@@ -1,0 +1,11 @@
+--- configure.orig	2011-05-17 22:54:24.000000000 +0200
++++ configure	2011-05-17 22:51:35.000000000 +0200
+@@ -7373,7 +7373,7 @@
+ 			fi
+ 		fi
+ 		;;
+-	Linux*|GNU*|QNX*) LDSHARED='$(CC) -shared';;
++	Linux*|GNU*|QNX*) LDSHARED='$(CC) -shared -Wl,-rpath,/usr/local/python26/lib';;
+ 	BSD/OS*/4*) LDSHARED="gcc -shared";;
+ 	FreeBSD*)
+ 		if [ "`$CC -dM -E - </dev/null | grep __ELF__`" != "" ]
