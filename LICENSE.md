@@ -1,7 +1,7 @@
 LICENSE
 =====
 
-Copyright (c) 2011, Sébastien Erard
+Copyright (c) 2011, Sebastien Erard
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
