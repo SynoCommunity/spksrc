@@ -23,4 +23,4 @@ If you find a bug please report it or it'll never get fixed. Verify that it hasn
 ## License
 When not explicitly set, files are placed under a [3 clause BSD license][bsd3clause].
 
-[bsd3clause][http://www.opensource.org/licenses/BSD-3-Clause]
+[bsd3clause]: http://www.opensource.org/licenses/BSD-3-Clause
