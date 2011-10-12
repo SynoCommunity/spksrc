@@ -123,6 +123,25 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS)
 
 package: $(SPK_FILE_NAME)
 
+ifneq ($(PUBLISHING_URL),)
+ifneq ($(PUBLISHING_KEY),)
+publish: package
+	curl -H "Accept: text/plain" \
+	     -F "spk=@$(SPK_FILE_NAME);type=application/x-extension-spk" \
+	     -F "info=@$(WORK_DIR)/INFO;type=text/plain" \
+	     -F "publishingKey=$(PUBLISHING_KEY);type=text/plain" \
+	     $(PUBLISHING_URL)
+else
+publish:
+	@echo 'Set PUBLISHING_KEY to the publishing key of your spkrepo server'
+	@exit 1
+endif
+else
+publish:
+	@echo 'Set PUBLISHING_URL to the upload URL of your spkrepo server (http://<myhost>/spkrepo/upload)'
+	@exit 1
+endif
+
 
 ### Clean rules
 clean:
@@ -137,7 +156,15 @@ SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 
+.PHONY: publish-all-archs
+publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
+
 arch-%:
 	@$(MSG) Building package for arch $(subst arch-,,$@) 
 	@env $(MAKE) ARCH=$(subst arch-,,$@)
+
+publish-arch-%:
+	@$(MSG) Building and publishing package for arch $(subst publish-arch-,,$@) 
+	@env $(MAKE) ARCH=$(subst publish-arch-,,$@) publish
+
 	
