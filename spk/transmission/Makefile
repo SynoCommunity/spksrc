@@ -1,7 +1,7 @@
 
 SPK_NAME = transmission
-SPK_VERS = 2.40b3
-SPK_REV = 2
+SPK_VERS = 2.41
+SPK_REV = 3
 SPK_ICON = src/transmission.png
 
 DEPENDS = cross/$(SPK_NAME) cross/xzdec-static

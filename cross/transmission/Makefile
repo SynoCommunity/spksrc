@@ -1,9 +1,8 @@
 
 
 PKG_NAME = transmission
-PKG_VERS = 2.40b3
+PKG_VERS = 2.41
 PKG_EXT = tar.xz
-PKG_REV = 1
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.transmissionbt.com/files
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
