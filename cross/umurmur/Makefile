@@ -1,0 +1,22 @@
+
+
+PKG_NAME = umurmur
+PKG_VERS = 0.2.8
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://umurmur.googlecode.com/files
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+DEPENDS = cross/polarssl
+
+MAINTAINER = packages@packages.nas-forum.com
+HOMEPAGE   = http://code.google.com/p/umurmur/
+COMMENT    = Minimalistic Mumble server
+LICENSE    =
+
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS = 
+
+INSTALL_PREFIX  = /usr/local/$(PKG_NAME)
+
+include ../../mk/spksrc.cross-cc.mk
