@@ -7,7 +7,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://umurmur.googlecode.com/files
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/polarssl
+DEPENDS = cross/libconfig cross/protobuf-c cross/polarssl
 
 MAINTAINER = packages@packages.nas-forum.com
 HOMEPAGE   = http://code.google.com/p/umurmur/

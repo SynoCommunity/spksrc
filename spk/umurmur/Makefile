@@ -5,7 +5,7 @@ SPK_VERS = 0.2.8
 SPK_REV = 1
 SPK_ICON = src/umurmur.png
 
-DEPENDS = cross/libconfig cross/polarssl cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = packages@packages.nas-forum.com
 COMMENT    = Minimalistic Mumble server
