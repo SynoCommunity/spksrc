@@ -1,0 +1,43 @@
+--- Makefile.orig	2011-10-14 00:03:16.000000000 +0200
++++ Makefile	2011-10-14 00:04:24.000000000 +0200
+@@ -4,11 +4,13 @@
+ 
+ .SILENT:
+ 
++.PHONY: all
+ all:
+ 	cd library  && $(MAKE) all && cd ..
+ 	cd programs && $(MAKE) all && cd ..
+-	cd tests    && $(MAKE) all && cd ..
++	#cd tests    && $(MAKE) all && cd ..
+ 
++.PHONY: install
+ install:
+ 	mkdir -p $(DESTDIR)/include/polarssl
+ 	cp -r include/polarssl $(DESTDIR)/include
+@@ -25,18 +27,23 @@
+ 	    fi                                  \
+ 	done
+ 
++.PHONY: clean
+ clean:
+ 	cd library  && $(MAKE) clean && cd ..
+ 	cd programs && $(MAKE) clean && cd ..
+-	cd tests    && $(MAKE) clean && cd ..
++	#cd tests    && $(MAKE) clean && cd ..
+ 
++.PHONY: check
+ check:
+-	( cd tests && $(MAKE) check )
++	#( cd tests && $(MAKE) check )
++	@echo No check
+ 
++.PHONY: apidoc
+ apidoc:
+ 	mkdir -p apidoc
+ 	doxygen doxygen/polarssl.doxyfile
+ 
++.PHONY: apidoc_clean
+ apidoc_clean:
+ 	if [ -d apidoc ] ;			\
+ 	then				    	\
