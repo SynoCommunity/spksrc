@@ -16,5 +16,6 @@ COMMENT    = Code generator and runtime libraries to use Protocol Buffers from p
 LICENSE    = 
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-protoc
  
 include ../../mk/spksrc.cross-cc.mk
