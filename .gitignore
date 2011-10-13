@@ -1,2 +1,6 @@
 distrib
 packages
+native/*/work*
+cross/*/work*
+spk/*/work*
+toolchains/*/work*
