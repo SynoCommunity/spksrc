@@ -43,6 +43,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	  localFile=`basename $${url}` ; \
 	  if [ ! -f $${localFile} ]  ; \
 	  then \
+	    url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
 	    echo "wget $${url}" ; \
 	  	wget -nv -O $${localFile} $${url} ; \
 	  fi ; \

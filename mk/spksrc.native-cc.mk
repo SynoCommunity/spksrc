@@ -13,11 +13,12 @@ URLS          = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
 NAME          = native-$(PKG_NAME) 
 COOKIE_PREFIX = $(PKG_NAME)-
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+DIST_EXT      = $(PKG_EXT)
 
 #####
 
 include ../../mk/spksrc.native-env.mk
-RUN = cd $(WORK_DIR)/$(PKG_DIR) && $(ENV)
+RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk

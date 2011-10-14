@@ -12,7 +12,7 @@ EXTRACT_CMD.tar.gz = tar xzpf $(DIST_FILE) -C $(WORK_DIR)
 EXTRACT_CMD.tar.bz2 = tar xjpf $(DIST_FILE) -C $(WORK_DIR)
 EXTRACT_CMD.tar.xz = tar xJpf $(DIST_FILE) -C $(WORK_DIR)
 
-EXTRACT_CMD = $(EXTRACT_CMD.$(PKG_EXT)) 
+EXTRACT_CMD = $(EXTRACT_CMD.$(DIST_EXT)) 
 
 
 EXTRACT_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)extract_done

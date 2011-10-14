@@ -11,14 +11,16 @@
 
 PWD := $(shell pwd)
 
-DISTRIB_DIR  = $(realpath $(PWD)/../../distrib)
-PACKAGES_DIR = $(realpath $(PWD)/../../packages)
+DISTRIB_DIR  = $(PWD)/../../distrib
+PACKAGES_DIR = $(PWD)/../../packages
 
 ifndef WORK_DIR
 WORK_DIR = $(PWD)/work$(ARCH_SUFFIX)
 endif
 
+ifndef INSTALL_DIR
 INSTALL_DIR = $(WORK_DIR)/install
+endif
 STAGING_DIR = $(WORK_DIR)/staging
 
 ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)

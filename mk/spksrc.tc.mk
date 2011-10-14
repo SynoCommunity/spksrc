@@ -1,98 +1,51 @@
 
 # Constants
-SHELL=sh -e
-DISTRIB_DIR = ../../distrib
-override WORK_DIR := $(shell pwd)/work
+SHELL := $(SHELL) -e
+default: all
 
-# Package dependend
-TC_DIST_FILE = $(DISTRIB_DIR)/$(TC_DIST_NAME)
+WORK_DIR := $(shell pwd)/work
+include ../../mk/spksrc.directories.mk
 
+
+# Configure the included makefiles
+URLS          = $(TC_DIST_SITE)/$(TC_DIST_NAME)
+NAME          = $(TC_NAME)
+COOKIE_PREFIX = $(TC_NAME)-
+DIST_FILE     = $(DISTRIB_DIR)/$(TC_DIST_NAME)
+DIST_EXT      = $(TC_EXT)
+
+#####
+
+RUN = cd $(WORK_DIR)/$(TC_BASE_DIR) && env $(ENV)
 MSG = echo "===>   "
 
-all: $(WORK_DIR) fetch checksum extract patch
+include ../../mk/spksrc.download.mk
 
-$(DISTRIB_DIR):
-	@mkdir $@
-$(WORK_DIR):
-	@mkdir $@
+checksum: download
+include ../../mk/spksrc.checksum.mk
 
-
-### Fetch rules
-.PHONY: fetch
-fetch: $(TC_DIST_FILE)
-
-ifneq ($(subst http://sourceforge.net/,,$(TC_DIST_SITE)),$(TC_DIST_SITE))
-FETCH_EXTRA_PARAM = "?use_mirror=autoselect"
-endif
-
-$(TC_DIST_FILE): $(DISTRIB_DIR)
-ifeq ($(wildcard $(TC_DIST_FILE)),)
-	@$(MSG) "Fetching $(TC_NAME)"
-	wget -O $@ $(TC_DIST_SITE)/$(TC_DIST_NAME)$(FETCH_EXTRA_PARAM)
-else
-	@true
-endif
-
-### Checksum rules
-.PHONY: checksum 
-checksum: $(TC_DIST_FILE)
-	@true
-
-
-### Extract rules
-EXTRACT_CMD.tar.gz = tar xzpf $(TC_DIST_FILE) -C $(WORK_DIR)
-EXTRACT_CMD.tgz = tar xzpf $(TC_DIST_FILE) -C $(WORK_DIR)
-EXTRACT_CMD.tar.bz2 = tar xjpf $(TC_DIST_FILE) -C $(WORK_DIR)
-EXTRACT_CMD.tar.xz = tar xJpf $(TC_DIST_FILE) -C $(WORK_DIR)
-
-EXTRACT_CMD = $(EXTRACT_CMD.$(TC_EXT)) 
-
-EXTRACT_COOKIE = $(WORK_DIR)/$(PKG_NAME).extract_done
-
-ifeq ($(wildcard $(EXTRACT_COOKIE)),)
 extract: checksum
-	@$(MSG) "Extracting for $(TC_NAME)"
-	$(EXTRACT_CMD)
-	@touch -f $(EXTRACT_COOKIE)
-else
-extract:
-	@true 
-endif
+include ../../mk/spksrc.extract.mk
 
-
-### Patch rules
-PATCH_COOKIE = $(WORK_DIR)/$(PKG_NAME).patch_done
-PATCHES = $(wildcard patches/*.patch)
-.PHONY: patch
 patch: extract
-ifeq ($(wildcard $(PATCH_COOKIE)),)
-patch: patch_msg
-ifeq ($(PATCH_TARGET),)
-ifneq ($(PATCHES),)
-patch: patch_effective
-endif
-else
-patch: $(PATCH_TARGET)
-endif
-patch: patch_cookie
-else
-patch:
-	@true 
-endif
+include ../../mk/spksrc.patch.mk
 
-.PHONY: patch_msg patch_effective patch_cookie
-patch_msg:
-	@$(MSG) "Patching $(TC_NAME)"
-patch_effective:
-	for patchfile in $(PATCHES) \
-	do \
-	  patch -C $(WORK_DIR) -p0 < $${patchfile} \
-	done 
-patch_cookie:
-	@touch -f $(PATCH_COOKIE)
+
+all: patch
 
 
 TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump
+
+CFLAGS  += $(TC_CFLAGS)
+CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
+
+CPPFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
+
+LDFLAGS += $(TC_LDFLAGS)
+LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
+LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
+LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
+
 
 .PHONY: tc_env
 tc_env: patch
@@ -101,8 +54,11 @@ tc_env: patch
 	  target=`echo $${tool} | sed 's/\(.*\):\(.*\)/\1/'` ; \
 	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
 	  echo `echo $${target} | tr [:lower:] [:upper:] `=$(WORK_DIR)/$(TC_BASE_DIR)/bin/$(TC_PREFIX)-$${source} ; \
-	done ; \
-
+	done
+	@echo CFLAGS=\"$(CFLAGS)\"
+	@echo CPPFLAGS=\"$(CPPFLAGS)\"
+	@echo LDFLAGS=\"$(LDFLAGS)\"
+	
 .PHONY: tc_configure_args
 tc_configure_args:
 	@echo --host=$(TC_TARGET) --build=i686-pc-linux

@@ -10,11 +10,17 @@ URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+DIST_EXT      = $(PKG_EXT)
+
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)
+TC = syno$(ARCH_SUFFIX)
+endif
 
 #####
 
 include ../../mk/spksrc.cross-env.mk
-RUN = cd $(WORK_DIR)/$(PKG_DIR) && $(ENV)
+RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk
@@ -29,11 +35,6 @@ include ../../mk/spksrc.extract.mk
 
 patch: extract
 include ../../mk/spksrc.patch.mk
-
-# TODO: Clean up this
-LDFLAGS  = -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
-LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
-export LDFLAGS
 
 configure: patch
 include ../../mk/spksrc.configure.mk
