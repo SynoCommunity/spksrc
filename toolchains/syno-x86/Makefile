@@ -10,7 +10,7 @@ TC_BASE_DIR = i686-linux-gnu
 TC_PREFIX = i686-linux-gnu
 TC_TARGET = i686-linux-gnu
 
-TC_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_CFLAGS =
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
