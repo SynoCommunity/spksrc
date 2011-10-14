@@ -17,7 +17,4 @@ LICENSE    =
 
 GNU_CONFIGURE = 1
 
-
-PC_FILES = libcurl.pc
-
 include ../../mk/spksrc.cross-cc.mk

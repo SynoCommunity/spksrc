@@ -17,6 +17,4 @@ LICENSE=	zlib-license
 
 CONFIGURE_ARGS = --shared --prefix=$(INSTALL_PREFIX)
 
-PC_FILES = zlib.pc
-
 include ../../mk/spksrc.cross-cc.mk

@@ -19,8 +19,6 @@ CONFIGURE_TARGET = myConfigure
 
 INSTALL_TARGET = myInstall
 
-PC_FILES = openssl.pc libcrypto.pc libssl.pc
-
 STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
