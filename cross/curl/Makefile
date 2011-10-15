@@ -17,4 +17,11 @@ LICENSE    =
 
 GNU_CONFIGURE = 1
 
+POST_INSTALL_TARGET = correct-curl-config
+
 include ../../mk/spksrc.cross-cc.mk
+
+
+.PHONY: correct-curl-config
+correct-curl-config:
+	sed -i.orig 's#prefix=/#prefix=$(INSTALL_DIR)/#' $(STAGING_INSTALL_PREFIX)/bin/curl-config

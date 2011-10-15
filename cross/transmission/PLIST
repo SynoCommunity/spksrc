@@ -5,4 +5,3 @@ bin:bin/transmission-edit
 bin:bin/transmission-remote
 bin:bin/transmission-show
 rsc:share/transmission
-

@@ -35,7 +35,7 @@ $(WORK_DIR)/package.tgz: strip
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && tar cpzf $@ *)
 
-$(WORK_DIR)/INFO: Makefile
+$(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\"  > $@

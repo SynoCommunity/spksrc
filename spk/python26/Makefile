@@ -4,14 +4,18 @@ SPK_VERS = 2.6.6
 SPK_REV = 5
 SPK_ICON = src/python.png
 
-DEPENDS = cross/$(SPK_NAME) cross/xzdec-static
+DEPENDS  = cross/$(SPK_NAME)
+DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc 
+DEPENDS += cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
-HOMEPAGE   = http://www.python.org/
 COMMENT    = Python Programming Language
-LICENSE    =
 ADMIN_PORT = 
 RELOAD_UI = yes
+DISPLAY_NAME = Python 2.6
+
+HOMEPAGE   = http://www.python.org/
+LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

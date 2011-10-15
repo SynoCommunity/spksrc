@@ -1,0 +1,13 @@
+lib:lib/python2.6/site-packages/Crypto/Cipher/AES.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/ARC2.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/ARC4.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/Blowfish.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/CAST.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/DES3.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/DES.so
+lib:lib/python2.6/site-packages/Crypto/Cipher/XOR.so
+lib:lib/python2.6/site-packages/Crypto/Hash/MD2.so
+lib:lib/python2.6/site-packages/Crypto/Hash/MD4.so
+lib:lib/python2.6/site-packages/Crypto/Hash/SHA256.so
+lib:lib/python2.6/site-packages/Crypto/Util/_counter.so
+lib:lib/python2.6/site-packages/Crypto/Util/strxor.so
