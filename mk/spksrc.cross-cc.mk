@@ -51,11 +51,16 @@ cat_PLIST:
 	do                          \
 	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
 	done
-	@cat PLIST
+	@if [ -f PLIST ] ; \
+	then \
+	  cat PLIST ; \
+	else \
+	  $(MSG) "No PLIST for $(NAME)" >&2; \
+	fi
 
 ### Clean rules
 clean:
-	rm -fr $(WORK_DIR)
+	rm -fr work work-*
 	
 all: install
 	
