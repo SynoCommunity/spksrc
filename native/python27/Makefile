@@ -1,7 +1,7 @@
 
 
-PKG_NAME = python26
-PKG_VERS = 2.6.6
+PKG_NAME = python27
+PKG_VERS = 2.7.2
 PKG_EXT = tar.bz2
 PKG_REV = 1
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)

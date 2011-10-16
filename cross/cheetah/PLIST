@@ -1,4 +1,4 @@
 rsc:bin/cheetah
 rsc:bin/cheetah-analyze
 rsc:bin/cheetah-compile
-lib:lib/python2.6/site-packages/Cheetah/_namemapper.so
+lib:@PYTHON_SITE_PACKAGES@/Cheetah/*.so

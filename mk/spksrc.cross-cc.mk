@@ -61,6 +61,5 @@ cat_PLIST:
 ### Clean rules
 clean:
 	rm -fr work work-*
-	
+
 all: install
-	

@@ -1,7 +1,7 @@
 
-SPK_NAME = python26
-SPK_VERS = 2.6.6
-SPK_REV = 5
+SPK_NAME = python27
+SPK_VERS = 2.7.2
+SPK_REV = 1
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -12,7 +12,7 @@ MAINTAINER = superzebulon@superzebulon.org
 COMMENT    = Python Programming Language
 ADMIN_PORT = 
 RELOAD_UI = yes
-DISPLAY_NAME = Python 2.6
+DISPLAY_NAME = Python 2.7
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
@@ -22,7 +22,7 @@ SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-PYTHON_LIB_DIR = lib/python2.6
+PYTHON_LIB_DIR = lib/python2.7
 
 PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"
 

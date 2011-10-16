@@ -1,3 +1,2 @@
-lib:lib/python2.6/site-packages/OpenSSL/crypto.so
-lib:lib/python2.6/site-packages/OpenSSL/rand.so
-lib:lib/python2.6/site-packages/OpenSSL/SSL.so
+lib:@PYTHON_SITE_PACKAGES@/OpenSSL/*.so
+

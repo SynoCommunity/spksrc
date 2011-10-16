@@ -1,0 +1,3 @@
+bin:bin/python
+rsc:lib/python2.7
+lib:lib/python2.7/lib-dynload/*.so

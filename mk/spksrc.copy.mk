@@ -43,7 +43,7 @@ copy_msg:
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
-	tar cpf - -C $(INSTALL_DIR)/$(INSTALL_PREFIX) `cat $(INSTALL_PLIST)| cut -d':' -f2` | \
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
 
 post_copy_target: $(COPY_TARGET)
@@ -58,9 +58,20 @@ else
 copy: ;
 endif
 
+ifeq ($(strip $(PLIST_TRANSFORM)),)
+PLIST_TRANSFORM= cat
+endif
+
 $(INSTALL_PLIST):
-	@(for depend in $(DEPENDS) ; \
-	do                          \
-	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$${depend} cat_PLIST ; \
-	done ; \
-	cat PLIST) | sort -u > $@
+	@(\
+	  for depend in $(DEPENDS) ; \
+	  do                          \
+	    $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$${depend} cat_PLIST ; \
+	  done ; \
+	  if [ -f PLIST ] ; \
+	  then \
+	    cat PLIST ; \
+	  else \
+	    $(MSG) "No PLIST for $(NAME)" >&2; \
+	  fi \
+	) | $(PLIST_TRANSFORM) | sort -u > $@
