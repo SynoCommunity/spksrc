@@ -1,10 +1,10 @@
 
 TC_NAME = syno-88f628x
 
-TC_DIST_NAME = gcc421_glibc25_88f628x.tgz
+TC_DIST_NAME = gcc421_glibc25_88f6281-GPL.tgz
 
 TC_EXT = tgz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%203.1%20Tool%20Chains/Marvell%2088F628x%20Linux%202.6.32
+TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%203.2%20Tool%20Chains/Marvell%2088F628x%20Linux%202.6.32
 
 TC_BASE_DIR = arm-none-linux-gnueabi
 TC_PREFIX = arm-none-linux-gnueabi
