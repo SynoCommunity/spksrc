@@ -1,8 +1,5 @@
-
-# Constants
-SHELL=sh -e
-default: all
-
+# Common makefiles
+include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Force build in native tool directrory, not cross directory.
@@ -18,8 +15,6 @@ DIST_EXT      = $(PKG_EXT)
 #####
 
 include ../../mk/spksrc.native-env.mk
-RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
-MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk
 

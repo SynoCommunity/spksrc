@@ -4,3 +4,4 @@ native/*/work*
 cross/*/work*
 spk/*/work*
 toolchains/*/work*
+local.mk

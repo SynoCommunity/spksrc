@@ -1,8 +1,5 @@
-
-# Constants
-SHELL := $(SHELL) -e
-default: all
-
+# Common makefiles
+include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
@@ -20,8 +17,6 @@ endif
 #####
 
 include ../../mk/spksrc.cross-env.mk
-RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
-MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk
 

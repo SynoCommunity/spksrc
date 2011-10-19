@@ -1,6 +1,6 @@
-# Constants
-SHELL := $(SHELL) -e
-default: all
+# Common makefiles
+include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.directories.mk
 
@@ -18,7 +18,6 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)$(ARCH_SUFFIX)-$(SPK_VERS)-$(SPK_REV)
 
 # Even though this makefile doesn't cross compile, we need this to setup the cross environment.
 include ../../mk/spksrc.cross-env.mk
-MSG = echo "===>   "
 
 include ../../mk/spksrc.depend.mk
 
