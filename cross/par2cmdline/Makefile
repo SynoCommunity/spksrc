@@ -17,6 +17,7 @@ LICENSE=	GPL
 GNU_CONFIGURE = 1
 
 PATCH_TARGET = myPatch
+POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -25,4 +26,15 @@ myPatch:
 	@$(RUN) tail -n +48 debian/patches/000_unidentified.diff | patch
 	@$(RUN) cat debian/patches/002-gcc_40_fixes.patch | patch
 	@$(RUN) cat debian/patches/003_fix_crash_in_quiet_mode.patch | patch
-	
+
+PAR2_TOOLS = par2create par2repair par2verify
+
+myPostInstall:
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin ; \
+	  for tool in $(PAR2_TOOLS); \
+	  do \
+	    rm $${tool} ; \
+	    ln -sf par2 $${tool} ; \
+	   done \
+	 )
+
