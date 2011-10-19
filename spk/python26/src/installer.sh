@@ -16,14 +16,14 @@ postinst ()
     mkdir -p ${INSTALL_PREFIX}
 
     # Extract the files to the installation ditectory
-    ${SYNOPKG_PKGDEST}/sbin/xzdec-$arch -c ${SYNOPKG_PKGDEST}/package.txz | \
+    ${SYNOPKG_PKGDEST}/sbin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
         tar xpf - -C ${INSTALL_PREFIX}
     # Remove the installer archive to save space
     rm ${SYNOPKG_PKGDEST}/package.txz
 
     # Install xzdec for the companion tools installation
-    cp ${SYNOPKG_PKGDEST}/sbin/xzdec ${INSTALL_PREFIX}/bin/xzdec 
-    
+    cp ${SYNOPKG_PKGDEST}/sbin/xzdec ${INSTALL_PREFIX}/bin/xzdec
+
     # Byte-compile the python distribution
     ${INSTALL_PREFIX}/bin/python -m compileall -q -f ${INSTALL_PREFIX}/lib/python2.6
     ${INSTALL_PREFIX}/bin/python -OO -m compileall -q -f ${INSTALL_PREFIX}/lib/python2.6
