@@ -1,10 +1,10 @@
 
-SPK_NAME = python26
+SPK_NAME = Python26
 SPK_VERS = 2.6.6
 SPK_REV = 5
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python26
 DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc 
 DEPENDS += cross/xzdec-static
 
@@ -21,7 +21,7 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS = 
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+INSTALL_PREFIX = /usr/local/python26
 PYTHON_LIB_DIR = lib/python2.6
 
 PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"

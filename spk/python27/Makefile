@@ -1,10 +1,10 @@
 
-SPK_NAME = python27
+SPK_NAME = Python27
 SPK_VERS = 2.7.2
 SPK_REV = 1
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python27
 DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc 
 DEPENDS += cross/xzdec-static
 
@@ -21,7 +21,7 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS = 
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+INSTALL_PREFIX = /usr/local/python27
 PYTHON_LIB_DIR = lib/python2.7
 
 PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"
