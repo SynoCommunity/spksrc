@@ -1,5 +1,5 @@
 
-TC_NAME = syno-88f628x
+TC_NAME = syno-88f6281
 
 TC_DIST_NAME = gcc421_glibc25_88f6281-GPL.tgz
 
