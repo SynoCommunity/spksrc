@@ -31,7 +31,7 @@ postinst ()
 	mkdir -p /usr/local/sslh/bin
 
 	# Create symlink
-	ln -s ${SYNOPKG_PKGDEST}/bin/sslh-$arch /usr/local/sslh/bin/sslh
+	ln -s ${SYNOPKG_PKGDEST}/bin/sslh /usr/local/sslh/bin/sslh
 	ln -s ${SYNOPKG_PKGDEST}/bin/generate_log.pl /usr/local/sslh/bin/generate_log.pl
 	ln -s ${SYNOPKG_PKGDEST}/log /usr/local/sslh/log
 	ln -s ${SYNOPKG_PKGDEST}/sslh.ini /usr/local/sslh/sslh.ini
