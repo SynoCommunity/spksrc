@@ -2,8 +2,6 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-include ../../mk/spksrc.directories.mk
-
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
@@ -46,10 +44,18 @@ ifneq ($(strip $(ARCH)),)
 else
 	@echo arch=\"noarch\" >> $@
 endif
+ifneq ($(strip $(FIRMWARE)),)
+	@echo firmware=\"$(FIRMWARE)\" >> $@
+else
+	@echo firmware=\"3.0-1593\" >> $@
+endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(ADMIN_PORT)),)
 	@echo adminport=$(ADMIN_PORT) >> $@
+endif
+ifneq ($(strip $(SPK_DEPENDS)),)
+	@echo install_dep_packages=\"$(SPK_DEPENDS)\" >> $@
 endif
 ifneq ($(strip $(SPK_ICON)),)
 	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 -transparent white - | base64 -w0 -`\" >> $@
@@ -70,7 +76,7 @@ DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
 
 define dsm_script_redirect
 $(create_target_dir)
-echo Creating $@
+$(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
 echo 'PATH=/bin:/usr/bin' >> $@
 echo '. `dirname $$0`/installer' >> $@
@@ -80,7 +86,7 @@ endef
 
 define dsm_script
 $(create_target_dir)
-echo Creating $@
+$(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
 echo 'PATH=/bin:/usr/bin' >> $@
 echo '. `dirname $$0`/installer' >> $@
@@ -90,7 +96,7 @@ endef
 
 define dsm_script_copy
 $(create_target_dir)
-echo Creating $@
+$(MSG) "Creating $@"
 cp $< $@
 chmod 755 $@
 endef
@@ -110,7 +116,7 @@ $(DSM_SCRIPTS_DIR)/postupgrade:
 
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT) 
 	@$(dsm_script_copy)
-$(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT) 
+$(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
 	@$(dsm_script_copy)
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS)) 
 	@$(dsm_script_copy)
@@ -118,7 +124,7 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 
 $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS)
 	$(create_target_dir)
-	(cd $(WORK_DIR) && tar cpf $@ package.tgz INFO scripts)
+	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root package.tgz INFO scripts)
 
 package: $(SPK_FILE_NAME)
 
