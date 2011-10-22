@@ -3,7 +3,6 @@
 PKG_NAME = protobuf-c
 PKG_VERS = 0.15
 PKG_EXT = tar.gz
-PKG_REV = 1
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://protobuf-c.googlecode.com/files
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)

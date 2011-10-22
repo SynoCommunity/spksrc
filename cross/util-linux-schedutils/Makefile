@@ -2,7 +2,6 @@
 PKG_NAME = util-linux-schedutils
 PKG_VERS = 2.20
 PKG_EXT = tar.bz2
-PKG_REV = 1
 PKG_DIST_NAME = util-linux-$(PKG_VERS).$(PKG_EXT)
 #PKG_DIST_SITE = ftp://ftp.kernel.org/pub/linux/utils/util-linux
 PKG_DIST_SITE = http://mirror.be.gbxs.net/pub/linux/utils/util-linux/v$(PKG_VERS)

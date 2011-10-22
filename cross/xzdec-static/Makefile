@@ -3,7 +3,6 @@
 PKG_NAME = xzdec-static
 PKG_VERS = 5.0.3
 PKG_EXT = tar.xz
-PKG_REV = 1
 PKG_DIST_NAME = xz-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://tukaani.org/xz
 PKG_DIR = xz-$(PKG_VERS)

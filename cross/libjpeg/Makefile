@@ -3,7 +3,6 @@
 PKG_NAME = libjpeg
 PKG_VERS = 8c
 PKG_EXT = tar.gz
-PKG_REV = 1
 PKG_DIST_NAME = jpegsrc.v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ijg.org/files
 PKG_DIR = jpeg-$(PKG_VERS)
