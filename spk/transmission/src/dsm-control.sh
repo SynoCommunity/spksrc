@@ -2,17 +2,15 @@
 
 PATH=/bin:/usr/bin
 
-TRDIR="/usr/local/transmission"
-TREXE="$TRDIR/bin/transmission-daemon"
-TRVAR="$TRDIR/var"
+TREXE="/usr/local/transmission/bin/transmission-daemon"
+TRVAR="/usr/local/var/transmission"
 TRPID="$TRVAR/transmission.pid"
-TRCFG="/usr/local/etc/transmission.cfg"
 RUNAS="transmission"
 
 start_daemon ()
 {
     # Launch transmission in the background.
-    su $RUNAS -s /bin/sh -c "$TREXE -g $TRVAR -x $TRPID"
+    su - $RUNAS -c "$TREXE -g $TRVAR -x $TRPID"
 
     # Wait until transmission is ready (race condition here).
     counter=5
@@ -61,20 +59,8 @@ daemon_status ()
 
 run_in_console ()
 {
-    su $RUNAS -s /bin/sh -c "$TREXE -g $TRVAR -f"
+    su - $RUNAS -c "$TREXE -g $TRVAR -f"
 }
-
-do_settings ()
-{
-    su $RUNAS -s /bin/sh -c "$TREXE -g $TRVAR -d 2> $TRVAR/new.settings.json"
-    mv $TRVAR/new.settings.json $TRVAR/settings.json
-}
-
-# Load the transmission config file if it exists
-if [ -e $TRCFG ]
-then
-    . $TRCFG
-fi
 
 case $1 in
     start)
@@ -121,10 +107,6 @@ case $1 in
         ;;
     console)
         run_in_console
-        exit $?
-        ;;
-    settings)
-        do_settings
         exit $?
         ;;
     *)

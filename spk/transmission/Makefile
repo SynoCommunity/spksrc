@@ -1,10 +1,10 @@
 
 SPK_NAME = transmission
-SPK_VERS = 2.41
-SPK_REV = 3
+SPK_VERS = 2.42
+SPK_REV = 1
 SPK_ICON = src/transmission.png
 
-DEPENDS = cross/$(SPK_NAME) cross/xzdec-static
+DEPENDS = cross/$(SPK_NAME) cross/xzdec-static cross/busybox
 
 MAINTAINER = superzebulon@superzebulon.org
 COMMENT    = "A Fast, Easy, and Free BitTorrent Client"
@@ -36,12 +36,11 @@ xz-compress:
 	            $(STAGING_DIR)/share/synoman/Transmission-$${size}.png ; \
 	done	
 	mv $(STAGING_DIR)/bin/xzdec $(WORK_DIR)/xzdec
-	(cd $(STAGING_DIR) && tar cpJf $(WORK_DIR)/package.txz *)
+	(cd $(STAGING_DIR) && tar cpJf $(WORK_DIR)/package.txz --group=root --owner=root *)
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mv $(WORK_DIR)/package.txz $(STAGING_DIR)/
 	install -m 755 -d $(STAGING_DIR)/sbin
 	install -m 755 $(WORK_DIR)/xzdec $(STAGING_DIR)/sbin/
-	install -m 755 src/passgen.pl $(STAGING_DIR)/sbin/passgen
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/settings.json $(STAGING_DIR)/var/ 

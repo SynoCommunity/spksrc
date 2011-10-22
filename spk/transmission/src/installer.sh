@@ -1,9 +1,16 @@
 #!/bin/sh
 
-#Set PATH to avoid ipkg stuff
-PATH=/bin:/usr/bin:/usr/syno/sbin
+SYNO3APP="/usr/syno/synoman/webman/3rdparty"
+UPGRADE="/tmp/transmission.upgrade"
 
-INSTALL_PREFIX=/usr/local/transmission
+INSTALL_DIR="/usr/local/transmission"
+VAR_DIR="/usr/local/var/transmission"
+
+TR_UTILS="transmission-cli transmission-create transmission-edit \
+          transmission-remote transmission-show" 
+
+# Set PATH to avoid ipkg stuff
+PATH="${INSTALL_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin"
 
 preinst ()
 {
@@ -12,44 +19,68 @@ preinst ()
 
 postinst ()
 {
-    # Create the transmission user if needed
-    if synouser --enum local | grep ^transmission$ >/dev/null
-    then
-        true # the user exists, nothing to do
-    else
-        synouser --add transmission `${SYNOPKG_PKGDEST}/sbin/passgen 1 12` 'Transmission User' '' '' ''
-    fi
-
-    # Installation directory
-    mkdir -p ${INSTALL_PREFIX}
+    # Installation directories
+    mkdir -p ${INSTALL_DIR}
+    mkdir -p ${VAR_DIR}
     mkdir -p /usr/local/bin
 
-    # Extract the files to the installation ditectory
+    # Remove the DSM transmission user
+    if synouser --enum local | grep "^transmission$" >/dev/null
+    then
+    	# Keep the existing uid
+        uid=`grep transmission /etc/passwd | cut -d: -f3`
+        synouser --del transmission 2> /dev/null
+        UID_PARAM="-u ${uid}"
+    fi
+
+    # Extract the files to the installation directory
     ${SYNOPKG_PKGDEST}/sbin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
-        tar xpf - -C ${INSTALL_PREFIX}
+        tar xpf - -C ${INSTALL_DIR}
     # Remove the installer archive to save space
     rm ${SYNOPKG_PKGDEST}/package.txz
 
     # Create symlinks to utils
-    for bin in transmission-create transmission-edit transmission-remote transmission-show
+    for exe in ${TR_UTILS}
     do
-      ln -s ${INSTALL_PREFIX}/bin/$bin /usr/local/bin/$bin
+      ln -s ${INSTALL_DIR}/bin/${exe} /usr/local/bin/${exe}
     done
+    ln -s /var/packages/transmission/scripts/start-stop-status /usr/local/bin/transmission-ctl 
 
     # Install the application in the main interface.
-    if [ -d $SYNO3APP ]
+    if [ -d ${SYNO3APP} ]
     then
-        rm -f $SYNO3APP/transmission
-        ln -s ${INSTALL_PREFIX}/share/synoman $SYNO3APP/transmission
+        rm -f ${SYNO3APP}/transmission
+        ln -s ${INSTALL_DIR}/share/synoman ${SYNO3APP}/transmission
     fi
 
-    # Complete the configuration file
-    # /usr/local/etc/rc.d/transmission.sh is still not available
-    /var/packages/transmission/scripts/start-stop-status settings
+    # Copy the default configuration if needed
+    if [ -f ${VAR_DIR}/settings.json ]
+    then
+        true
+    else
+        # No config file, copy default one
+        cp ${SYNOPKG_PKGDEST}/var/settings.json ${VAR_DIR}/settings.json
+    fi
+
+    # Update the configuration file
+    ${INSTALL_DIR}/bin/transmission-daemon -g ${VAR_DIR}/ -d 2> ${VAR_DIR}/new.settings.json 
+    mv ${VAR_DIR}/new.settings.json ${VAR_DIR}/settings.json
+    chmod 600 ${VAR_DIR}/settings.json
+
+    # Install the adduser and deluser hardlinks
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
+    # Create the service transmission user if needed
+    if grep "^transmission:" /etc/passwd >/dev/null
+    then
+        true
+    else
+        adduser -h ${VAR_DIR} -g "Transmission User" -G users -D -H ${UID_PARAM} -s /bin/sh transmission
+    fi
 
     # Correct the files ownership    
-    chown -R transmission:users ${INSTALL_PREFIX} ${SYNOPKG_PKGDEST}/var
-    
+    chown -Rh transmission:users ${INSTALL_DIR} ${VAR_DIR}
+
     exit 0
 }
 
@@ -60,28 +91,30 @@ preuninst ()
 
 postuninst ()
 {
-    # Remove the application from the main interface if it was previously added.
-    if [ -h $SYNO3APP/transmission ]
+    if [ -f ${UPGRADE} ]
     then
-        rm $SYNO3APP/transmission
+        true # Keep the transmission user
+    else
+        # Remove the user, the user data and the settings
+        deluser transmission
+        rm -fr ${VAR_DIR}
+    fi
+
+    # Remove the application from the main interface if it was previously added.
+    if [ -h ${SYNO3APP}/transmission ]
+    then
+        rm ${SYNO3APP}/transmission
     fi
 
     # Remove symlinks to utils
-    for bin in transmission-create transmission-edit transmission-remote transmission-show
+    for exe in ${TR_UTILS}
     do
-      rm /usr/local/bin/$bin
+      rm /usr/local/bin/${exe}
     done
+    rm /usr/local/bin/transmission-ctl 
 
     # Remove the installation directory
-    rm -fr ${INSTALL_PREFIX}
-
-    if [ -f $isUpgrade ]
-    then
-        true # Keep the transmission user, as we are upgrading
-    else
-        # Remove the user
-        synouser --del transmission 2> /dev/null
-    fi
+    rm -fr ${INSTALL_DIR}
 
     exit 0
 }
@@ -89,21 +122,21 @@ postuninst ()
 preupgrade ()
 {
     # Make sure transmission is not running while we are upgrading
-    /usr/local/etc/rc.d/transmission.sh stop
-    touch $isUpgrade
+    /var/packages/transmission/scripts/start-stop-status stop
+    touch ${UPGRADE}
 
+    # Make sure the work dir exists
+    mkdir -p ${VAR_DIR}
     # Save current state before upgrade
-    upgradedir=/`echo ${SYNOPKG_PKGDEST} | cut -d/ -f2`/@tmp/transmission-upgrade/
-    mkdir -p $upgradedir
     if [ -d ${SYNOPKG_PKGDEST}/usr ]
     then
-        # Old installation scheme
-        cp -r ${SYNOPKG_PKGDEST}/usr/local/var/lib/transmission-daemon $upgradedir/var
+        # First installation scheme, copy to new
+        mv ${SYNOPKG_PKGDEST}/usr/local/var/lib/transmission-daemon/* ${VAR_DIR}/
     else
         if [ -d ${SYNOPKG_PKGDEST}/var ]
         then
-            # New installation scheme
-            cp -r ${SYNOPKG_PKGDEST}/var $upgradedir/var
+            # Second installation scheme, copy to new
+            mv ${SYNOPKG_PKGDEST}/var/* ${VAR_DIR}/
         fi
     fi
     exit 0
@@ -111,31 +144,22 @@ preupgrade ()
 
 postupgrade ()
 {
-    # Restore state
-    upgradedir=/`echo ${SYNOPKG_PKGDEST} | cut -d/ -f2`/@tmp/transmission-upgrade/
-    if [ -d $upgradedir/var ]
-    then
-        cp -r $upgradedir/var ${SYNOPKG_PKGDEST}/
-        chown -R transmission:users ${SYNOPKG_PKGDEST}/var
-    fi
-
     # Correct permission and ownership of download directory
-    downloadDir=`grep download-dir ${SYNOPKG_PKGDEST}/var/settings.json | cut -d'"' -f4`
-    if [ -n "$downloadDir" -a -d "$downloadDir" ]
+    downloadDir=`grep download-dir ${VAR_DIR}/settings.json | cut -d'"' -f4`
+    if [ -n "${downloadDir}" -a -d "${downloadDir}" ]
     then
-        chown -R transmission:users $downloadDir
-        chmod -R g+w $downloadDir
+        chown -Rh transmission:users ${downloadDir}
+        chmod -R g+w ${downloadDir}
     fi
 
     # Correct permission and ownership of incomplete directory
-    incompleteDir=`grep incomplete-dir ${SYNOPKG_PKGDEST}/var/settings.json | cut -d'"' -f4`
-    if [ -n "$incompleteDir" -a -d "$incompleteDir" ]
+    incompleteDir=`grep incomplete-dir ${VAR_DIR}/settings.json | cut -d'"' -f4`
+    if [ -n "${incompleteDir}" -a -d "${incompleteDir}" ]
     then
-        chown -R transmission:users $incompleteDir
+        chown -Rh transmission:users ${incompleteDir}
     fi
 
-    rm -fr $upgradedir
-    rm -f $isUpgrade
+    rm -f ${UPGRADE}
 
     exit 0
 }
