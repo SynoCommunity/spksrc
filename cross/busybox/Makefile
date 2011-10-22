@@ -29,9 +29,7 @@ $(error Busybox configuration file '$(BUSYBOX_CONFIG)' not found)
 endif
 endif
 
-ifneq ($(strip $(CC)),)
-CROSS_COMPILE = $(subst -gcc,-,$(CC))
-endif
+CROSS_COMPILE=$(shell echo $(ENV) | sed 's/.*CC=\(.*-\)gcc.*/\1/')
 
 myConfigure:
 	cp $(BUSYBOX_CONFIG_FILE) $(WORK_DIR)/$(PKG_DIR)/configs
