@@ -6,7 +6,7 @@ SPK_ICON = src/python.png
 
 DEPENDS  = cross/python27
 DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc 
-DEPENDS += cross/xzdec-static
+DEPENDS += cross/busybox cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
 COMMENT    = Python Programming Language
