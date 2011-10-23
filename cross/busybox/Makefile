@@ -29,7 +29,7 @@ $(error Busybox configuration file '$(BUSYBOX_CONFIG)' not found)
 endif
 endif
 
-CROSS_COMPILE=$(shell echo $(ENV) | sed 's/.*CC=\(.*-\)gcc.*/\1/')
+CROSS_COMPILE=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p')
 
 myConfigure:
 	cp $(BUSYBOX_CONFIG_FILE) $(WORK_DIR)/$(PKG_DIR)/configs
