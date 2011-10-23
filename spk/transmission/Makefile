@@ -40,7 +40,7 @@ xz-compress:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mv $(WORK_DIR)/package.txz $(STAGING_DIR)/
-	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 755 $(WORK_DIR)/xzdec $(STAGING_DIR)/sbin/
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 $(WORK_DIR)/xzdec $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/settings.json $(STAGING_DIR)/var/ 

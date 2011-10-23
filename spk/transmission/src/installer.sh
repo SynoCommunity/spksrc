@@ -42,7 +42,7 @@ postinst ()
     fi
 
     # Extract the files to the installation directory
-    ${SYNOPKG_PKGDEST}/sbin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
+    ${SYNOPKG_PKGDEST}/bin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
         tar xpf - -C ${INSTALL_DIR}
     # Remove the installer archive to save space
     rm ${SYNOPKG_PKGDEST}/package.txz
