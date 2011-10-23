@@ -15,8 +15,8 @@ COMMENT    = A Fast, Easy, and Free BitTorrent Client
 LICENSE    =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = ac_cv_prog_cxx_g=no ac_cv_prog_cc_g=no \
-                 --enable-daemon --disable-gtk --disable-nls\
+CONFIGURE_ARGS = HAVE_CXX=yes --disable-gtk --disable-nls \
+                 --enable-daemon --enable-utp \
                  --with-zlib=$(STAGING_INSTALL_PREFIX)
 
 INSTALL_PREFIX  = /usr/local/transmission
