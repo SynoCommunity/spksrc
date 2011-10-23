@@ -9,7 +9,7 @@ DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah c
 DEPENDS += cross/busybox cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
-COMMENT    = Python Programming Language
+COMMENT    = "Python Programming Language"
 ADMIN_PORT = 
 RELOAD_UI = yes
 DISPLAY_NAME = Python 2.7
@@ -18,7 +18,7 @@ HOMEPAGE   = http://www.python.org/
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SSS_SCRIPT       = 
 ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/python27
@@ -32,10 +32,11 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: xz-compress
 xz-compress:
-	for dir in config distutils idellib lib2to3 lib-tk ; \
+	for dir in distutils idellib lib2to3 lib-tk ; \
 	do \
 	  rm -rf $(STAGING_DIR)/$(PYTHON_LIB_DIR)/$${dir} ; \
 	done
+	rm $(STAGING_DIR)/$(PYTHON_LIB_DIR)/config/libpython*.a
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type d -regex '.*/[Tt]ests?' | xargs rm -fr
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' | xargs rm -f
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py' | xargs chmod 444
