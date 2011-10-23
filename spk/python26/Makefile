@@ -6,7 +6,7 @@ SPK_ICON = src/python.png
 
 DEPENDS  = cross/python26
 DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc 
-DEPENDS += cross/xzdec-static
+DEPENDS += cross/busybox cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
 COMMENT    = Python Programming Language
@@ -18,7 +18,7 @@ HOMEPAGE   = http://www.python.org/
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SSS_SCRIPT       = 
 ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/python26

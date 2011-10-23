@@ -1,9 +1,18 @@
 #!/bin/sh
 
-#Set PATH to avoid ipkg stuff
-PATH=/bin:/usr/bin
+#########################################
+# A few variables to make things readable
 
-INSTALL_PREFIX=/usr/local/python26
+# Package specific variables
+PACKAGE="python26"
+DNAME="Python 2.6"
+
+# Common variables
+INSTALL_DIR="/usr/local/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin" # Avoid ipkg commands
+
+#########################################
+# DSM package manager functions
 
 preinst ()
 {
@@ -13,20 +22,24 @@ preinst ()
 postinst ()
 {
     # Installation directory
-    mkdir -p ${INSTALL_PREFIX}
+    mkdir -p ${INSTALL_DIR}
+    mkdir -p /usr/local/bin
 
     # Extract the files to the installation ditectory
     ${SYNOPKG_PKGDEST}/sbin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
-        tar xpf - -C ${INSTALL_PREFIX}
+        tar xpf - -C ${INSTALL_DIR}
     # Remove the installer archive to save space
     rm ${SYNOPKG_PKGDEST}/package.txz
 
     # Install xzdec for the companion tools installation
-    cp ${SYNOPKG_PKGDEST}/sbin/xzdec ${INSTALL_PREFIX}/bin/xzdec
+    cp ${SYNOPKG_PKGDEST}/sbin/xzdec ${INSTALL_DIR}/bin/xzdec
+
+    # Install the adduser and deluser hardlinks
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Byte-compile the python distribution
-    ${INSTALL_PREFIX}/bin/python -m compileall -q -f ${INSTALL_PREFIX}/lib/python2.6
-    ${INSTALL_PREFIX}/bin/python -OO -m compileall -q -f ${INSTALL_PREFIX}/lib/python2.6
+    ${INSTALL_DIR}/bin/python -m compileall -q -f ${INSTALL_DIR}/lib/python2.6
+    ${INSTALL_DIR}/bin/python -OO -m compileall -q -f ${INSTALL_DIR}/lib/python2.6
 
     exit 0
 }
@@ -39,7 +52,7 @@ preuninst ()
 postuninst ()
 {
     # Remove the installation directory
-    rm -fr ${INSTALL_PREFIX}
+    rm -fr ${INSTALL_DIR}
 
     exit 0
 }
