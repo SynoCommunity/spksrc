@@ -1,16 +1,24 @@
 #!/bin/sh
 
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-UPGRADE="/tmp/transmission.upgrade"
+#########################################
+# A few variables to make things readable
 
-INSTALL_DIR="/usr/local/transmission"
-VAR_DIR="/usr/local/var/transmission"
-
+# Package specific variables
+PACKAGE="transmission"
+DNAME="Transmission"
 TR_UTILS="transmission-cli transmission-create transmission-edit \
           transmission-remote transmission-show" 
 
-# Set PATH to avoid ipkg stuff
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin"
+# Common variables
+INSTALL_DIR="/usr/local/${PACKAGE}"
+VAR_DIR="/usr/local/var/${PACKAGE}"
+UPGRADE="/tmp/${PACKAGE}.upgrade"
+PATH="${INSTALL_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin" # Avoid ipkg commands
+
+SYNO3APP="/usr/syno/synoman/webman/3rdparty"
+
+#########################################
+# DSM package manager functions
 
 preinst ()
 {
@@ -24,12 +32,12 @@ postinst ()
     mkdir -p ${VAR_DIR}
     mkdir -p /usr/local/bin
 
-    # Remove the DSM transmission user
-    if synouser --enum local | grep "^transmission$" >/dev/null
+    # Remove the DSM user
+    if synouser --enum local | grep "^${PACKAGE}$" >/dev/null
     then
     	# Keep the existing uid
-        uid=`grep transmission /etc/passwd | cut -d: -f3`
-        synouser --del transmission 2> /dev/null
+        uid=`grep ${PACKAGE} /etc/passwd | cut -d: -f3`
+        synouser --del ${PACKAGE} 2> /dev/null
         UID_PARAM="-u ${uid}"
     fi
 
@@ -44,13 +52,13 @@ postinst ()
     do
       ln -s ${INSTALL_DIR}/bin/${exe} /usr/local/bin/${exe}
     done
-    ln -s /var/packages/transmission/scripts/start-stop-status /usr/local/bin/transmission-ctl 
+    ln -s /var/packages/${PACKAGE}/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl 
 
     # Install the application in the main interface.
     if [ -d ${SYNO3APP} ]
     then
-        rm -f ${SYNO3APP}/transmission
-        ln -s ${INSTALL_DIR}/share/synoman ${SYNO3APP}/transmission
+        rm -f ${SYNO3APP}/${PACKAGE}
+        ln -s ${INSTALL_DIR}/share/synoman ${SYNO3APP}/${PACKAGE}
     fi
 
     # Copy the default configuration if needed
@@ -70,16 +78,16 @@ postinst ()
     # Install the adduser and deluser hardlinks
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create the service transmission user if needed
-    if grep "^transmission:" /etc/passwd >/dev/null
+    # Create the service user if needed
+    if grep "^${PACKAGE}:" /etc/passwd >/dev/null
     then
         true
     else
-        adduser -h ${VAR_DIR} -g "Transmission User" -G users -D -H ${UID_PARAM} -s /bin/sh transmission
+        adduser -h ${VAR_DIR} -g "${DNAME} User" -G users -D -H ${UID_PARAM} -s /bin/sh ${PACKAGE}
     fi
 
     # Correct the files ownership    
-    chown -Rh transmission:users ${INSTALL_DIR} ${VAR_DIR}
+    chown -Rh ${PACKAGE}:users ${INSTALL_DIR} ${VAR_DIR}
 
     exit 0
 }
@@ -91,19 +99,19 @@ preuninst ()
 
 postuninst ()
 {
+    # Keep the user data and settings during the upgrade
     if [ -f ${UPGRADE} ]
     then
-        true # Keep the transmission user
+        true 
     else
-        # Remove the user, the user data and the settings
-        deluser transmission
+        deluser ${PACKAGE}
         rm -fr ${VAR_DIR}
     fi
 
     # Remove the application from the main interface if it was previously added.
-    if [ -h ${SYNO3APP}/transmission ]
+    if [ -h ${SYNO3APP}/${PACKAGE} ]
     then
-        rm ${SYNO3APP}/transmission
+        rm ${SYNO3APP}/${PACKAGE}
     fi
 
     # Remove symlinks to utils
@@ -111,7 +119,7 @@ postuninst ()
     do
       rm /usr/local/bin/${exe}
     done
-    rm /usr/local/bin/transmission-ctl 
+    rm /usr/local/bin/${PACKAGE}-ctl 
 
     # Remove the installation directory
     rm -fr ${INSTALL_DIR}
@@ -121,8 +129,8 @@ postuninst ()
 
 preupgrade ()
 {
-    # Make sure transmission is not running while we are upgrading
-    /var/packages/transmission/scripts/start-stop-status stop
+    # Make sure the package is not running while we are upgrading it
+    /usr/local/bin/${PACKAGE}-ctl stop
     touch ${UPGRADE}
 
     # Make sure the work dir exists
