@@ -68,7 +68,9 @@ DSM_SCRIPTS_  = preinst postinst
 DSM_SCRIPTS_ += preuninst postuninst
 DSM_SCRIPTS_ += preupgrade postupgrade
 # SPK specific scripts
+ifneq ($(strip $(SSS_SCRIPT)),)
 DSM_SCRIPTS_ += start-stop-status
+endif
 DSM_SCRIPTS_ += installer
 DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
 
