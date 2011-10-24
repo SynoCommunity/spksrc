@@ -1,0 +1,95 @@
+#!/bin/sh
+
+PATH=/bin:/usr/bin:/usr/syno/bin
+
+WWW=/usr/local/tinyproxy/www
+TINYPROXY=/usr/local/tinyproxy/bin/tinyproxy
+SYNO3APP=/usr/syno/synoman/webman/3rdparty
+
+# Files
+TINYPROXYLOG=/usr/local/tinyproxy/log/tinyproxy-spk.log
+TINYPROXY_CONF=/usr/local/tinyproxy/tinyproxy.conf
+
+start_daemon ()
+{
+    echo `date`" : Starting Tinyproxy extension ..." >> $TINYPROXYLOG
+    $TINYPROXY -c $TINYPROXY_CONF
+
+    # Install the application in the main interface.
+    if [ -d $SYNO3APP ]
+    then
+		rm -f $SYNO3APP/tinyproxy
+		ln -s $WWW $SYNO3APP/tinyproxy
+    fi
+}
+
+stop_daemon ()
+{
+    echo `date`" : Stopping Tinyproxy..." >> $TINYPROXYLOG
+
+    PID=`ps | grep $TINYPROXY | grep -v grep |awk '{print $1}'`
+	if [ "$PID" != "" ]
+	then
+		echo `date`" : Stop Tinyproxy..." >> $TINYPROXYLOG
+		kill $PID
+	fi
+	
+    # Remove the application from the main interface if it was previously added.
+    if [ -h $SYNO3APP/tinyproxy ]
+    then
+		rm -f $SYNO3APP/tinyproxy
+    fi
+}
+
+daemon_status ()
+{
+	[ -h $SYNO3APP/tinyproxy ]
+}
+
+case $1 in
+    start)
+        if daemon_status
+        then
+            echo TINYPROXY daemon already running
+            exit 0
+        else
+            echo Starting TINYPROXY...
+            start_daemon
+            exit $?
+        fi
+        ;;
+    stop)
+        if daemon_status
+        then
+            echo Stopping TINYPROXY ...
+            stop_daemon
+            exit $?
+        else
+            echo TINYPROXY is not running
+            exit 0
+        fi
+        ;;
+    restart)
+        stop_daemon
+        start_daemon
+        exit $?
+        ;;
+    status)
+        if daemon_status
+        then
+            echo TINYPROXY is running
+            exit 0
+        else
+            echo TINYPROXY is not running
+            exit 1
+        fi
+        ;;
+	log)
+		/usr/local/tinyproxy/bin/generate_log.pl > /usr/local/tinyproxy/log/genlog
+		echo /usr/local/tinyproxy/log/genlog
+		exit 0
+		;;
+    *)
+        exit 1
+        ;;
+esac
