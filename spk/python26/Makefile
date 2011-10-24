@@ -47,5 +47,3 @@ xz-compress:
 	mkdir $(STAGING_DIR)/sbin
 	mv $(WORK_DIR)/xzdec $(STAGING_DIR)/sbin/
 	chmod 755 $(STAGING_DIR)/sbin/xzdec
-	cp src/passgen.pl $(STAGING_DIR)/sbin/passgen
-	chmod 755 $(STAGING_DIR)/sbin/passgen
