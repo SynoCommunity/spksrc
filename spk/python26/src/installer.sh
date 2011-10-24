@@ -9,7 +9,11 @@ DNAME="Python 2.6"
 
 # Common variables
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin" # Avoid ipkg commands
+VAR_DIR="/usr/local/var/${PACKAGE}"
+UPGRADE="/tmp/${PACKAGE}.upgrade"
+PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
+
+SYNO3APP="/usr/syno/synoman/webman/3rdparty"
 
 #########################################
 # DSM package manager functions
@@ -21,9 +25,9 @@ preinst ()
 
 postinst ()
 {
-    # Installation directory
+    # Installation directories
     mkdir -p ${INSTALL_DIR}
-    mkdir -p /usr/local/bin
+    mkdir -p ${VAR_DIR}/run
 
     # Extract the files to the installation ditectory
     ${SYNOPKG_PKGDEST}/sbin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
@@ -33,7 +37,6 @@ postinst ()
 
     # Install xzdec for the companion tools installation
     cp ${SYNOPKG_PKGDEST}/sbin/xzdec ${INSTALL_DIR}/bin/xzdec
-
     # Install the adduser and deluser hardlinks
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
@@ -46,6 +49,11 @@ postinst ()
 
 preuninst ()
 {
+    for ctl in ${VAR_DIR}/run/*-ctl
+    do
+        ${ctl} stop
+    done
+    
     exit 0
 }
 
@@ -53,6 +61,7 @@ postuninst ()
 {
     # Remove the installation directory
     rm -fr ${INSTALL_DIR}
+    rm -fr ${VAR_DIR}
 
     exit 0
 }

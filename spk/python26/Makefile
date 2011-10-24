@@ -9,7 +9,7 @@ DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah c
 DEPENDS += cross/busybox cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
-COMMENT    = Python Programming Language
+COMMENT    = "Python Programming Language"
 ADMIN_PORT = 
 RELOAD_UI = yes
 DISPLAY_NAME = Python 2.6
