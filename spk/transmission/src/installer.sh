@@ -13,7 +13,7 @@ TR_UTILS="transmission-cli transmission-create transmission-edit \
 INSTALL_DIR="/usr/local/${PACKAGE}"
 VAR_DIR="/usr/local/var/${PACKAGE}"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin" # Avoid ipkg commands
+PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
 
 SYNO3APP="/usr/syno/synoman/webman/3rdparty"
 
