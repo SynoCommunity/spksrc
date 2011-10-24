@@ -1,0 +1,12 @@
+{
+   ".url": {
+     "org.superzebulon.sabzndb": {
+       "title": "SABnzbd",
+       "desc": "SABnzbd Web UI",
+       "icon": "sab2-{0}.png",
+       "type": "url",
+       "url": "3rdparty/sabnzbd/sabnzbd.cgi",
+       "allUsers": true
+      }
+    }
+}
