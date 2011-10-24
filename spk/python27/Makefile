@@ -5,7 +5,7 @@ SPK_REV = 1
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/python27
-DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc 
+DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/busybox cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
@@ -48,5 +48,3 @@ xz-compress:
 	mkdir $(STAGING_DIR)/sbin
 	mv $(WORK_DIR)/xzdec $(STAGING_DIR)/sbin/
 	chmod 755 $(STAGING_DIR)/sbin/xzdec
-	cp src/passgen.pl $(STAGING_DIR)/sbin/passgen
-	chmod 755 $(STAGING_DIR)/sbin/passgen
