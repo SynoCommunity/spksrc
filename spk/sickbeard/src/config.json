@@ -1,0 +1,12 @@
+{
+  ".url": {
+    "org.superzebulon.sickbeard": {
+      "title": "Sick Beard",
+      "desc": "Sick Beard Web UI",
+      "icon": "sickbeard-{0}.png",
+      "type": "url",
+      "url": "3rdparty/sickbeard/sickbeard.cgi",
+      "allUsers": true
+    }
+  }
+}

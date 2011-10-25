@@ -1,0 +1,12 @@
+{
+  ".url": {
+    "org.superzebulon.headphones": {
+      "title": "Headphones",
+      "desc": "Headphones Web UI",
+      "icon": "headphones-{0}.png",
+      "type": "url",
+      "url": "3rdparty/headphones/headphones.cgi",
+      "allUsers": true
+    }
+  }
+}
