@@ -1,0 +1,86 @@
+#!/bin/sh
+
+PATH=/bin:/usr/bin:/usr/syno/bin
+
+SCP=/usr/local/scp/bin/scp
+SFTP=/usr/local/scp/bin/sftp
+
+# Files
+SCPLOG=/usr/local/scp/log/scp-spk.log
+
+start_daemon ()
+{
+    echo `date`" : Start SCP extension..." >> $SCPLOG
+    echo `date`" : Create SCP link..." >> $SCPLOG
+    ln -s $SCP /sbin/scp
+    echo `date`" : Create SFTP link..." >> $SCPLOG
+    ln -s $SFTP /sbin/sftp
+}
+
+stop_daemon ()
+{
+    echo `date`" : Stop SCP extension..." >> $SCPLOG
+    if [ -L /sbin/scp ]
+	then
+		echo `date`" : Remove SCP link..." >> $SCPLOG
+		rm /sbin/scp
+	fi
+    if [ -L /sbin/sftp ]
+	then
+		echo `date`" : Remove SFTP link..." >> $SCPLOG
+		rm /sbin/sftp
+	fi
+}
+
+daemon_status ()
+{
+	[ -L /sbin/scp ]
+}
+
+case $1 in
+    start)
+        if daemon_status
+        then
+            echo SCP extension is already enabled
+            exit 0
+        else
+            echo Starting SCP extension...
+            start_daemon
+            exit $?
+        fi
+        ;;
+    stop)
+        if daemon_status
+        then
+            echo Stopping SCP extension...
+            stop_daemon
+            exit $?
+        else
+            echo SCP extension is already disabled
+            exit 0
+        fi
+        ;;
+    restart)
+        stop_daemon
+        start_daemon
+        exit $?
+        ;;
+    status)
+        if daemon_status
+        then
+            echo SCP extension is enabled
+            exit 0
+        else
+            echo SCP extension is disabled
+            exit 1
+        fi
+        ;;
+	log)
+		/usr/local/scp/bin/generate_log.pl > /usr/local/scp/log/genlog
+		echo /usr/local/scp/log/genlog
+		exit 0
+		;;
+    *)
+        exit 1
+        ;;
+esac
