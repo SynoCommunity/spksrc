@@ -2,11 +2,11 @@
 
 PATH=/bin:/usr/bin:/usr/syno/bin
 
-SCP=/usr/local/scp/bin/scp
-SFTP=/usr/local/scp/bin/sftp
+SCP=/usr/local/openssh/bin/scp
+SFTP=/usr/local/openssh/bin/sftp
 
 # Files
-SCPLOG=/usr/local/scp/log/scp-spk.log
+SCPLOG=/usr/local/openssh/log/openssh-spk.log
 
 start_daemon ()
 {
@@ -76,8 +76,8 @@ case $1 in
         fi
         ;;
 	log)
-		/usr/local/scp/bin/generate_log.pl > /usr/local/scp/log/genlog
-		echo /usr/local/scp/log/genlog
+		/usr/local/openssh/bin/generate_log.pl > /usr/local/openssh/log/genlog
+		echo /usr/local/openssh/log/genlog
 		exit 0
 		;;
     *)

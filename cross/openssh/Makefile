@@ -14,13 +14,19 @@ HOMEPAGE=	http://www.openssh.com/
 COMMENT=	Open source version of SSH connectivity tools
 LICENSE=	
 
-GNU_CONFIGURE = 
-CONFIGURE_ARGS = 	--disable-lastlog --disable-utmp \
-						--disable-utmpx --disable-wtmp --disable-wtmpx \
- 						--with-zlib=$(STAGING_INSTALL_PREFIX) \
-                 	--with-ssl-dir=$(STAGING_INSTALL_PREFIX)
+DESTDIR = $(INSTALL_DIR)
 
-INSTALL_PREFIX  = /usr/local/$(PKG_NAME)
+CONFIGURE_TARGET = myConfigure
+INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) LD=/home/manu/github/spksrc/toolchains/syno-x86/work/i686-linux-gnu/bin/i686-linux-gnu-gcc LDFLAGS=" -L$(STAGING_INSTALL_PREFIX)/lib " CFLAGS=" -I$(STAGING_INSTALL_PREFIX)/include -O " ./configure 	--disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --with-zlib=$(STAGING_INSTALL_PREFIX) --with-ssl-dir=$(STAGING_INSTALL_PREFIX)
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+
 

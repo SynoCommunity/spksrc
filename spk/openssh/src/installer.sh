@@ -17,32 +17,24 @@
 # You should have received a copy of the GNU General Public License
 # along with syno-packager.  If not, see <http://www.gnu.org/licenses/>.
 
-# Find the CPU architecture
-synoinfo=`get_key_value /etc.defaults/synoinfo.conf unique`
-arch=`echo $synoinfo | cut -d_ -f2`
-UPGSSLH=/tmp/sslh.upgrade.lock
+UPGRADELOCK=/tmp/openssh.upgrade.lock
 
 preinst ()
 {
-	# Check if the architecture is supported (88f628x, ppc824x, ppc853x, x86)
-	if ! echo "|88f6281|ppc824x|ppc853x|x86|" | grep -q "$arch"; then
-		echo "Your architecture is not supported by this package. Architecture  : '$arch'. Synology info : '$synoinfo'. Required : 'x86'."
-		exit 1
-	fi
 	exit 0
 }
 
 postinst ()
 {
 	# Create the directory
-	mkdir -p /usr/local/scp
-	mkdir -p /usr/local/scp/bin
+	mkdir -p /usr/local/openssh
+	mkdir -p /usr/local/openssh/bin
 
 	# Create symlink
-	ln -s ${SYNOPKG_PKGDEST}/bin/scp-$arch /usr/local/scp/bin/scp
-	ln -s ${SYNOPKG_PKGDEST}/bin/sftp-$arch /usr/local/scp/bin/sftp
-	ln -s ${SYNOPKG_PKGDEST}/bin/generate_log.pl /usr/local/scp/bin/generate_log.pl
-	ln -s ${SYNOPKG_PKGDEST}/log /usr/local/scp/log
+	ln -s ${SYNOPKG_PKGDEST}/bin/scp /usr/local/openssh/bin/scp
+	ln -s ${SYNOPKG_PKGDEST}/bin/sftp /usr/local/openssh/bin/sftp
+	ln -s ${SYNOPKG_PKGDEST}/bin/generate_log.pl /usr/local/openssh/bin/generate_log.pl
+	ln -s ${SYNOPKG_PKGDEST}/log /usr/local/openssh/log
 
 	# Correct the files ownership
 	chown -R root:root ${SYNOPKG_PKGDEST}
@@ -62,7 +54,7 @@ preuninst ()
 postuninst ()
 {
 	# Remove symlink
-	rm -Rf /usr/local/scp
+	rm -Rf /usr/local/openssh
 
 	exit 0
 }

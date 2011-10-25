@@ -8,7 +8,7 @@ SPK_ICON = src/openssh.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = packages@packages.nas-forum.com
-COMMENT    = "Open source version of SSH connectivity tools"
+COMMENT    = "Open source version of SSH connectivity tools. Only scp and sftp are installed."
 RELOAD_UI = no
 DISPLAY_NAME = OpenSSH
 
@@ -22,6 +22,7 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PRE_COPY_TARGET = install-openssh
 COPY_TARGET = nop
+STRIP_TARGET = myStrip
 
 include ../../mk/spksrc.spk.mk
 
@@ -30,4 +31,10 @@ install-openssh:
 	install -m 755 -d $(STAGING_DIR)/log
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/*.pl $(STAGING_DIR)/bin/
-	install -m 755 $(INSTALL_DIR)/usr/local/openssh/bin/* $(STAGING_DIR)/bin/
+	install -m 755 $(INSTALL_DIR)/usr/local/bin/scp $(STAGING_DIR)/bin/
+	install -m 755 $(INSTALL_DIR)/usr/local/bin/sftp $(STAGING_DIR)/bin/
+
+.PHONY: myStrip 
+myStrip:
+	@$(RUN) $(STRIP) $(STAGING_DIR)/bin/scp
+	@$(RUN) $(STRIP) $(STAGING_DIR)/bin/sftp

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use File::Copy;
 
-if (open (IN,"/usr/local/tinyproxy/log/tinyproxy-spk.log")) {
+if (open (IN,"/usr/local/openssh/log/openssh-spk.log")) {
 	print "<table>";
 	while($l=<IN>) {
 		print "<tr>";
