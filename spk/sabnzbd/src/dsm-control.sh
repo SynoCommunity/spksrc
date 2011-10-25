@@ -11,11 +11,12 @@ PYTHON_VAR_DIR="/usr/local/var/python26"
 # Common variables
 INSTALL_DIR="/usr/local/${PACKAGE}"
 VAR_DIR="/usr/local/var/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
+PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
 
 RUNAS="${PACKAGE}"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 SABCFG="${VAR_DIR}/config.ini"
+LOG_FILE="${VAR_DIR}/logs/sabnzbd.log"
 
 # Get the connection info from SABnzbd's config.ini
 if [ -e ${PYTHON_DIR}/bin/python ]
@@ -87,7 +88,7 @@ daemon_status ()
 
 run_in_console ()
 {
-    su - ${RUNAS} -c "PATH=${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:$PATH $SABNZBD -f $SABCFG"
+    su - ${RUNAS} -c "PATH=${PATH} ${SABNZBD} -f ${SABCFG}"
 }
 
 case $1 in
@@ -132,6 +133,10 @@ case $1 in
     console)
         run_in_console
         exit $?
+        ;;
+    log)
+        echo ${LOG_FILE}
+        exit 0
         ;;
     *)
         exit 1

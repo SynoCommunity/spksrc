@@ -12,7 +12,9 @@ PYTHON_DIR="/usr/local/python26"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 VAR_DIR="/usr/local/var/${PACKAGE}"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/sbin" # Avoid ipkg commands
+PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
+
+SYNOUSER="/usr/syno/sbin/synouser"
 
 SYNO3APP="/usr/syno/synoman/webman/3rdparty"
 
@@ -32,11 +34,11 @@ postinst ()
     mkdir -p /usr/local/bin
 
     # Remove the DSM user
-    if synouser --enum local | grep "^${PACKAGE}$" >/dev/null
+    if ${SYNOUSER} --enum local | grep "^${PACKAGE}$" >/dev/null
     then
     	# Keep the existing uid
         uid=`grep ${PACKAGE} /etc/passwd | cut -d: -f3`
-        synouser --del ${PACKAGE} 2> /dev/null
+        ${SYNOUSER} --del ${PACKAGE} 2> /dev/null
         UID_PARAM="-u ${uid}"
     fi
 
@@ -87,6 +89,9 @@ postinst ()
 
 preuninst ()
 {
+    # Make sure the package is not running while we are removing it.
+    /usr/local/bin/${PACKAGE}-ctl stop
+
     exit 0
 }
 
@@ -118,11 +123,16 @@ postuninst ()
 
 preupgrade ()
 {
-    # Make sure the package is not running while we are upgrading it
-    /usr/local/bin/${PACKAGE}-ctl stop
-    touch ${UPGRADE}
+    # The package manager only check the version when installing, not upgrading. So do it here the old way.
+    if [ -e ${PYTHON_DIR}/bin/adduser ]
+    then
+        touch ${UPGRADE}
+    else
+        echo "Please uppdate Python26 before updating this package"
+        false
+    fi
 
-    exit 0
+    exit $?
 }
 
 postupgrade ()
