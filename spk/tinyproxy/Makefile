@@ -21,11 +21,9 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PRE_COPY_TARGET = install-tinyproxy
-COPY_TARGET = copy_target_tinyproxy
+COPY_TARGET = nop
 
 include ../../mk/spksrc.spk.mk
-
-copy_target_tinyproxy:
 
 .PHONY: install-tinyproxy
 install-tinyproxy:
