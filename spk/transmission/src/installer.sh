@@ -15,6 +15,8 @@ VAR_DIR="/usr/local/var/${PACKAGE}"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
 PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
 
+SYNOUSER="/usr/syno/sbin/synouser"
+
 SYNO3APP="/usr/syno/synoman/webman/3rdparty"
 
 #########################################
@@ -33,11 +35,11 @@ postinst ()
     mkdir -p /usr/local/bin
 
     # Remove the DSM user
-    if synouser --enum local | grep "^${PACKAGE}$" >/dev/null
+    if ${SYNOUSER} --enum local | grep "^${PACKAGE}$" >/dev/null
     then
     	# Keep the existing uid
         uid=`grep ${PACKAGE} /etc/passwd | cut -d: -f3`
-        synouser --del ${PACKAGE} 2> /dev/null
+        ${SYNOUSER} --del ${PACKAGE} 2> /dev/null
         UID_PARAM="-u ${uid}"
     fi
 

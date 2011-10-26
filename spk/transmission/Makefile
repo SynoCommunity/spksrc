@@ -1,7 +1,7 @@
 
 SPK_NAME = transmission
 SPK_VERS = 2.42
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/transmission.png
 
 DEPENDS = cross/$(SPK_NAME) cross/xzdec-static cross/busybox
