@@ -23,7 +23,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) LD=/home/manu/github/spksrc/toolchains/syno-x86/work/i686-linux-gnu/bin/i686-linux-gnu-gcc LDFLAGS=" -L$(STAGING_INSTALL_PREFIX)/lib " CFLAGS=" -I$(STAGING_INSTALL_PREFIX)/include -O " ./configure 	--disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --with-zlib=$(STAGING_INSTALL_PREFIX) --with-ssl-dir=$(STAGING_INSTALL_PREFIX)
+	@$(RUN) LD=$(CC) LDFLAGS=" -L$(STAGING_INSTALL_PREFIX)/lib " CFLAGS=" -I$(STAGING_INSTALL_PREFIX)/include -O " ./configure $(TC_CONFIGURE_ARGS)	--disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-strip --with-zlib=$(STAGING_INSTALL_PREFIX) --with-ssl-dir=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: myInstall
 myInstall:
