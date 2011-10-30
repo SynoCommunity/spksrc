@@ -1,7 +1,7 @@
 
 SPK_NAME = Headphones
 SPK_VERS = 3.1
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/headphone.png
 
 DEPENDS  = 

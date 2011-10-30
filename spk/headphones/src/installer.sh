@@ -48,7 +48,7 @@ postinst ()
     # Remove the installer archive to save space
     rm ${SYNOPKG_PKGDEST}/package.txz
 
-    ln -s /var/packages/CouchPotato/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl 
+    ln -s /var/packages/Headphones/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl 
 
     # Install the application in the main interface.
     if [ -d ${SYNO3APP} ]
