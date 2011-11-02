@@ -1,0 +1,12 @@
+bin:bin/captoinfo
+bin:bin/clear
+bin:bin/infocmp
+bin:bin/infotocap
+rsc:bin/ncurses5-config
+bin:bin/reset
+bin:bin/tabs
+bin:bin/tic
+bin:bin/toe
+bin:bin/tput
+bin:bin/tset
+rsc:share/tabset
