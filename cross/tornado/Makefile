@@ -26,11 +26,6 @@ include ../../mk/spksrc.cross-cc.mk
 # Fetch python definition (provides HOSTPYTHON)
 include $(WORK_DIR)/python-cc.mk
 
-myConfigure:
-	@$(RUN) grep -v 'from tempfile import mktemp' < cheetah/FileUtils.py > FileUtils.py
-	@$(RUN) sed -i.orig SetupTools.py \
-	            -e 's/from cheetah.FileUtils import findFiles/from FileUtils import findFiles/'
-
 myCompile:
 	@$(RUN) $(HOSTPYTHON) setup.py build
 
