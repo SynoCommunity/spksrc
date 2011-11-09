@@ -7,8 +7,7 @@ CONFIG_DIR="/usr/local/var/openvpn"
 CONF_FILE="/usr/local/var/openvpn/client.conf"
 DAEMONARG="--daemon openvpn"
 PIDFILE="/usr/local/var/openvpn/openvpn.pid"
-LOG_FILE="/usr/local/var/openvpn/log/openvpn.log"
-
+LOG_FILE="/usr/local/var/openvpn/openvpn.log"
 
 test -x $DAEMON || exit 0
 test -d $CONFIG_DIR || exit 0
@@ -53,7 +52,7 @@ start_daemon ()
     echo -n "Starting openvpn, please wait ... "
     $DAEMON --writepid $PIDFILE --config $CONF_FILE $DAEMONARG --cd $CONFIG_DIR
     
-    # Wait until transmission is ready (race condition here).
+    # Wait until openvpn is ready.
     counter=5
     while [ $counter -gt 0 ]
     do
@@ -142,7 +141,7 @@ case "$1" in
         echo "${LOG_FILE}"
         exit 0
         ;;
-    *) 
+    *)
         echo "Usage: $0 {start|stop|restart|reload|status|log}" >&2 
         exit 1 
         ;; 

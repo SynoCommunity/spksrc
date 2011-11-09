@@ -13,7 +13,6 @@ VAR_DIR="/usr/local/var/${PACKAGE}"
 UPGRADELOCK="/tmp/${PACKAGE}.upgrade.lock"
 PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
 
-
 #########################################
 # DSM package manager functions
 
@@ -32,19 +31,16 @@ postinst ()
     # Create symlink
     ln -s ${SYNOPKG_PKGDEST}/bin/openvpn ${INSTALL_DIR}/bin/openvpn
     ln -s ${SYNOPKG_PKGDEST}/lib ${INSTALL_DIR}/lib
-    ln -s ${SYNOPKG_PKGDEST}/keys ${VAR_DIR}/keys
-    ln -s ${SYNOPKG_PKGDEST}/log ${VAR_DIR}/log
+    ln -s ${SYNOPKG_PKGDEST}/keys ${INSTALL_DIR}/keys
     ln -s ${SYNOPKG_PKGDEST}/var/client.conf ${VAR_DIR}/client.conf
     ln -s ${SYNOPKG_PKGDEST}/var/server.conf ${VAR_DIR}/server.conf
     
-    # Correct the files ownership
+    # Correct the files ownership (need to be change in a future release by a dedicated user)
     chown -R root:root ${SYNOPKG_PKGDEST}
 
     # Correct the files permission
     chmod 755 ${SYNOPKG_PKGDEST}/bin/*
-    chmod 600 ${SYNOPKG_PKGDEST}/keys/*
     chmod 666 ${SYNOPKG_PKGDEST}/var/*.conf
-    chmod 777 ${SYNOPKG_PKGDEST}/log
 
     exit 0
 }

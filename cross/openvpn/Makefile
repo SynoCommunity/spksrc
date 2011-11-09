@@ -8,13 +8,13 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/lzo cross/openssl
 
-MAINTAINER=	botho
-HOMEPAGE=	http://openvpn.net/
-COMMENT=	OpenVPN
-LICENSE=	OpenVPN support a license under GPLv2 along with a commercial license where appropriate without the restrictions of GPLv2
+MAINTAINER	=	packages@packages.nas-forum.com
+HOMEPAGE	=	http://openvpn.net/
+COMMENT		=	OpenVPN
+LICENSE		=	OpenVPN support a license under GPLv2 along with a commercial license where appropriate without the restrictions of GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --target=arm-marvell-linux-gnu --enable-password-save
+CONFIGURE_ARGS = --enable-password-save
 
 INSTALL_PREFIX  = /usr/local/$(PKG_NAME)
 
