@@ -1,11 +1,8 @@
 #!/bin/sh
 
-PATH=/bin:/sbin:/usr/bin
-
-DAEMON="/usr/local/openvpn/bin/openvpn"
-CONFIG_DIR="/usr/local/var/openvpn"
-CONF_FILE="/usr/local/var/openvpn/client.conf"
-DAEMONARG="--daemon openvpn"
+DAEMON="/usr/local/openvpn/sbin/openvpn"
+CONFIG_DIR="/usr/local/etc/openvpn"
+CONF_FILE="/usr/local/etc/openvpn/client.conf"
 PIDFILE="/usr/local/var/openvpn/openvpn.pid"
 LOG_FILE="/usr/local/var/openvpn/openvpn.log"
 
@@ -14,10 +11,8 @@ test -d $CONFIG_DIR || exit 0
 
 daemon_status ()
 {
-    if [ -f $PIDFILE ] 
-    then
-        if [ -d /proc/`cat $PIDFILE` ]
-        then
+    if ( [ -f $PIDFILE ] ) then
+        if ( [ -d /proc/`cat $PIDFILE` ] ) then
             return 0
         else
             # PID file exists, but no process has this PID. 
@@ -33,24 +28,21 @@ start_daemon ()
     echo 1 > /proc/sys/net/ipv4/ip_forward
 
     # Make device if not present (not devfs)
-    if [ ! -c /dev/net/tun ]
-    then
-        # Make /dev/net directory if needed
-        if [ ! -d /dev/net ]
-        then
-            mkdir -m 755 /dev/net
-        fi
-        mknod /dev/net/tun c 10 200
-    fi
+	if ( [ ! -c /dev/net/tun ] ) then
+  		# Make /dev/net directory if needed
+  		if ( [ ! -d /dev/net ] ) then
+  			mkdir -m 755 /dev/net
+  		fi
+  		mknod /dev/net/tun c 10 200
+	fi
 
     # Make sure the tunnel driver is loaded
-    if !(lsmod | grep -q "^tun")
-    then
-        insmod /lib/modules/tun.ko
-    fi
+    if ( !(lsmod | grep -q "^tun") ); then
+        	insmod /lib/modules/tun.ko
+	fi
 
     echo -n "Starting openvpn, please wait ... "
-    $DAEMON --writepid $PIDFILE --config $CONF_FILE $DAEMONARG --cd $CONFIG_DIR
+    $DAEMON --writepid $PIDFILE --config $CONF_FILE --daemon openvpn --cd $CONFIG_DIR
     
     # Wait until openvpn is ready.
     counter=5
@@ -63,12 +55,13 @@ start_daemon ()
 	
 	sleep 5
     ifconfig
+    
     echo "Done."
 }
 
 stop_daemon ()
 {
-	echo -n "Stopping openvpn daemon, please wait ... "
+	echo -n "Stopping openvpn, please wait ... "
 
     # Kill openvpn.
 	PID=`cat $PIDFILE`
@@ -76,7 +69,7 @@ stop_daemon ()
 	rm $PIDFILE
 
     # Wait until openvpn is really dead (may take some time).
-    counter=20
+    counter=10
     while [ $counter -gt 0 ]
         do
         daemon_status || break
@@ -84,8 +77,11 @@ stop_daemon ()
         sleep 1
     done
     
+    /sbin/rmmod tun
+    	    
 	sleep 5
 	ifconfig
+	
 	echo "Done."
 }
 
@@ -109,7 +105,7 @@ case "$1" in
     stop)
         if daemon_status
         then
-			stop_daemon
+        	stop_daemon
             exit 0
         else
             exit $?

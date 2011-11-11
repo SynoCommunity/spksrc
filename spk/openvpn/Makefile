@@ -7,7 +7,7 @@ SPK_ICON = src/openvpn.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER		= botho
-COMMENT			= "OpenVPN $(SPK_VERS)"
+COMMENT			= "OpenVPN $(SPK_VERS) (client mode)"
 RELOAD_UI		= no
 DISPLAY_NAME	= OpenVPN
 
@@ -26,9 +26,5 @@ include ../../mk/spksrc.spk.mk
 .PHONY: install-openvpn
 install-openvpn:
 	@$(MSG) "=========== PACKAGING OPENVPN ===================="
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/keys
-	install -m 644 src/var/*.* $(STAGING_DIR)/var/
-	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 -d $(STAGING_DIR)/keys
-	install -m 755 $(INSTALL_DIR)/usr/local/openvpn/sbin/openvpn $(STAGING_DIR)/bin/
+	install -m 755 -d $(STAGING_DIR)/etc/openvpn
+	install -m 644 src/etc/openvpn/* $(STAGING_DIR)/etc/openvpn
