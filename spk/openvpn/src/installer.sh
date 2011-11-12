@@ -87,54 +87,6 @@ postuninst ()
 
 preupgrade ()
 {
-    check_version_older() # $1 base version $2 target version
-	{
-		BASE_VER=$1
-		TARGET_VER=$2
-
-		# if no base ver, always reture false
-		if [ -z "${BASE_VER}" ]; then
-			return 0;
-		fi
-
-		# getting major, minor, build
-		base_major=`echo ${BASE_VER} | sed 's/^\([0-9]*\)[.-]\([0-9]*\)[.-]\([0-9]*\).*/\1/'`
-		base_minor=`echo ${BASE_VER} | sed 's/^\([0-9]*\)[.-]\([0-9]*\)[.-]\([0-9]*\).*/\2/'`
-		base_build=`echo ${BASE_VER} | sed 's/^\([0-9]*\)[.-]\([0-9]*\)[.-]\([0-9]*\).*/\3/'`
-		target_major=`echo ${TARGET_VER} | sed 's/^\([0-9]*\)[.-]\([0-9]*\)[.-]\([0-9]*\).*/\1/'`
-		target_minor=`echo ${TARGET_VER} | sed 's/^\([0-9]*\)[.-]\([0-9]*\)[.-]\([0-9]*\).*/\2/'`
-		target_build=`echo ${TARGET_VER} | sed 's/^\([0-9]*\)[.-]\([0-9]*\)[.-]\([0-9]*\).*/\3/'`
-
-		# compare major, version must equal or above limitation
-		if [ $target_major -lt $base_major ]; then
-			return 1;
-		elif [ $target_major -gt $base_major ]; then
-			return 0;
-		fi
-		# compare minor
-		if [ $target_minor -lt $base_minor ]; then
-			return 1;
-		elif [ $target_minor -gt $base_minor ]; then
-			return 0;
-		fi
-		# compare build
-		if [ $target_build -lt $base_build ]; then
-			return 1;
-		else
-			return 0;
-		fi
-	}
-
-	check_version_older ${OLD_PACKAGE_VER} ${NEW_PACKAGE_VER}
-	if [ $? -eq "1" ]; then
-		echo "Target version [${NEW_PACKAGE_VER}] is older than current [${OLD_PACKAGE_VER}], abort"
-		echo "Package version (${NEW_PACKAGE_VER}) is older then installed (${OLD_PACKAGE_VER})." > $PACKAGE_ERR_MSG
-		exit 1;
-	fi
-
-	touch ${UPGRAGE_FILE}
-	OLD_VER_STR="old_version="${OLD_PACKAGE_VER}
-	echo ${OLD_VER_STR} >> ${UPGRAGE_FILE}
 
 	exit 0
 }
