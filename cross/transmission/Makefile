@@ -1,5 +1,4 @@
 
-
 PKG_NAME = transmission
 PKG_VERS = 2.42
 PKG_EXT = tar.xz
