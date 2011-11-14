@@ -1,4 +1,4 @@
-### Striop rules
+### Strip rules
 #   Strip the binary files (exec and libs) in the staging directory. 
 # Target are executed in the following order:
 #  strip_msg_target
@@ -52,7 +52,7 @@ strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST)
 	    lib|bin) \
 	      echo "Stripping $${file}" ; \
 	      chmod u+w $(STAGING_DIR)/$${file} ; \
-	      $(STRIP) $(STAGING_DIR)/$${file} \
+	      $(STRIP) $(STAGING_DIR)/$${file} > /dev/null 2>&1 || echo "Cannot strip $${file}" \
 	      ;; \
 	  esac ; \
 	done
