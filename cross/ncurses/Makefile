@@ -15,6 +15,6 @@ COMMENT    = The Ncurses (new curses) library is a free software emulation of cu
 LICENSE    = http://www.gnu.org/licenses/gpl.html
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-shared
+CONFIGURE_ARGS = --with-shared --enable-rpath --enable-overwrite
 
 include ../../mk/spksrc.cross-cc.mk
