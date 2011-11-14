@@ -6,7 +6,7 @@ SPK_ICON = src/sickbeard.png
 
 DEPENDS  = 
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = http://packages.nas-forum.com
 COMMENT    = "The ultimate PVR application that downloads and manages your TV shows."
 ADMIN_PORT = 8081
 RELOAD_UI = yes
