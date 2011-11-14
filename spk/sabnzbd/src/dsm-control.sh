@@ -6,8 +6,8 @@
 # Package specific variables
 PACKAGE="sabnzbd"
 DNAME="SABnzbd+"
-PYTHON_DIR="/usr/local/python26"
-PYTHON_VAR_DIR="/usr/local/var/python26"
+PYTHON_DIR="/usr/local/python27"
+PYTHON_VAR_DIR="/usr/local/var/python27"
 
 # Common variables
 INSTALL_DIR="/usr/local/${PACKAGE}"

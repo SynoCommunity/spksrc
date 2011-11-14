@@ -1,4 +1,4 @@
-#!/usr/local/python26/bin/python
+#!/usr/local/python27/bin/python
 
 from sys import path as syspath
 from subprocess import check_call, CalledProcessError

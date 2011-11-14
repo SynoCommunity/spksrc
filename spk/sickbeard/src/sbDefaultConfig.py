@@ -1,4 +1,4 @@
-#!/usr/local/sabnzbd/bin/python
+#!/usr/local/python27/bin/python
 
 from sys import path, argv, stdout, exit
 import os.path

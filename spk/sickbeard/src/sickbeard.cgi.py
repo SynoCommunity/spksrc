@@ -1,4 +1,4 @@
-#!/usr/local/python26/bin/python
+#!/usr/local/python27/bin/python
 
 sbDir = '/usr/local/var/sickbeard/'
 try :

@@ -19,9 +19,9 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS = 
 
-PYTHON_VERS = 26
+PYTHON_VERS = 27
 
-SPK_DEPENDS = "Python${PYTHON_VERS}>=2.6.6-5"
+SPK_DEPENDS = "Python${PYTHON_VERS}>=2.7.2-1"
 
 INSTALL_PREFIX = /usr/local/sabnzbd
 
