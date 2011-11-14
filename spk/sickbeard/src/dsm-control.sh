@@ -6,9 +6,9 @@
 # Package specific variables
 PACKAGE="sickbeard"
 DNAME="Sick Beard"
-PYTHON_DIR="/usr/local/python26"
+PYTHON_DIR="/usr/local/python27"
 PYTHON=${PYTHON_DIR}/bin/python
-PYTHON_VAR_DIR="/usr/local/var/python26"
+PYTHON_VAR_DIR="/usr/local/var/python27"
 
 # Common variables
 INSTALL_DIR="/usr/local/${PACKAGE}"
