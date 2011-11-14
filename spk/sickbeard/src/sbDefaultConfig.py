@@ -4,7 +4,7 @@ from sys import path, argv, stdout, exit
 import os.path
 
 stdout.write ('[General]\n')
-stdout.write ('web_port = 8081\n')
+stdout.write ('web_port = 9300\n')
 stdout.write ('web_host = 0.0.0.0\n')
 stdout.write ('use_nzbs = 1\n')
 stdout.write ('launch_browser = 0\n')

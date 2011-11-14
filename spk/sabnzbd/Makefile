@@ -8,7 +8,7 @@ DEPENDS  = cross/busybox cross/par2cmdline cross/sabnzbd
 
 MAINTAINER = http://packages.nas-forum.com
 COMMENT    = "SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction."
-ADMIN_PORT = 8080
+ADMIN_PORT = 9200
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 
