@@ -24,7 +24,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) linux-generic32 shared
+	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) linux-generic32 zlib-dynamic shared threads
 
 
 .PHONY: myInstall
