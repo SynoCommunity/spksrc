@@ -8,7 +8,7 @@ DEPENDS  =
 
 MAINTAINER = http://packages.nas-forum.com
 COMMENT    = "The ultimate PVR application that downloads and manages your TV shows."
-ADMIN_PORT = 8081
+ADMIN_PORT = 9300
 RELOAD_UI = yes
 DISPLAY_NAME = ${SPK_NAME}
 

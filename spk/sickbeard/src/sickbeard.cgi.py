@@ -11,7 +11,7 @@ else :
         from ConfigParser import RawConfigParser
         sbCfg = RawConfigParser ()
         sbCfg.add_section ('General')
-        sbCfg.set ('General', 'web_port', '8081')
+        sbCfg.set ('General', 'web_port', '9300')
         sbCfg.read (sbDir  + 'config.ini')
         host = environ['HTTP_HOST'].split (':')[0]
         response = 'Location: http://%s:%s/\n' % (host, sbCfg.get ('General', 'web_port'))
