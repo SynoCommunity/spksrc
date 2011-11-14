@@ -6,7 +6,7 @@ from os import environ, devnull
 
 syspath.append ('/usr/local/sabnzbd/share/SABnzbd/sabnzbd/utils')
 from configobj import ConfigObj
-miscCfg = ConfigObj ('/usr/local/var/sabnzbd/config.ini')['misc']
+miscCfg = ConfigObj ('/usr/local/sabnzbd/config.ini')['misc']
 
 try :
     port=miscCfg['port']

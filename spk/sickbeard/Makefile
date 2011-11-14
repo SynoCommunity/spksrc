@@ -25,15 +25,15 @@ SPK_DEPENDS = "Python${PYTHON_VERS}>=2.7.2-1"
 INSTALL_PREFIX = /usr/local/sickbeard
 
 COPY_TARGET = nop
-POST_STRIP_TARGET = xz-compress
+POST_STRIP_TARGET = sickbeard_extra_install
 
 # Pure Python package, make sure ARCH is not defined
 override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: xz-compress
-xz-compress:
+.PHONY: sickbeard_extra_install
+sickbeard_extra_install:
 	@$(MSG) "Adding files for DSM integration"
 	install -m 755 -d $(STAGING_DIR)/sbin
 	install -m 755 -d $(STAGING_DIR)/share
@@ -41,15 +41,9 @@ xz-compress:
 	install -m 755 src/updateInfo.py $(STAGING_DIR)/sbin/updateInfo
 	install -m 644 src/config.json $(STAGING_DIR)/share/synoman/config
 	install -m 755 src/sickbeard.cgi.py $(STAGING_DIR)/share/synoman/sickbeard.cgi
+	install -m 755 src/sbDefaultConfig.py $(STAGING_DIR)/sbin/sbDefaultConfig 
 	for size in 16 24 32 48 ; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/share/synoman/sickbeard-$${size}.png ; \
 	done
-	@$(MSG) "Compressing with xz"
-	(cd $(STAGING_DIR) && tar cpJf $(WORK_DIR)/package.txz --group=root --owner=root *)
-	rm -fr $(STAGING_DIR)
-	mkdir $(STAGING_DIR)
-	mv $(WORK_DIR)/package.txz $(STAGING_DIR)/
-	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 755 src/sbDefaultConfig.py $(STAGING_DIR)/sbin/sbDefaultConfig 

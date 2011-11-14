@@ -1,6 +1,6 @@
 {
   ".url": {
-    "org.superzebulon.sickbeard": {
+    "com.nas-forum.packages.sickbeard": {
       "title": "Sick Beard",
       "desc": "Sick Beard Web UI",
       "icon": "sickbeard-{0}.png",

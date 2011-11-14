@@ -1,6 +1,6 @@
 {
    ".url": {
-     "org.superzebulon.sabzndb": {
+     "com.nas-forum.packages.sabnzbd": {
        "title": "SABnzbd",
        "desc": "SABnzbd Web UI",
        "icon": "sab2-{0}.png",

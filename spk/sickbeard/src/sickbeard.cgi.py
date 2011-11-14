@@ -1,6 +1,6 @@
 #!/usr/local/python27/bin/python
 
-sbDir = '/usr/local/var/sickbeard/'
+sbDir = '/usr/local/sickbeard/'
 try :
     pid  = int (open (sbDir  + 'sickbeard.pid', 'rt').readline ())
 except IOError, ValueError :
