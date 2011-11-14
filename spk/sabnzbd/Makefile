@@ -6,7 +6,7 @@ SPK_ICON = src/sab2_256.png
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/sabnzbd
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = http://packages.nas-forum.com
 COMMENT    = "SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction."
 ADMIN_PORT = 8080
 RELOAD_UI = yes

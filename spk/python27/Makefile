@@ -9,7 +9,7 @@ DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycur
 DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado
 DEPENDS += cross/busybox
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = http://packages.nas-forum.com
 COMMENT    = "Python Programming Language"
 ADMIN_PORT = 
 RELOAD_UI = yes
