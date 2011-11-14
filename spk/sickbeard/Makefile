@@ -1,6 +1,6 @@
 
 SPK_NAME = SickBeard
-SPK_VERS = 3.1
+SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/sickbeard.png
 
