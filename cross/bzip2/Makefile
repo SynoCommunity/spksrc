@@ -13,14 +13,11 @@ HOMEPAGE   = http://bzip.org/
 COMMENT    = High-quality data compressor
 LICENSE    = http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-CONFIGURE_TARGET = myConfigure
+CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myConfigure
-myConfigure: ;
 
 .PHONY: myCompile
 myCompile:

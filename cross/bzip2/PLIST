@@ -9,4 +9,3 @@ bin:bin/bzip2
 bin:bin/bzip2recover
 bin:bin/bzless
 bin:bin/bzmore
-lib:lib/libbz2.a
