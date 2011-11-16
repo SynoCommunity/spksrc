@@ -16,6 +16,7 @@ You can list all available SPKs with `ls spk`.
 
 * `make ARCH=yourarch yourspk-clean` to clean previous builds
 * `make ARCH=yourarch yourspk` to make the SPK
+* in your spk directory : `make all-archs` to make the spk for all available archs
 
 Required files for cross-compilation are downloaded in `distrib` directory.
 Built SPKs are stored in `packages` directory.
