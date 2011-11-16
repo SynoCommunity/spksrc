@@ -31,7 +31,6 @@ umurmur_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share/synoman
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 644 src/cert.fields $(STAGING_DIR)/var/cert.fields
 	install -m 644 src/config.json $(STAGING_DIR)/share/synoman/config
 	install -m 755 src/umurmur.cgi.pl $(STAGING_DIR)/share/synoman/umurmur.cgi
 	install -m 644 src/umurmur.conf $(STAGING_DIR)/etc/umurmur.conf
