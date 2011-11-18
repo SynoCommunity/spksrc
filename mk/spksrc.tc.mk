@@ -36,7 +36,7 @@ all: patch
 
 TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump
 
-CFLAGS  += $(TC_CFLAGS)
+CFLAGS += $(TC_CFLAGS)
 CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 
 CPPFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
@@ -47,23 +47,21 @@ LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
 
 
-.PHONY: tc_env
-tc_env: patch
+.PHONY: tc_vars
+tc_vars: patch
+	@echo TC_ENV :=
 	@for tool in $(TOOLS) ; \
 	do \
 	  target=`echo $${tool} | sed 's/\(.*\):\(.*\)/\1/'` ; \
 	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
-	  echo `echo $${target} | tr [:lower:] [:upper:] `=$(WORK_DIR)/$(TC_BASE_DIR)/bin/$(TC_PREFIX)-$${source} ; \
+	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=$(WORK_DIR)/$(TC_BASE_DIR)/bin/$(TC_PREFIX)-$${source} ; \
 	done
-	@echo CFLAGS=\"$(CFLAGS)\"
-	@echo CPPFLAGS=\"$(CPPFLAGS)\"
-	@echo LDFLAGS=\"$(LDFLAGS)\"
-	
-.PHONY: tc_configure_args
-tc_configure_args:
-	@echo --host=$(TC_TARGET) --build=i686-pc-linux
+	@echo TC_ENV += CFLAGS=\"$(CFLAGS)\"
+	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS)\"
+	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS)\"
+	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux) > $(TV_VARS_MK)
 
-
+        
 ### Clean rules
 clean:
 	rm -fr $(WORK_DIR)
