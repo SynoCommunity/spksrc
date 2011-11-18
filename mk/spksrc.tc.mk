@@ -59,9 +59,9 @@ tc_vars: patch
 	@echo TC_ENV += CFLAGS=\"$(CFLAGS)\"
 	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS)\"
 	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS)\"
-	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux) > $(TV_VARS_MK)
+	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
 
-        
+
 ### Clean rules
 clean:
 	rm -fr $(WORK_DIR)

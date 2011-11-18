@@ -33,7 +33,7 @@ compile_msg:
 pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET) 
-	$(RUN) $(MAKE)
+	@$(RUN) $(MAKE)
 
 post_compile_target: $(COMPILE_TARGET)
 

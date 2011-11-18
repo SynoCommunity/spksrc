@@ -17,8 +17,8 @@ $(TC_VARS_MK):
 	@$(MSG) "Set up toolchain "
 	@if env $(MAKE) --no-print-directory -C ../../toolchains/$(TC) ; \
 	then \
-	  env $(MAKE) --no-print-directory -C ../../toolchains/$(TC) tc_vars TC_VARS_MK=$@ ; \
-	else  \
+	  env $(MAKE) --no-print-directory -C ../../toolchains/$(TC) tc_vars > $@ ; \
+	else \
 	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
 	fi
 
