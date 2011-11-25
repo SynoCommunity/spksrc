@@ -11,18 +11,30 @@ DEPENDS =
 MAINTAINER = http://packages.nas-forum.com
 HOMEPAGE   = http://bzip.org/
 COMMENT    = High-quality data compressor
-LICENSE    = http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+LICENSE    = BSD License
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
+POST_INSTALL_TARGET = myPostInstall
+
+ADDITIONAL_CFLAGS = -D_FILE_OFFSET_BITS=64
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) $(MAKE) libbz2.a bzip2 bzip2recover PREFIX=$(STAGING_INSTALL_PREFIX) $(TC_ENV)
-	
+	$(RUN) $(MAKE) bzip2 bzip2recover PREFIX=$(STAGING_INSTALL_PREFIX)
+
 .PHONY: myInstall
 myInstall:
 	@$(RUN) $(MAKE) PREFIX=$(STAGING_INSTALL_PREFIX) install
+
+.PHONY: myPostInstall
+myPostInstall:
+	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bunzip2
+	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bzcat
+	ln -sf bzdiff $(STAGING_INSTALL_PREFIX)/bin/bzcmp
+	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzegrep
+	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzfgrep
+	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
