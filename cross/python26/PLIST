@@ -1,3 +1,4 @@
 bin:bin/python
+rsc:etc/mime.types
 rsc:lib/python2.6
 lib:lib/python2.6/lib-dynload/*.so
