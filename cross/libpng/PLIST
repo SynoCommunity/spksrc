@@ -1,0 +1,4 @@
+lnk:lib/libpng15.so
+lnk:lib/libpng15.so.15
+lnk:lib/libpng15.so.15.5.0
+lib:lib/libpng.so
