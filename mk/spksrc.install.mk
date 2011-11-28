@@ -9,7 +9,7 @@
 #  install_target                  (override with INSTALL_TARGET)
 #  post_install_target             (override with POST_INSTALL_TARGET)
 #  $(INSTALL_PLIST)
-#  install_correct_lib_files
+#  install_correct_pc_files
 # Variables:
 #  INSTALL_PREFIX          Target directory where the software will be run.
 #  INSTALL_DIR             Where to install files. INSTALL_PREFIX will be added.
@@ -60,22 +60,17 @@ $(INSTALL_PLIST):
 	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort | \
 	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | cut -d' ' -f2- > $@
 
-install_correct_lib_files: $(INSTALL_PLIST)
-	@for pc_file in `grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)` ; \
+install_correct_pc_files: $(INSTALL_PLIST)
+	@for pc_file in `grep -e "lib/pkgconfig/.*\.pc" $(INSTALL_PLIST)` ; \
 	do \
 	  $(MSG) "Correcting pkg-config file $${pc_file}" ; \
 	  sed -i -e 's#\($(INSTALL_PREFIX)\)#$(INSTALL_DIR)\1#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
-	done
-	@for la_file in `grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)` ; \
-	do \
-	  $(MSG) "Correcting libtool file $${la_file}" ; \
-	  sed -i -e 's#^\(libdir=.\)\($(INSTALL_PREFIX)\)#\1$(INSTALL_DIR)\2#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${la_file} ; \
 	done
 
 ifeq ($(wildcard $(INSTALL_COOKIE)),)
 install: $(INSTALL_COOKIE)
 
-$(INSTALL_COOKIE): install_correct_lib_files
+$(INSTALL_COOKIE): install_correct_pc_files
 	$(create_target_dir)
 	@touch -f $@
 else

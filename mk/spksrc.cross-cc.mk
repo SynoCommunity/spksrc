@@ -58,14 +58,3 @@ clean:
 	rm -fr work work-*
 
 all: install
-
-
-SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
-SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
-
-arch-%:
-	@$(MSG) Building package for arch $(subst arch-,,$@) 
-	@env $(MAKE) ARCH=$(subst arch-,,$@)

@@ -1,5 +1,4 @@
-diff -Naur Python-2.7.2-old/Makefile.pre.in Python-2.7.2-new/Makefile.pre.in
---- Makefile.pre.in	2011-06-15 20:00:00.000000000 +0200
+--- Makefile.pre.in.orig	2011-06-15 20:00:00.000000000 +0200
 +++ Makefile.pre.in	2011-06-15 21:00:00.000000000 +0200
 @@ -182,6 +182,7 @@
  
@@ -86,7 +85,7 @@ diff -Naur Python-2.7.2-old/Makefile.pre.in Python-2.7.2-new/Makefile.pre.in
  		--install-scripts=$(BINDIR) \
  		--install-platlib=$(DESTSHARED) \
 diff -Naur Python-2.7.2-old/setup.py Python-2.7.2-new/setup.py
---- setup.py	2011-06-15 20:00:00.000000000 +0200
+--- setup.py.orig	2011-06-15 20:00:00.000000000 +0200
 +++ setup.py	2011-06-15 21:00:00.000000000 +0200
 @@ -278,6 +282,14 @@
                            (ext.name, sys.exc_info()[1]))
@@ -135,8 +134,8 @@ diff -Naur Python-2.7.2-old/setup.py Python-2.7.2-new/setup.py
                  # Pass empty CFLAGS because we'll just append the resulting
                  # CFLAGS to Python's; -g or -O2 is to be avoided.
 diff -Naur Python-2.7.2-old/configure Python-2.7.2-new/configure
---- configure	2011-06-15 20:00:00.000000000 +0200
-+++ configure 	2011-06-15 21:00:00.000000000 +0200
+--- configure.orig	2011-06-15 20:00:00.000000000 +0200
++++ configure	2011-06-15 21:00:00.000000000 +0200
 @@ -13673,7 +13673,7 @@
    $as_echo_n "(cached) " >&6
  else

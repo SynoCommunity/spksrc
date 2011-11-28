@@ -1,111 +1,110 @@
 #!/bin/sh
+# Copyright 2010 Antoine Bertin
+# <diaoulael [ignore this] at users.sourceforge period net>
+#
+# This file is part of syno-packager.
+#
+# syno-packager is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# syno-packager is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with syno-packager.  If not, see <http://www.gnu.org/licenses/>.
 
-#########################################
-# A few variables to make things readable
+# Common
+UMDIR=/usr/local/umurmur
+UMVAR=$UMDIR/var
+UMLIB=$UMDIR/lib
+UMSHR=$UMDIR/share
+UMETC=$UMDIR/etc
+UMBIN=$UMDIR/bin
+UMEXE=$UMBIN/umurmurd
+UMCRT=$UMBIN/gencert.sh
+SUEXE=/bin/su
+PSEXE=ps
+SYNO3APP=/usr/syno/synoman/webman/3rdparty
+UMUSR=root
 
-# Package specific variables
-PACKAGE="umurmur"
-DNAME="uMurmur"
-
-# Common variables
-INSTALL_DIR="/usr/local/${PACKAGE}"
-GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
-LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
-
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-
-#########################################
-# DSM package manager functions
-
+# Files
+UMLOG=$UMVAR/umurmur.log
 
 preinst ()
 {
-    exit 0
+	exit 0
 }
 
 postinst ()
 {
-    # Correct the files ownership
-    chown -R root:root ${SYNOPKG_PKGDEST}
+	# Correct the files ownership
+	chown -R root:root ${SYNOPKG_PKGDEST}
 
-    # Create the view directory
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p /usr/local/bin
+	# Create the view directory
+	mkdir -p $UMDIR
+	mkdir -p /usr/local/bin
 
-    # Link folders
-    for dir in ${SYNOPKG_PKGDEST}/*; do
-        ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
-    done
+	# Create symlinks to the installation ditectory
+	ln -s ${SYNOPKG_PKGDEST}/bin $UMBIN
+	ln -s ${SYNOPKG_PKGDEST}/lib $UMLIB
+	ln -s ${SYNOPKG_PKGDEST}/share $UMSHR
+	ln -s ${SYNOPKG_PKGDEST}/var $UMVAR
+	ln -s ${SYNOPKG_PKGDEST}/etc $UMETC
 
-    # Create empty log file with full permissions (for nobody)
-    touch ${LOG_FILE}
-    chmod 777 ${LOG_FILE}
+	# Create symlink
+	ln -s $UMEXE /usr/local/bin/`basename $UMEXE`
 
-    # Create a link in /usr/local/bin
-    ln -s /var/packages/umurmur/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl
+	# Correct the files permission
+	chmod 555 /usr/local/umurmur/bin/*
+	chmod 555 /usr/local/umurmur/lib/*	
 
-    # Install the application in the main interface
-    if [ -d ${SYNO3APP} ]; then
-        rm -f ${SYNO3APP}/${PACKAGE}
-        ln -s ${SYNOPKG_PKGDEST}/share/synoman ${SYNO3APP}/${PACKAGE}
-    fi
+	# Log installation was successful
+	echo `date`" : uMurmur SPK successfuly installed" >>  $UMLOG
 
-    # Restore the config file and certificate if we're upgrading
-    if [ -f ${UPGRADE} ]; then
-        mv /tmp/umurmur.conf ${INSTALL_DIR}/etc/
-        mv /tmp/umurmur.crt ${INSTALL_DIR}/etc/
-        mv /tmp/umurmur.key ${INSTALL_DIR}/etc/
-    fi
+	# Certificate generation
+	$UMCRT > /dev/null
+	if [ $? -ne 0 ]; then
+		echo `date`" : Certificate generation failed" >> $UMLOG
+	else
+		echo `date`" : Certificate generation was successful" >> $UMLOG
+	fi
 
-    # Certificate generation
-    ${GEN_CERT} > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        exit 1
-    fi
-
-    exit 0
+	exit 0
 }
 
 preuninst ()
 {
-    exit 0
+	exit 0
 }
 
 postuninst ()
 {
-    # Save the config file and the user if we're upgrading, delete the user otherwise
-    if [ -f ${UPGRADE} ]; then
-        cp ${INSTALL_DIR}/etc/umurmur.conf /tmp/
-        cp ${INSTALL_DIR}/etc/umurmur.key /tmp/
-        cp ${INSTALL_DIR}/etc/umurmur.crt /tmp/
-    fi
+	# Remove symlink
+	rm -f /usr/local/bin/`basename $UMEXE`
 
-    # Remove the application from the main interface if it was previously added
-    if [ -h ${SYNO3APP}/${PACKAGE} ]; then
-        rm ${SYNO3APP}/${PACKAGE}
-    fi
+	# Remove symlinks from /usr/local/umurmur
+	rm -f $UMBIN
+	rm -f $UMLIB
+	rm -f $UMSHR
+	rm -f $UMVAR
+	rm -f $UMETC
 
-    # Remove symlinks to utils
-    rm /usr/local/bin/${PACKAGE}-ctl
+	# Remove the view directory
+	rmdir /usr/local/umurmur
 
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
-
-    exit 0
+	exit 0
 }
 
 preupgrade ()
 {
-    touch ${UPGRADE}
-
-    exit 0
+	exit 0
 }
 
 postupgrade ()
 {
-    rm -f ${UPGRADE}
-
-    exit 0
+	exit 0
 }

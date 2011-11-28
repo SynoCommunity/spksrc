@@ -1,5 +1,3 @@
 bin:bin/python
-rsc:etc/mime.types
 rsc:lib/python2.7
-rsc:include/python2.7/pyconfig.h
 lib:lib/python2.7/lib-dynload/*.so
