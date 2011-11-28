@@ -1,0 +1,11 @@
+bin:bin/bunzip2
+bin:bin/bzcat
+bin:bin/bzcmp
+bin:bin/bzdiff
+bin:bin/bzegrep
+bin:bin/bzfgrep
+bin:bin/bzgrep
+bin:bin/bzip2
+bin:bin/bzip2recover
+bin:bin/bzless
+bin:bin/bzmore

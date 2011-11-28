@@ -173,5 +173,3 @@ arch-%:
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $(subst publish-arch-,,$@) 
 	@env $(MAKE) ARCH=$(subst publish-arch-,,$@) publish
-
-	

@@ -49,6 +49,7 @@ xz-compress:
 	     -e "s#\(DEF_COMPLETE_DIR = '\)Downloads\(/complete'\)#\1/volume1/downloads\2#"
 	@$(MSG) "Adding files for DSM integration"
 	install -m 755 -d $(STAGING_DIR)/share/synoman
+	install -m 755 src/updateInfo.py $(STAGING_DIR)/sbin/updateInfo
 	install -m 644 src/config.json $(STAGING_DIR)/share/synoman/config
 	install -m 755 src/sabnzbd.cgi.py $(STAGING_DIR)/share/synoman/sabnzbd.cgi
 	for size in 16 24 32 48 ; \

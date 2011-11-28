@@ -16,14 +16,15 @@ then
 	SSL=`/bin/get_key_value $SSLH_CONF ssl`
 	SSH=`/bin/get_key_value $SSLH_CONF ssh`
 	VPN=`/bin/get_key_value $SSLH_CONF openvpn`
+	TINC=`/bin/get_key_value $SSLH_CONF tinc`
 fi
 
 start_daemon ()
 {
-    echo `date`" : Starting SSLH (listen=$LISTEN) (ssl=$SSL) (ssh=$SSH) (openvpn=$VPN) ..." >> $SSLHLOG
+    echo `date`" : Starting SSLH (listen=$LISTEN) (ssl=$SSL) (ssh=$SSH) (openvpn=$VPN) (tinc=$TINC) ..." >> $SSLHLOG
     if [ -f $SSLH_CONF ]
     then
-        $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN
+        $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN --tinc $TINC --timeout 5
     fi
 
     # Install the application in the main interface.
