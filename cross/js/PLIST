@@ -1,0 +1,6 @@
+bin:bin/js
+rsc:bin/jslint
+rsc:bin/jspack
+lnk:lib/libjs.so
+lnk:lib/libjs.so.1
+lib:lib/libjs.so.1.0.6
