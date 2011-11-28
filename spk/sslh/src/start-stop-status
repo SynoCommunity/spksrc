@@ -17,14 +17,15 @@ then
 	SSH=`/bin/get_key_value $SSLH_CONF ssh`
 	VPN=`/bin/get_key_value $SSLH_CONF openvpn`
 	TINC=`/bin/get_key_value $SSLH_CONF tinc`
+	XMPP=`/bin/get_key_value $SSLH_CONF xmpp`
 fi
 
 start_daemon ()
 {
-    echo `date`" : Starting SSLH (listen=$LISTEN) (ssl=$SSL) (ssh=$SSH) (openvpn=$VPN) (tinc=$TINC) ..." >> $SSLHLOG
+    echo `date`" : Starting SSLH (listen=$LISTEN) (ssl=$SSL) (ssh=$SSH) (openvpn=$VPN) (tinc=$TINC) (xmpp=$XMPP) ..." >> $SSLHLOG
     if [ -f $SSLH_CONF ]
     then
-        $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN --tinc $TINC --timeout 5
+        $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN --tinc $TINC --xmpp $XMPP -P /usr/local/sslh/pid/sslh.pid --timeout 5
     fi
 
     # Install the application in the main interface.

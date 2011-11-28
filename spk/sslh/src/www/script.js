@@ -24,7 +24,8 @@ Ext.onReady(function(){
 			&& Ext.getCmp('sshaddress').isValid(false) && Ext.getCmp('sshport').isValid(false)
 			&& Ext.getCmp('ssladdress').isValid(false) && Ext.getCmp('sslport').isValid(false)
 			&& Ext.getCmp('vpnaddress').isValid(false) && Ext.getCmp('vpnport').isValid(false)
-			&& Ext.getCmp('tincaddress').isValid(false) && Ext.getCmp('tincport').isValid(false);
+			&& Ext.getCmp('tincaddress').isValid(false) && Ext.getCmp('tincport').isValid(false)
+			&& Ext.getCmp('xmppaddress').isValid(false) && Ext.getCmp('xmppport').isValid(false);
 	}
 
     var services_form = new Ext.FormPanel({
@@ -207,6 +208,38 @@ Ext.onReady(function(){
 						msgTarget: 'side',
 						regex: /^(6553[0-5]|655[0-2][0-9]\d|65[0-4](\d){2}|6[0-4](\d){3}|[1-5](\d){4}|[1-9](\d){0,3})$/,
 						regexText: 'Numéro de port invalide',
+                        allowBlank: false
+                    },
+                    {
+                        xtype: 'label',
+                        text: 'Adresse et port XMPP :'
+                    },
+                    {
+                        xtype: 'textfield',
+                                                width: 110,
+                        name: 'xmppaddress',
+                                                id: 'xmppaddress',
+                                                value: sslhStore.query('key','xmpp',false).first().get('address').toString(),
+                                                maskRe: /[0-9.]/,
+                                                regex: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+                                                regexText: 'Adresse IP invalide',
+                                                msgTarget: 'side',
+                        allowBlank: false
+                    },
+                    {
+                        xtype: 'label',
+                        html: '&nbsp;:&nbsp;',
+                        text: ''
+                    },
+                    {
+                        xtype: 'textfield',
+                        width: 50,
+                                                value: sslhStore.query('key','xmpp',false).first().get('port').toString(),
+                        name: 'xmppport',
+                                                id: 'xmppport',
+                                                msgTarget: 'side',
+                                                regex: /^(6553[0-5]|655[0-2][0-9]\d|65[0-4](\d){2}|6[0-4](\d){3}|[1-5](\d){4}|[1-9](\d){0,3})$/,
+                                                regexText: 'Numéro de port invalide',
                         allowBlank: false
                     }
 
