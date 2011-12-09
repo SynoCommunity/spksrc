@@ -16,7 +16,7 @@ PYTHONPATH = $(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
 ### Python module rules
 nop: ;
 
-compile_python_module:
+compile_python_module: $(PRE_COMPILE_PYTHON_MODULE)
 	@if [ ! -d $(PYTHON_LIB_CROSS).bak ]; then \
 		mv $(PYTHON_LIB_CROSS) $(PYTHON_LIB_CROSS).bak; \
 	fi
