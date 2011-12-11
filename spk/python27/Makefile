@@ -4,7 +4,7 @@ SPK_VERS = 2.7.2
 SPK_REV = 1
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/python27
+DEPENDS  = cross/python27 cross/pocketsphinx
 DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycurl
 DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado
 DEPENDS += cross/busybox
