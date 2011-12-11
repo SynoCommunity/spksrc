@@ -4,7 +4,7 @@ SPK_VERS = 2.6.6
 SPK_REV = 6
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/python26
+DEPENDS  = cross/python26 cross/pocketsphinx
 DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil
 DEPENDS += cross/cheetah cross/yenc cross/tornado 
 DEPENDS += cross/busybox cross/xzdec-static
