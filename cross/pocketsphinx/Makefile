@@ -15,13 +15,24 @@ LICENSE=	CMU Sphinx
 
 GNU_CONFIGURE = 1
 
-# Try to fetch python variables
--include $(WORK_DIR)/python-cc.mk
-
-# Build the python module if being built as python dependency
-ifdef HOSTPYTHON
-PRE_COMPILE_PYTHON_MODULE = compile_target
-include ../../mk/spksrc.python-module.mk
-else
+# Standard build or build the python module if being built as python dependency
+ifeq ($(wildcard $(WORK_DIR)/python-cc.mk),)
 include ../../mk/spksrc.cross-cc.mk
+else
+COMPILE_TARGET = myCompile
+INSTALL_TARGET = myInstall
+include ../../mk/spksrc.python-module.mk
 endif
+
+.PHONY: myCompile
+myCompile: configure_target compile_target install_target
+	@if [ ! -d $(PYTHON_LIB_CROSS).bak ]; then \
+		mv $(PYTHON_LIB_CROSS) $(PYTHON_LIB_CROSS).bak; \
+	fi
+	@cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)
+	@cd $(WORK_DIR)/$(PKG_DIR)/python && env $(ENV) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build
+	@mv $(PYTHON_LIB_CROSS).bak $(PYTHON_LIB_CROSS)
+
+.PHONY: myInstall
+myInstall:
+	@cd $(WORK_DIR)/$(PKG_DIR)/python && env $(ENV) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR)
