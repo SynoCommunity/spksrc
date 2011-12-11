@@ -7,7 +7,7 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline
+DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2
 DEPENDS += native/$(PKG_NAME)
 
 MAINTAINER = superzebulon@superzebulon.org
