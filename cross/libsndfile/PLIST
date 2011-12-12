@@ -1,0 +1,14 @@
+bin:bin/sndfile-cmp
+bin:bin/sndfile-concat
+bin:bin/sndfile-convert
+bin:bin/sndfile-deinterleave
+bin:bin/sndfile-info
+bin:bin/sndfile-interleave
+bin:bin/sndfile-metadata-get
+bin:bin/sndfile-metadata-set
+bin:bin/sndfile-play
+bin:bin/sndfile-regtest
+bin:bin/sndfile-salvage
+lnk:lib/libsndfile.so
+lnk:lib/libsndfile.so.1
+lib:lib/libsndfile.so.1.0.25
