@@ -1,0 +1,7 @@
+lib:lib/libffi-3.0.10/include/ffi.h
+lib:lib/libffi-3.0.10/include/ffitarget.h
+lnk:lib/libffi.so
+lnk:lib/libffi.so.5
+lib:lib/libffi.so.5.0.10
+shr:share/info/dir
+shr:share/info/libffi.info
