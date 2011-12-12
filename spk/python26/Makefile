@@ -5,8 +5,8 @@ SPK_REV = 6
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/python26 cross/pocketsphinx
-DEPENDS += cross/pyopenssl cross/pycrypto cross/pycurl cross/pil
-DEPENDS += cross/cheetah cross/yenc cross/tornado 
+DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycurl
+DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado 
 DEPENDS += cross/busybox cross/xzdec-static
 
 MAINTAINER = superzebulon@superzebulon.org
