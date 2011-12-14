@@ -18,6 +18,7 @@ LICENSE=	GPL
 GNU_CONFIGURE = 1
 
 CONFIGURE_TARGET = myConfigure
+COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
@@ -25,6 +26,10 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myConfigure
 myConfigure:
 	$(RUN) cp portaudio$(PORTAUDIO_VERS).h portaudio.h
+
+.PHONY: myCompile
+myCompile:
+	$(RUN) $(MAKE) DATADIR=$(INSTALL_PREFIX)/share/espeak-data
 
 .PHONY: myInstall
 myInstall:
