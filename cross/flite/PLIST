@@ -1,0 +1,8 @@
+bin:bin/flite
+bin:bin/flite_cmu_time_awb
+bin:bin/flite_cmu_us_awb
+bin:bin/flite_cmu_us_kal
+bin:bin/flite_cmu_us_kal16
+bin:bin/flite_cmu_us_rms
+bin:bin/flite_cmu_us_slt
+bin:bin/flite_time
