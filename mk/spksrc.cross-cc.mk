@@ -54,6 +54,10 @@ cat_PLIST:
 	fi
 
 ### Clean rules
+smart-clean:
+	rm -rf $(WORK_DIR)/$(PKG_DIR)
+	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
+
 clean:
 	rm -fr work work-*
 
