@@ -1,0 +1,36 @@
+diff -urN src-old/audio/Makefile.am src/audio/Makefile.am
+--- src-old/audio/Makefile.am	2010-09-06 15:46:36.000000000 +0200
++++ src/audio/Makefile.am	2011-12-15 20:58:15.000000000 +0100
+@@ -2,7 +2,7 @@
+ localedir = $(datadir)/locale
+ inc_local = "-I$(top_srcdir)/intl/"
+ 
+-am_cflags = -DLOCALEDIR=\"$(localedir)\" -I/usr/include/ $(inc_local) @glib_include@
++am_cflags = -DLOCALEDIR=\"$(localedir)\" $(inc_local) @glib_include@
+ 
+ if nas_support
+ NAS_FLAGS = -DWITH_NAS
+diff -urN src-old/c/api/Makefile.am src/c/api/Makefile.am
+--- src-old/c/api/Makefile.am	2010-09-01 15:30:12.000000000 +0200
++++ src/c/api/Makefile.am	2011-12-15 20:58:05.000000000 +0100
+@@ -2,7 +2,7 @@
+ localedir = $(datadir)/locale
+ inc_local = "-I$(top_srcdir)/intl/"
+ 
+-AM_CFLAGS = @ERROR_CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -D_GNU_SOURCE -I/usr/include/ $(inc_local) @glib_include@ -DSPD_SPAWN_CMD=\""@prefix@/bin/speech-dispatcher"\"
++AM_CFLAGS = @ERROR_CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -D_GNU_SOURCE $(inc_local) @glib_include@ -DSPD_SPAWN_CMD=\""@prefix@/bin/speech-dispatcher"\"
+ 
+ lib_LTLIBRARIES = libspeechd.la
+ libspeechd_la_SOURCES = libspeechd.c
+diff -urN src-old/modules/Makefile.am src/modules/Makefile.am
+--- src-old/modules/Makefile.am	2010-09-10 10:23:55.000000000 +0200
++++ src/modules/Makefile.am	2011-12-15 20:58:11.000000000 +0100
+@@ -6,7 +6,7 @@
+ 
+ EXTRA_DIST = module_main.c module_utils_addvoice.c festival_client.c festival_client.h ivona_client.c dummy.c dummy-message.wav
+ 
+-AM_CFLAGS = @ERROR_CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(snddatadir)\" -I/usr/include/ $(inc_local) @glib_include@ -L$(top_builddir)/src/audio -I$(top_srcdir)/src/audio -I../../intl/ $(ibmtts_include) @SNDFILE_CFLAGS@ -D_GNU_SOURCE
++AM_CFLAGS = @ERROR_CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(snddatadir)\" $(inc_local) @glib_include@ -L$(top_builddir)/src/audio -I$(top_srcdir)/src/audio -I../../intl/ $(ibmtts_include) @SNDFILE_CFLAGS@ -D_GNU_SOURCE
+ 
+ modulebin_PROGRAMS = sd_dummy sd_generic sd_festival sd_cicero
+ 

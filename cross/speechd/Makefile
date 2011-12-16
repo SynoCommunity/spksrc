@@ -17,7 +17,13 @@ COMMENT    = Common interface to speech synthesis
 LICENSE    = 
 
 GNU_CONFIGURE = 1
-
 CONFIGURE_ARGS = PYTHON=$(WORK_DIR)/../../../native/python$(PYTHON_SHORT_VERS)/work-native/Python-$(PYTHON_VERS)/python
+
+PRE_CONFIGURE_TARGET = myPreConfigure
  
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myPreConfigure
+myPreConfigure:
+	$(RUN) automake
+
