@@ -27,6 +27,12 @@ cross-clean:
 	    (cd $${cross} && $(MAKE) clean) ; \
 	done
 
+spk-clean:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	    (cd $${spk} && $(MAKE) clean) ; \
+	done
+
 %: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
