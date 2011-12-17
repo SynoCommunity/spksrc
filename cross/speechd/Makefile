@@ -9,7 +9,7 @@ PKG_DIST_SITE = http://devel.freebsoft.org/pub/projects/$(PKG_NAME)
 PYTHON_SHORT_VERS = 27
 PYTHON_VERS = 2.7.2
 
-DEPENDS  = cross/libtool cross/dotconf cross/glib cross/alsa-oss cross/espeak cross/flite
+DEPENDS  = cross/dotconf cross/glib cross/alsa-oss cross/espeak cross/flite
 DEPENDS += native/python$(PYTHON_SHORT_VERS)
 
 MAINTAINER = http://packages.nas-forum.com
