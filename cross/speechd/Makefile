@@ -21,6 +21,10 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = PYTHON=$(WORK_DIR)/../../../native/python$(PYTHON_SHORT_VERS)/work-native/Python-$(PYTHON_VERS)/python
 
 PRE_CONFIGURE_TARGET = myPreConfigure
+INSTALL_TARGET = myInstall
+
+SPEECHD_CONFIG_PATHS  = spksrc_spdconforigdir=$(INSTALL_PREFIX)/share/speech-dispatcher/conf spksrc_spdconfdir=$(INSTALL_PREFIX)/etc/speech-dispatcher
+SPEECHD_CONFIG_PATHS += spksrc_snddatadir=$(INSTALL_PREFIX)/share/sounds/speech-dispatcher spksrc_spddesktopconforigdir=$(INSTALL_PREFIX)/share/speech-dispatcher/conf/desktop
  
 include ../../mk/spksrc.cross-cc.mk
 
@@ -28,3 +32,8 @@ include ../../mk/spksrc.cross-cc.mk
 myPreConfigure:
 	$(RUN) sed -i -e 's|^#!.*$$|#!$(INSTALL_PREFIX)/bin/python|g' src/python/speechd_config/spd-conf
 	$(RUN) automake
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) $(SPEECHD_CONFIG_PATHS)
+
