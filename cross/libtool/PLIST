@@ -1,0 +1,5 @@
+bin:bin/libtool
+bin:bin/libtoolize
+lnk:lib/libltdl.so
+lnk:lib/libltdl.so.7
+lib:lib/libltdl.so.7.3.0
