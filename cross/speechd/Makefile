@@ -9,7 +9,8 @@ PKG_DIST_SITE = http://devel.freebsoft.org/pub/projects/$(PKG_NAME)
 PYTHON_SHORT_VERS = 27
 PYTHON_VERS = 2.7.2
 
-DEPENDS = cross/dotconf cross/glib cross/espeak cross/flite native/python$(PYTHON_SHORT_VERS)
+DEPENDS  = cross/libtool cross/dotconf cross/glib cross/alsa-oss cross/espeak cross/flite
+DEPENDS += native/python$(PYTHON_SHORT_VERS)
 
 MAINTAINER = http://packages.nas-forum.com
 HOMEPAGE   = http://devel.freebsoft.org/speechd
@@ -25,5 +26,5 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:
+	$(RUN) sed -i -e 's|^#!.*$$|#!$(INSTALL_PREFIX)/bin/python|g' src/python/speechd_config/spd-conf
 	$(RUN) automake
-
