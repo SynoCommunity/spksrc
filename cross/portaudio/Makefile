@@ -6,7 +6,7 @@ PKG_DIR = $(PKG_NAME)
 PKG_DIST_NAME = pa_stable_v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.portaudio.com/archives
 
-DEPENDS = 
+DEPENDS = cross/alsa-oss
 
 MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.portaudio.com/
