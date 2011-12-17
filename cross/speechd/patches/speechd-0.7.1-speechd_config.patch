@@ -1,0 +1,18 @@
+diff -ur src-old/python/speechd_config/Makefile.am src/python/speechd_config/Makefile.am
+--- src-old/python/speechd_config/Makefile.am	2010-09-10 10:23:55.000000000 +0200
++++ src/python/speechd_config/Makefile.am	2011-12-18 00:03:57.000000000 +0100
+@@ -9,10 +9,10 @@
+ nodist_speechd_python_PYTHON = paths.py
+ 
+ paths_edit = sed \
+-	-e "s:[@]spdconforigdir[@]:$(spdconforigdir):" \
+-	-e "s:[@]spdconfdir[@]:$(spdconfdir):" \
+-	-e "s:[@]snddatadir[@]:$(snddatadir):" \
+-	-e "s:[@]spddesktopconforigdir[@]:$(spddesktopconforigdir):"
++	-e "s:[@]spdconforigdir[@]:$(spksrc_spdconforigdir):" \
++	-e "s:[@]spdconfdir[@]:$(spksrc_spdconfdir):" \
++	-e "s:[@]snddatadir[@]:$(spksrc_snddatadir):" \
++	-e "s:[@]spddesktopconforigdir[@]:$(spksrc_spddesktopconforigdir):"
+ 
+ paths.py: Makefile
+ 	rm -f $@
