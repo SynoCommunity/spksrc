@@ -14,5 +14,8 @@ COMMENT=	Festival-lite is a small, fast run-time synthesis engine
 LICENSE=	
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-shared
+
+PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk

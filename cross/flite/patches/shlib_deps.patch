@@ -1,0 +1,13 @@
+diff --git a/config/common_make_rules b/config/common_make_rules
+index fc5a79f..34b0490 100644
+--- a/config/common_make_rules
++++ b/config/common_make_rules
+@@ -123,7 +123,7 @@ $(LIBDIR)/%.so: $(LIBDIR)/%.shared.a
+ 	@ rm -rf shared_os && mkdir shared_os
+ 	@ rm -f $@ $@.${PROJECT_VERSION} $@.${PROJECT_SHLIB_VERSION} 
+ 	@ (cd shared_os && ar x ../$<)
+-	@ (cd shared_os && $(CC) -shared -Wl,-soname,`basename $@`.${PROJECT_SHLIB_VERSION} -o ../$@.${PROJECT_VERSION} *.os)
++	@ (cd shared_os && $(CC) -shared -Wl,-soname,`basename $@`.${PROJECT_SHLIB_VERSION} -o ../$@.${PROJECT_VERSION} *.os $(LDFLAGS))
+ 	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_VERSION}` `basename $@.${PROJECT_SHLIB_VERSION}` )
+ 	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_SHLIB_VERSION}` `basename $@` )
+ 	@ rm -rf shared_os
