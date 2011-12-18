@@ -6,7 +6,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)-release
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-release.$(PKG_EXT)
 PKG_DIST_SITE = http://www.speech.cs.cmu.edu/$(PKG_NAME)/packed/$(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS =
+DEPENDS = cross/alsa-lib
 
 MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.speech.cs.cmu.edu/flite/index.html
