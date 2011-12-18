@@ -50,6 +50,8 @@ lnk:lib/speech-dispatcher/libsdaudio.so
 lnk:lib/speech-dispatcher/libsdaudio.so.2
 lib:lib/speech-dispatcher/libsdaudio.so.2.0.4
 lib:lib/speech-dispatcher-modules/sd_cicero
+lib:lib/speech-dispatcher-modules/sd_espeak
+lib:lib/speech-dispatcher-modules/sd_flite
 lib:lib/speech-dispatcher-modules/sd_dummy
 lib:lib/speech-dispatcher-modules/sd_festival
 lib:lib/speech-dispatcher-modules/sd_generic
