@@ -19,7 +19,8 @@ COMMENT    = Common interface to speech synthesis
 LICENSE    = 
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = PYTHON=$(WORK_DIR)/../../../native/python$(PYTHON_SHORT_VERS)/work-native/Python-$(PYTHON_VERS)/python
+CONFIGURE_ARGS  = --with-espeak --with-flite --with-oss --with-alsa
+CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python$(PYTHON_SHORT_VERS)/work-native/Python-$(PYTHON_VERS)/python
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
