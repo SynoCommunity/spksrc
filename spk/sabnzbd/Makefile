@@ -1,6 +1,6 @@
 
 SPK_NAME = SABnzbd
-SPK_VERS = 0.6.14
+SPK_VERS = 0.6.15
 SPK_REV = 1
 SPK_ICON = src/sab2_256.png
 

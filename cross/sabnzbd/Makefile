@@ -2,7 +2,7 @@
 
 
 PKG_NAME = SABnzbd
-PKG_VERS = 0.6.14
+PKG_VERS = 0.6.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/sabnzbdplus/files/sabnzbdplus/sabnzbd-$(PKG_VERS)
