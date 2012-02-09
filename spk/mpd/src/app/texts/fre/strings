@@ -1,0 +1,15 @@
+[app]
+app_name = "Music Player Daemon"
+description = "Music Player Daemon (MPD) est un lecteur audio libre qui permet l'accès distant depuis un client réseau."
+
+[config]
+fieldset_files_and_directories = "Fichiers et dossiers"
+music_directory = "Répertoire musique"
+port_number = "Numéro de port"
+
+[errors]
+directsubmit = "Echec de la sauvegarde"
+
+[messages]
+saved = "Paramètres enregistrés. Redémarrez Music Player Daemon afin de les prendre en compte"
+

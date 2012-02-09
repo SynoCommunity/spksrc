@@ -1,0 +1,15 @@
+[app]
+app_name = "Music Player Daemon"
+description = "Music Player Daemon (MPD) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol."
+
+[config]
+fieldset_files_and_directories = "Files and directories"
+music_directory = "Music directory"
+port_number = "Port number"
+
+[errors]
+directsubmit = "Save operation failed"
+
+[messages]
+saved = "Parameters saved. Restart Music Player Daemon for changes to take effect"
+
