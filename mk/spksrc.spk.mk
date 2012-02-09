@@ -51,6 +51,12 @@ else
 endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
+ifneq ($(strip $(DSM_UI_DIR)),)
+	@echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@
+endif
+ifneq ($(strip $(DSM_APP_NAME)),)
+	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
+endif
 ifneq ($(strip $(ADMIN_PORT)),)
 	@echo adminport=$(ADMIN_PORT) >> $@
 endif
