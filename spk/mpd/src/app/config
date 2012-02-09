@@ -1,0 +1,21 @@
+{
+    "mpd.js": {
+        "MPD.Instance": {
+            "type": "app",
+            "title": "app:app_name",
+            "version": "0.1",
+            "icon": "images/mpd-{0}.png",
+            "texts": "texts",
+            "allowMultiInstance": false,
+            "appWindow": "MPD.MainWindow",
+            "depend": ["MPD.MainWindow"]
+        },
+        "MPD.MainWindow": {
+            "type": "lib",
+            "title": "app:app_name",
+            "icon": "images/mpd-{0}.png",
+            "texts": "texts",
+            "depend": ["MPD.MainPanel"]
+        }
+    }
+}

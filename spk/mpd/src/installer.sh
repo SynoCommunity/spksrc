@@ -24,9 +24,6 @@ preinst ()
 
 postinst ()
 {
-    # Correct the files ownership
-    chown -R root:root ${SYNOPKG_PKGDEST}
-
     # Create the view directory
     mkdir -p ${INSTALL_DIR}
     mkdir -p /usr/local/bin
@@ -39,16 +36,8 @@ postinst ()
     # Create a link in /usr/local/bin
     ln -s /var/packages/${PACKAGE}/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl
 
-    # Install the application in the main interface
-    if [ -d ${SYNO3APP} ]; then
-        rm -f ${SYNO3APP}/${PACKAGE}
-        ln -s ${SYNOPKG_PKGDEST}/share/synoman ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Restore the config file and certificate if we're upgrading
-    if [ -f ${UPGRADE} ]; then
-        mv /tmp/mpd.conf ${INSTALL_DIR}/etc/
-    fi
+    # Correct the files ownership
+    chown -R root:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
@@ -60,11 +49,6 @@ preuninst ()
 
 postuninst ()
 {
-    # Save the config file and the user if we're upgrading, delete the user otherwise
-    if [ -f ${UPGRADE} ]; then
-        cp ${INSTALL_DIR}/etc/mpd.conf /tmp/
-    fi
-
     # Remove symlinks to utils
     rm /usr/local/bin/${PACKAGE}-ctl
 
@@ -76,14 +60,24 @@ postuninst ()
 
 preupgrade ()
 {
-    touch ${UPGRADE}
+    # Save some stuff
+    rm -fr /tmp/${PACKAGE}
+    mkdir /tmp/${PACKAGE}
+    mkdir /tmp/${PACKAGE}/etc
+    cp ${INSTALL_DIR}/etc/mpd.conf /tmp/${PACKAGE}/etc/
+    mkdir /tmp/${PACKAGE}/var
+    cp -r ${INSTALL_DIR}/var/* /tmp/${PACKAGE}/var/
 
     exit 0
 }
 
 postupgrade ()
 {
-    rm -f ${UPGRADE}
+    # Restore some stuff
+    for dir in etc var; do
+        cp -r /tmp/${PACKAGE}/${dir}/* ${INSTALL_DIR}/${dir}/
+    done
+    rm -fr /tmp/mpd
 
     exit 0
 }

@@ -19,7 +19,7 @@ PID_FILE="${INSTALL_DIR}/var/pid"
 start_daemon ()
 {
     # Launch the application in the background
-    su - ${RUNAS} -c "PATH=${PATH} ${MPD} -c ${CFG_FILE}"
+    su - ${RUNAS} -c "PATH=${PATH} ${MPD} ${CFG_FILE}"
     counter=20
     while [ ${counter} -gt 0 ]; do
         daemon_status && break
@@ -57,7 +57,7 @@ daemon_status ()
         else
             # PID file exists, but no process has this PID
             rm ${PID_FILE}
-    	fi
+        fi
     fi
     return 1
 }
@@ -84,6 +84,11 @@ case $1 in
             exit 0
         fi
         ;;
+    restart)
+        stop_daemon
+        start_daemon
+        exit $?
+        ;;
     status)
         if daemon_status; then
             echo ${DNAME} is running
@@ -98,8 +103,7 @@ case $1 in
         exit $?
         ;;
     log)
-        echo ${LOG_FILE}
-        exit 0
+        exit 1
         ;;
     *)
         exit 1
