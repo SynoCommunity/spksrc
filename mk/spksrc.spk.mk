@@ -35,7 +35,7 @@ $(WORK_DIR)/package.tgz: strip
 $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
-	@echo package=\"$(SPK_NAME)\"  > $@
+	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@echo description=\"$(COMMENT)\" >> $@
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
