@@ -14,9 +14,18 @@ COMMENT    = Advanced Linux Sound Architecture provides audio and MIDI functiona
 LICENSE    = 
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --with-curses=ncurses
+CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
- 
+
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myConfigure
+myConfigure:
+	sed -i.orig $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses5-config \
+	    -e 's#^prefix=".*"$$#prefix="$(INSTALL_DIR)/$(INSTALL_PREFIX)"#'
+	$(RUN) PATH=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/:$(PATH) ./configure $(REAL_CONFIGURE_ARGS)
+	mv $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses5-config.orig $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses5-config
 
 .PHONY: myInstall
 myInstall:
