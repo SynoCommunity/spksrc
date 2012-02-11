@@ -6,6 +6,7 @@ description = "Music Player Daemon (MPD) est un lecteur audio libre qui permet l
 fieldset_files_and_directories = "Fichiers et dossiers"
 music_directory = "Répertoire musique"
 port_number = "Numéro de port"
+device = "Périphérique"
 
 [errors]
 directsubmit = "Echec de la sauvegarde"

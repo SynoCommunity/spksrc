@@ -6,6 +6,7 @@ description = "Music Player Daemon (MPD) is a flexible, powerful, server-side ap
 fieldset_files_and_directories = "Files and directories"
 music_directory = "Music directory"
 port_number = "Port number"
+device = "Device"
 
 [errors]
 directsubmit = "Save operation failed"

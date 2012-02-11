@@ -16,32 +16,16 @@ PID_FILE="${INSTALL_DIR}/var/pid"
 start_daemon ()
 {
     # Fix permissions
-    chown -R :audio /dev/dsp* /dev/snd /dev/mixer
-    chmod -R g+rwx /dev/dsp* /dev/snd /dev/mixer
+    chown -R :audio /dev/snd /dev/dsp* /dev/mixer*
+    chmod g+rwx /dev/snd
+    chmod g+rw /dev/snd/* /dev/dsp* /dev/mixer*
 
-    # Launch the application in the background
-    su - ${RUNAS} -c "PATH=${PATH} ${MPD} ${CFG_FILE}"
-    counter=20
-    while [ ${counter} -gt 0 ]; do
-        daemon_status && break
-        let counter=counter-1
-        sleep 1
-    done
+    su - ${RUNAS} -c "${MPD} ${CFG_FILE}"
 }
 
 stop_daemon ()
 {
-    # Kill the application and wait until it is really dead
-    kill `cat ${PID_FILE}`
-    rm ${PID_FILE}
-    counter=20
-    while [ $counter -gt 0 ]; do
-        daemon_status || exit 0
-        let counter=counter-1
-        sleep 1
-    done
-
-    exit 1
+    su - ${RUNAS} -c "${MPD} ${CFG_FILE} --kill"
 }
 
 daemon_status ()

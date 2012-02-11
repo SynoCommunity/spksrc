@@ -9,7 +9,8 @@ Ext.Direct.addProvider({
     "actions": {
         "MPD": [
             {"formHandler": true, "name": "save", "len": 2},
-            {"name": "load", "len": 0}
+            {"name": "load", "len": 0},
+            {"name": "get_devices", "len": 0}
         ]
     }
 });
@@ -67,18 +68,31 @@ MPD.MainPanel = Ext.extend(Ext.FormPanel, {
                 xtype:'fieldset',
                 title: _V('config', 'fieldset_files_and_directories'),
                 defaultType: 'textfield',
+                defaults: {
+                    anchor: '-20'
+                },
                 items :[{
                     fieldLabel: _V('config', 'music_directory'),
                     name: 'music_directory',
                     allowBlank: false,
-                    anchor: '100%'
                 }, {
                     xtype: 'numberfield',
                     fieldLabel: _V('config', 'port_number'),
                     name: 'port_number',
                     allowBlank: false,
                     allowNegative: false,
-                    anchor: '100%'
+                }, {
+                    xtype: 'combo',
+                    fieldLabel: _V('config', 'device'),
+                    name: 'device',
+                    triggerAction: 'all',
+                    valueField: 'id',
+                    displayField: 'name',
+                    store: new Ext.data.DirectStore({
+                        fields: ['id', 'name'],
+                        directFn: MPD.Remote.MPD.get_devices,
+                        root: 'records'
+                    })
                 }]
             }],
             buttons: [{
