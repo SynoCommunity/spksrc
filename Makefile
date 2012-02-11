@@ -38,3 +38,11 @@ spk-clean:
 
 %-clean: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
+
+setup: local.mk
+
+local.mk:
+	@echo "Creating local configuration \"local.mk\"..."
+	@echo "PUBLISHING_URL=http://packages.nas-forum.com/spksrc" > $@
+	@echo "PUBLISHING_KEY=" >> $@
+
