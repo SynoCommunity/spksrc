@@ -139,10 +139,8 @@ package: $(SPK_FILE_NAME)
 ifneq ($(PUBLISHING_URL),)
 ifneq ($(PUBLISHING_KEY),)
 publish: package
-	curl -H "Accept: text/plain" \
-	     -F "spk=@$(SPK_FILE_NAME);type=application/x-extension-spk" \
-	     -F "info=@$(WORK_DIR)/INFO;type=text/plain" \
-	     -F "publishingKey=$(PUBLISHING_KEY);type=text/plain" \
+	curl -A "spksrc v1.0; $(PUBLISHING_KEY)" \
+	     -F "package=@$(SPK_FILE_NAME)" \
 	     $(PUBLISHING_URL)
 else
 publish:
