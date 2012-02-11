@@ -50,6 +50,10 @@ $ssl_address=$cgi->param('ssladdress');
 $ssl_port=$cgi->param('sslport');
 $vpn_address=$cgi->param('vpnaddress');
 $vpn_port=$cgi->param('vpnport');
+$tinc_address=$cgi->param('tincaddress');
+$tinc_port=$cgi->param('tincport');
+$xmpp_address=$cgi->param('xmppaddress');
+$xmpp_port=$cgi->param('xmppport');
 
 &sdbg("sslh_address:$sslh_address");
 &sdbg("sslh_port:$sslh_port");
@@ -59,6 +63,11 @@ $vpn_port=$cgi->param('vpnport');
 &sdbg("ssl_port:$ssl_port");
 &sdbg("vpn_address:$vpn_address");
 &sdbg("vpn_port:$vpn_port");
+&sdbg("tinc_address:$tinc_address");
+&sdbg("tinc_port:$tinc_port");
+&sdbg("xmpp_address:$xmpp_address");
+&sdbg("xmpp_port:$xmpp_port");
+
 
 # Mise à jour du fichier sslh.ini
 if (!(open(SSLH,">/usr/local/sslh/sslh.ini"))) {
@@ -68,6 +77,8 @@ if (!(open(SSLH,">/usr/local/sslh/sslh.ini"))) {
 	print SSLH "ssh=$ssh_address:$ssh_port\n";
 	print SSLH "ssl=$ssl_address:$ssl_port\n";
 	print SSLH "openvpn=$vpn_address:$vpn_port\n";
+	print SSLH "tinc=$tinc_address:$tinc_port\n";
+	print SSLH "xmpp=$xmpp_address:$xmpp_port\n";
 	close(SSLH);
 }
 

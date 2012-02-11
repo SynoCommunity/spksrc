@@ -16,9 +16,21 @@ native-clean:
 	done
 
 toolchain-clean:
-	for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
 	    (cd $${tc} && $(MAKE) clean) ; \
+	done
+
+cross-clean:
+	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
+	do \
+	    (cd $${cross} && $(MAKE) clean) ; \
+	done
+
+spk-clean:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	    (cd $${spk} && $(MAKE) clean) ; \
 	done
 
 %: spk/%/Makefile

@@ -6,7 +6,7 @@ include ../../mk/spksrc.directories.mk
 WORK_DIR := $(PWD)/work-native
 
 # Package dependend
-URLS          = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = native-$(PKG_NAME) 
 COOKIE_PREFIX = $(PKG_NAME)-
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)

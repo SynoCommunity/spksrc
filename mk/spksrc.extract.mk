@@ -11,6 +11,7 @@ EXTRACT_CMD.tgz = tar xzpf $(DIST_FILE) -C $(WORK_DIR)
 EXTRACT_CMD.tar.gz = tar xzpf $(DIST_FILE) -C $(WORK_DIR)
 EXTRACT_CMD.tar.bz2 = tar xjpf $(DIST_FILE) -C $(WORK_DIR)
 EXTRACT_CMD.tar.xz = tar xJpf $(DIST_FILE) -C $(WORK_DIR)
+EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(WORK_DIR)
 
 EXTRACT_CMD = $(EXTRACT_CMD.$(DIST_EXT)) 
 

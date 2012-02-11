@@ -6,3 +6,4 @@ spk/*/work*
 toolchains/*/work*
 local.mk
 *.DS_Store
+*~

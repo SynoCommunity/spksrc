@@ -16,6 +16,4 @@ LICENSE		=	OpenVPN support a license under GPLv2 along with a commercial license
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-password-save
 
-INSTALL_PREFIX  = /usr/local/$(PKG_NAME)
-
 include ../../mk/spksrc.cross-cc.mk

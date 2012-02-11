@@ -1,0 +1,5 @@
+lnk:lib/libffi.so
+lnk:lib/libffi.so.5
+lib:lib/libffi.so.5.0.10
+shr:share/info/dir
+shr:share/info/libffi.info

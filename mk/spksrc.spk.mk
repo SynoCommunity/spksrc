@@ -35,7 +35,7 @@ $(WORK_DIR)/package.tgz: strip
 $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
-	@echo package=\"$(SPK_NAME)\"  > $@
+	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@echo description=\"$(COMMENT)\" >> $@
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
@@ -51,6 +51,12 @@ else
 endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
+ifneq ($(strip $(DSM_UI_DIR)),)
+	@echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@
+endif
+ifneq ($(strip $(DSM_APP_NAME)),)
+	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
+endif
 ifneq ($(strip $(ADMIN_PORT)),)
 	@echo adminport=$(ADMIN_PORT) >> $@
 endif
@@ -173,5 +179,3 @@ arch-%:
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $(subst publish-arch-,,$@) 
 	@env $(MAKE) ARCH=$(subst publish-arch-,,$@) publish
-
-	

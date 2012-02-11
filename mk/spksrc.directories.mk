@@ -23,8 +23,12 @@ INSTALL_DIR = $(WORK_DIR)/install
 endif
 STAGING_DIR = $(WORK_DIR)/staging
 
+ifndef INSTALL_PREFIX
+INSTALL_PREFIX = /usr/local
+endif
+
 ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
-STAGING_INSTALL_PREFIX = $(INSTALL_DIR)/$(INSTALL_PREFIX)
+STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif
 
 define create_target_dir

@@ -1,0 +1,3 @@
+lnk:lib/libmad.so
+lnk:lib/libmad.so.0
+lib:lib/libmad.so.0.2.1

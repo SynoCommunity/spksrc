@@ -1,16 +1,16 @@
 
 
 SPK_NAME = sslh
-SPK_VERS = 1.9
+SPK_VERS = 1.10
 SPK_REV = 1
 SPK_ICON = src/sslh.png
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = packages@packages.nas-forum.com
-COMMENT    = sslh accepts HTTPS, SSH and OpenVPN connections on the same port.
+COMMENT    = sslh accepts HTTPS, SSH, OpenVPN, Tinc and XMPP connections on the same port.
 RELOAD_UI = no
-DISPLAY_NAME = sslh
+DISPLAY_NAME = SSLH
 
 HOMEPAGE   = http://www.rutschle.net/tech/sslh.shtml
 LICENSE    = 

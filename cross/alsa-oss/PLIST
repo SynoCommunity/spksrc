@@ -1,0 +1,7 @@
+bin:bin/aoss
+lnk:lib/libalsatoss.so
+lnk:lib/libalsatoss.so.0
+lib:lib/libalsatoss.so.0.0.0
+lnk:lib/libaoss.so
+lnk:lib/libaoss.so.0
+lib:lib/libaoss.so.0.0.0

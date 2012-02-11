@@ -7,7 +7,7 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline
+DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2
 DEPENDS += native/$(PKG_NAME)
 
 MAINTAINER = superzebulon@superzebulon.org
@@ -33,7 +33,10 @@ POST_INSTALL_TARGET = $(WORK_DIR)/python-cc.mk
 include ../../mk/spksrc.cross-cc.mk
 
 HOSTPYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/python
+HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-i686-2.6
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-i686-2.6
 HOSTPGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
+PYTHON_LIB_DIR = lib/python2.6
 
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
@@ -53,4 +56,6 @@ myInstall:
 
 $(WORK_DIR)/python-cc.mk: Makefile
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
-	
+	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
+	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
+	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@

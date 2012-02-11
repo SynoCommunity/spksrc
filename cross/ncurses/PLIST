@@ -1,9 +1,9 @@
-lnk:bin/captoinfo
+bin:bin/captoinfo
 bin:bin/clear
-lnk:bin/infocmp
+bin:bin/infocmp
 bin:bin/infotocap
-rsc:bin/ncurses5-config
-lnk:bin/reset
+bin:bin/ncurses5-config
+bin:bin/reset
 bin:bin/tabs
 bin:bin/tic
 bin:bin/toe
@@ -21,4 +21,8 @@ lib:lib/libncurses.so.5.9
 lnk:lib/libpanel.so
 lnk:lib/libpanel.so.5
 lib:lib/libpanel.so.5.9
-rsc:share/tabset
+shr:share/tabset/std
+shr:share/tabset/stdcrt
+shr:share/tabset/vt100
+shr:share/tabset/vt300
+shr:share/terminfo

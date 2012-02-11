@@ -29,14 +29,11 @@ postinst ()
     mkdir -p ${INSTALL_DIR}
     mkdir -p ${VAR_DIR}/run
 
-    # Extract the files to the installation ditectory
-    ${SYNOPKG_PKGDEST}/sbin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
-        tar xpf - -C ${INSTALL_DIR}
-    # Remove the installer archive to save space
-    rm ${SYNOPKG_PKGDEST}/package.txz
+    # Link folders
+    for dir in ${SYNOPKG_PKGDEST}/*; do
+        ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
+    done
 
-    # Install xzdec for the companion tools installation
-    cp ${SYNOPKG_PKGDEST}/sbin/xzdec ${INSTALL_DIR}/bin/xzdec
     # Install the adduser and deluser hardlinks
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 

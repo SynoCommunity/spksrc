@@ -1,0 +1,4 @@
+bin:bin/dotconf-config
+lnk:lib/libdotconf.so
+lnk:lib/libdotconf-1.0.so.0
+lib:lib/libdotconf-1.0.so.0.10.4

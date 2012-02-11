@@ -29,6 +29,7 @@ postinst ()
 	# Create the directory
 	mkdir -p /usr/local/sslh
 	mkdir -p /usr/local/sslh/bin
+	mkdir -p /usr/local/sslh/pid
 
 	# Create symlink
 	ln -s ${SYNOPKG_PKGDEST}/bin/sslh /usr/local/sslh/bin/sslh
@@ -44,6 +45,7 @@ postinst ()
 	chmod 755 ${SYNOPKG_PKGDEST}/bin/*
 	chmod 666 ${SYNOPKG_PKGDEST}/sslh.ini
 	chmod 777 ${SYNOPKG_PKGDEST}/log
+	chmod 777 /usr/local/sslh/pid
 
 	exit 0
 }

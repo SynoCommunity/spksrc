@@ -50,9 +50,9 @@ strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST)
 	do \
 	  case $${type} in \
 	    lib|bin) \
-	      echo "Stripping $${file}" ; \
+	      echo -n "Stripping $${file}... " ; \
 	      chmod u+w $(STAGING_DIR)/$${file} ; \
-	      $(STRIP) $(STAGING_DIR)/$${file} > /dev/null 2>&1 || echo "Cannot strip $${file}" \
+	      $(STRIP) $(STAGING_DIR)/$${file} > /dev/null 2>&1 && echo "ok" || echo "failed!" \
 	      ;; \
 	  esac ; \
 	done
