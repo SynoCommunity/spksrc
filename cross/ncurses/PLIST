@@ -25,3 +25,4 @@ shr:share/tabset/std
 shr:share/tabset/stdcrt
 shr:share/tabset/vt100
 shr:share/tabset/vt300
+shr:share/terminfo
