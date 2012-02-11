@@ -5,7 +5,7 @@ SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 DSM_APP_NAME = MPD.Instance
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME) cross/busybox
 
 SPK_DEPENDS = "Python27>=2.7.2-1"
 
