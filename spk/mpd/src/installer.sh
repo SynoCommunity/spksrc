@@ -1,20 +1,14 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="mpd"
 DNAME="Music Player Daemon"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="${PACKAGE}"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
-
-#########################################
-# DSM package manager functions
 
 
 preinst ()
@@ -33,25 +27,36 @@ postinst ()
         ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
     done
 
-    # Create a link in /usr/local/bin
-    ln -s /var/packages/${PACKAGE}/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
+    # Create audio group for ALSA
+    addgroup -S audio
+
+    # Create user
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+    addgroup ${RUNAS} audio
 
     # Correct the files ownership
-    chown -R root:root ${SYNOPKG_PKGDEST}
+    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
+    # Remove the user (if not upgrading)
+    if [ ! -f ${UPGRADE} ]; then
+        delgroup ${RUNAS} audio
+        delgroup ${RUNAS} users
+        deluser ${RUNAS}
+    fi
+
     exit 0
 }
 
 postuninst ()
 {
-    # Remove symlinks to utils
-    rm /usr/local/bin/${PACKAGE}-ctl
-
     # Remove the installation directory
     rm -fr ${INSTALL_DIR}
 
@@ -68,6 +73,9 @@ preupgrade ()
     mkdir /tmp/${PACKAGE}/var
     cp -r ${INSTALL_DIR}/var/* /tmp/${PACKAGE}/var/
 
+    # Create the upgrade flag
+    touch ${UPGRADE}
+
     exit 0
 }
 
@@ -78,6 +86,9 @@ postupgrade ()
         cp -r /tmp/${PACKAGE}/${dir}/* ${INSTALL_DIR}/${dir}/
     done
     rm -fr /tmp/mpd
+
+    # Remove the upgrade flag
+    rm  ${UPGRADE}
 
     exit 0
 }

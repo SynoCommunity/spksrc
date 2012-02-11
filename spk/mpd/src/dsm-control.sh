@@ -1,23 +1,24 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="mpd"
 DNAME="Music Player Daemon"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
-
-RUNAS="root"
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="${PACKAGE}"
 MPD="${INSTALL_DIR}/bin/mpd"
 CFG_FILE="${INSTALL_DIR}/etc/mpd.conf"
 PID_FILE="${INSTALL_DIR}/var/pid"
 
+
 start_daemon ()
 {
+    # Fix permissions
+    chown -R :audio /dev/dsp* /dev/snd /dev/mixer
+    chmod -R g+rwx /dev/dsp* /dev/snd /dev/mixer
+
     # Launch the application in the background
     su - ${RUNAS} -c "PATH=${PATH} ${MPD} ${CFG_FILE}"
     counter=20
@@ -30,10 +31,9 @@ start_daemon ()
 
 stop_daemon ()
 {
-    # Kill the application
+    # Kill the application and wait until it is really dead
     kill `cat ${PID_FILE}`
-
-    # Wait until the application is really dead (may take some time)
+    rm ${PID_FILE}
     counter=20
     while [ $counter -gt 0 ]; do
         daemon_status || exit 0
@@ -44,20 +44,11 @@ stop_daemon ()
     exit 1
 }
 
-reload_daemon ()
-{
-    kill -s HUP `cat ${PID_FILE}`
-}
-
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ]; then
-        if [ -d /proc/`cat ${PID_FILE}` ]; then
-            return 0
-        else
-            # PID file exists, but no process has this PID
-            rm ${PID_FILE}
-        fi
+    # Check for pid file and an existing process with that pid
+    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
+        return 0
     fi
     return 1
 }
@@ -84,11 +75,6 @@ case $1 in
             exit 0
         fi
         ;;
-    restart)
-        stop_daemon
-        start_daemon
-        exit $?
-        ;;
     status)
         if daemon_status; then
             echo ${DNAME} is running
@@ -97,13 +83,6 @@ case $1 in
             echo ${DNAME} is not running
             exit 1
         fi
-        ;;
-    console)
-        run_in_console
-        exit $?
-        ;;
-    log)
-        exit 1
         ;;
     *)
         exit 1
