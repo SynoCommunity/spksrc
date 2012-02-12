@@ -6,7 +6,7 @@ SPK_ICON = src/python.png
 
 DEPENDS  = cross/python27
 DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycurl
-DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado
+DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado cross/pyextdirect
 DEPENDS += cross/busybox
 
 MAINTAINER = http://packages.nas-forum.com
