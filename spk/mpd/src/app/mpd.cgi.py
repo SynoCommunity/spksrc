@@ -1,4 +1,4 @@
-#!/usr/local/python27/bin/python
+#!/usr/local/python/bin/python
 import os
 import re
 import shutil

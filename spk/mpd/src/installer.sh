@@ -18,14 +18,8 @@ preinst ()
 
 postinst ()
 {
-    # Create the view directory
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p /usr/local/bin
-
-    # Link folders
-    for dir in ${SYNOPKG_PKGDEST}/*; do
-        ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
-    done
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
@@ -57,8 +51,8 @@ preuninst ()
 
 postuninst ()
 {
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
 
     exit 0
 }
@@ -85,10 +79,11 @@ postupgrade ()
     for dir in etc var; do
         cp -r /tmp/${PACKAGE}/${dir}/* ${INSTALL_DIR}/${dir}/
     done
-    rm -fr /tmp/mpd
+    rm -fr /tmp/${PACKAGE}
 
     # Remove the upgrade flag
     rm  ${UPGRADE}
 
     exit 0
 }
+
