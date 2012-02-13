@@ -1,4 +1,3 @@
-
 PKG_NAME = flex
 PKG_VERS = 2.5.35
 PKG_EXT = tar.gz
@@ -18,3 +17,4 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
  
 include ../../mk/spksrc.cross-cc.mk
+

@@ -7,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libogg
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.vorbis.com/
 COMMENT=	Free, open container format
 LICENSE=	BSD

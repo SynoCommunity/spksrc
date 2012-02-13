@@ -1,4 +1,3 @@
-
 PKG_NAME = leptonica
 PKG_VERS = 1.68
 PKG_EXT = tar.gz
@@ -8,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/libpng cross/libjpeg cross/libtiff cross/giflib
 
-MAINTAINER=	superzebulon@superzebulon.org
 HOMEPAGE=	http://www.leptonica.com/
 COMMENT=	"Leptonica is a pedagogically-oriented open source software that is broadly useful for image processing and image analysis applications."
 LICENSE=	http://www.leptonica.com/about-the-license.html
@@ -18,3 +16,4 @@ CONFIGURE_ARGS = --disable-static
 
 
 include ../../mk/spksrc.cross-cc.mk
+

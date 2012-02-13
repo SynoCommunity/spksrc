@@ -1,4 +1,3 @@
-
 PKG_NAME = libsndfile
 PKG_VERS = 1.0.25
 PKG_EXT = tar.gz
@@ -8,7 +7,6 @@ PKG_DIST_SITE = http://www.mega-nerd.com/libsndfile/files
 
 DEPENDS =
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.mega-nerd.com/libsndfile/
 COMMENT=	C library for reading and writing files containing sampled sound
 LICENSE=	LGPL

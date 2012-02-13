@@ -1,4 +1,3 @@
-
 PKG_NAME = pocketsphinx
 PKG_VERS = 0.7
 PKG_EXT = tar.gz
@@ -8,10 +7,9 @@ PKG_DIST_SITE = http://downloads.sourceforge.net/project/cmusphinx/$(PKG_NAME)/$
 
 DEPENDS = cross/sphinxbase
 
-MAINTAINER=	http://packages.nas-forum.com/
-HOMEPAGE=	http://cmusphinx.sourceforge.net/
-COMMENT=	Recognizer library
-LICENSE=	CMU Sphinx
+HOMEPAGE = http://cmusphinx.sourceforge.net/
+COMMENT  = Recognizer library
+LICENSE  = CMU Sphinx
 
 GNU_CONFIGURE = 1
 
@@ -36,3 +34,4 @@ myCompile: configure_target compile_target install_target
 .PHONY: myInstall
 myInstall:
 	@cd $(WORK_DIR)/$(PKG_DIR)/python && env $(ENV) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR)
+

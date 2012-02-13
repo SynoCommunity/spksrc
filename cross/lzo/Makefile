@@ -1,4 +1,3 @@
-
 PKG_NAME = lzo
 PKG_VERS = 2.06
 PKG_EXT = tar.gz
@@ -8,12 +7,12 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-MAINTAINER	=	packages@packages.nas-forum.com
-HOMEPAGE	=	http://www.oberhumer.com/opensource/lzo/
-COMMENT		=	LZO is a data compression library which is suitable for data de-/compression in real-time.
-LICENSE		=	GPL v2+
+HOMEPAGE = http://www.oberhumer.com/opensource/lzo/
+COMMENT	 = LZO is a data compression library which is suitable for data de-/compression in real-time.
+LICENSE	 = GPL v2+
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
+

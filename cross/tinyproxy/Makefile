@@ -1,4 +1,3 @@
-
 PKG_NAME = tinyproxy
 PKG_VERS = 1.8.3
 PKG_EXT = tar.bz2
@@ -8,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-MAINTAINER = packages@packages.nas-forum.com
 HOMEPAGE   = https://banu.com/tinyproxy/
 COMMENT    = Tinyproxy is a light-weight HTTP/HTTPS proxy daemon for POSIX operating systems.
 LICENSE    = GNU GPL 2
@@ -19,3 +17,4 @@ CONFIGURE_ARGS = --disable-regexcheck ac_cv_func_malloc_0_nonnull=yes ac_cv_func
 ADDITIONAL_CFLAGS =
 
 include ../../mk/spksrc.cross-cc.mk
+

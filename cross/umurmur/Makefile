@@ -1,5 +1,3 @@
-
-
 PKG_NAME = umurmur
 PKG_VERS = 0.2.8
 PKG_EXT = tar.gz
@@ -9,14 +7,12 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libconfig cross/protobuf-c cross/polarssl
 
-MAINTAINER = packages@packages.nas-forum.com
-HOMEPAGE   = http://code.google.com/p/umurmur/
-COMMENT    = Minimalistic Mumble server
-LICENSE    =
+HOMEPAGE = http://code.google.com/p/umurmur/
+COMMENT  = Minimalistic Mumble server
+LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = 
 
-INSTALL_PREFIX  = /usr/local/$(PKG_NAME)
-
 include ../../mk/spksrc.cross-cc.mk
+

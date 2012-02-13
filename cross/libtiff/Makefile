@@ -1,6 +1,4 @@
-
-
-PKG_NAME = 	tiff
+PKG_NAME = tiff
 PKG_VERS = 3.9.5
 PKG_EXT = tar.gz
 PKG_REV = 1
@@ -10,7 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-MAINTAINER=	superzebulon@superzebulon.org
 HOMEPAGE=	http://www.remotesensing.org/libtiff/
 COMMENT=	
 LICENSE=	
@@ -18,3 +15,4 @@ LICENSE=
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+

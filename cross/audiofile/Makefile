@@ -7,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/alsa-lib
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.68k.org/~michael/audiofile/
 COMMENT=	Handle reading and writing audio files in many common formats
 LICENSE=	LGPL

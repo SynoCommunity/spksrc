@@ -1,4 +1,3 @@
-
 PKG_NAME = bzip2
 PKG_VERS = 1.0.6
 PKG_EXT = tar.gz
@@ -8,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-MAINTAINER = http://packages.nas-forum.com
 HOMEPAGE   = http://bzip.org/
 COMMENT    = High-quality data compressor
 LICENSE    = BSD License
@@ -38,3 +36,4 @@ myPostInstall:
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzegrep
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzfgrep
 	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
+

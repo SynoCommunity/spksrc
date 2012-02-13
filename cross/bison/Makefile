@@ -1,4 +1,3 @@
-
 PKG_NAME = bison
 PKG_VERS = 2.5
 PKG_EXT = tar.gz
@@ -8,7 +7,6 @@ PKG_DIST_SITE = http://ftp.gnu.org/gnu/$(PKG_NAME)
 
 DEPENDS =
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.gnu.org/s/bison/
 COMMENT=	General-purpose parser generator
 LICENSE=	GNU GPL
