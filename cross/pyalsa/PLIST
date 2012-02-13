@@ -1,0 +1,5 @@
+lib:@PYTHON_SITE_PACKAGES@/pyalsa/alsacard.so
+lib:@PYTHON_SITE_PACKAGES@/pyalsa/alsacontrol.so
+lib:@PYTHON_SITE_PACKAGES@/pyalsa/alsahcontrol.so
+lib:@PYTHON_SITE_PACKAGES@/pyalsa/alsamixer.so
+lib:@PYTHON_SITE_PACKAGES@/pyalsa/alsaseq.so
