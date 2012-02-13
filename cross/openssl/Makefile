@@ -1,7 +1,5 @@
-
-
 PKG_NAME = openssl
-PKG_VERS = 1.0.0e
+PKG_VERS = 1.0.0g
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.openssl.org/source
@@ -9,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-MAINTAINER=	superzebulon@superzebulon.org
 HOMEPAGE=	http://www.openssl.org/
 COMMENT=	Compression Library
 LICENSE=	zlib-license
@@ -30,3 +27,4 @@ myConfigure:
 .PHONY: myInstall
 myInstall:
 	$(RUN) $(MAKE) install_sw INSTALL_PREFIX=$(INSTALL_DIR)
+
