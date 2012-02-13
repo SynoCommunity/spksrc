@@ -1,6 +1,4 @@
-
-
-PKG_NAME = python27
+PKG_NAME = python
 PKG_VERS = 2.7.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -9,7 +7,7 @@ PKG_DIR = Python-$(PKG_VERS)
 
 DEPENDS =
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = packages@packages.nas-forum.com
 HOMEPAGE   = http://www.python.org/
 COMMENT    = Python Programming Language
 LICENSE    =

@@ -1,6 +1,4 @@
-
-
-PKG_NAME = python27
+PKG_NAME = python
 PKG_VERS = 2.7.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -10,10 +8,9 @@ PKG_DIR = Python-$(PKG_VERS)
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2
 DEPENDS += native/$(PKG_NAME)
 
-MAINTAINER = superzebulon@superzebulon.org
-HOMEPAGE   = http://www.python.org/
-COMMENT    = Python Programming Language
-LICENSE    =
+HOMEPAGE = http://www.python.org/
+COMMENT  = Python Programming Language
+LICENSE  =
 
 # Patch
 POST_PATCH_TARGET = pyPostPatch
@@ -59,3 +56,4 @@ $(WORK_DIR)/python-cc.mk: Makefile
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
+
