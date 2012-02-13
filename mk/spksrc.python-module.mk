@@ -25,11 +25,11 @@ compile_python_module:
 		mv $(PYTHON_LIB_CROSS) $(PYTHON_LIB_CROSS).bak; \
 	fi
 	@cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build $(BUILD_ARGS)
 	@mv $(PYTHON_LIB_CROSS).bak $(PYTHON_LIB_CROSS)
 
 install_python_module:
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX)
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
 
 fix_shebang_python_module:
 	@cat PLIST | sed 's/:/ /' | while read type file ; \
