@@ -1,2 +1,1 @@
-lib:lib/python2.7/site-packages/_portaudio.so
-lib:lib/python2.7/site-packages/pyaudio.py
+lib:@PYTHON_SITE_PACKAGES@/_portaudio.so
