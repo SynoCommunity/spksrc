@@ -1,4 +1,3 @@
-
 PKG_NAME = glib
 PKG_SHORT_VERS = 2.28
 PKG_VERS = $(PKG_SHORT_VERS).8
@@ -9,7 +8,6 @@ PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_V
 
 DEPENDS = native/glib cross/zlib cross/libffi
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://developer.gnome.org/glib/
 COMMENT=	General-purpose utility library
 LICENSE=	
@@ -21,3 +19,4 @@ CONFIGURE_ARGS += GLIB_GENMARSHAL=$(WORK_DIR)/../../../native/glib/work-native/g
 CONFIGURE_ARGS += GLIB_COMPILE_SCHEMAS=$(WORK_DIR)/../../../native/glib/work-native/glib-2.28.8/gio/glib-compile-schemas
 
 include ../../mk/spksrc.cross-cc.mk
+

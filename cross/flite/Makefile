@@ -1,4 +1,3 @@
-
 PKG_NAME = flite
 PKG_VERS = 1.4
 PKG_EXT = tar.bz2
@@ -8,7 +7,6 @@ PKG_DIST_SITE = http://www.speech.cs.cmu.edu/$(PKG_NAME)/packed/$(PKG_NAME)-$(PK
 
 DEPENDS = cross/alsa-lib
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://www.speech.cs.cmu.edu/flite/index.html
 COMMENT=	Festival-lite is a small, fast run-time synthesis engine
 LICENSE=	
@@ -19,3 +17,4 @@ CONFIGURE_ARGS = --enable-shared
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk
+

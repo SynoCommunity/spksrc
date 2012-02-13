@@ -1,5 +1,3 @@
-
-
 PKG_NAME = sslh
 PKG_VERS = 1.10
 PKG_EXT = tar.gz
@@ -10,10 +8,9 @@ SRC_DIR= $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/
 VERSION="v1.10"
 DEPENDS = 
 
-MAINTAINER = packages@packages.nas-forum.com
-HOMEPAGE   = http://www.rutschle.net/tech/sslh.shtml
-COMMENT    = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
-LICENSE    =
+HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
+COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
+LICENSE  =
 
 ADDITIONAL_CFLAGS =
 CONFIGURE_ARGS = 
@@ -37,10 +34,11 @@ $(SRC_DIR)common.o : $(SRC_DIR)common.h
 	@$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)'  -o $(SRC_DIR)common.o -c $(SRC_DIR)common.c
 
 $(SRC_DIR)sslh-main.o : $(SRC_DIR)common.h
-        @$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)'  -o $(SRC_DIR)sslh-main.o -c $(SRC_DIR)sslh-main.c
+	@$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)'  -o $(SRC_DIR)sslh-main.o -c $(SRC_DIR)sslh-main.c
 
 
 myInstall:
 	echo "Install"
 	@$(RUN) mkdir -p $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin
 	@$(RUN) cp $(SRC_DIR)sslh-fork $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin/sslh
+

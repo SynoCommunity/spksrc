@@ -1,4 +1,3 @@
-
 PKG_NAME = busybox
 PKG_VERS = 1.19.4
 PKG_EXT = tar.bz2
@@ -8,7 +7,6 @@ PKG_DIST_SITE = http://busybox.net/downloads
 
 DEPENDS = 
 
-MAINTAINER=	superzebulon@superzebulon.org
 HOMEPAGE=	http://busybox.net/
 COMMENT=	Fairly comprehensive set of programs needed to run a Linux system
 LICENSE=	GPL
@@ -41,3 +39,4 @@ myCompile:
 myInstall:
 	install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/busybox $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin
+

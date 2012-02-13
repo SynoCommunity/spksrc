@@ -1,4 +1,3 @@
-
 PKG_NAME = libffi
 PKG_VERS = 3.0.10
 PKG_EXT = tar.gz
@@ -8,7 +7,6 @@ PKG_DIST_SITE = ftp://sourceware.org/pub/$(PKG_NAME)
 
 DEPENDS = 
 
-MAINTAINER = packages@packages.nas-forum.com
 HOMEPAGE   = http://sourceware.org/libffi/
 COMMENT    = A Portable Foreign Function Interface Library
 LICENSE    = 

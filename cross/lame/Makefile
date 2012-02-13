@@ -8,7 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-MAINTAINER=	http://packages.nas-forum.com/
 HOMEPAGE=	http://lame.sourceforge.net/
 COMMENT=	High quality MPEG Audio Layer III encoder
 LICENSE=	LGPL
