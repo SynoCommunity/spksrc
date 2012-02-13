@@ -1,7 +1,5 @@
-
-
 PKG_NAME = curl
-PKG_VERS = 7.23.1
+PKG_VERS = 7.24.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://curl.haxx.se/download
@@ -9,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
 
-MAINTAINER = superzebulon@superzebulon.org
 HOMEPAGE   = http://curl.haxx.se/
 COMMENT    = Compression Library
 LICENSE    = 
@@ -24,3 +21,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: correct-curl-config
 correct-curl-config:
 	sed -i.orig 's#prefix=/#prefix=$(INSTALL_DIR)/#' $(STAGING_INSTALL_PREFIX)/bin/curl-config
+
