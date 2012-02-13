@@ -1,4 +1,3 @@
-
 PKG_NAME = speechd
 PKG_FULL_NAME = speech-dispatcher
 PKG_VERS = 0.7.1
@@ -6,21 +5,19 @@ PKG_EXT = tar.gz
 PKG_DIR = $(PKG_FULL_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://devel.freebsoft.org/pub/projects/$(PKG_NAME)
-PYTHON_SHORT_VERS = 27
 PYTHON_VERS = 2.7.2
 
 DEPENDS  = cross/dotconf cross/glib cross/alsa-oss cross/alsa-utils
 DEPENDS += cross/espeak cross/flite
-DEPENDS += native/python$(PYTHON_SHORT_VERS)
+DEPENDS += native/python
 
-MAINTAINER = http://packages.nas-forum.com
 HOMEPAGE   = http://devel.freebsoft.org/speechd
 COMMENT    = Common interface to speech synthesis
 LICENSE    = 
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-espeak --with-flite --with-oss --with-alsa
-CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python$(PYTHON_SHORT_VERS)/work-native/Python-$(PYTHON_VERS)/python
+CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python/work-native/Python-$(PYTHON_VERS)/python
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
