@@ -1,35 +1,17 @@
-
-
 PKG_NAME = pycrypto
-PKG_VERS = 2.3
+PKG_VERS = 2.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.dlitz.net/pub/dlitz/crypto/pycrypto
+PKG_DIST_SITE = http://pypi.python.org/packages/source/p/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-MAINTAINER = superzebulon@superzebulon.org
-HOMEPAGE   = https://www.dlitz.net/software/pycrypto/
-COMMENT    = Python interface to the OpenSSL library
-LICENSE    = Public domain
+HOMEPAGE = https://www.dlitz.net/software/pycrypto/
+COMMENT  = Cryptographic modules for Python
+LICENSE  = Public domain
 
-ADDITIONAL_CFLAGS =
-CONFIGURE_ARGS = 
+ENV += cross_compiling=yes
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+include ../../mk/spksrc.python-module.mk
 
-include ../../mk/spksrc.cross-cc.mk
-
-# Fetch python definition (provides HOSTPYTHON)
-include $(WORK_DIR)/python-cc.mk
-
-nop: ;
-
-myCompile:
-	@$(RUN) $(HOSTPYTHON) setup.py build
-
-myInstall:
-	@$(RUN) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR)
