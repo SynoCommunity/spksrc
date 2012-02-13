@@ -1,6 +1,5 @@
-
 PKG_NAME = julius
-PKG_VERS = 4.2
+PKG_VERS = 4.2.1
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
@@ -16,3 +15,4 @@ LICENSE=	http://julius.sourceforge.jp/LICENSE.txt
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
