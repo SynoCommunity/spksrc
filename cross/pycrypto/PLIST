@@ -1,1 +1,16 @@
-lib:@PYTHON_SITE_PACKAGES@/Crypto/*/*.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/AES.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/ARC2.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/ARC4.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/Blowfish.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/CAST.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/DES3.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/DES.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Cipher/XOR.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Hash/_MD2.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Hash/_MD4.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Hash/_SHA224.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Hash/_SHA256.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Hash/_SHA384.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Hash/_SHA512.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Util/_counter.so
+lib:@PYTHON_SITE_PACKAGES@/Crypto/Util/strxor.so
