@@ -7,19 +7,18 @@ DSM_APP_NAME = MPD.Instance
 
 DEPENDS = cross/$(SPK_NAME) cross/busybox
 
-SPK_DEPENDS = "Python27>=2.7.2-1"
+SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = http://packages.nas-forum.com
 COMMENT    = Music Player Daemon is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
 RELOAD_UI = yes
 DISPLAY_NAME = Music Player Daemon
 
-HOMEPAGE   = http://mpd.wikia.com/
-LICENSE    =
+HOMEPAGE = http://mpd.wikia.com/
+LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
