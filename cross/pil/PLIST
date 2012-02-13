@@ -1,1 +1,2 @@
-lib:@PYTHON_SITE_PACKAGES@/PIL/*.so
+lib:@PYTHON_SITE_PACKAGES@/PIL/_imagingmath.so
+lib:@PYTHON_SITE_PACKAGES@/PIL/_imaging.so
