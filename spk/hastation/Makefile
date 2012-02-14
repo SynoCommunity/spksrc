@@ -3,8 +3,8 @@ SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/python27 cross/pyalsa cross/pyaudio cross/configobj
-DEPENDS += cross/espeak cross/flite cross/speechd cross/julius
+DEPENDS  = cross/python cross/pyalsa cross/pyaudio cross/configobj
+DEPENDS += cross/espeak cross/speechd cross/julius
 
 MAINTAINER = packages@packages.nas-forum.com
 COMMENT    = "Home Automation Station"
