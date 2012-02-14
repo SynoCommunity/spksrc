@@ -3,7 +3,7 @@ PKG_VERS = 4.2.1
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://osdn.dl.sourceforge.jp/julius/51820
+PKG_DIST_SITE = http://osdn.dl.sourceforge.jp/julius/54278
 
 DEPENDS = cross/zlib cross/libsndfile
 
