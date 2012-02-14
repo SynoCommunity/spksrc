@@ -1,23 +1,15 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="umurmur"
 DNAME="uMurmur"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
+GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
-
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-
-#########################################
-# DSM package manager functions
 
 
 preinst ()
@@ -27,43 +19,21 @@ preinst ()
 
 postinst ()
 {
-    # Correct the files ownership
-    chown -R root:root ${SYNOPKG_PKGDEST}
-
-    # Create the view directory
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p /usr/local/bin
-
-    # Link folders
-    for dir in ${SYNOPKG_PKGDEST}/*; do
-        ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
-    done
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Create empty log file with full permissions (for nobody)
     touch ${LOG_FILE}
     chmod 777 ${LOG_FILE}
-
-    # Create a link in /usr/local/bin
-    ln -s /var/packages/umurmur/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl
-
-    # Install the application in the main interface
-    if [ -d ${SYNO3APP} ]; then
-        rm -f ${SYNO3APP}/${PACKAGE}
-        ln -s ${SYNOPKG_PKGDEST}/share/synoman ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Restore the config file and certificate if we're upgrading
-    if [ -f ${UPGRADE} ]; then
-        mv /tmp/umurmur.conf ${INSTALL_DIR}/etc/
-        mv /tmp/umurmur.crt ${INSTALL_DIR}/etc/
-        mv /tmp/umurmur.key ${INSTALL_DIR}/etc/
-    fi
 
     # Certificate generation
     ${GEN_CERT} > /dev/null 2>&1
     if [ $? -ne 0 ]; then
         exit 1
     fi
+
+    # Correct the files ownership
+    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
@@ -75,29 +45,22 @@ preuninst ()
 
 postuninst ()
 {
-    # Save the config file and the user if we're upgrading, delete the user otherwise
-    if [ -f ${UPGRADE} ]; then
-        cp ${INSTALL_DIR}/etc/umurmur.conf /tmp/
-        cp ${INSTALL_DIR}/etc/umurmur.key /tmp/
-        cp ${INSTALL_DIR}/etc/umurmur.crt /tmp/
-    fi
-
-    # Remove the application from the main interface if it was previously added
-    if [ -h ${SYNO3APP}/${PACKAGE} ]; then
-        rm ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Remove symlinks to utils
-    rm /usr/local/bin/${PACKAGE}-ctl
-
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
 
     exit 0
 }
 
 preupgrade ()
 {
+    # Save some stuff
+    rm -fr /tmp/${PACKAGE}
+    mkdir /tmp/${PACKAGE}
+    cp ${INSTALL_DIR}/etc/umurmur.conf /tmp/${PACKAGE}/
+    cp ${INSTALL_DIR}/etc/umurmur.key /tmp/${PACKAGE}/
+    cp ${INSTALL_DIR}/etc/umurmur.crt /tmp/${PACKAGE}/
+
+    # Create the upgrade flag
     touch ${UPGRADE}
 
     exit 0
@@ -105,7 +68,14 @@ preupgrade ()
 
 postupgrade ()
 {
-    rm -f ${UPGRADE}
+    # Restore some stuff
+    mv /tmp/${PACKAGE}/umurmur.conf ${INSTALL_DIR}/etc/
+    mv /tmp/${PACKAGE}/umurmur.crt ${INSTALL_DIR}/etc/
+    mv /tmp/${PACKAGE}/umurmur.key ${INSTALL_DIR}/etc/
+    rm -fr /tmp/${PACKAGE}
+
+    # Remove the upgrade flag
+    rm  ${UPGRADE}
 
     exit 0
 }
