@@ -3,7 +3,7 @@
      "com.nas-forum.packages.umurmur": {
        "title": "uMurmur",
        "desc": "Minimalistic Mumble Server",
-       "icon": "umurmur-{0}.png",
+       "icon": "images/umurmur-{0}.png",
        "type": "url",
        "url": "3rdparty/umurmur/umurmur.cgi",
        "allUsers": true
