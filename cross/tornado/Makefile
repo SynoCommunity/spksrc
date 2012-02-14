@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE   = http://www.tornadoweb.org/
-COMMENT    = Open source scalable, non-blocking web server and tools
-LICENSE    = http://www.apache.org/licenses/LICENSE-2.0.html
+HOMEPAGE = http://www.tornadoweb.org/
+COMMENT  = Open source scalable, non-blocking web server and tools
+LICENSE  = http://www.apache.org/licenses/LICENSE-2.0.html
 
 include ../../mk/spksrc.python-module.mk
 

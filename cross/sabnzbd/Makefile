@@ -5,11 +5,11 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/sabnzbdplus/files/sabnzbdplus/sabnzbd-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
-HOMEPAGE   = http://sabnzbd.org/	
-COMMENT    = "Usenet binary downloader"
-LICENSE    = GPL
+HOMEPAGE = http://sabnzbd.org/
+COMMENT  = Usenet binary downloader
+LICENSE  = GPL
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop

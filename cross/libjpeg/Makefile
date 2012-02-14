@@ -5,11 +5,11 @@ PKG_DIST_NAME = jpegsrc.v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ijg.org/files
 PKG_DIR = jpeg-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
-HOMEPAGE=	http://www.ijg.org/
-COMMENT=	JPEG library
-LICENSE=	
+HOMEPAGE = http://www.ijg.org/
+COMMENT  = JPEG library
+LICENSE  =
 
 GNU_CONFIGURE = 1
 

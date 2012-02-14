@@ -5,11 +5,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://busybox.net/downloads
 
-DEPENDS = 
+DEPENDS =
 
-HOMEPAGE=	http://busybox.net/
-COMMENT=	Fairly comprehensive set of programs needed to run a Linux system
-LICENSE=	GPL
+HOMEPAGE = http://busybox.net/
+COMMENT  = Fairly comprehensive set of programs needed to run a Linux system
+LICENSE  = GPL
 
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = myCompile
@@ -20,10 +20,10 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(strip $(BUSYBOX_CONFIG)),)
 BUSYBOX_CONFIG_FILE = src/usermng_defconfig
 else
-BUSYBOX_CONFIG_FILES = $(WORK_DIR)/../$(BUSYBOX_CONFIG) src/$(BUSYBOX_CONFIG) $(BUSYBOX_CONFIG) 
+BUSYBOX_CONFIG_FILES = $(WORK_DIR)/../$(BUSYBOX_CONFIG) src/$(BUSYBOX_CONFIG) $(BUSYBOX_CONFIG)
 BUSYBOX_CONFIG_FILE = $(word 1,$(wildcard $(BUSYBOX_CONFIG_FILES)))
 ifeq ($(strip $(BUSYBOX_CONFIG_FILE)),)
-$(error Busybox configuration file '$(BUSYBOX_CONFIG)' not found) 
+$(error Busybox configuration file '$(BUSYBOX_CONFIG)' not found)
 endif
 endif
 

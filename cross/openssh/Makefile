@@ -17,7 +17,7 @@ CONFIGURE_ARGS  = cross_compiling=yes --disable-lastlog --disable-utmp --disable
 CONFIGURE_ARGS += --disable-strip --with-zlib=$(STAGING_INSTALL_PREFIX) --with-ssl-dir=$(STAGING_INSTALL_PREFIX) LD=$$CC
 INSTALL_TARGET = myInstall
 
-include ../../mk/spksrc.cross-cc.mk 
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE=	http://www.vorbis.com/
-COMMENT=	Free, open container format
-LICENSE=	BSD
+HOMEPAGE = http://www.vorbis.com/
+COMMENT  = Free, open container format
+LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 

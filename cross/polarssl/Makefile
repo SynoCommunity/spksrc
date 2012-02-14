@@ -23,7 +23,7 @@ myConfigure: ;
 .PHONY: myCompile
 myCompile:
 	@$(RUN) $(MAKE) DESTDIR=$(STAGING_INSTALL_PREFIX)
-	
+
 .PHONY: myInstall
 myInstall:
 	@$(RUN) $(MAKE) DESTDIR=$(STAGING_INSTALL_PREFIX) install

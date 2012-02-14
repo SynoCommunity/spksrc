@@ -9,9 +9,9 @@ PORTAUDIO_VERS = 19
 
 DEPENDS = cross/portaudio
 
-HOMEPAGE=	http://sourceforge.net/projects/$(PKG_NAME)/
-COMMENT=	Compact open source software speech synthesizer
-LICENSE=	GPL
+HOMEPAGE = http://sourceforge.net/projects/$(PKG_NAME)/
+COMMENT  = Compact open source software speech synthesizer
+LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 

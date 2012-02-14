@@ -8,12 +8,9 @@ PKG_DIST_SITE = http://people.csail.mit.edu/hubert/$(PKG_NAME)/packages/
 
 DEPENDS = cross/portaudio
 
-HOMEPAGE   = http://people.csail.mit.edu/hubert/pyaudio/
-COMMENT    = Provide Python bindings for PortAudio, the cross-platform audio I/O library
-LICENSE    =
-
-ADDITIONAL_CFLAGS =
-CONFIGURE_ARGS = 
+HOMEPAGE = http://people.csail.mit.edu/hubert/pyaudio/
+COMMENT  = Provide Python bindings for PortAudio, the cross-platform audio I/O library
+LICENSE  =
 
 include ../../mk/spksrc.python-module.mk
 

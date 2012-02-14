@@ -7,13 +7,12 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/libpng cross/libjpeg cross/libtiff cross/giflib
 
-HOMEPAGE=	http://www.leptonica.com/
-COMMENT=	"Leptonica is a pedagogically-oriented open source software that is broadly useful for image processing and image analysis applications."
-LICENSE=	http://www.leptonica.com/about-the-license.html
+HOMEPAGE =http://www.leptonica.com/
+COMMENT = Leptonica is a pedagogically-oriented open source software that is broadly useful for image processing and image analysis applications.
+LICENSE = http://www.leptonica.com/about-the-license.html
 
-GNU_CONFIGURE = 1 
+GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
-
 
 include ../../mk/spksrc.cross-cc.mk
 

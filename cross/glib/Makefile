@@ -8,9 +8,9 @@ PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_V
 
 DEPENDS = native/glib cross/zlib cross/libffi
 
-HOMEPAGE=	http://developer.gnome.org/glib/
-COMMENT=	General-purpose utility library
-LICENSE=	
+HOMEPAGE = http://developer.gnome.org/glib/
+COMMENT  = General-purpose utility library
+LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-gtk-doc-html --enable-debug=yes

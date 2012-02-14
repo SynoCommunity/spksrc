@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libogg
 
-HOMEPAGE=	http://flac.sourceforge.net/
-COMMENT=	Free Lossless Audio Codec
-LICENSE=	GPL
+HOMEPAGE = http://flac.sourceforge.net/
+COMMENT  = Free Lossless Audio Codec
+LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 

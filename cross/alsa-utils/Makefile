@@ -7,9 +7,9 @@ PKG_DIST_SITE = ftp://ftp.alsa-project.org/pub/utils
 
 DEPENDS = cross/alsa-lib cross/ncurses
 
-HOMEPAGE   = http://www.alsa-project.org/
-COMMENT    = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
-LICENSE    = 
+HOMEPAGE = http://www.alsa-project.org/
+COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
+LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-curses=ncurses
