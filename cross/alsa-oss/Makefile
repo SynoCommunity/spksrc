@@ -7,13 +7,13 @@ PKG_DIST_SITE = ftp://ftp.alsa-project.org/pub/oss-lib
 
 DEPENDS = cross/alsa-lib
 
-HOMEPAGE   = http://www.alsa-project.org/
-COMMENT    = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
-LICENSE    = 
+HOMEPAGE = http://www.alsa-project.org/
+COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
+LICENSE  =
 
 GNU_CONFIGURE = 1
 INSTALL_TARGET = myInstall
- 
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall

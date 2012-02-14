@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE   = http://bzip.org/
-COMMENT    = High-quality data compressor
-LICENSE    = BSD License
+HOMEPAGE = http://bzip.org/
+COMMENT  = High-quality data compressor
+LICENSE  = BSD License
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile

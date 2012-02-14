@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-HOMEPAGE=	http://www.openssl.org/
-COMMENT=	Compression Library
-LICENSE=	zlib-license
+HOMEPAGE = http://www.openssl.org/
+COMMENT  = Compression Library
+LICENSE  = zlib-license
 
 CONFIGURE_TARGET = myConfigure
 
@@ -22,7 +22,6 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myConfigure
 myConfigure:
 	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) linux-generic32 zlib-dynamic shared threads
-
 
 .PHONY: myInstall
 myInstall:

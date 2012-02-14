@@ -7,11 +7,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncurses
 
-HOMEPAGE   = http://www.gnu.org/s/readline
-COMMENT    = Set of functions for use by applications that allow users to edit command lines as they are typed in.
-LICENSE    = http://www.gnu.org/licenses/gpl.html
+HOMEPAGE = http://www.gnu.org/s/readline
+COMMENT  = Set of functions for use by applications that allow users to edit command lines as they are typed in.
+LICENSE  = http://www.gnu.org/licenses/gpl.html
 
 GNU_CONFIGURE = 1
- 
+
 include ../../mk/spksrc.cross-cc.mk
 

@@ -8,9 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE=	http://lame.sourceforge.net/
-COMMENT=	High quality MPEG Audio Layer III encoder
-LICENSE=	LGPL
+HOMEPAGE = http://lame.sourceforge.net/
+COMMENT  = High quality MPEG Audio Layer III encoder
+LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 

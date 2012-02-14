@@ -7,10 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-MAINTAINER=	http://packages.nas-forum.com/
-HOMEPAGE=	http://www.underbit.com/products/mad/
-COMMENT=	High-quality fixed-point MPEG audio decoder with 24-bit output
-LICENSE=	GPL
+HOMEPAGE = http://www.underbit.com/products/mad/
+COMMENT  = High-quality fixed-point MPEG audio decoder with 24-bit output
+LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 

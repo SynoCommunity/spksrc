@@ -7,9 +7,9 @@ PKG_DIST_SITE = http://www.speech.cs.cmu.edu/$(PKG_NAME)/packed/$(PKG_NAME)-$(PK
 
 DEPENDS = cross/alsa-lib
 
-HOMEPAGE=	http://www.speech.cs.cmu.edu/flite/index.html
-COMMENT=	Festival-lite is a small, fast run-time synthesis engine
-LICENSE=	
+HOMEPAGE = http://www.speech.cs.cmu.edu/flite/index.html
+COMMENT  = Festival-lite is a small, fast run-time synthesis engine
+LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared

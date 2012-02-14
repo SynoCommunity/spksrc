@@ -5,16 +5,16 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://sourceware.org/pub/$(PKG_NAME)
 
-DEPENDS = 
+DEPENDS =
 
-HOMEPAGE   = http://sourceware.org/libffi/
-COMMENT    = A Portable Foreign Function Interface Library
-LICENSE    = 
+HOMEPAGE = http://sourceware.org/libffi/
+COMMENT  = A Portable Foreign Function Interface Library
+LICENSE  =
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
- 
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure

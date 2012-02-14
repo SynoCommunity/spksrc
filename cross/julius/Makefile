@@ -7,10 +7,9 @@ PKG_DIST_SITE = http://osdn.dl.sourceforge.jp/julius/54278
 
 DEPENDS = cross/zlib cross/libsndfile
 
-MAINTAINER=	http://packages.nas-forum.com/
-HOMEPAGE=	http://julius.sourceforge.jp/en/
-COMMENT=	Open-Source Large Vocabulary CSR Engine
-LICENSE=	http://julius.sourceforge.jp/LICENSE.txt
+HOMEPAGE = http://julius.sourceforge.jp/en/
+COMMENT  = Open-Source Large Vocabulary CSR Engine
+LICENSE  = http://julius.sourceforge.jp/LICENSE.txt
 
 GNU_CONFIGURE = 1
 

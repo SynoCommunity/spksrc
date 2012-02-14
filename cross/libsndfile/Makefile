@@ -7,9 +7,9 @@ PKG_DIST_SITE = http://www.mega-nerd.com/libsndfile/files
 
 DEPENDS =
 
-HOMEPAGE=	http://www.mega-nerd.com/libsndfile/
-COMMENT=	C library for reading and writing files containing sampled sound
-LICENSE=	LGPL
+HOMEPAGE = http://www.mega-nerd.com/libsndfile/
+COMMENT  = C library for reading and writing files containing sampled sound
+LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 INSTALL_TARGET = myInstall
