@@ -1,12 +1,11 @@
-
 SPK_NAME = SickBeard
 SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/sickbeard.png
 
-DEPENDS  = 
+DEPENDS  =
 
-MAINTAINER = http://packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = "The ultimate PVR application that downloads and manages your TV shows."
 ADMIN_PORT = 9300
 RELOAD_UI = yes
@@ -17,7 +16,7 @@ LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 PYTHON_VERS = 27
 SPK_DEPENDS = "Python${PYTHON_VERS}>=2.7.2-1"
@@ -41,9 +40,10 @@ sickbeard_extra_install:
 	install -m 755 src/updateInfo.py $(STAGING_DIR)/sbin/updateInfo
 	install -m 644 src/config.json $(STAGING_DIR)/share/synoman/config
 	install -m 755 src/sickbeard.cgi.py $(STAGING_DIR)/share/synoman/sickbeard.cgi
-	install -m 755 src/sbDefaultConfig.py $(STAGING_DIR)/sbin/sbDefaultConfig 
+	install -m 755 src/sbDefaultConfig.py $(STAGING_DIR)/sbin/sbDefaultConfig
 	for size in 16 24 32 48 ; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/share/synoman/sickbeard-$${size}.png ; \
 	done
+

@@ -1,12 +1,11 @@
-
 SPK_NAME = CouchPotato
 SPK_VERS = 3.1
 SPK_REV = 1
 SPK_ICON = src/couchpotato.png
 
-DEPENDS  = 
+DEPENDS =
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = SynoCommunity
 COMMENT    = "CouchPotato is an automatic NZB and torrent downloader for movies."
 ADMIN_PORT = 8082
 RELOAD_UI = yes
@@ -17,7 +16,7 @@ LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 PYTHON_VERS = 26
 SPK_DEPENDS = "Python${PYTHON_VERS}>=2.6.6-5"
@@ -52,4 +51,5 @@ xz-compress:
 	mkdir $(STAGING_DIR)
 	mv $(WORK_DIR)/package.txz $(STAGING_DIR)/
 	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 755 src/cpDefaultConfig.py $(STAGING_DIR)/sbin/cpDefaultConfig 
+	install -m 755 src/cpDefaultConfig.py $(STAGING_DIR)/sbin/cpDefaultConfig
+

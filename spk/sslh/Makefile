@@ -1,5 +1,3 @@
-
-
 SPK_NAME = sslh
 SPK_VERS = 1.10
 SPK_REV = 1
@@ -7,17 +5,17 @@ SPK_ICON = src/sslh.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = packages@packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = sslh accepts HTTPS, SSH, OpenVPN, Tinc and XMPP connections on the same port.
 RELOAD_UI = no
 DISPLAY_NAME = SSLH
 
 HOMEPAGE   = http://www.rutschle.net/tech/sslh.shtml
-LICENSE    = 
+LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/start-stop-status
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = xz-compress
@@ -41,5 +39,6 @@ xz-compress:
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/www/images/icon$${size}.png ; \
-	done	
+	done
 	chmod 644 $(STAGING_DIR)/www/images/i*.png
+

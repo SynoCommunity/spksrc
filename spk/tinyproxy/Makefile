@@ -1,5 +1,3 @@
-
-
 SPK_NAME = tinyproxy
 SPK_VERS = 1.8.3
 SPK_REV = 1
@@ -7,7 +5,7 @@ SPK_ICON = src/tinyproxy.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = packages@packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = "Tinyproxy is a light-weight HTTP/HTTPS proxy daemon for POSIX operating systems."
 RELOAD_UI = no
 DISPLAY_NAME = Tinyproxy
@@ -17,7 +15,7 @@ LICENSE    = GNU GPL 2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/start-stop-status
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PRE_COPY_TARGET = install-tinyproxy
@@ -47,5 +45,5 @@ install-tinyproxy:
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/www/images/icon$${size}.png ; \
-	done	
+	done
 	chmod 644 $(STAGING_DIR)/www/images/*.png
