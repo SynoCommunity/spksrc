@@ -6,18 +6,18 @@ SPK_ICON = src/python.png
 DEPENDS  = cross/python cross/pyalsa cross/pyaudio cross/configobj
 DEPENDS += cross/espeak cross/speechd cross/julius
 
-MAINTAINER = packages@packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = "Home Automation Station"
-ADMIN_PORT = 
+ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = H.A. Station
 
-HOMEPAGE   = 
-LICENSE    =
+HOMEPAGE =
+LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = 
-ADDITIONAL_SCRIPTS = 
+SSS_SCRIPT       =
+ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python2.7

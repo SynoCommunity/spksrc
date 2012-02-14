@@ -1,12 +1,11 @@
-
 SPK_NAME = transmission
 SPK_VERS = 2.42
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/transmission.png
 
 DEPENDS = cross/$(SPK_NAME) cross/xzdec-static cross/busybox
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = SynoCommunity
 COMMENT    = "A Fast, Easy, and Free BitTorrent Client"
 ADMIN_PORT = 9091
 RELOAD_UI = yes
@@ -17,7 +16,7 @@ LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -34,7 +33,7 @@ xz-compress:
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/share/synoman/Transmission-$${size}.png ; \
-	done	
+	done
 	mv $(STAGING_DIR)/bin/xzdec $(WORK_DIR)/xzdec
 	(cd $(STAGING_DIR) && tar cpJf $(WORK_DIR)/package.txz --group=root --owner=root *)
 	rm -fr $(STAGING_DIR)
@@ -43,4 +42,5 @@ xz-compress:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 $(WORK_DIR)/xzdec $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/settings.json $(STAGING_DIR)/var/ 
+	install -m 644 src/settings.json $(STAGING_DIR)/var/
+

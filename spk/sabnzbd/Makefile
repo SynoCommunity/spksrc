@@ -6,7 +6,7 @@ SPK_ICON = src/sab2_256.png
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/sabnzbd
 
-MAINTAINER = http://packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = "SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction."
 ADMIN_PORT = 9200
 RELOAD_UI = yes
@@ -17,7 +17,7 @@ LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 PYTHON_VERS = 27
 
@@ -60,3 +60,4 @@ sabnzbd_extra_install:
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/share/synoman/sab2-$${size}.png ; \
 	done
+

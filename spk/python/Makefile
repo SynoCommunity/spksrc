@@ -9,7 +9,7 @@ DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado cross/pyextdirect
 DEPENDS += cross/pyaudio cross/pyalsa
 DEPENDS += cross/configobj
 
-MAINTAINER = packages@packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = "Python Programming Language"
 RELOAD_UI = yes
 DISPLAY_NAME = Python
@@ -18,8 +18,8 @@ HOMEPAGE   = http://www.python.org/
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = 
-ADDITIONAL_SCRIPTS = 
+SSS_SCRIPT       =
+ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python2.7

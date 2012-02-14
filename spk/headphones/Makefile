@@ -1,12 +1,11 @@
-
 SPK_NAME = Headphones
 SPK_VERS = 3.1
-SPK_REV = 3
+SPK_REV = 1
 SPK_ICON = src/headphone.png
 
-DEPENDS  = 
+DEPENDS =
 
-MAINTAINER = superzebulon@superzebulon.org
+MAINTAINER = SynoCommunity
 COMMENT    = "Automatic music downloader for SABnzbd."
 ADMIN_PORT = 8181
 RELOAD_UI = yes
@@ -17,7 +16,7 @@ LICENSE    = ?
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 PYTHON_VERS = 26
 SPK_DEPENDS = "Python${PYTHON_VERS}>=2.6.6-5"
@@ -51,3 +50,4 @@ xz-compress:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mv $(WORK_DIR)/package.txz $(STAGING_DIR)/
+

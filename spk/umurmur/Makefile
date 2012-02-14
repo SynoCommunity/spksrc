@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/openssl cross/$(SPK_NAME)
 
-MAINTAINER = packages@packages.nas-forum.com
+MAINTAINER = SynoCommunity
 COMMENT    = Minimalistic Mumble server
 RELOAD_UI = yes
 DISPLAY_NAME = uMurmur
@@ -16,7 +16,7 @@ LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
+ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
