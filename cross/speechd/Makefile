@@ -8,7 +8,7 @@ PKG_DIST_SITE = http://devel.freebsoft.org/pub/projects/$(PKG_NAME)
 PYTHON_VERS = 2.7.2
 
 DEPENDS  = cross/dotconf cross/glib cross/alsa-oss cross/alsa-utils
-DEPENDS += cross/espeak cross/flite
+DEPENDS += cross/espeak
 DEPENDS += native/python
 
 HOMEPAGE   = http://devel.freebsoft.org/speechd
@@ -16,7 +16,7 @@ COMMENT    = Common interface to speech synthesis
 LICENSE    = 
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --with-espeak --with-flite --with-oss --with-alsa
+CONFIGURE_ARGS  = --with-espeak --with-oss --with-alsa
 CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python/work-native/Python-$(PYTHON_VERS)/python
 
 PRE_CONFIGURE_TARGET = myPreConfigure
