@@ -11,9 +11,9 @@ DEPENDS  = cross/dotconf cross/glib cross/alsa-oss cross/alsa-utils
 DEPENDS += cross/espeak cross/flite
 DEPENDS += native/python
 
-HOMEPAGE   = http://devel.freebsoft.org/speechd
-COMMENT    = Common interface to speech synthesis
-LICENSE    = 
+HOMEPAGE = http://devel.freebsoft.org/speechd
+COMMENT  = Common interface to speech synthesis
+LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-espeak --with-flite --with-oss --with-alsa
@@ -24,7 +24,7 @@ INSTALL_TARGET = myInstall
 
 SPEECHD_CONFIG_PATHS  = spksrc_spdconforigdir=$(INSTALL_PREFIX)/share/speech-dispatcher/conf spksrc_spdconfdir=$(INSTALL_PREFIX)/etc/speech-dispatcher
 SPEECHD_CONFIG_PATHS += spksrc_snddatadir=$(INSTALL_PREFIX)/share/sounds/speech-dispatcher spksrc_spddesktopconforigdir=$(INSTALL_PREFIX)/share/speech-dispatcher/conf/desktop
- 
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure

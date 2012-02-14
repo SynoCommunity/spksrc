@@ -7,12 +7,9 @@ PKG_DIST_SITE = ftp://ftp.alsa-project.org/pub/pyalsa
 
 DEPENDS = cross/alsa-lib cross/setuptools
 
-HOMEPAGE   = http://www.alsa-project.org/
-COMMENT    = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
-LICENSE    =
-
-ADDITIONAL_CFLAGS =
-CONFIGURE_ARGS = 
+HOMEPAGE = http://www.alsa-project.org/
+COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
+LICENSE  =
 
 include ../../mk/spksrc.python-module.mk
 

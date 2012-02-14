@@ -12,7 +12,7 @@ COMMENT  = Minimalistic Mumble server
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = 
+CONFIGURE_ARGS =
 
 include ../../mk/spksrc.cross-cc.mk
 

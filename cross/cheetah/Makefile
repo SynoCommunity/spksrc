@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE   = http://www.cheetahtemplate.org/
-COMMENT    = Cheetah is a template engine and code generation tool.	
-LICENSE    = MIT License
+HOMEPAGE = http://www.cheetahtemplate.org/
+COMMENT  = Cheetah is a template engine and code generation tool.
+LICENSE  = MIT License
 
 include ../../mk/spksrc.python-module.mk
 

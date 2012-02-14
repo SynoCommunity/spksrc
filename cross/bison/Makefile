@@ -7,9 +7,9 @@ PKG_DIST_SITE = http://ftp.gnu.org/gnu/$(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE=	http://www.gnu.org/s/bison/
-COMMENT=	General-purpose parser generator
-LICENSE=	GNU GPL
+HOMEPAGE = http://www.gnu.org/s/bison/
+COMMENT  = General-purpose parser generator
+LICENSE  = GNU GPL
 
 GNU_CONFIGURE = 1
 #FIXME: This override detection of buggy m4/libc6. It is a (very bad) workaround for debian stable

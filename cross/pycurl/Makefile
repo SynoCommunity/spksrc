@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/curl
 
-HOMEPAGE   = http://pycurl.sourceforge.net/
-COMMENT    = PycURL is a Python interface to libcurl
-LICENSE    = Dual licensed under the LGPL and an MIT/X derivative license based on the cURL license
+HOMEPAGE = http://pycurl.sourceforge.net/
+COMMENT  = PycURL is a Python interface to libcurl
+LICENSE  = Dual licensed under the LGPL and an MIT/X derivative license based on the cURL license
 
 BUILD_ARGS   = --curl-config=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 INSTALL_ARGS = --curl-config=$(STAGING_INSTALL_PREFIX)/bin/curl-config

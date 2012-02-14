@@ -5,15 +5,11 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/c/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
-HOMEPAGE   = http://pypi.python.org/pypi/configobj
-COMMENT    = Config file reading, writing and validation
-LICENSE    =
-
-ADDITIONAL_CFLAGS =
-CONFIGURE_ARGS = 
-
+HOMEPAGE = http://pypi.python.org/pypi/configobj
+COMMENT  = Config file reading, writing and validation
+LICENSE  =
 
 include ../../mk/spksrc.python-module.mk
 
