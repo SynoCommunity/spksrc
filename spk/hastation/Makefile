@@ -20,6 +20,8 @@ SSS_SCRIPT       =
 ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+PYTHON_LIB_DIR = lib/python2.7
+PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"
 
 include ../../mk/spksrc.spk.mk
 
