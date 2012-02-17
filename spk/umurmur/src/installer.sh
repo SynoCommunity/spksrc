@@ -7,6 +7,7 @@ DNAME="uMurmur"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="root"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
 GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
