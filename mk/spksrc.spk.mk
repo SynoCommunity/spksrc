@@ -70,18 +70,7 @@ endif
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
 
-DSM_WIZARDS_  =
-ifneq ($(strip $(WIZARD_INSTALL)),)
-DSM_WIZARDS_ += install_uifile
-endif
-ifneq ($(strip $(WIZARD_UPGRADE)),)
-DSM_WIZARDS_ += upgrade_uifile
-endif
-ifneq ($(strip $(WIZARD_UNINSTALL)),)
-DSM_WIZARDS_ += uninstall_uifile
-endif
-
-DSM_WIZARDS = $(addprefix $(DSM_WIZARDS_DIR)/,$(DSM_WIZARDS_))
+DSM_WIZARDS = $(addprefix $(DSM_WIZARDS_DIR)/, $(notdir $(wildcard $(WIZARDS_DIR)/*)))
 
 define dsm_wizard_copy
 $(create_target_dir)
@@ -90,13 +79,9 @@ cp $< $@
 chmod 644 $@
 endef
 
-$(DSM_WIZARDS_DIR)/install_uifile: $(WIZARD_INSTALL)
+$(DSM_WIZARDS_DIR)/%: $(WIZARDS_DIR)/%
+	@echo $@
 	@$(dsm_wizard_copy)
-$(DSM_WIZARDS_DIR)/upgrade_uifile: $(WIZARD_UPGRADE)
-	@$(dsm_wizard_copy)
-$(DSM_WIZARDS_DIR)/uninstall_uifile: $(WIZARD_UNINSTALL)
-	@$(dsm_wizard_copy)
-
 
 # Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
@@ -214,3 +199,4 @@ arch-%:
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $(subst publish-arch-,,$@) 
 	@env $(MAKE) ARCH=$(subst publish-arch-,,$@) publish
+
