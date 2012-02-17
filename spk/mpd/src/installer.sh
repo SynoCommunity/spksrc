@@ -7,7 +7,7 @@ DNAME="Music Player Daemon"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="${PACKAGE}"
+RUNAS="mpd"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
 
 
