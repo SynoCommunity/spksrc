@@ -1,0 +1,12 @@
+{
+  ".url" : {
+    "com.synocommunity.packages.znc" : {
+      "title": "ZNC",
+      "desc": "ZNC Web Admin",
+      "icon": "images/znc-{0}.png",
+      "type": "url",
+      "url": "3rdparty/znc/znc.cgi",
+      "allUsers": true
+    }
+  }
+}
