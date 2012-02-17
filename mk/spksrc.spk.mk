@@ -67,6 +67,38 @@ ifneq ($(strip $(SPK_ICON)),)
 	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 -transparent white - | base64 -w0 -`\" >> $@
 endif
 
+# Wizard
+DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
+
+DSM_WIZARDS_  =
+ifneq ($(strip $(WIZARD_INSTALL)),)
+DSM_WIZARDS_ += install_uifile
+endif
+ifneq ($(strip $(WIZARD_UPGRADE)),)
+DSM_WIZARDS_ += upgrade_uifile
+endif
+ifneq ($(strip $(WIZARD_UNINSTALL)),)
+DSM_WIZARDS_ += uninstall_uifile
+endif
+
+DSM_WIZARDS = $(addprefix $(DSM_WIZARDS_DIR)/,$(DSM_WIZARDS_))
+
+define dsm_wizard_copy
+$(create_target_dir)
+$(MSG) "Creating $@"
+cp $< $@
+chmod 644 $@
+endef
+
+$(DSM_WIZARDS_DIR)/install_uifile: $(WIZARD_INSTALL)
+	@$(dsm_wizard_copy)
+$(DSM_WIZARDS_DIR)/upgrade_uifile: $(WIZARD_UPGRADE)
+	@$(dsm_wizard_copy)
+$(DSM_WIZARDS_DIR)/uninstall_uifile: $(WIZARD_UNINSTALL)
+	@$(dsm_wizard_copy)
+
+
+# Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
 
 # Generated scripts
@@ -130,9 +162,14 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS)
+SPK_CONTENT  = package.tgz INFO scripts
+ifneq ($(strip $(DSM_WIZARDS)),)
+SPK_CONTENT += WIZARD_UIFILES
+endif
+
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) $(DSM_WIZARDS)
 	$(create_target_dir)
-	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root package.tgz INFO scripts)
+	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
 package: $(SPK_FILE_NAME)
 
