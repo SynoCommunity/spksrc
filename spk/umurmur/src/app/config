@@ -1,6 +1,6 @@
 {
    ".url": {
-     "com.nas-forum.packages.umurmur": {
+     "com.synocommunity.packages.umurmur": {
        "title": "uMurmur",
        "desc": "Minimalistic Mumble Server",
        "icon": "images/umurmur-{0}.png",
