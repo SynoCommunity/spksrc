@@ -144,12 +144,12 @@ publish: package
 	     $(PUBLISHING_URL)
 else
 publish:
-	@echo 'Set PUBLISHING_KEY to the publishing key of your spkrepo server'
+	@echo 'Set PUBLISHING_KEY to the publishing key of your Package Server'
 	@exit 1
 endif
 else
 publish:
-	@echo 'Set PUBLISHING_URL to the upload URL of your spkrepo server (http://<myhost>/spkrepo/upload)'
+	@echo 'Set PUBLISHING_URL to the URL of your Package Server'
 	@exit 1
 endif
 
