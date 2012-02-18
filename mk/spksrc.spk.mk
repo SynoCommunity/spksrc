@@ -194,9 +194,9 @@ publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
 
 arch-%:
 	@$(MSG) Building package for arch $*
-	@env $(MAKE) ARCH=$*
+	-@env $(MAKE) ARCH=$*
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
-	@env $(MAKE) ARCH=$* publish
+	-@env $(MAKE) ARCH=$* publish
 
