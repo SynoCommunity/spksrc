@@ -70,7 +70,10 @@ endif
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
 
+DSM_WIZARDS =
+ifneq ($(WIZARDS_DIR),)
 DSM_WIZARDS = $(addprefix $(DSM_WIZARDS_DIR)/, $(notdir $(wildcard $(WIZARDS_DIR)/*)))
+endif
 
 define dsm_wizard_copy
 $(create_target_dir)
