@@ -3,8 +3,8 @@ SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/python cross/pyalsa cross/pyaudio
-DEPENDS += cross/espeak cross/speechd cross/julius
+DEPENDS  = cross/python cross/pip cross/pyalsa cross/pyaudio
+DEPENDS += cross/espeak cross/speechd cross/julius cross/dobby
 
 MAINTAINER = SynoCommunity
 COMMENT    = Home Automation Station
@@ -23,11 +23,17 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python2.7
 PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"
 
+POST_STRIP_TARGET = dobby_extra_install
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: dobby_extra_install
-dobby_extra_install:
-	@$(MSG) "Bundling Dobby"
+dobby_extra_install: $(STAGING_DIR)/share/Dobby/requirements.pybundle
+	install -m 755 -d $(STAGING_DIR)/var
+
+$(STAGING_DIR)/share/Dobby/requirements.pybundle:
+	@$(MSG) "Bundling requirements for Dobby"
+	sed -i -e "/^pyaudio/d" $(STAGING_DIR)/share/Dobby/requirements.txt
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle $(STAGING_DIR)/share/Dobby.pybundle git+git://github.com/Diaoul/Dobby.git
+	@cd $(WORK_DIR) && pip bundle $@ -r $(STAGING_DIR)/share/Dobby/requirements.txt
 
