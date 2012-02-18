@@ -3,11 +3,11 @@ SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/python cross/pyalsa cross/pyaudio cross/configobj
+DEPENDS  = cross/python cross/pyalsa cross/pyaudio
 DEPENDS += cross/espeak cross/speechd cross/julius
 
 MAINTAINER = SynoCommunity
-COMMENT    = "Home Automation Station"
+COMMENT    = Home Automation Station
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = H.A. Station
@@ -24,4 +24,10 @@ PYTHON_LIB_DIR = lib/python2.7
 PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: dobby_extra_install
+dobby_extra_install:
+	@$(MSG) "Bundling Dobby"
+	install -m 755 -d $(STAGING_DIR)/share
+	@cd $(WORK_DIR) && pip bundle $(STAGING_DIR)/share/Dobby.pybundle git+git://github.com/Diaoul/Dobby.git
 
