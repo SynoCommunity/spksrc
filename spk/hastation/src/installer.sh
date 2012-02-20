@@ -1,22 +1,16 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="hastation"
 DNAME="H.A. Station"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-VAR_DIR="/usr/local/var/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="root"
+PIP="${INSTALL_DIR}/bin/pip"
 UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
 
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-
-#########################################
-# DSM package manager functions
 
 preinst ()
 {
@@ -25,43 +19,41 @@ preinst ()
 
 postinst ()
 {
-    # Installation directories
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p ${VAR_DIR}/run
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Link folders
-    for dir in ${SYNOPKG_PKGDEST}/*; do
-        ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
-    done
+    # Install the bundle
+    ${PIP} install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/Dobby/requirements.pybundle
+    rm -fr ${INSTALL_DIR}/var/build
 
     exit 0
 }
 
 preuninst ()
 {
-    for ctl in ${VAR_DIR}/run/*-ctl
-    do
-        ${ctl} stop
-    done
-    
     exit 0
 }
 
 postuninst ()
 {
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
-    rm -fr ${VAR_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
 
     exit 0
 }
 
 preupgrade ()
 {
+    # Create the upgrade flag
+    touch ${UPGRADE}
+
     exit 0
 }
 
 postupgrade ()
 {
+    # Remove the upgrade flag
+    rm  ${UPGRADE}
+
     exit 0
 }
