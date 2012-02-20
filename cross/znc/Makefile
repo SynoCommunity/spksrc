@@ -12,7 +12,10 @@ COMMENT  = Advanced IRC bouncer
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-extra
+CONFIGURE_ARGS  = --enable-extra
+ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),)
+CONFIGURE_ARGS += gl_cv_cc_visibility=no
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
