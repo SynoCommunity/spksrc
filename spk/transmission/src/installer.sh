@@ -1,175 +1,88 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="transmission"
 DNAME="Transmission"
-TR_UTILS="transmission-cli transmission-create transmission-edit \
-          transmission-remote transmission-show" 
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-VAR_DIR="/usr/local/var/${PACKAGE}"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:/bin:/usr/bin" # Avoid ipkg commands
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="transmission"
+CFG_FILE="${INSTALL_DIR}/var/settings.json"
 
-SYNOUSER="/usr/syno/sbin/synouser"
-
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-
-#########################################
-# DSM package manager functions
 
 preinst ()
 {
+    # Installation wizard requirements
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" -a ! -d "${wizard_download_dir}" ]; then
+        exit 1
+    fi
+
     exit 0
 }
 
 postinst ()
 {
-    # Installation directories
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p ${VAR_DIR}
-    mkdir -p /usr/local/bin
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Remove the DSM user
-    if ${SYNOUSER} --enum local | grep "^${PACKAGE}$" >/dev/null
-    then
-    	# Keep the existing uid
-        uid=`grep ${PACKAGE} /etc/passwd | cut -d: -f3`
-        ${SYNOUSER} --del ${PACKAGE} 2> /dev/null
-        UID_PARAM="-u ${uid}"
-    fi
-
-    # Extract the files to the installation directory
-    ${SYNOPKG_PKGDEST}/bin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
-        tar xpf - -C ${INSTALL_DIR}
-    # Remove the installer archive to save space
-    rm ${SYNOPKG_PKGDEST}/package.txz
-
-    # Create symlinks to utils
-    for exe in ${TR_UTILS}
-    do
-      ln -s ${INSTALL_DIR}/bin/${exe} /usr/local/bin/${exe}
-    done
-    ln -s /var/packages/${PACKAGE}/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl 
-
-    # Install the application in the main interface.
-    if [ -d ${SYNO3APP} ]
-    then
-        rm -f ${SYNO3APP}/${PACKAGE}
-        ln -s ${INSTALL_DIR}/share/synoman ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Copy the default configuration if needed
-    if [ -f ${VAR_DIR}/settings.json ]
-    then
-        true
-    else
-        # No config file, copy default one
-        cp ${SYNOPKG_PKGDEST}/var/settings.json ${VAR_DIR}/settings.json
-    fi
-
-    # Update the configuration file
-    ${INSTALL_DIR}/bin/transmission-daemon -g ${VAR_DIR}/ -d 2> ${VAR_DIR}/new.settings.json 
-    mv ${VAR_DIR}/new.settings.json ${VAR_DIR}/settings.json
-    chmod 600 ${VAR_DIR}/settings.json
-
-    # Install the adduser and deluser hardlinks
+    # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create the service user if needed
-    if grep "^${PACKAGE}:" /etc/passwd >/dev/null
-    then
-        true
+    # Create user
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+
+    # Edit the configuration according to the wizzard
+    sed -i -e "s|@download_dir@|${wizard_download_dir}|g" ${CFG_FILE}
+    if [ -d "${wizard_watch_dir}" ]; then
+        sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
+        sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
     else
-        adduser -h ${VAR_DIR} -g "${DNAME} User" -G users -D -H ${UID_PARAM} -s /bin/sh ${PACKAGE}
+        sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
+        sed -i -e "/@watch_dir@/d" ${CFG_FILE}
     fi
 
-    # Correct the files ownership    
-    chown -Rh ${PACKAGE}:users ${INSTALL_DIR} ${VAR_DIR}
+    # Correct the files ownership
+    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
+    # Remove the user (if not upgrading)
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        deluser ${RUNAS}
+    fi
+
     exit 0
 }
 
 postuninst ()
 {
-    # Keep the user data and settings during the upgrade
-    if [ -f ${UPGRADE} ]
-    then
-        true 
-    else
-        deluser ${PACKAGE}
-        rm -fr ${VAR_DIR}
-    fi
-
-    # Remove the application from the main interface if it was previously added.
-    if [ -h ${SYNO3APP}/${PACKAGE} ]
-    then
-        rm ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Remove symlinks to utils
-    for exe in ${TR_UTILS}
-    do
-      rm /usr/local/bin/${exe}
-    done
-    rm /usr/local/bin/${PACKAGE}-ctl 
-
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
 
     exit 0
 }
 
 preupgrade ()
 {
-    # Make sure the package is not running while we are upgrading it
-    /usr/local/bin/${PACKAGE}-ctl stop
-    touch ${UPGRADE}
+    # Save some stuff
+    rm -fr /tmp/${PACKAGE}
+    mkdir /tmp/${PACKAGE}
+    mv ${INSTALL_DIR}/var /tmp/${PACKAGE}/
 
-    # Make sure the work dir exists
-    mkdir -p ${VAR_DIR}
-    # Save current state before upgrade
-    if [ -d ${SYNOPKG_PKGDEST}/usr ]
-    then
-        # First installation scheme, copy to new
-        mv ${SYNOPKG_PKGDEST}/usr/local/var/lib/transmission-daemon/* ${VAR_DIR}/
-    else
-        if [ -d ${SYNOPKG_PKGDEST}/var ]
-        then
-            # Second installation scheme, copy to new
-            mv ${SYNOPKG_PKGDEST}/var/* ${VAR_DIR}/
-        fi
-    fi
     exit 0
 }
 
 postupgrade ()
 {
-    # Correct permission and ownership of download directory
-    downloadDir=`grep download-dir ${VAR_DIR}/settings.json | cut -d'"' -f4`
-    if [ -n "${downloadDir}" -a -d "${downloadDir}" ]
-    then
-        chown -Rh transmission:users ${downloadDir}
-        chmod -R g+w ${downloadDir}
-    fi
-
-    # Correct permission and ownership of incomplete directory
-    incompleteDir=`grep incomplete-dir ${VAR_DIR}/settings.json | cut -d'"' -f4`
-    if [ -n "${incompleteDir}" -a -d "${incompleteDir}" ]
-    then
-        chown -Rh transmission:users ${incompleteDir}
-    fi
-
-    rm -f ${UPGRADE}
+    # Restore some stuff
+    rm -fr ${INSTALL_DIR}/var
+    mv /tmp/${PACKAGE}/var ${INSTALL_DIR}/
+    rm -fr /tmp/${PACKAGE}
 
     exit 0
 }
+
