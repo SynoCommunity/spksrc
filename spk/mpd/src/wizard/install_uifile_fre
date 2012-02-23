@@ -1,0 +1,10 @@
+[{
+    "step_title": "Configuration",
+    "items": [{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_music_dir",
+            "desc": "Répertoire musique"
+        }]
+    }]
+}]
