@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME) cross/busybox
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 COMMENT    = Advanced IRC bouncer
@@ -39,6 +39,6 @@ znc_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/znc-$${size}.png ; \
+		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
