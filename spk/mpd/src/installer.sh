@@ -8,10 +8,16 @@ DNAME="Music Player Daemon"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="mpd"
+CFG_FILE="${INSTALL_DIR}/etc/mpd.conf"
 
 
 preinst ()
 {
+    # Installation wizard requirements
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" -a ! -d "${wizard_music_dir}" ]; then
+        exit 1
+    fi
+
     exit 0
 }
 
@@ -29,6 +35,9 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
     addgroup ${RUNAS} audio
+
+    # Edit the configuration according to the wizzard
+    sed -i -e "s|@music_dir@|${wizard_music_dir}|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
