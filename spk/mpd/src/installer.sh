@@ -8,7 +8,6 @@ DNAME="Music Player Daemon"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="mpd"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
 
 
 preinst ()
@@ -40,7 +39,7 @@ postinst ()
 preuninst ()
 {
     # Remove the user (if not upgrading)
-    if [ ! -f ${UPGRADE} ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         delgroup ${RUNAS} audio
         delgroup ${RUNAS} users
         deluser ${RUNAS}
@@ -62,13 +61,7 @@ preupgrade ()
     # Save some stuff
     rm -fr /tmp/${PACKAGE}
     mkdir /tmp/${PACKAGE}
-    mkdir /tmp/${PACKAGE}/etc
-    cp ${INSTALL_DIR}/etc/mpd.conf /tmp/${PACKAGE}/etc/
-    mkdir /tmp/${PACKAGE}/var
-    cp -r ${INSTALL_DIR}/var/* /tmp/${PACKAGE}/var/
-
-    # Create the upgrade flag
-    touch ${UPGRADE}
+    mv ${INSTALL_DIR}/etc ${INSTALL_DIR}/var /tmp/${PACKAGE}/
 
     exit 0
 }
@@ -76,13 +69,9 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    for dir in etc var; do
-        cp -r /tmp/${PACKAGE}/${dir}/* ${INSTALL_DIR}/${dir}/
-    done
+    rm -fr ${INSTALL_DIR}/etc ${INSTALL_DIR}/var
+    mv /tmp/${PACKAGE}/etc /tmp/${PACKAGE}/var ${INSTALL_DIR}/
     rm -fr /tmp/${PACKAGE}
-
-    # Remove the upgrade flag
-    rm  ${UPGRADE}
 
     exit 0
 }

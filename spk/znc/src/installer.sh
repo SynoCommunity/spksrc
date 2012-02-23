@@ -9,7 +9,6 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="znc"
 ZNC="${INSTALL_DIR}/bin/znc"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
 
 
 preinst ()
@@ -44,7 +43,7 @@ postinst ()
 preuninst ()
 {
     # Remove the user (if not upgrading)
-    if [ ! -f ${UPGRADE} ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         deluser ${RUNAS}
     fi
 
@@ -66,20 +65,15 @@ preupgrade ()
     mkdir /tmp/${PACKAGE}
     mv ${INSTALL_DIR}/var /tmp/${PACKAGE}/
 
-    # Create the upgrade flag
-    touch ${UPGRADE}
-
     exit 0
 }
 
 postupgrade ()
 {
     # Restore some stuff
+    rm -fr ${INSTALL_DIR}/var
     mv  /tmp/${PACKAGE}/var ${INSTALL_DIR}/
     rm -fr /tmp/${PACKAGE}
-
-    # Remove the upgrade flag
-    rm  ${UPGRADE}
 
     exit 0
 }

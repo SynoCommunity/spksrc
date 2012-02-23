@@ -8,7 +8,6 @@ DNAME="uMurmur"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="root"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
 GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
 
@@ -57,12 +56,7 @@ preupgrade ()
     # Save some stuff
     rm -fr /tmp/${PACKAGE}
     mkdir /tmp/${PACKAGE}
-    cp ${INSTALL_DIR}/etc/umurmur.conf /tmp/${PACKAGE}/
-    cp ${INSTALL_DIR}/etc/umurmur.key /tmp/${PACKAGE}/
-    cp ${INSTALL_DIR}/etc/umurmur.crt /tmp/${PACKAGE}/
-
-    # Create the upgrade flag
-    touch ${UPGRADE}
+    mv ${INSTALL_DIR}/etc /tmp/${PACKAGE}/
 
     exit 0
 }
@@ -70,13 +64,9 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    mv /tmp/${PACKAGE}/umurmur.conf ${INSTALL_DIR}/etc/
-    mv /tmp/${PACKAGE}/umurmur.crt ${INSTALL_DIR}/etc/
-    mv /tmp/${PACKAGE}/umurmur.key ${INSTALL_DIR}/etc/
+    rm -fr ${INSTALL_DIR}/etc
+    mv /tmp/${PACKAGE}/etc ${INSTALL_DIR}/
     rm -fr /tmp/${PACKAGE}
-
-    # Remove the upgrade flag
-    rm  ${UPGRADE}
 
     exit 0
 }
