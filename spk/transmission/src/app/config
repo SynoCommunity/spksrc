@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.transmission": {
+            "title": "Transmission",
+            "desc": "Transmission Web UI",
+            "icon": "images/transmission-{0}.png",
+            "type": "url",
+            "url": "3rdparty/transmission/transmission.cgi",
+            "allUsers": true
+        }
+    }
+}

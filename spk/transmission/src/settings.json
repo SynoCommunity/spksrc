@@ -1,8 +1,8 @@
 {
-    "download-dir": "\/volume1\/transmission\/download",
+    "download-dir": "@download_dir@",
     "rpc-authentication-required": false,
     "rpc-whitelist-enabled": false,
     "umask": 2,
-    "watch-dir": "\/volume1\/transmission\/incoming",
-    "watch-dir-enabled": true
+    "watch-dir": "@watch_dir@",
+    "watch-dir-enabled": @watch_dir_enabled@
 }
