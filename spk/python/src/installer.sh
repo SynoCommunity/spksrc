@@ -20,6 +20,9 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
     # Byte-compile
     ${INSTALL_DIR}/bin/python -m compileall -q -f ${INSTALL_DIR}/lib/python2.7
     ${INSTALL_DIR}/bin/python -OO -m compileall -q -f ${INSTALL_DIR}/lib/python2.7
