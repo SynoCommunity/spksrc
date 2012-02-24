@@ -3,11 +3,10 @@ SPK_VERS = 2.7.2
 SPK_REV = 1
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/python
+DEPENDS  = cross/busybox cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycurl
-DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado cross/pyextdirect
-DEPENDS += cross/pyaudio cross/pyalsa
-DEPENDS += cross/configobj
+DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado cross/pyaudio
+DEPENDS += cross/pyalsa
 
 MAINTAINER = SynoCommunity
 COMMENT    = "Python Programming Language"
