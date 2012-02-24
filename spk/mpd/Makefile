@@ -5,7 +5,7 @@ SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 DSM_APP_NAME = MPD.Instance
 
-DEPENDS = cross/$(SPK_NAME) cross/busybox
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 SPK_DEPENDS = "python>=2.7.2-1"
 
@@ -45,6 +45,6 @@ mpd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
-		        $(STAGING_DIR)/app/images/mpd-$${size}.png ; \
+		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
