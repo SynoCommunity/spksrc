@@ -9,7 +9,6 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="root"
 PIP="${INSTALL_DIR}/bin/pip"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
 
 
 preinst ()
@@ -23,7 +22,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install the bundle
-    ${PIP} install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/Dobby/requirements.pybundle
+    ${PIP} install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/Dobby/requirements.pybundle > /dev/null
     rm -fr ${INSTALL_DIR}/var/build
 
     exit 0
@@ -44,16 +43,10 @@ postuninst ()
 
 preupgrade ()
 {
-    # Create the upgrade flag
-    touch ${UPGRADE}
-
     exit 0
 }
 
 postupgrade ()
 {
-    # Remove the upgrade flag
-    rm  ${UPGRADE}
-
     exit 0
 }
