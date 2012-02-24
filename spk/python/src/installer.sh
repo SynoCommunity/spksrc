@@ -7,7 +7,6 @@ DNAME="Python"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
 
 
 preinst ()
