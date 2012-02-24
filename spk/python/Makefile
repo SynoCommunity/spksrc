@@ -5,11 +5,11 @@ SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycurl
-DEPENDS += cross/pil cross/cheetah cross/yenc cross/tornado cross/pyaudio
+DEPENDS += cross/pil cross/cheetah cross/yenc cross/sqlalchemy cross/pyaudio
 DEPENDS += cross/pyalsa
 
 MAINTAINER = SynoCommunity
-COMMENT    = "Python Programming Language"
+COMMENT    = Python Programming Language
 RELOAD_UI = yes
 DISPLAY_NAME = Python
 
