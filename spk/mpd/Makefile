@@ -16,6 +16,7 @@ DISPLAY_NAME = Music Player Daemon
 
 HOMEPAGE = http://mpd.wikia.com/
 LICENSE  =
+WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -27,7 +28,7 @@ POST_STRIP_TARGET = mpd_extra_install
 include ../../mk/spksrc.spk.mk
 
 .PHONY: mpd_extra_install
-mpd_extra_install:
+mpd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/playlists
 	install -m 755 -d $(STAGING_DIR)/etc
@@ -47,4 +48,9 @@ mpd_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 		        $(STAGING_DIR)/app/images/mpd-$${size}.png ; \
 	done
+
+$(STAGING_DIR)/share/requirements.pybundle:
+	@$(MSG) "Bundling requirements"
+	install -m 755 -d $(STAGING_DIR)/share
+	@cd $(WORK_DIR) && pip bundle $@ pyextdirect
 

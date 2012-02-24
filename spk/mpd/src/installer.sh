@@ -8,6 +8,7 @@ DNAME="Music Player Daemon"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="mpd"
+PIP="/usr/local/python/bin/pip"
 CFG_FILE="${INSTALL_DIR}/etc/mpd.conf"
 
 
@@ -25,6 +26,10 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+
+    # Install the bundle
+    ${PIP} install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    rm -fr ${INSTALL_DIR}/var/build
 
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
