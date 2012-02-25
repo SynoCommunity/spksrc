@@ -4,7 +4,7 @@
         "type": "textfield",
         "subitems": [{
             "key": "wizard_music_dir",
-            "desc": "Music directory"
+            "desc": "Music directory (required)"
         }]
     }]
 }]
