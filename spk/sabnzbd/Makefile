@@ -39,7 +39,7 @@ endif
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/sabnzbd.cgi.pl $(STAGING_DIR)/app/sabnzbd.cgi
