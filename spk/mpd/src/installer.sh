@@ -15,7 +15,7 @@ CFG_FILE="${INSTALL_DIR}/etc/mpd.conf"
 preinst ()
 {
     # Installation wizard requirements
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" -a ! -d "${wizard_music_dir}" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ] && [ ! -d "${wizard_music_dir}" ]; then
         exit 1
     fi
 
