@@ -1,115 +1,82 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="sabnzbd"
-DNAME="SABnzbd+"
-PYTHON_DIR="/usr/local/python27"
+DNAME="SABnzbd"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
+PYTHON_DIR="/usr/local/python"
+RUNAS="sabnzbd"
+PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin"
+CFG_FILE="${INSTALL_DIR}/var/config.ini"
 
-SYNOUSER="/usr/syno/sbin/synouser"
-
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-
-#########################################
-# DSM package manager functions
 
 preinst ()
 {
+    # Installation wizard requirements
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ] && [ ! -d "${wizard_download_dir}" ]; then
+        exit 1
+    fi
+
     exit 0
 }
 
 postinst ()
 {
-    # Installation directories
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p /usr/local/bin
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Link folders
-    for dir in ${SYNOPKG_PKGDEST}/*; do
-        ln -s ${SYNOPKG_PKGDEST}/`basename ${dir}` ${INSTALL_DIR}/`basename ${dir}`
-    done
-
-    # Create a link in /usr/local/bin
-    ln -s /var/packages/SABnzbd/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl
-
-    # Install the application in the main interface
-    if [ -d ${SYNO3APP} ]; then
-        rm -f ${SYNO3APP}/${PACKAGE}
-        ln -s ${SYNOPKG_PKGDEST}/share/synoman ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Restore the config file if we're upgrading, use default otherwise
-    if [ -f ${UPGRADE} ]; then
-        mv /tmp/config.ini ${INSTALL_DIR}/
-    else
-        cp ${SYNOPKG_PKGDEST}/etc/config.ini ${INSTALL_DIR}/config.ini
-    fi
-
-    # Ensure that only the sabnzbd user can access this file, as some password are stored in clear text
-    chmod 600 ${INSTALL_DIR}/config.ini
-
-    # Install the nice and ionice hardlinks
+    # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create the service user if needed
-    if ! grep "^${PACKAGE}:" /etc/passwd >/dev/null; then
-        adduser -h ${INSTALL_DIR} -g "${DNAME} User" -G users -D -H ${UID_PARAM} -s /bin/sh ${PACKAGE}
-    fi
+    # Create user
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+
+    # Edit the configuration according to the wizzard
+    sed -i -e "s|@download_dir@|${wizard_download_dir}|g" ${CFG_FILE}
 
     # Correct the files ownership
-    chown -Rh ${PACKAGE}:users ${INSTALL_DIR}
+    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
-    # Make sure the package is not running while we are removing it
-    /usr/local/bin/${PACKAGE}-ctl stop
+    # Remove the user (if not upgrading)
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        deluser ${RUNAS}
+    fi
 
     exit 0
 }
 
 postuninst ()
 {
-    # Save the config file and the user if we're upgrading, delete the user otherwise
-    if [ -f ${UPGRADE} ]; then
-        cp ${INSTALL_DIR}/config.ini /tmp/
-    else
-        deluser ${PACKAGE}
-    fi
-
-    # Remove the application from the main interface if it was previously added
-    if [ -h ${SYNO3APP}/${PACKAGE} ]; then
-        rm ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Remove symlinks to utils
-    rm /usr/local/bin/${PACKAGE}-ctl
-
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
 
     exit 0
 }
 
 preupgrade ()
 {
-    touch ${UPGRADE}
+    # Save some stuff
+    rm -fr /tmp/${PACKAGE}
+    mkdir /tmp/${PACKAGE}
+    mv ${INSTALL_DIR}/var /tmp/${PACKAGE}/
 
     exit 0
 }
 
 postupgrade ()
 {
-    rm -f ${UPGRADE}
+    # Restore some stuff
+    rm -fr ${INSTALL_DIR}/var
+    mv /tmp/${PACKAGE}/var ${INSTALL_DIR}/
+    rm -fr /tmp/${PACKAGE}
 
     exit 0
 }
+

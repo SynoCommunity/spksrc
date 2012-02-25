@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.sabnzbd": {
+            "title": "SABnzbd",
+            "desc": "SABnzbd Web UI",
+            "icon": "images/sabnzbd-{0}.png",
+            "type": "url",
+            "url": "3rdparty/sabnzbd/sabnzbd.cgi",
+            "allUsers": true
+        }
+    }
+}
