@@ -1,27 +1,26 @@
-SPK_NAME = SickBeard
-SPK_VERS = 0.1
+SPK_NAME = sickbeard
+SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/sickbeard.png
+DSM_UI_DIR = app
 
 DEPENDS  =
 
+SPK_DEPENDS = "python>=2.7.2-1"
+
 MAINTAINER = SynoCommunity
-COMMENT    = "The ultimate PVR application that downloads and manages your TV shows."
-ADMIN_PORT = 9300
+COMMENT    = The ultimate PVR application that downloads and manages your TV shows
+ADMIN_PORT = 8081
 RELOAD_UI = yes
-DISPLAY_NAME = ${SPK_NAME}
+DISPLAY_NAME = SickBeard
 
 HOMEPAGE   = http://sickbeard.com/
 LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
-PYTHON_VERS = 27
-SPK_DEPENDS = "Python${PYTHON_VERS}>=2.7.2-1"
-
-INSTALL_PREFIX = /usr/local/sickbeard
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 COPY_TARGET = nop
 POST_STRIP_TARGET = sickbeard_extra_install
@@ -32,18 +31,20 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: sickbeard_extra_install
-sickbeard_extra_install:
-	@$(MSG) "Adding files for DSM integration"
-	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 755 -d $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/share/synoman
-	install -m 755 src/updateInfo.py $(STAGING_DIR)/sbin/updateInfo
-	install -m 644 src/config.json $(STAGING_DIR)/share/synoman/config
-	install -m 755 src/sickbeard.cgi.py $(STAGING_DIR)/share/synoman/sickbeard.cgi
-	install -m 755 src/sbDefaultConfig.py $(STAGING_DIR)/sbin/sbDefaultConfig
-	for size in 16 24 32 48 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
-	            $(STAGING_DIR)/share/synoman/sickbeard-$${size}.png ; \
+sickbeard_extra_install: $(STAGING_DIR)/share/SickBeard
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 src/app/sickbeard.cgi.pl $(STAGING_DIR)/app/sickbeard.cgi
+	install -m 755 -d $(STAGING_DIR)/app/images
+	for size in 16 24 32 48; do \
+		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
+
+$(STAGING_DIR)/share/SickBeard:
+	install -m 755 -d $(STAGING_DIR)/share
+	cd $(STAGING_DIR)/share && git clone https://github.com/midgetspy/Sick-Beard.git SickBeard
+	rm -fr $(STAGING_DIR)/share/SickBeard/.git $(STAGING_DIR)/share/SickBeard/.gitignore
 
