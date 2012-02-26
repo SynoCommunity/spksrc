@@ -16,23 +16,35 @@ PID_FILE="${INSTALL_DIR}/var/sickbeard.pid"
 LOG_FILE="${INSTALL_DIR}/var/Logs/sickbeard.log"
 
 
-start_daemon ()
+start_daemon()
 {
     su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
-stop_daemon ()
+stop_daemon()
 {
     kill `cat ${PID_FILE}`
+    wait_for_status 1 20
     rm ${PID_FILE}
 }
 
-daemon_status ()
+daemon_status()
 {
     if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
         return 0
     fi
     return 1
+}
+
+wait_for_status()
+{
+    counter=$2
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && break
+        let counter=counter-1
+        sleep 1
+    done
 }
 
 
