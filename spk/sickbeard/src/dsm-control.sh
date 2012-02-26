@@ -25,7 +25,6 @@ stop_daemon()
 {
     kill `cat ${PID_FILE}`
     wait_for_status 1 20
-    rm ${PID_FILE}
 }
 
 daemon_status()
@@ -52,21 +51,17 @@ case $1 in
     start)
         if daemon_status; then
             echo ${DNAME} is already running
-            exit 0
         else
             echo Starting ${DNAME} ...
             start_daemon
-            exit $?
         fi
         ;;
     stop)
         if daemon_status; then
             echo Stopping ${DNAME} ...
             stop_daemon
-            exit $?
         else
             echo ${DNAME} is not running
-            exit 0
         fi
         ;;
     status)
@@ -80,7 +75,6 @@ case $1 in
         ;;
     log)
         echo ${LOG_FILE}
-        exit 0
         ;;
     *)
         exit 1
