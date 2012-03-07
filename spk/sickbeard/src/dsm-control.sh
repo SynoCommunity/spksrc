@@ -25,6 +25,7 @@ stop_daemon()
 {
     kill `cat ${PID_FILE}`
     wait_for_status 1 20
+    rm -f ${PID_FILE}
 }
 
 daemon_status()
