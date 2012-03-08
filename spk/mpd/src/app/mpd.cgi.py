@@ -1,4 +1,4 @@
-#!/usr/local/python/bin/python
+#!/usr/local/mpd/env/bin/python
 import os
 import re
 import shutil
@@ -15,7 +15,7 @@ Base = create_configuration()
 
 
 class MPD(Base):
-    config_file = '/usr/local/mpd/etc/mpd.conf'
+    config_file = '/usr/local/mpd/var/mpd.conf'
 
     @expose(kind=LOAD)
     def load(self):

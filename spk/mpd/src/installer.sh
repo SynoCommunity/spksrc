@@ -8,9 +8,9 @@ DNAME="Music Player Daemon"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="mpd"
-PIP="/usr/local/python/bin/pip"
+VIRTUALENV="/usr/local/python/bin/virtualenv"
 CFG_FILE="${INSTALL_DIR}/var/mpd.conf"
-TMP_DIR="/volume`realpath ${SYNOPKG_PKGDEST} | sed -e 's|^/volume(\d).*$|$1|'`/@tmp"
+TMP_DIR="`realpath ${SYNOPKG_PKGDEST} | sed -e 's|^/volume(\d)/@appstore/.*$|/volume$1/@tmp|'`"
 
 
 preinst ()
@@ -28,8 +28,11 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env
+
     # Install the bundle
-    ${PIP} install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    ${INSTALL_DIR}/env/bin/pip install -b ${INSTALL_DIR}/var/build ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
     rm -fr ${INSTALL_DIR}/var/build
 
     # Install busybox stuff
