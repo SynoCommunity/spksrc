@@ -4,9 +4,9 @@ SPK_REV = 1
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
-DEPENDS += cross/setuptools cross/pip cross/pyopenssl cross/pycrypto cross/pycurl
-DEPENDS += cross/pil cross/cheetah cross/yenc cross/sqlalchemy cross/pyaudio
-DEPENDS += cross/pyalsa
+DEPENDS += cross/setuptools cross/pip cross/virtualenv cross/pyopenssl
+DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
+DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa
 
 MAINTAINER = SynoCommunity
 COMMENT    = Python Programming Language
