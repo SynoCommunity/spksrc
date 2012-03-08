@@ -43,6 +43,6 @@ setup: local.mk
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
-	@echo "PUBLISHING_URL=http://packages.nas-forum.com/spksrc" > $@
+	@echo "PUBLISHING_URL=http://packages.synocommunity.com/" > $@
 	@echo "PUBLISHING_KEY=" >> $@
 
