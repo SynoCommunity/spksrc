@@ -64,7 +64,7 @@ ifneq ($(strip $(SPK_DEPENDS)),)
 	@echo install_dep_packages=\"$(SPK_DEPENDS)\" >> $@
 endif
 ifneq ($(strip $(SPK_ICON)),)
-	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 -transparent white - | base64 -w0 -`\" >> $@
+	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 - | base64 -w0 -`\" >> $@
 endif
 
 # Wizard
