@@ -32,8 +32,7 @@ include ../../mk/spksrc.spk.mk
 mpd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/playlists
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/mpd.conf $(STAGING_DIR)/etc/mpd.conf
+	install -m 644 src/mpd.conf $(STAGING_DIR)/var/mpd.conf
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
