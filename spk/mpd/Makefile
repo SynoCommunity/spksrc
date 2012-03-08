@@ -52,5 +52,5 @@ mpd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle $@ pyextdirect
+	@cd $(WORK_DIR) && pip bundle $@ pyextdirect==0.2
 
