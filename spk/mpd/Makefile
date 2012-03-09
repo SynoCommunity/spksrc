@@ -4,6 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 DSM_APP_NAME = MPD.Instance
+BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
