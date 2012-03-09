@@ -49,6 +49,9 @@ ifneq ($(strip $(FIRMWARE)),)
 else
 	@echo firmware=\"3.0-1593\" >> $@
 endif
+ifneq ($(strip $(BETA)),)
+	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
+endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
