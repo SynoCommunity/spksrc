@@ -10,6 +10,7 @@ PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="root"
 GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()
@@ -54,9 +55,9 @@ postuninst ()
 preupgrade ()
 {
     # Save some stuff
-    rm -fr /tmp/${PACKAGE}
-    mkdir /tmp/${PACKAGE}
-    mv ${INSTALL_DIR}/etc /tmp/${PACKAGE}/
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
+    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -64,9 +65,10 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    rm -fr ${INSTALL_DIR}/etc
-    mv /tmp/${PACKAGE}/etc ${INSTALL_DIR}/
-    rm -fr /tmp/${PACKAGE}
+    rm -fr ${INSTALL_DIR}/var
+    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
 }
+
