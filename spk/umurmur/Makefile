@@ -27,8 +27,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: umurmur_extra_install
 umurmur_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/umurmur.conf $(STAGING_DIR)/etc/umurmur.conf
+	install -m 644 src/umurmur.conf $(STAGING_DIR)/var/umurmur.conf
 	install -m 755 -d $(STAGING_DIR)/sbin
 	install -m 755 src/gencert.sh $(STAGING_DIR)/sbin/gencert.sh
 	install -m 755 -d $(STAGING_DIR)/app

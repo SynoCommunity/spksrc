@@ -11,7 +11,7 @@ RUNAS="root"
 UMURMUR="${INSTALL_DIR}/bin/umurmurd"
 PID_FILE="${INSTALL_DIR}/var/umurmur.pid"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
-CFG_FILE="${INSTALL_DIR}/etc/umurmur.conf"
+CFG_FILE="${INSTALL_DIR}/var/umurmur.conf"
 
 
 start_daemon ()
