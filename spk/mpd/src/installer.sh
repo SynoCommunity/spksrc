@@ -10,7 +10,7 @@ PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="mpd"
 VIRTUALENV="/usr/local/python/bin/virtualenv"
 CFG_FILE="${INSTALL_DIR}/var/mpd.conf"
-TMP_DIR="`realpath ${SYNOPKG_PKGDEST} | sed -e 's|^/volume(\d)/@appstore/.*$|/volume$1/@tmp|'`"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()
@@ -77,11 +77,8 @@ postuninst ()
 preupgrade ()
 {
     # Save some stuff
-    if [ ! -d ${TMP_DIR} ]; then
-        mkdir ${TMP_DIR}
-    fi
     rm -fr ${TMP_DIR}/${PACKAGE}
-    mkdir ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
 
     exit 0
