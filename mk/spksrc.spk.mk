@@ -168,7 +168,7 @@ ifneq ($(PUBLISHING_URL),)
 ifneq ($(PUBLISHING_KEY),)
 publish: package
 	curl -A "spksrc v1.0; $(PUBLISHING_KEY)" \
-	     -F "package=@$(SPK_FILE_NAME)" \
+	     -F "package=@$(SPK_FILE_NAME);filename=$(notdir $(SPK_FILE_NAME))" \
 	     $(PUBLISHING_URL)
 else
 publish:
