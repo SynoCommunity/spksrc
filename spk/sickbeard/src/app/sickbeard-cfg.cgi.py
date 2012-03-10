@@ -1,4 +1,4 @@
-#!/usr/local/python/bin/python
+#!/usr/local/sickbeard/env/bin/python
 import os
 import subprocess
 import cgi
