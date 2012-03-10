@@ -60,5 +60,5 @@ $(STAGING_DIR)/share/SickBeard:
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle $@ pyextdirect configobj
+	@cd $(WORK_DIR) && pip bundle $@ pyextdirect==0.2 configobj
 
