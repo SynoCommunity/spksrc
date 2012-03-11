@@ -35,5 +35,5 @@ $(STAGING_DIR)/share/Dobby/requirements.pybundle:
 	@$(MSG) "Bundling requirements for Dobby"
 	sed -i -e "/^pyaudio/d" $(STAGING_DIR)/share/Dobby/requirements.txt
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle $@ -r $(STAGING_DIR)/share/Dobby/requirements.txt
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ -r $(STAGING_DIR)/share/Dobby/requirements.txt
 
