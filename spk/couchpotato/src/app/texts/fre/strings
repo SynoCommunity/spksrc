@@ -1,9 +1,7 @@
 [app]
-app_name = "SickBeard Configuration"
-description = "Aide à la configuration pour SickBeard"
+app_name = "CouchPotato Configuration"
+description = "Aide à la configuration pour CouchPotato"
 
 [config]
 binary_newsgrabber = "Binary newsgrabber"
 nothing = "Aucun"
-autoprocesstv = "Postprocessing SABnzbd"
-enable = "Activer"
