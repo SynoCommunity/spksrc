@@ -45,6 +45,7 @@ class CouchPotatoCfg(Base):
             self.configs['couchpotato']['Sabnzbd']['password'] = self.configs['sabnzbd']['misc']['password']
             self.configs['couchpotato']['Sabnzbd']['apikey'] = self.configs['sabnzbd']['misc']['api_key']
             self.configs['couchpotato']['Sabnzbd']['host'] = 'localhost:' + self.configs['sabnzbd']['misc']['port']
+            self.configs['couchpotato'].write()
             subprocess.call([couchpotato_sss, 'start'], stdout=devnull, stderr=devnull)
         elif configure_for == 'Nzbget' and 'Nzbget' in self.configs:
             #TODO
