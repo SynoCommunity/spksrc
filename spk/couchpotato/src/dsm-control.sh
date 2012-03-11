@@ -1,120 +1,84 @@
 #!/bin/sh
 
-
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="couchpotato"
-PYTHON_DIR="/usr/local/python26"
-PYTHON=${PYTHON_DIR}/bin/python
-PYTHON_VAR_DIR="/usr/local/var/python26"
+DNAME="CouchPotato"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-VAR_DIR="/usr/local/var/${PACKAGE}"
-PATH="${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="couchpotato"
+PYTHON="${INSTALL_DIR}/env/bin/python"
+COUCHPOTATO="${INSTALL_DIR}/share/CouchPotato/CouchPotato.py"
+CFG_FILE="${INSTALL_DIR}/var/config.ini"
+PID_FILE="${INSTALL_DIR}/var/couchpotato.pid"
+LOG_FILE="${INSTALL_DIR}/var/logs/CouchPotato.log"
 
-RUNAS="${PACKAGE}"
-CPPY="${VAR_DIR}/CouchPotato.py"
-CPPID="${VAR_DIR}/couchpotato.pid"
 
-
-start_daemon ()
+start_daemon()
 {
-    # Launch Couch Potato in the background.
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${CPPY} -d --pidfile ${CPPID}"
-    counter=20
-    while [ $counter -gt 0 ]
-    do
-        daemon_status && break
-        let counter=counter-1
-        sleep 1
-    done
-    ln -sf $0 ${PYTHON_VAR_DIR}/run/${PACKAGE}-ctl
+    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATO} -d --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
-stop_daemon ()
+stop_daemon()
 {
-    rm -f ${PYTHON_VAR_DIR}/run/${PACKAGE}-ctl
-	
-    # Kill Couch Potato.
-    kill `cat ${CPPID}`
-
-    # Wait until Couch Potato is really dead (may take some time).
-    counter=20
-    while [ ${counter} -gt 0 ]
-    do
-        daemon_status || break
-        let counter=counter-1
-        sleep 1
-    done
+    kill `cat ${PID_FILE}`
+    wait_for_status 1 20
+    rm -f ${PID_FILE}
 }
 
-daemon_status ()
+daemon_status()
 {
-    if [ -f ${CPPID} ] 
-    then
-        if [ -d /proc/`cat ${CPPID}` ]
-        then
-            return 0
-        else
-            # PID file exists, but no process has this PID. 
-            rm ${CPPID}
-        fi
+    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
+        return 0
     fi
     return 1
 }
 
-run_in_console ()
+wait_for_status()
 {
-    # Launch Couch Potato in the foreground
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${CPPY}"
+    counter=$2
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && break
+        let counter=counter-1
+        sleep 1
+    done
 }
+
 
 case $1 in
     start)
-        if daemon_status
-        then
-            echo Couch Potato is already running
-            exit 0
+        if daemon_status; then
+            echo ${DNAME} is already running
         else
-            echo Starting Couch Potato ...
+            echo Starting ${DNAME} ...
             start_daemon
-            exit $?
         fi
         ;;
     stop)
-        if daemon_status
-        then
-            echo Stopping Couch Potato ...
+        if daemon_status; then
+            echo Stopping ${DNAME} ...
             stop_daemon
-            exit $?
         else
-            echo Couch Potato is not running
-            exit 0
+            echo ${DNAME} is not running
         fi
         ;;
     status)
-        ${INSTALL_DIR}/sbin/updateInfo
-        if daemon_status
-        then
-            echo Couch Potato is running
+        if daemon_status; then
+            echo ${DNAME} is running
             exit 0
         else
-            echo Couch Potato is not running
+            echo ${DNAME} is not running
             exit 1
         fi
         ;;
-    console)
-        run_in_console
-        exit $?
-        ;;
     log)
-        echo ${VAR_DIR}/logs/CouchPotato.log
-        exit 0
+        echo ${LOG_FILE}
         ;;
     *)
         exit 1
         ;;
 esac
+

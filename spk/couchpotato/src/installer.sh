@@ -1,25 +1,18 @@
 #!/bin/sh
 
-#########################################
-# A few variables to make things readable
-
-# Package specific variables
+# Package
 PACKAGE="couchpotato"
-DNAME="Couch Potato"
-PYTHON_DIR="/usr/local/python26"
+DNAME="CouchPotato"
 
-# Common variables
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-VAR_DIR="/usr/local/var/${PACKAGE}"
-UPGRADE="/tmp/${PACKAGE}.upgrade"
-PATH="${INSTALL_DIR}/sbin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin" # Avoid ipkg commands
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="couchpotato"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+CFG_FILE="${INSTALL_DIR}/var/config.ini"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
-SYNOUSER="/usr/syno/sbin/synouser"
-
-SYNO3APP="/usr/syno/synoman/webman/3rdparty"
-
-#########################################
-# DSM package manager functions
 
 preinst ()
 {
@@ -27,125 +20,61 @@ preinst ()
 }
 
 postinst ()
-{ ( set -x      
-    # Installation directories
-    mkdir -p ${INSTALL_DIR}
-    mkdir -p ${VAR_DIR}
-    mkdir -p /usr/local/bin
+{
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Remove the DSM user
-    if ${SYNOUSER} --enum local | grep "^${PACKAGE}$" >/dev/null
-    then
-        # Keep the existing uid
-        uid=`grep ${PACKAGE} /etc/passwd | cut -d: -f3`
-        ${SYNOUSER} --del ${PACKAGE} 2> /dev/null
-        UID_PARAM="-u ${uid}"
-    fi
+    # Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env
 
-    # Extract the files to the installation directory
-    ${PYTHON_DIR}/bin/xzdec -c ${SYNOPKG_PKGDEST}/package.txz | \
-        tar xpf - -C ${INSTALL_DIR}
-    # Remove the installer archive to save space
-    rm ${SYNOPKG_PKGDEST}/package.txz
+    # Install the bundle
+    pip install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    rm -fr ${INSTALL_DIR}/var/build
 
-    ln -s /var/packages/CouchPotato/scripts/start-stop-status /usr/local/bin/${PACKAGE}-ctl 
-
-    # Install the application in the main interface.
-    if [ -d ${SYNO3APP} ]
-    then
-        rm -f ${SYNO3APP}/${PACKAGE}
-        ln -s ${INSTALL_DIR}/share/synoman ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Download and extract the application from github.
-    (
-      cd /usr/local/var
-      /usr/syno/bin/wget -q --no-check-certificate -O app.tgz https://github.com/RuudBurger/CouchPotato/tarball/master
-      dest=`tar -tzf app.tgz | head -n1 | cut -d/ -f1`
-      ln -sf ${VAR_DIR} $dest
-      tar xzpf app.tgz
-      rm app.tgz $dest
-      # Clear the current version info
-      rm -f couchpotato/cache/updates/history.txt
-    )
-
-    # Create the configuration file
-    if [ -f ${VAR_DIR}/config.ini ]
-    then
-        true
-    else
-        # No config file, create default one
-        ${SYNOPKG_PKGDEST}/sbin/cpDefaultConfig /usr/local/var/sabnzbd/config.ini > ${VAR_DIR}/config.ini
-    fi
-    # Ensure that only the service user can access this file, as some
-    # password are stored in clear text
-    chmod 600 ${VAR_DIR}/config.ini
-
-    # Create the service user if needed
-    if grep "^${PACKAGE}:" /etc/passwd >/dev/null
-    then
-        true
-    else
-        adduser -h ${VAR_DIR} -g "${DNAME} User" -G users -D -H ${UID_PARAM} -s /bin/sh ${PACKAGE}
-    fi
+    # Create user
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
 
     # Correct the files ownership
-    chown -Rh ${PACKAGE}:users ${INSTALL_DIR} ${VAR_DIR}
-) 2> /tmp/cp.log
+    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+
     exit 0
 }
 
 preuninst ()
 {
-    # Make sure the package is not running while we are removing it.
-    /usr/local/bin/${PACKAGE}-ctl stop
+    # Remove the user (if not upgrading)
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        deluser ${RUNAS}
+    fi
 
     exit 0
 }
 
 postuninst ()
 {
-    # Keep the user data and settings during the upgrade
-    if [ -f ${UPGRADE} ]
-    then
-        true 
-    else
-        deluser ${PACKAGE}
-        rm -fr ${VAR_DIR}
-    fi
-
-    # Remove the application from the main interface if it was previously added.
-    if [ -h ${SYNO3APP}/${PACKAGE} ]
-    then
-        rm ${SYNO3APP}/${PACKAGE}
-    fi
-
-    # Remove symlinks to utils
-    rm /usr/local/bin/${PACKAGE}-ctl 
-
-    # Remove the installation directory
-    rm -fr ${INSTALL_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
 
     exit 0
 }
 
 preupgrade ()
 {
-    # The package manager only check the version when installing, not upgrading. So do it here the old way.
-    if [ -e ${PYTHON_DIR}/bin/adduser ]
-    then
-        touch ${UPGRADE}
-    else
-        echo "Please uppdate Python26 before updating this package"
-        false
-    fi
+    # Save some stuff
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
+    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
 
-    exit $?
+    exit 0
 }
 
 postupgrade ()
 {
-    rm -f ${UPGRADE}
+    # Restore some stuff
+    rm -fr ${INSTALL_DIR}/var
+    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
 }
+

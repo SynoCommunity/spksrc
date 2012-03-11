@@ -1,55 +1,62 @@
-SPK_NAME = CouchPotato
-SPK_VERS = 3.1
+SPK_NAME = couchpotato
+SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/couchpotato.png
+DSM_UI_DIR = app
 
-DEPENDS =
+DEPENDS  =
+SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-COMMENT    = "CouchPotato is an automatic NZB and torrent downloader for movies."
-ADMIN_PORT = 8082
+COMMENT    = Automatic NZB and torrent downloader for movies
+ADMIN_PORT = 8200
 RELOAD_UI = yes
-DISPLAY_NAME = ${SPK_NAME}
+DISPLAY_NAME = CouchPotato
 
-HOMEPAGE   = http://couchpotatoapp.com/
+HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
-PYTHON_VERS = 26
-SPK_DEPENDS = "Python${PYTHON_VERS}>=2.6.6-5"
-
-INSTALL_PREFIX = /usr/local/${SPK_NAME}
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 COPY_TARGET = nop
-POST_STRIP_TARGET = xz-compress
+POST_STRIP_TARGET = couchpotato_extra_install
 
 # Pure Python package, make sure ARCH is not defined
 override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: xz-compress
-xz-compress:
-	@$(MSG) "Adding files for DSM integration"
-	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 755 -d $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/share/synoman
-	install -m 755 src/updateInfo.py $(STAGING_DIR)/sbin/updateInfo
-	install -m 644 src/config.json $(STAGING_DIR)/share/synoman/config
-	install -m 755 src/couchpotato.cgi.py $(STAGING_DIR)/share/synoman/couchpotato.cgi
-	for size in 16 24 32 48 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
-	            $(STAGING_DIR)/share/synoman/couchpotato-$${size}.png ; \
+.PHONY: couchpotato_extra_install
+couchpotato_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)/share/CouchPotato
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 src/app/couchpotato.cgi.pl $(STAGING_DIR)/app/couchpotato.cgi
+	install -m 755 src/app/couchpotato-cfg.cgi.py $(STAGING_DIR)/app/couchpotato-cfg.cgi
+	install -m 644 src/app/couchpotato-cfg.js $(STAGING_DIR)/app/couchpotato-cfg.js
+	install -m 755 -d $(STAGING_DIR)/app/texts
+	for language in enu fre; do \
+		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
+		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
 	done
-	@$(MSG) "Compressing with xz"
-	(cd $(STAGING_DIR) && tar cpJf $(WORK_DIR)/package.txz --group=root --owner=root *)
-	rm -fr $(STAGING_DIR)
-	mkdir $(STAGING_DIR)
-	mv $(WORK_DIR)/package.txz $(STAGING_DIR)/
-	install -m 755 -d $(STAGING_DIR)/sbin
-	install -m 755 src/cpDefaultConfig.py $(STAGING_DIR)/sbin/cpDefaultConfig
+	install -m 755 -d $(STAGING_DIR)/app/images
+	for size in 16 24 32 48; do \
+		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+		convert src/couchpotato-cfg.png -thumbnail $${size}x$${size} \
+		        $(STAGING_DIR)/app/images/couchpotato-cfg-$${size}.png ; \
+	done
+
+$(STAGING_DIR)/share/CouchPotato:
+	cd $(STAGING_DIR)/share && git clone https://github.com/RuudBurger/CouchPotato.git CouchPotato
+	rm -fr $(STAGING_DIR)/share/CouchPotato/.git $(STAGING_DIR)/share/CouchPotato/.gitignore
+
+$(STAGING_DIR)/share/requirements.pybundle:
+	@$(MSG) "Bundling requirements"
+	install -m 755 -d $(STAGING_DIR)/share
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ pyextdirect==0.2 configobj
 
