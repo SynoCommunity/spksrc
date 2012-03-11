@@ -64,6 +64,7 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+    mv ${INSTALL_DIR}/share/SickBeard/autoProcessTV/autoProcessTV.cfg ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -73,6 +74,7 @@ postupgrade ()
     # Restore some stuff
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    mv ${TMP_DIR}/${PACKAGE}/autoProcessTV.cfg ${INSTALL_DIR}/share/SickBeard/autoProcessTV/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
