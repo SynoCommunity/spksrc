@@ -51,6 +51,9 @@ class SickBeardCfg(Base):
             self.configs['sickbeard']['SABnzbd']['sab_apikey'] = self.configs['sabnzbd']['misc']['api_key']
             self.configs['sickbeard']['SABnzbd']['sab_host'] = 'http://localhost:' + self.configs['sabnzbd']['misc']['port'] + '/'
             self.configs['sickbeard'].write()
+            self.configs['autoprocesstv']['SickBeard']['username'] = self.configs['sickbeard']['General']['web_username']
+            self.configs['autoprocesstv']['SickBeard']['password'] = self.configs['sickbeard']['General']['web_password']
+            self.configs['autoprocesstv'].write()
             subprocess.call([sickbeard_sss, 'start'], stdout=devnull, stderr=devnull)
         elif configure_for == 'nzbget' and 'nzbget' in self.configs:
             #TODO
