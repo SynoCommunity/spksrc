@@ -1,6 +1,7 @@
 #!/usr/local/sickbeard/env/bin/python
 import os
 import subprocess
+import pwd
 import cgi
 import configobj
 from pyextdirect.configuration import create_configuration, expose, LOAD, SUBMIT
@@ -54,6 +55,8 @@ class SickBeardCfg(Base):
             self.configs['autoprocesstv']['SickBeard']['username'] = self.configs['sickbeard']['General']['web_username']
             self.configs['autoprocesstv']['SickBeard']['password'] = self.configs['sickbeard']['General']['web_password']
             self.configs['autoprocesstv'].write()
+            # Change ownership of autoProcessTV so SABnzbd doesn't fail opening it during postprocessing
+            os.chown(autoprocesstv_path, pwd.getpwnam('sabnzbd')[2], -1)
             subprocess.call([sickbeard_sss, 'start'], stdout=devnull, stderr=devnull)
         elif configure_for == 'nzbget' and 'nzbget' in self.configs:
             #TODO
