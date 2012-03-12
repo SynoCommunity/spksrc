@@ -65,6 +65,11 @@ case $1 in
             exit 0
         fi
         ;;
+    restart)
+        stop_daemon
+        start_daemon
+        exit $?
+        ;;
     status)
         if daemon_status; then
             echo ${DNAME} is running
