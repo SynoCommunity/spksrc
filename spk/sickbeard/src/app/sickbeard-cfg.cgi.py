@@ -46,15 +46,13 @@ class SickBeardCfg(Base):
         if configure_for == 'sabnzbd' and 'sabnzbd' in self.configs:
             devnull = open(os.devnull, 'w')
             subprocess.call([sickbeard_sss, 'stop'], stdout=devnull, stderr=devnull)
+            # Edit SickBeard's configuration to point to SABnzbd
             self.configs['sickbeard']['General']['nzb_method'] = 'sabnzbd'
             self.configs['sickbeard']['SABnzbd']['sab_username'] = self.configs['sabnzbd']['misc']['username']
             self.configs['sickbeard']['SABnzbd']['sab_password'] = self.configs['sabnzbd']['misc']['password']
             self.configs['sickbeard']['SABnzbd']['sab_apikey'] = self.configs['sabnzbd']['misc']['api_key']
             self.configs['sickbeard']['SABnzbd']['sab_host'] = 'http://localhost:' + self.configs['sabnzbd']['misc']['port'] + '/'
             self.configs['sickbeard'].write()
-            self.configs['autoprocesstv']['SickBeard']['username'] = self.configs['sickbeard']['General']['web_username']
-            self.configs['autoprocesstv']['SickBeard']['password'] = self.configs['sickbeard']['General']['web_password']
-            self.configs['autoprocesstv'].write()
             # Change ownership of autoProcessTV so SABnzbd doesn't fail opening it during postprocessing
             os.chown(autoprocesstv_path, pwd.getpwnam('sabnzbd')[2], -1)
             subprocess.call([sickbeard_sss, 'start'], stdout=devnull, stderr=devnull)
@@ -62,8 +60,15 @@ class SickBeardCfg(Base):
             #TODO
             pass
         if autoprocesstv and 'sabnzbd' in self.configs:
+            # Change SABnzbd script dir to the autoProcessTV directory
+            #TODO: Create a script dir in var for SABnzbd and put autoProcessTV in there rather
+            # than pointing to it
             self.configs['sabnzbd']['misc']['script_dir'] = os.path.dirname(autoprocesstv_path)
             self.configs['sabnzbd'].write()
+            # Setup autoProcessTV.cfg
+            self.configs['autoprocesstv']['SickBeard']['username'] = self.configs['sickbeard']['General']['web_username']
+            self.configs['autoprocesstv']['SickBeard']['password'] = self.configs['sickbeard']['General']['web_password']
+            self.configs['autoprocesstv'].write()
 
     @expose
     def available_configs(self):
