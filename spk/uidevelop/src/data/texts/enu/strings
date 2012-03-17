@@ -1,0 +1,15 @@
+[app]
+app_name = "UI Develop"
+description = "SPK to help developers develop DSM interfaces"
+
+[config]
+fieldset_test = "Test fieldset"
+test_directory = "Test directory"
+
+[errors]
+directsubmit = "Saving failed"
+
+[ui]
+configurations = "Configurations"
+test = "Test"
+
