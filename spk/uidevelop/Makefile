@@ -32,6 +32,7 @@ uidevelop_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/data
 	install -m 644 src/data/config $(STAGING_DIR)/data/config
 	install -m 644 src/data/uidevelop.js $(STAGING_DIR)/data/uidevelop.js
+	install -m 644 src/data/style.css $(STAGING_DIR)/data/style.css
 	install -m 755 src/data/uidevelop.cgi.py $(STAGING_DIR)/data/uidevelop.cgi
 	install -m 755 -d $(STAGING_DIR)/data/texts
 	for language in enu fre; do \
