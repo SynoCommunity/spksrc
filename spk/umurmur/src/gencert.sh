@@ -18,3 +18,4 @@ fi
 
 echo "uMurmur's certificate successfully generated"
 exit 0
+
