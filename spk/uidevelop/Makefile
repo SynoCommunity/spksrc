@@ -43,6 +43,9 @@ uidevelop_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/data/images/$(SPK_NAME)-$${size}.png ; \
 	done
+	install -m 644 src/data/images/icon_config.png $(STAGING_DIR)/data/images/icon_config.png
+	install -m 644 src/data/images/list_item_active.png $(STAGING_DIR)/data/images/list_item_active.png
+	install -m 644 src/data/images/list_item_hover.png $(STAGING_DIR)/data/images/list_item_hover.png
 
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
