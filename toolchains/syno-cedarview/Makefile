@@ -10,7 +10,9 @@ TC_BASE_DIR = i686-linux-gnu
 TC_PREFIX = i686-linux-gnu
 TC_TARGET = i686-linux-gnu
 
-TC_CFLAGS =
+# gcc 4.7 lists 'atom' as "64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3"
+# gcc 4.2 lists 'nocona' as "64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3"
+TC_CFLAGS = -O3 -march=nocona -mtune=nocona
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk

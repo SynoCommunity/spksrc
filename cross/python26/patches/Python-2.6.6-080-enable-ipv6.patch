@@ -1,5 +1,5 @@
---- configure.orig	2011-05-17 22:54:24.000000000 +0200
-+++ configure	2011-05-17 22:51:35.000000000 +0200
+--- configure.orig      2011-05-17 22:54:24.000000000 +0200
++++ configure   2011-05-17 22:51:35.000000000 +0200
 @@ -10183,9 +10183,9 @@
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking getaddrinfo bug" >&5
  $as_echo_n "checking getaddrinfo bug... " >&6; }
