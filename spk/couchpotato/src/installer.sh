@@ -60,6 +60,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Remove auto-updater stuff so it doesn't get confused
+    rm -fr ${INSTALL_DIR}/var/cache/updates/
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
