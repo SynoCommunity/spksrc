@@ -8,24 +8,5 @@
             "url": "3rdparty/sickbeard/sickbeard.cgi",
             "allUsers": true
         }
-    },
-    "sickbeard-cfg.js": {
-        "SickBeardCfg.Instance": {
-            "type": "app",
-            "title": "app:app_name",
-            "version": "0.1",
-            "icon": "images/sickbeard-cfg-{0}.png",
-            "texts": "texts",
-            "allowMultiInstance": false,
-            "appWindow": "SickBeardCfg.MainWindow",
-            "depend": ["SickBeardCfg.MainWindow"]
-        },
-        "SickBeardCfg.MainWindow": {
-            "type": "lib",
-            "title": "app:app_name",
-            "icon": "images/sickbeard-cfg-{0}.png",
-            "texts": "texts",
-            "depend": ["SickBeardCfg.MainPanel"]
-        }
     }
 }
