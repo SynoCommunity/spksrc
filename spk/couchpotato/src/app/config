@@ -8,24 +8,5 @@
             "url": "3rdparty/couchpotato/couchpotato.cgi",
             "allUsers": true
         }
-    },
-    "couchpotato-cfg.js": {
-        "CouchPotatoCfg.Instance": {
-            "type": "app",
-            "title": "app:app_name",
-            "version": "0.1",
-            "icon": "images/couchpotato-cfg-{0}.png",
-            "texts": "texts",
-            "allowMultiInstance": false,
-            "appWindow": "CouchPotatoCfg.MainWindow",
-            "depend": ["CouchPotatoCfg.MainWindow"]
-        },
-        "CouchPotatoCfg.MainWindow": {
-            "type": "lib",
-            "title": "app:app_name",
-            "icon": "images/couchpotato-cfg-{0}.png",
-            "texts": "texts",
-            "depend": ["CouchPotatoCfg.MainPanel"]
-        }
     }
 }
