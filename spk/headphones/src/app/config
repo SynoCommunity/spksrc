@@ -8,24 +8,5 @@
             "url": "3rdparty/headphones/headphones.cgi",
             "allUsers": true
         }
-    },
-    "headphones-cfg.js": {
-        "HeadphonesCfg.Instance": {
-            "type": "app",
-            "title": "app:app_name",
-            "version": "0.1",
-            "icon": "images/headphones-cfg-{0}.png",
-            "texts": "texts",
-            "allowMultiInstance": false,
-            "appWindow": "HeadphonesCfg.MainWindow",
-            "depend": ["HeadphonesCfg.MainWindow"]
-        },
-        "HeadphonesCfg.MainWindow": {
-            "type": "lib",
-            "title": "app:app_name",
-            "icon": "images/headphones-cfg-{0}.png",
-            "texts": "texts",
-            "depend": ["HeadphonesCfg.MainPanel"]
-        }
     }
 }

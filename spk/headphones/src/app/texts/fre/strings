@@ -1,7 +1,0 @@
-[app]
-app_name = "Headphones Configuration"
-description = "Aide à la configuration pour Headphones"
-
-[config]
-binary_newsgrabber = "Binary newsgrabber"
-nothing = "Aucun"
