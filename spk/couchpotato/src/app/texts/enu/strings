@@ -1,7 +1,0 @@
-[app]
-app_name = "CouchPotato Configuration"
-description = "Configuration helper for CouchPotato"
-
-[config]
-binary_newsgrabber = "Binary newsgrabber"
-nothing = "Nothing"
