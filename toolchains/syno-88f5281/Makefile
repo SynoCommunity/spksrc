@@ -1,4 +1,3 @@
-
 TC_NAME = syno-88f5281
 
 TC_DIST_NAME = gcc343_glibc232_88f5281.tgz
@@ -14,3 +13,4 @@ TC_CFLAGS = -mfloat-abi=soft
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
+
