@@ -43,3 +43,4 @@ fix_shebang_python_module:
 	done
 
 all: install fix_shebang_python_module
+

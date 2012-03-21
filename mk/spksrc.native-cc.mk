@@ -44,3 +44,4 @@ clean:
 	rm -fr $(WORK_DIR)
 
 all: compile
+

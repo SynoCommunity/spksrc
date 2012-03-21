@@ -75,3 +75,4 @@ $(INSTALL_PLIST):
 	    $(MSG) "No PLIST for $(NAME)" >&2; \
 	  fi \
 	) | $(PLIST_TRANSFORM) | sort -u > $@
+
