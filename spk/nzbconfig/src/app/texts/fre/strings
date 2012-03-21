@@ -1,0 +1,17 @@
+[app]
+app_name = "NZB Config"
+description = "Interface de configuration pour les SPKs NZB"
+
+[errors]
+sabnzbd_not_installed = "SABnzbd n'est pas installé"
+nzbget_not_installed = "NZBGet n'est pas installé"
+sickbeard_not_installed = "SickBeard n'est pas installé"
+couchpotato_not_installed = "CouchPotato n'est pas installé"
+headphones_not_installed = "Headphones n'est pas installé"
+
+[ui]
+newsgrabber = "Récupérateur de news"
+applications = "Applications"
+postprocessing = "Post-traitement"
+no_change = "Ne pas changer"
+configure_for = "Configurer pour"
