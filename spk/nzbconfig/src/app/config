@@ -1,0 +1,30 @@
+{
+    "nzbconfig.js": {
+        "SYNOCOMMUNITY.NZBConfig.AppInstance": {
+            "type": "app",
+            "title": "app:app_name",
+            "version": "0.1",
+            "icon": "images/nzbconfig-{0}.png",
+            "texts": "texts",
+            "allowMultiInstance": false,
+            "appWindow": "SYNOCOMMUNITY.NZBConfig.AppWindow",
+            "depend": ["SYNOCOMMUNITY.NZBConfig.AppWindow"]
+        },
+        "SYNOCOMMUNITY.NZBConfig.AppWindow": {
+            "type": "lib",
+            "title": "app:app_name",
+            "icon": "images/nzbconfig-{0}.png",
+            "texts": "texts",
+            "depend": ["SYNOCOMMUNITY.NZBConfig.ListView", "SYNOCOMMUNITY.NZBConfig.MainCardPanel"]
+        },
+		"SYNOCOMMUNITY.NZBConfig.ListView": [],
+        "SYNOCOMMUNITY.NZBConfig.MainCardPanel": {
+            "depend": ["SYNOCOMMUNITY.NZBConfig.PanelSABnzbd", "SYNOCOMMUNITY.NZBConfig.PanelNZBGet", "SYNOCOMMUNITY.NZBConfig.PanelSickBeard", "SYNOCOMMUNITY.NZBConfig.PanelCouchPotato", "SYNOCOMMUNITY.NZBConfig.PanelHeadphones"]
+        },
+		"SYNOCOMMUNITY.NZBConfig.PanelSABnzbd": [],
+		"SYNOCOMMUNITY.NZBConfig.PanelNZBGet": [],
+		"SYNOCOMMUNITY.NZBConfig.PanelSickBeard": [],
+		"SYNOCOMMUNITY.NZBConfig.PanelCouchPotato": [],
+		"SYNOCOMMUNITY.NZBConfig.PanelHeadphones": []
+    }
+}
