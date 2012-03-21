@@ -1,9 +1,0 @@
-[app]
-app_name = "SickBeard Configuration"
-description = "Configuration helper for SickBeard"
-
-[config]
-binary_newsgrabber = "Binary newsgrabber"
-nothing = "Nothing"
-autoprocesstv = "SABnzbd postprocessing"
-enable = "Enable"

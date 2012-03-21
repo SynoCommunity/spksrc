@@ -27,10 +27,6 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env
 
-    # Install the bundle
-    pip install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
-    rm -fr ${INSTALL_DIR}/var/build
-
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
 
