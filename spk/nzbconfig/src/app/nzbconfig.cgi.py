@@ -1,4 +1,4 @@
-#!/usr/local/uidevelop/env/bin/python
+#!/usr/local/nzbconfig/env/bin/python
 import os
 import subprocess
 import pwd
