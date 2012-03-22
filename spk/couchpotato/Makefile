@@ -8,7 +8,8 @@ DEPENDS  =
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-COMMENT    = Automatic NZB and torrent downloader for movies
+DESCRIPTION = Automatic NZB and torrent downloader for movies
+DESCRIPTION_FRE = Téléchargement automatique de films via NZB ou torrent
 ADMIN_PORT = 8200
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato

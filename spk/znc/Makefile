@@ -7,7 +7,8 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-COMMENT    = Advanced IRC bouncer
+DESCRIPTION = Advanced IRC bouncer
+DESCRIPTION_FRE = Bouncer IRC avancé
 ADMIN_PORT = 8250
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC

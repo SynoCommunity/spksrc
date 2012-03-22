@@ -9,7 +9,8 @@ DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa
 
 MAINTAINER = SynoCommunity
-COMMENT    = Python Programming Language
+DESCRIPTION = Python Programming Language
+DESCRIPTION_FRE = Langage de programmation Python
 RELOAD_UI = yes
 DISPLAY_NAME = Python
 

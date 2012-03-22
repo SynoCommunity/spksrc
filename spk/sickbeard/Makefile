@@ -8,7 +8,8 @@ DEPENDS  =
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-COMMENT    = The ultimate PVR application that downloads and manages your TV shows
+DESCRIPTION = The ultimate PVR application that downloads and manages your TV shows
+DESCRIPTION_FRE = L\'application ultime pour télécharger et gérer vos séries TV
 ADMIN_PORT = 8081
 RELOAD_UI = yes
 DISPLAY_NAME = SickBeard

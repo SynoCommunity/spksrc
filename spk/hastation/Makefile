@@ -7,7 +7,7 @@ DEPENDS  = cross/python cross/pip cross/pyalsa cross/pyaudio
 DEPENDS += cross/espeak cross/speechd cross/julius cross/dobby
 
 MAINTAINER = SynoCommunity
-COMMENT    = Home Automation Station
+DESCRIPTION = Home Automation Station
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = H.A. Station
