@@ -9,7 +9,7 @@ BETA = 1
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, CouchPotato et Headphones
+DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, CouchPotato and Headphones
 DESCRIPTION_FRE = Interface de configuration pour vos paquets SABnzbd, NZBGet, SickBeard, CouchPotato et Headphones
 RELOAD_UI = yes
 DISPLAY_NAME = NZB Config
