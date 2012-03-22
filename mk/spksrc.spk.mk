@@ -37,7 +37,7 @@ $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
-	@echo description=\"$(COMMENT)\" >> $@
+	@echo description=\"$(DESCRIPTION)\" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
 		$(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
 		echo description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\") \
