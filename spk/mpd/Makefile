@@ -11,7 +11,7 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-COMMENT    = Music Player Daemon is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
+DESCRIPTION = Music Player Daemon is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
 RELOAD_UI = yes
 DISPLAY_NAME = Music Player Daemon
 

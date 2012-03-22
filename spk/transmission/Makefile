@@ -7,7 +7,8 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-COMMENT    = A Fast, Easy, and Free BitTorrent Client
+DESCRIPTION = A Fast, Easy, and Free BitTorrent Client
+DESCRIPTION_FRE = Client BitTorrent rapide, simple et gratuit
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission

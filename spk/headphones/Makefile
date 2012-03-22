@@ -8,7 +8,8 @@ DEPENDS  =
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-COMMENT    = Automatic music downloader for SABnzbd
+DESCRIPTION = Automatic music downloader for SABnzbd
+DESCRIPTION_FRE = Téléchargement automatique de musique pour SABnzbd
 ADMIN_PORT = 8181
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones

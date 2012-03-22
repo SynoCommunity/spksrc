@@ -7,7 +7,8 @@ DSM_UI_DIR = app
 DEPENDS = cross/openssl cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-COMMENT    = Minimalistic Mumble server
+DESCRIPTION = Minimalistic Mumble server
+DESCRIPTION_FRE = Serveur Mumble minimaliste
 RELOAD_UI = yes
 DISPLAY_NAME = uMurmur
 
