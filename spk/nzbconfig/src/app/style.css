@@ -22,7 +22,10 @@
 }
 
 .synocommunity-nzbconfig .synocommunity-nzbconfig-list .x-panel-body {
-    background-color: #E1ECFA;
+	background-color: #E1ECFA;
+	background-image: url(images/synocommunity.png);
+	background-position: center bottom;
+	background-repeat: no-repeat;
 }
 
 /* List view icons */
