@@ -43,6 +43,6 @@ setup: local.mk
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
-	@echo "PUBLISHING_URL=http://packages.synocommunity.com/" > $@
+	@echo "PUBLISHING_URL=https://packages.synocommunity.com/" > $@
 	@echo "PUBLISHING_KEY=" >> $@
 
