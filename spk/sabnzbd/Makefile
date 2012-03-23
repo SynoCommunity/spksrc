@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/par2cmdline cross/sabnzbd
+DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
 
 SPK_DEPENDS = "python>=2.7.2-1"
 
