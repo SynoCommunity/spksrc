@@ -1,0 +1,16 @@
+--- makefile.unix.orig	2012-03-20 11:30:02.348140614 -0700
++++ makefile.unix	2012-03-20 11:34:11.252144571 -0700
+@@ -6,10 +6,10 @@
+ #
+ 
+ # Linux using GCC
+-CXX=g++
+-CXXFLAGS=-O2
++#CXX=g++
++#CXXFLAGS=-O2
+ DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+-STRIP=strip
++#STRIP=strip
+ DESTDIR=/usr
+ 
+ # Linux using LCC
