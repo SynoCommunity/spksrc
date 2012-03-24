@@ -4,7 +4,6 @@ SPK_REV = 1
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
-BETA = 1
 
 SPK_DEPENDS = "python>=2.7.2-1"
 
