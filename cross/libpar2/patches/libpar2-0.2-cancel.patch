@@ -1,0 +1,187 @@
+diff -aud ../libpar2-0.2-original/par2repairer.cpp ../libpar2-0.2/par2repairer.cpp
+--- ../libpar2-0.2-original/par2repairer.cpp	2008-10-26 19:54:33.000000000 +0100
++++ ../libpar2-0.2/par2repairer.cpp	2008-10-29 10:24:48.000000000 +0100
+@@ -52,6 +52,8 @@
+   noiselevel = CommandLine::nlNormal;
+   headers = new ParHeaders;
+   alreadyloaded = false;
++
++  cancelled = false;
+ }
+ 
+ Par2Repairer::~Par2Repairer(void)
+@@ -406,6 +408,10 @@
+           progress = offset;
+ 	sig_progress.emit(newfraction);
+ 
++          if (cancelled)
++          {
++            break;
++          }
+         }
+       }
+ 
+@@ -584,6 +590,11 @@
+     delete diskfile;
+   }
+   
++  if (cancelled)
++  {
++    return false;
++  }
++
+   return true;
+ }
+ 
+@@ -833,9 +844,17 @@
+     for (list<string>::const_iterator s=files->begin(); s!=files->end(); ++s)
+     {
+       LoadPacketsFromFile(*s);
++      if (cancelled)
++      {
++        break;
++      }
+     }
+ 
+     delete files;
++    if (cancelled)
++    {
++      return false;
++    }
+   }
+ 
+   {
+@@ -846,9 +865,17 @@
+     for (list<string>::const_iterator s=files->begin(); s!=files->end(); ++s)
+     {
+       LoadPacketsFromFile(*s);
++      if (cancelled)
++      {
++        break;
++      }
+     }
+ 
+     delete files;
++    if (cancelled)
++    {
++      return false;
++    }
+   }
+ 
+   return true;
+@@ -866,9 +893,18 @@
+         string::npos != filename.find(".PAR2"))
+     {
+       LoadPacketsFromFile(filename);
++      if (cancelled)
++      {
++        break;
++      }
+     }
+   }
+ 
++  if (cancelled)
++  {
++    return false;
++  }
++
+   return true;
+ }
+ 
+@@ -1210,6 +1246,11 @@
+   sf = sortedfiles.begin();
+   while (sf != sortedfiles.end())
+   {
++    if (cancelled)
++    {
++      return false;
++    }
++
+     // Do we have a source file
+     Par2RepairerSourceFile *sourcefile = *sf;
+ 
+@@ -1562,6 +1603,10 @@
+         cout << "Scanning: \"" << shortname << "\": " << newfraction/10 << '.' << newfraction%10 << "%\r" << flush;
+ 	sig_progress.emit(newfraction);
+ 
++        if (cancelled)
++        {
++          break;
++        }
+       }
+     }
+ 
+@@ -1651,6 +1696,11 @@
+     }
+   }
+ 
++  if (cancelled)
++  {
++    return false;
++  }
++
+   // Get the Full and 16k hash values of the file
+   filechecksummer.GetFileHashes(hashfull, hash16k);
+ 
+@@ -2291,10 +2341,19 @@
+             cout << "Repairing: " << newfraction/10 << '.' << newfraction%10 << "%\r" << flush;
+ 	    sig_progress.emit(newfraction);
+ 
++            if (cancelled)
++            {
++              break;
++            }
+           }
+         }
+       }
+ 
++      if (cancelled)
++      {
++        break;
++      }
++
+       ++inputblock;
+       ++inputindex;
+     }
+@@ -2348,9 +2407,18 @@
+           cout << "Processing: " << newfraction/10 << '.' << newfraction%10 << "%\r" << flush;
+ 	sig_progress.emit(newfraction);
+ 
++          if (cancelled)
++          {
++            break;
++          }
+         }
+       }
+ 
++      if (cancelled)
++      {
++        break;
++      }
++
+       ++copyblock;
+       ++inputblock;
+     }
+@@ -2362,6 +2430,11 @@
+     lastopenfile->Close();
+   }
+ 
++  if (cancelled)
++  {
++    return false;
++  }
++
+   if (noiselevel > CommandLine::nlQuiet)
+     cout << "Writing recovered data\r";
+ 
+diff -aud ../libpar2-0.2-original/par2repairer.h ../libpar2-0.2/par2repairer.h
+--- ../libpar2-0.2-original/par2repairer.h	2006-01-20 00:38:27.000000000 +0100
++++ ../libpar2-0.2/par2repairer.h	2008-10-26 19:01:08.000000000 +0100
+@@ -183,6 +183,7 @@
+   u64                       totaldata;               // Total amount of data to be processed.
+   u64                       totalsize;               // Total data size
+ 
++  bool                      cancelled;               // repair cancelled
+ };
+ 
+ #endif // __PAR2REPAIRER_H__
