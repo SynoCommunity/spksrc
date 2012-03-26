@@ -30,8 +30,11 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
+fix: patch
+include ../../mk/spksrc.tc-fix.mk
 
-all: patch
+
+all: fix
 
 
 TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump
