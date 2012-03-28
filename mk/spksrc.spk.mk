@@ -56,6 +56,12 @@ endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
 endif
+ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
+	@echo install_dep_services=\"$(INSTALL_DEP_SERVICES)\" >> $@
+endif
+ifneq ($(strip $(START_DEP_SERVICES)),)
+	@echo start_dep_services=\"$(START_DEP_SERVICES)\" >> $@
+endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
