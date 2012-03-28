@@ -7,8 +7,8 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Advanced IRC bouncer. ZNC remains connected to your IRC servers and delivers messages you got while you were away.
-DESCRIPTION_FRE = Bouncer IRC avancé. ZNC reste connecté à vos serveurs IRC et vous retransmet les messages arrivés pendant votre absence.
+DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
+DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\\\’est en fait qu\\\’un proxy IRC. ZNC restera connecté en permanence à vos salons de discussions et fera office de passerelle entre vos clients et vos serveurs IRC. Vous pourrez, par exemple, consultez des messages diffusés en votre absence ou masquer votre identité.
 ADMIN_PORT = 8250
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC

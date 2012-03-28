@@ -8,8 +8,8 @@ DEPENDS  =
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Headphones can download, tag, rename, move and index your music using SABnzbd. Manage your whole music library through its web interface.
-DESCRIPTION_FRE = Headphones peut télécharger, tagger, renommer, déplacer et indexer votre musique via SABnzbd. Gérez toute votre librairie musicale grâce à son interface web.
+DESCRIPTION = Headphones is an automatic NZB and torrent downloader for music. Mark albums as wanted and have them downloaded as soon as they are available. Different quality settings are possible, including lossless. With Headphones you can also manage your music library automatically: move, tag, rename and index for your DiskStation.
+DESCRIPTION_FRE = Headphones permet le téléchargement automatique de musique via NZB ou torrent. Indiquez les albums que vous désirez et ils seront téléchargés dès que possible. Pous pouvez choisir entre différentes qualités, dont le lossless. Avec Headphones, vous pouvez aussi gérer votre bibliothèque musicale automatiquement: déplacement, tag, renommage et indexation pour votre DiskStation.
 ADMIN_PORT = 8181
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones
