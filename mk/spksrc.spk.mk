@@ -62,6 +62,9 @@ endif
 ifneq ($(strip $(START_DEP_SERVICES)),)
 	@echo start_dep_services=\"$(START_DEP_SERVICES)\" >> $@
 endif
+ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
+	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
+endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
