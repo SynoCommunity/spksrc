@@ -7,8 +7,8 @@ DSM_UI_DIR = app
 DEPENDS = cross/openssl cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = uMurmur is a VoIP minimalistic server based on the open source software Mumble. It allows simultaneous communications between multiple users. Its low latency makes it especially suitable for communications during online gaming. The Mumble client is available at http://mumble.sourceforge.net/ (Windows, Mac, Linux and iOS).
-DESCRIPTION_FRE = uMurmur est un serveur minimaliste de voix sur IP basé sur le logiciel libre Mumble. Il rend possible la communication entre plusieurs interlocuteurs de manière simultanée. Sa faible latence le rend particulièrement adapté aux communications pendant les parties de jeux en réseau. Le client Mumble téléchargeable à l\\\'adresse http://mumble.sourceforge.net/ (Windows, Mac, Linux et iOS).
+DESCRIPTION = uMurmur is a minimalistic VoIP server based on the open source software Mumble. It allows simultaneous communications between multiple users. Its low latency makes it especially suitable for communications during online gaming. The Mumble client is available at http://mumble.sourceforge.net/ (Windows, Mac, Linux and iOS).
+DESCRIPTION_FRE = uMurmur est un serveur minimaliste de voix sur IP basé sur le logiciel libre Mumble. Il rend possible la communication entre plusieurs interlocuteurs de manière simultanée. Sa faible latence le rend particulièrement adapté aux communications pendant les parties de jeux en réseau. Le client Mumble est téléchargeable à l\\\'adresse http://mumble.sourceforge.net/ (Windows, Mac, Linux et iOS).
 RELOAD_UI = yes
 DISPLAY_NAME = uMurmur
 

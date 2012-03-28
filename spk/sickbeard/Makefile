@@ -8,8 +8,8 @@ DEPENDS  =
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SickBeard is the ultimate PVR application that downloads and manages your TV shows. It downloads in the quality you chose, rename, move and index episodes as soon as they are released
-DESCRIPTION_FRE = SickBeard est l\\\'application ultime pour télécharger et gérer vos séries télévisées. Il télécharge dans la qualité désirée, renomme, déplace et indexe les épisodes dès leur sortie
+DESCRIPTION = SickBeard is a PVR for newsgroup users \(with limited torrent support\). It watches for new episodes of your favorite shows and when they are posted it downloads them, sorts and renames them automatically. New episodes can also be indexed for your DiskStation.
+DESCRIPTION_FRE = L\\\'application ultime pour télécharger et gérer vos séries TV via NZB ou torrent. Il surveille la sortie de nouveaux épisodes et les télécharge, classe, renomme automatiquement. Les nouveaux épisodes peuvent être indexés pour votre DiskStation.
 ADMIN_PORT = 8081
 RELOAD_UI = yes
 DISPLAY_NAME = SickBeard

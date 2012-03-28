@@ -8,8 +8,8 @@ DEPENDS  =
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = CouchPotato is an automatic NZB and torrent downloader for movies. Many settings are available in the web interface like quality, renaming, folders, indexation, etc.
-DESCRIPTION_FRE = CouchPotato permet de télécharger automatiquement de films via NZB ou torrent. De nombreuses options (qualité, renommage, dossiers, indexation, etc.) sont disponibles via l\\\'interface web.
+DESCRIPTION = CouchPotato is an automatic NZB and torrent downloader for movies. You can keep a \"want to watch\"-list and it will search for NZBs/torrents of these items every X hours. Once a correct release is found, matching the correct quality, it will send it to SABnzbd/NZBGet or download the .nzb or .torrent to a specified directory. The downloaded movie can then be automatically moved and renamed to your liking as well as indexed by your DiskStation.
+DESCRIPTION_FRE = CouchPotato permet le téléchargement automatique de films via NZB ou torrent. Vous pouvez créer une \\\"liste de films à voir\\\", CouchPotato ira alors automatiquement rechercher les NZBs ou torrents correspondants toutes les X heures. Une fois qu\\\'une release correcte est trouvée, correspondant à la qualité demandé, elle sera ajouté a SABnzbd/NZBGet, ou téléchargée sous forme de .nzb ou de .torrent dans le répertoire indiqué. Les films téléchargés peuvent être déplacé et renommés selon vos préférences ainsi qu\\\'indexés par votre DiskStation.
 ADMIN_PORT = 8200
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato
