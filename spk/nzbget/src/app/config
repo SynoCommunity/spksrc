@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.nzbget": {
+            "title": "NZBGet",
+            "desc": "NZBGet Web UI",
+            "icon": "images/nzbget-{0}.png",
+            "type": "url",
+            "url": "3rdparty/nzbget/nzbget.cgi",
+            "allUsers": true
+        }
+    }
+}
