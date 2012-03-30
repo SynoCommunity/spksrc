@@ -65,7 +65,10 @@ class SABnzbd(Base):
 
 
 class NZBGet(Base):
-    config_path = '/usr/local/nzbget/var/config.ini'
+    config_path = '/usr/local/nzbget/var/nzbget.conf'
+    script_dir = '/usr/local/nzbget/var'
+    sickbeard_postprocessing_dir = '/usr/local/sickbeard/share/SickBeard/autoProcessTV'
+    sickbeard_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
 
     def __init__(self):
         self.config = None
@@ -75,6 +78,38 @@ class NZBGet(Base):
     @expose
     def is_installed(self):
         return self.config is not None
+
+    @expose(kind=LOAD)
+    def load(self):
+        if self.config is None:
+            return None
+        return {'sickbeard_postprocessing': self.sickbeard_postprocessing_configured()}
+
+    @expose(kind=SUBMIT)
+    def save(self, sickbeard_postprocessing=None):
+        if sickbeard_postprocessing:
+            self.sickbeard_postprocessing_enable()
+            return
+        self.sickbeard_postprocessing_disable()
+
+    def sickbeard_postprocessing_configured(self):
+        configured = True
+        for filename in self.sickbeard_postprocessing_filenames:
+            configured = configured and os.path.exists(os.path.join(self.script_dir, filename))
+        return configured
+
+    def sickbeard_postprocessing_disable(self):
+        for filename in self.sickbeard_postprocessing_filenames:
+            if not os.path.islink(os.path.join(self.script_dir, filename)):
+                continue
+            os.remove(os.path.join(self.script_dir, filename))
+
+    def sickbeard_postprocessing_enable(self):
+        self.sickbeard_postprocessing_disable()
+        for filename in self.sickbeard_postprocessing_filenames:
+            if os.path.exists(os.path.join(self.script_dir, filename)):
+                continue
+            os.symlink(os.path.join(self.sickbeard_postprocessing_dir, filename), os.path.join(self.script_dir, filename))
 
 
 class SickBeard(Base):
@@ -105,32 +140,34 @@ class SickBeard(Base):
     @expose(kind=SUBMIT)
     def save(self, configure_for=None):
         devnull = open(os.devnull, 'w')
+        subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
         if configure_for == 'sabnzbd':
             sabnzbd = SABnzbd()
-            subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
-            # Edit SickBeard's configuration to point to SABnzbd
             self.config['General']['nzb_method'] = 'sabnzbd'
             self.config['SABnzbd']['sab_username'] = sabnzbd.config['misc']['username']
             self.config['SABnzbd']['sab_password'] = sabnzbd.config['misc']['password']
             self.config['SABnzbd']['sab_apikey'] = sabnzbd.config['misc']['api_key']
             self.config['SABnzbd']['sab_host'] = 'http://localhost:' + sabnzbd.config['misc']['port'] + '/'
-            self.config.write()
-            # Change ownership of autoProcessTV so SABnzbd doesn't fail opening it during postprocessing
             os.chown(self.autoprocesstv_path, pwd.getpwnam('sabnzbd')[2], -1)
-            subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
             return
         if configure_for == 'nzbget':
             nzbget = NZBGet()
-            #TODO
-            pass
+            self.config['General']['nzb_method'] = 'nzbget'
+            self.config['NZBget']['nzbget_password'] = nzbget.config['ServerPassword']
+            self.config['NZBget']['nzbget_host'] = 'localhost:' + nzbget.config['ServerPort']
+            os.chown(self.autoprocesstv_path, pwd.getpwnam('nzbget')[2], -1)
+        self.config.write()
+        subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
 
     def configured_for(self):
         sabnzbd = SABnzbd()
+        nzbget = NZBGet()
         if (sabnzbd.is_installed() and self.config['General']['nzb_method'] == 'sabnzbd' and self.config['SABnzbd']['sab_username'] == sabnzbd.config['misc']['username'] and
             self.config['SABnzbd']['sab_password'] == sabnzbd.config['misc']['password'] and self.config['SABnzbd']['sab_apikey'] == sabnzbd.config['misc']['api_key'] and
             self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port'] + '/'):
             return SABNZBD
-        if nzbget.is_installed() and self.config['General']['nzb_method'] == 'nzbget':
+        if (nzbget.is_installed() and self.config['General']['nzb_method'] == 'nzbget' and self.config['NZBget']['nzbget_password'] == nzbget.config['ServerPassword'] and
+            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ServerPort']):
             return NZBGET
         return UNDEFINED
 
@@ -162,30 +199,32 @@ class CouchPotato(Base):
     @expose(kind=SUBMIT)
     def save(self, configure_for=None):
         devnull = open(os.devnull, 'w')
+        subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
         if configure_for == 'sabnzbd':
             sabnzbd = SABnzbd()
-            subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
-            # Edit Couchpotato's configuration to point to SABnzbd
             self.config['NZB']['sendto'] = 'Sabnzbd'
             self.config['Sabnzbd']['username'] = sabnzbd.config['misc']['username']
             self.config['Sabnzbd']['password'] = sabnzbd.config['misc']['password']
             self.config['Sabnzbd']['apikey'] = sabnzbd.config['misc']['api_key']
             self.config['Sabnzbd']['host'] = 'localhost:' + sabnzbd.config['misc']['port']
-            self.config.write()
-            subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
             return
         if configure_for == 'nzbget':
             nzbget = NZBGet()
-            #TODO
-            pass
+            self.config['NZB']['sendto'] = 'Nzbget'
+            self.config['Nzbget']['password'] = nzbget.config['misc']['ServerPassword']
+            self.config['Nzbget']['host'] = 'localhost:' + nzbget.config['ServerPort']
+        self.config.write()
+        subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
 
     def configured_for(self):
         sabnzbd = SABnzbd()
+        nzbget = NZBGet()
         if (sabnzbd.is_installed() and self.config['NZB']['sendto'] == 'Sabnzbd' and self.config['Sabnzbd']['username'] == sabnzbd.config['misc']['username'] and
             self.config['Sabnzbd']['password'] == sabnzbd.config['misc']['password'] and self.config['Sabnzbd']['apikey'] == sabnzbd.config['misc']['api_key'] and
             self.config['Sabnzbd']['host'] == 'localhost:' + sabnzbd.config['misc']['port']):
             return SABNZBD
-        if nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget':
+        if (nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget' and self.config['Nzbget']['password'] == nzbget.config['misc']['ServerPassword'] and
+            self.config['Nzbget']['host'] == 'localhost:' + nzbget.config['ServerPort']):
             return NZBGET
         return UNDEFINED
 
@@ -234,6 +273,7 @@ class Headphones(Base):
 
     def configured_for(self):
         sabnzbd = SABnzbd()
+        nzbget = NZBGet()
         if (sabnzbd.is_installed() and self.config['SABnzbd']['sab_username'] == sabnzbd.config['misc']['username'] and
             self.config['SABnzbd']['sab_password'] == sabnzbd.config['misc']['password'] and self.config['SABnzbd']['sab_apikey'] == sabnzbd.config['misc']['api_key'] and
             self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port']):
