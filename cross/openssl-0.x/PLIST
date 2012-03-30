@@ -1,0 +1,17 @@
+bin:bin/c_rehash
+bin:bin/openssl
+lib:lib/engines/lib4758cca.so
+lib:lib/engines/libaep.so
+lib:lib/engines/libatalla.so
+lib:lib/engines/libcapi.so
+lib:lib/engines/libchil.so
+lib:lib/engines/libcswift.so
+lib:lib/engines/libgmp.so
+lib:lib/engines/libnuron.so
+lib:lib/engines/libsureware.so
+lib:lib/engines/libubsec.so
+lnk:lib/libcrypto.so
+lib:lib/libcrypto.so.0.9.8
+lnk:lib/libssl.so
+lib:lib/libssl.so.0.9.8
+rsc:openssl.cnf
