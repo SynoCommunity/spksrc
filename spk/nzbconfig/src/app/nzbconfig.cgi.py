@@ -99,6 +99,10 @@ class NZBGet(Base):
             return
         self.sickbeard_postprocessing_disable()
 
+    def fix_config(self, path):
+        replace(path, ' = ', '=')
+        replace(path, '=""', '=')
+
     def sickbeard_postprocessing_configured(self):
         configured = (self.postprocessing_config['SickBeard'] == 'yes' and
                       self.postprocessing_config['SickBeardCategory'] == self.sickbeard.config['NZBget']['nzbget_category'])
@@ -113,8 +117,7 @@ class NZBGet(Base):
             os.remove(os.path.join(self.script_dir, filename))
         self.postprocessing_config['SickBeard'] = 'no'
         self.postprocessing_config.write()
-        replace(self.postprocessing_config_path, ' = ', '=')
-        replace(self.postprocessing_config_path, '=""', '=')
+        self.fix_config(self.postprocessing_config_path)
 
     def sickbeard_postprocessing_enable(self):
         self.sickbeard_postprocessing_disable()
@@ -125,8 +128,7 @@ class NZBGet(Base):
         self.postprocessing_config['SickBeard'] = 'yes'
         self.postprocessing_config['SickBeardCategory'] = self.sickbeard.config['NZBget']['nzbget_category']
         self.postprocessing_config.write()
-        replace(self.postprocessing_config_path, ' = ', '=')
-        replace(self.postprocessing_config_path, '=""', '=')
+        self.fix_config(self.postprocessing_config_path)
 
 
 class SickBeard(Base):
