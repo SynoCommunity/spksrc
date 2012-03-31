@@ -1,5 +1,7 @@
 #!/usr/local/nzbconfig/env/bin/python
 import os
+import tempfile
+import shutil
 import subprocess
 import pwd
 import cgi
@@ -77,7 +79,7 @@ class NZBGet(Base):
             self.config = configobj.ConfigObj(self.config_path)
         self.postprocessing_config = None
         if os.path.exists(self.postprocessing_config_path):
-            self.postprocessing_config  = configobj.ConfigObj(self.postprocessing_config_path)
+            self.postprocessing_config = configobj.ConfigObj(self.postprocessing_config_path)
         self.sickbeard = SickBeard()
 
     @expose
@@ -111,6 +113,8 @@ class NZBGet(Base):
             os.remove(os.path.join(self.script_dir, filename))
         self.postprocessing_config['SickBeard'] = 'no'
         self.postprocessing_config.write()
+        replace(self.postprocessing_config_path, ' = ', '=')
+        replace(self.postprocessing_config_path, '=""', '=')
 
     def sickbeard_postprocessing_enable(self):
         self.sickbeard_postprocessing_disable()
@@ -121,6 +125,8 @@ class NZBGet(Base):
         self.postprocessing_config['SickBeard'] = 'yes'
         self.postprocessing_config['SickBeardCategory'] = self.sickbeard.config['NZBget']['nzbget_category']
         self.postprocessing_config.write()
+        replace(self.postprocessing_config_path, ' = ', '=')
+        replace(self.postprocessing_config_path, '=""', '=')
 
 
 class SickBeard(Base):
@@ -292,6 +298,23 @@ class Headphones(Base):
         if nzbget.is_installed() and False:
             return NZBGET
         return UNDEFINED
+
+
+def replace(filepath, pattern, subst):
+    fh, abs_path = tempfile.mkstemp()
+    new_file = open(abs_path, 'w')
+    old_file = open(filepath)
+    for line in old_file:
+        new_file.write(line.replace(pattern, subst))
+    new_file.close()
+    old_file.close()
+    new_file = open(abs_path, 'r')
+    old_file = open(filepath, 'w')
+    shutil.copyfileobj(new_file, old_file)
+    new_file.close()
+    os.close(fh)
+    old_file.close()
+    os.remove(abs_path)
 
 
 if __name__ == '__main__':
