@@ -32,6 +32,13 @@ $(WORK_DIR)/package.tgz: strip
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && tar cpzf $@ *)
 
+$(WORK_DIR)/changelog:
+ifeq ($(strip $(CHANGELOG)),)
+	@echo $(shell git log --pretty=format:"- %s" -- $(WORK_DIR)/../) >> $@
+else
+	@cp $(CHANGELOG) $@
+endif
+
 $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
@@ -218,4 +225,6 @@ arch-%:
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
 	-@env $(MAKE) ARCH=$* publish
+
+changelog: $(WORK_DIR)/changelog
 
