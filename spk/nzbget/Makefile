@@ -7,10 +7,12 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/unrar cross/nzbgetweb cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION     = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair and web-interface. NZBGet requires low system resources.
-DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écrit en C++ pour les fichiers nzb. Il intègre un mode client/server, la vérification et réparation automatique ainsi qu\\\'une interface web. NZBGet requiert peu de ressources système.
+DESCRIPTION     = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
+DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écrit en C++ pour les fichiers nzb. Il intègre un mode client/server, la vérification, réparation et décompression automatique ainsi qu\\\'une interface web. NZBGet requiert peu de ressources système.
 RELOAD_UI = yes
 DISPLAY_NAME = NZBGet
+ADMIN_URL = nzbgetweb
+CHANGELOG = Initial release
 
 HOMEPAGE = http://nzbget.sourceforge.net/
 LICENSE  =
