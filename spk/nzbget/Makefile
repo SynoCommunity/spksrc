@@ -12,7 +12,6 @@ DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écr
 RELOAD_UI = yes
 DISPLAY_NAME = NZBGet
 ADMIN_URL = nzbgetweb
-CHANGELOG = Initial release
 
 HOMEPAGE = http://nzbget.sourceforge.net/
 LICENSE  =
