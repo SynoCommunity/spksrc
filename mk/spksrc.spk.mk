@@ -76,6 +76,9 @@ endif
 ifneq ($(strip $(ADMIN_PORT)),)
 	@echo adminport=$(ADMIN_PORT) >> $@
 endif
+ifneq ($(strip $(ADMIN_URL)),)
+	@echo adminurl=\"$(ADMIN_URL)\" >> $@
+endif
 ifneq ($(strip $(CHANGELOG)),)
 	@echo changelog=\"$(CHANGELOG)\" >> $@
 endif
