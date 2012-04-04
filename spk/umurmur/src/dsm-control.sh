@@ -16,7 +16,7 @@ CFG_FILE="${INSTALL_DIR}/var/umurmur.conf"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${UMURMUR} -r -c ${CFG_FILE} -p ${PID_FILE}"
+    su - ${RUNAS} -c "PATH=${PATH} ${UMURMUR} -c ${CFG_FILE} -p ${PID_FILE}"
 }
 
 stop_daemon ()
