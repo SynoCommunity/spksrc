@@ -16,13 +16,14 @@ CFG_FILE="${INSTALL_DIR}/var/umurmur.conf"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${UMURMUR} -r -c ${CFG_FILE} -p ${PID_FILE}"
+    su - ${RUNAS} -c "PATH=${PATH} ${UMURMUR} -c ${CFG_FILE} -p ${PID_FILE}"
 }
 
 stop_daemon ()
 {
     kill `cat ${PID_FILE}`
-    rm ${PID_FILE}
+    wait_for_status 1 20
+    rm -f ${PID_FILE}
 }
 
 daemon_status ()
@@ -31,6 +32,17 @@ daemon_status ()
         return 0
     fi
     return 1
+}
+
+wait_for_status()
+{
+    counter=$2
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && break
+        let counter=counter-1
+        sleep 1
+    done
 }
 
 
