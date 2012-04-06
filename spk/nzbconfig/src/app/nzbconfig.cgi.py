@@ -230,7 +230,7 @@ class CouchPotato(Base):
         if configure_for == 'nzbget':
             nzbget = NZBGet()
             self.config['NZB']['sendto'] = 'Nzbget'
-            self.config['Nzbget']['password'] = nzbget.config['misc']['ServerPassword']
+            self.config['Nzbget']['password'] = nzbget.config['ServerPassword']
             self.config['Nzbget']['host'] = 'localhost:' + nzbget.config['ServerPort']
         self.config.write()
         subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
@@ -242,7 +242,7 @@ class CouchPotato(Base):
             self.config['Sabnzbd']['password'] == sabnzbd.config['misc']['password'] and self.config['Sabnzbd']['apikey'] == sabnzbd.config['misc']['api_key'] and
             self.config['Sabnzbd']['host'] == 'localhost:' + sabnzbd.config['misc']['port']):
             return SABNZBD
-        if (nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget' and self.config['Nzbget']['password'] == nzbget.config['misc']['ServerPassword'] and
+        if (nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget' and self.config['Nzbget']['password'] == nzbget.config['ServerPassword'] and
             self.config['Nzbget']['host'] == 'localhost:' + nzbget.config['ServerPort']):
             return NZBGET
         return UNDEFINED
