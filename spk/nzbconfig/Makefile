@@ -1,5 +1,5 @@
 SPK_NAME = nzbconfig
-SPK_VERS = $(shell date +%Y%m%d)
+SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
