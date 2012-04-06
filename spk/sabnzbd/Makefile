@@ -30,7 +30,7 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 include ../../mk/spksrc.spk.mk
 
 
-ifeq ($(findstring $(ARCH),88f5281 bromolow powerpc ppc824x ppc853x ppc854x x86),$(ARCH))
+ifeq ($(findstring $(ARCH),88f5281 bromolow cedarview powerpc ppc824x ppc853x ppc854x x86),$(ARCH))
 # No support for building ionice
 ENV += BUSYBOX_CONFIG=src/nice_defconfig
 else
