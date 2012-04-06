@@ -168,7 +168,6 @@ class SickBeard(Base):
             self.config['SABnzbd']['sab_apikey'] = sabnzbd.config['misc']['api_key']
             self.config['SABnzbd']['sab_host'] = 'http://localhost:' + sabnzbd.config['misc']['port'] + '/'
             os.chown(self.autoprocesstv_path, pwd.getpwnam('sabnzbd')[2], -1)
-            return
         if configure_for == 'nzbget':
             nzbget = NZBGet()
             self.config['General']['nzb_method'] = 'nzbget'
@@ -226,7 +225,6 @@ class CouchPotato(Base):
             self.config['Sabnzbd']['password'] = sabnzbd.config['misc']['password']
             self.config['Sabnzbd']['apikey'] = sabnzbd.config['misc']['api_key']
             self.config['Sabnzbd']['host'] = 'localhost:' + sabnzbd.config['misc']['port']
-            return
         if configure_for == 'nzbget':
             nzbget = NZBGet()
             self.config['NZB']['sendto'] = 'Nzbget'
@@ -275,20 +273,15 @@ class Headphones(Base):
     @expose(kind=SUBMIT)
     def save(self, configure_for=None):
         devnull = open(os.devnull, 'w')
+        subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
         if configure_for == 'sabnzbd':
             sabnzbd = SABnzbd()
-            subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
             self.config['SABnzbd']['sab_username'] = sabnzbd.config['misc']['username']
             self.config['SABnzbd']['sab_password'] = sabnzbd.config['misc']['password']
             self.config['SABnzbd']['sab_apikey'] = sabnzbd.config['misc']['api_key']
             self.config['SABnzbd']['sab_host'] = 'http://localhost:' + sabnzbd.config['misc']['port']
-            self.config.write()
-            subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
-            return
-        if configure_for == 'nzbget':
-            nzbget = NZBGet()
-            #TODO
-            pass
+        self.config.write()
+        subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
 
     def configured_for(self):
         sabnzbd = SABnzbd()
