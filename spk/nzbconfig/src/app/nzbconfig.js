@@ -37,7 +37,7 @@ Ext.Direct.addProvider({
         "SickBeard": [{
             "formHandler": true,
             "name": "save",
-            "len": 1
+            "len": 2
         }, {
             "name": "load",
             "len": 0
@@ -674,6 +674,18 @@ SYNOCOMMUNITY.NZBConfig.PanelSickBeard = Ext.extend(SYNOCOMMUNITY.NZBConfig.Form
                         boxLabel: _V("ui", "no_change"),
                         inputValue: "nochange"
                     }]
+                }]
+            }, {
+                xtype: "fieldset",
+                title: _V("ui", "postprocessing"),
+                defaultType: "textfield",
+                defaults: {
+                    anchor: "-20"
+                },
+                items: [{
+                    xtype: "checkbox",
+                    fieldLabel: _V("ui", "configure_postprocessing"),
+                    name: "configure_postprocessing"
                 }]
             }],
             api: {
