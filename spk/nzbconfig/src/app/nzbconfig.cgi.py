@@ -13,7 +13,9 @@ from pyextdirect.router import Router
 Base = create_configuration()
 
 
-SABNZBD, NZBGET, UNDEFINED = range(3)
+SABNZBD = 'sabnzbd'
+NZBGET = 'nzbget'
+UNDEFINED = 'nochange'
 
 
 class SABnzbd(Base):
@@ -133,13 +135,16 @@ class NZBGet(Base):
 
 class SickBeard(Base):
     config_path = '/usr/local/sickbeard/var/config.ini'
+    postprocessing_config_path = '/usr/local/sickbeard/share/SickBeard/autoProcessTV/autoProcessTV.cfg'
     start_stop_status = '/var/packages/sickbeard/scripts/start-stop-status'
-    autoprocesstv_path = '/usr/local/sickbeard/share/SickBeard/autoProcessTV/autoProcessTV.cfg'
 
     def __init__(self):
         self.config = None
         if os.path.exists(self.config_path):
             self.config = configobj.ConfigObj(self.config_path)
+        self.postprocessing_config = None
+        if os.path.exists(self.postprocessing_config_path):
+            self.postprocessing_config = configobj.ConfigObj(self.postprocessing_config_path)
 
     @expose
     def is_installed(self):
@@ -149,15 +154,16 @@ class SickBeard(Base):
     def load(self):
         if self.config is None:
             return None
-        configured_for = self.configured_for()
-        if configured_for == SABNZBD:
-            return {'configure_for': 'sabnzbd'}
-        if configured_for == NZBGET:
-            return {'configure_for': 'nzbget'}
-        return {'configure_for': 'nochange'}
+        return {'configure_for': self.configured_for(), 'configure_postprocessing': self.postprocessing_configured()}
 
     @expose(kind=SUBMIT)
-    def save(self, configure_for=None):
+    def save(self, configure_for=None, configure_postprocessing=None):
+        if configure_postprocessing and configure_postprocessing != self.postprocessing_configured():
+            self.postprocessing_config['SickBeard']['username'] = self.config['General']['web_username']
+            self.postprocessing_config['SickBeard']['password'] = self.config['General']['web_password']
+            self.postprocessing_config.write()
+        if configure_for == self.configured_for():
+            return
         devnull = open(os.devnull, 'w')
         subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
         if configure_for == 'sabnzbd':
@@ -167,13 +173,13 @@ class SickBeard(Base):
             self.config['SABnzbd']['sab_password'] = sabnzbd.config['misc']['password']
             self.config['SABnzbd']['sab_apikey'] = sabnzbd.config['misc']['api_key']
             self.config['SABnzbd']['sab_host'] = 'http://localhost:' + sabnzbd.config['misc']['port'] + '/'
-            os.chown(self.autoprocesstv_path, pwd.getpwnam('sabnzbd')[2], -1)
+            os.chown(self.postprocessing_config_path, pwd.getpwnam('sabnzbd')[2], -1)
         if configure_for == 'nzbget':
             nzbget = NZBGet()
             self.config['General']['nzb_method'] = 'nzbget'
             self.config['NZBget']['nzbget_password'] = nzbget.config['ServerPassword']
             self.config['NZBget']['nzbget_host'] = 'localhost:' + nzbget.config['ServerPort']
-            os.chown(self.autoprocesstv_path, pwd.getpwnam('nzbget')[2], -1)
+            os.chown(self.postprocessing_config_path, pwd.getpwnam('nzbget')[2], -1)
         self.config.write()
         subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
 
@@ -188,6 +194,10 @@ class SickBeard(Base):
             self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ServerPort']):
             return NZBGET
         return UNDEFINED
+
+    def postprocessing_configured(self):
+        return (self.postprocessing_config['SickBeard']['username'] == self.config['General']['web_username'] and
+                self.postprocessing_config['SickBeard']['password'] == self.config['General']['web_password'])
 
 
 class CouchPotato(Base):
@@ -207,12 +217,7 @@ class CouchPotato(Base):
     def load(self):
         if self.config is None:
             return None
-        configured_for = self.configured_for()
-        if configured_for == SABNZBD:
-            return {'configure_for': 'sabnzbd'}
-        if configured_for == NZBGET:
-            return {'configure_for': 'nzbget'}
-        return {'configure_for': 'nochange'}
+        return {'configure_for': self.configured_for()}
 
     @expose(kind=SUBMIT)
     def save(self, configure_for=None):
@@ -263,12 +268,7 @@ class Headphones(Base):
     def load(self):
         if self.config is None:
             return None
-        configured_for = self.configured_for()
-        if configured_for == SABNZBD:
-            return {'configure_for': 'sabnzbd'}
-        if configured_for == NZBGET:
-            return {'configure_for': 'nzbget'}
-        return {'configure_for': 'nochange'}
+        return {'configure_for': self.configured_for()}
 
     @expose(kind=SUBMIT)
     def save(self, configure_for=None):
