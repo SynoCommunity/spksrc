@@ -1,0 +1,10 @@
+--- setup.py
++++ setup.py
+@@ -698,6 +698,7 @@ class PyBuildExt(build_ext):
+                 print "IOError while reading opensshv.h:", msg
+                 pass
+ 
++        print 'openssl_ver = 0x%08x' % openssl_ver
+ 
+         if (ssl_incs is not None and
+             ssl_libs is not None and
