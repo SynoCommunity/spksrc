@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.couchpotatoserver": {
+            "title": "CouchPotato Server",
+            "desc": "CouchPotato Server Web UI",
+            "icon": "images/couchpotatoserver-{0}.png",
+            "type": "url",
+            "url": "3rdparty/couchpotatoserver/couchpotatoserver.cgi",
+            "allUsers": true
+        }
+    }
+}
