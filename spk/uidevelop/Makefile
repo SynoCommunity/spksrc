@@ -11,6 +11,7 @@ SPK_DEPENDS = "python>=2.7.2-1"
 MAINTAINER = SynoCommunity
 DESCRIPTION = SPK to help developers creating DSM interfaces
 DESCRIPTION_FRE = SPK pour aider les développeurs à créer des interfaces DSM
+DESCRIPTION_SPN = SPK para asistir a los desarrolladores en la creación de interfaces para DSM.
 RELOAD_UI = yes
 DISPLAY_NAME = UI Develop
 
