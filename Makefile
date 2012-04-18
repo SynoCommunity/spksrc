@@ -39,6 +39,18 @@ spk-clean:
 %-clean: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
+toolchains:
+	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	do \
+	    (cd $${tc} && $(MAKE)) ; \
+	done
+
+downloads:
+	@for dl in $(dir $(wildcard cross/*/Makefile)) ; \
+	do \
+	    (cd $${dl} && $(MAKE) download) ; \
+	done
+
 setup: local.mk
 
 local.mk:
