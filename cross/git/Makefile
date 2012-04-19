@@ -13,7 +13,15 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --libexecdir=$(STAGING_INSTALL_PREFIX)/lib ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
+CONFIGURE_ARGS  = --without-tcltk--without-perl --without-python --libexecdir=$(INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
+
+INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
