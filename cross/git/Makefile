@@ -17,6 +17,7 @@ CONFIGURE_ARGS  = --without-tcltk--without-perl --without-python --libexecdir=$(
 CONFIGURE_ARGS += ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
 
 INSTALL_TARGET = myInstall
+POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -24,4 +25,9 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myInstall
 myInstall:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+
+.PHONY: myPostInstall
+myPostInstall:
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
+	install -m 644 src/gitconfig $(STAGING_INSTALL_PREFIX)/etc/gitconfig
 

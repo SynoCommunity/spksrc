@@ -258,3 +258,4 @@ shr:share/gitweb/static/git-favicon.png
 shr:share/gitweb/static/git-logo.png
 shr:share/gitweb/static/gitweb.css
 shr:share/gitweb/static/gitweb.js
+etc:etc/gitconfig
