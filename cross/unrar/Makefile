@@ -19,7 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) $(MAKE) -f makefile.unix CXXFLAGS=$(CFLAGS)
+	$(RUN) $(MAKE) -f makefile.unix
 
 .PHONY: myInstall
 myInstall:
