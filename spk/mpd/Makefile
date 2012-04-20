@@ -12,6 +12,7 @@ SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Music Player Daemon is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
+DESCRIPTION_SPN = Music Player Daemon es una aplicación de servidor flexible y poderosa para reproducir música. Mediante plugins y librerias puede reproducir una gran variedad de archivos de sonido mientras es controlado mediante su protocolo de red.
 RELOAD_UI = yes
 DISPLAY_NAME = Music Player Daemon
 
