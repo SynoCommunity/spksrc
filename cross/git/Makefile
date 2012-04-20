@@ -13,7 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS  = --without-tcltk --without-perl --without-python
+CONFIGURE_ARGS  = --without-tcltk --without-python
 CONFIGURE_ARGS += ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
 
 INSTALL_TARGET = myInstall
