@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/var/logs/CouchPotato.log"
 
 start_daemon()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --nogit --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
+    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
 }
 
 stop_daemon()
