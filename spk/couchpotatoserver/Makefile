@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/couchpotatoserver.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/git
+DEPENDS  = 
 SPK_DEPENDS = "python>=2.7.2-1"
 
 MAINTAINER = SynoCommunity
