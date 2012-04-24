@@ -1,0 +1,18 @@
+[app]
+app_name = "Debian Chroot"
+description = "Interface de gestion pour Debian Chroot"
+
+[ui]
+console = "Console"
+overview = "Général"
+services = "Services"
+status = "Statut"
+running_services = "Services lancés"
+installed = "Installé"
+installing = "En cours d'installation"
+name = "Nom"
+launch_script = "Script de lancement"
+status_command = "Commande de statut"
+start = "Démarrer"
+stop = "Arrêter"
+edit = "Editer"
