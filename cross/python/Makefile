@@ -29,9 +29,10 @@ POST_INSTALL_TARGET = $(WORK_DIR)/python-cc.mk
 
 include ../../mk/spksrc.cross-cc.mk
 
+HOST_ARCH = $(shell uname -m)
 HOSTPYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/python
-HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-i686-2.7
-PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-i686-2.7
+HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-2.7
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-2.7
 HOSTPGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
 PYTHON_LIB_DIR = lib/python2.7
 
