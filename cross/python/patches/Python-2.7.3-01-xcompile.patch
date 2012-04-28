@@ -36,37 +36,30 @@
  		-touch Parser/pgen.stamp
  
  $(PGEN):	$(PGENOBJS)
-@@ -938,26 +940,26 @@
- 		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
- 			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
- 	fi
+@@ -925,26 +928,6 @@
+ 		done; \
+ 	done
+ 	$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)$(LIBDEST)/LICENSE.txt
 -	PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
 -		./$(BUILDPYTHON) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
-+	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
-+		$(HOSTPYTHON) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
- 		-d $(LIBDEST) -f \
- 		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
- 		$(DESTDIR)$(LIBDEST)
+-		-d $(LIBDEST) -f \
+-		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+-		$(DESTDIR)$(LIBDEST)
 -	PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 -		./$(BUILDPYTHON) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
-+	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-+		$(HOSTPYTHON) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
- 		-d $(LIBDEST) -f \
- 		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
- 		$(DESTDIR)$(LIBDEST)
- 	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
+-		-d $(LIBDEST) -f \
+-		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+-		$(DESTDIR)$(LIBDEST)
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
 -		./$(BUILDPYTHON) -Wi -t $(DESTDIR)$(LIBDEST)/compileall.py \
-+		$(HOSTPYTHON) -Wi -t $(DESTDIR)$(LIBDEST)/compileall.py \
- 		-d $(LIBDEST)/site-packages -f \
- 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
- 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+-		-d $(LIBDEST)/site-packages -f \
+-		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 -		./$(BUILDPYTHON) -Wi -t -O $(DESTDIR)$(LIBDEST)/compileall.py \
-+		$(HOSTPYTHON) -Wi -t -O $(DESTDIR)$(LIBDEST)/compileall.py \
- 		-d $(LIBDEST)/site-packages -f \
- 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
- 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+-		-d $(LIBDEST)/site-packages -f \
+-		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 -		./$(BUILDPYTHON) -Wi -t -c "import lib2to3.pygram, lib2to3.patcomp;lib2to3.patcomp.PatternCompiler()"
-+		$(HOSTPYTHON) -Wi -t -c "import lib2to3.pygram, lib2to3.patcomp;lib2to3.patcomp.PatternCompiler()"
  
  # Create the PLATDIR source directory, if one wasn't distributed..
  $(srcdir)/Lib/$(PLATDIR):
@@ -97,18 +90,42 @@
          # Workaround for Mac OS X: The Carbon-based modules cannot be
          # reliably imported into a command-line Python
          if 'Carbon' in ext.extra_link_args:
+<<<<<<< HEAD:cross/python/patches/Python-2.7.3-01-xcompile.patch
 @@ -368,9 +375,6 @@
              os.unlink(tmpfile)
+||||||| parent of 8c2969a... Don't try and compile the .py files when cross compiling python as it doesn't work.:cross/python/patches/Python-2.7.2-01-xcompile.patch
+@@ -369,8 +377,8 @@
+=======
+@@ -369,9 +377,9 @@
+>>>>>>> 8c2969a... Don't try and compile the .py files when cross compiling python as it doesn't work.:cross/python/patches/Python-2.7.2-01-xcompile.patch
  
      def detect_modules(self):
 -        # Ensure that /usr/local is always used
 -        add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
 -        add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+<<<<<<< HEAD:cross/python/patches/Python-2.7.3-01-xcompile.patch
          self.add_multiarch_paths()
+||||||| parent of 8c2969a... Don't try and compile the .py files when cross compiling python as it doesn't work.:cross/python/patches/Python-2.7.2-01-xcompile.patch
++        # add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
++        # add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+         self.add_multiarch_paths()
+=======
+-        self.add_multiarch_paths()
++        # add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
++        # add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
++        # self.add_multiarch_paths()
+>>>>>>> 8c2969a... Don't try and compile the .py files when cross compiling python as it doesn't work.:cross/python/patches/Python-2.7.2-01-xcompile.patch
  
          # Add paths specified in the environment variables LDFLAGS and
+<<<<<<< HEAD:cross/python/patches/Python-2.7.3-01-xcompile.patch
 @@ -426,11 +430,8 @@
          # lib_dirs and inc_dirs are used to search for files;
+||||||| parent of 8c2969a... Don't try and compile the .py files when cross compiling python as it doesn't work.:cross/python/patches/Python-2.7.2-01-xcompile.patch
+@@ -427,8 +435,8 @@
+=======
+         # CPPFLAGS for header and library files.
+@@ -427,8 +435,8 @@
+>>>>>>> 8c2969a... Don't try and compile the .py files when cross compiling python as it doesn't work.:cross/python/patches/Python-2.7.2-01-xcompile.patch
          # if a file is found in one of those directories, it can
          # be assumed that no additional -I,-L directives are needed.
 -        lib_dirs = self.compiler.library_dirs + [
