@@ -46,10 +46,13 @@ endif
 	install -m 755 -d $(STAGING_DIR)/var
 	debootstrap --foreign --arch $(DEBIAN_ARCH) squeeze $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
 	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list
+	install -m 644 src/preferences $(STAGING_DIR)/var/chroottarget/etc/apt/preferences
 	install -m 644 src/policy-rc.d $(STAGING_DIR)/var/chroottarget/usr/sbin/policy-rc.d
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/db.py $(STAGING_DIR)/app/db.py
+	install -m 644 src/app/config.py $(STAGING_DIR)/app/config.py
+	install -m 644 src/app/api.py $(STAGING_DIR)/app/api.py
 	install -m 644 src/app/setup.py $(STAGING_DIR)/app/setup.py
 	install -m 644 src/app/debian-chroot.js $(STAGING_DIR)/app/debian-chroot.js
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
@@ -70,5 +73,5 @@ endif
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ pyextdirect==0.2
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ pyextdirect==0.3.1
 

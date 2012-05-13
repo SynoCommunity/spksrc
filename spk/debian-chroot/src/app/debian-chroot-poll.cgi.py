@@ -1,14 +1,13 @@
 #!/usr/local/debian-chroot/env/bin/python
-import os
-import db
+import json
+from api import Overview
 
 
 if __name__ == '__main__':
     print 'Content-type: application/json'
     print
-    session = db.Session()
+    overview = Overview()
     event = {'type': 'event', 'name': 'status', 'data': {
-        'installed': 'installed' if os.path.exists('/usr/local/debian-chroot/var/installed') else 'installing',
-        'running_services': len([service for service in session.query(db.Service).all() if service.status == 1])}}
-    json.dumps(event)
-
+                 'installed': 'installed' if overview.is_installed() else 'installing',
+                 'running_services': overview.running_services()}}
+    print json.dumps(event)

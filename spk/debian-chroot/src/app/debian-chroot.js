@@ -12,12 +12,34 @@ Ext.Direct.addProvider({
     "namespace": "SYNOCOMMUNITY.DebianChroot.Remote",
     "type": "remoting",
     "actions": {
+        "Overview": [{
+            "name": "load",
+            "len": 0
+        }, {
+            "name": "updates_count",
+            "len": 0
+        }, {
+            "name": "do_update",
+            "len": 0
+        }, {
+            "name": "do_upgrade",
+            "len": 0
+        }],
         "Services": [{
             "name": "save",
             "len": 5
         }, {
-            "name": "load",
+            "name": "read",
             "len": 0
+        }, {
+            "name": "create",
+            "len": 1
+        }, {
+            "name": "update",
+            "len": 1
+        }, {
+            "name": "destroy",
+            "len": 1
         }, {
             "name": "start",
             "len": 1
@@ -30,7 +52,7 @@ Ext.Direct.addProvider({
 SYNOCOMMUNITY.DebianChroot.Poller = new Ext.direct.PollingProvider({
     'type': 'polling',
     'url': '3rdparty/debian-chroot/debian-chroot-poll.cgi',
-    'intervall': 6000
+    'interval': 10000
 });
 Ext.Direct.addProvider(SYNOCOMMUNITY.DebianChroot.Poller);
 SYNOCOMMUNITY.DebianChroot.Poller.disconnect();
@@ -59,52 +81,6 @@ Ext.form.RadioGroup.override({
         return String(this.getValue().inputValue) !== String(this.originalValue.inputValue);
     }
 });
-
-// ActionColumn from ExtJS 3.3
-Ext.grid.ActionColumn = Ext.extend(Ext.grid.Column, {
-    header: '&#160;',
-    actionIdRe: /x-action-col-(\d+)/,
-    altText: '',
-    constructor: function(cfg) {
-        var me = this,
-            items = cfg.items || (me.items = [me]),
-            l = items.length,
-            i,
-            item;
-        Ext.grid.ActionColumn.superclass.constructor.call(me, cfg);
-        me.renderer = function(v, meta) {
-            v = Ext.isFunction(cfg.renderer) ? cfg.renderer.apply(this, arguments)||'' : '';
-
-            meta.css += ' x-action-col-cell';
-            for (i = 0; i < l; i++) {
-                item = items[i];
-                v += '<img alt="' + (item.altText || me.altText) + '" src="' + (item.icon || Ext.BLANK_IMAGE_URL) +
-                    '" class="x-action-col-icon x-action-col-' + String(i) + ' ' + (item.iconCls || '') +
-                    ' ' + (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope||this.scope||this, arguments) : '') + '"' +
-                    ((item.tooltip) ? ' ext:qtip="' + item.tooltip + '"' : '') + ' />';
-            }
-            return v;
-        };
-    },
-    destroy: function() {
-        delete this.items;
-        delete this.renderer;
-        return Ext.grid.ActionColumn.superclass.destroy.apply(this, arguments);
-    },
-    processEvent : function(name, e, grid, rowIndex, colIndex){
-        var m = e.getTarget().className.match(this.actionIdRe),
-            item, fn;
-        if (m && (item = this.items[parseInt(m[1], 10)])) {
-            if (name == 'click') {
-                (fn = item.handler || this.handler) && fn.call(item.scope||this.scope||this, grid, rowIndex, colIndex, item, e);
-            } else if ((name == 'mousedown') && (item.stopSelection !== false)) {
-                return false;
-            }
-        }
-        return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
-    }
-});
-Ext.apply(Ext.grid.Column.types, {actioncolumn: Ext.grid.ActionColumn})
 
 // Const
 SYNOCOMMUNITY.DebianChroot.DEFAULT_HEIGHT = 300;
@@ -151,6 +127,7 @@ SYNOCOMMUNITY.DebianChroot.AppWindow = Ext.extend(SYNO.SDS.AppWindow, {
     onClose: function () {
         if (SYNOCOMMUNITY.DebianChroot.AppWindow.superclass.onClose.apply(this, arguments)) {
             this.doClose();
+            this.mainPanel.onDeactivate();
             return true;
         }
         return false;
@@ -215,13 +192,13 @@ SYNOCOMMUNITY.DebianChroot.MainPanel = Ext.extend(Ext.Panel, {
             return
         }
         this.listPanel.onActivate(panel);
-        this.cardPanel.onActivate(panel)
+        this.cardPanel.onActivate(panel);
     },
     onDeactivate: function (panel) {
         if (!this.rendered) {
             return
         }
-        this.cardPanel.onDeactivate(panel)
+        this.cardPanel.onDeactivate(panel);
     },
     doSwitchPanel: function (id_panel) {
         var c = this.cardPanel.getLayout();
@@ -428,13 +405,15 @@ SYNOCOMMUNITY.DebianChroot.MainCardPanel = Ext.extend(Ext.Panel, {
             this.PanelOverview.onActivate();
         }
     },
-    onDeactivate: Ext.emptyFn
+    onDeactivate: function (panel) {
+        this.PanelOverview.onDeactivate();
+    }
 });
 
 // FormPanel base
 SYNOCOMMUNITY.DebianChroot.FormPanel = Ext.extend(Ext.FormPanel, {
     constructor: function (config) {
-        var a = Ext.apply({
+        config = Ext.apply({
             owner: null,
             items: [],
             padding: "20px 30px 2px 30px",
@@ -461,8 +440,8 @@ SYNOCOMMUNITY.DebianChroot.FormPanel = Ext.extend(Ext.FormPanel, {
                 }]
             }
         }, config);
-        SYNO.LayoutConfig.fill(a);
-        SYNOCOMMUNITY.DebianChroot.FormPanel.superclass.constructor.call(this, a);
+        SYNO.LayoutConfig.fill(config);
+        SYNOCOMMUNITY.DebianChroot.FormPanel.superclass.constructor.call(this, config);
         if (!this.owner instanceof SYNO.SDS.BaseWindow) {
             throw Error("please set the owner window of form");
         }
@@ -500,40 +479,134 @@ SYNOCOMMUNITY.DebianChroot.FormPanel = Ext.extend(Ext.FormPanel, {
 });
 
 // Overview panel
-SYNOCOMMUNITY.DebianChroot.PanelOverview = Ext.extend(Ext.Panel, {
+SYNOCOMMUNITY.DebianChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.DebianChroot.FormPanel, {
     constructor: function (config) {
         this.owner = config.owner;
+        this.loaded = false;
         config = Ext.apply({
-            xtype: "panel",
             itemId: "overview",
-            hideLabel: true,
-            layout: "form",
-            labelWidth: 250,
-            padding: "20px 40px 20px 40px",
-            border: false,
-            flex: 1,
+            fbar: {
+                xtype: "statusbar",
+                defaultText: "&nbsp;",
+                statusAlign: "left",
+                buttonAlign: "left",
+                hideMode: "visibility",
+                items: []
+            },
             items: [{
-                fieldLabel: _T("ui", "status"),
-                id: this.statusTextID = Ext.id(),
-                hideLabel: false
+                xtype: "fieldset",
+                labelWidth: 130,
+                title: _V("ui", "package_informations"),
+                defaultType: "displayfield",
+                items: [{
+                    fieldLabel: _V("ui", "status"),
+                    name: "install_status",
+                    value: ""
+                }, {
+                    fieldLabel: _V("ui", "running_services"),
+                    name: "running_services",
+                    value: ""
+                }]
             }, {
-                fieldLabel: _T("ui", "running_services"),
-                id: this.runningServicesTextID = Ext.id(),
-                hideLabel: false
-            }]
+                xtype: "fieldset",
+                labelWidth: 130,
+                title: "Debian",
+                items: [{
+                    xtype: "compositefield",
+                    fieldLabel: _V("ui", "updates"),
+                    items: [{
+                        xtype: "displayfield",
+                        name: "updates",
+                        width: 60,
+                        value: ""
+                    }, {
+                        xtype: "button",
+                        id: "synocommunity-debianchroot-do_update",
+                        text: _V("ui", "do_update"),
+                        handler: this.onClickUpdate,
+                        scope: this
+                    }, {
+                        xtype: "button",
+                        id: "synocommunity-debianchroot-do_upgrade",
+                        text: _V("ui", "do_upgrade"),
+                        handler: this.onClickUpgrade,
+                        scope: this
+                    }]
+                }]
+            }],
+            api: {
+                load: SYNOCOMMUNITY.DebianChroot.Remote.Overview.load
+            }
         }, config);
+        SYNO.LayoutConfig.fill(config);
         SYNOCOMMUNITY.DebianChroot.PanelOverview.superclass.constructor.call(this, config);
-        Ext.Direct.on("status", function (data) {
-            Ext.getCmp(this.statusTextID).setValue(_T("ui", data.installed));
-            Ext.getCmp(this.statusTextID).setValue(data.running_services);
-            this.getEl().unmask();
+    },
+    onClickUpdate: function (button, event) {
+        button.disable();
+        Ext.getCmp("synocommunity-debianchroot-do_upgrade").disable();
+        SYNOCOMMUNITY.DebianChroot.Remote.Overview.do_update(function (provider, response) {
+            if (response.result != false) {
+                this.getForm().findField("updates").setValue(response.result);
+                this.owner.setStatusOK({
+                    text: response.result + " " + _V("ui", "updates_available")
+                });
+            } else {
+                this.owner.setStatusError({
+                    text: _V("ui", "cannot_update"),
+                    clear: true
+                });
+            }
+            button.enable();
+            Ext.getCmp("synocommunity-debianchroot-do_upgrade").enable();
         }, this);
     },
+    onClickUpgrade: function (button, event) {
+        button.disable();
+        Ext.getCmp("synocommunity-debianchroot-do_update").disable();
+        SYNOCOMMUNITY.DebianChroot.Remote.Overview.do_upgrade(function (provider, response) {
+            if (response.result) {
+                this.getForm().findField("updates").setValue(0);
+                this.owner.setStatusOK({
+                    text: _V("ui", "upgrade_successful")
+                });
+            } else {
+                this.owner.setStatusError({
+                    text: _V("ui", "cannot_upgrade"),
+                    clear: true
+                });
+            }
+            button.enable();
+            Ext.getCmp("synocommunity-debianchroot-do_update").enable();
+        }, this);
+    },
+    onStatus: function (response) {
+        this.getForm().findField("install_status").setValue(_V("ui", response.data.installed));
+        this.getForm().findField("running_services").setValue(response.data.running_services);
+    },
     onActivate: function () {
-        this.getEl().mask(_T("common", "loading"));
-        SYNOCOMMUNITY.DebianChroot.Poller.connect();
+        Ext.Direct.on("status", this.onStatus, this);
+        if (!this.loaded) {
+            this.loaded = true;
+            this.getEl().mask(_T("common", "loading"), "x-mask-loading");
+            this.load({
+                scope: this,
+                success: function (form, action) {
+                    this.getForm().findField("install_status").setValue(_V("ui", action.result.data.installed));
+                    if (action.result.data.updates > 0) {
+                        this.owner.setStatusOK({
+                            text: action.result.data.updates + " " + _V("ui", "updates_available")
+                        });
+                    }
+                    this.getEl().unmask();
+                    SYNOCOMMUNITY.DebianChroot.Poller.connect();
+                }
+            });
+        } else {
+            SYNOCOMMUNITY.DebianChroot.Poller.connect();
+        }
     },
     onDeactivate: function () {
+        Ext.Direct.un("status", this.onStatus, this);
         SYNOCOMMUNITY.DebianChroot.Poller.disconnect();
     }
 });
@@ -542,69 +615,214 @@ SYNOCOMMUNITY.DebianChroot.PanelOverview = Ext.extend(Ext.Panel, {
 SYNOCOMMUNITY.DebianChroot.PanelServices = Ext.extend(Ext.grid.GridPanel, {
     constructor: function (config) {
         this.owner = config.owner;
-        var store = new Ext.data.DirectStore({
-            autoLoad: true,
+        this.loaded = false;
+        this.store = new Ext.data.DirectStore({
+            autoSave: false,
             fields: ["id", "name", "launch_script", "status_command", "status"],
             api: {
-                load: SYNOCOMMUNITY.DebianChroot.Remote.Services.load,
-                save: SYNOCOMMUNITY.DebianChroot.Remote.Services.save
+                read: SYNOCOMMUNITY.DebianChroot.Remote.Services.read,
+                create: SYNOCOMMUNITY.DebianChroot.Remote.Services.create,
+                update: SYNOCOMMUNITY.DebianChroot.Remote.Services.update,
+                destroy: SYNOCOMMUNITY.DebianChroot.Remote.Services.destroy
             },
-            root: "records"
+            idProperty: "id",
+            root: "data",
+            writer: new Ext.data.JsonWriter({
+                encode: false,
+                listful: true,
+                writeAllFields: true
+            })
         });
         config = Ext.apply({
             itemId: "services",
-            store: store,
-            columns: [
-            {
-                header: _V("ui", "name"),
-                width: 80,
-                sortable: true,
-                dataIndex: "name"
-            },
-            {
-                header: _V("ui", "launch_script"),
-                width: 200,
-                dataIndex: "launch_script"
-            },
-            {
-                header:  _V("ui", "status_command"),
-                width: 200,
-                dataIndex: 'status_command'
-            }, {
-                xtype: "actioncolumn",
-                width: 50,
+            border: false,
+            store: this.store,
+            loadMask: true,
+            tbar: {
                 items: [{
-                    icon: "3rdparty/debian-chroot/images/accept.png",
-                    tooltip: _V("ui", "start"),
-                    handler: function(grid, rowIndex, colIndex, item, e) {
-                        var service = store.getAt(rowIndex);
-                        SYNOCOMMUNITY.DebianChroot.Remote.Services.start(service.id);
-                    },
-                    scope: this
+                    text: _V("ui", "add"),
+                    itemId: "add",
+                    scope: this,
+                    handler: this.onClickAdd
                 }, {
-                    icon: "3rdparty/debian-chroot/images/delete.png",
-                    tooltip: _V("ui", "stop"),
-                    handler: function(grid, rowIndex, colIndex, item, e) {
-                        var service = store.getAt(rowIndex);
-                        SYNOCOMMUNITY.DebianChroot.Remote.Services.stop(service.id);
-                    },
-                    scope: this
+                    text: _V("ui", "edit"),
+                    itemId: "edit",
+                    scope: this,
+                    handler: this.onClickEdit
                 }, {
-                    icon: "3rdparty/debian-chroot/images/pencil.png",
-                    tooltip: _V("ui", "edit"),
-                    handler: function(grid, rowIndex, colIndex, item, e) {
-                        var service = store.getAt(rowIndex);
-                        //TODO: Edit form
-                    },
-                    scope: this
+                    text: _V("ui", "delete"),
+                    itemId: "delete",
+                    scope: this,
+                    handler: this.onClickDelete
+                }, {
+                    text: _V("ui", "start"),
+                    itemId: "start",
+                    scope: this,
+                    handler: this.onClickStart
+                }, {
+                    text: _V("ui", "stop"),
+                    itemId: "stop",
+                    scope: this,
+                    handler: this.onClickStop
+                }, {
+                    text: _V("ui", "refresh"),
+                    itemId: "refresh",
+                    scope: this,
+                    handler: this.onClickRefresh
                 }]
+            },
+            columns: [{
+                header: _V("ui", "name"),
+                sortable: true,
+                width: 35,
+                dataIndex: "name"
+            }, {
+                header: _V("ui", "launch_script"),
+                width: 45,
+                dataIndex: "launch_script"
+            }, {
+                header: _V("ui", "status_command"),
+                dataIndex: "status_command"
+            }, {
+                header: _V("ui", "status"),
+                width: 25,
+                dataIndex: "status",
+                renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+                    if (value) {
+                        return _V("ui", "running");
+                    }
+                    return _V("ui", "not_running");
+                }
             }]
         }, config);
         SYNOCOMMUNITY.DebianChroot.PanelServices.superclass.constructor.call(this, config);
     },
     onActivate: function () {
-        //TODO: Mask on store loading
-        //this.getEl().mask(_T("common", "loading"));
+        if (!this.loaded) {
+            this.store.load();
+            this.loaded = true;
+        }
+    },
+    onClickAdd: function () {
+        var editor = new SYNOCOMMUNITY.DebianChroot.ServiceEditorWindow({}, this.store);
+        editor.open()
+    },
+    onClickEdit: function () {
+        var editor = new SYNOCOMMUNITY.DebianChroot.ServiceEditorWindow({}, this.store, this.getSelectionModel().getSelected());
+        editor.open()
+    },
+    onClickDelete: function () {
+        var records = this.getSelectionModel().getSelections();
+        if (records.length != 0) {
+            this.store.remove(this.getSelectionModel().getSelections());
+            this.store.save();
+        }
+    },
+    onClickStart: function () {
+        this.getSelectionModel().each(function (record) {
+            SYNOCOMMUNITY.DebianChroot.Remote.Services.start(record.id, function (provider, response) {
+                if (response.result) {
+                    record.set("status", true);
+                    record.commit();
+                }
+            });
+        }, this);
+    },
+    onClickStop: function () {
+        this.getSelectionModel().each(function (record) {
+            SYNOCOMMUNITY.DebianChroot.Remote.Services.stop(record.id, function (provider, response) {
+                if (response.result) {
+                    record.set("status", false);
+                    record.commit();
+                }
+            });
+        }, this);
+    },
+    onClickRefresh: function () {
+        this.store.load();
     }
 });
 
+// Service window
+SYNOCOMMUNITY.DebianChroot.ServiceEditorWindow = Ext.extend(SYNO.SDS.ModalWindow, {
+    title: _V("ui", "service"),
+    constructor: function (config, store, record) {
+        this.store = store;
+        this.record = record;
+        this.panel = new SYNOCOMMUNITY.DebianChroot.PanelServiceEditor({}, record);
+        config = Ext.apply(config, {
+            width: 550,
+            height: 210,
+            resizable: false,
+            layout: "fit",
+            items: [this.panel],
+            buttons: [{
+                text: _T("common", "apply"),
+                scope: this,
+                handler: this.onClickApply
+            }, {
+                text: _T("common", "close"),
+                scope: this,
+                handler: this.onClickClose
+            }]
+        })
+        SYNOCOMMUNITY.DebianChroot.ServiceEditorWindow.superclass.constructor.call(this, config);
+    },
+    onClickApply: function () {
+        if (this.record === undefined) {
+            var record = new this.store.recordType({
+                name: this.panel.getForm().findField("name").getValue(),
+                launch_script: this.panel.getForm().findField("launch_script").getValue(),
+                status_command: this.panel.getForm().findField("status_command").getValue()
+            });
+            this.store.add(record);
+        } else {
+            this.record.beginEdit();
+            this.record.set("name", this.panel.getForm().findField("name").getValue());
+            this.record.set("launch_script", this.panel.getForm().findField("launch_script").getValue());
+            this.record.set("status_command", this.panel.getForm().findField("status_command").getValue());
+            this.record.endEdit();
+        }
+        this.store.save();
+        this.close();
+    },
+    onClickClose: function () {
+        this.close();
+    }
+});
+
+// Service panel
+SYNOCOMMUNITY.DebianChroot.PanelServiceEditor = Ext.extend(SYNOCOMMUNITY.DebianChroot.FormPanel, {
+    constructor: function (config, record) {
+        this.record = record;
+        config = Ext.apply({
+            itemId: "service",
+            padding: "15px 15px 2px 15px",
+            defaultType: "textfield",
+            labelWidth: 130,
+            fbar: null,
+            defaults: {
+                anchor: "-20"
+            },
+            items: [{
+                fieldLabel: _V("ui", "name"),
+                name: "name"
+            }, {
+                fieldLabel: _V("ui", "launch_script"),
+                name: "launch_script"
+            }, {
+                fieldLabel: _V("ui", "status_command"),
+                name: "status_command"
+            }]
+        }, config);
+        SYNOCOMMUNITY.DebianChroot.PanelServiceEditor.superclass.constructor.call(this, config);
+        if (this.record !== undefined) {
+            this.loadRecord();
+        }
+    },
+    loadRecord: function () {
+        this.getForm().findField("name").setValue(this.record.data.name);
+        this.getForm().findField("launch_script").setValue(this.record.data.launch_script);
+        this.getForm().findField("status_command").setValue(this.record.data.status_command);
+    }
+});
