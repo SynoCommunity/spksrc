@@ -6,8 +6,8 @@ DNAME="Debian Chroot"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-CHROOTTARGET="${INSTALL_DIR}/var/chroottarget"
 PATH="${INSTALL_DIR}/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin"
+CHROOTTARGET=`realpath ${INSTALL_DIR}/var/chroottarget`
 
 
 start_daemon ()
