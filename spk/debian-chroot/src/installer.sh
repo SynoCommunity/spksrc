@@ -39,7 +39,10 @@ postinst ()
 
     # Debootstrap second stage in the background and configure the chroot environment
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        chroot ${CHROOTTARGET}/ /debootstrap/debootstrap --second-stage && touch ${INSTALL_DIR}/var/installed > /dev/null 2>&1 &
+        chroot ${CHROOTTARGET}/ /debootstrap/debootstrap --second-stage && \
+            mv ${CHROOTTARGET}/etc/apt/sources.list.default ${CHROOTTARGET}/etc/apt/sources.list && \
+            mv ${CHROOTTARGET}/etc/apt/preferences.default ${CHROOTTARGET}/etc/apt/preferences && \
+            touch ${INSTALL_DIR}/var/installed > /dev/null 2>&1 &
         mkdir -p ${CHROOTTARGET}/proc
         mkdir -p ${CHROOTTARGET}/dev/pts
         mkdir -p ${CHROOTTARGET}/sys
@@ -49,11 +52,19 @@ postinst ()
         cp /etc/hosts /etc/hostname /etc/resolv.conf ${CHROOTTARGET}/etc/
     fi
 
+	# Index help files
+	pkgindexer_add ${INSTALL_DIR}/app/index.conf > /dev/null
+	pkgindexer_add ${INSTALL_DIR}/app/helptoc.conf > /dev/null
+
     exit 0
 }
 
 preuninst ()
 {
+	# Remove help files
+	pkgindexer_del ${INSTALL_DIR}/app/index.conf > /dev/null
+	pkgindexer_del ${INSTALL_DIR}/app/helptoc.conf > /dev/null
+
     exit 0
 }
 

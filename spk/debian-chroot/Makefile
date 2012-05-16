@@ -45,11 +45,13 @@ ifeq ($(strip $(DEBIAN_ARCH)),)
 endif
 	install -m 755 -d $(STAGING_DIR)/var
 	debootstrap --foreign --arch $(DEBIAN_ARCH) squeeze $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
-	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list
-	install -m 644 src/preferences $(STAGING_DIR)/var/chroottarget/etc/apt/preferences
+	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default
+	install -m 644 src/preferences $(STAGING_DIR)/var/chroottarget/etc/apt/preferences.default
 	install -m 644 src/policy-rc.d $(STAGING_DIR)/var/chroottarget/usr/sbin/policy-rc.d
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
+	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
 	install -m 644 src/app/db.py $(STAGING_DIR)/app/db.py
 	install -m 644 src/app/config.py $(STAGING_DIR)/app/config.py
 	install -m 644 src/app/api.py $(STAGING_DIR)/app/api.py
@@ -59,9 +61,12 @@ endif
 	install -m 755 src/app/debian-chroot.cgi.py $(STAGING_DIR)/app/debian-chroot.cgi
 	install -m 755 src/app/debian-chroot-poll.cgi.py $(STAGING_DIR)/app/debian-chroot-poll.cgi
 	install -m 755 -d $(STAGING_DIR)/app/texts
+	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
+		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
 		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
+		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
 	done
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
