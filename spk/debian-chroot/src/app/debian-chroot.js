@@ -545,7 +545,7 @@ SYNOCOMMUNITY.DebianChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.DebianChroot
         button.disable();
         Ext.getCmp("synocommunity-debianchroot-do_upgrade").disable();
         SYNOCOMMUNITY.DebianChroot.Remote.Overview.do_update(function (provider, response) {
-            if (response.result != false) {
+            if (response.result !== false) {
                 this.getForm().findField("updates").setValue(response.result);
                 this.owner.setStatusOK({
                     text: response.result + " " + _V("ui", "updates_available")

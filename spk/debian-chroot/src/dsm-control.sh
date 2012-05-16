@@ -12,6 +12,7 @@ CHROOTTARGET=`realpath ${INSTALL_DIR}/var/chroottarget`
 
 start_daemon ()
 {
+    # Mount
     mount --bind /proc ${CHROOTTARGET}/proc
     mount --bind /dev/pts ${CHROOTTARGET}/dev/pts
     mount --bind /sys ${CHROOTTARGET}/sys
@@ -19,6 +20,7 @@ start_daemon ()
 
 stop_daemon ()
 {
+    # Unmount
     umount ${CHROOTTARGET}/proc
     umount ${CHROOTTARGET}/dev/pts
     umount ${CHROOTTARGET}/sys
@@ -26,7 +28,7 @@ stop_daemon ()
 
 daemon_status ()
 {
-    `grep "/proc ${CHROOTTARGET}/proc " /proc/mounts > /dev/null 2>&1` || `grep "/dev/pts ${CHROOTTARGET}/dev/pts " /proc/mounts > /dev/null 2>&1` || `grep "/sys ${CHROOTTARGET}/sys " /proc/mounts > /dev/null 2>&1`
+    `grep -q "/proc ${CHROOTTARGET}/proc " /proc/mounts` || `grep -q "/dev/pts ${CHROOTTARGET}/dev/pts " /proc/mounts` || `grep -q "/sys ${CHROOTTARGET}/sys " /proc/mounts`
 }
 
 

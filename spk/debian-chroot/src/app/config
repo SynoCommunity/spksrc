@@ -22,6 +22,9 @@
             "depend": ["SYNOCOMMUNITY.DebianChroot.PanelOverview", "SYNOCOMMUNITY.DebianChroot.PanelServices"]
         },
         "SYNOCOMMUNITY.DebianChroot.PanelOverview": [],
-        "SYNOCOMMUNITY.DebianChroot.PanelServices": []
+        "SYNOCOMMUNITY.DebianChroot.PanelServices": {
+            "depend": ["SYNOCOMMUNITY.DebianChroot.ServiceEditorWindow"]
+        },
+        "SYNOCOMMUNITY.DebianChroot.ServiceEditorWindow": []
     }
 }

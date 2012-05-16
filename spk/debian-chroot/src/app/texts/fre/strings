@@ -2,6 +2,9 @@
 app_name = "Debian Chroot"
 description = "Interface de gestion pour Debian Chroot"
 
+[help]
+description = "Chroot Debian SynoCommunity"
+
 [ui]
 console = "Console"
 overview = "Vue d'ensemble"

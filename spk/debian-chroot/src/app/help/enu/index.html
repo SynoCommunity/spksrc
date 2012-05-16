@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Debian Chroot</title>
+        <link href="/webman/help/help.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <h1>Debian Chroot</h1>
+        <p><a href="http://www.debian.org/">Debian</a> is a free operating system (OS)
+            that comes with over 29000 packages, precompiled software bundled up in a
+            nice format for easy installation on your DiskStation. Debian Chroot allows
+            you to benefit from the Debian OS inside your DiskStation, alongside DSM.
+            This package is intended for advanced users only.</p>
+        <h3>Installation</h3>
+        <p>Once the installation finished in the Package Center, it continues in the
+            background and you can see its status to <b>Installing</b> under
+            <b>Overview</b> in the left pane. The installation finished, the status
+            will automatically change to <b>Installed</b>.</p>
+        <p>In the same pane, you can monitor how many services are running and perform
+            update operations.</p>
+        <h3>Usage</h3>
+        <p>As soon as the status is <b>Installed</b>, you can start using the chroot.
+            To do so, connect to the DiskStation through SSH and use the following command:
+            <b>/var/packages/debian-chroot/scripts/start-stop-status chroot</b>.</p>
+        <p>On the first use, it is recommended to perform some configuration operations:</p>
+        <ul>
+            <li>Update: type <b>aptitude update</b> followed by <b>aptitude upgrade</b></li>
+            <li>Locales: type <b>aptitude install locales</b> and then <b>dpkg-reconfigure locales</b></li>
+            <li>Timezone: execute <b>dpkg-reconfigure tzdata</b></li>
+        </ul>
+        <h4><a href="services.html">Configure services</a></h4>
+        <p>Debian Chroot allows you to manage the packages you installed in the chroot directly
+        from DSM.</p>
+    </body>
+</html>
