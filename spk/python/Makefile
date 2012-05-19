@@ -1,5 +1,5 @@
 SPK_NAME = python
-SPK_VERS = 2.7.2
+SPK_VERS = 2.7.3
 SPK_REV = 1
 SPK_ICON = src/python.png
 
