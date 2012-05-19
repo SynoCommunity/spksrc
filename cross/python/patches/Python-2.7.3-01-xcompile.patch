@@ -1,6 +1,5 @@
-diff -Naur Python-2.7.2-old/Makefile.pre.in Python-2.7.2-new/Makefile.pre.in
---- Makefile.pre.in	2011-06-15 20:00:00.000000000 +0200
-+++ Makefile.pre.in	2011-06-15 21:00:00.000000000 +0200
+--- Makefile.pre.in.orig	2012-04-10 01:07:33.000000000 +0200
++++ Makefile.pre.in	2012-05-19 22:02:06.000000000 +0200
 @@ -182,6 +182,7 @@
  
  PYTHON=		python$(EXE)
@@ -9,16 +8,15 @@ diff -Naur Python-2.7.2-old/Makefile.pre.in Python-2.7.2-new/Makefile.pre.in
  
  # The task to run while instrument when building the profile-opt target
  PROFILE_TASK=	$(srcdir)/Tools/pybench/pybench.py -n 2 --with-gc --with-syscheck
-@@ -215,6 +216,8 @@
+@@ -214,6 +215,7 @@
+ ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
- 
 +HOSTPGEN=   $(PGEN)
-+
+ 
  POBJS=		\
  		Parser/acceler.o \
- 		Parser/grammar1.o \
-@@ -407,8 +410,8 @@
+@@ -408,8 +410,8 @@
  # Build the shared modules
  sharedmods: $(BUILDPYTHON)
  	@case $$MAKEFLAGS in \
@@ -29,19 +27,19 @@ diff -Naur Python-2.7.2-old/Makefile.pre.in Python-2.7.2-new/Makefile.pre.in
  	esac
  
  # Build static library
-@@ -542,7 +544,7 @@
+@@ -543,7 +545,7 @@
  $(GRAMMAR_H) $(GRAMMAR_C): Parser/pgen.stamp
  Parser/pgen.stamp: $(PGEN) $(GRAMMAR_INPUT)
  		-@$(INSTALL) -d Include
 -		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
-+		-$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
++		$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
  		-touch Parser/pgen.stamp
  
  $(PGEN):	$(PGENOBJS)
-@@ -925,26 +928,26 @@
- 		done; \
- 	done
- 	$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)$(LIBDEST)/LICENSE.txt
+@@ -938,26 +940,26 @@
+ 		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
+ 			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
+ 	fi
 -	PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
 -		./$(BUILDPYTHON) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
 +	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
@@ -72,60 +70,57 @@ diff -Naur Python-2.7.2-old/Makefile.pre.in Python-2.7.2-new/Makefile.pre.in
  
  # Create the PLATDIR source directory, if one wasn't distributed..
  $(srcdir)/Lib/$(PLATDIR):
-@@ -1048,8 +1051,10 @@
- 
+@@ -1062,7 +1064,8 @@
  # Install the dynamically loadable modules
  # This goes into $(exec_prefix)
--sharedinstall: sharedmods
+ sharedinstall: sharedmods
 -	$(RUNSHARED) ./$(BUILDPYTHON) -E $(srcdir)/setup.py install \
-+sharedinstall: sharedmods
 +	CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' \
 +	$(RUNSHARED) $(HOSTPYTHON) -E $(srcdir)/setup.py install \
-+		--skip-build \
  	   	--prefix=$(prefix) \
  		--install-scripts=$(BINDIR) \
  		--install-platlib=$(DESTSHARED) \
-diff -Naur Python-2.7.2-old/setup.py Python-2.7.2-new/setup.py
---- setup.py	2011-06-15 20:00:00.000000000 +0200
-+++ setup.py	2011-06-15 21:00:00.000000000 +0200
-@@ -278,6 +282,14 @@
+--- setup.py.orig	2012-04-10 01:07:36.000000000 +0200
++++ setup.py	2012-05-19 22:07:29.000000000 +0200
+@@ -278,6 +278,13 @@
                            (ext.name, sys.exc_info()[1]))
              self.failed.append(ext.name)
              return
 +
-+        # Inport check will not work when cross-compiling.
++        # Import check will not work when cross-compiling
 +        if os.environ.has_key('PYTHONXCPREFIX'):
-+            self.announce(
-+                'WARNING: skipping inport check for cross-compiled: "%s"' %
-+                ext.name)
++            self.announce('WARNING: skipping inport check for cross-compiled: "%s"' %
++                          ext.name)
 +            return
 +
          # Workaround for Mac OS X: The Carbon-based modules cannot be
          # reliably imported into a command-line Python
          if 'Carbon' in ext.extra_link_args:
-@@ -369,8 +377,8 @@
+@@ -368,9 +375,6 @@
+             os.unlink(tmpfile)
  
      def detect_modules(self):
-         # Ensure that /usr/local is always used
+-        # Ensure that /usr/local is always used
 -        add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
 -        add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
-+        # add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
-+        # add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          self.add_multiarch_paths()
  
          # Add paths specified in the environment variables LDFLAGS and
-@@ -427,8 +435,8 @@
+@@ -426,11 +430,8 @@
+         # lib_dirs and inc_dirs are used to search for files;
          # if a file is found in one of those directories, it can
          # be assumed that no additional -I,-L directives are needed.
-         lib_dirs = self.compiler.library_dirs + [
+-        lib_dirs = self.compiler.library_dirs + [
 -            '/lib64', '/usr/lib64',
 -            '/lib', '/usr/lib',
-+            # '/lib64', '/usr/lib64',
-+            # '/lib', '/usr/lib',
-             ]
-         inc_dirs = self.compiler.include_dirs + ['/usr/include']
+-            ]
+-        inc_dirs = self.compiler.include_dirs + ['/usr/include']
++        lib_dirs = self.compiler.library_dirs
++        inc_dirs = self.compiler.include_dirs
          exts = []
-@@ -1860,7 +1868,7 @@
+         missing = []
+ 
+@@ -1860,7 +1861,7 @@
                                           ffi_configfile):
                  from distutils.dir_util import mkpath
                  mkpath(ffi_builddir)
@@ -134,24 +129,3 @@ diff -Naur Python-2.7.2-old/setup.py Python-2.7.2-new/setup.py
  
                  # Pass empty CFLAGS because we'll just append the resulting
                  # CFLAGS to Python's; -g or -O2 is to be avoided.
-diff -Naur Python-2.7.2-old/configure Python-2.7.2-new/configure
---- configure	2011-06-15 20:00:00.000000000 +0200
-+++ configure 	2011-06-15 21:00:00.000000000 +0200
-@@ -13673,7 +13673,7 @@
-   $as_echo_n "(cached) " >&6
- else
-   if test "$cross_compiling" = yes; then :
--  ac_cv_have_long_long_format=no
-+  ac_cv_have_long_long_format="cross -- assuming yes"
- else
-   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
- /* end confdefs.h.  */
-@@ -13725,7 +13725,7 @@
- $as_echo "$ac_cv_have_long_long_format" >&6; }
- fi
- 
--if test "$ac_cv_have_long_long_format" = yes
-+if test "$ac_cv_have_long_long_format" != no
- then
- 
- $as_echo "#define PY_FORMAT_LONG_LONG \"ll\"" >>confdefs.h
