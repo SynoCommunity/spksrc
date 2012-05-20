@@ -6,6 +6,7 @@ import subprocess
 import pwd
 import cgi
 import configobj
+import ConfigParser
 from pyextdirect.configuration import create_configuration, expose, LOAD, SUBMIT
 from pyextdirect.router import Router
 
@@ -247,6 +248,58 @@ class CouchPotato(Base):
             return SABNZBD
         if (nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget' and self.config['Nzbget']['password'] == nzbget.config['ServerPassword'] and
             self.config['Nzbget']['host'] == 'localhost:' + nzbget.config['ServerPort']):
+            return NZBGET
+        return UNDEFINED
+
+
+class CouchPotatoServer(Base):
+    config_path = '/usr/local/couchpotatoserver/var/settings.conf'
+    start_stop_status = '/var/packages/couchpotatoserver/scripts/start-stop-status'
+
+    def __init__(self):
+        self.config = None
+        if os.path.exists(self.config_path):
+            self.config = ConfigParser.ConfigParser()
+            self.config.read(self.config_path)
+
+    @expose
+    def is_installed(self):
+        return self.config is not None
+
+    @expose(kind=LOAD)
+    def load(self):
+        if self.config is None:
+            return None
+        return {'configure_for': self.configured_for()}
+
+    @expose(kind=SUBMIT)
+    def save(self, configure_for=None):
+        devnull = open(os.devnull, 'w')
+        subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
+        if configure_for == 'sabnzbd':
+            sabnzbd = SABnzbd()
+            self.config.set('nzbget', 'enabled', 0)
+            self.config.set('sabnzbd', 'enabled', 1)
+            self.config.set('sabnzbd', 'api_key', sabnzbd.config['misc']['api_key'])
+            self.config.set('sabnzbd', 'host', 'localhost:' + sabnzbd.config['misc']['port'])
+        if configure_for == 'nzbget':
+            nzbget = NZBGet()
+            self.config.set('sabnzbd', 'enabled', 0)
+            self.config.set('nzbget', 'enabled', 1)
+            self.config.set('nzbget', 'password', nzbget.config['ServerPassword'])
+            self.config.set('nzbget', 'host', 'localhost:' + nzbget.config['ServerPort'])
+        with open(self.config_path, 'w') as config_file:
+            self.config.write(config_file)
+        subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
+
+    def configured_for(self):
+        sabnzbd = SABnzbd()
+        nzbget = NZBGet()
+        if (sabnzbd.is_installed() and self.config.getboolean('sabnzbd', 'enabled') and self.config.get('sabnzbd', 'api_key') == sabnzbd.config['misc']['api_key'] and
+            self.config.get('sabnzbd', 'host') == 'localhost:' + sabnzbd.config['misc']['port']):
+            return SABNZBD
+        if (nzbget.is_installed() and self.config.getboolean('nzbget', 'enabled') and self.config.get('nzbget', 'password') == nzbget.config['ServerPassword'] and
+            self.config.get('nzbget', 'host') == 'localhost:' + nzbget.config['ServerPort']):
             return NZBGET
         return UNDEFINED
 
