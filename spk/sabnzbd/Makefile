@@ -41,6 +41,8 @@ endif
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/scripts
+	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
