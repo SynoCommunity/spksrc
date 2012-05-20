@@ -12,8 +12,8 @@ RUNAS="sabnzbd"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
-PID_FILE="${INSTALL_DIR}/var/sabnzbd-*.pid"
 LOG_FILE="${INSTALL_DIR}/var/logs/sabnzbd.log"
+PID_FILES="${INSTALL_DIR}/var/sabnzbd-*.pid"
 
 
 start_daemon ()
@@ -23,16 +23,20 @@ start_daemon ()
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
+    for pid_file in ${PID_FILES}; do
+        kill `cat ${pid_file}`
+    done
     wait_for_status 1 20
-    rm -f ${PID_FILE}
+    rm -f ${PID_FILES}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
-        return 0
-    fi
+    for pid_file in ${PID_FILES}; do
+        if [ -f ${pid_file} ] && [ -d /proc/`cat ${pid_file}` ]; then
+            return 0
+        fi
+    done
     return 1
 }
 
