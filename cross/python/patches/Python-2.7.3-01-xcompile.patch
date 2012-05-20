@@ -70,13 +70,14 @@
  
  # Create the PLATDIR source directory, if one wasn't distributed..
  $(srcdir)/Lib/$(PLATDIR):
-@@ -1062,7 +1064,8 @@
+@@ -1062,7 +1064,9 @@
  # Install the dynamically loadable modules
  # This goes into $(exec_prefix)
  sharedinstall: sharedmods
 -	$(RUNSHARED) ./$(BUILDPYTHON) -E $(srcdir)/setup.py install \
 +	CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' \
 +	$(RUNSHARED) $(HOSTPYTHON) -E $(srcdir)/setup.py install \
++		--skip-build \
  	   	--prefix=$(prefix) \
  		--install-scripts=$(BINDIR) \
  		--install-platlib=$(DESTSHARED) \
@@ -89,7 +90,7 @@
 +
 +        # Import check will not work when cross-compiling
 +        if os.environ.has_key('PYTHONXCPREFIX'):
-+            self.announce('WARNING: skipping inport check for cross-compiled: "%s"' %
++            self.announce('WARNING: skipping import check for cross-compiled: "%s"' %
 +                          ext.name)
 +            return
 +
