@@ -1,11 +1,11 @@
 SPK_NAME = nzbconfig
-SPK_VERS = 0.1
+SPK_VERS = 0.2
 SPK_REV = 1
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
 
-SPK_DEPENDS = "python>=2.7.2-1"
+SPK_DEPENDS = "python>=2.7.3-1"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, CouchPotato and Headphones
@@ -49,5 +49,5 @@ nzbconfig_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ pyextdirect==0.2 configobj
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ pyextdirect==0.3.1 configobj
 
