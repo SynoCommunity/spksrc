@@ -39,7 +39,7 @@ ENV += BUSYBOX_CONFIG=src/niceionice_defconfig
 endif
 
 .PHONY: sabnzbd_extra_install
-sabnzbd_extra_install:
+sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
@@ -50,4 +50,9 @@ sabnzbd_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
+
+$(STAGING_DIR)/share/requirements.pybundle:
+	@$(MSG) "Bundling requirements"
+	install -m 755 -d $(STAGING_DIR)/share
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ configobj
 
