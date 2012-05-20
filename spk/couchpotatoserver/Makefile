@@ -23,11 +23,11 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-#COPY_TARGET = nop
+COPY_TARGET = nop
 POST_STRIP_TARGET = couchpotatoserver_extra_install
 
 # Pure Python package, make sure ARCH is not defined
-#override ARCH=
+override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
@@ -47,5 +47,5 @@ couchpotatoserver_extra_install: $(STAGING_DIR)/share/CouchPotatoServer
 $(STAGING_DIR)/share/CouchPotatoServer:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/RuudBurger/CouchPotatoServer.git CouchPotatoServer
-#	rm -fr $(STAGING_DIR)/share/CouchPotatoServer/.git $(STAGING_DIR)/share/CouchPotatoServer/.gitignore
+	rm -fr $(STAGING_DIR)/share/CouchPotatoServer/.git $(STAGING_DIR)/share/CouchPotatoServer/.gitignore
 
