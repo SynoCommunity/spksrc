@@ -25,7 +25,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the bundle
     ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
