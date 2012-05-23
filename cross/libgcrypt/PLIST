@@ -1,0 +1,6 @@
+bin:bin/dumpsexp
+bin:bin/hmac256
+bin:bin/libgcrypt-config
+lnk:lib/libgcrypt.so
+lnk:lib/libgcrypt.so.11
+lib:lib/libgcrypt.so.11.7.0
