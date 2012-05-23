@@ -1,12 +1,12 @@
 SPK_NAME = python
 SPK_VERS = 2.7.3
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/virtualenv cross/pyopenssl
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
-DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa
+DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language. This package is not startable, it is just required by other packages as dependency.
