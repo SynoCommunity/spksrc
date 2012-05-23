@@ -4,4 +4,3 @@ bin:bin/xmllint
 lnk:lib/libxml2.so
 lnk:lib/libxml2.so.2
 lib:lib/libxml2.so.2.7.8
-rsc:lib/xml2Conf.sh

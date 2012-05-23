@@ -1,5 +1,5 @@
 PKG_NAME = python
-PKG_VERS = 2.7.2
+PKG_VERS = 2.7.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
@@ -18,7 +18,7 @@ POST_PATCH_TARGET = pyPostPatch
 # Configure
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS = --enable-ipv6 ac_cv_buggy_getaddrinfo=no
+CONFIGURE_ARGS = --enable-ipv6 ac_cv_buggy_getaddrinfo=no ac_cv_have_long_long_format=yes
 
 # Compile
 COMPILE_TARGET = myCompile
@@ -56,4 +56,3 @@ $(WORK_DIR)/python-cc.mk: Makefile
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
-

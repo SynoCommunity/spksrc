@@ -39,9 +39,10 @@ $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@echo description=\"$(DESCRIPTION)\" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-		$(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
-		echo description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\") \
-	) >> $@
+	    $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
+	   ) \
+	) | sed 's|"\s|"\n|' >> $@
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
 ifneq ($(strip $(ARCH)),)
 	@echo arch=\"$(ARCH)\" >> $@

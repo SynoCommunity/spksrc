@@ -1,4 +1,6 @@
-bin:bin/python
+lnk:bin/python
+lnk:bin/python2
+bin:bin/python2.7
 rsc:etc/mime.types
 rsc:lib/python2.7
 rsc:include/python2.7/pyconfig.h

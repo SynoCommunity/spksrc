@@ -31,10 +31,10 @@ postinst ()
     ln -s ${wizard_install_dir}/uidevelop/ ${INSTALL_DIR}/app
 
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install -b ${INSTALL_DIR}/var/build ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
     rm -fr ${INSTALL_DIR}/var/build
 
     # Correct the files ownership
