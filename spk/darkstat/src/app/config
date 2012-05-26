@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.darkstat": {
+            "title": "DarkStat",
+            "desc": "DarkStat Web UI",
+            "icon": "images/darkstat-{0}.png",
+            "type": "url",
+            "url": "3rdparty/darkstat/darkstat.cgi",
+            "allUsers": false
+        }
+    }
+}
