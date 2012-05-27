@@ -2,7 +2,7 @@ PKG_NAME = darkstat
 PKG_VERS = 3.0.715
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://unix4lyfe.org/darkstat/
+PKG_DIST_SITE = http://unix4lyfe.org/darkstat
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/libpcap
