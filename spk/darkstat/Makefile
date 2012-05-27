@@ -9,7 +9,6 @@ DEPENDS = cross/zlib cross/libpcap cross/$(SPK_NAME)
 MAINTAINER = SynoCommunity
 DESCRIPTION = DarkStat is an ntop-workalike network statistics gatherer. It runs as a background process on a cable or DSL router, uses libpcap to capture network traffic, and has a Web interface that serves up reports of statistics such as data transferred by host, port, and protocol. It also has a neat bandwidth usage graph.
 DESCRIPTION_FRE = DarkStat est un outil de monitoring réseau simple et léger. Il présente ses résultats via une interface web par des graphiques simplifiés avec leurs statistiques sommaires \\\(min/moy/max\\\) et un récapitulatif du trafic pour les différentes adresses IP ayant eu une connexion avec la machine surveillée.
-DESCRIPTION_SPN = Darkstat es una herramienta para monitorizar una red, el cual analiza el tráfico de la red y de acuerdo a los datos obtenidos genera un informe estadístico en formato HTML.
 ADMIN_PORT = 667
 RELOAD_UI = yes
 DISPLAY_NAME = DarkStat
