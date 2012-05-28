@@ -1,5 +1,5 @@
 PKG_NAME = nzbget
-PKG_VERS = 0.7.0
+PKG_VERS = 0.8.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)-stable/$(PKG_VERS)
