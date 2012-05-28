@@ -1,5 +1,5 @@
 PKG_NAME = nzbgetweb
-PKG_VERS = 1.4
+PKG_VERS = 1.5
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/nzbget/web-interface-stable/$(PKG_VERS)
