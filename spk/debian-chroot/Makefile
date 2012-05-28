@@ -4,8 +4,8 @@ SPK_REV = 1
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/coreutils
-SPK_DEPENDS = "python>=2.7.2-1"
+DEPENDS  =
+SPK_DEPENDS = "python>=2.7.3-1"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
@@ -30,9 +30,6 @@ DEBIAN_ARCH = armel
 endif
 ifeq ($(findstring $(ARCH),bromolow cedarview x86),$(ARCH))
 DEBIAN_ARCH = i386
-endif
-ifeq ($(findstring $(ARCH),powerpc ppc854x ppc853x ppc824x),$(ARCH))
-DEBIAN_ARCH = powerpc
 endif
 
 
