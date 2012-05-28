@@ -1,4 +1,3 @@
-bin:bin/xml2-config
 bin:bin/xmlcatalog
 bin:bin/xmllint
 lnk:lib/libxml2.so
