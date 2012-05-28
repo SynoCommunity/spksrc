@@ -2,7 +2,6 @@ bin:bin/captoinfo
 bin:bin/clear
 bin:bin/infocmp
 bin:bin/infotocap
-bin:bin/ncurses5-config
 bin:bin/reset
 bin:bin/tabs
 bin:bin/tic
