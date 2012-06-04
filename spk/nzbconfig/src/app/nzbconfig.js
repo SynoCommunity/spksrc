@@ -56,6 +56,17 @@ Ext.Direct.addProvider({
             "name": "is_installed",
             "len": 0
         }],
+        "CouchPotatoServer": [{
+            "formHandler": true,
+            "name": "save",
+            "len": 1
+        }, {
+            "name": "load",
+            "len": 0
+        }, {
+            "name": "is_installed",
+            "len": 0
+        }],
         "Headphones": [{
             "formHandler": true,
             "name": "save",
@@ -192,6 +203,7 @@ SYNOCOMMUNITY.NZBConfig.MainPanel = Ext.extend(Ext.Panel, {
             ["nzbget", this.cardPanel.PanelNZBGet],
             ["sickbeard", this.cardPanel.PanelSickBeard],
             ["couchpotato", this.cardPanel.PanelCouchPotato],
+            ["couchpotatoserver", this.cardPanel.PanelCouchPotatoServer],
             ["headphones", this.cardPanel.PanelHeadphones]
         ];
         SYNOCOMMUNITY.NZBConfig.MainPanel.superclass.constructor.call(this, {
@@ -320,6 +332,9 @@ SYNOCOMMUNITY.NZBConfig.ListView = Ext.extend(Ext.list.ListView, {
                     title: "CouchPotato",
                     id: "couchpotato"
                 }, {
+                    title: "CouchPotatoServer",
+                    id: "couchpotatoserver"
+                }, {
                     title: "Headphones",
                     id: "headphones"
                 }]
@@ -420,13 +435,16 @@ SYNOCOMMUNITY.NZBConfig.MainCardPanel = Ext.extend(Ext.Panel, {
         this.PanelCouchPotato = new SYNOCOMMUNITY.NZBConfig.PanelCouchPotato({
             owner: this.owner
         });
+        this.PanelCouchPotatoServer = new SYNOCOMMUNITY.NZBConfig.PanelCouchPotatoServer({
+            owner: this.owner
+        });
         this.PanelHeadphones = new SYNOCOMMUNITY.NZBConfig.PanelHeadphones({
             owner: this.owner
         });
         config = Ext.apply({
             activeItem: 0,
             layout: "card",
-            items: [this.PanelSABnzbd, this.PanelNZBGet, this.PanelSickBeard, this.PanelCouchPotato, this.PanelHeadphones],
+            items: [this.PanelSABnzbd, this.PanelNZBGet, this.PanelSickBeard, this.PanelCouchPotato, this.PanelCouchPotatoServer, this.PanelHeadphones],
             border: false,
             listeners: {
                 scope: this,
@@ -824,6 +842,100 @@ SYNOCOMMUNITY.NZBConfig.PanelCouchPotato = Ext.extend(SYNOCOMMUNITY.NZBConfig.Fo
     },
     onApply: function () {
         if (!SYNOCOMMUNITY.NZBConfig.PanelCouchPotato.superclass.onApply.apply(this, arguments)) {
+            return false;
+        }
+        this.owner.setStatusBusy({
+            text: _T("common", "saving")
+        });
+        this.getForm().submit({
+            scope: this,
+            success: function (form, action) {
+                this.owner.clearStatusBusy();
+                this.owner.setStatusOK();
+                this.getForm().setValues(this.getForm().getValues());
+            }
+        });
+    }
+});
+
+// CouchPotatoServer panel
+SYNOCOMMUNITY.NZBConfig.PanelCouchPotatoServer = Ext.extend(SYNOCOMMUNITY.NZBConfig.FormPanel, {
+    constructor: function (config) {
+        this.owner = config.owner;
+        config = Ext.apply({
+            itemId: "couchpotatoserver",
+            items: [{
+                xtype: "fieldset",
+                title: _V("ui", "newsgrabber"),
+                defaultType: "textfield",
+                defaults: {
+                    anchor: "-20"
+                },
+                items: [{
+                    xtype: "radiogroup",
+                    fieldLabel: _V("ui", "configure_for"),
+                    name: "configure_for",
+                    defaults: {
+                        xtype: "radio",
+                        name: "configure_for"
+                    },
+                    items: [{
+                        itemId: "sabnzbd",
+                        boxLabel: "SABnzbd",
+                        inputValue: "sabnzbd"
+                    }, {
+                        itemId: "nzbget",
+                        boxLabel: "NZBGet",
+                        inputValue: "nzbget"
+                    }, {
+                        itemId: "nochange",
+                        boxLabel: _V("ui", "no_change"),
+                        inputValue: "nochange"
+                    }]
+                }]
+            }],
+            api: {
+                load: SYNOCOMMUNITY.NZBConfig.Remote.CouchPotatoServer.load,
+                submit: SYNOCOMMUNITY.NZBConfig.Remote.CouchPotatoServer.save
+            }
+        }, config);
+        SYNOCOMMUNITY.NZBConfig.PanelCouchPotatoServer.superclass.constructor.call(this, config);
+    },
+    onActivate: function () {
+        this.getEl().mask(_T("common", "loading"));
+        SYNOCOMMUNITY.NZBConfig.Remote.CouchPotatoServer.is_installed(function (provider, response) {
+            if (!response.result) {
+                this.getEl().mask(_V("errors", "couchpotatoserver_not_installed"));
+                return;
+            }
+            SYNOCOMMUNITY.NZBConfig.Remote.SABnzbd.is_installed(function (provider, response) {
+                if (!response.result) {
+                    Ext.each(this.getForm().findField("configure_for").items.items, function (item, index) {
+                        if (item.itemId == "sabnzbd") {
+                            item.disable();
+                        }
+                    });
+                }
+            }, this);
+            SYNOCOMMUNITY.NZBConfig.Remote.NZBGet.is_installed(function (provider, response) {
+                if (!response.result) {
+                    Ext.each(this.getForm().findField("configure_for").items.items, function (item, index) {
+                        if (item.itemId == "nzbget") {
+                            item.disable();
+                        }
+                    });
+                }
+            }, this);
+            this.load({
+                scope: this,
+                success: function (form, action) {
+                    this.getEl().unmask();
+                }
+            });
+        }, this);
+    },
+    onApply: function () {
+        if (!SYNOCOMMUNITY.NZBConfig.PanelCouchPotatoServer.superclass.onApply.apply(this, arguments)) {
             return false;
         }
         this.owner.setStatusBusy({

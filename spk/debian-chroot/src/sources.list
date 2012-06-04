@@ -1,0 +1,31 @@
+################################################
+## squeeze
+deb http://ftp.fr.debian.org/debian/ squeeze main contrib non-free
+deb-src http://ftp.fr.debian.org/debian/ squeeze main contrib non-free
+
+# squeeze security
+deb http://security.debian.org/ squeeze/updates main contrib non-free
+deb-src http://security.debian.org/ squeeze/updates main contrib non-free
+
+# squeeze update
+deb http://ftp.fr.debian.org/debian/ squeeze-updates main contrib non-free
+deb-src http://ftp.fr.debian.org/debian/ squeeze-updates main contrib non-free
+
+################################################
+## wheezy
+deb http://ftp.fr.debian.org/debian/ wheezy main contrib non-free
+deb-src http://ftp.fr.debian.org/debian/ wheezy main contrib non-free
+
+## wheezy security
+deb http://security.debian.org/ wheezy/updates main contrib non-free
+deb-src http://security.debian.org/ wheezy/updates main contrib non-free
+
+################################################
+## sid
+deb http://ftp.fr.debian.org/debian/ sid main contrib non-free
+deb-src http://ftp.fr.debian.org/debian/ sid main contrib non-free
+
+################################################
+## experimental
+deb http://ftp.fr.debian.org/debian/ experimental main contrib non-free
+deb-src http://ftp.fr.debian.org/debian/ experimental main contrib non-free

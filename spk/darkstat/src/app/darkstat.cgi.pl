@@ -8,4 +8,4 @@ use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
 my $q = CGI->new;
 
 # Redirect
-print $q->redirect("http://".$ENV{SERVER_NAME}.":8080");
+print $q->redirect("http://".$ENV{SERVER_NAME}.":667");

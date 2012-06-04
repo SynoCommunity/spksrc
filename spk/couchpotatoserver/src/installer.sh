@@ -24,7 +24,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}

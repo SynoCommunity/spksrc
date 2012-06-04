@@ -1,11 +1,11 @@
 SPK_NAME = couchpotato
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 3
 SPK_ICON = src/couchpotato.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.2-1"
+SPK_DEPENDS = "python>=2.7.3-1"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = CouchPotato is an automatic NZB and torrent downloader for movies. You can keep a \"want to watch\"-list and it will search for NZBs/torrents of these items every X hours. Once a correct release is found, matching the correct quality, it will send it to SABnzbd/NZBGet or download the .nzb or .torrent to a specified directory. The downloaded movie can then be automatically moved and renamed to your liking as well as indexed by your DiskStation.
@@ -37,7 +37,7 @@ couchpotato_extra_install: $(STAGING_DIR)/share/CouchPotato
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/couchpotato.cgi.pl $(STAGING_DIR)/app/couchpotato.cgi
+	install -m 755 src/app/couchpotato.cgi.py $(STAGING_DIR)/app/couchpotato.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \

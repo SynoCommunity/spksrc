@@ -1,5 +1,5 @@
 PKG_NAME = libevent
-PKG_VERS = 2.0.17-stable
+PKG_VERS = 2.0.19-stable
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://cloud.github.com/downloads/libevent/libevent
