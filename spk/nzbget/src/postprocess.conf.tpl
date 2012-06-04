@@ -17,6 +17,9 @@ SabToSickBeard=/usr/local/nzbget/var/sabToSickBeard.py
 # Delete rar-files after unpacking (yes, no).
 DeleteRarFiles=yes
 
+# Temporary directory for unpacking.
+ExtractedDir=extracted
+
 # Rename img-files to iso (yes, no).
 RenameIMG=yes
 

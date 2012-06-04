@@ -5,6 +5,7 @@
 # Copyright (C) 2008 Peter Roubos <peterroubos@hotmail.com>
 # Copyright (C) 2008 Otmar Werner
 # Copyright (C) 2008-2009 Andrei Prygounkov <hugbug@users.sourceforge.net>
+# Copyright (C) 2012 Antoine Bertin <diaoulael@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -201,10 +202,10 @@ if (ls *.rar >/dev/null 2>&1); then
 
 	# Make a temporary directory to store the unrarred files
 	ExtractedDirExists=0
-	if [ -d extracted ]; then
+	if [ -d $ExtractedDir ]; then
 		ExtractedDirExists=1
 	else
-		mkdir extracted
+		mkdir $ExtractedDir
 	fi
 	
 	echo "[INFO] Post-Process: Unraring"
@@ -213,11 +214,11 @@ if (ls *.rar >/dev/null 2>&1); then
 		rarpasswordparam="-p$NZBPR_Password"
 	fi
 
-	$UnrarCmd x -y -p- "$rarpasswordparam" -o+ "*.rar"  ./extracted/
+	$UnrarCmd x -y -p- "$rarpasswordparam" -o+ "*.rar"  ./$ExtractedDir/
 	if [ "$?" -eq 3 ]; then
 		echo "[ERROR] Post-Process: Unrar failed"
 		if [ "$ExtractedDirExists" -eq 0 ]; then
-			rm -R extracted
+			rm -R $ExtractedDir
 		fi
 		# for delayed par-check/-repair at least one par-file must be already downloaded
 		if (ls *.[pP][aA][rR]2 >/dev/null 2>&1); then
@@ -238,7 +239,7 @@ if (ls *.rar >/dev/null 2>&1); then
 	
 	# Go to the temp directory and try to unrar again.  
 	# If there are any rars inside the extracted rars then these will no also be unrarred
-	cd extracted
+	cd $ExtractedDir
 	if (ls *.rar >/dev/null 2>&1); then
 		echo "[INFO] Post-Process: Unraring (second pass)"
 		$UnrarCmd x -y -p- -o+ "*.rar"
@@ -260,7 +261,7 @@ if (ls *.rar >/dev/null 2>&1); then
 	# Move everything back to the Download folder
 	mv * ..
 	cd ..
-	rmdir extracted
+	rmdir $ExtractedDir
 fi
 
 # If download contains only nzb-files move them into nzb-directory
