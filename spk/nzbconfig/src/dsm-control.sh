@@ -6,7 +6,6 @@ DNAME="NZB Config"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-RUNAS="root"
 RUN_FILE="${INSTALL_DIR}/var/${PACKAGE}.run"
 
 
