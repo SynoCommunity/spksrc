@@ -1,0 +1,30 @@
+{
+    "subliminal.js": {
+        "SYNOCOMMUNITY.Subliminal.AppInstance": {
+            "type": "app",
+            "title": "app:app_name",
+            "version": "0.1",
+            "icon": "images/subliminal-{0}.png",
+            "texts": "texts",
+            "allowMultiInstance": false,
+            "appWindow": "SYNOCOMMUNITY.Subliminal.AppWindow",
+            "depend": ["SYNOCOMMUNITY.Subliminal.AppWindow"]
+        },
+        "SYNOCOMMUNITY.Subliminal.AppWindow": {
+            "type": "lib",
+            "title": "app:app_name",
+            "icon": "images/subliminal-{0}.png",
+            "texts": "texts",
+            "depend": ["SYNOCOMMUNITY.Subliminal.ListView", "SYNOCOMMUNITY.Subliminal.MainCardPanel"]
+        },
+        "SYNOCOMMUNITY.Subliminal.ListView": [],
+        "SYNOCOMMUNITY.Subliminal.MainCardPanel": {
+            "depend": ["SYNOCOMMUNITY.Subliminal.PanelOverview", "SYNOCOMMUNITY.Subliminal.PanelServices"]
+        },
+        "SYNOCOMMUNITY.Subliminal.PanelOverview": [],
+        "SYNOCOMMUNITY.Subliminal.PanelServices": {
+            "depend": ["SYNOCOMMUNITY.Subliminal.ServiceEditorWindow"]
+        },
+        "SYNOCOMMUNITY.Subliminal.ServiceEditorWindow": []
+    }
+}
