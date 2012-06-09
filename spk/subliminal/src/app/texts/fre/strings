@@ -1,0 +1,27 @@
+[app]
+app_name = "Subliminal"
+description = "Interface de gestion pour Subliminal"
+
+[help]
+description = "Subliminal SynoCommunity"
+
+[ui]
+console = "Console"
+parameters = "Paramètres"
+directories = "Répertoires"
+general = "Général"
+languages = "Langues"
+multi = "Multiples sous-titres"
+age = "Ancienneté (en jours)"
+max_depth = "Profondeur de scan"
+add = "Ajouter"
+edit = "Modifier"
+delete = "Supprimer"
+scan = "Rechercher"
+name = "Nom"
+path = "Chemin"
+directory = "Répertoire"
+task = "Tâche"
+enable = "Activer"
+hour = "Heure"
+minute = "Minute"
