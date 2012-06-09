@@ -39,7 +39,7 @@ spk-clean:
 %-clean: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
-toolchains:
+prepare: downloads
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
 	    (cd $${tc} && $(MAKE)) ; \
