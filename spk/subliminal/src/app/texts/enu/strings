@@ -1,0 +1,27 @@
+[app]
+app_name = "Subliminal"
+description = "Subliminal's UI"
+
+[help]
+description = "Subliminal SynoCommunity"
+
+[ui]
+console = "Console"
+parameters = "Parameters"
+directories = "Directories"
+general = "General"
+languages = "Languages"
+multi = "Multiple subtitles"
+age = "Maximum age (in days)"
+max_depth = "Maximum depth"
+add = "Add"
+edit = "Edit"
+delete = "Delete"
+scan = "Scan"
+name = "Name"
+path = "Path"
+directory = "Directory"
+task = "Task"
+enable = "Enable"
+hour = "Hour"
+minute = "Minute"

@@ -1,30 +1,49 @@
 #!/bin/sh
 
 # Package
-PACKAGE="nzbconfig"
-DNAME="NZB Config"
+PACKAGE="subliminal"
+DNAME="Subliminal"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-RUN_FILE="${INSTALL_DIR}/var/${PACKAGE}.run"
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="root"
+PYTHON="${INSTALL_DIR}/env/bin/python"
+SCHEDULER="${INSTALL_DIR}/app/scheduler.py"
+PID_FILE="${INSTALL_DIR}/var/scheduler.pid"
 
 
-start_daemon ()
+start_daemon()
 {
-    touch ${RUN_FILE}
+    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${SCHEDULER}"
 }
 
-stop_daemon ()
+stop_daemon()
 {
-    rm -f ${RUN_FILE}
+    kill `cat ${PID_FILE}`
+    wait_for_status 1 20
+    rm -f ${PID_FILE}
 }
 
-daemon_status ()
+daemon_status()
 {
-    if [ -f ${RUN_FILE} ]; then
+    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
         return 0
     fi
+    rm -f ${PID_FILE}
     return 1
+}
+
+wait_for_status()
+{
+    counter=$2
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && break
+        let counter=counter-1
+        sleep 1
+    done
 }
 
 
@@ -62,4 +81,3 @@ case $1 in
         exit 1
         ;;
 esac
-
