@@ -1,0 +1,20 @@
+[{
+    "step_title": "Configuration",
+    "items": [{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Répertoire de téléchargement (champ obligatoire)"
+        }]
+    }]
+}, {
+      "step_title": "Information",
+    "items": [{
+        "type": "singleselect",
+        "subitems": [{
+            "key": "login",
+            "desc": "Les identifiants Administrateur par defaut sont : admin admin"
+        }]
+    }]
+}]
+
