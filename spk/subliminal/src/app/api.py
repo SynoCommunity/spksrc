@@ -106,8 +106,7 @@ class Subliminal(Base):
         paths = [directory.path for directory in self.session.query(Directory).all() if os.path.exists(directory.path)]
         if not paths:
             return
-        #TODO: Add scan_filter with next release of subliminal
-        #scan_filter = lambda x: datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getmtime(x)) > datetime.timedelta(days=self.config['Task']['age'])
+        scan_filter = lambda x: datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getmtime(x)) > datetime.timedelta(days=self.config['Task']['age'])
         subtitles = subliminal.download_subtitles(paths, languages=self.config['General']['languages'], force=False, multi=self.config['General']['multi'],
-                                                  cache_dir='/usr/local/subliminal/cache', max_depth=self.config['General']['max_depth'])
+                                                  cache_dir='/usr/local/subliminal/cache', max_depth=self.config['General']['max_depth'], scan_filter=scan_filter)
         return len(subtitles)
