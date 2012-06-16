@@ -162,6 +162,8 @@ class SickBeard(Base):
         if configure_postprocessing and configure_postprocessing != self.postprocessing_configured():
             self.postprocessing_config['SickBeard']['username'] = self.config['General']['web_username']
             self.postprocessing_config['SickBeard']['password'] = self.config['General']['web_password']
+            self.postprocessing_config['SickBeard']['port'] = self.config['General']['web_port']
+            self.postprocessing_config['SickBeard']['ssl'] = self.config['General']['enable_https']
             self.postprocessing_config.write()
         if configure_for == self.configured_for():
             return
@@ -198,7 +200,9 @@ class SickBeard(Base):
 
     def postprocessing_configured(self):
         return (self.postprocessing_config['SickBeard']['username'] == self.config['General']['web_username'] and
-                self.postprocessing_config['SickBeard']['password'] == self.config['General']['web_password'])
+                self.postprocessing_config['SickBeard']['password'] == self.config['General']['web_password'] and
+                self.postprocessing_config['SickBeard']['port'] == self.config['General']['web_port'] and
+                self.postprocessing_config['SickBeard']['ssl'] == self.config['General']['enable_https'])
 
 
 class CouchPotato(Base):
