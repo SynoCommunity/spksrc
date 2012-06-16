@@ -1,6 +1,4 @@
 bin:bin/znc
-bin:bin/znc-buildmod
-bin:bin/znc-config
 lib:lib/znc/adminlog.so
 lib:lib/znc/admin.so
 lib:lib/znc/antiidle.so
@@ -21,6 +19,7 @@ lib:lib/znc/chansaver.so
 lib:lib/znc/charset.so
 lib:lib/znc/clearbufferonmsg.so
 lib:lib/znc/clientnotify.so
+lib:lib/znc/colloquy.so
 lib:lib/znc/crypt.so
 lib:lib/znc/ctcpflood.so
 lib:lib/znc/dcc.so
@@ -43,6 +42,8 @@ lib:lib/znc/notes.so
 lib:lib/znc/notify_connect.so
 lib:lib/znc/partyline.so
 lib:lib/znc/perform.so
+lib:lib/znc/prowl.so
+lib:lib/znc/push.so
 lib:lib/znc/q.so
 lib:lib/znc/raw.so
 lib:lib/znc/route_replies.so
@@ -53,6 +54,8 @@ lib:lib/znc/send_raw.so
 lib:lib/znc/shell.so
 lib:lib/znc/simple_away.so
 lib:lib/znc/stickychan.so
+lib:lib/znc/twitter.so
+lib:lib/znc/urlbuffer.so
 lib:lib/znc/watch.so
 lib:lib/znc/webadmin.so
 shr:share/znc/modules/blockuser/tmpl/blockuser_WebadminUser.tmpl
