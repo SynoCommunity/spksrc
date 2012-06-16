@@ -14,6 +14,7 @@ DESCRIPTION_FRE = Langage de programmation Python. Ce paquet ne se lance pas, il
 DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, solo es requerido como dependecia de otros paquetes.
 RELOAD_UI = yes
 DISPLAY_NAME = Python
+CHANGELOG = "1. Add lxml module"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
