@@ -1,5 +1,5 @@
 [General]
-languages = string_list(default=list('en'))
+languages = string_list(default=list('eng'))
 multi = boolean(default=False)
 max_depth = integer(1, 8, default=3)
 
