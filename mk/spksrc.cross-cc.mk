@@ -67,6 +67,18 @@ all: install
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
 
+$(DIGESTS_FILE):
+	@$(MSG) "Generating digests for $(PKG_NAME)"
+	@touch -f $@
+	@for type in SHA1 SHA256 MD5; do \
+	  case $$type in \
+	    SHA1|sha1)     tool=sha1sum ;; \
+	    SHA256|sha256) tool=sha256sum ;; \
+	    MD5|md5)       tool=md5sum ;; \
+	  esac ; \
+	  echo "$(PKG_DIST_NAME) $$type `$$tool $(DISTRIB_DIR)/$(PKG_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
+	done
+
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 
