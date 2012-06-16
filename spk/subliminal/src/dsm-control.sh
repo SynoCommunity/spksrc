@@ -12,6 +12,7 @@ RUNAS="root"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SCHEDULER="${INSTALL_DIR}/app/scheduler.py"
 PID_FILE="${INSTALL_DIR}/var/scheduler.pid"
+LOG_FILE="${INSTALL_DIR}/var/scheduler.log"
 
 
 start_daemon()
@@ -76,6 +77,9 @@ case $1 in
             echo ${DNAME} is not running
             exit 1
         fi
+        ;;
+    log)
+        echo ${LOG_FILE}
         ;;
     *)
         exit 1
