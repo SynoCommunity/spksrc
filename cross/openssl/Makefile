@@ -19,9 +19,15 @@ STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifneq ($(findstring $(ARCH), bromolow cedarview x86),)
+OPENSSL_ARCH = linux-elf
+else
+OPENSSL_ARCH = linux-generic32
+endif
+
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) linux-generic32 zlib-dynamic shared threads
+	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
 
 .PHONY: myInstall
 myInstall:
