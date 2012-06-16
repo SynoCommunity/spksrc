@@ -1,8 +1,9 @@
 SPK_NAME = subliminal
 SPK_VERS = 0.6.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
+CHANGELOG = "1. Fix language list"
 
 DEPENDS  =
 SPK_DEPENDS = "python>=2.7.3-1"
