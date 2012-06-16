@@ -11,7 +11,7 @@ HOMEPAGE = http://directory.fsf.org/wiki/Libgcrypt
 COMMENT  = This is a general purpose cryptographic library based on the code from GnuPG
 LICENSE  = LGPL
 
-CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX) ac_cv_sys_symbol_underscore=no
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
