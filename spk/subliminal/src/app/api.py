@@ -63,8 +63,9 @@ class Directories(Base):
         if not os.path.exists(path):
             return 0
         s = Subliminal()
-        subtitles = subliminal.download_subtitles(path, languages=s.config['General']['languages'], force=False, multi=s.config['General']['multi'],
-                                                  cache_dir='/usr/local/subliminal/cache', max_depth=s.config['General']['max_depth'])
+        with subliminal.Pool(2) as p:
+            subtitles = p.download_subtitles(path, languages=s.config['General']['languages'], services=s.config['General']['services'], force=False, multi=s.config['General']['multi'],
+                                             cache_dir='/usr/local/subliminal/cache', max_depth=s.config['General']['max_depth'])
         return len(subtitles)
 
 
@@ -83,15 +84,16 @@ class Subliminal(Base):
 
     @expose(kind=LOAD)
     def load(self):
-        result = {'languages': self.config['General']['languages'], 'multi': self.config['General']['multi'],
-                  'max_depth': self.config['General']['max_depth'], 'task': self.config['Task']['enable'],
-                  'age': self.config['Task']['age'], 'hour': self.config['Task']['hour'],
-                  'minute': self.config['Task']['minute']}
+        result = {'languages': self.config['General']['languages'], 'services': self.config['General']['services'],
+                  'multi': self.config['General']['multi'], 'max_depth': self.config['General']['max_depth'],
+                  'task': self.config['Task']['enable'], 'age': self.config['Task']['age'],
+                  'hour': self.config['Task']['hour'], 'minute': self.config['Task']['minute']}
         return result
 
     @expose(kind=SUBMIT)
-    def save(self, languages=None, multi=None, max_depth=None, task=None, age=None, hour=None, minute=None):
+    def save(self, languages=None, services=None, multi=None, max_depth=None, task=None, age=None, hour=None, minute=None):
         self.config['General']['languages'] = languages
+        self.config['General']['services'] = services
         self.config['General']['multi'] = multi
         self.config['General']['max_depth'] = max_depth
         self.config['Task']['enable'] = task
@@ -107,6 +109,7 @@ class Subliminal(Base):
         if not paths:
             return
         scan_filter = lambda x: datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getmtime(x)) > datetime.timedelta(days=self.config['Task']['age'])
-        subtitles = subliminal.download_subtitles(paths, languages=self.config['General']['languages'], force=False, multi=self.config['General']['multi'],
-                                                  cache_dir='/usr/local/subliminal/cache', max_depth=self.config['General']['max_depth'], scan_filter=scan_filter)
+        with subliminal.Pool(2) as p:
+            subtitles = p.download_subtitles(paths, languages=self.config['General']['languages'], services=s.config['General']['services'], force=False, multi=self.config['General']['multi'],
+                                             cache_dir='/usr/local/subliminal/cache', max_depth=self.config['General']['max_depth'], scan_filter=scan_filter)
         return len(subtitles)

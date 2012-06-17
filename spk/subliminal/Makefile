@@ -1,9 +1,9 @@
 SPK_NAME = subliminal
-SPK_VERS = 0.6.0
-SPK_REV = 2
+SPK_VERS = 0.6.1
+SPK_REV = 3
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix language list"
+CHANGELOG = "1. Add a service selector\\\n2. Improve performances\\\n3. Update subliminal to 0.6.1\\\n4. Less logging"
 
 DEPENDS  =
 SPK_DEPENDS = "python>=2.7.3-1"
@@ -64,5 +64,4 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ subliminal==0.6.0 pyextdirect==0.3.1 configobj
-
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj

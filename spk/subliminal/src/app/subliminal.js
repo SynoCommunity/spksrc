@@ -2273,6 +2273,21 @@ SYNOCOMMUNITY.Subliminal.PanelParameters = Ext.extend(SYNOCOMMUNITY.Subliminal.F
                         }
                     })
                 }, {
+                    xtype: "superboxselect",
+                    allowBlank: false,
+                    fieldLabel: _V("ui", "services"),
+                    name: "services",
+                    mode: "local",
+                    valueField: "name",
+                    displayField: "display_name",
+                    store: new Ext.data.ArrayStore({
+                        fields: ["display_name", "name"],
+                        data: [["OpenSubtitles", "opensubtitles"], ["BierDopje", "bierdopje"],
+                               ["TheSubDB", "thesubdb"], ["SubsWiki", "subswiki"],
+                               ["Subtitulos", "subtitulos"], ["Addic7ed", "addic7ed"],
+                               ["TvSubtitles", "tvsubtitles"]]
+                    })
+                }, {
                     xtype: "checkbox",
                     fieldLabel: _V("ui", "multi"),
                     name: "multi"
