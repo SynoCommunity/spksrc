@@ -95,7 +95,7 @@ class CronTab(object):
 
 def initLogging(logfile):
     root = logging.getLogger()
-    root.setLevel(logging.DEBUG)
+    root.setLevel(logging.INFO)
     handler = logging.handlers.RotatingFileHandler(logfile, maxBytes=2097152, backupCount=3, encoding='utf-8')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s', datefmt='%m/%d/%Y %H:%M:%S'))
     root.handlers = [handler]
