@@ -20,8 +20,7 @@ UNDEFINED = 'nochange'
 
 
 class SABnzbd(Base):
-    root_path = '/usr/local/sabnzbd/'
-    var_path = os.path.join(root_path, 'var')
+    var_path = '/usr/local/sabnzbd/var'
     config_path = os.path.join(var_path, 'config.ini')
     sickbeard_postprocessing_dir = '/usr/local/sickbeard/share/SickBeard/autoProcessTV'
     sickbeard_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
@@ -49,14 +48,14 @@ class SABnzbd(Base):
         self.sickbeard_postprocessing_disable()
 
     def sickbeard_postprocessing_configured(self):
-        script_dir = self._getScriptDir()
+        script_dir = self.get_script_dir()
         configured = True
         for filename in self.sickbeard_postprocessing_filenames:
             configured = configured and os.path.exists(os.path.join(script_dir, filename))
         return configured
 
     def sickbeard_postprocessing_disable(self):
-        script_dir = self._getScriptDir()
+        script_dir = self.get_script_dir()
         for filename in self.sickbeard_postprocessing_filenames:
             if not os.path.islink(os.path.join(script_dir, filename)):
                 continue
@@ -64,13 +63,13 @@ class SABnzbd(Base):
 
     def sickbeard_postprocessing_enable(self):
         self.sickbeard_postprocessing_disable()
-        script_dir = self._getScriptDir()
+        script_dir = self.get_script_dir()
         for filename in self.sickbeard_postprocessing_filenames:
             if os.path.exists(os.path.join(script_dir, filename)):
                 continue
             os.symlink(os.path.join(self.sickbeard_postprocessing_dir, filename), os.path.join(script_dir, filename))
 
-    def _getScriptDir(self):
+    def get_script_dir(self):
         script_dir = self.config['misc']['script_dir']
         if not os.path.isabs(script_dir):
             script_dir = os.path.join(self.var_path, script_dir)
