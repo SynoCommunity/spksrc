@@ -2300,6 +2300,10 @@ SYNOCOMMUNITY.Subliminal.PanelParameters = Ext.extend(SYNOCOMMUNITY.Subliminal.F
                     allowNegative: false,
                     minValue: 1,
                     maxValue: 8
+                }, {
+                    xtype: "checkbox",
+                    fieldLabel: _V("ui", "dsm_notifications"),
+                    name: "dsm_notifications"
                 }]
             }, {
                 xtype: "fieldset",

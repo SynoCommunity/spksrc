@@ -80,10 +80,12 @@ class CronTab(object):
         while self.running:
             self.subliminal.config.reload()
             self.subliminal.config.validate(self.subliminal.config_validator)
-            logger.debug(u'Task %r' % self.subliminal.config['Task'])
             if self.subliminal.config['Task']['enable'] and self.subliminal.config['Task']['hour'] == t.hour and self.subliminal.config['Task']['minute'] == t.minute:
                 logger.info(u'Running scan')
-                self.subliminal.scan()
+                try:
+                    self.subliminal.scan()
+                except Exception as e:
+                    logger.fatal(u'Scan failed: %s' % e)
             t += timedelta(minutes=1)
             while self.running and datetime.now() < t:
                 time.sleep(min((t - datetime.now()).seconds + 1, 10))
