@@ -3,6 +3,7 @@ languages = string_list(default=list('eng'))
 services = string_list(default=list('opensubtitles', 'bierdopje', 'thesubdb', 'subswiki', 'subtitulos'))
 multi = boolean(default=False)
 max_depth = integer(1, 8, default=3)
+dsm_notifications = boolean(default=False)
 
 [Task]
 enable = boolean(default=False)

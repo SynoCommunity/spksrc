@@ -3,7 +3,7 @@ SPK_VERS = 0.6.1
 SPK_REV = 3
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Add a service selector\\\n2. Improve performances\\\n3. Update subliminal to 0.6.1\\\n4. Less logging"
+CHANGELOG = "1. Add a service selector\\\n2. Improve performances\\\n3. Update subliminal to 0.6.1\\\n4. Less logging\\\n5. Fix single language selection\\\n6. Add DSM Notifications"
 
 DEPENDS  =
 SPK_DEPENDS = "python>=2.7.3-1"

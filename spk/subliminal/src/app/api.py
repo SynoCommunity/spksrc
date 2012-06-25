@@ -59,14 +59,14 @@ class Directories(Base):
 
     @expose
     def scan(self, directory_id):
-        path = self.session.query(Directory).get(directory_id).path
-        if not os.path.exists(path):
+        directory = self.session.query(Directory).get(directory_id)
+        if not os.path.exists(directory.path):
             return 0
         s = Subliminal()
-        with subliminal.Pool(2) as p:
-            subtitles = p.download_subtitles(path, languages=s.config['General']['languages'], services=s.config['General']['services'], force=False, multi=s.config['General']['multi'],
-                                             cache_dir='/usr/local/subliminal/cache', max_depth=s.config['General']['max_depth'])
-        return len(subtitles)
+        results = scan(directory.path, s.config)
+        if s.config['General']['dsm_notifications']:
+            notify('Downloaded %d subtitles in directory %s' % (results, directory.name))
+        return results
 
 
 class Subliminal(Base):
@@ -86,16 +86,18 @@ class Subliminal(Base):
     def load(self):
         result = {'languages': self.config['General']['languages'], 'services': self.config['General']['services'],
                   'multi': self.config['General']['multi'], 'max_depth': self.config['General']['max_depth'],
+                  'dsm_notifications': self.config['General']['dsm_notifications'],
                   'task': self.config['Task']['enable'], 'age': self.config['Task']['age'],
                   'hour': self.config['Task']['hour'], 'minute': self.config['Task']['minute']}
         return result
 
     @expose(kind=SUBMIT)
-    def save(self, languages=None, services=None, multi=None, max_depth=None, task=None, age=None, hour=None, minute=None):
-        self.config['General']['languages'] = languages
-        self.config['General']['services'] = services
+    def save(self, languages=None, services=None, multi=None, max_depth=None, dsm_notifications=None, task=None, age=None, hour=None, minute=None):
+        self.config['General']['languages'] = languages if isinstance(languages, list) else [languages]
+        self.config['General']['services'] = services if isinstance(services, list) else [services]
         self.config['General']['multi'] = multi
         self.config['General']['max_depth'] = max_depth
+        self.config['General']['dsm_notifications'] = dsm_notifications
         self.config['Task']['enable'] = task
         self.config['Task']['age'] = age
         self.config['Task']['hour'] = hour
@@ -109,7 +111,18 @@ class Subliminal(Base):
         if not paths:
             return
         scan_filter = lambda x: datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getmtime(x)) > datetime.timedelta(days=self.config['Task']['age'])
-        with subliminal.Pool(2) as p:
-            subtitles = p.download_subtitles(paths, languages=self.config['General']['languages'], services=s.config['General']['services'], force=False, multi=self.config['General']['multi'],
-                                             cache_dir='/usr/local/subliminal/cache', max_depth=self.config['General']['max_depth'], scan_filter=scan_filter)
-        return len(subtitles)
+        results = scan(paths, self.config, scan_filter)
+        if self.config['General']['dsm_notifications']:
+            notify('Downloaded %d subtitles in all directories' % results)
+        return results
+
+
+def scan(paths, config, scan_filter=None):
+    with subliminal.Pool(2) as p:
+        subtitles = p.download_subtitles(paths, languages=config['General']['languages'], services=config['General']['services'], force=False, multi=config['General']['multi'],
+                                         cache_dir='/usr/local/subliminal/cache', max_depth=config['General']['max_depth'], scan_filter=scan_filter)
+    return len(subtitles)
+
+def notify(message):
+    with open(os.devnull, 'w') as devnull:
+        subprocess.call(['synodsmnotify', '@administrators', 'Subliminal', message], stdin=devnull, stdout=devnull, stderr=devnull)
