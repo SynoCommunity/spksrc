@@ -95,13 +95,13 @@ class Subliminal(Base):
     def save(self, languages=None, services=None, multi=None, max_depth=None, dsm_notifications=None, task=None, age=None, hour=None, minute=None):
         self.config['General']['languages'] = languages if isinstance(languages, list) else [languages]
         self.config['General']['services'] = services if isinstance(services, list) else [services]
-        self.config['General']['multi'] = multi
-        self.config['General']['max_depth'] = max_depth
-        self.config['General']['dsm_notifications'] = dsm_notifications
-        self.config['Task']['enable'] = task
-        self.config['Task']['age'] = age
-        self.config['Task']['hour'] = hour
-        self.config['Task']['minute'] = minute
+        self.config['General']['multi'] = bool(multi)
+        self.config['General']['max_depth'] = int(max_depth)
+        self.config['General']['dsm_notifications'] = bool(dsm_notifications)
+        self.config['Task']['enable'] = bool(task)
+        self.config['Task']['age'] = int(age)
+        self.config['Task']['hour'] = int(hour)
+        self.config['Task']['minute'] = int(minute)
         if not self.config.validate(self.config_validator):
             return
         self.config.write()
