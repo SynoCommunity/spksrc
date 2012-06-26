@@ -1769,7 +1769,7 @@ Ext.form.RadioGroup.override({
 });
 
 // Const
-SYNOCOMMUNITY.Subliminal.DEFAULT_HEIGHT = 440;
+SYNOCOMMUNITY.Subliminal.DEFAULT_HEIGHT = 480;
 SYNOCOMMUNITY.Subliminal.MAIN_WIDTH = 750;
 SYNOCOMMUNITY.Subliminal.LIST_WIDTH = 210;
 
