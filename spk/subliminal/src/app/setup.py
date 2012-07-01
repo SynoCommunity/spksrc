@@ -1,9 +1,8 @@
 #!/usr/local/subliminal/env/bin/python
-import db
-import api
+from application import db, direct
 
 
 if __name__ == '__main__':
     db.setup()
-    subliminal = api.Subliminal()
+    subliminal = direct.Subliminal()
     subliminal.setup()

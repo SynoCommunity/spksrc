@@ -1,15 +1,27 @@
 #!/usr/local/subliminal/env/bin/python
+from application.auth import requires_auth
+from application.direct import Base
+from flask import Flask, request, Response
+from pyextdirect.api import create_api
 from pyextdirect.router import Router
-import cgi
-from api import Base
+from wsgiref.handlers import CGIHandler
+
+
+app = Flask('subliminal')
+
+
+@app.route('/direct/router', methods=['POST'])
+@requires_auth(groups=['administrators'])
+def route():
+    router = Router(Base)
+    return Response(router.route(request.json or dict((k, v[0] if len(v) == 1 else v) for k, v in request.form.to_dict(False).iteritems())), mimetype='application/json')
+
+
+@app.route('/direct/api')
+@requires_auth(groups=['administrators'])
+def api():
+    return create_api(Base)
 
 
 if __name__ == '__main__':
-    print 'Content-type: application/json'
-    print
-    router = Router(Base)
-    fs = cgi.FieldStorage()
-    request = fs.value
-    if isinstance(fs.value, list):
-        request = dict((k, fs.getvalue(k)) for k in fs.keys())
-    print router.route(request)
+    CGIHandler().run(app)

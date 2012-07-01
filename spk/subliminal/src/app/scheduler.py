@@ -1,6 +1,6 @@
 #!/usr/local/subliminal/env/bin/python
 # -*- coding: utf-8 -*-
-from api import Subliminal
+from application.direct import Subliminal
 from datetime import datetime, timedelta
 import time
 import os

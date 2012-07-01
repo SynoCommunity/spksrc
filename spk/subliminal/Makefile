@@ -1,9 +1,9 @@
 SPK_NAME = subliminal
 SPK_VERS = 0.6.1
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix single subtitles naming\\\n2. Fix DSM window height"
+CHANGELOG = "1. Fix per-directory scan\\\n2. Fix subtitles count in DSM notifications\\\n3. Fix possible cache corruption during simultaneous multiple manual scans\\\n4. Security fix"
 
 DEPENDS  =
 SPK_DEPENDS = "python>=2.7.3-1"
@@ -36,14 +36,14 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
-	install -m 644 src/app/db.py $(STAGING_DIR)/app/db.py
-	install -m 644 src/app/api.py $(STAGING_DIR)/app/api.py
+	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
+	install -m 644 src/app/subliminal.js $(STAGING_DIR)/app/subliminal.js
 	install -m 755 src/app/setup.py $(STAGING_DIR)/app/setup.py
 	install -m 755 src/app/scheduler.py $(STAGING_DIR)/app/scheduler.py
-	install -m 644 src/app/config.spec $(STAGING_DIR)/app/config.spec
-	install -m 644 src/app/subliminal.js $(STAGING_DIR)/app/subliminal.js
-	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
+	install -m 755 src/app/scanner.py $(STAGING_DIR)/app/scanner.py
 	install -m 755 src/app/subliminal.cgi.py $(STAGING_DIR)/app/subliminal.cgi
+	install -m 755 -d $(STAGING_DIR)/app/application
+	install -m 644 src/app/application/* $(STAGING_DIR)/app/application/
 	install -m 755 -d $(STAGING_DIR)/app/texts
 	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
@@ -64,4 +64,4 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj
+	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj flask

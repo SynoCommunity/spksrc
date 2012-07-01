@@ -1,12 +1,15 @@
-from pyextdirect.configuration import create_configuration, expose, LOAD, STORE_READ, STORE_CUD, SUBMIT
-from pyextdirect.router import Router
-import subliminal
-import os
-import datetime
-import subprocess
 from configobj import ConfigObj
-from validate import Validator
 from db import *
+from pyextdirect.configuration import (create_configuration, expose, LOAD,
+    STORE_READ, STORE_CUD, SUBMIT)
+from validate import Validator
+import datetime
+import os
+import shutil
+import subliminal
+import subprocess
+import tempfile
+
 
 
 __all__ = ['Base', 'Directories', 'Subliminal']
@@ -59,14 +62,8 @@ class Directories(Base):
 
     @expose
     def scan(self, directory_id):
-        directory = self.session.query(Directory).get(directory_id)
-        if not os.path.exists(directory.path):
-            return 0
-        s = Subliminal()
-        results = scan(directory.path, s.config)
-        if s.config['General']['dsm_notifications']:
-            notify('Downloaded %d subtitles in directory %s' % (results, directory.name))
-        return results
+        with open(os.devnull, 'w') as devnull:
+            subprocess.call(['/usr/local/subliminal/app/scanner.py', str(directory_id)], stdin=devnull, stdout=devnull, stderr=devnull)
 
 
 class Subliminal(Base):
@@ -74,7 +71,7 @@ class Subliminal(Base):
 
     def __init__(self):
         self.session = Session()
-        self.config = ConfigObj(self.config_path, configspec='/usr/local/subliminal/app/config.spec', encoding='utf-8')
+        self.config = ConfigObj(self.config_path, configspec='/usr/local/subliminal/app/application/config.spec', encoding='utf-8')
         self.config_validator = Validator()
         self.config.validate(self.config_validator)
 
@@ -113,15 +110,21 @@ class Subliminal(Base):
         scan_filter = lambda x: datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getmtime(x)) > datetime.timedelta(days=self.config['Task']['age'])
         results = scan(paths, self.config, scan_filter)
         if self.config['General']['dsm_notifications']:
-            notify('Downloaded %d subtitles in all directories' % results)
+            notify('Downloaded %d subtitle(s) for %d video(s) in all directories' % (sum([len(s) for s in results.itervalues()]), len(results)))
         return results
 
 
-def scan(paths, config, scan_filter=None):
+def scan(paths, config, scan_filter=None, temp_cache=False):
+    if temp_cache:
+        cache_dir = tempfile.mkdtemp()
+    else:
+        cache_dir = '/usr/local/subliminal/cache'
     with subliminal.Pool(2) as p:
         subtitles = p.download_subtitles(paths, languages=config['General']['languages'], services=config['General']['services'], force=False, multi=config['General']['multi'],
-                                         cache_dir='/usr/local/subliminal/cache', max_depth=config['General']['max_depth'], scan_filter=scan_filter)
-    return len(subtitles)
+                                         cache_dir=cache_dir, max_depth=config['General']['max_depth'], scan_filter=scan_filter)
+    if temp_cache:
+        shutil.rmtree(cache_dir)
+    return subtitles
 
 def notify(message):
     with open(os.devnull, 'w') as devnull:
