@@ -1709,7 +1709,7 @@ _V = function (category, element) {
 
 // Direct API
 Ext.Direct.addProvider({
-    "url": "3rdparty/subliminal/subliminal.cgi",
+    "url": "3rdparty/subliminal/subliminal.cgi/direct/router",
     "namespace": "SYNOCOMMUNITY.Subliminal.Remote",
     "type": "remoting",
     "actions": {

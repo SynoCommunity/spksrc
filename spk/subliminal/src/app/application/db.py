@@ -1,9 +1,7 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, Unicode
 from sqlalchemy.engine import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.session import sessionmaker
-import subprocess
-import os
 
 
 __all__ = ['Base', 'engine', 'Session', 'Directory', 'setup']
