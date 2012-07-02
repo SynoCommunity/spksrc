@@ -1,5 +1,5 @@
 PKG_NAME = polarssl
-PKG_VERS = 1.1.1
+PKG_VERS = 1.1.4
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-gpl.$(PKG_EXT)
 PKG_DIST_SITE = http://polarssl.org/code/releases
