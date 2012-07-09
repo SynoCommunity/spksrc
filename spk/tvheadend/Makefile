@@ -3,7 +3,6 @@ SPK_VERS = 2.99.$(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
