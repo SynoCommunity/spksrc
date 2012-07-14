@@ -1,0 +1,33 @@
+--- functions.php.orig	2012-07-14 22:58:47.000000000 +0200
++++ functions.php	2012-07-14 22:58:53.000000000 +0200
+@@ -630,7 +630,7 @@
+ 			'reportid' => $id);
+  
+ 	// Post the Request, we will set the referrer url to newzbin, as it makes no sense to refer back to us!	
+-	list($header, $content) = PostRequest("http://www.newzbin.com/api/dnzb/","http://www.newzbin.com",$data);
++	list($header, $content) = PostRequest("http://www.newzbin2.es/api/dnzb/","http://www.newzbin2.es",$data);
+ 
+ 	// We need to check the Headers, these contain a load of info we can use to validate
+ 	$header_lines = explode("\r\n",$header,50);
+--- settings-template.php.orig	2010-01-01 23:19:42.000000000 +0100
++++ settings-template.php	2012-07-14 22:58:39.000000000 +0200
+@@ -317,15 +317,15 @@
+ ##############################################################################
+ ### NEWZBIN                                                                ###
+ 
+-# User name for www.newzbin.com.
++# User name for www.newzbin2.es.
+ #
+ # Leave blank to hide newzbin-input box (if you don't have a newzbin account).
+ $NewzbinUsername='';
+ 
+-# Password for www.newzbin.com.
++# Password for www.newzbin2.es.
+ $NewzbinPassword='';
+ 
+ # Automatically download nzb's to the Newzbin defined category (true, false).
+ $NewzbinUseCategories=true;
+ 
+-?>
+\ Pas de fin de ligne à la fin du fichier.
++?>

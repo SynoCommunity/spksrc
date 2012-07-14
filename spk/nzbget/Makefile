@@ -1,8 +1,9 @@
 SPK_NAME = nzbget
 SPK_VERS = 0.8.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
+CHANGELOG = 1. Fix newzbin URL
 
 DEPENDS = cross/busybox cross/unrar cross/nzbgetweb cross/$(SPK_NAME)
 
