@@ -1,8 +1,9 @@
 SPK_NAME = umurmur
 SPK_VERS = 0.2.10
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/umurmur.png
 DSM_UI_DIR = app
+CHANGELOG = 1. Fix umurmur not starting in some cases
 
 DEPENDS = cross/openssl cross/$(SPK_NAME)
 
@@ -41,4 +42,3 @@ umurmur_extra_install:
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
