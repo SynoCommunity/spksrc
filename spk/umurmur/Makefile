@@ -3,7 +3,7 @@ SPK_VERS = 0.2.10
 SPK_REV = 2
 SPK_ICON = src/umurmur.png
 DSM_UI_DIR = app
-CHANGELOG = 1. Fix umurmur not starting in some cases
+CHANGELOG = "1. Fix umurmur not starting in some cases"
 
 DEPENDS = cross/openssl cross/$(SPK_NAME)
 
