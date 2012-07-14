@@ -1,11 +1,11 @@
 SPK_NAME = subliminal
 SPK_VERS = 0.6.1
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix per-directory scan\\\n2. Fix subtitles count in DSM notifications\\\n3. Fix possible cache corruption during simultaneous multiple manual scans\\\n4. Security fix"
+CHANGELOG = "1. Fix permission issues\\\n 2. Improve documentation"
 
-DEPENDS  =
+DEPENDS =
 SPK_DEPENDS = "python>=2.7.3-1"
 
 MAINTAINER = SynoCommunity
@@ -25,6 +25,8 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = subliminal_extra_install
 
+# Pure Python package, make sure ARCH is not defined
+override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
