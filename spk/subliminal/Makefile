@@ -1,9 +1,9 @@
 SPK_NAME = subliminal
 SPK_VERS = 0.6.1
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix permission issues\\\n 2. Improve documentation"
+CHANGELOG = "1. Add a folder browser"
 
 DEPENDS =
 SPK_DEPENDS = "python>=2.7.3-1"

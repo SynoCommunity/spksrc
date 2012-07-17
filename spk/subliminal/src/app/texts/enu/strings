@@ -23,7 +23,13 @@ scan = "Scan"
 name = "Name"
 path = "Path"
 directory = "Directory"
+directory_add = "Directory add"
+directory_edit = "Directory edit"
 task = "Task"
 enable = "Enable"
 hour = "Hour"
 minute = "Minute"
+
+[browser]
+title = "Pick a folder"
+browse = "Browse..."

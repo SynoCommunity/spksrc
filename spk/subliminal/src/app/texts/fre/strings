@@ -23,7 +23,13 @@ scan = "Rechercher"
 name = "Nom"
 path = "Chemin"
 directory = "Répertoire"
+directory_add = "Ajout d'un répertoire"
+directory_edit = "Edition d'un répertoire"
 task = "Tâche"
 enable = "Activer"
 hour = "Heure"
 minute = "Minute"
+
+[browser]
+title = "Sélectionnez un dossier"
+browse = "Parcourir..."
