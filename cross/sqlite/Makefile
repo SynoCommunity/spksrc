@@ -1,11 +1,11 @@
 PKG_NAME = sqlite-autoconf
-PKG_VERS = 3071100
+PKG_VERS = 3071300
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.sqlite.org/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl
+DEPENDS = cross/zlib cross/speex
 
 HOMEPAGE = http://www.sqlite.org/
 COMMENT  = Self-contained, serverless, zero-configuration, transactional SQL database engine.
