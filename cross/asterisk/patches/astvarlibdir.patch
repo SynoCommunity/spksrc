@@ -1,0 +1,11 @@
+--- configure.orig	2012-04-12 17:01:13.000000000 +0200
++++ configure	2012-07-19 21:02:18.000000000 +0200
+@@ -4511,7 +4511,7 @@
+ astheaderdir='${includedir}/asterisk'
+ astlibdir='${libdir}/asterisk'
+ astmandir='${mandir}'
+-astvarlibdir='${localstatedir}/lib/asterisk'
++astvarlibdir='${datarootdir}/asterisk'
+ astdatadir='${astvarlibdir}'
+ astdbdir='${astvarlibdir}'
+ astkeydir='${astvarlibdir}'
