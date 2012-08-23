@@ -1,6 +1,6 @@
 SPK_NAME = oscam
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/oscam.png
 DSM_UI_DIR = app
 
