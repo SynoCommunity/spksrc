@@ -1,5 +1,5 @@
 SPK_NAME = sslh
-SPK_VERS = 1.10
+SPK_VERS = 1.13b
 SPK_REV = 1
 SPK_ICON = src/sslh.png
 
