@@ -1,7 +1,8 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5-dev8
-SPK_REV = 1
+SPK_VERS = 1.5-dev11
+SPK_REV = 2
 SPK_ICON = src/haproxy.png
+BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
