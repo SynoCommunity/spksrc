@@ -2,6 +2,7 @@ SPK_NAME = squidguard
 SPK_VERS = 1.00
 SPK_REV = 1
 SPK_ICON = src/squidguard.png
+BETA = 1
 
 DEPENDS = cross/busybox cross/berkeleydb cross/squidguard cross/squid
 
