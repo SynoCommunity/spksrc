@@ -30,4 +30,7 @@ haproxy_install:
 	pwd
 	install -m 777 -d $(STAGING_DIR)/var
 	install -m 500 -d $(STAGING_DIR)/chroot
-	install -m 644 src/var/haproxy.conf $(STAGING_DIR)/var/haproxy.conf
+	install -m 644 src/var/haproxy.ini $(STAGING_DIR)/var/haproxy.ini
+	install -m 644 src/var/haproxy.tpl $(STAGING_DIR)/var/haproxy.tpl
+	install -m 755 src/var/genConf.pl $(STAGING_DIR)/var/genConf.pl
+
