@@ -21,6 +21,11 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # build haproxy.conf file
+    if [ ! -f $CFG_FILE ]; then
+	cd $INSTALL_DIR/var; perl genConf.pl
+    fi
+
     exit 0
 }
 
@@ -47,7 +52,7 @@ preupgrade ()
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+    mv ${INSTALL_DIR}/var/haproxy.conf ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -56,7 +61,7 @@ postupgrade ()
 {
     # Restore some stuff
     rm -fr ${INSTALL_DIR}/var
-    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    mv ${TMP_DIR}/${PACKAGE}/haproxy.conf ${INSTALL_DIR}/var/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
