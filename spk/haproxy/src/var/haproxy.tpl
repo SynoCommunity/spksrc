@@ -9,10 +9,10 @@ global
 defaults
 	retries 3
 	option redispatch
+	timeout tunnel 1h
 
 frontend http_in
 	bind *:@HTTP_PORT@
-	timeout client 86400s
 	log 127.0.0.1 user debug
 	option httplog
 	mode http
@@ -22,10 +22,9 @@ frontend http_in
 listen https_in 
 	bind :@HTTPS_PORT@
 	mode tcp
-	timeout client 2h
 	option tcplog
 	log 127.0.0.1 user debug
-	tcp-request inspect-delay 5000
+	tcp-request inspect-delay 8s
 	tcp-request content accept if WAIT_END
 	acl is_ssl req_ssl_ver 2:3.1
 	use_backend ssh if !is_ssl

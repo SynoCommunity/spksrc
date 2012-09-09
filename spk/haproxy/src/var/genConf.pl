@@ -134,6 +134,7 @@ sub getValue
 				return $1;
 			}
 		}
+		close(FIC);
 	} else {
 		return 65535;
 	}
