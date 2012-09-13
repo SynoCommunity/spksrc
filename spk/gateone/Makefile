@@ -6,12 +6,11 @@ DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-1:haproxy>=1.5-dev11"
+SPK_DEPENDS = "python>=2.7.3-1"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
 DESCRIPTION_FRE = Gate One est un émulateur de terminal et un client SSH fonctionnant en HTML 5.
-ADMIN_PORT = 8200
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
 
@@ -37,7 +36,7 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 	install -m 755 -d $(STAGING_DIR)/var/conf
 	install -m 770 -d $(STAGING_DIR)/var/sessions
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config.tpl
+	install -m 644 src/app/config.tpl $(STAGING_DIR)/app/config.tpl
 	install -m 644 src/gateone.tpl $(STAGING_DIR)/var/conf/gateone.tpl
 	install -m 755 src/setConf.pl $(STAGING_DIR)/var/conf/setConf.pl
 	install -m 755 -d $(STAGING_DIR)/app/images
@@ -49,7 +48,7 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ auto2to3 tornado
+	@cd $(WORK_DIR) && pip bundle $@ auto2to3 tornado
 
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share

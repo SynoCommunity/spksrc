@@ -15,17 +15,16 @@ backend http_@SERVICE_NAME@
 	@SERVICE_HTTP_ENABLED@
 	mode http
 	option forwardfor
-	timeout server 30s
-	timeout connect 4s
 	server http_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTP_PORT@ check inter 30000 downinter 1000
 
 backend https_@SERVICE_NAME@
 	@SERVICE_HTTPS_ENABLED@
-	timeout server 2h
-	timeout connect 4s
+	mode tcp
+	timeout server 1h
 	option ssl-hello-chk
 	server https_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTPS_PORT@ check inter 30000 downinter 1000
 };
+my $redirect=q{	redirect prefix https://@SERVICE_NAME@.@DDNS@ if { hdr_dom(host) -i @SERVICE_NAME@.@DDNS@ }};
 
 # read ini file
 my $i = 0;
@@ -35,7 +34,7 @@ while($l=<IN>) {
 	$nolig++;
 
 	chomp $l;
-	if ($l !~ /^(HTTP_PORT=[0-9]+|HTTPS_PORT=[0-9]+|DDNS=([^|]*)\|(.*)|SSH_(PORT=[0-9]+|ENABLED=(enabled|disabled))|(DSM|SERVICE[0-9]+)_(NAME=[a-z0-9_]+|ENABLED=(enabled|disabled)|HTTPS?_PORT=([0-9]+|([^|]*)\|(.*))))?$/) {
+	if ($l !~ /^(HTTP_PORT=[0-9]+|HTTPS_PORT=[0-9]+|DDNS=([^|]*)\|(.*)|SSH_(PORT=[0-9]+|ENABLED=(enabled|disabled))|(SERVICE[0-9]+)_(NAME=[a-z0-9_]+|ENABLED=(enabled|disabled)|HTTP_PORT=(redirect|[0-9]+|([^|]*)\|(.*))|HTTPS_PORT=([0-9]+|([^|]*)\|(.*))))?$/) {
 		print "Ligne $nolig invalide : $l\n";
 	}
 
@@ -70,6 +69,9 @@ while($l=<IN>) {
 				if ($2 eq "NAME") {
 					$services_idx[$i] = $1;
 					$i++;
+				} elsif ($2 eq "HTTP_PORT" && $value eq "redirect") {
+					$services[$1]{"HTTP_PORT"}="65535";
+					$services[$1]{"HTTP_ENABLED"}="disabled";
 				}
 			}
 			else
@@ -89,33 +91,41 @@ while($l=<IN>) {
 		for $i (0 .. $#services_idx) {
 			my $ligne = $use_backend_http;
 			my $idx = $services_idx[$i];
+			if ($services[$idx]{"HTTP_PORT"} ne "redirect") {
+				$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
+				$ligne =~ s/@([^@]+)@/$params{$1}/g;
+				print OUT $ligne."\n";
+			}
+		}
+	} elsif ($l =~ /#redirect#/) {
+		for $i (0 .. $#services_idx) {
+			my $ligne = $redirect;
+			my $idx = $services_idx[$i];
+			if ($services[$idx]{"HTTP_PORT"} eq "redirect") {
+				$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
+				$ligne =~ s/@([^@]+)@/$params{$1}/g;
+				print OUT $ligne."\n";
+			}
+		}
+	} elsif ($l =~ /#backend_https#/) {
+		for $i (0 .. $#services_idx) {
+			my $ligne = $use_backend_https;
+			my $idx = $services_idx[$i];
+			$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
+			$ligne =~ s/@([^@]+)@/$params{$1}/g;
+			print OUT $ligne."\n";
+		}
+	} elsif ($l =~ /#backends#/) {
+		for $i (0 .. $#services_idx) {
+			my $ligne = $backend;
+			my $idx = $services_idx[$i];
 			$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
 			$ligne =~ s/@([^@]+)@/$params{$1}/g;
 			print OUT $ligne."\n";
 		}
 	} else {
-		if ($l =~ /#backend_https#/) {
-			for $i (0 .. $#services_idx) {
-				my $ligne = $use_backend_https;
-				my $idx = $services_idx[$i];
-				$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
-				$ligne =~ s/@([^@]+)@/$params{$1}/g;
-				print OUT $ligne."\n";
-			}
-		} else {
-			if ($l =~ /#backend#/) {
-				for $i (0 .. $#services_idx) {
-					my $ligne = $backend;
-					my $idx = $services_idx[$i];
-					$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
-					$ligne =~ s/@([^@]+)@/$params{$1}/g;
-					print OUT $ligne."\n";
-				}
-			} else {
-				$l =~ s/@([^@]+)@/$params{$1}/g;
-				print OUT $l;
-			}
-		}
+		$l =~ s/@([^@]+)@/$params{$1}/g;
+		print OUT $l;
 	}
 }
 close(IN);

@@ -15,6 +15,8 @@ PID_FILE="${INSTALL_DIR}/var/gateone.pid"
 
 start_daemon()
 {
+    perl ${INSTALL_DIR}/var/conf/setConf.pl
+
     PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} &
 }
 

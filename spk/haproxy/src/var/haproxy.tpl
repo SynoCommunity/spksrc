@@ -8,29 +8,29 @@ global
 
 defaults
 	retries 3
-	option redispatch
 	timeout tunnel 1h
+	timeout connect 5s
+	timeout client 50s
+	timeout server 50s
 
 frontend http_in
 	bind *:@HTTP_PORT@
-	log 127.0.0.1 user debug
+	log 127.0.0.1 user info
 	option httplog
 	mode http
-	redirect prefix https://@DSM_NAME@.@DDNS@ if { hdr_dom(host) -i @DSM_NAME@.@DDNS@ }
+	#redirect#
 	#backend_http#
 
 listen https_in 
 	bind :@HTTPS_PORT@
 	mode tcp
 	option tcplog
-	log 127.0.0.1 user debug
+	log 127.0.0.1 user info
 	tcp-request inspect-delay 8s
-	tcp-request content accept if WAIT_END
 	acl is_ssl req_ssl_ver 2:3.1
 	use_backend ssh if !is_ssl
 	tcp-request content accept if is_ssl
 	tcp-request content accept if { req_ssl_hello_type 1 }
-	use_backend https_@DSM_NAME@ if { req_ssl_sni @DSM_NAME@.@DDNS@ }
 	#backend_https#
 
 backend ssh
@@ -38,23 +38,8 @@ backend ssh
 	mode tcp
 	server ssh :@SSH_PORT@
 	timeout connect 5s
-	timeout server 2h	
+	timeout server 1h	
 
-backend http_@DSM_NAME@
-	@DSM_ENABLED@
-	mode http
-	option forwardfor
-	timeout server 30s
-	timeout connect 4s
-	server http_@DSM_NAME@ 127.0.0.1:@DSM_HTTP_PORT@ check inter 30000 downinter 1000
-
-backend https_@DSM_NAME@
-	@DSM_ENABLED@
-	timeout server 30s
-	timeout connect 4s
-	option ssl-hello-chk
-	server https_@DSM_NAME@ 127.0.0.1:@DSM_HTTPS_PORT@ check inter 30000 downinter 1000
-
-#backend#
+#backends#
 
 
