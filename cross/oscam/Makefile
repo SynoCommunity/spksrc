@@ -19,7 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./config.sh --enable WITH_SSL
+	$(RUN) ./config.sh --enable WITH_SSL --disable HAVE_DVBAPI
 
 .PHONY: myInstall
 myInstall:
