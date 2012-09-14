@@ -71,6 +71,7 @@ while($l=<IN>) {
 					$i++;
 				} elsif ($2 eq "HTTP_PORT" && $value eq "redirect") {
 					$services[$1]{"HTTP_PORT"}="65535";
+					$services[$1]{"HTTPS_REDIRECT"}=1;
 					$services[$1]{"HTTP_ENABLED"}="disabled";
 				}
 			}
@@ -101,7 +102,7 @@ while($l=<IN>) {
 		for $i (0 .. $#services_idx) {
 			my $ligne = $redirect;
 			my $idx = $services_idx[$i];
-			if ($services[$idx]{"HTTP_PORT"} eq "redirect") {
+			if ($services[$idx]{"HTTPS_REDIRECT"} == 1) {
 				$ligne =~ s/\@SERVICE_([^@]+)@/$services[$idx]{$1}/g;
 				$ligne =~ s/@([^@]+)@/$params{$1}/g;
 				print OUT $ligne."\n";
