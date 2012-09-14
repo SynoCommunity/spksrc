@@ -1,5 +1,5 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5-dev12
+SPK_VERS = 1.5-12
 SPK_REV = 1
 SPK_ICON = src/haproxy.png
 BETA = 1
