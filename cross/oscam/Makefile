@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/gfto/oscam/tarball/master
 PKG_DIR = gfto-$(PKG_NAME)-*
 
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl cross/libusb
 
 HOMEPAGE = http://oscam.to/
 COMMENT  = OSCam is an Open Source Conditional Access Module software
@@ -19,8 +19,9 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./config.sh --enable WITH_SSL
+	$(RUN) ./config.sh --enable WITH_SSL --disable HAVE_DVBAPI
 
 .PHONY: myInstall
 myInstall:
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/Distribution/oscam* $(STAGING_INSTALL_PREFIX)/bin/oscam
+	install -m 755 $(WORK_DIR)/$(PKG_DIR)/Distribution/list_smargo* $(STAGING_INSTALL_PREFIX)/bin/list_smargo

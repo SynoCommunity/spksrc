@@ -20,4 +20,3 @@ include ../../mk/spksrc.cross-cc.mk
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/SABnzbd
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/SABnzbd
-
