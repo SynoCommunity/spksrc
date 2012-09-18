@@ -2,14 +2,14 @@ PKG_NAME = db
 PKG_VERS = 4.6.21
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://download.oracle.com/otn/berkeley-db/
+PKG_DIST_SITE = https://github.com/downloads/SynoCommunity/spksrc
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
 HOMEPAGE = http://www.oracle.com/technetwork/products/berkeleydb/overview/index.html
 COMMENT  = Berkeley DB enables the development of custom data management solutions, without the overhead traditionally associated with such custom projects.
-LICENSE  = 
+LICENSE  = Copyright © 1990,2007 Oracle.  All rights reserved. See LICENSE file.
 
 DESTDIR = $(INSTALL_DIR)
 CONFIGURE_TARGET = myConfigure
