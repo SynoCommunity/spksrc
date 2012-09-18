@@ -13,7 +13,7 @@ RELOAD_UI = no
 DISPLAY_NAME = SquidGuard
 
 HOMEPAGE   = http://www.squidguard.org/
-LICENSE    = GNU PL
+LICENSE    = GNU PL - Copyright © 1990,2007 Oracle.  All rights reserved for berkeley db library. See LICENSE file.
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
