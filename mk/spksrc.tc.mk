@@ -69,3 +69,14 @@ tc_vars: patch
 clean:
 	rm -fr $(WORK_DIR)
 
+$(DIGESTS_FILE):
+	@$(MSG) "Generating digests for $(TC_NAME)"
+	@touch -f $@
+	@for type in SHA1 SHA256 MD5; do \
+	  case $$type in \
+	    SHA1|sha1)     tool=sha1sum ;; \
+	    SHA256|sha256) tool=sha256sum ;; \
+	    MD5|md5)       tool=md5sum ;; \
+	  esac ; \
+	  echo "$(TC_DIST_NAME) $$type `$$tool $(DISTRIB_DIR)/$(TC_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
+	done
