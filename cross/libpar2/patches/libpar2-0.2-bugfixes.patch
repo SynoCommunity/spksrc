@@ -1,6 +1,6 @@
-diff -aud ../libpar2-0.2-original/par2repairer.cpp ../libpar2-0.2/par2repairer.cpp
---- ../libpar2-0.2-original/par2repairer.cpp	2006-01-20 18:25:20.000000000 +0100
-+++ ../libpar2-0.2/par2repairer.cpp	2008-02-06 12:02:53.226050300 +0100
+diff -aud par2repairer.cpp par2repairer.cpp
+--- par2repairer.cpp	2006-01-20 18:25:20.000000000 +0100
++++ par2repairer.cpp	2008-02-06 12:02:53.226050300 +0100
 @@ -78,6 +78,7 @@
  
    delete mainpacket;
