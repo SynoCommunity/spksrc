@@ -15,14 +15,14 @@ backend http_@SERVICE_NAME@
 	@SERVICE_HTTP_ENABLED@
 	mode http
 	option forwardfor
-	server http_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTP_PORT@ check inter 30000 downinter 1000
+	server http_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTP_PORT@ check inter 30m downinter 1m
 
 backend https_@SERVICE_NAME@
 	@SERVICE_HTTPS_ENABLED@
 	mode tcp
 	timeout server 1h
 	option ssl-hello-chk
-	server https_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTPS_PORT@ check inter 30000 downinter 1000
+	server https_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTPS_PORT@ check inter 30m downinter 1m
 };
 my $redirect=q{	redirect prefix https://@SERVICE_NAME@.@DDNS@ if { hdr_dom(host) -i @SERVICE_NAME@.@DDNS@ }};
 
@@ -59,26 +59,23 @@ while($l=<IN>) {
 			}
 			$params{$1}=$value;
 		}
-	} else	{
-		if ($l =~ /([^=]+)=(.*)/) {
-			my $value=$2;
-
-			if ($1 =~ /SERVICE([0-9]+)_([A-Z_]+)/)
-			{
-				$services[$1]{$2}=$value;
-				if ($2 eq "NAME") {
-					$services_idx[$i] = $1;
-					$i++;
-				} elsif ($2 eq "HTTP_PORT" && $value eq "redirect") {
-					$services[$1]{"HTTP_PORT"}="65535";
-					$services[$1]{"HTTPS_REDIRECT"}=1;
-					$services[$1]{"HTTP_ENABLED"}="disabled";
-				}
+	} elsif ($l =~ /([^=]+)=(.*)/) {
+		my $value=$2;
+		if ($1 =~ /SERVICE([0-9]+)_([A-Z_]+)/)
+		{
+			$services[$1]{$2}=$value;
+			if ($2 eq "NAME") {
+				$services_idx[$i] = $1;
+				$i++;
+			} elsif ($2 eq "HTTP_PORT" && $value eq "redirect") {
+				$services[$1]{"HTTP_PORT"}="65535";
+				$services[$1]{"HTTPS_REDIRECT"}=1;
+				$services[$1]{"HTTP_ENABLED"}="disabled";
+			} elsif ($2 eq "HTTPS_PORT" && $value eq "65535") {
+				$services[$1]{"HTTPS_ENABLED"}="disabled";
 			}
-			else
-			{
-				$params{$1}=$value;
-			}
+		} else 	{
+			$params{$1}=$value;
 		}
 	}
 }
