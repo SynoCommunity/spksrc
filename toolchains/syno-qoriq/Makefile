@@ -1,4 +1,4 @@
-TC_NAME = syno-ppcqoriq
+TC_NAME = syno-qoriq
 
 TC_DIST_NAME = gcc4374_eglibc2874_qoriq-GPL.tgz
 
