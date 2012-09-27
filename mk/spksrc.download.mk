@@ -66,7 +66,10 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      fi ; \
 	      ;; \
 	    http*|ftp*) \
-	      localFile=`basename $${url}` ; \
+	      localFile=$(PKG_DIST_FILE) ; \
+	      if [ -z "$${localFile}" ]; then \
+	        localFile=`basename $${url}` ; \
+	      fi ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -f $${localFile}.part ; \
 	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
