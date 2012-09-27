@@ -1,10 +1,18 @@
 [{
-    "step_title": "Configuration",
+    "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
+        "desc": "Download directory",
         "subitems": [{
             "key": "wizard_download_dir",
             "desc": "Download directory (required)"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Server password. Leave blank to use nzbget (can be changed)",
+        "subitems": [{
+            "key": "wizard_server_password",
+            "desc": "Server password"
         }]
     }]
 }]

@@ -1,10 +1,18 @@
 [{
-    "step_title": "Configuration",
+    "step_title": "Configuration de base",
     "items": [{
         "type": "textfield",
+        "desc": "Répertoire de téléchargement",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Répertoire de téléchargement (champ obligatoire)"
+            "desc": "Répertoire de téléchargement (requis)"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Mot de passe du serveur. Laisser vide pour utiliser nzbget (peut être changé)",
+        "subitems": [{
+            "key": "wizard_server_password",
+            "desc": "Mot de passe du serveur"
         }]
     }]
 }]
