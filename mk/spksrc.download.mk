@@ -40,17 +40,46 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	@mkdir -p $(DISTRIB_DIR)
 	@cd $(DISTRIB_DIR) &&  for url in $(URLS) ; \
 	do \
-	  localFile=`basename $${url}` ; \
-	  if [ ! -f $${localFile} ]  ; \
-	  then \
-	    rm -f $${localFile}.part ; \
-	    url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
-	    echo "wget $${url}" ; \
-	    wget -nv -O $${localFile}.part $${url} ; \
-	    mv $${localFile}.part $${localFile} ; \
-	  else \
-	    $(MSG) "  File $${localFile} already downloaded" ; \
-	  fi ; \
+	  case "$${url}}" in \
+	    svn*|*svn.sourceforge.net*) \
+	      if [ "$(SVN_REV)" = "HEAD" ]; then \
+	        rev=`svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -` ; \
+	      else \
+	        rev=$(SVN_REV) ; \
+	      fi ; \
+	      localFolder=$(NAME)-r$${rev} ; \
+	      localFile=$${localFolder}.tar.gz ; \
+	      localHead=$(NAME)-rHEAD.tar.gz ; \
+	      if [ ! -f $${localFile} ]; then \
+	        rm -fr $${localFolder}.part ; \
+	        echo "svn co -r $${rev} $${url}" ; \
+	        svn export -q -r $${rev} $${url} $${localFolder}.part ; \
+	        mv $${localFolder}.part $${localFolder} ; \
+	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+	        rm -fr $${localFolder} ; \
+	      else \
+	        $(MSG) "  File $${localFile} already downloaded" ; \
+	      fi ; \
+	      if [ "$(SVN_REV)" = "HEAD" ]; then \
+	        rm -f $${localHead} ; \
+	        ln -s $${localFile} $${localHead} ; \
+	      fi ; \
+	      ;; \
+	    http*|ftp*) \
+	      localFile=`basename $${url}` ; \
+	      if [ ! -f $${localFile} ]; then \
+	        rm -f $${localFile}.part ; \
+	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
+	        echo "wget $${url}" ; \
+	        wget -nv -O $${localFile}.part $${url} ; \
+	        mv $${localFile}.part $${localFile} ; \
+	      else \
+	        $(MSG) "  File $${localFile} already downloaded" ; \
+	      fi ; \
+	      ;; \
+	    *) \
+	      ;; \
+	  esac ; \
 	done
 
 post_download_target: $(DOWNLOAD_TARGET) 
