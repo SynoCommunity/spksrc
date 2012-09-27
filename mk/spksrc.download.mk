@@ -40,12 +40,12 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	@mkdir -p $(DISTRIB_DIR)
 	@cd $(DISTRIB_DIR) &&  for url in $(URLS) ; \
 	do \
-	  case "$${url}}" in \
-	    svn*|*svn.sourceforge.net*) \
-	      if [ "$(SVN_REV)" = "HEAD" ]; then \
+	  case "$(PKG_DOWNLOAD_METHOD)" in \
+	    svn) \
+	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
 	        rev=`svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -` ; \
 	      else \
-	        rev=$(SVN_REV) ; \
+	        rev=$(PKG_SVN_REV) ; \
 	      fi ; \
 	      localFolder=$(NAME)-r$${rev} ; \
 	      localFile=$${localFolder}.tar.gz ; \
@@ -60,12 +60,12 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      fi ; \
-	      if [ "$(SVN_REV)" = "HEAD" ]; then \
+	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
 	        rm -f $${localHead} ; \
 	        ln -s $${localFile} $${localHead} ; \
 	      fi ; \
 	      ;; \
-	    http*|ftp*) \
+	    *) \
 	      localFile=$(PKG_DIST_FILE) ; \
 	      if [ -z "$${localFile}" ]; then \
 	        localFile=`basename $${url}` ; \
@@ -79,8 +79,6 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      fi ; \
-	      ;; \
-	    *) \
 	      ;; \
 	  esac ; \
 	done
