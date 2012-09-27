@@ -1,5 +1,5 @@
 SPK_NAME = tvheadend
-SPK_VERS = 3.1.$(shell date +%Y%m%d)
+SPK_VERS = 3.3
 SPK_REV = 1
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app

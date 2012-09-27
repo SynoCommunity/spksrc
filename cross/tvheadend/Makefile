@@ -1,8 +1,9 @@
 PKG_NAME = tvheadend
-PKG_VERS = 3.1.$(shell date +%Y%m%d)
+PKG_VERS = 3.3
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/tarball/master
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_VERS)
+PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/tarball
 PKG_DIR = tvheadend-$(PKG_NAME)-*
 
 DEPENDS = cross/openssl
