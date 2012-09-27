@@ -75,12 +75,16 @@ $(DIGESTS_FILE):
 	@$(MSG) "Generating digests for $(PKG_NAME)"
 	@touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
+	  localFile=$(PKG_DIST_FILE) ; \
+	  if [ -z "$${localFile}" ]; then \
+	    localFile=$(PKG_DIST_NAME) ; \
+	  fi ; \
 	  case $$type in \
 	    SHA1|sha1)     tool=sha1sum ;; \
 	    SHA256|sha256) tool=sha256sum ;; \
 	    MD5|md5)       tool=md5sum ;; \
 	  esac ; \
-	  echo "$(PKG_DIST_NAME) $$type `$$tool $(DISTRIB_DIR)/$(PKG_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$${localFile} $$type `$$tool $(DISTRIB_DIR)/$${localFile} | cut -d\" \" -f1`" >> $@ ; \
 	done
 
 .PHONY: all-archs
