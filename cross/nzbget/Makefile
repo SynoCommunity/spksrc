@@ -1,10 +1,11 @@
 PKG_NAME = nzbget
 PKG_VERS = 9.0
 PKG_EXT = tar.gz
+PKG_DOWNLOAD_METHOD = svn
 SVN_REV = 462
 PKG_DIST_NAME = trunk
 PKG_DIST_SITE = https://nzbget.svn.sourceforge.net/svnroot/nzbget
-PKG_DIST_FILE = $(PKG_NAME)-r$(SVN_REV).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-r*
 
 DEPENDS = cross/libxml2 cross/ncurses cross/libsigc++ cross/libpar2 cross/openssl
