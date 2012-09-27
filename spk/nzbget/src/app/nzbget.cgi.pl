@@ -8,5 +8,5 @@ use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
 my $q = CGI->new;
 
 # Redirect
-print $q->redirect("http://".$ENV{SERVER_NAME}."/nzbgetweb/");
+print $q->redirect("http://".$ENV{SERVER_NAME}.":6789");
 
