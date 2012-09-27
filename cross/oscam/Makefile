@@ -1,9 +1,12 @@
 PKG_NAME = oscam
-PKG_VERS = $(shell date +%Y%m%d)
+PKG_VERS = 1.20
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/gfto/oscam/tarball/master
-PKG_DIR = gfto-$(PKG_NAME)-*
+PKG_DOWNLOAD_METHOD = svn
+PKG_SVN_REV = 7518
+PKG_DIST_NAME = trunk
+PKG_DIST_SITE = http://www.streamboard.tv/svn/oscam
+PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-r*
 
 DEPENDS = cross/openssl cross/libusb
 
@@ -28,4 +31,6 @@ myCompile:
 
 .PHONY: myInstall
 myInstall:
+	rm -f $(WORK_DIR)/$(PKG_DIR)/Distribution/oscam*.debug
+	install -m 755 $(WORK_DIR)/$(PKG_DIR)/Distribution/list_smargo* $(STAGING_INSTALL_PREFIX)/bin/list_smargo
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/Distribution/oscam* $(STAGING_INSTALL_PREFIX)/bin/oscam
