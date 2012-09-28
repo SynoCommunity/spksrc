@@ -1,0 +1,11 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Password that unlocks access to special operator commands (required)",
+        "subitems": [{
+            "key": "wizard_oper_password",
+            "desc": "Password"
+        }]
+    }]
+}]

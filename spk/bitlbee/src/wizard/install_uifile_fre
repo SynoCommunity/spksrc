@@ -1,0 +1,11 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "password",
+        "desc": "Mot de passe déverrouillant l'accès aux commandes spéciales d'opérateur (requis)",
+        "subitems": [{
+            "key": "wizard_oper_password",
+            "desc": "Mot de passe"
+        }]
+    }]
+}]
