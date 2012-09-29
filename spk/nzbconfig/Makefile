@@ -1,10 +1,11 @@
 SPK_NAME = nzbconfig
-SPK_VERS = 0.3
+SPK_VERS = 0.4
 SPK_REV = 1
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
-CHANGELOG = "1. Fix for SickBeard's postprocessing configuration with SSL or non-default port\\\n"
+CHANGELOG = "1. Fix detection of SickBeard's newsgrabber\\\n2. Update for NZBGet 9.0"
+BETA = 1
 
 SPK_DEPENDS = "python>=2.7.3-1"
 
