@@ -78,7 +78,7 @@ class SABnzbd(Base):
 
 class NZBGet(Base):
     config_path = '/usr/local/nzbget/var/nzbget.conf'
-    postprocessing_config_path = '/usr/local/nzbget/var/postprocess.conf'
+    postprocessing_config_path = '/usr/local/nzbget/var/nzbget-postprocess.conf'
     script_dir = '/usr/local/nzbget/var'
     sickbeard_postprocessing_dir = '/usr/local/sickbeard/share/SickBeard/autoProcessTV'
     sickbeard_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
@@ -198,10 +198,10 @@ class SickBeard(Base):
         nzbget = NZBGet()
         if (sabnzbd.is_installed() and self.config['General']['nzb_method'] == 'sabnzbd' and self.config['SABnzbd']['sab_username'] == sabnzbd.config['misc']['username'] and
             self.config['SABnzbd']['sab_password'] == sabnzbd.config['misc']['password'] and self.config['SABnzbd']['sab_apikey'] == sabnzbd.config['misc']['api_key'] and
-            self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port'] + '/'):
+            self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port'] + '/' and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'sabnzbd'):
             return SABNZBD
         if (nzbget.is_installed() and self.config['General']['nzb_method'] == 'nzbget' and self.config['NZBget']['nzbget_password'] == nzbget.config['ServerPassword'] and
-            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ServerPort']):
+            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ServerPort'] and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'nzbget'):
             return NZBGET
         return UNDEFINED
 
