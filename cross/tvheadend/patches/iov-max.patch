@@ -1,6 +1,6 @@
 --- src/dvr/dvr_db.c.orig	2012-07-14 12:13:35.000000000 +0200
 +++ src/dvr/dvr_db.c	2012-07-14 12:10:04.000000000 +0200
-@@ -829,6 +829,12 @@
+@@ -958,6 +958,12 @@
    dvr_config_t *cfg;
  
    dvr_iov_max = sysconf(_SC_IOV_MAX);
