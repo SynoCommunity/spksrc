@@ -1,5 +1,5 @@
 SPK_NAME = oscam
-SPK_VERS = 1.20~r7518
+SPK_VERS = 1.20~r7536
 SPK_REV = 1
 SPK_ICON = src/oscam.png
 DSM_UI_DIR = app

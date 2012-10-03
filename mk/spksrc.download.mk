@@ -41,6 +41,21 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	@cd $(DISTRIB_DIR) &&  for url in $(URLS) ; \
 	do \
 	  case "$(PKG_DOWNLOAD_METHOD)" in \
+	    git) \
+	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
+	      localFile=$${localFolder}.tar.gz ; \
+	      if [ ! -f $${localFile} ]; then \
+	        rm -fr $${localFolder}.part ; \
+	        echo "git clone $${url}" ; \
+	        git clone --no-checkout --quiet $${url} $${localFolder}.part ; \
+	        git --git-dir=$${localFolder}.part/.git --work-tree=$${localFolder}.part checkout --quiet $(PKG_GIT_HASH) ; \
+	        mv $${localFolder}.part $${localFolder} ; \
+	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+	        rm -fr $${localFolder} ; \
+	      else \
+	        $(MSG) "  File $${localFile} already downloaded" ; \
+	      fi ; \
+	      ;; \
 	    svn) \
 	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
 	        rev=`svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -` ; \

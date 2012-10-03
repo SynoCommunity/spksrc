@@ -7,7 +7,7 @@ Requirements
 To use spksrc, it is recommended to use a virtual machine with Debian stable OS installed. You'll also
 need some stuff::
 
-    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config
+    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext
     sudo pip install -U pip
 
 You are now ready to use spksrc and make almost all SPKs. If you have any problem, try installing the
