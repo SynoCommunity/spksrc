@@ -15,14 +15,14 @@ backend http_@SERVICE_NAME@
 	@SERVICE_HTTP_ENABLED@
 	mode http
 	option forwardfor
-	server http_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTP_PORT@ check inter 30m downinter 1m
+	server http_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTP_PORT@ check inter 1800000 downinter 10000
 
 backend https_@SERVICE_NAME@
 	@SERVICE_HTTPS_ENABLED@
 	mode tcp
 	timeout server 1h
 	option ssl-hello-chk
-	server https_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTPS_PORT@ check inter 30m downinter 1m
+	server https_@SERVICE_NAME@ 127.0.0.1:@SERVICE_HTTPS_PORT@ check inter 1800000 downinter 10000
 };
 my $redirect=q{	redirect prefix https://@SERVICE_NAME@.@DDNS@ if { hdr_dom(host) -i @SERVICE_NAME@.@DDNS@ }};
 
@@ -30,52 +30,75 @@ my $redirect=q{	redirect prefix https://@SERVICE_NAME@.@DDNS@ if { hdr_dom(host)
 my $i = 0;
 my $nolig=0;
 open(IN,"haproxy.ini");
-while($l=<IN>) {
+while($l=<IN>) 
+{
 	$nolig++;
 
 	chomp $l;
-	if ($l !~ /^(HTTP_PORT=[0-9]+|HTTPS_PORT=[0-9]+|DDNS=([^|]*)\|(.*)|SSH_(PORT=[0-9]+|ENABLED=(enabled|disabled))|(SERVICE[0-9]+)_(NAME=[a-z0-9_]+|ENABLED=(enabled|disabled)|HTTP_PORT=(redirect|[0-9]+|([^|]*)\|(.*))|HTTPS_PORT=([0-9]+|([^|]*)\|(.*))))?$/) {
+	if ($l !~ /^(HTTP_PORT=[0-9]+|HTTPS_PORT=[0-9]+|DDNS=([^|]*)\|(.*)|SSH_(PORT=[0-9]+|ENABLED=(enabled|disabled))|(SERVICE[0-9]+)_(NAME=[a-z0-9_]+|ENABLED=(enabled|disabled)|HTTP_PORT=(redirect|[0-9]+|([^|]*)\|(.*))|HTTPS_PORT=([0-9]+|([^|]*)\|(.*))))?$/) 
+	{
 		print "Ligne $nolig invalide : $l\n";
 	}
 
-	if ($l =~ /([^=]+)=([^|]*)\|(.*)/) {
+	if ($l =~ /([^=]+)=([^|]*)\|(.*)/) 
+	{
 		my $value=getValue($2,$3);
 		if ($1 =~ /SERVICE([0-9]+)_([A-Z_]+)/)
 		{
 			my $idx = $1;			
 			$services[$idx]{$2}=$value;
-			if ( $2 =~ /(HTTPS?)_PORT/ ) {
-				if ( $value == 65535 ) {
+			if ( $2 =~ /(HTTPS?)_PORT/ ) 
+			{
+				if ( $value == 65535 ) 
+				{
 					$services[$idx]{$1."_ENABLED"}="disabled";
-				} else {
+				} else 
+				{
 					$services[$idx]{$1."_ENABLED"}="enabled";
 				}
 			}
-		}
-		else
+		} else
 		{
-			if ($1 eq "DDNS" && $value == 65535) {
+			if ($1 eq "DDNS" && $value == 65535) 
+			{
 				$value = "localdomain";
 			}
 			$params{$1}=$value;
 		}
-	} elsif ($l =~ /([^=]+)=(.*)/) {
-		my $value=$2;
-		if ($1 =~ /SERVICE([0-9]+)_([A-Z_]+)/)
+	} else	
+	{
+		if ($l =~ /([^=]+)=(.*)/) 
 		{
-			$services[$1]{$2}=$value;
-			if ($2 eq "NAME") {
-				$services_idx[$i] = $1;
-				$i++;
-			} elsif ($2 eq "HTTP_PORT" && $value eq "redirect") {
-				$services[$1]{"HTTP_PORT"}="65535";
-				$services[$1]{"HTTPS_REDIRECT"}=1;
-				$services[$1]{"HTTP_ENABLED"}="disabled";
-			} elsif ($2 eq "HTTPS_PORT" && $value eq "65535") {
-				$services[$1]{"HTTPS_ENABLED"}="disabled";
+			my $value=$2;
+			my $idx;
+
+			if ($1 =~ /SERVICE([0-9]+)_([A-Z_]+)/)
+			{
+				$idx = $1;				
+				$services[$idx]{$2}=$value;
+				if ($2 eq "NAME") 
+				{
+					$services_idx[$i] = $idx;
+					$i++;
+				} elsif ($2 eq "HTTP_PORT" && $value eq "redirect") 
+				{
+					$services[$idx]{"HTTP_PORT"}="65535";
+					$services[$idx]{"HTTPS_REDIRECT"}=1;
+					$services[$idx]{"HTTP_ENABLED"}="disabled";
+				} elsif ( $2 eq "HTTPS_PORT" )
+				{
+					if ( $value == 65535 ) 
+					{
+						$services[$idx]{"HTTPS_ENABLED"}="disabled";
+					} else 
+					{
+						$services[$idx]{"HTTPS_ENABLED"}="enabled";
+					}
+				}
+			} else 
+			{
+				$params{$1}=$value;
 			}
-		} else 	{
-			$params{$1}=$value;
 		}
 	}
 }
@@ -148,3 +171,4 @@ sub getValue
 	}
 	return 65535;
 }
+

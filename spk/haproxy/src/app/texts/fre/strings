@@ -1,0 +1,6 @@
+[app]
+app_name = "HAProxy"
+
+[help]
+description = "HAProxy SynoCommunity"
+
