@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>HAProxy</title>
+        <link href="/webman/help/help.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <h1>HAProxy</h1>
+	<h2>Description</h2>
+	<p>Haproxy est un reverse proxy HTTP / HTTPS qui supporte également les websockets
+	le rendant ainsi compatible avec GateOne par exemple. Grâce à lui, il est possible, 
+	derrière le même port 80 (HTTP) ou 443 (HTTPS) de servir plusieurs services du NAS 
+	Synology proposés normalement sur des ports TCP différents.
+	</p>
+	<p>Site web de l'éditeur : <a href="http://haproxy.1wt.eu/">haproxy.1wt.eu</a></p>
+	<h2>Préalables</h2>
+	<p>Pour fonctionner de manière optimale, il est conseillé de suivre les préconisations 
+	suivantes :</p>
+	<ol>
+		<li>le NAS doit être enregistré auprès d'un DDNS (celui de synology fonctionne très bien)</li>
+		<li>https (et donc également les certificats associés) doit être fonctionnel. Le plus simple est
+		de créer un certificat auto-signé pour *.&lt;ddns synology&gt;</li>
+		<li>haproxy écoute sur les ports 30080 pour HTTP et 30443 pour HTTPS, il est donc nécessaire de
+		router les ports 80 et 443 du routeur réseau respectivement vers les ports 30080 et 30443 du NAS</li>
+	</ol>
+	<h2>Services exposés</h2>
+	<p>Un fois le package haproxy démarré les services suivants sont accessibles:</p>
+	<ul>
+		<li>dsm.&lt;DDNS&gt; : le DSM du syno</li>
+		<li>surveillance.&lt;DDNS&gt; : surveillance station (activer le port personnalisé dans le portail des applications)</li>
+		<li>file.&lt;DDNS&gt; : file station (activer le port personnalisé dans le portail des applications)</li>
+		<li>sab.&lt;DDNS&gt; : sabnzbd</li>
+		<li>gateone.&lt;DDNS&gt; : gateone (le paquet GateOne doit être préalablement installé</li>
+		<li>dav.&lt;DDNS&gt; : webdav</li>
+		<li>audio.&lt;DDNS&gt; : audio station (activer le port personnalisé dans le portail des applications)</li>
+		<li>download.&lt;DDNS&gt; : download station (activer le port personnalisé dans le portail des applications)</li>
+		<li>video.&lt;DDNS&gt; : video station (activer le port personnalisé dans le portail des applications)</li>
+		<li>symform.&lt;DDNS&gt; : Symform (le paquet Symform doit être préalablement installé)</li>
+		<li>www.&lt;DDNS&gt; : webstation (en particlier www.&lt;DDNS&gt;/photo permet d'accéder à photo station)</li>
+		<li>ssh.&lt;DDNS&gt; : accès ssh direct depuis internet sur le port 443.</li>
+	</ul>
+	<p>Les numéros de port sont calculés automatiquement à partir des fichiers de configuration. 
+	Il est possible de modifier ou ajouter un service en modifiant le fichier /usr/local/haproxy/conf/haproxy.ini.
+	Un nouveau fichier de configuration est généré automatiquement au démarrage de HAProxy. Il est également possible de définir 
+	une redirection automatique HTTP vers HTTPS en mettant 'redirect' en port HTTP pour le service concerné.
+	</p>
+
+    </body>
+</html>

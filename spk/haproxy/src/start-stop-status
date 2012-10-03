@@ -42,7 +42,6 @@ wait_for_status()
     done
 }
 
-
 case $1 in
     start)
         if daemon_status; then
@@ -50,6 +49,8 @@ case $1 in
             exit 0
         else
             echo Starting ${DNAME} ...
+            cd ${INSTALL_DIR}/var
+            perl genConf.pl
             start_daemon
             exit $?
         fi
@@ -71,6 +72,34 @@ case $1 in
         else
             echo ${DNAME} is not running
             exit 1
+        fi
+        ;;
+    check)
+        cd ${INSTALL_DIR}/var
+        perl genConf.pl
+        PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -c
+        exit $?
+        ;;
+    restart)
+        cd ${INSTALL_DIR}/var
+        perl genConf.pl
+        PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -c
+        if [ $? -eq 0 ]; then
+            if daemon_status; then
+                echo Stopping ${DNAME} ...
+                stop_daemon
+            else
+                echo ${DNAME} is not running
+            fi
+            sleep 3
+            if daemon_status; then
+                echo ${DNAME} is already running
+            else
+                echo Starting ${DNAME} ...
+                start_daemon
+            fi
+        else
+            echo Restarting ${DNAME} : aborted
         fi
         ;;
     log)
