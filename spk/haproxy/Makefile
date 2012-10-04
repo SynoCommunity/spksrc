@@ -33,11 +33,14 @@ haproxy_install:
 	install -m 644 src/var/haproxy.ini $(STAGING_DIR)/var/haproxy.ini
 	install -m 644 src/var/haproxy.tpl $(STAGING_DIR)/var/haproxy.tpl
 	install -m 755 src/var/genConf.pl $(STAGING_DIR)/var/genConf.pl
+	install -m 755 -d $(STAGING_DIR)/app/texts
 	install -m 755 -d $(STAGING_DIR)/app/help
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/index.conf
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
 	for language in fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
+		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
 		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
+		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
 	done
 
