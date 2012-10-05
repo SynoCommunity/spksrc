@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/squidguard.png
 BETA = 1
 
-DEPENDS = cross/busybox cross/berkeleydb cross/squidguard cross/squid
+DEPENDS = cross/zlib cross/c_icap cross/busybox cross/unrar cross/squidclamav cross/berkeleydb cross/squidguard cross/squid cross/squidguardmanager
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid.
@@ -29,13 +29,20 @@ xz-compress:
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 -d $(STAGING_DIR)/libexec
 	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 -d $(STAGING_DIR)/share/c_icap/templates/
 	install -m 755 -d $(STAGING_DIR)/share/icons
 	install -m 755 -d $(STAGING_DIR)/share/errors
 	install -m 755 -d $(STAGING_DIR)/var/logs
-	install -m 755 -d $(STAGING_DIR)/var/run
+	install -m 755 -d $(STAGING_DIR)/var/run/c-icap
 	install -m 755 -d $(STAGING_DIR)/var/cache
-	install -m 755 -d $(STAGING_DIR)/var/db
 	install -m 755 -d $(STAGING_DIR)/var/db
 	install -m 755 src/update_db.sh $(STAGING_DIR)/bin/
 	install -m 755 src/etc/* $(STAGING_DIR)/etc/
+	install -m 644 app/config $(STAGING_DIR)/share/www/squidguardmgr/
+	for size in 16 24 32 48 ; \
+	do \
+	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
+	            $(STAGING_DIR)/share/www/squidguardmgr/images/icon$${size}.png ; \
+	done	
+	chmod 644 $(STAGING_DIR)/share/www/squidguardmgr/images/i*.png
 

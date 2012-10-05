@@ -1,0 +1,7 @@
+lib:lib/c_icap/squidclamav.so
+rsc:libexec/squidclamav/clwarn.cgi
+rsc:libexec/squidclamav/clwarn.cgi.de_DE
+rsc:libexec/squidclamav/clwarn.cgi.en_EN
+rsc:libexec/squidclamav/clwarn.cgi.fr_FR
+rsc:libexec/squidclamav/clwarn.cgi.pt_BR
+rsc:libexec/squidclamav/clwarn.cgi.ru_RU

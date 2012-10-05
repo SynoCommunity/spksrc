@@ -13,9 +13,7 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 
-#DESTDIR = $(STAGING_INSTALL_PREFIX)
-
-CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX) --enable-icap-client
 
 include ../../mk/spksrc.cross-cc.mk
 
