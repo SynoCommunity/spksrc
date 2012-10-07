@@ -1,8 +1,9 @@
 SPK_NAME = znc
-SPK_VERS = 0.206
+SPK_VERS = 1.0-beta1
 SPK_REV = 2
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -13,7 +14,7 @@ DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy p
 ADMIN_PORT = 8250
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "1. Add modules: colloquy, prowl, push, twitter and urlbuffer\\\n"
+CHANGELOG = "1. Update to 1.0\\\n2. Remove unsupported external modules"
 
 HOMEPAGE = http://wiki.znc.in/
 LICENSE  =
