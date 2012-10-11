@@ -7,7 +7,7 @@ address = "0.0.0.0"
 port = 8022
 log_file_num_backups = 3
 logging = "info"
-dtach = False
+dtach = True
 certificate = "/usr/syno/etc/ssl/ssl.crt/server.crt"
 keyfile = "/usr/syno/etc/ssl/ssl.key/server.key"
 log_to_stderr = False
@@ -19,4 +19,3 @@ debug = False
 auth = None
 log_file_prefix = "/usr/local/gateone/var/gateone.log"
 origins="*"
-

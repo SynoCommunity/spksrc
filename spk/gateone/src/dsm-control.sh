@@ -12,12 +12,13 @@ PYTHON="${INSTALL_DIR}/env/bin/python"
 GATEONE="${INSTALL_DIR}/gateone/gateone.py"
 CFG_FILE="${INSTALL_DIR}/var/conf/gateone.conf"
 PID_FILE="${INSTALL_DIR}/var/gateone.pid"
+RUNAS="gateone"
 
 start_daemon()
 {
     perl ${INSTALL_DIR}/var/conf/setConf.pl
 
-    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} &
+    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} --uid=`awk -v val=${RUNAS} -F ":" '$1==val{print $3}' /etc/passwd`&
 }
 
 stop_daemon()
