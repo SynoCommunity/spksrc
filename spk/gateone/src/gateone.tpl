@@ -8,8 +8,8 @@ port = 8022
 log_file_num_backups = 3
 logging = "info"
 dtach = True
-certificate = "/usr/local/gateone/var/server.crt"
-keyfile = "/usr/local/gateone/var/server.key"
+certificate = "/usr/syno/etc/ssl/ssl.crt/server.crt"
+keyfile = "/usr/syno/etc/ssl/ssl.key/server.key"
 log_to_stderr = False
 log_file_max_size = 1048576
 session_timeout = "5d"
@@ -19,4 +19,3 @@ debug = False
 auth = None
 log_file_prefix = "/usr/local/gateone/var/gateone.log"
 origins="*"
-

@@ -21,7 +21,7 @@ start_daemon()
 	cp /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/var/
 	chown -R ${RUNAS}:users ${INSTALL_DIR}/var/*
 
-    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} --uid=`awk -v val=${RUNAS} -F ":" '$1==val{print $3}' /etc/passwd` --gid=`awk -v val=users -F ":" '$1==val{print $3}' /etc/group` > ${INSTALL_DIR}/var/gateone_startup.log &
+    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} --uid=`awk -v val=${RUNAS} -F ":" '$1==val{print $3}' /etc/passwd`&
 }
 
 stop_daemon()
