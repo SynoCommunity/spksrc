@@ -1,8 +1,8 @@
 PKG_NAME = tvheadend
-PKG_VERS = 3.2~git20120927
+PKG_VERS = 3.2~git20121012
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 329c756
+PKG_GIT_HASH = 4303374
 PKG_DIST_NAME = tvheadend.git
 PKG_DIST_SITE = git://github.com/tvheadend
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
