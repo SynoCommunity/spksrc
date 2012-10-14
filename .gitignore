@@ -7,4 +7,3 @@ toolchains/*/work*
 local.mk
 *.DS_Store
 *~
-.project
