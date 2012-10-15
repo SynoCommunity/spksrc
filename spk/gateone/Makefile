@@ -45,7 +45,7 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 	install -m 755 -d $(STAGING_DIR)/app/help
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/index.conf
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
-	for language in fre; do \
+	for language in fre enu; do \
 		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
 		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \

@@ -11,9 +11,12 @@
 	sur un ou plusieurs serveurs.
 	</p>
 	<p>Site web de l'éditeur : <a href="http://liftoffsoftware.com/Products/GateOne">liftoffsoftware.com</a></p>
-	<p>Par défaut, GateOne écoute sur le port TCP 8022. Pour y accéder depuis internet, vouc avez deux possibilités :
-	soit en router le port sur le routeur, soit en utilisant le paquet HAProxy qui permettra alors de disposer de
-	GateOne derrière un même port 443 pour plusieurs services HTTPS (DSM, etc).
+	<h2>Paramétrage</h2>
+	<p>Par défaut, GateOne écoute sur le port TCP 8022. Pour y accéder depuis internet, vous avez deux possibilités :
 	</p>
+	<ul>
+	    <li>modifier la paramétrage du routeur principal</li>
+	    <li>utilisant le paquet HAProxy qui permettra alors d'utiliser de multiplexer le port 443 du NAS vers différents services</li>
+	</ul>
     </body>
 </html>

@@ -187,8 +187,8 @@ class SickBeard(Base):
         if configure_for == 'nzbget':
             nzbget = NZBGet()
             self.config['General']['nzb_method'] = 'nzbget'
-            self.config['NZBget']['nzbget_password'] = nzbget.config['ServerPassword']
-            self.config['NZBget']['nzbget_host'] = 'localhost:' + nzbget.config['ServerPort']
+            self.config['NZBget']['nzbget_password'] = nzbget.config['ControlPassword']
+            self.config['NZBget']['nzbget_host'] = 'localhost:' + nzbget.config['ControlPort']
             os.chown(self.postprocessing_config_path, pwd.getpwnam('nzbget')[2], -1)
         self.config.write()
         subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
@@ -200,8 +200,8 @@ class SickBeard(Base):
             self.config['SABnzbd']['sab_password'] == sabnzbd.config['misc']['password'] and self.config['SABnzbd']['sab_apikey'] == sabnzbd.config['misc']['api_key'] and
             self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port'] + '/' and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'sabnzbd'):
             return SABNZBD
-        if (nzbget.is_installed() and self.config['General']['nzb_method'] == 'nzbget' and self.config['NZBget']['nzbget_password'] == nzbget.config['ServerPassword'] and
-            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ServerPort'] and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'nzbget'):
+        if (nzbget.is_installed() and self.config['General']['nzb_method'] == 'nzbget' and self.config['NZBget']['nzbget_password'] == nzbget.config['ControlPassword'] and
+            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ControlPort'] and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'nzbget'):
             return NZBGET
         return UNDEFINED
 
@@ -245,8 +245,8 @@ class CouchPotato(Base):
         if configure_for == 'nzbget':
             nzbget = NZBGet()
             self.config['NZB']['sendto'] = 'Nzbget'
-            self.config['Nzbget']['password'] = nzbget.config['ServerPassword']
-            self.config['Nzbget']['host'] = 'localhost:' + nzbget.config['ServerPort']
+            self.config['Nzbget']['password'] = nzbget.config['ControlPassword']
+            self.config['Nzbget']['host'] = 'localhost:' + nzbget.config['ControlPort']
         self.config.write()
         subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
 
@@ -257,8 +257,8 @@ class CouchPotato(Base):
             self.config['Sabnzbd']['password'] == sabnzbd.config['misc']['password'] and self.config['Sabnzbd']['apikey'] == sabnzbd.config['misc']['api_key'] and
             self.config['Sabnzbd']['host'] == 'localhost:' + sabnzbd.config['misc']['port']):
             return SABNZBD
-        if (nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget' and self.config['Nzbget']['password'] == nzbget.config['ServerPassword'] and
-            self.config['Nzbget']['host'] == 'localhost:' + nzbget.config['ServerPort']):
+        if (nzbget.is_installed() and self.config['NZB']['sendto'] == 'Nzbget' and self.config['Nzbget']['password'] == nzbget.config['ControlPassword'] and
+            self.config['Nzbget']['host'] == 'localhost:' + nzbget.config['ControlPort']):
             return NZBGET
         return UNDEFINED
 
@@ -297,8 +297,8 @@ class CouchPotatoServer(Base):
             nzbget = NZBGet()
             self.config.set('sabnzbd', 'enabled', 0)
             self.config.set('nzbget', 'enabled', 1)
-            self.config.set('nzbget', 'password', nzbget.config['ServerPassword'])
-            self.config.set('nzbget', 'host', 'localhost:' + nzbget.config['ServerPort'])
+            self.config.set('nzbget', 'password', nzbget.config['ControlPassword'])
+            self.config.set('nzbget', 'host', 'localhost:' + nzbget.config['ControlPort'])
         with open(self.config_path, 'w') as config_file:
             self.config.write(config_file)
         subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
@@ -309,8 +309,8 @@ class CouchPotatoServer(Base):
         if (sabnzbd.is_installed() and self.config.getboolean('sabnzbd', 'enabled') and self.config.get('sabnzbd', 'api_key') == sabnzbd.config['misc']['api_key'] and
             self.config.get('sabnzbd', 'host') == 'localhost:' + sabnzbd.config['misc']['port']):
             return SABNZBD
-        if (nzbget.is_installed() and self.config.getboolean('nzbget', 'enabled') and self.config.get('nzbget', 'password') == nzbget.config['ServerPassword'] and
-            self.config.get('nzbget', 'host') == 'localhost:' + nzbget.config['ServerPort']):
+        if (nzbget.is_installed() and self.config.getboolean('nzbget', 'enabled') and self.config.get('nzbget', 'password') == nzbget.config['ControlPassword'] and
+            self.config.get('nzbget', 'host') == 'localhost:' + nzbget.config['ControlPort']):
             return NZBGET
         return UNDEFINED
 

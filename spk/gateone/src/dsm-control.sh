@@ -16,9 +16,14 @@ RUNAS="gateone"
 
 start_daemon()
 {
-    perl ${INSTALL_DIR}/var/conf/setConf.pl
+    if [ ! -f ${INSTALL_DIR}/var/conf/gateone.conf ]; then
+        perl ${INSTALL_DIR}/var/conf/setConf.pl
+    fi
+    cp  /usr/syno/etc/ssl/ssl.crt/server.crt ${INSTALL_DIR}/var/
+    cp /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/var/
+    chown -R ${RUNAS}:users ${INSTALL_DIR}/var/*
 
-    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} --uid=`awk -v val=${RUNAS} -F ":" '$1==val{print $3}' /etc/passwd`&
+    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} --uid=`awk -v val=${RUNAS} -F ":" '$1==val{print $3}' /etc/passwd` --gid=`awk -v val=users -F ":" '$1==val{print $3}' /etc/group` > ${INSTALL_DIR}/var/gateone_startup.log &
 }
 
 stop_daemon()
@@ -65,6 +70,21 @@ case $1 in
             echo ${DNAME} is not running
         fi
         ;;
+    restart)
+        if daemon_status; then
+            echo Stopping ${DNAME} ...
+            stop_daemon
+        else
+            echo ${DNAME} is not running
+        fi
+ 	sleep 2
+	if daemon_status; then
+            echo ${DNAME} is already running
+        else
+            echo Starting ${DNAME} ...
+            start_daemon
+        fi
+        ;;
     status)
         if daemon_status; then
             echo ${DNAME} is running
@@ -81,4 +101,5 @@ case $1 in
         exit 1
         ;;
 esac
+
 
