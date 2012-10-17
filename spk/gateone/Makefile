@@ -31,24 +31,26 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 	install -m 755 -d $(STAGING_DIR)/var/conf
 	install -m 770 -d $(STAGING_DIR)/var/sessions
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/help
 	install -m 755 $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/dtach $(STAGING_DIR)/bin/
-	install -m 644 src/app/config.tpl $(STAGING_DIR)/app/config.tpl
-	install -m 644 src/gateone.tpl $(STAGING_DIR)/var/conf/gateone.tpl
-	install -m 755 src/setConf.pl $(STAGING_DIR)/var/conf/setConf.pl
+	install -m 644 src/app/config $(STAGING_DIR)/app/
+	install -m 755 src/app/gateone.cgi $(STAGING_DIR)/app/
+	install -m 644 src/gateone.tpl $(STAGING_DIR)/var/conf/
+	install -m 755 src/setConf.pl $(STAGING_DIR)/var/conf/
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-	install -m 755 -d $(STAGING_DIR)/app/texts
-	install -m 755 -d $(STAGING_DIR)/app/help
-	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/index.conf
-	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
+	install -m 755 -d $(STAGING_DIR)/help/texts
+	install -m 755 -d $(STAGING_DIR)/help/help
+	install -m 644 src/help/index.conf $(STAGING_DIR)/help/
+	install -m 644 src/help/helptoc.conf $(STAGING_DIR)/help/
 	for language in fre enu; do \
-		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
-		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
-		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
-		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
+		install -m 755 -d $(STAGING_DIR)/help/help/$${language}; \
+		install -m 755 -d $(STAGING_DIR)/help/texts/$${language}; \
+		install -m 644 src/help/help/$${language}/*.html $(STAGING_DIR)/help/help/$${language}/; \
+		install -m 644 src/help/texts/$${language}/strings $(STAGING_DIR)/help/texts/$${language}/strings; \
 	done
 
 $(STAGING_DIR)/share/requirements.pybundle:
