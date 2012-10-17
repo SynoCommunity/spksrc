@@ -43,8 +43,8 @@ postinst ()
     chown -R ${RUNAS}:users ${SYNOPKG_PKGDEST}
 
     # Index help files
-    pkgindexer_add ${INSTALL_DIR}/app/index.conf > /dev/null
-    pkgindexer_add ${INSTALL_DIR}/app/helptoc.conf > /dev/null
+    pkgindexer_add ${INSTALL_DIR}/help/index.conf > /dev/null
+    pkgindexer_add ${INSTALL_DIR}/help/helptoc.conf > /dev/null
 
     exit 0
 }

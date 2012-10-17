@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>GateOne</title>
+        <link href="/webman/help/help.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <h1>GateOne</h1>
+	<h2>Description</h2>
+	<p>GateOne is an HTML5 web-based terminal emulator and SSH client. Top features:</p>
+	<ul>
+	    <li>No browser plugins are required!</li>
+	    <li>Supports multiple simultaneous terminal sessions.</li>
+	    <li>Advanced terminal emulation including support for 256 colors, fancy text styles, and more.</li>
+	    <li>Supports displaying PNG and JPEG images inline within terminals (see screenshots).</li>
+	    <li>Type in your native language! Gate One supports Unicode, non-English keyboard layouts, and localized strings (internationalization or i18n).</li>
+	    <li>Natural copy & paste: Highlight text and use your browser's native context menu. On Linux desktops you can also middle-click-to-paste.</li>
+	    <li>Terminal sessions can be resumed even if the browser is closed or disconnected. They can also be resumed from a completely different computer.</li>
+	    <li>Supports server-side logging of user sessions via any combination of syslog, remote syslog, or directly to disk.</li>
+	    <li>Gate One can be embedded into--and completely controlled by--other applications. A few lines of JavaScript is all it takes!</li>
+	    <li>Many authentication mechanisms are supported: Anonymous, Kerberos (Single Sign-On with Active Directory!), PAM, Google Auth, and there's an OpenID-like WebSocket API for applications embedding Gate One (see the chat app in the tests directory for an example of how it works).</li>
+	    <li>Gate One is easy to customize: Themes and plugins can add features or override just about anything. In fact, Gate One's SSH functionality is implemented entirely via a plugin.</li>
+	    <li>Plugins can be written in any combination of Python, JavaScript, or CSS.</li>
+	    <li>The Gate One server can be stopped & started without users losing their running terminal applications (even SSH sessions stay connected!).</li>
+	    <li>The SSH plugin allows users to duplicate sessions without having to re-enter their username and password (it re-uses the existing SSH tunnel). It also supports key-based authentication and includes an SSH identity manager that supports RSA, DSA, ECDSA, and even X.509 certificates.</li>
+	    <li>The Logging plugin includes a Log Viewer that allows users to sort, view, and even export recordings of their terminal sessions to self-contained HTML files that can be shared. Demonstrating anything on the command line can be as simple as performing the task and exporting the log!</li>
+	    <li>The Playback plugin allows users to "rewind" and play back their connected terminal sessions in real-time, just like a video! This can be done via the playback controls or by holding the shift key while scrolling.</li>
+	</ul>
+	<p>More information can be found at : <a href="http://liftoffsoftware.com/Products/GateOne">liftoffsoftware.com</a></p>
+	<h2>Parameters</h2>
+	<p>By default, GateOne listens TCP port 8022. To connect, two ways :</p>
+	</p>
+	<ul>
+	    <li>change main routeur configuration</li>
+	    <li>use HAProxy package in order to multiplexe TCP port 443 with differents services on your NAS</li>
+	</ul>
+    </body>
+</html>
