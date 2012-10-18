@@ -20,9 +20,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile: 
-	$(RUN) $(MAKE) TARGET=generic CC=$(CC) LD=$(CC) ARCH= CPU=generic PREFIX=$(INSTALL_PREFIX) USE_OPENSSL=1 ADDINC=-I${WORK_DIR}/install/usr/local/haproxy/include ADDLIB=-L${WORK_DIR}/install/usr/local/haproxy/lib
+	$(RUN) $(MAKE) TARGET=generic CPU=generic ARCH= USE_OPENSSL=1
 
 myInstall:
-	echo "Install"
-	@$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) SBINDIR=/usr/local/haproxy/bin
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 

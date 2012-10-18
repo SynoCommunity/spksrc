@@ -6,44 +6,52 @@
     </head>
     <body>
         <h1>HAProxy</h1>
-	<h2>Description</h2>
-	<p>Haproxy est un reverse proxy HTTP / HTTPS qui supporte également les websockets
-	le rendant ainsi compatible avec GateOne par exemple. Grâce à lui, il est possible, 
-	derrière le même port 80 (HTTP) ou 443 (HTTPS) de servir plusieurs services du NAS 
-	Synology proposés normalement sur des ports TCP différents.
-	</p>
-	<p>Site web de l'éditeur : <a href="http://haproxy.1wt.eu/">haproxy.1wt.eu</a></p>
-	<h2>Préalables</h2>
-	<p>Pour fonctionner de manière optimale, il est conseillé de suivre les préconisations 
-	suivantes :</p>
-	<ol>
-		<li>le NAS doit être enregistré auprès d'un DDNS (celui de synology fonctionne très bien)</li>
-		<li>https (et donc également les certificats associés) doit être fonctionnel. Le plus simple est
-		de créer un certificat auto-signé pour *.&lt;ddns synology&gt;</li>
-		<li>haproxy écoute sur les ports 30080 pour HTTP et 30443 pour HTTPS, il est donc nécessaire de
-		router les ports 80 et 443 du routeur réseau respectivement vers les ports 30080 et 30443 du NAS</li>
-	</ol>
-	<h2>Services exposés</h2>
-	<p>Un fois le package haproxy démarré les services suivants sont accessibles:</p>
-	<ul>
-		<li>dsm.&lt;DDNS&gt; : le DSM du syno</li>
-		<li>surveillance.&lt;DDNS&gt; : surveillance station (activer le port personnalisé dans le portail des applications)</li>
-		<li>file.&lt;DDNS&gt; : file station (activer le port personnalisé dans le portail des applications)</li>
-		<li>sab.&lt;DDNS&gt; : sabnzbd</li>
-		<li>gateone.&lt;DDNS&gt; : gateone (le paquet GateOne doit être préalablement installé</li>
-		<li>dav.&lt;DDNS&gt; : webdav</li>
-		<li>audio.&lt;DDNS&gt; : audio station (activer le port personnalisé dans le portail des applications)</li>
-		<li>download.&lt;DDNS&gt; : download station (activer le port personnalisé dans le portail des applications)</li>
-		<li>video.&lt;DDNS&gt; : video station (activer le port personnalisé dans le portail des applications)</li>
-		<li>symform.&lt;DDNS&gt; : Symform (le paquet Symform doit être préalablement installé)</li>
-		<li>www.&lt;DDNS&gt; : webstation (en particlier www.&lt;DDNS&gt;/photo permet d'accéder à photo station)</li>
-		<li>ssh.&lt;DDNS&gt; : accès ssh direct depuis internet sur le port 443.</li>
-	</ul>
-	<p>Les numéros de port sont calculés automatiquement à partir des fichiers de configuration. 
-	Il est possible de modifier ou ajouter un service en modifiant le fichier /usr/local/haproxy/conf/haproxy.ini.
-	Un nouveau fichier de configuration est généré automatiquement au démarrage de HAProxy. Il est également possible de définir 
-	une redirection automatique HTTP vers HTTPS en mettant 'redirect' en port HTTP pour le service concerné.
-	</p>
-
+        <p>HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité,
+           la répartition de charge et le proxy de services TCP ou HTTP.</p>
+        <h3>Configuration</h3>
+        <p>Dans ce panneau, vous pouvez voir le statut de HAProxy et effectuer des tâches de configuration. Si le statut est <b>Arrêté</b>
+           il y a probablement un problème de configuration. Corrigez la configuration puis cliquez sur <b>Ecrire configuration</b>.</p>
+        <h4>Ecrire configuration</h4>
+        <p>Ecrit le fichier de configuration selon les données contenues dans les panneaux Frontends, Backends et Associations.</p>
+        <h4>Recharger les valeurs par défaut</h4>
+        <p>Recharge les valeurs par défaut de HAProxy.</p>
+        <p><span class="note_head">Attention : </span>Les changements que vous avez effectué dans les panneaux Frontends,
+           Backends et Associations seront perdus</p>
+        <p><span class="note_head">Remarque : </span>Ces deux actions redémarreront HAProxy</p>
+        <h4>Générer le certificat</h4>
+        <p>Créé un certificat depuis celui utilisé par DSM. Après avoir importé un nouveau certificat dans DSM, utilisez cette fonction pour
+           l'utiliser aussi avec HAProxy.</p>
+        <h3>Frontends</h3>
+        <p>La tâche d'un Frontend est d'écouter le trafic entrant sur un ou plusieurs ports. Vous pouvez <b>Ajouter</b>, <b>Modifier</b> ou
+           <b>Supprimer</b> des Frontends à l'aide des boutons dédiés.</p>
+        <ol>
+            <li>Nom: Nom du Frontend sans espaces (par exemple : http)</li>
+            <li>Binds: <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#bind">bind</a> séparés par des virgules
+                (par exemple :5080, me.synology.me:5081)</li>
+            <li>Options: Lignes supplémentaires à insérer à la configuration du Frontend (par exemple maxconn 128), voir la
+                <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4.1">documentation</a> pour la liste
+                des options possibles pour un Frontend</li>
+        </ol>
+        <h3>Backends</h3>
+        <p>Un Backend est un service existant comme SickBeard, Web Station ou ZNC qui utilise un port spécifique. Vous pouvez <b>Ajouter</b>,
+           <b>Modifier</b> ou <b>Supprimer</b> des Backends à l'aide des boutons dédiés.</p>
+        <ol>
+            <li>Nom: Nom du Backend sans espaces (par exemple sickbeard)</li>
+            <li>Serveurs: <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4-server">server</a> séparés par des virgules (par exemple sickbeard localhost:8081)</li>
+            <li>Options: Lignes supplémentaires à insérer à la configuration du Backend (par exemple maxconn 128, mode http), voir la
+                <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4.1">documentation</a> pour la liste
+                des options possibles pour un Backend</li>
+        </ol>
+        <h3>Associations</h3>
+        <p>Une Association lie un Frontend à un Backend sous une certaine condition. Cela équivaut à une ligne
+           <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4-use_backend">use_backend</a> dans le fichier de configuration.</p>
+        <ol>
+            <li>Frontend: Frontend pour l'Association (par exemple http)</li>
+            <li>Backend: Backend pour l'Association (par exemple sickbeard)</li>
+            <li>Condition: Condition pour que le Frontend utilise le Backend (par exemple if { hdr_dom(Host) -i blackhole }), voir la                                                                                                                                                      
+                <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#7">documentation</a> pour la syntaxe
+                d'une condition. Vous pouvez ajouter des ACLs dans les options du Frontend ou utiliser des ACLs anonymes</li>
+        </ol>
+        <p><span class="note_head">Remarque : </span>Supprimer un Frontend ou un Backend supprimera aussi toutes leurs Associations</p>
     </body>
 </html>
