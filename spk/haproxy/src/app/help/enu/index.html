@@ -11,12 +11,12 @@
         <h3>Configuration</h3>
         <p>In this panel, you can view the status of HAProxy and perform configuration tasks. If status is <b>Stopped</b>
            there is a problem with the configuration. Fix the configuration then click <b>Write configuration</b>.</p>
+        <p><span class="note_head">Note: </span>The actions below will restart HAProxy</p>
         <h4>Write configuration</h4>
         <p>This will write the configuration file based on data in panels Frontends, Backends and Associations</p>
-        <h4>Reload default</h4>
-        <p>Reload default configuration for HAProxy.</p>
+        <h4>Reload default configuration</h4>
+        <p>Reload the default configuration of HAProxy.</p>
         <p><span class="note_head">Warning: </span>Your changes in panels Frontends, Backends and Associations will be lost</p>
-        <p><span class="note_head">Remarque : </span>Those actions will restart HAProxy</p>
         <h4>Generate certificate</h4>
         <p>Create a certificate from the one used for DSM. After changing your certificate in DSM, use this to use it with HAProxy.</p>
         <h3>Frontends</h3>
@@ -42,7 +42,8 @@
         </ol>
         <h3>Associations</h3>
         <p>An Association links a Frontend with a Backend under a given condition. It will result in a
-           <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4-use_backend">use_backend</a> line in the confiuration file.</p>
+           <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4-use_backend">use_backend</a> line in the confiuration file.
+           You can <b>Add</b>, <b>Edit</b> or <b>Delete</b> Associations with the dedicated buttons.</p>
         <ol>
             <li>Frontend: Frontend for the Association (e.g. http)</li>
             <li>Backend: Backend for the Association (e.g. sickbeard)</li>
