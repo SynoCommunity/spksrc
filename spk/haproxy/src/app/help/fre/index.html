@@ -11,13 +11,13 @@
         <h3>Configuration</h3>
         <p>Dans ce panneau, vous pouvez voir le statut de HAProxy et effectuer des tâches de configuration. Si le statut est <b>Arrêté</b>
            il y a probablement un problème de configuration. Corrigez la configuration puis cliquez sur <b>Ecrire configuration</b>.</p>
+        <p><span class="note_head">Remarque : </span>Les actions ci-dessous redémarreront HAProxy</p>
         <h4>Ecrire configuration</h4>
         <p>Ecrit le fichier de configuration selon les données contenues dans les panneaux Frontends, Backends et Associations.</p>
-        <h4>Recharger les valeurs par défaut</h4>
+        <h4>Recharger la configuration par défaut</h4>
         <p>Recharge les valeurs par défaut de HAProxy.</p>
         <p><span class="note_head">Attention : </span>Les changements que vous avez effectué dans les panneaux Frontends,
            Backends et Associations seront perdus</p>
-        <p><span class="note_head">Remarque : </span>Ces deux actions redémarreront HAProxy</p>
         <h4>Générer le certificat</h4>
         <p>Créé un certificat depuis celui utilisé par DSM. Après avoir importé un nouveau certificat dans DSM, utilisez cette fonction pour
            l'utiliser aussi avec HAProxy.</p>
@@ -44,7 +44,8 @@
         </ol>
         <h3>Associations</h3>
         <p>Une Association lie un Frontend à un Backend sous une certaine condition. Cela équivaut à une ligne
-           <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4-use_backend">use_backend</a> dans le fichier de configuration.</p>
+           <a href="http://cbonte.github.com/haproxy-dconv/configuration-1.5.html#4-use_backend">use_backend</a> dans le fichier de configuration.
+           Vous pouvez <b>Ajouter</b>, <b>Modifier</b> ou <b>Supprimer</b> des Associations à l'aide des boutons dédiés.</p>
         <ol>
             <li>Frontend: Frontend pour l'Association (par exemple http)</li>
             <li>Backend: Backend pour l'Association (par exemple sickbeard)</li>
