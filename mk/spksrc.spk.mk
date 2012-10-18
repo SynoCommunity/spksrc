@@ -75,8 +75,11 @@ endif
 ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
 endif
+ifneq ($(strip $(ADMIN_PROTOCOL)),)
+	@echo adminprotocol=\"$(ADMIN_PROTOCOL)\" >> $@
+endif
 ifneq ($(strip $(ADMIN_PORT)),)
-	@echo adminport=$(ADMIN_PORT) >> $@
+	@echo adminport=\"$(ADMIN_PORT)\" >> $@
 endif
 ifneq ($(strip $(ADMIN_URL)),)
 	@echo adminurl=\"$(ADMIN_URL)\" >> $@
