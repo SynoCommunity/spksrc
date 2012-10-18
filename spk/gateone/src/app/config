@@ -5,7 +5,7 @@
             "desc": "GateOne Web UI",
             "icon": "images/gateone-{0}.png",
             "type": "legacy",
-            "url": "https://gateone.==:DDNS:==/",
+            "url": "/webman/3rdparty/gateone/gateone.cgi",
             "allUsers": true
         }
     }

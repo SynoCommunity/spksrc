@@ -19,4 +19,3 @@ debug = False
 auth = None
 log_file_prefix = "/usr/local/gateone/var/gateone.log"
 origins="*"
-

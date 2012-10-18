@@ -3,9 +3,8 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
-BETA = 1
 
-DEPENDS  =
+DEPENDS  = cross/busybox cross/dtach
 SPK_DEPENDS = "python>=2.7.3-1"
 
 MAINTAINER = SynoCommunity
@@ -22,11 +21,7 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = gateone_extra_install
-
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
@@ -36,13 +31,26 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 	install -m 755 -d $(STAGING_DIR)/var/conf
 	install -m 770 -d $(STAGING_DIR)/var/sessions
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config.tpl $(STAGING_DIR)/app/config.tpl
-	install -m 644 src/gateone.tpl $(STAGING_DIR)/var/conf/gateone.tpl
-	install -m 755 src/setConf.pl $(STAGING_DIR)/var/conf/setConf.pl
+	install -m 755 -d $(STAGING_DIR)/help
+	install -m 755 $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/dtach $(STAGING_DIR)/bin/
+	install -m 644 src/app/config $(STAGING_DIR)/app/
+	install -m 755 src/app/gateone.cgi $(STAGING_DIR)/app/
+	install -m 644 src/gateone.tpl $(STAGING_DIR)/var/conf/
+	install -m 755 src/setConf.pl $(STAGING_DIR)/var/conf/
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+	done
+	install -m 755 -d $(STAGING_DIR)/help/texts
+	install -m 755 -d $(STAGING_DIR)/help/help
+	install -m 644 src/help/index.conf $(STAGING_DIR)/help/
+	install -m 644 src/help/helptoc.conf $(STAGING_DIR)/help/
+	for language in fre enu; do \
+		install -m 755 -d $(STAGING_DIR)/help/help/$${language}; \
+		install -m 755 -d $(STAGING_DIR)/help/texts/$${language}; \
+		install -m 644 src/help/help/$${language}/*.html $(STAGING_DIR)/help/help/$${language}/; \
+		install -m 644 src/help/texts/$${language}/strings $(STAGING_DIR)/help/texts/$${language}/strings; \
 	done
 
 $(STAGING_DIR)/share/requirements.pybundle:
