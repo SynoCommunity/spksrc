@@ -1,0 +1,23 @@
+{
+    "haproxy.js": {
+        "SYNOCOMMUNITY.HAProxy.AppInstance": {
+            "type": "app",
+            "title": "app:app_name",
+            "version": "0.1",
+            "icon": "images/haproxy-{0}.png",
+            "texts": "texts",
+            "allowMultiInstance": false,
+            "appWindow": "SYNOCOMMUNITY.HAProxy.AppWindow",
+            "depend": ["SYNOCOMMUNITY.HAProxy.AppWindow"]
+        },
+        "SYNOCOMMUNITY.HAProxy.AppWindow": {
+            "type": "lib",
+            "title": "app:app_name",
+            "icon": "images/haproxy-{0}.png",
+            "texts": "texts",
+            "depend": ["SYNOCOMMUNITY.HAProxy.ListView", "SYNOCOMMUNITY.HAProxy.MainCardPanel"]
+        },
+        "SYNOCOMMUNITY.HAProxy.ListView": [],
+        "SYNOCOMMUNITY.HAProxy.MainCardPanel": []
+    }
+}

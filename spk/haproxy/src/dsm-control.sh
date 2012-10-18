@@ -6,28 +6,33 @@ DNAME="HAProxy"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-HAPROXY="${INSTALL_DIR}/bin/haproxy"
-CFG_FILE="${INSTALL_DIR}/var/haproxy.conf"
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="haproxy"
+PYTHON="${INSTALL_DIR}/env/bin/python"
+HAPROXY="${INSTALL_DIR}/sbin/haproxy"
 PID_FILE="${INSTALL_DIR}/var/haproxy.pid"
+CFG_FILE="${INSTALL_DIR}/var/haproxy.cfg"
 
-start_daemon ()
+
+start_daemon()
 {
-    PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -p ${PID_FILE} -D
+    su - ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -p ${PID_FILE}"
 }
 
-stop_daemon ()
+stop_daemon()
 {
     kill `cat ${PID_FILE}`
     wait_for_status 1 20
     rm -f ${PID_FILE}
 }
 
-daemon_status ()
+daemon_status()
 {
     if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
         return 0
     fi
+    rm -f ${PID_FILE}
     return 1
 }
 
@@ -42,6 +47,7 @@ wait_for_status()
     done
 }
 
+
 case $1 in
     start)
         if daemon_status; then
@@ -49,8 +55,6 @@ case $1 in
             exit 0
         else
             echo Starting ${DNAME} ...
-            cd ${INSTALL_DIR}/var
-            perl genConf.pl
             start_daemon
             exit $?
         fi
@@ -74,40 +78,7 @@ case $1 in
             exit 1
         fi
         ;;
-    check)
-        cd ${INSTALL_DIR}/var
-        perl genConf.pl
-        PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -c
-        exit $?
-        ;;
-    restart)
-        cd ${INSTALL_DIR}/var
-        perl genConf.pl
-        PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -c
-        if [ $? -eq 0 ]; then
-            if daemon_status; then
-                echo Stopping ${DNAME} ...
-                stop_daemon
-            else
-                echo ${DNAME} is not running
-            fi
-            sleep 3
-            if daemon_status; then
-                echo ${DNAME} is already running
-            else
-                echo Starting ${DNAME} ...
-                start_daemon
-            fi
-        else
-            echo Restarting ${DNAME} : aborted
-        fi
-        ;;
-    log)
-        echo ${LOG_FILE}
-        exit 0
-        ;;
     *)
         exit 1
         ;;
 esac
-
