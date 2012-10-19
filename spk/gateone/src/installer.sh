@@ -10,9 +10,9 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-CFG_FILE="${INSTALL_DIR}/var/config.ini"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 RUNAS="gateone"
+
 
 preinst ()
 {
@@ -37,20 +37,22 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
     rm -fr ${INSTALL_DIR}/var/build
 
-    PATH=${PATH} ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}
+    # Install GateOne
+    ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}
 
     # Correct the files ownership
-    chown -R ${RUNAS}:users ${SYNOPKG_PKGDEST}
-
-    # Index help files
-    pkgindexer_add ${INSTALL_DIR}/help/index.conf > /dev/null
-    pkgindexer_add ${INSTALL_DIR}/help/helptoc.conf > /dev/null
+    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
+    # Remove the user (if not upgrading)
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        deluser ${RUNAS}
+    fi
+
     exit 0
 }
 
@@ -58,7 +60,6 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
-    deluser ${RUNAS}
 
     exit 0
 }
@@ -78,8 +79,8 @@ postupgrade ()
     # Restore some stuff
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    chown -R ${RUNAS}:root ${INSTALL_DIR}/var
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
 }
-
