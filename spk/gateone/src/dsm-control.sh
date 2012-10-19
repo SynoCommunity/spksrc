@@ -10,18 +10,18 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 GATEONE="${INSTALL_DIR}/gateone/gateone.py"
-CFG_FILE="${INSTALL_DIR}/var/conf/gateone.conf"
+CFG_FILE="${INSTALL_DIR}/var/server.conf"
 PID_FILE="${INSTALL_DIR}/var/gateone.pid"
 RUNAS="gateone"
 
+
 start_daemon()
 {
-    perl ${INSTALL_DIR}/var/conf/setConf.pl
-	cp  /usr/syno/etc/ssl/ssl.crt/server.crt ${INSTALL_DIR}/var/
-	cp /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/var/
-	chown -R ${RUNAS}:users ${INSTALL_DIR}/var/*
+    # Copy certificate
+    cp  /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
+    chown ${RUNAS} ${INSTALL_DIR}/ssl/*
 
-    PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} --uid=`awk -v val=${RUNAS} -F ":" '$1==val{print $3}' /etc/passwd`&
+    su - ${RUNAS} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} > ${INSTALL_DIR}/var/gateone_startup.log &"
 }
 
 stop_daemon()
@@ -66,21 +66,6 @@ case $1 in
             stop_daemon
         else
             echo ${DNAME} is not running
-        fi
-        ;;
-    restart)
-        if daemon_status; then
-            echo Stopping ${DNAME} ...
-            stop_daemon
-        else
-            echo ${DNAME} is not running
-        fi
- 	sleep 2
-	if daemon_status; then
-            echo ${DNAME} is already running
-        else
-            echo Starting ${DNAME} ...
-            start_daemon
         fi
         ;;
     status)
