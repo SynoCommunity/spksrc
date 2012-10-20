@@ -1,0 +1,219 @@
+diff -Naud ../libpar2-0.2.orig/letype.h ../libpar2-0.2/letype.h
+--- ../libpar2-0.2.orig/letype.h	2007-11-26 16:41:58.000000000 -0500
++++ ../libpar2-0.2/letype.h	2007-11-26 16:55:00.000000000 -0500
+@@ -28,44 +28,15 @@
+ 
+ #else
+ 
+-class leu16
++struct leu16
+ {
+-public:
+-  leu16(void);
+-
+-  leu16(const leu16 &other);
+-  leu16& operator=(const leu16 &other);
+-
+-  leu16(const u16 &other);
+   leu16& operator=(const u16 &other);
+ 
+   operator u16(void) const;
+ 
+-protected:
+   u16 value;
+ };
+ 
+-inline leu16::leu16(void)
+-{
+-}
+-
+-inline leu16::leu16(const leu16 &other)
+-: value(other.value)
+-{
+-}
+-
+-inline leu16& leu16::operator =(const leu16 &other)
+-{
+-  value = other.value;
+-  return *this;
+-}
+-
+-inline leu16::leu16(const u16 &other)
+-{
+-  ((unsigned char*)&value)[0] = (unsigned char)((other >> 0) & 0xff);
+-  ((unsigned char*)&value)[1] = (unsigned char)((other >> 8) & 0xff);
+-}
+-
+ inline leu16& leu16::operator=(const u16 &other)
+ {
+   ((unsigned char*)&value)[0] = (unsigned char)((other >> 0) & 0xff);
+@@ -81,46 +52,15 @@
+ }
+ 
+ 
+-class leu32
++struct leu32
+ {
+-public:
+-  leu32(void);
+-
+-  leu32(const leu32 &other);
+-  leu32& operator=(const leu32 &other);
+-
+-  leu32(const u32 &other);
+   leu32& operator=(const u32 &other);
+ 
+   operator u32(void) const;
+ 
+-protected:
+   u32 value;
+ };
+ 
+-inline leu32::leu32(void)
+-{
+-}
+-
+-inline leu32::leu32(const leu32 &other)
+-: value(other.value)
+-{
+-}
+-
+-inline leu32& leu32::operator =(const leu32 &other)
+-{
+-  value = other.value;
+-  return *this;
+-}
+-
+-inline leu32::leu32(const u32 &other)
+-{
+-  ((unsigned char*)&value)[0] = (unsigned char)((other >> 0) & 0xff);
+-  ((unsigned char*)&value)[1] = (unsigned char)((other >> 8) & 0xff);
+-  ((unsigned char*)&value)[2] = (unsigned char)((other >> 16) & 0xff);
+-  ((unsigned char*)&value)[3] = (unsigned char)((other >> 24) & 0xff);
+-}
+-
+ inline leu32& leu32::operator=(const u32 &other)
+ {
+   ((unsigned char*)&value)[0] = (unsigned char)((other >> 0) & 0xff);
+@@ -140,50 +80,15 @@
+ }
+ 
+ 
+-class leu64
++struct leu64
+ {
+-public:
+-  leu64(void);
+-
+-  leu64(const leu64 &other);
+-  leu64& operator=(const leu64 &other);
+-
+-  leu64(const u64 &other);
+   leu64& operator=(const u64 &other);
+ 
+   operator u64(void) const;
+ 
+-protected:
+   u64 value;
+ };
+ 
+-inline leu64::leu64(void)
+-{
+-}
+-
+-inline leu64::leu64(const leu64 &other)
+-: value(other.value)
+-{
+-}
+-
+-inline leu64& leu64::operator =(const leu64 &other)
+-{
+-  value = other.value;
+-  return *this;
+-}
+-
+-inline leu64::leu64(const u64 &other)
+-{
+-  ((unsigned char*)&value)[0] = (unsigned char)((other >> 0) & 0xff);
+-  ((unsigned char*)&value)[1] = (unsigned char)((other >> 8) & 0xff);
+-  ((unsigned char*)&value)[2] = (unsigned char)((other >> 16) & 0xff);
+-  ((unsigned char*)&value)[3] = (unsigned char)((other >> 24) & 0xff);
+-  ((unsigned char*)&value)[4] = (unsigned char)((other >> 32) & 0xff);
+-  ((unsigned char*)&value)[5] = (unsigned char)((other >> 40) & 0xff);
+-  ((unsigned char*)&value)[6] = (unsigned char)((other >> 48) & 0xff);
+-  ((unsigned char*)&value)[7] = (unsigned char)((other >> 56) & 0xff);
+-}
+-
+ inline leu64& leu64::operator=(const u64 &other)
+ {
+   ((unsigned char*)&value)[0] = (unsigned char)((other >> 0) & 0xff);
+diff -Naud ../libpar2-0.2.orig/md5.h ../libpar2-0.2/md5.h
+--- ../libpar2-0.2.orig/md5.h	2007-11-26 16:41:58.000000000 -0500
++++ ../libpar2-0.2/md5.h	2007-11-26 16:55:11.000000000 -0500
+@@ -20,6 +20,13 @@
+ #ifndef __MD5_H__
+ #define __MD5_H__
+ 
++#ifdef WIN32
++#pragma pack(push, 1)
++#define PACKED
++#else
++#define PACKED __attribute__ ((packed))
++#endif
++
+ // This file defines the MD5Hash and MD5Context objects which are used
+ // to compute and manipulate the MD5 Hash values for a block of data.
+ 
+@@ -35,12 +42,11 @@
+ 
+ // MD5 Hash value
+ 
+-class MD5Hash
+-{
+-public:
+-  // Constructor does not initialise the value
+-  MD5Hash(void) {};
++struct MD5Hash;
++ostream& operator<<(ostream &s, const MD5Hash &hash);
+ 
++struct MD5Hash
++{
+   // Comparison operators
+   bool operator==(const MD5Hash &other) const;
+   bool operator!=(const MD5Hash &other) const;
+@@ -54,13 +60,8 @@
+   friend ostream& operator<<(ostream &s, const MD5Hash &hash);
+   string print(void) const;
+ 
+-  // Copy and assignment
+-  MD5Hash(const MD5Hash &other);
+-  MD5Hash& operator=(const MD5Hash &other);
+-
+-public:
+   u8 hash[16]; // 16 byte MD5 Hash value
+-};
++} PACKED;
+ 
+ // Intermediate computation state
+ 
+@@ -144,16 +145,9 @@
+   return !other.operator<(*this);
+ }
+ 
+-inline MD5Hash::MD5Hash(const MD5Hash &other)
+-{
+-  memcpy(&hash, &other.hash, sizeof(hash));
+-}
+-
+-inline MD5Hash& MD5Hash::operator=(const MD5Hash &other)
+-{
+-  memcpy(&hash, &other.hash, sizeof(hash));
+-
+-  return *this;
+-}
++#ifdef WIN32
++#pragma pack(pop)
++#endif
++#undef PACKED
+ 
+ #endif // __MD5_H__
