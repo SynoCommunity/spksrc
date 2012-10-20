@@ -1,0 +1,18 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Administrator's login. Leave blank to use admin (cannot be changed)",
+        "subitems": [{
+            "key": "wizard_user",
+            "desc": "User name"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Administrator's password. Leave blank to use admin (cannot be changed)",
+        "subitems": [{
+            "key": "wizard_passwd",
+            "desc": "Password"
+        }]
+    }]
+}]

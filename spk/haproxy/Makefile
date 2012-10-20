@@ -1,5 +1,5 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5~dev12
+SPK_VERS = 1.5~ss20121019
 SPK_REV = 1
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
@@ -12,11 +12,14 @@ SPK_DEPENDS = "python>=2.7.3-1"
 MAINTAINER = SynoCommunity
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité, la répartition de charge et le proxy de services TCP ou HTTP.
+ADMIN_PORT=8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
+
+WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -31,10 +34,8 @@ include ../../mk/spksrc.spk.mk
 haproxy_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/crt
-	install -m 755 -d $(STAGING_DIR)/chroot
-	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/haproxy.cfg $(STAGING_DIR)/etc/haproxy.cfg
+	install -m 644 src/haproxy.cfg $(STAGING_DIR)/var/haproxy.cfg.tpl
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
