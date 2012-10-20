@@ -12,7 +12,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
 DESCRIPTION_FRE = Gate One est un émulateur de terminal et un client SSH fonctionnant en HTML5
 ADMIN_PROTOCOL = https
-ADMIN_PORT = 8071
+ADMIN_PORT = 8271
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
 
@@ -45,7 +45,7 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle $@ tornado
+	@cd $(WORK_DIR) && pip bundle $@ tornado configobj
 
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share
