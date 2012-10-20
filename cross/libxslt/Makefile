@@ -1,5 +1,5 @@
 PKG_NAME = libxslt
-PKG_VERS = 1.1.26
+PKG_VERS = 1.1.27
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://xmlsoft.org/$(PKG_NAME)
@@ -16,4 +16,3 @@ CONFIGURE_ARGS += --with-libxml-include-prefix=$(STAGING_INSTALL_PREFIX)/include
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
-
