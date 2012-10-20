@@ -18,7 +18,7 @@ Base = create_configuration()
 
 class Configuration(Base):
     path = u'/usr/local/haproxy/var/haproxy.cfg'
-    template = u'/usr/local/haproxy/etc/haproxy.cfg'
+    template = u'/usr/local/haproxy/var/haproxy.cfg.tpl'
     start_stop_status = u'/var/packages/haproxy/scripts/start-stop-status'
     crt_path = u'/usr/local/haproxy/var/crt/default.pem'
 

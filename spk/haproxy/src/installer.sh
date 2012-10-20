@@ -26,6 +26,10 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
 
+    # Edit the configuration according to the wizzard
+    sed -i -e "s/@user@/${wizard_user:=admin}/g" ${INSTALL_DIR}/var/haproxy.cfg.tpl
+    sed -i -e "s/@passwd@/${wizard_passwd:=admin}/g" ${INSTALL_DIR}/var/haproxy.cfg.tpl
+
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
