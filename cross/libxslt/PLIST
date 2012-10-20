@@ -1,8 +1,7 @@
-bin:bin/xslt-config
 bin:bin/xsltproc
 lnk:lib/libexslt.so
 lnk:lib/libexslt.so.0
-lib:lib/libexslt.so.0.8.15
+lib:lib/libexslt.so.0.8.16
 lnk:lib/libxslt.so
 lnk:lib/libxslt.so.1
-lib:lib/libxslt.so.1.1.26
+lib:lib/libxslt.so.1.1.27
