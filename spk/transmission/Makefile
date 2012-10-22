@@ -1,5 +1,5 @@
 SPK_NAME = transmission
-SPK_VERS = 2.71
+SPK_VERS = 2.72
 SPK_REV = 1
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
@@ -42,4 +42,3 @@ transmission_extra_install:
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
