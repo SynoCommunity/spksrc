@@ -57,8 +57,9 @@ endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
 	@echo beta=1 >> $@
-else
-	@echo helpurl=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
+endif
+ifneq ($(strip $(HELPURL)),)
+	@echo helpurl=\"$(HELPURL)\" >> $@
 endif
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
 	@echo install_dep_services=\"$(INSTALL_DEP_SERVICES)\" >> $@

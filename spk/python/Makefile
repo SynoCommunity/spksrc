@@ -12,6 +12,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language. This package is not startable, it is just required by other packages as dependency.
 DESCRIPTION_FRE = Langage de programmation Python. Ce paquet ne se lance pas, il est juste requis en tant que dépendance par d\\\'autres paquets.
 DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, solo es requerido como dependecia de otros paquetes.
+HELPURL = https://github.com/SynoCommunity/spksrc/issues
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
