@@ -51,5 +51,5 @@ nzbconfig_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ pyextdirect==0.3.1 configobj
+	@cd $(WORK_DIR) && $(PIP) bundle $@ pyextdirect==0.3.1 configobj
 

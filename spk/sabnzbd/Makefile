@@ -56,5 +56,5 @@ sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ configobj
+	@cd $(WORK_DIR) && $(PIP) bundle $@ configobj
 
