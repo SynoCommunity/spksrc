@@ -43,9 +43,6 @@ postinst ()
             mv ${CHROOTTARGET}/etc/apt/sources.list.default ${CHROOTTARGET}/etc/apt/sources.list && \
             mv ${CHROOTTARGET}/etc/apt/preferences.default ${CHROOTTARGET}/etc/apt/preferences && \
             touch ${INSTALL_DIR}/var/installed > /dev/null 2>&1 &
-        mkdir -p ${CHROOTTARGET}/proc
-        mkdir -p ${CHROOTTARGET}/dev/pts
-        mkdir -p ${CHROOTTARGET}/sys
         chmod 666 ${CHROOTTARGET}/dev/null
         chmod 666 ${CHROOTTARGET}/dev/tty
         chmod 777 ${CHROOTTARGET}/tmp
