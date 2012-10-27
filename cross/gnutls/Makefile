@@ -1,5 +1,5 @@
 PKG_NAME = gnutls
-PKG_VERS = 3.0.19
+PKG_VERS = 3.1.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.gnu.org/gnu/$(PKG_NAME)
