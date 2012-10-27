@@ -87,7 +87,7 @@ def default_config():
     session.add(Backend(id=15, name=u'surveillance', servers=u'surveillance localhost:9900 check'))
     session.add(Backend(id=16, name=u'video', servers=u'video localhost:9007 check'))
     session.add(Backend(id=17, name=u'file', servers=u'file localhost:7000 check'))
-    session.add(Backend(id=18, name=u'haproxy', servers=u'file localhost:8280 check'))
+    session.add(Backend(id=18, name=u'haproxy', servers=u'haproxy localhost:8280 check'))
     session.add(Frontend(id=1, name=u'http', binds=u':5080', default_backend_id=1))
     session.add(Frontend(id=2, name=u'https', binds=u':5443 ssl crt /usr/local/haproxy/var/crt/default.pem', default_backend_id=1))
     session.add(Association(frontend_id=2, backend_id=2, condition=u'if { hdr_beg(Host) -i dsm. }'))
