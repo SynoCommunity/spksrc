@@ -3,6 +3,7 @@ SPK_VERS = 0.1
 SPK_REV = 1
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS  =
 SPK_DEPENDS = "python>=2.7.3-1"
@@ -31,6 +32,9 @@ endif
 ifeq ($(findstring $(ARCH),bromolow cedarview x86),$(ARCH))
 DEBIAN_ARCH = i386
 endif
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+DEBIAN_ARCH = powerpc
+endif
 
 
 include ../../mk/spksrc.spk.mk
@@ -49,14 +53,12 @@ endif
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
-	install -m 644 src/app/db.py $(STAGING_DIR)/app/db.py
-	install -m 644 src/app/config.py $(STAGING_DIR)/app/config.py
-	install -m 644 src/app/api.py $(STAGING_DIR)/app/api.py
-	install -m 644 src/app/setup.py $(STAGING_DIR)/app/setup.py
-	install -m 644 src/app/debian-chroot.js $(STAGING_DIR)/app/debian-chroot.js
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
+	install -m 644 src/app/debian-chroot.js $(STAGING_DIR)/app/debian-chroot.js
+	install -m 755 src/app/setup.py $(STAGING_DIR)/app/setup.py
 	install -m 755 src/app/debian-chroot.cgi.py $(STAGING_DIR)/app/debian-chroot.cgi
-	install -m 755 src/app/debian-chroot-poll.cgi.py $(STAGING_DIR)/app/debian-chroot-poll.cgi
+	install -m 755 -d $(STAGING_DIR)/app/application
+	install -m 644 src/app/application/* $(STAGING_DIR)/app/application/
 	install -m 755 -d $(STAGING_DIR)/app/texts
 	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
@@ -66,11 +68,11 @@ endif
 		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
 	done
 	install -m 755 -d $(STAGING_DIR)/app/images
+	install -m 644 src/app/images/*.png $(STAGING_DIR)/app/images/
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-	install -m 644 src/app/images/* $(STAGING_DIR)/app/images/
 
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"

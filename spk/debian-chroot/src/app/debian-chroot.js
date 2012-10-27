@@ -8,7 +8,7 @@ _V = function (category, element) {
 
 // Direct API
 Ext.Direct.addProvider({
-    "url": "3rdparty/debian-chroot/debian-chroot.cgi",
+    "url": "3rdparty/debian-chroot/debian-chroot.cgi/direct/router",
     "namespace": "SYNOCOMMUNITY.DebianChroot.Remote",
     "type": "remoting",
     "actions": {
@@ -51,36 +51,11 @@ Ext.Direct.addProvider({
 });
 SYNOCOMMUNITY.DebianChroot.Poller = new Ext.direct.PollingProvider({
     'type': 'polling',
-    'url': '3rdparty/debian-chroot/debian-chroot-poll.cgi',
+    'url': '3rdparty/debian-chroot/debian-chroot.cgi/direct/poller',
     'interval': 10000
 });
 Ext.Direct.addProvider(SYNOCOMMUNITY.DebianChroot.Poller);
 SYNOCOMMUNITY.DebianChroot.Poller.disconnect();
-
-// Fix for RadioGroup reset bug
-Ext.form.RadioGroup.override({
-    reset: function () {
-        if (this.originalValue) {
-            this.setValue(this.originalValue.inputValue);
-        } else {
-            this.eachItem(function (c) {
-                if (c.reset) {
-                    c.reset();
-                }
-            });
-        }
-
-        (function () {
-            this.clearInvalid();
-        }).defer(50, this);
-    },
-    isDirty: function () {
-        if (this.disabled || !this.rendered) {
-            return false;
-        }
-        return String(this.getValue().inputValue) !== String(this.originalValue.inputValue);
-    }
-});
 
 // Const
 SYNOCOMMUNITY.DebianChroot.DEFAULT_HEIGHT = 300;

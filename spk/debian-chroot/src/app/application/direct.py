@@ -102,7 +102,7 @@ class Overview(Base):
         return status
 
     def is_installed(self):
-        return os.path.exists('/usr/local/debian-chroot/var/installed')
+        return os.path.exists(installed)
 
     def running_services(self):
         return len([service for service in self.session.query(Service).all() if service.status == 1])

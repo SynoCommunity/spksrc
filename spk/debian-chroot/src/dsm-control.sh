@@ -13,22 +13,24 @@ CHROOTTARGET=`realpath ${INSTALL_DIR}/var/chroottarget`
 start_daemon ()
 {
     # Mount
-    mount --bind /proc ${CHROOTTARGET}/proc
-    mount --bind /dev/pts ${CHROOTTARGET}/dev/pts
-    mount --bind /sys ${CHROOTTARGET}/sys
+    mount -t proc proc ${CHROOTTARGET}/proc
+    mount -t sysfs sys ${CHROOTTARGET}/sys
+    mount -o bind /dev ${CHROOTTARGET}/dev
+    mount -o bind /dev/pts ${CHROOTTARGET}/dev/pts
 }
 
 stop_daemon ()
 {
     # Unmount
-    umount ${CHROOTTARGET}/proc
     umount ${CHROOTTARGET}/dev/pts
+    umount ${CHROOTTARGET}/dev
     umount ${CHROOTTARGET}/sys
+    umount ${CHROOTTARGET}/proc
 }
 
 daemon_status ()
 {
-    `grep -q "/proc ${CHROOTTARGET}/proc " /proc/mounts` || `grep -q "/dev/pts ${CHROOTTARGET}/dev/pts " /proc/mounts` || `grep -q "/sys ${CHROOTTARGET}/sys " /proc/mounts`
+    `grep -q "${CHROOTTARGET}/proc " /proc/mounts` || `grep -q "${CHROOTTARGET}/sys " /proc/mounts` || `grep -q "${CHROOTTARGET}/dev " /proc/mounts`
 }
 
 
@@ -69,4 +71,3 @@ case $1 in
         exit 1
         ;;
 esac
-
