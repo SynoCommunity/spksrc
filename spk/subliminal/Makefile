@@ -66,4 +66,4 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle --use-mirrors $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj flask
+	@cd $(WORK_DIR) && $(PIP) bundle $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj flask
