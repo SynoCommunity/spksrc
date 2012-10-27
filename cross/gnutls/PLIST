@@ -10,7 +10,7 @@ lnk:lib/libgnutls-openssl.so.27
 lib:lib/libgnutls-openssl.so.27.0.2
 lnk:lib/libgnutls.so
 lnk:lib/libgnutls.so.28
-lib:lib/libgnutls.so.28.8.1
+lib:lib/libgnutls.so.28.13.0
 lnk:lib/libgnutlsxx.so
 lnk:lib/libgnutlsxx.so.28
-lib:lib/libgnutlsxx.so.28.0.0
+lib:lib/libgnutlsxx.so.28.1.0
