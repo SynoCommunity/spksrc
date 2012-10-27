@@ -7,7 +7,7 @@ from pyextdirect.router import Router
 from wsgiref.handlers import CGIHandler
 
 
-app = Flask('subliminal')
+app = Flask('haproxy')
 
 
 @app.route('/direct/router', methods=['POST'])
