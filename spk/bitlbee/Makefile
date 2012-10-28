@@ -1,8 +1,9 @@
 SPK_NAME = bitlbee
 SPK_VERS = 3.0.6
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/bitlbee.png
 DSM_UI_DIR = app
+CHANGELOG = "1. Change AuthMode to Closed\\\n2. Change RunMode to Daemon"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
