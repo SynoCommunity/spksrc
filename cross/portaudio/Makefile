@@ -14,4 +14,3 @@ LICENSE  = http://www.portaudio.com/license.html
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
-

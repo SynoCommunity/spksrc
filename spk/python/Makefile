@@ -1,6 +1,6 @@
 SPK_NAME = python
 SPK_VERS = 2.7.3
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -14,7 +14,7 @@ DESCRIPTION_FRE = Langage de programmation Python. Ce paquet ne se lance pas, il
 DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, solo es requerido como dependecia de otros paquetes.
 RELOAD_UI = yes
 DISPLAY_NAME = Python
-CHANGELOG = "1. Add lxml module"
+CHANGELOG = "1. Update modules"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
@@ -38,4 +38,3 @@ python_cleanup:
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type d -regex '.*/[Tt]ests?' | xargs rm -fr
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' | xargs rm -f
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py' | xargs chmod 444
-
