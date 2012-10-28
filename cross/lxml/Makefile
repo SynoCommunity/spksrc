@@ -13,5 +13,8 @@ LICENSE  = BSD
 
 BUILD_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config
 ADDITIONAL_CFLAGS = -I $(STAGING_INSTALL_PREFIX)/include/libxml2
+ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
+ADDITIONAL_CFLAGS += -O1
+endif
 
 include ../../mk/spksrc.python-module.mk
