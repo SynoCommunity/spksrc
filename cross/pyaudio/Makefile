@@ -1,6 +1,6 @@
 PKG_NAME = pyaudio
 PKG_REAL_NAME = PyAudio
-PKG_VERS = 0.2.4
+PKG_VERS = 0.2.7
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -13,4 +13,3 @@ COMMENT  = Provide Python bindings for PortAudio, the cross-platform audio I/O l
 LICENSE  =
 
 include ../../mk/spksrc.python-module.mk
-
