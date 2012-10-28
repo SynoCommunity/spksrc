@@ -52,7 +52,7 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX)
+	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
 post_install_target: $(INSTALL_TARGET) 
 
