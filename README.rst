@@ -4,10 +4,9 @@ spksrc is a cross compilation framework intended to compile and package software
 
 Requirements
 ------------
-To use spksrc, it is recommended to use a virtual machine with Debian stable OS installed. You'll also
-need some stuff::
+To use spksrc, it is recommended to use a virtual machine with an x86 version of Debian stable OS installed. You'll also need some stuff::
 
-    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl
+    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion
     sudo pip install -U pip
 
 You are now ready to use spksrc and make almost all SPKs. If you have any problem, try installing the
@@ -26,7 +25,10 @@ What have I done?
 
 * You cloned the repository
 * Went into the directory of the SPK for transmission
-* Started building the SPK for the architecture 88f6281 (see the `list of architectures`_)
+* Started building the SPK for the architecture 88f6281
+
+  * To list all available architectures use ``ls toolchains`` from within the ``spkrc`` directory. Remove the prefix syno- to have the actual architecture.
+  * An overview of which architecture is used per Synology model can be found on the wiki page `Architecture per Synology model`_
 
 At the end of the process, the SPK will be available in ``spksrc/packages/``
 
@@ -35,7 +37,7 @@ What is spksrc doing?
 
 * First spksrc will read ``spksrc/spk/transmission/Makefile``
 * Download the adequate toolchain for the chosen architecture
-* Recursivly:
+* Recursively:
 
   * Process dependencies if any
   * Download the source in ``spksrc/distrib/``
@@ -104,7 +106,7 @@ License
 When not explicitly set, files are placed under a `3 clause BSD license`_
 
 
-.. _list of architectures: http://forum.synology.com/wiki/index.php/What_kind_of_CPU_does_my_NAS_have
+.. _Architecture per Synology model: https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model
 .. _3 clause BSD license: http://www.opensource.org/licenses/BSD-3-Clause
 .. _bug tracker: https://github.com/SynoCommunity/spksrc/issues
 .. _GitHub help pages: https://help.github.com
