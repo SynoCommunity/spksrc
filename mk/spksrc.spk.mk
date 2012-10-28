@@ -58,6 +58,9 @@ ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
 	@echo beta=1 >> $@
 endif
+ifneq ($(strip $(HELPURL)),)
+	@echo helpurl=\"$(HELPURL)\" >> $@
+endif
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
 	@echo install_dep_services=\"$(INSTALL_DEP_SERVICES)\" >> $@
 endif
@@ -68,6 +71,9 @@ ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
+ifneq ($(strip $(STARTABLE)),)
+	@echo startable=\"$(STARTABLE)\" >> $@
+endif
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@
