@@ -12,17 +12,16 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language. This package is not startable, it is just required by other packages as dependency.
 DESCRIPTION_FRE = Langage de programmation Python. Ce paquet ne se lance pas, il est juste requis en tant que dépendance par d\\\'autres paquets.
 DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, solo es requerido como dependecia de otros paquetes.
-HELPURL = https://github.com/SynoCommunity/spksrc/issues
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules"
+CHANGELOG = "1. Update modules\\\n2. Make the SPK not startable"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/start-stop-status
+SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
