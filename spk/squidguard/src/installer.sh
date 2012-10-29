@@ -30,7 +30,7 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
 
     # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+    chown -R ${RUNAS}:users ${SYNOPKG_PKGDEST}
 
     # Init squid cache directory
     su - ${RUNAS} -c "${SQUID} -z -f ${CFG_FILE}"
@@ -65,6 +65,7 @@ postuninst ()
     rm -f ${INSTALL_DIR}
     rm -Rf ${WEBMAN_DIR}/${PACKAGE}
     sed "/${PACKAGE}/d" /etc/crontab
+    deluser ${RUNAS}
     
     exit 0
 }
