@@ -11,16 +11,36 @@ RUNAS="squid"
 SQUID="${INSTALL_DIR}/sbin/squid"
 PID_FILE="${INSTALL_DIR}/var/run/squid.pid"
 CFG_FILE="${INSTALL_DIR}/etc/squid.conf"
+CLAMD="/var/packages/AntiVirus/target/engine/clamav/sbin/clamd"
+CLAMD_CFG="${INSTALL_DIR}/etc/clamd.conf"
+CLAMD_PID="${INSTALL_DIR}/var/run/clamd/clamd.pid"
+CICAP="${INSTALL_DIR}/bin/c-icap"
+CICAP_CFG="${INSTALL_DIR}/etc/c-icap.conf"
+CICAP_PID="${INSTALL_DIR}var/run/c-icap/c-icap.pid"
 
 start_daemon ()
 {
+    # launch clamd
+    nohup ${CLAMD} -c ${CLAMD_CFG} &
+    
+    # launch c-icap
+    ${CICAP} -f ${CICAP_CFG}
+       
+    # launch squid
     su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE}"
 }
 
 stop_daemon ()
 {
+    # stop squid
     su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k shutdown"
     wait_for_status 1 20
+    
+    # stop c-icap
+    kill `cat ${CICAP_PID}`
+
+    # stop clamd
+    kill `cat ${CLAMD_PID}`
 }
 
 daemon_status ()
@@ -66,6 +86,7 @@ case $1 in
         ;;
     restart)
         stop_daemon
+        sleep 3
         start_daemon
         exit $?
         ;;
