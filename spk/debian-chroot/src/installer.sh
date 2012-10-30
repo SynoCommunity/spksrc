@@ -39,10 +39,10 @@ postinst ()
 
     # Debootstrap second stage in the background and configure the chroot environment
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        chroot ${CHROOTTARGET}/ /debootstrap/debootstrap --second-stage && \
+        chroot ${CHROOTTARGET}/ /debootstrap/debootstrap --second-stage > /dev/null 2>&1 && \
             mv ${CHROOTTARGET}/etc/apt/sources.list.default ${CHROOTTARGET}/etc/apt/sources.list && \
             mv ${CHROOTTARGET}/etc/apt/preferences.default ${CHROOTTARGET}/etc/apt/preferences && \
-            touch ${INSTALL_DIR}/var/installed > /dev/null 2>&1 &
+            touch ${INSTALL_DIR}/var/installed &
         chmod 666 ${CHROOTTARGET}/dev/null
         chmod 666 ${CHROOTTARGET}/dev/tty
         chmod 777 ${CHROOTTARGET}/tmp
