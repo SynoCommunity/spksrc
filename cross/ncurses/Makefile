@@ -12,7 +12,7 @@ COMMENT  = The Ncurses (new curses) library is a free software emulation of curs
 LICENSE  = http://www.gnu.org/licenses/gpl.html
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --with-shared --enable-rpath --without-manpages --without-tests --enable-overwrite
+CONFIGURE_ARGS  = --with-shared --enable-rpath --without-manpages --without-tests --enable-overwrite --enable-widec
 CONFIGURE_ARGS += --disable-home-terminfo --with-default-terminfo-dir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/terminfo
 CONFIGURE_ARGS += --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
 
