@@ -12,11 +12,13 @@ CHROOTTARGET=`realpath ${INSTALL_DIR}/var/chroottarget`
 
 start_daemon ()
 {
-    # Mount
-    mount -t proc proc ${CHROOTTARGET}/proc
-    mount -t sysfs sys ${CHROOTTARGET}/sys
-    mount -o bind /dev ${CHROOTTARGET}/dev
-    mount -o bind /dev/pts ${CHROOTTARGET}/dev/pts
+    # Mount if install is finished
+    if [ -f ${INSTALL_DIR}/var/installed ]; then
+        mount -t proc proc ${CHROOTTARGET}/proc
+        mount -t sysfs sys ${CHROOTTARGET}/sys
+        mount -o bind /dev ${CHROOTTARGET}/dev
+        mount -o bind /dev/pts ${CHROOTTARGET}/dev/pts
+    fi
 }
 
 stop_daemon ()
