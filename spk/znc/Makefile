@@ -1,5 +1,5 @@
 SPK_NAME = znc
-SPK_VERS = 1.0-beta1
+SPK_VERS = 1.0~rc1
 SPK_REV = 2
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
@@ -45,4 +45,3 @@ znc_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
