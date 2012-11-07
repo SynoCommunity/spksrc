@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.flexget": {
+            "title": "FlexGet",
+            "desc": "FlexGet Web UI",
+            "icon": "images/flexget-{0}.png",
+            "type": "url",
+            "url": "3rdparty/flexget/flexget.cgi",
+            "allUsers": true
+        }
+    }
+}
