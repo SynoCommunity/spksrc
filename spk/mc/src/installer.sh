@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with syno-packager.  If not, see <http://www.gnu.org/licenses/>.
 
-UPGRADELOCK=/tmp/sslh.upgrade.lock
+PACKAGE="midnightcommander"
+INSTALL_DIR="/usr/local/${PACKAGE}"
+
 
 preinst ()
 {
@@ -26,26 +28,11 @@ preinst ()
 
 postinst ()
 {
+	# Link
+	ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+
 	# Create the directory
-	mkdir -p /usr/local/sslh
-	mkdir -p /usr/local/sslh/bin
-	mkdir -p /usr/local/sslh/pid
-
-	# Create symlink
-	ln -s ${SYNOPKG_PKGDEST}/bin/sslh /usr/local/sslh/bin/sslh
-	ln -s ${SYNOPKG_PKGDEST}/bin/generate_log.pl /usr/local/sslh/bin/generate_log.pl
-	ln -s ${SYNOPKG_PKGDEST}/log /usr/local/sslh/log
-	ln -s ${SYNOPKG_PKGDEST}/sslh.ini /usr/local/sslh/sslh.ini
-	ln -s ${SYNOPKG_PKGDEST}/www /usr/local/sslh/www
-
-	# Correct the files ownership
-	chown -R root:root ${SYNOPKG_PKGDEST}
-
-	# Correct the files permission
-	chmod 755 ${SYNOPKG_PKGDEST}/bin/*
-	chmod 666 ${SYNOPKG_PKGDEST}/sslh.ini
-	chmod 777 ${SYNOPKG_PKGDEST}/log
-	chmod 777 /usr/local/sslh/pid
+	ln -s /usr/local/midnightcommander/bin/mc /usr/local/bin/mc
 
 	exit 0
 }
@@ -58,19 +45,18 @@ preuninst ()
 postuninst ()
 {
 	# Remove symlink
-	rm -Rf /usr/local/sslh
+	rm -f /usr/local/bin/mc
+	rm -f ${INSTALL_DIR}
 
 	exit 0
 }
 
 preupgrade ()
 {
-	touch $UPGRADELOCK
 	exit 0
 }
 
 postupgrade ()
 {
-	rm -f $UPGRADELOCK
 	exit 0
 }
