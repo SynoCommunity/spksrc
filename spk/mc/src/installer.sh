@@ -1,62 +1,51 @@
 #!/bin/sh
-# Copyright 2010 Antoine Bertin
-# <diaoulael [ignore this] at users.sourceforge period net>
-#
-# This file is part of syno-packager.
-#
-# syno-packager is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# syno-packager is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with syno-packager.  If not, see <http://www.gnu.org/licenses/>.
 
-PACKAGE="midnightcommander"
+# Package
+PACKAGE="mc"
+DNAME="Midnight Commander"
+
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 
 
 preinst ()
 {
-	exit 0
+    exit 0
 }
 
 postinst ()
 {
-	# Link
-	ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+    
+    # Put mc in the PATH
+    mkdir -p /usr/local/bin
+    ln -s ${INSTALL_DIR}/bin/mc /usr/local/bin/mc
 
-	# Create the directory
-	ln -s /usr/local/midnightcommander/bin/mc /usr/local/bin/mc
-
-	exit 0
+    exit 0
 }
 
 preuninst ()
 {
-	exit 0
+    exit 0
 }
 
 postuninst ()
 {
-	# Remove symlink
-	rm -f /usr/local/bin/mc
-	rm -f ${INSTALL_DIR}
+    # Remove link
+    rm -f ${INSTALL_DIR}
+    rm -f /usr/local/bin/mc
 
-	exit 0
+    exit 0
 }
 
 preupgrade ()
 {
-	exit 0
+    exit 0
 }
 
 postupgrade ()
 {
-	exit 0
+    exit 0
 }
