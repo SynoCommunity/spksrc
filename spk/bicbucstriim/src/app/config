@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.bicbucstriim": {
+            "type": "url",
+            "title": "BicBucStriim",
+            "desc": "BicBucStriim",
+            "allUsers": true,
+            "icon": "images/bicbucstriim-{0}.png",
+            "protocol": "http",
+            "url": "/bbs",
+            "port": "80"
+        }
+    }
+}
