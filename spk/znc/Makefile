@@ -1,9 +1,8 @@
 SPK_NAME = znc
-SPK_VERS = 1.0~rc1
+SPK_VERS = 1.0
 SPK_REV = 2
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
