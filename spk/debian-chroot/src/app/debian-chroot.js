@@ -557,6 +557,13 @@ SYNOCOMMUNITY.DebianChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.DebianChroot
     onStatus: function (response) {
         this.getForm().findField("install_status").setValue(_V("ui", response.data.installed));
         this.getForm().findField("running_services").setValue(response.data.running_services);
+        if (response.data.installed == "installing") {
+            Ext.getCmp("synocommunity-debianchroot-do_update").disable();
+            Ext.getCmp("synocommunity-debianchroot-do_upgrade").disable();
+        } else {
+            Ext.getCmp("synocommunity-debianchroot-do_update").enable();
+            Ext.getCmp("synocommunity-debianchroot-do_upgrade").enable();
+        }
     },
     onActivate: function () {
         Ext.Direct.on("status", this.onStatus, this);
@@ -571,6 +578,10 @@ SYNOCOMMUNITY.DebianChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.DebianChroot
                         this.owner.setStatusOK({
                             text: action.result.data.updates + " " + _V("ui", "updates_available")
                         });
+                    }
+                    if (action.result.data.installed == "installing") {
+                        Ext.getCmp("synocommunity-debianchroot-do_update").disable();
+                        Ext.getCmp("synocommunity-debianchroot-do_upgrade").disable();
                     }
                     this.getEl().unmask();
                     SYNOCOMMUNITY.DebianChroot.Poller.connect();

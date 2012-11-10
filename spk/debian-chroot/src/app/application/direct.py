@@ -69,6 +69,13 @@ class Services(Base):
         service = self.session.query(Service).get(service_id)
         return service.stop()
 
+    def stop_all(self):
+        for service in self.session.query(Service).all():
+            if service.status:
+                service.stop()
+                while service.status:
+                    time.sleep(0.8)
+
 
 class Overview(Base):
     def __init__(self):
