@@ -1,4 +1,4 @@
-SPK_NAME = midnightcommander
+SPK_NAME = mc
 SPK_VERS = 4.8.6
 SPK_REV = 1
 SPK_ICON = src/mc.png
@@ -23,4 +23,3 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
-	
