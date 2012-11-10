@@ -13,7 +13,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 # Fetch python variables
-include $(WORK_DIR)/python-cc.mk
+-include $(WORK_DIR)/python-cc.mk
 
 # Python module variables
 PYTHONPATH = $(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/

@@ -39,6 +39,13 @@ include ../../mk/spksrc.compile.mk
 cat_PLIST:
 	@true
 
+dependency-tree:
+	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
+	@for depend in $(DEPENDS) ; \
+	do \
+	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
+	done
+
 ### Clean rules
 clean:
 	rm -fr $(WORK_DIR)

@@ -87,6 +87,13 @@ $(DIGESTS_FILE):
 	  echo "$${localFile} $$type `$$tool $(DISTRIB_DIR)/$${localFile} | cut -d\" \" -f1`" >> $@ ; \
 	done
 
+dependency-tree:
+	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
+	@for depend in $(DEPENDS) ; \
+	do \
+	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
+	done
+
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 
