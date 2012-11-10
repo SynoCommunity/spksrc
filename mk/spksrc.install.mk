@@ -69,7 +69,7 @@ install_correct_lib_files: $(INSTALL_PLIST)
 	@for la_file in `grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)` ; \
 	do \
 	  $(MSG) "Correcting libtool file $${la_file}" ; \
-	  sed -i -e 's#^\(libdir=.\)\($(INSTALL_PREFIX)\)#\1$(INSTALL_DIR)\2#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${la_file} ; \
+	  perl -p -i -e 's#(?<!$(INSTALL_DIR)/)$(INSTALL_PREFIX)#$(INSTALL_DIR)/$(INSTALL_PREFIX)#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${la_file} ; \
 	done
 
 ifeq ($(wildcard $(INSTALL_COOKIE)),)
