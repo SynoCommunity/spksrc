@@ -222,6 +222,13 @@ all: package
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
 
+dependency-tree:
+	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
+	@for depend in $(DEPENDS) ; \
+	do \
+	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
+	done
+
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 
