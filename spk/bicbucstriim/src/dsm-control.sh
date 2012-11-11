@@ -7,6 +7,15 @@ DNAME="BicBucStriim"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
+ENABLED_FILE="/var/packages/${PACKAGE}/enabled"
+
+daemon_status ()
+{
+    if [ -f ${ENABLED_FILE} ]; then
+        return 0
+    fi
+    return 1
+}
 
 
 case $1 in
@@ -17,7 +26,13 @@ case $1 in
         exit 0
         ;;
     status)
-        exit 0
+        if daemon_status; then
+            echo ${DNAME} is running
+            exit 0
+        else
+            echo ${DNAME} is not running
+            exit 1
+        fi
         ;;
     log)
         exit 1
