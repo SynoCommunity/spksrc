@@ -63,6 +63,9 @@ tc_vars: patch
 	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\"
 	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
+	@echo TC_TARGET := $(TC_TARGET)
+	@echo TC_PREFIX := $(TC_PREFIX)-
+	@echo TC_PATH := $(WORK_DIR)/$(TC_BASE_DIR)/bin/
 
 
 ### Clean rules
