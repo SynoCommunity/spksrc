@@ -7,6 +7,7 @@ DEPENDS  = cross/busybox cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/virtualenv cross/pyopenssl
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
+DEPENDS += cross/zope.interface cross/markupsafe
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language. This package is not startable, it is just required by other packages as dependency.
@@ -15,7 +16,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, 
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules\\\n2. Make the SPK not startable"
+CHANGELOG = "1. Update existing modules\\\n2. Add modules Twisted, zope.interface and MarkupSafe\\\n3. Make the SPK not startable"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
