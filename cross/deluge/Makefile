@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.deluge-torrent.org/source
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS = cross/libtorrent
 
 HOMEPAGE = http://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
