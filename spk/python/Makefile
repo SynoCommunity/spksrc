@@ -15,7 +15,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, 
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules\\\n2. Make the SPK not startable"
+CHANGELOG = "1. Update modules and add twisted\\\n2. Make the SPK not startable"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
