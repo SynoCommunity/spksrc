@@ -10,6 +10,7 @@ TC_PREFIX = arm-marvell-linux-gnu
 TC_TARGET = arm-marvell-linux-gnu
 
 TC_CFLAGS = -mfloat-abi=soft
+TC_CPPFLAGS = -mfloat-abi=soft
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk

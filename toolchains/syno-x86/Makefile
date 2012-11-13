@@ -10,6 +10,7 @@ TC_PREFIX = i686-linux-gnu
 TC_TARGET = i686-linux-gnu
 
 TC_CFLAGS =
+TC_CPPFLAGS =
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk

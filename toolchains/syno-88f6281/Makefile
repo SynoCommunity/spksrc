@@ -10,6 +10,7 @@ TC_PREFIX = arm-none-linux-gnueabi
 TC_TARGET = arm-none-linux-gnueabi
 
 TC_CFLAGS =
+TC_CPPFLAGS =
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
