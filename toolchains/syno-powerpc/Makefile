@@ -10,6 +10,7 @@ TC_PREFIX = powerpc-linux
 TC_TARGET = powerpc-unknown-linux
 
 TC_CFLAGS =
+TC_CPPFLAGS =
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk

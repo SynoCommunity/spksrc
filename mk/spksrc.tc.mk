@@ -42,6 +42,7 @@ TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump
 CFLAGS += $(TC_CFLAGS)
 CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 
+CPPFLAGS += $(TC_CPPFLAGS)
 CPPFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 
 LDFLAGS += $(TC_LDFLAGS)
@@ -66,6 +67,9 @@ tc_vars: patch
 	@echo TC_TARGET := $(TC_TARGET)
 	@echo TC_PREFIX := $(TC_PREFIX)-
 	@echo TC_PATH := $(WORK_DIR)/$(TC_BASE_DIR)/bin/
+	@echo CFLAGS := $(CFLAGS) $$\(ADDITIONAL_CFLAGS\)
+	@echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)
+	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
 
 
 ### Clean rules
