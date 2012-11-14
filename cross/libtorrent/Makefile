@@ -5,12 +5,14 @@ PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://libtorrent.googlecode.com/files
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
-DEPENDS = cross/boost
+DEPENDS = cross/openssl cross/geoip cross/boost cross/python
 
 HOMEPAGE = http://www.rasterbar.com/products/libtorrent/
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-python-binding --with-boost-system=boost_system PYTHON=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
+ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/python2.7
 
 include ../../mk/spksrc.cross-cc.mk
