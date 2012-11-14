@@ -35,6 +35,9 @@ include ../../mk/spksrc.configure.mk
 compile: configure
 include ../../mk/spksrc.compile.mk
 
+install: compile
+include ../../mk/spksrc.install.mk
+
 .PHONY: cat_PLIST
 cat_PLIST:
 	@true
@@ -50,5 +53,5 @@ dependency-tree:
 clean:
 	rm -fr $(WORK_DIR)
 
-all: compile
+all: install
 
