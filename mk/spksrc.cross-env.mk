@@ -1,4 +1,3 @@
-
 PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig
 
 ENV += PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR)
@@ -26,4 +25,3 @@ $(TC_VARS_MK):
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
-
