@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
 
-DEPENDS = cross/bzip2 cross/zlib
+DEPENDS = cross/bzip2 cross/zlib native/python
 
 HOMEPAGE = http://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
@@ -20,7 +20,6 @@ OFLAGS = -O3
 ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
 OFLAGS = -O2
 endif
-#TODO: Depend on native/python instead of Debian python-dev?
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -29,6 +28,7 @@ myConfigure:
 	[ `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion | cut -f1 -d.` -ge 4 ]
 	$(RUN) ./bootstrap.sh
 	echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CPPFLAGS)\" <linkflags>\"$(LDFLAGS)\" ; " > $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
+	echo "using python : : $(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python ;" >> $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 	echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 
 .PHONY: myCompile
@@ -37,4 +37,4 @@ myCompile:
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) ./b2 -d+2 $(CONFIGURE_ARGS)  install
+	$(RUN) ./b2 -d+2 $(CONFIGURE_ARGS) install
