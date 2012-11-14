@@ -1,7 +1,13 @@
+bin:bin/2to3
+bin:bin/idle
+bin:bin/pydoc
+bin:bin/smtpd.py
 lnk:bin/python
 lnk:bin/python2
 bin:bin/python2.7
-rsc:etc/mime.types
+lnk:lib/libpython2.7.so
+lib:lib/libpython2.7.so.1.0
 rsc:lib/python2.7
-rsc:include/python2.7/pyconfig.h
 lib:lib/python2.7/lib-dynload/*.so
+rsc:etc/mime.types
+rsc:include/python2.7/pyconfig.h
