@@ -18,7 +18,7 @@ POST_PATCH_TARGET = pyPostPatch
 # Configure
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS = --enable-ipv6 ac_cv_buggy_getaddrinfo=no ac_cv_have_long_long_format=yes
+CONFIGURE_ARGS = --enable-shared --enable-unicode=ucs4 --enable-ipv6 ac_cv_buggy_getaddrinfo=no ac_cv_have_long_long_format=yes
 
 # Compile
 COMPILE_TARGET = myCompile
