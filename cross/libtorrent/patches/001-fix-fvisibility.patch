@@ -1,0 +1,15 @@
+--- configure.ac.orig	2012-10-23 04:13:47.000000000 +0200
++++ configure.ac	2012-11-15 14:46:19.000000000 +0100
+@@ -97,9 +97,10 @@
+ AX_PTHREAD()
+ 
+ LIBS="$PTHREAD_LIBS $LIBS"
+-CFLAGS="$PTHREAD_CFLAGS $CFLAGS -fvisibility=hidden"
+-CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
+ CC="$PTHREAD_CC"
++AS_IF([ `$(CC) -dumpversion | cut -f1 -d.` -ge 4 ],
++      [CFLAGS="$PTHREAD_CFLAGS $CFLAGS -fvisibility=hidden" CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"],
++      [CFLAGS="$PTHREAD_CFLAGS $CFLAGS" CXXFLAGS="$CXXFLAGS"])
+ 
+ AS_ECHO
+ AS_ECHO "Checking for boost libraries:"
