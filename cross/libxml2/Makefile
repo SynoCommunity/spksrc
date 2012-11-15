@@ -14,6 +14,7 @@ LICENSE  = MIT
 CONFIGURE_ARGS = --without-python
 GNU_CONFIGURE = 1
 POST_INSTALL_TARGET = myPostInstall
+ADDITIONAL_CFLAGS = -O3
 
 include ../../mk/spksrc.cross-cc.mk
 
