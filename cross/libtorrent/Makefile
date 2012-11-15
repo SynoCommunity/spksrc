@@ -15,4 +15,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-python-binding --with-boost-system=boost_system PYTHON=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/python2.7
 
+BOOST_LIBRARIES += system python
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+
 include ../../mk/spksrc.cross-cc.mk
