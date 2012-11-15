@@ -15,7 +15,8 @@ CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-wave --without-mpi --without-math --prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS  = --with-toolset=gcc --without-libraries=wave,mpi,math --prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 OFLAGS = -O3
 ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
 OFLAGS = -O2
@@ -26,15 +27,14 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myConfigure
 myConfigure:
 	[ `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion | cut -f1 -d.` -ge 4 ]
-	$(RUN) ./bootstrap.sh
+	$(RUN) ./bootstrap.sh $(CONFIGURE_ARGS)
 	echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CPPFLAGS)\" <linkflags>\"$(LDFLAGS)\" ; " > $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
-	echo "using python : : $(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python ;" >> $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 	echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) ./b2 -d+2 $(CONFIGURE_ARGS)
+	$(RUN) ./b2
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) ./b2 -d+2 $(CONFIGURE_ARGS) install
+	$(RUN) ./b2 install
