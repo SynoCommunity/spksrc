@@ -12,6 +12,7 @@ COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusi
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
+PRE_CONFIGURE_TARGET = myPreConfigure
 CONFIGURE_ARGS = --enable-python-binding --with-boost-system=boost_system PYTHON=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/python2.7
 
@@ -19,3 +20,7 @@ BOOST_LIBRARIES += system python
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myPreConfigure
+myPreConfigure:
+	$(RUN) autoconf
