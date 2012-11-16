@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
-# Busybox version: 1.20.1
-# Wed May 30 21:47:37 2012
+# Busybox version: 1.20.2
+# Fri Nov 16 08:18:43 2012
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -247,7 +247,7 @@ CONFIG_GZIP_FAST=0
 # CONFIG_MKNOD is not set
 # CONFIG_MV is not set
 # CONFIG_FEATURE_MV_LONG_OPTIONS is not set
-CONFIG_NICE=y
+# CONFIG_NICE is not set
 # CONFIG_NOHUP is not set
 # CONFIG_OD is not set
 # CONFIG_PRINTENV is not set
@@ -660,7 +660,7 @@ CONFIG_FEATURE_CROND_DIR=""
 # CONFIG_FLASH_LOCK is not set
 # CONFIG_FLASH_UNLOCK is not set
 # CONFIG_FLASH_ERASEALL is not set
-CONFIG_IONICE=y
+# CONFIG_IONICE is not set
 # CONFIG_INOTIFYD is not set
 # CONFIG_LAST is not set
 # CONFIG_FEATURE_LAST_SMALL is not set
