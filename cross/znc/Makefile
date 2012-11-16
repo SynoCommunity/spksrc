@@ -12,9 +12,6 @@ COMMENT  = Advanced IRC bouncer
 LICENSE  =
 
 GNU_CONFIGURE = 1
-ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),)
-CONFIGURE_ARGS += gl_cv_cc_visibility=no
-endif
 ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = myPostInstall
 endif
