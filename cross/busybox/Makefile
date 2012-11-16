@@ -17,26 +17,16 @@ INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(strip $(BUSYBOX_CONFIG)),)
-BUSYBOX_CONFIG_FILE = src/usermng_defconfig
-else
-BUSYBOX_CONFIG_FILES = $(WORK_DIR)/../$(BUSYBOX_CONFIG) src/$(BUSYBOX_CONFIG) $(BUSYBOX_CONFIG)
-BUSYBOX_CONFIG_FILE = $(word 1,$(wildcard $(BUSYBOX_CONFIG_FILES)))
-ifeq ($(strip $(BUSYBOX_CONFIG_FILE)),)
-$(error Busybox configuration file '$(BUSYBOX_CONFIG)' not found)
-endif
-endif
-
-CROSS_COMPILE=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p')
-
+.PHONY: myConfigure
 myConfigure:
-	cp $(BUSYBOX_CONFIG_FILE) $(WORK_DIR)/$(PKG_DIR)/configs
-	$(RUN) CROSS_COMPILE=$(CROSS_COMPILE) $(MAKE) $(notdir $(BUSYBOX_CONFIG_FILE))
+	cat $(addprefix $(WORK_DIR)/../configs/, default $(BUSYBOX_CONFIG)) > $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig
+	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) spksrc_defconfig
 
+.PHONY: myCompile
 myCompile:
-	$(RUN) CROSS_COMPILE=$(CROSS_COMPILE) $(MAKE) busybox
+	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) busybox
 
+.PHONY: myInstall
 myInstall:
-	install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin
-	install -m 755 $(WORK_DIR)/$(PKG_DIR)/busybox $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin
-
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
+	install -m 755 $(WORK_DIR)/$(PKG_DIR)/busybox $(STAGING_INSTALL_PREFIX)/bin

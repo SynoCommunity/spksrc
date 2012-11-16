@@ -1,0 +1,14 @@
+#
+# Coreutils
+#
+CONFIG_NICE=y
+
+#
+# Miscellaneous Utilities
+#
+CONFIG_IONICE=y
+
+#
+# Process Utilities
+#
+CONFIG_RENICE=y
