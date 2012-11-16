@@ -19,7 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	cat $(addprefix $(WORK_DIR)/../configs/, default $(BUSYBOX_CONFIG)) > $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig
+	cat $(addprefix configs/, default $(BUSYBOX_CONFIG)) > $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig
 	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) spksrc_defconfig
 
 .PHONY: myCompile
