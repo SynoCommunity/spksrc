@@ -32,6 +32,8 @@ PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%
 
 POST_STRIP_TARGET = python_cleanup
 
+BUSYBOX_CONFIG = usrmng nice daemon
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: python_cleanup
