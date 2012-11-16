@@ -98,6 +98,5 @@ dependency-tree:
 all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 
 arch-%:
-	@$(MSG) Building package for arch $(subst arch-,,$@) 
-	@env $(MAKE) ARCH=$(subst arch-,,$@)
-
+	@$(MSG) Building package for arch $(subst arch-,,$@)
+	-@MAKEFLAGS= $(MAKE) ARCH=$(subst arch-,,$@)

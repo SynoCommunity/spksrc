@@ -237,12 +237,11 @@ publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
 
 arch-%:
 	@$(MSG) Building package for arch $*
-	-@env $(MAKE) MAKEFLAGS= ARCH=$*
+	-@MAKEFLAGS= $(MAKE) ARCH=$*
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
-	-@env $(MAKE) MAKEFLAGS= ARCH=$* publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$* publish
 
 changelog:
 	@echo $(shell git log --pretty=format:"- %s" -- $(PWD))
-
