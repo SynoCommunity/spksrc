@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.deluge": {
+            "title": "Deluge",
+            "desc": "Deluge Web UI",
+            "icon": "images/deluge-{0}.png",
+            "type": "url",
+            "url": "3rdparty/deluge/deluge.cgi",
+            "allUsers": true
+        }
+    }
+}
