@@ -54,9 +54,7 @@ wait_for_status()
     counter=$2
     while [ ${counter} -gt 0 ]; do
         daemon_status
-        if [ $? -eq $1 ]; then
-            return
-        fi
+        [ $? -eq $1 ] && return
         let counter=counter-1
         sleep 1
     done
