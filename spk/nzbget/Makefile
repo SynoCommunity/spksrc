@@ -1,5 +1,5 @@
 SPK_NAME = nzbget
-SPK_VERS = 9.0~r497
+SPK_VERS = 9.0~r511
 SPK_REV = 4
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
@@ -28,6 +28,9 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = nzbget_extra_install
 
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: nzbget_extra_install
@@ -46,4 +49,3 @@ nzbget_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
