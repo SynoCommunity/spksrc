@@ -6,6 +6,7 @@ DNAME="uMurmur"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="root"
 GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
@@ -54,6 +55,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
@@ -71,4 +75,3 @@ postupgrade ()
 
     exit 0
 }
-
