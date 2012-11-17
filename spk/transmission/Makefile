@@ -1,6 +1,6 @@
 SPK_NAME = transmission
 SPK_VERS = 2.72
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
 
@@ -26,6 +26,9 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = transmission_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
