@@ -1,5 +1,5 @@
 PKG_NAME = SABnzbd
-PKG_VERS = 0.7.5
+PKG_VERS = 0.7.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/sabnzbdplus/sabnzbdplus/$(PKG_VERS)
@@ -20,4 +20,3 @@ include ../../mk/spksrc.cross-cc.mk
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/SABnzbd
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/SABnzbd
-
