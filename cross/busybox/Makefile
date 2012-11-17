@@ -19,7 +19,10 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	cat $(addprefix configs/, default $(BUSYBOX_CONFIG)) > $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig
+	cp spksrc_defconfig $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig
+	cat $(addprefix configs/, $(BUSYBOX_CONFIG)) | while IFS== read option value; do \
+	  sed -i -r -e "s/^(# )?$$option.*$$/$$option=$$value/" $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig ; \
+	done
 	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) spksrc_defconfig
 
 .PHONY: myCompile
