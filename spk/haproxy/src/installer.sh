@@ -25,7 +25,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G nobody -s /bin/sh -S -D ${RUNAS}
 
     # Edit the configuration according to the wizzard
     sed -i -e "s/@user@/${wizard_user:=admin}/g" ${INSTALL_DIR}/var/haproxy.cfg.tpl

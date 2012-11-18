@@ -33,7 +33,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G nobody -s /bin/sh -S -D ${RUNAS}
 
     # Edit the configuration according to the wizzard
     sed -i -e "s|@auth_password@|`${BITLBEE} -x hash ${wizard_auth_password}`|g" ${CFG_FILE}
