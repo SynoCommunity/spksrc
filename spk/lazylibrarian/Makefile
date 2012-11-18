@@ -1,6 +1,6 @@
 SPK_NAME = lazylibrarian
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/lazylibrarian.png
 DSM_UI_DIR = app
 BETA = 1
