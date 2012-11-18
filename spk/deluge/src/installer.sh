@@ -9,7 +9,8 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="deluge"
+USER="deluge"
+GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -43,10 +44,10 @@ postinst ()
     cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
@@ -55,7 +56,8 @@ preuninst ()
 {
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        deluser ${RUNAS}
+        delgroup ${USER} ${GROUP}
+        deluser ${USER}
     fi
 
     exit 0

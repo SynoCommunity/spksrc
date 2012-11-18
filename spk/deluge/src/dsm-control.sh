@@ -8,7 +8,8 @@ DNAME="Deluge"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="deluge"
+USER="deluge"
+GROUP="users"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 DELUGED="${INSTALL_DIR}/env/bin/deluged"
 DELUGE_WEB="${INSTALL_DIR}/env/bin/deluge-web"
@@ -21,30 +22,30 @@ DELUGE_WEB_LOG="${INSTALL_DIR}/var/deluge-web.log"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -x ${DELUGED} -c ${RUNAS} -u ${RUNAS} -p ${DELUGED_PID} \
+    start-stop-daemon -S -q -x ${DELUGED} -c ${USER} -u ${USER} -p ${DELUGED_PID} \
       -- --quiet --config ${CFG_DIR} --logfile ${DELUGED_LOG} --loglevel info --pidfile ${DELUGED_PID}
     sleep 3
-    start-stop-daemon -S -q -b -m -x ${DELUGE_WEB} -c ${RUNAS} -u ${RUNAS} -p ${DELUGE_WEB_PID} \
+    start-stop-daemon -S -q -b -m -x ${DELUGE_WEB} -c ${USER} -u ${USER} -p ${DELUGE_WEB_PID} \
       -- --quiet --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${RUNAS} -p ${DELUGE_WEB_PID}
-    start-stop-daemon -K -q -u ${RUNAS} -p ${DELUGED_PID}
+    start-stop-daemon -K -q -u ${USER} -p ${DELUGE_WEB_PID}
+    start-stop-daemon -K -q -u ${USER} -p ${DELUGED_PID}
     wait_for_status 1 20
     if [ $? -eq 1 ]; then
-        start-stop-daemon -K -s 9 -q -u ${RUNAS} -p ${DELUGE_WEB_PID}
-        start-stop-daemon -K -s 9 -q -u ${RUNAS} -p ${DELUGED_PID}
+        start-stop-daemon -K -s 9 -q -u ${USER} -p ${DELUGE_WEB_PID}
+        start-stop-daemon -K -s 9 -q -u ${USER} -p ${DELUGED_PID}
     fi
     rm -f ${DELUGED_PID} ${DELUGE_WEB_PID}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${RUNAS} -p ${DELUGE_WEB_PID}
+    start-stop-daemon -K -q -t -u ${USER} -p ${DELUGE_WEB_PID}
     DELUGE_WEB_RETVAL=$?
-    start-stop-daemon -K -q -t -u ${RUNAS} -p ${DELUGED_PID}
+    start-stop-daemon -K -q -t -u ${USER} -p ${DELUGED_PID}
     DELUGED_RETVAL=$?
     [ ${DELUGED_RETVAL} -eq 0 -a ${DELUGE_WEB_RETVAL} -eq 0 ] || return 1
 }
