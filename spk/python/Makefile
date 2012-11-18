@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, 
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update existing modules\\\n2. Add modules Twisted, zope.interface, MarkupSafe and libtorrent\\\n3. Enable unicode usc4\\\n4. Make the SPK not startable"
+CHANGELOG = "1. Update existing modules\\\n2. Add modules Twisted, zope.interface and MarkupSafe\\\n3. Add libtorrent for some architectures\\\n4. Enable unicode usc4\\\n5. Make the SPK not startable"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
