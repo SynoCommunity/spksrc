@@ -23,7 +23,7 @@ stop_daemon ()
 daemon_status ()
 {
     if [ -f ${RUN_FILE} ]; then
-        return 0
+        return
     fi
     return 1
 }

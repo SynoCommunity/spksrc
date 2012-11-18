@@ -26,7 +26,7 @@ stop_daemon ()
 daemon_status ()
 {
     if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
-        return 0
+        return
     fi
     rm -f ${PID_FILE}
     return 1
