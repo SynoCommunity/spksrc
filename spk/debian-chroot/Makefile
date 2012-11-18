@@ -3,6 +3,7 @@ SPK_VERS = 6.0.6
 SPK_REV = 2
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS  =
 SPK_DEPENDS = "python>=2.7.3-3"
