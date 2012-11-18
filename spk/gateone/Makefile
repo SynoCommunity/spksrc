@@ -1,5 +1,5 @@
 SPK_NAME = gateone
-SPK_VERS = 1.1.0~git20121015
+SPK_VERS = 1.1.0~git20121117
 SPK_REV = 1
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
@@ -45,10 +45,10 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && pip bundle $@ tornado configobj
+	@cd $(WORK_DIR) && $(PIP) bundle $@ tornado configobj
 
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/liftoff/GateOne.git GateOne
-	cd $(STAGING_DIR)/share/GateOne && git checkout 69b16c5147
+	cd $(STAGING_DIR)/share/GateOne && git checkout 6d305b97c1af47b421034965615462478f89b9fa
 	rm -fr $(STAGING_DIR)/share/GateOne/.git $(STAGING_DIR)/share/GateOne/.gitignore
