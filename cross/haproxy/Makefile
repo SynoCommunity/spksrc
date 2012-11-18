@@ -1,9 +1,9 @@
 PKG_NAME = haproxy
-PKG_VERS = 1.5~ss20121030
+PKG_VERS = 1.5~ss20121117
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-ss-20121030.$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-ss-20121117.$(PKG_EXT)
 PKG_DIST_SITE = http://haproxy.1wt.eu/download/1.5/src/snapshot
-PKG_DIR = $(PKG_NAME)-ss-20121030
+PKG_DIR = $(PKG_NAME)-ss-20121117
 
 DEPENDS = cross/openssl
 
@@ -24,4 +24,3 @@ myCompile:
 
 myInstall:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
-
