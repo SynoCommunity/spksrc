@@ -12,7 +12,7 @@ ENABLED_FILE="/var/packages/${PACKAGE}/enabled"
 daemon_status ()
 {
     if [ -f ${ENABLED_FILE} ]; then
-        return 0
+        return
     fi
     return 1
 }

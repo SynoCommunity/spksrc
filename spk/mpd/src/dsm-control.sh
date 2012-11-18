@@ -32,9 +32,8 @@ stop_daemon ()
 
 daemon_status ()
 {
-    # Check for pid file and an existing process with that pid
     if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
-        return 0
+        return
     fi
     return 1
 }
