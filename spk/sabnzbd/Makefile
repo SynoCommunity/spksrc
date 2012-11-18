@@ -33,7 +33,7 @@ BUSYBOX_CONFIG  = nice
 ifeq ($(findstring $(ARCH),88f6281 qoriq),$(ARCH))
 BUSYBOX_CONFIG += ionice
 endif
-ENV += BUSYBOX_CONFIG=$(BUSYBOX_CONFIG)
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
