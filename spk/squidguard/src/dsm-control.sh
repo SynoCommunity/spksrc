@@ -51,7 +51,7 @@ daemon_status ()
     return 1
 }
 
-wait_for_status()
+wait_for_status ()
 {
     counter=$2
     while [ ${counter} -gt 0 ]; do

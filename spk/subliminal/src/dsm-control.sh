@@ -15,7 +15,7 @@ PID_FILE="${INSTALL_DIR}/var/scheduler.pid"
 LOG_FILE="${INSTALL_DIR}/var/scheduler.log"
 
 
-start_daemon()
+start_daemon ()
 {
     su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${SCHEDULER}"
 }
@@ -35,7 +35,7 @@ daemon_status ()
     return 1
 }
 
-wait_for_status()
+wait_for_status ()
 {
     counter=$2
     while [ ${counter} -gt 0 ]; do

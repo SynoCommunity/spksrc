@@ -19,7 +19,7 @@ DELUGED_LOG="${INSTALL_DIR}/var/deluged.log"
 DELUGE_WEB_LOG="${INSTALL_DIR}/var/deluge-web.log"
 
 
-start_daemon()
+start_daemon ()
 {
     start-stop-daemon -S -q -x ${DELUGED} -c ${RUNAS} -u ${RUNAS} -p ${DELUGED_PID} \
       -- --quiet --config ${CFG_DIR} --logfile ${DELUGED_LOG} --loglevel info --pidfile ${DELUGED_PID}
@@ -28,7 +28,7 @@ start_daemon()
       -- --quiet --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
 }
 
-stop_daemon()
+stop_daemon ()
 {
     start-stop-daemon -K -q -u ${RUNAS} -p ${DELUGE_WEB_PID}
     start-stop-daemon -K -q -u ${RUNAS} -p ${DELUGED_PID}
@@ -40,7 +40,7 @@ stop_daemon()
     rm -f ${DELUGED_PID} ${DELUGE_WEB_PID}
 }
 
-daemon_status()
+daemon_status ()
 {
     start-stop-daemon -K -q -t -u ${RUNAS} -p ${DELUGE_WEB_PID}
     DELUGE_WEB_RETVAL=$?
@@ -49,7 +49,7 @@ daemon_status()
     [ ${DELUGED_RETVAL} -eq 0 -a ${DELUGE_WEB_RETVAL} -eq 0 ] || return 1
 }
 
-wait_for_status()
+wait_for_status ()
 {
     counter=$2
     while [ ${counter} -gt 0 ]; do
