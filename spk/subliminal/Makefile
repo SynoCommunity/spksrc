@@ -3,7 +3,7 @@ SPK_VERS = 0.6.2
 SPK_REV = 8
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
-CHANGELOG =
+BETA = 1
 
 DEPENDS =
 SPK_DEPENDS = "python>=2.7.3-3"
