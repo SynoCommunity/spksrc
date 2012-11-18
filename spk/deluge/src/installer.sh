@@ -54,6 +54,9 @@ postinst ()
 
 preuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         delgroup ${USER} ${GROUP}
