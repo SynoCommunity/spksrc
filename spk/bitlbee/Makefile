@@ -1,9 +1,8 @@
 SPK_NAME = bitlbee
 SPK_VERS = 3.0.6
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/bitlbee.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Change AuthMode to Closed\\\n2. Change RunMode to Daemon"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -24,6 +23,9 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = bitlbee_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
