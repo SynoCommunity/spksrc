@@ -3,6 +3,7 @@ SPK_VERS = 0.2.10
 SPK_REV = 3
 SPK_ICON = src/umurmur.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS = cross/openssl cross/$(SPK_NAME)
 
