@@ -6,6 +6,7 @@ DNAME="CouchPotato Server"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="couchpotatoserver"
@@ -55,6 +56,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Remove auto-updater stuff so it doesn't get confused
     rm -fr ${INSTALL_DIR}/var/cache/updates/
 
@@ -75,4 +79,3 @@ postupgrade ()
 
     exit 0
 }
-
