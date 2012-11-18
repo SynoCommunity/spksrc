@@ -5,8 +5,8 @@ SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 BETA = 1
 
-DEPENDS  = cross/busybox cross/dtach
-SPK_DEPENDS = "python>=2.7.3-1"
+DEPENDS  = cross/dtach
+SPK_DEPENDS = "python>=2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
@@ -52,4 +52,3 @@ $(STAGING_DIR)/share/GateOne:
 	cd $(STAGING_DIR)/share && git clone https://github.com/liftoff/GateOne.git GateOne
 	cd $(STAGING_DIR)/share/GateOne && git checkout 69b16c5147
 	rm -fr $(STAGING_DIR)/share/GateOne/.git $(STAGING_DIR)/share/GateOne/.gitignore
-
