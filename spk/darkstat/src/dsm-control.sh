@@ -7,25 +7,25 @@ DNAME="DarkStat"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:/usr/local/sbin"
-RUNAS="root"
+USER="root"
 DARKSTAT="${INSTALL_DIR}/sbin/darkstat"
 PID_FILE="${INSTALL_DIR}/var/darkstat.pid"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${DARKSTAT} -i eth0 --chroot ${INSTALL_DIR}/var --pidfile darkstat.pid --import darkstat.data --export darkstat.data"
+    su - ${USER} -c "PATH=${PATH} ${DARKSTAT} -i eth0 --chroot ${INSTALL_DIR}/var --pidfile darkstat.pid --import darkstat.data --export darkstat.data"
 }
 
 stop_daemon ()
 {
     kill `cat ${PID_FILE}`
-    wait_for_status 1 20
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
         return
     fi
     rm -f ${PID_FILE}
@@ -37,10 +37,11 @@ wait_for_status ()
     counter=$2
     while [ ${counter} -gt 0 ]; do
         daemon_status
-        [ $? -eq $1 ] && break
+        [ $? -eq $1 ] && return
         let counter=counter-1
         sleep 1
     done
+    return 1
 }
 
 
@@ -78,4 +79,3 @@ case $1 in
         exit 1
         ;;
 esac
-
