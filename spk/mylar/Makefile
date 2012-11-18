@@ -5,7 +5,7 @@ SPK_ICON = src/mylar.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-1"
+SPK_DEPENDS = "python>=2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
@@ -47,4 +47,3 @@ $(STAGING_DIR)/share/mylar:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/evilhero/mylar.git mylar
 	rm -fr $(STAGING_DIR)/share/mylar/.git $(STAGING_DIR)/share/mylar/.gitignore
-
