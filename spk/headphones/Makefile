@@ -5,7 +5,7 @@ SPK_ICON = src/headphones.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-1"
+SPK_DEPENDS = "python>=2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Headphones is an automatic NZB and torrent downloader for music. Mark albums as wanted and have them downloaded as soon as they are available. Different quality settings are possible, including lossless. With Headphones you can also manage your music library automatically: move, tag, rename and index for your DiskStation.
@@ -48,4 +48,3 @@ $(STAGING_DIR)/share/Headphones:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/rembo10/headphones.git Headphones
 	rm -fr $(STAGING_DIR)/share/Headphones/.git $(STAGING_DIR)/share/Headphones/.gitignore
-
