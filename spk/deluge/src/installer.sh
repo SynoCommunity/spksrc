@@ -17,6 +17,13 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
+    # Check for libtorrent
+    ${PYTHON_DIR}/bin/python -c 'import libtorrent' > /dev/null 2>&1
+    if [ $? -eq 1 ]; then
+        echo "This package is not available for your architecture"
+        exit 1
+    fi
+
     exit 0
 }
 
@@ -36,7 +43,7 @@ postinst ()
     cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G nobody -s /bin/sh -S -D ${RUNAS}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
 
     # Correct the files ownership
     chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
