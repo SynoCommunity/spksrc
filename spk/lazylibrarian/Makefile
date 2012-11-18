@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-1"
+SPK_DEPENDS = "python>=2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = This project isn\'t finished yet. Goal is to create a SickBeard, CouchPotato, Headphones-like application for ebooks. Headphones is used as a base, so there are still a lot of references to it.
