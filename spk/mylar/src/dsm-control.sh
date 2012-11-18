@@ -33,6 +33,7 @@ daemon_status ()
     if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
         return
     fi
+    rm -f ${PID_FILE}
     return 1
 }
 
