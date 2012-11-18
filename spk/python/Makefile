@@ -10,7 +10,7 @@ DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe
 # Add libtorrent for ARCHs that support it
-ifneq ($(findstring $(ARCH),88f5281 ppc824x ppc853x ppc854x),$(ARCH))
+ifneq ($(findstring $(ARCH),88f5281 powerpc ppc824x ppc853x ppc854x),$(ARCH))
 DEPENDS += cross/libtorrent
 endif
 
