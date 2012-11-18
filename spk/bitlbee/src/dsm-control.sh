@@ -18,17 +18,17 @@ start_daemon ()
     su - ${RUNAS} -c "${BITLBEE} -c ${CFG_FILE}"
 }
 
-stop_daemon ()
+stop_daemon()
 {
     kill `cat ${PID_FILE}`
-    wait_for_status 1 20
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
 }
 
-daemon_status ()
+daemon_status()
 {
-    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
-        return 0
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
     fi
     return 1
 }
@@ -38,10 +38,11 @@ wait_for_status()
     counter=$2
     while [ ${counter} -gt 0 ]; do
         daemon_status
-        [ $? -eq $1 ] && break
+        [ $? -eq $1 ] && return
         let counter=counter-1
         sleep 1
     done
+    return 1
 }
 
 
