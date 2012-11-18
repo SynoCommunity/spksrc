@@ -42,6 +42,7 @@ daemon_status ()
             return
         fi
     done
+    rm -f ${PID_FILES}
     return 1
 }
 
