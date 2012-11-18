@@ -5,7 +5,7 @@ SPK_ICON = src/sickbeard.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-1"
+SPK_DEPENDS = "python>=2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SickBeard is a PVR for newsgroup users \(with limited torrent support\). It watches for new episodes of your favorite shows and when they are posted it downloads them, sorts and renames them automatically. New episodes can also be indexed for your DiskStation.
@@ -50,4 +50,3 @@ $(STAGING_DIR)/share/SickBeard:
 	rm -fr $(STAGING_DIR)/share/SickBeard/.git $(STAGING_DIR)/share/SickBeard/.gitignore
 	chmod 777 $(STAGING_DIR)/share/SickBeard/autoProcessTV
 	install -m 600 $(STAGING_DIR)/share/SickBeard/autoProcessTV/autoProcessTV.cfg.sample $(STAGING_DIR)/share/SickBeard/autoProcessTV/autoProcessTV.cfg
-
