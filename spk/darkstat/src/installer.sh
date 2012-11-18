@@ -7,7 +7,7 @@ DNAME="DarkStat"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:/usr/local/sbin"
-RUNAS="root"
+USER="root"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
@@ -22,13 +22,16 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
@@ -42,6 +45,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
@@ -59,4 +65,3 @@ postupgrade ()
 
     exit 0
 }
-
