@@ -57,6 +57,9 @@ class Configuration(Base):
                 f.write('\n')
         if restart:
             self.restart()
+        error = self.check()
+        if error:
+            return {'success': False, 'error': error}
         return {'success': True}
 
     def status(self):
@@ -70,6 +73,11 @@ class Configuration(Base):
         with open(os.devnull, 'w') as devnull:
             subprocess.call([self.start_stop_status, 'stop'], stdout=devnull, stderr=devnull)
             subprocess.call([self.start_stop_status, 'start'], stdout=devnull, stderr=devnull)
+
+    def check(self):
+        with open(os.devnull, 'w') as devnull:
+            error = subprocess.check_output([self.start_stop_status, 'check'], stderr=subprocess.STDOUT)
+        return error
 
     @expose
     def reload(self):
