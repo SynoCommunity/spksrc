@@ -29,7 +29,7 @@ class Frontend(Base):
     name = Column(Unicode)
     binds = Column(Unicode)
     default_backend_id = Column(Integer, ForeignKey('backends.id', ondelete='SET NULL'))
-    options = Column(Unicode, nullable=False, default='')
+    options = Column(Unicode, nullable=False, default=u'')
 
     default_backend = relationship('Backend')
     associations = relationship('Association', back_populates='frontend', cascade='all, delete-orphan')
@@ -41,7 +41,7 @@ class Backend(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
     servers = Column(Unicode)
-    options = Column(Unicode, nullable=False, default='')
+    options = Column(Unicode, nullable=False, default=u'')
 
     associations = relationship('Association', back_populates='backend', cascade='all, delete-orphan')
 
@@ -51,7 +51,7 @@ class Association(Base):
 
     frontend_id = Column(Integer, ForeignKey('frontends.id', ondelete='CASCADE'), primary_key=True)
     backend_id = Column(Integer, ForeignKey('backends.id', ondelete='CASCADE'), primary_key=True)
-    condition = Column(Unicode, nullable=False, default='')
+    condition = Column(Unicode, nullable=False, default=u'')
 
     frontend = relationship('Frontend', back_populates='associations')
     backend = relationship('Backend', back_populates='associations')
