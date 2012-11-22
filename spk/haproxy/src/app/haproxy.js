@@ -563,10 +563,16 @@ SYNOCOMMUNITY.HAProxy.PanelConfiguration = Ext.extend(SYNOCOMMUNITY.HAProxy.Form
     onClickWriteConfiguration: function (button, event) {
         this.disableButtons();
         SYNOCOMMUNITY.HAProxy.Remote.Configuration.write(true, function (provider, response) {
-            if (response.result) {
+            if (response.result.success) {
                 this.owner.setStatusOK({
                     text: _V("msg", "write_configuration_successful")
                 });
+            } else {
+                this.owner.setStatusError({
+                    text: _V("msg", "configuration_error") + response.result.error,
+                    clear: true
+                });
+                this.onActivate();
             }
             this.enableButtons();
         }, this);

@@ -20,6 +20,11 @@ start_daemon ()
     su - ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -p ${PID_FILE}"
 }
 
+check_config ()
+{
+    su - ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -c -f ${CFG_FILE}" > /dev/null
+}
+
 stop_daemon ()
 {
     kill `cat ${PID_FILE}`
@@ -50,6 +55,10 @@ wait_for_status ()
 
 
 case $1 in
+    check)
+        check_config
+        exit 0
+        ;;
     start)
         if daemon_status; then
             echo ${DNAME} is already running

@@ -42,4 +42,5 @@ stopped = "Arrêté"
 [msg]
 association_duplicate = "Il y a déjà un enregistrement pour ce Frontend et ce Backend"
 write_configuration_successful = "Ecriture du fichier de configuration réussie"
-default_configuration_successful = "Configuration par défaut regargée avec succès"
+default_configuration_successful = "Configuration par défaut rechargée avec succès"
+configuration_error = "Il y a une erreur dans votre configuration : "
