@@ -8,7 +8,7 @@ DNAME="SABnzbd"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="sabnzbd"
+USER="sabnzbd"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
@@ -18,7 +18,7 @@ PID_FILES="${INSTALL_DIR}/var/sabnzbd-*.pid"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pid ${INSTALL_DIR}/var/ -d"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pid ${INSTALL_DIR}/var/ -d"
 }
 
 stop_daemon ()

@@ -9,7 +9,8 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="sabnzbd"
+USER="sabnzbd"
+GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -41,22 +42,26 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizzard
     sed -i -e "s|@download_dir@|${wizard_download_dir}|g" ${CFG_FILE}
 
     # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        deluser ${RUNAS}
+        delgroup ${USER} ${GROUP}
+        deluser ${USER}
     fi
 
     exit 0

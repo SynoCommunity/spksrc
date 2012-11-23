@@ -3,7 +3,7 @@ SPK_VERS = 0.7.6
 SPK_REV = 3
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
-BETA = 1
+CHANGELOG = "1. Update to 0.7.6\\\n2. Improve user management\\\n3. Update to new Python"
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
 
