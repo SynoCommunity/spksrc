@@ -7,14 +7,14 @@ DNAME="ZNC"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="znc"
+USER="znc"
 ZNC="${INSTALL_DIR}/bin/znc"
 PID_FILE="${INSTALL_DIR}/var/znc.pid"
 
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "${ZNC} -d ${INSTALL_DIR}/var"
+    su - ${USER} -c "${ZNC} -d ${INSTALL_DIR}/var"
 }
 
 stop_daemon ()

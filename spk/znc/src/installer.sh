@@ -8,7 +8,8 @@ DNAME="ZNC"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="znc"
+USER="znc"
+GROUP="nobody"
 ZNC="${INSTALL_DIR}/bin/znc"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -27,17 +28,17 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G nobody -s /bin/sh -S -D ${RUNAS}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizzard
     sed -i -e "s/@username@/${wizard_username:=admin}/g" ${INSTALL_DIR}/var/configs/znc.conf
     sed -i -e "s/@password@/${wizard_password:=admin}/g" ${INSTALL_DIR}/var/configs/znc.conf
 
     # Generate certificate
-    su - ${RUNAS} -c "${ZNC} -d ${INSTALL_DIR}/var -p" > /dev/null
+    su - ${USER} -c "${ZNC} -d ${INSTALL_DIR}/var -p" > /dev/null
 
     # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
@@ -46,7 +47,8 @@ preuninst ()
 {
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        deluser ${RUNAS}
+        delgroup ${USER} ${GROUP}
+        deluser ${USER}
     fi
 
     exit 0
@@ -54,6 +56,9 @@ preuninst ()
 
 postuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Remove link
     rm -f ${INSTALL_DIR}
 
