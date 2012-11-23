@@ -6,6 +6,7 @@ DNAME="DarkStat"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:/usr/local/sbin"
 USER="root"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
