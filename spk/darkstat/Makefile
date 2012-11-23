@@ -3,7 +3,6 @@ SPK_VERS = 3.0.715
 SPK_REV = 1
 SPK_ICON = src/darkstat.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/zlib cross/libpcap cross/$(SPK_NAME)
 
