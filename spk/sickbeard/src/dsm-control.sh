@@ -8,7 +8,7 @@ DNAME="SickBeard"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="sickbeard"
+USER="sickbeard"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SICKBEARD="${INSTALL_DIR}/share/SickBeard/SickBeard.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/var/Logs/sickbeard.log"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()
