@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
