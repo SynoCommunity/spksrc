@@ -3,7 +3,7 @@ import os
 import ConfigParser
 
 
-config = ConfigParser.ConfigParser()
+config = ConfigParser.SafeConfigParser()
 config.read('/usr/local/couchpotatoserver/var/settings.conf')
 protocol = 'http'
 port = int(config.get('core', 'port'))

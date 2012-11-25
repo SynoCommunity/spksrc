@@ -270,7 +270,7 @@ class CouchPotatoServer(Base):
     def __init__(self):
         self.config = None
         if os.path.exists(self.config_path):
-            self.config = ConfigParser.ConfigParser()
+            self.config = ConfigParser.SafeConfigParser()
             self.config.read(self.config_path)
 
     @expose
