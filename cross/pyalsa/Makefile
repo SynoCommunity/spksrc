@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.alsa-project.org/pub/pyalsa
 
-DEPENDS = cross/alsa-lib cross/setuptools
+DEPENDS = cross/alsa-lib
 
 HOMEPAGE = http://www.alsa-project.org/
 COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
