@@ -1,5 +1,5 @@
-bin:bin/bunzip2
-bin:bin/bzcat
+lnk:bin/bunzip2
+lnk:bin/bzcat
 lnk:bin/bzcmp
 bin:bin/bzdiff
 lnk:bin/bzegrep
@@ -9,3 +9,5 @@ bin:bin/bzip2
 bin:bin/bzip2recover
 lnk:bin/bzless
 bin:bin/bzmore
+lnk:lib/libbz2.so.1.0
+lib:lib/libbz2.so.1.0.6
