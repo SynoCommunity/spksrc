@@ -43,7 +43,7 @@ cat_PLIST:
 	@true
 
 dependency-tree:
-	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
+	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
 	@for depend in $(DEPENDS) ; \
 	do \
 	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
