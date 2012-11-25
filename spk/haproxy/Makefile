@@ -7,7 +7,7 @@ CHANGELOG =
 BETA = 1
 
 DEPENDS = cross/haproxy
-SPK_DEPENDS = "python>=2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.

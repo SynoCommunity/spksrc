@@ -7,7 +7,7 @@ DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
 CHANGELOG = "1. Fix detection of SickBeard's newsgrabber\\\n2. Update for NZBGet 9.0"
 BETA = 1
 
-SPK_DEPENDS = "python>=2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, CouchPotato and Headphones

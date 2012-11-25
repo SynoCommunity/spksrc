@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  =
-SPK_DEPENDS = "python>=2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.

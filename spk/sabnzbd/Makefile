@@ -7,7 +7,7 @@ CHANGELOG = "1. Update to 0.7.6\\\n2. Improve user management\\\n3. Update to ne
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
 
-SPK_DEPENDS = "python>=2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
