@@ -5,7 +5,7 @@ SPK_ICON = src/python.png
 BETA = 1
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
-DEPENDS += cross/setuptools cross/pip cross/virtualenv cross/pyopenssl
+DEPENDS += cross/distribute cross/distutils2 cross/pip cross/virtualenv cross/pyopenssl
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, 
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update existing modules\\\n2. Add modules Twisted, zope.interface and MarkupSafe\\\n3. Add libtorrent for some architectures\\\n4. Enable unicode usc4\\\n5. Make the SPK not startable"
+CHANGELOG = "1. Update existing modules\\\n2. Add modules distutils2, Twisted, zope.interface and MarkupSafe\\\n3. Replace setuptools with distribute\\\n4. Add libtorrent for some architectures\\\n5. Enable unicode usc4\\\n6. Make the SPK not startable"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
@@ -47,4 +47,3 @@ python_cleanup:
 	rm $(STAGING_DIR)/$(PYTHON_LIB_DIR)/config/libpython*.a
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type d -regex '.*/[Tt]ests?' | xargs rm -fr
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' | xargs rm -f
-	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py' | xargs chmod 444
