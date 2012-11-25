@@ -2,7 +2,6 @@ SPK_NAME = python
 SPK_VERS = 2.7.3
 SPK_REV = 3
 SPK_ICON = src/python.png
-BETA = 1
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 DEPENDS += cross/distribute cross/distutils2 cross/pip cross/virtualenv cross/pyopenssl
