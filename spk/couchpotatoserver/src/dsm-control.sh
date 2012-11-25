@@ -8,7 +8,7 @@ DNAME="CouchPotato Server"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="couchpotatoserver"
+USER="couchpotatoserver"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 COUCHPOTATOSERVER="${INSTALL_DIR}/share/CouchPotatoServer/CouchPotato.py"
 CFG_FILE="${INSTALL_DIR}/var/settings.conf"
@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/var/logs/CouchPotato.log"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
 }
 
 stop_daemon ()

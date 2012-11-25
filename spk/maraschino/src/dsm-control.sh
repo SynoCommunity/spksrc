@@ -8,7 +8,7 @@ DNAME="Maraschino"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="maraschino"
+USER="maraschino"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 MARASCHINO="${INSTALL_DIR}/share/maraschino/Maraschino.py"
 PID_FILE="${INSTALL_DIR}/var/maraschino.pid"
@@ -18,7 +18,7 @@ DB_FILE="${INSTALL_DIR}/var/maraschino.db"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${MARASCHINO} --daemon --port 8260 --pidfile ${PID_FILE} --database ${DB_FILE} --log ${LOG_FILE}"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${MARASCHINO} --daemon --port 8260 --pidfile ${PID_FILE} --database ${DB_FILE} --log ${LOG_FILE}"
 }
 
 stop_daemon ()
