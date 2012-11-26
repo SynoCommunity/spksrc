@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  = cross/dtach
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>=2.7.3-2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
