@@ -43,5 +43,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python_cleanup
 python_cleanup:
-	rm $(STAGING_DIR)/$(PYTHON_LIB_DIR)/config/libpython*.a
+	rm -f $(STAGING_DIR)/$(PYTHON_LIB_DIR)/config/libpython*.a
+	rm -fr $(STAGING_DIR)/$(PYTHON_LIB_DIR)/test/
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' | xargs rm -f
