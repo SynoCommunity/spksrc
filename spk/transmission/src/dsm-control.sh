@@ -7,14 +7,14 @@ DNAME="Transmission"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="transmission"
+USER="transmission"
 TRANSMISSION="${INSTALL_DIR}/bin/transmission-daemon"
 PID_FILE="${INSTALL_DIR}/var/transmission.pid"
 
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    su - ${USER} -c "${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
 }
 
 stop_daemon ()
