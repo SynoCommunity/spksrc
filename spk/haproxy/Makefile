@@ -4,7 +4,6 @@ SPK_REV = 2
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 CHANGELOG =
-BETA = 1
 
 DEPENDS = cross/haproxy
 SPK_DEPENDS = "python>2.7.3-2"
