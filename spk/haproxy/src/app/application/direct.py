@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from db import *
 from pyextdirect.configuration import (create_configuration, expose, LOAD,
-    STORE_READ, STORE_CUD, SUBMIT)
+    STORE_READ, STORE_CUD)
 from sqlalchemy.orm import joinedload
-import datetime
 import os
+import pwd
 import shutil
 import subprocess
-import tempfile
 
 
 __all__ = ['Base', 'Configuration', 'Frontends', 'Backends', 'Associations']
@@ -21,6 +20,7 @@ class Configuration(Base):
     template = u'/usr/local/haproxy/var/haproxy.cfg.tpl'
     start_stop_status = u'/var/packages/haproxy/scripts/start-stop-status'
     crt_path = u'/usr/local/haproxy/var/crt/default.pem'
+    user = u'haproxy'
 
     def __init__(self):
         self.session = Session()
@@ -87,9 +87,17 @@ class Configuration(Base):
 
     @expose
     def generate_certificate(self):
-        with open(os.devnull, 'w') as devnull:
-            with open(self.crt_path, 'w') as f:
-                subprocess.call(['cat', '/usr/syno/etc/ssl/ssl.crt/server.crt', '/usr/syno/etc/ssl/ssl.key/server.key'], stdout=f, stderr=devnull)
+        if os.path.exists(self.crt_path):
+            os.remove(self.crt_path)
+        with open(self.crt_path, 'w') as crt:
+            for filepath in [u'/usr/syno/etc/ssl/ssl.crt/server.crt', u'/usr/syno/etc/ssl/ssl.crt/ca.crt', u'/usr/syno/etc/ssl/ssl.key/server.key']:
+                with open(filepath, 'r') as f:
+                    content = f.read()
+                if not content.endswith('\n'):
+                    content += '\n'
+                cert.write(content)
+        os.chown(self.crt_path, pwd.getpwnam(self.user).pw_uid, -1)
+        os.chmod(self.crt_path, 0600)
         return {'success': True}
 
 
