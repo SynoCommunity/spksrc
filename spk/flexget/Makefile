@@ -1,5 +1,5 @@
 SPK_NAME = flexget
-SPK_VERS_REV = 3197
+SPK_VERS_REV = 3206
 SPK_VERS = 1.0~r$(SPK_VERS_REV)
 SPK_REV = 2
 SPK_ICON = src/flexget.png
