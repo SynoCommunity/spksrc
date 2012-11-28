@@ -95,7 +95,7 @@ class Configuration(Base):
                     content = f.read()
                 if not content.endswith('\n'):
                     content += '\n'
-                cert.write(content)
+                crt.write(content)
         os.chown(self.crt_path, pwd.getpwnam(self.user).pw_uid, -1)
         os.chmod(self.crt_path, 0600)
         return {'success': True}
