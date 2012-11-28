@@ -8,7 +8,7 @@ DNAME="uMurmur"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="root"
+USER="root"
 GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -35,13 +35,16 @@ postinst ()
     fi
 
     # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
 
 preuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
