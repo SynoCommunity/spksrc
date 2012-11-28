@@ -7,7 +7,7 @@ DNAME="BitlBee"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/sbin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="bitlbee"
+USER="bitlbee"
 BITLBEE="${INSTALL_DIR}/sbin/bitlbee"
 CFG_FILE="${INSTALL_DIR}/var/bitlbee.conf"
 PID_FILE="${INSTALL_DIR}/var/bitlbee.pid"
@@ -15,7 +15,7 @@ PID_FILE="${INSTALL_DIR}/var/bitlbee.pid"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "${BITLBEE} -c ${CFG_FILE}"
+    su - ${USER} -c "${BITLBEE} -c ${CFG_FILE}"
 }
 
 stop_daemon ()

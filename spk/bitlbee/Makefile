@@ -3,7 +3,6 @@ SPK_VERS = 3.0.6
 SPK_REV = 3
 SPK_ICON = src/bitlbee.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
