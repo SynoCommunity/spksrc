@@ -8,7 +8,7 @@ DNAME="LazyLibrarian"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="lazylibrarian"
+USER="lazylibrarian"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 LAZYLIBRARIAN="${INSTALL_DIR}/share/LazyLibrarian/LazyLibrarian.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/var/logs/lazylibrarian.log"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${LAZYLIBRARIAN} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${LAZYLIBRARIAN} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()
