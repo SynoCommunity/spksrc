@@ -8,7 +8,7 @@ DNAME="FlexGet"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="flexget"
+USER="flexget"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 FLEXGET="${INSTALL_DIR}/env/bin/flexget-webui"
 CFG_FILE="${INSTALL_DIR}/var/config.yml"
@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/var/flexget.log"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${FLEXGET} -d -c ${CFG_FILE} --port 8290 > /dev/null"
+    su - ${USER} -c "PATH=${PATH} ${FLEXGET} -d -c ${CFG_FILE} --port 8290 > /dev/null"
 }
 
 stop_daemon ()
