@@ -33,6 +33,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: deluge_extra_install
 deluge_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/config.yml $(STAGING_DIR)/var/config.yml
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/deluge.cgi.py $(STAGING_DIR)/app/deluge.cgi
