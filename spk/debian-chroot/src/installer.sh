@@ -10,7 +10,6 @@ PYTHON_DIR="/usr/local/python"
 CHROOTTARGET="${INSTALL_DIR}/var/chroottarget"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin"
 CHROOT_PATH="/usr/local/bin:/usr/bin:/bin"
-RUNAS="root"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -33,9 +32,6 @@ postinst ()
 
     # Setup the database
     ${INSTALL_DIR}/env/bin/python ${INSTALL_DIR}/app/setup.py
-
-    # Correct the files ownership
-    chown -R ${RUNAS}:root ${SYNOPKG_PKGDEST}
 
     # Debootstrap second stage in the background and configure the chroot environment
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
