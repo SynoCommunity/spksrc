@@ -6,11 +6,10 @@ include ../../mk/spksrc.directories.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
-ARCH_SUFFIX = -$(ARCH)
-TC = syno$(ARCH_SUFFIX)
+TC = syno-$(ARCH)
 endif
 
-SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)$(ARCH_SUFFIX)-$(SPK_VERS)-$(SPK_REV).spk
+SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(ARCH)_$(SPK_VERS)_$(SPK_REV).spk
 
 #####
 
