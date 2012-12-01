@@ -34,15 +34,15 @@ endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 DEBIAN_ARCH = powerpc
 endif
+ifeq ($(strip $(DEBIAN_ARCH)),)
+$(error Arch $(ARCH) not supported)
+endif
 
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: debian-chroot_extra_install
 debian-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
-ifeq ($(strip $(DEBIAN_ARCH)),)
-	false
-endif
 	install -m 755 -d $(STAGING_DIR)/var
 	debootstrap --foreign --arch $(DEBIAN_ARCH) squeeze $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
 	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default
