@@ -5,11 +5,12 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
-ifneq ($(ARCH),)
-TC = syno-$(ARCH)
+SPK_ARCH = $(ARCH)
+ifeq ($(strip $(SPK_ARCH)),)
+SPK_ARCH = noarch
 endif
 
-SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(ARCH)_$(SPK_VERS)_$(SPK_REV).spk
+SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_ARCH)_$(SPK_VERS)_$(SPK_REV).spk
 
 #####
 
