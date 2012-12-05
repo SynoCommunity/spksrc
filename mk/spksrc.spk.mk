@@ -47,11 +47,7 @@ $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	   ) \
 	) | sed 's|"\s|"\n|' >> $@
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
-ifneq ($(strip $(ARCH)),)
-	@echo arch=\"$(ARCH)\" >> $@
-else
-	@echo arch=\"noarch\" >> $@
-endif
+	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
