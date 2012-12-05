@@ -5,8 +5,11 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
+ifneq ($(ARCH),)
 SPK_ARCH = $(ARCH)
-ifeq ($(strip $(SPK_ARCH)),)
+ARCH_SUFFIX = -$(ARCH)
+TC = syno$(ARCH_SUFFIX)
+else
 SPK_ARCH = noarch
 endif
 
