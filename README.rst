@@ -17,7 +17,9 @@ Usage
 Lets start with an example::
 
     git clone https://github.com/SynoCommunity/spksrc.git
-    cd spksrc/spk/transmission
+    cd spksrc/
+    make setup
+    cd spk/transmission
     make arch-88f6281
 
 What have I done?
