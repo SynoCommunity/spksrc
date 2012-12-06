@@ -1,6 +1,7 @@
 bin:bin/polarssl_aescrypt2
 bin:bin/polarssl_benchmark
 bin:bin/polarssl_cert_app
+bin:bin/polarssl_cert_req
 bin:bin/polarssl_crl_app
 bin:bin/polarssl_crypt_and_hash
 bin:bin/polarssl_dh_client
@@ -12,6 +13,7 @@ bin:bin/polarssl_gen_random_ctr_drbg
 bin:bin/polarssl_gen_random_havege
 bin:bin/polarssl_hello
 bin:bin/polarssl_key_app
+bin:bin/polarssl_key_app_writer
 bin:bin/polarssl_md5sum
 bin:bin/polarssl_mpi_demo
 bin:bin/polarssl_rsa_decrypt
@@ -30,4 +32,7 @@ bin:bin/polarssl_ssl_client2
 bin:bin/polarssl_ssl_fork_server
 bin:bin/polarssl_ssl_mail_client
 bin:bin/polarssl_ssl_server
+bin:bin/polarssl_ssl_server2
 bin:bin/polarssl_ssl_test
+bin:bin/polarssl_strerror
+lib:lib/libpolarssl.so

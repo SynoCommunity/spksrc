@@ -1,5 +1,5 @@
 PKG_NAME = polarssl
-PKG_VERS = 1.1.4
+PKG_VERS = 1.2.3
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-gpl.$(PKG_EXT)
 PKG_DIST_SITE = http://polarssl.org/code/releases
@@ -22,9 +22,8 @@ myConfigure: ;
 
 .PHONY: myCompile
 myCompile:
-	@$(RUN) $(MAKE) DESTDIR=$(STAGING_INSTALL_PREFIX)
+	@$(RUN) $(MAKE) DESTDIR=$(STAGING_INSTALL_PREFIX) SHARED=1 no_test
 
 .PHONY: myInstall
 myInstall:
-	@$(RUN) $(MAKE) DESTDIR=$(STAGING_INSTALL_PREFIX) install
-
+	@$(RUN) $(MAKE) DESTDIR=$(STAGING_INSTALL_PREFIX) SHARED=1 install
