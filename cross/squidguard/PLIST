@@ -1,1 +1,2 @@
 bin:bin/squidGuard
+rsc:share/www/squidguardmgr/squidGuard.cgi

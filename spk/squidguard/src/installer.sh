@@ -35,22 +35,22 @@ postinst ()
     # Init squid cache directory
     su - ${RUNAS} -c "${SQUID} -z -f ${CFG_FILE}"
 
-    # Init squidGuard DB
-    su - ${RUNAS} -c "${INSTALL_DIR}/bin/update_db.sh > ${INSTALL_DIR}/var/logs/update_db.log"
-
     # Install webman
-    su - ${RUNAS} -c "ln -s $WWW_DIR ${WEBMAN_DIR}/${PACKAGE}"
-    su - ${RUNAS} -c "ln -s ${INSTALL_DIR}/etc/squiguardmgr.conf ${WEBMAN_DIR}/${PACKAGE}/"
+    ln -s ${WWW_DIR} ${WEBMAN_DIR}/${PACKAGE}
+    ln -sf ${INSTALL_DIR}/etc/squidguardmgr.conf ${WEBMAN_DIR}/${PACKAGE}/
       
     # Init crontab : update squidguard DB each day at 1 a.m
-    nb=`grep ${PACKAGE} /etc/crontab`
-    if [ "x$nb" eq "x" ]; then
-        echo "0 1       *       *       *       root    su - ${RUNAS} -c \"${INSTALL_DIR}/bin/update_db.sh > ${INSTALL_DIR}/var/logs/update_db.log\"" >> /etc/crontab
+    grep ${PACKAGE} /etc/crontab
+    if [ $? -eq 1 ]; then
+        echo "0 1       *       *       *       root    ${INSTALL_DIR}/bin/update_db.sh > ${INSTALL_DIR}/var/logs/update_db.log" >> /etc/crontab
         /usr/syno/etc/rc.d/S04crond.sh stop
         sleep 1
         /usr/syno/etc/rc.d/S04crond.sh start
     fi
     
+    # Init squidGuard DB
+    nohup ${INSTALL_DIR}/bin/update_db.sh > ${INSTALL_DIR}/var/logs/update_db.log &
+
     exit 0
 }
 
