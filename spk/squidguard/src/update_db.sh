@@ -15,9 +15,8 @@ wget ${DB_FILE}
 tar xvzf blacklists.tar.gz -C ${DB_DIR}
 if [ $? -eq 0 ]
 then
-  mv ${DB_DIR}/blacklists/* ${DB_DIR}
-  rm blacklists.tar.gz
-  rmdir blacklists
+  cp -R ${DB_DIR}/blacklists/* ${DB_DIR}/
+  rm -Rf ${DB_DIR}/blacklists*
   chown -R ${RUNAS}:root ${DB_DIR}
-  ${INSTALL_DIR}/bin/squidGuard -c ${INSTALL_DIR}/etc/squidguard.conf -C all
+  su - ${RUNAS} -c "${INSTALL_DIR}/bin/squidGuard -c ${INSTALL_DIR}/etc/squidguard.conf -C all -u"
 fi

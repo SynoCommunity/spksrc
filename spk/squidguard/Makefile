@@ -22,6 +22,9 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = xz-compress
 
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: xz-compress
@@ -39,7 +42,7 @@ xz-compress:
 	install -m 755 -d $(STAGING_DIR)/var/db
 	install -m 755 src/update_db.sh $(STAGING_DIR)/bin/
 	install -m 755 src/etc/* $(STAGING_DIR)/etc/
-	install -m 644 app/config $(STAGING_DIR)/share/www/squidguardmgr/
+	install -m 644 src/app/config $(STAGING_DIR)/share/www/squidguardmgr/
 	for size in 16 24 32 48 ; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
