@@ -8,7 +8,7 @@ BETA = 1
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Free \& open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load. It comes with phpMemcachedAdmin, a graphic stand-alone administration for memcached to monitor and debug purpose.
+DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 RELOAD_UI = yes
 DISPLAY_NAME = Redis
 
