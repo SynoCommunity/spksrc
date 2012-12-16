@@ -3,7 +3,6 @@ SPK_VERS = 1.4.15
 SPK_REV = 1
 SPK_ICON = src/memcached.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/phpmemcachedadmin cross/$(SPK_NAME)
 

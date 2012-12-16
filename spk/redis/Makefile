@@ -3,7 +3,6 @@ SPK_VERS = 2.6.7
 SPK_REV = 1
 SPK_ICON = src/redis.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
