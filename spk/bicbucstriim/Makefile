@@ -1,5 +1,5 @@
 SPK_NAME = bicbucstriim
-SPK_VERS = 0.9.3
+SPK_VERS = 1.0.0
 SPK_REV = 1
 SPK_ICON = src/bicbucstriim.png
 DSM_UI_DIR = app
