@@ -6,6 +6,7 @@
             "desc": "BicBucStriim",
             "allUsers": true,
             "icon": "images/bicbucstriim-{0}.png",
+            "protocol": "http",
             "url": "/bbs",
             "port": "80"
         }

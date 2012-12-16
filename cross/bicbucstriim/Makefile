@@ -1,8 +1,8 @@
 PKG_NAME = BicBucStriim
-PKG_VERS = 0.9.3
+PKG_VERS = 1.0.0
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/downloads/rvolz/$(PKG_NAME)
+PKG_DIST_SITE = http://projekte.textmulch.de/bicbucstriim/downloads
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
