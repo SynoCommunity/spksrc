@@ -10,6 +10,7 @@ PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 SQUID="${INSTALL_DIR}/sbin/squid"
 RUNAS="squid"
 CFG_FILE="${INSTALL_DIR}/etc/squid.conf"
+ETC_DIR="${INSTALL_DIR}/etc/"
 WWW_DIR="/var/packages/${PACKAGE}/target/share/www/squidguardmgr"
 WEBMAN_DIR="/usr/syno/synoman/webman/3rdparty"
 
@@ -29,6 +30,10 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
 
+    # Patch template files
+    hostname=`hostname`
+    sed "s/==HOSTNAME==/$hostname/g" ${ETC_DIR}/squidguard.conf.tpl > ${ETC_DIR}/squidguard.conf
+    
     # Correct the files ownership
     chown -R ${RUNAS}:users ${SYNOPKG_PKGDEST}
 
@@ -48,9 +53,6 @@ postinst ()
         /usr/syno/etc/rc.d/S04crond.sh start
     fi
     
-    # Init squidGuard DB
-    nohup ${INSTALL_DIR}/bin/update_db.sh > ${INSTALL_DIR}/var/logs/update_db.log &
-
     exit 0
 }
 

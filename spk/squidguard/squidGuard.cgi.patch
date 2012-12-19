@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+# Are we authenticated yet ?
+
+if (open (IN,"/usr/syno/synoman/webman/modules/authenticate.cgi|")) {
+	$user=<IN>;
+	chop($user);
+	close(IN);
+}
+
+
+# if not admin or no user at all...no authentication...so, bye-bye
+
+if ($user ne 'admin') {
+	print "Content-type: text/html\n\n";
+	print "<HTML><HEAD><TITLE>Login Required</TITLE></HEAD><BODY>Please login as admin first, before using this webpage</BODY></HTML>\n";
+	die;
+}
