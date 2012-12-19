@@ -4,7 +4,7 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.squidguard.org/Downloads/Devel/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
+DB_FILE= ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/blacklists.tar.gz
 DEPENDS = 
 
 HOMEPAGE = http://www.squidguard.org/
@@ -22,8 +22,12 @@ CONFIGURE_ARGS  = --with-db=$(INSTALL_DIR)/$(INSTALL_PREFIX) --exec-prefix=$(INS
 
 .PHONY: myInstall
 myInstall:
+	@$(RUN) install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
+	@$(RUN) wget $(DB_FILE) -O $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists.tar.gz
+	@$(RUN) tar xvzf $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists.tar.gz -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
+	@$(RUN) cp -R $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists/* $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/
+	@$(RUN) rm -Rf $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists*
 	@$(RUN) install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
-	@$(RUN) install -m 755 samples/squidGuard.cgi $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
 
 
 
