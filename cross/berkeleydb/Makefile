@@ -20,7 +20,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure: 
-	@$(RUN) ; cd build_unix ; ../dist/configure --prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+	$(RUN) ; cd build_unix ; ../dist/configure $(TC_CONFIGURE_ARGS) --prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX) 
 
 .PHONY: myCompile
 myCompile: 

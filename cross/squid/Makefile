@@ -13,7 +13,7 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX) --enable-icap-client --disable-strict-error-checking
+CONFIGURE_ARGS  = $(TC_CONFIGURE_ARGS) --prefix=$(INSTALL_PREFIX) --enable-icap-client --disable-strict-error-checking
 
 include ../../mk/spksrc.cross-cc.mk
 
