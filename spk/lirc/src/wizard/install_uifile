@@ -1,0 +1,29 @@
+[{
+    "step_title": "Configuration",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Choose driver to install",
+        "subitems": [{
+            "key": "lirc_driver_atiusb",
+ "desc": "atiusb"
+ }, {
+"key": "lirc_driver_i2c",
+ "desc": "i2c"
+ }, {
+"key": "lirc_driver_mceusb",
+ "desc": "mceusb"
+ }, {
+"key": "lirc_driver_parallel",
+ "desc": "parallel"
+ }, {
+"key": "lirc_driver_serial",
+ "desc": "serial"
+ }, {
+"key": "lirc_driver_ttusbir",
+ "desc": "ttusbir"
+ }, {
+"key": "lirc_driver_none",
+            "desc": "none"
+        }]
+    }]
+}]

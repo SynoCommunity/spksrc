@@ -1,0 +1,359 @@
+begin
+	flags = startup_mode
+	mode = doit
+end
+
+begin dontdoit
+begin
+	remote = comcast
+	button = AV
+	mode = doit
+	flags = quit
+end
+end dontdoit
+
+begin doit
+begin
+       remote = comcast
+       button = POWER
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast POWER
+end
+ 
+begin
+       remote = comcast
+       button = CH_UP
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast CH_UP
+end
+ 
+begin
+       remote = comcast
+       button = CH_DOWN
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast CH_DOWN
+end
+ 
+begin
+       remote = comcast
+       button = UP
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast UP
+end
+ 
+begin
+       remote = comcast
+       button = DOWN
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast DOWN
+end
+ 
+begin
+       remote = comcast
+       button = LEFT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast LEFT
+end
+ 
+begin
+       remote = comcast
+       button = RIGHT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast RIGHT
+end
+ 
+begin
+       remote = comcast
+       button = OK
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast OK
+end
+ 
+begin
+       remote = comcast
+       button = SELECT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast SELECT
+end
+ 
+begin
+       remote = comcast
+       button = GUIDE
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast GUIDE
+end
+ 
+begin
+       remote = comcast
+       button = MENU
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast MENU
+end
+ 
+begin
+       remote = comcast
+       button = INFO
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast INFO
+end
+ 
+begin
+       remote = comcast
+       button = LAST
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast LAST
+end
+ 
+begin
+       remote = comcast
+       button = EXIT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast EXIT
+end
+ 
+begin
+       remote = comcast
+       button = 1
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 1
+end
+ 
+begin
+       remote = comcast
+       button = 2
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 2
+end
+ 
+begin
+       remote = comcast
+       button = 3
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 3
+end
+ 
+begin
+       remote = comcast
+       button = 4
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 4
+end
+ 
+begin
+       remote = comcast
+       button = 5
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 5
+end
+ 
+begin
+       remote = comcast
+       button = 6
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 6
+end
+ 
+begin
+       remote = comcast
+       button = 7
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 7
+end
+ 
+begin
+       remote = comcast
+       button = 8
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 8
+end
+ 
+begin
+       remote = comcast
+       button = 9
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 9
+end
+ 
+begin
+       remote = comcast
+       button = 0
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast 0
+end
+ 
+begin
+       remote = comcast
+       button = HELP
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast HELP
+end
+ 
+begin
+       remote = comcast
+       button = PLAY
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast PLAY
+end
+ 
+begin
+       remote = comcast
+       button = FF
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast FF
+end
+ 
+begin
+       remote = comcast
+       button = RWD
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast RWD
+end
+ 
+begin
+       remote = comcast
+       button = STOP
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast STOP
+end
+ 
+begin
+       remote = comcast
+       button = PAUSE
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast PAUSE
+end
+ 
+begin
+       remote = comcast
+       button = ONDEMAND
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast ONDEMAND
+end
+
+begin
+	remote = comcast
+	button = AV
+	mode = dontdoit
+end
+
+begin
+       remote = comcast_atv
+       button = UP
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv UP
+end
+ 
+begin
+       remote = comcast_atv
+       button = DOWN
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv DOWN
+end
+ 
+begin
+       remote = comcast_atv
+       button = LEFT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv LEFT
+end
+ 
+begin
+       remote = comcast_atv
+       button = RIGHT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv RIGHT
+end
+ 
+begin
+       remote = comcast_atv
+       button = SELECT
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv SELECT
+end
+ 
+begin
+       remote = comcast_atv
+       button = OK
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv OK
+end
+ 
+begin
+       remote = comcast_atv
+       button = MENU
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv MENU
+end
+ 
+begin
+       remote = comcast_atv
+       button = PLAY
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv PLAY
+end
+ 
+begin
+       remote = comcast_atv
+       button = PAUSE
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv PAUSE
+end
+ 
+begin
+       remote = comcast_atv
+       button = FF
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv FF
+end
+ 
+begin
+       remote = comcast_atv
+       button = RWD
+       prog   = irexec
+       repeat = 0
+       config = /usr/local/lirc/etc/lirc/scripts/send_ir.sh comcast_atv RWD
+end
+ 
+end doit
+
