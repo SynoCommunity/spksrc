@@ -1,0 +1,13 @@
+push to my git branch!!!
+final touches in installer.sh (upgrade commands?)
+fix kernel source dependency
+test compile other architectures?
+play with config file editor package
+
+
+DONE:
+proper integration of irexec / lircrc (send_ir.sh)
+export path so lirc binaries are accessible?
+setup installation wizard to select driver and appropriately propogate
+compile with all drivers (except wpc8769l)
+provide sample base lircd.conf and lircrc
