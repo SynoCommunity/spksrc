@@ -1,11 +1,11 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5~dev14
-SPK_REV = 3
+SPK_VERS = 1.5~dev17
+SPK_REV = 4
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Update to dev14\\\n2. Fix certificate generation in some cases\\\n3. Change certificate permissions"
+CHANGELOG = "1. Update to dev17\\\n2. Add TPROXY"
 
-DEPENDS = cross/haproxy
+DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python>2.7.3-2"
 
 MAINTAINER = SynoCommunity
