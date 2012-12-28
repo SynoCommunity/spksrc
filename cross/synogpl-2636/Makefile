@@ -33,6 +33,5 @@ kernel_precompile_target:
 	sed -i -r 's,^CROSS_COMPILE\t+.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(WORK_DIR)/$(PKG_DIR)/Makefile
 	ln -sf arm $(WORK_DIR)/$(PKG_DIR)/arch/88f6281
 kernel_compile_target:
-	#cd $(WORK_DIR)/$(PKG_DIR) && $(MAKE) ARCH=arm CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) LDFLAGS="" modules
 	cd $(WORK_DIR)/$(PKG_DIR) && $(MAKE) LDFLAGS="" modules
 kernel_null_target:
