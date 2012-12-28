@@ -17,11 +17,6 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
-    # Installation wizard requirements
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ] && [ -z "${wizard_oper_password}" ]; then
-        exit 1
-    fi
-
     exit 0
 }
 
@@ -37,8 +32,8 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizzard
-    sed -i -e "s|@auth_password@|`${BITLBEE} -x hash ${wizard_auth_password}`|g" ${CFG_FILE}
-    sed -i -e "s|@oper_password@|`${BITLBEE} -x hash ${wizard_oper_password}`|g" ${CFG_FILE}
+    sed -i -e "s|@auth_password@|`${BITLBEE} -x hash ${wizard_auth_password:=admin}`|g" ${CFG_FILE}
+    sed -i -e "s|@oper_password@|`${BITLBEE} -x hash ${wizard_oper_password:=admin}`|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}

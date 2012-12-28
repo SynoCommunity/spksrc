@@ -1,8 +1,9 @@
 SPK_NAME = bitlbee
 SPK_VERS = 3.0.6
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/bitlbee.png
 DSM_UI_DIR = app
+CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 

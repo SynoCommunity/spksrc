@@ -1,8 +1,9 @@
 SPK_NAME = transmission
 SPK_VERS = 2.75
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
+CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 

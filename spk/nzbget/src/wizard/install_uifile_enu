@@ -2,14 +2,14 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download directory",
+        "desc": "Download directory. Defaults to /volume1/downloads",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Download directory (required)"
+            "desc": "Download directory"
         }]
     }, {
         "type": "password",
-        "desc": "Server password. Leave blank to use nzbget (can be changed)",
+        "desc": "Server password. Defaults to nzbget",
         "subitems": [{
             "key": "wizard_server_password",
             "desc": "Server password"

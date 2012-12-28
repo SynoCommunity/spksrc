@@ -1,15 +1,15 @@
 [{
-    "step_title": "Configuration minimale",
+    "step_title": "Configuration de base",
     "items": [{
         "type": "textfield",
-        "desc": "Identifiant de l'administrateur. Laisser vide pour utiliser admin (peut être changé)",
+        "desc": "Identifiant de l'administrateur. admin par défaut",
         "subitems": [{
             "key": "wizard_username",
             "desc": "Identifiant"
         }]
     }, {
         "type": "password",
-        "desc": "Mot de passe de l'administrateur. Laisser vide pour utiliser admin (peut être changé)",
+        "desc": "Mot de passe de l'administrateur. admin par défaut",
         "subitems": [{
             "key": "wizard_password",
             "desc": "Mot de passe"

@@ -7,14 +7,14 @@ DNAME="Tvheadend"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="tvheadend"
+USER="tvheadend"
 TVHEADEND="${INSTALL_DIR}/bin/tvheadend"
 PID_FILE="${INSTALL_DIR}/var/tvheadend.pid"
 
 
 start_daemon ()
 {
-    ${TVHEADEND} -f -u ${RUNAS} -c ${INSTALL_DIR}/var -p ${PID_FILE}
+    ${TVHEADEND} -f -u ${USER} -c ${INSTALL_DIR}/var -p ${PID_FILE}
 }
 
 stop_daemon ()
@@ -83,4 +83,3 @@ case $1 in
         exit 1
         ;;
 esac
-

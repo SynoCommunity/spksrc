@@ -1,9 +1,9 @@
 SPK_NAME = nzbget
 SPK_VERS = 9.0
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Uninstallation required"
+CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS = cross/busybox cross/unrar cross/$(SPK_NAME)
 
