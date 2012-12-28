@@ -1,8 +1,5 @@
-push to my git branch!!!
-final touches in installer.sh (upgrade commands?)
-fix kernel source dependency
 test compile other architectures?
-play with config file editor package
+play with config file editor package?
 
 
 DONE:
@@ -11,3 +8,6 @@ export path so lirc binaries are accessible?
 setup installation wizard to select driver and appropriately propogate
 compile with all drivers (except wpc8769l)
 provide sample base lircd.conf and lircrc
+push to my git branch!
+fix kernel source dependency (hacked in as a cross package - not thrilled about it)
+final touches in installer.sh (upgrade commands?)

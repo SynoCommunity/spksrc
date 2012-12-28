@@ -34,7 +34,7 @@ lirc_extra_install:
 	install -m 644 src/lircrc $(STAGING_DIR)/etc/lirc/lircrc
 	install -m 644 src/lircd.conf $(STAGING_DIR)/etc/lirc/lircd.conf
 	install $(WIZARDS_DIR)/install_uifile.tmpl $(WIZARDS_DIR)/install_uifile
-	cp -R $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/remotes $(STAGING_DIR)/etc/lirc/
+	cp -R $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/remotes $(STAGING_DIR)/
 	for DRIVER in `ls $(STAGING_DIR)/lib/modules | grep -v lirc_dev.ko | awk -F'_' '{print $$2}' | awk -F'.' '{print $$1}'`; do \
 	    sed -i "s/@keys@/\"key\": \"lirc_driver_$${DRIVER}\",\n \"desc\": \"$${DRIVER}\"\n }, {\n@keys@/" $(WIZARDS_DIR)/install_uifile; \
 	done; \
