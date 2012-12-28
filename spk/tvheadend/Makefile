@@ -1,5 +1,5 @@
 SPK_NAME = tvheadend
-SPK_VERS = 3.2~git20121012
+SPK_VERS = 3.2.18
 SPK_REV = 1
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
@@ -25,6 +25,9 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = tvheadend_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
