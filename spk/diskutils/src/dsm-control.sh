@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="e2fsprogs"
-DNAME="e2fsprogs"
+PACKAGE="diskutils"
+DNAME="Disk Utils"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
