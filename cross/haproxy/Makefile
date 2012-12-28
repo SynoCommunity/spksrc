@@ -1,5 +1,5 @@
 PKG_NAME = haproxy
-PKG_VERS = 1.5-dev14
+PKG_VERS = 1.5-dev17
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://haproxy.1wt.eu/download/1.5/src/devel
@@ -20,7 +20,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile: 
-	$(RUN) $(MAKE) TARGET=generic CPU=generic ARCH= USE_OPENSSL=1
+	$(RUN) $(MAKE) TARGET=generic CPU=generic ARCH= USE_OPENSSL=1 USE_TPROXY=1
 
 myInstall:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
