@@ -13,11 +13,6 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
-    # Installation wizard requirements
-#    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ] && [ ! -d "${wizard_download_dir}" ]; then
-#        exit 1
-#    fi
-
     exit 0
 }
 
@@ -30,16 +25,13 @@ postinst ()
     test -e /dev/lirc || /bin/mknod /dev/lirc c 61 0
     mkdir -p /var/run/lirc
     touch /var/run/lirc/lircd
-    chmod -R 666 /var/run/lirc/lircd
-
-    # Put the config file in place??
+    chmod -R 666 /var/run/lirc
 
     # Fix PATH to include package binaries
     fixpath
 
-    # Set up the driver module selected during wizard installation
+    # Set up the driver module selected during installation wizard
     for DRIVER in `ls ${INSTALL_DIR}/lib/modules | grep -v lirc_dev.ko | awk -F'_' '{print \$2}' | awk -F'.' '{print \$1}'`; do 
-        #echo $${DRIVER}
         if [ "$(eval echo \$lirc_driver_${DRIVER})" = "true" ]; then
             sed -i "s/@driver@/${DRIVER}/g" ${SSS}
             sed -i "s/#insmod/insmod/g" ${SSS}
@@ -47,18 +39,6 @@ postinst ()
             break
         fi
     done
-
-
-    # Edit the configuration according to the wizard
-#    sed -i -e "s|@download_dir@|${wizard_download_dir}|g" ${CFG_FILE}
-#    if [ -d "${wizard_watch_dir}" ]; then
-#        sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
-#        sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
-#    else
-#        sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
-#        sed -i -e "/@watch_dir@/d" ${CFG_FILE}
-#    fi
-
 
     exit 0
 }
@@ -72,13 +52,6 @@ preuninst ()
     test -c /dev/lirc && rm /dev/lirc
     rm -rf /var/run/lirc
     
-
-    # Remove the user (if not upgrading)
-#    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-#        delgroup ${USER} ${GROUP}
-#        deluser ${USER}
-#    fi
-
     exit 0
 }
 
@@ -96,9 +69,9 @@ preupgrade ()
     ${SSS} stop > /dev/null
 
     # Save some stuff
-#    rm -fr ${TMP_DIR}/${PACKAGE}
-#    mkdir -p ${TMP_DIR}/${PACKAGE}
-#    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
+    cd ${INSTALL_DIR} && tar cpf ${TMP_DIR}/${PACKAGE}/conf_backup.tar etc 
 
     exit 0
 }
@@ -106,9 +79,8 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-#    rm -fr ${INSTALL_DIR}/var
-#    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
-#    rm -fr ${TMP_DIR}/${PACKAGE}
+     cd ${INSTALL_DIR} && find etc -type f -print | grep -v -e "^etc/lirc/lircd.conf$" -e "^etc/lirc/lircrc$" > ${TMP_DIR}/${PACKAGE}/exclude
+     cd ${INSTALL_DIR} && tar xpf ${TMP_DIR}/${PACKAGE}/conf_backup.tar -X ${TMP_DIR}/${PACKAGE}/exclude
 
     exit 0
 }
