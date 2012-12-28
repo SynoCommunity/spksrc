@@ -1,10 +1,11 @@
 [{
-    "step_title": "Configuration",
+    "step_title": "Configuration de base",
     "items": [{
         "type": "textfield",
+        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Répertoire de téléchargement (champ obligatoire)"
+            "desc": "Répertoire de téléchargement"
         }]
     }]
 }]

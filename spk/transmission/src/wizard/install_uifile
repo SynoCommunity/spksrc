@@ -1,15 +1,15 @@
 [{
-    "step_title": "Configuration",
+    "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download folder (required)",
+        "desc": "Download directory. Defaults to /volume1/downloads",
         "subitems": [{
             "key": "wizard_download_dir",
             "desc": "Download directory"
         }]
     }, {
         "type": "textfield",
-        "desc": "Watch a directory for torrent files and add them to transmission (leave empty to disable)",
+        "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable",
         "subitems": [{
             "key": "wizard_watch_dir",
             "desc": "Watch directory"

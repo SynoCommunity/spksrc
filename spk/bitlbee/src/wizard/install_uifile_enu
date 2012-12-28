@@ -2,14 +2,14 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "password",
-        "desc": "Password the user should enter when logging into a closed BitlBee server (required)",
+        "desc": "Password the user should enter when logging into a closed BitlBee server. Defaults to admin",
         "subitems": [{
             "key": "wizard_auth_password",
             "desc": "Password"
         }]
     }, {
         "type": "password",
-        "desc": "Password that unlocks access to special operator commands (required)",
+        "desc": "Password that unlocks access to special operator commands. Defaults to admin",
         "subitems": [{
             "key": "wizard_oper_password",
             "desc": "Password"
