@@ -14,7 +14,7 @@ PID_FILE="${INSTALL_DIR}/var/tvheadend.pid"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "${TVHEADEND} -f -c ${INSTALL_DIR}/var -p ${PID_FILE}"
+    ${TVHEADEND} -f -u ${RUNAS} -c ${INSTALL_DIR}/var -p ${PID_FILE}
 }
 
 stop_daemon ()
