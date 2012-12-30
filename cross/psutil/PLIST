@@ -1,0 +1,2 @@
+lib:@PYTHON_SITE_PACKAGES@/_psutil_linux.so
+lib:@PYTHON_SITE_PACKAGES@/_psutil_posix.so
