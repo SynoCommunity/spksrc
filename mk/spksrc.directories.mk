@@ -28,6 +28,10 @@ ifndef INSTALL_PREFIX
 INSTALL_PREFIX = /usr/local
 endif
 
+ifndef KERNEL_DIR
+KERNEL_DIR = $(PWD)/../../kernel/syno-$(ARCH)/work/source/linux
+endif
+
 ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
 STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif

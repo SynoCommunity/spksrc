@@ -6,14 +6,14 @@ PKG_DIST_SITE = http://downloads.sourceforge.net/project/lirc/LIRC/0.8.7
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 MOD_DIR = /lib/modules
 
-DEPENDS = cross/synogpl-2636
+REQ_KERNEL = 1
 
 HOMEPAGE = http://www.lirc.org/
 COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=${MOD_DIR} --enable-sandboxed  --with-kerneldir=$(WORK_DIR)/source/linux-2.6.32
+CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
 
 POST_CONFIGURE_TARGET = lirc_kill_wpc8769l
 INSTALL_TARGET = lirc_custom_install
