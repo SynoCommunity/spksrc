@@ -30,11 +30,13 @@ POST_INSTALL_TARGET = $(WORK_DIR)/python-cc.mk
 include ../../mk/spksrc.cross-cc.mk
 
 HOST_ARCH = $(shell uname -m)
+PYTHON_VERSION = 2.7
 HOSTPYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/python
-HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-2.7
-PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-2.7
+HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_VERSION)
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_VERSION)
 HOSTPGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
-PYTHON_LIB_DIR = lib/python2.7
+PYTHON_LIB_DIR = lib/python$(PYTHON_VERSION)
+PYTHON_INC_DIR = include/python$(PYTHON_VERSION)
 
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
@@ -55,5 +57,7 @@ myInstall:
 $(WORK_DIR)/python-cc.mk: Makefile
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
+	@echo PYTHON_VERSION=$(PYTHON_VERSION) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
+	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@
