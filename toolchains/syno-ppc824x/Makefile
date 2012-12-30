@@ -15,4 +15,3 @@ TC_CXXFLAGS =
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
-

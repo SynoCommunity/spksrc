@@ -15,4 +15,3 @@ TC_CXXFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
-
