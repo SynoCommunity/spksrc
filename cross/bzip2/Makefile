@@ -15,7 +15,7 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
-ADDITIONAL_CFLAGS = -O3 -D_FILE_OFFSET_BITS=64
+ADDITIONAL_CFLAGS = -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
 
 include ../../mk/spksrc.cross-cc.mk
 
