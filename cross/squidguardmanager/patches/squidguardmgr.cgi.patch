@@ -1,5 +1,5 @@
---- ./squidguardmgr.cgi.old	2012-12-28 15:20:18.755884511 +0100
-+++ squidguardmgr.cgi	2012-12-28 16:01:54.092513886 +0100
+--- ./cgi-bin/squidguardmgr.cgi.old	2012-12-28 15:20:18.755884511 +0100
++++ cgi-bin/squidguardmgr.cgi	2012-12-28 16:01:54.092513886 +0100
 @@ -14,6 +14,30 @@
  
  use strict qw{vars subs};
