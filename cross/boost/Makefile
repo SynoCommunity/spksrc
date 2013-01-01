@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
 
-DEPENDS = cross/bzip2 cross/zlib native/python
+DEPENDS = cross/bzip2 cross/zlib cross/python
 
 HOMEPAGE = http://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
@@ -37,7 +37,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	@echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CPPFLAGS)\" <linkflags>\"$(LDFLAGS)\" ; " > $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
+	@echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/tools/build/v2/user-config.jam
 	$(RUN) ./bootstrap.sh $(CONFIGURE_ARGS)
