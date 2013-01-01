@@ -1,9 +1,8 @@
 SPK_NAME = nzbget
 SPK_VERS = 9.0
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS = cross/busybox cross/unrar cross/$(SPK_NAME)
 
@@ -12,8 +11,9 @@ DESCRIPTION     = NZBGet is a command-line based binary newsgrabber for nzb file
 DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écrit en C++ pour les fichiers nzb. Il intègre un mode client/serveur, la vérification, réparation et décompression automatique ainsi qu\\\'une interface web. NZBGet requiert peu de ressources système.
 DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ para descargar binarios, desde servidores de noticias, utilizando archivos nzb. Soporta modo cliente y servidor, verificación y descompresión automática y una interfaz web. NZBGet utiliza pocos recursos de sistema.
 RELOAD_UI = yes
-DISPLAY_NAME = NZBGet
 ADMIN_PORT = 6789
+DISPLAY_NAME = NZBGet
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE = http://nzbget.sourceforge.net/
 LICENSE  =
