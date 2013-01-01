@@ -1,9 +1,8 @@
 SPK_NAME = transmission
 SPK_VERS = 2.75
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -14,6 +13,7 @@ DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE = http://www.transmissionbt.com/
 LICENSE  =
