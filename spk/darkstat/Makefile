@@ -1,6 +1,6 @@
 SPK_NAME = darkstat
 SPK_VERS = 3.0.715
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/darkstat.png
 DSM_UI_DIR = app
 
@@ -12,6 +12,7 @@ DESCRIPTION_FRE = DarkStat est un outil de monitoring réseau simple et léger. 
 ADMIN_PORT = 667
 RELOAD_UI = yes
 DISPLAY_NAME = DarkStat
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE   = http://unix4lyfe.org/darkstat/
 LICENSE    = GPL v2
