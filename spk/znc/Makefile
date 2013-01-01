@@ -1,9 +1,9 @@
 SPK_NAME = znc
 SPK_VERS = 1.0
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix install for legacy archs"
+CHANGELOG = "1. Update c-ares to 1.9.1\\\n2. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
