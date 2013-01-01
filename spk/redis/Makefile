@@ -1,6 +1,6 @@
 SPK_NAME = redis
 SPK_VERS = 2.6.7
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/redis.png
 DSM_UI_DIR = app
 
@@ -10,6 +10,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 RELOAD_UI = yes
 DISPLAY_NAME = Redis
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE = http://redis.io/
 LICENSE  =
