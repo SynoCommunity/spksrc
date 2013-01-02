@@ -13,13 +13,7 @@ rsc:lib/liblirc_client.la
 lnk:lib/liblirc_client.so
 lnk:lib/liblirc_client.so.0
 lib:lib/liblirc_client.so.0.2.1
-rsc:lib/modules/lirc_atiusb.ko
-rsc:lib/modules/lirc_dev.ko
-rsc:lib/modules/lirc_i2c.ko
-rsc:lib/modules/lirc_mceusb.ko
-rsc:lib/modules/lirc_parallel.ko
-rsc:lib/modules/lirc_serial.ko
-rsc:lib/modules/lirc_ttusbir.ko
+rsc:lib/modules/*
 bin:sbin/lircd
 bin:sbin/lircmd
 rsc:share/man/man1/ircat.1

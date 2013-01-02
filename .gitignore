@@ -2,6 +2,7 @@ distrib
 packages
 native/*/work*
 cross/*/work*
+kernel/*/work*
 spk/*/work*
 toolchains/*/work*
 local.mk

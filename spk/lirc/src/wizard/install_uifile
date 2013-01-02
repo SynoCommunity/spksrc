@@ -2,7 +2,7 @@
     "step_title": "Configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Choose driver to install from the following list. The input must be exact and is case sensitive:@keys@ none",
+        "desc": "Choose driver to install from the following list. The input must be exact and is case sensitive: none",
         "subitems": [{
             "key": "lirc_driver_selected",
             "desc": "Driver:"
