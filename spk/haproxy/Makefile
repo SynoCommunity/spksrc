@@ -1,9 +1,8 @@
 SPK_NAME = haproxy
 SPK_VERS = 1.5~dev17
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python>2.7.3-2"
@@ -14,6 +13,7 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT=8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
