@@ -1,9 +1,8 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 0.7.7
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Fix install for legacy archs"
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
 
@@ -16,6 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE   = http://sabnzbd.org/
 LICENSE    = GPL
