@@ -7,11 +7,7 @@ DEPENDS  = cross/busybox cross/$(SPK_NAME)
 DEPENDS += cross/distribute cross/distutils2 cross/pip cross/virtualenv cross/pyopenssl
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
-DEPENDS += cross/zope.interface cross/markupsafe cross/psutil
-# Add libtorrent for ARCHs that support it
-ifneq ($(findstring $(ARCH),88f5281 powerpc ppc824x ppc853x ppc854x),$(ARCH))
-DEPENDS += cross/libtorrent
-endif
+DEPENDS += cross/zope.interface cross/markupsafe
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language. This package is not startable, it is just required by other packages as dependency.
@@ -20,8 +16,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, 
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update existing modules\\\n2. Add module psutil\\\n3. Fix install for legacy archs"
-BETA = 1
+CHANGELOG = "1. Update existing modules  and remove libtorrent\\\n2. Fix install for legacy archs\\\n3. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
