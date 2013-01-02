@@ -32,7 +32,9 @@ postinst ()
 
     # Set up the driver module selected during installation wizard
     for DRIVER in `ls ${INSTALL_DIR}/lib/modules | grep -v lirc_dev.ko | awk -F'_' '{print \$2}' | awk -F'.' '{print \$1}'`; do 
-        if [ "$(eval echo \$lirc_driver_${DRIVER})" = "true" ]; then
+        # put this line back if we go back to the singleselect in install_uifile
+        #if [ "$(eval echo \$lirc_driver_${DRIVER})" = "true" ]; then
+        if [ "${lirc_driver_selected}" = "${DRIVER}" ]; then
             sed -i "s/@driver@/${DRIVER}/g" ${SSS}
             sed -i "s/#insmod/insmod/g" ${SSS}
             sed -i "s/#rmmod/rmmod/g" ${SSS}

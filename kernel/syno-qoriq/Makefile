@@ -10,11 +10,11 @@ BASE_ARCH = powerpc
 
 HOMEPAGE = http://www.synology.com/
 
-PRE_COMPILE_TARGET = fix_qoriq_kernel
+PRE_COMPILE_TARGET = kernel_ppc_premake
 
 include ../../mk/spksrc.kernel-modules.mk
 
-.PHONY: fix_qoriq_kernel
+.PHONY: kernel_ppc_premake
 
-fix_qoriq_kernel:
+kernel_ppc_premake:
 	$(RUN) $(MAKE) LDFLAGS="" arch/powerpc/lib/crtsavres.o

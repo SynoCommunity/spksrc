@@ -8,6 +8,8 @@ PKG_EXTRACT = source/linux-3.x
 SYNO_CONFIG = synoconfigs/$(ARCH)
 BASE_ARCH = x86
 
+TC = syno-$(ARCH)-x64
+
 HOMEPAGE = http://www.synology.com/
 
 include ../../mk/spksrc.kernel-modules.mk

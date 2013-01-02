@@ -18,7 +18,10 @@ COPY_TARGET = kernel_null_target
 include ../../mk/spksrc.cross-env.mk
 #####
 
-RUN = cd $(KERNEL_DIR) && env LDFLAGS=""
+KERNEL_ENV ?=
+KERNEL_ENV += PATH=$$PATH
+
+RUN = cd $(KERNEL_DIR) && env -i $(KERNEL_ENV)
 MSG = echo "===>   "
 
 .PHONY: kernel_module_compile_target kernel_extract_target kernel_null_target
@@ -38,8 +41,8 @@ configure: patch
 	@$(MSG) "Configuring depended kernel source"
 	cp $(KERNEL_DIR)/$(SYNO_CONFIG) $(KERNEL_DIR)/.config
 	# Update the Makefile
-	sed -i -r 's,^ARCH\t+.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
-	sed -i -r 's,^CROSS_COMPILE\t+.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
+	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
+	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
 	test -e $(WORK_DIR)/$(KERNEL_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_DIR)/arch/$(ARCH)
 
 compile: configure
@@ -65,7 +68,7 @@ $(DIGESTS_FILE):
 	done
 
 kernel_module_compile_target:
-	$(RUN) $(MAKE) LDFLAGS="" modules
+	$(RUN) $(MAKE) modules
 
 kernel_extract_target:
 	mkdir -p $(KERNEL_DIR)
