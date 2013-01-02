@@ -16,7 +16,7 @@ CLAMD_CFG="${INSTALL_DIR}/etc/clamd.conf"
 CLAMD_PID="${INSTALL_DIR}/var/run/clamd/clamd.pid"
 CICAP="${INSTALL_DIR}/bin/c-icap"
 CICAP_CFG="${INSTALL_DIR}/etc/c-icap.conf"
-CICAP_PID="${INSTALL_DIR}var/run/c-icap/c-icap.pid"
+CICAP_PID="${INSTALL_DIR}/var/run/c-icap/c-icap.pid"
 
 start_daemon ()
 {

@@ -1,0 +1,11 @@
+error cf_gen :
+
+make cf_gen for native build :
+untar squid package en cd intio squid directory
+./configure
+make -C lib
+make -C src
+cp cf_gen .../spk/squidguard/work.../squid-*/src/
+
+run make for target architecture again
+

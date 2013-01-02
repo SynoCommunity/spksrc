@@ -1,0 +1,33 @@
+--- ./cgi-bin/squidguardmgr.cgi.old	2012-12-28 15:20:18.755884511 +0100
++++ cgi-bin/squidguardmgr.cgi	2012-12-28 16:01:54.092513886 +0100
+@@ -14,6 +14,30 @@
+ 
+ use strict qw{vars subs};
+ 
++my $user;
++my $admin=0;
++if (open (IN,"/usr/syno/synoman/webman/modules/authenticate.cgi|")) {
++	$user=<IN>;
++	chop($user);
++	close(IN);
++}
++open GROUP, "</etc/group"
++   or die "Could not find /etc/group: $!\n";
++while (<GROUP>) {
++  my ($group,$x,$gid,$list)=split(':',$_);
++  chop($list);
++  if ($group eq "administrators") {
++	my (@users)=split(',',$list);
++	$admin = 1 if (grep {$_ eq $user} @users);
++  }
++}
++# if not admin or no user at all...no authentication...so, bye-bye
++if ($admin == 0) {
++	print "Content-type: text/html\n\n";
++	print "<HTML><HEAD><TITLE>Login Required</TITLE></HEAD><BODY>Please login as admin first, before using this webpage</BODY></HTML>\n";
++	die;
++}
++
+ $VERSION     = '1.11',
+ $AUTHOR      = 'Gilles DAROLD <gilles AT darold DOT net>';
+ $COPYRIGHT   = 'Copyright &copy; 2010-2012 Gilles DAROLD, all rights reserved';
