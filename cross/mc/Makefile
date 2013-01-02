@@ -1,5 +1,5 @@
 PKG_NAME = mc
-PKG_VERS = 4.8.6
+PKG_VERS = 4.8.7
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.midnight-commander.org/downloads

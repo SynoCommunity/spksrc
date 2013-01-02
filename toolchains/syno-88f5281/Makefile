@@ -15,4 +15,3 @@ TC_CXXFLAGS = -mfloat-abi=soft
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
-

@@ -51,6 +51,13 @@ downloads:
 	    (cd $${dl} && $(MAKE) download) ; \
 	done
 
+.PHONY: toolchains
+toolchains:
+	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	do \
+	    (cd $${tc} && $(MAKE)) ; \
+	done
+
 setup: local.mk
 
 local.mk:

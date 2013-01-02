@@ -6,6 +6,7 @@ DNAME="NZB Config"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 RUNAS="root"
 VIRTUALENV="/usr/local/python/bin/virtualenv"
 
@@ -34,6 +35,9 @@ postinst ()
 
 preuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
@@ -47,6 +51,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 

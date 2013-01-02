@@ -1,6 +1,6 @@
 SPK_NAME = memcached
 SPK_VERS = 1.4.15
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/memcached.png
 DSM_UI_DIR = app
 
@@ -11,6 +11,7 @@ DESCRIPTION = Free \& open source, high-performance, distributed memory object c
 ADMIN_URL = /phpMemcachedAdmin/
 RELOAD_UI = yes
 DISPLAY_NAME = Memcached
+CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE = http://memcached.org/
 LICENSE  =
