@@ -1,11 +1,10 @@
 SPK_NAME = nzbconfig
-SPK_VERS = 0.4
-SPK_REV = 1
+SPK_VERS = 0.5
+SPK_REV = 2
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
-CHANGELOG = "1. Fix detection of SickBeard's newsgrabber\\\n2. Update for NZBGet 9.0"
-BETA = 1
+CHANGELOG = "1. Remove old CouchPotato (not CouchPotato Server)\\\n2. Use new application design"
 
 SPK_DEPENDS = "python>2.7.3-2"
 
@@ -36,6 +35,8 @@ nzbconfig_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 644 src/app/nzbconfig.js $(STAGING_DIR)/app/nzbconfig.js
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
 	install -m 755 src/app/nzbconfig.cgi.py $(STAGING_DIR)/app/nzbconfig.cgi
+	install -m 755 -d $(STAGING_DIR)/app/application
+	install -m 644 src/app/application/* $(STAGING_DIR)/app/application/
 	install -m 755 -d $(STAGING_DIR)/app/texts
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
@@ -51,4 +52,4 @@ nzbconfig_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ pyextdirect==0.3.1 configobj
+	@cd $(WORK_DIR) && $(PIP) bundle $@ pyextdirect==0.3.1 configobj flask
