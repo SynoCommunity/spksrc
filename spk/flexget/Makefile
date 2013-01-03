@@ -1,13 +1,13 @@
 SPK_NAME = flexget
-SPK_VERS_REV = 3206
+SPK_VERS_REV = 3230
 SPK_VERS = 1.0~r$(SPK_VERS_REV)
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/flexget.png
 DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
@@ -46,4 +46,4 @@ flexget_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ FlexGet==1.0r$(SPK_VERS_REV) transmissionrpc
+	@cd $(WORK_DIR) && $(PIP) bundle $@ FlexGet==1.0.$(SPK_VERS_REV) transmissionrpc

@@ -1,11 +1,11 @@
 SPK_NAME = debian-chroot
 SPK_VERS = 6.0.6
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.

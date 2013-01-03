@@ -1,11 +1,11 @@
 SPK_NAME = mylar
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/mylar.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)

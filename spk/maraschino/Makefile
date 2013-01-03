@@ -1,11 +1,11 @@
 SPK_NAME = maraschino
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/maraschino.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Maraschino is a simple web interface that acts as a nice overview/front page for your XBMC HTPC. It has many modules: Media library browser, SABnzbd+, SickBeard, XBMC controller, Diskspace, Weather, Transmission and so on.

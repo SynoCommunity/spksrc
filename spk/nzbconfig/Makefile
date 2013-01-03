@@ -1,12 +1,11 @@
 SPK_NAME = nzbconfig
 SPK_VERS = 0.5
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
-CHANGELOG = "1. Remove old CouchPotato (not CouchPotato Server)\\\n2. Use new application design"
 
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, CouchPotato and Headphones

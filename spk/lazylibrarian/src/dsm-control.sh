@@ -13,7 +13,7 @@ PYTHON="${INSTALL_DIR}/env/bin/python"
 LAZYLIBRARIAN="${INSTALL_DIR}/share/LazyLibrarian/LazyLibrarian.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/lazylibrarian.pid"
-LOG_FILE="${INSTALL_DIR}/var/logs/lazylibrarian.log"
+LOG_FILE="${INSTALL_DIR}/var/Logs/lazylibrarian.log"
 
 
 start_daemon ()

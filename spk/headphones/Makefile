@@ -1,11 +1,11 @@
 SPK_NAME = headphones
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/headphones.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Headphones is an automatic NZB and torrent downloader for music. Mark albums as wanted and have them downloaded as soon as they are available. Different quality settings are possible, including lossless. With Headphones you can also manage your music library automatically: move, tag, rename and index for your DiskStation.
