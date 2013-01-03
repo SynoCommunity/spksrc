@@ -15,7 +15,7 @@ PID_FILE="${INSTALL_DIR}/var/bitlbee.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "${BITLBEE} -c ${CFG_FILE}"
+    su - ${USER} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${BITLBEE} -c ${CFG_FILE}"
 }
 
 stop_daemon ()
