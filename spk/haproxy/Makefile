@@ -1,11 +1,11 @@
 SPK_NAME = haproxy
 SPK_VERS = 1.5~dev17
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
@@ -13,7 +13,6 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT=8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2

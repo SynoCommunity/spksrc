@@ -1,19 +1,20 @@
 SPK_NAME = lazylibrarian
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/lazylibrarian.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = This project isn\'t finished yet. Goal is to create a SickBeard, CouchPotato, Headphones-like application for ebooks. Headphones is used as a base, so there are still a lot of references to it.
-ADMIN_PORT = 5299
+DESCRIPTION = LazyLibrarian is an automated book downloader for SABnzbd.
+ADMIN_PORT = 8082
 RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
+CHANGELOG = "1. Use source from LibrarianMike\\\n2. Default port changed to 8082"
 
-HOMEPAGE   = https://github.com/itsmegb/LazyLibrarian
+HOMEPAGE   = https://github.com/LibrarianMike/LazyLibrarian
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
@@ -44,5 +45,5 @@ lazylibrarian_extra_install: $(STAGING_DIR)/share/LazyLibrarian
 
 $(STAGING_DIR)/share/LazyLibrarian:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/itsmegb/LazyLibrarian.git LazyLibrarian
+	cd $(STAGING_DIR)/share && git clone https://github.com/LibrarianMike/LazyLibrarian.git LazyLibrarian
 	rm -fr $(STAGING_DIR)/share/LazyLibrarian/.git $(STAGING_DIR)/share/LazyLibrarian/.gitignore

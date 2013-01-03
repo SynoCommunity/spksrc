@@ -5,7 +5,7 @@ SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
 
 DEPENDS =
-SPK_DEPENDS = "python>2.7.3-2"
+SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Subliminal allows you automatically download best-matching subtitles for your movies and tv shows on your DiskStation. This package is named after Subliminal, the Python library used to search and download subtitles.
