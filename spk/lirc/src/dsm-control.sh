@@ -15,10 +15,34 @@ LIRCRC_FILE="${INSTALL_DIR}/etc/lirc/lircrc"
 LOG_FILE="${INSTALL_DIR}/var/log/lircd"
 
 
+load_unload_drivers ()
+{
+    case $1 in
+        load)
+            insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+            for DRIVER in `find ${INSTALL_DIR}/lib/modules/ -type f -print | grep -v lirc_dev.ko`; do
+                insmod $DRIVER
+            done
+        ;;
+        unload)
+            for DRIVER in `find ${INSTALL_DIR}/lib/modules/ -type f -print | grep -v lirc_dev.ko`; do
+                rmmod $DRIVER
+            done
+            rmmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+        ;;
+    esac
+
+}
+
 start_daemon ()
 {
+    # Added case for "all" drivers
+    #load_unload_drivers load
+
+    # This code will update is a specific valid driver is selected during installation
     #insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
     #insmod ${INSTALL_DIR}/lib/modules/lirc_@driver@.ko
+
     ${DAEMON} ${CONF_FILE} --pidfile=${PID_FILE} --logfile=${LOG_FILE}
     if [ -e ${LIRCRC_FILE} ]; then
         ${IREXEC} -d ${LIRCRC_FILE}
@@ -38,8 +62,13 @@ stop_daemon ()
     fi
 
     test -e ${PID_FILE} || rm -f ${PID_FILE}
+
+    # This code will update is a specific valid driver is selected during installation
     #rmmod ${INSTALL_DIR}/lib/modules/lirc_@driver@.ko
     #rmmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+
+    # Added case for "all" drivers
+    #load_unload_drivers unload
 }
 
 daemon_status ()
