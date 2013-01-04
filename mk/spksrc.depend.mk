@@ -7,6 +7,8 @@
 #  post_depend_target  (override with POST_DEPEND_TARGET)
 # Variables:
 #  DEPENDS             List of dependencies to go through
+#  REQ_KERNEL          If set, will compile kernel modules and allow
+#                      use of KERNEL_DIR 
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
@@ -26,6 +28,11 @@ else
 $(POST_DEPEND_TARGET): $(DEPEND_TARGET)
 endif
 
+ifeq ($(strip $(REQ_KERNEL)),)
+KERNEL_DEPEND = 
+else
+KERNEL_DEPEND = kernel/syno-$(ARCH)
+endif
 
 depend_msg_target:
 	@$(MSG) "Processing dependencies of $(NAME)"
@@ -33,7 +40,7 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-	@for depend in $(DEPENDS) ; \
+	@for depend in $(KERNEL_DEPEND) $(DEPENDS) ; \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done
