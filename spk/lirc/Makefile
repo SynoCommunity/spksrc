@@ -47,9 +47,7 @@ lirc_extra_install:
 	cp -R $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/remotes $(STAGING_DIR)/
 	install src/install_uifile.tmpl $(WIZARDS_DIR)/install_uifile
 	@for DRIVER in `ls $(STAGING_DIR)/lib/modules | grep -v lirc_dev.ko | awk -F'_' '{print $$2}' | awk -F'.' '{print $$1}'`; do \
-	    # DSM UI only shows 6 radio buttons on a screen, so reverting to non-preferred textbox \
-	    #sed -i "s/@keys@/\"key\": \"lirc_driver_$${DRIVER}\",\n \"desc\": \"$${DRIVER}\"\n }, {\n@keys@/" $(WIZARDS_DIR)/install_uifile; \
-	    sed -i "s/@keys@/ $${DRIVER}@keys@/" $(WIZARDS_DIR)/install_uifile; \
+	    sed -i "s/@keys@/$${DRIVER} @keys@/" $(WIZARDS_DIR)/install_uifile; \
 	done;
 	@sed -i 's/@keys@//' $(WIZARDS_DIR)/install_uifile
 lirc_abort:
