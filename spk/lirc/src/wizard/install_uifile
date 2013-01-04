@@ -1,0 +1,15 @@
+[{
+    "step_title": "Driver Selection",
+    "items": [{
+        "desc": "Choose driver to install from the following list. The input must be exact and is case sensitive:"
+    },{
+        "type": "textfield",
+        "desc": "none all",
+        "subitems": [{
+            "key": "lirc_driver_selected",
+            "desc": "Driver"
+        }]
+    },{
+        "desc": "*If you don't know what you are doing, just enter: all"
+    }]
+}]
