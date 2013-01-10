@@ -12,7 +12,6 @@ bin:sbin/e2fsck
 bin:sbin/e2image
 bin:sbin/e2label
 bin:sbin/e2undo
-bin:sbin/e4defrag
 bin:sbin/filefrag
 bin:sbin/findfs
 bin:sbin/fsck
