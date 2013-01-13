@@ -1,0 +1,41 @@
+SPK_NAME = cops
+SPK_VERS = 0.3.0
+SPK_REV = 1
+SPK_ICON = src/cops.png
+DSM_UI_DIR = app
+
+DEPENDS  = cross/$(SPK_NAME)
+
+MAINTAINER = SynoCommunity
+DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
+ADMIN_URL = /cops/
+RELOAD_UI = yes
+DISPLAY_NAME = COPS
+
+HOMEPAGE   = http://blog.slucas.fr/en/oss/calibre-opds-php-server
+LICENSE    = GPL
+
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
+
+INSTALL_DEP_SERVICES = apache-web
+START_DEP_SERVICES = apache-web
+
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+POST_STRIP_TARGET = cops_extra_install
+
+# Pure PHP package, make sure ARCH is not defined
+override ARCH=
+
+include ../../mk/spksrc.spk.mk
+
+.PHONY: cops_extra_install
+cops_extra_install:
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/app/images
+	for size in 16 24 32 48; do \
+		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+	done
