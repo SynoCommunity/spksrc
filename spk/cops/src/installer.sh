@@ -22,6 +22,12 @@ postinst ()
     # Install the web interface
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
+    # Create a default configuration file
+    if [ ! -f ${WEB_DIR}/${PACKAGE}/config_local.php ]; then
+      echo -e "<?php\nif (\0041isset(\$config)) \$config = array();\n\$config['calibre_directory'] = './';\n?>" > ${WEB_DIR}/${PACKAGE}/config_local.php
+      chmod ga+w ${WEB_DIR}/${PACKAGE}/config_local.php
+    fi
+
     exit 0
 }
 
