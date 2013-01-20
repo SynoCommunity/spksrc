@@ -3,10 +3,11 @@ SPK_VERS = 0.9.0
 SPK_REV = 1
 SPK_ICON = src/lirc.png
 
+BETA=1
+
 # Abort for ARCHs that won't compile LIRC cleanly
-ifeq ($(findstring $(ARCH),powerpc 88f5281),$(ARCH))
-PRE_DEPEND_TARGET = lirc_abort
-ABORT_MSG = "Sorry, this package does not support the $(ARCH) architecture."
+ifneq ($(findstring $(ARCH),powerpc 88f5281),)
+$(error Sorry, this package does not support the $(ARCH) architecture.)
 endif
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
@@ -50,6 +51,3 @@ lirc_extra_install:
 	    sed -i "s/@keys@/$${DRIVER} @keys@/" $(WIZARDS_DIR)/install_uifile; \
 	done;
 	@sed -i 's/@keys@//' $(WIZARDS_DIR)/install_uifile
-lirc_abort:
-	@$(MSG) ABORTING: $(ABORT_MSG)
-	@exit 1
