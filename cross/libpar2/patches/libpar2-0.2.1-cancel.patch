@@ -1,6 +1,5 @@
-diff -aud ../libpar2-0.2-original/par2repairer.cpp ../libpar2-0.2/par2repairer.cpp
---- ../libpar2-0.2-original/par2repairer.cpp	2008-10-26 19:54:33.000000000 +0100
-+++ ../libpar2-0.2/par2repairer.cpp	2008-10-29 10:24:48.000000000 +0100
+--- par2repairer.cpp.old	2013-01-20 15:17:27.000000000 +0100
++++ par2repairer.cpp	2013-01-20 15:16:02.000000000 +0100
 @@ -52,6 +52,8 @@
    noiselevel = CommandLine::nlNormal;
    headers = new ParHeaders;
@@ -174,10 +173,9 @@ diff -aud ../libpar2-0.2-original/par2repairer.cpp ../libpar2-0.2/par2repairer.c
    if (noiselevel > CommandLine::nlQuiet)
      cout << "Writing recovered data\r";
  
-diff -aud ../libpar2-0.2-original/par2repairer.h ../libpar2-0.2/par2repairer.h
---- ../libpar2-0.2-original/par2repairer.h	2006-01-20 00:38:27.000000000 +0100
-+++ ../libpar2-0.2/par2repairer.h	2008-10-26 19:01:08.000000000 +0100
-@@ -183,6 +183,7 @@
+--- par2repairer.h.old	2013-01-20 15:17:27.000000000 +0100
++++ par2repairer.h	2013-01-20 15:16:22.000000000 +0100
+@@ -188,6 +188,7 @@
    u64                       totaldata;               // Total amount of data to be processed.
    u64                       totalsize;               // Total data size
  

@@ -1,0 +1,25 @@
+--- par2repairer.cpp.old	2011-07-10 11:55:59.000000000 +0200
++++ par2repairer.cpp	2013-01-20 14:57:35.000000000 +0100
+@@ -1805,7 +1805,7 @@
+       }
+     }
+   }
+-  sig_done.emit(name,count, sourcefile->GetVerificationPacket() ? sourcefile->GetVerificationPacket()->BlockCount() : 0); 
++  sig_done.emit(name,count, count>0 && sourcefile->GetVerificationPacket() ? sourcefile->GetVerificationPacket()->BlockCount() : 0); 
+   sig_progress.emit(1000.0);
+   return true;
+ }
+--- par2repairer.h.old	2011-07-10 11:52:26.000000000 +0200
++++ par2repairer.h	2013-01-20 14:53:23.000000000 +0100
+@@ -36,6 +36,11 @@
+   sigc::signal<void, ParHeaders*> sig_headers;
+   sigc::signal<void, std::string, int, int> sig_done;
+ 
++  // This method allows to determine whether libpar2 includes the patches
++  // ("libpar2-0.2.1-bugfixes.patch") submitted to libpar2 project.
++  // Use the method in configure scripts for detection.
++  void BugfixesPatchVersion2() { }
++
+ protected:
+   // Steps in verifying and repairing files:
+ 
