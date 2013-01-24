@@ -1,0 +1,11 @@
+--- squid_wrapper/squid_wrapper.c.old	2013-01-24 12:59:59.591161725 +0100
++++ squid_wrapper/squid_wrapper.c	2013-01-24 13:05:47.154790466 +0100
+@@ -10,7 +10,7 @@
+ #include <sys/types.h> 
+ #include <stdlib.h>
+ 
+-#define SQUID_BINARY "/usr/sbin/squid3"
++#define SQUID_BINARY "/usr/local/squid/sbin/squid"
+ 
+ int main(int argc, char **argv, char **envp) {
+   char *squidprog[] = { SQUID_BINARY, "-k", "reconfigure", NULL };
