@@ -1,0 +1,14 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Qui devrait voir l'icôd'application dans le DSM UI?:",
+        "subitems": [{
+            "key": "cps_users_admin",
+            "desc": "Seul le compte 'admin'"
+        },{
+            "key": "cps_users_all",
+            "desc": "Tout le monde"
+        }]
+    }]
+}]

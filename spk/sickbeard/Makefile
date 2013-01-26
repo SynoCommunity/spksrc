@@ -3,6 +3,7 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 5
 SPK_ICON = src/sickbeard.png
 DSM_UI_DIR = app
+WIZARDS_DIR = src/wizard
 
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"

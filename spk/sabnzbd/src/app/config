@@ -6,7 +6,7 @@
             "icon": "images/sabnzbd-{0}.png",
             "type": "url",
             "url": "3rdparty/sabnzbd/sabnzbd.cgi",
-            "allUsers": true
+            "allUsers": @allUsers@
         }
     }
 }
