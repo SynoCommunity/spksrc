@@ -8,12 +8,15 @@ DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
+DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 RELOAD_UI = yes
 DISPLAY_NAME = COPS
 
 HOMEPAGE   = http://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
+
+WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -34,6 +37,7 @@ include ../../mk/spksrc.spk.mk
 cops_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 666 src/config_local.php.synology $(STAGING_DIR)/config_local.php.synology
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
