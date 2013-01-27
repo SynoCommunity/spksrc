@@ -27,7 +27,7 @@ postinst ()
     # Create a default configuration file
     if [ ! -f ${CFG_FILE} ]; then
       cp ${DEFAULT_CFG_FILE} ${CFG_FILE}
-      sed -i -e "s|@calibre_dir@|${wizard_calibre_dir:=/volume1/calibre}|g" ${CFG_FILE}
+      sed -i -e "s|@calibre_dir@|${wizard_calibre_dir:=/volume1/calibre/}|g" ${CFG_FILE}
       sed -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
       sed -i -e "s|@use_url_rewriting@|${wizard_use_url_rewriting:=0}|g" ${CFG_FILE}
       chmod ga+w ${CFG_FILE}
