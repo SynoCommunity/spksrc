@@ -54,10 +54,20 @@ postuninst ()
 
 preupgrade ()
 {
+    # Save some stuff
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
+    mv ${CFG_FILE} ${TMP_DIR}/${PACKAGE}/
+
     exit 0
 }
 
 postupgrade ()
 {
+    # Restore some stuff
+    rm -f ${CFG_FILE}
+    mv ${TMP_DIR}/${PACKAGE}/config_local.php ${CFG_FILE}
+    rm -fr ${TMP_DIR}/${PACKAGE}
+
     exit 0
 }
