@@ -8,15 +8,12 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="squid"
 DB_DIR="${INSTALL_DIR}/var/db"
-DB_FILE="ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/blacklists.tar.gz"
+RSYNC_DIR="rsync://ftp.ut-capitole.fr/blacklist/dest/"
 
 cd ${DB_DIR}
-wget ${DB_FILE}
-tar xvzf blacklists.tar.gz -C ${DB_DIR}
+rync -arpogvt ${RSYNC_DIR} .
 if [ $? -eq 0 ]
 then
-  cp -R ${DB_DIR}/blacklists/* ${DB_DIR}/
-  rm -Rf ${DB_DIR}/blacklists*
   chown -R ${RUNAS}:root ${DB_DIR}
   su - ${RUNAS} -c "${INSTALL_DIR}/bin/squidGuard -c ${INSTALL_DIR}/etc/squidguard.conf -C all -u"
 fi
