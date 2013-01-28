@@ -30,3 +30,4 @@ myInstall:
 	@$(RUN) cp -R $(WORK_DIR)/$(PKG_DIR)/cgi-bin/* $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/
 	@$(RUN) cp -R $(WORK_DIR)/$(PKG_DIR)/htdocs/* $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/
 	@$(RUN) chmod 775 $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/*cgi
+	@$(RUN) chmod 755 $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/squid_wrapper

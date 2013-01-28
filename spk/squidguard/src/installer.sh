@@ -13,6 +13,7 @@ CFG_FILE="${INSTALL_DIR}/etc/squid.conf"
 ETC_DIR="${INSTALL_DIR}/etc/"
 WWW_DIR="/var/packages/${PACKAGE}/target/share/www/squidguardmgr"
 WEBMAN_DIR="/usr/syno/synoman/webman/3rdparty"
+SQUID_WRAPPER="${WWW_DIR}/squid_wrapper"
 
 preinst ()
 {
@@ -36,7 +37,9 @@ postinst ()
     
     # Correct the files ownership
     chown -R ${RUNAS}:users ${SYNOPKG_PKGDEST}
-
+    chown 0:0 ${SQUID_WRAPPER}
+	chmod +s ${SQUID_WRAPPER}
+	
     # Init squid cache directory
     su - ${RUNAS} -c "${SQUID} -z -f ${CFG_FILE}"
 

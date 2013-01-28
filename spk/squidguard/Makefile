@@ -1,14 +1,16 @@
 SPK_NAME = squidguard
-SPK_VERS = 1.00
+SPK_VERS = 1.5
 SPK_REV = 1
 SPK_ICON = src/squidguard.png
 BETA = 1
 
 DEPENDS = cross/zlib cross/c_icap cross/busybox cross/unrar cross/squidclamav cross/berkeleydb cross/squidguard cross/squid cross/squidguardmanager
 
+SPK_DEPENDS = "AntiVirus>1.2"
+
 MAINTAINER = SynoCommunity
-DESCRIPTION = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid.
-DESCRIPTION_FRE = SquidGuard est un proxy HTTP, basé sur squid, qui permet de filtrer les accès selon une liste noire.
+DESCRIPTION = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid. This package also includes SquidClamav for viruses protection and SquidGuard Manager.
+DESCRIPTION_FRE = SquidGuard est un proxy HTTP, basé sur squid, qui permet de filtrer les accès selon une liste noire. Ce paquet contient également SquidClamav pour une protection antivirus et SquidGuard Manager.
 RELOAD_UI = no
 DISPLAY_NAME = SquidGuard
 
