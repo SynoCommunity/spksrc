@@ -30,7 +30,7 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
-    # Edit the configuration according to the wizzard
+    # Edit the configuration according to the wizard
     sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
     sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
     sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
