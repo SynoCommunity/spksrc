@@ -32,6 +32,8 @@ postinst ()
 
     # Edit the configuration according to the wizzard
     sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+    sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
+    sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
     if [ -d "${wizard_watch_dir}" ]; then
         sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
         sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
