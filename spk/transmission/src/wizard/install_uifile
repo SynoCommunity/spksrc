@@ -14,5 +14,19 @@
             "key": "wizard_watch_dir",
             "desc": "Watch directory"
         }]
+    }, {
+        "type": "textfield",
+        "desc": "Web interface username. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_username",
+            "desc": "Username"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Web interface password. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Password"
+        }]
     }]
 }]

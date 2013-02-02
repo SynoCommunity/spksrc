@@ -14,5 +14,19 @@
             "key": "wizard_watch_dir",
             "desc": "Répertoire surveillé"
         }]
+    }, {
+        "type": "textfield",
+        "desc": "Nom d'utilisateur de l'interface web. admin par défaut",
+        "subitems": [{
+            "key": "wizard_username",
+            "desc": "Nom d'utilisateur"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Mot de passe de l'interface web. admin par défaut",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Mot de passe"
+        }]
     }]
 }]
