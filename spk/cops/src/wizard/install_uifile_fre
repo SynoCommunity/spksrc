@@ -1,0 +1,25 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "textfield",
+        "desc": "Répertoire contenant Calibre. /volume1/calibre par défaut. Attention : doit se terminer par un /",
+        "subitems": [{
+            "key": "wizard_calibre_dir",
+            "desc": "Répertoire contenant Calibre"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Titre du catalogue. COPS par défaut",
+        "subitems": [{
+            "key": "wizard_cops_title",
+            "desc": "Titre du catalogue"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Voulez vous permettre les téléchargement des fichiers Epub sur votre liseuse Kobo ? Si oui, taper 1. 0 (non) par défaut",
+        "subitems": [{
+            "key": "wizard_use_url_rewriting",
+            "desc": "1 ou 0"
+        }]
+    }]
+}]
