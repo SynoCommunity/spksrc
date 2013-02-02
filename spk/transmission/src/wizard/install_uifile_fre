@@ -14,7 +14,10 @@
             "key": "wizard_watch_dir",
             "desc": "Répertoire surveillé"
         }]
-    }, {
+    }]
+}, {
+    "step_title": "Configuration de base",
+    "items": [{
         "type": "textfield",
         "desc": "Nom d'utilisateur de l'interface web. admin par défaut",
         "subitems": [{
