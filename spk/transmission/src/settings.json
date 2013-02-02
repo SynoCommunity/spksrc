@@ -1,6 +1,6 @@
 {
     "download-dir": "@download_dir@",
-    "rpc-authentication-required": false,
+    "rpc-authentication-required": true,
     "rpc-username": "@username@",
     "rpc-password": "@password@",
     "rpc-whitelist-enabled": false,
