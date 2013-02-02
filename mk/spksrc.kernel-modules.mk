@@ -13,7 +13,8 @@ DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
 DIST_EXT      = $(PKG_EXT)
 COMPILE_TARGET = kernel_module_compile_target
 EXTRACT_TARGET = kernel_extract_target
-COPY_TARGET = kernel_null_target
+CONFIGURE_TARGET = kernel_configure_target
+COPY_TARGET = nop
 
 include ../../mk/spksrc.cross-env.mk
 #####
@@ -24,7 +25,7 @@ KERNEL_ENV += PATH=$$PATH
 RUN = cd $(KERNEL_DIR) && env -i $(KERNEL_ENV)
 MSG = echo "===>   "
 
-.PHONY: kernel_module_compile_target kernel_extract_target kernel_null_target
+.PHONY: kernel_module_compile_target kernel_extract_target kernel_configure_target
 
 include ../../mk/spksrc.download.mk
 
@@ -38,12 +39,7 @@ patch: extract
 include ../../mk/spksrc.patch.mk
 
 configure: patch
-	@$(MSG) "Configuring depended kernel source"
-	cp $(KERNEL_DIR)/$(SYNO_CONFIG) $(KERNEL_DIR)/.config
-	# Update the Makefile
-	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
-	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
-	test -e $(WORK_DIR)/$(KERNEL_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_DIR)/arch/$(ARCH)
+include ../../mk/spksrc.configure.mk
 
 compile: configure
 include ../../mk/spksrc.compile.mk
@@ -76,4 +72,10 @@ kernel_extract_target:
 	tar -xpf $(DIST_FILE) -C $(EXTRACT_PATH) $(PKG_EXTRACT)
 	mv $(EXTRACT_PATH)/$(PKG_EXTRACT) $(KERNEL_DIR)
 
-kernel_null_target: ;
+kernel_configure_target: 
+	@$(MSG) "Configuring depended kernel source"
+	cp $(KERNEL_DIR)/$(SYNO_CONFIG) $(KERNEL_DIR)/.config
+	# Update the Makefile
+	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
+	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
+	test -e $(WORK_DIR)/$(KERNEL_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_DIR)/arch/$(ARCH)
