@@ -15,6 +15,9 @@ CONFIGURE_ARGS = --without-python
 GNU_CONFIGURE = 1
 POST_INSTALL_TARGET = myPostInstall
 ADDITIONAL_CFLAGS = -O3
+ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
+ADDITIONAL_CFLAGS = -O2
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
