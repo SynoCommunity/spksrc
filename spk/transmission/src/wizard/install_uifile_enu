@@ -14,7 +14,10 @@
             "key": "wizard_watch_dir",
             "desc": "Watch directory"
         }]
-    }, {
+    }]
+}, {
+    "step_title": "Basic configuration",
+    "items": [{
         "type": "textfield",
         "desc": "Web interface username. Defaults to admin",
         "subitems": [{
