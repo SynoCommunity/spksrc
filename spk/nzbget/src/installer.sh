@@ -67,8 +67,8 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Revision 4 introduces backward incompatible changes
-    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 4 ]; then
+    # Revision 7 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 7 ]; then
         echo "Please uninstall previous version, no update possible"
         exit 1
     fi
