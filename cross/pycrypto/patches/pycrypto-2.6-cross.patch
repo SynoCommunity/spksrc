@@ -28,7 +28,7 @@
              if os.system("chmod 0755 configure") != 0:
                  raise RuntimeError("chmod error")
 -            cmd = "sh configure"    # we use "sh" here so that it'll work on mingw32 with standard python.org binaries
-+            cmd = "sh configure cross_compiling=yes"    # we use "sh" here so that it'll work on mingw32 with standard python.org binaries
++            cmd = "sh configure cross_compiling=yes ac_cv_func_malloc_0_nonnull=yes"    # we use "sh" here so that it'll work on mingw32 with standard python.org binaries
              if self.verbose < 1:
                  cmd += " -q"
              if os.system(cmd) != 0:
