@@ -1,5 +1,5 @@
 PKG_NAME = openssl
-PKG_VERS = 0.9.8x
+PKG_VERS = 0.9.8y
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.openssl.org/source
@@ -26,4 +26,3 @@ myConfigure:
 .PHONY: myInstall
 myInstall:
 	$(RUN) $(MAKE) install_sw INSTALL_PREFIX=$(INSTALL_DIR)
-
