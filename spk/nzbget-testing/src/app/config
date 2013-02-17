@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.nzbget-testing": {
+            "title": "NZBGet Testing",
+            "desc": "NZBGet Testing Web UI",
+            "icon": "images/nzbget-testing-{0}.png",
+            "type": "url",
+            "url": "3rdparty/nzbget-testing/nzbget-testing.cgi",
+            "allUsers": true
+        }
+    }
+}

@@ -1,0 +1,18 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "textfield",
+        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Répertoire de téléchargement"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Mot de passe du serveur. nzbget par défaut",
+        "subitems": [{
+            "key": "wizard_server_password",
+            "desc": "Mot de passe du serveur"
+        }]
+    }]
+}]
