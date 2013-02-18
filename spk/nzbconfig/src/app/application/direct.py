@@ -194,12 +194,16 @@ class SickBeard(Base):
     def configured_for(self):
         sabnzbd = SABnzbd()
         nzbget = NZBGet()
+        try:
+            postprocessing_config_owner = pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name
+        except KeyError:
+            postprocessing_config_owner = 'undefined'
         if (sabnzbd.is_installed() and self.config['General']['nzb_method'] == 'sabnzbd' and self.config['SABnzbd']['sab_username'] == sabnzbd.config['misc']['username'] and
             self.config['SABnzbd']['sab_password'] == sabnzbd.config['misc']['password'] and self.config['SABnzbd']['sab_apikey'] == sabnzbd.config['misc']['api_key'] and
-            self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port'] + '/' and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'sabnzbd'):
+            self.config['SABnzbd']['sab_host'] == 'http://localhost:' + sabnzbd.config['misc']['port'] + '/' and postprocessing_config_owner == 'sabnzbd'):
             return SABNZBD
         if (nzbget.is_installed() and self.config['General']['nzb_method'] == 'nzbget' and self.config['NZBget']['nzbget_password'] == nzbget.config['ControlPassword'] and
-            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ControlPort'] and pwd.getpwuid(os.stat(self.postprocessing_config_path).st_uid).pw_name == 'nzbget'):
+            self.config['NZBget']['nzbget_host'] == 'localhost:' + nzbget.config['ControlPort'] and postprocessing_config_owner == 'nzbget'):
             return NZBGET
         return UNDEFINED
 
