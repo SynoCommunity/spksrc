@@ -1,5 +1,5 @@
 SPK_NAME = nzbconfig
-SPK_VERS = 0.5
+SPK_VERS = 0.6
 SPK_REV = 3
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
