@@ -1,5 +1,5 @@
 PKG_NAME = curl
-PKG_VERS = 7.28.1
+PKG_VERS = 7.29.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://curl.haxx.se/download
@@ -13,10 +13,16 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 
-POST_INSTALL_TARGET = correct-curl-config
+CONFIGURE_TARGET = myConfigure
+POST_INSTALL_TARGET = myPostInstall
+
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: correct-curl-config
-correct-curl-config:
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) ./configure $(REAL_CONFIGURE_ARGS) CFLAGS=
+
+.PHONY: myPostInstall
+myPostInstall:
 	sed -i.orig 's#prefix=/#prefix=$(INSTALL_DIR)/#' $(STAGING_INSTALL_PREFIX)/bin/curl-config
