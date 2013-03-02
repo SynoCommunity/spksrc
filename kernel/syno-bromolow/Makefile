@@ -1,3 +1,4 @@
+ARCH ?= bromolow
 PKG_NAME = synogpl
 PKG_BRANCH = 2636
 PKG_ARCH = $(ARCH)

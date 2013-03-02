@@ -51,11 +51,16 @@ downloads:
 	    (cd $${dl} && $(MAKE) download) ; \
 	done
 
-.PHONY: toolchains
+.PHONY: toolchains kernel-modules
 toolchains:
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
 	    (cd $${tc} && $(MAKE)) ; \
+	done
+kernel-modules:
+	@for kern in $(dir $(wildcard kernel/*/Makefile)) ; \
+	do \
+	    (cd $${kern} && $(MAKE)) ; \
 	done
 
 setup: local.mk
