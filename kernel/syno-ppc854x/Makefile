@@ -1,3 +1,4 @@
+ARCH ?= ppc854x
 PKG_NAME = synogpl
 PKG_BRANCH = 2198
 PKG_ARCH = 854x
