@@ -16,6 +16,8 @@ EXTRACT_TARGET = kernel_extract_target
 CONFIGURE_TARGET = kernel_configure_target
 COPY_TARGET = nop
 
+TC ?= syno-$(ARCH)
+
 include ../../mk/spksrc.cross-env.mk
 #####
 
