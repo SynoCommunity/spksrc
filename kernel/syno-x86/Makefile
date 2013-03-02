@@ -1,5 +1,5 @@
 ARCH ?= x86
-ARCH ?= x86
+
 PKG_NAME = synogpl
 PKG_BRANCH = 2636
 PKG_ARCH = x64

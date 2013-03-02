@@ -1,5 +1,8 @@
 
+SUPPORTED_TCS = $(notdir $(wildcard toolchains/syno-*))
+SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
 SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
+
 
 all: $(SUPPORTED_SPKS)
 
@@ -52,16 +55,14 @@ downloads:
 	done
 
 .PHONY: toolchains kernel-modules
-toolchains:
-	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
-	do \
-	    (cd $${tc} && $(MAKE)) ; \
-	done
-kernel-modules:
-	@for kern in $(dir $(wildcard kernel/*/Makefile)) ; \
-	do \
-	    (cd $${kern} && $(MAKE)) ; \
-	done
+toolchains: $(addprefix toolchain-,$(SUPPORTED_ARCHS))
+kernel-modules: $(addprefix kernel-,$(SUPPORTED_ARCHS))
+
+toolchain-%:
+	-@cd toolchains/syno-$*/ && MAKEFLAGS= $(MAKE)
+
+kernel-%:
+	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
 setup: local.mk
 
