@@ -1,6 +1,6 @@
 SPK_NAME = python
 SPK_VERS = 2.7.3
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -16,7 +16,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, 
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update existing modules  and remove libtorrent\\\n2. Fix install for legacy archs\\\n3. Use 64-bit toolchains for bromolow, cedarview and x86"
+CHANGELOG = "1. Update modules\\\n2. Fix for DSM 4.2"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
