@@ -6,6 +6,7 @@ lnk:lib/libasound.so
 lnk:lib/libasound.so.2
 lib:lib/libasound.so.2.0.0
 shr:share/alsa/alsa.conf
+shr:share/alsa/alsa.conf.d/README
 shr:share/alsa/cards/AACI.conf
 shr:share/alsa/cards/aliases.alisp
 shr:share/alsa/cards/aliases.conf
@@ -26,12 +27,15 @@ shr:share/alsa/cards/CMI8738-MC6.conf
 shr:share/alsa/cards/CMI8738-MC8.conf
 shr:share/alsa/cards/CMI8788.conf
 shr:share/alsa/cards/CS46xx.conf
+shr:share/alsa/cards/Echo_Echo3G.conf
 shr:share/alsa/cards/EMU10K1.conf
 shr:share/alsa/cards/EMU10K1X.conf
 shr:share/alsa/cards/ENS1370.conf
 shr:share/alsa/cards/ENS1371.conf
 shr:share/alsa/cards/ES1968.conf
+shr:share/alsa/cards/FireWave.conf
 shr:share/alsa/cards/FM801.conf
+shr:share/alsa/cards/FWSpeakers.conf
 shr:share/alsa/cards/GUS.conf
 shr:share/alsa/cards/HDA-Intel.conf
 shr:share/alsa/cards/ICE1712.conf
