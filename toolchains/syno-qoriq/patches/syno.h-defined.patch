@@ -1,0 +1,32 @@
+--- include/syno.h.orig	2013-02-25 08:13:25.000000000 +0100
++++ include/syno.h	2013-03-07 23:53:16.000000000 +0100
+@@ -52,11 +52,11 @@
+ #define SDCOPY_PORT_LOCATION 98
+ #endif
+ 
+-#if 0 || defined(1)
++#if 1
+ #define SYNO_USB_BACKPORT_BY_ETRON
+ #endif
+ 
+-#if 0 || defined(1)
++#if 1
+ #define SYNO_FIX_IN_ETRON
+ #endif
+ 
+--- powerpc-none-linux-gnuspe/include/linux/syno.h.orig	2013-02-25 08:13:25.000000000 +0100
++++ powerpc-none-linux-gnuspe/include/linux/syno.h	2013-03-08 11:09:23.000000000 +0100
+@@ -52,11 +52,11 @@
+ #define SDCOPY_PORT_LOCATION 98
+ #endif
+ 
+-#if 0 || defined(1)
++#if 1
+ #define SYNO_USB_BACKPORT_BY_ETRON
+ #endif
+ 
+-#if 0 || defined(1)
++#if 1
+ #define SYNO_FIX_IN_ETRON
+ #endif
+ 
