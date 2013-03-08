@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+
+spawn php -d suhosin.executor.include.whitelist="phar" go-pear.phar
+expect "1-11, 'all' or Enter to continue:"
+send "1\r"
+expect -re "Installation base \\(\\\$prefix\\) \\\[.*\\\] :"
+send "$env(PEAR_INSTALL_DIR)\r"
+expect "1-11, 'all' or Enter to continue:"
+send "\r"
+expect -re "Would you like to alter php\.ini <.*>\\? \\\[Y/n\\\] :"
+send "n\r"
+expect "Press Enter to continue:"
+send "\r"
+expect eof
