@@ -12,7 +12,7 @@ COMMENT  = APR is the base portability library.
 LICENSE  = 
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_process_shared_works=no apr_cv_tcp_nodelay_with_cork=no ac_cv_sizeof_struct_iovec=8
+CONFIGURE_ARGS = ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_process_shared_works=no apr_cv_tcp_nodelay_with_cork=yes ac_cv_sizeof_struct_iovec=8
 POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk

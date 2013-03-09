@@ -30,6 +30,9 @@ lib:lib/libsvn_ra-1.so.0.0.0
 lnk:lib/libsvn_ra_local-1.so
 lnk:lib/libsvn_ra_local-1.so.0
 lib:lib/libsvn_ra_local-1.so.0.0.0
+lnk:lib/libsvn_ra_neon-1.so
+lnk:lib/libsvn_ra_neon-1.so.0
+lib:lib/libsvn_ra_neon-1.so.0.0.0
 lnk:lib/libsvn_ra_svn-1.so
 lnk:lib/libsvn_ra_svn-1.so.0
 lib:lib/libsvn_ra_svn-1.so.0.0.0
