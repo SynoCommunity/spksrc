@@ -8,4 +8,17 @@
             "desc": "Download directory"
         }]
     }]
+},{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Who should be able to see the application icon in the DSM UI?:",
+        "subitems": [{
+            "key": "sab_users_admin",
+            "desc": "'admin' account only"
+        },{
+            "key": "sab_users_all",
+            "desc": "All Users"
+        }]
+    }]
 }]

@@ -1,0 +1,14 @@
+[{
+    "step_title": "Configuration",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Who should be able to see the application icon in the DSM UI?:",
+        "subitems": [{
+            "key": "cps_users_admin",
+            "desc": "'admin' Account Only"
+        },{
+            "key": "cps_users_all",
+            "desc": "All Users"
+        }]
+    }]
+}]

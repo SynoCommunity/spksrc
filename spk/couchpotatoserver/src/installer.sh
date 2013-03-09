@@ -34,6 +34,13 @@ postinst ()
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
+    # Set allUsers parameter based on selection during installation wizard
+    if [ "${cps_users_all}" = "true" ]; then
+        sed -i "s/@allUsers@/true/g" ${INSTALL_DIR}/app/config
+    else
+        sed -i "s/@allUsers@/false/g" ${INSTALL_DIR}/app/config
+    fi
+
     exit 0
 }
 

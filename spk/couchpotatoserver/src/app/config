@@ -6,7 +6,7 @@
             "icon": "images/couchpotatoserver-{0}.png",
             "type": "url",
             "url": "3rdparty/couchpotatoserver/couchpotatoserver.cgi",
-            "allUsers": true
+            "allUsers": @allUsers@
         }
     }
 }
