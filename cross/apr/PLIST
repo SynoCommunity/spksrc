@@ -1,3 +1,3 @@
-lnk:lib/libapr-1.so
-lnk:lib/libapr-1.so.0
-lib:lib/libapr-1.so.0.4.6
+lnk:lib/libapr.so
+lnk:lib/libapr.so.0
+lib:lib/libapr.so.0.4.6
