@@ -1,6 +1,6 @@
 --- Makefile.orig	2012-04-20 01:03:38.460278866 +0200
 +++ Makefile	2012-04-20 01:04:32.144280184 +0200
-@@ -1915,7 +1915,6 @@
+@@ -2159,7 +2159,6 @@
  
  $(BUILT_INS): git$X
  	$(QUIET_BUILT_IN)$(RM) $@ && \
@@ -8,7 +8,7 @@
  	ln -s git$X $@ 2>/dev/null || \
  	cp git$X $@
  
-@@ -2241,7 +2240,6 @@
+@@ -2480,7 +2479,6 @@
  
  $(REMOTE_CURL_ALIASES): $(REMOTE_CURL_PRIMARY)
  	$(QUIET_LNCP)$(RM) $@ && \
@@ -16,24 +16,3 @@
  	ln -s $< $@ 2>/dev/null || \
  	cp $< $@
  
-@@ -2535,20 +2533,17 @@
- 	} && \
- 	for p in $(filter $(install_bindir_programs),$(BUILT_INS)); do \
- 		$(RM) "$$bindir/$$p" && \
--		ln "$$bindir/git$X" "$$bindir/$$p" 2>/dev/null || \
- 		ln -s "git$X" "$$bindir/$$p" 2>/dev/null || \
- 		cp "$$bindir/git$X" "$$bindir/$$p" || exit; \
- 	done && \
- 	for p in $(BUILT_INS); do \
- 		$(RM) "$$execdir/$$p" && \
--		ln "$$execdir/git$X" "$$execdir/$$p" 2>/dev/null || \
- 		ln -s "git$X" "$$execdir/$$p" 2>/dev/null || \
- 		cp "$$execdir/git$X" "$$execdir/$$p" || exit; \
- 	done && \
- 	remote_curl_aliases="$(REMOTE_CURL_ALIASES)" && \
- 	for p in $$remote_curl_aliases; do \
- 		$(RM) "$$execdir/$$p" && \
--		ln "$$execdir/git-remote-http$X" "$$execdir/$$p" 2>/dev/null || \
- 		ln -s "git-remote-http$X" "$$execdir/$$p" 2>/dev/null || \
- 		cp "$$execdir/git-remote-http$X" "$$execdir/$$p" || exit; \
- 	done && \
