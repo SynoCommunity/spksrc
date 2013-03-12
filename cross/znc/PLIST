@@ -17,6 +17,7 @@ lib:lib/znc/chansaver.so
 lib:lib/znc/charset.so
 lib:lib/znc/clearbufferonmsg.so
 lib:lib/znc/clientnotify.so
+lib:lib/znc/colloquy.so
 lib:lib/znc/controlpanel.so
 lib:lib/znc/crypt.so
 lib:lib/znc/ctcpflood.so
@@ -37,6 +38,7 @@ lib:lib/znc/notes.so
 lib:lib/znc/notify_connect.so
 lib:lib/znc/partyline.so
 lib:lib/znc/perform.so
+lib:lib/znc/push.so
 lib:lib/znc/q.so
 lib:lib/znc/raw.so
 lib:lib/znc/route_replies.so

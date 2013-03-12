@@ -21,7 +21,7 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myPostInstall
 myPostInstall:
 	@$(MSG) "Building extra modules"
-	@chmod +x $(WORK_DIR)/$(PKG_DIR)/znc-buildmod $(WORK_DIR)/$(PKG_DIR)/znc-config
+	@chmod +x $(WORK_DIR)/$(PKG_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
 	@PATH=$(WORK_DIR)/$(PKG_DIR) INCLUDES=-I$(STAGING_INSTALL_PREFIX)/include/znc prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(WORK_DIR)/modules/*.cpp
