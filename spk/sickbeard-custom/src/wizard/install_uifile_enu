@@ -1,0 +1,14 @@
+[{
+    "step_title": "Choose your fork",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configure the fork to use. For example, URL git://github.com/lad1337/Sick-Beard.git and branch anime",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "Fork URL"
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Fork branch"
+        ]
+    }]
+}]
