@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.sickbeard-custom": {
+            "title": "SickBeard Custom",
+            "desc": "SickBeard Custom Web UI",
+            "icon": "images/sickbeard-custom-{0}.png",
+            "type": "url",
+            "url": "/",
+            "port": "8083",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
