@@ -1,0 +1,9 @@
+lnk:lib/libgiomm-2.4.so
+lnk:lib/libgiomm-2.4.so.1
+lib:lib/libgiomm-2.4.so.1.3.0
+lnk:lib/libglibmm-2.4.so
+lnk:lib/libglibmm-2.4.so.1
+lib:lib/libglibmm-2.4.so.1.3.0
+lnk:lib/libglibmm_generate_extra_defs-2.4.so
+lnk:lib/libglibmm_generate_extra_defs-2.4.so.1
+lib:lib/libglibmm_generate_extra_defs-2.4.so.1.3.0
