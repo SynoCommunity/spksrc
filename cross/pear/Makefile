@@ -17,7 +17,6 @@ INSTALL_TARGET = nop
 # Pure PHP
 ARCH =
 
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myExtract
@@ -26,4 +25,4 @@ myExtract:
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) PEAR_INSTALL_DIR=$(STAGING_INSTALL_PREFIX) ../install.exp
+	WORK_DIR=$(WORK_DIR) PEAR_INSTALL_DIR=$(STAGING_INSTALL_PREFIX) src/install.exp
