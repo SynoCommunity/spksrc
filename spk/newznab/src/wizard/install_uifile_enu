@@ -1,0 +1,6 @@
+[{
+    "step_title": "Warning!",
+    "items": [{
+        "desc": "In order for newznab to work, you have to add '/usr/local/newznab/share/pear' to the open_basedir. To do so, go to Control Panel > Web Services > PHP Settings."
+    }]
+}]
