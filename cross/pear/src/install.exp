@@ -1,6 +1,6 @@
 #!/usr/bin/expect -f
 
-spawn php -d suhosin.executor.include.whitelist="phar" go-pear.phar
+spawn php -d suhosin.executor.include.whitelist="phar" $env(WORK_DIR)/go-pear.phar
 expect "1-11, 'all' or Enter to continue:"
 send "1\r"
 expect -re "Installation base \\(\\\$prefix\\) \\\[.*\\\] :"
