@@ -1,0 +1,18 @@
+[{
+	"step_title": "Suppression de la base de donnée newznab",
+	"items": [{
+		"type": "multiselect",
+		"desc": "Si vous supprimez la base de donnée newznab, toutes les releses indexées seront supprimées.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove newznab database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Saisissez votre mot de passe MySQL pour supprimer la base de donnée newznab.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Mot de passe Root"
+		}]
+	}]
+}]

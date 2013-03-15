@@ -7,7 +7,7 @@
     "step_title": "Configuration de la base de donnée",
     "items": [{
         "type": "password",
-        "desc": "Saisissez votre mot de passe MySQL",
+        "desc": "Saisissez votre mot de passe MySQL.",
         "subitems": [{
             "key": "wizard_mysql_password_root",
             "desc": "Mot de passe Root"

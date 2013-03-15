@@ -70,6 +70,11 @@ postuninst ()
     # Remove link
     rm -f ${INSTALL_DIR}
 
+    # Remove database
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" -a "${wizard_remove_database}" == "true" ]; then
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE newznab;"
+    fi
+
     # Remove the web interface
     rm -fr ${WEB_DIR}/newznab
 
