@@ -4,9 +4,17 @@ set -e
 
 PHP="php -d open_basedir= -d include_path=/usr/local/newznab/share/pear -d memory_limit=256M"
 SCRIPTS_PATH="/var/services/web/newznab/misc/update_scripts"
+CONFIG_PATH="/var/services/web/newznab/www/config.php"
 SLEEP_TIME="10"
 LASTOPTIMIZE=`date +%s`
 
+# Wait for the config.php to be created
+while [ ! -f ${CONFIG_PATH} ]; do
+    echo "Waiting for the configuration file to be created"
+    sleep 10
+done
+
+# Main loop
 while true; do
     cd ${SCRIPTS_PATH}
 
