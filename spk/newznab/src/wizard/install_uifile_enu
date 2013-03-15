@@ -7,7 +7,7 @@
     "step_title": "Database configuration",
     "items": [{
         "type": "password",
-        "desc": "Enter your MySQL password",
+        "desc": "Enter your MySQL password.",
         "subitems": [{
             "key": "wizard_mysql_password_root",
             "desc": "Root password"
