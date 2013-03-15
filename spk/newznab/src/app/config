@@ -6,7 +6,8 @@
             "icon": "images/newznab-{0}.png",
             "type": "url",
             "url": "/newznab",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
