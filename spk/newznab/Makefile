@@ -3,7 +3,7 @@ SPK_VERS = 0.2.3
 SPK_REV = 1
 SPK_ICON = src/newznab.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Newznab is a usenet indexing application, that makes building a usenet community easy.
@@ -25,13 +25,16 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = newznab_extra_install
 
-# Pure PHP
-override ARCH=
+BUSYBOX_CONFIG = daemon nice
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: newznab_extra_install
 newznab_extra_install:
+	cat src/htaccess.pear >> $(STAGING_DIR)/share/newznab/www/.htaccess
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 src/newznab.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
