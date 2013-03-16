@@ -6,25 +6,29 @@ DNAME="Newznab"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
+USER="nobody"
 MYSQL="/usr/syno/mysql/bin/mysql"
+MYSQL_USER="newznab"
+MYSQL_DATABASE="newznab"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()
 {
     # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
             echo "Incorrect MySQL root password"
             exit 1
         fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^newznab$ > /dev/null 2>&1; then
-            echo "MySQL user newznab already exists"
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
+            echo "MySQL user ${MYSQL_USER} already exists"
             exit 1
         fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^newznab$ > /dev/null 2>&1; then
-            echo "MySQL database newznab already exists"
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
+            echo "MySQL database ${MYSQL_DATABASE} already exists"
             exit 1
         fi
     fi
@@ -44,24 +48,32 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/newznab ${WEB_DIR}
 
     # Setup database
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE newznab;"
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "GRANT ALL PRIVILEGES ON newznab.* TO 'newznab'@'localhost' IDENTIFIED BY '${wizard_mysql_password_newznab}';"
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_newznab}';"
     fi
 
     # Fix permissions
-    chmod 777 ${WEB_DIR}/newznab/www/lib/smarty/templates_c
-    chmod 777 ${WEB_DIR}/newznab/www/covers/movies
-    chmod 777 ${WEB_DIR}/newznab/www/covers/music
-    chmod 777 ${WEB_DIR}/newznab/www
-    chmod 777 ${WEB_DIR}/newznab/www/install
-    chmod 777 ${WEB_DIR}/newznab/nzbfiles
+    chown ${USER} ${WEB_DIR}/newznab/www/lib/smarty/templates_c
+    chown ${USER} ${WEB_DIR}/newznab/www/covers/movies
+    chown ${USER} ${WEB_DIR}/newznab/www/covers/music
+    chown ${USER} ${WEB_DIR}/newznab/www
+    chown ${USER} ${WEB_DIR}/newznab/www/install
+    chown ${USER} ${WEB_DIR}/newznab/nzbfiles
 
     exit 0
 }
 
 preuninst ()
 {
+    # Check database
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+        echo "Incorrect MySQL root password"
+        exit 1
+    fi
+
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
@@ -71,8 +83,8 @@ postuninst ()
     rm -f ${INSTALL_DIR}
 
     # Remove database
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" -a "${wizard_remove_database}" == "true" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE newznab;"
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
     fi
 
     # Remove the web interface
@@ -83,6 +95,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}

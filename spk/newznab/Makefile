@@ -1,6 +1,6 @@
 SPK_NAME = newznab
 SPK_VERS = 0.2.3
-SPK_REV = 1
+SPK_REV = 3
 SPK_ICON = src/newznab.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)

@@ -7,24 +7,25 @@ DNAME="Newznab"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
+USER="nobody"
 NEWZNAB="${INSTALL_DIR}/bin/newznab.sh"
 PID_FILE="${INSTALL_DIR}/var/newznab.pid"
 
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -x ${NEWZNAB} -p ${PID_FILE}
+    start-stop-daemon -S -q -m -b -N 10 -x ${NEWZNAB} -c ${USER} -u ${USER} -p ${PID_FILE}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -p ${PID_FILE}
+    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -p ${PID_FILE}
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
 wait_for_status ()
