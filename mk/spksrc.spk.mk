@@ -138,19 +138,8 @@ define dsm_script_redirect
 $(create_target_dir)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
-echo 'PATH=/bin:/usr/bin' >> $@
 echo '. `dirname $$0`/installer' >> $@
 echo '`basename $$0` > $$SYNOPKG_TEMP_LOGFILE' >> $@
-chmod 755 $@
-endef
-
-define dsm_script
-$(create_target_dir)
-$(MSG) "Creating $@"
-echo '#!/bin/sh' > $@
-echo 'PATH=/bin:/usr/bin' >> $@
-echo '. `dirname $$0`/installer' >> $@
-echo '`basename $$0`' >> $@
 chmod 755 $@
 endef
 
@@ -166,9 +155,9 @@ $(DSM_SCRIPTS_DIR)/preinst:
 $(DSM_SCRIPTS_DIR)/postinst:
 	@$(dsm_script_redirect)
 $(DSM_SCRIPTS_DIR)/preuninst:
-	@$(dsm_script)
+	@$(dsm_script_redirect)
 $(DSM_SCRIPTS_DIR)/postuninst:
-	@$(dsm_script)
+	@$(dsm_script_redirect)
 $(DSM_SCRIPTS_DIR)/preupgrade:
 	@$(dsm_script_redirect)
 $(DSM_SCRIPTS_DIR)/postupgrade:
