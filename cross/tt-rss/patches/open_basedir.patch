@@ -1,0 +1,13 @@
+--- include/sanity_check.php.orig	2013-03-17 00:02:28.000000000 +0100
++++ include/sanity_check.php	2013-03-17 00:13:08.000000000 +0100
+@@ -85,10 +85,6 @@
+ 				array_push($errors, "LOCK_DIRECTORY defined in config.php is not writable (chmod -R 777 ".LOCK_DIRECTORY.").\n");
+ 			}
+ 
+-			if (ini_get("open_basedir")) {
+-				array_push($errors, "PHP configuration option open_basedir is not supported. Please disable this in PHP settings file (php.ini).");
+-			}
+-
+ 			if (!function_exists("curl_init") && !ini_get("allow_url_fopen")) {
+ 				array_push($errors, "PHP configuration option allow_url_fopen is disabled, and CURL functions are not present. Either enable allow_url_fopen or install PHP extension for CURL.");
+ 			}
