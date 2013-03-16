@@ -1,0 +1,18 @@
+[{
+	"step_title": "Suppression de la base de donnée ttrss",
+	"items": [{
+		"type": "multiselect",
+		"desc": "Si vous supprimez la base de donnée ttrss, tous les flux seront supprimées.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove ttrss database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Saisissez votre mot de passe MySQL pour supprimer la base de donnée ttrss.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Mot de passe Root"
+		}]
+	}]
+}]
