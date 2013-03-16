@@ -16,7 +16,7 @@ INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-layout=GNU --with-apr=$(STAGING_INSTALL_PREFIX)/bin/apr-1-config
+CONFIGURE_ARGS = --with-expat=builtin --enable-layout=GNU --with-apr=$(STAGING_INSTALL_PREFIX)/bin/apr-1-config
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/apache2
 
 include ../../mk/spksrc.cross-cc.mk
