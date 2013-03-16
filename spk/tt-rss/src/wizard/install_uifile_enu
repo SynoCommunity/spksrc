@@ -1,0 +1,25 @@
+[{
+    "step_title": "Tt-rss configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'ttrss' MySQL user and database will be created. Please enter a password for the 'ttrss' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_ttrss",
+            "desc": "Ttrss password"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Domain name of your DiskStation. For example: you.synology.me.",
+        "subitems": [{
+            "key": "wizard_domain_name",
+            "desc": "Domain name"
+        }]
+    }]
+}]
