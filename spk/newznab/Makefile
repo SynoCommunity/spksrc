@@ -1,6 +1,6 @@
 SPK_NAME = newznab
 SPK_VERS = 0.2.3
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/newznab.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -20,6 +20,9 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+
+INSTALL_DEP_SERVICES = apache-web mysql
+START_DEP_SERVICES = apache-web mysql
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
