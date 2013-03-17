@@ -5,7 +5,7 @@
             "desc": "Newznab",
             "icon": "images/newznab-{0}.png",
             "type": "url",
-            "url": "/newznab",
+            "url": "/newznab/www",
             "allUsers": true,
             "grantPrivilege": "local"
         }
