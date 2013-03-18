@@ -96,6 +96,7 @@ if [ "$NZBPR_PostProcess" = "no" ]; then
 fi
 
 echo "[INFO] Post-Process: Post-processing script successfully started"
+cd "$NZBPP_DIRECTORY"
 
 # Determine the location of configuration file (it must be stored in
 # the directory with nzbget.conf).
@@ -138,9 +139,29 @@ if [ "$NZBPP_PARSTATUS" -eq 1 ]; then
 fi
 
 # Check unpack status
-if [ "$NZBPP_UNPACKSTATUS" -ne 2 ]; then
-	echo "[WARNING] Post-Process: Unpack failed or disabled, exiting"
+if [ "$NZBPP_UNPACKSTATUS" -eq 1 ]; then
+	echo "[WARNING] Post-Process: Unpack failed, exiting"
 	exit $POSTPROCESS_NONE
+fi
+if [ "$NZBPP_UNPACKSTATUS" -eq 0 -a "$NZBPP_PARSTATUS" -ne 2 ]; then
+	# Unpack is disabled or was skipped due to nzb-file properties or due to errors during par-check
+
+	if (ls *.rar *.7z *.7z.??? >/dev/null 2>&1); then
+		echo "[WARNING] Post-Process: Archive files exist but unpack skipped, exiting"
+		exit $POSTPROCESS_NONE
+	fi
+
+	if (ls *.par2 >/dev/null 2>&1); then
+		echo "[WARNING] Post-Process: Unpack skipped and par-check skipped (although par2-files exist), exiting"
+		exit $POSTPROCESS_NONE
+	fi
+
+	if [ -f "_brokenlog.txt" ]; then
+		echo "[WARNING] Post-Process: _brokenlog.txt exists, download is probably damaged, exiting"
+		exit $POSTPROCESS_NONE
+	fi
+
+	echo "[INFO] Post-Process: Neither archive- nor par2-files found, _brokenlog.txt doesn't exist, considering download successful"
 fi
 
 # Check if destination directory exists (important for reprocessing of history items)
@@ -148,8 +169,6 @@ if [ ! -d "$NZBPP_DIRECTORY" ]; then
 	echo "[ERROR] Post-Process: Nothing to post-process: destination directory $NZBPP_DIRECTORY doesn't exist"
 	exit $POSTPROCESS_ERROR
 fi
-
-cd "$NZBPP_DIRECTORY"
 
 # All checks done, now processing the files
 
