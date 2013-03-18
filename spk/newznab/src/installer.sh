@@ -45,7 +45,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/newznab ${WEB_DIR}
+    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Setup database
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -53,12 +53,12 @@ postinst ()
     fi
 
     # Fix permissions
-    chown ${USER} ${WEB_DIR}/newznab/www/lib/smarty/templates_c
-    chown ${USER} ${WEB_DIR}/newznab/www/covers/movies
-    chown ${USER} ${WEB_DIR}/newznab/www/covers/music
-    chown ${USER} ${WEB_DIR}/newznab/www
-    chown ${USER} ${WEB_DIR}/newznab/www/install
-    chown ${USER} ${WEB_DIR}/newznab/nzbfiles
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/www/lib/smarty/templates_c
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/www/covers/movies
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/www/covers/music
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/www
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/www/install
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/nzbfiles
 
     exit 0
 }
@@ -88,7 +88,7 @@ postuninst ()
     fi
 
     # Remove the web interface
-    rm -fr ${WEB_DIR}/newznab
+    rm -fr ${WEB_DIR}/${PACKAGE}
 
     exit 0
 }
@@ -101,10 +101,10 @@ preupgrade ()
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${WEB_DIR}/newznab/www/config.php ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/newznab/www/covers/movies ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/newznab/www/covers/music ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/newznab/nzbfiles ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/www/config.php ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/www/covers/movies ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/www/covers/music ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/nzbfiles ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -112,10 +112,10 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/newznab/www/
-    mv ${TMP_DIR}/${PACKAGE}/movies ${WEB_DIR}/newznab/www/covers/
-    mv ${TMP_DIR}/${PACKAGE}/music ${WEB_DIR}/newznab/www/covers/
-    mv ${TMP_DIR}/${PACKAGE}/nzbfiles ${WEB_DIR}/newznab/
+    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/www/
+    mv ${TMP_DIR}/${PACKAGE}/movies ${WEB_DIR}/${PACKAGE}/www/covers/
+    mv ${TMP_DIR}/${PACKAGE}/music ${WEB_DIR}/${PACKAGE}/www/covers/
+    mv ${TMP_DIR}/${PACKAGE}/nzbfiles ${WEB_DIR}/${PACKAGE}/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
