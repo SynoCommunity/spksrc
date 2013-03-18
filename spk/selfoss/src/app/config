@@ -5,6 +5,8 @@
             "desc": "Selfoss",
             "icon": "images/selfoss-{0}.png",
             "type": "url",
+            "protocol": "http",
+            "port": "80",
             "url": "/selfoss",
             "allUsers": true
         }
