@@ -5,7 +5,7 @@
 		"desc": "Si vous supprimez la base de donnée ttrss, tous les flux seront supprimées.",
 		"subitems": [{
 			"key": "wizard_remove_database",
-			"desc": "Remove ttrss database"
+			"desc": "Supprimer la base de donnée ttrss"
 		}]
 	}, {
 		"type": "password",
