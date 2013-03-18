@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.selfoss": {
+            "title": "Selfoss",
+            "desc": "Selfoss",
+            "icon": "images/selfoss-{0}.png",
+            "type": "url",
+            "url": "/selfoss",
+            "allUsers": true
+        }
+    }
+}
