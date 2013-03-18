@@ -5,7 +5,7 @@
 		"desc": "Si vous supprimez la base de donnée newznab, toutes les releses indexées seront supprimées.",
 		"subitems": [{
 			"key": "wizard_remove_database",
-			"desc": "Remove newznab database"
+			"desc": "Supprimer la base de donnée newznab"
 		}]
 	}, {
 		"type": "password",
