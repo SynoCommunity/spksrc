@@ -1,0 +1,18 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Password for remote access on port 2240. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Password"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Download directory. Defaults to /volume1/downloads",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Download directory"
+        }]
+    }]
+}]
