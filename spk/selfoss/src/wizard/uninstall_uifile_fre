@@ -1,0 +1,18 @@
+[{
+	"step_title": "Suppression de la base de donnée selfoss",
+	"items": [{
+		"type": "multiselect",
+		"desc": "Si vous supprimez la base de donnée selfoss, tous les flux seront supprimées.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Supprimer la base de donnéee selfoss"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Saisissez votre mot de passe MySQL pour supprimer la base de donnée selfoss.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Mot de passe Root"
+		}]
+	}]
+}]
