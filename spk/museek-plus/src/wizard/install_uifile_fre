@@ -1,0 +1,18 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "password",
+        "desc": "Mot de passe pour l'accès à distance sur le port 2240. admin par défaut",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Mot de passe"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Répertoire de téléchargement"
+        }]
+    }]
+}]
