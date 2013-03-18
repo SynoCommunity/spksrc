@@ -5,7 +5,8 @@
             "desc": "NZBGet Testing Web UI",
             "icon": "images/nzbget-testing-{0}.png",
             "type": "url",
-            "url": "3rdparty/nzbget-testing/nzbget-testing.cgi",
+            "url": "/",
+            "port": "9876",
             "allUsers": true
         }
     }

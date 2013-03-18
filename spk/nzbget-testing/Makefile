@@ -1,6 +1,6 @@
 SPK_NAME = nzbget-testing
-SPK_VERS = 10.0~r567
-SPK_REV = 1
+SPK_VERS = 10.0~r603
+SPK_REV = 2
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
@@ -41,7 +41,6 @@ nzbget_extra_install:
 	install -m 644 src/nzbget-postprocess.conf $(STAGING_DIR)/share/nzbget/webui/nzbget-postprocess.conf
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/nzbget-testing.cgi.pl $(STAGING_DIR)/app/nzbget-testing.cgi
 	install -m 755 -d $(STAGING_DIR)/app/texts
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
