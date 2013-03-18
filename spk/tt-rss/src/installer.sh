@@ -51,11 +51,13 @@ postinst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
         ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
-        sed -e "s|define('DB_TYPE', \"pgsql\");|define('DB_TYPE', 'mysql');|" \
-            -e "s|define('DB_USER', \"fox\");|define('DB_USER', '${MYSQL_USER}');|" \
-            -e "s|define('DB_NAME', \"fox\");|define('DB_NAME', '${MYSQL_DATABASE}');|" \
-            -e "s|define('DB_PASS', \"XXXXXX\");|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
-            -e "s|define('SELF_URL_PATH', 'http://yourserver/tt-rss/');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
+        single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
+        sed -e "s|define('DB_TYPE', \".*\");|define('DB_TYPE', 'mysql');|" \
+            -e "s|define('DB_USER', \".*\");|define('DB_USER', '${MYSQL_USER}');|" \
+            -e "s|define('DB_NAME', \".*\");|define('DB_NAME', '${MYSQL_DATABASE}');|" \
+            -e "s|define('DB_PASS', \".*\");|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
+            -e "s|define('SINGLE_USER_MODE', .*);|define('SINGLE_USER_MODE', ${single_user_mode});|" \
+            -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
             ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php
     fi
 
