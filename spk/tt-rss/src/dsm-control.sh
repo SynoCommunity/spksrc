@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Package
-PACKAGE="ttrss"
+PACKAGE="tt-rss"
 DNAME="Tiny Tiny RSS"
 
 # Others
@@ -9,8 +9,8 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="nobody"
-TTRSS="${WEB_DIR}/tt-rss/update.php"
-PID_FILE="${INSTALL_DIR}/var/ttrss.pid"
+TTRSS="${WEB_DIR}/${PACKAGE}/update.php"
+PID_FILE="${INSTALL_DIR}/var/tt-rss.pid"
 
 
 start_daemon ()
