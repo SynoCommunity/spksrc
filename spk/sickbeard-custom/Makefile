@@ -1,6 +1,6 @@
 SPK_NAME = sickbeard-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 3
 SPK_ICON = src/sickbeard-custom.png
 DSM_UI_DIR = app
 
@@ -10,7 +10,7 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 MAINTAINER = SynoCommunity
 DESCRIPTION = SickBeard Custom allows you to run the fork of your choice of SickBeard. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = SickBeard Custom vous permet d\\\'exécuter le fork de votre choix de SickBeard. Vous aurez besoin de saisir l\\\'URL git du fork durant l\\\'installation.
-ADMIN_PORT = 8082
+ADMIN_PORT = 8083
 RELOAD_UI = yes
 DISPLAY_NAME = SickBeard Custom
 BETA = 1
