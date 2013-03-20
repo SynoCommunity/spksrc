@@ -1,0 +1,3 @@
+#!/bin/sh
+. `dirname $0`/start-stop-status.sh
+$1
