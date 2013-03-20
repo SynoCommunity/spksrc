@@ -6,7 +6,7 @@
 			"title": "Tekkit Lite",
 			"desc": "Admin console for Tekkit Lite",
 			"icon": "icons/icon_{0}.png",
-			"url": "3rdparty/TekkitLite/index.cgi"
+			"url": "3rdparty/tekkitlite/index.cgi"
 		}
 	}
 }

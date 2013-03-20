@@ -1,6 +1,6 @@
 SPK_NAME = tekkitlite
 SPK_VERS = 0.6.1
-SPK_REV = 008
+SPK_REV = 015
 SPK_ICON = src/tekkitlite.png
 DSM_UI_DIR = app
 
@@ -8,7 +8,7 @@ DEPENDS  =
 SPK_DEPENDS =
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = A new Tekkit is here! One geared for smaller servers and that takes avantage of the new way Minecraft handles multiplayer and arising out of the chaos that is the forgebukkit fiasco, we present Tekkit Lite.\n\n\nShout Out:\nThis package was made based on Patters scripts over at PCLoadLetter, without that this would not have been possible. MANY THANKS!\nAlso to Merty for his CFE package which inspired the console UI.
+DESCRIPTION = A new Tekkit is here! One geared for smaller servers and that takes avantage of the new way Minecraft handles multiplayer and arising out of the chaos that is the forgebukkit fiasco, we present Tekkit Lite. Shout Out: This package was made based on Patters scripts over at PCLoadLetter, without that this would not have been possible. MANY THANKS! Also to Merty for his CFE package which inspired the console UI.
 ADMIN_PORT = 
 RELOAD_UI = yes
 DISPLAY_NAME = Tekkit Lite

@@ -31,7 +31,7 @@ if (exists $args{'lineNo'}) {
 	#LIMIT this by 100 lines or something to stop network spam! (and lag!!)
 	my $limit = 100;
 
-	if (open(IN,"/var/packages/TekkitLite/target/server.log")) {
+	if (open(IN,"/var/packages/tekkitlite/target/server.log")) {
 		my $ctime = stat(IN)->ctime;
 		print('{"ret":"ok","log":"');
 		my $startLoopTime = time();
@@ -58,7 +58,7 @@ if (exists $args{'lineNo'}) {
 		close(IN);
 		print('","lineNo":"'.$lineNo.'","lastLogTime":"'.$lastChangeTime.'"}');
 	} else {
-		print('{"ret":"error","error":"Unable to read log file"');
+		print('{"ret":"error","error":"Unable to read log file"}');
 	}
 
 } else {
@@ -74,6 +74,6 @@ if (exists $args{'lineNo'}) {
 		close(OUT);
 		print('{"ret":"ok","text":"'.$value.'"}');
 	} else {
-		print('{"ret":"error","error":"Unable to write to log file"');
+		print('{"ret":"error","error":"Unable to write to log file"}');
 	}
 }
