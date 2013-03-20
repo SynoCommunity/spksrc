@@ -19,13 +19,13 @@ Ext.onReady(function() {
     function getLog(){
 		conn.request({
 			url: 'logFunctions.cgi',
-			params: Ext.urlEncode({lineNo: log.lineNumber}),
+			timeout: 60000,
+			params: Ext.urlEncode({lineNo: log.lineNumber, lastLogTime: log.lastLogTime }),
 			success: function(responseObject) {
-				console.log(responseObject.responseText);
+				
 				var obj = Ext.decode(responseObject.responseText);
 				if (obj.ret != 'ok') {
 					Ext.Msg.alert('Error','Unable to load Tekkit log... is the server running ?(' + obj.error + ')');
-					Ext.TaskMgr.stop(updateLog);
 				} else {
 					var pos = log.el.dom.scrollTop;
 					var max = log.el.dom.scrollTopMax;
@@ -41,10 +41,11 @@ Ext.onReady(function() {
 					        log.el.dom.scrollTop = 99999;
 					}
 					log.lineNumber = obj.lineNo;
+					log.lastLogTime = obj.lastLogTime;
+					updateLog.delay(500);
 				}
 			},
 			failure: function(rso) {
-				Ext.TaskMgr.stop(updateLog);
 				Ext.Msg.alert('Error', 'Error reading log');
 			}
 		});
@@ -60,24 +61,23 @@ Ext.onReady(function() {
 					Ext.Msg.alert('Error','Unable to send text (' + obj.error + ')');
 				} else {
 					msgBox.setValue('');
-					//Need to delay this get log slightly...
-					getLog(); //This usually happens to quick!
 					log.el.dom.scrollTop = 99999;
 				}
 			},
 			failure: function(responseObject) {
 				Ext.Msg.alert('Error','Server has been stopped.');
-				Ext.TaskMgr.stop(updateLog);
+				//Ext.TaskMgr.stop(updateLog);
 			}
 		});
 	}
 	
 	var conn = new Ext.data.Connection();
-	var updateLog = {
-		run: getLog,
-		interval: 1000 //1 second
-	}
-	Ext.TaskMgr.start(updateLog);
+	var currentReq = 0; //Keep track of the active request
+	var updateLog = new Ext.util.DelayedTask(function() {
+		conn.abort(currentReq);
+		currentReq = getLog();
+	});
+	updateLog.delay(500);
 
 	var log = new Ext.form.TextArea ({
 		hideLabel: true,
@@ -95,6 +95,7 @@ Ext.onReady(function() {
 	});
 
 	log.lineNumber = 0; //Keep track of how many lines we have read
+	log.lastLogTime = 0; //Has the log been updated since last we read it ?
 
 	var msgBox = new Ext.form.TextField({
 		hideLabel: true,
