@@ -1,0 +1,23 @@
+[{
+    "step_title": "ownCloud configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'owncloud' MySQL user and database will be created. Please enter a password for the 'owncloud' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_owncloud",
+            "desc": "owncloud password"
+        }]
+    }]
+}, {
+	"step_title": "Required configuration information",
+	"items": [{
+		"desc": "Use the Advance option during the first launch to configure ownCloud with following parameters.<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database: MySQL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database user: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database password: 'the one you selected'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database name: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database host: localhost",
+    }]
+}]

@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.owncloud": {
+            "title": "ownCloud",
+            "desc": "ownCloud",
+            "icon": "images/owncloud-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/owncloud",
+            "allUsers": true
+        }
+    }
+}
