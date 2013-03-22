@@ -1,0 +1,23 @@
+[{
+	"step_title": "Warning!",
+	"items": [{
+		"desc": "All created or uploaded user files will be deleted if you have been using the default data path, eg. /volume1/web/owncloud/data."
+    }]
+}, {
+	"step_title": "Remove owncloud database",
+	"items": [{
+		"type": "multiselect",
+		"desc": "If you remove the owncloud database, all users will be deleted.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove owncloud database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Enter your MySQL password to remove the owncloud database.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Root password"
+		}]
+	}]	
+}]
