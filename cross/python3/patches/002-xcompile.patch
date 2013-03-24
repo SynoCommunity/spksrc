@@ -1,0 +1,59 @@
+--- configure.ac.orig	2012-09-29 10:00:50.000000000 +0200
++++ configure.ac	2013-03-24 20:57:39.000000000 +0100
+@@ -50,12 +50,26 @@
+ 	fi
+         AC_MSG_RESULT($interp)
+ 	PYTHON_FOR_BUILD="_PYTHON_PROJECT_BASE=$srcdir"' _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(srcdir)/Lib:$(srcdir)/Lib/plat-$(MACHDEP) '$interp
++	else
++	    AC_MSG_RESULT($PYTHON_FOR_BUILD)
+     fi
+ else
+     PYTHON_FOR_BUILD='./$(BUILDPYTHON) -E'
+ fi
+ AC_SUBST(PYTHON_FOR_BUILD)
+ 
++if test "$cross_compiling" = yes; then
++    AC_MSG_CHECKING([for pgen for cross build])
++    if test -z "$PGEN_FOR_BUILD"; then
++	    which pgen >/dev/null 2>&1 || AC_MSG_ERROR([pgen not found])
++	    PGEN_FOR_BUILD=pgen
++	fi
++    AC_MSG_RESULT($PGEN_FOR_BUILD)
++else
++    PGEN_FOR_BUILD='$(PGEN)'
++fi
++AC_SUBST(PGEN_FOR_BUILD)
++
+ dnl Ensure that if prefix is specified, it does not end in a slash. If
+ dnl it does, we get path names containing '//' which is both ugly and
+ dnl can cause trouble.
+--- Makefile.pre.in.orig	2012-09-29 10:00:41.000000000 +0200
++++ Makefile.pre.in	2013-03-24 21:01:08.000000000 +0100
+@@ -239,6 +239,7 @@
+ ##########################################################################
+ # Parser
+ PGEN=		Parser/pgen$(EXE)
++PGEN_FOR_BUILD=	@PGEN_FOR_BUILD@
+ 
+ PSRCS=		\
+ 		Parser/acceler.c \
+@@ -640,7 +641,7 @@
+ $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
+ 		@$(MKDIR_P) Include
+ 		$(MAKE) $(PGEN)
+-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
++		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+ $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
+ 		$(MAKE) $(GRAMMAR_H)
+ 		touch $(GRAMMAR_C)
+--- setup.py.orig	2012-09-29 10:00:50.000000000 +0200
++++ setup.py	2013-03-24 21:15:49.000000000 +0100
+@@ -514,6 +514,8 @@
+         # lib_dirs and inc_dirs are used to search for files;
+         # if a file is found in one of those directories, it can
+         # be assumed that no additional -I,-L directives are needed.
++        lib_dirs = self.compiler.library_dirs
++        inc_dirs = self.compiler.include_dirs
+         if not cross_compiling:
+             lib_dirs = self.compiler.library_dirs + [
+                 '/lib64', '/usr/lib64',

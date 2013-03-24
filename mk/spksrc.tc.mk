@@ -37,7 +37,7 @@ include ../../mk/spksrc.tc-fix.mk
 all: fix
 
 
-TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump
+TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
 
 CFLAGS += $(TC_CFLAGS)
 CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include

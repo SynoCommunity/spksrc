@@ -1,0 +1,65 @@
+PKG_NAME = python3
+PKG_SHORT_VERS = 3.3
+PKG_VERS = $(PKG_SHORT_VERS).0
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
+PKG_DIR = Python-$(PKG_VERS)
+
+DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2 cross/xz
+DEPENDS += native/$(PKG_NAME)
+
+HOMEPAGE = http://www.python.org/
+COMMENT  = Python Programming Language
+LICENSE  =
+
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS  = --enable-shared --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
+CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
+
+POST_PATCH_TARGET = myPostPatch
+PRE_CONFIGURE_TARGET = myPreConfigure
+COMPILE_TARGET = myCompile
+INSTALL_TARGET = myInstall
+POST_INSTALL_TARGET = $(WORK_DIR)/python-cc.mk
+
+include ../../mk/spksrc.cross-cc.mk
+
+HOST_ARCH = $(shell uname -m)
+BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
+PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/python
+PGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
+HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
+HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
+HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_SHORT_VERS)
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PKG_SHORT_VERS)
+PYTHON_LIB_DIR = lib/python$(PKG_SHORT_VERS)
+PYTHON_INC_DIR = include/python$(PKG_SHORT_VERS)
+
+.PHONY: myPostPatch
+myPostPatch:
+	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
+
+.PHONY: myPreConfigure
+myPreConfigure:
+	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
+	cp $(PGEN_NATIVE) $(HOSTPGEN)
+	$(RUN) autoreconf
+
+.PHONY: myCompile
+myCompile:
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE)
+
+.PHONY: myInstall
+myInstall:
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
+	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
+
+$(WORK_DIR)/python-cc.mk: Makefile
+	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
+	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
+	@echo PYTHON_VERSION=$(PKG_SHORT_VERS) >> $@
+	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
+	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
+	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@

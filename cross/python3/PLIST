@@ -1,0 +1,16 @@
+lnk:bin/2to3
+bin:bin/2to3-3.3
+lnk:bin/idle3
+bin:bin/idle3.3
+lnk:bin/pydoc3
+bin:bin/pydoc3.3
+lnk:bin/python3
+bin:bin/python3.3
+bin:bin/python3.3m
+lnk:bin/pyvenv
+bin:bin/pyvenv-3.3
+rsc:etc/mime.types
+lnk:lib/libpython3.3m.so
+lib:lib/libpython3.3m.so.1.0
+lib:lib/libpython3.so
+rsc:lib/python3.3
