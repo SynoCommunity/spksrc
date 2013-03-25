@@ -25,7 +25,12 @@ Ext.onReady(function() {
 				
 				var obj = Ext.decode(responseObject.responseText);
 				if (obj.ret != 'ok') {
-					Ext.Msg.alert('Error','Unable to load Tekkit log... is the server running ?(' + obj.error + ')');
+					Ext.Msg.confirm('Unable to load the Tekkit log', obj.error + ' Try again ?', 
+					function(button) { 
+						if (button == 'yes') {
+							updateLog.delay(500);
+						}
+					});
 				} else {
 					var pos = log.el.dom.scrollTop;
 					var max = log.el.dom.scrollTopMax;
@@ -71,6 +76,67 @@ Ext.onReady(function() {
 		});
 	}
 	
+	function downloadLog(){
+		conn.abort(currentReq); //Abort the current request
+		conn.request({
+			url: 'logFunctions.cgi',
+			params: Ext.urlEncode({ download: true }), //download last 1000 lines ?
+			success: function(responseObject) {
+				//Is this worth it ? or should i just save log.value to a file... (what about specifing blob data with a name ?)
+				var obj = Ext.decode(responseObject.responseText);
+				if (obj.ret == 'ok') {
+					//A bit hacky... but it works
+					var tf = new Ext.form.FormPanel({
+						renderTo: 'hidden',
+						standardSubmit: true,
+						url: '/webman/3rdparty/tekkitlite/server.log.tar.gz'
+					});
+					tf.getForm().submit();
+					tf.destroy();
+					updateLog.delay(500); //Jobs done, go back to waiting for more log data
+				}
+			},
+			failure: function(responseObject) {
+				Ext.Msg.alert('Error', 'Unable to download log file');
+			}
+		});
+		menuOpened = false;
+	}
+
+	function clearLog(){
+		conn.request({
+			url: 'logFunctions.cgi',
+			params: Ext.urlEncode({ clearlog: true }),
+			success: function(responseObject) {
+				var obj = Ext.decode(responseObject.responseText);
+				if (obj.ret == 'ok') {
+					Ext.Msg.alert('', obj.text);
+				}
+			},
+			failure: function(responseObject) {
+				Ext.Msg.alert('Error', 'Unable to clear the log file');
+			}
+		});
+		menuOpened = false;
+	}
+
+	function mountFolder(){
+		conn.request({
+			url: 'logFunctions.cgi',
+			params: Ext.urlEncode({ mountfolder: true }), //var folderName
+			success: function(responseObject) {
+				var obj = Ext.decode(responseObject.responseText);
+				if (obj.ret == 'ok') {
+					Ext.Msg.alert('', obj.text);
+				}				
+			},
+			failure: function(responseObject) {
+				Ext.Msg.alert('Error', 'Unable to mount Tekkit folder.');
+			}
+		});
+		menuOpened = false;
+	}
+
 	var conn = new Ext.data.Connection();
 	var currentReq = 0; //Keep track of the active request
 	var updateLog = new Ext.util.DelayedTask(function() {
@@ -86,7 +152,7 @@ Ext.onReady(function() {
 		autoScroll: true,
 		grow: false,
 		preventScrollbars: false,
-		anchor: '100% -53',
+		anchor: '100% -50',
 		value: 'Loading...',
 		style: {
 			color: 'black',
@@ -110,30 +176,54 @@ Ext.onReady(function() {
 			}
 		},
 	});
+	
+	
+	var menuOpened = false;  //Clunky, but it works
+	var options = new Ext.SplitButton({
+		text: 'Options',
+		handler: function() {
+			if (!menuOpened) {
+				this.showMenu();
+				menuOpened = true;
+			} else {
+				this.hideMenu();
+				menuOpened = false;
+			}
+		},
+		menu: new Ext.menu.Menu({
+			items: [
+				{text: 'Clear Log', handler: clearLog },
+				{id: 'download', text: 'Download Log', handler: downloadLog },
+				{text: 'Un/Mount Tekkit Folder', handler: mountFolder }
+			]
+		})	
+	});
 
 
     var form = new Ext.form.FormPanel({
-    	renderTo: 'content',
-        baseCls: 'x-plain',
-        url:'save-form.php',
-		height: estimateHeight(),
+	renderTo: 'content',
+	baseCls: 'x-plain',
+	height: estimateHeight(),
         items: [
-			log,
-			new Ext.Toolbar({
-				items: [
-					msgBox,
-					'-',
-				]
-			})
+		log,
+		new Ext.Toolbar({
+			items: [
+				msgBox,
+				'-',
+				options
+			]
+		}),
 		]
-    });
+	
+	});
+	
 
 	Ext.EventManager.onWindowResize(function() {
 		form.doLayout();
 		form.setHeight(estimateHeight());
-		msgBox.setWidth(form.getWidth() - 5);
+		msgBox.setWidth(form.getWidth() - options.getWidth() - 15);
 	});
 
 	//Expand the textbox to use all the space in the toolbar
-	msgBox.setWidth(form.getWidth() - 5);
+	msgBox.setWidth(form.getWidth() - options.getWidth() - 15);
 });
