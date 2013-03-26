@@ -62,9 +62,6 @@ postinst ()
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}/apps
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config
 
-    # Link log
-    ln -s ${WEB_DIR}/${PACKAGE}/data/${PACKAGE}.log ${INSTALL_DIR}/var/logs/${PACKAGE}.log
-
     exit 0
 }
 
