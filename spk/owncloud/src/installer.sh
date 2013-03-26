@@ -47,14 +47,6 @@ postinst ()
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud}';"
-        sed -i -e "s|^db_type=.*$|db_type=mysql|" \
-               -e "s|^db_host=.*$|db_host=localhost|" \
-               -e "s|^db_port=.*$|db_port=3306|" \
-               -e "s|^db_username=.*$|db_username=${MYSQL_USER}|" \
-               -e "s|^db_password=.*$|db_password=${wizard_mysql_password_owncloud}|" \
-               -e "s|^salt=.*$|salt=$(openssl rand -hex 8)|" \
-               -e "s|\r\n$|\n|" \
-               ${WEB_DIR}/${PACKAGE}/config.ini
     fi
 
     # Fix permissions

@@ -27,7 +27,6 @@ START_DEP_SERVICES = apache-web mysql
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-#COPY_TARGET = nop
 POST_STRIP_TARGET = owncloud_extra_install
 
 # Pure PHP package, make sure ARCH is not defined

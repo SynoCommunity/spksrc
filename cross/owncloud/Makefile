@@ -11,7 +11,6 @@ HOMEPAGE = http://owncloud.org/
 COMMENT  = own cloud
 LICENSE  = AGPL
 
-#EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 EXTRACT_PATH = $(WORK_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
