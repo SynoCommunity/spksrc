@@ -1,8 +1,7 @@
 SPK_NAME = git
-SPK_VERS = 1.8.1.5
+SPK_VERS = 1.8.2
 SPK_REV = 1
 SPK_ICON = src/git.png
-BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
