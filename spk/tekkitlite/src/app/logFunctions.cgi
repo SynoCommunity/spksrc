@@ -2,6 +2,7 @@
 use File::Copy;
 use File::stat;
 use URI::Escape;
+use Time::HiRes qw(usleep);
 use Cwd 'realpath';
 
 #Synoshare error codes
@@ -9,17 +10,14 @@ my $ERR_NO_SUCH_SHARE = '0x1400';
 my $ERR_SHARE_EXISTS = '0x1300';
 
 my $tekkitPath = '/var/packages/tekkitlite/target';
+my $downloadLoc = '/webman/3rdparty/tekkitlite/server.log.tar.gz';
 
 if ( read(STDIN, $FormData, $ENV{'CONTENT_LENGTH'}) == 0 ) {
 	$FormData = $ENV{'QUERY_STRING'}
 }
 %args = map {split(/=/, $_)} split(/&/, $FormData);
 
-if ($args{'download'}) {
-	print "Content-type: application/octet-stream\n\n";
-} else {
-	print "Content-type: application/json\n\n";
-}
+print "Content-type: application/json\n\n";
 
 if (open (IN,"/usr/syno/synoman/webman/modules/authenticate.cgi|")) {
 	$user=<IN>;
@@ -35,6 +33,9 @@ if ($user ne 'admin') {
 	die;
 }
 
+########################
+#####   GET LOG    #####
+########################
 if (exists $args{'lineNo'}) {
 
 	my $lineNo = 0;
@@ -51,7 +52,7 @@ if (exists $args{'lineNo'}) {
 		#while($ctime == $lastChangeTime) {
 		while(1) {
 			#Wait until there is something to return
-			sleep 1;	
+			usleep(500);	 #microseconds
 			if (time() >= $startLoopTime + 55 || stat(IN)->ctime > $lastChangeTime) {
 				last;
 			}
@@ -74,7 +75,11 @@ if (exists $args{'lineNo'}) {
 		print('{"ret":"error","error":"Unable to read log file"}');
 	}
 
-} elsif (exists $args{'text'}) {
+} 
+########################
+#####   SEND TEXT  #####
+########################
+elsif (exists $args{'text'}) {
 	$value = uri_unescape($args{'text'});
 	@chars = map substr( $value, $_, 1), 0 .. length($value) -1;
 	#Remove any extra slashes at the front
@@ -89,16 +94,30 @@ if (exists $args{'lineNo'}) {
 	} else {
 		print('{"ret":"error","error":"Unable to write to log file"}');
 	}
-} elsif ($args{'download'}) {
-	system("tar zc -f server.log.tar.gz -C $tekkitPath/app server.log");
-	print('{"ret":"ok","text":""}');
-} elsif ($args{'clearlog'}) {
-	if (open(OUT,">/tmp/stdin.tekkitlite")) {
-		print ""; #Print nothing
+} 
+########################
+##### DOWNLOAD LOG #####
+########################
+elsif ($args{'download'}) {
+	system("tar zc -f server.log.tar.gz -C $tekkitPath server.log");
+	move("$tekkitPath/server.log.tar.gz", "$tekkitPath/app/server.log.tar.gz");
+	print('{"ret":"ok","location":"'.$downloadLoc.'"}');
+} 
+########################
+#####  CLEAR LOG   #####
+########################
+elsif ($args{'clearlog'}) {
+	$now = localtime;
+	if (open(OUT,">$tekkitPath/server.log")) {
+		print OUT "==Log cleared at: $now==\n"; #Print something to stop the console freaking out
 	}
 	close(OUT);
 	print('{"ret":"ok","text":"Log cleared."}');
-} elsif ($args{'mountfolder'}) {
+} 
+########################
+##### MOUNT FOLDER #####
+########################
+elsif ($args{'mountfolder'}) {
 	print('{"ret":"ok","text":"');
 	
 	#Does the tekkitlite share already exist ?
@@ -112,14 +131,16 @@ if (exists $args{'lineNo'}) {
 	
 	if ( $shareExists ne $ERR_NO_SUCH_SHARE) {
 		#If yes, delete it, leaving the data
-		print "deleting share ";
-		uri_escape(`synoshare --del false TekkitLite`); #Make me output something!
+		if (uri_escape(`synoshare --del false TekkitLite`) == ''){ #If successful, then no output is received
+			print "TekkikLite share removed OK";		
+		}
 	} else {
 		#If no, create it!
-		print "adding share ";
 		my $realPath = realpath($tekkitPath);
 		my $exec = 'synoshare --add TekkitLite "" '.$realPath.' "" "@administrators" "guest" 1 0';
-		uri_escape(`$exec`); #Make me output something!
+		if (uri_escape(`$exec`) == '') {
+			print "TekkitLite share added OK ";
+		}
 	}
 	print('"}');
 } else {

@@ -47,7 +47,7 @@ Ext.onReady(function() {
 					}
 					log.lineNumber = obj.lineNo;
 					log.lastLogTime = obj.lastLogTime;
-					updateLog.delay(500);
+					updateLog.delay(100);
 				}
 			},
 			failure: function(rso) {
@@ -66,6 +66,7 @@ Ext.onReady(function() {
 					Ext.Msg.alert('Error','Unable to send text (' + obj.error + ')');
 				} else {
 					msgBox.setValue('');
+					msgBox.enable();
 					log.el.dom.scrollTop = 99999;
 				}
 			},
@@ -93,7 +94,7 @@ Ext.onReady(function() {
 					});
 					tf.getForm().submit();
 					tf.destroy();
-					updateLog.delay(500); //Jobs done, go back to waiting for more log data
+					updateLog.delay(100); //Jobs done, go back to waiting for more log data
 				}
 			},
 			failure: function(responseObject) {
@@ -110,7 +111,7 @@ Ext.onReady(function() {
 			success: function(responseObject) {
 				var obj = Ext.decode(responseObject.responseText);
 				if (obj.ret == 'ok') {
-					Ext.Msg.alert('', obj.text);
+					log.lineNumber = 0;
 				}
 			},
 			failure: function(responseObject) {
@@ -140,10 +141,12 @@ Ext.onReady(function() {
 	var conn = new Ext.data.Connection();
 	var currentReq = 0; //Keep track of the active request
 	var updateLog = new Ext.util.DelayedTask(function() {
-		conn.abort(currentReq);
+		if (!msgBox.disabled) {
+			conn.abort(currentReq); //Aslong as the previous request wasn't
+		}
 		currentReq = getLog();
 	});
-	updateLog.delay(500);
+	updateLog.delay(100);
 
 	var log = new Ext.form.TextArea ({
 		hideLabel: true,
@@ -169,14 +172,42 @@ Ext.onReady(function() {
 		emptyText: 'Enter Message',
 		enableKeyEvents:true,
 		listeners: {
-			keypress: function(f, e) {
+			keypress: function(mb, e) {				
 				if(e.getCharCode() == 13) {
+					mb.disable(); //This stops people entering text too fast and aborting the previous request (Remember to enable after text has been sent!)
+					
+					if (mb.historyNow != '') {
+						mb.historyBefore.push(mb.historyNow);
+					}
+					mb.historyNow = '';  //New text, so there is no history
+					
+					var a = mb.historyAfter.reverse(); //So we can add stright onto the bottom of the Before array
+					a.pop(); //Remove the blank "" value
+					mb.historyBefore = mb.historyBefore.concat(a);
+					
+					mb.historyAfter = new Array(); //Clear any remaining history
+					mb.historyBefore.push(mb.getValue()); //Add to the up array
+					
 					sendText();
+				} else if (e.getCharCode() == 38 ) { //Up Arrow
+					if (mb.historyBefore.length > 0) {
+						mb.historyAfter.push(mb.historyNow); //Put the 'current' history back on the Down array
+						mb.historyNow = mb.historyBefore.pop(); //Update the 'current' history
+						mb.setValue(mb.historyNow);
+					}
+				} else if (e.getCharCode() == 40 ) { //Down Arrow
+					if (mb.historyAfter.length > 0) { //Are we showing the latest value ?
+						mb.historyBefore.push(mb.historyNow); //Put the 'current' history back on the Up array
+						msgBox.historyNow = mb.historyAfter.pop();
+						mb.setValue(msgBox.historyNow);
+					}
 				}
 			}
 		},
 	});
-	
+	msgBox.historyBefore = new Array(); //Store the last entered messages
+	msgBox.historyAfter = new Array();
+	msgBox.historyNow = ''; //The last history item to be entered into the msgbox
 	
 	var menuOpened = false;  //Clunky, but it works
 	var options = new Ext.SplitButton({
