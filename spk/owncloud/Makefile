@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
-DEPENDS  = 
+DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
@@ -27,7 +27,7 @@ START_DEP_SERVICES = apache-web mysql
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
+#COPY_TARGET = nop
 POST_STRIP_TARGET = owncloud_extra_install
 
 # Pure PHP package, make sure ARCH is not defined
@@ -36,7 +36,8 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
-owncloud_extra_install: $(STAGING_DIR)/share/owncloud
+owncloud_extra_install: 
+	install -m 755 -d $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/logs
 	install -m 755 -d $(STAGING_DIR)/app
@@ -46,9 +47,4 @@ owncloud_extra_install: $(STAGING_DIR)/share/owncloud
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/owncloud:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && wget http://download.owncloud.org/community/$(SPK_NAME)-$(SPK_VERS).tar.bz2 && tar -jxvf $(SPK_NAME)-$(SPK_VERS).tar.bz2
-	rm -fr $(STAGING_DIR)/share/$(SPK_NAME)-$(SPK_VERS).tar.bz2
 
