@@ -12,7 +12,7 @@ DESCRIPTION = A new Tekkit is here! One geared for smaller servers and that take
 ADMIN_PORT = 
 RELOAD_UI = yes
 DISPLAY_NAME = Tekkit Lite
-BETA = 1
+BETA = 
 
 HOMEPAGE   = http://technicpack.net/
 LICENSE    = 
