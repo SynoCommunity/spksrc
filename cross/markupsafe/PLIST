@@ -1,1 +1,1 @@
-lib:@PYTHON_SITE_PACKAGES@/markupsafe/_speedups.so
+lib:@PYTHON_SITE_PACKAGES@/markupsafe/_speedups*.so

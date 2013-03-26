@@ -1,2 +1,2 @@
 bin:bin/easy_install
-bin:bin/easy_install-2.7
+bin:bin/easy_install-@PYTHON_VERSION@
