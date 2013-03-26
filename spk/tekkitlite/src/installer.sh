@@ -5,6 +5,10 @@
 #--------package maintained at pcloadletter.co.uk
 #Modified by Meeces2911 for TekkitLite
 
+#
+#Shout Out: This package was made based on Patters scripts over at PCLoadLetter, without that #this would not have been possible. MANY THANKS! Also to Merty for his CFE package which inspired #the console UI.
+#
+
 
 #Modify these
 DOWNLOAD_PATH="http://mirror.technicpack.net/Technic/servers/tekkitlite"

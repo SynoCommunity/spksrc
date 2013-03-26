@@ -1,6 +1,6 @@
 SPK_NAME = tekkitlite
 SPK_VERS = 0.6.1
-SPK_REV = 015
+SPK_REV = 018
 SPK_ICON = src/tekkitlite.png
 DSM_UI_DIR = app
 
@@ -8,11 +8,11 @@ DEPENDS  =
 SPK_DEPENDS =
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = A new Tekkit is here! One geared for smaller servers and that takes avantage of the new way Minecraft handles multiplayer and arising out of the chaos that is the forgebukkit fiasco, we present Tekkit Lite. Shout Out: This package was made based on Patters scripts over at PCLoadLetter, without that this would not have been possible. MANY THANKS! Also to Merty for his CFE package which inspired the console UI.
+DESCRIPTION = A new Tekkit is here! One geared for smaller servers and that takes avantage of the new way Minecraft handles multiplayer and arising out of the chaos that is the forgebukkit fiasco, we present Tekkit Lite.
 ADMIN_PORT = 
 RELOAD_UI = yes
 DISPLAY_NAME = Tekkit Lite
-BETA = 
+BETA = 1
 
 HOMEPAGE   = http://technicpack.net/
 LICENSE    = 
@@ -27,7 +27,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = extra_install
 
-# Pure Python package, make sure ARCH is not defined
+# Pure Java package, make sure ARCH is not defined
 override ARCH=
 
 include ../../mk/spksrc.spk.mk
