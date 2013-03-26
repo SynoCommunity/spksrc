@@ -6,7 +6,8 @@ DNAME="ownCloud"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-LOG_FILE="${INSTALL_DIR}/var/logs/${PACKAGE}.log"
+WEB_DIR="/var/services/web"
+LOG_FILE="${WEB_DIR}/${PACKAGE}/data/${PACKAGE}.log"
 
 
 case $1 in
