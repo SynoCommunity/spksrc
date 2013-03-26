@@ -11,6 +11,6 @@ bin:bin/tapconvert
 bin:bin/tkconch
 bin:bin/trial
 bin:bin/twistd
-lib:@PYTHON_SITE_PACKAGES@/twisted/python/sendmsg.so
-lib:@PYTHON_SITE_PACKAGES@/twisted/runner/portmap.so
-lib:@PYTHON_SITE_PACKAGES@/twisted/test/raiser.so
+lib:@PYTHON_SITE_PACKAGES@/twisted/python/sendmsg*.so
+lib:@PYTHON_SITE_PACKAGES@/twisted/runner/portmap*.so
+lib:@PYTHON_SITE_PACKAGES@/twisted/test/raiser*.so
