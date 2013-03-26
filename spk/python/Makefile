@@ -1,6 +1,7 @@
 SPK_NAME = python
-SPK_VERS = 2.7.3
-SPK_REV = 5
+SPK_SHORT_VERS = 2.7
+SPK_VERS =$(SPK_SHORT_VERS).3
+SPK_REV = 6
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -10,13 +11,13 @@ DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Python Programming Language. This package is not startable, it is just required by other packages as dependency.
-DESCRIPTION_FRE = Langage de programmation Python. Ce paquet ne se lance pas, il est juste requis en tant que dépendance par d\\\'autres paquets.
-DESCRIPTION_SPN = Lenguaje de programación Python. Este paquente no se inicia, solo es requerido como dependecia de otros paquetes.
+DESCRIPTION = Python Programming Language.
+DESCRIPTION_FRE = Langage de programmation Python.
+DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules\\\n2. Fix for DSM 4.2"
+CHANGELOG = "1. Update modules"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
@@ -26,9 +27,9 @@ SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-PYTHON_LIB_DIR = lib/python2.7
+PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
 
-PLIST_TRANSFORM = sed "s%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%"
+PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
 
 POST_STRIP_TARGET = python_cleanup
 
