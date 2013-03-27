@@ -1,0 +1,23 @@
+[{
+	"step_title": "Attention !",
+	"items": [{
+		"desc": "Tous les fichiers créés ou chargés par les utilisateurs seront supprimés si vous avez utilisé le chemin de données par défaut, à savoir : /volume1/web/owncloud/data."
+    }]
+}, {
+	"step_title": "Supprimer la base de donnée owncloud",
+	"items": [{
+		"type": "multiselect",
+		"desc": "Si vous supprimez la base de donnée owncloud, tous les utilisateurs seront supprimés.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Supprimer la base de donnée owncloud"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Saisissez votre mot de passe MySQL pour supprimer la base de donnée owncloud.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Mot de passe Root"
+		}]
+	}]	
+}]

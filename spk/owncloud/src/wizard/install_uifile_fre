@@ -1,0 +1,23 @@
+[{
+    "step_title": "Configuration de ownCloud",
+    "items": [{
+        "type": "password",
+        "desc": "Saisissez votre mot de passe MySQL.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Mot de passe Root"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Un utilisateur et une base de donnée MySQL 'owncloud' vont être créés. Saisissez un mot de passe pour l'utilisateur 'owncloud'.",
+        "subitems": [{
+            "key": "wizard_mysql_password_owncloud",
+            "desc": "Mot de passe ownCloud"
+        }]
+    }]
+}, {
+	"step_title": "Informations de configuration",
+	"items": [{
+		"desc": "Utilisez l'option Avancée durant le premier démarrage pour configurer ownCloud avec les données suivantes.<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database: MySQL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database user: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database password: 'celui que vous avez saisi'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database name: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database host: localhost",
+    }]
+}]

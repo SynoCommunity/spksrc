@@ -36,7 +36,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
 owncloud_extra_install: 
-	install -m 755 -d $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
@@ -44,4 +43,3 @@ owncloud_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
