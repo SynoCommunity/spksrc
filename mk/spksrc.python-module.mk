@@ -1,3 +1,7 @@
+### Python module rules
+#   Invoke make to (cross-) compile a python module. 
+# You can do some customization through python-cc.mk
+
 # Python module targets
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = nope
@@ -37,7 +41,7 @@ fix_shebang_python_module:
 	  case $${type} in \
 	    bin) \
 	      echo -n "Fixing shebang for $${file}... " ; \
-	      sed -i -e 's|^#!.*$$|#!$(INSTALL_PREFIX)/bin/python|g' $(INSTALL_DIR)$(INSTALL_PREFIX)/$${file} > /dev/null 2>&1 && echo "ok" || echo "failed!" \
+	      sed -i -e 's|^#!.*$$|#!$(PYTHON_INTERPRETER)|g' $(INSTALL_DIR)$(INSTALL_PREFIX)/$${file} > /dev/null 2>&1 && echo "ok" || echo "failed!" \
 	      ;; \
 	  esac ; \
 	done

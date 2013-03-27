@@ -57,6 +57,7 @@ myInstall:
 $(WORK_DIR)/python-cc.mk: Makefile
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
+	@echo PYTHON_INTERPRETER=$(INSTALL_PREFIX)/bin/python >> $@
 	@echo PYTHON_VERSION=$(PYTHON_VERSION) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
