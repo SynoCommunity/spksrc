@@ -9,8 +9,9 @@ bin:bin/python3.3
 bin:bin/python3.3m
 lnk:bin/pyvenv
 bin:bin/pyvenv-3.3
-rsc:etc/mime.types
+rsc:lib/python3.3
+lib:lib/libpython3.so
 lnk:lib/libpython3.3m.so
 lib:lib/libpython3.3m.so.1.0
-lib:lib/libpython3.so
-rsc:lib/python3.3
+rsc:etc/mime.types
+rsc:include/python3.3m/pyconfig.h
