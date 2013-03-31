@@ -16,8 +16,27 @@
         }]
     }]
 }, {
-	"step_title": "Informations de configuration",
-	"items": [{
-		"desc": "Utilisez l'option Avancée durant le premier démarrage pour configurer ownCloud avec les données suivantes.<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database: MySQL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database user: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database password: 'celui que vous avez saisi'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database name: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database host: localhost",
+    "step_title": "ownCloud admin configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Administrator's login. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_owncloud_admin_username",
+            "desc": "User name"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Administrator's password. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_owncloud_admin_password",
+            "desc": "Password"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "ownCloud data directory. Defaults to /volume1/web/owncloud/data",
+        "subitems": [{
+            "key": "wizard_owncloud_datadirectory",
+            "desc": "Directory"
+        }]
     }]
 }]
