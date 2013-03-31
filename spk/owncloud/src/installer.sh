@@ -44,9 +44,25 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
 
-    # Setup database and configuration file
+    # Prepare data directory
+    DATA_DIR=
+    if [ -z "${wizard_owncloud_datadirectory}" ]; then
+        DATA_DIR="OC::\$SERVERROOT.\"/data\""
+    else
+        mkdir ${wizard_owncloud_datadirectory}
+        chown ${USER} ${wizard_owncloud_datadirectory}
+        DATA_DIR="\"${wizard_owncloud_datadirectory}\""
+        echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+        /usr/syno/etc/rc.d/S97apache-user.sh restart > /dev/null
+    fi
+
+    # Setup database and autoconfig file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud}';"
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud:=owncloud}';"
+        sed -i -e "s/@admin_username@/${wizard_owncloud_admin_username:=admin}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
+        sed -i -e "s/@admin_password@/${wizard_owncloud_admin_password:=admin}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
+        sed -i -e "s/@db_password@/${wizard_mysql_password_owncloud:=owncloud}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
+        sed -i -e "s#@directory@#${DATA_DIR}#g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
     fi
 
     # Fix permissions
@@ -70,6 +86,12 @@ preuninst ()
 
 postuninst ()
 {
+    # Remove open_basedir configuration
+    if [ -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf ]; then
+        rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+        /usr/syno/etc/rc.d/S97apache-user.sh restart > /dev/null
+    fi
+
     # Remove link
     rm -f ${INSTALL_DIR}
 
