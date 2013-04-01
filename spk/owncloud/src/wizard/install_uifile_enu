@@ -33,7 +33,7 @@
         }]
     }, {
         "type": "textfield",
-        "desc": "ownCloud data directory. Eg. /volume1/data/owncloud",
+        "desc": "ownCloud data directory. Defaults to /volume1/owncloud",
         "subitems": [{
             "key": "wizard_owncloud_datadirectory",
             "desc": "Directory"
