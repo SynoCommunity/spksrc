@@ -110,7 +110,6 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config/config.php ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/${PACKAGE}/data/ ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -119,7 +118,6 @@ postupgrade ()
 {
     # Restore the configuration file and data
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config/
-    mv ${TMP_DIR}/${PACKAGE}/data/ ${WEB_DIR}/${PACKAGE}/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
