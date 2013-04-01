@@ -53,7 +53,6 @@ postinst ()
         chown ${USER} ${wizard_owncloud_datadirectory}
         DATA_DIR="\"${wizard_owncloud_datadirectory}\""
         echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-        /usr/syno/etc/rc.d/S97apache-user.sh restart > /dev/null
     fi
 
     # Setup database and autoconfig file
@@ -89,7 +88,6 @@ postuninst ()
     # Remove open_basedir configuration
     if [ -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf ]; then
         rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-        /usr/syno/etc/rc.d/S97apache-user.sh restart > /dev/null
     fi
 
     # Remove link

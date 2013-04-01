@@ -24,6 +24,7 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_DEP_SERVICES = apache-web mysql
 START_DEP_SERVICES = apache-web mysql
+INSTUNINST_RESTART_SERVICES = apache-web
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
