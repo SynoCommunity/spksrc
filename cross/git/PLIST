@@ -112,7 +112,6 @@ libexec:libexec/git-core/git-remote-ftp
 libexec:libexec/git-core/git-remote-ftps
 libexec:libexec/git-core/git-remote-http
 libexec:libexec/git-core/git-remote-https
-libexec:libexec/git-core/git-remote-testgit
 libexec:libexec/git-core/git-remote-testsvn
 libexec:libexec/git-core/git-repack
 libexec:libexec/git-core/git-replace
@@ -158,11 +157,12 @@ libexec:libexec/git-core/git-write-tree
 libexec:libexec/git-core/mergetools/araxis
 libexec:libexec/git-core/mergetools/bc3
 libexec:libexec/git-core/mergetools/codecompare
-libexec:libexec/git-core/mergetools/defaults
 libexec:libexec/git-core/mergetools/deltawalker
 libexec:libexec/git-core/mergetools/diffuse
 libexec:libexec/git-core/mergetools/ecmerge
 libexec:libexec/git-core/mergetools/emerge
+libexec:libexec/git-core/mergetools/gvimdiff
+libexec:libexec/git-core/mergetools/gvimdiff2
 libexec:libexec/git-core/mergetools/kdiff3
 libexec:libexec/git-core/mergetools/kompare
 libexec:libexec/git-core/mergetools/meld
@@ -170,7 +170,8 @@ libexec:libexec/git-core/mergetools/opendiff
 libexec:libexec/git-core/mergetools/p4merge
 libexec:libexec/git-core/mergetools/tkdiff
 libexec:libexec/git-core/mergetools/tortoisemerge
-libexec:libexec/git-core/mergetools/vim
+libexec:libexec/git-core/mergetools/vimdiff
+libexec:libexec/git-core/mergetools/vimdiff2
 libexec:libexec/git-core/mergetools/xxdiff
 shr:share/git-core
 shr:share/gitweb
