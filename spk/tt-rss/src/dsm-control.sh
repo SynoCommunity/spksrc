@@ -16,7 +16,7 @@ PID_FILE="${INSTALL_DIR}/var/tt-rss.pid"
 start_daemon ()
 {
     start-stop-daemon -S -q -m -b -N 10 -x ${TTRSS} -c ${USER} -u ${USER} -p ${PID_FILE} \
-      -- -daemon 2> /dev/null
+      -- --daemon 2> /dev/null
 }
 
 stop_daemon ()
