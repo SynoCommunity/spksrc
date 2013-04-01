@@ -45,7 +45,6 @@ postinst ()
 
     # Configure open_basedir
     echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-    /usr/syno/etc/rc.d/S97apache-user.sh restart > /dev/null
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -76,11 +75,6 @@ preuninst ()
 
 postuninst ()
 {
-    # Remove open_basedir configuration
-    if [ -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf ]; then
-        rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-        /usr/syno/etc/rc.d/S97apache-user.sh restart > /dev/null
-    fi 
 
     # Remove link
     rm -f ${INSTALL_DIR}
@@ -89,6 +83,9 @@ postuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
     fi
+
+    # Remove open_basedir configuration
+    rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
