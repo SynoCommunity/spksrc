@@ -32,6 +32,8 @@ preinst ()
         fi
     fi
 
+    # TODO: Check if entered path to data directory is valid
+
     exit 0
 }
 
@@ -44,16 +46,11 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
 
-    # Prepare data directory
-    DATA_DIR=
-    if [ -z "${wizard_owncloud_datadirectory}" ]; then
-        DATA_DIR="OC::\$SERVERROOT.\"/data\""
-    else
-        mkdir ${wizard_owncloud_datadirectory}
-        chown ${USER} ${wizard_owncloud_datadirectory}
-        DATA_DIR="\"${wizard_owncloud_datadirectory}\""
-        echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-    fi
+    # Make sure data directory exists
+    mkdir -p ${wizard_owncloud_datadirectory}
+
+    # Configure open_basedir
+    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Setup database and autoconfig file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -61,10 +58,11 @@ postinst ()
         sed -i -e "s/@admin_username@/${wizard_owncloud_admin_username:=admin}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
         sed -i -e "s/@admin_password@/${wizard_owncloud_admin_password:=admin}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
         sed -i -e "s/@db_password@/${wizard_mysql_password_owncloud:=owncloud}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
-        sed -i -e "s#@directory@#${DATA_DIR}#g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
+        sed -i -e "s#@directory@#${wizard_owncloud_datadirectory}#g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
     fi
 
     # Fix permissions
+    chown -R ${USER} ${wizard_owncloud_datadirectory}
     chown ${USER} ${WEB_DIR}/${PACKAGE}/data
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}/apps
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config

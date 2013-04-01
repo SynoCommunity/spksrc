@@ -8,5 +8,5 @@ $AUTOCONFIG = array(
   "dbtableprefix" => "",
   "adminlogin"    => "@admin_username@",
   "adminpass"     => "@admin_password@",
-  "directory"     => @directory@,
+  "directory"     => "@directory@",
 );
