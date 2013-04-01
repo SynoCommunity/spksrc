@@ -1,9 +1,4 @@
 [{
-	"step_title": "Attention !",
-	"items": [{
-		"desc": "Tous les fichiers créés ou chargés par les utilisateurs seront supprimés si vous avez utilisé le chemin de données par défaut, à savoir : /volume1/web/owncloud/data."
-    }]
-}, {
 	"step_title": "Supprimer la base de donnée owncloud",
 	"items": [{
 		"type": "multiselect",

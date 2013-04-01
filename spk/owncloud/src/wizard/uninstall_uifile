@@ -1,9 +1,4 @@
 [{
-	"step_title": "Warning!",
-	"items": [{
-		"desc": "All created or uploaded user files will be deleted if you have been using the default data path, eg. /volume1/web/owncloud/data."
-    }]
-}, {
 	"step_title": "Remove owncloud database",
 	"items": [{
 		"type": "multiselect",
