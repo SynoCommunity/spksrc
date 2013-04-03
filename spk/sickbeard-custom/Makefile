@@ -1,6 +1,6 @@
 SPK_NAME = sickbeard-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 1
 SPK_ICON = src/sickbeard-custom.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,6 @@ DESCRIPTION_FRE = SickBeard Custom vous permet d\\\'exécuter le fork de votre c
 ADMIN_PORT = 8083
 RELOAD_UI = yes
 DISPLAY_NAME = SickBeard Custom
-BETA = 1
 
 HOMEPAGE   = http://sickbeard.com/
 LICENSE    = GPL
