@@ -17,7 +17,7 @@ CONFIGURE_ARGS  = --without-tcltk --without-python ac_cv_fread_reads_directories
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
 
-BUSYBOX_CONFIG = tr
+BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.cross-cc.mk
