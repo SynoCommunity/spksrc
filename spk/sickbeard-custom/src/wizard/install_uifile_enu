@@ -2,13 +2,21 @@
     "step_title": "Choose your fork",
     "items": [{
         "type": "textfield",
-        "desc": "Configure the fork to use. For example, URL git://github.com/lad1337/Sick-Beard.git and branch anime",
+        "desc": "Configure the fork to use",
         "subitems": [{
             "key": "wizard_fork_url",
-            "desc": "Fork URL"
+            "desc": "Fork URL",
+            "defaultVaule": "git://github.com/mr-orange/Sick-Beard.git",
+            "validator": {
+                "allowBlank": false
+            }
         }, {
             "key": "wizard_fork_branch",
-            "desc": "Fork branch"
+            "desc": "Fork branch",
+            "defaultVaule": "Pistachitos",
+            "validator": {
+                "allowBlank": false
+            }
         ]
     }]
 }]
