@@ -9,7 +9,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 USER="sickbeard-custom"
 GROUP="users"
 GIT="${GIT_DIR}/bin/git"
@@ -21,7 +21,7 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url} ${wizard_fork_branch} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/mr-orange/Sick-Beard.git} ${wizard_fork_branch:=Pistachitos} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -38,7 +38,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Clone the repository and configure autoProcessTV
-    ${GIT} clone -q -b ${wizard_fork_branch} ${wizard_fork_url} ${INSTALL_DIR}/var/SickBeard
+    ${GIT} clone -q -b ${wizard_fork_branch:=Pistachitos} ${wizard_fork_url:=git://github.com/mr-orange/Sick-Beard.git} ${INSTALL_DIR}/var/SickBeard
     cp ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickBeard/autoProcessTV
     chmod 600 ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
