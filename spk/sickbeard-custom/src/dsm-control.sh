@@ -20,7 +20,7 @@ LOG_FILE="${INSTALL_DIR}/var/Logs/sickbeard.log"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su - ${USER} -c "HOME=${INSTALL_DIR}/var PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()
