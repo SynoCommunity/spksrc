@@ -22,6 +22,8 @@ class SABnzbd(Base):
     config_path = os.path.join(var_path, 'config.ini')
     sickbeard_postprocessing_dir = '/usr/local/sickbeard/share/SickBeard/autoProcessTV'
     sickbeard_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
+    sickbeardcustom_postprocessing_dir = '/usr/local/sickbeard-custom/var/SickBeard/autoProcessTV'
+    sickbeardcustom_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
 
     def __init__(self):
         self.config = None
@@ -36,14 +38,18 @@ class SABnzbd(Base):
     def load(self):
         if self.config is None:
             return None
-        return {'sickbeard_postprocessing': self.sickbeard_postprocessing_configured()}
+        return {'sickbeard_postprocessing': self.sickbeard_postprocessing_configured(), 'sickbeardcustom_postprocessing': self.sickbeardcustom_postprocessing_configured()}
 
     @expose(kind=SUBMIT)
-    def save(self, sickbeard_postprocessing=None):
+    def save(self, sickbeard_postprocessing=None, sickbeardcustom_postprocessing=None):
         if sickbeard_postprocessing:
             self.sickbeard_postprocessing_enable()
-            return
-        self.sickbeard_postprocessing_disable()
+        else:
+            self.sickbeard_postprocessing_disable()
+        if sickbeardcustom_postprocessing:
+            self.sickbeardcustom_postprocessing_enable()
+        else:
+            self.sickbeardcustom_postprocessing_disable()
 
     def sickbeard_postprocessing_configured(self):
         script_dir = self.get_script_dir()
@@ -52,9 +58,23 @@ class SABnzbd(Base):
             configured = configured and os.path.exists(os.path.join(script_dir, filename))
         return configured
 
+    def sickbeardcustom_postprocessing_configured(self):
+        script_dir = self.get_script_dir()
+        configured = True
+        for filename in self.sickbeardcustom_postprocessing_filenames:
+            configured = configured and os.path.exists(os.path.join(script_dir, filename))
+        return configured
+
     def sickbeard_postprocessing_disable(self):
         script_dir = self.get_script_dir()
         for filename in self.sickbeard_postprocessing_filenames:
+            if not os.path.islink(os.path.join(script_dir, filename)):
+                continue
+            os.remove(os.path.join(script_dir, filename))
+
+    def sickbeardcustom_postprocessing_disable(self):
+        script_dir = self.get_script_dir()
+        for filename in self.sickbeardcustom_postprocessing_filenames:
             if not os.path.islink(os.path.join(script_dir, filename)):
                 continue
             os.remove(os.path.join(script_dir, filename))
@@ -66,6 +86,14 @@ class SABnzbd(Base):
             if os.path.exists(os.path.join(script_dir, filename)):
                 continue
             os.symlink(os.path.join(self.sickbeard_postprocessing_dir, filename), os.path.join(script_dir, filename))
+
+    def sickbeardcustom_postprocessing_enable(self):
+        self.sickbeardcustom_postprocessing_disable()
+        script_dir = self.get_script_dir()
+        for filename in self.sickbeardcustom_postprocessing_filenames:
+            if os.path.exists(os.path.join(script_dir, filename)):
+                continue
+            os.symlink(os.path.join(self.sickbeardcustom_postprocessing_dir, filename), os.path.join(script_dir, filename))
 
     def get_script_dir(self):
         script_dir = self.config['misc']['script_dir']
@@ -80,6 +108,8 @@ class NZBGet(Base):
     script_dir = '/usr/local/nzbget/var'
     sickbeard_postprocessing_dir = '/usr/local/sickbeard/share/SickBeard/autoProcessTV'
     sickbeard_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
+    sickbeardcustom_postprocessing_dir = '/usr/local/sickbeard-custom/var/SickBeard/autoProcessTV'
+    sickbeardcustom_postprocessing_filenames = ['sabToSickBeard.py', 'autoProcessTV.cfg', 'autoProcessTV.py']
 
     def __init__(self):
         self.config = None
@@ -89,6 +119,7 @@ class NZBGet(Base):
         if os.path.exists(self.postprocessing_config_path):
             self.postprocessing_config = configobj.ConfigObj(self.postprocessing_config_path)
         self.sickbeard = SickBeard()
+        self.sickbeardcustom = SickBeardCustom()
 
     @expose
     def is_installed(self):
@@ -98,14 +129,18 @@ class NZBGet(Base):
     def load(self):
         if self.config is None or self.postprocessing_config is None:
             return None
-        return {'sickbeard_postprocessing': self.sickbeard_postprocessing_configured()}
+        return {'sickbeard_postprocessing': self.sickbeard_postprocessing_configured(), 'sickbeardcustom_postprocessing': self.sickbeardcustom_postprocessing_configured()}
 
     @expose(kind=SUBMIT)
-    def save(self, sickbeard_postprocessing=None):
+    def save(self, sickbeard_postprocessing=None, sickbeardcustom_postprocessing=None):
         if sickbeard_postprocessing:
             self.sickbeard_postprocessing_enable()
-            return
-        self.sickbeard_postprocessing_disable()
+        else:
+            self.sickbeard_postprocessing_disable()
+        if sickbeardcustom_postprocessing:
+            self.sickbeardcustom_postprocessing_enable()
+        else:
+            self.sickbeardcustom_postprocessing_disable()
 
     def fix_config(self, path):
         replace(path, ' = ', '=')
@@ -118,8 +153,24 @@ class NZBGet(Base):
             configured = configured and os.path.exists(os.path.join(self.script_dir, filename))
         return configured
 
+    def sickbeardcustom_postprocessing_configured(self):
+        configured = (self.postprocessing_config['SickBeard'] == 'yes' and
+                      self.postprocessing_config['SickBeardCategory'] == self.sickbeardcustom.config['NZBget']['nzbget_category'])
+        for filename in self.sickbeardcustom_postprocessing_filenames:
+            configured = configured and os.path.exists(os.path.join(self.script_dir, filename))
+        return configured
+
     def sickbeard_postprocessing_disable(self):
         for filename in self.sickbeard_postprocessing_filenames:
+            if not os.path.islink(os.path.join(self.script_dir, filename)):
+                continue
+            os.remove(os.path.join(self.script_dir, filename))
+        self.postprocessing_config['SickBeard'] = 'no'
+        self.postprocessing_config.write()
+        self.fix_config(self.postprocessing_config_path)
+
+    def sickbeardcustom_postprocessing_disable(self):
+        for filename in self.sickbeardcustom_postprocessing_filenames:
             if not os.path.islink(os.path.join(self.script_dir, filename)):
                 continue
             os.remove(os.path.join(self.script_dir, filename))
@@ -135,6 +186,17 @@ class NZBGet(Base):
             os.symlink(os.path.join(self.sickbeard_postprocessing_dir, filename), os.path.join(self.script_dir, filename))
         self.postprocessing_config['SickBeard'] = 'yes'
         self.postprocessing_config['SickBeardCategory'] = self.sickbeard.config['NZBget']['nzbget_category']
+        self.postprocessing_config.write()
+        self.fix_config(self.postprocessing_config_path)
+
+    def sickbeardcustom_postprocessing_enable(self):
+        self.sickbeardcustom_postprocessing_disable()
+        for filename in self.sickbeardcustom_postprocessing_filenames:
+            if os.path.exists(os.path.join(self.script_dir, filename)):
+                continue
+            os.symlink(os.path.join(self.sickbeardcustom_postprocessing_dir, filename), os.path.join(self.script_dir, filename))
+        self.postprocessing_config['SickBeard'] = 'yes'
+        self.postprocessing_config['SickBeardCategory'] = self.sickbeardcustom.config['NZBget']['nzbget_category']
         self.postprocessing_config.write()
         self.fix_config(self.postprocessing_config_path)
 
@@ -212,6 +274,24 @@ class SickBeard(Base):
                 self.postprocessing_config['SickBeard']['password'] == self.config['General']['web_password'] and
                 self.postprocessing_config['SickBeard']['port'] == self.config['General']['web_port'] and
                 self.postprocessing_config['SickBeard']['ssl'] == self.config['General']['enable_https'])
+
+
+class SickBeardCustom(SickBeard):
+    config_path = '/usr/local/sickbeard-custom/var/config.ini'
+    postprocessing_config_path = '/usr/local/sickbeard-custom/var/SickBeard/autoProcessTV/autoProcessTV.cfg'
+    start_stop_status = '/var/packages/sickbeard-custom/scripts/start-stop-status'
+
+    @expose
+    def is_installed(self):
+        return super(SickBeardCustom, self).is_installed()
+
+    @expose(kind=LOAD)
+    def load(self):
+        return super(SickBeardCustom, self).load()
+
+    @expose(kind=SUBMIT)
+    def save(self, configure_for=None, configure_postprocessing=None):
+        super(SickBeardCustom, self).save(configure_for, configure_postprocessing)
 
 
 class CouchPotatoServer(Base):

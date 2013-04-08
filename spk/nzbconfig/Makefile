@@ -1,5 +1,5 @@
 SPK_NAME = nzbconfig
-SPK_VERS = 0.6
+SPK_VERS = 0.7
 SPK_REV = 3
 SPK_ICON = src/nzbconfig.png
 DSM_UI_DIR = app
@@ -8,11 +8,12 @@ DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, CouchPotato and Headphones
-DESCRIPTION_FRE = Interface de configuration pour vos paquets SABnzbd, NZBGet, SickBeard, CouchPotato et Headphones
-DESCRIPTION_SPN = Interfaz de configuración para los paquetes SABnzbd, NZBGet, SickBeard, CouchPotato y Headphones
+DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, SickBeard Custom, CouchPotato and Headphones
+DESCRIPTION_FRE = Interface de configuration pour vos paquets SABnzbd, NZBGet, SickBeard, SickBeard Custom, CouchPotato et Headphones
+DESCRIPTION_SPN = Interfaz de configuración para los paquetes SABnzbd, NZBGet, SickBeard, SickBeard Custom, CouchPotato y Headphones
 RELOAD_UI = yes
 DISPLAY_NAME = NZB Config
+CHANGELOG = "1. Add support for SickBeard Custom"
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
