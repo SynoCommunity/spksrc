@@ -5,8 +5,11 @@
             "desc": "NZBGet Web UI",
             "icon": "images/nzbget-{0}.png",
             "type": "url",
-            "url": "3rdparty/nzbget/nzbget.cgi",
-            "allUsers": true
+            "protocol": "http",
+            "port": "6789",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
