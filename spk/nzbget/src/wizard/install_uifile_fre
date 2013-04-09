@@ -2,17 +2,29 @@
     "step_title": "Configuration de base",
     "items": [{
         "type": "textfield",
-        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
+        "desc": "Répertoire de téléchargement",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Répertoire de téléchargement"
+            "desc": "Répertoire de téléchargement",
+            "defaultVaule": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                }
+            }
         }]
     }, {
         "type": "password",
         "desc": "Mot de passe du serveur. nzbget par défaut",
         "subitems": [{
             "key": "wizard_server_password",
-            "desc": "Mot de passe du serveur"
+            "desc": "Mot de passe du serveur",
+            "defaultVaule": "nzbget",
+            "validator": {
+                "allowBlank": false
+            }
         }]
     }]
 }]

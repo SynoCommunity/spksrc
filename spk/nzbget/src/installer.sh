@@ -7,7 +7,7 @@ DNAME="NZBGet"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="nzbget"
 GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/nzbget.conf"
@@ -67,8 +67,8 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Revision 7 introduces backward incompatible changes
-    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 7 ]; then
+    # Revision 8 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 8 ]; then
         echo "Please uninstall previous version, no update possible"
         exit 1
     fi
