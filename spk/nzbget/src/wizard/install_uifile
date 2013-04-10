@@ -2,17 +2,29 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download directory. Defaults to /volume1/downloads",
+        "desc": "Download directory",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Download directory"
+            "desc": "Download directory",
+            "defaultVaule": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
         }]
     }, {
         "type": "password",
         "desc": "Server password. Defaults to nzbget",
         "subitems": [{
             "key": "wizard_server_password",
-            "desc": "Server password"
+            "desc": "Server password",
+            "defaultVaule": "nzbget",
+            "validator": {
+                "allowBlank": false
+            }
         }]
     }]
 }]

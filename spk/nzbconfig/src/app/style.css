@@ -41,6 +41,10 @@
 	background-image: url(images/sickbeard-16.png);
 	margin-left: 16px;
 }
+.synocommunity-nzbconfig-list-sickbeardcustom {
+	background-image: url(images/sickbeardcustom-16.png);
+	margin-left: 16px;
+}
 .synocommunity-nzbconfig-list-couchpotatoserver {
 	background-image: url(images/couchpotatoserver-16.png);
 	margin-left: 16px;

@@ -45,6 +45,17 @@ Ext.Direct.addProvider({
             "name": "is_installed",
             "len": 0
         }],
+        "SickBeardCustom": [{
+            "formHandler": true,
+            "name": "save",
+            "len": 2
+        }, {
+            "name": "load",
+            "len": 0
+        }, {
+            "name": "is_installed",
+            "len": 0
+        }],
         "CouchPotatoServer": [{
             "formHandler": true,
             "name": "save",
@@ -166,6 +177,7 @@ SYNOCOMMUNITY.NZBConfig.MainPanel = Ext.extend(Ext.Panel, {
             ["sabnzbd", this.cardPanel.PanelSABnzbd],
             ["nzbget", this.cardPanel.PanelNZBGet],
             ["sickbeard", this.cardPanel.PanelSickBeard],
+            ["sickbeardcustom", this.cardPanel.PanelSickBeardCustom],
             ["couchpotatoserver", this.cardPanel.PanelCouchPotatoServer],
             ["headphones", this.cardPanel.PanelHeadphones]
         ];
@@ -292,6 +304,9 @@ SYNOCOMMUNITY.NZBConfig.ListView = Ext.extend(Ext.list.ListView, {
                     title: "SickBeard",
                     id: "sickbeard"
                 }, {
+                    title: "SickBeard Custom",
+                    id: "sickbeardcustom"
+                }, {
                     title: "CouchPotatoServer",
                     id: "couchpotatoserver"
                 }, {
@@ -392,6 +407,9 @@ SYNOCOMMUNITY.NZBConfig.MainCardPanel = Ext.extend(Ext.Panel, {
         this.PanelSickBeard = new SYNOCOMMUNITY.NZBConfig.PanelSickBeard({
             owner: this.owner
         });
+        this.PanelSickBeardCustom = new SYNOCOMMUNITY.NZBConfig.PanelSickBeardCustom({
+            owner: this.owner
+        });
         this.PanelCouchPotatoServer = new SYNOCOMMUNITY.NZBConfig.PanelCouchPotatoServer({
             owner: this.owner
         });
@@ -401,7 +419,7 @@ SYNOCOMMUNITY.NZBConfig.MainCardPanel = Ext.extend(Ext.Panel, {
         config = Ext.apply({
             activeItem: 0,
             layout: "card",
-            items: [this.PanelSABnzbd, this.PanelNZBGet, this.PanelSickBeard, this.PanelCouchPotatoServer, this.PanelHeadphones],
+            items: [this.PanelSABnzbd, this.PanelNZBGet, this.PanelSickBeard, this.PanelSickBeardCustom, this.PanelCouchPotatoServer, this.PanelHeadphones],
             border: false,
             listeners: {
                 scope: this,
@@ -505,6 +523,18 @@ SYNOCOMMUNITY.NZBConfig.PanelSABnzbd = Ext.extend(SYNOCOMMUNITY.NZBConfig.FormPa
                     fieldLabel: _V("ui", "postprocessing"),
                     name: "sickbeard_postprocessing"
                 }]
+            }, {
+                xtype: "fieldset",
+                title: "SickBeard Custom",
+                defaultType: "textfield",
+                defaults: {
+                    anchor: "-20"
+                },
+                items: [{
+                    xtype: "checkbox",
+                    fieldLabel: _V("ui", "postprocessing"),
+                    name: "sickbeardcustom_postprocessing"
+                }]
             }],
             api: {
                 load: SYNOCOMMUNITY.NZBConfig.Remote.SABnzbd.load,
@@ -523,6 +553,11 @@ SYNOCOMMUNITY.NZBConfig.PanelSABnzbd = Ext.extend(SYNOCOMMUNITY.NZBConfig.FormPa
             SYNOCOMMUNITY.NZBConfig.Remote.SickBeard.is_installed(function (provider, response) {
                 if (!response.result) {
                     this.getForm().findField("sickbeard_postprocessing").disable();
+                }
+            }, this);
+            SYNOCOMMUNITY.NZBConfig.Remote.SickBeardCustom.is_installed(function (provider, response) {
+                if (!response.result) {
+                    this.getForm().findField("sickbeardcustom_postprocessing").disable();
                 }
             }, this);
             this.load({
@@ -569,6 +604,18 @@ SYNOCOMMUNITY.NZBConfig.PanelNZBGet = Ext.extend(SYNOCOMMUNITY.NZBConfig.FormPan
                     fieldLabel: _V("ui", "postprocessing"),
                     name: "sickbeard_postprocessing"
                 }]
+            }, {
+                xtype: "fieldset",
+                title: "SickBeard Custom",
+                defaultType: "textfield",
+                defaults: {
+                    anchor: "-20"
+                },
+                items: [{
+                    xtype: "checkbox",
+                    fieldLabel: _V("ui", "postprocessing"),
+                    name: "sickbeardcustom_postprocessing"
+                }]
             }],
             api: {
                 load: SYNOCOMMUNITY.NZBConfig.Remote.NZBGet.load,
@@ -587,6 +634,11 @@ SYNOCOMMUNITY.NZBConfig.PanelNZBGet = Ext.extend(SYNOCOMMUNITY.NZBConfig.FormPan
             SYNOCOMMUNITY.NZBConfig.Remote.SickBeard.is_installed(function (provider, response) {
                 if (!response.result) {
                     this.getForm().findField("sickbeard_postprocessing").disable();
+                }
+            }, this);
+            SYNOCOMMUNITY.NZBConfig.Remote.SickBeardCustom.is_installed(function (provider, response) {
+                if (!response.result) {
+                    this.getForm().findField("sickbeardcustom_postprocessing").disable();
                 }
             }, this);
             this.load({
@@ -705,6 +757,112 @@ SYNOCOMMUNITY.NZBConfig.PanelSickBeard = Ext.extend(SYNOCOMMUNITY.NZBConfig.Form
     },
     onApply: function () {
         if (!SYNOCOMMUNITY.NZBConfig.PanelSickBeard.superclass.onApply.apply(this, arguments)) {
+            return false;
+        }
+        this.owner.setStatusBusy({
+            text: _T("common", "saving")
+        });
+        this.getForm().submit({
+            scope: this,
+            success: function (form, action) {
+                this.owner.clearStatusBusy();
+                this.owner.setStatusOK();
+                this.getForm().setValues(this.getForm().getValues());
+            }
+        });
+    }
+});
+
+// SickBeardCustom panel
+SYNOCOMMUNITY.NZBConfig.PanelSickBeardCustom = Ext.extend(SYNOCOMMUNITY.NZBConfig.FormPanel, {
+    constructor: function (config) {
+        this.owner = config.owner;
+        config = Ext.apply({
+            itemId: "sickbeardcustom",
+            items: [{
+                xtype: "fieldset",
+                title: _V("ui", "newsgrabber"),
+                defaultType: "textfield",
+                defaults: {
+                    anchor: "-20"
+                },
+                items: [{
+                    xtype: "radiogroup",
+                    fieldLabel: _V("ui", "configure_for"),
+                    name: "configure_for",
+                    defaults: {
+                        xtype: "radio",
+                        name: "configure_for"
+                    },
+                    items: [{
+                        itemId: "sabnzbd",
+                        boxLabel: "SABnzbd",
+                        inputValue: "sabnzbd"
+                    }, {
+                        itemId: "nzbget",
+                        boxLabel: "NZBGet",
+                        inputValue: "nzbget"
+                    }, {
+                        itemId: "nochange",
+                        boxLabel: _V("ui", "no_change"),
+                        inputValue: "nochange"
+                    }]
+                }]
+            }, {
+                xtype: "fieldset",
+                title: _V("ui", "postprocessing"),
+                defaultType: "textfield",
+                defaults: {
+                    anchor: "-20"
+                },
+                items: [{
+                    xtype: "checkbox",
+                    fieldLabel: _V("ui", "configure_postprocessing"),
+                    name: "configure_postprocessing"
+                }]
+            }],
+            api: {
+                load: SYNOCOMMUNITY.NZBConfig.Remote.SickBeardCustom.load,
+                submit: SYNOCOMMUNITY.NZBConfig.Remote.SickBeardCustom.save
+            }
+        }, config);
+        SYNOCOMMUNITY.NZBConfig.PanelSickBeardCustom.superclass.constructor.call(this, config);
+    },
+    onActivate: function () {
+        this.getEl().mask(_T("common", "loading"));
+        SYNOCOMMUNITY.NZBConfig.Remote.SickBeardCustom.is_installed(function (provider, response) {
+            if (!response.result) {
+                this.getEl().mask(_V("errors", "sickbeardcustom_not_installed"));
+                return;
+            }
+            SYNOCOMMUNITY.NZBConfig.Remote.SABnzbd.is_installed(function (provider, response) {
+                if (!response.result) {
+                    Ext.each(this.getForm().findField("configure_for").items.items, function (item, index) {
+                        if (item.itemId == "sabnzbd") {
+                            item.disable();
+                        }
+                    });
+                }
+            }, this);
+            SYNOCOMMUNITY.NZBConfig.Remote.NZBGet.is_installed(function (provider, response) {
+                if (!response.result) {
+                    Ext.each(this.getForm().findField("configure_for").items.items, function (item, index) {
+                        if (item.itemId == "nzbget") {
+                            item.disable();
+                        }
+                    });
+                }
+            }, this);
+            this.load({
+                scope: this,
+                success: function (form, action) {
+                    this.getEl().unmask();
+                }
+            });
+        }, this);
+    },
+    onApply: function () {
+        if (!SYNOCOMMUNITY.NZBConfig.PanelSickBeardCustom.superclass.onApply.apply(this, arguments)) {
             return false;
         }
         this.owner.setStatusBusy({
