@@ -7,16 +7,20 @@ DNAME="Git Server"
 # Others
 USER="git"
 INSTALL_DIR="/usr/local/${PACKAGE}"
+GIT_DIR="/usr/local/git"
+DROPBEAR_PID_FILE="${INSTALL_DIR}/var/run/dropbear.pid"
 PID_FILE="${INSTALL_DIR}/var/run/git-daemon.pid"
 LOG_FILE="${INSTALL_DIR}/var/log/git-daemon.log"
-GIT_HOME="/var/services/homes/${USER}"
-BASE_PATH="${GIT_HOME}/repositories"
+GIT_HOME="${INSTALL_DIR}/var/home"
+BASE_PATH="${INSTALL_DIR}/var/repositories"
 
 start_daemon ()
 {
-    su - ${USER} -c "${INSTALL_DIR}/bin/git daemon --export-all --base-path=${BASE_PATH} --pid-file=${PID_FILE} --reuseaddr --verbose --detach ${BASE_PATH}"
+    su - ${USER} -c "${GIT_DIR}/bin/git daemon --export-all --base-path=${BASE_PATH} --pid-file=${PID_FILE} --reuseaddr --verbose --detach ${BASE_PATH}"
+    su - ${USER} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${INSTALL_DIR}/sbin/dropbear -w"
+
     # Symlink for gitweb
-    ln -s ${INSTALL_DIR}/share/gitweb /var/services/web/gitweb
+    ln -s ${GIT_DIR}/share/gitweb /var/services/web/gitweb
 
     # Symlink apache2 config
     ln -s ${INSTALL_DIR}/etc/gitweb.apache2.conf /usr/syno/etc/sites-enabled-user/
@@ -30,6 +34,10 @@ stop_daemon ()
     kill `cat ${PID_FILE}`
     wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
+
+    kill `cat ${DROPBEAR_PID_FILE}`
+    rm -f ${DROPBEAR_PID_FILE}
+
 
     rm -f /var/services/web/gitweb
     rm -f /usr/syno/etc/sites-enabled-user/gitweb.apache2.conf

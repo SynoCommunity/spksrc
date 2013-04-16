@@ -5,7 +5,7 @@
             "desc": "Gitweb UI",
             "icon": "images/git-server-{0}.png",
             "type": "url",
-            "url": "3rdparty/git-server/git-server.cgi",
+            "url": "/git-server/git-server.cgi",
             "allUsers": true
         }
     }
