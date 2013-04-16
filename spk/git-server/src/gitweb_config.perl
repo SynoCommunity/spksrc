@@ -1,1 +1,1 @@
-$projectroot="/var/services/homes/git/repositories"
+$projectroot="/usr/local/git-server/var/repositories"
