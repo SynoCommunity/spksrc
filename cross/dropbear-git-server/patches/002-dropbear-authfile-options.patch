@@ -1,0 +1,23 @@
+--- svr-authpubkeyoptions.c	2013-03-21 16:29:35.000000000 +0100
++++ svr-authpubkeyoptions.c	2013-04-17 21:10:28.000000000 +0200
+@@ -143,20 +143,16 @@
+ 			ses.authstate.pubkey_options->no_port_forwarding_flag = 1;
+ 			goto next_option;
+ 		}
+-#ifdef ENABLE_SVR_AGENTFWD
+ 		if (match_option(options_buf, "no-agent-forwarding") == DROPBEAR_SUCCESS) {
+ 			dropbear_log(LOG_WARNING, "Agent forwarding disabled.");
+ 			ses.authstate.pubkey_options->no_agent_forwarding_flag = 1;
+ 			goto next_option;
+ 		}
+-#endif
+-#ifdef ENABLE_X11FWD
+ 		if (match_option(options_buf, "no-X11-forwarding") == DROPBEAR_SUCCESS) {
+ 			dropbear_log(LOG_WARNING, "X11 forwarding disabled.");
+ 			ses.authstate.pubkey_options->no_x11_forwarding_flag = 1;
+ 			goto next_option;
+ 		}
+-#endif
+ 		if (match_option(options_buf, "no-pty") == DROPBEAR_SUCCESS) {
+ 			dropbear_log(LOG_WARNING, "Pty allocation disabled.");
+ 			ses.authstate.pubkey_options->no_pty_flag = 1;
