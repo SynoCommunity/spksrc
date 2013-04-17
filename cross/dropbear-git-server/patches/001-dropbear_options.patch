@@ -1,5 +1,5 @@
---- options.h	2013-03-21 16:29:35.000000000 +0100
-+++ options.h	2013-04-15 21:56:11.000000000 +0200
+--- options.orig.h	2013-04-17 20:36:52.000000000 +0200
++++ options.h	2013-04-17 20:39:56.000000000 +0200
 @@ -11,7 +11,7 @@
   ******************************************************************/
  
@@ -93,7 +93,7 @@
  
  /* Authentication Types - at least one required.
     RFC Draft requires pubkey auth, and recommends password */
-@@ -174,20 +174,20 @@
+@@ -174,7 +174,7 @@
   * PAM challenge/response.
   * You can't enable both PASSWORD and PAM. */
  
@@ -102,14 +102,9 @@
  /* PAM requires ./configure --enable-pam */
  /*#define ENABLE_SVR_PAM_AUTH*/
  #define ENABLE_SVR_PUBKEY_AUTH
- 
- /* Whether to take public key options in 
-  * authorized_keys file into account */
--#ifdef ENABLE_SVR_PUBKEY_AUTH
-+/*#ifdef ENABLE_SVR_PUBKEY_AUTH
+@@ -185,9 +185,9 @@
  #define ENABLE_SVR_PUBKEY_OPTIONS
--#endif
-+#endif*/
+ #endif
  
 -#define ENABLE_CLI_PASSWORD_AUTH
 +/*#define ENABLE_CLI_PASSWORD_AUTH/*
@@ -172,7 +167,7 @@
  
  /* The default path. This will often get replaced by the shell */
 -#define DEFAULT_PATH "/usr/bin:/bin"
-+#define DEFAULT_PATH "/usr/local/git/bin:/usr/bin:/bin"
++#define DEFAULT_PATH "/usr/local/git/bin:/usr/local/git-server/bin:/usr/local/git-server/bin/gitolite:/usr/syno/bin/:/usr/bin:/bin"
  
  /* Some other defines (that mostly should be left alone) are defined
   * in sysoptions.h */

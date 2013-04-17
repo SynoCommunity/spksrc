@@ -49,19 +49,36 @@ postinst ()
     #mkdir ${GIT_HOME}
     mkdir -p ${GIT_HOME}/.ssh/
     #touch ${GIT_HOME}/.ssh/environment
-    touch ${GIT_HOME}/.ssh/authorized_keys
-    #echo "export PATH=${INSTALL_DIR}/bin:$PATH" >> ${GIT_HOME}/.profile
+    #touch ${GIT_HOME}/.ssh/authorized_keys
+    echo "export PATH=${GIT_DIR}/bin:${INSTALL_DIR}/bin:${INSTALL_DIR}/bin/gitolite:$PATH" >> ${GIT_HOME}/.profile
     #echo "PATH=${INSTALL_DIR}/bin:$PATH" >> ${GIT_HOME}/.ssh/environment
 
     # Create keys for dropbear
     ${INSTALL_DIR}/bin/dropbearkey -t rsa -f ${INSTALL_DIR}/etc/dropbear_rsa_host_key
     ${INSTALL_DIR}/bin/dropbearkey -t dss -f ${INSTALL_DIR}/etc/dropbear_dss_host_key
 
+    # Gitweb config
+    ln -s ${INSTALL_DIR}/etc/gitweb_config.perl ${GIT_DIR}/share/gitweb/gitweb_config.perl
+
+    # Gitweb theme
+    if [ ! -L ${GIT_DIR}/share/gitweb/static ]; then
+        mv ${GIT_DIR}/share/gitweb/static/ ${GIT_DIR}/share/gitweb/static.orig/
+        ln -s ${INSTALL_DIR}/share/gitweb/static/ ${GIT_DIR}/share/gitweb/static
+    fi
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
     chmod -R 755 ${SYNOPKG_PKGDEST}
     chown -R ${USER}:root ${GIT_HOME}
     chmod -R 700 ${GIT_HOME}/.ssh/
+    chown -R ${USER}:root ${GIT_DIR}/share/gitweb/static/
+
+    # Gitolite setup
+    mkdir ${INSTALL_DIR}/bin/gitolite/
+    echo "${wizard_public_key}" > ${GIT_HOME}/admin.pub
+    su - ${USER} -c "${INSTALL_DIR}/share/gitolite/install -to ${INSTALL_DIR}/bin/gitolite/"
+    su - ${USER} -c "${INSTALL_DIR}/bin/gitolite/gitolite setup -pk admin.pub"
+    sed -i -e "s|UMASK                           =>  0077,|UMASK                           =>  0022,|" ${INSTALL_DIR}/var/home/.gitolite.rc
 
     exit 0
 }
@@ -89,6 +106,13 @@ postuninst ()
     #rm -f /usr/bin/git
     #rm -f /usr/bin/git-upload-pack
     #rm -f /usr/bin/git-receive-pack
+
+    # Gitweb config
+    rm ${GIT_DIR}/share/gitweb/gitweb_config.perl
+
+    # Gitweb theme
+    rm -f ${GIT_DIR}/share/gitweb/static
+    mv ${GIT_DIR}/share/gitweb/static.orig/ ${GIT_DIR}/share/gitweb/static/
 
     exit 0
 }

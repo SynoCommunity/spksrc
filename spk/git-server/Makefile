@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEBUG = true
 
-DEPENDS = cross/dropbear-git-server
+DEPENDS = cross/dropbear-git-server cross/mktemp
 SPK_DEPENDS = "git>1.8.2"
 
 MAINTAINER = SynoCommunity
@@ -17,6 +17,8 @@ DISPLAY_NAME = Git Server
 RELOAD_UI = yes
 HOMEPAGE = http://git-scm.com/
 LICENSE  =
+
+WIZARDS_DIR = src/wizard
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -39,14 +41,14 @@ git_server_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/share/gitweb
 	install -m 644 src/gitweb.apache2.conf $(STAGING_DIR)/etc/
-	install -m 644 src/gitweb_config.perl $(STAGING_DIR)/share/gitweb/
+	install -m 644 src/gitweb_config.perl $(STAGING_DIR)/etc/
 	git clone https://github.com/kogakure/gitweb-theme.git $(STAGING_DIR)/share/gitweb/static
-	#cp src/gitweb-theme/git* $(STAGING_DIR)/share/gitweb/static/
 	rm $(STAGING_DIR)/share/gitweb/static/.gitignore
 	rm -rf $(STAGING_DIR)/share/gitweb/static/.git/
+	git clone https://github.com/sitaramc/gitolite.git $(STAGING_DIR)/share/gitolite
+	rm -rf $(STAGING_DIR)/share/gitolite/.git/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	#install -m 755 src/app/git-server.cgi.pl $(STAGING_DIR)/app/git-server.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 ; \
 	do \

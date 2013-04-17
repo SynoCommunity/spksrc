@@ -5,8 +5,11 @@
             "desc": "Gitweb UI",
             "icon": "images/git-server-{0}.png",
             "type": "url",
-            "url": "/git-server/git-server.cgi",
-            "allUsers": true
+            "protocol": "http",
+            "port": "80",
+            "url": "/gitweb/gitweb.cgi",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
