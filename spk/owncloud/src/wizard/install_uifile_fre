@@ -22,21 +22,35 @@
         "desc": "Administrator's login. Defaults to admin",
         "subitems": [{
             "key": "wizard_owncloud_admin_username",
-            "desc": "User name"
+            "desc": "User name",
+            "validator": {
+                "allowBlank": false
+            }
         }]
     }, {
         "type": "password",
         "desc": "Administrator's password. Defaults to admin",
         "subitems": [{
             "key": "wizard_owncloud_admin_password",
-            "desc": "Password"
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false
+            }
         }]
     }, {
         "type": "textfield",
-        "desc": "ownCloud data directory. Defaults to /volume1/owncloud",
+        "desc": "ownCloud data directory",
         "subitems": [{
             "key": "wizard_owncloud_datadirectory",
-            "desc": "Directory"
+            "desc": "Directory",
+            "defaultValue": "/volume1/owncloud",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
         }]
     }]
 }]

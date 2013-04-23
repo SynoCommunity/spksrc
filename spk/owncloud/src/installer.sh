@@ -16,8 +16,9 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
-    # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+
+        # Check database
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
             echo "Incorrect MySQL root password"
             exit 1
@@ -28,6 +29,12 @@ preinst ()
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
             echo "MySQL database ${MYSQL_DATABASE} already exists"
+            exit 1
+        fi
+
+        # Check directory
+        if [ ! -d ${wizard_owncloud_datadirectory} ]; then
+            echo "Directory does not exist"
             exit 1
         fi
     fi
@@ -43,15 +50,6 @@ postinst ()
     # Install the web interface
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
-
-    # Make sure data directory exists
-    if [ -z ${wizard_owncloud_datadirectory} ]; then
-        mkdir -p /volume1/${PACKAGE}
-        chown -R ${USER} /volume1/${PACKAGE}
-    else
-        mkdir -p ${wizard_owncloud_datadirectory}
-        chown -R ${USER} ${wizard_owncloud_datadirectory}
-    fi
 
     # Configure open_basedir
     echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
@@ -69,6 +67,7 @@ postinst ()
     chown ${USER} ${WEB_DIR}/${PACKAGE}/data
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}/apps
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config
+    chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
 }
