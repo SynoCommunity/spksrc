@@ -1,5 +1,5 @@
 PKG_NAME = node
-PKG_VERS = 0.10.4
+PKG_VERS = 0.10.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://nodejs.org/dist/v$(PKG_VERS)/
