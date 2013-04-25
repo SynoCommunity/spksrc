@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.gnutls.org/gcrypt/$(PKG_NAME)/v3.1
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/nettle cross/libgcrypt
+DEPENDS = cross/nettle
 
 HOMEPAGE = http://www.gnu.org/software/gnutls/
 COMMENT  = GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them
