@@ -1,6 +1,6 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
-SPK_VERS =$(SPK_SHORT_VERS).3
+SPK_VERS =$(SPK_SHORT_VERS).4
 SPK_REV = 6
 SPK_ICON = src/python.png
 
@@ -17,7 +17,8 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules"
+CHANGELOG = "1. Update python to 2.7.4\n2. Update modules"
+BETA = 1
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
@@ -29,7 +30,7 @@ ADDITIONAL_SCRIPTS =
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
 
-PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
+PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VER(SPK_SHORT_VERS)%'
 
 POST_STRIP_TARGET = python_cleanup
 
