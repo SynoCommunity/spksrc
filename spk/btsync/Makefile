@@ -1,42 +1,39 @@
-SPK_NAME = selfoss
-SPK_VERS = 2.3
+SPK_NAME = btsync
+SPK_VERS = 1.0.116
 SPK_REV = 2
-SPK_ICON = src/selfoss.png
+SPK_ICON = src/btsync.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = The new multipurpose rss reader, live stream, mashup, aggregation web application.
-ADMIN_URL = /selfoss/
+DESCRIPTION = Automatically sync files via secure, distributed technology.
+ADMIN_PORT = 8888
 RELOAD_UI = yes
-DISPLAY_NAME = Selfoss
+DISPLAY_NAME = BitTorrent Sync
 BETA = 1
 
-HOMEPAGE   = http://selfoss.aditu.de/
-LICENSE    = GPLv3
+HOMEPAGE   = http://labs.bittorrent.com/experiments/sync.html
+LICENSE    =
 
 WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
-INSTALL_DEP_SERVICES = apache-web mysql
-START_DEP_SERVICES = apache-web mysql
-
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-POST_STRIP_TARGET = selfoss_extra_install
+POST_STRIP_TARGET = btsync_extra_install
 
-BUSYBOX_CONFIG = daemon nice
+BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: selfoss_extra_install
-selfoss_extra_install:
+.PHONY: btsync_extra_install
+btsync_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 src/selfoss.sh $(STAGING_DIR)/bin/
+	install -m 600 src/sync.conf $(STAGING_DIR)/var/sync.conf
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

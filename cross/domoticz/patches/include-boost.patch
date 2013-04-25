@@ -1,0 +1,29 @@
+--- CMakeLists.txt.old	2013-02-24 19:25:04.000000000 +0100
++++ CMakeLists.txt	2013-02-25 22:38:28.000000000 +0100
+@@ -117,7 +117,7 @@
+ main/mainworker.cpp
+ main/SQLHelper.cpp
+ main/WebServer.cpp
+-main/Scheduler.cpp
++main/Scheduler.cpp
+ main/Camera.cpp
+ main/localtime_r.cpp
+ main/RFXNames.cpp
+@@ -153,7 +153,6 @@
+ jwsmtp/compat.cpp
+ )
+ add_executable(domoticz ${domoticz_SRCS})
+-ADD_PRECOMPILED_HEADER(domoticz "main/stdafx.h")
+ 
+ ## Link libraries
+ set(BOOST_LIBS thread date_time system)
+@@ -163,6 +162,9 @@
+     INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+     ADD_DEFINITIONS( "-DHAS_BOOST" )
+ ENDIF()
++
++ADD_PRECOMPILED_HEADER(domoticz "main/stdafx.h")
++
+ target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} pthread)
+ #target_link_libraries(domoticz ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
+ 
