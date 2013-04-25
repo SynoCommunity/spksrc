@@ -1,0 +1,49 @@
+--- configure.ac.orig	2013-04-06 16:02:41.000000000 +0200
++++ configure.ac	2013-04-19 09:42:50.000000000 +0200
+@@ -31,6 +31,8 @@
+ 	fi
+         AC_MSG_RESULT($interp)
+ 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/plat-$(MACHDEP) '$interp
++	else
++	    AC_MSG_RESULT($PYTHON_FOR_BUILD)
+     fi
+ elif test "$cross_compiling" = maybe; then
+     AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
+@@ -39,6 +41,18 @@
+ fi
+ AC_SUBST(PYTHON_FOR_BUILD)
+ 
++if test "$cross_compiling" = yes; then
++    AC_MSG_CHECKING([for pgen for cross build])
++    if test -z "$PGEN_FOR_BUILD"; then
++	    which pgen >/dev/null 2>&1 || AC_MSG_ERROR([pgen not found])
++	    PGEN_FOR_BUILD=pgen
++	fi
++    AC_MSG_RESULT($PGEN_FOR_BUILD)
++else
++    PGEN_FOR_BUILD='$(PGEN)'
++fi
++AC_SUBST(PGEN_FOR_BUILD)
++
+ dnl Ensure that if prefix is specified, it does not end in a slash. If
+ dnl it does, we get path names containing '//' which is both ugly and
+ dnl can cause trouble.
+--- Makefile.pre.in.orig	2013-04-06 16:02:34.000000000 +0200
++++ Makefile.pre.in	2013-04-19 09:43:26.000000000 +0200
+@@ -227,6 +227,7 @@
+ ##########################################################################
+ # Parser
+ PGEN=		Parser/pgen$(EXE)
++PGEN_FOR_BUILD=	@PGEN_FOR_BUILD@
+ 
+ PSRCS=		\
+ 		Parser/acceler.c \
+@@ -588,7 +589,7 @@
+ $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
+ 		@$(MKDIR_P) Include
+ 		$(MAKE) $(PGEN)
+-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
++		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+ $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
+ 		$(MAKE) $(GRAMMAR_H)
+ 		touch $(GRAMMAR_C)
