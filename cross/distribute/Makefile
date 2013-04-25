@@ -1,5 +1,5 @@
 PKG_NAME = distribute
-PKG_VERS = 0.6.35
+PKG_VERS = 0.6.36
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/d/$(PKG_NAME)
