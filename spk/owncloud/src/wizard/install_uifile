@@ -1,5 +1,5 @@
 [{
-    "step_title": "ownCloud configuration",
+    "step_title": "ownCloud database configuration",
     "items": [{
         "type": "password",
         "desc": "Enter your MySQL password.",
@@ -16,8 +16,41 @@
         }]
     }]
 }, {
-	"step_title": "Required configuration information",
-	"items": [{
-		"desc": "Use the Advance option during the first launch to configure ownCloud with following parameters.<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database: MySQL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database user: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database password: 'the one you selected'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database name: owncloud<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database host: localhost",
+    "step_title": "ownCloud admin configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Administrator's login. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_owncloud_admin_username",
+            "desc": "User name",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "Administrator's password. Defaults to admin",
+        "subitems": [{
+            "key": "wizard_owncloud_admin_password",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "ownCloud data directory",
+        "subitems": [{
+            "key": "wizard_owncloud_datadirectory",
+            "desc": "Directory",
+            "defaultValue": "/volume1/owncloud",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
+        }]
     }]
 }]
