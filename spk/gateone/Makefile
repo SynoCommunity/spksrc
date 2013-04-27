@@ -1,9 +1,8 @@
 SPK_NAME = gateone
 SPK_VERS = 1.1
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS  = cross/busybox cross/dtach
 SPK_DEPENDS = "python>2.7.3-3"
@@ -15,7 +14,6 @@ ADMIN_PROTOCOL = https
 ADMIN_PORT = 8271
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
-CHANGELOG = "1. Apply patch to make tab completion works"
 
 HOMEPAGE   = http://liftoffsoftware.com/Products/GateOne
 LICENSE    = AGPLv3
@@ -28,7 +26,6 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = gateone_extra_install
 
 BUSYBOX_CONFIG  = usrmng
-
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
@@ -40,7 +37,6 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/server.conf $(STAGING_DIR)/var/
-	install -m 755 src/app/gateone.cgi.py $(STAGING_DIR)/app/gateone.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
@@ -50,7 +46,7 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ tornado configobj
+	@cd $(WORK_DIR) && $(PIP) bundle $@ "tornado<3" configobj
 
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share

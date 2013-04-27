@@ -5,8 +5,11 @@
             "desc": "GateOne",
             "icon": "images/gateone-{0}.png",
             "type": "url",
-            "url": "/webman/3rdparty/gateone/gateone.cgi",
-            "allUsers": true
+            "protocol": "https",
+            "port": "8271",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
