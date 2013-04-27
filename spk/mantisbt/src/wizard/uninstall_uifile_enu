@@ -1,0 +1,18 @@
+[{
+	"step_title": "Remove mantisbt database",
+	"items": [{
+		"type": "multiselect",
+		"desc": "If you remove the mantisbt database, all bug reports will be deleted.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove mantisbt database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Enter your MySQL password to remove the mantisbt database.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Root password"
+		}]
+	}]
+}]
