@@ -1,0 +1,13 @@
+rsc:bin/erb
+rsc:bin/gem
+rsc:bin/irb
+rsc:bin/rake
+rsc:bin/rdoc
+rsc:bin/ri
+bin:bin/ruby
+rsc:bin/testrb
+lib:lib/libruby-static.a
+rsc:lib/pkgconfig/ruby-2.0.pc
+rsc:lib/ruby/2.0.0
+c:lib/ruby/2.0.0/xmlrpc
+rsc:lib/ruby/gems
