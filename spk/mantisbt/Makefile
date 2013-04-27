@@ -12,7 +12,6 @@ ADMIN_URL = /mantisbt/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = MantisBT
-BETA = 1
 
 HOMEPAGE   = http://www.mantisbt.org/
 LICENSE    = GPL
