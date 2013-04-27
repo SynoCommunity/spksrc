@@ -98,6 +98,11 @@ endif
 ifneq ($(strip $(SPK_ICON)),)
 	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 - | base64 -w0 -`\" >> $@
 endif
+ifneq ($(strip $(DEBUG)),)
+INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
+else
+INSTALLER_OUTPUT = > $$SYNOPKG_TEMP_LOGFILE
+endif
 
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
@@ -139,7 +144,7 @@ $(create_target_dir)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
 echo '. `dirname $$0`/installer' >> $@
-echo '`basename $$0` > $$SYNOPKG_TEMP_LOGFILE' >> $@
+echo '`basename $$0` $(INSTALLER_OUTPUT)' >> $@
 chmod 755 $@
 endef
 
