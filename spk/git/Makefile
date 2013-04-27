@@ -1,6 +1,6 @@
 SPK_NAME = git
 SPK_VERS = 1.8.2
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/git.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DESCRIPTION = Git is a free and open source distributed version control system d
 DESCRIPTION_FRE = Git est un logiciel de gestion de version décentralisée gratuit et open source destiné à gérer aussi bien les petits que les très gros projets avec vitesse et efficacité.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = "1. Add missing tr"
+CHANGELOG = "1. Add missing usrmgr"
 
 HOMEPAGE = http://git-scm.com/
 LICENSE  =

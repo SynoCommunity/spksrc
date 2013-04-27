@@ -1,0 +1,4 @@
+bin/dropbearconvert
+bin/dropbearkey
+bin/scp
+sbin/dropbear
