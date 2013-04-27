@@ -5,57 +5,35 @@ PACKAGE="git-server"
 DNAME="Git Server"
 
 # Others
-USER="git"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 GIT_DIR="/usr/local/git"
-DROPBEAR_PID_FILE="${INSTALL_DIR}/var/run/dropbear.pid"
-PID_FILE="${INSTALL_DIR}/var/run/git-daemon.pid"
-LOG_FILE="${INSTALL_DIR}/var/log/git-daemon.log"
-GIT_HOME="${INSTALL_DIR}/var/home"
-BASE_PATH="${INSTALL_DIR}/var/home/repositories"
+PATH="${INSTALL_DIR}/bin:${GIT_DIR}/bin:${PATH}"
+USER="git"
+DROPBEAR_PID_FILE="${INSTALL_DIR}/var/dropbear.pid"
+PID_FILE="${INSTALL_DIR}/var/git-daemon.pid"
+LOG_FILE="${INSTALL_DIR}/var/git-daemon.log"
+BASE_PATH="${INSTALL_DIR}/var/repositories"
 
 start_daemon ()
 {
     su - ${USER} -c "${GIT_DIR}/bin/git daemon --base-path=${BASE_PATH} --pid-file=${PID_FILE} --reuseaddr --verbose --detach ${BASE_PATH}"
-    export LD_LIBRARY_PATH=${INSTALL_DIR}/lib
-    ${INSTALL_DIR}/sbin/dropbear -w
-
-    # Symlink for gitweb
-    ln -s ${GIT_DIR}/share/gitweb /var/services/web/gitweb
-
-    # Symlink apache2 config
-    ln -s ${INSTALL_DIR}/etc/gitweb.apache2.conf /usr/syno/etc/sites-enabled-user/
-
-    # Restart Apache
-    /usr/syno/etc/rc.d/S97apache-user.sh restart
+    LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${INSTALL_DIR}/sbin/dropbear -w -s -j -k -p 8352
 }
 
 stop_daemon ()
 {
     kill `cat ${PID_FILE}`
     kill `cat ${DROPBEAR_PID_FILE}`
-    rm -f ${PID_FILE}
-    rm -f ${DROPBEAR_PID_FILE}
-
-    # Unlink gitweb
-    rm -f /var/services/web/gitweb
-    rm -f /usr/syno/etc/sites-enabled-user/gitweb.apache2.conf
-
-    # Restart Apache
-    /usr/syno/etc/rc.d/S97apache-user.sh restart
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}` && kill -9 `cat ${DROPBEAR_PID_FILE}`
+    rm -f ${PID_FILE} ${DROPBEAR_PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` && [ -f ${DROPBEAR_PID_FILE} ] && kill -0 `cat ${DROPBEAR_PID_FILE}` > /dev/null 2>&1; then
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1 && [ -f ${DROPBEAR_PID_FILE} ] && kill -0 `cat ${DROPBEAR_PID_FILE}` > /dev/null 2>&1; then
         return
     fi
-    if ! `pidof git-daemon`; then
-        rm -f ${PID_FILE}
-    fi
-    if ! `pidof dropbear`; then
-        rm -f ${DROPBEAR_PID_FILE}
-    fi
+    rm -f ${PID_FILE} ${DROPBEAR_PID_FILE}
     return 1
 }
 

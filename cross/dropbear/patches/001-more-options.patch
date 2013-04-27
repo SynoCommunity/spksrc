@@ -1,0 +1,24 @@
+--- options.h.orig	2013-03-21 16:29:35.000000000 +0100
++++ options.h	2013-04-27 23:42:13.000000000 +0200
+@@ -289,7 +289,9 @@
+ #define DEFAULT_IDLE_TIMEOUT 0
+ 
+ /* The default path. This will often get replaced by the shell */
++#ifndef DEFAULT_PATH
+ #define DEFAULT_PATH "/usr/bin:/bin"
++#endif
+ 
+ /* Some other defines (that mostly should be left alone) are defined
+  * in sysoptions.h */
+--- options.h.orig	2013-04-28 00:23:25.000000000 +0200
++++ options.h	2013-04-28 00:23:53.000000000 +0200
+@@ -252,7 +252,9 @@
+ 
+ /* This is used by the scp binary when used as a client binary. If you're
+  * not using the Dropbear client, you'll need to change it */
++#ifndef _PATH_SSH_PROGRAM
+ #define _PATH_SSH_PROGRAM "/usr/bin/dbclient"
++#endif
+ 
+ /* Whether to log commands executed by a client. This only logs the 
+  * (single) command sent to the server, not what a user did in a 
