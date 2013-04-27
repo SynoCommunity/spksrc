@@ -7,21 +7,21 @@ DNAME="GateOne"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 GATEONE="${INSTALL_DIR}/gateone/gateone.py"
 CFG_FILE="${INSTALL_DIR}/var/server.conf"
 PID_FILE="${INSTALL_DIR}/var/gateone.pid"
-RUNAS="gateone"
+USER="gateone"
 
 
 start_daemon ()
 {
     # Copy certificate
     cp  /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
-    chown ${RUNAS} ${INSTALL_DIR}/ssl/*
+    chown ${USER} ${INSTALL_DIR}/ssl/*
 
-    su - ${RUNAS} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} > ${INSTALL_DIR}/var/gateone_startup.log &"
+    su - ${USER} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} > ${INSTALL_DIR}/var/gateone_startup.log &"
 }
 
 stop_daemon ()
