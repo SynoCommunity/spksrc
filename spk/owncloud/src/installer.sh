@@ -57,10 +57,11 @@ postinst ()
     # Setup database and autoconfig file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud:=owncloud}';"
-        sed -i -e "s/@admin_username@/${wizard_owncloud_admin_username:=admin}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
-        sed -i -e "s/@admin_password@/${wizard_owncloud_admin_password:=admin}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
-        sed -i -e "s/@db_password@/${wizard_mysql_password_owncloud:=owncloud}/g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
-        sed -i -e "s#@directory@#${wizard_owncloud_datadirectory:=/volume1/owncloud}#g" ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
+        sed -i -e "s/@admin_username@/${wizard_owncloud_admin_username:=admin}/g" \
+               -e "s/@admin_password@/${wizard_owncloud_admin_password:=admin}/g" \
+               -e "s/@db_password@/${wizard_mysql_password_owncloud:=owncloud}/g" \
+               -e "s#@directory@#${wizard_owncloud_datadirectory:=/volume1/owncloud}#g" \
+               ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
     fi
 
     # Fix permissions
@@ -86,9 +87,7 @@ preuninst ()
 postuninst ()
 {
     # Remove open_basedir configuration
-    if [ -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf ]; then
-        rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-    fi
+    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove link
     rm -f ${INSTALL_DIR}

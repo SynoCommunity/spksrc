@@ -1,5 +1,5 @@
 [{
-    "step_title": "Configuration de ownCloud",
+    "step_title": "Configuration de la base de donnée d'ownCloud",
     "items": [{
         "type": "password",
         "desc": "Saisissez votre mot de passe MySQL.",
@@ -16,33 +16,33 @@
         }]
     }]
 }, {
-    "step_title": "ownCloud admin configuration",
+    "step_title": "Configuration de l'administrateur d'ownCloud",
     "items": [{
         "type": "textfield",
-        "desc": "Administrator's login. Defaults to admin",
+        "desc": "Nom d'utilisateur de l'administrateur. admin par défaut",
         "subitems": [{
             "key": "wizard_owncloud_admin_username",
-            "desc": "User name",
+            "desc": "Nom d'utilisateur",
             "validator": {
                 "allowBlank": false
             }
         }]
     }, {
         "type": "password",
-        "desc": "Administrator's password. Defaults to admin",
+        "desc": "Mot de passe de l'administrateur. admin par défaut",
         "subitems": [{
             "key": "wizard_owncloud_admin_password",
-            "desc": "Password",
+            "desc": "Mot de passe",
             "validator": {
                 "allowBlank": false
             }
         }]
     }, {
         "type": "textfield",
-        "desc": "ownCloud data directory",
+        "desc": "Répertoire de données d'ownCloud",
         "subitems": [{
             "key": "wizard_owncloud_datadirectory",
-            "desc": "Directory",
+            "desc": "Répertoire",
             "defaultValue": "/volume1/owncloud",
             "validator": {
                 "allowBlank": false,
