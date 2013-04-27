@@ -1,0 +1,5 @@
+bin:bin/dbclient
+bin:bin/dropbearconvert
+bin:bin/dropbearkey
+bin:bin/scp
+bin:sbin/dropbear
