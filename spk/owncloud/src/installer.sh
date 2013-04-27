@@ -86,11 +86,11 @@ preuninst ()
 
 postuninst ()
 {
-    # Remove open_basedir configuration
-    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-
     # Remove link
     rm -f ${INSTALL_DIR}
+
+    # Remove open_basedir configuration
+    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
