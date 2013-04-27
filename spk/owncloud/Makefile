@@ -12,7 +12,6 @@ ADMIN_URL = /owncloud/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = ownCloud
-BETA = 1
 
 HOMEPAGE   = http://owncloud.org/
 LICENSE    = AGPL
