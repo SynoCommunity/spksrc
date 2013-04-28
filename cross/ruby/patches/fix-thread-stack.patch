@@ -1,0 +1,10 @@
+--- thread_pthread.c.orig	2013-01-23 05:39:02.000000000 +0100
++++ thread_pthread.c	2013-04-28 08:24:50.852015021 +0200
+@@ -648,6 +648,7 @@
+     /* it should be on co-routine (alternative stack). [Feature #2294] */
+     {
+ 	void *start, *end;
++    STACK_GROW_DIR_DETECTION;
+ 
+ 	if (IS_STACK_DIR_UPPER()) {
+ 	    start = native_main_thread.stack_start;
