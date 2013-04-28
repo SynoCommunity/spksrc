@@ -1,6 +1,6 @@
 SPK_NAME = bitlbee
 SPK_VERS = 3.2
-SPK_REV = 6
+SPK_REV = 8
 SPK_ICON = src/bitlbee.png
 DSM_UI_DIR = app
 
