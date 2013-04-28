@@ -12,6 +12,7 @@ ADMIN_URL = /roundcube/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Roundcube Webmail
+BETA = 1
 
 HOMEPAGE   = http://www.roundcube.net/
 LICENSE    = GPLv3
