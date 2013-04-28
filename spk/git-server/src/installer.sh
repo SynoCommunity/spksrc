@@ -9,7 +9,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 GIT_DIR="/usr/local/git"
 WEB_DIR="/var/services/web"
-PATH="${INSTALL_DIR}/bin:${GIT_DIR}/bin:${PATH}"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/sbin:${GIT_DIR}/bin:${PATH}"
 USER="git-server"
 GROUP="nobody"
 
@@ -40,13 +40,15 @@ postinst ()
     ln -s ${INSTALL_DIR}/etc/gitweb.conf /usr/syno/etc/sites-enabled-user/gitweb.conf
 
     # Generate keys
-    dropbearkey -t rsa -f ${INSTALL_DIR}/etc/dropbear_rsa_host_key
-    dropbearkey -t dss -f ${INSTALL_DIR}/etc/dropbear_dss_host_key
+    dropbearkey -t rsa -f ${INSTALL_DIR}/var/dropbear_rsa_host_key > /dev/null 2>&1
+    dropbearkey -t dss -f ${INSTALL_DIR}/var/dropbear_dss_host_key > /dev/null 2>&1
 
     # Setup gitolite
-    echo "${wizard_public_key}" > ${INSTALL_DIR}/var/admin.pub
-    ${INSTALL_DIR}/share/gitolite/install -to ${INSTALL_DIR}/bin
-    su - ${USER} -c "${INSTALL_DIR}/bin/gitolite setup -pk admin.pub"
+    if [ ! -z "${wizard_public_key}" ]; then
+        echo "${wizard_public_key}" > ${INSTALL_DIR}/var/admin.pub
+        ${INSTALL_DIR}/share/gitolite/install -to ${INSTALL_DIR}/bin
+        su - ${USER} -c "${INSTALL_DIR}/bin/gitolite setup -pk admin.pub"
+    fi
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -91,7 +93,6 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
-    mv ${INSTALL_DIR}/etc ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -100,9 +101,7 @@ postupgrade ()
 {
     # Restore some stuff
     rm -fr ${INSTALL_DIR}/var
-    rm -fr ${INSTALL_DIR}/etc
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
-    mv ${TMP_DIR}/${PACKAGE}/etc ${INSTALL_DIR}/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
