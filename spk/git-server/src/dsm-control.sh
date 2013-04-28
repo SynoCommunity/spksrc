@@ -7,8 +7,8 @@ DNAME="Git Server"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 GIT_DIR="/usr/local/git"
-PATH="${INSTALL_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="git"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/sbin:${GIT_DIR}/bin:${PATH}"
+USER="git-server"
 DROPBEAR_PID_FILE="${INSTALL_DIR}/var/dropbear.pid"
 PID_FILE="${INSTALL_DIR}/var/git-daemon.pid"
 LOG_FILE="${INSTALL_DIR}/var/git-daemon.log"
@@ -17,24 +17,32 @@ BASE_PATH="${INSTALL_DIR}/var/repositories"
 start_daemon ()
 {
     su - ${USER} -c "${GIT_DIR}/bin/git daemon --base-path=${BASE_PATH} --pid-file=${PID_FILE} --reuseaddr --verbose --detach ${BASE_PATH}"
-    LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${INSTALL_DIR}/sbin/dropbear -w -s -j -k -p 8352
+    dropbear -r ${INSTALL_DIR}/var/dropbear_rsa_host_key -d ${INSTALL_DIR}/var/dropbear_dss_host_key -w -s -j -k -p 8352 -P ${DROPBEAR_PID_FILE}
 }
 
 stop_daemon ()
 {
     kill `cat ${PID_FILE}`
     kill `cat ${DROPBEAR_PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}` && kill -9 `cat ${DROPBEAR_PID_FILE}`
+    wait_for_status 1 20
+    if [ $? -eq 1 ]; then
+        kill -9 `cat ${PID_FILE}`
+        kill -9 `cat ${DROPBEAR_PID_FILE}`
+    fi
     rm -f ${PID_FILE} ${DROPBEAR_PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1 && [ -f ${DROPBEAR_PID_FILE} ] && kill -0 `cat ${DROPBEAR_PID_FILE}` > /dev/null 2>&1; then
-        return
+    GITDAEMON_RUNNING=0
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        GITDAEMON_RUNNING=1
     fi
-    rm -f ${PID_FILE} ${DROPBEAR_PID_FILE}
-    return 1
+    DROPBEAR_RUNNING=0
+    if [ -f ${DROPBEAR_PID_FILE} ] && kill -0 `cat ${DROPBEAR_PID_FILE}` > /dev/null 2>&1; then
+        DROPBEAR_RUNNING=1
+    fi
+    [ ${GITDAEMON_RUNNING} -eq 1 -a ${DROPBEAR_RUNNING} -eq 1 ] || return 1
 }
 
 wait_for_status ()
