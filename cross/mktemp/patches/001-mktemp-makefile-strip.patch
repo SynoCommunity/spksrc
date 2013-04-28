@@ -1,0 +1,11 @@
+--- Makefile.in.orig	2013-04-25 15:18:36.099349720 +0200
++++ Makefile.in	2013-04-25 15:18:50.731849776 +0200
+@@ -95,7 +95,7 @@
+ 	    $(DESTDIR)$(mandir)/man1
+ 
+ install-binaries: $(PROG)
+-	$(INSTALL) -m 0555 -s $(PROG) $(DESTDIR)$(bindir)/$(PROG)
++	$(INSTALL) -m 0555 $(PROG) $(DESTDIR)$(bindir)/$(PROG)
+ 
+ install-man:
+ 	$(INSTALL) -m 0444 $(srcdir)/mktemp.$(mantype) \
