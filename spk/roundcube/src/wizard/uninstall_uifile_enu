@@ -1,0 +1,18 @@
+[{
+	"step_title": "Remove Roundcube database",
+	"items": [{
+		"type": "multiselect",
+		"desc": "If you remove the roundcube database, mailboxes settings and contacts will be deleted.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove roundcube database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Enter your MySQL password to remove the roundcube database.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Root password"
+		}]
+	}]
+}]
