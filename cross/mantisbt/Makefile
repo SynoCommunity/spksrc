@@ -25,3 +25,5 @@ include ../../mk/spksrc.cross-cc.mk
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/mantisbt
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/mantisbt
+	chmod -R 755 $(STAGING_INSTALL_PREFIX)/share/mantisbt
+	chmod 777 $(STAGING_INSTALL_PREFIX)/share/mantisbt
