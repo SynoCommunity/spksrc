@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://git-core.googlecode.com/files
 
-DEPENDS = cross/expat cross/zlib cross/openssl cross/curl cross/busybox
+DEPENDS = cross/expat cross/zlib cross/openssl cross/curl
 
 HOMEPAGE = http://git-scm.com/
 COMMENT  = Git is a free & open source, distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
@@ -17,11 +17,7 @@ CONFIGURE_ARGS  = --without-tcltk --without-python ac_cv_fread_reads_directories
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
 
-BUSYBOX_CONFIG = tr usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: myInstall
 myInstall:
