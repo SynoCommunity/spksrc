@@ -14,5 +14,10 @@ LICENSE  = LGPL
 CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX) ac_cv_sys_symbol_underscore=no
 GNU_CONFIGURE = 1
 
+POST_INSTALL_TARGET = myPostInstall
+
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: myPostInstall
+myPostInstall:
+	sed -i -e 's|^prefix=$(INSTALL_PREFIX)$$|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/bin/libgcrypt-config
