@@ -2,7 +2,7 @@
 	"step_title": "Remove selfoss database",
 	"items": [{
 		"type": "multiselect",
-		"desc": "If you remove the ttrss database, all feeds will be deleted.",
+		"desc": "If you remove the selfoss database, all feeds will be deleted.",
 		"subitems": [{
 			"key": "wizard_remove_database",
 			"desc": "Remove selfoss database"
