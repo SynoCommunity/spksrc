@@ -14,6 +14,4 @@ LICENSE  = LGPL
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = gl_cv_func_gettimeofday_clobber=no
 
-
 include ../../mk/spksrc.cross-cc.mk
-

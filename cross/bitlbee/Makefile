@@ -11,7 +11,7 @@ HOMEPAGE = http://www.bitlbee.org/
 COMMENT  = BitlBee brings IM (instant messaging) to IRC clients. It\'s a great solution for people who have an IRC client running all the time and don\'t want to run an additional MSN/AIM/whatever client
 LICENSE  =
 
-POST_CONFIGURE_TARGET = myPostConfigure
+CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
 
 GNU_CONFIGURE = 1
@@ -21,10 +21,10 @@ CONFIGURE_ARGS += --config=$(INSTALL_PREFIX)/var/
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Fix bitlbee ldflags
-.PHONY: myPostConfigure
-myPostConfigure:
-	sed -i -e 's|LDFLAGS_BITLBEE=-pie|LDFLAGS_BITLBEE=-pie $(LDFLAGS) -lgcrypt|' $(WORK_DIR)/$(PKG_DIR)/Makefile.settings
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH ./configure $(REAL_CONFIGURE_ARGS)
+	@echo "LDFLAGS_BITLBEE+=\$$(LDFLAGS)" >> $(WORK_DIR)/$(PKG_DIR)/Makefile.settings
 
 .PHONY: myInstall
 myInstall:
