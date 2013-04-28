@@ -52,6 +52,9 @@ postinst ()
         sed -i -e "s/@password@/${wizard_mysql_password_mantisbt:=mantisbt}/g" ${WEB_DIR}/${PACKAGE}/config_inc.php
     fi
 
+    # Fix permissions
+    chmod 755 ${WEB_DIR}/${PACKAGE}/
+
     # Install/upgrade database
     sed -i -e "s/gpc_get_int( 'install', 0 );/gpc_get_int( 'install', 2 );/g" ${WEB_DIR}/${PACKAGE}/admin/install.php
     php ${WEB_DIR}/${PACKAGE}/admin/install.php > /dev/null
