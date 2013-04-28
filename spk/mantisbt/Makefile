@@ -1,5 +1,5 @@
 SPK_NAME = mantisbt
-SPK_VERS = 1.2.14
+SPK_VERS = 1.2.15
 SPK_REV = 1
 SPK_ICON = src/mantisbt.png
 DSM_UI_DIR = app
