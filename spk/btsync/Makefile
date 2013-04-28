@@ -11,7 +11,6 @@ DESCRIPTION = Automatically sync files via secure, distributed technology.
 ADMIN_PORT = 8888
 RELOAD_UI = yes
 DISPLAY_NAME = BitTorrent Sync
-BETA = 1
 
 HOMEPAGE   = http://labs.bittorrent.com/experiments/sync.html
 LICENSE    =
