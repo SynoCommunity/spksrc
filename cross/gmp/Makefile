@@ -1,5 +1,5 @@
 PKG_NAME = gmp
-PKG_VERS = 5.0.5
+PKG_VERS = 5.1.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.gmplib.org/pub/$(PKG_NAME)-$(PKG_VERS)
