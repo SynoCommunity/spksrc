@@ -1,0 +1,14 @@
+bin:bin/gunzip
+bin:bin/gzexe
+bin:bin/gzip
+bin:bin/uncompress
+bin:bin/zcat
+bin:bin/zcmp
+bin:bin/zdiff
+bin:bin/zegrep
+bin:bin/zfgrep
+bin:bin/zforce
+bin:bin/zgrep
+bin:bin/zless
+bin:bin/zmore
+bin:bin/znew
