@@ -44,21 +44,18 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     rm -fr ${WEB_DIR}/${PACKAGE}/installer
 
-    # Setup database and configuration file
+    # Setup database and configuration files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_roundcube}';"
         ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_roundcube}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/SQL/mysql.initial.sql
-
-        cp ${WEB_DIR}/${PACKAGE}/config/db.inc.php.dist ${WEB_DIR}/${PACKAGE}/config/db.inc.php
-        sed -i "s|^\(\$rcmail_config\['db_dsnw'\] =\).*$|\1 \'mysqli://roundcube:${wizard_mysql_password_roundcube}@localhost/roundcube\';|" ${WEB_DIR}/${PACKAGE}/config/db.inc.php
-
-        cp ${WEB_DIR}/${PACKAGE}/config/main.inc.php.dist ${WEB_DIR}/${PACKAGE}/config/main.inc.php
-        sed -i -e "s|^\(\$rcmail_config\['default_host'\] =\).*$|\1 \'${wizard_roundcube_default_host}\';|" \
-               -e "s|^\(\$rcmail_config\['smtp_server'\] =\).*$|\1 \'${wizard_roundcube_smtp_server}\';|" \
-               -e "s|^\(\$rcmail_config\['smtp_port'\] =\).*$|\1 \'${wizard_roundcube_smtp_port:=25}\';|" \
-               -e "s|^\(\$rcmail_config\['smtp_user'\] =\).*$|\1 \'${wizard_roundcube_smtp_user}\';|" \
-               -e "s|^\(\$rcmail_config\['smtp_pass'\] =\).*$|\1 \'${wizard_roundcube_smtp_pass}\';|" \
-               ${WEB_DIR}/${PACKAGE}/config/main.inc.php
+        sed "s|^\(\$rcmail_config\['db_dsnw'\] =\).*$|\1 \'mysqli://roundcube:${wizard_mysql_password_roundcube}@localhost/roundcube\';|" \
+            ${WEB_DIR}/${PACKAGE}/config/db.inc.php.dist > ${WEB_DIR}/${PACKAGE}/config/db.inc.php
+        sed -e "s|^\(\$rcmail_config\['default_host'\] =\).*$|\1 \'${wizard_roundcube_default_host}\';|" \
+            -e "s|^\(\$rcmail_config\['smtp_server'\] =\).*$|\1 \'${wizard_roundcube_smtp_server}\';|" \
+            -e "s|^\(\$rcmail_config\['smtp_port'\] =\).*$|\1 \'${wizard_roundcube_smtp_port:=25}\';|" \
+            -e "s|^\(\$rcmail_config\['smtp_user'\] =\).*$|\1 \'${wizard_roundcube_smtp_user}\';|" \
+            -e "s|^\(\$rcmail_config\['smtp_pass'\] =\).*$|\1 \'${wizard_roundcube_smtp_pass}\';|" \
+            ${WEB_DIR}/${PACKAGE}/config/main.inc.php.dist > ${WEB_DIR}/${PACKAGE}/config/main.inc.php
     fi
 
     # Fix permissions
