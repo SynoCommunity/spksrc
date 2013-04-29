@@ -23,12 +23,6 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Install busybox stuff
-    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
-
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
-
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
@@ -39,12 +33,6 @@ preuninst ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
-
-    # Remove the user (if not upgrading)
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        delgroup ${USER} ${GROUP}
-        deluser ${USER}
-    fi
 
     exit 0
 }

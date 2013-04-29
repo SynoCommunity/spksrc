@@ -16,10 +16,8 @@ case $1 in
 	exit 0
        ;;
     log)
-	echo "${INSTALL_DIR}/install.log"
         exit 0
         ;;
     *)
-        exit 1
         ;;
 esac
