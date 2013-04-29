@@ -12,6 +12,6 @@ COMMENT    = Ruby Programming Language
 LICENSE    =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-install-doc
+CONFIGURE_ARGS = --disable-install-doc --prefix=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.native-cc.mk
