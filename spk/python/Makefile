@@ -18,7 +18,6 @@ RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
 CHANGELOG = "1. Update python to 2.7.4\n2. Update modules"
-BETA = 1
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
