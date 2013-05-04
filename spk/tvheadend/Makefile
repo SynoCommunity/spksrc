@@ -1,6 +1,6 @@
 SPK_NAME = tvheadend
-SPK_VERS = 3.2.18
-SPK_REV = 4
+SPK_VERS = 3.4
+SPK_REV = 5
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Tvheadend est un serveur de streaming pour linux gérant les s
 ADMIN_PORT = 9981
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
-CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
+CHANGELOG = "Update to version 3.4"
 
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
 LICENSE  =
