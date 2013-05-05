@@ -9,9 +9,9 @@ TC_BASE_DIR = soft
 TC_PREFIX = arm-marvell-linux-gnueabi
 TC_TARGET = arm-marvell-linux-gnueabi
 
-TC_CFLAGS =
-TC_CPPFLAGS =
-TC_CXXFLAGS =
+TC_CFLAGS = -mcpu=marvell-pj4 -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp
+TC_CPPFLAGS = -mcpu=marvell-pj4 -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp
+TC_CXXFLAGS = -mcpu=marvell-pj4 -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp
 TC_LDFLAGS =
 
 include ../../mk/spksrc.tc.mk
