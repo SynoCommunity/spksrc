@@ -1,5 +1,5 @@
 PKG_NAME = cops
-PKG_VERS = 0.3.4
+PKG_VERS = 0.4.0
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://blog.slucas.fr/_media/en/oss/
