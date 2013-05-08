@@ -17,7 +17,7 @@ COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
 
 # Define BTSYNC_ARCH as per BitTorrent Sync standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),88f5281 88f6281 armada370),$(ARCH))
 BTSYNC_ARCH = arm
 endif
 ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x ppc854x),$(ARCH))
