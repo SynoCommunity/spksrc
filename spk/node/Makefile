@@ -1,6 +1,6 @@
 SPK_NAME = node
-SPK_VERS = 0.10.5
-SPK_REV = 2
+SPK_VERS = 0.10.6
+SPK_REV = 1
 SPK_ICON = src/nodejs.png
 
 DEPENDS  = cross/$(SPK_NAME)
