@@ -1,0 +1,33 @@
+[{
+    "step_title": "Horde database configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'horde' MySQL user and database will be created. Please enter a password for the 'horde' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_horde",
+            "desc": "Horde password"
+        }]
+    }]
+}, {
+    "step_title": "Horde application installation",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Select what Edition to install:",
+        "subitems": [{
+            "key": "wizard_horde_edition_groupware",
+            "desc": "Groupware (calendar, contacts, tasks, notes)",
+            "defaultValue": false
+        }, {
+            "key": "wizard_horde_edition_webmail",
+            "desc": "Webmail (everything from Groupware, email)",
+            "defaultValue": true
+        }]
+    }]
+}]
