@@ -100,13 +100,16 @@ postinst ()
             "\n\$conf['sql']['port'] = 3306;" \
             "\n\$conf['sql']['protocol'] = 'tcp';" \
             "\n\$conf['sql']['database'] = '${MYSQL_DATABASE}';" \
-            "\n\$conf['sql']['phptype'] = 'mysql';" >> ${WEB_DIR}/${PACKAGE}/config/conf.php
+            "\n\$conf['sql']['phptype'] = 'mysql';" \
+            "\n\$conf['share']['driver'] = 'Sqlng';" \
+            "\n\$conf['group']['driver'] = 'Sql';" >> ${WEB_DIR}/${PACKAGE}/config/conf.php
       fi && \
 
       # Fix permissions
       chmod -R 777 ${WEB_DIR}/${PACKAGE} && \
 
-      # Create/update database tables
+      # Create/update database tables (second run creates last two table)
+      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
       PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
 
       # Remove temporary page
