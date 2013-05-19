@@ -49,7 +49,7 @@ postinst ()
     fi
 
     # Configure Apache variables
-    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nSetEnv PHP_PEAR_SYSCONF_DIR ${INSTALL_DIR}/etc\nphp_value include_path \".:${INSTALL_DIR}/share/pear\"\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nSetEnv PHP_PEAR_SYSCONF_DIR ${INSTALL_DIR}/etc\nphp_value include_path \".:${INSTALL_DIR}/share/pear\"\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Create Pear config
     ${INSTALL_DIR}/bin/pear config-create ${INSTALL_DIR}/share ${INSTALL_DIR}/etc/pear.conf > /dev/null
