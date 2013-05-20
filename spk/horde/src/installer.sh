@@ -109,8 +109,8 @@ postinst ()
       chmod -R 777 ${WEB_DIR}/${PACKAGE} && \
 
       # Create/update database tables (second run creates last two table)
-      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
-      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
+      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
+      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
 
       # Remove temporary page
       rm ${WEB_DIR}/${PACKAGE}/index.html &
