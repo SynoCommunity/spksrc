@@ -81,6 +81,9 @@ preuninst ()
         exit 1
     fi
 
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
@@ -105,6 +108,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Save the configuration file and data
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
