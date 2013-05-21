@@ -6,6 +6,7 @@ DNAME="Horde"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status" 
 WEB_DIR="/var/services/web"
 USER="nobody"
 MYSQL="/usr/syno/mysql/bin/mysql"
@@ -126,6 +127,9 @@ preuninst ()
         exit 1
     fi
 
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
@@ -150,6 +154,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null 
+
     # Save configuration files
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
