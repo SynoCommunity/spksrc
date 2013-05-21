@@ -16,9 +16,6 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
