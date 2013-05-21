@@ -1,0 +1,12 @@
+[{
+	"step_title": "WARNING!",
+	"items": [{
+		"desc": "I decided NOT to include the 'config' folder in the backup process, as people are unlikely to upgrade these individually. So if you have any custom configs, please back them up before continuing!"
+	}]
+},
+{
+	"step_title": "Fetching the latest version",
+	"items": [{
+		"desc": "This package will now try to fetch the latest version of Tekkit Lite from the server. If this fails, you can download the file manually and place it in the /public share. Please be patient, this may take a while."
+	}]
+}]

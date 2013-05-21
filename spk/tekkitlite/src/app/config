@@ -1,0 +1,12 @@
+{
+	".url": {
+		"org.page81.tekkitlite": {
+			"type": "legacy",
+			"allUsers": "false",
+			"title": "Tekkit Lite",
+			"desc": "Admin console for Tekkit Lite",
+			"icon": "icons/icon_{0}.png",
+			"url": "3rdparty/tekkitlite/index.cgi"
+		}
+	}
+}

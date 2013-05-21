@@ -8,3 +8,4 @@ toolchains/*/work*
 local.mk
 *.DS_Store
 *~
+Thumbs.db
