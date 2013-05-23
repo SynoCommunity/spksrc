@@ -47,6 +47,9 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
     # Install the web interface
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
