@@ -89,6 +89,8 @@ postinst ()
         else
             echo "webmail" > ${INSTALL_DIR}/var/edition
         fi
+    else
+        mv ${TMP_DIR}/${PACKAGE}/edition ${INSTALL_DIR}/var
     fi
 
     edition=`cat ${INSTALL_DIR}/var/edition`
@@ -163,6 +165,9 @@ preupgrade ()
     # Save configuration files
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
+
+    # Save package edition config
+    mv ${INSTALL_DIR}/var/edition ${TMP_DIR}/${PACKAGE}
 
     # Save main Horde config
     mv ${WEB_DIR}/${PACKAGE}/config/conf.php ${TMP_DIR}/${PACKAGE}/
