@@ -49,5 +49,5 @@ horde_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

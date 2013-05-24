@@ -94,7 +94,7 @@ postinst ()
     edition=`cat ${INSTALL_DIR}/var/edition`
 
     # Launch main installation in the background
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf install -a -B -f horde/$edition > /root/horde.txt && \
+    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf install -a -B -f horde/$edition > $(INSTALL_DIR)/var/install.log 2>&1 && \
 
       if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
           cp ${WEB_DIR}/${PACKAGE}/config/conf.php.dist ${WEB_DIR}/${PACKAGE}/config/conf.php && \
@@ -113,8 +113,8 @@ postinst ()
       chmod -R 777 ${WEB_DIR}/${PACKAGE} && \
 
       # Create/update database tables (second run creates last two table)
-      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
-      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate > /dev/null && \
+      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1 && \
+      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1 && \
 
       # Remove temporary page
       rm ${WEB_DIR}/${PACKAGE}/index.html &
@@ -170,7 +170,7 @@ preupgrade ()
     # Save other apps configs
     cd ${WEB_DIR}/${PACKAGE} && for file in */config/conf.php; do
         if [ ! -f ${WEB_DIR}/${PACKAGE}/$file ]; then 
-            break
+            continue
         fi
         dir=$(dirname $file)
         mkdir -p ${TMP_DIR}/${PACKAGE}/$dir
@@ -189,7 +189,7 @@ postupgrade ()
     # Restore other apps configs
     cd ${TMP_DIR}/${PACKAGE} && for file in */config/conf.php; do
         if [ ! -f ${TMP_DIR}/${PACKAGE}/$file ]; then 
-            break
+            continue
         fi
         dir=$(dirname $file)
         mkdir -p ${WEB_DIR}/${PACKAGE}/$dir
