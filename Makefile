@@ -54,6 +54,12 @@ downloads:
 	    (cd $${dl} && $(MAKE) download) ; \
 	done
 
+natives:
+	@for n in $(dir $(wildcard native/*/Makefile)) ; \
+	do \
+	    (cd $${n} && $(MAKE)) ; \
+	done
+
 .PHONY: toolchains kernel-modules
 toolchains: $(addprefix toolchain-,$(SUPPORTED_ARCHS))
 kernel-modules: $(addprefix kernel-,$(SUPPORTED_ARCHS))
