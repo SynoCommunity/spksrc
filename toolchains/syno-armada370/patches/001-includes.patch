@@ -20,11 +20,6 @@
  
  #ifdef __KERNEL__
  
---- /dev/null	2013-05-08 22:39:14.325643179 +0200
-+++ arm-marvell-linux-gnueabi/libc/include/linux/version.h	2012-01-16 10:49:18.000000000 +0100
-@@ -0,0 +1,2 @@
-+#define LINUX_VERSION_CODE 132646
-+#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 --- arm-marvell-linux-gnueabi/libc/include/asm-generic/int-ll64.h.orig	2013-05-02 14:24:09.000000000 +0200
 +++ arm-marvell-linux-gnueabi/libc/include/asm-generic/int-ll64.h	2013-05-09 00:00:41.000000000 +0200
 @@ -8,7 +8,7 @@
