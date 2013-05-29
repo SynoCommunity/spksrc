@@ -38,7 +38,7 @@
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -588,7 +589,7 @@
+@@ -593,7 +594,7 @@
  $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
  		@$(MKDIR_P) Include
  		$(MAKE) $(PGEN)

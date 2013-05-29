@@ -1,6 +1,6 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
-SPK_VERS =$(SPK_SHORT_VERS).4
+SPK_VERS =$(SPK_SHORT_VERS).5
 SPK_REV = 6
 SPK_ICON = src/python.png
 
@@ -17,7 +17,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update python to 2.7.4\n2. Update modules"
+CHANGELOG = "1. Update python to 2.7.5\n2. Update modules"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =

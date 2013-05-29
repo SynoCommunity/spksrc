@@ -37,7 +37,7 @@ include ../../mk/spksrc.tc-fix.mk
 all: fix
 
 
-TOOLS = ld cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
+TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
 
 CFLAGS += $(TC_CFLAGS)
 CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
@@ -61,7 +61,7 @@ tc_vars: patch
 	do \
 	  target=`echo $${tool} | sed 's/\(.*\):\(.*\)/\1/'` ; \
 	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
-	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=$(WORK_DIR)/$(TC_BASE_DIR)/bin/$(TC_PREFIX)-$${source} ; \
+	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=\"$(WORK_DIR)/$(TC_BASE_DIR)/bin/$(TC_PREFIX)-$${source}\" ; \
 	done
 	@echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\)\"
 	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\"
