@@ -1,5 +1,5 @@
 PKG_NAME = lxml
-PKG_VERS = 3.1.2
+PKG_VERS = 3.2.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/l/$(PKG_NAME)
