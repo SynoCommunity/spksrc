@@ -47,6 +47,9 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
     # Install the web interface
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
@@ -81,6 +84,9 @@ preuninst ()
         exit 1
     fi
 
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     exit 0
 }
 
@@ -105,6 +111,9 @@ postuninst ()
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
     # Save the configuration file and data
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
