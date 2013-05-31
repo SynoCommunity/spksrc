@@ -1,5 +1,5 @@
 PKG_NAME = git
-PKG_VERS = 1.8.2
+PKG_VERS = 1.8.3
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
