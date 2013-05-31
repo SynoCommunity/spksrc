@@ -1,8 +1,8 @@
 PKG_NAME = btsync
-PKG_VERS = 1.0.116
+PKG_VERS = 1.0.134
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)_$(BTSYNC_ARCH).$(PKG_EXT)
-PKG_DIST_SITE = http://btsync.s3-website-us-east-1.amazonaws.com
+PKG_DIST_NAME = $(PKG_NAME)_$(BTSYNC_ARCH)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://syncapp.bittorrent.com/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
@@ -20,7 +20,7 @@ INSTALL_TARGET = myInstall
 ifeq ($(findstring $(ARCH),88f5281 88f6281 armada370),$(ARCH))
 BTSYNC_ARCH = arm
 endif
-ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x ppc854x),$(ARCH))
+ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x),$(ARCH))
 BTSYNC_ARCH = powerpc
 endif
 ifeq ($(findstring $(ARCH),x86 cedarview bromolow),$(ARCH))
