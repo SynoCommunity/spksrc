@@ -1,11 +1,11 @@
 SPK_NAME = git-server
-SPK_VERS = 1.8.2
+SPK_VERS = 1.8.3
 SPK_REV = 1
 SPK_ICON = src/git-server.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/dropbear cross/mktemp cross/busybox
-SPK_DEPENDS = "git>1.8.1"
+SPK_DEPENDS = "git>1.8.2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Git Server turns your DiskStation into a powerfull server for the popular DSCM git. It supports git-daemon, a themed gitweb, gitolite and ssh through a dedicated daemon.
