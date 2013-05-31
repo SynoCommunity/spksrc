@@ -17,6 +17,7 @@ libexec:libexec/git-core/git-branch
 libexec:libexec/git-core/git-bundle
 libexec:libexec/git-core/git-cat-file
 libexec:libexec/git-core/git-check-attr
+libexec:libexec/git-core/git-check-ignore
 libexec:libexec/git-core/git-checkout
 libexec:libexec/git-core/git-checkout-index
 libexec:libexec/git-core/git-check-ref-format
