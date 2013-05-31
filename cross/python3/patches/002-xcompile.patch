@@ -1,14 +1,15 @@
---- configure.ac.orig	2012-09-29 10:00:50.000000000 +0200
-+++ configure.ac	2013-03-24 20:57:39.000000000 +0100
-@@ -50,12 +50,26 @@
+--- configure.ac.orig	2013-05-15 18:33:00.000000000 +0200
++++ configure.ac	2013-05-29 21:47:03.814282128 +0200
+@@ -68,6 +68,8 @@
  	fi
          AC_MSG_RESULT($interp)
- 	PYTHON_FOR_BUILD="_PYTHON_PROJECT_BASE=$srcdir"' _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(srcdir)/Lib:$(srcdir)/Lib/plat-$(MACHDEP) '$interp
+ 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
 +	else
 +	    AC_MSG_RESULT($PYTHON_FOR_BUILD)
      fi
- else
-     PYTHON_FOR_BUILD='./$(BUILDPYTHON) -E'
+ elif test "$cross_compiling" = maybe; then
+     AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
+@@ -76,6 +78,18 @@
  fi
  AC_SUBST(PYTHON_FOR_BUILD)
  
@@ -29,7 +30,7 @@
  dnl can cause trouble.
 --- Makefile.pre.in.orig	2012-09-29 10:00:41.000000000 +0200
 +++ Makefile.pre.in	2013-03-24 21:01:08.000000000 +0100
-@@ -239,6 +239,7 @@
+@@ -249,6 +249,7 @@
  ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
@@ -37,7 +38,7 @@
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -640,7 +641,7 @@
+@@ -669,7 +670,7 @@
  $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
  		@$(MKDIR_P) Include
  		$(MAKE) $(PGEN)
@@ -46,14 +47,3 @@
  $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
  		$(MAKE) $(GRAMMAR_H)
  		touch $(GRAMMAR_C)
---- setup.py.orig	2012-09-29 10:00:50.000000000 +0200
-+++ setup.py	2013-03-24 21:15:49.000000000 +0100
-@@ -514,6 +514,8 @@
-         # lib_dirs and inc_dirs are used to search for files;
-         # if a file is found in one of those directories, it can
-         # be assumed that no additional -I,-L directives are needed.
-+        lib_dirs = self.compiler.library_dirs
-+        inc_dirs = self.compiler.include_dirs
-         if not cross_compiling:
-             lib_dirs = self.compiler.library_dirs + [
-                 '/lib64', '/usr/lib64',

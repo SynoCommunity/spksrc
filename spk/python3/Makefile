@@ -1,6 +1,6 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.3
-SPK_VERS = $(SPK_SHORT_VERS).0
+SPK_VERS = $(SPK_SHORT_VERS).2
 SPK_REV = 1
 SPK_ICON = src/python3.png
 
