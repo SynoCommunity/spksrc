@@ -71,6 +71,7 @@ all: install
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
 
+.PHONY: $(DIGESTS_FILE)
 $(DIGESTS_FILE):
 	@$(MSG) "Generating digests for $(PKG_NAME)"
 	@touch -f $@
