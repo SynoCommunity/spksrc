@@ -1,6 +1,8 @@
 PKG_NAME = python3
-PKG_SHORT_VERS = 3.3
-PKG_VERS = $(PKG_SHORT_VERS).0
+PKG_VERS_MAJOR = 3
+PKG_VERS_MINOR = 3
+PKG_VERS_PATCH = 2
+PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
@@ -14,6 +16,7 @@ COMMENT  = Python Programming Language
 LICENSE  =
 
 GNU_CONFIGURE = 1
+ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 CONFIGURE_ARGS  = --enable-shared --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 
@@ -21,7 +24,7 @@ POST_PATCH_TARGET = myPostPatch
 PRE_CONFIGURE_TARGET = myPreConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-POST_INSTALL_TARGET = $(WORK_DIR)/python-cc.mk
+POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -31,10 +34,11 @@ PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/p
 PGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
-HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_SHORT_VERS)
-PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PKG_SHORT_VERS)
-PYTHON_LIB_DIR = lib/python$(PKG_SHORT_VERS)
-PYTHON_INC_DIR = include/python$(PKG_SHORT_VERS)
+HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+PYTHON_LIB_NATIVE = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 
 .PHONY: myPostPatch
 myPostPatch:
@@ -56,11 +60,17 @@ myInstall:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
-$(WORK_DIR)/python-cc.mk: Makefile
+.PHONY: myPostInstall
+myPostInstall: $(WORK_DIR)/python-cc.mk
+	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
+	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/
+
+$(WORK_DIR)/python-cc.mk:
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
-	@echo PYTHON_INTERPRETER=$(INSTALL_PREFIX)/bin/python3 >> $@
-	@echo PYTHON_VERSION=$(PKG_SHORT_VERS) >> $@
+	@echo PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE) >> $@
+	@echo PYTHON_INTERPRETER=$(INSTALL_PREFIX)/bin/python >> $@
+	@echo PYTHON_VERSION=$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
 	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@
