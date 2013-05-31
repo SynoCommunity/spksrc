@@ -3,7 +3,7 @@ SPK_VERS = 1.8.3
 SPK_REV = 3
 SPK_ICON = src/git.png
 
-DEPENDS = cross/$(SPK_NAME) cross/busybox
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
