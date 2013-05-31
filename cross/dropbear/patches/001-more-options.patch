@@ -1,6 +1,6 @@
 --- options.h.orig	2013-03-21 16:29:35.000000000 +0100
 +++ options.h	2013-04-27 23:42:13.000000000 +0200
-@@ -289,7 +289,9 @@
+@@ -296,7 +296,9 @@
  #define DEFAULT_IDLE_TIMEOUT 0
  
  /* The default path. This will often get replaced by the shell */
@@ -12,7 +12,7 @@
   * in sysoptions.h */
 --- options.h.orig	2013-04-28 00:23:25.000000000 +0200
 +++ options.h	2013-04-28 00:23:53.000000000 +0200
-@@ -252,7 +252,9 @@
+@@ -259,7 +259,9 @@
  
  /* This is used by the scp binary when used as a client binary. If you're
   * not using the Dropbear client, you'll need to change it */
