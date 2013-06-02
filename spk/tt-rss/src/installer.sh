@@ -114,13 +114,21 @@ preupgrade ()
 
 postupgrade ()
 {
-    # Restore the configuration file if it has not been updated
-    old_config_version=$(grep 'CONFIG_VERSION' ${TMP_DIR}/${PACKAGE}/config.php | sed "s/define('CONFIG_VERSION', \([0-9]\+\));/\1/")
-    new_config_version=$(grep 'CONFIG_VERSION' ${WEB_DIR}/${PACKAGE}/config.php-dist | sed "s/define('CONFIG_VERSION', \([0-9]\+\));/\1/")
-    if [ ${old_config_version} -ne ${new_config_version} ]; then
-        echo "Configuration file web/${PACKAGE}/config.php needs to be updated manually. See web/${PACKAGE}/config.php-dist for changes to apply."
-    fi
-    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/
+    # Restore the configuration file
+    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config-bak.php
+    cp ${WEB_DIR}/${PACKAGE}/config.php-dist ${WEB_DIR}/${PACKAGE}/config.php
+
+    # Parse configuration and save to new config
+    while read line
+    do
+        key=`echo $line | sed -n "s|^define('\(.*\)',\(.*\));.*|\1|p"`
+        val=`echo $line | sed -n "s|^define('\(.*\)',\(.*\));.*|\2|p"`
+        if [ "$key" == "" ]; then
+            continue
+        fi
+        sed -i "s|define('$key', .*);|define('$key', $val);|g" ${WEB_DIR}/${PACKAGE}/config.php
+    done < ${WEB_DIR}/${PACKAGE}/config-bak.php
+
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
