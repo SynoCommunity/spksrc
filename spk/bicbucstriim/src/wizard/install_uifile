@@ -1,0 +1,6 @@
+[{
+    "step_title": "Warning!",
+    "items": [{
+        "desc": "In order for BicBucStriim to work, you have to add the path to your ebooks directory to the open_basedir. To do so, go to Control Panel > Web Services > PHP Settings."
+    }]
+}]
