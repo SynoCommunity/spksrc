@@ -1,0 +1,11 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Base directory. Defaults to /usr/local/apt-mirror/var/spool/apt-mirror",
+        "subitems": [{
+            "key": "wizard_base_dir",
+            "desc": "Base directory"
+        }]
+    }]
+}]

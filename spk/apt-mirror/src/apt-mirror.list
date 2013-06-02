@@ -1,0 +1,49 @@
+############# config ##################
+#
+set base_path           @wizard_base_dir@
+
+set mirror_path         $base_path/mirror
+set skel_path           $base_path/skel
+set var_path            $base_path/var
+set cleanscript         $var_path/clean.sh
+set defaultarch         i386
+
+set postmirror_script   $var_path/postmirror.sh
+set run_postmirror      0
+
+set nthreads            20
+set limit_rate          50k
+set _tilde              0
+#
+############# end config ##############
+
+# squeeze's section
+#deb http://ftp.de.debian.org/debian squeeze main contrib non-free
+#deb-src http://ftp.de.debian.org/debian squeeze main contrib non-free
+
+# this source required for network installation ability (udebs)
+deb http://ftp.de.debian.org/debian squeeze main/debian-installer
+
+# security updates is always good thing to install
+#deb http://security.debian.org/debian-security squeeze/updates main contrib non-free
+#deb-src http://security.debian.org/debian-security squeeze/updates main contrib non-free
+
+# squeeze-proposed-updates's section
+#deb http://ftp.de.debian.org/debian squeeze-proposed-updates main contrib non-free
+#deb-src http://ftp.de.debian.org/debian squeeze-proposed-updates main contrib non-free
+
+# mirror additional architectures
+#deb-alpha http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-amd64 http://ftp.de.debian.org/debian squeeze main contrib non-free
+#deb-armel http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-hppa http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-i386 http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-ia64 http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-m68k http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-mips http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-mipsel http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-powerpc http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-s390 http://ftp.de.debian.org/debian unstable main contrib non-free
+#deb-sparc http://ftp.de.debian.org/debian unstable main contrib non-free
+
+clean http://ftp.de.debian.org/debian
