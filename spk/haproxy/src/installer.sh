@@ -36,8 +36,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
-    rm -fr ${INSTALL_DIR}/var/build
+    ${INSTALL_DIR}/env/bin/pip install -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
 
     # Setup the database
     ${INSTALL_DIR}/env/bin/python ${INSTALL_DIR}/app/setup.py
