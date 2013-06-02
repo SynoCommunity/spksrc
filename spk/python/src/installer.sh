@@ -6,7 +6,7 @@ DNAME="Python"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 
 
 preinst ()
