@@ -7,12 +7,9 @@ DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Node.js is a platform built on Chrome\'s JavaScript runtime for easily building fast, scalable network applications.
-DESCRIPTION_FRE = Node.js is a platform built on Chrome\\\'s JavaScript runtime for easily building fast, scalable network applications.
+STARTABLE = no
 DISPLAY_NAME = Node.js
-
-ifneq ($(findstring $(ARCH),88f6281 bromolow cedarview x86),$(ARCH))
-$(error $(ARCH) is not a supported architecture)
-endif
+BETA = 1
 
 HOMEPAGE   = http://nodejs.org/
 LICENSE    = MIT
@@ -23,4 +20,3 @@ SSS_SCRIPT       = src/dsm-control.sh
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
-

@@ -6,11 +6,7 @@ DNAME="Node.js"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="node"
-GROUP="users"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 
 
 preinst ()
@@ -31,9 +27,6 @@ postinst ()
 
 preuninst ()
 {
-    # Stop the package
-    ${SSS} stop > /dev/null
-
     exit 0
 }
 
@@ -47,23 +40,10 @@ postuninst ()
 
 preupgrade ()
 {
-    # Stop the package
-    ${SSS} stop > /dev/null
-
-    # Save some stuff
-    rm -fr ${TMP_DIR}/${PACKAGE}
-    mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
-
     exit 0
 }
 
 postupgrade ()
 {
-    # Restore some stuff
-    rm -fr ${INSTALL_DIR}/var
-    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
-    rm -fr ${TMP_DIR}/${PACKAGE}
-
     exit 0
 }
