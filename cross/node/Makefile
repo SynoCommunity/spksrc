@@ -14,9 +14,13 @@ ENV += LINK.target=$(TC_PATH)$(TC_PREFIX)g++
 
 POST_INSTALL_TARGET = myPostInstall
 
+# Limit to supported archs
+ifneq ($(findstring $(ARCH),88f6281 bromolow cedarview x86),$(ARCH))
+$(error $(ARCH) is not a supported architecture)
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPostInstall
 myPostInstall:
 	sed -i -e 's|^#\!$(STAGING_INSTALL_PREFIX)|#\!$(INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/lib/node_modules/npm/bin/npm-cli.js
-
