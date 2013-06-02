@@ -22,8 +22,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install the bundle
-    ${PIP} install -b ${INSTALL_DIR}/var/build -U ${INSTALL_DIR}/share/Dobby/requirements.pybundle > /dev/null
-    rm -fr ${INSTALL_DIR}/var/build
+    ${PIP} install -U ${INSTALL_DIR}/share/Dobby/requirements.pybundle > /dev/null
 
     exit 0
 }
