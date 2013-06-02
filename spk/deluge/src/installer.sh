@@ -37,7 +37,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    ${INSTALL_DIR}/env/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
 
     # Install Deluge
     cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
