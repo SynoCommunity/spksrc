@@ -5,8 +5,11 @@
             "desc": "FlexGet Web UI",
             "icon": "images/flexget-{0}.png",
             "type": "url",
-            "url": "3rdparty/flexget/flexget.cgi",
-            "allUsers": true
+            "protocol": "http",
+            "port": "8290",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

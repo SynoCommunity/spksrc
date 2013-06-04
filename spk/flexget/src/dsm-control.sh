@@ -7,7 +7,7 @@ DNAME="FlexGet"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="flexget"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 FLEXGET="${INSTALL_DIR}/env/bin/flexget-webui"
