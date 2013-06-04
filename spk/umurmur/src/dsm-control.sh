@@ -6,7 +6,7 @@ DNAME="uMurmur"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="root"
 UMURMUR="${INSTALL_DIR}/bin/umurmurd"
 PID_FILE="${INSTALL_DIR}/var/umurmur.pid"
