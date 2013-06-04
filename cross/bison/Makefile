@@ -12,8 +12,5 @@ COMMENT  = General-purpose parser generator
 LICENSE  = GNU GPL
 
 GNU_CONFIGURE = 1
-#FIXME: This override detection of buggy m4/libc6. It is a (very bad) workaround for debian stable
-CONFIGURE_ARGS = M4=/usr/bin/m4
 
 include ../../mk/spksrc.cross-cc.mk
-
