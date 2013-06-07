@@ -95,33 +95,38 @@ postinst ()
 
     edition=`cat ${INSTALL_DIR}/var/edition`
 
-    # Launch main installation in the background
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf install -a -B -f horde/$edition > $(INSTALL_DIR)/var/install.log 2>&1 && \
-
-      if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-          cp ${WEB_DIR}/${PACKAGE}/config/conf.php.dist ${WEB_DIR}/${PACKAGE}/config/conf.php && \
-          echo -e "\n\$conf['sql']['username'] = '${MYSQL_USER}';" \
-            "\n\$conf['sql']['password'] = '${wizard_mysql_password_horde:=horde}';" \
-            "\n\$conf['sql']['hostspec'] = 'localhost';" \
-            "\n\$conf['sql']['port'] = 3306;" \
-            "\n\$conf['sql']['protocol'] = 'tcp';" \
-            "\n\$conf['sql']['database'] = '${MYSQL_DATABASE}';" \
-            "\n\$conf['sql']['phptype'] = 'mysql';" \
-            "\n\$conf['share']['driver'] = 'Sqlng';" \
-            "\n\$conf['group']['driver'] = 'Sql';" >> ${WEB_DIR}/${PACKAGE}/config/conf.php
-      fi && \
-
-      # Fix permissions
-      chmod -R 777 ${WEB_DIR}/${PACKAGE} && \
-
-      # Create/update database tables (second run creates last two table)
-      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1 && \
-      PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1 && \
-
-      # Remove temporary page
-      rm ${WEB_DIR}/${PACKAGE}/index.html &
+    # Finish installation in the background
+    postinst_bg &
 
     exit 0
+}
+
+postinst_bg ()
+{
+    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf install -a -B -f horde/$edition > $(INSTALL_DIR)/var/install.log 2>&1
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        cp ${WEB_DIR}/${PACKAGE}/config/conf.php.dist ${WEB_DIR}/${PACKAGE}/config/conf.php
+        echo -e "\n\$conf['sql']['username'] = '${MYSQL_USER}';" \
+          "\n\$conf['sql']['password'] = '${wizard_mysql_password_horde:=horde}';" \
+          "\n\$conf['sql']['hostspec'] = 'localhost';" \
+          "\n\$conf['sql']['port'] = 3306;" \
+          "\n\$conf['sql']['protocol'] = 'tcp';" \
+          "\n\$conf['sql']['database'] = '${MYSQL_DATABASE}';" \
+          "\n\$conf['sql']['phptype'] = 'mysql';" \
+          "\n\$conf['share']['driver'] = 'Sqlng';" \
+          "\n\$conf['group']['driver'] = 'Sql';" >> ${WEB_DIR}/${PACKAGE}/config/conf.php
+    fi
+
+    # Fix permissions
+    chmod -R 777 ${WEB_DIR}/${PACKAGE}
+
+    # Create/update database tables (second run creates last two table)
+    PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1
+    PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1
+
+    # Remove temporary page
+    rm ${WEB_DIR}/${PACKAGE}/index.html
 }
 
 preuninst ()
