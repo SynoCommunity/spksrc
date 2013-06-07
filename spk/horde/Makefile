@@ -1,5 +1,5 @@
 SPK_NAME = horde
-SPK_VERS = 5.0.4
+SPK_VERS = 5.1.0
 SPK_REV = 1
 SPK_ICON = src/horde.png
 DSM_UI_DIR = app
