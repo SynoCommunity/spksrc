@@ -1,5 +1,5 @@
 PKG_NAME = fengoffice
-PKG_VERS = 2.2.4.1
+PKG_VERS = 2.3
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/opengoo/files/$(PKG_NAME)/$(PKG_NAME)_$(PKG_VERS)
