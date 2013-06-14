@@ -33,7 +33,7 @@ preinst ()
         fi
 
         # Check directory
-        if [ ! -d ${wizard_owncloud_datadirectory} ]; then
+        if [ ! -d ${wizard_owncloud_datadirectory:=/volume1/owncloud} ]; then
             echo "Directory does not exist"
             exit 1
         fi
