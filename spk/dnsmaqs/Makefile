@@ -30,6 +30,7 @@ include ../../mk/spksrc.spk.mk
 dnsmasq_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 755 -d $(STAGING_DIR)/lease
 	install -m 755 -d $(STAGING_DIR)/log
 	install -m 755 -d $(STAGING_DIR)/app/log
 	install -m 644 src/etc/dnsmasq.conf $(STAGING_DIR)/etc/dnsmasq.conf
