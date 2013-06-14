@@ -11,6 +11,7 @@ DESCRIPTION = Feng Office is a Collaboration Platform and Project Management Sys
 ADMIN_URL = /fengoffice/
 RELOAD_UI = yes
 DISPLAY_NAME = Feng Office
+BETA = 1
 
 HOMEPAGE   = http://www.fengoffice.com/
 LICENSE    = AGPL
