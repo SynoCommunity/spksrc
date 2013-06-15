@@ -1,0 +1,4 @@
+bin:bin/idn
+lnk:lib/libidn.so
+lnk:lib/libidn.so.11
+lib:lib/libidn.so.11.6.10
