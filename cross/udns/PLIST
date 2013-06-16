@@ -1,0 +1,4 @@
+bin:bin/dnsget
+bin:bin/ex-rdns
+bin:bin/rblcheck
+lib:lib/libudns.a
