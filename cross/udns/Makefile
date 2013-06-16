@@ -12,6 +12,7 @@ COMMENT  = UDNS is a stub DNS resolver library with ability to perform both sync
 LICENSE  = LGPL
 
 PRE_CONFIGURE_TARGET = myPreConfigure
+COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
@@ -20,13 +21,18 @@ include ../../mk/spksrc.cross-cc.mk
 myPreConfigure:
 	@$(RUN) sed -e 's/ac_run() {/ac_run() { return 0/g' -i configure.lib
 
+.PHONY: myCompile
+myCompile:
+	$(RUN) $(MAKE) shared
+
 .PHONY: myInstall
 myInstall:
 	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/bin/
-	@$(RUN) cp dnsget $(STAGING_INSTALL_PREFIX)/bin/
-	@$(RUN) cp ex-rdns $(STAGING_INSTALL_PREFIX)/bin/
-	@$(RUN) cp rblcheck $(STAGING_INSTALL_PREFIX)/bin/
+	@$(RUN) cp dnsget_s $(STAGING_INSTALL_PREFIX)/bin/dnsget
+	@$(RUN) cp ex-rdns_s $(STAGING_INSTALL_PREFIX)/bin/ex-rdns
+	@$(RUN) cp rblcheck_s $(STAGING_INSTALL_PREFIX)/bin/rblcheck
 	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/
-	@$(RUN) cp libudns.a $(STAGING_INSTALL_PREFIX)/lib/
+	@$(RUN) cp libudns.so.0 $(STAGING_INSTALL_PREFIX)/lib/
+	ln -sf libudns.so.0 $(STAGING_INSTALL_PREFIX)/lib/libudns.so
 	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/include/
 	@$(RUN) cp udns.h $(STAGING_INSTALL_PREFIX)/include/
