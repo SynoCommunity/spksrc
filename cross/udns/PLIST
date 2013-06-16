@@ -1,4 +1,5 @@
-bin:bin/dnsget
-bin:bin/ex-rdns
-bin:bin/rblcheck
-lib:lib/libudns.a
+bin:bin/dnsget_s
+bin:bin/ex-rdns_s
+bin:bin/rblcheck_s
+lnk:lib/libudns.so
+lib:lib/libudns.so.0
