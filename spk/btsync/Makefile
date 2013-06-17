@@ -8,6 +8,7 @@ DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Automatically sync files via secure, distributed technology.
+DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sûre et distribuée. 
 ADMIN_PORT = 8888
 RELOAD_UI = yes
 DISPLAY_NAME = BitTorrent Sync
