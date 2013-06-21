@@ -1,0 +1,33 @@
+[{
+    "step_title": "IP configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "This is the server's ip address on the tun interface. The client will be given the next ip number in the range. It is recommended to use the 10.0.0.0 or 172.16.0.0 ranges. Using a smaller network will limit the number of concurrent users.",
+        "subitems": [{
+            "key": "ip",
+            "desc": "IP and netmask, ex: 10.0.0.1/24"
+        }]
+    }]
+},
+{
+    "step_title": "Password",
+    "items": [{
+        "type": "password",
+        "desc": "'password' to authenticate, Only the first 32 characters will be used",
+        "subitems": [{
+            "key": "password",
+            "desc": "Password"
+        }]
+    }]
+},
+{
+    "step_title": "domain name",
+    "items": [ {
+        "type": "textfield",
+        "desc": "The  dns  traffic  is expected to arrive as queries for subdomains under 'topdomain'. This is normally a subdomain to a domain you own. Use a short domain name to get better throughput.",
+        "subitems": [{
+            "key": "topdomain",
+            "desc": ""
+        }]
+    }]
+}]
