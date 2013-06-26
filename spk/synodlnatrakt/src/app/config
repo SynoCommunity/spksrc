@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.cytec.packages.synodlnatrakt": {
+            "title": "SynoDLNAtrakt",
+            "desc": "SynoDLNAtrakt",
+            "icon": "images/synodlnatrakt-{0}.png",
+            "type": "url",
+            "url": "3rdparty/synodlnatrakt/synodlnatrakt.cgi",
+            "allUsers": true
+        }
+    }
+}
