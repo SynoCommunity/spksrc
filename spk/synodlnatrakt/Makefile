@@ -5,7 +5,7 @@ SPK_ICON = src/synodlnatrakt.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3", "MediaServer"
+SPK_DEPENDS = "python>2.7.3-3:git", "MediaServer"
 
 
 MAINTAINER = cytec
