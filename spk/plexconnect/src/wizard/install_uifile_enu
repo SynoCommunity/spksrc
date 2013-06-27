@@ -1,0 +1,16 @@
+[{
+    "step_title": "PlexConnect settings",
+    "items": [{
+        "type": "textfield",
+        "desc": "Enter details for PlexConnect DNS.",
+        "subitems": [{
+            "key": "wizard_dns_server",
+            "desc": "DNS server (the one you noted down from the ATV before you changed it)",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 7,
+                "maxLength": 15
+                }
+        }]
+    }]
+}]
