@@ -15,7 +15,7 @@ LICENSE  = Charityware
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = vim_cv_toupper_broken=no --with-tlib=ncurses vim_cv_terminfo=yes vim_cv_tty_group=world vim_cv_getcwd_broken=yes vim_cv_stat_ignores_slash=yes vim_cv_memmove_handles_overlap=yes
 ADDITIONAL_CFLAGS = 
-
+PRE_CONFIGURE_TARGET = $(RUN) autoreconf
 
 INSTALL_TARGET = myInstall
 
