@@ -37,8 +37,6 @@ plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/httpd-vhosts.conf $(STAGING_DIR)/app/httpd-vhosts.conf
 	install -m 755 src/share/PlexConnect/Settings.cfg $(STAGING_DIR)/share/PlexConnect/Settings.cfg
-	#until they fix isatty
-	install -m 755 src/share/PlexConnect/PlexConnect.py $(STAGING_DIR)/share/PlexConnect/PlexConnect.py
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
@@ -49,4 +47,5 @@ $(STAGING_DIR)/share/PlexConnect:
 	echo "$(STAGING_DIR)/share/PlexConnect"
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone -b v0.1-iOS-pre5.1 https://github.com/iBaa/PlexConnect.git
+	cd $(STAGING_DIR)/share/PlexConnect && git am < $(STAGING_DIR)/../../src/share/PlexConnect/patch.diff
 	rm -fr $(STAGING_DIR)/share/PlexConnect/.git $(STAGING_DIR)/share/PlexConnect/.gitignore

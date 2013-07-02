@@ -1,0 +1,189 @@
+From 5f7fd5ed87f34834877d7b3b0e67d9fb2697207c Mon Sep 17 00:00:00 2001
+From: Bert Wynants <bwynants+drupal-git@gmail.com>
+Date: Mon, 1 Jul 2013 22:07:53 +0200
+Subject: [PATCH] proper shutdown added (ctrl-c or process kill)
+
+---
+ DNSServer.py   |  2 ++
+ PlexConnect.py | 32 +++++++++++++++++---------------
+ WebServer.py   |  2 ++
+ 3 files changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/DNSServer.py b/DNSServer.py
+index 96da94c..06172d7 100755
+--- a/DNSServer.py
++++ b/DNSServer.py
+@@ -59,6 +59,7 @@ Source: http://doc-tcpip.org/Dns/named.dns.message.html
+ import sys
+ import socket
+ import struct
++import signal
+ from multiprocessing import Pipe  # inter process communication
+ 
+ import Settings
+@@ -126,6 +127,7 @@ def printDNSPaket(paket):
+ 
+ 
+ def Run(cmdPipe, param):
++    signal.signal(signal.SIGINT, signal.SIG_IGN)
+     dinit(__name__, param)  # init logging, DNSServer process
+     
+     cfg_IP_self = param['IP_self']
+diff --git a/PlexConnect.py b/PlexConnect.py
+index ec84da4..a3fa587 100755
+--- a/PlexConnect.py
++++ b/PlexConnect.py
+@@ -11,13 +11,16 @@ inter-process-communication (queue): http://pymotw.com/2/multiprocessing/communi
+ import sys, time
+ from os import sep
+ import socket
+-from multiprocessing import Process, Pipe
++import signal
++from multiprocessing import Process, Pipe, active_children
+ 
+ import PlexGDM
+ import DNSServer, WebServer
+ import Settings
+ from Debug import *  # dprint()
+ 
++p_WebServer = None
++p_DNSServer = None
+ 
+ def getIP_self():
+     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+@@ -26,16 +29,25 @@ def getIP_self():
+     dprint('PlexConnect', 0, "IP_self: "+IP)
+     return IP
+ 
++def sig_handler(signum=None, frame=None):
++    if type(signum) != type(None):
++        dprint('PlexConnect', 0,  "Shutting down.")
++        if pipe_DNSServer != None:
++            pipe_DNSServer[0].send('shutdown')
++
++        pipe_WebServer[0].send('shutdown')
+ 
+ 
+ if __name__=="__main__":
++    signal.signal(signal.SIGINT, sig_handler)
++    signal.signal(signal.SIGTERM, sig_handler)
+     param = {}
+     param['LogFile'] = sys.path[0] + sep + 'PlexConnect.log'
+     dinit('PlexConnect', param, True)  # init logging, new file, main process
+ 
+     dprint('PlexConnect', 0, "***")
+     dprint('PlexConnect', 0, "PlexConnect")
+-    dprint('PlexConnect', 0, "Press ENTER to shut down.")
++    dprint('PlexConnect', 0, "Press ctrl-c to shut down.")
+     dprint('PlexConnect', 0, "***")
+     
+     # Settings
+@@ -86,16 +98,6 @@ if __name__=="__main__":
+             p_DNSServer.join()
+         sys.exit(1)
+     
+-    try:
+-        key = raw_input()
+-    except KeyboardInterrupt:
+-        dprint('PlexConnect', 0, "^C received.")
+-    
+-    finally:
+-        dprint('PlexConnect', 0,  "Shutting down.")
+-        if cfg.getSetting('enable_dnsserver')=='True':
+-            pipe_DNSServer[0].send('shutdown')
+-            p_DNSServer.join()
+-        
+-        pipe_WebServer[0].send('shutdown')
+-        p_WebServer.join()
++    # Stay alive while my threads do the work
++    while (active_children()):
++        time.sleep(10)
+diff --git a/WebServer.py b/WebServer.py
+index 786a555..1aff3b2 100755
+--- a/WebServer.py
++++ b/WebServer.py
+@@ -11,6 +11,7 @@ http://www.linuxjournal.com/content/tech-tip-really-simple-http-server-python
+ import sys
+ import string, cgi, time
+ from os import sep
++import signal
+ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+ from multiprocessing import Pipe  # inter process communication
+ 
+@@ -168,6 +169,7 @@ class MyHandler(BaseHTTPRequestHandler):
+ 
+ 
+ def Run(cmdPipe, param):
++    signal.signal(signal.SIGINT, signal.SIG_IGN)
+     dinit(__name__, param)  # init logging, WebServer process
+     
+     cfg_IP_WebServer = param['CSettings'].getSetting('ip_webserver')
+-- 
+1.8.1
+
+From fff1d2df4827ce0b32b390fb387196641e55e244 Mon Sep 17 00:00:00 2001
+From: Bert Wynants <bwynants+drupal-git@gmail.com>
+Date: Mon, 1 Jul 2013 22:35:32 +0200
+Subject: [PATCH] typo fixed
+
+---
+ PlexConnect.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/PlexConnect.py b/PlexConnect.py
+index a3fa587..b2460b7 100755
+--- a/PlexConnect.py
++++ b/PlexConnect.py
+@@ -19,8 +19,8 @@ import DNSServer, WebServer
+ import Settings
+ from Debug import *  # dprint()
+ 
+-p_WebServer = None
+-p_DNSServer = None
++pipe_WebServer = None
++pipe_DNSServer = None
+ 
+ def getIP_self():
+     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+-- 
+1.8.1
+
+From e6a99818e9a3306c1c3b345f25d6d88c5120e225 Mon Sep 17 00:00:00 2001
+From: Bert Wynants <bwynants+drupal-git@gmail.com>
+Date: Tue, 2 Jul 2013 20:07:37 +0200
+Subject: [PATCH] get rid of 10 second delay
+
+---
+ PlexConnect.py | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/PlexConnect.py b/PlexConnect.py
+index b2460b7..c8615c4 100755
+--- a/PlexConnect.py
++++ b/PlexConnect.py
+@@ -34,8 +34,8 @@ def sig_handler(signum=None, frame=None):
+         dprint('PlexConnect', 0,  "Shutting down.")
+         if pipe_DNSServer != None:
+             pipe_DNSServer[0].send('shutdown')
+-
+-        pipe_WebServer[0].send('shutdown')
++        if pipe_DNSServer != None:
++            pipe_WebServer[0].send('shutdown')
+ 
+ 
+ if __name__=="__main__":
+@@ -98,6 +98,8 @@ if __name__=="__main__":
+             p_DNSServer.join()
+         sys.exit(1)
+     
+-    # Stay alive while my threads do the work
+-    while (active_children()):
+-        time.sleep(10)
++    # wait till processed are gone
++    if cfg.getSetting('enable_dnsserver')=='True':
++        p_DNSServer.join()
++    
++    p_WebServer.join()
+-- 
+1.8.1
+
