@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/share/PlexConnect/PlexConnect.log"
 start_daemon ()
 {
     # Launch the application in the background as root so we can open the dns port
-    su -c "PATH=${PATH} ${PYTHON} ${PROG_PY} --daemon --pidfile ${PID_FILE}"
+    su -c "PATH=${PATH} ${PYTHON} ${PROG_PY} --daemon --pidfile ${PID_FILE} >/dev/null 2>&1"
 }
 
 stop_daemon ()
