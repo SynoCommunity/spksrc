@@ -37,7 +37,7 @@ postinst ()
   sed -i -e "s|ip_pms = 0.0.0.0|ip_pms = $MYIP|g" ${INSTALL_DIR}/${CFG_FILE}
 
   # make a copy
-  cp ${VHOST_CFG_FILE} ${VHOST_FILE}.bak
+  cp ${VHOST_CFG_FILE} ${VHOST_CFG_FILE}.bak
   # enable vhosts
   sed -i -e "s|#Include conf/extra/httpd-vhosts.conf|Include conf/extra/httpd-vhosts.conf |g" ${VHOST_CFG_FILE}
 
