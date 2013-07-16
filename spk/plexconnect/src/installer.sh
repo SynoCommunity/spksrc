@@ -15,8 +15,8 @@ RUNAS="${PACKAGE}"
 PYTHON="${PYTHON_DIR}/bin/python"
 PROG_PY="${INSTALL_DIR}/PlexConnect.py"
 APACHE_DIR="/usr/syno/apache"
-VHOST_CFG_FILE="${APACHE_DIR}/conf/httpd.conf-user"
-VHOST_FILE="${APACHE_DIR}/conf/extra/httpd-vhosts.conf"
+HTTPD_CONF_USER="${APACHE_DIR}/conf/httpd.conf-user"
+VHOST_FILE="${APACHE_DIR}/conf/extra/plexconnect-vhosts.conf"
 
 preinst ()
 {
@@ -36,18 +36,13 @@ postinst ()
   sed -i -e "s|8.8.8.8|${wizard_dns_server}|g" ${INSTALL_DIR}/${CFG_FILE}
   sed -i -e "s|ip_pms = 0.0.0.0|ip_pms = $MYIP|g" ${INSTALL_DIR}/${CFG_FILE}
 
-  # make a copy
-  cp ${VHOST_CFG_FILE} ${VHOST_CFG_FILE}.bak
-  # enable vhosts
-  sed -i -e "s|#Include conf/extra/httpd-vhosts.conf|Include conf/extra/httpd-vhosts.conf |g" ${VHOST_CFG_FILE}
+  #add VHOST_FILE
+  cp -f ${INSTALL_DIR}/app/plexconnect-vhosts.conf ${VHOST_FILE}
 
-  if [ -f ${VHOST_FILE} ]
-  then
-    # make a copy
-    mv ${VHOST_FILE} ${VHOST_FILE}.bak
-  fi
-  #add httpd-vhosts.conf
-  cp ${INSTALL_DIR}/app/httpd-vhosts.conf ${VHOST_FILE}
+  # make a copy of HTTPD_CONF_USER
+  cp ${HTTPD_CONF_USER} ${HTTPD_CONF_USER}.bak
+  # include our VHOST_FILE
+  echo "Include ${VHOST_FILE}" >> ${HTTPD_CONF_USER}
 
   # restart apache
   /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null
@@ -73,17 +68,11 @@ postuninst ()
   # Remove link
   rm -f ${INSTALL_DIR}
 
-  #remove httpd-vhosts.conf
-  rm -fr ${VHOST_FILE}
+  # remove plexconnect-vhosts.conf
+  sed -i -e "/^Include.*plexconnect-vhosts\.conf$/d" ${HTTPD_CONF_USER}
 
-  if [ -f ${VHOST_FILE}.bak ]
-  then
-    # restore vhost file
-    mv ${VHOST_FILE}.bak ${VHOST_FILE}
-  else
-    # disable vhosts
-    sed -i -e "s|Include conf/extra/httpd-vhosts.conf|#Include conf/extra/httpd-vhosts.conf |g" ${VHOST_CFG_FILE}
-  fi
+  #remove plexconnect-vhosts.conf
+  rm -fr ${VHOST_FILE}
 
   # restart apache
   /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null

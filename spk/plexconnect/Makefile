@@ -1,6 +1,6 @@
 SPK_NAME = plexconnect
 SPK_VERS = 0.1
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
@@ -35,7 +35,7 @@ plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/httpd-vhosts.conf $(STAGING_DIR)/app/httpd-vhosts.conf
+	install -m 755 src/app/plexconnect-vhosts.conf $(STAGING_DIR)/app/plexconnect-vhosts.conf
 	install -m 755 src/share/PlexConnect/Settings.cfg $(STAGING_DIR)/share/PlexConnect/Settings.cfg
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
