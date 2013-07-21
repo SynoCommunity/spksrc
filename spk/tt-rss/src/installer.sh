@@ -109,6 +109,9 @@ preupgrade ()
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config.php ${TMP_DIR}/${PACKAGE}/
 
+    mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/
+    mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/
+
     exit 0
 }
 
@@ -128,6 +131,8 @@ postupgrade ()
         fi
         sed -i "s|define('$key', .*);|define('$key', $val);|g" ${WEB_DIR}/${PACKAGE}/config.php
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
+
+    mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 
