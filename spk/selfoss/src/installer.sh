@@ -50,14 +50,14 @@ postinst ()
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_selfoss}';"
-        sed -i -e "s|^db_type=.*$|db_type=mysql|" \
-               -e "s|^db_host=.*$|db_host=localhost|" \
-               -e "s|^db_port=.*$|db_port=3306|" \
-               -e "s|^db_username=.*$|db_username=${MYSQL_USER}|" \
-               -e "s|^db_password=.*$|db_password=${wizard_mysql_password_selfoss}|" \
-               -e "s|^salt=.*$|salt=$(openssl rand -hex 8)|" \
-               -e "s|\r\n$|\n|" \
-               ${WEB_DIR}/${PACKAGE}/config.ini
+        echo -e "[globals]" \
+                "\ndb_type=mysql" \
+                "\ndb_host=localhost" \
+                "\ndb_port=3306" \
+                "\ndb_username=${MYSQL_USER}" \
+                "\ndb_password=${wizard_mysql_password_selfoss}" \
+                "\nsalt=$(openssl rand -hex 8)" \
+                > ${WEB_DIR}/${PACKAGE}/config.ini
     fi
 
     # Fix permissions
@@ -106,20 +106,16 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config.ini ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/data ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
 
 postupgrade ()
 {
-    # Restore the configuration file if it has not been updated
-    old_config_lines=$(wc -l ${TMP_DIR}/${PACKAGE}/config.ini | cut -f1 -d' ')
-    new_config_lines=$(wc -l ${WEB_DIR}/${PACKAGE}/config.ini | cut -f1 -d' ')
-    if [ ${old_config_lines} -ne ${new_config_lines} ]; then
-        mv ${WEB_DIR}/${PACKAGE}/config.ini ${WEB_DIR}/${PACKAGE}/config.ini.new
-        echo "Configuration file web/${PACKAGE}/config.ini needs to be updated manually. See web/selfoss/config.ini.new for changes to apply."
-    fi
+    # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config.ini ${WEB_DIR}/${PACKAGE}/
+    cp -r ${TMP_DIR}/${PACKAGE}/data ${WEB_DIR}/${PACKAGE}/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
