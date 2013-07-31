@@ -12,7 +12,6 @@ DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-BETA = 1
 
 HOMEPAGE   = http://tt-rss.org/
 LICENSE    = GPL
