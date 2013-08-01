@@ -100,7 +100,8 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config/config.php ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/${PACKAGE}/upload ${TMP_DIR}/${PACKAGE}/
+    mkdir ${TMP_DIR}/${PACKAGE}/upload/
+    cp -r ${WEB_DIR}/${PACKAGE}/upload/*/ ${TMP_DIR}/${PACKAGE}/upload/
 
     exit 0
 }
@@ -109,7 +110,7 @@ postupgrade ()
 {
     # Restore configuration
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config/
-    mv ${TMP_DIR}/${PACKAGE}/upload ${WEB_DIR}/${PACKAGE}/
+    cp -r ${TMP_DIR}/${PACKAGE}/upload/*/ ${WEB_DIR}/${PACKAGE}/upload/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
