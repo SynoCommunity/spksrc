@@ -1,0 +1,11 @@
+--- sabnzbd/newsunpack.py.orig	2013-07-07 13:29:12.000000000 +0200
++++ sabnzbd/newsunpack.py	2013-08-02 20:16:22.286697000 +0200
+@@ -966,7 +966,7 @@
+ 
+     # Append the wildcard for this set
+     wildcard = '%s*' % os.path.join(os.path.split(parfile)[0], setname)
+-    if single or len(globber(wildcard, None)) < 2:
++    if len(globber(wildcard, None)) < 2:
+         # Support bizarre naming conventions
+         wildcard = os.path.join(os.path.split(parfile)[0], '*')
+     command.append(wildcard)
