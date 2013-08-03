@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_FILENAME)-$(PKG_VERS)
 DEPENDS =
 
 HOMEPAGE = http://www.roundcube.net/
-COMMENT  = Roundcube is a free and open source webmail solution with a desktop-like user interface which is easy to install/configure and that runs on a standard LAMPP server.
+COMMENT  = Roundcube is a free and open source webmail solution with a desktop-like user interface which is easy to install/configure and that runs on a standard LAMPP server. It is the same software Synology offers as Mail Station except this does not depend on Mail Server package.
 LICENSE  = GPLv3
 
 EXTRACT_PATH = $(WORK_DIR)
