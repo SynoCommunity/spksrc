@@ -1,0 +1,14 @@
+--- owncloud/apps/files/js/file-upload.js.orig	2013-07-15 13:02:08.000000000 +0200
++++ owncloud/apps/files/js/file-upload.js	2013-08-09 17:35:49.954887700 +0200
+@@ -258,9 +258,9 @@
+ 			  var date=new Date();
+ 			  FileList.addFile(name,0,date,false,hidden);
+ 			  var tr=$('tr').filterAttr('data-file',name);
+-			  tr.attr('data-mime',result.data.mime);
++			  tr.attr('data-mime','text/plain');
+ 			  tr.attr('data-id', result.data.id);
+-			  getMimeIcon(result.data.mime,function(path){
++			  getMimeIcon('text/plain',function(path){
+ 			tr.find('td.filename').attr('style','background-image:url('+path+')');
+ 			  });
+ 			} else {
