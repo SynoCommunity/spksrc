@@ -1,0 +1,6 @@
+bin:bin/ftdi_eeprom
+bin:bin/libftdi1-config
+lnk:lib/libftdi1.so
+lnk:lib/libftdi1.so.2
+lib:lib/libftdi1.so.2.0.0
+
