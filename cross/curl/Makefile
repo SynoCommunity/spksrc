@@ -21,7 +21,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./configure $(REAL_CONFIGURE_ARGS) CFLAGS=
+	$(RUN) ./configure $(REAL_CONFIGURE_ARGS) --disable-HAVE_SSLV2_CLIENT_METHOD CFLAGS= 
 
 .PHONY: myPostInstall
 myPostInstall:
