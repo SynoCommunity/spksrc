@@ -15,14 +15,18 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_TARGET = myConfigure
 POST_INSTALL_TARGET = myPostInstall
-
+POST_CONFIGURE_TARGET = myPostConfigure
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./configure $(REAL_CONFIGURE_ARGS) --disable-HAVE_SSLV2_CLIENT_METHOD CFLAGS= 
+	$(RUN) ./configure $(REAL_CONFIGURE_ARGS) CFLAGS=
 
 .PHONY: myPostInstall
 myPostInstall:
 	sed -i.orig 's#prefix=/#prefix=$(INSTALL_DIR)/#' $(STAGING_INSTALL_PREFIX)/bin/curl-config
+
+.PHONY: myPostConfigure
+myPostConfigure:
+	sed -i.orig 's/D\["HAVE_SSLV2_CLIENT_METHOD"\]/#D\["HAVE_SSLV2_CLIENT_METHOD"\]/' $(WORK_DIR)/$(PKG_DIR)/config.status
