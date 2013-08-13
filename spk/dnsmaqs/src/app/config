@@ -1,12 +1,12 @@
 {
 	".url": {
-		"com.synocommunity.packages.dnsmaq": {
+		"com.synocommunity.packages.dnsmasq": {
 			"type": "legacy",
 			"allUsers": false,
 			"title": "dnsmasq",
 			"desc": "Configuration for dnsmaq",
 			"icon": "images/dnsmasq_{0}.png",
-			"url": "3rdparty/autorun/index.cgi"
+			"url": "3rdparty/dnsmasq/index.php"
 		}
 	}
 }

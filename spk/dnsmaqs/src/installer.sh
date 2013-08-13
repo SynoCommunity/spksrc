@@ -5,7 +5,7 @@ PKGPATH="/var/packages/"${PKGNAME}
 DNSPKG=`ls -l ${PKGPATH}/target | awk -F "-> " '{print $2}'`
 DNSTMPVOL="/"`echo ${DNSPKG} | cut -d'/' -f2`"/@tmp"
 DNSPKGTMP=${DNSTMPVOL}/${PKGNAME}
-WWW_DIR="/var/packages/${PKGNAME}/target/ui"
+WWW_DIR="/var/packages/${PKGNAME}/target/app"
 
 WEBMAN_DIR="/usr/syno/synoman/webman/3rdparty"
 
@@ -19,9 +19,8 @@ postinst ()
 {
 
     chown -R admin.users ${DNSPKG}
-    # Install webman
+    # Install ui
     ln -s ${WWW_DIR} ${WEBMAN_DIR}/${PKGNAME}
-    ln -sf ${INSTALL_DIR}/etc/squidguardmgr.conf ${WEBMAN_DIR}/${PKGNAME}/
 
     exit 0
 }
