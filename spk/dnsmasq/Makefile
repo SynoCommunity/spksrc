@@ -35,6 +35,7 @@ dnsmasq_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/log
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/index.php $(STAGING_DIR)/app/index.php
+	install -m 755 src/app/authenticate $(STAGING_DIR)/app/authenticate
 	install -m 644 src/etc/dnsmasq.conf $(STAGING_DIR)/etc/dnsmasq.conf
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \

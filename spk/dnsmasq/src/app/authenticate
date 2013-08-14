@@ -1,0 +1,6 @@
+#!/bin/sh
+export REMOTE_ADDR=$2
+export HTTP_COOKIE=$1
+/usr/syno/synoman/webman/modules/authenticate.cgi 
+exit $?
+

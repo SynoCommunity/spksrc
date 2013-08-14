@@ -41,6 +41,13 @@
 </head>
  <body>
  <?php
+$user=exec('/var/packages/dnsmasq/target/app/authenticate "'. $_SERVER['HTTP_COOKIE'] . '" "'.$_SERVER['REMOTE_ADDR'].'"');
+if ( $user !== "admin" ) {
+  echo "Please login as admin first, before using this webpage";
+  exit;
+}
+ 
+
 $url = 'http://domain.com/backend/editor.php';
 $file = '/var/packages/dnsmasq/target/etc/dnsmasq.conf';
 $tmpfile = '/var/packages/dnsmasq/target/etc/dnsmasq.conf.tmp';
@@ -77,6 +84,7 @@ if (isset($_POST['start']) )
 <div><pre>
 <?php echo exec ('/var/packages/dnsmasq/scripts/start-stop-status status'); ?>
 </pre></div>
+
 
 <div id="header">
 <ul>
