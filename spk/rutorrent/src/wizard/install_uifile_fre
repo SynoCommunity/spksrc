@@ -1,0 +1,18 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "textfield",
+        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Répertoire de téléchargement"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Surveille les torrents dans un répertoire et les ajoute à transmission automatiquement. Laisser vide pour désactiver",
+        "subitems": [{
+            "key": "wizard_watch_dir",
+            "desc": "Répertoire surveillé"
+        }]
+    }]
+}]

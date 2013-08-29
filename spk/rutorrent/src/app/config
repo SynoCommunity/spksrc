@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.rutorrent": {
+            "title": "ruTorrent",
+            "desc": "ruTorrent",
+            "icon": "images/rutorrent-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/rutorrent",
+            "allUsers": true
+        }
+    }
+}
