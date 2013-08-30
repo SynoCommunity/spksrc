@@ -55,6 +55,7 @@ debian-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
 	install -m 644 src/app/debian-chroot.js $(STAGING_DIR)/app/debian-chroot.js
 	install -m 755 src/app/setup.py $(STAGING_DIR)/app/setup.py
+	install -m 755 src/app/start.py $(STAGING_DIR)/app/start.py
 	install -m 755 src/app/stop.py $(STAGING_DIR)/app/stop.py
 	install -m 755 src/app/debian-chroot.cgi.py $(STAGING_DIR)/app/debian-chroot.cgi
 	install -m 755 -d $(STAGING_DIR)/app/application
