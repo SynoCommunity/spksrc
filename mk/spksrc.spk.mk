@@ -46,7 +46,10 @@ $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
 	   ) \
 	) | sed 's|"\s|"\n|' >> $@
+	@echo distributor=\"SynoCommunity\" >> $@
+	@echo distributor_url=\"http://www.synocommunity.com/\" >> $@
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
+	@echo maintainer_url=\"http://www.synocommunity.com/contributor/$(MAINTAINER)\" >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
