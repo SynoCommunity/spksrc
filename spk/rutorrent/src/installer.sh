@@ -31,6 +31,9 @@ postinst ()
     # Install the web interface
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
+    # Configure open_basedir
+    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
@@ -81,6 +84,9 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+
+    # Remove open_basedir configuration
+    rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
