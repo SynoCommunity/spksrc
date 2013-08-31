@@ -1,4 +1,5 @@
 scgi_port = localhost:8050
 directory = @download_dir@
-session = @download_dir@/.rtorrent
+session = /usr/local/rutorrent/var/.session
 schedule = watch_directory,5,5,load_start=@watch_dir@/*.torrent
+max_memory_usage = @max_memory@
