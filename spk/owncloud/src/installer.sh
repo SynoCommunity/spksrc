@@ -68,9 +68,7 @@ postinst ()
     fi
 
     # Fix permissions
-    chown ${USER} ${WEB_DIR}/${PACKAGE}/data
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/apps
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
