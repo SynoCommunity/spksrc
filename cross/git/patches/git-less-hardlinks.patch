@@ -1,14 +1,14 @@
---- Makefile.orig	2012-04-20 01:03:38.460278866 +0200
-+++ Makefile	2012-04-20 01:04:32.144280184 +0200
-@@ -2159,7 +2159,6 @@
+--- Makefile.orig	2013-08-23 21:38:43.000000000 +0200
++++ Makefile	2013-09-01 00:27:50.199478436 +0200
+@@ -1738,7 +1738,6 @@
  
  $(BUILT_INS): git$X
  	$(QUIET_BUILT_IN)$(RM) $@ && \
--	ln git$X $@ 2>/dev/null || \
- 	ln -s git$X $@ 2>/dev/null || \
- 	cp git$X $@
+-	ln $< $@ 2>/dev/null || \
+ 	ln -s $< $@ 2>/dev/null || \
+ 	cp $< $@
  
-@@ -2480,7 +2479,6 @@
+@@ -2065,7 +2064,6 @@
  
  $(REMOTE_CURL_ALIASES): $(REMOTE_CURL_PRIMARY)
  	$(QUIET_LNCP)$(RM) $@ && \
