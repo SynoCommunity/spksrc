@@ -40,13 +40,18 @@ postinst ()
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         TOP_DIR=`echo "${wizard_download_dir:=/volume1/downloads}" | cut -d "/" -f 2`
+        RAM_SIZE=`awk '/MemTotal/{print $2}' /proc/meminfo`
+        MAX_MEMORY=`expr $RAM_SIZE \* 1024 / 2`
 
-        sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" ${WEB_DIR}/${PACKAGE}/conf/config.php
-        sed -i -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" ${WEB_DIR}/${PACKAGE}/conf/config.php
+        sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
+               -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
+               ${WEB_DIR}/${PACKAGE}/conf/config.php
 
         echo "XSendFile On" > ${WEB_DIR}/${PACKAGE}/.htaccess
 
-        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${INSTALL_DIR}/var/.rtorrent.rc
+        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
+               -e "s|@max_memory@|$MAX_MEMORY|g" \
+               ${INSTALL_DIR}/var/.rtorrent.rc
 
         if [ -d "${wizard_watch_dir}" ]; then
             sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${INSTALL_DIR}/var/.rtorrent.rc
@@ -55,12 +60,8 @@ postinst ()
         fi
     fi
 
-    # Create session directory
-    mkdir -p ${wizard_download_dir:=/volume1/downloads}/.rtorrent
-
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-    chown -R ${USER}:root ${wizard_download_dir:=/volume1/downloads}/.rtorrent
     chown -R ${APACHE_USER} ${WEB_DIR}/${PACKAGE}
 
     exit 0
@@ -105,6 +106,7 @@ preupgrade ()
     mv ${WEB_DIR}/${PACKAGE}/conf/config.php ${TMP_DIR}/${PACKAGE}/
     mv ${WEB_DIR}/${PACKAGE}/.htaccess ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.rtorrent.rc ${TMP_DIR}/${PACKAGE}/
+    mv ${INSTALL_DIR}/var/.session ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -115,6 +117,7 @@ postupgrade ()
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/conf/
     mv ${TMP_DIR}/${PACKAGE}/.htaccess ${WEB_DIR}/${PACKAGE}/
     mv ${TMP_DIR}/${PACKAGE}/.rtorrent.rc ${INSTALL_DIR}/var/
+    mv ${TMP_DIR}/${PACKAGE}/.session ${INSTALL_DIR}/var/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
