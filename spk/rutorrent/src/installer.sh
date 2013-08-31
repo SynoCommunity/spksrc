@@ -40,8 +40,7 @@ postinst ()
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         TOP_DIR=`echo "${wizard_download_dir:=/volume1/downloads}" | cut -d "/" -f 2`
-        RAM_SIZE=`awk '/MemTotal/{print $2}' /proc/meminfo`
-        MAX_MEMORY=`expr $RAM_SIZE \* 1024 / 2`
+        MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
