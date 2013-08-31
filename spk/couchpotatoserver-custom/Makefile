@@ -1,6 +1,6 @@
 SPK_NAME = couchpotatoserver-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/couchpotatoserver-custom.png
 DSM_UI_DIR = app
 
