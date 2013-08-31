@@ -5,7 +5,7 @@ SPK_ICON = src/couchpotatoserver-custom.png
 DSM_UI_DIR = app
 
 DEPENDS  = 
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = CouchPotato Server Custom allows you to run the fork of your choice of CouchPotato Server. You will be asked for the fork\'s git URL during install.
