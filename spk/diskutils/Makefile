@@ -5,7 +5,7 @@ SPK_ICON = src/diskutils.png
 
 DEPENDS  = cross/e2fsprogs cross/screen
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Low level utilities to manage your hard disk drives. This package contains e2fsprogs and screen.
 DESCRIPTION_FRE = Utilitaires bas niveau pour gérer vos disques durs. Ce package contient e2fsprogs et screen.
 RELOAD_UI = yes

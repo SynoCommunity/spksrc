@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
 DESCRIPTION_FRE = Mylar permet le téléchargement automatique de Comic Book \\\(cbr/cbz\\\)
 ADMIN_PORT = 8090

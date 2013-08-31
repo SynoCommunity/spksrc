@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sûre et distribuée. 
 ADMIN_PORT = 8888

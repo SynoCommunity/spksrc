@@ -7,7 +7,7 @@ DSM_APP_NAME = SYNOCOMMUNITY.NZBConfig.AppInstance
 
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Configuration interface for your packages SABnzbd, NZBGet, SickBeard, SickBeard Custom, CouchPotato and Headphones
 DESCRIPTION_FRE = Interface de configuration pour vos paquets SABnzbd, NZBGet, SickBeard, SickBeard Custom, CouchPotato et Headphones
 DESCRIPTION_SPN = Interfaz de configuración para los paquetes SABnzbd, NZBGet, SickBeard, SickBeard Custom, CouchPotato y Headphones

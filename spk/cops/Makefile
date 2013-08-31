@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/

@@ -9,7 +9,7 @@ DEPENDS += cross/distribute cross/pip cross/virtualenv
 DEPENDS += cross/pyopenssl cross/pycrypto cross/lxml
 DEPENDS += cross/twisted cross/zope.interface cross/markupsafe
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
