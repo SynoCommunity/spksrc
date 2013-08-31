@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = ZI660
 DESCRIPTION = Tvheadend is a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV and Analog video \(V4L\) as input sources. It also comes with a powerful and easy to use web interface both used for configuration and day-to-day operations, such as searching the EPG and scheduling recordings. Even so, the most notable feature of Tvheadend is how easy it is to set up: Install it, navigate to the web user interface, drill into the TV adapters tab, select your current location and Tvheadend will start scanning channels and present them to you in just a few minutes
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming pour linux gérant les sources DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV et video analogique \\\(V4L\\\). Il possède aussi une interface web puissante et ergonomique pour la configuration tout comme l\\\'utilisation au quotidien : recherche EPG ou plannification d\\\'enregistrements. Le principal point fort de Tvheadend réside avant tout dans sa facilité d\\\'utilisation : installez-le, naviguez au travers de son interface web, choisissez votre adaptateur TV dans l\\\'onglet dédié ainsi que votre localisation et Tvheadend recherchera les cannaux et vous les affichera en seulement quelques minutes
 ADMIN_PORT = 9981
