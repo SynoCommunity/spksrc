@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = The new multipurpose rss reader, live stream, mashup, aggregation web application.
 ADMIN_URL = /selfoss/
 RELOAD_UI = yes

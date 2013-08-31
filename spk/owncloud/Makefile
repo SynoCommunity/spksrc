@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 ADMIN_URL = /owncloud/
 RELOAD_UI = yes

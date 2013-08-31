@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  =
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Create full-text feed from feed or webpage URL.
 ADMIN_URL = /full-text-rss/
 RELOAD_UI = yes

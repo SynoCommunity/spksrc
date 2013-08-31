@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
 DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et Atom open source conçu pour vous permettre de lire des nouvelles de n\\\'importe quel endroit, tout en se sentant aussi proche d\\\'une application de bureau que possible.
 ADMIN_URL = /tt-rss/
