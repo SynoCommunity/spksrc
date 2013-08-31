@@ -1,0 +1,10 @@
+#!/bin/sh
+export REMOTE_ADDR=$2
+export HTTP_COOKIE=$1
+export HTTP_X_FORWARDED_FOR=$3
+if [[ "$HTTP_X_FORWARDED_FOR" != "" ]]; then
+  REMOTE_ADDR=$HTTP_X_FORWARDED_FOR
+fi
+/usr/syno/synoman/webman/modules/authenticate.cgi     
+exit $?  
+
