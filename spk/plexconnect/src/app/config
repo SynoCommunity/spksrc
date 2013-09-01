@@ -1,0 +1,12 @@
+{
+  ".url": {
+    "com.synocommunity.packages.plexconnect": {
+      "title": "PlexConnect",
+      "desc": "PlexConnect",
+      "icon": "images/plexconnect-{0}.png",
+      "type": "url",
+      "url": "https://github.com/iBaa/PlexConnect",
+      "allUsers": true
+    }
+  }
+}
