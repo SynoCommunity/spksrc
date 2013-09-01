@@ -23,7 +23,7 @@
 #
 # On POSIX you can use "~" as alias for home directory (e.g. "~/download").
 # On Windows use absolute paths (e.g. "C:\Download").
-MainDir=@download_dir@
+MainDir=~/downloads
 
 # Destination directory for downloaded files.
 #
@@ -63,29 +63,29 @@ TempDir=${MainDir}/tmp
 
 # Directory with web-interface files.
 #
-# Example: /usr/local/nzbget/share/nzbget/webui.
+# Example: /usr/local/share/nzbget/webui.
 #
 # NOTE: To disable web-interface set the option to an empty value.
 # This however doesn't disable the built-in web-server completely because
 # it is also used to serve JSON-/XML-RPC requests.
-WebDir=/usr/local/nzbget/share/nzbget/webui
+WebDir=
 
 # Directory with post-processing scripts.
 #
 # NOTE: For information on writing post-processing scripts visit
 # http://nzbget.sourceforge.net/Post-processing_scripts.
-ScriptDir=/usr/local/nzbget/share/nzbget/ppscripts
+ScriptDir=${MainDir}/ppscripts
 
 # Lock-file for daemon-mode, POSIX only.
 #
 # If the option is not empty, NZBGet creates the file and writes process-id
 # (PID) into it. That info can be used in shell scripts.
-LockFile=/usr/local/nzbget/var/nzbget.pid
+LockFile=${MainDir}/nzbget.lock
 
 # Where to store log file, if it needs to be created.
 #
 # NOTE: See also option <CreateLog>.
-LogFile=/usr/local/nzbget/var/nzbget.log
+LogFile=${DestDir}/nzbget.log
 
 # Configuration file template.
 #
@@ -98,7 +98,7 @@ LogFile=/usr/local/nzbget/var/nzbget.log
 # /usr/local/share/nzbget/nzbget.conf).
 #
 # Example: /usr/local/share/nzbget/nzbget.conf.
-ConfigTemplate=/usr/local/nzbget/share/nzbget/nzbget.conf
+ConfigTemplate=
 
 
 ##############################################################################
@@ -233,12 +233,12 @@ ControlPort=6789
 # for older NZBGet versions may not have an option to define user name. In
 # this case you should set option <ControlUsername> to the default value
 # "nzbget" or use empty value.
-ControlUsername=@control_username@
+ControlUsername=nzbget
 
 # Password which NZBGet server and remote client use.
 #
 # Set to empty value to disable authorization request.
-ControlPassword=@control_password@
+ControlPassword=tegbzn6789
 
 # Secure control of NZBGet server (yes, no).
 #
@@ -280,7 +280,7 @@ DaemonUsername=root
 # command).
 # Empty value or value "1000" disable the setting of umask-mode; current
 # umask-mode (set via shell) is used in this case.
-UMask=0000
+UMask=1000
 
 
 ##############################################################################
@@ -712,16 +712,16 @@ ErrorTarget=both
 WarningTarget=both
 
 # How info messages must be printed (screen, log, both, none).
-InfoTarget=screen
+InfoTarget=both
 
 # How detail messages must be printed (screen, log, both, none).
-DetailTarget=none
+DetailTarget=both
 
 # How debug messages must be printed (screen, log, both, none).
 #
 # Debug-messages can be printed only if the program was compiled in
 # debug-mode: "./configure --enable-debug".
-DebugTarget=none
+DebugTarget=both
 
 # Number of messages stored in buffer and available for remote
 # clients (messages).
@@ -959,7 +959,7 @@ ParCleanupQueue=yes
 #
 # Enable this option for automatic deletion of nzb-file from incoming directory
 # after successful check/repair.
-NzbCleanupDisk=yes
+NzbCleanupDisk=no
 
 # Files to delete after successful check/repair.
 #
@@ -1112,7 +1112,7 @@ DefScript=
 # pointed by option <ScriptDir>. 
 #
 # Example: Cleanup.sh, Move.sh.
-ScriptOrder=DeleteSamples.py, nzbToMedia*.py, Email.py, Logger.py
+ScriptOrder=
 
 # Pause download queue during executing of postprocess-script (yes, no).
 #

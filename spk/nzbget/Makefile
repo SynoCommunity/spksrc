@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
-SPK_VERS = 10.2
-SPK_REV = 8
+SPK_VERS = 11.0
+SPK_REV = 9
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
 
@@ -33,12 +33,10 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: nzbget_extra_install
-nzbget_extra_install:
+nzbget_extra_install: $(STAGING_DIR)/share/nzbget/ppscripts/nzbToMedia
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/nzbget.conf $(STAGING_DIR)/var/nzbget.conf
-	install -m 755 src/nzbget-postprocess.sh $(STAGING_DIR)/bin/nzbget-postprocess.sh
-	install -m 644 src/nzbget-postprocess.conf $(STAGING_DIR)/var/nzbget-postprocess.conf
-	install -m 644 src/nzbget-postprocess.conf $(STAGING_DIR)/share/nzbget/webui/nzbget-postprocess.conf
+	install -m 644 src/nzbget.conf.template $(STAGING_DIR)/share/nzbget/nzbget.conf
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/texts
@@ -47,3 +45,8 @@ nzbget_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
+
+$(STAGING_DIR)/share/nzbget/ppscripts/nzbToMedia:
+	cd $(STAGING_DIR)/share/nzbget/ppscripts && git clone https://github.com/clinton-hall/nzbToMedia.git
+	rm -fr $(STAGING_DIR)/share/nzbget/ppscripts/nzbToMedia/.git*
+
