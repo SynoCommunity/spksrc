@@ -12,7 +12,7 @@ PYTHON="${PYTHON_DIR}/bin/python"
 PATH="${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="${PACKAGE}"
 PROG_PY="${INSTALL_DIR}/share/PlexConnect/PlexConnect.py"
-LOG_FILE="${INSTALL_DIR}/share/PlexConnect/PlexConnect.log"
+LOG_FILE="${INSTALL_DIR}/var/PlexConnect.log"
 
 start_daemon ()
 {

@@ -1,6 +1,6 @@
 SPK_NAME = plexconnect
-SPK_VERS = 0.1
-SPK_REV = 5
+SPK_VERS = 0.2
+SPK_REV = 2
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
@@ -8,7 +8,7 @@ DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = PlexConnect: Plex @ aTV - think different.
+DESCRIPTION = PlexConnect: Plex @ aTV - think different. You must disable HTTPS connection for web services \(\'Web Services\'\ control pannel - \'HTTP Service\' tab\). The installer installs some default certificates in /usr/local/plexconnect/etc/certificates and you can download the trailers.cer file at https://www.dropbox.com/s/lbqpxju5zkpls29/trailers.cer to update your ATV. You can also replace the certificates with your own generated certificates. Your settings and profiles will be restored when you update the package.
 RELOAD_UI = yes
 DISPLAY_NAME = PlexConnect
 
@@ -32,10 +32,15 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: plexconnect_extra_install
 plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/etc/certificates
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/plexconnect-vhosts.conf $(STAGING_DIR)/app/plexconnect-vhosts.conf
+	install -m 755 src/app/plexconnect-ssl-vhosts.conf $(STAGING_DIR)/app/plexconnect-ssl-vhosts.conf
+	install -m 755 src/app/certificates/trailers.cer $(STAGING_DIR)/etc/certificates/trailers.cer
+	install -m 755 src/app/certificates/trailers.key $(STAGING_DIR)/etc/certificates/trailers.key
+	install -m 755 src/app/certificates/trailers.pem $(STAGING_DIR)/etc/certificates/trailers.pem
 	install -m 755 src/share/PlexConnect/Settings.cfg $(STAGING_DIR)/share/PlexConnect/Settings.cfg
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
@@ -45,6 +50,6 @@ plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
 
 $(STAGING_DIR)/share/PlexConnect:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone -b v0.1-iOS-pre5.1 https://github.com/iBaa/PlexConnect.git
-	cd $(STAGING_DIR)/share/PlexConnect && git am < $(STAGING_DIR)/../../src/share/PlexConnect/patch.diff
+	cd $(STAGING_DIR)/share && git clone -b master https://github.com/iBaa/PlexConnect.git
+	#cd $(STAGING_DIR)/share/PlexConnect && git am < $(STAGING_DIR)/../../src/share/PlexConnect/patch.diff
 	rm -fr $(STAGING_DIR)/share/PlexConnect/.git $(STAGING_DIR)/share/PlexConnect/.gitignore
