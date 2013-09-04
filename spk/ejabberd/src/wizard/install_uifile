@@ -1,0 +1,36 @@
+[{
+    "step_title": "ejabberd configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Administrator's login.",
+        "subitems": [{
+            "key": "wizard_ejabberd_admin_username",
+            "desc": "User name",
+            "defaultValue": "admin",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "Administrator's password.",
+        "subitems": [{
+            "key": "wizard_ejabberd_admin_password",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Served hostname.",
+        "subitems": [{
+            "key": "wizard_ejabberd_hostname",
+            "desc": "Domain",
+            "defaultValue": "localhost",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}]
