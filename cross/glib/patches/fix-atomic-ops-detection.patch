@@ -1,0 +1,73 @@
+--- configure.orig	2013-04-15 23:32:44.000000000 +0200
++++ configure	2013-09-07 13:08:59.510193600 +0200
+@@ -26732,12 +26732,13 @@
+   return 0;
+ }
+ _ACEOF
+-if ac_fn_c_try_compile "$LINENO"; then :
++if ac_fn_c_try_link "$LINENO"; then :
+   glib_cv_g_atomic_lock_free=yes
+ else
+   glib_cv_g_atomic_lock_free=no
+ fi
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
+       if test "$glib_cv_g_atomic_lock_free" = "no"; then
+         SAVE_CFLAGS="${CFLAGS}"
+         CFLAGS="-march=i486"
+@@ -26753,10 +26754,11 @@
+   return 0;
+ }
+ _ACEOF
+-if ac_fn_c_try_compile "$LINENO"; then :
++if ac_fn_c_try_link "$LINENO"; then :
+   as_fn_error $? "GLib must be build with -march=i486 or later." "$LINENO" 5
+ fi
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
+         CFLAGS="${SAVE_CFLAGS}"
+       fi
+       ;;
+@@ -26784,14 +26786,15 @@
+   return 0;
+ }
+ _ACEOF
+-if ac_fn_c_try_compile "$LINENO"; then :
++if ac_fn_c_try_link "$LINENO"; then :
+ 
+ else
+ 
+ $as_echo "#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1" >>confdefs.h
+ 
+ fi
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
+     fi
+     ;;
+  esac
+--- glib/gatomic.c.orig	2013-04-15 23:22:14.000000000 +0200
++++ glib/gatomic.c	2013-06-11 04:14:02.000000000 +0200
+@@ -682,7 +682,7 @@
+ static pthread_mutex_t g_atomic_lock = PTHREAD_MUTEX_INITIALIZER;
+ 
+ gint
+-(g_atomic_int_get) (volatile gint *atomic)
++(g_atomic_int_get) (const volatile gint *atomic)
+ {
+   gint value;
+ 
+@@ -797,9 +797,9 @@
+ 
+ 
+ gpointer
+-(g_atomic_pointer_get) (volatile void *atomic)
++(g_atomic_pointer_get) (const volatile void *atomic)
+ {
+-  volatile gpointer *ptr = atomic;
++  const volatile gpointer *ptr = atomic;
+   gpointer value;
+ 
+   pthread_mutex_lock (&g_atomic_lock);
