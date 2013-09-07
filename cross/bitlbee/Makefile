@@ -17,7 +17,9 @@ INSTALL_TARGET = myInstall
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --ssl=gnutls --prefix=$(INSTALL_PREFIX) --pidfile=$(INSTALL_PREFIX)/var/bitlbee.pid
 CONFIGURE_ARGS += --config=$(INSTALL_PREFIX)/var/
-
+ifeq ($(findstring $(ARCH),powerpc ppc824x),$(ARCH))
+CONFIGURE_ARGS += --pie=0
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
