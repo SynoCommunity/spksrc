@@ -6,3 +6,4 @@ max_memory_usage = @max_memory@
 log.open_file = "rtorrent.log", "/usr/local/rutorrent/var/rtorrent.log"
 log.add_output = "warn", "rtorrent.log"
 http_cacert = /usr/local/rutorrent/etc/cacert.pem
+system.umask.set = 002
