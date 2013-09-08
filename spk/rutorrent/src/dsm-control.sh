@@ -10,6 +10,7 @@ PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
 USER="rutorrent"
 RTORRENT="${INSTALL_DIR}/bin/rtorrent"
 PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
+LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
 
 start_daemon ()
 {
@@ -68,7 +69,7 @@ case $1 in
         fi
         ;;
     log)
-        exit 1
+        echo ${LOG_FILE}
         ;;
     *)
         exit 1
