@@ -40,6 +40,8 @@ rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/cacert.pem $(STAGING_DIR)/etc/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
