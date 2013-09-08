@@ -1,5 +1,5 @@
---- sabnzbd/newsunpack.py.orig	2013-07-07 13:29:12.000000000 +0200
-+++ sabnzbd/newsunpack.py	2013-08-02 20:16:22.286697000 +0200
+--- sabnzbd/newsunpack.py.orig	2013-09-02 22:06:57.000000000 +0200
++++ sabnzbd/newsunpack.py	2013-09-08 16:32:24.664751012 +0200
 @@ -966,7 +966,7 @@
  
      # Append the wildcard for this set
@@ -8,4 +8,4 @@
 +    if len(globber(wildcard, None)) < 2:
          # Support bizarre naming conventions
          wildcard = os.path.join(os.path.split(parfile)[0], '*')
-     command.append(wildcard)
+     if sabnzbd.WIN32 or sabnzbd.DARWIN:
