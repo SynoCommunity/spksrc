@@ -15,4 +15,9 @@
             "desc": "Répertoire surveillé"
         }]
     }]
+},{
+    "step_title": "Attention !",
+    "items": [{
+        "desc": "Afin que ruTorrent fonctionne, vous devez ajouter votre répertoire de téléchargement à l'open_basedir. Pour ce faire, allez dans Panneau de configuration > Services Web > Paramètres PHP."
+    }]
 }]
