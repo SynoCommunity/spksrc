@@ -1,5 +1,5 @@
 SPK_NAME = owncloud
-SPK_VERS = 5.0.10
+SPK_VERS = 5.0.11
 SPK_REV = 2
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
