@@ -37,6 +37,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
+	sed -i 's/datadir_umask = 0022;/datadir_umask = 0002;/g' $(STAGING_DIR)/share/rutorrent/plugins/datadir/conf.php
+	sed -i 's/datadir_runmode="rtorrent";/datadir_runmode="webserver";/g' $(STAGING_DIR)/share/rutorrent/plugins/datadir/conf.php
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session
