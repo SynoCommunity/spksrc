@@ -16,6 +16,8 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --enable-libxml2-backend
 
+ENV += PATH=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin:$$PATH
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
