@@ -12,6 +12,9 @@ COMMENT  = GMP is a free library for arbitrary precision arithmetic, operating o
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
+ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+CONFIGURE_ARGS = --enable-assembly=no
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 

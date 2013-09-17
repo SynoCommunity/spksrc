@@ -1,32 +1,40 @@
 #!/bin/sh
 
 # Package
-PACKAGE="rutorrent"
-DNAME="ruTorrent"
+PACKAGE="xdm"
+DNAME="XDM"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
-USER="rutorrent"
-RTORRENT="${INSTALL_DIR}/bin/rtorrent"
-PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
-LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
+PYTHON_DIR="/usr/local/python"
+GIT_DIR="/usr/local/git"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
+USER="xdm"
+PYTHON="${INSTALL_DIR}/env/bin/python"
+XDM="${INSTALL_DIR}/share/XDM/XDM.py"
+PID_FILE="${INSTALL_DIR}/var/xdm.pid"
+LOG_FILE="${INSTALL_DIR}/var/xdm.log"
+
 
 start_daemon ()
 {
-    export HOME=${INSTALL_DIR}/var
-    start-stop-daemon -S -q -m -b -N 10 -x screen -c ${USER} -u ${USER} -p ${PID_FILE} -- -D -m ${RTORRENT}
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${XDM} --daemonize --pidfile ${PID_FILE} --nolaunch --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
+    kill `cat ${PID_FILE}`
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
+    fi
+    rm -f ${PID_FILE}
+    return 1
 }
 
 wait_for_status ()

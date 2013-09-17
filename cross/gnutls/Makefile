@@ -12,6 +12,9 @@ COMMENT  = GnuTLS is a secure communications library implementing the SSL, TLS a
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = gl_cv_func_gettimeofday_clobber=no
+CONFIGURE_ARGS = gl_cv_func_gettimeofday_clobber=no gl_cv_func_signbit_gcc=no
+ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
+CONFIGURE_ARGS += gl_cv_socket_ipv6=no
+endif
 
 include ../../mk/spksrc.cross-cc.mk

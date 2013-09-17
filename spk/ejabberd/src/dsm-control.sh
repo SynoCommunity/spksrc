@@ -1,32 +1,39 @@
 #!/bin/sh
 
 # Package
-PACKAGE="rutorrent"
-DNAME="ruTorrent"
+PACKAGE="ejabberd"
+DNAME="ejabberd"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
-USER="rutorrent"
-RTORRENT="${INSTALL_DIR}/bin/rtorrent"
-PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
-LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
+PATH="${INSTALL_DIR}/bin:${PATH}"
+USER="ejabberd"
+EJABBERD="${INSTALL_DIR}/sbin/ejabberdctl"
+PID_FILE="${INSTALL_DIR}/var/ejabberd.pid"
+LOG_FILE="${INSTALL_DIR}/var/log/ejabberd/ejabberd.log"
+
 
 start_daemon ()
 {
-    export HOME=${INSTALL_DIR}/var
-    start-stop-daemon -S -q -m -b -N 10 -x screen -c ${USER} -u ${USER} -p ${PID_FILE} -- -D -m ${RTORRENT}
+    ${EJABBERD} start
+    ${EJABBERD} started
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
+    ${EJABBERD} stop
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    rm -f ${PID_FILE} 
+    ${EJABBERD} stopped
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
+    fi
+    rm -f ${PID_FILE}
+    return 1
 }
 
 wait_for_status ()
@@ -46,17 +53,21 @@ case $1 in
     start)
         if daemon_status; then
             echo ${DNAME} is already running
+            exit 0
         else
             echo Starting ${DNAME} ...
             start_daemon
+            exit $?
         fi
         ;;
     stop)
         if daemon_status; then
             echo Stopping ${DNAME} ...
             stop_daemon
+            exit $?
         else
             echo ${DNAME} is not running
+            exit 0
         fi
         ;;
     status)

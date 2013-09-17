@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.5
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
@@ -37,9 +37,13 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
+	sed -i 's/datadir_umask = 0022;/datadir_umask = 0002;/g' $(STAGING_DIR)/share/rutorrent/plugins/datadir/conf.php
+	sed -i 's/datadir_runmode="rtorrent";/datadir_runmode="webserver";/g' $(STAGING_DIR)/share/rutorrent/plugins/datadir/conf.php
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/cacert.pem $(STAGING_DIR)/etc/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

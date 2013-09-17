@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.ejabberd": {
+            "title": "ejabberd",
+            "desc": "ejabberd",
+            "icon": "images/ejabberd-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "5280",
+            "url": "/admin",
+            "allUsers": true
+        }
+    }
+}
