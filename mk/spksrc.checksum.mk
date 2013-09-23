@@ -41,34 +41,38 @@ pre_checksum_target: checksum_msg
 checksum_target: $(PRE_CHECKSUM_TARGET)
 	@if [ -f $(DIGESTS_FILE) ] ; \
 	then \
+	  found="" ; \
 	  cat $(DIGESTS_FILE) | (cd $(DISTRIB_DIR) && while read file type value ; \
 	  do \
-	    if [ ! -f $$file ] ; \
+	    if [ -f $$file ] ; \
 	    then \
-	      $(MSG) "  File $$file not downloaded" ; \
-	      rm $(DOWNLOAD_COOKIE) ; \
-	      exit 1 ; \
-	    fi ; \
-	    case $$type in \
-	      SHA1|sha1)     tool=sha1sum ;; \
-	      SHA256|sha256) tool=sha256sum ;; \
-	      MD5|md5)       tool=md5sum ;; \
-	      *) $(MSG) "Unsupported digest type $$type" ; exit 1 ;; \
-	    esac ; \
-	    $(MSG) "  Checking $$tool of file $$file"; \
-	    if echo "$$value  $$file" | $$tool --status -c - ; \
-	    then \
-	      true ; \
-	    else  \
-	      $(MSG) "    Wrong $$tool for file $$file" ; \
-	      [ -f $$file.wrong ] && rm $$file.wrong ; \
-	      mv $$file $$file.wrong ; \
-	      $(MSG) "    Renamed as $$file.wrong" ; \
-	      rm $(DOWNLOAD_COOKIE) ; \
-	      $(MSG) "    Download cookie removed to trigger the download again" ; \
-	      exit 1 ; \
+	      case $$type in \
+	        SHA1|sha1)     tool=sha1sum ;; \
+	        SHA256|sha256) tool=sha256sum ;; \
+	        MD5|md5)       tool=md5sum ;; \
+	        *) $(MSG) "Unsupported digest type $$type" ; exit 1 ;; \
+	      esac ; \
+	      $(MSG) "  Checking $$tool of file $$file"; \
+	      if echo "$$value  $$file" | $$tool --status -c - ; \
+	      then \
+	        found="true" ; \
+	      else  \
+	        $(MSG) "    Wrong $$tool for file $$file" ; \
+	        [ -f $$file.wrong ] && rm $$file.wrong ; \
+	        mv $$file $$file.wrong ; \
+	        $(MSG) "    Renamed as $$file.wrong" ; \
+	        rm $(DOWNLOAD_COOKIE) ; \
+	        $(MSG) "    Download cookie removed to trigger the download again" ; \
+	        exit 1 ; \
+	      fi \
 	    fi \
-	  done) ; \
+	  done ; \
+	  if [ "$$found" == "" ] ; \
+	  then \
+	    $(MSG) "  File $$file not in digest" ; \
+	    rm $(DOWNLOAD_COOKIE) ; \
+	    exit 1 ; \
+	  fi) ; \
 	else \
 	  $(MSG) "No digests file for $(NAME)" ; \
 	fi
