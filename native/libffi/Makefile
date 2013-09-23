@@ -11,21 +11,22 @@ HOMEPAGE = http://sourceware.org/libffi/
 COMMENT  = A Portable Foreign Function Interface Library
 LICENSE  =
 
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --prefix=${WORK_DIR}/${TC_BASE_DIR}/native
 
 PRE_CONFIGURE_TARGET = myPreConfigure
-INSTALL_TARGET = myInstall
+COMPILE_TARGET = myCompile
+#INSTALL_TARGET = myInstall
 
-
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --libdir=$(INSTALL_PREFIX)/lib
-
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.native-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:
 	$(RUN) aclocal
 	$(RUN) automake
 
-.PHONY: myInstall
-myInstall:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR)
+.PHONY: myCompile
+myCompile:
+	$(RUN) make
+	$(RUN) make install
+

@@ -1,0 +1,88 @@
+diff -urN src.orig/3rdparty/webkit/Source/WebKit/qt/declarative/declarative.pro src/3rdparty/webkit/Source/WebKit/qt/declarative/declarative.pro
+--- src.orig/3rdparty/webkit/Source/WebKit/qt/declarative/declarative.pro	2013-06-07 07:16:58.000000000 +0200
++++ src/3rdparty/webkit/Source/WebKit/qt/declarative/declarative.pro	2013-09-21 00:54:13.511550055 +0200
+@@ -41,21 +41,6 @@
+ 
+ QT += declarative
+ 
+-!CONFIG(standalone_package) {
+-    linux-* {
+-        # From Creator's src/rpath.pri:
+-        # Do the rpath by hand since it's not possible to use ORIGIN in QMAKE_RPATHDIR
+-        # this expands to $ORIGIN (after qmake and make), it does NOT read a qmake var.
+-        QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
+-        MY_RPATH = $$join(QMAKE_RPATHDIR, ":")
+-
+-        QMAKE_LFLAGS += -Wl,-z,origin \'-Wl,-rpath,$${MY_RPATH}\'
+-        QMAKE_RPATHDIR =
+-    } else {
+-        QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
+-    }
+-}
+-
+ SOURCES += qdeclarativewebview.cpp plugin.cpp
+ HEADERS += qdeclarativewebview_p.h
+ 
+diff -urN src.orig/3rdparty/webkit/Source/WebKit/qt/docs/webkitsnippets/webelement/webelement.pro src/3rdparty/webkit/Source/WebKit/qt/docs/webkitsnippets/webelement/webelement.pro
+--- src.orig/3rdparty/webkit/Source/WebKit/qt/docs/webkitsnippets/webelement/webelement.pro	2013-06-07 07:16:58.000000000 +0200
++++ src/3rdparty/webkit/Source/WebKit/qt/docs/webkitsnippets/webelement/webelement.pro	2013-09-21 00:54:13.511550055 +0200
+@@ -5,4 +5,4 @@
+ }
+ SOURCES   = main.cpp
+ include(../../../../../WebKit.pri)
+-QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
++#QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
+diff -urN src.orig/3rdparty/webkit/Source/WebKit/qt/tests/tests.pri src/3rdparty/webkit/Source/WebKit/qt/tests/tests.pri
+--- src.orig/3rdparty/webkit/Source/WebKit/qt/tests/tests.pri	2013-06-07 07:16:58.000000000 +0200
++++ src/3rdparty/webkit/Source/WebKit/qt/tests/tests.pri	2013-09-21 00:54:13.511550055 +0200
+@@ -23,7 +23,7 @@
+ QT += testlib network
+ contains(QT_CONFIG, declarative): QT += declarative
+ 
+-QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
++#QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
+ 
+ symbian {
+     TARGET.CAPABILITY = ReadUserData WriteUserData NetworkServices WriteDeviceData
+diff -urN src.orig/3rdparty/webkit/Source/WebKit2/WebProcess.pro src/3rdparty/webkit/Source/WebKit2/WebProcess.pro
+--- src.orig/3rdparty/webkit/Source/WebKit2/WebProcess.pro	2013-06-07 07:16:53.000000000 +0200
++++ src/3rdparty/webkit/Source/WebKit2/WebProcess.pro	2013-09-21 00:54:13.511550055 +0200
+@@ -20,19 +20,6 @@
+ QT += network
+ macx:QT+=xml
+ 
+-linux-* {
+-    # From Creator's src/rpath.pri:
+-    # Do the rpath by hand since it's not possible to use ORIGIN in QMAKE_RPATHDIR
+-    # this expands to $ORIGIN (after qmake and make), it does NOT read a qmake var.
+-    QMAKE_RPATHDIR = \$\$ORIGIN/../lib $$QMAKE_RPATHDIR
+-    MY_RPATH = $$join(QMAKE_RPATHDIR, ":")
+-
+-    QMAKE_LFLAGS += -Wl,-z,origin \'-Wl,-rpath,$${MY_RPATH}\' -Wl,--no-undefined
+-    QMAKE_RPATHDIR =
+-} else {
+-    QMAKE_RPATHDIR = $$OUTPUT_DIR/lib $$QMAKE_RPATHDIR
+-}
+-
+ symbian {
+     TARGET.UID3 = 0xA000E544
+     MMP_RULES += pageddata
+diff -urN src.orig/3rdparty/webkit/Source/WebKit.pro src/3rdparty/webkit/Source/WebKit.pro
+--- src.orig/3rdparty/webkit/Source/WebKit.pro	2013-06-07 07:16:54.000000000 +0200
++++ src/3rdparty/webkit/Source/WebKit.pro	2013-09-21 02:28:08.603117537 +0200
+@@ -15,15 +15,12 @@
+ 
+ webkit2 {
+     exists($$PWD/WebKit2/WebProcess.pro): SUBDIRS += WebKit2/WebProcess.pro
+-    exists($$PWD/WebKit2/UIProcess/API/qt/tests): SUBDIRS += WebKit2/UIProcess/API/qt/tests
+ }
+ 
+ contains(QT_CONFIG, declarative) {
+     exists($$PWD/WebKit/qt/declarative): SUBDIRS += WebKit/qt/declarative
+ }
+ 
+-exists($$PWD/WebKit/qt/tests): SUBDIRS += WebKit/qt/tests
+-
+ build-qtscript {
+     SUBDIRS += \
+         JavaScriptCore/qt/api/QtScript.pro \

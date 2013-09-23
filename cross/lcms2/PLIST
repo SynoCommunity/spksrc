@@ -1,0 +1,6 @@
+bin:bin/linkicc
+bin:bin/psicc
+bin:bin/transicc
+lnk:lib/liblcms2.so
+lnk:lib/liblcms2.so.2
+lib:lib/liblcms2.so.2.0.4

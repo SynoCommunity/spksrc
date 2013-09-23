@@ -11,7 +11,10 @@ HOMEPAGE = http://www.vorbis.com/
 COMMENT  = Free, open container format
 LICENSE  = BSD
 
+
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --libdir=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
+
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -1,0 +1,84 @@
+{
+    ".url": {
+        "com.synocommunity.packages.fastcgiqt.BigWorld": {
+            "title": "FastCGIqt BigWorld",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/BigWorld.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.Dumper": {
+            "title": "FastcgiQt Dumper",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/Dumper.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.EmbedExample": {
+            "title": "FastcgiQt EmbedExample (vncviewer <ip diskstation>)",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/EmbedExample.cgi?-qws+-display+VNC",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.GetGreeter": {
+            "title": "FastcgiQt GetGreeter",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/GetGreeter.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.HelloWorld": {
+            "title": "FastcgiQt HelloWorld",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/HelloWorld.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.PostStreamExample": {
+            "title": "FastcgiQt PostStreamExample",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/PostStreamExample.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.PrefixExample": {
+            "title": "FastcgiQt PrefixExample",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/PrefixExample.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.ServiceExample": {
+            "title": "FastcgiQt ServiceExample",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/ServiceExample.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.ThreadedDumper": {
+            "title": "FastcgiQt ThreadedDumper",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/ThreadedDumper.cgi",
+            "allUsers": true
+        },
+        "com.synocommunity.packages.fastcgiqt.XsltExample": {
+            "title": "FastcgiQt XsltExample",
+            "desc": "Library testing ground.",
+            "icon": "images/HelloWorld-FastCGIqt-{0}.png",
+            "type": "legacy",
+            "url": "3rdparty/HelloWorld-FastCGIqt/XsltExample.cgi",
+            "allUsers": true
+        }
+	}
+}

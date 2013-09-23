@@ -12,7 +12,10 @@ HOMEPAGE = http://www.remotesensing.org/libtiff/
 COMMENT  =
 LICENSE  =
 
+
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --libdir=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
+
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -1,0 +1,15 @@
+bin:cgi-bin/BigWorld.cgi
+bin:cgi-bin/Dumper.cgi
+bin:cgi-bin/EmbedExample.cgi
+bin:cgi-bin/GetGreeter.cgi
+bin:cgi-bin/HelloWorld.cgi
+bin:cgi-bin/PostGreeter.cgi
+bin:cgi-bin/PostStreamExample.cgi
+bin:cgi-bin/ServiceExample.cgi
+bin:cgi-bin/PrefixExample.cgi
+bin:cgi-bin/ThreadedDumper.cgi
+bin:cgi-bin/XsltExample.cgi
+rsc:cgi-bin/example.xsl
+lnk:lib*/libFastCgiQt0.so
+lnk:lib*/libFastCgiQt0.so.0
+lib:lib*/libFastCgiQt0.so.0.0.1

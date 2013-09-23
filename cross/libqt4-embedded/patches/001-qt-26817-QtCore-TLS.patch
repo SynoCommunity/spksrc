@@ -1,0 +1,13 @@
+diff --git src/corelib/thread/qthread_unix.cpp src/corelib/thread/qthread_unix.cpp
+index 7cf56b7..5a4ac20 100644
+--- src/corelib/thread/qthread_unix.cpp
++++ src/corelib/thread/qthread_unix.cpp
+@@ -110,7 +110,7 @@ QT_BEGIN_NAMESPACE
+ 
+ enum { ThreadPriorityResetFlag = 0x80000000 };
+ 
+-#if defined(Q_OS_LINUX) && defined(__GLIBC__) && (defined(Q_CC_GNU) || defined(Q_CC_INTEL))
++#if defined(Q_OS_LINUX) && defined(__GLIBC__) && ((defined(Q_CC_GNU) && defined(_GLIBCXX_HAVE_TLS)) || defined(Q_CC_INTEL))
+ #define HAVE_TLS
+ #endif
+ #if defined(Q_CC_XLC) || defined (Q_CC_SUN)
