@@ -91,7 +91,7 @@ If you are not familiar with git or GitHub, please refer to the excellent `GitHu
 
 Donate
 ------
-If you like spksrc and packages made out of it, please consider making a donation to his authors:
+If you like spksrc and packages made out of it, please consider making a donation to these authors:
 
 * Diaoul
 
@@ -111,6 +111,13 @@ If you like spksrc and packages made out of it, please consider making a donatio
   .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
     :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=T6BU3QXYH4CMG
 
+* Ximi1970
+
+  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
+    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=93M5JMB4KEZE2
+
+    
+    
 Bugs
 ----
 If you find a bug please report it in the `bug tracker`_ if it has not already been reported. Be sure to provide as much information as possible.
