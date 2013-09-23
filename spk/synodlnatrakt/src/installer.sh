@@ -8,9 +8,11 @@ DNAME="SynoDLNAtrakt"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+GIT_DIR="/usr/local/git"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:${PATH}"
 USER="synodlnatrakt"
 GROUP="users"
+GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -30,6 +32,9 @@ postinst ()
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
+
+    #clone the repository
+    ${GIT} clone -q git://github.com/cytec/SynoDLNAtrakt.git ${INSTALL_DIR}/var/SynoDLNAtrakt
 
     # Install configobj
     ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build configobj > /dev/null
@@ -56,7 +61,7 @@ preuninst ()
     ${SSS} stop > /dev/null
 
     # Remove the user (if not upgrading)
-    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
@@ -80,9 +85,6 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
-
-    # Remove auto-updater stuff so it doesn't get confused
-    rm -fr ${INSTALL_DIR}/var/cache/updates/
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
