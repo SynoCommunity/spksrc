@@ -1,0 +1,11 @@
+diff -urN arch.orig/arm/include/asm/Kbuild arch/arm/include/asm/Kbuild
+--- arch.orig/arm/include/asm/Kbuild	2012-08-17 16:02:24.000000000 +0200
++++ arch/arm/include/asm/Kbuild	2013-06-02 22:57:46.428021771 +0200
+@@ -1,6 +1,7 @@
+ include include/asm-generic/Kbuild.asm
+ 
+ unifdef-y += hwcap.h
++unifdef-y += glue.h
+ unifdef-y += page-nommu.h
+ unifdef-y += memory.h
+ unifdef-y += sizes.h

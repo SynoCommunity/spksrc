@@ -1,0 +1,17 @@
+diff -urN include.orig/linux/Kbuild include/linux/Kbuild
+--- include.orig/linux/Kbuild	2012-08-17 16:02:20.000000000 +0200
++++ include/linux/Kbuild	2013-06-02 22:53:49.496985476 +0200
+@@ -306,6 +306,7 @@
+ unifdef-y += nfs_idmap.h
+ unifdef-y += n_r3964.h
+ unifdef-y += nubus.h
++unifdef-y += numa.h
+ unifdef-y += nvram.h
+ unifdef-y += oom.h
+ unifdef-y += parport.h
+@@ -393,4 +394,5 @@
+ header-y += synosata.h
+ header-y += syno_debug.h
+ header-y += synobios.h
++header-y += syno_acl.h
+ header-y += syno_acl_xattr_ds.h

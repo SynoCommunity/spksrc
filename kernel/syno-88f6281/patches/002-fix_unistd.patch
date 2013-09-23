@@ -1,0 +1,16 @@
+diff -urN arch.orig/arm/include/asm/unistd.h arch/arm/include/asm/unistd.h
+--- arch.orig/arm/include/asm/unistd.h	2012-09-28 17:54:25.000000000 +0200
++++ arch/arm/include/asm/unistd.h	2013-06-02 23:06:32.240696949 +0200
+@@ -430,11 +430,7 @@
+ #if !defined(__KERNEL__)
+ /* direct SYNOCaselessStat to stat64 in 32-bit platform
+  * 64-bits arch has no stat64 support */
+-#include <bits/wordsize.h>
+-#if __WORDSIZE == 64
+-#define SYNOCaselessStat(arg1,arg2)                         syscall(__NR_SYNOCaselessStat , arg1,arg2)
+-#define SYNOCaselessLStat(arg1,arg2)                         syscall(__NR_SYNOCaselessLStat , arg1,arg2)
+-#elif (_FILE_OFFSET_BITS == 64)
++#if (_FILE_OFFSET_BITS == 64)
+ #define SYNOCaselessStat(arg1,arg2)                         syscall(__NR_SYNOCaselessStat64 , arg1,arg2)
+ #define SYNOCaselessLStat(arg1,arg2)                         syscall(__NR_SYNOCaselessLStat64 , arg1,arg2)
+ #endif

@@ -1,0 +1,22 @@
+--- ld_prefix-fix.sh.orig	1970-01-01 01:00:00.000000000 +0100
++++ ld_prefix-fix.sh	2013-06-02 14:12:27.358052967 +0200
+@@ -0,0 +1,19 @@
++#!/bin/bash
++#
++#
++
++#
++#	Based upon a LFS patch
++#
++#	http://www.linuxfromscratch.org/lfs/view/stable/chapter05/gcc-pass1.html
++#
++TOOLCHAIN=
++
++for file in \
++	$(find gcc/config -name linux64.h -o -name linux.h -o -name linux-eabi.h -o -name linux-elf.h -o -name sysv4.h)
++do
++	cp -uv $file{,.orig}
++	sed -e "s@/lib\(64\)\?\(32\)\?/ld@$TOOLCHAIN&@g" $file.orig > $file
++	touch $file.orig
++done
++sed -i '/k prot/agcc_cv_libc_provides_ssp=yes' gcc/configure

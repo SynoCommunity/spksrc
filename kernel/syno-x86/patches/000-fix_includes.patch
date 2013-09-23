@@ -1,0 +1,11 @@
+diff -urN include.orig/linux/Kbuild include/linux/Kbuild
+--- include.orig/linux/Kbuild	2013-05-17 13:19:00.906398144 +0200
++++ include/linux/Kbuild	2013-05-17 13:14:39.842612218 +0200
+@@ -405,6 +405,7 @@
+ header-y += synosata.h
+ header-y += syno_debug.h
+ header-y += synobios.h
++header-y += syno_acl.h
+ header-y += syno_acl_xattr_ds.h
+ header-y += wireless.h
+ header-y += x25.h

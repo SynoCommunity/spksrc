@@ -1,0 +1,38 @@
+diff -urN arch.orig/x86/include/asm/unistd_32.h arch/x86/include/asm/unistd_32.h
+--- arch.orig/x86/include/asm/unistd_32.h	2012-09-28 19:19:04.000000000 +0200
++++ arch/x86/include/asm/unistd_32.h	2013-05-29 23:44:40.920629854 +0200
+@@ -387,11 +387,7 @@
+ #if !defined(__KERNEL__)
+ /* direct SYNOCaselessStat to stat64 in 32-bit platform
+  * 64-bits arch has no stat64 support */
+-#include <bits/wordsize.h>
+-#if __WORDSIZE == 64
+-#define SYNOCaselessStat(arg1,arg2)		syscall(__NR_SYNOCaselessStat ,arg1,arg2)
+-#define SYNOCaselessLStat(arg1,arg2)	syscall(__NR_SYNOCaselessLStat ,arg1,arg2)
+-#elif (_FILE_OFFSET_BITS == 64)
++#if (_FILE_OFFSET_BITS == 64)
+ #define SYNOCaselessStat(arg1,arg2)		syscall(__NR_SYNOCaselessStat64 ,arg1,arg2)
+ #define SYNOCaselessLStat(arg1,arg2)	syscall(__NR_SYNOCaselessLStat64 ,arg1,arg2)
+ #endif
+diff -urN arch.orig/x86/include/asm/unistd_64.h arch/x86/include/asm/unistd_64.h
+--- arch.orig/x86/include/asm/unistd_64.h	2012-09-28 19:19:04.000000000 +0200
++++ arch/x86/include/asm/unistd_64.h	2013-05-29 23:50:21.747135373 +0200
+@@ -722,18 +722,10 @@
+ #if !defined(__KERNEL__)
+ /* direct SYNOCaselessStat to stat64 in 32-bit platform
+  * 64-bits arch has no stat64 support */
+-#include <bits/wordsize.h>
+-#if __WORDSIZE == 64
+ #define SYNOCaselessStat(arg1,arg2)		syscall(__NR_SYNOCaselessStat , arg1,arg2)
+ #define SYNOCaselessLStat(arg1,arg2)	syscall(__NR_SYNOCaselessLStat , arg1,arg2)
+ __SYSCALL(__NR_SYNOCaselessStat, sys_SYNOCaselessStat)
+ __SYSCALL(__NR_SYNOCaselessLStat, sys_SYNOCaselessLStat)
+-#elif (_FILE_OFFSET_BITS == 64)
+-#define SYNOCaselessStat(arg1,arg2)		syscall(__NR_SYNOCaselessStat64 , arg1,arg2)
+-#define SYNOCaselessLStat(arg1,arg2)	syscall(__NR_SYNOCaselessLStat64 , arg1,arg2)
+-__SYSCALL(__NR_SYNOCaselessStat64, sys_SYNOCaselessStat64)
+-__SYSCALL(__NR_SYNOCaselessLStat64, sys_SYNOCaselessLStat64)
+-#endif
+ /* define stat64 interface for compatibility
+    These should be removed after AP modification */
+ #define SYNOCaselessStat64(arg1,arg2)	syscall(__NR_SYNOCaselessStat64 , arg1,arg2)
