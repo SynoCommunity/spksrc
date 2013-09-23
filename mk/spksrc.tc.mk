@@ -49,9 +49,33 @@ CXXFLAGS += $(TC_CXXFLAGS)
 CXXFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 
 LDFLAGS += $(TC_LDFLAGS)
-LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
-LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
+LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
+LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
+
+NAME_EXT = $(shell echo $(ARCH) | grep "-" | sed "s/.*-/-/" )
+ifneq ($(strip $(NAME_EXT)),)
+
+BASEARCH = $(shell echo $(ARCH) | sed "s/-gcc..//" )
+
+ifeq ($(NAME_EXT),-gcc47)
+
+ifneq ($(findstring bromolow,$(ARCH))$(findstring cedarview,$(ARCH))$(findstring x86,$(ARCH)),)
+LDFLAGS += -Wl,--rpath,/usr/local/toolchain-gcc47/lib64 -Wl,--rpath,/usr/local/toolchain-gcc47/usr/lib64
+else
+LDFLAGS += -Wl,--rpath,/usr/local/toolchain-gcc47/lib -Wl,--rpath,/usr/local/toolchain-gcc47/usr/lib
+endif
+
+else ifeq ($(NAME_EXT),-gcc48)
+
+ifneq ($(findstring bromolow,$(ARCH))$(findstring cedarview,$(ARCH))$(findstring x86,$(ARCH)),)
+LDFLAGS += -Wl,--rpath,/usr/local/toolchain-gcc48/lib64 -Wl,--rpath,/usr/local/toolchain-gcc48/usr/lib64
+else
+LDFLAGS += -Wl,--rpath,/usr/local/toolchain-gcc48/lib -Wl,--rpath,/usr/local/toolchain-gcc48/usr/lib
+endif
+
+endif
+endif
 
 
 .PHONY: tc_vars
