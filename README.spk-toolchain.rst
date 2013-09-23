@@ -3,9 +3,11 @@ How to use the spk toolchain-gcc47 package
 
 Toolchain-gcc47 is a package which creates a new toolchain for a synology architecture.
 The new toolchain consists of binutils 2.23.2, gcc 4.7.3 and glibc 2.18.
-Currently only the cedarview architecture is "tested" but the package is enabled for:
+
+Currently only these architecture are enabled:
 
 cedarview, bromolow, x86 and 88f6281
+
 
 Status of the toolchains::
 
@@ -15,6 +17,7 @@ Status of the toolchains::
 	bromolow              ok           ok       ok       ok               ok              (cannot test)
 	x86                   ok           ok       ok       ok               ok              (cannot test)
 	88f6281               ok           ok       ok       ok               ok              ok
+
 
 
 Generating the toolchain
