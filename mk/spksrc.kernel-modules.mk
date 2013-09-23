@@ -3,6 +3,7 @@ SHELL := $(SHELL) -e
 default: all
 
 WORK_DIR := $(shell pwd)/work
+include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
@@ -12,6 +13,7 @@ COOKIE_PREFIX = $(PKG_NAME)-
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
 DIST_EXT      = $(PKG_EXT)
 COMPILE_TARGET = kernel_module_compile_target
+INSTALL_TARGET = kernel_install_header_target
 EXTRACT_TARGET = kernel_extract_target
 CONFIGURE_TARGET = kernel_configure_target
 COPY_TARGET = nop
@@ -27,7 +29,7 @@ KERNEL_ENV += PATH=$$PATH
 RUN = cd $(KERNEL_DIR) && env -i $(KERNEL_ENV)
 MSG = echo "===>   "
 
-.PHONY: kernel_module_compile_target kernel_extract_target kernel_configure_target
+.PHONY: kernel_install_header_target kernel_module_compile_target kernel_extract_target kernel_configure_target
 
 include ../../mk/spksrc.download.mk
 
@@ -46,8 +48,11 @@ include ../../mk/spksrc.configure.mk
 compile: configure
 include ../../mk/spksrc.compile.mk
 
+install: compile
+include ../../mk/spksrc.install.mk
 
-all: compile
+
+all: install
 
 ### Clean rules
 clean:
@@ -65,8 +70,12 @@ $(DIGESTS_FILE):
 	  echo "$(PKG_DIST_NAME) $$type `$$tool $(DISTRIB_DIR)/$(PKG_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
 	done
 
+kernel_install_header_target:
+	$(RUN) $(MAKE) ARCH=$(ARCH) headers_check
+	$(RUN) $(MAKE) ARCH=$(ARCH) INSTALL_HDR_PATH=$(WORK_DIR) headers_install
+
 kernel_module_compile_target:
-	$(RUN) $(MAKE) modules
+	$(RUN) $(MAKE) $(MAKE_OPT) modules
 
 kernel_extract_target:
 	mkdir -p $(KERNEL_DIR)
