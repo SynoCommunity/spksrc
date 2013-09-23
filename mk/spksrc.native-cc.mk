@@ -7,9 +7,15 @@ WORK_DIR := $(PWD)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
-NAME          = native-$(PKG_NAME) 
+NAME          = $(PKG_NAME)
+ifeq ($(COOKIE_PREFIX),)
 COOKIE_PREFIX = $(PKG_NAME)-
+endif
+ifneq ($(PKG_DIST_FILE),)
+DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_FILE)
+else
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+endif
 DIST_EXT      = $(PKG_EXT)
 
 #####
@@ -40,7 +46,16 @@ include ../../mk/spksrc.install.mk
 
 .PHONY: cat_PLIST
 cat_PLIST:
-	@true
+	@for depend in $(DEPENDS) ; \
+	do                          \
+	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
+	done
+	@if [ -f PLIST ] ; \
+	then \
+	  cat PLIST ; \
+	else \
+	  $(MSG) "No PLIST for $(NAME)" >&2; \
+	fi
 
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
