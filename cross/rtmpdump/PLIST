@@ -1,0 +1,15 @@
+bin:bin/rtmpdump
+lnk:lib/librtmp.so
+lib:lib/librtmp.so.0
+lib:lib/engines/lib4758cca.so
+lib:lib/engines/libaep.so
+lib:lib/engines/libatalla.so
+lib:lib/engines/libcapi.so
+lib:lib/engines/libchil.so
+lib:lib/engines/libcswift.so
+lib:lib/engines/libgmp.so
+lib:lib/engines/libgost.so
+lib:lib/engines/libnuron.so
+lib:lib/engines/libpadlock.so
+lib:lib/engines/libsureware.so
+lib:lib/engines/libubsec.so
