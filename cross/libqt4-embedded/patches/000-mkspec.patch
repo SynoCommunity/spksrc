@@ -1,6 +1,14 @@
-diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281/qmake.conf mkspecs/qws/linux-g++-syno_88f5281/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_88f5281/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_88f5281/qmake.conf	2012-11-09 22:30:25.000000000 +0100
+diff -urN mkspecs.orig/qws/.directory mkspecs/qws/.directory
+--- mkspecs.orig/qws/.directory	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/.directory	2013-09-25 14:16:46.201568982 +0200
+@@ -0,0 +1,4 @@
++[Dolphin]
++Timestamp=2013,9,25,14,16,46
++Version=3
++ViewMode=2
+diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_88f5281-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_88f5281-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f5281-gcc47/qmake.conf	2013-09-25 14:15:50.595302378 +0200
 @@ -0,0 +1,21 @@
 +#
 +# qmake configuration for building with arm-marvell-linux-gnu-g++
@@ -23,9 +31,80 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281/qmake.conf mkspecs/qws/linux-g
 +QMAKE_STRIP             = arm-marvell-linux-gnu-strip
 +
 +load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281/qplatformdefs.h mkspecs/qws/linux-g++-syno_88f5281/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_88f5281/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_88f5281/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
+diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_88f5281-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_88f5281-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f5281-gcc47/qplatformdefs.h	2013-09-25 14:15:50.595302378 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_88f5281-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_88f5281-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f5281-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with arm-marvell-linux-gnu-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = arm-marvell-linux-gnu-gcc
++QMAKE_CXX               = arm-marvell-linux-gnu-g++
++QMAKE_LINK              = arm-marvell-linux-gnu-g++
++QMAKE_LINK_SHLIB        = arm-marvell-linux-gnu-g++
++
++# modifications to linux.conf
++QMAKE_AR                = arm-marvell-linux-gnu-ar cqs
++QMAKE_OBJCOPY           = arm-marvell-linux-gnu-objcopy
++QMAKE_STRIP             = arm-marvell-linux-gnu-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_88f5281-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_88f5281-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f5281-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
 @@ -0,0 +1,42 @@
 +/****************************************************************************
 +**
@@ -71,7 +150,7 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_88f5281/qplatformdefs.h mkspecs/qws/li
 +#include "../../linux-g++/qplatformdefs.h"
 diff -urN mkspecs.orig/qws/linux-g++-syno_88f6281-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_88f6281-gcc47/qmake.conf
 --- mkspecs.orig/qws/linux-g++-syno_88f6281-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_88f6281-gcc47/qmake.conf	2012-11-09 22:30:25.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f6281-gcc47/qmake.conf	2013-09-25 14:15:50.596302383 +0200
 @@ -0,0 +1,21 @@
 +#
 +# qmake configuration for building with arm-none-linux-gnueabi-g++
@@ -96,7 +175,7 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_88f6281-gcc47/qmake.conf mkspecs/qws/l
 +load(qt_config)
 diff -urN mkspecs.orig/qws/linux-g++-syno_88f6281-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_88f6281-gcc47/qplatformdefs.h
 --- mkspecs.orig/qws/linux-g++-syno_88f6281-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_88f6281-gcc47/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f6281-gcc47/qplatformdefs.h	2013-09-25 14:15:50.596302383 +0200
 @@ -0,0 +1,42 @@
 +/****************************************************************************
 +**
@@ -140,9 +219,80 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_88f6281-gcc47/qplatformdefs.h mkspecs/
 +****************************************************************************/
 +
 +#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow/qmake.conf mkspecs/qws/linux-g++-syno_bromolow/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_bromolow/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_bromolow/qmake.conf	2012-11-09 22:30:25.000000000 +0100
+diff -urN mkspecs.orig/qws/linux-g++-syno_88f6281-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_88f6281-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_88f6281-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f6281-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with arm-none-linux-gnueabi-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = arm-unknown-linux-gnueabi-gcc
++QMAKE_CXX               = arm-unknown-linux-gnueabi-g++
++QMAKE_LINK              = arm-unknown-linux-gnueabi-g++
++QMAKE_LINK_SHLIB        = arm-unknown-linux-gnueabi-g++
++
++# modifications to linux.conf
++QMAKE_AR                = arm-unknown-linux-gnueabi-ar cqs
++QMAKE_OBJCOPY           = arm-unknown-linux-gnueabi-objcopy
++QMAKE_STRIP             = arm-unknown-linux-gnueabi-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_88f6281-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_88f6281-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_88f6281-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_88f6281-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_bromolow-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_bromolow-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_bromolow-gcc47/qmake.conf	2013-09-25 14:15:50.596302383 +0200
 @@ -0,0 +1,21 @@
 +#
 +# qmake configuration for building with x86_64-linux-gnu-g++
@@ -165,9 +315,80 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow/qmake.conf mkspecs/qws/linux-
 +QMAKE_STRIP             = x86_64-linux-gnu-strip
 +
 +load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow/qplatformdefs.h mkspecs/qws/linux-g++-syno_bromolow/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_bromolow/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_bromolow/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
+diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_bromolow-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_bromolow-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_bromolow-gcc47/qplatformdefs.h	2013-09-25 14:15:50.596302383 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_bromolow-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_bromolow-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_bromolow-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with x86_64-linux-gnu-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = x86_64-linux-gnu-gcc
++QMAKE_CXX               = x86_64-linux-gnu-g++
++QMAKE_LINK              = x86_64-linux-gnu-g++
++QMAKE_LINK_SHLIB        = x86_64-linux-gnu-g++
++
++# modifications to linux.conf
++QMAKE_AR                = x86_64-linux-gnu-ar cqs
++QMAKE_OBJCOPY           = x86_64-linux-gnu-objcopy
++QMAKE_STRIP             = x86_64-linux-gnu-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_bromolow-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_bromolow-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_bromolow-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
 @@ -0,0 +1,42 @@
 +/****************************************************************************
 +**
@@ -213,7 +434,7 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_bromolow/qplatformdefs.h mkspecs/qws/l
 +#include "../../linux-g++/qplatformdefs.h"
 diff -urN mkspecs.orig/qws/linux-g++-syno_cedarview-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_cedarview-gcc47/qmake.conf
 --- mkspecs.orig/qws/linux-g++-syno_cedarview-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_cedarview-gcc47/qmake.conf	2012-11-09 23:53:31.483142936 +0100
++++ mkspecs/qws/linux-g++-syno_cedarview-gcc47/qmake.conf	2013-09-25 14:15:50.596302383 +0200
 @@ -0,0 +1,21 @@
 +#
 +# qmake configuration for building with x86_64-linux-gnu-g++
@@ -238,7 +459,7 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_cedarview-gcc47/qmake.conf mkspecs/qws
 +load(qt_config)
 diff -urN mkspecs.orig/qws/linux-g++-syno_cedarview-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_cedarview-gcc47/qplatformdefs.h
 --- mkspecs.orig/qws/linux-g++-syno_cedarview-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_cedarview-gcc47/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_cedarview-gcc47/qplatformdefs.h	2013-09-25 14:15:50.596302383 +0200
 @@ -0,0 +1,42 @@
 +/****************************************************************************
 +**
@@ -282,364 +503,9 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_cedarview-gcc47/qplatformdefs.h mkspec
 +****************************************************************************/
 +
 +#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_powerpc/qmake.conf mkspecs/qws/linux-g++-syno_powerpc/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_powerpc/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_powerpc/qmake.conf	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,21 @@
-+#
-+# qmake configuration for building with powerpc-linux-g++
-+#
-+
-+include(../../common/linux.conf)
-+include(../../common/gcc-base-unix.conf)
-+include(../../common/g++-unix.conf)
-+include(../../common/qws.conf)
-+
-+# modifications to g++.conf
-+QMAKE_CC                = powerpc-linux-gcc
-+QMAKE_CXX               = powerpc-linux-g++
-+QMAKE_LINK              = powerpc-linux-g++
-+QMAKE_LINK_SHLIB        = powerpc-linux-g++
-+
-+# modifications to linux.conf
-+QMAKE_AR                = powerpc-linux-ar cqs
-+QMAKE_OBJCOPY           = powerpc-linux-objcopy
-+QMAKE_STRIP             = powerpc-linux-strip
-+
-+load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_powerpc/qplatformdefs.h mkspecs/qws/linux-g++-syno_powerpc/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_powerpc/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_powerpc/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,42 @@
-+/****************************************************************************
-+**
-+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
-+** Contact: http://www.qt-project.org/
-+**
-+** This file is part of the qmake spec of the Qt Toolkit.
-+**
-+** $QT_BEGIN_LICENSE:LGPL$
-+** GNU Lesser General Public License Usage
-+** This file may be used under the terms of the GNU Lesser General Public
-+** License version 2.1 as published by the Free Software Foundation and
-+** appearing in the file LICENSE.LGPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU Lesser
-+** General Public License version 2.1 requirements will be met:
-+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-+**
-+** In addition, as a special exception, Nokia gives you certain additional
-+** rights. These rights are described in the Nokia Qt LGPL Exception
-+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-+**
-+** GNU General Public License Usage
-+** Alternatively, this file may be used under the terms of the GNU General
-+** Public License version 3.0 as published by the Free Software Foundation
-+** and appearing in the file LICENSE.GPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU General
-+** Public License version 3.0 requirements will be met:
-+** http://www.gnu.org/copyleft/gpl.html.
-+**
-+** Other Usage
-+** Alternatively, this file may be used in accordance with the terms and
-+** conditions contained in a signed written agreement between you and Nokia.
-+**
-+**
-+**
-+**
-+**
-+**
-+** $QT_END_LICENSE$
-+**
-+****************************************************************************/
-+
-+#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_ppc824x/qmake.conf mkspecs/qws/linux-g++-syno_ppc824x/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_ppc824x/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_ppc824x/qmake.conf	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,21 @@
-+#
-+# qmake configuration for building with powerpc-linux-g++
-+#
-+
-+include(../../common/linux.conf)
-+include(../../common/gcc-base-unix.conf)
-+include(../../common/g++-unix.conf)
-+include(../../common/qws.conf)
-+
-+# modifications to g++.conf
-+QMAKE_CC                = powerpc-linux-gcc
-+QMAKE_CXX               = powerpc-linux-g++
-+QMAKE_LINK              = powerpc-linux-g++
-+QMAKE_LINK_SHLIB        = powerpc-linux-g++
-+
-+# modifications to linux.conf
-+QMAKE_AR                = powerpc-linux-ar cqs
-+QMAKE_OBJCOPY           = powerpc-linux-objcopy
-+QMAKE_STRIP             = powerpc-linux-strip
-+
-+load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_ppc824x/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc824x/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_ppc824x/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_ppc824x/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,42 @@
-+/****************************************************************************
-+**
-+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
-+** Contact: http://www.qt-project.org/
-+**
-+** This file is part of the qmake spec of the Qt Toolkit.
-+**
-+** $QT_BEGIN_LICENSE:LGPL$
-+** GNU Lesser General Public License Usage
-+** This file may be used under the terms of the GNU Lesser General Public
-+** License version 2.1 as published by the Free Software Foundation and
-+** appearing in the file LICENSE.LGPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU Lesser
-+** General Public License version 2.1 requirements will be met:
-+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-+**
-+** In addition, as a special exception, Nokia gives you certain additional
-+** rights. These rights are described in the Nokia Qt LGPL Exception
-+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-+**
-+** GNU General Public License Usage
-+** Alternatively, this file may be used under the terms of the GNU General
-+** Public License version 3.0 as published by the Free Software Foundation
-+** and appearing in the file LICENSE.GPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU General
-+** Public License version 3.0 requirements will be met:
-+** http://www.gnu.org/copyleft/gpl.html.
-+**
-+** Other Usage
-+** Alternatively, this file may be used in accordance with the terms and
-+** conditions contained in a signed written agreement between you and Nokia.
-+**
-+**
-+**
-+**
-+**
-+**
-+** $QT_END_LICENSE$
-+**
-+****************************************************************************/
-+
-+#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_ppc835x/qmake.conf mkspecs/qws/linux-g++-syno_ppc835x/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_ppc835x/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_ppc835x/qmake.conf	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,21 @@
-+#
-+# qmake configuration for building with powerpc-linux-gnuspe-g++
-+#
-+
-+include(../../common/linux.conf)
-+include(../../common/gcc-base-unix.conf)
-+include(../../common/g++-unix.conf)
-+include(../../common/qws.conf)
-+
-+# modifications to g++.conf
-+QMAKE_CC                = powerpc-linux-gnuspe-gcc
-+QMAKE_CXX               = powerpc-linux-gnuspe-g++
-+QMAKE_LINK              = powerpc-linux-gnuspe-g++
-+QMAKE_LINK_SHLIB        = powerpc-linux-gnuspe-g++
-+
-+# modifications to linux.conf
-+QMAKE_AR                = powerpc-linux-gnuspe-ar cqs
-+QMAKE_OBJCOPY           = powerpc-linux-gnuspe-objcopy
-+QMAKE_STRIP             = powerpc-linux-gnuspe-strip
-+
-+load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_ppc835x/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc835x/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_ppc835x/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_ppc835x/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,42 @@
-+/****************************************************************************
-+**
-+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
-+** Contact: http://www.qt-project.org/
-+**
-+** This file is part of the qmake spec of the Qt Toolkit.
-+**
-+** $QT_BEGIN_LICENSE:LGPL$
-+** GNU Lesser General Public License Usage
-+** This file may be used under the terms of the GNU Lesser General Public
-+** License version 2.1 as published by the Free Software Foundation and
-+** appearing in the file LICENSE.LGPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU Lesser
-+** General Public License version 2.1 requirements will be met:
-+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-+**
-+** In addition, as a special exception, Nokia gives you certain additional
-+** rights. These rights are described in the Nokia Qt LGPL Exception
-+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-+**
-+** GNU General Public License Usage
-+** Alternatively, this file may be used under the terms of the GNU General
-+** Public License version 3.0 as published by the Free Software Foundation
-+** and appearing in the file LICENSE.GPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU General
-+** Public License version 3.0 requirements will be met:
-+** http://www.gnu.org/copyleft/gpl.html.
-+**
-+** Other Usage
-+** Alternatively, this file may be used in accordance with the terms and
-+** conditions contained in a signed written agreement between you and Nokia.
-+**
-+**
-+**
-+**
-+**
-+**
-+** $QT_END_LICENSE$
-+**
-+****************************************************************************/
-+
-+#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_ppc854x/qmake.conf mkspecs/qws/linux-g++-syno_ppc854x/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_ppc854x/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_ppc854x/qmake.conf	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,21 @@
-+#
-+# qmake configuration for building with powerpc-linux-gnuspe-g++
-+#
-+
-+include(../../common/linux.conf)
-+include(../../common/gcc-base-unix.conf)
-+include(../../common/g++-unix.conf)
-+include(../../common/qws.conf)
-+
-+# modifications to g++.conf
-+QMAKE_CC                = powerpc-linux-gnuspe-gcc
-+QMAKE_CXX               = powerpc-linux-gnuspe-g++
-+QMAKE_LINK              = powerpc-linux-gnuspe-g++
-+QMAKE_LINK_SHLIB        = powerpc-linux-gnuspe-g++
-+
-+# modifications to linux.conf
-+QMAKE_AR                = powerpc-linux-gnuspe-ar cqs
-+QMAKE_OBJCOPY           = powerpc-linux-gnuspe-objcopy
-+QMAKE_STRIP             = powerpc-linux-gnuspe-strip
-+
-+load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_ppc854x/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc854x/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_ppc854x/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_ppc854x/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,42 @@
-+/****************************************************************************
-+**
-+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
-+** Contact: http://www.qt-project.org/
-+**
-+** This file is part of the qmake spec of the Qt Toolkit.
-+**
-+** $QT_BEGIN_LICENSE:LGPL$
-+** GNU Lesser General Public License Usage
-+** This file may be used under the terms of the GNU Lesser General Public
-+** License version 2.1 as published by the Free Software Foundation and
-+** appearing in the file LICENSE.LGPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU Lesser
-+** General Public License version 2.1 requirements will be met:
-+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-+**
-+** In addition, as a special exception, Nokia gives you certain additional
-+** rights. These rights are described in the Nokia Qt LGPL Exception
-+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-+**
-+** GNU General Public License Usage
-+** Alternatively, this file may be used under the terms of the GNU General
-+** Public License version 3.0 as published by the Free Software Foundation
-+** and appearing in the file LICENSE.GPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU General
-+** Public License version 3.0 requirements will be met:
-+** http://www.gnu.org/copyleft/gpl.html.
-+**
-+** Other Usage
-+** Alternatively, this file may be used in accordance with the terms and
-+** conditions contained in a signed written agreement between you and Nokia.
-+**
-+**
-+**
-+**
-+**
-+**
-+** $QT_END_LICENSE$
-+**
-+****************************************************************************/
-+
-+#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_qoriq/qmake.conf mkspecs/qws/linux-g++-syno_qoriq/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_qoriq/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_qoriq/qmake.conf	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,21 @@
-+#
-+# qmake configuration for building with powerpc-none-linux-gnuspe-g++
-+#
-+
-+include(../../common/linux.conf)
-+include(../../common/gcc-base-unix.conf)
-+include(../../common/g++-unix.conf)
-+include(../../common/qws.conf)
-+
-+# modifications to g++.conf
-+QMAKE_CC                = powerpc-none-linux-gnuspe-gcc
-+QMAKE_CXX               = powerpc-none-linux-gnuspe-g++
-+QMAKE_LINK              = powerpc-none-linux-gnuspe-g++
-+QMAKE_LINK_SHLIB        = powerpc-none-linux-gnuspe-g++
-+
-+# modifications to linux.conf
-+QMAKE_AR                = powerpc-none-linux-gnuspe-ar cqs
-+QMAKE_OBJCOPY           = powerpc-none-linux-gnuspe-objcopy
-+QMAKE_STRIP             = powerpc-none-linux-gnuspe-strip
-+
-+load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_qoriq/qplatformdefs.h mkspecs/qws/linux-g++-syno_qoriq/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_qoriq/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_qoriq/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
-@@ -0,0 +1,42 @@
-+/****************************************************************************
-+**
-+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
-+** Contact: http://www.qt-project.org/
-+**
-+** This file is part of the qmake spec of the Qt Toolkit.
-+**
-+** $QT_BEGIN_LICENSE:LGPL$
-+** GNU Lesser General Public License Usage
-+** This file may be used under the terms of the GNU Lesser General Public
-+** License version 2.1 as published by the Free Software Foundation and
-+** appearing in the file LICENSE.LGPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU Lesser
-+** General Public License version 2.1 requirements will be met:
-+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-+**
-+** In addition, as a special exception, Nokia gives you certain additional
-+** rights. These rights are described in the Nokia Qt LGPL Exception
-+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-+**
-+** GNU General Public License Usage
-+** Alternatively, this file may be used under the terms of the GNU General
-+** Public License version 3.0 as published by the Free Software Foundation
-+** and appearing in the file LICENSE.GPL included in the packaging of this
-+** file. Please review the following information to ensure the GNU General
-+** Public License version 3.0 requirements will be met:
-+** http://www.gnu.org/copyleft/gpl.html.
-+**
-+** Other Usage
-+** Alternatively, this file may be used in accordance with the terms and
-+** conditions contained in a signed written agreement between you and Nokia.
-+**
-+**
-+**
-+**
-+**
-+**
-+** $QT_END_LICENSE$
-+**
-+****************************************************************************/
-+
-+#include "../../linux-g++/qplatformdefs.h"
-diff -urN mkspecs.orig/qws/linux-g++-syno_x86/qmake.conf mkspecs/qws/linux-g++-syno_x86/qmake.conf
---- mkspecs.orig/qws/linux-g++-syno_x86/qmake.conf	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_x86/qmake.conf	2012-11-09 22:30:25.000000000 +0100
+diff -urN mkspecs.orig/qws/linux-g++-syno_cedarview-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_cedarview-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_cedarview-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_cedarview-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
 @@ -0,0 +1,21 @@
 +#
 +# qmake configuration for building with x86_64-linux-gnu-g++
@@ -662,9 +528,861 @@ diff -urN mkspecs.orig/qws/linux-g++-syno_x86/qmake.conf mkspecs/qws/linux-g++-s
 +QMAKE_STRIP             = x86_64-linux-gnu-strip
 +
 +load(qt_config)
-diff -urN mkspecs.orig/qws/linux-g++-syno_x86/qplatformdefs.h mkspecs/qws/linux-g++-syno_x86/qplatformdefs.h
---- mkspecs.orig/qws/linux-g++-syno_x86/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
-+++ mkspecs/qws/linux-g++-syno_x86/qplatformdefs.h	2012-11-09 22:30:25.000000000 +0100
+diff -urN mkspecs.orig/qws/linux-g++-syno_cedarview-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_cedarview-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_cedarview-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_cedarview-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_powerpc-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_powerpc-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_powerpc-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_powerpc-gcc47/qmake.conf	2013-09-25 14:15:50.596302383 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gcc
++QMAKE_CXX               = powerpc-linux-g++
++QMAKE_LINK              = powerpc-linux-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-objcopy
++QMAKE_STRIP             = powerpc-linux-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_powerpc-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_powerpc-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_powerpc-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_powerpc-gcc47/qplatformdefs.h	2013-09-25 14:15:50.596302383 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_powerpc-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_powerpc-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_powerpc-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_powerpc-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gcc
++QMAKE_CXX               = powerpc-linux-g++
++QMAKE_LINK              = powerpc-linux-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-objcopy
++QMAKE_STRIP             = powerpc-linux-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_powerpc-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_powerpc-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_powerpc-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_powerpc-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_ppc824x-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc824x-gcc47/qmake.conf	2013-09-25 14:15:50.596302383 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gcc
++QMAKE_CXX               = powerpc-linux-g++
++QMAKE_LINK              = powerpc-linux-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-objcopy
++QMAKE_STRIP             = powerpc-linux-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc824x-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc824x-gcc47/qplatformdefs.h	2013-09-25 14:15:50.596302383 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_ppc824x-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc824x-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gcc
++QMAKE_CXX               = powerpc-linux-g++
++QMAKE_LINK              = powerpc-linux-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-objcopy
++QMAKE_STRIP             = powerpc-linux-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc824x-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_ppc824x-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc824x-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_ppc835x-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc835x-gcc47/qmake.conf	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-gnuspe-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gnuspe-gcc
++QMAKE_CXX               = powerpc-linux-gnuspe-g++
++QMAKE_LINK              = powerpc-linux-gnuspe-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-gnuspe-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-gnuspe-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-gnuspe-objcopy
++QMAKE_STRIP             = powerpc-linux-gnuspe-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc835x-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc835x-gcc47/qplatformdefs.h	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_ppc835x-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc835x-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-gnuspe-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gnuspe-gcc
++QMAKE_CXX               = powerpc-linux-gnuspe-g++
++QMAKE_LINK              = powerpc-linux-gnuspe-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-gnuspe-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-gnuspe-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-gnuspe-objcopy
++QMAKE_STRIP             = powerpc-linux-gnuspe-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc835x-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_ppc835x-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc835x-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_ppc854x-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc854x-gcc47/qmake.conf	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-gnuspe-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gnuspe-gcc
++QMAKE_CXX               = powerpc-linux-gnuspe-g++
++QMAKE_LINK              = powerpc-linux-gnuspe-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-gnuspe-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-gnuspe-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-gnuspe-objcopy
++QMAKE_STRIP             = powerpc-linux-gnuspe-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc854x-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc854x-gcc47/qplatformdefs.h	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_ppc854x-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc854x-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-linux-gnuspe-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-linux-gnuspe-gcc
++QMAKE_CXX               = powerpc-linux-gnuspe-g++
++QMAKE_LINK              = powerpc-linux-gnuspe-g++
++QMAKE_LINK_SHLIB        = powerpc-linux-gnuspe-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-linux-gnuspe-ar cqs
++QMAKE_OBJCOPY           = powerpc-linux-gnuspe-objcopy
++QMAKE_STRIP             = powerpc-linux-gnuspe-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_ppc854x-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_ppc854x-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_ppc854x-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_qoriq-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_qoriq-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_qoriq-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_qoriq-gcc47/qmake.conf	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-none-linux-gnuspe-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-none-linux-gnuspe-gcc
++QMAKE_CXX               = powerpc-none-linux-gnuspe-g++
++QMAKE_LINK              = powerpc-none-linux-gnuspe-g++
++QMAKE_LINK_SHLIB        = powerpc-none-linux-gnuspe-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-none-linux-gnuspe-ar cqs
++QMAKE_OBJCOPY           = powerpc-none-linux-gnuspe-objcopy
++QMAKE_STRIP             = powerpc-none-linux-gnuspe-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_qoriq-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_qoriq-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_qoriq-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_qoriq-gcc47/qplatformdefs.h	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_qoriq-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_qoriq-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_qoriq-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_qoriq-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with powerpc-none-linux-gnuspe-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = powerpc-none-linux-gnuspe-gcc
++QMAKE_CXX               = powerpc-none-linux-gnuspe-g++
++QMAKE_LINK              = powerpc-none-linux-gnuspe-g++
++QMAKE_LINK_SHLIB        = powerpc-none-linux-gnuspe-g++
++
++# modifications to linux.conf
++QMAKE_AR                = powerpc-none-linux-gnuspe-ar cqs
++QMAKE_OBJCOPY           = powerpc-none-linux-gnuspe-objcopy
++QMAKE_STRIP             = powerpc-none-linux-gnuspe-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_qoriq-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_qoriq-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_qoriq-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_qoriq-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_x86-gcc47/qmake.conf mkspecs/qws/linux-g++-syno_x86-gcc47/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_x86-gcc47/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_x86-gcc47/qmake.conf	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with x86_64-linux-gnu-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = x86_64-linux-gnu-gcc
++QMAKE_CXX               = x86_64-linux-gnu-g++
++QMAKE_LINK              = x86_64-linux-gnu-g++
++QMAKE_LINK_SHLIB        = x86_64-linux-gnu-g++
++
++# modifications to linux.conf
++QMAKE_AR                = x86_64-linux-gnu-ar cqs
++QMAKE_OBJCOPY           = x86_64-linux-gnu-objcopy
++QMAKE_STRIP             = x86_64-linux-gnu-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_x86-gcc47/qplatformdefs.h mkspecs/qws/linux-g++-syno_x86-gcc47/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_x86-gcc47/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_x86-gcc47/qplatformdefs.h	2013-09-25 14:15:50.597302387 +0200
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** GNU Lesser General Public License Usage
++** This file may be used under the terms of the GNU Lesser General Public
++** License version 2.1 as published by the Free Software Foundation and
++** appearing in the file LICENSE.LGPL included in the packaging of this
++** file. Please review the following information to ensure the GNU Lesser
++** General Public License version 2.1 requirements will be met:
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Nokia gives you certain additional
++** rights. These rights are described in the Nokia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU General
++** Public License version 3.0 as published by the Free Software Foundation
++** and appearing in the file LICENSE.GPL included in the packaging of this
++** file. Please review the following information to ensure the GNU General
++** Public License version 3.0 requirements will be met:
++** http://www.gnu.org/copyleft/gpl.html.
++**
++** Other Usage
++** Alternatively, this file may be used in accordance with the terms and
++** conditions contained in a signed written agreement between you and Nokia.
++**
++**
++**
++**
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../../linux-g++/qplatformdefs.h"
+diff -urN mkspecs.orig/qws/linux-g++-syno_x86-gcc48/qmake.conf mkspecs/qws/linux-g++-syno_x86-gcc48/qmake.conf
+--- mkspecs.orig/qws/linux-g++-syno_x86-gcc48/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_x86-gcc48/qmake.conf	2013-09-25 14:15:50.000000000 +0200
+@@ -0,0 +1,21 @@
++#
++# qmake configuration for building with x86_64-linux-gnu-g++
++#
++
++include(../../common/linux.conf)
++include(../../common/gcc-base-unix.conf)
++include(../../common/g++-unix.conf)
++include(../../common/qws.conf)
++
++# modifications to g++.conf
++QMAKE_CC                = x86_64-linux-gnu-gcc
++QMAKE_CXX               = x86_64-linux-gnu-g++
++QMAKE_LINK              = x86_64-linux-gnu-g++
++QMAKE_LINK_SHLIB        = x86_64-linux-gnu-g++
++
++# modifications to linux.conf
++QMAKE_AR                = x86_64-linux-gnu-ar cqs
++QMAKE_OBJCOPY           = x86_64-linux-gnu-objcopy
++QMAKE_STRIP             = x86_64-linux-gnu-strip
++
++load(qt_config)
+diff -urN mkspecs.orig/qws/linux-g++-syno_x86-gcc48/qplatformdefs.h mkspecs/qws/linux-g++-syno_x86-gcc48/qplatformdefs.h
+--- mkspecs.orig/qws/linux-g++-syno_x86-gcc48/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ mkspecs/qws/linux-g++-syno_x86-gcc48/qplatformdefs.h	2013-09-25 14:15:50.000000000 +0200
 @@ -0,0 +1,42 @@
 +/****************************************************************************
 +**
