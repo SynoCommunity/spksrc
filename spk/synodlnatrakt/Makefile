@@ -1,6 +1,6 @@
 SPK_NAME = synodlnatrakt
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 1
 SPK_ICON = src/synodlnatrakt.png
 DSM_UI_DIR = app
 
@@ -32,7 +32,7 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: synodlnatrakt_extra_install
-synodlnatrakt_extra_install: $(STAGING_DIR)/share/SynoDLNAtrakt
+synodlnatrakt_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/settings.conf $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app

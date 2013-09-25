@@ -34,7 +34,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     #clone the repository
-    ${GIT} clone -q git://github.com/cytec/SynoDLNAtrakt.git ${INSTALL_DIR}/var/SynoDLNAtrakt
+    ${GIT} clone -q git://github.com/cytec/SynoDLNAtrakt.git ${INSTALL_DIR}/share/SynoDLNAtrakt
 
     # Install configobj
     ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build configobj > /dev/null
@@ -48,9 +48,9 @@ postinst ()
 
 
     #check for debugmode and anable it...
-    sed -i.backup 's/loglevel_mediaservice.*/loglevel_mediaservice="3"/g' /var/packages/MediaServer/etc/dmsinfo.conf
-    /var/packages/MediaServer/scripts/start-stop-status stop
-    /var/packages/MediaServer/scripts/start-stop-status start
+    # sed -i.backup 's/loglevel_mediaservice.*/loglevel_mediaservice="3"/g' /var/packages/MediaServer/etc/dmsinfo.conf
+    # /var/packages/MediaServer/scripts/start-stop-status stop
+    # /var/packages/MediaServer/scripts/start-stop-status start
 
     exit 0
 }
@@ -75,8 +75,8 @@ postuninst ()
     rm -f ${INSTALL_DIR}
 
     #remove debugmode stuff from mediaserver
-    rm -rf /var/packages/MediaServer/etc/dmsinfo.conf
-    cp /var/packages/MediaServer/etc/dmsinfo.conf.backup /var/packages/MediaServer/etc/dmsinfo.conf
+    # rm -rf /var/packages/MediaServer/etc/dmsinfo.conf
+    # cp /var/packages/MediaServer/etc/dmsinfo.conf.backup /var/packages/MediaServer/etc/dmsinfo.conf
 
     exit 0
 }
