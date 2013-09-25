@@ -24,17 +24,12 @@ COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
 
-ifeq ($(findstring $(ARCH), bromolow cedarview x86 88f6281 88f5281 armada370 powerpc ppc824x ppc853x ppc854x qoriq),)
-$(error This package is part of a toolchain. Please start with the package: spk/toolchain-gcc48 arch-<arch> )
-endif
-
-include ../../local.mk
-ifeq ($(findstring $(MAKE_TOOLCHAIN_ARCH), bromolow cedarview x86 88f6281 88f5281 armada370 powerpc ppc824x ppc853x ppc854x qoriq),)
+ifeq ($(MAKE_TOOLCHAIN_TARGET),)
 $(error This package is part of a toolchain. Please start with the package: spk/toolchain-gcc48 arch-<arch> )
 endif
 
 ifeq ($(MAKE_TOOLCHAIN_GCC_VER),48)
-TOOLCHAIN_PATH = $(WORK_DIR)/../../../toolchains/syno-$(MAKE_TOOLCHAIN_ARCH)-gcc$(MAKE_TOOLCHAIN_GCC_VER)/work/$(MAKE_TOOLCHAIN_TARGET)
+TOOLCHAIN_PATH = $(WORK_DIR)/../../../toolchains/syno-$(ARCH)-gcc$(MAKE_TOOLCHAIN_GCC_VER)/work/$(MAKE_TOOLCHAIN_TARGET)
 else
 $(error This package is part of a toolchain. Please start with the package: spk/toolchain-gcc48 arch-<arch> )
 endif
@@ -46,7 +41,7 @@ ARCH_LIBDIR=lib
 endif
 
 
-COOKIE_PREFIX=$(PKG_NAME)-$(MAKE_TOOLCHAIN_ARCH)-
+COOKIE_PREFIX=$(PKG_NAME)-$(ARCH)-
 
 
 include ../../mk/spksrc.native-cc.mk
@@ -71,9 +66,9 @@ myPreDepend:
 .PHONY: myConfigure
 myConfigure:
 	$(RUN) echo ; \
-		rm -rf work-$(MAKE_TOOLCHAIN_ARCH) ; \
-		mkdir -p work-$(MAKE_TOOLCHAIN_ARCH) ; \
-		if [ -f *-$(PKG_NAME)-$(PKG_VERS)/README.md ] ; then mv *-$(PKG_NAME)-$(PKG_VERS) work-$(MAKE_TOOLCHAIN_ARCH) ; fi
+		rm -rf work-$(ARCH) ; \
+		mkdir -p work-$(ARCH) ; \
+		if [ -f *-$(PKG_NAME)-$(PKG_VERS)/README.md ] ; then mv *-$(PKG_NAME)-$(PKG_VERS) work-$(ARCH) ; fi
 
 .PHONY: myCompile
 myCompile:
