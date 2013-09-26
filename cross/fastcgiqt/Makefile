@@ -1,12 +1,12 @@
 PKG_NAME = fastcgiqt
-PKG_VERS = master
-PKG_EXT = tar.xz
+PKG_VERS =
+PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH =
+PKG_GIT_HASH = master
 PKG_DIST_NAME = fastcgiqt.git
 PKG_DIST_SITE = git://github.com/fredemmott
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)-git$(PKG_GIT_HASH)
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = cross/libqt4-embedded
 
