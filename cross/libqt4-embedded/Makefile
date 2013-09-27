@@ -30,6 +30,15 @@ CONFIGURE_ARGS += -nomake examples -nomake demos -nomake docs -nomake translatio
 CONFIGURE_ARGS += -I$(INSTALL_DIR)$(INSTALL_PREFIX)/include -I$(INSTALL_DIR)$(INSTALL_PREFIX)/include/glib-2.0 -I$(INSTALL_DIR)$(INSTALL_PREFIX)/lib/glib-2.0/include -L$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 
 
+define \n
+
+
+endef
+ifneq ($(findstring $(ARCH),88f5281 88f6281 armada370 bromolow cedarview powerpc ppc824x ppc853x ppc854x qoriq x86 ),)
+$(error ${\n}${\n}Toolchain not compatible.${\n}${\n}Please use:${\n}make arch-$(ARCH)-gcc47${\n}or${\n}make arch-$(ARCH)-gcc48${\n}${\n}You can create the toolchain by running: spk/toolchain-gcc<47|48> arch-$(ARCH)${\n}${\n})
+endif
+
+
 include ../../mk/spksrc.cross-cc.mk
 
 
