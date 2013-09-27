@@ -28,6 +28,15 @@ PRE_DEPEND_TARGET = myPreDepend
 PRE_STRIP_TARGET = myPreStrip
 
 
+define \n
+
+
+endef
+ifneq ($(findstring $(ARCH),88f5281 armada370 powerpc ppc824x ppc853x ppc854x qoriq ),)
+$(error ${\n}${\n}Architecture not supported.${\n}${\n})
+endif
+
+
 %-gcc47:
 	@echo "Recursive build. Exiting."
 	@exit 1
@@ -46,6 +55,7 @@ $(info Found $(ARCH))
 MAIN_MAKE_TOOLCHAIN_TARGET = arm-unknown-linux-gnueabi
 endif
 MAIN_MAKE_TOOLCHAIN_GCC_VER = $(GCC_VER)
+
 
 MAKE = make MAKE_TOOLCHAIN_TARGET=$(MAIN_MAKE_TOOLCHAIN_TARGET) MAKE_TOOLCHAIN_GCC_VER=$(MAIN_MAKE_TOOLCHAIN_GCC_VER) 
 

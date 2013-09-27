@@ -28,6 +28,15 @@ PRE_DEPEND_TARGET = myPreDepend
 PRE_STRIP_TARGET = myPreStrip
 
 
+define \n
+
+
+endef
+ifneq ($(findstring $(ARCH),88f5281 armada370 powerpc ppc824x ppc853x ppc854x qoriq ),)
+$(error ${\n}${\n}Architecture not supported.${\n}${\n})
+endif
+
+
 %-gcc48:
 	@echo "Recursive build. Exiting."
 	@exit 1
