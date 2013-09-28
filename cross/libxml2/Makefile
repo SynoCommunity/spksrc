@@ -14,18 +14,21 @@ LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --without-python
-CONFIGURE_ARGS += --libdir=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
 
 ADDITIONAL_CFLAGS = -O3
 ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
 ADDITIONAL_CFLAGS = -O2
 endif
 
+INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
-
 
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: myInstall
+myInstall:
+	$(RUN) make install DESTDIR=$(INSTALL_DIR)
 
 .PHONY: myPostInstall
 myPostInstall:

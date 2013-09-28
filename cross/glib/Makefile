@@ -21,12 +21,9 @@ CONFIGURE_ARGS += GLIB_GENMARSHAL=$(WORK_DIR)/../../../native/glib/work-native/$
 CONFIGURE_ARGS += GLIB_COMPILE_SCHEMAS=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gio/glib-compile-schemas
 CONFIGURE_ARGS += GLIB_COMPILE_RESOURCES=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gio/glib-compile-resources
 
-
 INSTALL_TARGET = myInstall
 
-
 include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: myInstall
 myInstall:

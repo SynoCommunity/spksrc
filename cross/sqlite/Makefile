@@ -13,7 +13,12 @@ LICENSE  = http://www.sqlite.org/copyright.html
 
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --libdir=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
+CONFIGURE_ARGS = --libdir=$(INSTALL_PREFIX)/lib
 
+INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) make install DESTDIR=$(INSTALL_DIR)
