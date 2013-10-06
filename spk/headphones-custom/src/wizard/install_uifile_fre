@@ -1,0 +1,22 @@
+[{
+    "step_title": "Choisissez votre fork",
+    "items": [{
+        "type": "textfield",
+        "desc": "Paramètres du fork à utiliser",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "URL du fork",
+            "defaultValue": "git://github.com/sarkha63/headphones.git",
+            "validator": {
+                "allowBlank": false
+            }
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Branch du fork",
+            "defaultValue": "master",
+            "validator": {
+                "allowBlank": false
+            }
+        ]
+    }]
+}]
