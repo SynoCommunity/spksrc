@@ -41,6 +41,7 @@ postinst ()
 
   #add VHOST_FILE
   cp -f ${INSTALL_DIR}/app/plexconnect-vhosts.conf ${VHOST_FILE}
+  sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
   #add VHOST_SSL_FILE
   #cp -f ${INSTALL_DIR}/app/plexconnect-ssl-vhosts.conf ${VHOST_SSL_FILE}
 

@@ -11,14 +11,14 @@ PYTHON_DIR="/usr/local/python"
 PYTHON="${PYTHON_DIR}/bin/python"
 PATH="${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="${PACKAGE}"
-PROG_PY="${INSTALL_DIR}/share/PlexConnect/PlexConnect.py"
+PROG_PY="${INSTALL_DIR}/share/PlexConnect/PlexConnect_daemon.py"
 PID_FILE="${INSTALL_DIR}/var/PlexConnect.pid"
 LOG_FILE="${INSTALL_DIR}/var/PlexConnect.log"
 
 start_daemon ()
 {
     # Launch the application in the background as root so we can open the dns port
-    su -c "PATH=${PATH} ${PYTHON} ${PROG_PY} --daemon --pidfile ${PID_FILE} >/dev/null 2>&1"
+    su -c "PATH=${PATH} ${PYTHON} ${PROG_PY} --pidfile ${PID_FILE}"
 }
 
 stop_daemon ()
