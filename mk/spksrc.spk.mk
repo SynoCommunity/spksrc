@@ -11,9 +11,9 @@ SPK_BASE_ARCH = $(shell echo $(ARCH) | cut -d'-' -f 1 )
 NAME_EXT = $(shell echo $(ARCH) | grep "-" | sed "s/.*-/-/" )
 ifneq ($(strip $(NAME_EXT)),)
 ifneq ($(findstring $(NAME_EXT),-gcc47),)
-SPK_DEPENDS += "toolchain-gcc47>4.7.0-1"
+SPK_DEPENDS += ":toolchain-gcc47>4.7.0-1"
 else ifneq ($(findstring $(NAME_EXT),-gcc48),)
-SPK_DEPENDS += "toolchain-gcc48>4.8.0-1"
+SPK_DEPENDS += ":toolchain-gcc48>4.8.0-1"
 endif
 endif
 ARCH_SUFFIX = -$(ARCH)
