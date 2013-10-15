@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.cytec.packages.htpcmanager": {
+            "title": "HTPC-Manager",
+            "desc": "HTPC-Manager",
+            "icon": "images/htpcmanager-{0}.png",
+            "type": "url",
+            "url": "3rdparty/htpcmanager/htpcmanager.cgi",
+            "allUsers": true
+        }
+    }
+}
