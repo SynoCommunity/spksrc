@@ -13,9 +13,11 @@ rsc:etc/lcdexec.conf
 rsc:etc/lcdproc.conf
 rsc:etc/lcdvc.conf
 
-lib:lib/lcdproc/hd44780.so
-lib:lib/lcdproc/curses.so
-sbin/LCDd
+#lib:lib/lcdproc/hd44780.so
+#lib:lib/lcdproc/curses.so
+lib:lib/lcdproc/glcd.so
+
+bin:sbin/LCDd
 
 shr:share/man/man1/lcdexec.1
 shr:share/man/man1/lcdproc.1

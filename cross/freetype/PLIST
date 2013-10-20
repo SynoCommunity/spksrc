@@ -1,0 +1,6 @@
+bin:bin/freetype-config
+lib:lib/libfreetype.a
+lib:lib/libfreetype.la
+lnk:lib/libfreetype.so
+lnk:lib/libfreetype.so.6
+lib:lib/libfreetype.so.6.10.2

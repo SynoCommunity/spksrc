@@ -8,29 +8,26 @@ DNAME="lcdproc"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${PATH}:${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 DAEMON="${INSTALL_DIR}/sbin/LCDd"
-PID_FILE="${INSTALL_DIR}/var/lcdproc.pid"
+CLIENT="${INSTALL_DIR}/bin/lcdproc"
+#PID_FILE="/var/run/lcdproc.pid"
 CONF_FILE="${INSTALL_DIR}/etc/LCDd.conf"
-#IREXEC="${INSTALL_DIR}/bin/irexec"
-#LIRCRC_FILE="${INSTALL_DIR}/etc/lirc/lircrc"
-LOG_FILE="${INSTALL_DIR}/var/log/lcdproc"
-
-
-load_unload_drivers ()
-{
-
-}
+LOG_FILE="${INSTALL_DIR}/lcdproc.log"
+PID=`pidof LCDd`
+PID_CLIENT=`pidof lcdproc`
 
 start_daemon ()
 {
-    ${DAEMON} -c ${CONF_FILE} 2>&1 | tee ${LOG_FILE} & echo $! > ${PID_FILE}
+    ${DAEMON} -c ${CONF_FILE}
+    sleep 1
+    ${CLIENT}
 }
 
 stop_daemon ()
 {
     if daemon_status; then
         echo Stopping ${DNAME} ...
-        kill `cat ${PID_FILE}`
-        wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+	kill ${PID}
+        wait_for_status 1 20 || kill -9 ${PID}
     else
         echo ${DNAME} is not running
         exit 0
@@ -41,10 +38,9 @@ stop_daemon ()
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+    if [ ! -z "${PID}" ] && kill -0 $PID > /dev/null 2>&1; then
         return
     fi
-    rm -f ${PID_FILE}
     return 1
 }
 

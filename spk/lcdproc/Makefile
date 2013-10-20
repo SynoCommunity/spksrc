@@ -6,10 +6,10 @@ SPK_ICON = src/lirc.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = LCDproc is a piece of open source software that displays real-time system information from your Linux/*BSD box on a LCD. Various clients are available that display things like CPU load, system load, memory usage, uptime, and a lot more. Please note: Currently only the common display driver hd44780 with libftdi and usb support is compiled into this package. A setup guide is available at https://michaelrogger.wordpress.com.
+DESCRIPTION = LCDproc is a piece of open source software that displays real-time system information from your Linux/*BSD box on a LCD. Various clients are available that display things like CPU load, system load, memory usage, uptime, and a lot more. Please note: Currently only the display drivers glcd and hd44780 are compiled into this package. A setup guide is available at https://michaelrogger.wordpress.com.
 RELOAD_UI = no
 DISPLAY_NAME = LCDProc
-CHANGELOG = "LCDProc with hd44780 and libftdi"
+CHANGELOG = "LCDProc with glcd2usb, hd44780 (with ftdi)"
 
 HOMEPAGE = http://www.lcdproc.org
 LICENSE  =

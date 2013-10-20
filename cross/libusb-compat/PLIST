@@ -1,0 +1,5 @@
+lib:lib/libusb.a
+lib:lib/libusb.la
+lib:lib/libusb-0.1.so.4.4.4
+lnk:lib/libusb.so
+lnk:lib/libusb-0.1.so.4
