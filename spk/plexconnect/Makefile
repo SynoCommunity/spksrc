@@ -1,6 +1,6 @@
 SPK_NAME = plexconnect
 SPK_VERS = 0.2
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
@@ -8,7 +8,7 @@ DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = PlexConnect: Plex @ aTV - think different. See http://forums.plexapp.com/index.php/topic/72356-plexconnect-on-synology/ for detailed installation instructions. You must disable HTTPS connection for web services \(\'Web Services\'\ control pannel - \'HTTP Service\' tab\). The installer installs some default certificates in /usr/local/plexconnect/etc/certificates and you can download the trailers.cer file at https://www.dropbox.com/s/lbqpxju5zkpls29/trailers.cer to update your ATV. You can also replace the certificates with your own generated certificates. Your settings and profiles will be restored when you update the package.
+DESCRIPTION = PlexConnect: Plex @ aTV - think different. See http://forums.plexapp.com/index.php/topic/72356-plexconnect-on-synology/ for detailed installation instructions.
 RELOAD_UI = yes
 DISPLAY_NAME = PlexConnect
 
@@ -38,9 +38,7 @@ plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/plexconnect-vhosts.conf $(STAGING_DIR)/app/plexconnect-vhosts.conf
 	install -m 755 src/app/plexconnect-ssl-vhosts.conf $(STAGING_DIR)/app/plexconnect-ssl-vhosts.conf
-	install -m 755 src/app/certificates/trailers.cer $(STAGING_DIR)/etc/certificates/trailers.cer
-	install -m 755 src/app/certificates/trailers.key $(STAGING_DIR)/etc/certificates/trailers.key
-	install -m 755 src/app/certificates/trailers.pem $(STAGING_DIR)/etc/certificates/trailers.pem
+	install -m 777 -d $(STAGING_DIR)/etc/certificates
 	install -m 755 src/share/PlexConnect/Settings.cfg $(STAGING_DIR)/share/PlexConnect/Settings.cfg
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \

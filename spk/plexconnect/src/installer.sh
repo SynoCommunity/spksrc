@@ -13,7 +13,6 @@ ATV_CFG_FILE="share/PlexConnect/ATVSettings.cfg"
 PATH="${INSTALL_DIR}/sbin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="${PACKAGE}"
 PYTHON="${PYTHON_DIR}/bin/python"
-PROG_PY="${INSTALL_DIR}/PlexConnect.py"
 APACHE_DIR="/usr/syno/apache"
 HTTPD_CONF_USER="${APACHE_DIR}/conf/httpd.conf-user"
 VHOST_FILE="${APACHE_DIR}/conf/extra/plexconnect-vhosts.conf"
@@ -34,6 +33,10 @@ postinst ()
 
   # Create user
   adduser -h ${INSTALL_DIR} -g "${DNAME} User" -G users -s /bin/sh -S -D ${PACKAGE}
+
+  # Create the certificates
+  openssl req -new -nodes -newkey rsa:2048 -out "${INSTALL_DIR}/etc/certificates/trailers.pem" -keyout "${INSTALL_DIR}/etc/certificates/trailers.key" -x509 -days 7300 -subj "/C=US/CN=trailers.apple.com"
+  openssl x509 -in "${INSTALL_DIR}/etc/certificates/trailers.pem" -outform der -out "${INSTALL_DIR}/etc/certificates/trailers.cer" && cat "${INSTALL_DIR}/etc/certificates/trailers.key" >> "${INSTALL_DIR}/etc/certificates/trailers.pem"
 
   # Edit the configuration according to the wizard
   sed -i -e "s|8.8.8.8|${wizard_dns_server}|g" ${INSTALL_DIR}/${CFG_FILE}
