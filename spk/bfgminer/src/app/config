@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.bfgminer": {
+            "title": "BFGMiner",
+            "desc": "BFGMiner Web UI",
+            "icon": "images/bfgminer-{0}.png",
+            "type": "url",
+            "url": "3rdparty/bfgminer/redirect.cgi",
+            "allUsers": true
+        }
+    }
+}
