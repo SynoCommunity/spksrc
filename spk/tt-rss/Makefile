@@ -1,5 +1,5 @@
 SPK_NAME = tt-rss
-SPK_VERS = 1.9
+SPK_VERS = 1.10
 SPK_REV = 3
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
