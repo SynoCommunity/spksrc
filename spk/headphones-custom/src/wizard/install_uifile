@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
-            "defaultValue": "git://github.com/sarkha63/headphones.git",
+            "defaultValue": "git://github.com/sarakha63/headphones.git",
             "validator": {
                 "allowBlank": false
             }

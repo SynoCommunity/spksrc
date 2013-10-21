@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="headphones-custom"
-DNAME="Headphones"
+DNAME="Headphones Custom"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
