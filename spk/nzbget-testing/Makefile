@@ -1,7 +1,7 @@
 SPK_NAME = nzbget-testing
 SPK_VERS = 12.0~r892
 SPK_REV = 1
-SPK_ICON = src/nzbget.png
+SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/unrar cross/p7zip cross/$(SPK_NAME)
