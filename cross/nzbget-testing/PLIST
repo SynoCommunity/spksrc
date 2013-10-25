@@ -1,4 +1,3 @@
 bin:bin/nzbget
-bin:bin/nzbget-postprocess.sh
 bin:sbin/nzbgetd
 shr:share/nzbget/webui/
