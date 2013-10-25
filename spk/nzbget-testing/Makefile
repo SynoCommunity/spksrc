@@ -35,17 +35,17 @@ include ../../mk/spksrc.spk.mk
 .PHONY: nzbget_extra_install
 nzbget_extra_install: $(STAGING_DIR)/var/ppscripts
 	install -m 755 -d $(STAGING_DIR)/var
-        install -m 644 src/nzbget.conf $(STAGING_DIR)/var/nzbget.conf
-        install -m 644 src/nzbget.conf.template $(STAGING_DIR)/var/nzbget.conf.template
-        install -m 755 -d $(STAGING_DIR)/app
-        install -m 644 src/app/config $(STAGING_DIR)/app/config
-        install -m 755 -d $(STAGING_DIR)/app/texts
-        install -m 755 -d $(STAGING_DIR)/app/images
-        for size in 16 24 32 48; do \
-                convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-                        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-        done
+	install -m 644 src/nzbget.conf $(STAGING_DIR)/var/nzbget.conf
+	install -m 644 src/nzbget.conf.template $(STAGING_DIR)/var/nzbget.conf.template
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/app/texts
+	install -m 755 -d $(STAGING_DIR)/app/images
+	for size in 16 24 32 48; do \
+		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+	done
 
 $(STAGING_DIR)/share/nzbget/ppscripts/nzbToMedia:
-        cd $(STAGING_DIR)/var/ppscripts && git clone -b dev-TPB https://github.com/clinton-hall/nzbToMedia.git
-        rm -fr $(STAGING_DIR)/var/ppscripts/nzbToMedia/.git*
+	cd $(STAGING_DIR)/var/ppscripts && git clone -b dev-TPB https://github.com/clinton-hall/nzbToMedia.git
+	rm -fr $(STAGING_DIR)/var/ppscripts/nzbToMedia/.git*
