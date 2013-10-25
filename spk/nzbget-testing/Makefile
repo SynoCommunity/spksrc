@@ -46,6 +46,6 @@ nzbget_extra_install: $(STAGING_DIR)/var/ppscripts
 			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
-$(STAGING_DIR)/share/nzbget/ppscripts/nzbToMedia:
+$(STAGING_DIR)/var/ppscripts/nzbToMedia:
 	cd $(STAGING_DIR)/var/ppscripts && git clone -b dev-TPB https://github.com/clinton-hall/nzbToMedia.git
 	rm -fr $(STAGING_DIR)/var/ppscripts/nzbToMedia/.git*
