@@ -33,6 +33,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: nzbget_extra_install
+nzbget_extra_install: $(STAGING_DIR)/var/ppscripts/nzbToMedia
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/ppscripts
 	install -m 644 src/nzbget.conf $(STAGING_DIR)/var/nzbget.conf
@@ -41,7 +42,6 @@ include ../../mk/spksrc.spk.mk
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/texts
 	install -m 755 -d $(STAGING_DIR)/app/images
-nzbget_extra_install: $(STAGING_DIR)/var/ppscripts
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
