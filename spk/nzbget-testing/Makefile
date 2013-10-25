@@ -35,7 +35,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: nzbget_extra_install
 nzbget_extra_install: $(STAGING_DIR)/var/ppscripts
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/ppscripts
+	install -m 755 -d $(STAGING_DIR)/ppscripts
 	install -m 644 src/nzbget.conf $(STAGING_DIR)/var/nzbget.conf
 	install -m 644 src/nzbget.conf.template $(STAGING_DIR)/var/nzbget.conf.template
 	install -m 755 -d $(STAGING_DIR)/app
