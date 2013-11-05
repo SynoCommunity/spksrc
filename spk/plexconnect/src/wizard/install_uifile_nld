@@ -1,0 +1,16 @@
+[{
+    "step_title": "Instellingen PlexConnect",
+    "items": [{
+        "type": "textfield",
+        "desc": "Voer gegevens voor PlexConnect DNS in.",
+        "subitems": [{
+            "key": "wizard_dns_server",
+            "desc": "DNS server (het DNS nummer van ATV dat je genoteerd hebt voordat je deze veranderde)",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 7,
+                "maxLength": 15
+                }
+        }]
+    }]
+}]
