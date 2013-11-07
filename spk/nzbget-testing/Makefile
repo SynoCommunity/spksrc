@@ -36,7 +36,8 @@ include ../../mk/spksrc.spk.mk
 nzbget_extra_install: $(STAGING_DIR)/var/ppscripts/nzbToMedia
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/nzbget.conf $(STAGING_DIR)/var/nzbget.conf
-	install -m 644 src/nzbget.conf.template $(STAGING_DIR)/var/nzbget.conf.template
+	install -m 755 -d $(STAGING_DIR)/share/nzbget
+	install -m 644 src/nzbget.conf.template $(STAGING_DIR)/share/nzbget/nzbget.conf.template
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/texts
