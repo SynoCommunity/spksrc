@@ -1,0 +1,25 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Mining pool url. Defaults to coinotron.com:8322",
+        "subitems": [{
+            "key": "wizard_pool_url",
+            "desc": "Pool URL"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Username.  Defaults to polandj.synominer",
+        "subitems": [{
+            "key": "wizard_pool_username",
+            "desc": "Pool username"
+        }]
+    }, {
+  	"type": "textfield",
+	"desc": "Password. Defaults to polandj.synominer",
+	"subitems": [{
+	    "key": "wizard_pool_password",
+	    "desc": "Pool password"
+	}]
+    }
+}]

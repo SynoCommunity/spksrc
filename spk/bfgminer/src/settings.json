@@ -1,0 +1,12 @@
+{
+"pools": [
+	{
+	"url": "@wizard_pool_url@",
+	"user": "@wizard_pool_username@",
+	"pass": "@wizard_pool_password@"
+	}
+],
+"real-quiet": true,
+"api-listen": true,
+"api-allow": "W:127.0.0.1"
+}
