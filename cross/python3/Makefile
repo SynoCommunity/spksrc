@@ -36,7 +36,7 @@ HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
 HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_LIB_NATIVE = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
-PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).cross
 PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 
@@ -62,7 +62,7 @@ myInstall:
 
 .PHONY: myPostInstall
 myPostInstall: $(WORK_DIR)/python-cc.mk
-	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
+	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/
 
 $(WORK_DIR)/python-cc.mk:
