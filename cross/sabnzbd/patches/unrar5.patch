@@ -1,0 +1,11 @@
+--- sabnzbd/newsunpack.py
++++ sabnzbd/newsunpack.py
+@@ -639,7 +639,7 @@ def rar_extract_core(rarfile, numrars, one_folder, nzo, setname, extraction_path
+             nzo.set_unpack_info('Unpack', unicoder(msg), set=setname)
+             fail = 1
+
+-        elif 'ncrypted file' in line and 'CRC failed' in line:
++        elif 'ncrypted file' in line:
+             # unrar 4.x syntax
+             m = re.search('encrypted file (.+)\. Corrupt file', line)
+             if not m:
