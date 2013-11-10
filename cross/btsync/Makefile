@@ -17,13 +17,13 @@ COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
 
 # Define BTSYNC_ARCH as per BitTorrent Sync standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281 armada370),$(ARCH))
+ifeq ($(findstring $(ARCH),88f5281 88f6281 armada370 armadaxp),$(ARCH))
 BTSYNC_ARCH = arm
 endif
 ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x),$(ARCH))
 BTSYNC_ARCH = powerpc
 endif
-ifeq ($(findstring $(ARCH),x86 cedarview bromolow),$(ARCH))
+ifeq ($(findstring $(ARCH),x86 cedarview bromolow evansport),$(ARCH))
 BTSYNC_ARCH = glibc23_x64
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
