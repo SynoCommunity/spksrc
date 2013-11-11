@@ -1,5 +1,5 @@
 PKG_NAME = virtualenv
-PKG_VERS = 1.9.1
+PKG_VERS = 1.10.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/v/$(PKG_NAME)
