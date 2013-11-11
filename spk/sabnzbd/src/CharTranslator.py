@@ -41,6 +41,8 @@
 # 13-02-18 |   1.6   | Argv1 folder is now renamed (not managed by SABnzbd)
 # 13-02-19 |   1.7   | Changed CP437 detection range
 # 13-02-19 |   1.8   | Changed CP437 DOS encoding style with CP850
+# 13-10-02 |   1.9   | Fixed an issue with some NZB and Sickbeard option
+#                    | In order to simplify the support, the script version is now displayed
 #
 
 # get library modules
@@ -48,6 +50,8 @@ import sys
 import os
 import subprocess
 import shutil
+
+scriptVersionIs = 1.9
 
 # If empty, then no move
 # Format must be synology full path (case sensitive). For ex: /volume1/video/News
@@ -185,7 +189,7 @@ def addToSynoIndex(DirName):
 ########################
 # --- Main Program --- #
 ########################
-print "Launching CharTranslator Python script..."
+print "Launching CharTranslator Python script (v%s) ..." %scriptVersionIs
 print ""
 
 # Get scripts directory of the SABnzbd from its config.ini file
@@ -350,7 +354,7 @@ if (IndexInSynoDLNA == True) & (SickBeardPostProcessing == False):
 elif (IndexInSynoDLNA == False) & (SickBeardPostProcessing == True):
     print 100*'-'
     print "Launching SickBeard post-processing..."
-    autoProcessTV.processEpisode(currentFolder, sys.argv[2])
+    autoProcessTV.processEpisode(currentFolder)
     print "SickBeard post-processing done!"
     print ""
     print 100*'-'
