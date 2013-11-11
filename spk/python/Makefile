@@ -5,7 +5,7 @@ SPK_REV = 7
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
-DEPENDS += cross/distribute cross/distutils2 cross/pip cross/virtualenv cross/pyopenssl
+DEPENDS += cross/setuptools cross/distutils2 cross/pip cross/virtualenv cross/pyopenssl
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
