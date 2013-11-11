@@ -49,5 +49,5 @@ nzbget_extra_install: $(STAGING_DIR)/var/ppscripts/nzbToMedia
 
 $(STAGING_DIR)/var/ppscripts/nzbToMedia:
 	install -m 755 -d $(STAGING_DIR)/var/ppscripts
-	cd $(STAGING_DIR)/var/ppscripts && git clone -b dev-TPB https://github.com/clinton-hall/nzbToMedia.git
+	cd $(STAGING_DIR)/var/ppscripts && git clone https://github.com/clinton-hall/nzbToMedia.git
 	rm -fr $(STAGING_DIR)/var/ppscripts/nzbToMedia/.git*
