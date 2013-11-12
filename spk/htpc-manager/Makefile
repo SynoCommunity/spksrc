@@ -8,7 +8,7 @@ DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 
-MAINTAINER = cytec
+MAINTAINER = SynoCommunity
 DESCRIPTION = Contol your Htpc with ease. Using multiple applications to control you htpc? No More! Htpc Manager combines all your software and provides an easy way to controll them all!
 ADMIN_PORT = 8085
 RELOAD_UI = yes
@@ -30,7 +30,7 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: htpcmanager_extra_install
-htpcmanager_extra_install: 
+htpcmanager_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
