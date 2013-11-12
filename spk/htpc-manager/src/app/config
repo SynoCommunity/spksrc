@@ -1,6 +1,6 @@
 {
     ".url": {
-        "com.cytec.packages.htpcmanager": {
+        "com.synocommunity.packages.htpcmanager": {
             "title": "HTPC-Manager",
             "desc": "HTPC-Manager",
             "icon": "images/htpcmanager-{0}.png",
