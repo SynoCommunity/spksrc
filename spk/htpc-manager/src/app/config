@@ -5,8 +5,11 @@
             "desc": "HTPC-Manager",
             "icon": "images/htpcmanager-{0}.png",
             "type": "url",
-            "url": "3rdparty/htpcmanager/htpcmanager.cgi",
-            "allUsers": true
+            "protocol": "http",
+            "port": "8085",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
