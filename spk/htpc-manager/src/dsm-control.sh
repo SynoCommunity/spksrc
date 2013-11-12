@@ -7,7 +7,7 @@ DNAME="HTPC-Manager"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 USER="htpcmanager"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 HTPCMANAGER="${INSTALL_DIR}/share/HTPC-Manager/Htpc.py"
