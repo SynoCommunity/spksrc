@@ -23,7 +23,7 @@
 #
 # On POSIX you can use "~" as alias for home directory (e.g. "~/downloads").
 # On Windows use absolute paths (e.g. "C:\Downloads").
-MainDir=@download_dir@
+MainDir=~/downloads
 
 # Destination directory for downloaded files.
 #
@@ -46,7 +46,7 @@ DestDir=${MainDir}/dst
 #
 # NOTE: If the option <InterDir> is set to empty value the downloaded
 # files are put directly to destination directory (option <DestDir>).
-InterDir=
+InterDir=${MainDir}/inter
 
 # Directory for incoming nzb-files.
 #
@@ -76,24 +76,24 @@ TempDir=${MainDir}/tmp
 # NOTE: To disable web-interface set the option to an empty value.
 # This however doesn't disable the built-in web-server completely because
 # it is also used to serve JSON-/XML-RPC requests.
-WebDir=/usr/local/nzbget-testing/share/nzbget/webui
+WebDir=
 
 # Directory with post-processing scripts.
 #
 # NOTE: For information on writing post-processing scripts visit
 # http://nzbget.sourceforge.net/Post-processing_scripts.
-ScriptDir=/usr/local/nzbget-testing/var/ppscripts
+ScriptDir=${MainDir}/ppscripts
 
 # Lock-file for daemon-mode, POSIX only.
 #
 # If the option is not empty, NZBGet creates the file and writes process-id
 # (PID) into it. That info can be used in shell scripts.
-LockFile=/usr/local/nzbget-testing/var/nzbget.pid
+LockFile=${MainDir}/nzbget.lock
 
 # Where to store log file, if it needs to be created.
 #
 # NOTE: See also option <CreateLog>.
-LogFile=/usr/local/nzbget-testing/var/nzbget.log
+LogFile=${DestDir}/nzbget.log
 
 # Configuration file template.
 #
@@ -106,7 +106,7 @@ LogFile=/usr/local/nzbget-testing/var/nzbget.log
 # /usr/local/share/nzbget/nzbget.conf).
 #
 # Example: /usr/local/share/nzbget/nzbget.conf.
-ConfigTemplate=/usr/local/nzbget-testing/share/nzbget/nzbget.conf.template
+ConfigTemplate=
 
 
 ##############################################################################
@@ -241,7 +241,7 @@ ControlIP=0.0.0.0
 #
 # NOTE: The communication via this port is not encrypted. For encrypted
 # communication see option <SecurePort>.
-ControlPort=9876
+ControlPort=6789
 
 # User name which NZBGet server and remote client use.
 #
@@ -257,7 +257,7 @@ ControlUsername=nzbget
 # Password which NZBGet server and remote client use.
 #
 # Set to empty value to disable authorization request.
-ControlPassword=@server_password@
+ControlPassword=tegbzn6789
 
 # Secure control of NZBGet server (yes, no).
 #
@@ -306,7 +306,7 @@ DaemonUsername=root
 # command).
 # Empty value or value "1000" disable the setting of umask-mode; current
 # umask-mode (set via shell) is used in this case.
-UMask=0000
+UMask=1000
 
 
 ##############################################################################
@@ -967,16 +967,16 @@ ErrorTarget=both
 WarningTarget=both
 
 # How info messages must be printed (screen, log, both, none).
-InfoTarget=screen
+InfoTarget=both
 
 # How detail messages must be printed (screen, log, both, none).
-DetailTarget=none
+DetailTarget=both
 
 # How debug messages must be printed (screen, log, both, none).
 #
 # Debug-messages can be printed only if the program was compiled in
 # debug-mode: "./configure --enable-debug".
-DebugTarget=none
+DebugTarget=both
 
 # Number of messages stored in buffer and available for remote
 # clients (messages).
@@ -1225,7 +1225,7 @@ ParTimeLimit=0
 # the queue.
 #
 # NOTE: See also options <ScriptPauseQueue> and <UnpackPauseQueue>.
-ParPauseQueue=yes
+ParPauseQueue=no
 
 # Cleanup download queue after successful check/repair (yes, no).
 #
@@ -1269,7 +1269,7 @@ Unpack=yes
 # to speed up unpacking on slow CPUs.
 #
 # NOTE: See also options <ParPauseQueue> and <ScriptPauseQueue>.
-UnpackPauseQueue=yes
+UnpackPauseQueue=no
 
 # Delete archive files after successful unpacking (yes, no).
 UnpackCleanupDisk=yes
@@ -1432,4 +1432,4 @@ ScriptOrder=
 # to speed up postprocess on slow CPUs with fast connection (e.g. NAS-devices).
 #
 # NOTE: See also options <ParPauseQueue> and <UnpackPauseQueue>.
-ScriptPauseQueue=yes
+ScriptPauseQueue=no
