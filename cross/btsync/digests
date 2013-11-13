@@ -1,12 +1,3 @@
-btsync_arm-1.2.68.tar.gz SHA1 130880d2201f61a1de3d0c3ad8f19d9d87098939
-btsync_arm-1.2.68.tar.gz SHA256 24a3bce6b32d351065408c2f8c2e476ebb7d7ee41c915ea32507d64cf1726759
-btsync_arm-1.2.68.tar.gz MD5 fa7626cf37f4179523cd0a3e36747038
-btsync_ppc_quoriq-1.2.68.tar.gz SHA1 2527a67613b6b1f583b8dce57e428b4cdb6b8a14
-btsync_ppc_quoriq-1.2.68.tar.gz SHA256 084375175b84c0cf6f7d11a24e16b658b1c4563b312839a0fcd0ca59e3c8d7b2
-btsync_ppc_quoriq-1.2.68.tar.gz MD5 3b04cec7b4ff83e1dd77df9baaeb0a30
-btsync_powerpc-1.2.68.tar.gz SHA1 bb032225ce1070efa3d6001b9a577a5a8b0cb57b
-btsync_powerpc-1.2.68.tar.gz SHA256 025e612cc6d732c0178f3174579415c55d574628e368ca129d52a69a89c436ae
-btsync_powerpc-1.2.68.tar.gz MD5 86e29ba93507d45f8213497d65c80353
-btsync_glibc23_x64-1.2.68.tar.gz SHA1 4a453a6551356a63d41a6e8cf0b6f9a333db7079
-btsync_glibc23_x64-1.2.68.tar.gz SHA256 1bf447e00446d1a07b482107fbd958d01cb4848702ad850d98659727a2f486b3
-btsync_glibc23_x64-1.2.68.tar.gz MD5 474f66f297707bf57d9354473183e5f7
+btsync_ppc_quoriq-1.2.72.tar.gz SHA1 10d5df2f4bc75c888aee55d8d7779015ce2193cf
+btsync_ppc_quoriq-1.2.72.tar.gz SHA256 648c583ffca5e977cacb1cd12b46e5862338ced0fed38babc1539f3ad29a7820
+btsync_ppc_quoriq-1.2.72.tar.gz MD5 bff7a38e3941199a103623f6267c75e0
