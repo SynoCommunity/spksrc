@@ -12,6 +12,7 @@ DESCRIPTION_SPN = Lenguaje de programación Ruby.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Ruby
+BETA = 1
 
 HOMEPAGE   = http://www.ruby-lang.org/
 LICENSE    =
