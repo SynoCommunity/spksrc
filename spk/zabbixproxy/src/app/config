@@ -1,0 +1,10 @@
+{
+    ".url": {
+        "com.synocommunity.packages.zabbixproxy": {
+            "title": "Zabbix",
+            "desc": "Zabbix Proxy",
+            "icon": "images/zabbix-{0}.png",
+            "allUsers": false
+        }
+    }
+}
