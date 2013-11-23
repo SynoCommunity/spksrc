@@ -11,7 +11,7 @@
         "type": "textfield",
         "desc": "ServerName Port. Default to 10051",
         "subitems": [{
-            "key": "wizard_watch_dir",
+            "key": "zabbix_server_port",
             "desc": "Server Port"
         }]
     }]
@@ -27,6 +27,7 @@
     }, {
         "type": "password",
         "subitems": [{
+	     "desc": "Mysql database root password",
             "key": "wizard_mysql_password_root",
             "desc": "MySql Root Password"
         }]

@@ -1,6 +1,6 @@
 {
     ".url": {
-        "com.synocommunity.packages.zabbix": {
+        "com.synocommunity.packages.zabbixserver": {
             "title": "Zabbix",
             "desc": "Zabbix Web UI",
             "icon": "images/zabbix-{0}.png",
