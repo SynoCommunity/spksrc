@@ -1,0 +1,3 @@
+etc:etc/zabbix_server.conf
+bin:sbin/zabbix_server
+shr:share/man/man8/zabbix_server.8
