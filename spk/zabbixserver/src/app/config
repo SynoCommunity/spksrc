@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.zabbix": {
+            "title": "Zabbix",
+            "desc": "Zabbix Web UI",
+            "icon": "images/zabbix-{0}.png",
+            "type": "url",
+	     "protocol": "http",
+            "port": "80",
+            "url": "/zabbix",
+            "allUsers": false
+        }
+    }
+}
