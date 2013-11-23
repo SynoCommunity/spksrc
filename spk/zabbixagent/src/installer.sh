@@ -26,7 +26,7 @@ postinst ()
     # Edit the configuration according to the wizard
 
     sed -i -e "s|@Hostname@|${zabbix_agent_hostname:=Zabbix server}|g" ${CFG_FILE}
-    sed -i -e "s|@Server@|${zabbix_agent_ip:=127.0.0.1}|g" ${CFG_FILE}
+    sed -i -e "s|@Server@|${zabbix_server_ip:=127.0.0.1}|g" ${CFG_FILE}
     sed -i -e "s|@ListenPort@|${zabbix_agent_port:=10050}|g" ${CFG_FILE}
 
     # Correct the files ownership
