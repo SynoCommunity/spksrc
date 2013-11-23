@@ -46,8 +46,6 @@ postinst ()
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
                ${WEB_DIR}/${PACKAGE}/conf/config.php
 
-        echo "XSendFile On" > ${WEB_DIR}/${PACKAGE}/.htaccess
-
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                ${INSTALL_DIR}/var/.rtorrent.rc
@@ -103,7 +101,6 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/conf/config.php ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/${PACKAGE}/.htaccess ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.rtorrent.rc ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.session ${TMP_DIR}/${PACKAGE}/
 
@@ -114,7 +111,6 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/conf/
-    mv ${TMP_DIR}/${PACKAGE}/.htaccess ${WEB_DIR}/${PACKAGE}/
     mv ${TMP_DIR}/${PACKAGE}/.rtorrent.rc ${INSTALL_DIR}/var/
     mv ${TMP_DIR}/${PACKAGE}/.session ${INSTALL_DIR}/var/
     rm -fr ${TMP_DIR}/${PACKAGE}
