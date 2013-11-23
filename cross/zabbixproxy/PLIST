@@ -1,0 +1,3 @@
+etc:etc/zabbix_proxy.conf
+bin:sbin/zabbix_proxy
+shr:share/man/man8/zabbix_proxy.8
