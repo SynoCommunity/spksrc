@@ -80,6 +80,20 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        ln -s $${localFile} $${localHead} ; \
 	      fi ; \
 	      ;; \
+	    hg) \
+	      localFolder=$(NAME) ; \
+	      localFile=$${localFolder}.tar.gz ; \
+	      if [ ! -f $${localFile} ]; then \
+		rm -rf $${localFolder}.part ; \
+		echo "hg clone $${url}" ; \
+		hg clone $${url} $${localFolder}.part ; \
+		mv $${localFolder}.part $${localFolder} ; \
+		tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+		rm -fr $${localFolder} ; \
+	      else \
+		$(MSG) "  File $${localFile} already downloaded" ; \
+	      fi ; \
+	      ;; \
 	    *) \
 	      localFile=$(PKG_DIST_FILE) ; \
 	      if [ -z "$${localFile}" ]; then \
