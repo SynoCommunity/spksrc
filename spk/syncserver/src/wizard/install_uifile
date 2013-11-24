@@ -1,0 +1,55 @@
+[{
+    "step_title": "SyncServer URL configuration",
+    "items": [{
+	"type": "textfield",
+	"desc": "Choose the URL SyncServer is available on",
+	"subitems": [{
+		"key": "wizard_syncserver_url",
+		"desc": "URL",
+		"defaultValue": "http://192.168.1.40:8084",
+		"validator": {
+			"allowBlank": false
+		}
+        }]
+    }, {
+	"type": "textfield",
+	"desc": "Port to use",
+	"defaultValue": "8084",
+	"subitems": [{
+		"key": "wizard_syncserver_port",
+		"desc": "Port",
+		"defaultValue": "8084",
+		"validator": {
+			"allowBlank": false
+		}
+        }]
+    }]
+}, {
+    "step_title": "SyncServer SMTP configuration",
+    "items": [{
+	"type": "textfield",
+	"desc": "SMTP host",
+	"subitems": [{
+		"key": "wizard_syncserver_smtp_server",
+		"desc": "SMTP server",
+		"defaultValue": "localhost"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "SMTP port (default is 25; 465 for SSL; 587 for submission)",
+        "subitems": [{
+            "key": "wizard_syncserver_smtp_port",
+            "desc": "SMTP port",
+            "defaultValue": "25"
+        }]
+    }, {
+	"type": "textfield",
+	"desc": "Address the password reset mail is sent from",
+	"subitems": [{
+		"key": "wizard_syncserver_sender",
+		"desc": "Sender",
+		"defaultValue": "syncserver@domain.com",
+		
+        }]
+    }]
+}]
