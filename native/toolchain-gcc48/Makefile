@@ -48,7 +48,7 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: myPreDepend
 myPreDepend:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		mkdir -p $(TOOLCHAIN_PATH) ; \
 		pushd $(TOOLCHAIN_PATH) ; \
 		mkdir -p include ; \
@@ -61,14 +61,14 @@ myPreDepend:
 		if [ ! -d $(ARCH_LIBDIR) ] ; then ln -sf sys-root/usr/$(ARCH_LIBDIR) $(ARCH_LIBDIR) ; fi ; \
 		if [ ! -d lib ] ; then ln -sf $(ARCH_LIBDIR) lib ; fi ; \
 		popd ; \
-		popd
+		popd'
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		rm -rf work-$(ARCH) ; \
 		mkdir -p work-$(ARCH) ; \
-		if [ -f *-$(PKG_NAME)-$(PKG_VERS)/README.md ] ; then mv *-$(PKG_NAME)-$(PKG_VERS) work-$(ARCH) ; fi
+		if [ -f *-$(PKG_NAME)-$(PKG_VERS)/README.md ] ; then mv *-$(PKG_NAME)-$(PKG_VERS) work-$(ARCH) ; fi'
 
 .PHONY: myCompile
 myCompile:

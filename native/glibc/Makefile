@@ -71,7 +71,7 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		cp -r $(WORK_DIR)/../../../kernel/syno-$(ARCH)/work/include/* $(TOOLCHAIN_PATH)/include ; \
 		cp -r $(WORK_DIR)/../../../kernel/syno-$(ARCH)/work/include/* $(TOOLCHAIN_PATH)/$(MAKE_TOOLCHAIN_TARGET)/sys-root/usr/include ; \
 		export BUILD_HOST=`echo ${MACHTYPE} | sed -e 's/-\([^-]*\)/-build_\1/'` ; \
@@ -83,18 +83,18 @@ myConfigure:
 		cd work-$(ARCH)-gcc$(MAKE_TOOLCHAIN_GCC_VER)/build ; \
 		BUILD_CC="gcc" CC="$(MAKE_TOOLCHAIN_TARGET)-gcc" \
 		AR="$(MAKE_TOOLCHAIN_TARGET)-ar" RANLIB="$(MAKE_TOOLCHAIN_TARGET)-ranlib" \
-		../$(PKG_DIR)/configure $(CONFIGURE_ARGS)
+		../$(PKG_DIR)/configure $(CONFIGURE_ARGS)'
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		export PATH=$(TOOLCHAIN_PATH)/bin:${PATH} ; \
 		cd ../work-$(ARCH)-gcc$(MAKE_TOOLCHAIN_GCC_VER)/build ; \
-		make $(MAKE_OPT)
+		make $(MAKE_OPT)'
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		export PATH=$(TOOLCHAIN_PATH)/bin:${PATH} ; \
 		cd ../work-$(ARCH)-gcc$(MAKE_TOOLCHAIN_GCC_VER)/build ; \
 		make install_root=$(INSTALL_DIR)-$(ARCH)-gcc$(MAKE_TOOLCHAIN_GCC_VER) install ; \
@@ -102,4 +102,4 @@ myInstall:
 		mkdir -p $(TOOLCHAIN_PATH)/$(MAKE_TOOLCHAIN_TARGET)/sys-root/usr/local ; \
 		pushd $(TOOLCHAIN_PATH)/$(MAKE_TOOLCHAIN_TARGET)/sys-root/usr/local ; \
 		if [ ! -d toolchain-gcc$(MAKE_TOOLCHAIN_GCC_VER) ] ; then ln -sf ../../../sys-root toolchain-gcc$(MAKE_TOOLCHAIN_GCC_VER) ; fi ; \
-		popd
+		popd'

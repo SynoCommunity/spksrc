@@ -65,7 +65,8 @@ ifeq ($(DELETE_COOKIES),)
 endif
 
 clean-%:
-	@export CLEANUP=$@ ; \
+	@/bin/bash -c '\
+	export CLEANUP=$@ ; \
 	export CLEANUP=$${CLEANUP:6} ; \
 	if 	[ "$$CLEANUP" == "bromolow" ] || \
 		[ "$$CLEANUP" == "cedarview" ] || \
@@ -97,7 +98,7 @@ clean-%:
 		rm -rf ../../toolchains/syno-$$CLEANUP-gcc$(GCC_VER) ; \
 	else \
 		echo "Unknown architecture" ; \
-	fi
+	fi'
 
 clean-all-arch:
 	@echo "Cleaning all toolchains" ; \
@@ -112,7 +113,8 @@ clean-all-arch:
 
 .PHONY: myPreDepend
 myPreDepend:
-	@if [ "$(ARCH)" == "" ] ; then \
+	@/bin/bash -c '\
+	if [ "$(ARCH)" == "" ] ; then \
 		echo "Architecture not set. Please run: make arch-<arch>." ; \
 		exit 1 ; \
 	fi ; \
@@ -148,7 +150,7 @@ myPreDepend:
 		echo >> Makefile ; \
 		echo "include ../../mk/spksrc.tc.mk" >> Makefile ; \
 		popd ; \
-	fi
+	fi'
 
 .PHONY: myPreStrip
 myPreStrip:
