@@ -18,7 +18,7 @@ COMPILE_TARGET = myCompile
 CONFIGURE_ARGS = --with-xmlrpc-c=$(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
 
 # Limit to supported archs
-ifneq ($(findstring $(ARCH),88f6281 armada370 bromolow cedarview qoriq x86),$(ARCH))
+ifeq ($(findstring $(ARCH),88f5281 powerpc ppc824x ppc853x ppc854x),$(ARCH))
 $(error $(ARCH) is not a supported architecture)
 endif
 

@@ -1,9 +1,9 @@
 PKG_NAME = python
 PKG_VERS_MAJOR = 2
 PKG_VERS_MINOR = 7
-PKG_VERS_PATCH = 5
+PKG_VERS_PATCH = 6
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
-PKG_EXT = tar.bz2
+PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
