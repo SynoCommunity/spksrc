@@ -67,7 +67,7 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 	      fi \
 	    fi \
 	  done ; \
-	  if [ "$$found" == "" ] ; \
+	  if [ -z "$$found" ] ; \
 	  then \
 	    $(MSG) "  File $$file not in digest" ; \
 	    rm $(DOWNLOAD_COOKIE) ; \
