@@ -19,6 +19,9 @@ LIBDIR=lib
 endif
 
 
+POST_INSTALL_TARGET = myPostInstall
+
+
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --with-gmp=$(WORK_DIR)/../../gmp/work-native/install/usr/local
@@ -27,3 +30,7 @@ CONFIGURE_ARGS += --with-mpfr-lib=$(WORK_DIR)/../../mpfr/work-native/install/usr
 
 
 include ../../mk/spksrc.native-cc.mk
+
+.PHONY: myPostInstall
+myPostInstall:
+	$(RUN) rm -f $(INSTALL_DIR)/usr/local/$(LIBDIR)/libmpc.la

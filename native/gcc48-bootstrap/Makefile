@@ -61,7 +61,7 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		cd .. ; \
 		mkdir -p work-$(ARCH)/build ; \
 		if [ -f $(PKG_DIR)/configure ] ; then mv $(PKG_DIR) work-$(ARCH) ; fi ; \
@@ -71,16 +71,16 @@ myConfigure:
 		bash ld_prefix-fix.sh ; \
 		export BUILD_HOST=`echo ${MACHTYPE} | sed -e 's/-\([^-]*\)/-build_\1/'` ; \
 		cd ../build ; \
-		AR=ar LDFLAGS="-Wl,-rpath,$(TOOLCHAIN_PATH)/$(LIBDIR)" ../$(PKG_DIR)/configure $(CONFIGURE_ARGS)
+		AR=ar LDFLAGS="-Wl,-rpath,$(WORK_DIR)/../../mpc/work-native/install/usr/local/$(LIBDIR) -Wl,-rpath,$(TOOLCHAIN_PATH)/$(LIBDIR)" ../$(PKG_DIR)/configure $(CONFIGURE_ARGS)'
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		cd ../work-$(ARCH)/build ; \
-		make $(MAKE_OPT) all-gcc  all-target-libgcc
+		make $(MAKE_OPT) all-gcc  all-target-libgcc'
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) echo ; \
+	$(RUN) /bin/bash -c '\
 		cd ../work-$(ARCH)/build ; \
-		make install-gcc  install-target-libgcc
+		make install-gcc  install-target-libgcc'

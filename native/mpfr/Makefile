@@ -11,8 +11,24 @@ HOMEPAGE = http://www.mpfr.org
 COMMENT  = Multiple-precision floating-point computations with correct rounding
 LICENSE  = LGPL
 
+HOST_ARCH = $(shell getconf LONG_BIT)
+ifeq ($(HOST_ARCH),64)
+LIBDIR=lib64
+else
+LIBDIR=lib
+endif
+
+
+POST_INSTALL_TARGET = myPostInstall
+
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS = --with-gmp=$(WORK_DIR)/../../gmp/work-native/install/usr/local
+
 
 include ../../mk/spksrc.native-cc.mk
+
+.PHONY: myPostInstall
+myPostInstall:
+	$(RUN) rm -f $(INSTALL_DIR)/usr/local/$(LIBDIR)/libmpfr.la

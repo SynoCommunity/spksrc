@@ -14,12 +14,15 @@ LICENSE  = LGPL
 HOST_ARCH = $(shell getconf LONG_BIT)
 ifeq ($(HOST_ARCH),64)
 ARCH_ABI=64
+LIBDIR=lib64
 else
 ARCH_ABI=32
+LIBDIR=lib
 endif
 
 
 COMPILE_TARGET = myCompile
+POST_INSTALL_TARGET = myPostInstall
 
 
 GNU_CONFIGURE = 1
@@ -32,3 +35,8 @@ include ../../mk/spksrc.native-cc.mk
 myCompile:
 	$(RUN) make $(MAKE_OPT)
 	$(RUN) make check
+
+.PHONY: myPostInstall
+myPostInstall:
+	$(RUN) rm -f $(INSTALL_DIR)/usr/local/$(LIBDIR)/libgmp.la
+
