@@ -20,7 +20,7 @@ start_daemon ()
 
 stop_daemon ()
 {
-    ${PASTER} --stop-daemon --pid-file=${PID_FILE}
+    ${PASTER} ${SYNCSERVER} --stop-daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
 }
 
 daemon_status ()

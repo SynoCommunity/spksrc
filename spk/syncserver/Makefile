@@ -9,7 +9,7 @@ SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python implementation of the Firefox Sync Server
-DISPLAY_NAME = SyncServer
+DISPLAY_NAME = Sync Server
 
 HOMEPAGE   = https://wiki.mozilla.org/Services/Sync/Server
 LICENSE    = MPL/GPL/LGPL
@@ -30,9 +30,6 @@ BUSYBOX_CONFIG += ionice
 endif
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: syncserver_extra_install
@@ -51,9 +48,12 @@ syncserver_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_D
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ MoPyTools cef WebOb==1.0.7 WebTest==1.4.3 Mako Beaker  python-memcached simplejson Routes SQLAlchemy==0.7.10 WSGIProxy recaptcha-client repoze.lru repoze.who zope.deprecation metlog-py>=0.9.6 metlog-cef docopt
-
+	@cd $(WORK_DIR) && $(PIP) bundle $@ SQLAlchemy==0.7.10 Paste PasteScript PasteDeploy WebOb==1.0.7 Routes simplejson cef WSGIProxy metlog-py>=0.9.6 metlog-cef Mako recaptcha-client repoze.lru docopt MarkupSafe
+	
 $(STAGING_DIR)/share/syncserver:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && hg clone http://hg.mozilla.org/services/server-full syncserver
-	
+	install -m 755 -d $(STAGING_DIR)/share/syncserver/deps
+	cd $(STAGING_DIR)/share/syncserver/deps && hg clone http://hg.mozilla.org/services/server-core server-core
+	cd $(STAGING_DIR)/share/syncserver/deps && hg clone http://hg.mozilla.org/services/server-reg server-reg
+	cd $(STAGING_DIR)/share/syncserver/deps && hg clone http://hg.mozilla.org/services/server-storage server-storage
