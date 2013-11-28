@@ -12,7 +12,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Contol your Htpc with ease. Using multiple applications to control you htpc? No More! Htpc Manager combines all your software and provides an easy way to controll them all!
 ADMIN_PORT = 8085
 RELOAD_UI = yes
-DISPLAY_NAME = HTPC-Manager
+DISPLAY_NAME = HTPC Manager
 
 HOMEPAGE   = http://htpc.io
 
@@ -30,7 +30,7 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: htpcmanager_extra_install
-htpcmanager_extra_install:
+htpcmanager_extra_install: $(STAGING_DIR)/share/HTPC-Manager
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
@@ -39,3 +39,7 @@ htpcmanager_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
+
+$(STAGING_DIR)/share/HTPC-Manager:
+	install -m 755 -d $(STAGING_DIR)/share
+	git clone git://github.com/styxit/HTPC-Manager.git ${STAGING_DIR}/share/HTPC-Manager
