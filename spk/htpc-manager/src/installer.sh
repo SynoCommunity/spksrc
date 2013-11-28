@@ -2,17 +2,15 @@
 
 # Package
 PACKAGE="htpcmanager"
-DNAME="HTPC-Manager"
+DNAME="HTPC Manager"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-GIT_DIR="/usr/local/git"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="htpcmanager"
 GROUP="users"
-GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -29,9 +27,6 @@ postinst ()
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
-
-    #clone the repository
-    ${GIT} clone -q git://github.com/styxit/HTPC-Manager.git ${INSTALL_DIR}/share/HTPC-Manager
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
