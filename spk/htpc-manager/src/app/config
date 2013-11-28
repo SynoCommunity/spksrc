@@ -1,8 +1,8 @@
 {
     ".url": {
         "com.synocommunity.packages.htpcmanager": {
-            "title": "HTPC-Manager",
-            "desc": "HTPC-Manager",
+            "title": "HTPC Manager",
+            "desc": "HTPC Manager",
             "icon": "images/htpcmanager-{0}.png",
             "type": "url",
             "protocol": "http",
