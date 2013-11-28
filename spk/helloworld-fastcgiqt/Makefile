@@ -40,8 +40,9 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: extra_install
 extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	@/bin/bash -c '\
+	install -m 755 -d $(STAGING_DIR)/app ; \
+	install -m 644 src/app/config $(STAGING_DIR)/app/config ; \
 	pushd $(STAGING_DIR)/app ; \
 	ln -sf ../cgi-bin/BigWorld.cgi BigWorld.cgi ; \
 	ln -sf ../cgi-bin/Dumper.cgi ; \
@@ -55,9 +56,9 @@ extra_install:
 	ln -sf ../cgi-bin/ThreadedDumper.cgi ; \
 	ln -sf ../cgi-bin/XsltExample.cgi ; \
 	ln -sf ../cgi-bin/example.xsl ; \
-	popd
-	install -m 755 -d $(STAGING_DIR)/app/images
+	popd ; \
+	install -m 755 -d $(STAGING_DIR)/app/images ; \
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
+	done'
