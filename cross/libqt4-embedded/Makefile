@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://download.qt-project.org/official_releases/qt/4.8/$(PKG_VERS)
 
-DEPENDS = cross/glib cross/openssl cross/libpng cross/libmng cross/libjpeg cross/libtiff cross/sqlite cross/libxml2 cross/freetype2
+DEPENDS = cross/glib cross/openssl cross/libpng cross/libmng cross/libjpeg8 cross/libtiff cross/sqlite cross/libxml2 cross/freetype2
 
 HOMEPAGE = http://qt-project.org
 COMMENT  = Qt is a full development framework with tools designed to streamline the creation of applications and user interfaces for desktop, embedded and mobile platforms.

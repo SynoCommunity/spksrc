@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)-devel/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/libjpeg cross/lcms2
+DEPENDS = cross/zlib cross/libjpeg8 cross/lcms2
 
 HOMEPAGE = http://www.libmng.com/pub/mng/index.html
 COMMENT  = Multiple-image Network Graphics Library
