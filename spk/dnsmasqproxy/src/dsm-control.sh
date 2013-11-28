@@ -19,7 +19,7 @@ SERVER_PID_FILE="${INSTALL_DIR}/var/dnsmasq.pid"
 
 start_daemon ()
 {
-    ${DNSMASQ_SERVER} --conf-file=${DNSMASQ_CONF} --dhcp-leasefile=${DNSMASQ_DNSLEASE} --log-facility=${LOG_FILE} --pid-file=${SERVER_PID_FILE}
+    ${DNSMASQ_SERVER} --user=${USER} --conf-file=${DNSMASQ_CONF} --dhcp-leasefile=${DNSMASQ_DNSLEASE} --log-facility=${LOG_FILE} --pid-file=${SERVER_PID_FILE}
 }
 
 stop_daemon ()
