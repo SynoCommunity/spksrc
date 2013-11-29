@@ -11,14 +11,14 @@ PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin
 USER="sabnzbd"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
-CFG_FILE="${INSTALL_DIR}/var/config.ini"
-LOG_FILE="${INSTALL_DIR}/var/logs/sabnzbd.log"
+CFG_FILE="/var/services/homes/${USER}/config.ini"
+LOG_FILE="/var/services/homes/${USER}/logs/sabnzbd.log"
 PID_FILES="${INSTALL_DIR}/var/sabnzbd-*.pid"
 
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pid ${INSTALL_DIR}/var/ -d"
+    su - root -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pid ${INSTALL_DIR}/var/ -d"
 }
 
 stop_daemon ()
