@@ -1,11 +1,11 @@
 {
     ".url": {
-        "com.synocommunity.packages.oscam": {
+        "com.synocommunity.packages.oscam-pcscd": {
             "title": "OSCam",
             "desc": "OSCam Web UI",
-            "icon": "images/oscam-{0}.png",
+            "icon": "images/oscam-pcscd-{0}.png",
             "type": "url",
-            "url": "3rdparty/oscam/oscam.cgi",
+            "url": "3rdparty/oscam-pcscd/oscam-pcscd.cgi",
             "allUsers": true
         }
     }
