@@ -11,24 +11,22 @@ RUNAS="root"
 OSCAM="${INSTALL_DIR}/bin/oscam"
 PID_FILE="${INSTALL_DIR}/var/oscam.pid"
 
-
 start_daemon ()
 {
-    su - ${RUNAS} -c "${OSCAM} -b -c ${INSTALL_DIR}/var"
+    su - ${RUNAS} -c "${OSCAM} -b -c /var/services/homes/oscam"
     sleep 1
-    pidof -s oscam > ${PID_FILE}
+    pidof oscam > ${PID_FILE}
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20
+    killall oscam
     rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
+    if [ -f ${PID_FILE} ]; then
         return
     fi
     return 1
@@ -80,6 +78,11 @@ case $1 in
             echo ${DNAME} is not running
             exit 1
         fi
+        ;;
+    log)
+        logfile=$(cat /var/services/homes/oscam/oscam.conf | grep logfile | awk {'print $3'})
+        echo $logfile
+        exit 0
         ;;
     *)
         exit 1
