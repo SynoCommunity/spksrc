@@ -8,8 +8,7 @@ DNAME="SynoDLNAtrakt"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-GIT_DIR="/usr/local/git"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:${PATH}"
+PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="synodlnatrakt"
 GROUP="users"
 GIT="${GIT_DIR}/bin/git"
@@ -34,7 +33,6 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     #clone the repository
-    ${GIT} clone -q git://github.com/cytec/SynoDLNAtrakt.git ${INSTALL_DIR}/share/SynoDLNAtrakt
 
     # Install configobj
     ${INSTALL_DIR}/env/bin/pip install -U -b ${INSTALL_DIR}/var/build configobj > /dev/null
