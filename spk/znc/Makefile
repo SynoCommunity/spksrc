@@ -3,7 +3,6 @@ SPK_VERS = 1.2
 SPK_REV = 6
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
-CHANGELOG = "1. Add modules colloquy and push"
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
