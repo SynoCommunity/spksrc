@@ -89,7 +89,6 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    exit 0
     # Remove the user if uninstalling
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         delgroup ${USER} ${GROUP}
