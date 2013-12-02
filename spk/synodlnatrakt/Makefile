@@ -45,7 +45,6 @@ synodlnatrakt_extra_install:
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
-
 $(STAGING_DIR)/share/SynoDLNAtrakt:
 	install -m 755 -d $(STAGING_DIR)/share
 	git clone git://github.com/cytec/SynoDLNAtrakt.git ${STAGING_DIR}/share/SynoDLNAtrakt
