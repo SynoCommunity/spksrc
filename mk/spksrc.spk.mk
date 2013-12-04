@@ -135,6 +135,7 @@ ifneq ($(strip $(SSS_SCRIPT)),)
 DSM_SCRIPTS_ += start-stop-status
 endif
 DSM_SCRIPTS_ += installer
+DSM_SCRIPTS_ += $(notdir $(FWPORTS))
 DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
@@ -172,7 +173,9 @@ $(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
 	@$(dsm_script_copy)
 $(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
 	@$(dsm_script_copy)
-$(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS)) 
+$(DSM_SCRIPTS_DIR)/%: $(filter %.sc,$(FWPORTS))
+	@$(dsm_script_copy)	
+$(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
 
