@@ -1,0 +1,13 @@
+{
+    ".url": {
+        "com.synocommunity.packages.nzbmegasearch": {
+            "title": "NZBmegasearcH",
+            "desc": "NZBmegasearcH",
+            "icon": "images/nzbmegasearch-{0}.png",
+            "type": "url",
+            "port": "8086",
+            "url": "/",
+            "allUsers": true
+        }
+    }
+}
