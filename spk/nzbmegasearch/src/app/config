@@ -5,6 +5,7 @@
             "desc": "NZBmegasearcH",
             "icon": "images/nzbmegasearch-{0}.png",
             "type": "url",
+            "protocol": "http",
             "port": "8086",
             "url": "/",
             "allUsers": true
