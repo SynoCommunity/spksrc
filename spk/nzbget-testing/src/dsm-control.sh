@@ -7,7 +7,7 @@ DNAME="NZBGet Testing"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="nzbget-testing"
 NZBGET="${INSTALL_DIR}/bin/nzbget"
 CFG_FILE="${INSTALL_DIR}/var/nzbget.conf"
