@@ -6,7 +6,7 @@
             "icon": "images/htpcmanager-{0}.png",
             "type": "url",
             "protocol": "http",
-            "port": "8085",
+            "port": "8087",
             "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"

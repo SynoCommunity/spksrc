@@ -19,7 +19,7 @@ LOG_FILE="${DATA_DIR}/htpcmanager.log"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${HTPCMANAGER} --datadir ${DATA_DIR} --pid ${PID_FILE} --daemon"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${HTPCMANAGER} --datadir ${DATA_DIR} --pid ${PID_FILE} --daemon --port 8087"
 }
 
 stop_daemon ()
