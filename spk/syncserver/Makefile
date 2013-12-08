@@ -8,9 +8,8 @@ DEPENDS  = cross/busybox
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Python implementation of the Firefox Sync Server
-DISPLAY_NAME = Sync Server
-
+DESCRIPTION = Python implementation of the Mozilla Sync Server. You can use Mozilla Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. Set up Firefox Sync on your main computer by creating a new account on a custom server, then add your other computers. The service runs on port 8084.
+DISPLAY_NAME = Mozilla Sync Server
 HOMEPAGE   = https://wiki.mozilla.org/Services/Sync/Server
 LICENSE    = MPL/GPL/LGPL
 
@@ -34,9 +33,10 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: syncserver_extra_install
 syncserver_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)/share/syncserver
+	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/log
 	install -m 755 src/syncserver.conf $(STAGING_DIR)/var/
-	install -m 755 src/syncserver.wsgi $(STAGING_DIR)/var/
 	install -m 755 src/syncserver.ini $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/log
 	install -m 755 -d $(STAGING_DIR)/app/images

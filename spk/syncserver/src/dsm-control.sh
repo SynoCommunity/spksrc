@@ -2,11 +2,11 @@
 
 # Package
 PACKAGE="syncserver"
-DNAME="SyncServer"
+DNAME="Mozilla Sync Server"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="syncserver"
 PASTER="${INSTALL_DIR}/env/bin/paster serve"
 SYNCSERVER="${INSTALL_DIR}/var/syncserver.ini"

@@ -1,18 +1,18 @@
 [{
-	"step_title": "Remove Sync Server database",
-	"items": [{
-		"type": "multiselect",
-		"desc": "If you remove the Sync Server database, all users and sync data will be deleted.",
-		"subitems": [{
-			"key": "wizard_remove_database",
-			"desc": "Remove Sync Server database"
-		}]
-	}, {
-		"type": "password",
-		"desc": "Enter your MySQL password to remove the Sync Server database.",
-		"subitems": [{
-			"key": "wizard_mysql_password_root",
-			"desc": "Root password"
-		}]
-	}]	
+    "step_title": "Remove Mozilla Sync Server database",
+    "items": [{
+        "type": "multiselect",
+        "desc": "If you remove the Mozilla Sync Server database, all users and sync data will be deleted.",
+        "subitems": [{
+            "key": "wizard_remove_database",
+            "desc": "Remove Mozilla Sync Server database"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Enter your MySQL password to remove the Mozilla Sync Server database.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }]    
 }]

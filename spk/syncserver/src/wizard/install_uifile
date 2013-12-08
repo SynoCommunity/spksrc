@@ -1,7 +1,7 @@
 [{
-    "step_title": "Sync Server database configuration",
+    "step_title": "Mozilla Sync Server database configuration",
     "items": [{
-		"type": "password",
+        "type": "password",
         "desc": "Enter your MySQL root password. Note that the MySQL service should be running. Leave blank to use SQLite database",
         "subitems": [{
             "key": "wizard_mysql_password_root",
@@ -12,34 +12,34 @@
         "desc": "A 'syncserver' user and database will be created. Please enter a password for the 'syncserver' user.",
         "subitems": [{
             "key": "wizard_password_syncserver",
-            "desc": "Sync Server password"
+            "desc": "Mozilla Sync Server password"
         }]
     }]
 }, {    
-    "step_title": "Sync Server SMTP configuration",
+    "step_title": "Mozilla Sync Server SMTP configuration",
     "items": [{
-	"type": "textfield",
-	"desc": "SMTP host used to send password-reset emails",
-	"subitems": [{
-		"key": "wizard_syncserver_smtp_server",
-		"desc": "SMTP server",
-		"defaultValue": "localhost"
+        "type": "textfield",
+        "desc": "SMTP host used to send password-reset emails",
+        "subitems": [{
+            "key": "wizard_syncserver_smtp_server",
+            "desc": "SMTP server",
+            "defaultValue": "localhost"
         }]
     }, {
-	"type": "textfield",
-	"desc": "SMTP port (default is 25; 465 for SSL; 587 for submission)",
-	"subitems": [{
-		"key": "wizard_syncserver_smtp_port",
-		"desc": "SMTP port",
-		"defaultValue": "25"
-		}]
+        "type": "textfield",
+        "desc": "SMTP port (default is 25; 465 for SSL; 587 for submission)",
+        "subitems": [{
+            "key": "wizard_syncserver_smtp_port",
+            "desc": "SMTP port",
+            "defaultValue": "25"
+        }]
     }, {
-	"type": "textfield",
-	"desc": "Mail address the password-reset mail is sent from",
-	"subitems": [{
-		"key": "wizard_syncserver_sender",
-		"desc": "Sender",
-		"defaultValue": "syncserver@domain.com",
+        "type": "textfield",
+        "desc": "Mail address the password-reset mail is sent from",
+        "subitems": [{
+            "key": "wizard_syncserver_sender",
+            "desc": "Sender",
+            "defaultValue": "syncserver@domain.com",
         }]
     }]
 }]
