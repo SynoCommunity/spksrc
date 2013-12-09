@@ -1,5 +1,5 @@
 SPK_NAME = selfoss
-SPK_VERS = 2.8
+SPK_VERS = 2.9
 SPK_REV = 2
 SPK_ICON = src/selfoss.png
 DSM_UI_DIR = app
@@ -11,7 +11,6 @@ DESCRIPTION = The new multipurpose rss reader, live stream, mashup, aggregation 
 ADMIN_URL = /selfoss/
 RELOAD_UI = yes
 DISPLAY_NAME = Selfoss
-BETA = 1
 
 HOMEPAGE   = http://selfoss.aditu.de/
 LICENSE    = GPLv3
