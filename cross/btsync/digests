@@ -10,3 +10,6 @@ btsync_powerpc-1.2.82.tar.gz MD5 5e993433c25fe153c97741b035428bf9
 btsync_glibc23_x64-1.2.82.tar.gz SHA1 3b5a4c5948524a1183c5240b3e826f55b5849c4f
 btsync_glibc23_x64-1.2.82.tar.gz SHA256 fc6719aabe1919134d07ca496142be95869fd412de15e6043b15f932215c7219
 btsync_glibc23_x64-1.2.82.tar.gz MD5 680376b3777b72a3fa8ea9e9b0d0705c
+btsync_glibc23_i386-1.2.82.tar.gz SHA1 d0c3bafeccae7c0bd2192d6ae8f28d655eee8e8a
+btsync_glibc23_i386-1.2.82.tar.gz SHA256 930bcb83c4b51fd4d5dbb08442156f1db459fabceafe0aa0204ffab0b91a8431
+btsync_glibc23_i386-1.2.82.tar.gz MD5 9d888efe2dd04d1440896e37cc4b11a5
