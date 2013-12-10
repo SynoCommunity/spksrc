@@ -34,11 +34,19 @@ include ../../mk/spksrc.spk.mk
 .PHONY: syncserver_extra_install
 syncserver_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)/share/syncserver
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/app/help
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/log
+	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
+	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
 	install -m 755 src/syncserver.conf $(STAGING_DIR)/var/
 	install -m 755 src/syncserver.ini $(STAGING_DIR)/var/
-	install -m 755 -d $(STAGING_DIR)/var/log
+	for language in enu; do \
+		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
+		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
+		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
+		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
+	done
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \

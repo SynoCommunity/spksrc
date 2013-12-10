@@ -1,0 +1,6 @@
+[app]
+app_name = "Mozilla Sync Server"
+
+[help]
+description = "Mozilla Sync Server SynoCommunity"
+

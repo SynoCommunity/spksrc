@@ -13,6 +13,8 @@ HG="${PYTHON_DIR}/bin/hg"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 WIZARD="/var/packages/${PACKAGE}/WIZARD_UIFILES"
 
+INDEXFILES="${INSTALL_DIR}/app/help"
+
 USER="syncserver"
 GROUP="users"
 
@@ -44,8 +46,10 @@ postinst ()
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${PACKAGE}; GRANT ALL PRIVILEGES ON ${PACKAGE}.* TO '${USER}'@'localhost' IDENTIFIED BY '${wizard_password_syncserver:=syncserver}';"    
         sed -i "s|sqluri.*|sqluri = pymysql://${USER}:${wizard_password_syncserver}@localhost:3306/${PACKAGE}|g" ${CONF_FILE}
     else
-        # No need for uninstall wizard files with SQLite, removing
-        rm -fr ${WIZARD}/uninstall*
+        if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+             # No need for uninstall wizard files with SQLite, removing
+             rm -fr ${WIZARD}/uninstall*
+        fi
     fi
 
     # Set other variables according to the wizard
@@ -67,6 +71,13 @@ postinst ()
 
     # Build Sync
     cd ${INSTALL_DIR}/share/syncserver && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
+
+    # Adjust and index help files
+    pkgindexer_add ${INSTALL_DIR}/app/index.conf > /dev/null
+    pkgindexer_add ${INSTALL_DIR}/app/helptoc.conf > /dev/null
+
+    # Since we're already counting on the IP not changing...
+    for f in `find ${INDEXFILES} -name 'index.html'`; do sed -i "s|syno-ip|${IP}|g" ${f};done;
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
@@ -94,6 +105,10 @@ preuninst ()
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
+
+    # Remove help files
+    pkgindexer_del ${INSTALL_DIR}/app/index.conf > /dev/null
+    pkgindexer_del ${INSTALL_DIR}/app/helptoc.conf > /dev/null
 
     exit 0
 }
