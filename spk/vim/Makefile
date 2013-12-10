@@ -7,6 +7,7 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Vim is an advanced text editor that seeks to provide the power of the de-facto Unix editor Vi, with a more complete feature set.
+DESCRIPTION_FRE = Vim est un éditeur de texte avancé basé sur Vi (unix) avec des fonctions plus complètes.
 RELOAD_UI = no
 DISPLAY_NAME = Vim
 STARTABLE = no
