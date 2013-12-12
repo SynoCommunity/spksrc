@@ -10,7 +10,7 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Contol your Htpc with ease. Using multiple applications to control you htpc? No More! Htpc Manager combines all your software and provides an easy way to controll them all!
-ADMIN_PORT = 8085
+ADMIN_PORT = 8087
 RELOAD_UI = yes
 DISPLAY_NAME = HTPC Manager
 
