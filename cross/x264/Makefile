@@ -14,7 +14,7 @@ LICENSE  =
 
 CONFIGURE_ARGS = --enable-static --disable-asm --prefix=$(INSTALL_PREFIX)
 
-ifeq ($(findstring $(ARCH), 88f6281),)
+ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
 ADDITIONAL_CFLAGS = -O0
 endif
 
