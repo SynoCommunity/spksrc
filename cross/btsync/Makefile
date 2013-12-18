@@ -23,7 +23,10 @@ endif
 ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x),$(ARCH))
 BTSYNC_ARCH = powerpc
 endif
-ifeq ($(findstring $(ARCH),x86 cedarview bromolow evansport),$(ARCH))
+ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+BTSYNC_ARCH = glibc23_i386
+endif
+ifeq ($(findstring $(ARCH),x86 cedarview bromolow),$(ARCH))
 BTSYNC_ARCH = glibc23_x64
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
