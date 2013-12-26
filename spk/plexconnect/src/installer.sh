@@ -21,18 +21,18 @@ INSTALLER_LOG="/../../@tmp/installer.log"
 
 installer_log() {
   return
-  echo "$INSTALLER: ${1}" >> "${INSTALLER_LOG}"
+  echo "INSTALLER: ${1}" >> "${INSTALLER_LOG}"
 }
 
 preinst ()
 {
-  installer_log "preinst"
+  installer_log "-- preinst"
   exit 0
 }
 
 postinst ()
 {
-  installer_log "postinst"
+  installer_log "-- postinst"
   # Link
   ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
@@ -50,7 +50,6 @@ postinst ()
   else
     installer_log "Not Using wizard_dns_server"
   fi
-  #sed -i -e "s|ip_pms = 0.0.0.0|ip_pms = $MYIP|g" ${INSTALL_DIR}/${CFG_FILE}
 
   #add VHOST_FILE
   cp -f ${INSTALL_DIR}/app/plexconnect-vhosts.conf ${VHOST_FILE}
@@ -84,7 +83,7 @@ postinst ()
 
 preuninst ()
 {
-  installer_log "preuninst"
+  installer_log "-- preuninst"
   # Remove the user (if not upgrading)
   if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
     deluser ${PACKAGE}
@@ -95,7 +94,7 @@ preuninst ()
 
 postuninst ()
 {
-  installer_log "postuninst"
+  installer_log "-- postuninst"
   # Remove link
   rm -f ${INSTALL_DIR}
 
@@ -117,15 +116,13 @@ postuninst ()
 
 preupgrade ()
 {
-  installer_log "preupgrade ${TMP_DIR}/${PACKAGE}"
+  installer_log "-- preupgrade ${TMP_DIR}/${PACKAGE}"
   rm -fr ${TMP_DIR}/${PACKAGE}
   mkdir -p ${TMP_DIR}/${PACKAGE}
 
   # Save post upgrade configuration files
-  if [ -f ${INSTALL_DIR}/share/PlexConnect/*.cfg ]; then
-    installer_log "backup configuration"
-    cp ${INSTALL_DIR}/share/PlexConnect/*.cfg ${TMP_DIR}/${PACKAGE}/
-  fi
+  installer_log "backup configuration"
+  cp ${INSTALL_DIR}/share/PlexConnect/*.cfg ${TMP_DIR}/${PACKAGE}/
 
   # backup certificates
   if [ -f ${INSTALL_DIR}/etc/certificates/trailers.cer ]; then
@@ -143,13 +140,11 @@ preupgrade ()
 
 postupgrade ()
 {
-  installer_log "postupgrade ${TMP_DIR}/${PACKAGE}"
+  installer_log "-- postupgrade ${TMP_DIR}/${PACKAGE}"
   # Restore some stuff
 
-  if [ -f ${TMP_DIR}/${PACKAGE}/*.cfg ]; then
-    installer_log "restore configuration"
-    mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
-  fi
+  installer_log "restore configuration"
+  mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
 
   # restore certificates
   if [ -f ${TMP_DIR}/${PACKAGE}/certificates/trailers.cer ]; then
