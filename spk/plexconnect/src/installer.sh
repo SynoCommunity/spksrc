@@ -20,7 +20,8 @@ INSTALLER_LOG="/../../@tmp/installer.log"
 #VHOST_SSL_FILE="${APACHE_DIR}/conf/extra/plexconnect-ssl-vhosts.conf"
 
 installer_log() {
-  #echo "$INSTALLER: ${1}" >> "${INSTALLER_LOG}"
+  return
+  echo "$INSTALLER: ${1}" >> "${INSTALLER_LOG}"
 }
 
 preinst ()
