@@ -135,9 +135,6 @@ preupgrade ()
   installer_log "backup IP"
   cat ${VHOST_FILE} | grep "ProxyPassReverse"  | awk -F:// '{print $2}' |  awk -F: '{print $1}' > ${TMP_DIR}/${PACKAGE}/ip
 
-  # restart apache
-  /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null
-
   exit 0
 }
 
@@ -163,6 +160,9 @@ postupgrade ()
   fi
 
   rm -fr ${TMP_DIR}/${PACKAGE}
+
+  # restart apache
+  /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null
 
   # Correct the files ownership
   chown -R ${PACKAGE}:root ${SYNOPKG_PKGDEST}
