@@ -9,27 +9,31 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 CFG_FILE="share/PlexConnect/Settings.cfg"
-ATV_CFG_FILE="share/PlexConnect/ATVSettings.cfg"
-PATH="${INSTALL_DIR}/sbin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="${PACKAGE}"
 PYTHON="${PYTHON_DIR}/bin/python"
 APACHE_DIR="/usr/syno/apache"
 HTTPD_CONF_USER="${APACHE_DIR}/conf/httpd.conf-user"
 VHOST_FILE="${APACHE_DIR}/conf/extra/plexconnect-vhosts.conf"
+INSTALLER_LOG="/../../@tmp/installer.log"
 ## not in use yet
 #HTTPD_SSL_CONF_USER="${APACHE_DIR}/conf/extra/httpd-ssl.conf-user"
 #VHOST_SSL_FILE="${APACHE_DIR}/conf/extra/plexconnect-ssl-vhosts.conf"
 
+installer_log() {
+  #echo "$INSTALLER: ${1}" >> "${INSTALLER_LOG}"
+}
+
 preinst ()
 {
-    exit 0
+  installer_log "preinst"
+  exit 0
 }
 
 postinst ()
 {
+  installer_log "postinst"
   # Link
   ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-  MYIP=`/sbin/ifconfig eth0 | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}'`
 
   # Create user
   adduser -h ${INSTALL_DIR} -g "${DNAME} User" -G users -s /bin/sh -S -D ${PACKAGE}
@@ -39,12 +43,22 @@ postinst ()
   #openssl x509 -in "${INSTALL_DIR}/etc/certificates/trailers.pem" -outform der -out "${INSTALL_DIR}/etc/certificates/trailers.cer" && cat "${INSTALL_DIR}/etc/certificates/trailers.key" >> "${INSTALL_DIR}/etc/certificates/trailers.pem"
 
   # Edit the configuration according to the wizard
-  sed -i -e "s|8.8.8.8|${wizard_dns_server}|g" ${INSTALL_DIR}/${CFG_FILE}
+  if [ "${wizard_dns_server}" != "" ]; then
+    sed -i -e "s|8.8.8.8|${wizard_dns_server}|g" ${INSTALL_DIR}/${CFG_FILE}
+    installer_log "Using wizard_dns_server"
+  else
+    installer_log "Not Using wizard_dns_server"
+  fi
   #sed -i -e "s|ip_pms = 0.0.0.0|ip_pms = $MYIP|g" ${INSTALL_DIR}/${CFG_FILE}
 
   #add VHOST_FILE
   cp -f ${INSTALL_DIR}/app/plexconnect-vhosts.conf ${VHOST_FILE}
-  sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
+  if [ "${wizard_ip}" != "" ]; then
+    installer_log "Using wizard_ip"
+    sed -i -e "s|127.0.0.1|$wizard_ip|g" ${VHOST_FILE}
+  else
+    installer_log "Not Using wizard_ip"
+  fi
   #add VHOST_SSL_FILE
   #cp -f ${INSTALL_DIR}/app/plexconnect-ssl-vhosts.conf ${VHOST_SSL_FILE}
 
@@ -69,6 +83,7 @@ postinst ()
 
 preuninst ()
 {
+  installer_log "preuninst"
   # Remove the user (if not upgrading)
   if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
     deluser ${PACKAGE}
@@ -79,6 +94,7 @@ preuninst ()
 
 postuninst ()
 {
+  installer_log "postuninst"
   # Remove link
   rm -f ${INSTALL_DIR}
 
@@ -100,32 +116,51 @@ postuninst ()
 
 preupgrade ()
 {
+  installer_log "preupgrade ${TMP_DIR}/${PACKAGE}"
   rm -fr ${TMP_DIR}/${PACKAGE}
   mkdir -p ${TMP_DIR}/${PACKAGE}
 
   # Save post upgrade configuration files
-  mv ${INSTALL_DIR}/share/PlexConnect/*.cfg ${TMP_DIR}/${PACKAGE}/
-
-  # backup certificates
-  if [ -f ${INSTALL_DIR}/etc/certificates/trailers.cer ]
-    then
-      mkdir -p ${TMP_DIR}/${PACKAGE}/certificates
-      mv ${INSTALL_DIR}/etc/certificates/* ${TMP_DIR}/${PACKAGE}/certificates
+  if [ -f ${INSTALL_DIR}/share/PlexConnect/*.cfg ]; then
+    installer_log "backup configuration"
+    cp ${INSTALL_DIR}/share/PlexConnect/*.cfg ${TMP_DIR}/${PACKAGE}/
   fi
 
-  exit 0
+  # backup certificates
+  if [ -f ${INSTALL_DIR}/etc/certificates/trailers.cer ]; then
+    installer_log "backup certificates"
+    mkdir -p ${TMP_DIR}/${PACKAGE}/certificates
+    cp ${INSTALL_DIR}/etc/certificates/* ${TMP_DIR}/${PACKAGE}/certificates
+  fi
 
+  #remember ip address
+  installer_log "backup IP"
+  cat ${VHOST_FILE} | grep "ProxyPassReverse"  | awk -F:// '{print $2}' |  awk -F: '{print $1}' > ${TMP_DIR}/${PACKAGE}/ip
+
+  exit 0
 }
+
 postupgrade ()
 {
+  installer_log "postupgrade ${TMP_DIR}/${PACKAGE}"
   # Restore some stuff
 
-  mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
+  if [ -f ${TMP_DIR}/${PACKAGE}/*.cfg ]; then
+    installer_log "restore configuration"
+    mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
+  fi
 
   # restore certificates
-  if [ -f ${TMP_DIR}/${PACKAGE}/certificates/trailers.cer ]
-    then
-      mv -f ${TMP_DIR}/${PACKAGE}/certificates/* ${INSTALL_DIR}/etc/certificates/
+  if [ -f ${TMP_DIR}/${PACKAGE}/certificates/trailers.cer ]; then
+    installer_log "restore certificates"
+    mv -f ${TMP_DIR}/${PACKAGE}/certificates/* ${INSTALL_DIR}/etc/certificates/
+  fi
+
+  # restore ip address
+  MYIP=`cat ${TMP_DIR}/${PACKAGE}/ip`
+  if [ "${MYIP}" != "" ]; then
+    installer_log "restoring IP ${MYIP}"
+    sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
   fi
 
   rm -fr ${TMP_DIR}/${PACKAGE}
