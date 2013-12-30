@@ -9,7 +9,6 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${PATH}:${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 DAEMON="${INSTALL_DIR}/sbin/LCDd"
 CLIENT="${INSTALL_DIR}/bin/lcdproc"
-#PID_FILE="/var/run/lcdproc.pid"
 CONF_FILE="${INSTALL_DIR}/etc/LCDd.conf"
 LOG_FILE="${INSTALL_DIR}/lcdproc.log"
 PID=`pidof LCDd`

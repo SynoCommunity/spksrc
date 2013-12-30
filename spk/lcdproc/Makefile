@@ -1,7 +1,7 @@
 SPK_NAME = lcdproc
 SPK_VERS = 0.5.6
 SPK_REV = 1
-SPK_ICON = src/lirc.png
+SPK_ICON = src/lcdproc.png
 
 DEPENDS = cross/$(SPK_NAME)
 
