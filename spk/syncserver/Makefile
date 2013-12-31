@@ -17,6 +17,7 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -60,8 +61,8 @@ $(STAGING_DIR)/share/requirements.pybundle:
 	
 $(STAGING_DIR)/share/syncserver:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && hg clone http://hg.mozilla.org/services/server-full syncserver
+	cd $(STAGING_DIR)/share && hg clone -r "549" http://hg.mozilla.org/services/server-full syncserver
 	install -m 755 -d $(STAGING_DIR)/share/syncserver/deps
-	cd $(STAGING_DIR)/share/syncserver/deps && hg clone http://hg.mozilla.org/services/server-core server-core
-	cd $(STAGING_DIR)/share/syncserver/deps && hg clone http://hg.mozilla.org/services/server-reg server-reg
-	cd $(STAGING_DIR)/share/syncserver/deps && hg clone http://hg.mozilla.org/services/server-storage server-storage
+	cd $(STAGING_DIR)/share/syncserver/deps && hg clone -r "1069" http://hg.mozilla.org/services/server-core server-core
+	cd $(STAGING_DIR)/share/syncserver/deps && hg clone -r "552" http://hg.mozilla.org/services/server-reg server-reg
+	cd $(STAGING_DIR)/share/syncserver/deps && hg clone -r "813" http://hg.mozilla.org/services/server-storage server-storage

@@ -13,6 +13,8 @@ HG="${PYTHON_DIR}/bin/hg"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 WIZARD="/var/packages/${PACKAGE}/WIZARD_UIFILES"
 
+SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 INDEXFILES="${INSTALL_DIR}/app/help"
 
 USER="syncserver"
@@ -37,7 +39,8 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Get IP address
-    IP=`/sbin/ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
+    IP=os.environ['SERVER_NAME']
+    
 
     # Edit the configuration according to the wizard
     # Setup database, using SQLite unless MySQL password is provided
@@ -79,6 +82,9 @@ postinst ()
     # Since we're already counting on the IP not changing...
     for f in `find ${INDEXFILES} -name 'index.html'`; do sed -i "s|syno-ip|${IP}|g" ${f};done;
 
+    # Add port-forwarding config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
@@ -109,6 +115,11 @@ preuninst ()
     # Remove help files
     pkgindexer_del ${INSTALL_DIR}/app/index.conf > /dev/null
     pkgindexer_del ${INSTALL_DIR}/app/helptoc.conf > /dev/null
+
+    # Remove port-forwarding config
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
+    fi
 
     exit 0
 }
