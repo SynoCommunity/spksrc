@@ -39,8 +39,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Get IP address
-    IP=os.environ['SERVER_NAME']
-    
+    IP=`/sbin/ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
 
     # Edit the configuration according to the wizard
     # Setup database, using SQLite unless MySQL password is provided
