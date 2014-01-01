@@ -8,7 +8,7 @@ PKG_DIST_SITE = http://www.streamboard.tv/svn/oscam
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-r*
 
-DEPENDS = cross/openssl cross/libusb
+DEPENDS = cross/openssl cross/libusb cross/ccid cross/pcscd-lite
 
 HOMEPAGE = http://oscam.to/
 COMMENT  = OSCam is an Open Source Conditional Access Module software
@@ -27,7 +27,7 @@ myConfigure:
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) $(MAKE) CROSS=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p') CONF_DIR=$(INSTALL_PREFIX)/etc USE_LIBUSB=1
+	$(RUN) $(MAKE) CROSS=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p') CONF_DIR=$(INSTALL_PREFIX)/etc USE_PCSC=1 USE_LIBUSB=1
 
 .PHONY: myInstall
 myInstall:

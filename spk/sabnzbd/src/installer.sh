@@ -8,16 +8,23 @@ DNAME="SABnzbd"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:/usr/syno/sbin"
 USER="sabnzbd"
 GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-CFG_FILE="${INSTALL_DIR}/var/config.ini"
+CFG_FILE="/var/services/homes/${USER}/config.ini"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 
 preinst ()
 {
+    # Create user
+    synouser --get ${USER}
+    if [ $? -ne 0 ]
+    then
+        # create user with random password
+        synouser --add ${USER} `uuidgen | cut -c-8` 'SABnzbd User' '' '' ''
+    fi
+
     exit 0
 }
 
@@ -25,6 +32,9 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+
+    # Install oscam config
+	cp ${INSTALL_DIR}/var/config.ini ${CFG_FILE}
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
@@ -34,9 +44,6 @@ postinst ()
 
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
-
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizard
     sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
@@ -54,8 +61,7 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        delgroup ${USER} ${GROUP}
-        deluser ${USER}
+        synouser --del ${USER}
     fi
 
     exit 0

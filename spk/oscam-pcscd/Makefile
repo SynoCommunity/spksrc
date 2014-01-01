@@ -1,6 +1,6 @@
-SPK_NAME = oscam
+SPK_NAME = oscam-pcscd
 SPK_VERS = 1.20~r9041
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/oscam.png
 DSM_UI_DIR = app
 

@@ -13,7 +13,8 @@ PID_FILE="${INSTALL_DIR}/var/oscam.pid"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "${OSCAM} -b -c /var/services/homes/oscam"
+    su - ${RUNAS} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${INSTALL_DIR}/sbin/pcscd"  
+    su - ${RUNAS} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${OSCAM} -b -c /var/services/homes/oscam"
     sleep 1
     pidof oscam > ${PID_FILE}
 }
@@ -21,6 +22,7 @@ start_daemon ()
 stop_daemon ()
 {
     killall oscam
+    killall pcscd
     rm -f ${PID_FILE}
 }
 

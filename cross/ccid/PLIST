@@ -1,0 +1,2 @@
+lib:lib/pcsc/drivers/ifd-ccid.bundle/Contents/Linux/libccid.so
+rsc:lib/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist

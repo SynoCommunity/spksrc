@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Package
-PACKAGE="oscam"
+PACKAGE="oscam-pcscd"
 DNAME="OSCam"
 
 # Others
@@ -55,7 +55,6 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
-
     exit 0
 }
 
