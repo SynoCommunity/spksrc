@@ -1,6 +1,6 @@
---- setup_org.py	2013-08-02 05:37:39.000000000 +0200
-+++ setup.py	2013-11-23 21:42:28.020984511 +0100
-@@ -44,14 +44,14 @@
+--- setup_org.py	2013-12-02 03:51:10.000000000 +0100
++++ setup.py	2014-01-01 16:26:44.533373691 +0100
+@@ -44,15 +44,6 @@
  except AttributeError:
      pass
  
@@ -12,14 +12,7 @@
 -    except ImportError:
 -        raise SystemExit(
 -            "Couldn't import standard bz2 (incomplete Python install).")
-+#if isironpython:
-+#    sys.stderr.write("warning: IronPython detected (no bz2 support)\n")
-+#else:
-+#    try:
-+#        import bz2
-+#    except ImportError:
-+#        raise SystemExit(
-+#            "Couldn't import standard bz2 (incomplete Python install).")
- 
+-
  import os, subprocess, time
  import shutil
+ import tempfile

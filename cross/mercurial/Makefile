@@ -9,6 +9,6 @@ DEPENDS = cross/docutils
 
 HOMEPAGE = http://mercurial.selenic.com/
 COMMENT  = Mercurial is a free, distributed source control management tool
-LICENSE  =
+LICENSE  = GPLv2
 
 include ../../mk/spksrc.python-module.mk
