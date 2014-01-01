@@ -8,19 +8,19 @@ DNAME="Mozilla Sync Server"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="syncserver"
-PASTER="${INSTALL_DIR}/env/bin/paster serve"
+PASTER="${INSTALL_DIR}/env/bin/paster"
 SYNCSERVER="${INSTALL_DIR}/var/syncserver.ini"
 PID_FILE="${INSTALL_DIR}/var/syncserver.pid"
 LOG_FILE="${INSTALL_DIR}/var/log/paster.log"
 
 start_daemon ()
 {
-    ${PASTER} ${SYNCSERVER} --user=${USER} --daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
+    ${PASTER} serve ${SYNCSERVER} --user=${USER} --daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
 }
 
 stop_daemon ()
 {
-    ${PASTER} ${SYNCSERVER} --stop-daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
+    ${PASTER} serve ${SYNCSERVER} --stop-daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
 }
 
 daemon_status ()

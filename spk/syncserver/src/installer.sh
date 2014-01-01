@@ -29,6 +29,23 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
+    # Check MySQL database
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        if [ ! -z "${wizard_mysql_password_root}" ]; then
+            if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+                echo "Incorrect MySQL root password"
+                exit 1
+            fi
+            if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${USER}$ > /dev/null 2>&1; then
+                echo "MySQL user ${USER} already exists"
+                exit 1
+            fi
+            if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${PACKAGE}$ > /dev/null 2>&1; then
+                echo "MySQL database ${PACKAGE} already exists"
+                exit 1
+            fi
+        fi   
+    fi
 
     exit 0
 }
@@ -42,38 +59,37 @@ postinst ()
     IP=`/sbin/ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
 
     # Edit the configuration according to the wizard
-    # Setup database, using SQLite unless MySQL password is provided
-    if [ ! -z "${wizard_mysql_password_root}" ]; then
-        # Use MySQL
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${PACKAGE}; GRANT ALL PRIVILEGES ON ${PACKAGE}.* TO '${USER}'@'localhost' IDENTIFIED BY '${wizard_password_syncserver:=syncserver}';"    
-        sed -i "s|sqluri.*|sqluri = pymysql://${USER}:${wizard_password_syncserver:=syncserver}@localhost:3306/${PACKAGE}|g" ${CONF_FILE}
-    else
-        if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # SMTP config
+        sed -i -e "s|@smtp_server@|${wizard_syncserver_smtp_server:=localhost}|g" \
+               -e "s|@smtp_port@|${wizard_syncserver_smtp_port:=25}|g" \
+               -e "s|@sender@|${wizard_syncserver_sender:=syncserver@domain.com}|g" \
+               ${CONF_FILE}
+        # Setup database, using SQLite unless MySQL password is provided
+        if [ ! -z "${wizard_mysql_password_root}" ]; then
+            # Use MySQL
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${PACKAGE}; GRANT ALL PRIVILEGES ON ${PACKAGE}.* TO '${USER}'@'localhost' IDENTIFIED BY '${wizard_password_syncserver:=syncserver}';"
+            sed -i "s|sqluri.*|sqluri = pymysql://${USER}:${wizard_password_syncserver:=syncserver}@localhost:3306/${PACKAGE}|g" ${CONF_FILE}
+        else
              # No need for uninstall wizard files with SQLite, removing
              rm -fr ${WIZARD}/uninstall*
         fi
-    fi
-
-    # Set up SSL
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Setup SSL and fallback node
         if [ ${wizard_syncserver_use_ssl} == "true" ]; then
              # Create .pem file
              awk 'FNR==1{print ""}1' /usr/syno/etc/ssl/ssl.key/server.key /usr/syno/etc/ssl/ssl.crt/server.crt > ${INSTALL_DIR}/var/server.pem
              # Store the pem with chmod 400 in /var, otherwise we can't read it
              chmod 400 ${INSTALL_DIR}/var/server.pem
-             # Set https in fallback node
-             sed -i "s|fallback_node = http|fallback_node = https|g" ${CONF_FILE}
              # Update ini file with .pem file
              sed -i "11a \
                \ssl_pem = ${INSTALL_DIR}/var/server.pem" ${INI_FILE}
+             # Use https in fallback node
+             sed -i "s|fallback_node = http.*|fallback_node = https://${IP}:8084|g" ${CONF_FILE}
+         else
+             # use http in fallback node
+             sed -i "s|fallback_node = http.*|fallback_node = http://${IP}:8084|g" ${CONF_FILE}
          fi
     fi
-
-    # Set other variables according to the wizard
-    sed -i "s|@ip@|${IP}|g" ${CONF_FILE}
-    sed -i "s|@smtp_server@|${wizard_syncserver_smtp_server:=localhost}|g" ${CONF_FILE}
-    sed -i "s|@smtp_port@|${wizard_syncserver_smtp_port:=25}|g" ${CONF_FILE}
-    sed -i "s|@sender@|${wizard_syncserver_sender:=syncserver@domain.com}|g" ${CONF_FILE}
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env >> /dev/null
@@ -89,12 +105,12 @@ postinst ()
     # Build Sync
     cd ${INSTALL_DIR}/share/syncserver && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
 
+    # Update IP address in helpfiles
+    for f in `find ${INDEXFILES} -name 'index.html'`; do sed -i "s|syno-ip|${IP}|g" ${f};done;
+
     # Adjust and index help files
     pkgindexer_add ${INSTALL_DIR}/app/index.conf > /dev/null
     pkgindexer_add ${INSTALL_DIR}/app/helptoc.conf > /dev/null
-
-    # Since we're already counting on the IP not changing...
-    for f in `find ${INDEXFILES} -name 'index.html'`; do sed -i "s|syno-ip|${IP}|g" ${f};done;
 
     # Add port-forwarding config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null

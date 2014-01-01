@@ -23,11 +23,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = syncserver_extra_install
 
-BUSYBOX_CONFIG  = nice
-# Add ionice for ARCHs that support it
-ifeq ($(findstring $(ARCH),88f6281 qoriq),$(ARCH))
-BUSYBOX_CONFIG += ionice
-endif
+BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
@@ -57,8 +53,8 @@ syncserver_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_D
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ SQLAlchemy==0.7.10 Paste PasteScript PasteDeploy WebOb==1.0.7 Routes simplejson cef WSGIProxy metlog-py>=0.9.6 metlog-cef Mako recaptcha-client repoze.lru docopt MarkupSafe
-	
+	@cd $(WORK_DIR) && $(PIP) bundle $@ SQLAlchemy==0.7.10 Paste PasteScript PasteDeploy WebOb==1.0.7 Routes simplejson cef WSGIProxy metlog-py>=0.9.6 metlog-cef Mako recaptcha-client repoze.lru docopt MarkupSafe pymysql pymysql_sa
+
 $(STAGING_DIR)/share/syncserver:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && hg clone -r "549" http://hg.mozilla.org/services/server-full syncserver
