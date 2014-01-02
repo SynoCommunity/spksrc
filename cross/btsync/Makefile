@@ -1,5 +1,5 @@
 PKG_NAME = btsync
-PKG_VERS = 1.2.73
+PKG_VERS = 1.2.82
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(BTSYNC_ARCH)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://syncapp.bittorrent.com/$(PKG_VERS)
@@ -23,7 +23,10 @@ endif
 ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x),$(ARCH))
 BTSYNC_ARCH = powerpc
 endif
-ifeq ($(findstring $(ARCH),x86 cedarview bromolow evansport),$(ARCH))
+ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+BTSYNC_ARCH = glibc23_i386
+endif
+ifeq ($(findstring $(ARCH),x86 cedarview bromolow),$(ARCH))
 BTSYNC_ARCH = glibc23_x64
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
