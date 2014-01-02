@@ -1,23 +1,25 @@
 #!/bin/sh
 
 # Package
-PACKAGE="nzbget-testing"
-DNAME="NZBGet Testing"
+PACKAGE="nzbmegasearch"
+DNAME="NZBmegasearcH"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="nzbget-testing"
-NZBGET="${INSTALL_DIR}/bin/nzbget"
-CFG_FILE="${INSTALL_DIR}/var/nzbget.conf"
-PID_FILE="${INSTALL_DIR}/var/nzbget.pid"
-LOG_FILE="${INSTALL_DIR}/var/nzbget.log"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+USER="nzbmegasearch"
+PYTHON="${INSTALL_DIR}/env/bin/python"
+NZBMEGASEARCH="${INSTALL_DIR}/share/NZBmegasearch/mega2.py"
+PID_FILE="${INSTALL_DIR}/var/nzbmegasearch.pid"
+LOG_FILE="${INSTALL_DIR}/share/NZBmegasearch/logs/nzbmegasearch.log"
 
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${NZBGET} -c ${CFG_FILE} -D"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${NZBMEGASEARCH} daemon"
+    sleep 1
+    ps w | grep [${INSTALL_DIR}]/share/NZBmegasearch/mega2.py | awk '{print $1}' > ${PID_FILE}
 }
 
 stop_daemon ()
@@ -53,21 +55,17 @@ case $1 in
     start)
         if daemon_status; then
             echo ${DNAME} is already running
-            exit 0
         else
             echo Starting ${DNAME} ...
             start_daemon
-            exit $?
         fi
         ;;
     stop)
         if daemon_status; then
             echo Stopping ${DNAME} ...
             stop_daemon
-            exit $?
         else
             echo ${DNAME} is not running
-            exit 0
         fi
         ;;
     status)
@@ -81,7 +79,6 @@ case $1 in
         ;;
     log)
         echo ${LOG_FILE}
-        exit 0
         ;;
     *)
         exit 1

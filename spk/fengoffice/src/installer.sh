@@ -3,6 +3,7 @@
 # Package
 PACKAGE="fengoffice"
 DNAME="Feng Office"
+VERSION="2.4"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -100,6 +101,7 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config/config.php ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/config/installed_version.php ${TMP_DIR}/${PACKAGE}/
     mkdir ${TMP_DIR}/${PACKAGE}/upload/
     cp -r ${WEB_DIR}/${PACKAGE}/upload/*/ ${TMP_DIR}/${PACKAGE}/upload/
 
@@ -108,10 +110,20 @@ preupgrade ()
 
 postupgrade ()
 {
+    # Detect old version
+    INSTALLED_VERSION=`sed -n "s|return '\(.*\)';|\1|p" ${TMP_DIR}/${PACKAGE}/installed_version.php | xargs`
+
     # Restore configuration
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config/
     cp -r ${TMP_DIR}/${PACKAGE}/upload/*/ ${WEB_DIR}/${PACKAGE}/upload/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Fix permissions
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/upload
+
+    # Run update scripts
+    php ${WEB_DIR}/${PACKAGE}/public/upgrade/console.php ${INSTALLED_VERSION} ${VERSION} > /dev/null
+    php ${WEB_DIR}/${PACKAGE}/public/install/plugin-console.php update_all > /dev/null
 
     exit 0
 }
