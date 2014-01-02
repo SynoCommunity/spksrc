@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 2.0.1
+PKG_VERS = 2.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases/

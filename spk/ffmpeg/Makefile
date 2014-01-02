@@ -1,9 +1,9 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 1.1
+SPK_VERS = 2.1.1
 SPK_REV = 1
 SPK_ICON = src/ffmpeg.png
 DSM_UI_DIR = app
-CHANGELOG = 1. Added support for mp3 and x264
+CHANGELOG = update ffmpeg
 
 DEPENDS = cross/$(SPK_NAME)
 
