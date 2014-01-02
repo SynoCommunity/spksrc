@@ -11,7 +11,6 @@ DESCRIPTION = The new multipurpose rss reader, live stream, mashup, aggregation 
 ADMIN_URL = /selfoss/
 RELOAD_UI = yes
 DISPLAY_NAME = Selfoss
-BETA = 1
 
 HOMEPAGE   = http://selfoss.aditu.de/
 LICENSE    = GPLv3

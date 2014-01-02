@@ -1,16 +1,17 @@
 #!/bin/sh
 
 # Package
-PACKAGE="nzbget-testing"
-DNAME="NZBGet Testing"
+PACKAGE="nzbmegasearch"
+DNAME="NZBmegasearcH"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="nzbget-testing"
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+USER="nzbmegasearch"
 GROUP="users"
-CFG_FILE="${INSTALL_DIR}/var/nzbget.conf"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
@@ -24,17 +25,11 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Install busybox stuff
-    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+    # Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
-
-    # Edit the configuration according to the wizard
-    sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
-           -e "s/@control_username@/${wizard_control_username:=nzbget}/g" \
-           -e "s/@control_password@/${wizard_control_password:=nzbget}/g" \
-           ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -69,16 +64,10 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Revision 3 introduces backward incompatible changes
-    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 3 ]; then
-        echo "Please uninstall previous version, no update possible"
-        exit 1
-    fi
-
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+    mv ${INSTALL_DIR}/share/NZBmegasearch/custom_params.ini ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -86,8 +75,7 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    rm -fr ${INSTALL_DIR}/var
-    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    mv ${TMP_DIR}/${PACKAGE}/custom_params.ini ${INSTALL_DIR}/share/NZBmegasearch/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
