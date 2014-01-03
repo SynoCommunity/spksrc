@@ -75,7 +75,7 @@ postinst ()
              rm -fr ${WIZARD}/uninstall*
         fi
         # Setup SSL and fallback node
-        if [ ${wizard_syncserver_use_ssl} == "true" ]; then
+        if [ "${wizard_syncserver_use_ssl}" == "true" ]; then
              # Create .pem file
              awk 'FNR==1{print ""}1' /usr/syno/etc/ssl/ssl.key/server.key /usr/syno/etc/ssl/ssl.crt/server.crt > ${INSTALL_DIR}/var/server.pem
              # Store the pem with chmod 400 in /var, otherwise we can't read it
