@@ -1,0 +1,7 @@
+bin:bin/hg
+lib:@PYTHON_SITE_PACKAGES@/mercurial/base85.so
+lib:@PYTHON_SITE_PACKAGES@/mercurial/bdiff.so
+lib:@PYTHON_SITE_PACKAGES@/mercurial/diffhelpers.so
+lib:@PYTHON_SITE_PACKAGES@/mercurial/mpatch.so
+lib:@PYTHON_SITE_PACKAGES@/mercurial/osutil.so
+lib:@PYTHON_SITE_PACKAGES@/mercurial/parsers.so

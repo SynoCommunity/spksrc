@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Mozilla Sync Server</title>
+        <link href="/webman/help/help.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <h1>Mozilla Sync Server</h1>
+        <p>You can use Mozilla Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. Set up Firefox Sync on your main computer by creating a new account on a custom server, then add your other computers.</p>
+        <h3>Which URL should I use to configure Firefox Sync on my computer?</h3>
+        <p>The IP of your Synology, along with port 8084: <a href="http://syno-ip:8084/" target="_blank">http://syno-ip:8084/</a>. Alternatively, if you have name resolution configured correctly, you can use http://my.domain.name:8084/</p>
+        <h3>How do I reset my password?</h3>
+        <p>Open your browser, and enter <a href="http://syno-ip:8084/weave-password-reset" target="_blank">http://syno-ip:8084/weave-password-reset</a>.</p>
+        <p>This opens a web page where you can enter your e-mail address. A link to reset your password will be sent via e-mail.</p>
+        <h3>How do I remove an account?</h3>
+        <p>Open your browser, and enter <a href="http://syno-ip:8084/weave-delete-account" target="_blank">http://syno-ip:8084/weave-delete-account</a>.</p>
+        <p>This opens a web page where you can enter your e-mail address and password to delete an existing account.</p>
+        <h3>Troubleshooting</h3>
+        <p>Mozilla has documented some troubleshooting tips when running a custom Sync Server at <a href="https://docs.services.mozilla.com/howtos/run-sync.html#troubleshooting" target="_blank">How to run a custom Sync Server#Troubleshooting</a>.</p>
+		<h3>FAQ</h3>
+		<h4>Why do I see "404 Not Found - The resource could not be found" when I open the url directly in my browser?</h4>
+		<p>This is expected behaviour. The webserver used for this service does not serve pages on http(s) connections, so a 404 is displayed.</p>
+		<h4>I want to change the IP of my Synology. What do I do?</h4>
+		<p>Adjust the fallback_node in syncserver.conf with the correct IP-address.</p>
+		<h4>I am using the built-in SSL, and I want to change the certificate</h4>
+		<p>First, create a .pem file. You can do this by running the command "cat server.crt server.key > server.pem". Note that a line break between the two is needed.</p>
+		<p>Replace the server.pem in /usr/local/syncserver/var/. Make sure the owner is set correctly: "chown -R syncserver:root server.pem", and set the access permissions to owner/read: "chmod 400 server.pem"
+    </body>
+</html>

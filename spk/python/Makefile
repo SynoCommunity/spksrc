@@ -1,7 +1,7 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
 SPK_VERS =$(SPK_SHORT_VERS).6
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -9,6 +9,7 @@ DEPENDS += cross/setuptools cross/distutils2 cross/pip cross/virtualenv cross/py
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
+DEPENDS += cross/mercurial cross/scrypt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -17,7 +18,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update to 2.7.6\n2. Update modules\n3. Add pocketsphinx module"
+CHANGELOG = "Add mercurial, scrypt and pymysql modules"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
