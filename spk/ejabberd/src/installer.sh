@@ -32,8 +32,9 @@ postinst ()
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        sed -i -e "s#{hosts, \[\"localhost\"\]}.#{hosts, \[\"${wizard_ejabberd_hostname:=localhost}\"\]}.#g" ${INSTALL_DIR}/etc/ejabberd/ejabberd.cfg \
+        sed -i -e "s#{hosts, \[\"localhost\"\]}.#{hosts, \[\"${wizard_ejabberd_hostname:=localhost}\"\]}.#g" \
                -e "s#\%\%{acl, admin, {user, \"ermine\", \"example.org\"}}.#{acl, admin, {user, \"${wizard_ejabberd_admin_username:=admin}\", \"${wizard_ejabberd_hostname:=localhost}\"}}.#g" \
+               -e "s#{access_createnode, pubsub_createnode},#{access_createnode, pubsub_createnode},\n\t\t  {max_items_node, 1000000},#g" \
                ${INSTALL_DIR}/etc/ejabberd/ejabberd.cfg
         ${SSS} start > /dev/null
         ${INSTALL_DIR}/sbin/ejabberdctl register ${wizard_ejabberd_admin_username:=admin} ${wizard_ejabberd_hostname:=localhost} ${wizard_ejabberd_admin_password}
