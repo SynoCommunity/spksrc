@@ -123,6 +123,24 @@ $(DSM_WIZARDS_DIR)/%: $(WIZARDS_DIR)/%
 	@echo $@
 	@$(dsm_wizard_copy)
 
+# License
+DSM_LICENSE_FILE = $(WORK_DIR)/LICENSE
+
+DSM_LICENSE =
+ifneq ($(LICENSE_FILE),)
+DSM_LICENSE = $(DSM_LICENSE_FILE)
+endif
+
+define dsm_license_copy
+$(MSG) "Creating $@"
+cp $< $@
+chmod 644 $@
+endef
+
+$(DSM_LICENSE_FILE): $(LICENSE_FILE)
+	@echo $@
+	@$(dsm_license_copy)
+
 # Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
 
@@ -181,7 +199,11 @@ ifneq ($(strip $(DSM_WIZARDS)),)
 SPK_CONTENT += WIZARD_UIFILES
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) $(DSM_WIZARDS)
+ifneq ($(strip $(DSM_LICENSE)),)
+SPK_CONTENT += LICENSE
+endif
+
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) $(DSM_WIZARDS) $(DSM_LICENSE)
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
