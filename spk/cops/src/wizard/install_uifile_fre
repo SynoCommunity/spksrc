@@ -2,7 +2,7 @@
     "step_title": "Configuration de base",
     "items": [{
         "type": "textfield",
-        "desc": "Répertoire contenant Calibre. /volume1/calibre/ par défaut. Attention : doit se terminer par un /",
+        "desc": "Répertoire contenant Calibre. /volume1/calibre/ par défaut (ne jamais utiliser le répertoire web). Attention : doit se terminer par un /",
         "subitems": [{
             "key": "wizard_calibre_dir",
             "desc": "Répertoire contenant Calibre"
