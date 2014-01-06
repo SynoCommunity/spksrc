@@ -2,7 +2,7 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Calibre directory. Defaults to /volume1/calibre/. WARNING: has to end with a /",
+        "desc": "Calibre directory. Defaults to /volume1/calibre/ (never use your web directory). WARNING: has to end with a /",
         "subitems": [{
             "key": "wizard_calibre_dir",
             "desc": "Calibre directory"
