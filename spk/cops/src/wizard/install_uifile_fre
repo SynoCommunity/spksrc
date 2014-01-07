@@ -1,25 +1,30 @@
 [{
-    "step_title": "Configuration de base",
+    "step_title": "Configuration de COPS",
     "items": [{
         "type": "textfield",
-        "desc": "Répertoire contenant Calibre. /volume1/calibre/ par défaut (ne jamais utiliser le répertoire web). Attention : doit se terminer par un /",
+        "desc": "Répertoire contenant Calibre. Attention : doit se terminer par un / et ne jamais utiliser le répertoire web.",
         "subitems": [{
             "key": "wizard_calibre_dir",
+            "defaultValue": "/volume1/calibre/",
             "desc": "Répertoire contenant Calibre"
         }]
     }, {
         "type": "textfield",
-        "desc": "Titre du catalogue. COPS par défaut",
+        "desc": "Titre du catalogue.",
         "subitems": [{
             "key": "wizard_cops_title",
+            "defaultValue": "COPS",
             "desc": "Titre du catalogue"
         }]
-    }, {
-        "type": "textfield",
-        "desc": "Voulez vous permettre les téléchargement des fichiers Epub sur votre liseuse Kobo ? Si oui, taper 1. 0 (non) par défaut",
+    }]
+}, {
+    "step_title": "Configuration de COPS (suite)",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Voulez vous utiliser COPS avec votre liseuse Kobo ?",
         "subitems": [{
             "key": "wizard_use_url_rewriting",
-            "desc": "1 ou 0"
+            "desc": "Kobo"
         }]
     }]
 }]
