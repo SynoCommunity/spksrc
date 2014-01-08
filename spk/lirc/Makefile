@@ -17,7 +17,7 @@ endif
 
 DEPENDS = cross/$(SPK_NAME)-$(SPK_VERS)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = bru7us
 DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
 RELOAD_UI = no
 DISPLAY_NAME = LIRC
