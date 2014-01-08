@@ -17,10 +17,14 @@ PRE_DOWNLOAD_TARGET = pre_download_target
 else
 $(PRE_DOWNLOAD_TARGET): download_msg
 endif
-ifeq ($(strip $(DOWNLOAD_TARGET)),)
-DOWNLOAD_TARGET = download_target
+ifneq (,$(findstring nop,$(strip $(DOWNLOAD_TARGET))))
+DOWNLOAD_TARGET = nop_download_target
 else
-$(DOWNLOAD_TARGET): $(PRE_DOWNLOAD_TARGET)
+  ifeq ($(strip $(DOWNLOAD_TARGET)),)
+  DOWNLOAD_TARGET = download_target
+  else
+  $(DOWNLOAD_TARGET): $(PRE_DOWNLOAD_TARGET)
+  endif
 endif
 ifeq ($(strip $(POST_DOWNLOAD_TARGET)),)
 POST_DOWNLOAD_TARGET = post_download_target
@@ -33,6 +37,18 @@ endif
 
 download_msg:
 	@$(MSG) "Downloading files for $(NAME)"
+	
+nop_download_target:
+	@nop_file=$(PKG_DIST_FILE) ; \
+	if [ -z "$$nop_file" ] ; then \
+	  nop_file=$(PKG_DIST_NAME) ; \
+	fi ; \
+	if [ -f "$(DISTRIB_DIR)/$$nop_file" ] ; then \
+	  $(MSG) "File $$nop_file already downloaded" ; \
+	else \
+	  $(MSG) "Please download $$nop_file manually from $(PKG_DIST_SITE), and place in $(DISTRIB_DIR)" ; \
+	exit 1 ; \
+	fi ; \
 
 pre_download_target: download_msg
 
@@ -109,4 +125,3 @@ $(DOWNLOAD_COOKIE): $(POST_DOWNLOAD_TARGET)
 else
 download: ;
 endif
-
