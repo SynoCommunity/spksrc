@@ -1,6 +1,6 @@
 ARCH ?= powerpc
 PKG_NAME = synogpl
-PKG_BRANCH = 2636
+PKG_BRANCH = 2198
 PKG_ARCH = ppc
 PKG_EXT = tbz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_BRANCH)-$(PKG_ARCH).$(PKG_EXT)
