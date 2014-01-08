@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.etherpad": {
+            "title": "Etherpad",
+            "desc": "Etherpad",
+            "icon": "images/etherpad-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "9001",
+            "url": "/",
+            "allUsers": true
+        }
+    }
+}

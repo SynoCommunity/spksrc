@@ -1,0 +1,18 @@
+[{
+	"step_title": "Remove Etherpad database",
+	"items": [{
+		"type": "multiselect",
+		"desc": "If you remove the Etherpad database, all users will be deleted.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove Etherpad database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Enter your MySQL password to remove the Etherpad database.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Root password"
+		}]
+	}]	
+}]

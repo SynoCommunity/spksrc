@@ -1,0 +1,41 @@
+[{
+    "step_title": "Etherpad database configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'etherpad' MySQL user and database will be created. Please enter a password for the 'etherpad' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_etherpad",
+            "desc": "Etherpad password"
+        }]
+    }]
+}, {
+    "step_title": "Etherpad Administrator account",
+    "items": [{
+        "type": "textfield",
+        "desc": "Administrator account",
+        "subitems": [{
+            "key": "wizard_etherpad_admin_username",
+            "desc": "User name",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "Administrator s password.",
+        "subitems": [{
+            "key": "wizard_etherpad_admin_password",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}]
