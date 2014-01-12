@@ -14,13 +14,28 @@ GROUP="users"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="etherpad"
 MYSQL_DATABASE="etherpad"
-ETHERPAD="${INSTALL_DIR}/share/etherpad/bin/run.sh"
 CFG_FILE="${INSTALL_DIR}/share/etherpad/settings.json"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()
 {
+    # Check database
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+            echo "Incorrect MySQL root password"
+            exit 1
+        fi
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
+            echo "MySQL user ${MYSQL_USER} already exists"
+            exit 1
+        fi
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
+            echo "MySQL database ${MYSQL_DATABASE} already exists"
+            exit 1
+        fi
+    fi
+    
     exit 0
 }
 
@@ -46,18 +61,18 @@ postinst ()
                -e "s|@adminusr@|${wizard_etherpad_admin_username:=etherpad}|g" \
                -e "s|@adminpass@|${wizard_etherpad_admin_password:=etherpad}|g" \
                ${CFG_FILE}
-        # Get NPM dependencies
-        PATH=${PATH} ${INSTALL_DIR}/share/etherpad/bin/installDeps.sh  
-        # Prepare database
-        ${SSS} start
-        sleep 10
-        ${SSS} stop
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "ALTER DATABASE ${MYSQL_DATABASE} CHARACTER SET utf8 COLLATE utf8_bin;USE ${MYSQL_DATABASE};ALTER TABLE store CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;"
-        sleep 10
     fi
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # First run, takes care of dependencies and allows us to set MySQL stuff
+        ${SSS} start > /dev/null
+        sleep 10
+        ${SSS} stop > /dev/null
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "ALTER DATABASE ${MYSQL_DATABASE} CHARACTER SET utf8 COLLATE utf8_bin;USE ${MYSQL_DATABASE};ALTER TABLE store CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;"
+    fi
 
     exit 0
 }

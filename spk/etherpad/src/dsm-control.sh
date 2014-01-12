@@ -10,34 +10,46 @@ NODE_DIR="/usr/local/node"
 PATH="${INSTALL_DIR}/bin:${NODE_DIR}/bin:${PATH}"
 USER="etherpad"
 ETHERPAD="${INSTALL_DIR}/share/etherpad/bin/run.sh"
-CFG_FILE="settings.json"
-PID_FILE="${INSTALL_DIR}/var/etherpad.pid"
+INSTALLDEPS="${INSTALL_DIR}/share/etherpad/bin/installDeps.sh"
+ETHERPAD_PID="${INSTALL_DIR}/var/etherpad.pid"
+NODE_PID="${INSTALL_DIR}/var/node.pid"
 LOG_FILE="${INSTALL_DIR}/var/log/etherpad.log"
 
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${ETHERPAD} -s ${CFG_FILE}" & > /dev/null 2>&1
-    sleep 10
-    ps -w | grep ${ETHERPAD} | grep -v grep |awk '{print $1}' > ${PID_FILE}
+    # Prevent issues with saving PID if deps need updating (e.g. first run)
+    su - ${USER} -c "PATH=${PATH} ${INSTALLDEPS}" || exit 1
+    # Start Etherpad via server.js. Config file will be found automatically.
+    su - ${USER} -c "cd ${INSTALL_DIR}/share/etherpad && PATH=${PATH} node ${INSTALL_DIR}/share/etherpad/node_modules/ep_etherpad-lite/node/server.js" & echo $! > ${ETHERPAD_PID}
+    sleep 5
+    ps -w | grep "ep_etherpad-lite/node/server.js" | grep -v grep |awk '{print $1}' > ${NODE_PID}
 
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    kill `ps -w | grep "etherpad/node_modules/ep_etherpad-lite/node/server.js" | grep -v grep |awk '{print $1}'` > /dev/null 2>&1
-    rm -f ${PID_FILE}
+    kill `cat ${ETHERPAD_PID}`
+    kill `cat ${NODE_PID}`
+    wait_for_status 1 20 
+    if [ $? -eq 1 ]; then
+        kill -9 `cat ${ETHERPAD_PID}`
+        kill -9 `cat ${NODE_PID}`
+    fi
+    rm -f ${ETHERPAD_PID} ${NODE_PID}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
-return
-fi
-rm -f ${PID_FILE}
-    return 1
+    ETHERPAD_RUNNING=0
+    NODE_RUNNING=0
+    if [ -f ${ETHERPAD_PID} ] && kill -0 `cat ${ETHERPAD_PID}` > /dev/null 2>&1; then
+        ETHERPAD_RUNNING=1
+    fi
+    if [ -f ${NODE_PID} ] && kill -0 `cat ${NODE_PID}` > /dev/null 2>&1; then
+        NODE_RUNNING=1
+    fi
+    [ ${ETHERPAD_RUNNING} -eq 1 -a ${NODE_RUNNING} -eq 1 ] || return 1
 }
 
 wait_for_status ()
@@ -79,6 +91,9 @@ case $1 in
             exit 1
         fi
         ;;
+    installdeps)
+        su - ${USER} -c "PATH=${PATH} ${INSTALLDEPS}" || exit 1
+        ;;
     log)
         echo ${LOG_FILE}
         ;;
@@ -86,4 +101,5 @@ case $1 in
         exit 1
         ;;
 esac
+
 

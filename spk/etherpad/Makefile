@@ -48,4 +48,5 @@ etherpad_extra_install: $(STAGING_DIR)/share/etherpad
 $(STAGING_DIR)/share/etherpad:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/ether/etherpad-lite.git etherpad
-	
+	mkdir -p $(STAGING_DIR)/share/etherpad/src/node_modules
+	cd $(STAGING_DIR)/share/etherpad/src && npm install
