@@ -110,6 +110,14 @@ If you like spksrc and packages made out of it, please consider making a donatio
 
   .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
     :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=T6BU3QXYH4CMG
+    
+* bru7us
+
+  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
+    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W3UX3VM22WRQY&item_name=SynoCommunity
+
+  .. image:: http://api.flattr.com/button/flattr-badge-large.png
+    :target: http://flattr.com/thing/1106801/
 
 * Ximi1970
 

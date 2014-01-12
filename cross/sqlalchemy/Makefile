@@ -1,5 +1,5 @@
 PKG_NAME = SQLAlchemy
-PKG_VERS = 0.8.3
+PKG_VERS = 0.9.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/S/$(PKG_NAME)
