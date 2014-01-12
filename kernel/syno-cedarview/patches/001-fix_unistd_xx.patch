@@ -1,7 +1,7 @@
 diff -urN arch.orig/x86/include/asm/unistd_32.h arch/x86/include/asm/unistd_32.h
---- arch.orig/x86/include/asm/unistd_32.h	2012-09-28 19:19:04.000000000 +0200
-+++ arch/x86/include/asm/unistd_32.h	2013-05-29 23:44:40.920629854 +0200
-@@ -387,11 +387,7 @@
+--- arch.orig/x86/include/asm/unistd_32.h	2013-08-25 14:17:53.000000000 +0200
++++ arch/x86/include/asm/unistd_32.h	2013-10-01 21:15:53.934921973 +0200
+@@ -392,11 +392,7 @@
  #if !defined(__KERNEL__)
  /* direct SYNOCaselessStat to stat64 in 32-bit platform
   * 64-bits arch has no stat64 support */
@@ -14,10 +14,24 @@ diff -urN arch.orig/x86/include/asm/unistd_32.h arch/x86/include/asm/unistd_32.h
  #define SYNOCaselessStat(arg1,arg2)		syscall(__NR_SYNOCaselessStat64 ,arg1,arg2)
  #define SYNOCaselessLStat(arg1,arg2)	syscall(__NR_SYNOCaselessLStat64 ,arg1,arg2)
  #endif
+@@ -435,12 +431,7 @@
+ #if !defined(__KERNEL__)
+ /* direct SYNOStat to stat64 in 32-bit platform
+  * 64-bits arch has no stat64 support */
+-#include <bits/wordsize.h>
+-#if __WORDSIZE == 64
+-#define SYNOStat(arg1, arg2, arg3)  syscall(__NR_SYNOStat, arg1, arg2, arg3)
+-#define SYNOFStat(arg1, arg2, arg3) syscall(__NR_SYNOFStat, arg1, arg2, arg3)
+-#define SYNOLStat(arg1, arg2, arg3) syscall(__NR_SYNOLStat, arg1, arg2, arg3)
+-#elif (_FILE_OFFSET_BITS == 64)
++#if (_FILE_OFFSET_BITS == 64)
+ #define SYNOStat(arg1, arg2, arg3)  syscall(__NR_SYNOStat64, arg1, arg2, arg3)
+ #define SYNOFStat(arg1, arg2, arg3) syscall(__NR_SYNOFStat64, arg1, arg2, arg3)
+ #define SYNOLStat(arg1, arg2, arg3) syscall(__NR_SYNOLStat64, arg1, arg2, arg3)
 diff -urN arch.orig/x86/include/asm/unistd_64.h arch/x86/include/asm/unistd_64.h
---- arch.orig/x86/include/asm/unistd_64.h	2012-09-28 19:19:04.000000000 +0200
-+++ arch/x86/include/asm/unistd_64.h	2013-05-29 23:50:21.747135373 +0200
-@@ -722,18 +722,10 @@
+--- arch.orig/x86/include/asm/unistd_64.h	2013-08-25 14:17:53.000000000 +0200
++++ arch/x86/include/asm/unistd_64.h	2013-10-01 21:17:27.440110388 +0200
+@@ -728,18 +728,10 @@
  #if !defined(__KERNEL__)
  /* direct SYNOCaselessStat to stat64 in 32-bit platform
   * 64-bits arch has no stat64 support */
@@ -36,3 +50,26 @@ diff -urN arch.orig/x86/include/asm/unistd_64.h arch/x86/include/asm/unistd_64.h
  /* define stat64 interface for compatibility
     These should be removed after AP modification */
  #define SYNOCaselessStat64(arg1,arg2)	syscall(__NR_SYNOCaselessStat64 , arg1,arg2)
+@@ -782,22 +774,12 @@
+ #if !defined(__KERNEL__)
+ /* direct SYNOStat to stat64 in 32-bit platform
+  * 64-bits arch has no stat64 support */
+-#include <bits/wordsize.h>
+-#if __WORDSIZE == 64
+ #define SYNOStat(arg1, arg2, arg3)  syscall(__NR_SYNOStat, arg1, arg2, arg3)
+ #define SYNOFStat(arg1, arg2, arg3) syscall(__NR_SYNOFStat, arg1, arg2, arg3)
+ #define SYNOLStat(arg1, arg2, arg3) syscall(__NR_SYNOLStat, arg1, arg2, arg3)
+ __SYSCALL(__NR_SYNOStat, sys_SYNOStat)
+ __SYSCALL(__NR_SYNOFStat, sys_SYNOFStat)
+ __SYSCALL(__NR_SYNOLStat, sys_SYNOLStat)
+-#elif (_FILE_OFFSET_BITS == 64)
+-#define SYNOStat(arg1, arg2, arg3)  syscall(__NR_SYNOStat64, arg1, arg2, arg3)
+-#define SYNOFStat(arg1, arg2, arg3) syscall(__NR_SYNOFStat64, arg1, arg2, arg3)
+-#define SYNOLStat(arg1, arg2, arg3) syscall(__NR_SYNOLStat64, arg1, arg2, arg3)
+-__SYSCALL(__NR_SYNOStat64, sys_SYNOStat64)
+-__SYSCALL(__NR_SYNOFStat64, sys_SYNOFStat64)
+-__SYSCALL(__NR_SYNOLStat64, sys_SYNOLStat64)
+-#endif
+ #endif /* __KERNEL__ */
+ #endif /* MY_ABC_HERE */
+ #ifdef CONFIG_SYNO_NOTIFY

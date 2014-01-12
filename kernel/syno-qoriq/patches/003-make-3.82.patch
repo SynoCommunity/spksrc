@@ -1,0 +1,36 @@
+diff -urN arch.orig/powerpc/Makefile arch/powerpc/Makefile
+--- arch.orig/powerpc/Makefile	2013-08-03 10:10:30.000000000 +0200
++++ arch/powerpc/Makefile	2013-10-03 23:48:38.913982234 +0200
+@@ -165,9 +165,11 @@
+ # Default to zImage, override when needed
+ all: zImage
+ 
+-BOOT_TARGETS = zImage zImage.initrd uImage zImage% dtbImage% treeImage.% cuImage.% simpleImage.%
++# With make 3.82 we cannot mix normal and wildcard targets
++BOOT_TARGETS1 := zImage zImage.initrd uImaged
++BOOT_TARGETS2 := zImage% dtbImage% treeImage.% cuImage.% simpleImage.%
+ 
+-PHONY += $(BOOT_TARGETS)
++PHONY += $(BOOT_TARGETS1) $(BOOT_TARGETS2)
+ 
+ boot := arch/$(ARCH)/boot
+ 
+@@ -182,10 +184,16 @@
+ zImage: relocs_check
+ endif
+ 
+-$(BOOT_TARGETS): vmlinux
++$(BOOT_TARGETS1): vmlinux
++	$(Q)$(MAKE) ARCH=ppc64 $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
++$(BOOT_TARGETS2): vmlinux
++	$(Q)$(MAKE) ARCH=ppc64 $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
++
++
++bootwrapper_install:
+ 	$(Q)$(MAKE) ARCH=ppc64 $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
+ 
+-bootwrapper_install %.dtb:
++%.dtb:
+ 	$(Q)$(MAKE) ARCH=ppc64 $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
+ 
+ define archhelp

@@ -1,7 +1,7 @@
-diff -urN arch.orig/arm/include/asm/unistd.h arch/arm/include/asm/unistd.h
---- arch.orig/arm/include/asm/unistd.h	2013-08-24 11:35:55.000000000 +0200
-+++ arch/arm/include/asm/unistd.h	2013-10-01 21:43:27.150455033 +0200
-@@ -443,11 +443,7 @@
+diff -urN arch.orig/powerpc/include/asm/unistd.h arch/powerpc/include/asm/unistd.h
+--- arch.orig/powerpc/include/asm/unistd.h	2013-08-24 11:39:59.000000000 +0200
++++ arch/powerpc/include/asm/unistd.h	2013-10-04 01:23:32.602127770 +0200
+@@ -384,11 +384,7 @@
  #if !defined(__KERNEL__)
  /* direct SYNOCaselessStat to stat64 in 32-bit platform
   * 64-bits arch has no stat64 support */
@@ -14,7 +14,7 @@ diff -urN arch.orig/arm/include/asm/unistd.h arch/arm/include/asm/unistd.h
  #define SYNOCaselessStat(arg1,arg2)                         syscall(__NR_SYNOCaselessStat64 , arg1,arg2)
  #define SYNOCaselessLStat(arg1,arg2)                         syscall(__NR_SYNOCaselessLStat64 , arg1,arg2)
  #endif
-@@ -486,12 +482,7 @@
+@@ -432,12 +428,7 @@
  #if !defined(__KERNEL__)
  /* direct SYNOStat to stat64 in 32-bit platform
   * 64-bits arch has no stat64 support */

@@ -1,0 +1,10 @@
+diff -urN include.orig/linux/Kbuild include/linux/Kbuild
+--- include.orig/linux/Kbuild	2013-08-03 10:10:32.000000000 +0200
++++ include/linux/Kbuild	2013-10-04 00:11:17.711627549 +0200
+@@ -393,5 +393,6 @@
+ header-y += synosata.h
+ header-y += syno_debug.h
+ header-y += synobios.h
++header-y += syno_acl.h
+ header-y += syno_acl_xattr_ds.h
+ header-y += timerfd.h

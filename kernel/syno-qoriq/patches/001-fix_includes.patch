@@ -1,0 +1,13 @@
+diff -urN arch.orig/powerpc/include/asm/Kbuild arch/powerpc/include/asm/Kbuild
+--- arch.orig/powerpc/include/asm/Kbuild	2013-08-03 10:10:30.000000000 +0200
++++ arch/powerpc/include/asm/Kbuild	2013-10-04 00:34:09.835297595 +0200
+@@ -21,6 +21,9 @@
+ header-y += sigcontext.h
+ header-y += statfs.h
+ header-y += ps3fb.h
++header-y += page_32.h
++header-y += page_64.h
++header-y += cache.h
+ 
+ unifdef-y += bootx.h
+ unifdef-y += byteorder.h
