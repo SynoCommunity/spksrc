@@ -15,6 +15,7 @@ Status of the toolchains::
 
 	cedarview             ok           ok       ok       ok               ok              ok
 	bromolow              ok           ok       ok       ok               ok              (cannot test)
+	evansport             ok           ok       ok       ok               ok              (cannot test)
 	x86                   ok           ok       ok       ok               ok              (cannot test)
 	88f6281               ok           ok       ok       ok               ok              ok
 

@@ -21,7 +21,7 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-ARCHITECTURES = bromolow cedarview x86 88f6281
+ARCHITECTURES = bromolow cedarview evansport x86 88f6281
 
 
 PRE_DEPEND_TARGET = myPreDepend
@@ -50,6 +50,11 @@ $(info Found $(ARCH))
 MAIN_MAKE_TOOLCHAIN_TARGET = x86_64-linux-gnu
 MAKE_TOOLCHAIN_TARGET = x86_64-linux-gnu
 endif
+ifneq ($(findstring $(ARCH), evansport),)
+$(info Found $(ARCH))
+MAIN_MAKE_TOOLCHAIN_TARGET = i686-pc-linux-gnu
+MAKE_TOOLCHAIN_TARGET = i686-pc-linux-gnu
+endif
 ifneq ($(findstring $(ARCH), 88f6281),)
 $(info Found $(ARCH))
 MAIN_MAKE_TOOLCHAIN_TARGET = arm-unknown-linux-gnueabi
@@ -70,6 +75,7 @@ clean-%:
 	export CLEANUP=$${CLEANUP:6} ; \
 	if 	[ "$$CLEANUP" == "bromolow" ] || \
 		[ "$$CLEANUP" == "cedarview" ] || \
+		[ "$$CLEANUP" == "evansport" ] || \
 		[ "$$CLEANUP" == "x86" ] || \
 		[ "$$CLEANUP" == "88f6281" ] || \
 		[ "$$CLEANUP" == "88f5281" ] || \
