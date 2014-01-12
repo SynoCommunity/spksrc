@@ -1,0 +1,9 @@
+bin:sbin/bbackupctl
+bin:sbin/bbackupd
+rsc:sbin/bbackupd-config
+bin:sbin/bbackupquery
+bin:sbin/bbstoreaccounts
+bin:sbin/bbstored
+rsc:sbin/bbstored-certs
+rsc:sbin/bbstored-config
+rsc:sbin/raidfile-config
