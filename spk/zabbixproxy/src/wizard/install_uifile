@@ -1,0 +1,31 @@
+[{
+    "step_title": "Zabbix Proxy Configuration",
+    "items": [{
+	 "desc": "Please enter Zabbix Proxy configuration settings for you environment."
+    }, {
+	"type": "textfield",
+        "desc": "IP address (or hostname) of Zabbix server",
+        "subitems": [{
+            "key": "zabbix_server_ip",
+            "desc": "Server ip address<br><small>default is 127.0.0.1</small>"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Zabbix server port address",
+        "subitems": [{
+            "key": "zabbix_server_port",
+            "desc": "Zabbix listening Port<br><small>default is 10051</small>"
+        }]
+    }]
+}, {
+    "step_title": "Zabbix Proxy Hostname Configuration",
+    "items": [{
+	}, {
+        "type": "textfield",
+        "desc": "Unique, case sensitive Proxy name. Make sure the Proxy name is known to the server!",
+        "subitems": [{
+            "key": "zabbix_proxy_hostname",
+            "desc": "Proxy Hostname. Default is Zabbix proxy "
+        }]
+    }]
+}]

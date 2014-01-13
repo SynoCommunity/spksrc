@@ -1,0 +1,9 @@
+bin:bin/zabbix_get
+bin:bin/zabbix_sender
+etc:etc/zabbix_agent.conf
+etc:etc/zabbix_agentd.conf
+bin:sbin/zabbix_agent
+bin:sbin/zabbix_agentd
+shr:share/man/man1/zabbix_get.1
+shr:share/man/man1/zabbix_sender.1
+shr:share/man/man8/zabbix_agentd.8

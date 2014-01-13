@@ -1,0 +1,35 @@
+[{
+    "step_title": "Server Configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "ServerName. Default to Zabbix server",
+        "subitems": [{
+            "key": "zabbix_server_hostname",
+            "desc": "ServerName"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "ServerName Port. Default to 10051",
+        "subitems": [{
+            "key": "zabbix_server_port",
+            "desc": "Server Port"
+        }]
+    }]
+}, {
+    "step_title": "Database Configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Zabbix database password. Defaults to zabbix",
+        "subitems": [{
+            "key": "wizard_mysql_password_zabbix",
+            "desc": "Database Password"
+        }]
+    }, {
+        "type": "password",
+        "subitems": [{
+	     "desc": "Mysql database root password",
+            "key": "wizard_mysql_password_root",
+            "desc": "MySql Root Password"
+        }]
+    }]
+}]

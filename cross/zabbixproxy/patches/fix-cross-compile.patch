@@ -1,0 +1,20 @@
+--- configure.orig	2013-11-12 06:09:34.000000000 +0000
++++ configure	2013-11-16 11:39:24.000000000 +0000
+@@ -7046,7 +7046,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long long format" >&5
+ $as_echo_n "checking for long long format... " >&6; }
+-if test "$cross_compiling" = yes; then :
++if test "$cross_compiling" = maybe; then :
+   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+ as_fn_error $? "cannot run test program while cross compiling
+@@ -7189,7 +7189,7 @@
+ $as_echo_n "checking for -m64 compilation flag... " >&6; }
+ 	saved_CFLAGS="$CFLAGS"
+ 	CFLAGS="-m64"
+-	if test "$cross_compiling" = yes; then :
++	if test "$cross_compiling" = maybe; then :
+   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+ as_fn_error $? "cannot run test program while cross compiling

@@ -1,0 +1,2 @@
+bin:sbin/dnsmasq
+rsc:share/man/man8/dnsmasq.8

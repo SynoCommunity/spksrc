@@ -1,0 +1,10 @@
+{
+    ".url": {
+        "com.synocommunity.packages.zabbixagent": {
+            "title": "Zabbix Agent",
+            "desc": "A process deployed on monitoring targets to actively monitor local resources and applications",
+            "icon": "images/zabbix-{0}.png",
+            "allUsers": false
+        }
+    }
+}
