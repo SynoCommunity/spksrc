@@ -9,7 +9,6 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 NODE_DIR="/usr/local/node"
 PATH="${INSTALL_DIR}/bin:${NODE_DIR}/bin:${PATH}"
 USER="etherpad"
-ETHERPAD="${INSTALL_DIR}/share/etherpad/bin/run.sh"
 INSTALLDEPS="${INSTALL_DIR}/share/etherpad/bin/installDeps.sh"
 ETHERPAD_PID="${INSTALL_DIR}/var/etherpad.pid"
 NODE_PID="${INSTALL_DIR}/var/node.pid"
@@ -90,9 +89,6 @@ case $1 in
             echo ${DNAME} is not running
             exit 1
         fi
-        ;;
-    installdeps)
-        su - ${USER} -c "PATH=${PATH} ${INSTALLDEPS}" || exit 1
         ;;
     log)
         echo ${LOG_FILE}
