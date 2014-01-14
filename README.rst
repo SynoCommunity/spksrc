@@ -9,6 +9,13 @@ To use spksrc, it is recommended to use a virtual machine with an x86 version of
     sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check bjam intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython
     sudo pip install -U pip
 
+To build packages which depend on nodejs and/or npm, install nodejs and npmjs as follows (from https://github.com/joyent/node/wiki/backports.debian.org)::
+
+    echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt/sources.list
+    apt-get update
+    apt-get install nodejs-legacy
+    curl https://npmjs.org/install.sh | sh
+    
 You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
 
 You are now ready to use spksrc and make almost all SPKs. If you have any problem, try installing the
