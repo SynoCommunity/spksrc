@@ -41,8 +41,6 @@ endif
 	@echo "Recursive build. Exiting."
 	@exit 1
 
-clean: clean-all-arch
-
 
 include ../../mk/spksrc.spk.mk
 
@@ -70,6 +68,8 @@ MAKE = make MAKE_TOOLCHAIN_TARGET=$(MAIN_MAKE_TOOLCHAIN_TARGET) MAKE_TOOLCHAIN_G
 DELETE_COOKIES = $(shell rm -f work-*/.depend_done)
 ifeq ($(DELETE_COOKIES),)
 endif
+
+clean: clean-all-arch
 
 clean-%:
 	@/bin/bash -c '\
