@@ -27,4 +27,5 @@ include ../../mk/spksrc.spk.mk
 boxbackup-client_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 src/syno-bbackupd-config $(STAGING_DIR)/sbin/syno-bbackupd-config
-
+	install -m 755 src/syno-bbackupctl $(STAGING_DIR)/sbin/syno-bbackupctl
+	install -m 755 src/syno-bbackupquery $(STAGING_DIR)/sbin/syno-bbackupquery
