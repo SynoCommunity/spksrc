@@ -1,13 +1,13 @@
-ARCH ?= 88f6281
+ARCH ?= evansport
 PKG_NAME = synogpl
 PKG_BRANCH = 3776
-PKG_ARCH = 6281
+PKG_ARCH = $(ARCH)
 PKG_EXT = tbz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_BRANCH)-$(PKG_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/dsgpl/Synology%20NAS%20GPL%20Source/$(PKG_BRANCH)branch
-PKG_EXTRACT = source/linux-2.6.32
+PKG_EXTRACT = source/linux-3.x
 SYNO_CONFIG = synoconfigs/$(ARCH)
-BASE_ARCH = arm
+BASE_ARCH = x86
 
 HOMEPAGE = http://www.synology.com/
 

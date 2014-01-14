@@ -1,5 +1,5 @@
 PKG_NAME = nzbget
-PKG_VERS = 11.0
+PKG_VERS = 12.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/nzbget/files
