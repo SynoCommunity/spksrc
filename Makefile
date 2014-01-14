@@ -1,7 +1,7 @@
 
 SUPPORTED_TCS = $(notdir $(wildcard toolchains/syno-*))
 SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
-SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
+SUPPORTED_SPKS = $(patsubst spk/%/Makefile,spk-%,$(wildcard spk/*/Makefile))
 
 
 all: $(SUPPORTED_SPKS)
@@ -36,10 +36,10 @@ spk-clean:
 	    (cd $${spk} && $(MAKE) clean) ; \
 	done
 
-%: spk/%/Makefile
+spk-%: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
-%-clean: spk/%/Makefile
+spk-%-clean: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
 prepare: downloads

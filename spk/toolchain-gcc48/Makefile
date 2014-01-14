@@ -41,6 +41,8 @@ endif
 	@echo "Recursive build. Exiting."
 	@exit 1
 
+clean: clean-all-arch
+
 
 include ../../mk/spksrc.spk.mk
 
