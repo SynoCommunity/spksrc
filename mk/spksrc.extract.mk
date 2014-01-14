@@ -13,6 +13,7 @@ EXTRACT_CMD.tar.gz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.bz2 = tar -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.lzma = tar --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tar.lz = tar --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH)
 
 EXTRACT_CMD = $(EXTRACT_CMD.$(DIST_EXT)) 
