@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="htpcmanager"
-DNAME="HTPC Manager"
+DNAME="HTPC-Manager"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
