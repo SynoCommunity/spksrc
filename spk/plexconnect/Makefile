@@ -8,10 +8,10 @@ DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = PlexConnect: Plex @ aTV - think different. See http://forums.plexapp.com/index.php/topic/72356-plexconnect-on-synology/ for detailed installation instructions.
+DESCRIPTION = PlexConnect: Plex @ aTV - think different. Package to show Plex content on your unhacked AppleTV 2 or 3.
 RELOAD_UI = yes
 DISPLAY_NAME = PlexConnect
-
+HELPURL = http://forums.plexapp.com/index.php/topic/72356-plexconnect-on-synology/
 HOMEPAGE   = https://github.com/iBaa/PlexConnect
 LICENSE    = GPL
 
@@ -51,6 +51,7 @@ plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
 
 $(STAGING_DIR)/share/PlexConnect:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone -b master https://github.com/iBaa/PlexConnect.git
+	cd $(STAGING_DIR)/share && git clone --single-branch -b master https://github.com/iBaa/PlexConnect.git
+	cd $(STAGING_DIR)/share/PlexConnect && git checkout 76bbae9642a16a6952d7797482a7996dba44d675
 	#cd $(STAGING_DIR)/share/PlexConnect && git am < $(STAGING_DIR)/../../src/share/PlexConnect/patch.diff
 	rm -fr $(STAGING_DIR)/share/PlexConnect/.git $(STAGING_DIR)/share/PlexConnect/.gitignore
