@@ -13,7 +13,7 @@ case $1 in
         exit 0
         ;;
     status)
-        exit 1
+        exit 0
         ;;
     log)
         exit 1
