@@ -19,7 +19,7 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Put mc in the PATH
+    # Link in binary directory
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/inotifywait /usr/local/bin/inotifywait
     ln -s ${INSTALL_DIR}/bin/inotifywatch /usr/local/bin/inotifywatch

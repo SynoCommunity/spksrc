@@ -1,9 +1,5 @@
 bin:bin/inotifywait
 bin:bin/inotifywatch
-rsc:include/inotifytools
-rsc:lib/libinotifytools.a
-rsc:lib/libinotifytools.la
 lnk:lib/libinotifytools.so
 lnk:lib/libinotifytools.so.0
 lib:lib/libinotifytools.so.0.4.1
-shr:share/*
