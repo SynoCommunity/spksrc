@@ -7,7 +7,7 @@ DNAME="Newznab"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 NEWZNAB="${INSTALL_DIR}/bin/newznab.sh"
 PID_FILE="${INSTALL_DIR}/var/newznab.pid"
 
