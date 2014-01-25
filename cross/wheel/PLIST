@@ -1,0 +1,3 @@
+bin:bin/egg2wheel
+bin:bin/wheel
+bin:bin/wininst2wheel
