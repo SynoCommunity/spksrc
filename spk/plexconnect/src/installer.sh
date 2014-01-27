@@ -11,17 +11,21 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 CFG_FILE="share/PlexConnect/Settings.cfg"
 RUNAS="${PACKAGE}"
 PYTHON="${PYTHON_DIR}/bin/python"
-APACHE_DIR="/usr/syno/apache"
+APACHE_DIR="/etc/httpd"
 HTTPD_CONF_USER="${APACHE_DIR}/conf/httpd.conf-user"
 VHOST_FILE="${APACHE_DIR}/conf/extra/plexconnect-vhosts.conf"
 INSTALLER_LOG="/../../@tmp/installer.log"
 ## not in use yet
-#HTTPD_SSL_CONF_USER="${APACHE_DIR}/conf/extra/httpd-ssl.conf-user"
+#HTTPD_SSL_CONF_USER="${APACHE_DIR}/conf/extra/httpd-ssl.conf-sys"
 #VHOST_SSL_FILE="${APACHE_DIR}/conf/extra/plexconnect-ssl-vhosts.conf"
+
+restart_apache() {
+  /usr/syno/sbin/synoservicecfg --restart httpd-user
+}
 
 installer_log() {
   return
-  echo "INSTALLER: ${1}" >> "${INSTALLER_LOG}"
+  #echo "INSTALLER: ${1}" >> "${INSTALLER_LOG}"
 }
 
 preinst ()
@@ -73,7 +77,7 @@ postinst ()
   #echo "Include ${VHOST_SSL_FILE}" >> ${HTTPD_SSL_CONF_USER}
 
   # restart apache
-  /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null
+  restart_apache
 
   # Correct the files ownership
   chown -R ${PACKAGE}:root ${SYNOPKG_PKGDEST}
@@ -109,7 +113,7 @@ postuninst ()
   #rm -fr ${VHOST_SSL_FILE}
 
   # restart apache
-  /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null
+  restart_apache
 
   exit 0
 }
@@ -162,7 +166,7 @@ postupgrade ()
   rm -fr ${TMP_DIR}/${PACKAGE}
 
   # restart apache
-  /usr/syno/etc.defaults/rc.d/S97apache-user.sh restart > /dev/null
+  restart_apache
 
   # Correct the files ownership
   chown -R ${PACKAGE}:root ${SYNOPKG_PKGDEST}

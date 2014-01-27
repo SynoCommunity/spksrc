@@ -1,6 +1,6 @@
 SPK_NAME = plexconnect
 SPK_VERS = 0.3
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
@@ -24,6 +24,8 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 COPY_TARGET = nop
 POST_STRIP_TARGET = plexconnect_extra_install
+
+FIRMWARE=5.0-4418
 
 # Pure Python package, make sure ARCH is not defined
 override ARCH=
