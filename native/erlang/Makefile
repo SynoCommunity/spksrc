@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = R15B01
+PKG_VERS = R16B03-1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = otp_src_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.erlang.org/download/
@@ -24,4 +24,4 @@ myInstall:
 
 .PHONY: myPostInstall
 myPostInstall:
-	sed -i 's#ROOTDIR=/usr/local/lib/erlang#ROOTDIR=$(INSTALL_DIR)/usr/local/lib/erlang#' $(INSTALL_DIR)/usr/local/bin/erl
+	sed -i 's#ROOTDIR="/usr/local/lib/erlang"#ROOTDIR="$(INSTALL_DIR)/usr/local/lib/erlang"#' $(INSTALL_DIR)/usr/local/bin/erl

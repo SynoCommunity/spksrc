@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = R15B01
+PKG_VERS = R16B03-1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = otp_src_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.erlang.org/download/
@@ -13,6 +13,9 @@ LICENSE  = Erlang Public License
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX) erl_xcomp_sysroot=$(INSTALL_DIR)
+ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+CONFIGURE_ARGS += --disable-smp-require-native-atomics
+endif
 
 INSTALL_TARGET = myInstall
 

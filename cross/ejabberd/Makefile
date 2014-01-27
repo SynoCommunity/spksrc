@@ -21,8 +21,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:
-	@$(RUN) sed -e "s#-I\$$ERLANG_EI_DIR#-I$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/erlang/lib/erl_interface-3.7.7#g" -i configure
-	@$(RUN) sed -e "s#-L\$$ERLANG_EI_LIB#-L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/erlang/lib/erl_interface-3.7.7/lib#g" -i configure
+	@$(RUN) sed -e "s#-I\$$ERLANG_EI_DIR#-I$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/erlang/lib/erl_interface-3.7.15#g" -i configure
+	@$(RUN) sed -e "s#-L\$$ERLANG_EI_LIB#-L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/erlang/lib/erl_interface-3.7.15/lib#g" -i configure
 
 .PHONY: myPostInstall
 myPostInstall:
