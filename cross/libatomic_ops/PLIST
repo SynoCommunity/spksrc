@@ -1,0 +1,2 @@
+lib:lib/libatomic_ops.a
+lib:lib/libatomic_ops_gpl.a
