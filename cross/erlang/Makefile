@@ -5,7 +5,7 @@ PKG_DIST_NAME = otp_src_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.erlang.org/download/
 PKG_DIR = otp_src_$(PKG_VERS)
 
-DEPENDS = native/$(PKG_NAME) cross/ncurses cross/openssl
+DEPENDS = native/$(PKG_NAME) cross/ncurses cross/openssl cross/libatomic_ops
 
 HOMEPAGE = http://www.erlang.org
 COMMENT  = Erlang is a programming language used to build massively scalable soft real-time systems with requirements on high availability.
@@ -15,6 +15,10 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX) erl_xcomp_sysroot=$(INSTALL_DIR)
 ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
 CONFIGURE_ARGS += --disable-smp-require-native-atomics
+endif
+
+ifeq ($(findstring $(ARCH),cedarview),$(ARCH))
+CONFIGURE_ARGS += --with-libatomic_ops
 endif
 
 INSTALL_TARGET = myInstall
