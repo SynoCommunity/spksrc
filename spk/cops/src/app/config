@@ -8,7 +8,9 @@
             "icon": "images/cops-{0}.png",
             "protocol": "http",
             "url": "/cops",
-            "port": "80"
+            "port": "80",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

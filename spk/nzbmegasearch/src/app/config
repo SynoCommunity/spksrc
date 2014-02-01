@@ -8,7 +8,8 @@
             "protocol": "http",
             "port": "8086",
             "url": "/",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

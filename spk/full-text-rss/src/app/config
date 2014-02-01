@@ -8,7 +8,8 @@
             "protocol": "http",
             "port": "80",
             "url": "/full-text-rss",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

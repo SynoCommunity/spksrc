@@ -8,7 +8,8 @@
             "protocol": "http",
             "port": "5280",
             "url": "/admin",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

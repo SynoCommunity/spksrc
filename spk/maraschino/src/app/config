@@ -6,7 +6,8 @@
             "icon": "images/maraschino-{0}.png",
             "type": "url",
             "url": "3rdparty/maraschino/maraschino.cgi",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
