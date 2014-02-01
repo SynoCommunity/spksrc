@@ -6,7 +6,8 @@
             "icon": "images/lazylibrarian-{0}.png",
             "type": "url",
             "url": "3rdparty/lazylibrarian/lazylibrarian.cgi",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

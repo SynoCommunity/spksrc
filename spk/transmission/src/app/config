@@ -6,7 +6,8 @@
             "icon": "images/transmission-{0}.png",
             "type": "url",
             "url": "3rdparty/transmission/transmission.cgi",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

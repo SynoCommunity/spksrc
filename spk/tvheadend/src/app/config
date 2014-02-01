@@ -6,7 +6,8 @@
             "icon": "images/tvheadend-{0}.png",
             "type": "url",
             "url": "3rdparty/tvheadend/tvheadend.cgi",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

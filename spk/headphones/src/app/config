@@ -6,7 +6,8 @@
             "icon": "images/headphones-{0}.png",
             "type": "url",
             "url": "3rdparty/headphones/headphones.cgi",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

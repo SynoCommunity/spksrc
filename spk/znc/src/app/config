@@ -6,7 +6,8 @@
             "icon": "images/znc-{0}.png",
             "type": "url",
             "url": "3rdparty/znc/znc.cgi",
-            "allUsers": true
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }
