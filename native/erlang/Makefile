@@ -11,17 +11,15 @@ HOMEPAGE = http://www.erlang.org
 COMMENT  = Erlang is a programming language used to build massively scalable soft real-time systems with requirements on high availability.
 LICENSE  = Erlang Public License
 
-GNU_CONFIGURE = 1
-
+CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
-POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.native-cc.mk
 
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) ./configure --prefix=$(INSTALL_DIR)$(INSTALL_PREFIX)
+
 .PHONY: myInstall
 myInstall:
-	$(RUN) $(MAKE) install INSTALL_PREFIX=$(INSTALL_DIR)
-
-.PHONY: myPostInstall
-myPostInstall:
-	sed -i 's#ROOTDIR="/usr/local/lib/erlang"#ROOTDIR="$(INSTALL_DIR)/usr/local/lib/erlang"#' $(INSTALL_DIR)/usr/local/bin/erl
+	$(RUN) make install INSTALL_PREFIX=
