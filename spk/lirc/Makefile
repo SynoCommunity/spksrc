@@ -1,6 +1,6 @@
 SPK_NAME = lirc
 SPK_VERS = 0.9.0
-SPK_REV = b2
+SPK_REV = 2
 SPK_ICON = src/lirc.png
 FIRMWARE = 4.3-3776
 
