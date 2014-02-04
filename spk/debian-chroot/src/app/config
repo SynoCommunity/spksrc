@@ -7,6 +7,7 @@
             "icon": "images/debian-chroot-{0}.png",
             "texts": "texts",
             "allowMultiInstance": false,
+            "allUsers": false,
             "appWindow": "SYNOCOMMUNITY.DebianChroot.AppWindow",
             "depend": ["SYNOCOMMUNITY.DebianChroot.AppWindow"]
         },

@@ -44,19 +44,11 @@ postinst ()
         cp /etc/hosts /etc/hostname /etc/resolv.conf ${CHROOTTARGET}/etc/
     fi
 
-	# Index help files
-	pkgindexer_add ${INSTALL_DIR}/app/index.conf > /dev/null
-	pkgindexer_add ${INSTALL_DIR}/app/helptoc.conf > /dev/null
-
     exit 0
 }
 
 preuninst ()
 {
-	# Remove help files
-	pkgindexer_del ${INSTALL_DIR}/app/index.conf > /dev/null
-	pkgindexer_del ${INSTALL_DIR}/app/helptoc.conf > /dev/null
-
     exit 0
 }
 
