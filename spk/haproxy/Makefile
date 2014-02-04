@@ -1,6 +1,6 @@
 SPK_NAME = haproxy
 SPK_VERS = 1.5~dev21
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 
@@ -16,6 +16,7 @@ DISPLAY_NAME = HAProxy
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
+HELPURL    = http://www.synocommunity.com/help/haproxy
 
 WIZARDS_DIR = src/wizard/
 
@@ -35,8 +36,6 @@ haproxy_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/haproxy.cfg $(STAGING_DIR)/var/haproxy.cfg.tpl
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
-	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
 	install -m 644 src/app/haproxy.js $(STAGING_DIR)/app/haproxy.js
 	install -m 755 src/app/setup.py $(STAGING_DIR)/app/setup.py
@@ -44,12 +43,9 @@ haproxy_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/app/application
 	install -m 644 src/app/application/* $(STAGING_DIR)/app/application/
 	install -m 755 -d $(STAGING_DIR)/app/texts
-	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
-		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
 		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
-		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
 	done
 	install -m 755 -d $(STAGING_DIR)/app/images
 	install -m 644 src/app/images/*.png $(STAGING_DIR)/app/images/
