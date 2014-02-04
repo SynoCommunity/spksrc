@@ -1,6 +1,6 @@
 SPK_NAME = debian-chroot
-SPK_VERS = 6.0.6
-SPK_REV = 3
+SPK_VERS = 7.3
+SPK_REV = 4
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
@@ -12,6 +12,7 @@ DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 2900
 DESCRIPTION_FRE = Debian est un système d\\\'exploitation \\\(SE\\\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://www.debian.org/
 LICENSE    =
@@ -45,7 +46,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: debian-chroot_extra_install
 debian-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/var
-	debootstrap --foreign --arch $(DEBIAN_ARCH) squeeze $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
+	debootstrap --foreign --arch $(DEBIAN_ARCH) wheezy $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
 	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default
 	install -m 644 src/preferences $(STAGING_DIR)/var/chroottarget/etc/apt/preferences.default
 	install -m 644 src/policy-rc.d $(STAGING_DIR)/var/chroottarget/usr/sbin/policy-rc.d
