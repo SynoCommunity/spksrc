@@ -62,15 +62,9 @@ postinst ()
     fi
 
     # Fix permissions
-    if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ]; then
-        chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-        find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
-        find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
-    else
-        chown ${USER} ${WEB_DIR}/${PACKAGE}/lock
-        chown ${USER} ${WEB_DIR}/${PACKAGE}/feed-icons
-        chown -R ${USER} ${WEB_DIR}/${PACKAGE}/cache
-    fi
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
+    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
 
     exit 0
 }
@@ -139,10 +133,8 @@ postupgrade ()
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
     mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
-    
-    if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ]; then
-        chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    fi
+
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 
