@@ -7,6 +7,7 @@
             "icon": "images/subliminal-{0}.png",
             "texts": "texts",
             "allowMultiInstance": false,
+            "allUsers": false,
             "appWindow": "SYNOCOMMUNITY.Subliminal.AppWindow",
             "depend": ["SYNOCOMMUNITY.Subliminal.AppWindow"]
         },
