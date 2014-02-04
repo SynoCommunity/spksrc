@@ -8,7 +8,7 @@ DNAME="Tiny Tiny RSS"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
@@ -62,9 +62,15 @@ postinst ()
     fi
 
     # Fix permissions
-    chown ${USER} ${WEB_DIR}/${PACKAGE}/lock
-    chown ${USER} ${WEB_DIR}/${PACKAGE}/feed-icons
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/cache
+    if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ]; then
+        chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+        find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
+        find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
+    else
+        chown ${USER} ${WEB_DIR}/${PACKAGE}/lock
+        chown ${USER} ${WEB_DIR}/${PACKAGE}/feed-icons
+        chown -R ${USER} ${WEB_DIR}/${PACKAGE}/cache
+    fi
 
     exit 0
 }

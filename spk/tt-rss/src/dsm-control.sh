@@ -8,14 +8,15 @@ DNAME="Tiny Tiny RSS"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
+PHP="/usr/bin/php"
 TTRSS="${WEB_DIR}/${PACKAGE}/update.php"
 PID_FILE="${INSTALL_DIR}/var/tt-rss.pid"
 
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -N 10 -x ${TTRSS} -c ${USER} -u ${USER} -p ${PID_FILE} \
+    start-stop-daemon -S -q -m -b -N 10 -x ${PHP} ${TTRSS} -c ${USER} -u ${USER} -p ${PID_FILE} \
       -- --daemon 2> /dev/null
 }
 
