@@ -139,6 +139,10 @@ postupgrade ()
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
     mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
+    
+    if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ]; then
+        chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    fi
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 
