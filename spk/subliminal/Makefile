@@ -1,6 +1,6 @@
 SPK_NAME = subliminal
 SPK_VERS = 0.6.4
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
 
@@ -12,9 +12,11 @@ DESCRIPTION = Subliminal allows you automatically download best-matching subtitl
 DESCRIPTION_FRE = Subliminal vous permet de télécharger automatiquement les meilleurs sous-titres pour vos films et séries sur votre DiskStation. Ce paquet est nommé d\\\'après Subliminal, la librairie Python utilisée pour rechercher et télécharger les sous-titres.
 RELOAD_UI = yes
 DISPLAY_NAME = Subliminal
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = https://github.com/Diaoul/subliminal
 LICENSE    = LGPL
+HELPURL    = http://www.synocommunity.com/help/subliminal
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -35,8 +37,6 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/cache
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 644 src/app/index.conf $(STAGING_DIR)/app/index.conf
-	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
 	install -m 644 src/app/subliminal.js $(STAGING_DIR)/app/subliminal.js
 	install -m 755 src/app/setup.py $(STAGING_DIR)/app/setup.py
@@ -46,12 +46,9 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/app/application
 	install -m 644 src/app/application/* $(STAGING_DIR)/app/application/
 	install -m 755 -d $(STAGING_DIR)/app/texts
-	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
-		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
 		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
-		install -m 644 src/app/help/$${language}/*.html $(STAGING_DIR)/app/help/$${language}/; \
 	done
 	install -m 755 -d $(STAGING_DIR)/app/images
 	install -m 644 src/app/images/*.png $(STAGING_DIR)/app/images/
@@ -65,4 +62,4 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj flask
+	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj flask
