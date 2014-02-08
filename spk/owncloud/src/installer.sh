@@ -7,7 +7,7 @@ DNAME="ownCloud"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="owncloud"
 MYSQL_DATABASE="owncloud"
@@ -69,6 +69,8 @@ postinst ()
 
     # Fix permissions
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
+    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
     chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
@@ -124,6 +126,7 @@ postupgrade ()
 {
     # Restore the configuration file and data
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config/
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
