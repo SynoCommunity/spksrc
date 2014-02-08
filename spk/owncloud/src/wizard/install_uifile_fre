@@ -23,6 +23,7 @@
         "subitems": [{
             "key": "wizard_owncloud_admin_username",
             "desc": "Nom d'utilisateur",
+            "defaultValue": "admin",
             "validator": {
                 "allowBlank": false
             }
@@ -33,6 +34,7 @@
         "subitems": [{
             "key": "wizard_owncloud_admin_password",
             "desc": "Mot de passe",
+            "defaultValue": "admin",
             "validator": {
                 "allowBlank": false
             }
@@ -52,5 +54,10 @@
                 }
             }
         }]
+    }]
+},{
+    "step_title": "Attention !",
+    "items": [{
+        "desc": "Afin que ownCloud fonctionne, vous devez ajouter votre répertoire de téléchargement à l'open_basedir. Pour ce faire, allez dans Panneau de configuration > Services Web > Paramètres PHP."
     }]
 }]
