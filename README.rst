@@ -31,7 +31,7 @@ What have I done?
 * Went into the directory of the SPK for transmission
 * Started building the SPK for the architecture 88f6281
 
-  * To list all available architectures use ``ls toolchains`` from within the ``spkrc`` directory. Remove the prefix syno- to have the actual architecture.
+  * To list all available architectures use ``ls toolchains`` from within the ``spksrc`` directory. Remove the prefix syno- to have the actual architecture.
   * An overview of which architecture is used per Synology model can be found on the wiki page `Architecture per Synology model`_
 
 At the end of the process, the SPK will be available in ``spksrc/packages/``
