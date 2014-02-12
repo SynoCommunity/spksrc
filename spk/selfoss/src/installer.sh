@@ -118,8 +118,8 @@ postupgrade ()
     mv ${TMP_DIR}/${PACKAGE}/config.ini ${WEB_DIR}/${PACKAGE}/
     cp -r ${TMP_DIR}/${PACKAGE}/data ${WEB_DIR}/${PACKAGE}/
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    
-    #rm -fr ${TMP_DIR}/${PACKAGE}
+
+    rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
 }
