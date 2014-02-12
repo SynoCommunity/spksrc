@@ -54,9 +54,6 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
 
-    # Configure open_basedir
-    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-
     # Setup database and autoconfig file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud:=owncloud}';"
@@ -94,9 +91,6 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
-
-    # Remove open_basedir configuration
-    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
