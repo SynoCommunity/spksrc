@@ -7,7 +7,7 @@ DNAME="MantisBT"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="mantisbt"
 MYSQL_DATABASE="mantisbt"
@@ -44,7 +44,10 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Configure open_basedir
-    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    # Seems to work without this on DSM4.3
+    if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -lt 4418 ]; then
+        echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    fi
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -58,6 +61,12 @@ postinst ()
 
     # Remove admin directory
     rm -fr ${WEB_DIR}/${PACKAGE}/admin/
+    
+    # Fix permissions
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
+    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
+
 
     exit 0
 }
@@ -85,7 +94,7 @@ postuninst ()
     fi
 
     # Remove open_basedir configuration
-    rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf > /dev/null
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
@@ -107,6 +116,7 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config_inc.php ${WEB_DIR}/${PACKAGE}/
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
