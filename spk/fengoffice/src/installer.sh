@@ -9,7 +9,7 @@ VERSION="2.4"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="fengoffice"
 MYSQL_DATABASE="fengoffice"
@@ -54,10 +54,9 @@ postinst ()
     fi
 
     # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/cache
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/upload
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/tmp
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
+    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
 
     exit 0
 }
@@ -119,7 +118,7 @@ postupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/upload
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
 
     # Run update scripts
     php ${WEB_DIR}/${PACKAGE}/public/upgrade/console.php ${INSTALLED_VERSION} ${VERSION} > /dev/null

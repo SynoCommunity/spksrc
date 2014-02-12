@@ -1,6 +1,6 @@
 SPK_NAME = fengoffice
 SPK_VERS = 2.4
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/fengoffice.png
 DSM_UI_DIR = app
 
@@ -12,6 +12,7 @@ ADMIN_URL = /fengoffice/
 RELOAD_UI = yes
 DISPLAY_NAME = Feng Office
 BETA = 1
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://www.fengoffice.com/
 LICENSE    = AGPL
