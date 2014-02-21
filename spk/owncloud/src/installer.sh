@@ -51,7 +51,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
 
     # Setup database and autoconfig file
@@ -66,8 +66,6 @@ postinst ()
 
     # Fix permissions
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
-    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
     chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
@@ -120,7 +118,6 @@ postupgrade ()
 {
     # Restore the configuration file and data
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config/
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

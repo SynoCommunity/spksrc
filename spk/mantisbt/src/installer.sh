@@ -41,7 +41,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Configure open_basedir
     # Seems to work without this on DSM4.3
@@ -61,12 +61,6 @@ postinst ()
 
     # Remove admin directory
     rm -fr ${WEB_DIR}/${PACKAGE}/admin/
-    
-    # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
-    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
-
 
     exit 0
 }
@@ -94,7 +88,7 @@ postuninst ()
     fi
 
     # Remove open_basedir configuration
-    rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf > /dev/null
+    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
@@ -116,7 +110,6 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config_inc.php ${WEB_DIR}/${PACKAGE}/
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

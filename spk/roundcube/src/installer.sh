@@ -41,7 +41,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     rm -fr ${WEB_DIR}/${PACKAGE}/installer
 
     # Setup database and configuration files
@@ -59,9 +59,8 @@ postinst ()
     fi
 
     # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
-    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/temp
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/logs
 
     exit 0
 }
@@ -109,7 +108,6 @@ postupgrade ()
     # Restore configuration files
     mv ${TMP_DIR}/${PACKAGE}/db.inc.php ${WEB_DIR}/${PACKAGE}/config/db.inc.php
     mv ${TMP_DIR}/${PACKAGE}/main.inc.php ${WEB_DIR}/${PACKAGE}/config/main.inc.php
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

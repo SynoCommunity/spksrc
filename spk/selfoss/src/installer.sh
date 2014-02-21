@@ -45,7 +45,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -61,9 +61,8 @@ postinst ()
     fi
 
     # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
-    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
+    chown ${USER} ${WEB_DIR}/${PACKAGE}/public
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/data
 
     exit 0
 }
@@ -117,8 +116,6 @@ postupgrade ()
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config.ini ${WEB_DIR}/${PACKAGE}/
     cp -r ${TMP_DIR}/${PACKAGE}/data ${WEB_DIR}/${PACKAGE}/
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

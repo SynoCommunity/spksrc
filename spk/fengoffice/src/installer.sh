@@ -45,7 +45,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Setup database and run installer
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -54,9 +54,10 @@ postinst ()
     fi
 
     # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    find ${WEB_DIR}/${PACKAGE} -type f -exec chmod 640 {} \;
-    find ${WEB_DIR}/${PACKAGE} -type d -exec chmod 750 {} \;
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/cache
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/upload
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/tmp
 
     exit 0
 }
@@ -118,7 +119,7 @@ postupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/upload
 
     # Run update scripts
     php ${WEB_DIR}/${PACKAGE}/public/upgrade/console.php ${INSTALLED_VERSION} ${VERSION} > /dev/null
