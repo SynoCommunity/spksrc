@@ -1,7 +1,7 @@
 [{
     "step_title": "Attention !",
     "items": [{
-        "desc": "Afin que newznab fonctionne, vous devez ajouter '/usr/local/newznab/share/pear' à l'open_basedir. Pour ce faire, allez dans Panneau de configuration > Services Web > Paramètres PHP."
+        "desc": "Afin que newznab fonctionne, vous devez ajouter '/var/services/web/newznab/www' à l'open_basedir. Pour ce faire, allez dans Panneau de configuration > Services Web > Paramètres PHP."
     }]
 }, {
     "step_title": "Configuration de la base de donnée",
