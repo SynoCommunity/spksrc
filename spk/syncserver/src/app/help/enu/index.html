@@ -9,13 +9,13 @@
         <p>You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. Set up Firefox Sync on your main computer by creating a new account on a custom server, then add your other computers.</p>
         <p>Firefox Sync Server 1.1 is compatible with FF30 and older, and can also be used on mobile clients and forks.</p>
         <h3>Which URL should I use to configure Firefox Sync on my computer?</h3>
-        <p>The IP of your Synology, along with port 8084: http://syno-ip:8084/. Note the slash at the end.</p><p>Alternatively, if you have name resolution configured correctly, you can use http://my.domain.name:8084/.</p>
+        <p>The IP of your Synology, along with port 8130: http://syno-ip:8130/. Note the slash at the end.</p><p>Alternatively, if you have name resolution configured correctly, you can use http://my.domain.name:8130/.</p>
         <p>Note: The webserver used for this service does not serve pages on http(s) connections, so a 404 is displayed when you type the URL into your browser.</p>
         <h3>How do I reset my password?</h3>
-        <p>Open http://syno-ip:8084/weave-password-reset in your browser.</p>
+        <p>Open http://syno-ip:8130/weave-password-reset in your browser.</p>
         <p>This opens a web page where you can enter your e-mail address. A link to reset your password will be sent via e-mail.</p>
         <h3>How do I remove an account?</h3>
-        <p>Open http://syno-ip:8084/weave-delete-account in your browser.</p>
+        <p>Open http://syno-ip:8130/weave-delete-account in your browser.</p>
         <p>This opens a web page where you can enter your e-mail address and password to delete an existing account.</p>
 		<h3>I changed the IP of my Synology. Now what?</h3>
 		<p>Reinstall the package, or alternatively, adjust the fallback_node in "/usr/local/ffsync/var/ffsync.conf" with the correct IP-address.</p>
