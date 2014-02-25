@@ -23,6 +23,7 @@
         "subitems": [{
             "key": "wizard_owncloud_admin_username",
             "desc": "User name",
+            "defaultValue": "admin",
             "validator": {
                 "allowBlank": false
             }
@@ -33,6 +34,7 @@
         "subitems": [{
             "key": "wizard_owncloud_admin_password",
             "desc": "Password",
+            "defaultValue": "admin",
             "validator": {
                 "allowBlank": false
             }
@@ -52,5 +54,10 @@
                 }
             }
         }]
+    }]
+},{
+    "step_title": "Warning!",
+    "items": [{
+        "desc": "In order for ownCloud to work, you have to add the path of your download directory to the open_basedir. To do so, go to Control Panel > Web Services > PHP Settings."
     }]
 }]
