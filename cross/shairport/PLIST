@@ -1,0 +1,5 @@
+bin:bin/shairport
+lib:lib/libcrypto.so.1.0.0
+lib:lib/libssl.so.1.0.0
+lib:lib/libasound.so.2
+shr:share/alsa
