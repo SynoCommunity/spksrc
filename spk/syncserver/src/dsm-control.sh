@@ -1,34 +1,35 @@
 #!/bin/sh
 
 # Package
-PACKAGE="tt-rss"
-DNAME="Tiny Tiny RSS"
+PACKAGE="syncserver"
+DNAME="Firefox Sync Server"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-WEB_DIR="/var/services/web"
-PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
-PHP="/usr/bin/php"
-TTRSS="${WEB_DIR}/${PACKAGE}/update.php"
-PID_FILE="${INSTALL_DIR}/var/tt-rss.pid"
-
+PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
+USER="syncserver"
+PASTER="${INSTALL_DIR}/env/bin/paster"
+SYNCSERVER="${INSTALL_DIR}/var/syncserver.ini"
+PID_FILE="${INSTALL_DIR}/var/syncserver.pid"
+LOG_FILE="${INSTALL_DIR}/var/log/paster.log"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -N 10 -x ${PHP} ${TTRSS} -c ${USER} -u ${USER} -p ${PID_FILE} \
-      -- --daemon 2> /dev/null
+    ${PASTER} serve ${SYNCSERVER} --user=${USER} --daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
+    ${PASTER} serve ${SYNCSERVER} --stop-daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
+    fi
+    rm -f ${PID_FILE}
+    return 1
 }
 
 wait_for_status ()
@@ -48,17 +49,21 @@ case $1 in
     start)
         if daemon_status; then
             echo ${DNAME} is already running
+            exit 0
         else
             echo Starting ${DNAME} ...
             start_daemon
+            exit $?
         fi
         ;;
     stop)
         if daemon_status; then
             echo Stopping ${DNAME} ...
             stop_daemon
+            exit $?
         else
             echo ${DNAME} is not running
+            exit 0
         fi
         ;;
     status)
@@ -71,7 +76,7 @@ case $1 in
         fi
         ;;
     log)
-        exit 1
+        echo ${LOG_FILE}
         ;;
     *)
         exit 1

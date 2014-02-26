@@ -8,7 +8,7 @@ DNAME="Selfoss"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 SELFOSS="${INSTALL_DIR}/bin/selfoss.sh"
 PID_FILE="${INSTALL_DIR}/var/selfoss.pid"
 
