@@ -29,8 +29,10 @@ compile_python_module:
 
 wheel_python_module:
 	@mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/share
-	$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py bdist_wheel -d $(INSTALL_DIR)$(INSTALL_PREFIX)/share
-	#TODO: Fix naming based on ARCH
-	@mv $(INSTALL_DIR)$(INSTALL_PREFIX)/share/$(PKG_NAME)-$(PKG_VERS)*.whl $(INSTALL_DIR)$(INSTALL_PREFIX)/share/$(PKG_NAME)-$(PKG_VERS).whl
+	mkdir -p $(WHEEL_DIR)/$(ARCH)
+	# Patching setup.py, blatantly stolen from pip
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" bdist_wheel -d $(INSTALL_DIR)$(INSTALL_PREFIX)/share
+	# Using $(ARCH) folder, we cannot determine the correct ARCH on the host
+	@mv $(INSTALL_DIR)$(INSTALL_PREFIX)/share/$(PKG_NAME)-$(PKG_VERS)*.whl $(WHEEL_DIR)/$(ARCH)/$(PKG_NAME)-$(PKG_VERS)-cp27-none-any.whl
 
 all: install
