@@ -1,6 +1,6 @@
 SPK_NAME = transmission
-SPK_VERS = 2.77
-SPK_REV = 5
+SPK_VERS = 2.82
+SPK_REV = 6
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "1. Add username/password configuration in wizard"
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE = http://www.transmissionbt.com/
 LICENSE  =
@@ -39,7 +39,6 @@ transmission_extra_install:
 	install -m 644 src/settings.json $(STAGING_DIR)/var/settings.json
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/transmission.cgi.pl $(STAGING_DIR)/app/transmission.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 ; \
 	do \

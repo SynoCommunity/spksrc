@@ -3020,7 +3020,7 @@ SYNOCOMMUNITY.Subliminal.BrowserWindow = Ext.extend(SYNO.SDS.ModalWindow, {
     initComponent: function () {
         this.panel = new Ext.tree.TreePanel({
             loader: {
-                dataUrl: "/webman/modules/FileBrowser/webfm/webUI/file_share.cgi",
+                dataUrl: "/webman/modules/FileBrowser/file_share.cgi",
                 baseParams: {
                     action: "getshares",
                     needrw: "false",

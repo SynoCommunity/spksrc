@@ -14,21 +14,58 @@ IREXEC="${INSTALL_DIR}/bin/irexec"
 LIRCRC_FILE="${INSTALL_DIR}/etc/lirc/lircrc"
 LOG_FILE="${INSTALL_DIR}/var/log/lircd"
 
+SELECTED_LIRC_DRIVER=@driver@
+
 
 load_unload_drivers ()
 {
     case $1 in
         load)
-            insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
-            for DRIVER in `find ${INSTALL_DIR}/lib/modules/ -type f -print | grep -v lirc_dev.ko`; do
-                insmod $DRIVER
-            done
+            case $2 in
+                mceusb)
+                    insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+                    insmod ${INSTALL_DIR}/lib/modules/lirc_${2}.ko
+                ;;
+                uirt)
+                    insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+                    insmod /lib/modules/usbserial.ko
+                    insmod /lib/modules/ftdi_sio.ko
+                    stty -F /dev/usb/ttyUSB0 1200 sane evenp parenb cs7 -crtscts
+                    LIRC_STARTUP_PARAMS="--device=/dev/usb/ttyUSB0 --driver=usb_uirt_raw"
+                ;;
+                uirt2)
+                    insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+                    insmod /lib/modules/usbserial.ko
+                    insmod /lib/modules/ftdi_sio.ko
+                    stty -F /dev/usb/ttyUSB0 1200 sane evenp parenb cs7 -crtscts
+                    LIRC_STARTUP_PARAMS="--device=/dev/usb/ttyUSB0 --driver=uirt2_raw"
+                ;;
+                irtoy)
+                    # Not yet supported. Here for example only.
+                ;;
+                *)
+                    # Not yet supported.
+                ;;
+            esac
         ;;
         unload)
-            for DRIVER in `find ${INSTALL_DIR}/lib/modules/ -type f -print | grep -v lirc_dev.ko`; do
-                rmmod $DRIVER
-            done
-            rmmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+            case $2 in
+                mceusb)
+                    rmmod ${INSTALL_DIR}/lib/modules/lirc_${2}.ko
+                    rmmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+                ;;
+                uirt|uirt2)
+                    rmmod /lib/modules/ftdi_sio.ko
+                    rmmod /lib/modules/usbserial.ko
+                    rmmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
+                ;;
+                irtoy)
+                    # Not yet supported. Here for example only.
+                ;;
+                *)
+                    # Not yet supported.
+                ;;
+            esac
         ;;
     esac
 
@@ -36,14 +73,10 @@ load_unload_drivers ()
 
 start_daemon ()
 {
-    # Added case for "all" drivers
-    #load_unload_drivers load
+    # Call function to load driver - validation happens inside
+    load_unload_drivers load $SELECTED_LIRC_DRIVER
 
-    # This code will update is a specific valid driver is selected during installation
-    #insmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
-    #insmod ${INSTALL_DIR}/lib/modules/lirc_@driver@.ko
-
-    ${DAEMON} ${CONF_FILE} --pidfile=${PID_FILE} --logfile=${LOG_FILE}
+    ${DAEMON} ${LIRC_STARTUP_PARAMS} ${CONF_FILE} --pidfile=${PID_FILE} --logfile=${LOG_FILE}
     if [ -e ${LIRCRC_FILE} ]; then
         ${IREXEC} -d ${LIRCRC_FILE}
     fi
@@ -63,12 +96,8 @@ stop_daemon ()
 
     test -e ${PID_FILE} || rm -f ${PID_FILE}
 
-    # This code will update is a specific valid driver is selected during installation
-    #rmmod ${INSTALL_DIR}/lib/modules/lirc_@driver@.ko
-    #rmmod ${INSTALL_DIR}/lib/modules/lirc_dev.ko
-
-    # Added case for "all" drivers
-    #load_unload_drivers unload
+    # Call function to unload driver - validation happens inside
+    load_unload_drivers unload $SELECTED_LIRC_DRIVER
 }
 
 daemon_status ()
@@ -124,6 +153,9 @@ case $1 in
         ;;
     log)
         echo ${LOG_FILE}
+        ;;
+    driver)
+        echo ${SELECTED_LIRC_DRIVER}
         ;;
     *)
         exit 1

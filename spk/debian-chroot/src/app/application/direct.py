@@ -76,6 +76,12 @@ class Services(Base):
                 while service.status:
                     time.sleep(0.8)
 
+    def start_all(self):
+        for service in self.session.query(Service).all():
+            if not service.status:
+                service.start()
+                while not service.status:
+                    time.sleep(0.8)
 
 class Overview(Base):
     def __init__(self):

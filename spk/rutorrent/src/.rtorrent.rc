@@ -1,0 +1,9 @@
+scgi_port = localhost:8050
+directory = @download_dir@
+session = /usr/local/rutorrent/var/.session
+schedule = watch_directory,5,5,load_start=@watch_dir@/*.torrent
+max_memory_usage = @max_memory@
+log.open_file = "rtorrent.log", "/usr/local/rutorrent/var/rtorrent.log"
+log.add_output = "warn", "rtorrent.log"
+http_cacert = /usr/local/rutorrent/etc/cacert.pem
+system.umask.set = 002

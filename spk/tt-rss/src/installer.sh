@@ -8,7 +8,7 @@ DNAME="Tiny Tiny RSS"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
@@ -45,7 +45,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -109,6 +109,9 @@ preupgrade ()
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config.php ${TMP_DIR}/${PACKAGE}/
 
+    mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/
+    mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/
+
     exit 0
 }
 
@@ -128,6 +131,8 @@ postupgrade ()
         fi
         sed -i "s|define('$key', .*);|define('$key', $val);|g" ${WEB_DIR}/${PACKAGE}/config.php
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
+
+    mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 

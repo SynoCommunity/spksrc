@@ -7,7 +7,7 @@ DNAME="ownCloud"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="owncloud"
 MYSQL_DATABASE="owncloud"
@@ -51,11 +51,8 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
-
-    # Configure open_basedir
-    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Setup database and autoconfig file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -68,9 +65,7 @@ postinst ()
     fi
 
     # Fix permissions
-    chown ${USER} ${WEB_DIR}/${PACKAGE}/data
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/apps
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/config
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
     chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
@@ -94,9 +89,6 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
-
-    # Remove open_basedir configuration
-    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
 
     # Remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then

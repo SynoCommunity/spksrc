@@ -1,0 +1,9 @@
+bin:bin/ex
+bin:bin/rview
+bin:bin/rvim
+bin:bin/view
+bin:bin/vim
+bin:bin/vimdiff
+bin:bin/vimtutor
+bin:bin/xxd
+shr:share/vim

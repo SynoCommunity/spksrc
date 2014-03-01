@@ -1,0 +1,3 @@
+lnk:lib/libtorrent.so
+lnk:lib/libtorrent.so.14
+lib:lib/libtorrent.so.14.0.4

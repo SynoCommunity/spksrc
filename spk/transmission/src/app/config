@@ -5,8 +5,11 @@
             "desc": "Transmission Web UI",
             "icon": "images/transmission-{0}.png",
             "type": "url",
-            "url": "3rdparty/transmission/transmission.cgi",
-            "allUsers": true
+            "protocol": "http",
+            "port": "9091",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
         }
     }
 }

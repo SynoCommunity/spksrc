@@ -1,6 +1,6 @@
 SPK_NAME = mantisbt
 SPK_VERS = 1.2.15
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/mantisbt.png
 DSM_UI_DIR = app
 
@@ -13,6 +13,7 @@ ADMIN_URL = /mantisbt/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = MantisBT
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://www.mantisbt.org/
 LICENSE    = GPL

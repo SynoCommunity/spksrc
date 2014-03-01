@@ -1,5 +1,5 @@
 PKG_NAME = bitlbee
-PKG_VERS = 3.2
+PKG_VERS = 3.2.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://get.bitlbee.org/src
@@ -17,7 +17,9 @@ INSTALL_TARGET = myInstall
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --ssl=gnutls --prefix=$(INSTALL_PREFIX) --pidfile=$(INSTALL_PREFIX)/var/bitlbee.pid
 CONFIGURE_ARGS += --config=$(INSTALL_PREFIX)/var/
-
+ifeq ($(findstring $(ARCH),powerpc ppc824x),$(ARCH))
+CONFIGURE_ARGS += --pie=0
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 

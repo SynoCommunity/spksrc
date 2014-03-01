@@ -1,5 +1,5 @@
 PKG_NAME = unrar
-PKG_VERS = 4.2.4
+PKG_VERS = 5.0.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)src-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.rarlab.com/rar
@@ -12,16 +12,11 @@ COMMENT  = Extract files from rar archives
 LICENSE  = 
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myCompile
-myCompile:
-	$(RUN) $(MAKE) -f makefile.unix
-
 .PHONY: myInstall
 myInstall:
-	$(RUN) $(MAKE) -f makefile.unix install DESTDIR=$(STAGING_INSTALL_PREFIX)
+	$(RUN) $(MAKE) install DESTDIR=$(STAGING_INSTALL_PREFIX)
 

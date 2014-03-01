@@ -1,9 +1,12 @@
 SPK_NAME = lirc
 SPK_VERS = 0.9.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/lirc.png
+FIRMWARE = 4.3-3776
 
 BETA=1
+
+LIRC_SUPPORTED_DRIVERS = 
 
 # Abort for ARCHs that won't compile LIRC cleanly
 ifneq ($(findstring $(ARCH),powerpc 88f5281),)
@@ -11,8 +14,9 @@ $(error Sorry, this package does not support the $(ARCH) architecture.)
 endif
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH),x86 bromolow cedarview),$(ARCH))
+ifneq ($(findstring $(ARCH),x86 bromolow cedarview evansport armadaxp armada370),$(ARCH))
 SPK_VERS = 0.8.7
+LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif
 
 DEPENDS = cross/$(SPK_NAME)-$(SPK_VERS)
@@ -47,7 +51,7 @@ lirc_extra_install:
 	install -m 644 src/lircd.conf $(STAGING_DIR)/etc/lirc/lircd.conf
 	cp -R $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/remotes $(STAGING_DIR)/
 	install src/install_uifile.tmpl $(WIZARDS_DIR)/install_uifile
-	@for DRIVER in `ls $(STAGING_DIR)/lib/modules | grep -v lirc_dev.ko | awk -F'_' '{print $$2}' | awk -F'.' '{print $$1}'`; do \
+	@for DRIVER in $(LIRC_SUPPORTED_DRIVERS); do \
 	    sed -i "s/@keys@/$${DRIVER} @keys@/" $(WIZARDS_DIR)/install_uifile; \
 	done;
 	@sed -i 's/@keys@//' $(WIZARDS_DIR)/install_uifile

@@ -13,6 +13,9 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared
+ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+CONFIGURE_ARGS += --disable-assembler
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 

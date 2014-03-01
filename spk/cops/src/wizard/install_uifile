@@ -1,25 +1,30 @@
 [{
-    "step_title": "Basic configuration",
+    "step_title": "COPS configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Calibre directory. Defaults to /volume1/calibre/. WARNING: has to end with a /",
+        "desc": "Calibre directory. WARNING: has to end with a / and never use your web directory",
         "subitems": [{
             "key": "wizard_calibre_dir",
+            "defaultValue": "/volume1/calibre/",
             "desc": "Calibre directory"
         }]
     }, {
         "type": "textfield",
-        "desc": "Catalog title. Defaults to COPS",
+        "desc": "Catalog title.",
         "subitems": [{
             "key": "wizard_cops_title",
+            "defaultValue": "COPS",
             "desc": "Catalog title"
         }]
-    }, {
-        "type": "textfield",
-        "desc": "Do you want to enable Epub download to Kobo eReader? If yes, type 1. Default to 0 (no)",
+    }]
+}, {
+    "step_title": "COPS configuration (next)",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Do you want to use COPS with a Kobo eReader?",
         "subitems": [{
             "key": "wizard_use_url_rewriting",
-            "desc": "1 or 0"
+            "desc": "Kobo"
         }]
     }]
 }]

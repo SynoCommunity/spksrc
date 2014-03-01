@@ -1,0 +1,18 @@
+[{
+    "step_title": "Remove Firefox Sync Server database",
+    "items": [{
+        "type": "multiselect",
+        "desc": "If you remove the Firefox Sync Server database, all users and sync data will be deleted.",
+        "subitems": [{
+            "key": "wizard_remove_database",
+            "desc": "Remove Firefox Sync Server database"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Enter your MySQL password to remove the Firefox Sync Server database.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }]    
+}]

@@ -7,7 +7,7 @@ DNAME="Roundcube Webmail"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="roundcube"
 MYSQL_DATABASE="roundcube"
@@ -41,7 +41,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     rm -fr ${WEB_DIR}/${PACKAGE}/installer
 
     # Setup database and configuration files

@@ -1,9 +1,9 @@
 TC_NAME = syno-armada370
 
-TC_DIST_NAME = gcc464_glibc215_hard_armada370-GPL.tgz
+TC_DIST_NAME = gcc464_glibc215_hard_armada-GPL.tgz
 
 TC_EXT = tgz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.2%20Tool%20Chains/Marvell%20armada%20370%20Linux%203.2.30
+TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Chains/Marvell%20armada%20370%20Linux%203.2.40
 
 TC_BASE_DIR = arm-marvell-linux-gnueabi
 TC_PREFIX = arm-marvell-linux-gnueabi

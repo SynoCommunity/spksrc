@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
-SPK_VERS = 5.0.7
-SPK_REV = 2
+SPK_VERS = 6.0.1
+SPK_REV = 3
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
@@ -11,6 +11,7 @@ DESCRIPTION = ownCloud is a personal cloud which runs on your own server and giv
 ADMIN_URL = /owncloud/
 RELOAD_UI = yes
 DISPLAY_NAME = ownCloud
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://owncloud.org/
 LICENSE    = AGPL

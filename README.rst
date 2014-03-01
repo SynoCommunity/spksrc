@@ -6,7 +6,7 @@ Requirements
 ------------
 To use spksrc, it is recommended to use a virtual machine with an x86 version of Debian stable OS installed. You'll also need some stuff::
 
-    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check bjam intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython
+    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check bjam intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython lzip
     sudo pip install -U pip
 
 You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
@@ -31,7 +31,7 @@ What have I done?
 * Went into the directory of the SPK for transmission
 * Started building the SPK for the architecture 88f6281
 
-  * To list all available architectures use ``ls toolchains`` from within the ``spkrc`` directory. Remove the prefix syno- to have the actual architecture.
+  * To list all available architectures use ``ls toolchains`` from within the ``spksrc`` directory. Remove the prefix syno- to have the actual architecture.
   * An overview of which architecture is used per Synology model can be found on the wiki page `Architecture per Synology model`_
 
 At the end of the process, the SPK will be available in ``spksrc/packages/``
@@ -100,6 +100,24 @@ If you like spksrc and packages made out of it, please consider making a donatio
 
   .. image:: http://api.flattr.com/button/flattr-badge-large.png
     :target: http://flattr.com/thing/718012/SynoCommunity
+
+* moneytoo
+
+  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
+    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DQKBRZBVPC77L
+
+* piwi82
+
+  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
+    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=T6BU3QXYH4CMG
+    
+* bru7us
+
+  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
+    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W3UX3VM22WRQY&item_name=SynoCommunity
+
+  .. image:: http://api.flattr.com/button/flattr-badge-large.png
+    :target: http://flattr.com/thing/1106801/
 
 Bugs
 ----

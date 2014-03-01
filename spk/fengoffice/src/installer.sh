@@ -3,12 +3,13 @@
 # Package
 PACKAGE="fengoffice"
 DNAME="Feng Office"
+VERSION="2.4"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="fengoffice"
 MYSQL_DATABASE="fengoffice"
@@ -44,7 +45,7 @@ postinst ()
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Setup database and run installer
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -100,17 +101,29 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/config/config.php ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/${PACKAGE}/upload ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/config/installed_version.php ${TMP_DIR}/${PACKAGE}/
+    mkdir ${TMP_DIR}/${PACKAGE}/upload/
+    cp -r ${WEB_DIR}/${PACKAGE}/upload/*/ ${TMP_DIR}/${PACKAGE}/upload/
 
     exit 0
 }
 
 postupgrade ()
 {
+    # Detect old version
+    INSTALLED_VERSION=`sed -n "s|return '\(.*\)';|\1|p" ${TMP_DIR}/${PACKAGE}/installed_version.php | xargs`
+
     # Restore configuration
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config/
-    mv ${TMP_DIR}/${PACKAGE}/upload ${WEB_DIR}/${PACKAGE}/
+    cp -r ${TMP_DIR}/${PACKAGE}/upload/*/ ${WEB_DIR}/${PACKAGE}/upload/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Fix permissions
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/upload
+
+    # Run update scripts
+    php ${WEB_DIR}/${PACKAGE}/public/upgrade/console.php ${INSTALLED_VERSION} ${VERSION} > /dev/null
+    php ${WEB_DIR}/${PACKAGE}/public/install/plugin-console.php update_all > /dev/null
 
     exit 0
 }
