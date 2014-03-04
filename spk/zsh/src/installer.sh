@@ -17,8 +17,8 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-
-    # Put zsh in the PATH
+    
+    # Put mc in the PATH
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/zsh /usr/local/bin/zsh
 
