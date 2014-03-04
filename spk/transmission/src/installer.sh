@@ -7,7 +7,7 @@ DNAME="Transmission"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="transmission"
 GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/settings.json"
@@ -16,6 +16,12 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        if [ ! -d "${wizard_download_dir}" ]; then
+            echo "Download folder ${wizard_download_dir} does not exist."
+            exit 1
+        fi
+    fi
     exit 0
 }
 
@@ -40,6 +46,13 @@ postinst ()
     else
         sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
         sed -i -e "/@watch_dir@/d" ${CFG_FILE}
+    fi
+    if [ -d "${wizard_incomplete_dir}" ]; then
+        sed -i -e "s|@incomplete_dir_enabled@|true|g" ${CFG_FILE}
+        sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" ${CFG_FILE}
+    else
+        sed -i -e "s|@incomplete_dir_enabled@|false|g" ${CFG_FILE}
+        sed -i -e "/@incomplete_dir@/d" ${CFG_FILE}
     fi
 
     # Correct the files ownership

@@ -6,7 +6,7 @@ DNAME="Transmission"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="transmission"
 TRANSMISSION="${INSTALL_DIR}/bin/transmission-daemon"
 PID_FILE="${INSTALL_DIR}/var/transmission.pid"
