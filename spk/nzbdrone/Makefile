@@ -3,6 +3,8 @@ SPK_VERS = 2.0.0.1236
 SPK_REV = 1
 SPK_ICON = src/nzbdrone.png
 
+FIRMWARE = 5.0
+
 DEPENDS = cross/busybox
 
 SPK_DEPENDS = "Mono>2.11.1:mediainfo>0.7.61"
