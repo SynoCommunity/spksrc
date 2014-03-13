@@ -37,6 +37,15 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: nzbdrone_extra_install
 nzbdrone_extra_install:
+
+        # Download & Extract NzbDrone
+ 	wget -P ${TMP_DIR} http://update.nzbdrone.com/v2/master/mono/NzbDrone.master.2.0.0.1236.mono.tar.gz
+	tar xvf ${TMP_DIR}/NzbDrone.master.2.0.0.1236.mono.tar.gz -C ${INSTALL_DIR}
+
+	# Add sqlite class library
+	wget -P ${TMP_DIR} http://dl.dropboxusercontent.com/u/300345/libsqlite3.tar.gz
+	tar xvf ${TMP_DIR}/libsqlite3.tar.gz -C ${INSTALL_DIR}/NzbDrone
+
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
