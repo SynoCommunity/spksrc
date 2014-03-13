@@ -1,0 +1,5 @@
+bin:bin/myodbc3i
+lnk:lib/libmyodbc3.so
+lib:lib/libmyodbc3-3.51.30.so
+lnk:lib/libmyodbc3_r.so
+lib:lib/libmyodbc3_r-3.51.30.so

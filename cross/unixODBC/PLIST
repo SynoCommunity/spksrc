@@ -1,0 +1,17 @@
+etc:etc/odbc.ini
+etc:etc/odbcinst.ini
+bin:bin/dltest
+bin:bin/isql
+bin:bin/iusql
+bin:bin/odbc_config
+bin:bin/odbcinst
+bin:bin/slencheck
+lnk:lib/libodbccr.so
+lnk:lib/libodbccr.so.2
+lib:lib/libodbccr.so.2.0.0
+lnk:lib/libodbcinst.so
+lnk:lib/libodbcinst.so.2
+lib:lib/libodbcinst.so.2.0.0
+lnk:lib/libodbc.so
+lnk:lib/libodbc.so.2
+lib:lib/libodbc.so.2.0.0

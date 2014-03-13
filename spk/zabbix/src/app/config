@@ -1,0 +1,27 @@
+{
+    ".url": {
+        "com.synocommunity.packages.zabbixcontrol": {
+            "title": "Zabbix Controls",
+            "desc": "Zabbix Controls",
+            "icon": "images/zabbix-{0}.png",
+            "type": "legacy",
+            "width": 900,
+            "height": 700,
+            "url": "3rdparty/zabbix/index.cgi",
+            "grantPrivilege": "local",
+            "allowMultiInstance": false,
+            "allUsers": "false"
+        },
+        "com.synocommunity.packages.zabbixgui": {
+            "title": "Zabbix Server Web Gui",
+            "desc": "Zabbix Server Web Gui",
+            "icon": "images/zabbix-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": 80,
+            "url": "/zabbix",
+            "allUsers": "false",
+            "grantPrivilege": "local"
+        }
+    }
+}
