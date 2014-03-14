@@ -1,0 +1,62 @@
+SPK_NAME = nzbdrone
+SPK_VERS = 2.0.0.1236
+SPK_REV = 2
+SPK_ICON = src/nzbdrone.png
+
+FIRMWARE = 5.0
+
+DEPENDS = cross/busybox
+
+SPK_DEPENDS = "Mono>2.11.1:mediainfo>0.7.61"
+
+MAINTAINER = SynoCommunity
+
+DESCRIPTION = NZBDrone is a PVR for newsgroup users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and renames them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
+DESCRIPTION_FRE = NZBDrone est un PVR pour les utilisateurs de groupes de discussion. Il peut surveiller plusieurs flux RSS pour les nouveaux épisodes de vos séries préférées et saisira, sortes et les renomme. Il peut également être configuré pour mettre à jour automatiquement la qualité des fichiers déjà téléchargés si un meilleur format de qualité devient disponible.
+DESCRIPTION_SPN = NZBDrone es un PVR para los usuarios de grupos de noticias. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
+ADMIN_PORT = 8989
+RELOAD_UI = yes
+DISPLAY_NAME = NzbDrone
+CHANGELOG = "1. Initial package"
+
+HOMEPAGE = http://nzbdrone.com/
+LICENSE  =
+
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
+ADDITIONAL_SCRIPTS =
+
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+POST_STRIP_TARGET = nzbdrone_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+
+include ../../mk/spksrc.spk.mk
+
+# Packages
+NZBDRONE_URL = http://update.nzbdrone.com/v2/master/mono
+NZBDRONE_PKG_NAME = NzbDrone.master.2.0.0.1236.mono.tar.gz
+SQL_PKG_NAME = libsqlite3.8.4.1.tar.gz
+NZBDRONE_DIR_NAME = NzbDrone
+TMP_DIR = /tmp
+
+.PHONY: nzbdrone_extra_install
+nzbdrone_extra_install:
+	# Download & extract NzbDrone
+	mkdir -p /tmp
+	wget -P $(TMP_DIR) $(NZBDRONE_URL)/$(NZBDRONE_PKG_NAME)
+	tar xvf $(TMP_DIR)/$(NZBDRONE_PKG_NAME) -C $(STAGING_DIR)
+	rm $(TMP_DIR)/$(NZBDRONE_PKG_NAME)
+	# Extract sqlite class library
+	tar xvf $(STAGING_DIR)/../../src/$(SQL_PKG_NAME) -C $(STAGING_DIR)/$(NZBDRONE_DIR_NAME)
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/app/images
+	for size in 16 24 32 48 ; \
+	do \
+	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+	done
