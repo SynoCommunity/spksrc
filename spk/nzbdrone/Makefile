@@ -35,8 +35,27 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
+# Packages
+NZBDRONE_URL = http://update.nzbdrone.com/v2/master/mono
+NZBDRONE_PKG_NAME = NzbDrone.master.2.0.0.1236.mono.tar.gz
+SQLITE_URL = http://dl.dropboxusercontent.com/u/300345
+SQL_PKG_NAME = libsqlite3.tar.gz
+NZBDRONE_DIR_NAME = NzbDrone
+TMP_DIR = /tmp
+
 .PHONY: nzbdrone_extra_install
 nzbdrone_extra_install:
+<<<<<<< HEAD
+	# Download & expand NzbDrone
+	mkdir -p /tmp
+	wget -P $(TMP_DIR) $(NZBDRONE_URL)/$(NZBDRONE_PKG_NAME)
+	tar xvf $(TMP_DIR)/$(NZBDRONE_PKG_NAME) -C $(STAGING_DIR)
+	rm $(TMP_DIR)/$(NZBDRONE_PKG_NAME)
+	# Download & expand sqlite class library
+	wget -P $(TMP_DIR) $(SQLITE_URL)/$(SQL_PKG_NAME)
+	tar xvf $(TMP_DIR)/$(SQL_PKG_NAME) -C $(STAGING_DIR)/$(NZBDRONE_DIR_NAME)
+	rm $(TMP_DIR)/$(SQL_PKG_NAME)
+=======
 
         # Download & Extract NzbDrone
  	wget -P ${TMP_DIR} http://update.nzbdrone.com/v2/master/mono/NzbDrone.master.2.0.0.1236.mono.tar.gz
@@ -46,6 +65,7 @@ nzbdrone_extra_install:
 	wget -P ${TMP_DIR} http://dl.dropboxusercontent.com/u/300345/libsqlite3.tar.gz
 	tar xvf ${TMP_DIR}/libsqlite3.tar.gz -C ${INSTALL_DIR}/NzbDrone
 
+>>>>>>> 519727e82df5275865ad28b0a32f99588b4987a5
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

@@ -24,6 +24,17 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+<<<<<<< HEAD
+    # Download & Extract NzbDrone
+#    wget -P ${TMP_DIR} http://update.nzbdrone.com/v2/master/mono/NzbDrone.master.2.0.0.1236.mono.tar.gz
+#    tar xvf ${TMP_DIR}/NzbDrone.master.2.0.0.1236.mono.tar.gz -C ${INSTALL_DIR}
+
+    # Add sqlite class library
+#    wget -P ${TMP_DIR} http://dl.dropboxusercontent.com/u/300345/libsqlite3.tar.gz
+#    tar xvf ${TMP_DIR}/libsqlite3.tar.gz -C ${INSTALL_DIR}/NzbDrone
+
+=======
+>>>>>>> 519727e82df5275865ad28b0a32f99588b4987a5
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
