@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = 2.0.0.1236
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/nzbdrone.png
 
 FIRMWARE = 5.0
@@ -38,22 +38,19 @@ include ../../mk/spksrc.spk.mk
 # Packages
 NZBDRONE_URL = http://update.nzbdrone.com/v2/master/mono
 NZBDRONE_PKG_NAME = NzbDrone.master.2.0.0.1236.mono.tar.gz
-SQLITE_URL = http://dl.dropboxusercontent.com/u/300345
-SQL_PKG_NAME = libsqlite3.tar.gz
+SQL_PKG_NAME = libsqlite3.8.4.1.tar.gz
 NZBDRONE_DIR_NAME = NzbDrone
 TMP_DIR = /tmp
 
 .PHONY: nzbdrone_extra_install
 nzbdrone_extra_install:
-	# Download & expand NzbDrone
+	# Download & extract NzbDrone
 	mkdir -p /tmp
 	wget -P $(TMP_DIR) $(NZBDRONE_URL)/$(NZBDRONE_PKG_NAME)
 	tar xvf $(TMP_DIR)/$(NZBDRONE_PKG_NAME) -C $(STAGING_DIR)
 	rm $(TMP_DIR)/$(NZBDRONE_PKG_NAME)
-	# Download & expand sqlite class library
-	wget -P $(TMP_DIR) $(SQLITE_URL)/$(SQL_PKG_NAME)
-	tar xvf $(TMP_DIR)/$(SQL_PKG_NAME) -C $(STAGING_DIR)/$(NZBDRONE_DIR_NAME)
-	rm $(TMP_DIR)/$(SQL_PKG_NAME)
+	# Extract sqlite class library
+	tar xvf $(STAGING_DIR)/../../src/$(SQL_PKG_NAME) -C $(STAGING_DIR)/$(NZBDRONE_DIR_NAME)
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
