@@ -1,5 +1,5 @@
 PKG_NAME = btsync
-PKG_VERS = 1.3.67
+PKG_VERS = 1.2.91
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(BTSYNC_ARCH)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://syncapp.bittorrent.com/$(PKG_VERS)
