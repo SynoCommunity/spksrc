@@ -1,0 +1,11 @@
+--- Makefile.am.orig	2014-03-19 13:25:31.294224069 +0100
++++ Makefile.am	2014-03-19 13:25:47.540891412 +0100
+@@ -98,7 +98,7 @@ FLAGS_TO_PASS = $(AM_MAKEFLAGS)
+ 
+ MAKEOVERRIDES=
+ 
+-toolexeclib_LTLIBRARIES = libffi.la
++lib_LTLIBRARIES = libffi.la
+ noinst_LTLIBRARIES = libffi_convenience.la
+ 
+ libffi_la_SOURCES = src/prep_cif.c src/types.c \

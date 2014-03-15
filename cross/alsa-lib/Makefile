@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://www.alsa-project.org/
 COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
-LICENSE  =
+LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-python
