@@ -107,21 +107,10 @@ endif
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
 
-DSM_WIZARDS =
 ifneq ($(WIZARDS_DIR),)
-DSM_WIZARDS = $(addprefix $(DSM_WIZARDS_DIR)/, $(notdir $(wildcard $(WIZARDS_DIR)/*)))
+# export working wizards dir to the shell for use later at compile-time
+export SPKSRC_WIZARDS_DIR=$(WIZARDS_DIR)
 endif
-
-define dsm_wizard_copy
-$(create_target_dir)
-$(MSG) "Creating $@"
-cp $< $@
-chmod 644 $@
-endef
-
-$(DSM_WIZARDS_DIR)/%: $(WIZARDS_DIR)/%
-	@echo $@
-	@$(dsm_wizard_copy)
 
 # License
 DSM_LICENSE_FILE = $(WORK_DIR)/LICENSE
@@ -196,17 +185,23 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sc,$(FWPORTS))
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
+SPK_CONTENT = package.tgz INFO scripts
 
-SPK_CONTENT  = package.tgz INFO scripts
-ifneq ($(strip $(DSM_WIZARDS)),)
-SPK_CONTENT += WIZARD_UIFILES
+.PHONY: wizards
+wizards:
+ifneq ($(strip $(WIZARDS_DIR)),)
+	@$(MSG) "Preparing DSM Wizards"
+	@mkdir -p $(DSM_WIZARDS_DIR)
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
+	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
 
 ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) $(DSM_WIZARDS) $(DSM_LICENSE)
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) wizards $(DSM_LICENSE)
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
