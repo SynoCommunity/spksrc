@@ -23,3 +23,6 @@ tar -cvf "$WORKSPACE_DIRECTORY/$PACKAGE_NAME.spk" *
 
 # Move Package Directory back to its orignail location
 mv "$WORKSPACE_DIRECTORY/package-TEMP" "$PACKAGE_PATH/package"
+
+# Rmove old package archive
+rm "$PACKAGE_PATH/package.tgz"
