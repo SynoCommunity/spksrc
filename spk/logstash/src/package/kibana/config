@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.logstash": {
+            "title": "logstash",
+            "desc": "logstash Kibana Web UI",
+            "icon": "icon/logstash_{0}.png",
+            "type": "url",
+            "url": "3rdparty/logstash/index.html",
+            "allUsers": false
+        }
+    }
+}

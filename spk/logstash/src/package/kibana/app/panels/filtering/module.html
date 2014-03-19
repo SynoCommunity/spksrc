@@ -1,0 +1,30 @@
+<div ng-controller="filtering" ng-init="init()"><style>.filtering-container {
+      margin-top: 3px;
+    }
+    .filter-panel-filter {
+      display:inline-block;
+      vertical-align: top;
+      width: 220px;
+      padding: 5px 5px 0px 5px;
+      margin: 5px 5px 5px 0px;
+      color: #fff;
+      background-color: #444;
+    }
+    .filter-panel-filter ul {
+      margin-bottom: 3px;
+    }
+    .filter-deselected {
+      opacity: 0.5;
+    }
+    .filter-action {
+      float:right;
+      margin-bottom: 0px !important;
+      margin-left: 3px;
+    }
+    .filter-mandate {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .filter-apply {
+      float:right;
+    }</style><div class="filtering-container"><span ng-show="filterSrv.ids.length == 0"><h5>No filters available</h5></span><div ng-repeat="id in filterSrv.ids" class="small filter-panel-filter"><div><strong>{{filterSrv.list[id].type}}</strong> <span ng-show="!filterSrv.list[id].editing && isEditable(filterSrv.list[id])" class="filter-mandate" ng-click="filterSrv.list[id].editing = true">{{filterSrv.list[id].mandate}}</span> <span ng-show="!isEditable(filterSrv.list[id])">{{filterSrv.list[id].mandate}}</span> <i ng-class="getFilterClass(filterSrv.list[id])" class="icon-circle"></i> <span ng-show="filterSrv.list[id].editing"><select class="input-small" ng-model="filterSrv.list[id].mandate" ng-options="f for f in ['must','mustNot','either']"></select></span> <i class="filter-action pointer icon-remove" bs-tooltip="'Remove'" ng-click="remove(id)"></i> <i class="filter-action pointer" ng-class="{'icon-check': filterSrv.list[id].active,'icon-check-empty': !filterSrv.list[id].active}" bs-tooltip="'Toggle'" ng-click="toggle(id)"></i> <i class="filter-action pointer icon-edit" ng-hide="filterSrv.list[id].editing || !isEditable(filterSrv.list[id])" bs-tooltip="'Edit'" ng-click="filterSrv.list[id].editing = true"></i></div><div ng-hide="filterSrv.list[id].editing && isEditable(filterSrv.list[id])"><ul class="unstyled"><li ng-repeat="(key,value) in filterSrv.list[id] track by $index" ng-show="show_key(key)"><strong>{{key}}</strong> : {{value}}</li></ul></div><form ng-show="filterSrv.list[id].editing && isEditable(filterSrv.list[id])"><ul class="unstyled"><li ng-repeat="key in _.keys(filterSrv.list[id])" ng-show="show_key(key)"><strong>{{key}}</strong> :<input type="text" ng-model="filterSrv.list[id][key]"></li></ul><div><button type="submit" ng-click="filterSrv.list[id].editing=undefined;refresh()" class="filter-apply btn btn-mini btn-success" bs-tooltip="'Save and refresh'">Apply</button> <button ng-click="filterSrv.list[id].editing=undefined" class="filter-apply btn-mini btn" bs-tooltip="'Save without refresh'">Save</button></div></form></div><i class="pointer icon-plus-sign" ng-click="add()" bs-tooltip="'Add a query filter'" data-placement="right"></i></div></div>
