@@ -1,0 +1,5 @@
+#!/bin/sh
+# Copyright (c) 2000-2013 Synology Inc. All rights reserved.
+
+. `dirname "$0"`/common.sh
+`basename "$0"`
