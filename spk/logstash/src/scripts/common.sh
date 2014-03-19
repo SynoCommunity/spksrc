@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copyright (c) 2014 AustinSaintAubin. All rights reserved.
 # http://ukdl.synology.com/download/ds/userguide/DSM_Developer_Guide.pdf
-# logstash-1.3.3-noarch-0008
+# logstash-1.3.3-noarch-0012
 
 # Script Environment Variables
 # Several variables are exported by Package Center and can be used in the scripts. Descriptions of the variables are given as below:
@@ -27,41 +27,82 @@
 # - SYNOPKG_OLD_PKGVER: Existing package version which is defined in INFO (only in preupgrade script).
 
 # COMMON PACKAGE VARABLES
-PACKAGE_NAME="$(echo "$SYNOPKG_PKGNAME" | awk '{print tolower($0)}' | sed -e 's/ /_/g')"
-PACKAGE_DIR="${SYNOPKG_PKGDEST}"  # "$SYNOPKG_PKGDEST"
-PACKAGE_UPGRADE_FLAG="/tmp/${PACKAGE_NAME}.upgrade"
-CFG_FILE="/var/packages/$SYNOPKG_PKGNAME/scripts/start-stop-status"
+PACKAGE_NAME_SIMPLE="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}' | sed -e 's/ /_/g')"
+PACKAGE_UPGRADE_FLAG="/tmp/${PACKAGE_NAME_SIMPLE}.upgrade"
+START_STOP_STATUS_FILE="/var/packages/${SYNOPKG_PKGNAME}/scripts/start-stop-status"
 
 # Logstash Varables
-LOGSTASH_LOG_PATH="${PACKAGE_DIR}/$SYNOPKG_PKGNAME.log"
+LOGSTASH_LOG_PATH="${SYNOPKG_PKGDEST}/${PACKAGE_NAME_SIMPLE}.log"
 
+# Download Varables
+LOGSTASH_DOWNLOAD_URL="http://download.elasticsearch.org/logstash/logstash/logstash-1.3.3-flatjar.jar"
+LOGSTASH_DOWNLOAD_FILE="$(basename ${LOGSTASH_DOWNLOAD_URL})"
+KIBANA_DOWNLOAD_URL="http://download.elasticsearch.org/kibana/kibana/kibana-latest.tar.gz"
+KIBANA_DOWNLOAD_FILE="$(basename ${KIBANA_DOWNLOAD_URL})"
+
+# Common Functions
+checkFolder() { [ -d "$@" ] && echo "Directory Exists: $@" || (echo "Making Directory: $@"; mkdir -p "$@"); }
+
+# Package Functions
 preinst() {
 	# Check if Java installed 
 	if [ -n "$(which java)" ]; then
-		echo "Java required to be installed to run ${PACKAGE_NAME}" > $SYNOPKG_TEMP_LOGFILE
+		echo "Java required to be installed to run ${SYNOPKG_PKGNAME}" # > $SYNOPKG_TEMP_LOGFILE
 		exit 1
 	fi
+	
+	# Download Logstash
+	[ -e "${SYNOPKG_PKGINST_TEMP_DIR}/${LOGSTASH_DOWNLOAD_FILE}" ] && rm "${SYNOPKG_PKGINST_TEMP_DIR}/${LOGSTASH_DOWNLOAD_FILE}"  # Remove older download if pressent
+	wget "${LOGSTASH_DOWNLOAD_URL}" -P "$SYNOPKG_PKGINST_TEMP_DIR" 
+	[ -e "${SYNOPKG_PKGINST_TEMP_DIR}/${LOGSTASH_DOWNLOAD_FILE}" ] || (echo "There was a problem downloading (${LOGSTASH_DOWNLOAD_FILE}) from the official download url (${LOGSTASH_DOWNLOAD_URL})." > $SYNOPKG_TEMP_LOGFILE; exit 1)
+	
+	# Download Kibana
+	[ -e "${SYNOPKG_PKGINST_TEMP_DIR}/${KIBANA_DOWNLOAD_FILE}" ] && rm "${SYNOPKG_PKGINST_TEMP_DIR}/${KIBANA_DOWNLOAD_FILE}"  # Remove older download if pressent
+	wget "${KIBANA_DOWNLOAD_URL}" -P "$SYNOPKG_PKGINST_TEMP_DIR"
+	[ -e "${SYNOPKG_PKGINST_TEMP_DIR}/${KIBANA_DOWNLOAD_FILE}" ] || (echo "There was a problem downloading (${KIBANA_DOWNLOAD_FILE}) from the official download url (${KIBANA_DOWNLOAD_URL})." > $SYNOPKG_TEMP_LOGFILE; exit 1)
 	
 	exit 0
 }
 
-postinst() {
-	# Create Softlink & Mount
-	ln -s "${LOGSTASH_CONFIG_PATH}" "${PACKAGE_DIR}"  # Logstash Config File
+postinst() {	
+	# Configure start-stop-status file based on download varables
+	sed -i -e "s|@package_name_simple@|${PACKAGE_NAME_SIMPLE}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@package_dir@|${SYNOPKG_PKGDEST}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@package_upgrade_flag@|${PACKAGE_UPGRADE_FLAG}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@logstash_jar_file@|${LOGSTASH_DOWNLOAD_FILE}|g" "${START_STOP_STATUS_FILE}"
 	
 	# Configure start-stop-status file based on wizard, or use defaults
-	sed -i -e "s|@logstash_config_path@|${wizard_config_path:=/volume1/active_system/logstash/logstash.conf}|g" "$CFG_FILE"
-	sed -i -e "s|@logstash_database_dir@|${wizard_database_dir:=/volume1/active_system/logstash/database}|g" "$CFG_FILE"
-	sed -i -e "s|@logstash_log_path@|${wizard_log_path:=/volume1/active_system/logstash/logstash.log}|g" "$CFG_FILE"
-	sed -i -e "s|@java_heap_size_initial@|${wizard_java_heap_size_initial}|g" "$CFG_FILE"
-	sed -i -e "s|@java_heap_size_max@|${wizard_java_heap_size_max}|g" "$CFG_FILE"
-	sed -i -e "s|@java_args_tuning@|${wizard_java_args_tuning}|g" "$CFG_FILE"
+	sed -i -e "s|@logstash_config_path@|${wizard_config_path:=/volume1/active_system/logstash/logstash.conf}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@logstash_database_dir@|${wizard_database_dir:=/volume1/active_system/logstash/database}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@logstash_log_path@|${wizard_log_path:=/volume1/active_system/logstash/logstash.log}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@java_heap_size_initial@|${wizard_java_heap_size_initial}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@java_heap_size_max@|${wizard_java_heap_size_max}|g" "${START_STOP_STATUS_FILE}"
+	sed -i -e "s|@java_args_tuning@|${wizard_java_args_tuning}|g" "${START_STOP_STATUS_FILE}"
 	
-	# Make Log Message
-	[ "$SYNOPKG_PKG_STATUS" != "UPGRADE" ] || date +"%c installed version ${SYNOPKG_PKGVER}<br>" >> $LOGSTASH_LOG_PATH
+	# Check Logstash Config, Log, & Database
+	checkFolder "$(dirname "${wizard_config_path}")"  # Create Folder if Needed
+	checkFolder "$(dirname "${wizard_database_dir}")"  # Create Folder if Needed
+	checkFolder "$(dirname "${wizard_log_path}")"  # Create Folder if Needed
+	[ -e "${wizard_config_path}" ] || cp "${SYNOPKG_PKGDEST}/logstash-sample.conf" "${wizard_config_path}"
 	
-# 	# Check if Config Pressent
-# 	[ -e "$PACKAGE_DIR\$LOGSTASH_JAR_FILE" ] && exit 0 || ( "Issue with package, cant find $PACKAGE_SETTINGS_PATH" > $SYNOPKG_TEMP_LOGFILE ;exit 1)  # exit status code 0 is good.
+	# Create Softlink for config
+# 	ln -s "${LOGSTASH_CONFIG_PATH}" "${SYNOPKG_PKGDEST}"  # Logstash Config File
+	
+	# Move Downloaded Items into Package Destination
+	### packages are moved by synology before post install... just need to extract the archive.
+	
+	# Extract Kibana
+	tar zxvf ${SYNOPKG_PKGDEST}/kibana-* -C "${SYNOPKG_PKGDEST}"
+	mv ${SYNOPKG_PKGDEST}/kibana-*/* "${SYNOPKG_PKGDEST}/kibana"
+	rm ${SYNOPKG_PKGDEST}/kibana-*.tar.gz
+	rm -r ${SYNOPKG_PKGDEST}/kibana-*
+	
+	# Check if Downloaded Files Pressent
+	[ -e "${SYNOPKG_PKGDEST}\$LOGSTASH_DOWNLOAD_FILE" ] && exit 0 || ( "Issue with package, cant find $LOGSTASH_DOWNLOAD_FILE" > $SYNOPKG_TEMP_LOGFILE ;exit 1)  # exit status code 0 is good.
+	
+# 	# Make Log Message
+# 	[ "$SYNOPKG_PKG_STATUS" != "UPGRADE" ] || date +"%c installed version ${SYNOPKG_PKGVER}<br>" >> $LOGSTASH_LOG_PATH
+	
 	exit 0
 }
 

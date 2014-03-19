@@ -6,7 +6,7 @@
 
 
 # [ Build Package ]
-PACKAGE_NAME="logstash-1.3.3-noarch-0011"
+PACKAGE_NAME="logstash-1.3.3-noarch-0012"
 WORKSPACE_DIRECTORY="$(pwd)"  # set to same directory that "make.sh" is located in.
 PACKAGE_PATH="$WORKSPACE_DIRECTORY/src"
 
