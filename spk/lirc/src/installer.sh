@@ -7,26 +7,14 @@ DNAME="LIRC"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${PATH}:${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
-
-preinst ()
+lirc_install_drivers ()
 {
-    exit 0
-}
-
-postinst ()
-{
-    # Link
-    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-
-    # Fix PATH to include package binaries
-    fixpath
-
-    # If variable is empty, see if this is an upgrade and grab the saved driver
-    if [[ -z ${lirc_driver_selected} ]]; then
-        lirc_driver_selected=$(cat ${TMP_DIR}/${PACKAGE}/driver 2>/dev/null || echo none)
+    if ! [ -z $1 ]; then
+        # Selected driver was passed in (happens on first start after DSM upgrade)
+        lirc_driver_selected=$1
     fi
 
     # Set up the driver module selected during installation wizard
@@ -53,6 +41,27 @@ postinst ()
     mkdir -p /var/run/lirc
     touch /var/run/lirc/lircd
     chmod -R 777 /var/run/lirc
+}
+
+preinst ()
+{
+    exit 0
+}
+
+postinst ()
+{
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+
+    # Fix PATH to include package binaries
+    #fixpath
+
+    # If variable is empty, see if this is an upgrade and grab the saved driver
+    if [[ -z ${lirc_driver_selected} ]]; then
+        lirc_driver_selected=$(cat ${TMP_DIR}/${PACKAGE}/driver 2>/dev/null || echo none)
+    fi
+
+    lirc_install_drivers
 
     exit 0
 }
@@ -113,13 +122,13 @@ fixpath ()
 {
     # fix roots .profile
     if [ $(grep "\${PATH}" /root/.profile | wc -l) -eq 0 ]; then
-        #sed -i 's/PATH=/PATH=\${PATH}:/' /root/.profile
         echo fixing roots .profile
+        sed -i 's/PATH=/PATH=\${PATH}:/' /root/.profile
     fi
 
     # fix the global /etc/profile
     if [ $(grep "\$pack" /etc/profile | wc -l) -eq 0 ]; then
-        #sed -i 's,export PATH,for pack in \$\(ls /var/packages\)\; do\n    PATH=\$\{PATH\}:/var/packages/\$pack/target/bin:/var/packages/\$pack/target/sbin\ndone\nexport PATH,' /etc/profile
         echo fixing etc/profile
+        sed -i 's,export PATH,for pack in \$\(ls /var/packages\)\; do\n    PATH=\$\{PATH\}:/var/packages/\$pack/target/bin:/var/packages/\$pack/target/sbin\ndone\nexport PATH,' /etc/profile
     fi
 }
