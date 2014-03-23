@@ -7,7 +7,7 @@ DNAME="LIRC"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:${PATH}"
+PATH="${PATH}:${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 lirc_install_drivers ()
@@ -23,7 +23,7 @@ lirc_install_drivers ()
             sed -i "s/@driver@/${lirc_driver_selected}/g" ${SSS}
     
             # Create driver-specific device
-            test -e /dev/lirc || mknod /dev/lirc c 61 0
+            test -e /dev/lirc || /bin/mknod /dev/lirc c 61 0
         ;;
         uirt|uirt2)
             sed -i "s/@driver@/${lirc_driver_selected}/g" ${SSS}
