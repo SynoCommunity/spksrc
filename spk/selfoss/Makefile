@@ -1,5 +1,5 @@
 SPK_NAME = selfoss
-SPK_VERS = 2.9
+SPK_VERS = 2.10
 SPK_REV = 3
 SPK_ICON = src/selfoss.png
 DSM_UI_DIR = app
