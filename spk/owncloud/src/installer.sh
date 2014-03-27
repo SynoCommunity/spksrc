@@ -3,6 +3,7 @@
 # Package
 PACKAGE="owncloud"
 DNAME="ownCloud"
+PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -54,6 +55,13 @@ postinst ()
     cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
     mkdir ${WEB_DIR}/${PACKAGE}/data
 
+    # Configure open_basedir
+    if [ "${USER}" == "nobody" ]; then
+        echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    else
+        echo -e "[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
+    fi
+
     # Setup database and autoconfig file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud:=owncloud}';"
@@ -89,6 +97,10 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+
+    # Remove open_basedir configuration
+    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    rm -f /etc/php/conf.d/${PACKAGE_NAME}.ini
 
     # Remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
