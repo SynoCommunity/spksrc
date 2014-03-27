@@ -59,7 +59,7 @@ postinst ()
     if [ "${USER}" == "nobody" ]; then
         echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
     else
-        echo -e "extension = fileinfo.so\n[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
+        echo -e "[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
     fi
 
     # Setup database and autoconfig file
@@ -70,11 +70,11 @@ postinst ()
                -e "s/@db_password@/${wizard_mysql_password_owncloud:=owncloud}/g" \
                -e "s#@directory@#${wizard_owncloud_datadirectory:=/volume1/owncloud}#g" \
                ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
-        chown -R ${USER} ${wizard_owncloud_datadirectory}
     fi
 
     # Fix permissions
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}
+    chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
 }
