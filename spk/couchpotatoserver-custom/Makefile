@@ -1,6 +1,6 @@
 SPK_NAME = couchpotatoserver-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/couchpotatoserver-custom.png
 DSM_UI_DIR = app
 
@@ -8,11 +8,12 @@ DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = CouchPotato Server Custom allows you to run the fork of your choice of CouchPotato Server. You will be asked for the fork\'s git URL during install.
-DESCRIPTION_FRE = CouchPotato Server Custom vous permet d\\\'exécuter le fork de votre choix de CouchPotato Server. Vous aurez besoin de saisir l\\\'URL git du fork durant l\\\'installation.
+DESCRIPTION = CouchPotato Custom allows you to run the fork of your choice of CouchPotato. You will be asked for the fork\'s git URL during install.
+DESCRIPTION_FRE = CouchPotato Custom vous permet d\\\'exécuter le fork de votre choix de CouchPotato. Vous aurez besoin de saisir l\\\'URL git du fork durant l\\\'installation.
 ADMIN_PORT = 5053
 RELOAD_UI = yes
-DISPLAY_NAME = CouchPotato Server Custom
+DISPLAY_NAME = CouchPotato Custom
+CHANGELOG = "1. Change default fork\n2. Rename package"
 
 HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL
