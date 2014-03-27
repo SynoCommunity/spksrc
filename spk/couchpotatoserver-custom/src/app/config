@@ -1,8 +1,8 @@
 {
     ".url": {
         "com.synocommunity.packages.couchpotatoserver-custom": {
-            "title": "CouchPotato Server Custom",
-            "desc": "CouchPotato Server Custom Web UI",
+            "title": "CouchPotato Custom",
+            "desc": "CouchPotato Custom Web UI",
             "icon": "images/couchpotatoserver-custom-{0}.png",
             "type": "url",
             "protocol": "http",

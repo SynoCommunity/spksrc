@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="couchpotatoserver-custom"
-DNAME="CouchPotato Server Custom"
+DNAME="CouchPotato Custom"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -20,7 +20,7 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/sarakha63/CouchPotatoServer.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=https://github.com/RuudBurger/CouchPotatoServer.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -37,7 +37,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Clone the repository
-    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/sarakha63/CouchPotatoServer.git} ${INSTALL_DIR}/var/CouchPotatoServer
+    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=https://github.com/RuudBurger/CouchPotatoServer.git} ${INSTALL_DIR}/var/CouchPotatoServer
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
