@@ -5,7 +5,9 @@
             "desc": "Headphones Web UI",
             "icon": "images/headphones-{0}.png",
             "type": "url",
-            "url": "3rdparty/headphones/headphones.cgi",
+            "protocol": "http",
+            "port": "8181",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }
