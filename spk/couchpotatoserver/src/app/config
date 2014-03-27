@@ -1,11 +1,13 @@
 {
     ".url": {
         "com.synocommunity.packages.couchpotatoserver": {
-            "title": "CouchPotato Server",
-            "desc": "CouchPotato Server Web UI",
+            "title": "CouchPotato",
+            "desc": "CouchPotato Web UI",
             "icon": "images/couchpotatoserver-{0}.png",
             "type": "url",
-            "url": "3rdparty/couchpotatoserver/couchpotatoserver.cgi",
+            "protocol": "http",
+            "port": "5050",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }
