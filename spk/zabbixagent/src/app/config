@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.zabbixagent": {
+            "title": "Zabbix Agent Controls",
+            "desc": "Zabbix Agent Controls",
+            "icon": "images/zabbixagent-{0}.png",
+            "type": "legacy",
+            "width": 1024,
+            "height": 700,
+            "url": "3rdparty/zabbixagent/index.cgi",
+            "allUsers": false
+        }
+
+    }
+}
