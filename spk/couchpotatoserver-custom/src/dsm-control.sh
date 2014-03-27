@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="couchpotatoserver-custom"
-DNAME="CouchPotato Server Custom"
+DNAME="CouchPotato Custom"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
