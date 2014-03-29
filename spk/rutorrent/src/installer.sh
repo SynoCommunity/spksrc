@@ -53,6 +53,7 @@ postinst ()
 
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
+               -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
                ${INSTALL_DIR}/var/.rtorrent.rc
 
         if [ -d "${wizard_watch_dir}" ]; then
