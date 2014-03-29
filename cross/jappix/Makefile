@@ -1,6 +1,6 @@
 PKG_NAME = jappix
-PKG_VERS = 0.9.9
-PKG_RELEASE_NAME = nemesis-alpha-9
+PKG_VERS = 1.0.1
+PKG_RELEASE_NAME = one
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(PKG_RELEASE_NAME).$(PKG_EXT)
 PKG_DIST_SITE = http://download.jappix.org/$(PKG_VERS)
