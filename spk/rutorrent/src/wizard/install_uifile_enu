@@ -9,15 +9,10 @@
         }]
     }, {
         "type": "textfield",
-        "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable",
+        "desc": "Watch a directory for torrent files and add them to ruTorrent. Leave empty to disable",
         "subitems": [{
             "key": "wizard_watch_dir",
             "desc": "Watch directory"
         }]
-    }]
-},{
-    "step_title": "Warning!",
-    "items": [{
-        "desc": "In order for ruTorrent to work, you have to add the path of your download directory to the open_basedir. To do so, go to Control Panel > Web Services > PHP Settings."
     }]
 }]
