@@ -33,7 +33,7 @@ postinst ()
     cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Configure open_basedir
-    if [ "${APACHE_USER}" == "nobody" ]; then
+    if [ "${USER}" == "nobody" ]; then
         echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
     else
         echo -e "[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
@@ -53,22 +53,12 @@ postinst ()
 
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
-               -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
                ${INSTALL_DIR}/var/.rtorrent.rc
 
         if [ -d "${wizard_watch_dir}" ]; then
             sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${INSTALL_DIR}/var/.rtorrent.rc
         else
             sed -i -e "/@watch_dir@/d" ${INSTALL_DIR}/var/.rtorrent.rc
-        fi
-        # Set group and permissions on download- and watch dir for DSM5
-        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
-            chgrp users ${wizard_download_dir:=/volume1/downloads}
-            chmod g+rw ${wizard_download_dir:=/volume1/downloads}
-            if [ -d "${wizard_watch_dir}" ]; then
-                chgrp users ${wizard_watch_dir}
-                chmod g+rw ${wizard_watch_dir}
-            fi
         fi
     fi
 

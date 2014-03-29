@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.6
-SPK_REV = 6
+SPK_REV = 4
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
