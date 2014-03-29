@@ -1,5 +1,5 @@
 SPK_NAME = fengoffice
-SPK_VERS = 2.4
+SPK_VERS = 2.5.1.2
 SPK_REV = 3
 SPK_ICON = src/fengoffice.png
 DSM_UI_DIR = app
