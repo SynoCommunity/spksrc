@@ -3,7 +3,7 @@
 # Package
 PACKAGE="fengoffice"
 DNAME="Feng Office"
-VERSION="2.4"
+VERSION="2.5.1.2"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
