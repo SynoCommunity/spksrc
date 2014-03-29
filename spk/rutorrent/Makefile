@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.6
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
@@ -12,6 +12,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
+CHANGELOG = "1. DSM 5.0 compatibility"
 BETA = 1
 
 HOMEPAGE   = http://code.google.com/p/rutorrent/
