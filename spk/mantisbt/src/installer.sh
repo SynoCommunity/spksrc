@@ -3,6 +3,7 @@
 # Package
 PACKAGE="mantisbt"
 DNAME="MantisBT"
+PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -44,9 +45,10 @@ postinst ()
     cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # Configure open_basedir
-    # Seems to work without this on DSM4.3
-    if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -lt 4418 ]; then
+    if [ "${USER}" == "nobody" ]; then
         echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    else
+        echo -e "extension = fileinfo.so\n[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
     fi
 
     # Setup database and configuration file
@@ -78,7 +80,6 @@ preuninst ()
 
 postuninst ()
 {
-
     # Remove link
     rm -f ${INSTALL_DIR}
 
@@ -89,6 +90,7 @@ postuninst ()
 
     # Remove open_basedir configuration
     rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    rm -f /etc/php/conf.d/${PACKAGE_NAME}.ini
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
