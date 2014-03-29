@@ -7,7 +7,7 @@ DNAME="Jappix"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="nobody"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 

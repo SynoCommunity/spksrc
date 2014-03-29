@@ -12,6 +12,7 @@ ADMIN_URL = /jappix/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Jappix
+CHANGELOG = "1. DSM 5.0 compatibility"
 BETA = 1
 
 HOMEPAGE   = http://jappix.org/
