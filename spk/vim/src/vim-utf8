@@ -1,0 +1,3 @@
+#!/bin/sh
+
+LC_ALL=en_US.UTF8 /usr/local/vim/bin/vim "$@"
