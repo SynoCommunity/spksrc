@@ -3,6 +3,7 @@
 # Package
 PACKAGE="horde"
 DNAME="Horde"
+PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -53,29 +54,24 @@ postinst ()
     fi
 
     # Configure Apache variables
-    echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nSetEnv PHP_PEAR_SYSCONF_DIR ${INSTALL_DIR}/etc\nphp_value include_path \".:${INSTALL_DIR}/share/pear\"\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    if [ "${USER}" == "nobody" ]; then
+        echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nSetEnv PHP_PEAR_SYSCONF_DIR ${INSTALL_DIR}/etc\nphp_value include_path \".:${INSTALL_DIR}/share/pear\"\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    else
+        echo -e "extension = fileinfo.so\n[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null\ninclude_path = .:${INSTALL_DIR}/share/pear/php" > /etc/php/conf.d/${PACKAGE_NAME}.ini
+    fi
 
     # Create Pear config
-    ${INSTALL_DIR}/bin/pear config-create ${INSTALL_DIR}/share ${INSTALL_DIR}/etc/pear.conf > /dev/null
+    pear config-create ${INSTALL_DIR}/share ${INSTALL_DIR}/etc/pear.conf > /dev/null
+    pear -c ${INSTALL_DIR}/etc/pear.conf config-set bin_dir ${INSTALL_DIR}/bin > /dev/null
 
-    # Make sure all variables point to correct locations
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set bin_dir ${INSTALL_DIR}/bin > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set doc_dir ${INSTALL_DIR}/var/doc > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set ext_dir ${INSTALL_DIR}/var/ext > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set php_dir ${INSTALL_DIR}/share/pear > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set cache_dir ${INSTALL_DIR}/var/cache > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set cfg_dir ${INSTALL_DIR}/etc > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set data_dir ${INSTALL_DIR}/data > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set download_dir ${INSTALL_DIR}/var/download > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set php_bin /usr/bin/php > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set temp_dir ${INSTALL_DIR}/var/temp > /dev/null
-    ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set test_dir ${INSTALL_DIR}/var/test > /dev/null
+    # Install Pear
+    pear -c ${INSTALL_DIR}/etc/pear.conf install pear > /dev/null
 
     # Begin installation
     ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf channel-discover pear.horde.org > /dev/null
     ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf install horde/horde_role > /dev/null
 
-    # Create required Horde variable manually instead of running interactive script via "run-scripts horde/horde_role"
+    # Create required Horde variable manually instead of running interactive script via "pear run-scripts horde/horde_role"
     ${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf config-set -c pear.horde.org horde_dir ${WEB_DIR}/${PACKAGE} > /dev/null
 
     # Setup temporary page
@@ -94,6 +90,10 @@ postinst ()
     fi
 
     edition=`cat ${INSTALL_DIR}/var/edition`
+
+    # Create script for easy upgrade
+    echo -e "#!/bin/sh\n${INSTALL_DIR}/bin/pear -c ${INSTALL_DIR}/etc/pear.conf upgrade -B\nchown -R ${USER} ${WEB_DIR}/${PACKAGE}" > ${INSTALL_DIR}/bin/horde-pear-upgrade
+    chmod +x ${INSTALL_DIR}/bin/horde-pear-upgrade
 
     # Finish installation in the background
     postinst_bg &
@@ -118,15 +118,15 @@ postinst_bg ()
           "\n\$conf['group']['driver'] = 'Sql';" >> ${WEB_DIR}/${PACKAGE}/config/conf.php
     fi
 
-    # Fix permissions
-    chmod -R 777 ${WEB_DIR}/${PACKAGE}
+    # Create/update database tables (second run creates last two table) - work around interactive installer
+    PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear/php ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1
+    PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear/php ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1
 
-    # Create/update database tables (second run creates last two table)
-    PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1
-    PHP_PEAR_SYSCONF_DIR=${INSTALL_DIR}/etc php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear ${INSTALL_DIR}/bin/horde-db-migrate >> $(INSTALL_DIR)/var/install.log 2>&1
+    # Fix permissions
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
 
     # Remove temporary page
-    rm ${WEB_DIR}/${PACKAGE}/index.html
+    rm -f ${WEB_DIR}/${PACKAGE}/index.html
 }
 
 preuninst ()
@@ -154,7 +154,8 @@ postuninst ()
     fi
 
     # Remove Apache configuration
-    rm /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    rm -f /etc/php/conf.d/${PACKAGE_NAME}.ini
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
@@ -177,6 +178,9 @@ preupgrade ()
     # Save main Horde config
     mv ${WEB_DIR}/${PACKAGE}/config/conf.php ${TMP_DIR}/${PACKAGE}/
 
+    # Save e-mail config
+    mv ${WEB_DIR}/${PACKAGE}/imp/config/backends.local.php ${TMP_DIR}/${PACKAGE}/
+
     # Save other apps configs
     cd ${WEB_DIR}/${PACKAGE} && for file in */config/conf.php; do
         if [ ! -f ${WEB_DIR}/${PACKAGE}/$file ]; then 
@@ -195,6 +199,12 @@ postupgrade ()
     # Restore main Horde config
     mkdir -p ${WEB_DIR}/${PACKAGE}/config
     mv ${TMP_DIR}/${PACKAGE}/conf.php ${WEB_DIR}/${PACKAGE}/config/conf.php
+
+    # Restore e-mail config
+    if [ -f ${TMP_DIR}/${PACKAGE}/backends.local.php ]; then
+        mkdir -p ${WEB_DIR}/${PACKAGE}/imp/config
+        mv ${TMP_DIR}/${PACKAGE}/backends.local.php ${WEB_DIR}/${PACKAGE}/imp/config/backends.local.php
+    fi
 
     # Restore other apps configs
     cd ${TMP_DIR}/${PACKAGE} && for file in */config/conf.php; do

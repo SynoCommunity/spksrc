@@ -4,7 +4,7 @@ set -e
 
 PACKAGE="horde"
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PHP="php -d include_path=${INSTALL_DIR}/share/pear"
+PHP="php -d open_basedir=none -d include_path=${INSTALL_DIR}/share/pear/php"
 HORDE="${INSTALL_DIR}/bin/horde-alarms"
 SLEEP_TIME="600"
 
