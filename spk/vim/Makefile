@@ -1,6 +1,6 @@
 SPK_NAME = vim
 SPK_VERS = 7.4
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/vim.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -12,6 +12,7 @@ RELOAD_UI = no
 DISPLAY_NAME = Vim
 STARTABLE = no
 BETA = 1
+CHANGELOG = "1. Support UTF8 by default"
 
 HOMEPAGE   = http://www.vim.org/
 LICENSE    = Charityware
@@ -22,4 +23,10 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
+POST_STRIP_TARGET = vim_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: vim_extra_install
+vim_extra_install:
+	install -m 755 src/vim-utf8 $(STAGING_DIR)/bin/vim-utf8
