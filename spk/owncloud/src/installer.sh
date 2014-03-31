@@ -70,11 +70,11 @@ postinst ()
                -e "s/@db_password@/${wizard_mysql_password_owncloud:=owncloud}/g" \
                -e "s#@directory@#${wizard_owncloud_datadirectory:=/volume1/owncloud}#g" \
                ${WEB_DIR}/${PACKAGE}/config/autoconfig.php
+        chown -R ${USER} ${wizard_owncloud_datadirectory}
     fi
 
     # Fix permissions
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    chown -R ${USER} ${wizard_owncloud_datadirectory}
 
     exit 0
 }
