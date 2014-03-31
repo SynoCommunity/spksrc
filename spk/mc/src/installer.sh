@@ -21,7 +21,7 @@ postinst ()
     
     # Put mc in the PATH
     mkdir -p /usr/local/bin
-    ln -s ${INSTALL_DIR}/bin/mc /usr/local/bin/mc
+    ln -s ${INSTALL_DIR}/bin/mc-utf8 /usr/local/bin/mc
 
     exit 0
 }
