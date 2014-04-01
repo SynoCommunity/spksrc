@@ -15,7 +15,7 @@ DESCRIPTION_SPN = CouchPotato es un sistema automático de descarga de peliculas
 ADMIN_PORT = 5050
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato
-CHANGELOG = "1. Uninstall required\n2. Add Git dependency\n3. Rename package"
+CHANGELOG = "1. Add Git dependency\n2. Rename package"
 
 HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL
