@@ -12,6 +12,7 @@ ADMIN_URL = /pydio/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Pydio
+BETA = 1
 
 HOMEPAGE   = http://pyd.io/
 LICENSE    = AGPLv3
