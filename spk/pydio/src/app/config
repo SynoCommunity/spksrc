@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.pydio": {
+            "title": "Pydio",
+            "desc": "Pydio",
+            "icon": "images/pydio-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/pydio",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

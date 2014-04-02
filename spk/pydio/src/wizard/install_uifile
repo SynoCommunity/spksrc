@@ -1,0 +1,18 @@
+[{
+    "step_title": "Pydio database configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'pydio' MySQL user and database will be created. Please enter a password for the 'pydio' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_pydio",
+            "desc": "Pydio password"
+        }]
+    }]
+}]
