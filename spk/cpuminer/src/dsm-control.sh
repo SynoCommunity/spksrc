@@ -1,20 +1,21 @@
 #!/bin/sh
 
 # Package
-PACKAGE="transmission"
-DNAME="Transmission"
+PACKAGE="cpuminer"
+DNAME="CPUMiner"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="transmission"
-TRANSMISSION="${INSTALL_DIR}/bin/transmission-daemon"
-PID_FILE="${INSTALL_DIR}/var/transmission.pid"
-
+USER="cpuminer"
+CPUMINER="${INSTALL_DIR}/bin/minerd"
+CFG_FILE="${INSTALL_DIR}/var/settings.json"
+LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
+PID_FILE="${INSTALL_DIR}/var/cpuminer.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    su - ${USER} -c "${CPUMINER} -c ${CFG_FILE} 2> ${LOG_FILE} & echo $! > ${PID_FILE}"
 }
 
 stop_daemon ()

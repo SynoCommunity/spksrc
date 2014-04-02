@@ -1,10 +1,9 @@
 {
-    "download-dir": "@download_dir@",
-    "rpc-authentication-required": true,
-    "rpc-username": "@username@",
-    "rpc-password": "@password@",
-    "rpc-whitelist-enabled": false,
-    "umask": 2,
-    "watch-dir": "@watch_dir@",
-    "watch-dir-enabled": @watch_dir_enabled@
+    "url": "@wizard_pool_url@",
+	"userpass": "@wizard_pool_username@:@wizard_pool_password@",
+    "retry-pause": "10",
+    "quiet": true,
+    "background": true,
+    "threads": @wizard_threads_number@,
+    "algo": "@wizard_pool_algo@"
 }

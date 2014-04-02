@@ -2,34 +2,43 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download directory. Defaults to /volume1/downloads",
+        "desc": "Mining pool url [Default: stratum+tcp://stratum.mining.eligius.st:3334]",
         "subitems": [{
-            "key": "wizard_download_dir",
-            "desc": "Download directory"
+            "key": "wizard_pool_url",
+            "desc": "Pool URL"
         }]
     }, {
         "type": "textfield",
-        "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable",
+        "desc": "Username [Default: 16acB7MK2iiHRVoUmK3W7eFtTBicJ85m7B]",
         "subitems": [{
-            "key": "wizard_watch_dir",
-            "desc": "Watch directory"
-        }]
-    }]
-}, {
-    "step_title": "Basic configuration",
-    "items": [{
-        "type": "textfield",
-        "desc": "Web interface username. Defaults to admin",
-        "subitems": [{
-            "key": "wizard_username",
-            "desc": "Username"
+            "key": "wizard_pool_username",
+            "desc": "Pool username"
         }]
     }, {
         "type": "password",
-        "desc": "Web interface password. Defaults to admin",
+        "desc": "Password (optional)",
         "subitems": [{
-            "key": "wizard_password",
-            "desc": "Password"
+            "key": "wizard_pool_password",
+            "desc": "Pool password"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Number of threads [Default: 1]",
+        "subitems": [{
+            "key": "wizard_threads_number",
+            "desc": "threads number"
+        }]
+    }, {
+        "type": "singleselect",
+        "desc": "What type of coin do you want to mine ?",
+        "subitems": [{
+            "key": "wizard_use_bitcoin",
+            "desc": "Bitcoin",
+            "defaultValue": "true"
+        }, {
+            "key": "wizard_use_litecoin",
+            "desc": "Litecoin",
+            "defaultValue": "false"
         }]
     }]
 }]
