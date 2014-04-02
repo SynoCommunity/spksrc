@@ -8,29 +8,24 @@ DNAME="CPUMiner"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 USER="cpuminer"
-CPUMINER="${INSTALL_DIR}/bin/minerd"
-CFG_FILE="${INSTALL_DIR}/var/settings.json"
+CPUMINER="${INSTALL_DIR}/bin/cpuminer.sh"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
-DAEMON_MINER="minerd"
+PID_FILE="${INSTALL_DIR}/var/cpuminer.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "${CPUMINER} -c ${CFG_FILE} 2> ${LOG_FILE}"
+    start-stop-daemon -S -q -m -b -N 10 -x ${CPUMINER} -c ${USER} -u ${USER} -p ${PID_FILE} > /dev/null
 }
 
 stop_daemon ()
 {
-    PIDS=`pidof ${DAEMON_MINER}`
-    kill ${PIDS}
-    wait_for_status 1 20 || kill -9 ${PIDS}
+    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ [ -z `pidof ${DAEMON_MINER}` ] ] then
-        return
-    fi
-    return 1
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
 wait_for_status ()
@@ -42,7 +37,7 @@ wait_for_status ()
         let counter=counter-1
         sleep 1
     done
-    return 1
+return 1
 }
 
 
@@ -50,27 +45,18 @@ case $1 in
     start)
         if daemon_status; then
             echo ${DNAME} is already running
-            exit 0
         else
             echo Starting ${DNAME} ...
             start_daemon
-            exit $?
         fi
         ;;
     stop)
         if daemon_status; then
             echo Stopping ${DNAME} ...
             stop_daemon
-            exit $?
         else
             echo ${DNAME} is not running
-            exit 0
         fi
-        ;;
-    restart)
-        stop_daemon
-        start_daemon
-        exit $?
         ;;
     status)
         if daemon_status; then
@@ -80,6 +66,9 @@ case $1 in
             echo ${DNAME} is not running
             exit 1
         fi
+        ;;
+    log)
+        exit 1
         ;;
     *)
         exit 1
