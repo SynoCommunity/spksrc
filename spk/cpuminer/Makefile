@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = eptmp3
-DESCRIPTION = Multi-threaded CPU miner for Litecoin and Bitcoin, fork of Jeff Garzik's reference cpuminer.
+DESCRIPTION = "Multi-threaded CPU miner for Litecoin and Bitcoin, fork of Jeff Garzik's reference cpuminer."
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = CPUMiner
