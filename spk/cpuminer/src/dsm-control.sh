@@ -11,26 +11,25 @@ USER="cpuminer"
 CPUMINER="${INSTALL_DIR}/bin/minerd"
 CFG_FILE="${INSTALL_DIR}/var/settings.json"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
-PID_FILE="${INSTALL_DIR}/var/cpuminer.pid"
+DAEMON_MINER="minerd"
 
 start_daemon ()
 {
-    su - ${USER} -c "${CPUMINER} -c ${CFG_FILE} 2> ${LOG_FILE} & echo $! > ${PID_FILE}"
+    su - ${USER} -c "${CPUMINER} -c ${CFG_FILE} 2> ${LOG_FILE}"
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    rm -f ${PID_FILE}
+    PIDS=`pidof ${DAEMON_MINER}`
+    kill ${PIDS}
+    wait_for_status 1 20 || kill -9 ${PIDS}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+    if [ [ -z `pidof ${DAEMON_MINER}` ] ] then
         return
     fi
-    rm -f ${PID_FILE}
     return 1
 }
 
