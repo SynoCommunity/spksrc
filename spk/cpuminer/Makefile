@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/cpuminer.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = eptmp3
 DESCRIPTION = "Multi-threaded CPU miner for Litecoin and Bitcoin, fork of Jeff Garzik's reference cpuminer."
@@ -23,6 +23,9 @@ SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 POST_STRIP_TARGET = cpuminer_extra_install
 
