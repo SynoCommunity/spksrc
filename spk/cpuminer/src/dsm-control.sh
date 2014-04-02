@@ -29,10 +29,10 @@ daemon_status ()
 {
 
     PIDS=`pidof ${DAEMON_MINER}`
-    if [ ${PIDS} ]; then
-        return
+    if [ -z "$PIDS" ]; then
+        return 1
     fi
-    return 1
+    return
 }
 
 wait_for_status ()
