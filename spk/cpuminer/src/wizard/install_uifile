@@ -21,7 +21,10 @@
             "key": "wizard_pool_password",
             "desc": "Pool password"
         }]
-    }, {
+   }]
+}, {
+    "step_title": "Basic configuration",
+    "items": [{
         "type": "textfield",
         "desc": "Number of threads [Default: 1]",
         "subitems": [{
