@@ -7,14 +7,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/curl cross/jansson
 
-HOMEPAGE = http://www.transmissionbt.com/
-COMMENT  = A Fast, Easy, and Free BitTorrent Client
-LICENSE  =
+HOMEPAGE = https://github.com/pooler/cpuminer
+COMMENT  = Multi-threaded CPU miner for Litecoin and Bitcoin, fork of Jeff Garzik's reference cpuminer.
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = 
 
-CFLAGS = -03
+CFLAGS = -O3
 
 PRE_CONFIGURE_TARGET = cpuMinerPreConfigure
 
