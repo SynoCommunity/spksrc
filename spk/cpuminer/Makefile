@@ -20,12 +20,11 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-LAUNCH_SCRIPT    = src/cpuminer.sh
 ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-BUSYBOX_CONFIG = daemon usrmng
+BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 POST_STRIP_TARGET = cpuminer_extra_install
@@ -38,7 +37,6 @@ cpuminer_extra_install:
 	install -m 644 src/settings.json $(STAGING_DIR)/var/settings.json
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images
-	install -m 755 src/cpuminer.sh $(STAGING_DIR)/bin/
 	for size in 16 24 32 48 ; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
