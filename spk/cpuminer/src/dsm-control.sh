@@ -3,10 +3,9 @@
 # Package
 PACKAGE="cpuminer"
 DNAME="CPUMiner"
-
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}
 USER="cpuminer"
 CPUMINER="${INSTALL_DIR}/bin/cpuminer.sh"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
