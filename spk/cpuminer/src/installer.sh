@@ -9,7 +9,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="cpuminer"
-GROUP="users"
+GROUP="nobody"
 CFG_FILE="${INSTALL_DIR}/var/settings.json"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -42,7 +42,7 @@ postinst ()
     fi
 
     # Correct the files ownership
-    chown -R ${USER}:users ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }

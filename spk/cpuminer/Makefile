@@ -6,9 +6,8 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = eptmp3
+MAINTAINER = TuXedMe
 DESCRIPTION = "Multi-threaded CPU miner for Litecoin and Bitcoin, fork of Jeff Garzik's reference cpuminer."
-ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = CPUMiner
 CHANGELOG = "1. First release"

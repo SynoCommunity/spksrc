@@ -6,26 +6,26 @@ DNAME="CPUMiner"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="cpuminer"
+USER="nobody"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
 PID_FILE="${INSTALL_DIR}/var/cpuminer.pid"
 DAEMON="${INSTALL_DIR}/bin/minerd"
-OPTIONS="-c ${INSTALL_DIR}/var/settings.json -t 1 2> ${LOG_FILE}"
+OPTIONS="-c ${INSTALL_DIR}/var/settings.json -t 1"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -N 10 -c ${USER} -u ${USER} -p ${PID_FILE} -x ${DAEMON} -- ${OPTIONS} > /dev/null
+    start-stop-daemon -S -q -m -b -N 10 -c ${USER} -u ${PACKAGE} -p ${PID_FILE} -x ${DAEMON} -- ${OPTIONS} 2> ${LOG_FILE}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
+    start-stop-daemon -K -q -u ${PACKAGE} -p ${PID_FILE}
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    start-stop-daemon -K -q -t -u ${PACKAGE} -p ${PID_FILE}
 }
 
 wait_for_status ()

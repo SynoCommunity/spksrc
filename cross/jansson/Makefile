@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-HOMEPAGE = http://www.transmissionbt.com/
-COMMENT  = A Fast, Easy, and Free BitTorrent Client
-LICENSE  =
+HOMEPAGE = http://www.digip.org/jansson/
+COMMENT  = Jansson is a C library for encoding, decoding and manipulating JSON data.
+LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = 
