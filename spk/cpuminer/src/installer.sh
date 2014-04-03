@@ -34,7 +34,6 @@ postinst ()
     sed -i -e "s|@wizard_pool_url@|${wizard_pool_url:=stratum+tcp://stratum.mining.eligius.st:3334}|g" ${CFG_FILE}
     sed -i -e "s|@wizard_pool_username@|${wizard_pool_username:=16acB7MK2iiHRVoUmK3W7eFtTBicJ85m7B}|g" ${CFG_FILE}
     sed -i -e "s|@wizard_pool_password@|${wizard_pool_password}|g" ${CFG_FILE}
-    sed -i -e "s|@wizard_threads_number@|${wizard_threads_number:=1}|g" ${CFG_FILE}
     
     if [ ${wizard_use_bitcoin} == "true" ]; then
         sed -i -e "s|@wizard_pool_algo@|sha256d|g" ${CFG_FILE}

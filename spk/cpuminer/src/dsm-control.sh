@@ -7,10 +7,10 @@ DNAME="CPUMiner"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="cpuminer"
-DAEMON="${INSTALL_DIR}/bin/minerd"
-OPTIONS="-c ${INSTALL_DIR}/var/settings.json -t 1"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
 PID_FILE="${INSTALL_DIR}/var/cpuminer.pid"
+DAEMON="${INSTALL_DIR}/bin/minerd"
+OPTIONS="-c ${INSTALL_DIR}/var/settings.json -t 1 2> ${LOG_FILE}"
 
 start_daemon ()
 {
