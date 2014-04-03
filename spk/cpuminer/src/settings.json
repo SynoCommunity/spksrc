@@ -1,6 +1,6 @@
 {
     "url": "@wizard_pool_url@",
-	"userpass": "@wizard_pool_username@:@wizard_pool_password@",
+    "userpass": "@wizard_pool_username@:@wizard_pool_password@",
     "retry-pause": "10",
     "algo": "@wizard_pool_algo@"
 }

@@ -7,7 +7,7 @@ DNAME="CPUMiner"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="cpuminer"
 GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/settings.json"
