@@ -6,7 +6,7 @@ DNAME="CPUMiner"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="nobody"
+USER="cpuminer"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
 PID_FILE="${INSTALL_DIR}/var/cpuminer.pid"
 DAEMON="${INSTALL_DIR}/bin/minerd"
