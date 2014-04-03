@@ -14,7 +14,7 @@ OPTIONS="-c ${INSTALL_DIR}/var/settings.json -t 1"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -N 10 -c ${USER} -u ${PACKAGE} -p ${PID_FILE} -x ${DAEMON} -- ${OPTIONS} 2> ${LOG_FILE}
+    start-stop-daemon -S -q -m -b -N 10 -c ${USER} -u ${PACKAGE} -p ${PID_FILE} -x ${DAEMON} -- ${OPTIONS} >> ${LOG_FILE} 2>&1 &
 }
 
 stop_daemon ()
