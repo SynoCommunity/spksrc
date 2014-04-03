@@ -1,6 +1,3 @@
-lib:lib/libjansson.a
-lb:ib/libjansson.la
 lnk:lib/libjansson.so
 lnk:lib/libjansson.so.4
 lib:lib/libjansson.so.4.5.0
-lib:lib/pkgconfig/jansson.pc

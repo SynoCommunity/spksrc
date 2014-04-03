@@ -23,4 +23,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: cpuMinerPreConfigure
 cpuMinerPreConfigure:
-	cd $(WORK_DIR)/$(PKG_DIR) && sh autogen.sh
+	cd $(WORK_DIR)/$(PKG_DIR) && $(RUN) autogen.sh
