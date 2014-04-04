@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 0.7.16
-SPK_REV = 7
+SPK_VERS = 0.7.17
+SPK_REV = 8
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -55,4 +55,4 @@ sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ configobj
+	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ configobj
