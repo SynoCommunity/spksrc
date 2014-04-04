@@ -38,9 +38,16 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
-    # Edit the configuration according to the wizard
-    sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
-
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Edit the configuration according to the wizard
+        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        # Set group and permissions on download dir for DSM5
+        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
+            chgrp users ${wizard_download_dir:=/volume1/downloads}
+            chmod g+rw ${wizard_download_dir:=/volume1/downloads}
+        fi
+    fi
+    
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 

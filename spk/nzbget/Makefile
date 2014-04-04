@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
 SPK_VERS = 12.0
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
 
@@ -13,6 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 6789
 DISPLAY_NAME = NZBGet
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE = http://nzbget.sourceforge.net/
 LICENSE  =
