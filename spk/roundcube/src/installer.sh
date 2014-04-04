@@ -100,6 +100,16 @@ preupgrade ()
     mv ${WEB_DIR}/${PACKAGE}/config/db.inc.php ${TMP_DIR}/${PACKAGE}/
     mv ${WEB_DIR}/${PACKAGE}/config/main.inc.php ${TMP_DIR}/${PACKAGE}/
 
+    # Save user installed plugins
+    mkdir -p ${TMP_DIR}/${PACKAGE}/plugins
+    for plugin in ${WEB_DIR}/${PACKAGE}/plugins/*/
+    do
+        dir=`basename $plugin`
+        if [ ! -d ${INSTALL_DIR}/share/${PACKAGE}/plugins/${dir} ]; then
+            cp -pR ${WEB_DIR}/${PACKAGE}/plugins/${dir} ${TMP_DIR}/${PACKAGE}/plugins/
+        fi
+    done
+
     exit 0
 }
 
@@ -108,6 +118,16 @@ postupgrade ()
     # Restore configuration files
     mv ${TMP_DIR}/${PACKAGE}/db.inc.php ${WEB_DIR}/${PACKAGE}/config/db.inc.php
     mv ${TMP_DIR}/${PACKAGE}/main.inc.php ${WEB_DIR}/${PACKAGE}/config/main.inc.php
+
+    # Restore user installed plugins
+    for plugin in ${TMP_DIR}/${PACKAGE}/plugins/*/
+    do
+        dir=`basename $plugin`
+        if [ ! -d ${WEB_DIR}/${PACKAGE}/plugins/${dir} ]; then
+            cp -pR ${TMP_DIR}/${PACKAGE}/plugins/${dir} ${WEB_DIR}/${PACKAGE}/plugins/
+        fi
+    done
+
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0
