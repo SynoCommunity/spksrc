@@ -61,6 +61,15 @@ postinst ()
         else
             sed -i -e "/@watch_dir@/d" ${INSTALL_DIR}/var/.rtorrent.rc
         fi
+        # Set group and permissions on download- and watch dir for DSM5
+        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
+            chgrp users ${wizard_download_dir:=/volume1/downloads}
+            chmod g+rw ${wizard_download_dir:=/volume1/downloads}
+            if [ -d "${wizard_watch_dir}" ]; then
+                chgrp users ${wizard_watch_dir}
+                chmod g+rw ${wizard_watch_dir}
+            fi
+        fi
     fi
 
     # Correct the files ownership

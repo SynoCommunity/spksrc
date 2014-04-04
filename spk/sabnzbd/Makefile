@@ -15,6 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
+CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://sabnzbd.org/
 LICENSE    = GPL

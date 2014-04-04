@@ -30,16 +30,27 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
-    # Edit the configuration according to the wizard
-    sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
-    sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
-    sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
-    if [ -d "${wizard_watch_dir}" ]; then
-        sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
-        sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
-    else
-        sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
-        sed -i -e "/@watch_dir@/d" ${CFG_FILE}
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Edit the configuration according to the wizard
+        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
+        sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
+        if [ -d "${wizard_watch_dir}" ]; then
+            sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
+        else
+            sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
+            sed -i -e "/@watch_dir@/d" ${CFG_FILE}
+        fi
+        # Set group and permissions on download- and watch dir for DSM5
+        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
+            chgrp users ${wizard_download_dir:=/volume1/downloads}
+            chmod g+rw ${wizard_download_dir:=/volume1/downloads}
+            if [ -d "${wizard_watch_dir}" ]; then
+                chgrp users ${wizard_watch_dir}
+                chmod g+rw ${wizard_watch_dir}
+            fi
+        fi
     fi
 
     # Correct the files ownership
