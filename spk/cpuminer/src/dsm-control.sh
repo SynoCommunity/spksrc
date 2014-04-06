@@ -3,19 +3,17 @@
 # Package
 PACKAGE="cpuminer"
 DNAME="CPUMiner"
-
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="cpuminer"
-CPUMINER="${INSTALL_DIR}/bin/minerd"
-CFG_FILE="${INSTALL_DIR}/var/settings.json"
+DAEMON="${INSTALL_DIR}/bin/cpuminer.sh"
 LOG_FILE="${INSTALL_DIR}/var/cpuminer.log"
 DAEMON_MINER="minerd"
 
 start_daemon ()
 {
-    su - ${USER} -c "${CPUMINER} -c ${CFG_FILE} -t 1 2> ${LOG_FILE}"
+    start-stop-daemon -S -q -m -b -N 10 -c ${USER} -u ${USER} -p ${PID_FILE} -x ${DAEMON} > /dev/null
 }
 
 stop_daemon ()

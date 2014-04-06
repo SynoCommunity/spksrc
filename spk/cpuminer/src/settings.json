@@ -2,6 +2,5 @@
     "url": "@wizard_pool_url@",
     "userpass": "@wizard_pool_username@:@wizard_pool_password@",
     "retry-pause": "10",
-    "background": true,
     "algo": "@wizard_pool_algo@"
 }

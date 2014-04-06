@@ -8,7 +8,6 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = TuXedMe
 DESCRIPTION = "Multi-threaded CPU miner for Litecoin and Bitcoin, fork of Jeff Garzik's reference cpuminer."
-ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = CPUMiner
 CHANGELOG = "1. First release"
@@ -35,6 +34,7 @@ include ../../mk/spksrc.spk.mk
 cpuminer_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/settings.json $(STAGING_DIR)/var/settings.json
+	install -m 755 src/cpuminer.sh $(STAGING_DIR)/bin/cpuminer.sh
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 ; \
