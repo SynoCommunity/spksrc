@@ -1,6 +1,6 @@
 SPK_NAME = gateone
 SPK_VERS = 1.1
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
@@ -14,6 +14,7 @@ ADMIN_PROTOCOL = https
 ADMIN_PORT = 8271
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
+CHANGELOG = "1. Fix termination of all sessions"
 
 HOMEPAGE   = http://liftoffsoftware.com/Products/GateOne
 LICENSE    = AGPLv3
@@ -46,7 +47,7 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ "tornado<3" configobj
+	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ "tornado<3" configobj
 
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share

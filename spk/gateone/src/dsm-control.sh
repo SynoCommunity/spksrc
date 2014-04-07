@@ -26,7 +26,7 @@ start_daemon ()
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${GATEONE} --kill --config=${CFG_FILE}"
     wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
 }
