@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-# Runs node.js against script, logging to a logfile. We have to do
-# this because there's no way to call node directly and have start-stop-daemon
-# redirect stdout to a logfile.
+# Script based on this gist :
+# https://gist.github.com/rbranson/638792
 #
 PACKAGE="cpuminer"
 INSTALL_DIR="/usr/local/${PACKAGE}"
