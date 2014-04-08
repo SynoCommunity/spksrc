@@ -23,6 +23,9 @@ include ../../mk/spksrc.cross-env.mk
 include ../../mk/spksrc.depend.mk
 
 copy: depend
+include ../../mk/spksrc.wheel.mk
+
+copy: wheel
 include ../../mk/spksrc.copy.mk
 
 strip: copy
