@@ -33,12 +33,14 @@ wheel_msg_target:
 pre_wheel_target: wheel_msg_target
 
 wheel_target: $(PRE_WHEEL_TARGET)
-	@if [ -n "$(WHEELS)" ] ; then \
+	@mkdir -p $(WHEEL_DIR)
+	mkdir -p $(WHEEL_DIR)/$(ARCH)
+	if [ -n "$(WHEELS)" ] ; then \
 		mkdir -p $(WORK_DIR)/wheelhouse ; \
 		mkdir -p $(WORK_DIR)/wheelbuild ; \
 		if [ -f "$(WHEELS)" ] ; then \
 			$(MSG) "Using existing requirements file" ; \
-			mv $(WHEELS) $(WORK_DIR)/wheelhouse ; \
+			cp $(WHEELS) $(WORK_DIR)/wheelhouse ; \
 		else \
 			$(MSG) "Creating requirements file" ; \
 			for wheel in $(WHEELS) ; \
@@ -47,12 +49,11 @@ wheel_target: $(PRE_WHEEL_TARGET)
 			done \
 		fi ; \
 	fi ; \
-		if [ -f "$(WORK_DIR)/wheelhouse/requirements.txt" ] ; then \
-			$(MSG) "Building and moving wheels to package wheelhouse" ; \
-			$(PIP) wheel --no-deps -b $(WORK_DIR)/wheelbuild -w $(WORK_DIR)/wheelhouse -f $(WHEEL_DIR)/$(ARCH)/ -r $(WORK_DIR)/wheelhouse/requirements.txt ; \
-		else  \
-			$(MSG) "No wheels to process" ; \
-		fi ; \
+	if [ -f "$(WORK_DIR)/wheelhouse/requirements.txt" ] ; then \
+		$(MSG) "Building and moving wheels to package wheelhouse" ; \
+		$(PIP) wheel --no-deps -b $(WORK_DIR)/wheelbuild -w $(WORK_DIR)/wheelhouse -f $(WHEEL_DIR)/$(ARCH)/ -r $(WORK_DIR)/wheelhouse/requirements.txt ; \
+	else  \
+		$(MSG) "No wheels to process" ; \
 	fi
 
 post_wheel_target: $(WHEEL_TARGET)
