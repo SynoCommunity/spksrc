@@ -1,0 +1,11 @@
+--- support/version.org	2014-04-08 14:12:15.000000000 +0200
++++ support/version	2014-04-08 14:12:26.000000000 +0200
+@@ -18,7 +18,7 @@
+ elif [ -f "$(dirname "$0")/../debian/changelog" ]; then
+   VER=$(head -1 "$(dirname "$0")/../debian/changelog" | awk '{ print $2 }' | tr -d '()' | cut -d '-' -f 1)
+ else
+-  VER="0.0.0~unknown"
++  VER="3.9.470"
+ fi
+ 
+ # Output
