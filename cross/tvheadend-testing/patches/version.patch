@@ -5,7 +5,7 @@
    VER=$(head -1 "$(dirname "$0")/../debian/changelog" | awk '{ print $2 }' | tr -d '()' | cut -d '-' -f 1)
  else
 -  VER="0.0.0~unknown"
-+  VER="3.9.470"
++  VER="!!!"
  fi
  
  # Output
