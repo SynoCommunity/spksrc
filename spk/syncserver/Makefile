@@ -9,7 +9,7 @@ WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>2.7.3-3:mercurial"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Python implementation of Firefox Sync Server 1.1. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. Set up Firefox Sync on your main computer by creating a new account on a custom server, then add your other computers. The service runs on port 8130.
+DESCRIPTION = Python implementation of Firefox Sync Server 1.1, used for Firefox 28 and earlier. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. Set up Firefox Sync on your main computer by creating a new account on a custom server, then add your other computers. The service runs on port 8130.
 DISPLAY_NAME = Firefox Sync Server
 BETA = 1
 
