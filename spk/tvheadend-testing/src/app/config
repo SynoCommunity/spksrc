@@ -1,0 +1,13 @@
+{
+    ".url": {
+        "com.synocommunity.packages.tvheadend-testing": {
+            "title": "Tvheadend",
+            "desc": "Tvheadend Web UI",
+            "icon": "images/tvheadend-testing-{0}.png",
+            "type": "url",
+            "url": "3rdparty/tvheadend-testing/tvheadend.cgi",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

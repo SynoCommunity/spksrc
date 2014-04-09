@@ -1,0 +1,10 @@
+--- src/muxer.c.org	2014-04-08 12:17:10.000000000 +0200
++++ src/muxer.c	2014-04-08 12:12:43.000000000 +0200
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include <string.h>
++#include <linux/fadvise.h>
+ #include <fcntl.h>
+ 
+ #include "tvheadend.h"
