@@ -1,6 +1,6 @@
 PKG_NAME = roundcube
 PKG_FILENAME = $(PKG_NAME)mail
-PKG_VERS = 0.9.5
+PKG_VERS = 1.0.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_FILENAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/roundcubemail/roundcubemail/$(PKG_VERS)

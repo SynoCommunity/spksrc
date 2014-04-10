@@ -1,5 +1,5 @@
 SPK_NAME = roundcube
-SPK_VERS = 0.9.5
+SPK_VERS = 1.0.0
 SPK_REV = 2
 SPK_ICON = src/roundcube.png
 DSM_UI_DIR = app
