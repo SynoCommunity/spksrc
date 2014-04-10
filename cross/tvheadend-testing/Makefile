@@ -1,8 +1,8 @@
 PKG_NAME = tvheadend-testing
-PKG_VERS = 3.9.508
+PKG_VERS = 3.9.470
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 19a2b875e8
+PKG_GIT_HASH = 6482d33ba9
 PKG_DIST_NAME = tvheadend.git
 PKG_DIST_SITE = https://github.com/tvheadend
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -23,6 +23,7 @@ CONFIGURE_ARGS = --disable-avahi --release
 INSTALL_TARGET = myInstall
 
 PRE_PATCH_TARGET = pre_patch_target_tvheadend-testing
+POST_COMPILE_TARGET = post_compile_target_tvheadend-testing
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -33,3 +34,5 @@ myInstall:
 pre_patch_target_tvheadend-testing:
 	sed -i -e 's|!!!|$(PKG_VERS)|' $(PWD)/patches/version.patch
 
+post_compile_target_tvheadend-testing:
+	sed -i -e 's|$(PKG_VERS)|!!!|' $(PWD)/patches/version.patch

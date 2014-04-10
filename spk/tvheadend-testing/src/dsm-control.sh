@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Package
-PACKAGE="tvheadend"
-DNAME="Tvheadend"
+PACKAGE="tvheadend-testing"
+DNAME="Tvheadend-testing"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="tvheadend"
+USER="tvheadend-testing"
 TVHEADEND="${INSTALL_DIR}/bin/tvheadend"
 PID_FILE="${INSTALL_DIR}/var/tvheadend.pid"
 
@@ -19,8 +19,9 @@ start_daemon ()
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20
+    killall -s 15 tvheadend
+    sleep 1
+    killall -s 9 tvheadend
     rm -f ${PID_FILE}
 }
 

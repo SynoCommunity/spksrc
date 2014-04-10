@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # Package
-PACKAGE="tvheadend"
-DNAME="Tvheadend"
+PACKAGE="tvheadend-testing"
+DNAME="Tvheadend-Testing"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="tvheadend"
+USER="tvheadend-testing"
 GROUP="users"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
