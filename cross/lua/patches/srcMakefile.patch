@@ -1,0 +1,10 @@
+--- src/Makefile.old	2014-04-09 18:59:04.602968710 +0200
++++ src/Makefile	2014-04-09 18:59:12.870968742 +0200
+@@ -6,7 +6,6 @@
+ # Your platform. See PLATS for possible values.
+ PLAT= none
+ 
+-CC= gcc
+ CFLAGS= -O2 -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS)
+ LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
+ LIBS= -lm $(SYSLIBS) $(MYLIBS)
