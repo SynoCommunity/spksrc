@@ -33,8 +33,8 @@ wheel_msg_target:
 pre_wheel_target: wheel_msg_target
 
 wheel_target: $(PRE_WHEEL_TARGET)
-	@mkdir -p $(WHEEL_DIR)
-	mkdir -p $(WHEEL_DIR)/$(ARCH)
+	@mkdir -p $(WHEEL_DIR) ; \
+	mkdir -p $(WHEEL_DIR)/$(ARCH) ; \
 	if [ -n "$(WHEELS)" ] ; then \
 		mkdir -p $(WORK_DIR)/wheelhouse ; \
 		mkdir -p $(WORK_DIR)/wheelbuild ; \
