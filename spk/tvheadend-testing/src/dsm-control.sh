@@ -19,9 +19,9 @@ start_daemon ()
 
 stop_daemon ()
 {
-    killall -s 15 tvheadend
-    sleep 1
-    killall -s 9 tvheadend
+    ps | grep "tvheadend" | awk '{print $1}' | xargs kill
+    sleep 2
+    ps | grep "tvheadend" | awk '{print $1}' | xargs kill -9
     rm -f ${PID_FILE}
 }
 
