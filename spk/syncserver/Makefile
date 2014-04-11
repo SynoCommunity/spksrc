@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>2.7.3-3:mercurial"
+SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python implementation of Firefox Sync Server 1.1, used for Firefox 28 and earlier. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. Set up Firefox Sync on your main computer by creating a new account on a custom server, then add your other computers. The service runs on port 8130.
@@ -33,8 +33,10 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: syncserver_extra_install
-syncserver_extra_install: $(STAGING_DIR)/share/syncserver
+syncserver_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
+	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/log
 	install -m 755 src/syncserver.conf $(STAGING_DIR)/var/
@@ -44,15 +46,8 @@ syncserver_extra_install: $(STAGING_DIR)/share/syncserver
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/syncserver:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && hg clone -r "549" http://hg.mozilla.org/services/server-full syncserver
-	cd $(STAGING_DIR)/share/syncserver && rm -rf .hg .hgignore .hgtags
-	install -m 755 -d $(STAGING_DIR)/share/syncserver/deps
-	cd $(STAGING_DIR)/share/syncserver/deps && hg clone -r "1069" http://hg.mozilla.org/services/server-core server-core
-	cd $(STAGING_DIR)/share/syncserver/deps/server-core && rm -rf .hg .hgignore .hgtags
-	cd $(STAGING_DIR)/share/syncserver/deps && hg clone -r "552" http://hg.mozilla.org/services/server-reg server-reg
-	cd $(STAGING_DIR)/share/syncserver/deps/server-reg && rm -rf .hg .hgignore .hgtags
-	cd $(STAGING_DIR)/share/syncserver/deps && hg clone -r "813" http://hg.mozilla.org/services/server-storage server-storage
-	cd $(STAGING_DIR)/share/syncserver/deps/server-storage && rm -rf .hg .hgignore .hgtags
+	sed -i -e "s|hg+http://hg.mozilla.org/services/server-core@1069|Services == 2.15|g" \
+	       -e "s|hg+http://hg.mozilla.org/services/server-reg@552|SyncReg == 1.2|g" \
+	       -e "s|hg+http://hg.mozilla.org/services/server-storage@813|SyncStorage == 1.17|g" \
+	       -e "s|hg+http://hg.mozilla.org/services/server-full@549|SyncServer == 1.0|g" \
+                $(STAGING_DIR)/share/wheelhouse/requirements.txt

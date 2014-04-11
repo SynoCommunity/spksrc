@@ -15,7 +15,10 @@ WSGIProxy == 0.2.2
 recaptcha-client == 1.0.6
 repoze.lru == 0.5
 zope.deprecation == 3.5.1
-zope.interface == 3.8
 metlog-py == 0.9.8
 metlog-cef == 0.2
 scrypt == 0.6.1
+hg+http://hg.mozilla.org/services/server-core@1069
+hg+http://hg.mozilla.org/services/server-reg@552
+hg+http://hg.mozilla.org/services/server-storage@813
+hg+http://hg.mozilla.org/services/server-full@549

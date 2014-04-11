@@ -9,7 +9,6 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
-HG="${PYTHON_DIR}/bin/hg"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 WIZARD="/var/packages/${PACKAGE}/WIZARD_UIFILES"
 
@@ -93,16 +92,8 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env >> /dev/null
 
-    # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install --no-index -U --no-deps --force-reinstall ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
-
-    # Build Sync dependencies
-    cd ${INSTALL_DIR}/share/syncserver/deps/server-storage && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
-    cd ${INSTALL_DIR}/share/syncserver/deps/server-reg && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
-    cd ${INSTALL_DIR}/share/syncserver/deps/server-core && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
-
-    # Build Sync
-    cd ${INSTALL_DIR}/share/syncserver && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
+    # Install the wheels
+    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -I -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null
 
     # Add port-forwarding config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
