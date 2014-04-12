@@ -21,6 +21,8 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myPreConfigure
 myPreConfigure:
 	cd $(WORK_DIR)/$(PKG_DIR)/src/libs/zbxsysinfo/;ln -s linux $(ARCH)
+	sed -i '/$as_echo_n "checking for long long format... " >&6; }/{n; s/yes/maybe/}' $(WORK_DIR)/$(PKG_DIR)/configure
+	sed -i '/CFLAGS="-m64"/{n; s/yes/maybe/}' $(WORK_DIR)/$(PKG_DIR)/configure
 
 
 .PHONY: myPostInstall
