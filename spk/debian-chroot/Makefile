@@ -1,5 +1,5 @@
 SPK_NAME = debian-chroot
-SPK_VERS = 7.3
+SPK_VERS = 7.4
 SPK_REV = 4
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
@@ -30,10 +30,10 @@ DEBIAN_ARCH =
 ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),armadaxp),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),bromolow cedarview x86),$(ARCH))
+ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86),$(ARCH))
 DEBIAN_ARCH = i386
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
