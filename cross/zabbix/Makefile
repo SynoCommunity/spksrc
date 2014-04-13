@@ -5,7 +5,7 @@ PKG_DIST_NAME = zabbix-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/$(PKG_VERS)
 PKG_DIR = zabbix-$(PKG_VERS)
 
-DEPENDS = cross/net-snmp cross/mysql cross/mysqlODBC cross/libssh2 cross/curl cross/libxml2 cross/openipmi cross/iksemel
+DEPENDS = cross/zlib cross/net-snmp cross/mysql5 cross/mysqlODBC5 cross/libssh2 cross/curl cross/libxml2 cross/openipmi cross/iksemel
 
 HOMEPAGE = http://www.zabbix.com/
 COMMENT  = The Enterprise-class Monitoring Solution for Everyone

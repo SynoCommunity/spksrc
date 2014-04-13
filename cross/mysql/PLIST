@@ -1,6 +1,0 @@
-lnk:lib/mysql/libmysqlclient_r.so
-lnk:lib/mysql/libmysqlclient_r.so.16
-lib:lib/mysql/libmysqlclient_r.so.16.0.0
-lnk:lib/mysql/libmysqlclient.so
-lnk:lib/mysql/libmysqlclient.so.16
-lib:lib/mysql/libmysqlclient.so.16.0.0

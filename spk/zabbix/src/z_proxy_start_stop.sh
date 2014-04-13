@@ -19,7 +19,7 @@ PROXY_FILE="${INSTALL_DIR}/var/proxy.enabled"
 start_daemon ()
 {
     echo -e "" > ${PROXY_FILE}
-    su - ${USER} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${INSTALL_DIR}/lib/mysql ${ZABBIX_PROXY}"
+    su - ${USER} -c "${ZABBIX_PROXY}"
 }
 
 stop_daemon ()

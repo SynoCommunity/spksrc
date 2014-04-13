@@ -1,0 +1,6 @@
+lnk:lib/libmysqlclient_r.so
+lnk:lib/libmysqlclient_r.so.18
+lib:lib/libmysqlclient_r.so.18.1.0
+lnk:lib/libmysqlclient.so
+lnk:lib/libmysqlclient.so.18
+lib:lib/libmysqlclient.so.18.1.0

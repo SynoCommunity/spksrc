@@ -13,13 +13,13 @@ USER="${PACKAGE}agent"
 ZABBIX_AGENTD="${INSTALL_DIR}/sbin/zabbix_agentd"
 AGENTD_PID_FILE="${INSTALL_DIR}/var/zabbix_agentd.pid"
 LOG_FILE="${INSTALL_DIR}/var/zabbix_agentd.log"
-AGENT_FILE="${INSTALL_DIR}/var//agent.enabled"
+AGENT_FILE="${INSTALL_DIR}/var/agent.enabled"
 
 
 start_daemon ()
 {
     echo -e "" > ${AGENT_FILE}
-    su - ${USER} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${INSTALL_DIR}/lib/mysql ${ZABBIX_AGENTD}"
+    su - ${USER} -c "${ZABBIX_AGENTD}"
 }
 
 stop_daemon ()

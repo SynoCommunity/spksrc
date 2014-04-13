@@ -103,7 +103,8 @@ postinst ()
     if [ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ]; then
         sed -i -e "s|#DBSocket=/tmp/mysql.sock|DBSocket=/run/mysqld/mysqld.sock|g" ${CFG_FILE}
         sed -i -e "s|#DBSocket=/tmp/mysql.sock|DBSocket=/run/mysqld/mysqld.sock|g" ${PROXY_CFG_FILE}
-        echo "SOCKET          = /run/mysqld/mysqld.sock" >> ${INSTALL_DIR}/etc/odbc.ini
+        sed -i '14i\SOCKET          = /run/mysqld/mysqld.sock' ${INSTALL_DIR}/etc/odbc.ini
+        sed -i '27i\SOCKET          = /run/mysqld/mysqld.sock' ${INSTALL_DIR}/etc/odbc.ini
     fi
 
     # Fix permissions

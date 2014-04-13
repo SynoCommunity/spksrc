@@ -19,7 +19,7 @@ SERVER_FILE="${INSTALL_DIR}/var/server.enabled"
 start_daemon ()
 {
     echo -e "" > ${SERVER_FILE}
-    su - ${USER} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${INSTALL_DIR}/lib/mysql ${ZABBIX_SERVER}"
+    su - ${USER} -c "${ZABBIX_SERVER}"
 }
 
 stop_daemon ()
