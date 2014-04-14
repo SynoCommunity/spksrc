@@ -1,6 +1,6 @@
 SPK_NAME = plexconnect
 SPK_VERS = 0.3
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
@@ -54,6 +54,6 @@ plexconnect_extra_install: $(STAGING_DIR)/share/PlexConnect
 $(STAGING_DIR)/share/PlexConnect:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone --single-branch -b master https://github.com/iBaa/PlexConnect.git
-	cd $(STAGING_DIR)/share/PlexConnect && git checkout 36347b603910090c42a4924a948fe2376389c249
+	cd $(STAGING_DIR)/share/PlexConnect && git checkout 9477eca24ab830c7fb18db24a71e2b0767b938c6
 	#cd $(STAGING_DIR)/share/PlexConnect && git am < $(STAGING_DIR)/../../src/share/PlexConnect/patch.diff
 	rm -fr $(STAGING_DIR)/share/PlexConnect/.git $(STAGING_DIR)/share/PlexConnect/.gitignore
