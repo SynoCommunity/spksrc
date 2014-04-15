@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
 SPK_VERS = 1.12
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "1. Fix dependencies"
 
 HOMEPAGE   = http://tt-rss.org/
 LICENSE    = GPL
@@ -21,6 +21,9 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+
+INSTALL_DEP_SERVICES = apache-web mysql
+START_DEP_SERVICES = apache-web mysql
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
