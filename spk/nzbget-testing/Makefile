@@ -1,5 +1,5 @@
 SPK_NAME = nzbget-testing
-SPK_VERS = 13.0~r963
+SPK_VERS = 13.0~r979
 SPK_REV = 4
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
