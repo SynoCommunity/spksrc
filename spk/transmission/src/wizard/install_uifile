@@ -5,7 +5,8 @@
         "desc": "Download directory. Defaults to /volume1/downloads",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Download directory"
+            "desc": "Download directory",
+            "defaultValue": "/volume1/downloads"
         }]
     }, {
         "type": "textfield",
@@ -13,6 +14,13 @@
         "subitems": [{
             "key": "wizard_watch_dir",
             "desc": "Watch directory"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Directory to keep files in until torrent is complete. Leave empty to disable",
+        "subitems": [{
+            "key": "wizard_incomplete_dir",
+            "desc": "Incomplete directory"
         }]
     }]
 }, {
