@@ -3,13 +3,14 @@
 # Package
 PACKAGE="cops"
 DNAME="COPS"
+PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 DEFAULT_CFG_FILE="/usr/local/${PACKAGE}/config_local.php.synology"
 WEB_DIR="/var/services/web"
 CFG_FILE="${WEB_DIR}/${PACKAGE}/config_local.php"
-
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 
 preinst ()
 {
@@ -22,7 +23,14 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Install the web interface
-    cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+
+    # Configure open_basedir
+    if [ "${USER}" == "nobody" ]; then
+        echo -e "<Directory \"${WEB_DIR}/${PACKAGE}\">\nphp_admin_value open_basedir ${WEB_DIR}/${PACKAGE}:${wizard_calibre_dir:=/volume1/calibre/} \n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    else
+        echo -e "[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = ${WEB_DIR}/${PACKAGE}:${wizard_calibre_dir:=/volume1/calibre/}" > /etc/php/conf.d/${PACKAGE_NAME}.ini
+    fi
 
     # Create a default configuration file
     if [ ! -f ${CFG_FILE} ]; then
@@ -33,6 +41,12 @@ postinst ()
       sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
       chmod ga+w ${CFG_FILE}
     fi
+
+    # Set permissions
+    chown ${USER}:root ${wizard_calibre_dir:=/volume1/calibre/}
+    chmod u+rw ${wizard_calibre_dir:=/volume1/calibre/}
+    chown ${USER}:root ${wizard_calibre_dir:=/volume1/calibre/}/metadata.db
+    chmod u+rw ${wizard_calibre_dir:=/volume1/calibre/}/metadata.db
 
     exit 0
 }
@@ -46,6 +60,10 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+
+    # Remove open_basedir configuration
+    rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
+    rm -f /etc/php/conf.d/${PACKAGE_NAME}.ini
 
     # Remove the web interface
     rm -fr ${WEB_DIR}/${PACKAGE}
