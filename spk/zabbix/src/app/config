@@ -8,7 +8,6 @@
             "width": 900,
             "height": 700,
             "url": "3rdparty/zabbix/index.cgi",
-            "grantPrivilege": "local",
             "allowMultiInstance": false,
             "allUsers": "false"
         },

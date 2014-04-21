@@ -68,7 +68,6 @@ zabbix_extra_install:
 	
 	install -m 644 src/app/config $(STAGING_DIR)/app/
 	install -m 755 src/app/*.cgi $(STAGING_DIR)/app/
-	install -m 644 src/app/*.pl $(STAGING_DIR)/app/
 	install -m 755 src/app/scripts/*.cgi $(STAGING_DIR)/app/scripts/
 	install -m 644 src/app/*.css $(STAGING_DIR)/app/
 	install -m 644 src/app/gui_images/* $(STAGING_DIR)/app/gui_images/
