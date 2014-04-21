@@ -5,7 +5,8 @@
         "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Répertoire de téléchargement"
+            "desc": "Répertoire de téléchargement",
+            "defaultValue": "/volume1/downloads"
         }]
     }]
 }]
