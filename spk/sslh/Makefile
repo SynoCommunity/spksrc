@@ -37,7 +37,7 @@ xz-compress:
 	install -m 644 src/www/*.js $(STAGING_DIR)/www/
 	install -m 644 src/www/config $(STAGING_DIR)/www/
 	install -m 755 -d $(STAGING_DIR)/www/images
-	for size in 16 24 32 48 ; \
+	for size in 16 24 32 48 72 ; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
 	            $(STAGING_DIR)/www/images/icon$${size}.png ; \
