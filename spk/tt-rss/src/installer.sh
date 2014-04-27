@@ -13,6 +13,7 @@ MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+TESTLOG="${INSTALL_DIR}/var/test.log"
 
 
 preinst ()
@@ -24,12 +25,13 @@ preinst ()
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
-            echo "MySQL user ${MYSQL_USER} already exists"
-            exit 1
+            # We can remove this check altogether...we override it anyway
+            SQLUSR="1"
+            exit 0
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
-            echo "MySQL database ${MYSQL_DATABASE} already exists"
-            exit 1
+            SQLDB="1"
+            exit 0
         fi
     fi
 
@@ -49,8 +51,16 @@ postinst ()
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
-        ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
+        if [ -z "${SQLUSR}" -a -z "${SQLDB}" ]; then
+            echo "reusedb" >> ${TESTLOG}
+            # Reuse database
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
+        else
+            echo "noreusedb" >> ${TESTLOG}   
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
+            ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
+        fi
+        echo "complete" >> ${TESTLOG}
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
         sed -e "s|define('DB_TYPE', \".*\");|define('DB_TYPE', 'mysql');|" \
             -e "s|define('DB_USER', \".*\");|define('DB_USER', '${MYSQL_USER}');|" \
