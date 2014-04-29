@@ -14,7 +14,7 @@ PYTHON="${PYTHON_DIR}/bin/python"
 APACHE_DIR="/etc/httpd"
 HTTPD_CONF_USER="${APACHE_DIR}/conf/httpd.conf-user"
 VHOST_FILE="${APACHE_DIR}/conf/extra/plexconnect-vhosts.conf"
-INSTALLER_LOG="/../../@tmp/installer.log"
+INSTALLER_LOG="/tmp/installer.log"
 ## not in use yet
 #HTTPD_SSL_CONF_USER="${APACHE_DIR}/conf/extra/httpd-ssl.conf-sys"
 #VHOST_SSL_FILE="${APACHE_DIR}/conf/extra/plexconnect-ssl-vhosts.conf"
@@ -125,8 +125,8 @@ preupgrade ()
   mkdir -p ${TMP_DIR}/${PACKAGE}
 
   # Save post upgrade configuration files
-  installer_log "backup configuration"
-  cp ${INSTALL_DIR}/share/PlexConnect/*.cfg ${TMP_DIR}/${PACKAGE}/
+  installer_log "backup old files"
+  cp -r ${INSTALL_DIR}/share/PlexConnect ${TMP_DIR}/${PACKAGE}/
 
   #remember old ip address
   if [ ! -f ${INSTALL_DIR}/share/PlexConnect/ip.cfg ]; then
@@ -149,8 +149,15 @@ postupgrade ()
   installer_log "-- postupgrade ${TMP_DIR}/${PACKAGE}"
   # Restore some stuff
 
-  installer_log "restore configuration"
-  mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
+  if [ -d ${TMP_DIR}/${PACKAGE}/PlexConnect/.git ]; then
+    installer_log "full restore and git pull to update"
+    rm -r ${INSTALL_DIR}/share/PlexConnect
+    mv -f ${TMP_DIR}/${PACKAGE}/PlexConnect ${INSTALL_DIR}/share/
+    git --git-dir=${INSTALL_DIR}/share/PlexConnect/.git pull || true
+  else
+    installer_log "restore only configuration"
+    mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
+  fi
 
   # restore certificates
   if [ -f ${TMP_DIR}/${PACKAGE}/certificates/trailers.cer ]; then
