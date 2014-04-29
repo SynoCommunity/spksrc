@@ -131,7 +131,7 @@ preupgrade ()
   #remember old ip address
   if [ ! -f ${INSTALL_DIR}/share/PlexConnect/ip.cfg ]; then
     installer_log "backup Old IP"
-    cat ${VHOST_FILE} | grep "ProxyPassReverse"  | awk -F:// '{print $2}' |  awk -F: '{print $1}' > ${TMP_DIR}/${PACKAGE}/ip.cfg
+    cat ${VHOST_FILE} | grep "ProxyPassReverse"  | awk -F:// '{print $2}' |  awk -F: '{print $1}' > ${TMP_DIR}/${PACKAGE}/PlexConnect/ip.cfg
   fi
 
   # backup certificates
@@ -149,6 +149,15 @@ postupgrade ()
   installer_log "-- postupgrade ${TMP_DIR}/${PACKAGE}"
   # Restore some stuff
 
+  # restore ip address
+  if [ -f ${TMP_DIR}/${PACKAGE}/PlexConnect/ip.cfg ]; then
+    MYIP=`cat ${TMP_DIR}/${PACKAGE}/PlexConnect/ip.cfg`
+    if [ "${MYIP}" != "" ]; then
+      installer_log "restoring IP ${MYIP}"
+      sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
+    fi
+  fi
+
   if [ -d ${TMP_DIR}/${PACKAGE}/PlexConnect/.git ]; then
     installer_log "full restore and git pull to update"
     rm -r ${INSTALL_DIR}/share/PlexConnect
@@ -156,22 +165,13 @@ postupgrade ()
     git --git-dir=${INSTALL_DIR}/share/PlexConnect/.git pull || true
   else
     installer_log "restore only configuration"
-    mv -f ${TMP_DIR}/${PACKAGE}/*.cfg ${INSTALL_DIR}/share/PlexConnect/
+    mv -f ${TMP_DIR}/${PACKAGE}/PlexConnect/*.cfg ${INSTALL_DIR}/share/PlexConnect/
   fi
 
   # restore certificates
   if [ -f ${TMP_DIR}/${PACKAGE}/certificates/trailers.cer ]; then
     installer_log "restore certificates"
     mv -f ${TMP_DIR}/${PACKAGE}/certificates/* ${INSTALL_DIR}/etc/certificates/
-  fi
-
-  # restore ip address
-  if [ -f ${TMP_DIR}/${PACKAGE}/ip.cfg ]; then
-    MYIP=`cat ${TMP_DIR}/${PACKAGE}/ip.cfg`
-    if [ "${MYIP}" != "" ]; then
-      installer_log "restoring IP ${MYIP}"
-      sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
-    fi
   fi
 
   rm -fr ${TMP_DIR}/${PACKAGE}
