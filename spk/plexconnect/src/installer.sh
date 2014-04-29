@@ -128,16 +128,18 @@ preupgrade ()
   installer_log "backup configuration"
   cp ${INSTALL_DIR}/share/PlexConnect/*.cfg ${TMP_DIR}/${PACKAGE}/
 
+  #remember old ip address
+  if [ ! -f ${INSTALL_DIR}/share/PlexConnect/ip.cfg ]; then
+    installer_log "backup Old IP"
+    cat ${VHOST_FILE} | grep "ProxyPassReverse"  | awk -F:// '{print $2}' |  awk -F: '{print $1}' > ${TMP_DIR}/${PACKAGE}/ip.cfg
+  fi
+
   # backup certificates
   if [ -f ${INSTALL_DIR}/etc/certificates/trailers.cer ]; then
     installer_log "backup certificates"
     mkdir -p ${TMP_DIR}/${PACKAGE}/certificates
     cp ${INSTALL_DIR}/etc/certificates/* ${TMP_DIR}/${PACKAGE}/certificates
   fi
-
-  #remember ip address
-  installer_log "backup IP"
-  cat ${VHOST_FILE} | grep "ProxyPassReverse"  | awk -F:// '{print $2}' |  awk -F: '{print $1}' > ${TMP_DIR}/${PACKAGE}/ip
 
   exit 0
 }
@@ -157,10 +159,12 @@ postupgrade ()
   fi
 
   # restore ip address
-  MYIP=`cat ${TMP_DIR}/${PACKAGE}/ip`
-  if [ "${MYIP}" != "" ]; then
-    installer_log "restoring IP ${MYIP}"
-    sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
+  if [ -f ${TMP_DIR}/${PACKAGE}/ip.cfg ]; then
+    MYIP=`cat ${TMP_DIR}/${PACKAGE}/ip.cfg`
+    if [ "${MYIP}" != "" ]; then
+      installer_log "restoring IP ${MYIP}"
+      sed -i -e "s|127.0.0.1|$MYIP|g" ${VHOST_FILE}
+    fi
   fi
 
   rm -fr ${TMP_DIR}/${PACKAGE}
