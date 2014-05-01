@@ -14,4 +14,11 @@ TC_CPPFLAGS =
 TC_CXXFLAGS =
 TC_LDFLAGS =
 
+FIX_TARGET = myFix
+
 include ../../mk/spksrc.tc.mk
+
+.PHONY: myFix
+myFix:
+	chmod -R u+w $(WORK_DIR)
+	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/lib'|" {} \;
