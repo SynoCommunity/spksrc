@@ -1,13 +1,14 @@
 SPK_NAME = plexconnect
 SPK_VERS = 0.3
-SPK_REV = 10
+SPK_REV = 11-beta
+BETA=1
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = bwynants
 DESCRIPTION = PlexConnect: Plex @ aTV - think different. Package to show Plex content on your unhacked AppleTV 2 or 3.
 RELOAD_UI = yes
 DISPLAY_NAME = PlexConnect
