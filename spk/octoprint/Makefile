@@ -47,5 +47,4 @@ octoprint_extra_install: $(STAGING_DIR)/share/OctoPrint
 
 $(STAGING_DIR)/share/OctoPrint:
 	install -m 755 -d $(STAGING_DIR)/share
-	# cd $(STAGING_DIR)/share && git clone https://github.com/foosel/OctoPrint.git OctoPrint
-	cd $(STAGING_DIR)/share && cp -r ~/OctoPrint OctoPrint
+	cd $(STAGING_DIR)/share && git clone https://github.com/foosel/OctoPrint.git OctoPrint
