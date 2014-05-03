@@ -1,0 +1,13 @@
+--- client/Makefile.old	2014-03-25 00:52:40.000000000 +0100
++++ client/Makefile	2014-04-25 21:41:00.457159389 +0200
+@@ -21,8 +21,8 @@
+ 
+ install : all
+ 	$(INSTALL) -d ${DESTDIR}$(prefix)/bin
+-	$(INSTALL) -s mosquitto_pub ${DESTDIR}${prefix}/bin/mosquitto_pub
+-	$(INSTALL) -s mosquitto_sub ${DESTDIR}${prefix}/bin/mosquitto_sub
++	$(INSTALL) -s --strip-program=$(STRIP) mosquitto_pub ${DESTDIR}${prefix}/bin/mosquitto_pub
++	$(INSTALL) -s --strip-program=$(STRIP) mosquitto_sub ${DESTDIR}${prefix}/bin/mosquitto_sub
+ 
+ uninstall :
+ 	-rm -f ${DESTDIR}${prefix}/bin/mosquitto_pub

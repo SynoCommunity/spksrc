@@ -1,0 +1,15 @@
+--- src/Makefile.old	2014-03-25 00:52:40.000000000 +0100
++++ src/Makefile	2014-04-25 21:46:52.225149536 +0200
+@@ -100,10 +100,10 @@
+ 
+ install : all
+ 	$(INSTALL) -d ${DESTDIR}$(prefix)/sbin
+-	$(INSTALL) -s mosquitto ${DESTDIR}${prefix}/sbin/mosquitto
++	$(INSTALL) -s --strip-program=$(STRIP) mosquitto ${DESTDIR}${prefix}/sbin/mosquitto
+ 	$(INSTALL) mosquitto_plugin.h ${DESTDIR}${prefix}/include/mosquitto_plugin.h
+ ifeq ($(WITH_TLS),yes)
+-	$(INSTALL) -s mosquitto_passwd ${DESTDIR}${prefix}/bin/mosquitto_passwd
++	$(INSTALL) -s --strip-program=$(STRIP) mosquitto_passwd ${DESTDIR}${prefix}/bin/mosquitto_passwd
+ endif
+ 
+ uninstall :

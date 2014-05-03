@@ -12,6 +12,15 @@ COMMENT  = Mosquitto is an open source (BSD licensed) message broker that implem
 LICENSE  = BSD
 
 CONFIGURE_TARGET = nop
+COMPILE_TARGET = myCompile
+#INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: myCompile
+myCompile:
+	$(RUN) $(MAKE) WITH_PYTHON=no
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) $(MAKE) install

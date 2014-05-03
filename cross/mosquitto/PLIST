@@ -1,2 +1,4 @@
-bin:bin/mosquitto
+sbin:sbin/mosquitto
 bin:bin/mosquitto_passwd
+bin:bin/mosquitto_pub
+bin:bin/mosquitto_sub
