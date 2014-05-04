@@ -101,6 +101,9 @@ endif
 ifneq ($(strip $(SPK_ICON)),)
 	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 - | base64 -w0 -`\" >> $@
 endif
+ifneq ($(strip $(SPK_ICON_120)),)
+	@echo package_icon_120=\"`convert $(SPK_ICON_120) -thumbnail 120x120 - | base64 -w0 -`\" >> $@
+endif
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
