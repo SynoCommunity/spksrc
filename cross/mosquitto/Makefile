@@ -8,19 +8,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/c-ares cross/openssl
 
 HOMEPAGE = http://www.mosquitto.org/
-COMMENT  = Mosquitto is an open source (BSD licensed) message broker that implements the MQ Telemetry Transport protocol version 3.1. MQTT provides a lightweight method of carrying out messaging using a publish/subscribe model. This makes it suitable for "machine to machine" messaging such as with low power sensors or mobile devices such as phones, embedded computers or microcontrollers like the Arduino.
-LICENSE  = BSD
+COMMENT  = Mosquitto is an open source message broker that implements the MQ Telemetry Transport protocol version 3.1.1.
+LICENSE  = BSD licensed
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
-#INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile:
 	$(RUN) $(MAKE) WITH_PYTHON=no
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install
