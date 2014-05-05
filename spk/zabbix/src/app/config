@@ -5,7 +5,7 @@
             "desc": "Zabbix Controls",
             "icon": "images/zabbix-{0}.png",
             "type": "legacy",
-            "width": 900,
+            "width": 1024,
             "height": 700,
             "url": "3rdparty/zabbix/index.cgi",
             "allowMultiInstance": false,

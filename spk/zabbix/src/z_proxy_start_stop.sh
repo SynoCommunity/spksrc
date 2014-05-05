@@ -14,11 +14,13 @@ ZABBIX_PROXY="${INSTALL_DIR}/sbin/zabbix_proxy"
 PROXY_PID_FILE="${INSTALL_DIR}/var/zabbix_proxy.pid"
 LOG_FILE="${INSTALL_DIR}/var/zabbix_proxy.log"
 PROXY_FILE="${INSTALL_DIR}/var/proxy.enabled"
+PROXY_FILE_GUI="${INSTALL_DIR}/app/enable/proxy.enabled"
 
 
 start_daemon ()
 {
     echo -e "" > ${PROXY_FILE}
+    echo -e "" > ${PROXY_FILE_GUI}
     su - ${USER} -c "${ZABBIX_PROXY}"
 }
 
@@ -28,6 +30,7 @@ stop_daemon ()
     wait_for_status 1 20 || kill -9 `cat ${PROXY_PID_FILE}`
     rm -f ${PROXY_PID_FILE}
     rm -f ${PROXY_FILE}
+    rm -f ${PROXY_FILE_GUI}
 }
 
 daemon_status ()
@@ -72,6 +75,12 @@ case $1 in
             echo ${DNAME} is not running
             exit 0
         fi
+        ;;
+    restart)
+            echo Restarting ${DNAME} ...
+            stop_daemon
+            start_daemon
+            exit $?
         ;;
     status)
         exit 0

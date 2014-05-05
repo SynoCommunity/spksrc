@@ -14,11 +14,13 @@ ZABBIX_AGENTD="${INSTALL_DIR}/sbin/zabbix_agentd"
 AGENTD_PID_FILE="${INSTALL_DIR}/var/zabbix_agentd.pid"
 LOG_FILE="${INSTALL_DIR}/var/zabbix_agentd.log"
 AGENT_FILE="${INSTALL_DIR}/var/agent.enabled"
+AGENT_FILE_GUI="${INSTALL_DIR}/app/enable/agent.enabled"
 
 
 start_daemon ()
 {
     echo -e "" > ${AGENT_FILE}
+    echo -e "" > ${AGENT_FILE_GUI}
     su - ${USER} -c "${ZABBIX_AGENTD}"
 }
 
@@ -28,6 +30,7 @@ stop_daemon ()
     wait_for_status 1 20 || kill -9 `cat ${AGENTD_PID_FILE}`
     rm -f ${AGENTD_PID_FILE}
     rm -f ${AGENT_FILE}
+    rm -f ${AGENT_FILE_GUI}
 }
 
 daemon_status ()
@@ -72,6 +75,12 @@ case $1 in
             echo ${DNAME} is not running
             exit 0
         fi
+        ;;
+    restart)
+            echo Restarting ${DNAME} ...
+            stop_daemon
+            start_daemon
+            exit $?
         ;;
     status)
         exit 0

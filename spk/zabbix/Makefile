@@ -54,6 +54,7 @@ zabbix_extra_install:
 	install -m 755 -d $(STAGING_DIR)/etc/zabbix_server.conf.d
 	install -m 755 -d $(STAGING_DIR)/app/gui_images
 	install -m 755 -d $(STAGING_DIR)/app/scripts
+	install -m 755 -d $(STAGING_DIR)/app/enable
        
 	install -m 644 src/zabbix.conf.php $(STAGING_DIR)/share/zabbix/conf/zabbix.conf.php
 	install -m 644 src/zabbix_server.conf $(STAGING_DIR)/etc/zabbix_server.conf
@@ -67,13 +68,15 @@ zabbix_extra_install:
 	install -m 755 src/z_agent_start_stop.sh $(STAGING_DIR)/sbin/
 	
 	install -m 644 src/app/config $(STAGING_DIR)/app/
+	install -m 644 src/app/*.js $(STAGING_DIR)/app/
+	install -m 644 src/app/*.html $(STAGING_DIR)/app/
 	install -m 755 src/app/*.cgi $(STAGING_DIR)/app/
 	install -m 755 src/app/scripts/*.cgi $(STAGING_DIR)/app/scripts/
-	install -m 644 src/app/*.css $(STAGING_DIR)/app/
+	install -m 644 src/app/scripts/*.txt $(STAGING_DIR)/app/scripts/
 	install -m 644 src/app/gui_images/* $(STAGING_DIR)/app/gui_images/
 
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 ; \
+	for size in 16 24 32 48 72; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \

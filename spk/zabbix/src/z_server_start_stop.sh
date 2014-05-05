@@ -14,11 +14,13 @@ ZABBIX_SERVER="${INSTALL_DIR}/sbin/zabbix_server"
 SERVER_PID_FILE="${INSTALL_DIR}/var/zabbix_server.pid"
 LOG_FILE="${INSTALL_DIR}/var/zabbix_server.log"
 SERVER_FILE="${INSTALL_DIR}/var/server.enabled"
+SERVER_FILE_GUI="${INSTALL_DIR}/app/enable/server.enabled"
 
 
 start_daemon ()
 {
     echo -e "" > ${SERVER_FILE}
+    echo -e "" > ${SERVER_FILE_GUI}
     su - ${USER} -c "${ZABBIX_SERVER}"
 }
 
@@ -28,6 +30,7 @@ stop_daemon ()
     wait_for_status 1 20 || kill -9 `cat ${SERVER_PID_FILE}`
     rm -f ${SERVER_PID_FILE}
     rm -f ${SERVER_FILE}
+    rm -f ${SERVER_FILE_GUI}
 }
 
 daemon_status ()
@@ -72,6 +75,12 @@ case $1 in
             echo ${DNAME} is not running
             exit 0
         fi
+        ;;
+    restart)
+            echo Restarting ${DNAME} ...
+            stop_daemon
+            start_daemon
+            exit $?
         ;;
     status)
         exit 0
