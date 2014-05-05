@@ -1,0 +1,28 @@
+[{
+    "step_title": "Instellingen PlexConnect",
+    "items": [{
+        "type": "textfield",
+        "desc": "Het IP adres van deze Synology NAS.",
+        "subitems": [{
+            "desc": "IP adres van deze NAS",
+            "key": "wizard_ip",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 7,
+                "maxLength": 15
+                }
+        }]
+    },{
+        "type": "textfield",
+        "desc": "Gateway of ISP DNS server (van ATV voordat je het veranderde)",
+        "subitems": [{
+            "desc": "IP adres van DNS",
+            "key": "wizard_dns_server",
+            "validator": {
+                "allowBlank": true,
+                "minLength": 7,
+                "maxLength": 15
+                }
+        }]
+    }]
+}]
