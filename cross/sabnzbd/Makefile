@@ -7,16 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-<<<<<<< HEAD
 HOMEPAGE = http://sabnzbd.org/
 COMMENT  = Usenet binary downloader
 LICENSE  = GPL
-=======
-MAINTAINER = superzebulon@superzebulon.org
-HOMEPAGE   = http://sabnzbd.org/
-COMMENT    = "Usenet binary downloader"
-LICENSE    = GPL
->>>>>>> 248a6fd384586733455953aae7a07f51c8b1e03a
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
