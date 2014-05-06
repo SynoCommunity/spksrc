@@ -26,7 +26,7 @@ stop_daemon ()
 
 daemon_status ()
 {
-    ps | grep nzbdrone | grep -v grep | awk "{ print \$1 }" > ${PID_FILE}
+    ps -ww | grep [N]zbDrone.exe | awk "{ print \$1 }" > ${PID_FILE}
     sleep 1
     start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
