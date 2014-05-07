@@ -102,6 +102,7 @@ postuninst ()
     # Remove open_basedir configuration
     rm -f /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
     rm -f /etc/php/conf.d/${PACKAGE_NAME}.ini
+    rm -f /etc/httpd/sites-enabled-user/${PACKAGE_NAME}.conf
 
     # Remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
