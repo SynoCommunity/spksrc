@@ -6,11 +6,9 @@ DNAME="PlexConnect"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PYTHON_DIR="/usr/local/python"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 CFG_FILE="share/PlexConnect/Settings.cfg"
 RUNAS="${PACKAGE}"
-PYTHON="${PYTHON_DIR}/bin/python"
 APACHE_DIR="/etc/httpd"
 HTTPD_CONF_USER="${APACHE_DIR}/conf/httpd.conf-user"
 VHOST_FILE="${APACHE_DIR}/conf/extra/plexconnect-vhosts.conf"

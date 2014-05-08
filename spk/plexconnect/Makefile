@@ -1,6 +1,6 @@
 SPK_NAME = plexconnect
 SPK_VERS = 0.3
-SPK_REV = 11-beta
+SPK_REV = 11-beta-2
 BETA=1
 SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
