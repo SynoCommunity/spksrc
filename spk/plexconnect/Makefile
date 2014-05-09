@@ -6,7 +6,7 @@ SPK_ICON = src/plexconnect.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "Python>2.7.6"
 
 MAINTAINER = bwynants
 DESCRIPTION = PlexConnect: Plex @ aTV - think different. Package to show Plex content on your unhacked AppleTV 2 or 3.
