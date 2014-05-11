@@ -12,8 +12,6 @@ PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="${PACKAGE}"
 GROUP="users"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-PID_FILE="${INSTALL_DIR}/var/${PACKAGE}.pid"
-
 
 preinst ()
 {

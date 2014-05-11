@@ -4,10 +4,10 @@
 PACKAGE="nzbdrone"
 DNAME="NzbDrone"
 INSTALL_DIR="/usr/local/${PACKAGE}"
-INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+NZBDRONE_LOG="${INSTALL_DIR}/var/.config/NzbDrone/logs/nzbdrone.txt"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="nzbdrone"
-PID_FILE="${INSTALL_DIR}/var/${PACKAGE}.pid"
+PID_FILE="${INSTALL_DIR}/var/.config/${DNAME}/${PACKAGE}.pid"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 NZBDRONE="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
@@ -15,7 +15,8 @@ COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -N 10 -x ${COMMAND} -c ${USER} -u ${USER} -p ${PID_FILE} > /dev/null
+    start-stop-daemon -S -q -b -N 10 -x ${COMMAND} -c ${USER} > /dev/null
+    sleep 2
 }
 
 stop_daemon ()
@@ -26,8 +27,6 @@ stop_daemon ()
 
 daemon_status ()
 {
-    ps -ww | grep [N]zbDrone.exe | awk "{ print \$1 }" > ${PID_FILE}
-    sleep 1
     start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
@@ -70,7 +69,7 @@ case $1 in
         fi
         ;;
     log)
-	echo "${INSTALL_LOG}"
+	echo "${NZBDRONE_LOG}"
         exit 0
         ;;
     *)
