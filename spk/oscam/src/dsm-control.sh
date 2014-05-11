@@ -16,7 +16,7 @@ start_daemon ()
 {
     su - ${RUNAS} -c "${OSCAM} -b -c ${INSTALL_DIR}/var"
     sleep 1
-    pidof -s oscam > ${PID_FILE}
+    pidof oscam | awk '{print $1}' > ${PID_FILE}
 }
 
 stop_daemon ()
