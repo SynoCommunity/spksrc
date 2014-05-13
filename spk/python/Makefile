@@ -9,7 +9,7 @@ DEPENDS += cross/setuptools cross/distutils2 cross/pip cross/virtualenv cross/py
 DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
-DEPENDS += cross/wheel cross/duplicity cross/mercurial cross/scrypt
+DEPENDS += cross/wheel cross/mercurial cross/scrypt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -19,6 +19,8 @@ RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
 CHANGELOG = "1. Update modules\n2. Add bsddb and duplicity modules\n3. Add mercurial and scrypt modules"
+BETA = 1
+FIRMWARE = 5.0-4418
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
