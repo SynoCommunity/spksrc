@@ -13,10 +13,14 @@ case $1 in
         exit 0
         ;;
     status)
-        exit 1
+	if [ -e /usr/local/bin/vim ]; then
+		exit 0
+	else
+		exit 150
+	fi
         ;;
     log)
-        exit 1
+        exit 0
         ;;
     *)
         exit 1

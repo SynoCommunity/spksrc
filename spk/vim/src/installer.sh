@@ -18,9 +18,17 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
     
-    # Put mc in the PATH
+    # Put vim in the PATH
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/vim-utf8 /usr/local/bin/vim
+    ln -s ${INSTALL_DIR}/bin/vimdiff /usr/local/bin/vimdiff
+    #
+    if [ -L /bin/vi ]; then
+        if [ "$(ls -l /bin/vi | grep busybox)" ]; then
+            rm -f /bin/vi
+            ln -s ${INSTALL_DIR}/bin/vim-utf8 /bin/vi
+        fi
+    fi
 
     exit 0
 }
@@ -35,6 +43,14 @@ postuninst ()
     # Remove link
     rm -f ${INSTALL_DIR}
     rm -f /usr/local/bin/vim
+    rm -f /usr/local/bin/vimdiff
+    #
+    if [ -L /bin/vi ]; then
+        if [ "$(ls -l /bin/vi | grep vim-utf8)" ]; then
+            rm -f /bin/vi
+            ln -s busybox /bin/vi
+        fi
+    fi
 
     exit 0
 }
