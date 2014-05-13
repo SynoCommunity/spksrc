@@ -10,9 +10,6 @@ PATH="${INSTALL_DIR}/bin:${PATH}"
 
 
 # Zabbix Others
-ZABBIX_UI="/usr/syno/synoman/webman/3rdparty/${PACKAGE}"
-ZABBIX_UI_LOC="${INSTALL_DIR}/app"
-
 ZABBIX_SERVER="${INSTALL_DIR}/sbin/z_server_start_stop.sh"
 ZABBIX_PROXY="${INSTALL_DIR}/sbin/z_proxy_start_stop.sh"
 ZABBIX_AGENTD="${INSTALL_DIR}/sbin/z_agent_start_stop.sh"
@@ -27,10 +24,7 @@ AGENT_FILE="${INSTALL_DIR}/var/agent.enabled"
 
 start ()
 {
-    ln -sf ${ZABBIX_UI_LOC} ${ZABBIX_UI}
-
 # Main start, stop scripts
-
     if [ -f ${SERVER_FILE} ]; then
         ${ZABBIX_SERVER} start
     fi
