@@ -18,7 +18,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules\n2. Add bsddb and duplicity modules\n3. Add mercurial and scrypt modules"
+CHANGELOG = "1. DSM5 only\n2. Add wheel, mercurial and scrypt modules"
 BETA = 1
 FIRMWARE = 5.0-4418
 
