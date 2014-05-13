@@ -19,7 +19,6 @@ RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
 CHANGELOG = "1. DSM5 only\n2. Add wheel, mercurial and scrypt modules"
-BETA = 1
 FIRMWARE = 5.0-4418
 
 HOMEPAGE   = http://www.python.org/
