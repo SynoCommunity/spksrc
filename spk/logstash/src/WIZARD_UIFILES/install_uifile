@@ -1,0 +1,55 @@
+[{
+	"step_title": "Logstash Configuration",
+	"items": [{
+		"type": "textfield",
+		"desc": "Configuration File. Defaults to /volume1/active_system/logstash/logstash.conf",
+		"subitems": [{
+			"key": "wizard_config_path",
+			"desc": "Configuration File Location",
+			"emptyText": "/volume1/active_system/logstash/logstash.conf"
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "Database Directory. Defaults to /volume1/active_system/logstash/database",
+		"subitems": [{
+			"key": "wizard_database_dir",
+			"desc": "Database Directory",
+			"emptyText": "/volume1/active_system/logstash/database"
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "Log File. Defaults to /volume1/active_system/logstash/logstash.log",
+		"subitems": [{
+			"key": "wizard_log_path",
+			"desc": "Log File Location",
+			"emptyText": "/volume1/active_system/logstash/logstash.log"
+		}]
+	}]
+}, {
+	"step_title": "Java Tuning",
+	"items": [{
+		"type": "textfield",
+		"desc": "Java Initial Heap Size in shorthand notation. Leave blank for Java defaults.",
+		"subitems": [{
+			"key": "wizard_java_heap_size_initial",
+			"desc": "Java Initial Heap Size",
+			"emptyText": "Example: 512m or 2G, may leave blank"
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "Java Max Heap Size in shorthand notation. Leave blank for Java defaults.",
+		"subitems": [{
+			"key": "wizard_java_heap_size_max",
+			"desc": "Java Max Heap Size",
+			"emptyText": "Example: 512m or 2G, may leave blank"
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "Additional Java Tuning Parameters. Leave blank for none,",
+		"subitems": [{
+			"key": "wizard_java_args_tuning",
+			"desc": "Java Tuning Parameters",
+			"emptyText": "-d64"
+		}]
+	}]
+}]
