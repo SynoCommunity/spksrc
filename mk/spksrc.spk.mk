@@ -101,6 +101,9 @@ endif
 ifneq ($(strip $(SPK_ICON)),)
 	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 - | base64 -w0 -`\" >> $@
 endif
+ifneq ($(strip $(CONF_DIR)),)
+	@echo support_conf_folder=\"yes\" >> $@
+endif
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
@@ -113,6 +116,13 @@ DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
 ifneq ($(WIZARDS_DIR),)
 # export working wizards dir to the shell for use later at compile-time
 export SPKSRC_WIZARDS_DIR=$(WIZARDS_DIR)
+endif
+
+# conf
+DSM_CONF_DIR = $(WORK_DIR)/conf
+
+ifneq ($(CONF_DIR),)
+export SPKSRC_CONF_DIR=$(CONF_DIR)
 endif
 
 # License
@@ -200,11 +210,21 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
 
+.PHONY: conf
+conf:
+ifneq ($(strip $(CONF_DIR)),)
+	@$(MSG) "Preparing conf"
+	@mkdir -p $(DSM_CONF_DIR)
+	@find $${SPKSRC_CONF_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
+	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
+	$(eval SPK_CONTENT += conf)
+endif
+
 ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) wizards $(DSM_LICENSE)
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
