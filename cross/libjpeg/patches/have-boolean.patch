@@ -1,0 +1,11 @@
+--- jconfig.cfg	2010-04-29 14:42:58.000000000 +0200
++++ jconfig.cfg	2014-05-15 00:32:13.000000000 +0200
+@@ -51,3 +51,8 @@
+ #undef PROGRESS_REPORT
+ 
+ #endif /* JPEG_CJPEG_DJPEG */
++
++/* At least libpng and libtiff have TRUE,FALSE defined as constant */
++typedef int boolean;
++#define HAVE_BOOLEAN
++
