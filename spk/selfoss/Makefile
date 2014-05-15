@@ -17,6 +17,7 @@ HOMEPAGE   = http://selfoss.aditu.de/
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

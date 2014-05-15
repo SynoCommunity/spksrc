@@ -18,6 +18,7 @@ HOMEPAGE   = http://tt-rss.org/
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
