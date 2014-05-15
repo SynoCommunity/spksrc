@@ -15,6 +15,9 @@ WWW_DIR="/var/packages/${PACKAGE}/target/share/www/squidguardmgr"
 WEBMAN_DIR="/usr/syno/synoman/webman/3rdparty"
 SQUID_WRAPPER="${WWW_DIR}/squid_wrapper"
 
+SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+
 preinst ()
 {
     exit 0
@@ -55,12 +58,21 @@ postinst ()
         sleep 1
         /usr/syno/etc/rc.d/S04crond.sh start
     fi
-    
+
+    # Add firewall config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+
     exit 0
 }
 
 preuninst ()
 {
+
+    # Remove firewall config
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
+    fi
+
     exit 0
 }
 
