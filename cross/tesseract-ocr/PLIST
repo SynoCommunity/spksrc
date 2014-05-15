@@ -1,0 +1,6 @@
+bin:bin/tesseract
+lnk:lib/libtesseract.so
+lnk:lib/libtesseract.so.3
+lib:lib/libtesseract.so.3.0.2
+rsc:share/tessdata/configs
+rsc:share/tessdata/tessconfigs
