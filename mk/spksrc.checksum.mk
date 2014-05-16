@@ -39,9 +39,9 @@ pre_checksum_target: checksum_msg
 
 # TODO: do something with sha256sum to check the file integrity.
 checksum_target: $(PRE_CHECKSUM_TARGET)
-	@if [ -f $(DIGESTS_FILE) ] ; \
+	@if grep -q $(PKG_DIST_NAME) $(DIGESTS_FILE) 2>/dev/null ; \
 	then \
-	  cat $(DIGESTS_FILE) | (cd $(DISTRIB_DIR) && while read file type value ; \
+	  grep $(PKG_DIST_NAME) $(DIGESTS_FILE) | (cd $(DISTRIB_DIR) && while read file type value ; \
 	  do \
 	    if [ ! -f $$file ] ; \
 	    then \
