@@ -60,15 +60,21 @@ Ext.onReady(function() {
                     var cp1 = Ext.getCmp('serverlog');
                     cp1.update(htmlText, true);
                     }
-                    });
+                    }),
+                    Ext.Ajax.request({
+                    url: 'enable/server.enabled',
+                    success : function() {
+                    //alert('file found');
+                    startserver.disable();
+                    stopserver.enable();
+                    }
+                });                
                 }});
                 saveBtn.disable();
                 startproxy.disable();
                 restartproxy.disable();
                 stopproxy.disable();
                 refresh1.disable();
-                stopserver.enable();
-                startserver.disable();
             }
         });
     }
@@ -88,13 +94,16 @@ Ext.onReady(function() {
                     var cp1 = Ext.getCmp('serverlog');
                     cp1.update(htmlText, true);
                     }
-                    });                
+                    }),
+                    Ext.Ajax.request({
+                    url: 'enable/server.enabled',
+                    success : function() {
+                    //alert('file found');
+                    startserver.disable();
+                    stopserver.enable();
+                    }
+                });                
                 }});
-                restartserver.disable();
-                restartproxy.disable();
-                restartagent.disable();
-                startserver.disable();
-                stopserver.enable();
             }
         });
     }
@@ -143,15 +152,21 @@ Ext.onReady(function() {
                     var cp1 = Ext.getCmp('proxylog');
                     cp1.update(htmlText, true);
                     }
-                    });
+                    }),
+                    Ext.Ajax.request({
+                    url: 'enable/proxy.enabled',
+                    success : function() {
+                    //alert('file found');
+                    startproxy.disable();
+                    stopproxy.enable();
+                    }
+                });                
                 }});
                 saveBtn.disable();
                 startserver.disable();
                 restartserver.disable();
                 stopserver.disable();
                 refresh0.disable();
-                stopproxy.enable();
-                startproxy.disable();
             }
         });
     }
@@ -171,13 +186,16 @@ Ext.onReady(function() {
                     var cp1 = Ext.getCmp('proxylog');
                     cp1.update(htmlText, true);
                     }
-                    });                
+                    }),
+                    Ext.Ajax.request({
+                    url: 'enable/proxy.enabled',
+                    success : function() {
+                    //alert('file found');
+                    startproxy.disable();
+                    stopproxy.enable();
+                    }
+                });                
                 }});
-                restartserver.disable();
-                restartproxy.disable();
-                restartagent.disable();
-                startproxy.disable();
-                stopproxy.enable();
             }
         });
     }
@@ -226,11 +244,17 @@ Ext.onReady(function() {
                     var cp1 = Ext.getCmp('agentlog');
                     cp1.update(htmlText, true);
                     }
-                    });  
+                    }),
+                    Ext.Ajax.request({
+                    url: 'enable/agent.enabled',
+                    success : function() {
+                    //alert('file found');
+                    startagent.disable();
+                    stopagent.enable();
+                    }
+                });                
                 }});
                 saveBtn.disable();
-                startagent.disable();
-                stopagent.enable();
             }
         });
     }
@@ -250,13 +274,16 @@ Ext.onReady(function() {
                     var cp1 = Ext.getCmp('agentlog');
                     cp1.update(htmlText, true);
                     }
-                    });                
+                    }),
+                    Ext.Ajax.request({
+                    url: 'enable/agent.enabled',
+                    success : function() {
+                    //alert('file found');
+                    startagent.disable();
+                    stopagent.enable();
+                    }
+                });                
                 }});
-                restartserver.disable();
-                restartproxy.disable();
-                restartagent.disable();
-                startagent.disable();
-                stopagent.enable();
             }
         });
     }
