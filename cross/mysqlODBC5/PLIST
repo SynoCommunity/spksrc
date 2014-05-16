@@ -1,0 +1,3 @@
+bin:bin/myodbc-installer
+lib:lib/libmyodbc5a.so
+lib:lib/libmyodbc5w.so

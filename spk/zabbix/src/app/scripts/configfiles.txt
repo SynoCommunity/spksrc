@@ -1,0 +1,4 @@
+/usr/local/zabbix/etc/zabbix_server.conf,Zabbix Server
+/usr/local/zabbix/etc/zabbix_proxy.conf,Zabbix Proxy
+/usr/local/zabbix/etc/zabbix_agentd.conf,Zabbix Agentd
+/usr/local/zabbix/etc/zabbix_agent.conf,Zabbix Agent
