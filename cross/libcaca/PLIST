@@ -1,0 +1,15 @@
+bin:bin/cacaclock
+bin:bin/caca-config
+bin:bin/cacademo
+bin:bin/cacafire
+bin:bin/cacaplay
+bin:bin/cacaserver
+bin:bin/cacaview
+bin:bin/img2txt
+lnk:lib/libcaca.so
+lnk:lib/libcaca++.so
+lnk:lib/libcaca.so.0
+lnk:lib/libcaca++.so.0
+lib:lib/libcaca.so.0.99.19
+lib:lib/libcaca++.so.0.99.19
+shr:share/libcaca/caca.txt
