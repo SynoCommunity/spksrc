@@ -98,9 +98,6 @@ endif
 ifneq ($(strip $(SPK_DEPENDS)),)
 	@echo install_dep_packages=\"$(SPK_DEPENDS)\" >> $@
 endif
-ifneq ($(strip $(SPK_ICON)),)
-	@echo package_icon=\"`convert $(SPK_ICON) -thumbnail 72x72 - | base64 -w0 -`\" >> $@
-endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
@@ -142,6 +139,19 @@ endef
 $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@echo $@
 	@$(dsm_license_copy)
+
+# Package Icons
+$(WORK_DIR)/PACKAGE_ICON.PNG:
+	$(create_target_dir)
+	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
+	@[ -f $@ ] && rm $@ || true
+	(convert $(SPK_ICON) -thumbnail 72x72 - >> $@)
+
+$(WORK_DIR)/PACKAGE_ICON_120.PNG:
+	$(create_target_dir)
+	@$(MSG) "Creating PACKAGE_ICON_120.PNG for $(SPK_NAME)"
+	@[ -f $@ ] && rm $@ || true
+	(convert $(SPK_ICON) -thumbnail 120x120 - >> $@)
 
 # Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
@@ -198,7 +208,7 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sc,$(FWPORTS))
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
-SPK_CONTENT = package.tgz INFO scripts
+SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_120.PNG scripts
 
 .PHONY: wizards
 wizards:
@@ -224,7 +234,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
