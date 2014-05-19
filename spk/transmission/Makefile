@@ -1,5 +1,5 @@
 SPK_NAME = transmission
-SPK_VERS = 2.82
+SPK_VERS = 2.83
 SPK_REV = 6
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
@@ -7,13 +7,13 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Transmission is an easy and fast BitTorrent client. You can control it remotly with its web interface or dedicated applications.
+DESCRIPTION = Transmission is an easy and fast BitTorrent client. You can control it remotely with its web interface or dedicated applications.
 DESCRIPTION_FRE = Transmission est un client BitTorrent simple et rapide. Vous pouvez le contrôler à distance grâce à son interface web ou des applications dédiées.
 DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes controlarlo remotamente mediante su interfaz web o alguna aplicación dedicada.
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "1. DSM 5.0 compatibility\n2. Check download directory exists on install\n3. Add incomplete dir configuration to wizard"
+CHANGELOG = "1. Update to 2.8.3\n2. Add wizard input validation"
 
 HOMEPAGE = http://www.transmissionbt.com/
 LICENSE  =
