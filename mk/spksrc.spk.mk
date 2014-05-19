@@ -52,8 +52,13 @@ $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 	@echo distributor=\"SynoCommunity\" >> $@
 	@echo distributor_url=\"http://synocommunity.com\" >> $@
+ifeq ($(strip $(MAINTAINER)),SynoCommunity)
+	@echo maintainer=\"SynoCommunity\" >> $@
+	@echo maintainer_url=\"http://synocommunity.com\" >> $@
+else
 	@echo maintainer=\"SynoCommunity/$(MAINTAINER)\" >> $@
 	@echo maintainer_url=\"http://synocommunity.com/developers/$(MAINTAINER)\" >> $@
+endif
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
