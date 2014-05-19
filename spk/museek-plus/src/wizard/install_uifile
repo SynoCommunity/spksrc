@@ -6,13 +6,22 @@
         "subitems": [{
             "key": "wizard_password",
             "desc": "Password"
+
         }]
     }, {
         "type": "textfield",
-        "desc": "Download directory. Defaults to /volume1/downloads",
+        "desc": "Download directory",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Download directory"
+            "desc": "Download directory",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
         }]
     }]
 }]

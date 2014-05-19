@@ -18,6 +18,14 @@ FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {
+    # Check directory
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        if [ ! -d ${wizard_download_dir:=/volume1/downloads} ]; then
+            echo "Download directory ${wizard_download_dir} does not exist."
+            exit 1
+        fi
+    fi
+
     exit 0
 }
 

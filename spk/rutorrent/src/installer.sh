@@ -20,6 +20,17 @@ FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        if [ ! -d "${wizard_download_dir}" ]; then
+            echo "Download directory ${wizard_download_dir} does not exist."
+            exit 1
+        fi
+        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
+            echo "Watch directory ${wizard_watch_dir} does not exist."
+            exit 1
+        fi
+    fi
+
     exit 0
 }
 

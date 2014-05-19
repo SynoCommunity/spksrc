@@ -5,14 +5,29 @@
         "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Répertoire de téléchargement"
+            "desc": "Répertoire de téléchargement",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                }
+            }
         }]
     }, {
         "type": "textfield",
         "desc": "Surveille les torrents dans un répertoire et les ajoute à ruTorrent automatiquement. Laisser vide pour désactiver",
         "subitems": [{
             "key": "wizard_watch_dir",
-            "desc": "Répertoire surveillé"
+            "desc": "Répertoire surveillé",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                }
+            }
         }]
     }]
 }, {
