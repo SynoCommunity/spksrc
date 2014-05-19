@@ -1,25 +1,26 @@
 SPK_NAME = nzbdrone
-SPK_VERS = 2.0.0.1397
-SPK_REV = 1
+SPK_VERS = $(shell date +%Y%m%d)
+SPK_REV = 2
 SPK_ICON = src/nzbdrone.png
+DSM_UI_DIR = app
 
 BETA = 1
 
-FIRMWARE = 4.0-2198
+FIRMWARE = 5.0-4458
 
 DEPENDS = cross/busybox cross/mediainfo cross/sqlite cross/$(SPK_NAME)
 
-SPK_DEPENDS = "mono>3.2"
+SPK_DEPENDS = "mono>3.4"
 
 MAINTAINER = SynoCommunity
 
-DESCRIPTION = NZBDrone is a PVR for newsgroup users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and renames them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
+DESCRIPTION = NZBDrone is a PVR for newsgroup users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
 DESCRIPTION_FRE = NZBDrone est un PVR pour les utilisateurs de groupes de discussion. Il peut surveiller plusieurs flux RSS pour les nouveaux épisodes de vos séries préférées et saisira, sortes et les renomme. Il peut également être configuré pour mettre à jour automatiquement la qualité des fichiers déjà téléchargés si un meilleur format de qualité devient disponible.
 DESCRIPTION_SPN = NZBDrone es un PVR para los usuarios de grupos de noticias. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
 ADMIN_PORT = 8989
 RELOAD_UI = yes
 DISPLAY_NAME = NzbDrone
-CHANGELOG = "1. Initial package"
+CHANGELOG = "2. Added built-in updater & multi-ver. compatibility"
 
 HOMEPAGE = http://nzbdrone.com
 LICENSE  =
@@ -29,6 +30,11 @@ SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+# Notify of unsupported architectures 
+ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k),$(ARCH))
+$(error Sorry $(ARCH) is not a supported architecture)
+endif
 
 POST_STRIP_TARGET = nzbdrone_extra_install
 
@@ -41,6 +47,9 @@ include ../../mk/spksrc.spk.mk
 nzbdrone_extra_install:
 	install -m 755 -d $(STAGING_DIR)/
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/.config
+	install -m 755 -d $(STAGING_DIR)/var/.config/NzbDrone
+	install -m 644 src/config.xml $(STAGING_DIR)/var/.config/NzbDrone/config.xml
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

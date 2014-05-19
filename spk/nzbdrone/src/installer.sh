@@ -6,12 +6,19 @@ DNAME="NzbDrone"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+TMP_INSTALL_LOG="${TMP_DIR}/${PACKAGE}/var/install.log"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="${PACKAGE}"
 GROUP="users"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+PID_FILE="${INSTALL_DIR}/var/.config/${DNAME}/${PACKAGE}.pid"
+MONO_PATH="/usr/local/mono/bin"
+MONO="${MONO_PATH}/mono"
+NZBDRONE="${INSTALL_DIR}/share/${DNAME}/NzbDrone.exe"
+SPK_NZBDRONE="${SYNOPKG_PKGINST_TEMP_DIR}/share/${DNAME}/NzbDrone.exe"
+COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO}"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
@@ -26,6 +33,10 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Logging Install
+    mkdir -p ${INSTALL_DIR}/var
+    echo "|| Installing package $(grep "version" /var/packages/${PACKAGE}/INFO) - $(date) ||" >> ${INSTALL_LOG}
+
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
@@ -35,11 +46,11 @@ postinst ()
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
-    # Log
-    echo " -- || Package Install Complete - $(date) || -- " >> ${INSTALL_LOG} 2>&1
-
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+
+    # Log
+    echo "|| Package Install Completed - $(date) ||" >> ${INSTALL_LOG}
 
     exit 0
 }
@@ -65,7 +76,7 @@ preuninst ()
 
 postuninst ()
 {
-    # Remove link
+    # Remove Link
     rm -f ${INSTALL_DIR}
 
     exit 0
@@ -74,14 +85,26 @@ postuninst ()
 preupgrade ()
 {
     # Log Upgrade
-    echo " -- || Beginning package upgrade - $(date) || -- " >> ${INSTALL_LOG} 2>&1
-    # Stop the package
-    ${SSS} stop > /dev/null
+    echo "|| Beginning Package Upgrade - $(date) ||" >> ${INSTALL_LOG}
 
     # Save some stuff
-    rm -fr ${TMP_DIR}/${PACKAGE} >> ${INSTALL_LOG} 2>&1
-    mkdir -p ${TMP_DIR}/${PACKAGE} >> ${INSTALL_LOG} 2>&1
-    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/ >> ${INSTALL_LOG} 2>&1
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
+    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+
+    # Is Installed NzbDrone Binary Ver. >= SPK NzbDrone Binary Ver.?
+    CUR_VER=$(${COMMAND} ${NZBDRONE} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
+    echo "   Installed NzbDrone Binary: ${CUR_VER}" >> ${TMP_INSTALL_LOG}
+    SPK_VER=$(${COMMAND} ${SPK_NZBDRONE} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
+    echo "   Requested NzbDrone Binary: ${SPK_VER}" >> ${TMP_INSTALL_LOG}
+    if [ "$CUR_VER" -ge "$SPK_VER" ]; then
+       echo 'KEEP_CUR="yes"' > ${TMP_DIR}/${PACKAGE}/var/KEEP_VAR
+       echo "   [KEEPING] Installed NzbDrone Binary - Upgrading Package Only" >> ${TMP_INSTALL_LOG}
+       mv ${INSTALL_DIR}/share ${TMP_DIR}/${PACKAGE}/
+    else
+       echo 'KEEP_CUR="no"' > ${TMP_DIR}/${PACKAGE}/var/KEEP_VAR
+       echo "   [REPLACING] Installed NzbDrone Binary" >> ${TMP_INSTALL_LOG}
+    fi
 
     exit 0
 }
@@ -89,12 +112,22 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    rm -fr ${INSTALL_DIR}/var >> ${TMP_DIR}/${PACKAGE}/var/install.log 2>&1
-    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/ >> ${TMP_DIR}/${PACKAGE}/var/install.log 2>&1
-    rm -fr ${TMP_DIR}/${PACKAGE} >> ${INSTALL_LOG} 2>&1
+    rm -fr ${INSTALL_DIR}/var
+    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+
+    # Restore Current NzbDrone Binary If Current Ver. >= SPK Ver.
+    . ${INSTALL_DIR}/var/KEEP_VAR
+    if [ "$KEEP_CUR" == "yes" ]; then
+       rm -fr ${INSTALL_DIR}/share
+       mv ${TMP_DIR}/${PACKAGE}/share ${INSTALL_DIR}/
+    fi
+
+    # Remove Backups & Upgrade Flag
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    rm ${INSTALL_DIR}/var/KEEP_VAR
 
     # Finish Logging
-    echo " -- || Finished package upgrade - $(date) || -- " >> ${INSTALL_LOG} 2>&1
+    echo "|| Package upgraded to $(grep "version" /var/packages/${PACKAGE}/INFO) - $(date) ||" >> ${INSTALL_LOG}
 
     exit 0
 }
