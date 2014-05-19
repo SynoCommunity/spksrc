@@ -103,6 +103,9 @@ INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
 INSTALLER_OUTPUT = > $$SYNOPKG_TEMP_LOGFILE
 endif
+ifneq ($(strip $(SPK_CONFLICT)),)
+@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
+endif
 
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
