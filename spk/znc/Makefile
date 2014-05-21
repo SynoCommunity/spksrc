@@ -1,5 +1,5 @@
 SPK_NAME = znc
-SPK_VERS = 1.2
+SPK_VERS = 1.4
 SPK_REV = 6
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
