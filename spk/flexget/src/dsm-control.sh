@@ -10,7 +10,7 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="flexget"
 PYTHON="${INSTALL_DIR}/env/bin/python"
-FLEXGET="${INSTALL_DIR}/env/bin/flexget-webui"
+FLEXGET="${INSTALL_DIR}/env/bin/flexget"
 CFG_FILE="${INSTALL_DIR}/var/config.yml"
 PID_FILE="${INSTALL_DIR}/var/.config-lock"
 LOG_FILE="${INSTALL_DIR}/var/flexget.log"
@@ -18,19 +18,23 @@ LOG_FILE="${INSTALL_DIR}/var/flexget.log"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -x ${FLEXGET} -c ${USER} -u ${USER} -p ${PID_FILE} \
-      -- -d -c ${CFG_FILE} --logfile ${LOG_FILE} --port 8290 2> /dev/null
+    su -- ${USER} -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} webui -d --port 8290"
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -u ${USER} -p ${PID_FILE}
+    kill `cat ${PID_FILE} | cut -d ' ' -f2`
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE} | cut -d ' ' -f2` > /dev/null 2>&1; then
+        return
+    fi
+    rm -f ${PID_FILE}
+    return 1
 }
 
 wait_for_status ()

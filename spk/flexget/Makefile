@@ -1,5 +1,5 @@
 SPK_NAME = flexget
-SPK_VERS = 1.1.26
+SPK_VERS = 1.2.129
 SPK_REV = 1
 SPK_ICON = src/flexget.png
 DSM_UI_DIR = app
@@ -45,4 +45,4 @@ flexget_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ FlexGet==$(SPK_VERS) transmissionrpc
+	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ flexget[webui]==$(SPK_VERS) transmissionrpc 
