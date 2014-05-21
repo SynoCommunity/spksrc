@@ -33,6 +33,7 @@ lib:lib/znc/lastseen.so
 lib:lib/znc/listsockets.so
 lib:lib/znc/log.so
 lib:lib/znc/missingmotd.so
+lib:lib/znc/modules_online.so
 lib:lib/znc/nickserv.so
 lib:lib/znc/notes.so
 lib:lib/znc/notify_connect.so
