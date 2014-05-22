@@ -72,7 +72,7 @@ gentoo-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/app/application
 	install -m 644 src/app/application/* $(STAGING_DIR)/app/application/
 	install -m 755 -d $(STAGING_DIR)/app/texts
-	for language in enu fre; do \
+	for language in enu; do \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
 		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
 	done
