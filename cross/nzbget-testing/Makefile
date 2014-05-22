@@ -4,7 +4,7 @@ PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = svn
 PKG_SVN_REV = 979
 PKG_DIST_NAME = trunk
-PKG_DIST_SITE = https://nzbget.svn.sourceforge.net/svnroot/nzbget
+PKG_DIST_SITE = https://svn.code.sf.net/p/nzbget/code
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-r*
 
