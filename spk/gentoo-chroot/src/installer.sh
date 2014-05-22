@@ -32,16 +32,14 @@ postinst ()
     # Setup the database
     ${INSTALL_DIR}/env/bin/python ${INSTALL_DIR}/app/setup.py
 
-    # Debootstrap second stage in the background and configure the chroot environment
+    # Configure the chroot environment
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        chroot ${CHROOTTARGET}/ /debootstrap/debootstrap --second-stage > /dev/null 2>&1 && \
-            mv ${CHROOTTARGET}/etc/apt/sources.list.default ${CHROOTTARGET}/etc/apt/sources.list && \
-            mv ${CHROOTTARGET}/etc/apt/preferences.default ${CHROOTTARGET}/etc/apt/preferences && \
-            touch ${INSTALL_DIR}/var/installed &
-        chmod 666 ${CHROOTTARGET}/dev/null
-        chmod 666 ${CHROOTTARGET}/dev/tty
-        chmod 777 ${CHROOTTARGET}/tmp
-        cp /etc/hosts /etc/hostname /etc/resolv.conf ${CHROOTTARGET}/etc/
+        cp /etc/hosts /etc/resolv.conf ${CHROOTTARGET}/etc/
+        echo 'hostname="'`hostname -s`'"' > ${CHROOTTARGET}/etc/conf.d/hostname
+        touch ${CHROOTTARGET}/run/openrc/softlevel
+        touch ${CHROOTTARGET}/var/run/utmp
+        touch ${CHROOTTARGET}/var/log/wtmp
+        touch ${INSTALL_DIR}/var/installed
     fi
 
     exit 0
