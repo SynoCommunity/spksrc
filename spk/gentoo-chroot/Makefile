@@ -16,6 +16,7 @@ CHANGELOG =
 HOMEPAGE   = "http://www.gentoo.org/"
 LICENSE    = 
 HELPURL    = 
+HELPURL    = "3rdparty/gentoo-chroot/help/enu/index.html"
 SUPPORTURL = "http://www.gentoo.org/main/en/support.xml"
 
 INSTALLER_SCRIPT = src/installer.sh
@@ -62,6 +63,9 @@ gentoo-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/mounts $(STAGING_DIR)/etc/mounts
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/app/help
+	install -m 755 -d $(STAGING_DIR)/app/help/enu
+	install -m 644 src/app/help/enu/index.html $(STAGING_DIR)/app/help/enu/index.html
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
 	install -m 644 src/app/gentoo-chroot.js $(STAGING_DIR)/app/gentoo-chroot.js
