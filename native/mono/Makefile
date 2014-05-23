@@ -1,5 +1,5 @@
 PKG_NAME = mono
-PKG_VERS = 3.4.0
+PKG_VERS = 3.6.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.mono-project.com/sources/mono
@@ -14,4 +14,11 @@ LICENSE    =
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = 
 
+POST_INSTALL_TARGET = myPostInstall
+
 include ../../mk/spksrc.native-cc.mk
+
+.PHONY: myPostInstall
+myPostInstall:
+	patch -p0 < $(WORK_DIR)/../mono3.6.0.patch
+	rm $(WORK_DIR)/install/usr/local/bin/*.orig

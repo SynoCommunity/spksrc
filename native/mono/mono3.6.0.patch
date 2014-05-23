@@ -1,0 +1,391 @@
+--- work-native/install/usr/local/bin/al	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/al.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/al.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/al.exe "$@"
+
+--- work-native/install/usr/local/bin/al2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/al2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/al.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/al.exe "$@"
+
+--- work-native/install/usr/local/bin/caspol	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/caspol.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/caspol.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/caspol.exe "$@"
+
+--- work-native/install/usr/local/bin/cccheck	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/cccheck.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/cccheck.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/cccheck.exe "$@"
+
+--- work-native/install/usr/local/bin/ccrewrite	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/ccrewrite.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/ccrewrite.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/ccrewrite.exe "$@"
+
+--- work-native/install/usr/local/bin/cert2spc	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/cert2spc.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/cert2spc.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/cert2spc.exe "$@"
+
+--- work-native/install/usr/local/bin/certmgr	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/certmgr.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/certmgr.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/certmgr.exe "$@"
+
+--- work-native/install/usr/local/bin/chktrust	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/chktrust.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/chktrust.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/chktrust.exe "$@"
+
+--- work-native/install/usr/local/bin/crlupdate	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/crlupdate.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/crlupdate.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/crlupdate.exe "$@"
+
+--- work-native/install/usr/local/bin/csharp	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/csharp.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/csharp.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/csharp.exe "$@"
+
+--- work-native/install/usr/local/bin/disco	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/disc.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/disco.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/disco.exe "$@"
+
+--- work-native/install/usr/local/bin/dmcs	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/dmcs.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mcs.exe -sdk:4 "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mcs.exe -sdk:4 "$@"
+
+--- work-native/install/usr/local/bin/dtd2rng	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/dtd2rng.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/dtd2rng.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/dtd2rng.exe "$@"
+
+--- work-native/install/usr/local/bin/dtd2xsd	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/dtd2xsd.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/dtd2xsd.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/dtd2xsd.exe "$@"
+
+--- work-native/install/usr/local/bin/gacutil	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/gacutil.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/gacutil.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/gacutil.exe "$@"
+
+--- work-native/install/usr/local/bin/gacutil2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/gacutil2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/gacutil.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/gacutil.exe "$@"
+
+--- work-native/install/usr/local/bin/genxs	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/genxs.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/genxs.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/genxs.exe "$@"
+
+--- work-native/install/usr/local/bin/gmcs	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/gmcs.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mcs.exe -sdk:2 "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mcs.exe -sdk:2 "$@"
+
+--- work-native/install/usr/local/bin/httpcfg	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/httpcfg.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/httpcfg.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/httpcfg.exe "$@"
+
+--- work-native/install/usr/local/bin/ikdasm	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/ikdasm.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/ikdasm.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/ikdasm.exe "$@"
+
+--- work-native/install/usr/local/bin/ilasm	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/ilasm.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/ilasm.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/ilasm.exe "$@"
+
+--- work-native/install/usr/local/bin/installvst	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/installvst.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/installvst.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/installvst.exe "$@"
+
+--- work-native/install/usr/local/bin/lc	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/lc.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/lc.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/lc.exe "$@"
+
+--- work-native/install/usr/local/bin/macpack	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/macpack.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/macpack.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/macpack.exe "$@"
+
+--- work-native/install/usr/local/bin/makecert	2014-08-21 17:07:37.084165652 -0600
++++ work-native/install/usr/local/bin/makecert.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,3 +1,3 @@
+ umask 077
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/makecert.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/makecert.exe "$@"
+
+--- work-native/install/usr/local/bin/mconfig	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mconfig.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mconfig.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mconfig.exe "$@"
+
+--- work-native/install/usr/local/bin/mcs	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/mcs.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mcs.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mcs.exe "$@"
+
+--- work-native/install/usr/local/bin/mdbrebase	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mdbrebase.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mdbrebase.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mdbrebase.exe "$@"
+
+--- work-native/install/usr/local/bin/mdoc	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/mdoc.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mdoc.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mdoc.exe "$@"
+
+--- work-native/install/usr/local/bin/mkbundle	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/mkbundle.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mkbundle.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mkbundle.exe "$@"
+
+--- work-native/install/usr/local/bin/mod	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mod.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mod.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mod.exe "$@"
+
+--- work-native/install/usr/local/bin/mono-api-info	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mono-api-info.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mono-api-info.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mono-api-info.exe "$@"
+
+--- work-native/install/usr/local/bin/mono-cil-strip	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/mono-cil-strip.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mono-cil-strip.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mono-cil-strip.exe "$@"
+
+--- work-native/install/usr/local/bin/mono-configuration-crypto	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/mono-configuration-crypto.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/mono-configuration-crypto/4.5/mono-configuration-crypto.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/mono-configuration-crypto/4.5/mono-configuration-crypto.exe "$@"
+
+--- work-native/install/usr/local/bin/monolinker	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/monolinker.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/monolinker.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/monolinker.exe "$@"
+
+--- work-native/install/usr/local/bin/monop	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/monop.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/monop.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/monop.exe "$@"
+
+--- work-native/install/usr/local/bin/monop2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/monop2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/monop.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/monop.exe "$@"
+
+--- work-native/install/usr/local/bin/mono-service	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/mono-service.new		2014-08-21 17:11:20.187022542 -0600
+@@ -35,7 +35,7 @@
+ export MONO_DISABLE_SHM=1
+ if $debug; then
+-   exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mono-service.exe $args
++   exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mono-service.exe $args
+ else
+-   exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mono-service.exe $args </dev/null >/dev/null 2>&1 &
++   exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mono-service.exe $args </dev/null >/dev/null 2>&1 &
+ fi
+
+--- work-native/install/usr/local/bin/mono-service2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/mono-service2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -35,7 +35,7 @@
+ export MONO_DISABLE_SHM=1
+ if $debug; then
+-   exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/mono-service.exe $args
++   exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/mono-service.exe $args
+ else
+-   exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/mono-service.exe $args </dev/null >/dev/null 2>&1 &
++   exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/mono-service.exe $args </dev/null >/dev/null 2>&1 &
+ fi
+
+--- work-native/install/usr/local/bin/mono-shlib-cop	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mono-shlib-cop.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mono-shlib-cop.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mono-shlib-cop.exe "$@"
+
+--- work-native/install/usr/local/bin/mono-xmltool	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mono-xmltool.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mono-xmltool.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mono-xmltool.exe "$@"
+
+--- work-native/install/usr/local/bin/mozroots	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/mozroots.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/mozroots.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/mozroots.exe "$@"
+
+--- work-native/install/usr/local/bin/nunit-console	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/nunit-console.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono --debug $MONO_OPTIONS /usr/local/lib/mono/2.0/nunit-console.exe "$@"
++exec /usr/local/mono/bin/mono --debug $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/nunit-console.exe "$@"
+
+--- work-native/install/usr/local/bin/nunit-console2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/nunit-console2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono --debug $MONO_OPTIONS /usr/local/lib/mono/2.0/nunit-console.exe "$@"
++exec /usr/local/mono/bin/mono --debug $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/nunit-console.exe "$@"
+
+--- work-native/install/usr/local/bin/nunit-console4	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/nunit-console4.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono --debug $MONO_OPTIONS /usr/local/lib/mono/4.5/nunit-console.exe "$@"
++exec /usr/local/mono/bin/mono --debug $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/nunit-console.exe "$@"
+
+--- work-native/install/usr/local/bin/pdb2mdb	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/pdb2mdb.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/pdb2mdb.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/pdb2mdb.exe "$@"
+
+--- work-native/install/usr/local/bin/permview	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/permview.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/permview.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/permview.exe "$@"
+
+--- work-native/install/usr/local/bin/prj2make	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/prj2make.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/prj2make.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/prj2make.exe "$@"
+
+--- work-native/install/usr/local/bin/resgen	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/resgen.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/resgen.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/resgen.exe "$@"
+
+--- work-native/install/usr/local/bin/resgen2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/resgen2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/resgen.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/resgen.exe "$@"
+
+--- work-native/install/usr/local/bin/secutil	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/secutil.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/secutil.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/secutil.exe "$@"
+
+--- work-native/install/usr/local/bin/setreg	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/setreg.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/setreg.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/setreg.exe "$@"
+
+--- work-native/install/usr/local/bin/sgen	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/sgen.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/sgen.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/sgen.exe "$@"
+
+--- work-native/install/usr/local/bin/signcode	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/signcode.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/signcode.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/signcode.exe "$@"
+
+--- work-native/install/usr/local/bin/sn	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/sn.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,3 +1,3 @@
+ umask 077
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/sn.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/sn.exe "$@"
+
+--- work-native/install/usr/local/bin/soapsuds	2014-08-21 17:07:37.092165320 -0600
++++ work-native/install/usr/local/bin/soapsuds.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/soapsuds.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/soapsuds.exe "$@"
+
+--- work-native/install/usr/local/bin/sqlmetal	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/sqlmetal.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/sqlmetal.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/sqlmetal.exe "$@"
+
+--- work-native/install/usr/local/bin/sqlsharp	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/sqlsharp.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/sqlsharp.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/sqlsharp.exe "$@"
+
+--- work-native/install/usr/local/bin/svcutil	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/svcutil.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/svcutil.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/svcutil.exe "$@"
+
+--- work-native/install/usr/local/bin/wsdl	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/wsdl.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/wsdl.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/wsdl.exe "$@"
+
+--- work-native/install/usr/local/bin/wsdl2	2014-08-21 17:07:37.088165486 -0600
++++ work-native/install/usr/local/bin/wsdl2.new		2014-08-21 17:11:20.191022391 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/2.0/wsdl.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/2.0/wsdl.exe "$@"
+
+--- work-native/install/usr/local/bin/xbuild	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/xbuild.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/xbuild/12.0/bin/xbuild.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/xbuild/12.0/bin/xbuild.exe "$@"
+
+--- work-native/install/usr/local/bin/xsd	2014-08-21 17:07:37.096165155 -0600
++++ work-native/install/usr/local/bin/xsd.new		2014-08-21 17:11:20.187022542 -0600
+@@ -1,2 +1,2 @@
+-exec /usr/local/bin/mono $MONO_OPTIONS /usr/local/lib/mono/4.5/xsd.exe "$@"
++exec /usr/local/mono/bin/mono $MONO_OPTIONS /usr/local/mono/lib/mono/4.5/xsd.exe "$@"

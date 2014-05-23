@@ -3,6 +3,7 @@
 # Package
 PACKAGE="mono"
 DNAME="Mono"
+INSTALL_DIR="/usr/local/${PACKAGE}"
 INSTALL_LOG="${INSTALL_DIR}/var/install.log"
 
 case "$1" in

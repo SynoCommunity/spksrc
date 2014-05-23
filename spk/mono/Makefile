@@ -1,11 +1,11 @@
 SPK_NAME = mono
-SPK_VERS = 3.4.0
-SPK_REV = 1
+SPK_VERS = 3.6.0
+SPK_REV = 2
 SPK_ICON = src/mono.png
 
 BETA = 1
 
-FIRMWARE = 4.0-2198
+FIRMWARE = 5.0-4458
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Mono est une plateforme logicielle conçue pour permettre aux 
 DESCRIPTION_SPN = Mono es una plataforma de software diseñada para permitir a los desarrolladores crear fácilmente aplicaciones de plataforma cruzada. Es una implementación de código abierto de Microsoft de. Net Framework basado en los estándares ECMA para C # y el Common Language Runtime. Creemos que al abrazar una exitosa plataforma de software estandarizada, podemos bajar las barreras a la producción de grandes aplicaciones para Linux.
 RELOAD_UI = yes
 DISPLAY_NAME = Mono
-CHANGELOG = "1. Initial release"
+CHANGELOG = "2. DSM5 compatibility / CIL bin files / Comcerto2k"
 
 HOMEPAGE = http://mono-project.com/
 LICENSE  =
@@ -25,6 +25,11 @@ SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+# Notify of unsupported architectures 
+ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k),$(ARCH))
+$(error Sorry $(ARCH) is not a supported architecture)
+endif
 
 POST_STRIP_TARGET = mono_extra_install
 
@@ -41,6 +46,8 @@ mono_extra_install:
 	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/lib . | tar -xpkf - -C $(STAGING_DIR)/lib
 	install -m 755 -d $(STAGING_DIR)/etc/mono
 	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/etc/mono . | tar -xpkf - -C $(STAGING_DIR)/etc/mono
+	install -m 755 -d $(STAGING_DIR)/bin
+	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/bin . | tar -xpkf - -C $(STAGING_DIR)/bin
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images
