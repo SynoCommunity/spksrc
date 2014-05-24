@@ -47,4 +47,4 @@ headphones_extra_install: $(STAGING_DIR)/share/Headphones
 
 $(STAGING_DIR)/share/Headphones:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/rembo10/headphones.git Headphones
+	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/rembo10/headphones.git Headphones

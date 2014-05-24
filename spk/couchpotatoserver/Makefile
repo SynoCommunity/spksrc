@@ -50,4 +50,4 @@ couchpotatoserver_extra_install: $(STAGING_DIR)/share/CouchPotatoServer
 
 $(STAGING_DIR)/share/CouchPotatoServer:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/RuudBurger/CouchPotatoServer.git CouchPotatoServer
+	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/RuudBurger/CouchPotatoServer.git CouchPotatoServer
