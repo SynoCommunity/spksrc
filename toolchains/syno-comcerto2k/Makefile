@@ -1,4 +1,4 @@
-TC_NAME = syno-comcerto
+TC_NAME = syno-comcerto2k
 
 TC_DIST_NAME = gcc464_glibc217_neon_comcerto-GPL.tgz
 
