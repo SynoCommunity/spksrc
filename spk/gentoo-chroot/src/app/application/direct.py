@@ -97,21 +97,21 @@ class Overview(Base):
     @expose
     def updates_count(self):
         with open(os.devnull, 'w') as devnull:
-            updates_count = int(subprocess.check_output(['chroot', chroottarget, '/bin/bash', '-c', 'aptitude search "~U" | wc -l | tail'], stdin=devnull, stderr=devnull, env={'PATH': env_path}))
+            updates_count = int(subprocess.check_output(['chroot', chroottarget, '/bin/bash', '-c', 'emerge --update --deep @world --pretend --quiet | grep "U" | wc -l'], stdin=devnull, stderr=devnull, env={'PATH': env_path}))
         return updates_count
 
     @expose
-    def do_update(self):
+    def do_refresh(self):
         with open(os.devnull, 'w') as devnull:
-            status = not subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', 'aptitude update -q'], stdin=devnull, stdout=devnull, stderr=devnull, env={'PATH': env_path})
+            status = not subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', 'emerge --sync --quiet'], stdin=devnull, stdout=devnull, stderr=devnull, env={'PATH': env_path})
         if status:
             return self.updates_count()
         return status
 
     @expose
-    def do_upgrade(self):
+    def do_update(self):
         with open(os.devnull, 'w') as devnull:
-            status = not subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', 'aptitude upgrade -q -y'], stdin=devnull, stdout=devnull, stderr=devnull, env={'PATH': env_path})
+            status = not subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', 'emerge --update --deep @world --quiet'], stdin=devnull, stdout=devnull, stderr=devnull, env={'PATH': env_path})
         return status
 
     def is_installed(self):

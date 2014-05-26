@@ -19,10 +19,10 @@ Ext.Direct.addProvider({
             "name": "updates_count",
             "len": 0
         }, {
-            "name": "do_update",
+            "name": "do_refresh",
             "len": 0
         }, {
-            "name": "do_upgrade",
+            "name": "do_update",
             "len": 0
         }],
         "Services": [{
@@ -471,7 +471,7 @@ SYNOCOMMUNITY.GentooChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.GentooChroot
             items: [{
                 xtype: "fieldset",
                 labelWidth: 130,
-                title: _V("ui", "package_informations"),
+                title: _V("ui", "information"),
                 defaultType: "displayfield",
                 items: [{
                     fieldLabel: _V("ui", "status"),
@@ -485,10 +485,10 @@ SYNOCOMMUNITY.GentooChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.GentooChroot
             }, {
                 xtype: "fieldset",
                 labelWidth: 130,
-                title: "Gentoo",
+                title: "Portage",
                 items: [{
                     xtype: "compositefield",
-                    fieldLabel: _V("ui", "updates"),
+                    fieldLabel: _V("ui", "available_updates"),
                     items: [{
                         xtype: "displayfield",
                         name: "updates",
@@ -496,15 +496,15 @@ SYNOCOMMUNITY.GentooChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.GentooChroot
                         value: ""
                     }, {
                         xtype: "button",
-                        id: "synocommunity-gentoochroot-do_update",
-                        text: _V("ui", "do_update"),
-                        handler: this.onClickUpdate,
+                        id: "synocommunity-gentoochroot-do_refresh",
+                        text: _V("ui", "do_refresh"),
+                        handler: this.onClickRefreshUpdates,
                         scope: this
                     }, {
                         xtype: "button",
-                        id: "synocommunity-gentoochroot-do_upgrade",
-                        text: _V("ui", "do_upgrade"),
-                        handler: this.onClickUpgrade,
+                        id: "synocommunity-gentoochroot-do_update",
+                        text: _V("ui", "do_update"),
+                        handler: this.onClickUpdate,
                         scope: this
                     }]
                 }]
@@ -516,10 +516,10 @@ SYNOCOMMUNITY.GentooChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.GentooChroot
         SYNO.LayoutConfig.fill(config);
         SYNOCOMMUNITY.GentooChroot.PanelOverview.superclass.constructor.call(this, config);
     },
-    onClickUpdate: function (button, event) {
+    onClickRefreshUpdates: function (button, event) {
         button.disable();
-        Ext.getCmp("synocommunity-gentoochroot-do_upgrade").disable();
-        SYNOCOMMUNITY.GentooChroot.Remote.Overview.do_update(function (provider, response) {
+        Ext.getCmp("synocommunity-gentoochroot-do_update").disable();
+        SYNOCOMMUNITY.GentooChroot.Remote.Overview.do_refresh(function (provider, response) {
             if (response.result !== false) {
                 this.getForm().findField("updates").setValue(response.result);
                 this.owner.setStatusOK({
@@ -532,37 +532,37 @@ SYNOCOMMUNITY.GentooChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.GentooChroot
                 });
             }
             button.enable();
-            Ext.getCmp("synocommunity-gentoochroot-do_upgrade").enable();
+            Ext.getCmp("synocommunity-gentoochroot-do_update").enable();
         }, this);
     },
-    onClickUpgrade: function (button, event) {
+    onClickUpdate: function (button, event) {
         button.disable();
-        Ext.getCmp("synocommunity-gentoochroot-do_update").disable();
-        SYNOCOMMUNITY.GentooChroot.Remote.Overview.do_upgrade(function (provider, response) {
+        Ext.getCmp("synocommunity-gentoochroot-do_refresh").disable();
+        SYNOCOMMUNITY.GentooChroot.Remote.Overview.do_update(function (provider, response) {
             if (response.result) {
                 this.getForm().findField("updates").setValue(0);
                 this.owner.setStatusOK({
-                    text: _V("ui", "upgrade_successful")
+                    text: _V("ui", "update_successful")
                 });
             } else {
                 this.owner.setStatusError({
-                    text: _V("ui", "cannot_upgrade"),
+                    text: _V("ui", "cannot_update"),
                     clear: true
                 });
             }
             button.enable();
-            Ext.getCmp("synocommunity-gentoochroot-do_update").enable();
+            Ext.getCmp("synocommunity-gentoochroot-do_refresh").enable();
         }, this);
     },
     onStatus: function (response) {
         this.getForm().findField("install_status").setValue(_V("ui", response.data.installed));
         this.getForm().findField("running_services").setValue(response.data.running_services);
         if (response.data.installed == "installing") {
+            Ext.getCmp("synocommunity-gentoochroot-do_refresh").disable();
             Ext.getCmp("synocommunity-gentoochroot-do_update").disable();
-            Ext.getCmp("synocommunity-gentoochroot-do_upgrade").disable();
         } else {
+            Ext.getCmp("synocommunity-gentoochroot-do_refresh").enable();
             Ext.getCmp("synocommunity-gentoochroot-do_update").enable();
-            Ext.getCmp("synocommunity-gentoochroot-do_upgrade").enable();
         }
     },
     onActivate: function () {
@@ -580,8 +580,8 @@ SYNOCOMMUNITY.GentooChroot.PanelOverview = Ext.extend(SYNOCOMMUNITY.GentooChroot
                         });
                     }
                     if (action.result.data.installed == "installing") {
+                        Ext.getCmp("synocommunity-gentoochroot-do_refresh").disable();
                         Ext.getCmp("synocommunity-gentoochroot-do_update").disable();
-                        Ext.getCmp("synocommunity-gentoochroot-do_upgrade").disable();
                     }
                     this.getEl().unmask();
                     SYNOCOMMUNITY.GentooChroot.Poller.connect();
