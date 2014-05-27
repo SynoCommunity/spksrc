@@ -6,7 +6,7 @@ from config import *
 from db import *
 
 
-__all__ = ['Base', 'Service', 'Overview']
+__all__ = ['Base', 'Services', 'Overview']
 
 
 Base = create_configuration()
