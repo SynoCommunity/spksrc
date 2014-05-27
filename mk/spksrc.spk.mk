@@ -71,6 +71,9 @@ endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
 endif
+ifneq ($(strip $(SUPPORTURL)),)
+	@echo support_url=\"$(SUPPORTURL)\" >> $@
+endif
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
 	@echo install_dep_services=\"$(INSTALL_DEP_SERVICES)\" >> $@
 endif
