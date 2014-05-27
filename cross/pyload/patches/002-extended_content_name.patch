@@ -1,0 +1,27 @@
+--- module/network/HTTPChunk.py	2014-05-24 02:06:47.000000000 +0200
++++ module/network/HTTPChunk.py	2014-05-24 02:10:54.000000000 +0200
+@@ -23,6 +23,7 @@
+ from module.utils import fs_encode
+ import codecs
+ import pycurl
++import urllib
+ 
+ from HTTPRequest import HTTPRequest
+ 
+@@ -256,8 +257,14 @@
+             if line.startswith("accept-ranges") and "bytes" in line:
+                 self.p.chunkSupport = True
+ 
+-            if line.startswith("content-disposition") and "filename=" in line:
+-                name = orgline.partition("filename=")[2]
++            if line.startswith("content-disposition") and ("filename=" in line or "filename*=utf-8''" in line):
++                if "filename=" in line:
++                    # basic version, US-ASCII only
++                    name = orgline.partition("filename=")[2]
++                elif "filename*=utf-8''" in line:
++                    # extended version according to RFC 6266 and RFC 5987. Moreless
++                    name = orgline.partition("''")[2]
++                    name = urllib.unquote(name.encode('ascii')).decode('utf8')
+                 name = name.replace('"', "").replace("'", "").replace(";", "").replace("/", "_").strip()
+                 self.p.nameDisposition = name
+                 self.log.debug("Content-Disposition: %s" % name)
