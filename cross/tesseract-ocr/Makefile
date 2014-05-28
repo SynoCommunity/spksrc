@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)
 DEPENDS = cross/leptonica
 
 HOMEPAGE = https://code.google.com/p/tesseract-ocr/
-COMMENT  = Tesseract is probably the most accurate open source OCR engine available.
+COMMENT  = Tesseract is probably the most accurate open source OCR engine available. This pkg is binary only.
 LICENSE  = Apache License 2.0
 
 GNU_CONFIGURE = 1
