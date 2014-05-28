@@ -6,6 +6,7 @@ DNAME="pyLoad"
 
 PIDFILE="/var/run/pyload.pid"
 PYLOADCORE="/usr/local/python/bin/python /usr/local/pyload/share/pyload/pyLoadCore.py --pidfile=${PIDFILE}"
+export PATH="/usr/local/pyload/bin:$PATH"
 
 case $1 in
     start)
