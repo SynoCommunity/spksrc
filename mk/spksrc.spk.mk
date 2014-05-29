@@ -62,7 +62,7 @@ endif
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
-	@echo firmware=\"3.0-1593\" >> $@
+	@echo firmware=\"3.1-1594\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
