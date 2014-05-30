@@ -13,7 +13,7 @@ DESCRIPTION_FRE = LazyLibrarian est un téléchargeur automatique de livre pour 
 ADMIN_PORT = 8082
 RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
-CHANGELOG = "1. Use source from LibrarianMike\\\n2. Default port changed to 8082"
+CHANGELOG = "1. Use source from LibrarianMike<br>2. Default port changed to 8082"
 
 HOMEPAGE   = https://github.com/LibrarianMike/LazyLibrarian
 LICENSE    =
