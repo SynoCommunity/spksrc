@@ -267,7 +267,7 @@ ifeq ($(PUBLISH_REPO_KEY),)
 	$(error Set PUBLISH_REPO_KEY in local.mk)
 endif
 	http POST $(PUBLISH_REPO_URL) "Authentication-Token:$(PUBLISH_REPO_KEY)" \
-	    @$(SPK_FILE_NAME);filename=$(notdir $(SPK_FILE_NAME))
+	    @$(SPK_FILE_NAME)
 endif
 ifeq ($(strip $(PUBLISH_METHOD)),FTP)
 publish: package
