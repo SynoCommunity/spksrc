@@ -37,7 +37,6 @@ $(WORK_DIR)/package.tgz: strip
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && tar cpzf $@ *)
-	@[ -f $(WORK_DIR)/INFO ] && rm $(WORK_DIR)/INFO || true
 
 $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
@@ -268,7 +267,7 @@ ifeq ($(PUBLISH_REPO_KEY),)
 	$(error Set PUBLISH_REPO_KEY in local.mk)
 endif
 	http POST $(PUBLISH_REPO_URL) "Authentication-Token:$(PUBLISH_REPO_KEY)" \
-	    @$(SPK_FILE_NAME)
+	    @$(SPK_FILE_NAME);filename=$(notdir $(SPK_FILE_NAME))
 endif
 ifeq ($(strip $(PUBLISH_METHOD)),FTP)
 publish: package

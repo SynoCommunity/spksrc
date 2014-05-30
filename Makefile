@@ -36,31 +36,6 @@ spk-clean:
 	    (cd $${spk} && $(MAKE) clean) ; \
 	done
 
-spk_comcerto2k:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
-	do \
-	    (cd $${spk} && $(MAKE) arch-comcerto2k) ; \
-	done
-
-spk-all:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
-	do \
-	    (cd $${spk} && $(MAKE) arch-88f5281) ; \
-	    (cd $${spk} && $(MAKE) arch-88f6281) ; \
-	    (cd $${spk} && $(MAKE) arch-armada370) ; \
-	    (cd $${spk} && $(MAKE) arch-armadaxp) ; \
-	    (cd $${spk} && $(MAKE) arch-bromolow) ; \
-	    (cd $${spk} && $(MAKE) arch-cedarview) ; \
-	    (cd $${spk} && $(MAKE) arch-evansport) ; \
-	    (cd $${spk} && $(MAKE) arch-ppc824x) ; \
-	    (cd $${spk} && $(MAKE) arch-ppc853x) ; \
-	    (cd $${spk} && $(MAKE) arch-ppc854x) ; \
-	    (cd $${spk} && $(MAKE) arch-powerpc) ; \
-	    (cd $${spk} && $(MAKE) arch-qoriq) ; \
-	    (cd $${spk} && $(MAKE) arch-x86) ; \
-	    (cd $${spk} && $(MAKE) arch-comcerto2k) ; \
-	done
-
 %: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
