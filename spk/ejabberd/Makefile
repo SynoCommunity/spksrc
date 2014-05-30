@@ -13,7 +13,6 @@ ADMIN_PORT = 5280
 RELOAD_UI = yes
 DISPLAY_NAME = ejabberd
 BETA = 1
-FIRMWARE = 5.0-4418
 
 HOMEPAGE   = http://www.ejabberd.im
 LICENSE    = GPLv2
