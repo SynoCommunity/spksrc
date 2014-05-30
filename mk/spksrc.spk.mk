@@ -66,7 +66,6 @@ else
 endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
-	@echo beta=1 >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
@@ -267,9 +266,8 @@ endif
 ifeq ($(PUBLISH_REPO_KEY),)
 	$(error Set PUBLISH_REPO_KEY in local.mk)
 endif
-	curl -k -A "spksrc v1.0; $(PUBLISH_REPO_KEY)" \
-	     -F "package=@$(SPK_FILE_NAME);filename=$(notdir $(SPK_FILE_NAME))" \
-	     $(PUBLISH_REPO_URL)
+	http POST $(PUBLISH_REPO_URL) "Authentication-Token:$(PUBLISH_REPO_KEY)" \
+	    @$(SPK_FILE_NAME);filename=$(notdir $(SPK_FILE_NAME))
 endif
 ifeq ($(strip $(PUBLISH_METHOD)),FTP)
 publish: package
