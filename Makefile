@@ -75,7 +75,7 @@ setup: local.mk
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
 	@echo "PUBLISH_METHOD=REPO" > $@
-	@echo "PUBLISH_REPO_URL=https://packages.synocommunity.com/" >> $@
+	@echo "PUBLISH_REPO_URL=http://packages.synocommunity.com/" >> $@
 	@echo "PUBLISH_REPO_KEY=" >> $@
 	@echo "PUBLISH_FTP_URL=ftp://synocommunity.com/upload_spk" >> $@
 	@echo "PUBLISH_FTP_USER=" >> $@
