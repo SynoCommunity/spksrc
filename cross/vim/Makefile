@@ -23,3 +23,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myInstall
 myInstall:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+	install -m 644 src/vimrc $(STAGING_INSTALL_PREFIX)/share/vim/vimrc
