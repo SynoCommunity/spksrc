@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 6789
 DISPLAY_NAME = NZBGet
-CHANGELOG = "1. DSM 5.0 compatibility\n2. unrar optimization"
+CHANGELOG = "1. DSM 5.0 compatibility<br>2. unrar optimization"
 
 HOMEPAGE = http://nzbget.sourceforge.net/
 LICENSE  =

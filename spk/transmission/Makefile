@@ -13,7 +13,7 @@ DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "1. Update to 2.8.3\n2. Add wizard input validation"
+CHANGELOG = "1. Update to 2.8.3<br>2. Add wizard input validation"
 
 HOMEPAGE = http://www.transmissionbt.com/
 LICENSE  =

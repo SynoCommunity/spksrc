@@ -14,7 +14,7 @@ DESCRIPTION_SPN = Headphones permite descargar automáticamente música mediante
 ADMIN_PORT = 8181
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones
-CHANGELOG = "1. Add DSM5.0 compatibility\n2. Remove Perl dependency, add Git dependency"
+CHANGELOG = "1. Add DSM5.0 compatibility<br>2. Remove Perl dependency, add Git dependency"
 
 HOMEPAGE   = https://github.com/rembo10/headphones
 LICENSE    =

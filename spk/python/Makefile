@@ -18,8 +18,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. DSM5 only\n2. Add wheel, mercurial and scrypt modules"
-FIRMWARE = 5.0-4418
+CHANGELOG = "1. Add wheel, mercurial and scrypt modules"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =

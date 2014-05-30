@@ -13,7 +13,7 @@ DESCRIPTION_FRE = CouchPotato Custom vous permet d\\\'exécuter le fork de votre
 ADMIN_PORT = 5053
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato Custom
-CHANGELOG = "1. Change default fork\n2. Rename package"
+CHANGELOG = "1. Change default fork<br>2. Rename package"
 
 HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL
