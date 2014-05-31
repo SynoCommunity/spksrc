@@ -257,31 +257,15 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO md5 $(WORK_DIR)/PACKA
 package: $(SPK_FILE_NAME)
 
 ### Publish rules
-PUBLISH_METHOD ?= REPO
-ifeq ($(strip $(PUBLISH_METHOD)),REPO)
 publish: package
-ifeq ($(PUBLISH_REPO_URL),)
-	$(error Set PUBLISH_REPO_URL in local.mk)
+ifeq ($(PUBLISH_URL),)
+	$(error Set PUBLISH_URL in local.mk)
 endif
-ifeq ($(PUBLISH_REPO_KEY),)
-	$(error Set PUBLISH_REPO_KEY in local.mk)
+ifeq ($(PUBLISH_AUTH_TOKEN),)
+	$(error Set PUBLISH_AUTH_TOKEN in local.mk)
 endif
-	http POST $(PUBLISH_REPO_URL) "Authentication-Token:$(PUBLISH_REPO_KEY)" \
+	http POST $(PUBLISH_URL) "Authentication-Token:$(PUBLISH_AUTH_TOKEN)" \
 	    @$(SPK_FILE_NAME)
-endif
-ifeq ($(strip $(PUBLISH_METHOD)),FTP)
-publish: package
-ifeq ($(PUBLISH_FTP_URL),)
-	$(error Set PUBLISH_FTP_URL in local.mk)
-endif
-ifeq ($(PUBLISH_FTP_USER),)
-	$(error Set PUBLISH_FTP_USER in local.mk)
-endif
-ifeq ($(PUBLISH_FTP_PASSWORD),)
-	$(error Set PUBLISH_FTP_PASSWORD in local.mk)
-endif
-	curl -T "$(SPK_FILE_NAME)" -u $(PUBLISH_FTP_USER):$(PUBLISH_FTP_PASSWORD) $(PUBLISH_FTP_URL)/$(notdir $(SPK_FILE_NAME))
-endif
 
 
 ### Clean rules
