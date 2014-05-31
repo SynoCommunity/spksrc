@@ -1,5 +1,5 @@
 PKG_NAME = openssl
-PKG_VERS = 1.0.0l
+PKG_VERS = 1.0.1g
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.openssl.org/source
