@@ -8,11 +8,12 @@ DNAME="HAProxy"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="haproxy"
 GROUP="nobody"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+CFG_FILE="${INSTALL_DIR}/var/haproxy.cfg"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
@@ -83,6 +84,13 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # Revision 12 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 12 ]; then
+        sed -i -r -e "s/server (.*) ssl/server \1 ssl verify none/" ${CFG_FILE}
+        cd ${INSTALL_DIR}/app/application && ${PYTHON} db_upgrade_12.py
+        exit 1
+    fi
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
