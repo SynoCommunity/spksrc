@@ -34,9 +34,6 @@ postinst ()
     #Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
     
-    #Correct /var write
-    chmod -R 757 ${INSTALL_DIR}/var
-
     exit 0
 }
 
