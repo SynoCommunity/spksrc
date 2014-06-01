@@ -4,7 +4,6 @@ SPK_REV = 1
 SPK_ICON = src/zabbix.png
 DSM_UI_DIR = app
 BETA = 1
-FIRMWARE = 5.0-4418
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 SPK_CONFLICT = "zabbix"
