@@ -88,8 +88,7 @@ preupgrade ()
     # Revision 12 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 12 ]; then
         sed -i -r -e "s/server (.*) ssl/server \1 ssl verify none/" ${CFG_FILE}
-        cd ${INSTALL_DIR}/app/application && ${PYTHON} db_upgrade_12.py
-        exit 1
+        ${INSTALL_DIR}/env/bin/python ${SYNOPKG_PKGINST_TEMP_DIR}/app/application/db_upgrade_12.py
     fi
 
     # Save some stuff
