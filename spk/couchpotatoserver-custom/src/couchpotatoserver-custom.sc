@@ -2,5 +2,5 @@
 title="CouchPotato Custom"
 desc="CouchPotato Custom"
 port_forward="yes"
-dst.ports="5050/tcp"
+dst.ports="5053/tcp"
 
