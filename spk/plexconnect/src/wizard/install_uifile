@@ -1,0 +1,28 @@
+[{
+    "step_title": "PlexConnect settings",
+    "items": [{
+        "type": "textfield",
+        "desc": "The IP address of this Synology NAS.",
+        "subitems": [{
+            "key": "wizard_ip",
+            "desc": "IP address of NAS",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 7,
+                "maxLength": 15
+                }
+        }]
+    },{
+        "type": "textfield",
+        "desc": "Gateway or ISP DNS server (fom ATV before you changed it)",
+        "subitems": [{
+            "key": "wizard_dns_server",
+            "desc": "IP address of DNS:",
+            "validator": {
+                "allowBlank": true,
+                "minLength": 7,
+                "maxLength": 15
+                }
+        }]
+    }]
+}]
