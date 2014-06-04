@@ -1,6 +1,6 @@
 SPK_NAME = couchpotatoserver
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/couchpotatoserver.png
 DSM_UI_DIR = app
 BETA = 1
@@ -15,7 +15,7 @@ DESCRIPTION_SPN = CouchPotato es un sistema automático de descarga de peliculas
 ADMIN_PORT = 5050
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato
-CHANGELOG = "1. Add Git dependency<br>2. Rename package"
+CHANGELOG = "1. Fix update issues"
 
 HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL
