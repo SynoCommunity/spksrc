@@ -17,7 +17,7 @@ BETA = 1
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
-HELPURL    = http://www.synocommunity.com/help/haproxy
+HELPURL    = http://synocommunity.com/help/haproxy
 
 WIZARDS_DIR = src/wizard/
 

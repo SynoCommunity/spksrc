@@ -16,7 +16,7 @@ CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = https://github.com/Diaoul/subliminal
 LICENSE    = LGPL
-HELPURL    = http://www.synocommunity.com/help/subliminal
+HELPURL    = http://synocommunity.com/help/subliminal
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

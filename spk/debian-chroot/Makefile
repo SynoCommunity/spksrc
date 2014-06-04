@@ -16,7 +16,7 @@ CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://www.debian.org/
 LICENSE    =
-HELPURL    = http://www.synocommunity.com/help/debian-chroot
+HELPURL    = http://synocommunity.com/help/debian-chroot
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
