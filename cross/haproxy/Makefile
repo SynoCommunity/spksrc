@@ -20,7 +20,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile: 
-	$(RUN) $(MAKE) TARGET=generic CPU=generic ARCH= USE_OPENSSL=1 USE_TPROXY=1
+	$(RUN) $(MAKE) TARGET=generic CPU=generic ARCH= USE_OPENSSL=1 USE_TPROXY=1 USE_PTHREAD_PSHARED=1 SPKSRC_CFLAGS="$(CFLAGS)" SPKSRC_LDFLAGS="$(LDFLAGS)"
 
 myInstall:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
