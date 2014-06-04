@@ -264,7 +264,7 @@ endif
 ifeq ($(PUBLISH_AUTH_TOKEN),)
 	$(error Set PUBLISH_AUTH_TOKEN in local.mk)
 endif
-	http POST $(PUBLISH_URL) "Authentication-Token:$(PUBLISH_AUTH_TOKEN)" \
+	http POST $(PUBLISH_URL)/packages Authentication-Token:$(PUBLISH_AUTH_TOKEN) \
 	    @$(SPK_FILE_NAME)
 
 
