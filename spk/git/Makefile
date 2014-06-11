@@ -1,5 +1,5 @@
 SPK_NAME = git
-SPK_VERS = 1.8.4
+SPK_VERS = 1.8.5.2
 SPK_REV = 3
 SPK_ICON = src/git.png
 
