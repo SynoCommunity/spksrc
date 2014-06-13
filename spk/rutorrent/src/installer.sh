@@ -54,6 +54,7 @@ postinst ()
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    addgroup ${USER} ${APACHE_USER}
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -87,7 +88,7 @@ postinst ()
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-    chown -R ${APACHE_USER} ${WEB_DIR}/${PACKAGE}
+    chown -R ${APACHE_USER}:${APACHE_USER} ${WEB_DIR}/${PACKAGE}
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -103,6 +104,7 @@ preuninst ()
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         delgroup ${USER} ${GROUP}
+        delgroup ${USER} ${APACHE_USER}
         deluser ${USER}
     fi
 
