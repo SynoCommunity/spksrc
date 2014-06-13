@@ -140,6 +140,7 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/conf/config.php ${TMP_DIR}/${PACKAGE}/
+    cp -pr ${WEB_DIR}/${PACKAGE}/share/ ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.rtorrent.rc ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.session ${TMP_DIR}/${PACKAGE}/
 
@@ -150,6 +151,7 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/conf/
+    cp -pr ${TMP_DIR}/${PACKAGE}/share/*/ ${WEB_DIR}/${PACKAGE}/share/
     mv ${TMP_DIR}/${PACKAGE}/.rtorrent.rc ${INSTALL_DIR}/var/
     mv ${TMP_DIR}/${PACKAGE}/.session ${INSTALL_DIR}/var/
     rm -fr ${TMP_DIR}/${PACKAGE}
