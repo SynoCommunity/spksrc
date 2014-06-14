@@ -16,6 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_TARGET = myConfigure
 POST_INSTALL_TARGET = myPostInstall
 
+CONFIGURE_ARGS = --enable-ipv6
 
 include ../../mk/spksrc.cross-cc.mk
 
