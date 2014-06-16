@@ -3,7 +3,7 @@ PKG_VERS = 1.6.20070208
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.ossp.org/pkg/lib/$(PKG_NAME)
+PKG_DIST_SITE = http://download.openpkg.org/components/cache/$(PKG_NAME)
 
 DEPENDS =
 
