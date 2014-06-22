@@ -1,0 +1,11 @@
+--- CMakeLists.txt.orig	2014-06-28 01:07:09.000000000 +0200
++++ CMakeLists.txt	2014-06-28 01:08:40.000000000 +0200
+@@ -332,7 +332,7 @@
+ 	message(STATUS "Not building on Raspberry Pi. GPIO support disabled.")
+ ENDIF(RaspberryPi)
+ 
+-target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} pthread lua ${CMAKE_DL_LIBS})
++target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} pthread lua ${CMAKE_DL_LIBS} -lrt)
+ 
+ ADD_PRECOMPILED_HEADER(domoticz "main/stdafx.h")
+ 
