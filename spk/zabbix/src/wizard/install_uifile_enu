@@ -1,0 +1,25 @@
+[{
+    "step_title": "Database Configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'zabbix' MySQL user and database will be created. Please enter a password for the 'zabbix' user.",
+        "subitems": [{
+         "desc": "Enter your Zabbix password.",
+            "key": "wizard_mysql_password_zabbix",
+            "desc": "Zabbix password"
+        }]
+    }]
+}, {
+    "step_title": "Installation Note",
+    "items": [{
+        "desc": "Using the Zabbix Controls link in the Synology interface, you can configure the server-, agent- and proxy services, view information and start or stop individual services.
+<br>In addition, you can use the Package Manager to start or stop the package and the services you have configured."
+    }]
+}]
