@@ -1,0 +1,3 @@
+shr:share/syslinux/core/pxelinux.0
+shr:share/syslinux/com32/menu/vesamenu.c32
+shr:share/syslinux/memdisk/memdisk
