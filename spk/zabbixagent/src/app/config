@@ -8,7 +8,8 @@
             "width": 1024,
             "height": 700,
             "url": "3rdparty/zabbixagent/index.cgi",
-            "allUsers": false
+            "allUsers": false,
+            "grantPrivilege": "local"
         }
 
     }
