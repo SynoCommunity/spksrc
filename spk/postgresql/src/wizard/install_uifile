@@ -1,0 +1,31 @@
+[{
+    "step_title": "Postgres SuperUser Configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Enter your require SuperUser username",
+        "subitems": [{
+            "key": "wizard_superuser_name",
+            "desc": "SuperUser username",
+            "validator": {
+            "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'SuperUser' will be created. Please enter a password for the 'SuperUser' user.",
+        "subitems": [{
+         "desc": "Enter your require SuperUser password.",
+            "key": "wizard_superuser_password",
+            "desc": "SuperUser password",
+            "validator": {
+            "allowBlank": false
+            }
+        }]
+    }]
+}, {
+    "step_title": "Installation Note",
+    "items": [{
+        "desc": "After the installer has been completed, you will be able to login with the SuperUser you created.
+<br><br>You can use pgAdmin3 for administration.",
+    }]
+}]
