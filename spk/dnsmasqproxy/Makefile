@@ -16,7 +16,7 @@ CHANGELOG = "Initial release"
 HOMEPAGE   = http://www.thekelleys.org.uk
 LICENSE    = 
 
-WIZARDS_DIR = 
+WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -46,7 +46,7 @@ dnsmasqproxy_extra_install:
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/dnsmasq.conf $(STAGING_DIR)/etc/dnsmasq.conf
 	install -m 644 src/default $(STAGING_DIR)/share/pxelinux.cfg/default
-	install -m 644 src/default $(STAGING_DIR)/share/bg.legacy.png
+	install -m 644 src/bg.legacy.png $(STAGING_DIR)/share/bg.legacy.png
 
 	install -m 644 $(WORK_DIR)/install$(INSTALL_PREFIX)/share/syslinux/com32/menu/vesamenu.c32 $(STAGING_DIR)/share
 	install -m 644 $(WORK_DIR)/install$(INSTALL_PREFIX)/share/syslinux/core/pxelinux.0 $(STAGING_DIR)/share

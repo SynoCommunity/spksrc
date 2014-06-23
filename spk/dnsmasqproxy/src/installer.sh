@@ -35,6 +35,13 @@ postinst ()
 
     cp -R ${INSTALL_DIR}/share/* /volume1/TFTP_PXE
 
+    # Setup Synology Tftp Server
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" -a "${wizard_start_tftp}" == "true" ]; then
+        sed -i "s|runtftp.*|runtftp=\"yes\"|g" /etc/synoinfo.conf
+        sed -i "s|syno_tftproot.*|syno_tftproot=/volume1/TFTP_PXE|g" /etc/opentftp.ini
+        /usr/syno/etc/rc.d/S99tftpd.sh start
+    fi
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
@@ -53,6 +60,13 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+
+    # Setup Synology Tftp Server
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_stop_tftp}" == "true" ]; then
+        /usr/syno/etc/rc.d/S99tftpd.sh stop
+        sed -i "s|syno_tftproot.*|syno_tftproot=|g" /etc/opentftp.ini
+        sed -i "s|runtftp.*|runtftp=\"no\"|g" /etc/synoinfo.conf
+    fi
 
     exit 0
 }
