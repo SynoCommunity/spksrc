@@ -19,8 +19,14 @@ SERVER_PID_FILE="${INSTALL_DIR}/var/dnsmasq.pid"
 
 start_daemon ()
 {
+    # auto creates the ip address to match the synology nas ip
+    sed -i '/^dhcp-range/d' ${DNSMASQ_CONF}
+    echo "dhcp-range=`hostname -i`,proxy" >> ${DNSMASQ_CONF}
+
+    # bootup
     ${DNSMASQ_SERVER} --user=${USER} --conf-file=${DNSMASQ_CONF} --dhcp-leasefile=${DNSMASQ_DNSLEASE} --log-facility=${LOG_FILE} --pid-file=${SERVER_PID_FILE}
 }
+
 
 stop_daemon ()
 {

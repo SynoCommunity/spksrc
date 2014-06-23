@@ -26,16 +26,13 @@ postinst ()
     # Setup pxe folder
     synoshare --get TFTP_PXE
     if [ $? != 0 ]; then
-    su -c 'synoshare --add TFTP_PXE "TFTP_PXE shared folder" /volume1/TFTP_PXE "" "admin" "" 1 0' - ${USER}
-    else
     echo "Directory already exist"
     exit 1
+    else
+    su -c 'synoshare --add TFTP_PXE "TFTP_PXE shared folder" /volume1/TFTP_PXE "" "admin" "" 1 0' - ${USER}
     fi
 	
     cp -R ${INSTALL_DIR}/share/* /volume1/TFTP_PXE
-
-    # Setup config file
-    sed -i -e "s|@server-ip@|${syno_server_ip}|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
