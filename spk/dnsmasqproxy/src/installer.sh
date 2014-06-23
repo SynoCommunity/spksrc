@@ -14,6 +14,16 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
 {
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Check directory and setup pxe folder
+        if [ ! -d /volume1/TFTP_PXE ]; then
+            su -c 'synoshare --add TFTP_PXE "TFTP_PXE shared folder" /volume1/TFTP_PXE "" "admin" "" 1 0' - ${USER}
+        else
+            echo "Install failed because the directory already exist"
+            exit 1
+        fi
+    fi
+
     exit 0
 }
 
@@ -23,15 +33,6 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
     ln -s /usr/syno/sbin/dnsmasq ${INSTALL_DIR}/sbin/dnsmasq
 
-    # Setup pxe folder
-    synoshare --get TFTP_PXE
-    if [ $? != 0 ]; then
-    echo "Directory already exist"
-    exit 1
-    else
-    su -c 'synoshare --add TFTP_PXE "TFTP_PXE shared folder" /volume1/TFTP_PXE "" "admin" "" 1 0' - ${USER}
-    fi
-	
     cp -R ${INSTALL_DIR}/share/* /volume1/TFTP_PXE
 
     # Correct the files ownership

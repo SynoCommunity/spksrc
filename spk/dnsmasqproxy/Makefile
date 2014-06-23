@@ -16,7 +16,7 @@ CHANGELOG = "Initial release"
 HOMEPAGE   = http://www.thekelleys.org.uk
 LICENSE    = 
 
-WIZARDS_DIR = src/wizard/
+WIZARDS_DIR = 
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
