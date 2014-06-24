@@ -95,6 +95,7 @@ postinst ()
         echo -e "[PATH=${WEB_DIR}/${PACKAGE}]\nmax_execution_time = 300\nmax_input_time = 300" > /etc/php/conf.d/${PACKAGE_NAME}.ini
     fi
 
+    echo -e "\nErrorDocument 403 \"Zabbix Server is turned off...\ndeny from all\n" >> ${WEB_DIR}/${PACKAGE}/.htaccess
 
     # Fix for Zabbix and MariaDB socket error
     # Seems to work without this on DSM4.3

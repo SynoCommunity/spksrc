@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = http://cdn.mysql.com/Downloads/Connector-ODBC/5.2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)-src
 
-DEPENDS = cross/mysql5 cross/unixODBC
+DEPENDS = cross/libmysql cross/unixODBC
 
 HOMEPAGE = https://dev.mysql.com/
 COMMENT  = 

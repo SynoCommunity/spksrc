@@ -19,7 +19,7 @@
 }, {
     "step_title": "Installation Note",
     "items": [{
-        "desc": "Using the Zabbix Controls link in the Synology interface, you can configure the server-, agent- and proxy services, view information and start or stop individual services.
-<br>In addition, you can use the Package Manager to start or stop the package and the services you have configured."
+        "desc": "Using the Zabbix Controls link in the Synology interface, you can configure the server, agent and proxy services, view information and start or stop individual services.
+<br><br>In addition, you can use the Package Manager to start or stop the package and the services you have configured."
     }]
 }]

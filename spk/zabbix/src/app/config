@@ -9,7 +9,8 @@
             "height": 700,
             "url": "3rdparty/zabbix/index.cgi",
             "allowMultiInstance": false,
-            "allUsers": "false"
+            "allUsers": "false",
+            "grantPrivilege": "local"
         },
         "com.synocommunity.packages.zabbixgui": {
             "title": "Zabbix Server Web Gui",

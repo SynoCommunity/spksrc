@@ -8,6 +8,7 @@ DNAME="Zabbix Server"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="${PACKAGE}server"
+WEB_DIR="/var/services/web"
 
 # Zabbix Others
 ZABBIX_SERVER="${INSTALL_DIR}/sbin/zabbix_server"
@@ -22,6 +23,7 @@ start_daemon ()
     echo -e "" > ${SERVER_FILE}
     echo -e "" > ${SERVER_FILE_GUI}
     su - ${USER} -c "${ZABBIX_SERVER}"
+    sed -i '/^deny from all/d' ${WEB_DIR}/${PACKAGE}/.htaccess
 }
 
 stop_daemon ()
@@ -31,6 +33,7 @@ stop_daemon ()
     rm -f ${SERVER_PID_FILE}
     rm -f ${SERVER_FILE}
     rm -f ${SERVER_FILE_GUI}
+    echo "deny from all" >> ${WEB_DIR}/${PACKAGE}/.htaccess
 }
 
 daemon_status ()

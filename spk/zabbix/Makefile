@@ -1,12 +1,13 @@
 SPK_NAME = zabbix
 SPK_VERS = 2.2.2
 SPK_REV = 1
-SPK_ICON = src/zabbix.png
+SPK_ICON = src/icon.png
 DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
-SPK_DEPENDS = "Perl"
+SPK_DEPENDS = "Perl:MariaDB"
+SPK_CONFLICT = "zabbixagent"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = The enterprise-class monitoring solution for everyone. This is the complete suite with Server, Proxy and Agent. Support for zabbix agents, ipmi, vmachine monitoring and jabber notifications.
@@ -21,6 +22,7 @@ LICENSE  =
 HELPURL    = https://www.zabbix.com/documentation/2.2
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
