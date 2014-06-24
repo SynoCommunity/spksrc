@@ -3,7 +3,7 @@
         "com.synocommunity.packages.postgresql": {
             "title": "PostgreSQL",
             "desc": "PostgreSQL is a powerful, open source object-relational database system.",
-            "icon": "images/icon{0}.png",
+            "icon": "images/postgresql-{0}.png",
             "allUsers": "false",
             "grantPrivilege": "local"
         }
