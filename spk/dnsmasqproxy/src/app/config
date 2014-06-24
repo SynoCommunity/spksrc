@@ -3,7 +3,7 @@
         "com.synocommunity.packages.dnsmasqproxy": {
             "title": "DnsMasq Proxy",
             "desc": "Dnsmasq is a lightweight, easy to configure DNS forwarder and DHCP server.",
-            "icon": "images/icon{0}.png",
+            "icon": "images/dnsmasqproxy-{0}.png",
             "allUsers": "false",
             "grantPrivilege": "local"
         }
