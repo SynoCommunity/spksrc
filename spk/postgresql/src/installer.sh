@@ -55,6 +55,11 @@ postinst ()
         fi
     fi
 
+    # Set pg_hba.conf allowed ip's to local network only
+    echo "">> ${PGDATA}/pg_hba.conf
+    echo "# IPv4 settings from installer :">> ${PGDATA}/pg_hba.conf
+    echo "host    all             all             `hostname -i`        md5" | sed -r "s/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)[0-9]{1,3}/\10\\/24/"  >> ${PGDATA}/pg_hba.conf
+
     exit 0
 }
 
