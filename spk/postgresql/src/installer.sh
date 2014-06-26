@@ -55,10 +55,18 @@ postinst ()
         fi
     fi
 
+    fi
+
     # Set pg_hba.conf allowed ip's to local network only
-    echo "">> ${PGDATA}/pg_hba.conf
-    echo "# IPv4 settings from installer :">> ${PGDATA}/pg_hba.conf
-    echo "host    all             all             `hostname -i`        md5" | sed -r "s/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)[0-9]{1,3}/\10\\/24/"  >> ${PGDATA}/pg_hba.conf
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" -a "${wizard_useownip_postgres}" == "true" ]; then
+        echo "">> ${PGDATA}/pg_hba.conf
+        echo "# IPv4 settings from installer :">> ${PGDATA}/pg_hba.conf
+        echo "host    all             all             ${wizard_myip_postgres}             md5"  >> ${PGDATA}/pg_hba.conf
+    else
+        echo "">> ${PGDATA}/pg_hba.conf
+        echo "# IPv4 settings from installer :">> ${PGDATA}/pg_hba.conf
+        echo "host    all             all             `hostname -i`        md5" | sed -r "s/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)[0-9]{1,3}/\10\\/24/"  >> ${PGDATA}/pg_hba.conf
+    fi
 
     exit 0
 }

@@ -2,7 +2,7 @@
     "step_title": "Postgres SuperUser Configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Enter your require SuperUser username",
+        "desc": "A 'SuperUser' will be created. Please enter 'SuperUser' details.",
         "subitems": [{
             "key": "wizard_superuser_name",
             "desc": "SuperUser username",
@@ -12,7 +12,7 @@
         }]
     }, {
         "type": "password",
-        "desc": "A 'SuperUser' will be created. Please enter a password for the 'SuperUser' user.",
+        "desc": " ",
         "subitems": [{
          "desc": "Enter your require SuperUser password.",
             "key": "wizard_superuser_password",
@@ -21,11 +21,26 @@
             "allowBlank": false
             }
         }]
+    }, {
+        "type": "multiselect",
+        "desc": "<br>The ip is set from your synology ip with a subnet */24, you can set this yourself by selecting and providing the information below. ei 192.168.0.0/24 if Nas address is 192.168.0.1-254",
+        "subitems": [{
+         "desc": "Yes I will set ip/subnet myself",
+            "key": "wizard_useownip_postgres",
+            "desc": "Yes, i'm setting myself"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": " ",
+        "subitems": [{
+         "desc": "Enter your require SuperUser password.",
+            "key": "wizard_myip_postgres",
+            "desc": "What is your ip/subnet ?"
+        }]
     }]
 }, {
     "step_title": "Installation Note",
     "items": [{
-        "desc": "After the installer has been completed, you will be able to login with the SuperUser you created.
-<br><br>You can use pgAdmin3 for administration.",
+        "desc": "After the installer has been completed, you will be able to login with the SuperUser you created.<br><br>You can use the pgAdmin3 desktop client for administration.",
     }]
 }]
