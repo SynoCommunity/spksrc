@@ -25,7 +25,6 @@
         "type": "multiselect",
         "desc": "<br>The ip is set from your synology ip with a subnet */24, you can set this yourself by selecting and providing the information below. ei 192.168.0.0/24 if Nas address is 192.168.0.1-254",
         "subitems": [{
-         "desc": "Yes I will set ip/subnet myself",
             "key": "wizard_useownip_postgres",
             "desc": "Yes, i'm setting myself"
         }]
@@ -33,9 +32,16 @@
         "type": "textfield",
         "desc": " ",
         "subitems": [{
-         "desc": "Enter your require SuperUser password.",
             "key": "wizard_myip_postgres",
-            "desc": "What is your ip/subnet ?"
+            "desc": "What is your ip/subnet ?",
+            "emptyText": "example 192.168.1.0/24 or 10.10.0.0/8",
+            "validator": {
+			"regex": {
+            "vtype": "alphanum",
+			"expr": "/^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0]{1})\\/([0-9]{1,2})$/", 
+			"errorText": "Error, Example 192.168.1.0/24 or 10.10.0.0/8" 
+			}
+            }
         }]
     }]
 }, {
