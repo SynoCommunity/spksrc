@@ -36,11 +36,11 @@
             "desc": "What is your ip/subnet ?",
             "emptyText": "example 192.168.1.0/24 or 10.10.0.0/8",
             "validator": {
-			"regex": {
-            "vtype": "alphanum",
-			"expr": "/^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0]{1})\\/([0-9]{1,2})$/", 
-			"errorText": "Error, Example 192.168.1.0/24 or 10.10.0.0/8" 
-			}
+                "regex": {
+                "vtype": "alphanum",
+                "expr": "/^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0]{1})\\/([0-9]{1,2})$/", 
+                "errorText": "Error, Example 192.168.1.0/24 or 10.10.0.0/8" 
+                }
             }
         }]
     }]
