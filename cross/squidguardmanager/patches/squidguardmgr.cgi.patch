@@ -1,6 +1,6 @@
---- cgi-bin/squidguardmgr.cgi.old	2013-01-16 14:52:34.878040714 +0100
-+++ cgi-bin/squidguardmgr.cgi	2013-01-16 16:18:42.973068959 +0100
-@@ -14,6 +14,57 @@
+--- cgi-bin/squidguardmgr.cgi.old	2014-06-07 20:11:07.370279654 +0200
++++ cgi-bin/squidguardmgr.cgi	2014-07-03 18:27:36.137067489 +0200
+@@ -14,6 +14,58 @@
  
  use strict qw{vars subs};
  
@@ -54,16 +54,118 @@
 +		"fr_FR"
 +		);
 +$LANG = getpreferedlang(@supported);
++my $RUNASUSER = 'squid';
 +
  $VERSION     = '1.11',
  $AUTHOR      = 'Gilles DAROLD <gilles AT darold DOT net>';
  $COPYRIGHT   = 'Copyright &copy; 2010-2012 Gilles DAROLD, all rights reserved';
-@@ -37,7 +88,6 @@
+@@ -24,8 +76,8 @@
+ my $SC_PROGRAM  = 'SquidClamav Manager';
+ 
+ # Default SquidGuard installation path
+-my $DBHOME = "/var/lib/squidguard/db";
+-my $LOGDIR = "/var/log/squid";
++my $DBHOME = "/usr/local/squidguard/var/db";
++my $LOGDIR = "/usr/local/squidguard/var/logs";
+ 
+ # Variables that can be overidden into the squidguardmgr.conf file
+ our $DIFF       = '/usr/bin/diff';
+@@ -33,11 +85,10 @@
+ our $FIND       = '/usr/bin/find';
+ our $RM         = '/bin/rm';
+ our $TAIL       = '/usr/bin/tail';
+-our $SQUIDGUARD = '/usr/local/bin/squidGuard';
++our $SQUIDGUARD = '/usr/local/squidguard/bin/squidGuard';
  our $BLDESC     = 'description.dat';
- our $CONF_FILE  = '/usr/local/squidGuard/squidguard.conf';
+-our $CONF_FILE  = '/usr/local/squidGuard/squidguard.conf';
++our $CONF_FILE  = '/usr/local/squidguard/etc/squidguard.conf';
  our $LANGDIR    = 'lang';
 -our $LANG       = 'en_US';
  our $IMG_DIR    = 'images';
  our $CSS_FILE   = 'squidguardmgr.css';
  our $JS_FILE    = 'squidguardmgr.js';
-
+@@ -45,8 +96,8 @@
+ our $LOG_LINES  = 1000;
+ our $SQUIDCLAMAV   = '/usr/bin/squidclamav';
+ our $SC_CONF_FILE  = '/etc/squidclamav.conf';
+-our $SQUID_WRAPPER = '/var/www/squidguardmgr/squid_wrapper';
+-our $C_ICAP_SOCKET = '/var/run/c-icap/c-icap.ctl';
++our $SQUID_WRAPPER = '/usr/local/squidguard/share/www/squidguardmgr/squid_wrapper';
++our $C_ICAP_SOCKET = '/usr/local/squidguard/var/run/c-icap/c-icap.ctl';
+ our $KEEP_DIFF  = 1;
+ 
+ # Configuration file
+@@ -155,7 +206,7 @@
+ 	if ($VIEW eq 'squid') {
+ 		if ($SQUID_WRAPPER) {
+ 			print "Running: $SQUID_WRAPPER ... \n";
+-			$ERROR = `$SQUID_WRAPPER 2>&1`;
++			$ERROR = `su - squid -c $SQUID_WRAPPER 2>&1`;
+ 			&error($ERROR) if ($ERROR);
+ 			print "Ok." if (!$ERROR);
+ 		}
+@@ -264,7 +315,7 @@
+ 
+ if ($ACTION eq 'squid') {
+ 	if ($SQUID_WRAPPER) {
+-		$ERROR = `$SQUID_WRAPPER`;
++		$ERROR = `su - squid -c $SQUID_WRAPPER 2>&1`;
+ 	}
+ 	$ACTION = '';
+ }
+@@ -861,6 +912,7 @@
+ 	if (open(OUT, ">>$file")) {
+ 		print OUT join("\n", @add), "\n";
+ 		close OUT;
++		`chown $RUNASUSER $file`;
+ 		if ($KEEP_DIFF) {
+ 			# Store these items into a squidGuard diff history file
+ 			&add_hist_item("$file.diff.hist", '+', @add);
+@@ -882,6 +934,7 @@
+ 	} else {
+ 		$file =~ s#$CONFIG{dbhome}/##;
+ 		$ERROR = `$SQUIDGUARD -C $file`;
++		`chown $RUNASUSER $file`;
+ 	}
+ }
+ 
+@@ -919,6 +972,7 @@
+ 			if (open(OUT, ">$file")) {
+ 				print OUT "$txt";
+ 				close OUT;
++				`chown $RUNASUSER $file`;
+ 				# Store these items into a squidGuard diff history file
+ 				if ($KEEP_DIFF) {
+ 					&add_hist_item("$file.diff.hist", '-', @removed);
+@@ -939,6 +993,7 @@
+ 				map { s/^/\-/; } @removed;
+ 				print OUT join("\n", @removed), "\n";
+ 				close OUT;
++				`chown $RUNASUSER $file`;				
+ 				print `$SQUIDGUARD -u $file.tmpdiff`;
+ 				unlink("$file.tmpdiff");
+ 			} else {
+@@ -988,6 +1043,7 @@
+ 		map { s/^/$prefix/ } @add;
+ 		print OUT join("\n", @add), "\n";
+ 		close OUT;
++		`chown $RUNASUSER $file`;	
+ 	} else {
+ 		&error("Can't open $file for writing: $!");
+ 	}
+@@ -1573,6 +1629,7 @@
+ 		$BL =~ s/[^a-z0-9\_\-]+//ig;
+ 		$BL = lc($BL);
+ 		mkdir("$CONFIG{dbhome}/$BL");
++		`chown $RUNASUSER $CONFIG{dbhome}/$BL`;	
+ 		$ACTION = 'bledit';
+ 		$BL =~ s/\/.*//;
+ 	}
+@@ -2505,6 +2562,7 @@
+ 		$DIFF = '';
+ 	}
+ 	rename("$CONFIG{dbhome}/$bl.tmp", "$CONFIG{dbhome}/$bl");
++	`chown $RUNASUSER $CONFIG{dbhome}/$bl`;
+ 	if (!$DIFF) {
+ 		$ERROR = `$SQUIDGUARD -C $bl`;
+ 	}
