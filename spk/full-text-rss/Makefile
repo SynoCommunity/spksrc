@@ -1,6 +1,6 @@
 SPK_NAME = full-text-rss
-SPK_VERS = 2.9.5
-SPK_REV = 1
+SPK_VERS = 3.2
+SPK_REV = 2
 SPK_ICON = src/full-text-rss.png
 DSM_UI_DIR = app
 
@@ -43,5 +43,5 @@ full-text-rss_extra_install: $(STAGING_DIR)/share/full-text-rss
 
 $(STAGING_DIR)/share/full-text-rss:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone http://bitbucket.org/fivefilters/full-text-rss.git full-text-rss && cd full-text-rss && git checkout bb2ea808169ada9cfdc7bed787336e5faadb067a
+	cd $(STAGING_DIR)/share && git clone http://bitbucket.org/fivefilters/full-text-rss.git full-text-rss && cd full-text-rss && git checkout ec7275f58df130b18f185bb16a0db7026ba51dca
 	rm -fr $(STAGING_DIR)/share/full-text-rss/.git $(STAGING_DIR)/share/full-text-rss/.gitignore
