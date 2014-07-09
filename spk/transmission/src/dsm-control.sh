@@ -6,7 +6,8 @@ DNAME="Transmission"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PATH}"
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="transmission"
 TRANSMISSION="${INSTALL_DIR}/bin/transmission-daemon"
 PID_FILE="${INSTALL_DIR}/var/transmission.pid"
@@ -14,7 +15,7 @@ PID_FILE="${INSTALL_DIR}/var/transmission.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    su - ${USER} -c "PATH=${PATH} ${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
 }
 
 stop_daemon ()
