@@ -9,6 +9,7 @@
  */
 
 #define REQUIRESSL
+#define PUSHVERSION "dev"
 
 #include <znc/znc.h>
 #include <znc/Chan.h>
@@ -20,9 +21,25 @@
 #include "time.h"
 #include <string.h>
 
+#ifdef USE_CURL
+#include <curl/curl.h>
+#endif // USE_CURL
+
 // Forward declaration
 class CPushMod;
 
+/**
+ * Shorthand for encoding a string for a URL.
+ *
+ * @param str String to be encoded
+ * @return Encoded string
+ */
+CString urlencode(const CString& str)
+{
+	return str.Escape_n(CString::EASCII, CString::EURL);
+}
+
+#ifndef USE_CURL
 /**
  * Socket class for generating HTTP requests.
  */
@@ -35,7 +52,7 @@ class CPushSocket : public CSocket
 			parent = (CPushMod*) p;
 			first = true;
 			crlf = "\r\n";
-			user_agent = "ZNC Push";
+			user_agent = "ZNC Push/" + CString(PUSHVERSION);
 		}
 
 		// Implemented after CPushMod
@@ -53,17 +70,13 @@ class CPushSocket : public CSocket
 		// User agent to use
 		CString user_agent;
 
-		/**
-		 * Shorthand for encoding a string for a URL.
-		 *
-		 * @param str String to be encoded
-		 * @return Encoded string
-		 */
-		CString urlencode(const CString& str)
-		{
-			return str.Escape_n(CString::EASCII, CString::EURL);
-		}
 };
+#else
+// forward declaration
+CURLcode make_curl_request(const CString& service_host, const CString& service_url,
+						   const CString& service_auth, MCString& params, int port,
+						   bool use_ssl, bool use_post, bool debug);
+#endif // USE_CURL
 
 /**
  * Push notification module.
@@ -76,16 +89,16 @@ class CPushMod : public CModule
 		CString app;
 
 		// Time last notification was sent for a given context
-        std::map <CString, unsigned int> last_notification_time;
+		std::map <CString, time_t> last_notification_time;
 
 		// Time of last message by user to a given context
-        std::map <CString, unsigned int> last_reply_time;
+		std::map <CString, time_t> last_reply_time;
 
 		// Time of last activity by user for a given context
-        std::map <CString, unsigned int> last_active_time;
+		std::map <CString, time_t> last_active_time;
 
 		// Time of last activity by user in any context
-		unsigned int idle_time;
+		time_t idle_time;
 
 		// User object
 		CUser *user;
@@ -97,6 +110,10 @@ class CPushMod : public CModule
 	public:
 
 		MODCONSTRUCTOR(CPushMod) {
+#ifdef USE_CURL
+			curl_global_init(CURL_GLOBAL_DEFAULT);
+#endif
+
 			app = "ZNC";
 
 			idle_time = time(NULL);
@@ -111,12 +128,14 @@ class CPushMod : public CModule
 			defaults["target"] = "";
 
 			// Notification settings
-			defaults["message_sound"] = "";
-			defaults["message_uri"] = "";
-			defaults["message_uri_title"] = "";
+			defaults["message_content"] = "{message}";
 			defaults["message_length"] = "100";
 			defaults["message_title"] = "{title}";
-			defaults["message_content"] = "{message}";
+			defaults["message_uri"] = "";
+			defaults["message_uri_post"] = "no";
+			defaults["message_uri_title"] = "";
+			defaults["message_priority"] = "0";
+			defaults["message_sound"] = "";
 
 			// Notification conditions
 			defaults["away_only"] = "no";
@@ -128,12 +147,17 @@ class CPushMod : public CModule
 			defaults["nick_blacklist"] = "";
 			defaults["replied"] = "yes";
 
-            // Advanced
+			// Advanced
 			defaults["channel_conditions"] = "all";
 			defaults["query_conditions"] = "all";
 			defaults["debug"] = "off";
 		}
-		virtual ~CPushMod() {}
+
+		virtual ~CPushMod() {
+#ifdef USE_CURL
+			curl_global_cleanup();
+#endif
+		}
 
 	public:
 
@@ -174,7 +198,19 @@ class CPushMod : public CModule
 		}
 
 		/**
-		 * Send a message to the currently-configured Notifo account.
+		 * Verifies whether a given string contains only numbers.
+		 *
+		 * @param content String to verify
+		 */
+		bool is_number(const CString& content)
+		{
+			CString::const_iterator it = content.begin();
+			while(it != content.end() && std::isdigit(*it)) ++it;
+			return !content.empty() && it == content.end();
+		}
+
+		/**
+		 * Send a message to the currently-configured push service.
 		 * Requires (and assumes) that the user has already configured their
 		 * username and API secret using the 'set' command.
 		 *
@@ -213,6 +249,7 @@ class CPushMod : public CModule
 			replace["{title}"] = title;
 			replace["{username}"] = options["username"];
 			replace["{secret}"] = options["secret"];
+			replace["{network}"] = GetNetwork()->GetName();
 
 			CString message_uri = expand(options["message_uri"], replace);
 			CString message_title = expand(options["message_title"], replace);
@@ -229,26 +266,28 @@ class CPushMod : public CModule
 			MCString params;
 
 			// Service-specific profiles
-			if (service == "notifo")
+			if (service == "pushbullet")
 			{
-				if (options["username"] == "" || options["secret"] == "")
+				if (options["secret"] == "")
 				{
-					PutModule("Error: username or secret not set");
+					PutModule("Error: secret (api key) not set");
 					return;
 				}
 
-				service_host = "api.notifo.com";
-				service_url = "/v1/send_notification";
+				service_host = "api.pushbullet.com";
+				service_url = "/v2/pushes";
 
-				// BASIC auth, base64-encoded username:password
-				service_auth = options["username"] + CString(":") + options["secret"];
-				service_auth.Base64Encode();
+				// BASIC auth, base64-encoded APIKey:
+				service_auth = options["secret"] + CString(":");
 
-				params["to"] = options["username"];
-				params["msg"] = message_content;
-				params["label"] = app;
+				if (options["target"] != "")
+				{
+					params["device_iden"] = options["target"];
+				}
+
+				params["type"] = "note";
 				params["title"] = message_title;
-				params["uri"] = message_uri;
+				params["body"] = message_content;
 			}
 			else if (service == "boxcar")
 			{
@@ -269,12 +308,35 @@ class CPushMod : public CModule
 				params["notification[message]"] = message_content;
 				params["notification[source_url]"] = message_uri;
 			}
+			else if (service == "boxcar2")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret not set to apikey");
+					return;
+				}
+
+				service_host = "new.boxcar.io";
+				service_url = "/api/notifications";
+
+				params["user_credentials"] = options["secret"];
+				params["notification[title]"] = message_title;
+				params["notification[long_message]"] = message_content;
+				if ( options["message_sound"] != "" )
+				{
+					params["notification[sound]"] = options["message_sound"];
+				}
+			}
 			else if (service == "nma")
 			{
 				if (options["secret"] == "")
 				{
 					PutModule("Error: secret not set");
 					return;
+				}
+				if (options["message_priority"] != "")
+				{
+					params["priority"] = options["message_priority"];
 				}
 
 				service_host = "www.notifymyandroid.com";
@@ -288,19 +350,22 @@ class CPushMod : public CModule
 			}
 			else if (service == "pushover")
 			{
-				if (options["secret"] == "")
+				if (options["username"] == "")
 				{
-					PutModule("Error: secret (user key) not set");
+					PutModule("Error: username (user key) not set");
 					return;
 				}
-
-				CString pushover_api_token = "h6RToHDU7gNnB3IMyUb94SuwKtBzOD";
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret (application token/key) not set");
+					return;
+				}
 
 				service_host = "api.pushover.net";
 				service_url = "/1/messages.json";
 
-				params["token"] = pushover_api_token;
-				params["user"] = options["secret"];
+				params["token"] = options["secret"];
+				params["user"] = options["username"];
 				params["title"] = message_title;
 				params["message"] = message_content;
 
@@ -309,20 +374,25 @@ class CPushMod : public CModule
 					params["url"] = message_uri;
 				}
 
-                if ( options["message_uri_title"] != "" )
-                {
-                    params["url_title"] = options["message_uri_title"];
-                }
+				if ( options["message_uri_title"] != "" )
+				{
+					params["url_title"] = options["message_uri_title"];
+				}
 
 				if (options["target"] != "")
 				{
 					params["device"] = options["target"];
 				}
 
-                if ( options["message_sound"] != "" )
-                {
-                    params["sound"] = options["message_sound"];
-                }
+				if ( options["message_sound"] != "" )
+				{
+					params["sound"] = options["message_sound"];
+				}
+
+				if (options["message_priority"] != "")
+				{
+					params["priority"] = options["message_priority"];
+				}
 			}
 			else if (service == "prowl")
 			{
@@ -358,8 +428,34 @@ class CPushMod : public CModule
 
 				params["title"] = message_title;
 				params["text"] = message_content;
-				params["image"] = "https://github.com/jreese/znc-push/raw/supertoasty/logo.png";
+				params["image"] = "https://raw2.github.com/jreese/znc-push/master/logo.png";
 				params["sender"] = "ZNC Push";
+			}
+			else if (service == "faast")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret not set to apikey");
+					return;
+				}
+
+				service_host = "www.appnotifications.com";
+				service_url = "/account/notifications.json";
+
+				params["user_credentials"] = options["secret"];
+				params["notification[title]"] = message_title;
+				params["notification[subtitle]"] = context;
+				params["notification[message]"] = message_content;
+				params["notification[long_message]"] = message_content;
+				params["notification[icon_url]"] = "https://raw2.github.com/jreese/znc-push/master/logo.png";
+				if ( options["message_sound"] != "" )
+				{
+					params["notification[sound]"] = options["message_sound"];
+				}
+				if ( options["message_uri"] != "" )
+				{
+					params["notification[run_command]"] = options["message_uri"];
+				}
 			}
 			else if (service == "url")
 			{
@@ -369,7 +465,7 @@ class CPushMod : public CModule
 					return;
 				}
 
-				int count;
+				CString::size_type count;
 				VCString parts;
 				CString url = options["message_uri"];
 
@@ -382,7 +478,10 @@ class CPushMod : public CModule
 					return;
 				}
 
-				use_post = false;
+				if(options["message_uri_post"] != "yes")
+				{
+					use_post = false;
+				}
 
 				if (parts[0] == "https")
 				{
@@ -398,6 +497,12 @@ class CPushMod : public CModule
 				{
 					PutModule("Error: invalid url schema");
 					return;
+				}
+
+				// HTTP basic auth
+				if(options["username"] != "" || options["secret"] != "")
+				{
+					service_auth = options["username"] + CString(":") + options["secret"];
 				}
 
 				// Process the remaining portion of the URL
@@ -426,17 +531,45 @@ class CPushMod : public CModule
 					i->second = expand(i->second, replace);
 				}
 			}
+			else if (service == "airgram")
+			{
+				if (options["target"] == "")
+				{
+					PutModule("Error: target (email) not set");
+					return;
+				}
+
+				service_host = "api.airgramapp.com";
+				service_url = "/1/send_as_guest";
+
+				params["email"] = options["target"];
+				params["msg"] = message_content;
+			}
 			else
 			{
 				PutModule("Error: service type not selected");
 				return;
 			}
 
+            PutDebug("service: " + service);
+            PutDebug("service_host: " + service_host);
+            PutDebug("service_url: " + service_url);
+            PutDebug("service_auth: " + service_auth);
+            PutDebug("use_port: " + CString(use_port));
+            PutDebug("use_ssl: " + CString(use_ssl ? 1 : 0));
+            PutDebug("use_post: " + CString(use_post ? 1 : 0));
+
+#ifdef USE_CURL
+            PutDebug("using libcurl");
+			make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
+#else
+            PutDebug("NOT using libcurl");
 			// Create the socket connection, write to it, and add it to the queue
 			CPushSocket *sock = new CPushSocket(this);
 			sock->Connect(service_host, use_port, use_ssl);
 			sock->Request(use_post, service_host, service_url, params, service_auth);
 			AddSocket(sock);
+#endif
 		}
 
 		/**
@@ -578,7 +711,7 @@ class CPushMod : public CModule
 		 *
 		 * @return Number of connected clients
 		 */
-		unsigned int client_count()
+		size_t client_count()
 		{
 			return GetNetwork()->GetClients().size();
 		}
@@ -606,6 +739,7 @@ class CPushMod : public CModule
 
 			VCString values;
 			options["highlight"].Split(" ", values, false);
+			values.push_back("%nick%");
 
 			for (VCString::iterator i = values.begin(); i != values.end(); i++)
 			{
@@ -641,57 +775,49 @@ class CPushMod : public CModule
 				}
 			}
 
-			CNick nick = user->GetNick();
-
-			if (message.find(nick.GetNick()) != std::string::npos)
-			{
-				return true;
-			}
-
 			return false;
 		}
 
 		/**
 		 * Check if the idle condition is met.
 		 *
-		 * @return True if idle is zero or elapsed time is greater than idle
+		 * @return True if idle is less than or equal to zero or elapsed time is greater than idle
 		 */
 		bool idle()
 		{
 			unsigned int value = options["idle"].ToUInt();
-			unsigned int now = time(NULL);
-			return value == 0
-				|| idle_time + value < now;
+			time_t now = time(NULL);
+			return value == 0 || difftime(now, idle_time) >= value;
 		}
 
 		/**
 		 * Check if the last_active condition is met.
 		 *
 		 * @param context Channel or nick context
-		 * @return True if last_active is zero or elapsed time is greater than last_active
+		 * @return True if last_active is less than or equal to zero or elapsed time is greater than last_active
 		 */
 		bool last_active(const CString& context)
 		{
 			unsigned int value = options["last_active"].ToUInt();
-			unsigned int now = time(NULL);
+			time_t now = time(NULL);
 			return value == 0
 				|| last_active_time.count(context) < 1
-				|| last_active_time[context] + value < now;
+				|| difftime(now, last_active_time[context]) >= value;
 		}
 
 		/**
 		 * Check if the last_notification condition is met.
 		 *
 		 * @param context Channel or nick context
-		 * @return True if last_notification is zero or elapsed time is greater than last_nofication
+		 * @return True if last_notification is less than or equal to zero or elapsed time is greater than last_nofication
 		 */
 		bool last_notification(const CString& context)
 		{
 			unsigned int value = options["last_notification"].ToUInt();
-			unsigned int now = time(NULL);
+			time_t now = time(NULL);
 			return value == 0
 				|| last_notification_time.count(context) < 1
-				|| last_notification_time[context] + value < now;
+				|| difftime(now, last_notification_time[context]) >= value;
 		}
 
 		/**
@@ -841,7 +967,7 @@ class CPushMod : public CModule
 				msg += ": [" + nick.GetNick();
 				msg += "] " + message;
 
-				send_message(msg, title, channel.GetName());
+				send_message(msg, title, channel.GetName(), nick);
 			}
 
 			return CONTINUE;
@@ -863,7 +989,7 @@ class CPushMod : public CModule
 				msg += ": " + nick.GetNick();
 				msg += " " + message;
 
-				send_message(msg, title, channel.GetName());
+				send_message(msg, title, channel.GetName(), nick);
 			}
 
 			return CONTINUE;
@@ -883,7 +1009,7 @@ class CPushMod : public CModule
 				CString msg = "From " + nick.GetNick();
 				msg += ": " + message;
 
-				send_message(msg, title, nick.GetNick());
+				send_message(msg, title, nick.GetNick(), nick);
 			}
 
 			return CONTINUE;
@@ -903,7 +1029,7 @@ class CPushMod : public CModule
 				CString msg = "* " + nick.GetNick();
 				msg += " " + message;
 
-				send_message(msg, title, nick.GetNick());
+				send_message(msg, title, nick.GetNick(), nick);
 			}
 
 			return CONTINUE;
@@ -988,7 +1114,7 @@ class CPushMod : public CModule
 		void OnModCommand(const CString& command)
 		{
 			VCString tokens;
-			int token_count = command.Split(" ", tokens, false);
+			CString::size_type token_count = command.Split(" ", tokens, false);
 
 			if (token_count < 1)
 			{
@@ -1029,13 +1155,17 @@ class CPushMod : public CModule
 					{
 						value.MakeLower();
 
-						if (value == "notifo")
+						if (value == "pushbullet")
 						{
-							PutModule("Note: Notifo requires setting both 'username' and 'secret' options");
+							PutModule("Note: Pushbullet requires setting both 'target' (to device id) and 'secret' (to api key) options");
 						}
 						else if (value == "boxcar")
 						{
 							PutModule("Note: Boxcar requires setting the 'username' option");
+						}
+						else if (value == "boxcar2")
+						{
+							PutModule("Note: Boxcar 2 requires setting the 'secret' option");
 						}
 						else if (value == "nma")
 						{
@@ -1043,7 +1173,7 @@ class CPushMod : public CModule
 						}
 						else if (value == "pushover")
 						{
-							PutModule("Note: Pushover requires setting the 'secret' option");
+							PutModule("Note: Pushover requires setting both the 'username' (to user key) and the 'secret' (to application api key) option");
 						}
 						else if (value == "prowl")
 						{
@@ -1056,6 +1186,14 @@ class CPushMod : public CModule
 						else if (value == "url")
 						{
 							PutModule("Note: URL requires setting the 'message_uri' option with the full URL");
+						}
+						else if (value == "airgram")
+						{
+							PutModule("Note: Airgram requires setting the 'target' with the email address of the recipient");
+						}
+						else if (value == "faast")
+						{
+							PutModule("Note: Faast requires setting the secret to your apikey");
 						}
 						else
 						{
@@ -1190,7 +1328,7 @@ class CPushMod : public CModule
 				}
 				else
 				{
-					PutModule(option + CString(": \"") + options[option] + CString("\""));
+					PutModule(option + CString(": ") + options[option]);
 				}
 			}
 			// SAVE command
@@ -1293,8 +1431,8 @@ class CPushMod : public CModule
 				table.SetCell("Condition", "client_count");
 				table.SetCell("Status", CString(client_count()));
 
-				unsigned int now = time(NULL);
-				unsigned int ago = now - idle_time;
+				time_t now = time(NULL);
+				time_t ago = now - idle_time;
 
 				table.AddRow();
 				table.SetCell("Condition", "idle");
@@ -1371,11 +1509,15 @@ class CPushMod : public CModule
 					return;
 				}
 
+#ifdef USE_CURL
+				make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
+#else
 				// Create the socket connection, write to it, and add it to the queue
 				CPushSocket *sock = new CPushSocket(this);
 				sock->Connect(service_host, use_port, use_ssl);
 				sock->Request(use_post, service_host, service_url, params, service_auth);
 				AddSocket(sock);
+#endif
 
 				PutModule("Ok");
 			}
@@ -1392,6 +1534,11 @@ class CPushMod : public CModule
 			{
 				PutModule("View the detailed documentation at https://github.com/jreese/znc-push/blob/master/README.md");
 			}
+			// VERSION command
+			else if (action == "version")
+			{
+				PutModule("znc-push " + CString(PUSHVERSION));
+			}
 			// EVAL command
 			else if (action == "eval")
 			{
@@ -1406,24 +1553,18 @@ class CPushMod : public CModule
 };
 
 /**
- * Send an HTTP request.
+ * Build a query string from a dictionary of request parameters.
  *
- * @param post POST command
- * @param host Host domain
- * @param url Resource path
- * @param parameters Query parameters
- * @param auth Basic authentication string
+ * @param params Request parameters
+ * @return query string
  */
-void CPushSocket::Request(bool post, const CString& host, const CString& url, MCString& parameters, const CString& auth)
+CString build_query_string(MCString& params)
 {
-	parent->PutDebug("Building notification to " + host + url + "...");
-
-	// query string for the request
 	bool more = false;
 	CString query;
 	CString key;
 	CString value;
-	for (MCString::iterator param = parameters.begin(); param != parameters.end(); param++)
+	for (MCString::iterator param = params.begin(); param != params.end(); param++)
 	{
 		key = urlencode(param->first);
 		value = urlencode(param->second);
@@ -1439,7 +1580,83 @@ void CPushSocket::Request(bool post, const CString& host, const CString& url, MC
 		}
 	}
 
-	parent->PutDebug("Query string: " + query);
+	return query;
+}
+
+#ifdef USE_CURL
+/**
+ * Send an HTTP request using libcurl.
+ *
+ * @param service_host Host domain
+ * @param service_url Host path
+ * @param service_auth Basic auth string
+ * @param params Request parameters
+ * @param port Port number
+ * @param use_ssl Use SSL
+ * @param use_post Use POST method
+ */
+CURLcode make_curl_request(const CString& service_host, const CString& service_url,
+						   const CString& service_auth, MCString& params, int port,
+						   bool use_ssl, bool use_post, bool debug)
+{
+	CURL *curl;
+	CURLcode result;
+
+	curl = curl_easy_init();
+
+	CString user_agent = "ZNC Push/" + CString(PUSHVERSION);
+
+	CString url = CString(use_ssl ? "https" : "http") + "://" + service_host + service_url;
+	CString query = build_query_string(params);
+
+	if (debug)
+	{
+		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+	}
+
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+
+	curl_easy_setopt(curl, CURLOPT_URL, url.data());
+	curl_easy_setopt(curl, CURLOPT_PORT, port);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent.c_str());
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 3); // three seconds ought to be good enough for anyone, eh?
+
+	if (service_auth != "")
+	{
+		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_easy_setopt(curl, CURLOPT_USERPWD, service_auth.data());
+	}
+
+	if (use_post)
+	{
+		curl_easy_setopt(curl, CURLOPT_POST, 1);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, query.data());
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query.length());
+	}
+
+	result = curl_easy_perform(curl);
+	curl_easy_cleanup(curl);
+
+	return result;
+}
+
+#else
+
+/**
+ * Send an HTTP request.
+ *
+ * @param post POST command
+ * @param host Host domain
+ * @param url Resource path
+ * @param parameters Query parameters
+ * @param auth Basic authentication string
+ */
+void CPushSocket::Request(bool post, const CString& host, const CString& url, MCString& parameters, const CString& auth)
+{
+	parent->PutDebug("Building notification to " + host + url + "...");
+
+	CString query = build_query_string(parameters);
 
 	// Request headers and POST body
 	CString request;
@@ -1458,10 +1675,13 @@ void CPushSocket::Request(bool post, const CString& host, const CString& url, MC
 	request += "Host: " + host + crlf;
 	request += "Connection: close" + crlf;
 	request += "User-Agent: " + user_agent + crlf;
+	parent->PutDebug("User-Agent: " + user_agent);
 
 	if (auth != "")
 	{
-		request += "Authorization: Basic " + auth + crlf;
+		CString auth_b64 = auth.Base64Encode_n();
+		request += "Authorization: Basic " + auth_b64 + crlf;
+		parent->PutDebug("Authorization: Basic " + auth_b64);
 	}
 
 	request += crlf;
@@ -1470,6 +1690,8 @@ void CPushSocket::Request(bool post, const CString& host, const CString& url, MC
 	{
 		request += query;
 	}
+
+	parent->PutDebug("Query string: " + query);
 
 	Write(request);
 	parent->PutDebug("Request sending");
@@ -1485,13 +1707,13 @@ void CPushSocket::ReadLine(const CString& data)
 		CString status = data.Token(1);
 		CString message = data.Token(2, true);
 
-		parent->PutDebug(status);
-		parent->PutDebug(message);
+		parent->PutDebug("Status: " + status);
+		parent->PutDebug("Message: " + message);
 		first = false;
 	}
 	else
 	{
-		parent->PutDebug(data);
+		parent->PutDebug("Data: " + data);
 	}
 }
 
@@ -1500,5 +1722,11 @@ void CPushSocket::Disconnected()
 	parent->PutDebug("Disconnected.");
 	Close(CSocket::CLT_AFTERWRITE);
 }
+#endif // USE_CURL
 
-MODULEDEFS(CPushMod, "Send highlights and personal messages to a push notification service")
+template<> void TModInfo<CPushMod>(CModInfo& Info) {
+	Info.AddType(CModInfo::UserModule);
+	Info.SetWikiPage("push");
+}
+
+NETWORKMODULEDEFS(CPushMod, "Send highlights and personal messages to a push notification service")
