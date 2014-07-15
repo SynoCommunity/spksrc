@@ -53,7 +53,7 @@ postinst ()
     fi
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${APACHE_USER} -s /bin/sh -S -D ${USER}
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -62,6 +62,7 @@ postinst ()
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
+               -e "s|tempDirectory = null;|tempDirectory = '${INSTALL_DIR}/tmp';|g" \
                ${WEB_DIR}/${PACKAGE}/conf/config.php
 
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
@@ -74,20 +75,41 @@ postinst ()
         else
             sed -i -e "/@watch_dir@/d" ${INSTALL_DIR}/var/.rtorrent.rc
         fi
-        # Set group and permissions on download- and watch dir for DSM5
+
+        if [ "${wizard_disable_openbasedir}" == "true" ] && [ "${APACHE_USER}" == "http" ]; then
+            sed -i -e "s|^open_basedir.*|open_basedir = none|g" /etc/php/conf.d/user-settings.ini
+            initctl restart php-fpm > /dev/null 2>&1
+        fi
+
+        # Set directories permissions for DSM5
         if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
-            chgrp users ${wizard_download_dir:=/volume1/downloads}
-            chmod g+rw ${wizard_download_dir:=/volume1/downloads}
+
+            # Allow root traversal
+            SHARE_DIR=`echo ${wizard_download_dir:=/volume1/downloads} | awk -F/ '{print "/"$2"/"$3}'`
+            if [ ! "`synoacltool -get $SHARE_DIR | grep \"group:http:allow:..x\"`" ]; then
+                synoacltool -add $SHARE_DIR group:http:allow:--x----------:---n &> /dev/null
+            fi
+
+            if [ "`synoacltool -get ${wizard_download_dir:=/volume1/downloads} | grep \"group:http\"`" ]; then
+                synoacltool -replace ${wizard_download_dir:=/volume1/downloads} `synoacltool -get ${wizard_download_dir:=/volume1/downloads} | grep "group:http" | awk 'BEGIN { OFS=" "; } { gsub(/[^[:alnum:]]/, "", $1); print $1;}' | head -1` group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
+            else
+                synoacltool -add ${wizard_download_dir:=/volume1/downloads} group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
+            fi
+
             if [ -d "${wizard_watch_dir}" ]; then
-                chgrp users ${wizard_watch_dir}
-                chmod g+rw ${wizard_watch_dir}
+                if [ "`synoacltool -get ${wizard_watch_dir} | grep \"group:http\"`" ]; then
+                    synoacltool -replace ${wizard_watch_dir} `synoacltool -get ${wizard_watch_dir} | grep "group:http" | awk 'BEGIN { OFS=" "; } { gsub(/[^[:alnum:]]/, "", $1); print $1;}' | head -1` group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
+                else
+                    synoacltool -add ${wizard_watch_dir} group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
+                fi
             fi
         fi
     fi
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-    chown -R ${APACHE_USER} ${WEB_DIR}/${PACKAGE}
+    chown -R ${USER}:${APACHE_USER} ${INSTALL_DIR}/tmp
+    chown -R ${APACHE_USER}:${APACHE_USER} ${WEB_DIR}/${PACKAGE}
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -102,7 +124,7 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        delgroup ${USER} ${GROUP}
+        delgroup ${USER} ${APACHE_USER}
         deluser ${USER}
     fi
 
@@ -138,6 +160,7 @@ preupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${WEB_DIR}/${PACKAGE}/conf/config.php ${TMP_DIR}/${PACKAGE}/
+    cp -pr ${WEB_DIR}/${PACKAGE}/share/ ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.rtorrent.rc ${TMP_DIR}/${PACKAGE}/
     mv ${INSTALL_DIR}/var/.session ${TMP_DIR}/${PACKAGE}/
 
@@ -148,6 +171,7 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/conf/
+    cp -pr ${TMP_DIR}/${PACKAGE}/share/*/ ${WEB_DIR}/${PACKAGE}/share/
     mv ${TMP_DIR}/${PACKAGE}/.rtorrent.rc ${INSTALL_DIR}/var/
     mv ${TMP_DIR}/${PACKAGE}/.session ${INSTALL_DIR}/var/
     rm -fr ${TMP_DIR}/${PACKAGE}
