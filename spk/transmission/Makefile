@@ -1,6 +1,6 @@
 SPK_NAME = transmission
-SPK_VERS = 2.83
-SPK_REV = 6
+SPK_VERS = 2.84
+SPK_REV = 7
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "1. Update to 2.8.3<br>2. Add wizard input validation"
+CHANGELOG = "1. Update to 2.8.4"
 
 HOMEPAGE = http://www.transmissionbt.com/
 LICENSE  =
