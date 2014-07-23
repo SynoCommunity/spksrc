@@ -1,0 +1,9 @@
+bin:bin/cntraining
+bin:bin/mftraining
+bin:bin/unicharset_extractor
+bin:bin/wordlist2dawg
+bin:bin/combine_tessdata
+bin:bin/tesseract
+lnk:lib/libtesseract.so
+lnk:lib/libtesseract.so.3
+lib:lib/libtesseract.so.3.0.1

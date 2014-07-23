@@ -1,0 +1,12 @@
+{
+    ".url": {
+        "com.synocommunity.packages.pyload": {
+            "title": "pyLoad",
+            "desc": "pyLoad Download Manager",
+            "icon": "images/pyload-{0}.png",
+            "type": "url",
+            "url": "3rdparty/pyload/pyload.cgi",
+            "allUsers": true
+        }
+    }
+}
