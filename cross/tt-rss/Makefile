@@ -1,6 +1,6 @@
 PKG_NAME = tt-rss
 PKG_FULL_NAME = Tiny-Tiny-RSS
-PKG_VERS = 1.12
+PKG_VERS = 1.13
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/gothfox/$(PKG_FULL_NAME)/archive
