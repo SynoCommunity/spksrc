@@ -10,3 +10,4 @@ lib:lib/libruby-static.a
 rsc:lib/pkgconfig/ruby-2.0.pc
 rsc:lib/ruby/2.0.0
 rsc:lib/ruby/gems
+rsc:include/ruby-2.0.0

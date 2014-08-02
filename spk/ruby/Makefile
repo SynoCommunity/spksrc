@@ -1,6 +1,6 @@
 SPK_NAME = ruby
 SPK_VERS = 2.0.0-p353
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/ruby.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,6 +13,7 @@ RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Ruby
 BETA = 1
+CHANGELOG = "Added symlinks and includes"
 
 HOMEPAGE   = http://www.ruby-lang.org/
 LICENSE    =
