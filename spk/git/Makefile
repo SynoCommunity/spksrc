@@ -1,6 +1,6 @@
 SPK_NAME = git
 SPK_VERS = 1.8.4
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/git.png
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
