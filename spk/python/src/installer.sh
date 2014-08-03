@@ -18,6 +18,11 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+    ln -s ${INSTALL_DIR}/bin/python /usr/local/bin/python
+    ln -s ${INSTALL_DIR}/bin/python2 /usr/local/bin/python2
+    ln -s ${INSTALL_DIR}/bin/python2.7 /usr/local/bin/python2.7
+    ln -s ${INSTALL_DIR}/bin/pydoc /usr/local/bin/pydoc
+    ln -s ${INSTALL_DIR}/bin/pip /usr/local/bin/pip
 
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
@@ -44,6 +49,11 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+    rm -f /usr/local/bin/python
+    rm -f /usr/local/bin/python2
+    rm -f /usr/local/bin/python2.7
+    rm -f /usr/local/bin/pydoc
+    rm -f /usr/local/bin/pip
 
     exit 0
 }
