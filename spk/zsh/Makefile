@@ -1,6 +1,6 @@
 SPK_NAME = zsh
 SPK_VERS = 5.0.5
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/zsh.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -12,6 +12,7 @@ RELOAD_UI = no
 DISPLAY_NAME = Z shell
 STARTABLE = no
 BETA = 1
+CHANGELOG = "Fixed file ownership"
 
 HOMEPAGE   = http://www.zsh.org/
 LICENSE    = Custom

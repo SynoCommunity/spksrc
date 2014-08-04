@@ -28,6 +28,10 @@ postinst ()
     ln -s ${INSTALL_DIR}/bin/ri /usr/local/bin/ri
     ln -s ${INSTALL_DIR}/bin/ruby /usr/local/bin/ruby
 
+    # Set the permissions
+    chown -hR root:root ${SYNOPKG_PKGDEST}
+    chmod -R go-w ${SYNOPKG_PKGDEST}
+
     exit 0
 }
 

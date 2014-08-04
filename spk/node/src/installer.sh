@@ -20,7 +20,8 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+    chown -hR root:root ${SYNOPKG_PKGDEST}
+    chmod -R go-w ${SYNOPKG_PKGDEST}
 
     # Put symlinks in the PATH
     mkdir -p /usr/local/bin

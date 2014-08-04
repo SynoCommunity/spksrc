@@ -1,6 +1,6 @@
 SPK_NAME = vim
 SPK_VERS = 7.4
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/vim.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ RELOAD_UI = no
 DISPLAY_NAME = Vim
 STARTABLE = no
 BETA = 1
-CHANGELOG = "1. Support UTF8 by default"
+CHANGELOG = "1. Fixed permissions\n2. Support UTF8 by default"
 
 HOMEPAGE   = http://www.vim.org/
 LICENSE    = Charityware

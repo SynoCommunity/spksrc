@@ -18,6 +18,10 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Set the permissions
+    chown -hR root:root ${SYNOPKG_PKGDEST}
+    chmod -R go-w ${SYNOPKG_PKGDEST}
+
     # Put zsh in the PATH
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/zsh /usr/local/bin/zsh

@@ -35,7 +35,7 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+    chown -hR ${USER}:root ${SYNOPKG_PKGDEST}
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null

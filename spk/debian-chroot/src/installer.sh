@@ -23,6 +23,10 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Set the permissions
+    chown -hR root:root ${SYNOPKG_PKGDEST}
+    chmod -R go-w ${SYNOPKG_PKGDEST}
+
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 

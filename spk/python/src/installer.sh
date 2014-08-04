@@ -33,6 +33,10 @@ postinst ()
     echo "System installed modules:" >> ${INSTALL_DIR}/install.log
     ${INSTALL_DIR}/bin/pip freeze >> ${INSTALL_DIR}/install.log
 
+    # Set the permissions
+    chown -hR root:root ${SYNOPKG_PKGDEST}
+    chmod -R go-w ${SYNOPKG_PKGDEST}
+
     # Byte-compile in background
     ${INSTALL_DIR}/bin/python -m compileall -q -f ${INSTALL_DIR}/lib/python2.7 > /dev/null &
     ${INSTALL_DIR}/bin/python -OO -m compileall -q -f ${INSTALL_DIR}/lib/python2.7 > /dev/null &

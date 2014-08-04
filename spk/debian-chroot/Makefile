@@ -1,6 +1,6 @@
 SPK_NAME = debian-chroot
 SPK_VERS = 7.4
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 2900
 DESCRIPTION_FRE = Debian est un système d\\\'exploitation \\\(SE\\\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "1. Fixed permissions\n2. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://www.debian.org/
 LICENSE    =
