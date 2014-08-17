@@ -14,5 +14,10 @@ LICENSE  = GPL
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-defrag
+INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) $(MAKE) install-libs install prefix=$(STAGING_INSTALL_PREFIX)

@@ -1,0 +1,7 @@
+bin:bin/tarsnap
+bin:bin/tarsnap-keygen
+bin:bin/tarsnap-keymgmt
+bin:bin/tarsnap-keyregen
+bin:bin/tarsnap-recrypt
+etc:etc/tarsnap.conf.sample
+
