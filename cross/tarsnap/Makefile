@@ -13,6 +13,5 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = 
-#ADDITIONAL_CFLAGS = "-I$(WORK_DIR)/e2fsprogs-1.42.6/lib"
 
 include ../../mk/spksrc.cross-cc.mk
