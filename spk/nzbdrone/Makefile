@@ -1,5 +1,5 @@
 SPK_NAME = nzbdrone
-SPK_VERS = 2.0.0.1397
+SPK_VERS = 2.0.0.1690
 SPK_REV = 1
 SPK_ICON = src/nzbdrone.png
 
