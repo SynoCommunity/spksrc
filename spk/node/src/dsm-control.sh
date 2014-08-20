@@ -6,6 +6,7 @@ DNAME="Node.js"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 
 
 case $1 in

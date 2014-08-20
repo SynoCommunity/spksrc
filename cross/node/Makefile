@@ -1,5 +1,5 @@
 PKG_NAME = node
-PKG_VERS = 0.10.6
+PKG_VERS = 0.10.31
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://nodejs.org/dist/v$(PKG_VERS)/
@@ -15,7 +15,7 @@ ENV += LINK.target=$(TC_PATH)$(TC_PREFIX)g++
 POST_INSTALL_TARGET = myPostInstall
 
 # Limit to supported archs
-ifneq ($(findstring $(ARCH),88f6281 bromolow cedarview x86),$(ARCH))
+ifneq ($(findstring $(ARCH),88f6281 bromolow cedarview x86 armadaxp),$(ARCH))
 $(error $(ARCH) is not a supported architecture)
 endif
 
