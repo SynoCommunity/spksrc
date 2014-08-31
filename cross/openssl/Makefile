@@ -23,6 +23,9 @@ OPENSSL_ARCH = linux-generic32
 ifneq ($(findstring $(ARCH), bromolow cedarview x86),)
 OPENSSL_ARCH = linux-x86_64
 endif
+ifneq ($(findstring $(ARCH), 88f6281),)
+OPENSSL_ARCH = linux-armv4
+endif
 
 .PHONY: myConfigure
 myConfigure:
