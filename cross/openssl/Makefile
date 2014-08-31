@@ -24,7 +24,10 @@ ifneq ($(findstring $(ARCH), bromolow cedarview x86),)
 OPENSSL_ARCH = linux-x86_64
 endif
 ifneq ($(findstring $(ARCH), 88f6281),)
-OPENSSL_ARCH = linux-armv4
+OPENSSL_ARCH = synology-armle
+endif
+ifneq ($(findstring $(ARCH), powerpc),)
+OPENSSL_ARCH = synology-ppc
 endif
 
 .PHONY: myConfigure
