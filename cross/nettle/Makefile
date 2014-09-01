@@ -1,8 +1,8 @@
 PKG_NAME = nettle
-PKG_VERS = 2.7
+PKG_VERS = 3.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.lysator.liu.se/~nisse/archive/
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/nettle
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/gmp
