@@ -1,8 +1,8 @@
 PKG_NAME = redis
-PKG_VERS = 2.6.7
+PKG_VERS = 2.8.13
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://redis.googlecode.com/files
+PKG_DIST_SITE = http://download.redis.io/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
