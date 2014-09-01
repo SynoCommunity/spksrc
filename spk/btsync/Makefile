@@ -1,6 +1,6 @@
 SPK_NAME = btsync
-SPK_VERS = 1.3.109
-SPK_REV = 3
+SPK_VERS = 1.4.72
+SPK_REV = 4
 SPK_ICON = src/btsync.png
 DSM_UI_DIR = app
 
