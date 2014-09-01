@@ -1,12 +1,12 @@
 PKG_NAME = sslh
-PKG_VERS = 1.13
-SRC_VERSION = 1.13b
+PKG_VERS = v1.16
+SRC_VERSION = v1.16
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(SRC_VERSION).$(PKG_EXT)
 PKG_DIST_SITE = http://www.rutschle.net/tech
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 SRC_DIR= $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/
-VERSION="v1.13b"
+VERSION="v1.16"
 
 DEPENDS =
 
@@ -23,17 +23,23 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myCompile
 myCompile: $(SRC_DIR)sslh-fork
 
-$(SRC_DIR)sslh-fork: $(SRC_DIR)common.o $(SRC_DIR)sslh-main.o $(SRC_DIR)sslh-fork.o $(SRC_DIR)probe.o $(SRC_DIR)common.h $(SRC_DIR)probe.h
-	@$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)' -o $(SRC_DIR)sslh-fork $(SRC_DIR)sslh-fork.o $(SRC_DIR)common.o $(SRC_DIR)sslh-main.o $(SRC_DIR)probe.o $(LIBS)
+OBJS=$(SRC_DIR)common.o $(SRC_DIR)sslh-main.o $(SRC_DIR)probe.o
 
-$(SRC_DIR)common.o : $(SRC_DIR)common.h $(SRC_DIR)probe.h
-	@$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)'  -o $(SRC_DIR)common.o -c $(SRC_DIR)common.c
+$(SRC_DIR)version.h:
+	$(SRC_DIR)genver.sh > $(SRC_DIR)version.h
 
-$(SRC_DIR)sslh-main.o : $(SRC_DIR)common.h $(SRC_DIR)probe.h
-	@$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)'  -o $(SRC_DIR)sslh-main.o -c $(SRC_DIR)sslh-main.c
+$(SRC_DIR)sslh: $(SRC_DIR)sslh-fork $(SRC_DIR)sslh-select
 
-$(SRC_DIR)probe.o : $(SRC_DIR)common.h $(SRC_DIR)probe.h   
-        @$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)'  -o $(SRC_DIR)probe.o -c $(SRC_DIR)probe.c
+$(SRC_DIR)sslh-fork: $(SRC_DIR)version.h $(OBJS) $(SRC_DIR)sslh-fork.o $(SRC_DIR)Makefile $(SRC_DIR)common.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(SRC_DIR)sslh-fork $(SRC_DIR)sslh-fork.o $(OBJS) $(LIBS)
+	#strip sslh-fork
+
+$(SRC_DIR)sslh-select: $(SRC_DIR)version.h $(OBJS) $(SRC_DIR)sslh-select.o $(SRC_DIR)Makefile $(SRC_DIR)common.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(SRC_DIR)sslh-select $(SRC_DIR)sslh-select.o $(OBJS) $(LIBS)
+	#strip sslh-select
+
+$(SRC_DIR)echosrv: $(OBJS) $(SRC_DIR)echosrv.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(SRC_DIR)echosrv $(SRC_DIR)echosrv.o $(SRC_DIR)probe.o $(SRC_DIR)common.o $(LIBS)
 
 .PHONY: myInstall
 myInstall:
