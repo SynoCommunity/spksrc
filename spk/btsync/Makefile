@@ -12,6 +12,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 ADMIN_PORT = 8888
 RELOAD_UI = yes
 DISPLAY_NAME = BitTorrent Sync
+CHANGELOG = "Update to 1.4.72"
 
 HOMEPAGE   = http://labs.bittorrent.com/experiments/sync.html
 LICENSE    =
