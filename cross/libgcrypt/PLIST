@@ -2,4 +2,4 @@ bin:bin/dumpsexp
 bin:bin/hmac256
 lnk:lib/libgcrypt.so
 lnk:lib/libgcrypt.so.11
-lib:lib/libgcrypt.so.11.8.2
+lib:lib/libgcrypt.so.11.8.3
