@@ -1,17 +1,17 @@
---- deps/lua/src/Makefile.orig	2012-12-03 12:53:09.000000000 +0100
-+++ deps/lua/src/Makefile	2012-12-08 11:35:21.000000000 +0100
-@@ -5,18 +5,18 @@
+--- deps/lua/src/Makefile.orig	2014-09-01 09:37:09.547519848 +0200
++++ deps/lua/src/Makefile	2014-09-01 09:38:40.703930434 +0200
+@@ -5,14 +5,14 @@
  # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
  
  # Your platform. See PLATS for possible values.
 -PLAT= none
 +PLAT= generic
  
--CC= gcc
+-CC?= gcc
 -CFLAGS= -O2 -Wall $(MYCFLAGS)
 -AR= ar rcu
 -RANLIB= ranlib
-+#CC= gcc
++#CC?= gcc
 +#CFLAGS= -O2 -Wall $(MYCFLAGS)
 +AR:= $(AR) rcu
 +#RANLIB= ranlib
@@ -19,12 +19,5 @@
 -LIBS= -lm $(MYLIBS)
 +#LIBS= -lm $(MYLIBS)
  
--MYCFLAGS=
--MYLDFLAGS=
--MYLIBS=
-+#MYCFLAGS=
-+#MYLDFLAGS=
-+#MYLIBS=
- 
- # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
- 
+ MYCFLAGS=
+ MYLDFLAGS=
