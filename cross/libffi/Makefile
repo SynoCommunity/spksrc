@@ -19,8 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:
-	$(RUN) aclocal
-	$(RUN) automake
+	$(RUN) autoconf
 
 .PHONY: myInstall
 myInstall:
