@@ -1,8 +1,8 @@
 SPK_NAME = sslh
-SPK_VERS = 1.13b
+SPK_VERS = 1.16
 SPK_REV = 1
 SPK_ICON = src/sslh.png
-BETA = 1
+BETA = 0
 
 DEPENDS = cross/$(SPK_NAME)
 
