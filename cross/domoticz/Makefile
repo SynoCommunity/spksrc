@@ -2,13 +2,13 @@ PKG_NAME = domoticz
 PKG_VERS = $(PKG_SVN_REV)
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 281
+PKG_SVN_REV = 1393
 PKG_DIST_NAME = domoticz
 PKG_DIST_SITE = svn://svn.code.sf.net/p/domoticz/code
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-r*
 
-DEPENDS = cross/boost cross/sqlite
+DEPENDS = cross/boost cross/sqlite cross/curl
 
 HOMEPAGE = http://www.domoticz.com/
 COMMENT  = Domoticz is a Home Automation System
@@ -18,7 +18,7 @@ CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
 
 BOOST_LIBRARIES = system thread date_time
-ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)" CMAKE_INCLUDE_PATH="$(STAGING_INSTALL_PREFIX)/include" CMAKE_LIBRARY_PATH="$(STAGING_INSTALL_PREFIX)/lib" PCH_COMPILE_FLAGS="$(CFLAGS)"
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)" CMAKE_PREFIX_PATH="$(STAGING_INSTALL_PREFIX):/usr" CMAKE_INCLUDE_PATH="$(STAGING_INSTALL_PREFIX)/include:/usr/include/curl" CMAKE_LIBRARY_PATH="$(STAGING_INSTALL_PREFIX)/lib:/usr/lib"  PCH_COMPILE_FLAGS="$(CFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
 

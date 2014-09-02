@@ -1,6 +1,6 @@
 SPK_NAME = domoticz
-SPK_VERS = 281
-SPK_REV = 1
+SPK_VERS = 1
+SPK_REV = 1393
 SPK_ICON = src/domoticz.png
 
 DEPENDS = cross/$(SPK_NAME)
