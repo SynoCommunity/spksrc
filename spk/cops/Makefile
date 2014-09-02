@@ -1,6 +1,6 @@
 SPK_NAME = cops
 SPK_VERS = 1.0.0RC2
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/cops.png
 DSM_UI_DIR = app
 
