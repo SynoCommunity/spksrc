@@ -1,6 +1,6 @@
 SPK_NAME = btsync
-SPK_VERS = 1.4.72
-SPK_REV = 4
+SPK_VERS = 1.4.75
+SPK_REV = 5
 SPK_ICON = src/btsync.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 ADMIN_PORT = 8888
 RELOAD_UI = yes
 DISPLAY_NAME = BitTorrent Sync
-CHANGELOG = "Update to 1.4.72"
+CHANGELOG = "Update to 1.4.75"
 
 HOMEPAGE   = http://labs.bittorrent.com/experiments/sync.html
 LICENSE    =

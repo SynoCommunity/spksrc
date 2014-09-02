@@ -1,5 +1,5 @@
 PKG_NAME = btsync
-PKG_VERS = 1.4.72
+PKG_VERS = 1.4.75
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(BTSYNC_ARCH)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = www.andreasgiemza.de/btsync-for-synocommunity/$(PKG_VERS)
