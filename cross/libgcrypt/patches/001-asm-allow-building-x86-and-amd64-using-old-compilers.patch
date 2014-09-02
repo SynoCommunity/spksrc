@@ -1,0 +1,34 @@
+--- src/hwf-x86.c.orig	2014-09-02 20:21:49.643607889 +0200
++++ src/hwf-x86.c	2014-09-02 20:21:54.571545937 +0200
+@@ -96,6 +96,7 @@
+     *edx = regs[3];
+ }
+ 
++#if defined(ENABLE_AVX_SUPPORT) || defined(ENABLE_AVX2_SUPPORT)
+ static unsigned int
+ get_xgetbv(void)
+ {
+@@ -109,6 +110,7 @@
+ 
+   return t_eax;
+ }
++#endif /* ENABLE_AVX_SUPPORT || ENABLE_AVX2_SUPPORT */
+ 
+ #endif /* i386 && GNUC */
+ 
+@@ -145,6 +147,7 @@
+     *edx = regs[3];
+ }
+ 
++#if defined(ENABLE_AVX_SUPPORT) || defined(ENABLE_AVX2_SUPPORT)
+ static unsigned int
+ get_xgetbv(void)
+ {
+@@ -158,6 +161,7 @@
+ 
+   return t_eax;
+ }
++#endif /* ENABLE_AVX_SUPPORT || ENABLE_AVX2_SUPPORT */
+ 
+ #endif /* x86-64 && GNUC */
+ 
