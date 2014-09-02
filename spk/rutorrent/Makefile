@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.6
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "1. Update rtorrent to 0.9.4"
 BETA = 1
 
 HOMEPAGE   = http://code.google.com/p/rutorrent/
@@ -44,6 +44,7 @@ rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.session
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/cacert.pem $(STAGING_DIR)/etc/
+	install -m 775 -d $(STAGING_DIR)/tmp
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

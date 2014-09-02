@@ -2,17 +2,32 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download directory. Defaults to /volume1/downloads",
+        "desc": "Download directory",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Download directory"
+            "desc": "Download directory",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
         }]
     }, {
         "type": "textfield",
         "desc": "Watch a directory for torrent files and add them to ruTorrent. Leave empty to disable",
         "subitems": [{
             "key": "wizard_watch_dir",
-            "desc": "Watch directory"
+            "desc": "Watch directory",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
         }]
     }]
 }, {
@@ -30,6 +45,17 @@
                     "errorText": "Entered port range is not valid"
                 }
             }
+        }]
+    }]
+}, {
+    "step_title": "Additional configuration",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Some features in web interface require disabling open_basedir (PHP restriction). Some tasks do not run as http user and therefore system wide master settings need to be modified. Do you want to disable open_basedir automatically? (Previous open_basedir settings won't be restored after ruTorrent uninstallation.)",
+        "subitems": [{
+            "key": "wizard_disable_openbasedir",
+            "desc": "Disable open_basedir",
+            "defaultValue": true
         }]
     }]
 }]

@@ -20,10 +20,19 @@ preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         if [ ! -d "${wizard_download_dir}" ]; then
-            echo "Download folder ${wizard_download_dir} does not exist."
+            echo "Download directory ${wizard_download_dir} does not exist."
+            exit 1
+        fi
+        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
+            echo "Watch directory ${wizard_watch_dir} does not exist."
+            exit 1
+        fi
+        if [ -n "${wizard_incomplete_dir}" -a ! -d "${wizard_incomplete_dir}" ]; then
+            echo "Incomplete directory ${wizard_incomplete_dir} does not exist."
             exit 1
         fi
     fi
+
     exit 0
 }
 
@@ -50,6 +59,14 @@ postinst ()
             sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
             sed -i -e "/@watch_dir@/d" ${CFG_FILE}
         fi
+        if [ -d "${wizard_incomplete_dir}" ]; then
+            sed -i -e "s|@incomplete_dir_enabled@|true|g" ${CFG_FILE}
+            sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" ${CFG_FILE}
+        else
+            sed -i -e "s|@incomplete_dir_enabled@|false|g" ${CFG_FILE}
+            sed -i -e "/@incomplete_dir@/d" ${CFG_FILE}
+        fi
+
         # Set group and permissions on download- and watch dir for DSM5
         if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
             chgrp users ${wizard_download_dir:=/volume1/downloads}
@@ -58,14 +75,11 @@ postinst ()
                 chgrp users ${wizard_watch_dir}
                 chmod g+rw ${wizard_watch_dir}
             fi
+            if [ -d "${wizard_incomplete_dir}" ]; then
+                chgrp users ${wizard_incomplete_dir}
+                chmod g+rw ${wizard_incomplete_dir}
+            fi
         fi
-    fi
-    if [ -d "${wizard_incomplete_dir}" ]; then
-        sed -i -e "s|@incomplete_dir_enabled@|true|g" ${CFG_FILE}
-        sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" ${CFG_FILE}
-    else
-        sed -i -e "s|@incomplete_dir_enabled@|false|g" ${CFG_FILE}
-        sed -i -e "/@incomplete_dir@/d" ${CFG_FILE}
     fi
 
     # Correct the files ownership

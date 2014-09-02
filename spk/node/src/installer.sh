@@ -20,7 +20,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+    chown -R root:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }

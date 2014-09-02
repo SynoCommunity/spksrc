@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = 
 WHEELS = mercurial==$(SPK_VERS)
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool

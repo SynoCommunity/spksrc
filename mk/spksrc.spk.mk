@@ -49,19 +49,29 @@ $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
 	   ) \
 	) | sed 's|"\s|"\n|' >> $@
-	@echo maintainer=\"$(MAINTAINER)\" >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
+	@echo distributor=\"SynoCommunity\" >> $@
+	@echo distributor_url=\"http://synocommunity.com\" >> $@
+ifeq ($(strip $(MAINTAINER)),SynoCommunity)
+	@echo maintainer=\"SynoCommunity\" >> $@
+	@echo maintainer_url=\"http://synocommunity.com\" >> $@
+else
+	@echo maintainer=\"SynoCommunity/$(MAINTAINER)\" >> $@
+	@echo maintainer_url=\"http://synocommunity.com/developers/$(MAINTAINER)\" >> $@
+endif
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
-	@echo firmware=\"3.0-1593\" >> $@
+	@echo firmware=\"3.1-1594\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
-	@echo beta=1 >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
+endif
+ifneq ($(strip $(SUPPORTURL)),)
+	@echo support_url=\"$(SUPPORTURL)\" >> $@
 endif
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
 	@echo install_dep_services=\"$(INSTALL_DEP_SERVICES)\" >> $@
@@ -101,10 +111,14 @@ endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
+	@echo md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
 INSTALLER_OUTPUT = > $$SYNOPKG_TEMP_LOGFILE
+endif
+ifneq ($(strip $(SPK_CONFLICT)),)
+@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
 endif
 
 # Wizard
@@ -210,6 +224,11 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 
 SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_120.PNG scripts
 
+.PHONY: md5
+md5:
+	@$(MSG) "Creating checksum for $(SPK_NAME)"
+	@sed -i -e "s|md5=\".*|md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\"|g" $(WORK_DIR)/INFO
+
 .PHONY: wizards
 wizards:
 ifneq ($(strip $(WIZARDS_DIR)),)
@@ -234,39 +253,22 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO md5 $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
 package: $(SPK_FILE_NAME)
 
 ### Publish rules
-PUBLISH_METHOD ?= REPO
-ifeq ($(strip $(PUBLISH_METHOD)),REPO)
 publish: package
-ifeq ($(PUBLISH_REPO_URL),)
-	$(error Set PUBLISH_REPO_URL in local.mk)
+ifeq ($(PUBLISH_URL),)
+	$(error Set PUBLISH_URL in local.mk)
 endif
-ifeq ($(PUBLISH_REPO_KEY),)
-	$(error Set PUBLISH_REPO_KEY in local.mk)
+ifeq ($(PUBLISH_AUTH_TOKEN),)
+	$(error Set PUBLISH_AUTH_TOKEN in local.mk)
 endif
-	curl -k -A "spksrc v1.0; $(PUBLISH_REPO_KEY)" \
-	     -F "package=@$(SPK_FILE_NAME);filename=$(notdir $(SPK_FILE_NAME))" \
-	     $(PUBLISH_REPO_URL)
-endif
-ifeq ($(strip $(PUBLISH_METHOD)),FTP)
-publish: package
-ifeq ($(PUBLISH_FTP_URL),)
-	$(error Set PUBLISH_FTP_URL in local.mk)
-endif
-ifeq ($(PUBLISH_FTP_USER),)
-	$(error Set PUBLISH_FTP_USER in local.mk)
-endif
-ifeq ($(PUBLISH_FTP_PASSWORD),)
-	$(error Set PUBLISH_FTP_PASSWORD in local.mk)
-endif
-	curl -T "$(SPK_FILE_NAME)" -u $(PUBLISH_FTP_USER):$(PUBLISH_FTP_PASSWORD) $(PUBLISH_FTP_URL)/$(notdir $(SPK_FILE_NAME))
-endif
+	http POST $(PUBLISH_URL)/packages Authentication-Token:$(PUBLISH_AUTH_TOKEN) \
+	    @$(SPK_FILE_NAME)
 
 
 ### Clean rules

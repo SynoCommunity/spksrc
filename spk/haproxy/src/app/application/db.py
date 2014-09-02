@@ -80,7 +80,7 @@ def default_config():
     session.add(Backend(id=8, name=u'maraschino', servers=u'maraschino localhost:8260 check'))
     session.add(Backend(id=9, name=u'znc', servers=u'znc localhost:8250 check'))
     session.add(Backend(id=10, name=u'transmission', servers=u'transmission localhost:9091 check'))
-    session.add(Backend(id=11, name=u'gateone', servers=u'gateone localhost:8271 ssl check'))
+    session.add(Backend(id=11, name=u'gateone', servers=u'gateone localhost:8271 ssl check verify none'))
     session.add(Backend(id=12, name=u'webdav', servers=u'webdav localhost:5005 check'))
     session.add(Backend(id=13, name=u'audio', servers=u'audio localhost:8800 check'))
     session.add(Backend(id=14, name=u'download', servers=u'download localhost:8000 check'))

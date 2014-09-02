@@ -1,6 +1,6 @@
 SPK_NAME = headphones
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/headphones.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ DESCRIPTION_SPN = Headphones permite descargar automáticamente música mediante
 ADMIN_PORT = 8181
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones
-CHANGELOG = "1. Add DSM5.0 compatibility\n2. Remove Perl dependency, add Git dependency"
+CHANGELOG = "1. Fix update issues"
 
 HOMEPAGE   = https://github.com/rembo10/headphones
 LICENSE    =
@@ -47,4 +47,4 @@ headphones_extra_install: $(STAGING_DIR)/share/Headphones
 
 $(STAGING_DIR)/share/Headphones:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/rembo10/headphones.git Headphones
+	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/rembo10/headphones.git Headphones

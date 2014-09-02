@@ -1,6 +1,6 @@
 SPK_NAME = couchpotatoserver-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/couchpotatoserver-custom.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = CouchPotato Custom vous permet d\\\'exécuter le fork de votre
 ADMIN_PORT = 5053
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato Custom
-CHANGELOG = "1. Change default fork\n2. Rename package"
+CHANGELOG = "1. Fix update issues"
 
 HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL

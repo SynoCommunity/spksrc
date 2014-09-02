@@ -15,7 +15,7 @@ BETA = 1
 
 HOMEPAGE   = https://wiki.mozilla.org/Services/Sync/Server
 LICENSE    = MPL/GPL/LGPL
-HELPURL    = http://www.synocommunity.com/help/syncserver
+HELPURL    = http://synocommunity.com/help/syncserver
 
 WIZARDS_DIR = src/wizard/
 

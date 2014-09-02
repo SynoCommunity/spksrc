@@ -1,6 +1,6 @@
 PKG_NAME = libcap
 PKG_VERS = 2.22
-PKG_EXT = tar.bz2
+PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.sunet.se/pub/Linux/kernel.org/linux/libs/security/linux-privs/libcap2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
