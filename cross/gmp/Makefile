@@ -1,9 +1,10 @@
 PKG_NAME = gmp
-PKG_VERS = 5.1.1
-PKG_EXT = tar.bz2
+PKG_VERS_SHORT = 6.0.0
+PKG_VERS = $(PKG_VERS_SHORT)a
+PKG_EXT = tar.lz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.gmplib.org/pub/$(PKG_NAME)-$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_SITE = https://gmplib.org/download/gmp
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS_SHORT)
 
 DEPENDS =
 
@@ -13,7 +14,7 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
-CONFIGURE_ARGS = --enable-assembly=no
+CONFIGURE_ARGS = --disable-assembly
 endif
 
 include ../../mk/spksrc.cross-cc.mk

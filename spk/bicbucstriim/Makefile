@@ -1,6 +1,6 @@
 SPK_NAME = bicbucstriim
-SPK_VERS = 1.1.0
-SPK_REV = 2
+SPK_VERS = 1.2.4
+SPK_REV = 3
 SPK_ICON = src/bicbucstriim.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,6 @@ ADMIN_URL = /bbs/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = BicBucStriim
-BETA = 1
 
 HOMEPAGE   = http://rvolz.github.com/BicBucStriim/
 LICENSE    = MIT

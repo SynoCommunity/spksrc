@@ -1,5 +1,5 @@
 PKG_NAME = mono
-PKG_VERS = 3.4.0
+PKG_VERS = 3.6.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.mono-project.com/sources/mono
@@ -15,11 +15,6 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = 
 
 PRE_CONFIGURE_TARGET = myPreConfigure
-
-# Notify of unsupported architectures 
-ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp),$(ARCH))
-$(error $(ARCH) is not a supported architecture)
-endif
 
 POST_INSTALL_TARGET = myPostInstall
 
@@ -37,3 +32,6 @@ myPostInstall:
 	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/lib . | tar -xpkf - -C $(STAGING_DIR)/lib
 	install -m 755 -d $(STAGING_DIR)/etc/mono
 	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/etc/mono . | tar -xpkf - -C $(STAGING_DIR)/etc/mono
+	install -m 755 -d $(STAGING_DIR)/bin
+	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/bin . | tar -xpkf - -C $(STAGING_DIR)/bin
+

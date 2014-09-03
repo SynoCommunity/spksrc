@@ -1,3 +1,3 @@
 lnk:lib/libprotobuf-c.so
-lnk:lib/libprotobuf-c.so.0
-lib:lib/libprotobuf-c.so.0.0.0
+lnk:lib/libprotobuf-c.so.1
+lib:lib/libprotobuf-c.so.1.0.0

@@ -12,6 +12,6 @@ COMMENT  = A Fast, Easy, and Free BitTorrent Client
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = HAVE_CXX=yes --disable-gtk --disable-nls --enable-daemon --enable-utp
+CONFIGURE_ARGS = HAVE_CXX=yes --disable-nls --enable-daemon --enable-utp
 
 include ../../mk/spksrc.cross-cc.mk
