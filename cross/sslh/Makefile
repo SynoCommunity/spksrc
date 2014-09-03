@@ -21,6 +21,6 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:
-	@$(RUN) mkdir -p $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin
-	@$(RUN) cp $(SRC_DIR)sslh-fork $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin/sslh
+	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/bin
+	@$(RUN) cp $(SRC_DIR)sslh-fork $(STAGING_INSTALL_PREFIX)/bin/sslh
 
