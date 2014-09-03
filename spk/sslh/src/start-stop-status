@@ -3,8 +3,6 @@
 PATH=/bin:/usr/bin:/usr/syno/bin
 
 SSLH=/usr/local/sslh/bin/sslh
-SSLHWWW=/usr/local/sslh/www
-SYNO3APP=/usr/syno/synoman/webman/3rdparty
 
 # Files
 SSLHLOG=/usr/local/sslh/log/sslh-spk.log
@@ -27,13 +25,6 @@ start_daemon ()
     then
         $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN --tinc $TINC --xmpp $XMPP -P /usr/local/sslh/pid/sslh.pid --timeout 5
     fi
-
-    # Install the application in the main interface.
-    if [ -d $SYNO3APP ]
-    then
-		rm -f $SYNO3APP/sslh
-		ln -s $SSLHWWW $SYNO3APP/sslh
-    fi
 }
 
 stop_daemon ()
@@ -46,17 +37,12 @@ stop_daemon ()
         echo `date`" : Stop SSLH..." >> $SSLHLOG
         kill $PID
     fi
-	
-    # Remove the application from the main interface if it was previously added.
-    if [ -h $SYNO3APP/sslh ]
-    then
-		rm -f $SYNO3APP/sslh
-    fi
 }
 
 daemon_status ()
 {
-	[ -h $SYNO3APP/sslh ]
+    PID=`ps | grep $SSLH | grep -v grep |awk '{print $1}'`
+    [ "$PID" != "" ]
 }
 
 case $1 in
