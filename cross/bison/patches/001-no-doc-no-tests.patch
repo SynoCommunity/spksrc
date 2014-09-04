@@ -1,0 +1,17 @@
+--- Makefile.am.orig	2014-09-04 23:50:38.531811865 +0200
++++ Makefile.am	2014-09-04 23:50:58.535810009 +0200
+@@ -54,12 +54,12 @@
+ include build-aux/local.mk
+ include data/local.mk
+ include djgpp/local.mk
+-include doc/local.mk
++#include doc/local.mk
+ include etc/local.mk
+ include examples/local.mk
+ include lib/local.mk
+ include src/local.mk
+-include tests/local.mk
++#include tests/local.mk
+ 
+ # See comments in build-aux/git-version-gen.  However, we make .version depend
+ # on configure so that .version and VERSION/PACKAGE_VERSION stay in sync in the
