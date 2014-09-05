@@ -1,0 +1,11 @@
+--- src/pcm/pcm_local.h.orig	2014-06-17 14:34:19.000000000 +0200
++++ src/pcm/pcm_local.h	2014-09-05 13:07:35.101281944 +0200
+@@ -975,7 +975,7 @@
+ 		tstamp->tv_sec = tv.tv_sec;
+ 		tstamp->tv_nsec = tv.tv_usec * 1000L;
+ #endif
+-#if defined(HAVE_CLOCK_GETTIME)
++#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
+ 	}
+ #endif
+ }
