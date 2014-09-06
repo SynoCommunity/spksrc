@@ -1,15 +1,15 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
-SPK_VERS =$(SPK_SHORT_VERS).6
-SPK_REV = 8
+SPK_VERS =$(SPK_SHORT_VERS).8
+SPK_REV = 9
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
-DEPENDS += cross/setuptools cross/distutils2 cross/pip cross/virtualenv cross/pyopenssl
-DEPENDS += cross/pycrypto cross/pycurl cross/pil cross/cheetah cross/yenc
+DEPENDS += cross/setuptools cross/pip cross/wheel cross/virtualenv cross/six
+DEPENDS += cross/cffi cross/cryptography cross/bcrypt cross/pyopenssl cross/pycrypto
+DEPENDS += cross/pycurl cross/pil cross/cheetah cross/yenc
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
-DEPENDS += cross/wheel cross/mercurial cross/scrypt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -18,7 +18,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Add wheel, mercurial and scrypt modules"
+CHANGELOG = "1. Update to 2.7.8<br>2. Update modules<br>3. Update dependencies"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
