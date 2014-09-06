@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/c/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libffi
+DEPENDS = cross/libffi cross/pycparser
 
 HOMEPAGE = http://pypi.python.org/pypi/cffi
 COMMENT  = Foreign Function Interface for Python calling C code
