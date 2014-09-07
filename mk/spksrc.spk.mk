@@ -36,7 +36,7 @@ include ../../mk/spksrc.strip.mk
 $(WORK_DIR)/package.tgz: strip
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ *)
+	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
