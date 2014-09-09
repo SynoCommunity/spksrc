@@ -579,26 +579,40 @@ SYNOCOMMUNITY.HAProxy.PanelConfiguration = Ext.extend(SYNOCOMMUNITY.HAProxy.Form
     },
     onClickDefaultConfiguration: function (button, event) {
         this.disableButtons();
-        SYNOCOMMUNITY.HAProxy.Remote.Configuration.reload(function (provider, response) {
-            if (response.result) {
-                this.owner.setStatusOK({
-                    text: _V("msg", "default_configuration_successful")
-                });
-            }
-            this.owner.mainPanel.cardPanel.forceRefresh();
-            this.enableButtons();
+	this.owner.getMsgBox().confirm(this.title, _V("msg", "confirm_reload"),
+	function (response) {
+	    if ("yes" === response) {
+	         SYNOCOMMUNITY.HAProxy.Remote.Configuration.reload(function (provider, response) {
+		    if (response.result) {
+		        this.owner.setStatusOK({
+		            text: _V("msg", "default_configuration_successful")
+		        });
+		    }
+		    this.owner.mainPanel.cardPanel.forceRefresh();
+		    this.enableButtons();
+		}, this);
+	    } else {
+		this.enableButtons();
+	    }
         }, this);
     },
     onClickGenerateCertificate: function (button, event) {
         this.disableButtons();
-        SYNOCOMMUNITY.HAProxy.Remote.Configuration.generate_certificate(function (provider, response) {
-            if (response.result) {
-                this.owner.setStatusOK({
-                    text: _V("msg", "generate_certificate_successful")
-                });
-            }
-            this.owner.mainPanel.cardPanel.forceRefresh();
-            this.enableButtons();
+	this.owner.getMsgBox().confirm(this.title, _V("msg", "confirm_gen_certif"),
+        function (response) {
+            if ("yes" === response) {
+                SYNOCOMMUNITY.HAProxy.Remote.Configuration.generate_certificate(function (provider, response) {
+		    if (response.result) {
+		        this.owner.setStatusOK({
+		            text: _V("msg", "generate_certificate_successful")
+		        });
+		    }
+		    this.owner.mainPanel.cardPanel.forceRefresh();
+		    this.enableButtons();
+		}, this);
+            } else {
+	        this.enableButtons();
+	    }
         }, this);
     }
 });
