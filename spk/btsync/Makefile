@@ -1,6 +1,6 @@
 SPK_NAME = btsync
 SPK_VERS = 1.4.75
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/btsync.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = BitTorrent Sync
 CHANGELOG = "Update to 1.4.75"
 
-HOMEPAGE   = http://labs.bittorrent.com/experiments/sync.html
+HOMEPAGE   = http://www.bittorrent.com/sync
 LICENSE    =
 
 WIZARDS_DIR = src/wizard/
