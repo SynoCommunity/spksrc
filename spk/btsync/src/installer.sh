@@ -34,8 +34,6 @@ postinst ()
 
     # Edit the configuration according to the wizard
     sed -i -e "s|@device_name@|${wizard_device_name:=NAS}|g" \
-           -e "s|@login@|${wizard_login:=login}|g" \
-           -e "s|@password@|${wizard_password:=password}|g" \
            ${CFG_FILE}
 
     # Correct the files ownership
