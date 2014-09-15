@@ -1,9 +1,9 @@
 PKG_NAME = python3
 PKG_VERS_MAJOR = 3
-PKG_VERS_MINOR = 3
-PKG_VERS_PATCH = 2
+PKG_VERS_MINOR = 4
+PKG_VERS_PATCH = 1
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
-PKG_EXT = tar.bz2
+PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
@@ -17,7 +17,7 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS  = --enable-shared --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
+CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 
 POST_PATCH_TARGET = myPostPatch
@@ -63,7 +63,9 @@ myInstall:
 .PHONY: myPostInstall
 myPostInstall: $(WORK_DIR)/python-cc.mk
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
+ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/
+endif
 
 $(WORK_DIR)/python-cc.mk:
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
