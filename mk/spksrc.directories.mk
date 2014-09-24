@@ -13,7 +13,6 @@ PWD := $(shell pwd)
 
 DISTRIB_DIR  = $(PWD)/../../distrib
 PIP_DIR = $(PWD)/../../distrib/pip
-WHEEL_DIR  = $(PWD)/../../distrib/wheelhouse
 PACKAGES_DIR = $(PWD)/../../packages
 
 ifndef WORK_DIR

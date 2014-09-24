@@ -41,7 +41,7 @@ endif
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
 
 strip_msg:
-	@$(MSG) "Striping binaries and libraries of $(NAME)"
+	@$(MSG) "Stripping binaries and libraries of $(NAME)"
 
 pre_strip_target: strip_msg
 
