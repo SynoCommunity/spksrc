@@ -28,9 +28,9 @@
 +            # skip binary files
 +            if b('\0') in data:
 +                continue
-+                
++
 +            shebang = '#!python'
-+            data1 = data1.replace('#!/usr/local/python/bin/python2.7', shebang.encode('string_escape')) 
++            data1 = data1.replace('#!/usr/local/mercurial/bin/python2.7', shebang.encode('string_escape'))
 +            fp = open(outfile, 'wb')
 +            fp.write(data1)
 +            fp.close()
