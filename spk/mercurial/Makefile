@@ -4,8 +4,8 @@ SPK_REV = 1
 SPK_ICON = src/mercurial.png
 DSM_UI_DIR = app
 
-DEPENDS = 
-WHEELS = mercurial==$(SPK_VERS)
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel cross/$(SPK_NAME)
+WHEELS = $(SPK_NAME)==$(SPK_VERS)
 SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
