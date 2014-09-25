@@ -9,7 +9,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="domoticz"
-GROUP="nogroup"
+GROUP="nobody"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
