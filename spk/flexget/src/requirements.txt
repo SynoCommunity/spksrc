@@ -1,0 +1,29 @@
+paver
+FeedParser>=5.1.3
+SQLAlchemy >=0.7, <0.7.99
+PyYAML
+argparse
+babelfish>=0.5.3
+stevedore>=0.14
+BeautifulSoup
+beautifulsoup4>=4.1, !=4.2.0, <4.4
+plumbum
+rpyc
+path.py
+html5lib>=0.11
+PyRSS2Gen
+pynzb
+progressbar
+jinja2
+flask
+cherrypy
+requests>=1.0, <2.99
+python-dateutil!=2.0, !=2.2
+jsonschema>=2.0
+python-tvrage
+tmdb3
+guessit>=0.9.3
+werkzeug>=0.7
+itsdangerous>=0.21
+flexget[webui]
+transmissionrpc
