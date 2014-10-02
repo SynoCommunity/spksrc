@@ -23,14 +23,14 @@ start_daemon ()
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE} | cut -d ' ' -f2`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    kill `grep PID: ${PID_FILE} | cut -d ' ' -f2`
+    wait_for_status 1 20 || kill -9 `grep PID: ${PID_FILE} | cut -d ' ' -f2`
     rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE} | cut -d ' ' -f2` > /dev/null 2>&1; then
+    if [ -f ${PID_FILE} ] && kill -0 `grep PID: ${PID_FILE} | cut -d ' ' -f2` > /dev/null 2>&1; then
         return
     fi
     rm -f ${PID_FILE}
