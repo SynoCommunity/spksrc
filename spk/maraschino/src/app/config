@@ -5,7 +5,9 @@
             "desc": "Maraschino Web UI",
             "icon": "images/maraschino-{0}.png",
             "type": "url",
-            "url": "3rdparty/maraschino/maraschino.cgi",
+            "protocol": "http",
+            "port": "8260",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }
