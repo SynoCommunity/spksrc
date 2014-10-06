@@ -1,7 +1,6 @@
 from pyextdirect.configuration import create_configuration, expose, LOAD, STORE_READ, STORE_CUD
 from pyextdirect.router import Router
 import os
-import time
 import subprocess
 from config import *
 from db import *
@@ -74,15 +73,11 @@ class Services(Base):
         for service in self.session.query(Service).all():
             if service.status:
                 service.stop()
-                while service.status:
-                    time.sleep(0.8)
 
     def start_all(self):
         for service in self.session.query(Service).all():
             if not service.status:
                 service.start()
-                while not service.status:
-                    time.sleep(0.8)
 
 class Overview(Base):
     def __init__(self):
