@@ -22,7 +22,6 @@ ADDITIONAL_CFLAGS = -O3
 
 include ../../mk/spksrc.cross-cc.mk
 
-
 .PHONY: myPreCompile
 myPreCompile:
 #       $(TC_PATH)$(TC_PREFIX)gcc $(WORK_DIR)/$(PKG_DIR)/deps/makeheaders.c -o $(WORK_DIR)/$(PKG_DIR)/makeheaders
@@ -30,5 +29,3 @@ myPreCompile:
         ln -s $(WORK_DIR)/$(PKG_DIR)/config.h $(WORK_DIR)/$(PKG_DIR)/doc/config.h
 #       $(TC_PATH)$(TC_PREFIX)gcc -I. $(WORK_DIR)/$(PKG_DIR)/doc/gendoc.c -o $(WORK_DIR)/$(PKG_DIR)/gendoc
         gcc -I. $(WORK_DIR)/$(PKG_DIR)/doc/gendoc.c -o $(WORK_DIR)/$(PKG_DIR)/gendoc
-
-
