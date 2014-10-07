@@ -4,7 +4,6 @@ PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://dev.yorhel.nl/download
-SPK_REV = 1
 
 DEPENDS = cross/ncurses cross/ncursesw cross/zlib cross/glib cross/sqlite cross/gnutls cross/bzip2
 
