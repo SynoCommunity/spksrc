@@ -1,37 +1,26 @@
-PKG_NAME = ncdc
-PKG_VERS = 1.19.1
-PKG_EXT = tar.gz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://dev.yorhel.nl/download
-SPK_ICON = src/btsync.png
+SPK_NAME = ncdc
+SPK_VERS = 1.19.1
+SPK_REV = 1
+# SPK_ICON = src/ncdc.png
 SPK_REV = 1
 
-DEPENDS = cross/ncursesw cross/zlib cross/glib cross/sqlite cross/gnutls cross/bzip2
-
-HOMEPAGE = http://dev.yorhel.nl/ncdc
-COMMENT  = Ncdc is a modern and lightweight direct connect client with a friendly ncurses interface.
-LICENSE  = MIT
+DEPENDS = cross/screen cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Ncdc is a modern and lightweight direct connect client with a friendly ncurses interface.
 DESCRIPTION_FRE = Ncdc est un client direct connect modern eteger, avec un interface conviviale.
+DISPLAY_NAME = ncdc
+CHANGELOG = "New version"
+
+HOMEPAGE = http://dev.yorhel.nl/ncdc
+LICENSE  = MIT
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT = src/dsm-control.sh
+FWPORT =
 
-GNU_CONFIGURE = 1
-PRE_COMPILE_TARGET = myPreCompile
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-CONFIGURE_ARGS  =
-ADDITIONAL_CFLAGS = -O2
+POST_STRIP_TARGET =
 
-include ../../mk/spksrc.cross-cc.mk
-
-
-.PHONY: myPreCompile
-myPreCompile:
-        ln -s $(WORK_DIR)/$(PKG_DIR)/config.h $(WORK_DIR)/$(PKG_DIR)/doc/config.h
-        cc $(WORK_DIR)/$(PKG_DIR)/deps/makeheaders.c -o $(WORK_DIR)/$(PKG_DIR)/makeheaders
-        cc -I. $(WORK_DIR)/$(PKG_DIR)/doc/gendoc.c -o $(WORK_DIR)/$(PKG_DIR)/gendoc
-        patch $(WORK_DIR)/$(PKG_DIR)/Makefile < patch
+include ../../mk/spksrc.spk.mk
