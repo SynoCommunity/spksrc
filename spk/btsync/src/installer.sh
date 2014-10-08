@@ -29,12 +29,17 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    # Create user (Random password and deactivated, we only need it for folder permissions)
+    synouser --add ${USER} `openssl rand 27 -base64 2>/dev/null` "${DNAME} User" 1 "" ""
+    # Change the home directory and the shell
+    sed -i "s|/var/services/homes/btsync:/sbin/nologin|${INSTALL_DIR}/var:/bin/sh|g" /etc/passwd
+    # Remove the not needed home directory which was created by synouser, but only when it is empty
+    if ! [ "$(ls -A /var/services/homes/btsync)" ]; then
+        rm -rf /var/services/homes/btsync
+    fi
 
     # Edit the configuration according to the wizard
-    sed -i -e "s|@device_name@|${wizard_device_name:=NAS}|g" \
-           ${CFG_FILE}
+    sed -i "s|@device_name@|${wizard_device_name:=NAS}|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -52,6 +57,8 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        synouser --del ${USER}
+        # Needed when the user was created with adduser
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
