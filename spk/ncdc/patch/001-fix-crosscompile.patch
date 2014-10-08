@@ -1,0 +1,8 @@
+540,542d539
+< gendoc$(EXEEXT): $(gendoc_OBJECTS) $(gendoc_DEPENDENCIES) $(EXTRA_gendoc_DEPENDENCIES)
+<       @rm -f gendoc$(EXEEXT)
+<       $(AM_V_CCLD)$(LINK) $(gendoc_OBJECTS) $(gendoc_LDADD) $(LIBS)
+546,548d542
+< makeheaders$(EXEEXT): $(makeheaders_OBJECTS) $(makeheaders_DEPENDENCIES) $(EXTRA_makeheaders_DEPENDENCIES)
+<       @rm -f makeheaders$(EXEEXT)
+<       $(AM_V_CCLD)$(LINK) $(makeheaders_OBJECTS) $(makeheaders_LDADD) $(LIBS)
