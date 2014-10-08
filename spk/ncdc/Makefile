@@ -34,5 +34,4 @@ myPreCompile:
         ln -s $(WORK_DIR)/$(PKG_DIR)/config.h $(WORK_DIR)/$(PKG_DIR)/doc/config.h
         cc $(WORK_DIR)/$(PKG_DIR)/deps/makeheaders.c -o $(WORK_DIR)/$(PKG_DIR)/makeheaders
         cc -I. $(WORK_DIR)/$(PKG_DIR)/doc/gendoc.c -o $(WORK_DIR)/$(PKG_DIR)/gendoc
-        patch $(WORK_DIR)/$(PKG_DIR)/Makefile < patches/001-fix-crosscompile.patch
-
+        patch $(WORK_DIR)/$(PKG_DIR)/Makefile < patch
