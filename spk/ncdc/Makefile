@@ -1,7 +1,7 @@
 SPK_NAME = ncdc
 SPK_VERS = 1.19.1
 SPK_REV = 1
-# SPK_ICON = src/ncdc.png
+SPK_ICON = src/ncdc.png
 SPK_REV = 1
 
 DEPENDS = cross/screen cross/$(SPK_NAME)
