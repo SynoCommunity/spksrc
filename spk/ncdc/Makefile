@@ -3,11 +3,6 @@ SPK_VERS = 1.19.1
 SPK_REV = 1
 SPK_ICON = src/ncdc.png
 
-# Abort for ARCHs that won't compile
-ifeq ($(findstring $(ARCH),88f6281),)
-$(error Sorry, this package does not support the $(ARCH) architecture.)
-endif
-
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity/sirjeannot
