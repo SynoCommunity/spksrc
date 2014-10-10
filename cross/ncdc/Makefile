@@ -5,6 +5,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://dev.yorhel.nl/download
 
+# Abort for ARCHs that won't compile
+ifeq ($(findstring $(ARCH),88f6281),)
+$(error Sorry, this package does not support the $(ARCH) architecture.)
+endif
+
 DEPENDS = cross/ncursesw cross/zlib cross/glib cross/sqlite cross/gnutls cross/bzip2
 
 HOMEPAGE = http://dev.yorhel.nl/ncdc
