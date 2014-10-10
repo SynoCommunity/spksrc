@@ -3,9 +3,14 @@ SPK_VERS = 1.19.1
 SPK_REV = 1
 SPK_ICON = src/ncdc.png
 
-DEPENDS = cross/screen cross/$(SPK_NAME)
+# Abort for ARCHs that won't compile
+ifeq ($(findstring $(ARCH),88f6281),)
+$(error Sorry, this package does not support the $(ARCH) architecture.)
+endif
 
-MAINTAINER = SynoCommunity
+DEPENDS = cross/$(SPK_NAME)
+
+MAINTAINER = SynoCommunity/sirjeannot
 DESCRIPTION = Ncdc is a modern and lightweight direct connect client with a friendly ncurses interface.
 DESCRIPTION_FRE = Ncdc est un client direct connect modern et leger, avec un interface conviviale.
 DISPLAY_NAME = ncdc
