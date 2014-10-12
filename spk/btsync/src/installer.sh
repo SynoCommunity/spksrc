@@ -9,7 +9,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="btsync"
-GROUP="users"
+GROUP="btsync"
 CFG_FILE="${INSTALL_DIR}/var/sync.conf"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -29,12 +29,15 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
+    # Add group
+    synogroup --add ${GROUP} > /dev/null
+    synogroup --descset ${GROUP} "BitTorrent Sync group"
+
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizard
-    sed -i -e "s|@device_name@|${wizard_device_name:=NAS}|g" \
-           ${CFG_FILE}
+    sed -i "s|@device_name@|${wizard_device_name:=NAS}|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -52,8 +55,8 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        delgroup ${USER} ${GROUP}
         deluser ${USER}
+        synogroup --del ${GROUP}
     fi
 
     # Remove firewall config
