@@ -111,7 +111,7 @@ endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
-	@echo md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
+	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
