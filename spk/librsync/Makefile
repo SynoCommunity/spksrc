@@ -8,7 +8,7 @@ DEPENDS = cross/$(SPK_NAME)
 MAINTAINER = SynoCommunity
 DESCRIPTION = The librsync library does network delta-compression of streams and files. Contains rdiff.
 DESCRIPTION_FRE =
-DISPLAY_NAME = ncdc
+DISPLAY_NAME = librsync
 CHANGELOG = "New version"
 
 HOMEPAGE = https://github.com/librsync/librsync
