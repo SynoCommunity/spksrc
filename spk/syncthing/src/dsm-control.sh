@@ -10,29 +10,22 @@ PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="syncthing"
 SYNCTHING="${INSTALL_DIR}/bin/syncthing"
 CONFIG_DIR="${INSTALL_DIR}/var/"
+PID_FILE="${CONFIG_DIR}/syncthing.pid"
 
 
 start_daemon ()
 {
-    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- --home ${CONFIG_DIR}
-    #su - ${USER} -c "PATH=${PATH} ${SYNCTHING} --home ${CONFIG_DIR}"
+    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -p ${PID_FILE} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- --home ${CONFIG_DIR}
 }
 
 stop_daemon ()
 {
-    # Kill the application
-    #kill `ps w | grep ${PACKAGE} | grep -v -E 'stop|grep' | awk '{print $1}'`
-    start-stop-daemon -o -c ${USER} -K -u ${USER} -x ${SYNCTHING} -- --home ${CONFIG_DIR}
+    start-stop-daemon -o -c ${USER} -K -u ${USER}  -p ${PID_FILE} -x ${SYNCTHING} -- --home ${CONFIG_DIR}
 }
 
 daemon_status ()
 {
-   if [ `ps w | grep ${PACKAGE} | grep -v -E 'status|grep' | wc -l` -gt 0 ]
-    then
-        return 0
-    else
-        return 1
-    fi
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
 wait_for_status ()
