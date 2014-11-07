@@ -64,7 +64,7 @@ myComp:
 	#go is particular about file locations so we have to link it to the native directory to work!
 	mkdir -p $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing
 	ln -sf $(WORK_DIR)/$(PKG_DIR) $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing/syncthing
-	cd $(WORK_DIR)/$(PKG_DIR) && export $(ENV) && go run build.go clean && go run build.go $(CONF_ARGS)
+	$(RUN) go run build.go $(CONF_ARGS)
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
