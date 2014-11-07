@@ -14,6 +14,32 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
+GROUP_SYNC="sc-syncthing"
+GROUP_SYNC_DESC="SynoCommunity's Syncthing group"
+
+sync_group_create ()
+{
+    # Create sync group (Does nothing when sync group already exists)
+    synogroup --add ${GROUP_SYNC} ${USER} > /dev/null
+    # Set description of the sync group
+    synogroup --descset ${GROUP_SYNC} "${GROUP_SYNC_DESC}"
+
+    # Add user to sync group (Does nothing when user already in the group)
+    addgroup ${USER} ${GROUP_SYNC}
+}
+
+sync_group_remove ()
+{
+    # Remove user from sync group
+    delgroup ${USER} ${GROUP_SYNC}
+
+    # Check if sync group is empty
+    if ! synogroup --get ${GROUP_SYNC} | grep -q "0:"; then
+        # Remove sync group
+        synogroup --del ${GROUP_SYNC} > /dev/null
+    fi
+}
+
 preinst ()
 {
     exit 0
@@ -29,6 +55,8 @@ postinst ()
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+
+    sync_group_create
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -46,6 +74,8 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        sync_group_remove
+
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
@@ -70,6 +100,8 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    sync_group_create
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
