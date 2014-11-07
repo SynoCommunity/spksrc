@@ -1,6 +1,6 @@
 SPK_NAME = domoticz
-SPK_VERS = 2.0
-SPK_REV = 2105
+SPK_VERS = 2.0.2105
+SPK_REV = 4
 SPK_ICON = src/domoticz.png
 DSM_UI_DIR = app
 
