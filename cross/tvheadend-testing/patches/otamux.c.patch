@@ -1,0 +1,25 @@
+--- ./src/epggrab/otamux.c.orig     2014-10-23 23:10:00.000000000 +0200
++++ ./src/epggrab/otamux.c  2014-10-24 10:16:20.000000000 +0200
+@@ -126,7 +126,7 @@
+     epggrab_ota_requeue();
+   }
+
+-  if (TAILQ_EMPTY(&epggrab_ota_pending))
++  if ((&epggrab_ota_pending)->tqh_first == NULL)
+     return;
+
+   gtimer_arm(&epggrab_ota_kick_timer, epggrab_ota_kick_cb, NULL, delay);
+@@ -199,9 +199,13 @@
+
+   /* In pending queue? Remove.. */
+   if (om->om_q_type == EPGGRAB_OTA_MUX_PENDING)
++  {
+     TAILQ_REMOVE(&epggrab_ota_pending, om, om_q_link);
++  }
+   else
++  {
+     assert(om->om_q_type == EPGGRAB_OTA_MUX_IDLE);
++  }
+
+   TAILQ_INSERT_TAIL(&epggrab_ota_active, om, om_q_link);
+   om->om_q_type = EPGGRAB_OTA_MUX_ACTIVE;

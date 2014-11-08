@@ -1,0 +1,20 @@
+--- ./src/service.c.orig    2014-10-23 23:10:00.000000000 +0200
++++ ./src/service.c 2014-10-24 10:16:20.000000000 +0200
+@@ -392,7 +392,7 @@
+   TAILQ_INIT(&t->s_filt_components);
+
+   for (i = ESF_CLASS_VIDEO; i <= ESF_CLASS_LAST; i++)
+-    if (!TAILQ_EMPTY(&esfilters[i]))
++    if (!(&esfilters[i])->tqh_first == NULL)
+       goto filter;
+
+   TAILQ_FOREACH(st, &t->s_components, es_link) {
+@@ -418,7 +418,7 @@
+   for (i = ESF_CLASS_VIDEO, p = 0; i <= ESF_CLASS_LAST; i++) {
+     o = p;
+     mask = esfilterclsmask[i];
+-    if (TAILQ_EMPTY(&esfilters[i])) {
++    if ((&esfilters[i])->tqh_first == NULL) {
+       TAILQ_FOREACH(st, &t->s_components, es_link) {
+         if ((mask & SCT_MASK(st->es_type)) != 0) {
+           service_build_filter_add(t, st, sta, &p);

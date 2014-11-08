@@ -1,0 +1,36 @@
+--- Makefile.orig	2014-06-24 12:15:55.000000000 +0200
++++ Makefile	2014-06-24 14:11:16.000000000 +0200
+@@ -86,13 +86,13 @@
+ endif
+ X86SRC = $(X86SRC0:%=common/x86/%)
+ 
+-ifeq ($(ARCH),X86)
++ifneq ($(filter $(ARCH), evansport),)
+ ARCH_X86 = yes
+ ASMSRC   = $(X86SRC) common/x86/pixel-32.asm
+ ASFLAGS += -DARCH_X86_64=0
+ endif
+ 
+-ifeq ($(ARCH),X86_64)
++ifneq ($(filter $(ARCH), bromolow cedarview x86),)
+ ARCH_X86 = yes
+ ASMSRC   = $(X86SRC:-32.asm=-64.asm) common/x86/trellis-64.asm
+ ASFLAGS += -DARCH_X86_64=1
+@@ -108,7 +108,7 @@
+ endif
+ 
+ # AltiVec optims
+-ifeq ($(ARCH),PPC)
++ifneq ($(filter $(ARCH), powerpc ppc824x ppc853x ppc854x qoriq),)
+ ifneq ($(AS),)
+ SRCS += common/ppc/mc.c common/ppc/pixel.c common/ppc/dct.c \
+         common/ppc/quant.c common/ppc/deblock.c \
+@@ -117,7 +117,7 @@
+ endif
+ 
+ # NEON optims
+-ifeq ($(ARCH),ARM)
++ifneq ($(filter $(ARCH), 88f5281 88f6281 armada370 armadaxp),)
+ ifneq ($(AS),)
+ ASMSRC += common/arm/cpu-a.S common/arm/pixel-a.S common/arm/mc-a.S \
+           common/arm/dct-a.S common/arm/quant-a.S common/arm/deblock-a.S \

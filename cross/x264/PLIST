@@ -1,0 +1,3 @@
+bin:bin/x264
+lnk:lib/libx264.so
+lib:lib/libx264.so.142

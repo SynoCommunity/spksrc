@@ -1,0 +1,4 @@
+bin:bin/faac
+lnk:lib/libfaac.so
+lnk:lib/libfaac.so.0
+lib:lib/libfaac.so.0.0.0
