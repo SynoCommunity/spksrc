@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.maraschino-custom": {
+            "title": "Maraschino-custom",
+            "desc": "Maraschino Web UI",
+            "icon": "images/maraschino-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8262",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
