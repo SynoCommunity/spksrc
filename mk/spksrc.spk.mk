@@ -264,11 +264,10 @@ publish: package
 ifeq ($(PUBLISH_URL),)
 	$(error Set PUBLISH_URL in local.mk)
 endif
-ifeq ($(PUBLISH_AUTH_TOKEN),)
-	$(error Set PUBLISH_AUTH_TOKEN in local.mk)
+ifeq ($(PUBLISH_API_KEY),)
+	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	http --auth-type basic --auth $(PUBLISH_AUTH_TOKEN): POST $(PUBLISH_URL)/packages \
-	    @$(SPK_FILE_NAME)
+	http --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
 
 
 ### Clean rules
