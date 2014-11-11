@@ -2,4 +2,4 @@
 title="Syncthing"
 desc="Syncthing"
 port_forward="yes"
-dst.ports="22000/tcp,21025/udp,7070/tcp"
+dst.ports="22000,21025,7070/tcp,udp"
