@@ -111,7 +111,7 @@ endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
-	@echo md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
+	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
@@ -224,10 +224,10 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 
 SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_120.PNG scripts
 
-.PHONY: md5
-md5:
+.PHONY: checksum
+checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
-	@sed -i -e "s|md5=\".*|md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\"|g" $(WORK_DIR)/INFO
+	@sed -i -e "s|checksum=\".*|checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\"|g" $(WORK_DIR)/INFO
 
 .PHONY: wizards
 wizards:
@@ -253,7 +253,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO md5 $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
@@ -267,7 +267,7 @@ endif
 ifeq ($(PUBLISH_AUTH_TOKEN),)
 	$(error Set PUBLISH_AUTH_TOKEN in local.mk)
 endif
-	http POST $(PUBLISH_URL)/packages Authentication-Token:$(PUBLISH_AUTH_TOKEN) \
+	http --auth-type basic --auth $(PUBLISH_AUTH_TOKEN): POST $(PUBLISH_URL)/packages \
 	    @$(SPK_FILE_NAME)
 
 

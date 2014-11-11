@@ -1,6 +1,6 @@
 SPK_NAME = domoticz
-SPK_VERS = 2014
-SPK_REV = 3
+SPK_VERS = 2.0.2112
+SPK_REV = 5
 SPK_ICON = src/domoticz.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Domoticz est un système domotique qui vous permet de surveill
 ADMIN_PORT = 8084
 RELOAD_UI = yes
 DISPLAY_NAME = Domoticz
-CHANGELOG = "update to svn revision 2014"
+CHANGELOG = "update to svn revision 2112"
 
 HOMEPAGE = http://www.domoticz.com/
 LICENSE  = 
