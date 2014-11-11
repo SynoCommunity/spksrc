@@ -1,5 +1,5 @@
 SPK_NAME = librsync
-SPK_VERS = 0.9.7
+SPK_VERS = 1.0.0PRE
 SPK_REV = 1
 SPK_ICON = src/librsync.png
 
