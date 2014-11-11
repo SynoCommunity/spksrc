@@ -75,4 +75,4 @@ setup: local.mk
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
 	@echo "PUBLISH_URL=https://api.synocommunity.com/" > $@
-	@echo "PUBLISH_AUTH_TOKEN=" >> $@
+	@echo "PUBLISH_API_KEY=" >> $@
