@@ -55,11 +55,11 @@ class Configuration(Base):
                 for server in backend.servers.split(','):
                     f.write('\tserver %s\n' % server.strip())
                 f.write('\n')
-        if restart:
-            self.restart()
         error = self.check()
         if error:
             return {'success': False, 'error': error}
+        if restart:
+            self.restart()
         return {'success': True}
 
     def status(self):
