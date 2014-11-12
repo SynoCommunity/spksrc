@@ -33,8 +33,7 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizard
-    sed -i -e "s|@device_name@|${wizard_device_name:=NAS}|g" \
-           ${CFG_FILE}
+    sed -i "s|@device_name@|${wizard_device_name:=NAS}|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
