@@ -1,9 +1,9 @@
 PKG_NAME = shairport
-PKG_VERS = 1.0
+PKG_VERS = 1.1.1
 PKG_EXT = zip
-PKG_DIST_NAME = master.zip
+PKG_DIST_NAME = 1.1.1.zip
 PKG_DIST_SITE = https://github.com/abrasive/shairport/archive
-PKG_DIR = $(PKG_NAME)-master
+PKG_DIR = $(PKG_NAME)-1.1.1
 
 DEPENDS = cross/openssl cross/alsa-lib
 
