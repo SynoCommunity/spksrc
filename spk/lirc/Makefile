@@ -1,10 +1,8 @@
 SPK_NAME = lirc
 SPK_VERS = 0.9.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/lirc.png
 FIRMWARE = 4.3-3776
-
-BETA=1
 
 LIRC_SUPPORTED_DRIVERS = 
 
@@ -21,7 +19,7 @@ endif
 
 DEPENDS = cross/$(SPK_NAME)-$(SPK_VERS)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = bru7us
 DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
 RELOAD_UI = no
 DISPLAY_NAME = LIRC
@@ -29,7 +27,7 @@ DISPLAY_NAME = LIRC
 HOMEPAGE = http://www.lirc.org/
 LICENSE  =
 
-WIZARDS_DIR = src/wizard
+WIZARDS_DIR = $(WORK_DIR)/wizard
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -50,6 +48,7 @@ lirc_extra_install:
 	install -m 644 src/lircrc $(STAGING_DIR)/etc/lirc/lircrc
 	install -m 644 src/lircd.conf $(STAGING_DIR)/etc/lirc/lircd.conf
 	cp -R $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/remotes $(STAGING_DIR)/
+	install -m 755 -d $(WIZARDS_DIR)
 	install src/install_uifile.tmpl $(WIZARDS_DIR)/install_uifile
 	@for DRIVER in $(LIRC_SUPPORTED_DRIVERS); do \
 	    sed -i "s/@keys@/$${DRIVER} @keys@/" $(WIZARDS_DIR)/install_uifile; \

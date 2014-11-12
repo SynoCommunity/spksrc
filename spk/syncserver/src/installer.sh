@@ -9,7 +9,6 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
-HG="${PYTHON_DIR}/bin/hg"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 WIZARD="/var/packages/${PACKAGE}/WIZARD_UIFILES"
 
@@ -20,6 +19,7 @@ USER="syncserver"
 GROUP="users"
 
 MYSQL="/usr/syno/mysql/bin/mysql"
+MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
 
 INI_FILE="${INSTALL_DIR}/var/syncserver.ini"
 CONF_FILE="${INSTALL_DIR}/var/syncserver.conf"
@@ -93,16 +93,8 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env >> /dev/null
 
-    # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install --no-index -U --no-deps --force-reinstall ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
-
-    # Build Sync dependencies
-    cd ${INSTALL_DIR}/share/syncserver/deps/server-storage && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
-    cd ${INSTALL_DIR}/share/syncserver/deps/server-reg && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
-    cd ${INSTALL_DIR}/share/syncserver/deps/server-core && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
-
-    # Build Sync
-    cd ${INSTALL_DIR}/share/syncserver && ${INSTALL_DIR}/env/bin/python setup.py develop > /dev/null
+    # Install the wheels
+    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -I -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null
 
     # Add port-forwarding config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -120,9 +112,17 @@ preuninst ()
 {
 
     # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
         echo "Incorrect MySQL root password"
         exit 1
+    fi
+
+    # Check database export location
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
+        if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${PACKAGE}.sql" ]; then
+            echo "File ${wizard_dbexport_path}/${PACKAGE}.sql already exists. Please remove or choose a different location"
+            exit 1
+        fi
     fi
 
     # Stop the package
@@ -147,8 +147,12 @@ postuninst ()
     # Remove link
     rm -f ${INSTALL_DIR}
 
-    # Remove MySQL database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
+    # Export and remove database
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        if [ -n "${wizard_dbexport_path}" ]; then
+            mkdir -p ${wizard_dbexport_path}
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${PACKAGE} > ${wizard_dbexport_path}/${PACKAGE}.sql
+        fi
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${PACKAGE}; DROP USER '${USER}'@'localhost';"
     fi
 

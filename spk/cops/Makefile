@@ -1,6 +1,6 @@
 SPK_NAME = cops
-SPK_VERS = 0.9.0
-SPK_REV = 1
+SPK_VERS = 1.0.0RC2
+SPK_REV = 3
 SPK_ICON = src/cops.png
 DSM_UI_DIR = app
 
@@ -12,6 +12,7 @@ DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au ser
 ADMIN_URL = /cops/
 RELOAD_UI = yes
 DISPLAY_NAME = COPS
+CHANGELOG = "1. Update to 1.0.0RC2"
 
 HOMEPAGE   = http://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
@@ -23,6 +24,7 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
+INSTUNINST_RESTART_SERVICES = apache-web
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -39,7 +41,7 @@ cops_extra_install:
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 666 src/config_local.php.synology $(STAGING_DIR)/config_local.php.synology
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

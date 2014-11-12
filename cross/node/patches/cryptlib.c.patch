@@ -1,0 +1,18 @@
+--- deps/openssl/openssl/crypto/cryptlib.c.orig	2014-08-20 21:42:52.066466954 +0200
++++ deps/openssl/openssl/crypto/cryptlib.c	2014-08-20 21:41:49.815356685 +0200
+@@ -677,6 +677,7 @@
+     return (unsigned long *)OPENSSL_ia32cap_P;
+ }
+ 
++#if !defined(__arm__)
+ #if defined(OPENSSL_CPUID_OBJ) && !defined(OPENSSL_NO_ASM) && !defined(I386_ONLY)
+ #define OPENSSL_CPUID_SETUP
+ #if defined(_WIN32)
+@@ -722,6 +723,7 @@
+ #if !defined(OPENSSL_CPUID_SETUP) && !defined(OPENSSL_CPUID_OBJ)
+ void OPENSSL_cpuid_setup(void) {}
+ #endif
++#endif
+ 
+ #if (defined(_WIN32) || defined(__CYGWIN__)) && defined(_WINDLL)
+ #ifdef __CYGWIN__

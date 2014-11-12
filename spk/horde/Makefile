@@ -1,22 +1,25 @@
 SPK_NAME = horde
 SPK_VERS = 5.1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/horde.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/pear
+DEPENDS  = cross/busybox
+SPK_DEPENDS = "PEAR"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Horde Groupware Webmail Edition is a free, enterprise ready, browser based communication suite. Users can read, send and organize email messages and manage and share calendars, contacts, tasks and notes with the standards compliant components from the Horde Project.
 ADMIN_URL = /horde/
 RELOAD_UI = yes
 DISPLAY_NAME = Horde
+CHANGELOG = "1. DSM 5.0 compatibility<br>2. Synology Pear dependency"
 BETA = 1
 
 HOMEPAGE   = http://www.horde.org/
 LICENSE    = LGPL
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -36,18 +39,13 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: horde_extra_install
 horde_extra_install:
-	# Fix hard coded paths
-	sed -i "s|$(STAGING_INSTALL_PREFIX)/share/pear|$(INSTALL_PREFIX)/share/pear|g" $(STAGING_DIR)/bin/*
-	sed -i "s|$(STAGING_INSTALL_PREFIX)/share/pear|$(INSTALL_PREFIX)/share/pear|g" $(STAGING_DIR)/share/pear/*cmd.php
-
-	# Fix Synology bug (non working gzseek())
-	@sed -i 's/@gzseek($$this->_file, gztell($$this->_file)+($$p_len\*512));/@gzread($$this->_file, $$p_len\*512);/g' $(STAGING_DIR)/share/pear/Archive/Tar.php
-
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 src/horde.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

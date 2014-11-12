@@ -1,4 +1,4 @@
 bin:bin/nzbget
 bin:sbin/nzbgetd
 shr:share/nzbget/webui/
-shr:share/nzbget/ppscripts/
+shr:share/nzbget/scripts/

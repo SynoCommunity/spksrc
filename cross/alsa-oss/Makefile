@@ -1,5 +1,5 @@
 PKG_NAME = alsa-oss
-PKG_VERS = 1.0.25
+PKG_VERS = 1.0.28
 PKG_EXT = tar.bz2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)

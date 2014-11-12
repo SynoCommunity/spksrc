@@ -11,4 +11,4 @@ HOMEPAGE = http://bitbucket.org/mhallin/py-scrypt
 COMMENT  = Bindings for the scrypt key derivation function library
 LICENSE  = 2-clause BSD
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk

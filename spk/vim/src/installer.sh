@@ -20,7 +20,7 @@ postinst ()
     
     # Put mc in the PATH
     mkdir -p /usr/local/bin
-    ln -s ${INSTALL_DIR}/bin/vim /usr/local/bin/vim
+    ln -s ${INSTALL_DIR}/bin/vim-utf8 /usr/local/bin/vim
 
     exit 0
 }

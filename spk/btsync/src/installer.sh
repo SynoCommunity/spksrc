@@ -13,6 +13,8 @@ GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/sync.conf"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
+SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {
@@ -31,13 +33,13 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizard
-    sed -i -e "s|@device_name@|${wizard_device_name:=NAS}|g" \
-           -e "s|@login@|${wizard_login:=login}|g" \
-           -e "s|@password@|${wizard_password:=password}|g" \
-           ${CFG_FILE}
+    sed -i "s|@device_name@|${wizard_device_name:=NAS}|g" ${CFG_FILE}
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+
+    # Add firewall config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
 
     exit 0
 }
@@ -51,6 +53,11 @@ preuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         delgroup ${USER} ${GROUP}
         deluser ${USER}
+    fi
+
+    # Remove firewall config
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
     exit 0

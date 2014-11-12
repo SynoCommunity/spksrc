@@ -1,6 +1,6 @@
 SPK_NAME = znc
-SPK_VERS = 1.2
-SPK_REV = 6
+SPK_VERS = 1.4
+SPK_REV = 9
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -13,6 +13,7 @@ DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy p
 ADMIN_PORT = 8250
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
+CHANGELOG = "Update dependencies"
 
 HOMEPAGE = http://wiki.znc.in/
 LICENSE  =
@@ -21,7 +22,7 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -42,7 +43,7 @@ znc_extra_install:
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/znc.cgi.pl $(STAGING_DIR)/app/znc.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

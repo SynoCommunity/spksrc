@@ -1,11 +1,11 @@
 SPK_NAME = nzbmegasearch
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/nzbmegasearch.png
 DSM_UI_DIR = app
 
 DEPENDS  = 
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Aggregate automatically NZB search results. Easy. Quick. Clean. NZBmegasearcH collects all your \(not only\) newznab-based accounts to one place. It is your meta-search engine and your SB, CP unique NZB provider.
@@ -13,12 +13,14 @@ ADMIN_PORT = 8086
 RELOAD_UI = yes
 DISPLAY_NAME = NZBmegasearcH
 BETA = 1
+CHANGELOG = "1. Update to 0.47, fixes tvrage<br>2. Allow built-in updater to work"
 
 HOMEPAGE   = http://pillone.github.io/usntssearch/
 LICENSE    = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -36,13 +38,12 @@ nzbmegasearch_extra_install: $(STAGING_DIR)/share/NZBmegasearch
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
 $(STAGING_DIR)/share/NZBmegasearch:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/pillone/usntssearch.git .
-	rm -fr $(STAGING_DIR)/share/.git $(STAGING_DIR)/share/.gitignore
+	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/pillone/usntssearch.git .
 	sed -i "s|^port = .*$$|port = 8086|g" $(STAGING_DIR)/share/NZBmegasearch/builtin_params.ini

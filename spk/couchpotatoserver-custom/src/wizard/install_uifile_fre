@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "URL du fork",
-            "defaultValue": "git://github.com/sarakha63/CouchPotatoServer.git",
+            "defaultValue": "https://github.com/RuudBurger/CouchPotatoServer.git",
             "validator": {
                 "allowBlank": false
             }

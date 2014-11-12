@@ -1,6 +1,6 @@
 SPK_NAME = jappix
-SPK_VERS = 0.9.9
-SPK_REV = 1
+SPK_VERS = 1.0.1
+SPK_REV = 2
 SPK_ICON = src/jappix.png
 DSM_UI_DIR = app
 
@@ -12,6 +12,7 @@ ADMIN_URL = /jappix/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Jappix
+CHANGELOG = "1. DSM 5.0 compatibility"
 BETA = 1
 
 HOMEPAGE   = http://jappix.org/
@@ -37,7 +38,7 @@ jappix_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

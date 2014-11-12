@@ -1,5 +1,5 @@
 SPK_NAME = mantisbt
-SPK_VERS = 1.2.15
+SPK_VERS = 1.2.17
 SPK_REV = 2
 SPK_ICON = src/mantisbt.png
 DSM_UI_DIR = app
@@ -19,6 +19,7 @@ HOMEPAGE   = http://www.mantisbt.org/
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -42,7 +43,7 @@ mantisbt_extra_install:
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/config_inc.php $(STAGING_DIR)/share/$(SPK_NAME)/config_inc.php
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

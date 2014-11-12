@@ -20,6 +20,7 @@ LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -38,7 +39,7 @@ deluge_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/deluge.cgi.py $(STAGING_DIR)/app/deluge.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

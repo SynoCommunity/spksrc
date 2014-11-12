@@ -1,5 +1,5 @@
 SPK_NAME = debian-chroot
-SPK_VERS = 7.3
+SPK_VERS = 7.4
 SPK_REV = 4
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
@@ -16,7 +16,7 @@ CHANGELOG = "1. DSM 5.0 compatibility"
 
 HOMEPAGE   = http://www.debian.org/
 LICENSE    =
-HELPURL    = http://www.synocommunity.com/help/debian-chroot
+HELPURL    = http://synocommunity.com/help/debian-chroot
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -30,7 +30,10 @@ DEBIAN_ARCH =
 ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),bromolow cedarview x86),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp),$(ARCH))
+DEBIAN_ARCH = armhf
+endif
+ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86),$(ARCH))
 DEBIAN_ARCH = i386
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
@@ -67,7 +70,7 @@ debian-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	done
 	install -m 755 -d $(STAGING_DIR)/app/images
 	install -m 644 src/app/images/*.png $(STAGING_DIR)/app/images/
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

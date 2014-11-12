@@ -1,6 +1,6 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5~dev21
-SPK_REV = 12
+SPK_VERS = 1.5.3
+SPK_REV = 15
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 
@@ -13,15 +13,17 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT = 8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
+CHANGELOG = "1. Update to 1.5.3<br>2. Improve default configuration"
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
-HELPURL    = http://www.synocommunity.com/help/haproxy
+HELPURL    = http://synocommunity.com/help/haproxy
 
 WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -49,7 +51,7 @@ haproxy_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	done
 	install -m 755 -d $(STAGING_DIR)/app/images
 	install -m 644 src/app/images/*.png $(STAGING_DIR)/app/images/
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

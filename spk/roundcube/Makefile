@@ -1,5 +1,5 @@
 SPK_NAME = roundcube
-SPK_VERS = 0.9.5
+SPK_VERS = 1.0.1
 SPK_REV = 2
 SPK_ICON = src/roundcube.png
 DSM_UI_DIR = app
@@ -18,6 +18,7 @@ HOMEPAGE   = http://www.roundcube.net/
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -39,7 +40,7 @@ roundcube_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

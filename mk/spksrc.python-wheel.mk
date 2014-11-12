@@ -7,7 +7,7 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = nope
 endif
 ifeq ($(strip $(COMPILE_TARGET)),)
-COMPILE_TARGET = compile_python_module
+COMPILE_TARGET = nope
 endif
 ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = wheel_python_module
@@ -24,13 +24,8 @@ PYTHONPATH = $(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_D
 
 
 ### Python wheel rules
-compile_python_module:
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build $(BUILD_ARGS)
-
 wheel_python_module:
-	@mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/share
-	$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py bdist_wheel -d $(INSTALL_DIR)$(INSTALL_PREFIX)/share
-	#TODO: Fix naming based on ARCH
-	@mv $(INSTALL_DIR)$(INSTALL_PREFIX)/share/$(PKG_NAME)-$(PKG_VERS)*.whl $(INSTALL_DIR)$(INSTALL_PREFIX)/share/$(PKG_NAME)-$(PKG_VERS).whl
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" bdist_wheel -d $(WORK_DIR)/wheelhouse
+	@rename -f 's/linux_i686/any/g' $(WORK_DIR)/wheelhouse/*.whl
 
 all: install

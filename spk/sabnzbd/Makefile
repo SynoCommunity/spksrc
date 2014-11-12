@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 0.7.16
-SPK_REV = 7
+SPK_VERS = 0.7.18
+SPK_REV = 10
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -15,6 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
+CHANGELOG = "1. Update SABnzbd to 0.7.18"
 
 HOMEPAGE   = http://sabnzbd.org/
 LICENSE    = GPL
@@ -23,6 +24,7 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -47,7 +49,7 @@ sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/sabnzbd.cgi.py $(STAGING_DIR)/app/sabnzbd.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
@@ -55,4 +57,4 @@ sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 $(STAGING_DIR)/share/requirements.pybundle:
 	@$(MSG) "Bundling requirements"
 	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ configobj
+	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ configobj

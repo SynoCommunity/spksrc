@@ -4,10 +4,12 @@ spksrc is a cross compilation framework intended to compile and package software
 
 Requirements
 ------------
-To use spksrc, it is recommended to use a virtual machine with an x86 version of Debian stable OS installed. You'll also need some stuff::
+To use spksrc, it is recommended to use a virtual machine with an x86, 32-bit version of Debian stable OS installed. Non-x86 architectures or 64-bit architectures are not supported.
 
-    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check bjam intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython lzip
-    sudo pip install -U pip
+You'll also need some stuff::
+
+    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check bjam intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython lzip cmake
+    sudo pip install -U setuptools pip==1.5.4 wheel==0.23 httpie
 
 You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
 

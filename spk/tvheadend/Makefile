@@ -21,7 +21,7 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
+FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -41,7 +41,7 @@ tvheadend_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/accesscontrol
 	install -m 700 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/1
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 ; \
+	for size in 16 24 32 48 72 ; \
 	do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \

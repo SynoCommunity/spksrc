@@ -29,9 +29,6 @@ bin:libexec/squid_unix_group
 bin:libexec/unlinkd
 rsc:libexec/wbinfo_group.pl
 bin:libexec/yp_auth
-lib:lib/libdb-4.6.so
-lnk:lib/libdb-4.so
-lnk:lib/libdb.so
 rsc:share/errors/templates/ERR_ACCESS_DENIED
 rsc:share/errors/templates/ERR_ACL_TIME_QUOTA_EXCEEDED
 rsc:share/errors/templates/ERR_AGENT_CONFIGURE

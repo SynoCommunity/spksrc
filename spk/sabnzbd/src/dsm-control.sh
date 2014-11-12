@@ -7,42 +7,34 @@ DNAME="SABnzbd"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="sabnzbd"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 LOG_FILE="${INSTALL_DIR}/var/logs/sabnzbd.log"
-PID_FILES="${INSTALL_DIR}/var/sabnzbd-*.pid"
+PID_FILE="${INSTALL_DIR}/var/sabnzbd.pid"
 
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pid ${INSTALL_DIR}/var/ -d"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 }
 
 stop_daemon ()
 {
-    for pid_file in ${PID_FILES}; do
-        kill `cat ${pid_file}`
-    done
+    kill `cat ${PID_FILE}`
     wait_for_status 1 20
-    if [ $? -eq 1 ]; then
-        for pid_file in ${PID_FILES}; do
-            kill -9 `cat ${pid_file}`
-        done
-    fi
-    rm -f ${PID_FILES}
+    kill -9 `cat ${PID_FILE}`
+    rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    for pid_file in ${PID_FILES}; do
-        if [ -f ${pid_file} ] && kill -0 `cat ${pid_file}` > /dev/null 2>&1; then
-            return
-        fi
-    done
-    rm -f ${PID_FILES}
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
+    fi
+    rm -f ${PID_FILE}
     return 1
 }
 
