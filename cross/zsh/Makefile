@@ -19,4 +19,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+	umask 022; $(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
