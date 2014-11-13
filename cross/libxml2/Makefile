@@ -11,7 +11,7 @@ HOMEPAGE = http://xmlsoft.org/
 COMMENT  = Libxml2 is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform)
 LICENSE  = MIT
 
-CONFIGURE_ARGS = --without-python
+CONFIGURE_ARGS = --without-python --with-zlib=$(STAGING_INSTALL_PREFIX)
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
 ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
