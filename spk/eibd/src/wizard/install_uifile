@@ -1,0 +1,15 @@
+[{
+    "step_title": "Initial eibd configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Will be written to <code>/var/packages/eibd/etc/eibd.cfg</code>. Existing config will not be replaced!",
+        "subitems": [{
+            "key": "wizard_eibd_options",
+            "desc": "Arguments to eibd",
+            "defaultValue": "-D -T -R -S -i -u --eibaddr=0.0.1 --pid-file=/usr/local/eibd/var/eibd.pid --daemon=/usr/local/eibd/var/eibd.log ipt:192.168.1.1",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}]
