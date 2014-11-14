@@ -15,17 +15,19 @@ PID_FILE="${CONFIG_DIR}/syncthing.pid"
 
 start_daemon ()
 {
-    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -p ${PID_FILE} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- --home ${CONFIG_DIR}
+    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -m -p ${PID_FILE} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- --home ${CONFIG_DIR}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -o -c ${USER} -K -u ${USER}  -p ${PID_FILE} -x ${SYNCTHING} -- --home ${CONFIG_DIR}
+    start-stop-daemon -o -c ${USER} -K -u ${USER} -p ${PID_FILE} -x ${SYNCTHING}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
     start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    [ $? -eq 0 ] || return 1
 }
 
 wait_for_status ()
