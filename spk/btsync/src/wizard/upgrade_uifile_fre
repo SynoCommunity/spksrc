@@ -1,0 +1,6 @@
+[{
+    "step_title": "Information",
+    "items": [{
+        "desc": "The group sc-btsync will be created during update, if not already created. You must provide the synocomm-sync group with read/write permissions on the folders you want to sync. You can set these permissions via Control Panel -> Group."
+    }]
+}]

@@ -1,0 +1,6 @@
+[{
+    "step_title": "Information",
+    "items": [{
+        "desc": "Die Gruppe sc-btsync wird während der Installation erstellt, wenn sie noch nicht erstellt wurde. Sie müssen der synocomm-sync Gruppe für die Ordner die Sie synchronisieren wollen Lesen/Schreiben Rechte geben. Die Rechte können Sie über die Systemsteuerung -> Gruppen gewähren."
+    }]
+}]

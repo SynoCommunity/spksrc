@@ -16,6 +16,23 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
+GROUP_SYNC="sc-btsync"
+GROUP_SYNC_DESC="SynoCommunity's BitTorrent Sync group"
+
+sync_group_create ()
+{
+    # Create sync group and add user (Does nothing when sync group already exists)
+    synogroup --add ${GROUP_SYNC} ${USER} > /dev/null
+    # Set description of the sync group
+    synogroup --descset ${GROUP_SYNC} "${GROUP_SYNC_DESC}"
+}
+
+sync_group_remove ()
+{
+    # Remove sync group
+    synogroup --del ${GROUP_SYNC} > /dev/null
+}
+
 preinst ()
 {
     exit 0
@@ -31,6 +48,8 @@ postinst ()
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+
+    sync_group_create
 
     # Edit the configuration according to the wizard
     sed -i "s|@device_name@|${wizard_device_name:=NAS}|g" ${CFG_FILE}
@@ -51,6 +70,8 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        sync_group_remove
+
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
@@ -75,6 +96,14 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # Revision 3 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 3 ]; then
+        echo "Please uninstall previous version, no update possible!"
+        exit 1
+    fi
+
+    sync_group_create
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
