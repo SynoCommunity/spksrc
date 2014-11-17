@@ -22,7 +22,7 @@ start_daemon ()
 
 check_config ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -c -f ${CFG_FILE}" > /dev/null
+    su ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -c -f ${CFG_FILE}" > /dev/null
 }
 
 stop_daemon ()
