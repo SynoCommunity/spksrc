@@ -1,6 +1,6 @@
 SPK_NAME = logstash
 SPK_VERS = 1.4.2
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/logstash.png
 DSM_UI_DIR = app
 
@@ -12,9 +12,9 @@ DESCRIPTION = "All your logs from all over your infrastructure in one place - wi
 # ADMIN_URL = /3rdparty/logstash/kibana/
 RELOAD_UI = yes
 DISPLAY_NAME = $(SPK_NAME)
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "1. Initial Release & DSM 5.0 compatibility"
 HELPURL = http://logstash.net/docs/$(SPK_VERS)/
-SUPPORT_URL="http://logstash.net"
+SUPPORT_URL= "http://logstash.net"
 
 HOMEPAGE = http://logstash.net/
 LICENSE  = Apache v2
@@ -26,15 +26,9 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_DEP_SERVICES = java
-# START_DEP_SERVICES = apache-web mysql
-# INSTUNINST_RESTART_SERVICES = apache-web
-
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = logstash_extra_install
-
-# BUSYBOX_CONFIG = daemon nice
-# ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)" 
 
 include ../../mk/spksrc.spk.mk
 
