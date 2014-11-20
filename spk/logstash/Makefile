@@ -20,7 +20,7 @@ HOMEPAGE = http://logstash.net/
 LICENSE  = Apache v2
 
 WIZARDS_DIR = src/wizard/
-CONF_DIR = src/conf/
+CONF = nop
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
