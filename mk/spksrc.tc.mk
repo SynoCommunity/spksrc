@@ -75,6 +75,8 @@ tc_vars: patch
 	@echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)
 	@echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)
 	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
+	@echo TC_FIRMWARE := $(TC_FIRMWARE)
+	@echo TC_ARCH := $(TC_ARCH)
 
 
 ### Clean rules
