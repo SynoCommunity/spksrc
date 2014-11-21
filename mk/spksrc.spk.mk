@@ -6,14 +6,18 @@ include ../../mk/spksrc.directories.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
-SPK_ARCH = $(ARCH)
-ARCH_SUFFIX = -$(ARCH)
+SPK_ARCH = $(TC_ARCH)
+SPK_NAME_ARCH = $(ARCH)
+SPK_TCVERS = $(TCVERSION)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 else
 SPK_ARCH = noarch
+SPK_NAME_ARCH = noarch
+SPK_TCVERS = all
 endif
 
-SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_ARCH)_$(SPK_VERS)-$(SPK_REV).spk
+SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
 
 #####
 
@@ -62,7 +66,11 @@ endif
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
+  ifneq ($(strip $(TC_FIRMWARE)),)
+	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
+  else
 	@echo firmware=\"3.1-1594\" >> $@
+  endif
 endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
@@ -257,7 +265,16 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
-package: $(SPK_FILE_NAME)
+# Compare optional Makefile REQUIRED_DSM to provided TCVERSION. If REQ_DSM is lower than TCVERSION, exit
+checkversion:
+ifneq ($(REQUIRED_DSM),)
+  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
+	$(error Stop: Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
+	@exit 1
+  endif
+endif
+
+package: checkversion $(SPK_FILE_NAME)
 
 ### Publish rules
 publish: package
@@ -278,7 +295,7 @@ all: package
 
 
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
-SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
+SUPPORTED_ARCHS = $(notdir $(subst syno-,/,$(SUPPORTED_TCS)))
 
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
