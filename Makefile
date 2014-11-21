@@ -1,6 +1,6 @@
 
 SUPPORTED_TCS = $(notdir $(wildcard toolchains/syno-*))
-SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
+SUPPORTED_ARCHS = $(notdir $(subst syno-,/,$(SUPPORTED_TCS)))
 SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
 
 
@@ -70,9 +70,13 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
-setup: local.mk
+setup: local.mk dsm-4.3
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
 	@echo "PUBLISH_URL=https://api.synocommunity.com/" > $@
 	@echo "PUBLISH_API_KEY=" >> $@
+
+dsm-%:
+	@echo "Setting default toolchain version to DSM-$*"
+	@echo "DEFAULT_TC=$*" >> local.mk
