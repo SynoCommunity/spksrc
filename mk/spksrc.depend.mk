@@ -32,7 +32,7 @@ endif
 ifeq ($(strip $(REQ_KERNEL)),)
 KERNEL_DEPEND = 
 else
-KERNEL_DEPEND = kernel/syno-$(ARCH)
+KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)
 endif
 
 depend_msg_target:
