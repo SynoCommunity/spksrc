@@ -310,13 +310,32 @@ all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 .PHONY: publish-all-archs
 publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
 
+all-archs-%:
+	@$(MSG) Building package for all archs with toolchain version $*
+	@for arch in $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))) ; \
+	do \
+	  $(MAKE) arch-$$arch-$* ; \
+	done
+
+all-archs-dsms:
+	@$(MSG) Build all archs with latest DSM per FIRMWARE
+	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
+	do \
+	  make latest-arch-$$arch ; \
+	done
+
+latest-arch-%:
+	@$(MSG) Building package for arch $* with latest available toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+
+
 arch-%:
 	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$*
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$* publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish
 
 changelog:
 	@echo $(shell git log --pretty=format:"- %s" -- $(PWD))
