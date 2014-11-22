@@ -37,13 +37,17 @@ JAVA_HEAP_SIZE_INITIAL="@java_heap_size_initial@"  # -XX:InitialHeapSize=512m
 PID_FILE="/var/run/${PACKAGE_NAME_SIMPLE}.pid"
 
 daemon_debug() {
-	DaemonStatus
-	if [ $? == 0 ]; then
-		echo "Starting [${PACKAGE_NAME_SIMPLE}] with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )"
+    if daemon_status; then
+        echo ${DNAME} is already running
+        exit $?
+    else
+	    echo "Starting [${PACKAGE_NAME_SIMPLE}] with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )"	
 		
 		# Run Logstash
 		JAVA_OPTS="-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS" LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS}
-	fi
+        exit 0
+    fi
+    ;;
 }
 
 start_daemon () {
