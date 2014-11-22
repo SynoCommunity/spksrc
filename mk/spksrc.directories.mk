@@ -29,7 +29,7 @@ INSTALL_PREFIX = /usr/local
 endif
 
 ifndef KERNEL_DIR
-KERNEL_DIR = $(PWD)/../../kernel/syno-$(ARCH)/work/source/linux
+KERNEL_DIR = $(PWD)/../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
 endif
 
 ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
