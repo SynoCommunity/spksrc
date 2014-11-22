@@ -47,7 +47,6 @@ daemon_debug() {
 		JAVA_OPTS="-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS" LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS}
         exit 0
     fi
-    ;;
 }
 
 start_daemon () {
