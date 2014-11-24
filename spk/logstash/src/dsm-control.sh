@@ -7,41 +7,33 @@
 source /root/.profile  # Get Environment Variables from Root Profile
 
 # Package Varables
-PACKAGE_NAME_SIMPLE="@package_name_simple@"  # "$(echo "$SYNOPKG_PKGNAME" | awk '{print tolower($0)}' | sed -e 's/ /_/g')"
+DNAME="@package_dname@"  # Simple Package Name
 PACKAGE_DIR="@package_dir@"  # "$SYNOPKG_PKGDEST"
-PACKAGE_UPGRADE_FLAG="@package_upgrade_flag@"
-DNAME="$PACKAGE_NAME_SIMPLE"
 
 # Logstash Varables
 LOGSTASH_CONFIG_PATH="@logstash_config_path@"
 LOGSTASH_DATABASE_DIR="@logstash_database_dir@"  # https://logstash.jira.com/browse/LOGSTASH-125
 LOGSTASH_LOG_PATH="@logstash_log_path@"
+JAVA_CONF_PATH="@java_config_path@"
 
-# Logstash Bin & Java Varables
+# Java Varables
 # JAVA_BINARY="$(which java)"
+source "${JAVA_CONF_PATH}"  # Load Java Settings
 LOGSTASH_BIN_PATH="${PACKAGE_DIR}/logstash/bin/logstash"
-LOGSTASH_BIN_ARGS="agent --config $LOGSTASH_CONFIG_PATH --log $LOGSTASH_LOG_PATH @logstash_parameters_tuning@"
-
-# Tuning Varables
-JAVA_ARGUMENTS="@java_arguments_tuning@"
-# Java Heap Size: ( https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-4-heap-tuning/ ) 
-# Both flags expect a value in bytes but also support a shorthand notation where “k” or “K” represent “kilo”, “m” or “M” represent “mega”, and “g” or “G” represent “giga”.
-# For example, the following command line starts the Java class “MyApp” setting an initial heap size of 128 megabytes and a maximum heap size of 2 gigabytes:
-# -Xms and -Xmx (or: -XX:InitialHeapSize and -XX:MaxHeapSize).  Example: java -XX:InitialHeapSize=128m -XX:MaxHeapSize=2g MyApp
-JAVA_HEAP_SIZE_MAX="@java_heap_size_max@"  # -XX:MaxHeapSize=1g      LS_HEAP_SIZE=1g
+LOGSTASH_BIN_ARGS="agent --config $LOGSTASH_CONFIG_PATH --log $LOGSTASH_LOG_PATH $LOGSTASH_PARAMETERS_TUNING"
 # [ -n "$JAVA_HEAP_SIZE_MAX" ] && JAVA_ARGUMENTS="LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${JAVA_ARGUMENTS}"  # 
-JAVA_HEAP_SIZE_INITIAL="@java_heap_size_initial@"  # -XX:InitialHeapSize=512m
 [ -n "$JAVA_HEAP_SIZE_INITIAL" ] && JAVA_ARGUMENTS="-XX:InitialHeapSize=$JAVA_HEAP_SIZE_INITIAL ${JAVA_ARGUMENTS}"
 
+
 # Start & Stop Varables
-PID_FILE="/var/run/${PACKAGE_NAME_SIMPLE}.pid"
+PID_FILE="/var/run/${DNAME}.pid"
 
 daemon_debug() {
     if daemon_status; then
         echo ${DNAME} is already running
         exit $?
     else
-	    echo "Starting [${PACKAGE_NAME_SIMPLE}] with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )"	
+	    echo "Starting [${DNAME}] with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )"	
 		
 		# Run Logstash
 		JAVA_OPTS="-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS" LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS}
@@ -50,10 +42,12 @@ daemon_debug() {
 }
 
 start_daemon () {
+	# Logstash Bin & Java Varables
 	rm -f "$LOGSTASH_LOG_PATH"
-	echo "Starting ${PACKAGE_NAME_SIMPLE}. $(date) [${PACKAGE_NAME_SIMPLE}] ( $LOGSTASH_BIN_PATH )" >> "$LOGSTASH_LOG_PATH"
+	echo "Starting ${DNAME}. $(date) [${DNAME}] ( $LOGSTASH_BIN_PATH )" >> "$LOGSTASH_LOG_PATH"
 	echo " ...Might take a moment to be fully initialize logstash... please wait." >> "$LOGSTASH_LOG_PATH"
-	[ -e "${LOGSTASH_CONFIG_PATH}" ] || ( cp "${SYNOPKG_PKGDEST}/logstash-sample.conf" "${LOGSTASH_CONFIG_PATH}"; echo "Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
+	[ -e "${LOGSTASH_CONFIG_PATH}" ] || ( cp "${SYNOPKG_PKGDEST}/logstash-sample.conf" "${LOGSTASH_CONFIG_PATH}"; echo "Logstash Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
+	[ -e "${JAVA_CONF_PATH}" ] || ( cp "${SYNOPKG_PKGDEST}/var/logstash-java.conf" "${JAVA_CONF_PATH}"; echo "Java Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
 	echo "Starting with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )" >> "$LOGSTASH_LOG_PATH"
 	echo "Using Elasticsearch database at ${LOGSTASH_DATABASE_DIR}." >> "$LOGSTASH_LOG_PATH"
 	
@@ -129,8 +123,12 @@ case $1 in
     debug)
         daemon_debug
         ;;
+    log)
+        echo "$LOGSTASH_LOG_PATH"
+        exit 0
+    ;;
     *)
-    	echo "Usage: $0 {start|stop|restart|status|debug}"
+    	echo "Usage: $0 {start|stop|restart|status|debug|log}"
         exit 1
         ;;
 esac

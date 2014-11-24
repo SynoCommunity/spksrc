@@ -1,8 +1,1 @@
-rsc:logstash/bin/
-rsc:logstash/lib/
-rsc:logstash/locales/
-rsc:logstash/patterns/
-rsc:logstash/spec/
-rsc:logstash/vendor/
-rsc:logstash/README.md
-rsc:logstash/LICENSE
+rsc:logstash

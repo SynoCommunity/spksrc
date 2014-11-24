@@ -2,27 +2,35 @@
 	"step_title": "Logstash Configuration",
 	"items": [{
 		"type": "textfield",
-		"desc": "Configuration File. Defaults to /volume1/active_system/logstash/logstash.conf",
+		"desc": "Logstash Configuration File Location. Defaults to /var/packages/logstash/target/var/logstash.conf",
 		"subitems": [{
-			"key": "wizard_config_path",
-			"desc": "Configuration File Location",
-			"emptyText": "/volume1/active_system/logstash/logstash.conf"
+			"key": "wizard_logstash_config_path",
+			"desc": "Logstash Configuration File",
+			"emptyText": "/var/packages/logstash/target/var/logstash.conf"
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "Database Directory. Defaults to /volume1/active_system/logstash/database",
+		"desc": "Database Directory Location. Defaults to /var/packages/logstash/target/var/database",
 		"subitems": [{
-			"key": "wizard_database_dir",
+			"key": "wizard_logstash_database_dir",
 			"desc": "Database Directory",
-			"emptyText": "/volume1/active_system/logstash/database"
+			"emptyText": "/var/packages/logstash/target/var/database"
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "Log File. Defaults to /volume1/active_system/logstash/logstash.log",
+		"desc": "Log File Location. Defaults to /var/packages/logstash/target/var/logstash.log",
 		"subitems": [{
-			"key": "wizard_log_path",
-			"desc": "Log File Location",
-			"emptyText": "/volume1/active_system/logstash/logstash.log"
+			"key": "wizard_logstash_log_path",
+			"desc": "Log File",
+			"emptyText": "/var/packages/logstash/target/var/logstash.log"
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "Java Configuration File Location. Defaults to /var/packages/logstash/target/var/logstash.conf",
+		"subitems": [{
+			"key": "wizard_java_config_path",
+			"desc": "Java Configuration File",
+			"emptyText": "/var/packages/logstash/target/var/logstash-java.conf"
 		}]
 	}]
 }, {
@@ -37,7 +45,7 @@
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "Java Initial Heap Size in shorthand notation. Leave blank for Java defaults.",
+		"desc": "Java Initial Heap Silze in shorthand notation. Leave blank for Java defaults.",
 		"subitems": [{
 			"key": "wizard_java_heap_size_initial",
 			"desc": "Java Initial Heap Size",

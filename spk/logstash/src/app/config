@@ -5,7 +5,9 @@
             "desc": "logstash Kibana Web UI",
             "icon": "images/logstash-{0}.png",
             "type": "url",
-            "url": "3rdparty/logstash/",
+            "protocol": "http",
+            "port": "5000",
+            "url": "/webman/3rdparty/logstash/kibana/",
             "allUsers": false
         }
     }
