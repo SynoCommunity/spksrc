@@ -1,0 +1,16 @@
+{
+    ".url": {
+        "com.synocommunity.packages.myreadings": {
+            "type": "url",
+            "title": "MyReadings",
+            "desc": "A web interface for Calibre software",
+            "allUsers": true,
+            "icon": "images/myreadings-{0}.png",
+            "protocol": "http",
+            "url": "/myreadings",
+            "port": "80",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
