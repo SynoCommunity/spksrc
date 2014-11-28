@@ -5,7 +5,9 @@
             "desc": "SABnzbd Web UI",
             "icon": "images/sabnzbd-{0}.png",
             "type": "url",
-            "url": "3rdparty/sabnzbd/sabnzbd.cgi",
+            "protocol": "http",
+            "port": "8080",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }
