@@ -1,0 +1,13 @@
+--- setup.py.old	2014-04-30 16:45:07.000000000 +0200
++++ setup.py	2014-12-01 15:56:50.386190105 +0100
+@@ -46,8 +46,8 @@ def get_config_value(key, defkey, path):
+     return os.path.exists(path)
+ 
+ 
+-LIBEV_EMBED = get_config_value('LIBEV_EMBED', 'EMBED', 'libev')
+-CARES_EMBED = get_config_value('CARES_EMBED', 'EMBED', 'c-ares')
++LIBEV_EMBED = False
++CARES_EMBED = False
+ 
+ define_macros = []
+ libraries = []
