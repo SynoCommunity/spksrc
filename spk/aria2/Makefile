@@ -8,7 +8,7 @@ BETA = 1
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = cytec
-DESCRIPTION = aria2 is a lightweight multi-protocol & multi-source command-line download utility. It supports HTTP/HTTPS, FTP, BitTorrent and Metalink. aria2 can be manipulated via built-in JSON-RPC and XML-RPC interfaces.
+DESCRIPTION = "aria2 is a lightweight multi-protocol & multi-source command-line download utility. It supports HTTP/HTTPS, FTP, BitTorrent and Metalink. aria2 can be manipulated via built-in JSON-RPC and XML-RPC interfaces."
 ADMIN_URL = /aria2/
 RELOAD_UI = yes
 DISPLAY_NAME = aria2
