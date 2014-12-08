@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.aria2": {
+            "title": "aria2",
+            "desc": "aria2 Web UI",
+            "icon": "images/aria-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/aria2",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
