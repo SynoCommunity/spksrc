@@ -129,7 +129,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        rm -f $${localFile}.part ; \
 	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
 	        echo "wget $${url}" ; \
-	        wget -nv -O $${localFile}.part $${url} ; \
+	        wget $(DOWNLOAD_ARGS) -nv -O $${localFile}.part $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
