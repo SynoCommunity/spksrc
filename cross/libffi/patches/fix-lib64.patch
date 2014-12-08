@@ -1,8 +1,8 @@
---- configure.ac.orig	2014-09-01 23:57:51.126855074 +0200
-+++ configure.ac	2014-09-02 00:05:53.512790663 +0200
-@@ -596,12 +596,6 @@
-     toolexecdir='$(libdir)/gcc-lib/$(target_alias)'
-     toolexeclibdir='$(libdir)'
+--- configure.ac.orig	2014-11-12 12:56:51.000000000 +0100
++++ configure.ac	2014-12-08 00:30:26.440532517 +0100
+@@ -601,12 +601,6 @@
+     toolexecdir="${libdir}"/gcc-lib/'$(target_alias)'
+     toolexeclibdir="${libdir}"
    fi
 -  multi_os_directory=`$CC $CFLAGS -print-multi-os-directory`
 -  case $multi_os_directory in
@@ -11,5 +11,5 @@
 -  esac
 -  AC_SUBST(toolexecdir)
  else
-   toolexeclibdir='$(libdir)'
+   toolexeclibdir="${libdir}"
  fi
