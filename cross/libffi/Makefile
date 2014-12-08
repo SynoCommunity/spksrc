@@ -1,5 +1,5 @@
 PKG_NAME = libffi
-PKG_VERS = 3.1
+PKG_VERS = 3.2.1
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
