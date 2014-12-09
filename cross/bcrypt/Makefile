@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/b/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libffi cross/pycparser
+DEPENDS = cross/cffi cross/pycparser
 
 HOMEPAGE = http://pypi.python.org/pypi/bcrypt
 COMMENT  = Modern password hashing for your software and your servers
