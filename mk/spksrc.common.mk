@@ -15,6 +15,7 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Pip command
 PIP = PIP_DOWNLOAD_CACHE=$(PIP_DIR) pip
+PIP_WHEEL = $(PIP) wheel --no-use-wheel --no-deps --wheel-dir $(STAGING_DIR)/wheelhouse
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
