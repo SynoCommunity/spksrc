@@ -10,6 +10,7 @@ DEPENDS += cross/bcrypt cross/pyopenssl cross/pycrypto cross/m2crypto
 DEPENDS += cross/pycurl cross/pillow cross/cheetah cross/yenc cross/pyzmq
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
+DEPENDS += cross/pyyaml cross/msgpack-python
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -18,7 +19,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules<br>2. Replace PIL with Pillow<br>3. Add m2crypto and pyzmq"
+CHANGELOG = "1. Update modules<br>2. Replace PIL with Pillow<br>3. Add M2Crypto, pyzmq, PyYAML and msgpack-python"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
