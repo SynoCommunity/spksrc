@@ -13,8 +13,6 @@ LICENSE  = LGPL
 
 POST_EXTRACT_TARGET = myPostExtract
 
-BUILD_ARGS = --zmq=$(STAGING_INSTALL_PREFIX)
-
 include ../../mk/spksrc.python-module.mk
 
 .PHONY: myPostExtract
