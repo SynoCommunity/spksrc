@@ -25,7 +25,7 @@ PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$
 
 ### Python module rules
 compile_python_module:
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build $(BUILD_ARGS)
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
 
 install_python_module:
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
