@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
 SPK_VERS = 2014.7.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/salt-master.png
 DSM_UI_DIR = app
 
@@ -36,9 +36,9 @@ salt-master_extra_install: $(STAGING_DIR)/wheelhouse
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/master $(STAGING_DIR)/etc/master
-	install -m 755 -d $(STAGING_DIR)/etc/extensions
-	install -m 755 -d $(STAGING_DIR)/etc/extensions/auth
-	install -m 644 src/synology.py $(STAGING_DIR)/etc/extensions/auth/synology.py
+	install -m 755 -d $(STAGING_DIR)/share/extensions
+	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
+	install -m 644 src/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

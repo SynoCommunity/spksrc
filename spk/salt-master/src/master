@@ -73,7 +73,7 @@ root_dir: /usr/local/salt-master
 # each of Salt's module types such as "runners", "output", "wheel", "modules",
 # "states", "returners", etc.
 #extension_modules: <no default>
-extension_modules: /etc/extensions
+extension_modules: /share/extensions
 
 # Verify and set permissions on configuration directories at startup:
 #verify_env: True
@@ -269,6 +269,7 @@ external_auth:
     admin:
       - .*
       - '@runner'
+      - '@wheel'
 
 # Time (in seconds) for a newly generated token to live. Default: 12 hours
 #token_expire: 43200
