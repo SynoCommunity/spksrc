@@ -1,4 +1,8 @@
-TC_NAME = syno-evansport
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = evansport
+TC_VERS = 4.3
+TC_FIRMWARE = 3.1-1594
 
 TC_DIST_NAME = gcc463_glibc213_i686-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Ch
 TC_BASE_DIR = i686-pc-linux-gnu
 TC_PREFIX = i686-pc-linux-gnu
 TC_TARGET = i686-pc-linux-gnu
-
-TC_ARCH = evansport
-TC_FIRMWARE = 3.1-1594
 
 TC_CFLAGS =
 TC_CPPFLAGS =

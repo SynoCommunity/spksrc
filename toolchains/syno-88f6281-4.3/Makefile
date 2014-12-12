@@ -1,4 +1,8 @@
-TC_NAME = syno-88f6281
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = 88f6281
+TC_VERS = 4.3
+TC_FIRMWARE = 3.1-1594
 
 TC_DIST_NAME = gcc421_glibc25_88f6281-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Ch
 TC_BASE_DIR = arm-none-linux-gnueabi
 TC_PREFIX = arm-none-linux-gnueabi
 TC_TARGET = arm-none-linux-gnueabi
-
-TC_ARCH = 88f6281
-TC_FIRMWARE = 3.1-1594
 
 TC_CFLAGS =
 TC_CPPFLAGS =

@@ -1,4 +1,8 @@
-TC_NAME = syno-ppc853x
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = ppc853x
+TC_VERS = 4.3
+TC_FIRMWARE = 3.1-1594
 
 TC_DIST_NAME = gcc343_glibc234_ppc853x-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Ch
 TC_BASE_DIR = powerpc-linux-gnuspe
 TC_PREFIX = powerpc-linux-gnuspe
 TC_TARGET = powerpc-unknown-linux
-
-TC_ARCH = ppc853x
-TC_FIRMWARE = 3.1-1594
 
 TC_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 TC_CPPFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double

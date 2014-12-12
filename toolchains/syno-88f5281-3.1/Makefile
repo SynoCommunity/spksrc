@@ -1,4 +1,8 @@
-TC_NAME = syno-88f5281
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = 88f5281
+TC_VERS = 3.1
+TC_FIRMWARE = 3.1-1594
 
 TC_DIST_NAME = gcc343_glibc232_88f5281.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%203.1%20Tool%20Ch
 TC_BASE_DIR = arm-marvell-linux-gnu
 TC_PREFIX = arm-marvell-linux-gnu
 TC_TARGET = arm-marvell-linux-gnu
-
-TC_ARCH = 88f5281
-TC_FIRMWARE = 3.1-1594
 
 TC_CFLAGS = -mfloat-abi=soft
 TC_CPPFLAGS = -mfloat-abi=soft

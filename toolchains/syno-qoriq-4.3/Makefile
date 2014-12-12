@@ -1,4 +1,8 @@
-TC_NAME = syno-qoriq
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = qoriq
+TC_VERS = 4.3
+TC_FIRMWARE = 3.1-1594
 
 TC_DIST_NAME = gcc4374_eglibc2874_qoriq-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Ch
 TC_BASE_DIR = powerpc-none-linux-gnuspe
 TC_PREFIX = powerpc-none-linux-gnuspe
 TC_TARGET = powerpc-none-linux-gnuspe
-
-TC_ARCH = qoriq
-TC_FIRMWARE = 3.1-1594
 
 TC_CFLAGS =
 TC_CPPFLAGS =
