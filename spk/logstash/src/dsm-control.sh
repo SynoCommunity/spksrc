@@ -1,20 +1,19 @@
 #!/bin/sh
 # Copyright (c) 2013-2014 AustinSaintAubin. All rights reserved.
 # https://github.com/mrlesmithjr/Logstash_Kibana3/blob/master/install_logstash_kibana_ubuntu.sh
-# logstash-1.3.3-noarch-0014
 
 # PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 source /root/.profile  # Get Environment Variables from Root Profile
 
 # Package Varables
-DNAME="@package_dname@"  # Simple Package Name
-PACKAGE_DIR="@package_dir@"  # "$SYNOPKG_PKGDEST"
+PACKAGE="logstash"
+DNAME="Logstash"
+PACKAGE_DIR="/var/packages/${PACKAGE}/target"  # "$SYNOPKG_PKGDEST"
 
-# Logstash Varables
-LOGSTASH_CONFIG_PATH="@logstash_config_path@"
-LOGSTASH_DATABASE_DIR="@logstash_database_dir@"  # https://logstash.jira.com/browse/LOGSTASH-125
-LOGSTASH_LOG_PATH="@logstash_log_path@"
-JAVA_CONF_PATH="@java_config_path@"
+# Logstash File Path Varables
+USER="logstash"
+PACKAGE_CONF_PATH="${PACKAGE_DIR}/var/package.conf"
+source "${PACKAGE_CONF_PATH}"  # Load Logstash File Path Varables
 
 # Java Varables
 # JAVA_BINARY="$(which java)"
@@ -26,7 +25,7 @@ LOGSTASH_BIN_ARGS="agent --config $LOGSTASH_CONFIG_PATH --log $LOGSTASH_LOG_PATH
 
 
 # Start & Stop Varables
-PID_FILE="/var/run/${DNAME}.pid"
+PID_FILE="/var/run/${PACKAGE}.pid"
 
 daemon_debug() {
     if daemon_status; then
@@ -36,7 +35,7 @@ daemon_debug() {
 	    echo "Starting [${DNAME}] with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )"	
 		
 		# Run Logstash
-		JAVA_OPTS="-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS" LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS}
+		su - ${USER} -c "JAVA_OPTS=\"-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS\" LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS}"
         exit 0
     fi
 }
@@ -46,8 +45,8 @@ start_daemon () {
 	rm -f "$LOGSTASH_LOG_PATH"
 	echo "Starting ${DNAME}. $(date) [${DNAME}] ( $LOGSTASH_BIN_PATH )" >> "$LOGSTASH_LOG_PATH"
 	echo " ...Might take a moment to be fully initialize logstash... please wait." >> "$LOGSTASH_LOG_PATH"
-	[ -e "${LOGSTASH_CONFIG_PATH}" ] || ( cp "${SYNOPKG_PKGDEST}/logstash-sample.conf" "${LOGSTASH_CONFIG_PATH}"; echo "Logstash Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
-	[ -e "${JAVA_CONF_PATH}" ] || ( cp "${SYNOPKG_PKGDEST}/var/logstash-java.conf" "${JAVA_CONF_PATH}"; echo "Java Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
+	[ -e "${LOGSTASH_CONFIG_PATH}" ] || ( cp "${PACKAGE_DIR}/logstash-sample.conf" "${LOGSTASH_CONFIG_PATH}"; echo "Logstash Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
+	[ -e "${JAVA_CONF_PATH}" ] || ( cp "${PACKAGE_DIR}/var/logstash-java.conf" "${JAVA_CONF_PATH}"; echo "Java Config not found, loading sample config." >> "$LOGSTASH_LOG_PATH" )
 	echo "Starting with: ( JAVA_OPTS=-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} )" >> "$LOGSTASH_LOG_PATH"
 	echo "Using Elasticsearch database at ${LOGSTASH_DATABASE_DIR}." >> "$LOGSTASH_LOG_PATH"
 	
@@ -55,8 +54,8 @@ start_daemon () {
 	### JAVA_OPTS="-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS" LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS}
 	export JAVA_OPTS="-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS"
 	export LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX
-	nohup ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} >> "$LOGSTASH_LOG_PATH" 2>&1&
-	echo $! > "$PID_FILE"
+# 	nohup ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} >> "$LOGSTASH_LOG_PATH" 2>&1&; echo $! > "$PID_FILE"
+	su - ${USER} -c "export JAVA_OPTS=\"-Des.path.data=${LOGSTASH_DATABASE_DIR} $JAVA_ARGUMENTS\"; export LS_HEAP_SIZE=$JAVA_HEAP_SIZE_MAX; nohup ${LOGSTASH_BIN_PATH} ${LOGSTASH_BIN_ARGS} >> \"${LOGSTASH_LOG_PATH}\" 2>&1&; echo $! > \"${PID_FILE}\""
 }
 
 stop_daemon () {

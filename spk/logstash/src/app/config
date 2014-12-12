@@ -1,9 +1,9 @@
 {
     ".url": {
-        "com.synocommunity.packages.logstash": {
-            "title": "logstash",
+        "com.synocommunity.packages.logstash.kibana": {
+            "title": "Kibana for logstash",
             "desc": "logstash Kibana Web UI",
-            "icon": "images/logstash-{0}.png",
+            "icon": "images/kibana-{0}.png",
             "type": "url",
             "protocol": "http",
             "port": "5000",
