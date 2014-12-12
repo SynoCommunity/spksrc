@@ -1,4 +1,8 @@
-TC_NAME = syno-ppc853x
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = ppc853x
+TC_VERS = 5.0
+TC_FIRMWARE = 5.0-4458
 
 TC_DIST_NAME = gcc4374_eglibc2874_qoriq-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.0%20Tool%20Ch
 TC_BASE_DIR = powerpc-none-linux-gnuspe
 TC_PREFIX = powerpc-none-linux-gnuspe
 TC_TARGET = powerpc-none-linux
-
-TC_ARCH = ppc853x
-TC_FIRMWARE = 5.0-4458
 
 TC_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 TC_CPPFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
