@@ -8,8 +8,8 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = AustinSaintAubin
 DESCRIPTION = "All your logs from all over your infrastructure in one place - with searching and graphing. logstash is a tool for managing events and logs. You can use it to collect logs, parse them, and store them for later use (like, for searching). Speaking of searching, logstash comes with a web interface for searching and drilling into all of your logs. It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way. logstash is now a part of the Elasticsearch family! This allows us to build better software much faster as well as offering production support.  NOTE: When starting logstash it might take a minute to a few minutes for it fully spin up, please be patient."
-ADMIN_URL = "3rdparty/logstash/kibana/index.html"
-ADMIN_PORT = 80
+# ADMIN_URL = "3rdparty/logstash/kibana/index.html"
+# ADMIN_PORT = 5000  # 80
 RELOAD_UI = yes
 DISPLAY_NAME = $(SPK_NAME)
 CHANGELOG = "1. Initial Release & DSM 5.0 compatibility"
@@ -30,7 +30,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = logstash_extra_install
 
-BUSYBOX_CONFIG = usrmng
+BUSYBOX_CONFIG = usrmng daemon nice
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
