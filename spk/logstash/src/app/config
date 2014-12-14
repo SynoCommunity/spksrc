@@ -6,9 +6,10 @@
             "icon": "images/kibana-{0}.png",
             "type": "url",
             "protocol": "http",
-            "port": "5000",
-            "url": "/webman/3rdparty/logstash/kibana/",
-            "allUsers": false
+            "port": "80",
+            "url": "/kibana",
+            "allUsers": false,
+            "grantPrivilege": "local"
         }
     }
 }

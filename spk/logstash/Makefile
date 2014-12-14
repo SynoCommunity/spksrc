@@ -1,16 +1,17 @@
 SPK_NAME = logstash
 SPK_VERS = 1.4.2
-SPK_REV = 6
+SPK_REV = 8
 SPK_ICON = src/logstash.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = AustinSaintAubin
-DESCRIPTION = "All your logs from all over your infrastructure in one place - with searching and graphing. logstash is a tool for managing events and logs. You can use it to collect logs, parse them, and store them for later use (like, for searching). Speaking of searching, logstash comes with a web interface for searching and drilling into all of your logs. It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way. logstash is now a part of the Elasticsearch family! This allows us to build better software much faster as well as offering production support.  NOTE: When starting logstash it might take a minute to a few minutes for it fully spin up, please be patient."
-# ADMIN_URL = "3rdparty/logstash/kibana/index.html"
-# ADMIN_PORT = 5000  # 80
+DESCRIPTION = "All your logs from all over your infrastructure in one place - with searching and graphing. logstash is a tool for managing events and logs. You can use it to collect logs, parse them, and store them for later use (like, for searching). Speaking of searching, logstash comes with a web interface for searching and drilling into all of your logs. It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way. logstash is now a part of the Elasticsearch family! This allows us to build better software much faster as well as offering production support.  NOTE: When starting logstash it might take a minute to a few minutes for it fully spin up, please be patient. This buld includes Logstash, Elasticsearch, and Kibana to give you an all-in-one package that works right out of the box."
+ADMIN_URL = /kibana/  # "3rdparty/logstash/kibana/index.html"
+ADMIN_PORT = 80  # 500
 RELOAD_UI = yes
+STARTABLE = yes
 DISPLAY_NAME = $(SPK_NAME)
 CHANGELOG = "1. Initial Release & DSM 5.0 compatibility"
 HELPURL = http://logstash.net/docs/$(SPK_VERS)/
@@ -25,7 +26,10 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 
-INSTALL_DEP_SERVICES = java
+INSTALL_DEP_SERVICES = apache-web java
+START_DEP_SERVICES = apache-web
+INSTUNINST_RESTART_SERVICES = apache-web
+
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = logstash_extra_install
