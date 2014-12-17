@@ -1,0 +1,16 @@
+set daemon 60
+set pidfile /usr/local/monit/var/monit.pid
+set statefile /usr/local/monit/var/monit.state
+set idfile /usr/local/monit/var/monit.id
+
+set eventqueue
+    basedir /usr/local/monit/var/events
+    slots 100
+
+set httpd
+    port 2812
+    allow "@control_username@":"@control_password@"
+    use address 0.0.0.0
+
+#include files in subdir
+include /usr/local/monit/var/monit.d/*
