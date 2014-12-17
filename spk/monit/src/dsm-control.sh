@@ -49,6 +49,7 @@ wait_for_status ()
 case $1 in
     reload)
         if daemon_status; then
+            echo reloading ${DNAME} config ...
             PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE} reload
         else
             echo ${DNAME} is not running

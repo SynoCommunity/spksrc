@@ -34,8 +34,6 @@ postinst ()
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
     exit 0
 }
 
