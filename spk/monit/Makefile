@@ -12,7 +12,7 @@ DEPENDS =  cross/$(SPK_NAME)
 MAINTAINER = SynoCommunity
 DESCRIPTION = Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
 RELOAD_UI = yes
-DISPLAY_NAME = monit
+DISPLAY_NAME = Monit
 
 HOMEPAGE = http://mmonit.com/monit/
 LICENSE  =

@@ -2,11 +2,10 @@
 
 # Package
 PACKAGE="monit"
-DNAME="monit"
-USER="root"
+DNAME="Monit"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 
 CFG_FILE="${INSTALL_DIR}/var/monitrc"
 PID_FILE="${INSTALL_DIR}/var/monit.pid"
@@ -15,7 +14,7 @@ LOG_FILE="${INSTALL_DIR}/var/monit.log"
 start_daemon ()
 {
     #run as root with verbose logging
-    su - ${USER} -c "PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE}"
+    PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE}
 }
 
 stop_daemon ()
@@ -50,7 +49,7 @@ wait_for_status ()
 case $1 in
     reload)
         if daemon_status; then
-            su - ${USER} -c "PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE} reload"
+            PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE} reload
         else
             echo ${DNAME} is not running
         fi

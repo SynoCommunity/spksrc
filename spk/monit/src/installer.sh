@@ -2,11 +2,10 @@
 
 # Package
 PACKAGE="monit"
-DNAME="monit"
-USER="root"
+DNAME="Monit"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 
 CFG_FILE="${INSTALL_DIR}/var/monitrc"
 PID_FILE="${INSTALL_DIR}/var/monit.pid"
