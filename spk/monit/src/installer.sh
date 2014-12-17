@@ -27,8 +27,8 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Edit the configuration according to the wizard
-    sed -i -e "s/@control_username@/${wizard_control_username:=nzbget}/g" \
-           -e "s/@control_password@/${wizard_control_password:=nzbget}/g" \
+    sed -i -e "s/@control_username@/${wizard_control_username:=admin}/g" \
+           -e "s/@control_password@/${wizard_control_password:=monit}/g" \
            ${CFG_FILE}
 
     # Add firewall config
