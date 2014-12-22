@@ -1,9 +1,9 @@
 {
     ".url": {
-        "com.synocommunity.packages.nzbdrone": {
-            "title": "NzbDrone",
-            "desc": "NzbDrone Web UI",
-            "icon": "images/nzbdrone-{0}.png",
+        "com.synocommunity.packages.sonarr": {
+            "title": "Sonarr",
+            "desc": "Sonarr Web UI",
+            "icon": "images/sonarr-{0}.png",
             "type": "url",
             "protocol": "http",
             "port": "8989",

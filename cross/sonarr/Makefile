@@ -1,0 +1,25 @@
+PKG_NAME = Sonarr
+PKG_BRANCH = master
+PKG_VERS = $(shell curl -s http://update.sonarr.tv/v2/master/mono/ | tac | grep -m1 -Eo '.{0,10}\.mono\.tar\.gz<' | cut -c1-10)
+PKG_LANG = mono
+PKG_EXT = tar.gz
+PKG_DIST_NAME = NzbDrone.$(PKG_BRANCH).$(PKG_VERS).$(PKG_LANG).$(PKG_EXT)
+PKG_DIST_SITE = http://update.sonarr.tv/v2/master/mono
+PKG_DIR = NzbDrone
+
+DEPENDS = 
+
+HOMEPAGE = http://sonarr.tv
+COMMENT  = Sonarr is a PVR for newsgroup users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
+LICENSE  =
+
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = myInstall
+
+include ../../mk/spksrc.cross-cc.mk
+
+myInstall:
+	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
+	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
+

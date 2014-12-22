@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="nzbdrone"
-DNAME="NzbDrone"
+PACKAGE="sonarr"
+DNAME="Sonarr"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -13,11 +13,11 @@ SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="${PACKAGE}"
 GROUP="users"
-PID_FILE="${INSTALL_DIR}/var/.config/${DNAME}/${PACKAGE}.pid"
+PID_FILE="${INSTALL_DIR}/var/.config/NzbDrone/nzbdrone.pid"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
-NZBDRONE="${INSTALL_DIR}/share/${DNAME}/NzbDrone.exe"
-SPK_NZBDRONE="${SYNOPKG_PKGINST_TEMP_DIR}/share/${DNAME}/NzbDrone.exe"
+SONARR="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
+SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe"
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO}"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -92,18 +92,18 @@ preupgrade ()
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
 
-    # Is Installed NzbDrone Binary Ver. >= SPK NzbDrone Binary Ver.?
-    CUR_VER=$(${COMMAND} ${NZBDRONE} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
-    echo "   Installed NzbDrone Binary: ${CUR_VER}" >> ${TMP_INSTALL_LOG}
-    SPK_VER=$(${COMMAND} ${SPK_NZBDRONE} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
-    echo "   Requested NzbDrone Binary: ${SPK_VER}" >> ${TMP_INSTALL_LOG}
+    # Is Installed Sonarr Binary Ver. >= SPK Sonarr Binary Ver.?
+    CUR_VER=$(${COMMAND} ${SONARR} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
+    echo "   Installed Sonarr Binary: ${CUR_VER}" >> ${TMP_INSTALL_LOG}
+    SPK_VER=$(${COMMAND} ${SPK_SONARR} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
+    echo "   Requested Sonarr Binary: ${SPK_VER}" >> ${TMP_INSTALL_LOG}
     if [ "$CUR_VER" -ge "$SPK_VER" ]; then
        echo 'KEEP_CUR="yes"' > ${TMP_DIR}/${PACKAGE}/var/KEEP_VAR
-       echo "   [KEEPING] Installed NzbDrone Binary - Upgrading Package Only" >> ${TMP_INSTALL_LOG}
+       echo "   [KEEPING] Installed Sonarr Binary - Upgrading Package Only" >> ${TMP_INSTALL_LOG}
        mv ${INSTALL_DIR}/share ${TMP_DIR}/${PACKAGE}/
     else
        echo 'KEEP_CUR="no"' > ${TMP_DIR}/${PACKAGE}/var/KEEP_VAR
-       echo "   [REPLACING] Installed NzbDrone Binary" >> ${TMP_INSTALL_LOG}
+       echo "   [REPLACING] Installed Sonarr Binary" >> ${TMP_INSTALL_LOG}
     fi
 
     exit 0
@@ -115,7 +115,7 @@ postupgrade ()
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
 
-    # Restore Current NzbDrone Binary If Current Ver. >= SPK Ver.
+    # Restore Current Sonarr Binary If Current Ver. >= SPK Ver.
     . ${INSTALL_DIR}/var/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
        rm -fr ${INSTALL_DIR}/share
