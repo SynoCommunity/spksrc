@@ -1,0 +1,8 @@
+sbin:sbin/mosquitto
+bin:bin/mosquitto_passwd
+bin:bin/mosquitto_pub
+bin:bin/mosquitto_sub
+lib:lib/libmosquitto.so
+lib:lib/libmosquitto.so.1
+lib:lib/libmosquittopp.so
+lib:lib/libmosquittopp.so.1
