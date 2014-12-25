@@ -10,12 +10,12 @@ PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="mosquitto"
 MOSQUITTO="${INSTALL_DIR}/sbin/mosquitto"
 PID_FILE="${INSTALL_DIR}/var/mosquitto.pid"
-CFG_FILE="${INSTALL_DIR}/etc/mosquitto.conf"
+CFG_FILE="${INSTALL_DIR}/var/mosquitto.conf"
 
 
 start_daemon ()
 {
-    su - ${USER} -s /bin/sh -c "PATH=${PATH} ${MOSQUITTO} -d -c ${CFG_FILE}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${MOSQUITTO} -d -c ${CFG_FILE}"
 }
 
 stop_daemon ()

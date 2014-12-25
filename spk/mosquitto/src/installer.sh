@@ -9,9 +9,11 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="mosquitto"
-GROUP="users"
-CFG_FILE="${INSTALL_DIR}/var/sync.conf"
+GROUP="nobody"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+
+SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 
 preinst ()
@@ -30,6 +32,8 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
+    # Add firewall config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} > /dev/null
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -46,6 +50,11 @@ preuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         delgroup ${USER} ${GROUP}
         deluser ${USER}
+    fi
+
+    # Remove firewall config
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc > /dev/null
     fi
 
     exit 0
