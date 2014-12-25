@@ -1,0 +1,11 @@
+--- config.mk.orig	2014-10-08 23:50:07.000000000 +0200
++++ config.mk	2014-12-26 00:32:33.277618657 +0100
+@@ -65,7 +65,7 @@
+ 
+ # Build with Python module. Comment out if Python is not installed, or required
+ # Python modules are not available.
+-WITH_PYTHON:=yes
++WITH_PYTHON:=no
+ 
+ # Build with SRV lookup support.
+ WITH_SRV:=yes

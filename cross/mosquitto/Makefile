@@ -2,7 +2,7 @@ PKG_NAME = mosquitto
 PKG_VERS = 1.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://mosquitto.org/files/source/
+PKG_DIST_SITE = http://mosquitto.org/files/source
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/c-ares cross/openssl
@@ -12,10 +12,5 @@ COMMENT  = Mosquitto is an open source message broker that implements the MQ Tel
 LICENSE  = BSD licensed
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = myCompile
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myCompile
-myCompile:
-	$(RUN) $(MAKE) WITH_PYTHON=no
