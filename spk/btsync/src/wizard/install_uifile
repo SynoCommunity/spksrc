@@ -11,27 +11,5 @@
                 "allowBlank": false
             }
         }]
-    }, {
-        "type": "textfield",
-        "desc": "Login of the web interface",
-        "subitems": [{
-            "key": "wizard_login",
-            "desc": "Login",
-            "defaultValue": "login",
-            "validator": {
-                "allowBlank": false
-            }
-        }]
-    }, {
-        "type": "password",
-        "desc": "Password of the web interface. Defaults to password",
-        "subitems": [{
-            "key": "wizard_password",
-            "desc": "Password",
-            "defaultValue": "password",
-            "validator": {
-                "allowBlank": false
-            }
-        }]
     }]
 }]

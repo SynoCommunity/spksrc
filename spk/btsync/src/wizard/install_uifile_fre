@@ -11,27 +11,5 @@
                 "allowBlank": false
             }
         }]
-    }, {
-        "type": "textfield",
-        "desc": "Nom d'utilisateur de l'interface web",
-        "subitems": [{
-            "key": "wizard_login",
-            "desc": "Nom d'utilisateur",
-            "defaultValue": "login",
-            "validator": {
-                "allowBlank": false
-            }
-        }]
-    }, {
-        "type": "password",
-        "desc": "Mot de passe de l'interface web. password par défaut",
-        "subitems": [{
-            "key": "wizard_password",
-            "desc": "Mot de passe",
-            "defaultValue": "password",
-            "validator": {
-                "allowBlank": false
-            }
-        }]
     }]
 }]

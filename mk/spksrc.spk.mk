@@ -6,14 +6,18 @@ include ../../mk/spksrc.directories.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
-SPK_ARCH = $(ARCH)
-ARCH_SUFFIX = -$(ARCH)
+SPK_ARCH = $(TC_ARCH)
+SPK_NAME_ARCH = $(ARCH)
+SPK_TCVERS = $(TCVERSION)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 else
 SPK_ARCH = noarch
+SPK_NAME_ARCH = noarch
+SPK_TCVERS = all
 endif
 
-SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_ARCH)_$(SPK_VERS)-$(SPK_REV).spk
+SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
 
 #####
 
@@ -36,7 +40,7 @@ include ../../mk/spksrc.strip.mk
 $(WORK_DIR)/package.tgz: strip
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ *)
+	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 $(WORK_DIR)/INFO: Makefile $(SPK_ICON)
 	$(create_target_dir)
@@ -62,7 +66,11 @@ endif
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
+  ifneq ($(strip $(TC_FIRMWARE)),)
+	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
+  else
 	@echo firmware=\"3.1-1594\" >> $@
+  endif
 endif
 ifneq ($(strip $(BETA)),)
 	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
@@ -111,7 +119,7 @@ endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
-	@echo md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
+	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\" >> $@
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
@@ -224,10 +232,10 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 
 SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_120.PNG scripts
 
-.PHONY: md5
-md5:
+.PHONY: checksum
+checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
-	@sed -i -e "s|md5=\".*|md5=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\"|g" $(WORK_DIR)/INFO
+	@sed -i -e "s|checksum=\".*|checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)`\"|g" $(WORK_DIR)/INFO
 
 .PHONY: wizards
 wizards:
@@ -253,22 +261,30 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO md5 $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
-package: $(SPK_FILE_NAME)
+# Compare optional Makefile REQUIRED_DSM to provided TCVERSION. If REQ_DSM is lower than TCVERSION, exit
+checkversion:
+ifneq ($(REQUIRED_DSM),)
+  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
+	$(error Stop: Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
+	@exit 1
+  endif
+endif
+
+package: checkversion $(SPK_FILE_NAME)
 
 ### Publish rules
 publish: package
 ifeq ($(PUBLISH_URL),)
 	$(error Set PUBLISH_URL in local.mk)
 endif
-ifeq ($(PUBLISH_AUTH_TOKEN),)
-	$(error Set PUBLISH_AUTH_TOKEN in local.mk)
+ifeq ($(PUBLISH_API_KEY),)
+	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	http POST $(PUBLISH_URL)/packages Authentication-Token:$(PUBLISH_AUTH_TOKEN) \
-	    @$(SPK_FILE_NAME)
+	http --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
 
 
 ### Clean rules
@@ -279,7 +295,7 @@ all: package
 
 
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
-SUPPORTED_ARCHS = $(notdir $(subst -,/,$(SUPPORTED_TCS)))
+SUPPORTED_ARCHS = $(notdir $(subst syno-,/,$(SUPPORTED_TCS)))
 
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
@@ -294,13 +310,32 @@ all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 .PHONY: publish-all-archs
 publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
 
+all-archs-%:
+	@$(MSG) Building package for all archs with toolchain version $*
+	@for arch in $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))) ; \
+	do \
+	  $(MAKE) arch-$$arch-$* ; \
+	done
+
+all-archs-dsms:
+	@$(MSG) Build all archs with latest DSM per FIRMWARE
+	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
+	do \
+	  make latest-arch-$$arch ; \
+	done
+
+latest-arch-%:
+	@$(MSG) Building package for arch $* with latest available toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+
+
 arch-%:
 	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$*
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$* publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish
 
 changelog:
 	@echo $(shell git log --pretty=format:"- %s" -- $(PWD))

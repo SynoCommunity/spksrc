@@ -10,6 +10,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
 USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 MYSQL="/usr/syno/mysql/bin/mysql"
+MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
 MYSQL_USER="owncloud"
 MYSQL_DATABASE="owncloud"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -83,9 +84,17 @@ postinst ()
 preuninst ()
 {
     # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
         echo "Incorrect MySQL root password"
         exit 1
+    fi
+
+    # Check database export location
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
+        if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
+            echo "File ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql already exists. Please remove or choose a different location"
+            exit 1
+        fi
     fi
 
     # Stop the package
@@ -104,8 +113,12 @@ postuninst ()
     rm -f /etc/php/conf.d/${PACKAGE_NAME}.ini
     rm -f /etc/httpd/sites-enabled-user/${PACKAGE_NAME}.conf
 
-    # Remove database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
+    # Export and remove database
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        if [ -n "${wizard_dbexport_path}" ]; then
+            mkdir -p ${wizard_dbexport_path}
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql
+        fi
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
     fi
 

@@ -19,6 +19,7 @@ USER="syncserver"
 GROUP="users"
 
 MYSQL="/usr/syno/mysql/bin/mysql"
+MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
 
 INI_FILE="${INSTALL_DIR}/var/syncserver.ini"
 CONF_FILE="${INSTALL_DIR}/var/syncserver.conf"
@@ -111,9 +112,17 @@ preuninst ()
 {
 
     # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
         echo "Incorrect MySQL root password"
         exit 1
+    fi
+
+    # Check database export location
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
+        if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${PACKAGE}.sql" ]; then
+            echo "File ${wizard_dbexport_path}/${PACKAGE}.sql already exists. Please remove or choose a different location"
+            exit 1
+        fi
     fi
 
     # Stop the package
@@ -138,8 +147,12 @@ postuninst ()
     # Remove link
     rm -f ${INSTALL_DIR}
 
-    # Remove MySQL database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a "${wizard_remove_database}" == "true" ]; then
+    # Export and remove database
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        if [ -n "${wizard_dbexport_path}" ]; then
+            mkdir -p ${wizard_dbexport_path}
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${PACKAGE} > ${wizard_dbexport_path}/${PACKAGE}.sql
+        fi
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${PACKAGE}; DROP USER '${USER}'@'localhost';"
     fi
 

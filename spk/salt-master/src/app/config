@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.salt-master": {
+            "title": "Halite",
+            "desc": "Salt Master Web UI",
+            "icon": "images/salt-master-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8282",
+            "url": "/app",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

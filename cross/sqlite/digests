@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 sqlite-autoconf-3080704.tar.gz SHA1 70ca0b8884a6b145b7f777724670566e2b4f3cde
 sqlite-autoconf-3080704.tar.gz SHA256 86370f139405fdfe03334fd618171a74e50f589f17ccbe5933361ed1f58359ec
 sqlite-autoconf-3080704.tar.gz MD5 33bb8db0038317ce1b0480ca1185c7ba
+=======
+sqlite-autoconf-3080703.tar.gz SHA1 5cbe9aa4af1b32787045a251dba6debee3f061c0
+sqlite-autoconf-3080703.tar.gz SHA256 90b43a72a9d43ddf68fff0f71db869c213b9fd5082ade7d13e85a655c39a678a
+sqlite-autoconf-3080703.tar.gz MD5 e738c376d8106d16d1d3e7974e7e15d8
+>>>>>>> upstream/develop

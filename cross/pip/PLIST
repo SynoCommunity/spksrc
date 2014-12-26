@@ -1,1 +1,2 @@
 bin:bin/pip
+bin:bin/pip@PYTHON_VERSION@

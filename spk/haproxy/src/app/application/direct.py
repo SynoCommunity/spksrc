@@ -55,11 +55,11 @@ class Configuration(Base):
                 for server in backend.servers.split(','):
                     f.write('\tserver %s\n' % server.strip())
                 f.write('\n')
-        if restart:
-            self.restart()
         error = self.check()
         if error:
             return {'success': False, 'error': error}
+        if restart:
+            self.restart()
         return {'success': True}
 
     def status(self):
@@ -89,8 +89,11 @@ class Configuration(Base):
     def generate_certificate(self):
         if os.path.exists(self.crt_path):
             os.remove(self.crt_path)
+	listCRT = [u'/usr/syno/etc/ssl/ssl.crt/server.crt', u'/usr/syno/etc/ssl/ssl.crt/ca.crt', u'/usr/syno/etc/ssl/ssl.key/server.key']
+	if os.path.isfile(u'/usr/syno/etc/ssl/ssl.intercrt/server-ca.crt'):
+		listCRT = [u'/usr/syno/etc/ssl/ssl.crt/server.crt', u'/usr/syno/etc/ssl/ssl.intercrt/server-ca.crt', u'/usr/syno/etc/ssl/ssl.key/server.key']
         with open(self.crt_path, 'w') as crt:
-            for filepath in [u'/usr/syno/etc/ssl/ssl.crt/server.crt', u'/usr/syno/etc/ssl/ssl.crt/ca.crt', u'/usr/syno/etc/ssl/ssl.key/server.key']:
+            for filepath in listCRT:
                 with open(filepath, 'r') as f:
                     content = f.read()
                 if not content.endswith('\n'):
