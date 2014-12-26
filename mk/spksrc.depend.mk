@@ -1,5 +1,5 @@
 ### Dependency rules
-#   Build all dependencie listed in DEPENDS.
+#   Build all dependencies listed in DEPENDS.
 # Target are executed in the following order:
 #  depend_msg_target
 #  pre_depend_target   (override with PRE_DEPEND_TARGET)
@@ -8,7 +8,8 @@
 # Variables:
 #  DEPENDS             List of dependencies to go through
 #  REQ_KERNEL          If set, will compile kernel modules and allow
-#                      use of KERNEL_DIR 
+#                      use of KERNEL_DIR
+#  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
@@ -31,7 +32,7 @@ endif
 ifeq ($(strip $(REQ_KERNEL)),)
 KERNEL_DEPEND = 
 else
-KERNEL_DEPEND = kernel/syno-$(ARCH)
+KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)
 endif
 
 depend_msg_target:
@@ -40,7 +41,7 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-	@for depend in $(KERNEL_DEPEND) $(DEPENDS) ; \
+	@for depend in $(KERNEL_DEPEND) $(BUILD_DEPENDS) $(DEPENDS) ; \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done

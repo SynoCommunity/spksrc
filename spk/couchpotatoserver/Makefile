@@ -1,9 +1,8 @@
 SPK_NAME = couchpotatoserver
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 6
 SPK_ICON = src/couchpotatoserver.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS  = 
 SPK_DEPENDS = "python>2.7.3-3:git"
@@ -15,7 +14,7 @@ DESCRIPTION_SPN = CouchPotato es un sistema automático de descarga de peliculas
 ADMIN_PORT = 5050
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato
-CHANGELOG = "1. Add Git dependency\n2. Rename package"
+CHANGELOG = "1. Fix update issues"
 
 HOMEPAGE   = http://couchpota.to/
 LICENSE    = GPL
@@ -50,4 +49,4 @@ couchpotatoserver_extra_install: $(STAGING_DIR)/share/CouchPotatoServer
 
 $(STAGING_DIR)/share/CouchPotatoServer:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/RuudBurger/CouchPotatoServer.git CouchPotatoServer
+	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/RuudBurger/CouchPotatoServer.git CouchPotatoServer

@@ -5,14 +5,29 @@
         "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
         "subitems": [{
             "key": "wizard_download_dir",
-            "desc": "Répertoire de téléchargement"
+            "desc": "Répertoire de téléchargement",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                }
+            }
         }]
     }, {
         "type": "textfield",
         "desc": "Surveille les torrents dans un répertoire et les ajoute à ruTorrent automatiquement. Laisser vide pour désactiver",
         "subitems": [{
             "key": "wizard_watch_dir",
-            "desc": "Répertoire surveillé"
+            "desc": "Répertoire surveillé",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                }
+            }
         }]
     }]
 }, {
@@ -30,6 +45,17 @@
                     "errorText": "Entered port range is not valid"
                 }
             }
+        }]
+    }]
+}, {
+    "step_title": "Additional configuration",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Some features in web interface require disabling open_basedir (PHP restriction). Some tasks do not run as http user and therefore system wide master settings need to be modified. Do you want to disable open_basedir automatically? (Previous open_basedir settings won't be restored after ruTorrent uninstallation.)",
+        "subitems": [{
+            "key": "wizard_disable_openbasedir",
+            "desc": "Disable open_basedir",
+            "defaultValue": true
         }]
     }]
 }]

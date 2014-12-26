@@ -1,11 +1,12 @@
 SPK_NAME = flexget
-SPK_VERS = 1.1.26
-SPK_REV = 1
+SPK_VERS = 1.2.197
+SPK_REV = 2
 SPK_ICON = src/flexget.png
 DSM_UI_DIR = app
 
-DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3"
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel cross/pyyaml
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
@@ -26,14 +27,14 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = flexget_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: flexget_extra_install
-flexget_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+flexget_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/share
+	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
+	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
@@ -41,8 +42,3 @@ flexget_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ FlexGet==$(SPK_VERS) transmissionrpc

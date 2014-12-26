@@ -44,3 +44,5 @@ association_duplicate = "Il y a déjà un enregistrement pour ce Frontend et ce 
 write_configuration_successful = "Ecriture du fichier de configuration réussie"
 default_configuration_successful = "Configuration par défaut rechargée avec succès"
 configuration_error = "Il y a une erreur dans votre configuration : "
+confirm_gen_certif="Voulez-vous vraiment générer le certificat ?"
+confirm_reload="Voulez-vous vraiment recharger la configuration initiale ?"

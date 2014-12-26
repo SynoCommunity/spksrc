@@ -1,8 +1,9 @@
 SPK_NAME = lazylibrarian
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/lazylibrarian.png
 DSM_UI_DIR = app
+BETA=1
 
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
@@ -13,9 +14,9 @@ DESCRIPTION_FRE = LazyLibrarian est un téléchargeur automatique de livre pour 
 ADMIN_PORT = 8082
 RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
-CHANGELOG = "1. Use source from LibrarianMike\\\n2. Default port changed to 8082"
+CHANGELOG = "1. Use source from DobyTang"
 
-HOMEPAGE   = https://github.com/LibrarianMike/LazyLibrarian
+HOMEPAGE   = http://github.com/DobyTang/LazyLibrarian
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
@@ -38,7 +39,6 @@ lazylibrarian_extra_install: $(STAGING_DIR)/share/LazyLibrarian
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/lazylibrarian.cgi.py $(STAGING_DIR)/app/lazylibrarian.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
@@ -47,5 +47,4 @@ lazylibrarian_extra_install: $(STAGING_DIR)/share/LazyLibrarian
 
 $(STAGING_DIR)/share/LazyLibrarian:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/LibrarianMike/LazyLibrarian.git LazyLibrarian
-	rm -fr $(STAGING_DIR)/share/LazyLibrarian/.git $(STAGING_DIR)/share/LazyLibrarian/.gitignore
+	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/DobyTang/LazyLibrarian.git LazyLibrarian

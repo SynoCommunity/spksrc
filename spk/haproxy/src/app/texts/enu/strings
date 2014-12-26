@@ -44,3 +44,5 @@ association_duplicate = "There's already a record for that Backend and that Fron
 write_configuration_successful = "Configuration file wrote successfully"
 default_configuration_successful = "Default configuration reloaded successfully"
 configuration_error = "There is an error in your configuration: "
+confirm_gen_certif="Do you really want to generate the certificate?"
+confirm_reload="Do you really want to reload the original configuration?"

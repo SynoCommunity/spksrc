@@ -11,7 +11,7 @@ DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\\\'int
 RELOAD_UI = no
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
-CHANGELOG = "1. Support UTF8 by default\n2. UTF8 box drawing"
+CHANGELOG = "1. Support UTF8 by default<br>2. UTF8 box drawing"
 
 HOMEPAGE   = http://www.midnight-commander.org/
 LICENSE    = GNU GPL
