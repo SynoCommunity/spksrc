@@ -2,16 +2,19 @@
 
 # Package
 PACKAGE="nzbdrone"
-DNAME="NzbDrone"
+DNAME="Sonarr"
+
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-NZBDRONE_LOG="${INSTALL_DIR}/var/.config/NzbDrone/logs/nzbdrone.txt"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="nzbdrone"
-PID_FILE="${INSTALL_DIR}/var/.config/${DNAME}/${PACKAGE}.pid"
+USER="${PACKAGE}"
+USER_HOME="$(eval echo ~$USER)"
+PID_FILE="${USER_HOME}/.config/NzbDrone/nzbdrone.pid"
+INSTALL_LOG="${INSTALL_DIR}/var/install.log"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
-NZBDRONE="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
-COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} ${NZBDRONE}"
+SONARR="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
+COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} ${SONARR}"
 
 start_daemon ()
 {
@@ -69,7 +72,7 @@ case $1 in
         fi
         ;;
     log)
-	echo "${NZBDRONE_LOG}"
+	echo "${INSTALL_LOG}"
         exit 0
         ;;
     *)
