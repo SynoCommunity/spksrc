@@ -5,7 +5,7 @@ SPK_ICON = src/mono.png
 
 BETA = 1
 
-FIRMWARE = 5.0-4458
+REQUIRED_DSM = 5.0
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -26,8 +26,8 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-# Notify of unsupported architectures 
-ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k),$(ARCH))
+# Notify of unsupported architectures
+ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k avoton armada375 alpine x64),$(ARCH))
 $(error Sorry $(ARCH) is not a supported architecture)
 endif
 
