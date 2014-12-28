@@ -1,0 +1,145 @@
+DEFAULT vesamenu.c32
+MENU TITLE Synology TFTP/PXE Boot Solution
+MENU BACKGROUND bg.legacy.png
+MENU MASTER PASSWD $1$0123456789
+\n
+menu color title 1;36;44 #ffffffff #00000000 std
+\n
+LABEL synology.local
+localboot 0
+MENU DEFAULT
+MENU LABEL Boot from hard disk
+TEXT HELP
+Boot from the local hard drive.
+If you are unsure, select this option.
+ENDTEXT
+\n
+LABEL memtest
+kernel memtest/memtest
+MENU LABEL Run Memtest86+
+TEXT HELP
+Run Memtest86+ on the client computer.
+ENDTEXT
+
+
+###################################################################################################
+MENU BEGIN Rescue tools
+MENU LABEL Rescue tools
+MENU TITLE Synology TFTP/PXE Boot Solution
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+LABEL Dell Diagnostics
+kernel dell/memdisk
+append iso initrd=synology/dell/delldiags.iso raw
+MENU LABEL Dell Diagnostics
+TEXT HELP
+Dell(TM) Diagnostic software
+ENDTEXT
+
+MENU END
+
+
+
+
+###################################################################################################
+MENU BEGIN ISO
+MENU LABEL Boot iso images
+MENU TITLE Synology TFTP/PXE Boot Solution
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+LABEL 2XOS
+kernel ISO/memdisk
+append iso initrd=ISO/2XOS/TCSclientOS-compact.r1.iso raw
+MENU LABEL 2XOS
+TEXT HELP
+2XOS
+ENDTEXT	
+
+LABEL WIN7 64BIT ALL
+kernel ISO/memdisk
+append initrd=ISO/WIN7_ALL_64BIT/win7all64bitdvd/sources/sperr32.exe x64
+MENU LABEL WIN7 64BIT ALL
+TEXT HELP
+WIN7 64BIT ALL
+ENDTEXT	
+
+
+MENU END
+
+
+
+###################################################################################################
+MENU BEGIN NONISO
+MENU LABEL Boot Files
+MENU TITLE Synology TFTP/PXE Boot Solution
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+#################################################
+MENU BEGIN UBUNTU 6
+MENU LABEL UBUNTU 6
+MENU TITLE UBUNTU 6
+LABEL Install
+	kernel NONISO/ubuntu6/linux
+	append vga=normal initrd=NONISO/ubuntu6/initrd.gz ramdisk_size=14332 root=/dev/rd/0 rw  --
+
+LABEL Install server
+	kernel NONISO/ubuntu6/linux
+	append base-installer/kernel/linux/extra-packages-2.6= pkgsel/install-pattern=~t^ubuntu-standard$ pkgsel/language-pack-patterns= pkgsel/install-language-support=false vga=normal initrd=NONISO/ubuntu6/initrd.gz ramdisk_size=14332 root=/dev/rd/0 rw  --
+
+LABEL Expert Install
+	kernel NONISO/ubuntu6/linux
+	append DEBCONF_PRIORITY=low vga=normal initrd=NONISO/ubuntu6/initrd.gz ramdisk_size=14332 root=/dev/rd/0 rw  --
+
+LABEL Expert Server Install
+	kernel NONISO/ubuntu6/linux
+	append base-installer/kernel/linux/extra-packages-2.6= pkgsel/install-pattern=~t^ubuntu-standard$ pkgsel/language-pack-patterns= pkgsel/install-language-support=false DEBCONF_PRIORITY=low vga=normal initrd=NONISO/ubuntu6/initrd.gz ramdisk_size=14332 root=/dev/rd/0 rw  --
+
+LABEL Rescue
+	kernel NONISO/ubuntu6/linux
+	append vga=normal initrd=NONISO/ubuntu6/initrd.gz ramdisk_size=14332 root=/dev/rd/0 rw  rescue/enable=true --
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+MENU END
+#################################################
+MENU BEGIN UBUNTU 8
+MENU LABEL UBUNTU 8
+MENU TITLE UBUNTU 8
+LABEL Install
+	kernel NONISO/ubuntu8/linux
+	append vga=normal initrd=NONISO/ubuntu8/initrd.gz --
+
+LABEL Cli
+	kernel linux
+	append tasks=standard pkgsel/language-pack-patterns= pkgsel/install-language-support=false vga=normal initrd=NONISO/ubuntu8/initrd.gz -- 
+
+LABEL Expert
+	kernel linux
+	append priority=low vga=normal initrd=initrd.gz -- 
+LABEL Cli-Expert
+	kernel linux
+	append tasks=standard pkgsel/language-pack-patterns= pkgsel/install-language-support=false priority=low vga=normal initrd=NONISO/ubuntu8/initrd.gz -- 
+
+LABEL Rescue
+	kernel linux
+	append vga=normal initrd=NONISO/ubuntu8/initrd.gz rescue/enable=true -- 
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+MENU END
+#################################################
+MENU END
+
+
+
+##################################################################################################
+
+
+\n
+PROMPT 0
+TIMEOUT 0\n

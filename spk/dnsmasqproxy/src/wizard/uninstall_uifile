@@ -1,0 +1,11 @@
+[{
+    "step_title": "Remove DnsMasq Proxy",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Do you wish me to turn off 'Synology Tftp Server' for you at the sametime as uninstall?",
+        "subitems": [{
+            "key": "wizard_stop_tftp",
+            "desc": "Yes turn off 'Synology Tftp Server'"
+        }]
+    }]
+}]

@@ -1,0 +1,11 @@
+[{
+    "step_title": "DnsMasq Proxy Setup",
+    "items": [{
+        "type": "multiselect",
+        "desc": "I can setup and start synology tftp server for you, otherwise you will have to do this manually making sure that '/volume1/TFTP_PXE' is selected as your root folder for tftp.",
+        "subitems": [{
+            "key": "wizard_start_tftp",
+            "desc": "Yes turn no 'Synology Tftp Server'"
+        }]
+    }]
+}]
