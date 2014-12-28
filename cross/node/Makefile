@@ -15,7 +15,7 @@ ENV += LINK.target=$(TC_PATH)$(TC_PREFIX)g++
 POST_INSTALL_TARGET = myPostInstall
 
 # Limit to supported archs
-ifneq ($(findstring $(ARCH),88f6281 bromolow cedarview x86 armadaxp armada370),$(ARCH))
+ifneq ($(findstring $(ARCH),88f6281 bromolow cedarview x86 armadaxp armada370 armada375 avoton alpine),$(ARCH))
 $(error $(ARCH) is not a supported architecture)
 endif
 

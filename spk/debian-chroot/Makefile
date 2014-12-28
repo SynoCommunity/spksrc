@@ -30,10 +30,10 @@ DEBIAN_ARCH =
 ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86),$(ARCH))
+ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86 avoton x64),$(ARCH))
 DEBIAN_ARCH = i386
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
