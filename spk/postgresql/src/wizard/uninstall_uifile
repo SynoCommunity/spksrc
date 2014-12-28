@@ -1,0 +1,12 @@
+[{
+    "step_title": "Remove Postgres Server",
+    "items": [{
+        "type": "multiselect",
+        "desc": "If you remove the Postgres database, all data and settings will be lost. 
+<br>A folder 'PostgresBackup' will be create at /volume1/homes/admin/, if you choose to backup.",
+        "subitems": [{
+            "key": "wizard_backup_postgres",
+            "desc": "Yes backup postgres"
+        }]
+    }]
+}]

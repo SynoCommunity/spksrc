@@ -1,0 +1,52 @@
+[{
+    "step_title": "Postgres SuperUser Configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "A 'SuperUser' will be created. Please enter 'SuperUser' details.",
+        "subitems": [{
+            "key": "wizard_superuser_name",
+            "desc": "SuperUser username",
+            "validator": {
+            "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": " ",
+        "subitems": [{
+         "desc": "Enter your require SuperUser password.",
+            "key": "wizard_superuser_password",
+            "desc": "SuperUser password",
+            "validator": {
+            "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "multiselect",
+        "desc": "<br>The ip is set from your synology ip with a subnet */24, you can set this yourself by selecting and providing the information below. ei 192.168.0.0/24 if Nas address is 192.168.0.1-254",
+        "subitems": [{
+            "key": "wizard_useownip_postgres",
+            "desc": "Yes, i'm setting myself"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": " ",
+        "subitems": [{
+            "key": "wizard_myip_postgres",
+            "desc": "What is your ip/subnet ?",
+            "emptyText": "example 192.168.1.0/24 or 10.10.0.0/8",
+            "validator": {
+                "regex": {
+                "vtype": "alphanum",
+                "expr": "/^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0]{1})\\/([0-9]{1,2})$/", 
+                "errorText": "Error, Example 192.168.1.0/24 or 10.10.0.0/8" 
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "Installation Note",
+    "items": [{
+        "desc": "After the installer has been completed, you will be able to login with the SuperUser you created.<br><br>You can use the pgAdmin3 desktop client for administration.",
+    }]
+}]
