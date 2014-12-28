@@ -2,7 +2,7 @@ PKG_NAME = umurmur
 PKG_VERS = 0.2.15
 PKG_EXT = tar.gz
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fatbob313/umurmur/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
