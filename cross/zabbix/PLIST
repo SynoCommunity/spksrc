@@ -1,0 +1,12 @@
+etc:etc/zabbix_server.conf
+etc:etc/zabbix_agent.conf
+etc:etc/zabbix_agentd.conf
+etc:etc/zabbix_proxy.conf
+bin:sbin/zabbix_server
+bin:bin/zabbix_get
+bin:bin/zabbix_sender
+bin:sbin/zabbix_proxy
+bin:sbin/zabbix_agent
+bin:sbin/zabbix_agentd
+shr:share/database
+shr:share/zabbix
