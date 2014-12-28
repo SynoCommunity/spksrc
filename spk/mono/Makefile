@@ -1,5 +1,5 @@
 SPK_NAME = mono
-SPK_VERS = 3.6.0
+SPK_VERS = 3.10.0
 SPK_REV = 2
 SPK_ICON = src/mono.png
 
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Mono est une plateforme logicielle conçue pour permettre aux 
 DESCRIPTION_SPN = Mono es una plataforma de software diseñada para permitir a los desarrolladores crear fácilmente aplicaciones de plataforma cruzada. Es una implementación de código abierto de Microsoft de. Net Framework basado en los estándares ECMA para C # y el Common Language Runtime. Creemos que al abrazar una exitosa plataforma de software estandarizada, podemos bajar las barreras a la producción de grandes aplicaciones para Linux.
 RELOAD_UI = yes
 DISPLAY_NAME = Mono
-CHANGELOG = "1. DSM5 compatibility<br>2. CIL bin files<br>3. Comcerto2k"
+CHANGELOG = "1. Updated to v3.10"
 
 HOMEPAGE = http://mono-project.com/
 LICENSE  =
