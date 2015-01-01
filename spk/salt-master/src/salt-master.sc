@@ -9,4 +9,3 @@ title="Halite"
 desc="Salt Master Web UI"
 port_forward="yes"
 dst.ports="8282/tcp"
-
