@@ -1,6 +1,6 @@
 SPK_NAME = mosquitto
 SPK_VERS = 1.3.5
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/mosquitto.png
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -9,7 +9,7 @@ DESCRIPTION = Mosquitto is an open source message broker that implements the MQ 
 RELOAD_UI = yes
 DISPLAY_NAME = Mosquitto
 STARTABLE = yes
-CHANGELOG = "Initial version"
+CHANGELOG = "Fix firewall rule"
 HOMEPAGE = http://www.mosquitto.org/
 LICENSE  = BSD licensed
 
