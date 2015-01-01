@@ -1,4 +1,8 @@
-TC_NAME = syno-x86
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = x86
+TC_VERS = 5.0
+TC_FIRMWARE = 5.0-4458
 
 TC_DIST_NAME = gcc473_glibc217_x86_64-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.0%20Tool%20Ch
 TC_BASE_DIR = x86_64-pc-linux-gnu
 TC_PREFIX = x86_64-pc-linux-gnu
 TC_TARGET = x86_64-pc-linux-gnu
-
-TC_ARCH = x86
-TC_FIRMWARE = 5.0-4458
 
 TC_CFLAGS =
 TC_CPPFLAGS =

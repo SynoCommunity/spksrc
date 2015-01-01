@@ -13,6 +13,7 @@ PWD := $(shell pwd)
 
 DISTRIB_DIR  = $(PWD)/../../distrib
 PIP_DIR = $(PWD)/../../distrib/pip
+TOOLCHAINS_DIR = $(PWD)/../../distrib/toolchains
 PACKAGES_DIR = $(PWD)/../../packages
 
 ifndef WORK_DIR

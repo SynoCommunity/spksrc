@@ -1,4 +1,8 @@
-TC_NAME = syno-comcerto2k
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = comcerto2k
+TC_VERS = 5.0
+TC_FIRMWARE = 5.0-4458
 
 TC_DIST_NAME = gcc464_glibc217_neon_comcerto-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.0%20Tool%20Ch
 TC_BASE_DIR = arm-cortexa9-linux-gnueabi
 TC_PREFIX = arm-cortexa9-linux-gnueabi
 TC_TARGET = arm-cortexa9-linux-gnueabi
-
-TC_ARCH = comcerto2k
-TC_FIRMWARE = 5.0-4458
 
 TC_CFLAGS =
 TC_CPPFLAGS =

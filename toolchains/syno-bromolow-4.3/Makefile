@@ -1,4 +1,8 @@
-TC_NAME = syno-bromolow
+TC_NAME = syno-$(TC_ARCH)
+
+TC_ARCH = bromolow
+TC_VERS = 4.3
+TC_FIRMWARE = 3.1-1594
 
 TC_DIST_NAME = gcc420_glibc236_x64_bromolow-GPL.tgz
 
@@ -8,9 +12,6 @@ TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Ch
 TC_BASE_DIR = x86_64-linux-gnu
 TC_PREFIX = x86_64-linux-gnu
 TC_TARGET = x86_64-linux-gnu
-
-TC_ARCH = bromolow
-TC_FIRMWARE = 3.1-1594
 
 TC_CFLAGS =
 TC_CPPFLAGS =
