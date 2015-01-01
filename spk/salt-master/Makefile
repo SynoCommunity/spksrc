@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
 SPK_VERS = 2014.7.0
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/salt-master.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough 
 ADMIN_PORT = 8282
 RELOAD_UI = yes
 DISPLAY_NAME = Salt Master
-CHANGELOG = "1. Fix package updating"
+CHANGELOG = "Fix firewall rules line ending"
 
 HOMEPAGE   = https://www.saltstack.com/
 LICENSE    = Apache
