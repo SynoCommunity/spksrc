@@ -16,9 +16,21 @@ ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 CONFIGURE_ARGS = --enable-ipv6 --without-ensurepip
 
 COMPILE_TARGET = myCompile
+POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.native-cc.mk
 
 .PHONY: myCompile
 myCompile:
 	@$(RUN) $(MAKE) Parser/pgen all
+
+PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
+EASY_INSTALL = $(WORK_DIR)/install/usr/local/bin/easy_install
+PIP = $(WORK_DIR)/install/usr/local/bin/pip
+
+.PHONY: myPostInstall
+myPostInstall:
+	@$(MSG) Installing setuptools, pip and cffi
+	@$(RUN) wget https://bootstrap.pypa.io/ez_setup.py -O - | $(PYTHON)
+	@$(EASY_INSTALL) "pip==1.5.6"
+	@$(PIP) install "cffi==0.8.6"

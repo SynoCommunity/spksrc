@@ -1,11 +1,11 @@
 SPK_NAME = mono
-SPK_VERS = 3.6.0
+SPK_VERS = 3.10.0
 SPK_REV = 2
 SPK_ICON = src/mono.png
 
 BETA = 1
 
-FIRMWARE = 5.0-4458
+REQUIRED_DSM = 5.0
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Mono est une plateforme logicielle conçue pour permettre aux 
 DESCRIPTION_SPN = Mono es una plataforma de software diseñada para permitir a los desarrolladores crear fácilmente aplicaciones de plataforma cruzada. Es una implementación de código abierto de Microsoft de. Net Framework basado en los estándares ECMA para C # y el Common Language Runtime. Creemos que al abrazar una exitosa plataforma de software estandarizada, podemos bajar las barreras a la producción de grandes aplicaciones para Linux.
 RELOAD_UI = yes
 DISPLAY_NAME = Mono
-CHANGELOG = "1. DSM5 compatibility<br>2. CIL bin files<br>3. Comcerto2k"
+CHANGELOG = "1. Updated to v3.10"
 
 HOMEPAGE = http://mono-project.com/
 LICENSE  =
@@ -26,8 +26,8 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-# Notify of unsupported architectures 
-ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k),$(ARCH))
+# Notify of unsupported architectures
+ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k avoton armada375 alpine x64),$(ARCH))
 $(error Sorry $(ARCH) is not a supported architecture)
 endif
 

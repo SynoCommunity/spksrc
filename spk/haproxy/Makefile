@@ -1,6 +1,6 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5.3
-SPK_REV = 15
+SPK_VERS = 1.5.8
+SPK_REV = 16
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT = 8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Update to 1.5.3<br>2. Improve default configuration"
+CHANGELOG = "1. Update to 1.5.8<br>2. Improve SSL security"
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2

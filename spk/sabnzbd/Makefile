@@ -1,12 +1,12 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 0.7.18
-SPK_REV = 10
+SPK_VERS = 0.7.20
+SPK_REV = 13
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
-
-SPK_DEPENDS = "python>2.7.3-3"
+WHEELS = six configobj
+SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
@@ -15,7 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "1. Update SABnzbd to 0.7.18"
+CHANGELOG = "Update SABnzbd to 0.7.20"
 
 HOMEPAGE   = http://sabnzbd.org/
 LICENSE    = GPL
@@ -40,11 +40,13 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: sabnzbd_extra_install
-sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
+	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/sabnzbd.cgi.py $(STAGING_DIR)/app/sabnzbd.cgi
@@ -53,8 +55,3 @@ sabnzbd_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ configobj

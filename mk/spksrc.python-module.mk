@@ -20,12 +20,12 @@ include ../../mk/spksrc.cross-cc.mk
 -include $(WORK_DIR)/python-cc.mk
 
 # Python module variables
-PYTHONPATH = $(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
+PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
 
 
 ### Python module rules
 compile_python_module:
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build $(BUILD_ARGS)
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
 
 install_python_module:
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
