@@ -3,7 +3,7 @@
         "com.synocommunity.packages.maraschino-custom": {
             "title": "Maraschino-custom",
             "desc": "Maraschino Web UI",
-            "icon": "images/maraschino-{0}.png",
+            "icon": "images/maraschino-custom-{0}.png",
             "type": "url",
             "protocol": "http",
             "port": "8262",
