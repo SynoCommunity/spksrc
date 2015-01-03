@@ -10,7 +10,7 @@ PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/sbin:${PATH}"
 USER="root"
 BBACKUPD="${INSTALL_DIR}/sbin/bacula-fd"
 CFG_FILE="${INSTALL_DIR}/etc/bacula-fd.conf"
-PID_FILE="${INSTALL_DIR}/var/run/bacula-fd.pid"
+PID_FILE="/var/run/bacula-fd.9102.pid"
 
 
 start_daemon ()
