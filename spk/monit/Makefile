@@ -1,6 +1,6 @@
 SPK_NAME = monit
-SPK_VERS = 5.10
-SPK_REV = 4
+SPK_VERS = 5.11
+SPK_REV = 5
 SPK_ICON = src/monit.png
 DSM_UI_DIR = app
 CHANGELOG =
