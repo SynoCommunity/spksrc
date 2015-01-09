@@ -13,7 +13,7 @@ DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy p
 ADMIN_PORT = 8250
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "Update dependencies"
+CHANGELOG = "Add 'privmsg' and 'palaver' modules"
 
 HOMEPAGE = http://wiki.znc.in/
 LICENSE  =
