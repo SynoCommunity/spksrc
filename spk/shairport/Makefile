@@ -1,6 +1,6 @@
 SPK_NAME = shairport
 SPK_VERS = 1.1.1
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/shairport.png
 
 DEPENDS =  cross/$(SPK_NAME)

@@ -22,6 +22,10 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # persuade asla to let use use that playback device
+    mv ${INSTALL_DIR}/share/alsa/alsa.conf ${INSTALL_DIR}/share/alsa/alsa.original.bak
+    cat ${INSTALL_DIR}/share/alsa/alsa.original.bak | grep -v "defaults.pcm.dmix.rate" > ${INSTALL_DIR}/share/alsa/alsa.conf
+    rm ${INSTALL_DIR}/share/alsa/alsa.original.bak 
+    echo "defaults.pcm.dmix.rate 44100" >> ${INSTALL_DIR}/share/alsa/alsa.conf
     echo "defaults.pcm.ipc_gid    \"root\"" >> ${INSTALL_DIR}/share/alsa/alsa.conf
 
     # create some /var directory - just for us...
