@@ -1,0 +1,4 @@
+bin:bin/inotifywait
+bin:bin/inotifywatch
+lnk:lib/libinotifytools.so.0
+lib:lib/libinotifytools.so.0.4.1
