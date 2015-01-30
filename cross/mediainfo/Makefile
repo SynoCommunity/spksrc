@@ -1,8 +1,8 @@
 PKG_NAME = mediainfo
-PKG_VERS = 0.7.68
-PKG_EXT = tar.gz
+PKG_VERS = 0.7.72
+PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.sourceforge.net/project/mediainfo/source/$(PKG_NAME)/$(PKG_VERS)
+PKG_DIST_SITE = http://mediaarea.net/download/source/$(PKG_NAME)/$(PKG_VERS)
 PKG_DIR = MediaInfo/Project/GNU/CLI
 
 DEPENDS = cross/libmediainfo
