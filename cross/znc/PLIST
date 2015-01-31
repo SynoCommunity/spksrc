@@ -37,8 +37,10 @@ lib:lib/znc/modules_online.so
 lib:lib/znc/nickserv.so
 lib:lib/znc/notes.so
 lib:lib/znc/notify_connect.so
+lib:lib/znc/palaver.so
 lib:lib/znc/partyline.so
 lib:lib/znc/perform.so
+lib:lib/znc/privmsg.so
 lib:lib/znc/push.so
 lib:lib/znc/q.so
 lib:lib/znc/raw.so
