@@ -11,7 +11,7 @@ DB_DIR="${INSTALL_DIR}/var/db"
 RSYNC_DIR="rsync://ftp.ut-capitole.fr/blacklist/dest/"
 
 cd ${DB_DIR}
-rync -arpogvt ${RSYNC_DIR} .
+rsync -arpogvt ${RSYNC_DIR} .
 if [ $? -eq 0 ]
 then
   chown -R ${RUNAS}:root ${DB_DIR}

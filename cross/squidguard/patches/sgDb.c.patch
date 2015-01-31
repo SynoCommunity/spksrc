@@ -1,0 +1,11 @@
+--- ./src/sgDb.c.old	2014-06-07 16:01:30.426370538 +0200
++++ ./src/sgDb.c	2014-06-07 16:02:10.289478740 +0200
+@@ -112,7 +112,7 @@
+     }
+   }
+ #endif
+-#if DB_VERSION_MAJOR == 4
++#if DB_VERSION_MAJOR >= 4
+   if(globalUpdate || createdb || (dbfile != NULL && stat(dbfile,&st))){
+     flag = DB_CREATE;
+     if(createdb)
