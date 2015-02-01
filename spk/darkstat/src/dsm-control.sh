@@ -6,14 +6,14 @@ DNAME="DarkStat"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:/usr/local/sbin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="root"
 DARKSTAT="${INSTALL_DIR}/sbin/darkstat"
 PID_FILE="${INSTALL_DIR}/var/darkstat.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${DARKSTAT} -i eth0 --chroot ${INSTALL_DIR}/var --pidfile darkstat.pid --import darkstat.data --export darkstat.data"
+    su ${USER} -c "PATH=${PATH} ${DARKSTAT} -i eth0 --chroot ${INSTALL_DIR}/var --pidfile darkstat.pid --import darkstat.data --export darkstat.data"
 }
 
 stop_daemon ()
