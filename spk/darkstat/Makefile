@@ -1,6 +1,6 @@
 SPK_NAME = darkstat
-SPK_VERS = 3.0.715
-SPK_REV = 2
+SPK_VERS = 3.0.719rc1
+SPK_REV = 3
 SPK_ICON = src/darkstat.png
 DSM_UI_DIR = app
 
@@ -12,14 +12,13 @@ DESCRIPTION_FRE = DarkStat est un outil de monitoring réseau simple et léger. 
 ADMIN_PORT = 667
 RELOAD_UI = yes
 DISPLAY_NAME = DarkStat
-CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
+CHANGELOG = "Update to 3.0.719"
 
 HOMEPAGE   = http://unix4lyfe.org/darkstat/
 LICENSE    = GPL v2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -32,10 +31,8 @@ darkstat_extra_install:
 	install -m 777 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/darkstat.cgi.pl $(STAGING_DIR)/app/darkstat.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+	for size in 16 24 32 48 72; do \
+		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+	                $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

@@ -7,10 +7,12 @@ DNAME="DarkStat"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:/usr/local/sbin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="root"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
+SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {
@@ -25,6 +27,9 @@ postinst ()
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
+    # Add firewall config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+
     exit 0
 }
 
@@ -32,6 +37,11 @@ preuninst ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # Remove firewall config
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
+    fi
 
     exit 0
 }
