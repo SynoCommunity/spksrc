@@ -38,7 +38,8 @@ monit_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/monit.d
 	install -m 755 -d $(STAGING_DIR)/var/events
 	install -m 700 src/monitrc $(STAGING_DIR)/var/monitrc
-	for size in 16 24 32 48; do \
+	install -m 700 src/monit.d/monit $(STAGING_DIR)/var/monit.d/monit
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
