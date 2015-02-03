@@ -1,10 +1,9 @@
 PKG_NAME = tmux
 PKG_VERS = 1.9a
-PKG_VERS_CUT = 1.9a
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_NAME)-1.9
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS_CUT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncurses cross/libevent
 
