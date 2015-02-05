@@ -2,7 +2,7 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download directory",
+        "desc": "Download folder",
         "subitems": [{
             "key": "wizard_download_dir",
             "desc": "Download directory",

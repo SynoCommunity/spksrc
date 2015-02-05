@@ -40,24 +40,17 @@ preinst ()
         SHARE_EXISTS=$(synoshare --get "${WIZ_SHARE}" | sed -ne 's/^[[:space:]]*Path[[:space:]\.]*\[\(.*\)\].*$/\1/p')  # FIXME: Better variable name
 
         if [ -z "${SHARE_EXISTS}" ]; then
-            synoshare --add "${WIZ_SHARE}" "" "/${VOLUME}/${WIZ_SHARE}" "" "" "" 1 0 > ${SYNOPKG_TEMP_LOGFILE} || exit 1
-            chown admin:users "/${VOLUME}/${WIZ_SHARE}"
-            chmod 775 "/${VOLUME}/${WIZ_SHARE}"
-        else
-            if [ -z "$(echo "${SHARE_EXISTS}" | grep "${VOLUME}")" ]; then
-               # IDEA: Shall I rewrite ${wizard_download_dir} to existing share name on different volume or end with error? For now, end with error.
-               echo "ERROR: There's already a share '${WIZ_SHARE}' but it points to a different volume." > ${SYNOPKG_TEMP_LOGFILE}
+               echo "ERROR: Share '${WIZ_SHARE}' doesn't exist." > ${SYNOPKG_TEMP_LOGFILE}
                exit 1
-            fi
         fi
-
-        # At this state, ${wizard_download_dir} is in a shared folder. Regardless of ${wizard_download_dir} existence.
 
         if [ ! -d ${wizard_download_dir} ]; then
-            mkdir -p "${wizard_download_dir}" && \
-                chown admin:users "${wizard_download_dir}" && \
-                chmod 775 "${wizard_download_dir}"
+            echo "ERROR: Folder ${wizard_download_dir} doesn't exist." > ${SYNOPKG_TEMP_LOGFILE}
+            exit 1
         fi
+
+	# TODO: Check write permissions (related to run under non-root user)
+
     fi
     exit 0
 }
