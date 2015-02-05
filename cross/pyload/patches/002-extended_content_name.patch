@@ -34,10 +34,13 @@
                  name = name.replace('"', "").replace("'", "").replace(";", "").replace("/", "_").strip()
                  self.p.nameDisposition = name
                  self.log.debug("Content-Disposition: %s" % name)
-@@ -291,3 +298,9 @@
+@@ -290,4 +297,10 @@
+         """ closes everything, unusable after this """
          if self.fp: self.fp.close()
          self.c.close()
-         if hasattr(self, "p"): del self.p
+-        if hasattr(self, "p"): del self.p
+\ No newline at end of file
++        if hasattr(self, "p"): del self.p
 +
 +def charEnc(enc):
 +    return {
