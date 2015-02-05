@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/pyload.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/tesseract-ocr cross/js cross/$(SPK_NAME)
+DEPENDS = cross/tesseract-ocr cross/tessdata-eng cross/js cross/$(SPK_NAME)
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
@@ -32,7 +32,7 @@ TESSDATA_DIST_NAME = tesseract-ocr-3.02.eng.tar.gz
 include ../../mk/spksrc.spk.mk
 
 .PHONY: pyload_extra_install
-pyload_extra_install: $(WORK_DIR)/.tessdata_install_done
+pyload_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/pyload.cgi.sh $(STAGING_DIR)/app/pyload.cgi
@@ -45,16 +45,3 @@ pyload_extra_install: $(WORK_DIR)/.tessdata_install_done
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(WORK_DIR)/.tessdata_install_done:
-	install -m 755 -d $(STAGING_DIR)/share/tessdata
-	@if [ ! -f "$(DISTRIB_DIR)/$(TESSDATA_DIST_NAME)" ]; then \
-		echo "wget $(TESSDATA_DIST_SITE)/$(TESSDATA_DIST_NAME)"; \
-		wget -nv -O $(DISTRIB_DIR)/$(TESSDATA_DIST_NAME).part $(TESSDATA_DIST_SITE)/$(TESSDATA_DIST_NAME) ; \
-		mv $(DISTRIB_DIR)/$(TESSDATA_DIST_NAME).part $(DISTRIB_DIR)/$(TESSDATA_DIST_NAME) ; \
-	else \
-		$(MSG) "File $(TESSDATA_DIST_NAME) already downloaded" ; \
-	fi
-	@$(MSG) "  Extracting $(TESSDATA_DIST_NAME)"
-	tar -xzpf "$(DISTRIB_DIR)/$(TESSDATA_DIST_NAME)" -C "$(STAGING_DIR)/share/tessdata" --strip-components 2
-	@touch -f $@
