@@ -33,7 +33,6 @@ preinst ()
         test "${wizard_download_dir}" || wizard_download_dir="/volume1/downloads"
 
         mkdir -p "${SYNOPKG_PKGINST_TEMP_DIR}/etc"
-        touch "${SYNOPKG_PKGINST_TEMP_DIR}/etc/pyload-pkg.conf"
 
         # Check whether ${wizard_download_dir} is in existing shared folder.
         VOLUME=$(echo "${wizard_download_dir}" | cut -d/ -f2)
@@ -44,7 +43,6 @@ preinst ()
             synoshare --add "${WIZ_SHARE}" "" "/${VOLUME}/${WIZ_SHARE}" "" "" "" 1 0 > ${SYNOPKG_TEMP_LOGFILE} || exit 1
             chown admin:users "/${VOLUME}/${WIZ_SHARE}"
             chmod 775 "/${VOLUME}/${WIZ_SHARE}"
-            echo "WIZ_SHARE=${WIZ_SHARE}" > "${SYNOPKG_PKGINST_TEMP_DIR}/etc/pyload-pkg.conf"
         else
             if [ -z "$(echo "${SHARE_EXISTS}" | grep "${VOLUME}")" ]; then
                # IDEA: Shall I rewrite ${wizard_download_dir} to existing share name on different volume or end with error? For now, end with error.
@@ -59,7 +57,6 @@ preinst ()
             mkdir -p "${wizard_download_dir}" && \
                 chown admin:users "${wizard_download_dir}" && \
                 chmod 775 "${wizard_download_dir}"
-            echo "WIZ_DWNLD_DIR=${wizard_download_dir}" >> "${SYNOPKG_PKGINST_TEMP_DIR}/etc/pyload-pkg.conf"
         fi
     fi
     exit 0
@@ -106,14 +103,6 @@ postinst ()
 preuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-	test -f "${INSTALL_DIR}/etc/pyload-pkg.conf" && . "${INSTALL_DIR}/etc/pyload-pkg.conf"
-        if [ "${WIZ_DWNLD_DIR}" ]; then
-            :   # IDEA: If download folder was created by postinst(), remove it. But do I know whether user didn't start using it for anything else after install?
-        fi
-        if [ "${WIZ_SHARE}" ]; then
-            :   # IDEA: If share where download folder is located was create by postinst(), remove it. Same "but" as wth ${WIZ_DWNLD_DIR}.
-        fi
-
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
