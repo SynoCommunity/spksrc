@@ -39,6 +39,7 @@ pyload_extra_install: $(WORK_DIR)/.tessdata_install_done
 	install -m 644 src/default_syn.conf $(STAGING_DIR)/share/pyload/module/config/default_syn.conf
 	install -m 644 src/pyload_init.sql $(STAGING_DIR)/share/pyload/module/config/pyload_init.sql
 	install -m 644 src/htaccess.example $(STAGING_DIR)/share/pyload/module/config/htaccess.example
+	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 64 72 256; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
