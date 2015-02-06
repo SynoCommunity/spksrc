@@ -26,6 +26,9 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = flexget_extra_install
 
+# Pure Python package, make sure ARCH is not defined
+override ARCH=
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: flexget_extra_install
