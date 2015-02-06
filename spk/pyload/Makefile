@@ -9,6 +9,7 @@ SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = pyLoad is a fast, lightweight and full featured download manager for many One-Click-Hoster, container formats like DLC, video sites or just plain http/ftp links.
+ADMIN_PORT = 8190
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = pyLoad
@@ -26,22 +27,24 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = pyload_extra_install
 
-TESSDATA_DIST_SITE = http://tesseract-ocr.googlecode.com/files
-TESSDATA_DIST_NAME = tesseract-ocr-3.02.eng.tar.gz
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: pyload_extra_install
-pyload_extra_install:
+pyload_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/pyload.cgi.sh $(STAGING_DIR)/app/pyload.cgi
-	install -m 644 src/default_syn.conf $(STAGING_DIR)/share/pyload/module/config/default_syn.conf
-	install -m 644 src/pyload_init.sql $(STAGING_DIR)/share/pyload/module/config/pyload_init.sql
-	install -m 644 src/htaccess.example $(STAGING_DIR)/share/pyload/module/config/htaccess.example
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/default_syn.conf $(STAGING_DIR)/etc/pyload.conf
+	install -m 644 src/pyload_init.sql $(STAGING_DIR)/etc/pyload_init.sql
+	install -m 644 src/htaccess.example $(STAGING_DIR)/etc/htaccess.example
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 64 72 256; do \
+	for size in 16 24 32 48 64 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
+
+$(STAGING_DIR)/share/requirements.pybundle:
+	@$(MSG) "Bundling requirements"
+	install -m 755 -d $(STAGING_DIR)/share
+	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ configobj

@@ -4,34 +4,68 @@
 PACKAGE="pyload"
 DNAME="pyLoad"
 
-PIDFILE="/usr/local/pyload/var/pyload.pid"
-PYLOADCORE="/usr/local/python/bin/python /usr/local/pyload/share/pyload/pyLoadCore.py --pidfile=${PIDFILE}"
-export PATH="/usr/local/pyload/bin:$PATH"
+# Others
+INSTALL_DIR="/usr/local/${PACKAGE}"
+PYTHON_DIR="/usr/local/python"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+USER="pyload"
+PYTHON="${INSTALL_DIR}/env/bin/python"
+PYLOAD="${INSTALL_DIR}/share/pyload/pyLoadCore.py"
+LOG_FILE="${INSTALL_DIR}/etc/Logs/log.txt"
+PID_FILE="${INSTALL_DIR}/var/pyload.pid"
+
+
+
+start_daemon ()
+{
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --daemon"
+}
+
+stop_daemon ()
+{
+    test "${SYNOPKG_TEMP_LOGFILE}" && exec > "${SYNOPKG_TEMP_LOGFILE}"
+    ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --quit
+}
+
+daemon_status ()
+{
+    ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --status > /dev/null
+}
+
 
 case $1 in
     start)
-        if [ -f /usr/syno/etc/ssl/ssl.crt/server.crt -a \
-             -f /usr/syno/etc/ssl/ssl.key/server.key ]; then
-            ln -s /usr/syno/etc/ssl/ssl.crt/server.crt /usr/local/pyload/etc/ssl.crt
-            ln -s /usr/syno/etc/ssl/ssl.key/server.key /usr/local/pyload/etc/ssl.key
-            sed -i -e 's/bool https : "Use HTTPS" = \(True|False\)/bool https : "Use HTTPS" = True/' /usr/local/pyload/etc/pyload.conf
+        if daemon_status; then
+            echo "${DNAME} is already running"
+            exit 0
         else
-            sed -i -e 's/bool https : "Use HTTPS" = \(True|False\)/bool https : "Use HTTPS" = False/' /usr/local/pyload/etc/pyload.conf
+            echo "Starting ${DNAME} ..."
+            start_daemon
+            exit $?
         fi
-        ${PYLOADCORE} --daemon
         ;;
     stop)
-        test "${SYNOPKG_TEMP_LOGFILE}" && exec >${SYNOPKG_TEMP_LOGFILE}
-        ${PYLOADCORE} --quit
+        if daemon_status; then
+            echo "Stopping ${DNAME} ..."
+            stop_daemon
+            exit $?
+        else
+            echo "${DNAME} is not running"
+            exit 0
+        fi
         ;;
     status)
-        test -f /usr/local/pyload/etc/pyload.conf || exit 150
-        ${PYLOADCORE} --status && exit 0
-        test -f ${PIDFILE} && exit 1
+        if daemon_status; then
+            echo "${DNAME} is running"
+            exit 0
+        else
+            echo "${DNAME} is not running"
+            exit 1
+        fi
         ;;
     log)
-        if [ -f /usr/local/pyload/etc/Logs/log.txt ]; then
-            echo "/usr/local/pyload/etc/Logs/log.txt"
+        if [ -f "${LOG_FILE}" ]; then
+            echo "${LOG_FILE}"
         else
             exit 1
         fi

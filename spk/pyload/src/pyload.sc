@@ -2,5 +2,5 @@
 title="pyLoad"
 desc="pyLoad"
 port_forward="yes"
-dst.ports="5080/tcp"
+dst.ports="8190/tcp"
 

@@ -1,6 +1,6 @@
 # To use pyLoad through Web Station's Virtual Host
 # put this file into VirtualHost directory as .htaccess file, edit accordingly
-# and change pyLoad to listen only on 127.0.0.1 (default is 0.0.0.0, port 5080).
+# and change pyLoad to listen only on 127.0.0.1 (default is 0.0.0.0, port 8190).
 # Remember that each virtualhost name and each protocol needs
 # own Virtual Host (pointing to the directory where your .htaccess resides).
 #
@@ -41,6 +41,6 @@ RewriteEngine on
 #RewriteCond %{HTTP_HOST} =virtualhost_ipv4_name [NC,OR]
 #RewriteCond %{HTTP_HOST} =virtualhost_ipv6_name [NC]
 #
-#RewriteRule ^(.*)$ http://127.0.0.1:5080/$1 [P,L]
+#RewriteRule ^(.*)$ http://127.0.0.1:8190/$1 [P,L]
 ##
 
