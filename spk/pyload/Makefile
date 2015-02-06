@@ -30,7 +30,7 @@ POST_STRIP_TARGET = pyload_extra_install
 include ../../mk/spksrc.spk.mk
 
 .PHONY: pyload_extra_install
-pyload_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+pyload_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/etc
@@ -43,8 +43,3 @@ pyload_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ configobj
