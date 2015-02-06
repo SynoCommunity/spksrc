@@ -28,7 +28,7 @@ stop_daemon ()
 
 daemon_status ()
 {
-    su ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --status > /dev/null"
+    su ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --status" > /dev/null
 }
 
 
