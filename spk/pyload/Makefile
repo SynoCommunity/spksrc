@@ -34,7 +34,7 @@ pyload_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/default_syn.conf $(STAGING_DIR)/etc/pyload.conf
+	install -m 644 src/pyload.conf $(STAGING_DIR)/etc/pyload.conf
 	install -m 644 src/pyload_init.sql $(STAGING_DIR)/etc/pyload_init.sql
 	install -m 644 src/htaccess.example $(STAGING_DIR)/etc/htaccess.example
 	install -m 755 -d $(STAGING_DIR)/var
