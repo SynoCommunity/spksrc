@@ -38,20 +38,9 @@ lng2iso()
 preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        test "${wizard_download_dir}" || wizard_download_dir="/volume1/downloads"
-
-        # Check whether ${wizard_download_dir} is in existing shared folder.
-        VOLUME=$(echo "${wizard_download_dir}" | cut -d/ -f2)
-        WIZ_SHARE=$(echo "${wizard_download_dir}" | cut -d/ -f3)
-        SHARE_EXISTS=$(synoshare --get "${WIZ_SHARE}" | sed -ne 's/^[[:space:]]*Path[[:space:]\.]*\[\(.*\)\].*$/\1/p')  # FIXME: Better variable name
-
-        if [ -z "${SHARE_EXISTS}" ]; then
-               echo "ERROR: Share '${WIZ_SHARE}' doesn't exist."
-               exit 1
-        fi
-
-        if [ ! -d ${wizard_download_dir} ]; then
-            echo "ERROR: Download directory ${wizard_download_dir} doesn't exist."
+        # Check directory
+        if [ ! -d ${wizard_download_dir:=/volume1/downloads} ]; then
+            echo "Download directory ${wizard_download_dir:=/volume1/downloads} does not exist."
             exit 1
         fi
     fi
@@ -73,19 +62,16 @@ postinst ()
     echo "${INSTALL_DIR}/etc" > "${INSTALL_DIR}/share/pyload/module/config/configdir"
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        test "${wizard_download_dir}" || wizard_download_dir="/volume1/downloads"
-
         # Set group and permissions on download dir for DSM5
         if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
-            chgrp users "${wizard_download_dir}"
-            chmod g+rwx "${wizard_download_dir}"
+            chgrp users "${wizard_download_dir:=/volume1/downloads}"
+            chmod g+rwx "${wizard_download_dir:=/volume1/downloads}"
         fi
 
         # Edit the configuration according to the wizard
-        sed -i -e " \
-            s|@W_DOWNLOAD_DIR@|${wizard_download_dir}|; \
-            s|@LNG@|$(lng2iso ${SYNOPKG_DSM_LANGUAGE})| \
-               " "${CFG_FILE}"
+        sed -i -e "s|@W_DOWNLOAD_DIR@|${wizard_download_dir:=/volume1/downloads}|" \
+               -e "s|@LNG@|$(lng2iso ${SYNOPKG_DSM_LANGUAGE})|" \
+               "${CFG_FILE}"
 
         # hash password
         SALT=$((RANDOM%99999+10000))

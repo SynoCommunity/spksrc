@@ -18,18 +18,17 @@ PID_FILE="${INSTALL_DIR}/var/pyload.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --daemon"
+    su ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --daemon"
 }
 
 stop_daemon ()
 {
-    test "${SYNOPKG_TEMP_LOGFILE}" && exec > "${SYNOPKG_TEMP_LOGFILE}"
-    ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --quit
+    su ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --quit"
 }
 
 daemon_status ()
 {
-    ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --status > /dev/null
+    su ${USER} -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --status > /dev/null"
 }
 
 

@@ -20,7 +20,7 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "password",
-        "desc": "pyLoad web interface needs own 'admin' account. Please enter a password for the pyLoad 'admin' user",
+        "desc": "An 'admin' account will be created for the pyLoad web interface. Please enter a password for the pyLoad 'admin' user.",
         "subitems": [{
             "key": "wizard_password",
             "desc": "Password",

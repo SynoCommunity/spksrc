@@ -1,6 +1,3 @@
-TESSDATA_DIST_SITE = http://tesseract-ocr.googlecode.com/files
-TESSDATA_DIST_NAME = tesseract-ocr-3.02.eng.tar.gz
-
 PKG_NAME = tessdata-eng
 PKG_VERS = 3.02
 PKG_EXT = tar.gz
