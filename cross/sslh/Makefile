@@ -1,12 +1,10 @@
 PKG_NAME = sslh
 PKG_VERS = v1.16
-SRC_VERSION = v1.16
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(SRC_VERSION).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.rutschle.net/tech
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 SRC_DIR= $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/
-VERSION="v1.16"
 
 DEPENDS = cross/libconfig
 
