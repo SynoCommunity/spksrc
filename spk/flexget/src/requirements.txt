@@ -1,7 +1,6 @@
 paver
 FeedParser>=5.1.3
-SQLAlchemy >=0.7, <0.7.99
-PyYAML
+SQLAlchemy >=0.7.5, !=0.9.0, <0.9.99
 argparse
 babelfish>=0.5.3
 stevedore>=0.14
@@ -17,7 +16,7 @@ progressbar
 jinja2
 flask
 cherrypy
-requests>=1.0, <2.99
+requests>=1.0, !=2.4.0, <2.99
 python-dateutil!=2.0, !=2.2
 jsonschema>=2.0
 python-tvrage
@@ -25,5 +24,10 @@ tmdb3
 guessit>=0.9.3
 werkzeug>=0.7
 itsdangerous>=0.21
-flexget[webui]
 transmissionrpc
+pytz
+tzlocal
+apscheduler
+futures
+pbr>=0.6,!=0.7,<1.0
+flexget[webui]
