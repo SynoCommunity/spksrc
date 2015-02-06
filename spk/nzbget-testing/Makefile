@@ -1,6 +1,6 @@
 SPK_NAME = nzbget-testing
-SPK_VERS = 14.0~r1121
-SPK_REV = 6
+SPK_VERS = 15.0~r1196
+SPK_REV = 7
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 14.0~r1121"
+CHANGELOG = "1. Update to 15.0~r1196"
 BETA = 1
 
 HOMEPAGE = http://nzbget.sourceforge.net/
