@@ -1,0 +1,5 @@
+serial:
+  port: /dev/ttyACM0
+
+server:
+  port: 8088
