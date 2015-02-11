@@ -1,6 +1,58 @@
---- CMakeLists.txt.orig	2014-06-28 01:07:09.000000000 +0200
-+++ CMakeLists.txt	2014-06-28 01:08:40.000000000 +0200
-@@ -332,7 +332,7 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 2112)
++++ CMakeLists.txt	(working copy)
+@@ -66,10 +66,10 @@
+ 	#ADD_DEFINITIONS( -Wall -O0 -ggdb )
+ 	#ADD_DEFINITIONS( -Wfatal-errors -Wformat=2 -Werror=format-security )
+ 
+-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static-libstdc++")
+-	SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -static-libstdc++")
+-	SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc -static-libstdc++")
++	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc")
++	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
++	SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc")
++	SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc")
+ 
+     GET_FILENAME_COMPONENT(_name ${_input} NAME)
+     SET(_source "${CMAKE_CURRENT_SOURCE_DIR}/${_input}")
+@@ -239,8 +239,6 @@
+ 
+ ## Link libraries
+ 
+-option(USE_STATIC_BOOST "Build with static BOOST libraries" YES)
+-set(Boost_USE_STATIC_LIBS ${USE_STATIC_BOOST})
+ set(Boost_USE_MULTITHREADED ON)
+ unset(Boost_INCLUDE_DIR CACHE)
+ unset(Boost_LIBRARY_DIRS CACHE)
+@@ -297,25 +295,6 @@
+   target_link_libraries(domoticz ${OpenZWave})
+   include_directories(${CMAKE_SOURCE_DIR}/hardware/openzwave) 
+   add_definitions(-DWITH_OPENZWAVE)
+-  # open-zwave needs libudev
+-  IF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+-    set(IOKIT_LIBRARY "-framework IOKit -framework CoreFoundation" CACHE FILEPATH "IOKit framework" FORCE)
+-    target_link_libraries(domoticz ${IOKIT_LIBRARY})
+-  else()
+-    find_library(UDEV NAMES libudev.a)
+-    IF(UDEV)
+-      message(STATUS ${UDEV})
+-      target_link_libraries(domoticz ${UDEV} -lrt)
+-    else()
+-      find_library(UDEV NAMES libudev.so)
+-      IF(UDEV)
+-         message(STATUS ${UDEV})
+-         target_link_libraries(domoticz ${UDEV} -lrt)
+-      else()
+-         MESSAGE(FATAL_ERROR "LIB UDEV not found on your system, see install.txt how to get them installed.\nsudo apt-get install libudev-dev")
+-      ENDIF(UDEV)
+-    ENDIF(UDEV)
+-  ENDIF()
+ else()
+ 	MESSAGE(STATUS "==== OpenZWave not found, support disabled!")
+ ENDIF(OpenZWave)
+@@ -344,7 +323,7 @@
  	message(STATUS "Not building on Raspberry Pi. GPIO support disabled.")
  ENDIF(RaspberryPi)
  
