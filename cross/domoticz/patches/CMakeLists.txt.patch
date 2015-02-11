@@ -1,6 +1,72 @@
---- CMakeLists.txt.orig	2015-03-25 08:59:06.695422175 +0100
-+++ CMakeLists.txt	2015-03-25 08:59:32.740438770 +0100
-@@ -405,7 +405,7 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 2287)
++++ CMakeLists.txt	(working copy)
+@@ -72,10 +72,10 @@
+   #ADD_DEFINITIONS( -Wall -O0 -ggdb )
+   #ADD_DEFINITIONS( -Wfatal-errors -Wformat=2 -Werror=format-security )
+ 
+-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static-libstdc++")
+-  SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -static-libstdc++")
+-  SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc -static-libstdc++")
++  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc")
++  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
++  SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc")
++  SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc")
+ 
+     GET_FILENAME_COMPONENT(_name ${_input} NAME)
+     SET(_source "${CMAKE_CURRENT_SOURCE_DIR}/${_input}")
+@@ -258,8 +258,6 @@
+ 
+ ## Link libraries
+ 
+-option(USE_STATIC_BOOST "Build with static BOOST libraries" YES)
+-set(Boost_USE_STATIC_LIBS ${USE_STATIC_BOOST})
+ set(Boost_USE_MULTITHREADED ON)
+ unset(Boost_INCLUDE_DIR CACHE)
+ unset(Boost_LIBRARY_DIRS CACHE)
+@@ -345,39 +343,6 @@
+   target_link_libraries(domoticz ${OpenZWave})
+   include_directories(${CMAKE_SOURCE_DIR}/hardware/openzwave) 
+   add_definitions(-DWITH_OPENZWAVE)
+-  # open-zwave needs libudev
+-  IF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+-    set(IOKIT_LIBRARY "-framework IOKit -framework CoreFoundation" CACHE FILEPATH "IOKit framework" FORCE)
+-    target_link_libraries(domoticz ${IOKIT_LIBRARY})
+-  else()
+-    IF(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+-      MESSAGE(STATUS "Building on FreeBSD, libudev not needed!")
+-      FIND_PATH(ICONV_INCLUDE_DIR iconv.h) 
+-      FIND_LIBRARY(ICONV_LIBRARIES NAMES iconv libiconv libiconv-2 c)
+-      IF(ICONV_INCLUDE_DIR AND ICONV_LIBRARIES) 
+-        SET(ICONV_FOUND TRUE) 
+-        #target_link_libraries(domoticz ${ICONV_INCLUDE_DIR})
+-        target_link_libraries(domoticz ${ICONV_LIBRARIES} -lrt)
+-        message(STATUS ${ICONV_LIBRARIES})
+-      else()
+-        MESSAGE(FATAL_ERROR "libiconv not found on your system")
+-      ENDIF(ICONV_INCLUDE_DIR AND ICONV_LIBRARIES)  
+-    else()
+-      find_library(UDEV NAMES libudev.a)
+-      IF(UDEV)
+-        message(STATUS ${UDEV})
+-        target_link_libraries(domoticz ${UDEV} -lrt)
+-      else()
+-        find_library(UDEV NAMES libudev.so)
+-        IF(UDEV)
+-           message(STATUS ${UDEV})
+-           target_link_libraries(domoticz ${UDEV} -lrt)
+-        else()
+-           MESSAGE(FATAL_ERROR "LIB UDEV not found on your system, see install.txt how to get them installed.\nsudo apt-get install libudev-dev")
+-        ENDIF(UDEV)
+-      ENDIF(UDEV)
+-    ENDIF()
+-  ENDIF()
+ else()
+   MESSAGE(STATUS "==== OpenZWave not found, support disabled!")
+ ENDIF(OpenZWave)
+@@ -406,7 +371,7 @@
    message(STATUS "Not building on Raspberry Pi. GPIO support disabled.")
  ENDIF(RaspberryPi)
  

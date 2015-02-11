@@ -78,15 +78,21 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      else \
 	        rev=$(PKG_SVN_REV) ; \
 	      fi ; \
+	      svnCmd=export ; \
+	      tarFlags='--exclude-vcs -czf' ; \
+	      if [ "$(PKG_DOWNLOAD_VCS_CLEAN)" = "nope" ]; then \
+	        svnCmd=co ; \
+	        tarFlags=-czf ; \
+	      fi ; \
 	      localFolder=$(NAME)-r$${rev} ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      localHead=$(NAME)-rHEAD.tar.gz ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -fr $${localFolder}.part ; \
-	        echo "svn co -r $${rev} $${url}" ; \
-	        svn export -q -r $${rev} $${url} $${localFolder}.part ; \
+	        echo "svn $${svnCmd} -r $${rev} $${url}" ; \
+	        svn $${svnCmd} -q -r $${rev} $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
-	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+	        tar $${tarFlags} $${localFile} $${localFolder} ; \
 	        rm -fr $${localFolder} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \

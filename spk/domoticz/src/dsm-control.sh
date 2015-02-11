@@ -16,6 +16,14 @@ PORT="8084"
 
 start_daemon ()
 {
+    insmod /lib/modules/usbserial.ko
+    insmod /lib/modules/ftdi_sio.ko
+    insmod ${INSTALL_DIR}/modules/cp210x.ko
+
+    # Create device
+    test -e /dev/ttyUSB0 || mknod /dev/ttyUSB0 c 188 0
+    chmod 777 /dev/ttyUSB0
+
     su - ${USER} -c "${DOMOTICZ} -www ${PORT} -approot ${INSTALL_DIR}/ -dbase ${DB_FILE} &> $LOGFILE & echo \$! > ${PID_FILE}"
 }
 

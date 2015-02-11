@@ -1,0 +1,107 @@
+Index: cpp/build/Makefile
+===================================================================
+--- cpp/build/Makefile
++++ cpp/build/Makefile
+@@ -33,13 +33,12 @@ else ifeq ($(UNAME),FreeBSD)
+ CFLAGS += -I/usr/local/include
+ else
+ LDFLAGS += -Wl,-soname,libopenzwave.so.$(VERSION)
+-LIBS 	+= -ludev
+ endif
+ 
+ #where to put the temporary library
+ LIBDIR	?= $(top_builddir)
+ 
+-INCLUDES	:= -I $(top_srcdir)/cpp/src -I $(top_srcdir)/cpp/tinyxml/ -I $(top_srcdir)/cpp/hidapi/hidapi/
++INCLUDES	:= -I $(top_srcdir)/cpp/src -I $(top_srcdir)/cpp/tinyxml/ 
+ 
+ ifeq ($(UNAME),Darwin)
+ SOURCES_HIDAPI =$(top_srcdir)/cpp/hidapi/mac
+@@ -51,9 +50,9 @@ endif
+ 
+ 
+ SOURCES		:= $(top_srcdir)/cpp/src $(top_srcdir)/cpp/src/command_classes $(top_srcdir)/cpp/tinyxml \
+-	$(top_srcdir)/cpp/src/value_classes $(top_srcdir)/cpp/src/platform $(top_srcdir)/cpp/src/platform/unix $(SOURCES_HIDAPI) $(top_srcdir)/cpp/src/aes/
++	$(top_srcdir)/cpp/src/value_classes $(top_srcdir)/cpp/src/platform $(top_srcdir)/cpp/src/platform/unix $(top_srcdir)/cpp/src/aes/
+ VPATH = $(top_srcdir)/cpp/src:$(top_srcdir)/cpp/src/command_classes:$(top_srcdir)/cpp/tinyxml:\
+-	$(top_srcdir)/cpp/src/value_classes:$(top_srcdir)/cpp/src/platform:$(top_srcdir)/cpp/src/platform/unix:$(SOURCES_HIDAPI):$(top_srcdir)/cpp/src/aes/
++	$(top_srcdir)/cpp/src/value_classes:$(top_srcdir)/cpp/src/platform:$(top_srcdir)/cpp/src/platform/unix:$(top_srcdir)/cpp/src/aes/
+ 	
+ 
+ tinyxml := $(notdir $(wildcard $(top_srcdir)/cpp/tinyxml/*.cpp))
+@@ -68,7 +67,7 @@ endif
+ 
+ cclasses := $(notdir $(wildcard $(top_srcdir)/cpp/src/command_classes/*.cpp))
+ vclasses := $(notdir $(wildcard $(top_srcdir)/cpp/src/value_classes/*.cpp))
+-pform := $(notdir $(wildcard $(top_srcdir)/cpp/src/platform/*.cpp)) \
++pform := $(filter-out HidController.cpp, $(notdir $(wildcard $(top_srcdir)/cpp/src/platform/*.cpp))) \
+ 	$(notdir $(wildcard $(top_srcdir)/cpp/src/platform/unix/*.cpp))
+ indep := $(notdir $(filter-out $(top_srcdir)/cpp/src/vers.cpp, $(wildcard $(top_srcdir)/cpp/src/*.cpp)))
+ aes := $(notdir $(wildcard $(top_srcdir)/cpp/src/aes/*.c))
+@@ -81,7 +80,6 @@ clean:
+ 
+ 
+ -include $(patsubst %.cpp,$(DEPDIR)/%.d,$(tinyxml))
+--include $(patsubst %.c,$(DEPDIR)/%.d,$(hidapi))
+ -include $(patsubst %.cpp,$(DEPDIR)/%.d,$(cclasses))
+ -include $(patsubst %.cpp,$(DEPDIR)/%.d,$(vclasses))
+ -include $(patsubst %.cpp,$(DEPDIR)/%.d,$(pform))
+@@ -99,7 +97,6 @@ $(top_srcdir)/cpp/src/vers.cpp:
+ #$(OBJDIR)/vers.o:	$(top_builddir)/vers.cpp
+ 
+ $(LIBDIR)/libopenzwave.a:	$(patsubst %.cpp,$(OBJDIR)/%.o,$(tinyxml)) \
+-			$(patsubst %.c,$(OBJDIR)/%.o,$(hidapi)) \
+ 			$(patsubst %.c,$(OBJDIR)/%.o,$(aes)) \
+ 			$(patsubst %.cpp,$(OBJDIR)/%.o,$(cclasses)) \
+ 			$(patsubst %.cpp,$(OBJDIR)/%.o,$(vclasses)) \
+@@ -111,7 +108,6 @@ $(LIBDIR)/libopenzwave.a:	$(patsubst %.cpp,$(OBJDIR)/%.o,$(tinyxml)) \
+ 	@$(RANLIB) $@
+ 
+ $(LIBDIR)/libopenzwave.so.$(VERSION):	$(patsubst %.cpp,$(OBJDIR)/%.o,$(tinyxml)) \
+-			$(patsubst %.c,$(OBJDIR)/%.o,$(hidapi)) \
+ 			$(patsubst %.c,$(OBJDIR)/%.o,$(aes)) \
+ 			$(patsubst %.cpp,$(OBJDIR)/%.o,$(cclasses)) \
+ 			$(patsubst %.cpp,$(OBJDIR)/%.o,$(vclasses)) \
+Index: cpp/src/Driver.cpp
+===================================================================
+--- cpp/src/Driver.cpp
++++ cpp/src/Driver.cpp
+@@ -36,7 +36,6 @@
+ #include "platform/Event.h"
+ #include "platform/Mutex.h"
+ #include "platform/SerialController.h"
+-#include "platform/HidController.h"
+ #include "platform/Thread.h"
+ #include "platform/Log.h"
+ #include "platform/TimeStamp.h"
+@@ -210,14 +209,7 @@ Driver::Driver
+ 	// Clear the virtual neighbors array
+ 	memset( m_virtualNeighbors, 0, NUM_NODE_BITFIELD_BYTES );
+ 
+-	if( ControllerInterface_Hid == _interface )
+-	{
+-		m_controller = new HidController();
+-	}
+-	else
+-	{
+-		m_controller = new SerialController();
+-	}
++	m_controller = new SerialController();
+ 	m_controller->SetSignalThreshold( 1 );
+ 
+ 	Options::Get()->GetOptionAsBool( "NotifyTransactions", &m_notifytransactions );
+Index: cpp/src/platform/unix/SerialControllerImpl.cpp
+===================================================================
+--- cpp/src/platform/unix/SerialControllerImpl.cpp
++++ cpp/src/platform/unix/SerialControllerImpl.cpp
+@@ -33,10 +33,6 @@
+ #include "SerialControllerImpl.h"
+ #include "platform/Log.h"
+ 
+-#ifdef __linux__
+-#include <libudev.h>
+-#endif
+-
+ using namespace OpenZWave;
+ 
+ //-----------------------------------------------------------------------------
