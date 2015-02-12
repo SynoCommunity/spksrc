@@ -7,8 +7,7 @@
 		"desc": "Saisissez votre mot de passe MySQL",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
-			"desc": "Mot de passe Root",
-			"allowBlank": false
+			"desc": "Mot de passe Root"
 		}]
 	}, {
 		"type": "textfield",

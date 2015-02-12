@@ -7,8 +7,7 @@
 		"desc": "Enter your MySQL password",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
-			"desc": "Root password",
-			"allowBlank": false
+			"desc": "Root password"
 		}]
 	}, {
 		"type": "textfield",
