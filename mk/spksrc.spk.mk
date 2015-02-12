@@ -321,14 +321,14 @@ all-archs-latest:
 	@$(MSG) Build all archs with latest DSM per FIRMWARE
 	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
 	do \
-	  make latest-arch-$$arch ; \
+	  $(MAKE) latest-arch-$$arch ; \
 	done
 
 publish-all-archs-latest:
 	@$(MSG) Build all archs with latest DSM per FIRMWARE
 	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
 	do \
-	  make publish-latest-arch-$$arch ; \
+	  $(MAKE) publish-latest-arch-$$arch ; \
 	done
 
 latest-arch-%:
