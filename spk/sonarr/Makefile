@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/sonarr.png
 DSM_UI_DIR = app
 
@@ -20,7 +20,7 @@ DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias. Se p
 ADMIN_PORT = 8989
 RELOAD_UI = yes
 DISPLAY_NAME = Sonarr
-CHANGELOG = "Fixed icon in launch menu"
+CHANGELOG = "Now runs mono in debug mode"
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  =
