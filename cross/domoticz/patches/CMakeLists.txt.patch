@@ -1,8 +1,8 @@
 Index: CMakeLists.txt
 ===================================================================
---- CMakeLists.txt	(revision 2112)
+--- CMakeLists.txt	(revision 2270)
 +++ CMakeLists.txt	(working copy)
-@@ -66,10 +66,10 @@
+@@ -72,10 +72,10 @@
  	#ADD_DEFINITIONS( -Wall -O0 -ggdb )
  	#ADD_DEFINITIONS( -Wfatal-errors -Wformat=2 -Werror=format-security )
  
@@ -17,7 +17,7 @@ Index: CMakeLists.txt
  
      GET_FILENAME_COMPONENT(_name ${_input} NAME)
      SET(_source "${CMAKE_CURRENT_SOURCE_DIR}/${_input}")
-@@ -239,8 +239,6 @@
+@@ -257,8 +257,6 @@
  
  ## Link libraries
  
@@ -26,7 +26,7 @@ Index: CMakeLists.txt
  set(Boost_USE_MULTITHREADED ON)
  unset(Boost_INCLUDE_DIR CACHE)
  unset(Boost_LIBRARY_DIRS CACHE)
-@@ -297,25 +295,6 @@
+@@ -344,25 +342,6 @@
    target_link_libraries(domoticz ${OpenZWave})
    include_directories(${CMAKE_SOURCE_DIR}/hardware/openzwave) 
    add_definitions(-DWITH_OPENZWAVE)
@@ -52,12 +52,12 @@ Index: CMakeLists.txt
  else()
  	MESSAGE(STATUS "==== OpenZWave not found, support disabled!")
  ENDIF(OpenZWave)
-@@ -344,7 +323,7 @@
+@@ -391,7 +370,7 @@
  	message(STATUS "Not building on Raspberry Pi. GPIO support disabled.")
  ENDIF(RaspberryPi)
  
--target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} pthread lua ${CMAKE_DL_LIBS})
-+target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} pthread lua ${CMAKE_DL_LIBS} -lrt)
+-target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} pthread lua mqtt ${CMAKE_DL_LIBS})
++target_link_libraries(domoticz ${Boost_LIBRARIES} ${SQLITE3_LIBRARY} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} pthread lua mqtt ${CMAKE_DL_LIBS} -lrt)
  
  ADD_PRECOMPILED_HEADER(domoticz "main/stdafx.h")
  

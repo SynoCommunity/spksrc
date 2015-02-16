@@ -1,0 +1,12 @@
+Index: main/RFXtrx.h
+===================================================================
+--- main/RFXtrx.h	(revision 2270)
++++ main/RFXtrx.h	(working copy)
+@@ -836,6 +836,7 @@
+ 		BYTE	FINEOFFSETenabled : 1;
+ 		BYTE	RUBICSONenabled : 1;
+ 		BYTE	AEenabled : 1;
++		BYTE	IMAGINTRONIXenabled : 1;
+ 
+ 		//BYTE	msg4;
+ 		BYTE	BLINDST1enabled : 1;
