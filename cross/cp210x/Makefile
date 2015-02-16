@@ -4,7 +4,6 @@ PKG_DIST_SITE = http://www.silabs.com/Support%20Documents/Software
 PKG_DIST_NAME = Linux_3.x.x_VCP_Driver_Source.zip
 PKG_DIST_FILE = cpx210x.zip
 PKG_DIR = cpx210x
-MOD_DIR = /lib/modules
 
 REQ_KERNEL = 1
 
