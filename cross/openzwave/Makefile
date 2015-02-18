@@ -1,12 +1,8 @@
 PKG_NAME = openzwave
-PKG_VERS = $(PKG_SVN_REV)
+PKG_VERS = 1.2.919
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = svn
-PKG_DOWNLOAD_VCS_CLEAN = nope
-PKG_SVN_REV = 1009
-PKG_DIST_NAME = trunk
-PKG_DIST_SITE = http://open-zwave.googlecode.com/svn
-PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://old.openzwave.com/downloads
 PKG_DIR = open-zwave-read-only
 
 HOMEPAGE = http://www.openzwave.com/
@@ -23,7 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPostExtract
 myPostExtract:
-	mv $(WORK_DIR)/$(PKG_NAME)-r$(PKG_SVN_REV) $(WORK_DIR)/$(PKG_DIR)
+	mv $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: myInstall
 myInstall:
