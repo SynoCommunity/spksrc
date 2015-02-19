@@ -1,6 +1,6 @@
 SPK_NAME = sudo
-SPK_VERS = 7.4
-SPK_REV = 2
+SPK_VERS = 1.0
+SPK_REV = 1
 SPK_ICON = src/sudo.png
 
 DEPENDS = cross/$(SPK_NAME)
