@@ -21,9 +21,5 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-POST_STRIP_TARGET = sudo_extra_install
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: sudo_extra_install
-sudo_extra_install:

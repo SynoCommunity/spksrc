@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS_CUT)
 
 DEPENDS = 
 
-HOMEPAGE = http://www.vim.org/
-COMMENT  = Vim is an advanced text editor that seeks to provide the power of the de-facto Unix editor Vi, with a more complete feature set.
+HOMEPAGE = http://www.sudo.ws
+COMMENT  = Sudo allows a system administrator to delegate authority to give certain users (or groups of users) the ability to run some (or all) commands as root or another user while providing an audit trail of the commands and their arguments.
 LICENSE  = Charityware
 
 GNU_CONFIGURE = 1
