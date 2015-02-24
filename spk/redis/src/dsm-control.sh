@@ -9,6 +9,7 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 USER="redis"
 REDIS="${INSTALL_DIR}/bin/redis-server"
+LOG_FILE="${INSTALL_DIR}/var/redis.log"
 PID_FILE="${INSTALL_DIR}/var/redis.pid"
 CFG_FILE="${INSTALL_DIR}/var/redis.conf"
 
