@@ -1,29 +1,19 @@
 PKG_NAME = util-linux-schedutils
-PKG_VERS = 2.20
-PKG_EXT = tar.bz2
+PKG_VERS = 2.26
+PKG_EXT = tar.xz
 PKG_DIST_NAME = util-linux-$(PKG_VERS).$(PKG_EXT)
-#PKG_DIST_SITE = ftp://ftp.kernel.org/pub/linux/utils/util-linux
-PKG_DIST_SITE = http://mirror.be.gbxs.net/pub/linux/utils/util-linux/v$(PKG_VERS)
+PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/util-linux/v$(PKG_VERS)
 PKG_DIR = util-linux-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://kernel.org/~kzak/util-linux/
+HOMEPAGE = https://github.com/karelzak/util-linux
 COMMENT  = Random collection of Linux utilities
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --disable-nls --disable-shared --without-ncurses --disable-use-tty-group
-CONFIGURE_ARGS += --disable-makeinstall-chown --disable-makeinstall-setuid
-
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+CONFIGURE_ARGS  = --without-ncurses --without-python
+CONFIGURE_ARGS += --disable-all-programs --enable-schedutils
 
 include ../../mk/spksrc.cross-cc.mk
-
-myCompile:
-	$(RUN) make -C schedutils
-
-myInstall:
-	$(RUN) make -C schedutils install prefix=$(STAGING_INSTALL_PREFIX)
 
