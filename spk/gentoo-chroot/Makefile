@@ -48,7 +48,7 @@ ifeq ($(strip $(GENTOO_ARCH)),)
 $(error Arch $(ARCH) not supported)
 endif
 
-GENTOO_STAGE3 := $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d')
+GENTOO_STAGE3 := $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d' | awk '{print $$1}')
 GENTOO_STAGE3_URL := http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/$(GENTOO_STAGE3)
 GENTOO_STAGE3_FILE := $(shell basename $(GENTOO_STAGE3))
 
