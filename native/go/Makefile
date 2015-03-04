@@ -1,5 +1,5 @@
 PKG_NAME = go
-PKG_VERS = 1.3.3
+PKG_VERS = 1.4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://storage.googleapis.com/golang
