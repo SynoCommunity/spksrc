@@ -6,12 +6,13 @@ DNAME="GateOne"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+APP_ENV="${INSTALL_DIR}/env"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${INSTALL_DIR}/bin:${APP_ENV}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="gateone"
 GROUP="nobody"
-PYTHON="${INSTALL_DIR}/env/bin/python"
+PYTHON="${APP_ENV}/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -35,10 +36,10 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
+    ${VIRTUALENV} --system-site-packages ${APP_ENV} > /dev/null
 
     # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    ${APP_ENV}/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
 
     # Install GateOne
     ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR} > /dev/null
