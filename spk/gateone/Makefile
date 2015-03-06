@@ -1,6 +1,6 @@
 SPK_NAME = gateone
-SPK_VERS = 1.1
-SPK_REV = 4
+SPK_VERS = 1.2
+SPK_REV = 20150205214929
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ ADMIN_PROTOCOL = https
 ADMIN_PORT = 8271
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
-CHANGELOG = "1. Fix termination of all sessions"
+CHANGELOG = "latest master build (da393e7)"
 
 HOMEPAGE   = http://liftoffsoftware.com/Products/GateOne
 LICENSE    = AGPLv3
@@ -54,6 +54,6 @@ $(STAGING_DIR)/share/requirements.pybundle:
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/liftoff/GateOne.git GateOne
-	cd $(STAGING_DIR)/share/GateOne && git checkout v1.1
+	cd $(STAGING_DIR)/share/GateOne && git checkout -q da393e7
 	patch -p1 -d $(STAGING_DIR)/share < patches/terminal.py.patch
 	rm -fr $(STAGING_DIR)/share/GateOne/.git $(STAGING_DIR)/share/GateOne/.gitignore
