@@ -42,7 +42,7 @@ postinst ()
     ${APP_ENV}/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
 
     # Install GateOne
-    ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR} > /dev/null
+    PYTHONPATH="${APP_ENV}/lib/python2.7/site-packages/:${PYTHONPATH}" ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${APP_ENV} --skip_init_scripts > /dev/null
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
