@@ -37,8 +37,9 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/ssl
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/conf.d
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 644 src/server.conf $(STAGING_DIR)/var/
+	install -m 644 src/90custom.conf $(STAGING_DIR)/var/conf.d/
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
