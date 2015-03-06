@@ -56,4 +56,5 @@ $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/liftoff/GateOne.git GateOne
 	cd $(STAGING_DIR)/share/GateOne && git checkout -q da393e7
+	patch -p1 -d $(STAGING_DIR)/share/GateOne < patches/ssh_connect.py.patch
 	rm -fr $(STAGING_DIR)/share/GateOne/.git $(STAGING_DIR)/share/GateOne/.gitignore
