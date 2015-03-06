@@ -44,6 +44,9 @@ postinst ()
     # Install GateOne
     PYTHONPATH="${APP_ENV}/lib/python2.7/site-packages/:${PYTHONPATH}" ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${APP_ENV} --skip_init_scripts > /dev/null
 
+    # install initial certificats
+    cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
