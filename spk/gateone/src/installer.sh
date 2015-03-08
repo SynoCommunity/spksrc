@@ -41,7 +41,7 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
 
     # Install GateOne
-    PYTHONPATH="${INSTALL_DIR}/env/lib/python2.7/site-packages/:${PYTHONPATH}" ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}/env --skip_init_scripts > /dev/null
+    ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}/env --skip_init_scripts > /dev/null
 
     # install initial certificats
     cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
