@@ -43,7 +43,7 @@ postinst ()
     # Install GateOne
     ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}/env --skip_init_scripts > /dev/null
 
-    # install initial certificats
+    # install initial certificates
     cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
 
     # Correct the files ownership
