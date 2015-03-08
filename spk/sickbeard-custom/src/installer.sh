@@ -22,7 +22,7 @@ FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/mr-orange/Sick-Beard.git} ${wizard_fork_branch:=Pistachitos} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -39,7 +39,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Clone the repository and configure autoProcessTV
-    ${GIT} clone -q -b ${wizard_fork_branch:=Pistachitos} ${wizard_fork_url:=git://github.com/mr-orange/Sick-Beard.git} ${INSTALL_DIR}/var/SickBeard
+    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${INSTALL_DIR}/var/SickBeard
     cp ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickBeard/autoProcessTV
     chmod 600 ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg

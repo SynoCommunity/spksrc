@@ -1,8 +1,8 @@
 [{
-    "step_title": "Choose your fork",
+    "step_title": "Kies de SickBeard fork",
     "items": [{
         "type": "textfield",
-        "desc": "Configure the fork to use",
+        "desc": "Kies de fork van SickBeard die je wilt gebruiken",
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
