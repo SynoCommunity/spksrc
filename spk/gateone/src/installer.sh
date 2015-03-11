@@ -90,7 +90,7 @@ preupgrade ()
     # version 1.2 is not backwards compatible with 1.1
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r -e 's/^([0-9]+)\.[0-9]+-[0-9]+$/\1/'` -lt 2 ] && [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r -e 's/^[0-9]+\.([0-9]+)-[0-9]+$/\1/'` -lt 2 ]; then
         echo "Please uninstall previous version, no update possible" 
-        echo "Remember to save your server.conf file before uninstalling"
+        echo "Remember to save your ${INSTALL_DIR}/var/server.conf file before uninstalling"
         echo "You will need to manually port old configuration settings to the new configuration files in 1.2"
         exit 1
     fi
