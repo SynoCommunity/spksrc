@@ -28,8 +28,8 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
-    # Install the wheelhouse
-    ${INSTALL_DIR}/env/bin/pip install --no-deps -U ${INSTALL_DIR}/wheelhouse/*.whl > /dev/null
+    # Install the wheels/requirements
+    ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -62,6 +62,12 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+    
+     # Revision 6 introduces backward incompatible changes in configuration file
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 6 ]; then
+        echo "Please uninstall previous version, no update possible. Make sure you have a backup of your configuration"
+        exit 1
+    fi
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}

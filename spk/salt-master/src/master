@@ -49,6 +49,7 @@
 # return calls made from minions to the master. If the master seems to be
 # running slowly, increase the number of threads.
 #worker_threads: 5
+worker_threads: 3
 
 # The port used by the communication interface. The ret (return) port is the
 # interface used for the file server, authentication, job returns, etc.
@@ -93,9 +94,6 @@ extension_modules: /share/extensions
 # Set the default outputter used by the salt command. The default is "nested".
 #output: nested
 
-# Return minions that timeout when running commands like test.ping
-#show_timeout: True
-
 # By default, output is colored. To disable colored output, set the color value
 # to False.
 #color: True
@@ -120,29 +118,6 @@ extension_modules: /share/extensions
 
 # Cache minion grains and pillar data in the cachedir.
 #minion_data_cache: True
-
-# Store all returns in the given returner.
-# Setting this option requires that any returner-specific configuration also 
-# be set. See various returners in salt/returners for details on required
-# configuration values. (See also, event_return_queue below.)
-#
-#event_return: mysql
-
-# On busy systems, enabling event_returns can cause a considerable load on
-# the storage system for returners. Events can be queued on the master and
-# stored in a batched fashion using a single transaction for multiple events.
-# By default, events are not queued.
-#event_return_queue: 0
-
-# Only events returns matching tags in a whitelist
-# event_return_whitelist:
-#   - salt/master/a_tag
-#   - salt/master/another_tag
-
-# Store all event returns _except_ the tags in a blacklist
-# event_return_blacklist:
-#   - salt/master/not_this_tag
-#   - salt/master/or_this_one
 
 # Passing very large events can cause the minion to consume large amounts of
 # memory. This value tunes the maximum size of a message allowed onto the
@@ -188,11 +163,11 @@ extension_modules: /share/extensions
 # option, then the master will log a warning message.
 #
 # Include a config file from some other path:
-# include: /etc/salt/extra_config
+#include: /etc/salt/extra_config
 #
 # Include config from several files and directories:
-# include:
-#   - /etc/salt/extra_config
+#include:
+#  - /etc/salt/extra_config
 
 
 #####        Security settings       #####
@@ -207,7 +182,7 @@ extension_modules: /share/extensions
 # public keys from the minions. Note that this is insecure.
 #auto_accept: False
 
-# Time in minutes that a incoming public key with a matching name found in
+# Time in minutes that a incomming public key with a matching name found in
 # pki_dir/minion_autosign/keyid is automatically accepted. Expired autosign keys
 # are removed when the master checks the minion_autosign directory.
 # 0 equals no timeout
@@ -252,11 +227,6 @@ extension_modules: /share/extensions
 #    - '^(?!sudo_).*$'   #  all non sudo users
 #  modules:
 #    - cmd
-
-# Enforce client_acl & client_acl_blacklist when users have sudo
-# access to the salt command. 
-#
-#sudo_acl: False
 
 # The external auth system uses the Salt auth modules to authenticate and
 # validate users to access areas of the Salt system.
@@ -517,11 +487,6 @@ external_auth:
 #  - hiera: /etc/hiera.yaml
 #  - cmd_yaml: cat /etc/salt/yaml
 
-# The ext_pillar_first option allows for external pillar sources to populate
-# before file system pillar. This allows for targeting file system pillar from
-# ext_pillar.
-#ext_pillar_first: False
-
 # The pillar_gitfs_ssl_verify option specifies whether to ignore ssl certificate
 # errors when contacting the pillar gitfs backend. You might want to set this to
 # false if you're using a git backend that uses a self-signed certificate but
@@ -532,7 +497,7 @@ external_auth:
 # The pillar_opts option adds the master configuration file data to a dict in
 # the pillar called "master". This is used to set simple configurations in the
 # master config file that can then be used on minions.
-#pillar_opts: False
+#pillar_opts: True
 
 
 #####          Syndic settings       #####
@@ -643,6 +608,7 @@ external_auth:
 
 # The level of messages to send to the log file.
 # One of 'garbage', 'trace', 'debug', info', 'warning', 'error', 'critical'.
+# If using 'log_granular_levels' this must be set to the highest desired level.
 #log_level_logfile: warning
 
 # The date and time format used in log messages. Allowed date/time formating
@@ -659,7 +625,7 @@ external_auth:
 # example sets the main salt library at the 'warning' level, but sets
 # 'salt.modules' to log at the 'debug' level:
 #   log_granular_levels:
-#     'salt': 'warning',
+#     'salt': 'warning'
 #     'salt.modules': 'debug'
 #
 #log_granular_levels: {}
@@ -694,14 +660,13 @@ external_auth:
 #win_gitrepos:
 #  - 'https://github.com/saltstack/salt-winrepo.git'
 
-#####      Returner settings          ######
-############################################
-# Which returner(s) will be used for minion's result:
-#return: mysql
 
-#####        Halite settings        ######
-##########################################
-halite:
-  port: '8282'
-  tls: False
+#####           Salt API         #####
+######################################
+rest_cherrypy:
+  port: 8282
+  host: 127.0.0.1
+  disable_ssl: true
+  thread_pool: 30
+  socket_queue_size: 10
 

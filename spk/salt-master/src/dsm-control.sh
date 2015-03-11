@@ -10,27 +10,43 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SALT_MASTER="${INSTALL_DIR}/env/bin/salt-master"
-PID_FILE="${INSTALL_DIR}/var/run/salt-master.pid"
+SALT_API="${INSTALL_DIR}/env/bin/salt-api"
+MASTER_PID_FILE="${INSTALL_DIR}/var/run/salt-master.pid"
+API_PID_FILE="${INSTALL_DIR}/var/run/salt-api.pid"
 
 
 start_daemon ()
 {
-    SALT_MASTER_CONFIG=${INSTALL_DIR}/etc/master ${SALT_MASTER} -c ${INSTALL_DIR}/etc -d
+    ${SALT_MASTER} -c ${INSTALL_DIR}/etc -d
+    ${SALT_API} -c ${INSTALL_DIR}/etc -d
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    rm -f ${PID_FILE}
+    kill `cat ${MASTER_PID_FILE}`
+    kill `pidof salt-api`
+    wait_for_status 1 20
+    if [ $? -eq 1 ]; then
+        kill -9 `cat ${MASTER_PID_FILE}`
+        kill -9 `pidof salt-api`
+    fi
+    rm -f ${MASTER_PID_FILE} ${API_PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+    MASTER_RUNNING=0
+    if [ -f ${MASTER_PID_FILE} ] && kill -0 `cat ${MASTER_PID_FILE}` > /dev/null 2>&1; then
+        MASTER_RUNNING=1
+    fi
+    API_RUNNING=0
+    if [ -f ${API_PID_FILE} ] && kill -0 `cat ${API_PID_FILE}` > /dev/null 2>&1; then
+        API_RUNNING=1
+    fi
+    if [ ${MASTER_RUNNING} -eq 1 -o ${API_RUNNING} -eq 1 ]; then
         return
     fi
-    rm -f ${PID_FILE}
+    rm -f ${MASTER_PID_FILE} ${API_PID_FILE}
     return 1
 }
 

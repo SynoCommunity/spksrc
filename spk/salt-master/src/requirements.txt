@@ -1,6 +1,4 @@
-salt==2014.7.0
-halite==0.1.17
-Jinja2==2.7.3
-requests==2.5.0
-Paste==1.7.5.1
-Mako==1.0.0
+salt==2014.7.2
+Jinja2
+requests>=1.0.0
+CherryPy
