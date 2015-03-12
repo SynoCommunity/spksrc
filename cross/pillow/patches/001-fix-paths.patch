@@ -2,7 +2,7 @@
 +++ setup.py	2014-12-09 00:03:22.455360924 +0100
 @@ -92,9 +92,9 @@
  NAME = 'Pillow'
- PILLOW_VERSION = '2.6.1'
+ PILLOW_VERSION = '2.7.0'
  TCL_ROOT = None
 -JPEG_ROOT = None
 +JPEG_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
