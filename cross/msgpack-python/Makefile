@@ -1,5 +1,5 @@
 PKG_NAME = msgpack-python
-PKG_VERS = 0.4.2
+PKG_VERS = 0.4.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/m/$(PKG_NAME)
