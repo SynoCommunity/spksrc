@@ -1,5 +1,5 @@
 PKG_NAME = curl
-PKG_VERS = 7.39.0
+PKG_VERS = 7.41.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://curl.haxx.se/download
