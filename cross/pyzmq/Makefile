@@ -1,5 +1,5 @@
 PKG_NAME = pyzmq
-PKG_VERS = 14.4.1
+PKG_VERS = 14.5.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/p/$(PKG_NAME)
