@@ -1,10 +1,10 @@
---- src/Makefile.in.orig	2012-10-04 12:06:28.000000000 +0200
-+++ src/Makefile.in	2012-10-04 12:07:15.000000000 +0200
-@@ -198,6 +198,7 @@
+--- src/Makefile.in.orig	2014-12-28 19:33:30.000000000 +0100
++++ src/Makefile.in	2015-03-07 18:06:05.053282285 +0100
+@@ -224,6 +224,7 @@
  top_srcdir = @top_srcdir@
  INCLUDES = -I$(top_srcdir)
  CONFIGDIR = @CONFDIR@
 +DESTDIR = $(prefix)/../../../
+ cicapdatadir = @DATADIR@
  cicapmoduledir = @MODSDIR@
  cicapmodule_LTLIBRARIES = squidclamav.la
- squidclamav_la_LIBADD = @MODULES_LIBADD@
