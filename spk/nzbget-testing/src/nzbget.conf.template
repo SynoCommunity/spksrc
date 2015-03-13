@@ -594,9 +594,10 @@ ReloadQueue=yes
 
 # Continue download of partially downloaded files (yes, no).
 #
-# If active the current state is saved after every article download and
-# reloaded after restart. This is about files included in download jobs (usually
-# rar-files), not about download-jobs (nzb-files) itself. Download-jobs are always
+# If active the current state (the info about what articles were already
+# downloaded) is saved every second and is reloaded after restart. This is
+# about files included in download jobs (usually rar-files), not about
+# download-jobs (nzb-files) itself. Download-jobs are always
 # continued regardless of that option.
 #
 # Disabling this option may slighlty reduce disk access and is
@@ -973,21 +974,24 @@ UpdateInterval=200
 # Examples: "1-7", "1-5", "5,6", "1-5, 7".
 #Task1.WeekDays=1-7
 
-# Command to be executed ( PauseDownload, UnpauseDownload, PauseScan, UnpauseScan,
-# DownloadRate, Script, Process, ActivateServer, DeactivateServer, FetchFeed).
+# Command to be executed (PauseDownload, UnpauseDownload, PausePostProcess,
+# UnpausePostProcess, PauseScan, UnpauseScan, DownloadRate, Script, Process,
+# ActivateServer, DeactivateServer, FetchFeed).
 #
 # Possible commands:
-#   PauseDownload    - pause download;
-#   UnpauseDownload  - resume download;
-#   PauseScan        - pause scan of incoming nzb-directory;
-#   UnpauseScan      - resume scan of incoming nzb-directory;
-#   DownloadRate     - set download rate limit;
-#   Script           - execute one or multiple scheduler scripts. The scripts
-#                      must be written specially for NZBGet;
-#   Process          - execute an external (any) program;
-#   ActivateServer   - activate news-server;
-#   DeactivateServer - deactivate news-server;
-#   FetchFeed        - fetch RSS feed.
+#   PauseDownload      - pause download;
+#   UnpauseDownload    - resume download;
+#   PausePostProcess   - pause post-processing;
+#   UnpausePostProcess - resume post-processing;
+#   PauseScan          - pause scan of incoming nzb-directory;
+#   UnpauseScan        - resume scan of incoming nzb-directory;
+#   DownloadRate       - set download rate limit;
+#   Script             - execute one or multiple scheduler scripts. The scripts
+#                        must be written specially for NZBGet;
+#   Process            - execute an external (any) program;
+#   ActivateServer     - activate news-server;
+#   DeactivateServer   - deactivate news-server;
+#   FetchFeed          - fetch RSS feed.
 #
 # On start the program checks all tasks and determines current state
 # for download-pause, scan-pause, download-rate and active servers.
@@ -1129,7 +1133,7 @@ ParQuick=yes
 # best repair performance.
 ParBuffer=16
 
-# Number of threads to use during par-repair (1-99).
+# Number of threads to use during par-repair (0-99).
 #
 # On multi-core CPUs for the best speed set the option to the number of
 # logical cores (physical cores + hyper-threading units). If you want
@@ -1137,7 +1141,10 @@ ParBuffer=16
 # to compensate for wait intervals used for thread synchronization.
 #
 # On single-core CPUs use only one thread.
-ParThreads=1
+#
+# Set to '0' to automatically use all available CPU cores (may not
+# work on old or exotic platforms).
+ParThreads=0
 
 # Files to ignore during par-check.
 #
@@ -1441,7 +1448,10 @@ PostScript=
 #  NZBNP_TOP  	   - flag indicating that the file will be added to the top
 #                    of queue: 0 or 1;
 #  NZBNP_PAUSED	   - flag indicating that the file will be added as
-#                    paused: 0 or 1.
+#                    paused: 0 or 1;
+#  NZBNP_DUPEKEY   - duplicate key of nzb-file;
+#  NZBNP_DUPESCORE - duplicate score of nzb-file;
+#  NZBNP_DUPEMODE  - duplicate mode of nzb-file: SCORE, ALL, FORCE.
 #
 # In addition to these arguments NZBGet passes all nzbget.conf-options 
 # as environment variables. These variables have prefix "NZBOP_" and
@@ -1495,6 +1505,15 @@ PostScript=
 #
 # To change paused-flag (nzb-file will be added in paused state):
 #   echo "[NZB] PAUSED=1";
+#
+# To change duplicate key:
+#   echo "[NZB] DUPEKEY=tv show s01e02";
+#
+# To change duplicate score:
+#   echo "[NZB] DUPESCORE=integer_value";
+#
+# To change duplicate mode:
+#   echo "[NZB] DUPEMODE=(SCORE|ALL|FORCE)";
 #
 # The script can delete processed file, rename it or move somewhere.
 # After the calling of the script the file will be either added to queue
@@ -1631,3 +1650,4 @@ ScriptPauseQueue=no
 # (for dual-mode scripts which act as queue- and post-processing-scripts
 # at the same time).
 EventInterval=0
+

@@ -7,7 +7,7 @@ DNAME="NZBGet Testing"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="nzbget-testing"
 GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/nzbget.conf"
