@@ -40,6 +40,7 @@ octoprint_extra_install: $(STAGING_DIR)/share/OctoPrint
 	install -m 755 -d ${STAGING_DIR}/var/.octoprint
 	install -m 600 src/config.yaml ${STAGING_DIR}/var/.octoprint/config.yaml
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
