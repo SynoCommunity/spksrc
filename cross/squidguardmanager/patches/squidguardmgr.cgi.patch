@@ -1,6 +1,6 @@
---- cgi-bin/squidguardmgr.cgi.old	2013-01-16 14:52:34.878040714 +0100
-+++ cgi-bin/squidguardmgr.cgi	2013-01-16 16:18:42.973068959 +0100
-@@ -14,6 +14,57 @@
+--- cgi-bin/squidguardmgr.cgi.orig	2014-12-05 19:10:41.477258783 +0100
++++ cgi-bin/squidguardmgr.cgi	2014-12-05 19:35:06.081331023 +0100
+@@ -14,6 +14,62 @@
  
  use strict qw{vars subs};
  
@@ -21,6 +21,11 @@
 +	$admin = 1 if (grep {$_ eq $user} @users);
 +  }
 +}
++
++if ( `synoldapclient --get-user $user | grep " administrators@"` ){
++        $admin = 1;
++}
++
 +# if not admin or no user at all...no authentication...so, bye-bye
 +if ($admin == 0) {
 +	print "Content-type: text/html\n\n";
@@ -55,9 +60,20 @@
 +		);
 +$LANG = getpreferedlang(@supported);
 +
- $VERSION     = '1.11',
+ $VERSION     = '1.14',
  $AUTHOR      = 'Gilles DAROLD <gilles AT darold DOT net>';
- $COPYRIGHT   = 'Copyright &copy; 2010-2012 Gilles DAROLD, all rights reserved';
+ $COPYRIGHT   = 'Copyright &copy; 2010-2015 Gilles DAROLD, all rights reserved';
+@@ -24,8 +75,8 @@
+ my $SC_PROGRAM  = 'SquidClamav Manager';
+ 
+ # Default SquidGuard installation path
+-my $DBHOME = "/var/lib/squidguard/db";
+-my $LOGDIR = "/var/log/squidguard";
++my $DBHOME = "/usr/local/squidguard/var/db";
++my $LOGDIR = "/usr/local/squidguard/var/logs";
+ 
+ # Variables that can be overidden into the squidguardmgr.conf file
+ our $DIFF       = '/usr/bin/diff';
 @@ -37,7 +88,6 @@
  our $BLDESC     = 'description.dat';
  our $CONF_FILE  = '/usr/local/squidGuard/squidguard.conf';
@@ -66,4 +82,21 @@
  our $IMG_DIR    = 'images';
  our $CSS_FILE   = 'squidguardmgr.css';
  our $JS_FILE    = 'squidguardmgr.js';
-
+@@ -161,7 +211,7 @@
+ 	if ($VIEW eq 'squid') {
+ 		if ($SQUID_WRAPPER) {
+ 			print "Running: $SQUID_WRAPPER ... \n";
+-			$ERROR = `$SQUID_WRAPPER 2>&1`;
++			$ERROR = `su squid -c $SQUID_WRAPPER 2>&1`;
+ 			&error($ERROR) if ($ERROR);
+ 			print "Ok." if (!$ERROR);
+ 		}
+@@ -276,7 +326,7 @@
+ 
+ if ($ACTION eq 'squid') {
+ 	if ($SQUID_WRAPPER) {
+-		$ERROR = `$SQUID_WRAPPER`;
++		$ERROR = `su squid -c $SQUID_WRAPPER 2>&1`;
+ 	}
+ 	$ACTION = '';
+ }
