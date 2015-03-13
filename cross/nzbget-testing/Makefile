@@ -1,8 +1,8 @@
 PKG_NAME = nzbget-testing
-PKG_VERS = 14.0
+PKG_VERS = 15.0
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 1121
+PKG_SVN_REV = 1196
 PKG_DIST_NAME = trunk
 PKG_DIST_SITE = https://svn.code.sf.net/p/nzbget/code
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
