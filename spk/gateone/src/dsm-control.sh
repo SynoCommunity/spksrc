@@ -9,8 +9,8 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
-GATEONE="${INSTALL_DIR}/gateone/gateone.py"
-CFG_FILE="${INSTALL_DIR}/var/server.conf"
+GATEONE="${INSTALL_DIR}/env/bin/gateone"
+SETTINGS_DIR="${INSTALL_DIR}/var/conf.d"
 PID_FILE="${INSTALL_DIR}/var/gateone.pid"
 USER="gateone"
 
@@ -21,12 +21,12 @@ start_daemon ()
     cp  /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
     chown ${USER} ${INSTALL_DIR}/ssl/*
 
-    su - ${USER} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --pid_file=${PID_FILE} --config=${CFG_FILE} > ${INSTALL_DIR}/var/gateone_startup.log &"
+    su - ${USER} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --settings_dir=${SETTINGS_DIR} > ${INSTALL_DIR}/var/gateone_startup.log &"
 }
 
 stop_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${GATEONE} --kill --config=${CFG_FILE}"
+    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${GATEONE} --kill --settings_dir=${SETTINGS_DIR}"
     wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
 }

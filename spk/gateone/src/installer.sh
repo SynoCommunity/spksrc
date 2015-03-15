@@ -41,7 +41,10 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
 
     # Install GateOne
-    ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR} > /dev/null
+    ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}/env --skip_init_scripts > /dev/null
+
+    # install initial certificates
+    cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -83,6 +86,14 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+    
+    # version 1.2 is not backwards compatible with 1.1
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r -e 's/^([0-9]+)\.[0-9]+-[0-9]+$/\1/'` -lt 2 ] && [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r -e 's/^[0-9]+\.([0-9]+)-[0-9]+$/\1/'` -lt 2 ]; then
+        echo "Please uninstall previous version, no update possible" 
+        echo "Remember to save your ${INSTALL_DIR}/var/server.conf file before uninstalling"
+        echo "You will need to manually port old configuration settings to the new configuration files in 1.2"
+        exit 1
+    fi
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}

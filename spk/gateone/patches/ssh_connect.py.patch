@@ -1,0 +1,25 @@
+From f60bbbb62c74ac6a7f52966466e55062de1d82f3 Mon Sep 17 00:00:00 2001
+From: Pat Sissons <patricksissons@gmail.com>
+Date: Fri, 6 Mar 2015 01:03:32 -0700
+Subject: [PATCH] fixing ssh_connect script execution issue when /bin/sh is
+ symlinked to busybox
+
+---
+ gateone/applications/terminal/plugins/ssh/scripts/ssh_connect.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gateone/applications/terminal/plugins/ssh/scripts/ssh_connect.py b/gateone/applications/terminal/plugins/ssh/scripts/ssh_connect.py
+index 2c5266d..125d2d6 100755
+--- a/gateone/applications/terminal/plugins/ssh/scripts/ssh_connect.py
++++ b/gateone/applications/terminal/plugins/ssh/scripts/ssh_connect.py
+@@ -468,6 +468,7 @@ def openssh_connect(
+     # Execute then immediately quit so we don't use up any more memory than we
+     # need.
+     os.execvpe('/bin/sh', [
++        'sh', # /bin/sh above gets resolved to busybox, so we need to supply the sh applet to ensure -c is handled
+         '-c', script_path, '&&', 'rm', '-f', script_path], env)
+     os._exit(0)
+ 
+-- 
+1.8.3.msysgit.0
+
