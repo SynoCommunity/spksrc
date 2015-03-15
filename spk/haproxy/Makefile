@@ -5,6 +5,7 @@ SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
+WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
@@ -32,7 +33,9 @@ POST_STRIP_TARGET = haproxy_extra_install
 include ../../mk/spksrc.spk.mk
 
 .PHONY: haproxy_extra_install
-haproxy_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+haproxy_extra_install:
+	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
+	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/crt
 	install -m 755 -d $(STAGING_DIR)/app
@@ -55,8 +58,3 @@ haproxy_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ pyextdirect==0.3.1 flask
