@@ -5,6 +5,7 @@ SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/dtach
+WHEELS = certifi backports.ssl-match-hostname tornado
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
@@ -33,7 +34,9 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: gateone_extra_install
-gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)/share/GateOne
+gateone_extra_install: $(STAGING_DIR)/share/GateOne
+	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
+	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/ssl
 	install -m 755 -d $(STAGING_DIR)/var
@@ -46,11 +49,6 @@ gateone_extra_install: $(STAGING_DIR)/share/requirements.pybundle $(STAGING_DIR)
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ "tornado<3" configobj
 
 $(STAGING_DIR)/share/GateOne:
 	install -m 755 -d $(STAGING_DIR)/share

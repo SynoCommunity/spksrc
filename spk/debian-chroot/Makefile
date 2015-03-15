@@ -5,6 +5,7 @@ SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
 DEPENDS  =
+WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
@@ -47,7 +48,9 @@ endif
 include ../../mk/spksrc.spk.mk
 
 .PHONY: debian-chroot_extra_install
-debian-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+debian-chroot_extra_install:
+	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
+	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	debootstrap --foreign --arch $(DEBIAN_ARCH) wheezy $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
 	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default
@@ -74,8 +77,3 @@ debian-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ pyextdirect==0.3.1 flask
