@@ -1,11 +1,11 @@
 PKG_NAME = znc
-PKG_VERS = 1.4
+PKG_VERS = 1.6.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://znc.in/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/c-ares
+DEPENDS = cross/openssl
 
 HOMEPAGE = http://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
@@ -24,5 +24,5 @@ myPostInstall:
 	@chmod +x $(WORK_DIR)/$(PKG_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
-	@PATH=$(WORK_DIR)/$(PKG_DIR) INCLUDES=-I$(STAGING_INSTALL_PREFIX)/include/znc prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(WORK_DIR)/modules/*.cpp
+	@cd $(WORK_DIR)/modules && PATH=$(WORK_DIR)/$(PKG_DIR) INCLUDES=-I$(STAGING_INSTALL_PREFIX)/include/znc prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(WORK_DIR)/modules/*.cpp
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/
