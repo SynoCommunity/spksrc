@@ -1,9 +1,9 @@
 PKG_NAME = git
-PKG_VERS = 1.8.4
+PKG_VERS = 2.3.0
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://git-core.googlecode.com/files
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://www.kernel.org/pub/software/scm/$(PKG_NAME)
 
 DEPENDS = cross/expat cross/zlib cross/openssl cross/curl
 
@@ -14,10 +14,16 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --without-tcltk --without-python ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
 
+PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+
+.PHONY: myPreConfigure
+myPreConfigure:
+	$(RUN) autoconf
 
 .PHONY: myInstall
 myInstall:
