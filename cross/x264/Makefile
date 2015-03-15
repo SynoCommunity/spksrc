@@ -1,10 +1,9 @@
 PKG_NAME = x264
-PKG_VERS = 20130819-2245
+PKG_VERS = 20141218-2245
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.videolan.org/pub/x264/snapshots/
 PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
-
 
 DEPENDS =
 GNU_CONFIGURE = 1
