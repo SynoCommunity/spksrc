@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-testDEPENDS = cross/berkeleydb
+DEPENDS =
 
 HOMEPAGE = http://www.openldap.org
 COMMENT  = OpenLDAP Software is an open source implementation of the Lightweight Directory Access Protocol
