@@ -7,7 +7,7 @@ DNAME="Subliminal"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="subliminal"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SCHEDULER="${INSTALL_DIR}/app/scheduler.py"
@@ -17,7 +17,7 @@ LOG_FILE="${INSTALL_DIR}/var/scheduler.log"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SCHEDULER}"
+    su ${USER} -c "PATH=${PATH} ${PYTHON} ${SCHEDULER}"
 }
 
 stop_daemon ()

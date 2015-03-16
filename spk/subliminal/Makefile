@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS =
 WHEELS = "subliminal==$(SPK_VERS)" pyextdirect configobj flask Werkzeug Jinja2
 WHEELS += beautifulsoup4 guessit enzyme html5lib dogpile.cache dogpile.core babelfish 
-WHEELS += chardet pysrt pyxdg
+WHEELS += chardet pysrt pyxdg itsdangerous
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
