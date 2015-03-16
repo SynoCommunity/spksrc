@@ -1,0 +1,20 @@
+# edit the following lines to use email notifications
+
+# set mailserver
+# set mailserver smtp.gmail.com port 587
+#     username "xxx@gmail.com" password "xxxxx"
+#     using tlsv1
+
+# # Mail format
+# set mail-format {
+#     from: xx@gmail.com
+#     reply-to: xx@gmail.com
+#     subject: $SERVICE $EVENT at $DATE
+#     message: Monit $ACTION $SERVICE at $DATE on $HOST: $DESCRIPTION.
+
+#              Yours sincerely,
+#              Monit
+# }
+# set alert mail@address.com
+
+#end
