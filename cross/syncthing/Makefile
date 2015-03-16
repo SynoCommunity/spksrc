@@ -23,13 +23,13 @@ STATIC_BINARIES = 0
 ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
 SYNCTHING_ARCH = armv5
 endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
 SYNCTHING_ARCH = armv7
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),x86 cedarview bromolow),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
