@@ -14,7 +14,7 @@ LOG_FILE="${INSTALL_DIR}/var/monit.log"
 start_daemon ()
 {
     #run as root with verbose logging
-    PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE}
+    PATH=${PATH} monit -c ${CFG_FILE} -l ${LOG_FILE}
 }
 
 stop_daemon ()
@@ -50,7 +50,7 @@ case $1 in
     reload)
         if daemon_status; then
             echo reloading ${DNAME} config ...
-            PATH=${PATH} monit -c ${CFG_FILE} -vv -l ${LOG_FILE} reload
+            PATH=${PATH} monit -c ${CFG_FILE} -l ${LOG_FILE} reload
         else
             echo ${DNAME} is not running
         fi
