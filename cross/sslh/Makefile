@@ -1,5 +1,5 @@
 PKG_NAME = sslh
-PKG_VERS = v1.16
+PKG_VERS = v1.17
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.rutschle.net/tech
