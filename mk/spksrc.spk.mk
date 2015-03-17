@@ -317,12 +317,7 @@ all-toolchain-%:
 	  $(MAKE) arch-$$arch-$* ; \
 	done
 
-all-archs-latest:
-	@$(MSG) Build all archs with latest DSM per FIRMWARE
-	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
-	do \
-	  $(MAKE) latest-arch-$$arch ; \
-	done
+all-archs-latest: $(addprefix latest-arch-,$(sort $(basename $(SUPPORTED_ARCHS))))
 
 publish-all-archs-latest:
 	@$(MSG) Build all archs with latest DSM per FIRMWARE
