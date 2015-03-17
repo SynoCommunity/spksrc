@@ -7,6 +7,7 @@
 
 #define REQUIRESSL
 
+
 #include <znc/Modules.h>
 #include <znc/User.h>
 #include <znc/IRCNetwork.h>
@@ -14,6 +15,14 @@
 #include <znc/Chan.h>
 #include <znc/FileUtils.h>
 
+#if defined VERSION_MAJOR && defined VERSION_MINOR && VERSION_MAJOR >= 1 && VERSION_MINOR >= 5
+#if defined(__has_include)
+#if __has_include(<regex>)
+#define HAS_REGEX
+#include <regex>
+#endif
+#endif
+#endif
 
 #ifndef PALAVER_VERSION
 	#define PALAVER_VERSION "unknown"
@@ -31,9 +40,41 @@ const char *kPLVIgnoreChannelKey = "IGNORE-CHANNEL";
 const char *kPLVIgnoreNickKey = "IGNORE-NICK";
 
 
+#ifdef HAS_REGEX
+/// Escape all non-alphanumeric characters or special characters in pattern.
+CString re_escape(const CString& sString) {
+	CString sEscaped;
+
+	for (const char& character : sString) {
+		if (isalpha(character) || isdigit(character)) {
+			sEscaped += character;
+		} else if (character == '\x00') {
+			sEscaped += "\\000";
+		} else {
+			sEscaped += "\\";
+			sEscaped += character;
+		}
+	}
+
+	return sEscaped;
+}
+#endif
+
+
+typedef enum {
+	StatusLine = 0,
+	Headers = 1,
+	Body = 2,
+	Closed = 3,
+} EPLVHTTPSocketState;
+
 class PLVHTTPSocket : public CSocket {
+	EPLVHTTPSocketState m_eState;
+
 public:
 	PLVHTTPSocket(CModule *pModule, const CString &sMethod, const CString &sURL, MCString &mcsHeaders, const CString &sContent) : CSocket(pModule) {
+		m_eState = StatusLine;
+
 		unsigned short uPort = 80;
 
 		CString sScheme = sURL.Token(0, false, "://");
@@ -66,6 +107,7 @@ public:
 		DEBUG("Palaver: Connecting to '" << sHostname << "' on port " << uPort << (useSSL ? " with" : " without") << " TLS (" << sMethod << " " << sPath << ")");
 
 		Connect(sHostname, uPort, useSSL);
+		EnableReadLine();
 		Write(sMethod + " " + sPath + " HTTP/1.1\r\n");
 		Write("Host: " + sHostname + "\r\n");
 
@@ -83,6 +125,45 @@ public:
 		}
 
 		Close(Csock::CLT_AFTERWRITE);
+	}
+
+	void ReadLine(const CString& sData) {
+		CString sLine = sData;
+		sLine.TrimRight("\r\n");
+
+		switch (m_eState) {
+			case StatusLine: {
+				CString sStatus = sLine.Token(1);
+				unsigned int uStatus = sStatus.ToUInt();
+
+				if (uStatus < 200 || uStatus > 299) {
+					DEBUG("Palaver: Received HTTP Response code: " << uStatus);
+				}
+
+				m_eState = Headers;
+				break;
+			}
+
+			case Headers: {
+				if (sLine.empty()) {
+					m_eState = Body;
+				}
+
+				break;
+			}
+
+			case Body: {
+				break;
+			}
+
+			case Closed: {
+				 break;
+			 }
+		}
+	}
+
+	void Disconnected() {
+		Close(CSocket::CLT_AFTERWRITE);
 	}
 };
 
@@ -345,17 +426,29 @@ public:
 
 		for (VCString::const_iterator it = m_vMentionKeywords.begin();
 				it != m_vMentionKeywords.end(); ++it) {
-			const CString& sKeyword = *it;
+			CString sKeyword = *it;
 
 			if (sKeyword.Equals("{nick}")) {
-				if (sMessage.find(sNick) != std::string::npos) {
-					bResult = true;
-					break;
-				}
-			} else if (sMessage.find(sKeyword) != std::string::npos) {
+				sKeyword = sNick;
+			}
+
+#ifdef HAS_REGEX
+			std::smatch match;
+			std::regex expression = std::regex("\\b" + re_escape(sKeyword) + "\\b",
+					std::regex_constants::ECMAScript | std::regex_constants::icase);
+
+			std::regex_search(sMessage, match, expression);
+
+			if (!match.empty()) {
 				bResult = true;
 				break;
 			}
+#else
+			if (sMessage.find(sKeyword) != std::string::npos) {
+				bResult = true;
+				break;
+			}
+#endif
 		}
 
 		return bResult;

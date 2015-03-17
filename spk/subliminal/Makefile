@@ -1,10 +1,13 @@
 SPK_NAME = subliminal
-SPK_VERS = 0.6.4
-SPK_REV = 10
+SPK_VERS = 0.7.5
+SPK_REV = 11
 SPK_ICON = src/subliminal.png
 DSM_UI_DIR = app
 
 DEPENDS =
+WHEELS = "subliminal==$(SPK_VERS)" pyextdirect configobj flask Werkzeug Jinja2
+WHEELS += beautifulsoup4 guessit enzyme html5lib dogpile.cache dogpile.core babelfish 
+WHEELS += chardet pysrt pyxdg itsdangerous
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
@@ -12,7 +15,7 @@ DESCRIPTION = Subliminal allows you automatically download best-matching subtitl
 DESCRIPTION_FRE = Subliminal vous permet de télécharger automatiquement les meilleurs sous-titres pour vos films et séries sur votre DiskStation. Ce paquet est nommé d\\\'après Subliminal, la librairie Python utilisée pour rechercher et télécharger les sous-titres.
 RELOAD_UI = yes
 DISPLAY_NAME = Subliminal
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "Update to 0.7.5"
 
 HOMEPAGE   = https://github.com/Diaoul/subliminal
 LICENSE    = LGPL
@@ -32,7 +35,9 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: subliminal_extra_install
-subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+subliminal_extra_install:
+	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
+	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/cache
@@ -58,8 +63,3 @@ subliminal_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle --no-use-wheel $@ subliminal==$(SPK_VERS) pyextdirect==0.3.1 configobj flask

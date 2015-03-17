@@ -8,7 +8,7 @@ DNAME="Subliminal"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="subliminal"
 GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
@@ -31,8 +31,8 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
-    # Install the bundle
-    ${INSTALL_DIR}/env/bin/pip install --no-index -U ${INSTALL_DIR}/share/requirements.pybundle > /dev/null
+    # Install the wheels/requirements
+    ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Setup the database
     ${INSTALL_DIR}/env/bin/python ${INSTALL_DIR}/app/setup.py

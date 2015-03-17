@@ -1,32 +1,25 @@
 #!/bin/sh
 
 # Package
-PACKAGE="gateone"
-DNAME="GateOne"
-
-# Others
+PACKAGE="monit"
+DNAME="Monit"
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-PYTHON="${INSTALL_DIR}/env/bin/python"
-GATEONE="${INSTALL_DIR}/env/bin/gateone"
-SETTINGS_DIR="${INSTALL_DIR}/var/conf.d"
-PID_FILE="${INSTALL_DIR}/var/gateone.pid"
-USER="gateone"
 
+PATH="${INSTALL_DIR}/bin:${PATH}"
+
+CFG_FILE="${INSTALL_DIR}/var/monitrc"
+PID_FILE="${INSTALL_DIR}/var/monit.pid"
+LOG_FILE="${INSTALL_DIR}/var/monit.log"
 
 start_daemon ()
 {
-    # Copy certificate
-    cp  /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
-    chown ${USER} ${INSTALL_DIR}/ssl/*
-
-    su - ${USER} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --settings_dir=${SETTINGS_DIR} > ${INSTALL_DIR}/var/gateone_startup.log &"
+    #run as root with verbose logging
+    PATH=${PATH} monit -c ${CFG_FILE} -l ${LOG_FILE}
 }
 
 stop_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${GATEONE} --kill --settings_dir=${SETTINGS_DIR}"
+    kill `cat ${PID_FILE}`
     wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
 }
@@ -54,6 +47,14 @@ wait_for_status ()
 
 
 case $1 in
+    reload)
+        if daemon_status; then
+            echo reloading ${DNAME} config ...
+            PATH=${PATH} monit -c ${CFG_FILE} -l ${LOG_FILE} reload
+        else
+            echo ${DNAME} is not running
+        fi
+        ;;
     start)
         if daemon_status; then
             echo ${DNAME} is already running

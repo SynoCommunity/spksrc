@@ -1,6 +1,6 @@
 SPK_NAME = znc
-SPK_VERS = 1.4
-SPK_REV = 10
+SPK_VERS = 1.6.0
+SPK_REV = 11
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,8 @@ DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy p
 ADMIN_PORT = 8250
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "Add 'privmsg' and 'palaver' modules"
+CHANGELOG = "1. Update to ZNC 1.6.0<br>2. Update modules<br>3. Add playback module"
+BETA = 1
 
 HOMEPAGE = http://wiki.znc.in/
 LICENSE  =

@@ -147,6 +147,10 @@ class CPushMod : public CModule
 			defaults["nick_blacklist"] = "";
 			defaults["replied"] = "yes";
 
+			// Proxy, for libcurl
+			defaults["proxy"] = "";
+			defaults["proxy_ssl_verify"] = "yes";
+
 			// Advanced
 			defaults["channel_conditions"] = "all";
 			defaults["query_conditions"] = "all";
@@ -250,6 +254,7 @@ class CPushMod : public CModule
 			replace["{username}"] = options["username"];
 			replace["{secret}"] = options["secret"];
 			replace["{network}"] = GetNetwork()->GetName();
+			replace["{target}"] = options["target"];
 
 			CString message_uri = expand(options["message_uri"], replace);
 			CString message_title = expand(options["message_title"], replace);
@@ -284,8 +289,14 @@ class CPushMod : public CModule
 				{
 					params["device_iden"] = options["target"];
 				}
-
-				params["type"] = "note";
+				
+				if (message_uri == "")
+				{
+					params["type"] = "note";
+				} else {
+					params["type"] = "link";
+					params["url"] = message_uri;
+				}					
 				params["title"] = message_title;
 				params["body"] = message_content;
 			}
@@ -457,6 +468,34 @@ class CPushMod : public CModule
 					params["notification[run_command]"] = options["message_uri"];
 				}
 			}
+			else if (service == "nexmo")
+			{
+			  if (options["username"] == "")
+			  {
+			    PutModule("Error: username (api key) not set");
+			    return;
+			  }
+			  if (options["secret"] == "")
+			  {
+			    PutModule("Error: secret (api secret) not set");
+			    return;
+			  }
+			  if (options["target"] == "")
+			  {
+			    PutModule("Error: destination mobile number (in international format) not set");
+			    return;
+			  }
+			  
+			  service_host = "rest.nexmo.com";
+			  service_url = "/sms/json";
+			  
+			  params["api_secret"] = options["secret"];
+			  params["api_key"] = options["username"];
+			  params["from"] = message_title;
+			  params["to"] = options["target"];
+			  params["text"] = message_content;
+			  
+			}
 			else if (service == "url")
 			{
 				if (options["message_uri"] == "")
@@ -540,10 +579,44 @@ class CPushMod : public CModule
 				}
 
 				service_host = "api.airgramapp.com";
-				service_url = "/1/send_as_guest";
+
+				if (options["username"] != "" && options["secret"] != "")
+				{
+					service_url = "/1/send";
+					service_auth = options["username"] + CString(":") + options["secret"];
+				}
+				else
+				{
+					service_url = "/1/send_as_guest";
+				}
 
 				params["email"] = options["target"];
 				params["msg"] = message_content;
+			}
+			else if (service == "slack")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret (from webhook, e.g. T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX) not set");
+					return;
+				}
+				if (options["target"] == "")
+				{
+					PutModule("Error: target (channel or username) not set");
+					return;
+				}
+
+				service_host = "hooks.slack.com";
+				service_url = "/services/" + options["secret"];
+
+				if (options["username"] != "")
+				{
+					params["username"] = options["username"];
+				}
+
+				params["payload"] = expand("{\"channel\": \"{target}\", \"text\": \"*{title}*: {message}\"}", replace);
+
+				PutDebug("payload: " + params["payload"]);
 			}
 			else
 			{
@@ -561,7 +634,9 @@ class CPushMod : public CModule
 
 #ifdef USE_CURL
             PutDebug("using libcurl");
-			make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
+      params["proxy"] = options["proxy"];
+			params["proxy_ssl_verify"] = options["proxy_ssl_verify"];
+      make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
 #else
             PutDebug("NOT using libcurl");
 			// Create the socket connection, write to it, and add it to the queue
@@ -1195,6 +1270,14 @@ class CPushMod : public CModule
 						{
 							PutModule("Note: Faast requires setting the secret to your apikey");
 						}
+						else if (value == "nexmo")
+						{
+							PutModule("Note: Nexmo requires setting the 'username' (to api key), 'secret' (to api secret), 'message_title' (to sender number in international format), and 'target' (to destination number in international format) options");
+						}
+						else if (value == "slack")
+						{
+							PutModule("Note: Slack requires setting 'secret' (from webhook) and 'target' (channel or username), optional 'username' (bot name)");
+						}
 						else
 						{
 							PutModule("Error: unknown service name");
@@ -1503,11 +1586,27 @@ class CPushMod : public CModule
 
 					params["email"] = options["username"];
 				}
+				else if (service == "airgram")
+				{
+					if (options["username"] == "" || options["secret"] == "" || options["target"] == "")
+					{
+						PutModule("Error: target, username, and secret must be set");
+						return;
+					}
+
+					service_host = "api.airgramapp.com";
+					service_url = "/1/subscribe";
+					service_auth = options["username"] + CString(":") + options["secret"];
+					params["email"] = options["target"];
+				}
 				else
 				{
 					PutModule("Error: service does not support subscribe command");
 					return;
 				}
+
+				params["proxy"] = options["proxy"];
+				params["proxy_ssl_verify"] = options["proxy_ssl_verify"];
 
 #ifdef USE_CURL
 				make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
@@ -1633,6 +1732,14 @@ CURLcode make_curl_request(const CString& service_host, const CString& service_u
 		curl_easy_setopt(curl, CURLOPT_POST, 1);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, query.data());
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query.length());
+	}
+
+	if (params["proxy"] != "") {
+		curl_easy_setopt(curl, CURLOPT_PROXY, params["proxy"].c_str());
+
+		if (params["proxy_ssl_verify"] == "no") {
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		}
 	}
 
 	result = curl_easy_perform(curl);
