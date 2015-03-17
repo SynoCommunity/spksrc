@@ -1,0 +1,22 @@
+--- src/Makefile.am.orig	2015-02-01 23:36:50.068449035 +0100
++++ src/Makefile.am	2015-02-01 23:37:18.196661181 +0100
+@@ -990,7 +990,7 @@
+ 	true
+ 
+ cf_parser.cci: cf.data cf_gen$(EXEEXT)
+-	./cf_gen$(EXEEXT) cf.data $(srcdir)/cf.data.depend
++	../cf_gen$(EXEEXT) cf.data $(srcdir)/cf.data.depend
+ 
+ # The cf_gen_defines.cci is auto-generated and does not exist when the 
+ # dependencies computed. We need to add its include files (autoconf.h) here
+--- src/Makefile.in.orig	2015-02-01 23:46:02.145959192 +0100
++++ src/Makefile.in	2015-02-01 23:46:48.690371437 +0100
+@@ -7749,7 +7749,7 @@
+ 	true
+ 
+ cf_parser.cci: cf.data cf_gen$(EXEEXT)
+-	./cf_gen$(EXEEXT) cf.data $(srcdir)/cf.data.depend
++	../cf_gen$(EXEEXT) cf.data $(srcdir)/cf.data.depend
+ 
+ # The cf_gen_defines.cci is auto-generated and does not exist when the 
+ # dependencies computed. We need to add its include files (autoconf.h) here
