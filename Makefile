@@ -10,7 +10,7 @@ clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean
 
 dist-clean: clean
-dist-clena: toolchain-clean
+dist-clean: toolchain-clean
 
 native-clean:
 	@for native in $(dir $(wildcard native/*/Makefile)) ; \
