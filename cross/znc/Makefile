@@ -2,7 +2,7 @@ PKG_NAME = znc
 PKG_VERS = 1.6.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://znc.in/releases
+PKG_DIST_SITE = http://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl
