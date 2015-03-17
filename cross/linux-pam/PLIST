@@ -61,11 +61,3 @@ bin:sbin/pam_tally2
 bin:sbin/pam_timestamp_check
 bin:sbin/unix_chkpwd
 bin:sbin/unix_update
-rsc:share/locale/de/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/en_GB/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/es/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/fr/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/it/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/nl/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/pt_BR/LC_MESSAGES/Linux-PAM.mo
-rsc:share/locale/pt/LC_MESSAGES/Linux-PAM.mo
