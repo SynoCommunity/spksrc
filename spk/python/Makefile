@@ -1,7 +1,7 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
-SPK_VERS =$(SPK_SHORT_VERS).8
-SPK_REV = 11
+SPK_VERS =$(SPK_SHORT_VERS).9
+SPK_REV = 12
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DEPENDS += cross/bcrypt cross/pyopenssl cross/pycrypto cross/m2crypto
 DEPENDS += cross/pycurl cross/pillow cross/cheetah cross/yenc cross/pyzmq
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
-DEPENDS += cross/pyyaml cross/msgpack-python
+DEPENDS += cross/pyyaml cross/msgpack-python cross/uwsgi
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -19,7 +19,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules<br>2. Replace PIL with Pillow<br>3. Add M2Crypto, pyzmq, PyYAML and msgpack-python"
+CHANGELOG = "1. Update modules<br>2. Add uWSGI module"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =

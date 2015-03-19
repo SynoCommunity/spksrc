@@ -1,5 +1,5 @@
 PKG_NAME = python
-PKG_VERS = 2.7.8
+PKG_VERS = 2.7.9
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
@@ -20,12 +20,11 @@ POST_INSTALL_TARGET = myPostInstall
 include ../../mk/spksrc.native-cc.mk
 
 PYTHON = $(WORK_DIR)/install/usr/local/bin/python
-EASY_INSTALL = $(WORK_DIR)/install/usr/local/bin/easy_install
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 
 .PHONY: myPostInstall
 myPostInstall:
 	@$(MSG) Installing setuptools, pip and cffi
 	@$(RUN) wget https://bootstrap.pypa.io/ez_setup.py -O - | $(PYTHON)
-	@$(EASY_INSTALL) "pip==1.5.6"
-	@$(PIP) install "cffi==0.8.6"
+	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
+	@$(PIP) install "cffi==0.9.1"
