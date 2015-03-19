@@ -20,8 +20,10 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myPreConfigure
 myPreConfigure:
 	$(RUN) autoconf
+	$(RUN) aclocal
+	$(RUN) automake
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR) prefix=$(STAGING_INSTALL_PREFIX)
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
 
