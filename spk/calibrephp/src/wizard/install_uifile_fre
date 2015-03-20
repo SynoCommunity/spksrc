@@ -1,0 +1,6 @@
+[{
+    "step_title": "Attention !",
+    "items": [{
+        "desc": "Afin que CalibrePHP fonctionne, vous devez ajouter votre répertoire d'ebooks à l'open_basedir. Pour ce faire, allez dans Panneau de configuration > Services Web > Paramètres PHP."
+    }]
+}]
