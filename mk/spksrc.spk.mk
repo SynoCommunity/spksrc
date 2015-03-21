@@ -310,12 +310,8 @@ all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
 .PHONY: publish-all-archs
 publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
 
-all-toolchain-%:
-	@$(MSG) Building package for all archs with toolchain version $*
-	@for arch in $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))) ; \
-	do \
-	  $(MAKE) arch-$$arch-$* ; \
-	done
+all-toolchain-%: $(addprefix arch-,$(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))))
+	@$(MSG) Built packages for toolchain $*
 
 all-archs-latest: $(addprefix latest-arch-,$(sort $(basename $(SUPPORTED_ARCHS))))
 
