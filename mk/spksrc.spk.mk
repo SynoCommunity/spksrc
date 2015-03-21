@@ -42,7 +42,7 @@ $(WORK_DIR)/package.tgz: strip
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
-$(WORK_DIR)/INFO: Makefile $(SPK_ICON)
+$(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
@@ -163,13 +163,13 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@$(dsm_license_copy)
 
 # Package Icons
-$(WORK_DIR)/PACKAGE_ICON.PNG:
+$(WORK_DIR)/PACKAGE_ICON.PNG: $(SPK_ICON)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
 	@[ -f $@ ] && rm $@ || true
 	(convert $(SPK_ICON) -thumbnail 72x72 - >> $@)
 
-$(WORK_DIR)/PACKAGE_ICON_120.PNG:
+$(WORK_DIR)/PACKAGE_ICON_120.PNG: $(SPK_ICON)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON_120.PNG for $(SPK_NAME)"
 	@[ -f $@ ] && rm $@ || true
