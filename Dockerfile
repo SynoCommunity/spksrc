@@ -32,10 +32,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install setuptools, pip, virtualenv and httpie
+# Install setuptools, pip, virtualenv, wheel and httpie
 RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python
-RUN pip install virtualenv httpie
+RUN pip install virtualenv wheel httpie
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
