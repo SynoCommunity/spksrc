@@ -17,6 +17,20 @@ SPK_NAME_ARCH = noarch
 SPK_TCVERS = all
 endif
 
+# Check if package supports ARCH
+ifneq ($(UNSUPPORTED_ARCH),)
+  ifeq ($(UNSUPPORTED_ARCH),$(ARCH))
+    @$(error Stop: ARCH $(ARCH) is not a supported architecture )
+  endif
+endif
+
+# Check minimum DSM requirements of package
+ifneq ($(REQUIRED_DSM),)
+  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
+    @$(error Stop: Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
+  endif
+endif
+
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
 
 #####
@@ -265,16 +279,7 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
-# Compare optional Makefile REQUIRED_DSM to provided TCVERSION. If REQ_DSM is lower than TCVERSION, exit
-checkversion:
-ifneq ($(REQUIRED_DSM),)
-  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
-	$(error Stop: Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
-	@exit 1
-  endif
-endif
-
-package: checkversion $(SPK_FILE_NAME)
+package: $(SPK_FILE_NAME) 
 
 ### Publish rules
 publish: package
@@ -296,6 +301,9 @@ all: package
 
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 SUPPORTED_ARCHS = $(notdir $(subst syno-,/,$(SUPPORTED_TCS)))
+ARCHS_NO_KRNLSUPP = $(filter-out x64%, $(SUPPORTED_ARCHS))
+#FIXME Does not account for `override SPK_ARCH`
+ARCHS_DUPES = $(filter-out x86% bromolow% cedarview% avoton%, $(SUPPORTED_ARCHS))
 
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
@@ -304,8 +312,36 @@ dependency-tree:
 	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
 	done
 
+.PHONY: kernel-required
+kernel-required:
+	@if [ -n "$(REQ_KERNEL)" ]; then \
+	  exit 1 ; \
+	fi
+	@for depend in $(DEPENDS) ; do \
+	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
+	    exit 0 ; \
+	  else \
+	    exit 1 ; \
+	  fi ; \
+	done
+
+arch: $(addprefix arch-,$(SUPPORTED_ARCHS))
+
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
+all-archs:
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  $(MSG) Skipping duplicate arches; \
+	  for arch in $(ARCHS_DUPES) ; \
+	  do \
+	    $(MAKE) arch-$$arch ; \
+	  done \
+	else \
+	  $(MSG) Skipping arches without kernelsupport ; \
+	  for arch in $(ARCHS_NO_KRNLSUPP) ; \
+	  do \
+	    $(MAKE) arch-$$arch ; \
+	  done \
+	fi
 
 .PHONY: publish-all-archs
 publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
@@ -315,15 +351,38 @@ all-toolchain-%: $(addprefix arch-,$(basename $(subst -,.,$(basename $(subst .,,
 
 publish-all-toolchain-%: $(addprefix publish-arch-,$(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))))
 	@$(MSG) Published packages for toolchain $*
-	
-all-archs-latest: $(addprefix latest-arch-,$(sort $(basename $(SUPPORTED_ARCHS))))
+
+all-archs-latest:
+	@$(MSG) Build all archs with latest DSM per FIRMWARE
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  $(MSG) Skipping duplicate arches; \
+	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
+	  do \
+	    $(MAKE) latest-arch-$$arch ; \
+	  done \
+	else \
+	  $(MSG) Skipping arches without kernelsupport ; \
+	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
+	  do \
+	    $(MAKE) latest-arch-$$arch ; \
+	  done \
+	fi
 
 publish-all-archs-latest:
 	@$(MSG) Build all archs with latest DSM per FIRMWARE
-	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
-	do \
-	  $(MAKE) publish-latest-arch-$$arch ; \
-	done
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  $(MSG) Skipping duplicate arches; \
+	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
+	  do \
+	    $(MAKE) publish-latest-arch-$$arch ; \
+	  done \
+	else \
+	  $(MSG) Skipping arches without kernelsupport ; \
+	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
+	  do \
+	    $(MAKE) publish-latest-arch-$$arch ; \
+	  done \
+	fi
 
 latest-arch-%:
 	@$(MSG) Building package for arch $* with latest available toolchain
