@@ -313,6 +313,9 @@ publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
 all-toolchain-%: $(addprefix arch-,$(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))))
 	@$(MSG) Built packages for toolchain $*
 
+publish-all-toolchain-%: $(addprefix publish-arch-,$(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))))
+	@$(MSG) Published packages for toolchain $*
+	
 all-archs-latest: $(addprefix latest-arch-,$(sort $(basename $(SUPPORTED_ARCHS))))
 
 publish-all-archs-latest:
