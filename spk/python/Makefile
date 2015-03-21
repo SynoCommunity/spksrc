@@ -10,7 +10,7 @@ DEPENDS += cross/bcrypt cross/pyopenssl cross/pycrypto cross/m2crypto
 DEPENDS += cross/pycurl cross/pillow cross/cheetah cross/yenc cross/pyzmq
 DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
-DEPENDS += cross/pyyaml cross/msgpack-python cross/uwsgi
+DEPENDS += cross/pyyaml cross/msgpack-python cross/pymongo cross/uwsgi
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -19,7 +19,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update modules<br>2. Add uWSGI module"
+CHANGELOG = "1. Update modules<br>2. Add pymongo and uWSGI modules"
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =
