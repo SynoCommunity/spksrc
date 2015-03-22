@@ -1,6 +1,12 @@
 [{
-    "step_title": "Attention !",
+    "step_title": "Configuration de CalibrePHP",
     "items": [{
-        "desc": "Afin que CalibrePHP fonctionne, vous devez ajouter votre répertoire d'ebooks à l'open_basedir. Pour ce faire, allez dans Panneau de configuration > Services Web > Paramètres PHP."
+        "type": "textfield",
+        "desc": "Répertoire contenant Calibre. Attention : doit se terminer par un / et ne jamais utiliser le répertoire web.",
+        "subitems": [{
+            "key": "wizard_calibre_dir",
+            "defaultValue": "/volume1/calibre/",
+            "desc": "Répertoire contenant Calibre"
+        }]
     }]
 }]

@@ -1,5 +1,5 @@
 SPK_NAME = calibrephp
-SPK_VERS = 0.0.1
+SPK_VERS = 0.0.2
 SPK_REV = 1
 SPK_ICON = src/calibrephp.png
 DSM_UI_DIR = app
@@ -8,6 +8,7 @@ DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Calibre OPDS and HTML PHP Server.
+DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur.
 ADMIN_URL = /calibrephp/
 RELOAD_UI = yes
 DISPLAY_NAME = CalibrePHP

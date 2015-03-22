@@ -1,6 +1,12 @@
 [{
-    "step_title": "Warning!",
+    "step_title": "CalibrePHP configuration",
     "items": [{
-        "desc": "In order for CalibrePHP to work, you have to add the path to your ebooks directory to the open_basedir. To do so, go to Control Panel > Web Services > PHP Settings."
+        "type": "textfield",
+        "desc": "Calibre directory. WARNING: has to end with a / and never use your web directory",
+        "subitems": [{
+            "key": "wizard_calibre_dir",
+            "defaultValue": "/volume1/calibre/",
+            "desc": "Calibre directory"
+        }]
     }]
 }]

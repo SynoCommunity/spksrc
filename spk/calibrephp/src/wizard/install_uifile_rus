@@ -1,6 +1,12 @@
 [{
-    "step_title": "Внимание!",
+    "step_title": "Настройка CalibrePHP",
     "items": [{
-        "desc": "Для того, чтобы CalibrePHP работал, вы должны добавить путь к вашей базе в open_basedir. Чтобы сделать это, зайдите в Панель управления > Веб-службы > Настройки PHP."
+        "type": "textfield",
+        "desc": "ВНИМАНИЕ: адрес должен заканчиваться на /",
+        "subitems": [{
+            "key": "wizard_calibre_dir",
+            "defaultValue": "/volume1/calibre/",
+            "desc": "Директория Calibre"
+        }]
     }]
 }]

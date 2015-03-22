@@ -1,5 +1,5 @@
 PKG_NAME = calibrephp
-PKG_VERS = 0.0.1
+PKG_VERS = 0.0.2
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/demorfi/calibrephp/releases/download/$(PKG_VERS)
