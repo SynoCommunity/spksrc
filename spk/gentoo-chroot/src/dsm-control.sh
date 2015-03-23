@@ -6,7 +6,7 @@ DNAME="Gentoo Chroot"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 CHROOTTARGET=`realpath ${INSTALL_DIR}/var/chroottarget`
 
 start_daemon ()
