@@ -5,6 +5,7 @@ SPK_ICON = src/gentoo.png
 DSM_UI_DIR = app
 
 DEPENDS = 
+WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = "SynoCommunity"
@@ -56,6 +57,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: gentoo-chroot_extra_install
 gentoo-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
+	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	wget -nv -c -O $(WORK_DIR)/$(GENTOO_STAGE3_FILE) $(GENTOO_STAGE3_URL)
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/chroottarget
@@ -87,7 +90,3 @@ gentoo-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
-$(STAGING_DIR)/share/requirements.pybundle:
-	@$(MSG) "Bundling requirements"
-	install -m 755 -d $(STAGING_DIR)/share
-	@cd $(WORK_DIR) && $(PIP) bundle $@ pyextdirect==0.3.1 flask
