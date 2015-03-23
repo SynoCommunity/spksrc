@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS = 
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = "MasterRoot24"
+MAINTAINER = "SynoCommunity"
 DESCRIPTION = "Gentoo is a free operating system based on either Linux or FreeBSD that can be automatically optimized and customized for just about any application or need. Gentoo Chroot allows you to install the Gentoo OS inside your DiskStation, alongside DSM. This package is intended for advanced users only."
 RELOAD_UI = yes
 DISPLAY_NAME = "Gentoo Chroot"
