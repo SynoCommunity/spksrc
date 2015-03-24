@@ -1,12 +1,12 @@
 [{
-    "step_title": "Настройка CalibrePHP",
-    "items": [{
-        "type": "textfield",
-        "desc": "ВНИМАНИЕ: адрес должен заканчиваться на /",
-        "subitems": [{
-            "key": "wizard_calibre_dir",
-            "defaultValue": "/volume1/calibre/",
-            "desc": "Директория Calibre"
-        }]
-    }]
+	"step_title": "Настройка CalibrePHP",
+	"items": [{
+		"type": "textfield",
+		"desc": "ВНИМАНИЕ: адрес должен заканчиваться на /",
+		"subitems": [{
+			"key": "wizard_calibre_dir",
+			"defaultValue": "/volume1/calibre/",
+			"desc": "Директория Calibre"
+		}]
+	}]
 }]

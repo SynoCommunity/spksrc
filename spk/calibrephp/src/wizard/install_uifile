@@ -1,12 +1,12 @@
 [{
-    "step_title": "CalibrePHP configuration",
-    "items": [{
-        "type": "textfield",
-        "desc": "Calibre directory. WARNING: has to end with a / and never use your web directory",
-        "subitems": [{
-            "key": "wizard_calibre_dir",
-            "defaultValue": "/volume1/calibre/",
-            "desc": "Calibre directory"
-        }]
-    }]
+	"step_title": "CalibrePHP configuration",
+	"items": [{
+		"type": "textfield",
+		"desc": "Calibre directory. WARNING: has to end with a / and never use your web directory",
+		"subitems": [{
+			"key": "wizard_calibre_dir",
+			"defaultValue": "/volume1/calibre/",
+			"desc": "Calibre directory"
+		}]
+	}]
 }]

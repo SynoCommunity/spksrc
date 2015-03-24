@@ -1,16 +1,16 @@
 {
-    ".url": {
-        "com.synocommunity.packages.calibrephp": {
-            "type": "url",
-            "title": "CalibrePHP",
-            "desc": "Calibre OPDS and HTML PHP Server",
-            "allUsers": true,
-            "icon": "images/calibrephp-{0}.png",
-            "protocol": "http",
-            "url": "/calibrephp",
-            "port": "80",
-            "allUsers": true,
-            "grantPrivilege": "local"
-        }
-    }
+	".url": {
+		"com.synocommunity.packages.calibrephp": {
+			"type": "url",
+			"title": "CalibrePHP",
+			"desc": "Calibre OPDS and HTML PHP Server",
+			"allUsers": true,
+			"icon": "images/calibrephp-{0}.png",
+			"protocol": "http",
+			"url": "/calibrephp",
+			"port": "80",
+			"allUsers": true,
+			"grantPrivilege": "local"
+		}
+	}
 }
