@@ -16,7 +16,6 @@ CHANGELOG =
 
 HOMEPAGE   = "http://www.gentoo.org/"
 LICENSE    = 
-HELPURL    = 
 HELPURL    = "3rdparty/gentoo-chroot/help/enu/index.html"
 SUPPORTURL = "http://www.gentoo.org/main/en/support.xml"
 
@@ -56,7 +55,7 @@ GENTOO_STAGE3_FILE := $(shell basename $(GENTOO_STAGE3))
 include ../../mk/spksrc.spk.mk
 
 .PHONY: gentoo-chroot_extra_install
-gentoo-chroot_extra_install: $(STAGING_DIR)/share/requirements.pybundle
+gentoo-chroot_extra_install:
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	wget -nv -c -O $(WORK_DIR)/$(GENTOO_STAGE3_FILE) $(GENTOO_STAGE3_URL)
