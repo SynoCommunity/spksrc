@@ -1,9 +1,7 @@
 SPK_NAME = mono
 SPK_VERS = 3.10.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/mono.png
-
-BETA = 1
 
 REQUIRED_DSM = 5.0
 
@@ -15,7 +13,8 @@ DESCRIPTION_FRE = Mono est une plateforme logicielle conçue pour permettre aux 
 DESCRIPTION_SPN = Mono es una plataforma de software diseñada para permitir a los desarrolladores crear fácilmente aplicaciones de plataforma cruzada. Es una implementación de código abierto de Microsoft de. Net Framework basado en los estándares ECMA para C # y el Common Language Runtime. Creemos que al abrazar una exitosa plataforma de software estandarizada, podemos bajar las barreras a la producción de grandes aplicaciones para Linux.
 RELOAD_UI = yes
 DISPLAY_NAME = Mono
-CHANGELOG = "1. Updated to v3.10"
+STARTABLE = no
+CHANGELOG = "No longer in beta"
 
 HOMEPAGE = http://mono-project.com/
 LICENSE  =
@@ -42,12 +41,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: mono_extra_install
 mono_extra_install:
-	install -m 755 -d $(STAGING_DIR)/lib
-	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/lib . | tar -xpkf - -C $(STAGING_DIR)/lib
-	install -m 755 -d $(STAGING_DIR)/etc/mono
-	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/etc/mono . | tar -xpkf - -C $(STAGING_DIR)/etc/mono
-	install -m 755 -d $(STAGING_DIR)/bin
-	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/bin . | tar -xpkf - -C $(STAGING_DIR)/bin
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images

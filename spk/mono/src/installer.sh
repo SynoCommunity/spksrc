@@ -8,6 +8,7 @@ DNAME="Mono"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+USER="${PACKAGE}"
 
 preinst ()
 {
