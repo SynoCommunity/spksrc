@@ -41,6 +41,12 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: mono_extra_install
 mono_extra_install:
+	install -m 755 -d $(STAGING_DIR)/lib
+	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/lib $(STAGING_DIR)/
+	install -m 755 -d $(STAGING_DIR)/etc/mono
+	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/etc/mono $(STAGING_DIR)/etc/
+	install -m 755 -d $(STAGING_DIR)/bin
+	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/bin $(STAGING_DIR)/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images
