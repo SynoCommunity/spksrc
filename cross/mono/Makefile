@@ -25,13 +25,3 @@ MONO_NATIVE_INSTALL = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/instal
 .PHONY: myPreConfigure
 myPreConfigure:
 	$(RUN) autoreconf
-
-.PHONY: myPostInstall
-myPostInstall:
-	install -m 755 -d $(STAGING_DIR)/lib
-	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/lib . | tar -xpkf - -C $(STAGING_DIR)/lib
-	install -m 755 -d $(STAGING_DIR)/etc/mono
-	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/etc/mono . | tar -xpkf - -C $(STAGING_DIR)/etc/mono
-	install -m 755 -d $(STAGING_DIR)/bin
-	tar -cpf - -C $(MONO_NATIVE_INSTALL)/usr/local/bin . | tar -xpkf - -C $(STAGING_DIR)/bin
-
