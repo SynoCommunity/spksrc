@@ -36,8 +36,8 @@ postinst ()
 		fi
 
 		# Set metadata path
-		if [ -f "${wizard_calibre_dir:=../}metadata.db" ]; then
-			sed -i -e "s|../metadata.db|${wizard_calibre_dir:=../}metadata.db|g" ${DB_FILE}
+		if [ -f "${wizard_calibre_dir:=/volume1/calibre/}metadata.db" ]; then
+			sed -i -e "s|../metadata.db|${wizard_calibre_dir:=/volume1/calibre/}metadata.db|g" ${DB_FILE}
 			chmod ga+w ${DB_FILE}
 
 			# Set permissions
