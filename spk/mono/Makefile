@@ -1,6 +1,6 @@
 SPK_NAME = mono
 SPK_VERS = 3.10.0
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/mono.png
 
 REQUIRED_DSM = 5.0
