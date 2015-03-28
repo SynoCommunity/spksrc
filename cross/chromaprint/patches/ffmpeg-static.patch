@@ -1,0 +1,11 @@
+--- examples/CMakeLists.txt.orig	2014-04-24 11:30:30.442190605 +0200
++++ examples/CMakeLists.txt	2014-04-24 11:30:50.338289265 +0200
+@@ -3,7 +3,7 @@
+     set(EXTRA_LIBS ${EXTRA_LIBS} -lz)
+ endif()
+ if(UNIX)
+-    set(EXTRA_LIBS ${EXTRA_LIBS} -lpthread)
++    set(EXTRA_LIBS ${EXTRA_LIBS} -lpthread -ldl -lmp3lame -lx264)
+ endif()
+ 
+ set(CMAKE_REQUIRED_LIBRARIES
