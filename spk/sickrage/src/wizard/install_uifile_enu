@@ -2,11 +2,11 @@
     "step_title": "Choose your fork",
     "items": [{
         "type": "textfield",
-        "desc": "Configure the fork to use",
+        "desc": "Configure the fork to use or skip this to install default sickrage",
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
-            "defaultValue": "git://github.com/cytec/SickRage.git",
+            "defaultValue": "git://github.com/SiCKRAGETV/SickRage.git",
             "validator": {
                 "allowBlank": false
             }

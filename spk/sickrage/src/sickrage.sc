@@ -1,4 +1,4 @@
-[sickbeard-custom]
+[sickrage]
 title="SickRage"
 desc="SickRage"
 port_forward="yes"
