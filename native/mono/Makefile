@@ -12,7 +12,7 @@ COMMENT    = .NET for linux... dude
 LICENSE    =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = 
+CONFIGURE_ARGS = --host=i386-linux-gnu
 
 POST_INSTALL_TARGET = myPostInstall
 
