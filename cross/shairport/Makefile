@@ -3,7 +3,7 @@ PKG_VERS = 1.1.1
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 # TODO switch to https://github.com/mikebrady/shairport-sync
-PKG_DIST_SITE = https://github.com/abrasive/shairport
+PKG_DIST_SITE = https://github.com/abrasive/shairport/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl cross/alsa-lib
