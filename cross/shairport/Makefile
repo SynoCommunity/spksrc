@@ -1,19 +1,18 @@
 PKG_NAME = shairport
 PKG_VERS = 1.1.1
 PKG_EXT = zip
-PKG_DIST_NAME = 1.1.1.zip
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/abrasive/shairport/archive
-PKG_DIR = $(PKG_NAME)-1.1.1
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl cross/alsa-lib
 
 HOMEPAGE = https://github.com/abrasive/shairport
-COMMENT  = Use Synology NAS as an Airplay-Receiver. Requires USB-Soundcard or speakers.
+COMMENT  = Use Synology NAS as an Airplay-Receiver. Requires USB soundcard or speakers.
 LICENSE  =
 
 GNU_CONFIGURE = 1
 
-#ADDITIONAL_LDFLAGS = "-static"
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
