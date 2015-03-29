@@ -3,17 +3,16 @@
 # Package
 PACKAGE="shairport"
 DNAME="ShairPort"
+
 # Others
 SHAIRPORT="${SYNOPKG_PKGDEST}/bin/shairport"
 VAR_DIR="${SYNOPKG_PKGDEST}/var"
 PID_FILE="${VAR_DIR}/${PACKAGE}.pid"
 
-
 start_daemon ()
 {
     # Launch the service in the background.
-	cd ${SYNOPKG_PKGDEST}
-	$SHAIRPORT --daemon --pidfile="$PID_FILE" --log=$SYNOPKG_TEMP_LOGFILE
+    ${SHAIRPORT} --daemon --pidfile="$PID_FILE" --log=${VAR_DIR}/${PACKAGE}.log
     # Wait until the service  is ready (race condition here).
     counter=5
     while [ $counter -gt 0 ]
@@ -26,17 +25,10 @@ start_daemon ()
 
 stop_daemon ()
 {
-    # Kill the servive.
-    kill -9 `cat ${PID_FILE}`
-
-    # Wait until transmission is really dead (may take some time).
-    counter=20
-    while [ $counter -gt 0 ] 
-    do
-        daemon_status || break
-        let counter=counter-1
-        sleep 1
-    done
+    # TODO figure out a cleaner way to stop shairport
+    kill `cat ${PID_FILE}`
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    rm -f ${PID_FILE}
 }
 
 daemon_status ()
@@ -61,7 +53,7 @@ case $1 in
         ;;
     stop)
         if daemon_status
-	then
+    then
             echo Stopping ${DNAME} ...
             stop_daemon
             exit $?
@@ -77,17 +69,13 @@ case $1 in
         ;;
     status)
         if daemon_status
-	then
+        then
             echo ${DNAME} is running
             exit 0
         else
             echo ${DNAME} is not running
             exit 1
         fi
-        ;;
-    log)
-        echo $LOGFILE
-        exit 0
         ;;
     *)
         exit 1

@@ -7,9 +7,8 @@ DNAME="ShairPort"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:${PATH}"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 
 preinst ()
 {
@@ -21,16 +20,14 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # persuade asla to let use use that playback device
+	# TODO maybe add an spk/shairport/src/alsa.conf with the correct configuration, and place that file during installation.
+    # persuade alsa to let use use that playback device
     mv ${INSTALL_DIR}/share/alsa/alsa.conf ${INSTALL_DIR}/share/alsa/alsa.original.bak
     cat ${INSTALL_DIR}/share/alsa/alsa.original.bak | grep -v "defaults.pcm.dmix.rate" > ${INSTALL_DIR}/share/alsa/alsa.conf
     rm ${INSTALL_DIR}/share/alsa/alsa.original.bak 
     echo "defaults.pcm.dmix.rate 44100" >> ${INSTALL_DIR}/share/alsa/alsa.conf
     echo "defaults.pcm.ipc_gid    \"root\"" >> ${INSTALL_DIR}/share/alsa/alsa.conf
 
-    # create some /var directory - just for us...
-    mkdir ${INSTALL_DIR}/var
-    
     exit 0
 }
 
