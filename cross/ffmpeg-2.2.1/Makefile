@@ -11,17 +11,19 @@ HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  =
 
+REQUIRED_DSM = 5.1
+
 # Define SYNCTHING_ARCH as per SyncThing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 MYARCH = armv5
 endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine comcerto2k),$(ARCH))
 MYARCH = armv7
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-MYARCH = 386
+MYARCH = i386
 endif
-ifeq ($(findstring $(ARCH),x86 cedarview bromolow x64),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
 MYARCH = x86_64
 endif
 ifeq ($(MYARCH),)
