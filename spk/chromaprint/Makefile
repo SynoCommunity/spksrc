@@ -10,7 +10,7 @@ STARTABLE = no
 
 BETA = 1
 
-MAINTAINER = cytec
+MAINTAINER = SynoCommunity
 DESCRIPTION = "Chromaprint is the core component of the AcoustID project. It's a client-side library that implements a custom algorithm for extracting fingerprints from any audio source. "
 DISPLAY_NAME = Chromaprint
 
