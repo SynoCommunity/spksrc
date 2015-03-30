@@ -10,7 +10,7 @@ SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 GROUP="users"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
+TARGET_LINK="/usr/bin/fpcalc"
 
 preinst ()
 {
@@ -21,7 +21,9 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-
+    if [ ! -e "$TARGET_LINK" ]; then
+            ln -s ${INSTALL_DIR}/bin/fpcalc ${TARGET_LINK}
+    fi
     exit 0
 }
 
@@ -29,6 +31,8 @@ preuninst ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    rm -f ${TARGET_LINK}
 
     exit 0
 }
