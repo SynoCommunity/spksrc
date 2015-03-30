@@ -10,7 +10,7 @@ SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 GROUP="users"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-TARGET_LINK="/usr/bin/fpcalc"
+TARGET_LINK="/usr/local/bin/fpcalc"
 
 preinst ()
 {
