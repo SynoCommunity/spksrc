@@ -22,7 +22,8 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
     if [ ! -e "$TARGET_LINK" ]; then
-            ln -s ${INSTALL_DIR}/bin/fpcalc ${TARGET_LINK}
+        mkdir -p /usr/local/bin
+        ln -s ${INSTALL_DIR}/bin/fpcalc ${TARGET_LINK}
     fi
     exit 0
 }
@@ -32,8 +33,6 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    rm -f ${TARGET_LINK}
-
     exit 0
 }
 
@@ -41,6 +40,7 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+    rm -f ${TARGET_LINK}
 
     exit 0
 }
