@@ -14,11 +14,8 @@ LICENSE  =
 REQUIRED_DSM = 5.1
 
 # Define SYNCTHING_ARCH as per SyncThing standards
-ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
-MYARCH = armv5
-endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine comcerto2k),$(ARCH))
-MYARCH = armv7
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine comcerto2k 88f6281),$(ARCH))
+MYARCH = arm
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 MYARCH = i386
