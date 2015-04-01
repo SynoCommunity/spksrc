@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
-SPK_VERS = v0.10.5
-SPK_REV = 2
+SPK_VERS = 0.10.30
+SPK_REV = 3
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 BETA = 1
@@ -26,6 +26,10 @@ POST_STRIP_TARGET = syncthing_extra_install
 
 BUSYBOX_CONFIG = usrmng daemon nice
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+
+ifneq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine 88f5281 88f6281 comcerto2k evansport avoton bromolow cedarview x86 x64),$(ARCH))
+$(error Unsupported ARCH $(ARCH))
+endif
 
 include ../../mk/spksrc.spk.mk
 
