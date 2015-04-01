@@ -12,7 +12,7 @@ PID_FILE="${VAR_DIR}/${PACKAGE}.pid"
 start_daemon ()
 {
     # Launch the service in the background.
-    ${SHAIRPORT} --daemon --pidfile="$PID_FILE" --log=${VAR_DIR}/${PACKAGE}.log
+    ${SHAIRPORT}-sync --daemon --port=${PORT}
     # Wait until the service  is ready (race condition here).
     counter=5
     while [ $counter -gt 0 ]
@@ -26,9 +26,7 @@ start_daemon ()
 stop_daemon ()
 {
     # TODO figure out a cleaner way to stop shairport
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    rm -f ${PID_FILE}
+    ${SHAIRPORT}-sync --kill
 }
 
 daemon_status ()
