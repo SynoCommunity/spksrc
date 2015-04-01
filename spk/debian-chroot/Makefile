@@ -1,19 +1,19 @@
 SPK_NAME = debian-chroot
 SPK_VERS = 7.4
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
 DEPENDS  =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
 DESCRIPTION_FRE = Debian est un système d\\\'exploitation \\\(SE\\\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "Fix install issues with Python 2.7.9-13"
 
 HOMEPAGE   = http://www.debian.org/
 LICENSE    =
