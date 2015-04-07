@@ -1,0 +1,9 @@
+--- ImageMagickSharp.dll.config.orig	2015-07-03 09:00:28.490688923 +0200
++++ ImageMagickSharp.dll.config	2015-07-03 08:59:34.798685832 +0200
+@@ -1,5 +1,5 @@
+ <configuration>
+-  <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.Q8.so" os="linux"/>
++  <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.Q16.so" os="linux"/>
+   <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.so" os="freebsd,openbsd,netbsd"/>
+   <dllmap dll="CORE_RL_Wand_.dll" target="./MediaInfo/osx/libmediainfo.dylib" os="osx"/>
+ </configuration>
