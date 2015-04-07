@@ -20,13 +20,8 @@ GOOS = linux
 STATIC_BINARIES = 0
 
 # Define SYNCTHING_ARCH as per SyncThing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine 88f5281 88f6281 comcerto2k),$(ARCH))
 SYNCTHING_ARCH = arm
-ENV += GOARM=5
-endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine comcerto2k),$(ARCH))
-SYNCTHING_ARCH = arm
-ENV += GOARM=7
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
