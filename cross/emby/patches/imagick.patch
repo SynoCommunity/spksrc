@@ -1,0 +1,10 @@
+--- ImageMagickSharp.dll.config.orig	2015-04-07 15:18:59.551139045 +0200
++++ ImageMagickSharp.dll.config	2015-04-07 15:19:08.455299710 +0200
+@@ -1,5 +1,5 @@
+ <configuration>
+-  <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.Q8.so" os="linux"/>
++  <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.Q16.so" os="linux"/>
+   <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.so" os="freebsd,openbsd,netbsd"/>
+   <dllmap dll="CORE_RL_Wand_.dll" target="./MediaInfo/osx/libmediainfo.dylib" os="osx"/>
+ </configuration>
+\ Kein Zeilenumbruch am Dateiende.
