@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.10.5
+PKG_VERS = 0.10.30
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/archive
@@ -20,11 +20,8 @@ GOOS = linux
 STATIC_BINARIES = 0
 
 # Define SYNCTHING_ARCH as per SyncThing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
-SYNCTHING_ARCH = armv5
-endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
-SYNCTHING_ARCH = armv7
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine 88f5281 88f6281 comcerto2k),$(ARCH))
+SYNCTHING_ARCH = arm
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
@@ -44,24 +41,25 @@ ifeq ($(findstring $(SYNCTHING_ARCH),386),$(SYNCTHING_ARCH))
 SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
 endif
 
-ifeq ($(findstring $(SYNCTHING_ARCH),armv7 armv5),$(SYNCTHING_ARCH))
+ifeq ($(findstring $(SYNCTHING_ARCH),arm),$(SYNCTHING_ARCH))
 SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_arm/syncthing
 endif
 
 include ../../mk/spksrc.cross-cc.mk
 
 ENV += GOPATH=$(WORK_DIR)/../../../native/go/work-native/go/
+ENV += CGO_ENABLED=1
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
 CONF_ARGS = -goos=$(GOOS) -goarch=$(SYNCTHING_ARCH) -version=v$(PKG_VERS)
 
 ifeq ($(strip $(STATIC_BINARIES)),1)
-ENV += CGO_ENABLED=1
 CONF_ARGS += -no-upgrade
 endif
 
 myComp:
 	#go is particular about file locations so we have to link it to the native directory to work!
+	rm -rf $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing
 	mkdir -p $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing
 	ln -sf $(WORK_DIR)/$(PKG_DIR) $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing/syncthing
 	$(RUN) go run build.go $(CONF_ARGS)
