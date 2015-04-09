@@ -2,7 +2,7 @@
     "step_title": "Installatie SickRage",
     "items": [{
         "type": "textfield",
-        "desc": "Klik op volgende om SickRage te installeren. (Of vul een alternative URL in.)",
+        "desc": "Klik op volgende om SickRage te installeren. (Of vul een alternatieve URL in.)",
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
