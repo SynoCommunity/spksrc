@@ -1,12 +1,12 @@
 SPK_NAME = gateone
-SPK_VERS = 1.2
-SPK_REV = 20150205214929
+SPK_VERS = 20150311
+SPK_REV = 5
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/dtach
-WHEELS = certifi backports.ssl-match-hostname tornado
-SPK_DEPENDS = "python>2.7.3-3"
+DEPENDS  = cross/busybox cross/dtach cross/$(SPK_NAME)
+WHEELS = certifi backports.ssl-match-hostname tornado html5lib
+SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
@@ -15,7 +15,7 @@ ADMIN_PROTOCOL = https
 ADMIN_PORT = 8271
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
-CHANGELOG = "latest master build (da393e7)"
+CHANGELOG = "Update to revision 2ddbd05"
 
 HOMEPAGE   = http://liftoffsoftware.com/Products/GateOne
 LICENSE    = AGPLv3
@@ -34,7 +34,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: gateone_extra_install
-gateone_extra_install: $(STAGING_DIR)/share/GateOne
+gateone_extra_install:
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
@@ -49,10 +49,3 @@ gateone_extra_install: $(STAGING_DIR)/share/GateOne
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/GateOne:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/liftoff/GateOne.git GateOne
-	cd $(STAGING_DIR)/share/GateOne && git checkout -q da393e7
-	patch -p1 -d $(STAGING_DIR)/share/GateOne < patches/ssh_connect.py.patch
-	rm -fr $(STAGING_DIR)/share/GateOne/.git $(STAGING_DIR)/share/GateOne/.gitignore

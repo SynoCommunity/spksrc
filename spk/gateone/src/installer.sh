@@ -41,7 +41,7 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Install GateOne
-    ${PYTHON} ${INSTALL_DIR}/share/GateOne/setup.py install --prefix=${INSTALL_DIR}/env --skip_init_scripts > /dev/null
+    ${PYTHON} ${INSTALL_DIR}/share/${PACKAGE}/setup.py install --prefix=${INSTALL_DIR}/env --skip_init_scripts > /dev/null
 
     # install initial certificates
     cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
@@ -86,12 +86,10 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
-    
-    # version 1.2 is not backwards compatible with 1.1
-    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r -e 's/^([0-9]+)\.[0-9]+-[0-9]+$/\1/'` -lt 2 ] && [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r -e 's/^[0-9]+\.([0-9]+)-[0-9]+$/\1/'` -lt 2 ]; then
-        echo "Please uninstall previous version, no update possible" 
-        echo "Remember to save your ${INSTALL_DIR}/var/server.conf file before uninstalling"
-        echo "You will need to manually port old configuration settings to the new configuration files in 1.2"
+
+    # Revision 5 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 4 ]; then
+        echo "Please uninstall previous version, no update possible.<br>Remember to save your ${INSTALL_DIR}/var/server.conf file before uninstalling.<br>You will need to manually port old configuration settings to the new configuration files."
         exit 1
     fi
 
