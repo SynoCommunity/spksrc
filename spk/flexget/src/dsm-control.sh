@@ -18,14 +18,12 @@ LOG_FILE="${INSTALL_DIR}/var/flexget.log"
 
 start_daemon ()
 {
-    su -- ${USER} -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} webui -d --port 8290"
+    su ${USER} -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon start -d"
 }
 
 stop_daemon ()
 {
-    kill `grep PID: ${PID_FILE} | cut -d ' ' -f2`
-    wait_for_status 1 20 || kill -9 `grep PID: ${PID_FILE} | cut -d ' ' -f2`
-    rm -f ${PID_FILE}
+    su ${USER} -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon stop"
 }
 
 daemon_status ()
