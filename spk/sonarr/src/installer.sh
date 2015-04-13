@@ -28,23 +28,23 @@ SYNO_GROUP_DESC="SynoCommunity's media related group"
 
 syno_group_create ()
 {
-    # Create sync group (Does nothing when sync group already exists)
+    # Create syno group (Does nothing when group already exists)
     synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
-    # Set description of the sync group
+    # Set description of the syno group
     synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
 
-    # Add user to sync group (Does nothing when user already in the group)
+    # Add user to syno group (Does nothing when user already in the group)
     addgroup ${USER} ${SYNO_GROUP}
 }
 
 syno_group_remove ()
 {
-    # Remove user from sync group
+    # Remove user from syno group
     delgroup ${USER} ${SYNO_GROUP}
 
-    # Check if sync group is empty
+    # Check if syno group is empty
     if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
-        # Remove sync group
+        # Remove syno group
         synogroup --del ${SYNO_GROUP} > /dev/null
     fi
 }
