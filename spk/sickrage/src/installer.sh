@@ -19,6 +19,32 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
+SYNO_GROUP="sc-media"
+SYNO_GROUP_DESC="SynoCommunity's media related group"
+
+syno_group_create ()
+{
+    # Create sync group (Does nothing when sync group already exists)
+    synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
+    # Set description of the sync group
+    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
+
+    # Add user to sync group (Does nothing when user already in the group)
+    addgroup ${USER} ${SYNO_GROUP}
+}
+
+syno_group_remove ()
+{
+    # Remove user from sync group
+    delgroup ${USER} ${SYNO_GROUP}
+
+    # Check if sync group is empty
+    if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
+        # Remove sync group
+        synogroup --del ${SYNO_GROUP} > /dev/null
+    fi
+}
+
 preinst ()
 {
     # Check fork
@@ -47,6 +73,8 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
+    syno_group_create
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
@@ -63,6 +91,8 @@ preuninst ()
 
     # Remove the user if uninstalling
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        synco_group_remove
+
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
@@ -87,6 +117,8 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    syno_group_create
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
