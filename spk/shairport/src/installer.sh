@@ -6,6 +6,7 @@ DNAME="ShairPort"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+VAR_DIR="${INSTALL_DIR}/var"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:${PATH}"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -28,7 +29,13 @@ postinst ()
     echo "defaults.pcm.dmix.rate 44100" >> ${INSTALL_DIR}/share/alsa/alsa.conf
     echo "defaults.pcm.ipc_gid    \"root\"" >> ${INSTALL_DIR}/share/alsa/alsa.conf
 
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
+    mkdir ${VAR_DIR}
+
     exit 0
+
 }
 
 preuninst ()

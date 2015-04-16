@@ -5,35 +5,39 @@ PACKAGE="shairport"
 DNAME="ShairPort"
 
 # Others
-SHAIRPORT="${SYNOPKG_PKGDEST}/bin/shairport"
-VAR_DIR="${SYNOPKG_PKGDEST}/var"
+PORT="4242"
+SHAIRPORT="shairport-sync"
+INSTALL_DIR="/usr/local/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:${PATH}"
+DAEMON="${INSTALL_DIR}/bin/${SHAIRPORT}"
+VAR_DIR="${INSTALL_DIR}/var"
 PID_FILE="${VAR_DIR}/${PACKAGE}.pid"
 
 start_daemon ()
 {
-    # Launch the service in the background.
-    ${SHAIRPORT}-sync --daemon --port=${PORT}
-    # Wait until the service  is ready (race condition here).
-    counter=5
-    while [ $counter -gt 0 ]
-    do
-        daemon_status && break
-        let counter=counter-1
-        sleep 1
-    done
+    start-stop-daemon -S -q -m -b -p ${PID_FILE} -x ${DAEMON} -- --port=${PORT} 2> /dev/null
 }
 
 stop_daemon ()
 {
-    # TODO figure out a cleaner way to stop shairport
-    ${SHAIRPORT}-sync --kill
+    start-stop-daemon -K -q -p ${PID_FILE} -x ${DAEMON}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
-        return 0
-    fi
+    start-stop-daemon -K -q -t -p ${PID_FILE}
+}
+
+wait_for_status ()
+{
+    counter=$2
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && return
+        let counter=counter-1
+        sleep 1
+    done
     return 1
 }
 
