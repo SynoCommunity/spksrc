@@ -5,8 +5,7 @@ SPK_ICON = src/${SPK_NAME}.png
 
 WHEELS = src/requirements.txt
 
-DEPENDS  = cross/python3 cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/pyyaml cross/netifaces #cross-compiled module and wheel
+BUILD_DEPENDS  = cross/python3 cross/setuptools cross/pip cross/wheel cross/pyyaml_whl cross/netifaces cross/pyephem
 
 SPK_DEPENDS = "python3>=3.4.1-3:git"
 

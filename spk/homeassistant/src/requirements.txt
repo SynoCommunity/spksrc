@@ -1,6 +1,6 @@
 # required for Home Assistant core
 requests>=2.0
-#pyyaml>=3.11 is currently included as a module
+pyyaml>=3.11
 
 # optional, needed for specific components
 

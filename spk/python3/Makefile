@@ -1,7 +1,7 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.4
 SPK_VERS = $(SPK_SHORT_VERS).1
-SPK_REV = 4
+SPK_REV = 3
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -9,7 +9,6 @@ DEPENDS += cross/setuptools cross/pip cross/wheel cross/virtualenv cross/six
 DEPENDS += cross/bcrypt cross/pyopenssl cross/pycrypto
 DEPENDS += cross/pycurl cross/sqlalchemy cross/lxml
 DEPENDS += cross/zope.interface cross/markupsafe
-DEPENDS += cross/pyyaml cross/netifaces
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
