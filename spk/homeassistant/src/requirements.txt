@@ -1,6 +1,6 @@
 # required for Home Assistant core
 requests>=2.0
-pyyaml>=3.11
+#pyyaml>=3.11 is currently included as a module
 
 # optional, needed for specific components
 
@@ -8,7 +8,7 @@ pyyaml>=3.11
 zeroconf>=0.16.0
 
 # sun
-pyephem>=3.7
+#pyephem>=3.7 is included as a module
 
 # lights.hue
 phue>=0.8
@@ -17,25 +17,25 @@ phue>=0.8
 pychromecast>=0.5
 
 # keyboard
-pyuserinput>=0.1.9
+# pyuserinput>=0.1.9 is excluded for the moment
 
 # switch.tellstick, sensor.tellstick
-tellcore-py>=1.0.4
+# tellcore-py>=1.0.4 is excluded for the moment
 
 # device_tracker.nmap
-python-libnmap>=0.6.2
+# python-libnmap>=0.6.2 is excluded for the moment
 
 # notify.pushbullet
 pushbullet.py>=0.7.1
 
 # thermostat.nest
-python-nest>=2.1
+# python-nest>=2.1 is excluded for the moment
 
 # z-wave
-pydispatcher>=2.0.5
+# pydispatcher>=2.0.5 is excluded for the moment
 
 # sensor.systemmonitor 
-psutil>=2.2.1
+# psutil>=2.2.1 is excluded for the moment
 
 #pushover notifications
 python-pushover>=0.2

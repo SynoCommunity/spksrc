@@ -11,4 +11,4 @@ HOMEPAGE = https://bitbucket.org/al45tair/netifaces
 COMMENT  = Portable network interface information.
 LICENSE  = MIT
 
-include ../../mk/spksrc.python-wheel.mk
+include ../../mk/spksrc.python-module.mk

@@ -5,9 +5,9 @@ SPK_ICON = src/${SPK_NAME}.png
 
 WHEELS = src/requirements.txt
 
-BUILD_DEPENDS  = cross/python3 cross/setuptools cross/pip cross/wheel cross/pyyaml_whl cross/netifaces cross/pyephem
+BUILD_DEPENDS  = cross/python3 cross/setuptools cross/pip cross/wheel cross/netifaces
 
-SPK_DEPENDS = "python3>=3.4.1-3:git"
+SPK_DEPENDS = "python3>=3.4.1-4:git"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
@@ -51,5 +51,5 @@ homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
 
 $(STAGING_DIR)/share/homeassistant:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/balloob/home-assistant.git homeassistant
+	cd $(STAGING_DIR)/share && git clone --recursive https://github.com/balloob/home-assistant.git homeassistant
 	rm -fr $(STAGING_DIR)/share/homeassistant/.git $(STAGING_DIR)/share/homeassistant/.gitignore

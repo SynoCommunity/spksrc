@@ -7,29 +7,33 @@ DNAME="Home Assistant"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python3"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PYTHONPATH="${INSTALL_DIR}/share/${PACKAGE}"
+PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 PYTHON="${INSTALL_DIR}/env/bin/python3"
-HOMEASSISTANT="${INSTALL_DIR}/share/homeassistant"
-CFG_FILE="${INSTALL_DIR}/share/homeassistant/configuration.yaml"
+CFG_DIR="${INSTALL_DIR}/share/homeassistant/config"
+
+LOG_FILE="${CFG_DIR}/homeassistant.log"
 PID_FILE="${INSTALL_DIR}/var/.config-lock"
-LOG_FILE="${INSTALL_DIR}/var/homeassistant.log"
+
 
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} -m ${HOMEASSISTANT} --open-ui --pid ${PID_FILE}"
+    su - ${USER} -c "PATH=${PATH} PYTHONPATH=${PYTHONPATH} ${PYTHON} -m ${PACKAGE} -c ${CFG_DIR} --open-ui &> /dev/null & echo \$! > ${PID_FILE}"
 }
 
 stop_daemon ()
 {    
-	exit 0
-	;;
+	kill `cat ${PID_FILE}`
+    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    rm -f ${PID_FILE}
+	rm -f ${START_LOG_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `grep PID: ${PID_FILE} | cut -d ' ' -f2` > /dev/null 2>&1; then
+	if [ -f ${PID_FILE} ] && kill -0 `grep PID: ${PID_FILE} | cut -d ' ' -f2` > /dev/null 2>&1; then
         return
     fi
     rm -f ${PID_FILE}
@@ -38,7 +42,7 @@ daemon_status ()
 
 wait_for_status ()
 {
-    counter=$2
+	counter=$2
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
@@ -76,7 +80,8 @@ case $1 in
         fi
         ;;
     log)
-        echo ${LOG_FILE}
+		echo ${LOG_FILE}
+		exit 0
         ;;
     *)
         exit 1
