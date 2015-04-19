@@ -11,33 +11,29 @@ PYTHONPATH="${INSTALL_DIR}/share/${PACKAGE}"
 PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 PYTHON="${INSTALL_DIR}/env/bin/python3"
-CFG_DIR="${INSTALL_DIR}/share/homeassistant/config"
+CONFIG_DIR="${INSTALL_DIR}/var/"
 
-LOG_FILE="${CFG_DIR}/homeassistant.log"
-PID_FILE="${INSTALL_DIR}/var/.config-lock"
+LOG_FILE="${CONFIG_DIR}/home-assistant.log"
+PID_FILE="${CONFIG_DIR}/homeassistant.pid"
 
-
+RUN_CMD="${PYTHON}"
+RUN_ARGS="-m ${PACKAGE} -c ${CONFIG_DIR} --open-ui"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} PYTHONPATH=${PYTHONPATH} ${PYTHON} -m ${PACKAGE} -c ${CFG_DIR} --open-ui &> /dev/null & echo \$! > ${PID_FILE}"
+    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -m -p ${PID_FILE} -x env PYTHONPATH=${PYTHONPATH} ${RUN_CMD} -- ${RUN_ARGS}
 }
 
 stop_daemon ()
-{    
-	kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    rm -f ${PID_FILE}
-	rm -f ${START_LOG_FILE}
+{
+    start-stop-daemon -o -c ${USER} -K -u ${USER} -p ${PID_FILE} -x ${RUN_CMD}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-	if [ -f ${PID_FILE} ] && kill -0 `grep PID: ${PID_FILE} | cut -d ' ' -f2` > /dev/null 2>&1; then
-        return
-    fi
-    rm -f ${PID_FILE}
-    return 1
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    [ $? -eq 0 ] || return 1
 }
 
 wait_for_status ()
