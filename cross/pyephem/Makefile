@@ -11,4 +11,4 @@ HOMEPAGE = http://rhodesmill.org/pyephem/
 COMMENT  = Compute positions of the planets and stars
 LICENSE  = LGPL
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk

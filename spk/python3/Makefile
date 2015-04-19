@@ -9,7 +9,8 @@ DEPENDS += cross/setuptools cross/pip cross/wheel cross/virtualenv cross/six
 DEPENDS += cross/bcrypt cross/pyopenssl cross/pycrypto
 DEPENDS += cross/pycurl cross/sqlalchemy cross/lxml
 DEPENDS += cross/zope.interface cross/markupsafe
-DEPENDS += cross/pyyaml cross/netifaces cross/pyephem
+DEPENDS += cross/pyyaml
+#DEPENDS += cross/netifaces cross/pyephem
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
