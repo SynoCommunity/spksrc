@@ -12,7 +12,7 @@ PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/python3 -m virtualenv"			#was "${PYTHON_DIR}/bin/virtualenv-3.4"
-CONFIG_DIR="${INSTALL_DIR}/var/"
+CONFIG_DIR="${INSTALL_DIR}/etc/"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -77,7 +77,7 @@ preupgrade ()
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${CONFIG_DIR}/configuration.yaml ${TMP_DIR}/${PACKAGE}/configuration.yaml
+    mv ${CONFIG_DIR}/* ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -85,7 +85,7 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    mv ${TMP_DIR}/${PACKAGE}/configuration.yaml ${CONFIG_DIR}/configuration.yaml
+    mv ${TMP_DIR}/${PACKAGE}/* ${CONFIG_DIR}/
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

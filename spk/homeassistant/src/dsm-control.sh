@@ -11,10 +11,12 @@ PYTHONPATH="${INSTALL_DIR}/share/${PACKAGE}"
 PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 PYTHON="${INSTALL_DIR}/env/bin/python3"
-CONFIG_DIR="${INSTALL_DIR}/var/"
 
-LOG_FILE="${CONFIG_DIR}/home-assistant.log"
-PID_FILE="${CONFIG_DIR}/homeassistant.pid"
+CONFIG_DIR="${INSTALL_DIR}/etc/"
+LOG_DIR="${INSTALL_DIR}/var/"
+
+LOG_FILE="${LOG_DIR}/home-assistant.log"
+PID_FILE="${LOG_DIR}/homeassistant.pid"
 
 RUN_CMD="${PYTHON}"
 RUN_ARGS="-m ${PACKAGE} -c ${CONFIG_DIR} --open-ui"
