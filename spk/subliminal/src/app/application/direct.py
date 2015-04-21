@@ -1,9 +1,10 @@
+from babelfish import Language
 from configobj import ConfigObj
+from datetime import timedelta
 from db import *
 from pyextdirect.configuration import (create_configuration, expose, LOAD,
     STORE_READ, STORE_CUD, SUBMIT)
 from validate import Validator
-import datetime
 import os
 import shutil
 import subliminal
@@ -81,19 +82,20 @@ class Subliminal(Base):
 
     @expose(kind=LOAD)
     def load(self):
-        result = {'languages': self.config['General']['languages'], 'services': self.config['General']['services'],
-                  'multi': self.config['General']['multi'], 'max_depth': self.config['General']['max_depth'],
-                  'dsm_notifications': self.config['General']['dsm_notifications'],
+        result = {'languages': self.config['General']['languages'], 'providers': self.config['General']['providers'],
+                  'single': self.config['General']['single'], 'hearing_impaired': self.config['General']['hearing_impaired'],
+                  'min_score': self.config['General']['min_score'], 'dsm_notifications': self.config['General']['dsm_notifications'],
                   'task': self.config['Task']['enable'], 'age': self.config['Task']['age'],
                   'hour': self.config['Task']['hour'], 'minute': self.config['Task']['minute']}
         return result
 
     @expose(kind=SUBMIT)
-    def save(self, languages=None, services=None, multi=None, max_depth=None, dsm_notifications=None, task=None, age=None, hour=None, minute=None):
+    def save(self, languages=None, providers=None, single=None, hearing_impaired=None, min_score=None, dsm_notifications=None, task=None, age=None, hour=None, minute=None):
         self.config['General']['languages'] = languages if isinstance(languages, list) else [languages]
-        self.config['General']['services'] = services if isinstance(services, list) else [services]
-        self.config['General']['multi'] = bool(multi)
-        self.config['General']['max_depth'] = int(max_depth)
+        self.config['General']['providers'] = providers if isinstance(providers, list) else [providers]
+        self.config['General']['single'] = bool(single)
+        self.config['General']['hearing_impaired'] = bool(hearing_impaired)
+        self.config['General']['min_score'] = int(min_score)
         self.config['General']['dsm_notifications'] = bool(dsm_notifications)
         self.config['Task']['enable'] = bool(task)
         self.config['Task']['age'] = int(age)
@@ -107,23 +109,25 @@ class Subliminal(Base):
         paths = [directory.path for directory in self.session.query(Directory).all() if os.path.exists(directory.path)]
         if not paths:
             return
-        scan_filter = lambda x: datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getmtime(x)) > datetime.timedelta(days=self.config['Task']['age'])
-        results = scan(paths, self.config, scan_filter)
+        results = scan(paths, self.config)
         if self.config['General']['dsm_notifications']:
             notify('Downloaded %d subtitle(s) for %d video(s) in all directories' % (sum([len(s) for s in results.itervalues()]), len(results)))
         return results
 
 
-def scan(paths, config, scan_filter=None, temp_cache=False):
-    if temp_cache:
-        cache_dir = tempfile.mkdtemp()
-    else:
-        cache_dir = '/usr/local/subliminal/cache'
-    with subliminal.Pool(2) as p:
-        subtitles = p.download_subtitles(paths, languages=config['General']['languages'], services=config['General']['services'], force=False, multi=config['General']['multi'],
-                                         cache_dir=cache_dir, max_depth=config['General']['max_depth'], scan_filter=scan_filter)
-    if temp_cache:
-        shutil.rmtree(cache_dir)
+def scan(paths, config):
+    subliminal.cache_region.configure('dogpile.cache.dbm', arguments={'filename': '/usr/local/subliminal/cache/cachefile.dbm'})
+    languageset=set(Language(language) for language in config['General']['languages'])
+    single=True
+    if not config.get('General').as_bool('single') or len(languageset) > 1:
+        single=False	     
+    hearing_impaired=None
+    if config.get('General').as_bool('hearing_impaired'):
+        hearing_impaired=True
+    videos = subliminal.scan_videos(paths, subtitles=True, embedded_subtitles=True, age=timedelta(days=config.get('Task').as_int('age')))
+    subtitles = subliminal.api.download_best_subtitles(videos, languages=languageset, providers=config['General']['providers'], provider_configs=None, 
+                                                       single=single, min_score=config.get('General').as_int('min_score'), 
+                                                       hearing_impaired=hearing_impaired)
     return subtitles
 
 def notify(message):
