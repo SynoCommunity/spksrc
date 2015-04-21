@@ -16,7 +16,6 @@ ADMIN_PORT = 8123
 DISPLAY_NAME = Home Assistant
 DSM_UI_DIR = app
 
-
 BETA = 1
 CHANGELOG = "First release"
 
@@ -32,16 +31,13 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = homeassistant_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
-	install -m 600 src/configuration.yaml ${STAGING_DIR}/share/homeassistant/configuration.yaml
+	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

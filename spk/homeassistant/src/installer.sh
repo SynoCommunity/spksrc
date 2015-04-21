@@ -11,8 +11,8 @@ PYTHON_DIR="/usr/local/python3"
 PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 GROUP="users"
-VIRTUALENV="${PYTHON_DIR}/bin/python3 -m virtualenv"			#was "${PYTHON_DIR}/bin/virtualenv-3.4"
-CONFIG_DIR="${INSTALL_DIR}/etc/"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+CONFIG_DIR="${INSTALL_DIR}/etc"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -31,7 +31,8 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the wheels
-    ${INSTALL_DIR}/env/bin/pip3.4 install --use-wheel --no-deps --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
+    # TODO add --no-index when wheels are downloaded as python3 versions
+    ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1 
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
