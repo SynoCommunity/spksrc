@@ -1,5 +1,5 @@
 SPK_NAME = shairport
-SPK_VERS = 2.2.2
+SPK_VERS = 2.2.3
 SPK_REV = 1
 SPK_ICON = src/shairport.png
 
