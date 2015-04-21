@@ -55,7 +55,7 @@ case $1 in
         ;;
     stop)
         if daemon_status
-    then
+        then
             echo Stopping ${DNAME} ...
             stop_daemon
             exit $?
