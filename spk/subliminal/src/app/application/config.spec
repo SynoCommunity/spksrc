@@ -1,8 +1,9 @@
 [General]
 languages = string_list(default=list('eng'))
-services = string_list(default=list('opensubtitles', 'bierdopje', 'thesubdb', 'subswiki', 'subtitulos'))
-multi = boolean(default=False)
-max_depth = integer(1, 8, default=3)
+providers = string_list(default=list('addic7ed', 'opensubtitles', 'podnapisi' 'thesubdb', 'tvsubtitles'))
+single = boolean(default=True)
+hearing_impaired = boolean(default=False)
+min_score = integer(0, 71, default=0)
 dsm_notifications = boolean(default=False)
 
 [Task]

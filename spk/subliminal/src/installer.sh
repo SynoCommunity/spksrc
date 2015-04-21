@@ -70,6 +70,12 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
+    # Revision 12 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 11 ]; then
+        echo "Please uninstall previous version, no update possible.<br>You will need to manually port old configuration settings to the new configuration files."
+        exit 1
+    fi
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
