@@ -30,4 +30,4 @@ include ../../mk/spksrc.spk.mk
 .PHONY: shairport_extra_install
 shairport_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-
+	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
