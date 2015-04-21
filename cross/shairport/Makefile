@@ -26,8 +26,6 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myPostExtract
 myPostExtract:
 	mv $(WORK_DIR)/$(PKG_NAME)-sync-$(PKG_VERS) $(WORK_DIR)/$(PKG_DIR)
-	mv $(WORK_DIR)/$(PKG_DIR)/Makefile.am $(WORK_DIR)/$(PKG_DIR)/Makefile.am.org	
-	head -n 39 $(WORK_DIR)/$(PKG_DIR)/Makefile.am.org > $(WORK_DIR)/$(PKG_DIR)/Makefile.am
 
 .PHONY: myPreConfigure
 myPreConfigure:
