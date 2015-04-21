@@ -8,7 +8,7 @@ DNAME="ShairPort"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 VAR_DIR="${INSTALL_DIR}/var"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin:${PATH}"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 preinst ()
