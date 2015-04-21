@@ -32,8 +32,6 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    mkdir ${VAR_DIR}
-
     exit 0
 
 }

@@ -20,7 +20,14 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
+POST_STRIP_TARGET = shairport_extra_install
+
 BUSYBOX_CONFIG = daemon nice
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: shairport_extra_install
+shairport_extra_install:
+	install -m 755 -d $(STAGING_DIR)/var
+
