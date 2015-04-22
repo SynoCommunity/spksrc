@@ -186,8 +186,6 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    syno_group_create
-
     # Save the configuration file
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}

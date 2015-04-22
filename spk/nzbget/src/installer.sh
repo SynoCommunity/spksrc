@@ -130,8 +130,6 @@ preupgrade ()
         exit 1
     fi
 
-    syno_group_create
-
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}

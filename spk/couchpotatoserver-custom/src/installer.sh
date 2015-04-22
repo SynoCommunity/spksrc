@@ -115,8 +115,6 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    syno_group_create
-
     # Remove auto-updater stuff so it doesn't get confused
     rm -fr ${INSTALL_DIR}/var/cache/updates/
 
