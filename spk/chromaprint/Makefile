@@ -34,12 +34,3 @@ chromaprint_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-	#delete unneeded stuff
-	rm -f $(STAGING_DIR)/bin/ffmpeg
-	rm -f $(STAGING_DIR)/bin/ffprobe
-	rm -f $(STAGING_DIR)/bin/ffserver
-	rm -rf $(STAGING_DIR)/share/
-	rm -f $(STAGING_DIR)/bin/lame
-	rm -f $(STAGING_DIR)/bin/x264
-	rm -rf $(STAGING_DIR)/include
-
