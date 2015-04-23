@@ -11,12 +11,9 @@ HOMEPAGE = https://github.com/mikebrady/shairport-sync
 COMMENT  = Use Synology NAS as an Airplay receiver. Requires USB soundcard or speakers.
 LICENSE  =
 
-FINAL_INSTALL_DIR  = /usr/local/$(PKG_NAME)
-FINAL_VAR_DIR = $(FINAL_INSTALL_DIR)/var
-
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX) --with-alsa --with-ssl=openssl --with-tinysvcmdns --with-piddir=$(FINAL_VAR_DIR)
+CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX) --with-alsa --with-ssl=openssl --with-tinysvcmdns --with-piddir=$(INSTALL_DIR)/var
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
 PRE_CONFIGURE_TARGET = myPreConfigure
