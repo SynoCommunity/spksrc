@@ -31,8 +31,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the wheels
-    # TODO add --no-index when wheels are downloaded as python3 versions
-    ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1 
+    ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}

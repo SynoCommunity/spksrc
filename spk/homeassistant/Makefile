@@ -4,6 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/${SPK_NAME}.png
 
 WHEELS = src/requirements.txt
+PIP = pip3
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/pyephem cross/netifaces

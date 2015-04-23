@@ -14,7 +14,7 @@ MSG = echo "===> "
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Pip command
-PIP = pip
+PIP ?= pip #define PIP in your makefile if you need pip3
 PIP_WHEEL = $(PIP) wheel --no-use-wheel --no-deps --wheel-dir $(STAGING_DIR)/wheelhouse
 
 # Available languages
@@ -33,4 +33,3 @@ LOCAL_CONFIG_MK = ../../local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
 include $(LOCAL_CONFIG_MK)
 endif
-
