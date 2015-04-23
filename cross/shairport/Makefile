@@ -6,6 +6,7 @@ PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
 PKG_DIR = $(PKG_NAME)-sync-$(PKG_VERS)
 
 DEPENDS = cross/libtool cross/popt cross/libdaemon cross/openssl cross/alsa-lib
+
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 COMMENT  = Use Synology NAS as an Airplay receiver. Requires USB soundcard or speakers.
 LICENSE  =
