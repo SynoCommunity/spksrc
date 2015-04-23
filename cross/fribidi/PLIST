@@ -1,0 +1,4 @@
+bin:bin/fribidi
+lnk:lib/libfribidi.so
+lnk:lib/libfribidi.so.0
+lib:lib/libfribidi.so.0.3.6

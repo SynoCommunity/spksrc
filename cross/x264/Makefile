@@ -1,20 +1,45 @@
 PKG_NAME = x264
-PKG_VERS = 20141218-2245
+PKG_VERS = 20160816-2245-stable
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.videolan.org/pub/x264/snapshots/
+PKG_DIST_SITE = https://ftp.videolan.org/pub/videolan/x264/snapshots
 PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
 
 DEPENDS =
-GNU_CONFIGURE = 1
+
 HOMEPAGE = http://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma
-LICENSE  =
+LICENSE  = GPLv2
 
-CONFIGURE_ARGS = --enable-static --disable-asm --prefix=$(INSTALL_PREFIX)
+GNU_CONFIGURE = 1
 
-ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
-ADDITIONAL_CFLAGS = -O0
-endif
+YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
+
+CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross-prefix=$(TC_PATH)$(TC_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
+
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
+ENV += x264_ARCH=ARM
+CONFIGURE_ARGS += --disable-asm
+endif
+
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ENV += x264_ARCH=PPC
+CONFIGURE_ARGS += --disable-asm
+endif
+
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+DEPENDS += native/yasm
+ENV += AS=$(YASM_PATH)/yasm
+ENV += PATH=$(YASM_PATH):$$PATH
+ENV += x264_ARCH=X86_64
+endif
+
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+DEPENDS += native/yasm
+ENV += AS=$(YASM_PATH)/yasm
+ENV += PATH=$(YASM_PATH):$$PATH
+ENV += x264_ARCH=X86
+endif
+

@@ -1,0 +1,6 @@
+bin:bin/opj_compress
+bin:bin/opj_decompress
+bin:bin/opj_dump
+lnk:lib/libopenjp2.so
+lib:lib/libopenjp2.so.2.1.0
+lnk:lib/libopenjp2.so.7
