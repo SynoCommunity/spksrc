@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="shairport"
-DNAME="ShairPort"
+PACKAGE="shairport-sync"
+DNAME="Shairport Sync"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"

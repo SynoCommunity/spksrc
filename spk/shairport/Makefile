@@ -1,14 +1,14 @@
-SPK_NAME = shairport
+SPK_NAME = shairport-sync
 SPK_VERS = 2.2.3
 SPK_REV = 1
-SPK_ICON = src/shairport.png
+SPK_ICON = src/airplay.png
 
 DEPENDS =  cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Use Synology NAS as an AirPlay receiver. Requires USB soundcard or speakers.
 RELOAD_UI = no
-DISPLAY_NAME = ShairPort
+DISPLAY_NAME = Shairport Sync
 BETA = 1
 CHANGELOG = "Initial SynoCommunity Release"
 

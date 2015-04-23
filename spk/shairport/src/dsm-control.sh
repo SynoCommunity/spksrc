@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="shairport"
-DNAME="ShairPort"
+PACKAGE="shairport-sync"
+DNAME="Shairport Sync"
 
 # Others
 PORT="4242"
