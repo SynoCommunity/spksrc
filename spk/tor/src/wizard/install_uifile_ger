@@ -1,0 +1,36 @@
+[
+    {
+        "step_title":"TOR Relay Typ",
+        "items":[
+            {
+                "type":"singleselect",
+                "desc":"Bitte wähle deinen bevorzugten TOR Relay Typ",
+                "subitems":[
+                    {
+                        "key":"TOR_NONEXIT",
+                        "desc":"Non-exit (TOR als Non-exit Relay betreiben)",
+                        "defaultValue":false
+                    },
+                    {
+                        "key":"TOR_EXIT",
+                        "desc":"Exit (TOR als Exit Relay betreiben)",
+                        "defaultValue":false
+                    },
+                    {
+                        "key":"TOR_BRIDGE",
+                        "desc":"Bridge (TOR als anonyme Brdige/Proxy betreiben)",
+                        "defaultValue":true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "step_title": "TOR Installations Hinweis",
+        "items": [
+            {
+                "desc": "TOR wird mit einigen standart Einstellungen, abhängig von deiner vorherigen Auswahl, installiert. Bitte überprüfe und ändere gegebenenfalls die Konfigurationsdatei /usr/local/tor/var/torrc nach deinen Bedürfnissen!"
+            }
+        ]
+    }
+]

@@ -15,6 +15,8 @@ BETA = 1
 HOMEPAGE   = https://www.torproject.org
 LICENSE    = 
 
+WIZARDS_DIR = src/wizard/
+
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
@@ -32,4 +34,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: tor_extra_install
 tor_extra_install: 
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 600 src/torrc $(STAGING_DIR)/var/torrc
+	install -m 600 src/torrc.bridge $(STAGING_DIR)/var/torrc.bridge
+	install -m 600 src/torrc.noexit $(STAGING_DIR)/var/torrc.noexit
+	install -m 600 src/torrc.exit $(STAGING_DIR)/var/torrc.exit

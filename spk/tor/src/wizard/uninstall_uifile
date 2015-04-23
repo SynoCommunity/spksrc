@@ -1,0 +1,11 @@
+[
+    {
+        "step_title": "TOR Uninstallation Note",
+        "items": [
+            {
+                "desc": "If you like to backup your configuration and ID, please backup /usr/local/tor/var BEFORE you uninstall this package!"
+            }
+        ]
+    }
+]
+

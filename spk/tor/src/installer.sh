@@ -28,6 +28,15 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
+    #rename configuration depending on install mode
+    if $TOR_EXIT == true ; then
+        mv ${INSTALL_DIR}/var/torrc.exit ${INSTALL_DIR}/var/torrc
+    elif $TOR_NONEXIT == true ; then
+        mv ${INSTALL_DIR}/var/torrc.noexit ${INSTALL_DIR}/var/torrc
+    else
+        mv ${INSTALL_DIR}/var/torrc.bridge ${INSTALL_DIR}/var/torrc
+    fi
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
