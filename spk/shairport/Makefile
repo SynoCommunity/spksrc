@@ -11,7 +11,7 @@ RELOAD_UI = no
 DISPLAY_NAME = ShairPort
 CHANGELOG = "Initial SynoCommunity Release"
 
-HOMEPAGE = https://github.com/abrasive/shairport
+HOMEPAGE = https://github.com/mikebrady/shairport-sync
 LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh
