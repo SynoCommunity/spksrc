@@ -1,0 +1,8 @@
+include/ass/ass.h
+include/ass/ass_types.h
+lib/libass.a
+lib/libass.la
+lib/libass.so
+lib/libass.so.5
+lib/libass.so.5.1.0
+lib/pkgconfig/libass.pc

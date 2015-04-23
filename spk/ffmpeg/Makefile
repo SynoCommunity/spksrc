@@ -1,16 +1,18 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 2.1.1
-SPK_REV = 1
+SPK_VERS = 3.0
+SPK_REV = 2
 SPK_ICON = src/ffmpeg.png
 DSM_UI_DIR = app
-CHANGELOG = update ffmpeg
+CHANGELOG = "1. Update ffmpeg to 3.0<br>2. Added 13 new libs/codecs<br>3. Support for yasm added"
+
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = cytec
+MAINTAINER = SynoCommunity
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.
 RELOAD_UI = yes
 DISPLAY_NAME = ffmpeg
+STARTABLE = no
 
 HOMEPAGE = http://www.ffmpeg.org/
 LICENSE  =
