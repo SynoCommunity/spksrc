@@ -12,7 +12,6 @@ COMMENT  = libdaemon is a lightweight C library that eases the writing of UNIX d
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --localstatedir=/var
-CONFIGURE_ARGS += ac_cv_func_setpgrp_void=yes
+CONFIGURE_ARGS = ac_cv_func_setpgrp_void=yes
 
 include ../../mk/spksrc.cross-cc.mk
