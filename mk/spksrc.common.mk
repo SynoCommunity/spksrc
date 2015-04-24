@@ -14,7 +14,7 @@ MSG = echo "===> "
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Pip command
-PIP = pip
+PIP ?= pip
 PIP_WHEEL = $(PIP) wheel --no-use-wheel --no-deps --wheel-dir $(STAGING_DIR)/wheelhouse
 
 # Available languages
