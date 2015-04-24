@@ -1,2 +1,1 @@
-bin:bin/virtualenv
-bin:bin/virtualenv-@PYTHON_VERSION@
+bin:bin/virtualenv*
