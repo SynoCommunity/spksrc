@@ -1,6 +1,8 @@
 FROM 32bit/debian:jessie
 MAINTAINER SynoCommunity <https://synocommunity.com>
 
+ENV LANG C.UTF-8
+
 # Install required packages
 RUN apt-get update && \
     apt-get install -y automake \
@@ -25,6 +27,7 @@ RUN apt-get update && \
         mercurial \
         ncurses-dev \
         pkg-config \
+        python3-pip \
         subversion \
         swig \
         xmlto \
