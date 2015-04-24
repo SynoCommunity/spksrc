@@ -11,6 +11,8 @@ BUILD_DEPENDS += cross/pyephem cross/netifaces
 
 SPK_DEPENDS = "python3>=3.4.1-4:git"
 
+DEPENDS = cross/nmap #for python-libnmap
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
 ADMIN_PORT = 8123
@@ -29,7 +31,6 @@ FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = homeassistant_extra_install
 
 include ../../mk/spksrc.spk.mk

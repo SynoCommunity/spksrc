@@ -8,7 +8,7 @@ DNAME="Home Assistant"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python3"
 PYTHONPATH="${INSTALL_DIR}/share/${PACKAGE}"
-PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 PYTHON="${INSTALL_DIR}/env/bin/python3"
 
