@@ -36,8 +36,11 @@ python-nest>=2.1
 # z-wave
 # pydispatcher>=2.0.5 is excluded for the moment
 
-# sensor.systemmonitor 
-# psutil>=2.2.1 is excluded for the moment
+# isy994
+#PyISY>=1.0.2 is excluded for the moment
+
+# sensor.systemmonitor
+psutil>=2.2.1
 
 #pushover notifications
 python-pushover>=0.2
