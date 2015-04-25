@@ -10,7 +10,6 @@ DEPENDS += cross/bcrypt cross/pyopenssl cross/pycrypto
 DEPENDS += cross/pycurl cross/sqlalchemy cross/lxml
 DEPENDS += cross/zope.interface cross/markupsafe
 DEPENDS += cross/pyyaml
-#DEPENDS += cross/netifaces cross/pyephem
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -19,6 +18,8 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
+
+CHANGELOG = Added PyYaml module
 
 HOMEPAGE   = http://www.python.org/
 LICENSE    =

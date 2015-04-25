@@ -11,8 +11,6 @@ HOMEPAGE = https://nmap.org/
 COMMENT  = Nmap ("Network Mapper") is a free and open source (license) utility for network discovery and security auditing
 LICENSE  = GPL
 
-#ncat doesn't compile well
-
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --without-zenmap --without-ncat --with-liblua=included --with-libpcre=included CFLAGS=$(TC_CFLAGS)
 
