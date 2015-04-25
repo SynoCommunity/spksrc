@@ -30,7 +30,7 @@ start_daemon ()
 
 stop_daemon ()
 {
-    start-stop-daemon -o -c ${USER} -K -u ${USER} -p ${PID_FILE} -x ${RUN_CMD}
+    start-stop-daemon -o -c ${USER} -K -u ${USER} -p ${PID_FILE}
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
@@ -42,7 +42,7 @@ daemon_status ()
 
 wait_for_status ()
 {
-	counter=$2
+    counter=$2
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
@@ -80,8 +80,8 @@ case $1 in
         fi
         ;;
     log)
-		echo ${LOG_FILE}
-		exit 0
+        echo ${LOG_FILE}
+        exit 0
         ;;
     *)
         exit 1
