@@ -12,7 +12,7 @@ PATH="${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="homeassistant"
 GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-CONFIG_DIR="${INSTALL_DIR}/etc"
+CONFIG_DIR="${INSTALL_DIR}/var"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"

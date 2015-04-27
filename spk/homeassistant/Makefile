@@ -39,7 +39,7 @@ include ../../mk/spksrc.spk.mk
 homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
-	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
