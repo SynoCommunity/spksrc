@@ -14,8 +14,8 @@
 ifeq ($(strip $(PATCHES_LEVEL)),)
 PATCHES_LEVEL = 0
 endif
-ifeq ($(strip $(PATCHES)),) 
-PATCHES = $(wildcard patches/*.patch)
+ifeq ($(strip $(PATCHES)),)
+PATCHES = $(sort $(wildcard patches/*.patch))
 endif
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
@@ -45,7 +45,7 @@ patch_msg:
 pre_patch_target: patch_msg
 
 patch_target: $(PRE_PATCH_TARGET)
-ifneq ($(strip $(PATCHES)),) 
+ifneq ($(strip $(PATCHES)),)
 	@for patchfile in $(PATCHES) ; \
 	do \
 	  echo "patch -p$(PATCHES_LEVEL) < $${patchfile}" ; \
