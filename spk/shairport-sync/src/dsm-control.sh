@@ -10,8 +10,7 @@ SHAIRPORT="shairport-sync"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 DAEMON="${INSTALL_DIR}/bin/${SHAIRPORT}"
-VAR_DIR="${INSTALL_DIR}/var"
-PID_FILE="${VAR_DIR}/${PACKAGE}.pid"
+PID_FILE="${INSTALL_DIR}/var/${PACKAGE}.pid"
 
 start_daemon ()
 {
