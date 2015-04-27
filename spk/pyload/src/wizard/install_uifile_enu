@@ -1,0 +1,32 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Download directory",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Download directory",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "errorText": "Path should begin with /volume?/ with ? the number of the volume"
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "password",
+        "desc": "An 'admin' account will be created for the pyLoad web interface. Please enter a password for the pyLoad 'admin' user.",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Password",
+            "validator": {
+                 "allowBlank": false
+            }
+        }]
+    }]
+}]
