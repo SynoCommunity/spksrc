@@ -4,6 +4,8 @@ SPK_REV = 1
 SPK_ICON = src/pyload.png
 DSM_UI_DIR = app
 
+BETA = 1
+
 DEPENDS = cross/tesseract-ocr cross/tessdata-eng cross/js cross/$(SPK_NAME)
 SPK_DEPENDS = "python>2.7.3-3"
 

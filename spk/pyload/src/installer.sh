@@ -18,6 +18,9 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
+SYNO_GROUP="sc-download"
+SYNO_GROUP_DESC="SynoCommunity's download related group"
+
 lng2iso()
 {
 	# changes 3-character Synology language code to ISO 639-1 code.
@@ -32,6 +35,29 @@ lng2iso()
 		echo "en"
 		;;
         esac
+}
+
+syno_group_create ()
+{
+    # Create syno group (Does nothing when group already exists)
+    synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
+    # Set description of the syno group
+    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
+
+    # Add user to syno group (Does nothing when user already in the group)
+    addgroup ${USER} ${SYNO_GROUP}
+}
+
+syno_group_remove ()
+{
+    # Remove user from syno group
+    delgroup ${USER} ${SYNO_GROUP}
+
+    # Check if syno group is empty
+    if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
+        # Remove syno group
+        synogroup --del ${SYNO_GROUP} > /dev/null
+    fi
 }
 
 
@@ -83,9 +109,11 @@ postinst ()
         sqlite3 "${INSTALL_DIR}/etc/files.db" "INSERT INTO users (name, password) VALUES ('admin', '${SALTED_PW_HASH}')" || exit 1
     fi
 
+    syno_group_create
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-    
+
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
 
@@ -99,6 +127,8 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        syno_group_remove
+
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
