@@ -2,12 +2,16 @@
 requests>=2.0
 #pyyaml>=3.11 is currently included as a module
 
+#(shared) extra dependencies since we use --no-deps for pip
+six>=1.9.0 #dependency for websocket-client and transmissionrpc
+websocket-client>=0.29.0 #dependency for pushbullet.py
+netifaces>=0.10.4 #cross-compiled dependency for zeroconf
+VarEvents>=1.0.0 #dependency for PyISY
+
 # optional, needed for specific components
 
 # discovery
 zeroconf>=0.16.0
-#cross-compiled dependency for zeroconf
-netifaces>=0.10.4
 
 # sun
 pyephem>=3.7
@@ -34,10 +38,10 @@ pushbullet.py>=0.7.1
 python-nest>=2.1
 
 # z-wave
-# pydispatcher>=2.0.5 is excluded for the moment
+ pydispatcher>=2.0.5
 
 # isy994
-#PyISY>=1.0.2 is excluded for the moment
+PyISY>=1.0.2
 
 # sensor.systemmonitor
 psutil>=2.2.1
@@ -46,4 +50,4 @@ psutil>=2.2.1
 python-pushover>=0.2
 
 # Transmission Torrent Client
-#transmissionrpc>=0.11
+transmissionrpc>=0.11
