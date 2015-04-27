@@ -5,7 +5,7 @@ PACKAGE="shairport-sync"
 DNAME="Shairport Sync"
 
 # Others
-PORT="4242"
+PORT="8303"
 SHAIRPORT="shairport-sync"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
