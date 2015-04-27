@@ -1,9 +1,0 @@
---- Makefile.am.orig	2015-04-20 16:41:27.000000000 -0400
-+++ Makefile.am	2015-04-21 17:51:03.237615645 -0400
-@@ -38,6 +38,3 @@
- shairport_sync_SOURCES += mdns_dns_sd.c
- endif
-
--install-exec-hook:
--	[ -f /etc/init.d/shairport-sync ] || cp scripts/shairport-sync /etc/init.d/
--	update-rc.d shairport-sync defaults 90 10
