@@ -189,4 +189,4 @@ libexec:libexec/git-core/mergetools/vimdiff2
 libexec:libexec/git-core/mergetools/vimdiff3
 libexec:libexec/git-core/mergetools/xxdiff
 rsc:share/git-core
-rsc:share/gitweb/gitweb.cgi
+rsc:share/gitweb
