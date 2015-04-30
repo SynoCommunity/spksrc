@@ -19,6 +19,8 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
 
+FWPORTS          = src/${SPK_NAME}.sc
+
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = shairport_extra_install
