@@ -18,9 +18,26 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 
+
+#####
+
 ifneq ($(REQ_KERNEL),)
   ifeq ($(ARCH),x64)
-    $(error x64 arch cannot be used when REQ_KERNEL is set )
+    @$(error x64 arch cannot be used when REQ_KERNEL is set )
+  endif
+endif
+
+# Check if package supports ARCH
+ifneq ($(UNSUPPORTED_ARCHS),)
+  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCH)))
+    @$(error Arch '$(ARCH)' is not a supported architecture )
+  endif
+endif
+
+# Check minimum DSM requirements of package
+ifneq ($(REQUIRED_DSM),)
+  ifneq ($(REQUIRED_DSM),$(sort $(TCVERSION) $(REQUIRED_DSM)))
+    @$(error Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
   endif
 endif
 
@@ -71,16 +88,8 @@ smart-clean:
 clean:
 	rm -fr work work-*
 
-# Compare optional Makefile REQUIRED_DSM to provided TCVERSION. If REQ_DSM is lower than TCVERSION, exit
-checkversion:
-ifneq ($(REQUIRED_DSM),)
-  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
-	@$(MSG) "Stop: Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) "
-	@exit 1
-  endif
-endif
 
-all: checkversion install
+all: install
 
 
 SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))

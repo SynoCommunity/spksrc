@@ -5,6 +5,7 @@ SPK_ICON = src/sonarr.png
 DSM_UI_DIR = app
 
 REQUIRED_DSM = 5.0
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/busybox cross/mediainfo cross/sqlite cross/sonarr
 
@@ -28,11 +29,6 @@ SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/$(SPK_NAME).sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
-# Notify of unsupported architectures 
-ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k avoton x64 armada375 alpine),$(ARCH))
-$(error Sorry $(ARCH) is not a supported architecture)
-endif
 
 POST_STRIP_TARGET = sonarr_extra_install
 
