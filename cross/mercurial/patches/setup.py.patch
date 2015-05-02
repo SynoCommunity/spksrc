@@ -1,22 +1,31 @@
 --- setup.py.org	2014-04-01 18:57:54.373039343 +0200
 +++ setup.py	2014-04-01 19:03:06.537114908 +0200
-@@ -44,15 +44,6 @@
- except AttributeError:
-     pass
+@@ -45,24 +45,6 @@
+     raise SystemExit(
+         "Couldn't import standard zlib (incomplete Python install).")
  
+-# The base IronPython distribution (as of 2.7.1) doesn't support bz2
+-isironpython = False
+-try:
+-    isironpython = (platform.python_implementation()
+-                    .lower().find("ironpython") != -1)
+-except AttributeError:
+-    pass
+-
 -if isironpython:
 -    sys.stderr.write("warning: IronPython detected (no bz2 support)\n")
 -else:
 -    try:
 -        import bz2
+-        bz2.BZ2Compressor # silence unused import warning
 -    except ImportError:
 -        raise SystemExit(
 -            "Couldn't import standard bz2 (incomplete Python install).")
 -
- import os, subprocess, time
- import shutil
- import tempfile
-@@ -408,6 +399,21 @@
+ ispypy = "PyPy" in sys.version
+ 
+ import os, stat, subprocess, time
+@@ -465,6 +465,21 @@
              fp.write(data)
              fp.close()
  

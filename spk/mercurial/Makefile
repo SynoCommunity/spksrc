@@ -1,6 +1,6 @@
 SPK_NAME = mercurial
-SPK_VERS = 2.8.2
-SPK_REV = 1
+SPK_VERS = 3.4
+SPK_REV = 2
 SPK_ICON = src/mercurial.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool
 RELOAD_UI = yes
 DISPLAY_NAME = Mercurial
-BETA = 1
+CHANGELOG = Update to 3.4
 
 HOMEPAGE = http://mercurial.selenic.com/
 LICENSE  = MPL1.1
