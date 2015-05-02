@@ -1,8 +1,7 @@
 SPK_NAME = sslh
-SPK_VERS = 1.13b
+SPK_VERS = 1.17
 SPK_REV = 1
 SPK_ICON = src/sslh.png
-BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -30,16 +29,3 @@ xz-compress:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/*.pl $(STAGING_DIR)/bin/
 	install -m 644 src/sslh.ini $(STAGING_DIR)/sslh.ini
-	install -m 755 -d $(STAGING_DIR)/www
-	install -m 755 src/www/*.cgi $(STAGING_DIR)/www/
-	install -m 644 src/www/*.css $(STAGING_DIR)/www/
-	install -m 644 src/www/*.html $(STAGING_DIR)/www/
-	install -m 644 src/www/*.js $(STAGING_DIR)/www/
-	install -m 644 src/www/config $(STAGING_DIR)/www/
-	install -m 755 -d $(STAGING_DIR)/www/images
-	for size in 16 24 32 48 72 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white \
-	            $(STAGING_DIR)/www/images/icon$${size}.png ; \
-	done	
-	chmod 644 $(STAGING_DIR)/www/images/i*.png

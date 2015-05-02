@@ -36,7 +36,7 @@ postinst ()
 	ln -s ${SYNOPKG_PKGDEST}/bin/generate_log.pl /usr/local/sslh/bin/generate_log.pl
 	ln -s ${SYNOPKG_PKGDEST}/log /usr/local/sslh/log
 	ln -s ${SYNOPKG_PKGDEST}/sslh.ini /usr/local/sslh/sslh.ini
-	ln -s ${SYNOPKG_PKGDEST}/www /usr/local/sslh/www
+	ln -s ${SYNOPKG_PKGDEST}/lib /usr/local/sslh/lib
 
 	# Correct the files ownership
 	chown -R root:root ${SYNOPKG_PKGDEST}

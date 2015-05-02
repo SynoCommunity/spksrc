@@ -3,12 +3,11 @@
 PATH=/bin:/usr/bin:/usr/syno/bin
 
 SSLH=/usr/local/sslh/bin/sslh
-SSLHWWW=/usr/local/sslh/www
-SYNO3APP=/usr/syno/synoman/webman/3rdparty
 
 # Files
 SSLHLOG=/usr/local/sslh/log/sslh-spk.log
 SSLH_CONF=/usr/local/sslh/sslh.ini
+PID_FILE=/usr/local/sslh/pid/sslh.pid
 
 if [ -f $SSLH_CONF ]
 then
@@ -25,14 +24,7 @@ start_daemon ()
     echo `date`" : Starting SSLH (listen=$LISTEN) (ssl=$SSL) (ssh=$SSH) (openvpn=$VPN) (tinc=$TINC) (xmpp=$XMPP) ..." >> $SSLHLOG
     if [ -f $SSLH_CONF ]
     then
-        $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN --tinc $TINC --xmpp $XMPP -P /usr/local/sslh/pid/sslh.pid --timeout 5
-    fi
-
-    # Install the application in the main interface.
-    if [ -d $SYNO3APP ]
-    then
-		rm -f $SYNO3APP/sslh
-		ln -s $SSLHWWW $SYNO3APP/sslh
+        $SSLH -p $LISTEN --ssl $SSL --ssh $SSH --openvpn $VPN --tinc $TINC --xmpp $XMPP -P $PID_FILE --timeout 5
     fi
 }
 
@@ -40,23 +32,23 @@ stop_daemon ()
 {
     echo `date`" : Stopping SSLH..." >> $SSLHLOG
 
-    PID=`ps | grep $SSLH | grep -v grep |awk '{print $1}'`
-    if [ "$PID" != "" ]
-    then
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
         echo `date`" : Stop SSLH..." >> $SSLHLOG
-        kill $PID
+        kill `cat ${PID_FILE}`
+        return
     fi
-	
-    # Remove the application from the main interface if it was previously added.
-    if [ -h $SYNO3APP/sslh ]
-    then
-		rm -f $SYNO3APP/sslh
-    fi
+    
+    rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-	[ -h $SYNO3APP/sslh ]
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
+    fi
+    
+    rm -f ${PID_FILE}
+    return 1
 }
 
 case $1 in
