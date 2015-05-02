@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="nano"
-DNAME="GNU Nano"
+DNAME="nano"
 
 
 case $1 in

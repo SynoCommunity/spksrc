@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="nano"
-DNAME="GNU Nano"
+DNAME="nano"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
