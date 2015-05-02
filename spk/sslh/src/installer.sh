@@ -1,76 +1,63 @@
 #!/bin/sh
-# Copyright 2010 Antoine Bertin
-# <diaoulael [ignore this] at users.sourceforge period net>
-#
-# This file is part of syno-packager.
-#
-# syno-packager is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# syno-packager is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with syno-packager.  If not, see <http://www.gnu.org/licenses/>.
 
-UPGRADELOCK=/tmp/sslh.upgrade.lock
+# Package
+PACKAGE="sslh"
+DNAME="sslh"
+
+#Others
+INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 
 preinst ()
 {
-	exit 0
+    exit 0
 }
 
 postinst ()
 {
-	# Create the directory
-	mkdir -p /usr/local/sslh
-	mkdir -p /usr/local/sslh/bin
-	mkdir -p /usr/local/sslh/pid
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-	# Create symlink
-	ln -s ${SYNOPKG_PKGDEST}/bin/sslh /usr/local/sslh/bin/sslh
-	ln -s ${SYNOPKG_PKGDEST}/bin/generate_log.pl /usr/local/sslh/bin/generate_log.pl
-	ln -s ${SYNOPKG_PKGDEST}/log /usr/local/sslh/log
-	ln -s ${SYNOPKG_PKGDEST}/sslh.ini /usr/local/sslh/sslh.ini
-	ln -s ${SYNOPKG_PKGDEST}/lib /usr/local/sslh/lib
+    # Correct the files ownership
+    chown -R root:root ${SYNOPKG_PKGDEST}
 
-	# Correct the files ownership
-	chown -R root:root ${SYNOPKG_PKGDEST}
-
-	# Correct the files permission
-	chmod 755 ${SYNOPKG_PKGDEST}/bin/*
-	chmod 666 ${SYNOPKG_PKGDEST}/sslh.ini
-	chmod 777 ${SYNOPKG_PKGDEST}/log
-	chmod 777 /usr/local/sslh/pid
-
-	exit 0
+    exit 0
 }
 
 preuninst ()
 {
-	exit 0
+    exit 0
 }
 
 postuninst ()
 {
-	# Remove symlink
-	rm -Rf /usr/local/sslh
+    # Remove symlink
+    rm -f ${INSTALL_DIR}
 
-	exit 0
+    exit 0
 }
 
 preupgrade ()
 {
-	touch $UPGRADELOCK
-	exit 0
+    # Stop the package
+    ${SSS} stop > /dev/null
+
+    # Save some stuff
+    rm -fr ${TMP_DIR}/${PACKAGE}
+    mkdir -p ${TMP_DIR}/${PACKAGE}
+    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+
+    exit 0
 }
 
 postupgrade ()
 {
-	rm -f $UPGRADELOCK
-	exit 0
+    # Restore some stuff
+    rm -fr ${INSTALL_DIR}/var
+    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    rm -fr ${TMP_DIR}/${PACKAGE}
+
+    exit 0
 }
+
