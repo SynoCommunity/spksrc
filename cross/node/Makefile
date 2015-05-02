@@ -6,6 +6,7 @@ PKG_DIST_SITE = http://nodejs.org/dist/v$(PKG_VERS)/
 PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 
 REQUIRED_DSM = 5.0
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHES) $(PPC_ARCHES)
 
 HOMEPAGE = http://nodejs.org/
 COMMENT  = Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.

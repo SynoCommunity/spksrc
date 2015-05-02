@@ -5,6 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://libtorrent.rakshasa.no/downloads
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+UNSUPPORTED_ARCHS = 88f5281 powerpc ppc824x ppc853x ppc854x
+
 DEPENDS = cross/ncurses cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 
 HOMEPAGE = http://libtorrent.rakshasa.no/
@@ -16,11 +18,6 @@ PRE_CONFIGURE_TARGET = myPreConfigure
 COMPILE_TARGET = myCompile
 
 CONFIGURE_ARGS = --with-xmlrpc-c=$(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
-
-# Limit to supported archs
-ifeq ($(findstring $(ARCH),88f5281 powerpc ppc824x ppc853x ppc854x),$(ARCH))
-$(error $(ARCH) is not a supported architecture)
-endif
 
 include ../../mk/spksrc.cross-cc.mk
 
