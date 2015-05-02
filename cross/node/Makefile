@@ -17,11 +17,6 @@ ENV += LINK.target=$(TC_PATH)$(TC_PREFIX)g++
 
 POST_INSTALL_TARGET = myPostInstall
 
-# Limit to supported archs
-ifneq ($(findstring $(ARCH),bromolow cedarview x86 armadaxp armada370 armada375 avoton alpine x64),$(ARCH))
-$(error $(ARCH) is not a supported architecture)
-endif
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPostInstall
