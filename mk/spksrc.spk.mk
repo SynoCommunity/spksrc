@@ -300,10 +300,6 @@ clean:
 
 all: package
 
-
-SUPPORTED_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
-SUPPORTED_ARCHS = $(notdir $(subst syno-,/,$(SUPPORTED_TCS)))
-
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
 	@for depend in $(DEPENDS) ; \
@@ -312,33 +308,110 @@ dependency-tree:
 	done
 
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(SUPPORTED_ARCHS))
+all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
 
 .PHONY: publish-all-archs
-publish-all-archs: $(addprefix publish-arch-,$(SUPPORTED_ARCHS))
+publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
-all-toolchain-%: $(addprefix arch-,$(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))))
-	@$(MSG) Built packages for toolchain $*
+####
 
-publish-all-toolchain-%: $(addprefix publish-arch-,$(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(SUPPORTED_ARCHS)))))))
-	@$(MSG) Published packages for toolchain $*
-	
-all-archs-latest: $(addprefix latest-arch-,$(sort $(basename $(SUPPORTED_ARCHS))))
+all-supported:
+	@$(MSG) Build supported archs
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  do \
+	    $(MAKE) latest-arch-$$arch ; \
+	  done \
+	else \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  do \
+	    $(MAKE) latest-arch-$$arch ; \
+	  done \
+	fi
+
+publish-all-supported:
+	@$(MSG) Publish supported archs
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  do \
+	    $(MAKE) publish-latest-arch-$$arch ; \
+	  done \
+	else \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  do \
+	    $(MAKE) publish-latest-arch-$$arch ; \
+	  done \
+	fi
+
+all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
+	$(MAKE) all-toolchain-4.3
+	@$(MSG) Built legacy archs
+
+publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
+	$(MAKE) all-toolchain-4.3
+	@$(MSG) Published legacy archs
+
+####
+
+all-archs-latest:
+	@$(MSG) Build all archs with latest DSM per FIRMWARE
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  $(MSG) Skipping duplicate arches; \
+	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
+	  do \
+	    $(MAKE) latest-arch-$$arch ; \
+	  done \
+	else \
+	  $(MSG) Skipping arches without kernelsupport ; \
+	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
+	  do \
+	    $(MAKE) latest-arch-$$arch ; \
+	  done \
+	fi
 
 publish-all-archs-latest:
-	@$(MSG) Build all archs with latest DSM per FIRMWARE
-	@for arch in $(sort $(basename $(SUPPORTED_ARCHS))) ; \
-	do \
-	  $(MAKE) publish-latest-arch-$$arch ; \
-	done
+	@$(MSG) Publish all archs with latest DSM per FIRMWARE
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  $(MSG) Skipping duplicate arches; \
+	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
+	  do \
+	    $(MAKE) publish-latest-arch-$$arch ; \
+	  done \
+	else \
+	  $(MSG) Skipping arches without kernelsupport ; \
+	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
+	  do \
+	    $(MAKE) publish-latest-arch-$$arch ; \
+	  done \
+	fi
+
+####
 
 latest-arch-%:
 	@$(MSG) Building package for arch $* with latest available toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))))
 
 publish-latest-arch-%:
 	@$(MSG) Building package for arch $* with latest available toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS))))))) publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS))))))) publish
+
+####
+
+all-toolchain-%:
+	@$(MSG) Built packages for toolchain $*
+	for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	do \
+	  $(MAKE) arch-$$arch-$* ; \
+	done \
+
+publish-all-toolchain-%:
+	@$(MSG) Built packages for toolchain $*
+	for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	do \
+	  $(MAKE) publish-arch-$$arch-$* ; \
+	done \
+
+####
 
 arch-%:
 	@$(MSG) Building package for arch $*
@@ -348,5 +421,22 @@ publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish
 
+####
+
 changelog:
 	@echo $(shell git log --pretty=format:"- %s" -- $(PWD))
+
+####
+
+.PHONY: kernel-required
+kernel-required:
+	@if [ -n "$(REQ_KERNEL)" ]; then \
+	  exit 1 ; \
+	fi
+	@for depend in $(DEPENDS) ; do \
+	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
+	    exit 0 ; \
+	  else \
+	    exit 1 ; \
+	  fi ; \
+	done
