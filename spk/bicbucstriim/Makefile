@@ -16,13 +16,12 @@ DISPLAY_NAME = BicBucStriim
 HOMEPAGE   = http://rvolz.github.com/BicBucStriim/
 LICENSE    = MIT
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
+INSTUNINST_RESTART_SERVICES = apache-web
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
