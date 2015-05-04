@@ -8,7 +8,7 @@ BETA = 1
 
 DEPENDS = cross/emby cross/busybox cross/sqlite
 
-SPK_DEPENDS = "mono>3.6:imagemagick=6.9.0-1:mediainfo=0.7.72-1:ffmpeg=2.6-3"
+SPK_DEPENDS = "mono>3.6:imagemagick>=6.9.0-1:mediainfo>=0.7.72-1:ffmpeg>=2.6-3"
 
 MAINTAINER = SynoCommunity
 
@@ -28,9 +28,7 @@ FWPORTS          = src/$(SPK_NAME).sc
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 # Notify of unsupported architectures
-ifneq ($(findstring $(ARCH),bromolow cedarview evansport x86 armada370 88f6281 armadaxp comcerto2k avoton x64 armada375 alpine),$(ARCH))
-$(error Sorry $(ARCH) is not a supported architecture)
-endif
+UNSUPPORTED_ARCH = $(PPC_ARCHES)
 
 POST_STRIP_TARGET = emby_extra_install
 
