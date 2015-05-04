@@ -5,7 +5,7 @@ PKG_DIST_NAME = MediaBrowser-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaBrowser/MediaBrowser.Releases/raw/master/Server
 PKG_DIR = emby
 
-DEPENDS = #cross/mediainfo cross/sqlite3 cross/imagemagick
+DEPENDS = 
 
 HOMEPAGE = http://emby.media/
 COMMENT  = Emby streams everything Your personal videos, music, photos, and live television in the palm of your hand.
