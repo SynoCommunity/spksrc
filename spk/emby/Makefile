@@ -6,8 +6,6 @@ DSM_UI_DIR = app
 
 BETA = 1
 
-#REQUIRED_DSM = 5.0
-
 DEPENDS = cross/emby cross/busybox cross/sqlite
 
 SPK_DEPENDS = "mono>3.6:imagemagick=6.9.0-1:mediainfo=0.7.72-1:ffmpeg=2.6-3"
