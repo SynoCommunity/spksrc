@@ -9,7 +9,7 @@ BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = cytec
+MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
 RELOAD_UI = yes
 DISPLAY_NAME = ImageMagick
