@@ -8,7 +8,6 @@ DNAME="Emby"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="${PACKAGE}"
-USER_HOME="$(eval echo ~$USER)"
 
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
