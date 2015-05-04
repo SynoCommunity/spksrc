@@ -8,16 +8,16 @@ DEPENDS =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = "SynoCommunity"
-DESCRIPTION = "Gentoo is a free operating system based on either Linux or FreeBSD that can be automatically optimized and customized for just about any application or need. Gentoo Chroot allows you to install the Gentoo OS inside your DiskStation, alongside DSM. This package is intended for advanced users only."
+MAINTAINER = SynoCommunity
+DESCRIPTION = Gentoo is a free operating system based on either Linux or FreeBSD that can be automatically optimized and customized for just about any application or need. Gentoo Chroot allows you to install the Gentoo OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
 RELOAD_UI = yes
-DISPLAY_NAME = "Gentoo Chroot"
+DISPLAY_NAME = Gentoo Chroot
 CHANGELOG = 
 
-HOMEPAGE   = "http://www.gentoo.org/"
+HOMEPAGE   = http://www.gentoo.org/
 LICENSE    = 
-HELPURL    = "3rdparty/gentoo-chroot/help/enu/index.html"
-SUPPORTURL = "http://www.gentoo.org/main/en/support.xml"
+HELPURL    = 3rdparty/gentoo-chroot/help/enu/index.html
+SUPPORTURL = http://www.gentoo.org/main/en/support.xml
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -30,7 +30,7 @@ POST_STRIP_TARGET = gentoo-chroot_extra_install
 GENTOO_ARCH =
 ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 GENTOO_CPU = arm
-GENTOO_ARCH = armv7a
+GENTOO_ARCH = armv5tel
 endif
 ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
 GENTOO_CPU = arm
