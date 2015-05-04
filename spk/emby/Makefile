@@ -1,6 +1,6 @@
 SPK_NAME = emby
-SPK_VERS = 3.0.5572.0
-SPK_REV = 2
+SPK_VERS = 3.0.5597.1
+SPK_REV = 3
 SPK_ICON = src/emby.png
 DSM_UI_DIR = app
 
@@ -10,7 +10,7 @@ BETA = 1
 
 DEPENDS = cross/emby cross/busybox cross/sqlite
 
-SPK_DEPENDS = "mono>3.6:imagemagick=6.9.0-1:mediainfo=0.7.72-1"
+SPK_DEPENDS = "mono>3.6:imagemagick=6.9.0-1:mediainfo=0.7.72-1:ffmpeg=2.6-3"
 
 MAINTAINER = SynoCommunity
 
@@ -18,7 +18,7 @@ DESCRIPTION = Emby streams everything Your personal videos, music, photos, and l
 ADMIN_PORT = 8096
 RELOAD_UI = yes
 DISPLAY_NAME = Emby
-CHANGELOG =
+CHANGELOG = "1. Update emby to 3.0.5597.1<br>2. depend on ffmpeg >= 2.6-3"
 
 HOMEPAGE = http://emby.media/
 LICENSE  =
