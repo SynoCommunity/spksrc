@@ -7,4 +7,4 @@
    <dllmap dll="CORE_RL_Wand_.dll" target="libMagickWand-6.so" os="freebsd,openbsd,netbsd"/>
    <dllmap dll="CORE_RL_Wand_.dll" target="./MediaInfo/osx/libmediainfo.dylib" os="osx"/>
  </configuration>
-\ Kein Zeilenumbruch am Dateiende.
+ 
