@@ -23,7 +23,7 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 
 # Check if package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
-  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCH)))
+  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
     @$(error Arch '$(ARCH)' is not a supported architecture )
   endif
 endif

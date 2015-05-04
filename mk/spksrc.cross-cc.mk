@@ -29,7 +29,7 @@ endif
 
 # Check if package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
-  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCH)))
+  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
     @$(error Arch '$(ARCH)' is not a supported architecture )
   endif
 endif
