@@ -1,5 +1,5 @@
 PKG_NAME = emby
-PKG_VERS = 3.0.5572.0
+PKG_VERS = 3.0.5597.1
 PKG_EXT = zip
 PKG_DIST_NAME = MediaBrowser-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaBrowser/MediaBrowser.Releases/raw/master/Server
