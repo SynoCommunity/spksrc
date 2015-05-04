@@ -21,7 +21,7 @@ start_daemon ()
 
 stop_daemon ()
 {
-    ${PSERVE} serve ${SYNCSERVER} --stop-daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
+    ${PSERVE} ${INI_FILE} --stop-daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
 }
 
 daemon_status ()

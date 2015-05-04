@@ -4,6 +4,8 @@ SPK_REV = 1
 SPK_ICON = src/ffsync.png
 BETA = 1
 
+UNSUPPORTED_ARCHS = 88f5281
+
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/gevent cross/greenlet cross/simplejson
 BUILD_DEPENDS += cross/umemcache
@@ -13,7 +15,7 @@ WHEELS      = src/requirements.txt
 SPK_DEPENDS = "python>2.7.6-8"
 
 MAINTAINER   = SynoCommunity
-DESCRIPTION  = Firefox Sync Server 1.5. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
+DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
 DISPLAY_NAME = Firefox Sync Server 1.5
 HOMEPAGE     = https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 LICENSE      = MPL/GPL/LGPL
