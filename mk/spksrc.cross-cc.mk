@@ -36,7 +36,7 @@ endif
 
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_DSM),)
-  ifneq ($(REQUIRED_DSM),$(sort $(TCVERSION) $(REQUIRED_DSM)))
+  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
     @$(error Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
   endif
 endif
