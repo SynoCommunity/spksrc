@@ -39,7 +39,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: emby_extra_install
 emby_extra_install:
-	install -m 755 -d $(STAGING_DIR)/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images
