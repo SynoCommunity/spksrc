@@ -10,10 +10,10 @@ PYTHON_DIR="/usr/local/python"
 TEMP="/tmp"
 PATH="${INSTALL_DIR}/sbin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin"
 CFG_FILE="${INSTALL_DIR}/config.properties"
-CFG_FILES="/var/packages/autosub-bootstrapbill/target"
+CFG_FILES="/var/packages/${DNAME}/target"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
-FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+FWPORTS="/var/packages/${DNAME}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {

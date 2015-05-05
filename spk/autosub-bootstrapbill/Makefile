@@ -1,4 +1,4 @@
-SPK_NAME = autosub-bootstrapbill
+SPK_NAME = AutoSub-BootstrapBill
 SPK_VERS = 0.6.2
 SPK_REV = 6
 SPK_ICON = src/autosub-bootstrapbill.png
@@ -22,7 +22,7 @@ WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+FWPORTS          = src/autosub-bootstrapbill.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
