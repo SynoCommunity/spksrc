@@ -70,14 +70,19 @@ $(WORK_DIR)/INFO:
 	   ) \
 	) | sed 's|"\s|"\n|' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
-	@echo distributor=\"SynoCommunity\" >> $@
-	@echo distributor_url=\"http://synocommunity.com\" >> $@
-ifeq ($(strip $(MAINTAINER)),SynoCommunity)
-	@echo maintainer=\"SynoCommunity\" >> $@
-	@echo maintainer_url=\"http://synocommunity.com\" >> $@
+ifeq ($(strip $(DISTRIBUTOR)),)
+	@echo distributor=\"Martijn de Vries\" >> $@
+	@echo distributor_url=\"http://tinyurl.com/reposponsor\" >> $@
 else
-	@echo maintainer=\"SynoCommunity/$(MAINTAINER)\" >> $@
-	@echo maintainer_url=\"http://synocommunity.com/developers/$(MAINTAINER)\" >> $@
+	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
+	@echo distributor_url=\"http://tinyurl.com/reposponsor\" >> $@
+endif
+ifeq ($(strip $(MAINTAINER)),)
+	@echo maintainer=\"Martijn de Vries\" >> $@
+	@echo maintainer_url=\"http://tinyurl.com/reposponsor\" >> $@
+else
+	@echo maintainer=\"$(MAINTAINER)\" >> $@
+	@echo maintainer_url=\"$(HOMEPAGE)\" >> $@
 endif
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
@@ -89,7 +94,7 @@ else
   endif
 endif
 ifneq ($(strip $(BETA)),)
-	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
+	@echo report_url=\"https://github.com/Martijn085/spksrc/issues\" >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
