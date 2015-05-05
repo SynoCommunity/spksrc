@@ -1,2 +1,0 @@
-lib:@PYTHON_SITE_PACKAGES@/lxml/etree*.so
-lib:@PYTHON_SITE_PACKAGES@/lxml/objectify*.so

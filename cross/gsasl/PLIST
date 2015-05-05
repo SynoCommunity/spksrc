@@ -1,4 +1,0 @@
-bin:bin/gsasl
-lnk:lib/libgsasl.so
-lnk:lib/libgsasl.so.7
-lib:lib/libgsasl.so.7.9.6

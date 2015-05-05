@@ -1,2 +1,0 @@
-bin:bin/easy_install
-bin:bin/easy_install-@PYTHON_VERSION@

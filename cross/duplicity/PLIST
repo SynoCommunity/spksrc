@@ -1,3 +1,0 @@
-bin:bin/duplicity
-bin:bin/rdiffdir
-lib:@PYTHON_SITE_PACKAGES@/duplicity/_librsync.so

@@ -1,0 +1,15 @@
+[{
+    "step_title": "AutoSub poort configuratie",
+    "items": [{
+        "type": "textfield",
+		"desc": "Vul de gewenste poort in.",
+        "subitems": [{
+            "key": "wizard_autosub_port",
+            "desc": "Poort nummer [8083]",	
+			"validator": { 
+				"allowBlank": false, 
+				"maxLength": 5
+				}
+		}]
+	}]
+}]

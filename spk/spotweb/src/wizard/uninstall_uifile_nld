@@ -1,0 +1,18 @@
+[{
+	"step_title": "Verwijder de spotweb database",
+	"items": [{
+		"type": "multiselect",
+		"desc": "Als je de spotweb database verwijderd, zullen alle geindexeerde releases worden verwijderd.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Verwijder de spotweb database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Vul het MySQL wachtwoord in om de database van spotweb te verwijderen.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Root wachtwoord"
+		}]
+	}]
+}]

@@ -1,4 +1,0 @@
-lnk:lib/libtorrent-rasterbar.so
-lnk:lib/libtorrent-rasterbar.so.6
-lib:lib/libtorrent-rasterbar.so.6.0.0
-lib:@PYTHON_SITE_PACKAGES@/libtorrent.so

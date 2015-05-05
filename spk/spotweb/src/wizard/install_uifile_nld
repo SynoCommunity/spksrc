@@ -1,0 +1,23 @@
+[{
+    "step_title": "Database configuratie",
+    "items": [{
+        "type": "password",
+        "desc": "Vul het MySQL wachtwoord in.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root wachtwoord"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Een 'spotweb' MySQL gebruiker en database wordt aangemaakt. Vul het wachtwoord in voor de 'spotweb' gebruiker.",
+        "subitems": [{
+            "key": "wizard_mysql_password_spotweb",
+            "desc": "Spotweb wachtwoord"
+			}]
+        }]
+    }, {
+    "step_title": "Laatste stappen na deze installatie",
+    "items": [{
+        "desc": "1. Als eerste moet je de installatie afmaken via 'http://serverIP/spotweb/install.php' vanuit je browser.<br>2. Daarna moet je handmatig retrieve.php uitvoeren via SSH.<br>Gebruik dit commando: '/usr/bin/php /volume1/web/spotweb/retrieve.php'<br>3. En tot slot maak je in de taakplanner van DSM een taak aan met het retrieve commando."
+    }]
+}]

@@ -1,8 +1,0 @@
-bin:bin/cjpeg
-bin:bin/djpeg
-bin:bin/jpegtran
-bin:bin/rdjpgcom
-bin:bin/wrjpgcom
-lnk:lib/libjpeg.so
-lnk:lib/libjpeg.so.9
-lib:lib/libjpeg.so.9.1.0

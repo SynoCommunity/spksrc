@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<Config>
-  <Branch>master</Branch>
-  <UpdateMechanism>BuiltIn</UpdateMechanism>
-  <LaunchBrowser>False</LaunchBrowser>
-</Config>

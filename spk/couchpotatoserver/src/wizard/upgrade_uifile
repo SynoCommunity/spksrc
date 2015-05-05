@@ -1,6 +1,0 @@
-[{
-    "step_title": "Update Note",
-    "items": [{
-        "desc": "CouchPotato will be updated. In some cases, the CouchPotato database cannot be migrated to the newest version. After installation, please verify all settings and check the logs for errors. <br><br>If issues arise, please remove the CouchPotato package and install it again. In doing so, all settings will be lost"
-    }]
-}]

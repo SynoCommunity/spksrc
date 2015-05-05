@@ -1,3 +1,0 @@
-#!/bin/sh
-
-LC_ALL=en_US.UTF8 /usr/local/tmux/bin/tmux "$@"

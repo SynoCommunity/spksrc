@@ -1,2 +1,0 @@
-lib:@PYTHON_SITE_PACKAGES@/bson/_cbson.so
-lib:@PYTHON_SITE_PACKAGES@/pymongo/_cmessage.so

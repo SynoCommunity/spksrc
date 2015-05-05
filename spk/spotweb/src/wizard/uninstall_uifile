@@ -1,0 +1,18 @@
+[{
+	"step_title": "Remove spotweb database",
+	"items": [{
+		"type": "multiselect",
+		"desc": "If you remove the spotweb database, all indexed releases will be deleted.",
+		"subitems": [{
+			"key": "wizard_remove_database",
+			"desc": "Remove spotweb database"
+		}]
+	}, {
+		"type": "password",
+		"desc": "Enter your MySQL password to remove the spotweb database.",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "Root password"
+		}]
+	}]
+}]

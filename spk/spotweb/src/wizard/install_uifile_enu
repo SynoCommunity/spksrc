@@ -1,0 +1,23 @@
+[{
+    "step_title": "Database configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'spotweb' MySQL user and database will be created. Please enter a password for the 'spotweb' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_spotweb",
+            "desc": "Spotweb password"
+			}]
+        }]
+    }, {
+    "step_title": "Final steps afther this installation",
+    "items": [{
+        "desc": "1. First you need to run 'http://serverIP/spotweb/install.php' from your browser to make the spotweb installation complete.<br>2. Then you manually need run retrieve.php from SSH.<br>Use this command: '/usr/bin/php /volume1/web/spotweb/retrieve.php'<br>3. And finally you need to add a scheduled tasks in DSM with the retrieve command."
+    }]
+}]

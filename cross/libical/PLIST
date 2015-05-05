@@ -1,9 +1,0 @@
-lnk:lib/libical.so
-lnk:lib/libical.so.0
-lib:lib/libical.so.0.48.0
-lnk:lib/libicalss.so
-lnk:lib/libicalss.so.0
-lib:lib/libicalss.so.0.48.0
-lnk:lib/libicalvcal.so
-lnk:lib/libicalvcal.so.0
-lib:lib/libicalvcal.so.0.48.0

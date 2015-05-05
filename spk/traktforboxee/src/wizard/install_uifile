@@ -1,0 +1,93 @@
+[{
+    "step_title": "Boxee settings",
+    "items": [{
+        "type": "textfield",
+		"desc": "Enter details for Boxee Box.",
+        "subitems": [{
+            "key": "wizard_boxee_ip",
+            "desc": "IP address",
+			"validator": { 
+				"allowBlank": false, 
+				"minLength": 7, 
+				"maxLength": 15
+				}
+		}]
+	}, {
+        "type": "textfield",
+		"desc": " ",
+        "subitems": [{
+            "key": "wizard_boxee_port",
+            "desc": "Port number",	
+			"validator": { 
+				"allowBlank": false, 
+				"maxLength": 5
+				}
+		}]
+	}]
+}, {
+    "step_title": "Trakt settings",
+    "items": [{
+        "type": "textfield",
+		"desc": "Enter details for Trakt.",
+        "subitems": [{
+            "key": "wizard_trakt_username",
+            "desc": "User name",
+			"validator": { 
+				"allowBlank": false }
+        }]
+    }, {
+        "type": "password",
+		"desc": " ",
+        "subitems": [{
+			"key": "wizard_trakt_password",
+            "desc": "Password",
+			"validator": { 
+				"allowBlank": false }
+        }]
+    }]
+}, {
+    "step_title": "TraktForBoxee settings 1/2",
+    "items": [{
+		"type": "singleselect",
+		"desc": "Scrobble movie",
+		"subitems": [{
+			"key": "wizard_traktforboxee_scrobblemovieyes",
+            "desc": "Yes"
+		}, {
+            "key": "wizard_traktforboxee_scrobblemovieno",
+            "desc": "No"		
+			}]
+		}, {
+		"type": "singleselect",
+		"desc": "Scrobble TV",
+		"subitems": [{
+			"key": "wizard_traktforboxee_scrobbletvyes",
+            "desc": "Yes"
+		}, {
+            "key": "wizard_traktforboxee_scrobbletvno",
+            "desc": "No"		
+		}]
+	}]
+}, {
+    "step_title": "TraktForBoxee settings 2/2",
+    "items": [{
+		"type": "singleselect",
+		"desc": "Notify Boxee",
+		"subitems": [{
+			"key": "wizard_traktforboxee_notifyboxeeyes",
+            "desc": "Yes",
+			"defaultValue": false
+		}, {
+            "key": "wizard_traktforboxee_notifyboxeeno",
+            "desc": "No",
+			"defaultValue": true			
+		}]
+		}, {
+			"type": "textfield",
+			"desc": "Location data files (empty for standard location)",
+			"subitems": [{
+				"key": "wizard_data_dir",
+				"desc": "Folder name"
+		}]
+	}]
+}]

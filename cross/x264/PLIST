@@ -1,5 +1,0 @@
-bin/x264
-include/x264_config.h
-include/x264.h
-lib/libx264.a
-lib/pkgconfig/x264.pc

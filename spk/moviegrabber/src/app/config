@@ -1,0 +1,13 @@
+{
+  ".url": {
+    "org.mdevries.moviegrabber": {
+      "title": "MovieGrabber",
+      "desc": "MovieGrabber Web UI",
+      "icon": "/images/moviegrabber-{0}.png",
+      "type": "url",
+      "url": "3rdparty/moviegrabber/moviegrabber.cgi",
+      "allUsers": true,
+	  "grantPrivilege": "local"
+    }
+  }
+}

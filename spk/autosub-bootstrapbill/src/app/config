@@ -1,0 +1,13 @@
+{
+  ".url": {
+    "org.mdevries.autosub-bootstrapbill": {
+      "title": "Auto-Sub Bootstrap Bill",
+      "desc": "Auto-Sub Bootstrap Bill Web UI",
+      "icon": "/images/autosub-bootstrapbill-{0}.png",
+      "type": "url",
+      "url": "3rdparty/autosub-bootstrapbill/autosub-bootstrapbill.cgi",
+      "allUsers": true,
+      "grantPrivilege": "local"	  
+    }
+  }
+}

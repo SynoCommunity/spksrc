@@ -1,0 +1,15 @@
+[{
+    "step_title": "AutoSub port configuration",
+    "items": [{
+        "type": "textfield",
+		"desc": "Enter the desired port.",
+        "subitems": [{
+            "key": "wizard_autosub_port",
+            "desc": "Port number [8083]",	
+			"validator": { 
+				"allowBlank": false, 
+				"maxLength": 5
+				}
+		}]
+	}]
+}]

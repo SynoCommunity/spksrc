@@ -1,3 +1,0 @@
-[http]
-	sslcainfo = /usr/syno/etc/cacert.pem
-

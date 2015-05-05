@@ -1,0 +1,14 @@
+{
+	".url": {
+		"org.mdevries.jsmusicdb": {
+			"type": "url",
+			"allUsers": true,
+			"title": "JSMusicDB",
+			"desc": "JSMusicDB",
+			"icon": "images/jsmusicdb-{0}.png",
+			"protocol": "http",
+			"url": "/jsmusicdb",
+			"port": "80"			
+		}
+	}
+}

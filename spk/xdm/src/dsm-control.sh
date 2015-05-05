@@ -7,77 +7,70 @@ DNAME="XDM"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-GIT_DIR="/usr/local/git"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="xdm"
-PYTHON="${INSTALL_DIR}/env/bin/python"
-XDM="${INSTALL_DIR}/share/XDM/XDM.py"
-PID_FILE="${INSTALL_DIR}/var/xdm.pid"
-LOG_FILE="${INSTALL_DIR}/var/xdm.log"
-
+PYTHON="${PYTHON_DIR}/bin/python"
+PATH="${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+RUNAS="${PACKAGE}"
+PROG_PY="${INSTALL_DIR}/XDM.py"
+LOG_FILE="${INSTALL_DIR}/xdm.log"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${XDM} --daemonize --pidfile ${PID_FILE} --nolaunch --datadir ${INSTALL_DIR}/var/"
+    # Launch the application in the background
+    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${PROG_PY} --port @PORT@ --daemonize"
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    rm -f ${PID_FILE}
+    # Kill the application
+    kill `ps w | grep ${PACKAGE} | grep -v -E 'stop|grep' | awk '{print $1}'`
 }
+
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
-        return
+   ${INSTALL_DIR}/app/updateInfo
+   if [ `ps w | grep ${PACKAGE} | grep -v -E 'status|grep' | wc -l` -gt 0 ] 
+    then
+        return 0
+    else
+        return 1
     fi
-    rm -f ${PID_FILE}
-    return 1
 }
 
-wait_for_status ()
+run_in_console ()
 {
-    counter=$2
-    while [ ${counter} -gt 0 ]; do
-        daemon_status
-        [ $? -eq $1 ] && return
-        let counter=counter-1
-        sleep 1
-    done
-    return 1
+    # Launch the application in the foreground
+    su - ${RUNAS} -c "PATH=${PATH} ${PYTHON} ${PROG_PY}"
 }
-
 
 case $1 in
     start)
-        if daemon_status; then
-            echo ${DNAME} is already running
-        else
             echo Starting ${DNAME} ...
             start_daemon
-        fi
+            exit $?
         ;;
     stop)
-        if daemon_status; then
             echo Stopping ${DNAME} ...
-            stop_daemon
-        else
-            echo ${DNAME} is not running
-        fi
-        ;;
-    status)
-        if daemon_status; then
-            echo ${DNAME} is running
+			stop_daemon
             exit 0
-        else
-            echo ${DNAME} is not running
-            exit 1
-        fi
+        ;;
+	status)
+			if daemon_status
+			then
+				echo ${DNAME} is running
+				exit 0
+			else
+				echo ${DNAME} is not running
+				exit 1
+			fi
+        ;;
+    console)
+        run_in_console
+        exit $?
         ;;
     log)
-        echo ${LOG_FILE}
+			echo ${LOG_FILE}
+			exit 0
         ;;
     *)
         exit 1

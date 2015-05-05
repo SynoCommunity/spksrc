@@ -1,4 +1,0 @@
-bin:bin/par2
-lnk:bin/par2create
-lnk:bin/par2repair
-lnk:bin/par2verify

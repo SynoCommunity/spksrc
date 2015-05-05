@@ -1,3 +1,0 @@
-lib:@PYTHON_SITE_PACKAGES@/sqlalchemy/cprocessors*.so
-lib:@PYTHON_SITE_PACKAGES@/sqlalchemy/cresultproxy*.so
-lib:@PYTHON_SITE_PACKAGES@/sqlalchemy/cutils*.so

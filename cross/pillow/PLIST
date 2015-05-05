@@ -1,3 +1,0 @@
-lib:@PYTHON_SITE_PACKAGES@/PIL/_imagingmath.so
-lib:@PYTHON_SITE_PACKAGES@/PIL/_imagingmorph.so
-lib:@PYTHON_SITE_PACKAGES@/PIL/_imaging.so

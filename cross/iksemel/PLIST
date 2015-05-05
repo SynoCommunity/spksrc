@@ -1,6 +1,0 @@
-bin:bin/ikslint
-bin:bin/iksperf
-bin:bin/iksroster
-lnk:lib/libiksemel.so
-lnk:lib/libiksemel.so.3
-lib:lib/libiksemel.so.3.1.1
