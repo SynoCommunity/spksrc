@@ -1,0 +1,14 @@
+--- Makefile.in.orig	2015-03-18 09:53:11.372525297 +0100
++++ Makefile.in	2015-03-18 09:53:56.025330034 +0100
+@@ -137,9 +137,9 @@
+ tools/gen_test_char@EXEEXT@: $(OBJECTS_gen_test_char)
+ 	$(LINK_PROG) $(OBJECTS_gen_test_char) $(ALL_LIBS)
+ 
+-include/private/apr_escape_test_char.h: tools/gen_test_char@EXEEXT@
++include/private/apr_escape_test_char.h: tools/gen_test_char_native@EXEEXT@
+ 	$(APR_MKDIR) include/private
+-	tools/gen_test_char@EXEEXT@ > $@
++	tools/gen_test_char_native@EXEEXT@ > $@
+ 
+ LINK_PROG = $(LIBTOOL) $(LTFLAGS) --mode=link $(COMPILE) $(LT_LDFLAGS) \
+ 	    @LT_NO_INSTALL@ $(ALL_LDFLAGS) -o $@
