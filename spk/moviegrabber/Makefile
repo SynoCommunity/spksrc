@@ -16,7 +16,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = MovieGrabber
 CHANGELOG = "1. Updated the package installer"
 
-HOMEPAGE   = https://github.com/binhex/moviegrabber
+HOMEPAGE   = https://github.com/binhex/moviegrabber/tree/development
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
