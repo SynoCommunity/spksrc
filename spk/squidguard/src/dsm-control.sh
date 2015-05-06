@@ -40,7 +40,7 @@ stop_daemon ()
     kill `cat ${CICAP_PID}`
 
     # stop clamd
-    kill `cat ${CLAMD_PID}`
+    kill `ps -w | grep clamd | grep squid | cut -b 1-5`
 }
 
 daemon_status ()
