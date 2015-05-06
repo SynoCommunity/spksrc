@@ -5,7 +5,7 @@
 			"allUsers": true,
 			"title": "JSMusicDB",
 			"desc": "JSMusicDB",
-			"icon": "images/jsmusicdb-{0}.png",
+			"icon": "images/JSMusicDB-{0}.png",
 			"protocol": "http",
 			"url": "/jsmusicdb",
 			"port": "80"			

@@ -3,7 +3,7 @@
     "org.mdevries.traktforboxee": {
       "title": "Trakt for Boxee",
       "desc": "Trakt for Boxee",
-      "icon": "images/traktforboxee-{0}.png",
+      "icon": "images/TraktForBoxee-{0}.png",
       "type": "url",
       "url": "http://trakt.tv",
       "allUsers": true

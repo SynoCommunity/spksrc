@@ -3,7 +3,7 @@
     "org.mdevries.gamez": {
       "title": "Gamez",
       "desc": "Gamez Web UI",
-      "icon": "/images/gamez-{0}.png",
+      "icon": "/images/Gamez-{0}.png",
       "type": "url",
       "url": "3rdparty/Gamez/gamez.cgi",
       "allUsers": true,

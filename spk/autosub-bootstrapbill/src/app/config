@@ -3,7 +3,7 @@
     "org.mdevries.autosub-bootstrapbill": {
       "title": "Auto-Sub Bootstrap Bill",
       "desc": "Auto-Sub Bootstrap Bill Web UI",
-      "icon": "/images/autosub-bootstrapbill-{0}.png",
+      "icon": "/images/AutoSub-BootstrapBill-{0}.png",
       "type": "url",
       "url": "3rdparty/AutoSub-BootstrapBill/autosub-bootstrapbill.cgi",
       "allUsers": true,

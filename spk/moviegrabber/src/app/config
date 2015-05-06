@@ -3,7 +3,7 @@
     "org.mdevries.moviegrabber": {
       "title": "MovieGrabber",
       "desc": "MovieGrabber Web UI",
-      "icon": "/images/moviegrabber-{0}.png",
+      "icon": "/images/MovieGrabber-{0}.png",
       "type": "url",
       "url": "3rdparty/MovieGrabber/moviegrabber.cgi",
       "allUsers": true,

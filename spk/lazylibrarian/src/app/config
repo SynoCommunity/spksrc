@@ -3,7 +3,7 @@
     "org.mdevries.lazylibrarian": {
       "title": "LazyLibrarian",
       "desc": "LazyLibrarian Web UI",
-      "icon": "images/lazylibrarian-{0}.png",
+      "icon": "images/LazyLibrarian-{0}.png",
       "type": "url",
       "url": "3rdparty/LazyLibrarian/lazylibrarian.cgi",
       "allUsers": true
