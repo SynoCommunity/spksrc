@@ -1,4 +1,4 @@
-SPK_NAME = moviegrabber
+SPK_NAME = MovieGrabber
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/moviegrabber.png
@@ -14,13 +14,14 @@ DESCRIPTION_NLD = MovieGrabber is een programma om automatisch films te download
 ADMIN_PORT = 9191
 RELOAD_UI = yes
 DISPLAY_NAME = MovieGrabber
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/binhex/moviegrabber
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+FWPORTS          = src/moviegrabber.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -47,5 +48,5 @@ moviegrabber_extra_install: $(STAGING_DIR)/share/moviegrabber
 
 $(STAGING_DIR)/share/moviegrabber:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/binhex/moviegrabber.git
+	cd $(STAGING_DIR)/share && git clone -b development https://github.com/binhex/moviegrabber.git
 	rm -fr $(STAGING_DIR)/share/moviegrabber/.git $(STAGING_DIR)/share/moviegrabber/.gitignore

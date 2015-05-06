@@ -1,4 +1,4 @@
-SPK_NAME = spotweb
+SPK_NAME = Spotweb
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/spotweb.png
@@ -13,6 +13,7 @@ DESCRIPTION_NLD = Spotweb is een webbased usenet binaire bron indexer op basis v
 ADMIN_URL = /spotweb
 RELOAD_UI = yes
 DISPLAY_NAME = Spotweb
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/spotweb/spotweb
 LICENSE    =

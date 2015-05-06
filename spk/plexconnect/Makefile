@@ -1,4 +1,4 @@
-SPK_NAME = plexconnect
+SPK_NAME = PlexConnect
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/plexconnect.png
@@ -11,6 +11,7 @@ DISTRIBUTOR = Matr1x
 DESCRIPTION = Plex Connect or: Plex @ aTV - think different...
 RELOAD_UI = yes
 DISPLAY_NAME = PlexConnect
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/iBaa/PlexConnect/
 LICENSE    =

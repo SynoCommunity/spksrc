@@ -14,7 +14,7 @@ CFG_FILE="${INSTALL_DIR}/var/Gamez.ini"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
-FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+FWPORTS="/var/packages/${DNAME}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {

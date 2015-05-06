@@ -5,7 +5,7 @@
       "desc": "MovieGrabber Web UI",
       "icon": "/images/moviegrabber-{0}.png",
       "type": "url",
-      "url": "3rdparty/moviegrabber/moviegrabber.cgi",
+      "url": "3rdparty/MovieGrabber/moviegrabber.cgi",
       "allUsers": true,
 	  "grantPrivilege": "local"
     }

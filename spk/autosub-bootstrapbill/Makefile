@@ -14,6 +14,7 @@ DESCRIPTION_NLD = Geautomatiseerde SubtitleSeeker en Addic7ed download script vo
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = Auto-Sub Bootstrap Bill
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/Donny87/autosub-bootstrapbill
 LICENSE    =

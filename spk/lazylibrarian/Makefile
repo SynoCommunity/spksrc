@@ -1,4 +1,4 @@
-SPK_NAME = lazylibrarian
+SPK_NAME = LazyLibrarian
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/lazylibrarian.png
@@ -13,13 +13,14 @@ DESCRIPTION_NLD = LazyLibrarian is een programma om schrijvers te volgen en digi
 ADMIN_PORT = 5299
 RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/DobyTang/LazyLibrarian
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+FWPORTS          = src/lazylibrarian.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

@@ -13,6 +13,7 @@ DESCRIPTION = XDM: eXtendable Download Manager. Plugin based media collection ma
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = XDM
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = http://xdm.lad1337.de
 LICENSE    =

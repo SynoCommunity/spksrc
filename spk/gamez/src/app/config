@@ -5,7 +5,7 @@
       "desc": "Gamez Web UI",
       "icon": "/images/gamez-{0}.png",
       "type": "url",
-      "url": "3rdparty/gamez/gamez.cgi",
+      "url": "3rdparty/Gamez/gamez.cgi",
       "allUsers": true,
       "grantPrivilege": "local"
     }

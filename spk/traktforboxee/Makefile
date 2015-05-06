@@ -1,4 +1,4 @@
-SPK_NAME = traktforboxee
+SPK_NAME = TraktForBoxee
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/traktforboxee.png
@@ -13,6 +13,7 @@ DESCRIPTION = Trakt For Boxee is a simple python script that will scrobble whate
 DESCRIPTION_NLD = Trakt For Boxee is een eenvoudig python script dat alles wat je met je Boxee Box kijkt scrobbelt naar Trakt.
 RELOAD_UI = yes
 DISPLAY_NAME = TraktForBoxee
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/cold12/Trakt-for-Boxee
 LICENSE    =

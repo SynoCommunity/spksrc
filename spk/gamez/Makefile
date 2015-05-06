@@ -1,4 +1,4 @@
-SPK_NAME = gamez
+SPK_NAME = Gamez
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/gamez.png
@@ -13,13 +13,14 @@ DESCRIPTION_NLD = Gamez is een geautomatiseerde downloader voor videospelletjes.
 ADMIN_PORT = 5290
 RELOAD_UI = yes
 DISPLAY_NAME = Gamez
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = https://github.com/avjui/Gamez
 LICENSE    =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+FWPORTS          = src/gamez.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

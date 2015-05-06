@@ -1,4 +1,4 @@
-SPK_NAME = jsmusicdb
+SPK_NAME = JSMusicDB
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/jsmusicdb.png
@@ -13,6 +13,7 @@ DESCRIPTION = A webstandards based music player with advanced playlist support a
 DESCRIPTION_NLD = Een webstandaard gebaseerde muziek speler met geavanceerde speellijst ondersteuning en een geintegreerde YouTube-speler. Een stand-alone versie voor Windows is ook beschikbaar, bekijk http://www.jsmusicdb.com voor meer info.
 RELOAD_UI = yes
 DISPLAY_NAME = JSMusicDB
+CHANGELOG = "1. Updated the package installer"
 
 HOMEPAGE   = http://www.jsmusicdb.com
 LICENSE    =

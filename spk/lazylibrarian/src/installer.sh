@@ -12,7 +12,7 @@ PATH="${INSTALL_DIR}/sbin:${PYTHON_DIR}/bin:/bin:/usr/bin:/usr/syno/bin"
 RUNAS="lazylibrarian"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
-FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+FWPORTS="/var/packages/${DNAME}/scripts/${PACKAGE}.sc"
 
 preinst ()
 {
