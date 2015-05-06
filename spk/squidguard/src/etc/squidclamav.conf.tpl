@@ -14,7 +14,7 @@
 maxsize 5000000
 
 # When a virus is found then redirect the user to this URL
-redirect http://proxy.domain.dom/cgi-bin/clwarn.cgi
+redirect http://==HOSTNAME==:5000/webman/3rdparty/squidguard/clwarn.cgi
 
 # Path to the squiGuard binary if you want URL filtering, note that you'd better
 # use the squid configuration directive 'url_rewrite_program' instead.
