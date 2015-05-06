@@ -1,0 +1,122 @@
+--- ./src/main.c.old	2013-12-12 11:47:31.000000000 +1300
++++ ./src/main.c	2013-12-12 11:50:38.000000000 +1300
+@@ -185,7 +185,7 @@
+ 	sgReloadConfig();
+       }
+       if(failsafe_mode) {
+-	puts("");
++	puts("ERR message=\"squidGuard failsafe mode\"");
+ 	fflush(stdout);
+ 	if(sig_hup){
+           sgReloadConfig();
+@@ -194,7 +194,7 @@
+       }
+       if(parseLine(buf,&squidInfo) != 1){
+ 	sgLogError("ERROR: Error parsing squid line: %s",buf);
+-	puts("");
++	puts("BH message=\"squidGuard error parsing squid line\"");
+       }
+         else {
+ 	src = Source;
+@@ -206,14 +206,14 @@
+ 	  acl = sgAclCheckSource(src);
+ 	  if((redirect = sgAclAccess(src,acl,&squidInfo)) == NULL){
+ 	    if(src == NULL || src->cont_search == 0){
+-	      puts(""); 
++	      puts("ERR");
+ 	      break;
+ 	    } else
+ 	      if(src->next != NULL){
+ 		src = src->next;
+ 		continue;
+ 	      } else {
+-		puts("");
++		puts("ERR");
+ 		break;
+ 	      }
+ 	  } else {
+@@ -228,6 +228,10 @@
+ 	    fprintf(stdout,"%s %s/%s %s %s\n",redirect,squidInfo.src,
+ 		    squidInfo.srcDomain,squidInfo.ident,
+ 		    squidInfo.method);
++           if (isdigit(redirect[0]) && isdigit(redirect[1]) && isdigit(redirect[2]) && redirect[3]==':') {
++             fprintf(stdout,"OK status=%c%c%c url=\"%s\"\n", redirect[0], redirect[1], redirect[2], &redirect[4]);
++           } else
++             fprintf(stdout,"OK rewrite-url=\"%s\"\n",redirect);
+             /* sgLogDebug("DEBUG: %s %s/%s %s %s\n",redirect,squidInfo.src,squidInfo.srcDomain,squidInfo.ident,squidInfo.method);  */
+ 	    break;
+ 	  }
+--- ./src/main.c.in.old	2013-12-12 11:47:31.000000000 +1300
++++ ./src/main.c.in	2013-12-12 11:53:18.000000000 +1300
+@@ -185,7 +185,7 @@
+ 	sgReloadConfig();
+       }
+       if(failsafe_mode) {
+-	puts("");
++	puts("ERR message=\"squidGuard failsafe mode\"");
+ 	fflush(stdout);
+ 	if(sig_hup){
+           sgReloadConfig();
+@@ -194,7 +194,7 @@
+       }
+       if(parseLine(buf,&squidInfo) != 1){
+ 	sgLogError("ERROR: Error parsing squid line: %s",buf);
+-	puts("");
++	puts("BH message=\"squidGuard error parsing squid line\"");
+       }
+         else {
+ 	src = Source;
+@@ -206,14 +206,14 @@
+ 	  acl = sgAclCheckSource(src);
+ 	  if((redirect = sgAclAccess(src,acl,&squidInfo)) == NULL){
+ 	    if(src == NULL || src->cont_search == 0){
+-	      puts(""); 
++	      puts("ERR");
+ 	      break;
+ 	    } else
+ 	      if(src->next != NULL){
+ 		src = src->next;
+ 		continue;
+ 	      } else {
+-		puts("");
++		puts("ERR");
+ 		break;
+ 	      }
+ 	  } else {
+@@ -225,9 +225,11 @@
+ 	      squidInfo.ident[0] = '-';
+ 	      squidInfo.ident[1] = '\0';
+ 	    }
+-	    fprintf(stdout,"%s %s/%s %s %s\n",redirect,squidInfo.src,
+-		    squidInfo.srcDomain,squidInfo.ident,
+-		    squidInfo.method);
++           if (isdigit(redirect[0]) && isdigit(redirect[1]) && isdigit(redirect[2]) && redirect[3]==':') {
++             fprintf(stdout,"OK status=%c%c%c url=\"%s\"\n", redirect[0], redirect[1], redirect[2], &redirect[4]);
++           } else
++             fprintf(stdout,"OK rewrite-url=\"%s\"\n",redirect);
++
+             /* sgLogDebug("DEBUG: %s %s/%s %s %s\n",redirect,squidInfo.src,squidInfo.srcDomain,squidInfo.ident,squidInfo.method);  */
+ 	    break;
+ 	  }
+--- ./src/sgDiv.c.old	2013-12-12 11:47:31.000000000 +1300
++++ ./src/sgDiv.c	2013-12-12 11:48:36.000000000 +1300
+@@ -782,7 +782,7 @@
+   }
+   sgLogError("ERROR: Going into emergency mode");
+   while(fgets(buf, MAX_BUF, stdin) != NULL){
+-    puts("");
++    puts("ERR");
+     fflush(stdout);
+   }
+   sgLogError("ERROR: Ending emergency mode, stdin empty");
+--- ./src/sgDiv.c.in.old	2013-12-12 11:47:31.000000000 +1300
++++ ./src/sgDiv.c.in	2013-12-12 11:48:36.000000000 +1300
+@@ -782,7 +782,7 @@
+   }
+   sgLogError("ERROR: Going into emergency mode");
+   while(fgets(buf, MAX_BUF, stdin) != NULL){
+-    puts("");
++    puts("ERR");
+     fflush(stdout);
+   }
+   sgLogError("ERROR: Ending emergency mode, stdin empty");

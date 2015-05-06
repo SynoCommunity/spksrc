@@ -83,8 +83,8 @@ $autoinaddr  = 2;			# 0|1|2;
 					# 2 TO AUTORESOLVE & REDIRECT TO FIRST NAME
 
 # You may wish to enter your company link and logo to be displayed on the page
-my $company = "SynoCommunity";
-my $companylogo = "synocommunity.png";
+my $company = "http://SynoCommunity.com";
+my $companylogo = "http://$ENV{SERVER_NAME}:5000/webman/3rdparty/squidguard/synocommunity.png";
 
 my $squidguard = "http://www.squidguard.org";
 my $squidguardlogo = "http://www.squidguard.org/Logos/squidGuard.gif";
@@ -319,6 +319,9 @@ if ($targetgroup eq "in-addr") {
    showinaddr($targetgroup,$protocol,$address,$port,$path);
 }
 
+$url =~ s/</&lt;/g ;
+$url =~ s/>/&gt;/g ;
+
 status("403 Forbidden");
 expires(0);
 print "Content-type: text/html\n\n";
@@ -377,6 +380,7 @@ if ($targetgroup eq "in-addr") {
    print "$Babel{msgwebmaster}\n";
 }
 print "<br><br>\n";
+print "$Babel{msgproxymaster} <A HREF=mailto:$proxymaster>$proxymaster</A>.<br>\n";
 print "$Babel{msgrefresh}\n";
 
 print "</td></tr></table>\n";
