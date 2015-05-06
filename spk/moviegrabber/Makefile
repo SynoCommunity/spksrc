@@ -1,6 +1,6 @@
 SPK_NAME = MovieGrabber
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_VERS = 2.2.1.0
+SPK_REV = 3
 SPK_ICON = src/moviegrabber.png
 DSM_UI_DIR = app
 
