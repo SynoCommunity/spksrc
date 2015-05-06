@@ -13,7 +13,7 @@ LICENSE  =
 
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-db=no
+CONFIGURE_ARGS  = --enable-db=no --includedir=$(STAGING_INSTALL_PREFIX)/include/security/
 
 include ../../mk/spksrc.cross-cc.mk
 

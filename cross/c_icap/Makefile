@@ -1,8 +1,8 @@
 PKG_NAME = c_icap
-PKG_VERS = 0.2.2
+PKG_VERS = 0.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.sourceforge.net/project/c-icap/c-icap/0.2.x
+PKG_DIST_SITE = http://downloads.sourceforge.net/project/c-icap/c-icap/0.3.x
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
