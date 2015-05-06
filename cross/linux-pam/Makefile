@@ -1,5 +1,5 @@
 PKG_NAME = Linux-PAM
-PKG_VERS = 1.1.8
+PKG_VERS = 1.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.linux-pam.org/library/

@@ -11,10 +11,10 @@ lnk:lib/libpamc.so.0
 lib:lib/libpamc.so.0.82.1
 lnk:lib/libpam_misc.so
 lnk:lib/libpam_misc.so.0
-lib:lib/libpam_misc.so.0.82.0
+lib:lib/libpam_misc.so.0.82.1
 lnk:lib/libpam.so
 lnk:lib/libpam.so.0
-lib:lib/libpam.so.0.83.1
+lib:lib/libpam.so.0.84.1
 lib:lib/security/pam_access.so
 lib:lib/security/pam_debug.so
 lib:lib/security/pam_deny.so
