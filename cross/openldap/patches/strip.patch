@@ -1,0 +1,11 @@
+--- clients/tools/Makefile.in.orig	2015-04-03 23:54:10.193715480 +0200
++++ clients/tools/Makefile.in	2015-04-03 23:54:58.795342134 +0200
+@@ -120,7 +120,7 @@
+ 	-$(MKDIR) $(DESTDIR)$(bindir)
+ 	@(								\
+ 	    for prg in $(PROGRAMS); do					\
+-		$(LTINSTALL) $(INSTALLFLAGS) $(STRIP) -m 755 $$prg$(EXEEXT)	\
++		$(LTINSTALL) $(INSTALLFLAGS) -m 755 $$prg$(EXEEXT)	\
+ 		    $(DESTDIR)$(bindir);				\
+ 	    done							\
+ 	)
