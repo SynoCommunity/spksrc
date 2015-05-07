@@ -1,11 +1,11 @@
 PKG_NAME = openssl
-PKG_VERS = 1.0.1m
+PKG_VERS = 1.0.2a
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.openssl.org/source
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib
+DEPENDS = 
 
 HOMEPAGE = http://www.openssl.org/
 COMMENT  = Compression Library
@@ -29,10 +29,13 @@ endif
 ifneq ($(findstring $(ARCH), powerpc),)
 OPENSSL_ARCH = synology-ppc
 endif
+ifneq ($(findstring $(ARCH), x64),)
+EC_NIST=enable-ec_nistp_64_gcc_128
+endif
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
+	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) shared threads no-ssl2 $(EC_NIST)
 
 .PHONY: myInstall
 myInstall:
