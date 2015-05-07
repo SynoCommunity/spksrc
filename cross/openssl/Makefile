@@ -32,6 +32,9 @@ endif
 ifneq ($(findstring $(ARCH), x64),)
 EC_NIST=enable-ec_nistp_64_gcc_128
 endif
+ifneq (5.0,$(firstword $(sort $(TCVERSION) 5.0)))
+PATCHES = $(sort $(wildcard patches/00*.patch))
+endif
 
 .PHONY: myConfigure
 myConfigure:
