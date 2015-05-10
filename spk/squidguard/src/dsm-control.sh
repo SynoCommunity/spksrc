@@ -27,13 +27,13 @@ start_daemon ()
     ${CICAP} -f ${CICAP_CFG}
        
     # launch squid
-    su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE}"
+    su ${RUNAS} -c "${SQUID} -f ${CFG_FILE}"
 }
 
 stop_daemon ()
 {
     # stop squid
-    su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k shutdown"
+    su ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k shutdown"
     wait_for_status 1 20
     
     # stop c-icap

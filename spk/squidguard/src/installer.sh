@@ -43,11 +43,11 @@ postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Init squid cache directory
-        su - ${RUNAS} -c "${SQUID} -z -f ${CFG_FILE}"
+        su ${RUNAS} -c "${SQUID} -z -f ${CFG_FILE}"
     fi
 
     # Init SSLBump cache directory
-    su - ${RUNAS} -c "${INSTALL_DIR}/libexec/ssl_crtd -c -s ${INSTALL_DIR}/var/ssl_db" >> /dev/null
+    su ${RUNAS} -c "${INSTALL_DIR}/libexec/ssl_crtd -c -s ${INSTALL_DIR}/var/ssl_db" >> /dev/null
 
     # Install webman
     ln -s ${WWW_DIR} ${WEBMAN_DIR}/${PACKAGE}
@@ -136,7 +136,7 @@ postupgrade ()
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     # check squid.conf and restore default file if parse error
-    su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k parse &> /dev/null"
+    su ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k parse &> /dev/null"
     if [ $? -ne 0 ]; then
         mv ${CFG_FILE} ${CFG_FILE}.bad
         cp ${CFG_FILE}.default ${CFG_FILE}

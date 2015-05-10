@@ -15,5 +15,5 @@ rsync -arpogvt ${RSYNC_DIR} .
 if [ $? -eq 0 ]
 then
   chown -R ${RUNAS}:root ${DB_DIR}
-  su - ${RUNAS} -c "${INSTALL_DIR}/bin/squidGuard -c ${INSTALL_DIR}/etc/squidguard.conf -C all"
+  su ${RUNAS} -c "${INSTALL_DIR}/bin/squidGuard -c ${INSTALL_DIR}/etc/squidguard.conf -C all"
 fi
