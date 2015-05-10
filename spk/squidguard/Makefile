@@ -12,7 +12,7 @@ DEPENDS = cross/busybox cross/squidclamav cross/squidguard cross/squid cross/squ
 SPK_DEPENDS = "AntiVirus>1.2:Perl"
 INSTALL_DEP_SERVICES = "apache-web"
 START_DEP_SERVICES = "apache-web"
-INSTUNINST_RESTART_SERVICES = "apache-web"
+INSTUNINST_RESTART_SERVICES = "apache-web crond"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid. This package also includes SquidClamav for viruses protection and SquidGuard Manager.

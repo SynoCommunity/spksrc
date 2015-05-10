@@ -63,9 +63,6 @@ postinst ()
     if [ $? -eq 1 ]; then
         echo "0	1	*	*	*	root	${INSTALL_DIR}/bin/update_db.sh > ${INSTALL_DIR}/var/logs/update_db.log" >> /etc/crontab
         echo "15	0	*	*	0	root	${INSTALL_DIR}/bin/logrotate.sh > ${INSTALL_DIR}/bin/logrotate.log" >> /etc/crontab
-        /usr/syno/etc/rc.d/S04crond.sh stop >> /dev/null
-        sleep 1
-        /usr/syno/etc/rc.d/S04crond.sh start >> /dev/null
     fi
 
     # launch first the update
@@ -93,9 +90,6 @@ postuninst ()
     rm -f ${INSTALL_DIR}
     rm -Rf ${WEBMAN_DIR}/${PACKAGE}
     sed "/${PACKAGE}/d" /etc/crontab >> /dev/null
-    /usr/syno/etc/rc.d/S04crond.sh stop >> /dev/null
-    sleep 1
-    /usr/syno/etc/rc.d/S04crond.sh start >> /dev/null
     deluser ${RUNAS}
     
     exit 0
