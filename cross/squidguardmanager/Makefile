@@ -15,12 +15,15 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 
+SQUID_PATH = "${INSTALL_PREFIX}/sbin/squid"
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile: $(SRC_DIR)squid_wrapper/squid_wrapper
 
 $(SRC_DIR)squid_wrapper/squid_wrapper:
+	perl -p -i -e 's/#define SQUID_BINARY.*/#define SQUID_BINARY $(shell echo "\"$(SQUID_PATH)\"" | sed 's/\//\\\//g')/' $(WORK_DIR)/$(PKG_DIR)/squid_wrapper/squid_wrapper.c
 	@$(RUN) $(CC) $(CFLAGS) -D'VERSION=$(VERSION)' -o $(SRC_DIR)squid_wrapper/squid_wrapper $(SRC_DIR)squid_wrapper/squid_wrapper.c
 
 .PHONY: myInstall

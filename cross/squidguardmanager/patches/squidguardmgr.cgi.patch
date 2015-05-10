@@ -63,17 +63,6 @@
  $VERSION     = '1.14',
  $AUTHOR      = 'Gilles DAROLD <gilles AT darold DOT net>';
  $COPYRIGHT   = 'Copyright &copy; 2010-2015 Gilles DAROLD, all rights reserved';
-@@ -24,8 +80,8 @@
- my $SC_PROGRAM  = 'SquidClamav Manager';
- 
- # Default SquidGuard installation path
--my $DBHOME = "/var/lib/squidguard/db";
--my $LOGDIR = "/var/log/squidguard";
-+my $DBHOME = "/usr/local/squidguard/var/db";
-+my $LOGDIR = "/usr/local/squidguard/var/logs";
- 
- # Variables that can be overidden into the squidguardmgr.conf file
- our $DIFF       = '/usr/bin/diff';
 @@ -37,7 +93,6 @@
  our $BLDESC     = 'description.dat';
  our $CONF_FILE  = '/usr/local/squidGuard/squidguard.conf';
