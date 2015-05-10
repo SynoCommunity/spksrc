@@ -5,6 +5,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/c-icap/c-icap/0.3.x
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+REQUIRED_DSM = 4.3
+UNSUPPORTED_ARCHS = bromolow cedarview x86
+
 DEPENDS =
 
 HOMEPAGE = http://c-icap.sourceforge.net/
@@ -13,7 +16,7 @@ LICENSE  =
 
 PRE_CONFIGURE_TARGET = myConfigure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-large-files --with-zlib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib -C
+CONFIGURE_ARGS  = --enable-large-files -C
 
 include ../../mk/spksrc.cross-cc.mk
 
