@@ -108,22 +108,15 @@ preupgrade ()
 
 postupgrade ()
 {
-    # Restore some stuff
-    mv ${INSTALL_DIR}/etc/c-icap.conf ${TMP_DIR}/${PACKAGE}/etc/c-icap.conf.default
-    mv ${INSTALL_DIR}/etc/c-icap.magic ${TMP_DIR}/${PACKAGE}/etc/c-icap.magic.default
-    mv ${INSTALL_DIR}/etc/cachemgr.conf ${TMP_DIR}/${PACKAGE}/etc/cachemgr.conf.default
-    mv ${INSTALL_DIR}/etc/clamd.conf ${TMP_DIR}/${PACKAGE}/etc/clamd.conf.default
-    mv ${INSTALL_DIR}/etc/errorpage.css ${TMP_DIR}/${PACKAGE}/etc/errorpage.css.default
-    mv ${INSTALL_DIR}/etc/mime.conf ${TMP_DIR}/${PACKAGE}/etc/mime.conf.default
-    mv ${INSTALL_DIR}/etc/msnauth.conf ${TMP_DIR}/${PACKAGE}/etc/msnauth.conf.default
-    mv ${INSTALL_DIR}/etc/squid.conf ${TMP_DIR}/${PACKAGE}/etc/squid.conf.default
-    mv ${INSTALL_DIR}/etc/squid.conf.documented ${TMP_DIR}/${PACKAGE}/etc/
-    mv ${INSTALL_DIR}/etc/squidclamav.conf ${TMP_DIR}/${PACKAGE}/etc/squidclamav.conf.default
-    mv ${INSTALL_DIR}/etc/squidguard.conf ${TMP_DIR}/${PACKAGE}/etc/squidguard.conf.default
-    mv ${INSTALL_DIR}/etc/squidguard.conf.tpl ${TMP_DIR}/${PACKAGE}/etc/squidguard.conf.tpl.default
-    mv ${INSTALL_DIR}/etc/squidguardmgr.conf ${TMP_DIR}/${PACKAGE}/etc/squidguardmgr.conf.default
+    # Backup default configuration
+    for file in ${INSTALL_DIR}/etc/*.conf; do
+        mv "${INSTALL_DIR}/etc/$file" "${TMP_DIR}/${PACKAGE}/etc/$file.default"
+    done
 
+    # Delete config file
     rm -fr ${INSTALL_DIR}/etc
+
+    # Restore old config dir
     mv ${TMP_DIR}/${PACKAGE}/etc ${INSTALL_DIR}/
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
