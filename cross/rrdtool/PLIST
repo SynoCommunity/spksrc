@@ -1,0 +1,6 @@
+lnk:lib/librrd.so
+lnk:lib/librrd.so.4
+lib:lib/librrd.so.4.2.2
+lnk:lib/librrd_th.so
+lnk:lib/librrd_th.so.4
+lib:lib/librrd_th.so.4.2.2
