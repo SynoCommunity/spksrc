@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.ntopng": {
+            "title": "ntopng",
+            "desc": "ntopng",
+            "icon": "images/ntopng-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "3000",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
