@@ -1,0 +1,11 @@
+--- Utils.cpp	2014-09-06 13:27:07.000000000 +0200
++++ Utils.cpp	2014-11-10 12:26:10.347648566 +0100
+@@ -133,7 +133,7 @@
+   if (num_cores > 1) {
+     CPU_ZERO(&cpu_set);
+     CPU_SET(core, &cpu_set);
+-    pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpu_set);
++    //pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpu_set);
+   }
+ #endif
+ }
