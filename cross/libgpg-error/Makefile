@@ -14,3 +14,7 @@ LICENSE  = LGPL
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi
+endif
