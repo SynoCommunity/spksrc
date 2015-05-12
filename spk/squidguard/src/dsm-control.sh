@@ -22,6 +22,7 @@ start_daemon ()
 {
     # launch clamd
     nohup ${CLAMD} -c ${CLAMD_CFG} &
+    wait_for_status 0 180 ${CLAMD_PID}
     
     # launch c-icap
     ${CICAP} -f ${CICAP_CFG}
@@ -34,18 +35,18 @@ stop_daemon ()
 {
     # stop squid
     su ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k shutdown"
-    wait_for_status 1 20
+    wait_for_status 1 20 ${PID_FILE}
     
     # stop c-icap
     kill `cat ${CICAP_PID}`
 
     # stop clamd
-    kill `ps -w | grep clamd | grep squid | cut -b 1-5`
+     kill `cat ${CLAMD_PID}`
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && [ -d /proc/`cat ${PID_FILE}` ]; then
+    if [ -f $1 ] && [ -d /proc/`cat $1` ]; then
         return
     fi
     return 1
@@ -55,7 +56,7 @@ wait_for_status ()
 {
     counter=$2
     while [ ${counter} -gt 0 ]; do
-        daemon_status
+        daemon_status $3
         [ $? -eq $1 ] && break
         let counter=counter-1
         sleep 1
@@ -65,7 +66,7 @@ wait_for_status ()
 
 case $1 in
     start)
-        if daemon_status; then
+        if daemon_status ${PID_FILE}; then
             echo ${DNAME} is already running
             exit 0
         else
@@ -75,7 +76,7 @@ case $1 in
         fi
         ;;
     stop)
-        if daemon_status; then
+        if daemon_status ${PID_FILE}; then
             echo Stopping ${DNAME} ...
             stop_daemon
             exit $?
@@ -91,7 +92,7 @@ case $1 in
         exit $?
         ;;
     status)
-        if daemon_status; then
+        if daemon_status ${PID_FILE}; then
             echo ${DNAME} is running
             exit 0
         else
