@@ -6,7 +6,7 @@ SPK_ICON = src/htop.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = an interactive process viewer for Linux
+DESCRIPTION = An interactive process viewer for Linux
 RELOAD_UI = no
 DISPLAY_NAME = htop
 STARTABLE = no
