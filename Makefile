@@ -70,7 +70,7 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
-setup: local.mk dsm-4.3
+setup: local.mk dsm-5.1
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
