@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/ncurses
 
 HOMEPAGE = http://hisham.hm/htop/
-COMMENT  = An interactive process viewer for Linux
+COMMENT  = An interactive process viewer for Linux (the package is intended for DSM-4.3 or earlier where it's not available)
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
