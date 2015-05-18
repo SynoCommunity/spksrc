@@ -15,7 +15,7 @@ PID_FILE="${INSTALL_DIR}/var/syncapp.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${BTSYNC} --config ${CFG_FILE}"
+    su - ${USER} -c "umask 200;PATH=${PATH} ${BTSYNC} --config ${CFG_FILE}"
 }
 
 stop_daemon ()
