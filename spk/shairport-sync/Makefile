@@ -25,7 +25,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = shairport_extra_install
 
-BUSYBOX_CONFIG = daemon nice
+BUSYBOX_CONFIG = daemon
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk

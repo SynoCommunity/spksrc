@@ -17,7 +17,6 @@ CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX) --with-alsa --with-ssl=opens
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
 PRE_CONFIGURE_TARGET = myPreConfigure
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -25,7 +24,3 @@ include ../../mk/spksrc.cross-cc.mk
 myPreConfigure:
 	$(RUN) autoreconf -i -f
 
-.PHONY: myInstall
-myInstall:
-	$(RUN) PREFIX=$(STAGING_INSTALL_PREFIX) make install
-	
