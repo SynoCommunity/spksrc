@@ -9,7 +9,7 @@ DEPENDS = cross/libtool cross/libconfig cross/popt cross/libdaemon cross/openssl
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 COMMENT  = Use Synology NAS as an Airplay receiver. Requires USB soundcard or speakers.
-LICENSE  =
+LICENSE  = https://raw.githubusercontent.com/mikebrady/shairport-sync/$(PKG_VERS)/LICENSES
 
 GNU_CONFIGURE = 1
 
