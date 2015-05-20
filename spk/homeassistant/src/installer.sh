@@ -16,6 +16,7 @@ CONFIG_DIR="${INSTALL_DIR}/var"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 SYNO_GROUP="sc-download"
 SYNO_GROUP_DESC="SynoCommunity's download related group"
