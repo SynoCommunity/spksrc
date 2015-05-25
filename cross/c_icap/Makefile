@@ -1,12 +1,9 @@
 PKG_NAME = c_icap
-PKG_VERS = 0.3.5
+PKG_VERS = 0.2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.sourceforge.net/project/c-icap/c-icap/0.3.x
+PKG_DIST_SITE = http://downloads.sourceforge.net/project/c-icap/c-icap/0.2.x
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-REQUIRED_DSM = 4.3
-UNSUPPORTED_ARCHS = bromolow cedarview x86
 
 DEPENDS =
 
