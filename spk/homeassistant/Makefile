@@ -29,6 +29,8 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 
+UNSUPPORTED_ARCHS = powerpc ppc824x
+
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = homeassistant_extra_install
