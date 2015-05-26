@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://0pointer.de/lennart/projects/libdaemon/
 COMMENT  = libdaemon is a lightweight C library that eases the writing of UNIX daemons.
-LICENSE  =
+LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = ac_cv_func_setpgrp_void=yes

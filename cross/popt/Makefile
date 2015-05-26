@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://rpm5.org/files/popt/
 COMMENT  = popt is a command line option parsing library
-LICENSE  =
+LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
