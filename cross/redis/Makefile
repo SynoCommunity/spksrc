@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://redis.io/
 COMMENT  = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
-LICENSE  = 
+LICENSE  = BSD
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
