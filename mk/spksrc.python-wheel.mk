@@ -27,5 +27,7 @@ PYTHONPATH = $(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_D
 wheel_python_module:
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" bdist_wheel -d $(WORK_DIR)/wheelhouse
 	@rename -f 's/linux_i686/any/g' $(WORK_DIR)/wheelhouse/*.whl
+	@rename -f 's/linux_x86_64/any/g' $(WORK_DIR)/wheelhouse/*.whl
+	@rename -f 's/cp34m/none/g' $(WORK_DIR)/wheelhouse/*.whl
 
 all: install

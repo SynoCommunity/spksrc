@@ -1,0 +1,53 @@
+# required for Home Assistant core
+requests>=2.0
+#pyyaml>=3.11 is currently included as a module
+
+#(shared) extra dependencies since we use --no-deps for pip
+six>=1.9.0 #dependency for websocket-client and transmissionrpc
+websocket-client>=0.29.0 #dependency for pushbullet.py
+netifaces>=0.10.4 #cross-compiled dependency for zeroconf
+VarEvents>=1.0.0 #dependency for PyISY
+
+# optional, needed for specific components
+
+# discovery
+zeroconf>=0.16.0
+
+# sun
+pyephem>=3.7
+
+# lights.hue
+phue>=0.8
+
+# media_player.cast
+# pychromecast>=0.5 disabled since it currently does not work with Chromecast api
+
+# keyboard
+# pyuserinput>=0.1.9 is excluded for the moment
+
+# switch.tellstick, sensor.tellstick
+# tellcore-py>=1.0.4 is excluded for the moment
+
+# device_tracker.nmap
+python-libnmap>=0.6.2
+
+# notify.pushbullet
+pushbullet.py>=0.7.1
+
+# thermostat.nest
+python-nest>=2.1
+
+# z-wave
+ pydispatcher>=2.0.5
+
+# isy994
+PyISY>=1.0.2
+
+# sensor.systemmonitor
+psutil>=2.2.1
+
+#pushover notifications
+python-pushover>=0.2
+
+# Transmission Torrent Client
+transmissionrpc>=0.11
