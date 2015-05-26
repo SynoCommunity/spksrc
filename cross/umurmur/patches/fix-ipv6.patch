@@ -1,8 +1,8 @@
---- src/server.c.orig	2014-09-01 23:44:12.341148606 +0200
-+++ src/server.c	2014-09-01 23:45:15.068360017 +0200
-@@ -48,6 +48,10 @@
- #include "version.h"
+--- src/server.c.orig	2015-04-07 10:01:12.000000000 +0000
++++ src/server.c	2015-05-26 21:00:05.355847103 +0000
+@@ -49,6 +49,10 @@
  #include "util.h"
+ #include "sharedmemory.h"
  
 +#ifndef IPV6_TCLASS
 +#  define IPV6_TCLASS 67
