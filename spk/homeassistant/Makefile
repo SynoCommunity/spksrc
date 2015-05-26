@@ -11,7 +11,7 @@ BUILD_DEPENDS += cross/pyephem cross/netifaces cross/psutil
 
 SPK_DEPENDS = "python3>=3.4.1-4:git"
 
-DEPENDS = cross/nmap #for python-libnmap
+DEPENDS = cross/busybox cross/nmap #for python-libnmap
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
@@ -34,6 +34,9 @@ UNSUPPORTED_ARCHS = powerpc ppc824x
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = homeassistant_extra_install
+
+BUSYBOX_CONFIG = usrmng daemon
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 

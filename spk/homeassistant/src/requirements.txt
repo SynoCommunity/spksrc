@@ -1,6 +1,7 @@
 # required for Home Assistant core
 requests>=2.0
 #pyyaml>=3.11 is currently included as a module
+pytz>=2015.2
 
 #(shared) extra dependencies since we use --no-deps for pip
 six>=1.9.0 #dependency for websocket-client and transmissionrpc
@@ -18,6 +19,9 @@ pyephem>=3.7
 
 # lights.hue
 phue>=0.8
+
+# lights.limitlessled
+ledcontroller>=1.0.7
 
 # media_player.cast
 # pychromecast>=0.5 disabled since it currently does not work with Chromecast api
@@ -51,3 +55,10 @@ python-pushover>=0.2
 
 # Transmission Torrent Client
 transmissionrpc>=0.11
+
+# OpenWeatherMap Web API
+#pyowm>=2.2.0
+
+# XMPP Bindings (notify.xmpp)
+#sleekxmpp>=1.3.1
+
