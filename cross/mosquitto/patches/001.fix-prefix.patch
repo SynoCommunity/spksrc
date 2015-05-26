@@ -1,6 +1,6 @@
---- Makefile.orig	2014-10-08 23:50:07.000000000 +0200
-+++ Makefile	2014-12-26 00:34:09.041618873 +0100
-@@ -33,11 +33,11 @@
+--- Makefile.orig	2015-05-07 13:21:22.000000000 +0000
++++ Makefile	2015-05-26 20:43:54.204228887 +0000
+@@ -37,11 +37,11 @@
  install : mosquitto
  	set -e; for d in ${DIRS}; do $(MAKE) -C $${d} install; done
  	set -e; for d in ${DOCDIRS}; do $(MAKE) -C $${d} install; done
