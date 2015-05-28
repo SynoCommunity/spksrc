@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://hisham.hm/htop/releases/1.0.1
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = powerpc-4.0 ppc824x-4.2
+UNSUPPORTED_ARCHS = powerpc ppc824x
 
 DEPENDS = cross/ncurses
 
