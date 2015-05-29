@@ -3,7 +3,6 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/saltpad.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS  = 
 WHEELS = src/requirements.txt
