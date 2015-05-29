@@ -85,8 +85,14 @@ ScriptDir=${MainDir}/scripts
 
 # Lock-file for daemon-mode, POSIX only.
 #
-# If the option is not empty, NZBGet creates the file and writes process-id
-# (PID) into it. That info can be used in shell scripts.
+# When started in daemon mode the program creates the lock file and
+# writes process-id (PID) into it. That info can be used in shell
+# scripts. If the lock file can not be created or the lock to the file
+# can not be acquired the daemon terminates, preventing unintentional
+# starting of multiple daemons.
+#
+# Set to empty value to disable the creating of the lock-file and the
+# check for another running instance (not recommended).
 LockFile=${MainDir}/nzbget.lock
 
 # Where to store log file, if it needs to be created.
@@ -196,6 +202,16 @@ Server1.Cipher=
 # Maximum number of simultaneous connections to this server (0-999).
 Server1.Connections=4
 
+# Server retention time (days).
+#
+# How long the articles are stored on the news server. The articles
+# whose age exceed the defined server retention time are not tried on
+# this news server, the articles are instead considered failed on this
+# news server.
+#
+# Value "0" disables retention check.
+Server1.Retention=0
+
 # Second server, on level 0.
 
 #Server2.Level=0
@@ -258,6 +274,52 @@ ControlUsername=nzbget
 # Set to empty value to disable authorization request.
 ControlPassword=tegbzn6789
 
+# User name for restricted access.
+#
+# Restricted user can control the program with few restrictions. He
+# has access to web-interface and can see most program settings. He
+# can not change program settings and can not view security related
+# options or options provided by extension scripts.
+#
+# Use this user to connect to NZBGet from other programs and web-sites.
+#
+# In terms of RPC-API the user:
+# - cannot use method "saveconfig";
+# - methods "config" and "saveconfig" return string "***" for
+#   options those content is protected from the user.
+#
+# Set to empty value to disable restricted user.
+#
+# NOTE: Don't forget to change default username/password of the control
+# user (options <ControlUsername> and <ControlPassword>).
+RestrictedUsername=
+
+# Password for restricted access.
+#
+# Set to empty value to disable password check.
+RestrictedPassword=
+
+# User name to add downloads via RPC-API.
+#
+# Use the AddUsername/AddPassword to give other programs or web-services
+# access to NZBGet with only two permissions:
+# - add new downloads using RPC-method "append";
+# - check program version using RPC-method "version".
+#
+# In a case the program/web-service needs more rights use the restricted
+# user instead (options <RestrictedUsername> and <RestrictedPassword>).
+#
+# Set to empty value to disable add-user.
+#
+# NOTE: Don't forget to change default username/password of the control
+# user (options <ControlUsername> and <ControlPassword>).
+AddUsername=
+
+# Password for user with add downloads access.
+#
+# Set to empty value to disable password check.
+AddPassword=
+
 # Secure control of NZBGet server (yes, no).
 #
 # Activate the option if you want to access NZBGet built-in web-server 
@@ -278,7 +340,8 @@ SecureKey=
 # IP-addresses allowed to connect without authorization.
 #
 # Comma separated list of privileged IPs for easy access to NZBGet
-# built-in web-server (web-interface and RPC).
+# built-in web-server (web-interface and RPC). The connected clients
+# have full unrestricted access.
 #
 # Example: 127.0.0.1,192.168.178.2.
 #
@@ -707,27 +770,29 @@ CrcCheck=yes
 
 # How many retries should be attempted if a download error occurs (0-99).
 #
-# 1) If download fails because of "article or group not found error" the
-# program tries another news server.
-#
-# 2) If download fails because of interrupted connection, the program
-# tries the same server again until connection can be established.
-#
-# In both cases 1) and 2) option <Retries> is not used.
-#
-# If download however fails because of incomplete article, CRC-error or other
-# error not mentioned above the program tries to redownload the article from
-# the same news server as many times as defined in option <Retries>. If all
+# If download fails because of incomplete or damaged article or due to
+# CRC-error the program tries to redownload the article from the same
+# news server as many times as defined in option <Retries>. If all
 # attempts fail the program tries another news server.
+#
+# If download fails because of "article or group not found error" the
+# program tries another news server without retrying on the failed server.
+#
+# If download fails because of interrupted connection the program
+# tries another news server or the same server after the block interval
+# expires.
 Retries=3
 
-# Set the interval between retries (seconds).
+# Wait interval between retries (seconds).
+#
+# If download of an article fails because of interrupted connection
+# the server is temporary blocked until the retry interval expires.
 RetryInterval=10
 
-# Set connection timeout for article downloading (seconds).
+# Connection timeout for article downloading (seconds).
 ArticleTimeout=60
 
-# Set connection timeout for URL fetching (seconds).
+# Connection timeout for URL fetching (seconds).
 #
 # This includes fetching of nzb-files via URLs and fetching of RSS feeds.
 UrlTimeout=60
@@ -858,7 +923,6 @@ WriteLog=append
 # (option <WriteLog> is set to "rotate").
 RotateLog=3
 
-
 # How error messages must be printed (screen, log, both, none).
 ErrorTarget=both
 
@@ -869,23 +933,29 @@ WarningTarget=both
 InfoTarget=both
 
 # How detail messages must be printed (screen, log, both, none).
-DetailTarget=both
+DetailTarget=log
 
 # How debug messages must be printed (screen, log, both, none).
 #
 # Debug-messages can be printed only if the program was compiled in
 # debug-mode: "./configure --enable-debug".
-DebugTarget=both
+DebugTarget=log
 
 # Number of messages stored in buffer and available for remote
 # clients (messages).
 LogBufferSize=1000
 
-# Create a log of all broken files (yes ,no).
+# Create log for each downloaded nzb-file (yes, no).
+#
+# The messages are saved for each download separately and can be viewed
+# at any time in download details dialog or history details dialog.
+NzbLog=yes
+
+# Create a log of all broken files (yes, no).
 #
 # It is a text file placed near downloaded files, which contains
 # the names of broken files.
-CreateBrokenLog=yes
+BrokenLog=yes
 
 # Create memory dump (core-file) on abnormal termination, Linux only (yes, no).
 #
@@ -1148,9 +1218,13 @@ ParThreads=0
 
 # Files to ignore during par-check.
 #
-# List of file extensions or file names to ignore by par-rename and
-# par-check. The entries must be separated with commas. The entries
-# can be file extensions or any text the file name may end with.
+# List of file extensions, file names or file masks to ignore by
+# par-rename and par-check. The entries must be separated with
+# commas.
+#
+# The entries must be separated with commas. The entries can be file
+# extensions, file names or file masks containing wildcard
+# characters * and ?.
 #
 # If par-rename or par-check detect missing or damaged files they
 # will ignore files matching this option and will not initiate
@@ -1170,8 +1244,9 @@ ParIgnoreExt=.sfv, .nzb, .nfo
 #  None   - do nothing (continue download).
 #
 # NOTE: For automatic duplicate handling option must be set to "Delete"
-# or "None". If it is set to "Pause" you will need to manually unpause
-# another duplicate (if any exists in queue). See also option <DupeCheck>.
+# or "None". If it is set to "Pause" you will need to manually return
+# another duplicate to queue (if any exists in history). See also
+# option <DupeCheck>.
 HealthCheck=delete
 
 # Maximum allowed time for par-repair (minutes).
@@ -1212,20 +1287,6 @@ ParPauseQueue=no
 # from download queue after successful check/repair.
 ParCleanupQueue=yes
 
-# Files to delete after successful check/repair.
-#
-# List of file extensions or file names to delete after successful
-# download. The entries must be separated with commas. The entries 
-# can be file extensions or any text the file name may end with.
-#
-# Files or extensions listed here are also ignored by par-rename
-# and par-check.
-#
-# NOTE: See also option <ParIgnoreExt>.
-#
-# Example: .par2, .sfv
-ExtCleanupDisk=.par2, .sfv, _brokenlog.txt
-
 
 ##############################################################################
 ### UNPACK                                                                 ###
@@ -1262,6 +1323,24 @@ UnpackCleanupDisk=yes
 #
 # Example: /usr/bin/unrar.
 #
+# The option can also contain extra switches to pass to unrar. To the 
+# here defined command line NZBGet adds the following switches:
+#    x -y -p- -o+ *.rar ./_unpack/
+#
+# Switch "x" is added only if neither "x" nor "e" were defined in
+# the option (this allows you to use switch "e" instead of "x"). switch
+# "-o+" is added only if neither "-o+" nor "-o-" were defined
+# in the command line. All other paramaters are always added. Parameter
+# "-p-" is replaced with "-ppassword" if a password is set for nzb-file.
+#
+# Examples:
+# 1) ignore file attributes (pemissions):
+# /usr/bin/unrar x -ai;
+# 2) decrease priority of unrar-process:
+# nice -n 19 unrar.
+#
+# For other useful switches refer to unrar documentation.
+#
 # If unrar is in your PATH you may leave the path part and set only
 # the executable name ("unrar" on POSIX or "unrar.exe" on Windows).
 UnrarCmd=unrar
@@ -1270,10 +1349,43 @@ UnrarCmd=unrar
 #
 # Example: /usr/bin/7z.
 #
+# Similar to option <UnrarCmd> this option can also include extra switches.
+#
 # If 7-Zip binary is in your PATH you may leave the path part and set only
 # the executable name ("7z" or "7za" on POSIX or "7z.exe" on Windows).
 SevenZipCmd=7z
 
+# Files to delete after successful download.
+#
+# List of file extensions, file names or file masks to delete after
+# successful download. If either unpack or par-check fail the cleanup is
+# not performed. If neither unpack nor par-check were made (because they
+# were disabled or the download doesn't contain archives and/or par-files
+# the cleanup is performed if the health is 100%.
+#
+# The entries must be separated with commas. The entries can be file
+# extensions, file names or file masks containing wildcard
+# characters * and ?.
+#
+# Files listed here are also ignored by par-rename and par-check.
+#
+# NOTE: See also option <ParIgnoreExt>.
+#
+# Example: .par2, .sfv
+ExtCleanupDisk=.par2, .sfv, _brokenlog.txt
+
+# Path to file containing unpack passwords.
+#
+# If the option is set the program will try all passwords from the file
+# when unpacking the archives. The file must be a text file containing
+# one password per line.
+#
+# If an nzb-file has a defined password (in the post-processing settings)
+# then the password-file is not used for that nzb-file.
+#
+# NOTE: Trying multiple passwords is a time consuming task. Whenever possible
+# passwords should be set per nzb-file in their post-processing settings. 
+UnpackPassFile=
 
 ##############################################################################
 ### EXTENSION SCRIPTS                                                      ###
@@ -1534,13 +1646,14 @@ PostScript=
 # http://nzbget.net/Extension_scripts.
 ScanScript=
 
-# List of queue scripts to execute after a nzb-file is added to queue.
+# List of queue scripts to execute on queue events.
 #
 # The scripts in the list must be separated with commas or semicolons. Only
 # filenames without path must be used. All scripts must be stored in directory
 # pointed by option <ScriptDir>. 
 #
-# The scripts are executed each time a new file is added to queue.
+# The scripts are executed on certain queue events such as adding
+# a new nzb-file to queue, etc.
 #
 # Example: DeleteQueueSamples.sh, NzbAddedNotify.py.
 #
@@ -1650,4 +1763,3 @@ ScriptPauseQueue=no
 # (for dual-mode scripts which act as queue- and post-processing-scripts
 # at the same time).
 EventInterval=0
-

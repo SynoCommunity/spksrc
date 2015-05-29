@@ -1,10 +1,10 @@
 SPK_NAME = nzbget
-SPK_VERS = 14.2
-SPK_REV = 15
+SPK_VERS = 15.0
+SPK_REV = 1
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/unrar cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/unrar cross/p7zip cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION     = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
@@ -13,7 +13,6 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 6789
 DISPLAY_NAME = NZBGet
-CHANGELOG = "1. Update NZBGet to 14.2"
 
 HOMEPAGE = http://nzbget.sourceforge.net/
 LICENSE  =
@@ -49,9 +48,7 @@ nzbget_extra_install: $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia $(STAGING_D
 
 $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia:
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/nzbToMedia.git
-	rm -fr $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia/.git*
 
 $(STAGING_DIR)/share/nzbget/scripts/GetScripts:
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/GetScripts.git
-	rm -fr $(STAGING_DIR)/share/nzbget/scripts/GetScripts/.git*
 
