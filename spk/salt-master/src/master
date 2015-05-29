@@ -1,9 +1,10 @@
 ##### Primary configuration settings #####
 ##########################################
 # This configuration file is used to manage the behavior of the Salt Master.
-# Values that are commented out but have no space after the comment are
-# defaults that need not be set in the config. If there is a space after the
-# comment that the value is presented as an example and is not the default.
+# Values that are commented out but have an empty line after the comment are
+# defaults that do not need to be set in the config. If there is no blank line
+# after the comment then the value is presented as an example and is not the
+# default.
 
 # Per default, the master will automatically include all config files
 # from master.d/*.conf (master.d is a directory in the same directory
@@ -76,6 +77,13 @@ root_dir: /usr/local/salt-master
 #extension_modules: <no default>
 extension_modules: /share/extensions
 
+# Directory for custom modules. This directory can contain subdirectories for
+# each of Salt's module types such as "runners", "output", "wheel", "modules",
+# "states", "returners", etc.
+# Like 'extension_modules' but can take an array of paths
+#module_dirs: <no default>
+#   - /var/cache/salt/minion/extmods
+
 # Verify and set permissions on configuration directories at startup:
 #verify_env: True
 
@@ -93,6 +101,9 @@ extension_modules: /share/extensions
 
 # Set the default outputter used by the salt command. The default is "nested".
 #output: nested
+
+# Return minions that timeout when running commands like test.ping
+#show_timeout: True
 
 # By default, output is colored. To disable colored output, set the color value
 # to False.
@@ -118,6 +129,29 @@ extension_modules: /share/extensions
 
 # Cache minion grains and pillar data in the cachedir.
 #minion_data_cache: True
+
+# Store all returns in the given returner.
+# Setting this option requires that any returner-specific configuration also 
+# be set. See various returners in salt/returners for details on required
+# configuration values. (See also, event_return_queue below.)
+#
+#event_return: mysql
+
+# On busy systems, enabling event_returns can cause a considerable load on
+# the storage system for returners. Events can be queued on the master and
+# stored in a batched fashion using a single transaction for multiple events.
+# By default, events are not queued.
+#event_return_queue: 0
+
+# Only events returns matching tags in a whitelist
+# event_return_whitelist:
+#   - salt/master/a_tag
+#   - salt/master/another_tag
+
+# Store all event returns _except_ the tags in a blacklist
+# event_return_blacklist:
+#   - salt/master/not_this_tag
+#   - salt/master/or_this_one
 
 # Passing very large events can cause the minion to consume large amounts of
 # memory. This value tunes the maximum size of a message allowed onto the
@@ -163,11 +197,11 @@ extension_modules: /share/extensions
 # option, then the master will log a warning message.
 #
 # Include a config file from some other path:
-#include: /etc/salt/extra_config
+# include: /etc/salt/extra_config
 #
 # Include config from several files and directories:
-#include:
-#  - /etc/salt/extra_config
+# include:
+#   - /etc/salt/extra_config
 
 
 #####        Security settings       #####
@@ -182,7 +216,7 @@ extension_modules: /share/extensions
 # public keys from the minions. Note that this is insecure.
 #auto_accept: False
 
-# Time in minutes that a incomming public key with a matching name found in
+# Time in minutes that a incoming public key with a matching name found in
 # pki_dir/minion_autosign/keyid is automatically accepted. Expired autosign keys
 # are removed when the master checks the minion_autosign directory.
 # 0 equals no timeout
@@ -214,7 +248,7 @@ extension_modules: /share/extensions
 #  larry:
 #    - test.ping
 #    - network.*
-
+#
 # Blacklist any of the following users or modules
 #
 # This example would blacklist all non sudo users, including root from
@@ -227,6 +261,11 @@ extension_modules: /share/extensions
 #    - '^(?!sudo_).*$'   #  all non sudo users
 #  modules:
 #    - cmd
+
+# Enforce client_acl & client_acl_blacklist when users have sudo
+# access to the salt command. 
+#
+#sudo_acl: False
 
 # The external auth system uses the Salt auth modules to authenticate and
 # validate users to access areas of the Salt system.
@@ -267,6 +306,17 @@ external_auth:
 # will cause minion to throw an exception and drop the message.
 # sign_pub_messages: False
 
+#####     Salt-SSH Configuration     #####
+##########################################
+
+# Pass in an alternative location for the salt-ssh roster file
+#roster_file: /etc/salt/roster
+
+# Pass in minion option overrides that will be inserted into the SHIM for
+# salt-ssh calls. The local minion config is not used for salt-ssh. Can be
+# overridden on a per-minion basis in the roster (`minion_opts`)
+#ssh_minion_opts:
+#  gpg_keydir: /root/gpg
 
 #####    Master Module Management    #####
 ##########################################
@@ -365,7 +415,7 @@ external_auth:
 #   prod:
 #     - /srv/salt/prod/services
 #     - /srv/salt/prod/states
-
+#
 #file_roots:
 #  base:
 #    - /srv/salt
@@ -470,8 +520,8 @@ external_auth:
 # within the repository. The path is defined relative to the root of the
 # repository and defaults to the repository root.
 #gitfs_root: somefolder/otherfolder
-
-
+#
+#
 #####         Pillar settings        #####
 ##########################################
 # Salt Pillars allow for the building of global data that can be made selectively
@@ -487,6 +537,11 @@ external_auth:
 #  - hiera: /etc/hiera.yaml
 #  - cmd_yaml: cat /etc/salt/yaml
 
+# The ext_pillar_first option allows for external pillar sources to populate
+# before file system pillar. This allows for targeting file system pillar from
+# ext_pillar.
+#ext_pillar_first: False
+
 # The pillar_gitfs_ssl_verify option specifies whether to ignore ssl certificate
 # errors when contacting the pillar gitfs backend. You might want to set this to
 # false if you're using a git backend that uses a self-signed certificate but
@@ -497,7 +552,23 @@ external_auth:
 # The pillar_opts option adds the master configuration file data to a dict in
 # the pillar called "master". This is used to set simple configurations in the
 # master config file that can then be used on minions.
-#pillar_opts: True
+#pillar_opts: False
+
+# The pillar_safe_render_error option prevents the master from passing piller
+# render errors to the minion. This is set on by default because the error could
+# contain templating data which would give that minion information it shouldn't
+# have, like a password! When set true the error message will only show:
+#   Rendering SLS 'my.sls' failed. Please see master log for details.
+#pillar_safe_render_error: True
+
+# The pillar_source_merging_strategy option allows you to configure merging strategy
+# between different sources. It accepts four values: recurse, aggregate, overwrite,
+# or smart. Recurse will merge recursively mapping of data. Aggregate instructs
+# aggregation of elements between sources that use the #!yamlex renderer. Overwrite
+# will verwrite elements according the order in which they are processed. This is
+# behavior of the 2014.1 branch and earlier. Smart guesses the best strategy based
+# on the "renderer" setting and is the default value.
+#pillar_source_merging_strategy: smart
 
 
 #####          Syndic settings       #####
@@ -566,8 +637,8 @@ external_auth:
 #peer_run:
 #  foo.example.com:
 #    - manage.up
-
-
+#
+#
 #####         Mine settings     #####
 ##########################################
 # Restrict mine.get access from minions. By default any minion has a full access
@@ -652,14 +723,18 @@ external_auth:
 ##############################################
 # Location of the repo on the master:
 #win_repo: '/srv/salt/win/repo'
-
+#
 # Location of the master's repo cache file:
 #win_repo_mastercachefile: '/srv/salt/win/repo/winrepo.p'
-
+#
 # List of git repositories to include with the local repo:
 #win_gitrepos:
 #  - 'https://github.com/saltstack/salt-winrepo.git'
 
+#####      Returner settings          ######
+############################################
+# Which returner(s) will be used for minion's result:
+#return: mysql
 
 #####           Salt API         #####
 ######################################
