@@ -1,12 +1,12 @@
 [{
-	"step_title": "Configuration de CalibrePHP",
-	"items": [{
-		"type": "textfield",
-		"desc": "Répertoire contenant Calibre. Attention : doit se terminer par un / et ne jamais utiliser le répertoire web.",
-		"subitems": [{
-			"key": "wizard_calibre_dir",
-			"defaultValue": "/volume1/calibre/",
-			"desc": "Répertoire contenant Calibre"
-		}]
-	}]
+    "step_title": "Configuration de CalibrePHP",
+    "items": [{
+        "type": "textfield",
+        "desc": "Répertoire contenant Calibre. Attention : doit se terminer par un / et ne jamais utiliser le répertoire web.",
+        "subitems": [{
+            "key": "wizard_calibre_dir",
+            "defaultValue": "/volume1/calibre/",
+            "desc": "Répertoire contenant Calibre"
+        }]
+    }]
 }]
