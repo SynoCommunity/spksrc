@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
 SPK_VERS = 15.0
-SPK_REV = 1
+SPK_REV = 16
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
 
