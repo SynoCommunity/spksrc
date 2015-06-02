@@ -933,13 +933,13 @@ WarningTarget=both
 InfoTarget=both
 
 # How detail messages must be printed (screen, log, both, none).
-DetailTarget=log
+DetailTarget=both
 
 # How debug messages must be printed (screen, log, both, none).
 #
 # Debug-messages can be printed only if the program was compiled in
 # debug-mode: "./configure --enable-debug".
-DebugTarget=log
+DebugTarget=both
 
 # Number of messages stored in buffer and available for remote
 # clients (messages).
