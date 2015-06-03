@@ -1,0 +1,1 @@
+lib:@PYTHON_SITE_PACKAGES@/cryptography/_Cryptography_cffi_*.so
