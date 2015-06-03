@@ -19,4 +19,4 @@ ADDITIONAL_CFLAGS = -DOBSOLETE_LINUX_KERNEL
 endif
 
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk
