@@ -1,5 +1,5 @@
 PKG_NAME = bison
-PKG_VERS = 3.0.2
+PKG_VERS = 3.0.4
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
