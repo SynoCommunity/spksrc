@@ -89,7 +89,7 @@ pymysql-sa==1.0
 pyramid==1.5.1
 pyramid-hawkauth==0.1.0
 repoze.lru==0.6
-requests==2.4.3
+#requests==2.4.3
 simplejson==3.6.5
 six==1.8
 testfixtures==4.1.0
@@ -108,7 +108,7 @@ zope.deprecation==4.1.1
 #cornice==0.16.2
 #gunicorn==19.1.1
 #pyramid==1.5
-#requests==2.2.1
+requests==2.7
 #simplejson==3.4
 #SQLAlchemy==0.9.4
 #unittest2==0.5.1
@@ -117,5 +117,5 @@ configparser==3.5.0b2
 https://github.com/mozilla-services/mozservices/archive/e00e1b68130423ad98d0f6185655bde650443da8.zip
 https://github.com/mozilla-services/tokenserver/archive/d7e513e8a4f5c588b70d685a8df1d2e508c341c0.zip
 http://github.com/mozilla-services/server-syncstorage/archive/1.5.5.zip
-https://github.com/mozilla-services/syncserver/archive/master.zip
+https://github.com/mozilla-services/syncserver/archive/1.5.2.tar.gz
 

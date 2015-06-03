@@ -53,6 +53,9 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
     # Edit the configuration according to the wizard
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${PACKAGE}; GRANT ALL PRIVILEGES ON ${PACKAGE}.* TO '${USER}'@'localhost' IDENTIFIED BY '${wizard_password_ffsync:=ffsync}';"
