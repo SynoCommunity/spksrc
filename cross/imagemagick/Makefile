@@ -11,6 +11,8 @@ HOMEPAGE = http://www.imagemagick.org/
 COMMENT  = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
 LICENSE  = Apache 2.0
 
+UNSUPPORTED_ARCHS = powerpc ppc824x
+
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-installed --without-perl --without-x --without-fpx --without-wmf --disable-openmp
