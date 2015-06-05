@@ -1,5 +1,5 @@
 SPK_NAME = imagemagick
-SPK_VERS = 6.9.0
+SPK_VERS = 6.9.1
 SPK_REV = 1
 SPK_ICON = src/imagemagick.png
 
@@ -7,7 +7,6 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
-RELOAD_UI = yes
 DISPLAY_NAME = ImageMagick
 CHANGELOG =
 

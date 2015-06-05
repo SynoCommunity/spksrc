@@ -16,8 +16,8 @@ bin:bin/stream
 bin:bin/Wand-config
 shr:etc/ImageMagick-6
 lnk:lib/libMagick++-6.Q16.so
-lnk:lib/libMagick++-6.Q16.so.5
-lib:lib/libMagick++-6.Q16.so.5.0.0
+lnk:lib/libMagick++-6.Q16.so.6
+lib:lib/libMagick++-6.Q16.so.6.0.0
 lnk:lib/libMagickCore-6.Q16.so
 lnk:lib/libMagickCore-6.Q16.so.2
 lib:lib/libMagickCore-6.Q16.so.2.0.0
