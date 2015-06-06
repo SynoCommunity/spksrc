@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 15.0~r1286<br>2. Add \"sc-download group\" to set permissions via DSM"
+CHANGELOG = "1. Update to 15.0~r1286<br>2. Add \"sc-download\" group to set permissions via DSM"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
