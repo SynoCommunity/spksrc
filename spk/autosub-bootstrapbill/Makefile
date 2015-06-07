@@ -1,6 +1,6 @@
 SPK_NAME = AutoSub-BootstrapBill
 SPK_VERS = 0.6.2
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/autosub-bootstrapbill.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ DESCRIPTION_NLD = Geautomatiseerde SubtitleSeeker en Addic7ed download script vo
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = Auto-Sub Bootstrap Bill
-CHANGELOG = "1. Fixed OpenSubtitles causing Auto-Sub to crash.<br>2. Podnapisi downloads should work again."
+CHANGELOG = "1. Released Beta.<br>2. Traceback message fix."
 
 HOMEPAGE   = https://github.com/Donny87/autosub-bootstrapbill
 LICENSE    =
