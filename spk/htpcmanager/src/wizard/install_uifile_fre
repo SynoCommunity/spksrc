@@ -1,18 +1,18 @@
 [{
-    "step_title": "Choisissez votre fork",
+    "step_title": "Choisissez votre source",
     "items": [{
         "type": "textfield",
-        "desc": "Paramètres du fork à utiliser",
+        "desc": "Paramètres du source à utiliser",
         "subitems": [{
             "key": "wizard_fork_url",
-            "desc": "URL du fork",
+            "desc": "URL du source",
             "defaultValue": "git://github.com/styxit/HTPC-Manager.git",
             "validator": {
                 "allowBlank": false
             }
         }, {
             "key": "wizard_fork_branch",
-            "desc": "Branch du fork",
+            "desc": "Branch du source",
             "defaultValue": "master",
             "validator": {
                 "allowBlank": false
