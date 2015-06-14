@@ -18,7 +18,7 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Put zsh in the PATH
+    # Put fish in the PATH
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/fish /usr/local/bin/fish
 
@@ -34,7 +34,7 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
-    rm -f /usr/local/bin/zsh
+    rm -f /usr/local/bin/fish
 
     exit 0
 }

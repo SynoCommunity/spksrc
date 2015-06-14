@@ -6,7 +6,7 @@ SPK_ICON = src/ascii_fish.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = fish is a smart and user-friendly command lineshell for OS X, Linux, and the rest of the family.
+DESCRIPTION = fish is a smart and user-friendly command line shell for OS X, Linux, and the rest of the family.
 RELOAD_UI = no
 DISPLAY_NAME = fish shell
 STARTABLE = no
