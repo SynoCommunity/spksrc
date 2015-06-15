@@ -13,6 +13,7 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+CONFIG_FILE="${INSTALL_DIR}/var/shairport-sync.conf"
 
 preinst ()
 {
@@ -59,7 +60,7 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
-
+    
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
@@ -74,6 +75,9 @@ postupgrade ()
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Add firewall config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
 
     exit 0
 }

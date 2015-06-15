@@ -5,16 +5,16 @@ PACKAGE="shairport-sync"
 DNAME="Shairport Sync"
 
 # Others
-PORT="8303"
 SHAIRPORT="shairport-sync"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 DAEMON="${INSTALL_DIR}/bin/${SHAIRPORT}"
 PID_FILE="${INSTALL_DIR}/var/${PACKAGE}.pid"
+CONFIG_FILE="${INSTALL_DIR}/var/shairport-sync.conf"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -p ${PID_FILE} -x ${DAEMON} -- --port=${PORT} 2> /dev/null
+    start-stop-daemon -S -q -m -b -p ${PID_FILE} -x ${DAEMON} -- -c ${CONFIG_FILE} 2> /dev/null
 }
 
 stop_daemon ()
