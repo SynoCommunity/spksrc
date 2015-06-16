@@ -125,6 +125,9 @@ preupgrade ()
     mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/
     mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/
 
+    mv ${WEB_DIR}/${PACKAGE}/plugins.local ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/themes.local ${TMP_DIR}/${PACKAGE}/
+
     exit 0
 }
 
@@ -146,6 +149,9 @@ postupgrade ()
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
     mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
+
+    mv ${TMP_DIR}/${PACKAGE}/plugins.local ${WEB_DIR}/${PACKAGE}/
+    mv ${TMP_DIR}/${PACKAGE}/themes.local ${WEB_DIR}/${PACKAGE}/
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 
