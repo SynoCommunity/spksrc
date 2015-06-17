@@ -1,0 +1,20 @@
+--- Makefile.am	2015-03-05 15:57:00.000000000 +0300
++++ Makefile.am	2015-06-04 14:34:34.852367204 +0300
+@@ -64,17 +64,6 @@
+ ykclient_SOURCES = tool.c
+ ykclient_LDADD = ./libykclient.la
+ 
+-# Man page
+-
+-dist_man_MANS = ykclient.1
+-DISTCLEANFILES = $(dist_man_MANS)
+-
+-ykclient.1: $(builddir)/ykclient $(srcdir)/tool.c $(srcdir)/configure.ac
+-	$(HELP2MAN) \
+-		--output=$@ $(builddir)/ykclient$(EXEEXT) \
+-		--name="YubiCloud One-Time-Password Validation Client" \
+-		--no-info
+-
+ if ENABLE_COV
+ AM_CFLAGS += --coverage
+ AM_LDFLAGS = --coverage

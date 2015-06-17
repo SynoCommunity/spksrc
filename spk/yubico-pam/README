@@ -1,0 +1,82 @@
+#### ACHTUNG ####
+Im Schlimmsten Fall kann man sich durch unvorsichtige Konfigurationen oder ungewollten
+Zuständen, wie etwa nach Updates, aus dem System aussperren.
+Halte dir immer den Weg über SSH/Telnet frei. (SSH aktivieren, /etc/pam.d/sshd in Frieden lassen)
+Installiere das Paket nicht auf Systemen die im produktiven Einsatz sind.
+Sei sehr vorsichtig mit dem PAM Kommando'required'. 
+Wenn du nicht wirklich 100% weisst was du machst, dann lass es sein.
+Du machst alles auf eigenen Gefahr!
+#### ACHTUNG #### 
+
+*** Was ist in dem Paket drin? ***
+Das Paket installiert die Bibiliotheken:
+yubico-c, yubico-c-client, yubico-personalization, yubico-pam
+und ihre Abhängikeiten auf die Diskstation.
+
+
+*** Was benötige ich? ***
+- Eine Synology Diskstation (XPENOLOGY/NONOBOOT geht auch)
+- Einen Yubikey
+- Eine Internetverbindung zum Auth-Server des Yubikeys
+- Fertiges Paket yubico-pam
+- Erfahrung mit Linux, ssh, vi, pam
+
+
+*** Wie geht es nach der Installation weiter? ***
+Nach der Installation kann wie auf https://developers.yubico.com/yubico-pam/
+beschrieben, unter Punkt "Configuration" fortgefahren werden.
+
+Jeder Dienst hat eine Konfigurationsdatei in /etc/pam.d/
+("webui" ist der standard Login via Browser)
+
+
+*** Ich kann das Paket nicht für x64 Systeme compilieren lassen ***
+DSM benutzt immer eine 32bit Version von PAM.
+Wird für ein x64 compiliert, dann kommt es zu einem Fehler bei der Ausführung.
+Hast du ein System mit x64 Architektur dann compiliere für evansport 'arch-evansport'
+und editiere im fertigen Paket die INFO-Datei. Ersetze 'arch=xxx' durch
+'arch="x86 cedarview avoton bromolow evansport"'
+
+
+*** Was ist der 'Yubikey token'? ***
+Der Token ist die öffentliche ID eines Yubikey. Das sind die ersten 12 Zeichen
+die ein Yubikey wiedergibt, wenn er gedrückt wird. Entwerder abzählen oder:
+diskstation> ykhelper.sh ident [yubikey drücken]
+
+
+*** Was mache ich, wenn ich mich von meiner DS ausgesperrt habe? ***
+Setze deine DiskStation zurück. Dadurch gehen die meisten Einstellugen aber
+nicht die Daten darauf verloren.
+Auf der Rückseite ist immer ein kleiner Knopf 'reset' den man mit einer Kugelschreiber-
+spitze drücken kann. Drücken und halten bis es piepst, kurz loslassen und dann
+wieder drücken, bis es drei mal piepst.
+Das System muss danach neu aufgesetzt werden. Die PAM Einstellungen sind wieder 
+auf Werkseinstellungen und die Daten auf den Festplatten noch vorhanden.
+
+
+*** Beispiel ***
+#(/etc/pam.d/webui)
+auth   sufficient      pam_yubico.so id=[DEINE ID] debug authfile=/etc/yubikey/yubikey_mappings
+auth    sufficient     pam_unix.so
+auth    [success=done acct_expired=die default=ignore] pam_winbind.so
+auth    sufficient     pam_ldap.so
+account [success=done acct_expired=die default=ignore] pam_unix.so
+account [success=done acct_expired=die default=ignore] pam_winbind.so
+account [success=done acct_expired=die default=ignore] pam_ldap.so
+
+# Erlaubt den Login der Vorhandenen Benutzer mit dem regulären Kennwort und dem
+# Yubikey OTP (als Kennwort), wenn der Benutzer in "/etc/yubikey/yubikey_mappings"
+# entsprechend eingetragen ist.
+# In der ersten Zeile muss deine id auf dem Auth-Server von Yubico eingetragen werden.
+# Hier zu bekommen: https://upgrade.yubico.com/getapikey
+
+--------
+
+#(/etc/yubikey/yubikey_mappings) - (Datei wird bei der Installation angelegt)
+# <first user name>:<Yubikey token ID1>:<Yubikey token ID2>:….
+anaximelis:vvhgnvvvgtnl
+
+
+
+
+

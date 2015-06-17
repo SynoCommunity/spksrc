@@ -1,0 +1,7 @@
+# The file must contain a user name and the Yubikey token ID
+# separated by colons (same format as the passwd file)
+# for each user you want to allow onto the system using a Yubikey.
+
+# <first user name>:<Yubikey token ID1>:<Yubikey token ID2>:….
+# <second user name>:<Yubikey token ID3>:<Yubikey token ID4>:….
+#anaximelis:vvhgnvvvgtnl

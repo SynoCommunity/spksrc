@@ -1,0 +1,6 @@
+bin:bin/modhex
+bin:bin/ykgenerate
+bin:bin/ykparse
+lnk:lib/libyubikey.so
+lnk:lib/libyubikey.so.0
+lib:lib/libyubikey.so.0.1.7
