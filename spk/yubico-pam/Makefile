@@ -1,7 +1,7 @@
 SPK_NAME = yubico-pam
 SPK_VERS = 2.19
 SPK_REV = 1
-SPK_ICON = src/YubiKey-NEO-keychain.jpg
+SPK_ICON = src/YubiKey-Edge.jpg
 
 MAINTAINER = Anaximelis
 DESCRIPTION     = The Yubico PAM module provides an easy way to integrate the Yubikey into your existing user authentication infrastructure.
@@ -25,7 +25,7 @@ CHANGELOG = "Initial release"
 BETA = 1
 # PAM module is allways 32bit on x64 Arches. Compiling it on a x64 toolchain
 # makes it unusable. (Wrong ELF header) 
-# Use 'evansport' an overwrite arch with
+# Use 'evansport' and overwrite arch with
 # arch="x86 cedarview avoton bromolow evansport"
 # in the finished INFO-file
 UNSUPPORTED_ARCHS = $(x64_ARCHES)
