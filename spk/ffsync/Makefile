@@ -17,16 +17,20 @@ SPK_DEPENDS = "python>2.7.6-8"
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
 DISPLAY_NAME = Firefox Sync Server 1.5
-CHANGELOG = Update to 1.5.2
+CHANGELOG = "1. Update to 1.5.2<br>2. Add MariaDB dependency"
 
 HOMEPAGE     = https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 LICENSE      = MPL/GPL/LGPL
 HELPURL      = https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Server-1.5
 
 WIZARDS_DIR      = src/wizard/
+CONF_DIR         = src/conf/
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+
+INSTALL_DEP_SERVICES = mysql
+START_DEP_SERVICES = mysql
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
