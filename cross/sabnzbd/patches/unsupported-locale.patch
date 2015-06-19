@@ -1,0 +1,14 @@
+--- sabnzbd/api.py.orig	2012-02-14 21:32:10.000000000 +0100
++++ sabnzbd/api.py	2012-02-14 21:32:31.000000000 +0100
+@@ -26,7 +26,10 @@
+ import time
+ import cherrypy
+ import locale
+-locale.setlocale(locale.LC_ALL, "")
++try:
++    locale.setlocale(locale.LC_ALL, "")
++except:
++    pass
+ try:
+     import win32api, win32file
+ except ImportError:
