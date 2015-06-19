@@ -3,4 +3,6 @@ rsc:svnversion.h
 rsc:www
 rsc:Config
 rsc:scripts
+rsc:samplescripts
 rsc:var
+rsc:rules.d
