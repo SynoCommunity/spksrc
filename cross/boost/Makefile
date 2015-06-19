@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
 
-DEPENDS = cross/bzip2 cross/zlib cross/python
+DEPENDS = cross/bzip2 cross/zlib
 
 HOMEPAGE = http://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
