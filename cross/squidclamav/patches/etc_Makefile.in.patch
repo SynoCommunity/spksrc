@@ -1,0 +1,10 @@
+--- etc/Makefile.in.orig	2015-06-19 14:20:13.416175342 +0200
++++ etc/Makefile.in	2015-06-19 14:20:48.164212188 +0200
+@@ -175,6 +175,7 @@
+ cicapdatadir = @DATADIR@
+ CONFIGDIR = @CONFDIR@
+ CFGINST = @CFGDIR@
++DESTDIR = $(prefix)
+ TMPLS = templates/en/MALWARE_FOUND
+ EXTRA_DIST = squidclamav.conf $(TMPLS)
+ all: all-am
