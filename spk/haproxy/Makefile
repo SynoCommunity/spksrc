@@ -14,7 +14,7 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT = 8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Update to 1.5.11"
+CHANGELOG = "1. Update to 1.5.12<br>2. Added gzip compression support<br>3. Fix listening on <1024 ports"
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
