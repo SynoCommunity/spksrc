@@ -95,6 +95,11 @@ preupgrade ()
         ${INSTALL_DIR}/env/bin/python ${SYNOPKG_PKGINST_TEMP_DIR}/app/application/db_upgrade_16.py
     fi
 
+    # Revision 18 runs as root, but requires 'haproxy' user entry in conf
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 18 ]; then
+        sed  '/^global/a user haproxy' ${CFG_FILE}
+    fi
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
