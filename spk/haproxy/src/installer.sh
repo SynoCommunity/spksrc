@@ -97,7 +97,7 @@ preupgrade ()
 
     # Revision 18 runs as root, but requires 'haproxy' user entry in conf
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 18 ]; then
-        sed  '/^global/a user haproxy' ${CFG_FILE}
+        sed -ie "/^global$/a\   user haproxy" ${CFG_FILE}
     fi
 
     # Save some stuff
