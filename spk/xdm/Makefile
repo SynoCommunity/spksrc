@@ -1,6 +1,6 @@
 SPK_NAME = xdm
-SPK_VERS = 0.5.18
-SPK_REV = 5
+SPK_VERS = 0.5.19
+SPK_REV = 1
 SPK_ICON = src/xdm.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION = XDM: eXtendable Download Manager. Plugin based media collection ma
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = XDM
-CHANGELOG = "1. Updated the package installer"
+CHANGELOG = "1. Updated to the develop branch"
 
 HOMEPAGE   = http://xdm.lad1337.de
 LICENSE    =
@@ -50,5 +50,5 @@ xdm_extra_install: $(STAGING_DIR)/share/XDM
 
 $(STAGING_DIR)/share/XDM:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/lad1337/XDM.git
+	cd $(STAGING_DIR)/share && git clone -b develop https://github.com/lad1337/XDM.git
 	rm -fr $(STAGING_DIR)/share/XDM/.git $(STAGING_DIR)/share/XDM/.gitignore
