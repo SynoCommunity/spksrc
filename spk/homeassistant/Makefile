@@ -11,7 +11,7 @@ BUILD_DEPENDS += cross/pyephem cross/netifaces cross/psutil
 
 SPK_DEPENDS = "python3>=3.4.1-4:git"
 
-DEPENDS = cross/busybox cross/nmap #for python-libnmap
+DEPENDS = cross/$(SPK_NAME) cross/busybox cross/nmap #for python-libnmap
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
@@ -20,7 +20,7 @@ DISPLAY_NAME = Home Assistant
 DSM_UI_DIR = app
 
 BETA = 1
-CHANGELOG = "First release"
+CHANGELOG = "Update to revision d9e3c02df3a2690e74d1b606e8db0a4dd686e872"
 
 HOMEPAGE   = https://home-assistant.io/
 LICENSE    = MIT
@@ -41,7 +41,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: homeassistant_extra_install
-homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
+homeassistant_extra_install:
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
@@ -52,8 +52,3 @@ homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/homeassistant:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone --recursive https://github.com/balloob/home-assistant.git homeassistant
-	rm -fr $(STAGING_DIR)/share/homeassistant/.git $(STAGING_DIR)/share/homeassistant/.gitignore

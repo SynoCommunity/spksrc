@@ -63,8 +63,12 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ ! -f $${localFile} ]; then \
 	        rm -fr $${localFolder}.part ; \
 	        echo "git clone $${url}" ; \
-	        git clone --no-checkout --quiet $${url} $${localFolder}.part ; \
+	        git clone --no-checkout --recursive --quiet $${url} $${localFolder}.part ; \
 	        git --git-dir=$${localFolder}.part/.git --work-tree=$${localFolder}.part checkout --quiet $(PKG_GIT_HASH) ; \
+	        echo "git submodule update --init --recursive" ; \
+                cd $${localFolder}.part ; \
+                git submodule update --init --recursive --quiet ; \
+                cd .. ; \
 	        mv $${localFolder}.part $${localFolder} ; \
 	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
 	        rm -fr $${localFolder} ; \
