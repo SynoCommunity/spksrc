@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 
 WHEELS = src/requirements.txt
@@ -14,13 +14,13 @@ SPK_DEPENDS = "python3>=3.4.1-4:git"
 DEPENDS = cross/$(SPK_NAME) cross/busybox cross/nmap #for python-libnmap
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
+DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control. The default password is empty, just click \"Login\".  Edit your settings via ssh in the configuration.yaml file. This is a beta package. Hue and Chrome are tested. Other modules might work, please test them and try to contribute if something does not work."
 ADMIN_PORT = 8123
 DISPLAY_NAME = Home Assistant
 DSM_UI_DIR = app
 
 BETA = 1
-CHANGELOG = "Update to revision d9e3c02df3a2690e74d1b606e8db0a4dd686e872"
+CHANGELOG = "Update to revision d9e3c02df3a2690e74d1b606e8db0a4dd686e872. Chromecast works now. Other dependencies are also added"
 
 HOMEPAGE   = https://home-assistant.io/
 LICENSE    = MIT
