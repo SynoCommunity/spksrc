@@ -1,0 +1,13 @@
+{
+    ".url": {
+        "com.synocommunity.packages.sabnzbd-beta": {
+            "title": "SABnzbd Beta",
+            "desc": "SABnzbd Beta Web UI",
+            "icon": "images/sabnzbd-beta-{0}.png",
+            "type": "url",
+            "url": "3rdparty/sabnzbd-beta/sabnzbd.cgi",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
