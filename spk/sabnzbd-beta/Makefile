@@ -5,7 +5,7 @@ SPK_ICON = src/sabnzbd-beta.png
 DSM_UI_DIR = app
 BETA = 1
 
-DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
+DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
 WHEELS = six configobj
 SPK_DEPENDS = "python>=2.7.6-8"
 
