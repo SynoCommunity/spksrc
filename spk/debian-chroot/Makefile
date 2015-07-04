@@ -1,6 +1,6 @@
 SPK_NAME = debian-chroot
 SPK_VERS = 8.1
-SPK_REV = 1
+SPK_REV = 5
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
