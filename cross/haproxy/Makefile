@@ -1,14 +1,14 @@
 PKG_NAME = haproxy
-PKG_VERS = 1.5.12
+PKG_VERS = 1.5.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://haproxy.1wt.eu/download/1.5/src
+PKG_DIST_SITE = http://www.haproxy.org/download/1.5/src
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl cross/zlib
 
 MAINTAINER = SynoCommunity
-HOMEPAGE   = http://haproxy.1wt.eu/
+HOMEPAGE   = http://www.haproxy.org
 COMMENT    = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 LICENSE    = GNU GPL 2
 
