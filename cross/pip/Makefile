@@ -1,5 +1,5 @@
 PKG_NAME = pip
-PKG_VERS = 6.0.8
+PKG_VERS = 7.0.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/p/$(PKG_NAME)

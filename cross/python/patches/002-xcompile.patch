@@ -1,15 +1,15 @@
 --- configure.ac.orig	2013-04-06 16:02:41.000000000 +0200
 +++ configure.ac	2013-04-19 09:42:50.000000000 +0200
-@@ -31,6 +31,8 @@
+@@ -34,6 +34,8 @@
  	fi
          AC_MSG_RESULT($interp)
- 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/plat-$(MACHDEP) '$interp
-+	else
-+	    AC_MSG_RESULT($PYTHON_FOR_BUILD)
+ 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
++    else
++        AC_MSG_RESULT($PYTHON_FOR_BUILD)
      fi
  elif test "$cross_compiling" = maybe; then
      AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
-@@ -39,6 +41,18 @@
+@@ -42,6 +44,18 @@
  fi
  AC_SUBST(PYTHON_FOR_BUILD)
  
@@ -30,7 +30,7 @@
  dnl can cause trouble.
 --- Makefile.pre.in.orig	2013-04-06 16:02:34.000000000 +0200
 +++ Makefile.pre.in	2013-04-19 09:43:26.000000000 +0200
-@@ -227,6 +227,7 @@
+@@ -234,6 +234,7 @@
  ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
@@ -38,7 +38,7 @@
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -593,7 +594,7 @@
+@@ -611,7 +612,7 @@
  $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
  		@$(MKDIR_P) Include
  		$(MAKE) $(PGEN)

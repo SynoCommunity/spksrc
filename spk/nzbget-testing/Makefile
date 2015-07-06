@@ -1,6 +1,6 @@
 SPK_NAME = nzbget-testing
-SPK_VERS = 15.0~r1228
-SPK_REV = 7
+SPK_VERS = 15.0~r1286
+SPK_REV = 8
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 15.0~r1228"
+CHANGELOG = "1. Update to 15.0~r1286<br>2. Add \"sc-download\" group to set permissions via DSM"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
@@ -50,8 +50,6 @@ nzbget_extra_install: $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia $(STAGING_D
 
 $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia:
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/nzbToMedia.git
-	rm -fr $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia/.git*
 
 $(STAGING_DIR)/share/nzbget/scripts/GetScripts:
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/GetScripts.git
-	rm -fr $(STAGING_DIR)/share/nzbget/scripts/GetScripts/.git*

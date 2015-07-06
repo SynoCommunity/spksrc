@@ -1,5 +1,5 @@
 SPK_NAME = htop
-SPK_VERS = 1.0.3
+SPK_VERS = 1.0.1
 SPK_REV = 1
 SPK_ICON = src/htop.png
 

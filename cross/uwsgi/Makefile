@@ -17,6 +17,10 @@ endif
 ifeq ($(findstring $(ARCH),ppc854x ppc824x),$(ARCH))
 ADDITIONAL_CFLAGS = -DOBSOLETE_LINUX_KERNEL
 endif
+#fixes x86/64-4.3
+ifeq ($(findstring $(TCVERSION),4.3),$(TCVERSION))
+ADDITIONAL_CFLAGS = -DOBSOLETE_LINUX_KERNEL
+endif
 
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk

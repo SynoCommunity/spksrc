@@ -53,6 +53,12 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Create conf dir for 4.3 and add dependencies
+    mkdir -p /var/packages/${PACKAGE}/conf && echo -e "[MariaDB]\ndsm_min_ver=5.0-4300" > /var/packages/${PACKAGE}/conf/PKG_DEPS
+
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
     # Edit the configuration according to the wizard
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${PACKAGE}; GRANT ALL PRIVILEGES ON ${PACKAGE}.* TO '${USER}'@'localhost' IDENTIFIED BY '${wizard_password_ffsync:=ffsync}';"

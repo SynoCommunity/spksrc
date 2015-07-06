@@ -7,7 +7,6 @@ bin:bin/manhole
 bin:bin/pyhtmlizer
 bin:bin/tap2deb
 bin:bin/tap2rpm
-bin:bin/tapconvert
 bin:bin/tkconch
 bin:bin/trial
 bin:bin/twistd
