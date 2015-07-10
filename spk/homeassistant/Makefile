@@ -20,7 +20,7 @@ DISPLAY_NAME = Home Assistant
 DSM_UI_DIR = app
 
 BETA = 1
-CHANGELOG = "Update to revision d9e3c02df3a2690e74d1b606e8db0a4dd686e872. Chromecast works now. Other dependencies are also added"
+CHANGELOG = "Update to revision 785e5e0fe7b1989b5a8cb9c1622738d3e555442d. PyISY will now work without having the climate module installed."
 
 HOMEPAGE   = https://home-assistant.io/
 LICENSE    = MIT
