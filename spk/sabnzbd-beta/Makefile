@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd-beta
 SPK_VERS = 0.8.0
-SPK_REV = Alpha2
+SPK_REV = Alpha3
 SPK_ICON = src/sabnzbd-beta.png
 DSM_UI_DIR = app
 BETA = 1
@@ -16,7 +16,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Beta
-CHANGELOG = "Update SABnzbd Beta to 0.8.0 Alpha 2"
+CHANGELOG = "Update SABnzbd Beta to 0.8.0 Alpha 3"
 
 HOMEPAGE   = http://sabnzbd.org/
 LICENSE    = GPL
