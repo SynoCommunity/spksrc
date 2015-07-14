@@ -1,7 +1,7 @@
 PKG_NAME = homeassistant
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = d9e3c02df3a2690e74d1b606e8db0a4dd686e872
+PKG_GIT_HASH = 785e5e0fe7b1989b5a8cb9c1622738d3e555442d
 PKG_DIST_SITE = https://github.com/balloob/home-assistant.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 DEPENDS =
 
 HOMEPAGE = https://home-assistant.io/
-COMMENT  = 
+COMMENT  =
 LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
