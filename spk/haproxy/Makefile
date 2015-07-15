@@ -1,6 +1,6 @@
 SPK_NAME = haproxy
 SPK_VERS = 1.5.14
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 
