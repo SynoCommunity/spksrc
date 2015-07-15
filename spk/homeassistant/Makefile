@@ -20,7 +20,7 @@ DISPLAY_NAME = Home Assistant
 DSM_UI_DIR = app
 
 BETA = 1
-CHANGELOG = "Update to revision 785e5e0fe7b1989b5a8cb9c1622738d3e555442d. PyISY will now work without having the climate module installed."
+CHANGELOG = "Update to revision bfa8131f4bff33160e08df3a2e0ead76d53f2728. PyISY will now work without having the climate module installed. More release notes at https://home-assistant.io/blog/2015/07/11/ip-cameras-arduino-kodi-efergy-support/."
 
 HOMEPAGE   = https://home-assistant.io/
 LICENSE    = MIT

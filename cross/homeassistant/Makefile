@@ -1,7 +1,7 @@
 PKG_NAME = homeassistant
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 785e5e0fe7b1989b5a8cb9c1622738d3e555442d
+PKG_GIT_HASH = bfa8131f4bff33160e08df3a2e0ead76d53f2728
 PKG_DIST_SITE = https://github.com/balloob/home-assistant.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
