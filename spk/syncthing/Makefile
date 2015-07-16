@@ -1,5 +1,5 @@
 SPK_NAME = syncthing
-SPK_VERS = 0.10.30
+SPK_VERS = 0.11.15
 SPK_REV = 4
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
@@ -15,6 +15,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 ADMIN_PORT = 7070
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
+CHANGELOG ="1.Update to 0.11.15<br>2.Fix package status after auto update"
 
 HOMEPAGE   = http://www.syncthing.net/
 LICENSE    =
