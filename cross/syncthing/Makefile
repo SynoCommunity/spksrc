@@ -16,12 +16,15 @@ COMPILE_TARGET = myComp
 INSTALL_TARGET = myInstall
 
 GOOS = linux
+CGO_ENABLED=1
+
 # set this to 1 to create static linked binaries
 STATIC_BINARIES = 0
 
 # Define SYNCTHING_ARCH as per SyncThing standards
 ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine 88f5281 88f6281 comcerto2k),$(ARCH))
 SYNCTHING_ARCH = arm
+CGO_ENABLED = 0
 ENV += GOARM=5
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -49,7 +52,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 ENV += GOPATH=$(WORK_DIR)/../../../native/go/work-native/go/
-ENV += CGO_ENABLED=1
+ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
 CONF_ARGS = -goos=$(GOOS) -goarch=$(SYNCTHING_ARCH) -version=v$(PKG_VERS)
