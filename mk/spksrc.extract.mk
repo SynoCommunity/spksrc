@@ -9,6 +9,7 @@
 EXTRACT_PATH ?= $(WORK_DIR)
 # Extract commands
 EXTRACT_CMD.tgz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.txz = tar -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.gz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.bz2 = tar -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
