@@ -11,6 +11,7 @@ NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
 DIST_EXT      = $(PKG_EXT)
+DISTRIB_DIR   = $(KERNELS_DIR)/$(PKG_BRANCH)
 COMPILE_TARGET = kernel_module_compile_target
 EXTRACT_TARGET = kernel_extract_target
 CONFIGURE_TARGET = kernel_configure_target
