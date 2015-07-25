@@ -1,6 +1,6 @@
 SPK_NAME = saltpad
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/saltpad.png
 DSM_UI_DIR = app
 
