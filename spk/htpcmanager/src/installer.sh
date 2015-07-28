@@ -38,7 +38,7 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
-    # Clone the repository and configure autoProcessTV
+    # Clone the repository
     ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/styxit/HTPC-Manager.git} ${INSTALL_DIR}/var/HTPC-Manager
 
     # Create user
