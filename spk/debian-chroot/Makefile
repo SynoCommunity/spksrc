@@ -1,5 +1,5 @@
 SPK_NAME = debian-chroot
-SPK_VERS = 7.4
+SPK_VERS = 8.1
 SPK_REV = 5
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
@@ -52,7 +52,7 @@ debian-chroot_extra_install:
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
-	debootstrap --foreign --arch $(DEBIAN_ARCH) wheezy $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
+	debootstrap --foreign --arch $(DEBIAN_ARCH) jessie $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
 	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default
 	install -m 644 src/preferences $(STAGING_DIR)/var/chroottarget/etc/apt/preferences.default
 	install -m 644 src/policy-rc.d $(STAGING_DIR)/var/chroottarget/usr/sbin/policy-rc.d
