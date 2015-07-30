@@ -1,6 +1,6 @@
 # Whatever's uncommented first in this file counts as the "main" distribution
 # (unless you change the ordering). See /etc/apt/preferences for more
-# information on how pinning is set up.
+# information on how apt-pinning is set up.
 
 ################################################
 ## jessie
@@ -10,8 +10,8 @@ deb http://security.debian.org/ jessie/updates main contrib non-free
 deb-src http://security.debian.org/ jessie/updates main contrib non-free
 
 # jessie-updates - optional, but default
-deb http://ftp.fr.debian.org/ jessie-updates main contrib non-free
-deb-src http://ftp.fr.debian.org/ jessie-updates main contrib non-free
+deb http://ftp.fr.debian.org/debian/ jessie-updates main contrib non-free
+deb-src http://ftp.fr.debian.org/debian/ jessie-updates main contrib non-free
 
 ################################################
 ## testing
@@ -19,8 +19,8 @@ deb-src http://ftp.fr.debian.org/ jessie-updates main contrib non-free
 #deb-src http://ftp.fr.debian.org/debian/ testing main contrib non-free
 #deb http://security.debian.org/ testing/updates main contrib non-free
 #deb-src http://security.debian.org/ testing/updates main contrib non-free
-#deb http://ftp.fr.debian.org/ testing-updates main contrib non-free
-#deb-src http://ftp.fr.debian.org/ testing-updates main contrib non-free
+#deb http://ftp.fr.debian.org/debian/ testing-updates main contrib non-free
+#deb-src http://ftp.fr.debian.org/debian/ testing-updates main contrib non-free
 
 ################################################
 ## unstable
