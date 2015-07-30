@@ -30,9 +30,6 @@ postinst ()
     echo "" >> ${INSTALL_DIR}/install.log
     echo "System installed modules:" >> ${INSTALL_DIR}/install.log
     ${INSTALL_DIR}/bin/pip freeze >> ${INSTALL_DIR}/install.log
-    
-    # Link SSL certificates
-    ln -s /etc/ssl/certs/ca-certificates.crt ${INSTALL_DIR}/cert.pem
 
     # Byte-compile in background
     ${INSTALL_DIR}/bin/python -m compileall -q -f ${INSTALL_DIR}/lib/python2.7 > /dev/null &
