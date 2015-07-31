@@ -16,7 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_TARGET = myConfigure
 POST_INSTALL_TARGET = myPostInstall
 
-CONFIGURE_ARGS = --enable-ipv6 --with-ca-bundle=$(INSTALL_DIR)/cert.pem
+CONFIGURE_ARGS = --enable-ipv6 --with-ca-bundle=$(INSTALL_PREFIX)/cert.pem
 
 include ../../mk/spksrc.cross-cc.mk
 
