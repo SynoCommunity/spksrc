@@ -80,11 +80,11 @@ preupgrade ()
 
     # Revision 7 moves  scripts, backups and other user files to ${INSTALL_DIR}/var/
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 6 ]; then
-    # backups dir is optional, but below move silently fails if directory doesn't exist.
-    mv ${INSTALL_DIR}/backups ${INSTALL_DIR}/var/
-    mv ${INSTALL_DIR}/scripts ${INSTALL_DIR}/var/
-    mv ${INSTALL_DIR}/Config/options.xml  ${INSTALL_DIR}/var/
-    mv ${INSTALL_DIR}/Config/zwcfg*.xml  ${INSTALL_DIR}/var/
+       # backups dir is optional, but below move silently fails if directory doesn't exist.
+       mv ${INSTALL_DIR}/backups ${INSTALL_DIR}/var/
+       mv ${INSTALL_DIR}/scripts ${INSTALL_DIR}/var/
+       mv ${INSTALL_DIR}/Config/options.xml  ${INSTALL_DIR}/var/
+       mv ${INSTALL_DIR}/Config/zwcfg*.xml  ${INSTALL_DIR}/var/
     fi
 
     mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
