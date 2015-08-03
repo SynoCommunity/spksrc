@@ -13,7 +13,7 @@ DESCRIPTION_NLD = Spotweb is een webbased usenet binaire bron indexer op basis v
 ADMIN_URL = /spotweb
 RELOAD_UI = yes
 DISPLAY_NAME = Spotweb
-CHANGELOG = "1. Fixed errors when retrieving spots"
+CHANGELOG = "1. Update Services_Upgrade_Settings.php."
 
 HOMEPAGE   = https://github.com/spotweb/spotweb
 LICENSE    =
