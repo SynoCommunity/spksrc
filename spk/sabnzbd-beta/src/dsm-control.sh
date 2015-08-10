@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="sabnzbd-beta"
-DNAME="SABnzbd Beta"
+PACKAGE="sabnzbd-testing"
+DNAME="SABnzbd Testing"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -18,7 +18,7 @@ PID_FILE="${INSTALL_DIR}/var/sabnzbd.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
+    su ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 }
 
 stop_daemon ()
