@@ -1,7 +1,7 @@
-SPK_NAME = sabnzbd-beta
-SPK_VERS = 0.8.0
-SPK_REV = Alpha3
-SPK_ICON = src/sabnzbd-beta.png
+SPK_NAME = sabnzbd-testing
+SPK_VERS = 0.8.0Alpha3
+SPK_REV = 1
+SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
@@ -13,10 +13,10 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
 DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\\\'avez qu\\\'a ajouter un .nzb, SABnzbd s\\\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
-ADMIN_PORT = 8080
+ADMIN_PORT = 9090
 RELOAD_UI = yes
-DISPLAY_NAME = SABnzbd Beta
-CHANGELOG = "Update SABnzbd Beta to 0.8.0 Alpha 3"
+DISPLAY_NAME = SABnzbd Testing
+CHANGELOG = "Update SABnzbd Testing to 0.8.0 Alpha 3"
 
 HOMEPAGE   = http://sabnzbd.org/
 LICENSE    = GPL
@@ -29,7 +29,7 @@ FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-POST_STRIP_TARGET = sabnzbd-beta_extra_install
+POST_STRIP_TARGET = sabnzbd-testing_extra_install
 
 BUSYBOX_CONFIG  = nice
 # Add ionice for ARCHs that support it
@@ -40,7 +40,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: sabnzbd-beta_extra_install
+.PHONY: sabnzbd-testing_extra_install
 sabnzbd-beta_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
