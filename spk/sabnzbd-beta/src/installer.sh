@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="sabnzbd-beta"
-DNAME="SABnzbd Beta"
+PACKAGE="sabnzbd-testing"
+DNAME="SABnzbd Testing"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
