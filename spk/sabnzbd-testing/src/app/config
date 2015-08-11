@@ -1,0 +1,13 @@
+{
+    ".url": {
+        "com.synocommunity.packages.sabnzbd-testing": {
+            "title": "SABnzbd Testing",
+            "desc": "SABnzbd Testing Web UI",
+            "icon": "images/sabnzbd-testing-{0}.png",
+            "type": "url",
+            "url": "3rdparty/sabnzbd-testing/sabnzbd.cgi",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

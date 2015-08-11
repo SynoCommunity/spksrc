@@ -1,15 +1,15 @@
 #!/bin/sh
 
 # Package
-PACKAGE="sabnzbd-beta"
-DNAME="SABnzbd Beta"
+PACKAGE="sabnzbd-testing"
+DNAME="SABnzbd Testing"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="sabnzbd-beta"
+USER="sabnzbd-testing"
 GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
