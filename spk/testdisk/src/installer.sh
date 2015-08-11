@@ -6,10 +6,6 @@ DNAME="TestDisk"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PATH="${INSTALL_DIR}/bin:${PATH}"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 
 preinst ()
 {
@@ -26,10 +22,6 @@ postinst ()
 
 preuninst ()
 {
-    # Stop the package
-    ${SSS} stop > /dev/null
-
-
     exit 0
 }
 
@@ -43,14 +35,10 @@ postuninst ()
 
 preupgrade ()
 {
-    # Stop the package
-    ${SSS} stop > /dev/null
-
     exit 0
 }
 
 postupgrade ()
 {
-
     exit 0
 }

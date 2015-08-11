@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
-SPK_VERS = 0.10.30
-SPK_REV = 3
+SPK_VERS = 0.11.15
+SPK_REV = 5
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 BETA = 1
@@ -15,6 +15,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 ADMIN_PORT = 7070
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
+CHANGELOG ="Fix issue for ARM where changes via the interface resulted in a connection error"
 
 HOMEPAGE   = http://www.syncthing.net/
 LICENSE    =
