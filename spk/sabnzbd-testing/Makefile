@@ -41,7 +41,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 .PHONY: sabnzbd-testing_extra_install
-sabnzbd-beta_extra_install:
+sabnzbd-testing_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
