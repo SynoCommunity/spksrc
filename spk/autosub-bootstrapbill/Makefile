@@ -1,6 +1,6 @@
 SPK_NAME = AutoSub-BootstrapBill
 SPK_VERS = 0.6.3
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/autosub-bootstrapbill.png
 DSM_UI_DIR = app
 
