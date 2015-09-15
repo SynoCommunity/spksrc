@@ -16,6 +16,8 @@ CHANGELOG = "1. Update ownCloud to 8.1.1"
 HOMEPAGE   = http://owncloud.org/
 LICENSE    = AGPL
 
+REQUIRED_DSM = 5.0
+
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
 
