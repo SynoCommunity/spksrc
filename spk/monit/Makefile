@@ -1,9 +1,9 @@
 SPK_NAME = monit
-SPK_VERS = 5.12.1
-SPK_REV = 6
+SPK_VERS = 5.13
+SPK_REV = 7
 SPK_ICON = src/monit.png
 DSM_UI_DIR = app
-CHANGELOG =
+CHANGELOG = Update monit to 5.13
 ADMIN_PORT = 2812
 BETA = 1
 
@@ -39,6 +39,11 @@ monit_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/events
 	install -m 700 src/monitrc $(STAGING_DIR)/var/monitrc
 	install -m 700 src/monit.d/monit $(STAGING_DIR)/var/monit.d/monit
+	install -m 755 -d $(STAGING_DIR)/share
+	install -m 755 -d $(STAGING_DIR)/share/examples
+	for sample in `ls -1c src/monit.d/`; do \
+		install -m 644 src/monit.d/$${sample} $(STAGING_DIR)/share/examples/$${sample}; \
+	done
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
