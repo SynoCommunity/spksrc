@@ -14,8 +14,8 @@ DESCRIPTION = Monit is a small Open Source utility for managing and monitoring U
 RELOAD_UI = yes
 DISPLAY_NAME = Monit
 
-HOMEPAGE = http://mmonit.com/monit/
-LICENSE  =
+HOMEPAGE = http://mmonit.com/monit
+LICENSE  = AGPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -41,9 +41,7 @@ monit_extra_install:
 	install -m 700 src/monit.d/monit $(STAGING_DIR)/var/monit.d/monit
 	install -m 755 -d $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/share/examples
-	for sample in `ls -1c src/monit.d/`; do \
-		install -m 644 src/monit.d/$${sample} $(STAGING_DIR)/share/examples/$${sample}; \
-	done
+	install -m 644 src/examples/* $(STAGING_DIR)/share/examples/
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
