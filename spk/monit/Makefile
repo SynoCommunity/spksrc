@@ -1,9 +1,9 @@
 SPK_NAME = monit
-SPK_VERS = 5.12.1
-SPK_REV = 6
+SPK_VERS = 5.13
+SPK_REV = 7
 SPK_ICON = src/monit.png
 DSM_UI_DIR = app
-CHANGELOG =
+CHANGELOG = Update monit to 5.13
 ADMIN_PORT = 2812
 BETA = 1
 
@@ -14,8 +14,8 @@ DESCRIPTION = Monit is a small Open Source utility for managing and monitoring U
 RELOAD_UI = yes
 DISPLAY_NAME = Monit
 
-HOMEPAGE = http://mmonit.com/monit/
-LICENSE  =
+HOMEPAGE = http://mmonit.com/monit
+LICENSE  = AGPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -39,6 +39,9 @@ monit_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/events
 	install -m 700 src/monitrc $(STAGING_DIR)/var/monitrc
 	install -m 700 src/monit.d/monit $(STAGING_DIR)/var/monit.d/monit
+	install -m 755 -d $(STAGING_DIR)/share
+	install -m 755 -d $(STAGING_DIR)/share/examples
+	install -m 644 src/examples/* $(STAGING_DIR)/share/examples/
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
