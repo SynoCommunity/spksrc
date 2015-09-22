@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="sshfs-fuse"
-DNAME="sshfs-fuse"
+PACKAGE="sshfs"
+DNAME="sshfs"
 
 
 case $1 in

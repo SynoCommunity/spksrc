@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Package
-PACKAGE="sshfs-fuse"
-DNAME="sshfs-fuse"
+PACKAGE="sshfs"
+DNAME="sshfs"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
