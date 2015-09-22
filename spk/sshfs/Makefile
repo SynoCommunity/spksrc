@@ -20,3 +20,4 @@ SSS_SCRIPT       = src/dsm-control.sh
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
+

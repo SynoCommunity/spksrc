@@ -15,3 +15,4 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS =  --exec-prefix=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
+

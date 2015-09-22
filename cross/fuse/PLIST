@@ -6,4 +6,4 @@ lib:lib/libfuse.so.2.9.4
 lnk:lib/libulockmgr.so
 lnk:lib/libulockmgr.so.1
 lib:lib/libulockmgr.so.1.0.1
-rsc:lib/pkgconfig/fuse.pc
+

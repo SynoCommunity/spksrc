@@ -14,3 +14,4 @@ LICENSE  = GNU GENERAL PUBLIC LICENSE Version 2, June 1991
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
