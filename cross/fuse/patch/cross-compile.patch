@@ -23,4 +23,3 @@
         echo "/usr/sbin/update-rc.d fuse start 34 S . start 41 0 6 . || true"; \
         /usr/sbin/update-rc.d fuse start 34 S . start 41 0 6 . || true; \
 		
-		
