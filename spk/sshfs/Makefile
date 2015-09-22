@@ -10,6 +10,7 @@ DESCRIPTION = SSHFS is a filesystem client based on the SSH File Transfer Protoc
 DISPLAY_NAME = sshfs
 STARTABLE = no
 CHANGELOG = "Initial release"
+BETA = 1
 
 HOMEPAGE   = http://fuse.sourceforge.net/sshfs.html
 LICENSE    = GNU GENERAL PUBLIC LICENSE Version 2, June 1991
