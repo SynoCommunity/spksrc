@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://fuse.sourceforge.net/
 COMMENT  = File System in User Space
-LICENSE  = GNU GENERAL PUBLIC LICENSE Version 2, June 1991
+LICENSE  = GNU GPLv2
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS =  --exec-prefix=$(STAGING_INSTALL_PREFIX)

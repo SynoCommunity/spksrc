@@ -6,14 +6,14 @@ SPK_ICON = src/sshfs.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SSHFS is a filesystem client based on the SSH File Transfer Protocol
+DESCRIPTION = sshfs is a filesystem client based on the SSH File Transfer Protocol
 DISPLAY_NAME = sshfs
 STARTABLE = no
 CHANGELOG = "Initial release"
 BETA = 1
 
 HOMEPAGE   = http://fuse.sourceforge.net/sshfs.html
-LICENSE    = GNU GENERAL PUBLIC LICENSE Version 2, June 1991
+LICENSE    = GNU GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
