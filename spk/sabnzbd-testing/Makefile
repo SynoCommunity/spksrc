@@ -1,12 +1,11 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 0.8.0Alpha3
-SPK_REV = 1
+SPK_VERS = 0.8.0Beta1
+SPK_REV = 2
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
-WHEELS = six configobj
 SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
@@ -16,9 +15,9 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Update SABnzbd Testing to 0.8.0 Alpha 3"
+CHANGELOG = "Update to 0.8.0 Beta 1"
 
-HOMEPAGE   = http://sabnzbd.org/
+HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
@@ -46,11 +45,8 @@ sabnzbd-testing_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/sabnzbd.cgi.py $(STAGING_DIR)/app/sabnzbd.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
