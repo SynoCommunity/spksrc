@@ -16,7 +16,7 @@ DESCRIPTION = Emby streams everything Your personal videos, music, photos, and l
 ADMIN_PORT = 8096
 RELOAD_UI = yes
 DISPLAY_NAME = Emby
-CHANGELOG = "1. Update emby to 3.0.5597.1<br>2. depend on ffmpeg >= 2.6-3"
+CHANGELOG = "Update emby to 3.0.5724.5"
 
 HOMEPAGE = http://emby.media/
 LICENSE  =

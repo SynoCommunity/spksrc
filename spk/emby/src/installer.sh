@@ -8,7 +8,6 @@ DNAME="Emby"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 INSTALL_LOG="${INSTALL_DIR}/var/install.log"
-TMP_INSTALL_LOG="${TMP_DIR}/${PACKAGE}/var/install.log"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="${PACKAGE}"
@@ -26,10 +25,6 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-
-    # Logging Install
-    mkdir -p ${INSTALL_DIR}/var
-    echo "|| Installing package $(grep "version" /var/packages/${PACKAGE}/INFO) - $(date) ||" >> ${INSTALL_LOG}
 
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
@@ -78,9 +73,6 @@ postuninst ()
 
 preupgrade ()
 {
-    # Log Upgrade
-    echo "|| Beginning Package Upgrade - $(date) ||" >> ${INSTALL_LOG}
-
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
