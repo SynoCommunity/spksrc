@@ -43,16 +43,17 @@ postinst ()
     dropbearkey -t rsa -f ${INSTALL_DIR}/var/dropbear_rsa_host_key > /dev/null 2>&1
     dropbearkey -t dss -f ${INSTALL_DIR}/var/dropbear_dss_host_key > /dev/null 2>&1
 
+    # Correct the files ownership
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+
     # Setup gitolite
     if [ ! -z "${wizard_public_key}" ]; then
         echo "${wizard_public_key}" > ${INSTALL_DIR}/var/admin.pub
         ${INSTALL_DIR}/share/gitolite/install -to ${INSTALL_DIR}/bin
-        su - ${USER} -c "${INSTALL_DIR}/bin/gitolite setup -pk admin.pub"
+        su - ${USER} -c "PATH=${PATH} ${INSTALL_DIR}/bin/gitolite setup -pk ${INSTALL_DIR}/var/admin.pub"
         sed -i -e "s|UMASK                           =>  0077,|UMASK                           =>  0022,|" ${INSTALL_DIR}/var/.gitolite.rc 
+        sed -i -e "$(printf '1i$ENV{PATH} = "%s/bin:$ENV{PATH}";\' "$GIT_DIR")" ${INSTALL_DIR}/var/.gitolite.rc
     fi
-
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
