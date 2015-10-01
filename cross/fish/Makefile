@@ -1,11 +1,9 @@
 PKG_NAME = fish
-PKG_FULL_NAME = fish-shell
+PKG_VERS = 2.2.0
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 0ddd0ed
-PKG_DIST_SITE = https://github.com/fish-shell/$(PKG_FULL_NAME).git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://fishshell.com/files/$(PKG_VERSION)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncurses
 
