@@ -42,6 +42,9 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Create conf dir for 4.3 and add dependencies
+    mkdir -p /var/packages/${PACKAGE}/conf && echo -e "[MariaDB]\ndsm_min_ver=5.0-4300" > /var/packages/${PACKAGE}/conf/PKG_DEPS
+
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
@@ -125,6 +128,9 @@ preupgrade ()
     mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/
     mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/
 
+    mv ${WEB_DIR}/${PACKAGE}/plugins.local ${TMP_DIR}/${PACKAGE}/
+    mv ${WEB_DIR}/${PACKAGE}/themes.local ${TMP_DIR}/${PACKAGE}/
+
     exit 0
 }
 
@@ -146,6 +152,9 @@ postupgrade ()
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
     mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
+
+    mv ${TMP_DIR}/${PACKAGE}/plugins.local ${WEB_DIR}/${PACKAGE}/
+    mv ${TMP_DIR}/${PACKAGE}/themes.local ${WEB_DIR}/${PACKAGE}/
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 

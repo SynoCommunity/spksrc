@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
-SPK_VERS = 8.0.2
-SPK_REV = 6
+SPK_VERS = 8.1.1
+SPK_REV = 7
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
@@ -11,10 +11,12 @@ DESCRIPTION = ownCloud is a personal cloud which runs on your own server and giv
 ADMIN_URL = /owncloud/
 RELOAD_UI = yes
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 8.0.2"
+CHANGELOG = "1. Update ownCloud to 8.1.1"
 
 HOMEPAGE   = http://owncloud.org/
 LICENSE    = AGPL
+
+REQUIRED_DSM = 5.0
 
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
@@ -31,12 +33,12 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = owncloud_extra_install
 
 BUSYBOX_CONFIG = daemon nice
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)" 
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
-owncloud_extra_install: 
+owncloud_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 src/owncloud.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app

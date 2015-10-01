@@ -24,8 +24,8 @@
             <b>/var/packages/debian-chroot/scripts/start-stop-status chroot</b>.</p>
         <p>On the first use, it is recommended to perform some configuration operations:</p>
         <ul>
-            <li>Update: type <b>aptitude update</b> followed by <b>aptitude upgrade</b></li>
-            <li>Locales: type <b>aptitude install locales</b> and then <b>dpkg-reconfigure locales</b></li>
+            <li>Update: type <b>apt-get update</b> followed by <b>apt-get upgrade</b></li>
+            <li>Locales: type <b>apt-get install locales</b> and then <b>dpkg-reconfigure locales</b></li>
             <li>Timezone: execute <b>dpkg-reconfigure tzdata</b></li>
         </ul>
         <h3>Configure Services</h3>
@@ -46,7 +46,7 @@
         </ol>
         <h4>Example: SSH Server</h4>
         <ol>
-            <li>Install the SSH server: <b>aptitude install ssh</b></li>
+            <li>Install the SSH server: <b>apt-get install ssh</b></li>
             <li>Edit the configuration file: <b>/etc/ssh/sshd_config</b> in order
             to change the port number and other things if necessary</li>
             <li>Click on <b>Add</b> and put the name <b>SSHD</b>, the launch

@@ -1,8 +1,7 @@
 SPK_NAME = redis
-SPK_VERS = 2.8.13
-SPK_REV = 3
+SPK_VERS = 3.0.4
+SPK_REV = 4
 SPK_ICON = src/redis.png
-DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -10,10 +9,10 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 RELOAD_UI = yes
 DISPLAY_NAME = Redis
-CHANGELOG = "1. Update to 2.8.13"
+CHANGELOG = "Update to 3.0.4"
 
-HOMEPAGE = http://redis.io/
-LICENSE  =
+HOMEPAGE = http://redis.io
+LICENSE  = 3-clause BSD
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
