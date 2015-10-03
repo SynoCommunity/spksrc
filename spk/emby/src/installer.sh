@@ -38,9 +38,6 @@ postinst ()
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
 
-    # Log
-    echo "|| Package Install Completed - $(date) ||" >> ${INSTALL_LOG}
-
     exit 0
 }
 

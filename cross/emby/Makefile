@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://emby.media/
 COMMENT  = Emby streams everything Your personal videos, music, photos, and live television in the palm of your hand.
-LICENSE  =
+LICENSE  = GPL
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
