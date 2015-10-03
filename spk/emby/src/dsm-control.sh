@@ -12,7 +12,7 @@ USER="${PACKAGE}"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 EXE_FILE="${INSTALL_DIR}/share/emby/MediaBrowser.Server.Mono.exe"
-
+PID_FILE="${INSTALL_DIR}/var/emby.pid"
 EXTRA_LIBS="/usr/local/mediainfo/lib:/usr/local/imagemagick/lib:${INSTALL_DIR}/lib"
 FFMPEG="/usr/local/ffmpeg/bin"
 
@@ -20,19 +20,19 @@ COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${EXTRA_LIBS} ${MONO} -- 
 
 start_daemon ()
 {
-    start-stop-daemon -c ${USER} -S -q -b -m -p ${INSTALL_DIR}/var/emby.pid -N 10 -x ${COMMAND} > /dev/null
+    start-stop-daemon -c ${USER} -S -q -b -m -p ${PID_FILE} -N 10 -x ${COMMAND} > /dev/null
     sleep 2
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${INSTALL_DIR}/var/emby.pid
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${INSTALL_DIR}/var/emby.pid
+    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${INSTALL_DIR}/var/emby.pid
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
 wait_for_status ()

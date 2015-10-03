@@ -1,6 +1,6 @@
 SPK_NAME = emby
 SPK_VERS = 3.0.5724.5
-SPK_REV = 5
+SPK_REV = 1
 SPK_ICON = src/emby.png
 DSM_UI_DIR = app
 
@@ -19,7 +19,7 @@ DISPLAY_NAME = Emby
 CHANGELOG = "Update emby to 3.0.5724.5"
 
 HOMEPAGE = http://emby.media/
-LICENSE  =
+LICENSE  = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
