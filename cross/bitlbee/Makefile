@@ -1,5 +1,5 @@
 PKG_NAME = bitlbee
-PKG_VERS = 3.2.2
+PKG_VERS = 3.4.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://get.bitlbee.org/src
