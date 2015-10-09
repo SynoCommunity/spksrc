@@ -1,16 +1,14 @@
 PKG_NAME = nzbget-testing
-PKG_VERS = 15.0
+PKG_VERS = 16.0
+PKG_REV = 1439
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 1286
-PKG_DIST_NAME = trunk
-PKG_DIST_SITE = https://svn.code.sf.net/p/nzbget/code
-PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-r*
+PKG_DIST_SITE = https://github.com/nzbget/nzbget/releases/download/v$(PKG_VERS)-r$(PKG_REV)
+PKG_DIST_FILE = nzbget-$(PKG_VERS)-testing-r$(PKG_REV)-dist.$(PKG_EXT)
+PKG_DIR = nzbget-$(PKG_VERS)-testing
 
 DEPENDS = cross/libxml2 cross/ncurses cross/openssl
 
-HOMEPAGE = http://nzbget.sourceforge.net/
+HOMEPAGE = http://nzbget.net/
 COMMENT  = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair and web-interface. NZBGet requires low system resources.
 LICENSE  = 
 
