@@ -1,6 +1,6 @@
 SPK_NAME = headphones
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/headphones.png
 DSM_UI_DIR = app
 
@@ -14,10 +14,10 @@ DESCRIPTION_SPN = Headphones permite descargar automáticamente música mediante
 ADMIN_PORT = 8181
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones
-CHANGELOG = "1. Fix update issues"
+CHANGELOG = "1. Allow non-localhost traffic for new installs<br>2. Add to sc-media group"
 
 HOMEPAGE   = https://github.com/rembo10/headphones
-LICENSE    =
+LICENSE    = GPLv3
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
