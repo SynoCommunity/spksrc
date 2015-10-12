@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Updated nzbget-testing to 16.0~r1439."
+CHANGELOG = "Update to 16.0~r1439"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
