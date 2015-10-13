@@ -7,7 +7,7 @@ DNAME="plexivity"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="plexivity"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 PLEXIVITY="${INSTALL_DIR}/share/plexivity/plexivity.py"
@@ -18,7 +18,7 @@ LOG_FILE="${INSTALL_DIR}/var/plexivity.log"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} PLEXIVITY_DATA=${DATA_DIR} ${PYTHON} ${PLEXIVITY} --daemon"
+    su ${USER} -c "PATH=${PATH} PLEXIVITY_DATA=${DATA_DIR} ${PYTHON} ${PLEXIVITY} --daemon"
 }
 
 stop_daemon ()

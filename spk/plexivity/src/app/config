@@ -1,6 +1,6 @@
 {
     ".url": {
-        "com.cytec.packages.plexivity": {
+        "com.synocommunity.packages.plexivity": {
             "title": "plexivity",
             "desc": "plexivity Web UI",
             "icon": "images/plexivity-{0}.png",

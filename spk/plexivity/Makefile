@@ -4,6 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/plexivity.png
 DSM_UI_DIR = app
 BETA = 1
+
 DEPENDS  = 
 SPK_DEPENDS = "python>=2.7.6-8"
 
@@ -36,10 +37,10 @@ include ../../mk/spksrc.spk.mk
 plexivity_extra_install: $(STAGING_DIR)/share/plexivity
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 600 src/settings.conf $(STAGING_DIR)/var/config.ini
+	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48; do \
+	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
