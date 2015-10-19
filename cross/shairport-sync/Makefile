@@ -1,5 +1,5 @@
 PKG_NAME = shairport-sync
-PKG_VERS = 2.3.0
+PKG_VERS = 2.3.11
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
@@ -13,7 +13,7 @@ LICENSE  = https://raw.githubusercontent.com/mikebrady/shairport-sync/$(PKG_VERS
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX) --with-alsa --with-ssl=openssl --with-tinysvcmdns --without-initscript --with-piddir=$(INSTALL_DIR)/var
+CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX) --with-alsa --with-ssl=openssl --with-tinysvcmdns --without-configfiles --with-piddir=$(INSTALL_DIR)/var
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
 PRE_CONFIGURE_TARGET = myPreConfigure
