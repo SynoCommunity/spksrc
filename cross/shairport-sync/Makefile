@@ -3,6 +3,7 @@ PKG_VERS = 2.3.11
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libtool cross/libconfig cross/popt cross/libdaemon cross/openssl cross/alsa-lib
