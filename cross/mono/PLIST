@@ -2,7 +2,6 @@ bin:bin/al
 bin:bin/al2
 bin:bin/gacutil
 bin:bin/gacutil2
-bin:bin/gmcs
 bin:bin/ilasm
 bin:bin/makecert
 bin:bin/mcs
@@ -48,6 +47,18 @@ rsc:etc/mono/2.0/DefaultWsdlHelpGenerator.aspx
 rsc:etc/mono/2.0/machine.config
 rsc:etc/mono/2.0/settings.map
 rsc:etc/mono/2.0/web.config
+rsc:etc/mono/4.0/Browsers/Compat.browser
+rsc:etc/mono/4.0/DefaultWsdlHelpGenerator.aspx
+rsc:etc/mono/4.0/machine.config
+rsc:etc/mono/4.0/settings.map
+rsc:etc/mono/4.0/web.config
+rsc:etc/mono/4.5/Browsers/Compat.browser
+rsc:etc/mono/4.5/DefaultWsdlHelpGenerator.aspx
+rsc:etc/mono/4.5/machine.config
+rsc:etc/mono/4.5/settings.map
+rsc:etc/mono/4.5/web.config
+rsc:etc/mono/browscap.ini
+rsc:etc/mono/config
 lib:lib/libikvm-native.so
 lnk:lib/libmono-2.0.so
 lnk:lib/libmono-2.0.so.1

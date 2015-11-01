@@ -1,6 +1,6 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 2.3.0
-SPK_REV = 1
+SPK_VERS = 2.3.11
+SPK_REV = 2
 SPK_ICON = src/shairport-sync.png
 
 DEPENDS =  cross/busybox cross/$(SPK_NAME)
@@ -34,3 +34,4 @@ include ../../mk/spksrc.spk.mk
 shairport_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
+	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf

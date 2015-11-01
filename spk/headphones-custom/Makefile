@@ -1,6 +1,6 @@
 SPK_NAME = headphones-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/headphones-custom.png
 DSM_UI_DIR = app
 
@@ -14,10 +14,11 @@ DESCRIPTION_SPN = Headphones permite descargar automáticamente música mediante
 ADMIN_PORT = 8182
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones Custom
+CHANGELOG = "1. Allow non-localhost traffic for new installs<br>2. Add to sc-media group"
 BETA = 1
 
 HOMEPAGE   = https://github.com/rembo10/headphones
-LICENSE    =
+LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/
 

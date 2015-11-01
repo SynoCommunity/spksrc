@@ -9,6 +9,7 @@ RUN apt-get update && \
         bison \
         build-essential \
         check \
+        cmake \
         curl \
         cython \
         debootstrap \
@@ -24,6 +25,7 @@ RUN apt-get update && \
         libltdl-dev \
         libssl-dev \
         libunistring-dev \
+        lzip \
         mercurial \
         ncurses-dev \
         pkg-config \

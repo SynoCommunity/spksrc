@@ -1,26 +1,22 @@
 SPK_NAME = mono
-SPK_VERS = 3.10.0
-SPK_REV = 4
+SPK_VERS = 4.0.4.1
+SPK_REV = 5
 SPK_ICON = src/mono.png
-
-REQUIRED_DSM = 5.0
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Mono is a software platform designed to allow developers to easily create cross platform applications.
-RELOAD_UI = yes
+DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "No longer in beta"
+CHANGELOG = "Update to 4.0.4.1"
 
-HOMEPAGE = http://mono-project.com/
-LICENSE  = https://github.com/mono/mono/blob/master/LICENSE
+HOMEPAGE = http://mono-project.com
+LICENSE  = http://www.mono-project.com/docs/faq/licensing
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -41,11 +37,3 @@ mono_extra_install:
 	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/etc/mono $(STAGING_DIR)/etc/
 	install -m 755 -d $(STAGING_DIR)/bin
 	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/bin $(STAGING_DIR)/
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
