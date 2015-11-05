@@ -1,11 +1,11 @@
-SPK_NAME = exfat
+SPK_NAME = fuse-exfat
 SPK_VERS = 1.2.1
-SPK_REV = 1
+SPK_REV = 2  
 SPK_ICON = src/fuse.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME) cross/exfat-utils
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Roman Tymoshyk 
 DESCRIPTION = Add support of exFAT filesystem
 DISPLAY_NAME = exFAT
 STARTABLE = no
