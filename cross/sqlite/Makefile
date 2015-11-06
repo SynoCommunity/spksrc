@@ -13,6 +13,6 @@ LICENSE  = http://www.sqlite.org/copyright.html
 
 GNU_CONFIGURE = 1
 
-ADDITIONAL_CFLAGS = -DSQLITE_ENABLE_COLUMN_METADATA
+ADDITIONAL_CFLAGS = -DSQLITE_ENABLE_COLUMN_METADATA -DHAVE_USLEEP=1
 
 include ../../mk/spksrc.cross-cc.mk
