@@ -5,7 +5,9 @@
             "desc": "Deluge Web UI",
             "icon": "images/deluge-{0}.png",
             "type": "url",
-            "url": "3rdparty/deluge/deluge.cgi",
+            "protocol": "http",
+            "port": "8112",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }
