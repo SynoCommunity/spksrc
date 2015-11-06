@@ -7,7 +7,7 @@ DNAME="Deluge"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/${PATH}"
 USER="deluge"
 GROUP="users"
 PYTHON="${INSTALL_DIR}/env/bin/python"
@@ -23,10 +23,10 @@ DELUGE_WEB_LOG="${INSTALL_DIR}/var/deluge-web.log"
 start_daemon ()
 {
     start-stop-daemon -S -q -x ${DELUGED} -c ${USER} -u ${USER} -p ${DELUGED_PID} \
-      -- --quiet --config ${CFG_DIR} --logfile ${DELUGED_LOG} --loglevel info --pidfile ${DELUGED_PID}
+      -- --config ${CFG_DIR} --logfile ${DELUGED_LOG} --loglevel info --pidfile ${DELUGED_PID}
     sleep 3
     start-stop-daemon -S -q -b -m -x ${DELUGE_WEB} -c ${USER} -u ${USER} -p ${DELUGE_WEB_PID} \
-      -- --quiet --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
+      -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
 }
 
 stop_daemon ()
@@ -90,7 +90,7 @@ case $1 in
         fi
         ;;
     log)
-        echo ${LOG_FILE}
+        echo ${DELUGED_LOG}
         ;;
     *)
         exit 1
