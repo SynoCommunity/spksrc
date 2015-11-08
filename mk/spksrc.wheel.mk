@@ -49,7 +49,7 @@ wheel_target: $(PRE_WHEEL_TARGET)
 		$(MSG) "Building wheels" ; \
 		rm -rf $(WORK_DIR)/wheelbuild ; \
 		mkdir -p $(WORK_DIR)/wheelbuild ; \
-		$(PIP) wheel --no-deps -b $(WORK_DIR)/wheelbuild -w $(WORK_DIR)/wheelhouse -f $(WORK_DIR)/wheelhouse/ -r $(WORK_DIR)/wheelhouse/requirements.txt ; \
+		$(RUN) $(PIP) wheel --no-deps -b $(WORK_DIR)/wheelbuild -w $(WORK_DIR)/wheelhouse -f $(WORK_DIR)/wheelhouse/ -r $(WORK_DIR)/wheelhouse/requirements.txt ; \
 	else  \
 		$(MSG) "No wheels to process" ; \
 	fi
