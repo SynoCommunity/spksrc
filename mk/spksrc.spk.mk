@@ -386,14 +386,16 @@ publish-all-archs-latest:
 	fi
 
 ####
+LATEST_ARCH_PREP = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(AVAILABLE_ARCHS)))))))
 
-latest-arch-%:
-	@$(MSG) Building package for arch $* with latest available toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))))
+latest-arch-$(addprefix latest-arch-,$(LATEST_ARCH_PREP)):
+	@$(MSG) Building package for arch $(subst latest-arch-,,$@) with latest available toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(subst latest-arch-,,$@) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(subst latest-arch-,,$@)%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $(subst latest-arch-,,$@)%, $(AVAILABLE_ARCHS)))))))
 
-publish-latest-arch-%:
-	@$(MSG) Building package for arch $* with latest available toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS))))))) publish
+
+publish-latest-arch-$(addprefix publish-latest-arch-,$(LATEST_ARCH_PREP)):
+	@$(MSG) Building package for arch $(subst publish-latest-arch-,,$@) with latest available toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(subst publish-latest-arch-,,$@) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(subst publish-latest-arch-,,$@)%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $(subst publish-latest-arch-,,$@)%, $(AVAILABLE_ARCHS))))))) publish
 
 ####
 
@@ -412,14 +414,17 @@ publish-all-toolchain-%:
 	done \
 
 ####
+ARCH_PREP = $(sort $(subst syno-,arch-,$(AVAILABLE_TCS)) $(subst syno.,arch-,$(basename $(subst -,.,$(basename $(subst .,,$(AVAILABLE_TCS)))))))
 
-arch-%:
-	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+arch-$(ARCH_PREP):
+	@$(MSG) Building package for $(subst arch-,,$@)
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$(subst arch-,,$@))))) TCVERSION=$(if $(findstring $(subst arch-,,$@),$(basename $(subst -,.,$(basename $(subst .,,$(subst arch-,,$@)))))),$(DEFAULT_TC),$(notdir $(subst -,/,$(subst arch-,,$@))))
+	
+PUBLISH_ARCH_PREP = $(sort $(subst syno-,publish-arch-,$(AVAILABLE_TCS)) $(subst syno.,publish-arch-,$(basename $(subst -,.,$(basename $(subst .,,$(AVAILABLE_TCS)))))))
 
-publish-arch-%:
-	@$(MSG) Building and publishing package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish
+publish-arch-$(PUBLISH_ARCH_PREP):
+	@$(MSG) Building and publishing package for arch $(subst publish-arch-,,$@)
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$(subst publish-arch-,,$@))))) TCVERSION=$(if $(findstring $(subst publish-arch-,,$@),$(basename $(subst -,.,$(basename $(subst .,,$(subst publish-arch-,,$@)))))),$(DEFAULT_TC),$(notdir $(subst -,/,$(subst publish-arch-,,$@)))) publish
 
 ####
 
