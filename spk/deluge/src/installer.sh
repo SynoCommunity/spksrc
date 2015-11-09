@@ -76,7 +76,7 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Install Deluge
-    cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
+    env PYTHON_EGG_CACHE=${INSTALL_DIR}/env/cache && cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py build && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
