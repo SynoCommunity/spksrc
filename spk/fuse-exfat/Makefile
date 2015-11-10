@@ -5,8 +5,8 @@ SPK_ICON = src/fuse.png
 
 DEPENDS = cross/$(SPK_NAME) cross/exfat-utils
 
-MAINTAINER = Roman Tymoshyk 
-DESCRIPTION = Add support of exFAT filesystem
+MAINTAINER = SynoCommunity
+DESCRIPTION = This project aims to provide a full-featured exFAT file system implementation for Unix-like systems. It consists of a FUSE module (fuse-exfat) and a set of utilities (exfat-utils).
 DISPLAY_NAME = exFAT
 STARTABLE = no
 CHANGELOG = "Initial release"
