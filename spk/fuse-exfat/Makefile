@@ -1,6 +1,6 @@
 SPK_NAME = fuse-exfat
 SPK_VERS = 1.2.1
-SPK_REV = 2  
+SPK_REV = 2
 SPK_ICON = src/fuse.png
 
 DEPENDS = cross/$(SPK_NAME) cross/exfat-utils
