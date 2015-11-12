@@ -1,12 +1,12 @@
 SPK_NAME = fuse-exfat
 SPK_VERS = 1.2.1
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/fuse.png
 
 DEPENDS = cross/$(SPK_NAME) cross/exfat-utils
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = This project aims to provide a full-featured exFAT file system implementation for Unix-like systems. It consists of a FUSE module (fuse-exfat) and a set of utilities (exfat-utils).
+DESCRIPTION = This project aims to provide a full-featured exFAT file system implementation for Unix-like systems. It consists of a FUSE module \(fuse-exfat\) and a set of utilities \(exfat-utils\).
 DISPLAY_NAME = exFAT
 STARTABLE = no
 CHANGELOG = "Initial release"

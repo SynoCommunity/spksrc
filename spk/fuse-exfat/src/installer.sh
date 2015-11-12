@@ -19,8 +19,8 @@ postinst ()
     
     # Put exfat & fusermount in the PATH
     mkdir -p /usr/local/bin
-    ln -s ${INSTALL_DIR}/sbin/mount.exfat-fuse /usr/local/bin/mount.exfat
-    ln -s ${INSTALL_DIR}/sbin/mount.exfat-fuse /usr/local/bin/mount.exfat-fuse
+    ln -s ${INSTALL_DIR}/sbin/mount.exfat-fuse /usr/sbin/mount.exfat
+    ln -s ${INSTALL_DIR}/sbin/mount.exfat-fuse /usr/sbin/mount.exfat-fuse
     ln -s ${INSTALL_DIR}/sbin/dumpexfat /usr/local/bin/dumpexfat
     ln -s ${INSTALL_DIR}/sbin/exfatfsck /usr/local/bin/exfatfsck
     ln -s ${INSTALL_DIR}/sbin/exfatlabel /usr/local/bin/exfatlabel
@@ -40,8 +40,8 @@ postuninst ()
 {
     # Remove links
     rm -f ${INSTALL_DIR}
-    rm -f /usr/local/bin/mount.exfat
-    rm -f /usr/local/bin/mount.exfat-fuse
+    rm -f /usr/sbin/mount.exfat
+    rm -f /usr/sbin/mount.exfat-fuse
 	rm -f /usr/local/bin/dumpexfat
 	rm -f /usr/local/bin/exfatfsck
 	rm -f /usr/local/bin/exfatlabel
