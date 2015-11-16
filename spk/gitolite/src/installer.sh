@@ -42,14 +42,29 @@ postinst ()
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     # Setup gitolite
+    ${INSTALL_DIR}/share/gitolite/install -to ${INSTALL_DIR}/bin
+	synoshare -add ${USER} "Gitolite data" "$(/usr/syno/bin/servicetool --get-alive-volume)/${PACKAGE}" "" "admin,${USER}" "" 0 0
+	REPOSITORIES_LOCATION="$(synoshare --get gitolite |sed -n -e "s|^\\s*Path \.*\[\(/.*\)\].*|\1|p")/repositories"
+
     if [ ! -z "${wizard_public_key}" ]; then
         echo "${wizard_public_key}" > ${INSTALL_DIR}/var/admin.pub
-        ${INSTALL_DIR}/share/gitolite/install -to ${INSTALL_DIR}/bin
         su - ${USER} -c "PATH=${PATH} ${INSTALL_DIR}/bin/gitolite setup -pk ${INSTALL_DIR}/var/admin.pub"
         sed -i -e "s|UMASK                           =>  0077,|UMASK                           =>  0022,|" ${INSTALL_DIR}/var/.gitolite.rc 
-        sed -i -e "$(printf '1i$ENV{PATH} = "%s/bin:$ENV{PATH}";\' "$GIT_DIR")" ${INSTALL_DIR}/var/.gitolite.rc
 		rm ${INSTALL_DIR}/var/admin.pub
+	else
+		su - ${USER} -c "PATH=${PATH} ${INSTALL_DIR}/bin/gitolite setup -a admin"
     fi
+
+	if [ -d "${REPOSITORIES_LOCATION}" ]; then
+		rm -rf "${REPOSITORIES_LOCATION}/gitolite-admin.git"
+		mv ${INSTALL_DIR}/var/repositories/gitolite-admin.git ${REPOSITORIES_LOCATION}/
+	else
+		mv ${INSTALL_DIR}/var/repositories ${REPOSITORIES_LOCATION}
+	fi
+	rm -rf ${INSTALL_DIR}/var/repositories
+	ln -s ${REPOSITORIES_LOCATION} ${INSTALL_DIR}/var/repositories
+
+    sed -i -e "$(printf '1i$ENV{PATH} = "%s/bin:$ENV{PATH}";\' "$GIT_DIR")" ${INSTALL_DIR}/var/.gitolite.rc
 
     exit 0
 }

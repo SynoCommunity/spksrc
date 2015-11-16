@@ -2,10 +2,18 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "SSH public key. If you leave this field empty, you will not be able to use gitolite!",
+        "desc": "If you have previously installed the gitolite package, force push the previous gitolite-admin repository after installation!",
+		"emptyText": "ssh-rsa AAAA...",
         "subitems": [{
             "key": "wizard_public_key",
-            "desc": "Public Key"
+            "desc": "SSH RSA public key",
+			"validator": {
+				"allowBlank": false,
+				"regex": {
+					"expr": "/ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/i",
+					"errorText": "SSH RSA key needed"
+				}
+			}
         }]
     }]
 }]

@@ -2,7 +2,6 @@ SPK_NAME = gitolite
 SPK_VERS = 3.6.3
 SPK_REV = 1
 SPK_ICON = src/gitolite.png
-DSM_UI_DIR = app
 
 DEPENDS = cross/dropbear cross/mktemp cross/busybox
 SPK_DEPENDS = "git>1.8.2"
@@ -42,11 +41,3 @@ git_server_extra_install:
 	git clone https://github.com/sitaramc/gitolite.git $(STAGING_DIR)/share/gitolite
 	git -C $(STAGING_DIR)/share/gitolite reset --hard 5d24ae666bfd2fa9093d67c840eb8d686992083f
 	rm -rf $(STAGING_DIR)/share/gitolite/.git*
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72 ; \
-	do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
