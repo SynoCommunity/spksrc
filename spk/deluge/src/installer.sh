@@ -8,11 +8,11 @@ DNAME="Deluge"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="deluge"
 GROUP="users"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-CFG_FILE="${INSTALL_DIR}/var/config.ini"
+CFG_FILE="${INSTALL_DIR}/var/core.conf"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -46,11 +46,19 @@ syno_group_remove ()
 
 preinst ()
 {
-    # Check for libtorrent
-    ${PYTHON_DIR}/bin/python -c 'import libtorrent' > /dev/null 2>&1
-    if [ $? -eq 1 ]; then
-        echo "This package is not available for your architecture"
-        exit 1
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        if [ ! -d "${wizard_download_dir}" ]; then
+            echo "Download directory ${wizard_download_dir} does not exist."
+            exit 1
+        fi
+        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
+            echo "Watch directory ${wizard_watch_dir} does not exist."
+            exit 1
+        fi
+        if [ -n "${wizard_complete_dir}" -a ! -d "${wizard_incomplete_dir}" ]; then
+            echo "Complete directory ${wizard_complete_dir} does not exist."
+            exit 1
+        fi
     fi
 
     exit 0
@@ -68,10 +76,43 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Install Deluge
-    cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
+    env PYTHON_EGG_CACHE=${INSTALL_DIR}/env/cache && cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py build && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Edit the configuration according to the wizard
+        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        if [ -d "${wizard_watch_dir}" ]; then
+            sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
+        else
+            sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
+            sed -i -e "s|@watch_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        fi
+        if [ -d "${wizard_complete_dir}" ]; then
+            sed -i -e "s|@complete_dir_enabled@|true|g" ${CFG_FILE}
+            sed -i -e "s|@complete_dir@|${wizard_complete_dir}|g" ${CFG_FILE}
+        else
+            sed -i -e "s|@complete_dir_enabled@|false|g" ${CFG_FILE}
+            sed -i -e "s|@complete_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        fi
+
+        # Set group and permissions on download- and watch dir for DSM5
+        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
+            chgrp users ${wizard_download_dir:=/volume1/downloads}
+            chmod g+rwx ${wizard_download_dir:=/volume1/downloads}
+            if [ -d "${wizard_watch_dir}" ]; then
+                chgrp users ${wizard_watch_dir}
+                chmod g+rwx ${wizard_watch_dir}
+            fi
+            if [ -d "${wizard_complete_dir}" ]; then
+                chgrp users ${wizard_complete_dir}
+                chmod g+rwx ${wizard_complete_dir}
+            fi
+        fi
+    fi
 
     syno_group_create
 

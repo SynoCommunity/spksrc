@@ -1,5 +1,5 @@
 PKG_NAME = deluge
-PKG_VERS = 1.3.5
+PKG_VERS = 1.3.12
 PKG_EXT = tar.lzma
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.deluge-torrent.org/source
