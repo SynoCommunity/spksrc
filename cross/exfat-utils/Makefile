@@ -1,5 +1,5 @@
 PKG_NAME = exfat-utils
-PKG_VERS = 1.2.1
+PKG_VERS = 1.2.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/relan/exfat/releases/download/v$(PKG_VERS)
