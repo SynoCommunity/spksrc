@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "URL du fork",
-            "defaultValue": "git://github.com/SiCKRAGETV/SickRage.git",
+            "defaultValue": "https://github.com/SickRage/SickRage.git",
             "validator": {
                 "allowBlank": false
             }

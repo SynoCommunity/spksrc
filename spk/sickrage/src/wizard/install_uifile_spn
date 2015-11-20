@@ -1,18 +1,18 @@
 [{
-    "step_title": "Installatie SickRage",
+    "step_title": "Elige tu fork",
     "items": [{
         "type": "textfield",
-        "desc": "Klik op volgende om SickRage te installeren. (Of vul een alternatieve URL in.)",
+        "desc": "Escoge el fork a utilizar u omite este paso para instalar sickrage por defecto",
         "subitems": [{
             "key": "wizard_fork_url",
-            "desc": "Fork URL",
+            "desc": "URL del fork",
             "defaultValue": "https://github.com/SickRage/SickRage.git",
             "validator": {
                 "allowBlank": false
             }
         }, {
             "key": "wizard_fork_branch",
-            "desc": "Fork branch",
+            "desc": "Rama del fork",
             "defaultValue": "master",
             "validator": {
                 "allowBlank": false
