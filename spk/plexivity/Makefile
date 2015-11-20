@@ -1,6 +1,6 @@
 SPK_NAME = plexivity
-SPK_VERS = 0.9.7
-SPK_REV = 1
+SPK_VERS = 0.9.8
+SPK_REV = 2
 SPK_ICON = src/plexivity.png
 DSM_UI_DIR = app
 BETA = 1
