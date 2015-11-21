@@ -32,7 +32,7 @@ ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine monaco),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
