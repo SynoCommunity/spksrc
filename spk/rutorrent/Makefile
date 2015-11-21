@@ -1,10 +1,10 @@
 SPK_NAME = rutorrent
-SPK_VERS = 3.6
-SPK_REV = 7
+SPK_VERS = 3.7
+SPK_REV = 1
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/rtorrent cross/rutorrent cross/rutorrent-plugins cross/busybox cross/screen cross/procps-ng cross/mediainfo
+DEPENDS  = cross/rtorrent cross/rutorrent cross/busybox cross/screen cross/procps-ng cross/mediainfo
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
@@ -12,7 +12,8 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Update rtorrent to 0.9.4"
+CHANGELOG = "1. Update rtorrent to 0.9.4\
+2. Update rtorrent to 0.9.6 / libtorrent to 0.13.6 / rutorrent to 3.7”
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
