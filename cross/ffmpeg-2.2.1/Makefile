@@ -13,7 +13,7 @@ LICENSE  =
 
 REQUIRED_DSM = 5.1
 
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine comcerto2k 88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine comcerto2k 88f6281 monaco),$(ARCH))
 MYARCH = arm
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
