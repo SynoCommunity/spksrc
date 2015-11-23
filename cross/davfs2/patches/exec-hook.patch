@@ -1,0 +1,15 @@
+diff -rupN davfs2-1.5.2_orig/src/Makefile.in davfs2-1.5.2/src/Makefile.in
+--- src/Makefile.in	2015-11-23 16:20:51.880285856 +0000
++++ src/Makefile.in	2015-11-23 16:23:48.976278611 +0000
+@@ -569,11 +569,6 @@ uninstall-am: uninstall-sbinPROGRAMS
+ 
+ install-exec-hook:
+ 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \
+-	if test "$(sbindir)" != "$(ssbindir)"; then \
+-	  $(mkinstalldirs) $(DESTDIR)$(ssbindir); \
+-	  $(LN_S) -f $(sbindir)/mount.davfs $(DESTDIR)$(ssbindir)/mount.davfs; \
+-	  $(LN_S) -f $(sbindir)/umount.davfs $(DESTDIR)$(ssbindir)/umount.davfs; \
+-	fi
+ 
+ uninstall-hook:
+ 	if test "$(sbindir)" != "$(ssbindir)"; then \
