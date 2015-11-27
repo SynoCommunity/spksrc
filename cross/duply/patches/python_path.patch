@@ -1,0 +1,11 @@
+--- duply_orig	2015-11-27 22:38:26.533513177 +0000
++++ duply	2015-11-27 22:39:25.961510746 +0000
+@@ -444,7 +444,7 @@ DEFAULT_TARGET_PASS='_backend_password_'
+ DEFAULT_GPG='gpg'
+ DEFAULT_GPG_KEY='_KEY_ID_'
+ DEFAULT_GPG_PW='_GPG_PASSWORD_'
+-DEFAULT_PYTHON='python2'
++DEFAULT_PYTHON='/usr/local/duplicity/env/bin/python'
+ 
+ # function definitions ##########################
+ 
