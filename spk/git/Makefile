@@ -10,7 +10,7 @@ DESCRIPTION = Git is a free and open source distributed version control system d
 DESCRIPTION_FRE = Git est un logiciel de gestion de version décentralisée gratuit et open source destiné à gérer aussi bien les petits que les très gros projets avec vitesse et efficacité.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = Update Git to 2.6.3
+CHANGELOG = "1. Update Git to 2.6.3<br>2. Include root certificates"
 
 HOMEPAGE = http://git-scm.com
 LICENSE  = GPLv2
