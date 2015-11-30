@@ -1,5 +1,5 @@
 bin:bin/curl
 lnk:lib/libcurl.so
 lnk:lib/libcurl.so.4
-lib:lib/libcurl.so.4.3.0
+lib:lib/libcurl.so.4.4.0
 rsc:cert.pem
