@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-HOMEPAGE = http://www.openssl.org/
+HOMEPAGE = http://www.openssl.org
 COMMENT  = Compression Library
-LICENSE  = zlib-license
+LICENSE  = http://www.openssl.org/source/license.html
 
 CONFIGURE_TARGET = myConfigure
 
