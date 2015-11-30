@@ -4,7 +4,7 @@ SPK_REV = 2
 SPK_ICON = src/duplicity.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/boto cross/msgpack-python cross/netifaces cross/rackspace-novaclient
+BUILD_DEPENDS += cross/boto cross/msgpack-python cross/netifaces
 BUILD_DEPENDS += cross/simplejson cross/wrapt cross/$(SPK_NAME)
 
 DEPENDS = cross/librsync cross/bash cross/duply
