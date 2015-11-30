@@ -1,5 +1,5 @@
 PKG_NAME = mercurial
-PKG_VERS = 3.4
+PKG_VERS = 3.6.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://mercurial.selenic.com/release
