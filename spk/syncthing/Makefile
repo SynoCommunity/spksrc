@@ -3,7 +3,6 @@ SPK_VERS = 0.12.5
 SPK_REV = 6
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
-BETA = 1
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
@@ -15,7 +14,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 ADMIN_PORT = 7070
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
-CHANGELOG = Update to 12.5
+CHANGELOG = "1. Update to 0.12.5<br>2. Move from beta to stable"
 
 HOMEPAGE   = http://www.syncthing.net/
 LICENSE    =
