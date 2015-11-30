@@ -1,6 +1,6 @@
 SPK_NAME = git
-SPK_VERS = 2.3.7
-SPK_REV = 4
+SPK_VERS = 2.6.3
+SPK_REV = 5
 SPK_ICON = src/git.png
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
@@ -10,10 +10,10 @@ DESCRIPTION = Git is a free and open source distributed version control system d
 DESCRIPTION_FRE = Git est un logiciel de gestion de version décentralisée gratuit et open source destiné à gérer aussi bien les petits que les très gros projets avec vitesse et efficacité.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = Update Git to 2.3.7
+CHANGELOG = Update Git to 2.6.3
 
-HOMEPAGE = http://git-scm.com/
-LICENSE  =
+HOMEPAGE = http://git-scm.com
+LICENSE  = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
