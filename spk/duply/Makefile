@@ -1,6 +1,6 @@
 SPK_NAME = duply
 SPK_VERS = 1.11
-SPK_REV = 5
+SPK_REV = 1
 
 SPK_ICON = src/duply.png
 
