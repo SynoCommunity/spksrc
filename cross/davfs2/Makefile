@@ -7,8 +7,7 @@ PKG_DIST_SITE = http://download.savannah.gnu.org/releases/$(PKG_NAME)
 
 DEPENDS = cross/neon cross/libtool
 
-HOMEPAGE = test
-COMMENT  = General-purpose parser generator
+HOMEPAGE = http://savannah.nongnu.org/projects/davfs2
 LICENSE  = GNU GPL
 
 export ssbindir=$(STAGING_INSTALL_PREFIX)/sbin/
