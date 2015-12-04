@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.7
-SPK_REV = 1
+SPK_REV = 7
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = 1. Update rtorrent to 0.9.4 2. Update rtorrent to 0.9.6 libtorrent to 0.13.6 rutorrent to 3.7
+CHANGELOG ="Update rtorrent to 0.9.4"
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
