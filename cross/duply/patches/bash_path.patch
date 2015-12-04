@@ -1,0 +1,9 @@
+diff -rupN duply_1.11_orig/duply duply_1.11/duply
+--- duply	2015-11-27 17:45:08.377314220 +0000
++++ duply	2015-11-27 17:45:31.749313264 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/usr/local/duply/bin/bash
+ #
+ ###############################################################################
+ #  duply (grown out of ftplicity), is a shell front end to duplicity that     #
