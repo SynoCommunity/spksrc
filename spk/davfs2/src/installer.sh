@@ -45,6 +45,7 @@ preuninst ()
         ${INSTALL_DIR}/bin/delgroup ${DAVUSER} ${DAVGROUP}
         ${INSTALL_DIR}/bin/deluser ${DAVUSER}
     fi
+
     exit 0
 }
 
@@ -54,6 +55,7 @@ postuninst ()
     rm -f ${INSTALL_DIR}
     rm -f /usr/local/bin/mount.davfs
     rm -f /usr/local/bin/umount.davfs
+    
     exit 0
 }
 
