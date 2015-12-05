@@ -1,9 +1,8 @@
 PKG_NAME = tt-rss
-PKG_FULL_NAME = Tiny-Tiny-RSS
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 35c12dc
-PKG_DIST_SITE = https://github.com/gothfox/$(PKG_FULL_NAME).git
+PKG_GIT_HASH = 7f4fff96
+PKG_DIST_SITE = https://tt-rss.org/gitlab/fox/$(PKG_NAME).git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 

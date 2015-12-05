@@ -8,7 +8,8 @@ DNAME="Tiny Tiny RSS"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
+USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
+PHP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
 MYSQL="/usr/syno/mysql/bin/mysql"
 MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
 MYSQL_USER="ttrss"
@@ -62,6 +63,7 @@ postinst ()
             -e "s|define('DB_PASS', \".*\");|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
             -e "s|define('SINGLE_USER_MODE', .*);|define('SINGLE_USER_MODE', ${single_user_mode});|" \
             -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
+            -e "s|define('PHP_EXECUTABLE',  '.*');|define('PHP_EXECUTABLE', '$(PHP)');|" \
             ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php
     fi
 
