@@ -12,7 +12,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG ="Update rtorrent to 0.9.4"
+CHANGELOG ="Update rtorrent to 0.9.6, libtorrent to 0.13.6, rutorrent to 3.7"
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
