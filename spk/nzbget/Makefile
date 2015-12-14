@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
-SPK_VERS = 16.3
-SPK_REV = 20
+SPK_VERS = 16.4
+SPK_REV = 21
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 6789
 DISPLAY_NAME = NZBGet
-CHANGELOG = "Update NZBGet to 16.3"
+CHANGELOG = "Update NZBGet to 16.4"
 
 HOMEPAGE = http://nzbget.net
 LICENSE  = GPLv2
