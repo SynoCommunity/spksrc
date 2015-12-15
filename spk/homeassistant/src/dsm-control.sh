@@ -14,7 +14,7 @@ PYTHONPATH="${INSTALL_DIR}/share/${PACKAGE}" #needed for python to find the home
 
 LOG_FILE="${INSTALL_DIR}/var/home-assistant.log"
 PID_FILE="${INSTALL_DIR}/var/homeassistant.pid"
-RUN_ARGS="-m ${PACKAGE} -c ${INSTALL_DIR}/var --open-ui"
+RUN_ARGS="-m ${PACKAGE} -c ${INSTALL_DIR}/var" #--open-ui is not needed since it opens a browser we don't have on a NAS
 
 start_daemon ()
 {
