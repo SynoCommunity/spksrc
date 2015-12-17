@@ -1,1 +1,3 @@
-lib:@PYTHON_SITE_PACKAGES@/cryptography/_Cryptography_cffi_*.so
+lib:@PYTHON_SITE_PACKAGES@/cryptography/hazmat/bindings/_constant_time*.so
+lib:@PYTHON_SITE_PACKAGES@/cryptography/hazmat/bindings/_openssl*.so
+lib:@PYTHON_SITE_PACKAGES@/cryptography/hazmat/bindings/_padding*.so
