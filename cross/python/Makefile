@@ -1,7 +1,7 @@
 PKG_NAME = python
 PKG_VERS_MAJOR = 2
 PKG_VERS_MINOR = 7
-PKG_VERS_PATCH = 10
+PKG_VERS_PATCH = 11
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -11,9 +11,9 @@ PKG_DIR = Python-$(PKG_VERS)
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2
 DEPENDS += cross/berkeleydb native/$(PKG_NAME)
 
-HOMEPAGE = http://www.python.org/
+HOMEPAGE = http://www.python.org
 COMMENT  = Python Programming Language
-LICENSE  =
+LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
