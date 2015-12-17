@@ -9,4 +9,4 @@ lnk:lib/libpcreposix.so.0
 lib:lib/libpcreposix.so.0.0.3
 lnk:lib/libpcre.so
 lnk:lib/libpcre.so.1
-lib:lib/libpcre.so.1.2.4
+lib:lib/libpcre.so.1.2.6
