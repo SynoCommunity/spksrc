@@ -5,7 +5,7 @@ SPK_ICON = src/letsencrypt.png
 DSM_UI_DIR = app
 BETA = 1
 
-SPK_DEPENDS = "python>=2.7.11-15 git"
+SPK_DEPENDS = "python>=2.7.11-15:git"
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 
