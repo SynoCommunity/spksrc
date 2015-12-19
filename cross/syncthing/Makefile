@@ -30,7 +30,7 @@ endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
@@ -38,7 +38,7 @@ $(error Unsupported ARCH $(ARCH))
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),amd64),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_amd64/syncthing
+SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),386),$(SYNCTHING_ARCH))

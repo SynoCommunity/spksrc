@@ -34,7 +34,8 @@ RUN apt-get update && \
         swig \
         xmlto \
         zlib1g-dev && \
-    apt-get clean && \
+        gcc-multilib 
+RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install setuptools, wheel and pip for Python3
