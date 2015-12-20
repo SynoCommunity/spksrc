@@ -1,0 +1,10 @@
+bin:bin/augparse
+bin:bin/augtool
+bin:bin/fadot
+lnk:lib/libaugeas.so
+lnk:lib/libaugeas.so.0
+lib:lib/libaugeas.so.0.20.0
+lnk:lib/libfa.so
+lnk:lib/libfa.so.1
+lib:lib/libfa.so.1.4.1
+
