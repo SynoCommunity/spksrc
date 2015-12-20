@@ -38,8 +38,10 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
     # Clone the repository
-    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/styxit/HTPC-Manager.git} ${INSTALL_DIR}/var/HTPC-Manager
+        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/styxit/HTPC-Manager.git} ${INSTALL_DIR}/var/HTPC-Manager
+    fi
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
@@ -84,6 +86,11 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # Revision 2 moves the HTPC-Manager dir to $(INSTALL_DIR}/var
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 2 ]; then
+        mv ${INSTALL_DIR}/share/HTPC-Manager ${INSTALL_DIR}/var
+    fi
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
