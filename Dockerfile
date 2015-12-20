@@ -1,4 +1,5 @@
-FROM 32bit/debian:jessie
+#FROM 32bit/debian:jessie
+FROM wdtz/debian-6.0-x86
 MAINTAINER SynoCommunity <https://synocommunity.com>
 
 ENV LANG C.UTF-8
