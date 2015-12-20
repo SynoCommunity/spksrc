@@ -76,6 +76,11 @@ local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
 	@echo "PUBLISH_URL=https://api.synocommunity.com/" > $@
 	@echo "PUBLISH_API_KEY=" >> $@
+	@echo "MAINTAINER?=" >> $@
+	@echo "MAINTAINER_URL=" >> $@
+	@echo "DISTRIBUTOR=" >> $@
+	@echo "DISTRIBUTOR_URL=" >> $@
+	@echo "REPORT_URL=" >> $@
 
 dsm-%:
 	@echo "Setting default toolchain version to DSM-$*"
