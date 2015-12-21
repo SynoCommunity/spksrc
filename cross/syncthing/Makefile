@@ -30,7 +30,7 @@ endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
@@ -71,5 +71,3 @@ myComp:
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(SYNCTHING_BIN) $(STAGING_INSTALL_PREFIX)/bin/
-
-
