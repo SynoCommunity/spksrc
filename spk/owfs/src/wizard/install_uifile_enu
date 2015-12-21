@@ -1,0 +1,15 @@
+[{
+    "step_title": "Server configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "OW Server hardware",
+        "subitems": [{
+            "key": "wizard_OWdriver",
+            "desc": "Driver",
+            "defaultValue": "FAKE = DS18S20,DS2405",
+            "validator": {
+                "allowBlank": false
+                }
+        }]
+    }]
+}]
