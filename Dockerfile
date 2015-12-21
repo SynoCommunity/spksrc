@@ -1,4 +1,5 @@
-FROM 32bit/debian:jessie
+#FROM 32bit/debian:jessie
+FROM wdtz/debian-6.0-x86
 MAINTAINER SynoCommunity <https://synocommunity.com>
 
 ENV LANG C.UTF-8
@@ -34,7 +35,8 @@ RUN apt-get update && \
         swig \
         xmlto \
         zlib1g-dev && \
-    apt-get clean && \
+        gcc-multilib 
+RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install setuptools, wheel and pip for Python3
