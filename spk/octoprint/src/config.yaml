@@ -3,3 +3,13 @@ serial:
 
 server:
   port: 8088
+
+plugins:
+  cura:
+    cura_engine: /usr/local/curaengine/bin/CuraEngine
+  softwareupdate:
+    checks:
+      octoprint:
+        checkout_folder: /usr/local/octoprint/share/OctoPrint
+        type: github_release
+
