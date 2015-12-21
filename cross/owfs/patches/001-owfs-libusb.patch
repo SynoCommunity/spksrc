@@ -1,0 +1,81 @@
+--- module/owshell/src/c/Makefile.in.orig	2015-12-20 18:24:38.472000000 +0100
++++ module/owshell/src/c/Makefile.in	2015-12-20 18:25:57.056270406 +0100
+@@ -498,9 +498,10 @@
+ 	-Wcast-align \
+ 	-Wstrict-prototypes \
+ 	-Wredundant-decls \
+-	${EXTRACFLAGS}
++	${EXTRACFLAGS} \
++	${LIBUSB_CFLAGS}
+ 
+-LDADD = ${LD_EXTRALIBS} ${OSLIBS}
++LDADD = ${LIBUSB_LIBS} ${LD_EXTRALIBS} ${OSLIBS}
+ all: all-am
+ 
+ .SUFFIXES:
+--- module/owshell/src/c/Makefile.am.orig	2015-12-20 18:24:38.472000000 +0100
++++ module/owshell/src/c/Makefile.am	2015-12-20 18:27:17.091122012 +0100
+@@ -41,7 +41,8 @@
+ 	-Wcast-align \
+ 	-Wstrict-prototypes \
+ 	-Wredundant-decls \
+-	${EXTRACFLAGS}
++	${EXTRACFLAGS} \
++	${LIBUSB_CFLAGS}
+ 
+-LDADD = ${LD_EXTRALIBS} ${OSLIBS}
++LDADD = ${LIBUSB_LIBS} ${LD_EXTRALIBS} ${OSLIBS}
+ 
+--- module/owlib/src/include/ow_usb_cycle.h.orig	2015-03-15 02:27:40.000000000 +0100
++++ module/owlib/src/include/ow_usb_cycle.h	2015-12-20 18:34:28.218174144 +0100
+@@ -55,7 +55,7 @@
+ 
+ #if OW_USB
+ #include <sys/types.h> // Mac needs this before <usb.h> according to Peter Peter Radcliffe's work
+-#include <usb.h>
++//#include <usb.h>
+ 
+ /* All the rest of the code sees is the DS9490_detect routine and the iroutine structure */
+ 
+--- module/owtcl/Makefile.am	2015-01-11 02:31:32.000000000 +0100
++++ module/owtcl/Makefile.am	2015-06-09 10:51:00.778221509 +0200
+@@ -40,6 +40,7 @@
+ 	-Wstrict-prototypes \
+ 	-Wredundant-decls \
+ 	${EXTRACFLAGS} \
++	${LIBUSB_CFLAGS} \
+ 	${PTHREAD_CFLAGS} \
+ 	$(TCL_DEFS) \
+ 	$(TCL_SHLIB_CFLAGS) \
+--- module/swig/perl5/OW/Makefile.linux.in	2015-01-11 02:31:32.000000000 +0100
++++ module/swig/perl5/OW/Makefile.linux.in	2015-06-09 10:50:30.190892962 +0200
+@@ -9,7 +9,7 @@
+     'VERSION'	=>	q[@VERSION@],
+ # Avoid compilation problem for Fedora Core 1 and Slackware 10.2
+     'DEFINE'    =>	q[@PTHREAD_CFLAGS@ -D_FILE_OFFSET_BITS=64 -DSKIP_SEARCH_H @DEFS@],
+-    'INC'       =>	q[-I../../../../src/include -I../../../owlib/src/include @CPPFLAGS@],
++    'INC'       =>	q[-I../../../../src/include -I../../../owlib/src/include @CPPFLAGS@ @LIBUSB_CFLAGS@],
+ # Default value for LDDLFLAGS is $Config{lddlflags}="-shared -L/usr/local/lib"
+ # but we want rpath to be @libdir@ or @exec_prefix@/lib
+     'LDDLFLAGS' =>      q[-shared -L../../../owlib/src/c/.libs -Wl,-rpath=@prefix@/lib],
+--- module/swig/perl5/OW/Makefile.osx.in	2015-01-11 02:31:32.000000000 +0100
++++ module/swig/perl5/OW/Makefile.osx.in	2015-06-09 10:50:30.190892962 +0200
+@@ -9,7 +9,7 @@
+     'VERSION'	=>	q[@VERSION@],
+ # Avoid compilation problem for Fedora Core 1 and Slackware 10.2
+     'DEFINE'    =>	q[@PTHREAD_CFLAGS@ -D_FILE_OFFSET_BITS=64 -DSKIP_SEARCH_H @DEFS@],
+-    'INC'       =>	q[-I../../../../src/include -I../../../owlib/src/include @CPPFLAGS@],
++    'INC'       =>	q[-I../../../../src/include -I../../../owlib/src/include @CPPFLAGS@ @LIBUSB_CFLAGS@],
+ # Default value for LDDLFLAGS is $Config{lddlflags}="-shared -L/usr/local/lib"
+ # but we want rpath to be @libdir@ or @exec_prefix@/lib
+     'LDDLFLAGS' =>      q[-bundle -flat_namespace -undefined suppress -Wl,-L../../../owlib/src/c/.libs],
+--- module/swig/php/Makefile.am	2015-01-11 02:31:32.000000000 +0100
++++ module/swig/php/Makefile.am	2015-06-09 10:50:30.190892962 +0200
+@@ -22,6 +22,7 @@
+ 	-I$(top_srcdir)/src/include \
+ 	-I$(top_srcdir)/module/owlib/src/include \
+ 	${EXTRACFLAGS} \
++	${LIBUSB_CFLAGS} \
+ 	${PTHREAD_CFLAGS} \
+ 	@PHPINC@
+ 
