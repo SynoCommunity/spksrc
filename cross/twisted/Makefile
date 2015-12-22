@@ -1,5 +1,5 @@
 PKG_NAME = Twisted
-PKG_VERS = 15.2.1
+PKG_VERS = 15.5.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/T/$(PKG_NAME)

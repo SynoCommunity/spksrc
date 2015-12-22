@@ -6,7 +6,7 @@ DNAME="Redis"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="redis"
 REDIS="${INSTALL_DIR}/bin/redis-server"
 LOG_FILE="${INSTALL_DIR}/var/redis.log"
@@ -16,7 +16,7 @@ CFG_FILE="${INSTALL_DIR}/var/redis.conf"
 
 start_daemon ()
 {
-    su - ${USER} -c "${REDIS} ${CFG_FILE}"
+    su ${USER} -c "${REDIS} ${CFG_FILE}"
 }
 
 stop_daemon ()

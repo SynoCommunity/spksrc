@@ -1,20 +1,21 @@
 SPK_NAME = htpcmanager
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/htpcmanager.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-3:git"
 
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Contol your Htpc with ease. Using multiple applications to control you htpc? No More! Htpc Manager combines all your software and provides an easy way to controll them all!
+DESCRIPTION = Control your Htpc with ease. Using multiple applications to control you htpc? No More! Htpc Manager combines all your software and provides an easy way to controll them all!
 ADMIN_PORT = 8087
 RELOAD_UI = yes
 DISPLAY_NAME = HTPC-Manager
 
 HOMEPAGE   = http://htpc.io
+WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -31,7 +32,7 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: htpcmanager_extra_install
-htpcmanager_extra_install: $(STAGING_DIR)/share/HTPC-Manager
+htpcmanager_extra_install: 
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
@@ -41,6 +42,3 @@ htpcmanager_extra_install: $(STAGING_DIR)/share/HTPC-Manager
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
 
-$(STAGING_DIR)/share/HTPC-Manager:
-	install -m 755 -d $(STAGING_DIR)/share
-	git clone git://github.com/styxit/HTPC-Manager.git ${STAGING_DIR}/share/HTPC-Manager

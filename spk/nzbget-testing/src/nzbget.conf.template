@@ -113,6 +113,21 @@ LogFile=${DestDir}/nzbget.log
 # Example: /usr/local/share/nzbget/nzbget.conf.
 ConfigTemplate=
 
+# Required directories.
+#
+# List of destination directories to be waited for on program start. Directories
+# must be separated with commas or semicolons.
+#
+# The list of directories is checked on program start. The program waits
+# until all directories become available before starting download or
+# post-processing. This is useful if the download destination is configured
+# on network or external drives, which may require some time to mount on boot.
+#
+# NOTE: Only directories used in option <InterDir> and option <DestDir>
+# (global or per-category) can be waited. Other directories, such as
+# option <TempDir>, option <NzbDir> and option <QueueDir> must be
+# available on program start.
+RequiredDir=
 
 ##############################################################################
 ### NEWS-SERVERS                                                           ###
@@ -127,7 +142,11 @@ ConfigTemplate=
 
 # Use this news server (yes, no).
 #
-# Set to "no" to temporary disable the server.
+# Set to "no" to disable the server on program start. Servers can be activated
+# later via scheduler tasks or manually via web-interface.
+#
+# NOTE: Download is not possible when all servers on level 0 are disabled. Servers
+# on higher levels are used only if at least one server on level 0 was tried.
 Server1.Active=yes
 
 # Name of news server.
@@ -189,10 +208,12 @@ Server1.Encryption=no
 #
 # See http://nzbget.net/Choosing_a_cipher for details.
 #
-# NOTE: One of the fastest cipher is RC4, it also provides strong 128 bit
-# encryption. To select it use the cipher string "RC4-MD5" (if NZBGet was
-# configured to use OpenSSL) or "NONE:+VERS-TLS-ALL:+ARCFOUR-128:+RSA:+MD5:+COMP-ALL"
-# (if NZBGet was configured to use GnuTLS).
+# NOTE: One of the fastest cipher is RC4. To select it use the cipher string
+# "RC4-MD5" (if NZBGet was configured to use OpenSSL) or
+# "NONE:+VERS-TLS-ALL:+ARCFOUR-128:+RSA:+MD5:+COMP-ALL"
+# (if NZBGet was configured to use GnuTLS). Note that RC4 is considered insecure
+# by the IETF (http://tools.ietf.org/html/rfc7465), but may be sufficient for
+# the usage of NZBGet.
 #
 # NOTE: You may get a TLS handshake error if the news server does
 # not support the chosen cipher. You can also get an error "Could not
@@ -429,9 +450,6 @@ Category4.Name=Software
 # Address (URL) of RSS Feed.
 #
 # Example: https://myindexer.com/api?apikey=3544646bfd1c535a9654645609800901&t=search&q=game.
-#
-# NOTE: When the feed is fetched for the very first time all existing
-# items are ignored. The items found on subsequentional fetches are processed. 
 #Feed1.URL=
 
 # Filter rules for items.
@@ -570,6 +588,15 @@ Category4.Name=Software
 # http://nzbget.net/RSS.
 #Feed1.Filter=
 
+# Treat all items on first fetch as backlog (yes, no).
+#
+#  yes - when the feed is fetched for the very first time (or after
+#        changing of URL or filter) all existing items are ignored (marked
+#        as backlog). The items found on subsequentional fetches are processed;
+#  no  - all items are processed even on first fetch (or after
+#        changing of URL or filter).
+#Feed1.Backlog=yes
+
 # How often to check for new items (minutes).
 #
 # Value "0" disables the automatic check of this feed.
@@ -594,6 +621,10 @@ Category4.Name=Software
 # post-processed even if the program is in paused state (force mode).
 #Feed1.Priority=0
 
+# List of rss feed scripts to execute before rss feed content is processed.
+#
+# For more information see global option <FeedScript>.
+#Feed1.FeedScript=
 
 ##############################################################################
 ### INCOMING NZBS                                                          ###
@@ -651,6 +682,17 @@ DupeCheck=yes
 #
 # This allows to reload it on next start.
 SaveQueue=yes
+
+# Flush download queue to disk (yes, no).
+#
+# Immediately flush file buffers for queue state file. This improves
+# safety for the queue file but may decrease disk performance due to
+# disabling of disk caching for queue state file.
+#
+# You can disable this option if it negatively affects disk performance on your
+# system. You should create backups of queue-directory (option <QueueDir>)
+# in that case. Keep the option enabled if your system often crashes.
+FlushQueue=yes
 
 # Reload download queue on start, if it exists (yes, no).
 ReloadQueue=yes
@@ -1169,16 +1211,18 @@ ParRename=yes
 # may take too much resources and time on a slow computers.
 ParRepair=yes
 
-# What files should be scanned during par-verification (auto, limited,
-# full).
+# What files should be scanned during par-verification (limited, extended,
+# full, dupe).
 #
-#  Limited - scan only files belonging to the par-set;
-#  Full    - scan all files in the directory. This helps if the
-#            files were renamed after creating of par-set;
-#  Auto    - a limited scan is performed first. If the par-checker 
-#            detects missing files, it scans other files in the 
-#            directory until all required files are found.
-ParScan=auto
+#  Limited  - scan only files belonging to par-set;
+#  Extended - scan files belonging to par-set first, scan other files until
+#             all missing files are found;
+#  Full     - scan all files in destination directory. Can be very time
+#             consuming but may sometimes repair where Limited and Extended fail;
+#  Dupe     - scan files belonging to par-set first, scan other files until
+#             repair is possible. Even files from other duplicate-downloads
+#             are scanned. Can be very time consuming but brings best results.
+ParScan=extended
 
 # Quick file verification during par-check (yes, no).
 #
@@ -1247,6 +1291,10 @@ ParIgnoreExt=.sfv, .nzb, .nfo
 # or "None". If it is set to "Pause" you will need to manually return
 # another duplicate to queue (if any exists in history). See also
 # option <DupeCheck>.
+#
+# NOTE: When option <ParScan> is set to "Dupe" the delete-action is performed
+# only if article completion is below 10% (empirical threshold). This is to
+# improve efficiency of dupe par scan mode.
 HealthCheck=delete
 
 # Maximum allowed time for par-repair (minutes).
@@ -1431,6 +1479,9 @@ UnpackPassFile=
 #                       may include full path;
 #  NZBPP_FINALDIR     - final destination path if set by one of previous pp-scripts;
 #  NZBPP_CATEGORY     - category assigned to nzb-file (can be empty string);
+#  NZBPP_DUPEKEY      - duplicate key of nzb-file;
+#  NZBPP_DUPESCORE    - duplicate score of nzb-file;
+#  NZBPP_DUPEMODE     - duplicate mode of nzb-file: SCORE, ALL, FORCE;
 #  NZBPP_TOTALSTATUS  - total status of nzb-file:
 #                       SUCCESS - everything OK;
 #                       WARNING - download is damaged but probably can
@@ -1666,26 +1717,50 @@ ScanScript=
 #
 # NZBGet passes following arguments to the queue script as environment
 # variables:
-#  NZBNA_NZBNAME  - name of nzb-group. This name can be used in calls
-#                   to nzbget edit-command using subswitch "-GN name";
-#  NZBNA_FILENAME - filename of the nzb-file. If the file was added
-#                   from nzb-directory this is the fullname with path.
-#                   If the file was added via web-interface it contains
-#                   only filename without path;
-#  NZBNA_EVENT    - describes why the script was called:
-#                   NZB_ADDED - after adding of nzb-file to queue;
-#                   FILE_DOWNLOADED - after a file included in nzb is
-#                   downloaded;
-#                   NZB_DOWNLOADED - after all files in nzb are downloaded
-#                   (before post-processing).
-#                   In the future the list of supported events may be
-#                   extended. To avoid conflicts with future NZBGet
-#                   versions the script must exit if the parameter
-#                   has a value unknown to the script.
-#  NZBNA_CATEGORY - category of nzb-file (if assigned);
-#  NZBNA_NZBID    - id of the nzb-file. This ID can be used with 
-#                   calls to nzbget edit-command;
-#  NZBNA_PRIORITY - priority (default is 0).
+#  NZBNA_NZBNAME   - name of nzb-group. This name can be used in calls
+#                    to nzbget edit-command using subswitch "-GN name";
+#  NZBNA_FILENAME  - filename of the nzb-file. If the file was added
+#                    from nzb-directory this is the fullname with path.
+#                    If the file was added via web-interface it contains
+#                    only filename without path;
+#  NZBNA_EVENT     - describes why the script was called:
+#                    NZB_ADDED - after adding of nzb-file to queue;
+#                    FILE_DOWNLOADED - after a file included in nzb is
+#                    downloaded;
+#                    NZB_DOWNLOADED - after all files in nzb are downloaded
+#                    (before post-processing);
+#                    NZB_DELETED - when nzb is deleted from queue (moved
+#                    to history). See NZBNA_DELETESTATUS for details;
+#                    URL_COMPLETED - after an URL download is completed
+#                    and the downloaded file was not added to queue
+#                    (not nzb-extension, download error, parse
+#                    error). See NZBNA_URLSTATUS for details;
+#                    In the future the list of supported events may be
+#                    extended. To avoid conflicts with future NZBGet
+#                    versions the script must exit if the parameter
+#                    has a value unknown to the script.
+#  NZBNA_DELETESTATUS - delete status info, NZBNA_EVENT=NZB_DELETED:
+#                    MANUAL - deleted by user or via API call;
+#                    HEALTH - deleted by health check;
+#                    DUPE - moved to history by duplicate check, can be
+#                    reused later if necessary;
+#                    GOOD - moved to history by duplicate check because
+#                    there is already a duplicate marked as good;
+#                    BAD - marked as bad by user or by queue-script;
+#                    COPY - already in queue or in history;
+#                    SCAN - malformed nzb-file, cannot be parsed;
+#  NZBNA_URLSTATUS - URL status info, when NZBNA_EVENT=URL_COMPLETED:
+#                    FAILURE - fetch error (could not be downloaded);
+#                    SCAN_SKIPPED - downloaded file doesn't have
+#                    nzb-extension and was skipped;
+#                    SCAN_FAILED - file format error;
+#  NZBNA_CATEGORY  - category of nzb-file (if assigned);
+#  NZBNA_NZBID     - id of the nzb-file. This ID can be used with 
+#                    calls to nzbget edit-command;
+#  NZBNA_PRIORITY  - priority (default is 0);
+#  NZBNA_DUPEKEY   - duplicate key of nzb-file;
+#  NZBNA_DUPESCORE - duplicate score of nzb-file;
+#  NZBNA_DUPEMODE  - duplicate mode of nzb-file: SCORE, ALL, FORCE.
 #
 # In addition to these arguments NZBGet passes all nzbget.conf-options
 # to  the script as environment variables. These variables have prefix
@@ -1719,6 +1794,48 @@ ScanScript=
 # NOTE: This is a short documentation, for more information visit
 # http://nzbget.net/Extension_scripts.
 QueueScript=
+
+# List of rss feed scripts to execute before a rss feed content is processed.
+#
+# The scripts in the list must be separated with commas or semicolons. Only
+# filenames without path must be used. All scripts must be stored in directory
+# pointed by option <ScriptDir>. 
+#
+# If rss feed has option <FeedX.FeedScript> defined (if not empty) 
+# the scripts defined there override the global option <FeedScript>.
+#
+# The scripts are executed after rss feed is read from server and before it
+# is processed by the feed parser. Once the feed is fetched it is saved
+# to a temporary file and the feed scripts are executed. The scripts
+# can modify the content of the temporary feed file. Then the file is 
+# read by the feed parser and processed.
+#
+# Example: Rss.sh, Filter.py.
+#
+# The feed content is usually filtered using option <FeedX.Filter>. If a
+# required filtering cannot be achieved via built-in filter commands the
+# more advanced processing of the feed can be made using feed scripts.
+#
+# INFO FOR DEVELOPERS:
+# NOTE: This is a short documentation, for more information visit
+# http://nzbget.net/Extension_scripts.
+#
+# NZBGet passes following arguments to the script as environment
+# variables:
+#  NZBFP_FILENAME  - name of feed file to be processed;
+#  NZBFP_FEEDID    - ID of the feed.
+#
+# In addition to these arguments NZBGet passes all nzbget.conf-options 
+# as environment variables. These variables have prefix "NZBOP_" and
+# are written in UPPER CASE. For Example option "ParRepair" is passed as
+# environment variable "NZBOP_PARREPAIR". The dots in option names are
+# replaced with underscores, for example "SERVER1_HOST". For options
+# with predefined possible values (yes/no, etc.) the values are passed
+# always in lower case.
+#
+# NOTE: This is a short documentation, for more information visit
+# http://nzbget.net/Extension_scripts.
+FeedScript=
 
 # Execution order for scripts.
 #

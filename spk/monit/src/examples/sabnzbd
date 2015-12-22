@@ -1,0 +1,9 @@
+#default file provided by monit spk
+
+check process Sabnzb with pidfile /usr/local/sabnzbd/var/sabnzbd.pid
+    start program = "/var/packages/sabnzbd/scripts/start-stop-status start"
+    stop program  = "/var/packages/sabnzbd/scripts/start-stop-status stop"
+    if failed host localhost port 8080 then restart
+    if 3 restarts within 5 cycles then timeout
+
+#end

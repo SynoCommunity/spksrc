@@ -1,6 +1,6 @@
 SPK_NAME = darkstat
-SPK_VERS = 3.0.719rc1
-SPK_REV = 3
+SPK_VERS = 3.0.719
+SPK_REV = 4
 SPK_ICON = src/darkstat.png
 DSM_UI_DIR = app
 
@@ -12,9 +12,9 @@ DESCRIPTION_FRE = DarkStat est un outil de monitoring réseau simple et léger. 
 ADMIN_PORT = 667
 RELOAD_UI = yes
 DISPLAY_NAME = DarkStat
-CHANGELOG = "Update to 3.0.719"
+CHANGELOG = "1. Update to 3.0.719<br>2. Use default interface instead of hardcoded eth0"
 
-HOMEPAGE   = http://unix4lyfe.org/darkstat/
+HOMEPAGE   = http://unix4lyfe.org/darkstat
 LICENSE    = GPL v2
 
 INSTALLER_SCRIPT = src/installer.sh

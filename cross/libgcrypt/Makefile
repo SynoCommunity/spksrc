@@ -1,5 +1,5 @@
 PKG_NAME = libgcrypt
-PKG_VERS = 1.6.3
+PKG_VERS = 1.6.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.gnupg.org/gcrypt/$(PKG_NAME)

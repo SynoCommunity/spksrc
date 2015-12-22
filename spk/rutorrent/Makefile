@@ -15,7 +15,7 @@ DISPLAY_NAME = ruTorrent
 CHANGELOG = "1. Update rtorrent to 0.9.4"
 BETA = 1
 
-HOMEPAGE   = http://code.google.com/p/rutorrent/
+HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/

@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
-SPK_VERS = 2015.5.1
-SPK_REV = 7
+SPK_VERS = 2015.5.3
+SPK_REV = 8
 SPK_ICON = src/salt-master.png
 
 DEPENDS =
@@ -11,7 +11,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 RELOAD_UI = yes
 DISPLAY_NAME = Salt Master
-CHANGELOG = "Update to 2015.5.1"
+CHANGELOG = "Update to 2015.5.3"
 
 HOMEPAGE   = https://www.saltstack.com/
 LICENSE    = Apache

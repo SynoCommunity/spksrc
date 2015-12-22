@@ -15,7 +15,7 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Pip command
 PIP ?= pip
-PIP_WHEEL = $(PIP) wheel --no-use-wheel --no-deps --wheel-dir $(STAGING_DIR)/wheelhouse
+PIP_WHEEL = $(RUN) $(PIP) wheel --no-use-wheel --no-deps --wheel-dir $(STAGING_DIR)/wheelhouse
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
@@ -30,15 +30,15 @@ LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 
 # Use x64 when kernels are not needed
 ARCHS_NO_KRNLSUPP = $(filter-out x64%, $(SUPPORTED_ARCHS))
-ARCHS_DUPES = $(filter-out x86% bromolow% cedarview% avoton%, $(SUPPORTED_ARCHS))
+ARCHS_DUPES = $(filter-out x86% braswell% bromolow% cedarview% avoton%, $(SUPPORTED_ARCHS))
 
 # Available Arches
 ARM5_ARCHES = 88f5281 88f6281
-ARM7_ARCHES = armada370 armadaxp armada375 alpine comcerto2k
+ARM7_ARCHES = alpine armada370 armada375 armadaxp comcerto2k monaco
 ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES)
 PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
-x64_ARCHES = avoton bromolow cedarview x86 x64
+x64_ARCHES = avoton braswell bromolow cedarview x86 x64
 
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk

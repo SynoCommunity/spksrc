@@ -5,7 +5,6 @@ SPK_ICON = src/horde.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox
-SPK_DEPENDS = "PEAR"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Horde Groupware Webmail Edition is a free, enterprise ready, browser based communication suite. Users can read, send and organize email messages and manage and share calendars, contacts, tasks and notes with the standards compliant components from the Horde Project.
