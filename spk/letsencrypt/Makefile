@@ -12,7 +12,7 @@ BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/augeas
 
 REQUIRED_DSM = 5.0
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+#UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Letsencrypt test
