@@ -12,7 +12,6 @@ BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/augeas
 
 REQUIRED_DSM = 5.0
-#UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Letsencrypt test
@@ -26,17 +25,18 @@ DISPLAY_NAME = Lets Encrypt
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 
-POST_STRIP_TARGET = augeas_extra_install
+POST_STRIP_TARGET = lea_extra_install
 
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: deluge_extra_install
-augeas_extra_install:
-	install -m 755 -d ${STAGING_DIR}/share/patches
-	install -m 644 src/python-augeas.req ${STAGING_DIR}/share/
+.PHONY: lea_extra_install
+lea_extra_install:
+	install -m 755 -d ${STAGING_DIR}/share
+	install -m 644 src/python-augeas.req $(STAGING_DIR)/share/
+	install -m 644 src/letsencrypt-synology.sh $(STAGING_DIR)/bin/
+	
