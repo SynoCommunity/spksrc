@@ -33,6 +33,7 @@ postinst ()
 	${INSTALL_DIR}/env/bin/pip install letsencrypt==0.1.1 > /dev/null 2>&1
 	${INSTALL_DIR}/env/bin/pip install letsencrypt-apache==0.1.1 > /dev/null 2>&1
 	
+	sed -i -e "s|@MAIL_ADRESS@|${wizard_email_adress:=admin@example.com}|g" ${INSTALL_DIR}/bin/letsencrypt-synology.sh
 	
     exit 0
 }

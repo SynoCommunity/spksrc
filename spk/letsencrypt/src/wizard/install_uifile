@@ -1,0 +1,19 @@
+[{
+    "step_title": "E-mail configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Administrator e-Mail",
+        "subitems": [{
+            "key": "wizard_email_adress",
+            "desc": "E-mail for Let's Encrypt recovery",
+            "defaultValue": "admin@example.com",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/",
+                    "errorText": "Must contain an @ and a valid domain name"
+                }
+            }
+        }]
+    }]
+}]
