@@ -87,7 +87,7 @@ fi
          
 
 # todo: email maybe different then $external_host_ip. Ask the user on install.
-lea_opt=$(echo $lea_opt --email admin@$external_host_ip --webroot-path /var/services/web $letsencrypt_user_domains --config-dir $letsencrypt_certs_directory --work-dir $letsencrypt_certs_directory --logs-dir $letsencrypt_certs_directory)
+lea_opt=$(echo $lea_opt --email admin@$external_host_ip --keep-until-expiring --webroot-path /var/services/web $letsencrypt_user_domains --config-dir $letsencrypt_certs_directory --work-dir $letsencrypt_certs_directory --logs-dir $letsencrypt_certs_directory)
 
 # Setup "well-known" challenge redirects for HTTPS Web Services
 task_start "Setup "well-known" challenge redirects for HTTPS Web Services"
