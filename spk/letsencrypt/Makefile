@@ -23,6 +23,8 @@ RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Lets Encrypt
 
+WIZARDS_DIR = src/wizard/
+
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 

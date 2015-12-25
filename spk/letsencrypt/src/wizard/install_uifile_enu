@@ -2,7 +2,7 @@
     "step_title": "E-mail configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Administrator e-Mail",
+        "desc": "Let the default value to disable e-Mail recovery",
         "subitems": [{
             "key": "wizard_email_adress",
             "desc": "E-mail for Let's Encrypt recovery",

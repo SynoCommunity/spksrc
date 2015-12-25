@@ -10,13 +10,15 @@
 
 # User Defined Variables
 lea_cmd="/usr/local/letsencrypt/env/bin/letsencrypt"
-lea_opt="certonly -t  --expand --agree-tos --rsa-key-size 4096 --webroot  "
+
 # Here are the letsencrypt files are stored. Certs, logs, usw.
 letsencrypt_certs_directory="/usr/local/letsencrypt/data"
 
-show_certs=false
+lea_opt="certonly -t  --expand --agree-tos --rsa-key-size 4096 --webroot --keep-until-expiring --webroot-path /var/services/web"
+lea_opt_mail="--email @MAIL_ADRESS@"
+lea_opt_dir="--config-dir $letsencrypt_certs_directory --work-dir $letsencrypt_certs_directory --logs-dir $letsencrypt_certs_directory"
 
-lea_opt_email="@MAIL_ADRESS@"
+show_certs=false
 
 # Dynamic Varables  
 httpd_vhost_conf_user_file="/etc/httpd/sites-enabled-user/httpd-vhost.conf-user"
@@ -27,6 +29,12 @@ sslcrtdir="/usr/syno/etc/ssl/ssl.crt"
 sslcsrdir="/usr/syno/etc/ssl/ssl.csr"
 sslkeydir="/usr/syno/etc/ssl/ssl.key"
 sslcadir="/usr/syno/etc/ssl/ssl.intercrt"
+
+# If e-Mail adress is default value we disable email registering
+if [ "$lea_opt_mail" == "--email admin@example.com" ]
+then
+	lea_opt_mail="--register-unsafely-without-email"
+fi
 
 
 task_start() {
@@ -94,10 +102,8 @@ then
   echo "DNS test faild. Check connectivity from internet."
   exit
 fi
-         
 
-# todo: email maybe different then $external_host_ip. Ask the user on install.
-lea_opt=$(echo $lea_opt --email $lea_opt_email --keep-until-expiring --webroot-path /var/services/web $letsencrypt_user_domains --config-dir $letsencrypt_certs_directory --work-dir $letsencrypt_certs_directory --logs-dir $letsencrypt_certs_directory)
+
 # Setup "well-known" challenge redirects for HTTPS Web Services
 task_start "Setup "well-known" challenge redirects for HTTPS Web Services"
 echo "ALL Domains: $external_host_ip $httpd_ssl_vhost_conf_user_domains"
@@ -146,8 +152,8 @@ fi
 mkdir -p "$letsencrypt_certs_directory"
 # Run letsencrypt client
 task_start "Run letsencrypt client"
-echo "$lea_cmd $lea_opt" 
-$lea_cmd $lea_opt
+echo "$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains" 
+$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains
 task_end
 # Certicate Backup/Copy Fuction
 file_backup_copy() {
