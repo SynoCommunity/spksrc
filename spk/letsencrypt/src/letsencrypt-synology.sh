@@ -154,7 +154,14 @@ mkdir -p "$letsencrypt_certs_directory"
 task_start "Run letsencrypt client"
 echo "$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains" 
 $lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains
+if [ $? -ne 0 ]
+then
+	# letsencrypt command failed
+	echo -e "[ LetsEncrypt FAIL ]\n"
+	exit 1
+fi
 task_end
+
 # Certicate Backup/Copy Fuction
 file_backup_copy() {
     # Create Backup
