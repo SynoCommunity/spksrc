@@ -35,11 +35,27 @@ postinst ()
 	
 	sed -i -e "s|@MAIL_ADRESS@|${wizard_email_adress:=admin@example.com}|g" ${INSTALL_DIR}/bin/letsencrypt-synology.sh
 	
+	# Set cron job to autorenew certs
+	if ! grep -q "${INSTALL_DIR}/bin/letsencrypt-synology.sh" "/etc/crontab"; then
+		cat "/etc/crontab" > "/etc/crontab.$$"
+		echo "0	0	5,15,25	*	*	root	${INSTALL_DIR}/bin/letsencrypt-synology.sh" >> "/etc/crontab.$$"
+		mv "/etc/crontab.$$" "/etc/crontab"
+		# Restart crond
+		/bin/kill -HUP `/bin/cat "/var/run/crond.pid"`
+	fi	
     exit 0
 }
 
 preuninst ()
 {
+	# Remove cron job
+	if grep -q "${INSTALL_DIR}/bin/letsencrypt-synology.sh" "/etc/crontab"; then
+		grep -v "letsencrypt-synology.sh" "/etc/crontab" > "/etc/crontab.$$"
+		mv "/etc/crontab.$$" "/etc/crontab"
+		# Restart crond
+		/bin/kill -HUP `/bin/cat "/var/run/crond.pid"`
+	fi
+	
     exit 0
 }
 
