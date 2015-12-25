@@ -12,6 +12,8 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
+# Here are the letsencrypt files are stored. Certs, logs, usw.
+letsencrypt_certs_directory="${INSTALL_DIR}/data"
 
 preinst ()
 {
@@ -55,6 +57,9 @@ preuninst ()
 		# Restart crond
 		/bin/kill -HUP `/bin/cat "/var/run/crond.pid"`
 	fi
+	
+	# Save data directory before uninstalling
+	tar -cf /volume1/public/letsencrypt.tar.gz $letsencrypt_certs_directory
 	
     exit 0
 }
