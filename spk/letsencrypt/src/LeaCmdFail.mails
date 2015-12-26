@@ -1,0 +1,13 @@
+[LeaCmdFail]
+Category: LetsEncrypt,Important
+Title: Failed to renew LetsEncrypt certificate
+Subject: Failed to renew LetsEncrypt certificate
+
+Dear user,
+
+The LetsEncrypt automated renewal script has failed, please read the log to have more information
+
+Sincerely,
+%COMPANY_NAME%
+
+

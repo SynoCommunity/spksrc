@@ -7,18 +7,44 @@
 # Enhanced by Anaximelis https://github.com/Anaximelis
 #
 
-
-# User Defined Variables
 lea_cmd="/usr/local/letsencrypt/env/bin/letsencrypt"
+show_certs=false
+
+/usr/syno/sbin/synoshare --get letsencrypt
+if [ $? != 0 ]
+then
+	echo "Problem : letsencrypt share doesn't exist"
+	exit 1
+fi
+
+letsencrypt_share_directory=$(/usr/syno/sbin/synoshare --get letsencrypt|grep  -o '/.*'|sed -e 's/\]//')
 
 # Here are the letsencrypt files are stored. Certs, logs, usw.
-letsencrypt_certs_directory="/usr/local/letsencrypt/data"
+letsencrypt_certs_directory="$letsencrypt_share_directory/data"
+
+if [ ! -f $letsencrypt_share_directory/email.conf ]
+then
+	echo "Error : $letsencrypt_share_directory/email.conf doesn't exist"
+	echo " Please recreate it and add the recovery adress in"
+	echo "  or leave blank to disable email recovery"
+	/usr/syno/bin/synonotify LeaNoEmail
+	exit 1
+fi
+
+external_host_ip=$(/bin/get_key_value /etc/synoinfo.conf external_host_ip)
 
 lea_opt="certonly -t  --expand --agree-tos --rsa-key-size 4096 --webroot --keep-until-expiring --webroot-path /var/services/web"
-lea_opt_mail="--email @MAIL_ADRESS@"
 lea_opt_dir="--config-dir $letsencrypt_certs_directory --work-dir $letsencrypt_certs_directory --logs-dir $letsencrypt_certs_directory"
 
-show_certs=false
+opt_mail=$(cat $letsencrypt_share_directory/email.conf)
+
+# If e-Mail adress is default value or nothing we disable email registering
+if [ "$opt_mail" == "admin@example.com" -o $opt_mail == "" ]
+then
+	lea_opt_mail="--register-unsafely-without-email"
+else
+	lea_opt_mail="--email $opt_mail)"
+fi
 
 # Dynamic Varables  
 httpd_vhost_conf_user_file="/etc/httpd/sites-enabled-user/httpd-vhost.conf-user"
@@ -29,12 +55,6 @@ sslcrtdir="/usr/syno/etc/ssl/ssl.crt"
 sslcsrdir="/usr/syno/etc/ssl/ssl.csr"
 sslkeydir="/usr/syno/etc/ssl/ssl.key"
 sslcadir="/usr/syno/etc/ssl/ssl.intercrt"
-
-# If e-Mail adress is default value we disable email registering
-if [ "$lea_opt_mail" == "--email admin@example.com" ]
-then
-	lea_opt_mail="--register-unsafely-without-email"
-fi
 
 
 task_start() {
@@ -63,18 +83,20 @@ task_end
 
 # Check if the DS has a external hostname in "Externer Zugriff>Erweitert"
 task_start "Search for DS external hostname"
+
 external_host_ip=$(/bin/get_key_value /etc/synoinfo.conf external_host_ip)
 
 if [ -n "$external_host_ip" ]
 then
   echo "DS external hostname: $external_host_ip"
   # Add forced hostname and www subdomain to domainlist
-  httpd_ssl_vhost_conf_user_domains="$external_host_ip www.$external_host_ip $httpd_ssl_vhost_conf_user_domains"
-  letsencrypt_user_domains="-d $external_host_ip"
+  httpd_ssl_vhost_conf_user_domains="www.$external_host_ip $httpd_ssl_vhost_conf_user_domains"
+  letsencrypt_user_domains="--domains $external_host_ip"
 else
   echo "DS external hostname is NOT set!"
   echo "Define the hostname of you DS in: Systememsteuerung>Externer Zugriff>Erweitert>Hostname"
-  exit
+  /usr/syno/bin/synonotify LeaNoExtIp
+  exit 1
 fi
 task_end
 
@@ -91,7 +113,7 @@ echo "Testing: $host"
   then
     echo 'Host found in DNS'    
     #Add it to the list of host
-    letsencrypt_user_domains="$letsencrypt_user_domains -d $host"
+    letsencrypt_user_domains="$letsencrypt_user_domains,$host"
   fi
 done
 task_end
@@ -99,8 +121,9 @@ task_end
 # Exit if access test faild
 if [ -z "$letsencrypt_user_domains" ]
 then
-  echo "DNS test faild. Check connectivity from internet."
-  exit
+  echo "DNS test faild. Check connectivity to internet."
+  /usr/syno/bin/synonotify LeaNoExtAccess
+  exit 1
 fi
 
 
@@ -158,6 +181,7 @@ if [ $? -ne 0 ]
 then
 	# letsencrypt command failed
 	echo -e "[ LetsEncrypt FAIL ]\n"
+	/usr/syno/bin/synonotify LeaCmdFail
 	exit 1
 fi
 task_end
@@ -190,11 +214,11 @@ task_end
 # Server Cert
 #openssl x509 -inform PEM -in /usr/syno/etc/ssl/ssl.crt/server.crt  -text
 task_start "Copying LetsEncrypt Server Cert"
-file_backup_copy "$letsencrypt_certs_directory/live/$external_host_ip//cert.pem" "$sslcrtdir/server.crt"
+file_backup_copy "$letsencrypt_certs_directory/live/$external_host_ip/cert.pem" "$sslcrtdir/server.crt"
 task_end
 # CA Cert (CHAIN)
 task_start "Copying LetsEncrypt CA Cert"
-file_backup_copy "$letsencrypt_certs_directory/live/$external_host_ip//chain.pem" "$sslcadir/server-ca.crt"
+file_backup_copy "$letsencrypt_certs_directory/live/$external_host_ip/chain.pem" "$sslcadir/server-ca.crt"
 task_end
 # Set Permisions
 task_start "Changeing persissions"
@@ -215,3 +239,13 @@ task_start "Restart webservices"
 /sbin/initctl stop webdav-httpd-ssl
 /sbin/initctl start webdav-httpd-ssl
 task_end 
+
+# if MailServer is installed and running, it need to be restarted to
+if [ -x /var/packages/MailServer/scripts/start-stop-status ]
+then
+task_start "Restart webservices"
+/var/packages/MailServer/scripts/start-stop-status stop
+/var/packages/MailServer/scripts/start-stop-status start
+task_end
+fi
+/usr/syno/bin/synonotify LeaCmdOk

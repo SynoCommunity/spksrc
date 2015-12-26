@@ -1,0 +1,14 @@
+[LeaNoExtIp]
+Category: LetsEncrypt,Important
+Title: LetsEncrypt certificate failed
+Subject: LetsEncrypt certificate script has failed
+
+Dear user,
+
+The LetsEncrypt automated renewal script has failed.
+DNS test failed. Check connectivity to internet.
+
+Sincerely,
+%COMPANY_NAME%
+
+
