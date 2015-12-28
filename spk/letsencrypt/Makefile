@@ -23,6 +23,8 @@ RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Lets Encrypt
 
+WIZARDS_DIR = src/wizard/
+
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
@@ -38,5 +40,9 @@ include ../../mk/spksrc.spk.mk
 lea_extra_install:
 	install -m 755 -d ${STAGING_DIR}/share
 	install -m 644 src/python-augeas.req $(STAGING_DIR)/share/
-	install -m 644 src/letsencrypt-synology.sh $(STAGING_DIR)/bin/
+	install -m 644 src/LeaNoExtIp.mails $(STAGING_DIR)/share/
+	install -m 644 src/LeaNoExtAccess.mails $(STAGING_DIR)/share/
+	install -m 644 src/LeaCmdFail.mails $(STAGING_DIR)/share/
+	install -m 644 src/LeaCmdOk.mails $(STAGING_DIR)/share/
+	install -m 755 src/letsencrypt-synology.sh $(STAGING_DIR)/bin/
 	
