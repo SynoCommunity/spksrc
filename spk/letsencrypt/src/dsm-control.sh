@@ -6,6 +6,7 @@ DNAME="Lets Encrypt"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+PACKAGE_LOG="${INSTALL_DIR}/var/package.log"
 
 
 case $1 in
@@ -19,7 +20,8 @@ case $1 in
         exit 1
         ;;
     log)
-        exit 1
+        echo "${PACKAGE_LOG}"
+        exit 0
         ;;
     *)
         exit 1
