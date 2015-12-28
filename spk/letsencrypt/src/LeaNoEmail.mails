@@ -1,0 +1,15 @@
+[LeaNoExtIp]
+Category: LetsEncrypt,Important
+Title: LetsEncrypt certificate failed
+Subject: LetsEncrypt certificate script has failed
+
+Dear user,
+
+The LetsEncrypt automated renewal script has failed.
+email.conf doesn't exist in letsencrypt share directory
+Please recreate it and add the recovery adress in or leave blank to disable email recovery
+
+Sincerely,
+%COMPANY_NAME%
+
+

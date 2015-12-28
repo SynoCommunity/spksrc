@@ -13,6 +13,11 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
+pkg_def_intall_vol=$(/usr/syno/bin/servicetool --get-alive-volume)
+
+# Here are the letsencrypt files are stored. Certs, logs, usw.
+share_path=$pkg_def_intall_vol/$PACKAGE
+letsencrypt_certs_directory="${share_path}/data"
 
 # Function to send messages to logfile
 # Usage:
@@ -23,8 +28,8 @@ log () {
 
 
 preinst ()
-{
-    exit 0
+{	
+	exit 0
 }
 
 postinst ()
@@ -47,15 +52,95 @@ postinst ()
 	# Install Letsencrypt & Letsencrypt-apache
 	${INSTALL_DIR}/env/bin/pip install letsencrypt==0.1.1 > /dev/null 2>&1
 	${INSTALL_DIR}/env/bin/pip install letsencrypt-apache==0.1.1 > /dev/null 2>&1
+<<<<<<< HEAD
 
 	# Log install done
 	log "Package Install Completed"
+=======
 	
+	if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+		/usr/syno/sbin/synoshare --get $PACKAGE
+		if [ $? != 0 ]; then
+			# share doesn't exist we create it
+			# synoshare --add sharename desc path Denylist rwlist rolist browsable{0|1} adv_privilege{0~7}
+			# share only accessible for admin users, totally blocked for guest
+			/usr/syno/sbin/synoshare --add $PACKAGE "Let's Encrypt Datas" ${share_path} "guest" "admin" "" 1 0
+		fi
+		mkdir -p $letsencrypt_certs_directory
+		echo ${wizard_email_adress:=admin@example.com} > $share_path/email.conf
+		#sed -i -e "s|@MAIL_ADRESS@|${wizard_email_adress:=admin@example.com}|g" ${INSTALL_DIR}/bin/letsencrypt-synology.sh
+		
+	fi
+	
+	language=$(/bin/get_key_value /etc/synoinfo.conf language)	
+	# Verify if notifications messages are present in files notification_category
+	cp /usr/syno/synoman/webman/texts/$language/notification_category $share_path/.
+	
+	if ! grep -q "LeaNoExtIp" "/usr/syno/synoman/webman/texts/$language/notification_category"; then
+		echo 'LeaNoExtIp="mail,mobile,cms"' >> /usr/syno/synoman/webman/texts/$language/notification_category
+	fi	
+	if ! grep -q "LeaNoExtAccess" "/usr/syno/synoman/webman/texts/$language/notification_category"; then
+		echo 'LeaNoExtAccess="mail,mobile,cms"' >> /usr/syno/synoman/webman/texts/$language/notification_category
+	fi
+	if ! grep -q "LeaCmdFail" "/usr/syno/synoman/webman/texts/$language/notification_category"; then
+		echo 'LeaCmdFail="mail,mobile,cms"' >> /usr/syno/synoman/webman/texts/$language/notification_category
+	fi
+	if ! grep -q "LeaCmdOk" "/usr/syno/synoman/webman/texts/$language/notification_category"; then
+		echo 'LeaCmdOk="mail,mobile,cms"' >> /usr/syno/synoman/webman/texts/$language/notification_category
+	fi
+	if ! grep -q "LeaNoShare" "/usr/syno/synoman/webman/texts/$language/notification_category"; then
+		echo 'LeaNoShare="mail,mobile,cms"' >> /usr/syno/synoman/webman/texts/$language/notification_category
+	fi
+	if ! grep -q "LeaNoEmail" "/usr/syno/synoman/webman/texts/$language/notification_category"; then
+		echo 'LeaNoEmail="mail,mobile,cms"' >> /usr/syno/synoman/webman/texts/$language/notification_category
+	fi
+>>>>>>> a0d442eabef880cb6e6e979eb097163a61031aab
+	
+	cp /usr/syno/synoman/webman/texts/$language/mails $share_path/.
+	# Verify if notifications messages are present in files mails
+	if ! grep -q "LeaNoExtIp" "/usr/syno/synoman/webman/texts/$language/mails"; then
+		cat ${INSTALL_DIR}/share/LeaNoExtIp.mails >> /usr/syno/synoman/webman/texts/$language/mails
+	fi	
+	if ! grep -q "LeaNoExtAccess" "/usr/syno/synoman/webman/texts/$language/mails"; then
+		cat ${INSTALL_DIR}/share/LeaNoExtAccess.mails >> /usr/syno/synoman/webman/texts/$language/mails
+	fi
+	if ! grep -q "LeaCmdFail" "/usr/syno/synoman/webman/texts/$language/mails"; then
+		cat ${INSTALL_DIR}/share/LeaCmdFail.mails >> /usr/syno/synoman/webman/texts/$language/mails
+	fi
+	if ! grep -q "LeaCmdOk" "/usr/syno/synoman/webman/texts/$language/mails"; then
+		cat ${INSTALL_DIR}/share/LeaCmdOk.mails >> /usr/syno/synoman/webman/texts/$language/mails
+	fi
+	if ! grep -q "LeaNoShare" "/usr/syno/synoman/webman/texts/$language/mails"; then
+		cat ${INSTALL_DIR}/share/LeaNoShare.mails >> /usr/syno/synoman/webman/texts/$language/mails
+	fi
+	if ! grep -q "LeaNoEmail" "/usr/syno/synoman/webman/texts/$language/mails"; then
+		cat ${INSTALL_DIR}/share/LeaNoEmail.mails >> /usr/syno/synoman/webman/texts/$language/mails
+	fi	
+	# Set cron job to autorenew certs
+	if ! grep -q "${INSTALL_DIR}/bin/letsencrypt-synology.sh" "/etc/crontab"; then
+		cat "/etc/crontab" > "/etc/crontab.$$"
+		echo "0	0	15	*	*	root	${INSTALL_DIR}/bin/letsencrypt-synology.sh" >> "/etc/crontab.$$"
+		mv "/etc/crontab.$$" "/etc/crontab"
+		# Restart crond
+		/bin/kill -HUP `/bin/cat "/var/run/crond.pid"`
+	fi	
     exit 0
+	
+	
+	
+	
 }
 
 preuninst ()
 {
+	# Remove cron job
+	if grep -q "${INSTALL_DIR}/bin/letsencrypt-synology.sh" "/etc/crontab"; then
+		grep -v "letsencrypt-synology.sh" "/etc/crontab" > "/etc/crontab.$$"
+		mv "/etc/crontab.$$" "/etc/crontab"
+		# Restart crond
+		/bin/kill -HUP `/bin/cat "/var/run/crond.pid"`
+	fi
+
     exit 0
 }
 

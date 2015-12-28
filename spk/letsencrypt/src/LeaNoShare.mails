@@ -1,0 +1,14 @@
+[LeaNoExtIp]
+Category: LetsEncrypt,Important
+Title: LetsEncrypt certificate failed
+Subject: LetsEncrypt certificate script has failed
+
+Dear user,
+
+The LetsEncrypt automated renewal script has failed.
+Share folder not found.
+
+Sincerely,
+%COMPANY_NAME%
+
+
