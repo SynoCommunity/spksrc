@@ -1,0 +1,90 @@
+--- Makefile.in	2015-12-29 15:34:07.754205838 -0800
++++ Makefile.in	2015-12-29 15:37:23.585698588 -0800
+@@ -115,13 +115,13 @@
+ EPIC_OLD  = $(epic5_exe).old
+ EPIC_LINK = $(epic5_exe)
+ installepic5 installirc: epic5 installdirs test
+-	if ./my_test \( ! -f $(IP)$(DESTDIR)$(EPIC) \) \
++	if test \( ! -f $(IP)$(DESTDIR)$(EPIC) \) \
+ 			-o source/epic5 -nt $(IP)$(DESTDIR)$(EPIC); then \
+ 		$(INSTALL_PROGRAM) source/epic5 $(IP)$(DESTDIR)$(EPIC);	\
+-		if ./my_test -f $(IP)$(DESTDIR)$(EPIC_OLD); then \
++		if test -f $(IP)$(DESTDIR)$(EPIC_OLD); then \
+ 			$(RM) $(IP)$(DESTDIR)$(EPIC_OLD); \
+ 		fi; \
+-		if ./my_test -f $(IP)$(DESTDIR)$(EPIC_LINK); then \
++		if test -f $(IP)$(DESTDIR)$(EPIC_LINK); then \
+ 			$(MV) $(IP)$(DESTDIR)$(EPIC_LINK) $(IP)$(DESTDIR)$(EPIC_OLD); \
+ 		fi; \
+ 		$(RM) $(IP)$(DESTDIR)$(EPIC_LINK); \
+@@ -136,7 +136,7 @@
+ 
+ WSERV	 = $(wserv_exe)
+ installwserv4: wserv4 installdirs test
+-	if ./my_test \( \! -f $(IP)$(DESTDIR)$(WSERV) \) -o \
++	if test \( \! -f $(IP)$(DESTDIR)$(WSERV) \) -o \
+ 			source/wserv4 -nt $(IP)$(DESTDIR)$(WSERV); then	\
+ 		$(INSTALL_PROGRAM) source/wserv4 $(IP)$(DESTDIR)$(WSERV);	\
+ 	fi
+@@ -148,8 +148,8 @@
+ scriptdir = $(epic5dir)/script
+ installscript: installdirs test
+ 	-@(								\
+-		if ./my_test -f $(IP)$(DESTDIR)$(scriptdir)/local; then		\
+-			if ./my_test -f script/local; then 		\
++		if test -f $(IP)$(DESTDIR)$(scriptdir)/local; then		\
++			if test -f script/local; then 		\
+ 				$(MV) @srcdir@/script/local 		\
+ 					@srcdir@/script/local.orig;	\
+ 			fi;						\
+@@ -157,20 +157,20 @@
+ 	)
+ 	for i in @srcdir@/script/*; \
+ 	do \
+-		if ./my_test -f $$i; then \
++		if test -f $$i; then \
+ 			target=$(IP)$(DESTDIR)$(scriptdir)/`basename $$i`; \
+-			if ./my_test -f $$target; then \
+-				if ./my_test $$i -nt $$target; then \
++			if test -f $$target; then \
++				if test $$i -nt $$target; then \
+ 					$(INSTALL_DATA) $$i $$target; \
+ 				fi; \
+-			elif ./my_test -f $$target.gz; then \
+-				if ./my_test $$i -nt $$target.gz; then \
++			elif test -f $$target.gz; then \
++				if test $$i -nt $$target.gz; then \
+ 					$(INSTALL_DATA) $$i $$target; \
+ 					gzip -f $$target; \
+ 				fi; \
+ 			else \
+ 				$(INSTALL_DATA) $$i $$target; \
+-				if ./my_test -f $(IP)$(DESTDIR)$(scriptdir)/gzip-scripts; then \
++				if test -f $(IP)$(DESTDIR)$(scriptdir)/gzip-scripts; then \
+ 					gzip -f $$target; \
+ 				fi; \
+ 			fi; \
+@@ -179,7 +179,7 @@
+ 
+ helpdir   = $(epic5dir)/help
+ installhelp: installdirs
+-	if ./my_test -d help ; then \
++	if test -d help ; then \
+ 		(cd @srcdir@/help; tar cf - .) | (cd $(IP)$(DESTDIR)$(helpdir); tar xf -)  ; \
+ 	else \
+ 		echo No help files to install. ; \
+@@ -194,14 +194,8 @@
+ 		$(IP)$(DESTDIR)$(helpdir) $(IP)$(DESTDIR)$(bindir) $(IP)$(DESTDIR)$(libexecdir) \
+ 		$(IP)$(DESTDIR)$(mandir)/man1
+ 
+-test.o: @srcdir@/test.c
+-	$(CC) -c @srcdir@/test.c
+-test: test.o
+-	$(CC) test.o -o my_test
+-
+ clean:
+ 	@-if test -f source/Makefile; then cd source; $(MAKE2) clean; fi
+-	$(RM) test.o my_test
+ 
+ distclean cleandir realclean: clean
+ 	$(RM) Makefile source/Makefile source/sig.inc config.status config.cache config.log include/defs.h source/info.c.sh

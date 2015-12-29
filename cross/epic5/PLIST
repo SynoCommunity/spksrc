@@ -1,0 +1,4 @@
+bin:bin/epic5
+bin:bin/epic5-1.4
+libexec:libexec/epic5-wserv4
+rsc:share/epic5
