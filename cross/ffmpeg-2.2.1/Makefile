@@ -19,7 +19,7 @@ endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 MYARCH = i386
 endif
-ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
 MYARCH = x86_64
 endif
 ifeq ($(MYARCH),)

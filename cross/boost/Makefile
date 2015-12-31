@@ -28,7 +28,7 @@ CONFIGURE_ARGS  = --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 
 ADDRESS_MODEL = 32
-ifneq ($(findstring $(ARCH), avoton bromolow cedarview x64 x86),)
+ifneq ($(findstring $(ARCH), avoton braswell bromolow cedarview x64 x86),)
 ADDRESS_MODEL = 64
 endif
 
