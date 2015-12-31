@@ -8,12 +8,23 @@
 #
 
 lea_cmd="/usr/local/letsencrypt/env/bin/letsencrypt"
+PACKAGE_LOG="/usr/local/letsencrypt/var/package.log"
 show_certs=false
+
+msg ()
+{
+	DATE=`date "+%d.%m.%y %H:%M:%S"`
+	message="$DATE: $1"
+
+	# Send stdout, stderr to console and into the packagelog
+	echo -e $message 2>&1 | tee -a ${PACKAGE_LOG}
+	#echo -e $message >> ${PACKAGE_LOG}
+}
 
 /usr/syno/sbin/synoshare --get letsencrypt
 if [ $? != 0 ]
 then
-	echo "Problem : letsencrypt share doesn't exist"
+	msg "Problem : letsencrypt share doesn't exist"
 	exit 1
 fi
 
@@ -24,9 +35,9 @@ letsencrypt_certs_directory="$letsencrypt_share_directory/data"
 
 if [ ! -f $letsencrypt_share_directory/email.conf ]
 then
-	echo "Error : $letsencrypt_share_directory/email.conf doesn't exist"
-	echo " Please recreate it and add the recovery adress in"
-	echo "  or leave blank to disable email recovery"
+	msg "Error : $letsencrypt_share_directory/email.conf doesn't exist"
+	msg "Please recreate it and add the recovery adress in"
+	msg " or leave blank to disable email recovery"
 	/usr/syno/bin/synonotify LeaNoEmail
 	exit 1
 fi
@@ -42,11 +53,13 @@ opt_mail=$(cat $letsencrypt_share_directory/email.conf)
 if [ "$opt_mail" == "admin@example.com" -o $opt_mail == "" ]
 then
 	lea_opt_mail="--register-unsafely-without-email"
+	msg "Without email recovery"
 else
 	lea_opt_mail="--email $opt_mail)"
+	msg "Recovery email set to: $opt_mail"
 fi
 
-# Dynamic Varables  
+# Dynamic Variables
 httpd_vhost_conf_user_file="/etc/httpd/sites-enabled-user/httpd-vhost.conf-user"
 httpd_ssl_vhost_conf_user_file="/etc/httpd/sites-enabled-user/httpd-ssl-vhost.conf-user"
 
@@ -58,26 +71,26 @@ sslcadir="/usr/syno/etc/ssl/ssl.intercrt"
 
 
 task_start() {
-  echo "[ $1 ]"
+  msg "[ $1 ]"
   #echo "~ - - - - - - - - - - - - - - - - - - - ~"
 }
 
 task_end() {
-  echo -e "[ DONE ]\n"
+  msg "[ DONE ]\n"
 }
 
 # Get domains in httpd-ssl-vhost.conf-user
 task_start "Searching for virtual hostnames in Webconfig"
-echo "Files: $httpd_vhost_conf_user_file ; $httpd_ssl_vhost_conf_user_file"
+msg "Files: $httpd_vhost_conf_user_file ; $httpd_ssl_vhost_conf_user_file"
 httpd_ssl_vhost_conf_user_domains="$(grep "ServerName" "$httpd_ssl_vhost_conf_user_file" | sed -e 's/^[[:space:]]*//' | cut -d ' ' -f 2)"
 
 # Remove Carriage Returns
 httpd_ssl_vhost_conf_user_domains=$(echo $httpd_ssl_vhost_conf_user_domains|tr -d '\n')
 if [ -n "$httpd_ssl_vhost_conf_user_domains" ]
 then
-  echo "Found virtual hostnames for: $httpd_ssl_vhost_conf_user_domains"
+  msg "Found virtual hostnames for: $httpd_ssl_vhost_conf_user_domains"
 else
-  echo "No virtual hostname found."
+  msg "No virtual hostname found."
 fi
 task_end
 
@@ -88,13 +101,13 @@ external_host_ip=$(/bin/get_key_value /etc/synoinfo.conf external_host_ip)
 
 if [ -n "$external_host_ip" ]
 then
-  echo "DS external hostname: $external_host_ip"
+  msg "DS external hostname: $external_host_ip"
   # Add forced hostname and www subdomain to domainlist
   httpd_ssl_vhost_conf_user_domains="www.$external_host_ip $httpd_ssl_vhost_conf_user_domains"
   letsencrypt_user_domains="--domains $external_host_ip"
 else
-  echo "DS external hostname is NOT set!"
-  echo "Define the hostname of you DS in: Systememsteuerung>Externer Zugriff>Erweitert>Hostname"
+  msg "DS external hostname is NOT set!"
+  msg "Define the hostname of you DS in: Systememsteuerung>Externer Zugriff>Erweitert>Hostname"
   /usr/syno/bin/synonotify LeaNoExtIp
   exit 1
 fi
@@ -105,13 +118,13 @@ task_end
 task_start "Test if vhost are accessible from outside for host in $httpd_ssl_vhost_conf_user_domains"
 
 for host in $httpd_ssl_vhost_conf_user_domains
-do 
+do
 echo "Testing: $host"
   nslookup $host
   # Host found in dns
   if [ $? -eq 0 ]
   then
-    echo 'Host found in DNS'    
+    msg 'Host found in DNS'
     #Add it to the list of host
     letsencrypt_user_domains="$letsencrypt_user_domains,$host"
   fi
@@ -121,7 +134,7 @@ task_end
 # Exit if access test faild
 if [ -z "$letsencrypt_user_domains" ]
 then
-  echo "DNS test faild. Check connectivity to internet."
+  msg "DNS test faild. Check connectivity to internet."
   /usr/syno/bin/synonotify LeaNoExtAccess
   exit 1
 fi
@@ -129,15 +142,15 @@ fi
 
 # Setup "well-known" challenge redirects for HTTPS Web Services
 task_start "Setup "well-known" challenge redirects for HTTPS Web Services"
-echo "ALL Domains: $external_host_ip $httpd_ssl_vhost_conf_user_domains"
-echo "NAS Domain: $external_host_ip"
-echo "Web Service Domains: $httpd_ssl_vhost_conf_user_domains"
+msg "NAS Main-Domain: $external_host_ip"
+msg "Web Service Domains (Webstation): $httpd_ssl_vhost_conf_user_domains"
+msg "ALL Domains: $external_host_ip $httpd_ssl_vhost_conf_user_domains"
 # Check if Redirect for /.well-known/acme-challenge is in httpd-ssl-vhost.conf-user, if not, then add it.
 if grep -q "Alias /.well-known/acme-challenge" "$httpd_ssl_vhost_conf_user_file"; then
-    echo "Redirect found, no need to edit: $httpd_ssl_vhost_conf_user_file"
+    msg "Redirect found, no need to edit: $httpd_ssl_vhost_conf_user_file"
 else
-    echo "Redirect NOT found in: $httpd_ssl_vhost_conf_user_file"
-    echo "Writing Redirect for /.well-known/acme-challenge in: $httpd_ssl_vhost_conf_user_file"
+    msg "Redirect NOT found in: $httpd_ssl_vhost_conf_user_file"
+    msg "Writing Redirect for /.well-known/acme-challenge in: $httpd_ssl_vhost_conf_user_file"
     sed -i -e "/\ServerName*/a Alias /.well-known/acme-challenge /var/services/web/.well-known/acme-challenge" /etc/httpd/sites-enabled-user/httpd-ssl-vhost.conf-user
     sed -i -e "/\ServerName*/a ProxyPass /.well-known/acme-challenge ! " /etc/httpd/sites-enabled-user/httpd-ssl-vhost.conf-user
     cat /etc/httpd/sites-enabled-user/httpd-ssl-vhost.conf-user
@@ -147,19 +160,19 @@ task_end
 # Check if Redirect for /.well-known/acme-challenge is in httpd-vhost.conf-user, if not, then add it.
 task_start "Check if Redirect for /.well-known/acme-challenge is in httpd-vhost.conf-user"
 if grep -q "Alias /.well-known/acme-challenge" "$httpd_vhost_conf_user_file"; then
-    echo "Redirect found, no need to edit: $httpd_vhost_conf_user_file"
+    msg "Redirect found, no need to edit: $httpd_vhost_conf_user_file"
     task_end
 else
-    echo "Redirect NOT found in: $httpd_vhost_conf_user_file"
-    echo "Writing Redirect for /.well-known/acme-challenge in: $httpd_vhost_conf_user_file"
+    msg "Redirect NOT found in: $httpd_vhost_conf_user_file"
+    msg "Writing Redirect for /.well-known/acme-challenge in: $httpd_vhost_conf_user_file"
 	# Adding Redirect for /.well-known/acme-challenge is in httpd-vhost.conf-user for each domain found.
 	sed -i -e "/\ServerName*/a Alias /.well-known/acme-challenge /var/services/web/.well-known/acme-challenge" /etc/httpd/sites-enabled-user/httpd-vhost.conf-user
 	sed -i -e "/\ServerName*/a ProxyPass /.well-known/acme-challenge ! " /etc/httpd/sites-enabled-user/httpd-vhost.conf-user
-	
-  echo "[ Result: ]"    
+
+  msg "[ Result: ]"
 	cat /etc/httpd/sites-enabled-user/httpd-vhost.conf-user
   task_end
-   	
+
 	# Set flag for modified vhost-config
 	modified=1
 fi
@@ -171,16 +184,16 @@ then
 	/sbin/initctl start httpd-user
 fi
 # we create the destination directory if it not exist
-# todo: 
 mkdir -p "$letsencrypt_certs_directory"
 # Run letsencrypt client
 task_start "Run letsencrypt client"
-echo "$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains" 
-$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains
+msg "Command will be executed:"
+msg "$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains"
+$lea_cmd $lea_opt $lea_opt_dir $lea_opt_mail $letsencrypt_user_domains 2>&1 | tee -a ${PACKAGE_LOG} 
 if [ $? -ne 0 ]
 then
 	# letsencrypt command failed
-	echo -e "[ LetsEncrypt FAIL ]\n"
+	msg "[ LetsEncrypt FAIL ]\n"
 	/usr/syno/bin/synonotify LeaCmdFail
 	exit 1
 fi
@@ -189,21 +202,21 @@ task_end
 # Certicate Backup/Copy Fuction
 file_backup_copy() {
     # Create Backup
-    echo "Creating Backup: $2.bak"
+    msg "Creating Backup: $2.bak"
     cp "$2" "$2.bak"
     # Output Destination
-    echo "Current File: $2"
+    msg  "Current File: $2"
     if [ "$show_certs" = "true" ] 
-    then 
+    then
       cat "$2"
     fi
     # Copy Source to Dest
-    echo "Coping Source to Destination: ($1) -> ($2)"
+    msg "Coping Source to Destination: ($1) -> ($2)"
     cp "$1" "$2"
     # Output Destination / As is Overwriten by Source
-    echo "Current File: $2"
+    msg "Current File: $2"
     if [ "$show_certs" = "true" ] 
-    then 
+    then
       cat "$2"
     fi
 }
