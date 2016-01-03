@@ -16,8 +16,6 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
 
-PATCHES_LEVEL = 1
-
 include ../../mk/spksrc.cross-cc.mk
 
 myInstall:
