@@ -1,6 +1,6 @@
 SPK_NAME   = octoprint
 SPK_VERS   = $(shell date +%Y%m%d)
-SPK_REV    = 2
+SPK_REV    = 3
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
@@ -8,10 +8,9 @@ BETA = 1
 
 WHEELS         = src/requirements.txt
 BUILD_DEPENDS  = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/netifaces cross/tornado
+BUILD_DEPENDS += cross/netifaces cross/tornado-4.0.1
 SPK_DEPENDS    = "python>=2.7.11-15"
-
-DEPENDS =
+DEPENDS        = cross/$(SPK_NAME)
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = OctoPrint is a so called host software for 3D printers that controls your 3D printer and sends it the actual commands to do its job.
@@ -27,13 +26,12 @@ FWPORTS          = src/$(SPK_NAME).sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = octoprint_extra_install
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: octoprint_extra_install
-octoprint_extra_install: $(STAGING_DIR)/share/OctoPrint
+octoprint_extra_install:
 	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
 	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
@@ -46,7 +44,3 @@ octoprint_extra_install: $(STAGING_DIR)/share/OctoPrint
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-
-$(STAGING_DIR)/share/OctoPrint:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone --depth 10 https://github.com/foosel/OctoPrint.git OctoPrint
