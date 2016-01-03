@@ -153,10 +153,9 @@ postupgrade ()
         sed -i "s|define('$key', .*);|define('$key', $val);|g" ${WEB_DIR}/${PACKAGE}/config.php
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
-    mv ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
-
-    mv ${TMP_DIR}/${PACKAGE}/plugins.local ${WEB_DIR}/${PACKAGE}/
-    mv ${TMP_DIR}/${PACKAGE}/themes.local ${WEB_DIR}/${PACKAGE}/
+    mv -f ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
+    mv -f ${TMP_DIR}/${PACKAGE}/plugins.local/* ${WEB_DIR}/${PACKAGE}/plugins.local/
+    mv -f ${TMP_DIR}/${PACKAGE}/themes.local/* ${WEB_DIR}/${PACKAGE}/themes.local/
 
     rm -fr ${TMP_DIR}/${PACKAGE}
 
