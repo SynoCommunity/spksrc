@@ -55,7 +55,7 @@ then
 	lea_opt_mail="--register-unsafely-without-email"
 	msg "Without email recovery"
 else
-	lea_opt_mail="--email $opt_mail)"
+	lea_opt_mail="--email $opt_mail"
 	msg "Recovery email set to: $opt_mail"
 fi
 

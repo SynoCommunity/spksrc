@@ -14,8 +14,8 @@ DEPENDS = cross/augeas
 REQUIRED_DSM = 5.0
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Let’s Encrypt is a free, automated, and open certificate authority (CA), run for the public’s benefit. Let’s Encrypt is a service provided by the Internet Security Research Group (ISRG).
-DESCRIPTION_GER = Let’s Encrypt ist eine freie, automatisierte und offene Zertifizierungsstelle (CA). Let’s Encrypt ist ein Service unterstützt durch die Internet Security Research Group (ISRG).
+DESCRIPTION = "Let’s Encrypt is a free, automated, and open certificate authority (CA), run for the public’s benefit. Let’s Encrypt is a service provided by the Internet Security Research Group (ISRG)."
+DESCRIPTION_GER = "Let’s Encrypt ist eine freie, automatisierte und offene Zertifizierungsstelle (CA). Let’s Encrypt ist ein Service unterstützt durch die Internet Security Research Group (ISRG)."
 
 HOMEPAGE   = http://letsencrypt.org
 LICENSE    = GPL
