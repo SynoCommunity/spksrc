@@ -1,0 +1,29 @@
+diff --git a/setup.py b/setup.py
+index 86b7837..6afc302 100644
+--- a/setup.py
++++ b/setup.py
+@@ -17,7 +17,7 @@ INSTALL_REQUIRES = [
+ 	"werkzeug==0.8.3",
+ 	"tornado==4.0.1",
+ 	"sockjs-tornado==1.0.1",
+-	"PyYAML==3.10",
++	"PyYAML==3.11",
+ 	"Flask-Login==0.2.2",
+ 	"Flask-Principal==0.3.5",
+ 	"Flask-Babel==0.9",
+@@ -26,13 +26,13 @@ INSTALL_REQUIRES = [
+ 	"netaddr==0.7.17",
+ 	"watchdog==0.8.3",
+ 	"sarge==0.1.4",
+-	"netifaces==0.10",
++	"netifaces==0.10.4",
+ 	"pylru==1.0.9",
+ 	"rsa==3.2",
+ 	"pkginfo==1.2.1",
+ 	"requests==2.7.0",
+ 	"semantic_version==2.4.2",
+-	"psutil==3.2.1"
++	"psutil==3.3.0"
+ ]
+ 
+ # Additional requirements for optional install options

@@ -1,6 +1,6 @@
 PKG_NAME = mono
-PKG_VERS_MAJOR = 4.0.4
-PKG_VERS_MINOR = 1
+PKG_VERS_MAJOR = 4.2.1
+PKG_VERS_MINOR = 102
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_EXT)
 PKG_DIST_SITE = http://download.mono-project.com/sources/$(PKG_NAME)

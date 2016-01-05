@@ -1,5 +1,5 @@
 PKG_NAME = setuptools
-PKG_VERS = 17.0
+PKG_VERS = 19.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/s/$(PKG_NAME)
@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://pypi.python.org/pypi/setuptools
+HOMEPAGE = https://bitbucket.org/pypa/setuptools
 COMMENT  = Easily download, build, install, upgrade, and uninstall Python packages
-LICENSE  =
+LICENSE  = PSF/ZPL
 
 include ../../mk/spksrc.python-module.mk

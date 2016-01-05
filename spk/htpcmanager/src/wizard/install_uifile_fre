@@ -1,0 +1,22 @@
+[{
+    "step_title": "Choisissez votre source",
+    "items": [{
+        "type": "textfield",
+        "desc": "Paramètres de la source à utiliser",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "URL de la source",
+            "defaultValue": "git://github.com/styxit/HTPC-Manager.git",
+            "validator": {
+                "allowBlank": false
+            }
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Branch de la source",
+            "defaultValue": "master",
+            "validator": {
+                "allowBlank": false
+            }
+        ]
+    }]
+}]

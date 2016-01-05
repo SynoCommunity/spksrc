@@ -1,6 +1,6 @@
 SPK_NAME = sickbeard-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/sickbeard-custom.png
 DSM_UI_DIR = app
 
@@ -13,9 +13,9 @@ DESCRIPTION_FRE = SickBeard Custom vous permet d\\\'exécuter le fork de votre c
 ADMIN_PORT = 8083
 RELOAD_UI = yes
 DISPLAY_NAME = SickBeard Custom
-CHANGELOG = "1. Fix for git not finding the correct HOME"
+CHANGELOG = "Maintenance release"
 
-HOMEPAGE   = http://sickbeard.com/
+HOMEPAGE   = http://sickbeard.com
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/

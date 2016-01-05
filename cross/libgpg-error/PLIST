@@ -1,4 +1,4 @@
 bin:bin/gpg-error
 lnk:lib/libgpg-error.so
 lnk:lib/libgpg-error.so.0
-lib:lib/libgpg-error.so.0.15.0
+lib:lib/libgpg-error.so.0.17.0

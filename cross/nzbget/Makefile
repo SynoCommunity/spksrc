@@ -1,5 +1,5 @@
 PKG_NAME = nzbget
-PKG_VERS = 16.3
+PKG_VERS = 16.4
 PKG_EXT = tar.gz
 PKG_DIST_SITE = https://github.com/$(PKG_NAME)/$(PKG_NAME)/releases/download/v$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)

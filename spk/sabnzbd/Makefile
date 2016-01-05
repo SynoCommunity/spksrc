@@ -1,11 +1,10 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 0.7.20
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
-WHEELS = six configobj
 SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
@@ -15,9 +14,9 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Update SABnzbd to 0.7.20"
+CHANGELOG = "Enable sc-download group"
 
-HOMEPAGE   = http://sabnzbd.org/
+HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
@@ -45,11 +44,8 @@ sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/sabnzbd.cgi.py $(STAGING_DIR)/app/sabnzbd.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
