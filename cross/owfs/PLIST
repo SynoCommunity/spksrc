@@ -10,9 +10,6 @@ bin:bin/owread
 bin:bin/owserver
 bin:bin/owtap
 bin:bin/owwrite
-inc:include/owcapi.h
-inc:include/owfs_config.h
-inc:include/ownetapi.h
 lnk:lib/libow-3.1.so.0
 lib:lib/libow-3.1.so.0.0.0
 lnk:lib/libowcapi-3.1.so.0

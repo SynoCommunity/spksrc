@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="owfs"
-DNAME="Owfs"
+DNAME="OWFS"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -18,13 +18,6 @@ CFG_FILE="${INSTALL_DIR}/var/owfs.conf"
 
 preinst ()
 {
- #     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
- #       if [ ! -d "${wizard_OWdriver}" ]; then
- #           echo "OW hardware not set."
- #           exit 1
- #       fi
-#	fi
-
     exit 0
 }
 
@@ -32,16 +25,15 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-
-
+    
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
         sed -i -e "s|@OW_HARDWARE@|${wizard_OWdriver:=FAKE \= DS18S20,DS2405}|g" ${CFG_FILE}
-	fi
-	
-	# Add firewall config
+    fi
+
+    # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
-	
+
     exit 0
 }
 

@@ -7,9 +7,8 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = OWFS is an easy way to use the powerful 1-wire system of Dallas
-STARTABLE = yes
-DISPLAY_NAME = Owfs
-CHANGELOG = "1. Initial release, just owserver and owhttp"
+DISPLAY_NAME = OWFS
+CHANGELOG = "Initial release, just owserver and owhttp"
 
 ADMIN_PORT = 2121
 RELOAD_UI = yes
@@ -17,14 +16,10 @@ RELOAD_UI = yes
 HOMEPAGE = http://owfs.org
 LICENSE  = GPL-2.0+
 
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
-
 FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
 WIZARDS_DIR      = src/wizard/
 
 POST_STRIP_TARGET = owfs_extra_install

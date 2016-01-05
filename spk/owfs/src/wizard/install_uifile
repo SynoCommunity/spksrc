@@ -9,7 +9,7 @@
             "defaultValue": "FAKE = DS18S20,DS2405",
             "validator": {
                 "allowBlank": false
-                }
+            }
         }]
     }]
 }]

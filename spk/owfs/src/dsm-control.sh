@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="owfs"
-DNAME="Owfs"
+DNAME="OWFS"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -18,7 +18,7 @@ start_daemon ()
 {
     ${OW_SERVER} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${SERV_PID_FILE}
     sleep 1
-	${OW_HTTPD} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${HTTPD_PID_FILE}
+    ${OW_HTTPD} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${HTTPD_PID_FILE}
     sleep 1
 }
 
@@ -27,7 +27,7 @@ stop_daemon ()
     kill `cat ${HTTPD_PID_FILE}`
     wait_for_status 1 20
     rm -f ${HTTPD_PID_FILE}
-	kill `cat ${SERV_PID_FILE}`
+    kill `cat ${SERV_PID_FILE}`
     wait_for_status 1 20
     rm -f ${SERV_PID_FILE}
 }
@@ -36,8 +36,8 @@ daemon_status ()
 {
     if [ -f ${HTTPD_PID_FILE} ] && [ -d /proc/`cat ${HTTPD_PID_FILE}` ]; then
         if [ -f ${SERV_PID_FILE} ] && [ -d /proc/`cat ${SERV_PID_FILE}` ]; then
-			return
-		fi
+            return
+        fi
     fi
     return 1
 }
