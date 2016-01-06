@@ -1,7 +1,5 @@
-diff --git a/setup.py b/setup.py
-index 86b7837..6afc302 100644
---- a/setup.py
-+++ b/setup.py
+--- setup.py.org	2015-01-03 00:00:00.000000000 +0000
++++ setup.py	2015-01-03 00:00:00.000000000 +0000
 @@ -17,7 +17,7 @@ INSTALL_REQUIRES = [
  	"werkzeug==0.8.3",
  	"tornado==4.0.1",
