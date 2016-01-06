@@ -1,8 +1,9 @@
 PKG_NAME = boxbackup
 PKG_VERS = 0.11.1
-PKG_EXT = tgz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.boxbackup.org/export/3180/box/packages
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/boxbackup/boxbackup/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl cross/readline cross/berkeleydb
@@ -14,9 +15,14 @@ LICENSE  = BSD/GPL
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-random=/dev/urandom --enable-gnu-readline box_cv_have_large_file_support=yes
 
+PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myPreConfigure
+myPreConfigure:
+	$(RUN) ./bootstrap
 
 .PHONY: myInstall
 myInstall:
