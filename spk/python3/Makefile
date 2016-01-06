@@ -12,7 +12,7 @@ DEPENDS += cross/lxml cross/markupsafe cross/psutil cross/pycurl cross/pyyaml
 DEPENDS += cross/sqlalchemy cross/zope.interface
 
 PIP = pip3
-WHEELS = six psutil
+WHEELS = psutil
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
