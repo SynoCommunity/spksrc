@@ -11,5 +11,11 @@
                 "allowBlank": false
             }
         }]
+    },{
+        "desc": "See http://owfs.org/index.php?page=owserver for available options in section 'Device Option'"
+    },{
+        "desc": "Enter options without '--' before"
+    },{
+        "desc": "You can change option later by mofying file /usr/local/owfs/var/owfs.conf"
     }]
 }]
