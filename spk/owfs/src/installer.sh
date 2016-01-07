@@ -8,6 +8,8 @@ DNAME="OWFS"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
+USER="owfs"
+GROUP="users"
 
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
@@ -25,11 +27,20 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+	
+    # Install busybox stuff
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+
+    # Create user
+    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
     
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
         sed -i -e "s|@OW_HARDWARE@|${wizard_OWdriver:=FAKE \= DS18S20,DS2405}|g" ${CFG_FILE}
     fi
+
+    # Correct the files ownership
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -41,6 +52,12 @@ preuninst ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # Remove the user (if not upgrading)
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        delgroup ${USER} ${GROUP}
+        deluser ${USER}
+    fi
 
     # Remove firewall config
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then

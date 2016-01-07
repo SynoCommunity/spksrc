@@ -3,12 +3,12 @@ SPK_VERS = 3.1p0
 SPK_REV = 1
 SPK_ICON = src/owfs.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = OWFS is an easy way to use the powerful 1-wire system of Dallas
 DISPLAY_NAME = OWFS
-CHANGELOG = "Initial release, just owserver and owhttp"
+CHANGELOG = "Initial release with just owserver and owhttp"
 
 ADMIN_PORT = 2121
 RELOAD_UI = yes
@@ -23,6 +23,9 @@ FWPORTS          = src/${SPK_NAME}.sc
 WIZARDS_DIR      = src/wizard/
 
 POST_STRIP_TARGET = owfs_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 

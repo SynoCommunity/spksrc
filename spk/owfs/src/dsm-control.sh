@@ -7,7 +7,7 @@ DNAME="OWFS"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-
+USER="owfs"
 OW_SERVER="${INSTALL_DIR}/bin/owserver"
 SERV_PID_FILE="${INSTALL_DIR}/var/owserver.pid"
 
@@ -16,10 +16,9 @@ HTTPD_PID_FILE="${INSTALL_DIR}/var/owhttpd.pid"
 
 start_daemon ()
 {
-    ${OW_SERVER} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${SERV_PID_FILE}
+    su - ${USER} -c "PATH=${PATH} ${OW_SERVER} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${SERV_PID_FILE}"
     sleep 1
-    ${OW_HTTPD} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${HTTPD_PID_FILE}
-    sleep 1
+    su - ${USER} -c "PATH=${PATH} ${OW_HTTPD} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${HTTPD_PID_FILE}"
 }
 
 stop_daemon ()
@@ -34,8 +33,8 @@ stop_daemon ()
 
 daemon_status ()
 {
-    if [ -f ${HTTPD_PID_FILE} ] && [ -d /proc/`cat ${HTTPD_PID_FILE}` ]; then
-        if [ -f ${SERV_PID_FILE} ] && [ -d /proc/`cat ${SERV_PID_FILE}` ]; then
+    if [ -f ${HTTPD_PID_FILE} ] && kill -0 `cat ${HTTPD_PID_FILE}` > /dev/null 2>&1; then
+        if [ -f ${SERV_PID_FILE} ] && kill -0 `cat ${SERV_PID_FILE}` > /dev/null 2>&1; then
             return
         fi
     fi
