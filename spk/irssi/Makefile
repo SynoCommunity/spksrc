@@ -16,7 +16,6 @@ HELP_URL   = https://irssi.org/documentation/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
