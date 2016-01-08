@@ -1,5 +1,3 @@
 bin:bin/irssi
 etc:etc/irssi.conf
-shr:share/doc/irssi
-shr:share/irssi/help
 shr:share/irssi/themes
