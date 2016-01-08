@@ -14,6 +14,7 @@ BETA = 0
 
 HOMEPAGE   = http://www.irssi.org/
 LICENSE    = GPLv2
+HELP_URL   = https://irssi.org/documentation/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
