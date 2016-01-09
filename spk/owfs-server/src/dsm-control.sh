@@ -16,6 +16,8 @@ HTTPD_PID_FILE="${INSTALL_DIR}/var/owhttpd.pid"
 
 start_daemon ()
 {
+    ln -s ${INSTALL_DIR}/rules.d/60-synocommunity.owfs-server.rules /lib/udev/rules.d/60-synocommunity.owfs-server.rules
+    udevadm control --reload-rules
     su - ${USER} -c "PATH=${PATH} ${OW_SERVER} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${SERV_PID_FILE}"
     if [ $(/bin/get_key_value ${INSTALL_DIR}/var/owfs.conf enable_http) == "true" ]; then
         su - ${USER} -c "PATH=${PATH} ${OW_HTTPD} -c ${INSTALL_DIR}/var/owfs.conf --pid-file ${HTTPD_PID_FILE}"
