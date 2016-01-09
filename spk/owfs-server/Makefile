@@ -1,16 +1,15 @@
-SPK_NAME = owfs
+SPK_NAME = owfs-server
 SPK_VERS = 3.1p0
 SPK_REV = 1
-SPK_ICON = src/owfs.png
+SPK_ICON = src/owfs-server.png
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = OWFS is an easy way to use the powerful 1-wire system of Dallas
-DISPLAY_NAME = OWFS
-CHANGELOG = "Initial release with just owserver and owhttp"
+DESCRIPTION = OWFS is an easy way to use the powerful 1-wire system of Dallas. This package implements the server part of OWFS.
+DISPLAY_NAME = OWFS-Server
+CHANGELOG = "Initial release"
 
-ADMIN_PORT = 2121
 RELOAD_UI = yes
 
 HOMEPAGE = http://owfs.org
@@ -34,6 +33,8 @@ owfs_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/owfs.conf $(STAGING_DIR)/var/owfs.conf
+	install -m 755 -d $(STAGING_DIR)/rules.d
+	install -m 644 src/60-synocommunity.owfs-server.rules $(STAGING_DIR)/rules.d/60-synocommunity.owfs-server.rules
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72 ; \
 	do \

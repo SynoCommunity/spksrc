@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # Package
-PACKAGE="owfs"
-DNAME="OWFS"
+PACKAGE="owfs-server"
+DNAME="OWFS-Server"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="owfs"
+USER="owfs-server"
 GROUP="users"
 
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -37,6 +37,13 @@ postinst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
         sed -i -e "s|@OW_HARDWARE@|${wizard_OWdriver:=FAKE \= DS18S20,DS2405}|g" ${CFG_FILE}
+		sed -i -e "s|@OW_PORT@|${wizard_OWport:=4304}|g" ${CFG_FILE}
+        if [ ${wizard_OW_httpyes} == "true" ] ; then
+            sed -i -e "s|@OW_HTTP_ENABLE@|true|g" ${CFG_FILE}
+        else
+            sed -i -e "s|@OW_HTTP_ENABLE@|false|g" ${CFG_FILE}        
+        fi
+        sed -i -e "s|@OW_HTTP_PORT@|${wizard_OWhttpport:=2121}|g" ${CFG_FILE}
     fi
 
     # Correct the files ownership
