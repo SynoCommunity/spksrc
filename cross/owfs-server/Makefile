@@ -13,6 +13,6 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --without-perl5 --without-python
+CONFIGURE_ARGS = --without-perl5 --without-python --disable-swig --disable-owtap --disable-owmon
 
 include ../../mk/spksrc.cross-cc.mk
