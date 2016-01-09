@@ -10,8 +10,8 @@ DESCRIPTION = Links is a web browser running in text mode.
 DISPLAY_NAME = Links
 BETA = 1
 
-HOMEPAGE   = http://links.twibright.com/
-LICENSE    = GPLv2
+HOMEPAGE = http://links.twibright.com/
+LICENSE = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
