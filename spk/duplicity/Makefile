@@ -1,6 +1,6 @@
 SPK_NAME = duplicity
 SPK_VERS = 0.7.05
-SPK_REV = 5
+SPK_REV = 2
 SPK_ICON = src/duplicity.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel 
