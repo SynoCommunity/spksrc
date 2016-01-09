@@ -18,7 +18,7 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-    
+
     # Put irssi in the PATH
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/irssi /usr/local/bin/irssi
