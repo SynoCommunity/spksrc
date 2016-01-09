@@ -10,9 +10,9 @@ DESCRIPTION = Irssi is a terminal based IRC client for UNIX systems. It also sup
 DISPLAY_NAME = Irssi
 BETA = 1
 
-HOMEPAGE   = http://www.irssi.org/
-LICENSE    = GPLv2
-HELP_URL   = https://irssi.org/documentation/
+HOMEPAGE = http://www.irssi.org/
+LICENSE = GPLv2
+HELP_URL = https://irssi.org/documentation/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
