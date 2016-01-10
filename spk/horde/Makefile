@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Horde Groupware Webmail Edition is a free, enterprise ready, browser based communication suite. Users can read, send and organize email messages and manage and share calendars, contacts, tasks and notes with the standards compliant components from the Horde Project.
 ADMIN_URL = /horde/
 RELOAD_UI = yes

@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = SickBeard is a PVR for newsgroup users \(with limited torrent support\). It watches for new episodes of your favorite shows and when they are posted it downloads them, sorts and renames them automatically. New episodes can also be indexed for your DiskStation.
 DESCRIPTION_FRE = L\\\'application ultime pour télécharger et gérer vos séries TV via NZB ou torrent. Il surveille la sortie de nouveaux épisodes et les télécharge, classe, renomme automatiquement. Les nouveaux épisodes peuvent être indexés pour votre DiskStation.
 DESCRIPTION_SPN = SickBeard es una aplicación para descargar series de televisión de manera automática. Busca por nuevos episodios de tus series favoritas y cuando estos están disponibles los descarga, ordena y renombra. Los nuevos episodios puedes ser indexados en tu DiskStation.

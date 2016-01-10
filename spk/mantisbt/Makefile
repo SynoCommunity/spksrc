@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
 DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d'accès que Bugzilla et facilement modifiable.
 ADMIN_URL = /mantisbt/

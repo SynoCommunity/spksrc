@@ -8,7 +8,7 @@ BETA=1
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = LazyLibrarian is an automated book downloader for SABnzbd.
 DESCRIPTION_FRE = LazyLibrarian est un téléchargeur automatique de livre pour SABnzbd.
 ADMIN_PORT = 8082

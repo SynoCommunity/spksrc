@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = OSCam is a multi-protocol and cross-platform card server. A card server is a software which acts as a key host for card clients. A card server usually has one or more smartcard readers and ethernet interface. It emulates conditional access module \(CAM\) for accessing smartcard and offers virtual common interface to the clients. OSCam has a card client and a web interface
 DESCRIPTION_FRE = OSCam est un card server multi-protocole et mutli-plateforme. Un card server est un logiciel qui agit comme une clé d\\\'hôte pour les card clients. Un card server a généralement un ou plusieurs lecteur de cartes à puce et une interface Ethernet. Il émule un Conditional Access Module \\\(CAM\\\) pour accéder à la carte à puce virtuelle et offre une interface commune pour les clients. OSCam a un card client et une interface web
 ADMIN_PORT = 83

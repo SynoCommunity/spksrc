@@ -14,7 +14,7 @@ DEPENDS += cross/sqlalchemy cross/zope.interface
 PIP = pip3
 WHEELS = psutil
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
