@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = SickBeard Custom allows you to run the fork of your choice of SickBeard. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = SickBeard Custom vous permet d\\\'exécuter le fork de votre choix de SickBeard. Vous aurez besoin de saisir l\\\'URL git du fork durant l\\\'installation.
 ADMIN_PORT = 8083

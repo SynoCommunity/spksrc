@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 ADMIN_URL = /fengoffice/
 RELOAD_UI = yes
