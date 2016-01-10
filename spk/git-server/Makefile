@@ -21,7 +21,6 @@ WIZARDS_DIR = src/wizard
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
