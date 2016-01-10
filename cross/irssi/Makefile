@@ -2,7 +2,7 @@ PKG_NAME = irssi
 PKG_VERS = 0.8.17
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.irssi.org/files
+PKG_DIST_SITE = https://github.com/irssi-import/$(PKG_NAME)/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/glib cross/ncurses cross/openssl
