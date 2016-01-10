@@ -8,6 +8,7 @@ DEPENDS = cross/irssi
 MAINTAINER = SynoCommunity
 DESCRIPTION = Irssi is a terminal based IRC client for UNIX systems. It also supports SILC and ICB protocols via plugins.
 DISPLAY_NAME = Irssi
+STARTABLE = no
 BETA = 1
 
 HOMEPAGE = http://www.irssi.org/

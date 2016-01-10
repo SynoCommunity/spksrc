@@ -8,6 +8,7 @@ DEPENDS = cross/links
 MAINTAINER = SynoCommunity
 DESCRIPTION = Links is a web browser running in text mode.
 DISPLAY_NAME = Links
+STARTABLE = no
 BETA = 1
 
 HOMEPAGE = http://links.twibright.com/
