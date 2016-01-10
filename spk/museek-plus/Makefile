@@ -5,7 +5,7 @@ SPK_ICON = src/museek+.png
 
 DEPENDS = cross/busybox cross/museek+
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Museek+ is an open source file-sharing application for the ​Soulseek peer-to-peer network.
 DESCRIPTION_FRE = Museek+ est une application de partage de fichier open source pour le réseau peer-to-peer Soulseek.
 RELOAD_UI = yes

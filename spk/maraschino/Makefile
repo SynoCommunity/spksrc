@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Maraschino is a simple web interface that acts as a nice overview/front page for your XBMC HTPC. It has many modules: Media library browser, SABnzbd+, SickBeard, XBMC controller, Diskspace, Weather, Transmission and so on.
 DESCRIPTION_FRE = Maraschino est une interface web qui sert de vue d\\\'ensemble/page d\\\'accueil à votre HTPC XBMC. Il dispose de multiple modules: Bibliothèque multimédia, SABnzbd+, SickBeard, Controlleur XBMC, Espace disque, Météo, Transmission et bien d\\\'autres.
 ADMIN_PORT = 8260

@@ -15,7 +15,7 @@ DEPENDS += cross/msgpack-python cross/psutil cross/pymongo cross/pyyaml cross/uw
 
 WHEELS = psutil uwsgi
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
