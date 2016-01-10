@@ -398,14 +398,14 @@ publish-latest-arch-%:
 
 all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
 	  $(MAKE) arch-$$arch-$* ; \
 	done \
 
 publish-all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
 	  $(MAKE) publish-arch-$$arch-$* ; \
 	done \
