@@ -11,7 +11,6 @@ DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid produc
 DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d'accès que Bugzilla et facilement modifiable.
 ADMIN_URL = /mantisbt/
 RELOAD_UI = yes
-STARTABLE = no
 DISPLAY_NAME = MantisBT
 CHANGELOG = "1. DSM 5.0 compatibility"
 
