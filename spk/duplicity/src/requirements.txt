@@ -3,7 +3,6 @@ boto
 duplicity
 msgpack-python
 netifaces
-rackspace-novaclient
 simplejson
 wrapt
 
@@ -34,6 +33,7 @@ python-novaclient==2.25.0
 python-swiftclient==2.3.1
 pytz==2015.4
 rackspace-auth-openstack==1.3
+rackspace-novaclient==1.5
 rax-default-network-flags-python-novaclient-ext==0.3.2
 rax-scheduled-images-python-novaclient-ext==0.3.1
 requests==2.7.0
