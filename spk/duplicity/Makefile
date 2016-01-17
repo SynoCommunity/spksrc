@@ -16,7 +16,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm using a command line interface. Also contains duply wrapper script.
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "Initial release"
+CHANGELOG = "1. Include duply<br>2. Add missing dependencies"
 BETA = 1
 
 HOMEPAGE = http://duplicity.nongnu.org/
