@@ -11,8 +11,9 @@ DESCRIPTION_FRE = Zsh est un shell conçu pour un usage intéractif, mais il est
 RELOAD_UI = no
 DISPLAY_NAME = Z shell
 STARTABLE = no
+CHANGELOG = "Update to 5.2"
 
-HOMEPAGE = http://www.zsh.org/
+HOMEPAGE = http://www.zsh.org
 LICENSE = Custom
 
 INSTALLER_SCRIPT = src/installer.sh
