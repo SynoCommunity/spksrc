@@ -13,4 +13,6 @@ LICENSE  =
 
 CONFIGURE_ARGS = --disable-yasm --enable-gpl --enable-libx264 --enable-libmp3lame --enable-nonfree --enable-cross-compile --arch=$(ARCH) --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX) --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include" --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib" --extra-libs=-ldl
 
+CONFIGURE_ARGS += --disable-static --enable-shared --ranlib=$(RANLIB) --pkg-config=$(PKG_CONFIG_LIBDIR) --enable-pic
+
 include ../../mk/spksrc.cross-cc.mk
