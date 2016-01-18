@@ -17,7 +17,7 @@ LOG_FILE="${INSTALL_DIR}/var/nzbget.log"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${NZBGET} -c ${CFG_FILE} -D"
+    su ${USER} -c "PATH=${PATH} ${NZBGET} -c ${CFG_FILE} -D"
 }
 
 stop_daemon ()

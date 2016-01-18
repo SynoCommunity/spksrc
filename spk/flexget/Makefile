@@ -6,7 +6,7 @@ SPK_ICON = src/flexget.png
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.8-11"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
 BETA = 1

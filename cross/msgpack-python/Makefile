@@ -11,4 +11,4 @@ HOMEPAGE = http://msgpack.org/
 COMMENT  = It\'s like JSON. but fast and small.
 LICENSE  = Apache
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk

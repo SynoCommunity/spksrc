@@ -1,0 +1,10 @@
+#default file provided by monit spk
+
+check process CouchPotato-Custom with pidfile /usr/local/couchpotatoserver-custom/var/couchpotatoserver.pid
+    start program = "/var/packages/couchpotatoserver-custom/scripts/start-stop-status start"
+    stop program  = "/var/packages/couchpotatoserver-custom/scripts/start-stop-status stop"
+    if failed host localhost port 5053 for 2 cycles then restart
+    if 3 restarts within 5 cycles then timeout
+    #if memory > 60 MB then restart
+
+#end

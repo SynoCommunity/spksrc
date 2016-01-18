@@ -1,4 +1,4 @@
 bin:bin/curve_keygen
 lnk:lib/libzmq.so
-lnk:lib/libzmq.so.4
-lib:lib/libzmq.so.4.0.0
+lnk:lib/libzmq.so.5
+lib:lib/libzmq.so.5.0.0

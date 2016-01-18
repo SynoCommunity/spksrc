@@ -14,6 +14,7 @@ GROUP="nobody"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 CFG_FILE="${INSTALL_DIR}/var/haproxy.cfg"
+TPL_FILE="${CFG_FILE}.tpl"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
@@ -32,8 +33,8 @@ postinst ()
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Edit the configuration according to the wizard
-    sed -i -e "s/@user@/${wizard_user:=admin}/g" ${INSTALL_DIR}/var/haproxy.cfg.tpl
-    sed -i -e "s/@passwd@/${wizard_passwd:=admin}/g" ${INSTALL_DIR}/var/haproxy.cfg.tpl
+    sed -i -e "s/@user@/${wizard_user:=admin}/g" ${TPL_FILE}
+    sed -i -e "s/@passwd@/${wizard_passwd:=admin}/g" ${TPL_FILE}
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
@@ -93,6 +94,12 @@ preupgrade ()
     # Revision 16 adds security updates
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 16 ]; then
         ${INSTALL_DIR}/env/bin/python ${SYNOPKG_PKGINST_TEMP_DIR}/app/application/db_upgrade_16.py
+    fi
+
+    # Revision 18 runs as root, but requires 'haproxy' user entry in conf
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 18 ]; then
+        sed -ie "/^global$/a\	user haproxy" ${CFG_FILE}
+        sed -ie "/^global$/a\	user haproxy" ${TPL_FILE}
     fi
 
     # Save some stuff

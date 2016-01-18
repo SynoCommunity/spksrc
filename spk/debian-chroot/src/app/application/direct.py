@@ -84,6 +84,16 @@ class Services(Base):
                 while not service.status:
                     time.sleep(0.8)
 
+
+def chroot_check_output(cmd):
+    with open(os.devnull, 'w') as devnull:
+        return subprocess.check_output(['chroot', chroottarget, '/bin/bash', '-c', cmd], stdin=devnull, stderr=devnull, env={'PATH': env_path})
+
+def chroot_call(cmd):
+    with open(os.devnull, 'w') as devnull:
+        return subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', cmd], stdin=devnull, stderr=devnull, stdout=devnull, env={'PATH': env_path})
+
+
 class Overview(Base):
     def __init__(self):
         self.session = Session()
@@ -97,23 +107,16 @@ class Overview(Base):
 
     @expose
     def updates_count(self):
-        with open(os.devnull, 'w') as devnull:
-            updates_count = int(subprocess.check_output(['chroot', chroottarget, '/bin/bash', '-c', 'aptitude search "~U" | wc -l | tail'], stdin=devnull, stderr=devnull, env={'PATH': env_path}))
-        return updates_count
+        return int(chroot_check_output('apt-get --dry-run upgrade | grep ^Inst | wc -l'))
 
     @expose
     def do_update(self):
-        with open(os.devnull, 'w') as devnull:
-            status = not subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', 'aptitude update -q'], stdin=devnull, stdout=devnull, stderr=devnull, env={'PATH': env_path})
-        if status:
+        if chroot_call('apt-get update -qq'):
             return self.updates_count()
-        return status
 
     @expose
     def do_upgrade(self):
-        with open(os.devnull, 'w') as devnull:
-            status = not subprocess.call(['chroot', chroottarget, '/bin/bash', '-c', 'aptitude upgrade -q -y'], stdin=devnull, stdout=devnull, stderr=devnull, env={'PATH': env_path})
-        return status
+        return not chroot_call('apt-get upgrade -qq -y')
 
     def is_installed(self):
         return os.path.exists(installed)

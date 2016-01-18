@@ -18,7 +18,8 @@ LOG_FILE="${INSTALL_DIR}/var/uwsgi.log"
 
 start_daemon ()
 {
-    ${UWSGI} --die-on-term --http :8283 --virtualenv ${INSTALL_DIR}/env --chdir ${INSTALL_DIR}/share/saltpad/saltpad --module app:app --master --processes 2 --pidfile ${PID_FILE} --daemonize ${LOG_FILE} --uid ${USER} --gid ${GROUP}
+    ${UWSGI} --die-on-term --http :8283 --virtualenv ${INSTALL_DIR}/env --chdir ${INSTALL_DIR}/share/saltpad/saltpad --pythonpath .. \
+        --module "saltpad.app:app" --master --processes 2 --pidfile ${PID_FILE} --daemonize ${LOG_FILE} --uid ${USER} --gid ${GROUP}
 }
 
 stop_daemon ()

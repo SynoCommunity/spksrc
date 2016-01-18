@@ -1,6 +1,6 @@
 SPK_NAME = pyload
 SPK_VERS = 0.4.9
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/pyload.png
 DSM_UI_DIR = app
 
@@ -15,6 +15,7 @@ ADMIN_PORT = 8190
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = pyLoad
+CHANGELOG = Fix updatemanager
 
 HOMEPAGE   = http://pyload.org
 LICENSE    = GPLv3

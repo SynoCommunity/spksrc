@@ -11,10 +11,6 @@ Pin: release o=Debian,a=stable,l=Debian-Security
 Pin-Priority: 990
 
 Package: *
-Pin: release o=Unofficial Multimedia Packages,a=stable,l=Unofficial Multimedia Packages
-Pin-Priority: 980
-
-Package: *
 Pin: release o=Debian,a=stable,l=Debian
 Pin-Priority: 990
 
@@ -23,24 +19,12 @@ Pin: release o=Debian,a=testing,l=Debian-Security
 Pin-Priority: 90
 
 Package: *
-Pin: release o=Unofficial Multimedia Packages,a=testing,l=Unofficial Multimedia Packages
-Pin-Priority: 90
-
-Package: *
 Pin: release o=Debian,a=testing,l=Debian
 Pin-Priority: 90
 
 Package: *
-Pin: release o=Unofficial Multimedia Packages,a=unstable,l=Unofficial Multimedia Packages
-Pin-Priority: 50
-
-Package: *
 Pin: release o=Debian,a=unstable,l=Debian
 Pin-Priority: 50
-
-Package: *
-Pin: release o=Unofficial Multimedia Packages,a=experimental,l=Unofficial Multimedia Packages
-Pin-Priority: 10
 
 Package: *
 Pin: release o=Debian,a=experimental,l=Debian

@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
 DESCRIPTION_FRE = Mylar permet le téléchargement automatique de Comic Book \\\(cbr/cbz\\\)
 ADMIN_PORT = 8090
@@ -37,7 +37,6 @@ mylar_extra_install: $(STAGING_DIR)/share/mylar
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/mylar.cgi.py $(STAGING_DIR)/app/mylar.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \

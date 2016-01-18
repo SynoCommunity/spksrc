@@ -7,7 +7,7 @@ DNAME="Deluge"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/${PATH}"
 USER="deluge"
 GROUP="users"
 PYTHON="${INSTALL_DIR}/env/bin/python"
@@ -18,15 +18,16 @@ DELUGED_PID="${INSTALL_DIR}/var/deluged.pid"
 DELUGE_WEB_PID="${INSTALL_DIR}/var/deluge-web.pid"
 DELUGED_LOG="${INSTALL_DIR}/var/deluged.log"
 DELUGE_WEB_LOG="${INSTALL_DIR}/var/deluge-web.log"
+PYTHON_EGG_CACHE="${INSTALL_DIR}/env/cache"
 
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -x ${DELUGED} -c ${USER} -u ${USER} -p ${DELUGED_PID} \
-      -- --quiet --config ${CFG_DIR} --logfile ${DELUGED_LOG} --loglevel info --pidfile ${DELUGED_PID}
+    start-stop-daemon -S -q -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED} -c ${USER} -u ${USER} -p ${DELUGED_PID} \
+      -- --config ${CFG_DIR} --logfile ${DELUGED_LOG} --loglevel info --pidfile ${DELUGED_PID}
     sleep 3
-    start-stop-daemon -S -q -b -m -x ${DELUGE_WEB} -c ${USER} -u ${USER} -p ${DELUGE_WEB_PID} \
-      -- --quiet --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
+    start-stop-daemon -S -q -b -m -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGE_WEB} -c ${USER} -u ${USER} -p ${DELUGE_WEB_PID} \
+      -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
 }
 
 stop_daemon ()
@@ -90,7 +91,7 @@ case $1 in
         fi
         ;;
     log)
-        echo ${LOG_FILE}
+        echo ${DELUGED_LOG}
         ;;
     *)
         exit 1

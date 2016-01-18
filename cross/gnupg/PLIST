@@ -1,0 +1,15 @@
+bin:bin/dirmngr
+bin:bin/dirmngr-client
+bin:bin/g13
+bin:bin/gpg2
+bin:bin/gpg-agent
+bin:bin/gpgconf
+bin:bin/gpg-connect-agent
+bin:bin/gpgkey2ssh
+bin:bin/gpgparsemail
+bin:bin/gpgsm
+bin:bin/gpgsm-gencert.sh
+bin:bin/gpgtar
+bin:bin/gpgv2
+bin:bin/kbxutil
+bin:bin/watchgnupg

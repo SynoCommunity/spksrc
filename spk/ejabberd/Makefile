@@ -16,6 +16,7 @@ BETA = 1
 
 HOMEPAGE   = http://www.ejabberd.im
 LICENSE    = GPLv2
+HELPURL    = http://docs.ejabberd.im/admin/guide
 
 WIZARDS_DIR = src/wizard/
 

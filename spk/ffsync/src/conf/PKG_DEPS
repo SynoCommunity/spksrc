@@ -1,2 +1,5 @@
 [MariaDB]
 dsm_min_ver=5.0-4300
+
+[python]
+pkg_min_ver=2.7.8-9

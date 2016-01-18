@@ -6,14 +6,14 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
-            "defaultValue": "git://github.com/mr-orange/Sick-Beard.git",
+            "defaultValue": "git://github.com/midgetspy/Sick-Beard.git",
             "validator": {
                 "allowBlank": false
             }
         }, {
             "key": "wizard_fork_branch",
             "desc": "Fork branch",
-            "defaultValue": "Pistachitos",
+            "defaultValue": "master",
             "validator": {
                 "allowBlank": false
             }

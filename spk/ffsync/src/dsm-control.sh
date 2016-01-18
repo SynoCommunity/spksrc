@@ -17,6 +17,7 @@ LOG_FILE="${INSTALL_DIR}/var/pserve.log"
 start_daemon ()
 {
     ${PSERVE} ${INI_FILE} --user=${USER} --daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}
+    sleep 1
 }
 
 stop_daemon ()

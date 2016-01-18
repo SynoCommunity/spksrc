@@ -1,2 +1,0 @@
-lib:@PYTHON_SITE_PACKAGES@/msgpack/_unpacker.so
-lib:@PYTHON_SITE_PACKAGES@/msgpack/_packer.so

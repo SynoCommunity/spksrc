@@ -48,7 +48,7 @@ syno_group_remove ()
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/mr-orange/Sick-Beard.git} ${wizard_fork_branch:=Pistachitos} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/midgetspy/Sick-Beard.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -64,11 +64,11 @@ postinst ()
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
-    # Clone the repository and configure autoProcessTV
-    ${GIT} clone -q -b ${wizard_fork_branch:=Pistachitos} ${wizard_fork_url:=git://github.com/mr-orange/Sick-Beard.git} ${INSTALL_DIR}/var/SickBeard
-    cp ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
-    chmod 777 ${INSTALL_DIR}/var/SickBeard/autoProcessTV
-    chmod 600 ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Clone the repository
+        ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/midgetspy/Sick-Beard.git} ${INSTALL_DIR}/var/SickBeard > /dev/null 2>&1
+        cp ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
+    fi
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}

@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/dropbear cross/mktemp cross/busybox
 SPK_DEPENDS = "git>1.8.2"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Git Server turns your DiskStation into a powerfull server for the popular DSCM git. It supports git-daemon, a themed gitweb, gitolite and ssh through a dedicated daemon.
 DESCRIPTION_FRE = Git Server transforme votre DiskStation en puissant serveur pour le DSCM populaire git. Il apporte git-daemon, gitweb avec un thème, gitolite et ssh à travers un daemon dédié.
 DISPLAY_NAME = Git Server
@@ -21,7 +21,6 @@ WIZARDS_DIR = src/wizard
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web

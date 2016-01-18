@@ -6,7 +6,7 @@ SPK_ICON = src/newznab.png
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 SPK_DEPENDS = "PEAR"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Newznab is a usenet indexing application, that makes building a usenet community easy.
 DESCRIPTION_FRE = Newznab est une application d\\\'indexation des newsgroups rendant facile la création d\\\'une communauté usenet.
 ADMIN_URL = /newznab/www/
