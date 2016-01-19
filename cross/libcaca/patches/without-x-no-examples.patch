@@ -1,0 +1,9 @@
+--- Makefile.am.orig	2016-01-18 22:57:14.568966617 +0100
++++ Makefile.am	2016-01-18 22:57:25.012966536 +0100
+@@ -1,5 +1,5 @@
+ 
+-SUBDIRS = kernel caca src examples tools \
++SUBDIRS = kernel caca src tools \
+           cxx caca-sharp python ruby java \
+           doc test
+ DIST_SUBDIRS = $(SUBDIRS) win32
