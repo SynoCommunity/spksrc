@@ -16,4 +16,4 @@ lib:lib/imlib2/loaders/xpm.so
 lib:lib/imlib2/loaders/zlib.so
 lnk:lib/libImlib2.so
 lnk:lib/libImlib2.so.1
-lib:lib/libImlib2.so.1.4.6
+lib:lib/libImlib2.so.1.4.7
