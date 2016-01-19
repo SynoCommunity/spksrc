@@ -1,6 +1,6 @@
 SPK_NAME = roundcube
-SPK_VERS = 1.0.1
-SPK_REV = 2
+SPK_VERS = 1.1.4
+SPK_REV = 3
 SPK_ICON = src/roundcube.png
 DSM_UI_DIR = app
 
@@ -11,9 +11,9 @@ DESCRIPTION = Roundcube is a free and open source webmail solution with a deskto
 ADMIN_URL = /roundcube/
 RELOAD_UI = yes
 DISPLAY_NAME = Roundcube Webmail
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = Update to 1.1.4
 
-HOMEPAGE   = http://www.roundcube.net/
+HOMEPAGE   = http://www.roundcube.net
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/
