@@ -1,11 +1,11 @@
 SPK_NAME = mylar
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/mylar.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = Diaoul
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
@@ -13,6 +13,7 @@ DESCRIPTION_FRE = Mylar permet le téléchargement automatique de Comic Book \\\
 ADMIN_PORT = 8090
 RELOAD_UI = yes
 DISPLAY_NAME = Mylar
+CHANGELOG = "1. Update to latest<br>2. Enable sc-media group<br>3. Enable built-in updater"
 
 HOMEPAGE   = https://github.com/evilhero/mylar
 LICENSE    =
@@ -46,4 +47,3 @@ mylar_extra_install: $(STAGING_DIR)/share/mylar
 $(STAGING_DIR)/share/mylar:
 	install -m 755 -d $(STAGING_DIR)/share
 	cd $(STAGING_DIR)/share && git clone https://github.com/evilhero/mylar.git mylar
-	rm -fr $(STAGING_DIR)/share/mylar/.git $(STAGING_DIR)/share/mylar/.gitignore
