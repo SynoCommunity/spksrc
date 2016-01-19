@@ -20,8 +20,9 @@ RELOAD_UI = yes
 CHANGELOG = Add instruction to wizard on enabling remote access.
 DISPLAY_NAME = Deluge
 
-HOMEPAGE   = http://deluge-torrent.org
-LICENSE    = GPL
+HOMEPAGE = http://deluge-torrent.org
+LICENSE  = GPL
+HELPURL  = http://dev.deluge-torrent.org/wiki/UserGuide
 
 WIZARDS_DIR      = src/wizard/
 INSTALLER_SCRIPT = src/installer.sh
