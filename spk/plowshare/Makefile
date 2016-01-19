@@ -1,6 +1,6 @@
 SPK_NAME = plowshare
-SPK_VERS = 2.1.1
-SPK_REV = 2
+SPK_VERS = 2.1.2
+SPK_REV = 3
 SPK_ICON = src/plowshare.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = plowshare
 BETA = 1
-CHANGELOG = Update to 2.1.1
+CHANGELOG = Update to 2.1.2
 
 HOMEPAGE   = https://github.com/mcrapet/plowshare
 LICENSE    = GPLv3
