@@ -1,6 +1,6 @@
 SPK_NAME = deluge
 SPK_VERS = 1.3.12
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/deluge.png
 DSM_UI_DIR = app
 BETA = 1
@@ -14,10 +14,10 @@ REQUIRED_DSM = 5.0
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 MAINTAINER = Diaoul
-DESCRIPTION = Deluge is a full-featured  BitTorrent client for Linux, OS X, Unix and Windows. It uses libtorrent in its backend and features multiple user-interfaces including: GTK+, web and console. It has been designed using the client server model with a daemon process that handles all the bittorrent activity. The Deluge daemon is able to run on headless machines with the user-interfaces being able to connect remotely from any platform.
+DESCRIPTION = Deluge is a full-featured  BitTorrent client for Linux, OS X, Unix and Windows. It uses libtorrent in its backend and features multiple user-interfaces including: GTK+, web and console. It has been designed using the client server model with a daemon process that handles all the bittorrent activity. The Deluge daemon is able to run on headless machines with the user-interfaces being able to connect remotely from any platform. This package is intended for advanced users.
 ADMIN_PORT = 8112
 RELOAD_UI = yes
-CHANGELOG = "1. Fix bug when using \"Complete Directory\" during installation<br>2. Remove build dialog during installation"
+CHANGELOG = Add instruction to wizard on enabling remote access.
 DISPLAY_NAME = Deluge
 
 HOMEPAGE   = http://deluge-torrent.org
