@@ -1,5 +1,8 @@
-salt==2015.5.3
-Jinja2
-requests>=1.0.0
-CherryPy
-futures>=2.0
+backports-abc==0.4
+backports.ssl-match-hostname==3.5.0.1
+certifi==2015.11.20.1
+futures==3.0.4
+Jinja2==2.8
+requests==2.9.1
+singledispatch==3.4.0.3
+tornado==4.3

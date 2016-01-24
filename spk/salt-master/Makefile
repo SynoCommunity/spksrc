@@ -1,9 +1,10 @@
 SPK_NAME = salt-master
-SPK_VERS = 2015.5.3
-SPK_REV = 8
+SPK_VERS = 2015.8.3
+SPK_REV = 9
 SPK_ICON = src/salt-master.png
 
-DEPENDS =
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/salt
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>2.7.8-10"
 
@@ -11,7 +12,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 RELOAD_UI = yes
 DISPLAY_NAME = Salt Master
-CHANGELOG = "Update to 2015.5.3"
+CHANGELOG = "Update to 2015.8.3"
 
 HOMEPAGE   = https://www.saltstack.com/
 LICENSE    = Apache
@@ -25,8 +26,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = salt-master_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+ENV += TORNADO_EXTENSION=1
 
 include ../../mk/spksrc.spk.mk
 
