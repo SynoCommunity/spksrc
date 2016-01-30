@@ -1,0 +1,7 @@
+bin:bin/libmikmod-config
+rsc:include/mikmod.h
+lnk:lib/libmikmod.so
+lnk:lib/libmikmod.so.3
+lib:lib/libmikmod.so.3.3.0
+lib:lib/pkgconfig/libmikmod.pc
+

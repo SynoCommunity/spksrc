@@ -1,0 +1,10 @@
+rsc:include/tcpd.h
+lib:lib/libwrap.a
+lnl:lib/libwrap.so
+lnk:lib/libwrap.so.0
+lib:lib/libwrap.so.0.7.6
+lib:sbin/safe_finger
+lib:sbin/tcpd
+lib:sbin/tcpdchk
+lib:sbin/tcpdmatch
+lib:sbin/try-from

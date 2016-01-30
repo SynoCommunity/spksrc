@@ -1,0 +1,38 @@
+--- libsidplay/include/sidplay/SmartPtr.h	2004-06-14 23:08:04.000000000 +0300
++++ libsidplay/include/sidplay/SmartPtr.h	2005-12-19 11:12:04.000000000 +0300
+@@ -211,16 +211,16 @@
+ 	{
+ 		if ( bufferLen >= 1 )
+ 		{
+-			pBufCurrent = ( bufBegin = buffer );
+-			bufEnd = bufBegin + bufferLen;
+-			bufLen = bufferLen;
+-			status = true;
++			this->pBufCurrent = ( this->bufBegin = buffer );
++			this->bufEnd = this->bufBegin + bufferLen;
++			this->bufLen = bufferLen;
++			this->status = true;
+ 		}
+ 		else
+ 		{
+-			pBufCurrent = bufBegin = bufEnd = 0;
+-			bufLen = 0;
+-			status = false;
++			this->pBufCurrent = this->bufBegin = this->bufEnd = 0;
++			this->bufLen = 0;
++			this->status = false;
+ 		}
+ 	}
+ };
+--- libsidutils/include/sidplay/utils/SidUsage.h	2004-06-14 23:08:08.000000000 +0300
++++ libsidutils/include/sidplay/utils/SidUsage.h	2005-12-19 11:12:25.000000000 +0300
+@@ -33,7 +33,7 @@
+     uint_least16_t length;  // usage scan length
+
+     // Copy common parts of basic usage to extended usage.
+-    sid2_usage_t &sid2_usage_t::operator= (const sid_usage_t &usage)
++    sid2_usage_t &operator= (const sid_usage_t &usage)
+     {
+         *((sid_usage_t *) this) = usage;
+         return *this;
+

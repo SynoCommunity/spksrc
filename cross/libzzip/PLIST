@@ -1,0 +1,7 @@
+rsc:include/zconf.h
+rsc:include/zlib.h
+lnk:lib/libz.so
+lnk:lib/libz.so.1
+lib:lib/libz.so.1.2.8
+lib:lib/pkgconfig/zlib.pc
+

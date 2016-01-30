@@ -1,0 +1,5 @@
+bin:bin/adplugdb
+lnk:lib/libadplug-2.2.1.so.0
+lib:lib/libadplug-2.2.1.so.0.0.0
+lnk:lib/libadplug.so
+lib:lib/pkgconfig/adplug.pc

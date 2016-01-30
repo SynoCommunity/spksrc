@@ -1,0 +1,10 @@
+--- ./src/binwrap.cpp.orig	2003-03-08 17:02:34.000000000 +0100
++++ ./src/binwrap.cpp	2016-01-05 00:06:02.257931890 +0100
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "binwrap.h"
++#include "cstdio"
+ 
+ #if BINIO_ENABLE_IOSTREAM
+ 

@@ -1,0 +1,8 @@
+bin:bin/altonegen
+bin:bin/bsincgen
+bin:bin/makehrtf
+bin:bin/openal-info
+lnk:lib/libopenal.so
+lnk:lib/libopenal.so.1
+lib:lib/libopenal.so.1.17.1
+lib:lib/pkgconfig/openal.pc

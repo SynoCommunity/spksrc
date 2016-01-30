@@ -1,0 +1,11 @@
+--- configure.old	2014-01-22 21:23:47.000000000 +0100
++++ configure	2016-01-02 12:36:01.718042194 +0100
+@@ -2625,7 +2625,7 @@
+     fi
+ done
+ 
+-if test $not_overwriting -gt 0 ; then
++if test $not_overwriting -gt 0 && test host_alias -eq "" && test build_alias -eq ""; then
+     echo
+     echo
+     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

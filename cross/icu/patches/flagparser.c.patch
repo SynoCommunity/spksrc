@@ -1,0 +1,11 @@
+--- source/tools/toolutil/flagparser.c.orig	2015-10-08 05:54:06.000000000 +0200
++++ source/tools/toolutil/flagparser.c	2016-01-04 12:36:22.106099571 +0100
+@@ -97,7 +97,7 @@
+ 
+     T_FileStream_close(f);
+     
+-    if (U_FAILURE(*status)) {
++    if (U_FAILURE(*status) && *status != U_BUFFER_OVERFLOW_ERROR) {
+         return -1;
+     }
+ 

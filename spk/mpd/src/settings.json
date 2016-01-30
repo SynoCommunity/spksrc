@@ -1,0 +1,12 @@
+{
+    "download-dir": "@download_dir@",
+    "incomplete-dir": "@incomplete_dir@", 
+    "incomplete-dir-enabled": @incomplete_dir_enabled@,
+    "rpc-authentication-required": true,
+    "rpc-username": "@username@",
+    "rpc-password": "@password@",
+    "rpc-whitelist-enabled": false,
+    "umask": 2,
+    "watch-dir": "@watch_dir@",
+    "watch-dir-enabled": @watch_dir_enabled@
+}

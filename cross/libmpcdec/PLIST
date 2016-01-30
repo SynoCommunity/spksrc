@@ -1,0 +1,3 @@
+lnk:lib/libmpcdec.so
+lnk:lib/libmpcdec.so.5
+lib:lib/libmpcdec.so.5.0.2

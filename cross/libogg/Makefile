@@ -12,6 +12,7 @@ COMMENT  = Free, open container format
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 

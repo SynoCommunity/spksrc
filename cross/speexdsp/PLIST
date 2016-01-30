@@ -1,0 +1,10 @@
+rsc:include/speex/speexdsp_config_types.h
+rsc:include/speex/speexdsp_types.h
+rsc:include/speex/speex_echo.h
+rsc:include/speex/speex_jitter.h
+rsc:include/speex/speex_preprocess.h
+rsc:include/speex/speex_resampler.h
+lnk:lib/libspeexdsp.so
+lnk:lib/libspeexdsp.so.1
+lib:lib/libspeexdsp.so.1.5.0
+lib:lib/pkgconfig/speexdsp.pc

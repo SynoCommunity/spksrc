@@ -1,0 +1,13 @@
+--- config.h.in	2014-04-11 02:42:02.000000000 +0200
++++ config.h.in	2016-01-05 12:14:37.245133855 +0100
+@@ -165,10 +165,8 @@
+ #undef const
+ 
+ /* Define to rpl_malloc if the replacement function should be used. */
+-#undef malloc
+ 
+ /* Define to rpl_realloc if the replacement function should be used. */
+-#undef realloc
+ 
+ /* Define to `unsigned int' if <sys/types.h> does not define. */
+ #undef size_t

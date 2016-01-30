@@ -1,0 +1,6 @@
+bin:bin/faad
+rsc:include/faad.h
+rsc:include/neaacdec.h
+lnk:lib/libfaad.so
+lnk:lib/libfaad.so.2
+lib:lib/libfaad.so.2.0.0

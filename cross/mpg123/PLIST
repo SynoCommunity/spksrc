@@ -1,0 +1,11 @@
+bin:bin/mpg123
+bin:bin/mpg123-id3dump
+bin:bin/mpg123-strip
+bin:bin/out123
+rsc:include/mpg123.h
+lnk:lib/libmpg123.so
+lnk:lib/libmpg123.so.0
+lib:lib/libmpg123.so.0.41.2
+lib:lib/mpg123/output_dummy.so
+lib:lib/mpg123/output_oss.so
+lib:lib/pkgconfig/libmpg123.pc
