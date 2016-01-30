@@ -1,7 +1,3 @@
-rsc:include/opus/opus_defines.h
-rsc:include/opus/opus.h
-rsc:include/opus/opus_multistream.h
-rsc:include/opus/opus_types.h
 lnk:lib/libopus.so
 lnk:lib/libopus.so.0
 lib:lib/libopus.so.0.5.1

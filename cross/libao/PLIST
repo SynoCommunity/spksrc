@@ -1,6 +1,3 @@
-rsc:include/ao/ao.h
-rsc:include/ao/os_types.h
-rsc:include/ao/plugin.h
 lib:lib/ao/plugins-4/libalsa.so
 lob:lib/ao/plugins-4/liboss.so
 lib:lib/ao/plugins-4/libpulse.la

@@ -1,4 +1,3 @@
-rsc:include/tcpd.h
 lib:lib/libwrap.a
 lnl:lib/libwrap.so
 lnk:lib/libwrap.so.0

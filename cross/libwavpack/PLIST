@@ -1,7 +1,6 @@
 bin:bin/wavpack
 bin:bin/wvgain
 bin:bin/wvunpack
-rsc:include/wavpack/wavpack.h
 lnk:lib/libwavpack.so
 lnk:lib/libwavpack.so.1
 lib:lib/libwavpack.so.1.1.7

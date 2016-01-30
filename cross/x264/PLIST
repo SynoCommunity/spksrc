@@ -1,5 +1,3 @@
-rsc:include/x264_config.h
-rsc:include/x264.h
 lib:lib/libx264.so
 lib:lib/libx264.so.148
 lib:lib/pkgconfig/x264.pc

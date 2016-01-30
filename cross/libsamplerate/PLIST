@@ -1,5 +1,4 @@
 bin:bin/sndfile-resample
-rsc:include/samplerate.h
 lnk:lib/libsamplerate.so
 lnk:lib/libsamplerate.so.0
 lib:lib/libsamplerate.so.0.1.8

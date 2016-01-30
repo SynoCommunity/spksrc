@@ -1,8 +1,3 @@
-rsc:include/libmms/mms_config.h
-rsc:include/libmms/mms.h
-rsc:include/libmms/mmsh.h
-rsc:include/libmms/mmsio.h
-rsc:include/libmms/mmsx.h
 lib:lib/libmms.la
 lnk:lib/libmms.so
 lnk:lib/libmms.so.0

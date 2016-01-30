@@ -3,4 +3,3 @@ bin:bin/mp3rtp
 lnk:lib/libmp3lame.so
 lnk:lib/libmp3lame.so.0
 lib:lib/libmp3lame.so.0.0.0
-rsc:include/lame/lame.h

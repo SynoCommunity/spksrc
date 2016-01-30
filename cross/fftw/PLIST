@@ -1,4 +1,3 @@
 bin:/fftw-wisdom
 bin:/fftw-wisdom-to-conf
-rsc:include/fftw3.h
 lib:lib/pkgconfig/fftw3.pc

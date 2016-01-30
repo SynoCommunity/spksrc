@@ -1,7 +1,3 @@
-rsc:include/libbinio/binfile.h
-rsc:include/libbinio/binio.h
-rsc:include/libbinio/binstr.h
-rsc:include/libbinio/binwrap.h
 lnk:lib/libbinio.so
 lnk:lib/libbinio.so.1
 lib:lib/libbinio.so.1.0.0

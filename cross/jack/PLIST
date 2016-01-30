@@ -27,21 +27,6 @@ bin:bin/jack_simple_session_client
 bin:bin/jack_transport_client
 bin:bin/jack_unload
 bin:bin/jack_wait
-rsc:include/jack/control.h
-rsc:include/jack/intclient.h
-rsc:include/jack/jack.h
-rsc:include/jack/jslist.h
-rsc:include/jack/metadata.h
-rsc:include/jack/midiport.h
-rsc:include/jack/ringbuffer.h
-rsc:include/jack/session.h
-rsc:include/jack/statistics.h
-rsc:include/jack/thread.h
-rsc:include/jack/transport.h
-rsc:include/jack/types.h
-rsc:include/jack/uuid.h
-rsc:include/jack/weakjack.h
-rsc:include/jack/weakmacros.h
 lib:lib64/jack/inprocess.la
 lib:lib64/jack/inprocess.so
 lib:lib64/jack/intime.la
@@ -61,5 +46,3 @@ lnk:lib64/libjack.so
 lnk:lib64/libjack.so.0
 lib:lib64/libjack.so.0.0.28
 lib:lib64/pkgconfig/jack.pc
-shr:share/man/man1/jackd.1
-shr:share/man/man1/jackstart.1
