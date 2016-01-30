@@ -5,7 +5,7 @@ SPK_ICON = src/redis.png
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 RELOAD_UI = yes
 DISPLAY_NAME = Redis

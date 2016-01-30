@@ -47,6 +47,6 @@
 }, {
     "step_title": "First login",
     "items": [{
-        "desc": "The default password is 'deluge'. You can change the password through the web interface"
+        "desc": "The default password for the web interface is 'deluge'.<br><br>Remote access is disabled by default. To allow clients to remotely connect to the daemon, see the ThinClient guide on the Deluge website"
     }]
 }]

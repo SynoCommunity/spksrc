@@ -17,7 +17,6 @@ LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 FWPORTS          = src/${SPK_NAME}.sc
 

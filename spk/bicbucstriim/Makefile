@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = BicBucStriim streams books, digital books. It fills a gap in the functionality of current NAS devices, which provide access to your collection of music, videos and photos -- but not books. BicBucStriim covers that area and provides web-based access to your e-book collection.
 ADMIN_URL = /bbs/
 RELOAD_UI = yes

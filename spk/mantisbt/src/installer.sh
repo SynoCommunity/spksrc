@@ -113,10 +113,18 @@ postuninst ()
 
 preupgrade ()
 {
-    # Save the configuration file
+    # Backup files
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
+
+    # Save the configuration file
     mv ${WEB_DIR}/${PACKAGE}/config_inc.php ${TMP_DIR}/${PACKAGE}/
+
+    # Save custom files
+    for file in ${WEB_DIR}/${PACKAGE}/custom*
+    do
+        mv $file ${TMP_DIR}/${PACKAGE}/
+    done
 
     exit 0
 }
@@ -125,6 +133,13 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config_inc.php ${WEB_DIR}/${PACKAGE}/
+
+    # Restore custom files
+    for file in ${TMP_DIR}/${PACKAGE}/custom*
+    do
+        mv $file ${WEB_DIR}/${PACKAGE}/
+    done
+
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

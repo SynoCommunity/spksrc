@@ -13,9 +13,9 @@ DEPENDS += cross/sqlalchemy cross/pyaudio cross/pyalsa cross/lxml cross/twisted
 DEPENDS += cross/zope.interface cross/markupsafe cross/sphinxbase cross/pocketsphinx
 DEPENDS += cross/msgpack-python cross/psutil cross/pymongo cross/pyyaml cross/uwsgi
 
-WHEELS = psutil uwsgi
+WHEELS = msgpack-python psutil uwsgi
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.

@@ -9,7 +9,7 @@ BETA = 1
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Subliminal allows you automatically download best-matching subtitles for your movies and tv shows on your DiskStation. This package is named after Subliminal, the Python library used to search and download subtitles.
 DESCRIPTION_FRE = Subliminal vous permet de télécharger automatiquement les meilleurs sous-titres pour vos films et séries sur votre DiskStation. Ce paquet est nommé d\\\'après Subliminal, la librairie Python utilisée pour rechercher et télécharger les sous-titres.
 RELOAD_UI = yes

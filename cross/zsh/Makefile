@@ -1,6 +1,6 @@
 PKG_NAME = zsh
-PKG_VERS = 5.0.7
-PKG_EXT = tar.bz2
+PKG_VERS = 5.2
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.zsh.org/pub
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
