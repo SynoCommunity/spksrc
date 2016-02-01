@@ -1,8 +1,8 @@
 PKG_NAME = emby
-PKG_VERS = 3.0.5724.5
+PKG_VERS = 3.0.5818
 PKG_EXT = zip
-PKG_DIST_NAME = MediaBrowser-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/MediaBrowser/MediaBrowser.Releases/raw/master/Server
+PKG_DIST_NAME = Emby.Mono.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/MediaBrowser/Emby/releases/download/$(PKG_VERS)
 PKG_DIR = emby
 
 DEPENDS = 
