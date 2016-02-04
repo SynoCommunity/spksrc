@@ -1,7 +1,7 @@
 PKG_NAME = gateone
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 2ddbd05
+PKG_GIT_HASH = 1d0e803
 PKG_DIST_SITE = https://github.com/liftoff/GateOne.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
