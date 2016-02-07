@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.xiph.org/releases/$(PKG_NAME)
 
-DEPENDS = cross/libogg cross/libvorbis cross/speex cross/speexdsp cross/libtheora cross/openssl
+DEPENDS = cross/libogg cross/libvorbis cross/speex cross/libtheora cross/openssl
 
 HOMEPAGE = http://www.icecast.org/
 COMMENT  = Library which can be used to write a source client like ices

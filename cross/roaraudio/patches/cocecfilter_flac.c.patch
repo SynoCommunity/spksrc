@@ -1,0 +1,24 @@
+--- roard/codecfilter_flac.c	2014-01-13 10:53:52.000000000 +0100
++++ roard/codecfilter_flac.c	2016-02-03 23:10:24.074512233 +0100
+@@ -226,21 +226,10 @@
+   return -1;
+  }
+ 
+-#ifndef ROAR_HAVE_FLAC_VERSION_1_2_1
+- FLAC__stream_decoder_set_read_callback(self->decoder.decoder, cf_flac_cb_read);
+- FLAC__stream_decoder_set_write_callback(self->decoder.decoder, cf_flac_cb_write);
+- FLAC__stream_decoder_set_metadata_callback(self->decoder.decoder, cf_flac_cb_metadata);
+- FLAC__stream_decoder_set_error_callback(self->decoder.decoder, cf_flac_cb_error);
+- FLAC__stream_decoder_set_client_data(self->decoder.decoder, self);
+-#endif
+ 
+  FLAC__stream_decoder_set_metadata_respond(self->decoder.decoder, FLAC__METADATA_TYPE_VORBIS_COMMENT);
+ 
+-#ifdef ROAR_HAVE_FLAC_VERSION_1_2_1
+  FLAC__stream_decoder_init_stream(self->decoder.decoder, cf_flac_cb_read, NULL, NULL, NULL, NULL, cf_flac_cb_write, cf_flac_cb_metadata, cf_flac_cb_error, self);
+-#else
+- FLAC__stream_decoder_init(self->decoder.decoder);
+-#endif
+ 
+  *inst = self;
+ 

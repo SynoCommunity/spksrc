@@ -9,4 +9,5 @@ etc:etc/dbus-1/system.conf
 libexec:libexec/dbus-daemon-launch-helper
 lnk:lib/libdbus-1.so
 lnk:lib/libdbus-1.so.3
-lib:lib/libdbus-1.so.3.7.2
+lib:lib/libdbus-1.so.3.14.6
+lib/pkgconfig/dbus-1.pc

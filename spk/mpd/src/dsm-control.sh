@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="mpd"
-DNAME="mpd"
+DNAME="MPD"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -11,8 +11,7 @@ PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="mpd"
 MPD="${INSTALL_DIR}/bin/mpd"
 PID_FILE="${INSTALL_DIR}/var/mpd.pid"
-CONF_FILE="/volume1/mpd/mpd.conf"
-PLAYLIST_DIR="/volume1/mpd/playlists"
+
 
 start_daemon ()
 {

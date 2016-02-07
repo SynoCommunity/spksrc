@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://www.mega-nerd.com/libsndfile/files
 
-DEPENDS = #cross/alsa-lib cross/flac cross/libogg cross/libvorbis cross/sqlite
+DEPENDS = cross/alsa-lib cross/flac cross/libogg cross/libvorbis cross/sqlite
 
 HOMEPAGE = http://www.mega-nerd.com/libsndfile/
 COMMENT  = C library for reading and writing files containing sampled sound

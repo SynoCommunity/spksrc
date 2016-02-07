@@ -12,7 +12,7 @@ HOMEPAGE = http://zziplib.sourceforge.net/
 COMMENT  = Extract data from files archived in a single zip file
 LICENSE  = 
 
-CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS  = --disable-static --prefix=$(INSTALL_PREFIX)
 CONFIGURE_TARGET = myConfigure
 
 include ../../mk/spksrc.cross-cc.mk

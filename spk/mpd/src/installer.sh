@@ -16,8 +16,8 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
-SYNO_GROUP="sc-download"
-SYNO_GROUP_DESC="SynoCommunity's download related group"
+SYNO_GROUP="sg-mpd"
+SYNO_GROUP_DESC="mpd related group"
 
 syno_group_create ()
 {
@@ -45,16 +45,8 @@ syno_group_remove ()
 preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ ! -d "${wizard_download_dir}" ]; then
-            echo "Download directory ${wizard_download_dir} does not exist."
-            exit 1
-        fi
-        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
-            echo "Watch directory ${wizard_watch_dir} does not exist."
-            exit 1
-        fi
-        if [ -n "${wizard_incomplete_dir}" -a ! -d "${wizard_incomplete_dir}" ]; then
-            echo "Incomplete directory ${wizard_incomplete_dir} does not exist."
+        if [ ! -d "${wizard_mpd_dir}" ]; then
+            echo "MPD config directory ${wizard_download_dir} does not exist."
             exit 1
         fi
     fi
@@ -75,37 +67,7 @@ postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
-        sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
-        sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
-        if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
-        else
-            sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
-            sed -i -e "/@watch_dir@/d" ${CFG_FILE}
-        fi
-        if [ -d "${wizard_incomplete_dir}" ]; then
-            sed -i -e "s|@incomplete_dir_enabled@|true|g" ${CFG_FILE}
-            sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" ${CFG_FILE}
-        else
-            sed -i -e "s|@incomplete_dir_enabled@|false|g" ${CFG_FILE}
-            sed -i -e "/@incomplete_dir@/d" ${CFG_FILE}
-        fi
-
-        # Set group and permissions on download- and watch dir for DSM5
-        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
-            chgrp users ${wizard_download_dir:=/volume1/downloads}
-            chmod g+rw ${wizard_download_dir:=/volume1/downloads}
-            if [ -d "${wizard_watch_dir}" ]; then
-                chgrp users ${wizard_watch_dir}
-                chmod g+rw ${wizard_watch_dir}
-            fi
-            if [ -d "${wizard_incomplete_dir}" ]; then
-                chgrp users ${wizard_incomplete_dir}
-                chmod g+rw ${wizard_incomplete_dir}
-            fi
-        fi
+        sed -i -e "s|@mpd_conf@|${wizard_mpd_conf:=/volume1/mpd/}mpd.conf|g" ${CFG_FILE}
     fi
 
     syno_group_create

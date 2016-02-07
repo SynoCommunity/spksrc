@@ -1,6 +1,5 @@
 lib:lib/ao/plugins-4/libalsa.so
 lob:lib/ao/plugins-4/liboss.so
-lib:lib/ao/plugins-4/libpulse.la
 lib:lib/ao/plugins-4/libpulse.so
 lib:lib/ckport/db/libao.ckport
 lnk:lib/libao.so

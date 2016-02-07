@@ -15,6 +15,9 @@ LICENSE  = LGPL
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = 
+ifneq ($(findstring $(ARCH), ppc853x qoriq),)
+ADDITIONAL_CFLAGS += -D_GNU_SOURCE
+endif
 
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = nop
@@ -24,10 +27,9 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) cmake ..
+	$(RUN) cmake -DCMAKE_INSTALL_PREFIX= ..
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR)
-
+	$(RUN) make DESTDIR=$(STAGING_INSTALL_PREFIX) install
 

@@ -1,11 +1,11 @@
 PKG_NAME = icecast
 PKG_VERS = 2.4.2
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.xiph.org/releases/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = http://downloads.xiph.org/releases/$(PKG_NAME)
 
-DEPENDS = cross/libxml2 cross/openssl cross/curl cross/libvorbis cross/libxslt cross/speex cross/speexdsp cross/libtheora
+DEPENDS = cross/libxml2 cross/openssl cross/curl cross/libvorbis cross/libxslt cross/speex cross/libtheora
 
 HOMEPAGE = http://www.icecast.org/
 COMMENT  = Icecast is a streaming media server which currently supports Ogg (Vorbis and Theora), Opus, WebM and MP3 audio streams.

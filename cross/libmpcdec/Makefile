@@ -12,11 +12,7 @@ COMMENT  = Musepack SV7 decoder library
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static --enable-shared #--host=$(TC_TARGET)
-#CONFIGURE_TARGET = myConfigure
+CONFIGURE_ARGS = --disable-static --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
-
-myConfigure:
-	$(RUN) ./configure $(CONFIGURE_ARGS)
 

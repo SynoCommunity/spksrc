@@ -12,6 +12,7 @@ COMMENT  = Free, cross-platform, hardware independent AdLib sound player library
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
 

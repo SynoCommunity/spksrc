@@ -1,8 +1,8 @@
 {
     ".url": {
         "com.synocommunity.packages.mpd": {
-            "title": "mpd",
-            "desc": "mpd",
+            "title": "MPD",
+            "desc": "Music Player Daemon",
             "icon": "images/mpd-{0}.png",
             "type": "url",
             "protocol": "http",

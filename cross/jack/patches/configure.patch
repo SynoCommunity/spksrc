@@ -1,11 +1,69 @@
---- configure.old	2014-01-22 21:23:47.000000000 +0100
-+++ configure	2016-01-02 12:36:01.718042194 +0100
-@@ -2625,7 +2625,7 @@
-     fi
- done
+--- configure.orig	2014-01-22 21:23:47.000000000 +0100
++++ configure	2016-02-06 13:14:21.915755721 +0100
+@@ -2610,47 +2610,6 @@
  
+ 
+ 
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking existing, conflicting JACK installs" >&5
+-$as_echo_n "checking existing, conflicting JACK installs... " >&6; }
+-not_overwriting=0
+-installs=
+-for dir in /usr/lib /usr/local/lib /opt/lib ; do
+-    if test -d $dir ; then
+-	if test $(find $dir/ -name 'libjack.so.*' 2>/dev/null | wc -l) -gt 0 ; then
+-	    if echo $prefix/lib | grep -vs $dir >/dev/null 2>&1 ; then
+-		not_overwriting=$(expr $not_overwriting + 1)
+-	    fi
+-	    installs="$installs $dir"
+-	fi
+-    fi
+-done
+-
 -if test $not_overwriting -gt 0 ; then
-+if test $not_overwriting -gt 0 && test host_alias -eq "" && test build_alias -eq ""; then
-     echo
-     echo
-     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+-    echo
+-    echo
+-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+-    echo "You appear to have at least one existing installation of JACK."
+-    echo
+-    echo "Complete or partial JACK installs exist in:$installs"
+-    echo
+-    echo "Installing this version will leave at least one of these"
+-    echo "existing installations installed and this will probably break"
+-    echo "JACK on your machine. "
+-    echo
+-    echo "Before building, you should first remove the existing JACK"
+-    echo "installation(s). "
+-    echo
+-    echo "Alternatively use ./configure --prefix=... to force overwriting"
+-    echo "the existing install."
+-    echo
+-    echo "WARNING: ON ANY DEBIAN-DERIVED DISTRIBUTION (Debian, Ubuntu etc)"
+-    echo "CHANGING THE INSTALLATION PREFIX WILL NOT PRODUCE A WORKING JACK"
+-    echo "INSTALL. Please contact the distribution packager for JACK and"
+-    echo "ask them to fix their packaging."
+-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+-    exit 1
+-fi
+-
+ ac_aux_dir=
+ for ac_dir in config "$srcdir"/config; do
+   for ac_t in install-sh install.sh shtool; do
+@@ -14928,18 +14887,6 @@
+ #
+ # We need to establish suitable defaults for a 64-bit OS
+ libnn=lib
+-case "${host_os}" in
+-    linux*)
+-    case "${host_cpu}" in
+-	x86_64|mips64|ppc64|sparc64|s390x)
+-        libnn=lib64
+-	;;
+-    esac
+-    ;;
+-    solaris*)
+-    ## libnn=lib/sparcv9 ## on 64-bit only, but that's compiler-specific
+-    ;;
+-esac
+ 
+ ## take care not to  override the command-line setting
+ if test "${libdir}" = '${exec_prefix}/lib'; then

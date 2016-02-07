@@ -12,7 +12,7 @@ COMMENT  = International Components for Unicode
 LICENSE  = 
 
 CONFIGURE_ARGS  = --with-cross-build=$(WORK_DIR)/$(PKG_DIR)_build_a  --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --disable-tools --disable-tests --disable-samples --disable-static --enable-shared --with-data-packaging=library
+CONFIGURE_ARGS += --disable-tools --disable-tests --disable-samples --enable-shared --with-data-packaging=library
 ADDITIONAL_CXXFLAGS = --std=c++0x
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = none
@@ -27,7 +27,6 @@ myConfigure:
 	mkdir -p $(WORK_DIR)/$(PKG_DIR)_build_a
 	cd $(WORK_DIR)/$(PKG_DIR)_build_a && CPP= CC= CXX= CPPFLAGS= CFLAGS= CXXFLAGS= LDFLAGS= MAKE= $(WORK_DIR)/$(PKG_DIR)/source/runConfigureICU Linux/gcc
 	cd $(WORK_DIR)/$(PKG_DIR)_build_a && make
-include ../../mk/spksrc.cross-env.mk
 
 .PHONY: myInstall
 myInstall:

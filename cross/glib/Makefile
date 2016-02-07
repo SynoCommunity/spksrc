@@ -3,7 +3,7 @@ PKG_SHORT_VERS = 2.46
 PKG_VERS = $(PKG_SHORT_VERS).2
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
 
 DEPENDS = native/glib cross/zlib cross/libffi cross/pcre

@@ -1,9 +1,9 @@
 PKG_NAME = speex
 PKG_VERS = 1.2rc2
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.xiph.org/releases/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = http://downloads.xiph.org/releases/$(PKG_NAME)
 
 DEPENDS = cross/speexdsp
 
@@ -12,8 +12,6 @@ COMMENT  = Speex is an Open Source/Free Software patent-free audio compression f
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
-
-CONFIGURE_ARGS = --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 
