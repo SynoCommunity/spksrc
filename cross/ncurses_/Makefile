@@ -11,7 +11,7 @@ ifneq ($(NCURSES_ACTIVE),)
   ifeq ($(NCURSES_SUFFIX),w)
 #   NCursesW already started
     DEPENDS += cross/ncursesw
-    include dummy-pkg.mk
+    include ../ncurses/dummy-pkg.mk
   endif
 endif
 
