@@ -13,7 +13,7 @@ DESCRIPTION_NLD = Gamez is een geautomatiseerde downloader voor videospelletjes.
 ADMIN_PORT = 5290
 RELOAD_UI = yes
 DISPLAY_NAME = Gamez
-CHANGELOG = "1. Updated the package installer"
+CHANGELOG = "1. Updated the package from GitHub."
 
 HOMEPAGE   = https://github.com/avjui/Gamez
 LICENSE    =

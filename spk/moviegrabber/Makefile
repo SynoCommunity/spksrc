@@ -14,7 +14,7 @@ DESCRIPTION_NLD = MovieGrabber is een programma om automatisch films te download
 ADMIN_PORT = 9191
 RELOAD_UI = yes
 DISPLAY_NAME = MovieGrabber
-CHANGELOG = "1. Updated the package installer"
+CHANGELOG = "1. Updated the package from GitHub."
 
 HOMEPAGE   = https://github.com/binhex/moviegrabber/tree/development
 LICENSE    =

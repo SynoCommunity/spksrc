@@ -11,7 +11,7 @@ DISTRIBUTOR = Matr1x
 DESCRIPTION = Plex Connect or: Plex @ aTV - think different...
 RELOAD_UI = yes
 DISPLAY_NAME = PlexConnect
-CHANGELOG = "1. Updated the package from GitHub"
+CHANGELOG = "1. Updated the package from GitHub."
 
 HOMEPAGE   = https://github.com/iBaa/PlexConnect/
 LICENSE    =

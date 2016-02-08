@@ -13,7 +13,7 @@ DESCRIPTION = Trakt For Boxee is a simple python script that will scrobble whate
 DESCRIPTION_NLD = Trakt For Boxee is een eenvoudig python script dat alles wat je met je Boxee Box kijkt scrobbelt naar Trakt.
 RELOAD_UI = yes
 DISPLAY_NAME = TraktForBoxee
-CHANGELOG = "1. Updated the package installer"
+CHANGELOG = "1. Updated the package from GitHub."
 
 HOMEPAGE   = https://github.com/cold12/Trakt-for-Boxee
 LICENSE    =

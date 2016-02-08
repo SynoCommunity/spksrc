@@ -1,22 +1,22 @@
 SPK_NAME = AutoSub-BootstrapBill
-SPK_VERS = 0.6.3
-SPK_REV = 4
+SPK_VERS = 0.6.5
+SPK_REV = 1
 SPK_ICON = src/autosub-bootstrapbill.png
 DSM_UI_DIR = app
 
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3"
 
-MAINTAINER = Donny87
-DISTRIBUTOR = Matr1x and Martijn de Vries
+MAINTAINER = BenjV
+DISTRIBUTOR = Martijn de Vries
 DESCRIPTION = Automated SubtitleSeeker and Addic7ed download script for TV-Series.
 DESCRIPTION_NLD = Geautomatiseerde SubtitleSeeker en Addic7ed download script voor TV-Series.
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = Auto-Sub Bootstrap Bill
-CHANGELOG = "1. Bugfixes."
+CHANGELOG = "1. Updated the package from the new GitHub."
 
-HOMEPAGE   = https://github.com/Donny87/autosub-bootstrapbill
+HOMEPAGE   = https://github.com/BenjV/autosub-bootstrapbill
 LICENSE    =
 
 WIZARDS_DIR = src/wizard/
@@ -51,5 +51,5 @@ autosub-bootstrapbill_extra_install: $(STAGING_DIR)/share/autosub-bootstrapbill
 
 $(STAGING_DIR)/share/autosub-bootstrapbill:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/Donny87/autosub-bootstrapbill.git
+	cd $(STAGING_DIR)/share && git clone https://github.com/BenjV/autosub-bootstrapbill.git
 	rm -fr $(STAGING_DIR)/share/autosub-bootstrapbill/.git $(STAGING_DIR)/share/autosub-bootstrapbill/.gitignore

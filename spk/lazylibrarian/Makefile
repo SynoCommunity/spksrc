@@ -13,7 +13,7 @@ DESCRIPTION_NLD = LazyLibrarian is een programma om schrijvers te volgen en digi
 ADMIN_PORT = 5299
 RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
-CHANGELOG = "1. Updated the package from GitHub"
+CHANGELOG = "1. Updated the package from GitHub."
 
 HOMEPAGE   = https://github.com/DobyTang/LazyLibrarian
 LICENSE    =
