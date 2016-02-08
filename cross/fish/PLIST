@@ -1,0 +1,5 @@
+bin:bin/fish
+bin:bin/fish_indent
+bin:bin/mimedb
+etc:etc/fish/config.fish
+shr:share/fish
