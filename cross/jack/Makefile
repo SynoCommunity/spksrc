@@ -3,7 +3,7 @@ PKG_VERS = 0.124.1
 PKG_EXT = tar.gz
 PKG_DIR = jack-audio-connection-kit-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://jackaudio.org/downloads/
+PKG_DIST_SITE = http://jackaudio.org/downloads
 
 DEPENDS = cross/berkeleydb cross/libuuid
 

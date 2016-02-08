@@ -3,7 +3,7 @@ ifneq ($(wildcard $(WORK_DIR)/.ncursesw-*), )
   NCURSES_ACTIVE = yes
   NCURSES_SUFFIX = w
 else
-  ifneq ($(wildcard $(WORK_DIR)/.ncurses-*), )
+  ifneq ($(wildcard $(WORK_DIR)/.ncurses_-*), )
 #   ncurses found
     NCURSES_ACTIVE = yes
     NCURSES_SUFFIX = 

@@ -8,7 +8,7 @@ DNAME="mpd"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="mpd"
+USER="${PACKAGE}"
 GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/settings.json"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -45,8 +45,8 @@ syno_group_remove ()
 preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ ! -d "${wizard_mpd_dir}" ]; then
-            echo "MPD config directory ${wizard_download_dir} does not exist."
+        if [ ! -d "${wizard_mpd_conf}" ]; then
+            echo "MPD config directory ${wizard_mpd_conf} does not exist."
             exit 1
         fi
     fi
@@ -67,7 +67,7 @@ postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@mpd_conf@|${wizard_mpd_conf:=/volume1/mpd/}mpd.conf|g" ${CFG_FILE}
+        sed -i -e "s|@mpd_conf@|${wizard_mpd_conf:=/volume1/mpd/}|g" ${CFG_FILE}
     fi
 
     syno_group_create

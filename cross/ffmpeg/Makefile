@@ -2,7 +2,7 @@ PKG_NAME = ffmpeg
 PKG_VERS = 2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.ffmpeg.org/releases/
+PKG_DIST_SITE = http://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/x264 cross/lame

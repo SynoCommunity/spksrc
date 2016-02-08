@@ -3,7 +3,7 @@ PKG_VERS = 7.6
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)_$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.porcupine.org/pub/security/
+PKG_DIST_SITE = ftp://ftp.porcupine.org/pub/security
 
 DEPENDS =
 

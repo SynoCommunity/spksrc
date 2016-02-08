@@ -2,12 +2,14 @@ SPK_NAME = mpd
 SPK_VERS = 0.19.12
 SPK_REV = 1
 SPK_ICON = src/mpd.png
+DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = vkostas
-DESCRIPTION = MPD
+DESCRIPTION = "Music Player Daemon (MPD) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol"
+ADMIN_PORT = 6600
 RELOAD_UI = yes
 DISPLAY_NAME = MPD
 CHANGELOG = "Initial release"
