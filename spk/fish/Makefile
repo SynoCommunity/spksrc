@@ -1,24 +1,25 @@
 SPK_NAME = fish
-SPK_VERS = 2.1.2
+SPK_VERS = 2.2.0
 SPK_REV = 1
 SPK_ICON = src/ascii_fish.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = tmaone
 DESCRIPTION = fish is a smart and user-friendly command line shell for OS X, Linux, and the rest of the family.
 RELOAD_UI = no
-DISPLAY_NAME = fish shell
+DISPLAY_NAME = fish
 STARTABLE = no
-CHANGELOG = "Initial release"
+CHANGELOG = "initial"
 
-
-HOMEPAGE   = http://fishshell.com
-LICENSE    = GPLv2
+HOMEPAGE   = https://fishshell.com
+LICENSE    = GPLv2/mixed
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 ADDITIONAL_SCRIPTS =
+
+UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

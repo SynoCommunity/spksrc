@@ -4,6 +4,9 @@
 PACKAGE="fish"
 DNAME="fish"
 
+# Others
+INSTALL_DIR="/usr/local/${PACKAGE}"
+
 case $1 in
     start)
         exit 0
