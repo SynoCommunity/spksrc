@@ -1,15 +1,6 @@
---- setup.py.org	2015-01-03 00:00:00.000000000 +0000
-+++ setup.py	2015-01-03 00:00:00.000000000 +0000
-@@ -17,7 +17,7 @@ INSTALL_REQUIRES = [
- 	"werkzeug==0.8.3",
- 	"tornado==4.0.1",
- 	"sockjs-tornado==1.0.1",
--	"PyYAML==3.10",
-+	"PyYAML==3.11",
- 	"Flask-Login==0.2.2",
- 	"Flask-Principal==0.3.5",
- 	"Flask-Babel==0.9",
-@@ -26,13 +26,13 @@ INSTALL_REQUIRES = [
+--- setup.py.org	2016-02-10 16:45:38.000000000 +0100
++++ setup.py	2016-02-10 16:47:46.000000000 +0100
+@@ -26,13 +26,13 @@
  	"netaddr==0.7.17",
  	"watchdog==0.8.3",
  	"sarge==0.1.4",
@@ -20,8 +11,8 @@
  	"pkginfo==1.2.1",
  	"requests==2.7.0",
  	"semantic_version==2.4.2",
--	"psutil==3.2.1"
-+	"psutil==3.3.0"
+-	"psutil==3.2.1",
++	"psutil==3.3.0",
+ 	"awesome-slugify>=1.6.5,<1.7"
  ]
  
- # Additional requirements for optional install options
