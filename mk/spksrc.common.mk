@@ -34,7 +34,7 @@ ARCHS_DUPES = $(filter-out x86% braswell% bromolow% cedarview% avoton%, $(SUPPOR
 
 # Available Arches
 ARM5_ARCHES = 88f5281 88f6281
-ARM7_ARCHES = alpine armada370 armada375 armadaxp comcerto2k monaco
+ARM7_ARCHES = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco
 ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES)
 PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
