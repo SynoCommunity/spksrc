@@ -1,4 +1,3 @@
-bin:bin/transmission-cli
 bin:bin/transmission-create
 bin:bin/transmission-daemon
 bin:bin/transmission-edit
