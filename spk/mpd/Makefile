@@ -35,7 +35,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: mpd_extra_install
 mpd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/settings.json $(STAGING_DIR)/var/settings.json
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images

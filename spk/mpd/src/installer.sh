@@ -8,45 +8,19 @@ DNAME="mpd"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="${PACKAGE}"
+USER="mpd"
 GROUP="users"
-CFG_FILE="${INSTALL_DIR}/var/settings.json"
+CFG_FILE="/volume1/mpd/mpd.conf"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
-SYNO_GROUP="sg-mpd"
-SYNO_GROUP_DESC="mpd related group"
-
-syno_group_create ()
-{
-    # Create syno group (Does nothing when group already exists)
-    synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
-    # Set description of the syno group
-    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
-
-    # Add user to syno group (Does nothing when user already in the group)
-    addgroup ${USER} ${SYNO_GROUP}
-}
-
-syno_group_remove ()
-{
-    # Remove user from syno group
-    delgroup ${USER} ${SYNO_GROUP}
-
-    # Check if syno group is empty
-    if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
-        # Remove syno group
-        synogroup --del ${SYNO_GROUP} > /dev/null
-    fi
-}
-
 preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ ! -d "${wizard_mpd_conf}" ]; then
-            echo "MPD config directory ${wizard_mpd_conf} does not exist."
+        if [ ! -d "${wizard_mpd_dir}" ]; then
+            echo "Configure directory ${wizard_mpd_dir} does not exist."
             exit 1
         fi
     fi
@@ -65,13 +39,6 @@ postinst ()
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        # Edit the configuration according to the wizard
-        sed -i -e "s|@mpd_conf@|${wizard_mpd_conf:=/volume1/mpd/}|g" ${CFG_FILE}
-    fi
-
-    syno_group_create
-
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
@@ -88,8 +55,6 @@ preuninst ()
 
     # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        syno_group_remove
-
         delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi

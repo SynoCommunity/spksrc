@@ -10,28 +10,23 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 USER="mpd"
 MPD="${INSTALL_DIR}/bin/mpd"
-PID_FILE="${INSTALL_DIR}/var/mpd.pid"
-
+CONF_FILE="/volume1/mpd/mpd.conf"
+COMMAND="${MPD} ${CONF_FILE}"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${MPD} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    start-stop-daemon -c ${USER} -S -q -b -p ${PID_FILE} -x ${COMMAND} > /dev/null
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
-    rm -f ${PID_FILE}
+    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
-        return
-    fi
-    rm -f ${PID_FILE}
-    return 1
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
 wait_for_status ()

@@ -7,7 +7,9 @@ lib:lib/libsidutils.so.0.0.4
 lib:lib/pkgconfig/libsidplay2.pc
 lib:lib/pkgconfig/libsidutils.pc
 lnk:lib/libhardsid-builder.so
+lnk:lib/libhardsid-builder.so.0
 lnk:lib/libresid-builder.so
+lnk:lib/libresid-builder.so.0
 lnk:lib/sidplay/builders/libhardsid-builder.so
 lnk:lib/sidplay/builders/libhardsid-builder.so.0
 lib:lib/sidplay/builders/libhardsid-builder.so.0.0.1
