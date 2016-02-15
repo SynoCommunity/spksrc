@@ -1,6 +1,6 @@
 SPK_NAME = MovieGrabber
 SPK_VERS = 2.2.1.0
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/moviegrabber.png
 DSM_UI_DIR = app
 
