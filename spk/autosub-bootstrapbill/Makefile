@@ -1,5 +1,5 @@
 SPK_NAME = AutoSub-BootstrapBill
-SPK_VERS = 0.6.7
+SPK_VERS = 0.6.9
 SPK_REV = 1
 SPK_ICON = src/autosub-bootstrapbill.png
 DSM_UI_DIR = app
@@ -14,7 +14,7 @@ DESCRIPTION_NLD = Geautomatiseerde SubtitleSeeker en Addic7ed download script vo
 ADMIN_PORT =
 RELOAD_UI = yes
 DISPLAY_NAME = Auto-Sub Bootstrap Bill
-CHANGELOG = "1. Updated the package from the new GitHub."
+CHANGELOG = "1. Updated the package from GitHub."
 
 HOMEPAGE   = https://github.com/BenjV/autosub-bootstrapbill
 LICENSE    =
