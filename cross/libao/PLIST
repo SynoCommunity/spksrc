@@ -1,0 +1,9 @@
+lib:lib/ao/plugins-4/libalsa.so
+lob:lib/ao/plugins-4/liboss.so
+lib:lib/ao/plugins-4/libpulse.so
+lib:lib/ckport/db/libao.ckport
+lnk:lib/libao.so
+lnk:lib/libao.so.4
+lib:lib/libao.so.4.1.0
+lib:lib/pkgconfig/ao.pc
+

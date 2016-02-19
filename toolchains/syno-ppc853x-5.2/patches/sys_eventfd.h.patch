@@ -1,0 +1,10 @@
+--- powerpc-none-linux-gnuspe/include/sys/eventfd.h 2016-01-26 13:33:27.325627641 +0100
++++ powerpc-none-linux-gnuspe/include/sys/eventfd.h 2016-01-25 20:42:40.806853546 +0100
+@@ -20,6 +20,7 @@
+ #define _SYS_EVENTFD_H 1
+
+ #include <stdint.h>
++#include <bits/eventfd.h>
+
+ /* Type for event counter. */
+ typedef uint64_t eventfd_t;

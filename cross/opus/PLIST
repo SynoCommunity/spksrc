@@ -1,0 +1,5 @@
+lnk:lib/libopus.so
+lnk:lib/libopus.so.0
+lib:lib/libopus.so.0.5.1
+lib:lib/pkgconfig/opus.pc
+

@@ -1,0 +1,39 @@
+--- configure.ac.orig	2007-04-17 21:05:32.000000000 +0200
++++ configure.ac	2016-01-24 17:02:35.020876102 +0100
+@@ -8,6 +8,9 @@
+ 
+ CFLAGS="$CFLAGS -O3 -fomit-frame-pointer -fPIC"
+ 
++AC_PROG_CC
++AC_PROG_CXX
++
+ AC_C_BIGENDIAN(,CFLAGS="$CFLAGS -DMPC_LITTLE_ENDIAN",)
+ 
+ AC_HEADER_STDC
+@@ -58,10 +61,15 @@
+ 	ac_cv_c_int64_t=int64_t
+ fi
+ 
++if test "x$cross_compiling" = "xyes" ; then
++AC_CHECK_FUNCS([memcmp], [],
++        AC_MSG_ERROR([memcmp is missing.]))
++else
+ AC_FUNC_MEMCMP
+ if test "x$ac_cv_func_memcmp_working" = "xno" ; then
+ 	AC_MSG_ERROR([working memcmp is not available.])
+ fi
++fi
+ 
+ AC_CHECK_FUNCS([memmove memset], [],
+         AC_MSG_ERROR([memset or memmove is missing.]))
+--- configure	2007-04-17 21:05:56.000000000 +0200
++++ configure	2016-01-24 17:28:51.811102320 +0100
+@@ -20533,7 +20533,7 @@
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   if test "$cross_compiling" = yes; then
+-  ac_cv_func_memcmp_working=no
++  ac_cv_func_memcmp_working=yes
+ else
+   cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */

@@ -1,0 +1,24 @@
+--- libsidplay/src/player.cpp	2007-02-10 15:30:28.000000000 +0100
++++ libsidplay/src/player.cpp	2007-02-10 15:28:44.000000000 +0100
+@@ -175,6 +175,10 @@
+ #   include <new>
+ #endif
+ 
++#ifdef HAVE_UNISTD_H
++#   include <unistd.h>
++#endif
++
+ #include "player.h"
+ #include "keyboard.h"
+ 
+@@ -670,6 +674,10 @@
+         m_driver.selected->write ();
+         // Deliberate run on
+     case playerPaused:
++#ifdef HAVE_UNISTD_H
++	if (m_state == playerPaused)
++	    usleep(100000);
++#endif
+         // Check for a keypress (approx 250ms rate, but really depends
+         // on music buffer sizes).  Don't do this for high quiet levels
+         // as chances are we are under remote control.

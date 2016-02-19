@@ -1,0 +1,6 @@
+bin:bin/sndfile-resample
+lnk:lib/libsamplerate.so
+lnk:lib/libsamplerate.so.0
+lib:lib/libsamplerate.so.0.1.8
+lib:lib/pkgconfig/samplerate.pc
+

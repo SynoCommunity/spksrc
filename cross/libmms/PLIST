@@ -1,0 +1,4 @@
+lnk:lib/libmms.so
+lnk:lib/libmms.so.0
+lib:lib/libmms.so.0.0.2
+lib:lib/pkgconfig/libmms.pc

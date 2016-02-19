@@ -1,0 +1,18 @@
+--- configure.old	2014-12-06 20:58:24.000000000 +0100
++++ configure	2015-12-31 17:03:41.182966740 +0100
+@@ -12806,7 +12806,6 @@
+   enableval=$enable_binaries;
+ fi
+ 
+-if test "$enableval" != no; then
+ 
+ 
+ 
+@@ -12928,6 +12927,7 @@
+ 	fi
+ fi
+ 
++if test "$enableval" != no; then
+ pkg_failed=no
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OGG" >&5
+ $as_echo_n "checking for OGG... " >&6; }

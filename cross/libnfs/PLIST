@@ -1,0 +1,17 @@
+bin:bin/nfs-cat
+bin:bin/nfs-cp
+bin:bin/nfs-ls
+rsc:include/nfsc/libnfs.h
+rsc:include/nfsc/libnfs-raw.h
+rsc:include/nfsc/libnfs-raw-mount.h
+rsc:include/nfsc/libnfs-raw-nfs.h
+rsc:include/nfsc/libnfs-raw-nlm.h
+rsc:include/nfsc/libnfs-raw-nsm.h
+rsc:include/nfsc/libnfs-raw-portmap.h
+rsc:include/nfsc/libnfs-raw-rquota.h
+rsc:include/nfsc/libnfs-zdr.h
+lnk:lib/libnfs.so
+lnk:lib/libnfs.so.8
+lib:lib/libnfs.so.8.1.0
+lib:lib/pkgconfig/libnfs.pc
+

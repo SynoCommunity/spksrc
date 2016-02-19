@@ -1,0 +1,3 @@
+bin:bin/fftw-wisdom
+bin:bin/fftw-wisdom-to-conf
+lib:lib/pkgconfig/fftw3.pc

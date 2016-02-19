@@ -1,0 +1,4 @@
+lnk:lib/libjson-c.so
+lnk:lib/libjson-c.so.2
+lib:lib/libjson-c.so.2.0.1
+lib:lib/pkgconfig/json-c.pc

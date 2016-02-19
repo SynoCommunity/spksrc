@@ -1,1 +1,3 @@
 bin:bin/mpd
+shr:share/doc/mpd/mpdconf.example
+shr:share/doc/mpd/NEWS

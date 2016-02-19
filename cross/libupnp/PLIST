@@ -1,0 +1,10 @@
+lnk:lib/libixml.so
+lnk:lib/libixml.so.2
+lib:lib/libixml.so.2.0.8
+lnk:lib/libthreadutil.so
+lnk:lib/libthreadutil.so.6
+lib:lib/libthreadutil.so.6.0.4
+lnk:lib/libupnp.so
+lnk:lib/libupnp.so.6
+lib:lib/libupnp.so.6.3.3
+lib:lib/pkgconfig/libupnp.pc

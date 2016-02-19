@@ -1,0 +1,5 @@
+lib:lib/ckport/db/libshout.ckport
+lnk:lib/libshout.so
+lnk:lib/libshout.so.3
+lib:lib/libshout.so.3.2.0
+lib:lib/pkgconfig/shout.pc

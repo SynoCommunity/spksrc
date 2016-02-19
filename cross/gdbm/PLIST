@@ -1,0 +1,4 @@
+rsc:include/gdbm.h
+lnk:lib/libgdbm.so
+lnk:lib/libgdbm.so.3
+lib:lib/libgdbm.so.3.0.0

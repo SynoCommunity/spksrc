@@ -12,6 +12,7 @@ COMMENT  = Libxml2 is the XML C parser and toolkit developed for the Gnome proje
 LICENSE  = MIT
 
 CONFIGURE_ARGS = --without-python --with-zlib=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --disable-static
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
 ifeq ($(findstring $(ARCH),88f5281),$(ARCH))

@@ -1,0 +1,5 @@
+lnk:lib/libmpdclient.so
+lnk:lib/libmpdclient.so.2
+lib:lib/libmpdclient.so.2.0.10
+lib:lib/pkgconfig/libmpdclient.pc
+

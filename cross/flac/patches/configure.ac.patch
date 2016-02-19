@@ -1,0 +1,18 @@
+--- configure.ac	2014-11-27 03:45:33.598155000 +0100
++++ configure.ac	2015-12-21 22:50:48.205102307 +0100
+@@ -348,14 +348,13 @@
+ 
+ if test "x$debug" = xtrue; then
+ 	CPPFLAGS="-DDEBUG $CPPFLAGS"
+-	CFLAGS=$(echo "$CFLAGS" | sed 's/-g//')
+ 	CFLAGS="-g $CFLAGS"
+ else
+ 	CPPFLAGS="-DNDEBUG $CPPFLAGS"
+-	CFLAGS=$(echo "$CFLAGS" | sed 's/-O2//;s/-g//')
++	CFLAGS=$(echo "$CFLAGS" | sed 's/-O2//')
+ 	CFLAGS="-O3 -funroll-loops $CFLAGS"
+ fi
+ 
+ XIPH_GCC_VERSION
+ 
+ if test x$ac_cv_c_compiler_gnu = xyes ; then

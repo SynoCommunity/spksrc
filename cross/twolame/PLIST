@@ -1,0 +1,5 @@
+lnk:lib/libtwolame.so
+lnk:lib/libtwolame.so.0
+lib:lib/libtwolame.so.0.0.0
+lib:lib/pkgconfig/twolame.pc
+

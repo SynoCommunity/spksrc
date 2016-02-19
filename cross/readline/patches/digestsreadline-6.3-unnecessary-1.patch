@@ -1,0 +1,59 @@
+--- Makefile.in
++++ Makefile.in
+@@ -245,7 +245,7 @@
+ installdirs: $(srcdir)/support/mkinstalldirs
+ 	-$(SHELL) $(srcdir)/support/mkinstalldirs $(DESTDIR)$(includedir) \
+ 		$(DESTDIR)$(includedir)/readline $(DESTDIR)$(libdir) \
+-		$(DESTDIR)$(infodir) $(DESTDIR)$(man3dir) $(DESTDIR)$(docdir)
++		$(DESTDIR)$(man3dir)
+ 
+ uninstall: uninstall-headers uninstall-doc uninstall-examples
+ 	-test -n "$(DESTDIR)$(libdir)" && cd $(DESTDIR)$(libdir) && \
+@@ -265,7 +265,6 @@
+ 	-( cd examples; ${MAKE} ${MFLAGS} DESTDIR=${DESTDIR} uninstall )
+ 
+ install-doc:	installdirs
+-	$(INSTALL_DATA) $(OTHER_DOCS) $(DESTDIR)$(docdir)
+ 	-( if test -d doc ; then \
+ 		cd doc && \
+ 		${MAKE} ${MFLAGS} infodir=$(infodir) DESTDIR=${DESTDIR} install; \
+--- doc/Makefile.in
++++ doc/Makefile.in
+@@ -197,35 +197,12 @@
+ 	$(RM) Makefile
+ 
+ installdirs:	$(topdir)/support/mkdirs
+-	-$(SHELL) $(topdir)/support/mkdirs $(DESTDIR)$(infodir) $(DESTDIR)$(man3dir)
++	-$(SHELL) $(topdir)/support/mkdirs $(DESTDIR)$(man3dir)
+ 	-if test -n "${htmldir}" ; then \
+ 		$(SHELL) $(topdir)/support/mkdirs $(DESTDIR)$(htmldir) ; \
+ 	fi
+ 
+ install:	installdirs
+-	if test -f readline.info; then \
+-		${INSTALL_DATA} readline.info $(DESTDIR)$(infodir)/readline.info; \
+-	else \
+-		${INSTALL_DATA} $(srcdir)/readline.info $(DESTDIR)$(infodir)/readline.info; \
+-	fi
+-	if test -f rluserman.info; then \
+-		${INSTALL_DATA} rluserman.info $(DESTDIR)$(infodir)/rluserman.info; \
+-	else \
+-		${INSTALL_DATA} $(srcdir)/rluserman.info $(DESTDIR)$(infodir)/rluserman.info; \
+-	fi
+-	if test -f history.info; then \
+-		${INSTALL_DATA} history.info $(DESTDIR)$(infodir)/history.info; \
+-	else \
+-		${INSTALL_DATA} $(srcdir)/history.info $(DESTDIR)$(infodir)/history.info; \
+-	fi
+-	-if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+-		install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+-			$(DESTDIR)$(infodir)/readline.info ; \
+-		install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+-			$(DESTDIR)$(infodir)/history.info ; \
+-		install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+-			$(DESTDIR)$(infodir)/rluserman.info ; \
+-	else true; fi
+ 	-${INSTALL_DATA} $(srcdir)/readline.3 $(DESTDIR)$(man3dir)/readline$(man3ext)
+ 	-${INSTALL_DATA} $(srcdir)/history.3 $(DESTDIR)$(man3dir)/history$(man3ext)
+ 	-if test -n "${htmldir}" ; then \
+

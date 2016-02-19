@@ -1,0 +1,10 @@
+--- common/mp4ff/Makefile.am	2009-02-06 15:24:21.000000000 +0100
++++ common/mp4ff/Makefile.am	2013-07-28 15:08:46.363310961 +0200
+@@ -1,5 +1,5 @@
+-lib_LIBRARIES = libmp4ff.a
+-include_HEADERS = mp4ff.h mp4ffint.h
++noinst_LIBRARIES = libmp4ff.a
++noinst_HEADERS = mp4ff.h mp4ffint.h
+ 
+ libmp4ff_a_CFLAGS = -DUSE_TAGGING=1
+ 

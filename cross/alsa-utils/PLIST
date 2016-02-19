@@ -1,6 +1,7 @@
 bin:bin/aconnect
 bin:bin/alsaloop
 bin:bin/alsamixer
+bin/alsatplg
 bin:bin/alsaucm
 bin:bin/amidi
 bin:bin/amixer

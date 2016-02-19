@@ -1,0 +1,4 @@
+lnk:lib/libbinio.so
+lnk:lib/libbinio.so.1
+lib:lib/libbinio.so.1.0.0
+lib:lib/pkgconfig/libbinio.pc

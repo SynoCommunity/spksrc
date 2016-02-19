@@ -1,0 +1,28 @@
+--- src/args.cpp	2009-05-11 21:57:04.000000000 +0200
++++ src/args.cpp	2009-05-11 22:06:46.000000000 +0200
+@@ -97,21 +97,22 @@
+ {
+     char *sep;
+     uint_least32_t _time;
++    char *str_copy = strdup(str);
+ 
+     // Check for empty string
+     if (*str == '\0')
+         return false;
+ 
+-    sep = strstr (str, ":");
++    sep = strstr (str_copy, ":");
+     if (!sep)
+     {   // User gave seconds
+-        _time = atoi (str);
++        _time = atoi (str_copy);
+     }
+     else
+     {   // Read in MM:SS format
+         int val;
+         *sep = '\0';
+-        val  = atoi (str);
++        val  = atoi (str_copy);
+         if (val < 0 || val > 99)
+             return false;
+         _time = (uint_least32_t) val * 60;

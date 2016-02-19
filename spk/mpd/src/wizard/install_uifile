@@ -1,0 +1,52 @@
+[{
+    "step_title": "Configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configuration location",
+        "subitems": [{
+            "key": "wizard_mpd_dir",
+            "desc": "Config directory",
+            "defaultValue": "/volume1/mpd/",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 8
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Configuration filename (without path)",
+        "subitems": [{
+            "key": "wizard_mpd_conf",
+            "desc": "MPD Config file",
+            "defaultValue": "mpd.conf",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 8
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "PID filename",
+        "subitems": [{
+            "key": "wizard_mpd_pid",
+            "desc": "PID file",
+            "defaultValue": "mpd.pid",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 7
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Log filename",
+        "subitems": [{
+            "key": "wizard_mpd_log",
+            "desc": "Log file",
+            "defaultValue": "mpd.log",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 7
+            }
+        }]
+    }]
+}]

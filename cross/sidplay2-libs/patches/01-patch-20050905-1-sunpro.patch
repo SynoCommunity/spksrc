@@ -1,0 +1,44 @@
+--- builders/resid-builder/src/resid.cpp	Mon Jun 14 22:07:58 2004
++++ builders/resid-builder/src/resid.cpp	Mon Sep  5 20:23:18 2005
+@@ -26,7 +26,7 @@
+ #include "resid-emu.h"
+ 
+ 
+-char ReSID::m_credit[];
++char ReSID::m_credit[180];
+ 
+ ReSID::ReSID (sidbuilder *builder)
+ :sidemu(builder),
+--- libsidplay/include/sidplay/SidTune.h	Mon Jun 14 22:08:04 2004
++++ libsidplay/include/sidplay/SidTune.h	Mon Sep  5 20:08:53 2005
+@@ -58,7 +58,7 @@
+ 
+ 
+ // Required to export template
+-#ifndef _SidTune_cpp_
++#if !defined(_SidTune_cpp_) && !defined(__sun)
+ extern
+ #endif
+ template class SID_EXTERN Buffer_sidtt<const uint_least8_t>;
+--- libsidplay/src/player.cpp	Mon Jun 14 22:08:02 2004
++++ libsidplay/src/player.cpp	Mon Sep  5 20:17:27 2005
+@@ -339,7 +339,7 @@
+ const char  *Player::ERR_MEM_ALLOC             = "SIDPLAYER ERROR: Memory Allocation Failure.";
+ const char  *Player::ERR_UNSUPPORTED_MODE      = "SIDPLAYER ERROR: Unsupported Environment Mode (Coming Soon).";
+ 
+-const char  *Player::credit[];
++const char *Player::credit[10];
+ 
+ 
+ // Set the ICs environment variable to point to
+--- resid/sid.cc	Mon Jun 14 22:08:23 2004
++++ resid/sid.cc	Mon Sep  5 20:20:50 2005
+@@ -552,7 +552,7 @@
+   // sample_offset a whole multiple of the filter table resolution.
+   int res = method == SAMPLE_RESAMPLE_INTERPOLATE ?
+     FIR_RES_INTERPOLATE : FIR_RES_FAST;
+-  int n = (int)ceil(log(res/f_cycles_per_sample)/log(2));
++  int n = (int)ceil(log((long double)(res/f_cycles_per_sample))/log((long double)2));
+   fir_RES = 1 << n;
+ 
+   // Allocate memory for FIR tables.

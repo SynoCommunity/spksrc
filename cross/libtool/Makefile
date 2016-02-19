@@ -1,5 +1,5 @@
 PKG_NAME = libtool
-PKG_VERS = 2.4.2
+PKG_VERS = 2.4.6
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)

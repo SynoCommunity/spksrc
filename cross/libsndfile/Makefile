@@ -1,11 +1,11 @@
 PKG_NAME = libsndfile
-PKG_VERS = 1.0.25
+PKG_VERS = 1.0.26
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 PKG_DIST_SITE = http://www.mega-nerd.com/libsndfile/files
 
-DEPENDS =
+DEPENDS = cross/alsa-lib cross/flac cross/libogg cross/libvorbis cross/sqlite
 
 HOMEPAGE = http://www.mega-nerd.com/libsndfile/
 COMMENT  = C library for reading and writing files containing sampled sound
@@ -13,6 +13,7 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 INSTALL_TARGET = myInstall
+CONFIGURE_ARGS = --disable-static 
 
 include ../../mk/spksrc.cross-cc.mk
 

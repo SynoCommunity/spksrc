@@ -1,0 +1,9 @@
+bin:bin/cd-paranoia
+lnk:lib/libcdio_cdda.so
+lnk:lib/libcdio_cdda.so.2
+lib:lib/libcdio_cdda.so.2.0.0
+lnk:lib/libcdio_paranoia.so
+lnk:lib/libcdio_paranoia.so.2
+lib:lib/libcdio_paranoia.so.2.0.0
+lib:lib/pkgconfig/libcdio_cdda.pc
+lib:lib/pkgconfig/libcdio_paranoia.pc
