@@ -13,10 +13,10 @@ TC_BASE_DIR = i686-pc-linux-gnu
 TC_PREFIX = i686-pc-linux-gnu
 TC_TARGET = i686-pc-linux-gnu
 
-TC_CFLAGS =
-TC_CPPFLAGS =
-TC_CXXFLAGS =
-TC_LDFLAGS =
+TC_CFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/usr/include
+TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/usr/include
+TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/usr/include
+TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/lib
 
 FIX_TARGET = myFix
 
