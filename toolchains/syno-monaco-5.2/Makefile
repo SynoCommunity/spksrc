@@ -7,7 +7,8 @@ TC_FIRMWARE = 5.2-5644
 TC_DIST_NAME = monaco-gcc483_glibc219_hard-GPL.txz
 
 TC_EXT = txz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/STMicroelectronics%20Monaco%20Linux%203.10.35
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/STMicroelectronics%20Monaco%20Linux%203.10.35
+               #https://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/STMicroelectronics%20Monaco%20Linux%203.10.35/monaco-gcc483_glibc219_hard-GPL.txz/download
 
 TC_BASE_DIR = arm-cortexa9hf-linux-gnueabi
 TC_PREFIX = arm-cortexa9hf-linux-gnueabi
@@ -16,7 +17,7 @@ TC_TARGET = arm-cortexa9hf-linux-gnueabi
 TC_CFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
-TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/lib -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
+TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/lib -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 
 FIX_TARGET = myFix
 
