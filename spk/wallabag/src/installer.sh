@@ -7,6 +7,7 @@ DNAME="Wallabag"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
+USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 
 
 preinst ()
@@ -21,6 +22,9 @@ postinst ()
 
     # Install the web interface
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+
+    # permissions
+    chown -R ${USER} ${WEB_DIR}/${SHORTNAME}
 
     exit 0
 }
