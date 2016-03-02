@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.wallabag": {
+            "title": "Wallabag",
+            "desc": "Wallabag is a self hostable application allowing you to not miss any content anymore. Click, save, read it when you can. It extracts content so that you can read it when you have time.",
+            "icon": "images/wallabag-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/wallabag",
+            "allUsers": false,
+            "grantPrivilege": "local"
+        }
+    }
+}
