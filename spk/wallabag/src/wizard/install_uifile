@@ -1,0 +1,38 @@
+[
+   {
+      "step_title":"Wallabag database configuration",
+      "items":[
+               {
+            "type":"password",
+            "desc":"Enter your MySQL password.",
+            "subitems":[
+               {
+                  "key":"wizard_mysql_password_root",
+                  "desc":"Root password",
+                  "validator":{
+                     "allowBlank":false
+                  }
+               }
+            ]
+         },
+         {
+            "type":"password",
+            "desc":"A 'wallabag' MySQL user and database will be created. Please enter a password for the 'wallabag' user.",
+            "subitems":[
+               {
+                  "key":"wizard_mysql_database_password",
+                  "desc":"User password",
+                  "validator":{
+                     "allowBlank":false
+                  }
+               }
+            ]
+         }
+      ]
+   }, {
+    "step_title": "First login",
+    "items": [{
+        "desc": "The default credentials for the web interface is wallabag:wallabag. Change it on 'User Management' page."
+    }]
+}
+]

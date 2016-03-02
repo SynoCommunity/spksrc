@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.wallabag": {
+            "title": "Wallabag",
+            "desc": "Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.",
+            "icon": "images/wallabag-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/wallabag/web",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
