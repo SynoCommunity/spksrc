@@ -1,0 +1,3 @@
+
+bin:bin/pinentry
+bin:bin/pinentry-curses
