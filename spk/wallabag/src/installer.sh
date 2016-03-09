@@ -8,6 +8,7 @@ DNAME="Wallabag"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
 USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()
@@ -46,11 +47,20 @@ postuninst ()
 }
 
 preupgrade ()
-{
+{	
+	rm -fr ${WEB_DIR}/${PACKAGE}/cache/*
+	rm -fr ${WEB_DIR}/${PACKAGE}/install/
+	rm -fr ${TMP_DIR}/${PACKAGE}
+	mkdir -p ${TMP_DIR}/${PACKAGE}
+	mv ${WEB_DIR}/${PACKAGE}/inc/poche/config.inc.php ${TMP_DIR}/${PACKAGE}/
+	mv ${WEB_DIR}/${PACKAGE}/db ${TMP_DIR}/${PACKAGE}/
     exit 0
 }
 
 postupgrade ()
 {
+	mv ${TMP_DIR}/${PACKAGE}/config.inc.php ${WEB_DIR}/${PACKAGE}/inc/poche/
+	mv ${TMP_DIR}/${PACKAGE}/db ${WEB_DIR}/${PACKAGE}/
+	rm -fr ${TMP_DIR}/${PACKAGE}
     exit 0
 }
