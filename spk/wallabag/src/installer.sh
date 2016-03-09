@@ -24,7 +24,7 @@ postinst ()
     cp -R ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
 
     # permissions
-    chown -R ${USER} ${WEB_DIR}/${SHORTNAME}
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
 
     exit 0
 }
