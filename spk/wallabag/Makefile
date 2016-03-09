@@ -1,5 +1,5 @@
 SPK_NAME = wallabag
-SPK_VERS = 1.9.1-b
+SPK_VERS = 1.9.1
 SPK_REV = 1
 SPK_ICON = src/wallabag.png
 DSM_UI_DIR = app
