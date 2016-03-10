@@ -1,21 +1,20 @@
 SPK_NAME = mantisbt
-SPK_VERS = 1.2.17
-SPK_REV = 2
+SPK_VERS = 1.2.19
+SPK_REV = 3
 SPK_ICON = src/mantisbt.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
-DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d'accès que Bugzilla et facilement modifiable.
-ADMIN_URL = /mantisbt/
+DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d\\\'accès que Bugzilla et facilement modifiable.
+ADMIN_URL = /mantisbt
 RELOAD_UI = yes
-STARTABLE = no
 DISPLAY_NAME = MantisBT
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = Update to 1.2.19
 
-HOMEPAGE   = http://www.mantisbt.org/
+HOMEPAGE   = http://www.mantisbt.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/

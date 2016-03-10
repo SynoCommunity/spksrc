@@ -8,7 +8,7 @@ DEPENDS  =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
 DESCRIPTION_FRE = Debian est un système d\\\'exploitation \\\(SE\\\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
@@ -34,7 +34,7 @@ endif
 ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine monaco),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64),$(ARCH))
 DEBIAN_ARCH = i386
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))

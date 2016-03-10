@@ -1,6 +1,6 @@
 SPK_NAME = tmux
-SPK_VERS = 1.9a
-SPK_REV = 1
+SPK_VERS = 2.1
+SPK_REV = 2
 SPK_ICON = src/tmux.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -11,13 +11,13 @@ RELOAD_UI = no
 DISPLAY_NAME = Tmux
 STARTABLE = no
 BETA = 1
+CHANGELOG = Update to 2.1
 
-HOMEPAGE   = http://sourceforge.net/projects/tmux/
+HOMEPAGE   = http://tmux.github.io
 LICENSE    = BSD License
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

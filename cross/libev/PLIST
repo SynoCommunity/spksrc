@@ -1,0 +1,3 @@
+lnk:lib/libev.so
+lnk:lib/libev.so.4
+lib:lib/libev.so.4.0.0

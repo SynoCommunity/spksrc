@@ -5,7 +5,9 @@
             "desc": "Mylar Web UI",
             "icon": "images/mylar-{0}.png",
             "type": "url",
-            "url": "3rdparty/mylar/mylar.cgi",
+            "protocol": "http",
+            "port": "8090",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }

@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-HOMEPAGE = http://xmlsoft.org/
+HOMEPAGE = http://xmlsoft.org
 COMMENT  = Libxml2 is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform)
 LICENSE  = MIT
 

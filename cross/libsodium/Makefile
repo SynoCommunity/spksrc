@@ -1,5 +1,5 @@
 PKG_NAME = libsodium
-PKG_VERS = 1.0.3
+PKG_VERS = 1.0.7
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)

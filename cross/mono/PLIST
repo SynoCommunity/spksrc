@@ -70,9 +70,6 @@ lib:lib/libMonoPosixHelper.so
 lnk:lib/libmono-profiler-aot.so
 lnk:lib/libmono-profiler-aot.so.0
 lib:lib/libmono-profiler-aot.so.0.0.0
-lnk:lib/libmono-profiler-cov.so
-lnk:lib/libmono-profiler-cov.so.0
-lib:lib/libmono-profiler-cov.so.0.0.0
 lnk:lib/libmono-profiler-iomap.so
 lnk:lib/libmono-profiler-iomap.so.0
 lib:lib/libmono-profiler-iomap.so.0.0.0

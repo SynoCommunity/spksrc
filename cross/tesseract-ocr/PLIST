@@ -1,15 +1,6 @@
-bin:bin/ambiguous_words
-bin:bin/classifier_tester
-bin:bin/cntraining
-bin:bin/combine_tessdata
-bin:bin/dawg2wordlist
-bin:bin/mftraining
-bin:bin/shapeclustering
 bin:bin/tesseract
-bin:bin/unicharset_extractor
-bin:bin/wordlist2dawg
 lnk:lib/libtesseract.so
 lnk:lib/libtesseract.so.3
-lib:lib/libtesseract.so.3.0.2
+lib:lib/libtesseract.so.3.0.4
 rsc:share/tessdata/configs
 rsc:share/tessdata/tessconfigs

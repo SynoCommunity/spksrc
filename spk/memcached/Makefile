@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/phpmemcachedadmin cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Free \& open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load. It comes with phpMemcachedAdmin, a graphic stand-alone administration for memcached to monitor and debug purpose.
 ADMIN_URL = /phpMemcachedAdmin/
 RELOAD_UI = yes

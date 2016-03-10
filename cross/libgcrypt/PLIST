@@ -3,4 +3,4 @@ bin:bin/hmac256
 bin:bin/mpicalc
 lnk:lib/libgcrypt.so
 lnk:lib/libgcrypt.so.20
-lib:lib/libgcrypt.so.20.0.3
+lib:lib/libgcrypt.so.20.0.4

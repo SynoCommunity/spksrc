@@ -55,7 +55,7 @@ preinst ()
             echo "Watch directory ${wizard_watch_dir} does not exist."
             exit 1
         fi
-        if [ -n "${wizard_complete_dir}" -a ! -d "${wizard_incomplete_dir}" ]; then
+        if [ -n "${wizard_complete_dir}" -a ! -d "${wizard_complete_dir}" ]; then
             echo "Complete directory ${wizard_complete_dir} does not exist."
             exit 1
         fi
@@ -76,7 +76,7 @@ postinst ()
     ${INSTALL_DIR}/env/bin/pip install --use-wheel --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /dev/null 2>&1
 
     # Install Deluge
-    env PYTHON_EGG_CACHE=${INSTALL_DIR}/env/cache && cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py build && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null
+    export PYTHON_EGG_CACHE=${INSTALL_DIR}/env/cache && cd ${INSTALL_DIR}/share/deluge && ${INSTALL_DIR}/env/bin/python setup.py build > /dev/null 2>&1 && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null 2>&1
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}

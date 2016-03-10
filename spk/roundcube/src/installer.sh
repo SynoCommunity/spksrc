@@ -125,6 +125,16 @@ preupgrade ()
         fi
     done
 
+    # Save user installed skins
+    mkdir -p ${TMP_DIR}/${PACKAGE}/skins
+    for skin in ${WEB_DIR}/${PACKAGE}/skins/*/
+    do
+        dir=`basename $skin`
+        if [ ! -d ${INSTALL_DIR}/share/${PACKAGE}/skins/${dir} ]; then
+            cp -pR ${WEB_DIR}/${PACKAGE}/skins/${dir} ${TMP_DIR}/${PACKAGE}/skins/
+        fi
+    done
+
     exit 0
 }
 
@@ -143,6 +153,15 @@ postupgrade ()
         dir=`basename $plugin`
         if [ ! -d ${WEB_DIR}/${PACKAGE}/plugins/${dir} ]; then
             cp -pR ${TMP_DIR}/${PACKAGE}/plugins/${dir} ${WEB_DIR}/${PACKAGE}/plugins/
+        fi
+    done
+
+    # Restore user installed skins
+    for skin in ${TMP_DIR}/${PACKAGE}/skin/*/
+    do
+        dir=`basename $skin`
+        if [ ! -d ${WEB_DIR}/${PACKAGE}/skins/${dir} ]; then
+            cp -pR ${TMP_DIR}/${PACKAGE}/skins/${dir} ${WEB_DIR}/${PACKAGE}/skins/
         fi
     done
 

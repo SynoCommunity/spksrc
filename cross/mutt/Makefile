@@ -1,13 +1,13 @@
 PKG_NAME = mutt
-PKG_VERS = 1.5.23
+PKG_VERS = 1.5.24
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)
+PKG_DIST_SITE = ftp://ftp.mutt.org/pub/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw cross/openssl
 
-HOMEPAGE = http://www.mutt.org/
+HOMEPAGE = http://www.mutt.org
 COMMENT  = Mutt is a small but very powerful text-based mail client for Unix operating systems.
 LICENSE  = GPLv2
 

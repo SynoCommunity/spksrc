@@ -9,4 +9,4 @@ lnk:bin/xzcat
 bin:bin/xzdec
 lnk:lib/liblzma.so
 lnk:lib/liblzma.so.5
-lib:lib/liblzma.so.5.0.4
+lib:lib/liblzma.so.5.2.2

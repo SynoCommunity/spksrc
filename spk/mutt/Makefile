@@ -1,6 +1,6 @@
 SPK_NAME = mutt
-SPK_VERS = 1.5.23
-SPK_REV = 1
+SPK_VERS = 1.5.24
+SPK_REV = 2
 SPK_ICON = src/mutt.png
 
 DEPENDS = cross/mutt
@@ -11,13 +11,13 @@ RELOAD_UI = no
 DISPLAY_NAME = Mutt
 STARTABLE = no
 BETA = 1
+CHANGELOG = Update to 1.5.24
 
-HOMEPAGE   = http://www.mutt.org/
+HOMEPAGE   = http://www.mutt.org
 LICENSE    = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = 
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

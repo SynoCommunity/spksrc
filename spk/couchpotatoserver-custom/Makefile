@@ -4,10 +4,10 @@ SPK_REV = 4
 SPK_ICON = src/couchpotatoserver-custom.png
 DSM_UI_DIR = app
 
-DEPENDS  = 
+DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = CouchPotato Custom allows you to run the fork of your choice of CouchPotato. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = CouchPotato Custom vous permet d\\\'exécuter le fork de votre choix de CouchPotato. Vous aurez besoin de saisir l\\\'URL git du fork durant l\\\'installation.
 ADMIN_PORT = 5053

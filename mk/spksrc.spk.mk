@@ -70,15 +70,14 @@ $(WORK_DIR)/INFO:
 	   ) \
 	) | sed 's|"\s|"\n|' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
-	@echo distributor=\"SynoCommunity\" >> $@
-	@echo distributor_url=\"http://synocommunity.com\" >> $@
-ifeq ($(strip $(MAINTAINER)),SynoCommunity)
-	@echo maintainer=\"SynoCommunity\" >> $@
-	@echo maintainer_url=\"http://synocommunity.com\" >> $@
+ifneq ($(strip $(MAINTAINER)),)
+	@echo maintainer=\"$(MAINTAINER)\" >> $@
 else
-	@echo maintainer=\"SynoCommunity/$(MAINTAINER)\" >> $@
-	@echo maintainer_url=\"http://synocommunity.com/developers/$(MAINTAINER)\" >> $@
+	$(error Set MAINTAINER in local.mk)
 endif
+	@echo maintainer_url=\"$(MAINTAINER_URL)\" >> $@
+	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
+	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
@@ -89,7 +88,7 @@ else
   endif
 endif
 ifneq ($(strip $(BETA)),)
-	@echo report_url=\"https://github.com/SynoCommunity/spksrc/issues\" >> $@
+	@echo report_url=\"$(REPORT_URL)\" >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
@@ -399,14 +398,14 @@ publish-latest-arch-%:
 
 all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
 	  $(MAKE) arch-$$arch-$* ; \
 	done \
 
 publish-all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
 	  $(MAKE) publish-arch-$$arch-$* ; \
 	done \

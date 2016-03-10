@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.11.15
+PKG_VERS = 0.12.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
@@ -30,7 +30,7 @@ endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
@@ -71,5 +71,3 @@ myComp:
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(SYNCTHING_BIN) $(STAGING_INSTALL_PREFIX)/bin/
-
-

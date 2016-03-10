@@ -1,2 +1,5 @@
 [MariaDB]
 dsm_min_ver=5.0-4300
+
+[PHP5.6]
+dsm_min_ver=6.0-7135

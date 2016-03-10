@@ -1,1 +1,1 @@
-lib:@PYTHON_SITE_PACKAGES@/_bcrypt_cffi_*.so
+lib:@PYTHON_SITE_PACKAGES@/bcrypt/_bcrypt*.so

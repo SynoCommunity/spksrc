@@ -8,7 +8,7 @@ DEPENDS  = cross/busybox cross/dtach cross/$(SPK_NAME)
 WHEELS = certifi backports.ssl-match-hostname tornado html5lib
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
 DESCRIPTION_FRE = Gate One est un émulateur de terminal et un client SSH fonctionnant en HTML5
 ADMIN_PROTOCOL = https
