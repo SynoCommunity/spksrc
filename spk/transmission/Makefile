@@ -13,7 +13,7 @@ DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "Update Transmission to 2.92"
+CHANGELOG = "1. Update Transmission to 2.92<br>2. Enable sc-download group"
 
 HOMEPAGE = http://www.transmissionbt.com
 LICENSE  = GPLv2/GPLv3
