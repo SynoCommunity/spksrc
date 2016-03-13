@@ -5,7 +5,8 @@
             "desc": "Tvheadend Web UI",
             "icon": "images/tvheadend-{0}.png",
             "type": "url",
-            "url": "3rdparty/tvheadend/tvheadend.cgi",
+            "port": "9981",
+            "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
         }
