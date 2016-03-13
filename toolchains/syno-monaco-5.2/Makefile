@@ -7,8 +7,7 @@ TC_FIRMWARE = 5.2-5644
 TC_DIST_NAME = monaco-gcc483_glibc219_hard-GPL.txz
 
 TC_EXT = txz
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/STMicroelectronics%20Monaco%20Linux%203.10.35
-               #https://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/STMicroelectronics%20Monaco%20Linux%203.10.35/monaco-gcc483_glibc219_hard-GPL.txz/download
+TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/STMicroelectronics%20Monaco%20Linux%203.10.35
 
 TC_BASE_DIR = arm-cortexa9hf-linux-gnueabi
 TC_PREFIX = arm-cortexa9hf-linux-gnueabi
