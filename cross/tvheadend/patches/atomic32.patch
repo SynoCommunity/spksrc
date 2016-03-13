@@ -14,9 +14,9 @@ diff -Naur configure.orig configure
  uint64_t test(uint64_t *ptr){
  return __sync_fetch_and_add(ptr, 1);
 diff -Naur src/atomic.h.orig src/atomic.h
---- src/atomic.h.orig	2013-04-18 16:23:19.000000000 +0200
-+++ src/atomic.h	2013-04-25 20:04:20.788382225 +0200
-@@ -21,13 +21,31 @@
+--- src/atomic.h.orig   2016-03-13 18:58:10.242043596 -0400
++++ src/atomic.h        2016-03-13 19:04:28.360549636 -0400
+@@ -21,7 +21,16 @@
  static inline int
  atomic_add(volatile int *ptr, int incr)
  {
@@ -31,7 +31,9 @@ diff -Naur src/atomic.h.orig src/atomic.h
 +  return ret;
 +#endif
  }
- 
+
+ static inline int
+@@ -33,7 +42,16 @@
  static inline int
  atomic_exchange(volatile int *ptr, int new)
  {
@@ -46,5 +48,5 @@ diff -Naur src/atomic.h.orig src/atomic.h
 +  return ret;
 +#endif
  }
- 
+
  static inline uint64_t
