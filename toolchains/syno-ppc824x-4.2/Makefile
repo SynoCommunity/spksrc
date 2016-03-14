@@ -13,9 +13,9 @@ TC_BASE_DIR = powerpc-linux
 TC_PREFIX = powerpc-linux
 TC_TARGET = powerpc-unknown-linux
 
-TC_CFLAGS =
-TC_CPPFLAGS =
-TC_CXXFLAGS =
-TC_LDFLAGS =
+TC_CFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/include
+TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/include
+TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/include
+TC_LDFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/lib
 
 include ../../mk/spksrc.tc.mk
