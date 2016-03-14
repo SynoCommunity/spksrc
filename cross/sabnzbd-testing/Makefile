@@ -1,8 +1,8 @@
 PKG_NAME = SABnzbd
-PKG_VERS = 0.8.0Beta5
+PKG_VERS = 1.0.0RC5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
-PKG_DIST_SITE = http://downloads.sourceforge.net/project/sabnzbdplus/sabnzbdplus-beta/$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/sabnzbd/sabnzbd/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
