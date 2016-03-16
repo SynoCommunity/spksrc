@@ -3,7 +3,7 @@ SPK_VERS = 1.0.0
 SPK_REV = 5
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
-BETA = 0
+BETA = 1
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
 SPK_DEPENDS = "python>=2.7.6-8"
