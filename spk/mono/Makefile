@@ -1,5 +1,5 @@
 SPK_NAME = mono
-SPK_VERS = 4.2.2,30
+SPK_VERS = 4.2.2.30
 SPK_REV = 7
 SPK_ICON = src/mono.png
 BETA = 1
