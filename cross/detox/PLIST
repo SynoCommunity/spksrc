@@ -1,0 +1,9 @@
+bin:bin/inline-detox
+bin:bin/detox
+etc:etc/detoxrc
+etc:etc/detoxrc.sample
+rsc:share/detox/iso8859_1.tbl
+rsc:share/detox/unicode.tbl
+rsc:share/man/man1/detox.1
+rsc:share/man/man5/detoxrc.5
+rsc:share/man/man5/detox.tbl.5
