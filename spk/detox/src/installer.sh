@@ -20,7 +20,7 @@ postinst ()
     
     # Put mc in the PATH
     mkdir -p /usr/local/bin
-    ln -s /usr/local/detox/bin/detox /usr/local/bin/detoxln -s /usr/local/detox/bin/detox /usr/local/bin/detox
+    ln -s /usr/local/detox/bin/detox /usr/local/bin/detox
     exit 0
 }
 
