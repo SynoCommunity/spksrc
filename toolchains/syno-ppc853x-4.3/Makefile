@@ -13,9 +13,9 @@ TC_BASE_DIR = powerpc-linux-gnuspe
 TC_PREFIX = powerpc-linux-gnuspe
 TC_TARGET = powerpc-unknown-linux
 
-TC_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
-TC_CPPFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
-TC_CXXFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
-TC_LDFLAGS =
+TC_CFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/include -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/include -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/include -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/lib
 
 include ../../mk/spksrc.tc.mk

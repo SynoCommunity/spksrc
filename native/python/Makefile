@@ -27,4 +27,4 @@ myPostInstall:
 	@$(MSG) Installing setuptools, pip and cffi
 	@$(RUN) wget https://bootstrap.pypa.io/ez_setup.py -O - | $(PYTHON)
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
-	@$(PIP) install "cffi==1.3.1"
+	@$(PIP) install "cffi==1.5.2"
