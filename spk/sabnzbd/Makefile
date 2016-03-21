@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 0.7.20
-SPK_REV = 14
+SPK_VERS = 1.0.0
+SPK_REV = 15
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Enable sc-download group"
+CHANGELOG = "1. Update to 1.0.0<br>2. Warning: When you upgrade an existing 0.7.x installation, release 1.0.0 will NOT be able to finish the queue. It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.0.0 and then use queue repair on the Status page. Some information (like the order of the queue) will be lost."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
