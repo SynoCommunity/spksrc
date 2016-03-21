@@ -6,7 +6,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = 88f5281 powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = 88f5281 powerpc ppc824x ppc854x
 
 DEPENDS = cross/ncurses cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 

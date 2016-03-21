@@ -12,7 +12,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG ="1. Update rtorrent to 0.9.6, libtorrent to 0.13.6, rutorrent to 3.7"
+CHANGELOG ="1. Update rtorrent to 0.9.6, libtorrent to 0.13.6, rutorrent to 3.7 2. Added support for ppc853x"
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
