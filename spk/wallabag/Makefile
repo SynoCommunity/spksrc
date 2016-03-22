@@ -3,6 +3,7 @@ SPK_VERS = 1.9.1
 SPK_REV = 1
 SPK_ICON = src/wallabag.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS  = cross/$(SPK_NAME)
 
