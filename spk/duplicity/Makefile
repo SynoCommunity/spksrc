@@ -1,6 +1,6 @@
 SPK_NAME = duplicity
-SPK_VERS = 0.7.05
-SPK_REV = 2
+SPK_VERS = 0.7.06
+SPK_REV = 3
 SPK_ICON = src/duplicity.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
@@ -16,7 +16,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm using a command line interface. Also contains duply wrapper script.
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Include duply<br>2. Add missing dependencies"
+CHANGELOG = "1. Upgraded Duplicity to 0.7.06 (which adds Backblaze B2 support among other things)<br>2. Upgraded Duply to 1.11.2"
 BETA = 1
 
 HOMEPAGE = http://duplicity.nongnu.org/
