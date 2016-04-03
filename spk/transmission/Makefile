@@ -1,6 +1,6 @@
 SPK_NAME = transmission
 SPK_VERS = 2.92
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
 
