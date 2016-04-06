@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.12.8
+PKG_VERS = 0.12.21
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
