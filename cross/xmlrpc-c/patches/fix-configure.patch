@@ -1,0 +1,14 @@
+--- configure.orig	2015-11-22 09:54:48.809044789 -0500
++++ configure	2015-11-22 09:59:28.489048756 -0500
+@@ -5829,9 +5829,9 @@
+ BUILDDIR=$(pwd)
+ 
+ 
+-AR=${ac_tool_prefix}ar
++#AR=${ac_tool_prefix}ar
+ 
+-RANLIB=${ac_tool_prefix}ranlib
++#RANLIB=${ac_tool_prefix}ranlib
+ 
+ 
+ 
