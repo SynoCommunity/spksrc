@@ -38,11 +38,11 @@ $(error Unsupported ARCH $(ARCH))
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),amd64),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_amd64/syncthing
+SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),386),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
+SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_386/syncthing
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),arm),$(SYNCTHING_ARCH))

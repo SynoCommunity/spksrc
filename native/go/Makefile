@@ -22,5 +22,5 @@ myComp:
 	cd $(WORK_DIR)/$(PKG_NAME)/src && ./make.bash
 	@$(MSG) "Building Go for arm"
 	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=arm && export GOARM=5 && ./make.bash --no-clean
-	@$(MSG) "Building Go amd64"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=amd64 && ./make.bash --no-clean
+	@$(MSG) "Building Go for 386"
+	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=386 && ./make.bash --no-clean
