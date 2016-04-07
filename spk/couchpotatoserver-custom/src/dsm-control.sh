@@ -15,11 +15,10 @@ COUCHPOTATOSERVER="${INSTALL_DIR}/var/CouchPotatoServer/CouchPotato.py"
 CFG_FILE="${INSTALL_DIR}/var/settings.conf"
 PID_FILE="${INSTALL_DIR}/var/couchpotatoserver-custom.pid"
 LOG_FILE="${INSTALL_DIR}/var/logs/CouchPotato.log"
-DSM_MAJOR_VERSION=`cat /etc.defaults/VERSION | grep majorversion | grep -o [0-9]*`
 
 start_daemon ()
 {
-	if [ ${DSM_MAJOR_VERSION} -gt 5 ]; then
+        if [ `/bin/get_key_value /etc.defaults/VERSION majorversion` -ge 6 ]; then
  		sudo -u ${USER} PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}
  	else
  		su - ${USER} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
