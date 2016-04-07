@@ -24,6 +24,7 @@ RUN apt-get update && \
         imagemagick \
         intltool \
         libc6-i386 \
+        libcppunit-dev \
         libffi-dev \
         libgc-dev \
         libltdl-dev \
