@@ -7,7 +7,7 @@
 #  wheel_target       (override with WHEEL_TARGET)
 #  post_wheel_target  (override with POST_WHEEL_TARGET)
 # Variables:
-#  WHEELS             List of wheels to go through 
+#  WHEELS             List of wheels to go through
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
@@ -33,11 +33,12 @@ wheel_msg_target:
 pre_wheel_target: wheel_msg_target
 
 wheel_target: $(PRE_WHEEL_TARGET)
+	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
 	@if [ -n "$(WHEELS)" ] ; then \
 		mkdir -p $(WORK_DIR)/wheelhouse ; \
 		if [ -f "$(WHEELS)" ] ; then \
 			$(MSG) "Using existing requirements file" ; \
-			cp $(WHEELS) $(WORK_DIR)/wheelhouse ; \
+			cp $(WHEELS) $(WORK_DIR)/wheelhouse/requirements.txt ; \
 		else \
 			$(MSG) "Creating requirements file" ; \
 			rm -f $(WORK_DIR)/wheelhouse/requirements.txt ; \
@@ -49,7 +50,7 @@ wheel_target: $(PRE_WHEEL_TARGET)
 		$(MSG) "Building wheels" ; \
 		rm -rf $(WORK_DIR)/wheelbuild ; \
 		mkdir -p $(WORK_DIR)/wheelbuild ; \
-		$(RUN) $(PIP) wheel --no-deps -b $(WORK_DIR)/wheelbuild -w $(WORK_DIR)/wheelhouse -f $(WORK_DIR)/wheelhouse/ -r $(WORK_DIR)/wheelhouse/requirements.txt ; \
+		$(RUN) CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)" $(PIP_WHEEL) -r $(WORK_DIR)/wheelhouse/requirements.txt ; \
 	else  \
 		$(MSG) "No wheels to process" ; \
 	fi

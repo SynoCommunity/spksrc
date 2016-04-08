@@ -1,0 +1,27 @@
+--- salt/utils/rsax931.py.orig	2016-01-24 20:09:22.876770322 +0000
++++ salt/utils/rsax931.py	2016-01-24 20:12:26.552560471 +0000
+@@ -21,23 +21,7 @@
+     '''
+     Load OpenSSL libcrypto
+     '''
+-    if sys.platform.startswith('win'):
+-        return cdll.LoadLibrary('libeay32')
+-    elif getattr(sys, 'frozen', False) and salt.utils.is_smartos():
+-        return cdll.LoadLibrary(glob.glob(os.path.join(
+-            os.path.dirname(sys.executable),
+-            'libcrypto.so*'))[0])
+-    else:
+-        lib = find_library('crypto')
+-        if not lib and salt.utils.is_smartos():
+-            # smartos does not have libraries in std location
+-            lib = glob.glob(os.path.join(
+-                '/opt/local/lib',
+-                'libcrypto.so*'))
+-            lib = lib[0] if len(lib) > 0 else None
+-        if lib:
+-            return cdll.LoadLibrary(lib)
+-        raise OSError('Cannot locate OpenSSL libcrypto')
++    return cdll.LoadLibrary('/usr/local/python/lib/libcrypto.so')
+ 
+ 
+ def _init_libcrypto():
