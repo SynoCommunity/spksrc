@@ -1,6 +1,6 @@
 SPK_NAME = debian-chroot
-SPK_VERS = 8.1
-SPK_REV = 6
+SPK_VERS = 8.4
+SPK_REV = 7
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
@@ -13,11 +13,11 @@ DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 2900
 DESCRIPTION_FRE = Debian est un système d\\\'exploitation \\\(SE\\\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
-CHANGELOG = "Update to Jessie"
+CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 arches"
 
-HOMEPAGE   = http://www.debian.org/
-LICENSE    =
-HELPURL    = https://github.com/SynoCommunity/spksrc/wiki/Debian-Chroot
+HOMEPAGE = http://www.debian.org
+LICENSE  = https://www.debian.org/legal/licenses
+HELPURL  = https://github.com/SynoCommunity/spksrc/wiki/Debian-Chroot
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -34,8 +34,11 @@ endif
 ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 DEBIAN_ARCH = i386
+endif
+ifeq ($(findstring $(ARCH),braswell bromolow cedarview x86 avoton x64),$(ARCH))
+DEBIAN_ARCH = amd64
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 DEBIAN_ARCH = powerpc
