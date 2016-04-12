@@ -1,0 +1,11 @@
+[{
+    "step_title": "Public URL",
+    "items": [{
+        "type": "textfield",
+        "desc": "Provide the client-visible URL. The URL to configure on your device is:<br/><br>http://public-url:8132/token/1.0/sync/1.5<br/><br>Note: Configure a reverse proxy for SSL support",
+        "subitems": [{
+            "key": "wizard_ffsync_public_url",
+            "desc": "Public URL"
+        }]
+    }]
+}]
