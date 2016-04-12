@@ -1,6 +1,6 @@
 SPK_NAME = git
-SPK_VERS = 2.7.4
-SPK_REV = 8
+SPK_VERS = 2.8.1
+SPK_REV = 9
 SPK_ICON = src/git.png
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DESCRIPTION = Git is a free and open source distributed version control system d
 DESCRIPTION_FRE = Git est un logiciel de gestion de version décentralisée gratuit et open source destiné à gérer aussi bien les petits que les très gros projets avec vitesse et efficacité.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = "1. Correct error in some powerpc compiles (e.g., DS413) <br> 2. Update Git to 2.7.4"
+CHANGELOG = "1. Update Git to 2.8.1 <br>2. Enable xdl fast hash for X64 arches"
 
 HOMEPAGE = http://git-scm.com
 LICENSE  = GPLv2
