@@ -17,8 +17,8 @@ PRE_DOWNLOAD_TARGET = pre_download_target
 else
 $(PRE_DOWNLOAD_TARGET): download_msg
 endif
-ifneq (,$(findstring nop,$(strip $(DOWNLOAD_TARGET))))
-DOWNLOAD_TARGET = nop_download_target
+ifneq (,$(findstring manual,$(strip $(DOWNLOAD_TARGET))))
+DOWNLOAD_TARGET = manual_dl_target
 else
   ifeq ($(strip $(DOWNLOAD_TARGET)),)
   DOWNLOAD_TARGET = download_target
@@ -37,16 +37,16 @@ endif
 
 download_msg:
 	@$(MSG) "Downloading files for $(NAME)"
-	
-nop_download_target:
-	@nop_file=$(PKG_DIST_FILE) ; \
-	if [ -z "$$nop_file" ] ; then \
-	  nop_file=$(PKG_DIST_NAME) ; \
+
+manual_dl_target:
+	@manual_dl=$(PKG_DIST_FILE) ; \
+	if [ -z "$$manual_dl" ] ; then \
+	  manual_dl=$(PKG_DIST_NAME) ; \
 	fi ; \
-	if [ -f "$(DISTRIB_DIR)/$$nop_file" ] ; then \
-	  $(MSG) "File $$nop_file already downloaded" ; \
+	if [ -f "$(DISTRIB_DIR)/$$manual_dl" ] ; then \
+	  $(MSG) "File $$manual_dl already downloaded" ; \
 	else \
-	  $(MSG) "Please download $$nop_file manually from $(PKG_DIST_SITE), and place in $(DISTRIB_DIR)" ; \
+	  $(MSG) "*** Manually download $$manual_dl from $(PKG_DIST_SITE) and place in $(DISTRIB_DIR). Stop." ; \
 	exit 1 ; \
 	fi ; \
 
