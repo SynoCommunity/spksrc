@@ -1,6 +1,6 @@
 SPK_NAME = ncdu
 SPK_VERS = 1.11
-SPK_REV = 0
+SPK_REV = 1
 SPK_ICON = src/ncdu.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DESCRIPTION = disk usage analyzer with an ncurses interface
 RELOAD_UI = no
 DISPLAY_NAME = ncdu
 STARTABLE = no
-CHANGELOG = "Initial import"
+CHANGELOG = "Initial release"
 
 HOMEPAGE   = https://dev.yorhel.nl/ncdu
 LICENSE    = MIT
