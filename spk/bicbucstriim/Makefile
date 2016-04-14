@@ -1,12 +1,12 @@
 SPK_NAME = bicbucstriim
 SPK_VERS = 1.3.6
-SPK_REV = 1
+SPK_REV = 5
 SPK_ICON = src/bicbucstriim.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = Alexandre Espinosa Menor
+MAINTAINER = Diaoul
 DESCRIPTION = BicBucStriim streams books, digital books. It fills a gap in the functionality of current NAS devices, which provide access to your collection of music, videos and photos -- but not books. BicBucStriim covers that area and provides web-based access to your e-book collection.
 ADMIN_URL = /bbs/
 RELOAD_UI = yes
