@@ -9,7 +9,7 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = RJBlake
 DESCRIPTION = PlexPy Custom allows you to run the fork of your choice of PlexPy. You will be asked for the fork\'s git URL during install.
-ADMIN_PORT = 8181
+ADMIN_PORT = 8183
 RELOAD_UI = yes
 DISPLAY_NAME = PlexPy Custom
 CHANGELOG = "Maintenance release"
