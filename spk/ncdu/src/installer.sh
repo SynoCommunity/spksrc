@@ -17,6 +17,7 @@ postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+
     # Put the binary in the PATH
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/${PACKAGE} /usr/local/bin/${PACKAGE}

@@ -6,7 +6,7 @@ SPK_ICON = src/ncdu.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = yeled
-DESCRIPTION = disk usage analyzer with an ncurses interface
+DESCRIPTION = Disk usage analyzer with an ncurses interface
 RELOAD_UI = no
 DISPLAY_NAME = ncdu
 STARTABLE = no

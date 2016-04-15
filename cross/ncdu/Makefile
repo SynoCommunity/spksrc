@@ -12,6 +12,5 @@ COMMENT  = disk usage analyzer with an ncurses interface
 LICENSE  = MIT
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = 
 
 include ../../mk/spksrc.cross-cc.mk
