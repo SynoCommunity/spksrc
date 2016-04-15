@@ -15,7 +15,7 @@ GIT="${GIT_DIR}/bin/git"
 PLEXPY="${INSTALL_DIR}/var/plexpy/PlexPy.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/plexpy-custom.pid"
-LOG_FILE="${INSTALL_DIR}/var/Logs/plexpy.log"
+LOG_FILE="${INSTALL_DIR}/var/logs/plexpy.log"
 
 
 start_daemon ()
