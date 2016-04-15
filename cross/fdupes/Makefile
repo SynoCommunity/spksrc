@@ -10,8 +10,6 @@ COMMENT  = FDUPES is a program for identifying or deleting duplicate files resid
 LICENSE  = MIT
 
 CONFIGURE_TARGET = none
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS =
 
 INSTALL_TARGET = myInstall
 
@@ -19,4 +17,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) $(MAKE) install PREFIX=$(INSTALL_DIR)/usr/local/fdupes
+	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)

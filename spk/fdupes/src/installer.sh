@@ -23,9 +23,6 @@ postinst ()
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/fdupes /usr/local/bin/fdupes
 
-    # Set permissions
-    chmod -R 755 ${INSTALL_DIR}
-
     exit 0
 }
 
