@@ -1,0 +1,2 @@
+bin:bin/lsscsi
+man:share/man/man8/lsscsi.8 
