@@ -67,7 +67,6 @@ postinst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
         ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/drzoidberg33/plexpy.git} ${INSTALL_DIR}/var/plexpy > /dev/null 2>&1
-        # cp ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
     fi
 
     # Create user
