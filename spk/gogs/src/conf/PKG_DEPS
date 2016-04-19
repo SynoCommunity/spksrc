@@ -1,0 +1,5 @@
+[MariaDB]
+dsm_min_ver=5.0-4300
+
+[Git]
+dsm_min_ver=1.8.0

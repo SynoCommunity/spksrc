@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.gogs": {
+            "title": "Gogs",
+            "desc": "Gogs (Go Git Service) is a painless self-hosted Git service",
+            "icon": "images/gogs-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "url": "/",
+            "port": "3000", 
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
