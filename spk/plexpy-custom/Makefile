@@ -1,6 +1,7 @@
 SPK_NAME = plexpy-custom
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
+BETA = 1
 SPK_ICON = src/plexpy-custom.png
 DSM_UI_DIR = app
 
@@ -9,7 +10,7 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = RJBlake
 DESCRIPTION = PlexPy Custom allows you to run the fork of your choice of PlexPy. You will be asked for the fork\'s git URL during install.
-ADMIN_PORT = 8183
+ADMIN_PORT = 8010
 RELOAD_UI = yes
 DISPLAY_NAME = PlexPy Custom
 CHANGELOG = "Initial release"
