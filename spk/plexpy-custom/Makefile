@@ -12,7 +12,7 @@ DESCRIPTION = PlexPy Custom allows you to run the fork of your choice of PlexPy.
 ADMIN_PORT = 8183
 RELOAD_UI = yes
 DISPLAY_NAME = PlexPy Custom
-CHANGELOG = "Maintenance release"
+CHANGELOG = "Initial release"
 
 HOMEPAGE   = https://github.com/drzoidberg33/plexpy
 LICENSE    = GPL
