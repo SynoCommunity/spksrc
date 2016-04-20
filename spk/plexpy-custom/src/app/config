@@ -6,7 +6,7 @@
             "icon": "images/plexpy-custom-{0}.png",
             "type": "url",
             "protocol": "http",
-            "port": "8183",
+            "port": "8010",
             "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
