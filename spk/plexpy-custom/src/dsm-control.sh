@@ -20,7 +20,7 @@ LOG_FILE="${INSTALL_DIR}/var/logs/plexpy.log"
 
 start_daemon ()
 {
-    su - ${USER} -s /bin/sh -c "HOME=${INSTALL_DIR}/var PATH=${PATH} ${PYTHON} ${PLEXPY} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su ${USER} -s /bin/sh -c "HOME=${INSTALL_DIR}/var PATH=${PATH} ${PYTHON} ${PLEXPY} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()
