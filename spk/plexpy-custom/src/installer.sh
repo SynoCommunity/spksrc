@@ -12,6 +12,7 @@ GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 USER="plexpy-custom"
 GROUP="nobody"
+CFG_FILE="config.ini"
 GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -45,7 +46,14 @@ postinst ()
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
-
+    
+    # get IP
+    sIPNAS=`/usr/syno/sbin/synonet --show | grep -m 1 IP:  | awk -F: '{gsub(/[ \t]+/, "", $2); print $2}'`
+    
+    # create config.ini with Port set to SynoCommunity port:8010
+    echo "HTTP_PORT=8010" > ${INSTALL_DIR}/var/{CFG_FILE}
+    echo "HTTP_HOST=${sIPNAS}" >> ${INSTALL_DIR}/var/{CFG_FILE}
+    
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
