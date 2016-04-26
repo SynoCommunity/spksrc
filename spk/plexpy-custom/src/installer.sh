@@ -71,7 +71,6 @@ preuninst ()
     # Remove the user if uninstalling
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
 
-        delgroup ${USER} ${GROUP}
         deluser ${USER}
     fi
 
