@@ -51,8 +51,9 @@ postinst ()
     sIPNAS=`/usr/syno/sbin/synonet --show | grep -m 1 IP:  | awk -F: '{gsub(/[ \t]+/, "", $2); print $2}'`
     
     # create config.ini with Port set to SynoCommunity port:8010
-    echo "HTTP_PORT=8010" > ${INSTALL_DIR}/var/{CFG_FILE}
-    echo "HTTP_HOST=${sIPNAS}" >> ${INSTALL_DIR}/var/{CFG_FILE}
+    echo "[General]" > ${INSTALL_DIR}/var/{CFG_FILE}
+    echo "http_port = 8010" >> ${INSTALL_DIR}/var/{CFG_FILE}
+    echo "http_host = ${sIPNAS}" >> ${INSTALL_DIR}/var/{CFG_FILE}
     
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
