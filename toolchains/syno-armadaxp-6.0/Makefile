@@ -7,7 +7,7 @@ TC_FIRMWARE = 6.0-7321
 TC_DIST_NAME = armadaxp-gcc493_glibc220_hard-GPL.txz
 
 TC_EXT = txz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%206.0%20Beta%20Tool%20Chains/Marvell%20Armada%20XP%20Linux%203.2.40
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%206.0%20Tool%20Chains/Marvell%20Armada%20XP%20Linux%203.2.40
 
 TC_BASE_DIR = arm-marvell-linux-gnueabi
 TC_PREFIX = arm-marvell-linux-gnueabi
