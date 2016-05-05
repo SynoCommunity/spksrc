@@ -1,9 +1,11 @@
 PKG_NAME = dotconf
-PKG_VERS = 1.0.13
+PKG_VERS = 1.1.0
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.azzit.de/$(PKG_NAME)/download/v1.0
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+#PKG_DIST_SITE = http://www.azzit.de/$(PKG_NAME)/download/v1.0
+PKG_DIST_SITE = https://github.com/williamh/dotconf/archive
+#https://github.com/williamh/dotconf/archive/v1.1.0.tar.gz
 
 DEPENDS =
 
