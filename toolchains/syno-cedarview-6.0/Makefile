@@ -4,7 +4,7 @@ TC_ARCH = cedarview
 TC_VERS = 6.0
 TC_FIRMWARE = 5.2-5565
 
-TC_DIST_NAME = comcerto2k-gcc493_glibc220_hard-GPL.txz
+TC_DIST_NAME = cedarview-gcc493_glibc220_linaro_x86_64-GPL.txz
 
 TC_EXT = txz
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%206.0%20Tool%20Chains/Intel%20x86%20Linux%203.10.77%20%28Cedarview%29
