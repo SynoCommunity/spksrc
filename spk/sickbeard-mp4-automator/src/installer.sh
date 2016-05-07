@@ -55,13 +55,7 @@ postinst ()
         cp ${INSTALL_DIR}/var/autoProcess.ini.sample.syno ${INSTALL_DIR}/var/autoProcess.ini
         chown ${USER}:users ${INSTALL_DIR}/var/autoProcess.ini
     fi
-    
-    if  [ -e "${CONFIG_FILE_EDITOR}" ]; then
-    echo "${INSTALL_DIR}/var/autoProcess.ini, Sickbeard MP4 Automator" >> ${CONFIG_FILE_EDITOR}
-    else
-    echo "${CONFIG_FILE_EDITOR} not found" >> ${INSTALL_DIR}/var/package_install.log
-    fi
-    
+      
     # Correct the files ownership. Package files will be owned by sickbeard-custom user
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
@@ -84,7 +78,6 @@ postuninst ()
     rm -f ${INSTALL_DIR}
     rm -f ${SICKBEARD_INSTALL_DIR}/${PACKAGE}
 	#rm -f ${SICKBEARD_INSTALL_DIR}/postConversion.py
-	
     exit 0
 }
 

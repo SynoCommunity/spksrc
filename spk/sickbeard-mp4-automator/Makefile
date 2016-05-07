@@ -6,6 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git:sickbeard-custom:ffmpeg"
+BETA = 1
 
 MAINTAINER = Phtagn
 DESCRIPTION = Sickbeard MP4 Automator enables to automatically transcode or repackage any video file in an mp4 container. It is made by mdhiggins and available on github. Once installed, you need to add sickbeard-mp4-automator/postConversion.py in the extra-script field in the postconversion tab. You also need to edit autoProcess.ini to set your defaults. It is automatically added to Config File Editor if you have it. If not, ssh into the machine and it can be found under /usr/local/sickbeard-mp4-automator/var.
