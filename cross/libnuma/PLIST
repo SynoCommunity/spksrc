@@ -1,0 +1,7 @@
+bin:bin/numactl
+lib:lib/libnuma.a
+lnk:lib/libnuma.so
+lib:lib/libnuma.so.1
+rsc:include/numa.h
+rsc:include/numaid.h
+rsc:include/numacompat1.h

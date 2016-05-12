@@ -1,7 +1,7 @@
 PKG_NAME = rtmpdump
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 550a0ca
+PKG_GIT_HASH = 550a0caea3cd3987ae3ce7eb20d0b4512dd064ac
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/BurntSushi/rtmpdump-ksv.git
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)

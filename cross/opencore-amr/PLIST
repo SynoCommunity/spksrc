@@ -1,0 +1,16 @@
+lib:lib/libopencore-amrnb.a
+lib:lib/libopencore-amrwb.la
+lnk:lib/libopencore-amrnb.so
+lnk:lib/libopencore-amrnb.so.0
+lib:lib/libopencore-amrnb.so.0.0.3
+lib:lib/libopencore-amrnb.la
+lnk:lib/libopencore-amrwb.so
+lnk:lib/libopencore-amrwb.so.0
+lib:lib/libopencore-amrwb.so.0.0.3
+lib:lib/libopencore-amrwb.a
+rsc:include/opencore-amrnb/interf_enc.h
+rsc:include/opencore-amrnb/interf_dec.h
+rsc:include/opencore-amrwb/dec_if.h
+rsc:include/opencore-amrwb/if_rom.h
+rsc:lib/pkgconfig/opencore-amrwb.pc
+rsc:lib/pkgconfig/opencore-amrnb.pc

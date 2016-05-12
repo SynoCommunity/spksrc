@@ -1,5 +1,5 @@
 PKG_NAME = fribidi
-PKG_VERS = 0.19.6
+PKG_VERS = 0.19.7
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://fribidi.org/download
