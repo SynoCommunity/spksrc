@@ -1,9 +1,10 @@
 PKG_NAME = x264
-PKG_VERS = 20141218-2245
-PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.videolan.org/pub/x264/snapshots/
-PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
+PKG_EXT = tar.gz
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = stable
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIST_SITE = https://git.videolan.org/git/x264.git
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS =
 GNU_CONFIGURE = 1
@@ -17,4 +18,10 @@ ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
 ADDITIONAL_CFLAGS = -O0
 endif
 
+PRE_DOWNLOAD_TARGET = eraseDownload
+
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: eraseDownload
+eraseDownload:
+	@rm -f $(DISTRIB_DIR)/$(PKG_DIST_FILE)
