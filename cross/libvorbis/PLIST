@@ -1,9 +1,9 @@
 lnk:lib/libvorbisenc.so
 lnk:lib/libvorbisenc.so.2
-lib:lib/libvorbisenc.so.2.0.9
+lib:lib/libvorbisenc.so.2.0.11
 lnk:lib/libvorbisfile.so
 lnk:lib/libvorbisfile.so.3
-lib:lib/libvorbisfile.so.3.3.5
+lib:lib/libvorbisfile.so.3.3.7
 lnk:lib/libvorbis.so
 lnk:lib/libvorbis.so.0
-lib:lib/libvorbis.so.0.4.6
+lib:lib/libvorbis.so.0.4.8
