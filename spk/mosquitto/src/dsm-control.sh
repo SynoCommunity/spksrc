@@ -7,7 +7,6 @@ DNAME="Mosquitto"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="mosquitto"
 MOSQUITTO="${INSTALL_DIR}/sbin/mosquitto"
 PID_FILE="${INSTALL_DIR}/var/mosquitto.pid"
 CFG_FILE="${INSTALL_DIR}/var/mosquitto.conf"
