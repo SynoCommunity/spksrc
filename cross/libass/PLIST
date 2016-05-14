@@ -4,5 +4,5 @@ lib/libass.a
 lib/libass.la
 lib/libass.so
 lib/libass.so.5
-lib/libass.so.5.1.0
+lib/libass.so.5.3.0
 lib/pkgconfig/libass.pc
