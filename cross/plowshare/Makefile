@@ -1,5 +1,5 @@
 PKG_NAME = plowshare
-PKG_VERS = 2.1.1
+PKG_VERS = 2.1.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mcrapet/$(PKG_NAME)/archive

@@ -2,4 +2,4 @@ bin:bin/xmlcatalog
 bin:bin/xmllint
 lnk:lib/libxml2.so
 lnk:lib/libxml2.so.2
-lib:lib/libxml2.so.2.9.2
+lib:lib/libxml2.so.2.9.3

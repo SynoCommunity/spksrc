@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.11.15
+PKG_VERS = 0.12.21
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
@@ -22,7 +22,7 @@ CGO_ENABLED=1
 STATIC_BINARIES = 0
 
 # Define SYNCTHING_ARCH as per SyncThing standards
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine 88f5281 88f6281 comcerto2k),$(ARCH))
+ifeq ($(findstring $(ARCH),88f5281 88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
 SYNCTHING_ARCH = arm
 CGO_ENABLED = 0
 ENV += GOARM=5
@@ -30,7 +30,7 @@ endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
@@ -38,11 +38,11 @@ $(error Unsupported ARCH $(ARCH))
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),amd64),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_amd64/syncthing
+SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),386),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
+SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_386/syncthing
 endif
 
 ifeq ($(findstring $(SYNCTHING_ARCH),arm),$(SYNCTHING_ARCH))
@@ -71,5 +71,3 @@ myComp:
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(SYNCTHING_BIN) $(STAGING_INSTALL_PREFIX)/bin/
-
-

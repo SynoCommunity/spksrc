@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/gentoo.png
 DSM_UI_DIR = app
 
-DEPENDS = 
+DEPENDS =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>=2.7.6-8"
 
@@ -12,10 +12,10 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Gentoo is a free operating system based on either Linux or FreeBSD that can be automatically optimized and customized for just about any application or need. Gentoo Chroot allows you to install the Gentoo OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
 RELOAD_UI = yes
 DISPLAY_NAME = Gentoo Chroot
-CHANGELOG = 
+CHANGELOG =
 
 HOMEPAGE   = http://www.gentoo.org/
-LICENSE    = 
+LICENSE    =
 HELPURL    = 3rdparty/gentoo-chroot/help/enu/index.html
 SUPPORTURL = http://www.gentoo.org/main/en/support.xml
 
@@ -32,11 +32,11 @@ ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
-ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64),$(ARCH))
 GENTOO_CPU = x86
 GENTOO_ARCH = i686
 endif
@@ -88,4 +88,3 @@ gentoo-chroot_extra_install:
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done
-

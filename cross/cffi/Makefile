@@ -1,5 +1,5 @@
 PKG_NAME = cffi
-PKG_VERS = 1.1.0
+PKG_VERS = 1.5.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://pypi.python.org/packages/source/c/$(PKG_NAME)
@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libffi cross/pycparser
 
-HOMEPAGE = http://pypi.python.org/pypi/cffi
+HOMEPAGE = http://cffi.readthedocs.org
 COMMENT  = Foreign Function Interface for Python calling C code
-LICENSE  =
+LICENSE  = MIT
 
 include ../../mk/spksrc.python-module.mk

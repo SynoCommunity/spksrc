@@ -55,3 +55,15 @@ clean:
 
 all: install
 
+.PHONY: kernel-required
+kernel-required:
+	@if [ -n "$(REQ_KERNEL)" ]; then \
+	  exit 1 ; \
+	fi
+	@for depend in $(DEPENDS) ; do \
+	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
+	    exit 0 ; \
+	  else \
+	    exit 1 ; \
+	  fi ; \
+	done

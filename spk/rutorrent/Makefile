@@ -1,18 +1,18 @@
 SPK_NAME = rutorrent
-SPK_VERS = 3.6
-SPK_REV = 7
+SPK_VERS = 3.7
+SPK_REV = 8
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/rtorrent cross/rutorrent cross/rutorrent-plugins cross/busybox cross/screen cross/procps-ng cross/mediainfo
+DEPENDS  = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Update rtorrent to 0.9.4"
+CHANGELOG ="1. Update rtorrent to 0.9.6, libtorrent to 0.13.6, rutorrent to 3.7 2. Added support for ppc853x"
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
@@ -42,8 +42,6 @@ rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/cacert.pem $(STAGING_DIR)/etc/
 	install -m 775 -d $(STAGING_DIR)/tmp
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

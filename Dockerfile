@@ -1,7 +1,10 @@
-FROM 32bit/debian:jessie
+FROM debian:jessie
 MAINTAINER SynoCommunity <https://synocommunity.com>
 
 ENV LANG C.UTF-8
+
+# Manage i386 arch
+RUN dpkg --add-architecture i386
 
 # Install required packages
 RUN apt-get update && \
@@ -9,6 +12,7 @@ RUN apt-get update && \
         bison \
         build-essential \
         check \
+        cmake \
         curl \
         cython \
         debootstrap \
@@ -19,11 +23,14 @@ RUN apt-get update && \
         gperf \
         imagemagick \
         intltool \
+        libc6-i386 \
+        libcppunit-dev \
         libffi-dev \
         libgc-dev \
         libltdl-dev \
         libssl-dev \
         libunistring-dev \
+        lzip \
         mercurial \
         ncurses-dev \
         pkg-config \

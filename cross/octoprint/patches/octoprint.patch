@@ -1,0 +1,18 @@
+--- setup.py.org	2016-02-10 16:45:38.000000000 +0100
++++ setup.py	2016-02-10 16:47:46.000000000 +0100
+@@ -26,13 +26,13 @@
+ 	"netaddr==0.7.17",
+ 	"watchdog==0.8.3",
+ 	"sarge==0.1.4",
+-	"netifaces==0.10",
++	"netifaces==0.10.4",
+ 	"pylru==1.0.9",
+ 	"rsa==3.2",
+ 	"pkginfo==1.2.1",
+ 	"requests==2.7.0",
+ 	"semantic_version==2.4.2",
+-	"psutil==3.2.1",
++	"psutil==3.3.0",
+ 	"awesome-slugify>=1.6.5,<1.7"
+ ]
+ 

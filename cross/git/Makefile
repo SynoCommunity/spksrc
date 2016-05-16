@@ -1,5 +1,5 @@
 PKG_NAME = git
-PKG_VERS = 2.3.7
+PKG_VERS = 2.7.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.kernel.org/pub/software/scm/$(PKG_NAME)
@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/expat cross/zlib cross/openssl cross/curl
 
-HOMEPAGE = http://git-scm.com/
+HOMEPAGE = http://git-scm.com
 COMMENT  = Git is a free & open source, distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
 LICENSE  = GPLv2
 

@@ -7,9 +7,9 @@ DNAME="Roundcube Webmail"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
-MYSQL="/usr/syno/mysql/bin/mysql"
-MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
+USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
+MYSQL="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
+MYSQLDUMP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="roundcube"
 MYSQL_DATABASE="roundcube"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -125,6 +125,16 @@ preupgrade ()
         fi
     done
 
+    # Save user installed skins
+    mkdir -p ${TMP_DIR}/${PACKAGE}/skins
+    for skin in ${WEB_DIR}/${PACKAGE}/skins/*/
+    do
+        dir=`basename $skin`
+        if [ ! -d ${INSTALL_DIR}/share/${PACKAGE}/skins/${dir} ]; then
+            cp -pR ${WEB_DIR}/${PACKAGE}/skins/${dir} ${TMP_DIR}/${PACKAGE}/skins/
+        fi
+    done
+
     exit 0
 }
 
@@ -143,6 +153,15 @@ postupgrade ()
         dir=`basename $plugin`
         if [ ! -d ${WEB_DIR}/${PACKAGE}/plugins/${dir} ]; then
             cp -pR ${TMP_DIR}/${PACKAGE}/plugins/${dir} ${WEB_DIR}/${PACKAGE}/plugins/
+        fi
+    done
+
+    # Restore user installed skins
+    for skin in ${TMP_DIR}/${PACKAGE}/skin/*/
+    do
+        dir=`basename $skin`
+        if [ ! -d ${WEB_DIR}/${PACKAGE}/skins/${dir} ]; then
+            cp -pR ${TMP_DIR}/${PACKAGE}/skins/${dir} ${WEB_DIR}/${PACKAGE}/skins/
         fi
     done
 

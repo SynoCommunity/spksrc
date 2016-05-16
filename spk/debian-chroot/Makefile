@@ -1,6 +1,6 @@
 SPK_NAME = debian-chroot
-SPK_VERS = 8.1
-SPK_REV = 6
+SPK_VERS = 8.4
+SPK_REV = 7
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
@@ -8,16 +8,16 @@ DEPENDS  =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
 DESCRIPTION_FRE = Debian est un système d\\\'exploitation \\\(SE\\\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
-CHANGELOG = "Update to Jessie"
+CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 arches"
 
-HOMEPAGE   = http://www.debian.org/
-LICENSE    =
-HELPURL    = https://github.com/SynoCommunity/spksrc/wiki/Debian-Chroot
+HOMEPAGE = http://www.debian.org
+LICENSE  = https://www.debian.org/legal/licenses
+HELPURL  = https://github.com/SynoCommunity/spksrc/wiki/Debian-Chroot
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -31,11 +31,14 @@ DEBIAN_ARCH =
 ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),armada370 armadaxp armada375 alpine),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),bromolow cedarview evansport x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 DEBIAN_ARCH = i386
+endif
+ifeq ($(findstring $(ARCH),braswell bromolow cedarview x86 avoton x64),$(ARCH))
+DEBIAN_ARCH = amd64
 endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 DEBIAN_ARCH = powerpc

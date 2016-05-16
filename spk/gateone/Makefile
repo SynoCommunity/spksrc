@@ -1,6 +1,6 @@
 SPK_NAME = gateone
-SPK_VERS = 20150311
-SPK_REV = 5
+SPK_VERS = 20151116
+SPK_REV = 6
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
@@ -8,14 +8,14 @@ DEPENDS  = cross/busybox cross/dtach cross/$(SPK_NAME)
 WHEELS = certifi backports.ssl-match-hostname tornado html5lib
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
 DESCRIPTION_FRE = Gate One est un émulateur de terminal et un client SSH fonctionnant en HTML5
 ADMIN_PROTOCOL = https
 ADMIN_PORT = 8271
 RELOAD_UI = yes
 DISPLAY_NAME = GateOne
-CHANGELOG = "Update to revision 2ddbd05"
+CHANGELOG = "Update to revision 1d0e803"
 
 HOMEPAGE   = http://liftoffsoftware.com/Products/GateOne
 LICENSE    = AGPLv3

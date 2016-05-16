@@ -1,18 +1,18 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20150616
-SPK_REV = 9
+SPK_VERS = 20160102
+SPK_REV = 10
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
 DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et Atom open source conçu pour vous permettre de lire des nouvelles de n\\\'importe quel endroit, tout en se sentant aussi proche d\\\'une application de bureau que possible.
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "1. Update Tiny Tiny RSS to Git revision 35c12dc<br>2. Preserve local themes and plugins<br>3. Fix DSM4.3 compatibility"
+CHANGELOG = "1. Update Tiny Tiny RSS to Git revision 7f4fff96<br>2. Fix DSM-6.0 compatibility"
 
 HOMEPAGE   = http://tt-rss.org/
 LICENSE    = GPL

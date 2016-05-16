@@ -13,9 +13,9 @@ TC_BASE_DIR = arm-none-linux-gnueabi
 TC_PREFIX = arm-none-linux-gnueabi
 TC_TARGET = arm-none-linux-gnueabi
 
-TC_CFLAGS =
-TC_CPPFLAGS =
-TC_CXXFLAGS =
-TC_LDFLAGS =
+TC_CFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/libc/usr/include
+TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/libc/usr/include
+TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/libc/usr/include
+TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/libc/usr/lib
 
 include ../../mk/spksrc.tc.mk

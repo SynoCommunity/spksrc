@@ -1,22 +1,22 @@
 SPK_NAME = transmission
-SPK_VERS = 2.84
-SPK_REV = 10
+SPK_VERS = 2.92
+SPK_REV = 12
 SPK_ICON = src/transmission.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = Transmission is an easy and fast BitTorrent client. You can control it remotely with its web interface or dedicated applications.
 DESCRIPTION_FRE = Transmission est un client BitTorrent simple et rapide. Vous pouvez le contrôler à distance grâce à son interface web ou des applications dédiées.
 DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes controlarlo remotamente mediante su interfaz web o alguna aplicación dedicada.
 ADMIN_PORT = 9091
 RELOAD_UI = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "Enable ipv6 support"
+CHANGELOG = "1. Update Transmission to 2.92<br>2. Enable sc-download group"
 
-HOMEPAGE = http://www.transmissionbt.com/
-LICENSE  =
+HOMEPAGE = http://www.transmissionbt.com
+LICENSE  = GPLv2/GPLv3
 
 WIZARDS_DIR = src/wizard/
 

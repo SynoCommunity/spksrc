@@ -1,23 +1,23 @@
 SPK_NAME = nzbget-testing
-SPK_VERS = 15.0~r1286
-SPK_REV = 8
+SPK_VERS = 16.0~r1439
+SPK_REV = 10
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/unrar cross/p7zip cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
-DESCRIPTION     = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
+MAINTAINER = Diaoul
+DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
 DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écrit en C++ pour les fichiers nzb. Il intègre un mode client/serveur, la vérification, réparation et décompression automatique ainsi qu\\\'une interface web. NZBGet requiert peu de ressources système.
 DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ para descargar binarios, desde servidores de noticias, utilizando archivos nzb. Soporta modo cliente y servidor, verificación y descompresión automática y una interfaz web. NZBGet utiliza pocos recursos de sistema.
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 15.0~r1286<br>2. Add \"sc-download\" group to set permissions via DSM"
+CHANGELOG = "1. Update to 16.0~r1439<br>2. Update configuration templates"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
-LICENSE  =
+LICENSE  = GPLv2
 
 WIZARDS_DIR = src/wizard/
 

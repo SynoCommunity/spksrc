@@ -1,5 +1,5 @@
 PKG_NAME = openssl
-PKG_VERS = 1.0.2d
+PKG_VERS = 1.0.2g
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.openssl.org/source
@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-HOMEPAGE = http://www.openssl.org/
+HOMEPAGE = http://www.openssl.org
 COMMENT  = Compression Library
-LICENSE  = zlib-license
+LICENSE  = http://www.openssl.org/source/license.html
 
 CONFIGURE_TARGET = myConfigure
 
@@ -20,7 +20,7 @@ STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 include ../../mk/spksrc.cross-cc.mk
 
 OPENSSL_ARCH = linux-generic32
-ifneq ($(findstring $(ARCH), bromolow cedarview x86 avoton x64),)
+ifneq ($(findstring $(ARCH), braswell bromolow cedarview x86 avoton x64),)
 OPENSSL_ARCH = linux-x86_64
 endif
 ifneq ($(findstring $(ARCH), 88f6281),)

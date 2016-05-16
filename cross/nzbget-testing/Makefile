@@ -1,26 +1,18 @@
-PKG_NAME = nzbget-testing
-PKG_VERS = 15.0
+PKG_NAME = nzbget
+PKG_VERS = 16.0
+PKG_REV = 1439
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 1286
-PKG_DIST_NAME = trunk
-PKG_DIST_SITE = https://svn.code.sf.net/p/nzbget/code
-PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-r*
+PKG_DIST_SITE = https://github.com/$(PKG_NAME)/$(PKG_NAME)/releases/download/v$(PKG_VERS)-r$(PKG_REV)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-testing-r$(PKG_REV)-src.$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)-testing
 
 DEPENDS = cross/libxml2 cross/ncurses cross/openssl
 
-HOMEPAGE = http://nzbget.sourceforge.net/
+HOMEPAGE = http://nzbget.net
 COMMENT  = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair and web-interface. NZBGet requires low system resources.
-LICENSE  = 
+LICENSE  = GPLv2
 
-PRE_CONFIGURE_TARGET = myPreConfigure
 CONFIGURE_ARGS = LIBPREF=$(INSTALL_DIR)$(INSTALL_PREFIX)
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myPreConfigure
-myPreConfigure:
-	$(RUN) touch configure
-	$(RUN) touch Makefile.in

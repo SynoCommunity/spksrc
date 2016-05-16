@@ -8,9 +8,9 @@ PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
-MYSQL="/usr/syno/mysql/bin/mysql"
-MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
+USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
+MYSQL="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
+MYSQLDUMP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="mantisbt"
 MYSQL_DATABASE="mantisbt"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -113,10 +113,18 @@ postuninst ()
 
 preupgrade ()
 {
-    # Save the configuration file
+    # Backup files
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
+
+    # Save the configuration file
     mv ${WEB_DIR}/${PACKAGE}/config_inc.php ${TMP_DIR}/${PACKAGE}/
+
+    # Save custom files
+    for file in ${WEB_DIR}/${PACKAGE}/custom*
+    do
+        mv $file ${TMP_DIR}/${PACKAGE}/
+    done
 
     exit 0
 }
@@ -125,6 +133,13 @@ postupgrade ()
 {
     # Restore the configuration file
     mv ${TMP_DIR}/${PACKAGE}/config_inc.php ${WEB_DIR}/${PACKAGE}/
+
+    # Restore custom files
+    for file in ${TMP_DIR}/${PACKAGE}/custom*
+    do
+        mv $file ${WEB_DIR}/${PACKAGE}/
+    done
+
     rm -fr ${TMP_DIR}/${PACKAGE}
 
     exit 0

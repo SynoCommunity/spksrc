@@ -1,23 +1,22 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 0.7.20
-SPK_REV = 13
+SPK_VERS = 1.0.0
+SPK_REV = 15
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
-WHEELS = six configobj
 SPK_DEPENDS = "python>=2.7.6-8"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Diaoul
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
 DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\\\'avez qu\\\'a ajouter un .nzb, SABnzbd s\\\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Update SABnzbd to 0.7.20"
+CHANGELOG = "1. Update to 1.0.0<br>2. Warning: When you upgrade an existing 0.7.x installation, release 1.0.0 will NOT be able to finish the queue. It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.0.0 and then use queue repair on the Status page. Some information (like the order of the queue) will be lost."
 
-HOMEPAGE   = http://sabnzbd.org/
+HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
@@ -45,11 +44,8 @@ sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/sabnzbd.cgi.py $(STAGING_DIR)/app/sabnzbd.cgi
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \

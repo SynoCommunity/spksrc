@@ -1,20 +1,19 @@
 SPK_NAME = roundcube
-SPK_VERS = 1.0.1
-SPK_REV = 2
+SPK_VERS = 1.1.4
+SPK_REV = 4
 SPK_ICON = src/roundcube.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = moneytoo
 DESCRIPTION = Roundcube is a free and open source webmail solution with a desktop-like user interface which is easy to install/configure and that runs on a standard LAMPP server. It is the same software Synology offers as Mail Station except this does not depend on Mail Server package.
 ADMIN_URL = /roundcube/
 RELOAD_UI = yes
-STARTABLE = no
 DISPLAY_NAME = Roundcube Webmail
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = DSM6 compatible
 
-HOMEPAGE   = http://www.roundcube.net/
+HOMEPAGE   = http://www.roundcube.net
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/

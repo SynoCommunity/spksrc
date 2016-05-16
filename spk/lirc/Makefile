@@ -4,7 +4,7 @@ SPK_REV = 3
 SPK_ICON = src/lirc.png
 FIRMWARE = 4.3-3776
 
-LIRC_SUPPORTED_DRIVERS = 
+LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
 ifneq ($(findstring $(ARCH),powerpc 88f5281),)
@@ -12,7 +12,7 @@ $(error Sorry, this package does not support the $(ARCH) architecture.)
 endif
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH),alpine armadaxp armada370 armada375 avoton bromolow cedarview evansport x64 x86),$(ARCH))
+ifneq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp avoton braswell bromolow cedarview evansport x64 x86),$(ARCH))
 SPK_VERS = 0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif
@@ -31,7 +31,6 @@ WIZARDS_DIR = $(WORK_DIR)/wizard
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

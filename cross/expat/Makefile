@@ -1,6 +1,6 @@
 PKG_NAME = expat
-PKG_VERS = 2.1.0
-PKG_EXT = tar.gz
+PKG_VERS = 2.1.1
+PKG_EXT = tar.bz2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)/$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
@@ -12,8 +12,6 @@ COMMENT  = Expat is an XML parser library written in C. It is a stream-oriented 
 LICENSE  = 
 
 GNU_CONFIGURE = 1
-
-CONFIGURE_ARGS = 
 
 include ../../mk/spksrc.cross-cc.mk
 

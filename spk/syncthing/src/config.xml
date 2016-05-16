@@ -1,19 +1,38 @@
-<configuration version="2">
+<configuration version="12">
     <gui enabled="true" tls="false">
         <address>0.0.0.0:7070</address>
     </gui>
     <options>
-        <listenAddress>0.0.0.0:22000</listenAddress>
-        <globalAnnounceServer>announce.syncthing.net:22025</globalAnnounceServer>
+        <listenAddress>tcp://0.0.0.0:22000</listenAddress>
+        <globalAnnounceServer>default</globalAnnounceServer>
         <globalAnnounceEnabled>true</globalAnnounceEnabled>
         <localAnnounceEnabled>true</localAnnounceEnabled>
-        <localAnnouncePort>21025</localAnnouncePort>
-        <parallelRequests>16</parallelRequests>
+        <localAnnouncePort>21027</localAnnouncePort>
+        <relayServer>dynamic+https://relays.syncthing.net/endpoint</relayServer>
         <maxSendKbps>0</maxSendKbps>
-        <rescanIntervalS>60</rescanIntervalS>
+        <maxRecvKbps>0</maxRecvKbps>
         <reconnectionIntervalS>60</reconnectionIntervalS>
-        <maxChangeKbps>10000</maxChangeKbps>
+        <relaysEnabled>true</relaysEnabled>
+        <relayReconnectIntervalM>10</relayReconnectIntervalM>
+        <relayWithoutGlobalAnn>false</relayWithoutGlobalAnn>
         <startBrowser>false</startBrowser>
         <upnpEnabled>true</upnpEnabled>
+        <upnpLeaseMinutes>60</upnpLeaseMinutes>
+        <upnpRenewalMinutes>30</upnpRenewalMinutes>
+        <upnpTimeoutSeconds>10</upnpTimeoutSeconds>
+        <urAccepted>0</urAccepted>
+        <urUniqueID></urUniqueID>
+        <urURL>https://data.syncthing.net/newdata</urURL>
+        <urPostInsecurely>false</urPostInsecurely>
+        <urInitialDelayS>1800</urInitialDelayS>
+        <restartOnWakeup>true</restartOnWakeup>
+        <autoUpgradeIntervalH>12</autoUpgradeIntervalH>
+        <keepTemporariesH>24</keepTemporariesH>
+        <cacheIgnoredFiles>true</cacheIgnoredFiles>
+        <progressUpdateIntervalS>5</progressUpdateIntervalS>
+        <symlinksEnabled>true</symlinksEnabled>
+        <limitBandwidthInLan>false</limitBandwidthInLan>
+        <minHomeDiskFreePct>1</minHomeDiskFreePct>
+        <releasesURL>https://api.github.com/repos/syncthing/syncthing/releases?per_page=30</releasesURL>
     </options>
 </configuration>
