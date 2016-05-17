@@ -17,6 +17,10 @@ GNU_CONFIGURE = 1
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --enable-gcc-armv5
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
