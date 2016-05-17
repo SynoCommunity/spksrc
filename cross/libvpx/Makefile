@@ -19,7 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 ENV = LD= CPP= NM= CC= RANLIB= CXX= AR= STRIP= OBJDUM= CFLAGS="$(CFLAGS)" CPPFLAGS= LDFLAGS="$(LDFLAGS)" CXXFLAGS= READELF= AS= OBJDUMP= DESTDIR=$(INSTALL_DIR) CROSS=$(TC_PATH)$(TC_PREFIX)
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --target=armv5te-linux-gcc
+CONFIGURE_ARGS += --target=generic-gnu
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
@@ -41,5 +41,5 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += native/yasm
 ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
-CONFIGURE_ARGS += --target=ppc32-linux-gcc --as=yasm
+CONFIGURE_ARGS += --target=generic-gnu --as=yasm
 endif
