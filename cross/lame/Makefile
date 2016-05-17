@@ -13,5 +13,29 @@ COMMENT  = High quality MPEG Audio Layer III encoder
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS += --with-Dll=no --with-debian=no
+
+
+PRE_CONFIGURE_TARGET = myPreConfigure
 
 include ../../mk/spksrc.cross-cc.mk
+
+
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+DEPENDS += native/nasm
+CONFIGURE_ARGS += --enable-nasm
+ENV += AS=$(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin/yasm
+ENV += PATH=$(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin/:$$PATH
+endif
+
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+DEPENDS += native/nasm
+CONFIGURE_ARGS += --enable-nasm
+ENV += AS=$(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin/yasm
+ENV += PATH=$(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin/:$$PATH
+endif
+
+
+.PHONY: myPreConfigure
+myPreConfigure:
+	$(RUN) autoreconf -i -f -I ./m4
