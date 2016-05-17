@@ -1,0 +1,13 @@
+--- configure.orig	2016-05-16 23:57:58.921355945 +0200
++++ configure	2016-05-16 23:58:40.310340637 +0200
+@@ -19898,8 +19898,8 @@
+ 
+ 
+ if test x$ac_cv_c_compiler_gnu = xyes ; then
+-	CFLAGS="$CFLAGS -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wnested-externs -Wshadow -Wundef -Wmissing-declarations -Wunreachable-code -Winline " # -Wcast-qual -Wbad-function-cast -Wwrite-strings -Wconversion
+-	CXXFLAGS="$CXXFLAGS -Wall -Wextra -Wcast-align -Wshadow -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Wsign-promo -Wundef -Wunreachable-code " # -Wcast-qual -Wbad-function-cast -Wwrite-strings -Woverloaded-virtual -Wmissing-declarations
++	CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wnested-externs -Wshadow -Wundef -Wmissing-declarations -Wunreachable-code -Winline " # -Wcast-qual -Wbad-function-cast -Wwrite-strings -Wconversion
++	CXXFLAGS="$CXXFLAGS -Wall -Wcast-align -Wshadow -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Wsign-promo -Wundef -Wunreachable-code " # -Wcast-qual -Wbad-function-cast -Wwrite-strings -Woverloaded-virtual -Wmissing-declarations
+ 
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -Wdeclaration-after-statement" >&5
+ $as_echo_n "checking if $CC accepts -Wdeclaration-after-statement... " >&6; }
