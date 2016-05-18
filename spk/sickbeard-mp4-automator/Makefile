@@ -5,7 +5,7 @@ SPK_ICON = src/sickbeard-custom.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3:git:sickbeard-custom:ffmpeg"
+SPK_DEPENDS = "python>2.7.3-3:git:sickbeard-custom"
 BETA = 1
 
 MAINTAINER = Phtagn

@@ -26,7 +26,7 @@ SYNO_GROUP_DESC="SynoCommunity's media related group"
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code git://github.com/phtagn/sickbeard_mp4_automator.git master > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code git://github.com/phtagn/sickbeard_mp4_automator.git phtagn-syno > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -50,7 +50,7 @@ postinst ()
    
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
-        ${GIT} clone --depth 10 --recursive -q -b master https://github.com/phtagn/sickbeard_mp4_automator.git ${INSTALL_DIR}/var/ > /dev/null 2>&1
+        ${GIT} clone --depth 10 --recursive -q -b phtagn-syno https://github.com/phtagn/sickbeard_mp4_automator.git ${INSTALL_DIR}/var/ > /dev/null 2>&1
         ${PYTHON_DIR}/bin/pip install -r ${INSTALL_DIR}/var/requirements.txt > ${INSTALL_DIR}/var/package_install.log 2>&1
         cp ${INSTALL_DIR}/var/autoProcess.ini.sample.syno ${INSTALL_DIR}/var/autoProcess.ini
         chown ${USER}:users ${INSTALL_DIR}/var/autoProcess.ini
@@ -89,7 +89,7 @@ preupgrade ()
     # Save settings
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${INSTALL_DIR}/var/autoProcess.ini ${TMP_DIR}/${PACKAGE}/
+    cp ${INSTALL_DIR}/var/autoProcess.ini ${TMP_DIR}/${PACKAGE}/
 
     exit 0
 }
@@ -97,7 +97,7 @@ preupgrade ()
 postupgrade ()
 {
     # Restore settings
-    mv ${TMP_DIR}/${PACKAGE}/var/autoProcess.ini ${INSTALL_DIR}/var/autoProcess.ini
+    cp ${TMP_DIR}/${PACKAGE}/var/autoProcess.ini ${INSTALL_DIR}/var/autoProcess.ini
     chmod ${USER}:root ${INSTALL_DIR}/var/autoProcess.ini
     rm -fr ${TMP_DIR}/${PACKAGE}
 
