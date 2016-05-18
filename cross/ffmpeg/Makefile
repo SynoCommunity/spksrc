@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/fdk-aac cross/flac cross/freetype cross/lame cross/libass cross/libbluray
 DEPENDS += cross/libopus cross/libtheora cross/libvorbis cross/libvpx cross/openjpeg cross/openssl
-DEPENDS += cross/rtmpdump cross/speex cross/x264 cross/x265 cross/opencore-amr
+DEPENDS += cross/rtmpdump cross/speex cross/x264 cross/x265 cross/opencore-amr cross/vo-amrwbenc
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -19,7 +19,7 @@ CONFIGURE_ARGS += --enable-optimizations --enable-gpl --enable-version3 --enable
 CONFIGURE_ARGS += --enable-libx264 --enable-libx265 --enable-libmp3lame --enable-libfdk-aac --enable-libspeex --enable-openssl --enable-libvorbis
 CONFIGURE_ARGS += --enable-gpl --enable-nonfree  --enable-fontconfig --enable-libfreetype
 CONFIGURE_ARGS += --enable-libass --enable-libbluray --enable-libopenjpeg --enable-libopus --enable-libtheora --enable-librtmp
-CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc
 CONFIGURE_ARGS += --enable-libvpx --disable-static --enable-shared --enable-pic
 CONFIGURE_ARGS += --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages  --disable-debug
 
