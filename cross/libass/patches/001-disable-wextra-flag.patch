@@ -1,0 +1,8 @@
+--- libass/Makefile.orig	2016-05-17 00:39:16.324236701 +0200
++++ libass/Makefile.am	2016-05-17 00:39:29.560551712 +0200
+@@ -1,4 +1,4 @@
+-AM_CFLAGS = -std=gnu99 -Wall -Wextra -Wno-sign-compare -Wno-unused-parameter \
++AM_CFLAGS = -std=gnu99 -Wall -Wno-sign-compare -Wno-unused-parameter \
+             -Werror-implicit-function-declaration -Wstrict-prototypes        \
+             -Wpointer-arith -Wredundant-decls -D_GNU_SOURCE
+ 
