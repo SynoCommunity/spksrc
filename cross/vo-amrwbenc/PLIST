@@ -1,0 +1,7 @@
+lnk:lib/libvo-amrwbenc.so
+lnk:lib/libvo-amrwbenc.so.0
+lib:lib/libvo-amrwbenc.so.0.0.4
+lib:lib/libvo-amrwbenc.a
+lib:lib/libvo-amrwbenc.la
+rsc:include/vo-amrwbenc/enc_if.h
+rsc:lib/pkgconfig/vo-amrwbenc.pc
