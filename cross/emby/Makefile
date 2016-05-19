@@ -1,5 +1,5 @@
 PKG_NAME = emby
-PKG_VERS = 3.0.5818
+PKG_VERS = 3.0.5934
 PKG_EXT = zip
 PKG_DIST_NAME = Emby.Mono.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaBrowser/Emby/releases/download/$(PKG_VERS)
