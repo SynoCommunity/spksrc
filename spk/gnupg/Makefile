@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.
 STARTABLE = no
 DISPLAY_NAME = GnuPG
-CHANGELOG = "1. Initial release<br>2. Add pinentry dependency"
+CHANGELOG = Add pinentry dependency
 BETA = 1
 
 HOMEPAGE = http://www.gnupg.org/
