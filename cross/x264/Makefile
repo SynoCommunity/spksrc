@@ -18,7 +18,6 @@ include ../../mk/spksrc.cross-cc.mk
 
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
-ADDITIONAL_CFLAGS = -O0
 CONFIGURE_ARGS += --disable-asm
 ENV += x264_ARCH=ARM
 endif
@@ -47,3 +46,7 @@ ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:
 ENV += x264_ARCH=X86
 endif
 
+# For 88f6281-4.3, fix internal compiler error when optimization is enabled
+ifeq ($(ARCH)-$(TCVERSION), 88f6281-4.3)
+CONFIGURE_ARGS += --extra-cflags="-O0"
+endif
