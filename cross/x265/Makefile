@@ -53,6 +53,10 @@ DEPENDS += cross/libnuma
 CMAKE += -DCMAKE_SYSTEM_PROCESSOR=x86
 endif
 
+# For 88f6281-4.3, disable atomics
+ifeq ($(ARCH)-$(TCVERSION), 88f6281-4.3)
+CMAKE+= -DNO_ATOMICS=ON
+endif
 
 myConf:
 	$(RUN) $(CMAKE) .
