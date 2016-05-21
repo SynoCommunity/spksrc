@@ -54,6 +54,11 @@ CMAKE += -DCMAKE_SYSTEM_PROCESSOR=x86
 endif
 
 
+# For ppc853x-4.3, disable atomics
+ifeq ($(ARCH)-$(TCVERSION), ppc853x-4.3)
+CMAKE+= -DNO_ATOMICS=ON
+endif
+
 myConf:
 	$(RUN) $(CMAKE) .
 
