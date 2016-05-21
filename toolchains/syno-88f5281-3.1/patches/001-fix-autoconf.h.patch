@@ -1,4 +1,0 @@
---- /dev/null	2013-02-16 09:29:07.631403241 +0100
-+++ arm-marvell-linux-gnu/include/linux/autoconf.h	2013-02-17 17:58:50.000000000 +0100
-@@ -0,0 +1 @@
-+// Dummy file
