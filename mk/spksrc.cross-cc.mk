@@ -94,7 +94,7 @@ all: install
 .PHONY: $(DIGESTS_FILE)
 $(DIGESTS_FILE):
 	@$(MSG) "Generating digests for $(PKG_NAME)"
-	@touch -f $@
+	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
 	  localFile=$(PKG_DIST_FILE) ; \
 	  if [ -z "$${localFile}" ]; then \

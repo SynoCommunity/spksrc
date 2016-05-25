@@ -56,7 +56,7 @@ clean:
 
 $(DIGESTS_FILE):
 	@$(MSG) "Generating digests for $(PKG_NAME)"
-	@touch -f $@
+	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
 	    SHA1|sha1)     tool=sha1sum ;; \
