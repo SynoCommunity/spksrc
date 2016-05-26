@@ -202,6 +202,7 @@ ifneq ($(strip $(SSS_SCRIPT)),)
 DSM_SCRIPTS_ += start-stop-status
 endif
 DSM_SCRIPTS_ += installer
+DSM_SCRIPTS_ += common
 DSM_SCRIPTS_ += $(notdir $(FWPORTS))
 DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
 
@@ -236,7 +237,9 @@ $(DSM_SCRIPTS_DIR)/preupgrade:
 $(DSM_SCRIPTS_DIR)/postupgrade:
 	@$(dsm_script_redirect)
 
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT) 
+$(DSM_SCRIPTS_DIR)/common: $(COMMON_SCRIPT)
+	@$(dsm_script_copy)
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
 	@$(dsm_script_copy)
 $(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
 	@$(dsm_script_copy)
