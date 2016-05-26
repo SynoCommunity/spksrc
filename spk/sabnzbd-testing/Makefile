@@ -1,11 +1,11 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 1.0.0
-SPK_REV = 5
+SPK_VERS = 1.0.2
+SPK_REV = 6
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
-DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
 SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
@@ -15,13 +15,14 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Update to 1.0.0"
+CHANGELOG = "1. Update to 1.0.2<br>2. Preliminary DSM6 support"
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
 
+COMMON_SCRIPT    = ../../common/common.sh
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
