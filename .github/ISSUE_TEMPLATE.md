@@ -1,26 +1,24 @@
-_[For package requests, click here](https://github.com/SynoCommunity/spksrc/blob/master/.github/PACKAGE_REQUEST_TEMPLATE.md)_.
+_For new Package Requests, see the guidelines_  
 
 ### Setup
-Package Name:  
-Package Version:  
+_Package Name:_
+_Package Version:_
 
-NAS Model:  
-NAS Architecture: _See [Architecture per Synology model](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model)_  
-DSM version:  
+_NAS Model:_
+_NAS Architecture:_
+_DSM version:_
 
-### Expected behaviour
+### Expected behavior
 Tell us what should happen
 
-### Actual behaviour
+### Actual behavior
 Tell us what happens instead
 
 ### Steps to reproduce
-1.  
-2.  
-3.  
+_1._
+_2._
+_3._
 
-### Log files
-_Limit to relevant parts. Use gist.github.com or pastebin for longer log files_
 #### Package log
 _Check Package Center or `/usr/local/{package}/var/`_
 ```

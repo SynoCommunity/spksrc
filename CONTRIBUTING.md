@@ -32,7 +32,7 @@ Title:
 
 Content:
 
-* In the issue body, describe what you did, what you expected to happen and what actually happened;
+* Describe what you did, what you expected to happen and what actually happened;
 * Which steps to perform to reproduce what happened;
 * Model, arch and DSM version of your NAS. See [Architecture per Synology model](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model);
 * Provide log files if available. Sometimes a log is shown in Package Center for that package. There might be a log available at `/usr/local/{package}/var/`;
@@ -48,11 +48,11 @@ Note that opening a request does not mean it will be honored, so please do not a
 You can show your support with a +1, or by adding a bounty via Bountysource.
 
 Before opening a Package Request, make sure that there are no existing requests for the same software.
-As part of your request, some basic information should be included. Contributors use that information as a starting point for packaging. Use the format as shown below.
+As part of your request, some basic information should be included. Contributors use that information as a starting point for packaging. Use the format as shown below or use the following link: [Package Request](https://github.com/SynoCommunity/spksrc/issues/new?title=[Package%20Request]%20&body=Description%3A%0AWebsite%3A%0ADocumentation%3A%0ABuild%2FInstallation%20documentation%3A%0ASource Code%3A%0ALicense%3A)
 
 Title:
 
-[request] Name of software
+[Package Request] Name of software
 
 Content:
 
