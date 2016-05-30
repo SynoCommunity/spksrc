@@ -37,7 +37,7 @@ $(error Unsupported ARCH $(ARCH))
 endif
 
 SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
-EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/../
+EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)/
 SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
 
 include ../../mk/spksrc.cross-cc.mk
@@ -53,11 +53,8 @@ ifeq ($(strip $(STATIC_BINARIES)),1)
 CONF_ARGS += -no-upgrade
 endif
 
-#overwrite the RUN arg to the correct location
-RUN = cd $(SYNCTHING_DIR) && env $(ENV)
-
 myComp:
-	$(RUN) go run build.go $(CONF_ARGS) build
+	cd $(SYNCTHING_DIR) && env $(ENV) go run build.go $(CONF_ARGS) build
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin

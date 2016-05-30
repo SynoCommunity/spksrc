@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
-DEPENDS  = cross/$(SPK_NAME) cross/busybox
+DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = cytec
 DESCRIPTION = Automatically sync files via secure, distributed technology.
