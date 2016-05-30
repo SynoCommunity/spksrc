@@ -15,14 +15,14 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = myComp
 INSTALL_TARGET = nop
 
+GOROOT_BOOTSTRAP=$(WORK_DIR)/../../go-1.4/work-native/go
+
 include ../../mk/spksrc.native-cc.mk
 
 myComp:
 	@$(MSG) "Building Go"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && GOROOT_BOOTSTRAP=$(WORK_DIR)/../../go-1.4/work-native/go ./make.bash
+	cd $(WORK_DIR)/$(PKG_NAME)/src && GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP) ./make.bash
 	@$(MSG) "Building Go for arm"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=arm && export GOARM=5 && GOROOT_BOOTSTRAP=$(WORK_DIR)/../../go-1.4/work-native/go ./make.bash --no-clean
+	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=arm && export GOARM=5 && GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP) ./make.bash --no-clean
 	@$(MSG) "Building Go for 386"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=386 && GOROOT_BOOTSTRAP=$(WORK_DIR)/../../go-1.4/work-native/go ./make.bash --no-clean
-	@$(MSG) "Building Go for amd64"
-        cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=amd64 && GOROOT_BOOTSTRAP=$(WORK_DIR)/../../go-1.4/work-native/go ./make.bash --no-clean
+	cd $(WORK_DIR)/$(PKG_NAME)/src && export GOARCH=386 && GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP) ./make.bash --no-clean
