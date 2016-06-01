@@ -3,7 +3,7 @@
 # Package
 PACKAGE="ffmpeg"
 
-FFMPEG_TARGET="/usr/bin/ffmpeg"
+FFMPEG_TARGET="/usr/bin/${PACKAGE}"
 FFPROBE_TARGET="/usr/bin/ffprobe"
 FFSERVER_TARGET="/usr/bin/ffserver"
 # Others

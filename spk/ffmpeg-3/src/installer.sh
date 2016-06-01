@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Package
-PACKAGE="ffmpeg"
+PACKAGE="ffmpeg-3"
 
-FFMPEG_TARGET="/usr/bin/${PACKAGE}"
+FFMPEG_TARGET="/usr/bin/ffmpeg"
 FFPROBE_TARGET="/usr/bin/ffprobe"
 FFSERVER_TARGET="/usr/bin/ffserver"
 # Others

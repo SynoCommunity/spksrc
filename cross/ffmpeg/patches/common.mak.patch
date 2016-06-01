@@ -1,8 +1,8 @@
---- common.mak.orig	2015-03-30 12:50:05.000000000 +0200
-+++ common.mak	2015-03-30 12:50:09.000000000 +0200
-@@ -111,8 +111,8 @@
+--- common.mak.orig	2015-03-15 09:29:05.910777051 +0100
++++ common.mak	2015-03-15 09:29:27.522698423 +0100
+@@ -122,8 +122,8 @@
  DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
-
+ 
  SRC_DIR    := $(SRC_PATH)/lib$(NAME)
 -ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
 -SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)

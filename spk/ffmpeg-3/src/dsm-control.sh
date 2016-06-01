@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Package
-PACKAGE="ffmpeg"
+PACKAGE="ffmpeg-3"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}/bin/"
