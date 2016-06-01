@@ -12,4 +12,6 @@ COMMENT  = NASM
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
+
 include ../../mk/spksrc.native-cc.mk
+

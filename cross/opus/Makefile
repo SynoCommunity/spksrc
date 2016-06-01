@@ -1,4 +1,4 @@
-PKG_NAME = libopus
+PKG_NAME = opus
 PKG_VERS = 1.1.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = opus-$(PKG_VERS).$(PKG_EXT)
@@ -16,3 +16,4 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-doc --disable-extra-programs
 
 include ../../mk/spksrc.cross-cc.mk
+

@@ -9,10 +9,11 @@ DEPENDS = cross/expat cross/freetype
 
 HOMEPAGE = http://www.freedesktop.org/wiki/Software/fontconfig/
 COMMENT  = Fontconfig is a library for configuring and customizing font access.
-LICENSE  =
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --enable-static --disable-docs --enable-iconv
 
 include ../../mk/spksrc.cross-cc.mk
+

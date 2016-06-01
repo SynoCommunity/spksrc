@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://fribidi.org/
 COMMENT  = GNU FriBidi is an implementation of the Unicode Bidirectional Algorithm (bidi).
-LICENSE  =
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
