@@ -61,6 +61,7 @@ endif
 # For ppc853x-4.3, disable atomics
 ifeq ($(ARCH)-$(TCVERSION), ppc853x-4.3)
 CMAKE+= -DNO_ATOMICS=ON
+CMAKE += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
 myConf:
