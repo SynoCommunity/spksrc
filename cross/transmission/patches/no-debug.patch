@@ -1,11 +1,11 @@
---- configure.orig	2011-07-21 01:39:42.000000000 +0200
-+++ configure	2011-09-21 20:39:01.000000000 +0200
-@@ -15421,7 +15421,7 @@
- 
+--- configure.orig      2016-03-07 20:37:38.167985408 -0500
++++ configure   2016-03-08 13:13:18.948888908 -0500
+@@ -17126,7 +17126,7 @@
+
  if test "x$GCC" = "xyes" ; then
- 
--    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
-+    CFLAGS="$CFLAGS -std=gnu99 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
- 
+
+-    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
++    CFLAGS="$CFLAGS -std=gnu99 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
+
          { $as_echo "$as_me:${as_lineno-$LINENO}: checking gcc version" >&5
  $as_echo_n "checking gcc version... " >&6; }

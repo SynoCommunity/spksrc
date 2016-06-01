@@ -1,5 +1,5 @@
 PKG_NAME = BicBucStriim
-PKG_VERS = 1.2.5
+PKG_VERS = 1.3.6
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://projekte.textmulch.de/bicbucstriim/downloads

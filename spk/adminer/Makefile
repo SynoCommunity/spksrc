@@ -1,20 +1,20 @@
 SPK_NAME = adminer
-SPK_VERS = 4.2.3
+SPK_VERS = 4.2.4
 SPK_REV = 1
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = piwi82
 DESCRIPTION = Adminer is a full-featured database management tool available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
 DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
+ADMIN_URL = /adminer/
 RELOAD_UI = yes
-STARTABLE = no
 DISPLAY_NAME = Adminer
-CHANGELOG = Initial release of Adminer 4.2.3
+CHANGELOG = Initial release of Adminer 4.2.4
 
-HOMEPAGE   = https://www.adminer.org/
+HOMEPAGE   = https://www.adminer.org
 LICENSE    = Apache License 2.0 or GPL 2
 
 INSTALLER_SCRIPT = src/installer.sh

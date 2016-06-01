@@ -8,9 +8,10 @@ PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
-MYSQL="/usr/syno/mysql/bin/mysql"
-MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
+USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
+PHP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
+MYSQL="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
+MYSQLDUMP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="mantisbt"
 MYSQL_DATABASE="mantisbt"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -60,7 +61,7 @@ postinst ()
 
     # Install/upgrade database
     sed -i -e "s/gpc_get_int( 'install', 0 );/gpc_get_int( 'install', 2 );/g" ${WEB_DIR}/${PACKAGE}/admin/install.php
-    php ${WEB_DIR}/${PACKAGE}/admin/install.php > /dev/null
+    ${PHP} ${WEB_DIR}/${PACKAGE}/admin/install.php > /dev/null
 
     # Remove admin directory
     rm -fr ${WEB_DIR}/${PACKAGE}/admin/

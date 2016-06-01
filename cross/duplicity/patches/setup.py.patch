@@ -1,16 +1,16 @@
---- setup.py.org	2014-05-09 15:27:41.000000000 +0200
-+++ setup.py	2014-10-02 07:28:43.000000000 +0200
-@@ -25,6 +25,7 @@
+--- setup.py.orig	2016-03-24 11:29:14.846659092 +0100
++++ setup.py	2016-03-24 11:29:01.422658618 +0100
+@@ -26,6 +26,7 @@
  from setuptools.command.test import test
  from setuptools.command.install import install
  from setuptools.command.sdist import sdist
 +from setuptools.command.install_scripts import install_scripts
+ from distutils.command.build_scripts import build_scripts
  
- version_string = "0.6.24"
- 
-@@ -124,6 +136,26 @@
+ version_string = "0.7.06"
+@@ -126,6 +127,24 @@
+         os.system("mkdir -p " + self.dist_dir)
          os.system("mv duplicity-" + version + ".tar.gz " + self.dist_dir)
- 
  
 +class InstallScriptsCommand(install_scripts):
 +    def run(self):
@@ -30,16 +30,14 @@
 +            fp = open(outfile, 'wb')
 +            fp.write(data)
 +            fp.close()
-+
-+
- setup(name="duplicity",
-       version=version_string,
-       description="Encrypted backup using rsync algorithm",
-@@ -151,5 +183,6 @@
-       test_suite = 'testing',
+ 
+ # don't touch my shebang
+ class BSCommand (build_scripts):
+@@ -198,5 +217,6 @@
        cmdclass={'test': TestCommand,
                  'install': InstallCommand,
--                'sdist': SDistCommand},
-+                'sdist': SDistCommand,
-+                'install_scripts': InstallScriptsCommand},
+                 'sdist': SDistCommand,
+-                'build_scripts': BSCommand},
++                'build_scripts': BSCommand,
++                'install_scripts': InstallScriptsCommand},                
        )

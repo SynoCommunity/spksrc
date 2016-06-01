@@ -1,4 +1,5 @@
 argh==0.26.1
+awesome-slugify==1.6.5
 Babel==2.0
 backports.ssl-match-hostname==3.4.0.2
 blinker==1.4
@@ -20,6 +21,7 @@ pyasn1==0.1.8
 pylru==1.0.9
 pyserial==2.7
 pytz==2015.6
+regex==2016.03.02
 requests==2.7.0
 rsa==3.2
 sarge==0.1.4

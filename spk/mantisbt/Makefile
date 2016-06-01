@@ -1,6 +1,6 @@
 SPK_NAME = mantisbt
 SPK_VERS = 1.2.19
-SPK_REV = 3
+SPK_REV = 5
 SPK_ICON = src/mantisbt.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour facili
 ADMIN_URL = /mantisbt
 RELOAD_UI = yes
 DISPLAY_NAME = MantisBT
-CHANGELOG = Update to 1.2.19
+CHANGELOG = Fix issue where new installs on DSM6 did not work
 
 HOMEPAGE   = http://www.mantisbt.org
 LICENSE    = GPL

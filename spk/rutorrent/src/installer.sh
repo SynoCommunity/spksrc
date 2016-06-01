@@ -186,6 +186,11 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
+    # Revision 8 introduces backward incompatible changes
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
+        sed -i -e "s|http_cacert = .*|http_cacert = ${INSTALL_DIR}/cert.pem|g" ${INSTALL_DIR}/var/.rtorrent.rc
+    fi
+
     # Save the configuration file
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}

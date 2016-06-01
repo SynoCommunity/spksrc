@@ -20,48 +20,27 @@ Docker
 
 Virtual machine
 ^^^^^^^^^^^^^^^
-A virtual machine based on an x86, 32-bit version of Debian stable OS is recommended. Non-x86 architectures or 64-bit architectures are not supported.
+A virtual machine based on an 64-bit version of Debian stable OS is recommended. Non-x86 architectures are not supported.
 
 * Install the requirements::
 
-    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check bjam intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython lzip cmake swig
+    sudo dpkg --add-architecture i386 && sudo apt-get update
+    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev libcppunit-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython lzip cmake swig libc6-i386
     sudo pip install -U setuptools pip wheel httpie
 
 * You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
-* Start the virtual machine
+* Some older toolchains may require 32-bit development versions of packages, e.g. `zlib1g-dev:i386`
+
 
 For further instructions, refer to Pull Requests section of `CONTRIBUTING`_.
 
 
 Donate
 ------
-If you like spksrc and packages created with it, consider making a donation to its core developers:
-
-* Diaoul
+To support SynoCommunity, you can make a donation to its founder
 
   .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
     :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F6GDE5APQ4SBN
-
-  .. image:: http://api.flattr.com/button/flattr-badge-large.png
-    :target: http://flattr.com/thing/718012/SynoCommunity
-
-* moneytoo
-
-  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
-    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DQKBRZBVPC77L
-
-* piwi82
-
-  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
-    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=T6BU3QXYH4CMG
-
-* bru7us
-
-  .. image:: https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif
-    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W3UX3VM22WRQY&item_name=SynoCommunity
-
-  .. image:: http://api.flattr.com/button/flattr-badge-large.png
-    :target: http://flattr.com/thing/1106801/
 
 
 License

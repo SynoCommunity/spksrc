@@ -1,0 +1,6 @@
+[{
+        "step_title": "Update Warning",
+        "items": [{
+        "desc": "When you upgrade an existing 0.7.x installation, release 1.0.0 will NOT be able to finish the queue. <br><br> It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.0.0 and then use queue repair on the Status page.<br><br>Some information, like the order of the queue, will be lost."
+    }]
+}]
