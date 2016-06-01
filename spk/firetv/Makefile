@@ -2,8 +2,8 @@ SPK_NAME = firetv
 SPK_VERS = 1.0.2
 SPK_REV = 1
 SPK_ICON = src/firetv.png
-
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel cross/$(SPK_NAME)
+DEPENDS = cross/libusb
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.6-8"
 
@@ -21,7 +21,6 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = firetv_extra_install
 
 include ../../mk/spksrc.spk.mk
