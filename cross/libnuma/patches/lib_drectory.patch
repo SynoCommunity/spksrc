@@ -1,12 +1,13 @@
---- getlibdir	2013-10-08 23:34:57.000000000 +0200
-+++ getlibdir.n	2016-05-10 16:58:29.455979019 +0200
-@@ -1,7 +1,7 @@
+--- getlibdir.orig	2016-06-01 14:14:30.444118300 +0200
++++ getlibdir	2016-06-01 14:14:45.204468769 +0200
+@@ -1,9 +1,2 @@
  #!/bin/sh
- case `uname -m` in
+-case `uname -m` in
 -s390x|x86_64|ppc64) 
 -	echo -n lib64
-+s390x|x86_64|ppc64)
-+	echo -n lib
- 	;;
- *)
- 	echo -n lib
+-	;;
+-*)
+-	echo -n lib
+-	;;
+-esac
++echo -n lib

@@ -15,7 +15,7 @@ DISPLAY_NAME = ffmpeg
 STARTABLE = no
 
 HOMEPAGE = http://www.ffmpeg.org/
-LICENSE  =
+LICENSE  = LGPL 2.1
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

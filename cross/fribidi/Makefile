@@ -9,10 +9,10 @@ DEPENDS =
 
 HOMEPAGE = http://fribidi.org/
 COMMENT  = GNU FriBidi is an implementation of the Unicode Bidirectional Algorithm (bidi).
-LICENSE  =
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --enable-static --with-pic
+CONFIGURE_ARGS = --with-pic
 
 include ../../mk/spksrc.cross-cc.mk

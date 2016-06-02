@@ -10,20 +10,19 @@ HOMEPAGE = https://sourceforge.net/projects/soxr/
 COMMENT  = The SoX Resampler library 'libsoxr' performs one-dimensional sample-rate conversion—it may be used, for example, to resample PCM-encoded audio.
 LICENSE  = GPL & LGPL
 
-CONFIGURE_TARGET = myConf
+CONFIGURE_TARGET = myConfigure
+
+CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
+CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
+CMAKE_ARGS += -DBUILD_TESTS=OFF
+
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+CMAKE_ARGS += -DVISIBILITY_HIDDEN=OFF
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-
-CMAKE=cmake \
-	-DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX) \
-	-DEXTRA_LINK_FLAGS="-ldl" \
-	-DBUILD_TESTS=OFF \
-
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-	CMAKE += -DVISIBILITY_HIDDEN=OFF
-endif
-
-myConf:
-	$(RUN) $(CMAKE) .
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) cmake $(CMAKE_ARGS)
 

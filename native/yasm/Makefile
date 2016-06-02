@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = http://yasm.tortall.net
 COMMENT  = Yasm is a complete rewrite of the NASM assembler under the new BSD License.
-LICENSE  =
+LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 

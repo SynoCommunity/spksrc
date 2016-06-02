@@ -11,59 +11,53 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = myConf
+CONFIGURE_TARGET = myConfigure
 
 include ../../mk/spksrc.cross-cc.mk
 
 
-CMAKE=cmake -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX) \
-				-DEXTRA_LINK_FLAGS="-ldl" \
-				-DCMAKE_CROSSCOMPILING=TRUE \
-				-DCMAKE_SYSTEM_NAME=Linux \
-				-DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc \
-				-DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
+CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
+CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
+CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
+CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
+CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
+CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
 
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
-CMAKE += -DCMAKE_SYSTEM_PROCESSOR=armv5
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 
 ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
-CMAKE += -DCMAKE_CXX_FLAGS=-fPIC
-CMAKE += -DCMAKE_SYSTEM_PROCESSOR=armv7
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 endif
 
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-CMAKE += -DCMAKE_SYSTEM_PROCESSOR=ppc64
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64
 endif
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
-DEPENDS += native/yasm
+DEPENDS += native/yasm cross/libnuma
 ENV += AS=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/yasm
 ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
-DEPENDS += cross/libnuma
-CMAKE += -DCMAKE_SYSTEM_PROCESSOR=x86_64
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
 endif
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
-DEPENDS += native/yasm
+DEPENDS += native/yasm cross/libnuma
 ENV += AS=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/yasm
 ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
-DEPENDS += cross/libnuma
-CMAKE += -DCMAKE_SYSTEM_PROCESSOR=x86
-endif
-
-# For 88f6281-4.3, disable atomics
-ifeq ($(ARCH)-$(TCVERSION), 88f6281-4.3)
-CMAKE+= -DNO_ATOMICS=ON
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86
 endif
 
 # For ppc853x-4.3, disable atomics
 ifeq ($(ARCH)-$(TCVERSION), ppc853x-4.3)
-CMAKE+= -DNO_ATOMICS=ON
-CMAKE += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
+CMAKE_ARGS += -DNO_ATOMICS=ON
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
-myConf:
-	$(RUN) $(CMAKE) .
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) cmake $(CMAKE_ARGS) .
 

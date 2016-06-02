@@ -9,11 +9,9 @@ DEPENDS = cross/freetype cross/fribidi cross/fontconfig
 
 HOMEPAGE = https://github.com/libass/libass
 COMMENT  = libass is a portable subtitle renderer for the ASS/SSA (Advanced Substation Alpha/Substation Alpha) subtitle format.
-LICENSE  =
+LICENSE  = ICS
 
 GNU_CONFIGURE = 1
 
-#CONFIGURE_ARGS += --disable-fontconfig
-CONFIGURE_ARGS +=
-
 include ../../mk/spksrc.cross-cc.mk
+
