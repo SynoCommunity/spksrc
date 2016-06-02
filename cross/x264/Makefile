@@ -16,6 +16,8 @@ CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross
 
 include ../../mk/spksrc.cross-cc.mk
 
+YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
+
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 ENV += x264_ARCH=ARM
 CONFIGURE_ARGS += --disable-asm
@@ -28,15 +30,15 @@ endif
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 DEPENDS += native/yasm
-ENV += AS=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/yasm
-ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
+ENV += AS=$(YASM_PATH)/yasm
+ENV += PATH=$(YASM_PATH):$$PATH
 ENV += x264_ARCH=X86_64
 endif
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 DEPENDS += native/yasm
-ENV += AS=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/yasm
-ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
+ENV += AS=$(YASM_PATH)/yasm
+ENV += PATH=$(YASM_PATH):$$PATH
 ENV += x264_ARCH=X86
 endif
 
