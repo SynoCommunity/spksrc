@@ -15,6 +15,7 @@ CONFIGURE_TARGET = myConfigure
 
 include ../../mk/spksrc.cross-cc.mk
 
+YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
 CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
@@ -39,15 +40,13 @@ endif
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 DEPENDS += native/yasm cross/libnuma
-ENV += AS=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/yasm
-ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
+ENV += PATH=$(YASM_PATH):$$PATH
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
 endif
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 DEPENDS += native/yasm cross/libnuma
-ENV += AS=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/yasm
-ENV += PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin/:$$PATH
+ENV += PATH=$(YASM_PATH):$$PATH
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86
 endif
 
