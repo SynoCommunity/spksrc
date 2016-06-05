@@ -1,0 +1,3 @@
+lnk:lib/libbluray.so
+lnk:lib/libbluray.so.1
+lib:lib/libbluray.so.1.10.0

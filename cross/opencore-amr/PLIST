@@ -1,0 +1,6 @@
+lnk:lib/libopencore-amrnb.so
+lnk:lib/libopencore-amrnb.so.0
+lib:lib/libopencore-amrnb.so.0.0.3
+lnk:lib/libopencore-amrwb.so
+lnk:lib/libopencore-amrwb.so.0
+lib:lib/libopencore-amrwb.so.0.0.3

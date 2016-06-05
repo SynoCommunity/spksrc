@@ -1,0 +1,8 @@
+lnk:lib/libsoxr-lsr.so
+lnk:lib/libsoxr-lsr.so.0
+lib:lib/libsoxr-lsr.so.0.1.9
+lnk:lib/libsoxr.so
+lnk:lib/libsoxr.so.0
+lib:lib/libsoxr.so.0.1.1
+rsc:include/soxr.h
+rsc:include/soxr-lsr.h

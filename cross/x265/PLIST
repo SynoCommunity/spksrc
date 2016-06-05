@@ -1,0 +1,5 @@
+bin:bin/x265
+lnk:lib/libx265.so
+lib:lib/libx265.so.79
+rsc:include/x265_config.h
+rsc:include/x265.h
