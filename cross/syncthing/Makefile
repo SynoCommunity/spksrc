@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.12.21
+PKG_VERS = 0.13.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
@@ -16,7 +16,7 @@ COMPILE_TARGET = myComp
 INSTALL_TARGET = myInstall
 
 GOOS = linux
-CGO_ENABLED=1
+CGO_ENABLED=0
 
 # set this to 1 to create static linked binaries
 STATIC_BINARIES = 0
@@ -24,7 +24,6 @@ STATIC_BINARIES = 0
 # Define SYNCTHING_ARCH as per SyncThing standards
 ifeq ($(findstring $(ARCH),88f5281 88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
 SYNCTHING_ARCH = arm
-CGO_ENABLED = 0
 ENV += GOARM=5
 endif
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -37,21 +36,14 @@ ifeq ($(SYNCTHING_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
-ifeq ($(findstring $(SYNCTHING_ARCH),amd64),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/syncthing
-endif
-
-ifeq ($(findstring $(SYNCTHING_ARCH),386),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_386/syncthing
-endif
-
-ifeq ($(findstring $(SYNCTHING_ARCH),arm),$(SYNCTHING_ARCH))
-SYNCTHING_BIN = $(WORK_DIR)/$(PKG_DIR)/bin/linux_arm/syncthing
-endif
+SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
+EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
+SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
 
 include ../../mk/spksrc.cross-cc.mk
 
-ENV += GOPATH=$(WORK_DIR)/../../../native/go/work-native/go/
+# use workdir as gopath
+ENV += GOPATH=$(WORK_DIR)
 ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
@@ -62,11 +54,7 @@ CONF_ARGS += -no-upgrade
 endif
 
 myComp:
-	#go is particular about file locations so we have to link it to the native directory to work!
-	rm -rf $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing
-	mkdir -p $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing
-	ln -sf $(WORK_DIR)/$(PKG_DIR) $(WORK_DIR)/../../../native/go/work-native/go/src/github.com/syncthing/syncthing
-	$(RUN) go run build.go $(CONF_ARGS)
+	cd $(SYNCTHING_DIR) && env $(ENV) go run build.go $(CONF_ARGS) build
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
