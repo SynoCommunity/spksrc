@@ -7,9 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://www.iis.fraunhofer.de/en/ff/amm/impl/fdkaaccodec.html
+HOMEPAGE = http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC
 COMMENT  = The Fraunhofer FDK AAC is a high-quality open-source AAC encoder library developed by Fraunhofer IIS.
-LICENSE  =
+LICENSE  = FDK License & Apache 2: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
 
 GNU_CONFIGURE = 1
 
