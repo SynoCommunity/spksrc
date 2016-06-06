@@ -37,13 +37,13 @@ $(error Unsupported ARCH $(ARCH))
 endif
 
 SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
-EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)/
+EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
 
 include ../../mk/spksrc.cross-cc.mk
 
-# use workdir as gopath 
-ENV += GOPATH=$(WORK_DIR)/
+# use workdir as gopath
+ENV += GOPATH=$(WORK_DIR)
 ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
