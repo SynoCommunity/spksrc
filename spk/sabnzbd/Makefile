@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 1.0.2
-SPK_REV = 16
+SPK_VERS = 1.0.3
+SPK_REV = 17
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
