@@ -1,10 +1,12 @@
 PKG_NAME = umurmur
 PKG_VERS = 0.2.16
 PKG_EXT = tar.gz
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/umurmur/umurmur/archive
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = 779660334a7291f4918e313a78ed48f4d3d6e0a5
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+#PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/umurmur/umurmur.git
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = cross/libconfig cross/protobuf-c cross/openssl
 

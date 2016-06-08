@@ -5,7 +5,7 @@ PKG_DIST_NAME = ffmpeg-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases/
 PKG_DIR = ffmpeg-$(PKG_VERS)
 
-DEPENDS = cross/x264-git cross/lame
+DEPENDS = cross/x264-git cross/lame cross/fdk-aac cross/xvid
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -27,6 +27,6 @@ $(error Unsupported ARCH $(ARCH))
 endif
 
 
-CONFIGURE_ARGS = --disable-yasm --disable-doc --enable-gpl --enable-libx264 --enable-libmp3lame --enable-nonfree --enable-cross-compile --arch=$(MYARCH) --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX) --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include" --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib" --extra-libs=-ldl
+CONFIGURE_ARGS = --disable-yasm --disable-doc --enable-gpl --enable-libx264 --enable-libmp3lame --enable-libfdk-aac --enable-libxvid --enable-nonfree --enable-cross-compile --arch=$(MYARCH) --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX) --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include" --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib" --extra-libs=-ldl
 
 include ../../mk/spksrc.cross-cc.mk
