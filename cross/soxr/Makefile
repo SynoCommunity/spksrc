@@ -12,17 +12,17 @@ LICENSE  = GPL & LGPL
 
 CONFIGURE_TARGET = myConfigure
 
-CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
+include ../../mk/spksrc.cross-cc.mk
+
+CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
 CMAKE_ARGS += -DBUILD_TESTS=OFF
 
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(ARCH)-$(TCVERSION),ppc853x-4.3)
 CMAKE_ARGS += -DVISIBILITY_HIDDEN=OFF
 endif
 
-include ../../mk/spksrc.cross-cc.mk
-
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) cmake $(CMAKE_ARGS)
+	$(RUN) cmake $(CMAKE_ARGS) .
 
