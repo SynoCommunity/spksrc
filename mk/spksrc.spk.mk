@@ -35,6 +35,13 @@ ifneq ($(REQUIRED_DSM),)
   endif
 endif
 
+# Check if package supports ARCH-DSM
+ifneq ($(UNSUPPORTED_ARCHS_DSM),)
+  ifneq (,$(findstring $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_DSM)))
+    @$(error '$(ARCH)-$(TCVERSION)' is not a supported )
+  endif
+endif
+
 #####
 
 # Even though this makefile doesn't cross compile, we need this to setup the cross environment.
@@ -236,7 +243,7 @@ $(DSM_SCRIPTS_DIR)/preupgrade:
 $(DSM_SCRIPTS_DIR)/postupgrade:
 	@$(dsm_script_redirect)
 
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT) 
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
 	@$(dsm_script_copy)
 $(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
 	@$(dsm_script_copy)

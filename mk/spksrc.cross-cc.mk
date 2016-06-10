@@ -41,6 +41,14 @@ ifneq ($(REQUIRED_DSM),)
   endif
 endif
 
+# Check if package supports ARCH-DSM
+ifneq ($(UNSUPPORTED_ARCHS_DSM),)
+  ifneq (,$(findstring $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_DSM)))
+    @$(error '$(ARCH)-$(TCVERSION)' is not a supported )
+  endif
+endif
+
+
 #####
 
 include ../../mk/spksrc.cross-env.mk
