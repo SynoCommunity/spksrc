@@ -1,0 +1,33 @@
+# This patch will be not necessary in the next version of fdk-aac
+# It was merged in master: https://github.com/mstorsjo/fdk-aac/pull/42
+--- libSYS/include/machine_type.h.orig	2016-05-17 15:34:37.851511531 +0200
++++ libSYS/include/machine_type.h	2016-05-17 15:34:56.591970579 +0200
+@@ -293,7 +293,7 @@
+ #else
+ #ifndef FORCEINLINE
+   #if defined(__GNUC__)	/* cppp replaced: elif */
+-    #define FORCEINLINE __attribute((always_inline))
++    #define FORCEINLINE inline __attribute((always_inline))
+   #else
+     #define FORCEINLINE
+   #endif
+--- libFDK/include/fft.h.orig	2016-05-18 08:01:16.259465851 +0200
++++ libFDK/include/fft.h	2016-05-18 08:00:28.950238245 +0200
+@@ -121,7 +121,7 @@
+  */
+
+ LNK_SECTION_CODE_L1
+-static void FORCEINLINE fft_4(FIXP_DBL *x)
++static FORCEINLINE void fft_4(FIXP_DBL *x)
+ {
+     FIXP_DBL a00, a10, a20, a30, tmp0, tmp1;
+
+@@ -149,7 +149,7 @@
+ }
+
+ LNK_SECTION_CODE_L1
+-static void FORCEINLINE fft_8(FIXP_DBL *x)
++static FORCEINLINE void fft_8(FIXP_DBL *x)
+ {
+       #define W_PiFOURTH STC(0x5a82799a)
+
