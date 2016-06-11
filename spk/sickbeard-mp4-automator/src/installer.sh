@@ -26,7 +26,7 @@ SYNO_GROUP_DESC="SynoCommunity's media related group"
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code git://github.com/phtagn/sickbeard_mp4_automator.git phtagn-syno > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code git://github.com/phtagn/sickbeard_mp4_automator.git upstream > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
