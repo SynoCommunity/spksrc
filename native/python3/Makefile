@@ -12,7 +12,6 @@ COMMENT    = Python Programming Language
 LICENSE    =
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 CONFIGURE_ARGS = --enable-ipv6 --without-ensurepip
 
 COMPILE_TARGET = myCompile
