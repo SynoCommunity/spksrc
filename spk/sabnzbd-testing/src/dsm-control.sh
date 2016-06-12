@@ -8,7 +8,7 @@ DNAME="SABnzbd Testing"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="sabnzbd-testing"
+USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n sc-sabnzbd-testing || echo -n sabnzbd-testing)"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
@@ -18,7 +18,7 @@ PID_FILE="${INSTALL_DIR}/var/sabnzbd.pid"
 
 start_daemon ()
 {
-    su ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 }
 
 stop_daemon ()
