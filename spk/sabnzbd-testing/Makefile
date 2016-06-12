@@ -1,11 +1,11 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 1.0.0
-SPK_REV = 5
+SPK_VERS = 1.0.3
+SPK_REV = 6
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
-DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
+DEPENDS  = cross/busybox cross/par2cmdline cross/unzip cross/unrar cross/$(SPK_NAME)
 SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
@@ -15,7 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Update to 1.0.0"
+CHANGELOG = "Updated to 1.0.3<br>Warning: When you upgrade an existing 0.7.x installation, release 1.0.0 will NOT be able to finish the queue. It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.0.0 and then use queue repair on the Status page. Some information (like the order of the queue) will be lost."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
