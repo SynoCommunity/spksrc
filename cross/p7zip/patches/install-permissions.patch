@@ -1,19 +1,19 @@
---- install.sh.old	2011-03-16 20:32:56.000000000 +0100
-+++ install.sh	2013-02-16 18:20:08.000000000 +0100
-@@ -178,8 +178,6 @@
-   echo "- installing HTML help in ${DEST_DIR}${DEST_SHARE_DOC}/DOCS"
+--- install.sh.orig	2016-06-12 10:42:37.409345181 +0200
++++ install.sh	2016-06-12 10:42:29.305345113 +0200
+@@ -180,8 +180,6 @@
+   echo "- installing HTML help in ${DEST_DIR}${DEST_SHARE_DOC}/DOC"
    mkdir -p "${DEST_DIR}${DEST_SHARE_DOC}"
-   cp -r DOCS "${DEST_DIR}${DEST_SHARE_DOC}/DOCS"
--  find "${DEST_DIR}${DEST_SHARE_DOC}/DOCS" -type d -exec chmod 555 {} \;
--  find "${DEST_DIR}${DEST_SHARE_DOC}/DOCS" -type f -exec chmod 444 {} \;
+   cp -r DOC "${DEST_DIR}${DEST_SHARE_DOC}/DOC"
+-  find "${DEST_DIR}${DEST_SHARE_DOC}/DOC" -type d -exec chmod 755 {} \;
+-  find "${DEST_DIR}${DEST_SHARE_DOC}/DOC" -type f -exec chmod 644 {} \;
  fi
  
  use_lang="n"
-@@ -200,7 +198,5 @@
+@@ -202,7 +200,5 @@
  then
    echo "- installing Lang in ${DEST_DIR}${DEST_SHARE}"
    cp -r GUI/Lang "${DEST_DIR}${DEST_SHARE}/"
--  find "${DEST_DIR}${DEST_SHARE}/Lang" -type d -exec chmod 555 {} \;
--  find "${DEST_DIR}${DEST_SHARE}/Lang" -type f -exec chmod 444 {} \;
+-  find "${DEST_DIR}${DEST_SHARE}/Lang" -type d -exec chmod 755 {} \;
+-  find "${DEST_DIR}${DEST_SHARE}/Lang" -type f -exec chmod 644 {} \;
  fi
  

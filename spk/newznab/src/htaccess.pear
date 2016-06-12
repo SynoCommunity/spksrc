@@ -1,3 +1,0 @@
-
-# Add PEAR to the include path
-php_value include_path ".:/usr/local/newznab/share/pear"

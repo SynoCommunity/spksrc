@@ -1,10 +1,10 @@
 SPK_NAME = nzbget-testing
 SPK_VERS = 16.0~r1439
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/unrar cross/p7zip cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/p7zip cross/unrar cross/$(SPK_NAME)
 
 MAINTAINER = Diaoul
 DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 16.0~r1439<br>2. Update configuration templates"
+CHANGELOG = "1. Update to 16.0~r1439<br>2. Security fix for p7zip"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
