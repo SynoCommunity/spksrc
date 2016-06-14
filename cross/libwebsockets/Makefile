@@ -1,8 +1,8 @@
 PKG_NAME = libwebsockets
 PKG_VERS = 1.4-chrome43-firefox-36
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://git.libwebsockets.org/cgi-bin/cgit/libwebsockets/snapshot
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/warmcat/libwebsockets/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl
