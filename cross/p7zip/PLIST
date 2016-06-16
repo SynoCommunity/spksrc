@@ -6,4 +6,4 @@ lib:lib/p7zip/7za
 lib:lib/p7zip/7zCon.sfx
 lib:lib/p7zip/7zr
 lib:lib/p7zip/7z.so
-lib:lib/p7zip/Codecs/Rar29.so
+lib:lib/p7zip/Codecs/Rar.so

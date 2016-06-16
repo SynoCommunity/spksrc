@@ -1,0 +1,11 @@
+--- config.mak.uname.orig	2016-03-22 11:13:28.842072683 -0400
++++ config.mak.uname	2016-03-22 21:19:59.399509791 -0400
+@@ -17,7 +17,7 @@
+ # because maintaining the nesting to match is a pain.  If
+ # we had "elif" things would have been much nicer...
+ 
+-ifeq ($(uname_M),x86_64)
++ifeq ($(TC_TARGET),x86_64-pc-linux-gnu)
+ 	XDL_FAST_HASH = YesPlease
+ endif
+ ifeq ($(uname_S),OSF1)

@@ -1,10 +1,10 @@
 SPK_NAME = nzbget
 SPK_VERS = 16.4
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/nzbget.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/unrar cross/p7zip cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/p7zip cross/unrar cross/$(SPK_NAME)
 
 MAINTAINER = Diaoul
 DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 6789
 DISPLAY_NAME = NZBGet
-CHANGELOG = "Update NZBGet to 16.4"
+CHANGELOG = "1. Update NZBGet to 16.4<br>2. Security fix for p7zip"
 
 HOMEPAGE = http://nzbget.net
 LICENSE  = GPLv2
