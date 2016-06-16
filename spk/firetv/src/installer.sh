@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="firetv"
-DNAME="firetv"
+DNAME="Fire TV Server"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"

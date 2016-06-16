@@ -6,7 +6,8 @@ DEPENDS = cross/libusb
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.6-8"
-
+CHANGELOG = "Initial release"
+BETA = 1
 MAINTAINER = SynoCommunity
 DESCRIPTION = Fire TV is a Python 2.x package that provides state information and some control of an Amazon Fire TV device over a network.
 RELOAD_UI = yes
