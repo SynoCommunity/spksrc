@@ -9,10 +9,10 @@ SPK_DEPENDS = "python>=2.7.6-8"
 CHANGELOG = "Initial release"
 BETA = 1
 MAINTAINER = SynoCommunity
-DESCRIPTION = Fire TV is a Python 2.x package that provides state information and some control of an Amazon Fire TV device over a network.
+DESCRIPTION = 'Fire TV is a Python 2.x package that provides state information and some control of a Amazon Fire TV device over a network. To run this module from the command line use "env LD_LIBRARY_PATH=/usr/local/firetv/lib firetv-server"'
 RELOAD_UI = yes
 STARTABLE = no
-DISPLAY_NAME = firetv
+DISPLAY_NAME = "Fire TV Server"
 
 HOMEPAGE = https://github.com/happyleavesaoc/python-firetv
 LICENSE  = MIT
