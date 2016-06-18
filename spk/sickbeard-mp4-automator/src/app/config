@@ -1,0 +1,11 @@
+{
+    ".url": {
+        "com.synocommunity.packages.sickbeard-mp4-automator": {
+            "title": "SickBeard MP4 Automator",
+            "desc": "SickBeard MP4 Automator Web UI",
+            "icon": "images/sickbeard-custom-{0}.png",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

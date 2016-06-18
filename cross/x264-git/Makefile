@@ -1,9 +1,10 @@
-PKG_NAME = x264
-PKG_VERS = 20141218-2245
-PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.videolan.org/pub/x264/snapshots/
-PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
+PKG_NAME = x264-git
+PKG_EXT = tar.gz
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = 3b70645597bea052d2398005bc723212aeea6875
+PKG_DIST_SITE = git://git.videolan.org/x264.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS =
 GNU_CONFIGURE = 1
@@ -12,7 +13,6 @@ COMMENT  = x264 is a free software library and application for encoding video st
 LICENSE  =
 
 CONFIGURE_ARGS = --enable-static --disable-asm --prefix=$(INSTALL_PREFIX)
-DOWNLOAD_ARGS = --no-passive-ftp
 
 ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
 ADDITIONAL_CFLAGS = -O0

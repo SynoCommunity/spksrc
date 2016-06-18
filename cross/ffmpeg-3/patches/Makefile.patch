@@ -1,0 +1,11 @@
+--- Makefile.orig	2016-05-18 19:37:43.394016307 +0000
++++ Makefile	2016-05-18 19:41:37.962017061 +0000
+@@ -98,7 +98,7 @@
+ $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
+ SUBDIR := $(1)/
+ include $(SRC_PATH)/$(1)/Makefile
+--include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
++-include $(SRC_PATH)/$(1)/$(FFMPEG_ARCH)/Makefile
+ -include $(SRC_PATH)/$(1)/$(INTRINSICS)/Makefile
+ include $(SRC_PATH)/library.mak
+ endef

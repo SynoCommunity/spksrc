@@ -1,6 +1,6 @@
 SPK_NAME = umurmur
 SPK_VERS = 0.2.16
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/umurmur.png
 DSM_UI_DIR = app
 
