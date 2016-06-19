@@ -1,7 +1,8 @@
 PKG_NAME = wallabag
-PKG_VERS = 1.9.1-b
+PKG_VERS = 1.9.2
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/wallabag/wallabag/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
