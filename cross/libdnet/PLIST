@@ -1,0 +1,7 @@
+bin:sbin/dnet
+lnk:lib/libdnet
+lnk:lib/libdnet.1
+lib:lib/libdnet.1.0.1
+lnk:lib/libdnet.so
+lnk:lib/libdnet.so.1
+lnk:lib/libdnet.so.1.0.1
