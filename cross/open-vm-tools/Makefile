@@ -11,9 +11,10 @@ DEPENDS = cross/glib cross/openssl cross/procps-ng cross/fuse cross/libdnet cros
 HOMEPAGE = https://github.com/vmware/open-vm-tools
 COMMENT  = open-vm-tools is a set of services and modules that enable several features in VMware products for better management of, and seamless user interactions with, guests
 LICENSE  = GPLv2
-PRE_CONFIGURE_TARGET = myPreConfigure
 
-ENV += confdir=$(STAGING_INSTALL_PREFIX)/etc/vmware-tools
+PRE_CONFIGURE_TARGET = myPreConfigure
+INSTALL_TARGET = myInstall
+
 ENV += CUSTOM_PROCPS_NAME=procps
 ENV += CUSTOM_PROCPS_LIBS="-L$(STAGING_INSTALL_PREFIX)/lib -lprocps"
 ADDITIONAL_CFLAGS = -Wno-error -Dlinux=1 -Wno-implicit-function-declaration
@@ -36,6 +37,7 @@ CONFIGURE_ARGS += --without-icu
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPreConfigure
 myPreConfigure:
 	$(RUN) autoreconf -fiv
+myInstall:
+	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX) confdir=$(STAGING_INSTALL_PREFIX)/etc/vmware-tools

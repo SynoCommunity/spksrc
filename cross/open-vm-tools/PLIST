@@ -9,8 +9,6 @@ bin:bin/vmware-toolbox-cmd
 bin:bin/vmware-vmblock-fuse
 bin:bin/vmware-xferlogs
 bin:sbin/mount.vmhgfs
-lib:common/libhgfsServer.so
-lib:common/libvix.so
 lib:lib/libDeployPkg.so.0.0.0
 lib:lib/libguestlib.so.0.0.0
 lib:lib/libhgfs.so.0.0.0
