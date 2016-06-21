@@ -1,0 +1,5 @@
+bin:sbin/tinyproxy
+rsc:etc/tinyproxy.conf
+rsc:share/tinyproxy/debug.html
+rsc:share/tinyproxy/default.html
+rsc:share/tinyproxy/stats.html
