@@ -8,6 +8,7 @@ bin:bin/tic
 bin:bin/toe
 bin:bin/tput
 bin:bin/tset
+lnk:lib/libcurses.so
 lnk:lib/libform.so
 lnk:lib/libform.so.6
 lib:lib/libform.so.6.0

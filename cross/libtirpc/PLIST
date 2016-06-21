@@ -1,0 +1,4 @@
+rsc:etc/netconfig
+lib:lib/libtirpc.so.1.0.10
+lnk:lib/libtirpc.so.1
+lnk:lib/libtirpc.so
