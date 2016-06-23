@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = x86
 TC_VERS = 6.0
-TC_FIRMWARE = 5.2-5565
+TC_FIRMWARE = 6.0-7321
 
 TC_DIST_NAME = x64-gcc493_glibc220_linaro_x86_64-GPL.txz
 

@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = armadaxp
 TC_VERS = 6.0
-TC_FIRMWARE = 5.0-4458
+TC_FIRMWARE = 6.0-7321
 
 TC_DIST_NAME = armadaxp-gcc493_glibc220_hard-GPL.txz
 

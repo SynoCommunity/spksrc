@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = braswell
 TC_VERS = 6.0
-TC_FIRMWARE = 5.2-5644
+TC_FIRMWARE = 6.0-7321
 
 TC_DIST_NAME = 	braswell-gcc493_glibc220_linaro_x86_64-GPL.txz
 

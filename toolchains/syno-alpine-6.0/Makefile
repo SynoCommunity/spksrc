@@ -2,7 +2,7 @@ TC_NAME = syno-alpine
 
 TC_ARCH = alpine alpine4k
 TC_VERS = 6.0
-TC_FIRMWARE = 5.1-5004
+TC_FIRMWARE = 6.0-7321
 
 TC_DIST_NAME = alpine4k-gcc493_glibc220_hard-GPL.txz
 
