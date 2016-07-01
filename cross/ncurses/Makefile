@@ -16,5 +16,10 @@ CONFIGURE_ARGS  = --with-shared --enable-rpath --without-manpages --without-test
 CONFIGURE_ARGS += --disable-home-terminfo --with-default-terminfo-dir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/terminfo
 CONFIGURE_ARGS += --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
 
+POST_INSTALL_TARGET = myPostInstall
+
 include ../../mk/spksrc.cross-cc.mk
 
+myPostInstall:
+	rm -f $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/terminfo
+	ln -s ../share/terminfo $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/terminfo
