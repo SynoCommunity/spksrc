@@ -35,3 +35,5 @@ myInstall:
 	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
 	@$(RUN) cp libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/
 	ln -sf libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0
+	ln -sf libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1
+	ln -sf libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/libbz2.so
