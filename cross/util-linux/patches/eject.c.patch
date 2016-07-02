@@ -1,0 +1,11 @@
+--- sys-utils/eject.c.orig	2016-07-01 01:39:24.315898663 +0200
++++ sys-utils/eject.c	2016-07-01 01:30:25.742968811 +0200
+@@ -616,7 +616,7 @@
+ 	 */
+ 	if (io_hdr.driver_status != 0 &&
+ 	    !(io_hdr.driver_status == DRIVER_SENSE && io_hdr.sbp &&
+-		                                      io_hdr.sbp[12] == 0x3a))
++		                                      ((unsigned char *)io_hdr.sbp)[12] == 0x3a))
+ 		return 0;
+ 
+ 	io_hdr.cmdp = startStop2Blk;
