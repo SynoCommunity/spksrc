@@ -1,0 +1,16 @@
+bin:bin/find
+bin:bin/locate
+bin:bin/updatedb
+bin:bin/xargs
+libexec:libexec/bigram
+libexec:libexec/code
+libexec:libexec/frcode
+rsc:share/info/find-maint.info
+rsc:share/info/find.info
+rsc:share/info/find.info-1
+rsc:share/info/find.info-2
+rsc:share/man/man1/find.1
+rsc:share/man/man1/locate.1
+rsc:share/man/man1/updatedb.1
+rsc:share/man/man1/xargs.1
+rsc:share/man/man5/locatedb.5
