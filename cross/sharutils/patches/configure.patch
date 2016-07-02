@@ -1,0 +1,14 @@
+--- configure.orig	2015-02-07 19:52:28.000000000 +0100
++++ configure	2016-06-29 18:09:35.006292143 +0200
+@@ -32621,10 +32621,7 @@
+ fi
+ 
+ if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
++$as_echo "#define BINARY_MODE_POPEN 1" >>confdefs.h
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */

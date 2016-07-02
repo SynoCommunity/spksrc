@@ -1,0 +1,10 @@
+bin:bin/shar
+bin:bin/unshar
+bin:bin/uudecode
+bin:bin/uuencode
+rsc:share/info/sharutils.info
+rsc:share/man/man1/shar.1
+rsc:share/man/man1/unshar.1
+rsc:share/man/man1/uudecode.1
+rsc:share/man/man1/uuencode.1
+rsc:share/man/man5/uuencode.5
