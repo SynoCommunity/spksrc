@@ -1,0 +1,7 @@
+bin:bin/egrep
+bin:bin/fgrep
+bin:bin/grep
+rsc:share/info/grep.info
+rsc:share/man/man1/egrep.1
+rsc:share/man/man1/fgrep.1
+rsc:share/man/man1/grep.1
