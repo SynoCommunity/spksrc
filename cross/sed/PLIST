@@ -1,0 +1,3 @@
+bin:bin/sed
+rsc:share/info/sed.info
+rsc:share/man/man1/sed.1
