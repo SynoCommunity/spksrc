@@ -1,0 +1,9 @@
+bin:bin/git-flow
+bin:bin/git-flow-feature
+bin:bin/git-flow-hotfix
+bin:bin/git-flow-init
+bin:bin/git-flow-release
+bin:bin/git-flow-support
+bin:bin/git-flow-version
+bin:bin/gitflow-common
+bin:bin/gitflow-shFlags
