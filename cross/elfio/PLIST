@@ -1,0 +1,4 @@
+bin:bin/elfdump
+bin:bin/tutorial
+bin:bin/write_obj
+bin:bin/writer
