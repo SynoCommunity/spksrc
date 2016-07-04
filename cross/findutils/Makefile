@@ -13,6 +13,6 @@ LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
 ENV += FORCE_UNSAFE_CONFIGURE=1
-CONFIGURE_ARGS = --disable-nls
+CONFIGURE_ARGS = --disable-nls --localstatedir=$(INSTALL_PREFIX)/var/cache/locate
 
 include ../../mk/spksrc.cross-cc.mk
