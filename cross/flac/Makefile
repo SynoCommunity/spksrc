@@ -15,3 +15,6 @@ GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --disable-asm --disable-altivec
+endif

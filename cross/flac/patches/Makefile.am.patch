@@ -1,0 +1,16 @@
+--- src/libFLAC/Makefile.am.orig	2007-09-14 14:06:17.000000000 -0700
++++ src/libFLAC/Makefile.am	2015-07-20 05:49:51.949877495 -0700
+@@ -40,8 +40,12 @@
+ CPUCFLAGS = -faltivec -force_cpusubtype_ALL -DFLAC__NO_ASM
+ else
+ # Linux-gcc for PPC does not have -force_cpusubtype_ALL, it is Darwin-specific
++CPUCFLAGS = 
++if FLaC__USE_ALTIVEC 
++CPUCFLAGS += -maltivec -mabi=altivec 
++endif 
+ #@@@ PPC optimizations temporarily disabled
+-CPUCFLAGS = -maltivec -mabi=altivec -DFLAC__NO_ASM
++CPUCFLAGS += -DFLAC__NO_ASM
+ endif
+ endif
+ 
