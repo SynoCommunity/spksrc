@@ -12,6 +12,7 @@ COMMENT  = Zsh is a shell designed for interactive use, although it is also a po
 LICENSE  = Custom
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-cap --enable-pcre
 
 INSTALL_TARGET = myInstall
 
@@ -20,3 +21,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myInstall
 myInstall:
 	umask 022; $(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+	umask 022; $(RUN) $(MAKE) install.modules DESTDIR=$(INSTALL_DIR)
