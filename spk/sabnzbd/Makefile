@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 1.1.0
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "1. Updated to 1.1.0<br>2. Add unzip<br>3. Warning: When you upgrade an existing 0.7.x installation, release 1.x will NOT be able to finish the queue. It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.x and then use queue repair on the Status page. Some information (like the order of the queue) will be lost."
+CHANGELOG = "1. Updated to 1.1.0 and updated logo<br>2. Add unzip<br>3. Warning: When you upgrade an existing 0.7.x installation, release 1.x will NOT be able to finish the queue. It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.x and then use queue repair on the Status page. Some information (like the order of the queue) will be lost."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
