@@ -1,11 +1,11 @@
 SPK_NAME = plexivity
-SPK_VERS = 0.9.8
-SPK_REV = 2
+SPK_VERS = 0.9.9
+SPK_REV = 3
 SPK_ICON = src/plexivity.png
 DSM_UI_DIR = app
 BETA = 1
 
-DEPENDS  = 
+DEPENDS  =
 SPK_DEPENDS = "python>=2.7.6-8"
 
 WHEELS = src/requirements.txt
