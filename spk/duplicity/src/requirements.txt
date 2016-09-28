@@ -37,4 +37,5 @@ rackspace-novaclient==1.5
 rax-default-network-flags-python-novaclient-ext==0.3.2
 rax-scheduled-images-python-novaclient-ext==0.3.1
 requests==2.7.0
+six==1.10.0
 stevedore==1.5.0
