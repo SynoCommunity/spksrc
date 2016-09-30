@@ -14,17 +14,11 @@ STARTABLE = no
 BETA = 1
 CHANGELOG = Updating to 1.21
 
-HOMEPAGE   = http://tmux.github.io
-LICENSE    = BSD License
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
-
 HOMEPAGE = https://www.gnu.org/software/ddrescue/ddrescue.html
 LICENSE  = GPLv2/GPLv3
-
-#FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
