@@ -1,6 +1,6 @@
 SPK_NAME = sickbeard-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/sickbeard-custom.png
 DSM_UI_DIR = app
 
@@ -19,6 +19,7 @@ HOMEPAGE   = http://sickbeard.com
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -36,6 +37,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sickbeard-custom_extra_install
 sickbeard-custom_extra_install:
+	install -m 755 -d $(STAGING_DIR)/etc
+	cp src/sickbeard-custom.sc $(STAGING_DIR)/etc/sickbeard-custom.sc
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
