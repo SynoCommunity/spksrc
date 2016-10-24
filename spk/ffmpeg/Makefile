@@ -1,6 +1,6 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 3.1.2
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/ffmpeg.png
 DSM_UI_DIR = app
 CHANGELOG = "1. Update ffmpeg to 3.1<br>2. Support nasm 2.12.02 and yasm 1.3 added. Added 12 new libs/codecs and update all depends : fdk-acc 0.1.4, fontconfig 2.12.1, freetype 2.6.5, fribidi 0.19.7, lame 3.99.5, libass 0.13.2, libbluray 0.9.3, libnuma 2.0.11, libvorbis 1.3.5, libvpx 1.6.0, opencore-amr 0.1.3, openjpeg 2.1.0, opus 1.1.3, rtmdpdump 550a0ca, soxr 0.1.2, vo-amrwbenc 0.1.3, x264 20160816-2245-stable, x265 2.0"
