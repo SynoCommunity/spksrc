@@ -18,7 +18,9 @@ USER="gateone"
 start_daemon ()
 {
     # Copy certificate
-    cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
+    cp /usr/syno/etc/certificate/system/default/cert.pem ${INSTALL_DIR}/ssl/server.crt
+    cp /usr/syno/etc/certificate/system/default/privkey.pem ${INSTALL_DIR}/ssl/server.key
+
     chown ${USER} ${INSTALL_DIR}/ssl/*
 
     su ${USER} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --settings_dir=${SETTINGS_DIR} > ${INSTALL_DIR}/var/gateone_startup.log &"
