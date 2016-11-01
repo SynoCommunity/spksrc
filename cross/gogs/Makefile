@@ -65,7 +65,7 @@ DISTRIB_DIR=$(PWD)/../../distrib/$(PKG_NAME)-$(PKG_VERS)
 ENV += GOPATH=$(WORK_DIR)
 ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$(WORK_DIR)/bin:$$PATH
-ENV += GOARCH=$(GOGARCH)
+ENV += GOARCH=$(GOARCH)
 
 
 # Targets
