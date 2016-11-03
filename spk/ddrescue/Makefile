@@ -1,6 +1,6 @@
 SPK_NAME = ddrescue
-SPK_VERS = 1
-SPK_REV = 21
+SPK_VERS = 1.21
+SPK_REV = 1
 SPK_ICON = src/gnu.png
 DSM_UI_DIR = app
 
