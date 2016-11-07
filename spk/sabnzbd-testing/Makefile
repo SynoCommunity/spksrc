@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 1.1.1RC2
-SPK_REV = 9
+SPK_VERS = 1.1.1RC3
+SPK_REV = 10
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
@@ -15,7 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Updated to 1.1.1 RC2"
+CHANGELOG = "Updated to 1.1.1 RC3"
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
