@@ -1,0 +1,28 @@
+[{
+    "step_title": "Gogs database configuration",
+    "items": [{
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'gogs' MySQL user and database will be created. Please enter a password for the 'gogs' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_gogs",
+            "desc": "gogs password"
+        }]
+    }]
+}, {
+    "step_title": "Gogs configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Domain name of your DiskStation. For example: you.synology.me.",
+        "subitems": [{
+            "key": "wizard_domain_name",
+            "desc": "Domain name"
+        }]
+    }]
+}]

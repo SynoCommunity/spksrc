@@ -24,6 +24,10 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 
+WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
+
+
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = gogs_extra_install
