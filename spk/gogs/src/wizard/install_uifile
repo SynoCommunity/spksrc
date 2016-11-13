@@ -1,8 +1,9 @@
 [{
-    "step_title": "Gogs database configuration",
+    "step_title": "Gogs Database Settings",
+	"invalid_next_disabled": true,
     "items": [{
         "type": "password",
-        "desc": "Enter your MySQL password.",
+        "desc": "Enter your MySQL root password.",
         "subitems": [{
             "key": "wizard_mysql_password_root",
             "desc": "Root password"
@@ -12,17 +13,117 @@
         "desc": "A 'gogs' MySQL user and database will be created. Please enter a password for the 'gogs' user.",
         "subitems": [{
             "key": "wizard_mysql_password_gogs",
-            "desc": "gogs password"
-        }]
+            "desc": "gogs password",
+			"validator": {
+				"allowBlank": false
+			}
+        },
+		{
+			"key": "wizard_mysql_repeat_password_gogs",
+			"desc": "repeat gogs password",
+			"validator": {
+				"allowBlank": false,
+				"fn": "{return arguments[0]==document.getElementsByName('wizard_mysql_password_gogs')[0].value ;}"
+			},
+			"invalidText": "Passwords mismatch"
+		}]
     }]
 }, {
-    "step_title": "Gogs configuration",
+    "step_title": "Application General Settings",
     "items": [{
+		"type": "textfield",
+		"desc": "Put your organization name here huge and loud!",
+		"subitems": [{
+		    "key": "wizard_app_name",
+			"desc": "Application Name",
+			"defaultValue": "Gogs: Go Git Service",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
+    }, {
+		"type": "textfield",
+		"desc": "All Git remote repositories attachments and data will be saved to this directory.",
+		"subitems": [{
+		    "key": "wizard_root_path",
+		    "desc": "Root Path",
+			"defaultValue": "/volume1/gogs",
+			"validator": {
+				"allowBlank": false,
+				"regex": {
+					"expr": "/^\\\/volume[0-9]+\\\//",
+					"errorText": "Path should begin with /volume?/ with ? the number of the volume"
+				}
+			}
+		}]
+    }, {
         "type": "textfield",
-        "desc": "Domain name of your DiskStation. For example: you.synology.me.",
+        "desc": "Clone URLS. Modify Application URL if you are using a Reverse Proxy",
         "subitems": [{
-            "key": "wizard_domain_name",
-            "desc": "Domain name"
-        }]
+            "key": "wizard_domain",
+            "desc": "SSH Domain name",
+			"emptyText": "you.synology.me",
+			"validator": {
+				"allowBlank": false,
+				"regex": {
+					"expr": "/^[a-zA-Z0-9]([a-zA-Z0-9-\\.]{0,61}[a-zA-Z0-9]|)$/",
+					"errorText": "Domain should be a valid domain name"
+				}
+			}
+        },
+		{
+			"key": "wizard_app_url",
+			"desc": "Application URL",
+			"emptyText": "http://<domain_name>:3000/",
+			"validator": {
+				"vtype": "url"
+			}
+		}]
     }]
+}, {
+	"step_title": "Admin account settings",
+	"items": [{
+		"type": "textfield",
+		"desc": "Create default administrator account",
+		"subitems": [{
+			"key": "wizard_admin_name",
+			"desc": "Username",
+			"validator": {
+				"allowBlank": false,
+				"fn": "{ return arguments[0].toLowerCase() != 'admin'; }"
+			},
+			"invalidText": "Admin account setting is invalid: name is reserved"
+		}]
+    }, {
+        "type": "password",
+		"desc": " ",
+        "subitems": [{
+            "key": "wizard_admin_passwd",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false
+            }
+        },
+        {
+            "key": "wizard_admin_confirm_passwd",
+            "desc": "Repeat password",
+            "validator": {
+                "allowBlank": false,
+                "fn": "{return arguments[0]==document.getElementsByName('wizard_admin_passwd')[0].value ;}"
+            },
+            "invalidText": "Passwords mismatch"
+        }]
+ 	}, {
+		"type": "textfield",
+		"desc": " ",
+		"subitems": [{
+			"key": "wizard_admin_enail",
+			"desc": "Admin email",
+			"validator": {
+				"allowBlank": false,
+				"vtype": "email"
+			}
+		}]
+	}]
 }]
+
