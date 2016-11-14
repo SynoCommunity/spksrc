@@ -40,7 +40,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: gogs_extra_install
 gogs_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/custom/conf
-	#install -m 600 src/app.ini ${STAGING_DIR}/var/custom/conf/app.ini
+	install -m 600 src/app.ini ${STAGING_DIR}/var/custom/conf/app.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
