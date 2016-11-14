@@ -37,6 +37,10 @@ preinst ()
             echo "MySQL database ${MYSQL_DATABASE} already exists"
             exit 1
         fi
+	if [ -d ${wizard_root_path} ]; then
+	    echo "Directory ${wizard_root_path} alreday exists"
+	    exit 1
+	fi
     fi
 
     exit 0
@@ -56,7 +60,11 @@ postinst ()
      # Setup database and run installer
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_fengoffice:=gogs}';"
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_gogs:=gogs}';"
+	
+	mkdir ${wizard_root_path}
+	mkdir ${wizard_root_path}/repositories
+	chown -R ${USER}:root ${wizard_root_path}
     fi
 
     # Create custom config
