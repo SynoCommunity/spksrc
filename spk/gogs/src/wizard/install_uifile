@@ -43,7 +43,7 @@
 		}]
     }, {
 		"type": "textfield",
-		"desc": "All Git remote repositories attachments and data will be saved to this directory.",
+		"desc": "All Git remote repositories will be saved to this newly created directory. This path MUST NOT EXIST",
 		"subitems": [{
 		    "key": "wizard_root_path",
 		    "desc": "Root Path",
