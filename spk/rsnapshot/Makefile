@@ -1,12 +1,12 @@
 SPK_NAME = rsnapshot
 SPK_VERS = 1.4.2
-SPK_REV = 3
+SPK_REV = 1
 SPK_ICON = src/rdiff-backup.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "Perl"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Peeter123
 DESCRIPTION = Rsnapshot is a filesystem snapshot utility. It can take incremental snapshots of local and remote filesystems. 
 STARTABLE = no
 DISPLAY_NAME = rsnapshot

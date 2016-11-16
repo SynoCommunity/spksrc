@@ -10,7 +10,7 @@ COMMENT  = Rsnapshot is a filesystem snapshot utility. It can take incremental s
 LICENSE  = GNU-GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --prefix=$(INSTALL_PREFIX) --with-perl=/usr/bin/perl --with-rsync=/usr/bin/rsync --with-ssh=/usr/bin/ssh
+CONFIGURE_ARGS = --with-perl=/usr/bin/perl --with-rsync=/usr/bin/rsync --with-ssh=/usr/bin/ssh
 
 INSTALL_TARGET = myInstall
 
@@ -18,4 +18,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:
-    $(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

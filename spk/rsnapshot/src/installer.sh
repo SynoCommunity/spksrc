@@ -43,6 +43,7 @@ postuninst ()
     rm -f ${INSTALL_DIR}
     rm /usr/local/bin/rsnapshot
     rm /usr/local/bin/rsnapshot-diff
+
     exit 0
 }
 
@@ -59,10 +60,11 @@ preupgrade ()
 postupgrade ()
 {
     # Restore the config file
-    cp ${TMP_DIR}/rsnapshot.conf ${INSTALL_DIR}/etc/rsnapshot.conf
+    cp -f ${TMP_DIR}/rsnapshot.conf ${INSTALL_DIR}/etc/rsnapshot.conf
     rm -rf ${TMP_DIR}
 
     # Upgrade config file to new version
-    /usr/local/bin/rsnapshot upgrade-config-file
+    ${INSTALL_DIR}/bin/rsnapshot upgrade-config-file
+
     exit 0
 }
