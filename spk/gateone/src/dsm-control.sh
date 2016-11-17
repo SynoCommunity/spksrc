@@ -17,7 +17,9 @@ USER="gateone"
 
 start_daemon ()
 {
-    # Copy certificate
+    # Copy certificate command for DSM5
+    cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
+    # Copy certificate commands for DSM6
     cp /usr/syno/etc/certificate/system/default/cert.pem ${INSTALL_DIR}/ssl/server.crt
     cp /usr/syno/etc/certificate/system/default/privkey.pem ${INSTALL_DIR}/ssl/server.key
 
