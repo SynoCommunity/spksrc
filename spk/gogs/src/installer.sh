@@ -132,34 +132,39 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove firewall config
+    # Remove firewall config and system user
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
+	deluser ${USER}
     fi
-
-    #Remove system user    
+    
+    #Save install config 
+    cp ${WORKDIR}/install.conf /tmp/gogs-install.conf
 
     exit 0
 }
 
 postuninst ()
 {
-    . ${WORKDIR}/install.conf
+    . /tmp/gogs-install.conf
 
     # Remove link
     rm -f ${INSTALL_DIR}
     
     # Remove the data and user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE};"
+	${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP USER '${MYSQL_USER}'@'localhost';"
 	rm -rf $ROOT_PATH/${REPOSITORIES}
 	rm -rf $ROOT_PATH/\@eaDir
-	rmdir $ROOT_PATH
-	deluser ${USER}
+	rmdir $ROOT_PATH	
     fi
+
+    rm -f /tmp/gogs-install.conf
    
     exit 0
 }
+
 
 preupgrade ()
 {
@@ -173,6 +178,7 @@ preupgrade ()
 
     exit 0
 }
+
 
 postupgrade ()
 {
