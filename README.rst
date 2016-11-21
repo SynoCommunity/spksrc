@@ -98,3 +98,4 @@ When not explicitly set, files are placed under a `3 clause BSD license`_
 .. _Docker installation: https://docs.docker.com/engine/installation
 .. _Install Docker with wget: https://docs.docker.com/linux/step_one
 .. _SynoCommunity repository: http://www.synocommunity.com
+.. _Architecture per Synology model: https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model#list-of-spksrc-architecture-per-synology-model
