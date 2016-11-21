@@ -123,10 +123,34 @@ postinst ()
 
 preuninst ()
 {
+	
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
         echo "Incorrect MySQL root password"
         exit 1
+    fi
+
+    # Export gogs data and repositories
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && [ "$wizard_export_path" != "" ]; then
+        if [ ! -d "$wizard_export_path" ]; then 
+            mkdir $wizard_export_path
+	    if [ $? -ne 0 ]; then
+                echo "Can't crate $wizard_export_path directory"
+                exit 1
+            fi
+        fi
+
+        DUMPDIR=$wizard_export_path/gogs-dump-tmp-$(date +%s)
+        mkdir -p $DUMPDIR
+        chown ${USER} $DUMPDIR
+
+        su - ${USER} -c "cd $DUMPDIR && GOGS_CUSTOM=${WORKDIR}/custom ${INSTALL_DIR}/gogs/gogs dump"
+        if [ $? -ne 0 ]; then
+            echo "Error exporting gogs data"
+            exit 1
+        fi
+        mv $DUMPDIR/* $wizard_export_path && rmdir $DUMPDIR
+
     fi
 
     # Stop the package
@@ -135,7 +159,7 @@ preuninst ()
     # Remove firewall config and system user
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
-	deluser ${USER}
+        deluser ${USER}
     fi
     
     #Save install config 

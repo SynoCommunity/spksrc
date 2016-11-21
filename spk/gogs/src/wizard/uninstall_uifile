@@ -1,7 +1,7 @@
 [{
 	"step_title": "Remove Gogs database and repositories",
 	"items": [{
-		"desc": "Attention: The gogs data will be removed during package uninstallation. All users and repositories will be deleted."
+		"desc": "Attention: The gogs data WILL BE REMOVED during package uninstallation. All users and repositories will be deleted."
 	}, {
 		"type": "password",
 		"desc": "Enter your MySQL password",
@@ -15,10 +15,11 @@
 		"subitems": [{
 			"key": "wizard_export_path",
 			"desc": "Database export location",
+			"emptyText": "/volume1/backup/gogs",
 			"validator": {
 				"allowBlank": true,
 				"regex": {
-					"expr": "/^\\\/volume[0-9]+\\\//",
+					"expr": "/^\\\/volume[0-9]+\\\//i",
 					"errorText": "Path should begin with /volume?/ with ? the number of the volume"
 				}
 			}
