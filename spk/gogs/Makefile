@@ -1,19 +1,19 @@
 SPK_NAME = gogs
 SPK_VERS = 0.97.7
-SPK_REV = 0
+SPK_REV = 1
 SPK_ICON = src/gogs.png
 DSM_UI_DIR = app
 
+BETA = 1
+
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 DEPENDS  = cross/busybox cross/git cross/$(SPK_NAME)
-#SPK_DEPENDS = "git>1.8.2"
 
 MAINTAINER = torrentalle
-DESCRIPTION = Go Git Service. A painless self-hosted Git service.
+DESCRIPTION = "Gogs lets you host your own private Git repositories on your own servers. It's a very detailed clone of GitHub, both in design and features. It's built in Go and works really, really fast!"
 
-#DESCRIPTION_FRE = .
-#ADMIN_PORT = 7070
-#RELOAD_UI = yes
+ADMIN_PORT = 3000
+RELOAD_UI = yes
 DISPLAY_NAME = Gogs
 CHANGELOG = "Gogs v0.97.7"
 
