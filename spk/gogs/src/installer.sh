@@ -149,6 +149,9 @@ preuninst ()
             echo "Error exporting gogs data"
             exit 1
         fi
+
+	chown root:users $DUMPDIR/*
+	chmod 660 $DUMPDIR/*
         mv $DUMPDIR/* $wizard_export_path && rmdir $DUMPDIR
 
     fi
