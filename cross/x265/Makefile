@@ -22,7 +22,7 @@ CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
@@ -54,6 +54,8 @@ ifeq ($(ARCH)-$(TCVERSION), ppc853x-4.3)
 CMAKE_ARGS += -DNO_ATOMICS=ON
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

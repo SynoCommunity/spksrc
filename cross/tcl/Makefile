@@ -18,8 +18,10 @@ GNU_CONFIGURE = 1
 # export ac_cv_func_strtod=yes
 # export tcl_cv_strtod_buggy=1
 
+include ../../mk/spksrc.common.mk
+
 # Enable 64-bit support in Tcl for 64-bit architectures
-ifneq ($(findstring $(ARCH), avoton braswell bromolow cedarview x64 x86),)
+ifneq ($(findstring $(ARCH), $(x64_ARCHES)),)
 	CONFIGURE_ARGS = tcl_cv_strtod_buggy=1 --prefix=$(STAGING_INSTALL_PREFIX) --enable-64bit
 else
 	CONFIGURE_ARGS = tcl_cv_strtod_buggy=1 --prefix=$(STAGING_INSTALL_PREFIX)

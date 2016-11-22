@@ -13,14 +13,19 @@ LICENSE  =
 
 REQUIRED_DSM = 5.1
 
-ifeq ($(findstring $(ARCH),88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 MYARCH = arm
 endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 MYARCH = i386
 endif
-ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 MYARCH = x86_64
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+MYARCH = ppc
 endif
 ifeq ($(MYARCH),)
 $(error Unsupported ARCH $(ARCH))

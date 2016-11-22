@@ -27,8 +27,10 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 
+include ../../mk/spksrc.common.mk
+
 ADDRESS_MODEL = 32
-ifneq ($(findstring $(ARCH), avoton braswell bromolow cedarview x64 x86),)
+ifneq ($(findstring $(ARCH), $(x64_ARCHES)),)
 ADDRESS_MODEL = 64
 endif
 

@@ -15,9 +15,10 @@ CONFIGURE_TARGET = myConfigure
 
 CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
+CMAKE_ARGS += -DWITH_OPENMP=OFF
 CMAKE_ARGS += -DBUILD_TESTS=OFF
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(ARCH)-$(TCVERSION),ppc853x-4.3)
 CMAKE_ARGS += -DVISIBILITY_HIDDEN=OFF
@@ -27,3 +28,4 @@ endif
 myConfigure:
 	$(RUN) cmake $(CMAKE_ARGS)
 
+include ../../mk/spksrc.cross-cc.mk

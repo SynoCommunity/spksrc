@@ -11,6 +11,8 @@ HOMEPAGE = http://www.bitlbee.org/
 COMMENT  = BitlBee brings IM (instant messaging) to IRC clients. It\'s a great solution for people who have an IRC client running all the time and don\'t want to run an additional MSN/AIM/whatever client
 LICENSE  =
 
+include ../../mk/spksrc.common.mk
+
 CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
 

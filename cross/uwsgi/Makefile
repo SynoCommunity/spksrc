@@ -11,6 +11,8 @@ HOMEPAGE = https://pypi.python.org/pypi/uWSGI
 COMMENT  = The uWSGI server
 LICENSE  = GPL2
 
+include ../../mk/spksrc.common.mk
+
 ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 ADDITIONAL_CFLAGS = -DUWSGI_EVENT_TIMER_USE_TIMERFD_NOINC
 endif

@@ -20,7 +20,7 @@ CONFIGURE_ARGS += --disable-static --enable-shared --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-vp8 --enable-vp9 --disable-examples --disable-docs --disable-unit_tests
 CONFIGURE_ARGS += --enable-postproc --enable-vp9-postproc --enable-pic
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
@@ -46,6 +46,7 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

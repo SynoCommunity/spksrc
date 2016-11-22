@@ -13,7 +13,10 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared
-ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --disable-assembler
 endif
 

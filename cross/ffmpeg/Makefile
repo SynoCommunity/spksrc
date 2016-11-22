@@ -32,7 +32,7 @@ CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-ope
 CONFIGURE_ARGS += --disable-debug --disable-doc --disable-htmlpages --disable-manpages
 CONFIGURE_ARGS += --disable-podpages --disable-static --disable-txtpages
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
@@ -60,3 +60,4 @@ ENV += PATH=$(YASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
 endif
 
+include ../../mk/spksrc.cross-cc.mk
