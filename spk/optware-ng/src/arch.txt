@@ -1,0 +1,90 @@
+Marvell Kirkwood, 88F6281 88f6281
+Marvell Kirkwood, 88F6282 88f6282
+Intel Atom D410/D510 (Pineview) x86
+Intel Atom D2700 (Cedarview) cedarview
+Intel SandyBridge, Intel IvyBridge, Intel Haswell bromolow
+Marvell Armada 370 armada370
+Marvell Armada 375 armada375
+Marvell Armada XP armadaxp
+Annapurnalabs, Alpine alpine/alpine4k
+Mindspeed, Comcerto, C2000 comcerto2k
+Intel Atom CE SoC evansport
+Freescale PowerQUICC III ppc853x
+STMicroelectronics Monaco, monaco
+
+DS216play
+	STM STiH412
+	# monaco			armv7a_hardfp
+DS216, DS216j, DS416j, DS416slim
+	Marvell Armada 385 Marvell Armada 388
+	# armada38x			armv7a_hardfp
+DS112j, DS112, DS112+, DS411slim, DS213, DS212j
+	Marvell 6281 Marvell 6282
+	ARM Little Endian 2.6.32
+	# 88f6281	arm-marvel	armv5tel
+DS115j, DS213j, DS216se, DS414slim, EDS14
+	Marvell Armada 370
+	ARM Little Endian 3.2.40
+	# armada370	arm-marvel	armv7a_hardfp
+DS115, DS215j
+	Marvell Armada 375
+	ARM Little Endian 3.2.40
+	# armada375	armv7-marvell	armv7a_hardfp
+DS214, DS214+, RS815
+	Marvell Armada XP
+	ARM Little Endian 3.2.40
+	# armadaxp	arm-marvel	armv7a_hardfp
+DS215+, DS416
+	Annapurnalabs, Alpine AL212
+	ARM Little Endian 3.2.40
+	# alpine	arm-cortex_a15	armv7a_hardfp
+DS715, DS1515
+	Annapurnalabs, Alpine AL314
+	ARM Little Endian 3.2.40
+	# alpine	arm-cortex_a15	armv7a_hardfp
+DS2015xs
+	Annapurnalabs, Alpine AL514
+	ARM Little Endian 3.2.40
+	# alpine	arm-cortex_a15	armv7a_hardfp
+DS414j
+	Mindspeed, Comcerto, C2000
+	ARM Little Endian 3.2.40
+	# comcerto2k	arm-cortexa9	armv7a_hardfp
+DS712+, DS2412+, RS2212+, DS1512+, DS1812+, DS412+, RS812+
+	Intel Atom
+	Intel x86 Little Endian 3.2.40
+	# cedarview	x86_64		i686
+	# avoton			i686
+	# braswell			i686
+DS3612xs, RS3412xs, RS3412RPxs
+	Intel Core i3
+	Intel x86 Little Endian 3.2.40
+	# bromolow	x86_64		i686
+DS214play
+	Intel SoC
+	Intel x86 Little Endian 3.2.40
+	# evansport	i686		i686
+DS213+, DS413
+	Freescale QorIQ P1022
+	PowerPC Big Endian 2.6.32
+	# qoriq				ppc
+DS110+, DS210+, DS410
+	Freescale 8533 Freescale 8533E
+	PowerPC Big Endian 2.6.32
+	# ppc853x			ppc
+	# ppc854x			ppc
+
+???
+	# 88f5281			armv5
+	# powerpc			ppc
+	# ppc824x			ppc
+	# x64				i686
+	# x86				i686
+
+# armabi-ng
+# armabihf
+# armv5eabi-ng	>= 2.6.36.4
+# armv5eabi-ng-legacy
+# i686
+# mipsel-ng
+# ppc-603e

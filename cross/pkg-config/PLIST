@@ -1,0 +1,13 @@
+bin:bin/pkg-config
+bin:bin/x86_64-pc-linux-gnu-pkg-config
+shr:share/aclocal/pkg.m4
+shr:share/pkg-config-crosswrapper
+rsc:share/doc/pkg-config/changelog.Debian.gz
+rsc:share/doc/pkg-config/README
+rsc:share/doc/pkg-config/AUTHORS
+rsc:share/doc/pkg-config/pkg-config-guide.html
+rsc:share/doc/pkg-config/changelog.gz
+rsc:share/doc/pkg-config/NEWS.gz
+rsc:share/doc/pkg-config/copyright
+rsc:share/man/man1/pkg-config.1.gz
+

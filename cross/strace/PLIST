@@ -1,0 +1,3 @@
+bin:bin/strace
+bin:bin/strace-graph
+bin:bin/strace-log-merge

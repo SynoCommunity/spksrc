@@ -1,0 +1,11 @@
+--- open-vm-tools-stable-10.0.7/open-vm-tools/configure.ac.orig	2016-06-19 07:49:52.257344556 +0200
++++ open-vm-tools-stable-10.0.7/open-vm-tools/configure.ac	2016-06-19 07:57:49.599757205 +0200
+@@ -935,7 +935,7 @@
+ 
+ ### General flags / actions
+ CFLAGS="$CFLAGS -Wall"
+-CFLAGS="$CFLAGS -Werror"
++# CFLAGS="$CFLAGS -Werror"
+ 
+ # -Wno-unknown-pragmas is due to gcc not understanding '#pragma ident'
+ # in Xlib.h on OpenSolaris.

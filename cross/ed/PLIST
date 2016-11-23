@@ -1,0 +1,5 @@
+bin:bin/ed
+bin:bin/red
+rsc:share/info/ed.info
+rsc:share/man/man1/ed.1
+rsc:share/man/man1/red.1

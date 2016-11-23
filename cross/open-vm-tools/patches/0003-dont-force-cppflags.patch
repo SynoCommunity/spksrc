@@ -1,0 +1,15 @@
+--- open-vm-tools-stable-10.0.7/open-vm-tools/m4/vmtools.m4.orig	2016-02-12 01:50:33.000000000 +0100
++++ open-vm-tools-stable-10.0.7/open-vm-tools/m4/vmtools.m4	2016-06-19 07:56:55.933273570 +0200
+@@ -281,10 +281,10 @@
+       if test "$os" = freebsd; then
+          CUSTOM_$1_CPPFLAGS="-I/usr/local/include"
+       else
+-         CUSTOM_$1_CPPFLAGS="-I/usr/include"
++         CUSTOM_$1_CPPFLAGS=" "
+       fi
+       if test -n "$2"; then
+-         CUSTOM_$1_CPPFLAGS="${CUSTOM_$1_CPPFLAGS}/$2"
++         : CUSTOM_$1_CPPFLAGS="${CUSTOM_$1_CPPFLAGS}/$2"
+       fi
+    fi
+ ])

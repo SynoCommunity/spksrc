@@ -1,0 +1,6 @@
+bin/bc
+bin/dc
+info/bc.info
+info/dc.info
+man/man1/bc.1
+man/man1/dc.1

@@ -1,0 +1,3 @@
+bin:bin/mksh
+shr:share/doc/mksh/examples/dot.mkshrc
+rsc:share/man/man1/mksh.1

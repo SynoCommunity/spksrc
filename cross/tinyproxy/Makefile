@@ -14,7 +14,7 @@ LICENSE  = GNU GPL 2
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-regexcheck ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
-ADDITIONAL_CFLAGS =
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
 

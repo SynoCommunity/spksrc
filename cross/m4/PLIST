@@ -1,0 +1,5 @@
+bin:bin/m4
+rsc:share/info/m4.info
+rsc:share/info/m4.info-1
+rsc:share/info/m4.info-2
+rsc:share/man/man1/m4.1

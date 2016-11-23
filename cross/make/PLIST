@@ -1,0 +1,5 @@
+bin:bin/make
+rsc:share/info/make.info
+rsc:share/info/make.info-1
+rsc:share/info/make.info-2
+rsc:share/man/man1/make.1

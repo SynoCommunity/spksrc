@@ -1,0 +1,9 @@
+bin:bin/cmp
+bin:bin/diff
+bin:bin/diff3
+bin:bin/sdiff
+rsc:share/info/diffutils.info
+rsc:share/man/man1/cmp.1
+rsc:share/man/man1/diff.1
+rsc:share/man/man1/diff3.1
+rsc:share/man/man1/sdiff.1

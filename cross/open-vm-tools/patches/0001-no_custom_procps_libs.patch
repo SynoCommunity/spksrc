@@ -1,0 +1,11 @@
+--- open-vm-tools-stable-10.0.7/open-vm-tools/configure.ac.orig	2016-06-19 07:49:52.257344556 +0200
++++ open-vm-tools-stable-10.0.7/open-vm-tools/configure.ac	2016-06-19 07:57:49.599757205 +0200
+@@ -707,7 +707,7 @@
+       # XXX: no pkg-config and no procps-config means we need to
+       # hard-code a sensible default.
+       if test -z "$CUSTOM_PROCPS_LIBS"; then
+-         CUSTOM_PROCPS_LIBS="-L/lib"
++         : CUSTOM_PROCPS_LIBS="-L/lib"
+       fi
+ 
+       # Some distros provide libproc-${version}.so only, others provide the

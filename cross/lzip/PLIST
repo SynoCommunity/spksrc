@@ -1,0 +1,3 @@
+bin:bin/lzip
+rsc:share/info/lzip.info
+rsc:share/man/man1/lzip.1

@@ -1,0 +1,16 @@
+--- Makefile.orig	2005-08-17 00:14:10.000000000 +0200
++++ Makefile	2016-06-26 05:34:09.240409991 +0200
+@@ -1,4 +1,5 @@
+-CFLAGS		+=	-O3 -lbz2
++CFLAGS		+=	-O3
++LDFLAGS		+=	-lbz2
+ 
+ PREFIX		?=	/usr/local
+ INSTALL_PROGRAM	?=	${INSTALL} -c -s -m 555
+@@ -10,6 +11,4 @@
+ 
+ install:
+ 	${INSTALL_PROGRAM} bsdiff bspatch ${PREFIX}/bin
+-.ifndef WITHOUT_MAN
+ 	${INSTALL_MAN} bsdiff.1 bspatch.1 ${PREFIX}/man/man1
+-.endif

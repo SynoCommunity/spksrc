@@ -1,0 +1,2 @@
+bin:sbin/nethogs
+rsc:share/man/man8/nethogs.8

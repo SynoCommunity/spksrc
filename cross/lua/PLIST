@@ -1,0 +1,7 @@
+bin:bin/lua
+bin:bin/luac
+lib:lib64/liblua.a
+rsc:include/lua.h
+rsc:include/luaconf.h
+rsc:include/lualib.h
+rsc:include/lua.hpp

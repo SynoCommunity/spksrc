@@ -1,0 +1,7 @@
+bin:bin/tar
+libexec:libexec/rmt
+rsc:share/info/tar.info
+rsc:share/info/tar.info-1
+rsc:share/info/tar.info-2
+rsc:share/man/man1/tar.1
+rsc:share/man/man8/rmt.8

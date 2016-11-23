@@ -12,7 +12,7 @@ COMMENT  = Git is a free & open source, distributed version control system desig
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --without-tcltk --without-python ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
+CONFIGURE_ARGS  = --without-tcltk --with-python=/usr/bin/python ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall

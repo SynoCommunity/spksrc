@@ -1,0 +1,5 @@
+bin:bin/cpio
+libexec:libexec/rmt
+rsc:share/info/cpio.info
+rsc:share/man/man1/cpio.1
+rsc:share/man/man8/rmt.8
