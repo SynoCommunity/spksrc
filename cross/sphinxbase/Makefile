@@ -15,13 +15,17 @@ GNU_CONFIGURE = 1
 
 # Standard build or build the python module if being built as python dependency
 ifeq ($(wildcard $(WORK_DIR)/python-cc.mk),)
+
 include ../../mk/spksrc.cross-cc.mk
+
 else
 PRE_CONFIGURE_TARGET = myPreConfigure
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
+
 include ../../mk/spksrc.python-module.mk
+
 endif
 
 .PHONY: myPreConfigure

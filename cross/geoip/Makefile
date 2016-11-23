@@ -12,6 +12,7 @@ COMMENT  = The GeoIP product is available in a variety of downloadable databases
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = 
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = 

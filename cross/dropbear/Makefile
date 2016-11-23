@@ -13,10 +13,10 @@ LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.cross-cc.mk
+
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile:

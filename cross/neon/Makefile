@@ -12,10 +12,11 @@ COMMENT  = Neon is an HTTP and WebDAV client library, with a C interface
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-shared --with-libxml2 --with-ssl=openssl --with-zlib XML2_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/xml2-config
-POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS  = --enable-shared --with-libxml2 --with-ssl=openssl --with-zlib XML2_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/xml2-config
+POST_INSTALL_TARGET = myPostInstall
 
 .PHONY: myPostInstall
 myPostInstall:

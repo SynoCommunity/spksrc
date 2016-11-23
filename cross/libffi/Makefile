@@ -12,10 +12,11 @@ COMMENT  = A Portable Foreign Function Interface Library
 LICENSE  =
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = myPreConfigure
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myPreConfigure
+INSTALL_TARGET = myInstall
 
 .PHONY: myPreConfigure
 myPreConfigure:

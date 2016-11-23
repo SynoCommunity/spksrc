@@ -11,11 +11,13 @@ HOMEPAGE = http://c-icap.sourceforge.net/
 COMMENT  = c-icap is an implementation of an ICAP server. It can be used with HTTP proxies that support the ICAP protocol to implement content adaptation and filtering services.
 LICENSE  = 
 
-PRE_CONFIGURE_TARGET = myConfigure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-large-files --with-zlib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib -C
 
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myConfigure
+
+CONFIGURE_ARGS  = --enable-large-files --with-zlib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib -C
 
 myConfigure:
 	cp patches/config.cache $(WORK_DIR)/$(PKG_DIR)

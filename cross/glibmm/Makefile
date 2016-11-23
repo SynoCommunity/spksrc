@@ -13,7 +13,9 @@ COMMENT  =
 LICENSE  =
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --disable-documentation
 CONFIGURE_ARGS += GLIB_COMPILE_SCHEMAS=$(WORK_DIR)/../../../native/glib/work-native/glib-*/gio/glib-compile-schemas
 
-include ../../mk/spksrc.cross-cc.mk

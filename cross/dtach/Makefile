@@ -12,9 +12,10 @@ COMMENT  = dtach is a tiny program that emulates the detach feature of screen, a
 LICENSE  = GNU GPL
 
 GNU_CONFIGURE = 1
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+INSTALL_TARGET = myInstall
 
 .PHONY: myInstall
 myInstall:

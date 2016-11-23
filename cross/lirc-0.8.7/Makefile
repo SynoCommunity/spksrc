@@ -12,9 +12,10 @@ HOMEPAGE = http://www.lirc.org/
 COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
 LICENSE  =
 
-include ../../mk/spksrc.common.mk
-
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
 
 POST_CONFIGURE_TARGET = lirc_kill_drivers
@@ -27,8 +28,6 @@ KILL_DRIVERS = lirc_wpc8769l
 ifeq ($(ARCH),$(PPC_ARCHES))
 KILL_DRIVERS += lirc_i2c
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: lirc_custom_install lirc_kill_drivers
 lirc_custom_install:

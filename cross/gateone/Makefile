@@ -12,11 +12,11 @@ HOMEPAGE = http://liftoffsoftware.com/Products/GateOne
 COMMENT  = 
 LICENSE  = AGPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

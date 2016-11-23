@@ -11,12 +11,12 @@ HOMEPAGE = http://code.google.com/p/phpmemcacheadmin/
 COMMENT  = Graphic stand-alone administration for memcached to monitor and debug purpose
 LICENSE  = Apache License 2.0
 
+include ../../mk/spksrc.cross-cc.mk
+
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

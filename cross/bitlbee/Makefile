@@ -11,19 +11,18 @@ HOMEPAGE = http://www.bitlbee.org/
 COMMENT  = BitlBee brings IM (instant messaging) to IRC clients. It\'s a great solution for people who have an IRC client running all the time and don\'t want to run an additional MSN/AIM/whatever client
 LICENSE  =
 
-include ../../mk/spksrc.common.mk
+GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
 
 CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --ssl=gnutls --prefix=$(INSTALL_PREFIX) --pidfile=$(INSTALL_PREFIX)/var/bitlbee.pid
 CONFIGURE_ARGS += --config=$(INSTALL_PREFIX)/var/
 ifeq ($(findstring $(ARCH),powerpc ppc824x),$(ARCH))
 CONFIGURE_ARGS += --pie=0
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

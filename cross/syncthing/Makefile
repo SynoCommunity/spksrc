@@ -11,6 +11,8 @@ HOMEPAGE = http://www.syncthing.net/
 COMMENT  = Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how ...
 LICENSE  =
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nope
 COMPILE_TARGET = myComp
 INSTALL_TARGET = myInstall
@@ -20,8 +22,6 @@ CGO_ENABLED=0
 
 # set this to 1 to create static linked binaries
 STATIC_BINARIES = 0
-
-include ../../mk/spksrc.common.mk
 
 # Define SYNCTHING_ARCH as per SyncThing standards
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
@@ -41,8 +41,6 @@ endif
 SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
-
-include ../../mk/spksrc.cross-cc.mk
 
 # use workdir as gopath
 ENV += GOPATH=$(WORK_DIR)

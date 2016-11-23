@@ -9,15 +9,15 @@ HOMEPAGE = http://pear.php.net
 COMMENT  = PEAR is a framework and distribution system for reusable PHP components.
 LICENSE  =
 
-EXTRACT_TARGET = myExtract
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = nop
-
 # Pure PHP
 ARCH =
 
 include ../../mk/spksrc.cross-cc.mk
+
+EXTRACT_TARGET = myExtract
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = myCompile
+INSTALL_TARGET = nop
 
 .PHONY: myExtract
 myExtract:

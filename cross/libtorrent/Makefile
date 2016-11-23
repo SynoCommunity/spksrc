@@ -11,12 +11,15 @@ HOMEPAGE = http://www.rasterbar.com/products/libtorrent
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.
 LICENSE  = BSD
 
+GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.python-wheel.mk
+
 # Build the libtorrent library first, then create a wheel with the python bindings
 CONFIGURE_TARGET = configure_target
 COMPILE_TARGET = compile_target
 INSTALL_TARGET = install_target wheel_python_module
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-python-binding --with-libgeoip --with-libiconv
 CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python
 CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
@@ -27,4 +30,3 @@ ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
 BOOST_LIBRARIES += system python
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 
-include ../../mk/spksrc.python-wheel.mk

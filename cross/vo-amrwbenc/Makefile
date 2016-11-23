@@ -13,15 +13,13 @@ LICENSE  = Apache 2
 
 GNU_CONFIGURE = 1
 
-PRE_CONFIGURE_TARGET = myPreConfigure
+include ../../mk/spksrc.cross-cc.mk
 
-include ../../mk/spksrc.common.mk
+PRE_CONFIGURE_TARGET = myPreConfigure
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --enable-armv5e
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:

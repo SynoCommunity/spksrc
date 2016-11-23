@@ -11,8 +11,7 @@ HOMEPAGE = http://pycurl.sourceforge.net
 COMMENT  = PycURL is a Python interface to libcurl
 LICENSE  = Dual licensed under the LGPL and an MIT/X derivative license based on the cURL license
 
+include ../../mk/spksrc.cross-cc.mk
+
 BUILD_ARGS   = --curl-config=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 INSTALL_ARGS = --curl-config=$(STAGING_INSTALL_PREFIX)/bin/curl-config
-
-include ../../mk/spksrc.python-module.mk
-

@@ -13,7 +13,6 @@ LICENSE  = open source
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --with-yielding_select=no --disable-slapd
-
 include ../../mk/spksrc.cross-cc.mk
 
+CONFIGURE_ARGS = --with-yielding_select=no --disable-slapd

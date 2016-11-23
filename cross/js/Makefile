@@ -12,11 +12,12 @@ COMMENT  = Mozilla JavaScript Engine
 LICENSE  = MPL/GPL/LGPL tri-license
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = ac_cv_va_copy=C99 --disable-dependency-tracking --disable-static
 
 PRE_COMPILE_TARGET = myPreCompile
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreCompile
 myPreCompile:

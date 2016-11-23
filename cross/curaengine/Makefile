@@ -12,13 +12,13 @@ HOMEPAGE = https://ultimaker.com
 COMMENT  = CuraEngine is a powerful, fast and robust engine for processing 3D models into 3D printing instruction for Ultimaker and other GCode based 3D printers.
 LICENSE  = AGPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 POST_EXTRACT_TARGET = myPostExtract
 CONFIGURE_TARGET = nope
 INSTALL_TARGET = myInstall
 
 PATCHES_LEVEL = 1
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPostExtract
 myPostExtract:

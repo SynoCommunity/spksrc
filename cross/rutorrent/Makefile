@@ -11,12 +11,12 @@ HOMEPAGE = http://code.google.com/p/rutorrent/
 COMMENT  = Yet another web front-end for rTorrent.
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 EXTRACT_PATH = $(WORK_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

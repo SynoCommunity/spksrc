@@ -13,7 +13,7 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi
@@ -21,5 +21,3 @@ endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
-
-include ../../mk/spksrc.cross-cc.mk

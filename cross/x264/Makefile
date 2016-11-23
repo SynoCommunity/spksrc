@@ -13,11 +13,11 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.cross-cc.mk
+
 YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
 CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross-prefix=$(TC_PATH)$(TC_PREFIX)
-
-include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 ENV += x264_ARCH=ARM
@@ -43,4 +43,3 @@ ENV += PATH=$(YASM_PATH):$$PATH
 ENV += x264_ARCH=X86
 endif
 
-include ../../mk/spksrc.cross-cc.mk

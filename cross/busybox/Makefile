@@ -11,11 +11,11 @@ HOMEPAGE = http://busybox.net
 COMMENT  = Fairly comprehensive set of programs needed to run a Linux system
 LICENSE  = GPL
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

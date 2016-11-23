@@ -11,10 +11,10 @@ HOMEPAGE = http://rarlab.com
 COMMENT  = Extract files from rar archives
 LICENSE  = freeware
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

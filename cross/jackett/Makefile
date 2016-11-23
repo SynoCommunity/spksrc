@@ -12,11 +12,11 @@ HOMEPAGE = https://github.com/Jackett/Jackett
 COMMENT  = Jackett works as a proxy server: it translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping & translation logic - removing the burden from other apps.
 LICENSE  = GNU GPL v2
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)

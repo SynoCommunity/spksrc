@@ -12,6 +12,7 @@ COMMENT  = Sodium is a modern, easy-to-use software library for encryption, decr
 LICENSE  = ISC
 
 GNU_CONFIGURE = 1
-DOWNLOAD_ARGS = --no-check-certificate
 
 include ../../mk/spksrc.cross-cc.mk
+
+DOWNLOAD_ARGS = --no-check-certificate

@@ -12,6 +12,7 @@ COMMENT  = popt is a command line option parsing library
 LICENSE  = MIT
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-static

@@ -11,12 +11,12 @@ HOMEPAGE = http://kernel.org/
 COMMENT  = 
 LICENSE  = 
 
-PRE_CONFIGURE_TARGET = myPreConfigure
-INSTALL_TARGET = myInstall
 GNU_CONFIGURE = 1
 
-
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myPreConfigure
+INSTALL_TARGET = myInstall
 
 .PHONY: myPreConfigure
 myPreConfigure:

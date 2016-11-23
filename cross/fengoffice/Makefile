@@ -11,12 +11,12 @@ HOMEPAGE = http://www.fengoffice.com
 COMMENT  = Feng Office is a Collaboration Platform and Project Management System.
 LICENSE  = AGPL
 
+include ../../mk/spksrc.cross-cc.mk
+
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

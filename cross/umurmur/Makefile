@@ -11,13 +11,13 @@ DEPENDS = cross/libconfig cross/protobuf-c cross/openssl
 HOMEPAGE = https://github.com/umurmur/umurmur
 COMMENT  = Minimalistic Murmur (Mumble server)
 LICENSE  =
-PRE_CONFIGURE_TARGET = myPreConfigure
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-ssl=openssl
 
 include ../../mk/spksrc.cross-cc.mk
 
+PRE_CONFIGURE_TARGET = myPreConfigure
+CONFIGURE_ARGS = --with-ssl=openssl
 
 .PHONY: myPreConfigure
 myPreConfigure:

@@ -12,9 +12,10 @@ COMMENT  = The serf library is a high performance C-based HTTP client library bu
 LICENSE  = Apache v2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-apr=$(STAGING_INSTALL_PREFIX) --with-apr-util=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --with-apr=$(STAGING_INSTALL_PREFIX) --with-apr-util=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: myPostInstall
 myPostInstall:

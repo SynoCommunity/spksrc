@@ -14,6 +14,8 @@ HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = LGPL 2.1
 
+include ../../mk/spksrc.cross-cc.mk
+
 YASM_PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
 CONFIGURE_ARGS = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
@@ -31,8 +33,6 @@ CONFIGURE_ARGS += --enable-libtheora --enable-libvo-amrwbenc --enable-libvorbis
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-openssl
 CONFIGURE_ARGS += --disable-debug --disable-doc --disable-htmlpages --disable-manpages
 CONFIGURE_ARGS += --disable-podpages --disable-static --disable-txtpages
-
-include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
@@ -60,4 +60,3 @@ ENV += PATH=$(YASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
 endif
 
-include ../../mk/spksrc.cross-cc.mk

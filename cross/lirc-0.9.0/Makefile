@@ -13,12 +13,13 @@ COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix doma
 LICENSE  =
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-transmitter --with-driver=userspace --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
 
 #POST_CONFIGURE_TARGET = lirc_kill_wpc8769l
 INSTALL_TARGET = lirc_custom_install
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: lirc_custom_install lirc_kill_wpc8769l
 lirc_custom_install:

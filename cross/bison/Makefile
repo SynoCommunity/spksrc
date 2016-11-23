@@ -21,9 +21,6 @@ endif
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 
-include ../../mk/spksrc.cross-cc.mk
-
-
 .PHONY: myPreConfigure
 myPreConfigure:
 	$(RUN) aclocal

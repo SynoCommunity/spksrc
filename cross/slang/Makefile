@@ -12,6 +12,7 @@ COMMENT  = This library provides functions for manipulating Unicode strings and 
 LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-z=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --with-z=$(INSTALL_DIR)/$(INSTALL_PREFIX)

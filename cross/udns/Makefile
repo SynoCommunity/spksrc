@@ -11,11 +11,11 @@ HOMEPAGE = http://www.corpit.ru/mjt/udns.html
 COMMENT  = UDNS is a stub DNS resolver library with ability to perform both syncronous and asyncronous DNS queries. 
 LICENSE  = LGPL
 
+include ../../mk/spksrc.cross-cc.mk
+
 PRE_CONFIGURE_TARGET = myPreConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:

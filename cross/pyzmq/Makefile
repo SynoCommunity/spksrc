@@ -11,9 +11,9 @@ HOMEPAGE = http://zeromq.org/
 COMMENT  = ØMQ (also known as ZeroMQ, 0MQ, or zmq) looks like an embeddable networking library but acts like a concurrency framework.
 LICENSE  = LGPL
 
-POST_EXTRACT_TARGET = myPostExtract
-
 include ../../mk/spksrc.python-module.mk
+
+POST_EXTRACT_TARGET = myPostExtract
 
 .PHONY: myPostExtract
 myPostExtract:

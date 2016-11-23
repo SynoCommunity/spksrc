@@ -12,7 +12,8 @@ COMMENT  = OpenVPN
 LICENSE  = OpenVPN support a license under GPLv2 along with a commercial license where appropriate without the restrictions of GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-password-save
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --enable-password-save
 

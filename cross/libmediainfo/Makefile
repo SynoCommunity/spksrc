@@ -11,12 +11,13 @@ HOMEPAGE = http://sourceforge.net/projects/mediainfo/
 COMMENT  = MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files.
 LICENSE  = 
 
-PRE_CONFIGURE_TARGET = myPreConfigure
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --enable-shared
-
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myPreConfigure
+
+CONFIGURE_ARGS = --enable-shared
 
 myPreConfigure:
 	$(RUN) ; ./autogen.sh

@@ -13,7 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config
-
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config
 

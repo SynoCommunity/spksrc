@@ -12,6 +12,8 @@ HOMEPAGE = http://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec
 LICENSE = https://raw.githubusercontent.com/webmproject/libvpx/master/LICENSE
 
+include ../../mk/spksrc.cross-cc.mk
+
 INSTALL_TARGET = myInstall
 
 YASM_PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
@@ -19,8 +21,6 @@ YASM_PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 CONFIGURE_ARGS += --disable-static --enable-shared --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-vp8 --enable-vp9 --disable-examples --disable-docs --disable-unit_tests
 CONFIGURE_ARGS += --enable-postproc --enable-vp9-postproc --enable-pic
-
-include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
@@ -45,8 +45,6 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

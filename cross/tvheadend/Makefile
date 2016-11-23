@@ -12,11 +12,11 @@ COMMENT  = Tvheadend is a TV streaming server for Linux supporting DVB-S, DVB-S2
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-avahi --release
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
+CONFIGURE_ARGS = --disable-avahi --release
+INSTALL_TARGET = myInstall
 
 .PHONY: myInstall
 myInstall:

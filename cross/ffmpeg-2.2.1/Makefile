@@ -11,9 +11,9 @@ HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  =
 
-REQUIRED_DSM = 5.1
+include ../../mk/spksrc.cross-cc.mk
 
-include ../../mk/spksrc.common.mk
+REQUIRED_DSM = 5.1
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 MYARCH = arm
@@ -33,5 +33,3 @@ endif
 
 
 CONFIGURE_ARGS = --disable-yasm --disable-doc --enable-gpl --enable-libx264 --enable-libmp3lame --enable-nonfree --enable-cross-compile --arch=$(MYARCH) --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX) --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include" --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib" --extra-libs=-ldl
-
-include ../../mk/spksrc.cross-cc.mk

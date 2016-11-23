@@ -13,5 +13,5 @@ LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-cc
 

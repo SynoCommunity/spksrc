@@ -13,7 +13,7 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava
-
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava
 

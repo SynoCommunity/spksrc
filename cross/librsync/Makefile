@@ -12,6 +12,7 @@ COMMENT  = librsync is a free software library that implements the rsync remote-
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-static --enable-shared

@@ -11,14 +11,15 @@ HOMEPAGE = http://xmlrpc-c.sourceforge.net/
 COMMENT  = Programming library for writing an XML-RPC server or client in C or C++.
 LICENSE  = BSD
 
-PRE_CONFIGURE_TARGET = myPreConfigure
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myPreConfigure
 
 CONFIGURE_ARGS = --enable-libxml2-backend
 
 ENV += PATH=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin:$$PATH
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:

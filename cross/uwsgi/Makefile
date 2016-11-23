@@ -11,7 +11,7 @@ HOMEPAGE = https://pypi.python.org/pypi/uWSGI
 COMMENT  = The uWSGI server
 LICENSE  = GPL2
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.python-wheel.mk
 
 ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 ADDITIONAL_CFLAGS = -DUWSGI_EVENT_TIMER_USE_TIMERFD_NOINC
@@ -24,5 +24,3 @@ ifeq ($(findstring $(TCVERSION),4.3),$(TCVERSION))
 ADDITIONAL_CFLAGS = -DOBSOLETE_LINUX_KERNEL
 endif
 
-
-include ../../mk/spksrc.python-wheel.mk

@@ -11,7 +11,7 @@ HOMEPAGE = http://lxml.de/
 COMMENT  = The lxml XML toolkit is a Pythonic binding for the C libraries libxml2 and libxslt
 LICENSE  = BSD
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.python-module.mk
 
 BUILD_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config
 ADDITIONAL_CFLAGS = -I $(STAGING_INSTALL_PREFIX)/include/libxml2
@@ -20,4 +20,3 @@ ADDITIONAL_CFLAGS += -O1
 endif
 #ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/libxml2
 
-include ../../mk/spksrc.python-module.mk

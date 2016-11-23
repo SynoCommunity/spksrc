@@ -11,11 +11,11 @@ HOMEPAGE = http://sabnzbd.org
 COMMENT  = Usenet binary downloader
 LICENSE  = GPL
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/SABnzbd

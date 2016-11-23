@@ -11,13 +11,13 @@ HOMEPAGE = http://www.openssl.org
 COMMENT  = Compression Library
 LICENSE  = http://www.openssl.org/source/license.html
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 
 INSTALL_TARGET = myInstall
 
 STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
-
-include ../../mk/spksrc.common.mk
 
 OPENSSL_ARCH = linux-generic32
 ifneq ($(findstring $(ARCH), $(x64_ARCHES)),)
@@ -29,8 +29,6 @@ endif
 ifneq ($(findstring $(ARCH), powerpc),)
 OPENSSL_ARCH = synology-ppc
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

@@ -12,7 +12,8 @@ COMMENT = Leptonica is a pedagogically-oriented open source software that is bro
 LICENSE = http://www.leptonica.com/about-the-license.html
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-static
 

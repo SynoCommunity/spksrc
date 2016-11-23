@@ -14,9 +14,9 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
+include ../../mk/spksrc.cross-cc.mk
 
-include ../../mk/spksrc.common.mk
+NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
@@ -24,5 +24,3 @@ ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --enable-nasm
 endif
-
-include ../../mk/spksrc.cross-cc.mk

@@ -14,11 +14,9 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --disable-assembly
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 

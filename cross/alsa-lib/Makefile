@@ -12,15 +12,15 @@ COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionali
 LICENSE  =
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --disable-python
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 ADDITIONAL_CFLAGS = -DNO_TLS_PFX
 endif
 
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: myInstall
 myInstall:

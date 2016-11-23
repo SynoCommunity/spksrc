@@ -13,7 +13,8 @@ COMMENT  = Tesseract is probably the most accurate open source OCR engine availa
 LICENSE  = Apache License 2.0
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = LIBLEPT_HEADERSDIR=$(STAGING_INSTALL_PREFIX)/include/leptonica
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = LIBLEPT_HEADERSDIR=$(STAGING_INSTALL_PREFIX)/include/leptonica
 

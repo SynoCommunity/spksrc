@@ -11,11 +11,11 @@ HOMEPAGE = http://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
 LICENSE  = MIT License
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

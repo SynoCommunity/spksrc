@@ -12,12 +12,13 @@ COMMENT  = Mutt is a small but very powerful text-based mail client for Unix ope
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-ssl=openssl --enable-pop --enable-imap --enable-smtp
 
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

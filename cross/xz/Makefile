@@ -10,6 +10,7 @@ COMMENT  = Free general-purpose data compression software with high compression 
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-scripts
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-scripts

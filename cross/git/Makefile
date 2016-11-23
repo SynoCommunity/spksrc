@@ -12,14 +12,15 @@ COMMENT  = Git is a free & open source, distributed version control system desig
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS  = --without-tcltk --without-python ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=no
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
 ENV += TC_TARGET="$(TC_TARGET)"
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:

@@ -12,13 +12,12 @@ COMMENT  = Nettle is a cryptographic library that is designed to fit easily in m
 LICENSE  = 
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-shared
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --enable-shared
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --disable-assembler
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 

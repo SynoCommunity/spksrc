@@ -12,12 +12,12 @@ HOMEPAGE   = http://www.haproxy.org
 COMMENT    = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 LICENSE    = GNU GPL 2
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 OFLAG = -O3
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile: 

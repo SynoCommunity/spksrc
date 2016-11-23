@@ -12,12 +12,13 @@ COMMENT  = ejabberd is high-performace enterprise Jabber/XMPP instant messaging 
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS += --with-erlang=$(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 POST_INSTALL_TARGET = myPostInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:

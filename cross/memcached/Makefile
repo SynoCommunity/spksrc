@@ -11,11 +11,12 @@ HOMEPAGE = http://www.memcached.org/
 COMMENT  = Free & open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
 LICENSE  = BSD
 
-PRE_CONFIGURE_TARGET = myPreConfigure
-CONFIGURE_ARGS = ac_cv_c_endian=little
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myPreConfigure
+CONFIGURE_ARGS = ac_cv_c_endian=little
 
 .PHONY: myPreConfigure
 myPreConfigure:

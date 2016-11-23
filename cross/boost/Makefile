@@ -24,18 +24,18 @@ empty:=
 space:= $(empty) $(empty)
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+include $(WORK_DIR)/python-cc.mk
+
 CONFIGURE_ARGS  = --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
-
-include ../../mk/spksrc.common.mk
 
 ADDRESS_MODEL = 32
 ifneq ($(findstring $(ARCH), $(x64_ARCHES)),)
 ADDRESS_MODEL = 64
 endif
 
-include ../../mk/spksrc.cross-cc.mk
--include $(WORK_DIR)/python-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
