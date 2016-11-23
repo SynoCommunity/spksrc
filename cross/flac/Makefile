@@ -13,11 +13,10 @@ LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-thorough-tests --disable-doxygen-docs --disable-oggtest
-
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-thorough-tests --disable-doxygen-docs --disable-oggtest
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --disable-altivec
 endif
-

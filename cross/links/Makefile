@@ -12,11 +12,12 @@ COMMENT  = Links is a web browser running in text mode.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-ssl=openssl
 
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

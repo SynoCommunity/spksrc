@@ -11,6 +11,6 @@ HOMEPAGE = http://www.mosquitto.org/
 COMMENT  = Mosquitto is an open source message broker that implements the MQ Telemetry Transport protocol version 3.1.1.
 LICENSE  = BSD licensed
 
-CONFIGURE_TARGET = nop
-
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_TARGET = nop

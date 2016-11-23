@@ -12,8 +12,9 @@ LICENSE  = LGPL
 DEPENDS = cross/libassuan cross/libgpg-error cross/ncurses
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS  = --enable-pinentry-curses --disable-pinentry-gtk2 --disable-pinentry-qt --without-x --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX) 
 CONFIGURE_ARGS += --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX) --with-ncurses-include-dir=$(STAGING_INSTALL_PREFIX)
 
-
-include ../../mk/spksrc.cross-cc.mk

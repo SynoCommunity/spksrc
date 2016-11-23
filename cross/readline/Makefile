@@ -12,7 +12,8 @@ COMMENT  = Set of functions for use by applications that allow users to edit com
 LICENSE  = http://www.gnu.org/licenses/gpl.html
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = bash_cv_wcwidth_broken=no
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = bash_cv_wcwidth_broken=no
 

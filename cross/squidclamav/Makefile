@@ -12,12 +12,13 @@ COMMENT  = SquidClamav is an antivirus for Squid proxy based on the Awards winni
 LICENSE  = GNU GPL v3
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 PRE_COMPILE_TARGET = myPreCompile
 
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX) --with-c-icap=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 ADDITIONAL_CFLAGS = -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/c_icap
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreCompile
 myPreCompile:

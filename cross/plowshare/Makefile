@@ -11,11 +11,11 @@ HOMEPAGE = https://github.com/mcrapet/plowshare
 COMMENT  = Command-line tool and engine for managing sharing websites 
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

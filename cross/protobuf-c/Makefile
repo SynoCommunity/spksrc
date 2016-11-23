@@ -12,7 +12,8 @@ COMMENT  = Protocol Buffers implementation in C
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-protoc
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-protoc
 

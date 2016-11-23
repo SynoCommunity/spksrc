@@ -12,10 +12,12 @@ COMMENT  = SquidGuard is a URL redirector used to use blacklists with the proxys
 LICENSE  = GNU PL
 
 DESTDIR = $(INSTALL_DIR)
+
 GNU_CONFIGURE = 1
-POST_INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+POST_INSTALL_TARGET = myInstall
 
 CONFIGURE_ARGS  = --with-db=$(INSTALL_DIR)/$(INSTALL_PREFIX) --exec-prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX) -with-sg-dbhome=$(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db --with-sg-config=$(INSTALL_DIR)/$(INSTALL_PREFIX)/etc/squidguard.conf --with-sg-logdir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/var/logs --with-squiduser=$(USER) -with-mysql=no --with-ldap-inc=no
 

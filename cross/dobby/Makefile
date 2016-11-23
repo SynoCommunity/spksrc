@@ -11,11 +11,11 @@ HOMEPAGE = https://github.com/Diaoul/Dobby
 COMMENT  = The house-elf you can talk to
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/Dobby

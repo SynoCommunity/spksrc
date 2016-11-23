@@ -13,12 +13,13 @@ COMMENT  = Vim is an advanced text editor that seeks to provide the power of the
 LICENSE  = Charityware
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = vim_cv_toupper_broken=no --with-tlib=ncurses vim_cv_terminfo=yes vim_cv_tty_group=world vim_cv_getcwd_broken=yes
 CONFIGURE_ARGS += vim_cv_stat_ignores_slash=yes vim_cv_memmove_handles_overlap=yes
 
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

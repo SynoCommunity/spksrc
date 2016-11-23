@@ -11,6 +11,8 @@ HOMEPAGE = http://www.syncthing.net/
 COMMENT  = Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how ...
 LICENSE  =
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nope
 COMPILE_TARGET = myComp
 INSTALL_TARGET = myInstall
@@ -22,14 +24,14 @@ CGO_ENABLED=0
 STATIC_BINARIES = 0
 
 # Define SYNCTHING_ARCH as per SyncThing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = arm
 ENV += GOARM=5
 endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
@@ -39,8 +41,6 @@ endif
 SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
-
-include ../../mk/spksrc.cross-cc.mk
 
 # use workdir as gopath
 ENV += GOPATH=$(WORK_DIR)

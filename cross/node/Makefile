@@ -12,12 +12,12 @@ HOMEPAGE = http://nodejs.org/
 COMMENT  = Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.
 LICENSE  = MIT
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --without-snapshot --dest-os=linux --prefix=$(STAGING_INSTALL_PREFIX)
 ENV += LINK.target=$(TC_PATH)$(TC_PREFIX)g++
 
 POST_INSTALL_TARGET = myPostInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPostInstall
 myPostInstall:

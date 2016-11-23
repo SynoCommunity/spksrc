@@ -11,6 +11,6 @@ HOMEPAGE = https://www.dlitz.net/software/pycrypto/
 COMMENT  = Cryptographic modules for Python
 LICENSE  = Public domain
 
-ENV += cross_compiling=yes
+nclude ../../mk/spksrc.python-module.mk
 
-include ../../mk/spksrc.python-module.mk
+ENV += cross_compiling=yes

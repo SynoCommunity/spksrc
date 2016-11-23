@@ -11,13 +11,13 @@ HOMEPAGE = http://www.openssh.com/
 COMMENT  = Open source version of SSH connectivity tools
 LICENSE  =
 
+include ../../mk/spksrc.cross-cc.mk
+
 DESTDIR = $(INSTALL_DIR)
 
 CONFIGURE_ARGS  = cross_compiling=yes --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx
 CONFIGURE_ARGS += --disable-strip --with-zlib=$(STAGING_INSTALL_PREFIX) --with-ssl-dir=$(STAGING_INSTALL_PREFIX) LD=$$CC
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

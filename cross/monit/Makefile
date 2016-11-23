@@ -12,6 +12,7 @@ COMMENT  = Monit is a small Open Source utility for managing and monitoring Unix
 LICENSE  = AGPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-pam libmonit_cv_setjmp_available=yes libmonit_cv_vsnprintf_c99_conformant=yes --with-ssl-incl-dir=$(STAGING_INSTALL_PREFIX)/include
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --without-pam libmonit_cv_setjmp_available=yes libmonit_cv_vsnprintf_c99_conformant=yes --with-ssl-incl-dir=$(STAGING_INSTALL_PREFIX)/include

@@ -13,12 +13,13 @@ COMMENT  = Box Backup is an open source, completely automatic, on-line backup sy
 LICENSE  = BSD/GPL
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-random=/dev/urandom --enable-gnu-readline box_cv_have_large_file_support=yes
 
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPreConfigure
 myPreConfigure:

@@ -11,10 +11,9 @@ HOMEPAGE = http://www.linux-pam.org/
 COMMENT  = 
 LICENSE  = 
 
-
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-db=no
 
 include ../../mk/spksrc.cross-cc.mk
 
+CONFIGURE_ARGS  = --enable-db=no
 

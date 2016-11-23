@@ -13,10 +13,10 @@ LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.cross-cc.mk
+
 PATCH_TARGET = myPatch
 POST_INSTALL_TARGET = myPostInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 myPatch:
 	@gzip -dc patches/par2cmdline_0.4-11.diff.gz | ($(RUN) patch -p1)

@@ -13,6 +13,8 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS  = $(TC_CONFIGURE_ARGS) --prefix=$(INSTALL_PREFIX) --enable-icap-client --disable-strict-error-checking
 
 HOSTCFGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/src/cf_gen
@@ -20,8 +22,6 @@ HOSTCFGEN = $(WORK_DIR)/$(PKG_DIR)/src/cf_gen
 
 # Compile
 PRE_COMPILE_TARGET = myPreCompile
-
-include ../../mk/spksrc.cross-cc.mk
 
 myPreCompile:
 	cp $(HOSTCFGEN_NATIVE) $(HOSTCFGEN)

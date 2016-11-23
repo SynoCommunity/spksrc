@@ -13,8 +13,9 @@ COMMENT  = Guile is the GNU Ubiquitous Intelligent Language for Extensions, the 
 LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = GUILE_FOR_BUILD=$(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/libguile/guile
 ENV += GUILE_LOAD_PATH=$(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/module GUILE_AUTO_COMPILE=0
 
-
-include ../../mk/spksrc.cross-cc.mk

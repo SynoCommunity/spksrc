@@ -12,11 +12,11 @@ HOMEPAGE = https://www.adminer.org/
 COMMENT  = Adminer is a full-featured database management tool written in PHP. Adminer is available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
 LICENSE  = Apache License 2.0 or GPL 2
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

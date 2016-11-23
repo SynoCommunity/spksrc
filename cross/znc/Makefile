@@ -12,11 +12,12 @@ COMMENT  = Advanced IRC bouncer
 LICENSE  =
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = myPostInstall
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myPostInstall
 myPostInstall:

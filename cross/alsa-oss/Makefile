@@ -12,9 +12,10 @@ COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionali
 LICENSE  =
 
 GNU_CONFIGURE = 1
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+INSTALL_TARGET = myInstall
 
 .PHONY: myInstall
 myInstall:

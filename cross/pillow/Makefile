@@ -11,6 +11,7 @@ HOMEPAGE = http://python-pillow.github.io
 COMMENT  = The friendly PIL fork
 LICENSE  = https://github.com/python-pillow/Pillow/blob/master/LICENSE
 
+include ../../mk/spksrc.python-module.mk
+
 ENV += STAGING_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 
-include ../../mk/spksrc.python-module.mk

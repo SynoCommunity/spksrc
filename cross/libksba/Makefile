@@ -11,7 +11,8 @@ HOMEPAGE = https://www.gnupg.org/related_software/libksba/
 COMMENT  = Libksba is a library to make the tasks of working with X.509 certificates, CMS data and related objects more easy. 
 LICENSE  = LGPL
 
-CONFIGURE_ARGS = --with-libgpg-error-prefix=$(STAGING_INSTALL_PREFIX)
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --with-libgpg-error-prefix=$(STAGING_INSTALL_PREFIX)

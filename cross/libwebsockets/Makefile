@@ -12,10 +12,10 @@ HOMEPAGE = http://libevent.org/
 COMMENT  = An event notification library
 LICENSE  = http://libevent.org/LICENSE.txt
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

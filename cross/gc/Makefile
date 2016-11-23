@@ -13,6 +13,4 @@ LICENSE  = http://hboehm.info/gc/license.txt
 
 GNU_CONFIGURE = 1
 
-
 include ../../mk/spksrc.cross-cc.mk
-

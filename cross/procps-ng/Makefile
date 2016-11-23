@@ -13,6 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
-include ../../mk/spksrc.cross-cc.mk

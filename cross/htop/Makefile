@@ -14,6 +14,7 @@ COMMENT  = An interactive process viewer for Linux. The package is intended for 
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-unicode
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --disable-unicode

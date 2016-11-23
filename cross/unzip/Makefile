@@ -11,10 +11,10 @@ HOMEPAGE = http://infozip.org/UnZip.html
 COMMENT  = UnZip is an extraction utility for archives compressed in .zip format
 LICENSE  = http://infozip.org/license.html
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = myCompile
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: MyConfigure
 myConfigure:

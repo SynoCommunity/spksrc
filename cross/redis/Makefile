@@ -11,11 +11,11 @@ HOMEPAGE = http://redis.io
 COMMENT  = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 LICENSE  = BSD
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile:

@@ -11,19 +11,19 @@ HOMEPAGE = http://www.openssl.org
 COMMENT  = Compression Library
 LICENSE  = http://www.openssl.org/source/license.html
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 
 INSTALL_TARGET = myInstall
 
 STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 
-include ../../mk/spksrc.cross-cc.mk
-
 OPENSSL_ARCH = linux-generic32
-ifneq ($(findstring $(ARCH), braswell bromolow cedarview x86 avoton x64),)
+ifneq ($(findstring $(ARCH), $(x64_ARCHES)),)
 OPENSSL_ARCH = linux-x86_64
 endif
-ifneq ($(findstring $(ARCH), 88f6281),)
+ifneq ($(findstring $(ARCH), $(ARM5_ARCHES)),)
 OPENSSL_ARCH = synology-armle
 endif
 ifneq ($(findstring $(ARCH), powerpc),)

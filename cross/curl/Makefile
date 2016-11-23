@@ -13,12 +13,12 @@ LICENSE  = http://curl.haxx.se/docs/copyright.html
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 POST_INSTALL_TARGET = myPostInstall
 
 CONFIGURE_ARGS = --enable-ipv6 --with-ca-bundle=$(INSTALL_PREFIX)/cert.pem
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

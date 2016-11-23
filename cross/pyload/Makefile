@@ -11,12 +11,11 @@ HOMEPAGE = http://pyload.org
 COMMENT  = pyLoad is a fast, lightweight and full featured download manager for many One-Click-Hoster, container formats like DLC, video sites or just plain http/ftp links.
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.cross-cc.mk
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

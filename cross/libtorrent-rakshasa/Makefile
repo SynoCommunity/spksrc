@@ -13,10 +13,11 @@ COMMENT  = LibTorrent is a BitTorrent library written in C++ for *nix, with a fo
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-PRE_PATCH_TARGET = myPrePatch
-CONFIGURE_ARGS = --disable-instrumentation --with-zlib=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_PATCH_TARGET = myPrePatch
+CONFIGURE_ARGS = --disable-instrumentation --with-zlib=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: myPrePatch
 myPrePatch:

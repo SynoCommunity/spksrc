@@ -13,6 +13,6 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --with-relaxed
-
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --with-relaxed

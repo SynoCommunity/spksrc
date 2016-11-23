@@ -12,7 +12,7 @@ COMMENT  = LZO is a data compression library which is suitable for data de-/comp
 LICENSE  = GPL v2+
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
 
+CONFIGURE_ARGS = --enable-shared

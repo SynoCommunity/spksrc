@@ -12,7 +12,7 @@ COMMENT  = Packet Capture library
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-pcap=linux
-
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --with-pcap=linux

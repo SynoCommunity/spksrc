@@ -12,6 +12,7 @@ COMMENT  = Nmap ("Network Mapper") is a free and open source (license) utility f
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-zenmap --without-ncat --with-liblua=included --with-libpcre=included CFLAGS=$(TC_CFLAGS)
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --without-zenmap --without-ncat --with-liblua=included --with-libpcre=included CFLAGS=$(TC_CFLAGS)

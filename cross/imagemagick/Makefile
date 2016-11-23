@@ -11,16 +11,15 @@ HOMEPAGE = http://www.imagemagick.org/
 COMMENT  = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
 LICENSE  = Apache 2.0
 
-UNSUPPORTED_ARCHS = powerpc ppc824x
-
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
+UNSUPPORTED_ARCHS = powerpc ppc824x
 
 CONFIGURE_ARGS = --disable-installed --without-perl --without-x --without-fpx --without-wmf --disable-openmp
 
-
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 myInstall:
 	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) \

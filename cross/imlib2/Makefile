@@ -12,6 +12,7 @@ COMMENT  = Imlib 2 library does image file loading and saving as well as renderi
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-x
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = --without-x

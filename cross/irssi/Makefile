@@ -12,12 +12,13 @@ COMMENT  = Irssi is a terminal based IRC client for UNIX systems. It also suppor
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-ssl=openssl --with-curses=ncurses --without-perl
 
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

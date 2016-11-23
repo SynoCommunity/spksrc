@@ -12,11 +12,12 @@ HOMEPAGE = http://www.gnupg.org/
 COMMENT  = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.
 LICENSE  = GNU General Public License
 
-PRE_CONFIGURE_TARGET = myPreConfigure
-CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX) --with-libgcrypt-prefix=$(STAGING_INSTALL_PREFIX) --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX) --with-ksba-prefix=$(STAGING_INSTALL_PREFIX) --with-npth-prefix=$(STAGING_INSTALL_PREFIX)
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
+PRE_CONFIGURE_TARGET = myPreConfigure
+CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX) --with-libgcrypt-prefix=$(STAGING_INSTALL_PREFIX) --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX) --with-ksba-prefix=$(STAGING_INSTALL_PREFIX) --with-npth-prefix=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: myPreConfigure
 myPreConfigure:

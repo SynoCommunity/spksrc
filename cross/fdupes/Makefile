@@ -9,11 +9,11 @@ HOMEPAGE = https://github.com/adrianlopezroche/fdupes
 COMMENT  = FDUPES is a program for identifying or deleting duplicate files residing within specified directories.
 LICENSE  = MIT
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = none
 
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

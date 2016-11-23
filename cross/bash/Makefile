@@ -12,6 +12,7 @@ COMMENT  = Bash is the GNU Project's shell. Bash is the Bourne Again SHell. Bash
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = bash_cv_dev_fd=whacky
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS = bash_cv_dev_fd=whacky

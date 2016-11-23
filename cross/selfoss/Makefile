@@ -11,12 +11,12 @@ HOMEPAGE = http://selfoss.aditu.de/
 COMMENT  = The new multipurpose rss reader, live stream, mashup, aggregation web application
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

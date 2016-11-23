@@ -17,9 +17,10 @@ INSTALL_TARGET = myInstall
 OFLAG = -O3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS =
 
 include ../../mk/spksrc.cross-cc.mk
+
+CONFIGURE_ARGS =
 
 .PHONY: myCompile
 myCompile:

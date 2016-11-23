@@ -13,9 +13,9 @@ LICENSE  = BSD License
 
 GNU_CONFIGURE = 1
 
-INSTALL_TARGET = myInstall
-
 include ../../mk/spksrc.cross-cc.mk
+
+INSTALL_TARGET = myInstall
 
 .PHONY: myInstall
 myInstall:

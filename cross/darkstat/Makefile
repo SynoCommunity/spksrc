@@ -11,8 +11,8 @@ HOMEPAGE = http://unix4lyfe.org/darkstat
 COMMENT  = Captures network traffic, calculates statistics about usage, and serves reports over HTTP
 LICENSE  =
 
-ENV += HOSTCC=gcc HOSTCFLAGS=
 GNU_CONFIGURE = 1
 
-
 include ../../mk/spksrc.cross-cc.mk
+
+ENV += HOSTCC=gcc HOSTCFLAGS=

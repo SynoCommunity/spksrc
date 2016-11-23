@@ -11,6 +11,7 @@ HOMEPAGE = https://pypi.python.org/pypi/M2Crypto
 COMMENT  = A Python crypto and SSL toolkit
 LICENSE  =  MIT
 
+include ../../mk/spksrc.python-module.mk
+
 ENV += STAGING_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 
-include ../../mk/spksrc.python-module.mk

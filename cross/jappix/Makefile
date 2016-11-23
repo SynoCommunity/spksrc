@@ -12,15 +12,15 @@ HOMEPAGE = http://jappix.org/
 COMMENT  = Jappix, a full-featured XMPP web-client (Jappix Desktop, Jappix Mobile & Jappix Mini). Jappix is a fresh new open social platform which enables you to create your own cloud, wherever you want to. People must be able to get in touch with all their friends on a free decentralized network!
 LICENSE  = AGPL
 
-EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
-
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
 include ../../mk/spksrc.cross-cc.mk
+
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = myInstall
 
 .PHONY: myInstall
 myInstall:

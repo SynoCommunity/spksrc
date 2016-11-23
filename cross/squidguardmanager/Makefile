@@ -11,11 +11,11 @@ HOMEPAGE = http://squidguardmgr.darold.net/
 COMMENT  = SquidGuard Manager is a Perl CGI script used to manage SquidGuard blocklists and ACLs. It also have a GUI for SquidClamav.
 LICENSE  = GNU GPL v3
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile: $(SRC_DIR)squid_wrapper/squid_wrapper

@@ -13,6 +13,9 @@ COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix doma
 LICENSE  =
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
 
 POST_CONFIGURE_TARGET = lirc_kill_drivers
@@ -22,11 +25,9 @@ INSTALL_TARGET = lirc_custom_install
 KILL_DRIVERS = lirc_wpc8769l
 
 # i2c functions not availble in ppc854x kernel configuration
-ifeq ($(ARCH),ppc854x)
+ifeq ($(ARCH),$(PPC_ARCHES))
 KILL_DRIVERS += lirc_i2c
 endif
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: lirc_custom_install lirc_kill_drivers
 lirc_custom_install:

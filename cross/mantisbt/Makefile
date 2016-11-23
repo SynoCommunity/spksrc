@@ -11,15 +11,15 @@ HOMEPAGE = http://www.mantisbt.org
 COMMENT  = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
 LICENSE  = GPL
 
-EXTRACT_PATH = $(WORK_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
-
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
 include ../../mk/spksrc.cross-cc.mk
+
+EXTRACT_PATH = $(WORK_DIR)
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = myInstall
 
 .PHONY: myInstall
 myInstall:

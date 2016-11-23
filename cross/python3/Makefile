@@ -16,6 +16,9 @@ COMMENT  = Python Programming Language
 LICENSE  =
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
@@ -25,8 +28,6 @@ PRE_CONFIGURE_TARGET = myPreConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
 POST_INSTALL_TARGET = myPostInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 HOST_ARCH = $(shell uname -m)
 BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )

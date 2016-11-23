@@ -11,10 +11,10 @@ HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
 COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
 LICENSE  = GPLv2
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

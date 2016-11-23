@@ -11,11 +11,11 @@ HOMEPAGE = http://polarssl.org/
 COMMENT  = Cryptography and SSL made easy
 LICENSE  = http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 COMPILE_TARGET = myCompile
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure: ;

@@ -11,6 +11,7 @@ HOMEPAGE = http://zlib.net/
 COMMENT  = Compression Library
 LICENSE  = zlib-license
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --shared --prefix=$(INSTALL_PREFIX)
 
-include ../../mk/spksrc.cross-cc.mk

@@ -12,12 +12,12 @@ COMMENT  = D-Bus is a message bus system, a simple way for applications to talk 
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
+
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_ARGS = --disable-dnotify
 
 INSTALL_TARGET = myInstall
-
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:

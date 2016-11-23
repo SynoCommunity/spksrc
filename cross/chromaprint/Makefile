@@ -11,11 +11,11 @@ HOMEPAGE = http://acoustid.org/chromaprint
 COMMENT  = Chromaprint is the core component of the AcoustID project. It's a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
 LICENSE  = LGPL2.1+
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = chromaprint_custom_configure
 COMPILE_TARGET = chromaprint_custom_compile
 INSTALL_TARGET = chromaprint_custom_install
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: chromaprint_custom_configure chromaprint_custom_compile chromaprint_custom_install
 

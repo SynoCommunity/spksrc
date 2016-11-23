@@ -11,11 +11,11 @@ HOMEPAGE = http://www.museek-plus.org/
 COMMENT  = Museek+ is a GPL licensed file-sharing application for the ​Soulseek peer-to-peer network
 LICENSE  = 
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall
 ENV += CMAKE_INCLUDE_PATH="$(STAGING_INSTALL_PREFIX)/include" CMAKE_LIBRARY_PATH="$(STAGING_INSTALL_PREFIX)/lib"
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

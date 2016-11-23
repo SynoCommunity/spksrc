@@ -9,11 +9,11 @@ HOMEPAGE = http://www.newznab.com/
 COMMENT  = Newznab is a usenet indexing application, that makes building a usenet community easy.
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.cross-cc.mk
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
-
-include ../../mk/spksrc.cross-cc.mk
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/newznab
