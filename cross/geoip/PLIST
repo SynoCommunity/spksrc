@@ -1,12 +1,5 @@
 bin:bin/geoiplookup
 bin:bin/geoiplookup6
-bin:bin/geoipupdate
-etc:etc/GeoIP.conf
-etc:etc/GeoIP.conf.default
 lnk:lib/libGeoIP.so
 lnk:lib/libGeoIP.so.1
-lib:lib/libGeoIP.so.1.4.8
-lnk:lib/libGeoIPUpdate.so
-lnk:lib/libGeoIPUpdate.so.0
-lib:lib/libGeoIPUpdate.so.0.0.0
-shr:share/GeoIP
+lib:lib/libGeoIP.so.1.6.9
