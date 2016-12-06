@@ -13,4 +13,4 @@ LICENSE  = Public domain
 
 ENV += cross_compiling=yes
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk
