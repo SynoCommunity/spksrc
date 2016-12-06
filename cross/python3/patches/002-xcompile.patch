@@ -1,15 +1,15 @@
---- configure.ac.orig	2013-05-15 18:33:00.000000000 +0200
-+++ configure.ac	2013-05-29 21:47:03.814282128 +0200
-@@ -68,6 +68,8 @@
+--- configure.ac.orig	2016-06-25 23:38:39.000000000 +0200
++++ configure.ac	2016-12-05 22:06:40.183563868 +0100
+@@ -72,6 +72,8 @@
  	fi
          AC_MSG_RESULT($interp)
  	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
 +	else
-+	    AC_MSG_RESULT($PYTHON_FOR_BUILD)
++        AC_MSG_RESULT($PYTHON_FOR_BUILD)
      fi
  elif test "$cross_compiling" = maybe; then
      AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
-@@ -76,6 +78,18 @@
+@@ -80,6 +82,19 @@
  fi
  AC_SUBST(PYTHON_FOR_BUILD)
  
@@ -25,12 +25,13 @@
 +fi
 +AC_SUBST(PGEN_FOR_BUILD)
 +
++
  dnl Ensure that if prefix is specified, it does not end in a slash. If
  dnl it does, we get path names containing '//' which is both ugly and
  dnl can cause trouble.
---- Makefile.pre.in.orig	2012-09-29 10:00:41.000000000 +0200
-+++ Makefile.pre.in	2013-03-24 21:01:08.000000000 +0100
-@@ -249,6 +249,7 @@
+--- Makefile.pre.in.orig	2016-06-25 23:38:37.000000000 +0200
++++ Makefile.pre.in	2016-12-05 22:08:58.803564372 +0100
+@@ -279,6 +279,7 @@
  ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
@@ -38,12 +39,12 @@
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -669,7 +670,7 @@
- $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
- 		@$(MKDIR_P) Include
- 		$(MAKE) $(PGEN)
--		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
-+		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
- $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
- 		$(MAKE) $(GRAMMAR_H)
- 		touch $(GRAMMAR_C)
+@@ -792,7 +793,7 @@
+ 	@$(MKDIR_P) Include
+ 	# Avoid copying the file onto itself for an in-tree build
+ 	if test "$(cross_compiling)" != "yes"; then \
+-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
++		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C) ; \
+ 	else \
+ 		cp $(srcdir)/Include/graminit.h $(GRAMMAR_H).tmp; \
+ 		mv $(GRAMMAR_H).tmp $(GRAMMAR_H); \
