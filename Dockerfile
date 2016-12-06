@@ -28,6 +28,8 @@ RUN apt-get update && \
         libffi-dev \
         libgc-dev \
         libltdl-dev \
+        libmount-dev \
+        libpcre3-dev \
         libssl-dev \
         libunistring-dev \
         lzip \
