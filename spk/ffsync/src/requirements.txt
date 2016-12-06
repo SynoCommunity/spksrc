@@ -23,8 +23,8 @@ chardet==2.3
 cornice==0.17
 #coverage==3.7.1
 docutils==0.12
-gevent==1.0.1
-greenlet==0.4.5
+# gevent==1.0.1 Built via DEPENDS
+# greenlet==0.4.5 Built via DEPENDS
 #hawkauthlib==0.1.1
 Jinja2==2.7.3
 #konfig==0.9

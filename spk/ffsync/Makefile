@@ -7,8 +7,7 @@ BETA = 1
 UNSUPPORTED_ARCHS = 88f5281
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/gevent cross/greenlet cross/simplejson
-BUILD_DEPENDS += cross/umemcache
+BUILD_DEPENDS += cross/gevent cross/greenlet
 
 DEPENDS     = cross/busybox
 WHEELS      = src/requirements.txt
@@ -45,9 +44,6 @@ ffsync_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/ffsync.ini $(STAGING_DIR)/var/
-	install -m 755 -d $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse	
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48; do \
 		convert $(SPK_ICON) -thumbnail $${size}x$${size} \

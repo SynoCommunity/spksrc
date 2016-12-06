@@ -34,8 +34,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: haproxy_extra_install
 haproxy_extra_install:
-	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
-	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/crt
 	install -m 755 -d $(STAGING_DIR)/app

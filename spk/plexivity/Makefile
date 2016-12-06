@@ -47,7 +47,5 @@ plexivity_extra_install: $(STAGING_DIR)/share/plexivity
 
 $(STAGING_DIR)/share/plexivity:
 	install -m 755 -d $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	cd $(STAGING_DIR)/share && git clone https://github.com/mutschler/plexivity.git plexivity 
 	cd $(STAGING_DIR)/share/plexivity && git checkout $(SPK_VERS) && rm -rf .git && rm .gitignore

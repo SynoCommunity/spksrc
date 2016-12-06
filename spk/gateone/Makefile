@@ -35,8 +35,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: gateone_extra_install
 gateone_extra_install:
-	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
-	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/ssl
 	install -m 755 -d $(STAGING_DIR)/var
