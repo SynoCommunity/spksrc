@@ -4,4 +4,4 @@ lnk:lib/libexslt.so.0
 lib:lib/libexslt.so.0.8.17
 lnk:lib/libxslt.so
 lnk:lib/libxslt.so.1
-lib:lib/libxslt.so.1.1.28
+lib:lib/libxslt.so.1.1.29
