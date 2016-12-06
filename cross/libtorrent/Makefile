@@ -1,5 +1,5 @@
 PKG_NAME = libtorrent
-PKG_VERS = 1.0.6
+PKG_VERS = 1.0.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(subst .,_,$(PKG_VERS))
@@ -13,8 +13,8 @@ LICENSE  = BSD
 
 # Build the libtorrent library first, then create a wheel with the python bindings
 CONFIGURE_TARGET = configure_target
-COMPILE_TARGET = compile_target
-INSTALL_TARGET = install_target wheel_python_module
+COMPILE_TARGET = compile_target build_python_wheel
+INSTALL_TARGET = install_target install_python_wheel
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-python-binding --with-libgeoip --with-libiconv
