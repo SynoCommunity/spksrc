@@ -1,8 +1,8 @@
 PKG_NAME = sqlite-autoconf
-PKG_VERS = 3090200
+PKG_VERS = 3150200
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.sqlite.org/2015
+PKG_DIST_SITE = http://www.sqlite.org/2016
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/speex
