@@ -1,5 +1,5 @@
 PKG_NAME = pip
-PKG_VERS = 7.1.2
+PKG_VERS = 9.0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/$(PKG_NAME)
