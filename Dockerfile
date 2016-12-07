@@ -23,6 +23,7 @@ RUN apt-get update && \
         gperf \
         imagemagick \
         intltool \
+        libbz2-dev \
         libc6-i386 \
         libcppunit-dev \
         libffi-dev \
