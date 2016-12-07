@@ -1,5 +1,4 @@
 bin:bin/certtool
-bin:bin/danetool
 bin:bin/gnutls-cli
 bin:bin/gnutls-cli-debug
 bin:bin/gnutls-serv
