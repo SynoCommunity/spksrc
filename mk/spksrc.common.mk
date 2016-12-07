@@ -38,7 +38,7 @@ ARM7_ARCHES = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco
 ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES)
 PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
-x64_ARCHES = avoton braswell bromolow cedarview x86 x64
+x64_ARCHES = avoton braswell broadwell bromolow cedarview dockerx64 grantley kvm64 x86 x64 x86_64
 
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk
