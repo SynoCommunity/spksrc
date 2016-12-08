@@ -14,7 +14,6 @@ LICENSE  = GPL
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --without-ncurses --without-python
 CONFIGURE_ARGS += --disable-all-programs --enable-schedutils --enable-libuuid
-CONFIGURE_ARGS += --enable-libblkid --enable-libmount
 
 include ../../mk/spksrc.cross-cc.mk
 
