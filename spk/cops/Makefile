@@ -12,12 +12,15 @@ DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au ser
 ADMIN_URL = /cops/
 RELOAD_UI = yes
 DISPLAY_NAME = COPS
-CHANGELOG = Update to 1.0.1
+CHANGELOG = "1. Update to 1.0.1<br>2. Improved DSM6 compatibility"
+
+BETA=1
 
 HOMEPAGE   = http://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
