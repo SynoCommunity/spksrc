@@ -13,7 +13,7 @@ ADMIN_PORT = 9117
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
-CHANEGLOG = Updated to version 0.7.806
+CHANGELOG = Updated to version 0.7.806
 
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE  = GPLv2
