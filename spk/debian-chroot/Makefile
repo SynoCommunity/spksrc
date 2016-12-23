@@ -52,8 +52,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: debian-chroot_extra_install
 debian-chroot_extra_install:
-	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
-	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	debootstrap --foreign --arch $(DEBIAN_ARCH) jessie $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
 	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default

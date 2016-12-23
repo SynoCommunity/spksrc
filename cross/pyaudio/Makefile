@@ -11,4 +11,4 @@ HOMEPAGE = http://people.csail.mit.edu/hubert/pyaudio/
 COMMENT  = Provide Python bindings for PortAudio, the cross-platform audio I/O library
 LICENSE  = MIT
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk

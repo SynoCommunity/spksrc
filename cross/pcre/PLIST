@@ -6,7 +6,7 @@ lnk:lib/libpcrecpp.so.0
 lib:lib/libpcrecpp.so.0.0.1
 lnk:lib/libpcreposix.so
 lnk:lib/libpcreposix.so.0
-lib:lib/libpcreposix.so.0.0.3
+lib:lib/libpcreposix.so.0.0.4
 lnk:lib/libpcre.so
 lnk:lib/libpcre.so.1
-lib:lib/libpcre.so.1.2.6
+lib:lib/libpcre.so.1.2.7

@@ -1,0 +1,49 @@
+# Update configure to add a better check for SSE intrinsics
+# This update will be availabe in the next version of lame
+# http://lame.cvs.sourceforge.net/viewvc/lame/lame/configure.in?r1=1.146&r2=1.147
+# http://lame.cvs.sourceforge.net/viewvc/lame/lame/configure.in?revision=1.147&view=markup
+--- configure.orig	2016-06-02 19:17:13.227527612 +0200
++++ configure	2016-06-02 19:29:18.138003349 +0200
+@@ -11922,7 +11922,6 @@
+ 		 sys/soundcard.h \
+ 		 sys/time.h \
+ 		 unistd.h \
+-		 xmmintrin.h \
+ 		 linux/soundcard.h
+ do :
+   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+@@ -11937,6 +11936,34 @@
+ done
+
+
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking working SSE intrinsics" >&5
++$as_echo_n "checking working SSE intrinsics... " >&6; }
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <xmmintrin.h>
++int
++main ()
++{
++_mm_sfence();
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++
++$as_echo "#define HAVE_XMMINTRIN_H 1" >>confdefs.h
++
++     ac_cv_header_xmmintrin_h=yes
++else
++  ac_cv_header_xmmintrin_h=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ac_cv_header_xmmintrin_h}" >&5
++$as_echo "${ac_cv_header_xmmintrin_h}" >&6; }
++
++
++
++
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for an ANSI C-conforming const" >&5
+ $as_echo_n "checking for an ANSI C-conforming const... " >&6; }
+ if ${ac_cv_c_const+:} false; then :

@@ -1,8 +1,8 @@
 PKG_NAME = GeoIP
-PKG_VERS = 1.4.8
+PKG_VERS = 1.6.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.maxmind.com/download/geoip/api/c
+PKG_DIST_SITE = https://github.com/maxmind/geoip-api-c/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
@@ -12,6 +12,6 @@ COMMENT  = The GeoIP product is available in a variety of downloadable databases
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = 
+CONFIGURE_ARGS = ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
 include ../../mk/spksrc.cross-cc.mk

@@ -54,7 +54,7 @@ all: compile
 clean:
 	rm -fr $(WORK_DIR)
 
-$(DIGESTS_FILE):
+$(DIGESTS_FILE): download
 	@$(MSG) "Generating digests for $(PKG_NAME)"
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \

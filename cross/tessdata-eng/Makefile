@@ -2,7 +2,7 @@ PKG_NAME = tessdata-eng
 PKG_VERS = 3.02
 PKG_EXT = tar.gz
 PKG_DIST_NAME = tesseract-ocr-$(PKG_VERS).eng.$(PKG_EXT)
-PKG_DIST_SITE = http://tesseract-ocr.googlecode.com/files
+PKG_DIST_SITE = http://heanet.dl.sourceforge.net/project/tesseract-ocr-alt
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

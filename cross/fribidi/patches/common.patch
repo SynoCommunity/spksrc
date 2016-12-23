@@ -1,0 +1,12 @@
+--- lib/common.h.orig	2012-12-30 01:12:59.000000000 +0100
++++ lib/common.h	2015-04-23 14:49:27.907467994 +0200
+@@ -132,7 +132,8 @@
+ #ifndef FRIBIDI_CHUNK_SIZE
+ # if HAVE_ASM_PAGE_H
+ #  ifndef __FRIBIDI_DOC
+-#   include <asm/page.h>
++#   include <unistd.h>
++#   define PAGE_SIZE sysconf(_SC_PAGESIZE)
+ #  endif /* __FRIBIDI_DOC */
+ #  define FRIBIDI_CHUNK_SIZE (PAGE_SIZE - 16)
+ # else /* !HAVE_ASM_PAGE_H */

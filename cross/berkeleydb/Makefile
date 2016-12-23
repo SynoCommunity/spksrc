@@ -1,5 +1,5 @@
 PKG_NAME = db
-PKG_VERS = 6.1.26
+PKG_VERS = 6.2.23
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.oracle.com/berkeley-db

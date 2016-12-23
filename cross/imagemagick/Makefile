@@ -1,6 +1,6 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 6.9.3-4
-PKG_EXT = tar.gz
+PKG_VERS = 6.9.5-10
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.imagemagick.org/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)

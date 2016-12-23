@@ -1,17 +1,17 @@
---- configure.ac.orig	2013-04-06 16:02:41.000000000 +0200
-+++ configure.ac	2013-04-19 09:42:50.000000000 +0200
+--- configure.ac.orig	2016-12-17 21:05:07.000000000 +0100
++++ configure.ac	2016-12-18 16:19:47.253888277 +0100
 @@ -34,6 +34,8 @@
  	fi
          AC_MSG_RESULT($interp)
  	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
-+    else
++	else
 +        AC_MSG_RESULT($PYTHON_FOR_BUILD)
      fi
- elif test "$cross_compiling" = maybe; then
-     AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
-@@ -42,6 +44,18 @@
- fi
+     # Used to comment out stuff for rebuilding generated files
+     GENERATED_COMMENT='#'
+@@ -46,6 +48,18 @@
  AC_SUBST(PYTHON_FOR_BUILD)
+ AC_SUBST(GENERATED_COMMENT)
  
 +if test "$cross_compiling" = yes; then
 +    AC_MSG_CHECKING([for pgen for cross build])
@@ -28,22 +28,14 @@
  dnl Ensure that if prefix is specified, it does not end in a slash. If
  dnl it does, we get path names containing '//' which is both ugly and
  dnl can cause trouble.
---- Makefile.pre.in.orig	2013-04-06 16:02:34.000000000 +0200
-+++ Makefile.pre.in	2013-04-19 09:43:26.000000000 +0200
-@@ -234,6 +234,7 @@
- ##########################################################################
- # Parser
- PGEN=		Parser/pgen$(EXE)
-+PGEN_FOR_BUILD=	@PGEN_FOR_BUILD@
+--- Makefile.pre.in.orig	2016-12-18 15:59:30.745883851 +0100
++++ Makefile.pre.in	2016-12-18 16:11:37.853886496 +0100
+@@ -681,7 +681,7 @@
  
- PSRCS=		\
- 		Parser/acceler.c \
-@@ -611,7 +612,7 @@
- $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
- 		@$(MKDIR_P) Include
- 		$(MAKE) $(PGEN)
--		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
-+		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
- $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
- 		$(MAKE) $(GRAMMAR_H)
- 		touch $(GRAMMAR_C)
+ $(GRAMMAR_H): @GENERATED_COMMENT@ $(GRAMMAR_INPUT) $(PGEN)
+ 	@$(MKDIR_P) Include
+-	$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
++	$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
+ $(GRAMMAR_C): @GENERATED_COMMENT@ $(GRAMMAR_H)
+ 	touch $(GRAMMAR_C)
+ 

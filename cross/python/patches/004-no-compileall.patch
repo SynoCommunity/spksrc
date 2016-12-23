@@ -1,6 +1,6 @@
---- Makefile.pre.in.orig	2013-04-19 09:54:22.000000000 +0200
-+++ Makefile.pre.in	2013-04-19 12:17:25.000000000 +0200
-@@ -1043,24 +1043,6 @@
+--- Makefile.pre.in.orig	2016-12-18 16:13:03.473886808 +0100
++++ Makefile.pre.in	2016-12-18 16:14:44.749887176 +0100
+@@ -1120,24 +1120,6 @@
  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
  			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
  	fi

@@ -1,7 +1,7 @@
 PKG_NAME = python3
 PKG_VERS_MAJOR = 3
-PKG_VERS_MINOR = 4
-PKG_VERS_PATCH = 1
+PKG_VERS_MINOR = 5
+PKG_VERS_PATCH = 2
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -13,7 +13,7 @@ DEPENDS += native/$(PKG_NAME)
 
 HOMEPAGE = http://www.python.org/
 COMMENT  = Python Programming Language
-LICENSE  =
+LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
@@ -31,6 +31,7 @@ include ../../mk/spksrc.cross-cc.mk
 HOST_ARCH = $(shell uname -m)
 BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR)
+PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 PGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
@@ -39,7 +40,7 @@ PYTHON_LIB_NATIVE = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VE
 PYTHON_SITE_PACKAGES_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)/site-packages
 PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
-PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)m
 
 .PHONY: myPostPatch
 myPostPatch:
@@ -78,3 +79,5 @@ $(WORK_DIR)/python-cc.mk:
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
 	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@
+	@echo PIP=$(PIP_NATIVE) >> $@
+	@echo CROSS_COMPILE_WHEELS=1 >> $@

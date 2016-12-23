@@ -1,0 +1,15 @@
+bin:bin/fc-cache
+bin:bin/fc-cat
+bin:bin/fc-list
+bin:bin/fc-match
+bin:bin/fc-pattern
+bin:bin/fc-query
+bin:bin/fc-scan
+bin:bin/fc-validate
+rsc:etc/fonts/conf.d/
+rsc:etc/fonts/fonts.conf
+lnk:lib/libfontconfig.so
+lnk:lib/libfontconfig.so.1
+lib:lib/libfontconfig.so.1.9.2
+rsc:share/fontconfig/conf.avail/
+rsc:share/xml/fontconfig/fonts.dtd

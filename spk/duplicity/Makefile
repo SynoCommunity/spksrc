@@ -4,8 +4,7 @@ SPK_REV = 3
 SPK_ICON = src/duplicity.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/boto cross/msgpack-python cross/netifaces
-BUILD_DEPENDS += cross/simplejson cross/wrapt cross/$(SPK_NAME)
+BUILD_DEPENDS += cross/$(SPK_NAME)
 
 DEPENDS = cross/librsync cross/bash cross/duply
 
@@ -27,12 +26,5 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-POST_STRIP_TARGET = duplicity_extra_install
-
 include ../../mk/spksrc.spk.mk
 
-.PHONY: duplicity_extra_install
-duplicity_extra_install:
-	install -m 755 -d $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/

@@ -1,5 +1,5 @@
 PKG_NAME = bitlbee
-PKG_VERS = 3.4.1
+PKG_VERS = 3.4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://get.bitlbee.org/src
@@ -9,7 +9,7 @@ DEPENDS = cross/glib cross/gnutls cross/libgcrypt
 
 HOMEPAGE = http://www.bitlbee.org/
 COMMENT  = BitlBee brings IM (instant messaging) to IRC clients. It\'s a great solution for people who have an IRC client running all the time and don\'t want to run an additional MSN/AIM/whatever client
-LICENSE  =
+LICENSE  = GPLv2
 
 CONFIGURE_TARGET = myConfigure
 INSTALL_TARGET = myInstall

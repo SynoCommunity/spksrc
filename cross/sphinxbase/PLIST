@@ -13,4 +13,3 @@ lib:lib/libsphinxad.so.0.0.1
 lnk:lib/libsphinxbase.so
 lnk:lib/libsphinxbase.so.1
 lib:lib/libsphinxbase.so.1.1.1
-lib:@PYTHON_SITE_PACKAGES@/sphinxbase.so

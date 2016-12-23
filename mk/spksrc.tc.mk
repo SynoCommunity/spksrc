@@ -84,7 +84,7 @@ tc_vars: patch
 clean:
 	rm -fr $(WORK_DIR)
 
-$(DIGESTS_FILE):
+$(DIGESTS_FILE): download
 	@$(MSG) "Generating digests for $(TC_NAME)"
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \

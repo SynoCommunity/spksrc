@@ -4,7 +4,7 @@ SPK_REV = 3
 SPK_ICON = src/saltpad.png
 DSM_UI_DIR = app
 
-DEPENDS  = 
+DEPENDS =
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.9-12:salt-master"
 
@@ -34,8 +34,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: saltpad_extra_install
 saltpad_extra_install: $(STAGING_DIR)/share/saltpad
-	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
-	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/app/images

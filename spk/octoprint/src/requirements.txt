@@ -29,6 +29,7 @@ semantic-version==2.4.2
 sockjs-tornado==1.0.1
 speaklater==1.3
 tornado==4.0.1
+unidecode==0.04.19
 watchdog==0.8.3
 webassets==0.11.1
 Werkzeug==0.8.3
