@@ -2,7 +2,7 @@ PKG_NAME = pycurl
 PKG_VERS = 7.43.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://pycurl.sourceforge.net/download
+PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/pycurl
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/curl
