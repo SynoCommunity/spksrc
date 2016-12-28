@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.plexpy-custom": {
+            "title": "PlexPy Custom",
+            "desc": "PlexPy Custom Web UI",
+            "icon": "images/plexpy-custom-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8010",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
