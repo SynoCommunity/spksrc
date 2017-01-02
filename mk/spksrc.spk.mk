@@ -51,9 +51,11 @@ include ../../mk/spksrc.copy.mk
 strip: copy
 include ../../mk/spksrc.strip.mk
 
+icon: strip
+include ../../mk/spksrc.icon.mk
 
 ### Packaging rules
-$(WORK_DIR)/package.tgz: strip
+$(WORK_DIR)/package.tgz: icon
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
