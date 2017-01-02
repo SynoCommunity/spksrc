@@ -184,11 +184,11 @@ $(WORK_DIR)/PACKAGE_ICON.PNG: $(SPK_ICON)
 	@[ -f $@ ] && rm $@ || true
 	(convert $(SPK_ICON) -thumbnail 72x72 - >> $@)
 
-$(WORK_DIR)/PACKAGE_ICON_120.PNG: $(SPK_ICON)
+$(WORK_DIR)/PACKAGE_ICON_256.PNG: $(SPK_ICON)
 	$(create_target_dir)
-	@$(MSG) "Creating PACKAGE_ICON_120.PNG for $(SPK_NAME)"
+	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
 	@[ -f $@ ] && rm $@ || true
-	(convert $(SPK_ICON) -thumbnail 120x120 - >> $@)
+	(convert $(SPK_ICON) -thumbnail 256x256 - >> $@)
 
 # Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
@@ -245,7 +245,7 @@ $(DSM_SCRIPTS_DIR)/%.sc: $(filter %.sc,$(FWPORTS))
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
-SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_120.PNG scripts
+SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG scripts
 
 .PHONY: checksum
 checksum:
@@ -276,7 +276,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_120.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_256.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
