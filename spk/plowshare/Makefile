@@ -2,7 +2,6 @@ SPK_NAME = plowshare
 SPK_VERS = 2.1.2
 SPK_REV = 3
 SPK_ICON = src/plowshare.png
-DSM_UI_DIR = app
 
 DEPENDS = cross/bash cross/libcaca cross/screen cross/plowshare
 
