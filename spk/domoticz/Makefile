@@ -1,8 +1,9 @@
 SPK_NAME = domoticz
-SPK_VERS = 2.0.2284
-SPK_REV = 6
+SPK_VERS = 2.0.2563
+SPK_REV = 7
 SPK_ICON = src/domoticz.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -12,7 +13,7 @@ DESCRIPTION_FRE = Domoticz est un système domotique qui vous permet de surveill
 ADMIN_PORT = 8084
 RELOAD_UI = yes
 DISPLAY_NAME = Domoticz
-CHANGELOG = "update to svn revision 2284"
+CHANGELOG = "1. Includes OpenZwave support<BR>2. fix RFlink causing crash on malformed input<BR>3. add USB drivers for pl2303<BR>4. fix backups directory permission<BR>5. upgrade now preserves scripts and backups<BR>5.  Updated to SVN revision 2563<BR>6. Removed Python dependency<BR>7. Moved approot to /var<BR>8. Added Libudev<BR>9. removed Dependency on cross/openzwave as domoticz ships its own "
 
 HOMEPAGE = http://www.domoticz.com/
 LICENSE  = 
@@ -34,6 +35,13 @@ include ../../mk/spksrc.spk.mk
 domoticz_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/backups
+	install -m 755 -d $(STAGING_DIR)/var/backups/hourly
+	install -m 755 -d $(STAGING_DIR)/var/backups/daily
+	install -m 755 -d $(STAGING_DIR)/var/backups/weekly
+	install -m 755 -d $(STAGING_DIR)/rules.d
+	install -m 644 src/60-synocommunity.domoticz.rules $(STAGING_DIR)/rules.d/60-synocommunity.domoticz.rules
 	install -m 755 -d $(STAGING_DIR)/app/images
 	for size in 16 24 32 48 72 ; do \
 	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
