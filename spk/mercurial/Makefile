@@ -9,7 +9,6 @@ SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = Dr-Bean
 DESCRIPTION = Mercurial is a free, distributed source control management tool
-RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Mercurial
 CHANGELOG = Update to 4.0.1
