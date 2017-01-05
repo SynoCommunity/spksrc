@@ -1,5 +1,5 @@
 SPK_NAME = ncdu
-SPK_VERS = 1.11
+SPK_VERS = 1.12
 SPK_REV = 1
 SPK_ICON = src/ncdu.png
 
