@@ -5,6 +5,7 @@ SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
+WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = Diaoul
