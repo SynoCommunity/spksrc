@@ -44,7 +44,7 @@ $(ICON_DIR): $(PRE_ICON_TARGET)
 	@for size in 16 24 32 48 64 72 256; do \
 	  convert $(SPK_ICON) -thumbnail $${size}x$${size} \
 	          $@/$(SPK_NAME)-$${size}.png ; \
-        done ; \
+	done ; \
 
 post_icon_target: $(ICON_TARGET)
 
