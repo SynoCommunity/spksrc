@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.6-8"
+SPK_DEPENDS = "python>=2.7.9-12"
 
 MAINTAINER = Diaoul
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
