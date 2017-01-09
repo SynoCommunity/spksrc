@@ -1,13 +1,13 @@
 SPK_NAME = sabnzbd-testing
 SPK_VERS = 1.2.0RC1
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.6-8"
+SPK_DEPENDS = "python>=2.7.9-12"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
