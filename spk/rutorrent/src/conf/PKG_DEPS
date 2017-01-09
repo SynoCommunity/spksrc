@@ -1,0 +1,5 @@
+[WebStation]
+dsm_min_ver=6.0
+
+[PHP5.6]
+dsm_min_ver=6.0
