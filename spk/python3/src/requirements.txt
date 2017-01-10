@@ -8,9 +8,9 @@
 
 ## Cross-compiled via spksrc.wheel.mk
 markupsafe==0.23
-psutil==5.0.0
+psutil==5.0.1
 sqlalchemy==1.1.4
-zope.interface==4.3.2
+zope.interface==4.3.3
 
 ## Pure-python via spksrc.wheel.mk
 pyopenssl==16.2.0
@@ -19,6 +19,6 @@ virtualenv==15.1.0
 
 # cryptography dependencies
 enum34==1.1.6
-idna==2.1
+idna==2.2
 ipaddress==1.0.17
 pyasn1==0.1.9
