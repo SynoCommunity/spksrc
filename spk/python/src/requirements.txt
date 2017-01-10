@@ -1,6 +1,6 @@
 ## Modules cross-compiled via spksrc.python-wheel.mk
 # Included for reference
-#lxml==3.6.4
+#lxml==3.7.2
 #m2crypto==0.25.1
 #msgpack-python==0.4.8
 #pillow==3.4.2

@@ -1,6 +1,6 @@
 ## Modules cross-compiled via spksrc.python-wheel.mk
 # Included for reference
-#lxml==3.6.4
+#lxml==3.7.2
 #pycrypto==2.6.1
 #pycurl==7.43.0
 #pyyaml==3.12
