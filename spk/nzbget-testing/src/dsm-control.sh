@@ -8,16 +8,21 @@ DNAME="NZBGet Testing"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="nzbget-testing"
 NZBGET="${INSTALL_DIR}/bin/nzbget"
 CFG_FILE="${INSTALL_DIR}/var/nzbget.conf"
 PID_FILE="${INSTALL_DIR}/var/nzbget.pid"
 LOG_FILE="${INSTALL_DIR}/var/nzbget.log"
 
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+
+USER="sc-nzbget-testing"
+LEGACY_USER="nzbget-testing"
+PACKAGE_USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${NZBGET} -c ${CFG_FILE} -D"
+    su ${PACKAGE_USER} -s /bin/sh -c "PATH=${PATH} ${NZBGET} -c ${CFG_FILE} -D"
 }
 
 stop_daemon ()
