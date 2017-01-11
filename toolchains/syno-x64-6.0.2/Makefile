@@ -1,6 +1,6 @@
 TC_NAME = syno-x64
 
-TC_ARCH = avoton braswell bromolow cedarview x86 x86_64
+TC_ARCH = avoton braswell broadwell bromolow cedarview grantley x86 x86_64
 TC_VERS = 6.0
 TC_FIRMWARE = 6.0-7321
 
