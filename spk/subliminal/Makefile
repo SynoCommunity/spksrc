@@ -25,7 +25,6 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = subliminal_extra_install
 
 # Pure Python package, make sure ARCH is not defined
