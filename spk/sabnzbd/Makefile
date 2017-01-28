@@ -15,7 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "1. Updated to 1.2.0<br>2. Warning: When you upgrade an existing 0.7.x installation, release 1.x will NOT be able to finish the queue. It's best to empty your queue first using 0.7.x. Alternatively, you can install 1.x and then use queue repair on the Status page. Some information (like the order of the queue) will be lost."
+CHANGELOG = "Updated to 1.2.0"
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
