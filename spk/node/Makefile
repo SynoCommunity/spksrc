@@ -1,6 +1,6 @@
 SPK_NAME = node
-SPK_VERS = 0.12.2
-SPK_REV = 5
+SPK_VERS = 0.12.13
+SPK_REV = 6
 SPK_ICON = src/nodejs.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -9,9 +9,9 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Node.js is a platform built on Chrome\'s JavaScript runtime for easily building fast, scalable network applications.
 STARTABLE = no
 DISPLAY_NAME = Node.js
-CHANGELOG = Update to Node.js v0.12.2
+CHANGELOG = Update to Node.js v0.12.13
 
-HOMEPAGE   = http://nodejs.org/
+HOMEPAGE   = https://nodejs.org/
 LICENSE    = MIT
 
 INSTALLER_SCRIPT = src/installer.sh
