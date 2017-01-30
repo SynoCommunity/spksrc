@@ -7,7 +7,7 @@ BETA = 1
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 DEPENDS  = cross/libtorrent cross/$(SPK_NAME)
-WHEELS = characteristic chardet pyasn1-modules pyxdg Mako service-identity
+WHEELS = attrs characteristic chardet pyasn1-modules pyxdg Mako service-identity
 SPK_DEPENDS = "python>=2.7.6-8"
 
 REQUIRED_DSM = 5.0

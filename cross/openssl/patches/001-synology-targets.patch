@@ -1,8 +1,8 @@
---- Configure.orig	2014-08-31 20:59:57.901551746 +0200
-+++ Configure	2014-08-31 21:00:58.472790163 +0200
-@@ -143,6 +143,9 @@
- my $ppc64_asm="ppccpuid.o ppccap.o:bn-ppc.o ppc-mont.o ppc64-mont.o::aes_core.o aes_cbc.o aes-ppc.o:::sha1-ppc.o sha256-ppc.o sha512-ppc.o::::::::";
- my $no_asm=":::::::::::::::void";
+--- Configure.orig	2017-01-26 14:22:03.000000000 +0100
++++ Configure	2017-01-28 17:45:09.258947749 +0100
+@@ -172,6 +172,9 @@
+ my $ppc32_asm=$ppc64_asm;
+ my $no_asm="::::::::::::::::void";
  
 +# Synology
 +my $syno_ppc32_asm="ppccpuid.o ppccap.o:bn-ppc.o ppc-mont.o ppc64-mont.o:::::sha1-ppc.o sha256-ppc.o::::::::";
@@ -10,7 +10,7 @@
  # As for $BSDthreads. Idea is to maintain "collective" set of flags,
  # which would cover all BSD flavors. -pthread applies to them all, 
  # but is treated differently. OpenBSD expands is as -D_POSIX_THREAD
-@@ -615,6 +618,13 @@
+@@ -683,6 +686,13 @@
  "uClinux-dist","$ENV{'CC'}:\$(CFLAGS)::-D_REENTRANT::\$(LDFLAGS) \$(LDLIBS):BN_LLONG:${no_asm}:$ENV{'LIBSSL_dlfcn'}:linux-shared:-fPIC:-shared:.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR):$ENV{'RANLIB'}::",
  "uClinux-dist64","$ENV{'CC'}:\$(CFLAGS)::-D_REENTRANT::\$(LDFLAGS) \$(LDLIBS):SIXTY_FOUR_BIT_LONG:${no_asm}:$ENV{'LIBSSL_dlfcn'}:linux-shared:-fPIC:-shared:.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR):$ENV{'RANLIB'}::",
  

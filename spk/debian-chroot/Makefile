@@ -24,7 +24,6 @@ SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = debian-chroot_extra_install
 
 DEBIAN_ARCH =

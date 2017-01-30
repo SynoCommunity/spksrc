@@ -41,6 +41,9 @@ pyasn1==0.1.9
 # m2crypto dependencies
 typing==3.5.2.2
 
+# pillow dependencies
+olefile==0.44
+
 # Twisted dependencies
 incremental==16.10.1
 constantly==15.1.0
