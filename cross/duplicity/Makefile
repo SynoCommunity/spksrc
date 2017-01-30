@@ -1,6 +1,6 @@
 PKG_NAME = duplicity
 PKG_SHORT_VERS = 0.7
-PKG_VERS = $(PKG_SHORT_VERS).06
+PKG_VERS = $(PKG_SHORT_VERS).11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://launchpad.net/$(PKG_NAME)/$(PKG_SHORT_VERS)-series/$(PKG_VERS)/+download
