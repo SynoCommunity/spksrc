@@ -8,9 +8,8 @@ DNAME="Deluge"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/${PATH}"
-USER="deluge"
-GROUP="users"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 DELUGED="${INSTALL_DIR}/env/bin/deluged"
 DELUGE_WEB="${INSTALL_DIR}/env/bin/deluge-web"
 CFG_DIR="${INSTALL_DIR}/var/"
@@ -19,6 +18,10 @@ DELUGE_WEB_PID="${INSTALL_DIR}/var/deluge-web.pid"
 DELUGED_LOG="${INSTALL_DIR}/var/deluged.log"
 DELUGE_WEB_LOG="${INSTALL_DIR}/var/deluge-web.log"
 PYTHON_EGG_CACHE="${INSTALL_DIR}/env/cache"
+
+SC_USER="sc-deluge"
+LEGACY_USER="deluge"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
