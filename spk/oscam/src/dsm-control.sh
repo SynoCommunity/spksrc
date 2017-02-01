@@ -7,14 +7,14 @@ DNAME="OSCam"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="root"
+USER="root"
 OSCAM="${INSTALL_DIR}/bin/oscam"
 PID_FILE="${INSTALL_DIR}/var/oscam.pid"
 
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "${OSCAM} -b -c ${INSTALL_DIR}/var"
+    su ${USER} -s /bin/sh -c "${OSCAM} -b -c ${INSTALL_DIR}/var"
     sleep 1
     pidof -s oscam > ${PID_FILE}
 }
