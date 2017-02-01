@@ -8,13 +8,17 @@ DNAME="Home Assistant"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python3"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="homeassistant"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 PYTHON="${INSTALL_DIR}/env/bin/python3"
 PYTHONPATH="${INSTALL_DIR}/share/${PACKAGE}" #needed for python to find the home-assistant module folder from git
-
 LOG_FILE="${INSTALL_DIR}/var/home-assistant.log"
 PID_FILE="${INSTALL_DIR}/var/homeassistant.pid"
 RUN_ARGS="-m ${PACKAGE} -c ${INSTALL_DIR}/var --open-ui"
+
+SC_USER="sc-homeassistant"
+LEGACY_USER="homeassistant"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {

@@ -1,0 +1,27 @@
+[{
+    "step_title": "Choose your fork",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configure the fork to use",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "Fork URL",
+            "defaultValue": "https://github.com/RuudBurger/CouchPotatoServer.git",
+            "validator": {
+                "allowBlank": false
+            }
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Fork branch",
+            "defaultValue": "master",
+            "validator": {
+                "allowBlank": false
+            }
+        ]
+    }]
+}, {
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+        "desc": "Permissions are managed with the group 'sc-media' in DSM."
+    }]
+}]
