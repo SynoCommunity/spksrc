@@ -6,48 +6,52 @@ DNAME="Sonarr"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-INSTALL_LOG="${INSTALL_DIR}/var/install.log"
-TMP_INSTALL_LOG="${TMP_DIR}/${PACKAGE}/var/install.log"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="${PACKAGE}"
-GROUP="users"
-PID_FILE="${INSTALL_DIR}/var/.config/NzbDrone/nzbdrone.pid"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+SERVICETOOL="/usr/syno/bin/servicetool"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+
 SONARR="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
 SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe"
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO}"
+PID_FILE="${INSTALL_DIR}/var/.config/NzbDrone/nzbdrone.pid"
+INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+TMP_INSTALL_LOG="${TMP_DIR}/${PACKAGE}/var/install.log"
 
-SERVICETOOL="/usr/syno/bin/servicetool"
-FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+SC_USER="sc-sonarr"
+SC_GROUP="sc-media"
+SC_GROUP_DESC="SynoCommunity's media related group"
+LEGACY_USER="nzbdrone"
+LEGACY_GROUP="users"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
-SYNO_GROUP="sc-media"
-SYNO_GROUP_DESC="SynoCommunity's media related group"
 
 syno_group_create ()
 {
-    # Create syno group (Does nothing when group already exists)
-    synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
+    # Create syno group
+    synogroup --add ${SC_GROUP} ${USER} > /dev/null
     # Set description of the syno group
-    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
-
-    # Add user to syno group (Does nothing when user already in the group)
-    addgroup ${USER} ${SYNO_GROUP}
+    synogroup --descset ${SC_GROUP} "${SC_GROUP_DESC}"
+    # Add user to syno group
+    addgroup ${USER} ${SC_GROUP}
 }
 
 syno_group_remove ()
 {
     # Remove user from syno group
-    delgroup ${USER} ${SYNO_GROUP}
-
+    delgroup ${USER} ${SC_GROUP}
     # Check if syno group is empty
-    if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
+    if ! synogroup --get ${SC_GROUP} | grep -q "0:"; then
         # Remove syno group
-        synogroup --del ${SYNO_GROUP} > /dev/null
+        synogroup --del ${SC_GROUP} > /dev/null
     fi
 }
+
 
 preinst ()
 {
@@ -66,8 +70,10 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    # Create legacy user
+    if [ "${BUILDNUMBER}" -lt "7321" ]; then
+        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+    fi
 
     syno_group_create
 
@@ -88,16 +94,13 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        # Remove the user (if not upgrading)
         syno_group_remove
-
-        delgroup ${USER} ${GROUP}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
-    fi
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall configuration
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
@@ -114,11 +117,18 @@ postuninst ()
 
 preupgrade ()
 {
-    # Log Upgrade
-    echo "|| Beginning Package Upgrade - $(date) ||" >> ${INSTALL_LOG}
-
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # DSM6 Upgrade handling
+    if [ "${BUILDNUMBER}" -ge "7321" ] && [ ! -f ${DSM6_UPGRADE} ]; then
+        echo "Deleting legacy user" > ${DSM6_UPGRADE}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${LEGACY_USER}
+    fi
+
+    # Log Upgrade
+    echo "|| Beginning Package Upgrade - $(date) ||" >> ${INSTALL_LOG}
 
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
@@ -161,6 +171,9 @@ postupgrade ()
 
     # Finish Logging
     echo "|| Package upgraded to $(grep "version" /var/packages/${PACKAGE}/INFO) - $(date) ||" >> ${INSTALL_LOG}
+
+    # Ensure file ownership is correct after upgrade
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
