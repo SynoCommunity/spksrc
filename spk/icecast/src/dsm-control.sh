@@ -7,11 +7,16 @@ DNAME="icecast"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="icecast"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 ICECAST="${INSTALL_DIR}/bin/icecast"
 CFG_FILE="${INSTALL_DIR}/var/icecast.xml"
 PID_FILE="${INSTALL_DIR}/var/icecast.pid"
 COMMAND="${ICECAST} -- -c ${CFG_FILE}"
+
+SC_USER="sc-icecast"
+LEGACY_USER="icecast"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
