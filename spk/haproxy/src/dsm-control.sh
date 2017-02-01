@@ -7,8 +7,9 @@ DNAME="HAProxy"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="root" # root is needed to listen on ports <1024, haproxy will drop the privileges after startup
+PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+USER="root" # root is needed to listen on ports <1024, haproxy will drop the privileges after startup
 PYTHON="${INSTALL_DIR}/env/bin/python"
 HAPROXY="${INSTALL_DIR}/sbin/haproxy"
 PID_FILE="${INSTALL_DIR}/var/haproxy.pid"
@@ -17,12 +18,12 @@ CFG_FILE="${INSTALL_DIR}/var/haproxy.cfg"
 
 start_daemon ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -p ${PID_FILE}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${HAPROXY} -f ${CFG_FILE} -p ${PID_FILE}"
 }
 
 check_config ()
 {
-    su - ${RUNAS} -c "PATH=${PATH} ${HAPROXY} -c -f ${CFG_FILE}" > /dev/null
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${HAPROXY} -c -f ${CFG_FILE}" > /dev/null
 }
 
 stop_daemon ()
