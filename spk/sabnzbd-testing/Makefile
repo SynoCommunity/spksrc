@@ -17,16 +17,14 @@ ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
 CHANGELOG = "Updated to 1.2.0 Final"
-
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
-
-WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
