@@ -14,11 +14,11 @@ CHANGELOG = Update to 3.4.2
 HOMEPAGE = http://www.bitlbee.org/
 LICENSE  = GPLv2
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
