@@ -8,17 +8,21 @@ DNAME="SABnzbd"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="sabnzbd"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 LOG_FILE="${INSTALL_DIR}/var/logs/sabnzbd.log"
 PID_FILE="${INSTALL_DIR}/var/sabnzbd.pid"
 
+SC_USER="sc-sabnzbd"
+LEGACY_USER="sabnzbd"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
+    su ${USER} -s /bin/sh -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 }
 
 stop_daemon ()
