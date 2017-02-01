@@ -12,7 +12,6 @@ USER="root"
 GEN_CERT="${INSTALL_DIR}/sbin/gencert.sh"
 LOG_FILE="${INSTALL_DIR}/var/umurmurd.log"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
