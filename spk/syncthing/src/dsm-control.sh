@@ -7,9 +7,13 @@ DNAME="Syncthing"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="syncthing"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 SYNCTHING="${INSTALL_DIR}/bin/syncthing"
 CONFIG_DIR="${INSTALL_DIR}/var/"
+
+SC_USER="sc-syncthing"
+LEGACY_USER="syncthing"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
