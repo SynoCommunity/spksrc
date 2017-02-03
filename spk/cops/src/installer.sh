@@ -13,7 +13,7 @@ CFG_FILE="${WEB_DIR}/${PACKAGE}/config_local.php"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
-HTTPUSER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
 PHP_CONFIG_LOCATION="$([ "${BUILDNUMBER}" -ge "7135" ] && echo -n /usr/local/etc/php56/conf.d || echo -n /etc/php/conf.d)"
 SC_GROUP="http"
 
