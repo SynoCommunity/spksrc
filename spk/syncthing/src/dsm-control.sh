@@ -19,7 +19,7 @@ fi
 
 start_daemon ()
 {
-    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- ${SYNCTHING_OPTIONS}
+    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -k 002 -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- ${SYNCTHING_OPTIONS}
 }
 
 stop_daemon ()
