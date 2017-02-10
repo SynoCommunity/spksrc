@@ -1,41 +1,35 @@
 #!/bin/sh
 
 # Package
-PACKAGE="syncthing"
-DNAME="Syncthing"
+PACKAGE="radarr"
+DNAME="Radarr"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-SYNCTHING="${INSTALL_DIR}/bin/syncthing"
-CONFIG_DIR="${INSTALL_DIR}/var"
-SYNCTHING_OPTIONS="-home=${CONFIG_DIR}"
-
-SC_USER="sc-syncthing"
-LEGACY_USER="syncthing"
-USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
-
-# Read additional startup options from /usr/local/syncthing/var/options.conf
-if [ -f ${CONFIG_DIR}/options.conf ]; then
-	source ${CONFIG_DIR}/options.conf
-fi
+USER="${PACKAGE}"
+PID_FILE="${INSTALL_DIR}/var/.config/Radarr/nzbdrone.pid"
+INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+MONO_PATH="/usr/local/mono/bin"
+MONO="${MONO_PATH}/mono"
+RADARR="${INSTALL_DIR}/share/Radarr/Radarr.exe"
+COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} -- --debug ${RADARR}"
 
 start_daemon ()
 {
-    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- ${SYNCTHING_OPTIONS}
+    start-stop-daemon -c ${USER} -S -q -b -N 10 -x ${COMMAND} > /dev/null
+    sleep 2
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -o -c ${USER} -K -u ${USER} -x ${SYNCTHING}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -x ${SYNCTHING}
+    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -x ${SYNCTHING}
-    [ $? -eq 0 ] || return 1
+    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
 wait_for_status ()
@@ -49,7 +43,6 @@ wait_for_status ()
     done
     return 1
 }
-
 
 case $1 in
     start)
@@ -68,8 +61,8 @@ case $1 in
             echo ${DNAME} is not running
         fi
         ;;
-    status)
-        if daemon_status; then
+    status)       
+	if daemon_status; then
             echo ${DNAME} is running
             exit 0
         else
@@ -78,7 +71,8 @@ case $1 in
         fi
         ;;
     log)
-        exit 1
+	echo "${INSTALL_LOG}"
+        exit 0
         ;;
     *)
         exit 1

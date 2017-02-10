@@ -1,40 +1,42 @@
 #!/bin/sh
 
 # Package
-PACKAGE="syncthing"
-DNAME="Syncthing"
+PACKAGE="syncthing-inotify"
+DNAME="Syncthing-Inotify"
+
+# Syncthing folders
+SYNCTHING_DIR="/usr/local/syncthing"
+SYNCTHING_CONFIG_DIR="${SYNCTHING_DIR}/var"
+
+# Syncthing-Inotify reads Syncthing's config and uses its busybox and user account
+PATH="${SYNCTHING_DIR}/bin:${PATH}"
+USER="syncthing"
+INOTIFY_OPTIONS="-home=${SYNCTHING_CONFIG_DIR}"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PATH}"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-SYNCTHING="${INSTALL_DIR}/bin/syncthing"
+INOTIFY="${INSTALL_DIR}/bin/syncthing-inotify"
 CONFIG_DIR="${INSTALL_DIR}/var"
-SYNCTHING_OPTIONS="-home=${CONFIG_DIR}"
 
-SC_USER="sc-syncthing"
-LEGACY_USER="syncthing"
-USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
-
-# Read additional startup options from /usr/local/syncthing/var/options.conf
+# Read additional startup options from /usr/local/syncthing-inotify/var/options.conf
 if [ -f ${CONFIG_DIR}/options.conf ]; then
 	source ${CONFIG_DIR}/options.conf
 fi
 
 start_daemon ()
 {
-    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- ${SYNCTHING_OPTIONS}
+    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -x env HOME=${SYNCTHING_CONFIG_DIR} ${INOTIFY} -- ${INOTIFY_OPTIONS}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -o -c ${USER} -K -u ${USER} -x ${SYNCTHING}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -x ${SYNCTHING}
+    start-stop-daemon -o -c ${USER} -K -u ${USER} -x ${INOTIFY}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -x ${INOTIFY}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -x ${SYNCTHING}
+    start-stop-daemon -K -q -t -u ${USER} -x ${INOTIFY}
     [ $? -eq 0 ] || return 1
 }
 
