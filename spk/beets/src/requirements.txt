@@ -1,0 +1,29 @@
+# Produced by pip freeze
+# Commented if provided by python package at /usr/local/python/share/wheelhouse/
+beets==1.4.3
+click==6.7
+# For Discogs
+discogs-client==2.2.1
+#enum34==1.1.6
+# For Web Plugin
+Flask==0.12
+Flask-Cors==3.0.2
+itsdangerous==0.24
+jellyfish==0.5.6
+Jinja2==2.9.5
+#MarkupSafe==0.23
+munkres==1.0.8
+musicbrainzngs==0.6
+mutagen==1.36.2
+oauthlib==2.0.1
+# For LastGenre, LastImport plugins
+pylast==1.7.0
+python-mpd2==0.5.5
+#PyYAML==3.12
+# For most API dependant plugins
+requests==2.13.0
+requests-oauthlib==0.7.0
+#six==1.10.0
+Unidecode==0.4.20
+#virtualenv==15.1.0
+Werkzeug==0.11.15
