@@ -32,7 +32,6 @@ preuninst ()
 postuninst ()
 {
     rm -f ${INSTALL_DIR}
-    rm -f /usr/local/bin/${PACKAGE}
     rm -f /lib/udev/rules.d/80-he853.rules
 
     exit 0

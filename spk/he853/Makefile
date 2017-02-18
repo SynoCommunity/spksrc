@@ -1,5 +1,5 @@
 SPK_NAME = he853
-SPK_VERS = 1.0.1
+SPK_VERS = 1.0.2
 SPK_REV  = 1
 SPK_ICON = src/HE853.png
 
