@@ -1,13 +1,12 @@
 SPK_NAME   = octoprint
 SPK_VERS   = $(shell date +%Y%m%d)
-SPK_REV    = 4
+SPK_REV    = 5
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
 BETA = 1
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/$(SPK_NAME)
 WHEELS  = src/requirements.txt
 
 SPK_DEPENDS = "python>=2.7.11-15"

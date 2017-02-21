@@ -33,14 +33,11 @@ postinst ()
     # Install the wheels
     ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
 
-    # Install OctoPrint
-    cd ${INSTALL_DIR}/share/OctoPrint && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null 2>&1
-
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
     # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:${GROUP} ${SYNOPKG_PKGDEST}
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
