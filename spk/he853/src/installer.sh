@@ -3,11 +3,13 @@
 # Package
 PACKAGE="he853"
 DNAME="HomeEasy HE853 USB device executable"
+UDEVRULE="80-${PACKAGE}.rules"
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PATH}"
-
+LOCALBASE="/usr/local/"
+LOCALBIN="${LOCALBASE}bin/"
+INSTALL_DIR="${LOCALBASE}${PACKAGE}/"
+UDEVBASE="/lib/udev/rules.d/"
 
 preinst ()
 {
@@ -17,9 +19,11 @@ preinst ()
 postinst ()
 {
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-    mkdir -p /usr/local/bin
-    ln -s ${INSTALL_DIR}/bin/${PACKAGE} /usr/local/bin/${PACKAGE}
-    ln -s ${INSTALL_DIR}/lib/udev/rules.d/80-he853.rules /lib/udev/rules.d/
+
+    mkdir -p ${LOCALBIN}
+    ln -s ${INSTALL_DIR}/bin/${PACKAGE} ${LOCALBIN}
+
+    ln -s ${INSTALL_DIR}${UDEVBASE}${UDEVRULE} ${UDEVBASE}
 
     exit 0
 }
@@ -31,8 +35,9 @@ preuninst ()
 
 postuninst ()
 {
+    rm -f ${UDEVBASE}${UDEVRULE}
+
     rm -f ${INSTALL_DIR}
-    rm -f /lib/udev/rules.d/80-he853.rules
 
     exit 0
 }
