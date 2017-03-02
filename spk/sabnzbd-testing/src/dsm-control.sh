@@ -14,7 +14,7 @@ SABNZBD="${INSTALL_DIR}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 LOG_FILE="${INSTALL_DIR}/var/logs/sabnzbd.log"
 PID_FILE="${INSTALL_DIR}/var/sabnzbd.pid"
-LANGUAGE="env LANG=UTF-8"
+LANGUAGE="env LANG=en_US.UTF-8"
 
 
 start_daemon ()
