@@ -1,5 +1,5 @@
 PKG_NAME = libmediainfo
-PKG_VERS = 0.7.91
+PKG_VERS = 0.7.93
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://mediaarea.net/download/source/$(PKG_NAME)/$(PKG_VERS)
