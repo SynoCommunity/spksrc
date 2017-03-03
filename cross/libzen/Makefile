@@ -19,4 +19,4 @@ CONFIGURE_ARGS = --enable-shared
 include ../../mk/spksrc.cross-cc.mk
 
 myPreConfigure:
-	$(RUN) ; ./autogen
+	$(RUN) ; ./autogen.sh
