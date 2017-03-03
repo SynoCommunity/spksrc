@@ -29,6 +29,7 @@ postinst ()
     # Add symlink
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/env/bin/borg /usr/local/bin/borg
+    ln -s ${INSTALL_DIR}/env/bin/borgmatic /usr/local/bin/borgmatic
 
     exit 0
 }

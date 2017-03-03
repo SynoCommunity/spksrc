@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.0.10
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
@@ -13,7 +13,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
 STARTABLE = no
 DISPLAY_NAME = Borg
-CHANGELOG = "First release"
+CHANGELOG = "1. First release<br>2. Add borgmatic"
 BETA = 1
 
 HOMEPAGE = https://borgbackup.readthedocs.io
