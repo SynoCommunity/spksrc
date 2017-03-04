@@ -1,6 +1,6 @@
 SPK_NAME = zsh
 SPK_VERS = 5.3.1
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/zsh.png
 
 DEPENDS = cross/$(SPK_NAME)
