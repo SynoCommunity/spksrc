@@ -1,8 +1,9 @@
 SPK_NAME = tvheadend
-SPK_VERS = 3.4.27
-SPK_REV = 6
+SPK_VERS = 4.0.9
+SPK_REV = 7
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
+BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -12,7 +13,7 @@ DESCRIPTION_FRE = Tvheadend est un serveur de streaming pour linux gérant les s
 ADMIN_PORT = 9981
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
-CHANGELOG = "Update to version 3.4.27"
+CHANGELOG = "Update to version 4.0.9"
 
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
 LICENSE  =
@@ -37,6 +38,5 @@ tvheadend_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/app/tvheadend.cgi.pl $(STAGING_DIR)/app/tvheadend.cgi
 	install -m 755 -d $(STAGING_DIR)/var/accesscontrol
 	install -m 700 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/1

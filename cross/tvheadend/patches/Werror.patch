@@ -1,11 +1,11 @@
---- Makefile.orig	2012-09-30 12:47:23.000000000 +0200
-+++ Makefile	2012-09-30 12:50:03.000000000 +0200
-@@ -27,7 +27,7 @@
- # Common compiler flags
+--- Makefile.orig	2016-03-13 18:48:44.480219027 -0400
++++ Makefile	2016-03-13 18:54:29.004982881 -0400
+@@ -28,7 +28,7 @@
  #
  
+ CFLAGS  += -g -O2 -Wunused-result
 -CFLAGS  += -Wall -Werror -Wwrite-strings -Wno-deprecated-declarations
 +CFLAGS  += -Wall -Wwrite-strings -Wno-deprecated-declarations
- CFLAGS  += -Wmissing-prototypes -fms-extensions
- CFLAGS  += -g -funsigned-char -O2 
+ CFLAGS  += -Wmissing-prototypes
+ CFLAGS  += -fms-extensions -funsigned-char -fno-strict-aliasing
  CFLAGS  += -D_FILE_OFFSET_BITS=64
