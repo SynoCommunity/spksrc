@@ -1,6 +1,6 @@
 SPK_NAME = tmux
 SPK_VERS = 2.3
-SPK_REV = 1
+SPK_REV = 3
 SPK_ICON = src/tmux.png
 
 DEPENDS = cross/$(SPK_NAME)
