@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
 SPK_VERS = 0.14.23
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 ADMIN_PORT = 7070
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Update to 0.14.23"
+CHANGELOG = "Resolved umask issue"
 HOMEPAGE = http://www.syncthing.net
 LICENSE = MPLv2.0
 
