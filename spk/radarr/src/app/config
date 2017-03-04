@@ -6,7 +6,7 @@
             "icon": "images/radarr-{0}.png",
             "type": "url",
             "protocol": "http",
-            "port": "7878",
+            "port": "8310",
             "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"

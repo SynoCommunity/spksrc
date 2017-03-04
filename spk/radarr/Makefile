@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/radarr.png
 DSM_UI_DIR = app
 BETA = 1
@@ -14,7 +14,7 @@ SPK_DEPENDS = "mono>3.6"
 
 MAINTAINER = ressu
 DESCRIPTION  = Radarr is a movie manager like Couchpotato, but based on the Sonarr codebase. It can monitor multiple RSS feeds for new movie releases and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
-ADMIN_PORT = 7878
+ADMIN_PORT = 8310
 RELOAD_UI = yes
 DISPLAY_NAME = Radarr
 CHANGELOG = "1. Initial release"

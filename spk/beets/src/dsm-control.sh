@@ -1,12 +1,11 @@
 #!/bin/sh
 
 # Package
-PACKAGE="node"
-DNAME="Node.js"
+PACKAGE="beets"
+DNAME="beets"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PATH}"
 
 
 case $1 in
@@ -20,6 +19,7 @@ case $1 in
         exit 0
         ;;
     log)
+        echo "${INSTALL_DIR}/install.log"
         exit 0
         ;;
     *)
