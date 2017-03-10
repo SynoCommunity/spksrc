@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 2.0.0Alpha1
-SPK_REV = 20
+SPK_VERS = 2.0.0Beta1
+SPK_REV = 21
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
@@ -17,7 +17,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Updated to 2.0.0 Alpha 1. Incremented version number to use par2cmdline-mt enabling multi-threaded support."
+CHANGELOG = "Updated to 2.0.0 Beta 1."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
