@@ -9,6 +9,7 @@ DEPENDS = cross/ncurses cross/libuuid
 
 HOMEPAGE = http://www.cgsecurity.org/wiki/TestDisk
 COMMENT  = TestDisk is powerful free data recovery software
+DOWNLOAD_PAGE = http://www.cgsecurity.org/wiki/TestDisk_Download
 
 GNU_CONFIGURE = 1
 

@@ -10,6 +10,7 @@ DEPENDS =
 HOMEPAGE = https://banu.com/tinyproxy/
 COMMENT  = Tinyproxy is a light-weight HTTP/HTTPS proxy daemon for POSIX operating systems.
 LICENSE  = GNU GPL 2
+DOWNLOAD_PAGE = https://github.com/tinyproxy/tinyproxy
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-regexcheck ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes

@@ -10,6 +10,7 @@ DEPENDS =
 HOMEPAGE = http://bzip.org/
 COMMENT  = High-quality data compressor
 LICENSE  = BSD License
+DOWNLOAD_PAGE = http://bzip.org/downloads.html
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = myCompile

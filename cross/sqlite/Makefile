@@ -10,6 +10,7 @@ DEPENDS = cross/zlib cross/speex
 HOMEPAGE = http://www.sqlite.org/
 COMMENT  = Self-contained, serverless, zero-configuration, transactional SQL database engine.
 LICENSE  = http://www.sqlite.org/copyright.html
+DOWNLOAD_PAGE = http://www.sqlite.org/download.html
 
 GNU_CONFIGURE = 1
 

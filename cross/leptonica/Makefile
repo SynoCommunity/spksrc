@@ -10,6 +10,7 @@ DEPENDS = cross/zlib cross/libpng cross/libjpeg cross/libtiff cross/giflib
 HOMEPAGE = http://www.leptonica.com
 COMMENT = Leptonica is a pedagogically-oriented open source software that is broadly useful for image processing and image analysis applications.
 LICENSE = http://www.leptonica.com/about-the-license.html
+DOWNLOAD_PAGE = http://leptonica.org/download.html
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static

@@ -11,6 +11,7 @@ BUILD_DEPENDS = cross/zlib
 HOMEPAGE = http://www.tcl.tk/
 COMMENT  = Tcl (Tool Command Language) is a very powerful but easy to learn dynamic programming language, suitable for a very wide range of uses, including web and desktop applications, networking, administration, testing and many more. Open source and business-friendly, Tcl is a mature yet evolving language that is truly cross platform, easily deployed and highly extensible.
 LICENSE  = http://tcl.tk/software/tcltk/license.html
+DOWNLOAD_PAGE = https://sourceforge.net/projects/tcl/files/Tcl/
 
 GNU_CONFIGURE = 1
 

@@ -8,6 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 HOMEPAGE = http://www.newznab.com/
 COMMENT  = Newznab is a usenet indexing application, that makes building a usenet community easy.
 LICENSE  = GPLv3
+DOWNLOAD_PAGE = http://www.newznab.com/download.html
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
