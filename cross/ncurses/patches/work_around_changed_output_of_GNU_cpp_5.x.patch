@@ -1,0 +1,40 @@
+Building ncurses with GCC 5.1 (or more precisely, with its 'cpp') fails with
+a syntax error, caused by earlier preprocessing.
+
+(I'm not entirely sure whether it's a GCC bug or rather caused by a new
+feature which breaks further processing with 'awk' and 'sed';  I *think*
+at least the 'awk' inline script "AW2" simply isn't prepared for the changed
+output of 'cpp' w.r.t. line directives [1].  Anyway, the patch fixes the issue.)
+
+[1] https://gcc.gnu.org/gcc-5/porting_to.html
+
+
+--- ncurses/base/MKlib_gen.sh  2011-06-04 21:14:08.000000000 +0200
++++ ncurses/base/MKlib_gen.sh  2015-04-26 00:47:06.911680782 +0200
+@@ -474,11 +474,22 @@ sed -n -f $ED1 \
+ 	-e 's/gen_$//' \
+ 	-e 's/  / /g' >>$TMP
+ 
++cat >$ED1 <<EOF
++s/  / /g
++s/^ //
++s/ $//
++s/P_NCURSES_BOOL/NCURSES_BOOL/g
++EOF
++
++# A patch discussed here:
++#	https://gcc.gnu.org/ml/gcc-patches/2014-06/msg02185.html
++# introduces spurious #line markers.  Work around that by ignoring the system's
++# attempt to define "bool" and using our own symbol here.
++sed -e 's/bool/P_NCURSES_BOOL/g' $TMP > $ED2
++cat $ED2 >$TMP
++
+ $preprocessor $TMP 2>/dev/null \
+-| sed \
+-	-e 's/  / /g' \
+-	-e 's/^ //' \
+-	-e 's/_Bool/NCURSES_BOOL/g' \
++| sed -f $ED1 \
+ | $AWK -f $AW2 \
+ | sed -f $ED3 \
+ | sed \
