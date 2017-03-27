@@ -1,0 +1,13 @@
+--- Makefile.orig	2017-03-27 21:10:20.023847566 +0200
++++ Makefile	2017-03-27 21:10:46.282317463 +0200
+@@ -10,8 +10,8 @@
+ 
+ all clean install:
+ 	$(MAKE) -C lib $@
+-	$(MAKE) -C test $@
+-	$(MAKE) -C util $@
++#	$(MAKE) -C test $@
++#	$(MAKE) -C util $@
+ 
+ update:
+ 	@echo "Pulling changes & updating from master repository"
