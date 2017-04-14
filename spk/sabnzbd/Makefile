@@ -1,21 +1,22 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 1.2.3
-SPK_REV = 22
+SPK_VERS = 2.0.0
+SPK_REV = 23
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.9-12"
 
-MAINTAINER = Diaoul
+MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
 DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\\\'avez qu\\\'a ajouter un .nzb, SABnzbd s\\\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Updated to 1.2.3"
+CHANGELOG = "Updated to 2.0.0 Final"
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
