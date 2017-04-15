@@ -48,7 +48,7 @@ syno_group_remove ()
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=https://github.com/SickRage/SickRage.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -65,7 +65,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Clone the repository and configure autoProcessTV
-    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${INSTALL_DIR}/var/SickRage
+    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=https://github.com/SickRage/SickRage.git} ${INSTALL_DIR}/var/SickRage
     cp ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickRage/autoProcessTV
     chmod 600 ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg

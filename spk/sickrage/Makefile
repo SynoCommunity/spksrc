@@ -14,7 +14,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = SickRage
 CHANGELOG =
 
-HOMEPAGE   = http://sickrage.tv/
+HOMEPAGE   = http://sickrage.github.io/
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
