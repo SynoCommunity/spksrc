@@ -15,14 +15,12 @@ SERVICETOOL="/usr/syno/bin/servicetool"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
-SONARR="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
-SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe"
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO}"
-PID_FILE="${INSTALL_DIR}/var/.config/NzbDrone/nzbdrone.pid"
-INSTALL_LOG="${INSTALL_DIR}/var/install.log"
-TMP_INSTALL_LOG="${TMP_DIR}/${PACKAGE}/var/install.log"
+PID_FILE="${INSTALL_DIR}/.config/NzbDrone/nzbdrone.pid"
+INSTALL_LOG="${INSTALL_DIR}/.config/install.log"
+TMP_INSTALL_LOG="${TMP_DIR}/${PACKAGE}/.config/install.log"
 
-DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+DSM6_UPGRADE="${INSTALL_DIR}/.config/.dsm6_upgrade"
 SC_USER="sc-sonarr"
 SC_GROUP="sc-media"
 SC_GROUP_DESC="SynoCommunity's media related group"
@@ -64,7 +62,7 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Logging Install
-    mkdir -p ${INSTALL_DIR}/var
+    mkdir -p ${INSTALL_DIR}/.config
     echo "|| Installing package $(grep "version" /var/packages/${PACKAGE}/INFO) - $(date) ||" >> ${INSTALL_LOG}
 
     # Install busybox stuff
@@ -72,7 +70,7 @@ postinst ()
 
     # Create legacy user
     if [ "${BUILDNUMBER}" -lt "7321" ]; then
-        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+        adduser -h ${INSTALL_DIR}/.config -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
     fi
 
     syno_group_create
@@ -133,19 +131,26 @@ preupgrade ()
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
+
+    # Check for legacy var folder and (if found) move contents to .config
+    if [ -d "${INSTALL_DIR}/var" ]; then
+    echo "   [LEGACY] Found var Folder - Moving To .config" >> ${TMP_INSTALL_LOG}
+    mv ${INSTALL_DIR}/var/.config ${TMP_DIR}/${PACKAGE}
+    else
+    mv ${INSTALL_DIR}/.config ${TMP_DIR}/${PACKAGE}/
+    fi
 
     # Is Installed Sonarr Binary Ver. >= SPK Sonarr Binary Ver.?
-    CUR_VER=$(${COMMAND} ${SONARR} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
+    CUR_VER=$(tail -1 ${INSTALL_DIR}/share/NzbDrone/LogentriesCore.dll | cut -c1-10)
     echo "   Installed Sonarr Binary: ${CUR_VER}" >> ${TMP_INSTALL_LOG}
-    SPK_VER=$(${COMMAND} ${SPK_SONARR} --? | grep -o "Version.*" | awk '{print $2;exit;}' | tr -d '.')
+    SPK_VER=$(tail -1 ${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/LogentriesCore.dll | cut -c1-10)
     echo "   Requested Sonarr Binary: ${SPK_VER}" >> ${TMP_INSTALL_LOG}
     if [ "$CUR_VER" -ge "$SPK_VER" ]; then
-       echo 'KEEP_CUR="yes"' > ${TMP_DIR}/${PACKAGE}/var/KEEP_VAR
+       echo 'KEEP_CUR="yes"' > ${TMP_DIR}/${PACKAGE}/.config/KEEP_VAR
        echo "   [KEEPING] Installed Sonarr Binary - Upgrading Package Only" >> ${TMP_INSTALL_LOG}
        mv ${INSTALL_DIR}/share ${TMP_DIR}/${PACKAGE}/
     else
-       echo 'KEEP_CUR="no"' > ${TMP_DIR}/${PACKAGE}/var/KEEP_VAR
+       echo 'KEEP_CUR="no"' > ${TMP_DIR}/${PACKAGE}/.config/KEEP_VAR
        echo "   [REPLACING] Installed Sonarr Binary" >> ${TMP_INSTALL_LOG}
     fi
 
@@ -155,11 +160,11 @@ preupgrade ()
 postupgrade ()
 {
     # Restore some stuff
-    rm -fr ${INSTALL_DIR}/var
-    mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+    rm -fr ${INSTALL_DIR}/.config
+    mv ${TMP_DIR}/${PACKAGE}/.config ${INSTALL_DIR}/
 
     # Restore Current Sonarr Binary If Current Ver. >= SPK Ver.
-    . ${INSTALL_DIR}/var/KEEP_VAR
+    . ${INSTALL_DIR}/.config/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
        rm -fr ${INSTALL_DIR}/share
        mv ${TMP_DIR}/${PACKAGE}/share ${INSTALL_DIR}/
@@ -167,7 +172,7 @@ postupgrade ()
 
     # Remove Backups & Upgrade Flag
     rm -fr ${TMP_DIR}/${PACKAGE}
-    rm ${INSTALL_DIR}/var/KEEP_VAR
+    rm ${INSTALL_DIR}/.config/KEEP_VAR
 
     # Finish Logging
     echo "|| Package upgraded to $(grep "version" /var/packages/${PACKAGE}/INFO) - $(date) ||" >> ${INSTALL_LOG}
