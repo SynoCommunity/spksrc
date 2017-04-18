@@ -40,8 +40,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sonarr_extra_install
 sonarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/.config
-	install -m 755 -d $(STAGING_DIR)/.config/NzbDrone
-	install -m 644 src/config.xml $(STAGING_DIR)/.config/NzbDrone/config.xml
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml

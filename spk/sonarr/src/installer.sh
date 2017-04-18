@@ -75,6 +75,10 @@ postinst ()
 
     syno_group_create
 
+    # Move config.xml to .config
+    mkdir -p ${INSTALL_DIR}/.config/NzbDrone
+    mv ${INSTALL_DIR}/app/config.xml ${INSTALL_DIR}/.config/NzbDrone/config.xml
+
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
@@ -135,17 +139,17 @@ preupgrade ()
     # Check for legacy var folder and (if found) move contents to .config
     if [ -d "${INSTALL_DIR}/var" ]; then
     echo "   [LEGACY] Found var Folder - Moving To .config" >> ${TMP_INSTALL_LOG}
-    mv ${INSTALL_DIR}/var/.config ${TMP_DIR}/${PACKAGE}
+    mv ${INSTALL_DIR}/var/.config ${TMP_DIR}/${PACKAGE}/
     else
     mv ${INSTALL_DIR}/.config ${TMP_DIR}/${PACKAGE}/
     fi
 
     # Is Installed Sonarr Binary Ver. >= SPK Sonarr Binary Ver.?
-    CUR_VER=$(tail -1 ${INSTALL_DIR}/share/NzbDrone/LogentriesCore.dll | cut -c1-10)
+    CUR_VER=$(cat ${INSTALL_DIR}/share/NzbDrone/LogentriesCore.dll | tr -cd '\40-\176' | grep -oP '(?<=ProductVersion).*(?=>)')
     echo "   Installed Sonarr Binary: ${CUR_VER}" >> ${TMP_INSTALL_LOG}
-    SPK_VER=$(tail -1 ${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/LogentriesCore.dll | cut -c1-10)
+    SPK_VER=$(cat ${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/LogentriesCore.dll | tr -cd '\40-\176' | grep -oP '(?<=ProductVersion).*(?=>)')
     echo "   Requested Sonarr Binary: ${SPK_VER}" >> ${TMP_INSTALL_LOG}
-    if [ "$CUR_VER" -ge "$SPK_VER" ]; then
+    if [ "${CUR_VER//.}" -ge "${SPK_VER//.}" ]; then
        echo 'KEEP_CUR="yes"' > ${TMP_DIR}/${PACKAGE}/.config/KEEP_VAR
        echo "   [KEEPING] Installed Sonarr Binary - Upgrading Package Only" >> ${TMP_INSTALL_LOG}
        mv ${INSTALL_DIR}/share ${TMP_DIR}/${PACKAGE}/
