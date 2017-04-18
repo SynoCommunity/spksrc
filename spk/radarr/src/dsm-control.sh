@@ -7,13 +7,18 @@ DNAME="Radarr"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="${PACKAGE}"
-PID_FILE="${INSTALL_DIR}/var/.config/Radarr/nzbdrone.pid"
-INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+PID_FILE="${INSTALL_DIR}/.config/Radarr/nzbdrone.pid"
+INSTALL_LOG="${INSTALL_DIR}/.config/install.log"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 RADARR="${INSTALL_DIR}/share/Radarr/Radarr.exe"
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} -- --debug ${RADARR}"
+
+SC_USER="sc-radarr"
+LEGACY_USER="radarr"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
