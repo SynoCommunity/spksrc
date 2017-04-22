@@ -34,8 +34,11 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: tvheadend_extra_install
 tvheadend_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/accesscontrol
-	install -m 700 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/1
+	install -m 755 -d $(STAGING_DIR)/var/passwd
+	# The following filenames stem from an arbitrary (valid) combination created by TVH
+	install -m 644 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
+	install -m 644 src/passwd.json $(STAGING_DIR)/var/passwd/a927e30a755504f9784f23a4efac5109
