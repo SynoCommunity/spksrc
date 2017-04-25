@@ -1,7 +1,7 @@
 PKG_NAME = tt-rss
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 7f4fff96
+PKG_GIT_HASH = a8625557
 PKG_DIST_SITE = https://tt-rss.org/gitlab/fox/$(PKG_NAME).git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
