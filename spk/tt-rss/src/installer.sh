@@ -19,7 +19,6 @@ MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 
 
-
 preinst ()
 {
     # Check database
@@ -66,7 +65,7 @@ postinst ()
             -e "s|define('DB_PASS', \".*\");|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
             -e "s|define('SINGLE_USER_MODE', .*);|define('SINGLE_USER_MODE', ${single_user_mode});|" \
             -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
-            -e "s|define('PHP_EXECUTABLE',  '.*');|define('PHP_EXECUTABLE', '$(PHP)');|" \
+            -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
             ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php
     fi
 
@@ -153,7 +152,9 @@ postupgrade ()
         if [ "$key" == "" ]; then
             continue
         fi
-        sed -i "s|define('$key', .*);|define('$key', $val);|g" ${WEB_DIR}/${PACKAGE}/config.php
+        sed -i -e "s|define('$key', .*);|define('$key', $val);|g" \
+               -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
+            ${WEB_DIR}/${PACKAGE}/config.php
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
     mv -f ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
