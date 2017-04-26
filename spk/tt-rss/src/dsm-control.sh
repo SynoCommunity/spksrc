@@ -11,7 +11,7 @@ PATH="${INSTALL_DIR}/bin:${PATH}"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
-PHP="$([ "${BUILDNUMBER}" -ge "7321" ] && ( [ -x /usr/local/bin/php70 ] && echo -n /usr/local/bin/php70 || ( [ -x /usr/local/bin/php56 ] && echo -n /usr/local/bin/php56 ) ) || echo -n /usr/bin/php)"
+PHP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
 
 TTRSS="${WEB_DIR}/${PACKAGE}/update.php"
 PID_FILE="${INSTALL_DIR}/var/tt-rss.pid"
