@@ -153,7 +153,7 @@ postupgrade ()
             continue
         fi
         sed -i -e "s|define('$key', .*);|define('$key', $val);|g" \
-               -e "s|define('PHP_EXECUTABLE',  '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
+               -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
             ${WEB_DIR}/${PACKAGE}/config.php
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
