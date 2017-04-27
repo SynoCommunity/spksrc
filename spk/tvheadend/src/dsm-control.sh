@@ -7,9 +7,13 @@ DNAME="Tvheadend"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="tvheadend"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 TVHEADEND="${INSTALL_DIR}/bin/tvheadend"
 PID_FILE="${INSTALL_DIR}/var/tvheadend.pid"
+
+SC_USER="sc-tvheadend"
+LEGACY_USER="tvheadend"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
