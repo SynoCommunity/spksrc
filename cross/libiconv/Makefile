@@ -12,5 +12,6 @@ COMMENT  = iconv implementation
 LICENSE  = GNU GPLv3
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-extra-encodings
 
 include ../../mk/spksrc.cross-cc.mk
