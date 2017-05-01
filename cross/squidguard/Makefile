@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.squidguard.org/Downloads/Devel/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DB_FILE= ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/blacklists.tar.gz
-DEPENDS = 
+DEPENDS = cross/berkeleydb
 
 HOMEPAGE = http://www.squidguard.org/
 COMMENT  = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid.
