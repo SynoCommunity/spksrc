@@ -40,6 +40,23 @@ PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
 x64_ARCHES = avoton braswell broadwell bromolow cedarview dockerx64 grantley kvm64 x86 x64 x86_64
 
+# NbProcessors
+NPROCS := 1
+OS := $(shell uname)
+export NPROCS
+ifeq ($J,)
+
+ifeq ($(OS),Linux)
+  NPROCS := $(shell grep -c ^processor /proc/cpuinfo)
+else ifeq ($(OS),Darwin)
+  NPROCS := $(shell system_profiler | awk '/Number of CPUs/ {print $$4}{next;}')
+endif
+
+else
+  NPROCS := $J
+endif
+
+
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
