@@ -3,7 +3,7 @@ PKG_VERS = 1.0.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/hphde/$(PKG_NAME)/archive
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_NAME)-v$(PKG_VERS)
 
 BUILD_DEPENDS = cross/libusb
 
