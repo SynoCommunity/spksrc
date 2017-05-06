@@ -67,8 +67,12 @@ postinst ()
     # Clone the repository and configure autoProcessTV
     ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${INSTALL_DIR}/var/SickRage
     cp ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg
-    chmod 777 ${INSTALL_DIR}/var/SickRage/autoProcessTV
-    chmod 600 ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg
+
+    # Only owner and root should be able to write here, and chmod the files, not the dir
+    chmod 755 ${INSTALL_DIR}/var/SickRage/autoProcessTV/*.py
+
+    # Group needs to read this (sabnzbd, nzbget, etc)
+    chmod 640 ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg
 
     # Create user
     adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
