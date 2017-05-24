@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 2.0.0
-SPK_REV = 24
+SPK_VERS = 2.0.1
+SPK_REV = 25
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -16,7 +16,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Updated to 2.0.0 Final"
+CHANGELOG = "Updated to 2.0.1. Includes multicore-par2 for verification and repair."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
