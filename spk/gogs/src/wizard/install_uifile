@@ -1,0 +1,11 @@
+[{
+    "step_title": "Gogs configuration: Debug",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Check to create debug when start and see what happens behind the scenes (New log file at each start)",
+        "subitems": [{
+          "key": "wizard_create_log",
+            "desc": "Create log file at start"
+        }]
+    }]
+}]
