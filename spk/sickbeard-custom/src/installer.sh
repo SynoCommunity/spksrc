@@ -15,6 +15,7 @@ GROUP="users"
 GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
@@ -71,15 +72,18 @@ postinst ()
     fi
 
     # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    if [ "${BUILDNUMBER}" -lt "7135" ]; then
+    	adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
 
-    syno_group_create
+   		syno_group_create
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-
+    	
+	
     # Add firewall config
-    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+    	${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+    fi
+    # Correct the files ownership
+   	chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }
@@ -88,19 +92,21 @@ preuninst ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
-
+    
     # Remove the user if uninstalling
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        syno_group_remove
+    
+	if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && [ "${BUILDNUMBER}" -lt "7135" ]; then
+    	syno_group_remove
 
         delgroup ${USER} ${GROUP}
         deluser ${USER}
-    fi
+  
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
-    fi
+    	# Remove firewall config
+    	if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        	${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
+    	fi
+	fi
 
     exit 0
 }
