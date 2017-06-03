@@ -14,4 +14,3 @@ LICENSE  = BSD
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
-
