@@ -52,6 +52,10 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
+    # Put mc in the PATH
+    mkdir -p /usr/local/bin
+    ln -s ${INSTALL_DIR}/env/bin/flexget /usr/local/bin/flexget
+
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
@@ -94,6 +98,7 @@ postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
+    rm -f /usr/local/bin/flexget
 
     exit 0
 }
