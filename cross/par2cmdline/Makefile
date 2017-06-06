@@ -21,9 +21,9 @@ PAR2_TOOLS = par2create par2repair par2verify
 
 .PHONY: myPreConfigure
 myPreConfigure:
-	#$(RUN) aclocal
-	#$(RUN) automake --add-missing
-	#$(RUN) autoconf
+	$(RUN) aclocal
+	$(RUN) automake --add-missing
+	$(RUN) autoconf
 	
 	
 myPostInstall:

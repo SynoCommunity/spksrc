@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd-testing
 SPK_VERS = 2.1.0RC1
-SPK_REV = 25
+SPK_REV = 26
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
