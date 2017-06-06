@@ -15,7 +15,11 @@ PID_FILE="${INSTALL_DIR}/var/transmission.pid"
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "7321" ]; then
+        sudo -u ${USER} PATH=${PATH} ${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}
+    else
+        su - ${USER} -c "PATH=${PATH} ${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    fi
 }
 
 stop_daemon ()
