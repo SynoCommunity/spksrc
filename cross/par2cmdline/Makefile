@@ -12,8 +12,6 @@ LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-openmp
-ADDITIONAL_LD_FLAGS =
-ADDITIONAL_C_FLAGS =
 
 POST_INSTALL_TARGET = myPostInstall
 PRE_CONFIGURE_TARGET = myPreConfigure
@@ -24,14 +22,15 @@ PAR2_TOOLS = par2create par2repair par2verify
 
 .PHONY: myPreConfigure
 myPreConfigure:
-        $(RUN) ./automake.sh
+	$(RUN) ./automake.sh
 
 
 myPostInstall:
-        (cd $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin ; \
-          for tool in $(PAR2_TOOLS); \
-          do \
-            rm $${tool} ; \
-            ln -sf par2 $${tool} ; \
-           done \
-         )
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin ; \
+	for tool in $(PAR2_TOOLS); \
+	do \
+		rm $${tool} ; \
+		ln -sf par2 $${tool} ; \
+	done \
+	)
+
