@@ -1,10 +1,6 @@
 SPK_NAME = sabnzbd-testing
 SPK_VERS = 2.1.0RC1
-<<<<<<< HEAD
-SPK_REV = 27
-=======
 SPK_REV = 28
->>>>>>> Updated to push latest statically compiled par2cmdline
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
