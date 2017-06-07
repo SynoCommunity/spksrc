@@ -11,7 +11,8 @@ COMMENT  = par2cmdline is a PAR 2.0 compatible file verification and repair tool
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-openmp
+CONFIGURE_ARGS =
+ADDITIONAL_LDFLAGS =-static
 
 POST_INSTALL_TARGET = myPostInstall
 PRE_CONFIGURE_TARGET = myPreConfigure
