@@ -2,13 +2,13 @@ PKG_NAME = domoticz
 PKG_VERS = $(PKG_SVN_REV)
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 2284
+PKG_SVN_REV = 2287
 PKG_DIST_NAME = trunk
 PKG_DIST_SITE = svn://svn.code.sf.net/p/domoticz/code
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-r*
 
-DEPENDS = cross/boost cross/sqlite cross/curl
+DEPENDS = cross/boost cross/sqlite cross/curl cross/openzwave cross/cp210x
 
 HOMEPAGE = http://www.domoticz.com/
 COMMENT  = Domoticz is a Home Automation System
