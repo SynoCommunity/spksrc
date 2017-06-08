@@ -1,3 +1,8 @@
+# Remove -flto flag optimizer
+# Use c++0x instead of c+11 for old compiler
+# Replace c++11 :
+# - nullptr to 0
+# - for loop with auto type
 diff --git a/Makefile b/Makefile
 index 32fa704..4a097e9 100644
 --- a/Makefile

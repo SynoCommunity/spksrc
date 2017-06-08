@@ -1,3 +1,4 @@
+# Use TC_TARGET instead of uname_M to check arch
 --- config.mak.uname.orig	2016-03-22 11:13:28.842072683 -0400
 +++ config.mak.uname	2016-03-22 21:19:59.399509791 -0400
 @@ -17,7 +17,7 @@
