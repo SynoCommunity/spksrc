@@ -1,3 +1,4 @@
+# Disable error for configure curl
 --- configure.orig	2015-05-08 17:52:24.000000000 +0200
 +++ configure	2015-05-08 18:33:21.860927072 +0200
 @@ -14004,7 +14004,7 @@

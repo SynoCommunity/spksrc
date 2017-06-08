@@ -1,3 +1,4 @@
+# Check if stdnoreturn.h exists before include it
 --- src/libopts/autoopts.h.orig	2014-09-01 16:40:26.756791489 +0200
 +++ src/libopts/autoopts.h	2014-09-01 16:41:36.819910675 +0200
 @@ -32,7 +32,14 @@

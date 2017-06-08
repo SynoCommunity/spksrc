@@ -1,3 +1,5 @@
+# Fix cross compiling issue
+# Remove -fvisibility=hidden flag
 --- configure.orig      2015-11-15 13:32:43.244650908 -0500
 +++ configure   2015-11-15 13:34:28.800652406 -0500
 @@ -15850,7 +15850,7 @@
