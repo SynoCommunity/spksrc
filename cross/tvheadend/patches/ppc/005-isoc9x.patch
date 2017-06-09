@@ -1,3 +1,4 @@
+# Fix implicit declaration errors for old PPC architectures
 --- src/dvr/dvr_db.c.org	2017-03-17 20:55:43.784617822 +0100
 +++ src/dvr/dvr_db.c	2017-03-17 21:03:35.314171581 +0100
 @@ -17,6 +17,8 @@
