@@ -1,5 +1,5 @@
 PKG_NAME = tvheadend
-PKG_VERS = 4.2.1
+PKG_VERS = 4.2.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
@@ -30,6 +30,5 @@ myInstall:
 
 post_patch_target_tvheadend:
 	@if [ "$(ARCH)" = "ppc853x" ] || [ "$(ARCH)" = "qoriq" ]; then \
-		cat $(PWD)/patches/ppc/iptos.patch | ($(RUN) patch -p0) ;\
-		cat $(PWD)/patches/ppc/isoc9x.patch | ($(RUN) patch -p0) ;\
+		cat $(PWD)/patches/ppc/005-isoc9x.patch | ($(RUN) patch -p0) ;\
 	fi;
