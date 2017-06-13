@@ -1,15 +1,15 @@
 # Fix for undefined _SC_IOV_MAX
---- src/dvr/dvr_db.c.orig	2012-07-14 12:13:35.000000000 +0200
-+++ src/dvr/dvr_db.c	2012-07-14 12:10:04.000000000 +0200
-@@ -958,6 +958,12 @@
+--- src/dvr/dvr_config.c.orig	2016-03-13 19:17:08.663416509 -0400
++++ src/dvr/dvr_config.c	2016-03-13 19:15:18.020150894 -0400
+@@ -1324,6 +1324,12 @@
    dvr_config_t *cfg;
  
    dvr_iov_max = sysconf(_SC_IOV_MAX);
-+  if( dvr_iov_max == -1 )                        
-+#ifdef IOV_MAX                    
-+    dvr_iov_max = IOV_MAX;                                           
-+#else                                                                    
-+    dvr_iov_max = 16;                       
++  if( dvr_iov_max == -1 )
++#ifdef IOV_MAX
++    dvr_iov_max = IOV_MAX;
++#else
++    dvr_iov_max = 16;
 +#endif
  
    /* Default settings */

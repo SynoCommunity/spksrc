@@ -30,5 +30,5 @@ myInstall:
 
 post_patch_target_tvheadend:
 	@if [ "$(ARCH)" = "ppc853x" ] || [ "$(ARCH)" = "qoriq" ]; then \
-		cat $(PWD)/patches/ppc/005-isoc9x.patch | ($(RUN) patch -p0) ;\
+		cat $(PWD)/patches/ppc/004-isoc9x.patch | ($(RUN) patch -p0) ;\
 	fi;
