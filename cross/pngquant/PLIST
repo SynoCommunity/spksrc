@@ -1,5 +1,5 @@
 bin:bin/libpng16-config
-lnk:bin/libpng-config
+bin:bin/libpng-config
 bin:bin/pngfix
 bin:bin/png-fix-itxt
 lnk:lib/libpng16.so
