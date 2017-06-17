@@ -29,5 +29,10 @@
             ]
          }
       ]
-   }
+   }, {
+    "step_title": "First login",
+    "items": [{
+        "desc": "The default credentials for the web interface is wallabag:wallabag. Change it on 'User Management' page."
+    }]
+}
 ]

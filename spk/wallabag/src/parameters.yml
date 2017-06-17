@@ -15,10 +15,10 @@ parameters:
     mailer_password: null
     locale: en
     secret: @wallabag_secret@
-    twofactor_auth: true
+    twofactor_auth: false
     twofactor_sender: no-reply@wallabag.org
     fosuser_registration: true
-    fosuser_confirmation: true
+    fosuser_confirmation: false
     from_email: no-reply@wallabag.org
     rss_limit: 50
     rabbitmq_host: localhost

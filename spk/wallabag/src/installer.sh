@@ -65,7 +65,6 @@ postinst ()
 
     # permissions
     chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    chmod -R u+rw ${WEB_DIR}/${PACKAGE}/data/db
 
     exit 0
 }
@@ -121,13 +120,16 @@ preupgrade ()
 postupgrade ()
 {
     mv ${TMP_DIR}/${PACKAGE}/parameters.yml ${CFG_FILE}
-    mv -f ${TMP_DIR}/${PACKAGE}/db ${WEB_DIR}/${PACKAGE}/data/
+    mv ${TMP_DIR}/${PACKAGE}/db ${WEB_DIR}/${PACKAGE}/data/db
 
     # migrate database
     if ! ${PHP} ${WEB_DIR}/${PACKAGE}/bin/console doctrine:migrations:migrate --env=prod -n -vvv > ${WEB_DIR}/${PACKAGE}/migration.log 2>&1; then
         echo "Unable to migrate database schema. Please check the log: ${WEB_DIR}/${PACKAGE}/migration.log"
         exit 1
     fi
+
+    # permissions after upgrade
+    chown -R ${USER} ${WEB_DIR}/${PACKAGE}
 
     rm -rf ${TMP_DIR}/${PACKAGE}
     exit 0
