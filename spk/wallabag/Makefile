@@ -1,5 +1,5 @@
 SPK_NAME = wallabag
-SPK_VERS = 1.9.2
+SPK_VERS = 2.2.3
 SPK_REV = 1
 SPK_ICON = src/wallabag.png
 DSM_UI_DIR = app
@@ -9,7 +9,7 @@ DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = tolkonepiu
 DESCRIPTION = Wallabag is a self hostable application allowing you to not miss any content anymore. Click, save, read it when you can. It extracts content so that you can read it when you have time.
-ADMIN_URL = /wallabag/
+ADMIN_URL = /wallabag/web/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Wallabag
@@ -17,6 +17,8 @@ CHANGELOG = "Initial release"
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT
+
+WIZARDS_DIR = src/wizard/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -37,6 +39,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: wallabag_extra_install
 wallabag_extra_install:
+	install -m 644 src/parameters.yml $(STAGING_DIR)/share/${SPK_NAME}/app/config/parameters.yml
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/app/images
