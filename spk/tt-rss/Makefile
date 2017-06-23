@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20160102
-SPK_REV = 10
+SPK_VERS = 17.4
+SPK_REV = 11
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "1. Update Tiny Tiny RSS to Git revision 7f4fff96<br>2. Fix DSM-6.0 compatibility"
+CHANGELOG = "Update Tiny Tiny RSS to Git revision 467bc4fe (17.4)"
 
 HOMEPAGE   = http://tt-rss.org/
 LICENSE    = GPL
