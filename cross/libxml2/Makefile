@@ -1,5 +1,5 @@
 PKG_NAME = libxml2
-PKG_VERS = 2.9.3
+PKG_VERS = 2.9.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://xmlsoft.org/$(PKG_NAME)

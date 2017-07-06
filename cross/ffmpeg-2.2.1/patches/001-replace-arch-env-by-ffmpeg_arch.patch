@@ -1,0 +1,35 @@
+--- configure.orig	2015-03-30 12:50:17.000000000 +0200
++++ configure	2015-03-30 12:50:49.000000000 +0200
+@@ -5053,7 +5053,7 @@
+ SRC_PATH:=\$(SRC_PATH:.%=..%)
+ endif
+ CC_IDENT=$cc_ident
+-ARCH=$arch
++FFMPEG_ARCH=$arch
+ CC=$cc
+ CXX=$cxx
+ AS=$as
+--- common.mak.orig	2015-03-30 12:50:05.000000000 +0200
++++ common.mak	2015-03-30 12:50:09.000000000 +0200
+@@ -111,8 +111,8 @@
+ DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
+
+ SRC_DIR    := $(SRC_PATH)/lib$(NAME)
+-ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
+-SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
++ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(FFMPEG_ARCH)/*.h))
++SKIPHEADERS += $(ARCH_HEADERS:%=$(FFMPEG_ARCH)/%) $(SKIPHEADERS-)
+ SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
+ HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
+ checkheaders: $(HOBJS)
+--- Makefile.orig	2015-03-30 12:52:37.000000000 +0200
++++ Makefile	2015-03-30 12:52:57.000000000 +0200
+@@ -87,7 +87,7 @@
+ $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
+ SUBDIR := $(1)/
+ include $(SRC_PATH)/$(1)/Makefile
+--include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
++-include $(SRC_PATH)/$(1)/$(FFMPEG_ARCH)/Makefile
+ include $(SRC_PATH)/library.mak
+ endef
+ 

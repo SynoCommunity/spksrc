@@ -12,6 +12,6 @@ bin:bin/db_stat
 bin:bin/db_tuner
 bin:bin/db_upgrade
 bin:bin/db_verify
-lib:lib/libdb-6.1.so
+lib:lib/libdb-6.2.so
 lnk:lib/libdb-6.so
 lnk:lib/libdb.so

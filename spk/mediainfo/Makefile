@@ -1,6 +1,6 @@
 SPK_NAME = mediainfo
-SPK_VERS = 0.7.73
-SPK_REV = 2
+SPK_VERS = 0.7.93
+SPK_REV = 3
 SPK_ICON = src/mediainfo.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -8,7 +8,7 @@ DEPENDS  = cross/$(SPK_NAME)
 RELOAD_UI = yes
 STARTABLE = no
 
-MAINTAINER = SynoCommunity
+MAINTAINER = cytec
 DESCRIPTION = "MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files."
 DISPLAY_NAME = MediaInfo
 
@@ -27,9 +27,3 @@ include ../../mk/spksrc.spk.mk
 .PHONY: mediainfo_extra_install
 mediainfo_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

@@ -1,6 +1,6 @@
 SPK_NAME = gnupg
 SPK_VERS = 2.1.6
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/gnupg.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.
 STARTABLE = no
 DISPLAY_NAME = GnuPG
-CHANGELOG = "Initial release"
+CHANGELOG = Add pinentry dependency
 BETA = 1
 
 HOMEPAGE = http://www.gnupg.org/

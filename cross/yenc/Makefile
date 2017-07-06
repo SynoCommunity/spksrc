@@ -11,5 +11,5 @@ HOMEPAGE = http://www.golug.it/yenc.html
 COMMENT  = yEnc module for Python
 LICENSE  = LGPL
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk
 

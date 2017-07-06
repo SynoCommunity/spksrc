@@ -1,5 +1,5 @@
 PKG_NAME = xmlrpc-c
-PKG_VERS = 1.25.25
+PKG_VERS = 1.39.07
 PKG_EXT = tgz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/Xmlrpc-c%20Super%20Stable/$(PKG_VERS)

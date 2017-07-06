@@ -22,6 +22,9 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
+    # Install the wheels
+    ${INSTALL_DIR}/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
+
     # Log installation informations
     ${INSTALL_DIR}/bin/python3 --version > ${INSTALL_DIR}/install.log 2>&1
     echo "" >> ${INSTALL_DIR}/install.log

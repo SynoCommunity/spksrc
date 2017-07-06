@@ -34,8 +34,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: haproxy_extra_install
 haproxy_extra_install:
-	install -m 755 -d ${STAGING_DIR}/share/wheelhouse
-	install -m 644 ${WORK_DIR}/wheelhouse/* ${STAGING_DIR}/share/wheelhouse/
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/crt
 	install -m 755 -d $(STAGING_DIR)/app
@@ -51,10 +49,4 @@ haproxy_extra_install:
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/texts/$${language}; \
 		install -m 644 src/app/texts/$${language}/strings $(STAGING_DIR)/app/texts/$${language}/strings; \
-	done
-	install -m 755 -d $(STAGING_DIR)/app/images
-	install -m 644 src/app/images/*.png $(STAGING_DIR)/app/images/
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
 	done

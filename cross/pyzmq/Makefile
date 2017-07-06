@@ -1,8 +1,8 @@
 PKG_NAME = pyzmq
-PKG_VERS = 15.1.0
+PKG_VERS = 16.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://pypi.python.org/packages/source/p/$(PKG_NAME)
+PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zeromq
@@ -13,7 +13,7 @@ LICENSE  = LGPL
 
 POST_EXTRACT_TARGET = myPostExtract
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk
 
 .PHONY: myPostExtract
 myPostExtract:

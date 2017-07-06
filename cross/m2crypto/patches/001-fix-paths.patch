@@ -1,22 +1,11 @@
---- setup.py.orig	2014-01-22 20:36:53.000000000 +0100
-+++ setup.py	2014-12-08 23:30:19.551278195 +0100
-@@ -39,7 +39,7 @@
+--- setup.py.orig	2016-07-22 14:43:17.000000000 +0200
++++ setup.py	2016-12-03 11:22:50.358848097 +0100
+@@ -71,7 +71,7 @@
              self.openssl = 'c:\\pkg'
          else:
              self.libraries = ['ssl', 'crypto']
 -            self.openssl = '/usr'
 +            self.openssl = os.environ.get('STAGING_INSTALL_PREFIX')
  
-     def add_multiarch_paths(self):
-         # Debian/Ubuntu multiarch support.
-@@ -56,8 +56,8 @@
-             if ret >> 8 == 0:
-                 with open(tmpfile) as fp:
-                     multiarch_path_component = fp.readline().strip()
--                self.library_dirs.append(os.path.join('/usr/lib/' + multiarch_path_component))
--                self.include_dirs.append(os.path.join('/usr/include/' + multiarch_path_component))
-+                self.library_dirs.append(os.path.join(os.environ.get('STAGING_INSTALL_PREFIX'), 'lib', multiarch_path_component))
-+                self.include_dirs.append(os.path.join(os.environ.get('STAGING_INSTALL_PREFIX'), 'include', multiarch_path_component))
-         finally:
-             os.unlink(tmpfile)
- 
+     def finalize_options(self):
+         '''Overloaded build_ext implementation to append custom openssl

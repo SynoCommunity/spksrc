@@ -1,0 +1,36 @@
+--- setup.py.orig	2016-12-04 19:50:11.545113538 +0100
++++ setup.py	2016-12-04 19:50:00.009113496 +0100
+@@ -37,24 +37,6 @@
+     raise SystemExit(
+         "Couldn't import standard zlib (incomplete Python install).")
+ 
+-# The base IronPython distribution (as of 2.7.1) doesn't support bz2
+-isironpython = False
+-try:
+-    isironpython = (platform.python_implementation()
+-                    .lower().find("ironpython") != -1)
+-except AttributeError:
+-    pass
+-
+-if isironpython:
+-    sys.stderr.write("warning: IronPython detected (no bz2 support)\n")
+-else:
+-    try:
+-        import bz2
+-        bz2.BZ2Compressor # silence unused import warning
+-    except ImportError:
+-        raise SystemExit(
+-            "Couldn't import standard bz2 (incomplete Python install).")
+-
+ ispypy = "PyPy" in sys.version
+ 
+ import ctypes
+@@ -526,7 +508,7 @@
+                          'not known' % outfile)
+                 continue
+ 
+-            data = data.replace(b'@LIBDIR@', libdir.encode(libdir_escape))
++            data = data.replace('#!/usr/local/mercurial/bin/python2.7', '#!python')
+             with open(outfile, 'wb') as fp:
+                 fp.write(data)
+ 

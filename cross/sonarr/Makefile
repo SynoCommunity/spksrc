@@ -1,6 +1,7 @@
-PKG_NAME = Sonarr
+PKG_NAME = NzbDrone
+PKG_VERS = 2.0.0.4472
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(shell curl -s https://services.sonarr.tv/v1/update/master?os=linux | grep -Po 'mono/\K.*?(?=.tar.gz)').$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).mono.$(PKG_EXT)
 PKG_DIST_SITE = http://download.sonarr.tv/v2/master/mono
 PKG_DIR = NzbDrone
 

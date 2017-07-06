@@ -18,8 +18,8 @@ FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 USER="ffsync"
 GROUP="nobody"
 
-MYSQL="/usr/syno/mysql/bin/mysql"
-MYSQLDUMP="/usr/syno/mysql/bin/mysqldump"
+MYSQL="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
+MYSQLDUMP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 
 INI_FILE="${INSTALL_DIR}/var/ffsync.ini"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -72,8 +72,8 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the wheels
-    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -I -f ${INSTALL_DIR}/share/wheelhouse -r ${INSTALL_DIR}/share/wheelhouse/requirements.txt > /${INSTALL_DIR}/var/install.log
-
+    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
+    
     # Add port-forwarding config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
 

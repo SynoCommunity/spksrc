@@ -1,6 +1,6 @@
 SPK_NAME = roundcube
 SPK_VERS = 1.1.4
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/roundcube.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ DESCRIPTION = Roundcube is a free and open source webmail solution with a deskto
 ADMIN_URL = /roundcube/
 RELOAD_UI = yes
 DISPLAY_NAME = Roundcube Webmail
-CHANGELOG = Update to 1.1.4
+CHANGELOG = DSM6 compatible
 
 HOMEPAGE   = http://www.roundcube.net
 LICENSE    = GPLv3
@@ -38,8 +38,3 @@ include ../../mk/spksrc.spk.mk
 roundcube_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

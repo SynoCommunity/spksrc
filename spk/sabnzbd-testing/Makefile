@@ -1,12 +1,14 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 1.0.0
-SPK_REV = 5
+SPK_VERS = 2.1.0
+SPK_REV = 29
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
-DEPENDS  = cross/busybox cross/par2cmdline cross/unrar cross/$(SPK_NAME)
-SPK_DEPENDS = "python>=2.7.6-8"
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python>=2.7.9-12"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
@@ -15,7 +17,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Update to 1.0.0"
+CHANGELOG = "Updated to 2.1.0. Includes par2cmdline version 0.7.2 with multicore support."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
@@ -47,8 +49,3 @@ sabnzbd-testing_extra_install:
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

@@ -1,4 +1,4 @@
 lnk:lib/libpng16.so
 lnk:lib/libpng16.so.16
-lib:lib/libpng16.so.16.21.0
+lib:lib/libpng16.so.16.28.0
 lnk:lib/libpng.so

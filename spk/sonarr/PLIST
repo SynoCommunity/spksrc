@@ -1,3 +1,0 @@
-lnk:lib/libsqlite3.so
-lnk:lib/libsqlite3.so.0
-lib:lib/libsqlite3.so.0.8.6

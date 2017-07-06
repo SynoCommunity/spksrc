@@ -1,5 +1,5 @@
 PKG_NAME = boost
-PKG_VERS = 1.59.0
+PKG_VERS = 1.63.0
 PKG_EXT = tar.bz2
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
@@ -27,13 +27,14 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 
+include ../../mk/spksrc.cross-cc.mk
+-include $(WORK_DIR)/python-cc.mk
+
 ADDRESS_MODEL = 32
-ifneq ($(findstring $(ARCH), avoton braswell bromolow cedarview x64 x86),)
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 ADDRESS_MODEL = 64
 endif
 
-include ../../mk/spksrc.cross-cc.mk
--include $(WORK_DIR)/python-cc.mk
 
 .PHONY: myConfigure
 myConfigure:

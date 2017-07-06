@@ -1,5 +1,5 @@
 PKG_NAME = glib
-PKG_SHORT_VERS = 2.38
+PKG_SHORT_VERS = 2.50
 PKG_VERS = $(PKG_SHORT_VERS).2
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -10,7 +10,7 @@ DEPENDS =
 
 HOMEPAGE = http://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library
-LICENSE  =
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 

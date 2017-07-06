@@ -5,6 +5,6 @@ bin:bin/git-shell
 lnk:bin/git-upload-archive
 bin:bin/git-upload-pack
 etc:etc/gitconfig
-libexec:libexec/git-core
-rsc:share/git-core
-rsc:share/gitweb
+libexec:libexec/git-core/
+rsc:share/git-core/
+rsc:share/gitweb/

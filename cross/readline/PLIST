@@ -1,6 +1,6 @@
 lnk:lib/libhistory.so
-lnk:lib/libhistory.so.6
-lib:lib/libhistory.so.6.3
+lnk:lib/libhistory.so.7
+lib:lib/libhistory.so.7.0
 lnk:lib/libreadline.so
-lnk:lib/libreadline.so.6
-lib:lib/libreadline.so.6.3
+lnk:lib/libreadline.so.7
+lib:lib/libreadline.so.7.0

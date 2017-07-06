@@ -1,10 +1,10 @@
 SPK_NAME = nzbget-testing
 SPK_VERS = 16.0~r1439
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/unrar cross/p7zip cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/p7zip cross/unrar cross/$(SPK_NAME)
 
 MAINTAINER = Diaoul
 DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
@@ -13,7 +13,7 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 16.0~r1439<br>2. Update configuration templates"
+CHANGELOG = "1. Update to 16.0~r1439<br>2. Security fix for p7zip"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
@@ -41,12 +41,6 @@ nzbget_extra_install: $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia $(STAGING_D
 	install -m 644 src/nzbget.conf.template $(STAGING_DIR)/share/nzbget/nzbget.conf
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/texts
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
 
 $(STAGING_DIR)/share/nzbget/scripts/nzbToMedia:
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/nzbToMedia.git

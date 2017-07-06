@@ -1,0 +1,6 @@
+bin:bin/asn1Coding
+bin:bin/asn1Decoding
+bin:bin/asn1Parser
+lib:lib/libtasn1.so
+lib:lib/libtasn1.so.6
+lib:lib/libtasn1.so.6.5.2

@@ -1,0 +1,20 @@
+--- etc/Makefile.in.orig	2012-10-04 11:58:03.000000000 +0200
++++ etc/Makefile.in	2012-10-04 12:02:05.000000000 +0200
+@@ -168,6 +168,7 @@
+ top_srcdir = @top_srcdir@
+ EXTRA_DIST = squidclamav.conf
+ CFGINST = @CFGDIR@
++DESTDIR = $(prefix)
+ all: all-am
+ 
+ .SUFFIXES:
+--- src/Makefile.in.orig	2012-10-04 12:06:28.000000000 +0200
++++ src/Makefile.in	2012-10-04 12:07:15.000000000 +0200
+@@ -198,6 +198,7 @@
+ top_srcdir = @top_srcdir@
+ INCLUDES = -I$(top_srcdir)
+ CONFIGDIR = @CONFDIR@
++DESTDIR = $(prefix)/../../../
+ cicapmoduledir = @MODSDIR@
+ cicapmodule_LTLIBRARIES = squidclamav.la
+ squidclamav_la_LIBADD = @MODULES_LIBADD@

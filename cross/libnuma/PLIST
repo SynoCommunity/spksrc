@@ -1,0 +1,8 @@
+bin:bin/memhog
+bin:bin/migratepages
+bin:bin/migspeed
+bin:bin/numactl
+bin:bin/numastat
+lnk:lib/libnuma.so
+lnk:lib/libnuma.so.1
+lib:lib/libnuma.so.1.0.0

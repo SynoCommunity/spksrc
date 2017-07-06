@@ -1,0 +1,6 @@
+[{
+    "step_title": "Updating Radarr",
+    "items": [{
+        "desc": "Keep Radarr up-to-date by using Radarr's built-in updater.<br><br>Navigate to System>Updates in the Radarr UI."
+    }]
+}]

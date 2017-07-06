@@ -1,0 +1,3 @@
+bin:bin/x265
+lnk:lib/libx265.so
+lib:lib/libx265.so.87

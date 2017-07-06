@@ -1,10 +1,9 @@
 PKG_NAME = gmp
-PKG_VERS_SHORT = 6.0.0
-PKG_VERS = $(PKG_VERS_SHORT)a
+PKG_VERS = 6.1.1
 PKG_EXT = tar.lz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://gmplib.org/download/gmp
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS_SHORT)
+PKG_DIST_SITE = https://gmplib.org/download/$(PKG_NAME)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 

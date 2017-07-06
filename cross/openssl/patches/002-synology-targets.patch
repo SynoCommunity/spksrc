@@ -1,0 +1,26 @@
+--- Configure.orig	2017-01-26 14:22:03.000000000 +0100
++++ Configure	2017-01-28 17:45:09.258947749 +0100
+@@ -172,6 +172,9 @@
+ my $ppc32_asm=$ppc64_asm;
+ my $no_asm="::::::::::::::::void";
+ 
++# Synology
++my $syno_ppc32_asm="ppccpuid.o ppccap.o:bn-ppc.o ppc-mont.o ppc64-mont.o:::::sha1-ppc.o sha256-ppc.o::::::::";
++
+ # As for $BSDthreads. Idea is to maintain "collective" set of flags,
+ # which would cover all BSD flavors. -pthread applies to them all, 
+ # but is treated differently. OpenBSD expands is as -D_POSIX_THREAD
+@@ -683,6 +686,13 @@
+ "uClinux-dist","$ENV{'CC'}:\$(CFLAGS)::-D_REENTRANT::\$(LDFLAGS) \$(LDLIBS):BN_LLONG:${no_asm}:$ENV{'LIBSSL_dlfcn'}:linux-shared:-fPIC:-shared:.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR):$ENV{'RANLIB'}::",
+ "uClinux-dist64","$ENV{'CC'}:\$(CFLAGS)::-D_REENTRANT::\$(LDFLAGS) \$(LDLIBS):SIXTY_FOUR_BIT_LONG:${no_asm}:$ENV{'LIBSSL_dlfcn'}:linux-shared:-fPIC:-shared:.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR):$ENV{'RANLIB'}::",
+ 
++##### Synology
++# ppc
++"synology-ppc",	"gcc:-DB_ENDIAN -DTERMIO -O3 -Wall::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_RISC1 DES_UNROLL:${syno_ppc32_asm}:linux32:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++
++# armle
++"synology-armle","gcc:-DL_ENDIAN -DTERMIO -Os -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_INT DES_UNROLL BF_PTR:${no_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++
+ );
+ 
+ my @MK1MF_Builds=qw(VC-WIN64I VC-WIN64A
