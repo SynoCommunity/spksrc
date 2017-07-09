@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 2.1.0
-SPK_REV = 29
+SPK_VERS = 2.2.0Alpha2
+SPK_REV = 30
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
@@ -17,7 +17,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Updated to 2.1.0. Includes par2cmdline version 0.7.2 with multicore support."
+CHANGELOG = "Updated to 2.2.0 Alpha 2. Due to changes in this release, the queue will be converted when 2.2.0 is started for the first time. Job order, settings and data will be preserved, but all jobs will be unpaused and URL's that did not finish fetching before the upgrade will be lost!"
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
