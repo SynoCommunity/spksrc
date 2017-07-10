@@ -44,6 +44,26 @@ syno_group_remove ()
     fi
 }
 
+set_syno_permissions ()
+{
+    # Sets recursive permissions for ${SC_GROUP} on specified directory
+    # Usage: set_syno_permissions "${wizard_download_dir}"
+    DIRNAME=$1
+    VOLUME=`echo $1 | awk -F/ '{print "/"$2}'`
+    # Set read/write permissions for SC_GROUP on target directory
+    if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--"`" ]; then
+        synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--" > /dev/null 2>&1
+    fi
+    # Walk up the tree and set traverse permissions up to VOLUME
+    DIRNAME="$(dirname "${DIRNAME}")"
+    while [ "${DIRNAME}" != "${VOLUME}" ]; do
+        if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:..x"`" ]; then
+            synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:--x----------:---n" > /dev/null 2>&1
+        fi
+        DIRNAME="$(dirname "${DIRNAME}")"
+    done
+}
+
 
 preinst ()
 {
@@ -157,6 +177,9 @@ postupgrade ()
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Ensure file ownership is correct after upgrade
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }

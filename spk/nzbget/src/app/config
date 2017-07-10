@@ -6,7 +6,7 @@
             "icon": "images/nzbget-{0}.png",
             "type": "url",
             "protocol": "http",
-            "port": "6789",
+            "port": "9876",
             "url": "/",
             "allUsers": true,
             "grantPrivilege": "local"
