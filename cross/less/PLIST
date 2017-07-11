@@ -1,0 +1,3 @@
+bin:bin/less
+bin:bin/lesskey
+bin:bin/lessecho
