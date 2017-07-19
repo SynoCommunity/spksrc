@@ -1,6 +1,6 @@
 SPK_NAME = jackett
-SPK_VERS = 0.7.1225
-SPK_REV = 3
+SPK_VERS = 0.7.1483
+SPK_REV = 4
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ ADMIN_PORT = 9117
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
-CHANGELOG = Updated to version 0.7.1225
+CHANGELOG = Updated to version 0.7.1483
 
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE  = GPLv2
