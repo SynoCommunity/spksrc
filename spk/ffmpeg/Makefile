@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 3.2.2
-SPK_REV = 5
+SPK_VERS = 3.3.2
+SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 3.2.2"
+CHANGELOG = "1. Update ffmpeg to 3.3.2  2. Enable AC3 encoder"
 
 DEPENDS = cross/$(SPK_NAME)
 
