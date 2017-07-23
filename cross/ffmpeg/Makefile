@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 3.1.2
+PKG_VERS = 3.3.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases
@@ -31,6 +31,7 @@ CONFIGURE_ARGS += --enable-libtheora --enable-libvo-amrwbenc --enable-libvorbis
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-openssl
 CONFIGURE_ARGS += --disable-debug --disable-doc --disable-htmlpages --disable-manpages
 CONFIGURE_ARGS += --disable-podpages --disable-static --disable-txtpages
+CONFIGURE_ARGS += --enable-encoder=ac3
 
 include ../../mk/spksrc.cross-cc.mk
 
