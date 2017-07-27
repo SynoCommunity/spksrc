@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="sickrage"
-DNAME="SickRage"
+DNAME="sickrage"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -12,10 +12,10 @@ PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin
 PYTHON="${INSTALL_DIR}/env/bin/python"
 GIT="${GIT_DIR}/bin/git"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-SICKRAGE="${INSTALL_DIR}/var/SickRage/SickBeard.py"
+SICKRAGE="${INSTALL_DIR}/var/SickRage/SiCKRAGE.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/sickrage.pid"
-LOG_FILE="${INSTALL_DIR}/var/Logs/sickrage.log"
+LOG_FILE="${INSTALL_DIR}/var/logs/sickrage.log"
 
 SC_USER="sc-sickrage"
 LEGACY_USER="sickrage"
