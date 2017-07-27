@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="sickrage"
-DNAME="SickRage"
+DNAME="sickrage"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
