@@ -1,19 +1,4 @@
-# Sample configuration file for NZBGet
-#
-# On POSIX put this file to one of the following locations:
-# ~/.nzbget
-# /etc/nzbget.conf
-# /usr/etc/nzbget.conf
-# /usr/local/etc/nzbget.conf
-# /opt/etc/nzbget.conf
-#
-# On Windows put this file in program's directory.
-#
-# You can also put the file into any location, if you specify the path to it
-# using switch "-c", e.g:
-#   nzbget -c /home/user/myconfig.txt
-
-# For quick start change the option MainDir and configure one news-server
+# Configuration file for NZBGet
 
 
 ##############################################################################
@@ -51,8 +36,8 @@ InterDir=${MainDir}/inter
 # Directory for incoming nzb-files.
 #
 # If a new nzb-file is added to queue via web-interface or RPC-API, it
-# is saved into this directory and then processed by pre-processing
-# script (option <ScanScript>).
+# is saved into this directory and then processed by extension
+# scripts (option <Extensions>).
 #
 # This directory is also monitored for new nzb-files. If a new file
 # is found it is added to download queue. The directory can have
@@ -80,7 +65,9 @@ WebDir=
 
 # Directory with post-processing and other scripts.
 #
-# NOTE: For information on writing scripts visit http://nzbget.net/Extension_scripts.
+# This option may contain multiple directories separated with commas or semicolons.
+#
+# NOTE: For information on writing scripts visit http://nzbget.net/extension-scripts.
 ScriptDir=${MainDir}/scripts
 
 # Lock-file for daemon-mode, POSIX only.
@@ -129,6 +116,23 @@ ConfigTemplate=
 # available on program start.
 RequiredDir=
 
+# Certificate store file or directory.
+#
+# Certificate store contains root certificates used for server certificate
+# verification when connecting to servers with encryption (TLS/SSL). This
+# includes communication with news-servers for article downloading and
+# with web-servers (via https) for fetching of rss feeds and nzb-files.
+#
+# The option can point either to one big file containing all root
+# certificates or to a directory containing certificate files, in PEM format.
+#
+# Example: /etc/ssl/certs/ca-certificates.crt.
+#
+# NOTE: Certificate verification must be enabled separately via option <CertCheck>.
+#
+# NOTE: For more details visit http://nzbget.net/certificate-verification.
+CertStore=
+
 ##############################################################################
 ### NEWS-SERVERS                                                           ###
 
@@ -169,6 +173,19 @@ Server1.Name=
 # the same priority.
 Server1.Level=0
 
+# This is an optional non-reliable server (yes, no).
+#
+# Marking server as optional tells NZBGet to ignore this server if a
+# connection to this server cannot be established. Normally NZBGet
+# doesn't try upper-level servers before all servers on current level
+# were tried. If a connection to server fails NZBGet waits until the
+# server becomes available (it may try others from current level at this
+# time). This is usually what you want to avoid exhausting of
+# (costly) upper level servers if one of main servers is temporary
+# unavailable. However, for less reliable servers you may prefer to ignore
+# connection errors and go on with higher-level servers instead.
+Server1.Optional=no
+
 # Group of news server (0-99).
 #
 # If you have multiple accounts with same conditions (retention, etc.)
@@ -206,7 +223,7 @@ Server1.Encryption=no
 # chooses the cipher automatically. To achieve the best performance
 # however you can manually select a faster cipher.
 #
-# See http://nzbget.net/Choosing_a_cipher for details.
+# See http://nzbget.net/choosing-cipher for details.
 #
 # NOTE: One of the fastest cipher is RC4. To select it use the cipher string
 # "RC4-MD5" (if NZBGet was configured to use OpenSSL) or
@@ -232,6 +249,15 @@ Server1.Connections=4
 #
 # Value "0" disables retention check.
 Server1.Retention=0
+
+# IP protocol version (auto, ipv4, ipv6).
+Server1.IpVersion=auto
+
+# User comments on this server.
+#
+# Any text you want to save along with the server definition. For your convenience
+# or for usage in custom extension scripts.
+Server1.Notes=
 
 # Second server, on level 0.
 
@@ -259,7 +285,7 @@ Server1.Retention=0
 
 # IP on which NZBGet server listen and which clients use to contact NZBGet.
 #
-# It could be a dns-hostname (e. g. "mypc") or an ip-address (e. g. "192.168.1.2" or
+# It could be a dns-hostname (e. g. "mypc") or an IP address (e. g. "192.168.1.2" or
 # "127.0.0.1"). An IP-address is more effective because does not require dns-lookup.
 #
 # Your computer may have multiple network interfaces and therefore multiple IP
@@ -297,10 +323,10 @@ ControlPassword=tegbzn6789
 
 # User name for restricted access.
 #
-# Restricted user can control the program with few restrictions. He
-# has access to web-interface and can see most program settings. He
-# can not change program settings and can not view security related
-# options or options provided by extension scripts.
+# The restricted user can control the program with a few restrictions.
+# They have access to the web-interface and can see most of the program
+# settings. They however, can not change program settings, view security
+# related options or options provided by extension scripts.
 #
 # Use this user to connect to NZBGet from other programs and web-sites.
 #
@@ -341,9 +367,19 @@ AddUsername=
 # Set to empty value to disable password check.
 AddPassword=
 
+# Authenticate using web-form (yes, no).
+#
+# The preferred and default way to authenticate in web-interface is using
+# HTTP authentication. Web-browsers show a special dialog to enter username
+# and password which they then send back to NZBGet. Sometimes browser plugins
+# aided at storing and filling of passwords do not work properly with browser's
+# built-in dialog. To help with such tools NZBGet provide an alternative
+# authentication mechanism via web form.
+FormAuth=no
+
 # Secure control of NZBGet server (yes, no).
 #
-# Activate the option if you want to access NZBGet built-in web-server 
+# Activate the option if you want to access NZBGet built-in web-server
 # via HTTPS (web-interface and RPC). You should also provide certificate
 # and key files, see option <SecureCert> and option <SecureKey>.
 SecureControl=no
@@ -369,6 +405,27 @@ SecureKey=
 # NOTE: Do not use this option if the program works behind another
 # web-server because all requests will have the address of this server.
 AuthorizedIP=
+
+# TLS certificate verification (yes, no).
+#
+# When connecting to a news server (for downloading) or a web server
+# (for fetching of rss feeds and nzb-files) the authenticity of the server
+# should be validated using server security certificate. If the check
+# fails that means the connection cannot be trusted and must be closed
+# with an error message explaining the security issue.
+#
+# Sometimes servers are improperly configured and the certificate verification
+# fails even if there is no hacker attack in place. In that case you should
+# inform the server owner about the issue. If you still need to connect to
+# servers with invalid certificates you can disable the certificate verification
+# but you should know that your connection is insecure and you might be
+# connecting to attacker's server without your awareness.
+#
+# NOTE: Certificate verification requires a list of trusted root certificates,
+# which must be configured using option <CertStore>.
+#
+# NOTE: For more details visit http://nzbget.net/certificate-verification.
+CertCheck=no
 
 # User name for daemon-mode, POSIX only.
 #
@@ -417,10 +474,10 @@ Category1.DestDir=
 # For more information see global option <Unpack>.
 Category1.Unpack=yes
 
-# Default list of post-processing scripts.
+# List of extension scripts for this category.
 #
-# For more information see global option <PostScript>.
-Category1.PostScript=
+# For more information see global option <Extensions>.
+Category1.Extensions=
 
 # List of aliases.
 #
@@ -428,7 +485,7 @@ Category1.PostScript=
 # is usually supplied by nzb-site or by application accessing
 # NZBGet. Using Aliases you can match their categories with your owns.
 #
-# Separate aliases with commas or semicolons. Use wildcard-characters
+# Separate aliases with commas or semicolons. Use wildcard characters
 # * and ? for pattern matching.
 #
 # Example: TV - HD, TV - SD, TV*
@@ -462,7 +519,7 @@ Category4.Name=Software
 #
 # MORE INFO:
 # NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/RSS.
+# http://nzbget.net/rss.
 #
 # Feed filter consists of rules - one rule per line. Each rule defines
 # a search string and a command, which must be performed if the search
@@ -476,7 +533,7 @@ Category4.Name=Software
 #  [A:|A(options):|R:|Q:|O(options):|#] search-string
 #
 #  A - declares Accept-rule. Rules are accept-rules by default, the
-#      "A:" can be imitted. If the feed item matches to the rule the
+#      "A:" can be omitted. If the feed item matches to the rule the
 #      item is considered good and no further rules are checked.
 #  R - declares Reject-rule. If the feed item matches to the rule the
 #      item is considered bad and no further rules are checked.
@@ -532,7 +589,7 @@ Category4.Name=Software
 #
 #  +       - declares a positive term. Terms are positive by default,
 #            the "+" can be omitted;
-#  -       - declares a negative term. If the term succeed the feed
+#  -       - declares a negative term. If the term succeeds the feed
 #            item is ignored;
 #  field   - field to which apply the term. If not specified
 #            the default field "title" is used;
@@ -560,7 +617,7 @@ Category4.Name=Software
 # Any newznab attribute (encoded as "newznab:attr" in the RSS feed) can
 # be used as search field with prefix "attr-", for example "attr-genre".
 #
-# Text search (Command @) supports supports wildcard characters * (matches
+# Text search (Command @) supports wildcard characters * (matches
 # any number of any characters), ? (matches any one character)
 # and # (matches one digit).
 # Text search is by default performed against words (word-search mode): the
@@ -585,22 +642,22 @@ Category4.Name=Software
 # 5) Q: HDTV.
 #
 # NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/RSS.
+# http://nzbget.net/rss.
 #Feed1.Filter=
-
-# Treat all items on first fetch as backlog (yes, no).
-#
-#  yes - when the feed is fetched for the very first time (or after
-#        changing of URL or filter) all existing items are ignored (marked
-#        as backlog). The items found on subsequentional fetches are processed;
-#  no  - all items are processed even on first fetch (or after
-#        changing of URL or filter).
-#Feed1.Backlog=yes
 
 # How often to check for new items (minutes).
 #
 # Value "0" disables the automatic check of this feed.
 #Feed1.Interval=15
+
+# Treat all items on first fetch as backlog (yes, no).
+#
+#  yes - when the feed is fetched for the very first time (or after
+#        changing of URL or filter) all existing items are ignored (marked
+#        as backlog). The items found on subsequent fetches are processed;
+#  no  - all items are processed even on first fetch (or after
+#        changing of URL or filter).
+#Feed1.Backlog=yes
 
 # Add nzb-files as paused (yes, no).
 #Feed1.PauseNzb=no
@@ -621,10 +678,15 @@ Category4.Name=Software
 # post-processed even if the program is in paused state (force mode).
 #Feed1.Priority=0
 
-# List of rss feed scripts to execute before rss feed content is processed.
+# List of rss feed extension scripts to execute for rss content.
 #
-# For more information see global option <FeedScript>.
-#Feed1.FeedScript=
+# The scripts in the list must be separated with commas or semicolons. All
+# scripts must be stored in directory set by option <ScriptDir> and
+# paths relative to <ScriptDir> must be entered here.
+#
+# NOTE: For developer documentation visit http://nzbget.net/extension-scripts.
+#Feed1.Extensions=
+
 
 ##############################################################################
 ### INCOMING NZBS                                                          ###
@@ -637,8 +699,7 @@ AppendCategoryDir=yes
 #
 # Value "0" disables the check.
 #
-# NOTE: nzb-files are processed by scan and queue scripts. See
-# options <ScanScript> and <QueueScript>.
+# NOTE: nzb-files are processed by extension scripts. See option <Extensions>.
 NzbDirInterval=5
 
 # How old nzb-file should at least be for it to be loaded to queue (seconds).
@@ -655,7 +716,7 @@ NzbDirFileAge=60
 # 1) if history contains the same title (see below) with success status
 #    the nzb-file is not added to queue;
 # 2) if download queue already contains the same title the nzb-file is
-#    added to queue for backup (if firt file fails);
+#    added to queue for backup (if the first file fails);
 # 3) if nzb-file contains duplicate entries. This helps to find errors
 #    in bad nzb-files.
 #
@@ -668,10 +729,10 @@ NzbDirFileAge=60
 # duplicates are deleted from queue.
 #
 # NOTE: For automatic duplicate handling option <HealthCheck> must be
-# set to "Delete" or "None". If it is set to "Pause" you will need to
+# set to "Delete", "Park" or "None". If it is set to "Pause" you will need to
 # manually unpause another duplicate (if any exists in queue).
 #
-# NOTE: For more info on duplicates see http://nzbget.net/RSS.
+# NOTE: For more info on duplicates see http://nzbget.net/rss.
 DupeCheck=yes
 
 
@@ -705,14 +766,14 @@ ReloadQueue=yes
 # download-jobs (nzb-files) itself. Download-jobs are always
 # continued regardless of that option.
 #
-# Disabling this option may slighlty reduce disk access and is
+# Disabling this option may slightly reduce disk access and is
 # therefore recommended on fast connections.
 ContinuePartial=yes
 
 # Propagation delay to your news servers (minutes).
 #
 # The option sets minimum post age for nzb-files. Very recent files
-# are not downloaded to avoid download failures. The files remain 
+# are not downloaded to avoid download failures. The files remain
 # on hold in the download queue until the propagation delay expires,
 # after that they are downloaded.
 PropagationDelay=0
@@ -766,7 +827,7 @@ ArticleCache=0
 # all articles of the file are downloaded or when the cache becomes
 # full to 90%.
 #
-# The direct write relies on the ability of file system to create 
+# The direct write relies on the ability of file system to create
 # empty files without allocating the space on the drive (sparse files),
 # which most modern file systems support including EXT3, EXT4
 # and NTFS. The notable exception is HFS+ (default file system on OSX).
@@ -810,33 +871,142 @@ WriteBuffer=0
 # slow CPU disabling of CRC-Check may improve performance.
 CrcCheck=yes
 
+# How to name downloaded files (auto, article, nzb).
+#
+#  Article - use file names stored in article metadata;
+#  Nzb     - use file names as defined in nzb-file;
+#  Auto    - prefer names from article metadata; for obfuscated files use
+#            names from nzb-file.
+#
+# NOTE: This option sets the naming convention for files listed in nzb. It has not
+# effect on files extracted from archives.
+FileNaming=auto
+
+# Reorder files within nzbs for optimal download order (yes, no).
+#
+# When nzb-file is added to queue the files listed within nzb can be in a random
+# order. When "ReorderFiles" is active the files are automatically sorted
+# alphabetically to ensure download of archive parts in correct order. The
+# par2-files are moved to the end and then sorted by size.
+#
+# NOTE: When option <DirectRename> is active the files are sorted again after the file
+# names become known.
+ReorderFiles=yes
+
+# Post-processing strategy (sequential, balanced, aggressive, rocket).
+#
+#  Sequential - downloaded items are post processed from a queue, one item at a
+#               time, to dedicate the most computer resources to each
+#               item. Therefore, a post process par repair will prevent another
+#               task from running even if the item does not require a par repair;
+#  Balanced   - items that do not need par repair are post processed one at a
+#               time while par repair tasks may also run simultaneously one after
+#               another at the same time. This means that a post process par
+#               repair will not prevent another task from running, but at a cost
+#               of using more computer resource;
+#  Aggressive - will simultaneously post process up to three items including
+#               one par repair task;
+#  Rocket     - will simultaneously post process up to six items including one
+#               or two par repair tasks.
+#
+# NOTE: Computer resources are in heavy demand when post-processing with
+# simultaneous tasks - make sure the hardware is capable.
+PostStrategy=balanced
+
+# Pause if disk space gets below this value (megabytes).
+#
+# Disk space is checked for directories pointed by option <DestDir> and
+# option <InterDir>.
+#
+# Value "0" disables the check.
+DiskSpace=250
+
+# Delete source nzb-file when it is not needed anymore (yes, no).
+#
+# Enable this option for automatic deletion of source nzb-file from
+# incoming directory when the program doesn't require it anymore (the
+# nzb-file has been deleted from queue and history).
+NzbCleanupDisk=yes
+
+# Keep the history of downloaded nzb-files (days).
+#
+# After download and post-processing the items are added to history where
+# their status can be checked and they can be post-processed again if
+# necessary.
+#
+# After expiring of defined period:
+#
+# If option <DupeCheck> is active the items become hidden and the amount
+# of data kept is significantly reduced (for better performance), only
+# fields necessary for duplicate check are kept. The item remains in the
+# hidden history (forever);
+#
+# If option <DupeCheck> is NOT active the items are removed from history.
+#
+# When a failed item is removed from history or become hidden all downloaded
+# files of that item are deleted from disk.
+#
+# Value "0" disables history. Duplicate check will not work.
+KeepHistory=30
+
+# Keep the history of outdated feed items (days).
+#
+# After fetching of an RSS feed the information about included items (nzb-files)
+# is saved to disk. This allows to detect new items on next fetch. Feed
+# providers update RSS feeds constantly. Since the feed length is limited
+# (usually 100 items or less) the old items get pushed away by new
+# ones. When an item is not present in the feed anymore it's not necessary
+# to keep the information about this item on the disk.
+#
+# If option is set to "0", the outdated items are deleted from history
+# immediately.
+#
+# Otherwise the items are held in the history for defined number of
+# days. Keeping of items for few days helps in situations when feed provider
+# has technical issues and may response with empty feeds (or with missing
+# items). When the technical issue is fixed the items may reappear in the
+# feed causing the program to re-download items if they were not found in
+# the feed history.
+FeedHistory=7
+
+##############################################################################
+### CONNECTION                                                             ###
+
 # How many retries should be attempted if a download error occurs (0-99).
 #
 # If download fails because of incomplete or damaged article or due to
-# CRC-error the program tries to redownload the article from the same
-# news server as many times as defined in option <Retries>. If all
-# attempts fail the program tries another news server.
+# CRC-error the program tries to re-download the article from the same
+# news server as many times as defined in this option. If all attempts fail
+# the program tries another news server.
 #
 # If download fails because of "article or group not found error" the
 # program tries another news server without retrying on the failed server.
-#
-# If download fails because of interrupted connection the program
-# tries another news server or the same server after the block interval
-# expires.
-Retries=3
+ArticleRetries=3
 
-# Wait interval between retries (seconds).
+# Article retry interval (seconds).
 #
-# If download of an article fails because of interrupted connection
+# If download of article fails because of interrupted connection
 # the server is temporary blocked until the retry interval expires.
-RetryInterval=10
+ArticleInterval=10
 
 # Connection timeout for article downloading (seconds).
 ArticleTimeout=60
 
+# Number of download attempts for URL fetching (0-99).
+#
+# If fetching of nzb-file via URL or fetching of RSS feed fails another
+# attempt is made after the retry interval (option <UrlInterval>).
+UrlRetries=3
+
+# URL fetching retry interval (seconds).
+#
+# If fetching of nzb-file via URL or fetching of RSS feed fails another
+# attempt is made after the retry interval.
+UrlInterval=10
+
 # Connection timeout for URL fetching (seconds).
 #
-# This includes fetching of nzb-files via URLs and fetching of RSS feeds.
+# Connection timeout when fetching nzb-files via URLs and fetching RSS feeds.
 UrlTimeout=60
 
 # Timeout until a download-thread should be killed (seconds).
@@ -847,7 +1017,7 @@ TerminateTimeout=600
 
 # Set the maximum download rate on program start (kilobytes/sec).
 #
-# The download rate can be changed later via remote calls.
+# The download rate can be changed later in web-interface or via remote calls.
 #
 # Value "0" means no speed control.
 DownloadRate=0
@@ -870,68 +1040,6 @@ DownloadRate=0
 # download speed on a particular system.
 AccurateRate=no
 
-# Pause if disk space gets below this value (megabytes).
-#
-# Disk space is checked for directories pointed by option <DestDir> and
-# option <InterDir>.
-#
-# Value "0" disables the check.
-DiskSpace=250
-
-# Delete already downloaded files from disk when nzb-file is deleted
-# (yes, no).
-#
-# This option defines if downloaded files must be deleted when:
-# 1) download of nzb-file is cancelled (deleted from queue);
-# 2) history record with failure-status (par-failure or unpack-failure)
-# is deleted from history.
-DeleteCleanupDisk=yes
-
-# Delete source nzb-file when it is not needed anymore (yes, no).
-#
-# Enable this option for automatic deletion of source nzb-file from
-# incoming directory when the program doesn't require it anymore (the
-# nzb-file has been deleted from queue and history).
-NzbCleanupDisk=yes
-
-# Keep the history of downloaded nzb-files (days).
-#
-# After download and post-processing the items are added to history where
-# their status can be checked and they can be post-processed again if
-# neccessary.
-#
-# After expiring of defined period:
-#
-# If option <DupeCheck> is active the items become hidden and the amount
-# of data kept is significantly reduced (for better performance), only
-# fields necessary for duplicate check are kept. The item remain in the
-# hidden history (forever);
-#
-# If option <DupeCheck> is NOT active the items are removed from history.
-#
-# Value "0" disables history. Duplicate check will not work.
-KeepHistory=30
-
-# Keep the history of outdated feed items (days).
-#
-# After fetching of an RSS feed the information about included items (nzb-files)
-# is saved to disk. This allows to detect new items on next fetch. Feed 
-# providers update RSS feeds constantly. Since the feed length is limited
-# (usually 100 items or less) the old items get pushed away by new
-# ones. When an item is not present in the feed anymore it's not necessary
-# to keep the information about this item on the disk.
-#
-# If option is set to "0", the outdated items are deleted from history
-# immediately.
-#
-# Otherwise the items are held in the history for defined number of
-# days. Keeping of items for few days helps in situations when feed provider
-# has technical issues and may response with empty feeds (or with missing
-# items). When the technical issue is fixed the items may reappear in the
-# feed causing the program to redownload items if they were not found in
-# the feed history. 
-FeedHistory=7
-
 # Maximum number of simultaneous connections for nzb URL downloads (0-999).
 #
 # When NZB-files are added to queue via URL, the program downloads them
@@ -945,6 +1053,28 @@ UrlConnections=4
 # via URL or fetching of RSS feeds and nzb-files from feeds) are performed
 # even if download is in paused state.
 UrlForce=yes
+
+# Monthly download volume quota (megabytes).
+#
+# During download the quota is constantly monitored and the downloading
+# is automatically stopped if the limit is reached. Once the next billing month
+# starts the "quota reached"-status is automatically lifted and the downloading
+# continues.
+#
+# Downloads with force-priority are processed regardless of quota status.
+#
+# Value "0" disables monthly quota check.
+MonthlyQuota=0
+
+# Day of month when the monthly quota starts (1-31).
+QuotaStartDay=1
+
+# Daily download volume quota (megabytes).
+#
+# See option <MonthlyQuota> for details.
+#
+# Value "0" disables daily quota check.
+DailyQuota=0
 
 
 ##############################################################################
@@ -999,13 +1129,20 @@ NzbLog=yes
 # the names of broken files.
 BrokenLog=yes
 
-# Create memory dump (core-file) on abnormal termination, Linux only (yes, no).
+# Print call stack trace into log on program crash (Linux and Windows) (yes, no).
 #
-# Core-files are very helpful for debugging.
+# Call stack traces are very helpful for debugging. Call stack traces can be
+# printed only when the program was compiled in debug mode.
+CrashTrace=yes
+
+# Save memory dump into disk on program crash (Linux only) (yes, no).
 #
-# NOTE: Core-files may contain sensible data, like your login/password to
-# newsserver etc.
-DumpCore=no
+# Memory dumps (core-files) are very helpful for debugging, especially if
+# they were produced by the program compiled in debug mode.
+#
+# NOTE: Memory dumps may contain sensitive data, like your login/password
+# to news-server etc.
+CrashDump=no
 
 # Local time correction (hours or minutes).
 #
@@ -1014,7 +1151,7 @@ DumpCore=no
 # to the log-file and by option "TaskX.Time" in the scheduler settings.
 #
 # The option is usually not needed if the time zone is set up correctly.
-# However, sometimes, especially when using a binary compiled on onother
+# However, sometimes, especially when using a binary compiled on another
 # platform (cross-compiling) the conversion between system and local time
 # may not work properly and requires adjustment.
 #
@@ -1022,8 +1159,6 @@ DumpCore=no
 #  Example 1: set time correction to one hour: TimeCorrection=1;
 #  Example 2: set time correction to one hour and a half: TimeCorrection=90.
 TimeCorrection=0
-
-# See also option <LogFile> in section "PATHS"
 
 
 ##############################################################################
@@ -1070,9 +1205,10 @@ UpdateInterval=200
 # Time to execute the command (HH:MM).
 #
 # Multiple comma-separated values are accepted.
-# Asterix as hours-part means "every hour".
+# An asterisk placed in the hours location will run task every hour (e. g. "*:00").
+# An asterisk without minutes will run task at program startup (e. g. "*").
 #
-# Examples: "08:00", "00:00,06:00,12:00,18:00", "*:00", "*:00,*:30".
+# Examples: "08:00", "00:00,06:00,12:00,18:00", "*:00", "*,*:00,*:30".
 #
 # NOTE: Also see option <TimeCorrection>.
 #Task1.Time=08:00
@@ -1113,19 +1249,21 @@ UpdateInterval=200
 #
 # Some scheduler commands require additional parameters:
 #  DownloadRate     - download rate limit to be set (kilobytes/sec).
-#                     Example: 1000;
-#  Script           - list of scheduler scripts to execute. The scripts in
-#                     the list must be separated with commas or semicolons. Only
-#                     filenames without path must be used. All scripts must be
-#                     stored in directory pointed by option <ScriptDir>. For
-#                     more info see below;
+#                     Example: 1000.
+#                     NOTE: use value "0" to disable download limit (unlimited speed).
+#  Script           - list of scheduler scripts to execute. The scripts in the
+#                     list must be separated with commas or semicolons. All
+#                     scripts must be stored in directory set by option
+#                     <ScriptDir> and paths relative to <ScriptDir> must be
+#                     entered here. For developer documentation visit
+#                     http://nzbget.net/extension-scripts;
 #  Process          - path to the program to execute and its parameters.
 #                     Example: /home/user/fetch.sh.
 #                     If filename or any parameter contains spaces it
 #                     must be surrounded with single quotation
 #                     marks. If filename/parameter contains single quotation marks,
-#                     each of them must be replaced with two single quotation 
-#                     marks and the resulting filename/parameter must be 
+#                     each of them must be replaced (escaped) with two single quotation
+#                     marks and the resulting filename/parameter must be
 #                     surrounded with single quotation marks.
 #                     Example: '/home/user/download/my scripts/task process.sh' 'world''s fun'.
 #                     In this example one parameter (world's fun) is passed
@@ -1140,27 +1278,6 @@ UpdateInterval=200
 #                     Example: bookmarks feed, another feed.
 #                     NOTE: feed names should not have commas.
 #                     NOTE: use feed id "0" to fetch all feeds.
-#
-# INFO FOR DEVELOPERS:
-# The rest of the description is for command "Script".
-#
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-#
-# NZBGet passes following arguments to scheduler script as environment
-# variables:
-#  NZBSP_TASKID    - id number of scheduler Task.
-#
-# In addition to these arguments NZBGet passes all nzbget.conf-options 
-# as environment variables. These variables have prefix "NZBOP_" and
-# are written in UPPER CASE. For Example option "ParRepair" is passed as
-# environment variable "NZBOP_PARREPAIR". The dots in option names are
-# replaced with underscores, for example "SERVER1_HOST". For options
-# with predefined possible values (yes/no, etc.) the values are passed
-# always in lower case.
-#
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
 #Task1.Param=
 
 #Task2.Time=20:00
@@ -1170,7 +1287,7 @@ UpdateInterval=200
 
 
 ##############################################################################
-### PAR CHECK/REPAIR                                                       ###
+### CHECK AND REPAIR                                                       ###
 
 # Whether and how par-verification must be performed (auto, always, force, manual).
 #
@@ -1180,35 +1297,24 @@ UpdateInterval=200
 #           is enabled;
 #  Always - check every download (even undamaged). One par2-file is
 #           always downloaded. Additional par2-files are downloaded
-#           if needed for repair.  Repair is performed if the option 
+#           if needed for repair.  Repair is performed if the option
 #           <ParRepair> is enabled;
 #  Force  - force par-check for every download (even undamaged). All
 #           par2-files are always downloaded. Repair is performed if
 #           the option <ParRepair> is enabled;
 #  Manual - par-check is skipped. One par2-file is always
 #           downloaded. If a damaged download is detected, all
-#           par2-files are downloaded but neithet par-check nor par-repair
+#           par2-files are downloaded but neither par-check nor par-repair
 #           take place. The download can be then repaired manually,
 #           eventually on another faster computer.
 ParCheck=auto
-
-# Check for renamed and missing files (yes, no).
-#
-# Par-rename restores original file names using information stored
-# in par2-files. It also detects missing files (files listed in
-# par2-files but not present on disk). When enabled the par-rename is
-# performed as the first step of post-processing for every nzb-file.
-#
-# Par-rename is very fast and is highly recommended, especially if
-# unpack is disabled.
-ParRename=yes
 
 # Automatic par-repair after par-verification (yes, no).
 #
 # If option <ParCheck> is set to "Auto" or "Force" this option defines
 # if the download must be repaired when needed. The option can be
-# disabled if computer does not have enough CPU power, since repairing
-# may take too much resources and time on a slow computers.
+# disabled if a computer does not have enough CPU power, since repairing
+# may consume too many resources and time on a slow computer.
 ParRepair=yes
 
 # What files should be scanned during par-verification (limited, extended,
@@ -1227,9 +1333,9 @@ ParScan=extended
 # Quick file verification during par-check (yes, no).
 #
 # If the option is active the files are quickly verified using
-# checksums calculated during download; quick verification is very fast 
-# because it doesn't require the reading of files from disk, NZBGet 
-# knows checksums of downloaded files and quickly compares them with 
+# checksums calculated during download; quick verification is very fast
+# because it doesn't require the reading of files from disk, NZBGet
+# knows checksums of downloaded files and quickly compares them with
 # checksums stored in the par-file.
 #
 # If the option is disabled the files are verified as usual. That's
@@ -1274,28 +1380,59 @@ ParThreads=0
 # will ignore files matching this option and will not initiate
 # repair. This avoids time costing repair for unimportant files.
 #
-# NOTE: Files matching the option <ExtCleanupDisk> are ignored as well.
-#
 # Example: .sfv, .nzb, .nfo
 ParIgnoreExt=.sfv, .nzb, .nfo
 
-# What to do if download health drops below critical health (delete,
+# Check for renamed and missing files using par-files (yes, no).
+#
+# Par-rename restores original file names using information stored
+# in par2-files. It also detects missing files (files listed in
+# par2-files but not present on disk). When enabled the par-rename is
+# performed as the first step of post-processing for every nzb-file.
+#
+# Par-rename is very fast and is highly recommended, especially if
+# unpack is disabled.
+ParRename=yes
+
+# Check for renamed rar-files (yes, no).
+#
+# Rar-rename restores original file names using information stored
+# in rar-files. When enabled the rar-rename is performed as one of the
+# first steps of post-processing for every nzb-file.
+#
+# Rar-rename is useful for downloads not having par2-files or for
+# downloads those files were renamed before creating par2-files. In
+# both cases par-rename (option <ParRename>) can't rename files
+# and the rar-rename makes it possible to unpack downloads which
+# would fail otherwise.
+RarRename=yes
+
+# Directly rename files during downloading (yes, no).
+#
+# This is similar to par-renaming (option <ParRename>) but the files
+# are renamed during downloading instead of post-processing stage. This
+# requires some tricky handling of files and works only for healthy
+# downloads.
+DirectRename=no
+
+# What to do if download health drops below critical health (delete, park,
 # pause, none).
 #
-#  Delete - delete nzb-file from queue. If option <DeleteCleanupDisk>
-#           is active the already downloaded files will be deleted too;
+#  Delete - delete nzb-file from queue, also delete already downloaded files;
+#  Park   - move nzb-file to history, keep already downloaded files. Commands
+#           "Download remaining files" and "Retry failed articles" are available
+#           for this nzb;
 #  Pause  - pause nzb-file;
 #  None   - do nothing (continue download).
 #
-# NOTE: For automatic duplicate handling option must be set to "Delete"
-# or "None". If it is set to "Pause" you will need to manually return
-# another duplicate to queue (if any exists in history). See also
-# option <DupeCheck>.
+# NOTE: For automatic duplicate handling option must be set to "Delete", "Park"
+# or "None". If it is set to "Pause" you will need to manually move another
+# duplicate from history to queue. See also option <DupeCheck>.
 #
-# NOTE: When option <ParScan> is set to "Dupe" the delete-action is performed
+# NOTE: When option <ParScan> is set to "Dupe" the park-action is performed
 # only if article completion is below 10% (empirical threshold). This is to
 # improve efficiency of dupe par scan mode.
-HealthCheck=delete
+HealthCheck=park
 
 # Maximum allowed time for par-repair (minutes).
 #
@@ -1313,7 +1450,7 @@ HealthCheck=delete
 # Value "0" means unlimited.
 #
 # NOTE: The option limits only the time required for repairing. It doesn't
-# affect the first stage of parcheck - verification of files. However the
+# affect the first stage of parcheck - verification of files. However, the
 # verification speed is constant, it doesn't depend on files integrity and
 # therefore it is not necessary to limit the time needed for the first stage.
 ParTimeLimit=0
@@ -1328,12 +1465,6 @@ ParTimeLimit=0
 #
 # NOTE: See also options <ScriptPauseQueue> and <UnpackPauseQueue>.
 ParPauseQueue=no
-
-# Cleanup download queue after successful check/repair (yes, no).
-#
-# Enable this option for automatic deletion of unneeded (paused) par-files
-# from download queue after successful check/repair.
-ParCleanupQueue=yes
 
 
 ##############################################################################
@@ -1356,6 +1487,16 @@ ParCleanupQueue=yes
 # is performed and the unpack is executed again.
 Unpack=yes
 
+# Directly unpack files during downloading (yes, no).
+#
+# When active the files are unpacked during downloading instead of post-processing
+# stage. This works only for healthy downloads. Damaged downloads are unpacked
+# as usual during post-processing stage after par-repair.
+#
+# NOTE: This option requires unpack to be enabled in general via option <Unpack>.
+# NOTE: For best results also activate option <DirectRename> and option <ReorderFiles>.
+DirectUnpack=no
+
 # Pause download queue during unpack (yes, no).
 #
 # Enable the option to give CPU more time for unpacking. That helps
@@ -1371,18 +1512,18 @@ UnpackCleanupDisk=yes
 #
 # Example: /usr/bin/unrar.
 #
-# The option can also contain extra switches to pass to unrar. To the 
+# The option can also contain extra switches to pass to unrar. To the
 # here defined command line NZBGet adds the following switches:
 #    x -y -p- -o+ *.rar ./_unpack/
 #
 # Switch "x" is added only if neither "x" nor "e" were defined in
 # the option (this allows you to use switch "e" instead of "x"). switch
 # "-o+" is added only if neither "-o+" nor "-o-" were defined
-# in the command line. All other paramaters are always added. Parameter
+# in the command line. All other parameters are always added. Parameter
 # "-p-" is replaced with "-ppassword" if a password is set for nzb-file.
 #
 # Examples:
-# 1) ignore file attributes (pemissions):
+# 1) ignore file attributes (permissions):
 # /usr/bin/unrar x -ai;
 # 2) decrease priority of unrar-process:
 # nice -n 19 unrar.
@@ -1407,20 +1548,39 @@ SevenZipCmd=7z
 #
 # List of file extensions, file names or file masks to delete after
 # successful download. If either unpack or par-check fail the cleanup is
-# not performed. If neither unpack nor par-check were made (because they
-# were disabled or the download doesn't contain archives and/or par-files
-# the cleanup is performed if the health is 100%.
+# not performed. If download doesn't contain archives nor par-files
+# the cleanup is performed if the health is 100%. If parameter "unpack"
+# is disabled for that nzb-file the cleanup isn't performed.
 #
 # The entries must be separated with commas. The entries can be file
 # extensions, file names or file masks containing wildcard
 # characters * and ?.
 #
-# Files listed here are also ignored by par-rename and par-check.
-#
-# NOTE: See also option <ParIgnoreExt>.
-#
 # Example: .par2, .sfv
 ExtCleanupDisk=.par2, .sfv, _brokenlog.txt
+
+# Files to ignore during unpack.
+#
+# List of file extensions to ignore when unpacking archives or renaming
+# obfuscated archive files. The entries must be separated with commas.
+#
+# Archive files with non standard extensions belong to one of two categories: they
+# are either obfuscated files or files with special purposes which should not be
+# unpacked. List the files of second type here to avoid attempts to unpack them.
+#
+# This option has effect on two post-processing stages.
+#
+# First, during rar-rename (option <RarRename>) rar-files with non-standard
+# extensions are renamed back to rar-extension, which is required for successful
+# unpacking. Files with extensions listed here will not be renamed.
+#
+# Second, if during unpack no rar-files are found but instead rar-archives
+# with non-rar extensions are found the unpack fails. For files listed here
+# no unpack failure occurs and download is considered not having archive
+# files and be successful.
+#
+# Example: .cbr
+UnpackIgnoreExt=.cbr
 
 # Path to file containing unpack passwords.
 #
@@ -1432,420 +1592,55 @@ ExtCleanupDisk=.par2, .sfv, _brokenlog.txt
 # then the password-file is not used for that nzb-file.
 #
 # NOTE: Trying multiple passwords is a time consuming task. Whenever possible
-# passwords should be set per nzb-file in their post-processing settings. 
+# passwords should be set per nzb-file in their post-processing settings.
 UnpackPassFile=
+
 
 ##############################################################################
 ### EXTENSION SCRIPTS                                                      ###
 
-# Default list of post-processing scripts to execute after the download
-# of nzb-file is completed and possibly par-checked/repaired and unpacked.
+# List of active extension scripts for new downloads.
 #
-# The scripts in the list must be separated with commas or semicolons. Only
-# filenames without path must be used. All scripts must be stored in directory
-# pointed by option <ScriptDir>. 
+# Extension scripts associated with nzb-files are executed before, during
+# or after download as defined by script developer.
+#
+# Each download (nzb-file) has its own list of extension scripts; the list
+# can be viewed and changed in web-interface in download details dialog or
+# via API. Option <Extensions> sets defaults for new downloads; changes
+# to option <Extensions> do not affect downloads which are already in queue.
+#
+# When nzb-file is added to queue it can have a category assigned to it. In this
+# case option <CategoryX.Extensions> (if not empty) have precedence and
+# defines the scripts for that nzb-file; consequently global option <Extensions>
+# has no effect for that nzb-file.
+#
+# Certain extensions work globally for the whole program instead of
+# per-nzb basis. Such extensions are activated once and cannot be overriden
+# per category or per nzb.
+#
+# The scripts in the list must be separated with commas or semicolons. All
+# scripts must be stored in directory set by option <ScriptDir> and
+# paths relative to <ScriptDir> must be entered here.
 #
 # Example: Cleanup.sh, Move.sh, EMail.py.
 #
-# Each download (nzb-file) has its own list of post-processing scripts. The option
-# <PostScript> is the default value assigned to download when it is added to
-# queue. The list of post-processing scripts for a particular download can be
-# changed in the edit dialog in web-interface or using remote command "--edit/-E".
-#
-# When nzb-file is added to queue it can have a category assigned to it. In this
-# case the option <CategoryX.PostScript> (if not empty) overrides the
-# global option <PostScript>.
-#
 # NOTE: The script execution order is controlled by option <ScriptOrder>, not
-# by their order in option <PostScript>.
+# by their order in option <Extensions>.
 #
-# NOTE: Changing options <PostScript> and <CategoryX.PostScript> doesn't affect
-# already queued downloads.
+# NOTE: For the list of interesting extension scripts see
+# http://nzbget.net/catalog-of-extension-scripts.
 #
-# NOTE: For the list of interesting post-processing scripts see
-# http://nzbget.net/Catalog_of_post-processing_scripts.
-#
-# INFO FOR DEVELOPERS:
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-#
-# NZBGet passes following arguments to post-processing script as environment
-# variables:
-#  NZBPP_DIRECTORY    - path to destination dir for downloaded files;
-#  NZBPP_NZBNAME      - user-friendly name of processed nzb-file as it is displayed
-#                       by the program. The file path and extension are removed.
-#                       If download was renamed, this parameter reflects the new name;
-#  NZBPP_NZBFILENAME  - name of processed nzb-file. It includes file extension and also
-#                       may include full path;
-#  NZBPP_FINALDIR     - final destination path if set by one of previous pp-scripts;
-#  NZBPP_CATEGORY     - category assigned to nzb-file (can be empty string);
-#  NZBPP_DUPEKEY      - duplicate key of nzb-file;
-#  NZBPP_DUPESCORE    - duplicate score of nzb-file;
-#  NZBPP_DUPEMODE     - duplicate mode of nzb-file: SCORE, ALL, FORCE;
-#  NZBPP_TOTALSTATUS  - total status of nzb-file:
-#                       SUCCESS - everything OK;
-#                       WARNING - download is damaged but probably can
-#                                 be repaired; user intervention is
-#                                 required;
-#                       FAILURE - download has failed or a serious error
-#                                 occurred during post-processing (unpack, par);
-#                       DELETED - download was deleted; post-processing
-#                                 scripts are usually not called in this case;
-#                                 however it's possible to force calling
-#                                 scripts with command "post-process again";
-#  NZBPP_STATUS       - complete status info for nzb-file: it consists
-#                       of total status and status detail separated with
-#                       slash, for example: "FAILURE/UNPACK"; for possible
-#                       status details see documentation on web site;
-#  NZBPP_SCRIPTSTATUS - summary status of the scripts executed before the
-#                       current one:
-#                       NONE - no other scripts were executed yet or all
-#                              of them have ended with exit code "NONE";
-#                       SUCCESS - all other scripts have ended with exit
-#                                 code "SUCCESS" ;
-#                       FAILURE - at least one of the script has failed;
-#  NZBPP_HEALTH       - download health: an integer value in the range
-#                       from 0 (all articles failed) to 1000 (all articles
-#                       successfully downloaded);
-#  NZBPP_CRITICALHEALTH - critical health for this nzb-file: an integer 
-#                       value in the range 0-1000. The critical health 
-#                       is calculated based on number and size of
-#                       par-files. If nzb-file doesn't have any par-files
-#                       the critical health is 1000 (100.0%). If a half
-#                       of nzb-file were par-files its critical health
-#                       would be 0. If NZBPP_HEALTH goes down below
-#                       NZBPP_CRITICALHEALTH the download becomes unrepairable;
-#  NZBPP_TOTALARTICLES - number of articles in nzb-file;
-#  NZBPP_SUCCESSARTICLES - number of successfully downloaded articles;
-#  NZBPP_FAILEDARTICLES - number of failed articles;
-#  NZBPP_SERVERX_SUCCESSARTICLES - number of successfully downloaded
-#                       articles from ServerX (X is replaced with server
-#                       number, for example NZBPP_SERVER1_SUCCESSARTICLES);
-#  NZBPP_SERVERX_FAILEDARTICLES - number of failed articles from ServerX.
-#
-# If the script defines own options they are also passed as environment
-# variables. These variables have prefix "NZBPO_" in their names. For
-# example, option "myoption" will be passed as environment variable
-# "NZBPO_myoption" and in addition in uppercase as "NZBPO_MYOPTION".
-#
-# If the script defines own post-processing parameters, they are also passed as
-# environment variables. These variables have prefix "NZBPR_" in their
-# names. For example, pp-parameter "myparam" will be passed as environment
-# variable "NZBPR_myparam" and in addition in uppercase as "NZBPR_MYPARAM".
-#
-# In addition to arguments, pp-options and pp-parameters NZBGet passes all
-# nzbget.conf-options to pp-script as environment variables. These
-# variables have prefix "NZBOP_" and are written in UPPER CASE. For Example
-# option "ParRepair" is passed as environment variable "NZBOP_PARREPAIR". The
-# dots in option names are replaced with underscores, for example
-# "SERVER1_HOST". For options with predefined possible values (yes/no, etc.)
-# the values are passed always in lower case.
-#
-# If the script moves files it can inform the program about new location
-# by printing special message into standard output (which is processed
-# by NZBGet):
-#   echo "[NZB] DIRECTORY=/path/to/moved/files";
-# or:
-#   echo "[NZB] FINALDIR=/path/to/moved/files";
-#
-# Command "DIRECTORY" changes the destiantion path of the download and
-# affects the scripts executed after the current script as well as the
-# program code itself, for example the command "Post-process again"
-# will work on new location. Command "FINALDIR" just sets a separate
-# property of the download and should be used when the files are moved
-# into an existing directory containg other files to avoid the processing
-# of those files by other scripts.
-#
-# To assign post-processing parameters:
-#   echo "[NZB] NZBPR_myvar=my value";
-#
-# The prefix "NZBPR_" will be removed. In this example a post-processing
-# parameter with name "myvar" and value "my value" will be associated
-# with nzb-file.
-#
-# To inform NZBGet about bad download:
-#   echo "[NZB] MARK=BAD";
-#
-# Return value: NZBGet processes the exit code returned by the script:
-#  93 - post-process successful (status = SUCCESS);
-#  94 - post-process failed (status = FAILURE);
-#  95 - post-process skipped (status = NONE). Use this code when you script
-#       terminates immediateley without doing any job and when this is not
-#       a failure termination;
-#  92 - request NZBGet to do par-check/repair for current nzb-file.
-#
-# All other return codes are interpreted as failure (status = FAILURE).
-#
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-PostScript=
+# NOTE: For developer documentation visit http://nzbget.net/extension-scripts.
+Extensions=
 
-# List of scan scripts to execute before a nzb-file is added to queue.
-#
-# The scripts in the list must be separated with commas or semicolons. Only
-# filenames without path must be used. All scripts must be stored in directory
-# pointed by option <ScriptDir>. 
-#
-# The scripts are executed each time a new file is found in incoming
-# directory (option <NzbDir>) or a file is received via RPC (web-interface,
-# command "nzbget --append", etc.).
-#
-# Example: UnzipNzb.sh, ScanNotify.py.
-#
-# The scripts can unpack archives which were put in incoming directory, make
-# filename cleanup, change nzb-name, category, priority and post-processing
-# parameters of the nzb-file or do other things.
-#
-# INFO FOR DEVELOPERS:
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-#
-# NZBGet passes following arguments to the script as environment
-# variables:
-#  NZBNP_DIRECTORY - path to directory, where file is located. It is a directory
-#                    specified by the option <NzbDir> or a subdirectory;
-#  NZBNP_FILENAME  - name of file to be processed;
-#  NZBNP_NZBNAME   - nzb-name (without path but with extension);
-#  NZBNP_CATEGORY  - category of nzb-file;
-#  NZBNP_PRIORITY  - priority of nzb-file;
-#  NZBNP_TOP  	   - flag indicating that the file will be added to the top
-#                    of queue: 0 or 1;
-#  NZBNP_PAUSED	   - flag indicating that the file will be added as
-#                    paused: 0 or 1;
-#  NZBNP_DUPEKEY   - duplicate key of nzb-file;
-#  NZBNP_DUPESCORE - duplicate score of nzb-file;
-#  NZBNP_DUPEMODE  - duplicate mode of nzb-file: SCORE, ALL, FORCE.
-#
-# In addition to these arguments NZBGet passes all nzbget.conf-options 
-# as environment variables. These variables have prefix "NZBOP_" and
-# are written in UPPER CASE. For Example option "ParRepair" is passed as
-# environment variable "NZBOP_PARREPAIR". The dots in option names are
-# replaced with underscores, for example "SERVER1_HOST". For options
-# with predefined possible values (yes/no, etc.) the values are passed
-# always in lower case.
-#
-# The script can change nzb-name, category, priority,
-# post-processing parameters and top-/paused-flags of the nzb-file
-# by printing special messages into standard output (which is processed
-# by NZBGet).
-#
-# To change nzb-name use following syntax:
-#   echo "[NZB] NZBNAME=my download";
-#
-# To change category:
-#   echo "[NZB] CATEGORY=my category";
-#
-# To change priority:
-#   echo "[NZB] PRIORITY=signed_integer_value";
-#
-# for example: to set priority higher than normal:
-#   echo "[NZB] PRIORITY=50";
-#
-# another example: use a negative value for "lower than normal" priority:
-#   echo "[NZB] PRIORITY=-100";
-#
-# Although priority can be any integer value, the web-interface operates
-# with six predefined priorities:
-# -100 - very low priority;
-# -50  - low priority;
-# 0    - normal priority (default);
-# 50   - high priority;
-# 100  - very high priority;
-# 900  - force priority.
-#
-# Downloads with priorities equal to or greater than 900 are downloaded and
-# post-processed even if the program is in paused state (force mode).
-#
-# To assign post-processing parameters:
-#   echo "[NZB] NZBPR_myvar=my value";
-#
-# The prefix "NZBPR_" will be removed. In this example a post-processing
-# parameter with name "myvar" and value "my value" will be associated
-# with nzb-file.
-#
-# To change top-flag (nzb-file will be added to the top of queue):
-#   echo "[NZB] TOP=1";
-#
-# To change paused-flag (nzb-file will be added in paused state):
-#   echo "[NZB] PAUSED=1";
-#
-# To change duplicate key:
-#   echo "[NZB] DUPEKEY=tv show s01e02";
-#
-# To change duplicate score:
-#   echo "[NZB] DUPESCORE=integer_value";
-#
-# To change duplicate mode:
-#   echo "[NZB] DUPEMODE=(SCORE|ALL|FORCE)";
-#
-# The script can delete processed file, rename it or move somewhere.
-# After the calling of the script the file will be either added to queue
-# (if it was an nzb-file) or renamed by adding the extension ".processed".
-#
-# NOTE: Files with extensions ".processed", ".queued" and ".error" are skipped
-# during the directory scanning.
-#
-# NOTE: Files with extension ".nzb_processed" are not passed to
-# scan-script before adding to queue. This feature allows scan-script
-# to prevent the scanning of nzb-files extracted from archives, if
-# they were already processed by the script.
-#
-# NOTE: Files added via RPC calls in particular from web-interface are
-# saved into incoming nzb-directory and then processed by the script.
-#
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-ScanScript=
-
-# List of queue scripts to execute on queue events.
-#
-# The scripts in the list must be separated with commas or semicolons. Only
-# filenames without path must be used. All scripts must be stored in directory
-# pointed by option <ScriptDir>. 
-#
-# The scripts are executed on certain queue events such as adding
-# a new nzb-file to queue, etc.
-#
-# Example: DeleteQueueSamples.sh, NzbAddedNotify.py.
-#
-# The script can modify the files in download queue (for example
-# delete or pause all nfo, sfv, sample files) or do something else.
-#
-# INFO FOR DEVELOPERS:
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-#
-# NZBGet passes following arguments to the queue script as environment
-# variables:
-#  NZBNA_NZBNAME   - name of nzb-group. This name can be used in calls
-#                    to nzbget edit-command using subswitch "-GN name";
-#  NZBNA_FILENAME  - filename of the nzb-file. If the file was added
-#                    from nzb-directory this is the fullname with path.
-#                    If the file was added via web-interface it contains
-#                    only filename without path;
-#  NZBNA_EVENT     - describes why the script was called:
-#                    NZB_ADDED - after adding of nzb-file to queue;
-#                    FILE_DOWNLOADED - after a file included in nzb is
-#                    downloaded;
-#                    NZB_DOWNLOADED - after all files in nzb are downloaded
-#                    (before post-processing);
-#                    NZB_DELETED - when nzb is deleted from queue (moved
-#                    to history). See NZBNA_DELETESTATUS for details;
-#                    URL_COMPLETED - after an URL download is completed
-#                    and the downloaded file was not added to queue
-#                    (not nzb-extension, download error, parse
-#                    error). See NZBNA_URLSTATUS for details;
-#                    In the future the list of supported events may be
-#                    extended. To avoid conflicts with future NZBGet
-#                    versions the script must exit if the parameter
-#                    has a value unknown to the script.
-#  NZBNA_DELETESTATUS - delete status info, NZBNA_EVENT=NZB_DELETED:
-#                    MANUAL - deleted by user or via API call;
-#                    HEALTH - deleted by health check;
-#                    DUPE - moved to history by duplicate check, can be
-#                    reused later if necessary;
-#                    GOOD - moved to history by duplicate check because
-#                    there is already a duplicate marked as good;
-#                    BAD - marked as bad by user or by queue-script;
-#                    COPY - already in queue or in history;
-#                    SCAN - malformed nzb-file, cannot be parsed;
-#  NZBNA_URLSTATUS - URL status info, when NZBNA_EVENT=URL_COMPLETED:
-#                    FAILURE - fetch error (could not be downloaded);
-#                    SCAN_SKIPPED - downloaded file doesn't have
-#                    nzb-extension and was skipped;
-#                    SCAN_FAILED - file format error;
-#  NZBNA_CATEGORY  - category of nzb-file (if assigned);
-#  NZBNA_NZBID     - id of the nzb-file. This ID can be used with 
-#                    calls to nzbget edit-command;
-#  NZBNA_PRIORITY  - priority (default is 0);
-#  NZBNA_DUPEKEY   - duplicate key of nzb-file;
-#  NZBNA_DUPESCORE - duplicate score of nzb-file;
-#  NZBNA_DUPEMODE  - duplicate mode of nzb-file: SCORE, ALL, FORCE.
-#
-# In addition to these arguments NZBGet passes all nzbget.conf-options
-# to  the script as environment variables. These variables have prefix
-# "NZBOP_" and are written in UPPER CASE. For Example option "ParRepair"
-# is passed as environment variable "NZBOP_PARREPAIR". The dots in option
-# names are replaced with underscores, for example "SERVER1_HOST". For
-# options with predefined possible values (yes/no, etc.) the values are
-# passed always in lower case.
-#
-# The script can printing special messages into standard output (which
-# is processed by NZBGet).
-#
-# To assign post-processing parameters:
-#   echo "[NZB] NZBPR_myvar=my value";
-#
-# The prefix "NZBPR_" will be removed. In this example a post-processing
-# parameter with name "myvar" and value "my value" will be associated
-# with nzb-file.
-#
-# To inform NZBGet about bad download:
-#   echo "[NZB] MARK=BAD";
-#
-# Examples of what the script can do:
-# 1) pausing nzb-file using file-id:
-# "$NZBOP_APPBIN" -c "$NZBOP_CONFIGFILE" -E G P $NZBNA_NZBID;
-# 2) setting category using nzb-name:
-# "$NZBOP_APPBIN" -c "$NZBOP_CONFIGFILE" -E GN K "my cat" "$NZBNA_NZBNAME";
-# 3) pausing files with extension "nzb":
-# "$NZBOP_APPBIN" -c "$NZBOP_CONFIGFILE" -E FR P "$NZBNA_NZBNAME/.*\.nzb";
-#
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-QueueScript=
-
-# List of rss feed scripts to execute before a rss feed content is processed.
-#
-# The scripts in the list must be separated with commas or semicolons. Only
-# filenames without path must be used. All scripts must be stored in directory
-# pointed by option <ScriptDir>. 
-#
-# If rss feed has option <FeedX.FeedScript> defined (if not empty) 
-# the scripts defined there override the global option <FeedScript>.
-#
-# The scripts are executed after rss feed is read from server and before it
-# is processed by the feed parser. Once the feed is fetched it is saved
-# to a temporary file and the feed scripts are executed. The scripts
-# can modify the content of the temporary feed file. Then the file is 
-# read by the feed parser and processed.
-#
-# Example: Rss.sh, Filter.py.
-#
-# The feed content is usually filtered using option <FeedX.Filter>. If a
-# required filtering cannot be achieved via built-in filter commands the
-# more advanced processing of the feed can be made using feed scripts.
-#
-# INFO FOR DEVELOPERS:
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-#
-# NZBGet passes following arguments to the script as environment
-# variables:
-#  NZBFP_FILENAME  - name of feed file to be processed;
-#  NZBFP_FEEDID    - ID of the feed.
-#
-# In addition to these arguments NZBGet passes all nzbget.conf-options 
-# as environment variables. These variables have prefix "NZBOP_" and
-# are written in UPPER CASE. For Example option "ParRepair" is passed as
-# environment variable "NZBOP_PARREPAIR". The dots in option names are
-# replaced with underscores, for example "SERVER1_HOST". For options
-# with predefined possible values (yes/no, etc.) the values are passed
-# always in lower case.
-#
-# NOTE: This is a short documentation, for more information visit
-# http://nzbget.net/Extension_scripts.
-FeedScript=
-
-# Execution order for scripts.
+# Execution order for extension scripts.
 #
 # If you assign multiple scripts to one nzb-file, they are executed in the
-# order defined by this option. Scripts not listed here are executed at
-# the end in their alphabetical order.
+# order defined by this option.
 #
-# The scripts in the list must be separated with commas or semicolons. Only
-# filenames without path must be used. All scripts must be stored in directory
-# pointed by option <ScriptDir>. 
+# The scripts in the list must be separated with commas or semicolons. All
+# scripts must be stored in directory set by option <ScriptDir> and
+# paths relative to <ScriptDir> must be entered here.
 #
 # Example: Cleanup.sh, Move.sh.
 ScriptOrder=
@@ -1858,25 +1653,31 @@ ScriptOrder=
 # NOTE: See also options <ParPauseQueue> and <UnpackPauseQueue>.
 ScriptPauseQueue=no
 
-# Minimum interval between calls of queue-scripts (seconds).
+# Shell overrides for script interpreters.
 #
-# Queue-scripts are executed during download, after every file included in
-# nzb-file is downloaded. If the files are small they may be downloaded
-# very fast causing queue-scripts to be working all the time. Sometimes
-# this may lead to a performance decrease on systems with slow CPUs.
+# By default extension scripts are executed as normal programs. The system finds
+# an associated interpreter automatically. If for some reason that doesn't work
+# properly you can provide shell overrides here.
 #
-# This option allows to reduce the number of calls of queue-scripts by
-# skipping "file-downloaded"-events if the previous call of queue-scripts
-# for the same download (nzb-file) were performed a short time ago
-# (as defined by the option).
+# This option contains a comma separated list of shell overrides per
+# file extension. A shell override consists of file extension (starting with
+# dot) followed by equal sign and the full path to script interpreter.
 #
-# Value "-1" disables executing of queue-scripts on
-# "file-downloaded"-events. Scripts are still executed on events
-# "nzb-added" and "nzb-downloaded".
+# Example: .py=/usr/bin/python2;.py3=/usr/bin/python3;.sh=/usr/bin/bash.
+ShellOverride=
+
+# Minimum interval between queue events (seconds).
 #
-# NOTE: This options affects only queue-scripts and only
-# "file-downloaded"-events. Queue-scripts can be activated using
-# option <QueueScript> (for pure queue-scripts) or option <PostScript>
-# (for dual-mode scripts which act as queue- and post-processing-scripts
-# at the same time).
+# Extension scripts can opt-in for progress notifcations during
+# download. For downloads containing many small files the events can
+# be fired way too often increasing load on the system due to script
+# execution.
+#
+# This option allows to reduce the number of calls of scripts by
+# skipping "file-downloaded"-events if the previous call for the same
+# download (nzb-file) were performed a short time ago (as defined by
+# the option).
+#
+# Value "-1" disables "file-downloaded"-events. Scripts are still
+# notified on other events (such as "nzb-added" or "nzb-downloaded").
 EventInterval=0
