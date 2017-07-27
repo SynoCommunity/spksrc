@@ -1,20 +1,20 @@
 SPK_NAME = sickrage
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 DSM_UI_DIR = app
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3:git"
+SPK_DEPENDS = "python>2.7.6-8:git"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Video File Manager for TV Shows. It watches for new episodes of your favorite shows and when they are posted it does its magic.
 ADMIN_PORT = 8899
 RELOAD_UI = yes
-DISPLAY_NAME = SickRage
+DISPLAY_NAME = SiCKRAGE
 CHANGELOG =
 
-HOMEPAGE   = http://sickrage.tv/
+HOMEPAGE   = http://www.sickrage.ca/
 LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh

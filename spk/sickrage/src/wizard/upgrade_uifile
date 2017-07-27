@@ -1,6 +1,6 @@
 [{
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "Update Note",
     "items": [{
-    "desc": "Permissions are managed with the group 'sc-media' in DSM. The group 'users' is no longer used."
+    "desc": "SiCKRAGE will be updated. In some cases, the SiCKRAGE database cannot be migrated to the newest version. After installation, please verify all settings and check the logs for errors. <br><br>If issues arise, please remove the SICKRAGE package and install it again. In doing so, all settings will be lost"
     }]
 }]

@@ -1,8 +1,8 @@
 {
     ".url": {
         "com.synocommunity.packages.sickrage": {
-            "title": "SickRage",
-            "desc": "SickRage Web UI",
+            "title": "SiCKRAGE",
+            "desc": "SiCKRAGE Web UI",
             "icon": "images/sickrage-{0}.png",
             "type": "url",
             "protocol": "http",
