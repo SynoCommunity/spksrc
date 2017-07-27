@@ -1,6 +1,6 @@
 SPK_NAME = sickrage
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/${SPK_NAME}.png
 DSM_UI_DIR = app
 
