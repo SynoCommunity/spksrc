@@ -53,7 +53,7 @@ postinst ()
         # render properties
         sed -i -e "s|@database_password@|${wizard_mysql_database_password}|g" \
             -e "s|@database_name@|${MYSQL_DATABASE}|g" \
-            -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 30 | head -n 1)|g" \
+            -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" \
             ${CFG_FILE}
 
         # install wallabag
