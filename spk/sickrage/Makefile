@@ -4,7 +4,6 @@ SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 DSM_UI_DIR = app
 
-WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.6-8:git"
 
 MAINTAINER = SynoCommunity
