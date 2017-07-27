@@ -1,8 +1,0 @@
-bin:bin/libpng16-config
-bin:bin/libpng-config
-bin:bin/pngfix
-bin:bin/png-fix-itxt
-lnk:lib/libpng16.so
-lnk:lib/libpng16.so.16
-lib:lib/libpng16.so.16.28.0
-lnk:lib/libpng.so
