@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="sickrage"
-DNAME="sickrage"
+DNAME="SiCKRAGE"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -57,11 +57,10 @@ postinst ()
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
-	
-    # Clone the repository, install requirements and configure autoProcessTV
-    ${GIT} clone -q https://git.sickrage.ca/sickrage/sickrage.git ${INSTALL_DIR}/var/SickRage
 
-    ${INSTALL_DIR}/env/bin/pip install -U --force-reinstall -r ${INSTALL_DIR}/var/SickRage/requirements.txt > /dev/null 2>&1
+    # Install SiCKRAGE
+    ${INSTALL_DIR}/env/bin/pip install -U --force-reinstall sickrage==9.0.34 > /dev/null 2>&1
+	
     cp ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV
     chmod 600 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
