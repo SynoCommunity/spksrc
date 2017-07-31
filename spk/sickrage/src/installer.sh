@@ -59,7 +59,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install SiCKRAGE
-    ${INSTALL_DIR}/env/bin/pip install -U --force-reinstall sickrage==9.0.34 > /dev/null 2>&1
+    ${INSTALL_DIR}/env/bin/pip install -U --force-reinstall sickrage==9.0.39 > /dev/null 2>&1
 	
     cp ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV

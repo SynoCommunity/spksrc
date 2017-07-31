@@ -1,5 +1,5 @@
 SPK_NAME = sickrage
-SPK_VERS = 9.0.34
+SPK_VERS = 9.0.39
 SPK_REV = 1
 SPK_ICON = src/${SPK_NAME}.png
 DSM_UI_DIR = app
