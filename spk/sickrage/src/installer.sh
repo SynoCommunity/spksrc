@@ -14,6 +14,7 @@ USER="sickrage"
 GROUP="users"
 GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+PIP="${INSTALL_DIR}/env/bin/pip"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -59,7 +60,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install SiCKRAGE
-    ${INSTALL_DIR}/env/bin/pip install -U --force-reinstall sickrage==9.0.39 > /dev/null 2>&1
+    ${PIP} install -U --force-reinstall sickrage==9.0.40 > /dev/null 2>&1
 	
     cp ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV
