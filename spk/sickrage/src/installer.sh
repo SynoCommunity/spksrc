@@ -60,7 +60,7 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install SiCKRAGE
-    ${PIP} install -U --build ${INSTALL_DIR}/build --force-reinstall sickrage==9.0.41 > /dev/null 2>&1
+    ${PIP} install -U --build ${INSTALL_DIR}/build --force-reinstall sickrage==9.0.44 > /dev/null 2>&1
 	
     cp ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV
