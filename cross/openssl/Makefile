@@ -1,5 +1,5 @@
 PKG_NAME = openssl
-PKG_VERS = 1.0.2l
+PKG_VERS = 1.1.0f
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.openssl.org/source
@@ -24,16 +24,16 @@ ifneq ($(findstring $(ARCH), braswell bromolow cedarview x86 avoton x64),)
 OPENSSL_ARCH = linux-x86_64
 endif
 ifneq ($(findstring $(ARCH), 88f6281),)
-OPENSSL_ARCH = synology-armle
+OPENSSL_ARCH = linux-armv4
 endif
 ifneq ($(findstring $(ARCH), powerpc),)
-OPENSSL_ARCH = synology-ppc
+OPENSSL_ARCH = linux-ppc32
 endif
 
 .PHONY: myConfigure
 myConfigure:
-	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
+	$(RUN) ./Configure --prefix=$(INSTALL_PREFIX) --openssldir=$(INSTALL_PREFIX)/ssl $(OPENSSL_ARCH) zlib-dynamic shared threads --with-zlib-include=$(INSTALL_DIR)$(INSTALL_PREFIX)/include -Wl,-rpath=$(INSTALL_PREFIX)/lib
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) $(MAKE) install_sw INSTALL_PREFIX=$(INSTALL_DIR)
+	$(RUN) $(MAKE) install_sw DESTDIR=$(INSTALL_DIR)

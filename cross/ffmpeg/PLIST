@@ -13,6 +13,9 @@ lib:lib/libavfilter.so.6.82.100
 lnk:lib/libavformat.so
 lnk:lib/libavformat.so.57
 lib:lib/libavformat.so.57.71.100
+lnk:lib/libavresample.so
+lnk:lib/libavresample.so.3
+lib:lib/libavresample.so.3.5.0
 lnk:lib/libavutil.so
 lnk:lib/libavutil.so.55
 lib:lib/libavutil.so.55.58.100

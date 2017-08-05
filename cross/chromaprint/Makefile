@@ -1,11 +1,11 @@
 PKG_NAME = chromaprint
-PKG_VERS = 1.3.1
+PKG_VERS = 1.4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://bitbucket.org/acoustid/chromaprint/downloads
+PKG_DIST_SITE = https://github.com/acoustid/chromaprint/releases/download/v${PKG_VERS}/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/ffmpeg-2.2.1
+BUILD_DEPENDS = cross/ffmpeg
 
 HOMEPAGE = http://acoustid.org/chromaprint
 COMMENT  = Chromaprint is the core component of the AcoustID project. It's a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
@@ -19,9 +19,12 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: chromaprint_custom_configure chromaprint_custom_compile chromaprint_custom_install
 
+# Patch cross/chromaprint/patches/002-cmake-find-ffmpeg.patch
+# as a work-around of https://github.com/acoustid/chromaprint/issues/42
+
 chromaprint_custom_configure:
 	$(RUN) cmake \
-		-DBUILD_EXAMPLES=ON \
+		-DBUILD_TOOLS=ON \
 		-DBUILD_SHARED_LIBS=OFF \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) \
