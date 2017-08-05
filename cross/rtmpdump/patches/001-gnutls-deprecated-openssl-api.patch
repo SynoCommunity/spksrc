@@ -1,0 +1,31 @@
+diff --git Makefile.orig Makefile
+index a1595a8..9894586 100644
+--- Makefile.orig
++++ Makefile
+@@ -8,9 +8,9 @@ LD=$(CROSS_COMPILE)ld
+ SYS=posix
+ #SYS=mingw
+ 
+-CRYPTO=OPENSSL
++#CRYPTO=OPENSSL
+ #CRYPTO=POLARSSL
+-#CRYPTO=GNUTLS
++CRYPTO=GNUTLS
+ LIBZ=-lz
+ LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp $(LIBZ)
+ LIB_OPENSSL=-lssl -lcrypto $(LIBZ)
+diff --git a/librtmp/Makefile b/librtmp/Makefile
+index 2c1c790..3e84e33 100644
+--- librtmp/Makefile.orig
++++ librtmp/Makefile
+@@ -16,8 +16,8 @@ LD=$(CROSS_COMPILE)ld
+ AR=$(CROSS_COMPILE)ar
+ 
+ SYS=posix
+-CRYPTO=OPENSSL
+-#CRYPTO=GNUTLS
++#CRYPTO=OPENSSL
++CRYPTO=GNUTLS
+ DEF_POLARSSL=-DUSE_POLARSSL
+ DEF_OPENSSL=-DUSE_OPENSSL
+ DEF_GNUTLS=-DUSE_GNUTLS
