@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 SPK_DEPENDS = "python>=2.7.6-8:git"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = echel0n
 DESCRIPTION = Video File Manager for TV Shows. It watches for new episodes of your favorite shows and when they are posted it does its magic.
 ADMIN_PORT = 8899
 RELOAD_UI = yes
