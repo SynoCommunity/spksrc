@@ -15,7 +15,7 @@ GIT="${GIT_DIR}/bin/git"
 SICKRAGE="${INSTALL_DIR}/var/SickRage/SiCKRAGE.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/sickrage.pid"
-LOG_FILE="${INSTALL_DIR}/var/Logs/sickrage.log"
+LOG_FILE="${INSTALL_DIR}/var/logs/sickrage.log"
 
 
 start_daemon ()
