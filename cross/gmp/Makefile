@@ -1,5 +1,5 @@
 PKG_NAME = gmp
-PKG_VERS = 6.1.1
+PKG_VERS = 6.1.2
 PKG_EXT = tar.lz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gmplib.org/download/$(PKG_NAME)

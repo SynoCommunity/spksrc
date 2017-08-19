@@ -1,9 +1,9 @@
 PKG_NAME = rtmpdump
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 550a0caea3cd3987ae3ce7eb20d0b4512dd064ac
+PKG_GIT_HASH = fa8646daeb19dfd12c181f7d19de708d623704c0
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/BurntSushi/rtmpdump-ksv.git
+PKG_DIST_SITE = https://git.ffmpeg.org/rtmpdump
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = cross/openssl
@@ -18,5 +18,5 @@ COMPILE_TARGET = myCompile
 include ../../mk/spksrc.cross-cc.mk
 
 myCompile:
-	$(RUN) $(MAKE) SYS=posix prefix=$(INSTALL_PREFIX) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) INC=-I$(STAGING_INSTALL_PREFIX) LDFLAGS=" $(LDFLAGS)"
+	$(RUN) $(MAKE) SYS=posix prefix=$(INSTALL_PREFIX) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) INC=-I$(INSTALL_DIR)$(INSTALL_PREFIX)/include LDFLAGS=" $(LDFLAGS)"
 

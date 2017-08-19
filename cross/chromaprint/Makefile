@@ -1,11 +1,11 @@
 PKG_NAME = chromaprint
-PKG_VERS = 1.3.1
+PKG_VERS = 1.3.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/acoustid/chromaprint/downloads
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/ffmpeg-2.2.1
+DEPENDS = cross/ffmpeg
 
 HOMEPAGE = http://acoustid.org/chromaprint
 COMMENT  = Chromaprint is the core component of the AcoustID project. It's a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
@@ -29,7 +29,8 @@ chromaprint_custom_configure:
 		-DCMAKE_SYSTEM_NAME=Linux \
 		-DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc \
 		-DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++ \
-		-DCMAKE_EXE_LINKER_FLAGS="-L$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -Wl,--rpath-link,$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -Wl,--rpath,/usr/local/chromaprint/lib" \
+		-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_PREFIX}/lib \
+		-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE \
 		-DCMAKE_FIND_ROOT_PATH=$(INSTALL_DIR)$(INSTALL_PREFIX) \
 		-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
