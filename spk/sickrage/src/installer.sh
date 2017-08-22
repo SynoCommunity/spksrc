@@ -27,8 +27,7 @@ syno_group_create ()
 {
     # Create syno group (Does nothing when syno group already exists)
     synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
-    # Set description of the syno group
-    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
+    # Set description of the syno group    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
 
     # Add user to syno group (Does nothing when user already in the group)
     addgroup ${USER} ${SYNO_GROUP}
@@ -67,14 +66,13 @@ postinst ()
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 	
     # Clone the repository, install requirements and configure autoProcessTV
-	${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=https://git.sickrage.ca/sickrage/sickrage.git} ${INSTALL_DIR}/var/SickRage > /dev/null 2>&1
+    ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=https://git.sickrage.ca/sickrage/sickrage.git} ${INSTALL_DIR}/var/SickRage > /dev/null 2>&1
 	
-	# PIP install requirements.txt
-	if [ -f "${INSTALL_DIR}/var/SickRage/requirements.txt" ]; then
-		${PIP} install -U --build ${INSTALL_DIR}/build --force-reinstall -r ${INSTALL_DIR}/var/SickRage/requirements.txt > /dev/null 2>&1
-	fi
+    # PIP install requirements.txt
+    if [ -f "${INSTALL_DIR}/var/SickRage/requirements.txt" ]; then
+        ${PIP} install -U --build ${INSTALL_DIR}/build --force-reinstall -r ${INSTALL_DIR}/var/SickRage/requirements.txt > /dev/null 2>&1
+    fi
 
-    ${INSTALL_DIR}/env/bin/pip install -U --force-reinstall -r ${INSTALL_DIR}/var/SickRage/requirements.txt > /dev/null 2>&1
     cp ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV
     chmod 600 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
