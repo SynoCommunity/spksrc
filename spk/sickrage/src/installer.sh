@@ -13,7 +13,8 @@ PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin
 USER="sickrage"
 GROUP="users"
 GIT="${GIT_DIR}/bin/git"
-PIP="${INSTALL_DIR}/env/bin/pip"VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+PIP="${INSTALL_DIR}/env/bin/pip"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -26,6 +27,7 @@ syno_group_create ()
 {
     # Create syno group (Does nothing when syno group already exists)
     synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
+	
     # Set description of the syno group
     synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
 
