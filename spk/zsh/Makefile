@@ -1,6 +1,6 @@
 SPK_NAME = zsh
-SPK_VERS = 5.3.1
-SPK_REV = 4
+SPK_VERS = 5.4.2
+SPK_REV = 5
 SPK_ICON = src/zsh.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -11,7 +11,7 @@ DESCRIPTION_FRE = Zsh est un shell conçu pour un usage intéractif, mais il est
 RELOAD_UI = no
 DISPLAY_NAME = Z shell
 STARTABLE = no
-CHANGELOG = "Update to 5.3.1"
+CHANGELOG = "Update to 5.4.2"
 
 HOMEPAGE = http://www.zsh.org
 LICENSE = Custom
