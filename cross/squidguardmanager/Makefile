@@ -25,9 +25,9 @@ $(SRC_DIR)squid_wrapper/squid_wrapper:
 
 .PHONY: myInstall
 myInstall:
-	@$(RUN) mkdir -p $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr
-	@$(RUN) cp $(SRC_DIR)squid_wrapper/squid_wrapper $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/
-	@$(RUN) cp -R $(WORK_DIR)/$(PKG_DIR)/cgi-bin/* $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/
-	@$(RUN) cp -R $(WORK_DIR)/$(PKG_DIR)/htdocs/* $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/
-	@$(RUN) chmod 775 $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/*cgi
-	@$(RUN) chmod 755 $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/www/squidguardmgr/squid_wrapper
+	@$(RUN) mkdir -p $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr
+	@$(RUN) cp $(SRC_DIR)squid_wrapper/squid_wrapper $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
+	@$(RUN) cp -R $(WORK_DIR)/$(PKG_DIR)/cgi-bin/* $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
+	@$(RUN) cp -R $(WORK_DIR)/$(PKG_DIR)/htdocs/* $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
+	@$(RUN) chmod 775 $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/*cgi
+	@$(RUN) chmod 755 $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/squid_wrapper

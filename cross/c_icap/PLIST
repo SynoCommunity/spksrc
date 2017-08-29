@@ -8,6 +8,7 @@ lib:lib/c_icap/dnsbl_tables.so
 lib:lib/c_icap/srv_echo.so
 lib:lib/c_icap/srv_ex206.so
 lib:lib/c_icap/sys_logger.so
+lib:lib/c_icap/shared_cache.so
 lnk:lib/libicapapi.so
-lnk:lib/libicapapi.so.2
-lib:lib/libicapapi.so.2.0.2
+lnk:lib/libicapapi.so.5
+lib:lib/libicapapi.so.5.0.2
