@@ -2,7 +2,7 @@
 
 # Package
 PACKAGE="sickrage"
-DNAME="SickRage"
+DNAME="sickrage"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
@@ -11,6 +11,7 @@ PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 GIT="${GIT_DIR}/bin/git"
+PIP="${INSTALL_DIR}/env/bin/pip"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
@@ -30,6 +31,7 @@ syno_group_create ()
 {
     # Create syno group (Does nothing when syno group already exists)
     synogroup --add ${SC_GROUP} ${USER} > /dev/null
+	
     # Set description of the syno group
     synogroup --descset ${SC_GROUP} "${SC_GROUP_DESC}"
 
@@ -51,9 +53,10 @@ syno_group_remove ()
 
 
 preinst ()
+
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=https://git.sickrage.ca/sickrage/sickrage.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -68,12 +71,18 @@ postinst ()
 
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
+	
+    # Clone the repository, install requirements and configure autoProcessTV
+    ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=https://git.sickrage.ca/sickrage/sickrage.git} ${INSTALL_DIR}/var/SickRage > /dev/null 2>&1
+	
+    # PIP install requirements.txt
+    if [ -f "${INSTALL_DIR}/var/SickRage/requirements.txt" ]; then
+        ${PIP} install -U --build ${INSTALL_DIR}/build --force-reinstall -r ${INSTALL_DIR}/var/SickRage/requirements.txt > /dev/null 2>&1
+    fi
 
-    # Clone the repository and configure autoProcessTV
-    ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/SiCKRAGETV/SickRage.git} ${INSTALL_DIR}/var/SickRage
-    cp ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg
-    chmod 777 ${INSTALL_DIR}/var/SickRage/autoProcessTV
-    chmod 600 ${INSTALL_DIR}/var/SickRage/autoProcessTV/autoProcessTV.cfg
+    cp ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
+    chmod 777 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV
+    chmod 600 ${INSTALL_DIR}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
 
     # Create legacy user
     if [ "${BUILDNUMBER}" -lt "7321" ]; then

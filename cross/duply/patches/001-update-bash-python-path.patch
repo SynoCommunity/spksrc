@@ -1,0 +1,18 @@
+# Update path to bash and python
+--- duply.orig	2016-11-16 14:16:22.000000000 +0100
++++ duply	2017-01-28 18:08:49.102952915 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/usr/local/duplicity/bin/bash
+ #
+ ################################################################################
+ #  duply (grown out of ftplicity), is a shell front end to duplicity that      #
+@@ -473,7 +473,7 @@
+ DEFAULT_GPG='gpg'
+ DEFAULT_GPG_KEY='_KEY_ID_'
+ DEFAULT_GPG_PW='_GPG_PASSWORD_'
+-DEFAULT_PYTHON='python'
++DEFAULT_PYTHON='/usr/local/duplicity/env/bin/python'
+ 
+ # function definitions ##########################
+ 

@@ -1,4 +1,4 @@
-<configuration version="17">
+<configuration version="18">
     <gui enabled="true" tls="false">
         <address>0.0.0.0:7070</address>
     </gui>
@@ -21,6 +21,7 @@
         <urInitialDelayS>1800</urInitialDelayS>
         <restartOnWakeup>true</restartOnWakeup>
         <autoUpgradeIntervalH>12</autoUpgradeIntervalH>
+        <upgradeToPreReleases>false</upgradeToPreReleases>
         <keepTemporariesH>24</keepTemporariesH>
         <cacheIgnoredFiles>true</cacheIgnoredFiles>
         <progressUpdateIntervalS>5</progressUpdateIntervalS>
@@ -30,5 +31,6 @@
         <releasesURL>https://upgrades.syncthing.net/meta.json</releasesURL>
         <overwriteRemoteDeviceNamesOnConnect>false</overwriteRemoteDeviceNamesOnConnect>
         <tempIndexMinBlocks>10</tempIndexMinBlocks>
+        <weakHashSelectionMethod>auto</weakHashSelectionMethod>
     </options>
 </configuration>

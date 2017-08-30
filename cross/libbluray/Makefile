@@ -1,5 +1,5 @@
 PKG_NAME = libbluray
-PKG_VERS = 0.9.3
+PKG_VERS = 1.0.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.videolan.org/pub/videolan/libbluray/$(PKG_VERS)
@@ -13,7 +13,7 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava
+CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava-jar
 
 include ../../mk/spksrc.cross-cc.mk
 
