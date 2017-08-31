@@ -303,7 +303,7 @@ all: package
 
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME)
-	@for depend in $(DEPENDS) ; \
+	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; \
 	do \
 	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
 	done
@@ -434,7 +434,7 @@ kernel-required:
 	@if [ -n "$(REQ_KERNEL)" ]; then \
 	  exit 1 ; \
 	fi
-	@for depend in $(DEPENDS) ; do \
+	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \
 	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
 	    exit 0 ; \
 	  else \

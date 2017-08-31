@@ -21,6 +21,10 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
+    # Put git in the PATH
+    mkdir -p /usr/local/bin
+    ln -s ${INSTALL_DIR}/bin/git /usr/local/bin/git
+    
     exit 0
 }
 

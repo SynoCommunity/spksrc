@@ -1,0 +1,12 @@
+# Fix version number in web interface
+--- support/version.orig	2017-04-21 20:11:17.859708168 +0200
++++ support/version	2017-04-21 20:11:49.171715806 +0200
+@@ -25,7 +25,7 @@
+   VER=$(basename $(realpath $(dirname "$0")/..) | sed -e 's/^tvheadend-//' | sed -e 's/^tvheadend-v//')
+   case $VER in
+   [1-9]*\.[0-9]*) ;;
+-  *) VER="0.0.0~unknown" ;;
++  *) VER="4.2.3" ;;
+   esac
+ fi
+ 

@@ -1,13 +1,14 @@
 PKG_NAME = tessdata-eng
-PKG_VERS = 3.02
+PKG_VERS = 3.04.00
 PKG_EXT = tar.gz
-PKG_DIST_NAME = tesseract-ocr-$(PKG_VERS).eng.$(PKG_EXT)
-PKG_DIST_SITE = http://heanet.dl.sourceforge.net/project/tesseract-ocr-alt
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/tesseract-ocr/tessdata/archive
+PKG_DIST_FILE = tesseract-ocr-$(PKG_VERS).eng.$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = https://code.google.com/p/tesseract-ocr/
+HOMEPAGE = https://github.com/tesseract-ocr/tessdata/
 COMMENT  = Tesseract is probably the most accurate open source OCR engine available. English langpack.
 LICENSE  = Apache License 2.0
 

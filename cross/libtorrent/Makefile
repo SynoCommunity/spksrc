@@ -1,5 +1,5 @@
 PKG_NAME = libtorrent
-PKG_VERS = 1.0.10
+PKG_VERS = 1.0.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(subst .,_,$(PKG_VERS))
