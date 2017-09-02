@@ -136,14 +136,15 @@ endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
+ifneq ($(strip $(SPK_CONFLICT)),)
+	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
+endif
 	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\" >> $@
+
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
 INSTALLER_OUTPUT = > $$SYNOPKG_TEMP_LOGFILE
-endif
-ifneq ($(strip $(SPK_CONFLICT)),)
-	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
 endif
 
 # Wizard
