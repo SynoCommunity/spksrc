@@ -1,20 +1,20 @@
 SPK_NAME = syncthing-inotify
-SPK_VERS = 0.8.4
-SPK_REV = 1
+SPK_VERS = 0.8.5
+SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 BETA = 1
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "syncthing>=0.14.21-10"
+SPK_DEPENDS = "syncthing>=0.14.23-11"
 START_DEP_SERVICES = syncthing
 
 MAINTAINER = o0v7r0o
 DESCRIPTION = File watcher intended for use with Syncthing. Syncthing uses a rescan interval to detect changes in folders. Syncthing-inotify uses OS primitives to detect changes as soon as they happen. Therefore, near real-time synchronisation can be achieved.
 RELOAD_UI = no
 DISPLAY_NAME = Syncthing-Inotify
-CHANGELOG = "Initial release"
+CHANGELOG = "Update to 0.8.5"
 HOMEPAGE = https://github.com/syncthing/syncthing-inotify
 LICENSE = MPL-2.0
 

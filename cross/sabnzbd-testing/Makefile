@@ -1,5 +1,5 @@
 PKG_NAME = SABnzbd
-PKG_VERS = 1.2.1
+PKG_VERS = 2.2.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sabnzbd/sabnzbd/releases/download/$(PKG_VERS)
@@ -16,6 +16,7 @@ COMPILE_TARGET = nop
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.python-wheel.mk
 
 myInstall:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/SABnzbd

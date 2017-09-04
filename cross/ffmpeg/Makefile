@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 3.1.2
+PKG_VERS = 3.3.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases
@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/fdk-aac cross/flac cross/freetype cross/fribidi cross/lame cross/libass
 DEPENDS += cross/libbluray cross/libtheora cross/libvorbis cross/libvpx
 DEPENDS += cross/opencore-amr cross/openjpeg cross/openssl cross/opus cross/rtmpdump
-DEPENDS += cross/soxr cross/speex cross/vo-amrwbenc cross/x264 cross/x265
+DEPENDS += cross/soxr cross/speex cross/vo-amrwbenc cross/x264
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -23,7 +23,7 @@ CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared --enable-optimizations --enable-pthreads
 CONFIGURE_ARGS += --enable-gpl --enable-version3 --enable-nonfree
-CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray
+CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enable-avresample
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg
 CONFIGURE_ARGS += --enable-libopus --enable-librtmp --enable-libsoxr --enable-libspeex
@@ -55,8 +55,11 @@ CONFIGURE_ARGS += --arch=x86_64 --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-DEPENDS += native/yasm
+DEPENDS += native/yasm cross/x265-2.1
 ENV += PATH=$(YASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
+else
+# Latest x265 version for non-pcc arch
+DEPENDS += cross/x265
 endif
 

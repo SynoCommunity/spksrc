@@ -1,5 +1,5 @@
 PKG_NAME = x265
-PKG_VERS = 2.0
+PKG_VERS = 2.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265/downloads
@@ -23,6 +23,13 @@ CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
 
 include ../../mk/spksrc.cross-cc.mk
+
+# Version since 2.2 fails on PPC
+# source/common/ppc/pixel_altivec.cpp:1: error: bad value (power8) for -mcpu= switch
+# source/common/ppc/pixel_altivec.cpp:1: error: AltiVec and E500 instructions cannot coexist
+# Support pending: https://bitbucket.org/multicoreware/x265/issues?q=altivec
+# Meanwhile PPC depends on cross/x265-2.1
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5

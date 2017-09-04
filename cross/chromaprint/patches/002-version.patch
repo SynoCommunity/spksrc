@@ -1,0 +1,22 @@
+--- CMakeLists.txt.orig.txt	2014-08-26 18:57:36.000000000 +0200
++++ CMakeLists.txt	2015-03-29 04:05:16.832256278 +0200
+@@ -5,7 +5,7 @@
+ endif()
+ 
+ project(chromaprint)
+-set(PROJECT_VERSION 1.3.1)
++set(PROJECT_VERSION 1.3.2)
+ 
+ # 1. If the library source code has changed at all since the last update, then increment revision.
+ # 2. If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
+--- src/chromaprint.h.orig
++++ src/chromaprint.h
+@@ -47,7 +47,7 @@
+ 
+ #define CHROMAPRINT_VERSION_MAJOR 1
+ #define CHROMAPRINT_VERSION_MINOR 3
+-#define CHROMAPRINT_VERSION_PATCH 1
++#define CHROMAPRINT_VERSION_PATCH 2
+ 
+ enum ChromaprintAlgorithm {
+ 	CHROMAPRINT_ALGORITHM_TEST1 = 0,
