@@ -1,0 +1,40 @@
+# Fix cross compiling issues
+--- Makefile.orig	2010-09-11 00:46:02.000000000 +0200
++++ Makefile	2011-11-18 22:57:07.000000000 +0100
+@@ -12,21 +12,6 @@
+ # in the file LICENSE.
+ # ------------------------------------------------------------------
+ 
+-SHELL=/bin/sh
+-
+-# To assist in cross-compiling
+-CC=gcc
+-AR=ar
+-RANLIB=ranlib
+-LDFLAGS=
+-
+-BIGFILES=-D_FILE_OFFSET_BITS=64
+-CFLAGS=-Wall -Winline -O2 -g $(BIGFILES)
+-
+-# Where you want it installed when you do 'make install'
+-PREFIX=/usr/local
+-
+-
+ OBJS= blocksort.o  \
+       huffman.o    \
+       crctable.o   \
+--- Makefile-libbz2_so.orig	2010-09-11 01:07:52.000000000 +0200
++++ Makefile-libbz2_so	2012-11-25 17:51:08.000000000 +0100
+@@ -20,12 +20,6 @@
+ # in the file LICENSE.
+ # ------------------------------------------------------------------
+ 
+-
+-SHELL=/bin/sh
+-CC=gcc
+-BIGFILES=-D_FILE_OFFSET_BITS=64
+-CFLAGS=-fpic -fPIC -Wall -Winline -O2 -g $(BIGFILES)
+-
+ OBJS= blocksort.o  \
+       huffman.o    \
+       crctable.o   \

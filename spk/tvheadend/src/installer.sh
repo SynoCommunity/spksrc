@@ -15,9 +15,32 @@ FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
 DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
 SC_USER="sc-tvheadend"
+SC_GROUP="sc-media"
+SC_GROUP_DESC="SynoCommunity's media related group"
 LEGACY_USER="tvheadend"
 LEGACY_GROUP="users"
 USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
+syno_group_create ()
+{
+    # Create syno group
+    synogroup --add ${SC_GROUP} ${USER} > /dev/null
+    # Set description of the syno group
+    synogroup --descset ${SC_GROUP} "${SC_GROUP_DESC}"
+    # Add user to syno group
+    addgroup ${USER} ${SC_GROUP}
+}
+
+syno_group_remove ()
+{
+    # Remove user from syno group
+    delgroup ${USER} ${SC_GROUP}
+    # Check if syno group is empty
+    if ! synogroup --get ${SC_GROUP} | grep -q "0:"; then
+        # Remove syno group
+        synogroup --del ${SC_GROUP} > /dev/null
+    fi
+}
 
 preinst ()
 {
@@ -37,12 +60,24 @@ postinst ()
         adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
     fi
 
+    syno_group_create
+
+    wizard_password=`echo -n "TVHeadend-Hide-${wizard_password:=admin}" | openssl enc -a`
+
     # Edit the configuration according to the wizard
-    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${INSTALL_DIR}/var/accesscontrol/1
-    sed -i -e "s/@password@/${wizard_password:=admin}/g" ${INSTALL_DIR}/var/accesscontrol/1
+    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${INSTALL_DIR}/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
+
+    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${INSTALL_DIR}/var/passwd/a927e30a755504f9784f23a4efac5109
+    sed -i -e "s/@password@/${wizard_password}/g" ${INSTALL_DIR}/var/passwd/a927e30a755504f9784f23a4efac5109
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}/var/accesscontrol/*
+    chmod 700 ${SYNOPKG_PKGDEST}/var/accesscontrol/*
+
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}/var/passwd/*
+    chmod 700 ${SYNOPKG_PKGDEST}/var/passwd/*
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -57,6 +92,7 @@ preuninst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         # Remove the user (if not upgrading)
+        syno_group_remove
         delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
 
