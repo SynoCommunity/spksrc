@@ -1,5 +1,5 @@
 PKG_NAME = owncloud
-PKG_VERS = 8.1.1
+PKG_VERS = 8.1.12
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.owncloud.org/community

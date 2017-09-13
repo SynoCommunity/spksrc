@@ -1,6 +1,6 @@
 SPK_NAME = deluge
-SPK_VERS = 1.3.13
-SPK_REV = 7
+SPK_VERS = 1.3.15
+SPK_REV = 8
 SPK_ICON = src/deluge.png
 DSM_UI_DIR = app
 BETA = 1

@@ -1,13 +1,45 @@
 {
-	"enabled": 1,
+	"index": 1,
+	"enabled": true,
 	"username": "@username@",
-	"password": "@password@",
-	"comment": "Administrator",
 	"prefix": "0.0.0.0/0",
-	"streaming": 1,
-	"dvr": 1,
-	"dvrallcfg": 1,
-	"webui": 1,
-	"admin": 1,
-	"id": "1"
+	"change": [
+		"change_rights",
+		"change_chrange",
+		"change_chtags",
+		"change_dvr_configs",
+		"change_profiles",
+		"change_conn_limit",
+		"change_lang",
+		"change_lang_ui",
+		"change_theme",
+		"change_uilevel"
+	],
+	"uilevel": -1,
+	"uilevel_nochange": -1,
+	"streaming": [
+		"basic",
+		"advanced",
+		"htsp"
+	],
+	"profile": [
+	],
+	"dvr": [
+		"basic",
+		"htsp"
+	],
+	"htsp_anonymize": false,
+	"dvr_config": [
+	],
+	"webui": true,
+	"admin": true,
+	"conn_limit_type": 0,
+	"conn_limit": 0,
+	"channel_min": 0,
+	"channel_max": 0,
+	"channel_tag_exclude": false,
+	"channel_tag": [
+	],
+	"comment": "Administrator",
+	"wizard": true
 }

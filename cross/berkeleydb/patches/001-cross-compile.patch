@@ -1,0 +1,21 @@
+# Fix x64 compile issue
+--- dist/configure.orig	2016-11-30 17:10:08.635975082 +0100
++++ dist/configure	2016-11-30 17:10:01.635975176 +0100
+@@ -22787,7 +22787,7 @@
+ fi
+ 
+ if test "$db_cv_atomic" = no; then
+-	if test "$cross_compiling" = yes; then :
++	if test "$cross_compiling" = maybe; then :
+   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+ as_fn_error $? "cannot run test program while cross compiling
+@@ -22826,7 +22826,7 @@
+ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+ 
+-		if test "$cross_compiling" = yes; then :
++		if test "$cross_compiling" = maybe; then :
+   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+ as_fn_error $? "cannot run test program while cross compiling

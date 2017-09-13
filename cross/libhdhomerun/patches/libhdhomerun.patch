@@ -1,0 +1,13 @@
+--- Makefile.orig	2016-02-09 01:09:03.000000000 +0100
++++ Makefile	2017-03-22 21:29:54.773406841 +0100
+@@ -11,8 +11,8 @@
+ LIBSRCS += hdhomerun_sock_posix.c
+ LIBSRCS += hdhomerun_video.c
+ 
+-CC    := $(CROSS_COMPILE)gcc
+-STRIP := $(CROSS_COMPILE)strip
++# CC    := $(CROSS_COMPILE)gcc
++# STRIP := $(CROSS_COMPILE)strip
+ 
+ CFLAGS += -O2 -Wall -Wextra -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wno-unused-parameter
+ LDFLAGS += -lpthread

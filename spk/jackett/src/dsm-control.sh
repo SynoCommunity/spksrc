@@ -8,13 +8,14 @@ DNAME="Jackett"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+USER_HOME="$(eval echo ~$USER)"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 JACKETT="${INSTALL_DIR}/share/${PACKAGE}/JackettConsole.exe"
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} -- --debug ${JACKETT}"
 HOME_DIR="${INSTALL_DIR}/var"
-PID_FILE="${HOME_DIR}/jackett.pid"
-LOG_FILE="${HOME_DIR}/.config/Jackett/log.txt"
+PID_FILE="${USER_HOME}/jackett.pid"
+LOG_FILE="${USER_HOME}/.config/Jackett/log.txt"
 
 SC_USER="sc-jackett"
 LEGACY_USER="jackett"
@@ -23,7 +24,7 @@ USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGAC
 
 start_daemon ()
 {
-    export HOME=${HOME_DIR} && start-stop-daemon -c ${USER} -Sqbmp ${PID_FILE} -x ${COMMAND} > /dev/null
+    export HOME=${USER_HOME} && start-stop-daemon -c ${USER} -Sqbmp ${PID_FILE} -x ${COMMAND} > /dev/null
     sleep 2
 }
 
