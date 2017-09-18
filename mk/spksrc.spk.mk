@@ -64,6 +64,8 @@ $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
+	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
+	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@echo description=\"$(DESCRIPTION)\" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
