@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 2.2.1
-SPK_REV = 31
+SPK_VERS = 2.3.0
+SPK_REV = 32
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -16,7 +16,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Updated to 2.2.1. Due to changes in the 2.2.x release, the queue will be converted when 2.2.x is started for the first time. Job order, settings and data will be preserved, but all jobs will be unpaused and URL's that did not finish fetching before the upgrade will be lost!"
+CHANGELOG = "Updated SABnzbd to 2.3.0 and par2cmdline to 0.7.4."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
