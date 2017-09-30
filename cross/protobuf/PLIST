@@ -1,0 +1,7 @@
+lnk:lib/libprotobuf.so
+lnk:lib/libprotobuf.so.14
+lib:lib/libprotobuf.so.14.0.0
+lnk:lib/libprotoc.so
+lnk:lib/libprotoc.so.14
+lib:lib/libprotoc.so.14.0.0
+bin:bin/protoc
