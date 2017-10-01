@@ -98,8 +98,8 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove the user if uninstalling
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+    # Remove the user (if not upgrading)
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         synco_group_remove
 
         delgroup ${USER} ${GROUP}
