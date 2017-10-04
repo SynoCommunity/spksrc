@@ -1,5 +1,5 @@
 
-COMMANDS="nmap nping sshfs fusermount"
+COMMANDS="nmap nping sshfs fusermount screen mosh mosh-client mosh-server"
 
 service_postinst ()
 {
