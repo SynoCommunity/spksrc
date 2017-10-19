@@ -136,14 +136,15 @@ endif
 ifneq ($(strip $(CONF_DIR)),)
 	@echo support_conf_folder=\"yes\" >> $@
 endif
+ifneq ($(strip $(SPK_CONFLICT)),)
+	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
+endif
 	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\" >> $@
+
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
 else
 INSTALLER_OUTPUT = > $$SYNOPKG_TEMP_LOGFILE
-endif
-ifneq ($(strip $(SPK_CONFLICT)),)
-	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
 endif
 
 # Wizard
@@ -178,19 +179,6 @@ endef
 $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@echo $@
 	@$(dsm_license_copy)
-
-# Package Icons
-$(WORK_DIR)/PACKAGE_ICON.PNG: $(SPK_ICON)
-	$(create_target_dir)
-	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
-	@[ -f $@ ] && rm $@ || true
-	(convert $(SPK_ICON) -thumbnail 72x72 - >> $@)
-
-$(WORK_DIR)/PACKAGE_ICON_256.PNG: $(SPK_ICON)
-	$(create_target_dir)
-	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
-	@[ -f $@ ] && rm $@ || true
-	(convert $(SPK_ICON) -thumbnail 256x256 - >> $@)
 
 # Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
@@ -247,7 +235,19 @@ $(DSM_SCRIPTS_DIR)/%.sc: $(filter %.sc,$(FWPORTS))
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
-SPK_CONTENT = package.tgz INFO PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG scripts
+SPK_CONTENT = package.tgz INFO scripts
+
+# Package Icons
+.PHONY: icons
+icons:
+ifneq ($(strip $(SPK_ICON)),)
+	$(create_target_dir)
+	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
+	(convert $(SPK_ICON) -thumbnail 72x72 - >> $@)
+	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
+	(convert $(SPK_ICON) -thumbnail 256x256 - >> $@)
+	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
+endif
 
 .PHONY: checksum
 checksum:
@@ -278,7 +278,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum $(WORK_DIR)/PACKAGE_ICON.PNG $(WORK_DIR)/PACKAGE_ICON_256.PNG $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 

@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = cedarview
 TC_VERS = 5.2
-TC_FIRMWARE = 5.2-5565
+TC_FIRMWARE = 5.2-5644
 
 TC_DIST_NAME = cedarview-gcc473_glibc217_x86_64-GPL.txz
 
