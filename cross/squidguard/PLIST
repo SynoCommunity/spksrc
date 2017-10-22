@@ -1,12 +1,5 @@
 bin:bin/squidGuard
 rsc:share/www/squidguardmgr/squidGuard.cgi
-rsc:share/www/squidguardmgr/babel.en
-rsc:share/www/squidguardmgr/babel.fr
-rsc:share/www/squidguardmgr/babel.de
-rsc:share/www/squidguardmgr/babel.es
-rsc:share/www/squidguardmgr/babel.nl
-rsc:share/www/squidguardmgr/babel.no
-rsc:share/www/squidguardmgr/babel.ru
 lnk:var/db/ads
 rsc:var/db/adult/domains
 rsc:var/db/adult/expressions
