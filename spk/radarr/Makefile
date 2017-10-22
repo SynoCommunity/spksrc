@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/radarr.png
 DSM_UI_DIR = app
 BETA = 1
@@ -17,7 +17,7 @@ DESCRIPTION  = Radarr is a movie manager like Couchpotato, but based on the Sona
 ADMIN_PORT = 8310
 RELOAD_UI = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "1. Initial release"
+CHANGELOG = "Improved service status representation"
 
 HOMEPAGE = https://radarr.video/
 LICENSE  = GPLv3
