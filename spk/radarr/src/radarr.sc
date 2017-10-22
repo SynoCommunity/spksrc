@@ -1,4 +1,4 @@
-[nzbdrone]
+[radarr]
 title="Radarr"
 desc="Radarr"
 port_forward="yes"
