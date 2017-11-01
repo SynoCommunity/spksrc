@@ -22,6 +22,9 @@ postinst ()
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
+    # Sync certificate
+    /var/packages/mono/target/bin/cert-sync /etc/ssl/certs/ca-certificates.crt > /dev/null
+
     exit 0
 }
 
@@ -45,5 +48,8 @@ preupgrade ()
 
 postupgrade ()
 {
+    # Sync certificate
+    /var/packages/mono/target/bin/cert-sync /etc/ssl/certs/ca-certificates.crt > /dev/null
+
     exit 0
 }
