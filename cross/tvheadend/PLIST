@@ -1,2 +1,3 @@
 bin:bin/tvheadend
 rsc:share/tvheadend
+rsc:share/fontconfig
