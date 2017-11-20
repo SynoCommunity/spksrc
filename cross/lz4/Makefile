@@ -1,7 +1,7 @@
 PKG_NAME = lz4
 PKG_VERS = 1.7.5
 PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/lz4/lz4/archive/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
