@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/attr
 
 HOMEPAGE = http://kernel.org/
-COMMENT  = 
-LICENSE  = 
+COMMENT  = Access control list package
+LICENSE  = GPLv2+ 
 
 GNU_CONFIGURE = 1
 INSTALL_TARGET = myInstall
