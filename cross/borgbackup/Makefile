@@ -9,7 +9,7 @@ DEPENDS = cross/acl cross/lz4 cross/openssl
 
 HOMEPAGE = https://borgbackup.readthedocs.io/
 COMMENT  = Deduplicating backup program with compression and authenticated encryption
-LICENSE  = Borg
+LICENSE  = BSD Style
 
 ENV += BORG_LZ4_PREFIX="$(STAGING_INSTALL_PREFIX)" BORG_OPENSSL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 
