@@ -10,9 +10,9 @@ SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="root"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 SERVICETOOL="/usr/syno/bin/servicetool"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+
 
 preinst ()
 {

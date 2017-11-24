@@ -13,9 +13,10 @@ PID_FILE="${INSTALL_DIR}/var/darkstat.pid"
 
 PORT=`ip r | awk '/^default/{print $5}'`
 
+
 start_daemon ()
 {
-    su ${USER} -c "PATH=${PATH} ${DARKSTAT} -i ${PORT} --chroot ${INSTALL_DIR}/var --pidfile darkstat.pid --import darkstat.data --export darkstat.data"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${DARKSTAT} -i ${PORT} --chroot ${INSTALL_DIR}/var --pidfile darkstat.pid --import darkstat.data --export darkstat.data"
 }
 
 stop_daemon ()

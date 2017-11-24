@@ -7,14 +7,18 @@ DNAME="ZNC"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="znc"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 ZNC="${INSTALL_DIR}/bin/znc"
 PID_FILE="${INSTALL_DIR}/var/znc.pid"
+
+SC_USER="sc-znc"
+LEGACY_USER="znc"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
 {
-    su ${USER} -c "${ZNC} -d ${INSTALL_DIR}/var"
+    su ${USER} -s /bin/sh -c "${ZNC} -d ${INSTALL_DIR}/var"
 }
 
 stop_daemon ()

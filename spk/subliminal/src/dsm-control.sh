@@ -8,16 +8,20 @@ DNAME="Subliminal"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="subliminal"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 SCHEDULER="${INSTALL_DIR}/app/scheduler.py"
 PID_FILE="${INSTALL_DIR}/var/scheduler.pid"
 LOG_FILE="${INSTALL_DIR}/var/scheduler.log"
 
+SC_USER="sc-subliminal"
+LEGACY_USER="subliminal"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su ${USER} -c "PATH=${PATH} ${PYTHON} ${SCHEDULER}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${SCHEDULER}"
 }
 
 stop_daemon ()

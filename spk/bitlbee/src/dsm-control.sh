@@ -7,15 +7,19 @@ DNAME="BitlBee"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/sbin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="bitlbee"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 BITLBEE="${INSTALL_DIR}/sbin/bitlbee"
 CFG_FILE="${INSTALL_DIR}/var/bitlbee.conf"
 PID_FILE="${INSTALL_DIR}/var/bitlbee.pid"
 
+SC_USER="sc-bitlbee"
+LEGACY_USER="bitlbee"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${BITLBEE} -c ${CFG_FILE}"
+    su ${USER} -s /bin/sh -c "LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${BITLBEE} -c ${CFG_FILE}"
 }
 
 stop_daemon ()

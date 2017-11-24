@@ -26,9 +26,6 @@ postinst ()
     # Copy config file
     cp ${INSTALL_DIR}/etc/rsnapshot.conf.default ${INSTALL_DIR}/etc/rsnapshot.conf
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-
     exit 0
 }
 

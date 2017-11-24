@@ -3,13 +3,15 @@
 # Package
 PACKAGE="monit"
 DNAME="Monit"
+
+# Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-
 PATH="${INSTALL_DIR}/bin:${PATH}"
-
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 CFG_FILE="${INSTALL_DIR}/var/monitrc"
 PID_FILE="${INSTALL_DIR}/var/monit.pid"
 LOG_FILE="${INSTALL_DIR}/var/monit.log"
+
 
 start_daemon ()
 {

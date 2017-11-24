@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/sonarr.png
 DSM_UI_DIR = app
 
@@ -18,14 +18,15 @@ DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias. Se p
 ADMIN_PORT = 8989
 RELOAD_UI = yes
 DISPLAY_NAME = Sonarr
-CHANGELOG = "1. Update Sonarr to 2.0.0.4472<br>2. Update dependencies<br>3. Add wizard to inform users of Sonarr's built-in updater"
+CHANGELOG = "1. DSM6 Compatibility"
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/$(SPK_NAME).sc
+FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
@@ -39,9 +40,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sonarr_extra_install
 sonarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/.config
-	install -m 755 -d $(STAGING_DIR)/var/.config/NzbDrone
-	install -m 644 src/config.xml $(STAGING_DIR)/var/.config/NzbDrone/config.xml
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
