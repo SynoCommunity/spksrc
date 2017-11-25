@@ -1,7 +1,7 @@
-$TC_NAME = syno-$(TC_ARCH)
+TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = comcerto2k
-TTC_VERS = 6.1
+TC_VERS = 6.1
 TC_FIRMWARE = 6.1-15047
 
 TC_DIST = comcerto2k-gcc493_glibc220_hard-GPL
