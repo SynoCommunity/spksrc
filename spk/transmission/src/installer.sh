@@ -8,39 +8,62 @@ DNAME="Transmission"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="transmission"
-GROUP="users"
 CFG_FILE="${INSTALL_DIR}/var/settings.json"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 SERVICETOOL="/usr/syno/bin/servicetool"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
-SYNO_GROUP="sc-download"
-SYNO_GROUP_DESC="SynoCommunity's download related group"
+DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+SC_USER="sc-transmission"
+SC_GROUP="sc-download"
+SC_GROUP_DESC="SynoCommunity's download related group"
+LEGACY_USER="transmission"
+LEGACY_GROUP="users"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 syno_group_create ()
 {
-    # Create syno group (Does nothing when group already exists)
-    synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
+    # Create syno group
+    synogroup --add ${SC_GROUP} ${USER} > /dev/null
     # Set description of the syno group
-    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
-
-    # Add user to syno group (Does nothing when user already in the group)
-    addgroup ${USER} ${SYNO_GROUP}
+    synogroup --descset ${SC_GROUP} "${SC_GROUP_DESC}"
+    # Add user to syno group
+    addgroup ${USER} ${SC_GROUP}
 }
 
 syno_group_remove ()
 {
     # Remove user from syno group
-    delgroup ${USER} ${SYNO_GROUP}
-
+    delgroup ${USER} ${SC_GROUP}
     # Check if syno group is empty
-    if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
+    if ! synogroup --get ${SC_GROUP} | grep -q "0:"; then
         # Remove syno group
-        synogroup --del ${SYNO_GROUP} > /dev/null
+        synogroup --del ${SC_GROUP} > /dev/null
     fi
 }
+
+set_syno_permissions ()
+{
+    # Sets recursive permissions for ${SC_GROUP} on specified directory
+    # Usage: set_syno_permissions "${wizard_download_dir}"
+    DIRNAME=$1
+    VOLUME=`echo $1 | awk -F/ '{print "/"$2}'`
+    # Set read/write permissions for SC_GROUP on target directory
+    if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--"`" ]; then
+        synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--" > /dev/null 2>&1
+    fi
+    # Walk up the tree and set traverse permissions up to VOLUME
+    DIRNAME="$(dirname "${DIRNAME}")"
+    while [ "${DIRNAME}" != "${VOLUME}" ]; do
+        if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:..x"`" ]; then
+            synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:--x----------:---n" > /dev/null 2>&1
+        fi
+        DIRNAME="$(dirname "${DIRNAME}")"
+    done
+}
+
 
 preinst ()
 {
@@ -70,8 +93,10 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    # Create legacy user
+    if [ "${BUILDNUMBER}" -lt "7321" ]; then
+        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+    fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
@@ -92,9 +117,16 @@ postinst ()
             sed -i -e "s|@incomplete_dir_enabled@|false|g" ${CFG_FILE}
             sed -i -e "/@incomplete_dir@/d" ${CFG_FILE}
         fi
-
-        # Set group and permissions on download- and watch dir for DSM5
-        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
+        # Permissions handling
+        if [ "${BUILDNUMBER}" -ge "7321" ]; then
+            set_syno_permissions "${wizard_download_dir:=/volume1/downloads}"
+            if [ -d "${wizard_watch_dir}" ]; then
+                set_syno_permissions "${wizard_watch_dir}"
+            fi
+            if [ -d "${wizard_incomplete_dir}" ]; then
+                set_syno_permissions "${wizard_incomplete_dir}"
+            fi
+        else
             chgrp users ${wizard_download_dir:=/volume1/downloads}
             chmod g+rw ${wizard_download_dir:=/volume1/downloads}
             if [ -d "${wizard_watch_dir}" ]; then
@@ -124,16 +156,13 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        # Remove the user (if not upgrading)
         syno_group_remove
-
-        delgroup ${USER} ${GROUP}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
-    fi
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall configuration
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
@@ -153,6 +182,13 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
+    # DSM6 Upgrade handling
+    if [ "${BUILDNUMBER}" -ge "7321" ] && [ ! -f ${DSM6_UPGRADE} ]; then
+        echo "Deleting legacy user" > ${DSM6_UPGRADE}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${LEGACY_USER}
+    fi
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
@@ -167,6 +203,9 @@ postupgrade ()
     rm -fr ${INSTALL_DIR}/var
     mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Ensure file ownership is correct after upgrade
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }

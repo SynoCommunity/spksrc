@@ -9,17 +9,21 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="couchpotatoserver-custom"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 COUCHPOTATOSERVER="${INSTALL_DIR}/var/CouchPotatoServer/CouchPotato.py"
 CFG_FILE="${INSTALL_DIR}/var/settings.conf"
 PID_FILE="${INSTALL_DIR}/var/couchpotatoserver-custom.pid"
 LOG_FILE="${INSTALL_DIR}/var/logs/CouchPotato.log"
 
+SC_USER="sc-couchpotatoserver-custom"
+LEGACY_USER="couchpotatoserver-custom"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} --config_file ${CFG_FILE}"
 }
 
 stop_daemon ()

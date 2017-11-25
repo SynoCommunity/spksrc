@@ -7,16 +7,21 @@ DNAME="Domoticz"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="domoticz"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 DOMOTICZ="${INSTALL_DIR}/bin/domoticz"
 PID_FILE="${INSTALL_DIR}/var/domoticz.pid"
 LOGFILE="${INSTALL_DIR}/var/domoticz.log"
 DB_FILE="${INSTALL_DIR}/var/domoticz.db"
 PORT="8084"
 
+SC_USER="sc-domoticz"
+LEGACY_USER="domoticz"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
+
 start_daemon ()
 {
-    su - ${USER} -c "${DOMOTICZ} -www ${PORT} -approot ${INSTALL_DIR}/ -dbase ${DB_FILE} &> $LOGFILE & echo \$! > ${PID_FILE}"
+    su ${USER} -s /bin/sh -c "${DOMOTICZ} -www ${PORT} -approot ${INSTALL_DIR}/ -dbase ${DB_FILE} &> $LOGFILE & echo \$! > ${PID_FILE}"
 }
 
 stop_daemon ()

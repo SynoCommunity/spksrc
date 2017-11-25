@@ -6,8 +6,8 @@ DNAME="SquidGuard"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-RUNAS="squid"
+PATH="${INSTALL_DIR}/bin:${PATH}"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 SQUID="${INSTALL_DIR}/sbin/squid"
 PID_FILE="${INSTALL_DIR}/var/run/squid.pid"
 CFG_FILE="${INSTALL_DIR}/etc/squid.conf"
@@ -18,6 +18,11 @@ CICAP="${INSTALL_DIR}/bin/c-icap"
 CICAP_CFG="${INSTALL_DIR}/etc/c-icap.conf"
 CICAP_PID="${INSTALL_DIR}/var/run/c-icap/c-icap.pid"
 
+SC_USER="sc-squid"
+LEGACY_USER="squid"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
+
 start_daemon ()
 {
     # launch clamd
@@ -27,13 +32,13 @@ start_daemon ()
     ${CICAP} -f ${CICAP_CFG}
        
     # launch squid
-    su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE}"
+    su ${USER} -s /bin/sh -c "${SQUID} -f ${CFG_FILE}"
 }
 
 stop_daemon ()
 {
     # stop squid
-    su - ${RUNAS} -c "${SQUID} -f ${CFG_FILE} -k shutdown"
+    su ${USER} -s /bin/sh -c "${SQUID} -f ${CFG_FILE} -k shutdown"
     wait_for_status 1 20
     
     # stop c-icap

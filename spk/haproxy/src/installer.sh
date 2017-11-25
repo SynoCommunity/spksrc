@@ -9,15 +9,20 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="haproxy"
-GROUP="nobody"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+SERVICETOOL="/usr/syno/bin/servicetool"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 CFG_FILE="${INSTALL_DIR}/var/haproxy.cfg"
 TPL_FILE="${CFG_FILE}.tpl"
 
-SERVICETOOL="/usr/syno/bin/servicetool"
-FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+SC_USER="sc-haproxy"
+LEGACY_USER="haproxy"
+LEGACY_GROUP="nobody"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 preinst ()
 {
@@ -29,8 +34,10 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    # Create legacy user
+    if [ "${BUILDNUMBER}" -lt "7321" ]; then
+        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+    fi
 
     # Edit the configuration according to the wizard
     sed -i -e "s/@user@/${wizard_user:=admin}/g" ${TPL_FILE}
@@ -59,14 +66,12 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
-        delgroup ${USER} ${GROUP}
+        # Remove the user (if not upgrading)
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
-    fi
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall configuration
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
@@ -86,6 +91,13 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
+    # DSM6 Upgrade handling
+    if [ "${BUILDNUMBER}" -ge "7321" ] && [ ! -f ${DSM6_UPGRADE} ]; then
+        echo "Deleting legacy user" > ${DSM6_UPGRADE}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${LEGACY_USER}
+    fi
+
     # Revision 12 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 12 ]; then
         ${INSTALL_DIR}/env/bin/python ${SYNOPKG_PKGINST_TEMP_DIR}/app/application/db_upgrade_12.py
@@ -100,6 +112,12 @@ preupgrade ()
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 18 ]; then
         sed -ie "/^global$/a\	user haproxy" ${CFG_FILE}
         sed -ie "/^global$/a\	user haproxy" ${TPL_FILE}
+    fi
+
+    # Revision 19 runs as root, but requires 'sc-haproxy' user entry in conf
+    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 19 ]; then
+        sed -ie "/^global$/a\	user ${USER}" ${CFG_FILE}
+        sed -ie "/^global$/a\	user ${USER}" ${TPL_FILE}
     fi
 
     # Save some stuff

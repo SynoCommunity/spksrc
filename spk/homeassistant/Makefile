@@ -23,6 +23,8 @@ LICENSE  = MIT
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 UNSUPPORTED_ARCHS = powerpc ppc824x
 
