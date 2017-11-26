@@ -1,6 +1,5 @@
 bin:bin/ffmpeg
 bin:bin/ffprobe
-bin:bin/ffserver
 lnk:lib/libavcodec.so
 lnk:lib/libavcodec.so.57
 lib:lib/libavcodec.so.57.89.100

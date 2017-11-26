@@ -2,7 +2,7 @@ PKG_NAME = libnuma
 PKG_VERS = 2.0.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = numactl-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://oss.sgi.com/www/projects/libnuma/download
+PKG_DIST_SITE = https://src.fedoraproject.org/repo/pkgs/numactl/numactl-2.0.11.tar.gz/md5/d3bc88b7ddb9f06d60898f4816ae9127
 PKG_DIR = numactl-$(PKG_VERS)
 
 DEPENDS =
