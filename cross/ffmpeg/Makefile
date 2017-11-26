@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/fdk-aac cross/flac cross/freetype cross/fribidi cross/lame cross/libass
 DEPENDS += cross/libbluray cross/libtheora cross/libvorbis cross/libvpx
 DEPENDS += cross/opencore-amr cross/openjpeg cross/openssl cross/opus cross/rtmpdump
-DEPENDS += cross/soxr cross/speex cross/vo-amrwbenc cross/x264
+DEPENDS += cross/soxr cross/speex cross/vo-amrwbenc cross/x264 cross/mfx_dispatch
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -31,6 +31,7 @@ CONFIGURE_ARGS += --enable-libtheora --enable-libvo-amrwbenc --enable-libvorbis
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-openssl
 CONFIGURE_ARGS += --disable-debug --disable-doc --disable-htmlpages --disable-manpages
 CONFIGURE_ARGS += --disable-podpages --disable-static --disable-txtpages
+CONFIGURE_ARGS += --disable-ffplay --disable-ffserver
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -51,7 +52,10 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DEPENDS += native/yasm
 ENV += PATH=$(YASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86_64 --enable-thumb
+CONFIGURE_ARGS += --arch=x86_64 --enable-thumb --enable-vaapi --enable-libmfx
+CONFIGURE_ARGS += --enable-decoder=hevc_qsv --enable-decoder=h264_qsv --enable-encoder=h264_qsv
+CONFIGURE_ARGS += --enable-encoder=hevc_qsv --enable-encoder=mpeg2_qsv --enable-encoder=h264_vaapi
+CONFIGURE_ARGS += --enable-encoder=hevc_vaapi --enable-encoder=mpeg2_vaapi --enable-encoder=mjpeg_vaapi
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))

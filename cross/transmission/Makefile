@@ -14,4 +14,13 @@ LICENSE  = GPLv2/GPLv3
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = HAVE_CXX=yes --disable-nls --enable-daemon --enable-utp
 
+POST_INSTALL_TARGET = RemoteWeb
+
 include ../../mk/spksrc.cross-cc.mk
+
+SCRIPT_DIR = $(CURDIR)
+
+.PHONY: RemoteWeb
+RemoteWeb:
+	#cd $(CURDIR)
+	$(RUN) $(SCRIPT_DIR)/ds-control-easy-install.sh $(STAGING_INSTALL_PREFIX)

@@ -2,7 +2,7 @@ PKG_NAME = x264
 PKG_VERS = 20170730-2245-stable
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.videolan.org/pub/videolan/x264/snapshots
+PKG_DIST_SITE = ftp://ftp.videolan.org/pub/videolan/x264/snapshots
 PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
 
 DEPENDS =

@@ -1,9 +1,9 @@
 PKG_NAME = ruTorrent
-PKG_VERS = 3.7
-PKG_EXT = zip
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://dl.bintray.com/novik65/generic
-PKG_DIR = $(PKG_NAME)-master
+PKG_VERS = 3.8
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/Novik/ruTorrent/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
