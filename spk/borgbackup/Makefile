@@ -1,5 +1,5 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.1.2
+SPK_VERS = 1.1.3
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
