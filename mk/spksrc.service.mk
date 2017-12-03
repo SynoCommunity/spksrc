@@ -167,6 +167,7 @@ endif
 # Generate DSM UI configuration
 ifneq ($(strip $(SPK_ICON)),)
 ifneq ($(strip $(SERVICE_PORT)),)
+ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
 # Set some defaults
 ifeq ($(strip $(SERVICE_URL)),)
 SERVICE_URL=/
@@ -197,6 +198,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo '} } }' >> $@
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
+endif
 endif
 endif
 
