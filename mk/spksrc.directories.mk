@@ -7,7 +7,7 @@
 # * the copy target creates a staging area, in $(WORK_DIR)/staging/, known as $(STAGING_DIR).
 #   This staging dir does not contain the $(INSTALL_PREFIX)
 # * Binaries and libraries are strip in $(STAGING_DIR)
-# * The full content of $(STAGING_DIR) is packed, it will then be unpacked on the target in $(INSTALL_PREFIX)  
+# * The full content of $(STAGING_DIR) is packed, it will then be unpacked on the target in $(INSTALL_PREFIX)
 
 PWD := $(shell pwd)
 
@@ -27,7 +27,7 @@ endif
 STAGING_DIR = $(WORK_DIR)/staging
 
 ifndef INSTALL_PREFIX
-INSTALL_PREFIX = /usr/local
+INSTALL_PREFIX = /var/packages/$(SPK_NAME)/target
 endif
 
 ifndef KERNEL_DIR
