@@ -78,6 +78,9 @@ preupgrade ()
     mkdir -p ${TMP_DIR}/${PACKAGE}
     mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
 
+    # Remove busybox service user to prepare to generic service DSM 5+6
+    delgroup ${USER} ${GROUP}
+    deluser ${USER}
     exit 0
 }
 

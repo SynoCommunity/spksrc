@@ -5,5 +5,5 @@ bin:bin/libwebsockets-test-ping
 bin:bin/libwebsockets-test-server
 bin:bin/libwebsockets-test-server-extpoll
 lnk:lib/libwebsockets.so
-lib:lib/libwebsockets.so.6
+lib:lib/libwebsockets.so.12
 shr:share/libwebsockets-test-server
