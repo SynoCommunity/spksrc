@@ -1,5 +1,5 @@
 PKG_NAME = bcrypt
-PKG_VERS = 2.0.0
+PKG_VERS = 3.1.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/b/$(PKG_NAME)

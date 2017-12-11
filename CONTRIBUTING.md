@@ -68,9 +68,4 @@ Pull requests
 ----------
 Pull requests to add packages to the [SynoCommunity repository](https://synocommunity.com) are always welcome, as are improvements to the spksrc framework or existing packages.
 
-You'll first need to set up a development environment as outlined in the [README](https://github.com/SynoCommunity/spksrc/blob/master/README.rst#setup-development-environment). After that:
-* Fork and clone spksrc: ``git clone https://You@github.com/You/spksrc.git``
-* Create a new topic branch: `git checkout -b newfeature master`;
-* After completing and testing your changes, submit a pull request.
-
-A general approach on how to develop packages is outlined in the [spksrc example wiki page](https://github.com/SynoCommunity/spksrc/wiki/spksrc-example).
+Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people. See the [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO) for information on how to use spksrc.

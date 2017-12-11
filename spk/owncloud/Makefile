@@ -1,17 +1,17 @@
 SPK_NAME = owncloud
-SPK_VERS = 8.1.1
-SPK_REV = 7
+SPK_VERS = 8.1.12
+SPK_REV = 8
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = moneytoo
+MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 ADMIN_URL = /owncloud/
 RELOAD_UI = yes
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 8.1.1"
+CHANGELOG = "1. Update ownCloud to 8.1.12"
 
 HOMEPAGE   = http://owncloud.org/
 LICENSE    = AGPL
@@ -44,8 +44,3 @@ owncloud_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/autoconfig.php $(STAGING_DIR)/share/$(SPK_NAME)/config/autoconfig.php
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

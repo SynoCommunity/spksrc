@@ -1,0 +1,6 @@
+[{
+    "step_title": "Updating Sonarr",
+    "items": [{
+        "desc": "Keep Sonarr up-to-date by using Sonarr's built-in updater.<br><br>Navigate to System>Updates in the Sonarr UI."
+    }]
+}]

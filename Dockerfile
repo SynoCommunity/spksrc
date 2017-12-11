@@ -23,11 +23,14 @@ RUN apt-get update && \
         gperf \
         imagemagick \
         intltool \
+        libbz2-dev \
         libc6-i386 \
         libcppunit-dev \
         libffi-dev \
         libgc-dev \
         libltdl-dev \
+        libmount-dev \
+        libpcre3-dev \
         libssl-dev \
         libunistring-dev \
         lzip \

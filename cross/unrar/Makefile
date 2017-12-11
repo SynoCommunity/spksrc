@@ -1,8 +1,8 @@
 PKG_NAME = unrar
-PKG_VERS = 5.3.8
+PKG_VERS = 5.5.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)src-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.rarlab.com/rar
+PKG_DIST_SITE = https://www.rarlab.com/rar
 PKG_DIR = $(PKG_NAME)
 
 DEPENDS =

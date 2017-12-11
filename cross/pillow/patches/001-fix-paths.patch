@@ -1,25 +1,29 @@
---- setup.py.orig	2016-03-14 08:02:35.527514310 +0100
-+++ setup.py	2016-03-14 15:52:09.740841450 +0100
-@@ -92,9 +92,9 @@
+--- setup.py.orig	2017-01-02 12:47:11.000000000 +0100
++++ setup.py	2017-01-07 13:07:26.387452602 +0100
+@@ -107,12 +107,12 @@
+ 
  NAME = 'Pillow'
- PILLOW_VERSION = '3.0.0'
- TCL_ROOT = None
+ PILLOW_VERSION = '4.0.0'
 -JPEG_ROOT = None
 +JPEG_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
  JPEG2K_ROOT = None
 -ZLIB_ROOT = None
 +ZLIB_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
+ IMAGEQUANT_ROOT = None
  TIFF_ROOT = None
- FREETYPE_ROOT = None
+-FREETYPE_ROOT = None
++FREETYPE_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
  LCMS_ROOT = None
-@@ -240,65 +240,6 @@
+ 
+ 
+@@ -302,64 +302,6 @@
                  _add_directory(library_dirs, "/usr/X11/lib")
                  _add_directory(include_dirs, "/usr/X11/include")
  
 -        elif sys.platform.startswith("linux"):
 -            arch_tp = (plat.processor(), plat.architecture()[0])
 -            if arch_tp == ("x86_64", "32bit"):
--                # 32 bit build on 64 bit machine.
+-                # 32-bit build on 64-bit machine.
 -                _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
 -            else:
 -                for platform_ in arch_tp:
@@ -30,38 +34,37 @@
 -                    if platform_ in ["x86_64", "64bit"]:
 -                        _add_directory(library_dirs, "/lib64")
 -                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(
--                            library_dirs, "/usr/lib/x86_64-linux-gnu")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/x86_64-linux-gnu")
 -                        break
 -                    elif platform_ in ["i386", "i686", "32bit"]:
--                        _add_directory(
--                            library_dirs, "/usr/lib/i386-linux-gnu")
+-                        _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
 -                        break
 -                    elif platform_ in ["aarch64"]:
 -                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(
--                            library_dirs, "/usr/lib/aarch64-linux-gnu")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/aarch64-linux-gnu")
 -                        break
 -                    elif platform_ in ["arm", "armv7l"]:
--                        _add_directory(
--                            library_dirs, "/usr/lib/arm-linux-gnueabi")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/arm-linux-gnueabi")
 -                        break
 -                    elif platform_ in ["ppc64"]:
 -                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(
--                            library_dirs, "/usr/lib/ppc64-linux-gnu")
--                        _add_directory(
--                            library_dirs, "/usr/lib/powerpc64-linux-gnu")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/ppc64-linux-gnu")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/powerpc64-linux-gnu")
 -                        break
 -                    elif platform_ in ["ppc"]:
 -                        _add_directory(library_dirs, "/usr/lib/ppc-linux-gnu")
--                        _add_directory(
--                            library_dirs, "/usr/lib/powerpc-linux-gnu")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/powerpc-linux-gnu")
 -                        break
 -                    elif platform_ in ["s390x"]:
 -                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(
--                            library_dirs, "/usr/lib/s390x-linux-gnu")
+-                        _add_directory(library_dirs,
+-                                       "/usr/lib/s390x-linux-gnu")
 -                        break
 -                    elif platform_ in ["s390"]:
 -                        _add_directory(library_dirs, "/usr/lib/s390-linux-gnu")
@@ -70,35 +73,27 @@
 -                    raise ValueError(
 -                        "Unable to identify Linux platform: `%s`" % platform_)
 -
--            # XXX Kludge. Above /\ we brute force support multiarch. Here we
--            # try Barry's more general approach. Afterward, something should
--            # work ;-)
--            self.add_multiarch_paths()
+-                # XXX Kludge. Above /\ we brute force support multiarch. Here we
+-                # try Barry's more general approach. Afterward, something should
+-                # work ;-)
+-                self.add_multiarch_paths()
 -
          elif sys.platform.startswith("gnu"):
              self.add_multiarch_paths()
  
-@@ -349,12 +290,8 @@
-             if os.path.isfile(os.path.join(tcl_dir, "tk.h")):
-                 _add_directory(include_dirs, tcl_dir)
+@@ -379,13 +321,8 @@
  
--        # standard locations
--        _add_directory(library_dirs, "/usr/local/lib")
--        _add_directory(include_dirs, "/usr/local/include")
+         # standard locations
+         if not self.disable_platform_guessing:
+-            _add_directory(library_dirs, "/usr/local/lib")
+-            _add_directory(include_dirs, "/usr/local/include")
 -
--        _add_directory(library_dirs, "/usr/lib")
--        _add_directory(include_dirs, "/usr/include")
-+        _add_directory(library_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/lib")
-+        _add_directory(include_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/include")
+-            _add_directory(library_dirs, "/usr/lib")
+-            _add_directory(include_dirs, "/usr/include")
+-            # alpine, at least
+-            _add_directory(library_dirs, "/lib")
++            _add_directory(library_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/lib")
++            _add_directory(include_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/include")
  
          # on Windows, look for the OpenJPEG libraries in the location that
          # the official installer puts them
-@@ -541,8 +478,6 @@
-             defs.append(("HAVE_LIBTIFF", None))
-         if sys.platform == "win32":
-             libs.extend(["kernel32", "user32", "gdi32"])
--        if struct.unpack("h", "\0\1".encode('ascii'))[0] == 1:
--            defs.append(("WORDS_BIGENDIAN", None))
- 
-         exts = [(Extension(
-             "PIL._imaging", files, libraries=libs, define_macros=defs))]

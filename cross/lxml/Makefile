@@ -1,5 +1,5 @@
 PKG_NAME = lxml
-PKG_VERS = 3.5.0
+PKG_VERS = 3.7.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/l/$(PKG_NAME)
@@ -16,6 +16,5 @@ ADDITIONAL_CFLAGS = -I $(STAGING_INSTALL_PREFIX)/include/libxml2
 ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
 ADDITIONAL_CFLAGS += -O1
 endif
-#ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/libxml2
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk

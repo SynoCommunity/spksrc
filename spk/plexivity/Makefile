@@ -24,7 +24,6 @@ SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-COPY_TARGET = nop
 
 POST_STRIP_TARGET = plexivity_extra_install
 
@@ -39,15 +38,8 @@ plexivity_extra_install: $(STAGING_DIR)/share/plexivity
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
 
 $(STAGING_DIR)/share/plexivity:
 	install -m 755 -d $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
-	install -m 644 $(WORK_DIR)/wheelhouse/* $(STAGING_DIR)/share/wheelhouse/
 	cd $(STAGING_DIR)/share && git clone https://github.com/mutschler/plexivity.git plexivity 
 	cd $(STAGING_DIR)/share/plexivity && git checkout $(SPK_VERS) && rm -rf .git && rm .gitignore

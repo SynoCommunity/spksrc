@@ -1,5 +1,5 @@
 PKG_NAME = curl
-PKG_VERS = 7.47.1
+PKG_VERS = 7.52.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://curl.haxx.se/download
@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/zlib cross/openssl
 
 HOMEPAGE = http://curl.haxx.se
-COMMENT  = Compression Library
+COMMENT  = Command line tool and library for transferring data with URLs
 LICENSE  = http://curl.haxx.se/docs/copyright.html
 
 GNU_CONFIGURE = 1

@@ -11,5 +11,5 @@ HOMEPAGE = http://www.alsa-project.org/
 COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
 LICENSE  =
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.python-wheel.mk
 

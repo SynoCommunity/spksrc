@@ -1,5 +1,5 @@
 PKG_NAME = freetype
-PKG_VERS = 2.6.5
+PKG_VERS = 2.8
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.savannah.gnu.org/releases/freetype

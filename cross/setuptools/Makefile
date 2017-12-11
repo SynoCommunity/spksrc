@@ -1,6 +1,6 @@
 PKG_NAME = setuptools
-PKG_VERS = 19.1.1
-PKG_EXT = tar.gz
+PKG_VERS = 32.3.1
+PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/s/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)

@@ -1,6 +1,6 @@
 SPK_NAME = jackett
-SPK_VERS = 0.7.33
-SPK_REV = 1
+SPK_VERS = 0.7.1483
+SPK_REV = 4
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -13,6 +13,7 @@ ADMIN_PORT = 9117
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
+CHANGELOG = Updated to version 0.7.1483
 
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE  = GPLv2
@@ -40,9 +41,3 @@ jackett_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.config/Jackett
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

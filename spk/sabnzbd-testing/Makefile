@@ -1,12 +1,14 @@
 SPK_NAME = sabnzbd-testing
-SPK_VERS = 1.1.1RC2
-SPK_REV = 9
+SPK_VERS = 2.3.1
+SPK_REV = 39
 SPK_ICON = src/sabnzbd-testing.png
 DSM_UI_DIR = app
 BETA = 1
 
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
-SPK_DEPENDS = "python>=2.7.6-8"
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python>=2.7.9-12"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
@@ -15,7 +17,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8089
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd Testing
-CHANGELOG = "Updated to 1.1.1 RC2"
+CHANGELOG = "Updated SABnzbd to 2.3.1."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
@@ -47,8 +49,3 @@ sabnzbd-testing_extra_install:
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

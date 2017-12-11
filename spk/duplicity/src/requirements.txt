@@ -1,40 +1,50 @@
-# Cross compiled packages dependencies
-boto
-duplicity
-msgpack-python
-netifaces
-simplejson
-wrapt
+# Included for reference
+#duplicity==0.7.11
 
-# Downloaded dependencies
-Babel==1.3
-argparse==1.4.0
-debtcollector==0.5.0
-funcsigs==0.4
-futures==3.0.3
-ip-associations-python-novaclient-ext==0.1
-iso8601==0.1.10
-keyring==5.6
-lockfile==0.10.2
-mock==1.3.0
-netaddr==0.7.14
-os-diskconfig-python-novaclient-ext==0.1.2
-os-networksv2-python-novaclient-ext==0.25
-os-virtual-interfacesv2-python-novaclient-ext==0.19
-oslo.config==1.12.0
-oslo.i18n==1.7.0
-oslo.serialization==1.6.0
-oslo.utils==1.6.0
-pbr==1.0.1
+# Main requirements
+boto==2.45.0
+lockfile==0.12.2
+paramiko==2.1.1 # SCP
+pycryptopp==0.7.1.869544967005693312591928092448767568728501330214
+
+pyrax==1.9.8
+
+#pyrax dependencies
+appdirs==1.4.0
+Babel==2.3.4
+debtcollector==1.11.0
+funcsigs==1.0.2
+ip-associations-python-novaclient-ext==0.2
+iso8601==0.1.11
+keyring==10.2
+keystoneauth1==2.18.0
+mock==2.0.0
+monotonic==1.2
+netaddr==0.7.19
+netifaces==0.10.4 # Pinned to 0.10.4, 0.10.5 is broken for older Linux kernels
+os-diskconfig-python-novaclient-ext==0.1.3
+os-networksv2-python-novaclient-ext==0.26
+os-virtual-interfacesv2-python-novaclient-ext==0.20
+oslo.config==3.22.0
+oslo.i18n==3.12.0
+oslo.serialization==2.16.0
+oslo.utils==3.22.0
+packaging==16.8
+pbr==1.10.0
+positional==1.1.1
 prettytable==0.7.2
-pyrax==1.9.4
-python-keystoneclient==1.6.0
-python-novaclient==2.25.0
-python-swiftclient==2.3.1
-pytz==2015.4
+pyparsing==2.1.10
+python-keystoneclient==3.10.0
+python-novaclient==2.27.0
+pytz==2016.10
 rackspace-auth-openstack==1.3
-rackspace-novaclient==1.5
-rax-default-network-flags-python-novaclient-ext==0.3.2
+rackspace-novaclient==2.1
+rax-default-network-flags-python-novaclient-ext==0.4.0
 rax-scheduled-images-python-novaclient-ext==0.3.1
-requests==2.7.0
-stevedore==1.5.0
+requests==2.13.0
+rfc3986==0.4.1
+SecretStorage==2.3.1
+simplejson==3.10.0
+six==1.10.0
+stevedore==1.20.0
+wrapt==1.10.8

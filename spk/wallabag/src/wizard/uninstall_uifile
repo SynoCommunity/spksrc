@@ -1,0 +1,37 @@
+[
+   {
+      "step_title":"Remove wallabag database",
+      "items":[
+         {
+            "desc":"Attention: The wallabag database will be removed during package uninstallation. All entries will be deleted."
+         },
+         {
+            "type":"password",
+            "desc":"Enter your MySQL password",
+            "subitems":[
+               {
+                  "key":"wizard_mysql_password_root",
+                  "desc":"Root password"
+               }
+            ]
+         },
+         {
+            "type":"textfield",
+            "desc":"Optional: Provide directory for database export. Leave blank to skip export. The directory will be created if it does not exist",
+            "subitems":[
+               {
+                  "key":"wizard_dbexport_path",
+                  "desc":"Database export location",
+                  "validator":{
+                     "allowBlank":true,
+                     "regex":{
+                        "expr":"/^\\\/volume[0-9]+\\\//",
+                        "errorText":"Path should begin with /volume?/ with ? the number of the volume"
+                     }
+                  }
+               }
+            ]
+         }
+      ]
+   }
+]

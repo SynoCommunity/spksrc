@@ -1,5 +1,5 @@
 PKG_NAME = uwsgi
-PKG_VERS = 2.0.12
+PKG_VERS = 2.0.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/u/uWSGI

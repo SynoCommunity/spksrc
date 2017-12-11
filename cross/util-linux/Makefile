@@ -1,9 +1,8 @@
 PKG_NAME = util-linux
-PKG_SHORT_VERS = 2.26
-PKG_VERS = $(PKG_SHORT_VERS).2
+PKG_VERS = 2.29
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/util-linux/v$(PKG_SHORT_VERS)
+PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/$(PKG_NAME)/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

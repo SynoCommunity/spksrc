@@ -9,12 +9,17 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="syncthing"
 SYNCTHING="${INSTALL_DIR}/bin/syncthing"
-CONFIG_DIR="${INSTALL_DIR}/var/"
+CONFIG_DIR="${INSTALL_DIR}/var"
+SYNCTHING_OPTIONS="-home=${CONFIG_DIR}"
 
+# Read additional startup options from /usr/local/syncthing/var/options.conf
+if [ -f ${CONFIG_DIR}/options.conf ]; then
+	source ${CONFIG_DIR}/options.conf
+fi
 
 start_daemon ()
 {
-    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- --home ${CONFIG_DIR}
+    start-stop-daemon -b -o -c ${USER} -S -u ${USER} -k 002 -x env HOME=${CONFIG_DIR} ${SYNCTHING} -- ${SYNCTHING_OPTIONS}
 }
 
 stop_daemon ()
@@ -25,7 +30,7 @@ stop_daemon ()
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER}
+    start-stop-daemon -K -q -t -u ${USER} -x ${SYNCTHING}
     [ $? -eq 0 ] || return 1
 }
 

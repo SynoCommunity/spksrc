@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.radarr": {
+            "title": "Radarr",
+            "desc": "Radarr Web UI",
+            "icon": "images/radarr-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8310",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

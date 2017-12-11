@@ -15,7 +15,7 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Pip command
 PIP ?= pip
-PIP_WHEEL = $(RUN) $(PIP) wheel --no-use-wheel --no-deps --wheel-dir $(STAGING_DIR)/wheelhouse
+PIP_WHEEL = $(PIP) wheel --no-binary :all: --no-deps --requirement $(WORK_DIR)/wheelhouse/requirements.txt --wheel-dir $(WORK_DIR)/wheelhouse --build-dir $(WORK_DIR)/wheelbuild
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
@@ -38,7 +38,7 @@ ARM7_ARCHES = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco
 ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES)
 PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
-x64_ARCHES = avoton braswell bromolow cedarview x86 x64
+x64_ARCHES = avoton braswell broadwell bromolow cedarview dockerx64 grantley kvm64 x86 x64 x86_64
 
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk

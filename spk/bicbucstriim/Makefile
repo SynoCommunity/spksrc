@@ -14,7 +14,7 @@ STARTABLE = no
 DISPLAY_NAME = BicBucStriim
 CHANGELOG = Update to 1.3.6
 
-HOMEPAGE   = http://rvolz.github.com/BicBucStriim/
+HOMEPAGE   = http://projekte.textmulch.de/bicbucstriim
 LICENSE    = MIT
 
 INSTALLER_SCRIPT = src/installer.sh
@@ -37,8 +37,3 @@ include ../../mk/spksrc.spk.mk
 bicbucstriim_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done

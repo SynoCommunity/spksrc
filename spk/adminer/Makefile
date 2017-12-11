@@ -1,6 +1,6 @@
 SPK_NAME = adminer
-SPK_VERS = 4.2.4
-SPK_REV = 1
+SPK_VERS = 4.2.5
+SPK_REV = 2
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet di
 ADMIN_URL = /adminer/
 RELOAD_UI = yes
 DISPLAY_NAME = Adminer
-CHANGELOG = Initial release of Adminer 4.2.4
+CHANGELOG = Update to 4.2.5
 
 HOMEPAGE   = https://www.adminer.org
 LICENSE    = Apache License 2.0 or GPL 2
@@ -37,8 +37,3 @@ include ../../mk/spksrc.spk.mk
 adminer_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	for size in 16 24 32 48 72; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-			$(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
