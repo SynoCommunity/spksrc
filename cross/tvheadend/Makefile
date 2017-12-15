@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = cross/openssl cross/libhdhomerun cross/uriparser cross/libdvbcsa
-DEPENDS += cross/dvb-apps cross/pcre2 cross/ffmpeg
+DEPENDS += cross/pcre2 cross/ffmpeg
 
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.

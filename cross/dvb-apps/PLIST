@@ -1,6 +1,0 @@
-lib:lib/libdvbapi.so
-lib:lib/libdvbcfg.so
-lib:lib/libdvben50221.so
-lib:lib/libdvbsec.so
-lib:lib/libesg.so
-lib:lib/libucsi.so
