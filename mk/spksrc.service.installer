@@ -88,12 +88,13 @@ syno_remove_user ()
     fi
 }
 
-# Create syno group $GROUP with $USER as member
+# Create syno group $GROUP with parameter user as member
 syno_group_create ()
 {
+    EFF_USER=$1
     echo "Creating group ${GROUP}" >> ${INST_LOG}
     # Create syno group
-    synogroup --add "${GROUP}" "${USER}" >> ${INST_LOG}
+    synogroup --add "${GROUP}" "${EFF_USER}" >> ${INST_LOG}
     # Set description of the syno group
     synogroup --descset "${GROUP}" "${GROUP_DESC}" >> ${INST_LOG}
 }
@@ -161,11 +162,13 @@ postinst ()
         servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
     fi
 
+    EFF_USER="${PRIV_PREFIX}${USER}"
     # DSM 5 specific operations
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        # Create "normal" user
-        if ! cat /etc/passwd | grep "${USER}:x:" &> /dev/null; then
-            synouser --add "$USER" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
+        EFF_USER="${SYNOUSER_PREFIX}${USER}"
+        # Create prefixed synouser
+        if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
+            synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
         fi
     fi
 
@@ -174,16 +177,16 @@ postinst ()
         # Check if group already exists
         if ! synogroup --get "$GROUP" &> /dev/null; then
             # Group does not exist yet: create with user as member
-            syno_group_create
+            syno_group_create "${EFF_USER}"
         fi
         if synogroup --get "$GROUP" &> /dev/null; then
             # Check user already in group
-            if ! synogroup --get "$GROUP" | grep '^[0-9]:\[$USER\]' &> /dev/null; then
+            if ! synogroup --get "$GROUP" | grep '^[0-9]:\[${EFF_USER}\]' &> /dev/null; then
                 # Add user, not in group yet
                 MEMBERS="$(synogroup --get $GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
                 # The "synogroup --member" command clears all users before adding new ones
                 # so all the users must be listed on the command line
-                synogroup --member "$GROUP" $MEMBERS "$USER" >> ${INST_LOG}
+                synogroup --member "$GROUP" $MEMBERS "${EFF_USER}" >> ${INST_LOG}
             fi
         fi
         # Not sure but invoked with hope DSM is updated
@@ -201,19 +204,15 @@ postinst ()
 
         # Add user/group permissions depending if GROUP is set in UI
         if [ -n "$GROUP" ]; then
-            synoshare --setuser "${SHARE_NAME}" RW + "${USER}",@"${GROUP}" >> ${INST_LOG} 2>&1
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}",@"${GROUP}" >> ${INST_LOG} 2>&1
         else
-            synoshare --setuser "${SHARE_NAME}" RW + "${USER}" >> ${INST_LOG} 2>&1
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" >> ${INST_LOG} 2>&1
         fi
         synoshare --build
 
         $MKDIR "${SHARE_PATH}"
         # Permissions
         set_syno_permissions "${SHARE_PATH}"
-        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-            chgrp users "${SHARE_PATH}"
-            chmod g+rw "${SHARE_PATH}"
-        fi
     fi
 
     call_func "service_postinst"
@@ -222,7 +221,13 @@ postinst ()
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
     fi
-    chown -R ${USER}:root "${SYNOPKG_PKGDEST}" >> $INST_LOG 2>&1
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        # On DSM 5 set package files permissions
+        chown -R ${EFF_USER}:root "${SYNOPKG_PKGDEST}" >> $INST_LOG 2>&1
+    else
+        # On DSM 6 only var is concerned
+        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> $INST_LOG 2>&1
+    fi
     exit 0
 }
 
@@ -256,7 +261,7 @@ postuninst ()
         fi
         # On DSM 5, remove user if still exists
         if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-            syno_remove_user "${USER}"
+            syno_remove_user "${SYNOUSER_PREFIX}${USER}"
         fi
     fi
 
@@ -277,6 +282,11 @@ preupgrade ()
     $MKDIR "$TMP_DIR" >> ${INST_LOG}
 
     call_func "service_save"
+
+    # On DSM 6, remove syno user if still exists
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -ge 6 ]; then
+        syno_remove_user "${SYNOUSER_PREFIX}${USER}"
+    fi
 
     $MV "${TO_SAVE_DIR}/*" "$TMP_DIR" >> ${INST_LOG}
     exit 0
