@@ -1,6 +1,6 @@
 SPK_NAME = mono
-SPK_VERS = 4.6.2.7
-SPK_REV = 8
+SPK_VERS = 5.4.1.6
+SPK_REV = 9
 SPK_ICON = src/mono.png
 BETA = 1
 
@@ -10,7 +10,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "Update to 4.6.2.7"
+CHANGELOG = "Update to 5.4.1.6 (Release)"
 
 HOMEPAGE = http://mono-project.com
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
@@ -21,6 +21,7 @@ SSS_SCRIPT       = src/dsm-control.sh
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = mono_extra_install
+PRE_COPY_TARGET = mono_pre_copy
 
 BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
@@ -37,3 +38,9 @@ mono_extra_install:
 	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/etc/mono $(STAGING_DIR)/etc/
 	install -m 755 -d $(STAGING_DIR)/bin
 	cp -nR $(MONO_NATIVE_INSTALL)/usr/local/bin $(STAGING_DIR)/
+
+.PHONY: mono_pre_copy
+mono_pre_copy: $(INSTALL_PLIST)
+	# remove boehm GC references from PLIST if it isn't available on the platform (e.g. rtd1296)
+	test -f $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/mono-boehm || sed -i -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d' $(INSTALL_PLIST)
+
