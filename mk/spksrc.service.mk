@@ -68,8 +68,10 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	$(create_target_dir)
 	@echo "### Package specific variables and functions" >> $@
 ifneq ($(strip $(SPK_USER)),)
-	@echo "# Service USER to run background process" >> $@
+	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
 	@echo USER=\"$(SPK_USER)\" >> $@
+	@echo "PRIV_PREFIX=sc-" >> $@
+	@echo "SYNOUSER_PREFIX=svc-" >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo "# Group name from UI if provided" >> $@
@@ -125,11 +127,11 @@ endif
 endif
 
 
-# Generate privilege file for service user
+# Generate privilege file for service user (prefixed to avoid collision with busybox account)
 ifneq ($(strip $(SPK_USER)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
 	$(create_target_dir)
-	@sed 's|USER|$(SPK_USER)|' $< > $@
+	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
 	$(eval SPK_CONTENT += conf)
 
 SERVICE_FILES += $(DSM_CONF_DIR)/privilege

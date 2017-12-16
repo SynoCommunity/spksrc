@@ -26,9 +26,9 @@ start_daemon ()
                 SERVICE_SHELL=/bin/sh
             fi
             if [ -z "${SVC_NO_REDIRECT}" ]; then
-                su ${USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}" >> ${LOG_FILE} 2>&1
+                su ${SYNOUSER_PREFIX}${USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}" >> ${LOG_FILE} 2>&1
             else
-                su ${USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}"
+                su ${SYNOUSER_PREFIX}${USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}"
             fi
         else
             # DSM 6 user is set by conf/privilege
