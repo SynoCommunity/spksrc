@@ -7,16 +7,20 @@ DNAME="Redis"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="redis"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 REDIS="${INSTALL_DIR}/bin/redis-server"
 LOG_FILE="${INSTALL_DIR}/var/redis.log"
 PID_FILE="${INSTALL_DIR}/var/redis.pid"
 CFG_FILE="${INSTALL_DIR}/var/redis.conf"
 
+SC_USER="sc-redis"
+LEGACY_USER="redis"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su ${USER} -c "${REDIS} ${CFG_FILE}"
+    su ${USER} -s /bin/sh -c "${REDIS} ${CFG_FILE}"
 }
 
 stop_daemon ()

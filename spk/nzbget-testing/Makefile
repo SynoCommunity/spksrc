@@ -1,6 +1,6 @@
 SPK_NAME = nzbget-testing
-SPK_VERS = 16.0~r1439
-SPK_REV = 11
+SPK_VERS = 18.0~r1858
+SPK_REV = 12
 SPK_ICON = src/nzbget-testing.png
 DSM_UI_DIR = app
 
@@ -13,17 +13,17 @@ DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ 
 RELOAD_UI = yes
 ADMIN_PORT = 9876
 DISPLAY_NAME = NZBGet Testing
-CHANGELOG = "1. Update to 16.0~r1439<br>2. Security fix for p7zip"
+CHANGELOG = "1. Update to 18.0~r1858<br>2. Add DSM6 support"
 BETA = 1
 
 HOMEPAGE = http://nzbget.net
 LICENSE  = GPLv2
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

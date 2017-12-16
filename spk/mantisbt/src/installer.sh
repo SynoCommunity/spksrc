@@ -8,13 +8,15 @@ PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
-PHP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
-MYSQL="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
-MYSQLDUMP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+
+USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+PHP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
+MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
+MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="mantisbt"
 MYSQL_DATABASE="mantisbt"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()

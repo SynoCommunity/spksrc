@@ -7,7 +7,7 @@ DNAME="Jackett"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="${PACKAGE}"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 USER_HOME="$(eval echo ~$USER)"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
@@ -16,6 +16,11 @@ COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO
 HOME_DIR="${INSTALL_DIR}/var"
 PID_FILE="${USER_HOME}/jackett.pid"
 LOG_FILE="${USER_HOME}/.config/Jackett/log.txt"
+
+SC_USER="sc-jackett"
+LEGACY_USER="jackett"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {

@@ -3,4 +3,9 @@
     "items": [{
         "desc": "Keep Radarr up-to-date by using Radarr's built-in updater.<br><br>Navigate to System>Updates in the Radarr UI."
     }]
+}, {
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+        "desc": "Permissions are managed with the group 'sc-media' in DSM."
+    }]
 }]

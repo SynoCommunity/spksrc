@@ -33,9 +33,6 @@ postinst ()
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/env/bin/rdiff-backup /usr/local/bin/rdiff-backup
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-
     exit 0
 }
 
@@ -49,6 +46,7 @@ postuninst ()
     # Remove link
     rm -f ${INSTALL_DIR}
     rm -f /usr/local/bin/rdiff-backup
+
     exit 0
 }
 

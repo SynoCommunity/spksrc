@@ -8,12 +8,16 @@ DNAME="SaltPad"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="saltpad"
-GROUP="nobody"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 UWSGI="${PYTHON_DIR}/bin/uwsgi"
 PID_FILE="${INSTALL_DIR}/var/saltpad.pid"
 LOG_FILE="${INSTALL_DIR}/var/uwsgi.log"
+
+SC_USER="sc-saltpad"
+LEGACY_USER="saltpad"
+GROUP="nobody"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()

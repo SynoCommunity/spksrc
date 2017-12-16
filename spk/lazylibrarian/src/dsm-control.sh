@@ -9,17 +9,21 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="lazylibrarian"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 LAZYLIBRARIAN="${INSTALL_DIR}/share/LazyLibrarian/LazyLibrarian.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/lazylibrarian.pid"
 LOG_FILE="${INSTALL_DIR}/var/Logs/lazylibrarian.log"
 
+SC_USER="sc-lazylibrarian"
+LEGACY_USER="lazylibrarian"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${LAZYLIBRARIAN} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${LAZYLIBRARIAN} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()

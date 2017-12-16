@@ -20,7 +20,8 @@ LICENSE  = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/$(SPK_NAME).sc
+FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

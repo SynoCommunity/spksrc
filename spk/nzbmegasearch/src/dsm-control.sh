@@ -9,16 +9,20 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="nzbmegasearch"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 NZBMEGASEARCH="${INSTALL_DIR}/share/NZBmegasearch/mega2.py"
 PID_FILE="${INSTALL_DIR}/var/nzbmegasearch.pid"
 LOG_FILE="${INSTALL_DIR}/share/NZBmegasearch/logs/nzbmegasearch.log"
 
+SC_USER="sc-nzbmegasearch"
+LEGACY_USER="nzbmegasearch"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${NZBMEGASEARCH} daemon"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${NZBMEGASEARCH} daemon"
     sleep 1
     ps w | grep [${INSTALL_DIR}]/share/NZBmegasearch/mega2.py | awk '{print $1}' > ${PID_FILE}
 }

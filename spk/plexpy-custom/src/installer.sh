@@ -10,19 +10,24 @@ SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="plexpy-custom"
-GROUP="nobody"
 GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 SERVICETOOL="/usr/syno/bin/servicetool"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+
+DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+SC_USER="sc-plexpy-custom"
+LEGACY_USER="plexpy-custom"
+LEGACY_GROUP="users"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/JonnyWong16/plexpy/plxpy.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/JonnyWong16/plexpy/plexpy.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -43,8 +48,10 @@ postinst ()
         ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/JonnyWong16/plexpy.git} ${INSTALL_DIR}/var/plexpy > /dev/null 2>&1
     fi
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${GROUP} -s /bin/sh -S -D ${USER}
+    # Create legacy user
+    if [ "${BUILDNUMBER}" -lt "7321" ]; then
+        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+    fi
 
     # Add firewall config
     ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
@@ -61,13 +68,12 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove the user if uninstalling
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        # Remove the user (if not upgrading)
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
-    fi
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall configuration
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
@@ -86,6 +92,13 @@ preupgrade ()
 {
     # Stop the package
     ${SSS} stop > /dev/null
+
+    # DSM6 Upgrade handling
+    if [ "${BUILDNUMBER}" -ge "7321" ] && [ ! -f ${DSM6_UPGRADE} ]; then
+        echo "Deleting legacy user" > ${DSM6_UPGRADE}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${LEGACY_USER}
+    fi
 
     # Save config & database
     rm -fr ${TMP_DIR}/${PACKAGE}
