@@ -21,11 +21,10 @@ HOMEPAGE     = https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 LICENSE      = MPL/GPL/LGPL
 HELPURL      = https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Server-1.5
 
-WIZARDS_DIR      = src/wizard/
-CONF_DIR         = src/conf/
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_DEP_SERVICES = mysql
 START_DEP_SERVICES = mysql

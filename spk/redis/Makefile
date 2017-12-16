@@ -16,6 +16,7 @@ LICENSE  = 3-clause BSD
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+CONF_DIR         = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

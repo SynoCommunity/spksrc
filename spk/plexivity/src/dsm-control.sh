@@ -8,17 +8,21 @@ DNAME="plexivity"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="plexivity"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 PLEXIVITY="${INSTALL_DIR}/share/plexivity/plexivity.py"
 DATA_DIR="${INSTALL_DIR}/var/"
 PID_FILE="${INSTALL_DIR}/var/plexivity.pid"
 LOG_FILE="${INSTALL_DIR}/var/plexivity.log"
 
+SC_USER="sc-plexivity"
+LEGACY_USER="plexivity"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su ${USER} -c "PATH=${PATH} PLEXIVITY_DATA=${DATA_DIR} ${PYTHON} ${PLEXIVITY} --daemon"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} PLEXIVITY_DATA=${DATA_DIR} ${PYTHON} ${PLEXIVITY} --daemon"
 }
 
 stop_daemon ()

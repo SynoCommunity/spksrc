@@ -30,15 +30,16 @@ LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 
 # Use x64 when kernels are not needed
 ARCHS_NO_KRNLSUPP = $(filter-out x64%, $(SUPPORTED_ARCHS))
-ARCHS_DUPES = $(filter-out x86% braswell% bromolow% cedarview% avoton%, $(SUPPORTED_ARCHS))
+ARCHS_DUPES = $(filter-out avoton% braswell% broadwell% bromolow% cedarview% grantley% x86%, $(SUPPORTED_ARCHS))
 
 # Available Arches
 ARM5_ARCHES = 88f5281 88f6281
 ARM7_ARCHES = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco
-ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES)
+ARM8_ARCHES = rtd1296
+ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES) $(ARM8_ARCHES)
 PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
-x64_ARCHES = avoton braswell broadwell bromolow cedarview dockerx64 grantley kvm64 x86 x64 x86_64
+x64_ARCHES = apollolake avoton braswell broadwell bromolow cedarview denverton dockerx64 grantley kvm64 x86 x64 x86_64
 
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk

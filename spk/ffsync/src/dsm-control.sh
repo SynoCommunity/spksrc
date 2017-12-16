@@ -7,12 +7,16 @@ DNAME="Firefox Sync Server 1.5"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="ffsync"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 PSERVE="${INSTALL_DIR}/env/bin/pserve"
-
 INI_FILE="${INSTALL_DIR}/var/ffsync.ini"
 PID_FILE="${INSTALL_DIR}/var/ffsync.pid"
 LOG_FILE="${INSTALL_DIR}/var/pserve.log"
+
+SC_USER="sc-ffsync"
+LEGACY_USER="ffsync"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {

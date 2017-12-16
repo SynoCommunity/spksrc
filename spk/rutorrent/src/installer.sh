@@ -10,39 +10,62 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
-USER="rutorrent"
-GROUP="users"
 APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-
 SERVICETOOL="/usr/syno/bin/servicetool"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 
-SYNO_GROUP="sc-download"
-SYNO_GROUP_DESC="SynoCommunity's download related group"
+DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+SC_USER="sc-rutorrent"
+SC_GROUP="sc-download"
+SC_GROUP_DESC="SynoCommunity's download related group"
+LEGACY_USER="rutorrent"
+LEGACY_GROUP="users"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 syno_group_create ()
 {
-    # Create syno group (Does nothing when group already exists)
-    synogroup --add ${SYNO_GROUP} ${USER} > /dev/null
+    # Create syno group
+    synogroup --add ${SC_GROUP} ${USER} > /dev/null
     # Set description of the syno group
-    synogroup --descset ${SYNO_GROUP} "${SYNO_GROUP_DESC}"
-
-    # Add user to syno group (Does nothing when user already in the group)
-    addgroup ${USER} ${SYNO_GROUP}
+    synogroup --descset ${SC_GROUP} "${SC_GROUP_DESC}"
+    # Add user to syno group
+    addgroup ${USER} ${SC_GROUP}
 }
 
 syno_group_remove ()
 {
     # Remove user from syno group
-    delgroup ${USER} ${SYNO_GROUP}
+    delgroup ${USER} ${SC_GROUP}
 
     # Check if syno group is empty
-    if ! synogroup --get ${SYNO_GROUP} | grep -q "0:"; then
+    if ! synogroup --get ${SC_GROUP} | grep -q "0:"; then
         # Remove syno group
-        synogroup --del ${SYNO_GROUP} > /dev/null
+        synogroup --del ${SC_GROUP} > /dev/null
     fi
 }
+
+set_syno_permissions ()
+{
+    # Sets recursive permissions for ${SC_GROUP} on specified directory
+    # Usage: set_syno_permissions "${wizard_download_dir}"
+    DIRNAME=$1
+    VOLUME=`echo $1 | awk -F/ '{print "/"$2}'`
+    # Set read/write permissions for SC_GROUP on target directory
+    if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--"`" ]; then
+        synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--" > /dev/null 2>&1
+    fi
+    # Walk up the tree and set traverse permissions up to VOLUME
+    DIRNAME="$(dirname "${DIRNAME}")"
+    while [ "${DIRNAME}" != "${VOLUME}" ]; do
+        if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:..x"`" ]; then
+            synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:--x----------:---n" > /dev/null 2>&1
+        fi
+        DIRNAME="$(dirname "${DIRNAME}")"
+    done
+}
+
 
 preinst ()
 {
@@ -78,8 +101,12 @@ postinst ()
         echo -e "[PATH=${WEB_DIR}/${PACKAGE}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
     fi
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${APACHE_USER} -s /bin/sh -S -D ${USER}
+    # Create legacy user
+    if [ "${BUILDNUMBER}" -lt "7321" ]; then
+        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+    fi
+
+    syno_group_create
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -106,33 +133,14 @@ postinst ()
             sed -i -e "s|^open_basedir.*|open_basedir = none|g" /etc/php/conf.d/user-settings.ini
             initctl restart php-fpm > /dev/null 2>&1
         fi
-
-        # Set directories permissions for DSM5
-        if [ `/bin/get_key_value /etc.defaults/VERSION buildnumber` -ge "4418" ]; then
-
-            # Allow root traversal
-            SHARE_DIR=`echo ${wizard_download_dir:=/volume1/downloads} | awk -F/ '{print "/"$2"/"$3}'`
-            if [ ! "`synoacltool -get $SHARE_DIR | grep \"group:http:allow:..x\"`" ]; then
-                synoacltool -add $SHARE_DIR group:http:allow:--x----------:---n &> /dev/null
-            fi
-
-            if [ "`synoacltool -get ${wizard_download_dir:=/volume1/downloads} | grep \"group:http\"`" ]; then
-                synoacltool -replace ${wizard_download_dir:=/volume1/downloads} `synoacltool -get ${wizard_download_dir:=/volume1/downloads} | grep "group:http" | awk 'BEGIN { OFS=" "; } { gsub(/[^[:alnum:]]/, "", $1); print $1;}' | head -1` group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
-            else
-                synoacltool -add ${wizard_download_dir:=/volume1/downloads} group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
-            fi
-
+        # Permissions handling
+        if [ "${BUILDNUMBER}" -ge "4418" ]; then
+            set_syno_permissions "${wizard_download_dir:=/volume1/downloads}"
             if [ -d "${wizard_watch_dir}" ]; then
-                if [ "`synoacltool -get ${wizard_watch_dir} | grep \"group:http\"`" ]; then
-                    synoacltool -replace ${wizard_watch_dir} `synoacltool -get ${wizard_watch_dir} | grep "group:http" | awk 'BEGIN { OFS=" "; } { gsub(/[^[:alnum:]]/, "", $1); print $1;}' | head -1` group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
-                else
-                    synoacltool -add ${wizard_watch_dir} group:http:allow:rwxpdDaARWc--:fd-- &> /dev/null
-                fi
+                set_syno_permissions "${wizard_watch_dir}"
             fi
         fi
     fi
-
-    syno_group_create
 
     # Correct the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
@@ -150,16 +158,13 @@ preuninst ()
     # Stop the package
     ${SSS} stop > /dev/null
 
-    # Remove the user (if not upgrading)
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        # Remove the user (if not upgrading)
         syno_group_remove
-
-        delgroup ${USER} ${APACHE_USER}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
-    fi
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall configuration
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
@@ -186,6 +191,13 @@ preupgrade ()
     # Stop the package
     ${SSS} stop > /dev/null
 
+    # DSM6 Upgrade handling
+    if [ "${BUILDNUMBER}" -ge "7321" ] && [ ! -f ${DSM6_UPGRADE} ]; then
+        echo "Deleting legacy user" > ${DSM6_UPGRADE}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${LEGACY_USER}
+    fi
+
     # Revision 8 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
         sed -i -e "s|http_cacert = .*|http_cacert = ${INSTALL_DIR}/cert.pem|g" ${INSTALL_DIR}/var/.rtorrent.rc
@@ -210,6 +222,9 @@ postupgrade ()
     mv ${TMP_DIR}/${PACKAGE}/.rtorrent.rc ${INSTALL_DIR}/var/
     mv ${TMP_DIR}/${PACKAGE}/.session ${INSTALL_DIR}/var/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Ensure file ownership is correct after upgrade
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }

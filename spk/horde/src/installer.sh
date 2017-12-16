@@ -9,12 +9,14 @@ PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
-MYSQL="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
-MYSQLDUMP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+
+USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
+MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="horde"
 MYSQL_DATABASE="horde"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
 
 preinst ()

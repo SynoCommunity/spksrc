@@ -17,10 +17,9 @@ RELOAD_UI = yes
 HOMEPAGE = http://git-scm.com/
 LICENSE  =
 
-WIZARDS_DIR = src/wizard
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+CONF_DIR         = src/conf/
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web

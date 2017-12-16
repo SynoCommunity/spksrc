@@ -18,11 +18,11 @@ CHANGELOG = "1. Update Transmission to 2.92<br>2. Enable sc-download group"
 HOMEPAGE = http://www.transmissionbt.com
 LICENSE  = GPLv2/GPLv3
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

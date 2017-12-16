@@ -8,22 +8,26 @@ DNAME="FlexGet"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="flexget"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FLEXGET="${INSTALL_DIR}/env/bin/flexget"
 CFG_FILE="${INSTALL_DIR}/var/config.yml"
 PID_FILE="${INSTALL_DIR}/var/.config-lock"
 LOG_FILE="${INSTALL_DIR}/var/flexget.log"
 
+SC_USER="sc-flexget"
+LEGACY_USER="flexget"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su ${USER} -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon start -d"
+    su ${USER} -s /bin/sh -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon start -d"
 }
 
 stop_daemon ()
 {
-    su ${USER} -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon stop"
+    su ${USER} -s /bin/sh -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon stop"
 }
 
 daemon_status ()

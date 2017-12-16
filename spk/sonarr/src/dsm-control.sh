@@ -7,14 +7,18 @@ DNAME="Sonarr"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="${PACKAGE}"
-USER_HOME="$(eval echo ~$USER)"
-PID_FILE="${USER_HOME}/.config/NzbDrone/nzbdrone.pid"
-INSTALL_LOG="${INSTALL_DIR}/var/install.log"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+PID_FILE="${INSTALL_DIR}/.config/NzbDrone/nzbdrone.pid"
+INSTALL_LOG="${INSTALL_DIR}/.config/install.log"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 SONARR="${INSTALL_DIR}/share/NzbDrone/NzbDrone.exe"
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} -- --debug ${SONARR}"
+
+SC_USER="sc-sonarr"
+LEGACY_USER="nzbdrone"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
