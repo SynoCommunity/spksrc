@@ -35,8 +35,10 @@ else
 $(PRE_SERVICE_TARGET): service_msg_target
 endif
 
-.PHONY: service_target service_msg_target $(DSM_SCRIPTS_DIR)/service-setup
+.PHONY: service_target service_msg_target
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
+.PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
+.PHONY: $(DSM_CONF_DIR)/privilege $(DSM_CONF_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
 
 service_msg_target:
 	@$(MSG) "Generating service scripts for $(NAME)"
@@ -66,7 +68,7 @@ SERVICE_FILES =
 # Generate service-setup from SERVICE variables
 $(DSM_SCRIPTS_DIR)/service-setup:
 	$(create_target_dir)
-	@echo "### Package specific variables and functions" >> $@
+	@echo "### Package specific variables and functions" > $@
 ifneq ($(strip $(SPK_USER)),)
 	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
 	@echo USER=\"$(SPK_USER)\" >> $@
@@ -143,7 +145,7 @@ ifeq ($(strip $(FWPORTS)),)
 ifneq ($(strip $(SERVICE_PORT)),)
 $(DSM_CONF_DIR)/$(SPK_NAME).sc:
 	$(create_target_dir)
-	@echo "[$(SPK_NAME)]" >> $@
+	@echo "[$(SPK_NAME)]" > $@
 ifneq ($(strip $(SERVICE_PORT_TITLE)),)
 	@echo "title=\"$(SERVICE_PORT_TITLE)\"" >> $@
 else
@@ -186,7 +188,7 @@ endif
 
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
-	@echo '{ ".url": { ' >> $@
+	@echo '{ ".url": { ' > $@
 	@echo "  \"com.synocommunity.packages.${SPK_NAME}\": {" >> $@
 	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
 	@echo "    \"desc\": \"${DESCRIPTION}\"," >> $@

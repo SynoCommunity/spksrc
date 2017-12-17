@@ -1,6 +1,6 @@
 SPK_NAME = mosquitto
 SPK_VERS = 1.4.14
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/mosquitto.png
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
