@@ -16,9 +16,6 @@ CHANGELOG = "Update to 2.5.1<br>2. Remove beta tag"
 HOMEPAGE   = http://www.nano-editor.org
 LICENSE    = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

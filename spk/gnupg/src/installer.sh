@@ -21,9 +21,6 @@ postinst ()
     mkdir -p /usr/local/bin
     ln -s ${INSTALL_DIR}/bin/gpg-agent /usr/local/bin/gpg-agent
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-
     exit 0
 }
 
@@ -37,6 +34,7 @@ postuninst ()
     # Remove link
     rm -f ${INSTALL_DIR}
     rm -f /usr/local/bin/gpg-agent
+
     exit 0
 }
 

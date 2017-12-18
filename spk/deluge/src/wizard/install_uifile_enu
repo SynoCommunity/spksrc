@@ -49,4 +49,9 @@
     "items": [{
         "desc": "The default password for the web interface is 'deluge'.<br><br>Remote access is disabled by default. To allow clients to remotely connect to the daemon, see the ThinClient guide on the Deluge website"
     }]
+}, {
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+    "desc": "Permissions are managed with the group 'sc-download' in DSM.<br><br>During package installation, this group will be added with correct permissions to the chosen directory(s)."
+    }]
 }]

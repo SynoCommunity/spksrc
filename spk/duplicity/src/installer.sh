@@ -31,9 +31,6 @@ postinst ()
     ln -s ${INSTALL_DIR}/env/bin/duplicity /usr/local/bin/duplicity
     ln -s ${INSTALL_DIR}/share/duply/duply /usr/local/bin/duply
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-
     exit 0
 }
 

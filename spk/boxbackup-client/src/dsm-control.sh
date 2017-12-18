@@ -16,7 +16,7 @@ PID_FILE="${INSTALL_DIR}/var/run/bbackupd.pid"
 start_daemon ()
 {
     if [ -f ${CFG_FILE} ]; then
-        su - ${USER} -c "${BBACKUPD} -c ${CFG_FILE}"
+        su ${USER} -s /bin/sh -c "${BBACKUPD} -c ${CFG_FILE}"
     else
         echo "Use /usr/local/boxbackup-client/sbin/syno-bbackupd-config to configure Box Backup Client" >&2
     fi

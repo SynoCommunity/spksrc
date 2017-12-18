@@ -20,11 +20,10 @@ HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
 HELPURL    = http://synocommunity.com/help/haproxy
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

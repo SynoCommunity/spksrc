@@ -23,6 +23,11 @@ LOG_FILE_STDERR="${HOME_DIR}/${PACKAGE}-stderr.log"
 PID_FILE="${HOME_DIR}/${PACKAGE}.pid"
 COMMAND="env HOME=${HOME_DIR} PATH=${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} --debug ${JACKETT} --PIDFile ${PID_FILE}"
 
+SC_USER="sc-jackett"
+LEGACY_USER="jackett"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
+
 start_daemon ()
 {
     start-stop-daemon -S -u ${USER} -c ${USER} -b -p ${PID_FILE} -a /bin/sh -- -c "${COMMAND} 2>${LOG_FILE_STDERR} | logger --id ${PACKAGE}"

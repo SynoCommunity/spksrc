@@ -58,4 +58,9 @@
             "defaultValue": true
         }]
     }]
+}, {
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+    "desc": "Permissions are managed with the group 'sc-download' in DSM.<br><br>During package installation, this group will be added with correct permissions to the chosen directory(s)."
+    }]
 }]

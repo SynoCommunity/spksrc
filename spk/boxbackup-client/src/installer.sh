@@ -20,9 +20,6 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Correct the files ownership
-    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
-
     # Configuration message
     echo "You need to manually configure Box Backup Client before running the package. To do so, connect to SSH and use /usr/local/boxbackup-client/sbin/syno-bbackupd-config"
 

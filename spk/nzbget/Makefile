@@ -18,11 +18,11 @@ CHANGELOG = "1. Update NZBGet to 16.4<br>2. Security fix for p7zip"
 HOMEPAGE = http://nzbget.net
 LICENSE  = GPLv2
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

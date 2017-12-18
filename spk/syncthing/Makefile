@@ -19,8 +19,10 @@ HOMEPAGE = http://www.syncthing.net
 LICENSE = MPLv2.0
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT = src/dsm-control.sh
-FWPORTS = src/${SPK_NAME}.sc
+SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

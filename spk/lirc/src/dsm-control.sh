@@ -7,7 +7,7 @@ DNAME="LIRC"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 INSTALLER_SCRIPT=`dirname $0`/installer
-PATH="${PATH}:${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+PATH="${PATH}:${INSTALL_DIR}/bin:${PATH}"
 DAEMON="${INSTALL_DIR}/sbin/lircd"
 PID_FILE="${INSTALL_DIR}/var/lircd.pid"
 CONF_FILE="${INSTALL_DIR}/etc/lirc/lircd.conf"

@@ -19,6 +19,7 @@ MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 
 
+
 preinst ()
 {
     # Check database

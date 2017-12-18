@@ -8,15 +8,22 @@ DNAME="SquidGuard"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 SQUID="${INSTALL_DIR}/sbin/squid"
-RUNAS="squid"
 CFG_FILE="${INSTALL_DIR}/etc/squid.conf"
 ETC_DIR="${INSTALL_DIR}/etc/"
 WWW_DIR="/var/packages/${PACKAGE}/target/share/www/squidguardmgr"
 WEBMAN_DIR="/usr/syno/synoman/webman/3rdparty"
 SQUID_WRAPPER="${WWW_DIR}/squid_wrapper"
-
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+
+DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
+SC_USER="sc-squid"
+LEGACY_USER="squid"
+LEGACY_GROUP="users"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 preinst ()
 {
@@ -31,20 +38,22 @@ postinst ()
     # Install busybox stuff
     ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
-    # Create user
-    adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G users -s /bin/sh -S -D ${RUNAS}
+    # Create legacy user
+    if [ "${BUILDNUMBER}" -lt "7321" ]; then
+        adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
+    fi
 
     # Patch template files
     hostname=`hostname`
     sed "s/==HOSTNAME==/$hostname/g" ${ETC_DIR}/squidguard.conf.tpl > ${ETC_DIR}/squidguard.conf
     
     # Correct the files ownership
-    chown -R ${RUNAS}:users ${SYNOPKG_PKGDEST}
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
     chown 0:0 ${SQUID_WRAPPER}
 	chmod +s ${SQUID_WRAPPER}
 	
     # Init squid cache directory
-    su - ${RUNAS} -c "${SQUID} -z -f ${CFG_FILE}"
+    su ${USER} -s /bin/sh -c "${SQUID} -z -f ${CFG_FILE}"
 
     # Install webman
     ln -s ${WWW_DIR} ${WEBMAN_DIR}/${PACKAGE}
@@ -67,9 +76,15 @@ postinst ()
 
 preuninst ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
 
-    # Remove firewall config
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+        # Remove the user (if not upgrading)
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${USER}
+
+        # Remove firewall configuration
         ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
     fi
 
@@ -82,13 +97,22 @@ postuninst ()
     rm -f ${INSTALL_DIR}
     rm -Rf ${WEBMAN_DIR}/${PACKAGE}
     sed "/${PACKAGE}/d" /etc/crontab
-    deluser ${RUNAS}
     
     exit 0
 }
 
 preupgrade ()
 {
+    # Stop the package
+    ${SSS} stop > /dev/null
+
+    # DSM6 Upgrade handling
+    if [ "${BUILDNUMBER}" -ge "7321" ] && [ ! -f ${DSM6_UPGRADE} ]; then
+        echo "Deleting legacy user" > ${DSM6_UPGRADE}
+        delgroup ${LEGACY_USER} ${LEGACY_GROUP}
+        deluser ${LEGACY_USER}
+    fi
+
     # Save some stuff
     rm -fr ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
@@ -103,6 +127,9 @@ postupgrade ()
     rm -fr ${INSTALL_DIR}/etc
     mv ${TMP_DIR}/${PACKAGE}/etc ${INSTALL_DIR}/
     rm -fr ${TMP_DIR}/${PACKAGE}
+
+    # Ensure file ownership is correct after upgrade
+    chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     exit 0
 }

@@ -1,0 +1,307 @@
+#!/bin/sh
+
+# DSM 5 -> 6 upgrade path:
+#  Cannot remove user as still in use or may be DSM service itself
+# Require warning in ChangeLog and manual user/group cleanup
+
+INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
+INST_VAR="${SYNOPKG_PKGDEST}/var"
+
+# Optional FWPORTS file
+FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
+
+# Versions lower then DSM 6 don't support an upgrade folder
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+    TMP_DIR="/var/tmp/${SYNOPKG_PKGNAME}/var"
+else
+    TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
+fi
+
+
+# Source package specific variable and functions
+SVC_SETUP=`dirname $0`"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
+
+# Reload wizard variables stored by postinst
+if [ -r "${INST_VARIABLES}" ]; then
+    . "${INST_VARIABLES}"
+fi
+
+# Expect user to be set from package specific variables
+if [ -n "${USER}" -a -z "${USER_DESC}" ]; then
+    USER_DESC="User running $SYNOPKG_PKGNAME"
+fi
+
+# Default description if group name provided by UI
+if [ -n "${GROUP}" -a -z "${GROUP_DESC}" ]; then
+    GROUP_DESC="SynoCommunity Package Group"
+fi
+
+# Extract share volume and share name from download location if provided
+if [ -n "${SHARE_PATH}" ]; then
+    SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
+    SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
+fi
+
+
+# Tools shortcuts
+MV="/bin/mv -f"
+RM="/bin/rm -rf"
+MKDIR="/bin/mkdir -p"
+LN="/bin/ln -nsf"
+TEE="/usr/bin/tee -a"
+
+### Functions library
+
+log_step ()
+{
+    date >> ${INST_LOG}
+    echo "Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}" >> ${INST_LOG}
+}
+
+save_wizard_variables ()
+{
+    $RM "${INST_VARIABLES}"
+    if [ -n "${GROUP}" ]; then
+        echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
+    fi
+    if [ -n "${SHARE_PATH}" ]; then
+        echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
+    fi
+}
+
+# Remove user from system and from groups it is member of
+syno_remove_user ()
+{
+    RM_USER=$1
+    if [ -n "${RM_USER}" ]; then
+        # Check if user exists
+        if synouser --get "${RM_USER}" &> /dev/null; then
+            echo "Removing user ${RM_USER}" >> ${INST_LOG}
+            synouser --del "${RM_USER}" >> ${INST_LOG} 2>&1
+            synouser --rebuild all
+        fi
+    fi
+}
+
+# Create syno group $GROUP with parameter user as member
+syno_group_create ()
+{
+    EFF_USER=$1
+    echo "Creating group ${GROUP}" >> ${INST_LOG}
+    # Create syno group
+    synogroup --add "${GROUP}" "${EFF_USER}" >> ${INST_LOG}
+    # Set description of the syno group
+    synogroup --descset "${GROUP}" "${GROUP_DESC}" >> ${INST_LOG}
+}
+
+# Delete syno group if empty
+syno_group_remove ()
+{
+    RM_GROUP=$1
+    # Check if syno group is empty
+    if ! synogroup --get "${RM_GROUP}" | grep -q "0:\["; then
+        echo "Removing group ${RM_GROUP}" >> ${INST_LOG}
+        # Remove syno group
+        synogroup --del "${RM_GROUP}" >> ${INST_LOG} 2>&1
+        synogroup --rebuild all
+    fi
+}
+
+# Sets recursive permissions for ${GROUP} on specified directory
+# Usage: set_syno_permissions "${SHARE_FOLDER}"
+set_syno_permissions ()
+{
+    DIRNAME=$1
+    echo "Granting '$GROUP' group permissions on $DIRNAME" >> ${INST_LOG}
+    VOLUME=$(echo "$DIRNAME" | awk -F/ '{print "/"$2}')
+
+    # Walk up the tree and set traverse permissions up to VOLUME
+    while [ "${DIRNAME}" != "${VOLUME}" ]; do
+        # Set read/write permissions for GROUP
+        if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${GROUP}:allow:..x"`" ]; then
+            synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:--x----------:---n" >> ${INST_LOG} 2>&1
+        fi
+        DIRNAME="$(dirname "${DIRNAME}")"
+    done
+}
+
+### Generic package behaviors
+
+preinst ()
+{
+    log_step "preinst"
+    call_func "service_preinst"
+
+    # Check volume exists
+    if [ -n "${SHARE_PATH}" ]; then
+        if [ ! -d "${SHARE_VOLUME}" ]; then
+            echo "Volume ${SHARE_VOLUME} does not exist." | $TEE ${INST_LOG}
+            exit 1
+        fi
+    fi
+
+    exit 0
+}
+
+postinst ()
+{
+    log_step "postinst"
+    save_wizard_variables
+
+    # Link for backward compatibility of binaries location
+    $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
+
+    # Add firewall config
+    if [ -r "${FWPORTS_FILE}" ]; then
+        echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
+        servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
+    fi
+
+    EFF_USER="${PRIV_PREFIX}${USER}"
+    # DSM 5 specific operations
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        EFF_USER="${SYNOUSER_PREFIX}${USER}"
+        # Create prefixed synouser
+        if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
+            synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
+        fi
+    fi
+
+    # Only if a group is provided via UI or set by script
+    if [ -n "$GROUP" ]; then
+        # Check if group already exists
+        if ! synogroup --get "$GROUP" &> /dev/null; then
+            # Group does not exist yet: create with user as member
+            syno_group_create "${EFF_USER}"
+        fi
+        if synogroup --get "$GROUP" &> /dev/null; then
+            # Check user already in group
+            if ! synogroup --get "$GROUP" | grep '^[0-9]:\[${EFF_USER}\]' &> /dev/null; then
+                # Add user, not in group yet
+                MEMBERS="$(synogroup --get $GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
+                # The "synogroup --member" command clears all users before adding new ones
+                # so all the users must be listed on the command line
+                synogroup --member "$GROUP" $MEMBERS "${EFF_USER}" >> ${INST_LOG}
+            fi
+        fi
+        # Not sure but invoked with hope DSM is updated
+        synogroup --rebuild all
+    fi
+
+    # Share management
+    if [ -n "${SHARE_PATH}" ]; then
+        echo "Configuring ${SHARE_PATH}" >> ${INST_LOG}
+        # Create share if does not exist
+        #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
+        if ! synoshare --get "${SHARE_NAME}"  &> /dev/null ; then
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG}
+        fi
+
+        # Add user/group permissions depending if GROUP is set in UI
+        if [ -n "$GROUP" ]; then
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}",@"${GROUP}" >> ${INST_LOG} 2>&1
+        else
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" >> ${INST_LOG} 2>&1
+        fi
+        synoshare --build
+
+        $MKDIR "${SHARE_PATH}"
+        # Permissions
+        set_syno_permissions "${SHARE_PATH}"
+    fi
+
+    call_func "service_postinst"
+    $MKDIR "${INST_VAR}"
+    cp "${INST_LOG}" "${INST_VAR}"
+    if [ -n "${LOG_FILE}" ]; then
+        echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
+    fi
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        # On DSM 5 set package files permissions
+        chown -R ${EFF_USER}:root "${SYNOPKG_PKGDEST}" >> $INST_LOG 2>&1
+    else
+        # On DSM 6 only var is concerned
+        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> $INST_LOG 2>&1
+    fi
+    exit 0
+}
+
+preuninst ()
+{
+    log_step "preuninst"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall config
+        if [ -r "${FWPORTS_FILE}" ]; then
+            echo "Removing service configuration ${SYNOPKG_PKGNAME}.sc" >> ${INST_LOG}
+            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" >> ${INST_LOG} 2>&1
+        fi
+    fi
+
+    call_func "service_preuninst"
+    exit 0
+}
+
+postuninst ()
+{
+    log_step "postuninst"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove link
+        $RM "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
+
+        # Remove syno group if empty
+        if [ -n "${GROUP}" ]; then
+            syno_group_remove "${GROUP}"
+        fi
+        # On DSM 5, remove user if still exists
+        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+            syno_remove_user "${SYNOUSER_PREFIX}${USER}"
+        fi
+    fi
+
+    call_func "service_postuninst"
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
+    exit 0
+}
+
+preupgrade ()
+{
+    log_step "preupgrade"
+    call_func "service_preupgrade"
+
+    # Save some stuff
+    $RM "$TMP_DIR" >> ${INST_LOG}
+    $MKDIR "$TMP_DIR" >> ${INST_LOG}
+
+    call_func "service_save"
+
+    # On DSM 6, remove syno user if still exists
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -ge 6 ]; then
+        syno_remove_user "${SYNOUSER_PREFIX}${USER}"
+    fi
+
+    $MV "${TO_SAVE_DIR}/*" "$TMP_DIR" >> ${INST_LOG}
+    exit 0
+}
+
+postupgrade ()
+{
+    log_step "postupgrade"
+    # Restore some stuff
+    $MV "$TMP_DIR" "$TO_SAVE_DIR" >> ${INST_LOG}
+
+    call_func "service_restore"
+
+    $RM "$TMP_DIR" >> ${INST_LOG}
+
+    call_func "service_postupgrade"
+    exit 0
+}

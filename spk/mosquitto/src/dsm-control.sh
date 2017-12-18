@@ -7,15 +7,19 @@ DNAME="Mosquitto"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="mosquitto"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 MOSQUITTO="${INSTALL_DIR}/sbin/mosquitto"
 PID_FILE="${INSTALL_DIR}/var/mosquitto.pid"
 CFG_FILE="${INSTALL_DIR}/var/mosquitto.conf"
 
+SC_USER="sc-mosquitto"
+LEGACY_USER="mosquitto"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su ${USER} -s /bin/sh -c "PATH=${PATH} ${MOSQUITTO} -d -c ${CFG_FILE}"
+    su ${USER} -s /bin/sh -s /bin/sh -c "PATH=${PATH} ${MOSQUITTO} -d -c ${CFG_FILE}"
 }
 
 stop_daemon ()
