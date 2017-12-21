@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 2.3.1
-SPK_REV = 33
+SPK_REV = 34
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -9,7 +9,7 @@ DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NA
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.9-12"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
 DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\\\'avez qu\\\'a ajouter un .nzb, SABnzbd s\\\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
@@ -21,13 +21,14 @@ CHANGELOG = "Updated SABnzbd to 2.3.1."
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+CONF_DIR = src/conf/
+WIZARDS_DIR = src/wizard/
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8080
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_COMMAND = "PATH=$$\{PATH\} $$\{LANGUAGE\} $$\{PYTHON\} $$\{SABNZBD\} -f $$\{CFG_FILE\} --pidfile $$\{PID_FILE\} -d"
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
