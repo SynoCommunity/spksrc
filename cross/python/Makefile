@@ -17,7 +17,7 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS  = --enable-shared --enable-unicode=ucs4 --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
+CONFIGURE_ARGS  = --enable-optimizations --enable-shared --enable-unicode=ucs4 --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ac_cv_buggy_getaddrinfo=no
 
 POST_PATCH_TARGET = myPostPatch
