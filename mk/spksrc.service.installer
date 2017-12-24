@@ -19,7 +19,6 @@ else
     TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 fi
 
-
 # Source package specific variable and functions
 SVC_SETUP=`dirname $0`"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
@@ -47,10 +46,10 @@ if [ -n "${SHARE_PATH}" ]; then
     SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
 fi
 
-
 # Tools shortcuts
 MV="/bin/mv -f"
 RM="/bin/rm -rf"
+CP="/bin/cp -rfp"
 MKDIR="/bin/mkdir -p"
 LN="/bin/ln -nsf"
 TEE="/usr/bin/tee -a"
@@ -289,15 +288,26 @@ preupgrade ()
         syno_remove_user "${SYNOUSER_PREFIX}${USER}"
     fi
 
-    $MV "${TO_SAVE_DIR}/*" "$TMP_DIR" >> ${INST_LOG}
+    # Beware of /* outside the quotes, fails otherwise!
+    $MV "${INST_VAR}"/* "$TMP_DIR" >> ${INST_LOG}
     exit 0
 }
 
 postupgrade ()
 {
     log_step "postupgrade"
-    # Restore some stuff
-    $MV "$TMP_DIR" "$TO_SAVE_DIR" >> ${INST_LOG}
+
+    # Restore some stuff, has to be cp otherwise fails on directories
+    $CP "${TMP_DIR}"/* "${INST_VAR}" >> ${INST_LOG}
+
+    # Correct permissions of var folder
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        EFF_USER="${SYNOUSER_PREFIX}${USER}"
+        chown -R ${EFF_USER}:root "${INST_VAR}" >> $INST_LOG 2>&1
+    else
+        EFF_USER="${PRIV_PREFIX}${USER}"
+        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> $INST_LOG 2>&1
+    fi
 
     call_func "service_restore"
 
