@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 2.3.1
-SPK_REV = 34
+SPK_REV = 35
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
@@ -31,7 +31,7 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-BUSYBOX_CONFIG  = nice
+BUSYBOX_CONFIG = usrmng nice
 # Add ionice for ARCHs that support it
 ifeq ($(findstring $(ARCH),88f6281 qoriq),$(ARCH))
 BUSYBOX_CONFIG += ionice
