@@ -162,13 +162,14 @@ postinst ()
         servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
     fi
 
-    EFF_USER="${PRIV_PREFIX}${USER}"
     # DSM 5 specific operations
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        EFF_USER="${SYNOUSER_PREFIX}${USER}"
         # Create prefixed synouser
         if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
             synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
+            BACKUP_PASSWD="/tmp/install_${SYNOPKG_PKGNAME}_passwd"
+            cp /etc/passwd ${BACKUP_PASSWD}
+            sed -i "s#/var/services/homes/${EFF_USER}#/var/packages/${SYNOPKG_PKGNAME}/target/var#" /etc/passwd
         fi
     fi
 

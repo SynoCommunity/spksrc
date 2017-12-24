@@ -11,7 +11,6 @@ fi
 
 start_daemon ()
 {
-    call_func "service_prestart"
     if [ -z "${SVC_QUIET}" ]; then
         if [ -z "${SVC_KEEP_LOG}" ]; then
             date > ${LOG_FILE}
@@ -20,15 +19,16 @@ start_daemon ()
         fi
         echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
     fi
+    call_func "service_prestart"
     if [ -n "${SERVICE_COMMAND}" ]; then
         if [ -n "${USER}" -a $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
             if [ -z "${SERVICE_SHELL}" ]; then
                 SERVICE_SHELL=/bin/sh
             fi
             if [ -z "${SVC_NO_REDIRECT}" ]; then
-                su ${SYNOUSER_PREFIX}${USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}" >> ${LOG_FILE} 2>&1
+                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}" >> ${LOG_FILE} 2>&1
             else
-                su ${SYNOUSER_PREFIX}${USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}"
+                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SERVICE_COMMAND}"
             fi
         else
             # DSM 6 user is set by conf/privilege

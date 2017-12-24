@@ -1,6 +1,6 @@
 SPK_NAME = demoservice
-SPK_VERS = 1.0
-SPK_REV = 4
+SPK_VERS = 1.1
+SPK_REV = 5
 SPK_ICON = src/demoservice.png
 
 override ARCH=
@@ -20,7 +20,7 @@ SERVICE_USER         = auto
 SERVICE_WIZARD_GROUP = wizard_group
 SERVICE_WIZARD_SHARE = wizard_download_dir
 SERVICE_SETUP        = src/service-setup.sh
-SERVICE_COMMAND      = '$$\{SYNOPKG_PKGDEST\}/bin/demoservice.sh $$\{SERVICE_PORT\} $$\{PID_FILE\}'
+STARTABLE            = yes
 
 # Service configuration
 SERVICE_PORT = 8888
@@ -29,16 +29,15 @@ SERVICE_PORT_TITLE = DemoService(HTTP)
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
-
 PRE_COPY_TARGET = demoservice_install
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: demoservice_install
-# Replace standard copy/install targets
+# Replace standard copy/install targets, no sources, no content
 demoservice_install:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mkdir --parents $(STAGING_INSTALL_PREFIX)
-	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 src/demoservice.sh $(STAGING_INSTALL_PREFIX)/bin
+	echo "No files package" > $(STAGING_INSTALL_PREFIX)/README
+
