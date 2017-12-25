@@ -217,16 +217,16 @@ postinst ()
 
     call_func "service_postinst"
     $MKDIR "${INST_VAR}"
-    cp "${INST_LOG}" "${INST_VAR}"
+    $CP "${INST_LOG}" "${INST_VAR}"
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
     fi
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
         # On DSM 5 set package files permissions
-        chown -R ${EFF_USER}:root "${SYNOPKG_PKGDEST}" >> $INST_LOG 2>&1
+        chown -R ${EFF_USER}:root "${SYNOPKG_PKGDEST}" >> ${INST_LOG} 2>&1
     else
         # On DSM 6 only var is concerned
-        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> $INST_LOG 2>&1
+        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> ${INST_LOG} 2>&1
     fi
     exit 0
 }
@@ -303,10 +303,10 @@ postupgrade ()
     # Correct permissions of var folder
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
         EFF_USER="${SYNOUSER_PREFIX}${USER}"
-        chown -R ${EFF_USER}:root "${INST_VAR}" >> $INST_LOG 2>&1
+        chown -R ${EFF_USER}:root "${INST_VAR}" >> ${INST_LOG}
     else
         EFF_USER="${PRIV_PREFIX}${USER}"
-        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> $INST_LOG 2>&1
+        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> ${INST_LOG}
     fi
 
     call_func "service_restore"
@@ -314,5 +314,8 @@ postupgrade ()
     $RM "$TMP_DIR" >> ${INST_LOG}
 
     call_func "service_postupgrade"
+
+    # Make sure we also have the logging for this step
+    $CP "${INST_LOG}" "${INST_VAR}"
     exit 0
 }
