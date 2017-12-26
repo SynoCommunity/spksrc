@@ -17,18 +17,6 @@
                 "errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
               }
             }
-          },
-          {
-            "key": "wizard_group",
-            "desc": "SynoCommunity's download related group",
-            "defaultValue": "sc-download",
-            "validator": {
-              "allowBlank": false,
-              "regex": {
-                "expr": "/^[^<>:*/?\"]*$/",
-                "errorText": "Not allowed character in group name"
-              }
-            }
           }
         ]
       }

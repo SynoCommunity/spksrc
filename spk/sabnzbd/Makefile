@@ -15,15 +15,14 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Use DSM 5+6 generic service"
+CHANGELOG = "1. Use DSM 5+6 generic service approach."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/
 
-SERVICE_USER         = auto
-SERVICE_WIZARD_GROUP = wizard_group
+SERVICE_USER = auto
 SERVICE_WIZARD_SHARE = wizard_download_dir
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
