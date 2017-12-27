@@ -1,7 +1,7 @@
 ## Modules cross-compiled via spksrc.python-wheel.mk
 # Included for reference
 #lxml==3.7.2
-#m2crypto==0.25.1
+#m2crypto==0.27.0
 #msgpack-python==0.4.8
 #pillow==4.0.0
 #pocketsphinx==0.8
@@ -13,7 +13,7 @@
 #pyzmq==16.0.2
 #sphinxbase==0.8
 #uwsgi==2.0.14
-#yenc==0.4.0
+#pycparser==2.17
 
 ## Cross-compiled via spksrc.wheel.mk
 cheetah==2.4.4
@@ -21,29 +21,16 @@ markupsafe==0.23
 psutil==5.0.1
 pymongo==3.4.0
 sqlalchemy==1.1.4
-twisted==16.6.0
 zope.interface==4.3.3
+twisted
+pyopenssl
 
 ## Pure Python via spksrc.wheel.mk
-pyopenssl==16.2.0
-six==1.10.0
-virtualenv==15.1.0
-
-# cheetah dependencies
-Markdown==2.6.7
-
-# cryptography dependencies
-enum34==1.1.6
-idna==2.2
-ipaddress==1.0.17
-pyasn1==0.1.9
+six
+virtualenv
 
 # m2crypto dependencies
 typing==3.5.2.2
 
 # pillow dependencies
 olefile==0.44
-
-# Twisted dependencies
-incremental==16.10.1
-constantly==15.1.0

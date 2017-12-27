@@ -12,8 +12,7 @@ DEPENDS += cross/cffi cross/cryptography cross/bcrypt
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow
 DEPENDS += cross/pocketsphinx cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
-DEPENDS += cross/pyyaml cross/pyzmq cross/sphinxbase
-DEPENDS += cross/uwsgi cross/yenc
+DEPENDS += cross/pyyaml cross/pyzmq cross/sphinxbase cross/uwsgi
 
 WHEELS = src/requirements.txt
 
