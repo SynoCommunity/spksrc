@@ -4,7 +4,6 @@
 #m2crypto==0.27.0
 #msgpack-python==0.4.8
 #pillow==4.0.0
-#pocketsphinx==0.8
 #pyalsa==1.0.29
 #pyaudio==0.2.9
 #pycrypto==2.6.1
