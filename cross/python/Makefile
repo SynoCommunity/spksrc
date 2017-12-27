@@ -1,7 +1,7 @@
 PKG_NAME = python
 PKG_VERS_MAJOR = 2
 PKG_VERS_MINOR = 7
-PKG_VERS_PATCH = 13
+PKG_VERS_PATCH = 14
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -17,7 +17,7 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS  = --enable-shared --enable-unicode=ucs4 --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
+CONFIGURE_ARGS  = --enable-shared --enable-unicode=ucs4 --enable-ipv6 --host=$(HOST_ARCH) --build=$(BUILD_ARCH) PYTHON_FOR_BUILD=$(PYTHON_NATIVE)
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ac_cv_buggy_getaddrinfo=no
 
 POST_PATCH_TARGET = myPostPatch
@@ -31,10 +31,8 @@ include ../../mk/spksrc.cross-cc.mk
 HOST_ARCH = $(shell uname -m)
 BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python
-PGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
-HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
 HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_LIB_NATIVE = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_SITE_PACKAGES_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)/site-packages
@@ -42,14 +40,9 @@ PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux2-$(BUILD_ARCH)-$(PKG_V
 PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 
-.PHONY: myPostPatch
-myPostPatch:
-	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
-
 .PHONY: myPreConfigure
 myPreConfigure:
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
-	cp $(PGEN_NATIVE) $(HOSTPGEN)
 	$(RUN) autoreconf
 
 .PHONY: myCompile
@@ -59,13 +52,10 @@ myCompile:
 .PHONY: myInstall
 myInstall:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
-	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: myPostInstall
 myPostInstall: $(WORK_DIR)/python-cc.mk
-	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
-	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/
 
 $(WORK_DIR)/python-cc.mk:
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
