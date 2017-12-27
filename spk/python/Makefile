@@ -28,8 +28,8 @@ CHANGELOG = "1. Update to Python 2.7.14<br>2. Update modules"
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+STARTABLE = no
+SERVICE_SETUP = src/service-setup.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
