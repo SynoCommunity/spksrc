@@ -112,16 +112,22 @@ syno_group_remove ()
 }
 
 # Sets recursive permissions for ${GROUP} on specified directory
-# Usage: set_syno_permissions "${SHARE_FOLDER}"
+# Usage: set_syno_permissions "${SHARE_FOLDER}" "${GROUP}"
 set_syno_permissions ()
 {
     DIRNAME=$1
+    GROUP=$2
     echo "Granting '$GROUP' group permissions on $DIRNAME" >> ${INST_LOG}
-    VOLUME=$(echo "$DIRNAME" | awk -F/ '{print "/"$2}')
+
+    # Set read/write permissions for GROUP
+    if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${GROUP}:allow:rwxpdDaARWcC-:fd--"`" ]; then
+        synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:rwxpdDaARWcC-:fd--" >> ${INST_LOG} 2>&1
+    fi
 
     # Walk up the tree and set traverse permissions up to VOLUME
+    VOLUME=$(echo "$DIRNAME" | awk -F/ '{print "/"$2}')
     while [ "${DIRNAME}" != "${VOLUME}" ]; do
-        # Set read/write permissions for GROUP
+        # Set execute permissions for GROUP
         if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${GROUP}:allow:..x"`" ]; then
             synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:--x----------:---n" >> ${INST_LOG} 2>&1
         fi
@@ -202,17 +208,19 @@ postinst ()
             synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG}
         fi
 
-        # Add user/group permissions depending if GROUP is set in UI
-        if [ -n "$GROUP" ]; then
-            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}",@"${GROUP}" >> ${INST_LOG} 2>&1
-        else
+        # Add user permission if no GROUP is set in UI
+        # GROUP permission will be added in set_syno_permissions
+        if [ ! -n "$GROUP" ]; then
             synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" >> ${INST_LOG} 2>&1
         fi
         synoshare --build
 
         $MKDIR "${SHARE_PATH}"
-        # Permissions
-        set_syno_permissions "${SHARE_PATH}"
+
+        # Permissions for folder, up to volume
+        if [ -n "$GROUP" ]; then
+            set_syno_permissions "${SHARE_PATH}" "${GROUP}"
+        fi
     fi
 
     call_func "service_postinst"
