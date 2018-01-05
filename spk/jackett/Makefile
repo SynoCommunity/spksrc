@@ -1,11 +1,12 @@
 SPK_NAME = jackett
-SPK_VERS = 0.7.1483
-SPK_REV = 4
+SPK_VERS = 0.8.490
+SPK_REV = 5
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/curl cross/$(SPK_NAME)
-SPK_DEPENDS = "mono>=4.2.1.102-6"
+# depend on mono 5.4 for BTLS HttpWebClient support
+SPK_DEPENDS = "mono>=5.4"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Jackett works as a proxy server: it translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping & translation logic - removing the burden from other apps."
@@ -13,7 +14,7 @@ ADMIN_PORT = 9117
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
-CHANGELOG = Updated to version 0.7.1483
+CHANGELOG = Updated to version 0.8.490
 
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE  = GPLv2
@@ -28,6 +29,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = jackett_extra_install
 
 REQUIRED_DSM = 5.0
+# no PPC support for mono
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 BUSYBOX_CONFIG = usrmng daemon

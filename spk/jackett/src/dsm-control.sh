@@ -4,18 +4,24 @@
 PACKAGE="jackett"
 DNAME="Jackett"
 
+#BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+SC_USER="sc-jackett"
+LEGACY_USER="jackett"
+#USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+# always use legacy user for now
+USER=${LEGACY_USER}
+
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PATH}"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-USER_HOME="$(eval echo ~$USER)"
 MONO_PATH="/usr/local/mono/bin"
+PATH="${INSTALL_DIR}/bin:${MONO_PATH}:${PATH}"
 MONO="${MONO_PATH}/mono"
 JACKETT="${INSTALL_DIR}/share/${PACKAGE}/JackettConsole.exe"
-COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} -- --debug ${JACKETT}"
 HOME_DIR="${INSTALL_DIR}/var"
-PID_FILE="${USER_HOME}/jackett.pid"
-LOG_FILE="${USER_HOME}/.config/Jackett/log.txt"
+LOG_FILE_JACKETT="${HOME_DIR}/.config/Jackett/log.txt"
+LOG_FILE_STDERR="${HOME_DIR}/${PACKAGE}-stderr.log"
+PID_FILE="${HOME_DIR}/${PACKAGE}.pid"
+COMMAND="env HOME=${HOME_DIR} PATH=${PATH} LD_LIBRARY_PATH=${INSTALL_DIR}/lib ${MONO} --debug ${JACKETT} --PIDFile ${PID_FILE}"
 
 SC_USER="sc-jackett"
 LEGACY_USER="jackett"
@@ -24,8 +30,8 @@ USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGAC
 
 start_daemon ()
 {
-    export HOME=${USER_HOME} && start-stop-daemon -c ${USER} -Sqbmp ${PID_FILE} -x ${COMMAND} > /dev/null
-    sleep 2
+    start-stop-daemon -S -u ${USER} -c ${USER} -b -p ${PID_FILE} -a /bin/sh -- -c "${COMMAND} 2>${LOG_FILE_STDERR} | logger --id ${PACKAGE}"
+    sleep 2 # give jackett some time to write the pid file
 }
 
 stop_daemon ()
@@ -36,7 +42,13 @@ stop_daemon ()
 
 daemon_status ()
 {
-    start-stop-daemon -Kqtu ${USER} -p ${PID_FILE}
+    if [ -n "${PID_FILE}" -a -r "${PID_FILE}" ]; then
+        if kill -0 $(cat "${PID_FILE}") > /dev/null 2>&1; then
+            return
+        fi
+        rm -f "${PID_FILE}" > /dev/null
+    fi
+    return 1
 }
 
 wait_for_status ()
@@ -69,7 +81,7 @@ case $1 in
         fi
         ;;
     status)
-	    if daemon_status; then
+        if daemon_status; then
             echo ${DNAME} is running
             exit 0
         else
@@ -78,10 +90,11 @@ case $1 in
         fi
         ;;
     log)
-        echo "${LOG_FILE}"
+        echo "${LOG_FILE_JACKETT}"
         exit 0
         ;;
     *)
         exit 1
         ;;
 esac
+
