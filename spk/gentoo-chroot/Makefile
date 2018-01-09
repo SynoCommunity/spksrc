@@ -31,11 +31,15 @@ ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco hi3535),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
-ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),rtd1296),$(ARCH))
+GENTOO_CPU = arm
+GENTOO_ARCH = arm64
+endif
+ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64 apollolake),$(ARCH))
 GENTOO_CPU = x86
 GENTOO_ARCH = i686
 endif
@@ -58,7 +62,7 @@ gentoo-chroot_extra_install:
 	wget -nv -c -O $(WORK_DIR)/$(GENTOO_STAGE3_FILE) $(GENTOO_STAGE3_URL)
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/chroottarget
-	tar xjpf $(WORK_DIR)/$(GENTOO_STAGE3_FILE) -C $(STAGING_DIR)/var/chroottarget --exclude './dev/*'
+	tar xpf $(WORK_DIR)/$(GENTOO_STAGE3_FILE) -C $(STAGING_DIR)/var/chroottarget --exclude './dev/*'
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/mounts $(STAGING_DIR)/etc/mounts
 	install -m 755 -d $(STAGING_DIR)/app
