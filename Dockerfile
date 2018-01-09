@@ -9,6 +9,7 @@ RUN dpkg --add-architecture i386
 # Install required packages
 RUN apt-get update && \
     apt-get install -y automake \
+        bc \
         bison \
         build-essential \
         check \
@@ -36,6 +37,7 @@ RUN apt-get update && \
         lzip \
         mercurial \
         ncurses-dev \
+        php5 \
         pkg-config \
         python3 \
         subversion \
