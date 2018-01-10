@@ -1,2 +1,1 @@
-requests==2.18.4
-sabyenc==3.3.1
+sabyenc==3.3.2
