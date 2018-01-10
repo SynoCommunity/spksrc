@@ -1,5 +1,5 @@
 PKG_NAME = p7zip
-PKG_VERS = 15.14.1
+PKG_VERS = 16.02
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS)_src_all.$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)/$(PKG_VERS)
