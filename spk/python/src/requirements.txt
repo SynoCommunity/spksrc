@@ -1,49 +1,59 @@
 ## Modules cross-compiled via spksrc.python-wheel.mk
+## These modules require patches or have cross dependencies
 # Included for reference
 #lxml==3.7.2
-#m2crypto==0.25.1
+#m2crypto==0.25.0
 #msgpack-python==0.4.8
 #pillow==4.0.0
-#pocketsphinx==0.8
 #pyalsa==1.0.29
 #pyaudio==0.2.9
 #pycrypto==2.6.1
 #pycurl==7.43.0
 #pyyaml==3.12
 #pyzmq==16.0.2
-#sphinxbase==0.8
 #uwsgi==2.0.14
-#yenc==0.4.0
+#pycparser==2.18
 
 ## Cross-compiled via spksrc.wheel.mk
-cheetah==2.4.4
-markupsafe==0.23
-psutil==5.0.1
+markupsafe==1.0
+psutil==5.4.3
 pymongo==3.4.0
-sqlalchemy==1.1.4
-twisted==16.6.0
-zope.interface==4.3.3
+sqlalchemy==1.2.0
 
-## Pure Python via spksrc.wheel.mk
-pyopenssl==16.2.0
-six==1.10.0
+# General support
+six==1.11.0
 virtualenv==15.1.0
 
-# cheetah dependencies
-Markdown==2.6.7
+# Cheetah and dependencies
+cheetah==2.4.4
+markdown==2.6.11
 
-# cryptography dependencies
+# Cryptography/pyOpenSSL/M2Crypto dependencies
+# These also depends on cross/cffi and cross/openssl,
+# which are installed through cross/bcrypt
+pyOpenSSL==17.5.0
+cryptography==2.1.4
+asn1crypto==0.24.0
 enum34==1.1.6
-idna==2.2
-ipaddress==1.0.17
-pyasn1==0.1.9
-
-# m2crypto dependencies
+idna==2.6
+ipaddress==1.0.19
 typing==3.5.2.2
+
+# Twisted and dependencies
+twisted==17.9.0
+zope.interface==4.4.3
+Automat==0.6.0
+constantly==15.1.0
+hyperlink==17.3.1
+attrs==17.4.0
+incremental==17.5.0
+
+# Requests and dependencies
+# Always get latest certificates!
+requests==2.18.4
+urllib3==1.22
+chardet==3.0.4
+certifi
 
 # pillow dependencies
 olefile==0.44
-
-# Twisted dependencies
-incremental==16.10.1
-constantly==15.1.0
