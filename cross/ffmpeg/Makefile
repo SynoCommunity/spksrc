@@ -42,6 +42,10 @@ ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
 endif
 
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm64 --disable-neon --disable-yasm --disable-asm
+endif
+
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEPENDS += native/yasm
 ENV += PATH=$(YASM_PATH):$$PATH

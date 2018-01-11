@@ -19,9 +19,14 @@ CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES) $(ARM7_ARCHES)),$(ARCH))
 ENV += x264_ARCH=ARM
 CONFIGURE_ARGS += --disable-asm
+endif
+
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+ENV += x264_ARCH=aarch64
+CONFIGURE_ARGS += --disable-asm --disable-cli
 endif
 
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
@@ -42,4 +47,3 @@ ENV += AS=$(YASM_PATH)/yasm
 ENV += PATH=$(YASM_PATH):$$PATH
 ENV += x264_ARCH=X86
 endif
-
