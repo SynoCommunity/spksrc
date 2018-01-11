@@ -30,6 +30,10 @@ ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=armv7-linux-gcc
 endif
 
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --target=armv8-linux-gcc
+endif
+
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEPENDS += native/yasm
 ENV += PATH=$(YASM_PATH):$$PATH
