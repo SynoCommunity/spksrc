@@ -1,0 +1,15 @@
+
+When compiling x86/x64 toolchains the setup.py script will
+automatically try to add library-dirs of the compile host.
+This results in failures to compile modules on those platforms.
+
+--- setup.py.orig	2017-12-30 21:17:56.338023000 +0000
++++ setup.py	2018-01-04 17:10:38.904900000 +0000
+@@ -460,7 +460,6 @@
+             add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+         if cross_compiling:
+             self.add_gcc_paths()
+-        self.add_multiarch_paths()
+
+         # Add paths specified in the environment variables LDFLAGS and
+         # CPPFLAGS for header and library files.

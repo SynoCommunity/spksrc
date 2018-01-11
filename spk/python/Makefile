@@ -1,44 +1,41 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
-SPK_VERS =$(SPK_SHORT_VERS).13
-SPK_REV = 16
+SPK_VERS = $(SPK_SHORT_VERS).14
+SPK_REV = 17
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 # Build-time dependencies
 DEPENDS += cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/cffi cross/cryptography cross/bcrypt
+DEPENDS += cross/cffi cross/bcrypt
 
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow
-DEPENDS += cross/pocketsphinx cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
-DEPENDS += cross/pyyaml cross/pyzmq cross/sphinxbase
-DEPENDS += cross/uwsgi cross/yenc
+DEPENDS += cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
+DEPENDS += cross/pyyaml cross/pyzmq cross/uwsgi
 
 WHEELS = src/requirements.txt
 
-MAINTAINER = Diaoul
-DESCRIPTION = Python Programming Language.
-DESCRIPTION_FRE = Langage de programmation Python.
-DESCRIPTION_SPN = Lenguaje de programación Python.
+MAINTAINER = Safihre
+DESCRIPTION = Python 2.7 Programming Language.
+DESCRIPTION_FRE = Langage de programmation Python 2.7.
+DESCRIPTION_SPN = Lenguaje de programación Python 2.7.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update to Python 2.7.13<br>2. Update modules"
+CHANGELOG = "1. Update to Python 2.7.14<br>2. Update modules"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
-
 PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
 
 POST_STRIP_TARGET = python_extra_install
 
+# Busybox needed so pure-Python spk's can use it
 BUSYBOX_CONFIG = usrmng nice daemon
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
