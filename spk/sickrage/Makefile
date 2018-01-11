@@ -1,28 +1,29 @@
 SPK_NAME = sickrage
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/${SPK_NAME}.png
-DSM_UI_DIR = app
 
 SPK_DEPENDS = "python>=2.7.6-8:git"
 
 MAINTAINER = echel0n
 DESCRIPTION = Video File Manager for TV Shows. It watches for new episodes of your favorite shows and when they are posted it does its magic.
-ADMIN_PORT = 8899
+STARTABLE = yes
 RELOAD_UI = yes
 DISPLAY_NAME = SiCKRAGE
-CHANGELOG =
+CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 
 HOMEPAGE   = https://www.sickrage.ca
 LICENSE    = GPL
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8899
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
+
+WIZARDS_DIR = src/wizard/
 
 COPY_TARGET = nop
 POST_STRIP_TARGET = sickrage_extra_install
@@ -36,5 +37,3 @@ include ../../mk/spksrc.spk.mk
 sickrage_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
