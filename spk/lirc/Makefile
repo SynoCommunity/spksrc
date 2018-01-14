@@ -12,7 +12,7 @@ $(error Sorry, this package does not support the $(ARCH) architecture.)
 endif
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp avoton braswell bromolow cedarview evansport x64 x86 apollolake),$(ARCH))
+ifeq ($(findstring $(ARCH),88f6281 $(PPC_ARCHES) armada370 armadaxp bromolow cedarview evansport qorig),$(ARCH))
 SPK_VERS = 0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif
