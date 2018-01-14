@@ -26,28 +26,37 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = debian-chroot_extra_install
 
-DEBIAN_ARCH =
-ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
-DEBIAN_ARCH = armel
-endif
-ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
-DEBIAN_ARCH = armhf
-endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-DEBIAN_ARCH = i386
-endif
-ifeq ($(findstring $(ARCH),braswell bromolow cedarview x86 avoton x64),$(ARCH))
-DEBIAN_ARCH = amd64
-endif
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
-DEBIAN_ARCH = powerpc
-endif
-ifeq ($(strip $(DEBIAN_ARCH)),)
+
+include ../../mk/spksrc.spk.mk
+
+ifeq ($(findstring $(ARCH),88f5281 powerpc ppc824x ppc853x ppc854x dockerx64 grantley kvm64),$(ARCH))
 $(error Arch $(ARCH) not supported)
 endif
 
+DEBIAN_ARCH =
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+DEBIAN_ARCH = armel
+endif
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+DEBIAN_ARCH = armhf
+endif
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+DEBIAN_ARCH = arm64
+endif
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+DEBIAN_ARCH = i386
+endif
+ifeq ($(findstring $(ARCH),$(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
+DEBIAN_ARCH = amd64
+endif
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+DEBIAN_ARCH = powerpc
+endif
+ifeq ($(strip $(DEBIAN_ARCH)),)
+$(error Arch $(ARCH) not handled in makefile)
+endif
 
-include ../../mk/spksrc.spk.mk
+
 
 .PHONY: debian-chroot_extra_install
 debian-chroot_extra_install:
