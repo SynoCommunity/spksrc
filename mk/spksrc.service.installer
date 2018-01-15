@@ -296,8 +296,9 @@ preupgrade ()
         syno_remove_user "${SYNOUSER_PREFIX}${USER}"
     fi
 
-    # Beware of /* outside the quotes, fails otherwise!
-    $MV "${INST_VAR}"/* "$TMP_DIR" >> ${INST_LOG}
+    # Beware of /. outside the quotes
+    # Needed to copy all files including hidden ones
+    $CP "${INST_VAR}"/. "$TMP_DIR" >> ${INST_LOG}
     exit 0
 }
 
@@ -306,7 +307,7 @@ postupgrade ()
     log_step "postupgrade"
 
     # Restore some stuff, has to be cp otherwise fails on directories
-    $CP "${TMP_DIR}"/* "${INST_VAR}" >> ${INST_LOG}
+    $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG}
 
     # Correct permissions of var folder
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
