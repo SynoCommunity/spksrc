@@ -135,7 +135,7 @@ set_syno_permissions ()
             if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:..x\"`" ]; then
                 synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:--x----------:---n" >> ${INST_LOG} 2>&1
             fi
-            DIRNAME="$(dirname \"${DIRNAME}\")"
+            DIRNAME="$(dirname "${DIRNAME}")"
         done
     else
         echo "Skip granting '${GROUP}' group permissions on ${DIRNAME} as the directory does not reside in '/volumeX'. Set manually if needed." >> ${INST_LOG}
