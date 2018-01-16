@@ -12,5 +12,8 @@ COMMENT  = The PCRE library is a set of functions that implement regular express
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
+# enable UTF-8 support
+# pcre is used by: mc, sshfs, irssi, bitlbee, museek-plus
+CONFIGURE_ARGS = --enable-utf --enable-unicode-properties
 
 include ../../mk/spksrc.cross-cc.mk

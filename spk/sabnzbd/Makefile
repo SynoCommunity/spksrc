@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 2.3.0
-SPK_REV = 32
+SPK_VERS = 2.3.1
+SPK_REV = 33
 SPK_ICON = src/sabnzbd.png
 DSM_UI_DIR = app
 
@@ -16,16 +16,16 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Updated SABnzbd to 2.3.0 and par2cmdline to 0.7.4."
+CHANGELOG = "Updated SABnzbd to 2.3.1."
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
 
-WIZARDS_DIR = src/wizard/
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

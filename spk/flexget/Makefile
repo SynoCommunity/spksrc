@@ -17,6 +17,8 @@ LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

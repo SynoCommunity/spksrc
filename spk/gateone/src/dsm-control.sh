@@ -9,24 +9,39 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 GATEONE="${INSTALL_DIR}/env/bin/gateone"
 SETTINGS_DIR="${INSTALL_DIR}/var/conf.d"
 PID_FILE="${INSTALL_DIR}/var/gateone.pid"
-USER="gateone"
+
+LEGACY_CERTPATH="/usr/syno/etc/ssl/ssl.key"
+LEGACY_CERTIFICATE="server.crt"
+LEGACY_KEYFILE="server.key"
+CERTPATH="/usr/syno/etc/certificate/system/default"
+CERTIFICATE="cert.pem"
+KEYFILE="privkey.pem"
+
+SC_USER="sc-gateone"
+LEGACY_USER="gateone"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
 {
     # Copy certificate
-    cp /usr/syno/etc/ssl/ssl.crt/server.crt /usr/syno/etc/ssl/ssl.key/server.key ${INSTALL_DIR}/ssl/
+    if [ "${BUILDNUMBER}" -ge "7321" ]; then
+        cp ${CERTIFICATE} ${KEYFILE} ${INSTALL_DIR}/ssl/
+    else
+        cp ${LEGACY_CERTIFICATE} ${LEGACY_KEYFILE} ${INSTALL_DIR}/ssl/
+    fi
     chown ${USER} ${INSTALL_DIR}/ssl/*
 
-    su ${USER} -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --settings_dir=${SETTINGS_DIR} > ${INSTALL_DIR}/var/gateone_startup.log &"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} nohup ${PYTHON} ${GATEONE} --settings_dir=${SETTINGS_DIR} > ${INSTALL_DIR}/var/gateone_startup.log &"
 }
 
 stop_daemon ()
 {
-    su ${USER} -c "PATH=${PATH} ${PYTHON} ${GATEONE} --kill --settings_dir=${SETTINGS_DIR}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${GATEONE} --kill --settings_dir=${SETTINGS_DIR}"
     wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
     rm -f ${PID_FILE}
 }

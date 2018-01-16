@@ -1,0 +1,45 @@
+[
+  {
+    "step_title": "Example configuration for demoservice",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Download configuration",
+        "subitems": [
+          {
+            "key": "wizard_download_dir",
+            "desc": "Download location",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                "errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
+              }
+            }
+          },
+          {
+            "key": "wizard_group",
+            "desc": "DSM group",
+            "defaultValue": "sc-download",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[^<>:*/?\"]*$/",
+                "errorText": "Not allowed character in group name"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "Attention! DSM Permissions",
+    "items": [
+      {
+        "desc": "Permissions are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= demoservice) will not appear on most UI settings.<br>Including the following:<br>- Application privilege's permission viewer<br>- FPT's chroot user selector<br>- File Stations's<br>- Change owner<br>- Shared Links Manager -> Enable secure sharing<br><br>The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor<br>"
+      }
+    ]
+  }
+]

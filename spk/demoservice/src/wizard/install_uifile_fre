@@ -1,0 +1,45 @@
+[
+  {
+    "step_title": "Exemple de configuration pour demoservice",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Configuration de téléchargement",
+        "subitems": [
+          {
+            "key": "wizard_download_dir",
+            "desc": "Répertoire cible",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume (1-99)"
+              }
+            }
+          },
+          {
+            "key": "wizard_group",
+            "desc": "Groupe DSM",
+            "defaultValue": "sc-download",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[^<>:*/?\"]*$/",
+                "errorText": "Caractère non autorisé dans le nom de groupe"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "Attention! DSM Permissions",
+    "items": [
+      {
+         "desc": "Les autorisations sont gérées avec le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'utilisateurs' n'est plus utilisé à partir de DSM 6.<br>L'utilisateur du paquet (= demoservice) n'apparaîtra pas sur la plupart des paramètres d'interface utilisateur. Y compris ce qui suit: <br>- Afficheur d'autorisation de privilège d'application <br>- Sélecteur d'utilisateur chroot FPT <br>- File Stations's- Changer de propriétaire <br>- Shared Links Manager -> Activer le partage sécurisé <br><br>Les seules exceptions sont: <br>- Panneau de configuration> Dossier partagé> Edition> Autorisation> Utilisateur interne du système <br>- Éditeur ACL"
+      }
+    ]
+  }
+]

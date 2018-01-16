@@ -8,14 +8,18 @@ DNAME="Transmission"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
-USER="transmission"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 TRANSMISSION="${INSTALL_DIR}/bin/transmission-daemon"
 PID_FILE="${INSTALL_DIR}/var/transmission.pid"
+
+SC_USER="sc-transmission"
+LEGACY_USER="transmission"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${TRANSMISSION} -g ${INSTALL_DIR}/var/ -x ${PID_FILE}"
 }
 
 stop_daemon ()

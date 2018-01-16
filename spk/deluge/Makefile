@@ -7,7 +7,7 @@ BETA = 1
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 DEPENDS  = cross/libtorrent cross/$(SPK_NAME)
-WHEELS = attrs characteristic chardet pyasn1-modules pyxdg Mako service-identity
+WHEELS = characteristic chardet pyasn1-modules pyxdg Mako service-identity
 SPK_DEPENDS = "python>=2.7.6-8"
 
 REQUIRED_DSM = 5.0
@@ -24,10 +24,11 @@ HOMEPAGE = http://deluge-torrent.org
 LICENSE  = GPL
 HELPURL  = http://dev.deluge-torrent.org/wiki/UserGuide
 
-WIZARDS_DIR      = src/wizard/
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

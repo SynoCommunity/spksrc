@@ -1,0 +1,18 @@
+--- Makefile.orig	2018-01-10 07:23:22.319973500 +0000
++++ Makefile	2018-01-10 07:23:54.935822700 +0000
+@@ -1893,7 +1893,6 @@
+ 
+ $(BUILT_INS): git$X
+ 	$(QUIET_BUILT_IN)$(RM) $@ && \
+-	ln $< $@ 2>/dev/null || \
+ 	ln -s $< $@ 2>/dev/null || \
+ 	cp $< $@
+ 
+@@ -2187,7 +2186,6 @@
+ 
+ $(REMOTE_CURL_ALIASES): $(REMOTE_CURL_PRIMARY)
+ 	$(QUIET_LNCP)$(RM) $@ && \
+-	ln $< $@ 2>/dev/null || \
+ 	ln -s $< $@ 2>/dev/null || \
+ 	cp $< $@
+ 

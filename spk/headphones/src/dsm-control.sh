@@ -9,17 +9,21 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="headphones"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 HEADPHONES="${INSTALL_DIR}/share/Headphones/Headphones.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/headphones.pid"
 LOG_FILE="${INSTALL_DIR}/var/logs/headphones.log"
 
+SC_USER="sc-headphones"
+LEGACY_USER="headphones"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${HEADPHONES} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${HEADPHONES} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()

@@ -51,21 +51,55 @@ include ../../mk/spksrc.copy.mk
 strip: copy
 include ../../mk/spksrc.strip.mk
 
+
+# Scripts
+DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
+
+# Generated scripts
+DSM_SCRIPTS_  = preinst postinst
+DSM_SCRIPTS_ += preuninst postuninst
+DSM_SCRIPTS_ += preupgrade postupgrade
+
+# SPK specific scripts
+ifneq ($(strip $(SSS_SCRIPT)),)
+DSM_SCRIPTS_ += start-stop-status
+
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
+	@$(dsm_script_copy)
+endif
+
+ifneq ($(strip $(INSTALLER_SCRIPT)),)
+DSM_SCRIPTS_ += installer
+
+$(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
+	@$(dsm_script_copy)
+endif
+
+DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
+
+SPK_CONTENT = package.tgz INFO scripts
+
+# conf
+DSM_CONF_DIR = $(WORK_DIR)/conf
+
+ifneq ($(CONF_DIR),)
+export SPKSRC_CONF_DIR=$(CONF_DIR)
+endif
+
+# Generic service scripts
+include ../../mk/spksrc.service.mk
+
 icon: strip
 ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
 
-### Packaging rules
-$(WORK_DIR)/package.tgz: icon
-	$(create_target_dir)
-	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
-
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
+	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
+	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@echo description=\"$(DESCRIPTION)\" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
@@ -112,6 +146,7 @@ endif
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 ifneq ($(strip $(STARTABLE)),)
 	@echo startable=\"$(STARTABLE)\" >> $@
+	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
@@ -157,13 +192,6 @@ ifneq ($(WIZARDS_DIR),)
 export SPKSRC_WIZARDS_DIR=$(WIZARDS_DIR)
 endif
 
-# conf
-DSM_CONF_DIR = $(WORK_DIR)/conf
-
-ifneq ($(CONF_DIR),)
-export SPKSRC_CONF_DIR=$(CONF_DIR)
-endif
-
 # License
 DSM_LICENSE_FILE = $(WORK_DIR)/LICENSE
 
@@ -182,20 +210,11 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@echo $@
 	@$(dsm_license_copy)
 
-# Scripts
-DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
-
-# Generated scripts
-DSM_SCRIPTS_  = preinst postinst
-DSM_SCRIPTS_ += preuninst postuninst
-DSM_SCRIPTS_ += preupgrade postupgrade
-# SPK specific scripts
-ifneq ($(strip $(SSS_SCRIPT)),)
-DSM_SCRIPTS_ += start-stop-status
-endif
-DSM_SCRIPTS_ += installer
-DSM_SCRIPTS_ += $(notdir $(FWPORTS))
-DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
+### Packaging rules
+$(WORK_DIR)/package.tgz: icon service
+	$(create_target_dir)
+	@[ -f $@ ] && rm $@ || true
+	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
 
@@ -228,16 +247,8 @@ $(DSM_SCRIPTS_DIR)/preupgrade:
 $(DSM_SCRIPTS_DIR)/postupgrade:
 	@$(dsm_script_redirect)
 
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT) 
-	@$(dsm_script_copy)
-$(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
-	@$(dsm_script_copy)
-$(DSM_SCRIPTS_DIR)/%.sc: $(filter %.sc,$(FWPORTS))
-	@$(dsm_script_copy)
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
-
-SPK_CONTENT = package.tgz INFO scripts
 
 # Package Icons
 .PHONY: icons
@@ -280,7 +291,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 

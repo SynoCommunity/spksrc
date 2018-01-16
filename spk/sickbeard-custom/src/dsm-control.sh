@@ -9,18 +9,22 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="sickbeard-custom"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 GIT="${GIT_DIR}/bin/git"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 SICKBEARD="${INSTALL_DIR}/var/SickBeard/SickBeard.py"
 CFG_FILE="${INSTALL_DIR}/var/config.ini"
 PID_FILE="${INSTALL_DIR}/var/sickbeard-custom.pid"
 LOG_FILE="${INSTALL_DIR}/var/Logs/sickbeard.log"
 
+SC_USER="sc-sickbeard-custom"
+LEGACY_USER="sickbeard-custom"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "HOME=${INSTALL_DIR}/var PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
+    su ${USER} -s /bin/sh -c "HOME=${INSTALL_DIR}/var PATH=${PATH} ${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${INSTALL_DIR}/var/"
 }
 
 stop_daemon ()

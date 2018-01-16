@@ -9,17 +9,21 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="maraschino"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 MARASCHINO="${INSTALL_DIR}/share/maraschino/Maraschino.py"
 PID_FILE="${INSTALL_DIR}/var/maraschino.pid"
 LOG_FILE="${INSTALL_DIR}/var/maraschino.log"
 DB_FILE="${INSTALL_DIR}/var/maraschino.db"
 
+SC_USER="sc-maraschino"
+LEGACY_USER="maraschino"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${MARASCHINO} --daemon --port 8260 --pidfile ${PID_FILE} --database ${DB_FILE} --log ${LOG_FILE}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${MARASCHINO} --daemon --port 8260 --pidfile ${PID_FILE} --database ${DB_FILE} --log ${LOG_FILE}"
 }
 
 stop_daemon ()
