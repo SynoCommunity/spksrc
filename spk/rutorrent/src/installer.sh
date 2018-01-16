@@ -115,7 +115,7 @@ postinst ()
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
-               -e "s|tempDirectory = null;|tempDirectory = '${INSTALL_DIR}/tmp';|g" \
+               -e "s|tempDirectory = null;|tempDirectory = '${INSTALL_DIR}/tmp/';|g" \
                ${WEB_DIR}/${PACKAGE}/conf/config.php
 
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
