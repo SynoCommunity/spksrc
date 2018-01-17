@@ -9,7 +9,11 @@ WORK_DIR := $(PWD)/work-native
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = native-$(PKG_NAME) 
 COOKIE_PREFIX = $(PKG_NAME)-
+ifneq ($(PKG_DIST_FILE),)
+DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_FILE)
+else
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+endif
 DIST_EXT      = $(PKG_EXT)
 
 #####
