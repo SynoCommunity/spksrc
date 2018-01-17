@@ -26,48 +26,39 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = gentoo-chroot_extra_install
 
-include ../../mk/spksrc.spk.mk
-
-ifeq ($(findstring $(ARCH),88f5281 powerpc ppc824x ppc853x ppc854x dockerx64 grantley kvm64),$(ARCH))
-$(error Arch $(ARCH) not supported)
-endif
-
 GENTOO_ARCH =
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-GENTOO_CPU = arm
-GENTOO_ARCH = arm64
-endif
-ifeq ($(findstring $(ARCH),$(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64),$(ARCH))
 GENTOO_CPU = x86
 GENTOO_ARCH = i686
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 GENTOO_CPU = ppc
 GENTOO_ARCH = ppc
 endif
 ifeq ($(strip $(GENTOO_ARCH)),)
-$(error Arch $(ARCH) not handled in Makefile)
+$(error Arch $(ARCH) not supported)
 endif
 
 GENTOO_STAGE3 := $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d' | awk '{print $$1}')
 GENTOO_STAGE3_URL := http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/$(GENTOO_STAGE3)
 GENTOO_STAGE3_FILE := $(shell basename $(GENTOO_STAGE3))
 
+include ../../mk/spksrc.spk.mk
 
 .PHONY: gentoo-chroot_extra_install
 gentoo-chroot_extra_install:
 	wget -nv -c -O $(WORK_DIR)/$(GENTOO_STAGE3_FILE) $(GENTOO_STAGE3_URL)
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/chroottarget
-	tar xpf $(WORK_DIR)/$(GENTOO_STAGE3_FILE) -C $(STAGING_DIR)/var/chroottarget --exclude './dev/*'
+	tar xjpf $(WORK_DIR)/$(GENTOO_STAGE3_FILE) -C $(STAGING_DIR)/var/chroottarget --exclude './dev/*'
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/mounts $(STAGING_DIR)/etc/mounts
 	install -m 755 -d $(STAGING_DIR)/app
