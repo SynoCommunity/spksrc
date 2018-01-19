@@ -4,7 +4,7 @@
         "desc": "Keep Sonarr up-to-date by using Sonarr's built-in updater.<br>Navigate to System>Updates in the Sonarr UI."
     }]
 },{
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "Attention! DSM Permissions",
     "items": [{
         "desc": "Permissions for all media-related packages are managed with the group <b>'sc-media'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
     },{
