@@ -1,6 +1,6 @@
 SPK_NAME = mono
-SPK_VERS = 5.4.1.6
-SPK_REV = 9
+SPK_VERS = 5.8.0.108
+SPK_REV = 10
 SPK_ICON = src/mono.png
 BETA = 1
 
@@ -10,7 +10,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "Update to 5.4.1.6 (Release)"
+CHANGELOG = "Update to 5.8.0.108 (Release)"
 
 HOMEPAGE = http://mono-project.com
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
@@ -43,4 +43,3 @@ mono_extra_install:
 mono_pre_copy: $(INSTALL_PLIST)
 	# remove boehm GC references from PLIST if it isn't available on the platform (e.g. rtd1296)
 	test -f $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/mono-boehm || sed -i -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d' $(INSTALL_PLIST)
-
