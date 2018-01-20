@@ -1,5 +1,5 @@
 PKG_NAME = x264
-PKG_VERS = 20170730-2245-stable
+PKG_VERS = 20180119-2245-stable
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.videolan.org/x264/snapshots
@@ -26,7 +26,7 @@ endif
 
 ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 ENV += x264_ARCH=aarch64
-CONFIGURE_ARGS += --disable-asm --disable-cli
+CONFIGURE_ARGS += --disable-asm --host=arm-linux
 endif
 
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
