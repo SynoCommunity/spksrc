@@ -39,11 +39,11 @@ CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --disable-neon --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
+CONFIGURE_ARGS += --arch=arm --enable-neon --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --disable-neon --disable-yasm --disable-asm
+CONFIGURE_ARGS += --arch=arm64 --enable-neon --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
@@ -66,4 +66,3 @@ else
 # Latest x265 version for non-pcc arch
 DEPENDS += cross/x265
 endif
-

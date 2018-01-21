@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 3.3.3
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 3.3.3  2. Produces libavresample for tvheadend"
+CHANGELOG = "1. Update x264 to 20180119-2245-stable 2. Fix compilation for armv8 platforms"
 
 DEPENDS = cross/$(SPK_NAME)
 
