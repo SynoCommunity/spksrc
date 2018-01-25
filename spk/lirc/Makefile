@@ -8,11 +8,14 @@ LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
 ifneq ($(findstring $(ARCH),powerpc 88f5281),)
-$(error Sorry, this package does not support the $(ARCH) architecture.)
+$(error Sorry, this package does not support the $(ARCH) architecture)
 endif
 
+# include definition of PPC_ARCHES...
+include ../../mk/spksrc.common.mk
+
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifeq ($(findstring $(ARCH),88f6281 $(PPC_ARCHES) armada370 armadaxp bromolow cedarview evansport qorig),$(ARCH))
+ifneq ($(findstring $(ARCH),88f6281 $(PPC_ARCHES)),)
 SPK_VERS = 0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif
