@@ -4,7 +4,7 @@ CFG_FILE="${SYNOPKG_PKGDEST}/var/nzbget.conf"
 TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/share/nzbget/nzbget.conf"
 UPGRADE_CFG_FILE="${TMP_DIR}/nzbget.conf"
 WEBDIR="${SYNOPKG_PKGDEST}/bin/webui"
-
+NZBGET_INSTALLER="${SYNOPKG_PKGDEST}/var/nzbget.run"
 GROUP="sc-download"
 
 # Force-overwrite the PID-file and WebDir setting
@@ -15,8 +15,8 @@ SERVICE_COMMAND="${NZBGET} -c ${CFG_FILE} -o WebDir=${WEBDIR} -o LockFile=${PID_
 # Extract the right paths from config file
 if [ -r "${UPGRADE_CFG_FILE}" ]; then
     DOWNLOAD_FOLDER=`grep -Po '(?<=MainDir=).*' ${UPGRADE_CFG_FILE}`
-    if [ -n "$(dirname "${DOWNLOAD_FOLDER}")" ]; then
-        SHARE_PATH=$(dirname "${DOWNLOAD_FOLDER}")
+    if [ -e "${DOWNLOAD_FOLDER}" -a "/" != "$(dirname "${DOWNLOAD_FOLDER}")" ]; then
+        SHARE_PATH="${DOWNLOAD_FOLDER}"
     fi
 fi
 
@@ -24,36 +24,36 @@ service_postinst ()
 {
     # Download latest NZBGet
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
-        wget -O "${SYNOPKG_PKGDEST}/nzbget.run" "https://nzbget.net/download/nzbget-latest-bin-linux.run" >> ${INST_LOG} 2>&1
+        wget -O "${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run" >> ${INST_LOG} 2>&1
     fi
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
-        wget -O "${SYNOPKG_PKGDEST}/nzbget.run" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run" >> ${INST_LOG} 2>&1
+        wget -O "${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run" >> ${INST_LOG} 2>&1
     fi
 
     # Stop if download failed
-    if [ ! -r "${SYNOPKG_PKGDEST}/nzbget.run" ]; then
-        echo "Failed to download installer, please check the internet connection of your device." >> ${SYNOPKG_TEMP_LOGFILE}
+    if [ ! -r "${NZBGET_INSTALLER}" ]; then
+        echo "Failed to download installer, please check the internet connection of your device."
         exit 1
     fi
 
     # Install as nzbget user, for correct permissions
-    sudo -u ${EFF_USER} sh ${SYNOPKG_PKGDEST}/nzbget.run --destdir ${SYNOPKG_PKGDEST}/bin >> ${INST_LOG} 2>&1
+    su ${EFF_USER} -s /bin/sh -c "${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin" >> ${INST_LOG} 2>&1
 
     # Make sure installation worked
     if [ ! -r "${NZBGET}" ]; then
-        echo "The installer failed to install NZBGet. Please report the log below to SynoCommunity:" >> ${SYNOPKG_TEMP_LOGFILE}
-        echo "${INST_LOG}" >> ${SYNOPKG_TEMP_LOGFILE}
+        echo "The installer failed to install NZBGet. Please report the log below to SynoCommunity:"
+        echo "${INST_LOG}"
         exit 1
     fi
 
     # Copy the new template config file created by installer
     cp -f ${SYNOPKG_PKGDEST}/bin/nzbget.conf ${TEMPLATE_CFG_FILE}
 
-    # Rempove installer
-    rm -f ${SYNOPKG_PKGDEST}/nzbget.run
+    # Remove installer
+    rm -f "${NZBGET_INSTALLER}"
 
     # Correct options from wizard
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+    if [ ! -e "${${CFG_FILE}" ]; then
         # Use whatever the installer found best
         # It does optimizations based on the current system
         cp -f ${TEMPLATE_CFG_FILE} ${CFG_FILE}
@@ -69,11 +69,6 @@ service_postinst ()
                -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGDEST}/var/nzbget.log|g" \
                -e "s|ConfigTemplate=.*$|ConfigTemplate=${TEMPLATE_CFG_FILE}|g" \
                ${CFG_FILE}
-    fi
-
-    # Have to make sure our download dirs have right permissions
-    if [ -n "${DOWNLOAD_FOLDER}" ] && [ -d "${DOWNLOAD_FOLDER}" ]; then
-        set_syno_permissions "${DOWNLOAD_FOLDER}" "${GROUP}"
     fi
 
     # Discard legacy obsolete busybox user account
