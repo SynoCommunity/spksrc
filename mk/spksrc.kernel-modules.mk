@@ -9,7 +9,11 @@ include ../../mk/spksrc.directories.mk
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
+ifneq ($(PKG_DIST_FILE),)
+DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_FILE)
+else
 DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+endif
 DIST_EXT      = $(PKG_EXT)
 DISTRIB_DIR   = $(KERNELS_DIR)/$(PKG_BRANCH)
 COMPILE_TARGET = kernel_module_compile_target
