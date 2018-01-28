@@ -1,6 +1,6 @@
 TC_NAME = syno-x64
 
-TC_ARCH = x86_64 x86 braswell bromolow cedarview avoton apollolake broadwell denverton grantley
+TC_ARCH = x86_64 x86 braswell bromolow cedarview avoton apollolake broadwell broadwellnk denverton grantley
 TC_VERS = 5.2
 TC_FIRMWARE = 5.0-4458
 
