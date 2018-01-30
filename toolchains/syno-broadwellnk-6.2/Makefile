@@ -1,13 +1,13 @@
-TC_NAME = syno-x64
+TC_NAME = syno-$(TC_ARCH)
 
-TC_ARCH = x86_64 x86 braswell bromolow cedarview avoton apollolake broadwell broadwellnk denverton grantley
-TC_VERS = 5.2
-TC_FIRMWARE = 5.0-4458
+TC_ARCH = broadwellnk
+TC_VERS = 6.2
+TC_FIRMWARE = 6.2-22259
 
-TC_DIST_NAME = x64-gcc473_glibc217_x86_64-GPL.txz
-
+TC_DIST = broadwellnk-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.2%20Tool%20Chains/Intel%20x86%20Linux%203.2.40%20%28Pineview%29
+TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%206.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Broadwellnk%29
 
 TC_BASE_DIR = x86_64-pc-linux-gnu
 TC_PREFIX = x86_64-pc-linux-gnu
@@ -25,4 +25,4 @@ include ../../mk/spksrc.tc.mk
 .PHONY: myFix
 myFix:
 	chmod -R u+w $(WORK_DIR)
-	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/lib'|" {} \;
+	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/lib'|" {} \;
