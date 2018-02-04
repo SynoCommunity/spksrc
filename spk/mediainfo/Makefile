@@ -1,6 +1,6 @@
 SPK_NAME = mediainfo
-SPK_VERS = 0.7.93
-SPK_REV = 3
+SPK_VERS = 0.7.99
+SPK_REV = 5
 SPK_ICON = src/mediainfo.png
 
 DEPENDS  = cross/$(SPK_NAME)
