@@ -2,7 +2,6 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 NZBGET="${SYNOPKG_PKGDEST}/bin/nzbget"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/nzbget.conf"
 TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/share/nzbget/nzbget.conf"
-UPGRADE_CFG_FILE="${TMP_DIR}/nzbget.conf"
 WEBDIR="${SYNOPKG_PKGDEST}/bin/webui"
 NZBGET_INSTALLER="${SYNOPKG_PKGDEST}/var/nzbget.run"
 GROUP="sc-download"
@@ -10,15 +9,6 @@ GROUP="sc-download"
 # Force-overwrite the PID-file and WebDir setting
 # These could change depending on previous package settings
 SERVICE_COMMAND="${NZBGET} -c ${CFG_FILE} -o WebDir=${WEBDIR} -o LockFile=${PID_FILE} -D"
-
-# Needed to force correct permissions, during update
-# Extract the right paths from config file
-if [ -r "${UPGRADE_CFG_FILE}" ]; then
-    DOWNLOAD_FOLDER=`grep -Po '(?<=MainDir=).*' ${UPGRADE_CFG_FILE}`
-    if [ -e "${DOWNLOAD_FOLDER}" -a "/" != "$(dirname "${DOWNLOAD_FOLDER}")" ]; then
-        SHARE_PATH="${DOWNLOAD_FOLDER}"
-    fi
-fi
 
 service_postinst ()
 {
@@ -36,7 +26,11 @@ service_postinst ()
         exit 1
     fi
 
+    # On DSM5 the lib-dir is not owned by the package-user
+    set_unix_permissions "${SYNOPKG_PKGDEST}/bin"
+
     # Install as nzbget user, for correct permissions
+    chmod +x "${NZBGET_INSTALLER}"
     su ${EFF_USER} -s /bin/sh -c "${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin" >> ${INST_LOG} 2>&1
 
     # Make sure installation worked
@@ -53,7 +47,7 @@ service_postinst ()
     rm -f "${NZBGET_INSTALLER}"
 
     # Correct options from wizard
-    if [ ! -e "${${CFG_FILE}" ]; then
+    if [ ! -e "${CFG_FILE}" ]; then
         # Use whatever the installer found best
         # It does optimizations based on the current system
         cp -f ${TEMPLATE_CFG_FILE} ${CFG_FILE}
@@ -76,4 +70,16 @@ service_postinst ()
     $BIN/busybox --install $BIN >> ${INST_LOG}
     $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
     $BIN/deluser "${USER}" >> ${INST_LOG}
+}
+
+service_postupgrade ()
+{
+    # Needed to force correct permissions, during update
+    # Extract the right paths from config file
+    if [ -r "${CFG_FILE}" ]; then
+        MAIN_DIR=`sed -n 's/^MainDir[ ]*=[ ]*//p' ${CFG_FILE}`
+        if [ -n "${MAIN_DIR}" ] && [ -d "${MAIN_DIR}" ]; then
+            set_syno_permissions "${MAIN_DIR}" "${GROUP}"
+        fi
+    fi
 }
