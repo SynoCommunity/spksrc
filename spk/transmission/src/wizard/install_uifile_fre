@@ -10,8 +10,8 @@
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
-                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }
         }]
@@ -24,8 +24,8 @@
             "validator": {
                 "allowBlank": true,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
-                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }
         }]
@@ -38,8 +38,8 @@
             "validator": {
                 "allowBlank": true,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
-                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }
         }]
@@ -64,6 +64,6 @@
 }, {
      "Step_title": "Attention! DSM6 Permissions",
      "articles": [{
-     "Desc": "Les autorisations sont gérées avec le groupe 'sc-download' dans DSM.<br><br>Au cours de l'installation du package, ce groupe sera ajouté avec les autorisations correctes au répertoire choisi.
+    "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration."
      }]
 }]
