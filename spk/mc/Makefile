@@ -1,6 +1,6 @@
 SPK_NAME = mc
-SPK_VERS = 4.8.15
-SPK_REV = 3
+SPK_VERS = 4.8.20
+SPK_REV = 4
 SPK_ICON = src/mc.png
 
 DEPENDS = cross/mc
@@ -11,15 +11,12 @@ DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\\\'int
 RELOAD_UI = no
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
-CHANGELOG = Update to 4.8.15
+CHANGELOG = Update to 4.8.20
 
 HOMEPAGE = http://www.midnight-commander.org
 LICENSE  = GNU GPL
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 POST_STRIP_TARGET = mc_extra_install
 
