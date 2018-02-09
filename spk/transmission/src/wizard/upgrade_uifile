@@ -1,6 +1,9 @@
 [{
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "Attention! DSM Permissions",
     "items": [{
-    "desc": "Permissions are managed with the group 'sc-download' in DSM. The group 'users' is no longer used."
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
+    },
+    {
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within Transmission, manually set Read/Write permissions for the 'sc-download' group on the reported folders using File Station."
     }]
 }]
