@@ -2,7 +2,7 @@ PKG_NAME = jemalloc
 PKG_VERS = 3.2.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.canonware.com/download/jemalloc
+PKG_DIST_SITE = https://github.com/jemalloc/jemalloc/releases/download/$(PKG_VERS)/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
