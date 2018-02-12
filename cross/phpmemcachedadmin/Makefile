@@ -1,9 +1,8 @@
 PKG_NAME = phpMemcachedAdmin
-PKG_VERS = 1.3.0
+PKG_VERS = 1.2.2-r262
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/elijaa/phpmemcachedadmin/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://phpmemcacheadmin.googlecode.com/files
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
