@@ -1,5 +1,5 @@
 PKG_NAME = mediainfo
-PKG_VERS = 0.7.93
+PKG_VERS = 17.12
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://mediaarea.net/download/source/$(PKG_NAME)/$(PKG_VERS)
@@ -7,7 +7,7 @@ PKG_DIR = MediaInfo/Project/GNU/CLI
 
 DEPENDS = cross/libmediainfo
 
-HOMEPAGE = http://sourceforge.net/projects/mediainfo/
+HOMEPAGE = https://mediaarea.net/en/MediaInfo
 COMMENT  = MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files.
 LICENSE  = BSD
 
