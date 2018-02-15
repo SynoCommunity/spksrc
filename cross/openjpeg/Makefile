@@ -1,8 +1,8 @@
 PKG_NAME = openjpeg
-PKG_VERS = 2.1.0
+PKG_VERS = 2.3.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://sourceforge.net/projects/openjpeg.mirror/files/$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/uclouvain/openjpeg/archive/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/libtiff

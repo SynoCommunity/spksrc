@@ -11,16 +11,20 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = myConfigure
+CONFIGURE_TARGET = x265_custom_configure
+INSTALL_TARGET = x265_custom_install
 
 YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
-CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
+CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(INSTALL_PREFIX)/lib
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -59,4 +63,10 @@ endif
 .PHONY: myConfigure
 myConfigure:
 	$(RUN) cmake $(CMAKE_ARGS) .
+.PHONY: x265_custom_configure x265_custom_install
+x265_custom_configure:
+	$(RUN) cmake $(CMAKE_ARGS) .
+
+x265_custom_install:
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
 
