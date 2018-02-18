@@ -33,6 +33,7 @@ markdown==2.6.11
 # which are installed through cross/bcrypt
 pyOpenSSL==17.5.0
 cryptography==2.1.4
+pyasn1==0.4.2
 asn1crypto==0.24.0
 enum34==1.1.6
 idna==2.6
