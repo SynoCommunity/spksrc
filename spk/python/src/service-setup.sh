@@ -13,7 +13,7 @@ service_postinst ()
 
     # Install busybox stuff
     # So pure-Python spk's can use the functions
-    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+    ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
 
     # Byte-compile in background
     ${SYNOPKG_PKGDEST}/bin/python -m compileall -q -f ${SYNOPKG_PKGDEST}/lib/python2.7 </dev/null &>/dev/null &
