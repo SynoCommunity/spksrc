@@ -1,6 +1,6 @@
 SPK_NAME = mono
 SPK_VERS = 5.8.0.108
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -14,16 +14,10 @@ CHANGELOG = "Update to 5.8.0.108 (Release)"
 HOMEPAGE = http://mono-project.com
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 POST_STRIP_TARGET = mono_extra_install
 PRE_COPY_TARGET = mono_pre_copy
-
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 MONO_NATIVE_INSTALL = $(WORK_DIR)/../../../native/$(SPK_NAME)/work-native/install
 
