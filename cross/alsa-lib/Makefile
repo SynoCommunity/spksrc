@@ -13,7 +13,7 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-python
-ifeq ($(findstring $(ARCH),88f5281 ppc853x ppc854x),$(ARCH))
+ifeq ($(findstring $(ARCH), ppc853x ppc854x),$(ARCH))
 ADDITIONAL_CFLAGS = -DNO_TLS_PFX
 endif
 

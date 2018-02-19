@@ -25,7 +25,7 @@ AVAILABLE_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
 
 # Toolchain filters
-SUPPORTED_ARCHS = $(sort $(filter-out 88f5281% powerpc% ppc824% ppc854x%, $(AVAILABLE_ARCHS)))
+SUPPORTED_ARCHS = $(sort $(filter-out powerpc% ppc824% ppc854x%, $(AVAILABLE_ARCHS)))
 LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 
 # Use x64 when kernels are not needed
@@ -33,7 +33,7 @@ ARCHS_NO_KRNLSUPP = $(filter-out x64%, $(SUPPORTED_ARCHS))
 ARCHS_DUPES = $(filter-out avoton% braswell% broadwell% bromolow% cedarview% grantley% x86%, $(SUPPORTED_ARCHS))
 
 # Available Arches
-ARM5_ARCHES = 88f5281 88f6281
+ARM5_ARCHES = 88f6281
 ARM7_ARCHES = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco hi3535
 ARM8_ARCHES = rtd1296
 ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES) $(ARM8_ARCHES)
