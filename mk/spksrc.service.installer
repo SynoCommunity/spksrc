@@ -83,6 +83,8 @@ syno_remove_user ()
             echo "Removing user ${RM_USER}" >> ${INST_LOG}
             synouser --del "${RM_USER}" >> ${INST_LOG} 2>&1
             synouser --rebuild all
+            # Also rebuild groups so users are removed
+            synogroup --rebuild all
         fi
     fi
 }
@@ -133,6 +135,7 @@ set_syno_permissions ()
         # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
         while [ "${DIRNAME}" != "${VOLUME}" ]; do
             if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:..x\"`" ]; then
+                echo "Granting '${GROUP}' group basic permissions on ${DIRNAME}" >> ${INST_LOG}
                 synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:--x----------:---n" >> ${INST_LOG} 2>&1
             fi
             DIRNAME="$(dirname "${DIRNAME}")"
@@ -274,10 +277,8 @@ postuninst ()
         if [ -n "${GROUP}" ]; then
             syno_group_remove "${GROUP}"
         fi
-        # On DSM 5, remove user if still exists
-        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-            syno_remove_user "${SYNOUSER_PREFIX}${USER}"
-        fi
+        # Remove user
+        syno_remove_user "${EFF_USER}"
     fi
 
     call_func "service_postuninst"
@@ -297,11 +298,6 @@ preupgrade ()
     $MKDIR "$TMP_DIR" >> ${INST_LOG}
 
     call_func "service_save"
-
-    # On DSM 6, remove syno user if still exists
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -ge 6 ]; then
-        syno_remove_user "${SYNOUSER_PREFIX}${USER}"
-    fi
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
