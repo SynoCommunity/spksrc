@@ -7,7 +7,7 @@ FIRMWARE = 4.3-3776
 LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
-ifneq ($(findstring $(ARCH),powerpc 88f5281),)
+ifneq ($(findstring $(ARCH),powerpc),)
 $(error Sorry, this package does not support the $(ARCH) architecture)
 endif
 
@@ -15,7 +15,7 @@ endif
 include ../../mk/spksrc.common.mk
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH),88f6281 $(PPC_ARCHES)),)
+ifneq ($(findstring $(ARCH), $(ARM5_ARCHES) $(PPC_ARCHES)),)
 SPK_VERS = 0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif

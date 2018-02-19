@@ -11,10 +11,9 @@ HOMEPAGE = http://gmplib.org/
 COMMENT  = GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating point numbers
 LICENSE  = LGPL
 
-GNU_CONFIGURE = 1
-ifeq ($(findstring $(ARCH),88f5281 88f6281),$(ARCH))
-CONFIGURE_ARGS = --disable-assembly
-endif
-
 include ../../mk/spksrc.cross-cc.mk
 
+GNU_CONFIGURE = 1
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --disable-assembly
+endif
