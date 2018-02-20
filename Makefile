@@ -66,6 +66,12 @@ natives:
 	    (cd $${n} && $(MAKE)) ; \
 	done
 
+native-digests:
+	@for n in $(dir $(wildcard native/*/Makefile)) ; \
+	do \
+	    (cd $${n} && $(MAKE) digests) ; \
+	done
+
 toolchain-digests:
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
