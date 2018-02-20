@@ -130,6 +130,10 @@ ifneq ($(strip $(BETA)),)
 endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
+else
+  ifneq ($(strip $(HOMEPAGE)),)
+	@echo helpurl=\"$(HOMEPAGE)\" >> $@
+  endif
 endif
 ifneq ($(strip $(SUPPORTURL)),)
 	@echo support_url=\"$(SUPPORTURL)\" >> $@
