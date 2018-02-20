@@ -6,7 +6,7 @@ SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
 
 all: $(SUPPORTED_SPKS)
 
-clean: $(addsuffix -clean,$(SUPPORTED_SPKS)) 
+clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean
 
 dist-clean: clean
@@ -100,7 +100,7 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
-setup: local.mk dsm-5.2
+setup: local.mk dsm-6.1
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
