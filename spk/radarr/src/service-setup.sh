@@ -12,19 +12,6 @@ PID_FILE="${CONFIG_DIR}/Radarr/nzbdrone.pid"
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
 
-# Generic service corrects only /var/ directories
-# Radarr needs other folders too
-correct_sonarr_permissions ()
-{
-    DIR=$1
-    echo "Setting permissions for ${EFF_USER} on ${DIR}" >> ${INST_LOG}
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        chown -R ${EFF_USER}:root "${DIR}" >> ${INST_LOG} 2>&1
-    else
-        chown -R ${EFF_USER}:${USER} "${DIR}" >> ${INST_LOG} 2>&1
-    fi
-}
-
 service_prestart ()
 {
     # Replace generic service startup, run service as daemon
@@ -44,7 +31,7 @@ service_postinst ()
     # Move config.xml to .config
     mkdir -p ${CONFIG_DIR}/Radarr
     mv ${SYNOPKG_PKGDEST}/app/config.xml ${CONFIG_DIR}/Radarr/config.xml
-    correct_sonarr_permissions "${CONFIG_DIR}"
+    set_unix_permissions "${CONFIG_DIR}"
 
     # If nessecary, add user also to the old group before removing it
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
@@ -99,9 +86,9 @@ service_postupgrade ()
         echo "Restoring Radarr version from before upgrade" >> ${INST_LOG}
         rm -fr ${SYNOPKG_PKGDEST}/share >> $INST_LOG 2>&1
         mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> $INST_LOG 2>&1
-        correct_sonarr_permissions "${SYNOPKG_PKGDEST}/share"
+        set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
-    correct_sonarr_permissions "${CONFIG_DIR}"
+    set_unix_permissions "${CONFIG_DIR}"
 
     # Remove upgrade Flag
     rm ${CONFIG_DIR}/KEEP_VAR
