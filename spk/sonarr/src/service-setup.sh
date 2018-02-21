@@ -9,7 +9,8 @@ SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe"
 CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
 PID_FILE="${CONFIG_DIR}/NzbDrone/nzbdrone.pid"
 
-GROUP="sc-media"
+GROUP="sc-download"
+LEGACY_GROUP="sc-media"
 
 # Generic service corrects only /var/ directories
 # Sonarr needs other folders too
@@ -44,6 +45,9 @@ service_postinst ()
     mkdir -p ${CONFIG_DIR}/NzbDrone
     mv ${SYNOPKG_PKGDEST}/app/config.xml ${CONFIG_DIR}/NzbDrone/config.xml
     correct_sonarr_permissions "${CONFIG_DIR}"
+
+    # If nessecary, add user also to the old group before removing it
+    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
 
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin
