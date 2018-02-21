@@ -10,10 +10,11 @@ URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 ifneq ($(PKG_DIST_FILE),)
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_FILE)
+LOCAL_FILE    = $(PKG_DIST_FILE)
 else
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+LOCAL_FILE    = $(PKG_DIST_NAME)
 endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 DISTRIB_DIR   = $(KERNELS_DIR)/$(PKG_BRANCH)
 COMPILE_TARGET = kernel_module_compile_target
@@ -63,11 +64,11 @@ $(DIGESTS_FILE): download
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
-	    SHA1|sha1)     tool=sha1sum ;; \
-	    SHA256|sha256) tool=sha256sum ;; \
-	    MD5|md5)       tool=md5sum ;; \
+	    SHA1)     tool=sha1sum ;; \
+	    SHA256)   tool=sha256sum ;; \
+	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(PKG_DIST_NAME) $$type `$$tool $(DISTRIB_DIR)/$(PKG_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
 	done
 
 kernel_module_compile_target:

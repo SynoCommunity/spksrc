@@ -24,6 +24,12 @@ toolchain-clean:
 	    (cd $${tc} && $(MAKE) clean) ; \
 	done
 
+kernel-clean:
+	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
+	do \
+	    (cd $${kernel} && $(MAKE) clean) ; \
+	done
+
 cross-clean:
 	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
 	do \
@@ -58,6 +64,30 @@ natives:
 	@for n in $(dir $(wildcard native/*/Makefile)) ; \
 	do \
 	    (cd $${n} && $(MAKE)) ; \
+	done
+
+native-digests:
+	@for n in $(dir $(wildcard native/*/Makefile)) ; \
+	do \
+	    (cd $${n} && $(MAKE) digests) ; \
+	done
+
+toolchain-digests:
+	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	do \
+	    (cd $${tc} && $(MAKE) digests) ; \
+	done
+
+kernel-digests:
+	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
+	do \
+	    (cd $${kernel} && $(MAKE) digests) ; \
+	done
+
+cross-digests:
+	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
+	do \
+	    (cd $${cross} && $(MAKE) digests) ; \
 	done
 
 .PHONY: toolchains kernel-modules
