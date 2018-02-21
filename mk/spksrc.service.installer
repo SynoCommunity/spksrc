@@ -124,10 +124,15 @@ set_syno_permissions ()
 
     # Ensure directory resides in /volumeX before setting GROUP permissions
     if [ "`echo ${VOLUME} | cut -c2-7`" = "volume" ]; then
-        echo "Granting '${GROUP}' group permissions on ${DIRNAME}" >> ${INST_LOG}
-
         # Set read/write permissions for GROUP for folder and subfolders
         if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:rwxpdDaARWcC-:fd--\"`" ]; then
+            # First Unix permissions, but only if it's in Linux mode
+            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+                set_unix_permissions "${DIRNAME}"
+            fi
+
+            # Then fix the Synology permissions
+            echo "Granting '${GROUP}' group permissions on ${DIRNAME}" >> ${INST_LOG}
             synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:rwxpdDaARWcC-:fd--" >> ${INST_LOG} 2>&1
             find "${DIRNAME}" -type d -exec synoacltool -enforce-inherit "{}" \; >> ${INST_LOG} 2>&1
         fi
@@ -144,6 +149,39 @@ set_syno_permissions ()
         echo "Skip granting '${GROUP}' group permissions on ${DIRNAME} as the directory does not reside in '/volumeX'. Set manually if needed." >> ${INST_LOG}
     fi
 }
+
+# Sets recurivse permissions using chown
+set_unix_permissions ()
+{
+    DIRNAME=$1
+    echo "Granting '${EFF_USER}' unix permissions on ${DIRNAME}" >> ${INST_LOG}
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        chown -R ${EFF_USER}:root "${DIRNAME}" >> $INST_LOG 2>&1
+    else
+        chown -R ${EFF_USER}:${USER} "${DIRNAME}" >> $INST_LOG 2>&1
+    fi
+}
+
+# If package was moved to new group, we need to add the new package user
+# also to the old group. Only if the legacy user was in the old group.
+# Usage: syno_user_add_to_legacy_group "${NEW_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
+syno_user_add_to_legacy_group () {
+    NEW_USER=$1
+    LEGACY_USER=$2
+    LEGACY_GROUP=$3
+
+    # Check if user in old group
+    if synogroup --get "$LEGACY_GROUP" | grep "^[0-9]:\[${LEGACY_USER}\]" &> /dev/null; then
+        # Add new user and remove old one
+        echo "Adding '${NEW_USER}' to '${LEGACY_GROUP}' for backwards compatibility" >> ${INST_LOG}
+        MEMBERS="$(synogroup --get $LEGACY_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
+        MEMBERS=${MEMBERS//$LEGACY_USER}
+        # The "synogroup --member" command clears all users before adding new ones
+        # so all the users must be listed on the command line
+        synogroup --member "$LEGACY_GROUP" $MEMBERS "${NEW_USER}" >> ${INST_LOG}
+    fi
+}
+
 
 ### Generic package behaviors
 
@@ -197,8 +235,9 @@ postinst ()
         fi
         if synogroup --get "$GROUP" &> /dev/null; then
             # Check user already in group
-            if ! synogroup --get "$GROUP" | grep '^[0-9]:\[${EFF_USER}\]' &> /dev/null; then
+            if ! synogroup --get "$GROUP" | grep "^[0-9]:\[${EFF_USER}\]" &> /dev/null; then
                 # Add user, not in group yet
+                echo "Adding '${EFF_USER}' to '${GROUP}'" >> ${INST_LOG}
                 MEMBERS="$(synogroup --get $GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
                 # The "synogroup --member" command clears all users before adding new ones
                 # so all the users must be listed on the command line
@@ -214,7 +253,7 @@ postinst ()
         echo "Configuring ${SHARE_PATH}" >> ${INST_LOG}
         # Create share if does not exist
         #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
-        if ! synoshare --get "${SHARE_NAME}"  &> /dev/null ; then
+        if ! synoshare --get "${SHARE_NAME}" &> /dev/null ; then
             synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG}
         fi
 
@@ -313,11 +352,7 @@ postupgrade ()
     $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG}
 
     # Correct permissions of var folder
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        chown -R ${EFF_USER}:root "${INST_VAR}" >> $INST_LOG 2>&1
-    else
-        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> $INST_LOG 2>&1
-    fi
+    set_unix_permissions "${INST_VAR}"
 
     call_func "service_restore"
 
