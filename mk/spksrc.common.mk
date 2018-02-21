@@ -30,7 +30,7 @@ LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 
 # Use x64 when kernels are not needed
 ARCHS_NO_KRNLSUPP = $(filter-out x64%, $(SUPPORTED_ARCHS))
-ARCHS_DUPES = $(filter-out avoton% braswell% broadwell% bromolow% cedarview% grantley% x86%, $(SUPPORTED_ARCHS))
+ARCHS_DUPES = $(filter-out apollolake% avoton% braswell% broadwell% bromolow% cedarview% grantley% x86%, $(SUPPORTED_ARCHS))
 
 # Available Arches
 ARM5_ARCHES = 88f6281
