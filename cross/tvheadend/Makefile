@@ -1,15 +1,15 @@
 PKG_NAME = tvheadend
-PKG_VERS = 4.2.4
 PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = 51702525d
+PKG_DIST_SITE = https://github.com/tvheadend/tvheadend.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = cross/openssl cross/libhdhomerun cross/uriparser cross/libdvbcsa
 DEPENDS += cross/dvb-apps cross/ffmpeg
 
-HOMEPAGE = https://www.lonelycoder.com/tvheadend/
+HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 LICENSE  = GPL v3
 

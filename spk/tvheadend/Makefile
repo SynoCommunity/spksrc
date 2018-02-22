@@ -1,9 +1,8 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.4
-SPK_REV = 11
+SPK_VERS = 4.2.5-33
+SPK_REV = 12
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -12,9 +11,9 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 ADMIN_PORT = 9981
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
-CHANGELOG = "Update to Tvheadend 4.2.4 (Release), including update of libhdhomerun to 20170930"
+CHANGELOG = "Update to Tvheadend 4.2.5 (r33~g51702525d)"
 
-HOMEPAGE = https://www.lonelycoder.com/tvheadend/
+HOMEPAGE = https://tvheadend.org/
 LICENSE  = GPL v3
 
 INSTALLER_SCRIPT = src/installer.sh
