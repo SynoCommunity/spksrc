@@ -93,23 +93,27 @@ syno_remove_user ()
 syno_group_create ()
 {
     EFF_USER=$1
-    echo "Creating group ${GROUP}" >> ${INST_LOG}
-    # Create syno group
-    synogroup --add "${GROUP}" "${EFF_USER}" >> ${INST_LOG}
-    # Set description of the syno group
-    synogroup --descset "${GROUP}" "${GROUP_DESC}" >> ${INST_LOG}
+    if [ -n "${EFF_USER}" ]; then
+        echo "Creating group ${GROUP}" >> ${INST_LOG}
+        # Create syno group
+        synogroup --add "${GROUP}" "${EFF_USER}" >> ${INST_LOG}
+        # Set description of the syno group
+        synogroup --descset "${GROUP}" "${GROUP_DESC}" >> ${INST_LOG}
+    fi
 }
 
 # Delete syno group if empty
 syno_group_remove ()
 {
     RM_GROUP=$1
-    # Check if syno group is empty
-    if ! synogroup --get "${RM_GROUP}" | grep -q "0:\["; then
-        echo "Removing group ${RM_GROUP}" >> ${INST_LOG}
-        # Remove syno group
-        synogroup --del "${RM_GROUP}" >> ${INST_LOG} 2>&1
-        synogroup --rebuild all
+    if [ -n "${RM_GROUP}" ]; then
+        # Check if syno group is empty
+        if ! synogroup --get "${RM_GROUP}" | grep -q "0:\["; then
+            echo "Removing group ${RM_GROUP}" >> ${INST_LOG}
+            # Remove syno group
+            synogroup --del "${RM_GROUP}" >> ${INST_LOG} 2>&1
+            synogroup --rebuild all
+        fi
     fi
 }
 
@@ -154,11 +158,13 @@ set_syno_permissions ()
 set_unix_permissions ()
 {
     DIRNAME=$1
-    echo "Granting '${EFF_USER}' unix permissions on ${DIRNAME}" >> ${INST_LOG}
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        chown -R ${EFF_USER}:root "${DIRNAME}" >> $INST_LOG 2>&1
-    else
-        chown -R ${EFF_USER}:${USER} "${DIRNAME}" >> $INST_LOG 2>&1
+    if [ -n "${EFF_USER}" ]; then
+        echo "Granting '${EFF_USER}' unix permissions on ${DIRNAME}" >> ${INST_LOG}
+        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+            chown -R ${EFF_USER}:root "${DIRNAME}" >> $INST_LOG 2>&1
+        else
+            chown -R ${EFF_USER}:${USER} "${DIRNAME}" >> $INST_LOG 2>&1
+        fi
     fi
 }
 
@@ -216,7 +222,7 @@ postinst ()
     fi
 
     # DSM 5 specific operations
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ] && [ -n "${EFF_USER}" ]; then
         # Create prefixed synouser
         if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
             synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
@@ -259,7 +265,7 @@ postinst ()
 
         # Add user permission if no GROUP is set in UI
         # GROUP permission will be added in set_syno_permissions
-        if [ ! -n "$GROUP" ]; then
+        if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
             synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" >> ${INST_LOG} 2>&1
         fi
         synoshare --build
@@ -282,10 +288,10 @@ postinst ()
     fi
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
         # On DSM 5 set package files permissions
-        chown -R ${EFF_USER}:root "${SYNOPKG_PKGDEST}" >> ${INST_LOG} 2>&1
+        set_unix_permissions "${SYNOPKG_PKGDEST}"
     else
         # On DSM 6 only var is concerned
-        chown -R ${EFF_USER}:${USER} "${INST_VAR}" >> ${INST_LOG} 2>&1
+        set_unix_permissions "${INST_VAR}"
     fi
     exit 0
 }
@@ -315,9 +321,8 @@ postuninst ()
         $RM "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
 
         # Remove syno group if empty
-        if [ -n "${GROUP}" ]; then
-            syno_group_remove "${GROUP}"
-        fi
+        syno_group_remove "${GROUP}"
+
         # Remove user
         syno_remove_user "${EFF_USER}"
     fi
