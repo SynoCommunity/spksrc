@@ -272,8 +272,10 @@ postinst ()
         fi
     fi
 
-    call_func "service_postinst"
     $MKDIR "${INST_VAR}"
+
+    call_func "service_postinst"
+
     $CP "${INST_LOG}" "${INST_VAR}"
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
