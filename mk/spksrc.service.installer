@@ -59,7 +59,7 @@ TEE="/usr/bin/tee -a"
 log_step ()
 {
     date >> ${INST_LOG}
-    echo "Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}" >> ${INST_LOG}
+    echo "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}" >> ${INST_LOG}
 }
 
 save_wizard_variables ()
