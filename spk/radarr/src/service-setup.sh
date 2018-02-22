@@ -2,12 +2,17 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 
+# Check versions during upgrade
 RADARR="${SYNOPKG_PKGDEST}/share/Radarr/Radarr.exe"
 SPK_RADARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/Radarr/Radarr.exe"
 
 # Radarr uses custom Config and PID directories
-CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
+HOME_DIR="${SYNOPKG_PKGDEST}/var"
+CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
 PID_FILE="${CONFIG_DIR}/Radarr/nzbdrone.pid"
+
+# Some have it stored in the root of package
+LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
@@ -16,7 +21,7 @@ service_prestart ()
 {
     # Replace generic service startup, run service as daemon
     echo "Starting Radarr as daemon under user ${EFF_USER} in group ${GROUP}" >> ${LOG_FILE}
-    COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${RADARR}"
+    COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${RADARR}"
     echo "${COMMAND}" >> ${LOG_FILE}
 
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
@@ -45,16 +50,15 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    # We have to account for legacy folder under /var/
-    # It should go, after the upgrade, into /.config/
+    # We have to account for legacy folder in the root
+    # It should go, after the upgrade, into /var/.config/
     # The /var/ folder gets automatically copied by service-installer after this
-    # So we need to move our new /.config/ folder to /var/ (if present)
-    if [ -d "${CONFIG_DIR}" ]; then
-        echo "Moving ${CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
-        mv ${CONFIG_DIR} ${INST_VAR}/.config
+    if [ -d "${LEGACY_CONFIG_DIR}" ]; then
+        echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
+        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${LOG_FILE} 2>&1
     else
-        # Need it always, to save KEEP_VAR
-        mkdir ${INST_VAR}/.config
+        # Create, in case it's missing for some reason
+        mkdir ${CONFIG_DIR} >> ${LOG_FILE} 2>&1
     fi
 
     # Is Installed Radarr Binary Ver. >= SPK Radarr Binary Ver.?
@@ -63,23 +67,17 @@ service_preupgrade ()
     SPK_VER=$(${MONO_PATH}/monodis --assembly ${SPK_RADARR} | grep "Version:" | awk '{print $2}')
     echo "Requested Radarr Binary: ${SPK_VER}" >> ${INST_LOG}
     if [ "${CUR_VER//.}" -ge "${SPK_VER//.}" ]; then
-        echo 'KEEP_CUR="yes"' > ${INST_VAR}/.config/KEEP_VAR
+        echo 'KEEP_CUR="yes"' > ${CONFIG_DIR}/KEEP_VAR
         echo "[KEEPING] Installed Radarr Binary - Upgrading Package Only" >> ${INST_LOG}
         mv ${SYNOPKG_PKGDEST}/share ${INST_VAR}
     else
-        echo 'KEEP_CUR="no"' > ${INST_VAR}/.config/KEEP_VAR
+        echo 'KEEP_CUR="no"' > ${CONFIG_DIR}/KEEP_VAR
         echo "[REPLACING] Installed Radarr Binary" >> ${INST_LOG}
     fi
 }
 
 service_postupgrade ()
 {
-    # Restore some stuff
-    # Service-installer already copied the /var/ folder with .config in it
-    echo "Moving ${INST_VAR}/.config to ${CONFIG_DIR}" >> ${INST_LOG}
-    rm -fr ${CONFIG_DIR} >> $INST_LOG 2>&1
-    mv ${INST_VAR}/.config ${SYNOPKG_PKGDEST}/ >> $INST_LOG 2>&1
-
     # Restore Current Radarr Binary If Current Ver. >= SPK Ver.
     . ${CONFIG_DIR}/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
