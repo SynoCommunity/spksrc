@@ -131,7 +131,7 @@ set_syno_permissions ()
         # Set read/write permissions for GROUP for folder and subfolders
         if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:rwxpdDaARWcC-:fd--\"`" ]; then
             # First Unix permissions, but only if it's in Linux mode
-            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+            if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
                 set_unix_permissions "${DIRNAME}"
             fi
 
