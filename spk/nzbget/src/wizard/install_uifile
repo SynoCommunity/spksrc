@@ -56,11 +56,11 @@
         "subitems": [{
             "key": "wizard_stable_release",
             "desc": "Latest stable NZBGet version",
-            "defaultVaule": true
+            "defaultValue": true
         }, {
             "key": "wizard_testing_release",
             "desc": "Latest testing (beta) NZBGet version",
-            "defaultVaule": false
+            "defaultValue": false
         }]
     }]
 }]
