@@ -144,6 +144,12 @@ set_syno_permissions ()
         # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
         while [ "${DIRNAME}" != "${VOLUME}" ]; do
             if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:..x\"`" ]; then
+                # If it is linux mode (due to old package) we need to add "administrators"-group,
+                # otherwise the folder is not accessible from File Station anymore!
+                if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+                    synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" >> ${INST_LOG} 2>&1
+                fi
+                # Add the new group permissions
                 echo "Granting '${GROUP}' group basic permissions on ${DIRNAME}" >> ${INST_LOG}
                 synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:--x----------:---n" >> ${INST_LOG} 2>&1
             fi
