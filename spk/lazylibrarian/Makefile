@@ -1,31 +1,30 @@
 SPK_NAME = lazylibrarian
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/lazylibrarian.png
-DSM_UI_DIR = app
-BETA=1
 
 DEPENDS  =
-SPK_DEPENDS = "python>2.7.3-3"
+SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = Diaoul
-DESCRIPTION = LazyLibrarian is an automated book downloader for SABnzbd.
-DESCRIPTION_FRE = LazyLibrarian est un téléchargeur automatique de livre pour SABnzbd.
-ADMIN_PORT = 8082
+DESCRIPTION = LazyLibrarian is a program to follow authors and grab metadata for all your digital reading needs. It uses Goodreads.com for author info and book info websites as a source.
 RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
-CHANGELOG = "1. Use source from DobyTang"
+CHANGELOG = "1. Integrate with DSM5+6 Generic Service support and added to 'sc-download' group. 2. Selecting of fork for new installs. 3. Depend on Git for auto-updates"
 
 HOMEPAGE   = http://github.com/DobyTang/LazyLibrarian
-LICENSE    =
+LICENSE    = GPLv3
+STARTABLE  = yes
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8082
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
+
+WIZARDS_DIR = src/wizard/
 
 COPY_TARGET = nop
 POST_STRIP_TARGET = lazylibrarian_extra_install
@@ -36,12 +35,6 @@ override ARCH=
 include ../../mk/spksrc.spk.mk
 
 .PHONY: lazylibrarian_extra_install
-lazylibrarian_extra_install: $(STAGING_DIR)/share/LazyLibrarian
+lazylibrarian_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
-
-$(STAGING_DIR)/share/LazyLibrarian:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone --depth=1 https://github.com/DobyTang/LazyLibrarian.git LazyLibrarian
