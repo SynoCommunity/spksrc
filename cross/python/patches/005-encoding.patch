@@ -1,0 +1,23 @@
+
+Not all Python packages handle non-UTF8 encoding very well.
+Force UTF8 from within Python, to be sure.
+
+--- Python/bltinmodule.c.orig	2011-09-11 22:10:10.000000000 +0200
++++ Python/bltinmodule.c	2010-05-09 17:15:40.000000000 +0200
+@@ -15,15 +15,9 @@
+ #endif
+
+ /* The default encoding used by the platform file system APIs
+-   Can remain NULL for all platforms that don't have such a concept
++   Force to utf-8 to avoid encoding issues.
+ */
+-#if defined(MS_WINDOWS) && defined(HAVE_USABLE_WCHAR_T)
+-const char *Py_FileSystemDefaultEncoding = "mbcs";
+-#elif defined(__APPLE__)
+ const char *Py_FileSystemDefaultEncoding = "utf-8";
+-#else
+-const char *Py_FileSystemDefaultEncoding = NULL; /* use default */
+-#endif
+
+ /* Forward */
+ static PyObject *filterstring(PyObject *, PyObject *);

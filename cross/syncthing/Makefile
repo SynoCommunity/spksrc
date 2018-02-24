@@ -21,15 +21,18 @@ CGO_ENABLED=0
 # set this to 1 to create static linked binaries
 STATIC_BINARIES = 0
 
+# Need arch-defs now
+include ../../mk/spksrc.cross-cc.mk
+
 # Define SYNCTHING_ARCH as per Syncthing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = arm
 ENV += GOARM=5
 endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
 ifeq ($(SYNCTHING_ARCH),)
@@ -39,8 +42,6 @@ endif
 SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
-
-include ../../mk/spksrc.cross-cc.mk
 
 # use workdir as gopath
 ENV += GOPATH=$(WORK_DIR)

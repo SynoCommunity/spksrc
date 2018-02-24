@@ -6,7 +6,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = 88f5281 powerpc ppc824x ppc854x
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc854x
 
 DEPENDS = cross/ncurses cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 
@@ -26,7 +26,7 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: myPreConfigure
 myPreConfigure:
 	cp src/linux-atomic.c $(WORK_DIR)/$(PKG_DIR)/src
-	
+
 .PHONY: myPrePatch
 myPrePatch:
 	@$(RUN) ./autogen.sh

@@ -198,8 +198,9 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
 	@echo "    \"port\": \"${SERVICE_PORT}\"," >> $@
 	@echo "    \"url\": \"${SERVICE_URL}\"," >> $@
-	@echo "    \"allUsers\": \"${SERVICE_PORT_ALL_USERS}\"," >> $@
-	@echo "    \"grantPrivilege\": \"local\"" >> $@
+	@echo "    \"allUsers\": ${SERVICE_PORT_ALL_USERS}," >> $@
+	@echo "    \"grantPrivilege\": \"all\"," >> $@
+	@echo "    \"advanceGrantPrivilege\": true" >> $@
 	@echo '} } }' >> $@
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config

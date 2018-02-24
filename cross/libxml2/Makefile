@@ -14,10 +14,6 @@ LICENSE  = MIT
 CONFIGURE_ARGS = --without-python --with-zlib=$(STAGING_INSTALL_PREFIX)
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
-ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
-ADDITIONAL_CFLAGS = -O2
-endif
-
 POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk

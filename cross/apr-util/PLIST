@@ -1,6 +1,0 @@
-lnk:lib/libaprutil.so
-lnk:lib/libaprutil.so.0
-lib:lib/libaprutil.so.0.5.1
-lnk:lib/libexpat.so
-lnk:lib/libexpat.so.0
-lib:lib/libexpat.so.0.5.0

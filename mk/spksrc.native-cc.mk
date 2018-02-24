@@ -9,7 +9,12 @@ WORK_DIR := $(PWD)/work-native
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = native-$(PKG_NAME) 
 COOKIE_PREFIX = $(PKG_NAME)-
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+ifneq ($(PKG_DIST_FILE),)
+LOCAL_FILE    = $(PKG_DIST_FILE)
+else
+LOCAL_FILE    = $(PKG_DIST_NAME)
+endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 #####
@@ -54,6 +59,18 @@ clean:
 	rm -fr $(WORK_DIR)
 
 all: install
+
+$(DIGESTS_FILE): download
+	@$(MSG) "Generating digests for $(PKG_NAME)"
+	@rm -f $@ && touch -f $@
+	@for type in SHA1 SHA256 MD5; do \
+	  case $$type in \
+	    SHA1)     tool=sha1sum ;; \
+	    SHA256)   tool=sha256sum ;; \
+	    MD5)      tool=md5sum ;; \
+	  esac ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
+	done
 
 .PHONY: kernel-required
 kernel-required:

@@ -1,9 +1,7 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/radarr.png
-DSM_UI_DIR = app
-BETA = 1
 
 REQUIRED_DSM = 5.0
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
@@ -14,25 +12,27 @@ SPK_DEPENDS = "mono>3.6"
 
 MAINTAINER = ressu
 DESCRIPTION  = Radarr is a movie manager like Couchpotato, but based on the Sonarr codebase. It can monitor multiple RSS feeds for new movie releases and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
-ADMIN_PORT = 8310
 RELOAD_UI = yes
+STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "1. Update for DSM6 Compatibility"
+CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 
 HOMEPAGE = https://radarr.video/
 LICENSE  = GPLv3
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/$(SPK_NAME).sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8310
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
+
+WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = radarr_extra_install
 
-BUSYBOX_CONFIG = usrmng daemon
+BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
@@ -40,5 +40,4 @@ include ../../mk/spksrc.spk.mk
 .PHONY: radarr_extra_install
 radarr_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml

@@ -7,7 +7,7 @@ SPK_ICON = src/python3.png
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 #Build-time dependencies
 DEPENDS += cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/cffi cross/cryptography cross/bcrypt
+DEPENDS += cross/cffi cross/bcrypt
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
 DEPENDS += cross/msgpack-python cross/attr cross/acl cross/lz4

@@ -4,8 +4,6 @@ SPK_REV = 3
 SPK_ICON = src/ffsync.png
 BETA = 1
 
-UNSUPPORTED_ARCHS = 88f5281
-
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/gevent cross/greenlet
 

@@ -1,0 +1,11 @@
+--- gitweb/gitweb.perl.orig	2017-11-28 04:47:44.000000000 +0000
++++ gitweb/gitweb.perl	2018-01-10 07:26:44.546217900 +0000
+@@ -42,7 +42,7 @@
+ 
+ 	# Base URL for relative URLs in gitweb ($logo, $favicon, ...),
+ 	# needed and used only for URLs with nonempty PATH_INFO
+-	our $base_url = $my_url;
++	our $base_url = $my_url . "/";
+ 
+ 	# When the script is used as DirectoryIndex, the URL does not contain the name
+ 	# of the script file itself, and $cgi->url() fails to strip PATH_INFO, so we

@@ -3,7 +3,7 @@ PKG_VERS = 3.2.1
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://sourceware.org/pub/$(PKG_NAME)
+PKG_DIST_SITE = https://sourceware.org/pub/$(PKG_NAME)
 
 DEPENDS =
 
