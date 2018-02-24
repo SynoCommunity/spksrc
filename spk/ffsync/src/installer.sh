@@ -29,20 +29,18 @@ preinst ()
 {
     # Check MySQL database
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ ! -z "${wizard_mysql_password_root}" ]; then
-            if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-                echo "Incorrect MySQL root password"
-                exit 1
-            fi
-            if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${USER}$ > /dev/null 2>&1; then
-                echo "MySQL user ${USER} already exists"
-                exit 1
-            fi
-            if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${PACKAGE}$ > /dev/null 2>&1; then
-                echo "MySQL database ${PACKAGE} already exists"
-                exit 1
-            fi
-        fi   
+        if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+            echo "Incorrect MySQL root password"
+            exit 1
+        fi
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${USER}$ > /dev/null 2>&1; then
+            echo "MySQL user ${USER} already exists"
+            exit 1
+        fi
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${PACKAGE}$ > /dev/null 2>&1; then
+            echo "MySQL database ${PACKAGE} already exists"
+            exit 1
+        fi
     fi
 
     exit 0
