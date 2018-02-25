@@ -260,9 +260,9 @@ icons:
 ifneq ($(strip $(SPK_ICON)),)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
-	(convert $(SPK_ICON) -thumbnail 72x72 - > $(WORK_DIR)/PACKAGE_ICON.PNG)
+	(convert $(SPK_ICON) -thumbnail 72x72 -strip - > $(WORK_DIR)/PACKAGE_ICON.PNG)
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
-	(convert $(SPK_ICON) -thumbnail 256x256 - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
+	(convert $(SPK_ICON) -thumbnail 256x256 -strip - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
 	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
