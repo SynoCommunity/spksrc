@@ -1,29 +1,18 @@
 # Package specific behaviors
 # Sourced script by generic installer and start-stop-status scripts
 
-# Group configuration to manage permissions of recording folders
-GROUP=sc-media
-
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
 HTTPP=9981
 HTSPP=9982
 
-service_prestart ()
-{
-    # Replace generic service startup, run service as daemon
+# Replace generic service startup, run service in background
+GRPN=`id -gn ${EFF_USER}`
+HOME_DIR="${SYNOPKG_PKGDEST}/var"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -l ${LOG_FILE} -p ${PID_FILE}"
+SVC_BACKGROUND=yes
 
-    GRPN=`id -gn ${EFF_USER}`
-    HOME_DIR="${SYNOPKG_PKGDEST}/var"
-
-    echo "Starting Tvheadend as daemon under user ${EFF_USER} in group ${GRPN} with configuration directory ${HOME_DIR} on http port ${HTTPP} and htsp port ${HTSPP}" >> ${LOG_FILE}
-    COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -l ${LOG_FILE} -p ${PID_FILE}"
-
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        su ${EFF_USER} -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1 &
-    else
-        ${COMMAND} >> ${LOG_FILE} 2>&1 &
-    fi
-}
+# Group configuration to manage permissions of recording folders
+GROUP=sc-media
 
 service_postinst ()
 {
@@ -60,6 +49,18 @@ service_postupgrade ()
     for file in ${UPGRADE_CFG_DIR}/*
     do
         DVR_DIR=`grep -e 'storage\":' ${file} | awk -F'"' '{print $4}'`
-        set_syno_permissions "${DVR_DIR}" "${GROUP}" >> ${INST_LOG}
+        # Exclude target link (default recording folder) as ACL permissions srew up package installation
+        if [ ! "${DVR_DIR}" = "/var/packages/tvheadend/target" ]; then
+            echo "Done: ${DVR_DIR}" >> ${INST_LOG}
+            set_syno_permissions "${DVR_DIR}" "${GROUP}"
+        fi
     done
+
+    # Restore ownership of target link, which is lost during upgrades
+    echo "Restore '${EFF_USER}' unix permissions on target link" >> ${INST_LOG}
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        chown ${EFF_USER}:root "/var/packages/tvheadend/target" >> $INST_LOG 2>&1
+    else
+        chown ${EFF_USER}:${USER} "/var/packages/tvheadend/target" >> $INST_LOG 2>&1
+    fi
 }
