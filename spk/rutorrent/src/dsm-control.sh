@@ -1,37 +1,35 @@
 #!/bin/sh
 
-# Package
-PACKAGE="rutorrent"
-DNAME="ruTorrent"
+# Source package specific variable and functions
+SVC_SETUP=`dirname $0`"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
+
+# Default display name
+DNAME="${SYNOPKG_PKGNAME}"
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-RTORRENT="${INSTALL_DIR}/bin/rtorrent"
-PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
-LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
-
-SC_USER="sc-rutorrent"
-LEGACY_USER="rutorrent"
-USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+RTORRENT="${SYNOPKG_PKGDEST}/bin/rtorrent"
+PID_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.pid"
+LOG_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.log"
 
 
 start_daemon ()
 {
-    export HOME=${INSTALL_DIR}/var
-    start-stop-daemon -S -q -m -b -N 10 -x screen -c ${USER} -u ${USER} -p ${PID_FILE} -- -D -m ${RTORRENT}
+    export HOME=${SYNOPKG_PKGDEST}/var
+    start-stop-daemon -S -q -m -b -N 10 -x screen -p ${PID_FILE} -- -D -m ${RTORRENT}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
+    start-stop-daemon -K -q -p ${PID_FILE}
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
+    start-stop-daemon -K -q -t -p ${PID_FILE}
 }
 
 wait_for_status ()
@@ -50,31 +48,38 @@ wait_for_status ()
 case $1 in
     start)
         if daemon_status; then
-            echo ${DNAME} is already running
+            echo "${DNAME} is already running"
+            exit 0
         else
-            echo Starting ${DNAME} ...
+            echo "Starting ${DNAME} ..."
             start_daemon
+            exit $?
         fi
         ;;
     stop)
         if daemon_status; then
-            echo Stopping ${DNAME} ...
+            echo "Stopping ${DNAME} ..."
             stop_daemon
+            exit $?
         else
-            echo ${DNAME} is not running
+            echo "${DNAME} is not running"
+            exit 0
         fi
         ;;
     status)
         if daemon_status; then
-            echo ${DNAME} is running
+            echo "${DNAME} is running"
             exit 0
         else
-            echo ${DNAME} is not running
+            echo "${DNAME} is not running"
             exit 1
         fi
         ;;
     log)
-        echo ${LOG_FILE}
+        if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
+            echo "${LOG_FILE}"
+        fi
+        exit 0
         ;;
     *)
         exit 1

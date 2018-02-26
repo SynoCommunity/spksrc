@@ -9,7 +9,8 @@
             "port": "80",
             "url": "/rutorrent",
             "allUsers": true,
-            "grantPrivilege": "local"
+            "grantPrivilege": "all",
+            "advanceGrantPrivilege": true
         }
     }
 }
