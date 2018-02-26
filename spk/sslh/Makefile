@@ -1,6 +1,6 @@
 SPK_NAME = sslh
-SPK_VERS = 1.17
-SPK_REV = 2
+SPK_VERS = 1.19c
+SPK_REV = 3
 SPK_ICON = src/sslh.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -11,13 +11,12 @@ DESCRIPTION_FRE = sslh accepte des connexions HTTPS, SSH, OpenVPN, tinc et XMPP 
 RELOAD_UI = no
 DISPLAY_NAME = sslh
 
-HOMEPAGE   = http://www.rutschle.net/tech/sslh.shtml
+HOMEPAGE   = http://www.rutschle.net/tech/sslh/README.html
 LICENSE    = GPLv2
+STARTABLE  = yes
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = sslh_extra_install
 
 include ../../mk/spksrc.spk.mk
