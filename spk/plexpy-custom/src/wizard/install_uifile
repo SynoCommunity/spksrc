@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
-            "defaultValue": "git://github.com/JonnyWong16/plexpy.git",
+            "defaultValue": "git://github.com/Tautulli/Tautulli.git",
             "validator": {
                 "allowBlank": false
             }
@@ -17,6 +17,6 @@
             "validator": {
                 "allowBlank": false
             }
-        ]
+        }]
     }]
 }]
