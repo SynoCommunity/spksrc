@@ -133,6 +133,9 @@ set_syno_permissions ()
             # First Unix permissions, but only if it's in Linux mode
             if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
                 set_unix_permissions "${DIRNAME}"
+                # If it is linux mode (due to old package) we need to add "administrators"-group,
+                # otherwise the folder is not accessible from File Station anymore!
+                synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" >> ${INST_LOG} 2>&1
             fi
 
             # Then fix the Synology permissions
@@ -144,8 +147,7 @@ set_syno_permissions ()
         # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
         while [ "${DIRNAME}" != "${VOLUME}" ]; do
             if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:..x\"`" ]; then
-                # If it is linux mode (due to old package) we need to add "administrators"-group,
-                # otherwise the folder is not accessible from File Station anymore!
+                # Here we also need to make sure the admin can access data via File Station
                 if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
                     synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" >> ${INST_LOG} 2>&1
                 fi
