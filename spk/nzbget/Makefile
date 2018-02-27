@@ -5,9 +5,6 @@ SPK_ICON = src/nzbget.png
 
 DEPENDS = cross/busybox cross/p7zip cross/unrar
 
-# Testing the new installer-approach
-BETA = 1
-
 MAINTAINER = Safihre
 DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
 DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écrit en C++ pour les fichiers nzb. Il intègre un mode client/serveur, la vérification, réparation et décompression automatique ainsi qu\\\'une interface web. NZBGet requiert peu de ressources système.
