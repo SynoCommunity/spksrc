@@ -7,7 +7,7 @@ TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
 GROUP="sc-download"
 
-SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGDEST}/var/ -x ${PID_FILE}"
+SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGDEST}/var/ -x ${PID_FILE} -e ${LOG_FILE}"
 
 
 service_preinst ()
