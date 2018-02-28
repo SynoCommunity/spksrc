@@ -2,19 +2,10 @@
 # Package specific behaviors
 # Sourced script by generic installer and start-stop-status scripts
 
-service_prestart ()
-{
-    # Replace generic service startup, fork process in background
-    echo "Starting python -m SimpleHTTPServer ${SERVICE_PORT} at ${SYNOPKG_PKGDEST}" >> ${LOG_FILE}
-    COMMAND="python -m SimpleHTTPServer ${SERVICE_PORT}"
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        su ${EFF_USER} -s /bin/sh -c "cd ${SYNOPKG_PKGDEST}; ${COMMAND}" >> ${LOG_FILE} 2>&1 &
-    else
-        cd ${SYNOPKG_PKGDEST}
-        ${COMMAND} >> ${LOG_FILE} 2>&1 &
-    fi
-    echo "$!" > "${PID_FILE}"
-}
+SERVICE_COMMAND="python -m SimpleHTTPServer ${SERVICE_PORT}"
+SVC_CWD="${SYNOPKG_PKGDEST}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
 
 
 # These functions are for demonstration purpose of DSM sequence call.

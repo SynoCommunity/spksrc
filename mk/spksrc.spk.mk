@@ -94,6 +94,7 @@ ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
 
+.PHONY: $(WORK_DIR)/INFO
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
@@ -288,7 +289,9 @@ ifneq ($(strip $(CONF_DIR)),)
 	@mkdir -p $(DSM_CONF_DIR)
 	@find $${SPKSRC_CONF_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
-	$(eval SPK_CONTENT += conf)
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 endif
 
 ifneq ($(strip $(DSM_LICENSE)),)
