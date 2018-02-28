@@ -6,6 +6,7 @@ VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GIT="${GIT_DIR}/bin/git"
 COUCHPOTATOSERVER="${SYNOPKG_PKGDEST}/var/CouchPotatoServer/CouchPotato.py"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.conf"
+LOG_FILE="${SYNOPKG_PKGDEST}/var/logs/CouchPotato.log"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
@@ -30,6 +31,9 @@ service_postinst ()
         # Clone the repository
          ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/CouchPotato/CouchPotatoServer.git} ${SYNOPKG_PKGDEST}/var/CouchPotatoServer >> ${INST_LOG} 2>&1
     fi
+
+    # Create logs directory, otherwise it might not start
+    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 
     # If nessecary, add user also to the old group
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
