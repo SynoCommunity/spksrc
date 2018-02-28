@@ -1,0 +1,6 @@
+bin:sbin/dumpexfat
+bin:sbin/exfatfsck
+bin:sbin/exfatlabel
+bin:sbin/fsck.exfat
+bin:sbin/mkexfatfs
+bin:sbin/mkfs.exfat
