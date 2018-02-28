@@ -3,9 +3,9 @@
 #   scripts/installer
 #   scripts/start-stop-status
 #   scripts/service-setup
-#   conf/privilege            if SERVICE_USER
-#   conf/resource/SPK_NAME.sc if SERVICE_PORT
-#   app/config                if DSM_UI_DIR
+#   conf/privilege        if SERVICE_USER
+#   conf/SPK_NAME.sc      if SERVICE_PORT
+#   app/config            if DSM_UI_DIR
 #
 # Target are executed in the following order:
 #  service_msg_target
@@ -102,6 +102,13 @@ endif
 	@echo "# Service command to execute (either with shell or as is)" >> $@
 	@echo 'SERVICE_COMMAND="$(SERVICE_COMMAND)"' >> $@
 endif
+ifneq ($(strip $(SERVICE_EXE)),)
+	@echo "# Service command to execute with start-stop-daemon" >> $@
+	@echo 'SERVICE_EXE="$(SERVICE_EXE)"' >> $@
+ifneq ($(strip $(SERVICE_OPTIONS)),)
+	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
+endif
+endif
 	@cat $(SPKSRC_MK)spksrc.service.call_func >> $@
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
@@ -135,8 +142,9 @@ ifneq ($(strip $(SPK_USER)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
 	$(create_target_dir)
 	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
-	$(eval SPK_CONTENT += conf)
-
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 SERVICE_FILES += $(DSM_CONF_DIR)/privilege
 endif
 
@@ -159,13 +167,17 @@ else
 endif
 	@echo "port_forward=\"yes\"" >> $@
 	@echo "dst.ports=\"${SERVICE_PORT}/tcp\"" >> $@
-	$(eval SPK_CONTENT += conf)
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 SERVICE_FILES += $(DSM_CONF_DIR)/$(SPK_NAME).sc
 endif
 else
 $(DSM_CONF_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
 	@$(dsm_script_copy)
-	$(eval SPK_CONTENT += conf)
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 SERVICE_FILES += $(DSM_CONF_DIR)/$(SPK_NAME).sc
 endif
 

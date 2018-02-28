@@ -17,19 +17,8 @@ LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
 
-service_prestart ()
-{
-    # Replace generic service startup, run service as daemon
-    echo "Starting Radarr as daemon under user ${EFF_USER} in group ${GROUP}" >> ${LOG_FILE}
-    COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${RADARR}"
-    echo "${COMMAND}" >> ${LOG_FILE}
-
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        su ${EFF_USER} -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1 &
-    else
-        ${COMMAND} >> ${LOG_FILE} 2>&1 &
-    fi
-}
+SERVICE_COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${RADARR}"
+SVC_BACKGROUND=y
 
 service_postinst ()
 {
