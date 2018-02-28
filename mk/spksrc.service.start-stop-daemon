@@ -54,6 +54,7 @@ wait_for_status ()
     return 1
 }
 
+
 case $1 in
     start)
         if daemon_status; then
@@ -86,7 +87,12 @@ case $1 in
         ;;
     log)
         if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
-            echo "${LOG_FILE}"
+            # Shorten long logs to last 100 lines
+            TEMP_LOG_FILE="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_temp.log"
+            # Clear any previous log
+            echo "Full log: ${LOG_FILE}" > "${TEMP_LOG_FILE}"
+            tail -n100 "${LOG_FILE}" >> "${TEMP_LOG_FILE}"
+            echo "${TEMP_LOG_FILE}"
         fi
         exit 0
         ;;
