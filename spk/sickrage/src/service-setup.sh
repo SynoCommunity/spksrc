@@ -6,6 +6,7 @@ VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GIT="${GIT_DIR}/bin/git"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 SICKRAGE="${SYNOPKG_PKGDEST}/var/SickRage/SiCKRAGE.py"
+LOG_FILE="${SYNOPKG_PKGDEST}/var/logs/sickrage.log"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
 UPGRADE_CFG_FILE="${TMP_DIR}/config.ini"
 
@@ -40,6 +41,9 @@ service_postinst ()
     cp ${SYNOPKG_PKGDEST}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg.sample ${SYNOPKG_PKGDEST}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
     chmod 777 ${SYNOPKG_PKGDEST}/var/SickRage/sickrage/autoProcessTV
     chmod 600 ${SYNOPKG_PKGDEST}/var/SickRage/sickrage/autoProcessTV/autoProcessTV.cfg
+
+    # Create logs directory, otherwise it might not start
+    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 
     # If nessecary, add user also to the old group before removing it
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
