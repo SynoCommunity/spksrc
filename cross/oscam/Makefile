@@ -2,7 +2,7 @@ PKG_NAME = oscam
 PKG_VERS = 1.20
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 7536
+PKG_SVN_REV = 10775
 PKG_DIST_NAME = trunk
 PKG_DIST_SITE = http://www.streamboard.tv/svn/oscam
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
@@ -27,7 +27,7 @@ myConfigure:
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) $(MAKE) CROSS=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p') CONF_DIR=$(INSTALL_PREFIX)/etc USE_LIBUSB=1
+	$(RUN) $(MAKE) CROSS=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p') CONF_DIR=$(INSTALL_PREFIX)/etc  EXTRA_LDFLAGS=${LDFLAGS} USE_LIBUSB=1
 
 .PHONY: myInstall
 myInstall:

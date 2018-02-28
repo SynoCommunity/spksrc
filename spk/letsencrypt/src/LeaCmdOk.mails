@@ -1,0 +1,13 @@
+[LeaCmdOk]
+Category: LetsEncrypt,Important
+Title: LetsEncrypt certificate have been renewed
+Subject: LetsEncrypt certificate have been renewed
+
+Dear user,
+
+The LetsEncrypt automated renewal script has succeed , please verify that all is correct
+
+Sincerely,
+%COMPANY_NAME%
+
+

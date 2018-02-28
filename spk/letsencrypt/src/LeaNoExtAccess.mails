@@ -1,0 +1,13 @@
+[LeaNoExtAccess]
+Category: LetsEncrypt,Important
+Title: LetsEncrypt certificate failed
+Subject: LetsEncrypt certificate have been renewed
+
+Dear user,
+
+The LetsEncrypt automated renewal script has failed.
+DS external hostname is NOT set!
+Define the hostname of you DS
+
+Sincerely,
+%COMPANY_NAME%
