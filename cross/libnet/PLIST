@@ -1,0 +1,10 @@
+rsc:bin/libnet-config
+rsc:include/libnet.h
+rsc:include/libnet/libnet-asn1.h
+rsc:include/libnet/libnet-functions.h
+rsc:include/libnet/libnet-headers.h
+rsc:include/libnet/libnet-macros.h
+rsc:include/libnet/libnet-ospf.h
+rsc:include/libnet/libnet-structures.h
+lnk:lib/libnet.a
+lnk:lib/libpwrite.a
