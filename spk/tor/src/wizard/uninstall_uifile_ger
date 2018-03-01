@@ -1,0 +1,11 @@
+[
+    {
+        "step_title": "TOR Deinstallations Hinweis",
+        "items": [
+            {
+                "desc": "Wenn du deine Einstellungen und/oder ID sichern willst, kopiere den ordner /usr/local/tor/var VOR der deinstallation dieses Paketes!"
+            }
+        ]
+    }
+]
+
