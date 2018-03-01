@@ -1,0 +1,36 @@
+[
+    {
+        "step_title":"TOR relay type",
+        "items":[
+            {
+                "type":"singleselect",
+                "desc":"Please select your preferred TOR relay type",
+                "subitems":[
+                    {
+                        "key":"TOR_NONEXIT",
+                        "desc":"Non-exit (Configure TOR as an non-exit relay)",
+                        "defaultValue":false
+                    },
+                    {
+                        "key":"TOR_EXIT",
+                        "desc":"Exit (Configure TOR as an exit relay)",
+                        "defaultValue":false
+                    },
+                    {
+                        "key":"TOR_BRIDGE",
+                        "desc":"Bridge (Configure TOR as an anonymous bridge)",
+                        "defaultValue":true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "step_title": "TOR Installation Note",
+        "items": [
+            {
+                "desc": "The configuration file with your settings is located at /usr/local/tor/var/torrc.<br>Please verify the settings and change them to your needs."
+            }
+        ]
+    }
+]

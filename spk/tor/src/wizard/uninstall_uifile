@@ -1,0 +1,11 @@
+[
+    {
+        "step_title": "TOR Uninstallation Note",
+        "items": [
+            {
+                "desc": "Attention: The Tor configuration and ID will be removed during package uninstallation. Remember to backup /usr/local/tor/var before you uninstall this package"
+            }
+        ]
+    }
+]
+
