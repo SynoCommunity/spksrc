@@ -77,6 +77,11 @@ service_postupgrade ()
     fi
     set_unix_permissions "${CONFIG_DIR}"
 
+    # If backup was created before new-style packages
+    # new updates/backups will fail due to permissions (see #3185)
+    set_unix_permissions "/tmp/radarr_backup"
+    set_unix_permissions "/tmp/radarr_update"
+
     # Remove upgrade Flag
     rm ${CONFIG_DIR}/KEEP_VAR
 }
