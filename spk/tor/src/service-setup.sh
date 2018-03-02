@@ -1,10 +1,3 @@
-#!/bin/sh
-
-# Package
-PACKAGE="tor"
-DNAME="Tor"
-
-# Others
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 
 TORBIN="${SYNOPKG_PKGDEST}/bin/tor"
