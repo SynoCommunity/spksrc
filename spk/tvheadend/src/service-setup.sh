@@ -41,26 +41,47 @@ service_postinst ()
     $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
+service_preupgrade ()
+{
+    # For backwards compatibility on DSM6 systems, backup potential recordings from package root directory
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -gt 5 ]; then
+        echo "Backup potential recordings from package root directory:" >> ${INST_LOG}
+        tar --exclude=app --exclude=bin --exclude=etc --exclude=lib --exclude=sbin --exclude=share --exclude=var --exclude=openssl.cnf -cvf "/tmp/savedrecs.tar" -C "/volume1/@appstore/tvheadend" . >> ${INST_LOG}
+    fi
+}
+
 service_postupgrade ()
 {
+    # For backwards compatibility, restore potential recordings from package root directory into var directory
+    if [ -e "/tmp/savedrecs.tar" ]; then
+        echo "Restoring potential recordings into /volume1/@appstore/tvheadend/var" >> ${INST_LOG}
+        /bin/tar -xvf "/tmp/savedrecs.tar" -C "/volume1/@appstore/tvheadend/var" >> ${INST_LOG}
+        $RM "/tmp/savedrecs.tar"
+    fi
+
     # Need to enforce correct permissions for recording directories on upgrades
     echo "Adding ${GROUP} group permissions on recording directories:"  >> ${INST_LOG}
     UPGRADE_CFG_DIR="${SYNOPKG_PKGDEST}/var/dvr/config"
     for file in ${UPGRADE_CFG_DIR}/*
     do
         DVR_DIR=`grep -e 'storage\":' ${file} | awk -F'"' '{print $4}'`
-        # Exclude target link (default recording folder) as ACL permissions srew up package installation
-        if [ ! "${DVR_DIR}" = "/var/packages/tvheadend/target" ]; then
+        # Exclude directories in @appstore as ACL permissions srew up package installations
+        TRUNC_DIR=$(echo "$(realpath ${DVR_DIR})" | awk -F/ '{print "/"$3}')
+        if [ "${TRUNC_DIR}" = "/@appstore" ]; then
+            echo "Skip: ${DVR_DIR} (system directory)" >> ${INST_LOG}
+        else
             echo "Done: ${DVR_DIR}" >> ${INST_LOG}
             set_syno_permissions "${DVR_DIR}" "${GROUP}"
         fi
     done
 
-    # Restore ownership of target link, which is lost during upgrades
-    echo "Restore '${EFF_USER}' unix permissions on target link" >> ${INST_LOG}
+    # For backwards compatibility, restore ownership of package system directories
+    echo "Restore '${EFF_USER}' unix permissions on package system directories" >> ${INST_LOG}
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        chown ${EFF_USER}:root "/var/packages/tvheadend/target" >> $INST_LOG 2>&1
+        synoacltool -del "/volume1/@appstore/tvheadend" >> ${INST_LOG} 2>&1
+        chown ${EFF_USER}:root "/var/packages/tvheadend" >> ${INST_LOG} 2>&1
     else
-        chown ${EFF_USER}:${USER} "/var/packages/tvheadend/target" >> $INST_LOG 2>&1
+        chown ${EFF_USER}:${USER} "/var/packages/tvheadend/target" >> ${INST_LOG} 2>&1
+        set_unix_permissions "/volume1/@appstore/tvheadend/var"
     fi
 }
