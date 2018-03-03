@@ -1,6 +1,6 @@
 TC_NAME = syno-x64
 
-TC_ARCH = apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton grantley kvmx64 x86 x86_64
+TC_ARCH = apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton dockerx64 grantley kvmx64 x86 x86_64
 TC_VERS = 6.1
 TC_FIRMWARE = 6.1-15047
 
