@@ -1,10 +1,10 @@
 PKG_NAME = dnscrypt
 PKG_VERS = 1.9.5
-PKG_EXT = tar.bz2
+PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-proxy-$(PKG_VERS).$(PKG_EXT)
 # jedisct1 does not host version 1.9.5 anymore
 # PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/releases/download/$(PKG_VERS)
-PKG_DIST_SITE = https://fossies.org/linux/misc/dns/
+PKG_DIST_SITE = https://fossies.org/linux/misc/dns/legacy
 PKG_DIR = $(PKG_NAME)-proxy-$(PKG_VERS)
 
 DEPENDS = cross/libsodium
