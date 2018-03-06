@@ -55,8 +55,10 @@ endif
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT)),)
 ifeq ($(strip $(SERVICE_COMMAND)),)
+ifeq ($(strip $(SERVICE_EXE)),)
 ifeq ($(strip $(STARTABLE)),)
 $(error Set STARTABLE=no or provide either SERVICE_COMMAND or specific SSS_SCRIPT)
+endif
 endif
 endif
 endif
@@ -131,8 +133,13 @@ ifeq ($(STARTABLE),no)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
 	@$(dsm_script_copy)
 else
+ifneq ($(strip $(SERVICE_EXE)),)
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-daemon
+	@$(dsm_script_copy)
+else
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-status
 	@$(dsm_script_copy)
+endif
 endif
 endif
 
