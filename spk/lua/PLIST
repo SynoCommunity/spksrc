@@ -1,0 +1,7 @@
+lib:lib/libncurses.so.6.*
+lnk:lib/libncurses.so.6
+lnk:lib/libncurses.so
+lib:lib/libreadline.so.7.*
+lnk:lib/libreadline.so.7
+lnk:lib/libreadline.so
+
