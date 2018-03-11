@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 3.4.1
-SPK_REV = 9
+SPK_VERS = 3.4.2
+SPK_REV = 10
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update x264 to 20180119-2245-stable 2. Fix compilation for armv8 platforms"
+CHANGELOG = "1. Update ffmpeg to 3.4.2 <br>2. Add VAAPI for intel x64 processors"
 
 DEPENDS = cross/$(SPK_NAME)
 

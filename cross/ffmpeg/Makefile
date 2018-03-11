@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 3.4.1
+PKG_VERS = 3.4.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases
@@ -53,9 +53,9 @@ CONFIGURE_ARGS += --arch=i386 --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/yasm
+DEPENDS += native/yasm cross/libva
 ENV += PATH=$(YASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86_64 --enable-thumb
+CONFIGURE_ARGS += --arch=x86_64 --enable-thumb --enable-vaapi
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
