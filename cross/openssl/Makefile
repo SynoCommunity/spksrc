@@ -19,16 +19,34 @@ STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 
-OPENSSL_ARCH = linux-generic32
-ifneq ($(findstring $(ARCH), braswell bromolow cedarview x86 avoton x64),)
+OPENSSL_ARCH = 
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 OPENSSL_ARCH = linux-x86_64
 endif
-ifneq ($(findstring $(ARCH), 88f6281),)
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+OPENSSL_ARCH = linux-x32
+endif
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 OPENSSL_ARCH = synology-armle
 endif
-ifneq ($(findstring $(ARCH), powerpc),)
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+OPENSSL_ARCH = linux-generic32
+endif
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+OPENSSL_ARCH = linux-aarch64
+endif
+ifeq ($(findstring $(ARCH), powerpc),$(ARCH))
 OPENSSL_ARCH = synology-ppc
 endif
+# TODO: validate the best OPENSSL_ARCH for the following archs:
+ifeq ($(findstring $(ARCH), ppc824x ppc853x ppc854x qoriq),$(ARCH))
+OPENSSL_ARCH = linux-generic32
+endif
+ifeq ($(strip $(OPENSSL_ARCH)),)
+# unexpected arch. Please add arch to mk/spksrc.common.mk
+$(error Arch $(ARCH) not expected yet)
+endif
+
 
 .PHONY: myConfigure
 myConfigure:
