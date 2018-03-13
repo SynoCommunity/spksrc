@@ -53,7 +53,7 @@ CONFIGURE_ARGS += --arch=i386 --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/yasm cross/libva
+DEPENDS += native/yasm cross/libva cross/libva-utils cross/intel-vaapi-driver
 ENV += PATH=$(YASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=x86_64 --enable-thumb --enable-vaapi
 endif

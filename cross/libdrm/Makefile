@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/libpciaccess
 
 HOMEPAGE = 
-COMMENT  = 
+COMMENT = Userspace interface to kernel DRM services
 LICENSE = 
 
 GNU_CONFIGURE = 1
