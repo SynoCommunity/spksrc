@@ -8,6 +8,8 @@ HTSPP=9982
 # Replace generic service startup, run service in background
 GRPN=`id -gn ${EFF_USER}`
 HOME_DIR="${SYNOPKG_PKGDEST}/var"
+DVR_LOG_DIR="${SYNOPKG_PKGDEST}/var/dvr/log"
+SAVE_DIR="/tmp/tvheadend-recording-backup"
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -l ${LOG_FILE} -p ${PID_FILE}"
 SVC_BACKGROUND=yes
 
@@ -43,20 +45,59 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    # For backwards compatibility on DSM6 systems, backup potential recordings from package root directory
+    # For backwards compatibility on DSM6
     if [ $SYNOPKG_DSM_VERSION_MAJOR -gt 5 ]; then
-        echo "Backup potential recordings from package root directory:" >> ${INST_LOG}
-        tar --exclude=app --exclude=bin --exclude=etc --exclude=lib --exclude=sbin --exclude=share --exclude=var --exclude=openssl.cnf -cvf "/tmp/savedrecs.tar" -C "/volume1/@appstore/tvheadend" . >> ${INST_LOG}
+        # Backup potential recordings from package root directory
+        echo "Save potential recordings from package root directory..." >> ${INST_LOG}
+        for logfile in ${DVR_LOG_DIR}/*
+        do
+            REC_FILE=`grep -e 'filename' ${logfile} | awk -F'"' '{print $4}'`
+            # Check whether recording actually exists, otherwise ignore the entry
+            if [ -e "${REC_FILE}" ]; then
+                REC_DIR=`dirname "${REC_FILE}"`
+                REAL_DIR=`realpath "${REC_DIR}"`
+                TRUNC_DIR=`echo "${REAL_DIR}" | cut -c1-28`
+                CHECK_VAR=`echo "${REAL_DIR}" | cut -c29-32`
+                if [ ! "${REC_FILE}" = "" ] && [ "${TRUNC_DIR}" = "/volume1/@appstore/tvheadend" ] && [ ! "${CHECK_VAR}" = "/var" ]; then
+                    REC_NAME=`basename "${REC_FILE}"`
+                    REST_DIR=`echo "${REAL_DIR}" | cut -c30-`
+                    DEST_FILE="${SAVE_DIR}/${REST_DIR}/${REC_NAME}"
+                    echo "Saving: ${REC_FILE}" >> ${INST_LOG}
+                    $MKDIR "${SAVE_DIR}/${REST_DIR}"
+                    $CP "${REC_FILE}" "${DEST_FILE}"
+                    # Replace any remaining target links in log files first
+                    sed -i -e "s,/var/packages/tvheadend/target/,/usr/local/tvheadend/,g" "${logfile}"
+                    # Adapt recording paths in dvr log files for restored files (postupgrade)
+                    sed -i -e "s,/tvheadend/,/tvheadend/var/,g" "${logfile}"
+                fi
+            fi
+        done
+        # Move recording directories from package root into var
+        UPGRADE_CFG_DIR="${SYNOPKG_PKGDEST}/var/dvr/config"
+        echo "Move any recording directories from package root directory into var..." >> ${INST_LOG}
+        for file in ${UPGRADE_CFG_DIR}/*
+        do
+            DVR_DIR=`grep -e 'storage\":' ${file} | awk -F'"' '{print $4}'`
+            REAL_DIR=`realpath "${DVR_DIR}"`
+            TRUNC_DIR=`echo "${REAL_DIR}" | cut -c1-28`
+            CHECK_VAR=`echo "${REAL_DIR}" | cut -c29-32`
+            # Replace any remaining target links in log files first
+            sed -i -e "s,/var/packages/tvheadend/target,/usr/local/tvheadend,g" "${file}"
+            if [ "${TRUNC_DIR}" = "/volume1/@appstore/tvheadend" ] && [ ! "${CHECK_VAR}" = "/var" ]; then
+                # Move recording paths in recording profiles into var
+                sed -i -e "s,/tvheadend,/tvheadend/var,g" "${file}"
+            fi
+        done
     fi
 }
 
 service_postupgrade ()
 {
-    # For backwards compatibility, restore potential recordings from package root directory into var directory
-    if [ -e "/tmp/savedrecs.tar" ]; then
-        echo "Restoring potential recordings into /volume1/@appstore/tvheadend/var" >> ${INST_LOG}
-        /bin/tar -xvf "/tmp/savedrecs.tar" -C "/volume1/@appstore/tvheadend/var" >> ${INST_LOG}
-        $RM "/tmp/savedrecs.tar"
+    # For backwards compatibility, restore recordings from old package root into var directory
+    if [ -d "${SAVE_DIR}" ]; then
+        echo "Restoring recordings into ${HOME_DIR}" >> ${INST_LOG}
+        $CP "${SAVE_DIR}"/. "${HOME_DIR}" >> ${INST_LOG}
+        $RM "${SAVE_DIR}"
     fi
 
     # Need to enforce correct permissions for recording directories on upgrades
