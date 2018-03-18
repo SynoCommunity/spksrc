@@ -12,7 +12,7 @@ language: false
 # Build environment configuration
 env:
   global:
-    - PKG=
+    - PKG=python
   matrix:
     - SYNOARCH=armada370
     - SYNOARCH=ppc853x
