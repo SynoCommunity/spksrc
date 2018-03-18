@@ -53,6 +53,8 @@ start_daemon ()
         fi
         if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
             echo "$!" > "${PID_FILE}"
+        else
+            wait_for_status 0 ${SVC_WAIT_TIMEOUT}
         fi
     fi
 }
@@ -66,7 +68,7 @@ stop_daemon ()
             echo "Stopping ${DNAME} service ${PID} " >> ${LOG_FILE}
         fi
         kill -TERM $PID >> ${LOG_FILE} 2>&1
-        wait_for_status 1 20 || kill -KILL $PID >> ${LOG_FILE} 2>&1
+        wait_for_status 1 ${SVC_WAIT_TIMEOUT} || kill -KILL $PID >> ${LOG_FILE} 2>&1
         if [ -f "${PID_FILE}" ]; then
             rm -f "${PID_FILE}" > /dev/null
         fi
@@ -88,7 +90,7 @@ daemon_status ()
 
 wait_for_status ()
 {
-    counter=$2
+    counter=${2:=20}
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
