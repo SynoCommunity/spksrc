@@ -90,7 +90,9 @@ daemon_status ()
 
 wait_for_status ()
 {
-    counter=${2:=20}
+    timeout=$2
+    # default value: 20 seconds
+    counter=${timeout:=20}
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
