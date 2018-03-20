@@ -1,4 +1,4 @@
---- src/Makefile.orig	2017-04-26 18:39:24.655503489 +0200
+--- src/Makefile	2017-04-26 18:39:24.655503489 +0200
 +++ src/Makefile	2017-04-26 18:40:59.715893871 +0200
 @@ -29,6 +29,7 @@
  PLATS= aix bsd c89 freebsd generic linux macosx mingw posix solaris
