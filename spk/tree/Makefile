@@ -15,7 +15,8 @@ CHANGELOG = First release 1.7.0
 HOMEPAGE = http://mama.indstate.edu/users/ice/tree/index.html
 # LICENSE  = GNU GPL
 
-INSTALLER_SCRIPT = src/install.sh
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
