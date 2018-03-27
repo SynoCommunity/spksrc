@@ -2,17 +2,16 @@
 
 # Variables
 PACKAGE="umurmur"
-INSTALL_DIR="/usr/local/${PACKAGE}"
-OPENSSL="${INSTALL_DIR}/bin/openssl"
+OPENSSL="${SYNOPKG_PKGDEST}/bin/openssl"
 
 # Certificate generation
-${OPENSSL} req -x509 -newkey rsa:1024 -keyout ${INSTALL_DIR}/var/umurmur.key -nodes -sha1 -days 365 -out ${INSTALL_DIR}/var/umurmur.crt -batch -config ${INSTALL_DIR}/openssl.cnf > /dev/null 2>&1
+${OPENSSL} req -x509 -newkey rsa:1024 -keyout ${SYNOPKG_PKGDEST}/var/umurmur.key -nodes -sha1 -days 365 -out ${SYNOPKG_PKGDEST}/var/umurmur.crt -batch -config ${SYNOPKG_PKGDEST}/openssl.cnf > /dev/null 2>&1
 
 # Exit with the right code and an explicit message
 if [ $? -ne 0 ]; then
     echo "Certificate generation for uMurmur failed"
-    touch ${INSTALL_DIR}/var/umurmur.key
-    touch ${INSTALL_DIR}/var/umurmur.crt
+    touch ${SYNOPKG_PKGDEST}/var/umurmur.key
+    touch ${SYNOPKG_PKGDEST}/var/umurmur.crt
     exit 1
 fi
 

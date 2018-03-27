@@ -18,5 +18,5 @@ INSTALL_TARGET = myComp
 include ../../mk/spksrc.native-cc.mk
 
 myComp:
-	@$(MSG) "Building Go"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && ./make.bash
+	@$(MSG) "Building Go 1.4"
+	cd $(WORK_DIR)/$(PKG_NAME)/src && GOARCH="" ./make.bash

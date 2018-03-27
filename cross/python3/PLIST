@@ -15,3 +15,6 @@ lnk:lib/libpython3.5m.so
 lib:lib/libpython3.5m.so.1.0
 lib:lib/libpython3.so
 rsc:lib/python3.5
+lnk:lib/libsqlite3.so
+lnk:lib/libsqlite3.so.0
+lib:lib/libsqlite3.so.0.*

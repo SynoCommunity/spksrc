@@ -1,6 +1,6 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.4
-SPK_REV = 11
+SPK_VERS = 4.2.6
+SPK_REV = 13
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 BETA = 1
@@ -9,21 +9,26 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = m4tt075
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
-ADMIN_PORT = 9981
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
-CHANGELOG = "Update to Tvheadend 4.2.4 (Release), including update of libhdhomerun to 20170930"
-
+STARTABLE = yes
+CHANGELOG = "1. Update TVH to 4.2.6 (maintenance release), 2. Update libhdhomerun to 20171221, 3. Use DSM 5+6 generic service, 4. Recover recordings from system directories"
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
-LICENSE  = GPL v3
+LICENSE = GPL v3
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# 'auto' reserved value grabs SPK_NAME
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+
+# Service configuration
+SERVICE_PORT = 9981
+SERVICE_PORT_TITLE = Tvheadend(HTTP)
+
+# Admin link
+ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = tvheadend_extra_install
 
@@ -34,8 +39,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: tvheadend_extra_install
 tvheadend_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/accesscontrol
 	install -m 755 -d $(STAGING_DIR)/var/passwd

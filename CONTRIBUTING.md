@@ -37,7 +37,7 @@ Content:
 * Model, arch and DSM version of your NAS. See [Architecture per Synology model](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model);
 * Provide log files if available. Sometimes a log is shown in Package Center for that package. There might be a log available at `/usr/local/{package}/var/`;
 * Wrap larger logs between triple backticks (```). Log files over ten lines should be placed on gist.github.com, Pastebin etc., and linked in the issue;
-* If the package doesn't start, try to start the package via the command line: `/var/packages/{package}/scripts/start-stop-status start`, and provide the output.
+* If the package doesn't start, try to start the package [via the command line](https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions#how-to-query-package-status-or-start-from-command-line)  and provide the output.
 
 
 Package Requests

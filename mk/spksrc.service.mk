@@ -76,7 +76,7 @@ ifneq ($(strip $(SPK_USER)),)
 	@echo USER=\"$(SPK_USER)\" >> $@
 	@echo "PRIV_PREFIX=sc-" >> $@
 	@echo "SYNOUSER_PREFIX=svc-" >> $@
-	@echo 'if [ $${SYNOPKG_DSM_VERSION_MAJOR} -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
+	@echo 'if [ -n "$${SYNOPKG_DSM_VERSION_MAJOR}" -a "$${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo "# Group name from UI if provided" >> $@
@@ -146,7 +146,11 @@ endif
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
 ifneq ($(strip $(SPK_USER)),)
+ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
+else
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
+endif
 	$(create_target_dir)
 	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
@@ -211,8 +215,9 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo '{ ".url": { ' > $@
 	@echo "  \"com.synocommunity.packages.${SPK_NAME}\": {" >> $@
 	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
-	@echo "    \"desc\": \"${DESCRIPTION}\"," >> $@
-	@echo "    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
+	@/bin/echo -n "    \"desc\": \"" >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
+	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
 	@echo "    \"type\": \"url\"," >> $@
 	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
 	@echo "    \"port\": \"${SERVICE_PORT}\"," >> $@
@@ -221,6 +226,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo "    \"grantPrivilege\": \"all\"," >> $@
 	@echo "    \"advanceGrantPrivilege\": true" >> $@
 	@echo '} } }' >> $@
+	cat $@ | python -m json.tool > /dev/null
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif

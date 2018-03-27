@@ -1,0 +1,9 @@
+[{
+    "step_title": "Attention! Permissions DSM",
+    "items": [{
+        "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-media'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration à l'exception de <br>- Panneau de configuration > Dossier partagé > Modifier > Permissions > Utilisateur du système interne<br>- Éditeur de permissions.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+    },
+    {
+        "desc": "<strong style='color:red'>NOTE:</strong> La mise à jour de l'application va tenter de corriger les permissions des répertoires. En cas d'erreur de permission dans Tvheadend, donner les droits de Lecture/Ecriture au groupe <b>'sc-media'<b> sur les répertoires mentionnés depuis File Station ou les outils de gestion des groupes ou dossier partagé."
+    }]
+}]

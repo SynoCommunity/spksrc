@@ -17,21 +17,23 @@ start_daemon ()
         else
             date >> ${LOG_FILE}
         fi
-        echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
     fi
     call_func "service_prestart"
+    if [ -z "${SVC_QUIET}" ]; then
+        echo "Starting ${DNAME} command ${SERVICE_EXE} ${SERVICE_OPTIONS} " >> ${LOG_FILE}
+    fi
     if [ -n "${SERVICE_EXE}" ]; then
         if [ -n "${SERVICE_OPTIONS}" ]; then
-            start-stop-daemon -b -o -c ${EFF_USER} -S -u ${EFF_USER} -k 002 -x "${SERVICE_EXE}" -- "${SERVICE_OPTIONS}"
+            start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}" -- "${SERVICE_OPTIONS}"
         else
-            start-stop-daemon -b -o -c ${EFF_USER} -S -u ${EFF_USER} -k 002 -x "${SERVICE_EXE}"
+            start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}"
         fi
     fi
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -o -c ${EFF_USER} -K -u ${EFF_USER} -x "${SERVICE_EXE}"
+    start-stop-daemon -o -K -u ${EFF_USER} -x "${SERVICE_EXE}"
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -x "${SERVICE_EXE}"
     call_func "service_poststop"
 }
@@ -82,7 +84,7 @@ case $1 in
             exit 0
         else
             echo "${DNAME} is not running"
-            exit 1
+            exit 3
         fi
         ;;
     log)

@@ -379,13 +379,13 @@ postupgrade ()
 {
     log_step "postupgrade"
 
+    call_func "service_restore"
+
     # Restore some stuff, has to be cp otherwise fails on directories
     $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG}
 
     # Correct permissions of var folder
     set_unix_permissions "${INST_VAR}"
-
-    call_func "service_restore"
 
     $RM "$TMP_DIR" >> ${INST_LOG}
 

@@ -1,0 +1,12 @@
+# This ensures that the default recording directory is not placed in package system directories, independent of the DSM version
+--- src/dvr/dvr_config.c.orig	2018-02-27 18:58:45.957196424 +0100
++++ src/dvr/dvr_config.c	2018-02-27 19:00:17.210138337 +0100
+@@ -282,7 +282,7 @@
+ 
+   /* Try to figure out a good place to put them videos */
+ 
+-  homedir = getenv("HOME");
++  homedir = "/usr/local/tvheadend/var";
+ 
+   if(homedir != NULL) {
+     snprintf(buf, sizeof(buf), "%s/Videos", homedir);
