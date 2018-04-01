@@ -1,6 +1,6 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.5
-SPK_REV = 12
+SPK_VERS = 4.2.6
+SPK_REV = 13
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 BETA = 1
@@ -12,7 +12,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update TVH to 4.2.5 (maintenance release), 2. Use DSM 5+6 generic service"
+CHANGELOG = "1. Update TVH to 4.2.6 (maintenance release), 2. Update libhdhomerun to 20171221, 3. Use DSM 5+6 generic service, 4. Recover recordings from system directories"
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
 LICENSE = GPL v3
 
