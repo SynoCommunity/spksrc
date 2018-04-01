@@ -56,9 +56,9 @@ service_preupgrade ()
             if [ -e "${REC_FILE}" ]; then
                 REC_DIR=`dirname "${REC_FILE}"`
                 REAL_DIR=`realpath "${REC_DIR}"`
-                TRUNC_DIR=`echo "${REAL_DIR}" | cut -c1-28`
+                TRUNC_DIR=`echo "${REAL_DIR}" | cut -c9-28`
                 CHECK_VAR=`echo "${REAL_DIR}" | cut -c29-32`
-                if [ ! "${REC_FILE}" = "" ] && [ "${TRUNC_DIR}" = "/volume1/@appstore/tvheadend" ] && [ ! "${CHECK_VAR}" = "/var" ]; then
+                if [ ! "${REC_FILE}" = "" ] && [ "${TRUNC_DIR}" = "/@appstore/tvheadend" ] && [ ! "${CHECK_VAR}" = "/var" ]; then
                     REC_NAME=`basename "${REC_FILE}"`
                     REST_DIR=`echo "${REAL_DIR}" | cut -c30-`
                     DEST_FILE="${SAVE_DIR}/${REST_DIR}/${REC_NAME}"
@@ -79,11 +79,11 @@ service_preupgrade ()
         do
             DVR_DIR=`grep -e 'storage\":' ${file} | awk -F'"' '{print $4}'`
             REAL_DIR=`realpath "${DVR_DIR}"`
-            TRUNC_DIR=`echo "${REAL_DIR}" | cut -c1-28`
+            TRUNC_DIR=`echo "${REAL_DIR}" | cut -c9-28`
             CHECK_VAR=`echo "${REAL_DIR}" | cut -c29-32`
             # Replace any remaining target links in log files first
             sed -i -e "s,/var/packages/tvheadend/target,/usr/local/tvheadend,g" "${file}"
-            if [ "${TRUNC_DIR}" = "/volume1/@appstore/tvheadend" ] && [ ! "${CHECK_VAR}" = "/var" ]; then
+            if [ "${TRUNC_DIR}" = "/@appstore/tvheadend" ] && [ ! "${CHECK_VAR}" = "/var" ]; then
                 # Move recording paths in recording profiles into var
                 sed -i -e "s,/tvheadend,/tvheadend/var,g" "${file}"
             fi
@@ -119,10 +119,10 @@ service_postupgrade ()
     # For backwards compatibility, restore ownership of package system directories
     echo "Restore '${EFF_USER}' unix permissions on package system directories" >> ${INST_LOG}
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        synoacltool -del "/volume1/@appstore/tvheadend" >> ${INST_LOG} 2>&1
+        synoacltool -del "${SYNOPKG_PKGDEST}" >> ${INST_LOG} 2>&1
         chown ${EFF_USER}:root "/var/packages/tvheadend" >> ${INST_LOG} 2>&1
     else
         chown ${EFF_USER}:${USER} "/var/packages/tvheadend/target" >> ${INST_LOG} 2>&1
-        set_unix_permissions "/volume1/@appstore/tvheadend/var"
+        set_unix_permissions "${SYNOPKG_PKGDEST}/var"
     fi
 }
