@@ -15,19 +15,14 @@
                     "errorText": "Please enter a port number, valid range is 1-65535"
                 }
             }
-        }, {
-            "key": "wizard_ipv6",
-            "desc": "Choose IPv6 servers",
-            "type": "singleselect",
-            "subitems": [{
-                "key": "wizard_ipv6",
-                "desc": "Enable servers with IPv6 support",
-                "defaultValue": true
-            }, {
-                "key": "wizard_ipv6",
-                "desc": "Disable servers with IPv6 support",
-                "defaultValue": false
-            }]
         }]
+    }, {
+        "type": "singleselect",
+        "desc": "Choose IPv6 servers",
+        "subitems": [{
+            "key": "wizard_ipv6",
+            "desc": "Enable servers with IPv6 support (IPv6 connection is required)",
+            "defaultValue": false
+        }
     }]
 }]
