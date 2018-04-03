@@ -1,0 +1,33 @@
+[{
+    "step_title": "DNSCrypt configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "DNScrypt service configuration",
+        "subitems": [{
+            "key": "wizard_port",
+            "desc": "Listen port",
+            "type": "textfield",
+            "defaultValue": "10053",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/\d{1,5}/",
+                    "errorText": "Please enter a port number, valid range is 1-65535"
+                }
+            }
+        }, {
+            "key": "wizard_ipv6",
+            "desc": "Choose IPv6 servers",
+            "type": "singleselect",
+            "subitems": [{
+                "key": "wizard_ipv6",
+                "desc": "Enable servers with IPv6 support",
+                "defaultValue": true
+            }, {
+                "key": "wizard_ipv6",
+                "desc": "Disable servers with IPv6 support",
+                "defaultValue": false
+            }]
+        }]
+    }]
+}]
