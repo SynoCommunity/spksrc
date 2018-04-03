@@ -26,7 +26,7 @@ start_daemon ()
         else
             OUT="${LOG_FILE}"
         fi
-        if [ -n "${USER}" -a $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        if [ -n "${USER}" -a -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
             if [ -z "${SERVICE_SHELL}" ]; then
                 SERVICE_SHELL=/bin/sh
             fi
