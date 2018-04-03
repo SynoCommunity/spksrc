@@ -6,12 +6,11 @@
         "subitems": [{
             "key": "wizard_port",
             "desc": "Listen port",
-            "type": "textfield",
             "defaultValue": "10053",
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/\d{1,5}/",
+                    "expr": "/\\d{1,5}/",
                     "errorText": "Please enter a port number, valid range is 1-65535"
                 }
             }
@@ -23,6 +22,10 @@
             "key": "wizard_ipv6",
             "desc": "Enable servers with IPv6 support (IPv6 connection is required)",
             "defaultValue": false
-        }
+        }, {
+            "key": "wizard_noipv6",
+            "desc": "Disable servers with IPv6 support",
+            "defaultValue": true
+        }]
     }]
 }]
