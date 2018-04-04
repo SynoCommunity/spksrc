@@ -1,16 +1,55 @@
-PKG_NAME = aria2
-PKG_VERS = 1.31.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/$(PKG_NAME)/$(PKG_NAME)/releases/download/release-$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+SPK_NAME = aria2
+SPK_VERS = 1.33.1
+SPK_REV = 6
+SPK_ICON = src/aria2.png
 
-DEPENDS = cross/c-ares cross/expat cross/nettle cross/openssl cross/zlib
+# override ARCH=arch-rtd1296
 
-HOMEPAGE = http://aria2.github.io
-COMMENT  = aria2 is a lightweight multi-protocol and multi-source command-line download utility.
+DEPENDS = cross/$(SPK_NAME)
+
+MAINTAINER = cnrat
+DESCRIPTION = aria2 is a lightweight multi-protocol and multi-source command-line download utility.
+DESCRIPTION_CHS = Aria2是一个命令行下运行、多协议、多来源下载工具（HTTP/HTTPS、FTP、BitTorrent、Metalink）。
+RELOAD_UI = yes
+STARTABLE = yes
+DISPLAY_NAME = Aria2
+CHANGELOG = "Apr 6 2018 This is a first beta version."
+
 LICENSE  = GPLv2/GPLv3
+HOMEPAGE = http://aria2.github.io
+BETA = 1
 
-GNU_CONFIGURE = 1
+WIZARDS_DIR = src/wizard/
 
-include ../../mk/spksrc.cross-cc.mk
+# 'auto' reserved value grabs SPK_NAME
+SERVICE_USER         = auto
+SERVICE_WIZARD_GROUP = wizard_group
+SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_SETUP        = src/service-setup.sh
+
+
+# Service configuration
+SERVICE_PORT = 6800
+SERVICE_PORT_TITLE = Aria2-RPC
+
+# Admin link
+ADMIN_PORT = $(SERVICE_PORT)
+
+PRE_COPY_TARGET = aria2_service_install
+POST_STRIP_TARGET = aria2_post_install
+
+include ../../mk/spksrc.spk.mk
+
+.PHONY: aria2_service_install
+aria2_service_install:
+	rm -fr $(STAGING_DIR)
+	mkdir $(STAGING_DIR)
+	mkdir --parents $(STAGING_INSTALL_PREFIX)
+
+.PHONY: aria2_post_install
+aria2_post_install:
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/aria2.conf $(STAGING_DIR)/var/aria2.conf
+	install -m 644 src/aria2.dht $(STAGING_DIR)/var/aria2.dht
+	install -m 644 src/aria2.session $(STAGING_DIR)/var/aria2.session
+	install -m 644 src/aria2.log $(STAGING_DIR)/var/aria2.log
