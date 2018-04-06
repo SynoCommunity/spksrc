@@ -1,8 +1,8 @@
 PKG_NAME = dnscrypt-proxy
 PKG_VERS = 2.0.8
 PKG_EXT = tar.gz
-
-PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/releases/download/$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_VERS)
+PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/releases/download
 
 HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy
 COMMENT  = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2.
@@ -32,7 +32,7 @@ ifeq ($(findstring $(ARCH), powerpc),$(ARCH))
 DNSCRYPT_ARCH = linux_ppc
 endif
 ifeq ($(findstring $(ARCH), ppc824x ppc853x ppc854x qoriq),$(ARCH))
-DNSCRYPT_ARCH = linux_arm
+DNSCRYPT_ARCH = linux_ppc
 endif
 ifeq ($(strip $(DNSCRYPT_ARCH)),)
 # unexpected arch. Please add arch to mk/spksrc.common.mk

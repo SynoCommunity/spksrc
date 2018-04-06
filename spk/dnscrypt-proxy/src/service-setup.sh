@@ -14,8 +14,9 @@ service_postinst ()
         echo "Applying settings from Wizard..." >> "${INST_LOG}"
         cp -f "${TEMPLATE_CFG_FILE}" "${CFG_FILE}" >> "${INST_LOG}"
 
-        # change default address, port, only use dnssec enabled servers, ipv6, logfile, change logfile location
-        listen_addresses="['0.0.0.0:${wizard_port:=10053}']" # $SERVICE_PORT
+        listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:10053'"}\]
+
+        # change default settings
         sed -i -e "s/listen_addresses = .*/listen_addresses = ${listen_addresses}/" \
             -e "s/require_dnssec = .*/require_dnssec = true/" \
             -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:=false}/" \
