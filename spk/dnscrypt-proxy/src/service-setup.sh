@@ -1,8 +1,8 @@
 SVC_CWD="${SYNOPKG_PKGDEST}"
-DNSCRYPT_PROXY=${SYNOPKG_PKGDEST}/dnscrypt-proxy
+DNSCRYPT_PROXY=${SYNOPKG_PKGDEST}/bin/dnscrypt-proxy
 PID_FILE=${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.pid
 CFG_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.toml"
-TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/example-dnscrypt-proxy.toml"
+TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/etc/example-dnscrypt-proxy.toml"
 
 SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE}"
 SVC_BACKGROUND=y
