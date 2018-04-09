@@ -26,7 +26,8 @@ SYNCTHING_ARCH = arm
 export GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm64
+SYNCTHING_ARCH = arm
+export GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = 386
