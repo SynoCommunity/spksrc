@@ -85,6 +85,10 @@ wait_for_status ()
 
 
 case $1 in
+	prestart)
+		call_func "service_prestart"
+		exit $?
+		;;
     start)
         if daemon_status; then
             echo "${DNAME} is already running"
@@ -95,6 +99,10 @@ case $1 in
             exit $?
         fi
         ;;
+	prestop)
+		call_func "service_prestop"
+		exit $?
+		;;
     stop)
         if daemon_status; then
             echo "Stopping ${DNAME} ..."
