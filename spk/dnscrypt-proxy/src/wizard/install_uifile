@@ -1,8 +1,8 @@
 [{
-    "step_title": "DNSCrypt configuration",
+    "step_title": "DNSCrypt-proxy configuration",
     "items": [{
         "type": "textfield",
-        "desc": "DNScrypt service configuration",
+        "desc": "",
         "subitems": [{
             "key": "wizard_listen_address",
             "desc": "Listen Addresses",
@@ -17,15 +17,30 @@
         }]
     }, {
         "type": "singleselect",
-        "desc": "Choose IPv6 servers",
+        "desc": "IPv6 servers:",
         "subitems": [{
             "key": "wizard_ipv6",
-            "desc": "Enable servers with IPv6 support (IPv6 connection is required)",
+            "desc": "Enable servers with IPv6 support (a IPv6 connection is required)",
             "defaultValue": false
         }, {
             "key": "wizard_noipv6",
-            "desc": "Disable servers with IPv6 support",
+            "desc": "Disable IPv6 servers",
             "defaultValue": true
+        }]
+    },{
+        "type": "textfield",
+        "desc": "If empty the proxy will automatically pick the fastest, working servers from the list. https://dnscrypt.info/public-servers",
+        "subitems": [{
+            "key": "wizard_servers",
+            "desc": "Server Names",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/('\\w+'(, )?)+/",
+                    "errorText": "Please use the following format: 'cloudflare', 'google'"
+                }
+            }
         }]
     }]
 }]
