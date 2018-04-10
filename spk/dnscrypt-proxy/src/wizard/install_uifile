@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_listen_address",
             "desc": "Listen Addresses",
-            "defaultValue": "'0.0.0.0:10053'",
+            "defaultValue": "'0.0.0.0:1053'",
             "validator": {
                 "allowBlank": false,
                 "regex": {

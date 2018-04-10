@@ -22,8 +22,8 @@ WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-# SERVICE_PORT = 10053
-# SERVICE_PORT_TITLE = DNS
-# NO_SERVICE_SHORTCUT = yes
+SERVICE_PORT = 1053
+SERVICE_PORT_TITLE = DNS
+NO_SERVICE_SHORTCUT = yes
 
 include ../../mk/spksrc.spk.mk

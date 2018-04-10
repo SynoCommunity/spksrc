@@ -20,7 +20,7 @@ service_postinst ()
             server_names_enabled='# '
         fi
 
-        listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:10053'"}\]
+        listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:$SERVICE_PORT'"}\]
         server_names=\[${wizard_servers:-"'scaleway-fr', 'google', 'yandex', 'cloudflare'"}\]
 
         # change default settings

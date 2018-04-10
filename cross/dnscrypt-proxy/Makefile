@@ -12,55 +12,52 @@ LICENSE  = ISC License
 DEPENDS = native/go
 
 CONFIGURE_TARGET = nope
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+COMPILE_TARGET = dnscrypt_proxy_compile
+INSTALL_TARGET = dnscrypt_proxy_install
 
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm
+DNSCRYPT_ARCH = arm
 export GOARM=5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm
+DNSCRYPT_ARCH = arm
 export GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm
+DNSCRYPT_ARCH = arm
 export GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = 386
+DNSCRYPT_ARCH = 386
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = amd64
+DNSCRYPT_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = ppc64
-endif
-ifeq ($(SYNCTHING_ARCH),)
+ifeq ($(DNSCRYPT_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
-SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)-$(PKG_VERS)
+DNSCRYPT_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
-SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)-$(PKG_VERS)/$(PKG_NAME)/$(PKG_NAME)
+DNSCRYPT_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)-$(PKG_VERS)/$(PKG_NAME)/$(PKG_NAME)
 
 CONF_ARGS = -ldflags="-s -w"
 export GOPATH = $(WORK_DIR)
 export PATH := $(WORK_DIR)/../../../native/go/work-native/go/bin/:$(WORK_DIR)/bin:$(PATH)
 export GOOS = linux
-export GOARCH = $(SYNCTHING_ARCH)
+export GOARCH = $(DNSCRYPT_ARCH)
 export CGO_ENABLED=0
 
-.PHONY: myCompile
-myCompile:
+.PHONY: dnscrypt_proxy_compile
+dnscrypt_proxy_compile:
 	mkdir -p $(GOPATH)/bin
 	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-	cd $(SYNCTHING_DIR) && dep ensure
-	cd $(SYNCTHING_DIR)/$(PKG_NAME) && go build $(CONF_ARGS)
-.PHONY: myInstall
-myInstall:
+	cd $(DNSCRYPT_DIR) && dep ensure
+	cd $(DNSCRYPT_DIR)/$(PKG_NAME) && go build $(CONF_ARGS)
+.PHONY: dnscrypt_proxy_install
+dnscrypt_proxy_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/etc
-	install -m 755 $(SYNCTHING_BIN) $(STAGING_INSTALL_PREFIX)/bin
-	install -m 644 $(SYNCTHING_DIR)/$(PKG_NAME)/example-* $(STAGING_INSTALL_PREFIX)/etc
+	install -m 755 $(DNSCRYPT_BIN) $(STAGING_INSTALL_PREFIX)/bin
+	install -m 644 $(DNSCRYPT_DIR)/$(PKG_NAME)/example-* $(STAGING_INSTALL_PREFIX)/etc
