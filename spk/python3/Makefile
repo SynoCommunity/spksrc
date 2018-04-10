@@ -1,7 +1,7 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.5
 SPK_VERS = $(SPK_SHORT_VERS).2
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cffi cross/bcrypt
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
-DEPENDS += cross/msgpack-python cross/attr cross/acl cross/lz4
+DEPENDS += cross/msgpack-python cross/attr cross/acl
 
 WHEELS = src/requirements.txt
 
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "1. Update to Python 3.5.2<br>2. Update modules<br>3. Added msgpack libattr libacl liblz4"
+CHANGELOG = "1. Update to Python 3.5.2<br>2. Update modules<br>3. Added msgpack libattr libacl liblz4<br>4. Remove lz4"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF
