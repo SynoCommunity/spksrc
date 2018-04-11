@@ -1,15 +1,15 @@
 SVC_CWD="${SYNOPKG_PKGDEST}"
 DNSCRYPT_PROXY=${SYNOPKG_PKGDEST}/bin/dnscrypt-proxy
 PID_FILE=${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.pid
-CFG_FILE="${SYNOPKG_PKGDEST}/etc/dnscrypt-proxy.toml"
-TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/etc/example-dnscrypt-proxy.toml"
+CFG_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.toml"
+TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/example-dnscrypt-proxy.toml"
 
 SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE}"
 SVC_BACKGROUND=y
 
 service_postinst ()
 {
-    mkdir -p "${SYNOPKG_PKGDEST}"/etc "${SYNOPKG_PKGDEST}"/var
+    mkdir -p "${SYNOPKG_PKGDEST}"/var
     if [ ! -e "${CFG_FILE}" ]; then
         echo "Applying settings from Wizard..." >> "${INST_LOG}"
         cp -f "${TEMPLATE_CFG_FILE}" "${CFG_FILE}" >> "${INST_LOG}"
