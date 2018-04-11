@@ -1,8 +1,9 @@
 [{
     "step_title": "DNSCrypt-proxy configuration",
     "items": [{
+        "desc": "Configuration file is located at: /volume?/@appstore/dnscrypt-proxy/etc/dnscrypt-proxy.toml"
+    }, {
         "type": "textfield",
-        "desc": "",
         "subitems": [{
             "key": "wizard_listen_address",
             "desc": "Listen Addresses",
@@ -27,9 +28,8 @@
             "desc": "Disable IPv6 servers",
             "defaultValue": true
         }]
-    },{
+    }, {
         "type": "textfield",
-        "desc": "If empty the proxy will automatically pick the fastest, working servers from the list. https://dnscrypt.info/public-servers",
         "subitems": [{
             "key": "wizard_servers",
             "desc": "Server Names",
@@ -42,5 +42,7 @@
                 }
             }
         }]
+    }, {
+        "desc": "If empty the proxy will automatically pick the fastest, working servers from the list. https://dnscrypt.info/public-servers"
     }]
 }]
