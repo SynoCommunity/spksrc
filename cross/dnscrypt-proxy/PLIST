@@ -1,2 +1,2 @@
 bin:bin/dnscrypt-proxy
-rsc:example-dnscrypt-proxy.toml
+rsc:example-*
