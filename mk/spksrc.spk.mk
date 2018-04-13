@@ -102,7 +102,7 @@ $(WORK_DIR)/INFO:
 	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
 	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
-	@echo description=\"$(DESCRIPTION)\" >> $@
+	@echo description=\""$(DESCRIPTION)"\" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
 	    $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
 	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
