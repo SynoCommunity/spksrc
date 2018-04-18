@@ -3,7 +3,7 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 TORBIN="${SYNOPKG_PKGDEST}/bin/tor"
 TORCONF="${SYNOPKG_PKGDEST}/var/torrc"
 
-SERVICE_COMMAND="${TORBIN} -f ${TORCONF} --pidfile ${PID_FILE} --user ${USER}"
+SERVICE_COMMAND="${TORBIN} -f ${TORCONF} --pidfile ${PID_FILE}"
 
 service_postinst ()
 {

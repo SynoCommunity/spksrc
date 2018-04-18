@@ -12,12 +12,19 @@ COMMENT  = Tor is free software for enabling anonymous communication. The name i
 LICENSE  =
 
 GNU_CONFIGURE = 1
+PRE_CONFIGURE_TARGET = generate_auto_conf
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
 
 
-CONFIGURE_ARGS = --disable-asciidoc
+CONFIGURE_ARGS = --disable-asciidoc --disable-tool-name-check
+
+generate_auto_conf:
+	$(RUN) aclocal -I m4 && \
+		   autoheader && \
+		   autoconf && \
+		   automake --add-missing --copy
 
 myInstall:
 	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) exec_prefix=$(STAGING_INSTALL_PREFIX)
