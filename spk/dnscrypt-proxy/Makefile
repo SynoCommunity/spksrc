@@ -10,9 +10,9 @@ DEPENDS = cross/$(SPK_NAME)
 MAINTAINER = publicarray
 DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2. https://github.com/jedisct1/dnscrypt-proxy
 DISPLAY_NAME = DNSCrypt-proxy
-HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy
+HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
-CHANGELOG = "Added a basic UI"
+CHANGELOG = "Added a GUI"
 
 RELOAD_UI = yes
 STARTABLE = yes
@@ -69,7 +69,6 @@ dnscrypt_extra_install: copy_msg
 	mkdir -p $(STAGING_DIR)/$(DSM_UI_DIR)/
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/
 	@echo "===> UI - Compiling cgi"
-	# go get github.com/BurntSushi/toml
 	go build -ldflags "-s -w" -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
 ## rm -f work-ipq806x-1.1/.copy_done && rm -f work-ipq806x-1.1/.icon_done && make arch-ipq806x-1.1
 ## synopkg uninstall dnscrypt-proxy

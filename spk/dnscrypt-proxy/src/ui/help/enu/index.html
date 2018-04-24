@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="E=edge,chrome=1">
+        <title>DNSCrypt-proxy</title>
+        <link rel="stylesheet" type="text/css" href="../../../../help/help.css">
+        <link rel="stylesheet" type="text/css" href="../../../../help/scrollbar/flexcroll.css">
+        <script type="text/javascript" src="../../../../help/scrollbar/flexcroll.js"></script>
+        <script type="text/javascript" src="../../../../help/scrollbar/initFlexcroll.js"></script>
+    </head>
+    <body>
+        <h1>DNSCrypt-Proxy</h1>
+        <p><a href="https://github.com/jedisct1/dnscrypt-proxy" target="_blank">DNSCrypt-Proxy</a> is a DNS proxy that implements the <a href="https://dnscrypt.info/protocol" target="_blank">dnscrypt</a> and <a href="https://tools.ietf.org/html/draft-ietf-doh-dns-over-https" target="_blank">DNS-over-HTTPS (doh)</a> protocols.</p>
+        <h2>Installation</h2>
+        <div class="section">
+            <h4>Note:</h4>
+            <ol>
+                <li>This package is incompatible with the DNS Server package from Synology!</li>
+            </ol>
+        </div>
+        <img src="/webman/3rdparty/dnscrypt-proxy/help/images/install-wizard.png" alt="Installer interface of DNSCrypt-proxy">
+        <ul>
+            <li><b>Listen Addresses:</b> List of local addresses and ports to listen to. Can be IPv4 and/or IPv6</li>
+            <li><b>IPv6 Servers:</b> Use servers reachable over IPv6 -- Do not enable if you don't have IPv6 connectivity</li>
+            <li><b>Server Names:</b> List of <a href="https://dnscrypt.info/public-servers" target="_blank">Servers</a> to use. If empty, all registered servers matching the <code>require_*</code> filters will be used, The proxy will automatically pick the fastest, working servers from the list.</li>
+        </ul>
+        <h2>Configuration</h2>
+        <img src="/webman/3rdparty/dnscrypt-proxy/help/images/ui.png" alt="User interface of DNSCrypt-proxy">
+        <ol>
+            <li><b>Generate Blacklist:</b> will fetch provided lists and update the var/blacklist.txt file using the <a href="https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists" target="_blank">generate-domains-blacklist.py</a> script</li>
+            <li><b>Save:</b> Saves the file to disk. You need to manually restart DNSCrypt-proxy to apply changes.</li>
+        </ol>
+        <p>For more detailed information I suggest you visit the <a href="https://github.com/jedisct1/dnscrypt-proxy/wiki" target="_blank">dnscrypt-proxy wiki</a>.</p>
+        <h3>Optional: Network devices configuration</h3>
+        <p><a href="https://1.1.1.1/#setup-instructions" target="_blank">Cloudflare</a> has some good instructions on how to change your DNS settings to point to a custom DNS server. Instead of <code>1.1.1.1</code> you need to use your Synology's IP address. e.g. <code>192.168.1.1<code></p>
+    </body>
+</html>
