@@ -1,7 +1,10 @@
 SPK_NAME = sockd
 SPK_VERS = 1.4.2
-SPK_REV = 0
+SPK_REV = 1
 SPK_ICON = src/dante.png
+
+REQUIRED_DSM = 6.0
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/$(SPK_NAME)
 
