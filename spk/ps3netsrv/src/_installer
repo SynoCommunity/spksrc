@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# Package
+PACKAGE="ps3netsrv"
+DNAME="ps3netsrv"
+
+# Others
+SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
+CFG_FILE="/var/packages/${PACKAGE}/scripts/start-stop-status"
+USER="ps3netsrv"
+GROUP="users"
+
+
+preinst ()
+{
+	exit 0
+}
+
+postinst ()
+{
+	# create ps3netsrv system user
+	synouser --add ${USER} "" "ps3netsrv daemon user" 1 "" ""
+	PS3NETSRV_HOME=`grep '^ps3netsrv\:' /etc/passwd | cut -d: -f6`
+	if [ ! ${PS3NETSRV_HOME} ]; then
+		echo "Could not create ps3netsrv system user, please check your accounts configuration." >${SYNOPKG_TEMP_LOGFILE}
+		exit 1
+	fi
+	[ -e ${PS3NETSRV_HOME} ] || mkdir -p ${PS3NETSRV_HOME}
+
+	# Correct the files ownership
+	chown -R ${USER}:root ${SYNOPKG_PKGDEST}
+	chown -R ${USER}:${GROUP} ${PS3NETSRV_HOME}
+
+	# Edit the configuration according to the wizard
+	sed -i -e "s|@PS3_dir@|${wizard_PS3_dir:=/volume1/PS3}|g" ${CFG_FILE}
+	sed -i -e "s|@PS3_port@|${wizard_PS3_port:=38008}|g" ${CFG_FILE}
+
+	exit 0
+}
+
+preuninst ()
+{
+	# Stop the package
+	${SSS} stop > /dev/null
+
+	# Remove the user (if not upgrading)
+	if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
+		#PS3NETSRV_HOME=`grep '^ps3netsrv\:' /etc/passwd | cut -d: -f6`
+		#rmdir ${PS3NETSRV_HOME}
+		synouser --del ps3netsrv
+	fi
+
+	exit 0
+}
+
+postuninst ()
+{
+	exit 0
+}
+
+preupgrade ()
+{
+	# Stop the package
+	${SSS} stop > /dev/null
+
+	exit 0
+}
+
+postupgrade ()
+{
+	exit 0
+}

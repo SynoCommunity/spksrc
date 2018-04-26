@@ -1,0 +1,34 @@
+[{
+    "step_title": "PS3 files location",
+    "items": [{
+        "type": "textfield",
+        "desc": "Path to the directory containing PS3 files. Defaults to: /volume1/PS3",
+        "subitems": [{
+            "key": "wizard_dir",
+            "desc": "Files location",
+            "defaultValue": "/volume1/PS3",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Port used by service. Defaults to: 38008",
+        "subitems": [{
+            "key": "wizard_port",
+            "desc": "Service port",
+            "defaultValue": "38008",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[1-9][0-9]{2,4}$/",
+                    "errorText": "Port must be in range 100-65535"
+                }
+            }
+        }]
+    }]
+}]
