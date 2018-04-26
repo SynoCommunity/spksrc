@@ -14,17 +14,10 @@ LICENSE = GPL
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS =
 
-CONFIGURE_TARGET = myConfigure
+CONFIGURE_TARGET = nop
 INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myConfigure
-myConfigure:
-		mv $(WORK_DIR)/$(PKG_DIR)/Makefile $(WORK_DIR)/$(PKG_DIR)/Makefile.win
-		mv $(WORK_DIR)/$(PKG_DIR)/Makefile.linux $(WORK_DIR)/$(PKG_DIR)/Makefile
-		# TODO: Remove it
-		#sed -i -e "s|BUILD_TYPE = release|BUILD_TYPE = debug_static|g" $(WORK_DIR)/$(PKG_DIR)/Makefile
 
 .PHONY: myInstall
 myInstall:

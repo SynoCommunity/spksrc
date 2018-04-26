@@ -23,7 +23,6 @@ WIZARDS_DIR = src/wizard/
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
-STRIP_TARGET = nop # TODO: maybe not needed
 POST_STRIP_TARGET = ps3netsrv_extra_install
 
 include ../../mk/spksrc.spk.mk
