@@ -24,7 +24,7 @@
         "desc": "Si le partage saisi n'existe pas, il sera créé. Vous pouvez indiquer un partage existant en précisant le chemin absolu du répertoire. Vérifiez que votre saisie soit correcte, par exemple un disque USB externe est pointé par <em>/volumeUSB1/usbshare</em>."
       },
       {
-        "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration."
+        "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
       }
     ]
   }
