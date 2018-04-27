@@ -1,7 +1,7 @@
 CFG_FILE="${SYNOPKG_PKGDEST}/var/sockd.conf"
 BIN="${SYNOPKG_PKGDEST}/sbin/sockd"
 
-SC_GROUP="sockd"
+SC_GROUP="sockd-users"
 SC_GROUP_DESC="Users with access to proxy server"
 
 SERVICE_COMMAND="${BIN} -f ${CFG_FILE} -p ${PID_FILE} -D"

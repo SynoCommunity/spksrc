@@ -31,7 +31,7 @@
         }]
     }, {
         "type": "multiselect",
-        "desc": "If authentification required, only users from group <code>'sockd'</code> will have access to proxy",
+        "desc": "If authentification required, only users from group <code>'sockd-users'</code> will have access to proxy",
         "subitems": [{
             "key": "wizard_proxy_auth",
             "desc": "Authentification required",
