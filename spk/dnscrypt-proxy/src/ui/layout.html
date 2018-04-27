@@ -62,11 +62,10 @@
         <!-- Search -->
         <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css">
         <script src="codemirror/addon/dialog/dialog.js"></script>
-        <script src="codemirror/addon/display/panel.js"></script>
         <script src="codemirror/addon/search/searchcursor.js"></script>
         <script src="codemirror/addon/search/search.js"></script>
         <script>
-            textArea = document.querySelectorAll('.dnscrypt-proxy textarea')[0]
+            var textArea = document.querySelectorAll('.dnscrypt-proxy textarea')[0]
             if (typeof CodeMirror === "undefined") {
                 textArea.style.opacity = 1
             } else {
@@ -85,7 +84,7 @@
                 var request = new XMLHttpRequest()
                 request.onload = function() {
                     if (request.status >= 200 && request.status < 400) {
-                        successMessage = document.querySelectorAll('.dnscrypt-proxy .success')[0]
+                        var successMessage = document.querySelectorAll('.dnscrypt-proxy .success')[0]
                         // restart fade animation
                         successMessage.style.animation = 'none';
                         successMessage.offsetHeight //  trigger reflow
@@ -100,7 +99,7 @@
                 }
                 request.onerror = function() {
                     console.error(request.status, request.responseText)
-                    errorMessage = document.querySelectorAll('.dnscrypt-proxy .error')[0]
+                    var errorMessage = document.querySelectorAll('.dnscrypt-proxy .error')[0]
                     errorMessage.innerText = "Something went wrong :'("
                     toggleSpinner()
                 }
@@ -115,16 +114,16 @@
             }
 
             function toggleSpinner () {
-                spinner = document.querySelectorAll('.dnscrypt-proxy .spinner')[0]
+                var spinner = document.querySelectorAll('.dnscrypt-proxy .spinner')[0]
                 spinner.style.visibility = (spinner.style.visibility === 'visible') ? 'hidden' : 'visible'
             }
 
-            select = document.querySelectorAll('.dnscrypt-proxy select')[0]
+            var select = document.querySelectorAll('.dnscrypt-proxy select')[0]
             select.addEventListener('change', function(e) {
                 setGetParameter(e.target.name, e.target.value)
             }, false)
 
-            updateBlacklist = document.querySelectorAll('.dnscrypt-proxy .updateBlacklist')[0]
+            var updateBlacklist = document.querySelectorAll('.dnscrypt-proxy .updateBlacklist')[0]
             updateBlacklist.addEventListener('submit', function(e) {
                 if (e.preventDefault) e.preventDefault();
                 toggleSpinner()

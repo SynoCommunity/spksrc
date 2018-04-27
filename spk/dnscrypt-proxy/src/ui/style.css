@@ -1,6 +1,6 @@
 .dnscrypt-proxy html, .dnscrypt-proxy body {
     margin: 0;
-    font-family: verdana, tahoma, arial, helvetica, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     font-size: 14px;
 }
 
@@ -11,7 +11,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(255,255,255,0.7s);
+    background: rgba(255,255,255,0.7);
     visibility: hidden;
 }
 
@@ -33,6 +33,7 @@
     left: 30px;
     margin-top: -14px;
     height: 30px;
+    width: 30px;
 }
 .dnscrypt-proxy .spinner p {
     text-align: right;
