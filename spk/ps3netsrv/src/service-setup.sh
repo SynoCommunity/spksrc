@@ -5,8 +5,6 @@ if [ -r "${CFG_FILE}" ]; then
     . "${CFG_FILE}"
 fi
 
-SERVICE_COMMAND="${BIN} ${PS3_DIR} ${PS3_PORT}"
-
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -17,16 +15,8 @@ service_postinst ()
 
 service_prestart ()
 {
-    # Replace generic service startup, fork process in background
-    # TODO: remove debug log
-    echo "EFF_USER:  ${EFF_USER}; SYNOPKG_PKGDEST: ${SYNOPKG_PKGDEST}; SERVICE_COMMAND: ${SERVICE_COMMAND}; PID_FILE: ${PID_FILE}" >> ${LOG_FILE}
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        echo "First run" >> ${LOG_FILE}
-        su ${EFF_USER} -s /bin/sh -c "cd ${SYNOPKG_PKGDEST}; ${SERVICE_COMMAND}" >> ${LOG_FILE} 2>&1 &
-    else
-        echo "Second run" >> ${LOG_FILE}
-        cd ${SYNOPKG_PKGDEST};
-        ${SERVICE_COMMAND} >> ${LOG_FILE} 2>&1 &
-    fi
+    COMMAND="${BIN} ${PS3_DIR} ${PS3_PORT}"
+    cd ${SYNOPKG_PKGDEST};
+    stdbuf -o L -e L ${COMMAND} >> ${LOG_FILE} 2>&1 &
     echo "$!" > "${PID_FILE}"
 }
