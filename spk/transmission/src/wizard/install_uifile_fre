@@ -31,7 +31,7 @@
         }]
     }, {
         "type": "textfield",
-        "desc": "Répertoire de conserver les fichiers jusqu'à ce torrent est terminée. Laisser vide pour désactiver",
+        "desc": "Répertoire où conserver les fichiers de torrent incomplets. Laisser vide pour désactiver",
         "subitems": [{
             "key": "wizard_incomplete_dir",
             "desc": "Répertoire incomplet",
@@ -62,8 +62,8 @@
         }]
     }]
 }, {
-     "Step_title": "Attention! DSM6 Permissions",
-     "articles": [{
-    "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration."
+     "step_title": "Attention! DSM6 Permissions",
+     "items": [{
+         "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration."
      }]
 }]
