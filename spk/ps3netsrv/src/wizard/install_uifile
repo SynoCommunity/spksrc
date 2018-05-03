@@ -15,20 +15,5 @@
                 }
             }
         }]
-    }, {
-        "type": "textfield",
-        "desc": "Port used by service. Defaults to: 38008",
-        "subitems": [{
-            "key": "wizard_port",
-            "desc": "Service port",
-            "defaultValue": "38008",
-            "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^[1-9][0-9]{2,4}$/",
-                    "errorText": "Port must be in range 100-65535"
-                }
-            }
-        }]
     }]
 }]

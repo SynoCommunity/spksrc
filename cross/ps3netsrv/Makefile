@@ -15,11 +15,11 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS =
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = ps3netsrv_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: ps3netsrv_install
+ps3netsrv_install:
 		@mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 		@install -m 755 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME) $(STAGING_INSTALL_PREFIX)/bin/

@@ -1,6 +1,6 @@
 SPK_NAME = ps3netsrv
 SPK_VERS = 1.47.08
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 
 REQUIRED_DSM = 6.0
@@ -23,6 +23,8 @@ WIZARDS_DIR = src/wizard/
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_dir
+SERVICE_PORT = 38008
+NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = ps3netsrv_extra_install
 
