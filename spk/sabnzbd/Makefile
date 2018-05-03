@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 2.3.3
-SPK_REV = 34
+SPK_REV = 35
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
