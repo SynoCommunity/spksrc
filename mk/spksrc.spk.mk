@@ -277,7 +277,7 @@ wizards:
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Preparing DSM Wizards"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uninstall" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
