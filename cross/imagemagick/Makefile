@@ -26,7 +26,7 @@ imagemagick_extra_install:
 	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) \
 	SHARE_PATH=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
 	DATA_DIR=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
-	CONFIGURE_PATH=$(STAGING_INSTALL_PREFIX)/etc/ImageMagick-7/ \
+	CONFIGURE_PATH=$(STAGING_INSTALL_PREFIX)/etc/ImageMagick-6/ \
 	LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.7/ \
 	SHAREARCH_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.7/config-Q16 \
 	DOCUMENTATION_PATH=$(STAGING_INSTALL_PREFIX)/share/doc/ImageMagick-7 \
