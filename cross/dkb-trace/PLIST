@@ -1,0 +1,4 @@
+bin:bin/dkb-trace
+shr:share/dkb-trace/dat
+shr:share/doc
+shr:share/dkb-trace/web
