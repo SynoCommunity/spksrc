@@ -18,11 +18,11 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-installed --without-perl --without-x --without-fpx --without-wmf --disable-openmp
 
 
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = imagemagick_extra_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-myInstall:
+imagemagick_extra_install:
 	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) \
 	SHARE_PATH=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
 	DATA_DIR=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
