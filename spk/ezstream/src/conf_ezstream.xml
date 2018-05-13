@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ezstream>
+    <url>http://url:8000/my_radio</url>
+    <sourcepassword>hackme</sourcepassword>
+    <format>MP3</format>
+    <filename>playlist.txt</filename>
+</ezstream>
+
