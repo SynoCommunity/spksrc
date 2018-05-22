@@ -117,13 +117,25 @@ endif
 	@echo maintainer_url=\"$(MAINTAINER_URL)\" >> $@
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
+
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
-else
-  ifneq ($(strip $(TC_FIRMWARE)),)
+else ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else ifneq ($(strip $(TC_FIRMWARE)),)
 	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
-  else
+else ifneq ($(strip $(TC_OS_MIN_VER)),)
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+else
 	@echo firmware=\"3.1-1594\" >> $@
+endif
+ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else
+    ifneq ($(strip $(TC_OS_MIN_VER)),)
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+  else
+	@echo os_min_ver=\"6.1-14715\" >> $@
   endif
 endif
 ifneq ($(strip $(BETA)),)
@@ -148,8 +160,10 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
+ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
-ifneq ($(strip $(STARTABLE)),)
+endif
+ifeq ($(STARTABLE),no)
 	@echo startable=\"$(STARTABLE)\" >> $@
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif

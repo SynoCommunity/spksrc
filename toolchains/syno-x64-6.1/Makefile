@@ -2,7 +2,7 @@ TC_NAME = syno-x64
 
 TC_ARCH = apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton dockerx64 grantley kvmx64 x86 x86_64
 TC_VERS = 6.1
-TC_FIRMWARE = 6.1-15047
+TC_OS_MIN_VER = 6.1-15047
 
 TC_DIST = x64-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz
