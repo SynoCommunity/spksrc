@@ -22,6 +22,7 @@ service_postinst ()
 
     # If nessecary, add user also to the old group
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
+    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "users"
 
     # Remove legacy user
     # Commands of busybox from spk/python
