@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 2.3.3
-SPK_REV = 35
+SPK_VERS = 2.3.4
+SPK_REV = 36
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
@@ -15,7 +15,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1) Update SABnzbd to 2.3.3. 2) Update par2cmdline to 0.8.0. 3) Use DSM 5+6 generic service approach for correct permissions."
+CHANGELOG = "1) Update SABnzbd to 2.3.4"
 
 HOMEPAGE   = http://sabnzbd.org
 LICENSE    = GPL
