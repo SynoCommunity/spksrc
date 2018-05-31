@@ -35,11 +35,13 @@ ARCHS_DUPES = $(filter-out apollolake% avoton% braswell% broadwell% bromolow% ce
 # Available Arches
 ARM5_ARCHES = 88f6281
 ARM7_ARCHES = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco hi3535 ipq806x northstarplus
+ARM7_ARCHES += wdarm
 ARM8_ARCHES = rtd1296 armada37xx aarch64
 ARM_ARCHES = $(ARM5_ARCHES) $(ARM7_ARCHES) $(ARM8_ARCHES)
 PPC_ARCHES = powerpc ppc824x ppc853x ppc854x qoriq
 x86_ARCHES = evansport
 x64_ARCHES = apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton dockerx64 grantley kvmx64 x86 x64 x86_64
+x64_ARCHES += wdpro wddl wdx64
 
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk
