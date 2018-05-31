@@ -8,4 +8,4 @@ use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
 my $q = CGI->new;
 
 # Redirect
-print $q->redirect("mumble://".$ENV{SERVER_NAME}."/?version=1.2.3");
+print $q->redirect("mumble://".$ENV{SERVER_NAME}."/?version=1.2.19");

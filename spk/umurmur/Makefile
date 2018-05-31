@@ -1,6 +1,6 @@
 SPK_NAME = umurmur
-SPK_VERS = 0.2.16
-SPK_REV = 6
+SPK_VERS = 0.2.17
+SPK_REV = 7
 SPK_ICON = src/umurmur.png
 DSM_UI_DIR = app
 
@@ -12,16 +12,15 @@ DESCRIPTION_FRE = uMurmur est un serveur minimaliste de voix sur IP basé sur le
 DESCRIPTION_SPN = uMurmur es un servidor VoIP minimalista basado en el software de codigo abierto Mumble. Permite comunicaciones simultáneas entre múltiples usuarios. Su baja latencia lo hace especialmente adecuado para comunicarse durante un juego en linea. El cliente Mumble está disponible en http://mumble.sourceforge.net/ \\\(Windows, Mac, Linux and iOS\\\).
 RELOAD_UI = yes
 DISPLAY_NAME = uMurmur
-CHANGELOG = "Update to 0.2.16"
+CHANGELOG = "1. Update to 0.2.17 2. Use DSM5+6 generic service"
+STARTABLE = yes
 
-HOMEPAGE   = https://github.com/umurmur/umurmur
-LICENSE    =
+SERVICE_USER = auto
+# SERVICE_COMMAND is provided there
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+HOMEPAGE = https://github.com/umurmur/umurmur
+LICENSE = BSD 3-clause License
 
 POST_STRIP_TARGET = umurmur_extra_install
 
