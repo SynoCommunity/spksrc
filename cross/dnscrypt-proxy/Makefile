@@ -1,5 +1,5 @@
 PKG_NAME = dnscrypt-proxy
-PKG_VERS = 2.0.10
+PKG_VERS = 2.0.14
 PKG_EXT = tar.gz
 PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/archive
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
@@ -26,14 +26,16 @@ DNSCRYPT_ARCH = arm
 export GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm
-export GOARM=7
+DNSCRYPT_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = 386
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = amd64
+endif
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+DNSCRYPT_ARCH = ppc64
 endif
 ifeq ($(DNSCRYPT_ARCH),)
 $(error Unsupported ARCH $(ARCH))
