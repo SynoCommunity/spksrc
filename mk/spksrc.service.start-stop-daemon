@@ -17,7 +17,7 @@ start_daemon ()
         else
             date >> ${LOG_FILE}
         fi
-        echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
+        echo "Starting ${DNAME} command ${SERVICE_EXE} ${SERVICE_OPTIONS} " >> ${LOG_FILE}
     fi
     call_func "service_prestart"
     if [ -n "${SERVICE_EXE}" ]; then
