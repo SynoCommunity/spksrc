@@ -1,5 +1,5 @@
 PKG_NAME = go
-PKG_VERS = 1.8.3
+PKG_VERS = 1.10.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://storage.googleapis.com/golang
@@ -15,7 +15,6 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = myComp
 INSTALL_TARGET = nop
 
-# GOROOT_BOOTSTRAP=$(WORK_DIR)/../../go/work-native/go
 GOROOT_BOOTSTRAP14=$(WORK_DIR)/../../go-1.4/work-native/go
 
 include ../../mk/spksrc.native-cc.mk
