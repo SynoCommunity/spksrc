@@ -1,5 +1,5 @@
 PKG_NAME = libev
-PKG_VERS = 4.33
+PKG_VERS = 4.24
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://dist.schmorp.de/$(PKG_NAME)/Attic
