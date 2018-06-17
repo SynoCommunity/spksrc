@@ -212,7 +212,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo "  \"com.synocommunity.packages.${SPK_NAME}\": {" >> $@
 	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
 	@/bin/echo -n "    \"desc\": \"" >> $@
-	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/"/\\"/g' >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
 	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
 	@echo "    \"type\": \"url\"," >> $@
 	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
@@ -222,6 +222,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo "    \"grantPrivilege\": \"all\"," >> $@
 	@echo "    \"advanceGrantPrivilege\": true" >> $@
 	@echo '} } }' >> $@
+	cat $@ | python -m json.tool > /dev/null
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif

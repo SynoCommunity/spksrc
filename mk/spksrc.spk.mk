@@ -102,12 +102,14 @@ $(WORK_DIR)/INFO:
 	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
 	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
-	@echo description=\""$(DESCRIPTION)"\" >> $@
+	@/bin/echo -n "description=\"" >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
+	@echo "\"" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-	    $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
-	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
-	   ) \
-	) | sed 's|"\s|"\n|' >> $@
+          $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+            /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
+            /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
+            /bin/echo "\\\"" ) ) >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifneq ($(strip $(MAINTAINER)),)
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
