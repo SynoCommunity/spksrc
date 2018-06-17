@@ -1,33 +1,45 @@
 SPK_NAME = ffsync
 SPK_VERS = 1.5.2
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/ffsync.png
 BETA = 1
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/gevent cross/greenlet
 
-DEPENDS     = cross/busybox
-WHEELS      = src/requirements.txt
+BUILD_DEPENDS 	= cross/python cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS 	+= cross/gevent cross/greenlet
 
-MAINTAINER   = SynoCommunity
-DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
-DISPLAY_NAME = Firefox Sync Server 1.5
-CHANGELOG = "1. Fix Python requirement<br>2. Fix startup issue when pidfile is not yet written"
-
-HOMEPAGE     = https://docs.services.mozilla.com/howtos/run-sync-1.5.html
-LICENSE      = MPL/GPL/LGPL
-HELPURL      = https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Server-1.5
-
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
+DEPENDS     	= cross/busybox
+WHEELS      	= src/requirements.txt
 
 INSTALL_DEP_SERVICES = mysql
 START_DEP_SERVICES = mysql
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+MAINTAINER   	= SynoCommunity
+DESCRIPTION  	= Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
+DISPLAY_NAME	= Firefox Sync Server 1.5
+CHANGELOG 		= "1. Fix Python requirement<br>2. Fix startup issue when pidfile is not yet written"
+
+HOMEPAGE     	= https://docs.services.mozilla.com/howtos/run-sync-1.5.html
+LICENSE      	= MPL/GPL/LGPL
+HELPURL      	= https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Server-1.5
+
+STARTABLE = yes
+SERVICE_SETUP = src/service-setup.sh
+
+#SERVICE_USER = auto
+#SERVICE_PORT = 8192
+#SERVICE_PORT_TITLE = ffsync(TCP)
+FWPORTS = src/${SPK_NAME}.sc
+
+#INSTALLER_SCRIPT = src/installer.sh
+#SSS_SCRIPT       = src/dsm-control.sh
+#CONF_DIR         = src/conf/
+
+
+
+
+#INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = ffsync_extra_install
 
