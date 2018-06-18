@@ -14,6 +14,7 @@ blocklist_setup () {
     wget -t 3 -O "${SYNOPKG_PKGDEST}/var/generate-domains-blacklist.py" \
         --https-only https://raw.githubusercontent.com/jedisct1/dnscrypt-proxy/master/utils/generate-domains-blacklists/generate-domains-blacklist.py \
         >> "${INST_LOG}" 2>&1
+    touch "${SYNOPKG_PKGDEST}"/var/ip-blacklist.txt
     touch "${SYNOPKG_PKGDEST}"/var/domains-whitelist.txt
     touch "${SYNOPKG_PKGDEST}"/var/domains-time-restricted.txt
     touch "${SYNOPKG_PKGDEST}"/var/domains-blacklist-local-additions.txt
