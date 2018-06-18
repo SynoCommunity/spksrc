@@ -310,6 +310,7 @@ func main() {
     files = make(map[string]string)
     files["config"] = "/var/dnscrypt-proxy.toml"
     files["blacklist"] = "/var/blacklist.txt"
+    files["ip-blacklist"] = "/var/ip-blacklist.txt"
     files["cloaking"] = "/var/cloaking-rules.txt"
     files["forwarding"] = "/var/forwarding-rules.txt"
     files["whitelist"] = "/var/whitelist.txt"

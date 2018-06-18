@@ -13,7 +13,6 @@ HELPURL = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
 CHANGELOG = "Added a GUI"
 
-RELOAD_UI = yes
 STARTABLE = yes
 BETA = 1
 

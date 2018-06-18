@@ -1,6 +1,6 @@
 {
     ".url": {
-        "SYNO.SDS.DNSCryptProxy.Application": { //dashes are not allowed
+        "SYNO.SDS.DNSCryptProxy.Application": {
             "type": "legacy",
             "allUsers": false,
             "allowMultiInstance": false,
