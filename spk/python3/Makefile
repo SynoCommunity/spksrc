@@ -1,7 +1,7 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.5
 SPK_VERS = $(SPK_SHORT_VERS).2
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "1. Update to Python 3.5.2<br>2. Update modules<br>3. Added msgpack libattr libacl liblz4"
+CHANGELOG = "1. Update to Python 3.5.2<br>2. Update modules<br>3. Added msgpack libattr libacl liblz4<br>4. Update msgpack"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF

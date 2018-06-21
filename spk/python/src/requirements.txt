@@ -3,7 +3,7 @@
 # Included for reference
 #lxml==3.7.2
 #m2crypto==0.25.0
-#msgpack-python==0.4.8
+#msgpack-python==0.5.6
 #pillow==4.0.0
 #pyalsa==1.0.29
 #pyaudio==0.2.9
