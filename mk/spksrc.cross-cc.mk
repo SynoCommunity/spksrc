@@ -119,9 +119,11 @@ dependency-tree:
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
 
-arch-%:
-	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+ARCH_PREP = $(sort $(subst syno-,arch-,$(AVAILABLE_TCS)) $(subst syno.,arch-,$(basename $(subst -,.,$(basename $(subst .,,$(AVAILABLE_TCS)))))))
+
+arch-$(ARCH_PREP):
+	@$(MSG) Building package for $(subst arch-,,$@)
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$(subst arch-,,$@))))) TCVERSION=$(if $(findstring $(subst arch-,,$@),$(basename $(subst -,.,$(basename $(subst .,,$(subst arch-,,$@)))))),$(DEFAULT_TC),$(notdir $(subst -,/,$(subst arch-,,$@))))
 
 .PHONY: kernel-required
 kernel-required:
