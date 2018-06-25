@@ -1,0 +1,11 @@
+bin/dar
+bin/dar_cp
+bin/dar_manager
+bin/dar_slave
+bin/dar_split
+bin/dar_xform
+etc/darrc
+lib/libdar64.la
+lib/libdar64.so
+lib/libdar64.so.5000
+lib/libdar64.so.5000.12.2
