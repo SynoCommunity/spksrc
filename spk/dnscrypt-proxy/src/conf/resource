@@ -1,10 +1,12 @@
-"indexdb": {
-    "app-index": {
-        "config-realpath": "ui/index.conf",
-        "db-realpath": "indexdb/appindexdb"
-    },
-    "help-index": {
-        "config-realpath": "ui/helptoc.conf",
-        "db-realpath": "indexdb/helpindexdb"
+{
+    "indexdb": {
+        "app-index": {
+            "config-realpath": "ui/index.conf",
+            "db-realpath": "indexdb/appindexdb"
+        },
+        "help-index": {
+            "config-realpath": "ui/helptoc.conf",
+            "db-realpath": "indexdb/helpindexdb"
+        }
     }
 }
