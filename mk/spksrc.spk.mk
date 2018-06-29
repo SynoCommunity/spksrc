@@ -126,12 +126,18 @@ else ifneq ($(strip $(OS_MIN_VER)),)
 	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
 else ifneq ($(strip $(TC_FIRMWARE)),)
 	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
+	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
 else ifneq ($(strip $(TC_OS_MIN_VER)),)
 	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
 else
 	@echo firmware=\"3.1-1594\" >> $@
+	@echo os_min_ver=\"3.1-1594\" >> $@
+endif
+ifneq ($(strip $(OS_MAX_VER)),)
+	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
+	@echo beta=\"yes\" >> $@
 	@echo report_url=\"$(REPORT_URL)\" >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
