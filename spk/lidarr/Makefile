@@ -32,9 +32,6 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = lidarr_extra_install
 
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: lidarr_extra_install
