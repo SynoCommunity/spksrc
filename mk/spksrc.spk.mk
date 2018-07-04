@@ -109,7 +109,7 @@ $(WORK_DIR)/INFO:
           $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
             /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
             /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
-            /bin/echo "\\\"" ) ) >> $@
+            /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifneq ($(strip $(MAINTAINER)),)
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
