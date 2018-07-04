@@ -1,3 +1,9 @@
+
+In Cross-compile, we need to regenerate -- if needed -- using a native-built
+Python.  This patch includes additional vebose output and fail-fast logic for
+when the PGEN determination is incorrectly done to avoid the 55-minute build
+that ultimately fails
+
 --- configure.ac.orig	2016-06-25 23:38:39.000000000 +0200
 +++ configure.ac	2016-12-05 22:06:40.183563868 +0100
 @@ -72,6 +72,8 @@
@@ -39,12 +45,17 @@
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -792,7 +793,7 @@
+@@ -769,11 +769,11 @@
+ 		$(CC) $(OPT) $(PY_LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
+ 
+ .PHONY: regen-grammar
+-regen-grammar: $(PGEN)
++regen-grammar: $(PGEN_FOR_BUILD)
+ 	# Regenerate Include/graminit.h and Python/graminit.c
+ 	# from Grammar/Grammar using pgen
  	@$(MKDIR_P) Include
- 	# Avoid copying the file onto itself for an in-tree build
- 	if test "$(cross_compiling)" != "yes"; then \
--		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
-+		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C) ; \
- 	else \
- 		cp $(srcdir)/Include/graminit.h $(GRAMMAR_H).tmp; \
- 		mv $(GRAMMAR_H).tmp $(GRAMMAR_H); \
+-	$(PGEN) $(srcdir)/Grammar/Grammar \
++	$(PGEN_FOR_BUILD) $(srcdir)/Grammar/Grammar \
+ 		$(srcdir)/Include/graminit.h \
+ 		$(srcdir)/Python/graminit.c
+ 
