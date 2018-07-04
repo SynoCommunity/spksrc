@@ -13,6 +13,9 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
+# if for python3, replace the -config path with abspath
+POST_INSTALL_TARGET = python3PostInstall
+
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
@@ -21,3 +24,7 @@ endif
 ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
+
+.PHONY: python3PostInstall
+python3PostInstall:
+	sed -i -e 's|^prefix=$(INSTALL_PREFIX)$$|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/bin/gpg-error-config
