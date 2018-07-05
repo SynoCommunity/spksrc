@@ -7,7 +7,7 @@ DEPENDS = cross/mc
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Midnight Commander is a console application with a text user interface. The main interface consists of two panels which display the file system.
-DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\\\'interface principale se compose de deux « panneaux » qui affichent les fichiers présents par rapport à leur emplacement sur le disque.
+DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\'interface principale se compose de deux « panneaux » qui affichent les fichiers présents par rapport à leur emplacement sur le disque.
 RELOAD_UI = no
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
