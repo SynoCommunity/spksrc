@@ -3,13 +3,14 @@ SPK_VERS = 1.47.08
 SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 
-REQUIRED_DSM = 6.0
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+REQUIRED_DSM = 5.0
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = Cobra/Deank
+MAINTAINER = Anonym-tsk
+# From Cobra/Deank
 DESCRIPTION = Allows PS3 content to be loaded from network
+DESCRIPTION_FRE = Fournit l\'accès par le réseau aux contenus pour PS3
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ps3netsrv
