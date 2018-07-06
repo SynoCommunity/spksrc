@@ -3,16 +3,17 @@ SPK_VERS = 1.4.2
 SPK_REV = 1
 SPK_ICON = src/dante.png
 
-REQUIRED_DSM = 6.0
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+REQUIRED_DSM = 5.0
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = Inferno Nettverk A/S
+MAINTAINER = Anonym-tsk
+# From Inferno Nettverk A/S
 DESCRIPTION = Dante implements the socks standard and can function as a firewall between networks. Package contains sockd - socks proxyserver.
+DESCRIPTION_FRE = Dante fournit le service socks et peut servir de firewall entre réseaux. Le package contient sockd - un serveur proxy socks.
 RELOAD_UI = yes
 STARTABLE = yes
-DISPLAY_NAME = Sockd
+DISPLAY_NAME = Dante Sockd
 CHANGELOG =
 
 HOMEPAGE = https://www.inet.no/dante/
