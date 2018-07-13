@@ -4,7 +4,7 @@ SPK_VERS = 5.5.1
 SPK_CONFLICT ?= zsh-static
 # Allow overriding the revision, used by spk/zsh-static.
 # If you rev here, please also rev spk/zsh-static.
-SPK_REV ?= 1
+SPK_REV ?= 6
 SPK_ICON = ../zsh/src/zsh.png
 
 DEPENDS = cross/zsh
@@ -20,9 +20,6 @@ CHANGELOG = "Update to 5.5.1"
 HOMEPAGE = http://www.zsh.org
 LICENSE = Custom
 
-INSTALLER_SCRIPT = ../zsh/src/installer.sh
-SSS_SCRIPT       = ../zsh/src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/zsh
+SERVICE_SETUP = ../zsh/src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
