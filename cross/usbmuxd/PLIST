@@ -1,0 +1,2 @@
+bin:bin/iproxy
+bin:sbin/usbmuxd
