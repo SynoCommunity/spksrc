@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = ipq806x
 TC_VERS = 1.1
-TC_FIRMWARE = 1.1.6-6931
+TC_FIRMWARE = 1.1-6931
 
 TC_DIST = gcc493_glibc220_hard-GPL
 TC_EXT = tgz
