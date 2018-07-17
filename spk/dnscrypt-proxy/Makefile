@@ -1,5 +1,5 @@
 SPK_NAME = dnscrypt-proxy
-SPK_VERS = 2.0.15
+SPK_VERS = 2.0.17
 SPK_REV = 0
 SPK_ICON = src/dnscrypt-proxy.png
 
@@ -7,11 +7,11 @@ DEPENDS = cross/$(SPK_NAME)
 SPK_CONFLICT = DNSServer
 
 MAINTAINER = publicarray
-DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2. https://github.com/jedisct1/dnscrypt-proxy
-DISPLAY_NAME = DNSCrypt-proxy
+DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS. https://github.com/jedisct1/dnscrypt-proxy
+DISPLAY_NAME = dnscrypt-proxy
 HELPURL = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
-CHANGELOG = "Added a GUI"
+CHANGELOG = "Update to 2.0.17"
 
 STARTABLE = yes
 BETA = 1
@@ -35,11 +35,11 @@ include ../../mk/spksrc.spk.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = arm
-export GOARM=5
+ENV += GOARM=5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = arm
-export GOARM=7
+ENV += GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = arm64
@@ -57,11 +57,12 @@ ifeq ($(DNSCRYPT_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
-export GOPATH = $(WORK_DIR)
-export PATH := $(WORK_DIR)/../../../native/go/work-native/go/bin/:$(WORK_DIR)/bin:$(PATH)
-export GOOS = linux
-export GOARCH = $(DNSCRYPT_ARCH)
-export CGO_ENABLED=0
+CONF_ARGS = -ldflags="-s -w"
+ENV += GOPATH="$(WORK_DIR)" \
+	GOOS=linux \
+	GOARCH="$(DNSCRYPT_ARCH)" \
+	CGO_ENABLED=0 \
+	PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
 .PHONY: dnscrypt_extra_install
 dnscrypt_extra_install: copy_msg
@@ -69,6 +70,6 @@ dnscrypt_extra_install: copy_msg
 	mkdir -p $(STAGING_DIR)/$(DSM_UI_DIR)/
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/
 	@echo "===> UI - Compiling cgi"
-	go build -ldflags "-s -w" -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
+	env $(ENV) go build $(CONF_ARGS) -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
 ## rm -f work-ipq806x-1.1/.copy_done && rm -f work-ipq806x-1.1/.icon_done && make arch-ipq806x-1.1
 ## synopkg uninstall dnscrypt-proxy
