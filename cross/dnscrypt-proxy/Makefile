@@ -55,8 +55,6 @@ export CGO_ENABLED=0
 .PHONY: dnscrypt_proxy_compile
 dnscrypt_proxy_compile:
 	mkdir -p $(GOPATH)/bin
-	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-	cd $(DNSCRYPT_DIR) && dep ensure
 	cd $(DNSCRYPT_DIR)/$(PKG_NAME) && go build $(CONF_ARGS)
 .PHONY: dnscrypt_proxy_install
 dnscrypt_proxy_install:
