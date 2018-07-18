@@ -1,0 +1,23 @@
+--- Makefile	2018-07-18 14:03:55.000000000 +0300
++++ Makefile	2018-07-18 14:07:02.000000000 +0300
+@@ -2,18 +2,8 @@
+ DEP	=	dep
+ EXE = ${OBJ}/bin
+ 
+-COMMIT := $(shell git log -1 --pretty=format:"%H")
+-
+-ARCH =
+-ifeq ($m, 32)
+-ARCH = -m32
+-endif
+-ifeq ($m, 64)
+-ARCH = -m64
+-endif
+-
+-CFLAGS = $(ARCH) -O3 -std=gnu11 -Wall -mpclmul -march=core2 -mfpmath=sse -mssse3 -fno-strict-aliasing -fno-strict-overflow -fwrapv -DAES=1 -DCOMMIT=\"${COMMIT}\" -D_GNU_SOURCE=1 -D_FILE_OFFSET_BITS=64
+-LDFLAGS = $(ARCH) -ggdb -rdynamic -lm -lrt -lcrypto -lz -lpthread -lcrypto
++CFLAGS = -O3 -std=gnu11 -Wall -mpclmul -march=core2 -mfpmath=sse -mssse3 -fno-strict-aliasing -fno-strict-overflow -fwrapv -DAES=1 -DCOMMIT=\"${COMMIT}\" -D_GNU_SOURCE=1 -D_FILE_OFFSET_BITS=64 $(SPKSRC_CFLAGS)
++LDFLAGS = -ggdb -rdynamic -lm -lrt -lcrypto -lz -lpthread -lcrypto $(SPKSRC_LDFLAGS)
+ 
+ LIB = ${OBJ}/lib
+ CINCLUDE = -iquote common -iquote .
