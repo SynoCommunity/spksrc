@@ -16,6 +16,8 @@ STARTABLE = yes
 DISPLAY_NAME = MTProxy
 CHANGELOG =
 
+UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES)
+
 HOMEPAGE = https://github.com/TelegramMessenger/MTProxy
 LICENSE  = GPL
 
