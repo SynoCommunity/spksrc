@@ -14,6 +14,4 @@ service_postuninst ()
      rm -f /usr/local/bin/mcedit
      rm -f /usr/local/bin/mcdiff
      rm -f /usr/local/bin/mcview
-
-     exit 0
 }
