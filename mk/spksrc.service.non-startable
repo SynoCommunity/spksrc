@@ -8,7 +8,7 @@ case $1 in
         exit 0
         ;;
     status)
-        exit 0
+        exit 3
         ;;
     log)
         exit 1
