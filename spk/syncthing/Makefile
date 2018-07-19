@@ -10,7 +10,7 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = Safihre
 DESCRIPTION = Automatically sync files via secure, distributed technology.
-DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sûre et distribuée.
+DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
 CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
@@ -25,11 +25,9 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 7070
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-# Add special options to start-stop-daemon command
-# Need them to trigger start-stop-daemon setup, but
-# we substitute them later in service-setup.sh
-SERVICE_EXE=dummy
-SERVICE_OPTIONS=dummy
+# Use busybox start-stop-daemon support
+# Options and environment are provided in service-setup.sh
+SERVICE_EXE = $${SYNOPKG_PKGDEST}/bin/syncthing
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
