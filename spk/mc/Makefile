@@ -1,6 +1,6 @@
 SPK_NAME = mc
-SPK_VERS = 4.8.20
-SPK_REV = 4
+SPK_VERS = 4.8.21
+SPK_REV = 5
 SPK_ICON = src/mc.png
 
 DEPENDS = cross/mc
@@ -11,7 +11,7 @@ DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\'inter
 RELOAD_UI = no
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
-CHANGELOG = Update to 4.8.20
+CHANGELOG = Update to 4.8.21
 
 HOMEPAGE = http://www.midnight-commander.org
 LICENSE  = GNU GPL
