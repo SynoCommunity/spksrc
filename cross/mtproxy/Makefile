@@ -1,4 +1,4 @@
-PKG_NAME = MTProxy
+PKG_NAME = mtproxy
 PKG_VERS = 0.01
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
