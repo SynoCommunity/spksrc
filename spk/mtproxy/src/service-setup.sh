@@ -20,15 +20,29 @@ SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
 get_aes_pwd() {
-    wget -t 3 -O "${AES_PWD_FILE}" \
-        --https-only https://core.telegram.org/getProxySecret \
-        >> "${LOG_FILE}" 2>&1
+    curl -s https://core.111telegram.org/getProxySecret -o "${AES_PWD_FILE}" || {
+        echo "[W] Cannot download AES password from Telegram servers." >> "${LOG_FILE}"
+
+        if [ -f "${AES_PWD_FILE}" ]; then
+            echo "[+] Using old AES password from file ${AES_PWD_FILE}" >> "${LOG_FILE}"
+        else
+            echo "[E] AES password file not found. Cannot start." >> "${LOG_FILE}"
+            exit 2
+        fi
+    }
 }
 
 get_rules() {
-    wget -t 3 -O "${RULES_FILE}" \
-        --https-only https://core.telegram.org/getProxyConfig \
-        >> "${LOG_FILE}" 2>&1
+    curl -s https://core.111telegram.org/getProxyConfig -o "${RULES_FILE}" || {
+        echo '[W] Cannot download proxy configuration from Telegram servers.' >> "${LOG_FILE}"
+
+        if [ -f "${RULES_FILE}" ]; then
+            echo "[+] Using old proxy configuration from file ${RULES_FILE}" >> "${LOG_FILE}"
+        else
+            echo "[E] Proxy configuration file not found. Cannot start." >> "${LOG_FILE}"
+            exit 2
+        fi
+    }
 }
 
 service_prestart() {
