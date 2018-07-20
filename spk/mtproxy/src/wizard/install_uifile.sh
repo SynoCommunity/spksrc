@@ -8,6 +8,8 @@ WIZARD_CONTENT="$(cat << 'EOF'
     "step_title": "Server configuration",
     "invalid_next_disabled": true,
     "items": [{
+        "desc": "Please read <a href=\"https://github.com/TelegramMessenger/MTProxy/blob/master/README.md\" target=\"_blank\">MTProxy documentation</a> before you start"
+    }, {
         "type": "textfield",
         "subitems": [{
             "key": "wizard_proxy_port",
@@ -72,11 +74,22 @@ WIZARD_CONTENT="$(cat << 'EOF'
     }]
 }, {
     "step_title": "Information",
-    "activeate": "{(function(step,ip){if(step.getNext()!=='applyStep'){return}var d=document,$s=d.querySelector('input[name=\"wizard_proxy_secrets\"]'),$p=d.querySelector('input[name=\"wizard_proxy_port\"]'),$l=d.getElementById('wizard_proxy_tg_links'),s=$s.value.split(','),p=$p.value,c='';s.forEach(function(k){var link='tg://proxy?server='+ip+'&port='+p+'&secret='+k;c+='<p><a href=\"'+link+'\" target=\"_blank\">'+link+'</a></p>'});$l.innerHTML=c;}).call(this,arguments[0],'@proxy_ip@');}",
+    "invalid_next_disabled": true,
+    "activeate": "{(function(step,ip){if(step.getNext()!=='applyStep'){return}var d=document,p=d.querySelector('input[name=\"wizard_proxy_port\"]').value,$l=d.getElementById('wizard_proxy_tg_link'),$t=d.getElementById('wizard_proxy_tg_links'),r=d.querySelector('input[name=\"wizard_proxy_secrets\"]').value.split(',').map(function(k){return 'tg://proxy?server='+ip+'&port='+p+'&secret='+k}).join(\"\\n\");$t.value=r;$l.href=URL.createObjectURL(new Blob([r]))}).call(this,arguments[0],'@proxy_ip@');}",
     "items": [{
-        "desc": "Your proxy links, please save them:"
+        "desc": "<h3>Your proxy links, please save them:</h3>"
     }, {
-        "desc": "<span id=\"wizard_proxy_tg_links\"></span>"
+        "desc": "<textarea readonly wrap=\"off\" id=\"wizard_proxy_tg_links\" class=\"x-form-text x-form-field syno-ux-textfield x-item-disabled\" style=\"width:100%;height:10em;overflow:auto;background-image:none;margin-bottom:4px\"></textarea><a href=\"#\" id=\"wizard_proxy_tg_link\" download=\"MTProxy.txt\">Download proxy links as file</a>"
+    }, {
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_proxy_confirm",
+            "desc": "I saved the links",
+            "defaultVaule": false,
+            "validator": {
+                "fn": "{return arguments[0];}"
+             }
+        }]
     }]
 }]
 EOF

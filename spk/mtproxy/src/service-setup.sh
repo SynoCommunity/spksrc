@@ -20,7 +20,7 @@ SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
 get_aes_pwd() {
-    curl -s https://core.111telegram.org/getProxySecret -o "${AES_PWD_FILE}" || {
+    curl -s https://core.telegram.org/getProxySecret -o "${AES_PWD_FILE}" || {
         echo "[W] Cannot download AES password from Telegram servers." >> "${LOG_FILE}"
 
         if [ -f "${AES_PWD_FILE}" ]; then
@@ -33,7 +33,7 @@ get_aes_pwd() {
 }
 
 get_rules() {
-    curl -s https://core.111telegram.org/getProxyConfig -o "${RULES_FILE}" || {
+    curl -s https://core.telegram.org/getProxyConfig -o "${RULES_FILE}" || {
         echo '[W] Cannot download proxy configuration from Telegram servers.' >> "${LOG_FILE}"
 
         if [ -f "${RULES_FILE}" ]; then
