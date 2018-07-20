@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
-SPK_VERS = 0.14.30
-SPK_REV = 13
+SPK_VERS = 0.14.44
+SPK_REV = 14
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
@@ -8,23 +8,33 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = cytec
+MAINTAINER = Safihre
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sûre et distribuée.
-ADMIN_PORT = 7070
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Resolved umask issue"
+CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 HOMEPAGE = http://www.syncthing.net
 LICENSE = MPLv2.0
+STARTABLE = yes
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+WIZARDS_DIR = src/wizard/
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 7070
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+
+# Add special options to start-stop-daemon command
+# Need them to trigger start-stop-daemon setup, but
+# we substitute them later in service-setup.sh
+SERVICE_EXE=dummy
+SERVICE_OPTIONS=dummy
+
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
+
+FWPORTS = src/${SPK_NAME}.sc
 
 POST_STRIP_TARGET = syncthing_extra_install
 
@@ -38,5 +48,3 @@ syncthing_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.xml $(STAGING_DIR)/var/config.xml
 	install -m 644 src/options.conf $(STAGING_DIR)/var/options.conf
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
