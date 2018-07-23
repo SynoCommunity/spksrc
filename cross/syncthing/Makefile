@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.14.30
+PKG_VERS = 0.14.44
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
@@ -16,18 +16,24 @@ COMPILE_TARGET = myComp
 INSTALL_TARGET = myInstall
 
 GOOS = linux
-CGO_ENABLED=0
+CGO_ENABLED = 0
 
 # set this to 1 to create static linked binaries
 STATIC_BINARIES = 0
 
-# Need arch-defs now
 include ../../mk/spksrc.cross-cc.mk
 
 # Define SYNCTHING_ARCH as per Syncthing standards
-ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = arm
 ENV += GOARM=5
+endif
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+SYNCTHING_ARCH = arm
+ENV += GOARM=7
+endif
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+SYNCTHING_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = 386
