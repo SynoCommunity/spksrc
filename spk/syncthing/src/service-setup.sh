@@ -1,17 +1,5 @@
 # Setup environment
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-SYNCTHING="${SYNOPKG_PKGDEST}/bin/syncthing"
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var"
-SYNCTHING_OPTIONS="-home=${CONFIG_DIR}"
-
-# Read additional startup options from /usr/local/syncthing/var/options.conf
-if [ -f ${CONFIG_DIR}/options.conf ]; then
-    source ${CONFIG_DIR}/options.conf
-fi
-
-# Overwrite the Makefile variables
-SERVICE_EXE="env HOME=${SYNOPKG_PKGDEST}/var ${SYNOPKG_PKGDEST}/bin/syncthing"
-SERVICE_OPTIONS="-home=${SYNOPKG_PKGDEST}/var"
 
 GROUP="sc-syncthing"
 LEGACY_GROUP="users"
@@ -27,4 +15,21 @@ service_postinst ()
     $BIN/busybox --install $BIN >> ${INST_LOG}
     $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
     $BIN/deluser "${USER}" >> ${INST_LOG}
+}
+
+service_prestart ()
+{
+    CONFIG_DIR="${SYNOPKG_PKGDEST}/var"
+    SYNCTHING_OPTIONS="-home=${CONFIG_DIR}"
+
+    # Read additional startup options from /usr/local/syncthing/var/options.conf
+    if [ -f ${CONFIG_DIR}/options.conf ]; then
+        . ${CONFIG_DIR}/options.conf
+    fi
+
+    SERVICE_OPTIONS=$SYNCTHING_OPTIONS
+
+    # Required: start-stop-daemon do not set environment variables
+    HOME=${SYNOPKG_PKGDEST}/var
+    export HOME
 }
