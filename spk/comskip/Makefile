@@ -1,6 +1,6 @@
 SPK_NAME = comskip
-SPK_VERS = 0.81.094
-SPK_REV = 1
+SPK_VERS = 0.82.003
+SPK_REV = 2
 SPK_ICON = src/comskip.png
 BETA = 1
 
@@ -13,7 +13,7 @@ STARTABLE = no
 MAINTAINER = schumi2004
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "Initial release"
+CHANGELOG = "Update to 0.82.003 release"
 BETA = 1
 
 HOMEPAGE = http://www.kaashoek.com/comskip/
@@ -35,5 +35,3 @@ comskip_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/comskip.ini $(STAGING_DIR)/var/comskip.ini
 	install -m 644 src/comskip.dictionary $(STAGING_DIR)/var/comskip.dictionary
-
-
