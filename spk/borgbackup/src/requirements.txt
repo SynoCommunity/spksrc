@@ -1,6 +1,6 @@
 # Cross compiled packages dependencies
-#borgbackup==1.1.5
-#msgpack-python==0.4.8
+#borgbackup==1.1.6
+#msgpack-python==0.5.6
 
 # Downloaded dependencies
 borgmatic==1.0.3
