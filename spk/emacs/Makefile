@@ -16,11 +16,4 @@ CHANGELOG = Add emacs 26.1
 HOMEPAGE   = https://www.gnu.org/software/emacs/
 LICENSE    = GPLv3
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
-POST_STRIP_TARGET = tmux_extra_install
-
 include ../../mk/spksrc.spk.mk

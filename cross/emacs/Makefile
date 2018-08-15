@@ -12,6 +12,6 @@ COMMENT  = Emacs is the extensible, customizable, self-documenting real-time dis
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-x --with-gnutls --prefix=/usr/local
+CONFIGURE_ARGS = --without-x --with-gnutls
 
 include ../../mk/spksrc.cross-cc.mk
