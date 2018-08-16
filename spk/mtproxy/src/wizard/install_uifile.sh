@@ -12,6 +12,36 @@ WIZARD_CONTENT="$(cat << 'EOF'
     }, {
         "type": "textfield",
         "subitems": [{
+            "key": "wizard_proxy_internal_ip",
+            "desc": "Internal IP address",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/",
+                    "errorText": "Incorrect IP address"
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_proxy_external_ip",
+            "desc": "External IP address",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/",
+                    "errorText": "Incorrect IP address"
+                }
+            }
+        }]
+    }, {
+        "desc": "Leave IP addresses blank if you don't know them or your addresses are dynamic"
+    }, {
+        "type": "textfield",
+        "subitems": [{
             "key": "wizard_proxy_port",
             "desc": "Proxy port",
             "defaultValue": "1984",

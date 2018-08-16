@@ -12,6 +12,36 @@ WIZARD_CONTENT="$(cat << 'EOF'
     }, {
         "type": "textfield",
         "subitems": [{
+            "key": "wizard_proxy_internal_ip",
+            "desc": "Внутренний IP адрес",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/",
+                    "errorText": "Некорректный IP адрес"
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_proxy_external_ip",
+            "desc": "Внешний IP адрес",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/",
+                    "errorText": "Некорректный IP адрес"
+                }
+            }
+        }]
+    }, {
+        "desc": "Оставьте IP адреса пустыми, если вы их не знаете или у вас динамические адреса"
+    }, {
+        "type": "textfield",
+        "subitems": [{
             "key": "wizard_proxy_port",
             "desc": "Порт сервера",
             "defaultValue": "1984",
