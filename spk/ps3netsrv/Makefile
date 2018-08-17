@@ -1,6 +1,6 @@
 SPK_NAME = ps3netsrv
 SPK_VERS = 1.47.08
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/${SPK_NAME}.png
 
 REQUIRED_DSM = 5.0
@@ -35,3 +35,4 @@ include ../../mk/spksrc.spk.mk
 ps3netsrv_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/ps3netsrv.conf $(STAGING_DIR)/var/ps3netsrv.conf
+	install -m 755 src/ps3netsrv-starter.sh $(STAGING_DIR)/ps3netsrv-starter.sh
