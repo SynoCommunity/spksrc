@@ -25,6 +25,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_dir
 SERVICE_PORT = 38008
+SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/ps3netsrv-starter.sh
 NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = ps3netsrv_extra_install

@@ -1,9 +1,6 @@
 CFG_FILE="${SYNOPKG_PKGDEST}/var/ps3netsrv.conf"
-BIN_FILE="${SYNOPKG_PKGDEST}/bin/ps3netsrv"
 
-export PID_FILE LOG_FILE CFG_FILE BIN_FILE
-
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/ps3netsrv-starter.sh"
+export PID_FILE CFG_FILE
 
 service_postinst ()
 {
