@@ -1,8 +1,8 @@
 PKG_NAME = bzip2
 PKG_VERS = 1.0.6
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://bzip.org/$(PKG_VERS)
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
+PKG_DIST_SITE = http://http.debian.net/debian/pool/main/b/bzip2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
