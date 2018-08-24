@@ -1,6 +1,6 @@
 SPK_NAME = nano
-SPK_VERS = 2.9.5
-SPK_REV = 3
+SPK_VERS = 2.9.8
+SPK_REV = 4
 SPK_ICON = src/nano.png
 
 DEPENDS = cross/$(SPK_NAME)
