@@ -17,6 +17,5 @@ HOMEPAGE   = http://www.nano-editor.org
 LICENSE    = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
-SSS_SCRIPT    = src/dsm-control.sh
 
 include ../../mk/spksrc.spk.mk
