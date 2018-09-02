@@ -21,3 +21,7 @@ endif
 ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
+ifeq ($(findstring $(ARCH),rtd1296),$(ARCH))
+CONFIGURE_ARGS = --target=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu
+endif
+
