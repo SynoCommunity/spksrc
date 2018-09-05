@@ -1,0 +1,11 @@
+--- duply.orig	2018-09-01 19:46:42.143830862 +0100
++++ duply	2018-09-01 19:39:20.402845754 +0100
+@@ -1884,7 +1884,7 @@
+ 
+ # pw set? 
+ # symmetric needs one, always
+-if gpg_symmetric && ( [ -z "$GPG_PW" ] || [ "$GPG_PW" == "${DEFAULT_GPG_PW}" ] ) \
++if gpg_symmetric && [ -z "$GPG_PW" ] \
+   ; then
+   error_gpg "Encryption passphrase GPG_PW (needed for symmetric encryption) 
+ is empty/not set or still default value in conf file 

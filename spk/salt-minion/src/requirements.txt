@@ -1,0 +1,8 @@
+salt==2018.3.2
+msgpack
+Jinja2
+tornado==4.2.1
+singledispatch
+#requests>=1.0.0
+#CherryPy
+futures>=2.0
