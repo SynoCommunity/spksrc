@@ -1,0 +1,19 @@
+[{
+    "step_title": "Директория с файлами PS3",
+    "items": [{
+        "type": "textfield",
+        "desc": "Путь к директории с играми и файлами PS3. По умолчанию: /volume1/PS3",
+        "subitems": [{
+            "key": "wizard_dir",
+            "desc": "Директория с играми",
+            "defaultValue": "/volume1/PS3",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Путь должен начинаться с /volumename?/ где volumename может быть 'volume' или 'volumeUSB' и ? номер раздела (1-99)."
+                }
+            }
+        }]
+    }]
+}]
