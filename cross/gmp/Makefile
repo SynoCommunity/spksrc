@@ -17,3 +17,6 @@ GNU_CONFIGURE = 1
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --disable-assembly
 endif
+ifeq ($(findstring $(ARCH),rtd1296),$(ARCH))
+CONFIGURE_ARGS += --target=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu
+endif
