@@ -46,7 +46,6 @@ safekeep_extra_install: work/$(PKG_DIR)
 	install -m 755 -d $(STAGING_DIR)/etc/safekeep/backup.d
 	install -m 644 src/safekeep.conf $(STAGING_DIR)/etc/safekeep
 	install -m 644 src/host1.backup.sample $(STAGING_DIR)/etc/safekeep/backup.d
-	install -m 644 src/safekeep-backups.sh $(STAGING_DIR)/bin
 	install -m 644 src/safekeep.cron $(STAGING_DIR)/etc/cron.d/safekeep
 	install -m 755 work/$(PKG_DIR)/safekeep $(STAGING_DIR)/bin
 
