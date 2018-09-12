@@ -1,10 +1,16 @@
 
+PACKAGE="itools"
+INSTALL_DIR="/usr/local/${PACKAGE}"
+VOLUME_DIR="${INSTALL_DIR}/volume"
+
 SVC_CWD="${SYNOPKG_PKGDEST}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
 service_postinst ()
 {
+    easy_install lockfile
+    ln -s ${SYNOPKG_PKGDEST_VOL} ${VOLUME_DIR}
     ln -s ${SYNOPKG_PKGDEST}/bin/idevicebackup /usr/local/bin/idevicebackup
     ln -s ${SYNOPKG_PKGDEST}/bin/idevicebackup2 /usr/local/bin/idevicebackup2
     ln -s ${SYNOPKG_PKGDEST}/bin/idevicecrashreport /usr/local/bin/idevicecrashreport
@@ -29,6 +35,7 @@ service_postinst ()
 
 service_postuninst ()
 {
+    rm -f ${VOLUME_DIR}
     rm -f /usr/local/bin/idevicebackup
     rm -f /usr/local/bin/idevicebackup2
     rm -f /usr/local/bin/idevicecrashreport
@@ -49,4 +56,17 @@ service_postuninst ()
     rm -f /usr/local/bin/ifuse
     rm -f /usr/local/bin/iproxy
     rm -f /usr/local/bin/plistutil
+}
+
+service_prestart ()
+{
+    cp ${SYNOPKG_PKGDEST}/39-libimobiledevice.rules /usr/lib/udev/rules.d/
+    udevadm control --reload-rules
+}
+
+service_poststop ()
+{
+    ${INSTALL_DIR}/umounting.py
+    rm -f /usr/lib/udev/rules.d/39-libimobiledevice.rules
+    udevadm control --reload-rules
 }
