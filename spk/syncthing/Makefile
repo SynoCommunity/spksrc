@@ -1,5 +1,5 @@
 SPK_NAME = syncthing
-SPK_VERS = 0.14.49
+SPK_VERS = 0.14.50
 SPK_REV = 16
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
@@ -11,7 +11,7 @@ DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Split up firewall port definitions for different protocols."
+CHANGELOG = "Split up firewall port definitions for different protocols.  Update to upstream v0.14.50."
 HOMEPAGE = http://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
