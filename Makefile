@@ -126,3 +126,14 @@ setup-synocommunity: setup
 		-e "s|REPORT_URL=.*|REPORT_URL=https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk
 
+all-affected-spks-from-master:
+	for spk in $(git diff --stat upstream/master...HEAD | bash mk/build-target-determinator.bash | sort) ; \
+	do \
+	    env $(MAKE) $${spk}-all-supported ; \
+	done
+
+# "make python3-all-supported" causes "make all-supported" to run in that spk
+%-all-supported: spk/%/Makefile
+	cd $(dir $^) && env $(MAKE) all-supported
+
+
