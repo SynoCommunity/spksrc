@@ -1,13 +1,14 @@
 SPK_NAME = homeassistant
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+include ../../cross/$(SPK_NAME)/version
+SPK_VERS=$(PKG_VERS)
+SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel cross/$(SPK_NAME)
 DEPENDS = cross/busybox cross/nmap #for python-libnmap
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python3>=3.4.1-4:git"
+SPK_DEPENDS = "python3>=3.5.3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
@@ -17,8 +18,8 @@ CHANGELOG = "First release"
 
 BETA = 1
 
-HOMEPAGE = https://home-assistant.io/
-LICENSE  = MIT
+HOMEPAGE = https://www.home-assistant.io/
+LICENSE  = Apache License 2.0
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -44,6 +45,7 @@ homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 
 $(STAGING_DIR)/share/homeassistant:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone --recursive https://github.com/balloob/home-assistant.git homeassistant
-	rm -fr $(STAGING_DIR)/share/homeassistant/.git $(STAGING_DIR)/share/homeassistant/.gitignore
+	install -m 755 -d $(@D)
+	tar -C $(@D) -xzf $(DISTRIB_DIR)/$(NAME)-git$(PKG_GIT_HASH).tar.gz
+	mv $(@D)/$(NAME)-git$(PKG_GIT_HASH) $@
+	ls -al $(@D)

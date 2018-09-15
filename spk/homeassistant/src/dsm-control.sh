@@ -67,6 +67,25 @@ case $1 in
             echo ${DNAME} is not running
         fi
         ;;
+    restart)
+        if daemon_status; then
+            echo Stopping ${DNAME} ...
+            stop_daemon
+        else
+            echo ${DNAME} is not running
+        fi
+		while daemon_status; do
+			echo restarting: ${DNAME} still running
+			sleep 1
+		done
+        echo Starting ${DNAME} ...
+        start_daemon
+		until daemon_status; do
+			echo restarting: ${DNAME} not yet running
+			sleep 1
+		done
+        echo Started ${DNAME}
+        ;;
     status)
         if daemon_status; then
             echo ${DNAME} is running

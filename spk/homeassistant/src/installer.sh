@@ -14,7 +14,7 @@ CONFIG_DIR="${INSTALL_DIR}/var"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 SERVICETOOL="/usr/syno/bin/servicetool"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
+FWPORTS="/var/packages/${PACKAGE}/conf/${PACKAGE}.sc"
 
 DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
 SC_USER="sc-homeassistant"
