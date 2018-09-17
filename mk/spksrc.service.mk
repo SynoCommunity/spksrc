@@ -146,7 +146,11 @@ endif
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
 ifneq ($(strip $(SPK_USER)),)
+ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
+else
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
+endif
 	$(create_target_dir)
 	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)

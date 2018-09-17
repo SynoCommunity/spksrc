@@ -1,7 +1,7 @@
 PKG_NAME = python3
 PKG_VERS_MAJOR = 3
 PKG_VERS_MINOR = 5
-PKG_VERS_PATCH = 2
+PKG_VERS_PATCH = 5
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -16,8 +16,8 @@ COMMENT  = Python Programming Language
 LICENSE  = PSF
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
+ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(WORK_DIR)/install/usr/local/python3/lib -I $(WORK_DIR)/install/usr/local/python3/include
+CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 
 POST_PATCH_TARGET = myPostPatch
@@ -51,6 +51,13 @@ myPreConfigure:
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
 	cp $(PGEN_NATIVE) $(HOSTPGEN)
 	$(RUN) autoreconf
+	# create phantom header and library to succeed add_dir_to_list in setup.py
+	# so that future-promised libsqlite3.so and sqlite3.h will be used.  Yep,
+	# it's a bit hokey, but avoids editing upstream pristine source
+	mkdir -p $(WORK_DIR)/install/usr/local/python3/lib $(WORK_DIR)/install/usr/local/python3/include
+	mkdir -p $(WORK_DIR)/Python-$(PKG_VERS)/Include $(WORK_DIR)/Python-$(PKG_VERS)/lib
+	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(WORK_DIR)/install/usr/local/python3/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
+	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(WORK_DIR)/install/usr/local/python3/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
 .PHONY: myCompile
 myCompile:
@@ -64,6 +71,7 @@ myInstall:
 
 .PHONY: myPostInstall
 myPostInstall: $(WORK_DIR)/python-cc.mk
+	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/

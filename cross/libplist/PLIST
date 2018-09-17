@@ -1,0 +1,7 @@
+bin:bin/plistutil
+lnk:lib/libplist.so
+lnk:lib/libplist.so.3
+lib:lib/libplist.so.3.1.0
+lnk:lib/libplist++.so
+lnk:lib/libplist++.so.3
+lib:lib/libplist++.so.3.1.0

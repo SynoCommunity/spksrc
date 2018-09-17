@@ -1,6 +1,6 @@
 SPK_NAME = zsh-static
 SPK_CONFLICT = zsh
-SPK_REV = 2
+SPK_REV = 3
 
 export ZSH_STATIC_MODULES = true
 
