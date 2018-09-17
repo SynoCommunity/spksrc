@@ -3,25 +3,19 @@
 DNAME="ZeroTier"
 PACKAGE="zerotier"
 INSTALL_DIR="/usr/local/${PACKAGE}"
-ZT_HOME_DIR="/var/lib/zerotier-one"
-ZEROTIER="${INSTALL_DIR}/bin/zerotier-one"
-WATCHDOG="${INSTALL_DIR}/bin/zerotier-watchdog.sh"
+ZT_HOME_DIR="${SYNOPKG_PKGDEST}/var"
+ZEROTIER="${SYNOPKG_PKGDEST}/bin/zerotier-one"
 PID_FILE="${ZT_HOME_DIR}/zerotier-one.pid"
-LOG_FILE="/var/log/zerotier-one.log"
 
 start_daemon ()
 {
-    ${WATCHDOG} stop ;
-    ${WATCHDOG} start ;
     sleep 1
-    echo "starting" ${SYNOPKG_PKGDEST} >> ${LOG_FILE}
     ${SYNOPKG_PKGDEST}/bin/zerotier-one -d ;
     echo $! >> ${PID_FILE}
 }
 
 stop_daemon ()
 {
-    ${WATCHDOG} stop ;
     pkill zerotier-one
 }
 
@@ -46,40 +40,29 @@ wait_for_status ()
     return 1
 }
 
-
 case "$1" in
   start)
-    if ( pidof zerotier-one ); then 
-        echo "${DNAME} is already running"
+    if ( pidof zerotier-one ); then
+        exit 0
     else
-        echo "$(date) Starting ${DNAME} " >> ${LOG_FILE}
-        echo "Starting ${DNAME} " ;
         start_daemon
-        echo "$(date) Started ZeroTier" >> ${LOG_FILE} ;
     fi
     ;;
   stop)
     if ( pidof zerotier-one ); then
-        echo "$(date) Stopping ${DNAME}" >> ${LOG_FILE}
-        echo "Stopping ${DNAME}"
         stop_daemon
-        echo "$(date) Stopped ZeroTier" >> ${LOG_FILE} ;
     else
-        echo "${DNAME} is not running" ;
+        exit 0
     fi
     ;;
   status)
     if ( pidof zerotier-one ); then
-        echo "${DNAME} is running."
         exit 0
-    else 
-        echo "${DNAME} is not running"
+    else
         exit 1
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/zerotier {start|stop|status}"
     exit 1
     ;;
 esac
-
