@@ -1,0 +1,10 @@
+{
+        ".url": {
+                "com.synocommunity.zerotier": {
+                        "type": "legacy",
+                        "title": "ZeroTier",
+                        "icon": "images/icon_{0}.png",
+                        "url": "/webman/3rdparty/zerotier/index.html"
+                }
+        }
+}

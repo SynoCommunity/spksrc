@@ -17,8 +17,6 @@ DISPLAY_NAME = ZeroTier
 PRODUCT_DIR = /spksrc/spksrc/spk/zerotier/work/ZeroTierOne-b8268d894b4dd0774eeb2bcd0009b818fe960b52
 # PRODUCT_DIR=$(WORK_DIR)/$(DISPLAY_NAME)One-$(SPK_VERS)
 
-SERVICE_PORT = 5000
-
 DSM_UI_DIR = ui
 RELOAD_UI = yes
 OS_MIN_VERS = 6.0-7321
