@@ -37,3 +37,4 @@ template<> void TModInfo<CPrivMsgMod>(CModInfo& Info) {
 }
 
 USERMODULEDEFS(CPrivMsgMod, "Send outgoing PRIVMSGs and CTCP ACTIONs to other clients")
+

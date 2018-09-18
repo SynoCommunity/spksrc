@@ -1,15 +1,16 @@
 PKG_NAME = znc
-PKG_VERS = 1.6.0
+PKG_VERS = 1.7.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://znc.in/releases/archive
+
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl
 
 HOMEPAGE = http://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
-LICENSE  =
+LICENSE  = Apache License 2.0
 
 GNU_CONFIGURE = 1
 ifneq ($(wildcard modules/*),)
