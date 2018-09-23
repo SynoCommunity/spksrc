@@ -1,5 +1,4 @@
 bin:bin/znc
-bin:bin/znc-buildmod
 lib:lib/znc/admindebug.so
 lib:lib/znc/adminlog.so
 lib:lib/znc/alias.so
@@ -27,6 +26,7 @@ lib:lib/znc/dcc.so
 lib:lib/znc/disconkick.so
 lib:lib/znc/fail2ban.so
 lib:lib/znc/flooddetach.so
+lib:lib/znc/identd.so
 lib:lib/znc/identfile.so
 lib:lib/znc/imapauth.so
 lib:lib/znc/keepnick.so

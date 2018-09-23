@@ -50,4 +50,5 @@ znc_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/modules
 	install -m 755 -d $(STAGING_DIR)/var/configs
 	install -m 644 src/znc.conf $(STAGING_DIR)/var/configs/znc.conf
+	install -m 644 src/oidentd.conf ${STAGING_DIR}/var/configs/oidentd.conf
 	ln -sf /etc/ssl/certs $(STAGING_DIR)/certs

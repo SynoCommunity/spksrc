@@ -15,7 +15,7 @@ service_postinst ()
     sed -i -e "s,@certfile@,${CERT_FILE},g" ${SYNOPKG_PKGDEST}/var/configs/znc.conf
     sed -i -e "s,@username@,${wizard_username:=admin},g" ${SYNOPKG_PKGDEST}/var/configs/znc.conf
     sed -i -e "s,@password@,${wizard_password:=admin},g" ${SYNOPKG_PKGDEST}/var/configs/znc.conf
-
+    sed -i -e "s,@zncuser@,${EFF_USER},g" ${SYNOPKG_PKGDEST}/var/configs/oidentd.conf
 
     # Generate certificate
     echo "Generating initial certificate file" >> ${INST_LOG}
