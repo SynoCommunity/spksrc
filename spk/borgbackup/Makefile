@@ -1,20 +1,20 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.1.5
-SPK_REV = 2
+SPK_VERS = 1.1.7
+SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/$(SPK_NAME)
-DEPENDS = cross/bash
+DEPENDS = cross/bash cross/acl cross/attr
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python3>=3.5.2-6"
+SPK_DEPENDS = "python3>=3.5.5-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
 RELOAD_UI = no
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = Update to 1.1.5
+CHANGELOG = Update to 1.1.7
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause
