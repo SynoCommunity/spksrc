@@ -1,6 +1,6 @@
 SPK_NAME = mosquitto
-SPK_VERS = 1.4.9
-SPK_REV = 5
+SPK_VERS = 1.4.14
+SPK_REV = 9
 SPK_ICON = src/mosquitto.png
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
@@ -9,15 +9,17 @@ DESCRIPTION = Mosquitto is an open source message broker that implements the MQ 
 RELOAD_UI = yes
 DISPLAY_NAME = Mosquitto
 STARTABLE = yes
-CHANGELOG = "1. Updated logo. 2. Add websockets support"
+CHANGELOG = "1. Update to 1.4.14. 2. Use DSM 5+6 generic service"
 HOMEPAGE = http://www.mosquitto.org/
 LICENSE  = BSD licensed
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+SERVICE_USER = auto
+# SERVICE_COMMAND is provided there
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_PORT = 1883
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = mosquitto_extra_install
 

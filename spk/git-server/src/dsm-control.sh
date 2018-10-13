@@ -8,15 +8,20 @@ DNAME="Git Server"
 INSTALL_DIR="/usr/local/${PACKAGE}"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/sbin:${GIT_DIR}/bin:${PATH}"
-USER="git-server"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 DROPBEAR_PID_FILE="${INSTALL_DIR}/var/dropbear.pid"
 PID_FILE="${INSTALL_DIR}/var/git-daemon.pid"
 LOG_FILE="${INSTALL_DIR}/var/git-daemon.log"
 BASE_PATH="${INSTALL_DIR}/var/repositories"
 
+SC_USER="sc-git-server"
+LEGACY_USER="git-server"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
+
 start_daemon ()
 {
-    su - ${USER} -c "${GIT_DIR}/bin/git daemon --base-path=${BASE_PATH} --pid-file=${PID_FILE} --reuseaddr --verbose --detach ${BASE_PATH}"
+    su ${USER} -s /bin/sh -c "${GIT_DIR}/bin/git daemon --base-path=${BASE_PATH} --pid-file=${PID_FILE} --reuseaddr --verbose --detach ${BASE_PATH}"
     dropbear -r ${INSTALL_DIR}/var/dropbear_rsa_host_key -d ${INSTALL_DIR}/var/dropbear_dss_host_key -w -s -j -k -p 8352 -P ${DROPBEAR_PID_FILE}
 }
 

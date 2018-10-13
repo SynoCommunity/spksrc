@@ -1,11 +1,11 @@
 PKG_NAME = sslh
-PKG_VERS = 1.17
+PKG_VERS = 1.19c
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.rutschle.net/tech
+PKG_DIST_SITE = http://www.rutschle.net/tech/sslh
 PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 
-DEPENDS = cross/libconfig
+DEPENDS = cross/libconfig cross/pcre
 
 HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
 COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port

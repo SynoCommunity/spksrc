@@ -1,0 +1,17 @@
+{
+    ".url": {
+        "SYNO.SDS.DNSCryptProxy.Application": {
+            "type": "legacy",
+            "allUsers": false,
+            "allowMultiInstance": false,
+            "title": "app:displayname",
+            "desc": "app:description",
+            "icon": "images/dnscrypt-proxy-{0}.png",
+            "appWindow": "SYNO.SDS.DNSCryptProxy.Application",
+            "texts": "texts",
+            "width": 640,
+            "height": 500,
+            "url": "/webman/3rdparty/dnscrypt-proxy/index.cgi"
+        }
+    }
+}

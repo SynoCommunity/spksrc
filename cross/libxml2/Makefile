@@ -1,5 +1,5 @@
 PKG_NAME = libxml2
-PKG_VERS = 2.9.4
+PKG_VERS = 2.9.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://xmlsoft.org/$(PKG_NAME)
@@ -14,10 +14,6 @@ LICENSE  = MIT
 CONFIGURE_ARGS = --without-python --with-zlib=$(STAGING_INSTALL_PREFIX)
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
-ifeq ($(findstring $(ARCH),88f5281),$(ARCH))
-ADDITIONAL_CFLAGS = -O2
-endif
-
 POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk

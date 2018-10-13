@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.14.30
+PKG_VERS = 0.14.49
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
@@ -12,35 +12,45 @@ COMMENT  = Syncthing replaces Dropbox and BitTorrent Sync with something open, t
 LICENSE  = MPL-2.0
 
 CONFIGURE_TARGET = nope
-COMPILE_TARGET = myComp
-INSTALL_TARGET = myInstall
+COMPILE_TARGET = syncthing_compile
+INSTALL_TARGET = syncthing_install
 
 GOOS = linux
-CGO_ENABLED=0
+CGO_ENABLED = 0
 
 # set this to 1 to create static linked binaries
 STATIC_BINARIES = 0
 
+include ../../mk/spksrc.cross-cc.mk
+
 # Define SYNCTHING_ARCH as per Syncthing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = arm
 ENV += GOARM=5
 endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+SYNCTHING_ARCH = arm
+ENV += GOARM=7
+endif
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+SYNCTHING_ARCH = arm64
+endif
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = amd64
+endif
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+SYNCTHING_ARCH = ppc64
 endif
 ifeq ($(SYNCTHING_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
-SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
-SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
-
-include ../../mk/spksrc.cross-cc.mk
+SYNCTHING_DIR = $(EXTRACT_PATH)/$(PKG_NAME)
+SYNCTHING_BIN = $(SYNCTHING_DIR)/syncthing
 
 # use workdir as gopath
 ENV += GOPATH=$(WORK_DIR)
@@ -53,9 +63,9 @@ ifeq ($(strip $(STATIC_BINARIES)),1)
 CONF_ARGS += -no-upgrade
 endif
 
-myComp:
+syncthing_compile:
 	cd $(SYNCTHING_DIR) && env $(ENV) go run build.go $(CONF_ARGS) build
 
-myInstall:
+syncthing_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(SYNCTHING_BIN) $(STAGING_INSTALL_PREFIX)/bin/

@@ -7,10 +7,11 @@ URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 ifneq ($(PKG_DIST_FILE),)
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_FILE)
+LOCAL_FILE    = $(PKG_DIST_FILE)
 else
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+LOCAL_FILE    = $(PKG_DIST_NAME)
 endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
@@ -91,21 +92,21 @@ clean:
 
 all: install
 
+sha1sum := $(shell which sha1sum 2>/dev/null || which gsha1sum 2>/dev/null)
+sha256sum := $(shell which sha256sum 2>/dev/null || which gsha256sum 2>/dev/null)
+md5sum := $(shell which md5sum 2>/dev/null || which gmd5sum 2>/dev/null || which md5 2>/dev/null)
+
 .PHONY: $(DIGESTS_FILE)
 $(DIGESTS_FILE): download
 	@$(MSG) "Generating digests for $(PKG_NAME)"
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
-	  localFile=$(PKG_DIST_FILE) ; \
-	  if [ -z "$${localFile}" ]; then \
-	    localFile=$(PKG_DIST_NAME) ; \
-	  fi ; \
 	  case $$type in \
-	    SHA1|sha1)     tool=sha1sum ;; \
-	    SHA256|sha256) tool=sha256sum ;; \
-	    MD5|md5)       tool=md5sum ;; \
+	    SHA1)     tool=${sha1sum} ;; \
+	    SHA256)	  tool=${sha256sum} ;; \
+	    MD5)      tool=${md5sum} ;; \
 	  esac ; \
-	  echo "$${localFile} $$type `$$tool $(DISTRIB_DIR)/$${localFile} | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
 	done
 
 dependency-tree:

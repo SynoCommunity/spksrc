@@ -1,32 +1,38 @@
 SPK_NAME = jackett
-SPK_VERS = 0.7.1483
-SPK_REV = 4
+SPK_VERS = 0.8.490
+SPK_REV = 6
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/curl cross/$(SPK_NAME)
-SPK_DEPENDS = "mono>=4.2.1.102-6"
+# depend on mono 5.4 for BTLS HttpWebClient support
+SPK_DEPENDS = "mono>=5.4"
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = "Jackett works as a proxy server: it translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping & translation logic - removing the burden from other apps."
-ADMIN_PORT = 9117
+MAINTAINER = m4tt075
+DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
-CHANGELOG = Updated to version 0.7.1483
-
+STARTABLE = yes
+CHANGELOG = "1. Update Jackett to version 0.8.490, 2. Use DSM 5+6 generic service"
 HOMEPAGE = https://github.com/Jackett/Jackett
-LICENSE  = GPLv2
+LICENSE = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/$(SPK_NAME).sc
+# 'auto' reserved value grabs SPK_NAME
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Service configuration
+SERVICE_PORT = 9117
+SERVICE_PORT_TITLE = Jackett(HTTP)
+
+# Admin link
+ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = jackett_extra_install
 
 REQUIRED_DSM = 5.0
+# no PPC support for mono
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 BUSYBOX_CONFIG = usrmng daemon

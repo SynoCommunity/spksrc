@@ -6,7 +6,7 @@ SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
 
 all: $(SUPPORTED_SPKS)
 
-clean: $(addsuffix -clean,$(SUPPORTED_SPKS)) 
+clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean
 
 dist-clean: clean
@@ -22,6 +22,12 @@ toolchain-clean:
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
 	    (cd $${tc} && $(MAKE) clean) ; \
+	done
+
+kernel-clean:
+	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
+	do \
+	    (cd $${kernel} && $(MAKE) clean) ; \
 	done
 
 cross-clean:
@@ -60,6 +66,30 @@ natives:
 	    (cd $${n} && $(MAKE)) ; \
 	done
 
+native-digests:
+	@for n in $(dir $(wildcard native/*/Makefile)) ; \
+	do \
+	    (cd $${n} && $(MAKE) digests) ; \
+	done
+
+toolchain-digests:
+	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	do \
+	    (cd $${tc} && $(MAKE) digests) ; \
+	done
+
+kernel-digests:
+	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
+	do \
+	    (cd $${kernel} && $(MAKE) digests) ; \
+	done
+
+cross-digests:
+	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
+	do \
+	    (cd $${cross} && $(MAKE) digests) ; \
+	done
+
 .PHONY: toolchains kernel-modules
 toolchains: $(addprefix toolchain-,$(AVAILABLE_ARCHS))
 kernel-modules: $(addprefix kernel-,$(AVAILABLE_ARCHS))
@@ -70,7 +100,7 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
-setup: local.mk dsm-5.2
+setup: local.mk dsm-6.1
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."

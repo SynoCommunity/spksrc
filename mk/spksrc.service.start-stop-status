@@ -1,0 +1,150 @@
+#!/bin/sh
+
+# Default display name
+DNAME="${SYNOPKG_PKGNAME}"
+
+# Source package specific variable and functions
+SVC_SETUP=`dirname $0`"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
+
+start_daemon ()
+{
+    if [ -z "${SVC_QUIET}" ]; then
+        if [ -z "${SVC_KEEP_LOG}" ]; then
+            date > ${LOG_FILE}
+        else
+            date >> ${LOG_FILE}
+        fi
+        echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
+    fi
+    call_func "service_prestart"
+    if [ -n "${SERVICE_COMMAND}" ]; then
+        if [ -n "${SVC_NO_REDIRECT}" ]; then
+            OUT="/dev/null"
+        else
+            OUT="${LOG_FILE}"
+        fi
+        if [ -n "${USER}" -a -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
+            if [ -z "${SERVICE_SHELL}" ]; then
+                SERVICE_SHELL=/bin/sh
+            fi
+            if [ -z "${SVC_CWD}" ]; then
+                SVC_CD=""
+            else
+                SVC_CD="cd ${SVC_CWD}; "
+            fi
+            if [ -z "${SVC_BACKGROUND}" ]; then
+                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
+            else
+                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
+            fi
+        else
+            # DSM 6 user is set by conf/privilege
+            if [ -n "${SVC_CWD}" ]; then
+                cd "${SVC_CWD}"
+            fi
+            if [ -z "${SVC_BACKGROUND}" ]; then
+                ${SERVICE_COMMAND} >> ${OUT} 2>&1
+            else
+                ${SERVICE_COMMAND} >> ${OUT} 2>&1 &
+            fi
+        fi
+        if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
+            echo "$!" > "${PID_FILE}"
+        else
+            wait_for_status 0 ${SVC_WAIT_TIMEOUT}
+        fi
+    fi
+}
+
+stop_daemon ()
+{
+    if [ -n "${PID_FILE}" -a -r "${PID_FILE}" ]; then
+        PID=$(cat "${PID_FILE}")
+        if [ -z "${SVC_QUIET}" ]; then
+            date >> ${LOG_FILE}
+            echo "Stopping ${DNAME} service ${PID} " >> ${LOG_FILE}
+        fi
+        kill -TERM $PID >> ${LOG_FILE} 2>&1
+        wait_for_status 1 ${SVC_WAIT_TIMEOUT} || kill -KILL $PID >> ${LOG_FILE} 2>&1
+        if [ -f "${PID_FILE}" ]; then
+            rm -f "${PID_FILE}" > /dev/null
+        fi
+    fi
+    call_func "service_poststop"
+}
+
+daemon_status ()
+{
+
+    if [ -n "${PID_FILE}" -a -r "${PID_FILE}" ]; then
+        if kill -0 $(cat "${PID_FILE}") > /dev/null 2>&1; then
+            return
+        fi
+        rm -f "${PID_FILE}" > /dev/null
+    fi
+    return 1
+}
+
+wait_for_status ()
+{
+    timeout=$2
+    # default value: 20 seconds
+    counter=${timeout:=20}
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && return
+        counter=$((counter-1))
+        sleep 1
+    done
+    return 1
+}
+
+
+case $1 in
+    start)
+        if daemon_status; then
+            echo "${DNAME} is already running"
+            exit 0
+        else
+            echo "Starting ${DNAME} ..."
+            start_daemon
+            exit $?
+        fi
+        ;;
+    stop)
+        if daemon_status; then
+            echo "Stopping ${DNAME} ..."
+            stop_daemon
+            exit $?
+        else
+            echo "${DNAME} is not running"
+            exit 0
+        fi
+        ;;
+    status)
+        if daemon_status; then
+            echo "${DNAME} is running"
+            exit 0
+        else
+            echo "${DNAME} is not running"
+            exit 3
+        fi
+        ;;
+    log)
+        if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
+            # Shorten long logs to last 100 lines
+            TEMP_LOG_FILE="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_temp.log"
+            # Clear any previous log
+            echo "Full log: ${LOG_FILE}" > "${TEMP_LOG_FILE}"
+            tail -n100 "${LOG_FILE}" >> "${TEMP_LOG_FILE}"
+            echo "${TEMP_LOG_FILE}"
+        fi
+        exit 0
+        ;;
+    *)
+        exit 1
+        ;;
+esac

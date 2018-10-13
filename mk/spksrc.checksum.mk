@@ -6,9 +6,9 @@
 #  checksum_target       (override with CHECKSUM_TARGET)
 #  post_checksum_target  (override with POST_CHECKSUM_TARGET)
 # Variables:
-#  DIST_FILE             List of file to check. TODO
+#  LOCAL_FILE            name of file to check 
 # Files:
-#  Checksums             File wich type, checksum values and file name
+#  digests               File with filename, hash-type and checksum values
 
 DIGESTS_FILE = digests
 CHECKSUM_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)checksum_done
@@ -37,12 +37,18 @@ checksum_msg:
 
 pre_checksum_target: checksum_msg
 
-# TODO: do something with sha256sum to check the file integrity.
+# validate file integrity with the provided digests.
 checksum_target: $(PRE_CHECKSUM_TARGET)
 	@if [ -f $(DIGESTS_FILE) ] ; \
 	then \
 	  cat $(DIGESTS_FILE) | (cd $(DISTRIB_DIR) && while read file type value ; \
 	  do \
+	    if [ $$file != $(LOCAL_FILE) ] ; \
+	    then \
+	      $(MSG) "  Downloaded file $(LOCAL_FILE) not in digests file" ; \
+	      rm $(DOWNLOAD_COOKIE) ; \
+	      exit 1 ; \
+	    fi ; \
 	    if [ ! -f $$file ] ; \
 	    then \
 	      $(MSG) "  File $$file not downloaded" ; \

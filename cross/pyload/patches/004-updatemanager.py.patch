@@ -1,6 +1,6 @@
 --- module/plugins/hooks/UpdateManager.py.orig	2012-10-13 10:31:30.000000000 +0200
-+++ module/plugins/hooks/UpdateManager.py	2015-12-29 12:44:20.653525885 +0100
-@@ -1,44 +1,28 @@
++++ module/plugins/hooks/UpdateManager.py	2017-12-30 00:32:55.514653100 +0000
+@@ -1,27 +1,10 @@
  # -*- coding: utf-8 -*-
  
 -"""
@@ -18,8 +18,9 @@
 -    along with this program; if not, see <http://www.gnu.org/licenses/>.
 -
 -    @author: RaNaN
+-    @interface-version: 0.1
 -"""
--
+ 
  import sys
  import re
 -from os import stat
@@ -29,35 +30,26 @@
  from time import time
  
  from module.ConfigParser import IGNORE
- from module.network.RequestFactory import getURL
- from module.plugins.Hook import threaded, Expose, Hook
+@@ -30,13 +13,13 @@
  
-+
  class UpdateManager(Hook):
      __name__ = "UpdateManager"
--    __version__ = "0.13"
--    __description__ = """checks for updates"""
--    __config__ = [("activated", "bool", "Activated", "True"),
--        ("interval", "int", "Check interval in minutes", "480"),
+-    __version__ = "0.1"
++    __version__ = "0.16"
+     __description__ = """checks for updates"""
+     __config__ = [("activated", "bool", "Activated", "True"),
+-        ("interval", "int", "Check interval in minutes", "360"),
 -        ("debug", "bool", "Check for plugin changes when in debug mode", False)]
 -    __author_name__ = ("RaNaN")
 -    __author_mail__ = ("ranan@pyload.org")
-+    __version__ = "0.16"
-+    __description__ = """Checks for updates"""
-+    __config__ = [("activated", "bool", "Activated", True),
-+                  ("interval", "int", "Check interval in minutes", 480),
++                  ("interval", "int", "Check interval in minutes", "480"),
 +                  ("debug", "bool", "Check for plugin changes when in debug mode", False)]
 +    __author_name__ = ("RaNaN", "stickell")
 +    __author_mail__ = ("ranan@pyload.org", "l.stickell@yahoo.it")
  
--    URL = "http://get.pyload.org/check2/%s/"
--    MIN_TIME = 3 * 60 * 60 # 3h minimum check interval
-+    URL = "http://updatemanager-spyload.rhcloud.com"
-+    MIN_TIME = 3 * 60 * 60  # 3h minimum check interval
- 
      @property
      def debug(self):
-@@ -48,10 +32,10 @@
+@@ -47,10 +30,10 @@
          if self.debug:
              self.logDebug("Monitoring file changes")
              self.interval = 4
@@ -68,16 +60,15 @@
 -            self.mtimes = {}  #recordes times
 +            self.mtimes = {}  # recordes times
          else:
-             self.interval = max(self.getConfig("interval") * 60, self.MIN_TIME)
+             self.interval = self.getConfig("interval") * 60
  
-@@ -63,19 +47,18 @@
- 
-     @threaded
-     def periodical(self):
--
-         updates = self.checkForUpdate()
-         if updates:
-             self.checkPlugins(updates)
+@@ -65,17 +48,17 @@
+         if update:
+             self.info["pyload"] = True
+         else:
+-            self.log.info(_("No Updates for pyLoad"))
++            self.logInfo(_("No Updates for pyLoad"))
+             self.checkPlugins()
  
          if self.updated and not self.reloaded:
              self.info["plugins"] = True
@@ -87,46 +78,36 @@
 -            self.log.info(_("Plugins updated and reloaded"))
 +            self.logInfo(_("Plugins updated and reloaded"))
              self.updated = False
-         elif self.version == "None":
+         else:
 -            self.log.info(_("No plugin updates available"))
 +            self.logInfo(_("No plugin updates available"))
  
      @Expose
      def recheckForUpdates(self):
-@@ -84,40 +67,42 @@
+@@ -83,18 +66,18 @@
+         self.periodical()
  
      def checkForUpdate(self):
-         """checks if an update is available, return result"""
--
+-        """checks if an update is available"""
++        """checks if an update is available, return result"""
+ 
          try:
--            if self.version == "None": # No updated known
--                version_check = getURL(self.URL % self.core.api.getServerVersion()).splitlines()
-+            if self.version == "None":  # No updated known
-+                version_check = getURL(self.URL, get={'v': self.core.api.getServerVersion()}).splitlines()
-                 self.version = version_check[0]
- 
-                 # Still no updates, plugins will be checked
-                 if self.version == "None":
--                    self.log.info(_("No Updates for pyLoad"))
-+                    self.logInfo(_("No Updates for pyLoad"))
-                     return version_check[1:]
- 
--
-             self.info["pyload"] = True
--            self.log.info(_("***  New pyLoad Version %s available  ***") % self.version)
--            self.log.info(_("***  Get it here: http://pyload.org/download  ***"))
--
-+            self.logInfo(_("***  New pyLoad Version %s available  ***") % self.version)
-+            self.logInfo(_("***  Get it here: http://pyload.org/download  ***"))
+             version_check = getURL("http://get.pyload.org/check/%s/" % self.core.api.getServerVersion())
+             if version_check == "":
+                 return False
+             else:
+-                self.log.info(_("***  New pyLoad Version %s available  ***") % version_check)
+-                self.log.info(_("***  Get it here: http://pyload.org/download  ***"))
++                self.logInfo(_("***  New pyLoad Version %s available  ***") % version_check)
++                self.logInfo(_("***  Get it here: http://pyload.org/download  ***"))
+                 return True
          except:
 -            self.log.warning(_("Not able to connect server for updates"))
--
--        return None # Nothing will be done
 +            self.logWarning(_("Not able to connect server for updates"))
+             return False
  
-+        return None  # Nothing will be done
  
-     def checkPlugins(self, updates):
+@@ -102,12 +85,13 @@
          """ checks for plugins updates"""
  
          # plugins were already updated
@@ -134,22 +115,15 @@
 +        if self.info["plugins"]:
 +            return
  
-         reloads = []
+         try:
+             updates = getURL("http://get.pyload.org/plugins/check/")
+         except:
+-            self.log.warning(_("Not able to connect server for updates"))
++            self.logWarning(_("Not able to connect server for updates"))
+             return False
  
-         vre = re.compile(r'__version__.*=.*("|\')([0-9.]+)')
-         url = updates[0]
-         schema = updates[1].split("|")
--        updates = updates[2:]
-+        if 'BLACKLIST' in updates:
-+            blacklist = updates[updates.index('BLACKLIST') + 1:]
-+            updates = updates[2:updates.index('BLACKLIST')]
-+        else:
-+            blacklist = None
-+            updates = updates[2:]
- 
-         for plugin in updates:
-             info = dict(zip(schema, plugin.split("|")))
-@@ -145,7 +130,7 @@
+         updates = updates.splitlines()
+@@ -138,7 +122,7 @@
              if name in IGNORE or (type, name) in IGNORE:
                  continue
  
@@ -158,15 +132,10 @@
                  "type": type,
                  "name": name,
                  "version": float(version)
-@@ -169,17 +154,30 @@
+@@ -164,6 +148,18 @@
  
-             reloads.append((prefix, name))
- 
-+        self.executeBlacklist(blacklist)
-+
          self.reloaded = self.core.pluginManager.reloadPlugins(reloads)
  
--    def checkChanges(self):
 +    def executeBlacklist(self, blacklist):
 +        for b in blacklist:
 +            type, name = b.split('|')
@@ -178,21 +147,22 @@
 +                remove(join("userplugins", type, name))
 +            if isfile(join("userplugins", type, name.replace('.py', '.pyc'))):
 +                remove(join("userplugins", type, name.replace('.py', '.pyc')))
++
+     def checkChanges(self):
  
-+    def checkChanges(self):
-         if self.last_check + max(self.getConfig("interval") * 60, self.MIN_TIME) < time():
-             self.old_periodical()
+         if self.last_check + self.getConfig("interval") * 60 < time():
+@@ -171,8 +167,8 @@
              self.last_check = time()
  
          modules = filter(
--            lambda m: m and (m.__name__.startswith("module.plugins.") or m.__name__.startswith("userplugins.")) and m.__name__.count(".") >= 2,
+-            lambda m: m and (m.__name__.startswith("module.plugins.") or m.__name__.startswith("userplugins.")),
 -            sys.modules.itervalues())
 +            lambda m: m and (m.__name__.startswith("module.plugins.") or m.__name__.startswith(
 +                "userplugins.")) and m.__name__.count(".") >= 2, sys.modules.itervalues())
  
          reloads = []
  
-@@ -188,7 +186,8 @@
+@@ -181,7 +177,8 @@
              id = (type, name)
              if type in self.core.pluginManager.plugins:
                  f = m.__file__.replace(".pyc", ".py")

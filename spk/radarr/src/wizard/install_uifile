@@ -1,6 +1,11 @@
 [{
-    "step_title": "Updating Radarr",
+    "step_title": "Starting and updating Radarr",
     "items": [{
-        "desc": "Keep Radarr up-to-date by using Radarr's built-in updater.<br><br>Navigate to System>Updates in the Radarr UI."
+        "desc": "The first time Radarr is started it might take a few moments for the interface to become available!<br><br>Keep Radarr up-to-date by using Radarr's built-in updater.<br>Navigate to System>Updates in the Radarr UI."
+    }]
+},{
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
     }]
 }]

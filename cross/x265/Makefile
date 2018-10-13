@@ -1,9 +1,9 @@
 PKG_NAME = x265
-PKG_VERS = 2.5
+PKG_VERS = 2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265/downloads
-PKG_DIR = $(PKG_NAME)_$(PKG_VERS)/source
+PKG_DIR = $(PKG_NAME)_v$(PKG_VERS)/source
 
 DEPENDS =
 
@@ -11,18 +11,28 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = myConfigure
+CONFIGURE_TARGET = x265_custom_configure
+INSTALL_TARGET = x265_custom_install
 
 YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
-CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
-CMAKE_ARGS += -DEXTRA_LINK_FLAGS="-ldl"
+CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(INSTALL_PREFIX)/lib
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 
 include ../../mk/spksrc.cross-cc.mk
+
+# gcc version above 4.8 required to support hdr10plus
+ifeq ($(findstring $(TCVERSION), "6.0.2,6.1"),$(TCVERSION))
+ifneq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
+endif
+endif
 
 # Version since 2.2 fails on PPC
 # source/common/ppc/pixel_altivec.cpp:1: error: bad value (power8) for -mcpu= switch
@@ -32,12 +42,17 @@ include ../../mk/spksrc.cross-cc.mk
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
-CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
+CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 
 ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
+endif
+
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
@@ -53,7 +68,7 @@ endif
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 DEPENDS += native/yasm cross/libnuma
 ENV += PATH=$(YASM_PATH):$$PATH
-CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86
+CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
 endif
 
 # For ppc853x-4.3, disable atomics
@@ -62,7 +77,35 @@ CMAKE_ARGS += -DNO_ATOMICS=ON
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
-.PHONY: myConfigure
-myConfigure:
-	$(RUN) cmake $(CMAKE_ARGS) .
 
+.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure x265_custom_install
+
+# First create specific static libraries with build options for 12 and 10 bit depth
+PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_v$(PKG_VERS)
+PKG_BUILD_12BIT = $(PKG_WORK_DIR)/build12bit
+PKG_BUILD_10BIT = $(PKG_WORK_DIR)/build10bit
+
+CMAKE_BITLIB_ARGS = -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF
+CMAKE_BITLIB_ARGS += -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LINK_FLAGS="-ldl"
+
+$(PKG_DIR)/libx265_main12.a:
+	mkdir --parents $(PKG_BUILD_12BIT)
+	cd $(PKG_BUILD_12BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) -DMAIN12=ON ../source
+	cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_OPTIONS)
+	$(RUN) ln -sf $(PKG_BUILD_12BIT)/libx265.a libx265_main12.a
+
+$(PKG_DIR)/libx265_main10.a:
+	mkdir --parents $(PKG_BUILD_10BIT)
+	cd $(PKG_BUILD_10BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) ../source
+	cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_OPTIONS)
+	$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
+
+# Aggregate them all together in default 8 bit depth build
+CMAKE_MULTILIB_ARGS = -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
+CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
+
+x265_custom_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
+	$(RUN) cmake $(CMAKE_ARGS) $(CMAKE_MULTILIB_ARGS) .
+
+x265_custom_install:
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

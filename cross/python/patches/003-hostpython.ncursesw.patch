@@ -1,0 +1,30 @@
+
+The configure script assumes cross-compile environment with
+system-python installed. We need to provide PATHs for our
+native/python builds.
+On x86 toolchains the configure script will also pickup local
+ncursesw (on TravisCI), while we provide ncurses ourselves.
+This results in wrong linking during install step.
+
+
+--- configure.ac.orig	2017-12-27 09:08:38.303013000 +0000
++++ configure.ac	2018-01-11 07:38:48.436042001 +0000
+@@ -37,6 +37,9 @@
+ 	fi
+         AC_MSG_RESULT($interp)
+ 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
++	else
++		PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH='$PYTHON_LIB_NATIVE' '$PYTHON_FOR_BUILD
++		AC_MSG_RESULT($PYTHON_FOR_BUILD)
+     fi
+ elif test "$cross_compiling" = maybe; then
+     AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
+@@ -4239,7 +4242,7 @@
+ # with setup.py.
+ py_cv_lib_readline=no
+ AC_MSG_CHECKING([how to link readline libs])
+-for py_libtermcap in "" ncursesw ncurses curses termcap; do
++for py_libtermcap in "" ncurses curses termcap; do
+   if test -z "$py_libtermcap"; then
+     READLINE_LIBS="-lreadline"
+   else

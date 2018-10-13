@@ -10,8 +10,8 @@
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
-                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }
         }]
@@ -24,22 +24,22 @@
             "validator": {
                 "allowBlank": true,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
-                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }
         }]
     }, {
         "type": "textfield",
-        "desc": "Répertoire de conserver les fichiers jusqu'à ce torrent est terminée. Laisser vide pour désactiver",
+        "desc": "Répertoire où conserver les fichiers de torrent incomplets. Laisser vide pour désactiver",
         "subitems": [{
             "key": "wizard_incomplete_dir",
             "desc": "Répertoire incomplet",
             "validator": {
                 "allowBlank": true,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
-                    "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }
         }]
@@ -61,4 +61,9 @@
             "desc": "Mot de passe"
         }]
     }]
+}, {
+     "step_title": "Attention! DSM6 Permissions",
+     "items": [{
+         "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+     }]
 }]

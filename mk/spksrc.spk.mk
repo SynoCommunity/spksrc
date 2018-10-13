@@ -51,28 +51,65 @@ include ../../mk/spksrc.copy.mk
 strip: copy
 include ../../mk/spksrc.strip.mk
 
+
+# Scripts
+DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
+
+# Generated scripts
+DSM_SCRIPTS_  = preinst postinst
+DSM_SCRIPTS_ += preuninst postuninst
+DSM_SCRIPTS_ += preupgrade postupgrade
+
+# SPK specific scripts
+ifneq ($(strip $(SSS_SCRIPT)),)
+DSM_SCRIPTS_ += start-stop-status
+
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
+	@$(dsm_script_copy)
+endif
+
+ifneq ($(strip $(INSTALLER_SCRIPT)),)
+DSM_SCRIPTS_ += installer
+
+$(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
+	@$(dsm_script_copy)
+endif
+
+DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
+
+SPK_CONTENT = package.tgz INFO scripts
+
+# conf
+DSM_CONF_DIR = $(WORK_DIR)/conf
+
+ifneq ($(CONF_DIR),)
+export SPKSRC_CONF_DIR=$(CONF_DIR)
+endif
+
+# Generic service scripts
+include ../../mk/spksrc.service.mk
+
 icon: strip
 ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
 
-### Packaging rules
-$(WORK_DIR)/package.tgz: icon
-	$(create_target_dir)
-	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
-
+.PHONY: $(WORK_DIR)/INFO
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
+	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
+	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
-	@echo description=\"$(DESCRIPTION)\" >> $@
+	@/bin/echo -n "description=\"" >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
+	@echo "\"" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-	    $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
-	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
-	   ) \
-	) | sed 's|"\s|"\n|' >> $@
+          $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+            /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
+            /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
+            /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifneq ($(strip $(MAINTAINER)),)
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
@@ -82,20 +119,33 @@ endif
 	@echo maintainer_url=\"$(MAINTAINER_URL)\" >> $@
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
+
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
-else
-  ifneq ($(strip $(TC_FIRMWARE)),)
+else ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else ifneq ($(strip $(TC_FIRMWARE)),)
 	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
-  else
+	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
+else ifneq ($(strip $(TC_OS_MIN_VER)),)
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+else
 	@echo firmware=\"3.1-1594\" >> $@
-  endif
+	@echo os_min_ver=\"3.1-1594\" >> $@
+endif
+ifneq ($(strip $(OS_MAX_VER)),)
+	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
+	@echo beta=\"yes\" >> $@
 	@echo report_url=\"$(REPORT_URL)\" >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
+else
+  ifneq ($(strip $(HOMEPAGE)),)
+	@echo helpurl=\"$(HOMEPAGE)\" >> $@
+  endif
 endif
 ifneq ($(strip $(SUPPORTURL)),)
 	@echo support_url=\"$(SUPPORTURL)\" >> $@
@@ -109,9 +159,12 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
+ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
-ifneq ($(strip $(STARTABLE)),)
+endif
+ifeq ($(STARTABLE),no)
 	@echo startable=\"$(STARTABLE)\" >> $@
+	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
@@ -157,13 +210,6 @@ ifneq ($(WIZARDS_DIR),)
 export SPKSRC_WIZARDS_DIR=$(WIZARDS_DIR)
 endif
 
-# conf
-DSM_CONF_DIR = $(WORK_DIR)/conf
-
-ifneq ($(CONF_DIR),)
-export SPKSRC_CONF_DIR=$(CONF_DIR)
-endif
-
 # License
 DSM_LICENSE_FILE = $(WORK_DIR)/LICENSE
 
@@ -182,20 +228,11 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@echo $@
 	@$(dsm_license_copy)
 
-# Scripts
-DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
-
-# Generated scripts
-DSM_SCRIPTS_  = preinst postinst
-DSM_SCRIPTS_ += preuninst postuninst
-DSM_SCRIPTS_ += preupgrade postupgrade
-# SPK specific scripts
-ifneq ($(strip $(SSS_SCRIPT)),)
-DSM_SCRIPTS_ += start-stop-status
-endif
-DSM_SCRIPTS_ += installer
-DSM_SCRIPTS_ += $(notdir $(FWPORTS))
-DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
+### Packaging rules
+$(WORK_DIR)/package.tgz: icon service
+	$(create_target_dir)
+	@[ -f $@ ] && rm $@ || true
+	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
 
@@ -228,16 +265,8 @@ $(DSM_SCRIPTS_DIR)/preupgrade:
 $(DSM_SCRIPTS_DIR)/postupgrade:
 	@$(dsm_script_redirect)
 
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT) 
-	@$(dsm_script_copy)
-$(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
-	@$(dsm_script_copy)
-$(DSM_SCRIPTS_DIR)/%.sc: $(filter %.sc,$(FWPORTS))
-	@$(dsm_script_copy)
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
-
-SPK_CONTENT = package.tgz INFO scripts
 
 # Package Icons
 .PHONY: icons
@@ -261,8 +290,9 @@ wizards:
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Preparing DSM Wizards"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "upgrade_uninstall" -or -name "uninstall_uifile_???" -or -name "upgrade_uninstall.sh" -or -name "upgrade_uninstall_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
 
@@ -273,14 +303,16 @@ ifneq ($(strip $(CONF_DIR)),)
 	@mkdir -p $(DSM_CONF_DIR)
 	@find $${SPKSRC_CONF_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
-	$(eval SPK_CONTENT += conf)
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 endif
 
 ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 

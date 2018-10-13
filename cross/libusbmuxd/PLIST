@@ -1,0 +1,3 @@
+lnk:lib/libusbmuxd.so
+lnk:lib/libusbmuxd.so.4
+lib:lib/libusbmuxd.so.4.0.0

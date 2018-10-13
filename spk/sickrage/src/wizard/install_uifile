@@ -10,13 +10,17 @@
             "validator": {
                 "allowBlank": false
             }
-        }, {
+        },
+        {
             "key": "wizard_fork_branch",
             "desc": "Fork branch",
             "defaultValue": "master",
             "validator": {
                 "allowBlank": false
             }
-        ]
+        }]
+    },
+    {
+        "desc": "Permissions for all media-related packages are managed with the group <b>'sc-media'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
     }]
 }]

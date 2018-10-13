@@ -19,4 +19,9 @@
             }
         ]
     }]
+}, {
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+        "desc": "Permissions are managed with the group 'sc-media' in DSM."
+    }]
 }]
