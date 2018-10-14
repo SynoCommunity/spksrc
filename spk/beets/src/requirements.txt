@@ -27,3 +27,5 @@ requests-oauthlib==1.0.0
 Unidecode==1.0.22
 #virtualenv==15.1.0
 Werkzeug==0.14.1
+# For chroma
+pyacoustid==1.1.5
