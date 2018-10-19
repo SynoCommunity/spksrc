@@ -248,7 +248,7 @@ func renderHTML(fileKey string, successMessage string, errorMessage string) {
         logError(err.Error())
     }
 
-    page.Title = "DNSCrypt-proxy"
+    page.Title = "dnscrypt-proxy"
     page.File = fileKey
     page.Files = files
     page.FileData = fileData
