@@ -1,6 +1,6 @@
 SPK_NAME = mono
-SPK_VERS = 5.8.0.108
-SPK_REV = 11
+SPK_VERS = 5.18.0.225
+SPK_REV = 12
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "Update to 5.8.0.108 (Release)"
+CHANGELOG = "Update to 5.18.0.225 (Pre-Release)"
 
 HOMEPAGE = http://mono-project.com
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
@@ -36,3 +36,5 @@ mono_extra_install:
 mono_pre_copy: $(INSTALL_PLIST)
 	# remove boehm GC references from PLIST if it isn't available on the platform (e.g. rtd1296)
 	test -f $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/mono-boehm || sed -i -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d' $(INSTALL_PLIST)
+        # remove btls library from PLIST if it isn't available on the platform (e.g. 88f6281)
+	test -f $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/libmono-btls-shared.so || sed -i -e '/:lib\/libmono-btls-shared.so/d' $(INSTALL_PLIST)
