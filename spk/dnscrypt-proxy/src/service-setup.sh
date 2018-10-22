@@ -33,7 +33,9 @@ pgrep () {
 }
 
 forward_dns_dhcpd () {
+    if [ "$1" == "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
         echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
+        echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
         /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
     elif [ "$1" == "yes" ]; then
         if pgrep "dhcpd.conf"; then  # if dhcpd (dnsmasq) is enabled and running
