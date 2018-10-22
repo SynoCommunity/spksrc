@@ -1,6 +1,6 @@
 SPK_NAME = zerotier
 SPK_VERS = 1.2.12
-SPK_REV = 0
+SPK_REV = 1
 SPK_ICON = src/zerotier.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -19,9 +19,9 @@ PRODUCT_DIR = /spksrc/spksrc/spk/zerotier/work/ZeroTierOne-b8268d894b4dd0774eeb2
 
 DSM_UI_DIR = ui
 RELOAD_UI = yes
-OS_MIN_VERS = 6.0-7321
-FIRMWARE = 6.0-7321
 STARTABLE = yes
+REQUIRED_DSM = 6.1
+BETA = 1
 
 LICENSE  = GPLv3
 INSTALLER_SCRIPT = src/installer.sh
