@@ -244,16 +244,15 @@ func generateBlacklist () {
 		logError("Python could not be found or is not installed!")
 	}
 
-	var stdout, stderr bytes.Buffer
+	var stderr bytes.Buffer
 	cmd := exec.Command("python", rootDir+"/var/generate-domains-blacklist.py")
 	cmd.Dir = rootDir+"/var"
-	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	err := cmd.Run()
+	stdout, err := cmd.Output()
 	if err != nil {
-		logError(err.Error() + string(stdout.Bytes()) + string(stderr.Bytes()))
+		logError(err.Error() + string(stdout) + string(stderr.Bytes()))
 	}
-	saveFile("blacklist", string(stdout.Bytes()))
+	saveFile("blacklist", string(stdout))
 }
 
 // Return HTML from layout.html.
@@ -334,6 +333,9 @@ func main() {
 			// return
 		} else if generateBlacklistStr != "" {
 			generateBlacklist()
+			if fileKey == "blacklist" {
+				renderHTML(fileKey, "File saved successfully!", "")
+			}
 			fmt.Print("Status: 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n")
 			os.Exit(0)
 		}

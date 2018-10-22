@@ -65,7 +65,7 @@
         <script src="codemirror/addon/search/searchcursor.js"></script>
         <script src="codemirror/addon/search/search.js"></script>
         <script>
-            var textArea = document.querySelectorAll('.dnscrypt-proxy textarea')[0]
+            const textArea = document.querySelector('.dnscrypt-proxy textarea')
             if (typeof CodeMirror === "undefined") {
                 textArea.style.opacity = 1
             } else {
@@ -77,14 +77,14 @@
             function setGetParameter (key, value) {
                 var baseUrl = [location.protocol, '//', location.host, location.pathname].join('')
                 var param = '?' + key + '=' + value
-                document.location = baseUrl+param
+                document.location = baseUrl + param
             }
 
-            function ajax (method, data) {
-                var request = new XMLHttpRequest()
+            function ajax (method, data, successFn) {
+                const request = new XMLHttpRequest()
                 request.onload = function() {
                     if (request.status >= 200 && request.status < 400) {
-                        var successMessage = document.querySelectorAll('.dnscrypt-proxy .success')[0]
+                        const successMessage = document.querySelector('.dnscrypt-proxy .success')
                         // restart fade animation
                         successMessage.style.animation = 'none';
                         successMessage.offsetHeight //  trigger reflow
@@ -92,14 +92,14 @@
                         successMessage.style.animation = null;
                     } else {
                         console.error(request.status, request.responseText)
-                        errorMessage = document.querySelectorAll('.dnscrypt-proxy .error')[0]
+                        errorMessage = document.querySelector('.dnscrypt-proxy .error')
                         errorMessage.innerText = request.responseText
                     }
                     toggleSpinner()
                 }
                 request.onerror = function() {
                     console.error(request.status, request.responseText)
-                    var errorMessage = document.querySelectorAll('.dnscrypt-proxy .error')[0]
+                    const errorMessage = document.querySelector('.dnscrypt-proxy .error')
                     errorMessage.innerText = "Something went wrong :'("
                     toggleSpinner()
                 }
@@ -114,20 +114,23 @@
             }
 
             function toggleSpinner () {
-                var spinner = document.querySelectorAll('.dnscrypt-proxy .spinner')[0]
+                const spinner = document.querySelector('.dnscrypt-proxy .spinner')
                 spinner.style.visibility = (spinner.style.visibility === 'visible') ? 'hidden' : 'visible'
             }
 
-            var select = document.querySelectorAll('.dnscrypt-proxy select')[0]
+            const select = document.querySelector('.dnscrypt-proxy select')
             select.addEventListener('change', function(e) {
                 setGetParameter(e.target.name, e.target.value)
             }, false)
 
-            var updateBlacklist = document.querySelectorAll('.dnscrypt-proxy .updateBlacklist')[0]
+            const updateBlacklist = document.querySelector('.dnscrypt-proxy .updateBlacklist')
             updateBlacklist.addEventListener('submit', function(e) {
-                if (e.preventDefault) e.preventDefault();
-                toggleSpinner()
-                ajax('POST', 'generateBlacklist=true')
+                const urlParams = new URLSearchParams(window.location.search)
+                if (urlParams.get('file') !== 'blacklist') {
+                    if (e.preventDefault) e.preventDefault()
+                    toggleSpinner()
+                    ajax('POST', 'generateBlacklist=true')
+                }
             }, false)
 
         </script>
