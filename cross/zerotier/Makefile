@@ -20,6 +20,7 @@ LICENSE  = GPLv3
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = HAVE_CXX=yes
 INSTALL_TARGET = zerotier_custom_install
+CONFIGURE_TARGET = zerotier_custom_configure
 
 ENV += ZT_SYNOLOGY=1
 
