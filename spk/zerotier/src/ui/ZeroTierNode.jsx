@@ -2,7 +2,7 @@ var ZeroTierNode = React.createClass({
 	getInitialState: function() {
 		
 		// get local address (of NAS) for ZT UI server and auth functions
-		window.ui_port = window.location.port
+		window.ui_port = ((window.location.port > 0 ? window.location.port : (location.protocol == 'http:' ? 5000 : 5001)))
 		window.auth_addr = location.protocol + "//" + document.location.host + "/"
 		window.ui_addr = location.protocol + "//" + document.location.hostname + ":" + ui_port + "/"
 
@@ -234,10 +234,11 @@ var ZeroTierNode = React.createClass({
 				</div></div>
 				<div className="bottom">
 					<div className="left">
-						<span className="statusLine"><span className="zeroTierAddress">{this.state.address}</span>&nbsp;&nbsp;{this.state.online ? (this.state.tcpFallbackActive ? 'TUNNELED' : 'ONLINE') : 'OFFLINE'}&nbsp;&nbsp;{this.state.version}</span>
-					</div>
-					<div className="middle">
-						<a href="https://my.zerotier.com">my.zerotier.com</a>
+						<span className="statusLine">
+							<a href="https://my.zerotier.com">my.zerotier.com</a>
+							<span className="zeroTierAddress">{this.state.address}</span>
+							&nbsp;&nbsp;{this.state.online ? (this.state.tcpFallbackActive ? 'TUNNELED' : 'ONLINE') : 'OFFLINE'}&nbsp;&nbsp;{this.state.version}
+						</span>
 					</div>
 					<div className="right">
 						<form onSubmit={this.joinNetwork}><input type="text" maxlength="16" placeholder="[ Network ID ]" onChange={this.handleNetworkIdEntry} size="16"/>

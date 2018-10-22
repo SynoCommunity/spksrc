@@ -2,7 +2,7 @@ var ZeroTierNode = React.createClass({
 	getInitialState: function () {
 
 		// get local address (of NAS) for ZT UI server and auth functions
-		window.ui_port = window.location.port;
+		window.ui_port = window.location.port > 0 ? window.location.port : location.protocol == 'http:' ? 5000 : 5001;
 		window.auth_addr = location.protocol + "//" + document.location.host + "/";
 		window.ui_addr = location.protocol + "//" + document.location.hostname + ":" + ui_port + "/";
 
@@ -237,6 +237,11 @@ var ZeroTierNode = React.createClass({
 						"span",
 						{ className: "statusLine" },
 						React.createElement(
+							"a",
+							{ href: "https://my.zerotier.com" },
+							"my.zerotier.com"
+						),
+						React.createElement(
 							"span",
 							{ className: "zeroTierAddress" },
 							this.state.address
@@ -245,15 +250,6 @@ var ZeroTierNode = React.createClass({
 						this.state.online ? this.state.tcpFallbackActive ? 'TUNNELED' : 'ONLINE' : 'OFFLINE',
 						"\xA0\xA0",
 						this.state.version
-					)
-				),
-				React.createElement(
-					"div",
-					{ className: "middle" },
-					React.createElement(
-						"a",
-						{ href: "https://my.zerotier.com" },
-						"my.zerotier.com"
 					)
 				),
 				React.createElement(
