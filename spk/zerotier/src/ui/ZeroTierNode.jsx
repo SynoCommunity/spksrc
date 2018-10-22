@@ -236,6 +236,9 @@ var ZeroTierNode = React.createClass({
 					<div className="left">
 						<span className="statusLine"><span className="zeroTierAddress">{this.state.address}</span>&nbsp;&nbsp;{this.state.online ? (this.state.tcpFallbackActive ? 'TUNNELED' : 'ONLINE') : 'OFFLINE'}&nbsp;&nbsp;{this.state.version}</span>
 					</div>
+					<div className="middle">
+						<a href="https://my.zerotier.com">my.zerotier.com</a>
+					</div>
 					<div className="right">
 						<form onSubmit={this.joinNetwork}><input type="text" maxlength="16" placeholder="[ Network ID ]" onChange={this.handleNetworkIdEntry} size="16"/>
 							<button type="button" onClick={this.joinNetwork}>Join</button></form>

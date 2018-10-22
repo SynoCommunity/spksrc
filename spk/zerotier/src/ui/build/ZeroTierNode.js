@@ -249,6 +249,15 @@ var ZeroTierNode = React.createClass({
 				),
 				React.createElement(
 					"div",
+					{ className: "middle" },
+					React.createElement(
+						"a",
+						{ href: "https://my.zerotier.com" },
+						"my.zerotier.com"
+					)
+				),
+				React.createElement(
+					"div",
 					{ className: "right" },
 					React.createElement(
 						"form",
