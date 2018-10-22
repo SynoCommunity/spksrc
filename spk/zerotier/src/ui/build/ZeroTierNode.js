@@ -2,7 +2,7 @@ var ZeroTierNode = React.createClass({
 	getInitialState: function () {
 
 		// get local address (of NAS) for ZT UI server and auth functions
-		window.ui_port = window.location.origin;
+		window.ui_port = window.location.port;
 		window.auth_addr = location.protocol + "//" + document.location.host + "/";
 		window.ui_addr = location.protocol + "//" + document.location.hostname + ":" + ui_port + "/";
 
