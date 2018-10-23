@@ -4,6 +4,9 @@ DNSCRYPT_PROXY="${SYNOPKG_PKGDEST}/bin/dnscrypt-proxy"
 PID_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.pid"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.toml"
 EXAMPLE_FILES="${SYNOPKG_PKGDEST}/example-*"
+BACKUP_PORT="10053"
+## I need root to bind to port 53 see `service_prestart()` below
+#SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} --logfile ${LOG_FILE} &"
 
 blocklist_setup () {
     ## https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists
@@ -29,44 +32,58 @@ pgrep () {
     ps -w | grep "[^]]$1" >> "${LOG_FILE}" 2>&1
 }
 
-disable_dhcpd_dns_port () {
-    if [ "$1" == "no" ] && [ -f /etc/dhcpd/dhcpd-custom-custom.conf ]; then
-        echo "Port 0 - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
-        echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-custom-custom.info
+forward_dns_dhcpd () {
+    if [ "$1" == "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
+        echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
+        echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
         /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
-    elif [ "$1" == "yes" ] && netstat -na | grep ":53 " >> "${LOG_FILE}" 2>&1; then
-        echo "Port 53 is in use" >> "${LOG_FILE}"
+    elif [ "$1" == "yes" ]; then
         if pgrep "dhcpd.conf"; then  # if dhcpd (dnsmasq) is enabled and running
-            echo "Port 0 - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
-            echo "port=0" > /etc/dhcpd/dhcpd-custom-custom.conf
-            echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-custom-custom.info
+            echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
+            echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
+            echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
             /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
         else
             echo "pgrep: no process with 'dhcpd.conf' found" >> "${LOG_FILE}"
         fi
-    else
-        echo "Port 53 is free" >> "${LOG_FILE}"
-        rm -f /etc/dhcpd/dhcpd-custom-custom.conf
     fi
 }
 
 service_prestart () {
-    disable_dhcpd_dns_port "yes"
+    echo "service_preinst ${SYNOPKG_PKG_STATUS}" >> "${INST_LOG}"
+
+    # This fixes https://github.com/SynoCommunity/spksrc/issues/3468
+    # This can't be done at install time. see:
+    #  https://github.com/SynoCommunity/spksrc/blob/e914a32600e65f80131ae09913f1b6f6a2dd8b13/mk/spksrc.service.installer#L307-L319
+    chown root:root "${SYNOPKG_PKGDEST}/ui/index.cgi"
+    forward_dns_dhcpd "yes"
     cd "$SVC_CWD" || exit 1
-    ${DNSCRYPT_PROXY} --config "${CFG_FILE}" --pidfile "${PID_FILE}" --logfile "${LOG_FILE}" &
+
+    # Limit num of processes https://golang.org/pkg/runtime/
+    #
+    # Fixes https://github.com/ksonnet/ksonnet/issues/298
+    #  until https://github.com/golang/go/commit/3a18f0ecb5748488501c565e995ec12a29e66966
+    #  is released.
+    # related https://github.com/golang/go/issues/14626
+    # https://github.com/golang/go/blob/release-branch.go1.11/src/os/user/lookup_stubs.go
+    #
+    # override community script from this point and launch the program ourselves
+    env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" --logfile "${LOG_FILE}" &
     # su "${EFF_USER}" -s /bin/false -c "cd ${SVC_CWD}; ${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} --logfile ${LOG_FILE}" &
 }
 
 service_poststop () {
-    disable_dhcpd_dns_port "no"
+    echo "After stop (service_poststop)" >> "${INST_LOG}"
+    forward_dns_dhcpd "no"
 }
 
 service_postinst () {
-    echo "Running post-install script" >> "${INST_LOG}"
+    echo "Running service_postinst script" >> "${INST_LOG}"
     mkdir -p "${SYNOPKG_PKGDEST}"/var >> "${INST_LOG}" 2>&1
     if [ ! -e "${CFG_FILE}" ]; then
         # shellcheck disable=SC2086
         cp -f ${EXAMPLE_FILES} "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+        cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
         for file in ${SYNOPKG_PKGDEST}/var/example-*; do
             mv "${file}" "${file//example-/}" >> "${INST_LOG}" 2>&1
         done
@@ -78,6 +95,14 @@ service_postinst () {
             server_names_enabled="# "
         fi
 
+        # Check for dhcp
+        if pgrep "dhcpd.conf" || netstat -na | grep ":${SERVICE_PORT} "; then
+            echo "dhcpd is running or port ${SERVICE_PORT} is in use. Switching service port to ${BACKUP_PORT}" >> "${INST_LOG}"
+            SERVICE_PORT=${BACKUP_PORT}
+        fi
+
+        ## IPv6 address errors with -> bind: address already in use
+        #listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:$SERVICE_PORT', '[::1]:$SERVICE_PORT'"}\]
         listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:$SERVICE_PORT'"}\]
         server_names=\[${wizard_servers:-"'scaleway-fr', 'google', 'yandex', 'cloudflare'"}\]
 
@@ -86,21 +111,9 @@ service_postinst () {
             -e "s/require_dnssec = .*/require_dnssec = true/" \
             -e "s/# server_names = .*/${server_names_enabled:-""}server_names = ${server_names}/" \
             -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:=false}/" \
+            -e "s/# user_name = .*/user_name = '${EFF_USER:-"nobody"}'/" \
             "${CFG_FILE}" >> "${INST_LOG}" 2>&1
     fi
-
-    # shellcheck disable=SC2129
-    echo "Setting up the Web GUI..." >> "${INST_LOG}"
-    ln -s "${SYNOPKG_PKGDEST}/ui/" /usr/syno/synoman/webman/3rdparty/dnscrypt-proxy >> "${INST_LOG}" 2>&1
-
-    echo "Fixing permissions for cgi GUI..." >> "${INST_LOG}"
-    ## Allow cgi user to write to this file
-    ## chown doesn't work as it's overwritten by the SynoCommunity install script. Also see page 104 in https://developer.synology.com/download/developer-guide.pdf
-    # chown system /var/packages/dnscrypt-proxy/target/var/dnscrypt-proxy.toml
-    ## Less than ideal solution, ToDo: find something better
-    chmod 0666 "${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.toml" >> "${INST_LOG}" 2>&1
-    chmod 0666 "${SYNOPKG_PKGDEST}"/var/*.txt >> "${INST_LOG}" 2>&1
-    chmod 0777 "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
 
     blocklist_setup
 
@@ -112,13 +125,13 @@ service_postinst () {
 }
 
 service_postuninst () {
+    echo "service_postuninst ${SYNOPKG_PKG_STATUS}" >> "${INST_LOG}"
     # shellcheck disable=SC2129
     echo "Uninstall Help files" >> "${INST_LOG}"
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf" >> "${INST_LOG}" 2>&1
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf" >> "${INST_LOG}" 2>&1
-    rm -f /usr/syno/synoman/webman/3rdparty/dnscrypt-proxy >> "${INST_LOG}" 2>&1
     disable_dhcpd_dns_port "no"
-    rm -f /etc/dhcpd/dhcpd-custom-custom.conf
-    rm -f /etc/dhcpd/dhcpd-custom-custom.info
+    rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
+    rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
 }
 ## rm -drf work-ipq806x-1.1/scripts && make arch-ipq806x-1.1
