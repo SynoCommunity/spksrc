@@ -6,8 +6,8 @@ PKG_EXT = tar.gz
 #PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 # Special build of 1.2.12 which contains changes required for spksrc pull request.
 # This will be removed after next major ZeroTier version bump (1.4.0)
-PKG_DIST_NAME = b8268d894b4dd0774eeb2bcd0009b818fe960b52.tar.gz
-PKG_DIR = ZeroTierOne-b8268d894b4dd0774eeb2bcd0009b818fe960b52
+PKG_DIST_NAME = 7dbccf08aeccab18be5fb24e90a6a1d89248aa3a.tar.gz
+PKG_DIR = ZeroTierOne-7dbccf08aeccab18be5fb24e90a6a1d89248aa3a
 
 PKG_DIST_SITE = https://github.com/zerotier/ZeroTierOne/archive
 
