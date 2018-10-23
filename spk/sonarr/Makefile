@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 14
+SPK_REV = 15
 SPK_ICON = src/sonarr.png
 
 REQUIRED_DSM = 5.0
@@ -42,4 +42,3 @@ include ../../mk/spksrc.spk.mk
 .PHONY: sonarr_extra_install
 sonarr_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
