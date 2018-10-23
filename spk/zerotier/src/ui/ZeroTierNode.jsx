@@ -235,9 +235,9 @@ var ZeroTierNode = React.createClass({
 				<div className="bottom">
 					<div className="left">
 						<span className="statusLine">
-							<a href="https://my.zerotier.com">my.zerotier.com</a>
 							<span className="zeroTierAddress">{this.state.address}</span>
 							&nbsp;&nbsp;{this.state.online ? (this.state.tcpFallbackActive ? 'TUNNELED' : 'ONLINE') : 'OFFLINE'}&nbsp;&nbsp;{this.state.version}
+							&nbsp;&nbsp;Go to: <a href="https://my.zerotier.com">my.zerotier.com</a>
 						</span>
 					</div>
 					<div className="right">

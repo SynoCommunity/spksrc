@@ -237,11 +237,6 @@ var ZeroTierNode = React.createClass({
 						"span",
 						{ className: "statusLine" },
 						React.createElement(
-							"a",
-							{ href: "https://my.zerotier.com" },
-							"my.zerotier.com"
-						),
-						React.createElement(
 							"span",
 							{ className: "zeroTierAddress" },
 							this.state.address
@@ -249,7 +244,13 @@ var ZeroTierNode = React.createClass({
 						"\xA0\xA0",
 						this.state.online ? this.state.tcpFallbackActive ? 'TUNNELED' : 'ONLINE' : 'OFFLINE',
 						"\xA0\xA0",
-						this.state.version
+						this.state.version,
+						"\xA0\xA0Go to: ",
+						React.createElement(
+							"a",
+							{ href: "https://my.zerotier.com" },
+							"my.zerotier.com"
+						)
 					)
 				),
 				React.createElement(
