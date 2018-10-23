@@ -13,10 +13,6 @@ blocklist_setup () {
     ## https://github.com/jedisct1/dnscrypt-proxy/tree/master/utils/generate-domains-blacklists
     echo "Install/Upgrade generate-domains-blacklist.py (requires python)" >> "${INST_LOG}"
     mkdir -p "${SYNOPKG_PKGDEST}/var"
-    chmod 0777 "${SYNOPKG_PKGDEST}"/var/ >> "${INST_LOG}" 2>&1
-    wget -t 3 -O "${SYNOPKG_PKGDEST}/var/generate-domains-blacklist.py" \
-        --https-only https://raw.githubusercontent.com/jedisct1/dnscrypt-proxy/master/utils/generate-domains-blacklists/generate-domains-blacklist.py \
-        >> "${INST_LOG}" 2>&1
     touch "${SYNOPKG_PKGDEST}"/var/ip-blacklist.txt
     touch "${SYNOPKG_PKGDEST}"/var/domains-whitelist.txt
     touch "${SYNOPKG_PKGDEST}"/var/domains-time-restricted.txt
@@ -134,4 +130,8 @@ service_postuninst () {
     rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
     rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
 }
-## rm -drf work-ipq806x-1.1/scripts && make arch-ipq806x-1.1
+
+service_postupgrade () {
+    # upgrade script when the offline-cache is also updated
+    cp -f "${SYNOPKG_PKGDEST}"/offline-cache/generate-domains-blacklist.py "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+}
