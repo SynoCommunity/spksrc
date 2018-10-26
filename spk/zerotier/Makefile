@@ -15,7 +15,7 @@ DISPLAY_NAME = ZeroTier
 
 # Special build of 1.2.12 which contains changes required for spksrc pull request.
 # This will be removed after next major ZeroTier version bump (1.4.0)
-PRODUCT_DIR = work/$(WORKDIR)/ZeroTierOne-b8268d894b4dd0774eeb2bcd0009b818fe960b52
+PRODUCT_DIR = $(WORK_DIR)/ZeroTierOne-7dbccf08aeccab18be5fb24e90a6a1d89248aa3a
 # PRODUCT_DIR=$(WORK_DIR)/$(DISPLAY_NAME)One-$(SPK_VERS)
 
 DSM_UI_DIR = ui
