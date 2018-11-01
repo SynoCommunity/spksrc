@@ -111,6 +111,11 @@ service_postinst () {
             "${CFG_FILE}" >> "${INST_LOG}" 2>&1
     fi
 
+    echo "Fixing permissions for cgi GUI... on SRM" >> "${INST_LOG}"
+    # Fixes https://github.com/publicarray/spksrc/issues/3
+    # https://originhelp.synology.com/developer-guide/privilege/privilege_specification.html
+    chmod 0777 "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+
     blocklist_setup
 
     # shellcheck disable=SC2129
