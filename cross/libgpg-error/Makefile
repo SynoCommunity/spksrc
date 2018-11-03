@@ -17,11 +17,16 @@ GNU_CONFIGURE = 1
 POST_INSTALL_TARGET = python3PostInstall
 
 include ../../mk/spksrc.cross-cc.mk
-
-ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi --disable-assembly
+endif
+ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
 
