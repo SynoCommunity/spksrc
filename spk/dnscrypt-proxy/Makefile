@@ -74,5 +74,3 @@ dnscrypt_extra_install: copy_msg
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/
 	@echo "===> UI - Compiling cgi"
 	env $(ENV) go build $(CONF_ARGS) -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
-## rm -f work-ipq806x-1.1/.copy_done && rm -f work-ipq806x-1.1/.icon_done && make arch-ipq806x-1.1
-## synopkg uninstall dnscrypt-proxy
