@@ -19,12 +19,12 @@ STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 
-OPENSSL_ARCH = 
+OPENSSL_ARCH =
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 OPENSSL_ARCH = linux-x86_64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-OPENSSL_ARCH = linux-x32
+OPENSSL_ARCH = linux-generic32
 endif
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 OPENSSL_ARCH = synology-armle

@@ -1,7 +1,7 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
 SPK_VERS = $(SPK_SHORT_VERS).14
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -15,6 +15,7 @@ DEPENDS += cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/pyzmq cross/uwsgi
 
 WHEELS = src/requirements.txt
+
 
 MAINTAINER = Safihre
 DESCRIPTION = Python 2.7 Programming Language.
@@ -40,6 +41,12 @@ BUSYBOX_CONFIG = usrmng nice daemon
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
+
+# Wheel "cryptography" lacks libpthread when cross-compile for ARM
+ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
+WHEELS_CFLAGS = "-pthread"
+WHEELS_LDFLAGS = "-lpthread"
+endif
 
 .PHONY: python_extra_install
 python_extra_install:

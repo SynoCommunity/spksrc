@@ -26,7 +26,7 @@ start_daemon ()
         else
             OUT="${LOG_FILE}"
         fi
-        if [ -n "${USER}" -a $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        if [ -n "${USER}" -a -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
             if [ -z "${SERVICE_SHELL}" ]; then
                 SERVICE_SHELL=/bin/sh
             fi
@@ -53,6 +53,8 @@ start_daemon ()
         fi
         if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
             echo "$!" > "${PID_FILE}"
+        else
+            wait_for_status 0 ${SVC_WAIT_TIMEOUT}
         fi
     fi
 }
@@ -66,7 +68,7 @@ stop_daemon ()
             echo "Stopping ${DNAME} service ${PID} " >> ${LOG_FILE}
         fi
         kill -TERM $PID >> ${LOG_FILE} 2>&1
-        wait_for_status 1 20 || kill -KILL $PID >> ${LOG_FILE} 2>&1
+        wait_for_status 1 ${SVC_WAIT_TIMEOUT} || kill -KILL $PID >> ${LOG_FILE} 2>&1
         if [ -f "${PID_FILE}" ]; then
             rm -f "${PID_FILE}" > /dev/null
         fi
@@ -88,7 +90,9 @@ daemon_status ()
 
 wait_for_status ()
 {
-    counter=$2
+    timeout=$2
+    # default value: 20 seconds
+    counter=${timeout:=20}
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
@@ -126,7 +130,7 @@ case $1 in
             exit 0
         else
             echo "${DNAME} is not running"
-            exit 1
+            exit 3
         fi
         ;;
     log)

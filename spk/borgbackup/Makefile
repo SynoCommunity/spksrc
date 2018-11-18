@@ -1,5 +1,5 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.0.10
+SPK_VERS = 1.1.5
 SPK_REV = 2
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -11,17 +11,14 @@ SPK_DEPENDS = "python3>=3.5.2-6"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
-STARTABLE = no
+RELOAD_UI = no
 DISPLAY_NAME = Borg
-CHANGELOG = "1. First release<br>2. Add borgmatic"
-BETA = 1
+STARTABLE = no
+CHANGELOG = Update to 1.1.5
 
 HOMEPAGE = https://borgbackup.readthedocs.io
-LICENSE  = Borg
+LICENSE  = BSD-3-Clause
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

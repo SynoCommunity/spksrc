@@ -1,0 +1,9 @@
+bin:bin/pcre2-config
+bin:bin/pcre2grep
+bin:bin/pcre2test
+lnk:lib/libpcre2-8.so
+lnk:lib/libpcre2-8.so.0
+lib:lib/libpcre2-8.so.0.7.1
+lnk:lib/libpcre2-posix.so
+lnk:lib/libpcre2-posix.so.2
+lib:lib/libpcre2-posix.so.2.0.1

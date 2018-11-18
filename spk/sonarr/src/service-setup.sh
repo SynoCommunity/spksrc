@@ -29,6 +29,7 @@ service_postinst ()
 
     # If nessecary, add user also to the old group before removing it
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
+    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "users"
 
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin

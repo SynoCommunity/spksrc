@@ -1,0 +1,6 @@
+[{
+    "step_title": "Attention! Permissions DSM",
+    "items": [{
+        "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-syncthing'</b> dans DSM.<br>Depuis File Station, ajouter ce groupe à tout répertoire auquel Syncthing doit avoir accès.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+    }]
+}]

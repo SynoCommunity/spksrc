@@ -1,5 +1,5 @@
 # Cross compiled packages dependencies
-#borgbackup==1.0.10
+#borgbackup==1.1.5
 #msgpack-python==0.4.8
 
 # Downloaded dependencies

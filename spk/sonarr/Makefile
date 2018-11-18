@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/sonarr.png
 
 REQUIRED_DSM = 5.0

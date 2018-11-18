@@ -117,6 +117,22 @@ syno_group_remove ()
     fi
 }
 
+# Add user to existing group
+syno_user_add_to_group ()
+{
+    ADD_USER=$1
+    ADD_GROUP=$2
+    # Check user already in group
+    if ! synogroup --get "$ADD_GROUP" | grep "^[0-9]:\[${ADD_USER}\]" &> /dev/null; then
+        # Add user, not in group yet
+        echo "Adding '${ADD_USER}' to '${ADD_GROUP}'" >> ${INST_LOG}
+        MEMBERS="$(synogroup --get $ADD_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
+        # The "synogroup --member" command clears all users before adding new ones
+        # so all the users must be listed on the command line
+        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}" >> ${INST_LOG}
+    fi
+}
+
 # Sets recursive permissions for ${GROUP} on specified directory
 # Usage: set_syno_permissions "${SHARE_FOLDER}" "${GROUP}"
 set_syno_permissions ()
@@ -146,14 +162,14 @@ set_syno_permissions ()
 
         # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
         while [ "${DIRNAME}" != "${VOLUME}" ]; do
-            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:..x\"`" ]; then
+            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:r.x\"`" ]; then
                 # Here we also need to make sure the admin can access data via File Station
                 if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
                     synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" >> ${INST_LOG} 2>&1
                 fi
                 # Add the new group permissions
                 echo "Granting '${GROUP}' group basic permissions on ${DIRNAME}" >> ${INST_LOG}
-                synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:--x----------:---n" >> ${INST_LOG} 2>&1
+                synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:r-x---a-R----:---n" >> ${INST_LOG} 2>&1
             fi
             DIRNAME="$(dirname "${DIRNAME}")"
         done
@@ -162,12 +178,12 @@ set_syno_permissions ()
     fi
 }
 
-# Sets recurivse permissions using chown
+# Set recursive permissions using chown
 set_unix_permissions ()
 {
     DIRNAME=$1
     if [ -n "${EFF_USER}" ]; then
-        echo "Granting '${EFF_USER}' unix permissions on ${DIRNAME}" >> ${INST_LOG}
+        echo "Granting '${EFF_USER}' unix ownership on ${DIRNAME}" >> ${INST_LOG}
         if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
             chown -R ${EFF_USER}:root "${DIRNAME}" >> $INST_LOG 2>&1
         else
@@ -229,14 +245,22 @@ postinst ()
         servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
     fi
 
-    # DSM 5 specific operations
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ] && [ -n "${EFF_USER}" ]; then
-        # Create prefixed synouser
-        if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
-            synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
-            BACKUP_PASSWD="/tmp/install_${SYNOPKG_PKGNAME}_passwd"
-            cp /etc/passwd ${BACKUP_PASSWD}
-            sed -i "s#/var/services/homes/${EFF_USER}#/var/packages/${SYNOPKG_PKGNAME}/target/var#" /etc/passwd
+    # Service user management
+    if [ -n "${EFF_USER}" ]; then
+        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+            # DSM 5 specific operations
+            # Create prefixed synouser
+            if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
+                synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 >> ${INST_LOG} 2>&1
+                # Set HOME for consistency with DSM 6, location available even if homes not enabled
+                BACKUP_PASSWD="/tmp/install_${SYNOPKG_PKGNAME}_passwd"
+                cp /etc/passwd ${BACKUP_PASSWD}
+                sed -i "s#/var/services/homes/${EFF_USER}#/var/packages/${SYNOPKG_PKGNAME}/target#" /etc/passwd
+            fi
+        fi
+        # Register service in "users" group to access any content
+        if [ "$ADD_USER_IN_USERS" = "yes" ]; then
+            syno_user_add_to_group "${EFF_USER}" "users"
         fi
     fi
 
@@ -248,15 +272,7 @@ postinst ()
             syno_group_create "${EFF_USER}"
         fi
         if synogroup --get "$GROUP" &> /dev/null; then
-            # Check user already in group
-            if ! synogroup --get "$GROUP" | grep "^[0-9]:\[${EFF_USER}\]" &> /dev/null; then
-                # Add user, not in group yet
-                echo "Adding '${EFF_USER}' to '${GROUP}'" >> ${INST_LOG}
-                MEMBERS="$(synogroup --get $GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
-                # The "synogroup --member" command clears all users before adding new ones
-                # so all the users must be listed on the command line
-                synogroup --member "$GROUP" $MEMBERS "${EFF_USER}" >> ${INST_LOG}
-            fi
+            syno_user_add_to_group "${EFF_USER}" "${GROUP}"
         fi
         # Not sure but invoked with hope DSM is updated
         synogroup --rebuild all
@@ -295,7 +311,7 @@ postinst ()
         echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
     fi
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        # On DSM 5 set package files permissions
+        # On DSM 5 set package files permissions for consistency with DSM 6
         set_unix_permissions "${SYNOPKG_PKGDEST}"
     else
         # On DSM 6 only var is concerned
@@ -363,13 +379,13 @@ postupgrade ()
 {
     log_step "postupgrade"
 
+    call_func "service_restore"
+
     # Restore some stuff, has to be cp otherwise fails on directories
     $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG}
 
     # Correct permissions of var folder
     set_unix_permissions "${INST_VAR}"
-
-    call_func "service_restore"
 
     $RM "$TMP_DIR" >> ${INST_LOG}
 

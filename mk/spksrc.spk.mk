@@ -102,12 +102,14 @@ $(WORK_DIR)/INFO:
 	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
 	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
-	@echo description=\"$(DESCRIPTION)\" >> $@
+	@/bin/echo -n "description=\"" >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
+	@echo "\"" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-	    $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
-	            echo -n description_$(LANGUAGE)=\\\"$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))\\\" \
-	   ) \
-	) | sed 's|"\s|"\n|' >> $@
+          $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+            /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
+            /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
+            /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifneq ($(strip $(MAINTAINER)),)
 	@echo maintainer=\"$(MAINTAINER)\" >> $@
@@ -117,16 +119,25 @@ endif
 	@echo maintainer_url=\"$(MAINTAINER_URL)\" >> $@
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
+
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
-else
-  ifneq ($(strip $(TC_FIRMWARE)),)
+else ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else ifneq ($(strip $(TC_FIRMWARE)),)
 	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
-  else
+	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
+else ifneq ($(strip $(TC_OS_MIN_VER)),)
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+else
 	@echo firmware=\"3.1-1594\" >> $@
-  endif
+	@echo os_min_ver=\"3.1-1594\" >> $@
+endif
+ifneq ($(strip $(OS_MAX_VER)),)
+	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
+	@echo beta=\"yes\" >> $@
 	@echo report_url=\"$(REPORT_URL)\" >> $@
 endif
 ifneq ($(strip $(HELPURL)),)
@@ -148,8 +159,10 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
+ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
-ifneq ($(strip $(STARTABLE)),)
+endif
+ifeq ($(STARTABLE),no)
 	@echo startable=\"$(STARTABLE)\" >> $@
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
@@ -277,8 +290,9 @@ wizards:
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Preparing DSM Wizards"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "upgrade_uninstall" -or -name "uninstall_uifile_???" -or -name "upgrade_uninstall.sh" -or -name "upgrade_uninstall_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
 

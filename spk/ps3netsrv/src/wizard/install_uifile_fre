@@ -1,0 +1,19 @@
+[{
+    "step_title": "Emplacement des fichiers PS3",
+    "items": [{
+        "type": "textfield",
+        "desc": "Chemin vers le répertoire contenant les fichiers PS3. Par défaut: /volume1/PS3",
+        "subitems": [{
+            "key": "wizard_dir",
+            "desc": "Emplacement des fichiers",
+            "defaultValue": "/volume1/PS3",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
+                }
+            }
+        }]
+    }]
+}]

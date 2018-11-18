@@ -9,7 +9,6 @@ GROUP="sc-download"
 
 SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGDEST}/var/ -x ${PID_FILE} -e ${LOG_FILE}"
 
-
 service_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
