@@ -35,9 +35,6 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = ppc64
-endif
 ifeq ($(DNSCRYPT_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
