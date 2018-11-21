@@ -8,14 +8,14 @@
 #  post_extract_target  (override with POST_EXTRACT_TARGET)
 EXTRACT_PATH ?= $(WORK_DIR)
 # Extract commands
-EXTRACT_CMD.tgz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.txz = tar -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.gz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.bz2 = tar -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.lzma = tar --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.lz = tar --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH)
+EXTRACT_CMD.tgz = tar -xzpf $(DIST_FILE) -C
+EXTRACT_CMD.txz = tar -xpf $(DIST_FILE) -C
+EXTRACT_CMD.tar.gz = tar -xzpf $(DIST_FILE) -C
+EXTRACT_CMD.tar.bz2 = tar -xjpf $(DIST_FILE) -C
+EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C
+EXTRACT_CMD.tar.lzma = tar --lzma -xpf $(DIST_FILE) -C
+EXTRACT_CMD.tar.lz = tar --lzip -xpf $(DIST_FILE) -C
+EXTRACT_CMD.zip = unzip $(DIST_FILE) -d
 
 EXTRACT_CMD = $(EXTRACT_CMD.$(DIST_EXT)) 
 
@@ -48,7 +48,7 @@ pre_extract_target: extract_msg
 
 extract_target: $(PRE_EXTRACT_TARGET)
 	@mkdir -p $(EXTRACT_PATH)
-	$(EXTRACT_CMD)
+	$(EXTRACT_CMD) $(EXTRACT_PATH) 2>/dev/null || ( t=$$(mktemp -d /tmp/XXXXXX) ; mkdir -p $$t && $(EXTRACT_CMD) $$t && mv $$t/* $(EXTRACT_PATH) && rmdir $$t )
 
 post_extract_target: $(EXTRACT_TARGET) 
 
