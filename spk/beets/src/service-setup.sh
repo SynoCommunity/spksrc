@@ -8,7 +8,7 @@ service_postinst ()
     ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env > /dev/null
 
     # Install the wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl > /dev/null 2>&1
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
 
     # Add symlink
     mkdir -p /usr/local/bin
