@@ -61,8 +61,7 @@ service_prestart () {
     # https://github.com/golang/go/blob/release-branch.go1.11/src/os/user/lookup_stubs.go
     #
     # override community script from this point and launch the program ourselves
-    # ToDo Remove 'netprobe-timeout' in next release
-    env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" -netprobe-timeout 2 &
+    env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" &
     # su "${EFF_USER}" -s /bin/false -c "cd ${SVC_CWD}; ${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} --logfile ${LOG_FILE}" &
 }
 
