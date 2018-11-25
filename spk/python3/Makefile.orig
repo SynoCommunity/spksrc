@@ -1,7 +1,15 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.5
-SPK_VERS = $(SPK_SHORT_VERS).6
+<<<<<<< Updated upstream
+SPK_VERS = $(SPK_SHORT_VERS).5
 SPK_REV = 7
+||||||| merged common ancestors
+SPK_VERS = $(SPK_SHORT_VERS).5
+SPK_REV = 8
+=======
+SPK_VERS = $(SPK_SHORT_VERS).6
+SPK_REV = 8
+>>>>>>> Stashed changes
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
