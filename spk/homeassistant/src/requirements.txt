@@ -1,30 +1,31 @@
 # Home Assistant core
-aiohttp==3.4.0
+homeassistant==0.82.1
+aiohttp==3.4.4
 idna-ssl>=1.0		# needed for aiohttp
 multidict<5.0,>=4.0	# needed for aiohttp
 yarl<2.0,>=1.0		# needed for aiohttp
-astral==1.6.1
+astral==1.7.1
 async_timeout==3.0.0
-attrs==18.1.0
-bcrypt==3.1.4
-certifi>=2018.04.16
-jinja2>=2.10
+attrs==18.2.0
+bcrypt==3.1.2
+certifi>=2018.10.15
+Jinja2>=2.10
 PyJWT==1.6.4
 cryptography==2.3.1
 ed25519
 pip>=8.0.3
-pytz>=2018.04
+pytz>=2018.7
 pyyaml>=3.13,<4
-requests==2.19.1
+requests==2.20.0
 chardet		# needed for requests
 urllib3		# needed for requests
 idna<2.8,>=2.5	# needed for requests, may conflict with idna-ssl>=1.0 for aiohttp
 voluptuous==0.11.5
-
 pyephem>=3.7
 phue>=0.8
 ledcontroller>=1.0.7
 python-libnmap>=0.6.2
+pycparser==2.18
 
 
 # homeassistant.components.nuimo_controller
@@ -1014,7 +1015,7 @@ pyfttt==0.3
 
 # homeassistant.auth.mfa_modules.totp
 # homeassistant.components.sensor.otp
-#pyotp==2.2.6
+pyotp==2.2.6
 
 # homeassistant.components.sensor.openweathermap
 # homeassistant.components.weather.openweathermap
@@ -1133,7 +1134,7 @@ pyfttt==0.3
 # sseclient			# discovered during first component use
 
 # homeassistant.components.device_tracker.nmap_tracker
-#python-nmap==0.6.1
+python-nmap==0.6.1
 
 # homeassistant.components.notify.pushover
 python-pushover==0.3
@@ -1151,7 +1152,7 @@ python-pushover==0.3
 #python-songpal==0.0.7
 
 # homeassistant.components.sensor.synologydsm
-#python-synology==0.2.0
+python-synology==0.2.0
 
 # homeassistant.components.tado
 #python-tado==0.2.3
