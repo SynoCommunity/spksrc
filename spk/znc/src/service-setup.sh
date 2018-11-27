@@ -17,13 +17,20 @@ service_postinst ()
     sed -i -e "s,@password@,${wizard_password:=admin},g" ${SYNOPKG_PKGDEST}/var/configs/znc.conf
     sed -i -e "s,@zncuser@,${EFF_USER},g" ${SYNOPKG_PKGDEST}/var/configs/oidentd.conf
 
-    # Generate certificate
-    echo "Generating initial certificate file" >> ${INST_LOG}
-    su ${EFF_USER} -s /bin/sh -c "${ZNC} -d ${SYNOPKG_PKGDEST}/var -p" >> ${INST_LOG}
-
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin
     $BIN/busybox --install $BIN
     $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
     $BIN/deluser "${USER}" >> ${INST_LOG}
+}
+
+service_prestart ()
+{
+    # Generate certificate if it does not exist (on first run)
+    if [ -e "${CERT_FILE}" ]; then
+        echo "Certificate file exists. Starting..." >> ${LOG_FILE}
+    else
+        echo "Generating initial certificate file" >> ${LOG_FILE}
+        ${ZNC} -d ${SYNOPKG_PKGDEST}/var -p >> ${LOG_FILE}
+    fi
 }
