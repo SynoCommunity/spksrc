@@ -3,7 +3,6 @@ SPK_VERS = 4.2.7
 SPK_REV = 15
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
