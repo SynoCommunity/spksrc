@@ -1,0 +1,12 @@
+# Fixes 'high' errors with software transcoding in TVH 4.2.7. Addressed in master. Will be obsolete with 4.2.8+ and 4.3.x 
+--- src/plumbing/transcoding.c.orig	2018-11-27 08:34:47.347891754 +0100
++++ src/plumbing/transcoding.c	2018-11-27 08:35:40.262228361 +0100
+@@ -1348,7 +1348,7 @@
+       tvhinfo(LS_TRANSCODE, "%04X: Using preset %s", shortid(t), t->t_props.tp_vcodec_preset);
+ 
+       // All modern devices should support "high" profile
+-      av_dict_set(&opts, "profile", "high", 0);
++      //av_dict_set(&opts, "profile", "high", 0);
+ 
+       if (t->t_props.tp_vbitrate < 64) {
+         // encode with specified quality and optimize for low latency
