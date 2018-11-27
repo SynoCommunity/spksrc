@@ -1,0 +1,29 @@
+--- src/hts_strtab.h.orig	2019-01-21 22:12:06.237926589 +0100
++++ src/hts_strtab.h	2019-01-21 22:15:29.746113112 +0100
+@@ -42,7 +42,7 @@
+ static int str2val0(const char *str, const struct strtab tab[], int l)
+      __attribute((unused));
+ 
+-static inline int
++static int
+ str2val0(const char *str, const struct strtab tab[], int l)
+ {
+   int i;
+@@ -60,7 +60,7 @@
+ static int str2val0_def(const char *str, struct strtab tab[], int l, int def)
+      __attribute((unused));
+ 
+-static inline int
++static int
+ str2val0_def(const char *str, struct strtab tab[], int l, int def)
+ {
+   int i;
+@@ -78,7 +78,7 @@
+ static const char * val2str0(int val, const struct strtab tab[], int l)
+      __attribute__((unused));
+ 
+-static inline const char *
++static const char *
+ val2str0(int val, const struct strtab tab[], int l)
+ {
+   int i;
