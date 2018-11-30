@@ -35,6 +35,10 @@ else
 $(PRE_SERVICE_TARGET): service_msg_target
 endif
 
+ifeq ($(strip $(DSM_UI_DIR)),)
+DSM_UI_DIR=app
+endif
+
 .PHONY: service_target service_msg_target
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
 .PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
@@ -205,9 +209,6 @@ SERVICE_PORT_PROTOCOL=http
 endif
 ifeq ($(strip $(SERVICE_PORT_ALL_USERS)),)
 SERVICE_PORT_ALL_USERS=true
-endif
-ifeq ($(strip $(DSM_UI_DIR)),)
-DSM_UI_DIR=app
 endif
 
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
