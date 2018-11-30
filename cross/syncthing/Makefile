@@ -41,9 +41,10 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 SYNCTHING_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = ppc64
-endif
+# Go has no ppc32 support for qoriq https://github.com/golang/go/issues/22885
+#ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+#SYNCTHING_ARCH = ppc32
+#endif
 ifeq ($(SYNCTHING_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
