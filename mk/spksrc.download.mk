@@ -64,9 +64,8 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        rm -fr $${localFolder}.part ; \
 	        echo "git clone $${url}" ; \
 	        git clone --no-checkout --quiet $${url} $${localFolder}.part ; \
-	        git --git-dir=$${localFolder}.part/.git --work-tree=$${localFolder}.part checkout --quiet $(PKG_GIT_HASH) ; \
 	        mv $${localFolder}.part $${localFolder} ; \
-	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+	        git --git-dir=$${localFolder}/.git --work-tree=$${localFolder} archive --prefix=$${localFolder}/ -o $${localFile} $(PKG_GIT_HASH) ; \
 	        rm -fr $${localFolder} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
@@ -86,7 +85,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        echo "svn co -r $${rev} $${url}" ; \
 	        svn export -q -r $${rev} $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
-	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+	        tar --exclude-vcs -c $${localFolder} | gzip -n > $${localFile} ; \
 	        rm -fr $${localFolder} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
@@ -110,7 +109,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        echo "hg clone -r $${rev} $${url}" ; \
 	        hg clone -r $${rev} $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
-	        tar --exclude-vcs -czf $${localFile} $${localFolder} ; \
+	        tar --exclude-vcs -c $${localFolder} | gzip -n > $${localFile} ; \
 	        rm -fr $${localFolder} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
