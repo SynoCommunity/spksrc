@@ -16,11 +16,10 @@ CONFIGURE_ARGS += --with-libxml-include-prefix=$(STAGING_INSTALL_PREFIX)/include
 GNU_CONFIGURE = 1
 
 # if for libgcrypt, replace the -config path with abspath
-POST_INSTALL_TARGET = python3PostInstall
+POST_INSTALL_TARGET = libxslt_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: python3PostInstall
-python3PostInstall:
+.PHONY: libxslt_post_install
+libxslt_post_install:
 	sed -i -e 's|^prefix=$(INSTALL_PREFIX)$$|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/bin/xslt-config
-

@@ -1,5 +1,5 @@
 PKG_NAME = lxml
-PKG_VERS = 3.7.2
+PKG_VERS = 4.2.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/l/$(PKG_NAME)

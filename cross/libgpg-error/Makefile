@@ -1,5 +1,5 @@
 PKG_NAME = libgpg-error
-PKG_VERS = 1.25
+PKG_VERS = 1.32
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.gnupg.org/gcrypt/$(PKG_NAME)
@@ -14,7 +14,7 @@ LICENSE  = LGPL
 GNU_CONFIGURE = 1
 
 # if for python3, replace the -config path with abspath
-POST_INSTALL_TARGET = python3PostInstall
+POST_INSTALL_TARGET = libgpg-error_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
@@ -30,6 +30,6 @@ ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
 
-.PHONY: python3PostInstall
-python3PostInstall:
+.PHONY: libgpg-error_post_install
+libgpg-error_post_install:
 	sed -i -e 's|^prefix=$(INSTALL_PREFIX)$$|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/bin/gpg-error-config
