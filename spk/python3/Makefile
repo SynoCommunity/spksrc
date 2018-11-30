@@ -1,7 +1,7 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.5
 SPK_VERS = $(SPK_SHORT_VERS).6
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
-DEPENDS += cross/msgpack-python cross/attr cross/acl cross/lz4
+DEPENDS += cross/msgpack-python cross/ruamel.yaml
 
 WHEELS = src/requirements.txt
 
