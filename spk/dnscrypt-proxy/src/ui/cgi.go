@@ -222,7 +222,7 @@ func checkConfFile(yes bool) {
 		tmpExt = ".tmp"
 	}
 
-	cmd := exec.Command(rootDir+"/bin/dnscrypt-proxy", "-check", "-config", rootDir+files["config"]+tmpExt)
+	cmd := exec.Command(rootDir+"/bin/dnscrypt-proxy", "-netprobe-timeout", "0", "-check", "-config", rootDir+files["config"]+tmpExt)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		renderHTML("config", "", string(out)+err.Error())

@@ -1,9 +1,10 @@
 PKG_NAME = dnscrypt-proxy
-PKG_VERS = 2.0.17
+PKG_VERS = 2.0.19
 PKG_EXT = tar.gz
 PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/archive
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIR =  $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
 HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy
 COMMENT  = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2.
@@ -34,9 +35,6 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DNSCRYPT_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = ppc64
-endif
 ifeq ($(DNSCRYPT_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
@@ -58,6 +56,7 @@ dnscrypt_proxy_compile:
 	cd $(DNSCRYPT_DIR)/$(PKG_NAME) && env $(ENV) go build $(CONF_ARGS)
 .PHONY: dnscrypt_proxy_install
 dnscrypt_proxy_install:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
+	mkdir -p $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/blacklist
 	install -m 755 $(DNSCRYPT_BIN) $(STAGING_INSTALL_PREFIX)/bin
 	install -m 644 $(DNSCRYPT_DIR)/$(PKG_NAME)/example-* $(STAGING_INSTALL_PREFIX)
+	install -m 644 $(DNSCRYPT_DIR)/utils/generate-domains-blacklists/* $(STAGING_INSTALL_PREFIX)/blacklist

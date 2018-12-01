@@ -6,21 +6,14 @@ CFG_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.toml"
 EXAMPLE_FILES="${SYNOPKG_PKGDEST}/example-*"
 BACKUP_PORT="10053"
 ## I need root to bind to port 53 see `service_prestart()` below
-#SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} --logfile ${LOG_FILE} &"
+#SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} &"
 
 blocklist_setup () {
     ## https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists
     ## https://github.com/jedisct1/dnscrypt-proxy/tree/master/utils/generate-domains-blacklists
     echo "Install/Upgrade generate-domains-blacklist.py (requires python)" >> "${INST_LOG}"
     mkdir -p "${SYNOPKG_PKGDEST}/var"
-    chmod 0777 "${SYNOPKG_PKGDEST}"/var/ >> "${INST_LOG}" 2>&1
-    wget -t 3 -O "${SYNOPKG_PKGDEST}/var/generate-domains-blacklist.py" \
-        --https-only https://raw.githubusercontent.com/jedisct1/dnscrypt-proxy/master/utils/generate-domains-blacklists/generate-domains-blacklist.py \
-        >> "${INST_LOG}" 2>&1
     touch "${SYNOPKG_PKGDEST}"/var/ip-blacklist.txt
-    touch "${SYNOPKG_PKGDEST}"/var/domains-whitelist.txt
-    touch "${SYNOPKG_PKGDEST}"/var/domains-time-restricted.txt
-    touch "${SYNOPKG_PKGDEST}"/var/domains-blacklist-local-additions.txt
     if [ ! -e "${SYNOPKG_PKGDEST}/var/domains-blacklist.conf" ]; then
         wget -t 3 -O "${SYNOPKG_PKGDEST}/var/domains-blacklist.conf" \
             --https-only https://raw.githubusercontent.com/jedisct1/dnscrypt-proxy/master/utils/generate-domains-blacklists/domains-blacklist.conf
@@ -68,7 +61,7 @@ service_prestart () {
     # https://github.com/golang/go/blob/release-branch.go1.11/src/os/user/lookup_stubs.go
     #
     # override community script from this point and launch the program ourselves
-    env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" --logfile "${LOG_FILE}" &
+    env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" &
     # su "${EFF_USER}" -s /bin/false -c "cd ${SVC_CWD}; ${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} --logfile ${LOG_FILE}" &
 }
 
@@ -84,6 +77,7 @@ service_postinst () {
         # shellcheck disable=SC2086
         cp -f ${EXAMPLE_FILES} "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
         cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+        cp -f "${SYNOPKG_PKGDEST}"/blacklist/* "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
         for file in ${SYNOPKG_PKGDEST}/var/example-*; do
             mv "${file}" "${file//example-/}" >> "${INST_LOG}" 2>&1
         done
@@ -107,13 +101,20 @@ service_postinst () {
         server_names=\[${wizard_servers:-"'scaleway-fr', 'google', 'yandex', 'cloudflare'"}\]
 
         ## change default settings
-        sed -i -e "s/listen_addresses = .*/listen_addresses = ${listen_addresses}/" \
-            -e "s/require_dnssec = .*/require_dnssec = true/" \
-            -e "s/# server_names = .*/${server_names_enabled:-""}server_names = ${server_names}/" \
-            -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:=false}/" \
+        sed -i -e "s/# server_names = .*/${server_names_enabled:-""}server_names = ${server_names}/" \
+            -e "s/listen_addresses = .*/listen_addresses = ${listen_addresses}/" \
             -e "s/# user_name = .*/user_name = '${EFF_USER:-"nobody"}'/" \
+            -e "s/require_dnssec = .*/require_dnssec = true/" \
+            -e "s|# log_file = 'dnscrypt-proxy.log'.*|log_file = '${LOG_FILE:-""}'|" \
+            -e "s/netprobe_timeout = .*/netprobe_timeout = 2/" \
+            -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:=false}/" \
             "${CFG_FILE}" >> "${INST_LOG}" 2>&1
     fi
+
+    echo "Fixing permissions for cgi GUI... on SRM" >> "${INST_LOG}"
+    # Fixes https://github.com/publicarray/spksrc/issues/3
+    # https://originhelp.synology.com/developer-guide/privilege/privilege_specification.html
+    chmod 0777 "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
 
     blocklist_setup
 
@@ -134,4 +135,8 @@ service_postuninst () {
     rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
     rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
 }
-## rm -drf work-ipq806x-1.1/scripts && make arch-ipq806x-1.1
+
+service_postupgrade () {
+    # upgrade script when the offline-cache is also updated
+    cp -f "${SYNOPKG_PKGDEST}"/blacklist/generate-domains-blacklist.py "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+}
