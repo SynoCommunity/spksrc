@@ -1,6 +1,7 @@
 bin:bin/tclsh8.6
-lib:lib/itcl4.0.5/libitcl4.0.5.so
+lib:lib/itcl4.1.2/libitcl4.1.2.so
 lib:lib/libtcl8.6.so
+lnk:lib/libtcl.so
 rsc:lib/tcl8.6/init.tcl
 rsc:lib/tcl8.6/encoding/ascii.enc
 rsc:lib/tcl8.6/encoding/big5.enc
@@ -207,9 +208,9 @@ rsc:lib/tcl8.6/msgs/zh_hk.msg
 rsc:lib/tcl8.6/msgs/zh.msg
 rsc:lib/tcl8.6/msgs/zh_sg.msg
 rsc:lib/tcl8.6/msgs/zh_tw.msg
-lib:lib/tdbc1.0.4/libtdbc1.0.4.so
-lib:lib/tdbcmysql1.0.4/libtdbcmysql1.0.4.so
-lib:lib/tdbcodbc1.0.4/libtdbcodbc1.0.4.so
-lib:lib/tdbcpostgres1.0.4/libtdbcpostgres1.0.4.so
-lib:lib/thread2.8.0/libthread2.8.0.so
+lib:lib/tdbc1.1.0/libtdbc1.1.0.so
+lib:lib/tdbcmysql1.1.0/libtdbcmysql1.1.0.so
+lib:lib/tdbcodbc1.1.0/libtdbcodbc1.1.0.so
+lib:lib/tdbcpostgres1.1.0/libtdbcpostgres1.1.0.so
+lib:lib/thread2.8.4/libthread2.8.4.so
 
