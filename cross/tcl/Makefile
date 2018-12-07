@@ -1,5 +1,5 @@
 PKG_NAME = tcl
-PKG_VERS = 8.6.6
+PKG_VERS = 8.6.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = http://prdownloads.sourceforge.net/tcl/
@@ -18,19 +18,20 @@ GNU_CONFIGURE = 1
 # export ac_cv_func_strtod=yes
 # export tcl_cv_strtod_buggy=1
 
+CONFIGURE_ARGS = tcl_cv_strtod_buggy=1 --prefix=$(INSTALL_PREFIX)
+
 # Enable 64-bit support in Tcl for 64-bit architectures
-ifneq ($(findstring $(ARCH), avoton braswell bromolow cedarview x64 x86),)
-	CONFIGURE_ARGS = tcl_cv_strtod_buggy=1 --prefix=$(STAGING_INSTALL_PREFIX) --enable-64bit
-else
-	CONFIGURE_ARGS = tcl_cv_strtod_buggy=1 --prefix=$(STAGING_INSTALL_PREFIX)
+ifneq ($(findstring $(ARCH), $(x64_ARCHES) $(ARM8_ARCHES)),)
+  CONFIGURE_ARGS += --enable-64bit
 endif
 
-POST_INSTALL_TARGET = myPostInstall
+INSTALL_TARGET = tcl_custom_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPostInstall
-myPostInstall:
-	# Let's create a symlink so that any other packages which are compiled by spksrc will link to a library without a version number in the filename
-	ln -s $(STAGING_INSTALL_PREFIX)/lib/libtcl8.6.so $(STAGING_INSTALL_PREFIX)/lib/libtcl.so
-
+# Let's create a symlink so that any other packages which are compiled by
+# spksrc will link to a library without a version number in the filename
+.PHONY: tcl_custom_install
+tcl_custom_install:
+	$(RUN) $(MAKE) install prefix=$(INSTALL_PREFIX) INSTALL_ROOT=$(INSTALL_DIR)
+	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/lib/libtcl8.6.so $(STAGING_INSTALL_PREFIX)/lib/libtcl.so
