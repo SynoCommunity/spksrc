@@ -11,9 +11,11 @@ RELOAD_UI = no
 DISPLAY_NAME = Emacs
 STARTABLE = no
 BETA = 1
-CHANGELOG = Add emacs 26.1
+CHANGELOG = 1. First package release
 
 HOMEPAGE   = https://www.gnu.org/software/emacs/
 LICENSE    = GPLv3
+
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
