@@ -5,6 +5,8 @@ PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH
 CONFIG_DIR="${SYNOPKG_PKGDEST}/var/config"
 
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/env/bin/hass -v --config ${CONFIG_DIR} --pid-file ${PID_FILE} --log-file ${LOG_FILE} --daemon"
+SVC_CWD="${SYNOPKG_PKGDEST}/var/"
+HOME="${SYNOPKG_PKGDEST}/var/"
 
 service_postinst ()
 {
