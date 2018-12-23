@@ -12,17 +12,19 @@ COMMENT  = GMP is a free library for arbitrary precision arithmetic, operating o
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --prefix=$(INSTALL_PREFIX)
+
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
-CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi --disable-assembly
+CONFIGURE_ARGS += --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi --disable-assembly
 endif
 ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
-CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi
+CONFIGURE_ARGS += --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi
 endif
 ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
-CONFIGURE_ARGS = --target=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu
+CONFIGURE_ARGS += --target=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
+CONFIGURE_ARGS += --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=i686-pc-linux-gnu --host=i686-pc-linux-gnu

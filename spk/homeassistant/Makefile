@@ -2,10 +2,10 @@ SPK_NAME = homeassistant
 SPK_VERS = 0.82.1
 SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
-# DSM_UI_DIR = app   TO REMOVE if OK with defaults
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/nmap #for python-libnmap
+DEPENDS = cross/nmap  # for python-libnmap
+DEPENDS += cross/gmp cross/mpfr cross/mpc  # for gmpy2
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.5.3"
 

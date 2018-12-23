@@ -1,0 +1,3153 @@
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-04-27 12:40:46.838268769 +0000
++++ PATCHES	2018-04-27 12:40:46.870268475 +0000
+@@ -0,0 +1 @@
++sub1sp1n-reuse
+diff -Naurd VERSION VERSION
+--- VERSION	2018-02-07 12:50:31.000000000 +0000
++++ VERSION	2018-04-27 12:40:46.870268475 +0000
+@@ -1 +1 @@
+-4.0.1
++4.0.1-p1
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-02-07 12:50:31.000000000 +0000
++++ src/mpfr.h	2018-04-27 12:40:46.870268475 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1"
++#define MPFR_VERSION_STRING "4.0.1-p1"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/sub1sp.c src/sub1sp.c
+--- src/sub1sp.c	2018-01-09 12:30:58.000000000 +0000
++++ src/sub1sp.c	2018-04-27 12:40:46.858268585 +0000
+@@ -375,13 +375,15 @@
+                 }
+               else /* cases (a), (c), (d) and (e) */
+                 {
+-                  ap[0] = -MPFR_LIMB_ONE;
+                   /* rb=1 in case (e) and case (c) */
+                   rb = d > GMP_NUMB_BITS + 1
+                     || (d == GMP_NUMB_BITS + 1 && cp[0] == MPFR_LIMB_HIGHBIT);
+                   /* sb = 1 in case (d) and (e) */
+                   sb = d > GMP_NUMB_BITS + 1
+                     || (d == GMP_NUMB_BITS + 1 && cp[0] > MPFR_LIMB_HIGHBIT);
++                  /* Warning: only set ap[0] last, otherwise in case ap=cp,
++                     the above comparisons involving cp[0] would be wrong */
++                  ap[0] = -MPFR_LIMB_ONE;
+                 }
+             }
+         }
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-02-07 12:50:31.000000000 +0000
++++ src/version.c	2018-04-27 12:40:46.870268475 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1";
++  return "4.0.1-p1";
+ }
+diff -Naurd tests/tsub.c tests/tsub.c
+--- tests/tsub.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tsub.c	2018-04-27 12:40:46.858268585 +0000
+@@ -22,12 +22,13 @@
+ 
+ #include "mpfr-test.h"
+ 
+-#ifdef CHECK_EXTERNAL
+ static int
+ test_sub (mpfr_ptr a, mpfr_srcptr b, mpfr_srcptr c, mpfr_rnd_t rnd_mode)
+ {
++#ifdef CHECK_EXTERNAL
+   int res;
+   int ok = rnd_mode == MPFR_RNDN && mpfr_number_p (b) && mpfr_number_p (c);
++
+   if (ok)
+     {
+       mpfr_print_raw (b);
+@@ -42,10 +43,69 @@
+       printf ("\n");
+     }
+   return res;
+-}
+-#else
+-#define test_sub mpfr_sub
++#else  /* reuse test */
++  int inex;
++
++  inex = mpfr_sub (a, b, c, rnd_mode);
++
++  if (a != b && a != c && ! MPFR_IS_NAN (a))
++    {
++      mpfr_t t;
++      int reuse_b, reuse_c, inex_r;
++
++      reuse_b = MPFR_PREC (a) == MPFR_PREC (b);
++      reuse_c = MPFR_PREC (a) == MPFR_PREC (c);
++
++      if (reuse_b || reuse_c)
++        mpfr_init2 (t, MPFR_PREC (a));
++
++      if (reuse_b)
++        {
++          mpfr_set (t, b, MPFR_RNDN);
++          inex_r = mpfr_sub (t, t, c, rnd_mode);
++          if (!(mpfr_equal_p (t, a) && SAME_SIGN (inex_r, inex)))
++            {
++              printf ("reuse of b error in b - c in %s for\n",
++                      mpfr_print_rnd_mode (rnd_mode));
++              printf ("b = ");
++              mpfr_dump (b);
++              printf ("c = ");
++              mpfr_dump (c);
++              printf ("Expected "); mpfr_dump (a);
++              printf ("  with inex = %d\n", inex);
++              printf ("Got      "); mpfr_dump (t);
++              printf ("  with inex = %d\n", inex_r);
++              exit (1);
++            }
++        }
++
++      if (reuse_c)
++        {
++          mpfr_set (t, c, MPFR_RNDN);
++          inex_r = mpfr_sub (t, b, t, rnd_mode);
++          if (!(mpfr_equal_p (t, a) && SAME_SIGN (inex_r, inex)))
++            {
++              printf ("reuse of c error in b - c in %s for\n",
++                      mpfr_print_rnd_mode (rnd_mode));
++              printf ("b = ");
++              mpfr_dump (b);
++              printf ("c = ");
++              mpfr_dump (c);
++              printf ("Expected "); mpfr_dump (a);
++              printf ("  with inex = %d\n", inex);
++              printf ("Got      "); mpfr_dump (t);
++              printf ("  with inex = %d\n", inex_r);
++              exit (1);
++            }
++        }
++
++      if (reuse_b || reuse_c)
++        mpfr_clear (t);
++    }
++
++  return inex;
+ #endif
++}
+ 
+ static void
+ check_diverse (void)
+@@ -940,6 +1000,80 @@
+     }
+ }
+ 
++/* Fails with r12281: "reuse of c error in b - c in MPFR_RNDN". */
++static void
++bug20180217 (void)
++{
++  mpfr_t x, y, z1, z2;
++  int r, p, d, i, inex1, inex2;
++
++  for (p = 3; p <= 3 + 4 * GMP_NUMB_BITS; p++)
++    {
++      mpfr_inits2 (p, x, y, z1, z2, (mpfr_ptr) 0);
++      for (d = p; d <= p+4; d++)
++        {
++          mpfr_set_ui (x, 1, MPFR_RNDN);
++          mpfr_set_ui_2exp (y, 1, -d, MPFR_RNDN);
++          for (i = 0; i < 3; i++)
++            {
++              RND_LOOP_NO_RNDF (r)
++                {
++                  mpfr_set (z1, x, MPFR_RNDN);
++                  if (d == p)
++                    {
++                      mpfr_nextbelow (z1);
++                      if (i == 0)
++                        inex1 = 0;
++                      else if (r == MPFR_RNDD || r == MPFR_RNDZ ||
++                               (r == MPFR_RNDN && i > 1))
++                        {
++                          mpfr_nextbelow (z1);
++                          inex1 = -1;
++                        }
++                      else
++                        inex1 = 1;
++                    }
++                  else if (r == MPFR_RNDD || r == MPFR_RNDZ ||
++                           (r == MPFR_RNDN && d == p+1 && i > 0))
++                    {
++                      mpfr_nextbelow (z1);
++                      inex1 = -1;
++                    }
++                  else
++                    inex1 = 1;
++                  inex2 = test_sub (z2, x, y, (mpfr_rnd_t) r);
++                  if (!(mpfr_equal_p (z1, z2) && SAME_SIGN (inex1, inex2)))
++                    {
++                      printf ("Error in bug20180217 with "
++                              "p=%d, d=%d, i=%d, %s\n", p, d, i,
++                              mpfr_print_rnd_mode ((mpfr_rnd_t) r));
++                      printf ("x = ");
++                      mpfr_dump (x);
++                      printf ("y = ");
++                      mpfr_dump (y);
++                      printf ("Expected "); mpfr_dump (z1);
++                      printf ("  with inex = %d\n", inex1);
++                      printf ("Got      "); mpfr_dump (z2);
++                      printf ("  with inex = %d\n", inex2);
++                      exit (1);
++                    }
++                }
++              if (i == 0)
++                mpfr_nextabove (y);
++              else
++                {
++                  if (p < 6)
++                    break;
++                  mpfr_nextbelow (y);
++                  mpfr_mul_ui (y, y, 25, MPFR_RNDD);
++                  mpfr_div_2ui (y, y, 4, MPFR_RNDN);
++                }
++            }
++        }
++      mpfr_clears (x, y, z1, z2, (mpfr_ptr) 0);
++    }
++}
++
+ #define TEST_FUNCTION test_sub
+ #define TWO_ARGS
+ #define RAND_FUNCTION(x) mpfr_random2(x, MPFR_LIMB_SIZE (x), randlimb () % 100, RANDS)
+@@ -962,6 +1096,7 @@
+   check_inexact ();
+   check_max_almosteven ();
+   bug_ddefour ();
++  bug20180217 ();
+   for (p=2; p<200; p++)
+     for (i=0; i<50; i++)
+       check_two_sum (p);
+diff -Naurd tests/tsub1sp.c tests/tsub1sp.c
+--- tests/tsub1sp.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tsub1sp.c	2018-04-27 12:40:46.858268585 +0000
+@@ -284,6 +284,91 @@
+     }
+ }
+ 
++static void
++coverage (void)
++{
++  mpfr_t a, b, c, d, u;
++  int inex;
++
++  /* coverage test in mpfr_sub1sp: case d=1, limb > MPFR_LIMB_HIGHBIT, RNDF
++     and also RNDZ */
++  mpfr_init2 (a, 3 * GMP_NUMB_BITS);
++  mpfr_init2 (b, 3 * GMP_NUMB_BITS);
++  mpfr_init2 (c, 3 * GMP_NUMB_BITS);
++  mpfr_init2 (d, 3 * GMP_NUMB_BITS);
++  mpfr_init2 (u, 3 * GMP_NUMB_BITS);
++  mpfr_set_ui (b, 1, MPFR_RNDN);
++  mpfr_nextbelow (b); /* b = 1 - 2^(-p) */
++  mpfr_set_prec (c, GMP_NUMB_BITS);
++  mpfr_set_ui_2exp (c, 1, -1, MPFR_RNDN);
++  mpfr_nextbelow (c);
++  mpfr_nextbelow (c); /* c = 1/2 - 2*2^(-GMP_NUMB_BITS-1) */
++  mpfr_prec_round (c, 3 * GMP_NUMB_BITS, MPFR_RNDN);
++  mpfr_nextbelow (c); /* c = 1/2 - 2*2^(-GMP_NUMB_BITS-1) - 2^(-p-1) */
++  /* b-c = c */
++  mpfr_sub (a, b, c, MPFR_RNDF);
++  mpfr_sub (d, b, c, MPFR_RNDD);
++  mpfr_sub (u, b, c, MPFR_RNDU);
++  /* check a = d or u */
++  MPFR_ASSERTN(mpfr_equal_p (a, d) || mpfr_equal_p (a, u));
++
++  /* coverage test in mpfr_sub1sp: case d=p, RNDN, sb = 0, significand of b
++     is even but b<>2^e, (case 1e) */
++  mpfr_set_prec (a, 3 * GMP_NUMB_BITS);
++  mpfr_set_prec (b, 3 * GMP_NUMB_BITS);
++  mpfr_set_prec (c, 3 * GMP_NUMB_BITS);
++  mpfr_set_ui (b, 1, MPFR_RNDN);
++  mpfr_nextabove (b);
++  mpfr_nextabove (b);
++  mpfr_set_ui_2exp (c, 1, -3 * GMP_NUMB_BITS, MPFR_RNDN);
++  inex = mpfr_sub (a, b, c, MPFR_RNDN);
++  MPFR_ASSERTN(inex > 0);
++  MPFR_ASSERTN(mpfr_equal_p (a, b));
++
++  mpfr_clear (a);
++  mpfr_clear (b);
++  mpfr_clear (c);
++  mpfr_clear (d);
++  mpfr_clear (u);
++}
++
++/* bug in mpfr_sub1sp1n, made generic */
++static void
++bug20180217 (mpfr_prec_t pmax)
++{
++  mpfr_t a, b, c;
++  int inex;
++  mpfr_prec_t p;
++
++  for (p = MPFR_PREC_MIN; p <= pmax; p++)
++    {
++      mpfr_init2 (a, p);
++      mpfr_init2 (b, p);
++      mpfr_init2 (c, p);
++      mpfr_set_ui (b, 1, MPFR_RNDN); /* b = 1 */
++      mpfr_set_ui_2exp (c, 1, -p-1, MPFR_RNDN); /* c = 2^(-p-1) */
++      /* a - b = 1 - 2^(-p-1) and should be rounded to 1 (case 2f of
++         mpfr_sub1sp) */
++      inex = mpfr_sub (a, b, c, MPFR_RNDN);
++      MPFR_ASSERTN(inex > 0);
++      MPFR_ASSERTN(mpfr_cmp_ui (a, 1) == 0);
++      /* check also when a=b */
++      mpfr_set_ui (a, 1, MPFR_RNDN);
++      inex = mpfr_sub (a, a, c, MPFR_RNDN);
++      MPFR_ASSERTN(inex > 0);
++      MPFR_ASSERTN(mpfr_cmp_ui (a, 1) == 0);
++      /* and when a=c */
++      mpfr_set_ui (b, 1, MPFR_RNDN); /* b = 1 */
++      mpfr_set_ui_2exp (a, 1, -p-1, MPFR_RNDN);
++      inex = mpfr_sub (a, b, a, MPFR_RNDN);
++      MPFR_ASSERTN(inex > 0);
++      MPFR_ASSERTN(mpfr_cmp_ui (a, 1) == 0);
++      mpfr_clear (a);
++      mpfr_clear (b);
++      mpfr_clear (c);
++    }
++}
++
+ int
+ main (void)
+ {
+@@ -291,6 +376,8 @@
+ 
+   tests_start_mpfr ();
+ 
++  bug20180217 (1024);
++  coverage ();
+   compare_sub_sub1sp ();
+   test20170208 ();
+   bug20170109 ();
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-04-27 12:45:53.139452673 +0000
++++ PATCHES	2018-04-27 12:45:53.171452379 +0000
+@@ -0,0 +1 @@
++fma
+diff -Naurd VERSION VERSION
+--- VERSION	2018-04-27 12:40:46.870268475 +0000
++++ VERSION	2018-04-27 12:45:53.171452379 +0000
+@@ -1 +1 @@
+-4.0.1-p1
++4.0.1-p2
+diff -Naurd src/fma.c src/fma.c
+--- src/fma.c	2018-01-09 12:30:58.000000000 +0000
++++ src/fma.c	2018-04-27 12:45:53.159452489 +0000
+@@ -225,194 +225,73 @@
+ 
+       if (MPFR_IS_INF (u))  /* overflow */
+         {
++          int sign_u = MPFR_SIGN (u);
++
+           MPFR_LOG_MSG (("Overflow on x*y\n", 0));
++          MPFR_GROUP_CLEAR (group);  /* we no longer need u */
+ 
+           /* Let's eliminate the obvious case where x*y and z have the
+              same sign. No possible cancellation -> real overflow.
+              Also, we know that |z| < 2^emax. If E(x) + E(y) >= emax+3,
+-             then |x*y| >= 2^(emax+1), and |x*y + z| >= 2^emax. This case
++             then |x*y| >= 2^(emax+1), and |x*y + z| > 2^emax. This case
+              is also an overflow. */
+-          if (MPFR_SIGN (u) == MPFR_SIGN (z) || e >= __gmpfr_emax + 3)
++          if (sign_u == MPFR_SIGN (z) || e >= __gmpfr_emax + 3)
+             {
+-              MPFR_GROUP_CLEAR (group);
+               MPFR_SAVE_EXPO_FREE (expo);
+-              return mpfr_overflow (s, rnd_mode, MPFR_SIGN (z));
++              return mpfr_overflow (s, rnd_mode, sign_u);
+             }
+-
+-          /* E(x) + E(y) <= emax+2, therefore |x*y| < 2^(emax+2), and
+-             (x/4)*y does not overflow (let's recall that the result
+-             is exact with an unbounded exponent range). It does not
+-             underflow either, because x*y overflows and the exponent
+-             range is large enough. */
+-          inexact = mpfr_div_2ui (u, x, 2, MPFR_RNDN);
+-          MPFR_ASSERTN (inexact == 0);
+-          inexact = mpfr_mul (u, u, y, MPFR_RNDN);
+-          MPFR_ASSERTN (inexact == 0);
+-
+-          /* Now, we need to add z/4... But it may underflow! */
+-          {
+-            mpfr_t zo4;
+-            mpfr_srcptr zz;
+-            MPFR_BLOCK_DECL (flags);
+-
+-            if (MPFR_GET_EXP (u) > MPFR_GET_EXP (z) &&
+-                MPFR_GET_EXP (u) - MPFR_GET_EXP (z) > MPFR_PREC (u))
+-              {
+-                /* |z| < ulp(u)/2, therefore one can use z instead of z/4. */
+-                zz = z;
+-              }
+-            else
+-              {
+-                mpfr_init2 (zo4, MPFR_PREC (z));
+-                if (mpfr_div_2ui (zo4, z, 2, MPFR_RNDZ))
+-                  {
+-                    /* The division by 4 underflowed! */
+-                    MPFR_ASSERTN (0); /* TODO... */
+-                  }
+-                zz = zo4;
+-              }
+-
+-            /* Let's recall that u = x*y/4 and zz = z/4 (or z if the
+-               following addition would give the same result). */
+-            MPFR_BLOCK (flags, inexact = mpfr_add (s, u, zz, rnd_mode));
+-            /* u and zz have different signs, so that an overflow
+-               is not possible. But an underflow is theoretically
+-               possible! */
+-            if (MPFR_UNDERFLOW (flags))
+-              {
+-                MPFR_ASSERTN (zz != z);
+-                MPFR_ASSERTN (0); /* TODO... */
+-                mpfr_clears (zo4, u, (mpfr_ptr) 0);
+-              }
+-            else
+-              {
+-                int inex2;
+-
+-                if (zz != z)
+-                  mpfr_clear (zo4);
+-                MPFR_GROUP_CLEAR (group);
+-                MPFR_ASSERTN (! MPFR_OVERFLOW (flags));
+-                inex2 = mpfr_mul_2ui (s, s, 2, rnd_mode);
+-                if (inex2)  /* overflow */
+-                  {
+-                    inexact = inex2;
+-                    MPFR_SAVE_EXPO_UPDATE_FLAGS (expo, __gmpfr_flags);
+-                  }
+-                goto end;
+-              }
+-          }
+         }
+-      else  /* underflow: one has |xy| < 2^(emin-1). */
++      else  /* underflow: one has |x*y| < 2^(emin-1). */
+         {
+-          unsigned long scale = 0;
+-          mpfr_t scaled_z;
+-          mpfr_srcptr new_z;
+-          mpfr_exp_t diffexp;
+-          mpfr_prec_t pzs;
+-          int xy_underflows;
+-
+           MPFR_LOG_MSG (("Underflow on x*y\n", 0));
+ 
+-          /* Let's scale z so that ulp(z) > 2^emin and ulp(s) > 2^emin
+-             (the + 1 on MPFR_PREC (s) is necessary because the exponent
+-             of the result can be EXP(z) - 1). */
+-          diffexp = MPFR_GET_EXP (z) - __gmpfr_emin;
+-          pzs = MAX (MPFR_PREC (z), MPFR_PREC (s) + 1);
+-          MPFR_LOG_MSG (("diffexp=%" MPFR_EXP_FSPEC "d pzs=%Pd\n",
+-                         diffexp, pzs));
+-          if (diffexp <= pzs)
+-            {
+-              mpfr_uexp_t uscale;
+-              mpfr_t scaled_v;
+-              MPFR_BLOCK_DECL (flags);
+-
+-              uscale = (mpfr_uexp_t) pzs - diffexp + 1;
+-              MPFR_ASSERTN (uscale > 0);
+-              MPFR_ASSERTN (uscale <= ULONG_MAX);
+-              scale = uscale;
+-              mpfr_init2 (scaled_z, MPFR_PREC (z));
+-              inexact = mpfr_mul_2ui (scaled_z, z, scale, MPFR_RNDN);
+-              MPFR_ASSERTN (inexact == 0);  /* TODO: overflow case */
+-              new_z = scaled_z;
+-              /* Now we need to recompute u = xy * 2^scale. */
+-              MPFR_BLOCK (flags,
+-                          if (MPFR_GET_EXP (x) < MPFR_GET_EXP (y))
+-                            {
+-                              mpfr_init2 (scaled_v, precx);
+-                              mpfr_mul_2ui (scaled_v, x, scale, MPFR_RNDN);
+-                              mpfr_mul (u, scaled_v, y, MPFR_RNDN);
+-                            }
+-                          else
+-                            {
+-                              mpfr_init2 (scaled_v, precy);
+-                              mpfr_mul_2ui (scaled_v, y, scale, MPFR_RNDN);
+-                              mpfr_mul (u, x, scaled_v, MPFR_RNDN);
+-                            });
+-              mpfr_clear (scaled_v);
+-              MPFR_ASSERTN (! MPFR_OVERFLOW (flags));
+-              xy_underflows = MPFR_UNDERFLOW (flags);
+-            }
+-          else
+-            {
+-              new_z = z;
+-              xy_underflows = 1;
+-            }
+-
+-          MPFR_LOG_MSG (("scale=%lu xy_underflows=%d\n",
+-                         scale, xy_underflows));
+-
+-          if (xy_underflows)
++          /* Easy cases: when 2^(emin-1) <= 1/2 * min(ulp(z),ulp(s)),
++             one can replace x*y by sign(x*y) * 2^(emin-1). Note that
++             this is even true in case of equality for MPFR_RNDN thanks
++             to the even-rounding rule.
++             The + 1 on MPFR_PREC (s) is necessary because the exponent
++             of the result can be EXP(z) - 1. */
++          if (MPFR_GET_EXP (z) - __gmpfr_emin >=
++              MAX (MPFR_PREC (z), MPFR_PREC (s) + 1))
+             {
+-              /* Let's replace xy by sign(xy) * 2^(emin-1). */
+               MPFR_PREC (u) = MPFR_PREC_MIN;
+               mpfr_setmin (u, __gmpfr_emin);
+               MPFR_SET_SIGN (u, MPFR_MULT_SIGN (MPFR_SIGN (x),
+                                                 MPFR_SIGN (y)));
++              mpfr_clear_flags ();
++              goto add;
+             }
+ 
+-          {
+-            MPFR_BLOCK_DECL (flags);
++          MPFR_GROUP_CLEAR (group);  /* we no longer need u */
++        }
+ 
+-            MPFR_BLOCK (flags, inexact = mpfr_add (s, u, new_z, rnd_mode));
+-            MPFR_LOG_MSG (("inexact=%d\n", inexact));
+-            MPFR_GROUP_CLEAR (group);
+-            if (scale != 0)
+-              {
+-                int inex2;
++      /* Let's use UBF to resolve the overflow/underflow issues. */
++      {
++        mpfr_ubf_t uu;
++        mp_size_t un;
++        mpfr_limb_ptr up;
++        MPFR_TMP_DECL(marker);
+ 
+-                mpfr_clear (scaled_z);
+-                /* Here an overflow is theoretically possible, in which case
+-                   the result may be wrong, hence the assert. An underflow
+-                   is not possible, but let's check that anyway. */
+-                MPFR_ASSERTN (! MPFR_OVERFLOW (flags));  /* TODO... */
+-                MPFR_ASSERTN (! MPFR_UNDERFLOW (flags));  /* not possible */
+-                if (rnd_mode == MPFR_RNDN &&
+-                    MPFR_GET_EXP (s) == __gmpfr_emin - 1 + scale &&
+-                    mpfr_powerof2_raw (s))
+-                  {
+-                    MPFR_LOG_MSG (("Double rounding\n", 0));
+-                    rnd_mode = (MPFR_IS_NEG (s) ? inexact <= 0 : inexact >= 0)
+-                      ? MPFR_RNDZ : MPFR_RNDA;
+-                  }
+-                inex2 = mpfr_div_2ui (s, s, scale, rnd_mode);
+-                MPFR_LOG_MSG (("inex2=%d\n", inex2));
+-                if (inex2)  /* underflow */
+-                  inexact = inex2;
+-              }
+-          }
++        MPFR_LOG_MSG (("Use UBF\n", 0));
+ 
+-          /* FIXME/TODO: I'm not sure that the following is correct.
+-             Check for possible spurious exceptions due to intermediate
+-             computations. */
+-          MPFR_SAVE_EXPO_UPDATE_FLAGS (expo, __gmpfr_flags);
+-          goto end;
+-        }
++        MPFR_TMP_MARK (marker);
++        un = MPFR_LIMB_SIZE (x) + MPFR_LIMB_SIZE (y);
++        MPFR_TMP_INIT (up, uu, (mpfr_prec_t) un * GMP_NUMB_BITS, un);
++        mpfr_ubf_mul_exact (uu, x, y);
++        mpfr_clear_flags ();
++        inexact = mpfr_add (s, (mpfr_srcptr) uu, z, rnd_mode);
++        MPFR_UBF_CLEAR_EXP (uu);
++        MPFR_TMP_FREE (marker);
++      }
++    }
++  else
++    {
++    add:
++      inexact = mpfr_add (s, u, z, rnd_mode);
++      MPFR_GROUP_CLEAR (group);
+     }
+ 
+-  inexact = mpfr_add (s, u, z, rnd_mode);
+-  MPFR_GROUP_CLEAR (group);
+   MPFR_SAVE_EXPO_UPDATE_FLAGS (expo, __gmpfr_flags);
+- end:
+   MPFR_SAVE_EXPO_FREE (expo);
+   return mpfr_check_range (s, inexact, rnd_mode);
+ }
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-04-27 12:40:46.870268475 +0000
++++ src/mpfr.h	2018-04-27 12:45:53.171452379 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p1"
++#define MPFR_VERSION_STRING "4.0.1-p2"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-04-27 12:40:46.870268475 +0000
++++ src/version.c	2018-04-27 12:45:53.171452379 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p1";
++  return "4.0.1-p2";
+ }
+diff -Naurd tests/tfma.c tests/tfma.c
+--- tests/tfma.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tfma.c	2018-04-27 12:45:53.163452452 +0000
+@@ -196,6 +196,238 @@
+ }
+ 
+ static void
++test_overflow3 (void)
++{
++  mpfr_t x, y, z, r;
++  int inex;
++  mpfr_prec_t p = 8;
++  mpfr_flags_t ex_flags = MPFR_FLAGS_OVERFLOW | MPFR_FLAGS_INEXACT, flags;
++  int i, j, k;
++  unsigned int neg;
++
++  mpfr_inits2 (p, x, y, z, (mpfr_ptr) 0);
++  for (i = 0; i < 2; i++)
++    {
++      mpfr_init2 (r, 2 * p + i);
++      mpfr_set_ui_2exp (x, 1, mpfr_get_emax () - 1, MPFR_RNDN);
++      mpfr_set_ui (y, 2, MPFR_RNDN);       /* y = 2 */
++      for (j = 1; j <= 2; j++)
++        for (k = 0; k <= 1; k++)
++          {
++            mpfr_set_si_2exp (z, -1, mpfr_get_emax () - mpfr_get_prec (r) - j,
++                              MPFR_RNDN);
++            if (k)
++              mpfr_nextabove (z);
++            for (neg = 0; neg <= 3; neg++)
++              {
++                mpfr_clear_flags ();
++                /* (The following applies for neg = 0 or 2, all the signs
++                   need to be reversed for neg = 1 or 3.)
++                   We have x*y = 2^emax and
++                   z = - 2^(emax-2p-i-j) * (1-k*2^(-p)), thus
++                   x*y+z = 2^emax - 2^(emax-2p-i-j) + k*2^(emax-3p-i-j)
++                   should overflow. Indeed it is >= the midpoint of
++                   2^emax - 2^(emax-2p-i) and 2^emax, the midpoint
++                   being obtained for j = 1 and k = 0. */
++                inex = mpfr_fma (r, x, y, z, MPFR_RNDN);
++                flags = __gmpfr_flags;
++                if (! mpfr_inf_p (r) || flags != ex_flags ||
++                    ((neg & 1) == 0 ?
++                     (inex <= 0 || MPFR_IS_NEG (r)) :
++                     (inex >= 0 || MPFR_IS_POS (r))))
++                  {
++                    printf ("Error in test_overflow3 for "
++                            "i=%d j=%d k=%d neg=%u\n", i, j, k, neg);
++                    printf ("Expected %c@Inf@\n  with inex %c 0 and flags:",
++                            (neg & 1) == 0 ? '+' : '-',
++                            (neg & 1) == 0 ? '>' : '<');
++                    flags_out (ex_flags);
++                    printf ("Got      ");
++                    mpfr_dump (r);
++                    printf ("  with inex = %d and flags:", inex);
++                    flags_out (flags);
++                    exit (1);
++                  }
++                if (neg == 0 || neg == 2)
++                  mpfr_neg (x, x, MPFR_RNDN);
++                if (neg == 1 || neg == 3)
++                  mpfr_neg (y, y, MPFR_RNDN);
++                mpfr_neg (z, z, MPFR_RNDN);
++              }  /* neg */
++          }  /* k */
++      mpfr_clear (r);
++    }  /* i */
++  mpfr_clears (x, y, z, (mpfr_ptr) 0);
++}
++
++static void
++test_overflow4 (void)
++{
++  mpfr_t x, y, z, r1, r2;
++  mpfr_exp_t emax, e;
++  mpfr_prec_t px;
++  mpfr_flags_t flags1, flags2;
++  int inex1, inex2;
++  int ei, i, j;
++  int below;
++  unsigned int neg;
++
++  emax = mpfr_get_emax ();
++
++  mpfr_init2 (y, MPFR_PREC_MIN);
++  mpfr_set_ui (y, 2, MPFR_RNDN);  /* y = 2 */
++
++  mpfr_init2 (z, 8);
++
++  for (px = 17; px < 256; px *= 2)
++    {
++      mpfr_init2 (x, px);
++      mpfr_inits2 (px - 8, r1, r2, (mpfr_ptr) 0);
++      for (ei = 0; ei <= 1; ei++)
++        {
++          e = ei ? emax : 0;
++          mpfr_set_ui_2exp (x, 1, e - 1, MPFR_RNDN);
++          mpfr_nextabove (x);  /* x = 2^(e - 1) + 2^(e - px) */
++          /* x*y = 2^e + 2^(e - px + 1), which internally overflows
++             when e = emax. */
++          for (i = -4; i <= 4; i++)
++            for (j = 2; j <= 3; j++)
++              {
++                mpfr_set_si_2exp (z, -j, e - px + i, MPFR_RNDN);
++                /* If |z| <= 2^(e - px + 1), then x*y + z >= 2^e and
++                   RZ(x*y + z) = 2^e with an unbounded exponent range.
++                   If |z| > 2^(e - px + 1), then RZ(x*y + z) is the
++                   predecessor of 2^e (since |z| < ulp(r)/2); this
++                   occurs when i > 0 and when i = 0 and j > 2 */
++                mpfr_set_ui_2exp (r1, 1, e - 1, MPFR_RNDN);
++                below = i > 0 || (i == 0 && j > 2);
++                if (below)
++                  mpfr_nextbelow (r1);
++                mpfr_clear_flags ();
++                inex1 = mpfr_mul_2ui (r1, r1, 1, MPFR_RNDZ);
++                if (below || e < emax)
++                  {
++                    inex1 = i == 0 && j == 2 ? 0 : -1;
++                    flags1 = inex1 ? MPFR_FLAGS_INEXACT : 0;
++                  }
++                else
++                  {
++                    MPFR_ASSERTN (inex1 < 0);
++                    flags1 = MPFR_FLAGS_INEXACT | MPFR_FLAGS_OVERFLOW;
++                    MPFR_ASSERTN (flags1 == __gmpfr_flags);
++                  }
++                for (neg = 0; neg <= 3; neg++)
++                  {
++                    mpfr_clear_flags ();
++                    inex2 = mpfr_fma (r2, x, y, z, MPFR_RNDZ);
++                    flags2 = __gmpfr_flags;
++                    if (! (mpfr_equal_p (r1, r2) &&
++                           SAME_SIGN (inex1, inex2) &&
++                           flags1 == flags2))
++                      {
++                        printf ("Error in test_overflow4 for "
++                                "px=%d ei=%d i=%d j=%d neg=%u\n",
++                                (int) px, ei, i, j, neg);
++                        printf ("Expected ");
++                        mpfr_dump (r1);
++                        printf ("with inex = %d and flags:", inex1);
++                        flags_out (flags1);
++                        printf ("Got      ");
++                        mpfr_dump (r2);
++                        printf ("with inex = %d and flags:", inex2);
++                        flags_out (flags2);
++                        exit (1);
++                      }
++                    if (neg == 0 || neg == 2)
++                      mpfr_neg (x, x, MPFR_RNDN);
++                    if (neg == 1 || neg == 3)
++                      mpfr_neg (y, y, MPFR_RNDN);
++                    mpfr_neg (z, z, MPFR_RNDN);
++                    mpfr_neg (r1, r1, MPFR_RNDN);
++                    inex1 = - inex1;
++                  }
++              }
++        }
++      mpfr_clears (x, r1, r2, (mpfr_ptr) 0);
++    }
++
++  mpfr_clears (y, z, (mpfr_ptr) 0);
++}
++
++static void
++test_overflow5 (void)
++{
++  mpfr_t x, y, z, r1, r2;
++  mpfr_exp_t emax;
++  int inex1, inex2;
++  int i, rnd;
++  unsigned int neg, negr;
++
++  emax = mpfr_get_emax ();
++
++  mpfr_init2 (x, 123);
++  mpfr_init2 (y, 45);
++  mpfr_init2 (z, 67);
++  mpfr_inits2 (89, r1, r2, (mpfr_ptr) 0);
++
++  mpfr_set_ui_2exp (x, 1, emax - 1, MPFR_RNDN);
++
++  for (i = 3; i <= 17; i++)
++    {
++      mpfr_set_ui (y, i, MPFR_RNDN);
++      mpfr_set_ui_2exp (z, 1, emax - 1, MPFR_RNDN);
++      for (neg = 0; neg < 8; neg++)
++        {
++          mpfr_setsign (x, x, neg & 1, MPFR_RNDN);
++          mpfr_setsign (y, y, neg & 2, MPFR_RNDN);
++          mpfr_setsign (z, z, neg & 4, MPFR_RNDN);
++
++          /* |x*y + z| = (i +/- 1) * 2^(emax - 1) >= 2^emax (overflow)
++             and x*y + z has the same sign as x*y. */
++          negr = (neg ^ (neg >> 1)) & 1;
++
++          RND_LOOP (rnd)
++            {
++              mpfr_set_inf (r1, 1);
++              if (MPFR_IS_LIKE_RNDZ ((mpfr_rnd_t) rnd, negr))
++                {
++                  mpfr_nextbelow (r1);
++                  inex1 = -1;
++                }
++              else
++                inex1 = 1;
++
++              if (negr)
++                {
++                  mpfr_neg (r1, r1, MPFR_RNDN);
++                  inex1 = - inex1;
++                }
++
++              mpfr_clear_flags ();
++              inex2 = mpfr_fma (r2, x, y, z, (mpfr_rnd_t) rnd);
++              MPFR_ASSERTN (__gmpfr_flags ==
++                            (MPFR_FLAGS_INEXACT | MPFR_FLAGS_OVERFLOW));
++
++              if (! (mpfr_equal_p (r1, r2) && SAME_SIGN (inex1, inex2)))
++                {
++                  printf ("Error in test_overflow5 for i=%d neg=%u %s\n",
++                          i, neg, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
++                  printf ("Expected ");
++                  mpfr_dump (r1);
++                  printf ("with inex = %d\n", inex1);
++                  printf ("Got      ");
++                  mpfr_dump (r2);
++                  printf ("with inex = %d\n", inex2);
++                  exit (1);
++                }
++            }  /* rnd */
++        }  /* neg */
++    }  /* i */
++
++  mpfr_clears (x, y, z, r1, r2, (mpfr_ptr) 0);
++}
++
++static void
+ test_underflow1 (void)
+ {
+   mpfr_t x, y, z, r;
+@@ -281,59 +513,128 @@
+ static void
+ test_underflow2 (void)
+ {
+-  mpfr_t x, y, z, r;
+-  int b, i, inex, same, err = 0;
++  mpfr_t x, y, z, r1, r2;
++  int e, b, i, prec = 32, pz, inex;
++  unsigned int neg;
+ 
+-  mpfr_inits2 (32, x, y, z, r, (mpfr_ptr) 0);
++  mpfr_init2 (x, MPFR_PREC_MIN);
++  mpfr_inits2 (prec, y, z, r1, r2, (mpfr_ptr) 0);
+ 
+-  mpfr_set_si_2exp (z, 1, mpfr_get_emin (), MPFR_RNDN);   /* z = 2^emin */
+-  mpfr_set_si_2exp (x, 1, mpfr_get_emin (), MPFR_RNDN);   /* x = 2^emin */
++  mpfr_set_si_2exp (x, 1, mpfr_get_emin () - 1, MPFR_RNDN);
++  /* x = 2^(emin-1) */
+ 
+-  for (b = 0; b <= 1; b++)
++  for (e = -1; e <= prec + 2; e++)
+     {
+-      for (i = 15; i <= 17; i++)
++      mpfr_set (z, x, MPFR_RNDN);
++      /* z = x = 2^(emin+e) */
++      for (b = 0; b <= 1; b++)
+         {
+-          mpfr_set_si_2exp (y, i, -4 - MPFR_PREC (z), MPFR_RNDN);
+-          /*  z = 1.000...00b
+-           * xy =            01111
+-           *   or            10000
+-           *   or            10001
+-           */
+-          mpfr_clear_flags ();
+-          inex = mpfr_fma (r, x, y, z, MPFR_RNDN);
+-#define STRTU2 "Error in test_underflow2 (b = %d, i = %d)\n  "
+-          if (__gmpfr_flags != MPFR_FLAGS_INEXACT)
+-            {
+-              printf (STRTU2 "flags = %u instead of %u\n", b, i,
+-                      (unsigned int) __gmpfr_flags,
+-                      (unsigned int) MPFR_FLAGS_INEXACT);
+-              err = 1;
+-            }
+-          same = i == 15 || (i == 16 && b == 0);
+-          if (same ? (inex >= 0) : (inex <= 0))
+-            {
+-              printf (STRTU2 "incorrect ternary value (%d instead of %c 0)\n",
+-                      b, i, inex, same ? '<' : '>');
+-              err = 1;
+-            }
+-          mpfr_set (y, z, MPFR_RNDN);
+-          if (!same)
+-            mpfr_nextabove (y);
+-          if (! mpfr_equal_p (r, y))
++          for (pz = prec - 4 * (b == 0); pz <= prec + 4; pz++)
+             {
+-              printf (STRTU2 "expected ", b, i);
+-              mpfr_dump (y);
+-              printf ("  got      ");
+-              mpfr_dump (r);
+-              err = 1;
+-            }
+-        }
+-      mpfr_nextabove (z);
+-    }
++              inex = mpfr_prec_round (z, pz, MPFR_RNDZ);
++              MPFR_ASSERTN (inex == 0);
++              for (i = 15; i <= 17; i++)
++                {
++                  mpfr_flags_t flags1, flags2;
++                  int inex1, inex2;
+ 
+-  if (err)
+-    exit (1);
+-  mpfr_clears (x, y, z, r, (mpfr_ptr) 0);
++                  mpfr_set_si_2exp (y, i, -4 - prec, MPFR_RNDN);
++
++                  /*      <--- r --->
++                   *  z = 1.000...00b   with b = 0 or 1
++                   * xy =            01111  (i = 15)
++                   *   or            10000  (i = 16)
++                   *   or            10001  (i = 17)
++                   *
++                   * x, y, and z will be modified to test the different sign
++                   * combinations. In the case b = 0 (i.e. |z| is a power of
++                   * 2) and x*y has a different sign from z, then y will be
++                   * divided by 2, so that i = 16 corresponds to a midpoint.
++                   */
++
++                  for (neg = 0; neg < 8; neg++)
++                    {
++                      int xyneg, prev_binade;
++
++                      mpfr_setsign (x, x, neg & 1, MPFR_RNDN);
++                      mpfr_setsign (y, y, neg & 2, MPFR_RNDN);
++                      mpfr_setsign (z, z, neg & 4, MPFR_RNDN);
++
++                      xyneg = (neg ^ (neg >> 1)) & 1;  /* true iff x*y < 0 */
++
++                      /* If a change of binade occurs by adding x*y to z
++                         exactly, then take into account the fact that the
++                         midpoint has a different exponent. */
++                      prev_binade = b == 0 && (xyneg ^ MPFR_IS_NEG (z));
++                      if (prev_binade)
++                        mpfr_div_2ui (y, y, 1, MPFR_RNDN);
++
++                      mpfr_set (r1, z, MPFR_RNDN);
++                      flags1 = MPFR_FLAGS_INEXACT;
++
++                      if (e == -1 && i == 17 && b == 0 &&
++                          (xyneg ^ (neg >> 2)) != 0)
++                        {
++                          /* Special underflow case. */
++                          flags1 |= MPFR_FLAGS_UNDERFLOW;
++                          inex1 = xyneg ? 1 : -1;
++                        }
++                      else if (i == 15 || (i == 16 && b == 0))
++                        {
++                          /* round toward z */
++                          inex1 = xyneg ? 1 : -1;
++                        }
++                      else if (xyneg)
++                        {
++                          /* round away from z, with x*y < 0 */
++                          mpfr_nextbelow (r1);
++                          inex1 = -1;
++                        }
++                      else
++                        {
++                          /* round away from z, with x*y > 0 */
++                          mpfr_nextabove (r1);
++                          inex1 = 1;
++                        }
++
++                      mpfr_clear_flags ();
++                      inex2 = mpfr_fma (r2, x, y, z, MPFR_RNDN);
++                      flags2 = __gmpfr_flags;
++
++                      if (! (mpfr_equal_p (r1, r2) &&
++                             SAME_SIGN (inex1, inex2) &&
++                             flags1 == flags2))
++                        {
++                          printf ("Error in test_underflow2 for "
++                                  "e=%d b=%d pz=%d i=%d neg=%u\n",
++                                  e, b, pz, i, neg);
++                          printf ("Expected ");
++                          mpfr_dump (r1);
++                          printf ("with inex = %d and flags:", inex1);
++                          flags_out (flags1);
++                          printf ("Got      ");
++                          mpfr_dump (r2);
++                          printf ("with inex = %d and flags:", inex2);
++                          flags_out (flags2);
++                          exit (1);
++                        }
++
++                      /* Restore y. */
++                      if (prev_binade)
++                        mpfr_mul_2ui (y, y, 1, MPFR_RNDN);
++                    }  /* neg */
++                }  /* i */
++            }  /* pz */
++
++          inex = mpfr_prec_round (z, prec, MPFR_RNDZ);
++          MPFR_ASSERTN (inex == 0);
++          MPFR_SET_POS (z);
++          mpfr_nextabove (z);
++        }  /* b */
++      mpfr_mul_2ui (x, x, 1, MPFR_RNDN);
++    }  /* e */
++
++  mpfr_clears (x, y, z, r1, r2, (mpfr_ptr) 0);
+ }
+ 
+ static void
+@@ -397,6 +698,185 @@
+   mpfr_clears (x, y, z, t1, t2, (mpfr_ptr) 0);
+ }
+ 
++/* Test s = x*y + z with PREC(z) > PREC(s) + 1, x*y underflows, where
++   z + x*y and z + sign(x*y) * 2^(emin-1) do not give the same result.
++     x = 2^emin
++     y = 2^(-8)
++     z = 2^emin * (2^PREC(s) + k - 2^(-1))
++   with k = 3 for MPFR_RNDN and k = 2 for the directed rounding modes.
++   Also test the opposite versions with neg != 0.
++*/
++static void
++test_underflow4 (void)
++{
++  mpfr_t x, y, z, s1, s2;
++  mpfr_prec_t ps = 32;
++  int inex, rnd;
++
++  mpfr_inits2 (MPFR_PREC_MIN, x, y, (mpfr_ptr) 0);
++  mpfr_inits2 (ps, s1, s2, (mpfr_ptr) 0);
++  mpfr_init2 (z, ps + 2);
++
++  inex = mpfr_set_si_2exp (x, 1, mpfr_get_emin (), MPFR_RNDN);
++  MPFR_ASSERTN (inex == 0);
++  inex = mpfr_set_si_2exp (y, 1, -8, MPFR_RNDN);
++  MPFR_ASSERTN (inex == 0);
++
++  RND_LOOP_NO_RNDF (rnd)
++    {
++      mpfr_flags_t flags1, flags2;
++      int inex1, inex2;
++      unsigned int neg;
++
++      inex = mpfr_set_si_2exp (z, 1 << 1, ps, MPFR_RNDN);
++      MPFR_ASSERTN (inex == 0);
++      inex = mpfr_sub_ui (z, z, 1, MPFR_RNDN);
++      MPFR_ASSERTN (inex == 0);
++      inex = mpfr_div_2ui (z, z, 1, MPFR_RNDN);
++      MPFR_ASSERTN (inex == 0);
++      inex = mpfr_add_ui (z, z, rnd == MPFR_RNDN ? 3 : 2, MPFR_RNDN);
++      MPFR_ASSERTN (inex == 0);
++      inex = mpfr_mul (z, z, x, MPFR_RNDN);
++      MPFR_ASSERTN (inex == 0);
++
++      for (neg = 0; neg <= 3; neg++)
++        {
++          inex1 = mpfr_set (s1, z, (mpfr_rnd_t) rnd);
++          flags1 = MPFR_FLAGS_INEXACT;
++
++          mpfr_clear_flags ();
++          inex2 = mpfr_fma (s2, x, y, z, (mpfr_rnd_t) rnd);
++          flags2 = __gmpfr_flags;
++
++          if (! (mpfr_equal_p (s1, s2) &&
++                 SAME_SIGN (inex1, inex2) &&
++                 flags1 == flags2))
++            {
++              printf ("Error in test_underflow4 for neg=%u %s\n",
++                      neg, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
++              printf ("Expected ");
++              mpfr_dump (s1);
++              printf ("  with inex ~ %d, flags =", inex1);
++              flags_out (flags1);
++              printf ("Got      ");
++              mpfr_dump (s2);
++              printf ("  with inex ~ %d, flags =", inex2);
++              flags_out (flags2);
++              exit (1);
++            }
++
++          if (neg == 0 || neg == 2)
++            mpfr_neg (x, x, MPFR_RNDN);
++          if (neg == 1 || neg == 3)
++            mpfr_neg (y, y, MPFR_RNDN);
++          mpfr_neg (z, z, MPFR_RNDN);
++        }
++    }
++
++  mpfr_clears (x, y, z, s1, s2, (mpfr_ptr) 0);
++}
++
++/* Test s = x*y + z on:
++     x = +/- 2^emin
++     y = +/- 2^(-3)
++     z = +/- 2^(emin + PREC(s)) and MPFR numbers close to this value.
++   with PREC(z) from PREC(s) - 2 to PREC(s) + 8.
++*/
++static void
++test_underflow5 (void)
++{
++  mpfr_t w, x, y, z, s1, s2, t;
++  mpfr_exp_t emin;
++  mpfr_prec_t ps = 32;
++  int inex, i, j, rnd;
++  unsigned int neg;
++
++  mpfr_inits2 (MPFR_PREC_MIN, w, x, y, (mpfr_ptr) 0);
++  mpfr_inits2 (ps, s1, s2, (mpfr_ptr) 0);
++  mpfr_init2 (t, ps + 9);
++
++  emin = mpfr_get_emin ();
++
++  inex = mpfr_set_si_2exp (w, 1, emin, MPFR_RNDN);  /* w = 2^emin */
++  MPFR_ASSERTN (inex == 0);
++  inex = mpfr_set_si (x, 1, MPFR_RNDN);
++  MPFR_ASSERTN (inex == 0);
++  inex = mpfr_set_si_2exp (y, 1, -3, MPFR_RNDN);
++  MPFR_ASSERTN (inex == 0);
++
++  for (i = -2; i <= 8; i++)
++    {
++      mpfr_init2 (z, ps + i);
++      inex = mpfr_set_si_2exp (z, 1, ps, MPFR_RNDN);
++      MPFR_ASSERTN (inex == 0);
++
++      for (j = 1; j <= 32; j++)
++        mpfr_nextbelow (z);
++
++      for (j = -32; j <= 32; j++)
++        {
++          for (neg = 0; neg < 8; neg++)
++            {
++              mpfr_setsign (x, x, neg & 1, MPFR_RNDN);
++              mpfr_setsign (y, y, neg & 2, MPFR_RNDN);
++              mpfr_setsign (z, z, neg & 4, MPFR_RNDN);
++
++              inex = mpfr_fma (t, x, y, z, MPFR_RNDN);
++              MPFR_ASSERTN (inex == 0);
++
++              inex = mpfr_mul (x, x, w, MPFR_RNDN);
++              MPFR_ASSERTN (inex == 0);
++              inex = mpfr_mul (z, z, w, MPFR_RNDN);
++              MPFR_ASSERTN (inex == 0);
++
++              RND_LOOP_NO_RNDF (rnd)
++                {
++                  mpfr_flags_t flags1, flags2;
++                  int inex1, inex2;
++
++                  mpfr_clear_flags ();
++                  inex1 = mpfr_mul (s1, w, t, (mpfr_rnd_t) rnd);
++                  flags1 = __gmpfr_flags;
++
++                  mpfr_clear_flags ();
++                  inex2 = mpfr_fma (s2, x, y, z, (mpfr_rnd_t) rnd);
++                  flags2 = __gmpfr_flags;
++
++                  if (! (mpfr_equal_p (s1, s2) &&
++                         SAME_SIGN (inex1, inex2) &&
++                         flags1 == flags2))
++                    {
++                      printf ("Error in test_underflow5 on "
++                              "i=%d j=%d neg=%u %s\n", i, j, neg,
++                              mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
++                      printf ("Expected ");
++                      mpfr_dump (s1);
++                      printf ("  with inex ~ %d, flags =", inex1);
++                      flags_out (flags1);
++                      printf ("Got      ");
++                      mpfr_dump (s2);
++                      printf ("  with inex ~ %d, flags =", inex2);
++                      flags_out (flags2);
++                      exit (1);
++                    }
++                }  /* rnd */
++
++              inex = mpfr_div (x, x, w, MPFR_RNDN);
++              MPFR_ASSERTN (inex == 0);
++              inex = mpfr_div (z, z, w, MPFR_RNDN);
++              MPFR_ASSERTN (inex == 0);
++            }  /* neg */
++
++          MPFR_SET_POS (z);  /* restore the value before the loop on neg */
++          mpfr_nextabove (z);
++        }  /* j */
++
++      mpfr_clear (z);
++    }  /* i */
++
++  mpfr_clears (w, x, y, s1, s2, t, (mpfr_ptr) 0);
++}
++
+ static void
+ bug20101018 (void)
+ {
+@@ -533,6 +1013,7 @@
+ {
+   mpfr_t x, y, z, s;
+   mpfr_exp_t emin, emax;
++  int i;
+ 
+   tests_start_mpfr ();
+ 
+@@ -823,21 +1304,39 @@
+ 
+   test_exact ();
+ 
+-  test_overflow1 ();
+-  test_overflow2 ();
+-  test_underflow1 ();
+-  test_underflow2 ();
+-  test_underflow3 (1);
++  for (i = 0; i <= 2; i++)
++    {
++      if (i == 0)
++        {
++          /* corresponds to the generic code + mpfr_check_range */
++          set_emin (-1024);
++          set_emax (1024);
++        }
++      else if (i == 1)
++        {
++          set_emin (MPFR_EMIN_MIN);
++          set_emax (MPFR_EMAX_MAX);
++        }
++      else
++        {
++          MPFR_ASSERTN (i == 2);
++          if (emin == MPFR_EMIN_MIN && emax == MPFR_EMAX_MAX)
++            break;
++          set_emin (emin);
++          set_emax (emax);
++        }
+ 
+-  set_emin (MPFR_EMIN_MIN);
+-  set_emax (MPFR_EMAX_MAX);
+-  test_overflow1 ();
+-  test_overflow2 ();
+-  test_underflow1 ();
+-  test_underflow2 ();
+-  test_underflow3 (2);
+-  set_emin (emin);
+-  set_emax (emax);
++      test_overflow1 ();
++      test_overflow2 ();
++      test_overflow3 ();
++      test_overflow4 ();
++      test_overflow5 ();
++      test_underflow1 ();
++      test_underflow2 ();
++      test_underflow3 (i);
++      test_underflow4 ();
++      test_underflow5 ();
++    }
+ 
+   tests_end_mpfr ();
+   return 0;
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-04-27 12:47:54.194308761 +0000
++++ PATCHES	2018-04-27 12:47:54.230308407 +0000
+@@ -0,0 +1 @@
++sqr_1n-underflow
+diff -Naurd VERSION VERSION
+--- VERSION	2018-04-27 12:45:53.171452379 +0000
++++ VERSION	2018-04-27 12:47:54.226308446 +0000
+@@ -1 +1 @@
+-4.0.1-p2
++4.0.1-p3
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-04-27 12:45:53.171452379 +0000
++++ src/mpfr.h	2018-04-27 12:47:54.226308446 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p2"
++#define MPFR_VERSION_STRING "4.0.1-p3"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/sqr.c src/sqr.c
+--- src/sqr.c	2018-01-09 12:30:58.000000000 +0000
++++ src/sqr.c	2018-04-27 12:47:54.218308525 +0000
+@@ -161,15 +161,18 @@
+   if (MPFR_UNLIKELY(ax < __gmpfr_emin))
+     {
+       /* As seen in mpfr_mul_1, we cannot have a0 = 111...111 here if there
+-         was not exponent decrease (ax--) above.
+-         In the case of an exponent decrease, it is not possible for
+-         GMP_NUMB_BITS=32 since the largest b0 such that b0^2 < 2^(2*32-1)
+-         is b0=3037000499, but its square has only 30 leading ones.
+-         For GMP_NUMB_BITS=64 it is possible: the largest b0 is
+-         13043817825332782212, and its square has 64 leading ones. */
+-      if ((ax == __gmpfr_emin - 1) && (ap[0] == ~MPFR_LIMB_HIGHBIT) &&
+-          ((rnd_mode == MPFR_RNDN && rb) ||
+-           (MPFR_IS_LIKE_RNDA(rnd_mode, MPFR_IS_NEG (a)) && (rb | sb))))
++         was not an exponent decrease (ax--) above.
++         In the case of an exponent decrease:
++         - For GMP_NUMB_BITS=32, a0 = 111...111 is not possible since the
++           largest b0 such that b0^2 < 2^(2*32-1) is b0=3037000499, but
++           its square has only 30 leading ones.
++         - For GMP_NUMB_BITS=64, a0 = 111...111 is possible: the largest b0
++           is 13043817825332782212, and its square has 64 leading ones; but
++           since the next bit is rb=0, for RNDN, we always have an underflow.
++         For the test below, note that a is positive.
++      */
++      if (ax == __gmpfr_emin - 1 && ap[0] == MPFR_LIMB_MAX &&
++          MPFR_IS_LIKE_RNDA (rnd_mode, 0))
+         goto rounding; /* no underflow */
+       /* For RNDN, mpfr_underflow always rounds away, thus for |a| <= 2^(emin-2)
+          we have to change to RNDZ. This corresponds to:
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-04-27 12:45:53.171452379 +0000
++++ src/version.c	2018-04-27 12:47:54.226308446 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p2";
++  return "4.0.1-p3";
+ }
+diff -Naurd tests/tsqr.c tests/tsqr.c
+--- tests/tsqr.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tsqr.c	2018-04-27 12:47:54.218308525 +0000
+@@ -188,6 +188,156 @@
+ #endif
+ }
+ 
++static void
++coverage (mpfr_prec_t pmax)
++{
++  mpfr_prec_t p;
++
++  for (p = MPFR_PREC_MIN; p <= pmax; p++)
++    {
++      mpfr_t a, b, c;
++      int inex;
++      mpfr_exp_t emin;
++
++      mpfr_init2 (a, p);
++      mpfr_init2 (b, p);
++      mpfr_init2 (c, p);
++
++      /* exercise carry in most significant bits of a, with overflow */
++      mpfr_set_ui_2exp (b, 1, mpfr_get_emax (), MPFR_RNDZ);
++      mpfr_sqrt (b, b, MPFR_RNDU);
++      mpfr_div_2exp (c, b, 1, MPFR_RNDN);
++      mpfr_sqr (c, c, MPFR_RNDN);
++      mpfr_clear_flags ();
++      inex = mpfr_sqr (a, b, MPFR_RNDN);
++      /* if EXP(c) > emax-2, there is overflow */
++      if (mpfr_get_exp (c) > mpfr_get_emax () - 2)
++        {
++          MPFR_ASSERTN(inex > 0);
++          MPFR_ASSERTN(mpfr_inf_p (a) && mpfr_sgn (a) > 0);
++          MPFR_ASSERTN(mpfr_overflow_p ());
++        }
++      else /* no overflow */
++        {
++          /* 2^p-1 is a square only for p=1 */
++          MPFR_ASSERTN((p == 1 && inex == 0) || (p > 1 && inex < 0));
++          MPFR_ASSERTN(!mpfr_overflow_p ());
++          mpfr_set_ui_2exp (c, 1, mpfr_get_emax (), MPFR_RNDZ);
++          MPFR_ASSERTN(mpfr_equal_p (a, c));
++        }
++
++      /* same as above, with RNDU */
++      mpfr_set_ui_2exp (b, 1, mpfr_get_emax (), MPFR_RNDZ);
++      mpfr_sqrt (b, b, MPFR_RNDU);
++      mpfr_div_2exp (c, b, 1, MPFR_RNDN);
++      mpfr_sqr (c, c, MPFR_RNDU);
++      mpfr_clear_flags ();
++      inex = mpfr_sqr (a, b, MPFR_RNDU);
++      /* if EXP(c) > emax-2, there is overflow */
++      if (mpfr_get_exp (c) > mpfr_get_emax () - 2)
++        {
++          MPFR_ASSERTN(inex > 0);
++          MPFR_ASSERTN(mpfr_inf_p (a) && mpfr_sgn (a) > 0);
++          MPFR_ASSERTN(mpfr_overflow_p ());
++        }
++      else /* no overflow */
++        {
++          /* 2^p-1 is a square only for p=1 */
++          MPFR_ASSERTN((p == 1 && inex == 0) || (p > 1 && inex < 0));
++          MPFR_ASSERTN(!mpfr_overflow_p ());
++          mpfr_set_ui_2exp (c, 1, mpfr_get_emax (), MPFR_RNDZ);
++          MPFR_ASSERTN(mpfr_equal_p (a, c));
++        }
++
++      /* exercise trivial overflow */
++      mpfr_set_ui_2exp (b, 1, mpfr_get_emax (), MPFR_RNDZ);
++      mpfr_sqrt (b, b, MPFR_RNDU);
++      mpfr_mul_2exp (b, b, 1, MPFR_RNDN);
++      mpfr_clear_flags ();
++      inex = mpfr_sqr (a, b, MPFR_RNDN);
++      MPFR_ASSERTN(inex > 0);
++      MPFR_ASSERTN(mpfr_inf_p (a) && mpfr_sgn (a) > 0);
++      MPFR_ASSERTN(mpfr_overflow_p ());
++
++      /* exercise trivial underflow */
++      mpfr_set_ui_2exp (b, 1, mpfr_get_emin () - 1, MPFR_RNDZ);
++      mpfr_sqrt (b, b, MPFR_RNDU);
++      mpfr_div_2exp (b, b, 1, MPFR_RNDN);
++      mpfr_clear_flags ();
++      inex = mpfr_sqr (a, b, MPFR_RNDN);
++      MPFR_ASSERTN(inex < 0);
++      MPFR_ASSERTN(mpfr_zero_p (a) && mpfr_signbit (a) == 0);
++      MPFR_ASSERTN(mpfr_underflow_p ());
++
++      /* exercise square between 0.5*2^emin and its predecessor (emin even) */
++      emin = mpfr_get_emin ();
++      mpfr_set_emin (emin + (emin & 1)); /* now emin is even */
++      mpfr_set_ui_2exp (b, 1, mpfr_get_emin () - 1, MPFR_RNDN);
++      inex = mpfr_sqrt (b, b, MPFR_RNDZ);
++      MPFR_ASSERTN(inex != 0); /* sqrt(2) is not exact */
++      mpfr_mul_2exp (c, b, 1, MPFR_RNDN);
++      mpfr_sqr (c, c, MPFR_RNDN);
++      mpfr_clear_flags ();
++      inex = mpfr_sqr (a, b, MPFR_RNDN);
++      if (mpfr_get_exp (c) < mpfr_get_emin () + 2) /* underflow */
++        {
++          /* if c > 0.5*2^(emin+1), we should round to 0.5*2^emin */
++          if (mpfr_cmp_ui_2exp (c, 1, mpfr_get_emin ()) > 0)
++            {
++              MPFR_ASSERTN(inex > 0);
++              MPFR_ASSERTN(mpfr_cmp_ui_2exp (a, 1, mpfr_get_emin () - 1) == 0);
++              MPFR_ASSERTN(mpfr_underflow_p ());
++            }
++          else /* we should round to 0 */
++            {
++              MPFR_ASSERTN(inex < 0);
++              MPFR_ASSERTN(mpfr_zero_p (a) && mpfr_signbit (a) == 0);
++              MPFR_ASSERTN(mpfr_underflow_p ());
++            }
++        }
++      else
++        {
++          MPFR_ASSERTN(inex > 0);
++          MPFR_ASSERTN(mpfr_cmp_ui_2exp (a, 1, mpfr_get_emin () - 1) == 0);
++          MPFR_ASSERTN(!mpfr_underflow_p ());
++        }
++      mpfr_set_emin (emin);
++
++      /* exercise exact square root 2^(emin-2) for emin even */
++      emin = mpfr_get_emin ();
++      mpfr_set_emin (emin + (emin & 1)); /* now emin is even */
++      mpfr_set_ui_2exp (b, 1, (mpfr_get_emin () - 2) / 2, MPFR_RNDN);
++      inex = mpfr_sqr (a, b, MPFR_RNDN);
++      MPFR_ASSERTN(inex < 0);
++      MPFR_ASSERTN(mpfr_zero_p (a) && mpfr_signbit (a) == 0);
++      MPFR_ASSERTN(mpfr_underflow_p ());
++      mpfr_set_emin (emin);
++
++      /* same as above, for RNDU */
++      emin = mpfr_get_emin ();
++      mpfr_set_emin (emin + (emin & 1)); /* now emin is even */
++      mpfr_set_ui_2exp (b, 1, mpfr_get_emin () - 1, MPFR_RNDN);
++      inex = mpfr_sqrt (b, b, MPFR_RNDZ);
++      MPFR_ASSERTN(inex != 0); /* sqrt(2) is not exact */
++      mpfr_mul_2exp (c, b, 1, MPFR_RNDN);
++      mpfr_sqr (c, c, MPFR_RNDU);
++      mpfr_clear_flags ();
++      inex = mpfr_sqr (a, b, MPFR_RNDU);
++      MPFR_ASSERTN(inex > 0);
++      MPFR_ASSERTN(mpfr_cmp_ui_2exp (a, 1, mpfr_get_emin () - 1) == 0);
++      /* we have underflow if c < 2^(emin+1) */
++      if (mpfr_cmp_ui_2exp (c, 1, mpfr_get_emin () + 1) < 0)
++        MPFR_ASSERTN(mpfr_underflow_p ());
++      else
++        MPFR_ASSERTN(!mpfr_underflow_p ());
++      mpfr_set_emin (emin);
++
++      mpfr_clear (a);
++      mpfr_clear (b);
++      mpfr_clear (c);
++    }
++}
++
+ int
+ main (void)
+ {
+@@ -195,6 +345,7 @@
+ 
+   tests_start_mpfr ();
+ 
++  coverage (1024);
+   check_mpn_sqr ();
+   check_special ();
+   test_underflow ();
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-04-27 12:50:10.592974822 +0000
++++ PATCHES	2018-04-27 12:50:10.624974512 +0000
+@@ -0,0 +1 @@
++get_str
+diff -Naurd VERSION VERSION
+--- VERSION	2018-04-27 12:47:54.226308446 +0000
++++ VERSION	2018-04-27 12:50:10.624974512 +0000
+@@ -1 +1 @@
+-4.0.1-p3
++4.0.1-p4
+diff -Naurd doc/mpfr.info doc/mpfr.info
+--- doc/mpfr.info	2018-02-07 12:58:03.000000000 +0000
++++ doc/mpfr.info	2018-04-27 12:50:17.128911341 +0000
+@@ -1321,10 +1321,9 @@
+           size_t N, mpfr_t OP, mpfr_rnd_t RND)
+      Convert OP to a string of digits in base B, with rounding in the
+      direction RND, where N is either zero (see below) or the number of
+-     significant digits output in the string; in the latter case, N must
+-     be greater or equal to 2.  The base may vary from 2 to 62;
+-     otherwise the function does nothing and immediately returns a null
+-     pointer.
++     significant digits output in the string.  The base may vary from 2
++     to 62; otherwise the function does nothing and immediately returns
++     a null pointer.
+ 
+      If the input is NaN, then the returned string is ‘@NaN@’ and the
+      NaN flag is set.  If the input is +Inf (resp. −Inf), then the
+@@ -4471,21 +4470,21 @@
+ * mpfr_expm1:                            Special Functions.   (line  40)
+ * mpfr_fac_ui:                           Special Functions.   (line 136)
+ * mpfr_fits_intmax_p:                    Conversion Functions.
+-                                                              (line 168)
++                                                              (line 167)
+ * mpfr_fits_sint_p:                      Conversion Functions.
+-                                                              (line 164)
++                                                              (line 163)
+ * mpfr_fits_slong_p:                     Conversion Functions.
+-                                                              (line 162)
++                                                              (line 161)
+ * mpfr_fits_sshort_p:                    Conversion Functions.
+-                                                              (line 166)
++                                                              (line 165)
+ * mpfr_fits_uintmax_p:                   Conversion Functions.
+-                                                              (line 167)
++                                                              (line 166)
+ * mpfr_fits_uint_p:                      Conversion Functions.
+-                                                              (line 163)
++                                                              (line 162)
+ * mpfr_fits_ulong_p:                     Conversion Functions.
+-                                                              (line 161)
++                                                              (line 160)
+ * mpfr_fits_ushort_p:                    Conversion Functions.
+-                                                              (line 165)
++                                                              (line 164)
+ * mpfr_flags_clear:                      Exception Related Functions.
+                                                               (line 190)
+ * mpfr_flags_restore:                    Exception Related Functions.
+@@ -4520,7 +4519,7 @@
+ * mpfr_free_cache2:                      Special Functions.   (line 295)
+ * mpfr_free_pool:                        Special Functions.   (line 309)
+ * mpfr_free_str:                         Conversion Functions.
+-                                                              (line 156)
++                                                              (line 155)
+ * mpfr_frexp:                            Conversion Functions.
+                                                               (line  49)
+ * mpfr_gamma:                            Special Functions.   (line 155)
+@@ -4928,30 +4927,30 @@
+ Node: Assignment Functions47553
+ Node: Combined Initialization and Assignment Functions57499
+ Node: Conversion Functions58800
+-Node: Basic Arithmetic Functions69381
+-Node: Comparison Functions80277
+-Node: Special Functions83765
+-Node: Input and Output Functions101974
+-Node: Formatted Output Functions106751
+-Node: Integer and Remainder Related Functions116956
+-Node: Rounding-Related Functions124484
+-Node: Miscellaneous Functions131001
+-Node: Exception Related Functions141493
+-Node: Compatibility with MPF151733
+-Node: Custom Interface154679
+-Node: Internals159310
+-Node: API Compatibility160854
+-Node: Type and Macro Changes162802
+-Node: Added Functions165985
+-Node: Changed Functions170499
+-Node: Removed Functions177095
+-Node: Other Changes177825
+-Node: MPFR and the IEEE 754 Standard179526
+-Node: Contributors182143
+-Node: References185200
+-Node: GNU Free Documentation License187084
+-Node: Concept Index209677
+-Node: Function and Type Index216049
++Node: Basic Arithmetic Functions69323
++Node: Comparison Functions80219
++Node: Special Functions83707
++Node: Input and Output Functions101916
++Node: Formatted Output Functions106693
++Node: Integer and Remainder Related Functions116898
++Node: Rounding-Related Functions124426
++Node: Miscellaneous Functions130943
++Node: Exception Related Functions141435
++Node: Compatibility with MPF151675
++Node: Custom Interface154621
++Node: Internals159252
++Node: API Compatibility160796
++Node: Type and Macro Changes162744
++Node: Added Functions165927
++Node: Changed Functions170441
++Node: Removed Functions177037
++Node: Other Changes177767
++Node: MPFR and the IEEE 754 Standard179468
++Node: Contributors182085
++Node: References185142
++Node: GNU Free Documentation License187026
++Node: Concept Index209619
++Node: Function and Type Index215991
+ 
+ End Tag Table
+ 
+diff -Naurd doc/mpfr.texi doc/mpfr.texi
+--- doc/mpfr.texi	2018-02-07 12:50:31.000000000 +0000
++++ doc/mpfr.texi	2018-04-27 12:50:10.612974628 +0000
+@@ -1655,8 +1655,8 @@
+ @deftypefun {char *} mpfr_get_str (char *@var{str}, mpfr_exp_t *@var{expptr}, int @var{b}, size_t @var{n}, mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+ Convert @var{op} to a string of digits in base @var{b}, with rounding in
+ the direction @var{rnd}, where @var{n} is either zero (see below) or the
+-number of significant digits output in the string; in the latter case,
+-@var{n} must be greater or equal to 2. The base may vary from 2 to 62;
++number of significant digits output in the string.
++The base may vary from 2 to 62;
+ otherwise the function does nothing and immediately returns a null pointer.
+ 
+ If the input is NaN, then the returned string is @samp{@@NaN@@} and the
+@@ -1699,8 +1699,7 @@
+ but in some very rare cases, it might be @math{m+1}
+ (the smallest case for bases up to 62 is when @var{p} equals 186564318007
+ for bases 7 and 49).
+-@c In the source src/get_str.c, this is due to the approximate mpfr_ceil_mul,
+-@c but also m = 1 is changed to 2.
++@c In the source src/get_str.c, this is due to the approximate mpfr_ceil_mul.
+ 
+ If @var{str} is a null pointer, space for the significand is allocated using
+ the allocation function (@pxref{Memory Handling}) and a pointer to the string
+diff -Naurd src/get_str.c src/get_str.c
+--- src/get_str.c	2018-01-09 12:30:58.000000000 +0000
++++ src/get_str.c	2018-04-27 12:50:10.612974628 +0000
+@@ -2325,15 +2325,12 @@
+       */
+       m = 1 +
+         mpfr_ceil_mul (IS_POW2(b) ? MPFR_PREC(x) - 1 : MPFR_PREC(x), b, 1);
+-      if (m < 2)
+-        m = 2;
+     }
+ 
+   MPFR_LOG_MSG (("m=%zu\n", m));
+ 
+-  /* The code below for non-power-of-two bases works for m=1;
+-     this is important for the internal use of mpfr_get_str. */
+-  MPFR_ASSERTN (m >= 2 || (!IS_POW2(b) && m >= 1));
++  /* The code below works for m=1, both for power-of-two and non-power-of-two
++     bases; this is important for the internal use of mpfr_get_str. */
+ 
+   /* x is a floating-point number */
+ 
+@@ -2376,6 +2373,8 @@
+ 
+       /* the first digit will contain only r bits */
+       prec = (m - 1) * pow2 + r; /* total number of bits */
++      /* if m=1 then 1 <= prec <= pow2, and since prec=1 is now valid in MPFR,
++         the power-of-two code also works for m=1 */
+       n = MPFR_PREC2LIMBS (prec);
+ 
+       MPFR_TMP_MARK (marker);
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-04-27 12:47:54.226308446 +0000
++++ src/mpfr.h	2018-04-27 12:50:10.620974551 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p3"
++#define MPFR_VERSION_STRING "4.0.1-p4"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-04-27 12:47:54.226308446 +0000
++++ src/version.c	2018-04-27 12:50:10.624974512 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p3";
++  return "4.0.1-p4";
+ }
+diff -Naurd tests/tget_str.c tests/tget_str.c
+--- tests/tget_str.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tget_str.c	2018-04-27 12:50:10.612974628 +0000
+@@ -1267,6 +1267,41 @@
+ 
+ #define ITER 1000
+ 
++static void
++coverage (void)
++{
++  mpfr_t x;
++  char s[42];
++  mpfr_exp_t e;
++  int b = 3;
++  size_t m = 40;
++
++  mpfr_init2 (x, 128);
++
++  /* exercise corner case in mpfr_get_str_aux: exact case (e < 0), where r
++     rounds to a power of 2, and f is a multiple of GMP_NUMB_BITS */
++  mpfr_set_ui_2exp (x, 1, 64, MPFR_RNDU);
++  mpfr_nextbelow (x);
++  /* x = 2^64 - 2^(-64) */
++  mpfr_get_str (s, &e, b, m, x, MPFR_RNDU);
++  /* s is the base-3 string for 6148914691236517206 (in base 10) */
++  MPFR_ASSERTN(strcmp (s, "1111222002212212010121102012021021021200") == 0);
++  MPFR_ASSERTN(e == 41);
++
++  /* exercise corner case in mpfr_get_str: input is m=0, then it is changed
++     to m=1 */
++  mpfr_set_prec (x, 1);
++  mpfr_set_ui (x, 1, MPFR_RNDN);
++  mpfr_get_str (s, &e, 2, 0, x, MPFR_RNDN);
++  MPFR_ASSERTN(strcmp (s, "1") == 0);
++  MPFR_ASSERTN(e == 1);
++  mpfr_get_str (s, &e, 2, 1, x, MPFR_RNDN);
++  MPFR_ASSERTN(strcmp (s, "1") == 0);
++  MPFR_ASSERTN(e == 1);
++
++  mpfr_clear (x);
++}
++
+ int
+ main (int argc, char *argv[])
+ {
+@@ -1281,6 +1316,7 @@
+ 
+   tests_start_mpfr ();
+ 
++  coverage ();
+   check_small ();
+ 
+   check_special (2, 2);
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-04-27 12:52:13.875783093 +0000
++++ PATCHES	2018-04-27 12:52:13.911782747 +0000
+@@ -0,0 +1 @@
++cmp_q-special
+diff -Naurd VERSION VERSION
+--- VERSION	2018-04-27 12:50:10.624974512 +0000
++++ VERSION	2018-04-27 12:52:13.911782747 +0000
+@@ -1 +1 @@
+-4.0.1-p4
++4.0.1-p5
+diff -Naurd src/gmp_op.c src/gmp_op.c
+--- src/gmp_op.c	2018-01-09 12:30:58.000000000 +0000
++++ src/gmp_op.c	2018-04-27 12:52:13.899782862 +0000
+@@ -452,11 +452,15 @@
+   mpfr_prec_t p;
+   MPFR_SAVE_EXPO_DECL (expo);
+ 
+-  if (MPFR_UNLIKELY (mpq_denref (q) == 0))
++  if (MPFR_UNLIKELY (mpz_sgn (mpq_denref (q)) == 0))
+     {
+       /* q is an infinity or NaN */
+-      mpfr_init2 (t, 2);
++      mpfr_flags_t old_flags;
++
++      mpfr_init2 (t, MPFR_PREC_MIN);
++      old_flags = __gmpfr_flags;
+       mpfr_set_q (t, q, MPFR_RNDN);
++      __gmpfr_flags = old_flags;
+       res = mpfr_cmp (x, t);
+       mpfr_clear (t);
+       return res;
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-04-27 12:50:10.620974551 +0000
++++ src/mpfr.h	2018-04-27 12:52:13.907782785 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p4"
++#define MPFR_VERSION_STRING "4.0.1-p5"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-04-27 12:50:10.624974512 +0000
++++ src/version.c	2018-04-27 12:52:13.911782747 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p4";
++  return "4.0.1-p5";
+ }
+diff -Naurd tests/tgmpop.c tests/tgmpop.c
+--- tests/tgmpop.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tgmpop.c	2018-04-27 12:52:13.899782862 +0000
+@@ -307,16 +307,39 @@
+   mpfr_init2 (z, MPFR_PREC_MIN);
+   mpq_init (y);
+ 
+-  /* check the erange flag when x is NaN */
++  /* Check the flags when x is NaN: the erange flags must be set, and
++     only this one. */
+   mpfr_set_nan (x);
+   mpq_set_ui (y, 17, 1);
+-  mpfr_clear_erangeflag ();
++  mpfr_clear_flags ();
+   res1 = mpfr_cmp_q (x, y);
+-  if (res1 != 0 || mpfr_erangeflag_p () == 0)
++  if (res1 != 0 || __gmpfr_flags != MPFR_FLAGS_ERANGE)
+     {
+       printf ("Error for mpfr_cmp_q (NaN, 17)\n");
+       printf ("Return value: expected 0, got %d\n", res1);
+-      printf ("Erange flag: expected set, got %d\n", mpfr_erangeflag_p ());
++      printf ("Expected flags:");
++      flags_out (MPFR_FLAGS_ERANGE);
++      printf ("Got flags:     ");
++      flags_out (__gmpfr_flags);
++      exit (1);
++    }
++
++  /* Check the flags when y is NaN: the erange flags must be set, and
++     only this one. */
++  mpfr_set_ui (x, 42, MPFR_RNDN);
++  /* A NaN rational is represented by 0/0 (MPFR extension). */
++  mpz_set_ui (mpq_numref (y), 0);
++  mpz_set_ui (mpq_denref (y), 0);
++  mpfr_clear_flags ();
++  res1 = mpfr_cmp_q (x, y);
++  if (res1 != 0 || __gmpfr_flags != MPFR_FLAGS_ERANGE)
++    {
++      printf ("Error for mpfr_cmp_q (42, NaN)\n");
++      printf ("Return value: expected 0, got %d\n", res1);
++      printf ("Expected flags:");
++      flags_out (MPFR_FLAGS_ERANGE);
++      printf ("Got flags:     ");
++      flags_out (__gmpfr_flags);
+       exit (1);
+     }
+ 
+@@ -341,6 +364,55 @@
+             }
+         }
+     }
++
++  /* check for y = 1/0 */
++  mpz_set_ui (mpq_numref (y), 1);
++  mpz_set_ui (mpq_denref (y), 0);
++  mpfr_set_ui (x, 1, MPFR_RNDN);
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) < 0);
++  mpfr_set_inf (x, -1);
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) < 0);
++  mpfr_set_inf (x, +1);
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  mpfr_set_nan (x);
++  mpfr_clear_erangeflag ();
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  MPFR_ASSERTN(mpfr_erangeflag_p ());
++
++  /* check for y = -1/0 */
++  mpz_set_si (mpq_numref (y), -1);
++  mpz_set_ui (mpq_denref (y), 0);
++  mpfr_set_ui (x, 1, MPFR_RNDN);
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) > 0);
++  mpfr_set_inf (x, -1);
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  mpfr_set_inf (x, +1);
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) > 0);
++  mpfr_set_nan (x);
++  mpfr_clear_erangeflag ();
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  MPFR_ASSERTN(mpfr_erangeflag_p ());
++
++  /* check for y = 0/0 */
++  mpz_set_ui (mpq_numref (y), 0);
++  mpz_set_ui (mpq_denref (y), 0);
++  mpfr_set_ui (x, 1, MPFR_RNDN);
++  mpfr_clear_erangeflag ();
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  MPFR_ASSERTN(mpfr_erangeflag_p ());
++  mpfr_set_inf (x, -1);
++  mpfr_clear_erangeflag ();
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  MPFR_ASSERTN(mpfr_erangeflag_p ());
++  mpfr_set_inf (x, +1);
++  mpfr_clear_erangeflag ();
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  MPFR_ASSERTN(mpfr_erangeflag_p ());
++  mpfr_set_nan (x);
++  mpfr_clear_erangeflag ();
++  MPFR_ASSERTN(mpfr_cmp_q (x, y) == 0);
++  MPFR_ASSERTN(mpfr_erangeflag_p ());
++
+   mpq_clear (y);
+   mpfr_clear (x);
+   mpfr_clear (z);
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-04-27 12:54:17.862594948 +0000
++++ PATCHES	2018-04-27 12:54:17.894594642 +0000
+@@ -0,0 +1 @@
++io-null-stream
+diff -Naurd VERSION VERSION
+--- VERSION	2018-04-27 12:52:13.911782747 +0000
++++ VERSION	2018-04-27 12:54:17.894594642 +0000
+@@ -1 +1 @@
+-4.0.1-p5
++4.0.1-p6
+diff -Naurd src/inp_str.c src/inp_str.c
+--- src/inp_str.c	2018-01-09 12:30:58.000000000 +0000
++++ src/inp_str.c	2018-04-27 12:54:17.882594757 +0000
+@@ -37,9 +37,6 @@
+   int retval;
+   size_t nread;
+ 
+-  if (stream == NULL)
+-    stream = stdin;
+-
+   alloc_size = 100;
+   str = (unsigned char *) mpfr_allocate_func (alloc_size);
+   str_size = 0;
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-04-27 12:52:13.907782785 +0000
++++ src/mpfr.h	2018-04-27 12:54:17.894594642 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p5"
++#define MPFR_VERSION_STRING "4.0.1-p6"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/out_str.c src/out_str.c
+--- src/out_str.c	2018-01-09 12:30:58.000000000 +0000
++++ src/out_str.c	2018-04-27 12:54:17.882594757 +0000
+@@ -43,10 +43,6 @@
+ 
+   MPFR_ASSERTN (base >= 2 && base <= 62);
+ 
+-  /* when stream=NULL, output to stdout */
+-  if (stream == NULL)
+-    stream = stdout;
+-
+   if (MPFR_UNLIKELY (MPFR_IS_SINGULAR (op)))
+     {
+       if (MPFR_IS_NAN (op))
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-04-27 12:52:13.911782747 +0000
++++ src/version.c	2018-04-27 12:54:17.894594642 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p5";
++  return "4.0.1-p6";
+ }
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-10 15:29:07.937776370 +0000
++++ PATCHES	2018-07-10 15:29:08.017776303 +0000
+@@ -0,0 +1 @@
++tstckintc-casts
+diff -Naurd VERSION VERSION
+--- VERSION	2018-04-27 12:54:17.894594642 +0000
++++ VERSION	2018-07-10 15:29:08.017776303 +0000
+@@ -1 +1 @@
+-4.0.1-p6
++4.0.1-p7
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-04-27 12:54:17.894594642 +0000
++++ src/mpfr.h	2018-07-10 15:29:08.013776307 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p6"
++#define MPFR_VERSION_STRING "4.0.1-p7"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-04-27 12:54:17.894594642 +0000
++++ src/version.c	2018-07-10 15:29:08.017776303 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p6";
++  return "4.0.1-p7";
+ }
+diff -Naurd tests/tstckintc.c tests/tstckintc.c
+--- tests/tstckintc.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tstckintc.c	2018-07-10 15:29:07.989776327 +0000
+@@ -32,6 +32,22 @@
+ 
+ #define ALIGNED(s) (((s) + sizeof (long) - 1) / sizeof (long) * sizeof (long))
+ 
++/* This code ensures alignment to "long". However, this might not be
++   sufficient on some platforms. GCC's -Wcast-align=strict option can
++   be useful, but this needs successive casts to help GCC, e.g.
++
++   newx = (mpfr_ptr) (long *) (void *) old_stack;
++
++   successively casts old_stack (of type char *) to
++   - void *: avoid a false positive for the following cast to long *
++     (as the code takes care of alignment to "long");
++   - long *: this corresponds to the alignment checked by MPFR; coming
++     from void *, it will not trigger a warning (even if incorrect);
++   - mpfr_ptr: -Wcast-align=strict will emit a warning if mpfr_ptr has
++     an alignment requirement stronger than long *. In such a case,
++     the code will have to be fixed.
++*/
++
+ static void *
+ new_st (size_t s)
+ {
+@@ -94,12 +110,14 @@
+   void *mantissa       = mpfr_custom_get_significand (x);
+   size_t size_mantissa = mpfr_custom_get_size (mpfr_get_prec (x));
+   mpfr_ptr newx;
++  long *newx2;
+ 
+   memmove (old_stack, x, sizeof (mpfr_t));
+   memmove (old_stack + ALIGNED (sizeof (mpfr_t)), mantissa, size_mantissa);
+-  newx = (mpfr_ptr) old_stack;
+-  mpfr_custom_move (newx, old_stack + ALIGNED (sizeof (mpfr_t)));
+-  stack = old_stack + ALIGNED (sizeof (mpfr_t)) + ALIGNED (size_mantissa);
++  newx = (mpfr_ptr) (long *) (void *) old_stack;
++  newx2 = (long *) (void *) (old_stack + ALIGNED (sizeof (mpfr_t)));
++  mpfr_custom_move (newx, newx2);
++  stack = (char *) newx2 + ALIGNED (size_mantissa);
+   return newx;
+ }
+ 
+@@ -113,7 +131,7 @@
+ 
+   memmove (old_stack, x, sizeof (mpfr_t));
+   memmove (old_stack + ALIGNED (sizeof (mpfr_t)), mantissa, size_mantissa);
+-  newx = (mpfr_ptr) old_stack;
++  newx = (mpfr_ptr) (long *) (void *) old_stack;
+   (mpfr_custom_move) (newx, old_stack + ALIGNED (sizeof (mpfr_t)));
+   stack = old_stack + ALIGNED (sizeof (mpfr_t)) + ALIGNED (size_mantissa);
+   return newx;
+@@ -127,7 +145,7 @@
+   mpfr_ptr x, y;
+ 
+   reset_stack ();
+-  org = (long *) stack;
++  org = (long *) (void *) stack;
+ 
+   x = new_mpfr (p);
+   y = new_mpfr (p);
+@@ -277,7 +295,7 @@
+   long *a, *b, *c;
+ 
+   reset_stack ();
+-  org = (long *) stack;
++  org = (long *) (void *) stack;
+ 
+   a = dummy_set_si (42);
+   b = dummy_set_si (17);
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-10 15:33:45.189532503 +0000
++++ PATCHES	2018-07-10 15:33:45.265532432 +0000
+@@ -0,0 +1 @@
++set_d64-ternary
+diff -Naurd VERSION VERSION
+--- VERSION	2018-07-10 15:29:08.017776303 +0000
++++ VERSION	2018-07-10 15:33:45.261532435 +0000
+@@ -1 +1 @@
+-4.0.1-p7
++4.0.1-p8
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-07-10 15:29:08.013776307 +0000
++++ src/mpfr.h	2018-07-10 15:33:45.261532435 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p7"
++#define MPFR_VERSION_STRING "4.0.1-p8"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/set_d64.c src/set_d64.c
+--- src/set_d64.c	2018-01-09 12:30:58.000000000 +0000
++++ src/set_d64.c	2018-07-10 15:33:45.237532458 +0000
+@@ -425,7 +425,7 @@
+                       1 character for terminating \0. */
+ 
+   decimal64_to_string (s, d);
+-  return mpfr_set_str (r, s, 10, rnd_mode);
++  return mpfr_strtofr (r, s, NULL, 10, rnd_mode);
+ }
+ 
+ #endif /* MPFR_WANT_DECIMAL_FLOATS */
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-07-10 15:29:08.017776303 +0000
++++ src/version.c	2018-07-10 15:33:45.261532435 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p7";
++  return "4.0.1-p8";
+ }
+diff -Naurd tests/tget_set_d64.c tests/tget_set_d64.c
+--- tests/tget_set_d64.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tget_set_d64.c	2018-07-10 15:33:45.237532458 +0000
+@@ -381,6 +381,66 @@
+   mpfr_clear (x);
+ }
+ 
++static void
++powers_of_10 (void)
++{
++  mpfr_t x1, x2;
++  _Decimal64 d[2];
++  int i, rnd;
++  unsigned int neg;
++
++  mpfr_inits2 (200, x1, x2, (mpfr_ptr) 0);
++  for (i = 0, d[0] = 1, d[1] = 1; i < 150; i++, d[0] *= 10, d[1] /= 10)
++    for (neg = 0; neg <= 3; neg++)
++      RND_LOOP_NO_RNDF (rnd)
++        {
++          int inex1, inex2;
++          mpfr_flags_t flags1, flags2;
++          mpfr_rnd_t rx1;
++          _Decimal64 dd;
++
++          inex1 = mpfr_set_si (x1, (neg >> 1) ? -i : i, MPFR_RNDN);
++          MPFR_ASSERTN (inex1 == 0);
++
++          rx1 = (neg & 1) ?
++            MPFR_INVERT_RND ((mpfr_rnd_t) rnd) : (mpfr_rnd_t) rnd;
++          mpfr_clear_flags ();
++          inex1 = mpfr_exp10 (x1, x1, rx1);
++          flags1 = __gmpfr_flags;
++
++          dd = d[neg >> 1];
++
++          if (neg & 1)
++            {
++              MPFR_SET_NEG (x1);
++              inex1 = -inex1;
++              dd = -dd;
++            }
++
++          mpfr_clear_flags ();
++          inex2 = mpfr_set_decimal64 (x2, dd, (mpfr_rnd_t) rnd);
++          flags2 = __gmpfr_flags;
++
++          if (!(mpfr_equal_p (x1, x2) &&
++                SAME_SIGN (inex1, inex2) &&
++                flags1 == flags2))
++            {
++              printf ("Error in powers_of_10 for i=%d, neg=%d, %s\n",
++                      i, neg, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
++              printf ("Expected ");
++              mpfr_dump (x1);
++              printf ("with inex = %d and flags =", inex1);
++              flags_out (flags1);
++              printf ("Got      ");
++              mpfr_dump (x2);
++              printf ("with inex = %d and flags =", inex2);
++              flags_out (flags2);
++              exit (1);
++            }
++        }
++  mpfr_clears (x1, x2, (mpfr_ptr) 0);
++}
++
+ int
+ main (void)
+ {
+@@ -401,6 +461,7 @@
+   check_overflow ();
+ #endif
+   check_tiny ();
++  powers_of_10 ();
+ 
+   tests_end_mpfr ();
+   return 0;
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-10 15:46:13.596797032 +0000
++++ PATCHES	2018-07-10 15:46:13.676796949 +0000
+@@ -0,0 +1 @@
++buffer_sandwich
+diff -Naurd VERSION VERSION
+--- VERSION	2018-07-10 15:33:45.261532435 +0000
++++ VERSION	2018-07-10 15:46:13.676796949 +0000
+@@ -1 +1 @@
+-4.0.1-p8
++4.0.1-p9
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-07-10 15:33:45.261532435 +0000
++++ src/mpfr.h	2018-07-10 15:46:13.672796954 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p8"
++#define MPFR_VERSION_STRING "4.0.1-p9"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/vasprintf.c src/vasprintf.c
+--- src/vasprintf.c	2018-01-09 12:30:58.000000000 +0000
++++ src/vasprintf.c	2018-07-10 15:46:13.648796978 +0000
+@@ -683,20 +683,31 @@
+   else
+     {
+       const size_t step = 3;
+-      const size_t size = len + tz;
+-      const size_t r = size % step == 0 ? step : size % step;
+-      const size_t q = size % step == 0 ? size / step - 1 : size / step;
+-      const size_t fullsize = size + q;
+-      size_t i;
++      size_t size, q, r, fullsize;
+ 
++      /* check that len + tz does not overflow */
++      if (len > (size_t) -1 - tz)
++        return 1;
++
++      size = len + tz;              /* number of digits */
+       MPFR_ASSERTD (size > 0);
+ 
++      q = (size - 1) / step;        /* number of separators C */
++      r = ((size - 1) % step) + 1;  /* number of digits in the leftmost block */
++
++      /* check that size + q does not overflow */
++      if (size > (size_t) -1 - q)
++        return 1;
++
++      fullsize = size + q;          /* number of digits and separators */
++
+       if (buffer_incr_len (b, fullsize))
+         return 1;
+ 
+       if (b->size != 0)
+         {
+           char *oldcurr;
++          size_t i;
+ 
+           MPFR_ASSERTD (*b->curr == '\0');
+           MPFR_ASSERTN (b->size < ((size_t) -1) - fullsize);
+@@ -705,11 +716,21 @@
+ 
+           MPFR_DBGRES (oldcurr = b->curr);
+ 
+-          /* first R significant digits */
+-          memcpy (b->curr, str, r);
++          /* first r significant digits (leftmost block) */
++          if (r <= len)
++            {
++              memcpy (b->curr, str, r);
++              str += r;
++              len -= r;
++            }
++          else
++            {
++              MPFR_ASSERTD (r > len);
++              memcpy (b->curr, str, len);
++              memset (b->curr + len, '0', r - len);
++              len = 0;
++            }
+           b->curr += r;
+-          str += r;
+-          len -= r;
+ 
+           /* blocks of thousands. Warning: STR might end in the middle of a block */
+           for (i = 0; i < q; ++i)
+@@ -722,6 +743,7 @@
+                     {
+                       memcpy (b->curr, str, step);
+                       len -= step;
++                      str += step;
+                     }
+                   else
+                     /* last digits in STR, fill up thousand block with zeros */
+@@ -736,7 +758,6 @@
+                 memset (b->curr, '0', step);
+ 
+               b->curr += step;
+-              str += step;
+             }
+ 
+           MPFR_ASSERTD (b->curr - oldcurr == fullsize);
+@@ -1920,8 +1941,14 @@
+   /* integral part (may also be "nan" or "inf") */
+   MPFR_ASSERTN (np.ip_ptr != NULL); /* never empty */
+   if (MPFR_UNLIKELY (np.thousands_sep))
+-    buffer_sandwich (buf, np.ip_ptr, np.ip_size, np.ip_trailing_zeros,
+-                     np.thousands_sep);
++    {
++      if (buffer_sandwich (buf, np.ip_ptr, np.ip_size, np.ip_trailing_zeros,
++                           np.thousands_sep))
++        {
++          buf->len = -1;
++          goto clear_and_exit;
++        }
++    }
+   else
+     {
+       buffer_cat (buf, np.ip_ptr, np.ip_size);
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-07-10 15:33:45.261532435 +0000
++++ src/version.c	2018-07-10 15:46:13.672796954 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p8";
++  return "4.0.1-p9";
+ }
+diff -Naurd tests/tprintf.c tests/tprintf.c
+--- tests/tprintf.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tprintf.c	2018-07-10 15:46:13.648796978 +0000
+@@ -31,6 +31,10 @@
+ #include <stddef.h>
+ #include <errno.h>
+ 
++#ifdef HAVE_LOCALE_H
++#include <locale.h>
++#endif
++
+ #include "mpfr-intmax.h"
+ #include "mpfr-test.h"
+ #define STDOUT_FILENO 1
+@@ -474,30 +478,41 @@
+   mpfr_clear (x);
+ }
+ 
+-#ifdef HAVE_LOCALE_H
+-
+-#include <locale.h>
+-
+-const char * const tab_locale[] = {
+-  "en_US",
+-  "en_US.iso88591",
+-  "en_US.iso885915",
+-  "en_US.utf8"
+-};
++#if defined(HAVE_LOCALE_H) && defined(HAVE_SETLOCALE)
+ 
+ static void
+ test_locale (void)
+ {
++  const char * const tab_locale[] = {
++    "en_US",
++    "en_US.iso88591",
++    "en_US.iso885915",
++    "en_US.utf8"
++  };
+   int i;
+-  char *s = NULL;
+   mpfr_t x;
+   int count;
++  char v[] = "99999999999999999999999.5";
+ 
+-  for(i = 0; i < numberof(tab_locale) && s == NULL; i++)
+-    s = setlocale (LC_ALL, tab_locale[i]);
++  for (i = 0; i < numberof(tab_locale); i++)
++    {
++      char *s;
+ 
+-  if (s == NULL || MPFR_THOUSANDS_SEPARATOR != ',')
+-    return;
++      s = setlocale (LC_ALL, tab_locale[i]);
++
++      if (s != NULL && MPFR_THOUSANDS_SEPARATOR == ',')
++        break;
++    }
++
++  if (i == numberof(tab_locale))
++    {
++      if (getenv ("MPFR_CHECK_LOCALES") == NULL)
++        return;
++
++      fprintf (stderr, "Cannot find a locale with ',' thousands separator.\n"
++               "Please install one of the en_US based locales.\n");
++      exit (1);
++    }
+ 
+   mpfr_init2 (x, 113);
+   mpfr_set_ui (x, 10000, MPFR_RNDN);
+@@ -507,6 +522,50 @@
+   count = mpfr_printf ("(2) 10000=%'Rf \n", x);
+   check_length (10001, count, 25, d);
+ 
++  mpfr_set_ui (x, 1000, MPFR_RNDN);
++  count = mpfr_printf ("(3) 1000=%'Rf \n", x);
++  check_length (10002, count, 23, d);
++
++  for (i = 1; i <= sizeof (v) - 3; i++)
++    {
++      mpfr_set_str (x, v + sizeof (v) - 3 - i, 10, MPFR_RNDN);
++      count = mpfr_printf ("(4) 10^i=%'.0Rf \n", x);
++      check_length (10002 + i, count, 12 + i + i/3, d);
++    }
++
++#define N0 20
++
++  for (i = 1; i <= N0; i++)
++    {
++      char s[N0+4];
++      int j, rnd;
++
++      s[0] = '1';
++      for (j = 1; j <= i; j++)
++        s[j] = '0';
++      s[i+1] = '\0';
++
++      mpfr_set_str (x, s, 10, MPFR_RNDN);
++
++      RND_LOOP (rnd)
++        {
++          count = mpfr_printf ("(5) 10^i=%'.0R*f \n", (mpfr_rnd_t) rnd, x);
++          check_length (11000 + 10 * i + rnd, count, 12 + i + i/3, d);
++        }
++
++      strcat (s + (i + 1), ".5");
++      count = mpfr_printf ("(5) 10^i=%'.0Rf \n", x);
++      check_length (11000 + 10 * i + 9, count, 12 + i + i/3, d);
++    }
++
++  mpfr_set_str (x, "1000", 10, MPFR_RNDN);
++  count = mpfr_printf ("%'012.3Rg\n", x);
++  check_length (12000, count, 13, d);
++  count = mpfr_printf ("%'012.4Rg\n", x);
++  check_length (12001, count, 13, d);
++  count = mpfr_printf ("%'013.4Rg\n", x);
++  check_length (12002, count, 14, d);
++
+   mpfr_clear (x);
+ }
+ 
+@@ -515,7 +574,11 @@
+ static void
+ test_locale (void)
+ {
+-  /* Nothing */
++  if (getenv ("MPFR_CHECK_LOCALES") != NULL)
++    {
++      fprintf (stderr, "Cannot test locales.\n");
++      exit (1);
++    }
+ }
+ 
+ #endif
+diff -Naurd tests/tsprintf.c tests/tsprintf.c
+--- tests/tsprintf.c	2018-01-10 10:15:30.000000000 +0000
++++ tests/tsprintf.c	2018-07-10 15:46:13.648796978 +0000
+@@ -380,7 +380,7 @@
+   check_sprintf ("1.00                ", "%-#20.3RG", x);
+   check_sprintf ("0.9999              ", "%-#20.4RG", x);
+ 
+-  /* multiple of 10 */
++  /* powers of 10 */
+   mpfr_set_str (x, "1e17", 10, MPFR_RNDN);
+   check_sprintf ("1e+17", "%Re", x);
+   check_sprintf ("1.000e+17", "%.3Re", x);
+@@ -402,7 +402,7 @@
+   check_sprintf ("1", "%.0RUf", x);
+   check_sprintf ("1", "%.0RYf", x);
+ 
+-  /* multiple of 10 with 'g' style */
++  /* powers of 10 with 'g' style */
+   mpfr_set_str (x, "10", 10, MPFR_RNDN);
+   check_sprintf ("10", "%Rg", x);
+   check_sprintf ("1e+01", "%.0Rg", x);
+@@ -419,6 +419,12 @@
+   check_sprintf ("1e+03", "%.0Rg", x);
+   check_sprintf ("1e+03", "%.3Rg", x);
+   check_sprintf ("1000", "%.4Rg", x);
++  check_sprintf ("1e+03", "%.3Rg", x);
++  check_sprintf ("1000", "%.4Rg", x);
++  check_sprintf ("    1e+03", "%9.3Rg", x);
++  check_sprintf ("     1000", "%9.4Rg", x);
++  check_sprintf ("00001e+03", "%09.3Rg", x);
++  check_sprintf ("000001000", "%09.4Rg", x);
+ 
+   mpfr_ui_div (x, 1, x, MPFR_RNDN);
+   check_sprintf ("0.001", "%Rg", x);
+@@ -430,6 +436,10 @@
+   check_sprintf ("1e+05", "%.0Rg", x);
+   check_sprintf ("1e+05", "%.5Rg", x);
+   check_sprintf ("100000", "%.6Rg", x);
++  check_sprintf ("            1e+05", "%17.5Rg", x);
++  check_sprintf ("           100000", "%17.6Rg", x);
++  check_sprintf ("0000000000001e+05", "%017.5Rg", x);
++  check_sprintf ("00000000000100000", "%017.6Rg", x);
+ 
+   mpfr_ui_div (x, 1, x, MPFR_RNDN);
+   check_sprintf ("1e-05", "%Rg", x);
+@@ -857,6 +867,12 @@
+                   "%.*Zi, %R*e, %Lf", 20, mpz, rnd, x, d);
+ #endif
+ 
++  /* check invalid spec.spec */
++  check_vsprintf ("%,", "%,");
++
++  /* check empty format */
++  check_vsprintf ("%", "%");
++
+   mpf_clear (mpf);
+   mpq_clear (mpq);
+   mpz_clear (mpz);
+@@ -864,12 +880,12 @@
+   return 0;
+ }
+ 
+-#if MPFR_LCONV_DPTS
++#if defined(HAVE_LOCALE_H) && defined(HAVE_SETLOCALE) && MPFR_LCONV_DPTS
+ 
+ /* Check with locale "da_DK". On most platforms, decimal point is ','
+    and thousands separator is '.'; the test is not performed if this
+    is not the case or if the locale doesn't exist. */
+-static int
++static void
+ locale_da_DK (void)
+ {
+   mpfr_prec_t p = 128;
+@@ -878,7 +894,16 @@
+   if (setlocale (LC_ALL, "da_DK") == 0 ||
+       localeconv()->decimal_point[0] != ',' ||
+       localeconv()->thousands_sep[0] != '.')
+-    return 0;
++    {
++      setlocale (LC_ALL, "C");
++
++      if (getenv ("MPFR_CHECK_LOCALES") == NULL)
++        return;
++
++      fprintf (stderr,
++               "Cannot test the da_DK locale (not found or inconsistent).\n");
++      exit (1);
++    }
+ 
+   mpfr_init2 (x, p);
+ 
+@@ -917,10 +942,11 @@
+   check_sprintf ("100" S2 "0000", "%'.4Rf", x);
+ 
+   mpfr_clear (x);
+-  return 0;
++
++  setlocale (LC_ALL, "C");
+ }
+ 
+-#endif  /* MPFR_LCONV_DPTS */
++#endif  /* ... && MPFR_LCONV_DPTS */
+ 
+ /* check concordance between mpfr_asprintf result with a regular mpfr float
+    and with a regular double float */
+@@ -1425,6 +1451,117 @@
+     exit (1);
+ }
+ 
++#if defined(HAVE_LOCALE_H) && defined(HAVE_SETLOCALE)
++
++/* The following tests should be equivalent to those from test_locale()
++   in tprintf.c (remove the \n at the end of the test strings). */
++
++static void
++test_locale (void)
++{
++  const char * const tab_locale[] = {
++    "en_US",
++    "en_US.iso88591",
++    "en_US.iso885915",
++    "en_US.utf8"
++  };
++  int i;
++  mpfr_t x;
++  char v[] = "99999999999999999999999.5";
++
++  for (i = 0; i < numberof(tab_locale); i++)
++    {
++      char *s;
++
++      s = setlocale (LC_ALL, tab_locale[i]);
++
++      if (s != NULL && MPFR_THOUSANDS_SEPARATOR == ',')
++        break;
++    }
++
++  if (i == numberof(tab_locale))
++    {
++      if (getenv ("MPFR_CHECK_LOCALES") == NULL)
++        return;
++
++      fprintf (stderr, "Cannot find a locale with ',' thousands separator.\n"
++               "Please install one of the en_US based locales.\n");
++      exit (1);
++    }
++
++  mpfr_init2 (x, 113);
++  mpfr_set_ui (x, 10000, MPFR_RNDN);
++
++  check_sprintf ("(1) 10000=10,000 ", "(1) 10000=%'Rg ", x);
++  check_sprintf ("(2) 10000=10,000.000000 ", "(2) 10000=%'Rf ", x);
++
++  mpfr_set_ui (x, 1000, MPFR_RNDN);
++  check_sprintf ("(3) 1000=1,000.000000 ", "(3) 1000=%'Rf ", x);
++
++  for (i = 1; i <= sizeof (v) - 3; i++)
++    {
++      char buf[64];
++      int j;
++
++      strcpy (buf, "(4) 10^i=1");
++      for (j = i; j > 0; j--)
++        strcat (buf, ",0" + (j % 3 != 0));
++      strcat (buf, " ");
++      mpfr_set_str (x, v + sizeof (v) - 3 - i, 10, MPFR_RNDN);
++      check_sprintf (buf, "(4) 10^i=%'.0Rf ", x);
++    }
++
++#define N0 20
++
++  for (i = 1; i <= N0; i++)
++    {
++      char s[N0+4], buf[64];
++      int j;
++
++      s[0] = '1';
++      for (j = 1; j <= i; j++)
++        s[j] = '0';
++      s[i+1] = '\0';
++
++      strcpy (buf, "(5) 10^i=1");
++      for (j = i; j > 0; j--)
++        strcat (buf, ",0" + (j % 3 != 0));
++      strcat (buf, " ");
++
++      mpfr_set_str (x, s, 10, MPFR_RNDN);
++
++      check_sprintf (buf, "(5) 10^i=%'.0RNf ", x);
++      check_sprintf (buf, "(5) 10^i=%'.0RZf ", x);
++      check_sprintf (buf, "(5) 10^i=%'.0RUf ", x);
++      check_sprintf (buf, "(5) 10^i=%'.0RDf ", x);
++      check_sprintf (buf, "(5) 10^i=%'.0RYf ", x);
++
++      strcat (s + (i + 1), ".5");
++      check_sprintf (buf, "(5) 10^i=%'.0Rf ", x);
++    }
++
++  mpfr_set_str (x, "1000", 10, MPFR_RNDN);
++  check_sprintf ("00000001e+03", "%'012.3Rg", x);
++  check_sprintf ("00000001,000", "%'012.4Rg", x);
++  check_sprintf ("000000001,000", "%'013.4Rg", x);
++
++  mpfr_clear (x);
++}
++
++#else
++
++static void
++test_locale (void)
++{
++  if (getenv ("MPFR_CHECK_LOCALES") != NULL)
++    {
++      fprintf (stderr, "Cannot test locales.\n");
++      exit (1);
++    }
++}
++
++#endif
++
+ int
+ main (int argc, char **argv)
+ {
+@@ -1446,12 +1583,14 @@
+       binary ();
+       decimal ();
+ 
+-#if defined(HAVE_LOCALE_H) && defined(HAVE_SETLOCALE)
+-#if MPFR_LCONV_DPTS
++#if defined(HAVE_LOCALE_H) && defined(HAVE_SETLOCALE) && MPFR_LCONV_DPTS
+       locale_da_DK ();
+-  /* Avoid a warning by doing the setlocale outside of this #if */
+-#endif
+-      setlocale (LC_ALL, "C");
++#else
++      if (getenv ("MPFR_CHECK_LOCALES") != NULL)
++        {
++          fprintf (stderr, "Cannot test locales.\n");
++          exit (1);
++        }
+ #endif
+     }
+ 
+@@ -1462,6 +1601,7 @@
+   snprintf_size ();
+   percent_n ();
+   mixed ();
++  test_locale ();
+ 
+   if (getenv ("MPFR_CHECK_LIBC_PRINTF"))
+     {
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-23 08:30:20.241198970 +0000
++++ PATCHES	2018-07-23 08:30:20.269198598 +0000
+@@ -0,0 +1 @@
++tconst_pi
+diff -Naurd VERSION VERSION
+--- VERSION	2018-07-10 15:46:13.676796949 +0000
++++ VERSION	2018-07-23 08:30:20.269198598 +0000
+@@ -1 +1 @@
+-4.0.1-p9
++4.0.1-p10
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-07-10 15:46:13.672796954 +0000
++++ src/mpfr.h	2018-07-23 08:30:20.269198598 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p9"
++#define MPFR_VERSION_STRING "4.0.1-p10"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-07-10 15:46:13.672796954 +0000
++++ src/version.c	2018-07-23 08:30:20.269198598 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p9";
++  return "4.0.1-p10";
+ }
+diff -Naurd tests/tconst_pi.c tests/tconst_pi.c
+--- tests/tconst_pi.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/tconst_pi.c	2018-07-23 08:30:20.261198705 +0000
+@@ -81,9 +81,11 @@
+ 
+ # define RUN_PTHREAD_TEST()                                             \
+   (MPFR_ASSERTN(mpfr_buildopt_sharedcache_p() == 1), run_pthread_test())
++
+ #else
+-# define RUN_PTHREAD_TEST() \
+-  (MPFR_ASSERTN(mpfr_buildopt_sharedcache_p() == 0))
++
++# define RUN_PTHREAD_TEST() ((void) 0)
++
+ #endif
+ 
+ /* tconst_pi [prec] [rnd] [0 = no print] */
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-23 08:39:40.951246327 +0000
++++ PATCHES	2018-07-23 08:39:40.983246047 +0000
+@@ -0,0 +1 @@
++erf
+diff -Naurd VERSION VERSION
+--- VERSION	2018-07-23 08:30:20.269198598 +0000
++++ VERSION	2018-07-23 08:39:40.983246047 +0000
+@@ -1 +1 @@
+-4.0.1-p10
++4.0.1-p11
+diff -Naurd src/erf.c src/erf.c
+--- src/erf.c	2018-01-09 12:30:58.000000000 +0000
++++ src/erf.c	2018-07-23 08:39:40.971246153 +0000
+@@ -186,10 +186,8 @@
+ {
+   mpfr_prec_t n, m;
+   mpfr_exp_t nuk, sigmak;
+-  double tauk;
+   mpfr_t y, s, t, u;
+   unsigned int k;
+-  int log2tauk;
+   int inex;
+   MPFR_GROUP_DECL (group);
+   MPFR_ZIV_DECL (loop);
+@@ -204,10 +202,14 @@
+   MPFR_ZIV_INIT (loop, m);
+   for (;;)
+     {
++      mpfr_t tauk;
++      mpfr_exp_t log2tauk;
++
+       mpfr_mul (y, x, x, MPFR_RNDU); /* err <= 1 ulp */
+       mpfr_set_ui (s, 1, MPFR_RNDN);
+       mpfr_set_ui (t, 1, MPFR_RNDN);
+-      tauk = 0.0;
++      mpfr_init2 (tauk, 53);
++      mpfr_set_ui (tauk, 0, MPFR_RNDU);
+ 
+       for (k = 1; ; k++)
+         {
+@@ -222,12 +224,13 @@
+           sigmak -= MPFR_GET_EXP(s);
+           nuk = MPFR_GET_EXP(u) - MPFR_GET_EXP(s);
+ 
+-          if ((nuk < - (mpfr_exp_t) m) && ((double) k >= xf2))
++          if ((nuk < - (mpfr_exp_t) m) && (k >= xf2))
+             break;
+ 
+           /* tauk <- 1/2 + tauk * 2^sigmak + (1+8k)*2^nuk */
+-          tauk = 0.5 + mul_2exp (tauk, sigmak)
+-            + mul_2exp (1.0 + 8.0 * (double) k, nuk);
++          mpfr_mul_2si (tauk, tauk, sigmak, MPFR_RNDU);
++          mpfr_add_d (tauk, tauk, 0.5 + mul_2exp (1.0 + 8.0 * (double) k, nuk),
++                      MPFR_RNDU);
+         }
+ 
+       mpfr_mul (s, x, s, MPFR_RNDU);
+@@ -236,8 +239,14 @@
+       mpfr_const_pi (t, MPFR_RNDZ);
+       mpfr_sqrt (t, t, MPFR_RNDZ);
+       mpfr_div (s, s, t, MPFR_RNDN);
+-      tauk = 4.0 * tauk + 11.0; /* final ulp-error on s */
+-      log2tauk = __gmpfr_ceil_log2 (tauk);
++      /* tauk = 4 * tauk + 11: final ulp-error on s */
++      mpfr_mul_2ui (tauk, tauk, 2, MPFR_RNDU);
++      mpfr_add_ui (tauk, tauk, 11, MPFR_RNDU);
++      /* In practice, one should not get an infinity, as it would require
++         a huge precision and a lot of time, but just in case... */
++      MPFR_ASSERTN (!MPFR_IS_INF (tauk));
++      log2tauk = MPFR_GET_EXP (tauk);
++      mpfr_clear (tauk);
+ 
+       if (MPFR_LIKELY (MPFR_CAN_ROUND (s, m - log2tauk, n, rnd_mode)))
+         break;
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-07-23 08:30:20.269198598 +0000
++++ src/mpfr.h	2018-07-23 08:39:40.983246047 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p10"
++#define MPFR_VERSION_STRING "4.0.1-p11"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-07-23 08:30:20.269198598 +0000
++++ src/version.c	2018-07-23 08:39:40.983246047 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p10";
++  return "4.0.1-p11";
+ }
+diff -Naurd tests/terf.c tests/terf.c
+--- tests/terf.c	2018-01-09 12:30:58.000000000 +0000
++++ tests/terf.c	2018-07-23 08:39:40.971246153 +0000
+@@ -638,6 +638,20 @@
+   mpfr_set_emax (emax);
+ }
+ 
++/* Similar to a bug reported by Naoki Shibata:
++   https://sympa.inria.fr/sympa/arc/mpfr/2018-07/msg00028.html
++*/
++static void
++bug20180723 (void)
++{
++  mpfr_t x;
++
++  mpfr_init2 (x, 256);
++  mpfr_set_ui (x, 28, MPFR_RNDN);
++  mpfr_erfc (x, x, MPFR_RNDN);
++  mpfr_clear (x);
++}
++
+ int
+ main (int argc, char *argv[])
+ {
+@@ -648,9 +662,10 @@
+   large_arg ();
+   test_erfc ();
+   reduced_expo_range ();
++  bug20180723 ();
+ 
+-  test_generic_erf (MPFR_PREC_MIN, 100, 15);
+-  test_generic_erfc (MPFR_PREC_MIN, 100, 15);
++  test_generic_erf (MPFR_PREC_MIN, 300, 150);
++  test_generic_erfc (MPFR_PREC_MIN, 300, 150);
+ 
+   data_check ("data/erf",  mpfr_erf,  "mpfr_erf");
+   data_check ("data/erfc", mpfr_erfc, "mpfr_erfc");
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-31 11:21:08.747432173 +0000
++++ PATCHES	2018-07-31 11:21:08.887430085 +0000
+@@ -0,0 +1 @@
++vasprintf-error-ub
+diff -Naurd VERSION VERSION
+--- VERSION	2018-07-23 08:39:40.983246047 +0000
++++ VERSION	2018-07-31 11:21:08.887430085 +0000
+@@ -1 +1 @@
+-4.0.1-p11
++4.0.1-p12
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-07-23 08:39:40.983246047 +0000
++++ src/mpfr.h	2018-07-31 11:21:08.887430085 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p11"
++#define MPFR_VERSION_STRING "4.0.1-p12"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/vasprintf.c src/vasprintf.c
+--- src/vasprintf.c	2018-07-10 15:46:13.648796978 +0000
++++ src/vasprintf.c	2018-07-31 11:21:08.771431816 +0000
+@@ -33,11 +33,22 @@
+    So, for the time being, we return a negative value and set the erange
+    flag, and set errno to EOVERFLOW in POSIX system. */
+ 
+-/* Note: Due to limitations from the C standard and GMP, if
+-   size_t < unsigned int (which is allowed by the C standard but unlikely
+-   to occur on any platform), the behavior is undefined for output that
+-   would reach SIZE_MAX = (size_t) -1 (if the result cannot be delivered,
+-   there should be an assertion failure, but this could not be tested). */
++/* Notes about limitations on some platforms:
++
++   Due to limitations from the C standard and GMP, if size_t < unsigned int
++   (which is allowed by the C standard but unlikely to occur on any
++   platform), the behavior is undefined for output that would reach
++   SIZE_MAX = (size_t) -1 (if the result cannot be delivered, there should
++   be an assertion failure, but this could not be tested).
++
++   The stdarg(3) Linux man page says:
++      On some systems, va_end contains a closing '}' matching a '{' in
++      va_start, so that both macros must occur in the same function,
++      and in a way that allows this.
++   However, the only requirement from ISO C is that both macros must be
++   invoked in the same function (MPFR uses va_copy instead of va_start,
++   but the requirement is the same). Here, MPFR just follows ISO C.
++*/
+ 
+ #ifdef HAVE_CONFIG_H
+ # include "config.h"
+@@ -2273,44 +2284,42 @@
+ 
+   va_end (ap2);
+ 
+-  if (buf.len > INT_MAX)  /* overflow */
+-    buf.len = -1;
++  if (buf.len == -1 || buf.len > INT_MAX)  /* overflow */
++    goto overflow;
+ 
+-  if (buf.len != -1)
+-    {
+-      nbchar = buf.len;
+-      MPFR_ASSERTD (nbchar >= 0);
++  nbchar = buf.len;
++  MPFR_ASSERTD (nbchar >= 0);
+ 
+-      if (ptr != NULL)  /* implement mpfr_vasprintf */
++  if (ptr != NULL)  /* implement mpfr_vasprintf */
++    {
++      MPFR_ASSERTD (nbchar == strlen (buf.start));
++      *ptr = (char *) mpfr_reallocate_func (buf.start, buf.size, nbchar + 1);
++    }
++  else if (size != 0)  /* implement mpfr_vsnprintf */
++    {
++      if (nbchar < size)
+         {
+-          MPFR_ASSERTD (nbchar == strlen (buf.start));
+-          *ptr = (char *)
+-            mpfr_reallocate_func (buf.start, buf.size, nbchar + 1);
++          strncpy (Buf, buf.start, nbchar);
++          Buf[nbchar] = '\0';
+         }
+-      else if (size > 0)  /* implement mpfr_vsnprintf */
++      else
+         {
+-          if (nbchar < size)
+-            {
+-              strncpy (Buf, buf.start, nbchar);
+-              Buf[nbchar] = '\0';
+-            }
+-          else
+-            {
+-              strncpy (Buf, buf.start, size - 1);
+-              Buf[size-1] = '\0';
+-            }
+-          mpfr_free_func (buf.start, buf.size);
++          strncpy (Buf, buf.start, size - 1);
++          Buf[size-1] = '\0';
+         }
+-
+-      MPFR_SAVE_EXPO_FREE (expo);
+-      return nbchar; /* return the number of characters that would have
+-                        been written had 'size' been sufficiently large,
+-                        not counting the terminating null character */
++      mpfr_free_func (buf.start, buf.size);
+     }
+ 
++  MPFR_SAVE_EXPO_FREE (expo);
++  return nbchar; /* return the number of characters that would have
++                    been written had 'size' been sufficiently large,
++                    not counting the terminating null character */
++
+  error:
++  va_end (ap2);
+   if (buf.len == -1)  /* overflow */
+     {
++    overflow:
+       MPFR_LOG_MSG (("Overflow\n", 0));
+       MPFR_SAVE_EXPO_UPDATE_FLAGS (expo, MPFR_FLAGS_ERANGE);
+ #ifdef EOVERFLOW
+@@ -2320,8 +2329,10 @@
+     }
+ 
+   MPFR_SAVE_EXPO_FREE (expo);
+-  *ptr = NULL;
+-  mpfr_free_func (buf.start, buf.size);
++  if (ptr != NULL)  /* implement mpfr_vasprintf */
++    *ptr = NULL;
++  if (ptr != NULL || size != 0)
++    mpfr_free_func (buf.start, buf.size);
+ 
+   return -1;
+ }
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-07-23 08:39:40.983246047 +0000
++++ src/version.c	2018-07-31 11:21:08.887430085 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p11";
++  return "4.0.1-p12";
+ }
+diff -Naurd PATCHES PATCHES
+--- PATCHES	2018-07-31 11:26:25.226690969 +0000
++++ PATCHES	2018-07-31 11:26:25.262690428 +0000
+@@ -0,0 +1 @@
++vasprintf-p-length-modifier
+diff -Naurd VERSION VERSION
+--- VERSION	2018-07-31 11:21:08.887430085 +0000
++++ VERSION	2018-07-31 11:26:25.262690428 +0000
+@@ -1 +1 @@
+-4.0.1-p12
++4.0.1-p13
+diff -Naurd src/mpfr.h src/mpfr.h
+--- src/mpfr.h	2018-07-31 11:21:08.887430085 +0000
++++ src/mpfr.h	2018-07-31 11:26:25.262690428 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 1
+-#define MPFR_VERSION_STRING "4.0.1-p12"
++#define MPFR_VERSION_STRING "4.0.1-p13"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd src/vasprintf.c src/vasprintf.c
+--- src/vasprintf.c	2018-07-31 11:21:08.771431816 +0000
++++ src/vasprintf.c	2018-07-31 11:26:25.246690670 +0000
+@@ -259,6 +259,8 @@
+     }
+ }
+ 
++/* Note: additional flags should be added to the MPFR_PREC_ARG code
++   for gmp_asprintf (when supported). */
+ static const char *
+ parse_flags (const char *format, struct printf_spec *specinfo)
+ {
+@@ -2220,7 +2222,7 @@
+         /* output mpfr_prec_t variable */
+         {
+           char *s;
+-          char format[MPFR_PREC_FORMAT_SIZE + 6]; /* see examples below */
++          char format[MPFR_PREC_FORMAT_SIZE + 12]; /* e.g. "%0#+ -'*.*ld\0" */
+           size_t length;
+           mpfr_prec_t prec;
+ 
+@@ -2232,14 +2234,14 @@
+           start = fmt;
+ 
+           /* construct format string, like "%*.*hd" "%*.*d" or "%*.*ld" */
+-          format[0] = '%';
+-          format[1] = '*';
+-          format[2] = '.';
+-          format[3] = '*';
+-          format[4] = '\0';
+-          strcat (format, MPFR_PREC_FORMAT_TYPE);
+-          format[4 + MPFR_PREC_FORMAT_SIZE] = spec.spec;
+-          format[5 + MPFR_PREC_FORMAT_SIZE] = '\0';
++          sprintf (format, "%%%s%s%s%s%s%s*.*" MPFR_PREC_FORMAT_TYPE "%c",
++                   spec.pad == '0' ? "0" : "",
++                   spec.alt ? "#" : "",
++                   spec.showsign ? "+" : "",
++                   spec.space ? " " : "",
++                   spec.left ? "-" : "",
++                   spec.group ? "'" : "",
++                   spec.spec);
+           length = gmp_asprintf (&s, format, spec.width, spec.prec, prec);
+           MPFR_ASSERTN (length >= 0);  /* guaranteed by GMP 6 */
+           buffer_cat (&buf, s, length);
+diff -Naurd src/version.c src/version.c
+--- src/version.c	2018-07-31 11:21:08.887430085 +0000
++++ src/version.c	2018-07-31 11:26:25.262690428 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.1-p12";
++  return "4.0.1-p13";
+ }
+diff -Naurd tests/tsprintf.c tests/tsprintf.c
+--- tests/tsprintf.c	2018-07-10 15:46:13.648796978 +0000
++++ tests/tsprintf.c	2018-07-31 11:26:25.250690608 +0000
+@@ -232,6 +232,22 @@
+   /* specifier 'P' for precision */
+   check_vsprintf ("128", "%Pu", p);
+   check_vsprintf ("00128", "%.5Pu", p);
++  check_vsprintf ("  128", "%5Pu", p);
++  check_vsprintf ("000128", "%06Pu", p);
++  check_vsprintf ("128    :", "%-7Pu:", p);
++  check_vsprintf ("000128:", "%-2.6Pd:", p);
++  check_vsprintf ("  000128:", "%8.6Pd:", p);
++  check_vsprintf ("000128  :", "%-8.6Pd:", p);
++  check_vsprintf ("+128:", "%+d:", p);
++  check_vsprintf (" 128:", "% d:", p);
++  check_vsprintf ("80:", "% x:", p);
++  check_vsprintf ("0x80:", "% #x:", p);
++  check_vsprintf ("0x80:", "%0#+ -x:", p);
++  check_vsprintf ("0200:", "%0#+ -o:", p);
++  check_vsprintf ("+0000128 :", "%0+ *.*Pd:", -9, 7, p);
++  check_vsprintf ("+12345   :", "%0+ -*.*Pd:", -9, -3, (mpfr_prec_t) 12345);
++  /* Do not add a test like "%05.1Pd" as MS Windows is buggy: when
++     a precision is given, the '0' flag must be ignored. */
+ 
+   /* special numbers */
+   mpfr_set_inf (x, 1);
