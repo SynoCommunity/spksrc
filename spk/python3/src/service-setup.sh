@@ -15,6 +15,7 @@ service_postinst ()
     ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
 
     # Byte-compile in background
-    ${SYNOPKG_PKGDEST}/bin/python3 -m compileall -q -f ${SYNOPKG_PKGDEST}/lib/python3.3 >> ${INST_LOG} &
-    ${SYNOPKG_PKGDEST}/bin/python3 -OO -m compileall -q -f ${SYNOPKG_PKGDEST}/lib/python3.3 >> ${INST_LOG} &
+    PYTHON_SHORT_VER=$(${SYNOPKG_PKGDEST}/bin/python3 -c 'import sys; print("{0}.{1}".format(*sys.version_info[:2]))')
+    ${SYNOPKG_PKGDEST}/bin/python3 -m compileall -q -f ${SYNOPKG_PKGDEST}/lib/python${PYTHON_SHORT_VER} >> ${INST_LOG} &
+    ${SYNOPKG_PKGDEST}/bin/python3 -OO -m compileall -q -f ${SYNOPKG_PKGDEST}/lib/python${PYTHON_SHORT_VER} >> ${INST_LOG} &
 }

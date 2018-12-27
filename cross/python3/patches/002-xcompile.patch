@@ -6,16 +6,16 @@ that ultimately fails
 
 --- configure.ac.orig	2016-06-25 23:38:39.000000000 +0200
 +++ configure.ac	2016-12-05 22:06:40.183563868 +0100
-@@ -72,6 +72,8 @@
+@@ -74,6 +74,8 @@
  	fi
          AC_MSG_RESULT($interp)
- 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
+ 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib _PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_$(ABIFLAGS)_$(MACHDEP)_$(MULTIARCH) '$interp
 +	else
 +        AC_MSG_RESULT($PYTHON_FOR_BUILD)
      fi
  elif test "$cross_compiling" = maybe; then
      AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
-@@ -80,6 +82,19 @@
+@@ -82,6 +84,19 @@
  fi
  AC_SUBST(PYTHON_FOR_BUILD)
  
@@ -37,7 +37,7 @@ that ultimately fails
  dnl can cause trouble.
 --- Makefile.pre.in.orig	2016-06-25 23:38:37.000000000 +0200
 +++ Makefile.pre.in	2016-12-05 22:08:58.803564372 +0100
-@@ -279,6 +279,7 @@
+@@ -286,6 +286,7 @@
  ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
@@ -45,8 +45,8 @@ that ultimately fails
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -769,11 +769,11 @@
- 		$(CC) $(OPT) $(PY_LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
+@@ -786,11 +786,11 @@
+ 		$(CC) $(OPT) $(PY_CORE_LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
  
  .PHONY: regen-grammar
 -regen-grammar: $(PGEN)
@@ -56,6 +56,6 @@ that ultimately fails
  	@$(MKDIR_P) Include
 -	$(PGEN) $(srcdir)/Grammar/Grammar \
 +	$(PGEN_FOR_BUILD) $(srcdir)/Grammar/Grammar \
- 		$(srcdir)/Include/graminit.h \
- 		$(srcdir)/Python/graminit.c
- 
+ 		$(srcdir)/Include/graminit.h.new \
+ 		$(srcdir)/Python/graminit.c.new
+ 		$(UPDATE_FILE) $(srcdir)/Include/graminit.h $(srcdir)/Include/graminit.h.new

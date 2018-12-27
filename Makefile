@@ -48,6 +48,12 @@ spk-clean:
 %-clean: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
+native-%: native/%/Makefile
+	cd $(dir $^) && env $(MAKE)
+
+native-%-clean: native/%/Makefile
+	cd $(dir $^) && env $(MAKE) clean
+
 # define a template that instantiates a 'python3-avoton-6.1' -style target for
 # every ($2) arch, every ($1) spk
 define SPK_ARCH_template =
