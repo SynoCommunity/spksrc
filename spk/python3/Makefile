@@ -1,7 +1,7 @@
 SPK_NAME = python3
-SPK_SHORT_VERS = 3.5
-SPK_VERS = $(SPK_SHORT_VERS).6
-SPK_REV = 8
+SPK_SHORT_VERS = 3.6
+SPK_VERS = $(SPK_SHORT_VERS).8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "1. Update to Python 3.5.6<br/>2. Added sqlite3 module, lxml module"
+CHANGELOG = "Update to Python 3.6.8"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF

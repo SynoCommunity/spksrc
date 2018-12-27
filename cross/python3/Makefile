@@ -1,7 +1,7 @@
 PKG_NAME = python3
 PKG_VERS_MAJOR = 3
-PKG_VERS_MINOR = 5
-PKG_VERS_PATCH = 6
+PKG_VERS_MINOR = 6
+PKG_VERS_PATCH = 8
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -25,6 +25,8 @@ PRE_CONFIGURE_TARGET = python3_pre_configure
 COMPILE_TARGET = python3_custom_compile
 INSTALL_TARGET = python3_custom_install
 POST_INSTALL_TARGET = python3_post_install
+
+PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)%'
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -74,7 +76,7 @@ python3_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
-	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/
+	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
 
 $(WORK_DIR)/python-cc.mk:
