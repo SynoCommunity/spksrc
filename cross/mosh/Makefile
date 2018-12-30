@@ -5,8 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mobile-shell/mosh/releases/download/$(PKG_DIR)
 
-BUILD_DEPENDS = cross/zlib cross/openssl
-DEPENDS = cross/protobuf cross/ncurses
+DEPENDS = cross/zlib cross/openssl cross/protobuf cross/ncurses
 
 HOMEPAGE = https://mosh.org
 COMMENT  = Mosh: the mobile shell
