@@ -280,8 +280,8 @@ ifneq ($(strip $(SPK_ICON)),)
 	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
-.PHONY: checksum
-checksum:
+.PHONY: info-checksum
+info-checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
 	@sed -i -e "s|checksum=\".*|checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\"|g" $(WORK_DIR)/INFO
 
@@ -312,7 +312,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
