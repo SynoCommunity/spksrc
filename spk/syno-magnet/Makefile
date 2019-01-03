@@ -6,7 +6,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/neykov/$(PKG_NAME)/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-SPK_NAME = SynoMagnet
+SPK_NAME = $(PKG_NAME)
 SPK_VERS = $(PKG_VERS)
 SPK_REV = 1
 SPK_ICON = src/magnet.png
