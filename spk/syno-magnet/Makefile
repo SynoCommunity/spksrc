@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 SPK_NAME = $(PKG_NAME)
 SPK_VERS = $(PKG_VERS)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/magnet.png
 
 MAINTAINER = neykov
@@ -21,6 +21,9 @@ LICENSE    = Apache 2.0
 
 STARTABLE  = no
 DSM_UI_DIR = app
+SERVICE_TYPE = legacy
+SERVICE_URL = /webman/3rdparty/syno-magnet/index.html
+SERVICE_PORT_ALL_USERS=true
 
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -44,10 +47,24 @@ include ../../mk/spksrc.extract.mk
 
 .PHONY: syno_magnet_copy
 
-# Icons already included in download
-$(ICON_DIR): ;
+# Override because we need type: legacy
+$(WORK_DIR)/config:
+	$(create_target_dir)
+	@echo '{ ".url": { ' > $@
+	@echo "  \"com.synocommunity.packages.SynoMagnet\": {" >> $@
+	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
+	@/bin/echo -n "    \"desc\": \"" >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
+	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
+	@echo "    \"type\": \"$(SERVICE_TYPE)\"," >> $@
+	@echo "    \"url\": \"${SERVICE_URL}\"," >> $@
+	@echo "    \"allUsers\": ${SERVICE_PORT_ALL_USERS}" >> $@
+	@echo '} } }' >> $@
+	cat $@ | python -m json.tool > /dev/null
 
-syno_magnet_copy: extract
-	install -m 755 -d $(STAGING_DIR)/app
-	(cd $(WORK_DIR)/$(PKG_DIR) && tar cpf - . | \
-	  tar xpf - -C $(STAGING_DIR)/app)
+syno_magnet_copy: extract $(WORK_DIR)/config
+	install -m 755 -d $(STAGING_DIR)/$(DSM_UI_DIR)
+	install -m 644 $(WORK_DIR)/config $(STAGING_DIR)/$(DSM_UI_DIR)/config
+	cp PLIST $(INSTALL_PLIST)
+	(cd $(WORK_DIR)/$(PKG_DIR) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2` | \
+	  tar xpf - -C $(STAGING_DIR)/$(DSM_UI_DIR))
