@@ -1,6 +1,6 @@
 SPK_NAME = mercurial
-SPK_VERS = 4.0.1
-SPK_REV = 4
+SPK_VERS = 4.8.1
+SPK_REV = 5
 SPK_ICON = src/mercurial.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel cross/$(SPK_NAME)
@@ -11,7 +11,7 @@ MAINTAINER = Dr-Bean
 DESCRIPTION = Mercurial is a free, distributed source control management tool
 STARTABLE = no
 DISPLAY_NAME = Mercurial
-CHANGELOG = Update to 4.0.1
+CHANGELOG = Update to 4.8.1
 
 HOMEPAGE = http://mercurial.selenic.com/
 LICENSE  = MPL1.1
