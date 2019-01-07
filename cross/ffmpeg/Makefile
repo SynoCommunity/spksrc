@@ -9,8 +9,6 @@ DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
 DEPENDS += cross/libbluray cross/libtheora cross/libvorbis cross/libvpx
 DEPENDS += cross/opencore-amr cross/openjpeg cross/gnutls cross/opus cross/rtmpdump
 DEPENDS += cross/soxr cross/speex cross/vo-amrwbenc cross/x264
-# fdk-acc is not compatible with (L)GPL. Can be included for personal use, but not for distributed packages
-# DEPENDS += cross/fdk-aac
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -33,8 +31,6 @@ CONFIGURE_ARGS += --enable-libtheora --enable-libvo-amrwbenc --enable-libvorbis
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --disable-debug --disable-doc --disable-htmlpages --disable-manpages
 CONFIGURE_ARGS += --disable-podpages --disable-static --disable-txtpages
-# fdk-acc is not compatible with (L)GPL. Can be included for personal use, but not be freely distributed
-# CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
 include ../../mk/spksrc.cross-cc.mk
 
