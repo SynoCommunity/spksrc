@@ -13,5 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS = --enable-freetype-config
+
 include ../../mk/spksrc.cross-cc.mk
 

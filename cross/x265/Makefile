@@ -1,9 +1,9 @@
 PKG_NAME = x265
-PKG_VERS = 2.6
+PKG_VERS = 2.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265/downloads
-PKG_DIR = $(PKG_NAME)_v$(PKG_VERS)/source
+PKG_DIR = $(PKG_NAME)_$(PKG_VERS)/source
 
 DEPENDS =
 
@@ -14,7 +14,7 @@ LICENSE  = GPL
 CONFIGURE_TARGET = x265_custom_configure
 INSTALL_TARGET = x265_custom_install
 
-YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
+NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
 CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
@@ -34,13 +34,6 @@ CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
 endif
 endif
 
-# Version since 2.2 fails on PPC
-# source/common/ppc/pixel_altivec.cpp:1: error: bad value (power8) for -mcpu= switch
-# source/common/ppc/pixel_altivec.cpp:1: error: AltiVec and E500 instructions cannot coexist
-# Support pending: https://bitbucket.org/multicoreware/x265/issues?q=altivec
-# Meanwhile PPC depends on cross/x265-2.1
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
@@ -56,18 +49,20 @@ CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64 -DENABLE_ALTIVEC=OFF -DCPU_POWER8=OFF
 endif
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
-DEPENDS += native/yasm cross/libnuma
-ENV += PATH=$(YASM_PATH):$$PATH
+DEPENDS += native/nasm cross/libnuma
+ENV += PATH=$(NASM_PATH):$$PATH
+ENV += AS=$(NASM_PATH)/nasm
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
 endif
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
-DEPENDS += native/yasm cross/libnuma
-ENV += PATH=$(YASM_PATH):$$PATH
+DEPENDS += native/nasm cross/libnuma
+ENV += PATH=$(NASM_PATH):$$PATH
+ENV += AS=$(NASM_PATH)/nasm
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
 endif
 
@@ -81,7 +76,7 @@ endif
 .PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure x265_custom_install
 
 # First create specific static libraries with build options for 12 and 10 bit depth
-PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_v$(PKG_VERS)
+PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)
 PKG_BUILD_12BIT = $(PKG_WORK_DIR)/build12bit
 PKG_BUILD_10BIT = $(PKG_WORK_DIR)/build10bit
 
