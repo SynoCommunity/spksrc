@@ -1,5 +1,5 @@
 PKG_NAME = libunistring
-PKG_VERS = 0.9.3
+PKG_VERS = 0.9.10
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
@@ -15,4 +15,3 @@ GNU_CONFIGURE = 1
 
 
 include ../../mk/spksrc.cross-cc.mk
-

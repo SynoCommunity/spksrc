@@ -1,7 +1,7 @@
---- ./CMakeLists.txt.orig
-+++ ./CMakeLists.txt
-@@ -111,11 +111,7 @@
-     endif(NO_ATOMICS)
+--- ./CMakeLists.txt.orig	2019-01-11 08:52:11.894748017 +0100
++++ ./CMakeLists.txt	2019-01-11 08:53:56.490216603 +0100
+@@ -116,11 +116,7 @@
+     endif()
  endif(UNIX)
  
 -if(X64 AND NOT WIN32)
@@ -13,26 +13,3 @@
  
  # Compiler detection
  if(CMAKE_GENERATOR STREQUAL "Xcode")
-@@ -204,7 +204,7 @@
-         add_definitions(-std=gnu++98)
-     endif()
-     if(ENABLE_PIC)
--         add_definitions(-fPIC)
-+         add_definitions(-fPIE)
-     endif(ENABLE_PIC)
-     if(NATIVE_BUILD)
-         if(INTEL_CXX)
-@@ -223,11 +223,11 @@
-         endif()
-     endif()
-     if(ARM AND CROSS_COMPILE_ARM)
--        set(ARM_ARGS -march=armv6 -mfloat-abi=soft -mfpu=vfp -marm -fPIC)
-+        set(ARM_ARGS -march=armv6 -mfloat-abi=soft -mfpu=vfp -marm -fPIE)
-     elseif(ARM)
-         find_package(Neon)
-         if(CPU_HAS_NEON)
--            set(ARM_ARGS -mcpu=native -mfloat-abi=hard -mfpu=neon -marm -fPIC)
-+            set(ARM_ARGS -mcpu=native -mfloat-abi=hard -mfpu=neon -marm -fPIE)
-             add_definitions(-DHAVE_NEON)
-         else()
-             set(ARM_ARGS -mcpu=native -mfloat-abi=hard -mfpu=vfp -marm)

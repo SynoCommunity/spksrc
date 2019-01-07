@@ -46,15 +46,3 @@
      vas = vaUnmapBuffer(ctx->hwctx->display, pic->output_buffer);
      if (vas != VA_STATUS_SUCCESS) {
          av_log(avctx, AV_LOG_ERROR, "Failed to unmap output buffers: "
-diff -urN ../ffmpeg-3.1.3.orig/libavcodec/vaapi_encode_h265.c ./libavcodec/vaapi_encode_h265.c
---- ./libavcodec/vaapi_encode_h265.c.orig
-+++ ./libavcodec/vaapi_encode_h265.c
-@@ -299,7 +299,7 @@
- 
-     u(6, mseq_var(vps_max_layer_id));
-     ue(mseq_var(vps_num_layer_sets_minus1));
--    for (i = 1; i <= mseq->vps_num_layer_sets_minus1; i++) {
-+    for (i = 0; i <= mseq->vps_num_layer_sets_minus1; i++) {
-         for (j = 0; j < mseq->vps_max_layer_id; j++)
-             u(1, mseq_var(layer_id_included_flag[i][j]));
-     }
