@@ -1,5 +1,5 @@
 PKG_NAME = nettle
-PKG_VERS = 3.3
+PKG_VERS = 3.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
@@ -26,4 +26,11 @@ endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
-CONFIGURE_ARGS += --enable-shared
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=i686-pc-linux-gnu --host=i686-pc-linux-gnu --disable-assembly
+endif
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu
+endif
+CONFIGURE_ARGS += --prefix=$(STAGING_INSTALL_PREFIX) --enable-shared
+CONFIGURE_ARGS += --libdir=$(STAGING_INSTALL_PREFIX)/lib --includedir=$(STAGING_INSTALL_PREFIX)/include
