@@ -21,4 +21,5 @@ include ../../mk/spksrc.native-cc.mk
 
 myComp:
 	@$(MSG) "Building Go for host system"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && GOARCH="" GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP14) ./make.bash
+	# GO111MODULE disable go.mod per https://github.com/golang/go/issues/26996
+	cd $(WORK_DIR)/$(PKG_NAME)/src && GO111MODULE=off GOARCH="" GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP14) ./make.bash
