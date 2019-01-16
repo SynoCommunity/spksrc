@@ -7,7 +7,7 @@ SPK_ICON = src/python.png
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 # Build-time dependencies
 DEPENDS += cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/cffi cross/bcrypt
+DEPENDS += cross/cffi cross/cryptography cross/bcrypt
 
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow

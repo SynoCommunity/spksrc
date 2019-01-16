@@ -12,7 +12,8 @@
 #pyyaml==3.13
 #pyzmq==16.0.2
 #uwsgi==2.0.14
-#pycparser==2.18
+#pycparser==2.19
+#cryptography==2.4.2
 
 ## Cross-compiled via spksrc.wheel.mk
 markupsafe==1.1.0
@@ -32,7 +33,6 @@ markdown==2.6.11
 # These also depends on cross/cffi and cross/openssl,
 # which are installed through cross/bcrypt
 pyOpenSSL==18.0.0
-cryptography==2.4.2
 pyasn1==0.4.4
 asn1crypto==0.24.0
 enum34==1.1.6
