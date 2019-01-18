@@ -1,18 +1,19 @@
---- Makefile	2007-02-19 12:14:08.000000000 +0000
-+++ Makefile.new	2019-01-17 08:33:09.000000000 +0000
-@@ -30,9 +30,12 @@
+--- Makefile	2010-11-04 17:14:53.000000000 +0000
++++ Makefile.new	2019-01-18 09:48:35.000000000 +0000
+@@ -30,10 +30,12 @@
  TARGETS = $(PROJECT) $(SHAREDLIB) $(STATICLIB)
  
  INSTALL = install
 -libdir = /usr/lib
 -libexecdir = /usr/lib
 -includedir = /usr/include
+-mandir = /usr/share/man
 +prefix = @INSTALL_PREFIX@
 +exec_prefix =${prefix}
 +libdir =${exec_prefix}/lib
 +libexecdir =${exec_prefix}/lib
 +sharedlibdir =${libdir}
 +includedir =${prefix}/include
+ man3dir = $(mandir)/man3
  DESTDIR =
  
- WARNINGS = -W -Wall -Waggregate-return -Wcast-align -Wconversion \

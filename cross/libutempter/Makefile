@@ -1,5 +1,5 @@
 PKG_NAME = libutempter
-PKG_VERS = 1.1.5
+PKG_VERS = 1.1.6
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.altlinux.org/pub/people/ldv/utempter/
