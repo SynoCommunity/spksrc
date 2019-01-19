@@ -48,3 +48,15 @@ LOCAL_CONFIG_MK = ../../local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
 include $(LOCAL_CONFIG_MK)
 endif
+
+# Relocate to set conditionally according to existing parallel options in caller
+ifneq ($(PARALLEL_MAKE),)
+ifeq ($(PARALLEL_MAKE),max)
+NCPUS = $(shell grep -c ^processor /proc/cpuinfo)
+else
+NCPUS = $(PARALLEL_MAKE)
+endif
+ifeq ($(filter $(NCPUS),0 1),)
+COMPILE_MAKE_OPTIONS = -j$(NCPUS)
+endif
+endif
