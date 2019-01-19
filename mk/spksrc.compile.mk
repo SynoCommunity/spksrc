@@ -1,5 +1,5 @@
 ### Compile rules
-#   Invoke make to (cross-) compile the software. 
+#   Invoke make to (cross-) compile the software.
 # Target are executed in the following order:
 #  compile_msg_target
 #  pre_compile_target   (override with PRE_COMPILE_TARGET)
@@ -32,8 +32,8 @@ compile_msg:
 
 pre_compile_target: compile_msg
 
-compile_target:  $(PRE_COMPILE_TARGET) 
-	@$(RUN) $(MAKE)
+compile_target:  $(PRE_COMPILE_TARGET)
+	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 post_compile_target: $(COMPILE_TARGET)
 
