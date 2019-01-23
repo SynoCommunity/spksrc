@@ -7,7 +7,7 @@ TC_FIRMWARE = 6.1-15047
 TC_DIST = x86_64-intel-linux-gnu-WD-00.02B-04272014.1721
 TC_EXT = tar.gz
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
-TC_DIST_SITE = https://github.com/WDCommunity/wdpksrc/releases/download/kernel-tc-v0.01
+TC_DIST_SITE = https://dl.bintray.com/tfl/wdpksrc
 
 TC_BASE_DIR = x86_64-intel-linux-gnu
 TC_PREFIX = x86_64-intel-linux-gnu

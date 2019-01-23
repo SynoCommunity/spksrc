@@ -7,7 +7,7 @@ TC_FIRMWARE = 6.1-15047
 TC_DIST = armv7-marvell-linux-gnueabi-softfp_i686_64K_Dev_20131002
 TC_EXT = tar.gz
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
-TC_DIST_SITE = https://github.com/WDCommunity/wdpksrc/releases/download/kernel-tc-v0.01
+TC_DIST_SITE = https://dl.bintray.com/tfl/wdpksrc
 
 TC_BASE_DIR = armv7-marvell-linux-gnueabi-softfp_i686_64K_Dev_20131002
 TC_PREFIX = arm-marvell-linux-gnueabi
