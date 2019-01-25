@@ -1,7 +1,6 @@
 SPK_NAME = tree
-SPK_VERS = 1.7.0
+SPK_VERS = 1.8.0
 SPK_REV = 1
-# SPK_ICON = src/tree.png
 
 DEPENDS = cross/tree
 
@@ -10,13 +9,12 @@ DESCRIPTION = Tree is a recursive directory listing command that produces a dept
 RELOAD_UI = no
 DISPLAY_NAME = Tree
 STARTABLE = no
-CHANGELOG = First release 1.7.0
+BETA = 1
+CHANGELOG = First release 1.8.0
 
 HOMEPAGE = http://mama.indstate.edu/users/ice/tree/index.html
-# LICENSE  = GNU GPL
+LICENSE  = Unknown
 
-INSTALLER_SCRIPT = src/install.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

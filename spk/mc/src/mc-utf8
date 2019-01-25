@@ -1,3 +1,0 @@
-#!/bin/sh
-
-NCURSES_NO_UTF8_ACS=1 LC_ALL=en_US.UTF8 /usr/local/mc/bin/mc "$@"

@@ -1,6 +1,6 @@
 SPK_NAME = mc
-SPK_VERS = 4.8.21
-SPK_REV = 5
+SPK_VERS = 4.8.23
+SPK_REV = 6
 SPK_ICON = src/mc.png
 
 DEPENDS = cross/mc
@@ -11,7 +11,7 @@ DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\'inter
 RELOAD_UI = no
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
-CHANGELOG = Update to 4.8.21
+CHANGELOG = Update to 4.8.23
 
 HOMEPAGE = http://www.midnight-commander.org
 LICENSE  = GNU GPL
@@ -24,4 +24,4 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: mc_extra_install
 mc_extra_install:
-	install -m 755 src/mc-utf8 $(STAGING_DIR)/bin/mc-utf8
+	install -m 755 ../../spk/synocli-file/src/mc-utf8 $(STAGING_DIR)/bin/mc-utf8
