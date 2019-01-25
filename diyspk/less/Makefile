@@ -1,5 +1,5 @@
 SPK_NAME = less
-SPK_VERS = 481
+SPK_VERS = 530
 SPK_REV = 1
 SPK_ICON = src/gnu-logo.png
 
@@ -15,9 +15,6 @@ HOMEPAGE   = https://www.gnu.org/software/less/
 LICENSE    = GPLv3
 HELP_URL   = http://www.greenwoodsoftware.com/less/faq.html
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

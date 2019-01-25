@@ -1,0 +1,11 @@
+--- Makefile.orig	2019-01-26 21:44:34.571112711 +0100
++++ Makefile	2019-01-26 21:44:44.315151754 +0100
+@@ -18,7 +18,7 @@
+ 
+ prefix = /usr
+ 
+-CC=gcc
++#CC=gcc
+ 
+ VERSION=1.8.0
+ TREE_DEST=tree

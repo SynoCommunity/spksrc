@@ -1,5 +1,5 @@
 SPK_NAME = jdupes
-SPK_VERS = 1.51
+SPK_VERS = 1.13.2
 SPK_REV = 2
 SPK_ICON = src/jdupes.png
 
@@ -15,9 +15,6 @@ HOMEPAGE   = https://github.com/jbruchon/jdupes/
 LICENSE    = MIT
 HELP_URL   = https://github.com/jbruchon/jdupes/README
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

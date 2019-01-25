@@ -1,5 +1,5 @@
 SPK_NAME = rhash
-SPK_VERS = 1.3.5
+SPK_VERS = 1.3.8
 SPK_REV = 1
 
 DEPENDS = cross/$(SPK_NAME)
@@ -9,13 +9,12 @@ DESCRIPTION = "RHash is a console utility for calculation and verification of ma
 RELOAD_UI = no
 DISPLAY_NAME = rhash
 STARTABLE = no
+BETA = 1
 
 HOMEPAGE   = http://rhash.sourceforge.net/
 LICENSE    = MIT
 
-INSTALLER_SCRIPT = src/installer.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
 

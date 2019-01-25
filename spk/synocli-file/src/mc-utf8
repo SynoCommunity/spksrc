@@ -1,0 +1,5 @@
+#!/bin/sh
+
+SCRIPT=`readlink -f "$0"`
+SCRIPT_PATH=`dirname "$SCRIPT"`
+NCURSES_NO_UTF8_ACS=1 LC_ALL=en_US.UTF8 exec $SCRIPT_PATH/mc "$@"

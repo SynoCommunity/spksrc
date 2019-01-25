@@ -4,6 +4,7 @@ native/*/work*
 cross/*/work*
 kernel/*/work*
 spk/*/work*
+diyspk/*/work*
 toolchains/*/work*
 local.mk
 *.DS_Store

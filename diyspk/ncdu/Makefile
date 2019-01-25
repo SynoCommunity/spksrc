@@ -1,6 +1,6 @@
 SPK_NAME = ncdu
-SPK_VERS = 1.12
-SPK_REV = 1
+SPK_VERS = 1.14.1
+SPK_REV = 2
 SPK_ICON = src/ncdu.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -15,9 +15,6 @@ CHANGELOG = "Initial release"
 HOMEPAGE   = https://dev.yorhel.nl/ncdu
 LICENSE    = MIT
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
