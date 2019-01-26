@@ -13,7 +13,7 @@
 # Variables:
 #  INSTALL_PREFIX          Target directory where the software will be run.
 #  INSTALL_DIR             Where to install files. INSTALL_PREFIX will be added.
-#  STAGING_INSTALL_PREFIX  Where to instll files, in extenso.
+#  STAGING_INSTALL_PREFIX  Where to instll files, in extenso. 
 # Files:
 #  $(WORK_DIR)/$(PKG_NAME).plist   List of files installed. Can be used to build the PLIST file
 #                                  of each software.
@@ -39,7 +39,7 @@ POST_INSTALL_TARGET = post_install_target
 else
 $(POST_INSTALL_TARGET): $(INSTALL_TARGET)
 endif
-$(INSTALL_PLIST): $(POST_INSTALL_TARGET)
+$(INSTALL_PLIST): $(POST_INSTALL_TARGET) 
 
 install_msg_target:
 	@$(MSG) "Installing for $(NAME)"
@@ -52,9 +52,9 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
-post_install_target: $(INSTALL_TARGET)
+post_install_target: $(INSTALL_TARGET) 
 
 $(INSTALL_PLIST):
 	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort | \
@@ -82,3 +82,4 @@ $(INSTALL_COOKIE): install_correct_lib_files
 else
 install: ;
 endif
+
