@@ -68,6 +68,10 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
+ifeq ($(strip $(PLIST_TRANSFORM)),)
+PLIST_TRANSFORM= cat
+endif
+
 .PHONY: cat_PLIST
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
@@ -76,7 +80,7 @@ cat_PLIST:
 	done
 	@if [ -f PLIST ] ; \
 	then \
-	  cat PLIST ; \
+	  $(PLIST_TRANSFORM) PLIST ; \
 	else \
 	  $(MSG) "No PLIST for $(NAME)" >&2; \
 	fi
