@@ -12,7 +12,6 @@ COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
 CONFIGURE_TARGET = x265_custom_configure
-INSTALL_TARGET = x265_custom_install
 
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
@@ -31,6 +30,8 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(TCVERSION), "6.0.2,6.1"),$(TCVERSION))
 ifneq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
+else
+PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
 endif
 endif
 
@@ -73,7 +74,7 @@ CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
 
-.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure x265_custom_install
+.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure
 
 # First create specific static libraries with build options for 12 and 10 bit depth
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)
@@ -101,6 +102,3 @@ CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
 
 x265_custom_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
 	$(RUN) cmake $(CMAKE_ARGS) $(CMAKE_MULTILIB_ARGS) .
-
-x265_custom_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
