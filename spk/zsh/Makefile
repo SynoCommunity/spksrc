@@ -1,10 +1,10 @@
 # Allow overriding the name, used by spk/zsh-static.
 SPK_NAME ?= zsh
-SPK_VERS = 5.6.2
+SPK_VERS = 5.7.1
 SPK_CONFLICT ?= zsh-static
 # Allow overriding the revision, used by spk/zsh-static.
 # If you rev here, please also rev spk/zsh-static.
-SPK_REV ?= 8
+SPK_REV ?= 9
 SPK_ICON = ../zsh/src/zsh.png
 
 DEPENDS = cross/zsh
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Zsh est un shell conçu pour un usage intéractif, mais il est
 RELOAD_UI = no
 DISPLAY_NAME = Z shell
 STARTABLE = no
-CHANGELOG = "Update to 5.6.2"
+CHANGELOG = "Update to 5.7.1"
 
 HOMEPAGE = http://www.zsh.org
 LICENSE = Custom
