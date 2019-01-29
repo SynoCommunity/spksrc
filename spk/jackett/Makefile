@@ -1,6 +1,6 @@
 SPK_NAME = jackett
-SPK_VERS = 0.8.490
-SPK_REV = 6
+SPK_VERS = 0.10.589
+SPK_REV = 7
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
 STARTABLE = yes
-CHANGELOG = "1. Update Jackett to version 0.8.490, 2. Use DSM 5+6 generic service"
+CHANGELOG = "Update Jackett to version 0.10.589"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
 
