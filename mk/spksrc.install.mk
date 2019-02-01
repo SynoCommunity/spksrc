@@ -13,7 +13,7 @@
 # Variables:
 #  INSTALL_PREFIX          Target directory where the software will be run.
 #  INSTALL_DIR             Where to install files. INSTALL_PREFIX will be added.
-#  STAGING_INSTALL_PREFIX  Where to instll files, in extenso. 
+#  STAGING_INSTALL_PREFIX  Where to install files, in extenso.
 # Files:
 #  $(WORK_DIR)/$(PKG_NAME).plist   List of files installed. Can be used to build the PLIST file
 #                                  of each software.
@@ -39,7 +39,7 @@ POST_INSTALL_TARGET = post_install_target
 else
 $(POST_INSTALL_TARGET): $(INSTALL_TARGET)
 endif
-$(INSTALL_PLIST): $(POST_INSTALL_TARGET) 
+$(INSTALL_PLIST): $(POST_INSTALL_TARGET)
 
 install_msg_target:
 	@$(MSG) "Installing for $(NAME)"
@@ -52,9 +52,9 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
 
-post_install_target: $(INSTALL_TARGET) 
+post_install_target: $(INSTALL_TARGET)
 
 $(INSTALL_PLIST):
 	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort | \
@@ -64,7 +64,8 @@ install_correct_lib_files: $(INSTALL_PLIST)
 	@for pc_file in `grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)` ; \
 	do \
 	  $(MSG) "Correcting pkg-config file $${pc_file}" ; \
-	  sed -i -e 's#\($(INSTALL_PREFIX)\)#$(INSTALL_DIR)\1#g' \
+	  sed -i -e 's#=\($(INSTALL_PREFIX)\)#=$(INSTALL_DIR)\1#g' \
+	         -e 's#-rpath,\([^ ,]*\)#-rpath,\1,-rpath-link,$(INSTALL_DIR)\1#g' \
 	         -e 's#$$(libdir)#$${libdir}#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
 	done
 	@for la_file in `grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)` ; \
@@ -82,4 +83,3 @@ $(INSTALL_COOKIE): install_correct_lib_files
 else
 install: ;
 endif
-
