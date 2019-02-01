@@ -11,8 +11,7 @@ HOMEPAGE = http://xmlsoft.org/
 COMMENT  = Libxslt is the XSLT C library developed for the GNOME project
 LICENSE  = MIT
 
-CONFIGURE_ARGS  = --without-python --with-libxml-prefix=$(STAGING_INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-libxml-include-prefix=$(STAGING_INSTALL_PREFIX)/include/libxml2
+CONFIGURE_ARGS  = --without-python
 GNU_CONFIGURE = 1
 
 # if for libgcrypt, replace the -config path with abspath

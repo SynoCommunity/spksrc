@@ -12,11 +12,5 @@ COMMENT  = Extract files from rar archives
 LICENSE  = freeware
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install DESTDIR=$(STAGING_INSTALL_PREFIX)
-
