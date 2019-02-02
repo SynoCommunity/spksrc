@@ -6,7 +6,8 @@
 #  install_msg_target
 #  $(PRE_INSTALL_PLIST)
 #  pre_install_target              (override with PRE_INSTALL_TARGET)
-#  install_target                  (override with INSTALL_TARGET)
+#  install_destdir_target          (default override with INSTALL_TARGET)
+#  install_target                  (alternative for INSTALL_TARGET)
 #  post_install_target             (override with POST_INSTALL_TARGET)
 #  $(INSTALL_PLIST)
 #  install_correct_lib_files
@@ -30,7 +31,7 @@ else
 $(PRE_INSTALL_TARGET): $(PRE_INSTALL_PLIST)
 endif
 ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = install_target
+INSTALL_TARGET = install_destdir_target
 else
 $(INSTALL_TARGET): $(PRE_INSTALL_TARGET)
 endif
@@ -52,6 +53,9 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
+	$(RUN) $(MAKE) install prefix=$(INSTALL_PREFIX)
+
+install_destdir_target: $(PRE_INSTALL_TARGET)
 	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
 
 post_install_target: $(INSTALL_TARGET)
