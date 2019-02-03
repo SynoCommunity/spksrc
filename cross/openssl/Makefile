@@ -11,9 +11,9 @@ HOMEPAGE = http://www.openssl.org
 COMMENT  = Compression Library
 LICENSE  = http://www.openssl.org/source/license.html
 
-CONFIGURE_TARGET = myConfigure
+CONFIGURE_TARGET = openssl_configure
 
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = openssl_install
 
 STAGING_INSTALL_PREFIX := $(INSTALL_DIR)
 
@@ -48,10 +48,10 @@ $(error Arch $(ARCH) not expected yet)
 endif
 
 
-.PHONY: myConfigure
-myConfigure:
+.PHONY: openssl_configure
+openssl_configure:
 	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
 
-.PHONY: myInstall
-myInstall:
+.PHONY: openssl_install
+openssl_install:
 	$(RUN) $(MAKE) install_sw INSTALL_PREFIX=$(INSTALL_DIR)

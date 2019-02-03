@@ -16,7 +16,7 @@ COMMENT  = Python Programming Language
 LICENSE  = PSF
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(WORK_DIR)/install/usr/local/python3/lib -I $(WORK_DIR)/install/usr/local/python3/include
+ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions PYTHON_FOR_BUILD=$(HOSTPYTHON) PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 
@@ -54,10 +54,10 @@ python3_pre_configure:
 	# create phantom header and library to succeed add_dir_to_list in setup.py
 	# so that future-promised libsqlite3.so and sqlite3.h will be used.  Yep,
 	# it's a bit hokey, but avoids editing upstream pristine source
-	mkdir -p $(WORK_DIR)/install/usr/local/python3/lib $(WORK_DIR)/install/usr/local/python3/include
+	mkdir -p $(STAGING_INSTALL_PREFIX)/lib $(STAGING_INSTALL_PREFIX)/include
 	mkdir -p $(WORK_DIR)/Python-$(PKG_VERS)/Include $(WORK_DIR)/Python-$(PKG_VERS)/lib
-	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(WORK_DIR)/install/usr/local/python3/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
-	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(WORK_DIR)/install/usr/local/python3/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
+	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(STAGING_INSTALL_PREFIX)/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
+	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(STAGING_INSTALL_PREFIX)/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
 .PHONY: python3_custom_compile
 python3_custom_compile:
