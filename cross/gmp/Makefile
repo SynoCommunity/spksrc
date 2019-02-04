@@ -26,3 +26,9 @@ endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=powerpc-unknown-linux-gnu --host=powerpc-unknown-linux-gnu
 endif
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=i686-pc-linux-gnu --host=i686-pc-linux-gnu
+endif
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+CONFIGURE_ARGS = --target=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu
+endif

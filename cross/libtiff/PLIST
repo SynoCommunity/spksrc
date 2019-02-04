@@ -1,6 +1,6 @@
 lnk:lib/libtiff.so
 lnk:lib/libtiff.so.5
-lib:lib/libtiff.so.5.2.4
+lib:lib/libtiff.so.5.4.0
 lnk:lib/libtiffxx.so
 lnk:lib/libtiffxx.so.5
-lib:lib/libtiffxx.so.5.2.4
+lib:lib/libtiffxx.so.5.4.0

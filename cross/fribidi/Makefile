@@ -1,8 +1,9 @@
 PKG_NAME = fribidi
-PKG_VERS = 0.19.7
+PKG_VERS = 1.0.5
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.videolan.org/contrib/fribidi
+PKG_DIST_SITE = https://github.com/fribidi/fribidi/releases/download/v$(PKG_VERS)
+
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -16,4 +17,3 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-pic
 
 include ../../mk/spksrc.cross-cc.mk
-

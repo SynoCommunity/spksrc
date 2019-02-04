@@ -1,3 +1,3 @@
 lnk:lib/libfdk-aac.so
-lnk:lib/libfdk-aac.so.1
-lib:lib/libfdk-aac.so.1.0.0
+lnk:lib/libfdk-aac.so.2
+lib:lib/libfdk-aac.so.2.0.0
