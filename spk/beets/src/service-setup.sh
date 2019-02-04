@@ -13,11 +13,15 @@ service_postinst ()
     # Add symlink
     mkdir -p /usr/local/bin
     ln -s ${SYNOPKG_PKGDEST}/env/bin/beet /usr/local/bin/beet
-    ln -s ${SYNOPKG_PKGDEST}/env/bin/borgmatic /usr/local/bin/borgmatic
 
     # Extended diagnostic information
     ${SYNOPKG_PKGDEST}/env/bin/beet version >> ${INST_LOG}
     ${SYNOPKG_PKGDEST}/env/bin/beet --version --help >> ${INST_LOG}
     echo -e "\nModules:" >> ${INST_LOG}
     ${SYNOPKG_PKGDEST}/env/bin/pip freeze >> ${INST_LOG}
+}
+
+service_postuninst ()
+{
+    rm /usr/local/bin/beet
 }
