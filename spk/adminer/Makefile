@@ -1,6 +1,6 @@
 SPK_NAME = adminer
-SPK_VERS = 4.2.5
-SPK_REV = 2
+SPK_VERS = 4.7.1
+SPK_REV = 3
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet di
 ADMIN_URL = /adminer/
 RELOAD_UI = yes
 DISPLAY_NAME = Adminer
-CHANGELOG = Update to 4.2.5
+CHANGELOG = Update to 4.7.1
 
 HOMEPAGE   = https://www.adminer.org
 LICENSE    = Apache License 2.0 or GPL 2
