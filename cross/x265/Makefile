@@ -27,11 +27,11 @@ CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 include ../../mk/spksrc.cross-cc.mk
 
 # gcc version above 4.8 required to support hdr10plus
-ifeq ($(findstring $(TCVERSION), "6.0.2,6.1"),$(TCVERSION))
+PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
+ifeq ($(findstring $(TCVERSION), "6.0.2 6.1 6.2"),$(TCVERSION))
 ifneq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
-else
-PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
+PLIST_TRANSFORM = cat
 endif
 endif
 
