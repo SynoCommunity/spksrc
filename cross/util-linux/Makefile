@@ -15,6 +15,12 @@ LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --without-ncurses --without-python
-CONFIGURE_ARGS += --disable-all-programs --enable-schedutils --enable-libuuid
+CONFIGURE_ARGS += --disable-all-programs --enable-libuuid
+
+ifeq ($(findstring $(ARCH), hi3535),$(ARCH))
+CONFIGURE_ARGS += --disable-schedutils
+else
+CONFIGURE_ARGS += --enable-schedutils
+endif
 
 include ../../mk/spksrc.cross-cc.mk

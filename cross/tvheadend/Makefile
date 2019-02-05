@@ -20,15 +20,15 @@ CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 CONFIGURE_ARGS += --disable-libfdkaac_static --disable-libopus_static --disable-libtheora --disable-libtheora_static
 CONFIGURE_ARGS += --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static
 
-INSTALL_TARGET = myInstall
 POST_PATCH_TARGET = post_patch_target_tvheadend
+
+ifeq ($(wildcard $(FFMPEG_DIR)),)
+DEPENDS += cross/ffmpeg
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR)
+.PHONY: post_patch_target_tvheadend
 
 post_patch_target_tvheadend:
 	@if [ "$(ARCH)" = "ppc853x" ] || [ "$(ARCH)" = "qoriq" ]; then \
