@@ -2,6 +2,8 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
+SHELL = /bin/bash
+
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
@@ -18,7 +20,7 @@ SPK_TCVERS = all
 endif
 
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
-
+WD_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)_$(SPK_VERS)-$(SPK_REV).bin
 #####
 
 # Check if package supports ARCH
@@ -60,6 +62,12 @@ DSM_SCRIPTS_  = preinst postinst
 DSM_SCRIPTS_ += preuninst postuninst
 DSM_SCRIPTS_ += preupgrade postupgrade
 
+# WD specific scripts
+WD_SCRIPTS_ = install.sh preinst.sh remove.sh
+WD_SCRIPTS_ += init.sh clean.sh
+WD_SCRIPTS_ += start.sh stop.sh
+WD_SCRIPTS_ += apkg.rc
+
 # SPK specific scripts
 ifneq ($(strip $(SSS_SCRIPT)),)
 DSM_SCRIPTS_ += start-stop-status
@@ -78,6 +86,7 @@ endif
 DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
 
 SPK_CONTENT = package.tgz INFO scripts
+SPK_CONTENT += $(WD_SCRIPTS_)
 
 # conf
 DSM_CONF_DIR = $(WORK_DIR)/conf
@@ -93,6 +102,25 @@ icon: strip
 ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
+
+.PHONY: $(WORK_DIR)/apkg.rc
+$(WORK_DIR)/apkg.rc:
+	$(create_target_dir)
+	@$(MSG) "Creating WD apkg config file for $(SPK_NAME)"
+	@echo Package: $(SPK_NAME) > $@
+	@echo Version: $(SPK_VERS)-$(SPK_REV) >> $@
+	@echo Packager: $(MAINTAINER) >> $@
+	@echo Homepage: $(HOMEPAGE) >> $@
+	@echo Description: ${DESCRIPTION} >> $@
+	@echo Icon: PACKAGE_ICON.PNG >> $@
+ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
+    @echo InstDepend: $(INSTALL_DEP_SERVICES) >> $@
+endif
+ifneq ($(strip $(START_DEP_SERVICES)),)
+    @echo StartDepend: $(START_DEP_SERVICES) >> $@
+endif
+	@echo IndividualFlag: 0 >> $@
+
 
 .PHONY: $(WORK_DIR)/INFO
 $(WORK_DIR)/INFO:
@@ -235,6 +263,17 @@ $(WORK_DIR)/package.tgz: icon service
 	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
+WD_SCRIPTS = $(addprefix $(WORK_DIR)/,$(WD_SCRIPTS_))
+
+define wd_script_redirect
+$(create_target_dir)
+$(MSG) "Creating $@"
+echo '#!/bin/sh' > $@
+# echo '. `dirname $$0`/scripts/wdinstaller' >> $@
+# echo '`basename $$0` $(INSTALLER_OUTPUT)' >> $@
+exit 0
+chmod 755 $@
+endef
 
 define dsm_script_redirect
 $(create_target_dir)
@@ -268,16 +307,55 @@ $(DSM_SCRIPTS_DIR)/postupgrade:
 $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
+$(WORK_DIR)/preinst.sh:
+	@$(create_target_dir)
+	@$(MSG) "Creating $@"
+	@echo '#!/bin/sh' > $@
+	@chmod 755 $@
+$(WORK_DIR)/install.sh:
+	@$(create_target_dir)
+	@$(MSG) "Creating $@"
+	@echo '#!/bin/sh' > $@
+	@echo 'echo DEBUG: "$$0 $$@" >> /tmp/debug_apkg' >> $@
+	@echo 'tmp=$$1' >> $@
+	@echo 'nasprog=$$2' >> $@
+	@echo 'cd $$1' >> $@
+	@echo 'tar xf package.tgz' >> $@
+	@echo 'rm package.tgz' >> $@
+	@echo 'mv $$tmp $$nasprog' >> $@
+	@chmod 755 $@
+
+$(WORK_DIR)/init.sh:
+	@$(create_target_dir)
+	@$(MSG) "Creating $@"
+	@echo '#!/bin/sh' > $@
+	@echo 'mkdir /var/www/$(SPK_NAME)' >> $@
+	@echo 'ln -sf $$1/web/* /var/www/$(SPK_NAME)/' >> $@
+	@chmod 755 $@
+$(WORK_DIR)/start.sh:
+	@$(wd_script_redirect)
+$(WORK_DIR)/stop.sh:
+	@$(wd_script_redirect)
+$(WORK_DIR)/clean.sh:
+	@$(create_target_dir)
+	@$(MSG) "Creating $@"
+	@echo '#!/bin/sh' > $@
+	@echo 'rm -rf  /var/www/$(SPK_NAME)' >> $@
+	@chmod 755 $@
+$(WORK_DIR)/remove.sh:
+	@$(wd_script_redirect)
+
 # Package Icons
 .PHONY: icons
 icons:
 ifneq ($(strip $(SPK_ICON)),)
 	$(create_target_dir)
+	mkdir -p $(WORK_DIR)/web
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
-	(convert $(SPK_ICON) -thumbnail 72x72 - > $(WORK_DIR)/PACKAGE_ICON.PNG)
+	(convert $(SPK_ICON) -thumbnail 72x72 - > $(WORK_DIR)/web/PACKAGE_ICON.PNG)
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
-	(convert $(SPK_ICON) -thumbnail 256x256 - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
-	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
+	(convert $(SPK_ICON) -thumbnail 256x256 - > $(WORK_DIR)/web/PACKAGE_ICON_256.PNG)
+	$(eval SPK_CONTENT += web)
 endif
 
 .PHONY: info-checksum
@@ -312,11 +390,100 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf $(WD_SCRIPTS)
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
-package: $(SPK_FILE_NAME)
+WD_ARCHIVE = $(WORK_DIR)/$(SPK_NAME)_$(ARCH).tar.gz
+WD_HEADER = $(WORK_DIR)/$(SPK_NAME)_$(ARCH).blob
+WD_SIGN = apkg.sign
+WD_XML = $(WORK_DIR)/apkg.xml
+
+.PHONY: $(WORK_DIR)/apkg.sign
+$(WORK_DIR)/apkg.sign:
+	@$(MSG) "Create WD signature"
+	$(create_target_dir)
+	@cd $(WORK_DIR) && echo $(SPK_NAME) | openssl bf-cbc -out apkg.sign -k Lidho.mdk3K3h -md md5 && chmod 644 apkg.sign
+	$(eval SPK_CONTENT += apkg.sign)
+
+.PHONY: $(WD_XML)
+$(WD_XML):
+	@$(MSG) "Create WD XML"
+	$(create_target_dir)
+	echo '<?xml version="1.0" encoding="UTF-8"?>' > $@
+	echo '<config>' >> $@
+	echo ' <apkg>' >> $@
+	echo '  <item>' >> $@
+	echo '   <procudt_id>0</procudt_id>' >> $@
+	echo '   <custom_id>20</custom_id>' >> $@
+	echo '   <model_id>7</model_id>' >> $@
+	echo '   <user_control>0</user_control>' >> $@
+	echo '   <center_type>0</center_type>' >> $@
+	echo '   <individual_flag>0</individual_flag>' >> $@
+	echo '   <name>$(SPK_NAME)</name>' >> $@
+	echo '   <show>$(SPK_NAME)</show>' >> $@
+	echo '   <enable>1</enable>' >> $@
+	echo '   <version>$(SPK_VERS)</version>' >> $@
+	echo '   <date>20190125</date>' >> $@
+	echo '   <inst_date/>' >> $@
+	echo '   <path/>' >> $@
+	echo '   <ps_name/>' >> $@
+	echo '   <url/>' >> $@
+	echo '   <url_port/>' >> $@
+	echo '   <apkg_version>2</apkg_version>' >> $@
+	echo '   <packager>TFL</packager>' >> $@
+	echo '   <email/>' >> $@
+	echo '   <homepage>$(HOME_PAGE)</homepage>' >> $@
+	echo '   <inst_depend/>' >> $@
+	echo '   <inst_conflict/>' >> $@
+	echo '   <start_depend/>' >> $@
+	echo '   <start_conflict/>' >> $@
+	echo '   <description>${DESCRIPTION}</description>' >> $@
+	echo '   <icon>PACKAGE_ICON.PNG</icon>' >> $@
+	echo '   <MinFWVer/>' >> $@
+	echo '   <MaxFWVer/>' >> $@
+	echo '   </item>' >> $@
+	echo '  </apkg>' >> $@
+	echo '</config>' >> $@
+	chmod 644 $@
+	$(eval SPK_CONTENT += apkg.xml)
+
+
+.PHONY: $(WD_ARCHIVE)
+$(WD_ARCHIVE): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf $(WD_SCRIPTS) $(WD_XML)
+	$(create_target_dir)
+ifneq ("$(wildcard $(WORK_DIR)/$(SPK_NAME))","")
+	rm -rf $(WORK_DIR)/$(SPK_NAME)
+endif
+	cd $(WORK_DIR) && mkdir $(SPK_NAME) && mv $(SPK_CONTENT) $(SPK_NAME) && \
+    tar -zcf $@ $(SPK_NAME) --owner=root --group=root
+
+$(WD_HEADER): $(WORK_DIR)/package.tgz $(WD_SCRIPTS) icons $(WORK_DIR)/apkg.sign $(WD_ARCHIVE)
+	$(create_target_dir)
+	L=$$(stat -L -c %s $(WD_ARCHIVE)); \
+	echo Got size $$L, trim to 4 bytes; \
+	T=$$((4 * ($$L / 4 ))); \
+	C=$$(($$(xor_checksum $(WD_ARCHIVE) 4 0 $$T ))); \
+	echo Got checksum $$C; \
+	dd if=/dev/zero of=$(WD_HEADER) bs=200 count=1 status=none; \
+	printf 'BlackCyZ' | dd of=$(WD_HEADER) conv=notrunc status=none; \
+	printf $(SPK_NAME) | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=2; \
+	printf $(SPK_VERS)-$(SPK_REV) | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=19; \
+	printf 02 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=28; \
+	printf 14 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=30; \
+	printf 07 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=31; \
+	printf 01 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=32; \
+	printf '%08x' $$C | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=48 status=none; \
+	printf '%08x' $$L | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=49 status=none; \
+	cat $(WD_HEADER) | xxd
+	@$(MSG) "Found length and checksum"
+
+$(WD_FILE_NAME): $(WORK_DIR)/package.tgz $(WD_SCRIPTS) icons $(WORK_DIR)/apkg.sign $(WD_ARCHIVE) $(WD_HEADER)
+	$(create_target_dir)
+	cat $(WD_HEADER) > $(WD_FILE_NAME)
+	cat $(WD_ARCHIVE) >> $(WD_FILE_NAME)
+
+package: $(WD_FILE_NAME)
 
 ### Publish rules
 publish: package
