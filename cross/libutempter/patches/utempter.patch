@@ -1,0 +1,20 @@
+--- utempter.c	2010-11-04 17:14:53.000000000 +0000
++++ utempter-new.c	2019-02-09 07:17:05.000000000 +0000
+@@ -191,16 +191,7 @@
+ 	const char *device, *host;
+ 	struct passwd *pw;
+ 	pid_t   pid;
+-	int     add = 0, i;
+-
+-	for (i = 0; i <= 2; ++i)
+-	{
+-		struct stat sb;
+-
+-		if (fstat(i, &sb) < 0)
+-			/* At this stage, we shouldn't even report error. */
+-			exit(EXIT_FAILURE);
+-	}
++	int     add = 0;
+ 
+ 	if (argc < 2)
+ 		usage();
