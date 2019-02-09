@@ -26,7 +26,7 @@ bzip2_compile:
 
 .PHONY: bzip2_install
 bzip2_install:
-	@$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) install
+	@$(RUN) $(MAKE) PREFIX=$(STAGING_INSTALL_PREFIX) install
 	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bunzip2
 	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bzcat
 	ln -sf bzdiff $(STAGING_INSTALL_PREFIX)/bin/bzcmp
