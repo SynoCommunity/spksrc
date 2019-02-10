@@ -1,6 +1,6 @@
 PKG_NAME = mono
 PKG_VERS_MAJOR = 5.18.0
-PKG_VERS_MINOR = 225
+PKG_VERS_MINOR = 240
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -20,19 +20,19 @@ PRE_CONFIGURE_TARGET = mono_pre_configure
 
 # Avoid building C# code (built natively)
 CONFIGURE_ARGS = --disable-mcs-build
-
 # force building with BTLS
 # needed for platforms compiling with gcc < 4.8
 # patches/001-add-boringssl-alignas-support.patch adds the necessary compatibility
 CONFIGURE_ARGS += --enable-btls
+# Optimize compilation for size
+ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk
 
-AG_ARGS = --disable-mcs-build
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 	AG_ARGS += --host=arm-linux
 endif
 
 .PHONY: mono_pre_configure
 mono_pre_configure:
-	$(RUN) ; ./autogen.sh ${AG_ARGS}
+	$(RUN) ; ./autogen.sh --disable-mcs-build

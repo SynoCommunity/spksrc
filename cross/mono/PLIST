@@ -88,3 +88,7 @@ lib:lib/libMonoSupportW.so
 lnk:lib/libmono-system-native.so
 lnk:lib/libmono-system-native.so.0
 lib:lib/libmono-system-native.so.0.0.0
+rsc:share/mono-2.0/mono/cil/cil-opcodes.xml
+rsc:share/mono-2.0/mono/eglib/eglib-config.h
+rsc:share/mono-2.0/mono/profiler/mono-profiler-coverage.suppression
+
