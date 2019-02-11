@@ -218,7 +218,8 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
 	@/bin/echo -n "    \"desc\": \"" >> $@
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
-	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
+	@echo "\"," >> $@
+	@echo "    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
 	@echo "    \"type\": \"url\"," >> $@
 	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
 	@echo "    \"port\": \"${SERVICE_PORT}\"," >> $@
