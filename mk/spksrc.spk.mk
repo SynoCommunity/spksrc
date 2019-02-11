@@ -351,9 +351,6 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 ####
 
 all-supported:
-ifneq ($(PIP_CACHE_OPT),)
-	@mkdir -p $(PIP_DIR)  # to ensure caching
-endif
 	@$(MSG) Build supported archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
@@ -368,9 +365,6 @@ endif
 	fi
 
 publish-all-supported:
-ifneq ($(PIP_CACHE_OPT),)
-	@mkdir -p $(PIP_DIR)  # to ensure caching
-endif
 	@$(MSG) Publish supported archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
@@ -395,9 +389,6 @@ publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
 ####
 
 all-archs-latest:
-ifneq ($(PIP_CACHE_OPT),)
-	@mkdir -p $(PIP_DIR)  # to ensure caching
-endif
 	@$(MSG) Build all archs with latest DSM per FIRMWARE
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  $(MSG) Skipping duplicate arches; \
@@ -414,9 +405,6 @@ endif
 	fi
 
 publish-all-archs-latest:
-ifneq ($(PIP_CACHE_OPT),)
-	@mkdir -p $(PIP_DIR)  # to ensure caching
-endif
 	@$(MSG) Publish all archs with latest DSM per FIRMWARE
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  $(MSG) Skipping duplicate arches; \
@@ -445,9 +433,6 @@ publish-latest-arch-%:
 ####
 
 all-toolchain-%:
-ifneq ($(PIP_CACHE_OPT),)
-	@mkdir -p $(PIP_DIR)  # to ensure caching
-endif
 	@$(MSG) Built packages for toolchain $*
 	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
