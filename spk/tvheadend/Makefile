@@ -4,7 +4,7 @@ SPK_REV = 15
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = m4tt075
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
@@ -30,6 +30,9 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = tvheadend_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.common.mk
 
