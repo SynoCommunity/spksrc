@@ -21,9 +21,7 @@ service_postinst ()
     # Encrypt password
     wizard_password=`echo -n "TVHeadend-Hide-${wizard_password:=admin}" | openssl enc -a`
 
-    # Edit the configuration according to the wizard
-    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${SYNOPKG_PKGDEST}/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
-    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${SYNOPKG_PKGDEST}/var/passwd/a927e30a755504f9784f23a4efac5109
+    # Edit the password configuration according to the wizard
     sed -i -e "s/@password@/${wizard_password}/g" ${SYNOPKG_PKGDEST}/var/passwd/a927e30a755504f9784f23a4efac5109
 
     # Fix fontconfig links

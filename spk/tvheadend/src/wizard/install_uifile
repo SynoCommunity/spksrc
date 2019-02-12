@@ -1,13 +1,6 @@
 [{
-    "step_title": "Basic configuration",
+    "step_title": "Set password for admin user",
     "items": [{
-        "type": "textfield",
-        "desc": "Administrator's login. Defaults to admin",
-        "subitems": [{
-            "key": "wizard_username",
-            "desc": "User name"
-        }]
-    }, {
         "type": "password",
         "desc": "Administrator's password. Defaults to admin",
         "subitems": [{
