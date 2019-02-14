@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
 DEPENDS += cross/libbluray cross/libvorbis cross/libvpx
 DEPENDS += cross/gnutls cross/opus
-DEPENDS += cross/soxr cross/x264 cross/x265
+DEPENDS += cross/soxr cross/x264
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -27,7 +27,7 @@ CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enabl
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr
 CONFIGURE_ARGS += --enable-libvorbis
-CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
+CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-gnutls
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
 
@@ -58,9 +58,9 @@ CONFIGURE_ARGS += --arch=i386 --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver
+DEPENDS += native/nasm cross/x265 cross/libva cross/libva-utils cross/intel-vaapi-driver
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86_64 --enable-thumb --enable-vaapi
+CONFIGURE_ARGS += --arch=x86_64 --enable-libx265 --enable-thumb --enable-vaapi
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
