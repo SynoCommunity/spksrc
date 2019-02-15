@@ -15,7 +15,9 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Pip command
 PIP ?= pip
-PIP_WHEEL = $(PIP) wheel --no-binary :all: --no-deps --requirement $(WORK_DIR)/wheelhouse/requirements.txt --wheel-dir $(WORK_DIR)/wheelhouse --build-dir $(WORK_DIR)/wheelbuild
+# Why ask for the same thing twice?  Always cache downloads
+PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
+PIP_WHEEL = $(PIP) wheel --no-binary :all: $(PIP_CACHE_OPT) --no-deps --requirement $(WORK_DIR)/wheelhouse/requirements.txt --wheel-dir $(WORK_DIR)/wheelhouse --build-dir $(WORK_DIR)/wheelbuild
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
