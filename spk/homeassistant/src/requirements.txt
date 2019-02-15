@@ -1,22 +1,22 @@
 # Home Assistant core
-homeassistant==0.82.1
-aiohttp==3.4.4
+homeassistant==0.87.1
+aiohttp==3.5.4
 idna-ssl>=1.0		# needed for aiohttp
 multidict<5.0,>=4.0	# needed for aiohttp
 yarl<2.0,>=1.0		# needed for aiohttp
-astral==1.7.1
-async_timeout==3.0.0
+astral==1.8
+async_timeout==3.0.1
 attrs==18.2.0
-bcrypt==3.1.2
-certifi>=2018.10.15
+bcrypt==3.1.5
+certifi>=2018.11.29
 Jinja2>=2.10
 PyJWT==1.6.4
 cryptography==2.3.1
 ed25519
 pip>=8.0.3
-pytz>=2018.7
+pytz>=2018.9
 pyyaml>=3.13,<4
-requests==2.20.0
+requests==2.21.0
 chardet		# needed for requests
 urllib3		# needed for requests
 idna<2.8,>=2.5	# needed for requests, may conflict with idna-ssl>=1.0 for aiohttp
@@ -25,7 +25,7 @@ pyephem>=3.7
 phue>=0.8
 ledcontroller>=1.0.7
 python-libnmap>=0.6.2
-pycparser==2.18
+pycparser==2.19
 
 
 # homeassistant.components.nuimo_controller
