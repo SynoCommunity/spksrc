@@ -14,15 +14,15 @@ LICENSE  = PSF
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-unicode=ucs4 --enable-ipv6
 
-POST_INSTALL_TARGET = myPostInstall
+POST_INSTALL_TARGET = python_post_install
 
 include ../../mk/spksrc.native-cc.mk
 
 PYTHON = $(WORK_DIR)/install/usr/local/bin/python
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 
-.PHONY: myPostInstall
-myPostInstall: $(WORK_DIR)/python-native.mk
+.PHONY: python_post_install
+python_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing setuptools, pip and cffi
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
 	@$(PIP) install "setuptools==37.0.0"
