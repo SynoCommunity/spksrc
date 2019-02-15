@@ -1,13 +1,13 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
-SPK_VERS = $(SPK_SHORT_VERS).14
+SPK_VERS = $(SPK_SHORT_VERS).15
 SPK_REV = 20
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 # Build-time dependencies
 DEPENDS += cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/cffi cross/bcrypt
+DEPENDS += cross/cryptography cross/cffi cross/bcrypt
 
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow
@@ -24,7 +24,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python 2.7.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Update to Python 2.7.14<br>2. Update modules"
+CHANGELOG = "1. Update to Python 2.7.15<br>2. Update modules"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF

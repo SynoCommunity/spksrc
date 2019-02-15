@@ -1,5 +1,5 @@
 PKG_NAME = python
-PKG_VERS = 2.7.14
+PKG_VERS = 2.7.15
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
@@ -25,8 +25,8 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 python_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing setuptools, pip and cffi
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
-	@$(PIP) install "setuptools==37.0.0"
-	@$(PIP) install "cffi==1.11.2"
+	@$(PIP) install "setuptools==40.6.2"
+	@$(PIP) install "cffi==1.11.5"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

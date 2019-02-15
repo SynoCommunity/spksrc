@@ -1,7 +1,7 @@
 PKG_NAME = python
 PKG_VERS_MAJOR = 2
 PKG_VERS_MINOR = 7
-PKG_VERS_PATCH = 14
+PKG_VERS_PATCH = 15
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -24,6 +24,8 @@ POST_PATCH_TARGET = python_post_patch
 PRE_CONFIGURE_TARGET = python_pre_configure
 PRE_INSTALL_TARGET = python_pre_install
 POST_INSTALL_TARGET = python_post_install
+
+PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)%'
 
 include ../../mk/spksrc.cross-cc.mk
 
