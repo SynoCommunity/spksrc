@@ -13,11 +13,11 @@ LICENSE  = GPLv2
 
 CONFIGURE_TARGET = none
 
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = he853_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: he853_install
+he853_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/udev/rules.d
-	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX) MY_UDEV_RULES=$(STAGING_INSTALL_PREFIX)/lib/udev/rules.d
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) MY_UDEV_RULES=$(STAGING_INSTALL_PREFIX)/lib/udev/rules.d

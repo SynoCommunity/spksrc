@@ -1,17 +1,18 @@
 SPK_NAME = dnscrypt-proxy
-SPK_VERS = 2.0.17
+SPK_VERS = 2.0.19
 SPK_REV = 0
 SPK_ICON = src/dnscrypt-proxy.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_CONFLICT = DNSServer
+UNSUPPORTED_ARCHES = $(PPC_ARCHES)
 
 MAINTAINER = publicarray
 DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS. https://github.com/jedisct1/dnscrypt-proxy
 DISPLAY_NAME = dnscrypt-proxy
 HELPURL = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
-CHANGELOG = "Update to 2.0.17"
+CHANGELOG = "Update to 2.0.19"
 
 STARTABLE = yes
 BETA = 1
@@ -74,5 +75,3 @@ dnscrypt_extra_install: copy_msg
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/
 	@echo "===> UI - Compiling cgi"
 	env $(ENV) go build $(CONF_ARGS) -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
-## rm -f work-ipq806x-1.1/.copy_done && rm -f work-ipq806x-1.1/.icon_done && make arch-ipq806x-1.1
-## synopkg uninstall dnscrypt-proxy

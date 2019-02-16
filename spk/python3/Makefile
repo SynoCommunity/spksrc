@@ -1,7 +1,7 @@
 SPK_NAME = python3
-SPK_SHORT_VERS = 3.5
-SPK_VERS = $(SPK_SHORT_VERS).5
-SPK_REV = 7
+SPK_SHORT_VERS = 3.6
+SPK_VERS = $(SPK_SHORT_VERS).8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
-DEPENDS += cross/msgpack-python cross/attr cross/acl cross/lz4
+DEPENDS += cross/msgpack-python cross/ruamel.yaml
 
 WHEELS = src/requirements.txt
 
@@ -21,15 +21,13 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "1. Update to Python 3.5.5<br>2. Added sqlite3 module, lxml module"
+CHANGELOG = "Update to Python 3.6.8"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
 
 PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'

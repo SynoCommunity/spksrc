@@ -1,18 +1,17 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.7
-SPK_REV = 14
+SPK_VERS = 4.2.8
+SPK_REV = 15
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
-BETA = 1
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = m4tt075
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update TVH to 4.2.7 (maintenance release), 2. Update libhdhomerun to 20180817, 3. Enable pcre2, 4. Remove dvb-apps (obsolete), 5. Remove default logging to allow NAS hibernation"
+CHANGELOG = "1. Update TVH to 4.2.8<br/>2. Fix software transcoding with x264<br/>3. Fix ppc build<br/>4. Remove beta flag"
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
 LICENSE = GPL v3
 
@@ -32,12 +31,27 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = tvheadend_extra_install
 
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+include ../../mk/spksrc.common.mk
+
+# Reuse ffmpeg libraries
+# Requires to invoke: make [package|publish] ARCH= TCVERSION=
+export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+
+ifneq ($(wildcard $(FFMPEG_DIR)),)
+PRE_DEPEND_TARGET = tvheadend_pre_depend
+SPK_DEPENDS = "ffmpeg>4.1"
+endif
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: tvheadend_extra_install
+.PHONY: tvheadend_pre_depend tvheadend_extra_install
+
+FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc libswscale.pc libavutil.pc libavformat.pc libavcodec.pc
+
+tvheadend_pre_depend:
+	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
+	$(foreach lib,$(FFMPEG_LIBS),ln -s $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+
 tvheadend_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/accesscontrol

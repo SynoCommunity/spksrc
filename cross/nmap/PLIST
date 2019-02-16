@@ -1,3 +1,4 @@
 bin:bin/ndiff
 bin:bin/nmap
 bin:bin/nping
+shr:share/nmap

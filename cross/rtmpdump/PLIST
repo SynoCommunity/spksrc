@@ -1,6 +1,0 @@
-bin:bin/rtmpdump
-bin:sbin/rtmpgw
-bin:sbin/rtmpsrv
-bin:sbin/rtmpsuck
-lnk:lib/librtmp.so
-lib:lib/librtmp.so.1

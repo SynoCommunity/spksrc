@@ -1,0 +1,15 @@
+lnk:lib/libdrm.so
+lnk:lib/libdrm.so.2
+lib:lib/libdrm.so.2.4.0
+lnk:lib/libdrm_intel.so
+lnk:lib/libdrm_intel.so.1
+lib:lib/libdrm_intel.so.1.0.0
+lnk:lib/libdrm_nouveau.so
+lnk:lib/libdrm_nouveau.so.2
+lib:lib/libdrm_nouveau.so.2.0.0
+lnk:lib/libdrm_radeon.so
+lnk:lib/libdrm_radeon.so.1
+lib:lib/libdrm_radeon.so.1.0.1
+lnk:lib/libkms.so
+lnk:lib/libkms.so.1
+lib:lib/libkms.so.1.0.0

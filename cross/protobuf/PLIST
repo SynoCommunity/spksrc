@@ -1,0 +1,9 @@
+lnk:lib/libprotobuf.so
+lnk:lib/libprotobuf.so.15
+lib:lib/libprotobuf.so.15.0.1
+lnk:lib/libprotobuf-lite.so
+lnk:lib/libprotobuf-lite.so.15
+lib:lib/libprotobuf-lite.so.15.0.1
+lnk:lib/libprotoc.so
+lnk:lib/libprotoc.so.15
+lib:lib/libprotoc.so.15.0.1

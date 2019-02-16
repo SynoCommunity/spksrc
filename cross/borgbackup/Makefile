@@ -1,11 +1,11 @@
 PKG_NAME = borgbackup
-PKG_VERS = 1.1.5
+PKG_VERS = 1.1.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/b/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/acl cross/openssl
+DEPENDS = cross/attr cross/acl cross/openssl
 
 HOMEPAGE = https://borgbackup.readthedocs.io/
 COMMENT  = Deduplicating backup program with compression and authenticated encryption

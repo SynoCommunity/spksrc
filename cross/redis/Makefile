@@ -12,15 +12,10 @@ COMMENT  = Redis is an open source, advanced key-value store. It is often referr
 LICENSE  = BSD
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+COMPILE_TARGET = redis_custom_compile
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myCompile
-myCompile:
+.PHONY: redis_custom_compile
+redis_custom_compile:
 	$(RUN) $(MAKE) MALLOC=libc DEBUG=
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)
