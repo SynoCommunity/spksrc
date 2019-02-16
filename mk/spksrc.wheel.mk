@@ -34,8 +34,15 @@ endif
 wheel_msg_target:
 	@$(MSG) "Processing wheels of $(NAME)"
 
+# PIP distributions caching requires that the user running it owns the cache directory.
+# PIP_CACHE_OPT is default "--cache-dir $(PIP_DIR)", PIP_DIR defaults to $(DISTRIB_DIR)/pip, so
+# will move if the user chooses a custom persistent distribution dir for caching downloads between
+# containers and builds.
 pre_wheel_target: wheel_msg_target
 	@if [ ! -z "$(WHEELS)" ] ; then \
+		if [ ! -z "$(PIP_CACHE_OPT)" ] ; then \
+			mkdir -p $(PIP_DIR) ; \
+		fi; \
 		mkdir -p $(WORK_DIR)/wheelhouse ; \
 		if [ -f "$(WHEELS)" ] ; then \
 			$(MSG) "Using existing requirements file" ; \
