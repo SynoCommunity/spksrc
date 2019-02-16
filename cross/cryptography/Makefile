@@ -9,6 +9,6 @@ DEPENDS = cross/openssl cross/cffi
 
 HOMEPAGE = http://github.com/pyca/cryptography
 COMMENT  = Provide cryptographic recipes and primitives to Python developers
-LICENSE  = BSD/APL2
+LICENSE  = BSD/ASL2
 
 include ../../mk/spksrc.python-module.mk
