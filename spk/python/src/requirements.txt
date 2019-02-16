@@ -32,7 +32,7 @@ markdown==2.6.11
 # These also depends on cross/cffi and cross/openssl,
 # which are installed through cross/bcrypt
 pyOpenSSL==18.0.0
-#cryptography==2.1.4 now built as buildtime dependency
+#cryptography==2.4.2 now built as buildtime dependency
 pyasn1==0.4.4
 asn1crypto==0.24.0
 enum34==1.1.6
