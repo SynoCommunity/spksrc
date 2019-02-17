@@ -1,0 +1,63 @@
+#!/bin/sh
+xmltv_file_location=/var/packages/webgrabplus/target/var/guide.xml
+dflag=
+vflag=
+cflag=
+qflag=
+if (( $# < 1 ))
+then
+  cat "$xmltv_file_location"
+  exit 0
+fi
+
+for arg
+do
+    delim=""
+    case "$arg" in
+    #translate --gnu-long-options to -g (short options)
+       --description) args="${args}-d ";;
+       --version) args="${args}-v ";;
+       --capabilities) args="${args}-c ";;
+       --quiet) args="${args}-q ";;
+
+       #pass through anything else
+       *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+           args="${args}${delim}${arg}${delim} ";;
+    esac
+done
+
+#Reset the positional parameters to the short options
+eval set -- $args
+
+while getopts "dvcq" option
+do
+    case $option in
+        d)  dflag=1;;
+        v)  vflag=1;;
+        c)  cflag=1;;
+        q)  qflag=1;;
+        \?) printf "unknown option: -%s\n" $OPTARG
+            printf "Usage: %s: [--description] [--version] [--capabilities] \n" $(basename $0)
+            exit 2
+            ;;
+    esac >&2
+done
+
+if [ "$dflag" ]
+then
+   printf "$0 is a wrapper grabber around WebGrab+Plus\n"
+fi
+if [ "$vflag" ]
+then
+   printf "0.2\n"
+fi
+if [ "$cflag" ]
+then
+   printf "baseline\n"
+fi
+if [ "$qflag" ]
+then
+   printf ""
+fi
+
+exit 0

@@ -1,0 +1,22 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "desc": "This package integrates <b>WebGrab++</b> into the Synology infrastructure.<br>However, <b>the configuration needs to be completed manually</b> after the package has been installed.<br>Please read the following <a target=\"_blank\" href=\"http://www.webgrabplus.com/documentation/configuration/howto\">WebGrab++ HOWTO</a> for details.<br>All required configuration files are stored in <b>'/usr/local/webgrabplus/var/'</b>.<br>"
+    }, {
+        "type": "multiselect",
+        "desc": "You have the following options:",
+        "subitems": [{
+            "key": "check_gitdl",
+            "desc": "Download latest EPG provider (siteini) packages from github during installation",
+            "defaultValue": true
+        }, {
+            "key": "check_lntvh",
+            "desc": "Integrate WebGrab++ with Tvheadend (requires Tvheadend restart after installation)",
+            "defaultValue": false
+        }, {
+            "key": "check_cron",
+            "desc": "Run WebGrab++ automatically at 1.24am each day (edit '/etc/crontab' to customize)",
+            "defaultValue": true,
+        }]
+    }]
+}]
