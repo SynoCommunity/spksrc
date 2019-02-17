@@ -12,9 +12,9 @@
 PWD := $(shell pwd)
 
 DISTRIB_DIR  = $(PWD)/../../distrib
-PIP_DIR = $(DISTRIB_DIR)/pip
-TOOLCHAINS_DIR = $(DISTRIB_DIR)/toolchains
-KERNELS_DIR = $(DISTRIB_DIR)/kernels
+PIP_DIR = $(PWD)/../../distrib/pip
+TOOLCHAINS_DIR = $(PWD)/../../distrib/toolchains
+KERNELS_DIR = $(PWD)/../../distrib/kernels
 PACKAGES_DIR = $(PWD)/../../packages
 
 ifndef WORK_DIR
