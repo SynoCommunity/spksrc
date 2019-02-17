@@ -280,8 +280,8 @@ ifneq ($(strip $(SPK_ICON)),)
 	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
-.PHONY: checksum
-checksum:
+.PHONY: info-checksum
+info-checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
 	@sed -i -e "s|checksum=\".*|checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\"|g" $(WORK_DIR)/INFO
 
@@ -290,8 +290,9 @@ wizards:
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Preparing DSM Wizards"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uninstall" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "upgrade_uninstall" -or -name "uninstall_uifile_???" -or -name "upgrade_uninstall.sh" -or -name "upgrade_uninstall_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
+	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
 
@@ -311,7 +312,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 

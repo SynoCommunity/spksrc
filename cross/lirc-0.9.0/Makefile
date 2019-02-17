@@ -16,12 +16,9 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-transmitter --with-driver=userspace --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
 
 #POST_CONFIGURE_TARGET = lirc_kill_wpc8769l
-INSTALL_TARGET = lirc_custom_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: lirc_custom_install lirc_kill_wpc8769l
-lirc_custom_install:
-	$(RUN) $(MAKE) install DESTDIR=$(STAGING_INSTALL_PREFIX) prefix=""
+.PHONY: lirc_kill_wpc8769l
 lirc_kill_wpc8769l:
 	echo -e ".PHONY: all install\nall:\ninstall:\n" > $(WORK_DIR)/$(PKG_DIR)/drivers/lirc_wpc8769l/Makefile

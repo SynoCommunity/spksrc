@@ -13,6 +13,7 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 INSTALL_TARGET = myInstall
+CONFIGURE_ARGS = --enable-static=no
 
 include ../../mk/spksrc.cross-cc.mk
 

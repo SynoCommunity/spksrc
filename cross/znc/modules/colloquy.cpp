@@ -734,7 +734,8 @@ public:
 		}
 
 		if ( m_bIgnoreNetworkServices ) {
-			if ( sNick.Equals("NickServ") or sNick.Equals("ChanServ") or sNick.Equals("MemoServ") or sNick.Equals("HostServ") ) {
+			if ( sNick.Equals("NickServ") or sNick.Equals("ChanServ") or sNick.Equals("MemoServ") or sNick.Equals("HostServ") or sNick.Equals("OperServ") or
+				  sNick.Equals("AuthServ") or sNick.Equals("x") or sNick.Equals("q")) {
 				return false;
 			}
 		}
@@ -825,7 +826,7 @@ public:
 			if (m_debug) {
 			PutModule("debug: idleTest Pass... "+CString(m_lastActivity) + " < " + CString(time(NULL)-m_idleAfterMinutes*60)+" | #" +sChannel + " "+sMessage);
 			}
-			if (!pDevice->Push(sNick, sPushMessage, sChannel, bHilite, iBadge)) {
+			if (!sPushMessage.Equals("") && !pDevice->Push(sNick, sPushMessage, sChannel, bHilite, iBadge)) {
 				bRet = false;
 			}
 		}

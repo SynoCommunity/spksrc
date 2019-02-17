@@ -6,6 +6,8 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+
 MAINTAINER = Safihre
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.

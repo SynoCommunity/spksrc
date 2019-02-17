@@ -1,15 +1,21 @@
+
+In Cross-compile, we need to regenerate -- if needed -- using a native-built
+Python.  This patch includes additional vebose output and fail-fast logic for
+when the PGEN determination is incorrectly done to avoid the 55-minute build
+that ultimately fails
+
 --- configure.ac.orig	2016-06-25 23:38:39.000000000 +0200
 +++ configure.ac	2016-12-05 22:06:40.183563868 +0100
-@@ -72,6 +72,8 @@
+@@ -74,6 +74,8 @@
  	fi
          AC_MSG_RESULT($interp)
- 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '$interp
+ 	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib _PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_$(ABIFLAGS)_$(MACHDEP)_$(MULTIARCH) '$interp
 +	else
 +        AC_MSG_RESULT($PYTHON_FOR_BUILD)
      fi
  elif test "$cross_compiling" = maybe; then
      AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
-@@ -80,6 +82,19 @@
+@@ -82,6 +84,19 @@
  fi
  AC_SUBST(PYTHON_FOR_BUILD)
  
@@ -31,7 +37,7 @@
  dnl can cause trouble.
 --- Makefile.pre.in.orig	2016-06-25 23:38:37.000000000 +0200
 +++ Makefile.pre.in	2016-12-05 22:08:58.803564372 +0100
-@@ -279,6 +279,7 @@
+@@ -286,6 +286,7 @@
  ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
@@ -39,12 +45,17 @@
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -792,7 +793,7 @@
+@@ -786,11 +786,11 @@
+ 		$(CC) $(OPT) $(PY_CORE_LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
+ 
+ .PHONY: regen-grammar
+-regen-grammar: $(PGEN)
++regen-grammar: $(PGEN_FOR_BUILD)
+ 	# Regenerate Include/graminit.h and Python/graminit.c
+ 	# from Grammar/Grammar using pgen
  	@$(MKDIR_P) Include
- 	# Avoid copying the file onto itself for an in-tree build
- 	if test "$(cross_compiling)" != "yes"; then \
--		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
-+		$(PGEN_FOR_BUILD) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C) ; \
- 	else \
- 		cp $(srcdir)/Include/graminit.h $(GRAMMAR_H).tmp; \
- 		mv $(GRAMMAR_H).tmp $(GRAMMAR_H); \
+-	$(PGEN) $(srcdir)/Grammar/Grammar \
++	$(PGEN_FOR_BUILD) $(srcdir)/Grammar/Grammar \
+ 		$(srcdir)/Include/graminit.h.new \
+ 		$(srcdir)/Python/graminit.c.new
+ 		$(UPDATE_FILE) $(srcdir)/Include/graminit.h $(srcdir)/Include/graminit.h.new

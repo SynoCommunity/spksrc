@@ -10,7 +10,7 @@ GRPN=`id -gn ${EFF_USER}`
 HOME_DIR="${SYNOPKG_PKGDEST}/var"
 DVR_LOG_DIR="${SYNOPKG_PKGDEST}/var/dvr/log"
 SAVE_DIR="/tmp/tvheadend-recording-backup"
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -l ${LOG_FILE} -p ${PID_FILE}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -p ${PID_FILE}"
 SVC_BACKGROUND=yes
 
 # Group configuration to manage permissions of recording folders
@@ -35,12 +35,6 @@ service_postinst ()
         FONT_NAME=`basename "${FONT_FILE}"`
         $LN "${FONTS_DIR}/${FONT_NAME}" "${CONFD_DIR}/${FONT_NAME}" >> ${INST_LOG}
     done
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 service_preupgrade ()
