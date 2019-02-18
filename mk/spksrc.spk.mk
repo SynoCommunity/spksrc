@@ -19,8 +19,36 @@ SPK_NAME_ARCH = noarch
 SPK_TCVERS = all
 endif
 
+# TODO: clean up
+# EX4
+#WD_MODEL = Lightni
+#WD_MODEL_CODE = 00
+# MyCloudEX2Ultra, MirrorGen2
+#WD_MODEL = GrandTe
+#WD_MODEL_CODE = 01
+# EX2, Mirror
+#WD_MODEL = KingsCa
+#WD_MODEL_CODE = 01
+# MyCloud
+#WD_MODEL = Glacier
+#WD_MODEL_CODE = 02
+# EX4100
+#WD_MODEL = Yellow
+#WD_MODEL_CODE = 03
+# EX2100
+#WD_MODEL = Yosemit
+#WD_MODEL_CODE = 04
+
+# Build for PR4100 by default
+ifeq ($(WD_MODEL),)
+	WD_MODEL = BlackCy
+endif
+ifeq ($(WD_MODEL_CODE),)
+	WD_MODEL_CODE = 07
+endif
+
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
-WD_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)_$(SPK_VERS)-$(SPK_REV).bin
+WD_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(WD_MODEL)_$(SPK_NAME_ARCH)_$(SPK_VERS)-$(SPK_REV).bin
 #####
 
 # Check if package supports ARCH
@@ -56,6 +84,7 @@ include ../../mk/spksrc.strip.mk
 
 # Scripts
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
+WD_SCRIPTS_DIR = $(WORK_DIR)
 
 # Generated scripts
 DSM_SCRIPTS_  = preinst postinst
@@ -75,6 +104,11 @@ DSM_SCRIPTS_ += start-stop-status
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
 	@$(dsm_script_copy)
 endif
+
+#WD_SCRIPTS_ += wdinstaller
+# enforce the presence of a WD installer script
+#$(WD_SCRIPTS_DIR)/wdinstaller: $(WD_INSTALLER_SCRIPT)
+#    @$(dsm_script_copy)
 
 ifneq ($(strip $(INSTALLER_SCRIPT)),)
 DSM_SCRIPTS_ += installer
@@ -114,12 +148,12 @@ $(WORK_DIR)/apkg.rc:
 	@echo Description: ${DESCRIPTION} >> $@
 	@echo Icon: PACKAGE_ICON.PNG >> $@
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
-    @echo InstDepend: $(INSTALL_DEP_SERVICES) >> $@
+    @echo "InstDepend: $(subst \, ,$(INSTALL_DEP_SERVICES))" >> $@
 endif
 ifneq ($(strip $(START_DEP_SERVICES)),)
-    @echo StartDepend: $(START_DEP_SERVICES) >> $@
+    @echo "StartDepend: $(subst \, ,$(START_DEP_SERVICES))" >> $@
 endif
-	@echo IndividualFlag: 0 >> $@
+	@echo "IndividualFlag: 0" >> $@
 
 
 .PHONY: $(WORK_DIR)/INFO
@@ -263,14 +297,19 @@ $(WORK_DIR)/package.tgz: icon service
 	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
-WD_SCRIPTS = $(addprefix $(WORK_DIR)/,$(WD_SCRIPTS_))
+WD_SCRIPTS = $(addprefix $(WD_SCRIPTS_DIR)/,$(WD_SCRIPTS_))
 
 define wd_script_redirect
 $(create_target_dir)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
-# echo '. `dirname $$0`/scripts/wdinstaller' >> $@
-# echo '`basename $$0` $(INSTALLER_OUTPUT)' >> $@
+echo 'SYNOPKG_PKGNAME=$(SPK_NAME)' >> $@
+echo 'PKGNAME=$(SPK_NAME)' >> $@
+echo 'SYNOPKG_PKGDEST=/shares/Volume_1/Nas_Prog/$(SPK_NAME)' >> $@
+echo 'SYNOPKG_TEMP_LOGFILE=/tmp/debug_apkg' >> $@
+echo '[[ ! -e /var/packages ]] && ln -s /shares/Volume_1/Nas_Prog /var/packages' >> $@
+echo '. `dirname $$0`/scripts/installer' >> $@
+echo '`basename $$0 .sh` $$@ $(INSTALLER_OUTPUT)' >> $@
 exit 0
 chmod 755 $@
 endef
@@ -308,40 +347,17 @@ $(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
 	@$(dsm_script_copy)
 
 $(WORK_DIR)/preinst.sh:
-	@$(create_target_dir)
-	@$(MSG) "Creating $@"
-	@echo '#!/bin/sh' > $@
-	@chmod 755 $@
+	@$(wd_script_redirect)
 $(WORK_DIR)/install.sh:
-	@$(create_target_dir)
-	@$(MSG) "Creating $@"
-	@echo '#!/bin/sh' > $@
-	@echo 'echo DEBUG: "$$0 $$@" >> /tmp/debug_apkg' >> $@
-	@echo 'tmp=$$1' >> $@
-	@echo 'nasprog=$$2' >> $@
-	@echo 'cd $$1' >> $@
-	@echo 'tar xf package.tgz' >> $@
-	@echo 'rm package.tgz' >> $@
-	@echo 'mv $$tmp $$nasprog' >> $@
-	@chmod 755 $@
-
+	@$(wd_script_redirect)
 $(WORK_DIR)/init.sh:
-	@$(create_target_dir)
-	@$(MSG) "Creating $@"
-	@echo '#!/bin/sh' > $@
-	@echo 'mkdir /var/www/$(SPK_NAME)' >> $@
-	@echo 'ln -sf $$1/web/* /var/www/$(SPK_NAME)/' >> $@
-	@chmod 755 $@
+	@$(wd_script_redirect)
 $(WORK_DIR)/start.sh:
 	@$(wd_script_redirect)
 $(WORK_DIR)/stop.sh:
 	@$(wd_script_redirect)
 $(WORK_DIR)/clean.sh:
-	@$(create_target_dir)
-	@$(MSG) "Creating $@"
-	@echo '#!/bin/sh' > $@
-	@echo 'rm -rf  /var/www/$(SPK_NAME)' >> $@
-	@chmod 755 $@
+	@$(wd_script_redirect)
 $(WORK_DIR)/remove.sh:
 	@$(wd_script_redirect)
 
@@ -356,6 +372,16 @@ ifneq ($(strip $(SPK_ICON)),)
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
 	(convert $(SPK_ICON) -thumbnail 256x256 - > $(WORK_DIR)/web/PACKAGE_ICON_256.PNG)
 	$(eval SPK_CONTENT += web)
+endif
+
+.PHONY: webredirect
+webredirect:
+ifneq ($(strip $(ADMIN_PORT)),)
+	$(create_target_dir)
+	mkdir -p $(WORK_DIR)/web
+	@$(MSG) "Creating web redirect for $(SPK_NAME)"
+	# little hack as I don't know how to escape this
+	echo "<?php header(\"Location: http://{$$ _SERVER['SERVER_ADDR']}:$(ADMIN_PORT)\"); ?>" | sed 's/$$ /$$/' >> $(WORK_DIR)/web/index.php
 endif
 
 .PHONY: info-checksum
@@ -410,42 +436,46 @@ $(WORK_DIR)/apkg.sign:
 $(WD_XML):
 	@$(MSG) "Create WD XML"
 	$(create_target_dir)
-	echo '<?xml version="1.0" encoding="UTF-8"?>' > $@
-	echo '<config>' >> $@
-	echo ' <apkg>' >> $@
-	echo '  <item>' >> $@
-	echo '   <procudt_id>0</procudt_id>' >> $@
-	echo '   <custom_id>20</custom_id>' >> $@
-	echo '   <model_id>7</model_id>' >> $@
-	echo '   <user_control>0</user_control>' >> $@
-	echo '   <center_type>0</center_type>' >> $@
-	echo '   <individual_flag>0</individual_flag>' >> $@
-	echo '   <name>$(SPK_NAME)</name>' >> $@
-	echo '   <show>$(SPK_NAME)</show>' >> $@
-	echo '   <enable>1</enable>' >> $@
-	echo '   <version>$(SPK_VERS)</version>' >> $@
-	echo '   <date>20190125</date>' >> $@
-	echo '   <inst_date/>' >> $@
-	echo '   <path/>' >> $@
-	echo '   <ps_name/>' >> $@
-	echo '   <url/>' >> $@
-	echo '   <url_port/>' >> $@
-	echo '   <apkg_version>2</apkg_version>' >> $@
-	echo '   <packager>TFL</packager>' >> $@
-	echo '   <email/>' >> $@
-	echo '   <homepage>$(HOME_PAGE)</homepage>' >> $@
-	echo '   <inst_depend/>' >> $@
-	echo '   <inst_conflict/>' >> $@
-	echo '   <start_depend/>' >> $@
-	echo '   <start_conflict/>' >> $@
-	echo '   <description>${DESCRIPTION}</description>' >> $@
-	echo '   <icon>PACKAGE_ICON.PNG</icon>' >> $@
-	echo '   <MinFWVer/>' >> $@
-	echo '   <MaxFWVer/>' >> $@
-	echo '   </item>' >> $@
-	echo '  </apkg>' >> $@
-	echo '</config>' >> $@
-	chmod 644 $@
+	@echo '<?xml version="1.0" encoding="UTF-8"?>' > $@
+	@echo '<config>' >> $@
+	@echo ' <apkg>' >> $@
+	@echo '  <item>' >> $@
+	@echo '   <procudt_id>0</procudt_id>' >> $@
+	@echo '   <custom_id>20</custom_id>' >> $@
+	@echo '   <model_id>7</model_id>' >> $@
+	@echo '   <user_control>0</user_control>' >> $@
+	@echo '   <center_type>0</center_type>' >> $@
+	@echo '   <individual_flag>0</individual_flag>' >> $@
+	@echo '   <name>$(SPK_NAME)</name>' >> $@
+	@echo '   <show>$(SPK_NAME)</show>' >> $@
+	@echo '   <enable>1</enable>' >> $@
+	@echo '   <version>$(SPK_VERS)</version>' >> $@
+	@echo '   <date>20190125</date>' >> $@
+	@echo '   <inst_date/>' >> $@
+	@echo '   <path/>' >> $@
+	@echo '   <ps_name/>' >> $@
+ifneq ($(strip $(ADMIN_PORT)),)
+	@echo '   <url>index.php</url>' >> $@
+else
+	@echo '   <url/>' >> $@
+endif
+	@echo '   <url_port/>' >> $@
+	@echo '   <apkg_version>2</apkg_version>' >> $@
+	@echo '   <packager>TFL</packager>' >> $@
+	@echo '   <email/>' >> $@
+	@echo '   <homepage>$(HOME_PAGE)</homepage>' >> $@
+	@echo '   <inst_depend/>' >> $@
+	@echo '   <inst_conflict/>' >> $@
+	@echo '   <start_depend/>' >> $@
+	@echo '   <start_conflict/>' >> $@
+	@echo '   <description>${DESCRIPTION}</description>' >> $@
+	@echo '   <icon>PACKAGE_ICON.PNG</icon>' >> $@
+	@echo '   <MinFWVer/>' >> $@
+	@echo '   <MaxFWVer/>' >> $@
+	@echo '   </item>' >> $@
+	@echo '  </apkg>' >> $@
+	@echo '</config>' >> $@
+	@chmod 644 $@
 	$(eval SPK_CONTENT += apkg.xml)
 
 
@@ -458,30 +488,29 @@ endif
 	cd $(WORK_DIR) && mkdir $(SPK_NAME) && mv $(SPK_CONTENT) $(SPK_NAME) && \
     tar -zcf $@ $(SPK_NAME) --owner=root --group=root
 
-$(WD_HEADER): $(WORK_DIR)/package.tgz $(WD_SCRIPTS) icons $(WORK_DIR)/apkg.sign $(WD_ARCHIVE)
+$(WD_HEADER): $(WORK_DIR)/package.tgz $(WD_SCRIPTS) icons $(WORK_DIR)/apkg.sign $(WD_ARCHIVE) webredirect
 	$(create_target_dir)
-	L=$$(stat -L -c %s $(WD_ARCHIVE)); \
+	@L=$$(stat -L -c %s $(WD_ARCHIVE)); \
 	echo Got size $$L, trim to 4 bytes; \
 	T=$$((4 * ($$L / 4 ))); \
 	C=$$(($$(xor_checksum $(WD_ARCHIVE) 4 0 $$T ))); \
 	echo Got checksum $$C; \
 	dd if=/dev/zero of=$(WD_HEADER) bs=200 count=1 status=none; \
-	printf 'BlackCyZ' | dd of=$(WD_HEADER) conv=notrunc status=none; \
-	printf $(SPK_NAME) | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=2; \
+	printf $(WD_MODEL) | dd of=$(WD_HEADER) conv=notrunc status=none; \
+	printf Z$(SPK_NAME) | dd of=$(WD_HEADER) conv=notrunc status=none bs=1 seek=7; \
 	printf $(SPK_VERS)-$(SPK_REV) | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=19; \
 	printf 02 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=28; \
 	printf 14 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=30; \
-	printf 07 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=31; \
+	printf $(WD_MODEL_CODE) | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=31; \
 	printf 01 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=32; \
 	printf '%08x' $$C | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=48 status=none; \
-	printf '%08x' $$L | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=49 status=none; \
+	printf '%08x' $$L | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=49 status=none;
 	cat $(WD_HEADER) | xxd
-	@$(MSG) "Found length and checksum"
 
 $(WD_FILE_NAME): $(WORK_DIR)/package.tgz $(WD_SCRIPTS) icons $(WORK_DIR)/apkg.sign $(WD_ARCHIVE) $(WD_HEADER)
 	$(create_target_dir)
-	cat $(WD_HEADER) > $(WD_FILE_NAME)
-	cat $(WD_ARCHIVE) >> $(WD_FILE_NAME)
+	@cat $(WD_HEADER) > $(WD_FILE_NAME)
+	@cat $(WD_ARCHIVE) >> $(WD_FILE_NAME)
 
 package: $(WD_FILE_NAME)
 
@@ -615,9 +644,22 @@ publish-all-toolchain-%:
 
 ####
 
+apkg-%:
+	@$(MSG) Building WD binary package
+	# DL4100
+	-@MAKEFLAGS= $(MAKE) WD_MODEL=Sprite WD_MODEL_CODE=05 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+	# DL2100
+	-@MAKEFLAGS= $(MAKE) WD_MODEL=Aurora WD_MODEL_CODE=06 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+	# MyCloudPR4100
+	-@MAKEFLAGS= $(MAKE) WD_MODEL=BlackCy WD_MODEL_CODE=07 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+	# MyCloudPR2100
+	-@MAKEFLAGS= $(MAKE) WD_MODEL=BryceCy WD_MODEL_CODE=08 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+
 arch-%:
 	@$(MSG) Building package for arch $*
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+
+
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*

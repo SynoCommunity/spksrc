@@ -126,7 +126,7 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
 DSM_SCRIPTS_ += installer
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.wdinstaller
 	@$(dsm_script_copy)
 endif
 
@@ -138,10 +138,10 @@ $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
 	@$(dsm_script_copy)
 else
 ifneq ($(strip $(SERVICE_EXE)),)
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-daemon
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.wd-start-stop-daemon
 	@$(dsm_script_copy)
 else
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-status
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.wd-start-stop-status
 	@$(dsm_script_copy)
 endif
 endif

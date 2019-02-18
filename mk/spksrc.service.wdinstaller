@@ -1,0 +1,100 @@
+#!/bin/sh
+#
+# WD APKG service expects these files to be present
+#   * preinst.sh
+#   * install.sh
+#   * init.sh
+#   * start.sh
+#   * stop.sh
+#   * clean.sh
+#   * remove.sh
+# This installer provides functions for when you remove the extension
+
+# Source package specific variable and functions
+SVC_SETUP=`dirname $0`"/scripts/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+	. "${SVC_SETUP}"
+fi
+
+# Reload wizard variables stored by postinst
+if [ -r "${INST_VARIABLES}" ]; then
+	. "${INST_VARIABLES}"
+fi
+
+
+
+# Pre-installation checks
+preinst ()
+{
+	echo "Preinstall ${PKGNAME}"
+	exit 0
+}
+
+# Install application
+install ()
+{
+	echo "Install ${PKGNAME}"
+	TMP=$1
+	NASPROG=$2
+	cd $1
+	mkdir target
+	tar -C target -xf package.tgz
+	rm package.tgz
+	mv ${TMP} ${NASPROG}
+	exit 0
+}
+
+# Initialize application, setup icon for web ui, setup path
+init ()
+{
+	echo "Init ${PKGNAME}"
+	APPDIR=$1
+	mkdir -p /var/www/${PKGNAME}
+	ln -sf ${APPDIR}/web/* /var/www/${PKGNAME}/
+
+	# syno packages sit in /var/packages
+	# add a symlink for improved script compatibility
+	ln -sf /shares/Volume_1/Nas_Prog /var/packages
+
+	ln -sf ${APPDIR}/target /usr/local/${PKGNAME}
+
+	# run syno post installation steps
+	service_postinst
+	exit 0
+}
+
+# Start application binary
+start ()
+{
+	echo "Start ${PKGNAME}"
+	exit 0
+}
+
+# Stop application binary
+stop ()
+{
+	echo "Stop ${PKGNAME}"
+	exit 0
+}
+
+# Clean up icons and resources to allow volume umount and NAS shutdown
+clean ()
+{
+	echo "Clean ${PKGNAME}"
+	APPDIR=$1
+	rm -rf /var/www/${PKGNAME}
+
+	rm -f /usr/local/${PKGNAME}
+
+	service_postuninst
+	exit 0
+}
+
+# Backup the config and remove the app
+remove ()
+{
+	echo "Remove ${PKGNAME}"
+	APPDIR=$1
+	rm -rf ${APPDIR}
+	exit 0
+}
