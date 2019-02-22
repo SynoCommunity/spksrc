@@ -1,17 +1,17 @@
 SPK_NAME = tvheadend
 SPK_VERS = 4.2.8
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = m4tt075
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update TVH to 4.2.8<br/>2. Fix software transcoding with x264<br/>3. Fix ppc build<br/>4. Remove beta flag"
+CHANGELOG = "1. Fix CA module support regression<br/>2. Fix regression of upgrading legacy packages<br/>3. Simplify and fix initial login credential setting"
 HOMEPAGE = https://www.lonelycoder.com/tvheadend/
 LICENSE = GPL v3
 
@@ -30,6 +30,9 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = tvheadend_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.common.mk
 
