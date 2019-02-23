@@ -26,7 +26,8 @@ phue>=0.8
 ledcontroller>=1.0.7
 python-libnmap>=0.6.2
 pycparser==2.19
-
+python-slugify==1.2.6
+Unidecode==1.0.23
 
 # homeassistant.components.nuimo_controller
 #--only-binary=all nuimo==0.1.0

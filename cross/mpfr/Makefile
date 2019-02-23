@@ -19,7 +19,3 @@ CONFIGURE_ARGS = --with-gmp=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Replace libgmp.la location in  install/var/packages/homeassistant/target/lib/libmpfr.la
-# /spksrc/spk/homeassistant/work-x64-6.1/install/var/packages/homeassistant/target/lib/libgmp.la
-# LT_SYS_LIBRARY_PATH does not help
-

@@ -13,7 +13,6 @@ LICENSE  = libffi BSD-like
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libffi_pre_configure
-INSTALL_TARGET = libffi_install
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -22,7 +21,3 @@ libffi_pre_configure:
 	$(RUN) autoconf
 	$(RUN) aclocal
 	$(RUN) automake
-
-.PHONY: libffi_install
-libffi_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
