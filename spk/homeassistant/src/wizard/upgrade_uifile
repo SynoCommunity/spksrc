@@ -1,0 +1,6 @@
+[{
+    "step_title": "HomeAssistant FAQ for configuration",
+    "items": [{
+        "desc": "Warning: your configuration may require changes after update. Please refer to <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-HomeAssistant\">dedicated FAQ</a> for HA configuration. This native Python 3 package may not provide components required by addons you may be interested in."
+    }]
+}]
