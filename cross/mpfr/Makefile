@@ -17,5 +17,16 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --with-gmp=$(STAGING_INSTALL_PREFIX)
 
+COMPILE_TARGET = mpfr_compile
+INSTALL_TARGET = mpfr_install
+
 include ../../mk/spksrc.cross-cc.mk
 
+# Do not build test nor doc
+.PHONY: mpfr_compile mpfr_install
+
+mpfr_compile:
+	@$(RUN) $(MAKE) SUBDIRS=src
+
+mpfr_install:
+	$(RUN) $(MAKE) SUBDIRS=src DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
