@@ -13,12 +13,12 @@ LICENSE  = GPL
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = sabnzbd_install
 
 include ../../mk/spksrc.cross-cc.mk
 include ../../mk/spksrc.python-wheel.mk
 
-myInstall:
+sabnzbd_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/SABnzbd
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/SABnzbd
 
