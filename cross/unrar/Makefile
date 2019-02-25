@@ -12,5 +12,10 @@ COMMENT  = Extract files from rar archives
 LICENSE  = freeware
 
 CONFIGURE_TARGET = nop
+INSTALL_TARGET = unrar_install
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: unrar_install
+unrar_install:
+	$(RUN) $(MAKE) install DESTDIR=$(STAGING_INSTALL_PREFIX)
