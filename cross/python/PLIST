@@ -4,10 +4,10 @@ bin:bin/pydoc
 bin:bin/smtpd.py
 lnk:bin/python
 lnk:bin/python2
-bin:bin/python2.7
-lnk:lib/libpython2.7.so
-lib:lib/libpython2.7.so.1.0
-rsc:lib/python2.7
-lib:lib/python2.7/lib-dynload/*.so
+bin:bin/python@PKG_SHORT_VERS@
+lnk:lib/libpython@PKG_SHORT_VERS@.so
+lib:lib/libpython@PKG_SHORT_VERS@.so.1.0
+rsc:lib/python@PKG_SHORT_VERS@
+lib:lib/python@PKG_SHORT_VERS@/lib-dynload/*.so
 rsc:etc/mime.types
-rsc:include/python2.7/pyconfig.h
+rsc:include/python@PKG_SHORT_VERS@/pyconfig.h

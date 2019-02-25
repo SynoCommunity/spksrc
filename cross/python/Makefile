@@ -1,7 +1,7 @@
 PKG_NAME = python
 PKG_VERS_MAJOR = 2
 PKG_VERS_MINOR = 7
-PKG_VERS_PATCH = 14
+PKG_VERS_PATCH = 15
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -20,10 +20,12 @@ ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 CONFIGURE_ARGS  = --enable-shared --enable-unicode=ucs4 --target=$(TC_TARGET) --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE)
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ac_cv_buggy_getaddrinfo=no
 
-POST_PATCH_TARGET = myPostPatch
-PRE_CONFIGURE_TARGET = myPreConfigure
-PRE_INSTALL_TARGET = myPreInstall
-POST_INSTALL_TARGET = myPostInstall
+POST_PATCH_TARGET = python_post_patch
+PRE_CONFIGURE_TARGET = python_pre_configure
+PRE_INSTALL_TARGET = python_pre_install
+POST_INSTALL_TARGET = python_post_install
+
+PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)%'
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -39,27 +41,27 @@ PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux2-$(BUILD_ARCH)-$(PKG_V
 PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 
-.PHONY: myPostPatch
-myPostPatch:
+.PHONY: python_post_patch
+python_post_patch:
 	# Need to bring our own mime-type definitions
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
 
-.PHONY: myPreConfigure
-myPreConfigure:
+.PHONY: python_pre_configure
+python_pre_configure:
 	# Needed for cross-compilation of wheels
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
 	# Needed to apply patch-changes to configure.ac
 	$(RUN) autoreconf
 
-.PHONY: myPreInstall
-myPreInstall:
+.PHONY: python_pre_install
+python_pre_install:
 	# Needed to have native modules available when compiling wheels
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	# Supplies correct flags
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata.py* $(PYTHON_LIB_NATIVE)/
 
-.PHONY: myPostInstall
-myPostInstall: $(WORK_DIR)/python-cc.mk
+.PHONY: python_post_install
+python_post_install: $(WORK_DIR)/python-cc.mk
 	# Add mimetypes
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc/
 	@install -m 644 -D src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
