@@ -12,6 +12,7 @@ COMMENT  = GMP is a free library for arbitrary precision arithmetic, operating o
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
+
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=arm-unknown-linux-gnueabi --host=arm-unknown-linux-gnueabi --disable-assembly
 endif
