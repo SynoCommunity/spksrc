@@ -14,10 +14,10 @@ COMMENT  = Cross platform, open source .NET development framework
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
 
 REQUIRED_DSM = 5.0
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = mono_pre_configure
+UNSUPPORTED_ARCHS = ppc853x
 
+PRE_CONFIGURE_TARGET = mono_pre_configure
+GNU_CONFIGURE = 1
 # Avoid building C# code (built natively)
 CONFIGURE_ARGS = --disable-mcs-build
 # force building with BTLS
@@ -29,10 +29,31 @@ ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
-	AG_ARGS += --host=arm-linux
+PLIST_TRANSFORM = cat
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+	AG_ARGS = --host=arm-linux
+	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 endif
+ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
+	AG_ARGS = --host=arm-linux
+	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
+		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
+	endif
+endif
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+	AG_ARGS = --host=aarch64-linux
+	PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+	AG_ARGS = --host=powerpc-linux
+endif
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
+		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
+	endif
+endif
+AG_ARGS += --disable-mcs-build
 
 .PHONY: mono_pre_configure
 mono_pre_configure:
-	$(RUN) ; ./autogen.sh --disable-mcs-build
+	$(RUN) ; ./autogen.sh $(AG_ARGS)
