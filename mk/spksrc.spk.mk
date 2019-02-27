@@ -19,26 +19,6 @@ SPK_NAME_ARCH = noarch
 SPK_TCVERS = all
 endif
 
-# TODO: clean up
-# EX4
-#WD_MODEL = Lightni
-#WD_MODEL_CODE = 00
-# MyCloudEX2Ultra, MirrorGen2
-#WD_MODEL = GrandTe
-#WD_MODEL_CODE = 01
-# EX2, Mirror
-#WD_MODEL = KingsCa
-#WD_MODEL_CODE = 01
-# MyCloud
-#WD_MODEL = Glacier
-#WD_MODEL_CODE = 02
-# EX4100
-#WD_MODEL = Yellow
-#WD_MODEL_CODE = 03
-# EX2100
-#WD_MODEL = Yosemit
-#WD_MODEL_CODE = 04
-
 # Build for PR4100 by default
 ifeq ($(WD_MODEL),)
 	WD_MODEL = BlackCy
@@ -46,9 +26,12 @@ endif
 ifeq ($(WD_MODEL_CODE),)
 	WD_MODEL_CODE = 07
 endif
+ifeq ($(WD_MODEL_NAME),)
+	WD_MODEL_NAME = PR4100
+endif
 
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
-WD_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(WD_MODEL)_$(SPK_NAME_ARCH)_$(SPK_VERS)-$(SPK_REV).bin
+WD_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(WD_MODEL_NAME)_$(SPK_VERS)-$(SPK_REV).bin
 #####
 
 # Check if package supports ARCH
@@ -297,7 +280,7 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 $(WORK_DIR)/package.tgz: icon service
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
+	@(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
 WD_SCRIPTS = $(addprefix $(WD_SCRIPTS_DIR)/,$(WD_SCRIPTS_))
@@ -381,10 +364,10 @@ endif
 webredirect:
 ifneq ($(strip $(ADMIN_PORT)),)
 	$(create_target_dir)
-	mkdir -p $(WORK_DIR)/web
-	@$(MSG) "Creating web redirect for $(SPK_NAME)"
-	# little hack as I don't know how to escape this
-	echo "<?php header(\"Location: http://{$$ _SERVER['SERVER_ADDR']}:$(ADMIN_PORT)\"); ?>" | sed 's/$$ /$$/' >> $(WORK_DIR)/web/index.php
+	@mkdir -p $(WORK_DIR)/web
+	@$(MSG) "Creating web redirect for $(SPK_NAME) and $(WD_MODEL)"
+	@# little hack as I don't know how to escape this
+	@echo "<?php header(\"Location: http://{$$ _SERVER['SERVER_ADDR']}:$(ADMIN_PORT)\"); ?>" | sed 's/$$ /$$/' >> $(WORK_DIR)/web/index.php
 endif
 
 .PHONY: info-checksum
@@ -421,7 +404,7 @@ endif
 
 $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf $(WD_SCRIPTS)
 	$(create_target_dir)
-	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
+	@(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
 WD_ARCHIVE = $(WORK_DIR)/$(SPK_NAME)_$(ARCH).tar.gz
 WD_HEADER = $(WORK_DIR)/$(SPK_NAME)_$(ARCH).blob
@@ -648,15 +631,12 @@ publish-all-toolchain-%:
 ####
 
 apkg-%:
-	@$(MSG) Building WD binary package
-	# DL4100
-	-@MAKEFLAGS= $(MAKE) WD_MODEL=Sprite WD_MODEL_CODE=05 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
-	# DL2100
-	-@MAKEFLAGS= $(MAKE) WD_MODEL=Aurora WD_MODEL_CODE=06 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
-	# MyCloudPR4100
-	-@MAKEFLAGS= $(MAKE) WD_MODEL=BlackCy WD_MODEL_CODE=07 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
-	# MyCloudPR2100
-	-@MAKEFLAGS= $(MAKE) WD_MODEL=BryceCy WD_MODEL_CODE=08 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+	@$(MSG) Building WD binary package for $*
+	@IFS=':'; \
+	for model in $($*_MODELS); do \
+		set -- $$model; \
+		$(MAKE) WD_MODEL=$$1 WD_MODEL_CODE=$$2 WD_MODEL_NAME=$$3 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))); \
+	done
 
 arch-%:
 	@$(MSG) Building package for arch $*
