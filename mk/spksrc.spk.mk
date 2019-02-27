@@ -137,6 +137,8 @@ ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
 
+WD_DEPENDS = $(foreach dep,$(subst :, ,$(patsubst "%",%,$(SPK_DEPENDS))),$(firstword $(subst >, ,$(dep))))
+
 .PHONY: $(WORK_DIR)/apkg.rc
 $(WORK_DIR)/apkg.rc:
 	$(create_target_dir)
@@ -146,12 +148,13 @@ $(WORK_DIR)/apkg.rc:
 	@echo Packager: $(MAINTAINER) >> $@
 	@echo Homepage: $(HOMEPAGE) >> $@
 	@echo Description: ${DESCRIPTION} >> $@
+	@echo AddonShowName: $(DISPLAY_NAME) >> $@
 	@echo Icon: PACKAGE_ICON.PNG >> $@
 ifneq ($(strip $(INSTALL_DEP_SERVICES)),)
-    @echo "InstDepend: $(subst \, ,$(INSTALL_DEP_SERVICES))" >> $@
+    @echo "InstDepend: $(WD_DEPENDS)" >> $@
 endif
 ifneq ($(strip $(START_DEP_SERVICES)),)
-    @echo "StartDepend: $(subst \, ,$(START_DEP_SERVICES))" >> $@
+    @echo "StartDepend: $(WD_DEPENDS)" >> $@
 endif
 	@echo "IndividualFlag: 0" >> $@
 
@@ -447,7 +450,7 @@ $(WD_XML):
 	@echo '   <center_type>0</center_type>' >> $@
 	@echo '   <individual_flag>0</individual_flag>' >> $@
 	@echo '   <name>$(SPK_NAME)</name>' >> $@
-	@echo '   <show>$(SPK_NAME)</show>' >> $@
+	@echo '   <show>$(DISPLAY_NAME)</show>' >> $@
 	@echo '   <enable>1</enable>' >> $@
 	@echo '   <version>$(SPK_VERS)</version>' >> $@
 	@echo '   <date>20190125</date>' >> $@
@@ -464,9 +467,9 @@ endif
 	@echo '   <packager>TFL</packager>' >> $@
 	@echo '   <email/>' >> $@
 	@echo '   <homepage>$(HOME_PAGE)</homepage>' >> $@
-	@echo '   <inst_depend/>' >> $@
+	@echo '   <inst_depend>$(WD_DEPENDS)</inst_depend>' >> $@
 	@echo '   <inst_conflict/>' >> $@
-	@echo '   <start_depend/>' >> $@
+	@echo '   <start_depend>$(WD_DEPENDS)</start_depend>' >> $@
 	@echo '   <start_conflict/>' >> $@
 	@echo '   <description>${DESCRIPTION}</description>' >> $@
 	@echo '   <icon>PACKAGE_ICON.PNG</icon>' >> $@
