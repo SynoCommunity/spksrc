@@ -1,0 +1,4 @@
+bin:bin/wg
+lib:lib/libmnl.a
+rsc:lib/libmnl.la
+rsc:wireguard.ko
