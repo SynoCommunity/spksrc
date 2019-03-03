@@ -4,7 +4,6 @@ PKG_EXT = tar.xz
 PKG_DIST_SITE = https://git.zx2c4.com/WireGuard/snapshot
 PKG_DIST_NAME = WireGuard-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR =  $(PKG_NAME)-$(PKG_VERS)
-MOD_DIR = /lib/modules
 
 REQ_KERNEL = 1
 
