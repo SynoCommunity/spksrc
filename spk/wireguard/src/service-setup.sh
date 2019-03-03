@@ -1,20 +1,21 @@
+# shellcheck disable=SC2129
 SERVERPORT=51820
 NETWORK=172.23.0.0/24 # why 172.23 ? because Synology SRM uses 172.22 and 172.21 for OpenVPN and L2TP/IPsec
-PID_FILE="${SYNOPKG_PKGDEST}/var/wireguard.pid"
+# PID_FILE="${SYNOPKG_PKGDEST}/var/wireguard.pid"
 
 # Todo: survive a restart (help needed)
 start() {
     # generate keys
-    [ -f /var/packages/${SYNOPKG_PKGNAME}/target/etc/privatekey ] || umask 077 && wg genkey | tee /var/packages/${SYNOPKG_PKGNAME}/target/etc/privatekey | wg pubkey > /var/packages/${SYNOPKG_PKGNAME}/target/etc/publickey && umask 022
+    [ -f "/var/packages/${SYNOPKG_PKGNAME}/target/etc/privatekey" ] || umask 077 && wg genkey | tee "/var/packages/${SYNOPKG_PKGNAME}/target/etc/privatekey" | wg pubkey > "/var/packages/${SYNOPKG_PKGNAME}/target/etc/publickey" && umask 022
     # allow synoeditor to read the publickey
-    chmod 644 /var/packages/${SYNOPKG_PKGNAME}/target/etc/publickey
+    chmod 644 "/var/packages/${SYNOPKG_PKGNAME}/target/etc/publickey"
     # delete and make a new wg0 interface
     ip link del dev wg0 2>/dev/null || true
     ip link add dev wg0 type wireguard
 
     # if the config does not exist make one
-    if [ ! -f /var/packages/${SYNOPKG_PKGNAME}/target/etc/wg0.conf ]; then
-cat<<EOF > /var/packages/${SYNOPKG_PKGNAME}/target/etc/wg0.conf
+    if [ ! -f "/var/packages/${SYNOPKG_PKGNAME}/target/etc/wg0.conf" ]; then
+cat<<EOF > "/var/packages/${SYNOPKG_PKGNAME}/target/etc/wg0.conf"
 # NOTICE - Work in Progress
 # WireGuard is not yet complete. You should not rely on this code.
 # It has not undergone proper degrees of security auditing and the protocol
@@ -52,9 +53,9 @@ ListenPort = $SERVERPORT
 EOF
     fi
     # load config
-    wg setconf wg0 /var/packages/${SYNOPKG_PKGNAME}/target/etc/wg0.conf
+    wg setconf wg0 "/var/packages/${SYNOPKG_PKGNAME}/target/etc/wg0.conf"
     # load private key
-    wg set wg0 private-key /var/packages/${SYNOPKG_PKGNAME}/target/etc/privatekey
+    wg set wg0 private-key "/var/packages/${SYNOPKG_PKGNAME}/target/etc/privatekey"
     # give clients an address space
     ip address add dev wg0 ${NETWORK}
     # set a listening port (already set in config file)
@@ -63,16 +64,16 @@ EOF
     ip link set up dev wg0
 }
 
-stop {
+stop () {
     ip link set down dev wg0
 }
 
 service_postinst () {
     # Put wg in the PATH
-    mkdir -p /usr/local/bin /var/packages/${SYNOPKG_PKGNAME}/target/etc/ >> "${INST_LOG}" 2>&1
-    ln -fs /var/packages/${SYNOPKG_PKGNAME}/target/bin/wg /usr/local/bin/wg >> "${INST_LOG}" 2>&1
+    mkdir -p /usr/local/bin "/var/packages/${SYNOPKG_PKGNAME}/target/etc/" >> "${INST_LOG}" 2>&1
+    ln -fs "/var/packages/${SYNOPKG_PKGNAME}/target/bin/wg" /usr/local/bin/wg >> "${INST_LOG}" 2>&1
     # load kernel module and verify that is is loaded
-    insmod /var/packages/${SYNOPKG_PKGNAME}/target/wireguard.ko >> "${INST_LOG}" 2>&1
+    insmod "/var/packages/${SYNOPKG_PKGNAME}/target/wireguard.ko" >> "${INST_LOG}" 2>&1
     lsmod | grep wireguard >> "${INST_LOG}" 2>&1
 }
 
@@ -84,9 +85,8 @@ service_poststop () {
 }
 
 service_postuninst () {
-    # Remove links
+    # Remove link
     rm -f /usr/local/bin/wg
-    rm -rf /usr/local/etc/wireguard
     # remove interface
     ip link del wg0 2>/dev/null || true
 }
