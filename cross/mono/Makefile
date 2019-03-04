@@ -14,7 +14,9 @@ COMMENT  = Cross platform, open source .NET development framework
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
 
 REQUIRED_DSM = 5.0
-UNSUPPORTED_ARCHS = ppc853x
+# Although qoriq can be compiled successfully it won't run as classic floating point unit not available
+# For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 PRE_CONFIGURE_TARGET = mono_pre_configure
 GNU_CONFIGURE = 1
@@ -43,9 +45,6 @@ endif
 ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 	AG_ARGS = --host=aarch64-linux
 	PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
-endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-	AG_ARGS = --host=powerpc-linux
 endif
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))

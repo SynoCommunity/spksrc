@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "1. Update to 5.18.0.240 2. Add PowerPC support for DSM6.1+"
+CHANGELOG = "Update to 5.18.0.240"
 
 HOMEPAGE = http://mono-project.com
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
