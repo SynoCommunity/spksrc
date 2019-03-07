@@ -35,33 +35,34 @@ PRE_COPY_TARGET = dnscrypt_extra_install
 include ../../mk/spksrc.spk.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm
+GO_ARCH = arm
 ENV += GOARM=5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm
+GO_ARCH = arm
 ENV += GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm64
+GO_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = 386
+GO_ARCH = 386
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = amd64
+GO_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = ppc64
-endif
-ifeq ($(DNSCRYPT_ARCH),)
+# Go has no ppc32 support for qoriq https://github.com/golang/go/issues/22885
+#ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+#GO_ARCH = ppc32
+#endif
+ifeq ($(GO_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
 CONF_ARGS = -ldflags="-s -w"
 ENV += GOPATH="$(WORK_DIR)" \
 	GOOS=linux \
-	GOARCH="$(DNSCRYPT_ARCH)" \
+	GOARCH="$(GO_ARCH)" \
 	CGO_ENABLED=0 \
 	PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
