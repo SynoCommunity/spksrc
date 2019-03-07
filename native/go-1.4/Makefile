@@ -1,8 +1,8 @@
 PKG_NAME = go
-PKG_VERS = 1.4.2
+PKG_VERS = 1.4-bootstrap-20171003
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).src.$(PKG_EXT)
-PKG_DIST_SITE = https://storage.googleapis.com/golang
+PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://dl.google.com/go/
 PKG_DIR = $(PKG_NAME)
 
 DEPENDS =

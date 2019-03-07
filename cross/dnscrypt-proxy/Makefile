@@ -18,24 +18,26 @@ INSTALL_TARGET = dnscrypt_proxy_install
 
 include ../../mk/spksrc.cross-cc.mk
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm
+GO_ARCH = arm
 ENV += GOARM=5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm
+GO_ARCH = arm
 ENV += GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = arm64
+GO_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = 386
+GO_ARCH = 386
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DNSCRYPT_ARCH = amd64
+GO_ARCH = amd64
 endif
-ifeq ($(DNSCRYPT_ARCH),)
+ifeq ($(GO_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
@@ -46,7 +48,7 @@ DNSCRYPT_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)-$(PKG_VERS)/$(
 CONF_ARGS = -ldflags="-s -w"
 ENV += GOPATH="$(WORK_DIR)" \
 	GOOS=linux \
-	GOARCH="$(DNSCRYPT_ARCH)" \
+	GOARCH="$(GO_ARCH)" \
 	CGO_ENABLED=0 \
 	PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH \
 
