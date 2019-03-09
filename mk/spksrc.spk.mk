@@ -293,7 +293,7 @@ echo 'SYNOPKG_PKGNAME=$(SPK_NAME)' >> $@
 echo 'PKGNAME=$(SPK_NAME)' >> $@
 echo 'SYNOPKG_PKGDEST=/shares/Volume_1/Nas_Prog/$(SPK_NAME)' >> $@
 echo 'SYNOPKG_TEMP_LOGFILE=/tmp/debug_apkg' >> $@
-echo '[[ ! -e /var/packages ]] && ln -s /shares/Volume_1/Nas_Prog /var/packages' >> $@
+echo '[[ ! -e /var/packages ]] && ln -s /shares/Volume_1/Nas_Prog/ /var/packages' >> $@
 echo '. `dirname $$0`/scripts/installer' >> $@
 echo '`basename $$0 .sh` $$@ $(INSTALLER_OUTPUT)' >> $@
 exit 0
