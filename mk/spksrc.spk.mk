@@ -10,7 +10,8 @@ NAME = $(SPK_NAME)
 ifneq ($(ARCH),)
 SPK_ARCH = $(TC_ARCH)
 SPK_NAME_ARCH = $(ARCH)
-SPK_TCVERS = $(TCVERSION)
+TCVERSION = 6.1
+SPK_TCVERS = 6.1
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 else
@@ -635,7 +636,7 @@ apkg-%:
 	@IFS=':'; \
 	for model in $($*_MODELS); do \
 		set -- $$model; \
-		$(MAKE) WD_MODEL=$$1 WD_MODEL_CODE=$$2 WD_MODEL_NAME=$$3 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))); \
+		$(MAKE) WD_MODEL=$$1 WD_MODEL_CODE=$$2 WD_MODEL_NAME=$$3 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))); \
 	done
 
 arch-%:
