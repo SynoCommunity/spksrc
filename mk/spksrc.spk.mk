@@ -24,8 +24,8 @@ endif
 ifeq ($(WD_MODEL),)
 	WD_MODEL = BlackCy
 endif
-ifeq ($(WD_MODEL_CODE),)
-	WD_MODEL_CODE = 07
+ifeq ($(WD_MODEL_ID),)
+	WD_MODEL_ID = 7
 endif
 ifeq ($(WD_MODEL_NAME),)
 	WD_MODEL_NAME = PR4100
@@ -429,7 +429,7 @@ $(WD_XML):
 	@echo '  <item>' >> $@
 	@echo '   <procudt_id>0</procudt_id>' >> $@
 	@echo '   <custom_id>20</custom_id>' >> $@
-	@echo '   <model_id>7</model_id>' >> $@
+	@echo '   <model_id>$(WD_MODEL_ID)</model_id>' >> $@
 	@echo '   <user_control>0</user_control>' >> $@
 	@echo '   <center_type>0</center_type>' >> $@
 	@echo '   <individual_flag>0</individual_flag>' >> $@
@@ -488,7 +488,7 @@ $(WD_HEADER): $(WORK_DIR)/package.tgz $(WD_SCRIPTS) icons $(WORK_DIR)/apkg.sign 
 	printf $(SPK_VERS)-$(SPK_REV) | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=19; \
 	printf 02 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=28; \
 	printf 14 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=30; \
-	printf $(WD_MODEL_CODE) | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=31; \
+	printf 0$(WD_MODEL_ID) | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=31; \
 	printf 01 | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc status=none bs=4 seek=32; \
 	printf '%08x' $$C | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=48 status=none; \
 	printf '%08x' $$L | rev | dd conv=swab status=none | xxd -r -p | dd of=$(WD_HEADER) conv=notrunc bs=4 seek=49 status=none;
@@ -636,7 +636,7 @@ apkg-%:
 	@IFS=':'; \
 	for model in $($*_MODELS); do \
 		set -- $$model; \
-		$(MAKE) WD_MODEL=$$1 WD_MODEL_CODE=$$2 WD_MODEL_NAME=$$3 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))); \
+		$(MAKE) WD_MODEL=$$1 WD_MODEL_ID=$$2 WD_MODEL_NAME=$$3 ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))); \
 	done
 
 arch-%:
