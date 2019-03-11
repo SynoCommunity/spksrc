@@ -56,7 +56,7 @@ init ()
 	# add a symlink for improved script compatibility
 	ln -sf /shares/Volume_1/Nas_Prog /var/packages
 
-	ln -sf ${APPDIR}/target /usr/local/${PKGNAME}
+	ln -sf ${APPDIR}/target/ /usr/local/${PKGNAME}
 
 	# run syno post installation steps
 	service_postinst

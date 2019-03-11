@@ -13,7 +13,7 @@ MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 EXE_FILE="${INSTALL_DIR}/share/emby/system/EmbyServer.exe"
 PID_FILE="${INSTALL_DIR}/var/emby.pid"
-EXTRA_LIBS="/usr/local/imagemagick/lib:${INSTALL_DIR}/lib"
+EXTRA_LIBS="${INSTALL_DIR}/lib"
 FFMPEG="/usr/local/ffmpeg/bin"
 
 COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${EXTRA_LIBS} ${MONO} ${EXE_FILE} -programdata ${INSTALL_DIR}/var -ffmpeg ${FFMPEG}/ffmpeg -ffprobe ${FFMPEG}/ffprobe"
