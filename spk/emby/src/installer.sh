@@ -23,14 +23,16 @@ preinst ()
 
 install ()
 {
-	echo "Install ${PKG_NAME}"
-	TMP=$1
-	NASPROG=$2
+	echo "Install ${PKGNAME}"
+	TMP=$(readlink -f $1)
+	NASPROG=$(readlink -f $2)
 	cd ${TMP}
 	mkdir target
 	tar -C target -xf package.tgz
 	rm package.tgz
-	mkdir target/var
+	if [ -e ${NASPROG}/${PKGNAME} ]; then
+		echo "WARNING: cleanup ${NASPROG}/${PKGNAME} first!"
+	fi
 	mv ${TMP} ${NASPROG}	
 	postupgrade
 }
@@ -38,8 +40,8 @@ install ()
 init ()
 {
 	# Link
-	APPDIR=$1
-	ln -sf ${APPDIR}/target ${INSTALL_DIR}
+	APPDIR=$(readlink -f $1)
+	ln -sf ${APPDIR}/target/ ${INSTALL_DIR}
 	# Install busybox stuff
 	${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
 
@@ -59,12 +61,14 @@ init ()
 
 start ()
 {
-	${SSS} start > /dev/null
+	echo "Start ${PKGNAME} with ${SSS}"
+	${SSS} start
 }
 
 stop ()
 {
-	${SSS} stop > /dev/null
+	echo "Stop ${PKGNAME} with ${SSS}"
+	${SSS} stop
 }
 
 clean ()
@@ -105,7 +109,7 @@ remove ()
 preupgrade ()
 {
 	# Save some stuff
-	rm -fr ${TMP_DIR}/${PACKAGE}
+	rm -rf ${TMP_DIR}/${PACKAGE}
 	mkdir -p ${TMP_DIR}/${PACKAGE}
 	mv ${INSTALL_DIR}/var ${TMP_DIR}/${PACKAGE}/
 }
@@ -113,7 +117,7 @@ preupgrade ()
 postupgrade ()
 {
 	# Restore some stuff
-	rm -fr ${INSTALL_DIR}/var
+	rm -rf ${INSTALL_DIR}/var
 	mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
 }
 

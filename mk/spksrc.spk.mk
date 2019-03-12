@@ -246,7 +246,7 @@ endif
 	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\" >> $@
 
 ifneq ($(strip $(DEBUG)),)
-INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
+INSTALLER_OUTPUT = >> /root/$${PKGNAME}.log 2>&1
 else
 INSTALLER_OUTPUT = >> $$SYNOPKG_TEMP_LOGFILE
 endif
@@ -292,7 +292,7 @@ $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
 echo 'SYNOPKG_PKGNAME=$(SPK_NAME)' >> $@
 echo 'PKGNAME=$(SPK_NAME)' >> $@
-echo 'SYNOPKG_PKGDEST=/shares/Volume_1/Nas_Prog/$(SPK_NAME)' >> $@
+echo 'SYNOPKG_PKGDEST=/shares/Volume_1/Nas_Prog/$(SPK_NAME)/target' >> $@
 echo 'SYNOPKG_TEMP_LOGFILE=/tmp/debug_apkg' >> $@
 echo '[[ ! -e /var/packages ]] && ln -s /shares/Volume_1/Nas_Prog/ /var/packages' >> $@
 echo '. `dirname $$0`/scripts/installer' >> $@
