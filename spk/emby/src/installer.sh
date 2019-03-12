@@ -31,9 +31,10 @@ install ()
 	tar -C target -xf package.tgz
 	rm package.tgz
 	if [ -e ${NASPROG}/${PKGNAME} ]; then
-		echo "WARNING: cleanup ${NASPROG}/${PKGNAME} first!"
+		echo "WARNING: cleaning ${NASPROG}/${PKGNAME} first!"
+		rm -rf ${NASPROG}/${PKGNAME}
 	fi
-	mv ${TMP} ${NASPROG}	
+	mv ${TMP} ${NASPROG}
 	postupgrade
 }
 

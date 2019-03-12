@@ -21,24 +21,32 @@ COMMAND="env PATH=${MONO_PATH}:${PATH} LD_LIBRARY_PATH=${EXTRA_LIBS} ${MONO} ${E
 start_daemon ()
 {
 	#sudo -u ${USER} ${COMMAND}
-	"${COMMAND}" & echo $! > ${PID_FILE}
+	echo "Start command: ${COMMAND}"
+	${COMMAND} & echo $! > ${PID_FILE}
 	sleep 2
 }
 
 stop_daemon ()
 {
-	kill $(cat ${PID_FILE})
-	wait_for_status 1 20 || kill -9 $(cat ${PID_FILE})
-	PID=$(ps w | grep [e]mby | awk '{print $1}')
+	if [ -e ${PID_FILE} ]; then
+		kill $(cat ${PID_FILE})
+		wait_for_status 1 20 || kill -9 $(cat ${PID_FILE})
+		rm ${PID_FILE}
+	fi
+	# kill anything emby related
+	PID=$(ps w | grep [E]mbyServer.exe | awk '{print $1}')
 	if [ $PID -ne "" ]; then
 		kill $PID
 	fi
-	rm ${PID_FILE}
 }
 
 daemon_status ()
 {
-	kill -0 $(cat ${PID_FILE})
+	if [ -e ${PID_FILE} ]; then
+		kill -0 $(cat ${PID_FILE})
+		return $?
+	fi
+	return 1
 }
 
 wait_for_status ()
