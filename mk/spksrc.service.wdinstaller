@@ -10,6 +10,17 @@
 #   * remove.sh
 # This installer provides functions for when you remove the extension
 
+
+INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
+INST_VAR="${SYNOPKG_PKGDEST}/var"
+
+# Optional port forwards file
+FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
+
+TMP_DIR="/shares/Volume_1/.systemfile/${SYNOPKG_PKGNAME}/var"
+
 # Source package specific variable and functions
 SVC_SETUP=`dirname $0`"/scripts/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
