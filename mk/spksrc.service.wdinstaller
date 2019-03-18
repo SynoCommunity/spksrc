@@ -52,6 +52,12 @@ install ()
 	tar -C target -xf package.tgz
 	rm package.tgz
 	mv ${TMP} ${NASPROG}
+	if [ -d ${TMP_DIR} ]; then
+		echo "Restore ${PKGNAME} backup"
+		rm -rf ${SYNOPKG_PKGDEST}/var
+		mv ${TMP_DIR} ${SYNOPKG_PKGDEST}
+		# TODO: how to upgrade properly?
+	fi
 }
 
 # Initialize application, setup icon for web ui, setup path
@@ -101,5 +107,9 @@ remove ()
 {
 	echo "Remove ${PKGNAME}"
 	APPDIR=$(readlink -f $1)
+	echo "but create a backup first"
+	rm -rf ${TMP_DIR}
+	mkdir -p ${TMP_DIR}
+	mv ${SYNOPKG_PKGDEST}/var/* ${TMP_DIR}
 	rm -rf ${APPDIR}
 }
