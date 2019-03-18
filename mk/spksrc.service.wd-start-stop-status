@@ -26,30 +26,19 @@ start_daemon ()
         else
             OUT="${LOG_FILE}"
         fi
-        if [ -n "${USER}" -a -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
-            if [ -z "${SERVICE_SHELL}" ]; then
-                SERVICE_SHELL=/bin/sh
-            fi
-            if [ -z "${SVC_CWD}" ]; then
-                SVC_CD=""
-            else
-                SVC_CD="cd ${SVC_CWD}; "
-            fi
-            if [ -z "${SVC_BACKGROUND}" ]; then
-                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
-            else
-                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
-            fi
+        if [ -z "${SERVICE_SHELL}" ]; then
+            SERVICE_SHELL=/bin/sh
+        fi
+        if [ -z "${SVC_CWD}" ]; then
+            SVC_CD=""
         else
-            # DSM 6 user is set by conf/privilege
-            if [ -n "${SVC_CWD}" ]; then
-                cd "${SVC_CWD}"
-            fi
-            if [ -z "${SVC_BACKGROUND}" ]; then
-                ${SERVICE_COMMAND} >> ${OUT} 2>&1
-            else
-                ${SERVICE_COMMAND} >> ${OUT} 2>&1 &
-            fi
+            SVC_CD="cd ${SVC_CWD}; "
+        fi
+        if [ -z "${SVC_BACKGROUND}" ]; then
+			# sudo ${EFF_USER} -s ...
+            ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
+        else
+            ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
         fi
         if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
             echo "$!" > "${PID_FILE}"
@@ -96,7 +85,7 @@ wait_for_status ()
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
-        counter=$((counter-1))
+        counter=$(expr $counter - 1)
         sleep 1
     done
     return 1

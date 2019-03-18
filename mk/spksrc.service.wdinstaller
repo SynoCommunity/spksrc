@@ -27,11 +27,12 @@ if [ -r "${SVC_SETUP}" ]; then
 	. "${SVC_SETUP}"
 fi
 
+SSS=`dirname $0`"/scripts/start-stop-status"
+
 # Reload wizard variables stored by postinst
 if [ -r "${INST_VARIABLES}" ]; then
 	. "${INST_VARIABLES}"
 fi
-
 
 
 # Pre-installation checks
@@ -65,6 +66,7 @@ init ()
 	ln -sf ${SYNOPKG_PKGDEST}/ /usr/local/${PKGNAME}
 
 	# run syno post installation steps
+	SYNOPKG_PKG_STATUS="INSTALL"
 	service_postinst
 }
 
@@ -72,12 +74,14 @@ init ()
 start ()
 {
 	echo "Start ${PKGNAME}"
+	${SSS} start
 }
 
 # Stop application binary
 stop ()
 {
 	echo "Stop ${PKGNAME}"
+	${SSS} stop
 }
 
 # Clean up icons and resources to allow volume umount and NAS shutdown

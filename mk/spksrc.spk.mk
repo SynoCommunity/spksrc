@@ -290,10 +290,10 @@ define wd_script_redirect
 $(create_target_dir)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
-echo 'SYNOPKG_PKGNAME=$(SPK_NAME)' >> $@
-echo 'PKGNAME=$(SPK_NAME)' >> $@
-echo 'SYNOPKG_PKGDEST=/shares/Volume_1/Nas_Prog/$(SPK_NAME)/target' >> $@
-echo 'SYNOPKG_TEMP_LOGFILE=/tmp/debug_apkg' >> $@
+echo 'export SYNOPKG_PKGNAME=$(SPK_NAME)' >> $@
+echo 'export PKGNAME=$(SPK_NAME)' >> $@
+echo 'export SYNOPKG_PKGDEST=/shares/Volume_1/Nas_Prog/$(SPK_NAME)/target' >> $@
+echo 'export SYNOPKG_TEMP_LOGFILE=/tmp/debug_apkg' >> $@
 echo '[[ ! -e /var/packages ]] && ln -s /shares/Volume_1/Nas_Prog/ /var/packages' >> $@
 echo '. `dirname $$0`/scripts/installer' >> $@
 echo '`basename $$0 .sh` $$@ $(INSTALLER_OUTPUT)' >> $@
