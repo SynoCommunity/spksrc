@@ -67,4 +67,7 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+CONFIGURE_ARGS += --disable-asm --cpu=e500v2
+endif
 endif
