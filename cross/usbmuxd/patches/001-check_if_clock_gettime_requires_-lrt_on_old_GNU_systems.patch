@@ -1,0 +1,12 @@
+--- configure.ac.orig	2019-03-24 18:50:37.239438387 +0100
++++ configure.ac	2019-03-24 18:49:01.315144842 +0100
+@@ -92,6 +92,9 @@
+ AC_TYPE_UINT32_T
+ AC_TYPE_UINT8_T
+ 
++# Check if clock_gettime requires -lrt (old GNU systems)
++AC_SEARCH_LIBS([clock_gettime],[rt posix4])
++
+ # Checks for library functions.
+ AC_FUNC_MALLOC
+ AC_FUNC_REALLOC
