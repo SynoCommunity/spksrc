@@ -9,7 +9,7 @@ DEPENDS = cross/fuse cross/glib
 
 HOMEPAGE = https://github.com/libfuse/sshfs
 COMMENT  = sshfs is a network filesystem client to connect to SSH servers
-LICENSE  = GNU GPLv2
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
