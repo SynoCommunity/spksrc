@@ -17,11 +17,11 @@ PRE_CONFIGURE_TARGET = libusb_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
+LIBUSB_AUTOGEN_PARAMS =
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
-libusb_pre_configure:
-	$(RUN) ; ./autogen.sh --host=arm-linux
-else
-libusb_pre_configure:
-	$(RUN) ; ./autogen.sh
+LIBUSB_AUTOGEN_PARAMS += --host=arm-linux
 endif
+
+libusb_pre_configure:
+	$(RUN) ; ./autogen.sh $(LIBUSB_AUTOGEN_PARAMS)

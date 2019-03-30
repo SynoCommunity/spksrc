@@ -2,10 +2,14 @@ PKG_NAME = squidGuard
 PKG_VERS = 1.5-beta
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.squidguard.org/Downloads/Devel/
+PKG_DIST_SITE = https://fossies.org/linux/www/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DB_FILE= ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/blacklists.tar.gz
 DEPENDS = 
+
+# original url: http://www.squidguard.org/Downloads/Devel/squidGuard-1.5-beta.tar.gz
+# squidguard.org is not reachable anymore! alternate mirrors (as of 2019.03.):
+# https://fossies.org/linux/www/squidGuard-1.5-beta.tar.gz
 
 HOMEPAGE = http://www.squidguard.org/
 COMMENT  = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid.

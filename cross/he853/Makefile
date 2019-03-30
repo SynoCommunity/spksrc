@@ -20,4 +20,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: he853_install
 he853_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/udev/rules.d
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) MY_UDEV_RULES=$(STAGING_INSTALL_PREFIX)/lib/udev/rules.d
+	$(RUN) $(MAKE) install PREFIX=$(INSTALL_DIR)$(INSTALL_PREFIX) MY_UDEV_RULES=$(STAGING_INSTALL_PREFIX)/lib/udev/rules.d
