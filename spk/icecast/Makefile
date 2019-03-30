@@ -8,7 +8,7 @@ BETA = 1
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = "Icecast is a streaming media server which currently supports Ogg (Vorbis and Theora), Opus, WebM and MP3 audio streams. It can be used to create an Internet radio station or a privately running jukebox and many things in between. It is very versatile in that new formats can be added relatively easily and supports open standards for communication and interaction."
+DESCRIPTION = "Icecast is a streaming media server which currently supports Ogg \(Vorbis and Theora\), Opus, WebM and MP3 audio streams. It can be used to create an Internet radio station or a privately running jukebox and many things in between. It is very versatile in that new formats can be added relatively easily and supports open standards for communication and interaction."
 ADMIN_PORT = 8000
 
 RELOAD_UI = yes
