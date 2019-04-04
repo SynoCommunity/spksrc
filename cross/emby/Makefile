@@ -1,11 +1,11 @@
 PKG_NAME = emby
-PKG_VERS = 4.0.2.0
+PKG_VERS = 4.0.3.0
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)server-netframework_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaBrowser/Emby.Releases/releases/download/${PKG_VERS}
 PKG_DIR = emby
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = https://emby.media
 COMMENT = Emby streams everything Your personal videos, music, photos, and live television in the palm of your hand.

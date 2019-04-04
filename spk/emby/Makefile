@@ -1,6 +1,6 @@
 SPK_NAME = emby
-SPK_VERS = 4.0.2.0
-SPK_REV = 7
+SPK_VERS = 4.0.3.0
+SPK_REV = 8
 SPK_ICON = src/emby.png
 DSM_UI_DIR = app
 
@@ -16,7 +16,7 @@ DESCRIPTION = Emby streams everything Your personal videos, music, photos, and l
 ADMIN_PORT = 8096
 RELOAD_UI = yes
 DISPLAY_NAME = Emby
-CHANGELOG = "Update emby to 4.0.2.0"
+CHANGELOG = "Update emby to 4.0.3.0"
 
 HOMEPAGE = http://emby.media/
 LICENSE  = GPL
