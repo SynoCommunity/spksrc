@@ -1,0 +1,10 @@
+bin:bin/node
+rsc:bin/npm
+rsc:bin/npx
+rsc:lib/node_modules/npm/AUTHORS
+rsc:lib/node_modules/npm/bin/*
+rsc:lib/node_modules/npm/lib/*
+rsc:lib/node_modules/npm/LICENSE
+rsc:lib/node_modules/npm/node_modules/*
+rsc:lib/node_modules/npm/package.json
+rsc:lib/node_modules/npm/scripts/*
