@@ -1,0 +1,13 @@
+[{
+    "step_title": "Mettre à jour Sonarr",
+    "items": [{
+        "desc": "Garder Sonarr à jour en utilisant System>Updates dans l'interface Sonarr."
+    }]
+},{
+    "step_title": "Attention! Permissions DSM",
+    "items": [{
+        "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration."
+    },{
+        "desc": "<strong style='color:red'>NOTE:</strong> La mise à jour de l'application va tenter de corriger les permissions des répertoires. En cas d'erreur de permission dans Sonarr, donner les droits de Lecture/Ecriture au groupe 'sc-download' sur les répertoires mentionnés depuis File Station."
+    }]
+}]
