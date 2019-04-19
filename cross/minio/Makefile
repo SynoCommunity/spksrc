@@ -1,7 +1,8 @@
 PKG_NAME = minio
-PKG_VERS = RELEASE.2019-04-18T21-44-59Z
+PKG_VERS = 2019-04-18T21-44-59Z
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_PREFIX = RELEASE.$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIST_PREFIX).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/minio/minio/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
@@ -70,10 +71,12 @@ endif
 
 minio_configure:
 	# rename extracted folder to make imports work when used as GOPATH
-	cd $(EXTRACT_PATH) && [ -d $(PKG_NAME)-$(PKG_VERS) ] && mv $(PKG_NAME)-$(PKG_VERS) $(PKG_NAME)
+	cd $(EXTRACT_PATH) && [ -d $(PKG_NAME)-$(PKG_DIST_PREFIX) ] && \
+		mv $(PKG_NAME)-$(PKG_DIST_PREFIX) $(PKG_NAME)
 
 minio_compile:
-	cd $(MINIO_DIR) && env $(ENV) go build -tags kqueue -ldflags "-s -w" -o $(MINIO_BIN)
+	cd $(MINIO_DIR) && \
+	env $(ENV) go build -tags kqueue -ldflags "-s -w" -o $(MINIO_BIN)
 
 minio_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
