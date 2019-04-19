@@ -1,12 +1,12 @@
---- makefile.orig	2014-03-12 16:54:39.486673701 +0100
-+++ makefile	2014-03-12 16:54:25.254852618 +0100
+--- makefile.orig	2019-04-21 10:35:11.486673701 +0100
++++ makefile	2019-04-21 10:35:11.254852618 +0100
 @@ -2,12 +2,12 @@
  # Makefile for UNIX - unrar
 
  # Linux using GCC
 -CXX=c++
 +#CXX=c++
--CXXFLAGS=-O2
+-CXXFLAGS=-O2 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
 +CXXFLAGS=-O3
  LIBFLAGS=-fPIC
  DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
