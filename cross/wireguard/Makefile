@@ -1,5 +1,5 @@
 PKG_NAME = wireguard
-PKG_VERS = 0.0.20190227
+PKG_VERS = 0.0.20190406
 PKG_EXT = tar.xz
 PKG_DIST_SITE = https://git.zx2c4.com/WireGuard/snapshot
 PKG_DIST_NAME = WireGuard-$(PKG_VERS).$(PKG_EXT)

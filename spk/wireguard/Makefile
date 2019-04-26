@@ -1,5 +1,5 @@
 SPK_NAME = wireguard
-SPK_VERS = 0.0.20190227
+SPK_VERS = 0.0.20190406
 SPK_REV = 0
 SPK_ICON = src/wireguard.png
 
