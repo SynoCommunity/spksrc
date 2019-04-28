@@ -27,6 +27,7 @@ SERVICE_PORT = 53
 SERVICE_PORT_TITLE = DNS
 NO_SERVICE_SHORTCUT = true
 SERVICE_PORT_ALL_USERS = false
+STARTSTOP_RESTART_SERVICE = cron
 SERVICE_TYPE = legacy
 SERVICE_URL = /webman/3rdparty/dnscrypt-proxy/index.cgi
 
@@ -69,8 +70,9 @@ ENV += GOPATH="$(WORK_DIR)" \
 .PHONY: dnscrypt_extra_install
 dnscrypt_extra_install: copy_msg
 	@echo "===> Copying files"
-	mkdir -p $(STAGING_DIR)/offline-cache/
+	mkdir -p $(STAGING_DIR)/offline-cache/ $(STAGING_DIR)/blocklist/
 	cp -rf $(CURDIR)/src/offline-cache/* $(STAGING_DIR)/offline-cache/
+	install -m 755 $(CURDIR)/src/update-blocklist.sh $(STAGING_DIR)/blocklist/update-blocklist.sh
 	@echo "===> UI - Copying files"
 	mkdir -p $(STAGING_DIR)/$(DSM_UI_DIR)/
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/

@@ -58,7 +58,7 @@ dnscrypt_proxy_compile:
 	cd $(DNSCRYPT_DIR)/$(PKG_NAME) && env $(ENV) go build $(CONF_ARGS)
 .PHONY: dnscrypt_proxy_install
 dnscrypt_proxy_install:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/blacklist
+	mkdir -p $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/blocklist
 	install -m 755 $(DNSCRYPT_BIN) $(STAGING_INSTALL_PREFIX)/bin
 	install -m 644 $(DNSCRYPT_DIR)/$(PKG_NAME)/example-* $(STAGING_INSTALL_PREFIX)
-	install -m 644 $(DNSCRYPT_DIR)/utils/generate-domains-blacklists/* $(STAGING_INSTALL_PREFIX)/blacklist
+	install -m 644 $(DNSCRYPT_DIR)/utils/generate-domains-blacklists/* $(STAGING_INSTALL_PREFIX)/blocklist
