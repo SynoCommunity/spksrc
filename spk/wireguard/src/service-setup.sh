@@ -41,7 +41,7 @@ cat<<EOF > "/var/packages/${SYNOPKG_PKGNAME}/target/var/wg0.conf"
 Address = $NETWORK
 ListenPort = $SERVERPORT
 PrivateKey = $server_privkey
-SaveConfig = true
+SaveConfig = false
 PostUp = iptables -A SYNO_FORWARD_ACCEPT -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
 PostDown = iptables -D SYNO_FORWARD_ACCEPT -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o $INTERFACE -j MASQUERADE
 
