@@ -69,6 +69,10 @@ ifeq ($(strip $(STATIC_BINARIES)),1)
 CONF_ARGS += -no-upgrade
 endif
 
+GO_LDFLAGS +=-s -w
+GO_LDFLAGS += -X github.com/minio/minio/cmd.Version=$(PKG_VERS)
+GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_VERS)
+
 minio_configure:
 	# rename extracted folder to make imports work when used as GOPATH
 	cd $(EXTRACT_PATH) && [ -d $(PKG_NAME)-$(PKG_DIST_PREFIX) ] && \
@@ -76,7 +80,8 @@ minio_configure:
 
 minio_compile:
 	cd $(MINIO_DIR) && \
-	env $(ENV) go build -tags kqueue -ldflags "-s -w" -o $(MINIO_BIN)
+	env $(ENV) go build -tags kqueue -ldflags "$(GO_LDFLAGS)" \
+	  -o $(MINIO_BIN)
 
 minio_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
