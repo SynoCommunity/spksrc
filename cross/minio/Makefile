@@ -3,8 +3,9 @@ PKG_VERS = 2019-05-02T19-07-09Z
 PKG_EXT = tar.gz
 PKG_DIST_PREFIX = RELEASE.$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIST_PREFIX).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 PKG_DIST_SITE = https://github.com/minio/minio/archive
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_DIST_PREFIX)
 
 DEPENDS = native/go
 
@@ -75,8 +76,8 @@ GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_VERS)
 
 minio_configure:
 	# rename extracted folder to make imports work when used as GOPATH
-	cd $(EXTRACT_PATH) && [ -d $(PKG_NAME)-$(PKG_DIST_PREFIX) ] && \
-		mv $(PKG_NAME)-$(PKG_DIST_PREFIX) $(PKG_NAME)
+	cd $(EXTRACT_PATH) && [ -d $(PKG_DIR) ] && \
+		mv $(PKG_DIR) $(PKG_NAME)
 
 minio_compile:
 	cd $(MINIO_DIR) && \
