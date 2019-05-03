@@ -1,6 +1,6 @@
 SPK_NAME = minio
 SPK_VERS = 2019-05-02T19-07-09Z
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -8,10 +8,10 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
-MAINTAINER = minio
+MAINTAINER = fgma
 DESCRIPTION = The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage.
 RELOAD_UI = yes
-DISPLAY_NAME = minio
+DISPLAY_NAME = MinIO
 CHANGELOG = "Initial version"
 HOMEPAGE = https://min.io/
 LICENSE = Apache License 2.0

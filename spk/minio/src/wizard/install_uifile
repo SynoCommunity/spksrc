@@ -1,10 +1,9 @@
 [
 	{
-		"step_title": "minio configuration",
+		"step_title": "MinIO configuration",
 		"items": [
 		  {
 			"type": "textfield",
-			"desc": "Data directory location",
 			"subitems": [
 			  {
 				"key": "wizard_data_directory",
@@ -20,7 +19,7 @@
 			  },
 			  {
 				"key": "wizard_access_key",
-				"desc": "minio access key",
+				"desc": "MinIO access key",
 				"defaultValue": "minio-access-822791549661344",
 				"validator": {
 				  "allowBlank": false,
@@ -33,7 +32,7 @@
 			  },
 			  {
 				"key": "wizard_secret_key",
-				"desc": "minio secret key",
+				"desc": "MinIO secret key",
 				"defaultValue": "minio-secret-033309986404774",
 				"validator": {
 				  "allowBlank": false,
@@ -48,10 +47,9 @@
 		  },
 		  {
 		    "type": "multiselect",
-		    "desc": "Auto update",
 		    "subitems": [{
 		      "key": "wizard_minio_auto_update",
-		      "desc": "enable minio auto update before starting service (not available for all platforms)",
+		      "desc": "enable MinIO auto update before starting service (updates not available for all platforms)",
 		      "defaultValue": false
 		    }]
 		  }
