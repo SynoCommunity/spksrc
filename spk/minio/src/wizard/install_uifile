@@ -45,6 +45,15 @@
 				}
 			  }
 			]
+		  },
+		  {
+		    "type": "multiselect",
+		    "desc": "Auto update",
+		    "subitems": [{
+		      "key": "wizard_minio_auto_update",
+		      "desc": "enable minio auto update before starting service (not available for all platforms)",
+		      "defaultValue": false
+		    }]
 		  }
 		]
 	},
