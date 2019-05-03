@@ -36,6 +36,7 @@
 				"defaultValue": "minio-access-822791549661344",
 				"validator": {
 				  "allowBlank": false,
+				  "minLength": 3,
 				  "regex": {
 					"expr": "/^[^<>:*/?\"]*$/",
 					"errorText": "Not allowed character in key"
@@ -48,6 +49,7 @@
 				"defaultValue": "minio-secret-033309986404774",
 				"validator": {
 				  "allowBlank": false,
+				  "minLength": 8,
 				  "regex": {
 					"expr": "/^[^\"]*$/",
 					"errorText": "Not allowed character in key"
