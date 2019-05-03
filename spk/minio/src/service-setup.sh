@@ -26,7 +26,7 @@ service_prestart ()
 		. $CFG_FILE
     fi
     
-    SERVICE_OPTIONS="server ${WIZARD_DATA_DIRECTORY}"
+    SERVICE_OPTIONS="server --quiet --anonymous ${WIZARD_DATA_DIRECTORY}"
     
     export MINIO_ACCESS_KEY=$WIZARD_ACCESS_KEY
     export MINIO_SECRET_KEY=$WIZARD_SECRET_KEY
