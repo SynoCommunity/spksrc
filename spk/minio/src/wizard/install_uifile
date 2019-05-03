@@ -19,18 +19,6 @@
 				}
 			  },
 			  {
-				"key": "wizard_group",
-				"desc": "DSM group",
-				"defaultValue": "sc-minio",
-				"validator": {
-				  "allowBlank": false,
-				  "regex": {
-					"expr": "/^[^<>:*/?\"]*$/",
-					"errorText": "Not allowed character in group name"
-				  }
-				}
-			  },
-			  {
 				"key": "wizard_access_key",
 				"desc": "minio access key",
 				"defaultValue": "minio-access-822791549661344",

@@ -23,7 +23,6 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9000
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-SERVICE_WIZARD_GROUP = wizard_group
 SERVICE_WIZARD_SHARE = wizard_data_directory
 
 # Use busybox start-stop-daemon support
