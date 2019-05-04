@@ -25,7 +25,7 @@
 				  "allowBlank": false,
 				  "minLength": 3,
 				  "regex": {
-					"expr": "/^[^<>:*/?\"]*$/",
+					"expr": "/^[^<>:*/?\"|]*$/",
 					"errorText": "Not allowed character in key"
 				  }
 				}
@@ -38,7 +38,7 @@
 				  "allowBlank": false,
 				  "minLength": 8,
 				  "regex": {
-					"expr": "/^[^\"]*$/",
+					"expr": "/^[^\"|]*$/",
 					"errorText": "Not allowed character in key"
 				  }
 				}
