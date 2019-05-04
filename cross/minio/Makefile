@@ -57,8 +57,8 @@ EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 MINIO_DIR = $(EXTRACT_PATH)/minio
 MINIO_BIN = $(MINIO_DIR)/minio
 
-# use workdir as gopath
-ENV += GOPATH=$(WORK_DIR)/src
+# use distrib folder 'go' as GOPATH to download dependencies only once
+ENV += GOPATH=$(DISTRIB_DIR)/go
 ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
