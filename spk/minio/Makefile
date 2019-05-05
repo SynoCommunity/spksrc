@@ -32,8 +32,6 @@ SERVICE_EXE = $${SYNOPKG_PKGDEST}/bin/minio
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-FWPORTS = src/${SPK_NAME}.sc
-
 POST_STRIP_TARGET = minio_extra_install
 
 BUSYBOX_CONFIG = usrmng daemon nice
