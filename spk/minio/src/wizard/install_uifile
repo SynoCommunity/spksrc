@@ -20,7 +20,7 @@
 			  {
 				"key": "wizard_access_key",
 				"desc": "MinIO access key",
-				"defaultValue": "minio-access-822791549661344",
+				"defaultValue": "",
 				"validator": {
 				  "allowBlank": false,
 				  "minLength": 3,
@@ -33,7 +33,7 @@
 			  {
 				"key": "wizard_secret_key",
 				"desc": "MinIO secret key",
-				"defaultValue": "minio-secret-033309986404774",
+				"defaultValue": "",
 				"validator": {
 				  "allowBlank": false,
 				  "minLength": 8,
