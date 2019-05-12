@@ -13,7 +13,6 @@ service_postinst ()
           -e "s|@wizard_data_directory@|${wizard_data_directory}|g" \
           -e "s|@wizard_access_key@|${wizard_access_key}|g" \
           -e "s|@wizard_secret_key@|${wizard_secret_key}|g" \
-          -e "s|@wizard_minio_auto_update@|${wizard_minio_auto_update}|g" \
           ${CFG_FILE}
     fi
 
@@ -27,12 +26,6 @@ service_prestart ()
     if [ -f $CFG_FILE ]
     then
       . $CFG_FILE
-    fi
-    
-    # if enabled in install wizard run auto update before starting
-    if [ "$WIZARD_MINIO_AUTO_UPDATE" = 'true' ]
-    then
-      "${SYNOPKG_PKGDEST}/bin/minio" --quiet update
     fi
 
     SERVICE_OPTIONS="server --quiet --anonymous ${WIZARD_DATA_DIRECTORY}"
