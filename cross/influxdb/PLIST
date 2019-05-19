@@ -1,0 +1,7 @@
+bin:bin/influx
+bin:bin/influxd
+bin:bin/influx_inspect
+bin:bin/influx_stress
+bin:bin/influx_tools
+bin:bin/influx_tsm
+bin:bin/store
