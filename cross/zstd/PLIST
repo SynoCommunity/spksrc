@@ -1,0 +1,11 @@
+bin:bin/unzstd
+bin:bin/zstd
+bin:bin/zstdcat
+bin:bin/zstdgrep
+bin:bin/zstdless
+bin:bin/zstdmt
+lib:lib/libzstd.a
+lib:lib/libzstd.so
+lib:lib/libzstd.so.1
+lib:lib/libzstd.so.1.4.0
+lib:lib/pkgconfig/libzstd.pc
