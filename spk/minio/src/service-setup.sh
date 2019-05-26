@@ -1,5 +1,6 @@
 # Setup environment
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
+GROUP="sc-minio"
 
 CONFIG_DIR="${SYNOPKG_PKGDEST}/var"
 CFG_FILE="${CONFIG_DIR}/options.conf"
