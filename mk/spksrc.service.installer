@@ -236,6 +236,8 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
+    $MKDIR /usr/local/bin >> ${INST_LOG}
+
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
 
