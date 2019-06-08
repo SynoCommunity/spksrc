@@ -1,6 +1,6 @@
 SPK_NAME = tcl
 SPK_VERS = 8.6.9
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/tcl.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -15,9 +15,9 @@ DESCRIPTION = Tcl \(Tool Command Language\) is a very powerful but easy to learn
 RELOAD_UI = no
 DISPLAY_NAME = Tcl
 STARTABLE = no
-CHANGELOG = "1. Update to 8.6.9<br/>2. Use framework generic installer"
+CHANGELOG = "1. Update to 8.6.9<br/>2. Use framework generic installer<br/>3. Fixed Tcl shell variables and packages, fixed 64-bit support"
 
-HOMEPAGE = http://www.tcl.tk
+HOMEPAGE = https://www.tcl.tk
 LICENSE = Custom
 
 SERVICE_SETUP = src/service-setup.sh
