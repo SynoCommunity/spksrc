@@ -15,7 +15,7 @@ LICENSE    = GPLv2
 
 STARTABLE = no
 
-INSTALLER_SCRIPT = src/installer.sh
+SERVICE_SETUP = src/service-setup.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
