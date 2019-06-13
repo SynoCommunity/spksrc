@@ -12,13 +12,13 @@ service_postinst ()
 
     # Add symlink
     mkdir -p /usr/local/bin
-    #ln -s ${SYNOPKG_PKGDEST}/env/bin/borg /usr/local/bin/borg
-    #ln -s ${SYNOPKG_PKGDEST}/env/bin/borgmatic /usr/local/bin/borgmatic
+    ln -s ${SYNOPKG_PKGDEST}/env/bin/borg /usr/local/bin/borg
+    ln -s ${SYNOPKG_PKGDEST}/env/bin/borgmatic /usr/local/bin/borgmatic
 }
 
 service_postuninst ()
 {
-    #rm -f /usr/local/bin/borg
-    #rm -f /usr/local/bin/borgmatic
+    rm -f /usr/local/bin/borg
+    rm -f /usr/local/bin/borgmatic
 }
 
