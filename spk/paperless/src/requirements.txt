@@ -1,7 +1,7 @@
 # Cross compiled packages dependencies
 #psycopg2==2.7.7 #Just for PostgreSQL database
-pillow==5.4.1
-pdftotext==2.1.1
+#pillow==5.4.1
+#pdftotext==2.1.1
 
 
 coverage==4.5.2
