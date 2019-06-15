@@ -19,5 +19,5 @@ paperless_install:
         mkdir -p $(STAGING_INSTALL_PREFIX)/share/paperless
         cp -r  $(WORK_DIR)/$(PKG_DIR)/src/* $(STAGING_INSTALL_PREFIX)/share/paperless/
         rm  $(STAGING_INSTALL_PREFIX)/share/paperless/tox.ini
-	rm  $(STAGING_INSTALL_PREFIX)/share/paperless/setup.cfg	
+        rm  $(STAGING_INSTALL_PREFIX)/share/paperless/setup.cfg	
         
