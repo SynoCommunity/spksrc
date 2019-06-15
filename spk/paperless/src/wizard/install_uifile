@@ -1,0 +1,74 @@
+[
+    {
+        "step_title": "Paths & Folders",
+        "items": [{
+            "type": "password",
+            "desc": "Password the user should enter when logging into a closed BitlBee server. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_auth_password",
+                "desc": "Password"
+            }]
+        }, {
+            "type": "password",
+            "desc": "Password that unlocks access to special operator commands. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_oper_password",
+                "desc": "Password"
+            }]
+        }]
+    },
+    {
+        "step_title": "Security",
+        "items": [{
+            "type": "password",
+            "desc": "Password the user should enter when logging into a closed BitlBee server. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_auth_password",
+                "desc": "Password"
+            }]
+        }, {
+            "type": "password",
+            "desc": "Password that unlocks access to special operator commands. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_oper_password",
+                "desc": "Password"
+            }]
+        }]
+    },
+    {
+        "step_title": "Software Tweaks",
+        "items": [{
+            "type": "password",
+            "desc": "Password the user should enter when logging into a closed BitlBee server. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_auth_password",
+                "desc": "Password"
+            }]
+        }, {
+            "type": "password",
+            "desc": "Password that unlocks access to special operator commands. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_oper_password",
+                "desc": "Password"
+            }]
+        }]
+    },
+    {
+        "step_title": "Interface",
+        "items": [{
+            "type": "password",
+            "desc": "Password the user should enter when logging into a closed BitlBee server. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_auth_password",
+                "desc": "Password"
+            }]
+        }, {
+            "type": "password",
+            "desc": "Password that unlocks access to special operator commands. Defaults to admin",
+            "subitems": [{
+                "key": "wizard_oper_password",
+                "desc": "Password"
+            }]
+        }]
+    },
+]

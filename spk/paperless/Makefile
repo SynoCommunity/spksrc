@@ -19,9 +19,9 @@ CHANGELOG = Initial release
 HOMEPAGE = https://paperless.readthedocs.io
 LICENSE  = GPL-3.0
 
-SERVICE_USER = auto
+#SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT = 8010
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+#SERVICE_PORT = 8010
+#SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 include ../../mk/spksrc.spk.mk
