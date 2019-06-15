@@ -5,7 +5,7 @@ SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 #BUILD_DEPENDS += cross/$(SPK_NAME)
-DEPENDS = cross/pillow
+DEPENDS = cross/$(SPK_NAME) cross/pillow 
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.5.6"
 
@@ -19,6 +19,13 @@ CHANGELOG = Initial release
 HOMEPAGE = https://paperless.readthedocs.io
 LICENSE  = GPL-3.0
 
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8010
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: paperless_install
+paperless_install:
+	install -m 755 -d $(STAGING_DIR)/app
