@@ -8,19 +8,9 @@ BACKUP_PORT="10053"
 ## I need root to bind to port 53 see `service_prestart()` below
 #SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} &"
 
-is_DSM () {
-    if uname -n == "dsm";then
-        return 0 # using return code 0=true
-    fi
-    return 1 # using return code 1=false
-}
-
-echo "Version detected: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD" >> "${INST_LOG}" 2>&1
-if is_DSM; then
-    echo "Is DSM?: Yes" >> "${INST_LOG}" 2>&1
-else # RSM
-    echo "Is DSM?: No" >> "${INST_LOG}" 2>&1
-fi
+OS=$(uname -n 2>"${INST_LOG}")
+echo "OS: $OS" >> "${INST_LOG}" 2>&1
+echo "Version: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD" >> "${INST_LOG}" 2>&1
 
 blocklist_setup () {
     ## https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists
@@ -41,7 +31,7 @@ blocklist_cron_uninstall () {
 }
 
 pgrep () {
-    if is_DSM; then
+    if [ "$OS" == 'dsm' ]; then
         # shellcheck disable=SC2009,SC2153
         ps aux | grep "[^]]$1" >> "${LOG_FILE}" 2>&1
     else
@@ -50,22 +40,31 @@ pgrep () {
     fi
 }
 
+restart_dhcpd () {
+    /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
+}
+
 forward_dns_dhcpd () {
+    echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
     if [ "$1" == "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
-        echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
-        echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
-        /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
+        if [ "$OS" == 'dsm' ]; then
+            echo "enable=no" > /etc/dhcpd/dhcpd-dns-dns.info
+        else
+            echo "enable=no" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
+        fi
+        restart_dhcpd
     elif [ "$1" == "yes" ]; then
         if pgrep "dhcpd.conf"; then  # if dhcpd (dnsmasq) is enabled and running
-            echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
-            if is_DSM; then
-                echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dnscrypt.conf
-                echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-dnscrypt.info
+            if [ "$OS" == 'dsm ' ]; then
+                echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dns-dns.conf
+                echo "enable=yes" > /etc/dhcpd/dhcpd-dns-dns.info
+                # /etc/dhcpd/dhcpd-vendor.conf
+                # /etc/dhcpd/dhcpd-dns-dns.conf
             else # RSM
                 echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
-                echo "enable=\"$1\"" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
+                echo "enable=yes" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
             fi
-            /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
+            restart_dhcpd
         else
             echo "pgrep: no process with 'dhcpd.conf' found" >> "${LOG_FILE}"
         fi
@@ -76,7 +75,7 @@ service_prestart () {
     echo "service_preinst ${SYNOPKG_PKG_STATUS}" >> "${INST_LOG}"
 
     # Install daily cron job (3 minutes past midnight), to update the block list
-    if is_DSM; then
+    if [ "$OS" == 'dsm' ]; then
         mkdir -p /etc/cron.d
         echo "3       0       *       *       *       root    /var/packages/dnscrypt-proxy/target/var/update-blocklist.sh" >> /etc/cron.d/dnscrypt-proxy-update-blocklist
     else # RSM
@@ -175,8 +174,8 @@ service_postuninst () {
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf" >> "${INST_LOG}" 2>&1
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf" >> "${INST_LOG}" 2>&1
     disable_dhcpd_dns_port "no"
-    rm -f /etc/dhcpd/dhcpd-dnscrypt.conf
-    rm -f /etc/dhcpd/dhcpd-dnscrypt.info
+    rm -f /etc/dhcpd/dhcpd-dns-dns.conf
+    rm -f /etc/dhcpd/dhcpd-dns-dns.info
     rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
     rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
 }
