@@ -8,9 +8,18 @@ BACKUP_PORT="10053"
 ## I need root to bind to port 53 see `service_prestart()` below
 #SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} &"
 
-OS=$(uname -n 2>"${INST_LOG}")
-echo "OS: $OS" >> "${INST_LOG}" 2>&1
-echo "Version: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD" >> "${INST_LOG}" 2>&1
+echo "DSM Version: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD" >> "${INST_LOG}" 2>&1
+# SRM 1.2 example: DSM Version: 5.2-7915
+# DSM 6.2 example: DSM Version: 6.2-23739
+UNAME=$(uname -a)
+echo "uname: $UNAME" >> "${INST_LOG}" 2>&1
+# SRM example: Linux {some-name} 4.4.60 #7779 SMP Mon Jan 28 04:30:39 CST 2019 armv7l GNU/Linux synology_ipq806x_rt2600ac
+# DSM example: Linux {some-name} 3.10.105 #23739 SMP Tue Jul 3 19:47:13 CST 2018 x86_64 GNU/Linux synology_bromolow_3615xs
+OS="dsm"
+if echo "$UNAME" | grep -q -i 'rt1900ac\|rt2600ac\|mr2200ac'; then
+    OS="srm"
+fi
+echo "OS detected: $OS" >> "${INST_LOG}" 2>&1
 
 blocklist_setup () {
     ## https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists
@@ -33,7 +42,7 @@ blocklist_cron_uninstall () {
 pgrep () {
     if [ "$OS" == 'dsm' ]; then
         # shellcheck disable=SC2009,SC2153
-        ps aux | grep "[^]]$1" >> "${LOG_FILE}" 2>&1
+        ps aux | grep "$1" >> "${LOG_FILE}" 2>&1
     else
         # shellcheck disable=SC2009,SC2153
         ps -w | grep "[^]]$1" >> "${LOG_FILE}" 2>&1
@@ -45,7 +54,7 @@ restart_dhcpd () {
 }
 
 forward_dns_dhcpd () {
-    echo "dns forwarding - dhcpd (dnsmasq) enabled: $1" >> "${LOG_FILE}"
+    echo "dns forwarding - $1" >> "${LOG_FILE}"
     if [ "$1" == "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
         if [ "$OS" == 'dsm' ]; then
             echo "enable=no" > /etc/dhcpd/dhcpd-dns-dns.info
