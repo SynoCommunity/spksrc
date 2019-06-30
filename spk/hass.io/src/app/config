@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.hassio": {
+            "title": "Hass.io",
+            "desc": "Hass.io",
+            "icon": "images/hassio-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8123",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
