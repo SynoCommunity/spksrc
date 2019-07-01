@@ -14,8 +14,6 @@ service_postinst ()
     HOMEASSISTANT_DOCKER="homeassistant/qemux86-64-homeassistant"
     HASSIO_DOCKER="homeassistant/amd64-hassio-supervisor"
 
-    # CONF_FILE="${SYNOPKG_PKGDEST}/hassio.json"
-
     # Read infos from web
     HASSIO_VERSION=$(curl -s $URL_VERSION | jq -e -r '.supervisor')
 
