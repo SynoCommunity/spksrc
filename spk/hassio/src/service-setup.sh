@@ -25,9 +25,16 @@ service_postinst ()
     sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
     sed -i -e "s|@homeassistant@|${HOMEASSISTANT_DOCKER}|g" ${CFG_FILE}
     sed -i -e "s|@data_dir@|${data_dir}|g" ${CFG_FILE}
+
+    # Install busybox stuff
+    ln -s busybox ${SYNOPKG_PKGDEST}/bin/start-stop-daemon
 }
 
 service_preuninst ()
 {
+    HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CONFIG_FILE})"
+    SUPERVISOR="$(jq --raw-output '.supervisor' ${CONFIG_FILE})"
+
     docker rm --force homeassistant hassio_supervisor
+    docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
 }

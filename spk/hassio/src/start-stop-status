@@ -1,11 +1,11 @@
 #!/bin/sh 
 
 # Package
-PACKAGE="hass.io"
+PACKAGE="hassio"
 DNAME="hass.io"
 
 # Others
-INSTALL_DIR="/var/packages/${PACKAGE}/target/"
+INSTALL_DIR="/var/packages/${PACKAGE}/target"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 USER="root"
 EXEC="${INSTALL_DIR}/bin/${PACKAGE}.sh"
@@ -13,7 +13,7 @@ PID_FILE="${INSTALL_DIR}/var/${PACKAGE}.pid"
 
 start_daemon ()
 {
-    start-stop-daemon -S -q -m -b -N 10 -x ${EXEC} -c ${USER} -u ${USER} -p ${PID_FILE} > /dev/null
+    start-stop-daemon -S -q -m -b -x ${EXEC} -c ${USER} -u ${USER} -p ${PID_FILE} > /dev/null
 }
 
 stop_daemon ()
