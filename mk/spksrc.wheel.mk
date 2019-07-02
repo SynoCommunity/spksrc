@@ -34,8 +34,15 @@ endif
 wheel_msg_target:
 	@$(MSG) "Processing wheels of $(NAME)"
 
+# PIP distributions caching requires that the user running it owns the cache directory.
+# PIP_CACHE_OPT is default "--cache-dir $(PIP_DIR)", PIP_DIR defaults to $(DISTRIB_DIR)/pip, so
+# will move if the user chooses a custom persistent distribution dir for caching downloads between
+# containers and builds.
 pre_wheel_target: wheel_msg_target
 	@if [ ! -z "$(WHEELS)" ] ; then \
+		if [ ! -z "$(PIP_CACHE_OPT)" ] ; then \
+			mkdir -p $(PIP_DIR) ; \
+		fi; \
 		mkdir -p $(WORK_DIR)/wheelhouse ; \
 		if [ -f "$(WHEELS)" ] ; then \
 			$(MSG) "Using existing requirements file" ; \
@@ -55,14 +62,14 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
 		if [ ! -z "$(CROSS_COMPILE_WHEELS)" ] ; then \
 			$(MSG) "Force cross-compile" ; \
-			$(RUN) CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)" $(PIP_WHEEL) ; \
+			$(RUN) CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) ; \
 		else \
 			$(MSG) "Force pure-python" ; \
 			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
 			  $(RUN) $(PIP_WHEEL) ; \
 		fi ; \
 	fi
-	
+
 
 post_wheel_target: $(WHEEL_TARGET)
 	@if [ -d "$(WORK_DIR)/wheelhouse" ] ; then \

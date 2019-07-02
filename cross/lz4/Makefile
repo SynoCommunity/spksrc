@@ -13,11 +13,5 @@ COMMENT  = LZ4 is lossless compression algorithm, providing compression speed at
 LICENSE  = BSD
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)
-

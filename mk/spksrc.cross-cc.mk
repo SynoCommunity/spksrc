@@ -68,6 +68,10 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
+ifeq ($(strip $(PLIST_TRANSFORM)),)
+PLIST_TRANSFORM= cat
+endif
+
 .PHONY: cat_PLIST
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
@@ -76,7 +80,7 @@ cat_PLIST:
 	done
 	@if [ -f PLIST ] ; \
 	then \
-	  cat PLIST ; \
+	  $(PLIST_TRANSFORM) PLIST ; \
 	else \
 	  $(MSG) "No PLIST for $(NAME)" >&2; \
 	fi
@@ -92,15 +96,19 @@ clean:
 
 all: install
 
+sha1sum := $(shell which sha1sum 2>/dev/null || which gsha1sum 2>/dev/null)
+sha256sum := $(shell which sha256sum 2>/dev/null || which gsha256sum 2>/dev/null)
+md5sum := $(shell which md5sum 2>/dev/null || which gmd5sum 2>/dev/null || which md5 2>/dev/null)
+
 .PHONY: $(DIGESTS_FILE)
 $(DIGESTS_FILE): download
 	@$(MSG) "Generating digests for $(PKG_NAME)"
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
-	    SHA1)     tool=sha1sum ;; \
-	    SHA256)	  tool=sha256sum ;; \
-	    MD5)      tool=md5sum ;; \
+	    SHA1)     tool=${sha1sum} ;; \
+	    SHA256)	  tool=${sha256sum} ;; \
+	    MD5)      tool=${md5sum} ;; \
 	  esac ; \
 	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
 	done

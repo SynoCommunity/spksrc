@@ -1,8 +1,8 @@
 PKG_NAME = bzip2
 PKG_VERS = 1.0.6
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://bzip.org/$(PKG_VERS)
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
+PKG_DIST_SITE = http://http.debian.net/debian/pool/main/b/bzip2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -12,20 +12,20 @@ COMMENT  = High-quality data compressor
 LICENSE  = BSD License
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+COMPILE_TARGET = bzip2_compile
+INSTALL_TARGET = bzip2_install
 
 ADDITIONAL_CFLAGS = -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myCompile
-myCompile:
-	$(RUN) $(MAKE) bzip2 bzip2recover PREFIX=$(STAGING_INSTALL_PREFIX)
-	$(RUN) $(MAKE) -f Makefile-libbz2_so PREFIX=$(STAGING_INSTALL_PREFIX)
+.PHONY: bzip2_compile
+bzip2_compile:
+	$(RUN) $(MAKE) bzip2 bzip2recover PREFIX=$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
 
-.PHONY: myInstall
-myInstall:
+.PHONY: bzip2_install
+bzip2_install:
 	@$(RUN) $(MAKE) PREFIX=$(STAGING_INSTALL_PREFIX) install
 	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bunzip2
 	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bzcat

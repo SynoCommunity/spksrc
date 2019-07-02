@@ -16,7 +16,6 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
 
 POST_CONFIGURE_TARGET = lirc_kill_drivers
-INSTALL_TARGET = lirc_custom_install
 
 # These drivers would not make and are likely un-needed anyway
 KILL_DRIVERS = lirc_wpc8769l
@@ -28,9 +27,7 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: lirc_custom_install lirc_kill_drivers
-lirc_custom_install:
-	$(RUN) $(MAKE) install DESTDIR=$(STAGING_INSTALL_PREFIX) prefix=""
+.PHONY: lirc_kill_drivers
 lirc_kill_drivers:
 	@for DRIVER in $(KILL_DRIVERS); do \
 	    echo -e ".PHONY: all install\nall:\ninstall:\n" > $(WORK_DIR)/$(PKG_DIR)/drivers/$$DRIVER/Makefile; \

@@ -35,6 +35,10 @@ else
 $(PRE_SERVICE_TARGET): service_msg_target
 endif
 
+ifeq ($(strip $(DSM_UI_DIR)),)
+DSM_UI_DIR=app
+endif
+
 .PHONY: service_target service_msg_target
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
 .PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
@@ -146,7 +150,11 @@ endif
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
 ifneq ($(strip $(SPK_USER)),)
+ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
+else
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
+endif
 	$(create_target_dir)
 	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
@@ -202,17 +210,15 @@ endif
 ifeq ($(strip $(SERVICE_PORT_ALL_USERS)),)
 SERVICE_PORT_ALL_USERS=true
 endif
-ifeq ($(strip $(DSM_UI_DIR)),)
-DSM_UI_DIR=app
-endif
 
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
 	@echo '{ ".url": { ' > $@
 	@echo "  \"com.synocommunity.packages.${SPK_NAME}\": {" >> $@
 	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
-	@echo "    \"desc\": \"${DESCRIPTION}\"," >> $@
-	@echo "    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
+	@/bin/echo -n "    \"desc\": \"" >> $@
+	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
+	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
 	@echo "    \"type\": \"url\"," >> $@
 	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
 	@echo "    \"port\": \"${SERVICE_PORT}\"," >> $@
@@ -221,6 +227,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	@echo "    \"grantPrivilege\": \"all\"," >> $@
 	@echo "    \"advanceGrantPrivilege\": true" >> $@
 	@echo '} } }' >> $@
+	cat $@ | python -m json.tool > /dev/null
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif

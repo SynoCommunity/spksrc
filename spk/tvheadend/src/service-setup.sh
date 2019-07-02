@@ -10,7 +10,7 @@ GRPN=`id -gn ${EFF_USER}`
 HOME_DIR="${SYNOPKG_PKGDEST}/var"
 DVR_LOG_DIR="${SYNOPKG_PKGDEST}/var/dvr/log"
 SAVE_DIR="/tmp/tvheadend-recording-backup"
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -l ${LOG_FILE} -p ${PID_FILE}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTPP} --htsp_port ${HTSPP} -c ${HOME_DIR} -p ${PID_FILE}"
 SVC_BACKGROUND=yes
 
 # Group configuration to manage permissions of recording folders
@@ -21,9 +21,7 @@ service_postinst ()
     # Encrypt password
     wizard_password=`echo -n "TVHeadend-Hide-${wizard_password:=admin}" | openssl enc -a`
 
-    # Edit the configuration according to the wizard
-    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${SYNOPKG_PKGDEST}/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
-    sed -i -e "s/@username@/${wizard_username:=admin}/g" ${SYNOPKG_PKGDEST}/var/passwd/a927e30a755504f9784f23a4efac5109
+    # Edit the password configuration according to the wizard
     sed -i -e "s/@password@/${wizard_password}/g" ${SYNOPKG_PKGDEST}/var/passwd/a927e30a755504f9784f23a4efac5109
 
     # Fix fontconfig links

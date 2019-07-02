@@ -14,6 +14,7 @@ LICENSE  = GPLv2+
 PRE_CONFIGURE_TARGET = myPreConfigure
 INSTALL_TARGET = myInstall
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-static=no
 
 
 include ../../mk/spksrc.cross-cc.mk

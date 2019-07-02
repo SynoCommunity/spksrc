@@ -1,12 +1,12 @@
 _For new Package Requests, see the guidelines_  
 
 ### Setup
-_Package Name:_
-_Package Version:_
+_Package Name:_ 
+_Package Version:_ 
 
-_NAS Model:_
-_NAS Architecture:_
-_DSM version:_
+_NAS Model:_ 
+_NAS Architecture:_ 
+_DSM version:_ 
 
 ### Expected behavior
 Tell us what should happen
@@ -15,9 +15,9 @@ Tell us what should happen
 Tell us what happens instead
 
 ### Steps to reproduce
-_1._
-_2._
-_3._
+_1._ 
+_2._ 
+_3._ 
 
 #### Package log
 _Check Package Center or `/usr/local/{package}/var/`_

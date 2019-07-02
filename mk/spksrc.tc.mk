@@ -51,8 +51,8 @@ CXXFLAGS += $(TC_CXXFLAGS)
 CXXFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 
 LDFLAGS += $(TC_LDFLAGS)
-LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
-LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
+LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
+LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
 
 
@@ -78,6 +78,7 @@ tc_vars: patch
 	@echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)
 	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
 	@echo TC_FIRMWARE := $(TC_FIRMWARE)
+	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)
 
 
@@ -94,5 +95,5 @@ $(DIGESTS_FILE): download
 	    SHA256)   tool=sha256sum ;; \
 	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(LOCAL_FILE) $$type `$$tool $(DISTRIB_DIR)/$(TC_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
 	done

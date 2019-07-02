@@ -1,6 +1,6 @@
 SPK_NAME = mediainfo
-SPK_VERS = 17.12
-SPK_REV = 6
+SPK_VERS = 19.04
+SPK_REV = 8
 SPK_ICON = src/mediainfo.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -8,17 +8,13 @@ DEPENDS  = cross/$(SPK_NAME)
 RELOAD_UI = yes
 STARTABLE = no
 
-MAINTAINER = cytec
+MAINTAINER = ymartin59
 DESCRIPTION = "MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files."
 DISPLAY_NAME = MediaInfo
 
-HOMEPAGE   = http://sourceforge.net/projects/mediainfo/
-LICENSE    =
+HOMEPAGE   = https://mediaarea.net/en/MediaInfo
+LICENSE    = BSD
 
-POST_STRIP_TARGET = mediainfo_extra_install
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: mediainfo_extra_install
-mediainfo_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var

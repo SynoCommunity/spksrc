@@ -1,8 +1,8 @@
 PKG_NAME = go
-PKG_VERS = 1.4.2
+PKG_VERS = 1.4-bootstrap-20171003
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).src.$(PKG_EXT)
-PKG_DIST_SITE = https://storage.googleapis.com/golang
+PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://dl.google.com/go/
 PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
@@ -18,5 +18,5 @@ INSTALL_TARGET = myComp
 include ../../mk/spksrc.native-cc.mk
 
 myComp:
-	@$(MSG) "Building Go"
-	cd $(WORK_DIR)/$(PKG_NAME)/src && ./make.bash
+	@$(MSG) "Building Go 1.4"
+	cd $(WORK_DIR)/$(PKG_NAME)/src && GOARCH="" ./make.bash

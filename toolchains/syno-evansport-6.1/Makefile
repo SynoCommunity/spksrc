@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = evansport
 TC_VERS = 6.1
-TC_FIRMWARE = 6.1-15047
+TC_OS_MIN_VER = 6.1-15047
 
 TC_DIST = evansport-gcc493_glibc220_linaro_i686-GPL
 TC_EXT = txz

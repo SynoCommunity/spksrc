@@ -1,6 +1,6 @@
 <configuration version="18">
     <gui enabled="true" tls="false">
-        <address>0.0.0.0:7070</address>
+        <address>0.0.0.0:8384</address>
     </gui>
     <options>
         <listenAddress>default</listenAddress>

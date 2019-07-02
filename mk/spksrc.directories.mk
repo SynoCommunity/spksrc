@@ -11,11 +11,13 @@
 
 PWD := $(shell pwd)
 
-DISTRIB_DIR  = $(PWD)/../../distrib
-PIP_DIR = $(PWD)/../../distrib/pip
-TOOLCHAINS_DIR = $(PWD)/../../distrib/toolchains
-KERNELS_DIR = $(PWD)/../../distrib/kernels
+BASE_DISTRIB_DIR  = $(PWD)/../../distrib
+PIP_DIR = $(BASE_DISTRIB_DIR)/pip
+TOOLCHAINS_DIR = $(BASE_DISTRIB_DIR)/toolchains
+KERNELS_DIR = $(BASE_DISTRIB_DIR)/kernels
 PACKAGES_DIR = $(PWD)/../../packages
+# Default download location, see spksrc.download.mk
+DISTRIB_DIR = $(BASE_DISTRIB_DIR)
 
 ifndef WORK_DIR
 WORK_DIR = $(PWD)/work$(ARCH_SUFFIX)

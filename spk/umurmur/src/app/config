@@ -6,8 +6,11 @@
             "icon": "images/umurmur-{0}.png",
             "type": "url",
             "url": "3rdparty/umurmur/umurmur.cgi",
+            "protocol" : "http",
+            "port": "64738",
             "allUsers": true,
-            "grantPrivilege": "local"
+            "grantPrivilege": "all",
+            "advanceGrantPrivilege": true
         }
     }
 }

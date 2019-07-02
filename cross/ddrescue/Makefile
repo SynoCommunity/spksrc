@@ -12,6 +12,4 @@ HOMEPAGE = http://www.gnu.org/software/ddrescue/
 COMMENT = GNU ddrescue is a data recovery tool. It copies data from one file or block device (hard disc, cdrom, etc) to another, trying hard to rescue data in case of read errors.
 LICENSE = GNU GPL
 
-CONFIGURE_ARGS = --prefix="$(STAGING_INSTALL_PREFIX)"
-
 include ../../mk/spksrc.cross-cc.mk
