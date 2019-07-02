@@ -62,7 +62,9 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
 		if [ ! -z "$(CROSS_COMPILE_WHEELS)" ] ; then \
 			$(MSG) "Force cross-compile" ; \
+			cp $(WORK_DIR)/install/$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/$(_PYTHON_SYSCONFIGDATA_NAME).py $(PYTHON_SITE_PACKAGES_NATIVE)/../ ; \
 			$(RUN) CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) ; \
+			rm $(PYTHON_SITE_PACKAGES_NATIVE)/../$(_PYTHON_SYSCONFIGDATA_NAME).py ; \
 		else \
 			$(MSG) "Force pure-python" ; \
 			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
