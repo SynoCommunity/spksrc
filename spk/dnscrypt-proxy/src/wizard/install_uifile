@@ -1,5 +1,5 @@
 [{
-    "step_title": "DNSCrypt-proxy configuration",
+    "step_title": "dnscrypt-proxy configuration",
     "items": [{
         "desc": "Configuration file is located at: /var/packages/dnscrypt-proxy/target/var/dnscrypt-proxy.toml"
     }, {
