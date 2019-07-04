@@ -1,5 +1,6 @@
 SPK_NAME = ser2net
 SPK_VERS = 4.0
+SPK_REV = 1
 
 DEPENDS = cross/ser2net
 
