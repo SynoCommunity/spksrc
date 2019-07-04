@@ -1,6 +1,6 @@
 SPK_NAME = hassio
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = alpha
+SPK_REV = 1
 SPK_ICON = src/hass.png
 SPK_DEPENDS = Docker
 DSM_UI_DIR = app
@@ -10,7 +10,6 @@ DEPENDS = cross/busybox
 MAINTAINER = fredrike+hassio@gmail.com
 DESCRIPTION = Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts.
 ADMIN_PORT = 8123
-# ADMIN_URL = :8123/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Hass.io 
