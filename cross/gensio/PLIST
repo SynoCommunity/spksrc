@@ -1,2 +1,5 @@
-lnk:bin/screen
-bin:bin/screen-4.0.3
+lib:lib/libgensio.a
+lib:lib/libgensio.so
+lib:lib/libgensio.so.0.0.0
+lib:lib/libgensio.la
+lib:lib/libgensio.so.0 
