@@ -15,6 +15,8 @@ STARTABLE = yes
 DISPLAY_NAME = Hass.io 
 CHANGELOG = ""
 
+UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
+
 HOMEPAGE   = https://www.home-assistant.io/hassio/
 LICENSE    = Apache License 2.0
 HELPURL    = https://www.home-assistant.io/docs/
