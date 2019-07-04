@@ -1,7 +1,7 @@
 SPK_NAME = hassio
 SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
-SPK_ICON = src/hass.png
+SPK_ICON = src/$(SPK_NAME).png
 SPK_DEPENDS = Docker
 DSM_UI_DIR = app
 
