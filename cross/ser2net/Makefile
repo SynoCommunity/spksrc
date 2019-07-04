@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_SITE =  http://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 
-DEPENDS = cross/gensio
+DEPENDS = cross/gensio cross/libyaml
 
 HOMEPAGE = https://sourceforge.net/projects/ser2net/
 COMMENT  = Serial port to network proxy
