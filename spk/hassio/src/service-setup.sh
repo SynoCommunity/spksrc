@@ -7,7 +7,7 @@ service_preinst ()
 
 service_postinst ()
 {
-    mkdir -p "${data_dir}"
+    DATA_DIR="${share_path}/${folder_name}"
 
     URL_VERSION="https://s3.amazonaws.com/hassio-version/stable.json"
 
@@ -24,10 +24,13 @@ service_postinst ()
     # Write config
     sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
     sed -i -e "s|@homeassistant@|${HOMEASSISTANT_DOCKER}|g" ${CFG_FILE}
-    sed -i -e "s|@data_dir@|${data_dir}|g" ${CFG_FILE}
+    sed -i -e "s|@data_dir@|${DATA_DIR}|g" ${CFG_FILE}
 
     # Install busybox stuff
     ln -s busybox ${SYNOPKG_PKGDEST}/bin/start-stop-daemon
+
+    # Fix install directory
+    mkdir -p "${DATA_DIR}"
 }
 
 service_preuninst ()

@@ -3,17 +3,18 @@ set +x
 
 GetShares()
 {
-	for share in `sudo /usr/syno/sbin/synoshare  --enum ALL|tail -n +3`; do 
-		echo "[\"$share\", \"$share (`sudo /usr/syno/sbin/synoshare --get "${share}"|sed -n 's/.*Path.*\[\(.*\)\]/\1/p'`)\"]"
+	for share in `sudo /usr/syno/sbin/synoshare  --enum ALL|tail -n +3`; do
+		path=$(sudo /usr/syno/sbin/synoshare --get "${share}"|sed -n 's/.*Path.*\[\(.*\)\]/\1/p')
+		echo "[\"$path\", \"$share (${path})\"]"
 	done  | tr -s '\n' ',' | sed -e 's/,$//'
 }
 
 
 FIRST=`/bin/cat<<EOF
 {
-		"step_title": "Choose data location",
+		"step_title": "Data location",
 		"items": [{
-                "desc": "The installer will download and build the latest versions of hass.io and homeassistant. <br/>Please fill the desired storage location for the data directory below."
+                "desc": "The installer will download and build the latest versions of hass.io and homeassistant. <br/>Please fill the desired storage location for the data directory below (create a new share if none of the ones below suits storage of hass.io data)."
             },{
 			"type": "combobox",
 			"subitems": [{
@@ -21,12 +22,12 @@ FIRST=`/bin/cat<<EOF
 				"desc": "Shared Folder to store hass.io data in",
 				"editable": false,
 				"mode": "local",
-				"value": "null",
-				"valueField": "name",
+				"value": "",
+				"valueField": "path",
 				"displayField": "display_name",
 				"store": {
 					"xtype": "arraystore",
-					"fields": ["name", "display_name"],
+					"fields": ["path", "display_name"],
 					"data": [$(GetShares)]
 				}
 			}]
@@ -45,28 +46,3 @@ EOF`
 echo "[$FIRST]" > $SYNOPKG_TEMP_LOGFILE
 
 exit 0
-[
-    {
-        "step_title": "Configuration location",
-        "items": [
-            {
-                "desc": "The installer will download and build the latest versions of hass.io and homeassistant. <br/>Please fill the desired storage location for the data directory below."
-            },
-            {
-                "type": "textfield",
-                "subitems": [{
-                        "key": "data_dir",
-                        "desc": "Data directory",
-                        "defaultValue": "/volume1/hass.io",
-                        "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                                "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
-                            }
-                        }
-                    }]
-            }
-        ]
-    }
-]
