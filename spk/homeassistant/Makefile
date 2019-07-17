@@ -7,6 +7,7 @@ BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/cffi cross/nmap  # for python-libnmap
 DEPENDS += cross/gmp cross/mpfr cross/mpc  # for gmpy2
 WHEELS = src/requirements.txt
+PIP_WHEEL_ADDITIONAL_OPTIONS = --no-use-pep517
 SPK_DEPENDS = "python3>=3.6.8"
 
 MAINTAINER = ymartin59
