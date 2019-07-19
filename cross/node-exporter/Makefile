@@ -2,8 +2,9 @@ PKG_NAME = node_exporter
 PKG_VERS = 0.18.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/prometheus/node_exporter/releases/archive
+PKG_DIST_SITE = https://github.com/prometheus/node_exporter/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = native/go
 
