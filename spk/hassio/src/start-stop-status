@@ -20,6 +20,7 @@ stop_daemon ()
 {
     start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
+    docker stop hassio_supervisor homeassistant
 }
 
 daemon_status ()

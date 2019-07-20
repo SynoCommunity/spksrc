@@ -14,7 +14,7 @@ FIRST=`/bin/cat<<EOF
 {
 		"step_title": "Data location",
 		"items": [{
-                "desc": "The installer will download and build the latest versions of hass.io and homeassistant. <br/>Please fill the desired storage location for the data directory below (create a new share if none of the ones below suits storage of hass.io data)."
+                "desc": "The installer will download and build the latest versions of hass.io and homeassistant. <br/>Please fill the desired storage location for the data directory below (create a new <b>Shared Folder</b> if none of the ones below suits storage of hass.io data)."
             },{
 			"type": "combobox",
 			"subitems": [{
