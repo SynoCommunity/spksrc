@@ -12,6 +12,11 @@ COMMENT  = The industry-standard colour ASCII-art library.
 LICENSE  = WTFPL
 
 GNU_CONFIGURE = 1
+PRE_CONFIGURE_TARGET = libcaca_pre_configure
 CONFIGURE_ARGS = --disable-python
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: libcaca_pre_configure
+libcaca_pre_configure:
+	$(RUN) ; ./bootstrap

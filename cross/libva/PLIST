@@ -1,0 +1,6 @@
+lnk:lib/libva.so
+lnk:lib/libva.so.2
+lib:lib/libva.so.2.100.0
+lnk:lib/libva-drm.so
+lnk:lib/libva-drm.so.2
+lib:lib/libva-drm.so.2.100.0

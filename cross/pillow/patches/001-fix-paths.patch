@@ -1,87 +1,86 @@
 --- setup.py.orig	2017-01-02 12:47:11.000000000 +0100
 +++ setup.py	2017-01-07 13:07:26.387452602 +0100
-@@ -107,12 +107,12 @@
+@@ -136,12 +136,13 @@
  
  NAME = 'Pillow'
- PILLOW_VERSION = '4.0.0'
+ PILLOW_VERSION = get_version()
++lib_include = os.path.join(os.environ['STAGING_INSTALL_PREFIX'], "lib"), os.path.join(os.environ['STAGING_INSTALL_PREFIX'], "include")
 -JPEG_ROOT = None
-+JPEG_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
++JPEG_ROOT = lib_include
  JPEG2K_ROOT = None
 -ZLIB_ROOT = None
-+ZLIB_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
++ZLIB_ROOT = lib_include
  IMAGEQUANT_ROOT = None
  TIFF_ROOT = None
 -FREETYPE_ROOT = None
-+FREETYPE_ROOT = _lib_include(os.environ['STAGING_INSTALL_PREFIX'])
++FREETYPE_ROOT = lib_include
  LCMS_ROOT = None
  
  
-@@ -302,64 +302,6 @@
+@@ -339,62 +340,6 @@
                  _add_directory(library_dirs, "/usr/X11/lib")
                  _add_directory(include_dirs, "/usr/X11/include")
  
 -        elif sys.platform.startswith("linux"):
 -            arch_tp = (plat.processor(), plat.architecture()[0])
--            if arch_tp == ("x86_64", "32bit"):
--                # 32-bit build on 64-bit machine.
+-            # This should be correct on debian derivatives.
+-            if os.path.exists('/etc/debian_version'):
+-                # If this doesn't work, don't just silently patch
+-                # downstream because it's going to break when people
+-                # try to build pillow from source instead of
+-                # installing from the system packages.
+-                self.add_multiarch_paths()
+-
+-            elif arch_tp == ("x86_64", "32bit"):
+-                # Special Case: 32-bit build on 64-bit machine.
 -                _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
 -            else:
+-                libdirs = {
+-                    'x86_64':  ["/lib64", "/usr/lib64",
+-                                "/usr/lib/x86_64-linux-gnu"],
+-                    '64bit':   ["/lib64", "/usr/lib64",
+-                                "/usr/lib/x86_64-linux-gnu"],
+-                    'i386':    ["/usr/lib/i386-linux-gnu"],
+-                    'i686':    ["/usr/lib/i386-linux-gnu"],
+-                    '32bit':   ["/usr/lib/i386-linux-gnu"],
+-                    'aarch64': ["/usr/lib64", "/usr/lib/aarch64-linux-gnu"],
+-                    'arm':     ["/usr/lib/arm-linux-gnueabi"],
+-                    'armv71':  ["/usr/lib/arm-linux-gnueabi"],
+-                    'armv7l':  ["/usr/lib"],
+-                    'ppc64':   ["/usr/lib64", "/usr/lib/ppc64-linux-gnu",
+-                                "/usr/lib/powerpc64-linux-gnu"],
+-                    'ppc64le':   ["/usr/lib64"],
+-                    'ppc':     ["/usr/lib/ppc-linux-gnu",
+-                                "/usr/lib/powerpc-linux-gnu"],
+-                    's390x':   ["/usr/lib64", "/usr/lib/s390x-linux-gnu"],
+-                    's390':    ["/usr/lib/s390-linux-gnu"],
+-                    }
+-
 -                for platform_ in arch_tp:
--
--                    if not platform_:
+-                    dirs = libdirs.get(platform_, None)
+-                    if not dirs:
 -                        continue
+-                    for path in dirs:
+-                        _add_directory(library_dirs, path)
+-                    break
 -
--                    if platform_ in ["x86_64", "64bit"]:
--                        _add_directory(library_dirs, "/lib64")
--                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(library_dirs,
--                                       "/usr/lib/x86_64-linux-gnu")
--                        break
--                    elif platform_ in ["i386", "i686", "32bit"]:
--                        _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
--                        break
--                    elif platform_ in ["aarch64"]:
--                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(library_dirs,
--                                       "/usr/lib/aarch64-linux-gnu")
--                        break
--                    elif platform_ in ["arm", "armv7l"]:
--                        _add_directory(library_dirs,
--                                       "/usr/lib/arm-linux-gnueabi")
--                        break
--                    elif platform_ in ["ppc64"]:
--                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(library_dirs,
--                                       "/usr/lib/ppc64-linux-gnu")
--                        _add_directory(library_dirs,
--                                       "/usr/lib/powerpc64-linux-gnu")
--                        break
--                    elif platform_ in ["ppc"]:
--                        _add_directory(library_dirs, "/usr/lib/ppc-linux-gnu")
--                        _add_directory(library_dirs,
--                                       "/usr/lib/powerpc-linux-gnu")
--                        break
--                    elif platform_ in ["s390x"]:
--                        _add_directory(library_dirs, "/usr/lib64")
--                        _add_directory(library_dirs,
--                                       "/usr/lib/s390x-linux-gnu")
--                        break
--                    elif platform_ in ["s390"]:
--                        _add_directory(library_dirs, "/usr/lib/s390-linux-gnu")
--                        break
 -                else:
 -                    raise ValueError(
 -                        "Unable to identify Linux platform: `%s`" % platform_)
 -
--                # XXX Kludge. Above /\ we brute force support multiarch. Here we
--                # try Barry's more general approach. Afterward, something should
--                # work ;-)
--                self.add_multiarch_paths()
+-                # termux support for android.
+-                # system libraries (zlib) are installed in /system/lib
+-                # headers are at $PREFIX/include
+-                # user libs are at $PREFIX/lib
+-                if os.environ.get('ANDROID_ROOT', None):
+-                    _add_directory(library_dirs,
+-                                   os.path.join(os.environ['ANDROID_ROOT'],
+-                                                'lib'))
 -
          elif sys.platform.startswith("gnu"):
              self.add_multiarch_paths()
  
-@@ -379,13 +321,8 @@
+@@ -414,13 +357,8 @@
  
          # standard locations
          if not self.disable_platform_guessing:

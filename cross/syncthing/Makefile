@@ -1,5 +1,5 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.14.49
+PKG_VERS = 1.1.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
@@ -23,28 +23,31 @@ STATIC_BINARIES = 0
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Define SYNCTHING_ARCH as per Syncthing standards
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+
+# Define GO_ARCH for go compiler
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm
+GO_ARCH = arm
 ENV += GOARM=5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm
+GO_ARCH = arm
 ENV += GOARM=7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = arm64
+GO_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = 386
+GO_ARCH = 386
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = amd64
+GO_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-SYNCTHING_ARCH = ppc64
-endif
-ifeq ($(SYNCTHING_ARCH),)
+# Go has no ppc32 support for qoriq https://github.com/golang/go/issues/22885
+#ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+#GO_ARCH = ppc32
+#endif
+ifeq ($(GO_ARCH),)
 $(error Unsupported ARCH $(ARCH))
 endif
 
@@ -57,7 +60,7 @@ ENV += GOPATH=$(WORK_DIR)
 ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
-CONF_ARGS = -goos=$(GOOS) -goarch=$(SYNCTHING_ARCH) -version=v$(PKG_VERS)
+CONF_ARGS = -goos=$(GOOS) -goarch=$(GO_ARCH) -version=v$(PKG_VERS)
 
 ifeq ($(strip $(STATIC_BINARIES)),1)
 CONF_ARGS += -no-upgrade

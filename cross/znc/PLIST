@@ -1,4 +1,5 @@
 bin:bin/znc
+lib:lib/znc/admindebug.so
 lib:lib/znc/adminlog.so
 lib:lib/znc/alias.so
 lib:lib/znc/autoattach.so
@@ -25,6 +26,7 @@ lib:lib/znc/dcc.so
 lib:lib/znc/disconkick.so
 lib:lib/znc/fail2ban.so
 lib:lib/znc/flooddetach.so
+lib:lib/znc/identd.so
 lib:lib/znc/identfile.so
 lib:lib/znc/imapauth.so
 lib:lib/znc/keepnick.so
@@ -47,6 +49,7 @@ lib:lib/znc/q.so
 lib:lib/znc/raw.so
 lib:lib/znc/route_replies.so
 lib:lib/znc/sample.so
+lib:lib/znc/samplewebapi.so
 lib:lib/znc/sasl.so
 lib:lib/znc/savebuff.so
 lib:lib/znc/schat.so
@@ -54,6 +57,7 @@ lib:lib/znc/send_raw.so
 lib:lib/znc/shell.so
 lib:lib/znc/simple_away.so
 lib:lib/znc/stickychan.so
+lib:lib/znc/stripcontrols.so
 lib:lib/znc/watch.so
 lib:lib/znc/webadmin.so
 shr:share/znc

@@ -13,8 +13,7 @@ LICENSE  = http://www.gnu.org/licenses/gpl.html
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-shared --enable-rpath --without-manpages --without-tests --enable-overwrite --disable-widec
-CONFIGURE_ARGS += --disable-home-terminfo --with-default-terminfo-dir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/terminfo
+CONFIGURE_ARGS += --disable-home-terminfo
 CONFIGURE_ARGS += --disable-stripping --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
 
 include ../../mk/spksrc.cross-cc.mk
-

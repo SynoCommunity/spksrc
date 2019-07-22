@@ -1,9 +1,10 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/lidarr.png
 
 REQUIRED_DSM = 5.0
+# Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/curl cross/mediainfo cross/sqlite cross/lidarr
@@ -15,7 +16,7 @@ DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent us
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Lidarr
-CHANGELOG = "First release."
+CHANGELOG = "Update Lidarr to v0.5.0.583"
 
 HOMEPAGE = http://lidarr.audio/
 LICENSE  = GPLv3

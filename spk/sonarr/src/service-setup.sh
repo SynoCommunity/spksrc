@@ -2,14 +2,29 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 MONO_PATH="/usr/local/mono/bin"
 MONO="${MONO_PATH}/mono"
 
-# Check versions during upgrade
-SONARR="${SYNOPKG_PKGDEST}/share/NzbDrone/NzbDrone.exe"
-SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe"
-
 # Sonarr uses the home directory to store it's ".config"
 HOME_DIR="${SYNOPKG_PKGDEST}/var"
 CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
-PID_FILE="${CONFIG_DIR}/NzbDrone/nzbdrone.pid"
+
+# Sonarr v2 -> v3 compatibility:
+if [ -f "${SYNOPKG_PKGDEST}/share/NzbDrone/NzbDrone.exe" ]; then
+    # v2 installed
+    SONARR="${SYNOPKG_PKGDEST}/share/NzbDrone/NzbDrone.exe"
+    PID_FILE="${CONFIG_DIR}/NzbDrone/nzbdrone.pid"
+else
+    # v3 installed
+    SONARR="${SYNOPKG_PKGDEST}/share/Sonarr/Sonarr.exe"
+    PID_FILE="${CONFIG_DIR}/Sonarr/sonarr.pid"
+fi
+
+# Allow correct Sonarr SPK version checking (v2 or v3)
+if [ -f "${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe" ]; then
+    # v2 SPK
+    SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/NzbDrone/NzbDrone.exe"
+else
+    # v3 SPK
+    SPK_SONARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/Sonarr/Sonarr.exe"
+fi
 
 # Some have it stored in the root of package
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
@@ -22,12 +37,9 @@ SVC_BACKGROUND=y
 
 service_postinst ()
 {
-    # Move config.xml to .config
-    mkdir -p ${CONFIG_DIR}/NzbDrone
-    mv ${SYNOPKG_PKGDEST}/app/config.xml ${CONFIG_DIR}/NzbDrone/config.xml
     set_unix_permissions "${CONFIG_DIR}"
 
-    # If nessecary, add user also to the old group before removing it
+    # If necessary, add user also to the old group before removing it
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "users"
 
@@ -56,7 +68,8 @@ service_preupgrade ()
     echo "Installed Sonarr Binary: ${CUR_VER}" >> ${INST_LOG}
     SPK_VER=$(${MONO_PATH}/monodis --assembly ${SPK_SONARR} | grep "Version:" | awk '{print $2}')
     echo "Requested Sonarr Binary: ${SPK_VER}" >> ${INST_LOG}
-    if [ "${CUR_VER//.}" -ge "${SPK_VER//.}" ]; then
+    function version_compare() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+    if version_compare $CUR_VER $SPK_VER; then
         echo 'KEEP_CUR="yes"' > ${CONFIG_DIR}/KEEP_VAR
         echo "[KEEPING] Installed Sonarr Binary - Upgrading Package Only" >> ${INST_LOG}
         mv ${SYNOPKG_PKGDEST}/share ${INST_VAR}
@@ -76,6 +89,7 @@ service_postupgrade ()
         mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> $INST_LOG 2>&1
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
+
     set_unix_permissions "${CONFIG_DIR}"
 
     # If backup was created before new-style packages

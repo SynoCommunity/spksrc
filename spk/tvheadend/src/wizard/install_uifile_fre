@@ -1,13 +1,6 @@
 [{
-    "step_title": "Configuration du service",
+    "step_title": "Configuration du mot de passe administrateur",
     "items": [{
-        "type": "textfield",
-        "desc": "Nom d'utilisateur administrateur. Par défaut, admin",
-        "subitems": [{
-            "key": "wizard_username",
-            "desc": "Nom d'utilisateur"
-        }]
-    }, {
         "type": "password",
         "desc": "Mot de passe administrateur. Par défaut, admin",
         "subitems": [{
