@@ -51,10 +51,10 @@ postinst ()
 
 preuninst ()
 {
-    killall zerotier-one ;
+    killall -s SIGKILL zerotier-one;
     # remove all files except for identity files and network config files (for future convenience)
     find ${ZT_HOMEDIR} -type f ! -name 'identity.*' -delete
-    rm -rf ${INSTALL_DIR} ${ZT_HOMEDIR}/peers.d ${ZT_HOMEDIR}/controller.d ${ZT_HOMEDIR}/iddb.d /usr/local/bin/zerotier-cli /usr/local/bin/zerotier-idtool
+    rm -rf ${ZT_HOMEDIR}/peers.d ${ZT_HOMEDIR}/controller.d ${ZT_HOMEDIR}/iddb.d /usr/local/bin/zerotier-cli /usr/local/bin/zerotier-idtool
     # nginx de-config
     rm -f /usr/local/etc/nginx/conf.d/dsm.zerotier.conf
     rm -f /etc/init.d/zerotier

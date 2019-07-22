@@ -2,14 +2,13 @@
 
 DNAME="ZeroTier"
 PACKAGE="zerotier"
-INSTALL_DIR="/usr/local/${PACKAGE}"
-ZT_HOME_DIR="${SYNOPKG_PKGDEST}/var"
 ZEROTIER="${SYNOPKG_PKGDEST}/bin/zerotier-one"
-PID_FILE="${ZT_HOME_DIR}/zerotier-one.pid"
+PID_FILE="/var/lib/zerotier-one/zerotier-one.pid"
 
 start_daemon ()
 {
     sleep 1
+    insmod /lib/modules/tun.ko
     ${SYNOPKG_PKGDEST}/bin/zerotier-one -d ;
     echo $! >> ${PID_FILE}
 }
@@ -66,3 +65,4 @@ case "$1" in
     exit 1
     ;;
 esac
+

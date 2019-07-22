@@ -1,28 +1,28 @@
 SPK_NAME = zerotier
-SPK_VERS = 1.2.12
+SPK_VERS = 1.2.99-pre1.4.0
 SPK_REV = 1
 SPK_ICON = src/zerotier.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = Joseph Henry @ ZeroTier, Inc.
-DESCRIPTION = A Simple global P2P encrypted LAN for all of your devices.
+MAINTAINER = ZeroTier, Inc.
+DESCRIPTION = An easy-to-use encrypted P2P LAN for all of your devices.
 LICENSE  = GPLv3
-CHANGELOG = Various performance upgrades and bugfixes to core service.
+CHANGELOG = TUN/TAP-related bugfix, identity files now reside in /var/lib/zerotier-one
 HOMEPAGE = https://my.zerotier.com
 REPORT_URL = https://github.com/zerotier/ZeroTierNAS/issues
 DISPLAY_NAME = ZeroTier
 
-# Special build of 1.2.12 which contains changes required for spksrc pull request.
+# Special build of 1.2.13 which contains changes required for spksrc pull request.
 # This will be removed after next major ZeroTier version bump (1.4.0)
-PRODUCT_DIR = $(WORK_DIR)/ZeroTierOne-7dbccf08aeccab18be5fb24e90a6a1d89248aa3a
+PRODUCT_DIR = $(WORK_DIR)/ZeroTierOne-a0f47b12b43c99100c8db87f5a127221d513784b
 # PRODUCT_DIR=$(WORK_DIR)/$(DISPLAY_NAME)One-$(SPK_VERS)
 
 DSM_UI_DIR = ui
 RELOAD_UI = yes
 STARTABLE = yes
 REQUIRED_DSM = 6.0
-BETA = 1
+BETA = 0
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT = src/dsm-control.sh
