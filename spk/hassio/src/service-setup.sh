@@ -40,4 +40,5 @@ service_preuninst ()
 
     docker rm --force homeassistant hassio_supervisor
     docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
+    docker network rm hassio
 }
