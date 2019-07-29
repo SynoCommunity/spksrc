@@ -1,5 +1,5 @@
 PKG_NAME = opus
-PKG_VERS = 1.3
+PKG_VERS = 1.3.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = opus-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://archive.mozilla.org/pub/opus
