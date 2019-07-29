@@ -21,12 +21,12 @@ Docker
 
 Virtual machine
 ^^^^^^^^^^^^^^^
-A virtual machine based on an 64-bit version of Debian stable OS is recommended. Non-x86 architectures are not supported.
+A virtual machine based on an 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.
 
 * Install the requirements::
 
     sudo dpkg --add-architecture i386 && sudo apt-get update
-    sudo aptitude install build-essential debootstrap python-pip automake libgmp3-dev libltdl-dev libunistring-dev libffi-dev libcppunit-dev ncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check intltool gperf flex bison xmlto php5 expect libgc-dev mercurial cython lzip cmake swig libc6-i386 libmount-dev libpcre3-dev libbz2-dev
+    sudo apt install build-essential debootstrap python-pip automake autogen libgmp3-dev libltdl-dev libunistring-dev libffi-dev libcppunit-dev libncurses-dev imagemagick libssl-dev pkg-config zlib1g-dev gettext git curl subversion check intltool gperf flex bison xmlto php expect libgc-dev mercurial cython lzip cmake swig libc6-i386 libmount-dev libpcre3-dev libbz2-dev
     sudo pip install -U setuptools pip wheel httpie
 
 * You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
