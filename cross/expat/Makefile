@@ -1,5 +1,5 @@
 PKG_NAME = expat
-PKG_VERS = 2.2.6
+PKG_VERS = 2.2.7
 PKG_EXT = tar.bz2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)/$(PKG_VERS)

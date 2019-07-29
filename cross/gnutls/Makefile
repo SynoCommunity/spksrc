@@ -1,6 +1,6 @@
 PKG_NAME = gnutls
 PKG_VERS_SHORT = 3.6
-PKG_VERS = $(PKG_VERS_SHORT).4
+PKG_VERS = $(PKG_VERS_SHORT).8
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.gnupg.org/ftp/gcrypt/$(PKG_NAME)/v$(PKG_VERS_SHORT)
