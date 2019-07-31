@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONFIG_FILE="/var/packages/hassio/target/var/hassio.json"
+CONFIG_FILE="/var/packages/hassio/target/etc/hassio.json"
 
 runSupervisor() {
     HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CONFIG_FILE})"

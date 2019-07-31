@@ -1,4 +1,4 @@
-CFG_FILE="${SYNOPKG_PKGDEST}/var/hassio.json"
+CFG_FILE="${SYNOPKG_PKGDEST}/etc/hassio.json"
 
 service_preinst ()
 {
