@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 4.1
-SPK_REV = 11
+SPK_VERS = 4.1.4
+SPK_REV = 12
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 4.1<br/>2. Update ffmpeg dependencies<br/>3. Add VAAPI for intel x64 processors<br/>4. Fix HDR10Plus support in x265<br/>5. Fix x265 support for ppc platforms"
+CHANGELOG = "1. Update ffmpeg to 4.1.4<br/>2. Update ffmpeg dependencies<br/>3. Add VAAPI for intel x64 processors<br/>4. Fix HDR10Plus support in x265<br/>5. Fix x265 support for ppc platforms"
 
 DEPENDS = cross/$(SPK_NAME)
 
