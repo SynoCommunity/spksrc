@@ -8,7 +8,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox
 
 MAINTAINER = fredrike+hassio@gmail.com
-DESCRIPTION = Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts.
+DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the configuration folder of Home Assistant."
 ADMIN_PORT = 8123
 RELOAD_UI = yes
 STARTABLE = yes

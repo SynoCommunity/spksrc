@@ -2,6 +2,48 @@
 
 CONFIG_FILE="/var/packages/hassio/target/etc/hassio.json"
 
+fix_usb_devices() {
+    RULES_FILE="/lib/udev/rules.d/59-usb-serial.rules"
+    HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CONFIG_FILE})"
+    USB_FILE="${HASSIO_DATA}/homeassistant/usb_devices.txt"
+
+    # Clear entris from file
+    echo >${USB_FILE}
+
+    for tty_path in $(find /sys/bus/usb/devices/usb*/ -name tty); do
+        tty_iface_path=$(dirname $tty_path)
+        serial_device_path=$(dirname $tty_iface_path)
+        prefix=usb
+        if test -f "$serial_device_path/idVendor"; then
+            bInterfaceNumber=$(cat $tty_iface_path/bInterfaceNumber)
+        else
+            bInterfaceNumber=$(cat $serial_device_path/bInterfaceNumber)
+            # We need to go up 1 level to get information
+            serial_device_path=$(dirname $serial_device_path)
+            manufacturer=$(cat $serial_device_path/manufacturer)
+        fi
+        idVendor=$(cat $serial_device_path/idVendor)
+        product=$(cat $serial_device_path/product)
+        idProduct=$(cat $serial_device_path/idProduct)
+        serial=$(cat $serial_device_path/serial)
+
+        if [ ! -z "$manufacturer" ]; then
+            symLink="serial/by-id/${prefix}-${manufacturer}_${product}_${serial}-if${bInterfaceNumber}-port0"
+        else
+            symLink="serial/by-id/${prefix}-${idVendor}_${product}_${serial}-if${bInterfaceNumber}"
+        fi
+
+        line="SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\", SYMLINK+=\"${symLink}\""
+        echo $line
+        grep -s $symLink $RULES_FILE >/dev/null ||
+            echo ${line} >>$RULES_FILE
+
+        echo "/dev/${symlink}" >>$USB_FILE
+    done
+
+    udevadm control --reload && udevadm trigger
+}
+
 runSupervisor() {
     HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CONFIG_FILE})"
     HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CONFIG_FILE})"
@@ -23,6 +65,7 @@ runSupervisor() {
 }
 
 start_hassio () {
+    fix_usb_devices
     SUPERVISOR="$(jq --raw-output '.supervisor' ${CONFIG_FILE})"
 
     HASSIO_IMAGE_ID=$(/usr/local/bin/docker inspect --format='{{.Id}}' ${SUPERVISOR})
