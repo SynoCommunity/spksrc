@@ -42,3 +42,9 @@ service_preuninst ()
     docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
     docker network rm hassio
 }
+
+service_preupgrade() {
+    if [ -f "${SYNOPKG_PKGDEST}/var/hassio.json"]; then
+       mv "${SYNOPKG_PKGDEST}/var/hassio.json" $CFG_FILE
+    fi
+}
