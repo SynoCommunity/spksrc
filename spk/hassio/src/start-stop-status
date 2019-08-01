@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 # Package
 PACKAGE="hassio"
@@ -11,25 +11,21 @@ USER="root"
 EXEC="${INSTALL_DIR}/bin/${PACKAGE}.sh"
 PID_FILE="${INSTALL_DIR}/var/${PACKAGE}.pid"
 
-start_daemon ()
-{
-    start-stop-daemon -S -q -m -b -x ${EXEC} -c ${USER} -u ${USER} -p ${PID_FILE} > /dev/null
+start_daemon() {
+    start-stop-daemon -S -q -m -b -x ${EXEC} -c ${USER} -u ${USER} -p ${PID_FILE} >/dev/null
 }
 
-stop_daemon ()
-{
+stop_daemon() {
     start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
     wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
     docker stop hassio_supervisor homeassistant
 }
 
-daemon_status ()
-{
+daemon_status() {
     start-stop-daemon -K -q -t -u ${USER} -p ${PID_FILE}
 }
 
-wait_for_status ()
-{
+wait_for_status() {
     counter=$2
     while [ ${counter} -gt 0 ]; do
         daemon_status
@@ -40,37 +36,36 @@ wait_for_status ()
     return 1
 }
 
-
 case $1 in
-    start)
-        if daemon_status; then
-            echo ${DNAME} is already running
-        else
-            echo Starting ${DNAME} ...
-            start_daemon
-        fi
-        ;;
-    stop)
-        if daemon_status; then
-            echo Stopping ${DNAME} ...
-            stop_daemon
-        else
-            echo ${DNAME} is not running
-        fi
-        ;;
-    status)
-        if daemon_status; then
-            echo ${DNAME} is running
-            exit 0
-        else
-            echo ${DNAME} is not running
-            exit 1
-        fi
-        ;;
-    log)
+start)
+    if daemon_status; then
+        echo ${DNAME} is already running
+    else
+        echo Starting ${DNAME} ...
+        start_daemon
+    fi
+    ;;
+stop)
+    if daemon_status; then
+        echo Stopping ${DNAME} ...
+        stop_daemon
+    else
+        echo ${DNAME} is not running
+    fi
+    ;;
+status)
+    if daemon_status; then
+        echo ${DNAME} is running
+        exit 0
+    else
+        echo ${DNAME} is not running
         exit 1
-        ;;
-    *)
-        exit 1
-        ;;
+    fi
+    ;;
+log)
+    exit 1
+    ;;
+*)
+    exit 1
+    ;;
 esac

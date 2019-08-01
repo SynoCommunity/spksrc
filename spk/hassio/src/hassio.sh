@@ -50,7 +50,7 @@ runSupervisor() {
 
     APPARMOR="--security-opt apparmor=unconfined"
 
-    /usr/local/bin/docker rm --force hassio_supervisor > /dev/null || true
+    /usr/local/bin/docker rm --force hassio_supervisor >/dev/null || true
     /usr/local/bin/docker run --name hassio_supervisor \
         --privileged \
         $APPARMOR \
@@ -64,7 +64,7 @@ runSupervisor() {
         ${SUPERVISOR}
 }
 
-start_hassio () {
+start_hassio() {
     fix_usb_devices
     SUPERVISOR="$(jq --raw-output '.supervisor' ${CONFIG_FILE})"
 
@@ -72,11 +72,11 @@ start_hassio () {
     HASSIO_CONTAINER_ID=$(/usr/local/bin/docker inspect --format='{{.Image}}' hassio_supervisor || echo "--")
 
     # Fix routing
-    route -vn |grep 172.30.32.0 >/dev/null || \
+    route -vn | grep 172.30.32.0 >/dev/null ||
         route add -net 172.30.32.0/23 gw 172.30.32.1
 
     # Run supervisor
-    ([ "${HASSIO_IMAGE_ID}" = "${HASSIO_CONTAINER_ID}" ] && /usr/local/bin/docker start --attach hassio_supervisor) || runSupervisor 
+    ([ "${HASSIO_IMAGE_ID}" = "${HASSIO_CONTAINER_ID}" ] && /usr/local/bin/docker start --attach hassio_supervisor) || runSupervisor
 }
 
 while true; do

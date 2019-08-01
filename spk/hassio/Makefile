@@ -12,7 +12,7 @@ DESCRIPTION = "Open source home automation that puts local control and privacy f
 ADMIN_PORT = 8123
 RELOAD_UI = yes
 STARTABLE = yes
-DISPLAY_NAME = Hass.io 
+DISPLAY_NAME = Hass.io
 CHANGELOG = ""
 
 UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
@@ -29,7 +29,7 @@ SSS_SCRIPT = src/start-stop-status
 #DSM UI integration
 SERVICE_PORT = 8123
 
-INSTALL_DEP_SERVICES = Docker 
+INSTALL_DEP_SERVICES = Docker
 START_DEP_SERVICES = Docker
 
 POST_STRIP_TARGET = hassio_extra_install

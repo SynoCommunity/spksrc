@@ -1,12 +1,10 @@
 CFG_FILE="${SYNOPKG_PKGDEST}/etc/hassio.json"
 
-service_preinst ()
-{
+service_preinst() {
     exit 0
 }
 
-service_postinst ()
-{
+service_postinst() {
     DATA_DIR="${share_path}/${folder_name}"
 
     URL_VERSION="https://s3.amazonaws.com/hassio-version/stable.json"
@@ -18,8 +16,8 @@ service_postinst ()
     HASSIO_VERSION=$(curl -s $URL_VERSION | jq -e -r '.supervisor')
 
     # Pull supervisor image
-    /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" > /dev/null
-    /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" > /dev/null
+    /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" >/dev/null
+    /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" >/dev/null
 
     # Write config
     sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
@@ -33,8 +31,7 @@ service_postinst ()
     mkdir -p "${DATA_DIR}"
 }
 
-service_preuninst ()
-{
+service_preuninst() {
     HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CONFIG_FILE})"
     SUPERVISOR="$(jq --raw-output '.supervisor' ${CONFIG_FILE})"
 
