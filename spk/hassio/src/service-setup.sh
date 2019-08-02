@@ -42,8 +42,8 @@ service_preuninst() {
     mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-`date '+%s'`.bak" 
 }
 
-service_preupgrade() {
-    if [ -f "${SYNOPKG_PKGDEST}/var/hassio.json"]; then
+service_postupgrade() {
+    if [ -f "${SYNOPKG_PKGDEST}/var/hassio.json" ]; then
        mv "${SYNOPKG_PKGDEST}/var/hassio.json" $CFG_FILE
     fi
 }
