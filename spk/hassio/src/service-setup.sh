@@ -34,10 +34,12 @@ service_postinst() {
 service_preuninst() {
     HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CONFIG_FILE})"
     SUPERVISOR="$(jq --raw-output '.supervisor' ${CONFIG_FILE})"
+    HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CONFIG_FILE})"
 
     docker rm --force homeassistant hassio_supervisor
     docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
     docker network rm hassio
+    mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-`date '+%s'`.bak" 
 }
 
 service_preupgrade() {
