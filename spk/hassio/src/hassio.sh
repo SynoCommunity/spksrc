@@ -14,7 +14,7 @@ fix_usb_devices() {
         tty_iface_path=$(dirname $tty_path)
         serial_device_path=$(dirname $tty_iface_path)
         prefix=usb
-        if test -f "$serial_device_path/idVendor"; then
+        if [ -f "$serial_device_path/idVendor" ]; then
             bInterfaceNumber=$(cat $tty_iface_path/bInterfaceNumber)
         else
             bInterfaceNumber=$(cat $serial_device_path/bInterfaceNumber)
@@ -29,6 +29,7 @@ fix_usb_devices() {
 
         if [ ! -z "$manufacturer" ]; then
             symLink="serial/by-id/${prefix}-${manufacturer}_${product}_${serial}-if${bInterfaceNumber}-port0"
+            unset manufacturer
         else
             symLink="serial/by-id/${prefix}-${idVendor}_${product}_${serial}-if${bInterfaceNumber}"
         fi
