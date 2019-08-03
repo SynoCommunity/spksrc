@@ -1,6 +1,6 @@
 SPK_NAME = ps3netsrv
-SPK_VERS = 1.47.15
-SPK_REV = 4
+SPK_VERS = 1.47.25
+SPK_REV = 5
 SPK_ICON = src/${SPK_NAME}.png
 
 REQUIRED_DSM = 5.0

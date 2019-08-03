@@ -1,0 +1,19 @@
+--- Makefile.org	2019-08-03 11:11:04.071756255 +0200
++++ Makefile	2019-08-03 11:11:48.579937398 +0200
+@@ -4,13 +4,13 @@
+ OUTPUT := ps3netsrv
+ OBJS = main.o compat.o File.o VIsoFile.o
+ 
+-CFLAGS = -Wall -I. -I./polarssl-1.3.2/include -std=gnu99 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+-CPPFLAGS += -Wall -I. -I./polarssl-1.3.2/include -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
++CFLAGS = -Wall -I. -I../../../polarssl-1.3.2/include -std=gnu99 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
++CPPFLAGS += -Wall -I. -I../../../polarssl-1.3.2/include -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+ 
+ #CFLAGS += -DNOSSL
+ #CPPFLAGS +=-DNOSSL
+ 
+-LDFLAGS = -L. -L./polarssl-1.3.2/library
++LDFLAGS = -L. -L../../../polarssl-1.3.2/library
+ LIBS = -lstdc++ -lpolarssl
+ 
+ 
