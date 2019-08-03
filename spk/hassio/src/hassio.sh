@@ -36,10 +36,10 @@ fix_usb_devices() {
 
         line="SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\", SYMLINK+=\"${symLink}\""
         echo $line
-        grep -s $symLink $RULES_FILE >/dev/null ||
+        grep -s "ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\"" $RULES_FILE >/dev/null ||
             echo ${line} >>$RULES_FILE
 
-        echo "/dev/${symlink}" >>$USB_FILE
+        echo "/dev/${symLink}" >>$USB_FILE
     done
 
     udevadm control --reload && udevadm trigger
