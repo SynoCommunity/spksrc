@@ -1,0 +1,35 @@
+# Travis config file to build spk package
+# Credits to torrentalle, Safihre, ymartin59
+notifications:
+  email: false
+
+git:
+  depth: 1
+
+sudo: required
+language: false
+
+# Build environment configuration
+env:
+  global:
+    - PKG=python
+    - IMAGE=hpgy/spksrc:jessie-old
+  matrix:
+    - SYNOARCH=armada370-6.1
+    - SYNOARCH=ppc853x-5.2
+    - SYNOARCH=x64-6.1
+
+# spksrc docker image
+services:
+  - docker
+
+before_install:
+  - docker pull hpgy/spksrc:jessie-org
+
+# Build spk package
+script:
+  # Output is too verbose for TravisCI, so we hide it
+  # Remove the ">/dev/null" part to debug!
+  - docker run -it -v `pwd`:/spksrc hpgy/spksrc:jessie-org /bin/bash -c "cd /spksrc && make setup && cd spk/$PKG && make arch-$SYNOARCH >/dev/null"
+  # make arch-$SYNOARCH always return exit code 0. This line is to test if SPK has been build.
+  - ls -ll packages/${PKG}_$SYNOARCH.spk
