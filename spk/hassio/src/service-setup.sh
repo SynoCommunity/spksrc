@@ -16,8 +16,8 @@ service_postinst() {
     HASSIO_VERSION=$(curl -s $URL_VERSION | jq -e -r '.supervisor')
 
     # Pull supervisor image
-    /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" >/dev/null
-    /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" >/dev/null
+    /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" >/dev/null &&
+        /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" >/dev/null
 
     # Write config
     sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
@@ -32,14 +32,14 @@ service_postinst() {
 }
 
 service_preuninst() {
-    HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CONFIG_FILE})"
-    SUPERVISOR="$(jq --raw-output '.supervisor' ${CONFIG_FILE})"
-    HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CONFIG_FILE})"
+    HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CFG_FILE})"
+    SUPERVISOR="$(jq --raw-output '.supervisor' ${CFG_FILE})"
+    HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
 
     docker rm --force homeassistant hassio_supervisor
     docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
     docker network rm hassio
-    mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-`date '+%s'`.bak" 
+    mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-$(date '+%s').bak"
 }
 
 service_preupgrade() {
@@ -50,6 +50,6 @@ service_preupgrade() {
 
 service_postupgrade() {
     if [ -f "${SYNOPKG_PKGDEST}/var/hassio.json" ]; then
-       mv "${SYNOPKG_PKGDEST}/var/hassio.json" $CFG_FILE
+        mv "${SYNOPKG_PKGDEST}/var/hassio.json" $CFG_FILE
     fi
 }
