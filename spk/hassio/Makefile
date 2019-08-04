@@ -8,7 +8,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox
 
 MAINTAINER = fredrike+hassio@gmail.com
-DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the configuration folder of Home Assistant."
+DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the hass.io folder."
 ADMIN_PORT = 8123
 RELOAD_UI = yes
 STARTABLE = yes
@@ -34,7 +34,7 @@ START_DEP_SERVICES = Docker
 
 POST_STRIP_TARGET = hassio_extra_install
 
-BUSYBOX_CONFIG = daemon nice
+BUSYBOX_CONFIG = daemon
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
@@ -44,4 +44,4 @@ hassio_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/hassio.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/hassio.json $(STAGING_DIR)/etc/hassio.json
+	install -m 644 src/hassio.json $(STAGING_DIR)/var/hassio.dist

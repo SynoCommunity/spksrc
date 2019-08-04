@@ -1,11 +1,11 @@
 #!/bin/sh
 
-CONFIG_FILE="/var/packages/hassio/target/etc/hassio.json"
+CONFIG_FILE="/usr/local/hassio/etc/hassio.json"
 
 fix_usb_devices() {
-    RULES_FILE="/lib/udev/rules.d/59-usb-serial.rules"
+    RULES_FILE="/lib/udev/rules.d/59-usb-hassio.rules"
     HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CONFIG_FILE})"
-    USB_FILE="${HASSIO_DATA}/homeassistant/usb_devices.txt"
+    USB_FILE="${HASSIO_DATA}/usb_devices.txt"
 
     # Clear entris from file
     echo >${USB_FILE}
