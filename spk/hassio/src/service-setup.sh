@@ -21,7 +21,7 @@ service_postinst() {
     /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" >/dev/null &&
         /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" >/dev/null
 
-   if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+   if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ ! -f ${CFG_FILE} ]; then
         cp ${SYNOPKG_PKGDEST}/var/hassio.dist ${CFG_FILE}
         # Write config
         sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
