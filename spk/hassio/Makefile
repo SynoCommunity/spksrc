@@ -1,6 +1,6 @@
 SPK_NAME = hassio
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = $(shell git rev-parse --short HEAD)
 SPK_ICON = src/$(SPK_NAME).png
 SPK_DEPENDS = Docker
 DSM_UI_DIR = app
