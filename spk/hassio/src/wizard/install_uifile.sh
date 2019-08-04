@@ -18,7 +18,7 @@ FIRST=`/bin/cat<<EOF
             },{
 			"type": "combobox",
 			"subitems": [{
-				"key": "share_path",
+				"key": "wizard_share_path",
 				"desc": "Shared Folder to store hass.io data in",
 				"editable": false,
 				"mode": "local",
@@ -34,7 +34,7 @@ FIRST=`/bin/cat<<EOF
 		}, {
 			"type": "textfield",
 			"subitems": [{
-				"key": "folder_name",
+				"key": "wizard_folder_name",
 				"desc": "Data folder name",
 				"value": "hass.io",
 				"disabled": false

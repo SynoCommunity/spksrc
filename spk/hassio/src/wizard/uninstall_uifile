@@ -1,0 +1,14 @@
+[{
+    {
+    "step_title": "Uninstall of hass.io",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Do you want to remove all installed addons?",
+        "subitems": [{
+            "key": "wizard_remove_addons",
+            "desc": "Remove installed addons",
+            "defaultValue": true
+        }]
+    }]
+    }
+}]

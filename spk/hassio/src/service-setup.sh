@@ -5,7 +5,7 @@ service_preinst() {
 }
 
 service_postinst() {
-    DATA_DIR="${share_path}/${folder_name}"
+    DATA_DIR="${wizard_share_path}/${wizard_folder_name}"
     # Fix install directory
     mkdir -p "${DATA_DIR}"
 
@@ -21,7 +21,7 @@ service_postinst() {
     /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" >/dev/null &&
         /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" >/dev/null
 
-   if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ ! -f ${CFG_FILE} ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ ! -f ${CFG_FILE} ]; then
         cp ${SYNOPKG_PKGDEST}/var/hassio.dist ${CFG_FILE}
         # Write config
         sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
@@ -43,6 +43,14 @@ service_preuninst() {
     docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
     docker network rm hassio
 
+    if [ "${wizard_remove_addons}" == "true" ]; then
+        # Remove addons
+        ADDONS_FILE=$(jq -r '.data + "/addons.json"' /usr/local/hassio/etc/hassio.json)
+
+        docker rm --force $(jq -r '.user| keys| map("addon_"+.)| join(" ")' $ADDONS_FILE)
+        docker rmi --force $(jq -r '[.user | keys[] as $k | .[$k].image] | join(" ")' $ADDONS_FILE)
+    fi
+
     # Move config.json so hassio_supervisor will create a new homeassistant container.
     mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-$(date '+%s').bak"
 }
@@ -55,8 +63,6 @@ service_postupgrade() {
 
     # Move config.json from data dir if there is no homeassistant container.
     HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
-    docker ps -a|grep qemux86-64-homeassistant || \
+    docker ps -a | grep qemux86-64-homeassistant ||
         mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-$(date '+%s').bak"
 }
-
-    # Fix install directory
