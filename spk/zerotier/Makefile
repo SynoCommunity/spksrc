@@ -1,6 +1,6 @@
 SPK_NAME = zerotier
-SPK_VERS = 1.2.99-pre1.4.0
-SPK_REV = 1
+SPK_VERS = 1.4.0
+SPK_REV = 0
 SPK_ICON = src/zerotier.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -15,14 +15,17 @@ DISPLAY_NAME = ZeroTier
 
 # Special build of 1.2.13 which contains changes required for spksrc pull request.
 # This will be removed after next major ZeroTier version bump (1.4.0)
-PRODUCT_DIR = $(WORK_DIR)/ZeroTierOne-a0f47b12b43c99100c8db87f5a127221d513784b
+PRODUCT_DIR = $(WORK_DIR)/ZeroTierOne-db813db7e875c257e42c41ab8091c3df1e9300a5
 # PRODUCT_DIR=$(WORK_DIR)/$(DISPLAY_NAME)One-$(SPK_VERS)
 
 DSM_UI_DIR = ui
 RELOAD_UI = yes
 STARTABLE = yes
-REQUIRED_DSM = 6.0
+REQUIRED_DSM = 5.0
 BETA = 0
+
+ENV += ZT_SYNOLOGY=1
+#ZT_DISABLE_COMPRESSION=1
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT = src/dsm-control.sh
