@@ -43,5 +43,5 @@ include ../../mk/spksrc.spk.mk
 hassio_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/hassio.sh $(STAGING_DIR)/bin/
-	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/hassio.json $(STAGING_DIR)/var/hassio.dist
