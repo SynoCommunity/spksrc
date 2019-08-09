@@ -1,6 +1,10 @@
 spksrc
 ======
-spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the `SynoCommunity repository`_.
+spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the `SynoCommunity repository`_. 
+
+About this fork
+---------------
+This fork of spksrc creates packages for WD My Cloud devices. If you have questions/issues, make a ticket in the `WDCommunity repo`_.
 
 
 Contributing
@@ -60,3 +64,4 @@ When not explicitly set, files are placed under a `3 clause BSD license`_
 .. _FAQ: https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions
 .. _Install Docker with wget: https://docs.docker.com/linux/step_one
 .. _SynoCommunity repository: http://www.synocommunity.com
+.. _WDCommunity repo: https://github.com/WDCommunity/wdpksrc
