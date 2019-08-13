@@ -126,6 +126,7 @@ local.mk:
 	@echo "DISTRIBUTOR_URL=" >> $@
 	@echo "REPORT_URL=" >> $@
 	@echo "DEFAULT_TC=" >> $@
+	@echo "#PARALLEL_MAKE=max" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"

@@ -46,8 +46,8 @@
                 </select>
             </span>
         </form>
-        <form method="post" class="updateBlacklist">
-            <input class="btn" type="submit" name="generateBlacklist" value="Generate Blacklist">
+        <form method="post" class="updateBlocklist updateBlacklist">
+            <input class="btn" type="submit" name="generateBlocklist" value="Generate Blocklist">
         </form>
         <form method="post" class="fileEditor">
             <input type="hidden" name="file" value="{{.File}}">
@@ -123,13 +123,13 @@
                 setGetParameter(e.target.name, e.target.value)
             }, false)
 
-            const updateBlacklist = document.querySelector('.dnscrypt-proxy .updateBlacklist')
-            updateBlacklist.addEventListener('submit', function(e) {
+            const updateBlocklist = document.querySelector('.dnscrypt-proxy .updateBlocklist')
+            updateBlocklist.addEventListener('submit', function(e) {
                 const urlParams = new URLSearchParams(window.location.search)
-                if (urlParams.get('file') !== 'blacklist') {
+                if (urlParams.get('file') !== 'blocklist') {
                     if (e.preventDefault) e.preventDefault()
                     toggleSpinner()
-                    ajax('POST', 'generateBlacklist=true')
+                    ajax('POST', 'generateBlocklist=true')
                 }
             }, false)
 

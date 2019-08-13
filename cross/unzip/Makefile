@@ -11,15 +11,18 @@ HOMEPAGE = http://infozip.org/UnZip.html
 COMMENT  = UnZip is an extraction utility for archives compressed in .zip format
 LICENSE  = http://infozip.org/license.html
 
-CONFIGURE_TARGET = myConfigure
-COMPILE_TARGET = myCompile
+GNU_CONFIGURE = 1
+CONFIGURE_TARGET = none
+COMPILE_TARGET = unzip_compile
+INSTALL_TARGET = unzip_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: MyConfigure
-myConfigure:
-	cp $(WORK_DIR)/$(PKG_DIR)/unix/Makefile $(WORK_DIR)/$(PKG_DIR)
 
-.PHONY: myCompile
-myCompile:
-	$(RUN) $(MAKE) generic CC="$(TC_PATH)$(TC_PREFIX)gcc"
+.PHONY: unzip_compile
+unzip_compile:
+	$(RUN) $(MAKE) -f unix/Makefile generic CC="$(TC_PATH)$(TC_PREFIX)gcc"
+
+.PHONY: unzip_install
+unzip_install:
+	$(RUN) $(MAKE) -f unix/Makefile install prefix=$(INSTALL_DIR)$(INSTALL_PREFIX)

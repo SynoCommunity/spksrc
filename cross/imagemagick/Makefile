@@ -1,8 +1,9 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 7.0.7-30
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.imagemagick.org/download/releases
+PKG_VERS = 7.0.8-53
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/freetype cross/libpng cross/libxml2 cross/libtiff cross/libjpeg
@@ -27,7 +28,7 @@ imagemagick_extra_install:
 	SHARE_PATH=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
 	DATA_DIR=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
 	CONFIGURE_PATH=$(STAGING_INSTALL_PREFIX)/etc/ImageMagick-6/ \
-	LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.7/ \
+	LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.8/ \
 	SHAREARCH_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.7/config-Q16 \
 	DOCUMENTATION_PATH=$(STAGING_INSTALL_PREFIX)/share/doc/ImageMagick-7 \
 	INCLUDE_PATH=$(STAGING_INSTALL_PREFIX)/include/ImageMagick-7 \

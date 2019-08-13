@@ -23,6 +23,7 @@ RUN apt-get update && \
         debootstrap \
         expect \
         flex \
+        g++-multilib \
         gettext \
         git \
         gperf \

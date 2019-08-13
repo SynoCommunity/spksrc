@@ -25,3 +25,7 @@ $(TC_VARS_MK):
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
+
+#ifneq ($(COMPILE_MAKE_OPTIONS),)
+#ENV += MAKEFLAGS="$(COMPILE_MAKE_OPTIONS)"
+#endif

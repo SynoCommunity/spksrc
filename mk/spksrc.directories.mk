@@ -29,7 +29,15 @@ endif
 STAGING_DIR = $(WORK_DIR)/staging
 
 ifndef INSTALL_PREFIX
+ifneq ($(strip $(SPK_NAME)),)
 INSTALL_PREFIX = /var/packages/$(SPK_NAME)/target
+else
+ifneq ($(strip $(PKG_NAME)),)
+INSTALL_PREFIX = /usr/local/$(PKG_NAME)
+else
+INSTALL_PREFIX = /usr/local
+endif
+endif
 endif
 
 ifndef KERNEL_DIR
