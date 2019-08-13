@@ -22,6 +22,11 @@ fix_usb_devices() {
             serial_device_path=$(dirname $serial_device_path)
             manufacturer=$(cat $serial_device_path/manufacturer)
         fi
+        if [ -f "$serial_device_path/manufacturer" ]; then
+            idManufacturer=$(cat $serial_device_path/manufacturer)
+        else
+            idManufacturer=$(cat $serial_device_path/idVendor)
+        fi
         idVendor=$(cat $serial_device_path/idVendor)
         product=$(cat $serial_device_path/product)
         idProduct=$(cat $serial_device_path/idProduct)
@@ -31,10 +36,10 @@ fix_usb_devices() {
             symLink="serial/by-id/${prefix}-${manufacturer}_${product}_${serial}-if${bInterfaceNumber}-port0"
             unset manufacturer
         else
-            symLink="serial/by-id/${prefix}-${idVendor}_${product}_${serial}-if${bInterfaceNumber}"
+            symLink="serial/by-id/${prefix}-${idManufacturer}_${product}_${serial}-if${bInterfaceNumber}"
         fi
 
-        line="SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\", SYMLINK+=\"${symLink}\""
+        line="SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\", SYMLINK+=\"${symLink// /_}\""
         echo $line
         grep -s "ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\"" $RULES_FILE >/dev/null ||
             echo ${line} >>$RULES_FILE
