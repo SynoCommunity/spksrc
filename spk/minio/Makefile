@@ -32,15 +32,7 @@ SERVICE_EXE = $${SYNOPKG_PKGDEST}/bin/minio
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-POST_STRIP_TARGET = minio_extra_install
-
 BUSYBOX_CONFIG = usrmng daemon nice
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: minio_extra_install
-minio_extra_install:
-	@echo "===> Copying files"
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 600 src/options.conf $(STAGING_DIR)/var/options.conf

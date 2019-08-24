@@ -2,20 +2,16 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 GROUP="sc-minio"
 
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var"
-CFG_FILE="${CONFIG_DIR}/options.conf"
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
 
 service_postinst ()
 {
     echo "Running service_postinst script" >> "${INST_LOG}"
-
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        sed -i \
-          -e "s|@wizard_data_directory@|${wizard_data_directory}|g" \
-          -e "s|@wizard_access_key@|${wizard_access_key}|g" \
-          -e "s|@wizard_secret_key@|${wizard_secret_key}|g" \
-          ${CFG_FILE}
-    fi
+    
+    echo "WIZARD_DATA_DIRECTORY=${wizard_data_directory}" >> ${INST_VARIABLES}
+    echo "WIZARD_ACCESS_KEY=${wizard_access_key}" >> ${INST_VARIABLES}
+    echo "WIZARD_SECRET_KEY=${wizard_secret_key}" >> ${INST_VARIABLES}
 
     echo "Install busybox binaries" >> "${INST_LOG}"
     BIN=${SYNOPKG_PKGDEST}/bin
@@ -23,10 +19,10 @@ service_postinst ()
 }
 
 service_prestart ()
-{    
-    if [ -f $CFG_FILE ]
+{
+    if [ -f ${INST_VARIABLES} ]
     then
-      . $CFG_FILE
+      . ${INST_VARIABLES}
     fi
 
     SERVICE_OPTIONS="server --quiet --anonymous ${WIZARD_DATA_DIRECTORY}"
