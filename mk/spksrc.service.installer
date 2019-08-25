@@ -71,6 +71,9 @@ save_wizard_variables ()
     if [ -n "${SHARE_PATH}" ]; then
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
     fi
+    # Restriction permissions to protect sensitive options
+    chmod go-rwx ${INST_VARIABLES}
+    chown ${EFF_USER} ${INST_VARIABLES}
 }
 
 # Remove user from system and from groups it is member of
