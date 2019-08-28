@@ -1,0 +1,44 @@
+--- Makefile.orig	2019-08-11 20:10:26.293058000 +0200
++++ Makefile	2019-08-11 20:30:18.180704001 +0200
+@@ -15,10 +15,10 @@
+   BUILD_STANDALONE =
+ endif
+ ifndef BUILD_CLIENT
+-  BUILD_CLIENT     =
++  BUILD_CLIENT     = 0
+ endif
+ ifndef BUILD_SERVER
+-  BUILD_SERVER     =
++  BUILD_SERVER     = 1
+ endif
+ ifndef BUILD_GAME_SO
+   BUILD_GAME_SO    =
+@@ -978,11 +978,12 @@
+ TARGETS =
+ 
+ ifndef FULLBINEXT
+-  FULLBINEXT=.$(ARCH)$(BINEXT)
++  FULLBINEXT=
++  #.$(ARCH)$(BINEXT)
+ endif
+ 
+ ifndef SHLIBNAME
+-  SHLIBNAME=$(ARCH).$(SHLIBEXT)
++  SHLIBNAME=.$(SHLIBEXT)
+ endif
+ 
+ ifneq ($(BUILD_SERVER),0)
+@@ -2305,11 +2305,11 @@
+       $(B)/ded/snapvector.o \
+       $(B)/ded/ftola.o
+ endif
+-ifeq ($(ARCH),x86_64)
++#ifeq ($(ARCH),x86_64)
+   Q3DOBJ += \
+       $(B)/ded/snapvector.o \
+       $(B)/ded/ftola.o
+-endif
++#endif
+ 
+ ifeq ($(USE_INTERNAL_ZLIB),1)
+ Q3DOBJ += \

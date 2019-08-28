@@ -1,0 +1,15 @@
+[{
+    "step_title": "Information on pak0 for Quake III Server",
+    "items": [{
+        "type": "singleselect",
+        "desc": "The pak0.pak file that comes with your original Quake III game is required to make the server works. It contains the maps, models, programs, sounds, and skins used to play the game. Please copy this file under your NAS folder named /var/packages/ioquake/target/baseq3/ once the package is installed.", 
+     "subitems": [{
+            "key": "radio1",
+            "desc": "Ok, understood",
+            "defaultVaule": true
+        }, {
+            "key": "radio2",
+            "desc": "I don't have the game, I will check that :),
+            "defaultVaule": false
+        }]
+}]

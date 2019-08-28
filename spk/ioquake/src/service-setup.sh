@@ -1,0 +1,8 @@
+CFG_FILE="server.cfg"
+LVL_FILE="levels.cfg"
+BOT_FILE="bots.cfg"
+PATH="${SYNOPKG_PKGDEST}:${PATH}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/ioq3ded +exec ${CFG_FILE} +exec ${LVL_FILE} +exec ${BOT_FILE}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
+export HOME=${SYNOPKG_PKGDEST}/var
