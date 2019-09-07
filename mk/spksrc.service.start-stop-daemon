@@ -24,7 +24,7 @@ start_daemon ()
     fi
     if [ -n "${SERVICE_EXE}" ]; then
         if [ -n "${SERVICE_OPTIONS}" ]; then
-            start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}" -- "${SERVICE_OPTIONS}"
+            start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}" -- ${SERVICE_OPTIONS}
         else
             start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}"
         fi
