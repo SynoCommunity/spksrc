@@ -2,7 +2,7 @@ bin:bin/mc
 bin:bin/mcdiff
 bin:bin/mcedit
 bin:bin/mcview
-rsc:etc/mc
+etc:etc/mc
 rsc:libexec/mc/cons.saver
 rsc:libexec/mc/ext.d/
 rsc:libexec/mc/extfs.d/
