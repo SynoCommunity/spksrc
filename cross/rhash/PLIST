@@ -1,12 +1,2 @@
-bin:bin/ed2k-link
-bin:bin/edonr256-hash
-bin:bin/edonr512-hash
-bin:bin/gost-hash
-bin:bin/has160-hash
-bin:bin/magnet-link
 bin:bin/rhash
-bin:bin/sfv-hash
-bin:bin/tiger-hash
-bin:bin/tth-hash
-bin:bin/whirlpool-hash
 rsc:etc/rhashrc
