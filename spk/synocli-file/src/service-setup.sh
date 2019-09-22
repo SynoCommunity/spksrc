@@ -1,4 +1,4 @@
-COMMANDS="jdupes less lessecho lesskey tree rhash rnm nano rnano ncdu file"
+COMMANDS="jdupes less lessecho lesskey tree rhash rnm nano rnano ncdu file detox rmlint"
 RHASH_COMMAND_LINKS="ed2k-link edonr256-hash edonr512-hash gost-hash has160-hash magnet-link sfv-hash tiger-hash tth-hash whirlpool-hash"
 MC_COMMAND_LINKS="mc mcedit mcdiff mcview"
 
