@@ -6,6 +6,7 @@ SPK_ICON = src/synocli-file.png
 include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
+DEPENDS += cross/detox cross/rmlint
 ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x $(ARM5_ARCHES)),$(ARCH))
 # to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
 DEPENDS += cross/rnm
