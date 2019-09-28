@@ -1,6 +1,6 @@
 SPK_NAME = minio
 SPK_VERS = 2019-09-26T19-42-35Z
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
