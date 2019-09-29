@@ -1,0 +1,9 @@
+rsc:share/bazarr/LICENSE
+rsc:share/bazarr/___init__.py
+bin:share/bazarr/bazarr.py
+rsc:share/bazarr/bazarr/*.py
+bin:share/bazarr/bin/Linux/**
+rsc:share/bazarr/libs/**
+rsc:share/bazarr/requirements.txt
+rsc:share/bazarr/static/**
+rsc:share/bazarr/views/**
