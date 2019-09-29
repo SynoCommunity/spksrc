@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libtool \
         libunistring-dev \
         libxml2-dev \
+        libxslt-dev \
         lzip \
         mercurial \
         ncurses-dev \
