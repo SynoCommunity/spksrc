@@ -1,0 +1,18 @@
+#!/bin/bash
+
+PACKAGE_NAME=bazarr
+
+INSTALL_DIR="/var/packages/${PACKAGE}/target"
+FFMPEG_DIR="/usr/local/ffmpeg"
+export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${FFMPEG_DIR}/bin:${PATH}"
+VAR_DIR="${INSTALL_DIR}/var"
+
+
+export LC_ALL=en_US.utf8
+export LANG=en_US.utf8
+
+if [ -f "${VAR_DIR}/profile" ]; then
+	source "${VAR_DIR}/profile"
+fi
+
+exec python3 bazarr.py --no-update --config "${VAR_DIR}/data">>"${VAR_DIR}/bazarr.log" 2>&1
