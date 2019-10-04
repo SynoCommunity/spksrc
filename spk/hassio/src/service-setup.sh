@@ -37,7 +37,7 @@ service_preuninst() {
         SUPERVISOR="$(jq --raw-output '.supervisor' ${CFG_FILE})"
         HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
 
-        docker rm --force homeassistant hassio_supervisor
+        docker rm --force homeassistant hassio_supervisor hassio_dns
         docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
         docker network rm hassio
 

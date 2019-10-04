@@ -3,51 +3,15 @@
 CONFIG_FILE="/usr/local/hassio/etc/hassio.json"
 
 fix_usb_devices() {
-    RULES_FILE="/lib/udev/rules.d/59-usb-hassio.rules"
-    HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CONFIG_FILE})"
     USB_FILE="${HASSIO_DATA}/usb_devices.txt"
 
-    # Clear entris from file
-    echo >${USB_FILE}
-
-    for tty_path in $(find /sys/bus/usb/devices/usb*/ -name tty); do
-        tty_iface_path=$(dirname $tty_path)
-        serial_device_path=$(dirname $tty_iface_path)
-        prefix=usb
-        if [ -f "$serial_device_path/idVendor" ]; then
-            bInterfaceNumber=$(cat $tty_iface_path/bInterfaceNumber)
-        else
-            bInterfaceNumber=$(cat $serial_device_path/bInterfaceNumber)
-            # We need to go up 1 level to get information
-            serial_device_path=$(dirname $serial_device_path)
-            manufacturer=$(cat $serial_device_path/manufacturer)
-        fi
-        if [ -f "$serial_device_path/manufacturer" ]; then
-            idManufacturer=$(cat $serial_device_path/manufacturer)
-        else
-            idManufacturer=$(cat $serial_device_path/idVendor)
-        fi
-        idVendor=$(cat $serial_device_path/idVendor)
-        product=$(cat $serial_device_path/product)
-        idProduct=$(cat $serial_device_path/idProduct)
-        serial=$(cat $serial_device_path/serial)
-
-        if [ ! -z "$manufacturer" ]; then
-            symLink="serial/by-id/${prefix}-${manufacturer}_${product}_${serial}-if${bInterfaceNumber}-port0"
-            unset manufacturer
-        else
-            symLink="serial/by-id/${prefix}-${idManufacturer}_${product}_${serial}-if${bInterfaceNumber}"
-        fi
-
-        line="SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\", SYMLINK+=\"${symLink// /_}\""
-        echo $line
-        grep -s "ATTRS{idVendor}==\"${idVendor}\", ATTRS{idProduct}==\"${idProduct}\"" $RULES_FILE >/dev/null ||
-            echo ${line} >>$RULES_FILE
-
-        echo "/dev/${symLink}" >>$USB_FILE
-    done
+    docker cp hassio_supervisor:/lib/udev/rules.d/60-serial.rules /lib/udev/rules.d/60-serial-hassio.rules 
+    docker cp hassio_supervisor:/lib/udev/rules.d/60-input-id.rules /lib/udev/rules.d/60-input-id-hassio.rules
 
     udevadm control --reload && udevadm trigger
+
+    # Add entries to file
+    ls /dev/serial/by_id/* >$USB_FILE
 }
 
 runSupervisor() {
