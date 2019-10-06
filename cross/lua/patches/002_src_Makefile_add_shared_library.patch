@@ -1,3 +1,5 @@
+By default the Lua makefile will only create a static library (liblua.a).
+This patch will modify the makefile so it will create a dynamic library.
 --- src/Makefile	2017-04-26 18:39:24.655503489 +0200
 +++ src/Makefile	2017-04-26 18:40:59.715893871 +0200
 @@ -29,6 +29,7 @@

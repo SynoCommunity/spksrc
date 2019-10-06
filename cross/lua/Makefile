@@ -1,12 +1,11 @@
 PKG_NAME = lua
-PKG_VERS = 5.3.4
+PKG_VERS = 5.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.lua.org/ftp/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncurses cross/readline
-BUILD_DEPENDS = 
 
 HOMEPAGE = https://www.lua.org/
 COMMENT = Lua is a powerful, efficient, lightweight, embeddable scripting language. It supports procedural programming, object-oriented programming, functional programming, data-driven programming, and data description.
