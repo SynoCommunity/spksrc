@@ -26,9 +26,6 @@ service_postinst() {
             sed -i -e "s|@data_dir@|${DATA_DIR}|g" ${CFG_FILE}
         fi
     fi
-
-    # Install busybox stuff
-    ln -s busybox ${SYNOPKG_PKGDEST}/bin/start-stop-daemon
 }
 
 service_preuninst() {
@@ -75,4 +72,22 @@ service_postupgrade() {
     HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
     docker ps -a | grep qemux86-64-homeassistant >/dev/null ||
         mv "${HASSIO_DATA}/config.json" "${HASSIO_DATA}/config-$(date '+%s').bak"
+}
+
+service_prestart ()
+{
+    # Replace generic service startup, fork process in background
+    echo "Starting hass.io at ${SYNOPKG_PKGDEST}" >> ${LOG_FILE}
+    COMMAND="bin/hassio.sh"
+
+    cd ${SYNOPKG_PKGDEST};
+    ${COMMAND} >> ${LOG_FILE} 2>&1 &
+    echo "$!" > "${PID_FILE}"
+
+    docker start homeassistant
+}
+
+service_poststop ()
+{
+    docker stop hassio_supervisor homeassistant
 }

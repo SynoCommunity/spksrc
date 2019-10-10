@@ -5,7 +5,7 @@ SPK_ICON = src/$(SPK_NAME).png
 SPK_DEPENDS = "Docker>=18.09.0-0506"
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox
+DEPENDS =
 
 MAINTAINER = fredrike+hassio@gmail.com
 DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the hass.io folder."
@@ -24,7 +24,6 @@ HELPURL    = https://www.home-assistant.io/docs/
 WIZARDS_DIR = src/wizard/
 
 SERVICE_SETUP = src/service-setup.sh
-SSS_SCRIPT = src/start-stop-status
 
 #DSM UI integration
 SERVICE_PORT = 8123
@@ -32,10 +31,9 @@ SERVICE_PORT = 8123
 INSTALL_DEP_SERVICES = Docker
 START_DEP_SERVICES = Docker
 
-POST_STRIP_TARGET = hassio_extra_install
+COPY_TARGET = nop
 
-BUSYBOX_CONFIG = daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+POST_STRIP_TARGET = hassio_extra_install
 
 include ../../mk/spksrc.spk.mk
 
