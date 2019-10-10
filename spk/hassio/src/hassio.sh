@@ -5,13 +5,17 @@ CONFIG_FILE="/usr/local/hassio/etc/hassio.json"
 fix_usb_devices() {
     USB_FILE="${HASSIO_DATA}/usb_devices.txt"
 
-    docker cp hassio_supervisor:/lib/udev/rules.d/60-serial.rules /lib/udev/rules.d/60-serial-hassio.rules 
+    docker cp hassio_supervisor:/lib/udev/rules.d/60-serial.rules /lib/udev/rules.d/60-serial-hassio.rules
     docker cp hassio_supervisor:/lib/udev/rules.d/60-input-id.rules /lib/udev/rules.d/60-input-id-hassio.rules
 
     udevadm control --reload && udevadm trigger
 
     # Add entries to file
-    ls /dev/serial/by_id/* >$USB_FILE
+    if [ -d /dev/serial/by_id/ ]; then
+        ls /dev/serial/by_id/* >${USB_FILE}
+    else
+        touch ${USB_FILE}
+    fi
 }
 
 runSupervisor() {

@@ -14,8 +14,8 @@ service_postinst() {
         HASSIO_VERSION=$(curl -s $URL_VERSION | jq -e -r '.supervisor')
 
         # Pull supervisor image
-        /usr/local/bin/docker pull "$HASSIO_DOCKER:$HASSIO_VERSION" >/dev/null &&
-            /usr/local/bin/docker tag "$HASSIO_DOCKER:$HASSIO_VERSION" "$HASSIO_DOCKER:latest" >/dev/null
+        /usr/local/bin/docker pull "${HASSIO_DOCKER}:${HASSIO_VERSION}" >/dev/null &&
+            /usr/local/bin/docker tag "${HASSIO_DOCKER}:${HASSIO_VERSION}" "${HASSIO_DOCKER}:latest" >/dev/null
 
         if [ ! -f ${CFG_FILE} ]; then
             mkdir -p /usr/local/${SYNOPKG_PKGNAME}/etc 
@@ -43,14 +43,14 @@ service_preuninst() {
 
         if [ "${wizard_remove_addons}" == "true" ]; then
             # Remove addons
-            ADDONS_FILE=$(jq -r '.data + "/addons.json"' /usr/local/hassio/etc/hassio.json)
+            ADDONS_FILE=$(jq -r '.data + "/addons.json"' ${CFG_FILE})
 
             docker rm --force $(jq -r '.user| keys| map("addon_"+.)| join(" ")' $ADDONS_FILE)
             docker rmi --force $(jq -r '[.user | keys[] as $k | .[$k].image] | join(" ")' $ADDONS_FILE)
         fi
 
         # Move config.json so hassio_supervisor will create a new homeassistant container.
-        mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-$(date '+%s').bak"
+        mv "${HASSIO_DATA}/config.json" "${HASSIO_DATA}/config-$(date '+%s').bak"
     fi
 }
 
@@ -74,5 +74,5 @@ service_postupgrade() {
     # Move config.json from data dir if there is no homeassistant container.
     HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
     docker ps -a | grep qemux86-64-homeassistant >/dev/null ||
-        mv "$HASSIO_DATA/config.json" "$HASSIO_DATA/config-$(date '+%s').bak"
+        mv "${HASSIO_DATA}/config.json" "${HASSIO_DATA}/config-$(date '+%s').bak"
 }
