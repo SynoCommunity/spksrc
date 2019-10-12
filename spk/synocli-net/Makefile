@@ -17,7 +17,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs, fritzctl. Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "built with go 1.13.1"
+CHANGELOG = "fritzctl built with go 1.13.1"
 
 HOMEPAGE   = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE    = Mixed
