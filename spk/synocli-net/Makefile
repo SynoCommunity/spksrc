@@ -20,7 +20,7 @@ STARTABLE = no
 CHANGELOG = "fritzctl built with go 1.13.1"
 
 HOMEPAGE   = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
-LICENSE    = Mixed
+LICENSE    = Each tool is licensed unter its respective license.
 
 SERVICE_SETUP = src/service-setup.sh
 
