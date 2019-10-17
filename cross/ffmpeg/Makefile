@@ -39,6 +39,12 @@ CONFIGURE_ARGS += --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 
+# Add AV1 codec to supported ARCH
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
+DEPENDS += cross/libaom
+CONFIGURE_ARGS += --enable-libaom
+endif
+
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
 endif
