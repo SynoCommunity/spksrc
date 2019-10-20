@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.2.1
 SPK_REV = 13
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Add AOMedia Video 1 (AV1) for ARVv7, ARMv8 and x86 platforms<br/>2. Update ffmpeg to 4.2.1<br/>3. Port Synology FFMPEG 3.3.7 changes and fixes for VideoStation and MediaServer<br/>4. Update ffmpeg dependencies<br/>5. Add VAAPI for intel x64 processors<br/>6. Fix HDR10Plus support in x265<br/>5. Fix x265 support for ppc platforms"
+CHANGELOG = "1. Add AOMedia Video 1 (AV1) for ARMv7, ARMv8 and x86 platforms<br/>2. Update ffmpeg to 4.2.1<br/>3. Port Synology FFMPEG 3.3.7 changes and fixes for VideoStation and MediaServer<br/>"
 
 DEPENDS = cross/$(SPK_NAME)
 
