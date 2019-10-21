@@ -2,14 +2,3 @@ bin:bin/aomdec
 bin:bin/aomenc
 lib:lib/libaom.so.0
 lnk:lib/libaom.so
-rsc:lib/pkgconfig/aom.pc
-rsc:include/aom/aom.h
-rsc:include/aom/aom_codec.h
-rsc:include/aom/aom_frame_buffer.h
-rsc:include/aom/aom_image.h
-rsc:include/aom/aom_integer.h
-rsc:include/aom/aom.h
-rsc:include/aom/aom_decoder.h
-rsc:include/aom/aomdx.h
-rsc:include/aom/aomcx.h
-rsc:include/aom/aom_encoder.h
