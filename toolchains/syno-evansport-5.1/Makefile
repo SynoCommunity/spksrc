@@ -4,10 +4,10 @@ TC_ARCH = evansport
 TC_VERS = 5.1
 TC_FIRMWARE = 5.0-4458
 
-TC_DIST_NAME = gcc463_glibc213_i686_evansport-GPL.tgz
-
+TC_DIST = gcc463_glibc213_i686_evansport-GPL
 TC_EXT = tgz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%205.0%20Tool%20Chains/Intel%20x86%20Linux%203.2.40%20%28Evansport%29
+TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%205.0%20Tool%20Chains/Intel%20x86%20Linux%203.2.40%20%28Evansport%29
 
 TC_BASE_DIR = i686-pc-linux-gnu
 TC_PREFIX = i686-pc-linux-gnu

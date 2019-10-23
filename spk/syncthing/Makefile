@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.1.0
-SPK_REV = 16
+SPK_VERS = 1.2.2
+SPK_REV = 17
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
-CHANGELOG = "1. Update to 1.1.0<br />2. built with go 1.12"
+CHANGELOG = "Update to upstream version 1.2.2.  Fix support for custom command line options set in by options.conf."
 HOMEPAGE = http://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
