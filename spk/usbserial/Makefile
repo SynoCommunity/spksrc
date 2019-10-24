@@ -1,21 +1,23 @@
 SPK_NAME = UsbSerialDrivers
 SPK_VERS = 6
-SPK_REV = 7
+SPK_REV = 1
 SPK_ICON = src/usb.png
 DSM_UI_DIR = app
-CHANGELOG = "DSM 6.2xx USB drivers and USB utils,added HGI80 and usbserial.ko"
+CHANGELOG = "Initial release \(USB drivers and USB utils, including HGI80 and usbserial.ko\)"
 
 DEPENDS = cross/usb-serial cross/usbutils cross/ftdi_sio cross/ch341 cross/cp210x cross/pl2303 cross/ti_usb_3410_5052
 
-REQUIRED_DSM = 6.1
+REQUIRED_DSM = 5.2
+# armarch64 is a group or archs (it should not build kernel modules, but all-supported does not exclude this)
+UNSUPPORTED_ARCHS = aarch64
 
-MAINTAINER = Jadahl
-DESCRIPTION = "USBSerialDrivers for DSM 6.2xx. This package include usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko. USB utils: Log in to your Synology with Telnet or ssh and type: lsusb -v or usb-devices. If you use my driver package, you might consider a donation with paypal. https://www.paypal.me/jumbotroll."
+MAINTAINER = SynoCommunity
+DESCRIPTION = "USBSerialDrivers includes usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko. USB utils: Log in to your Synology with Telnet or ssh and type: lsusb -v or usb-devices. If you use my driver package, you might consider a donation with paypal. https://www.paypal.me/jumbotroll."
 
 
 RELOAD_UI = yes
 STARTABLE = no
-DISPLAY_NAME = UsbSerialDrivers for DSM 6.2
+DISPLAY_NAME = UsbSerialDrivers
 
 HOMEPAGE = http://www.jadahl.com/
 LICENSE  = GPL
@@ -26,6 +28,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 POST_STRIP_TARGET = usbserial_extra_install
 
 include ../../mk/spksrc.spk.mk
+
 .PHONY: usbserial_extra_install
 usbserial_extra_install:
 	install -m 755 -d $(STAGING_DIR)/rules.d

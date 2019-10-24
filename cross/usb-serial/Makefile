@@ -19,7 +19,7 @@ include ../../mk/spksrc.cross-cc.mk
 myCompile:
 	@mkdir -p $(WORK_DIR)/$(PKG_DIR)
 	@echo "obj-m += usbserial.mod.o" > $(WORK_DIR)/$(PKG_DIR)/Makefile
-	@echo "obj-m += usb-serial.o" > $(WORK_DIR)/$(PKG_DIR)/Makefile
+	@echo "obj-m += usb-serial.o" >> $(WORK_DIR)/$(PKG_DIR)/Makefile
 	@cp $(KERNEL_DIR)/drivers/usb/serial/pl2303.h $(WORK_DIR)/$(PKG_DIR)/
 	@cp $(KERNEL_DIR)/drivers/usb/serial/usb-serial.c $(WORK_DIR)/$(PKG_DIR)/
 	@cp $(KERNEL_DIR)/drivers/usb/serial/usbserial.mod.c $(WORK_DIR)/$(PKG_DIR)/
