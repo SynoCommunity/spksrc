@@ -117,8 +117,11 @@ preupgrade ()
 
 postupgrade ()
 {
-	# Restore some stuff
-	rm -rf ${INSTALL_DIR}/var
-	mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+	# Restore user data
+	BACKUP=${TMP_DIR}/${PACKAGE}/var
+	if [ -d $BACKUP ]; then
+		rm -rf ${INSTALL_DIR}/var
+		mv ${TMP_DIR}/${PACKAGE}/var ${INSTALL_DIR}/
+	fi
 }
 
