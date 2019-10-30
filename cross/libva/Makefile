@@ -15,9 +15,10 @@ LICENSE = MIT
 PRE_CONFIGURE_TARGET = libva_custom_preconfigure
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --with-drivers-path=$(INSTALL_PREFIX)/lib
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libva_custom_preconfigure
 libva_custom_preconfigure:
-	$(RUN) ./autogen.sh
+	$(RUN) ./autogen.sh --with-drivers-path=$(INSTALL_PREFIX)/lib

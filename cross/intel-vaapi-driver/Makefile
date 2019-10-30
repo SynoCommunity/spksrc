@@ -19,7 +19,7 @@ GNU_CONFIGURE = 1
 include ../../mk/spksrc.cross-cc.mk
 
 # Enforce install prefix because of make install DESTDIR
-ENV += LIBVA_DRIVERS_PATH=$(INSTALL_PREFIX)/lib/dri
+ENV += LIBVA_DRIVERS_PATH=$(INSTALL_PREFIX)/lib
 
 .PHONY: intel_vaapi_driver_configure
 intel_vaapi_driver_configure:
