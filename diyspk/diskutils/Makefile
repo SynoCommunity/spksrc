@@ -1,6 +1,6 @@
 SPK_NAME = diskutils
-SPK_VERS = 1.42.6
-SPK_REV = 1
+SPK_VERS = 1.45.4
+SPK_REV = 2
 SPK_ICON = src/diskutils.png
 
 DEPENDS  = cross/e2fsprogs cross/screen

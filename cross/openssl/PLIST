@@ -1,4 +1,4 @@
-bin:bin/c_rehash
+rsc:bin/c_rehash
 bin:bin/openssl
 lib:lib/engines/lib4758cca.so
 lib:lib/engines/libaep.so

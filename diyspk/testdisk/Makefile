@@ -1,17 +1,16 @@
 SPK_NAME = testdisk
-SPK_VERS = 7.0
-SPK_REV = 2
+SPK_VERS = 7.1
+SPK_REV = 3
 SPK_ICON = src/testdisk.png
 
 DEPENDS  = cross/$(SPK_NAME)
 
 STARTABLE = no
-BETA = 1
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = "TestDisk is powerful free data recovery software"
 DISPLAY_NAME = TestDisk
-CHANGELOG = "Update to TestDisk 7.0 stable"
+CHANGELOG = "Update to TestDisk 7.1"
 
 HOMEPAGE   = http://www.cgsecurity.org/wiki/TestDisk
 LICENSE    = GPLv2
