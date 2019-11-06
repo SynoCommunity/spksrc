@@ -11,14 +11,10 @@ DESCRIPTION_FRE = Utilitaires bas niveau pour gérer vos disques durs. Ce packag
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Disk Utils
-BETA = 1
 
 HOMEPAGE   = 
 LICENSE    =
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

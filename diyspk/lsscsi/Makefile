@@ -15,6 +15,4 @@ HELP_URL   = http://sg.danny.cz/scsi/lsscsi.html
 
 SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
 include ../../mk/spksrc.spk.mk
