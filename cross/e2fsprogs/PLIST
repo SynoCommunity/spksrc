@@ -20,6 +20,7 @@ rsc:sbin/e2scrub
 rsc:sbin/e2scrub_all
 bin:sbin/e2undo
 bin:sbin/e4crypt
+bin:sbin/e4defrag
 bin:sbin/filefrag
 bin:sbin/findfs
 bin:sbin/fsck

@@ -14,10 +14,9 @@ service_postinst ()
 
 service_postuninst ()
 {
-    rm /usr/local/bin/tmux
-    for cmd in $COMMANDS
-        do
-        if [ -e "/usr/local/bin/$cmd" ]; then
+    for cmd in $COMMANDS tmux
+    do
+        if [ -L "/usr/local/bin/$cmd" ]; then
             rm -f "/usr/local/bin/$cmd"
         fi
     done

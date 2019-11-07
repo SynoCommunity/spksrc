@@ -15,7 +15,7 @@ service_postuninst ()
 {
     for cmd in $SBIN_COMMANDS
     do
-        if [ -e "/usr/local/sbin/$cmd" ]; then
+        if [ -L "/usr/local/sbin/$cmd" ]; then
             rm -f "/usr/local/sbin/$cmd"
         fi
     done

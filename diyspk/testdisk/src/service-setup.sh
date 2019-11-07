@@ -14,7 +14,7 @@ service_postuninst ()
 {
     for cmd in $COMMANDS
     do
-        if [ -e "/usr/local/bin/$cmd" ]; then
+        if [ -L "/usr/local/bin/$cmd" ]; then
             rm -f "/usr/local/bin/$cmd"
         fi
     done
