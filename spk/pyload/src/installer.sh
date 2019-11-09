@@ -27,18 +27,18 @@ USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGAC
 
 lng2iso()
 {
-	# changes 3-character Synology language code to ISO 639-1 code.
-        case $1 in
-            eng|deu|fre|ita|nld|sve|rus|plk|csy)
-                echo "${1%?}"
-                ;;
-            spn)
-                echo "es"
-                ;;
-            *)
-		echo "en"
-		;;
-        esac
+    # changes 3-character Synology language code to ISO 639-1 code.
+    case $1 in
+        eng|deu|fre|ita|nld|sve|rus|plk|csy)
+            echo "${1%?}"
+            ;;
+        spn)
+            echo "es"
+            ;;
+        *)
+    echo "en"
+    ;;
+    esac
 }
 
 syno_group_create ()
