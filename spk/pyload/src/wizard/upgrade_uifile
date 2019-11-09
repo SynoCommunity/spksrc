@@ -1,5 +1,5 @@
 [{
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "DSM6 Permissions",
     "items": [{
     "desc": "Permissions are managed with the group 'sc-download' in DSM. The group 'users' is no longer used."
     }]

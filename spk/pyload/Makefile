@@ -1,10 +1,8 @@
 SPK_NAME = pyload
 SPK_VERS = 0.4.9
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/pyload.png
 DSM_UI_DIR = app
-
-BETA = 1
 
 DEPENDS = cross/tesseract-ocr cross/tessdata-eng cross/js cross/$(SPK_NAME)
 SPK_DEPENDS = "python>2.7.3-3"
@@ -17,7 +15,7 @@ STARTABLE = yes
 DISPLAY_NAME = pyLoad
 CHANGELOG = Fix updatemanager
 
-HOMEPAGE   = http://pyload.org
+HOMEPAGE   = http://pyload.net
 LICENSE    = GPLv3
 
 INSTALLER_SCRIPT = src/installer.sh
@@ -41,3 +39,5 @@ pyload_extra_install:
 	install -m 644 src/pyload_init.sql $(STAGING_DIR)/etc/pyload_init.sql
 	install -m 644 src/htaccess.example $(STAGING_DIR)/etc/htaccess.example
 	install -m 755 -d $(STAGING_DIR)/var
+	# fix for #2259:
+	mv $(STAGING_DIR)/share/pyload/module/Utils.py $(STAGING_DIR)/share/pyload/module/utils.py
