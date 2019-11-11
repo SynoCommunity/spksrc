@@ -4,9 +4,6 @@ SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/icecast -c ${CFG_FILE}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-service_preinst ()
-{
-}
 
 service_postinst ()
 {
