@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/sonarr.png
 
 # Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
@@ -17,7 +17,7 @@ DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y tor
 RELOAD_UI = yes
 DISPLAY_NAME = Sonarr
 STARTABLE = yes
-CHANGELOG = "Update openssl to 1.1."
+CHANGELOG = "Update Sonarr to v3.0.4.1091"
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
