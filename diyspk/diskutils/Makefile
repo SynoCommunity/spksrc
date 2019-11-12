@@ -1,6 +1,6 @@
 SPK_NAME = diskutils
-SPK_VERS = 1.42.6
-SPK_REV = 1
+SPK_VERS = 1.45.4
+SPK_REV = 2
 SPK_ICON = src/diskutils.png
 
 DEPENDS  = cross/e2fsprogs cross/screen
@@ -11,14 +11,10 @@ DESCRIPTION_FRE = Utilitaires bas niveau pour gérer vos disques durs. Ce packag
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Disk Utils
-BETA = 1
 
 HOMEPAGE   = 
 LICENSE    =
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

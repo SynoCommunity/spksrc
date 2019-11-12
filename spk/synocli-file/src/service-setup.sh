@@ -34,7 +34,7 @@ service_postuninst ()
     
     for cmd in $COMMANDS
     do
-        if [ -e "/usr/local/bin/$cmd" ]; then
+        if [ -L "/usr/local/bin/$cmd" ]; then
             if [ "$(readlink /usr/local/bin/$cmd)" == "${SYNOPKG_PKGDEST}/bin/$cmd" ]; then
                 rm -f "/usr/local/bin/$cmd"
             fi
@@ -44,7 +44,7 @@ service_postuninst ()
     # Remove custom links for rhash
     for cmd in $RHASH_COMMAND_LINKS
     do
-        if [ -e "/usr/local/bin/$cmd" ]; then
+        if [ -L "/usr/local/bin/$cmd" ]; then
             if [ "$(readlink /usr/local/bin/$cmd)" == "${SYNOPKG_PKGDEST}/bin/rhash" ]; then
                 rm -f "/usr/local/bin/$cmd"
             fi
@@ -54,7 +54,7 @@ service_postuninst ()
     # Remove custom links for midnight commander
     for cmd in $MC_COMMAND_LINKS
     do
-        if [ -e "/usr/local/bin/$cmd" ]; then
+        if [ -L "/usr/local/bin/$cmd" ]; then
             if [ "$(readlink /usr/local/bin/$cmd)" == "${SYNOPKG_PKGDEST}/bin/mc-utf8" ]; then
                 rm -f "/usr/local/bin/$cmd"
             fi
