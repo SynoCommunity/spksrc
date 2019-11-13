@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.2.1
 SPK_REV = 14
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. apparmor permission denied fix<br/>2. Add AOMedia Video 1 (AV1) for ARMv7, ARMv8 and x86 platforms<br/>3. Update ffmpeg to 4.2.1<br/>4. Port Synology FFMPEG 3.3.7 changes and fixes for VideoStation and MediaServer"
+CHANGELOG = "1. Update ffmpeg to 4.2.1<br/>2. Add AOMedia Video 1 (AV1) for ARMv7, ARMv8 and x86 platforms<br/>3. apparmor permission denied fix<br/>4. Port Synology FFMPEG 3.3.7 changes and fixes for VideoStation and MediaServer"
 
 DEPENDS = cross/$(SPK_NAME)
 
