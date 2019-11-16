@@ -24,6 +24,7 @@ SERVICE_SETUP = src/service-setup.sh
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 NO_SERVICE_SHORTCUT = yes
 =======
 =======
@@ -39,6 +40,9 @@ NO_SERVICE_SHORTCUT = yes
 >>>>>>> fe07c4af... Fix on icecast Makefile
 =======
 >>>>>>> ed480ee3... Icecast 2.4.4 package including ezstream as client
+=======
+NO_SERVICE_SHORTCUT = yes
+>>>>>>> fe07c4af... Fix on icecast Makefile
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
