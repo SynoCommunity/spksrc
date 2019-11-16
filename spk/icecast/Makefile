@@ -21,7 +21,18 @@ WIZARDS_DIR = WIZARD_UIFILES
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+<<<<<<< HEAD
+<<<<<<< HEAD
 NO_SERVICE_SHORTCUT = yes
+=======
+SERVICE_PORT = 8000
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+NO_SERVICE_SHORTCUT = yes
+FWPORTS = src/icecast.sc
+>>>>>>> ed480ee3... Icecast 2.4.4 package including ezstream as client
+=======
+NO_SERVICE_SHORTCUT = yes
+>>>>>>> fe07c4af... Fix on icecast Makefile
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
