@@ -22,6 +22,12 @@ SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 CONF_DIR         = src/conf/
 
+WIZARDS_DIR = WIZARD_UIFILES
+
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+NO_SERVICE_SHORTCUT = yes
+
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = icecast_extra_install
