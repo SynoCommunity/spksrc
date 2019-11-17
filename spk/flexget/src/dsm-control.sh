@@ -10,6 +10,7 @@ PYTHON_DIR="/usr/local/python"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+MAJOR_VERSION="$(/bin/get_key_value /etc.defaults/VERSION majorversion)"
 FLEXGET="${INSTALL_DIR}/env/bin/flexget"
 CFG_FILE="${INSTALL_DIR}/var/config.yml"
 PID_FILE="${INSTALL_DIR}/var/.config-lock"
@@ -18,16 +19,17 @@ LOG_FILE="${INSTALL_DIR}/var/flexget.log"
 SC_USER="sc-flexget"
 LEGACY_USER="flexget"
 USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+SUDO="$([ "${MAJOR_VERSION}" -ge "6" ] && echo 'sudo -u' || echo 'su' )"
 
 
 start_daemon ()
 {
-    su ${USER} -s /bin/sh -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon start -d"
+    ${SUDO} ${USER} -s /bin/sh -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon start -d"
 }
 
 stop_daemon ()
 {
-    su ${USER} -s /bin/sh -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon stop"
+    ${SUDO} ${USER} -s /bin/sh -c "${FLEXGET} -c ${CFG_FILE} --logfile ${LOG_FILE} daemon stop"
 }
 
 daemon_status ()
