@@ -1,6 +1,6 @@
 SPK_NAME = flexget
-SPK_VERS = 2.9.14
-SPK_REV = 6
+SPK_VERS = 2.21.24
+SPK_REV = 7
 SPK_ICON = src/flexget.png
 
 WHEELS = src/requirements.txt
@@ -9,8 +9,8 @@ SPK_DEPENDS = "python>=2.7.8-11"
 MAINTAINER = Diaoul
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-BETA = 1
-CHANGELOG = "Update Flexget to version 2.9.14"
+
+CHANGELOG = "1. Update Flexget to version 2.21.24<br>2. Fix user and group creation<br>3. Fix installation wizard"
 
 HOMEPAGE   = http://flexget.com/
 LICENSE    = GPL
