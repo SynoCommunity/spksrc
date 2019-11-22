@@ -17,13 +17,8 @@ INSTALL_TARGET = inotify_extra_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 inotify_pre_configure:
-	$(RUN) ; ./autogen.sh --host=arm-linux
-else
-inotify_pre_configure:
-	$(RUN) ; ./autogen.sh
-endif
+	$(RUN) ; ./autogen.sh 
 	
 inotify_extra_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
