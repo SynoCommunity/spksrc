@@ -1,0 +1,87 @@
+From cecbd5fcb28d531ae7fe1c3eaa6896fd01ea3831 Mon Sep 17 00:00:00 2001
+From: Jan Kratochvil <jan.kratochvil@redhat.com>
+Date: Thu, 15 Aug 2019 11:07:15 +0200
+Subject: [PATCH] Fix stack overflow in: `inotifytools_replace_filename`
+
+```
+/var/cache/dnf/fedora-modular-42f5060c2cfa4ffa/ MOVED_TO,ISDIR repodata
+*** stack smashing detected ***: <unknown> terminated
+% #0  0x0000ffffa6d08c90 in raise () from /usr/lib64/libc.so.6
+% #1  0x0000ffffa6cf6aa8 in abort () from /usr/lib64/libc.so.6
+% #2  0x0000ffffa6d42acc in __libc_message () from /usr/lib64/libc.so.6
+% #3  0x0000ffffa6db4f54 in __fortify_fail_abort () from /usr/lib64/libc.so.6
+% #4  0x0000ffffa6db4f08 in __stack_chk_fail () from /usr/lib64/libc.so.6
+% #5  0x0000ffffa6e4f958 in inotifytools_replace_filename (oldname=<optimized out>, newname=<optimized out>) at inotifytools.c:866
+% #6  0x0000aaaab1b5de98 in main (argc=<optimized out>, argv=<optimized out>) at inotifywait.c:389
+```
+
+A simple fix would be:
+```
+	char *names[2+(sizeof(int)+sizeof(char*)-1)/sizeof(char*)];
+```
+
+A similar fix is in:
+```
+	inotify-tools_3.14-8.debian/debian/patches/0006-Fix-buffer-overrun-in-inotifytools.c.patch
+```
+
+I find the attached struct for callback data as a more clean and standard
+solution.
+---
+ libinotifytools/src/inotifytools.c | 28 +++++++++++++++++-----------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
+
+diff --git libinotifytools/src/inotifytools.c_orig_004 libinotifytools/src/inotifytools.c
+index 81b58a6..ffbe8b3 100644
+--- libinotifytools/src/inotifytools.c_orig_004
++++ libinotifytools/src/inotifytools.c
+@@ -370,6 +370,14 @@ void empty_stats(const void *nodep,
+ 	w->hit_total = 0;
+ }
+ 
++/**
++ * @internal
++ */
++struct replace_filename_data {
++	char *old_name, *new_name;
++	size_t old_len;
++};
++
+ /**
+  * @internal
+  */
+@@ -378,13 +386,11 @@ void replace_filename(const void *nodep,
+                       const int depth, void *arg) {
+     if (which != endorder && which != leaf) return;
+ 	watch *w = (watch*)nodep;
+-	char *old_name = ((char**)arg)[0];
+-	char *new_name = ((char**)arg)[1];
+-	int old_len = *((int*)&((char**)arg)[2]);
++	const struct replace_filename_data *data = arg;
+ 	char *name;
+-	if ( 0 == strncmp( old_name, w->filename, old_len ) ) {
+-		nasprintf( &name, "%s%s", new_name, &(w->filename[old_len]) );
+-		if (!strcmp( w->filename, new_name )) {
++	if ( 0 == strncmp( data->old_name, w->filename, data->old_len ) ) {
++		nasprintf( &name, "%s%s", data->new_name, &(w->filename[data->old_len]) );
++		if (!strcmp( w->filename, data->new_name )) {
+ 			free(name);
+ 		} else {
+ 			rbdelete(w, tree_filename);
+@@ -862,11 +868,11 @@ void inotifytools_set_filename_by_filename( char const * oldname,
+ void inotifytools_replace_filename( char const * oldname,
+                                     char const * newname ) {
+ 	if ( !oldname || !newname ) return;
+-	char *names[2+sizeof(int)/sizeof(char*)];
+-	names[0] = (char*)oldname;
+-	names[1] = (char*)newname;
+-	*((int*)&names[2]) = strlen(oldname);
+-	rbwalk(tree_filename, replace_filename, (void*)names);
++	struct replace_filename_data data;
++	data.old_name = oldname;
++	data.new_name = newname;
++	data.old_len = strlen(oldname);
++	rbwalk(tree_filename, replace_filename, (void*)&data);
+ }
+ 
+ /**

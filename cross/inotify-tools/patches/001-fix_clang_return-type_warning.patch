@@ -1,0 +1,22 @@
+From 34450e0ff8f5fce7bfec4a7bbc726120ef414c3e Mon Sep 17 00:00:00 2001
+From: Radu Voicilas <radu.voicilas@users.noreply.github.com>
+Date: Mon, 5 Mar 2018 18:32:43 +0200
+Subject: [PATCH] Fix clang return-type warning
+
+warning: control may reach end of non-void function [-Wreturn-type]
+---
+ libinotifytools/src/inotifytools.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git libinotifytools/src/inotifytools.c_orig_001 libinotifytools/src/inotifytools.c
+index b5bc4a1..9fe09bd 100644
+--- libinotifytools/src/inotifytools.c_orig_001
++++ libinotifytools/src/inotifytools.c
+@@ -894,6 +894,7 @@ watch *create_watch(int wd, char *filename) {
+ 	w->filename = strdup(filename);
+ 	rbsearch(w, tree_wd);
+ 	rbsearch(w, tree_filename);
++    return w;
+ }
+ 
+ /**
