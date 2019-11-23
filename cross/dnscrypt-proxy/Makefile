@@ -1,5 +1,5 @@
 PKG_NAME = dnscrypt-proxy
-PKG_VERS = 2.0.31
+PKG_VERS = 2.0.33
 PKG_EXT = tar.gz
 PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/archive
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
