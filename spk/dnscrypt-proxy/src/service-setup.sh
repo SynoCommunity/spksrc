@@ -35,7 +35,11 @@ blocklist_setup () {
 
 blocklist_cron_uninstall () {
     # remove cron job
-    sed -i '/.*update-blocklist.sh/d' /etc/crontab
+    if [ "$OS" == 'dsm' ]; then
+        rm -f /etc/cron.d/dnscrypt-proxy-update-blocklist
+    else
+        sed -i '/.*update-blocklist.sh/d' /etc/crontab
+    fi
     synoservicectl --restart crond >> "${INST_LOG}" 2>&1
 }
 
@@ -183,10 +187,13 @@ service_postuninst () {
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf" >> "${INST_LOG}" 2>&1
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf" >> "${INST_LOG}" 2>&1
     disable_dhcpd_dns_port "no"
-    rm -f /etc/dhcpd/dhcpd-dns-dns.conf
-    rm -f /etc/dhcpd/dhcpd-dns-dns.info
-    rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
-    rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
+    if [ "$OS" == 'dsm ' ]; then
+        rm -f /etc/dhcpd/dhcpd-dns-dns.conf
+        rm -f /etc/dhcpd/dhcpd-dns-dns.info
+    else
+        rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
+        rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
+    fi
 }
 
 service_postupgrade () {
