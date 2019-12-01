@@ -1,5 +1,5 @@
 SPK_NAME = lua
-SPK_VERS = 5.3.4
+SPK_VERS = 5.3.5
 SPK_REV = 1
 SPK_ICON = src/lua.png
 
