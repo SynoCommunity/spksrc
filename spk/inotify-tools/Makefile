@@ -1,5 +1,5 @@
 SPK_NAME = inotify-tools
-SPK_VERS = 1.0.0
+SPK_VERS = 3.20.1
 SPK_REV = 1
 SPK_ICON = src/inotifytools.png
 
@@ -17,7 +17,7 @@ STARTABLE = no
 CHANGELOG = "1. Initial release"
 
 HOMEPAGE = https://github.com/rvoicilas/inotify-tools/
-LICENSE  = GNU General Public License version 2.0 (GPLv2)
+LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
