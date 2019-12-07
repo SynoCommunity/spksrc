@@ -31,9 +31,9 @@ solution.
  libinotifytools/src/inotifytools.c | 28 +++++++++++++++++-----------
  1 file changed, 17 insertions(+), 11 deletions(-)
 
-diff --git libinotifytools/src/inotifytools.c_orig_004 libinotifytools/src/inotifytools.c
+diff --git libinotifytools/src/inotifytools.c_orig_001 libinotifytools/src/inotifytools.c
 index 81b58a6..ffbe8b3 100644
---- libinotifytools/src/inotifytools.c_orig_004
+--- libinotifytools/src/inotifytools.c_orig_001
 +++ libinotifytools/src/inotifytools.c
 @@ -370,6 +370,14 @@ void empty_stats(const void *nodep,
  	w->hit_total = 0;
