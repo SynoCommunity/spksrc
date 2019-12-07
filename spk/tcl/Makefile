@@ -15,7 +15,7 @@ DESCRIPTION = Tcl \(Tool Command Language\) is a very powerful but easy to learn
 RELOAD_UI = no
 DISPLAY_NAME = Tcl
 STARTABLE = no
-CHANGELOG = "1. Update to 8.6.9<br/>2. Use framework generic installer<br/>3. Fixed Tcl shell variables and packages, fixed 64-bit support<br/>4. Update to 8.6.10, fixed symlinks."
+CHANGELOG = "1. Update to 8.6.10<br/>2. Fix symlinks."
 
 HOMEPAGE = https://www.tcl.tk
 LICENSE = Custom
@@ -23,4 +23,3 @@ LICENSE = Custom
 SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
-
