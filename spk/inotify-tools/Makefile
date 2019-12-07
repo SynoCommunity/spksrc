@@ -1,5 +1,5 @@
 SPK_NAME = inotify-tools
-SPK_VERS = 3.20.1
+SPK_VERS = 3.20.1patch1
 SPK_REV = 1
 SPK_ICON = src/inotifytools.png
 
