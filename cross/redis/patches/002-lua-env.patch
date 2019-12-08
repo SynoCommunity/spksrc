@@ -1,5 +1,5 @@
---- deps/lua/src/Makefile.org	2015-10-15 15:44:54.000000000 +0200
-+++ deps/lua/src/Makefile	2015-10-26 10:33:53.716879667 +0100
+--- deps/lua/src/Makefile-orig	2019-12-08 18:34:35.068004000 +0100
++++ deps/lua/src/Makefile	2019-12-08 18:35:45.836004000 +0100
 @@ -5,12 +5,12 @@
  # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
  
@@ -12,7 +12,7 @@
 -AR= ar rcu
 -RANLIB= ranlib
 +CFLAGS+= -O2 -Wall $(MYCFLAGS)
-+AR:= $(AR) rcu
++AR= $(AR) rcu
 +#RANLIB= ranlib
  RM= rm -f
  LIBS= -lm $(MYLIBS)
