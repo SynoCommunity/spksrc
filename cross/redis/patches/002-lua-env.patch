@@ -12,7 +12,7 @@
 -AR= ar rcu
 -RANLIB= ranlib
 +CFLAGS+= -O2 -Wall $(MYCFLAGS)
-+AR= $(AR) rcu
++AR:= $(AR) rcu
 +#RANLIB= ranlib
  RM= rm -f
  LIBS= -lm $(MYLIBS)
