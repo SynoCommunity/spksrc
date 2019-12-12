@@ -1,5 +1,5 @@
 SPK_NAME = postgresql
-SPK_VERS = 10.11
+SPK_VERS = 11.6
 SPK_REV = 1
 SPK_ICON = src/postgresql.png
 
@@ -13,7 +13,7 @@ DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
 
 HOMEPAGE   = http://www.postgresql.com
-LICENSE    = MPL
+LICENSE    = PostgreSQL Licence
 
 WIZARDS_DIR = WIZARD_UIFILES
 
