@@ -1,10 +1,12 @@
 PKG_NAME = glib
-PKG_SHORT_VERS = 2.55
+PKG_SHORT_VERS = 2.62
 PKG_VERS = $(PKG_SHORT_VERS).2
-PKG_EXT = tar.xz
+PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/GNOME/glib/archive/
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+
 
 DEPENDS = native/glib cross/libffi cross/pcre cross/zlib
 

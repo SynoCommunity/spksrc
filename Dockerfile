@@ -41,7 +41,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libunistring-dev \
         lzip \
         mercurial \
+        meson \
         ncurses-dev \
+        ninja-build \
         php \
         pkg-config \
         python3 \
@@ -61,6 +63,9 @@ RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 # Install setuptools, pip, virtualenv, wheel and httpie for Python2
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python
 RUN pip install virtualenv httpie
+
+# To publish to synocommunity.com
+RUN sed --in-place "s/SECLEVEL=2/SECLEVEL=1/" /etc/ssl/openssl.cnf
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
