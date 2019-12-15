@@ -31,11 +31,15 @@ CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnu
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
 
-# fdk-acc is not compatible with (L)GPL.
-# It can be enabled for personal use, but not for freely distributed packages.
-# Uncomment the following lines if you want to enable it.
-# DEPENDS += cross/fdk-aac
-# CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
+# fdk-acc is now considered compatible with (L)GPL.
+# It requires --enable-nonfree if you're also using --enable-gpl
+#
+# https://en.wikipedia.org/wiki/Fraunhofer_FDK_AAC
+# It was classified as free by Fedora after a review by the legal department at Red Hat.
+# See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
+#
+DEPENDS += cross/fdk-aac
+CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
 include ../../mk/spksrc.cross-cc.mk
 
