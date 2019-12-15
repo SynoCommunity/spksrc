@@ -1,6 +1,6 @@
 SPK_NAME = bicbucstriim
-SPK_VERS = 1.3.6
-SPK_REV = 5
+SPK_VERS = 1.5.0
+SPK_REV = 6
 SPK_ICON = src/bicbucstriim.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ ADMIN_URL = /bbs/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = BicBucStriim
-CHANGELOG = Update to 1.3.6
+CHANGELOG = Updated to 1.5.0 by andreas-becker
 
 HOMEPAGE   = http://projekte.textmulch.de/bicbucstriim
 LICENSE    = MIT
