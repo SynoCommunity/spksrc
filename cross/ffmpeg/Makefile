@@ -41,6 +41,9 @@ CONFIGURE_ARGS += --disable-static
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
+# Enable Synology specific -hls_seek_time option and other optimizations
+CONFIGURE_ARGS += --extra-cflags="-DSYNO_VIDEOSTATION -DSYNO_AUDIOSTATION -DSYNO_MEDIASERVER -DSYNO_DSM"
+
 include ../../mk/spksrc.cross-cc.mk
 
 # Add AV1 codec to supported ARCH
