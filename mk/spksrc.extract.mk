@@ -9,7 +9,7 @@
 EXTRACT_PATH ?= $(WORK_DIR)
 # Extract commands
 EXTRACT_CMD.tgz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.txz = tar -xf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.txz = tar -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.gz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.bz2 = tar -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
@@ -35,7 +35,7 @@ endif
 ifeq ($(strip $(POST_EXTRACT_TARGET)),)
 POST_EXTRACT_TARGET = post_extract_target
 else
-$(POST_EXTRACT_TARGET): $(EXTRACT_TARGET)
+$(POST_EXTRACT_TARGET): $(EXTRACT_TARGET) 
 endif
 
 .PHONY: extract extract_msg
