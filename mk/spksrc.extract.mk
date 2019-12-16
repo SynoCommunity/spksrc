@@ -17,7 +17,7 @@ EXTRACT_CMD.tar.lzma = tar --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.lz = tar --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH)
 
-EXTRACT_CMD = $(EXTRACT_CMD.$(DIST_EXT))
+EXTRACT_CMD = $(EXTRACT_CMD.$(DIST_EXT)) 
 
 
 EXTRACT_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)extract_done
@@ -35,7 +35,7 @@ endif
 ifeq ($(strip $(POST_EXTRACT_TARGET)),)
 POST_EXTRACT_TARGET = post_extract_target
 else
-$(POST_EXTRACT_TARGET): $(EXTRACT_TARGET) 
+$(POST_EXTRACT_TARGET): $(EXTRACT_TARGET)
 endif
 
 .PHONY: extract extract_msg
@@ -50,7 +50,7 @@ extract_target: $(PRE_EXTRACT_TARGET)
 	@mkdir -p $(EXTRACT_PATH)
 	$(EXTRACT_CMD)
 
-post_extract_target: $(EXTRACT_TARGET)
+post_extract_target: $(EXTRACT_TARGET) 
 
 ifeq ($(wildcard $(EXTRACT_COOKIE)),)
 extract: $(EXTRACT_COOKIE)
