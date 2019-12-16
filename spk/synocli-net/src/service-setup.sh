@@ -1,5 +1,5 @@
 
-COMMANDS="nmap nping sshfs fusermount screen mosh mosh-client mosh-server socat procan filan fritzctl"
+COMMANDS="nmap nping sshfs fusermount screen mosh mosh-client mosh-server socat procan filan fritzctl rsync"
 
 service_postinst ()
 {

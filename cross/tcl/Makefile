@@ -1,5 +1,5 @@
 PKG_NAME = tcl
-PKG_VERS = 8.6.9
+PKG_VERS = 8.6.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://prdownloads.sourceforge.net/tcl/

@@ -1,7 +1,5 @@
-bin:bin/icecast
 bin:bin/ezstream
 rsc:bin/ezstream-file.sh
-rsc:share/icecast/
 rsc:share/examples/ezstream/ezstream-file_template.xml
 rsc:share/examples/ezstream/ezstream_metadata.xml
 rsc:share/examples/ezstream/ezstream_mp3.xml
