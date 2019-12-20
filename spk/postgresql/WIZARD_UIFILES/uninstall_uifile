@@ -1,0 +1,13 @@
+[{
+        "step_title": "Uninstall PostgreSQL databases",
+        "items": [{
+                "type": "multiselect",
+                "desc": "By default the PostgreSQL config files will be saved and all the databases will be dumped. Please select the requested option.",
+                "subitems": [{
+                        "key": "pkgwizard_dump_database",
+                        "desc": "Save config files and databases dump files to /tmp directory",
+			"defaultValue": true
+                }]
+        }]
+}]
+
