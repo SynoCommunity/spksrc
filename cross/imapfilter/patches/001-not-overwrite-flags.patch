@@ -1,0 +1,17 @@
+--- src/Makefile
++++ src/Makefile
+@@ -19,12 +19,12 @@ LIBPCRE = -lpcre
+ LIBSSL = -lssl
+ LIBCRYPTO = -lcrypto
+ 
+-CFLAGS = -Wall -Wextra -O \
++CFLAGS += -Wall -Wextra -O \
+ 	 -DCONFIG_SHAREDIR='"$(SHAREDIR)"' \
+ 	 -DCONFIG_SSL_CAPATH='"$(SSLCAPATH)"' \
+ 	 -DCONFIG_SSL_CAFILE='"$(SSLCAFILE)"' \
+ 	 $(INCDIRS) $(MYCFLAGS)
+-LDFLAGS = $(LIBDIRS) $(MYLDFLAGS)
++LDFLAGS += $(LIBDIRS) $(MYLDFLAGS)
+ LIBS = -lm -ldl $(LIBLUA) $(LIBPCRE) $(LIBSSL) $(LIBCRYPTO) $(MYLIBS)
+ 
+ MAN1 = imapfilter.1
