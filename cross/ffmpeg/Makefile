@@ -57,23 +57,23 @@ CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --enable-neon --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
+CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --enable-neon --disable-yasm --disable-asm
+CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=i386 --enable-thumb
+CONFIGURE_ARGS += --arch=i386
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86_64 --enable-thumb --enable-vaapi
+CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
