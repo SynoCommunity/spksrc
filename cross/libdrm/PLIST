@@ -4,6 +4,9 @@ lib:lib/libdrm.so.2.4.0
 lnk:lib/libdrm_intel.so
 lnk:lib/libdrm_intel.so.1
 lib:lib/libdrm_intel.so.1.0.0
+lnk:lib/libdrm_amdgpu.so
+lnk:lib/libdrm_amdgpu.so.1
+lib:lib/libdrm_amdgpu.so.1.0.0
 lnk:lib/libdrm_nouveau.so
 lnk:lib/libdrm_nouveau.so.2
 lib:lib/libdrm_nouveau.so.2.0.0
