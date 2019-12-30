@@ -4,9 +4,9 @@ SPK_REV = 6
 SPK_ICON = src/redis.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = DigitalBox
+MAINTAINER = DigitalBox98
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 
 RELOAD_UI = yes
@@ -28,9 +28,6 @@ NO_SERVICE_SHORTCUT = yes
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = redis_extra_install
-
-BUSYBOX_CONFIG = usrmng daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
