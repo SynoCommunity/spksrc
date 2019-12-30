@@ -20,8 +20,8 @@ DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
 CHANGELOG = "1. Add rsync"
 
-HOMEPAGE   = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
-LICENSE    = Mixed
+HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
+LICENSE  = Each tool is licensed under it\'s respective license.
 
 SERVICE_SETUP = src/service-setup.sh
 
