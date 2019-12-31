@@ -6,16 +6,38 @@ start_daemon ()
 {
     synoservicectl --stop pkgctl-VideoStation
 
-    mv /var/packages/VideoStation/target/bin/ffmpeg /var/packages/VideoStation/target/bin/ffmpeg.old
-    mv /var/packages/VideoStation/target/bin/ffprobe /var/packages/VideoStation/target/bin/ffprobe.old
-    ln -sf /var/packages/ffmpeg/target/bin/ffmpeg /var/packages/VideoStation/target/bin/ffmpeg
-    ln -sf /var/packages/ffmpeg/target/bin/ffprobe /var/packages/VideoStation/target/bin/ffprobe
+    source=/var/packages/ffmpeg/target
+    destination=/var/packages/VideoStation/target
 
-    cp /var/packages/VideoStation/target/lib/libsynovte.so /var/packages/VideoStation/target/lib/libsynovte.so.old
-    sed -i 's/eac3/OFF0/' /var/packages/VideoStation/target/lib/libsynovte.so
-    sed -i 's/truehd/IGNORE/' /var/packages/VideoStation/target/lib/libsynovte.so
-    sed -i 's/dts/OFF/' /var/packages/VideoStation/target/lib/libsynovte.so
-    sed -i 's/main 10/IGNORE/' /var/packages/VideoStation/target/lib/libsynovte.so
+    for item in 'ffmpeg ffprobe vainfo'
+    do
+        # In case of NAS powerfailure make sure destination doesn't already
+        # exists and original VideoStation ain't already a symbolic limk
+        # (do not overwrite backup OR copy symlink)
+        [ ! -e $destination/bin/$item.orig -a ! -L $destination/bin/$item ] && mv $destination/bin/$item $destination/bin/$item.orig
+    done
+
+    for item in 'ffprobe vainfo'
+    do
+        # In case of NAS powerfailure make sure source files exist
+        # and and destination doesn't exist (do not overwrite)
+        [ -e $source/bin/$item -a ! -e $destination/bin/$item ] && ln -sfT $source/bin/$item $destination/bin/$item
+    done
+
+    # Download latest version of ffmpeg wrapper from @BenjaminPoncet
+    [ ! -e $destination/bin/$ffmpeg ] \
+       && curl -o $destination/bin/ffmpeg https://gist.github.com/BenjaminPoncet/bbef9edc1d0800528813e75c1669e57e
+    [ $? -eq 0 ] \
+       && chmod 0755 $destination/bin/ffmpeg
+
+    # In case of NAS powerfailure make sure:
+    # a) backup file doesn't exist & original file does
+    [ ! $destination/lib/libsynovte.so.orig -a -s $destination/lib/libsynovte.so ] \
+      && sed -i'.old' -e 's/eac3/OFF0/' \
+                      -e 's/truehd/IGNORE/' \
+                      -e 's/dts/OFF/' \
+                      -e 's/main 10/IGNORE0/' \
+                      $destination/lib/libsynovte.so
 
     synoservicectl --start pkgctl-VideoStation
 }
@@ -24,19 +46,28 @@ stop_daemon ()
 {
     synoservicectl --stop pkgctl-VideoStation
 
-    rm /var/packages/VideoStation/target/bin/ffmpeg
-    rm /var/packages/VideoStation/target/bin/ffprobe
+    target=/var/packages/VideoStation/target
 
-    mv /var/packages/VideoStation/target/bin/ffmpeg.old /var/packages/VideoStation/target/bin/ffmpeg
-    mv /var/packages/VideoStation/target/bin/ffprobe.old /var/packages/VideoStation/target/bin/ffprobe
-    mv /var/packages/VideoStation/target/lib/libsynovte.so.old /var/packages/VideoStation/target/lib/libsynovte.so
+    for item in 'bin/ffmpeg bin/ffprobe bin/vainfo lib/libsynovte.so'
+    do
+        # If backup file exist then delete and put backup file in place
+        if [ -e $target/$item.orig ]; then
+           rm -f $target/$item
+           mv $target/$item.orig $target/$item
+        fi
+    done
 
     synoservicectl --start pkgctl-VideoStation
 }
 
 daemon_status ()
 {
-    test -L /var/packages/VideoStation/target/bin/ffmpeg -a -e /var/packages/VideoStation/target/lib/libsynovte.so.old
+    target=/var/packages/VideoStation/target
+
+    test    -L $target/bin/ffmpeg \
+         -a -L $target/bin/ffprobe \
+         -a -L $target/bin/vainfo \
+         -a -e $target/lib/libsynovte.so.orig
     return $?
 }
 
