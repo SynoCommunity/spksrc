@@ -15,8 +15,6 @@ CONFIGURE_TARGET = gmmlib_custom_configure
 COMPILE_TARGET = gmmlib_custom_compile
 INSTALL_TARGET = gmmlib_custom_install
 
-#NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
-
 CMAKE_ARGS = -DBUILD_TYPE=release
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
