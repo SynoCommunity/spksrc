@@ -16,7 +16,7 @@ COMPILE_TARGET = intel-media_custom_compile
 INSTALL_TARGET = intel-media_custom_install
 
 CMAKE_ARGS = -DBUILD_TYPE=release
-CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
@@ -76,4 +76,4 @@ intel-media_custom_compile:
 .PHONY: intel-media_custom_install
 
 intel-media_custom_install: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(WORK_DIR)/install
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install
