@@ -1,3 +1,4 @@
-lnk:libigdgmm.so
-lnk:libigdgmm.so.11
-lib:libigdgmm.so.11.1.0
+lnk:libigfxcmrt.so
+lnk:libigfxcmrt.so.7
+lib:libigfxcmrt.so.7.2.0
+lib:iHD_drv_video.so
