@@ -1,0 +1,14 @@
+lib:libmfx.so.1.31
+lnk:libmfx.so.1
+lnk:libmfx.so
+lib:libmfxhw64.so.1.31
+lnk:libmfxhw64.so.1
+lnk:libmfxhw64.so
+lib:mfx/libmfx_hevce_hw64.so
+lib:mfx/libmfx_hevc_fei_hw64.so
+lib:mfx/libmfx_vp9e_hw64.so
+lib:mfx/libmfx_h264la_hw64.so
+lib:mfx/libmfx_hevcd_hw64.so
+lib:mfx/libmfx_hevcd_hw64.so
+lib:mfx/libmfx_vp8d_hw64.so
+lib:mfx/libmfx_vp9d_hw64.so
