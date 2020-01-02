@@ -74,7 +74,7 @@ CONFIGURE_ARGS += --arch=i386
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver
+DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
 endif
