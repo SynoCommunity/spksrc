@@ -1,5 +1,5 @@
 SPK_NAME = synocli-file
-SPK_VERS = 1.0
+SPK_VERS = 1.1
 SPK_REV = 2
 SPK_ICON = src/synocli-file.png
 
@@ -10,14 +10,16 @@ DEPENDS += cross/detox cross/rmlint
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
+
+OPTIONAL_DESC =
+
 ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x $(ARM5_ARCHES)),$(ARCH))
 # to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
 DEPENDS += cross/rnm
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, rhash, mc \(midnight commander\), nano, file, detox, rmlint, rnm."
-else
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, rhash, mc \(midnight commander\), nano, file, detox, rmlint."
+OPTIONAL_DESC += , rnm
 endif
 
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, rhash, mc \(midnight commander\), nano, file, detox, rmlint$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG = "Midnight-Commander: add sftp support;  Fix subshell; fix mouse handling; fix mcedit, mcview and mcdiff"
 
