@@ -12,3 +12,4 @@ lib:lib/mfx/libmfx_hevcd_hw64.so
 lib:lib/mfx/libmfx_hevcd_hw64.so
 lib:lib/mfx/libmfx_vp8d_hw64.so
 lib:lib/mfx/libmfx_vp9d_hw64.so
+rsc:share/mfx/plugins.cfg

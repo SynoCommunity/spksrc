@@ -54,3 +54,5 @@ intel-mediasdk_custom_compile:
 
 intel-mediasdk_custom_install: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install
+	# Fix plugins path for end-state install dir
+	sed -i-BAK '/^Path =/s/= .*install/= /' $(WORK_DIR)/install/$(INSTALL_PREFIX)/share/mfx/plugins.cfg
