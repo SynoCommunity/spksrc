@@ -1,17 +1,23 @@
+COMMANDS="mc mcedit mcdiff mcview"
+
 service_postinst ()
 {
-    # Use the mc-utf8 command for mc
-    ln -s ${SYNOPKG_PKGDEST}/bin/mc-utf8 /usr/local/bin/mc
-    ln -s ${SYNOPKG_PKGDEST}/bin/mc-utf8 /usr/local/bin/mcedit
-    ln -s ${SYNOPKG_PKGDEST}/bin/mc-utf8 /usr/local/bin/mcdiff
-    ln -s ${SYNOPKG_PKGDEST}/bin/mc-utf8 /usr/local/bin/mcview
+    for cmd in $COMMANDS
+    do
+        if [ -e "${SYNOPKG_PKGDEST}/bin/$cmd" ]; then
+            ln -s "${SYNOPKG_PKGDEST}/bin/$cmd" "/usr/local/bin/$cmd"
+        fi
+    done
 }
 
 service_postuninst ()
 {
-     # Remove symlinks
-     rm -f /usr/local/bin/mc
-     rm -f /usr/local/bin/mcedit
-     rm -f /usr/local/bin/mcdiff
-     rm -f /usr/local/bin/mcview
+    for cmd in $COMMANDS
+    do
+        if [ -L "/usr/local/bin/$cmd" ]; then
+            if [ "$(readlink /usr/local/bin/$cmd)" == "${SYNOPKG_PKGDEST}/bin/$cmd" ]; then
+                rm -f "/usr/local/bin/$cmd"
+            fi
+        fi
+    done
 }

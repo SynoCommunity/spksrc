@@ -22,7 +22,7 @@ STARTABLE = no
 CHANGELOG = "1. Initial release"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
-LICENSE  = Each tool is licensed under its respective license.
+LICENSE  = Each tool is licensed under it\'s respective license.
 
 SERVICE_SETUP = src/service-setup.sh
 
