@@ -70,7 +70,7 @@ endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=i386
+CONFIGURE_ARGS += --arch=x86 --cpu=atom
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
