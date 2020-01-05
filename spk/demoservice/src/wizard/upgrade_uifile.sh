@@ -1,3 +1,14 @@
+#!/bin/sh
+
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
+
+# Reload wizard variables stored by postinst
+if [ -r "${INST_VARIABLES}" ]; then
+    . "${INST_VARIABLES}"
+fi
+
+cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 [
   {
     "step_title": "Example configuration for demoservice",
@@ -9,7 +20,7 @@
           {
             "key": "wizard_download_dir",
             "desc": "Download location",
-            "defaultValue": "/volume1/downloads",
+            "defaultValue": "${SHARE_PATH}",
             "validator": {
               "allowBlank": false,
               "regex": {
@@ -21,7 +32,7 @@
           {
             "key": "wizard_group",
             "desc": "DSM group",
-            "defaultValue": "sc-download",
+            "defaultValue": "${GROUP}",
             "validator": {
               "allowBlank": false,
               "regex": {
@@ -33,6 +44,7 @@
           {
             "key": "wizard_custom_option",
             "desc": "Demoservice custom option",
+            "defaultValue": "${CUSTOM_OPTION}",
           }
         ]
       }
@@ -42,8 +54,10 @@
     "step_title": "Attention! DSM Permissions",
     "items": [
       {
-        "desc": "Permissions are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= demoservice) will not appear on most UI settings.<br>Including the following:<br>- Application privilege's permission viewer<br>- FPT's chroot user selector<br>- File Stations's<br>- Change owner<br>- Shared Links Manager -> Enable secure sharing<br><br>The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor<br>"
+        "desc": "Permissions are managed with the group <b>'sc-download'</b> in DSM."
       }
     ]
   }
 ]
+EOF
+exit 0

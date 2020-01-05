@@ -18,6 +18,7 @@ service_preinst ()
 service_postinst ()
 {
     echo "service_postinst ${SYNOPKG_PKG_STATUS}" >> $INST_LOG
+    echo "CUSTOM_OPTION=${wizard_custom_option}" >> ${INST_VARIABLES}
 }
 
 service_preuninst ()
@@ -25,7 +26,7 @@ service_preuninst ()
     echo "service_preuninst ${SYNOPKG_PKG_STATUS}" >> $INST_LOG
 }
 
-service_postinst ()
+service_postuninst ()
 {
     echo "service_postuninst ${SYNOPKG_PKG_STATUS}" >> $INST_LOG
 }

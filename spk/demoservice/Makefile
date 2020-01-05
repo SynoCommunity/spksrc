@@ -1,6 +1,6 @@
 SPK_NAME = demoservice
-SPK_VERS = 1.2
-SPK_REV = 6
+SPK_VERS = 1.3
+SPK_REV = 10
 SPK_ICON = src/demoservice.png
 
 override ARCH=
