@@ -30,6 +30,7 @@ CONFIGURE_ARGS += --enable-libvorbis
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
+CONFIGURE_ARGS += --enable-debug=1
 
 # fdk-acc is now considered compatible with (L)GPL.
 # It requires --enable-nonfree if you're also using --enable-gpl
@@ -68,9 +69,17 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-yasm --dis
 endif
 
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-DEPENDS += native/nasm
+#EVANSPORT_TOOLCHAIN = $(WORK_DIR)/../../../toolchains/syno-evansport-6.1/work/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr
+#CONFIGURE_ARGS += --extra-cflags="-I$(EVANSPORT_TOOLCHAIN)/include/intelce-utilities"
+#CONFIGURE_ARGS += --extra-cflags="-I$(EVANSPORT_TOOLCHAIN)/include/intelce-utilities/libffmpeg_plugin"
+#CONFIGURE_ARGS += --extra-ldflags="-L$(EVANSPORT_TOOLCHAIN)/lib/intelce-utilities"
+CONFIGURE_ARGS += --extra-ldflags="-L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/intelce-utilities -Wl,-rpath-link=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/intelce-utilities"
+CONFIGURE_ARGS += --extra-cflags="-DSYNO_EVANSPORT_SMD"
+DEPENDS += native/nasm cross/ds.evansport
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86 --cpu=atom
+CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-libh264_smd --enable-smd
+#CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-h264_smd --enable-smd
+#CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-smd
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))

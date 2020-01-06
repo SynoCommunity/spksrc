@@ -4,7 +4,6 @@ PKG_EXT = txz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/toolkit/DSM6.1
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-TC_WORK_DIR = $(WORK_DIR)/../../../toolchains/$(TC)/work
 
 DEPENDS = 
 REQUIRED_DSM = 6.1
@@ -24,4 +23,28 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: ds.evansport_custom_extract
 
 ds.evansport_custom_extract: 
-	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(TC_WORK_DIR) --skip-old-files --strip-components=2 -xvf $(DIST_FILE) usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu
+	cd $(PKG_WORK_DIR) && env $(ENV) mkdir --parents $(INSTALL_DIR)/$(INSTALL_PREFIX)/include
+	cd $(PKG_WORK_DIR) && env $(ENV) mkdir --parents $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
+	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
+		--skip-old-files --strip-components=8 \
+		-xvf $(DIST_FILE) \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/include/intelce-utilities
+	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
+		--skip-old-files --strip-components=9 \
+		-xvf $(DIST_FILE) \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/include/intelce-utilities/linux/os/
+	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
+		--skip-old-files --strip-components=13 \
+		-xvf $(DIST_FILE) \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/arch/x86/include/asm/
+	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
+		--skip-old-files --strip-components=11 \
+		-xvf $(DIST_FILE) \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/asm-generic/   \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/linux/         \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/generated/     \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/trace/
+	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib \
+		--skip-old-files --strip-components=7 \
+		-xvf $(DIST_FILE) \
+		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/intelce-utilities
