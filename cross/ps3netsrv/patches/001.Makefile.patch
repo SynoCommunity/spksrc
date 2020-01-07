@@ -1,8 +1,0 @@
---- Makefile.org	2019-08-03 09:54:46.348534135 +0200
-+++ Makefile	2019-08-03 09:55:05.244619573 +0200
-@@ -1,4 +1,4 @@
--OS = windows
-+OS = linux
- BUILD_TYPE = release_static
- 
- OUTPUT := ps3netsrv
