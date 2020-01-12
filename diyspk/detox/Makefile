@@ -1,7 +1,7 @@
 SPK_NAME = detox
-PKG_VERS = 1.2.0
+SPK_VERS = 1.2.0
 SPK_REV = 1
-SPK_ICON = src/detox_logo.jpg
+SPK_ICON = src/detox_logo.png
 
 DEPENDS = cross/detox
 
@@ -9,11 +9,10 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Detox is a utility designed to clean up filenames
 DISPLAY_NAME = detox
 STARTABLE = no
-BETA = 1
 
 HOMEPAGE   = http://detox.sourceforge.net/
 LICENSE    = BSD
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/detox
 
 include ../../mk/spksrc.spk.mk

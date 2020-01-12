@@ -17,6 +17,6 @@ HOMEPAGE = http://dar.linux.free.fr/
 
 LICENSE = GPLv3
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
 
 include ../../mk/spksrc.spk.mk

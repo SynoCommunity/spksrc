@@ -12,10 +12,10 @@ DISPLAY_NAME = Tmux
 STARTABLE = no
 CHANGELOG = Updated tmux to version 2.9a
 
-HOMEPAGE   = http://tmux.github.io
-LICENSE    = BSD License
+HOMEPAGE  = http://tmux.github.io
+LICENSE   = BSD License
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_LINKS = /usr/local/bin/tmux:bin/tmux-utf8
 
 include ../../mk/spksrc.spk.mk
 

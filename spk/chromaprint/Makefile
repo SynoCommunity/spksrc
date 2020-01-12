@@ -25,6 +25,9 @@ PRE_DEPEND_TARGET = chromaprint_pre_depend
 SPK_DEPENDS = "ffmpeg>4.1"
 endif
 
+SPK_COMMANDS = bin/fpcalc
+
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: chromaprint_pre_depend
