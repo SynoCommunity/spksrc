@@ -27,7 +27,7 @@ endif
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, rhash, mc \(midnight commander\), nano, file, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "Midnight-Commander: add sftp support; Fix subshell; fix mouse handling; fix mcedit, mcview and mcdiff; fix symlinks"
+CHANGELOG = "1. Midnight-Commander: add sftp support; Fix subshell; fix mouse handling; fix mcedit, mcview and mcdiff; fix symlinks. </br>2. Fix rmlint not executable."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it\'s respective license.
