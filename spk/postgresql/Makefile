@@ -17,8 +17,8 @@ LICENSE    = PostgreSQL Licence
 
 WIZARDS_DIR = WIZARD_UIFILES
 
-SERVICE_USER = auto
-SERVICE_SETUP = src/service-setup.sh
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT = src/start-stop-status.sh
 
 include ../../mk/spksrc.spk.mk
 
