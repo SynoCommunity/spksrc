@@ -27,9 +27,9 @@ lib:lib/libswresample.so.3.5.100
 lnk:lib/libswscale.so
 lnk:lib/libswscale.so.5
 lib:lib/libswscale.so.5.5.100
-shr:share/ffmpeg/ffprobe.xsd
-shr:share/ffmpeg/libvpx-1080p50_60.ffpreset
-shr:share/ffmpeg/libvpx-1080p.ffpreset
-shr:share/ffmpeg/libvpx-360p.ffpreset
-shr:share/ffmpeg/libvpx-720p50_60.ffpreset
-shr:share/ffmpeg/libvpx-720p.ffpreset
+rsc:share/ffmpeg/ffprobe.xsd
+rsc:share/ffmpeg/libvpx-1080p50_60.ffpreset
+rsc:share/ffmpeg/libvpx-1080p.ffpreset
+rsc:share/ffmpeg/libvpx-360p.ffpreset
+rsc:share/ffmpeg/libvpx-720p50_60.ffpreset
+rsc:share/ffmpeg/libvpx-720p.ffpreset

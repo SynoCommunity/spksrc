@@ -1,5 +1,6 @@
 PKG_NAME = tcl
 PKG_VERS = 8.6.10
+MAIN_VERS = 8.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://prdownloads.sourceforge.net/tcl/
@@ -23,8 +24,8 @@ POST_INSTALL_TARGET = tcl_custom_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Let's create a symlink so that any other packages which are compiled by
+# Create a symlink libtcl so that any other packages which are compiled by
 # spksrc will link to a library without a version number in the filename
 .PHONY: tcl_custom_post_install
 tcl_custom_post_install:
-	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/lib/libtcl$(shell echo $(PKG_VERS) | cut -d"." -f1-2).so $(STAGING_INSTALL_PREFIX)/lib/libtcl.so
+	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/lib/libtcl$(MAIN_VERS).so $(STAGING_INSTALL_PREFIX)/lib/libtcl.so

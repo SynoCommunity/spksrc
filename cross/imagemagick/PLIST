@@ -14,7 +14,7 @@ rsc:bin/MagickWand-config
 lnk:bin/mogrify
 lnk:bin/montage
 lnk:bin/stream
-shr:etc/ImageMagick-6
+rsc:etc/ImageMagick-6
 lnk:lib/libMagick++-7.Q16HDRI.so
 lnk:lib/libMagick++-7.Q16HDRI.so.4
 lib:lib/libMagick++-7.Q16HDRI.so.4.0.0
