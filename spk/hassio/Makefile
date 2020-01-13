@@ -1,6 +1,6 @@
 SPK_NAME = hassio
 SPK_VERS = 20191224
-SPK_REV = 1 
+SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 SPK_DEPENDS = "Docker>=18.09.0-0506"
 DSM_UI_DIR = app
