@@ -26,6 +26,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 #DSM UI integration
 SERVICE_PORT = 8123
+SPK_CONFLICT = homeassistant
 
 INSTALL_DEP_SERVICES = Docker
 START_DEP_SERVICES = Docker
