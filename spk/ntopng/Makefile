@@ -1,44 +1,48 @@
 SPK_NAME = ntopng
-SPK_VERS = 2.4.2
-SPK_REV = 3
-SPK_ICON = src/ntopng.png
-DSM_UI_DIR = app
-CHANGELOG = 
-
-BETA = 1
+SPK_VERS = 3.8.1
+SPK_REV = 1
+SPK_ICON = src/$(SPK_NAME).png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = ntopng is the next generation version of the original ntop, a network traffic probe that shows the network usage, similar to what the popular top Unix command does.
+SPK_DEPENDS = "redis"
+
+# toolchains of DSM <=5.2 have outdated compiler
+REQUIRED_DSM = 6.1
+
+BETA = 1
+
+MAINTAINER = hgy59
+DESCRIPTION = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.
+CHANGELOG = Initial synology package release.
 RELOAD_UI = yes
 DISPLAY_NAME = ntopng
-ADMIN_PORT = 3000
-STARTABLE = yes
 
-HOMEPAGE = http://www.ntop.org/
-LICENSE  =
+HELPURL = https://www.ntop.org/guides/ntopng/index.html
+LICENSE = GNU GPLv3
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-ADDITIONAL_SCRIPTS =
-FWPORTS = src/${SPK_NAME}.sc
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# 'auto' (reserved value) grabs SPK_NAME
+SERVICE_USER   = auto
+SERVICE_SETUP  = src/service-setup.sh
+STARTABLE      = yes
+SERVICE_PORT   = 3000
 
-POST_STRIP_TARGET = ntop_extra_install
+# generate app/config and app/images/*.png
+DSM_UI_DIR = app
+
+# In case script start-stop-status has to run as root on DSM 6, package can
+# provide its own conf/privilege file as far as CONF_DIR variable is set.
+CONF_DIR = src/conf
+
+POST_STRIP_TARGET = ntopng_extra_install
 
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: ntop_extra_install
-ntop_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/app/images
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/ntopng.conf $(STAGING_DIR)/var/ntopng.conf
-	for size in 16 24 32 48; do \
-		convert $(SPK_ICON) -thumbnail $${size}x$${size} \
-		        $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
-	done
+.PHONY: ntopng_extra_install
+ntopng_extra_install:
+	install -m 755 -d $(STAGING_DIR)/var/data
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/ntopng.conf $(STAGING_DIR)/etc/ntopng.conf
+	unzip -o src/GeoLite2.mmdb.zip -d $(STAGING_DIR)/share/ntopng/httpdocs/geoip/
