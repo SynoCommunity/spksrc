@@ -1,6 +1,6 @@
 SPK_NAME = hassio
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = $(shell git rev-parse --short HEAD)
+SPK_VERS = 20191224
+SPK_REV = 1 
 SPK_ICON = src/$(SPK_NAME).png
 SPK_DEPENDS = "Docker>=18.09.0-0506"
 DSM_UI_DIR = app
@@ -9,7 +9,6 @@ DEPENDS =
 
 MAINTAINER = fredrike+hassio@gmail.com
 DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the hass.io folder."
-ADMIN_PORT = 8123
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Hass.io
