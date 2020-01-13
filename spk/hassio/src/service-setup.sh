@@ -32,10 +32,14 @@ service_preuninst() {
     if [ ${SYNOPKG_PKG_STATUS} == "UNINSTALL" ]; then
         HOMEASSISTANT="$(jq --raw-output '.homeassistant' ${CFG_FILE})"
         SUPERVISOR="$(jq --raw-output '.supervisor' ${CFG_FILE})"
+        HASSIO_DNS="$(docker inspect --format='{{.Image}}' HASSIO_DNS)"
         HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
 
-        docker rm --force homeassistant hassio_supervisor hassio_dns
-        docker image rm ${HOMEASSISTANT} ${SUPERVISOR}
+        docker rm --force hassio_supervisor hassio_dns
+        if [ `docker inspect --format='{{.Config.Image}}' homeassistant|grep -q homeassistant/qemux86-64` ]; then
+            docker rm --force homeassistant && docker image rm ${HOMEASSISTANT}
+        fi 
+        docker image rm ${SUPERVISOR} ${HASSIO_DNS}
         docker network rm hassio
 
         if [ "${wizard_remove_addons}" == "true" ]; then
