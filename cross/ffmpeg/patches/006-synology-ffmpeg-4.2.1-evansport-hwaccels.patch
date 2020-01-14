@@ -1545,7 +1545,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/encode.c ./libavcodec/encode.c
 +#ifdef SYNO_EVANSPORT_SMD
 +int syno_alloc_packet(AVPacket *avpkt, int size)
 +{
-+    return ff_alloc_packet2(NULL, avpkt, size);
++    return ff_alloc_packet2(NULL, avpkt, size, 0);
 +}
 +#endif
 +
