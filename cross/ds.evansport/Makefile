@@ -26,24 +26,9 @@ ds.evansport_custom_extract:
 	cd $(PKG_WORK_DIR) && env $(ENV) mkdir --parents $(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 	cd $(PKG_WORK_DIR) && env $(ENV) mkdir --parents $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
-		--skip-old-files --strip-components=8 \
+		--skip-old-files --strip-components=7 \
 		-xvf $(DIST_FILE) \
 		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/include/intelce-utilities
-	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
-		--skip-old-files --strip-components=9 \
-		-xvf $(DIST_FILE) \
-		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/include/intelce-utilities/linux/os/
-	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
-		--skip-old-files --strip-components=13 \
-		-xvf $(DIST_FILE) \
-		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/arch/x86/include/asm/
-	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/include \
-		--skip-old-files --strip-components=11 \
-		-xvf $(DIST_FILE) \
-		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/asm-generic/   \
-		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/linux/         \
-		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/generated/     \
-		usr/local/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/lib/modules/DSM-6.1/build/include/trace/
 	cd $(PKG_WORK_DIR) && env $(ENV) tar -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib \
 		--skip-old-files --strip-components=7 \
 		-xvf $(DIST_FILE) \
