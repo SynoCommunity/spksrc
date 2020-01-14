@@ -4642,8 +4642,8 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  
 +#ifdef SYNO_EVANSPORT_SMD
 +static const AVOption mpeg4_options_smd[] = {
-+    {"quarter_sample", "1/4 subpel MC", offsetof(MpegEncContext, quarter_sample), FF_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
-+    {"divx_packed", "divx style packed b frames", offsetof(MpegEncContext, divx_packed), FF_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
++    {"quarter_sample", "1/4 subpel MC", offsetof(MpegEncContext, quarter_sample), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
++    {"divx_packed", "divx style packed b frames", offsetof(MpegEncContext, divx_packed), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
 +    {NULL}
 +};
 +#endif
@@ -4682,11 +4682,11 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
 +     .init                  = decode_init_smd,
 +     .close                 = ff_h263_decode_end,
 +     .decode                = ff_h263_decode_frame_smd,
-+     .capabilities          = CODEC_CAP_DELAY,
++     .capabilities          = AV_CODEC_CAP_DELAY,
 +     .flush                 = ff_mpeg_flush,
 +     .max_lowres            = 3,
 +     .pix_fmts              = ff_h263_hwaccel_pixfmt_list_420,
-+     .profiles              = NULL_IF_CONFIG_SMALL(mpeg4_video_profiles),
++     .profiles              = NULL_IF_CONFIG_SMALL(ff_mpeg4_video_profiles),
 +     .update_thread_context = ONLY_IF_THREADS_ENABLED(ff_mpeg_update_thread_context),
 +     .priv_class            = &mpeg4_class_smd,
 +};
