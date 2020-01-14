@@ -69,17 +69,21 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-yasm --dis
 endif
 
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-#EVANSPORT_TOOLCHAIN = $(WORK_DIR)/../../../toolchains/syno-evansport-6.1/work/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr
-#CONFIGURE_ARGS += --extra-cflags="-I$(EVANSPORT_TOOLCHAIN)/include/intelce-utilities"
-#CONFIGURE_ARGS += --extra-cflags="-I$(EVANSPORT_TOOLCHAIN)/include/intelce-utilities/libffmpeg_plugin"
-#CONFIGURE_ARGS += --extra-ldflags="-L$(EVANSPORT_TOOLCHAIN)/lib/intelce-utilities"
-CONFIGURE_ARGS += --extra-ldflags="-L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/intelce-utilities -Wl,-rpath-link=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/intelce-utilities"
-CONFIGURE_ARGS += --extra-cflags="-DSYNO_EVANSPORT_SMD"
-DEPENDS += native/nasm cross/ds.evansport
+DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
+
+ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
+TOOLCHAIN = /usr/local/evansport-pc-linux-gnu
+DEPENDS += cross/ds.evansport
+CONFIGURE_ARGS += --extra-cflags="-DSYNO_EVANSPORT_SMD"
+CONFIGURE_ARGS += --extra-cflags="-fasm"
+CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities -I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user"
+CONFIGURE_ARGS += --extra-ldflags="-Wl,-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities,-rpath-link,$(TOOLCHAIN)/lib,-rpath-link,$(TOOLCHAIN)/lib/intelce-utilities"
 CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-libh264_smd --enable-smd
-#CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-h264_smd --enable-smd
-#CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-smd
+
+else
+CONFIGURE_ARGS += --arch=i386
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
