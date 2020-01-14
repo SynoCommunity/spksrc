@@ -1728,7 +1728,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
 +			*data_size = sizeof(AVFrame);
 +			avctx->width = decoded_frame.width;
 +			avctx->height = decoded_frame.height;
-+			avctx->pix_fmt = PIX_FMT_YUV420P;
++			avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 +
 +			pict->pkt_pts = AV_NOPTS_VALUE;
 +			pict->pts = AV_NOPTS_VALUE ;
@@ -4532,7 +4532,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
 +			*data_size = sizeof(AVFrame);
 +			avctx->width = decoded_frame.width;
 +			avctx->height = decoded_frame.height;
-+			avctx->pix_fmt = PIX_FMT_YUV420P;
++			avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 +
 +			pict->pkt_pts = AV_NOPTS_VALUE;
 +			pict->pts = AV_NOPTS_VALUE ;
@@ -5282,7 +5282,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
 +			*data_size = 1;
 +			avctx->width = decoded_frame.width;
 +			avctx->height = decoded_frame.height;
-+			avctx->pix_fmt = PIX_FMT_YUV420P;
++			avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 +
 +			pict->pkt_pts = AV_NOPTS_VALUE;
 +			pict->pts = AV_NOPTS_VALUE ;
