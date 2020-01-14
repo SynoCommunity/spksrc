@@ -2627,7 +2627,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_smd.h ./libavcodec/h264_smd.h
 +#endif /* AVCODEC_H264_H */
 diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd_ffmpeg_audio_util.c
 --- ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/ismd_ffmpeg_audio_util.c	2020-01-04 21:09:07.159257367 -0500
++++ ./libavcodec/ismd_ffmpeg_audio_util.c	2020-01-14 14:30:02.609981781 -0500
 @@ -0,0 +1,1213 @@
 +/*
 + * This file contains utility functions
@@ -2823,18 +2823,18 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +			/* extract flag infos */
 +			extradata = avctx->extradata;
 +
-+			if (avctx->codec->id == CODEC_ID_WMAV1 && avctx->extradata_size >= 4) {
++			if (avctx->codec->id == AV_CODEC_ID_WMAV1 && avctx->extradata_size >= 4) {
 +				encode_option= AV_RL16(extradata+2);
-+			} else if (avctx->codec->id == CODEC_ID_WMAV2 && avctx->extradata_size >= 6) {
++			} else if (avctx->codec->id == AV_CODEC_ID_WMAV2 && avctx->extradata_size >= 6) {
 +				encode_option = AV_RL16(extradata+4);
 +			}
 +			//FILLING WMA DATA STRUCTURE
 +			p_aud_dec->current_input.wma_fmt_param.sample_rate= avctx->sample_rate;
 +			p_aud_dec->current_input.wma_fmt_param.num_channels = avctx->channels;
 +			p_aud_dec->current_input.wma_fmt_param.bitrate = avctx->bit_rate/8;//byte rate
-+			if (avctx->codec->id == CODEC_ID_WMAV1)
++			if (avctx->codec->id == AV_CODEC_ID_WMAV1)
 +				p_aud_dec->current_input.wma_fmt_param.format_tag = 0x160;
-+			else if (avctx->codec->id == CODEC_ID_WMAV2)
++			else if (avctx->codec->id == AV_CODEC_ID_WMAV2)
 +				p_aud_dec->current_input.wma_fmt_param.format_tag = 0x161;
 +			if(avctx->sample_fmt== AV_SAMPLE_FMT_S16)
 +				p_aud_dec->current_input.wma_fmt_param.sample_size = 16;
@@ -2884,9 +2884,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +				p_aud_dec->out_config.sample_size= 32;
 +			break;
 +		case ISMD_AUDIO_MEDIA_FMT_DD:
-+			if(avctx->codec->id == CODEC_ID_AC3)
++			if(avctx->codec->id == AV_CODEC_ID_AC3)
 +				p_aud_dec->current_input.format = ISMD_AUDIO_MEDIA_FMT_DD;
-+			else if(avctx->codec->id == CODEC_ID_EAC3)
++			else if(avctx->codec->id == AV_CODEC_ID_EAC3)
 +				p_aud_dec->current_input.format = ISMD_AUDIO_MEDIA_FMT_DD_PLUS;
 +
 +			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
@@ -3138,7 +3138,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +	{
 +		// get output buffer
 +		frame.nb_samples = data_copied/(2* avctx->channels);
-+		if ((avctx->get_buffer(avctx, &frame)) < 0)
++		if ((avctx->get_buffer2(avctx, &frame, 0)) < 0)
 +		{
 +			av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
 +		}
@@ -3199,7 +3199,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +		if (avpkt->size != pkt_size) {
 +			av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
 +		}
-+		memset(avpkt->data + avpkt->size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
++		memset(avpkt->data + avpkt->size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 +	}
 +	if(pcm_samples == NULL)
 +		av_log( NULL, AV_LOG_DEBUG, "\nNULL frame received in ismd_ffmpeg_enc_aud_samples data copied %d\n", avpkt->size);
@@ -3215,15 +3215,15 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +	    val =   avctx->sample_rate && avctx->channels && avctx->sample_fmt != AV_SAMPLE_FMT_NONE && avctx->channel_layout;
 +        break;
 +    case AVMEDIA_TYPE_VIDEO:
-+        val = avctx->width && avctx->pix_fmt != PIX_FMT_NONE;
++        val = avctx->width && avctx->pix_fmt != AV_PIX_FMT_NONE;
 +        break;
 +    case AVMEDIA_TYPE_DATA:
-+        if(avctx->codec_id == CODEC_ID_NONE) return 1;
++        if(avctx->codec_id == AV_CODEC_ID_NONE) return 1;
 +    default:
 +        val = 1;
 +        break;
 +    }
-+    return avctx->codec_id != CODEC_ID_NONE && val != 0;
++    return avctx->codec_id != AV_CODEC_ID_NONE && val != 0;
 +}
 +ismd_result_t ismd_ffmpeg_create_video_pipeline(AVCodecContext *ocodec , viddec_struct_t* p_vid_dec , videnc_struct_t* p_vid_enc, const int dtv_smd)
 +{
@@ -3771,7 +3771,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +	av_copy_packet(&packets[index], avpkt);
 +	av_free_packet(avpkt);
 +
-+	return 0;
++	//return 0;
 +}
 +
 +static void syno_heap_bubble_down(AVPacket *avpkt, int index)
