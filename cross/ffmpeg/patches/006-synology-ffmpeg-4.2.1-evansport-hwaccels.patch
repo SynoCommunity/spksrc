@@ -4595,10 +4595,10 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
 +    .init           = mpeg_decode_init_smd,
 +    .close          = mpeg_decode_end,
 +    .decode         = mpeg_decode_frame_smd,
-+    .capabilities   = CODEC_CAP_DELAY,
++    .capabilities   = AV_CODEC_CAP_DELAY,
 +    .flush          = flush,
 +    .max_lowres     = 3,
-+    .profiles       = NULL_IF_CONFIG_SMALL(mpeg2_video_profiles),
++    .profiles       = NULL_IF_CONFIG_SMALL(ff_mpeg2_video_profiles),
 +};
 +#endif
 +
