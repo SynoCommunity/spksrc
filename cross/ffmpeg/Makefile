@@ -73,12 +73,11 @@ DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
-TOOLCHAIN = /usr/local/evansport-pc-linux-gnu
 DEPENDS += cross/ds.evansport
 CONFIGURE_ARGS += --extra-cflags="-DSYNO_EVANSPORT_SMD"
 CONFIGURE_ARGS += --extra-cflags="-fasm"
 CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities -I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user"
-CONFIGURE_ARGS += --extra-ldflags="-Wl,-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities,-rpath-link,$(TOOLCHAIN)/lib,-rpath-link,$(TOOLCHAIN)/lib/intelce-utilities"
+CONFIGURE_ARGS += --extra-ldflags="-Wl,-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities"
 CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-libh264_smd --enable-smd
 
 else
