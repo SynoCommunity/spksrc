@@ -4064,7 +4064,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/libx264.c ./libavcodec/libx264.c
 +			if (ret != pkt_size) {
 +				av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
 +			}
-+			memset(pkt->data + pkt->size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
++			memset(pkt->data + pkt->size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 +		}
 +
 +		if(ret <= 0)
@@ -4409,7 +4409,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/libx264.c ./libavcodec/libx264.c
 +    .init             = X264_init_smd,
 +    .encode2          = X264_frame_smd,
 +    .close            = X264_close,
-+    .capabilities     = CODEC_CAP_DELAY,
++    .capabilities     = AV_CODEC_CAP_DELAY,
 +    .priv_class       = &x264_class_smd,
 +    .defaults         = x264_defaults,
 +    .init_static_data = X264_init_static,
