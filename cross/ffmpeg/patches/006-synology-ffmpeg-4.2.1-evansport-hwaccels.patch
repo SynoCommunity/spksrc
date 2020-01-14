@@ -1594,9 +1594,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
      case AV_CODEC_ID_VC1IMAGE:
      case AV_CODEC_ID_WMV3IMAGE:
      case AV_CODEC_ID_MSS2:
-@@ -136,6 +154,11 @@ av_cold int ff_h263_decode_init(AVCodecC
+@@ -136,9 +154,15 @@ av_cold int ff_h263_decode_init(AVCodecC
              s->ehc_mode = 1;
- 
+
      /* for H.263, we allocate the images after having read the header */
 +#ifdef SYNO_EVANSPORT_SMD
 +    if (avctx->codec->id != AV_CODEC_ID_H263 &&
@@ -1606,6 +1606,10 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
      if (avctx->codec->id != AV_CODEC_ID_H263 &&
          avctx->codec->id != AV_CODEC_ID_H263P &&
          avctx->codec->id != AV_CODEC_ID_MPEG4) {
++#endif
+         avctx->pix_fmt = h263_get_format(avctx);
+         ff_mpv_idct_init(s);
+         if ((ret = ff_mpv_common_init(s)) < 0)
 @@ -152,11 +175,60 @@ av_cold int ff_h263_decode_init(AVCodecC
      return 0;
  }
