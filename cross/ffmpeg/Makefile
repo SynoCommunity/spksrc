@@ -73,7 +73,7 @@ DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
-DEPENDS += cross/ds.evansport
+DEPENDS += cross/ds.evansport cross/json-c
 CONFIGURE_ARGS += --disable-x86asm
 CONFIGURE_ARGS += --extra-cflags="-fasm"
 CONFIGURE_ARGS += --extra-cflags="-std=c99 -pedantic"

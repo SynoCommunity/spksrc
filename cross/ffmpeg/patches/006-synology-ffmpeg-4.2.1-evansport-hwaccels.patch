@@ -4789,7 +4789,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.c ./libavcodec/syno_tra
 +#include <sys/stat.h>
 +#include <sys/types.h>
 +#include <sys/file.h>
-+#include <json.h>
++#include "json-c/json.h"
 +#include "libavutil/log.h"
 +#include "syno_trans_loading.h"
 +
