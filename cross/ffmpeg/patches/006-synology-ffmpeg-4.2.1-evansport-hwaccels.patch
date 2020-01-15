@@ -5317,10 +5317,10 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
 +	.init           = vc1_decode_init_smd,
 +	.close          = ff_vc1_decode_end,
 +	.decode         = vc1_decode_frame_smd,
-+	.capabilities   = CODEC_CAP_DELAY,
++	.capabilities   = AV_CODEC_CAP_DELAY,
 +	.long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 Hardware(SMD) Decoder"),
 +	.pix_fmts       = vc1_hwaccel_pixfmt_list_420,
-+	.profiles       = NULL_IF_CONFIG_SMALL(profiles)
++	.profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
 +};
 +#endif
 +
@@ -5341,9 +5341,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
 +    .init           = vc1_decode_init_smd,
 +    .close          = ff_vc1_decode_end,
 +    .decode         = vc1_decode_frame_smd,
-+    .capabilities   = CODEC_CAP_DELAY,
++    .capabilities   = AV_CODEC_CAP_DELAY,
 +    .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
-+    .profiles       = NULL_IF_CONFIG_SMALL(profiles)
++    .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
 +};
 +#endif
 +
