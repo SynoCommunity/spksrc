@@ -1473,9 +1473,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/encode.c ./libavcodec/encode.c
  /**
   * Pad last frame with silence.
   */
-diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
---- ../ffmpeg-4.2.1/libavcodec/h263dec.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavcodec/h263dec.c	2020-01-04 21:58:29.375193797 -0500
+diff -uprN ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c ./libavcodec/h263dec.c
+--- ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c	2019-08-05 16:52:21.000000000 -0400
++++ ./libavcodec/h263dec.c	2020-01-17 11:01:56.496391874 -0500
 @@ -45,6 +45,16 @@
  #include "thread.h"
  #include "wmv2.h"
@@ -1517,7 +1517,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
      case AV_CODEC_ID_MSS2:
 @@ -136,9 +154,15 @@ av_cold int ff_h263_decode_init(AVCodecC
              s->ehc_mode = 1;
-
+ 
      /* for H.263, we allocate the images after having read the header */
 +#ifdef SYNO_EVANSPORT_SMD
 +    if (avctx->codec->id != AV_CODEC_ID_H263 &&
@@ -1531,7 +1531,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
          avctx->pix_fmt = h263_get_format(avctx);
          ff_mpv_idct_init(s);
          if ((ret = ff_mpv_common_init(s)) < 0)
-@@ -152,11 +175,60 @@ av_cold int ff_h263_decode_init(AVCodecC
+@@ -152,11 +176,60 @@ av_cold int ff_h263_decode_init(AVCodecC
      return 0;
  }
  
@@ -1592,7 +1592,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263dec.c ./libavcodec/h263dec.c
      return 0;
  }
  
-@@ -726,6 +798,80 @@ frame_end:
+@@ -726,6 +799,80 @@ frame_end:
          return get_consumed_bytes(s, buf_size);
  }
  
@@ -5306,29 +5306,6 @@ diff -uprN ../ffmpeg-4.2.1/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
              if (is_dvb_subtitle) {
                  /* First two fields of DVB subtitles PES data:
                   * data_identifier: for DVB subtitle streams shall be coded with the value 0x20
-diff -uprN ../ffmpeg-4.2.1/libavformat/smoothstreamingenc.c.rej ./libavformat/smoothstreamingenc.c.rej
---- ../ffmpeg-4.2.1/libavformat/smoothstreamingenc.c.rej	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavformat/smoothstreamingenc.c.rej	1969-12-31 19:00:00.000000000 -0500
-@@ -1,19 +0,0 @@
----- libavformat/smoothstreamingenc.c	2018-04-13 19:34:28.000000000 -0400
--+++ libavformat/smoothstreamingenc.c	2019-04-11 02:26:08.000000000 -0400
--@@ -565,7 +589,15 @@ static int ism_flush(AVFormatContext *s,
--         size = os->tail_pos - os->cur_start_pos;
--         if ((ret = parse_fragment(s, filename, &start_ts, &duration, &moof_size, size)) < 0)
--             break;
---        snprintf(header_filename, sizeof(header_filename), "%s/FragmentInfo(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
--+#ifdef SYNO_SMOOTH_STREAMING
--+		if (0 != c->fragment_length) {
--+			start_ts = (int64_t)((int64_t)os->nb_fragments * (int64_t)c->fragment_length * (int64_t)10000000);
--+		}
--+		if (0 != c->seek_time) {
--+			start_ts += (int64_t)((int64_t)c->seek_time * (int64_t)10000000);
--+		}
--+#endif
--+		snprintf(header_filename, sizeof(header_filename), "%s/FragmentInfo(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
--         snprintf(target_filename, sizeof(target_filename), "%s/Fragments(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
--         copy_moof(s, filename, header_filename, moof_size);
--         ret = ff_rename(filename, target_filename, s);
 diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_internal.h
 --- ../ffmpeg-4.2.1/libswscale/swscale_internal.h	2020-01-04 21:07:34.000000000 -0500
 +++ ./libswscale/swscale_internal.h	2020-01-04 21:09:15.871386957 -0500
@@ -5353,9 +5330,9 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
  void ff_sws_init_swscale_ppc(SwsContext *c);
  void ff_sws_init_swscale_vsx(SwsContext *c);
  void ff_sws_init_swscale_x86(SwsContext *c);
-diff -uprN ../ffmpeg-4.2.1-patch1-5/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.1-patch1-5/synoconfig.h	2020-01-04 21:07:34.000000000 -0500
-+++ ./synoconfig.h	2020-01-17 10:02:54.626620086 -0500
+diff -uprN ../ffmpeg-4.2.1-patch059/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.1-patch059/synoconfig.h	2020-01-17 10:45:12.000000000 -0500
++++ ./synoconfig.h	2020-01-17 11:01:59.348424323 -0500
 @@ -52,6 +52,11 @@
   */
  #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
@@ -5368,7 +5345,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/synoconfig.h ./synoconfig.h
  /* Add ffmpeg option for HLS.
   * -hls_seek_time:
   *  Let output fragment ts start with this seek time
-@@ -97,6 +102,45 @@
+@@ -91,6 +96,45 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  
@@ -5414,7 +5391,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/synoconfig.h ./synoconfig.h
  /* Add skip unknown track config to support dtv streaming with unknown codec track.
   * add flag "-dtv_skip_unknown" to skip unknown tracks.
   * See Video Station #2470
-@@ -113,6 +157,15 @@
+@@ -107,6 +151,15 @@
  #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
  #endif
  
