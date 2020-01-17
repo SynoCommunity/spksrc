@@ -13,7 +13,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update4/libavcodec/srtenc.c ./libavcodec/srt
  static void srt_cancel_overrides_cb(void *priv, const char *style)
  {
      srt_stack_push_pop(priv, 0, 1);
-+ #ifndef SYNO_FILTER_SRT_TAGS
++#ifndef SYNO_FILTER_SRT_TAGS
      srt_style_apply(priv, style);
 +#endif
  }
