@@ -3,7 +3,7 @@ TODO: Isolate into individual patches
 +#define SYNO_SMOOTH_STREAMING                                 -> DONE - 049
 +#define SYNO_FIX_MP4_REMUX_H264PARSER                         -> DONE - 048
 +#define SYNO_FILTER_SRT_TAGS                                  -> DONE - 047
-+#define SYNO_SKIP_FLAC_PARSE_PICTURE
++#define SYNO_SKIP_FLAC_PARSE_PICTURE                          -> DONE - 046
 +#define SYNO_CODEC_PATENT_G1
 +#define SYNO_SKIP_DISABLED_AUDIO_STREAM
 +#define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
