@@ -7063,32 +7063,6 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/h264dec.c ./libavcod
      ret = h264_init_context(avctx, h);
      if (ret < 0)
          return ret;
-diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/h264_parser.c ./libavcodec/h264_parser.c
---- ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/h264_parser.c	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/h264_parser.c	2019-10-15 22:12:46.404181891 -0400
-@@ -47,6 +47,8 @@
- #include "mpegutils.h"
- #include "parser.h"
- 
-+#include "synoconfig.h"
-+
- typedef struct H264ParseContext {
-     ParseContext pc;
-     H264ParamSets ps;
-@@ -108,8 +110,13 @@ static int h264_find_frame_end(H264Parse
-                 state >>= 1;           // 2->1, 1->0, 0->0
-         } else if (state <= 5) {
-             int nalu_type = buf[i] & 0x1F;
-+#ifdef SYNO_FIX_MP4_REMUX_H264PARSER
-+            if (nalu_type == H264_NAL_SEI || nalu_type == H264_NAL_SPS ||
-+                nalu_type == H264_NAL_AUD) {
-+#else
-             if (nalu_type == H264_NAL_SEI || nalu_type == H264_NAL_SPS ||
-                 nalu_type == H264_NAL_PPS || nalu_type == H264_NAL_AUD) {
-+#endif
-                 if (pc->frame_start_found) {
-                     i++;
-                     goto found;
 diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/hevcdec.c ./libavcodec/hevcdec.c
 --- ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/hevcdec.c	2019-09-06 18:18:26.000000000 -0400
 +++ ./libavcodec/hevcdec.c	2019-10-15 22:12:46.408181922 -0400
@@ -9797,17 +9771,11 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/SynoBuildConf/install-virtual-v
 +fi
 diff -uprN ../ffmpeg-4.2.1-patch1-4/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch1-4/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./synoconfig.h	2020-01-17 07:33:49.302167409 -0500
-@@ -0,0 +1,122 @@
++++ ./synoconfig.h	2020-01-17 09:15:23.724603559 -0500
+@@ -0,0 +1,110 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE
 +#endif
-+
-+/* Fixed h264_parser error in special MP4 remux
-+ * some MP4 file could parser error with remain PPS information
-+ * See Video Station #944
-+ */
-+#define SYNO_FIX_MP4_REMUX_H264PARSER
 +
 +/* filter out some tag that not needed
 + * those tags producted at *.ass convert *.srt
@@ -9854,12 +9822,6 @@ diff -uprN ../ffmpeg-4.2.1-patch1-4/synoconfig.h ./synoconfig.h
 + * See Surveillance bug 1151/1155
 + */
 +#define SYNO_FIX_QORIQ_CORE_DUMP
-+
-+/* Fixed h264_parser error in special MP4 remux
-+ * some MP4 file could parser error with remain PPS information
-+ * See Video Station #944
-+ */
-+#define SYNO_FIX_MP4_REMUX_H264PARSER
 +
 +/* Rule out basename logic in filename setting
 + * Set Name length to 64 rather than fix strlen(%d.ts)
