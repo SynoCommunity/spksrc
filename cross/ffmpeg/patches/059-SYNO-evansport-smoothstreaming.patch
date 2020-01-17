@@ -1,6 +1,6 @@
-diff -uprN ../ffmpeg-4.2.1-patch1-5-Update1/libavformat/smoothstreamingenc.c ./libavformat/smoothstreamingenc.c
---- ../ffmpeg-4.2.1-patch1-5-Update1/libavformat/smoothstreamingenc.c	2020-01-17 07:06:02.771704757 -0500
-+++ ./libavformat/smoothstreamingenc.c	2020-01-04 21:07:34.000000000 -0500
+diff -uprN ../ffmpeg-4.2.1-patch049/libavformat/smoothstreamingenc.c ./libavformat/smoothstreamingenc.c
+--- ../ffmpeg-4.2.1-patch049/libavformat/smoothstreamingenc.c	2020-01-17 10:45:12.000000000 -0500
++++ ./libavformat/smoothstreamingenc.c	2020-01-17 10:46:16.613713720 -0500
 @@ -83,6 +83,10 @@ typedef struct SmoothStreamingContext {
  	char *fragment_url;
  	int fragment_length;
@@ -22,7 +22,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update1/libavformat/smoothstreamingenc.c ./l
  fail:
      if (ret)
          ism_free(s);
-@@ -624,6 +631,34 @@ static int ism_write_packet(AVFormatCont
+@@ -632,6 +639,34 @@ static int ism_write_packet(AVFormatCont
      int64_t end_dts = (c->nb_fragments + 1) * (int64_t) c->min_frag_duration;
      int ret;
  
@@ -57,7 +57,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update1/libavformat/smoothstreamingenc.c ./l
      if (st->first_dts == AV_NOPTS_VALUE)
          st->first_dts = pkt->dts;
  
-@@ -669,6 +704,9 @@ static const AVOption options[] = {
+@@ -677,6 +712,9 @@ static const AVOption options[] = {
  	{ "fragment_url", "set fragment url in manifest", OFFSET(fragment_url), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, E },
      { "fragment_length", "let file name of output fragment mp4 with the duration (in seconds)", OFFSET(fragment_length), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, E },
      { "seek_time", "add seek time to fragment file (in seconds)", OFFSET(seek_time), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, E },
