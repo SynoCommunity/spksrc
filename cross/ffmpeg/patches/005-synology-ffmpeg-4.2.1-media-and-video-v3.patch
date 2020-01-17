@@ -7492,7 +7492,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/vaapi_encode.c ./lib
  
  static const char * const picture_type_name[] = { "IDR", "I", "P", "B" };
  
-@@ -2089,6 +2091,12 @@ av_cold int ff_vaapi_encode_init(AVCodec
+@@ -2111,6 +2113,12 @@ av_cold int ff_vaapi_encode_init(AVCodec
      VAStatus vas;
      int err;
  
