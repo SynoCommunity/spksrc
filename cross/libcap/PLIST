@@ -1,7 +1,3 @@
 lnk:lib/libcap.so
 lnk:lib/libcap.so.2
 lib:lib/libcap.so.2.31
-bin:sbin/capsh
-bin:sbin/getcap
-bin:sbin/getpcaps
-bin:sbin/setcap
