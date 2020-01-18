@@ -2,11 +2,11 @@ TODO:
 - Isolate into individual patches
 - Review code of SYNO_EVANSPORT_DTV_SMD_AVSYNC to use ifdef (currently forced with // comments)
 
-#define SYNO_SMOOTH_STREAMING                                  -> DONE - 049
-#define SYNO_FIX_MP4_REMUX_H264PARSER                          -> DONE - 048
-#define SYNO_FILTER_SRT_TAGS                                   -> DONE - 047
-#define SYNO_SKIP_FLAC_PARSE_PICTURE                           -> DONE - 046
-#define SYNO_SKIP_DISABLED_AUDIO_STREAM                        -> BLOCKED BY SYNO_EVANSPORT_AUTO_HW_DECODER
+#define SYNO_SMOOTH_STREAMING                                   -> DONE - 049
+#define SYNO_FIX_MP4_REMUX_H264PARSER                           -> DONE - 048
+#define SYNO_FILTER_SRT_TAGS                                    -> DONE - 047
+#define SYNO_SKIP_FLAC_PARSE_PICTURE                            -> DONE - 046
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> BLOCKED BY SYNO_EVANSPORT_AUTO_HW_DECODER
 #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
 #define SYNO_VIDEOSTATION_HLS_SEEK_TIME
 #define SYNO_FIX_QORIQ_CORE_DUMP
@@ -14,15 +14,15 @@ TODO:
 #define SYNO_HLS_COSTUMIZED_TS_NAME
 #define SYNO_ALPINE_NEON_LIBSWSCALE
 #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
-#define SYNO_DTV_SKIP_UNKNOWN_TRACK                              -> NEXT -> after SYNO_EVANSPORT_DTV_SMD_AVSYNC
-#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                      -> NEXT -> after SYNO_EVANSPORT_DTV_SMD_AVSYNC
-#define SYNO_DTV_SKIP_TELETEXT
+#define SYNO_DTV_SKIP_UNKNOWN_TRACK                             -> NEXT -> after SYNO_EVANSPORT_*
+#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                     -> NEXT -> after SYNO_EVANSPORT_*
+#define SYNO_DTV_SKIP_TELETEXT                                  -> NEXT -> after SYNO_EVANSPORT_*
 #define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX
 #define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME
-#ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE      -> DONE - 089
-#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC                             -> TODO - 0xx ->> BLOCKED BY SYNO_EVANSPORT_AUTO_HW_DECODER & SYNO_EVANSPORT_HANDBRAKE_MP4
-#define SYNO_EVANSPORT_HANDBRAKE_MP4                             -> DONE - 088
-#ifdef SYNO_EVANSPORT_FLV_EXTRADATA                              -> TODO
-#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER                            -> DONE - 099
-#if defined(SYNO_EVANSPORT_SMD)                                  -> NEXT+++ >> BLOCKED BY SYNO_EVANSPORT_AUTO_HW_DECODER
+#ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE     -> DONE - 089
+#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC                            -> DONE - 087 -> FIX TODO: ifdef instead of //
+#define SYNO_EVANSPORT_HANDBRAKE_MP4                            -> DONE - 088
+#ifdef SYNO_EVANSPORT_FLV_EXTRADATA                             -> TODO
+#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER                           -> DONE - 099
+#if defined(SYNO_EVANSPORT_SMD)                                 -> NEXT+++ >> BLOCKED BY SYNO_EVANSPORT_AUTO_HW_DECODER
 #define SYNO_CODEC_PATENT_G1
