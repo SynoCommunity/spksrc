@@ -67,3 +67,21 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavformat/smoothstreamingenc.c ./libavform
  #endif
       { NULL },
  };
+diff -uprN ../ffmpeg-4.2.1-patch060-streaming-orig/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.1-patch060-streaming-orig/synoconfig.h	2020-01-18 09:16:26.413624358 -0500
++++ ./synoconfig.h	2020-01-18 09:15:29.473055414 -0500
+@@ -96,6 +96,14 @@
+ #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
+ #endif
+ 
++/* smooth streaming enable hardware transcoding on Evansport.
++ * fixed video not sync with subtitile.
++ * See Video Station #1244
++ */
++#if defined(SYNO_EVANSPORT_SMD)
++#define SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE
++#endif
++
+ /* Fixed DTV recoded file or DTV streaming A/V issue on Evansport.
+  * add flag "-dtv_smd" is used other way to calculate timestamp.
+  * in hardware pipeline mode.
