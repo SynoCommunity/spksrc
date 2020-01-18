@@ -10,8 +10,6 @@ SPK_DEPENDS = "redis"
 # toolchains of DSM <=5.2 have outdated compiler
 REQUIRED_DSM = 6.1
 
-BETA = 1
-
 MAINTAINER = hgy59
 DESCRIPTION = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.
 CHANGELOG = Initial synology package release.
@@ -24,7 +22,7 @@ LICENSE = GNU GPLv3
 
 # 'auto' (reserved value) grabs SPK_NAME
 SERVICE_USER   = auto
-SERVICE_SETUP  = src/service-setup.sh
+SSS_SCRIPT     = src/start-stop-status.sh
 STARTABLE      = yes
 SERVICE_PORT   = 3000
 
