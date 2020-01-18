@@ -1,0 +1,1779 @@
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsv.c libavcodec/qsv.c
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsv.c	2019-08-05 16:52:21.000000000 -0400
++++ libavcodec/qsv.c	2020-01-03 10:09:13.093084667 -0500
+@@ -325,7 +325,41 @@ load_plugin_fail:
+ 
+ }
+ 
+-int ff_qsv_init_internal_session(AVCodecContext *avctx, mfxSession *session,
++//This code is only required for Linux since a display handle is required.
++//For Windows the session is complete and ready to use.
++
++#ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
++static int ff_qsv_set_display_handle(AVCodecContext *avctx, QSVSession *qs)
++{
++    AVDictionary *child_device_opts = NULL;
++    AVVAAPIDeviceContext *hwctx;
++    int ret;
++
++    av_dict_set(&child_device_opts, "kernel_driver", "i915", 0);
++    av_dict_set(&child_device_opts, "driver",        "iHD",  0);
++
++    ret = av_hwdevice_ctx_create(&qs->va_device_ref, AV_HWDEVICE_TYPE_VAAPI, NULL, child_device_opts, 0);
++    if (ret < 0) {
++        av_log(avctx, AV_LOG_ERROR, "Failed to create a VAAPI device.\n");
++        return ret;
++    } else {
++        qs->va_device_ctx = (AVHWDeviceContext*)qs->va_device_ref->data;
++        hwctx = qs->va_device_ctx->hwctx;
++
++        ret = MFXVideoCORE_SetHandle(qs->session,
++                (mfxHandleType)MFX_HANDLE_VA_DISPLAY, (mfxHDL)hwctx->display);
++        if (ret < 0) {
++            return ff_qsv_print_error(avctx, ret, "Error during set display handle\n");
++        }
++    }
++
++    av_dict_free(&child_device_opts);
++
++    return 0;
++}
++#endif //AVCODEC_QSV_LINUX_SESSION_HANDLE
++
++int ff_qsv_init_internal_session(AVCodecContext *avctx, QSVSession *qs,
+                                  const char *load_plugins)
+ {
+     mfxIMPL impl   = MFX_IMPL_AUTO_ANY;
+@@ -334,18 +368,24 @@ int ff_qsv_init_internal_session(AVCodec
+     const char *desc;
+     int ret;
+ 
+-    ret = MFXInit(impl, &ver, session);
++    ret = MFXInit(impl, &ver, &qs->session);
+     if (ret < 0)
+         return ff_qsv_print_error(avctx, ret,
+                                   "Error initializing an internal MFX session");
+ 
+-    ret = qsv_load_plugins(*session, load_plugins, avctx);
++#ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
++    ret = ff_qsv_set_display_handle(avctx, qs);
++    if (ret < 0)
++        return ret;
++#endif
++
++    ret = qsv_load_plugins(qs->session, load_plugins, avctx);
+     if (ret < 0) {
+         av_log(avctx, AV_LOG_ERROR, "Error loading plugins\n");
+         return ret;
+     }
+ 
+-    MFXQueryIMPL(*session, &impl);
++    MFXQueryIMPL(qs->session, &impl);
+ 
+     switch (MFX_IMPL_BASETYPE(impl)) {
+     case MFX_IMPL_SOFTWARE:
+@@ -735,3 +775,17 @@ int ff_qsv_init_session_frames(AVCodecCo
+     *psession = session;
+     return 0;
+ }
++
++int ff_qsv_close_internal_session(QSVSession *qs)
++{
++    if (qs->session) {
++        MFXClose(qs->session);
++        qs->session = NULL;
++    }
++#ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
++    if (qs->va_device_ctx) {
++        qs->va_device_ctx->free(qs->va_device_ctx);
++    }
++#endif
++    return 0;
++}
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsv.c.orig libavcodec/qsv.c.orig
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsv.c.orig	1969-12-31 19:00:00.000000000 -0500
++++ libavcodec/qsv.c.orig	2019-08-05 16:52:21.000000000 -0400
+@@ -0,0 +1,737 @@
++/*
++ * Intel MediaSDK QSV encoder/decoder shared code
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include <mfx/mfxvideo.h>
++#include <mfx/mfxplugin.h>
++#include <mfx/mfxjpeg.h>
++
++#include <stdio.h>
++#include <string.h>
++
++#include "libavutil/avstring.h"
++#include "libavutil/common.h"
++#include "libavutil/error.h"
++#include "libavutil/hwcontext.h"
++#include "libavutil/hwcontext_qsv.h"
++#include "libavutil/imgutils.h"
++#include "libavutil/avassert.h"
++
++#include "avcodec.h"
++#include "qsv_internal.h"
++
++#if QSV_VERSION_ATLEAST(1, 12)
++#include "mfx/mfxvp8.h"
++#endif
++
++int ff_qsv_codec_id_to_mfx(enum AVCodecID codec_id)
++{
++    switch (codec_id) {
++    case AV_CODEC_ID_H264:
++        return MFX_CODEC_AVC;
++#if QSV_VERSION_ATLEAST(1, 8)
++    case AV_CODEC_ID_HEVC:
++        return MFX_CODEC_HEVC;
++#endif
++    case AV_CODEC_ID_MPEG1VIDEO:
++    case AV_CODEC_ID_MPEG2VIDEO:
++        return MFX_CODEC_MPEG2;
++    case AV_CODEC_ID_VC1:
++        return MFX_CODEC_VC1;
++#if QSV_VERSION_ATLEAST(1, 12)
++    case AV_CODEC_ID_VP8:
++        return MFX_CODEC_VP8;
++#endif
++    case AV_CODEC_ID_MJPEG:
++        return MFX_CODEC_JPEG;
++    default:
++        break;
++    }
++
++    return AVERROR(ENOSYS);
++}
++
++
++static const struct {
++    enum AVCodecID codec_id;
++    int codec_profile;
++    int mfx_profile;
++} qsv_profile_map[] = {
++#define MAP(c, p, v) { AV_CODEC_ID_ ## c, FF_PROFILE_ ## p, MFX_PROFILE_ ## v }
++    MAP(MPEG2VIDEO,  MPEG2_SIMPLE,    MPEG2_SIMPLE ),
++    MAP(MPEG2VIDEO,  MPEG2_MAIN,      MPEG2_MAIN   ),
++    MAP(MPEG2VIDEO,  MPEG2_HIGH,      MPEG2_HIGH   ),
++
++    MAP(H264,        H264_BASELINE,   AVC_BASELINE ),
++    MAP(H264,        H264_CONSTRAINED_BASELINE, AVC_BASELINE),
++#if QSV_VERSION_ATLEAST(1, 3)
++    MAP(H264,        H264_EXTENDED,   AVC_EXTENDED ),
++#endif
++    MAP(H264,        H264_MAIN,       AVC_MAIN     ),
++    MAP(H264,        H264_HIGH,       AVC_HIGH     ),
++    MAP(H264,        H264_HIGH_422,   AVC_HIGH_422 ),
++
++#if QSV_VERSION_ATLEAST(1, 8)
++    MAP(HEVC,        HEVC_MAIN,       HEVC_MAIN    ),
++    MAP(HEVC,        HEVC_MAIN_10,    HEVC_MAIN10  ),
++    MAP(HEVC,        HEVC_MAIN_STILL_PICTURE,    HEVC_MAINSP ),
++#endif
++#if QSV_VERSION_ATLEAST(1, 16)
++    MAP(HEVC,        HEVC_REXT,       HEVC_REXT    ),
++#endif
++
++    MAP(VC1,         VC1_SIMPLE,      VC1_SIMPLE   ),
++    MAP(VC1,         VC1_MAIN,        VC1_MAIN     ),
++    MAP(VC1,         VC1_COMPLEX,     VC1_ADVANCED ),
++    MAP(VC1,         VC1_ADVANCED,    VC1_ADVANCED ),
++#undef MAP
++};
++
++int ff_qsv_profile_to_mfx(enum AVCodecID codec_id, int profile)
++{
++    int i;
++    if (profile == FF_PROFILE_UNKNOWN)
++        return MFX_PROFILE_UNKNOWN;
++
++    for (i = 0; i < FF_ARRAY_ELEMS(qsv_profile_map); i++) {
++        if (qsv_profile_map[i].codec_id != codec_id)
++            continue;
++        if (qsv_profile_map[i].codec_profile == profile)
++            return qsv_profile_map[i].mfx_profile;
++    }
++
++    return MFX_PROFILE_UNKNOWN;
++}
++
++int ff_qsv_level_to_mfx(enum AVCodecID codec_id, int level)
++{
++    if (level == FF_LEVEL_UNKNOWN)
++        return MFX_LEVEL_UNKNOWN;
++
++    switch (codec_id) {
++    case AV_CODEC_ID_HEVC:
++        return level / 3;
++    default:
++        return level;
++    }
++}
++
++static const struct {
++    mfxStatus   mfxerr;
++    int         averr;
++    const char *desc;
++} qsv_errors[] = {
++    { MFX_ERR_NONE,                     0,               "success"                              },
++    { MFX_ERR_UNKNOWN,                  AVERROR_UNKNOWN, "unknown error"                        },
++    { MFX_ERR_NULL_PTR,                 AVERROR(EINVAL), "NULL pointer"                         },
++    { MFX_ERR_UNSUPPORTED,              AVERROR(ENOSYS), "unsupported"                          },
++    { MFX_ERR_MEMORY_ALLOC,             AVERROR(ENOMEM), "failed to allocate memory"            },
++    { MFX_ERR_NOT_ENOUGH_BUFFER,        AVERROR(ENOMEM), "insufficient input/output buffer"     },
++    { MFX_ERR_INVALID_HANDLE,           AVERROR(EINVAL), "invalid handle"                       },
++    { MFX_ERR_LOCK_MEMORY,              AVERROR(EIO),    "failed to lock the memory block"      },
++    { MFX_ERR_NOT_INITIALIZED,          AVERROR_BUG,     "not initialized"                      },
++    { MFX_ERR_NOT_FOUND,                AVERROR(ENOSYS), "specified object was not found"       },
++    /* the following 3 errors should always be handled explicitly, so those "mappings"
++     * are for completeness only */
++    { MFX_ERR_MORE_DATA,                AVERROR_UNKNOWN, "expect more data at input"            },
++    { MFX_ERR_MORE_SURFACE,             AVERROR_UNKNOWN, "expect more surface at output"        },
++    { MFX_ERR_MORE_BITSTREAM,           AVERROR_UNKNOWN, "expect more bitstream at output"      },
++    { MFX_ERR_ABORTED,                  AVERROR_UNKNOWN, "operation aborted"                    },
++    { MFX_ERR_DEVICE_LOST,              AVERROR(EIO),    "device lost"                          },
++    { MFX_ERR_INCOMPATIBLE_VIDEO_PARAM, AVERROR(EINVAL), "incompatible video parameters"        },
++    { MFX_ERR_INVALID_VIDEO_PARAM,      AVERROR(EINVAL), "invalid video parameters"             },
++    { MFX_ERR_UNDEFINED_BEHAVIOR,       AVERROR_BUG,     "undefined behavior"                   },
++    { MFX_ERR_DEVICE_FAILED,            AVERROR(EIO),    "device failed"                        },
++    { MFX_ERR_INCOMPATIBLE_AUDIO_PARAM, AVERROR(EINVAL), "incompatible audio parameters"        },
++    { MFX_ERR_INVALID_AUDIO_PARAM,      AVERROR(EINVAL), "invalid audio parameters"             },
++
++    { MFX_WRN_IN_EXECUTION,             0,               "operation in execution"               },
++    { MFX_WRN_DEVICE_BUSY,              0,               "device busy"                          },
++    { MFX_WRN_VIDEO_PARAM_CHANGED,      0,               "video parameters changed"             },
++    { MFX_WRN_PARTIAL_ACCELERATION,     0,               "partial acceleration"                 },
++    { MFX_WRN_INCOMPATIBLE_VIDEO_PARAM, 0,               "incompatible video parameters"        },
++    { MFX_WRN_VALUE_NOT_CHANGED,        0,               "value is saturated"                   },
++    { MFX_WRN_OUT_OF_RANGE,             0,               "value out of range"                   },
++    { MFX_WRN_FILTER_SKIPPED,           0,               "filter skipped"                       },
++    { MFX_WRN_INCOMPATIBLE_AUDIO_PARAM, 0,               "incompatible audio parameters"        },
++};
++
++int ff_qsv_map_error(mfxStatus mfx_err, const char **desc)
++{
++    int i;
++    for (i = 0; i < FF_ARRAY_ELEMS(qsv_errors); i++) {
++        if (qsv_errors[i].mfxerr == mfx_err) {
++            if (desc)
++                *desc = qsv_errors[i].desc;
++            return qsv_errors[i].averr;
++        }
++    }
++    if (desc)
++        *desc = "unknown error";
++    return AVERROR_UNKNOWN;
++}
++
++int ff_qsv_print_error(void *log_ctx, mfxStatus err,
++                       const char *error_string)
++{
++    const char *desc;
++    int ret;
++    ret = ff_qsv_map_error(err, &desc);
++    av_log(log_ctx, AV_LOG_ERROR, "%s: %s (%d)\n", error_string, desc, err);
++    return ret;
++}
++
++int ff_qsv_print_warning(void *log_ctx, mfxStatus err,
++                         const char *warning_string)
++{
++    const char *desc;
++    int ret;
++    ret = ff_qsv_map_error(err, &desc);
++    av_log(log_ctx, AV_LOG_WARNING, "%s: %s (%d)\n", warning_string, desc, err);
++    return ret;
++}
++
++static enum AVPixelFormat qsv_map_fourcc(uint32_t fourcc)
++{
++    switch (fourcc) {
++    case MFX_FOURCC_NV12: return AV_PIX_FMT_NV12;
++    case MFX_FOURCC_P010: return AV_PIX_FMT_P010;
++    case MFX_FOURCC_P8:   return AV_PIX_FMT_PAL8;
++    }
++    return AV_PIX_FMT_NONE;
++}
++
++int ff_qsv_map_pixfmt(enum AVPixelFormat format, uint32_t *fourcc)
++{
++    switch (format) {
++    case AV_PIX_FMT_YUV420P:
++    case AV_PIX_FMT_YUVJ420P:
++    case AV_PIX_FMT_NV12:
++        *fourcc = MFX_FOURCC_NV12;
++        return AV_PIX_FMT_NV12;
++    case AV_PIX_FMT_YUV420P10:
++    case AV_PIX_FMT_P010:
++        *fourcc = MFX_FOURCC_P010;
++        return AV_PIX_FMT_P010;
++    default:
++        return AVERROR(ENOSYS);
++    }
++}
++
++int ff_qsv_find_surface_idx(QSVFramesContext *ctx, QSVFrame *frame)
++{
++    int i;
++    for (i = 0; i < ctx->nb_mids; i++) {
++        QSVMid *mid = &ctx->mids[i];
++        if (mid->handle == frame->surface.Data.MemId)
++            return i;
++    }
++    return AVERROR_BUG;
++}
++
++enum AVPictureType ff_qsv_map_pictype(int mfx_pic_type)
++{
++    enum AVPictureType type;
++    switch (mfx_pic_type & 0x7) {
++    case MFX_FRAMETYPE_I:
++        if (mfx_pic_type & MFX_FRAMETYPE_S)
++            type = AV_PICTURE_TYPE_SI;
++        else
++            type = AV_PICTURE_TYPE_I;
++        break;
++    case MFX_FRAMETYPE_B:
++        type = AV_PICTURE_TYPE_B;
++        break;
++    case MFX_FRAMETYPE_P:
++        if (mfx_pic_type & MFX_FRAMETYPE_S)
++            type = AV_PICTURE_TYPE_SP;
++        else
++            type = AV_PICTURE_TYPE_P;
++        break;
++    case MFX_FRAMETYPE_UNKNOWN:
++        type = AV_PICTURE_TYPE_NONE;
++        break;
++    default:
++        av_assert0(0);
++    }
++
++    return type;
++}
++
++static int qsv_load_plugins(mfxSession session, const char *load_plugins,
++                            void *logctx)
++{
++    if (!load_plugins || !*load_plugins)
++        return 0;
++
++    while (*load_plugins) {
++        mfxPluginUID uid;
++        mfxStatus ret;
++        int i, err = 0;
++
++        char *plugin = av_get_token(&load_plugins, ":");
++        if (!plugin)
++            return AVERROR(ENOMEM);
++        if (strlen(plugin) != 2 * sizeof(uid.Data)) {
++            av_log(logctx, AV_LOG_ERROR, "Invalid plugin UID length\n");
++            err = AVERROR(EINVAL);
++            goto load_plugin_fail;
++        }
++
++        for (i = 0; i < sizeof(uid.Data); i++) {
++            err = sscanf(plugin + 2 * i, "%2hhx", uid.Data + i);
++            if (err != 1) {
++                av_log(logctx, AV_LOG_ERROR, "Invalid plugin UID\n");
++                err = AVERROR(EINVAL);
++                goto load_plugin_fail;
++            }
++
++        }
++
++        ret = MFXVideoUSER_Load(session, &uid, 1);
++        if (ret < 0) {
++            char errorbuf[128];
++            snprintf(errorbuf, sizeof(errorbuf),
++                     "Could not load the requested plugin '%s'", plugin);
++            err = ff_qsv_print_error(logctx, ret, errorbuf);
++            goto load_plugin_fail;
++        }
++
++        if (*load_plugins)
++            load_plugins++;
++load_plugin_fail:
++        av_freep(&plugin);
++        if (err < 0)
++            return err;
++    }
++
++    return 0;
++
++}
++
++int ff_qsv_init_internal_session(AVCodecContext *avctx, mfxSession *session,
++                                 const char *load_plugins)
++{
++    mfxIMPL impl   = MFX_IMPL_AUTO_ANY;
++    mfxVersion ver = { { QSV_VERSION_MINOR, QSV_VERSION_MAJOR } };
++
++    const char *desc;
++    int ret;
++
++    ret = MFXInit(impl, &ver, session);
++    if (ret < 0)
++        return ff_qsv_print_error(avctx, ret,
++                                  "Error initializing an internal MFX session");
++
++    ret = qsv_load_plugins(*session, load_plugins, avctx);
++    if (ret < 0) {
++        av_log(avctx, AV_LOG_ERROR, "Error loading plugins\n");
++        return ret;
++    }
++
++    MFXQueryIMPL(*session, &impl);
++
++    switch (MFX_IMPL_BASETYPE(impl)) {
++    case MFX_IMPL_SOFTWARE:
++        desc = "software";
++        break;
++    case MFX_IMPL_HARDWARE:
++    case MFX_IMPL_HARDWARE2:
++    case MFX_IMPL_HARDWARE3:
++    case MFX_IMPL_HARDWARE4:
++        desc = "hardware accelerated";
++        break;
++    default:
++        desc = "unknown";
++    }
++
++    av_log(avctx, AV_LOG_VERBOSE,
++           "Initialized an internal MFX session using %s implementation\n",
++           desc);
++
++    return 0;
++}
++
++static void mids_buf_free(void *opaque, uint8_t *data)
++{
++    AVBufferRef *hw_frames_ref = opaque;
++    av_buffer_unref(&hw_frames_ref);
++    av_freep(&data);
++}
++
++static AVBufferRef *qsv_create_mids(AVBufferRef *hw_frames_ref)
++{
++    AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)hw_frames_ref->data;
++    AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
++    int                  nb_surfaces = frames_hwctx->nb_surfaces;
++
++    AVBufferRef *mids_buf, *hw_frames_ref1;
++    QSVMid *mids;
++    int i;
++
++    hw_frames_ref1 = av_buffer_ref(hw_frames_ref);
++    if (!hw_frames_ref1)
++        return NULL;
++
++    mids = av_mallocz_array(nb_surfaces, sizeof(*mids));
++    if (!mids) {
++        av_buffer_unref(&hw_frames_ref1);
++        return NULL;
++    }
++
++    mids_buf = av_buffer_create((uint8_t*)mids, nb_surfaces * sizeof(*mids),
++                                mids_buf_free, hw_frames_ref1, 0);
++    if (!mids_buf) {
++        av_buffer_unref(&hw_frames_ref1);
++        av_freep(&mids);
++        return NULL;
++    }
++
++    for (i = 0; i < nb_surfaces; i++) {
++        QSVMid *mid = &mids[i];
++        mid->handle        = frames_hwctx->surfaces[i].Data.MemId;
++        mid->hw_frames_ref = hw_frames_ref1;
++    }
++
++    return mids_buf;
++}
++
++static int qsv_setup_mids(mfxFrameAllocResponse *resp, AVBufferRef *hw_frames_ref,
++                          AVBufferRef *mids_buf)
++{
++    AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)hw_frames_ref->data;
++    AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
++    QSVMid                     *mids = (QSVMid*)mids_buf->data;
++    int                  nb_surfaces = frames_hwctx->nb_surfaces;
++    int i;
++
++    // the allocated size of the array is two larger than the number of
++    // surfaces, we store the references to the frames context and the
++    // QSVMid array there
++    resp->mids = av_mallocz_array(nb_surfaces + 2, sizeof(*resp->mids));
++    if (!resp->mids)
++        return AVERROR(ENOMEM);
++
++    for (i = 0; i < nb_surfaces; i++)
++        resp->mids[i] = &mids[i];
++    resp->NumFrameActual = nb_surfaces;
++
++    resp->mids[resp->NumFrameActual] = (mfxMemId)av_buffer_ref(hw_frames_ref);
++    if (!resp->mids[resp->NumFrameActual]) {
++        av_freep(&resp->mids);
++        return AVERROR(ENOMEM);
++    }
++
++    resp->mids[resp->NumFrameActual + 1] = av_buffer_ref(mids_buf);
++    if (!resp->mids[resp->NumFrameActual + 1]) {
++        av_buffer_unref((AVBufferRef**)&resp->mids[resp->NumFrameActual]);
++        av_freep(&resp->mids);
++        return AVERROR(ENOMEM);
++    }
++
++    return 0;
++}
++
++static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
++                                 mfxFrameAllocResponse *resp)
++{
++    QSVFramesContext *ctx = pthis;
++    int ret;
++
++    /* this should only be called from an encoder or decoder and
++     * only allocates video memory frames */
++    if (!(req->Type & (MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET |
++                       MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET))         ||
++        !(req->Type & (MFX_MEMTYPE_FROM_DECODE | MFX_MEMTYPE_FROM_ENCODE)))
++        return MFX_ERR_UNSUPPORTED;
++
++    if (req->Type & MFX_MEMTYPE_EXTERNAL_FRAME) {
++        /* external frames -- fill from the caller-supplied frames context */
++        AVHWFramesContext *frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
++        AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
++        mfxFrameInfo      *i  = &req->Info;
++        mfxFrameInfo      *i1 = &frames_hwctx->surfaces[0].Info;
++
++        if (i->Width  > i1->Width  || i->Height > i1->Height ||
++            i->FourCC != i1->FourCC || i->ChromaFormat != i1->ChromaFormat) {
++            av_log(ctx->logctx, AV_LOG_ERROR, "Mismatching surface properties in an "
++                   "allocation request: %dx%d %d %d vs %dx%d %d %d\n",
++                   i->Width,  i->Height,  i->FourCC,  i->ChromaFormat,
++                   i1->Width, i1->Height, i1->FourCC, i1->ChromaFormat);
++            return MFX_ERR_UNSUPPORTED;
++        }
++
++        ret = qsv_setup_mids(resp, ctx->hw_frames_ctx, ctx->mids_buf);
++        if (ret < 0) {
++            av_log(ctx->logctx, AV_LOG_ERROR,
++                   "Error filling an external frame allocation request\n");
++            return MFX_ERR_MEMORY_ALLOC;
++        }
++    } else if (req->Type & MFX_MEMTYPE_INTERNAL_FRAME) {
++        /* internal frames -- allocate a new hw frames context */
++        AVHWFramesContext *ext_frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
++        mfxFrameInfo      *i  = &req->Info;
++
++        AVBufferRef *frames_ref, *mids_buf;
++        AVHWFramesContext *frames_ctx;
++        AVQSVFramesContext *frames_hwctx;
++
++        frames_ref = av_hwframe_ctx_alloc(ext_frames_ctx->device_ref);
++        if (!frames_ref)
++            return MFX_ERR_MEMORY_ALLOC;
++
++        frames_ctx   = (AVHWFramesContext*)frames_ref->data;
++        frames_hwctx = frames_ctx->hwctx;
++
++        frames_ctx->format            = AV_PIX_FMT_QSV;
++        frames_ctx->sw_format         = qsv_map_fourcc(i->FourCC);
++        frames_ctx->width             = i->Width;
++        frames_ctx->height            = i->Height;
++        frames_ctx->initial_pool_size = req->NumFrameSuggested;
++
++        frames_hwctx->frame_type      = req->Type;
++
++        ret = av_hwframe_ctx_init(frames_ref);
++        if (ret < 0) {
++            av_log(ctx->logctx, AV_LOG_ERROR,
++                   "Error initializing a frames context for an internal frame "
++                   "allocation request\n");
++            av_buffer_unref(&frames_ref);
++            return MFX_ERR_MEMORY_ALLOC;
++        }
++
++        mids_buf = qsv_create_mids(frames_ref);
++        if (!mids_buf) {
++            av_buffer_unref(&frames_ref);
++            return MFX_ERR_MEMORY_ALLOC;
++        }
++
++        ret = qsv_setup_mids(resp, frames_ref, mids_buf);
++        av_buffer_unref(&mids_buf);
++        av_buffer_unref(&frames_ref);
++        if (ret < 0) {
++            av_log(ctx->logctx, AV_LOG_ERROR,
++                   "Error filling an internal frame allocation request\n");
++            return MFX_ERR_MEMORY_ALLOC;
++        }
++    } else {
++        return MFX_ERR_UNSUPPORTED;
++    }
++
++    return MFX_ERR_NONE;
++}
++
++static mfxStatus qsv_frame_free(mfxHDL pthis, mfxFrameAllocResponse *resp)
++{
++    av_buffer_unref((AVBufferRef**)&resp->mids[resp->NumFrameActual]);
++    av_buffer_unref((AVBufferRef**)&resp->mids[resp->NumFrameActual + 1]);
++    av_freep(&resp->mids);
++    return MFX_ERR_NONE;
++}
++
++static mfxStatus qsv_frame_lock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
++{
++    QSVMid *qsv_mid = mid;
++    AVHWFramesContext *hw_frames_ctx = (AVHWFramesContext*)qsv_mid->hw_frames_ref->data;
++    AVQSVFramesContext *hw_frames_hwctx = hw_frames_ctx->hwctx;
++    int ret;
++
++    if (qsv_mid->locked_frame)
++        return MFX_ERR_UNDEFINED_BEHAVIOR;
++
++    /* Allocate a system memory frame that will hold the mapped data. */
++    qsv_mid->locked_frame = av_frame_alloc();
++    if (!qsv_mid->locked_frame)
++        return MFX_ERR_MEMORY_ALLOC;
++    qsv_mid->locked_frame->format  = hw_frames_ctx->sw_format;
++
++    /* wrap the provided handle in a hwaccel AVFrame */
++    qsv_mid->hw_frame = av_frame_alloc();
++    if (!qsv_mid->hw_frame)
++        goto fail;
++
++    qsv_mid->hw_frame->data[3] = (uint8_t*)&qsv_mid->surf;
++    qsv_mid->hw_frame->format  = AV_PIX_FMT_QSV;
++
++    // doesn't really matter what buffer is used here
++    qsv_mid->hw_frame->buf[0]  = av_buffer_alloc(1);
++    if (!qsv_mid->hw_frame->buf[0])
++        goto fail;
++
++    qsv_mid->hw_frame->width   = hw_frames_ctx->width;
++    qsv_mid->hw_frame->height  = hw_frames_ctx->height;
++
++    qsv_mid->hw_frame->hw_frames_ctx = av_buffer_ref(qsv_mid->hw_frames_ref);
++    if (!qsv_mid->hw_frame->hw_frames_ctx)
++        goto fail;
++
++    qsv_mid->surf.Info = hw_frames_hwctx->surfaces[0].Info;
++    qsv_mid->surf.Data.MemId = qsv_mid->handle;
++
++    /* map the data to the system memory */
++    ret = av_hwframe_map(qsv_mid->locked_frame, qsv_mid->hw_frame,
++                         AV_HWFRAME_MAP_DIRECT);
++    if (ret < 0)
++        goto fail;
++
++    ptr->Pitch = qsv_mid->locked_frame->linesize[0];
++    ptr->Y     = qsv_mid->locked_frame->data[0];
++    ptr->U     = qsv_mid->locked_frame->data[1];
++    ptr->V     = qsv_mid->locked_frame->data[1] + 1;
++
++    return MFX_ERR_NONE;
++fail:
++    av_frame_free(&qsv_mid->hw_frame);
++    av_frame_free(&qsv_mid->locked_frame);
++    return MFX_ERR_MEMORY_ALLOC;
++}
++
++static mfxStatus qsv_frame_unlock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
++{
++    QSVMid *qsv_mid = mid;
++
++    av_frame_free(&qsv_mid->locked_frame);
++    av_frame_free(&qsv_mid->hw_frame);
++
++    return MFX_ERR_NONE;
++}
++
++static mfxStatus qsv_frame_get_hdl(mfxHDL pthis, mfxMemId mid, mfxHDL *hdl)
++{
++    QSVMid *qsv_mid = (QSVMid*)mid;
++    *hdl = qsv_mid->handle;
++    return MFX_ERR_NONE;
++}
++
++int ff_qsv_init_session_device(AVCodecContext *avctx, mfxSession *psession,
++                               AVBufferRef *device_ref, const char *load_plugins)
++{
++    static const mfxHandleType handle_types[] = {
++        MFX_HANDLE_VA_DISPLAY,
++        MFX_HANDLE_D3D9_DEVICE_MANAGER,
++        MFX_HANDLE_D3D11_DEVICE,
++    };
++    AVHWDeviceContext    *device_ctx = (AVHWDeviceContext*)device_ref->data;
++    AVQSVDeviceContext *device_hwctx = device_ctx->hwctx;
++    mfxSession        parent_session = device_hwctx->session;
++
++    mfxSession    session;
++    mfxVersion    ver;
++    mfxIMPL       impl;
++    mfxHDL        handle = NULL;
++    mfxHandleType handle_type;
++    mfxStatus err;
++
++    int i, ret;
++
++    err = MFXQueryIMPL(parent_session, &impl);
++    if (err == MFX_ERR_NONE)
++        err = MFXQueryVersion(parent_session, &ver);
++    if (err != MFX_ERR_NONE)
++        return ff_qsv_print_error(avctx, err,
++                                  "Error querying the session attributes");
++
++    for (i = 0; i < FF_ARRAY_ELEMS(handle_types); i++) {
++        err = MFXVideoCORE_GetHandle(parent_session, handle_types[i], &handle);
++        if (err == MFX_ERR_NONE) {
++            handle_type = handle_types[i];
++            break;
++        }
++        handle = NULL;
++    }
++    if (!handle) {
++        av_log(avctx, AV_LOG_VERBOSE, "No supported hw handle could be retrieved "
++               "from the session\n");
++    }
++
++    err = MFXInit(impl, &ver, &session);
++    if (err != MFX_ERR_NONE)
++        return ff_qsv_print_error(avctx, err,
++                                  "Error initializing a child MFX session");
++
++    if (handle) {
++        err = MFXVideoCORE_SetHandle(session, handle_type, handle);
++        if (err != MFX_ERR_NONE)
++            return ff_qsv_print_error(avctx, err,
++                                      "Error setting a HW handle");
++    }
++
++    if (QSV_RUNTIME_VERSION_ATLEAST(ver, 1, 25)) {
++        err = MFXJoinSession(parent_session, session);
++        if (err != MFX_ERR_NONE)
++            return ff_qsv_print_error(avctx, err,
++                                      "Error joining session");
++    }
++
++    ret = qsv_load_plugins(session, load_plugins, avctx);
++    if (ret < 0) {
++        av_log(avctx, AV_LOG_ERROR, "Error loading plugins\n");
++        return ret;
++    }
++
++    *psession = session;
++    return 0;
++}
++
++int ff_qsv_init_session_frames(AVCodecContext *avctx, mfxSession *psession,
++                               QSVFramesContext *qsv_frames_ctx,
++                               const char *load_plugins, int opaque)
++{
++    mfxFrameAllocator frame_allocator = {
++        .pthis  = qsv_frames_ctx,
++        .Alloc  = qsv_frame_alloc,
++        .Lock   = qsv_frame_lock,
++        .Unlock = qsv_frame_unlock,
++        .GetHDL = qsv_frame_get_hdl,
++        .Free   = qsv_frame_free,
++    };
++
++    AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)qsv_frames_ctx->hw_frames_ctx->data;
++    AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
++
++    mfxSession    session;
++    mfxStatus err;
++
++    int ret;
++
++    ret = ff_qsv_init_session_device(avctx, &session,
++                                     frames_ctx->device_ref, load_plugins);
++    if (ret < 0)
++        return ret;
++
++    if (!opaque) {
++        qsv_frames_ctx->logctx = avctx;
++
++        /* allocate the memory ids for the external frames */
++        av_buffer_unref(&qsv_frames_ctx->mids_buf);
++        qsv_frames_ctx->mids_buf = qsv_create_mids(qsv_frames_ctx->hw_frames_ctx);
++        if (!qsv_frames_ctx->mids_buf)
++            return AVERROR(ENOMEM);
++        qsv_frames_ctx->mids    = (QSVMid*)qsv_frames_ctx->mids_buf->data;
++        qsv_frames_ctx->nb_mids = frames_hwctx->nb_surfaces;
++
++        err = MFXVideoCORE_SetFrameAllocator(session, &frame_allocator);
++        if (err != MFX_ERR_NONE)
++            return ff_qsv_print_error(avctx, err,
++                                      "Error setting a frame allocator");
++    }
++
++    *psession = session;
++    return 0;
++}
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsvdec.c libavcodec/qsvdec.c
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsvdec.c	2019-08-05 16:52:21.000000000 -0400
++++ libavcodec/qsvdec.c	2020-01-03 10:09:13.097084710 -0500
+@@ -62,9 +62,9 @@ static int qsv_init_session(AVCodecConte
+     if (session) {
+         q->session = session;
+     } else if (hw_frames_ref) {
+-        if (q->internal_session) {
+-            MFXClose(q->internal_session);
+-            q->internal_session = NULL;
++        if (q->internal_qs.session) {
++            MFXClose(q->internal_qs.session);
++            q->internal_qs.session = NULL;
+         }
+         av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+ 
+@@ -72,7 +72,7 @@ static int qsv_init_session(AVCodecConte
+         if (!q->frames_ctx.hw_frames_ctx)
+             return AVERROR(ENOMEM);
+ 
+-        ret = ff_qsv_init_session_frames(avctx, &q->internal_session,
++        ret = ff_qsv_init_session_frames(avctx, &q->internal_qs.session,
+                                          &q->frames_ctx, q->load_plugins,
+                                          q->iopattern == MFX_IOPATTERN_OUT_OPAQUE_MEMORY);
+         if (ret < 0) {
+@@ -80,28 +80,28 @@ static int qsv_init_session(AVCodecConte
+             return ret;
+         }
+ 
+-        q->session = q->internal_session;
++        q->session = q->internal_qs.session;
+     } else if (hw_device_ref) {
+-        if (q->internal_session) {
+-            MFXClose(q->internal_session);
+-            q->internal_session = NULL;
++        if (q->internal_qs.session) {
++            MFXClose(q->internal_qs.session);
++            q->internal_qs.session = NULL;
+         }
+ 
+-        ret = ff_qsv_init_session_device(avctx, &q->internal_session,
++        ret = ff_qsv_init_session_device(avctx, &q->internal_qs.session,
+                                          hw_device_ref, q->load_plugins);
+         if (ret < 0)
+             return ret;
+ 
+-        q->session = q->internal_session;
++        q->session = q->internal_qs.session;
+     } else {
+-        if (!q->internal_session) {
+-            ret = ff_qsv_init_internal_session(avctx, &q->internal_session,
++        if (!q->internal_qs.session) {
++            ret = ff_qsv_init_internal_session(avctx, &q->internal_qs,
+                                                q->load_plugins);
+             if (ret < 0)
+                 return ret;
+         }
+ 
+-        q->session = q->internal_session;
++        q->session = q->internal_qs.session;
+     }
+ 
+     /* make sure the decoder is uninitialized */
+@@ -512,8 +512,7 @@ int ff_qsv_decode_close(QSVContext *q)
+     av_parser_close(q->parser);
+     avcodec_free_context(&q->avctx_internal);
+ 
+-    if (q->internal_session)
+-        MFXClose(q->internal_session);
++    ff_qsv_close_internal_session(&q->internal_qs);
+ 
+     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+     av_buffer_unref(&q->frames_ctx.mids_buf);
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsvdec.c.orig libavcodec/qsvdec.c.orig
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsvdec.c.orig	1969-12-31 19:00:00.000000000 -0500
++++ libavcodec/qsvdec.c.orig	2019-08-05 16:52:21.000000000 -0400
+@@ -0,0 +1,625 @@
++/*
++ * Intel MediaSDK QSV codec-independent code
++ *
++ * copyright (c) 2013 Luca Barbato
++ * copyright (c) 2015 Anton Khirnov <anton@khirnov.net>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include <string.h>
++#include <sys/types.h>
++
++#include <mfx/mfxvideo.h>
++
++#include "libavutil/common.h"
++#include "libavutil/hwcontext.h"
++#include "libavutil/hwcontext_qsv.h"
++#include "libavutil/mem.h"
++#include "libavutil/log.h"
++#include "libavutil/pixdesc.h"
++#include "libavutil/pixfmt.h"
++#include "libavutil/time.h"
++
++#include "avcodec.h"
++#include "internal.h"
++#include "qsv.h"
++#include "qsv_internal.h"
++#include "qsvdec.h"
++
++const AVCodecHWConfigInternal *ff_qsv_hw_configs[] = {
++    &(const AVCodecHWConfigInternal) {
++        .public = {
++            .pix_fmt     = AV_PIX_FMT_QSV,
++            .methods     = AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX |
++                           AV_CODEC_HW_CONFIG_METHOD_AD_HOC,
++            .device_type = AV_HWDEVICE_TYPE_QSV,
++        },
++        .hwaccel = NULL,
++    },
++    NULL
++};
++
++static int qsv_init_session(AVCodecContext *avctx, QSVContext *q, mfxSession session,
++                            AVBufferRef *hw_frames_ref, AVBufferRef *hw_device_ref)
++{
++    int ret;
++
++    if (session) {
++        q->session = session;
++    } else if (hw_frames_ref) {
++        if (q->internal_session) {
++            MFXClose(q->internal_session);
++            q->internal_session = NULL;
++        }
++        av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
++
++        q->frames_ctx.hw_frames_ctx = av_buffer_ref(hw_frames_ref);
++        if (!q->frames_ctx.hw_frames_ctx)
++            return AVERROR(ENOMEM);
++
++        ret = ff_qsv_init_session_frames(avctx, &q->internal_session,
++                                         &q->frames_ctx, q->load_plugins,
++                                         q->iopattern == MFX_IOPATTERN_OUT_OPAQUE_MEMORY);
++        if (ret < 0) {
++            av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
++            return ret;
++        }
++
++        q->session = q->internal_session;
++    } else if (hw_device_ref) {
++        if (q->internal_session) {
++            MFXClose(q->internal_session);
++            q->internal_session = NULL;
++        }
++
++        ret = ff_qsv_init_session_device(avctx, &q->internal_session,
++                                         hw_device_ref, q->load_plugins);
++        if (ret < 0)
++            return ret;
++
++        q->session = q->internal_session;
++    } else {
++        if (!q->internal_session) {
++            ret = ff_qsv_init_internal_session(avctx, &q->internal_session,
++                                               q->load_plugins);
++            if (ret < 0)
++                return ret;
++        }
++
++        q->session = q->internal_session;
++    }
++
++    /* make sure the decoder is uninitialized */
++    MFXVideoDECODE_Close(q->session);
++
++    return 0;
++}
++
++static inline unsigned int qsv_fifo_item_size(void)
++{
++    return sizeof(mfxSyncPoint*) + sizeof(QSVFrame*);
++}
++
++static inline unsigned int qsv_fifo_size(const AVFifoBuffer* fifo)
++{
++    return av_fifo_size(fifo) / qsv_fifo_item_size();
++}
++
++static int check_dec_param(AVCodecContext *avctx, QSVContext *q, mfxVideoParam *param_in)
++{
++    mfxVideoParam param_out = { .mfx.CodecId = param_in->mfx.CodecId };
++    mfxStatus ret;
++
++#define CHECK_MATCH(x) \
++    do { \
++      if (param_out.mfx.x != param_in->mfx.x) {   \
++          av_log(avctx, AV_LOG_WARNING, "Required "#x" %d is unsupported\n", \
++          param_in->mfx.x); \
++      } \
++    } while (0)
++
++    ret = MFXVideoDECODE_Query(q->session, param_in, &param_out);
++
++    if (ret < 0) {
++        CHECK_MATCH(CodecId);
++        CHECK_MATCH(CodecProfile);
++        CHECK_MATCH(CodecLevel);
++        CHECK_MATCH(FrameInfo.Width);
++        CHECK_MATCH(FrameInfo.Height);
++#undef CHECK_MATCH
++        return 0;
++    }
++    return 1;
++}
++
++static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q)
++{
++    const AVPixFmtDescriptor *desc;
++    mfxSession session = NULL;
++    int iopattern = 0;
++    mfxVideoParam param = { 0 };
++    int frame_width  = avctx->coded_width;
++    int frame_height = avctx->coded_height;
++    int ret;
++
++    desc = av_pix_fmt_desc_get(avctx->sw_pix_fmt);
++    if (!desc)
++        return AVERROR_BUG;
++
++    if (!q->async_fifo) {
++        q->async_fifo = av_fifo_alloc(q->async_depth * qsv_fifo_item_size());
++        if (!q->async_fifo)
++            return AVERROR(ENOMEM);
++    }
++
++    if (avctx->pix_fmt == AV_PIX_FMT_QSV && avctx->hwaccel_context) {
++        AVQSVContext *user_ctx = avctx->hwaccel_context;
++        session           = user_ctx->session;
++        iopattern         = user_ctx->iopattern;
++        q->ext_buffers    = user_ctx->ext_buffers;
++        q->nb_ext_buffers = user_ctx->nb_ext_buffers;
++    }
++
++    if (avctx->hw_frames_ctx) {
++        AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
++        AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
++
++        if (!iopattern) {
++            if (frames_hwctx->frame_type & MFX_MEMTYPE_OPAQUE_FRAME)
++                iopattern = MFX_IOPATTERN_OUT_OPAQUE_MEMORY;
++            else if (frames_hwctx->frame_type & MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET)
++                iopattern = MFX_IOPATTERN_OUT_VIDEO_MEMORY;
++        }
++    }
++
++    if (!iopattern)
++        iopattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
++    q->iopattern = iopattern;
++
++    ret = qsv_init_session(avctx, q, session, avctx->hw_frames_ctx, avctx->hw_device_ctx);
++    if (ret < 0) {
++        av_log(avctx, AV_LOG_ERROR, "Error initializing an MFX session\n");
++        return ret;
++    }
++
++    ret = ff_qsv_codec_id_to_mfx(avctx->codec_id);
++    if (ret < 0)
++        return ret;
++
++    param.mfx.CodecId      = ret;
++    param.mfx.CodecProfile = ff_qsv_profile_to_mfx(avctx->codec_id, avctx->profile);
++    param.mfx.CodecLevel   = ff_qsv_level_to_mfx(avctx->codec_id, avctx->level);
++
++    param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
++    param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
++    param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
++    param.mfx.FrameInfo.FourCC         = q->fourcc;
++    param.mfx.FrameInfo.Width          = frame_width;
++    param.mfx.FrameInfo.Height         = frame_height;
++    param.mfx.FrameInfo.ChromaFormat   = MFX_CHROMAFORMAT_YUV420;
++
++    switch (avctx->field_order) {
++    case AV_FIELD_PROGRESSIVE:
++        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;
++        break;
++    case AV_FIELD_TT:
++        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_FIELD_TFF;
++        break;
++    case AV_FIELD_BB:
++        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_FIELD_BFF;
++        break;
++    default:
++        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_UNKNOWN;
++        break;
++    }
++
++    param.IOPattern   = q->iopattern;
++    param.AsyncDepth  = q->async_depth;
++    param.ExtParam    = q->ext_buffers;
++    param.NumExtParam = q->nb_ext_buffers;
++
++    if (!check_dec_param(avctx, q, &param)) {
++        //Just give a warning instead of an error since it is still decodable possibly.
++        av_log(avctx, AV_LOG_WARNING,
++               "Current input bitstream is not supported by QSV decoder.\n");
++    }
++
++    ret = MFXVideoDECODE_Init(q->session, &param);
++    if (ret < 0)
++        return ff_qsv_print_error(avctx, ret,
++                                  "Error initializing the MFX video decoder");
++
++    q->frame_info = param.mfx.FrameInfo;
++
++    return 0;
++}
++
++static int alloc_frame(AVCodecContext *avctx, QSVContext *q, QSVFrame *frame)
++{
++    int ret;
++
++    ret = ff_get_buffer(avctx, frame->frame, AV_GET_BUFFER_FLAG_REF);
++    if (ret < 0)
++        return ret;
++
++    if (frame->frame->format == AV_PIX_FMT_QSV) {
++        frame->surface = *(mfxFrameSurface1*)frame->frame->data[3];
++    } else {
++        frame->surface.Info = q->frame_info;
++
++        frame->surface.Data.PitchLow = frame->frame->linesize[0];
++        frame->surface.Data.Y        = frame->frame->data[0];
++        frame->surface.Data.UV       = frame->frame->data[1];
++    }
++
++    if (q->frames_ctx.mids) {
++        ret = ff_qsv_find_surface_idx(&q->frames_ctx, frame);
++        if (ret < 0)
++            return ret;
++
++        frame->surface.Data.MemId = &q->frames_ctx.mids[ret];
++    }
++    frame->surface.Data.ExtParam    = &frame->ext_param;
++    frame->surface.Data.NumExtParam = 1;
++    frame->ext_param                = (mfxExtBuffer*)&frame->dec_info;
++    frame->dec_info.Header.BufferId = MFX_EXTBUFF_DECODED_FRAME_INFO;
++    frame->dec_info.Header.BufferSz = sizeof(frame->dec_info);
++
++    frame->used = 1;
++
++    return 0;
++}
++
++static void qsv_clear_unused_frames(QSVContext *q)
++{
++    QSVFrame *cur = q->work_frames;
++    while (cur) {
++        if (cur->used && !cur->surface.Data.Locked && !cur->queued) {
++            cur->used = 0;
++            av_frame_unref(cur->frame);
++        }
++        cur = cur->next;
++    }
++}
++
++static int get_surface(AVCodecContext *avctx, QSVContext *q, mfxFrameSurface1 **surf)
++{
++    QSVFrame *frame, **last;
++    int ret;
++
++    qsv_clear_unused_frames(q);
++
++    frame = q->work_frames;
++    last  = &q->work_frames;
++    while (frame) {
++        if (!frame->used) {
++            ret = alloc_frame(avctx, q, frame);
++            if (ret < 0)
++                return ret;
++            *surf = &frame->surface;
++            return 0;
++        }
++
++        last  = &frame->next;
++        frame = frame->next;
++    }
++
++    frame = av_mallocz(sizeof(*frame));
++    if (!frame)
++        return AVERROR(ENOMEM);
++    frame->frame = av_frame_alloc();
++    if (!frame->frame) {
++        av_freep(&frame);
++        return AVERROR(ENOMEM);
++    }
++    *last = frame;
++
++    ret = alloc_frame(avctx, q, frame);
++    if (ret < 0)
++        return ret;
++
++    *surf = &frame->surface;
++
++    return 0;
++}
++
++static QSVFrame *find_frame(QSVContext *q, mfxFrameSurface1 *surf)
++{
++    QSVFrame *cur = q->work_frames;
++    while (cur) {
++        if (surf == &cur->surface)
++            return cur;
++        cur = cur->next;
++    }
++    return NULL;
++}
++
++static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
++                      AVFrame *frame, int *got_frame,
++                      AVPacket *avpkt)
++{
++    QSVFrame *out_frame;
++    mfxFrameSurface1 *insurf;
++    mfxFrameSurface1 *outsurf;
++    mfxSyncPoint *sync;
++    mfxBitstream bs = { { { 0 } } };
++    int ret;
++
++    if (avpkt->size) {
++        bs.Data       = avpkt->data;
++        bs.DataLength = avpkt->size;
++        bs.MaxLength  = bs.DataLength;
++        bs.TimeStamp  = avpkt->pts;
++        if (avctx->field_order == AV_FIELD_PROGRESSIVE)
++            bs.DataFlag   |= MFX_BITSTREAM_COMPLETE_FRAME;
++    }
++
++    sync = av_mallocz(sizeof(*sync));
++    if (!sync) {
++        av_freep(&sync);
++        return AVERROR(ENOMEM);
++    }
++
++    do {
++        ret = get_surface(avctx, q, &insurf);
++        if (ret < 0) {
++            av_freep(&sync);
++            return ret;
++        }
++
++        ret = MFXVideoDECODE_DecodeFrameAsync(q->session, avpkt->size ? &bs : NULL,
++                                              insurf, &outsurf, sync);
++        if (ret == MFX_WRN_DEVICE_BUSY)
++            av_usleep(500);
++
++    } while (ret == MFX_WRN_DEVICE_BUSY || ret == MFX_ERR_MORE_SURFACE);
++
++    if (ret != MFX_ERR_NONE &&
++        ret != MFX_ERR_MORE_DATA &&
++        ret != MFX_WRN_VIDEO_PARAM_CHANGED &&
++        ret != MFX_ERR_MORE_SURFACE) {
++        av_freep(&sync);
++        return ff_qsv_print_error(avctx, ret,
++                                  "Error during QSV decoding.");
++    }
++
++    /* make sure we do not enter an infinite loop if the SDK
++     * did not consume any data and did not return anything */
++    if (!*sync && !bs.DataOffset) {
++        bs.DataOffset = avpkt->size;
++        ++q->zero_consume_run;
++        if (q->zero_consume_run > 1)
++            ff_qsv_print_warning(avctx, ret, "A decode call did not consume any data");
++    } else if (!*sync && bs.DataOffset) {
++        ++q->buffered_count;
++    } else {
++        q->zero_consume_run = 0;
++    }
++
++    if (*sync) {
++        QSVFrame *out_frame = find_frame(q, outsurf);
++
++        if (!out_frame) {
++            av_log(avctx, AV_LOG_ERROR,
++                   "The returned surface does not correspond to any frame\n");
++            av_freep(&sync);
++            return AVERROR_BUG;
++        }
++
++        out_frame->queued = 1;
++        av_fifo_generic_write(q->async_fifo, &out_frame, sizeof(out_frame), NULL);
++        av_fifo_generic_write(q->async_fifo, &sync,      sizeof(sync),      NULL);
++    } else {
++        av_freep(&sync);
++    }
++
++    if ((qsv_fifo_size(q->async_fifo) >= q->async_depth) ||
++        (!avpkt->size && av_fifo_size(q->async_fifo))) {
++        AVFrame *src_frame;
++
++        av_fifo_generic_read(q->async_fifo, &out_frame, sizeof(out_frame), NULL);
++        av_fifo_generic_read(q->async_fifo, &sync,      sizeof(sync),      NULL);
++        out_frame->queued = 0;
++
++        if (avctx->pix_fmt != AV_PIX_FMT_QSV) {
++            do {
++                ret = MFXVideoCORE_SyncOperation(q->session, *sync, 1000);
++            } while (ret == MFX_WRN_IN_EXECUTION);
++        }
++
++        av_freep(&sync);
++
++        src_frame = out_frame->frame;
++
++        ret = av_frame_ref(frame, src_frame);
++        if (ret < 0)
++            return ret;
++
++        outsurf = &out_frame->surface;
++
++#if FF_API_PKT_PTS
++FF_DISABLE_DEPRECATION_WARNINGS
++        frame->pkt_pts = outsurf->Data.TimeStamp;
++FF_ENABLE_DEPRECATION_WARNINGS
++#endif
++        frame->pts = outsurf->Data.TimeStamp;
++
++        frame->repeat_pict =
++            outsurf->Info.PicStruct & MFX_PICSTRUCT_FRAME_TRIPLING ? 4 :
++            outsurf->Info.PicStruct & MFX_PICSTRUCT_FRAME_DOUBLING ? 2 :
++            outsurf->Info.PicStruct & MFX_PICSTRUCT_FIELD_REPEATED ? 1 : 0;
++        frame->top_field_first =
++            outsurf->Info.PicStruct & MFX_PICSTRUCT_FIELD_TFF;
++        frame->interlaced_frame =
++            !(outsurf->Info.PicStruct & MFX_PICSTRUCT_PROGRESSIVE);
++        frame->pict_type = ff_qsv_map_pictype(out_frame->dec_info.FrameType);
++        //Key frame is IDR frame is only suitable for H264. For HEVC, IRAPs are key frames.
++        if (avctx->codec_id == AV_CODEC_ID_H264)
++            frame->key_frame = !!(out_frame->dec_info.FrameType & MFX_FRAMETYPE_IDR);
++
++        /* update the surface properties */
++        if (avctx->pix_fmt == AV_PIX_FMT_QSV)
++            ((mfxFrameSurface1*)frame->data[3])->Info = outsurf->Info;
++
++        *got_frame = 1;
++    }
++
++    return bs.DataOffset;
++}
++
++int ff_qsv_decode_close(QSVContext *q)
++{
++    QSVFrame *cur = q->work_frames;
++
++    if (q->session)
++        MFXVideoDECODE_Close(q->session);
++
++    while (q->async_fifo && av_fifo_size(q->async_fifo)) {
++        QSVFrame *out_frame;
++        mfxSyncPoint *sync;
++
++        av_fifo_generic_read(q->async_fifo, &out_frame, sizeof(out_frame), NULL);
++        av_fifo_generic_read(q->async_fifo, &sync,      sizeof(sync),      NULL);
++
++        av_freep(&sync);
++    }
++
++    while (cur) {
++        q->work_frames = cur->next;
++        av_frame_free(&cur->frame);
++        av_freep(&cur);
++        cur = q->work_frames;
++    }
++
++    av_fifo_free(q->async_fifo);
++    q->async_fifo = NULL;
++
++    av_parser_close(q->parser);
++    avcodec_free_context(&q->avctx_internal);
++
++    if (q->internal_session)
++        MFXClose(q->internal_session);
++
++    av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
++    av_buffer_unref(&q->frames_ctx.mids_buf);
++
++    return 0;
++}
++
++int ff_qsv_process_data(AVCodecContext *avctx, QSVContext *q,
++                        AVFrame *frame, int *got_frame, AVPacket *pkt)
++{
++    uint8_t *dummy_data;
++    int dummy_size;
++    int ret;
++    const AVPixFmtDescriptor *desc;
++
++    if (!q->avctx_internal) {
++        q->avctx_internal = avcodec_alloc_context3(NULL);
++        if (!q->avctx_internal)
++            return AVERROR(ENOMEM);
++
++        q->avctx_internal->codec_id = avctx->codec_id;
++
++        q->parser = av_parser_init(avctx->codec_id);
++        if (!q->parser)
++            return AVERROR(ENOMEM);
++
++        q->parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
++        q->orig_pix_fmt   = AV_PIX_FMT_NONE;
++    }
++
++    if (!pkt->size)
++        return qsv_decode(avctx, q, frame, got_frame, pkt);
++
++    /* we assume the packets are already split properly and want
++     * just the codec parameters here */
++    av_parser_parse2(q->parser, q->avctx_internal,
++                     &dummy_data, &dummy_size,
++                     pkt->data, pkt->size, pkt->pts, pkt->dts,
++                     pkt->pos);
++
++    avctx->field_order  = q->parser->field_order;
++    /* TODO: flush delayed frames on reinit */
++    if (q->parser->format       != q->orig_pix_fmt    ||
++        FFALIGN(q->parser->coded_width, 16)  != FFALIGN(avctx->coded_width, 16) ||
++        FFALIGN(q->parser->coded_height, 16) != FFALIGN(avctx->coded_height, 16)) {
++        enum AVPixelFormat pix_fmts[3] = { AV_PIX_FMT_QSV,
++                                           AV_PIX_FMT_NONE,
++                                           AV_PIX_FMT_NONE };
++        enum AVPixelFormat qsv_format;
++        AVPacket zero_pkt = {0};
++
++        if (q->buffered_count) {
++            q->reinit_flag = 1;
++            /* decode zero-size pkt to flush the buffered pkt before reinit */
++            q->buffered_count--;
++            return qsv_decode(avctx, q, frame, got_frame, &zero_pkt);
++        }
++
++        q->reinit_flag = 0;
++
++        qsv_format = ff_qsv_map_pixfmt(q->parser->format, &q->fourcc);
++        if (qsv_format < 0) {
++            av_log(avctx, AV_LOG_ERROR,
++                   "Decoding pixel format '%s' is not supported\n",
++                   av_get_pix_fmt_name(q->parser->format));
++            ret = AVERROR(ENOSYS);
++            goto reinit_fail;
++        }
++
++        q->orig_pix_fmt     = q->parser->format;
++        avctx->pix_fmt      = pix_fmts[1] = qsv_format;
++        avctx->width        = q->parser->width;
++        avctx->height       = q->parser->height;
++        avctx->coded_width  = FFALIGN(q->parser->coded_width, 16);
++        avctx->coded_height = FFALIGN(q->parser->coded_height, 16);
++        avctx->level        = q->avctx_internal->level;
++        avctx->profile      = q->avctx_internal->profile;
++
++        ret = ff_get_format(avctx, pix_fmts);
++        if (ret < 0)
++            goto reinit_fail;
++
++        avctx->pix_fmt = ret;
++
++        desc = av_pix_fmt_desc_get(avctx->pix_fmt);
++        if (!desc)
++            goto reinit_fail;
++
++         if (desc->comp[0].depth > 8) {
++            avctx->coded_width =  FFALIGN(q->parser->coded_width, 32);
++            avctx->coded_height = FFALIGN(q->parser->coded_height, 32);
++        }
++
++        ret = qsv_decode_init(avctx, q);
++        if (ret < 0)
++            goto reinit_fail;
++    }
++
++    return qsv_decode(avctx, q, frame, got_frame, pkt);
++
++reinit_fail:
++    q->orig_pix_fmt = q->parser->format = avctx->pix_fmt = AV_PIX_FMT_NONE;
++    return ret;
++}
++
++void ff_qsv_decode_flush(AVCodecContext *avctx, QSVContext *q)
++{
++    q->orig_pix_fmt = AV_PIX_FMT_NONE;
++}
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsvdec.h libavcodec/qsvdec.h
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsvdec.h	2019-08-05 16:52:21.000000000 -0400
++++ libavcodec/qsvdec.h	2020-01-03 10:09:13.101084752 -0500
+@@ -42,7 +42,7 @@ typedef struct QSVContext {
+ 
+     // the session we allocated internally, in case the caller did not provide
+     // one
+-    mfxSession internal_session;
++    QSVSession internal_qs;
+ 
+     QSVFramesContext frames_ctx;
+ 
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsvenc.c libavcodec/qsvenc.c
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsvenc.c	2019-08-05 16:52:21.000000000 -0400
++++ libavcodec/qsvenc.c	2020-01-03 10:09:13.101084752 -0500
+@@ -954,7 +954,7 @@ static int qsvenc_init_session(AVCodecCo
+         if (!q->frames_ctx.hw_frames_ctx)
+             return AVERROR(ENOMEM);
+ 
+-        ret = ff_qsv_init_session_frames(avctx, &q->internal_session,
++        ret = ff_qsv_init_session_frames(avctx, &q->internal_qs.session,
+                                          &q->frames_ctx, q->load_plugins,
+                                          q->param.IOPattern == MFX_IOPATTERN_IN_OPAQUE_MEMORY);
+         if (ret < 0) {
+@@ -962,21 +962,21 @@ static int qsvenc_init_session(AVCodecCo
+             return ret;
+         }
+ 
+-        q->session = q->internal_session;
++        q->session = q->internal_qs.session;
+     } else if (avctx->hw_device_ctx) {
+-        ret = ff_qsv_init_session_device(avctx, &q->internal_session,
++        ret = ff_qsv_init_session_device(avctx, &q->internal_qs.session,
+                                          avctx->hw_device_ctx, q->load_plugins);
+         if (ret < 0)
+             return ret;
+ 
+-        q->session = q->internal_session;
++        q->session = q->internal_qs.session;
+     } else {
+-        ret = ff_qsv_init_internal_session(avctx, &q->internal_session,
++        ret = ff_qsv_init_internal_session(avctx, &q->internal_qs,
+                                            q->load_plugins);
+         if (ret < 0)
+             return ret;
+ 
+-        q->session = q->internal_session;
++        q->session = q->internal_qs.session;
+     }
+ 
+     return 0;
+@@ -1507,10 +1507,9 @@ int ff_qsv_enc_close(AVCodecContext *avc
+ 
+     if (q->session)
+         MFXVideoENCODE_Close(q->session);
+-    if (q->internal_session)
+-        MFXClose(q->internal_session);
++
+     q->session          = NULL;
+-    q->internal_session = NULL;
++    ff_qsv_close_internal_session(&q->internal_qs);
+ 
+     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+     av_buffer_unref(&q->frames_ctx.mids_buf);
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsvenc.h libavcodec/qsvenc.h
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsvenc.h	2019-08-05 16:52:21.000000000 -0400
++++ libavcodec/qsvenc.h	2020-01-03 10:09:13.101084752 -0500
+@@ -102,7 +102,7 @@ typedef struct QSVEncContext {
+     QSVFrame *work_frames;
+ 
+     mfxSession session;
+-    mfxSession internal_session;
++    QSVSession internal_qs;
+ 
+     int packet_size;
+     int width_align;
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsv_internal.h libavcodec/qsv_internal.h
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsv_internal.h	2019-08-05 16:52:21.000000000 -0400
++++ libavcodec/qsv_internal.h	2020-01-03 10:09:13.097084710 -0500
+@@ -21,6 +21,22 @@
+ #ifndef AVCODEC_QSV_INTERNAL_H
+ #define AVCODEC_QSV_INTERNAL_H
+ 
++#if CONFIG_VAAPI
++#define AVCODEC_QSV_LINUX_SESSION_HANDLE
++#endif //CONFIG_VAAPI
++
++#ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
++#include <stdio.h>
++#include <string.h>
++#if HAVE_UNISTD_H
++#include <unistd.h>
++#endif
++#include <fcntl.h>
++#include <va/va.h>
++#include <va/va_drm.h>
++#include "libavutil/hwcontext_vaapi.h"
++#endif
++
+ #include <mfx/mfxvideo.h>
+ 
+ #include "libavutil/frame.h"
+@@ -64,6 +80,14 @@ typedef struct QSVFrame {
+     struct QSVFrame *next;
+ } QSVFrame;
+ 
++typedef struct QSVSession {
++    mfxSession session;
++#ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
++    AVBufferRef *va_device_ref;
++    AVHWDeviceContext *va_device_ctx;
++#endif
++} QSVSession;
++
+ typedef struct QSVFramesContext {
+     AVBufferRef *hw_frames_ctx;
+     void *logctx;
+@@ -95,9 +119,11 @@ int ff_qsv_level_to_mfx(enum AVCodecID c
+ int ff_qsv_map_pixfmt(enum AVPixelFormat format, uint32_t *fourcc);
+ enum AVPictureType ff_qsv_map_pictype(int mfx_pic_type);
+ 
+-int ff_qsv_init_internal_session(AVCodecContext *avctx, mfxSession *session,
++int ff_qsv_init_internal_session(AVCodecContext *avctx, QSVSession *qs,
+                                  const char *load_plugins);
+ 
++int ff_qsv_close_internal_session(QSVSession *qs);
++
+ int ff_qsv_init_session_device(AVCodecContext *avctx, mfxSession *psession,
+                                AVBufferRef *device_ref, const char *load_plugins);
+ 
+diff -uprN ../ffmpeg-4.2.1-orig/libavcodec/qsv_internal.h.orig libavcodec/qsv_internal.h.orig
+--- ../ffmpeg-4.2.1-orig/libavcodec/qsv_internal.h.orig	1969-12-31 19:00:00.000000000 -0500
++++ libavcodec/qsv_internal.h.orig	2019-08-05 16:52:21.000000000 -0400
+@@ -0,0 +1,110 @@
++/*
++ * Intel MediaSDK QSV encoder/decoder shared code
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_QSV_INTERNAL_H
++#define AVCODEC_QSV_INTERNAL_H
++
++#include <mfx/mfxvideo.h>
++
++#include "libavutil/frame.h"
++
++#include "avcodec.h"
++
++#define QSV_VERSION_MAJOR 1
++#define QSV_VERSION_MINOR 1
++
++#define ASYNC_DEPTH_DEFAULT 4       // internal parallelism
++
++#define QSV_MAX_ENC_PAYLOAD 2       // # of mfxEncodeCtrl payloads supported
++
++#define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
++    (MFX_VERSION_MAJOR > (MAJOR) ||         \
++     MFX_VERSION_MAJOR == (MAJOR) && MFX_VERSION_MINOR >= (MINOR))
++
++#define QSV_RUNTIME_VERSION_ATLEAST(MFX_VERSION, MAJOR, MINOR) \
++    ((MFX_VERSION.Major > (MAJOR)) ||                           \
++    (MFX_VERSION.Major == (MAJOR) && MFX_VERSION.Minor >= (MINOR)))
++
++typedef struct QSVMid {
++    AVBufferRef *hw_frames_ref;
++    mfxHDL handle;
++
++    AVFrame *locked_frame;
++    AVFrame *hw_frame;
++    mfxFrameSurface1 surf;
++} QSVMid;
++
++typedef struct QSVFrame {
++    AVFrame *frame;
++    mfxFrameSurface1 surface;
++    mfxEncodeCtrl enc_ctrl;
++    mfxExtDecodedFrameInfo dec_info;
++    mfxExtBuffer *ext_param;
++
++    int queued;
++    int used;
++
++    struct QSVFrame *next;
++} QSVFrame;
++
++typedef struct QSVFramesContext {
++    AVBufferRef *hw_frames_ctx;
++    void *logctx;
++
++    /* The memory ids for the external frames.
++     * Refcounted, since we need one reference owned by the QSVFramesContext
++     * (i.e. by the encoder/decoder) and another one given to the MFX session
++     * from the frame allocator. */
++    AVBufferRef *mids_buf;
++    QSVMid *mids;
++    int  nb_mids;
++} QSVFramesContext;
++
++/**
++ * Convert a libmfx error code into an ffmpeg error code.
++ */
++int ff_qsv_map_error(mfxStatus mfx_err, const char **desc);
++
++int ff_qsv_print_error(void *log_ctx, mfxStatus err,
++                       const char *error_string);
++
++int ff_qsv_print_warning(void *log_ctx, mfxStatus err,
++                         const char *warning_string);
++
++int ff_qsv_codec_id_to_mfx(enum AVCodecID codec_id);
++int ff_qsv_profile_to_mfx(enum AVCodecID codec_id, int profile);
++int ff_qsv_level_to_mfx(enum AVCodecID codec_id, int level);
++
++int ff_qsv_map_pixfmt(enum AVPixelFormat format, uint32_t *fourcc);
++enum AVPictureType ff_qsv_map_pictype(int mfx_pic_type);
++
++int ff_qsv_init_internal_session(AVCodecContext *avctx, mfxSession *session,
++                                 const char *load_plugins);
++
++int ff_qsv_init_session_device(AVCodecContext *avctx, mfxSession *psession,
++                               AVBufferRef *device_ref, const char *load_plugins);
++
++int ff_qsv_init_session_frames(AVCodecContext *avctx, mfxSession *session,
++                               QSVFramesContext *qsv_frames_ctx,
++                               const char *load_plugins, int opaque);
++
++int ff_qsv_find_surface_idx(QSVFramesContext *ctx, QSVFrame *frame);
++
++#endif /* AVCODEC_QSV_INTERNAL_H */
