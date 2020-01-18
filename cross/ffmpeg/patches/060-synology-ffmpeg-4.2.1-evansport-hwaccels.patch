@@ -953,9 +953,9 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
      return 0;
  }
  
-diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.h ./fftools/ffmpeg.h
---- ../ffmpeg-4.2.1/fftools/ffmpeg.h	2019-08-05 16:52:21.000000000 -0400
-+++ ./fftools/ffmpeg.h	2020-01-05 09:01:10.755842169 -0500
+diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h ./fftools/ffmpeg.h
+--- ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h	2019-08-05 16:52:21.000000000 -0400
++++ ./fftools/ffmpeg.h	2020-01-18 09:42:59.123197281 -0500
 @@ -46,6 +46,8 @@
  
  #include "libswresample/swresample.h"
@@ -975,17 +975,7 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.h ./fftools/ffmpeg.h
      int64_t last_ts;
      int64_t start_time;   /* user-specified start time in AV_TIME_BASE or AV_NOPTS_VALUE */
      int seek_timestamp;
-@@ -603,6 +608,9 @@ extern int print_stats;
- extern int qp_hist;
- extern int stdin_interaction;
- extern int frame_bits_per_raw_sample;
-+// SYNO_EVANSPORT_DTV_SMD_AVSYNC
-+extern int enable_dtv_smd;
-+// SYNO_EVANSPORT_DTV_SMD_AVSYNC
- extern AVIOContext *progress_avio;
- extern float max_error_rate;
- extern char *videotoolbox_pixfmt;
-@@ -621,7 +629,6 @@ extern char *qsv_device;
+@@ -621,7 +626,6 @@ extern char *qsv_device;
  #endif
  extern HWDevice *filter_hw_device;
  
@@ -993,9 +983,9 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.h ./fftools/ffmpeg.h
  void term_init(void);
  void term_exit(void);
  
-diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
---- ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./fftools/ffmpeg_opt.c	2020-01-17 10:01:04.053391473 -0500
+diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.2.1-patch049/fftools/ffmpeg_opt.c	2019-08-05 16:52:21.000000000 -0400
++++ ./fftools/ffmpeg_opt.c	2020-01-18 09:42:48.767077108 -0500
 @@ -43,6 +43,12 @@
  
  #define DEFAULT_PASS_LOGFILENAME_PREFIX "ffmpeg2pass"
@@ -1009,14 +999,11 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
  #define MATCH_PER_STREAM_OPT(name, type, outvar, fmtctx, st)\
  {\
      int i, ret;\
-@@ -107,11 +113,21 @@ int qp_hist           = 0;
+@@ -107,11 +113,18 @@ int qp_hist           = 0;
  int stdin_interaction = 1;
  int frame_bits_per_raw_sample = 0;
  float max_error_rate  = 2.0/3;
 +
-+// SYNO_EVANSPORT_DTV_SMD_AVSYNC
-+int enable_dtv_smd = 0;
-+// SYNO_EVANSPORT_DTV_SMD_AVSYNC
 +#ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
 +int dtv_skip_unknown = 0;
 +#endif
@@ -1032,7 +1019,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
  static int intra_only         = 0;
  static int file_overwrite     = 0;
  static int no_file_overwrite  = 0;
-@@ -310,7 +326,6 @@ static int opt_map(void *optctx, const c
+@@ -310,7 +323,6 @@ static int opt_map(void *optctx, const c
          }
      }
  
@@ -1040,7 +1027,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
      if (map[0] == '[') {
          /* this mapping refers to lavfi output */
          const char *c = map + 1;
-@@ -344,6 +359,27 @@ static int opt_map(void *optctx, const c
+@@ -344,6 +356,27 @@ static int opt_map(void *optctx, const c
                  if (check_stream_specifier(input_files[file_idx]->ctx, input_files[file_idx]->ctx->streams[i],
                              *p == ':' ? p + 1 : p) <= 0)
                      continue;
@@ -1068,7 +1055,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
                  if (input_streams[input_files[file_idx]->ist_index + i]->user_set_discard == AVDISCARD_ALL) {
                      disabled = 1;
                      continue;
-@@ -692,6 +728,37 @@ static AVCodec *find_codec_or_die(const
+@@ -692,6 +725,37 @@ static AVCodec *find_codec_or_die(const
      return codec;
  }
  
@@ -1106,7 +1093,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
  static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
  {
      char *codec_name = NULL;
-@@ -1234,7 +1301,6 @@ static int open_input_file(OptionsContex
+@@ -1234,7 +1298,6 @@ static int open_input_file(OptionsContex
          if (!option || foption)
              continue;
  
@@ -1114,7 +1101,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
          if (!(option->flags & AV_OPT_FLAG_DECODING_PARAM)) {
              av_log(NULL, AV_LOG_ERROR, "Codec AVOption %s (%s) specified for "
                     "input file #%d (%s) is not a decoding option.\n", e->key,
-@@ -1835,7 +1901,6 @@ static OutputStream *new_video_stream(Op
+@@ -1835,7 +1898,6 @@ static OutputStream *new_video_stream(Op
          ost->top_field_first = -1;
          MATCH_PER_STREAM_OPT(top_field_first, i, ost->top_field_first, oc, st);
  
@@ -1122,7 +1109,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
          ost->avfilter = get_ost_filters(o, oc, ost);
          if (!ost->avfilter)
              exit_program(1);
-@@ -2028,7 +2093,6 @@ static int copy_chapters(InputFile *ifil
+@@ -2028,7 +2090,6 @@ static int copy_chapters(InputFile *ifil
          int64_t rt       = (ofile->recording_time == INT64_MAX) ? INT64_MAX :
                             av_rescale_q(ofile->recording_time, AV_TIME_BASE_Q, in_ch->time_base);
  
@@ -1130,7 +1117,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
          if (in_ch->end < ts_off)
              continue;
          if (rt != INT64_MAX && in_ch->start > rt + ts_off)
-@@ -2198,6 +2262,12 @@ static int open_output_file(OptionsConte
+@@ -2198,6 +2259,12 @@ static int open_output_file(OptionsConte
              for (i = 0; i < nb_input_streams; i++) {
                  int new_area;
                  ist = input_streams[i];
@@ -1143,7 +1130,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
                  new_area = ist->st->codecpar->width * ist->st->codecpar->height + 100000000*!!ist->st->codec_info_nb_frames
                             + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
                  if (ist->user_set_discard == AVDISCARD_ALL)
-@@ -2323,6 +2393,12 @@ loop_end:
+@@ -2323,6 +2390,12 @@ loop_end:
                      continue;
                  if(o->    data_disable && ist->st->codecpar->codec_type == AVMEDIA_TYPE_DATA)
                      continue;
@@ -1156,7 +1143,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
  
                  ost = NULL;
                  switch (ist->st->codecpar->codec_type) {
-@@ -2429,7 +2505,6 @@ loop_end:
+@@ -2429,7 +2502,6 @@ loop_end:
          if (!option || foption)
              continue;
  
@@ -1164,14 +1151,10 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
          if (!(option->flags & AV_OPT_FLAG_ENCODING_PARAM)) {
              av_log(NULL, AV_LOG_ERROR, "Codec AVOption %s (%s) specified for "
                     "output file #%d (%s) is not an encoding option.\n", e->key,
-@@ -3364,6 +3439,19 @@ static int opt_progress(void *optctx, co
+@@ -3364,6 +3436,15 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS
-+#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC
-+    { "dtv_smd",        OPT_BOOL,                                    {              &enable_dtv_smd},
-+        "enable passthough timestamp in hardware pipeline mode" },
-+#endif
 +#ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
 +    { "dtv_skip_unknown",        OPT_BOOL,                                    {              &dtv_skip_unknown},
 +        "skip unknown codec track during dtv streaming" },
@@ -5305,7 +5288,7 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
  void ff_sws_init_swscale_x86(SwsContext *c);
 diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch049/synoconfig.h	2020-01-17 13:49:13.000000000 -0500
-+++ ./synoconfig.h	2020-01-18 09:26:21.219732889 -0500
++++ ./synoconfig.h	2020-01-18 09:43:27.451525257 -0500
 @@ -52,6 +52,11 @@
   */
  #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
@@ -5318,19 +5301,10 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
  /* Add ffmpeg option for HLS.
   * -hls_seek_time:
   *  Let output fragment ts start with this seek time
-@@ -91,6 +96,29 @@
+@@ -91,6 +96,20 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  
-+/* Fixed DTV recoded file or DTV streaming A/V issue on Evansport.
-+ * add flag "-dtv_smd" is used other way to calculate timestamp.
-+ * in hardware pipeline mode.
-+ * See Video Station #1652, #1716
-+ */
-+#if defined(SYNO_EVANSPORT_SMD)
-+#define SYNO_EVANSPORT_DTV_SMD_AVSYNC
-+#endif
-+
 +/* Fixed evansport coredump transcode to flv on pipeline mode
 + * See Video Station #2132
 + */
@@ -5348,7 +5322,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
  /* Add skip unknown track config to support dtv streaming with unknown codec track.
   * add flag "-dtv_skip_unknown" to skip unknown tracks.
   * See Video Station #2470
-@@ -107,6 +135,15 @@
+@@ -107,6 +126,15 @@
  #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
  #endif
  
