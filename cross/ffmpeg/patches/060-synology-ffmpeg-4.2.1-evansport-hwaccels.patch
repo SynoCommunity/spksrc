@@ -41,9 +41,9 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
  enabled libx264           && { check_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
                                 { require libx264 "stdint.h x264.h" x264_encoder_encode "-lx264 $pthreads_extralibs $libm_extralibs" &&
                                   warn "using libx264 without pkg-config"; } } &&
-diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.c ./fftools/ffmpeg.c
---- ../ffmpeg-4.2.1/fftools/ffmpeg.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./fftools/ffmpeg.c	2020-01-05 09:41:50.274464103 -0500
+diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
+--- ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c	2019-08-05 16:52:21.000000000 -0400
++++ ./fftools/ffmpeg.c	2020-01-18 09:01:27.545538344 -0500
 @@ -106,6 +106,87 @@
  
  #include "libavutil/avassert.h"
@@ -789,7 +789,7 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.c ./fftools/ffmpeg.c
          int64_t duration_dts = 0;
          int64_t duration_pts = 0;
          int got_output = 0;
-@@ -3164,6 +3788,48 @@ static int init_output_stream_streamcopy
+@@ -3164,6 +3788,26 @@ static int init_output_stream_streamcopy
      return 0;
  }
  
@@ -813,32 +813,10 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.c ./fftools/ffmpeg.c
 +}
 +#endif
 +
-+#ifdef SYNO_EVANSPORT_HANDBRAKE_MP4
-+static int IsFileEncodeByHandBrake()
-+{
-+	int i;
-+	AVDictionaryEntry *tag = NULL;
-+
-+	for (i = 0; i < nb_input_files; i++) {
-+		InputFile *ifile = input_files[i];
-+		if (0 != strcmp(ifile->ctx->iformat->name, "mov,mp4,m4a,3gp,3g2,mj2")) {
-+			continue;
-+		}
-+		while ((tag = av_dict_get(ifile->ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
-+			if (0 == strncmp(tag->key, "encoder", 7) && 0 == strncmp(tag->value, "HandBrake", 9)) {
-+				return 1;
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+#endif
-+
  static void set_encoder_id(OutputFile *of, OutputStream *ost)
  {
      AVDictionaryEntry *e;
-@@ -3662,6 +4328,14 @@ static void report_new_stream(int input_
+@@ -3662,6 +4306,14 @@ static void report_new_stream(int input_
  
  static int transcode_init(void)
  {
@@ -853,7 +831,7 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.c ./fftools/ffmpeg.c
      int ret = 0, i, j, k;
      AVFormatContext *oc;
      OutputStream *ost;
-@@ -4501,6 +5175,23 @@ static int process_input(int file_index)
+@@ -4501,6 +5153,23 @@ static int process_input(int file_index)
          }
      }
  
@@ -877,7 +855,7 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.c ./fftools/ffmpeg.c
      if (pkt.dts != AV_NOPTS_VALUE)
          ifile->last_ts = av_rescale_q(pkt.dts, ist->st->time_base, AV_TIME_BASE_Q);
  
-@@ -4520,6 +5211,102 @@ static int process_input(int file_index)
+@@ -4520,6 +5189,97 @@ static int process_input(int file_index)
  discard_packet:
      av_packet_unref(&pkt);
  
@@ -939,11 +917,6 @@ diff -uprN ../ffmpeg-4.2.1/fftools/ffmpeg.c ./fftools/ffmpeg.c
 +		}
 +		if(ISMD_SUCCESS == result)
 +		{
-+#ifdef SYNO_EVANSPORT_HANDBRAKE_MP4
-+			if (IsFileEncodeByHandBrake()) {
-+				enable_dtv_smd = 1;
-+			}
-+#endif
 +			if (ost->encoding_needed)
 +			{
 +				//close H.264 smd encoder because transcoding will be done through pipeline
@@ -5332,7 +5305,7 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
  void ff_sws_init_swscale_x86(SwsContext *c);
 diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch049/synoconfig.h	2020-01-17 13:49:13.000000000 -0500
-+++ ./synoconfig.h	2020-01-18 09:16:26.413624358 -0500
++++ ./synoconfig.h	2020-01-18 09:26:21.219732889 -0500
 @@ -52,6 +52,11 @@
   */
  #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
@@ -5345,7 +5318,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
  /* Add ffmpeg option for HLS.
   * -hls_seek_time:
   *  Let output fragment ts start with this seek time
-@@ -91,6 +96,37 @@
+@@ -91,6 +96,29 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  
@@ -5356,14 +5329,6 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
 + */
 +#if defined(SYNO_EVANSPORT_SMD)
 +#define SYNO_EVANSPORT_DTV_SMD_AVSYNC
-+#endif
-+
-+/* Fixed mp4 can't hardwared trasncode that encoded by Handbrake.
-+ * auto enable -dtv_smd flag when detecting Handbrake encoded file.
-+ * See Video Station #1513
-+ */
-+#if defined(SYNO_EVANSPORT_SMD) && defined(SYNO_EVANSPORT_DTV_SMD_AVSYNC)
-+#define SYNO_EVANSPORT_HANDBRAKE_MP4
 +#endif
 +
 +/* Fixed evansport coredump transcode to flv on pipeline mode
@@ -5383,7 +5348,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
  /* Add skip unknown track config to support dtv streaming with unknown codec track.
   * add flag "-dtv_skip_unknown" to skip unknown tracks.
   * See Video Station #2470
-@@ -107,6 +143,15 @@
+@@ -107,6 +135,15 @@
  #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
  #endif
  
