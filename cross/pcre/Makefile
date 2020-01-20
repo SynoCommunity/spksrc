@@ -13,7 +13,7 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 # enable UTF-8 support
-# pcre is used by: mc, sshfs, irssi, bitlbee, museek-plus
+# pcre is used by glib and dependents: mc, sshfs, irssi, bitlbee, museek-plus, rmlint
 CONFIGURE_ARGS = --enable-utf --enable-unicode-properties
 
 include ../../mk/spksrc.cross-cc.mk
