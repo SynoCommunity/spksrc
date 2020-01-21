@@ -6972,7 +6972,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/aacdec_template.c ./
  
  static VLC vlc_scalefactors;
  static VLC vlc_spectral[11];
-@@ -1171,6 +1173,12 @@ static av_cold int aac_decode_init(AVCod
+@@ -1174,6 +1176,12 @@ static av_cold int aac_decode_init(AVCod
      avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
  #endif /* USE_FIXED */
  
@@ -7076,7 +7076,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/hevcdec.c ./libavcod
  const uint8_t ff_hevc_pel_weight[65] = { [2] = 0, [4] = 1, [6] = 2, [8] = 3, [12] = 4, [16] = 5, [24] = 6, [32] = 7, [48] = 8, [64] = 9 };
  
  /**
-@@ -3476,6 +3479,12 @@ static av_cold int hevc_decode_init(AVCo
+@@ -3478,6 +3481,12 @@ static av_cold int hevc_decode_init(AVCo
      HEVCContext *s = avctx->priv_data;
      int ret;
  
@@ -7192,7 +7192,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavcodec/mpeg4videodec.c ./li
  /* The defines below define the number of bits that are read at once for
   * reading vlc values. Changing these may improve speed and data cache needs
   * be aware though that decreasing them may need the number of stages that is
-@@ -3505,6 +3508,12 @@ static av_cold int decode_init(AVCodecCo
+@@ -3506,6 +3509,12 @@ static av_cold int decode_init(AVCodecCo
      MpegEncContext *s = &ctx->m;
      int ret;
  
