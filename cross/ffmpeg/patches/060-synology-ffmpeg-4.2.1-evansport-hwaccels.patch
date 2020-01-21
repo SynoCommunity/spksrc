@@ -1045,44 +1045,6 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
                  if (input_streams[input_files[file_idx]->ist_index + i]->user_set_discard == AVDISCARD_ALL) {
                      disabled = 1;
                      continue;
-@@ -692,6 +725,37 @@ static AVCodec *find_codec_or_die(const
-     return codec;
- }
- 
-+#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
-+static int IsAudioCopyStream(OptionsContext *o, AVFormatContext *oc)
-+{
-+	int ret = 0;
-+	char *audio_codec_name = NULL;
-+
-+	MATCH_PER_TYPE_OPT(codec_names, str, audio_codec_name, oc, "a");
-+
-+	if (audio_codec_name && 0 == strcmp(audio_codec_name, "copy")) {
-+		ret = 1;
-+	}
-+
-+	return ret;
-+}
-+
-+static int IsSkipAudioStream(const InputStream *ist, OptionsContext *o, AVFormatContext *oc)
-+{
-+	if (ist->st->codec->codec_id == AV_CODEC_ID_DTS
-+		|| ist->st->codec->codec_id == AV_CODEC_ID_EAC3
-+		|| ist->st->codec->codec_id == AV_CODEC_ID_TRUEHD)
-+	{
-+		// if not stream copy
-+		if (!IsAudioCopyStream(o, oc)) {
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
-+#endif
-+
- static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
- {
-     char *codec_name = NULL;
 @@ -1234,7 +1298,6 @@ static int open_input_file(OptionsContex
          if (!option || foption)
              continue;
@@ -1107,40 +1069,6 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
          if (in_ch->end < ts_off)
              continue;
          if (rt != INT64_MAX && in_ch->start > rt + ts_off)
-@@ -2198,6 +2259,12 @@ static int open_output_file(OptionsConte
-             for (i = 0; i < nb_input_streams; i++) {
-                 int new_area;
-                 ist = input_streams[i];
-+#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
-+                               if (IsSkipAudioStream(ist, o, oc)) {
-+                                       // if not stream copy
-+                                       continue;
-+                               }
-+#endif
-                 new_area = ist->st->codecpar->width * ist->st->codecpar->height + 100000000*!!ist->st->codec_info_nb_frames
-                            + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
-                 if (ist->user_set_discard == AVDISCARD_ALL)
-@@ -2323,6 +2390,12 @@ loop_end:
-                     continue;
-                 if(o->    data_disable && ist->st->codecpar->codec_type == AVMEDIA_TYPE_DATA)
-                     continue;
-+#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
-+				if (IsSkipAudioStream(ist, o, oc)) {
-+					// if not stream copy
-+					continue;
-+				}
-+#endif
- 
-                 ost = NULL;
-                 switch (ist->st->codecpar->codec_type) {
-@@ -2429,7 +2502,6 @@ loop_end:
-         if (!option || foption)
-             continue;
- 
--
-         if (!(option->flags & AV_OPT_FLAG_ENCODING_PARAM)) {
-             av_log(NULL, AV_LOG_ERROR, "Codec AVOption %s (%s) specified for "
-                    "output file #%d (%s) is not an encoding option.\n", e->key,
 @@ -3364,6 +3436,15 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
@@ -5265,7 +5193,7 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
 diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch049/synoconfig.h	2020-01-17 13:49:13.000000000 -0500
 +++ ./synoconfig.h	2020-01-18 13:09:17.841500651 -0500
-@@ -52,6 +52,11 @@
+@@ -45,6 +45,11 @@
   */
  #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
  
@@ -5277,7 +5205,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
  /* Add ffmpeg option for HLS.
   * -hls_seek_time:
   *  Let output fragment ts start with this seek time
-@@ -91,6 +96,13 @@
+@@ -84,6 +89,13 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  
@@ -5291,7 +5219,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
  /* Add skip unknown track config to support dtv streaming with unknown codec track.
   * add flag "-dtv_skip_unknown" to skip unknown tracks.
   * See Video Station #2470
-@@ -107,6 +119,15 @@
+@@ -100,6 +112,15 @@
  #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
  #endif
  

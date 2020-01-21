@@ -9697,7 +9697,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/SynoBuildConf/install-virtual-v
 diff -uprN ../ffmpeg-4.2.1-patch1-4/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch1-4/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
 +++ ./synoconfig.h	2020-01-17 09:15:23.724603559 -0500
-@@ -0,0 +1,98 @@
+@@ -0,0 +1,91 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE
 +#endif
@@ -9708,13 +9708,6 @@ diff -uprN ../ffmpeg-4.2.1-patch1-4/synoconfig.h ./synoconfig.h
 + */
 +#if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
 +#define SYNO_CODEC_PATENT_G1
-+#endif
-+
-+/* let ffmpeg skip audio stream with disabled codec.
-+ * e.g. DTS dec/enc ,AC3 enc
-+ */
-+#if !defined(STANDALONE) && !defined(SYNO_VIDEOSTATION) && !defined(SYNO_MEDIASERVER)
-+#define SYNO_SKIP_DISABLED_AUDIO_STREAM
 +#endif
 +
 +/* Optional for writing RIFF info tag to wav

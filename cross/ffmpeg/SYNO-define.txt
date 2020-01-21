@@ -3,11 +3,15 @@ TODO:
 - Review code of SYNO_EVANSPORT_DTV_SMD_AVSYNC to use ifdef (currently forced with // comments)
 - Merge code of patch 086 directly on _smd main patches as this is fix segfault fix
 
+PATCH:
+10 -> 49: Port from Synology FFMPEG 3.3.7
+50 -> 99: Port from Synology FFMPEG 2.7.1
+
 #define SYNO_SMOOTH_STREAMING                                   -> DONE - 049
 #define SYNO_FIX_MP4_REMUX_H264PARSER                           -> DONE - 048
 #define SYNO_FILTER_SRT_TAGS                                    -> DONE - 047
 #define SYNO_SKIP_FLAC_PARSE_PICTURE                            -> DONE - 046
-#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> BLOCKED BY SYNO_EVANSPORT_AUTO_HW_DECODER
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 079 -> Fix: Should this patch apply?
 #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
 #define SYNO_VIDEOSTATION_HLS_SEEK_TIME
 #define SYNO_FIX_QORIQ_CORE_DUMP
