@@ -7,8 +7,8 @@ DEPENDS = cross/nmon cross/iperf2 cross/iperf3
 
 OPTIONAL_DESC =
 
-# provide htop until DSM 5.2 (DSM >=6 already have htop)
-ifeq (5,$(firstword $(sort $(TCVERSION) 5.2)))
+# provide htop until DSM 5.0 (later versions already have htop)
+ifeq (5.0,$(firstword $(sort $(TCVERSION) 5.0)))
 DEPENDS += cross/htop
 OPTIONAL_DESC += "htop, "
 endif
