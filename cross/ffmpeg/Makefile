@@ -6,7 +6,7 @@ PKG_DIST_SITE = http://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
-DEPENDS += cross/libbluray cross/libvorbis cross/libvpx
+DEPENDS += cross/libbluray cross/libvorbis cross/speex cross/libvpx cross/shine
 DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265
 
@@ -27,6 +27,7 @@ CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enabl
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr
 CONFIGURE_ARGS += --enable-libvorbis
+CONFIGURE_ARGS += --enable-libspeex --enable-libshine
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
