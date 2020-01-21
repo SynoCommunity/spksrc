@@ -1160,7 +1160,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
 diff -uprN ../ffmpeg-4.2.1/libavcodec/aacdec.c ./libavcodec/aacdec.c
 --- ../ffmpeg-4.2.1/libavcodec/aacdec.c	2019-09-06 18:18:26.000000000 -0400
 +++ ./libavcodec/aacdec.c	2020-01-04 21:09:06.627249440 -0500
-@@ -473,7 +473,6 @@ static int read_audio_mux_element(struct
+@@ -475,7 +475,6 @@ static int read_audio_mux_element(struct
      return 0;
  }
  
@@ -4471,7 +4471,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  /* The defines below define the number of bits that are read at once for
   * reading vlc values. Changing these may improve speed and data cache needs
   * be aware though that decreasing them may need the number of stages that is
-@@ -3537,6 +3540,17 @@ static av_cold int decode_init(AVCodecCo
+@@ -3538,6 +3541,17 @@ static av_cold int decode_init(AVCodecCo
      return 0;
  }
  
@@ -4489,7 +4489,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  static av_cold int decode_end(AVCodecContext *avctx)
  {
      Mpeg4DecContext *ctx = avctx->priv_data;
-@@ -3559,6 +3573,14 @@ static const AVOption mpeg4_options[] =
+@@ -3560,6 +3574,14 @@ static const AVOption mpeg4_options[] =
      {NULL}
  };
  
@@ -4504,7 +4504,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  static const AVClass mpeg4_class = {
      .class_name = "MPEG4 Video Decoder",
      .item_name  = av_default_item_name,
-@@ -3566,6 +3588,15 @@ static const AVClass mpeg4_class = {
+@@ -3567,6 +3589,15 @@ static const AVClass mpeg4_class = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -4520,7 +4520,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  AVCodec ff_mpeg4_decoder = {
      .name                  = "mpeg4",
      .long_name             = NULL_IF_CONFIG_SMALL("MPEG-4 part 2"),
-@@ -3601,3 +3632,23 @@ AVCodec ff_mpeg4_decoder = {
+@@ -3602,3 +3633,23 @@ AVCodec ff_mpeg4_decoder = {
                                 NULL
                             },
  };
@@ -4938,8 +4938,8 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
          int count = 0;
  
          // looks like WMV3 has a sequence header stored in the extradata
-@@ -594,11 +615,49 @@ static av_cold int vc1_decode_init(AVCod
-     return 0;
+@@ -601,11 +622,49 @@ error:
+     return ret;
  }
  
 +#ifdef SYNO_EVANSPORT_SMD
@@ -4988,7 +4988,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
      VC1Context *v = avctx->priv_data;
      int i;
  
-@@ -625,9 +684,19 @@ av_cold int ff_vc1_decode_end(AVCodecCon
+@@ -632,9 +691,19 @@ av_cold int ff_vc1_decode_end(AVCodecCon
      av_freep(&v->is_intra_base); // FIXME use v->mb_type[]
      av_freep(&v->luma_mv_base);
      ff_intrax8_common_end(&v->x8);
@@ -5009,7 +5009,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  /** Decode a VC1/WMV3 frame
   * @todo TODO: Handle VC-1 IDUs (Transport level?)
-@@ -1179,6 +1248,147 @@ err:
+@@ -1186,6 +1255,147 @@ err:
      return ret;
  }
  
@@ -5157,7 +5157,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
  #if CONFIG_VC1_DXVA2_HWACCEL
-@@ -1237,6 +1447,22 @@ AVCodec ff_vc1_decoder = {
+@@ -1244,6 +1454,22 @@ AVCodec ff_vc1_decoder = {
      .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
  };
  
@@ -5180,10 +5180,11 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  #if CONFIG_WMV3_DECODER
  AVCodec ff_wmv3_decoder = {
      .name           = "wmv3",
-@@ -1275,6 +1501,22 @@ AVCodec ff_wmv3_decoder = {
+@@ -1281,6 +1507,22 @@ AVCodec ff_wmv3_decoder = {
+     .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
  };
  #endif
- 
++
 +#ifdef SYNO_EVANSPORT_SMD
 +AVCodec ff_wmv3_smd_decoder = {
 +    .name           = "wmv3_smd",
@@ -5199,10 +5200,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
 +    .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
 +};
 +#endif
-+
+
  #if CONFIG_WMV3IMAGE_DECODER
  AVCodec ff_wmv3image_decoder = {
-     .name           = "wmv3image",
 diff -uprN ../ffmpeg-4.2.1/libavformat/flacdec.c ./libavformat/flacdec.c
 --- ../ffmpeg-4.2.1/libavformat/flacdec.c	2020-01-04 21:07:34.000000000 -0500
 +++ ./libavformat/flacdec.c	2020-01-04 21:09:07.467261951 -0500
