@@ -3708,29 +3708,13 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/libavcodec.v ./libavcodec/libavcodec.v
      local:
          *;
  };
-diff -uprN ../ffmpeg-4.2.1/libavcodec/libfdk-aacenc.c ./libavcodec/libfdk-aacenc.c
---- ../ffmpeg-4.2.1/libavcodec/libfdk-aacenc.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavcodec/libfdk-aacenc.c	2020-01-04 21:09:07.219258260 -0500
-@@ -37,6 +37,9 @@
+diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c	2020-01-21 10:03:16.000000000 -0500
++++ ./libavcodec/libx264.c	2020-01-21 10:20:29.764267921 -0500
+@@ -47,6 +47,17 @@
  #include "synoconfig.h"
  #include "synog1codecpatent.h"
  
-+#include "synoconfig.h"
-+#include "synog1codecpatent.h"
-+
- typedef struct AACContext {
-     const AVClass *class;
-     HANDLE_AACENCODER handle;
-diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
---- ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c	2020-01-17 13:42:08.000000000 -0500
-+++ ./libavcodec/libx264.c	2020-01-18 13:13:33.292914544 -0500
-@@ -47,6 +47,20 @@
- #include "synoconfig.h"
- #include "synog1codecpatent.h"
- 
-+#include "synoconfig.h"
-+#include "synog1codecpatent.h"
-+
 +#ifdef SYNO_EVANSPORT_SMD
 +#include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
 +#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
@@ -3745,7 +3729,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  typedef struct X264Context {
      AVClass        *class;
      x264_param_t    params;
-@@ -119,7 +133,6 @@ static void X264_log(void *p, int level,
+@@ -119,7 +130,6 @@ static void X264_log(void *p, int level,
      av_vlog(p, level_map[level], fmt, args);
  }
  
@@ -3753,7 +3737,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  static int encode_nals(AVCodecContext *ctx, AVPacket *pkt,
                         const x264_nal_t *nals, int nnal)
  {
-@@ -476,10 +489,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -476,10 +486,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return 0;
  }
  
@@ -3899,7 +3883,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
      av_freep(&avctx->extradata);
      av_freep(&x4->sei);
      av_freep(&x4->reordered_opaque);
-@@ -489,6 +637,26 @@ static av_cold int X264_close(AVCodecCon
+@@ -489,6 +634,26 @@ static av_cold int X264_close(AVCodecCon
          x4->enc = NULL;
      }
  
@@ -3926,7 +3910,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
      return 0;
  }
  
-@@ -958,6 +1132,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -958,6 +1123,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return 0;
  }
  
@@ -4134,7 +4118,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  static const enum AVPixelFormat pix_fmts_8bit[] = {
      AV_PIX_FMT_YUV420P,
      AV_PIX_FMT_YUVJ420P,
-@@ -1160,6 +1535,15 @@ static const AVClass x264_class = {
+@@ -1160,6 +1526,15 @@ static const AVClass x264_class = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -4150,7 +4134,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  AVCodec ff_libx264_encoder = {
      .name             = "libx264",
      .long_name        = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
-@@ -1187,6 +1571,23 @@ static const AVClass rgbclass = {
+@@ -1187,6 +1562,23 @@ static const AVClass rgbclass = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -4174,22 +4158,20 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  AVCodec ff_libx264rgb_encoder = {
      .name           = "libx264rgb",
      .long_name      = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 RGB"),
-diff -uprN ../ffmpeg-4.2.1/libavcodec/Makefile ./libavcodec/Makefile
---- ../ffmpeg-4.2.1/libavcodec/Makefile	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavcodec/Makefile	2020-01-04 21:09:07.227258379 -0500
-@@ -54,6 +54,12 @@ OBJS = ac3_parser.o
- 
- OBJS += synog1codecpatent.o
+diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-4.2.2-patch049/libavcodec/Makefile	2020-01-21 10:04:33.000000000 -0500
++++ ./libavcodec/Makefile	2020-01-21 10:21:04.244270067 -0500
+@@ -52,6 +52,10 @@ OBJS = ac3_parser.o
+        vorbis_parser.o                                                  \
+        xiph.o                                                           \
  
 +ifdef CONFIG_SMD
 +OBJS += ismd_ffmpeg_audio_util.o
 +OBJS += syno_trans_loading.o
 +endif
-+OBJS += synog1codecpatent.o
-+
+ OBJS += synog1codecpatent.o
+ 
  # subsystems
- OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
- OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
 diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
 --- ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c	2019-07-08 13:45:25.000000000 -0400
 +++ ./libavcodec/mpeg12dec.c	2020-01-04 22:05:42.839778315 -0500
@@ -4363,16 +4345,6 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
 diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
 --- ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c	2020-01-04 21:07:34.000000000 -0500
 +++ ./libavcodec/mpeg4videodec.c	2020-01-04 22:01:37.869680725 -0500
-@@ -42,6 +42,9 @@
- #include "synoconfig.h"
- #include "synog1codecpatent.h"
- 
-+#include "synoconfig.h"
-+#include "synog1codecpatent.h"
-+
- /* The defines below define the number of bits that are read at once for
-  * reading vlc values. Changing these may improve speed and data cache needs
-  * be aware though that decreasing them may need the number of stages that is
 @@ -3538,6 +3541,17 @@ static av_cold int decode_init(AVCodecCo
      return 0;
  }
@@ -4446,19 +4418,6 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
 +     .priv_class            = &mpeg4_class_smd,
 +};
 +#endif
-diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videoenc.c ./libavcodec/mpeg4videoenc.c
---- ../ffmpeg-4.2.1/libavcodec/mpeg4videoenc.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavcodec/mpeg4videoenc.c	2020-01-04 21:09:07.239258558 -0500
-@@ -31,6 +31,9 @@
- #include "synoconfig.h"
- #include "synog1codecpatent.h"
- 
-+#include "synoconfig.h"
-+#include "synog1codecpatent.h"
-+
- /* The uni_DCtab_* tables below contain unified bits+length tables to encode DC
-  * differences in MPEG-4. Unified in the sense that the specification specifies
-  * this encoding in several steps. */
 diff -uprN ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c ./libavcodec/mpegvideo_parser.c
 --- ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c	2019-07-08 13:45:25.000000000 -0400
 +++ ./libavcodec/mpegvideo_parser.c	2020-01-04 21:09:07.243258617 -0500
@@ -4781,16 +4740,13 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.h ./libavcodec/syno_tra
 +
 +#endif //SYNO_EVANSPORT_SMD
 +#endif //_SYNO_TRANS_LOADING_H
-diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
---- ../ffmpeg-4.2.1/libavcodec/vc1dec.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavcodec/vc1dec.c	2020-01-04 21:09:07.463261891 -0500
-@@ -270,6 +270,16 @@ static void vc1_draw_sprites(VC1Context
+diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
+--- ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c	2020-01-21 10:03:16.000000000 -0500
++++ ./libavcodec/vc1dec.c	2020-01-21 10:29:20.824300974 -0500
+@@ -270,6 +270,13 @@ static void vc1_draw_sprites(VC1Context
      }
  }
  
-+#include "synoconfig.h"
-+#include "synog1codecpatent.h"
-+
 +#ifdef SYNO_EVANSPORT_SMD
 +#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
 +#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
@@ -4801,7 +4757,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  static int vc1_decode_sprites(VC1Context *v, GetBitContext* gb)
  {
-@@ -445,7 +461,12 @@ static av_cold int vc1_decode_init(AVCod
+@@ -445,7 +452,12 @@ static av_cold int vc1_decode_init(AVCod
      if ((ret = ff_vc1_init_common(v)) < 0)
          return ret;
  
@@ -4814,7 +4770,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
          int count = 0;
  
          // looks like WMV3 has a sequence header stored in the extradata
-@@ -601,11 +622,49 @@ error:
+@@ -601,11 +613,49 @@ error:
      return ret;
  }
  
@@ -4864,7 +4820,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
      VC1Context *v = avctx->priv_data;
      int i;
  
-@@ -632,9 +691,19 @@ av_cold int ff_vc1_decode_end(AVCodecCon
+@@ -632,9 +682,19 @@ av_cold int ff_vc1_decode_end(AVCodecCon
      av_freep(&v->is_intra_base); // FIXME use v->mb_type[]
      av_freep(&v->luma_mv_base);
      ff_intrax8_common_end(&v->x8);
@@ -4885,7 +4841,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  /** Decode a VC1/WMV3 frame
   * @todo TODO: Handle VC-1 IDUs (Transport level?)
-@@ -1186,6 +1255,147 @@ err:
+@@ -1186,6 +1246,147 @@ err:
      return ret;
  }
  
@@ -5033,7 +4989,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
  #if CONFIG_VC1_DXVA2_HWACCEL
-@@ -1244,6 +1454,22 @@ AVCodec ff_vc1_decoder = {
+@@ -1244,6 +1445,22 @@ AVCodec ff_vc1_decoder = {
      .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
  };
  
@@ -5056,7 +5012,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  #if CONFIG_WMV3_DECODER
  AVCodec ff_wmv3_decoder = {
      .name           = "wmv3",
-@@ -1281,6 +1507,22 @@ AVCodec ff_wmv3_decoder = {
+@@ -1281,6 +1498,22 @@ AVCodec ff_wmv3_decoder = {
      .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
  };
  #endif
@@ -5076,7 +5032,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
 +    .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
 +};
 +#endif
-
+ 
  #if CONFIG_WMV3IMAGE_DECODER
  AVCodec ff_wmv3image_decoder = {
 diff -uprN ../ffmpeg-4.2.1/libavformat/flacdec.c ./libavformat/flacdec.c
@@ -5138,12 +5094,12 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
  void ff_sws_init_swscale_ppc(SwsContext *c);
  void ff_sws_init_swscale_vsx(SwsContext *c);
  void ff_sws_init_swscale_x86(SwsContext *c);
-diff -uprN ../ffmpeg-4.2.1-patch049/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.1-patch049/synoconfig.h	2020-01-17 13:49:13.000000000 -0500
-+++ ./synoconfig.h	2020-01-18 13:09:17.841500651 -0500
-@@ -45,6 +45,11 @@
-  */
- #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
+diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch049/synoconfig.h	2020-01-21 10:05:45.000000000 -0500
++++ ./synoconfig.h	2020-01-21 10:07:39.548219984 -0500
+@@ -40,6 +40,11 @@
+ #define SYNO_CODEC_PATENT_G1
+ #endif
  
 +/* Fixed aac copy failed on mpegts format.
 + * See Video Station #1730
