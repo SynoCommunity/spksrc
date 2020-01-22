@@ -1,6 +1,6 @@
 SPK_NAME = tcl
-SPK_VERS = 8.6.10
-MAIN_VERS = 8.6
+SPK_MAIN_VERS = 8.6
+SPK_VERS = $(SPK_MAIN_VERS).10
 SPK_REV = 4
 SPK_ICON = src/tcl.png
 
@@ -21,6 +21,6 @@ CHANGELOG = "1. Update to 8.6.10<br/>2. Fix symlinks."
 HOMEPAGE = https://www.tcl.tk
 LICENSE = Tcl/Tk License
 
-SPK_LINKS = /usr/local/bin/tclsh:bin/tclsh$(MAIN_VERS)
+SPK_LINKS = /usr/local/bin/tclsh:bin/tclsh$(SPK_MAIN_VERS)
 
 include ../../mk/spksrc.spk.mk

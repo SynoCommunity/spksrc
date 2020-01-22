@@ -5,7 +5,7 @@ service_create_links ()
     for cmd in ${SPK_COMMANDS}
     do
         if [ -e "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-            mkdir -p "/usr/local/${cmd%/*}"
+            mkdir -p "$(dirname /usr/local/${cmd}"
             echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"  >> "${INST_LOG}"
             ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"
         fi
@@ -13,11 +13,10 @@ service_create_links ()
 
     for item in ${SPK_LINKS}
     do
-        linkArray=(${item//:/ })
-        _link=${linkArray[0]}
-        _target=${linkArray[1]}
+        _link=$(echo ${item} | sed "s/:.*//g")
+        _target=$(echo ${item} | sed "s/.*://g")
         if [ -e "${SYNOPKG_PKGDEST}/${_target}" ]; then
-            mkdir -p "${_link%/*}"
+            mkdir -p "$(dirname ${_link})"
             echo "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"  >> "${INST_LOG}"
             ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"
         fi
@@ -39,9 +38,8 @@ service_remove_links ()
 
     for item in ${SPK_LINKS}
     do
-        linkArray=(${item//:/ })
-        _link=${linkArray[0]}
-        _target=${linkArray[1]}
+        _link=$(echo ${item} | sed "s/:.*//g")
+        _target=$(echo ${item} | sed "s/.*://g")
         if [ -L "${_link}" ]; then
             if [ "$(readlink ${_link})" == "${SYNOPKG_PKGDEST}/${_target}" ]; then
                 echo "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"  >> "${INST_LOG}"

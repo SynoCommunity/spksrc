@@ -2,7 +2,6 @@ SPK_NAME = ddrescue
 SPK_VERS = 1.21
 SPK_REV = 2
 SPK_ICON = src/gnu-logo.png
-DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -15,13 +14,11 @@ DESCRIPTION_SPN = GNU ddrescue es una herramienta de recuperación de datos. Cop
 RELOAD_UI = no
 DISPLAY_NAME = ddrescue
 STARTABLE = no
-CHANGELOG = Updating to 1.21
+CHANGELOG = Update to version 1.21
 
 HOMEPAGE = https://www.gnu.org/software/ddrescue/ddrescue.html
 LICENSE  = GPLv2/GPLv3
 
 SPK_COMMANDS = bin/ddrescue bin/ddrescuelog
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
