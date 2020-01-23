@@ -14,7 +14,7 @@ CHANGELOG = "1. Update to version 2.2.0<br/>2. Activate unicode support"
 HOMEPAGE   = http://hisham.hm/htop/
 LICENSE    = GPLv2
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/htop
 
 
 include ../../mk/spksrc.spk.mk
