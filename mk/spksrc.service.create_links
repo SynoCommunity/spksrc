@@ -5,7 +5,7 @@ service_create_links ()
     for cmd in ${SPK_COMMANDS}
     do
         if [ -e "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-            mkdir -p "$(dirname /usr/local/${cmd}"
+            mkdir -p "$(dirname /usr/local/${cmd})"
             echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"  >> "${INST_LOG}"
             ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"
         fi
