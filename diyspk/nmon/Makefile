@@ -14,7 +14,7 @@ HOMEPAGE   = http://nmon.sourceforge.net/
 LICENSE    = GPLv3
 HELP_URL   = http://nmon.sourceforge.net/pmwiki.php
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/nmon
 
 
 include ../../mk/spksrc.spk.mk

@@ -26,7 +26,7 @@ CHANGELOG = "Initial release"
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/htop bin/nmon bin/iperf2 bin/iperf3 bin/lsof
 
 
 include ../../mk/spksrc.spk.mk

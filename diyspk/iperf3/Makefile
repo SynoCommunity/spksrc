@@ -10,10 +10,10 @@ DESCRIPTION = The iperf series of tools perform active measurements to determine
 DISPLAY_NAME = iperf3
 STARTABLE = no
 
-HOMEPAGE = 
+HOMEPAGE = https://iperf.fr/
 LICENSE = three-clause BSD
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/iperf3
 
 
 include ../../mk/spksrc.spk.mk
