@@ -1,4 +1,4 @@
-bin:bin/event_rpcgen.py
+rsc:bin/event_rpcgen.py
 lnk:lib/libevent.so
 lnk:lib/libevent-2.0.so.5
 lib:lib/libevent-2.0.so.5.1.9

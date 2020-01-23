@@ -60,4 +60,4 @@ lib:lib/znc/stickychan.so
 lib:lib/znc/stripcontrols.so
 lib:lib/znc/watch.so
 lib:lib/znc/webadmin.so
-shr:share/znc
+rsc:share/znc

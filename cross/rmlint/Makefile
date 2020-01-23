@@ -26,4 +26,4 @@ rmlint_compile_target:
 	$(RUN) scons prefix=${STAGING_INSTALL_PREFIX} actual_prefix=$(INSTALL_PREFIX) VERBOSE=0 DEBUG=0 O=release
 
 rmlint_install_target:
-	$(RUN) install --mode=644 --target-directory=${STAGING_INSTALL_PREFIX}/bin/ ./rmlint
+	$(RUN) install --mode=755 --target-directory=${STAGING_INSTALL_PREFIX}/bin/ ./rmlint

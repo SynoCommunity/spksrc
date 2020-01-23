@@ -5,4 +5,4 @@ lib:lib/alsa-lib/smixer/smixer-sbase.so
 lnk:lib/libasound.so
 lnk:lib/libasound.so.2
 lib:lib/libasound.so.2.0.0
-shr:share/alsa
+rsc:share/alsa

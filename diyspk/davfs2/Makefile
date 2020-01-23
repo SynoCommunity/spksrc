@@ -6,14 +6,14 @@ SPK_ICON = src/davfs2.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Neon is an HTTP and WebDAV client library, with a C interface
+DESCRIPTION = Mount a WebDAV resource as a regular file system.
 RELOAD_UI = no
 DISPLAY_NAME = davfs2
 STARTABLE = no
 
-HOMEPAGE   = http://savannah.nongnu.org/projects/davfs2
-LICENSE    = GNU GPL
+HOMEPAGE = http://savannah.nongnu.org/projects/davfs2
+LICENSE = GPLv3+
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = sbin/mount.davfs sbin/umount.davfs
 
 include ../../mk/spksrc.spk.mk

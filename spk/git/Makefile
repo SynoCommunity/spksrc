@@ -15,6 +15,6 @@ CHANGELOG = "Update Git to 2.24.1"
 HOMEPAGE = http://git-scm.com
 LICENSE  = GPLv2
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/git bin/git-cvsserver bin/git-receive-pack bin/git-shell bin/git-upload-archive bin/git-upload-pack
 
 include ../../mk/spksrc.spk.mk

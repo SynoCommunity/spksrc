@@ -4,5 +4,5 @@ lnk:bin/jpico
 lnk:bin/jstar
 lnk:bin/jupp
 lnk:bin/rjoe
-etc:etc/joe
-shr:share/man/man1
+rsc:etc/joe
+rsc:share/man/man1

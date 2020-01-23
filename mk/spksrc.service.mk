@@ -119,6 +119,12 @@ endif
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
+ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
+	@echo "# List of commands to create links for" >> $@
+	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
+	@echo "SPK_LINKS=\"${SPK_LINKS}\"" >> $@
+	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
+endif
 DSM_SCRIPTS_ += service-setup
 SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 

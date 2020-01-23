@@ -15,6 +15,6 @@ DISPLAY_NAME = MediaInfo
 HOMEPAGE   = https://mediaarea.net/en/MediaInfo
 LICENSE    = BSD
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/mediainfo
 
 include ../../mk/spksrc.spk.mk

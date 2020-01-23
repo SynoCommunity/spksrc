@@ -16,6 +16,8 @@ HOMEPAGE   = http://beets.io/
 LICENSE    = GPL
 
 SERVICE_SETUP = src/service-setup.sh
+SPK_LINKS = /usr/local/bin/beet:env/bin/beet
+
 STARTABLE = no
 
 # Pure Python package, make sure ARCH is not defined

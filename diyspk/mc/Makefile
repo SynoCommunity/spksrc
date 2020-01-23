@@ -16,6 +16,6 @@ CHANGELOG = "1. Add sftp support<br>2. Fix subshell for /bin/sh as link to /bin/
 HOMEPAGE = http://www.midnight-commander.org
 LICENSE  = GNU GPL
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/mc bin/mcdiff bin/mcview bin/mcedit
 
 include ../../mk/spksrc.spk.mk

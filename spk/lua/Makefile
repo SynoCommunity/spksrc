@@ -18,7 +18,6 @@ CHANGELOG = "First Synology package release"
 HOMEPAGE = https://www.lua.org
 LICENSE = MIT
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/lua bin/luac
 
 include ../../mk/spksrc.spk.mk
-

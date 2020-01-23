@@ -12,7 +12,7 @@ MAINTAINER_URL = https://www.linkedin.com/in/bingjing-chang/
 DISTRIBUTOR = SynoCommunity
 DISTRIBUTOR_URL = https://synocommunity.com
 DESCRIPTION = A collection toolkit for connecting iOS devices.
-RELOAD_UI = n
+RELOAD_UI = no
 DISPLAY_NAME = iOS Access
 CHANGELOG = Added udev rules and python scripts to auto-detect and mount/umount iOS devices into/from FileStation. 
 
@@ -24,6 +24,28 @@ SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/sbin/usbmuxd
 STARTABLE       = yes
 
 POST_STRIP_TARGET = itools_extra_install
+
+SPK_COMMANDS  = bin/idevicebackup
+SPK_COMMANDS += bin/idevicebackup2
+SPK_COMMANDS += bin/idevicecrashreport
+SPK_COMMANDS += bin/idevicedate
+SPK_COMMANDS += bin/idevicedebug
+SPK_COMMANDS += bin/idevicedebugserverproxy
+SPK_COMMANDS += bin/idevicediagnostics
+SPK_COMMANDS += bin/ideviceenterrecovery
+SPK_COMMANDS += bin/idevice_id
+SPK_COMMANDS += bin/ideviceimagemounter
+SPK_COMMANDS += bin/ideviceinfo
+SPK_COMMANDS += bin/idevicename
+SPK_COMMANDS += bin/idevicenotificationproxy
+SPK_COMMANDS += bin/idevicepair
+SPK_COMMANDS += bin/ideviceprovision
+SPK_COMMANDS += bin/idevicescreenshot
+SPK_COMMANDS += bin/idevicesyslog
+SPK_COMMANDS += bin/ifuse
+SPK_COMMANDS += bin/iproxy
+SPK_COMMANDS += bin/plistutil
+
 
 include ../../mk/spksrc.spk.mk
 
