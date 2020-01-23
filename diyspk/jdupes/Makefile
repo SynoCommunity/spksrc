@@ -9,12 +9,11 @@ MAINTAINER = jbruchon
 DESCRIPTION = A powerful duplicate file finder and an enhanced fork of fdupes
 DISPLAY_NAME = jdupes
 STARTABLE = no
-BETA = 1
 
 HOMEPAGE   = https://github.com/jbruchon/jdupes/
 LICENSE    = MIT
 HELP_URL   = https://github.com/jbruchon/jdupes/README
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/jdupes
 
 include ../../mk/spksrc.spk.mk

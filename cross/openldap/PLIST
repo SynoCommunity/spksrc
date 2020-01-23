@@ -8,7 +8,7 @@ bin:bin/ldappasswd
 bin:bin/ldapsearch
 bin:bin/ldapurl
 bin:bin/ldapwhoami
-etc:etc/openldap/ldap.conf
+rsc:etc/openldap/ldap.conf
 lnk:lib/liblber-2.4.so.2
 lib:lib/liblber-2.4.so.2.10.3
 lnk:lib/liblber.so

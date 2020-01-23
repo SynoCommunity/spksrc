@@ -14,6 +14,6 @@ CHANGELOG = Initial release
 HOMEPAGE = https://neurobin.org/projects/softwares/unix/rnm/
 LICENSE = GPL v3.0
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/rnm
 
 include ../../mk/spksrc.spk.mk

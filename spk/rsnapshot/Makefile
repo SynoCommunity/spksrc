@@ -1,7 +1,7 @@
 SPK_NAME = rsnapshot
 SPK_VERS = 1.4.2
 SPK_REV = 2
-SPK_ICON = src/rdiff-backup.png
+SPK_ICON = src/rsnapshot.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "Perl"
@@ -19,5 +19,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 # Pure Perl package, make sure ARCH is not defined
 override ARCH=
+
+SPK_COMMANDS = bin/rsnapshot bin/rsnapshot-diff
 
 include ../../mk/spksrc.spk.mk

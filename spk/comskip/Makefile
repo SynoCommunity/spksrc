@@ -19,7 +19,7 @@ LICENSE = GNU/LGPL
 HELPURL = https://github.com/SynoCommunity/spksrc/wiki/Comskip
 SUPPORTURL = http://www.kaashoek.com/comskip/
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/comskip
 
 POST_STRIP_TARGET = comskip_extra_install
 

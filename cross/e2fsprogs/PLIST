@@ -3,8 +3,8 @@ rsc:bin/compile_et
 bin:bin/lsattr
 rsc:bin/mk_cmds
 bin:bin/uuidgen
-etc:etc/e2scrub.conf
-etc:etc/mke2fs.conf
+rsc:etc/e2scrub.conf
+rsc:etc/mke2fs.conf
 rsc:lib/e2fsprogs/e2scrub_all_cron
 lib:lib/e2initrd_helper
 bin:sbin/badblocks

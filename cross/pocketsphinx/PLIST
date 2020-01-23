@@ -4,4 +4,4 @@ bin:bin/pocketsphinx_mdef_convert
 lnk:lib/libpocketsphinx.so
 lnk:lib/libpocketsphinx.so.1
 lib:lib/libpocketsphinx.so.1.1.0
-shr:share/pocketsphinx
+rsc:share/pocketsphinx
