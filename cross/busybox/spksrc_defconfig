@@ -1,5 +1,7 @@
 #
-# Automatically generated make config: don't edit
+# busybox default make configuration
+# 
+# Initially auto generated make config
 # Busybox version: 1.26.2
 # Mon Feb  6 13:49:15 2017
 #
@@ -20,7 +22,7 @@ CONFIG_BUSYBOX=y
 CONFIG_FEATURE_INSTALLER=y
 CONFIG_INSTALL_NO_USR=y
 # CONFIG_PAM is not set
-# CONFIG_LONG_OPTS is not set
+CONFIG_LONG_OPTS=y
 # CONFIG_FEATURE_DEVPTS is not set
 # CONFIG_FEATURE_CLEAN_UP is not set
 # CONFIG_FEATURE_UTMP is not set
