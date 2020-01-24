@@ -83,7 +83,7 @@ diff -uprN ../ffmpeg-4.2.1-patch099-Update1/fftools/ffmpeg_opt.c ./fftools/ffmpe
          ist->decoder_opts = filter_codec_opts(o->g->codec_opts, ist->st->codecpar->codec_id, ic, st, ist->dec);
  
          ist->reinit_filters = -1;
-@@ -3439,6 +3499,10 @@ static int opt_progress(void *optctx, co
+@@ -3440,6 +3500,10 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS

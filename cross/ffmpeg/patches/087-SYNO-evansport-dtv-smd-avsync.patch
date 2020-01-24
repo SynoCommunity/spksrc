@@ -24,7 +24,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
  #ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
  int dtv_skip_unknown = 0;
  #endif
-@@ -3436,6 +3439,10 @@ static int opt_progress(void *optctx, co
+@@ -3437,6 +3440,10 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS

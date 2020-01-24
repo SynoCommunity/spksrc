@@ -65,11 +65,11 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
  
                  ost = NULL;
                  switch (ist->st->codecpar->codec_type) {
-diff -uprN ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h	2020-01-21 08:49:08.096021291 -0500
-+++ ./synoconfig.h	2020-01-21 08:29:11.000000000 -0500
-@@ -40,6 +40,13 @@
- #define SYNO_CODEC_PATENT_G1
+diff -uprN ../ffmpeg-4.2.2-patch060/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch060/synoconfig.h	2020-01-24 06:02:18.000000000 -0500
++++ ./synoconfig.h	2020-01-24 06:07:40.306962200 -0500
+@@ -54,6 +54,13 @@
+ #define SYNO_VIDEOSTATION_HLS_SEEK_TIME
  #endif
  
 +/* let ffmpeg skip audio stream with disabled codec.

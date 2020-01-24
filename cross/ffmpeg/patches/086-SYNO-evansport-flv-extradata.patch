@@ -26,10 +26,10 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg.c ./fftools/ffmpeg.c
  				ost->enc_ctx->coded_frame = av_frame_alloc();
  				if (!ost->enc_ctx->coded_frame)
  					return AVERROR(ENOMEM);
-diff -uprN ../ffmpeg-4.2.1-patch060-NEW/libavcodec/libx264.c ./libavcodec/libx264.c
---- ../ffmpeg-4.2.1-patch060-NEW/libavcodec/libx264.c	2020-01-18 13:13:33.292914544 -0500
-+++ ./libavcodec/libx264.c	2020-01-18 13:05:36.210370439 -0500
-@@ -116,6 +116,11 @@ typedef struct X264Context {
+diff -uprN ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c	2020-01-24 06:02:18.000000000 -0500
++++ ./libavcodec/libx264.c	2020-01-24 06:14:09.775061127 -0500
+@@ -113,6 +113,11 @@ typedef struct X264Context {
  
      int nb_reordered_opaque, next_reordered_opaque;
      int64_t *reordered_opaque;
@@ -41,7 +41,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/libavcodec/libx264.c ./libavcodec/libx26
  } X264Context;
  
  static void X264_log(void *p, int level, const char *fmt, va_list args)
-@@ -625,7 +630,9 @@ static av_cold int X264_close(AVCodecCon
+@@ -622,7 +627,9 @@ static av_cold int X264_close(AVCodecCon
      X264Context *x4 = avctx->priv_data;
  
  #ifdef SYNO_EVANSPORT_SMD
