@@ -8,7 +8,7 @@ ONGOING - Isolate into individual patches
 PATCH:
 10 -> 49 : Port from Synology FFMPEG 3.3.7
 50 -> 99 : Port from Synology FFMPEG 2.7.1
-   100+  : Discarded patches as non-applicable
+   100+  : Discarded patches as non-applicable to FFMPEG usage with VideoStation
 
 #define SYNO_CODEC_PATENT_G1                                    -> DONE - 010
 #define SYNO_FIX_QORIQ_CORE_DUMP                                -> TODO - 018 *
@@ -25,7 +25,6 @@ PATCH:
 #define SYNO_DTV_SKIP_UNKNOWN_TRACK                             -> TODO - 076 *
 #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                     -> TODO - 077 *
 #define SYNO_DTV_SKIP_TELETEXT                                  -> TODO - 078 *
-#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 079 -> FIX: Should this patch apply?
 #if defined(SYNO_EVANSPORT_SMD)                                 -> TODO - 084 *
 #ifdef SYNO_EVANSPORT_AUTO_HW_DECODER                           -> DONE - 099 -> TO MOVE AT 085 (AFTER MASTER _SMD)
 #ifdef SYNO_EVANSPORT_FLV_EXTRADATA                             -> DONE - 086 -> FIX: To merge with default _smd patches?
@@ -34,4 +33,5 @@ PATCH:
 #ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE     -> DONE - 089
 
 REJECT:
-#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 100 -> REJECT: Relates to Synology Surveillance Station
+#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 100 -> REJECT: Relates to Synology SurveillanceStation
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 101 -> REJECT: Unrelated to VideoStation

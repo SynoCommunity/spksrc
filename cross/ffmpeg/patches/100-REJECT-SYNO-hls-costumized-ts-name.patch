@@ -28,7 +28,7 @@ diff -uprN ../ffmpeg-4.2.2-patch099/libavformat/segment.c ./libavformat/segment.
 diff -uprN ../ffmpeg-4.2.2-patch099/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch099/synoconfig.h	2020-01-25 11:18:25.000000000 -0500
 +++ ./synoconfig.h	2020-01-25 11:22:26.968159703 -0500
-@@ -71,6 +71,13 @@
+@@ -64,6 +64,13 @@
   */
  #define SYNO_FIX_QORIQ_CORE_DUMP
  
