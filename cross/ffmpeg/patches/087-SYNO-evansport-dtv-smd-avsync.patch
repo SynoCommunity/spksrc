@@ -24,7 +24,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
  #ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
  int dtv_skip_unknown = 0;
  #endif
-@@ -3437,6 +3440,10 @@ static int opt_progress(void *optctx, co
+@@ -3439,6 +3442,10 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS
@@ -38,7 +38,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 09:43:27.451525257 -0500
 +++ ./synoconfig.h	2020-01-18 09:44:13.812059786 -0500
-@@ -96,6 +96,15 @@
+@@ -89,6 +89,15 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  

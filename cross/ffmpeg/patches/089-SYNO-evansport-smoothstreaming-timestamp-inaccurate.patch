@@ -70,7 +70,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavformat/smoothstreamingenc.c ./libavform
 diff -uprN ../ffmpeg-4.2.1-patch060-streaming-orig/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-streaming-orig/synoconfig.h	2020-01-18 09:16:26.413624358 -0500
 +++ ./synoconfig.h	2020-01-18 09:15:29.473055414 -0500
-@@ -96,6 +96,14 @@
+@@ -89,6 +89,14 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  

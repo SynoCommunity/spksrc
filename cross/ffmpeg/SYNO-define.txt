@@ -1,21 +1,21 @@
 Task List:
 ----------
-ONGOIN - Isolate into individual patches
- TODO  - Review code of SYNO_EVANSPORT_DTV_SMD_AVSYNC to use ifdef (currently forced with // comments)
- TODO  - Merge code of patch 086 directly on _smd main patches as this is fix segfault fix
- TODO  - Create a directory SYNO-defines under which every "standalone" define is within a single file to limit patch collisions when possible
+ONGOING - Isolate into individual patches
+ TODO   - Review code of SYNO_EVANSPORT_DTV_SMD_AVSYNC to use ifdef (currently forced with // comments)
+ TODO   - Merge code of patch 086 directly on _smd main patches as this is fix segfault fix
+ TODO   - Create a directory SYNO-defines under which every "standalone" define is within a single file to limit patch collisions when possible
 
 PATCH:
-10 -> 49: Port from Synology FFMPEG 3.3.7
-50 -> 99: Port from Synology FFMPEG 2.7.1
+10 -> 49 : Port from Synology FFMPEG 3.3.7
+50 -> 99 : Port from Synology FFMPEG 2.7.1
+   100+  : Discarded patches as non-applicable
 
 #define SYNO_CODEC_PATENT_G1                                    -> DONE - 010
 #define SYNO_FIX_QORIQ_CORE_DUMP                                -> TODO - 018 *
 #define SYNO_ALPINE_NEON_LIBSWSCALE                             -> TODO - 019 *
 #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                        -> TODO - 026 *
 #define SYNO_VIDEOSTATION_HLS_SEEK_TIME                         -> TODO - 027 *
-#define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME                -> TODO - 028 *
-#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> TODO - 028 **** TO MERGE WITH PREVIOUS!!!
+#define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME                -> DONE - 028
 #define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX                    -> DONE - 029
 #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                         -> DONE - 045
 #define SYNO_SKIP_FLAC_PARSE_PICTURE                            -> DONE - 046
@@ -32,3 +32,6 @@ PATCH:
 #ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC                            -> DONE - 087 -> FIX: Use ifdef instead of //
 #define SYNO_EVANSPORT_HANDBRAKE_MP4                            -> DONE - 088
 #ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE     -> DONE - 089
+
+REJECT:
+#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 100 -> REJECT: Relates to Synology Surveillance Station

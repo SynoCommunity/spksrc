@@ -83,7 +83,7 @@ diff -uprN ../ffmpeg-4.2.1-patch099-Update1/fftools/ffmpeg_opt.c ./fftools/ffmpe
          ist->decoder_opts = filter_codec_opts(o->g->codec_opts, ist->st->codecpar->codec_id, ic, st, ist->dec);
  
          ist->reinit_filters = -1;
-@@ -3440,6 +3500,10 @@ static int opt_progress(void *optctx, co
+@@ -3442,6 +3502,10 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS
@@ -97,7 +97,7 @@ diff -uprN ../ffmpeg-4.2.1-patch099-Update1/fftools/ffmpeg_opt.c ./fftools/ffmpe
 diff -uprN ../ffmpeg-4.2.1-patch099-Update1/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch099-Update1/synoconfig.h	2020-01-17 10:02:54.626620086 -0500
 +++ ./synoconfig.h	2020-01-17 09:47:17.808045401 -0500
-@@ -96,6 +96,14 @@
+@@ -89,6 +89,14 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  

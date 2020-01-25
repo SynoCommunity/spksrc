@@ -7113,37 +7113,6 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  } SegmentContext;
  
  static void print_csv_escaped_str(AVIOContext *ctx, const char *str)
-@@ -224,15 +232,30 @@ static int set_segment_filename(AVFormat
-     ff_format_set_url(oc, new_name);
- 
-     /* copy modified name in list entry */
-+#ifdef SYNO_HLS_COSTUMIZED_TS_NAME
-+    const size_t SVS_FILE_NAME_LEN = 1024;
-+    size = SVS_FILE_NAME_LEN;
-+#else
-     size = strlen(av_basename(oc->url)) + 1;
-+#endif
-     if (seg->entry_prefix)
-         size += strlen(seg->entry_prefix);
- 
-     if ((ret = av_reallocp(&seg->cur_entry.filename, size)) < 0)
-         return ret;
-+#ifdef SYNO_HLS_COSTUMIZED_TS_NAME
-+    snprintf(seg->cur_entry.filename, size, "%s%s",
-+             seg->entry_prefix ? seg->entry_prefix : "",
-+             oc->filename);
-+#elif defined(SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME)
-+    snprintf(seg->cur_entry.filename, size, "%s%03d",
-+             seg->entry_prefix ? seg->entry_prefix : "",
-+             seg->segment_idx);
-+#else
-     snprintf(seg->cur_entry.filename, size, "%s%s",
-              seg->entry_prefix ? seg->entry_prefix : "",
-              av_basename(oc->url));
-+#endif
- 
-     return 0;
- }
 @@ -864,6 +887,10 @@ static int seg_write_header(AVFormatCont
          if (!seg->individual_header_trailer)
              oc->pb->seekable = 0;
@@ -9024,7 +8993,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/SynoBuildConf/install-virtual-v
 diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch004/synoconfig.h	2020-01-21 09:52:22.956162937 -0500
 +++ ./synoconfig.h	2020-01-21 09:51:02.368157922 -0500
-@@ -9,3 +9,70 @@
+@@ -9,3 +9,59 @@
  #if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
  #define SYNO_CODEC_PATENT_G1
  #endif
@@ -9042,13 +9011,6 @@ diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
 + * See Surveillance bug 1151/1155
 + */
 +#define SYNO_FIX_QORIQ_CORE_DUMP
-+
-+/* Rule out basename logic in filename setting
-+ * Set Name length to 64 rather than fix strlen(%d.ts)
-+ */
-+#if defined(SYNO_SURVEILLANCESTATION)
-+#define SYNO_HLS_COSTUMIZED_TS_NAME
-+#endif
 +
 +/* Use neon acceleration in libswscale, which boosts transcoding
 + * performance on Alpine platform.
@@ -9090,8 +9052,4 @@ diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
 + */
 +#if defined(SYNO_VIDEOSTATION)
 +#define SYNO_DTV_SKIP_TELETEXT
-+#endif
-+
-+#if defined(SYNO_VIDEOSTATION)
-+#define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME
 +#endif

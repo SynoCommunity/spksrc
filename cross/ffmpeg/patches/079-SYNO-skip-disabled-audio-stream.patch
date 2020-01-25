@@ -39,7 +39,7 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
  static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
  {
      char *codec_name = NULL;
-@@ -2228,6 +2259,12 @@ static int open_output_file(OptionsConte
+@@ -2230,6 +2261,12 @@ static int open_output_file(OptionsConte
              for (i = 0; i < nb_input_streams; i++) {
                  int new_area;
                  ist = input_streams[i];
@@ -52,7 +52,7 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
                  new_area = ist->st->codecpar->width * ist->st->codecpar->height + 100000000*!!ist->st->codec_info_nb_frames
                             + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
                  if (ist->user_set_discard == AVDISCARD_ALL)
-@@ -2353,6 +2390,12 @@ loop_end:
+@@ -2355,6 +2392,12 @@ loop_end:
                      continue;
                  if(o->    data_disable && ist->st->codecpar->codec_type == AVMEDIA_TYPE_DATA)
                      continue;
