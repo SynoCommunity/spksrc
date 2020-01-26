@@ -5,7 +5,7 @@ PKG_DIST_NAME = lmon$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/ncurses
+DEPENDS = cross/ncursesw
 
 HOMEPAGE = http://nmon.sourceforge.net
 COMMENT  = nmon (Nigel's performance Monitor) is a performance monitoring tool for Linux
@@ -17,7 +17,7 @@ INSTALL_TARGET = nmon_install_target
 
 NMON_TARGET=$(PKG_NAME)
 
-ADDITIONAL_CFLAGS = -g -O3 -Wall -D JFS -D GETUSER -D LARGEMEM -lncurses -lm -o $(NMON_TARGET)
+ADDITIONAL_CFLAGS = -g -O3 -Wall -D JFS -D GETUSER -D LARGEMEM -lncursesw -lm -o $(NMON_TARGET)
 
 
 include ../../mk/spksrc.cross-cc.mk
