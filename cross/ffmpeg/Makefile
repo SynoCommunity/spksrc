@@ -44,10 +44,14 @@ DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
 # Enable Synology specific -hls_seek_time option and other optimizations
-CONFIGURE_ARGS += --extra-cflags="-DSYNO_VIDEOSTATION -DSYNO_AUDIOSTATION -DSYNO_MEDIASERVER -DSYNO_DSM"
+CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
 
 # Compiler workaround to enable DTS-HD MA stream decoding
-CONFIGURE_ARGS += --extra-cflags="-fno-if-conversion"
+CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
+# Synology default optimization
+CONFIGURE_ARGS += --extra-cflags=-O3
+# Remove some of the noise while compiling
+CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -76,16 +80,15 @@ ENV += PATH=$(NASM_PATH):$$PATH
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
 DEPENDS += cross/ds.evansport cross/json-c
 CONFIGURE_ARGS += --disable-x86asm
-CONFIGURE_ARGS += --extra-cflags="-fasm"
-CONFIGURE_ARGS += --extra-cflags="-std=c99 -pedantic"
-CONFIGURE_ARGS += --extra-cflags="-pedantic"
-CONFIGURE_ARGS += --extra-cflags="-Wno-deprecated-declarations"
-CONFIGURE_ARGS += --extra-cflags="-DSYNO_EVANSPORT_SMD"
-CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities"
-CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user"
-CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities"
-CONFIGURE_ARGS += --extra-ldflags="-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
-CONFIGURE_ARGS += --extra-ldflags="-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities"
+CONFIGURE_ARGS += --extra-cflags=-fasm
+CONFIGURE_ARGS += --extra-cflags=-std=c99
+CONFIGURE_ARGS += --extra-cflags=-pedantic
+CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
+CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user
+CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
 CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-libh264_smd --enable-smd
 
 else
