@@ -1,14 +1,11 @@
-PKG_NAME = oscam
-PKG_VERS = 1.20
+PKG_NAME = oscam-8917
+PKG_VERS = 1.0
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = svn
-PKG_SVN_REV = 7536
-PKG_DIST_NAME = trunk
-PKG_DIST_SITE = http://www.streamboard.tv/svn/oscam
-PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_SVN_REV).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-r*
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/R0T13Z/oscam-8917/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/libusb
+DEPENDS = cross/libusb cross/pcsc-lite
 
 HOMEPAGE = http://oscam.to/
 COMMENT  = OSCam is an Open Source Conditional Access Module software
@@ -23,11 +20,13 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myConfigure
 myConfigure:
+	$(RUN) chmod 755 config.sh
+	$(RUN) chmod 755 webif/pages_mkdep
 	$(RUN) ./config.sh --enable WITH_SSL --disable HAVE_DVBAPI
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) $(MAKE) CROSS=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p') CONF_DIR=$(INSTALL_PREFIX)/etc USE_LIBUSB=1
+	$(RUN) $(MAKE) CROSS=$(shell echo $(ENV) | sed 's/ /\n/g' | sed -n -e 's/CC=\(.*-\)gcc/\1/p') CONF_DIR=$(INSTALL_PREFIX)/etc USE_LIBUSB=1 USE_PCSC=1
 
 .PHONY: myInstall
 myInstall:
