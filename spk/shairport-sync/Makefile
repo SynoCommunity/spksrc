@@ -1,5 +1,5 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 2.3.11
+SPK_VERS = 2.8.6
 SPK_REV = 3
 SPK_ICON = src/shairport-sync.png
 
@@ -8,7 +8,7 @@ DEPENDS = cross/busybox cross/$(SPK_NAME)
 MAINTAINER = SynoCommunity
 DESCRIPTION = AirPlay audio player. Shairport Sync adds multi-room capability with Audio Synchronisation. Requires USB soundcard or speakers.
 DISPLAY_NAME = Shairport Sync
-CHANGELOG = "Fix DSM 6 service installation"
+CHANGELOG = "1. Fix DSM 6 service installation<br/>2. Update to 2.8.6"
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 LICENSE  = https://github.com/mikebrady/shairport-sync/blob/master/COPYING
