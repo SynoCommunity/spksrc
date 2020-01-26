@@ -35,3 +35,4 @@ REJECT:
 #define SYNO_CODEC_PATENT_G1                                    -> DONE - 100 -> REJECT: Prevents users of Xpenology from using VideoStation
 #define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 101 -> REJECT: Relates to Synology SurveillanceStation
 #define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 102 -> REJECT: Unrelated to VideoStation
+Build configs & scripts                                         -> DONE - 110 -> REJECT: Kept for review added build configs from Synology
