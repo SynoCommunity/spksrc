@@ -8,7 +8,7 @@ DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox
 OPTIONAL_DESC =
 
 # provide htop until DSM 5.0 (later versions already have htop)
-ifeq (5.0,$(firstword $(sort $(TCVERSION) 5.0)))
+ifneq (5.1,$(firstword $(sort $(TCVERSION) 5.1)))
 DEPENDS += cross/htop
 OPTIONAL_DESC += "htop, "
 endif
