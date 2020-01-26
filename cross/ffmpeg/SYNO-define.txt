@@ -10,7 +10,6 @@ PATCH:
 50 -> 99 : Port from Synology FFMPEG 2.7.1
    100+  : Discarded patches as non-applicable to FFMPEG usage with VideoStation
 
-#define SYNO_CODEC_PATENT_G1                                    -> DONE - 010
 #define SYNO_FIX_QORIQ_CORE_DUMP                                -> TODO - 018 *
 #define SYNO_ALPINE_NEON_LIBSWSCALE                             -> TODO - 019 *
 #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                        -> TODO - 026 *
@@ -33,5 +32,6 @@ PATCH:
 #ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE     -> DONE - 089
 
 REJECT:
-#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 100 -> REJECT: Relates to Synology SurveillanceStation
-#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 101 -> REJECT: Unrelated to VideoStation
+#define SYNO_CODEC_PATENT_G1                                    -> DONE - 100 -> REJECT: Prevents users of Xpenology from using VideoStation
+#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 101 -> REJECT: Relates to Synology SurveillanceStation
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 102 -> REJECT: Unrelated to VideoStation

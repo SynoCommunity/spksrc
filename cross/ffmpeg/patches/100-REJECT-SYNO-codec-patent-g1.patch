@@ -182,17 +182,15 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacenc.c ./libavcodec/
 diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libx264.c ./libavcodec/libx264.c
 --- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libx264.c	2020-01-21 08:54:20.000000000 -0500
 +++ ./libavcodec/libx264.c	2020-01-21 08:01:42.000000000 -0500
-@@ -44,6 +44,9 @@
- // blocks of pixels (with respect to the luma plane)
+@@ -45,6 +45,7 @@
  #define MB_SIZE 16
  
-+#include "synoconfig.h"
+ #include "synoconfig.h"
 +#include "synog1codecpatent.h"
-+
- typedef struct X264Context {
-     AVClass        *class;
-     x264_param_t    params;
-@@ -552,6 +555,12 @@ static av_cold int X264_init(AVCodecCont
+ 
+ #ifdef SYNO_EVANSPORT_SMD
+ #include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
+@@ -727,6 +728,12 @@ static av_cold int X264_init(AVCodecCont
      AVCPBProperties *cpb_props;
      int sw,sh;
  
@@ -208,17 +206,15 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libx264.c ./libavcodec/libx26
 diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
 --- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videodec.c	2019-12-31 16:35:30.000000000 -0500
 +++ ./libavcodec/mpeg4videodec.c	2020-01-21 08:01:42.000000000 -0500
-@@ -39,6 +39,9 @@
- #include "xvididct.h"
+@@ -40,6 +40,7 @@
  #include "unary.h"
  
-+#include "synoconfig.h"
+ #include "synoconfig.h"
 +#include "synog1codecpatent.h"
-+
+ 
  /* The defines below define the number of bits that are read at once for
   * reading vlc values. Changing these may improve speed and data cache needs
-  * be aware though that decreasing them may need the number of stages that is
-@@ -3506,6 +3509,12 @@ static av_cold int decode_init(AVCodecCo
+@@ -3508,6 +3509,12 @@ static av_cold int decode_init(AVCodecCo
      MpegEncContext *s = &ctx->m;
      int ret;
  
@@ -506,16 +502,15 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vaapi_encode.c ./libavcodec/v
 diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
 --- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vc1dec.c	2019-12-31 16:35:30.000000000 -0500
 +++ ./libavcodec/vc1dec.c	2020-01-21 08:01:42.000000000 -0500
-@@ -40,6 +40,8 @@
- #include "vc1data.h"
+@@ -41,6 +41,7 @@
  #include "libavutil/avassert.h"
  
-+#include "synoconfig.h"
+ #include "synoconfig.h"
 +#include "synog1codecpatent.h"
  
  #if CONFIG_WMV3IMAGE_DECODER || CONFIG_VC1IMAGE_DECODER
  
-@@ -426,6 +428,12 @@ static av_cold int vc1_decode_init(AVCod
+@@ -434,6 +435,12 @@ static av_cold int vc1_decode_init(AVCod
      GetBitContext gb;
      int ret;
  
@@ -581,11 +576,10 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavformat/utils.c ./libavformat/utils.
 diff -uprN ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 09:43:11.888128640 -0500
-@@ -0,0 +1,11 @@
-+#ifndef MY_ABC_HERE
-+#define MY_ABC_HERE
-+#endif
-+
+@@ -2,6 +2,14 @@
+ #define MY_ABC_HERE
+ #endif
+ 
 +/* add SynoCodecPantent mechanism
 + * h264, mpe4part2, aac , vc1 enc/dec should actived at the first time.
 + * See Video Station #1291
@@ -593,3 +587,7 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h ./synoconfig.h
 +#if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
 +#define SYNO_CODEC_PATENT_G1
 +#endif
++
+ /* Add ffmpeg option for HLS.
+  * -hls_seek_time:
+  *  Let output fragment ts start with this seek time

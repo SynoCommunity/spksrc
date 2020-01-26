@@ -27,16 +27,16 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update3/libavcodec/h264_parser.c ./libavcode
 diff -uprN ../ffmpeg-4.2.1-patch1-5-Update3/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch1-5-Update3/synoconfig.h	2020-01-17 09:15:23.724603559 -0500
 +++ ./synoconfig.h	2020-01-17 09:20:03.490853172 -0500
-@@ -2,6 +2,12 @@
- #define MY_ABC_HERE
- #endif
- 
+@@ -16,6 +16,12 @@
+  * See Video Station #1031
+  */
+ #define SYNO_FILTER_SRT_TAGS
++ 
 +/* Fixed h264_parser error in special MP4 remux
 + * some MP4 file could parser error with remain PPS information
 + * See Video Station #944
 + */
 +#define SYNO_FIX_MP4_REMUX_H264PARSER
-+
- /* filter out some tag that not needed
-  * those tags producted at *.ass convert *.srt
-  * See Video Station #1031
+ 
+ /* Optional for writing RIFF info tag to wav
+  * See Media Server #386

@@ -38,7 +38,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 09:43:27.451525257 -0500
 +++ ./synoconfig.h	2020-01-18 09:44:13.812059786 -0500
-@@ -82,6 +82,15 @@
+@@ -74,6 +74,15 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  

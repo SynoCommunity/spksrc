@@ -29,7 +29,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg.c ./fftools/ffmpeg.c
 diff -uprN ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c ./libavcodec/libx264.c
 --- ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c	2020-01-24 06:02:18.000000000 -0500
 +++ ./libavcodec/libx264.c	2020-01-24 06:14:09.775061127 -0500
-@@ -113,6 +113,11 @@ typedef struct X264Context {
+@@ -112,6 +112,11 @@ typedef struct X264Context {
  
      int nb_reordered_opaque, next_reordered_opaque;
      int64_t *reordered_opaque;
@@ -54,7 +54,7 @@ diff -uprN ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c ./libavcodec/libx264.c
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 13:09:17.841500651 -0500
 +++ ./synoconfig.h	2020-01-18 13:05:36.226370673 -0500
-@@ -82,6 +82,13 @@
+@@ -74,6 +74,13 @@
  #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  

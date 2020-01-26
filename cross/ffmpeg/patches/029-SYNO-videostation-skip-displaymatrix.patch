@@ -48,7 +48,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/movenc.h ./libavfor
 diff -uprN ../ffmpeg-4.2.2-patch020/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch020/synoconfig.h	2020-01-24 11:58:33.796045047 -0500
 +++ ./synoconfig.h	2020-01-24 05:58:21.000000000 -0500
-@@ -66,6 +66,14 @@
+@@ -58,6 +58,14 @@
  #define SYNO_DTV_SKIP_TELETEXT
  #endif
  

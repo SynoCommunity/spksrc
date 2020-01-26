@@ -7113,7 +7113,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  } SegmentContext;
  
  static void print_csv_escaped_str(AVIOContext *ctx, const char *str)
-@@ -864,6 +887,10 @@ static int seg_write_header(AVFormatCont
+@@ -864,6 +872,10 @@ static int seg_write_header(AVFormatCont
          if (!seg->individual_header_trailer)
              oc->pb->seekable = 0;
      }
@@ -7124,7 +7124,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  
      return 0;
  }
-@@ -896,6 +923,40 @@ static int seg_write_packet(AVFormatCont
+@@ -896,6 +908,40 @@ static int seg_write_packet(AVFormatCont
          }
      }
  
@@ -7165,7 +7165,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  calc_times:
      if (seg->times) {
          end_pts = seg->segment_count < seg->nb_times ?
-@@ -982,6 +1043,14 @@ calc_times:
+@@ -982,6 +1028,14 @@ calc_times:
             av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, &st->time_base),
             av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, &st->time_base));
  
@@ -7180,7 +7180,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
      ret = ff_write_chained(seg->avf, pkt->stream_index, pkt, s, seg->initial_offset || seg->reset_timestamps);
  
  fail:
-@@ -1098,6 +1167,9 @@ static const AVOption options[] = {
+@@ -1098,6 +1152,9 @@ static const AVOption options[] = {
      { "reset_timestamps", "reset timestamps at the beginning of each segment", OFFSET(reset_timestamps), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, E },
      { "initial_offset", "set initial timestamp offset", OFFSET(initial_offset), AV_OPT_TYPE_DURATION, {.i64 = 0}, -INT64_MAX, INT64_MAX, E },
      { "write_empty_segments", "allow writing empty 'filler' segments", OFFSET(write_empty), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, E },
@@ -8993,10 +8993,10 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/SynoBuildConf/install-virtual-v
 diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch004/synoconfig.h	2020-01-21 09:52:22.956162937 -0500
 +++ ./synoconfig.h	2020-01-21 09:51:02.368157922 -0500
-@@ -9,3 +9,59 @@
- #if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
- #define SYNO_CODEC_PATENT_G1
- #endif
+@@ -0,0 +1,59 @@
++#ifndef MY_ABC_HERE
++#define MY_ABC_HERE
++#endif
 +
 +/* Add ffmpeg option for HLS.
 + * -hls_seek_time:

@@ -86,10 +86,10 @@ diff -uprN ../ffmpeg-4.2.1-patch1-4-NEW-TMP/libavformat/smoothstreamingenc.c ./l
 diff -uprN ../ffmpeg-4.2.1-patch1-4-NEW-TMP/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch1-4-NEW-TMP/synoconfig.h	2020-01-17 07:33:49.302167409 -0500
 +++ ./synoconfig.h	2020-01-04 21:07:34.000000000 -0500
-@@ -2,6 +2,18 @@
- #define MY_ABC_HERE
+@@ -11,6 +11,18 @@
+ #define SYNO_VIDEOSTATION_HLS_SEEK_TIME
  #endif
- 
+  
 +/* Add ffmpeg option for smooth streaming.
 + * -fragment_url:
 + *  This option can overwrite fragment url in Manifest for smooth streaming.
@@ -101,7 +101,7 @@ diff -uprN ../ffmpeg-4.2.1-patch1-4-NEW-TMP/synoconfig.h ./synoconfig.h
 + * See Video Station #659
 + */
 +#define SYNO_SMOOTH_STREAMING
-+
- /* Fixed h264_parser error in special MP4 remux
-  * some MP4 file could parser error with remain PPS information
-  * See Video Station #944
++ 
+ /* filter out some tag that not needed
+  * those tags producted at *.ass convert *.srt
+  * See Video Station #1031

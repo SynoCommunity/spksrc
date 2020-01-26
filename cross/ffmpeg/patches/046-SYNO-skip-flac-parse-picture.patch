@@ -19,16 +19,16 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update5/libavformat/flacdec.c ./libavformat/
 diff -uprN ../ffmpeg-4.2.1-patch1-5-Update5/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch1-5-Update5/synoconfig.h	2020-01-17 09:39:25.178370599 -0500
 +++ ./synoconfig.h	2020-01-17 09:30:59.453135285 -0500
-@@ -2,6 +2,12 @@
- #define MY_ABC_HERE
- #endif
- 
+@@ -15,6 +15,12 @@
+  * See Media Server #386
+  */
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
++ 
 +/* skip parse_picture in flacdec.c
 + * to avoid gapless playback fails when flac has big embedded cover
 + * See Audio Station #1013
 + */
 +#define SYNO_SKIP_FLAC_PARSE_PICTURE
-+
- /* add SynoCodecPantent mechanism
-  * h264, mpe4part2, aac , vc1 enc/dec should actived at the first time.
-  * See Video Station #1291
+ 
+ /* Fixed core dump when truncate recording in QORIQ platform
+  * See Surveillance bug 1151/1155
