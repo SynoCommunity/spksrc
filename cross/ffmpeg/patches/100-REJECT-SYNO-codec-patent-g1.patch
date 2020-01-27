@@ -576,10 +576,11 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavformat/utils.c ./libavformat/utils.
 diff -uprN ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 09:43:11.888128640 -0500
-@@ -2,6 +2,14 @@
- #define MY_ABC_HERE
+@@ -157,3 +157,11 @@
+ #if defined(SYNO_EVANSPORT_SMD)
+ #define SYNO_EVANSPORT_AUTO_HW_DECODER
  #endif
- 
++
 +/* add SynoCodecPantent mechanism
 + * h264, mpe4part2, aac , vc1 enc/dec should actived at the first time.
 + * See Video Station #1291
@@ -587,7 +588,3 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h ./synoconfig.h
 +#if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
 +#define SYNO_CODEC_PATENT_G1
 +#endif
-+
- /* Add ffmpeg option for HLS.
-  * -hls_seek_time:
-  *  Let output fragment ts start with this seek time

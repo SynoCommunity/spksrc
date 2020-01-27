@@ -5093,36 +5093,23 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
 diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch049/synoconfig.h	2020-01-21 10:05:45.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 10:07:39.548219984 -0500
-@@ -44,6 +44,11 @@
- #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
+@@ -80,3 +80,40 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME
  #endif
- 
++
 +/* Fixed aac copy failed on mpegts format.
 + * See Video Station #1730
 + */
 +#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
-+
- /* Optional for writing RIFF info tag to wav
-  * See Media Server #386
-  */
-@@ -69,6 +74,13 @@
- #define SYNO_ALPINE_NEON_LIBSWSCALE
- #endif
- 
++ 
 +/* Add ffserver config option to support multiple audio track.
 + * See Video Station #2245
 + */
 +#if defined(SYNO_VIDEOSTATION)
 +#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
 +#endif
-+
- /* Add skip unknown track config to support dtv streaming with unknown codec track.
-  * add flag "-dtv_skip_unknown" to skip unknown tracks.
-  * See Video Station #2470
-@@ -85,6 +97,15 @@
- #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
- #endif
- 
++ 
 +/* Add patch to fix mpegts dvbsub encoding
 + * https://trac.ffmpeg.org/ticket/2024
 + * https://github.com/FFmpeg/FFmpeg/commit/c917cde9cc52ad1ca89926a617f847bc9861d5a0add
@@ -5132,6 +5119,18 @@ diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
 +#define SYNO_DTV_MPEGTS_DVBSUB_ENCODING
 +#endif
 +
- /* Skip subtitle streams in teletext codec to avoid the abort casued by non monotonically increasing dts.
-  * add flag "-dtv_skip_teletext" to skip subtitle streams in teletext codec.
-  * See Video Station #3925
++/* Add skip unknown track config to support dtv streaming with unknown codec track.
++ * add flag "-dtv_skip_unknown" to skip unknown tracks.
++ * See Video Station #2470
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_DTV_SKIP_UNKNOWN_TRACK
++#endif
++
++/* Add skip visual impaired track config to support dtv streaming with visual impaired track.
++ * add flag "-dtv_skip_visual_impaired" to skip visual impaired tracks.
++ * See Video Station #2525
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
++#endif

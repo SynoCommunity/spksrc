@@ -682,7 +682,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libswscale/utils.c ./libswscale
 diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch004/synoconfig.h	2020-01-21 09:52:22.956162937 -0500
 +++ ./synoconfig.h	2020-01-21 09:51:02.368157922 -0500
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,21 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE
 +#endif
@@ -703,28 +703,4 @@ diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
 + */
 +#if defined(MY_DEF_HERE)
 +#define SYNO_ALPINE_NEON_LIBSWSCALE
-+#endif
-+
-+/* Add skip unknown track config to support dtv streaming with unknown codec track.
-+ * add flag "-dtv_skip_unknown" to skip unknown tracks.
-+ * See Video Station #2470
-+ */
-+#if defined(SYNO_VIDEOSTATION)
-+#define SYNO_DTV_SKIP_UNKNOWN_TRACK
-+#endif
-+
-+/* Add skip visual impaired track config to support dtv streaming with visual impaired track.
-+ * add flag "-dtv_skip_visual_impaired" to skip visual impaired tracks.
-+ * See Video Station #2525
-+ */
-+#if defined(SYNO_VIDEOSTATION)
-+#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
-+#endif
-+
-+/* Skip subtitle streams in teletext codec to avoid the abort casued by non monotonically increasing dts.
-+ * add flag "-dtv_skip_teletext" to skip subtitle streams in teletext codec.
-+ * See Video Station #3925
-+ */
-+#if defined(SYNO_VIDEOSTATION)
-+#define SYNO_DTV_SKIP_TELETEXT
 +#endif

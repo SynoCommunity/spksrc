@@ -97,10 +97,11 @@ diff -uprN ../ffmpeg-4.2.1-patch099-Update1/fftools/ffmpeg_opt.c ./fftools/ffmpe
 diff -uprN ../ffmpeg-4.2.1-patch099-Update1/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch099-Update1/synoconfig.h	2020-01-17 10:02:54.626620086 -0500
 +++ ./synoconfig.h	2020-01-17 09:47:17.808045401 -0500
-@@ -74,6 +74,14 @@
- #define SYNO_ALPINE_NEON_LIBSWSCALE
+@@ -149,3 +149,11 @@
+ #if defined(SYNO_EVANSPORT_SMD)
+ #define SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE
  #endif
- 
++ 
 +/* on Evansport, default always using software decoder.
 + * add new flag "-prefer_smd" can auto using hardware decoder.
 + * See Video Station #1234, DSM #50422
@@ -108,7 +109,3 @@ diff -uprN ../ffmpeg-4.2.1-patch099-Update1/synoconfig.h ./synoconfig.h
 +#if defined(SYNO_EVANSPORT_SMD)
 +#define SYNO_EVANSPORT_AUTO_HW_DECODER
 +#endif
-+
- /* smooth streaming enable hardware transcoding on Evansport.
-  * fixed video not sync with subtitile.
-  * See Video Station #1244

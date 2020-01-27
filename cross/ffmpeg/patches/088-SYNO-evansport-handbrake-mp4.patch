@@ -45,10 +45,11 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg.c ./fftools/ffmpeg.c
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 09:26:21.219732889 -0500
 +++ ./synoconfig.h	2020-01-18 09:26:42.359953578 -0500
-@@ -83,6 +83,14 @@
+@@ -133,3 +133,11 @@
+ #if defined(SYNO_EVANSPORT_SMD)
  #define SYNO_EVANSPORT_DTV_SMD_AVSYNC
  #endif
- 
++ 
 +/* Fixed mp4 can't hardwared trasncode that encoded by Handbrake.
 + * auto enable -dtv_smd flag when detecting Handbrake encoded file.
 + * See Video Station #1513
@@ -56,7 +57,3 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 +#if defined(SYNO_EVANSPORT_SMD) && defined(SYNO_EVANSPORT_DTV_SMD_AVSYNC)
 +#define SYNO_EVANSPORT_HANDBRAKE_MP4
 +#endif
-+
- /* Fixed evansport coredump transcode to flv on pipeline mode
-  * See Video Station #2132
-  */

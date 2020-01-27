@@ -23,7 +23,6 @@ PATCH:
 #define SYNO_SMOOTH_STREAMING                                   -> DONE - 049
 #define SYNO_DTV_SKIP_UNKNOWN_TRACK                             -> TODO - 076 *
 #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                     -> TODO - 077 *
-#define SYNO_DTV_SKIP_TELETEXT                                  -> TODO - 078 *
 #if defined(SYNO_EVANSPORT_SMD)                                 -> TODO - 084 *
 #ifdef SYNO_EVANSPORT_AUTO_HW_DECODER                           -> DONE - 099 -> TO MOVE AT 085 (AFTER MASTER _SMD)
 #ifdef SYNO_EVANSPORT_FLV_EXTRADATA                             -> DONE - 086 -> FIX: To merge with default _smd patches?
@@ -35,4 +34,5 @@ REJECT:
 #define SYNO_CODEC_PATENT_G1                                    -> DONE - 100 -> REJECT: Prevents users of Xpenology from using VideoStation
 #define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 101 -> REJECT: Relates to Synology SurveillanceStation
 #define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 102 -> REJECT: Unrelated to VideoStation
+#define SYNO_DTV_SKIP_TELETEXT                                  -> TODO - 103 -> REJECT: Empty #define
 Build configs & scripts                                         -> DONE - 110 -> REJECT: Kept for review added build configs from Synology

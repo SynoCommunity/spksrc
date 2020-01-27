@@ -38,10 +38,11 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 09:43:27.451525257 -0500
 +++ ./synoconfig.h	2020-01-18 09:44:13.812059786 -0500
-@@ -74,6 +74,15 @@
- #define SYNO_ALPINE_NEON_LIBSWSCALE
+@@ -124,3 +124,12 @@
+ #if defined(SYNO_EVANSPORT_SMD)
+ #define SYNO_EVANSPORT_FLV_EXTRADATA
  #endif
- 
++ 
 +/* Fixed DTV recoded file or DTV streaming A/V issue on Evansport.
 + * add flag "-dtv_smd" is used other way to calculate timestamp.
 + * in hardware pipeline mode.
@@ -50,7 +51,3 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 +#if defined(SYNO_EVANSPORT_SMD)
 +#define SYNO_EVANSPORT_DTV_SMD_AVSYNC
 +#endif
-+
- /* Fixed evansport coredump transcode to flv on pipeline mode
-  * See Video Station #2132
-  */
