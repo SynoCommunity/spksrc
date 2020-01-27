@@ -38,5 +38,5 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update3/synoconfig.h ./synoconfig.h
 + */
 +#define SYNO_FIX_MP4_REMUX_H264PARSER
  
- /* Optional for writing RIFF info tag to wav
-  * See Media Server #386
+ /* Add ffmpeg option for WEBM.
+  * -webm_seek_time:

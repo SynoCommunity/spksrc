@@ -29,8 +29,8 @@ diff -uprN ../ffmpeg-4.2.2-patch020/libavcodec/ppc/blockdsp.c ./libavcodec/ppc/b
 diff -uprN ../ffmpeg-4.2.2-patch020/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch020/synoconfig.h	2020-01-26 17:10:08.482045232 -0500
 +++ ./synoconfig.h	2020-01-26 17:11:24.805629959 -0500
-@@ -11,6 +11,11 @@
- #define SYNO_VIDEOSTATION_HLS_SEEK_TIME
+@@ -20,6 +20,11 @@
+ #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
  #endif
  
 +/* Fixed core dump when truncate recording in QORIQ platform

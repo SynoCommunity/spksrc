@@ -68,7 +68,7 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
 diff -uprN ../ffmpeg-4.2.2-patch060/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch060/synoconfig.h	2020-01-24 06:02:18.000000000 -0500
 +++ ./synoconfig.h	2020-01-24 06:07:40.306962200 -0500
-@@ -48,6 +48,13 @@
+@@ -57,6 +57,13 @@
   */
  #define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
  

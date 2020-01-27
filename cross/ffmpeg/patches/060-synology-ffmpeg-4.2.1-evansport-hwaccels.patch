@@ -1053,7 +1053,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
          if (!(option->flags & AV_OPT_FLAG_DECODING_PARAM)) {
              av_log(NULL, AV_LOG_ERROR, "Codec AVOption %s (%s) specified for "
                     "input file #%d (%s) is not a decoding option.\n", e->key,
-@@ -3364,6 +3394,15 @@ static int opt_progress(void *optctx, co
+@@ -3364,6 +3396,15 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS
@@ -3715,7 +3715,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  typedef struct X264Context {
      AVClass        *class;
      x264_param_t    params;
-@@ -473,10 +485,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -473,10 +486,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return 0;
  }
  
@@ -3861,7 +3861,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
      av_freep(&avctx->extradata);
      av_freep(&x4->sei);
      av_freep(&x4->reordered_opaque);
-@@ -486,6 +633,26 @@ static av_cold int X264_close(AVCodecCon
+@@ -486,6 +634,26 @@ static av_cold int X264_close(AVCodecCon
          x4->enc = NULL;
      }
  
@@ -3888,7 +3888,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
      return 0;
  }
  
-@@ -949,6 +1116,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -949,6 +1117,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return 0;
  }
  
@@ -4096,7 +4096,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  static const enum AVPixelFormat pix_fmts_8bit[] = {
      AV_PIX_FMT_YUV420P,
      AV_PIX_FMT_YUVJ420P,
-@@ -1151,6 +1519,15 @@ static const AVClass x264_class = {
+@@ -1151,6 +1520,15 @@ static const AVClass x264_class = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -4112,7 +4112,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  AVCodec ff_libx264_encoder = {
      .name             = "libx264",
      .long_name        = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
-@@ -1178,6 +1555,23 @@ static const AVClass rgbclass = {
+@@ -1178,6 +1556,23 @@ static const AVClass rgbclass = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -4139,7 +4139,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
 diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/Makefile ./libavcodec/Makefile
 --- ../ffmpeg-4.2.2-patch049/libavcodec/Makefile	2020-01-21 10:04:33.000000000 -0500
 +++ ./libavcodec/Makefile	2020-01-21 10:21:04.244270067 -0500
-@@ -52,6 +52,10 @@ OBJS = ac3_parser.o
+@@ -52,6 +52,11 @@ OBJS = ac3_parser.o
         vorbis_parser.o                                                  \
         xiph.o                                                           \
  
@@ -4147,9 +4147,10 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/Makefile ./libavcodec/Makefile
 +OBJS += ismd_ffmpeg_audio_util.o
 +OBJS += syno_trans_loading.o
 +endif
- OBJS += synog1codecpatent.o
- 
++
  # subsystems
+ OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+ OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
 diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
 --- ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c	2019-07-08 13:45:25.000000000 -0400
 +++ ./libavcodec/mpeg12dec.c	2020-01-04 22:05:42.839778315 -0500
@@ -5092,9 +5093,9 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
 diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch049/synoconfig.h	2020-01-21 10:05:45.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 10:07:39.548219984 -0500
-@@ -35,6 +35,11 @@
-  */
- #define SYNO_FIX_MP4_REMUX_H264PARSER
+@@ -44,6 +44,11 @@
+ #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
+ #endif
  
 +/* Fixed aac copy failed on mpegts format.
 + * See Video Station #1730
@@ -5105,7 +5106,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
   * See Media Server #386
   */
 @@ -69,6 +74,13 @@
- #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
+ #define SYNO_ALPINE_NEON_LIBSWSCALE
  #endif
  
 +/* Add ffserver config option to support multiple audio track.

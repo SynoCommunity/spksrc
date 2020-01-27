@@ -11,11 +11,11 @@ PATCH:
    100+  : Discarded patches as non-applicable to FFMPEG usage with VideoStation
 
 #define SYNO_ALPINE_NEON_LIBSWSCALE                             -> TODO - 019 *
-#define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                        -> TODO - 026 *
 #define SYNO_VIDEOSTATION_HLS_SEEK_TIME                         -> TODO - 027 *
 #define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME                -> DONE - 028
 #define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX                    -> DONE - 029
-#define SYNO_FIX_QORIQ_CORE_DUMP                                -> DONE - 030
+#define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                        -> DONE - 030
+#define SYNO_FIX_QORIQ_CORE_DUMP                                -> DONE - 031
 #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                         -> DONE - 045
 #define SYNO_SKIP_FLAC_PARSE_PICTURE                            -> DONE - 046
 #define SYNO_FILTER_SRT_TAGS                                    -> DONE - 047

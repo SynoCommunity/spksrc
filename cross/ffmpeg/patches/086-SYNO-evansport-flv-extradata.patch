@@ -55,7 +55,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 13:09:17.841500651 -0500
 +++ ./synoconfig.h	2020-01-18 13:05:36.226370673 -0500
 @@ -74,6 +74,13 @@
- #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
+ #define SYNO_ALPINE_NEON_LIBSWSCALE
  #endif
  
 +/* Fixed evansport coredump transcode to flv on pipeline mode

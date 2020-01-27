@@ -69,5 +69,5 @@ diff -uprN ../ffmpeg-4.2.1-patch1-5-Update4/synoconfig.h ./synoconfig.h
 + */
 +#define SYNO_FILTER_SRT_TAGS
  
- /* Optional for writing RIFF info tag to wav
-  * See Media Server #386
+ /* Add ffmpeg option for WEBM.
+  * -webm_seek_time:
