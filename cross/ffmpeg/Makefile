@@ -90,7 +90,8 @@ CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/
 CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
 CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
-CONFIGURE_ARGS += --arch=x86 --cpu=atom --enable-libh264_smd --enable-smd
+#CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
+CONFIGURE_ARGS += --arch=x86 --cpu=atom
 
 else
 CONFIGURE_ARGS += --arch=i386
