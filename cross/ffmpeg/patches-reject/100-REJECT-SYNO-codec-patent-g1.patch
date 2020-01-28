@@ -576,7 +576,7 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavformat/utils.c ./libavformat/utils.
 diff -uprN ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 09:43:11.888128640 -0500
-@@ -157,3 +157,11 @@
+@@ -152,3 +152,11 @@
  #if defined(SYNO_EVANSPORT_SMD)
  #define SYNO_EVANSPORT_AUTO_HW_DECODER
  #endif
