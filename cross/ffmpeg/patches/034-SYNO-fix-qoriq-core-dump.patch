@@ -29,15 +29,12 @@ diff -uprN ../ffmpeg-4.2.2-patch020/libavcodec/ppc/blockdsp.c ./libavcodec/ppc/b
 diff -uprN ../ffmpeg-4.2.2-patch020/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch020/synoconfig.h	2020-01-26 17:10:08.482045232 -0500
 +++ ./synoconfig.h	2020-01-26 17:11:24.805629959 -0500
-@@ -20,6 +20,11 @@
- #define SYNO_VIDEOSTATION_WEBM_SEEK_TIME
+@@ -70,3 +70,8 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_FIX_MP4_REMUX_H264PARSER
  #endif
- 
++
 +/* Fixed core dump when truncate recording in QORIQ platform
 + * See Surveillance bug 1151/1155
 + */
 +#define SYNO_FIX_QORIQ_CORE_DUMP
-+
- /* Use neon acceleration in libswscale, which boosts transcoding
-  * performance on Alpine platform.
-  * The patch is provided by AnnapurnaLabs.
