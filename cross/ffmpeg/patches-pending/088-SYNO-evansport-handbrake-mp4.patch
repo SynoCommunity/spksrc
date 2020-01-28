@@ -45,7 +45,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg.c ./fftools/ffmpeg.c
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 09:26:21.219732889 -0500
 +++ ./synoconfig.h	2020-01-18 09:26:42.359953578 -0500
-@@ -133,3 +133,11 @@
+@@ -128,3 +128,11 @@
  #if defined(SYNO_EVANSPORT_SMD)
  #define SYNO_EVANSPORT_DTV_SMD_AVSYNC
  #endif

@@ -5093,10 +5093,10 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
 diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch049/synoconfig.h	2020-01-21 10:05:45.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 10:07:39.548219984 -0500
-@@ -80,3 +80,40 @@
- #if defined(SYNO_VIDEOSTATION)
- #define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME
- #endif
+@@ -75,3 +75,40 @@
+  * See Surveillance bug 1151/1155
+  */
+ #define SYNO_FIX_QORIQ_CORE_DUMP
 +
 +/* Fixed aac copy failed on mpegts format.
 + * See Video Station #1730

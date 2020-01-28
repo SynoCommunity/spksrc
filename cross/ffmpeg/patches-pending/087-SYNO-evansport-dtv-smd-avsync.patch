@@ -38,7 +38,7 @@ diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
 diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 09:43:27.451525257 -0500
 +++ ./synoconfig.h	2020-01-18 09:44:13.812059786 -0500
-@@ -124,3 +124,12 @@
+@@ -119,3 +119,12 @@
  #if defined(SYNO_EVANSPORT_SMD)
  #define SYNO_EVANSPORT_FLV_EXTRADATA
  #endif

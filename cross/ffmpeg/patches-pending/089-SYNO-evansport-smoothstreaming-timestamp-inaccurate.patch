@@ -70,7 +70,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/libavformat/smoothstreamingenc.c ./libavform
 diff -uprN ../ffmpeg-4.2.1-patch060-streaming-orig/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.1-patch060-streaming-orig/synoconfig.h	2020-01-18 09:16:26.413624358 -0500
 +++ ./synoconfig.h	2020-01-18 09:15:29.473055414 -0500
-@@ -141,3 +141,11 @@
+@@ -136,3 +136,11 @@
  #if defined(SYNO_EVANSPORT_SMD) && defined(SYNO_EVANSPORT_DTV_SMD_AVSYNC)
  #define SYNO_EVANSPORT_HANDBRAKE_MP4
  #endif
