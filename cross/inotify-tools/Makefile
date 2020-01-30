@@ -1,13 +1,13 @@
 PKG_NAME = inotify-tools
-PKG_VERS = 3.20.1
+PKG_VERS = 3.20.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/rvoicilas/inotify-tools/archive
+PKG_DIST_SITE = https://github.com/inotify-tools/inotify-tools/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
-HOMEPAGE = https://github.com/rvoicilas/inotify-tools
+HOMEPAGE = https://github.com/inotify-tools/inotify-tools
 COMMENT  = inotify-tools is a C library and a set of command-line programs for Linux providing a simple interface to inotify. 
 LICENSE  = GPLv2
 
