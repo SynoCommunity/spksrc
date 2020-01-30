@@ -1,11 +1,10 @@
 PKG_NAME = inotify-tools
-PKG_VERS = 3.20.1patch1
+PKG_VERS = 3.20.1
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 501a806c9fa2cccb90ee55b7d36c00a78fac5527
-PKG_DIST_SITE = https://github.com/rvoicilas/$(PKG_NAME).git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/rvoicilas/inotify-tools/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 HOMEPAGE = https://github.com/rvoicilas/inotify-tools
