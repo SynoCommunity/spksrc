@@ -1,5 +1,5 @@
 PKG_NAME = inotify-tools
-PKG_VERS = 3.20.2
+PKG_VERS = 3.20.2.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/inotify-tools/inotify-tools/archive
@@ -13,7 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = inotify_pre_configure
-CONFIGURE_ARGS = 
+
 
 include ../../mk/spksrc.cross-cc.mk
 
