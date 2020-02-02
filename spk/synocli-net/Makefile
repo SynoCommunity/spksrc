@@ -1,27 +1,45 @@
 SPK_NAME = synocli-net
-SPK_VERS = 1.1
+SPK_VERS = 1.2
 SPK_REV = 2
 SPK_ICON = src/synocli-net.png
 
 include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/sshfs cross/mosh cross/socat
+DEPENDS += cross/rsync
+
+OPTIONAL_DESC =
+
 ifneq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += cross/fritzctl
+OPTIONAL_DESC += "fritzctl, "
 endif
+
+ifeq ($(OPTIONAL_DESC),)
+OPTIONAL_DESC = " "
+endif
+
 
 # Requirement for Mosh
 SPK_DEPENDS = "Perl>=5.14"
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs, fritzctl. Credits to Sebastian Schmidt \(publicarray\) for icons"
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs,$(OPTIONAL_DESC)rsync. Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "3. Build sshfs 2.10 with fuse updated to v2.9.9"
+CHANGELOG = "1. Add rsync"
 
-HOMEPAGE   = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
-LICENSE    = Mixed
+HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
+LICENSE  = Each tool is licensed under it\'s respective license.
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/screen
+SPK_LINKS = /usr/local/bin/tmux:bin/tmux-utf8
+SPK_COMMANDS += bin/nmap bin/nping bin/ndiff
+SPK_COMMANDS += bin/sshfs
+SPK_COMMANDS += bin/fusermount
+SPK_COMMANDS += bin/mosh bin/mosh-client bin/mosh-server
+SPK_COMMANDS += bin/socat bin/procan bin/filan
+SPK_COMMANDS += bin/fritzctl
+SPK_COMMANDS += bin/rsync
 
 include ../../mk/spksrc.spk.mk

@@ -99,4 +99,4 @@ bin:bin/wc
 bin:bin/who
 bin:bin/whoami
 bin:bin/yes
-libexec:libexec/coreutils/libstdbuf.so
+lib:libexec/coreutils/libstdbuf.so

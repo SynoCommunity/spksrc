@@ -1,6 +1,6 @@
 SPK_NAME = minio
-SPK_VERS = 2019-10-12T01-39-57Z
-SPK_REV = 2
+SPK_VERS = 2019-12-30T05-45-39Z
+SPK_REV = 3
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ MAINTAINER = fgma
 DESCRIPTION = The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage.
 RELOAD_UI = yes
 DISPLAY_NAME = MinIO
-CHANGELOG = "Update to 2019-10-12T01-39-57Z built with go 1.13.1"
+CHANGELOG = "Update to latest release which includes a major feature release and minor bugfix releases. Breaking Change: Lots of new features have been implemented, so rolling upgrade is not supported. Please upgrade all servers. Also, mc version RELEASE.2019-12-17T23-26-28Z is required to talk to this version of MinIO."
 HOMEPAGE = https://min.io/
 LICENSE = Apache License 2.0
 STARTABLE = yes

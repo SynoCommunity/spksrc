@@ -7,7 +7,7 @@ bin:bin/glib-compile-resources
 bin:bin/glib-compile-schemas
 rsc:bin/glib-genmarshal
 rsc:bin/glib-gettextize
-bin:bin/glib-mkenums
+rsc:bin/glib-mkenums
 bin:bin/gobject-query
 bin:bin/gresource
 bin:bin/gsettings

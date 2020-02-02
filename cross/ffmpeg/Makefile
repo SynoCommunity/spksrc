@@ -31,11 +31,21 @@ CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnu
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
 
-# fdk-acc is not compatible with (L)GPL.
-# It can be enabled for personal use, but not for freely distributed packages.
-# Uncomment the following lines if you want to enable it.
-# DEPENDS += cross/fdk-aac
-# CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
+# fdk-acc is now considered compatible with (L)GPL.
+# It requires --enable-nonfree if you're also using --enable-gpl
+#
+# https://en.wikipedia.org/wiki/Fraunhofer_FDK_AAC
+# It was classified as free by Fedora after a review by the legal department at Red Hat.
+# See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
+#
+DEPENDS += cross/fdk-aac
+CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
+
+# Enable Synology specific -hls_seek_time option and other optimizations
+CONFIGURE_ARGS += --extra-cflags="-DSYNO_VIDEOSTATION -DSYNO_AUDIOSTATION -DSYNO_MEDIASERVER -DSYNO_DSM"
+
+# Compiler workaround to enable DTS-HD MA stream decoding
+CONFIGURE_ARGS += --extra-cflags="-fno-if-conversion"
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -50,23 +60,23 @@ CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --enable-neon --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
+CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --enable-neon --disable-yasm --disable-asm
+CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=i386 --enable-thumb
+CONFIGURE_ARGS += --arch=i386
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver
+DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86_64 --enable-thumb --enable-vaapi
+CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))

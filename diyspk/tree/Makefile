@@ -9,12 +9,11 @@ DESCRIPTION = Tree is a recursive directory listing command that produces a dept
 RELOAD_UI = no
 DISPLAY_NAME = Tree
 STARTABLE = no
-BETA = 1
 CHANGELOG = First release 1.8.0
 
 HOMEPAGE = http://mama.indstate.edu/users/ice/tree/index.html
 LICENSE  = Unknown
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/tree
 
 include ../../mk/spksrc.spk.mk

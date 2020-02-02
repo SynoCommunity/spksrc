@@ -1,21 +1,20 @@
 SPK_NAME = dnscrypt-proxy
-SPK_VERS = 2.0.25
+SPK_VERS = 2.0.33
 SPK_REV = 3
 SPK_ICON = src/dnscrypt-proxy.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_CONFLICT = DNSServer
-UNSUPPORTED_ARCHES = $(PPC_ARCHES)
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 MAINTAINER = publicarray
 DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS. https://github.com/jedisct1/dnscrypt-proxy
 DISPLAY_NAME = dnscrypt-proxy
 HELPURL = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
-CHANGELOG = "Update to 2.0.25 built with go 1.13.1"
+CHANGELOG = "Update to 2.0.33"
 
 STARTABLE = yes
-BETA = 1
 
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = ui
@@ -69,12 +68,12 @@ ENV += GOPATH="$(WORK_DIR)" \
 
 .PHONY: dnscrypt_extra_install
 dnscrypt_extra_install: copy_msg
-	@echo "===> Copying files"
+	@$(MSG) "Copying files"
 	mkdir -p $(STAGING_DIR)/offline-cache/ $(STAGING_DIR)/blocklist/
 	cp -rf $(CURDIR)/src/offline-cache/* $(STAGING_DIR)/offline-cache/
 	install -m 755 $(CURDIR)/src/update-blocklist.sh $(STAGING_DIR)/blocklist/update-blocklist.sh
-	@echo "===> UI - Copying files"
+	@$(MSG) "UI - Copying files"
 	mkdir -p $(STAGING_DIR)/$(DSM_UI_DIR)/
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/
-	@echo "===> UI - Compiling cgi"
+	@$(MSG) "UI - Compiling cgi"
 	env $(ENV) go build $(CONF_ARGS) -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go

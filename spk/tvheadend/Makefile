@@ -1,18 +1,27 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.8
-SPK_REV = 16
+SPK_SHORT_VERS = 4.3
+SPK_GIT_HASH = 221c29b
+SPK_GIT_DATE = 20191128
+SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
+TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
+SPK_REV = 17
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
+# Export version to the build where version
+# script gets patched accordingly by:
+# 000-fix-version.patch from cross/tvheadend
+export TVH_VERS
+
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = m4tt075
+MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Fix CA module support regression<br/>2. Fix regression of upgrading legacy packages<br/>3. Simplify and fix initial login credential setting"
-HOMEPAGE = https://www.lonelycoder.com/tvheadend/
+CHANGELOG = "1. Use latest github commit on 4.3 branch 221c29b<br/>2. Update all trivial dependencies to latest versions<br/>3. New package built on m4tt075 v4.28 version"
+HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
 WIZARDS_DIR = src/wizard/

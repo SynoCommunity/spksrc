@@ -1,4 +1,4 @@
-bin:bin/pcre2-config
+rsc:bin/pcre2-config
 bin:bin/pcre2grep
 bin:bin/pcre2test
 lnk:lib/libpcre2-8.so

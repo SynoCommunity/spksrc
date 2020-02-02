@@ -14,4 +14,4 @@ lib:lib/slang/v2/modules/sysconf-module.so
 lib:lib/slang/v2/modules/termios-module.so
 lib:lib/slang/v2/modules/varray-module.so
 lib:lib/slang/v2/modules/zlib-module.so
-shr:share/slsh
+rsc:share/slsh

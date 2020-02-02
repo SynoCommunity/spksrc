@@ -6,4 +6,4 @@ bin:bin/libwebsockets-test-server
 bin:bin/libwebsockets-test-server-extpoll
 lnk:lib/libwebsockets.so
 lib:lib/libwebsockets.so.12
-shr:share/libwebsockets-test-server
+rsc:share/libwebsockets-test-server

@@ -1,5 +1,5 @@
 SPK_NAME = lua
-SPK_VERS = 5.3.4
+SPK_VERS = 5.3.5
 SPK_REV = 1
 SPK_ICON = src/lua.png
 
@@ -18,7 +18,6 @@ CHANGELOG = "First Synology package release"
 HOMEPAGE = https://www.lua.org
 LICENSE = MIT
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/lua bin/luac
 
 include ../../mk/spksrc.spk.mk
-

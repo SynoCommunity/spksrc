@@ -20,6 +20,6 @@ CHANGELOG = "Update to 5.7.1"
 HOMEPAGE = http://www.zsh.org
 LICENSE = Custom
 
-SERVICE_SETUP = ../zsh/src/service-setup.sh
+SPK_COMMANDS = bin/zsh
 
 include ../../mk/spksrc.spk.mk
