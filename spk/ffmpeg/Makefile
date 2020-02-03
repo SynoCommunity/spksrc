@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.2.2
-SPK_REV = 26
+SPK_REV = 27
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 4.2.2<br/>2. Review and isolate Synology FFMPEG 3.3.7 patches with fixes<br/>3. Enable opencore-amr codec<br/>4. Fix issues #3668, #3716, #3861 and #3862"
+CHANGELOG = "1. Update ffmpeg to 4.2.2<br/>2. Review and isolate Synology FFMPEG 3.3.7 patches with fixes<br/>3. Enable opencore-amr codec<br/>4. Update libva-utils to v2.6<br/>5. Fix issues 3668, 3716, 3861 and 3862"
 
 DEPENDS = cross/$(SPK_NAME)
 
