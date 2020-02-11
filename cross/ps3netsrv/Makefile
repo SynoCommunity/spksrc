@@ -1,15 +1,10 @@
 PKG_NAME = ps3netsrv
-PKG_VERS = 1.47.26rc1
+PKG_VERS = 1.47.26
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 85276922fee1b3a6ef2e1b764872f31c87054e9c
-#PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-#PKG_DIST_SITE = https://github.com/aldostools/webMAN-MOD/archive
-PKG_DIST_SITE = https://github.com/aldostools/webMAN-MOD.git
-#PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-#PKG_DIR = webMAN-MOD-$(PKG_VERS)/_Projects_/$(PKG_NAME)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)/_Projects_/$(PKG_NAME)
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/aldostools/webMAN-MOD/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = webMAN-MOD-$(PKG_VERS)/_Projects_/$(PKG_NAME)
 
 DEPENDS = 
 
