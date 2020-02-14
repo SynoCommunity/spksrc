@@ -75,8 +75,14 @@ RUN pip install virtualenv httpie
 
 # Install rustup and add the required toolchains
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
-        CARGO_HOME=/spksrc/.cargo/ sh -s -- -y && . /spksrc/.cargo/env && \
-        rustup target add armv7-unknown-linux-gnueabihf aarch64-unknown-linux-gnu
+        CARGO_HOME=/opt/cargo/ sh -s -- -y && . /opt/cargo/env && \
+        rustup target add \
+        x86_64-unknown-linux-gnu i686-unknown-linux-gnu \
+        aarch64-unknown-linux-gnu \
+        armv7-unknown-linux-gnueabihf arm-unknown-linux-gnueabi arm-unknown-linux-gnueabihf \
+        powerpc-unknown-linux-gnu
+
+ENV PATH="${PATH}:/opt/cargo/bin"
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
