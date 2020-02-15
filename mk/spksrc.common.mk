@@ -42,6 +42,8 @@ ARCHS_DUPES := $(filter-out rtd1296% armada37xx%, $(ARCHS_DUPES))
 # optional remove archs for generic armv7 build
 ifeq ($(findstring ARM7,$(GENERIC_ARCHS)),ARM7)
   ARCHS_DUPES := $(filter-out alpine% armada370% armada375% armada38x% armadaxp% comcerto2k% monaco%, $(ARCHS_DUPES))
+else
+  ARCHS_DUPES := $(filter-out armv7%, $(ARCHS_DUPES))
 endif
 
 # Available Arches
