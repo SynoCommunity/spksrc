@@ -34,6 +34,15 @@ DEPENDS += cross/micro cross/fzf
 OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor), fzf (fuzzy finder)"
 endif
 
+ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x hi3535),$(ARCH))
+DEPENDS += cross/ripgrep
+OPTIONAL_DESC += "rg \(ripgrep\), "
+endif
+
+ifeq ($(OPTIONAL_DESC),)
+OPTIONAL_DESC = " "
+endif
+
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL=1
 export PCRE2_CLI_FULL
@@ -61,6 +70,7 @@ SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
+SPK_COMMANDS += bin/rg
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
