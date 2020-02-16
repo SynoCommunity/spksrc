@@ -36,18 +36,15 @@ endif
 
 ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x hi3535),$(ARCH))
 DEPENDS += cross/ripgrep
-OPTIONAL_DESC += "rg \(ripgrep\), "
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rg \(ripgrep\)"
 endif
 
-ifeq ($(OPTIONAL_DESC),)
-OPTIONAL_DESC = " "
-endif
 
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL=1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd, lzip, plzip$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG = "1. Add micro (editor)<br/>2. Add Lzip and Plzip<br/>3. Add fzf (fuzzy finder)<br/>4. Update mc to version 4.8.26<br/>Fix rmlint and zstd."
 
