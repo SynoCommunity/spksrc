@@ -11,7 +11,9 @@ UNSUPPORTED_ARCHS = hi3535
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS += powerpc ppc824x ppc853x ppc854x
 
+HOMEPAGE = https://github.com/BurntSushi/ripgrep
+COMMENT = ripgrep recursively searches directories for a regex pattern 
+LICENSE  = MIT/UNLICENSE
+
 
 include ../../mk/spksrc.cross-rust.mk
-
-
