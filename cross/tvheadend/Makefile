@@ -29,6 +29,10 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --nowerror
+endif
+
 .PHONY: post_patch_target_tvheadend
 
 post_patch_target_tvheadend:

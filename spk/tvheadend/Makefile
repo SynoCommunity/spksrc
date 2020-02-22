@@ -62,7 +62,7 @@ FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc li
 
 tvheadend_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG_LIBS),ln -s $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 
 tvheadend_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
