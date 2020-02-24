@@ -14,8 +14,23 @@
 ifeq ($(strip $(PATCHES_LEVEL)),)
 PATCHES_LEVEL = 0
 endif
+
 ifeq ($(strip $(PATCHES)),)
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+PATCHES = $(sort $(wildcard patches/*.patch patches/[aA][rR][mM][vV]?5/*.patch))
+else ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+PATCHES = $(sort $(wildcard patches/*.patch patches/[aA][rR][mM][vV]?7/*.patch))
+else ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+PATCHES = $(sort $(wildcard patches/*.patch patches/[aA][rR][mM][vV]?8/*.patch))
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+PATCHES = $(sort $(wildcard patches/*.patch patches/[pP][pP][cC]/*.patch))
+else ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+PATCHES = $(sort $(wildcard patches/*.patch patches/[xX]86/*.patch))
+else ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+PATCHES = $(sort $(wildcard patches/*.patch patches/[xX]8?6?_?64/*.patch))
+else
 PATCHES = $(sort $(wildcard patches/*.patch))
+endif
 endif
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
