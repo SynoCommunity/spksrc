@@ -22,6 +22,10 @@ CONFIGURE_ARGS += --enable-postproc --enable-vp9-postproc --enable-pic
 CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
 CONFIGURE_ARGS += --disable-multithread
 
+ifeq ($(ARCH), 88f6281)
+PATCHES = patches/arm5/001-armv5-88f6281-configure-fix.patch
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
