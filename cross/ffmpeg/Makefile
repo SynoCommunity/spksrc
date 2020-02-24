@@ -35,6 +35,20 @@ CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --enable-debug=1
 
+PATCHES  = patches/001-replace-arch-env-by-ffmpeg_arch.patch
+PATCHES += patches/002-tvheadend-ffmpeg.libx264.patch
+PATCHES += patches/003-tvheadend-ffmpeg.libx265.patch
+PATCHES += patches/004-tvheadend-ffmpeg.vaapi_encode.patch
+PATCHES += patches/005-fix-MSDK-initialization-failure-in-system-memory-mode.patch
+PATCHES += patches/020-SYNO-videostation-hls-seek-time.patch
+PATCHES += patches/021-SYNO-videostation-hls-costumized-ts-name.patch
+PATCHES += patches/022-SYNO-videostation-skip-displaymatrix.patch
+PATCHES += patches/023-SYNO-videostation-webm-seek-time.patch
+PATCHES += patches/030-SYNO-smooth-streaming.patch
+PATCHES += patches/031-SYNO-filter-srt-tags.patch
+PATCHES += patches/032-SYNO-fix-mp4-remux-h264parser.patch
+PATCHES += patches/033-SYNO-write-riff-info-tag-to-wav.patch
+
 # fdk-acc is now considered compatible with (L)GPL.
 # It requires --enable-nonfree if you're also using --enable-gpl
 #
@@ -68,6 +82,7 @@ CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+PATCHES += patches/arm7/001-SYNO-alpine-neon-libwscale.patch
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
@@ -107,6 +122,7 @@ CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+PATCHES += patches/ppc/001-SYNO-fix-qoriq-core-dump.patch
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc

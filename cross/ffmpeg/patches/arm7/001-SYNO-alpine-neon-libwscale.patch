@@ -580,10 +580,10 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libswscale/utils.c ./libswscale
 diff -uprN ../ffmpeg-4.2.2-patch030/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch030/synoconfig.h	2020-01-27 19:36:22.336168627 -0500
 +++ ./synoconfig.h	2020-01-27 19:43:00.550402172 -0500
-@@ -45,3 +45,12 @@
- #if defined(SYNO_VIDEOSTATION)
- #define SYNO_SMOOTH_STREAMING
- #endif
+@@ -66,3 +66,12 @@
+  * See Media Server #386
+  */
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
 +
 +/* Use neon acceleration in libswscale, which boosts transcoding
 + * performance on Alpine platform.
