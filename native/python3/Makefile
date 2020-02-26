@@ -32,7 +32,7 @@ nativepython3_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing setuptools, pip and cffi
 	@$(RUN) wget https://bootstrap.pypa.io/ez_setup.py -O - | $(PYTHON)
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
-	@$(PIP) install "cffi==1.11.5"
+	@$(PIP) install "cffi==1.14.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
