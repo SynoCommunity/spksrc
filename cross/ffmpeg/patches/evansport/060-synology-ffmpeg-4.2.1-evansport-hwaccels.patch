@@ -5069,16 +5069,16 @@ diff -uprN ../ffmpeg-4.2.1/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
 diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_internal.h
 --- ../ffmpeg-4.2.1/libswscale/swscale_internal.h	2020-01-04 21:07:34.000000000 -0500
 +++ ./libswscale/swscale_internal.h	2020-01-04 21:09:15.871386957 -0500
-@@ -35,6 +35,8 @@
- 
- #include "synoconfig.h"
+@@ -33,6 +33,8 @@
+ #include "libavutil/pixdesc.h"
+ #include "libavutil/ppc/util_altivec.h"
  
 +#include "synoconfig.h"
 +
  #define STR(s) AV_TOSTRING(s) // AV_STRINGIFY is too long
  
  #define YUVRGB_TABLE_HEADROOM 512
-@@ -869,6 +871,11 @@ void ff_sws_init_output_funcs(SwsContext
+@@ -867,6 +869,11 @@ void ff_sws_init_output_funcs(SwsContext
                                yuv2packed2_fn *yuv2packed2,
                                yuv2packedX_fn *yuv2packedX,
                                yuv2anyX_fn *yuv2anyX);
@@ -5093,22 +5093,10 @@ diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_in
 diff -uprN ../ffmpeg-4.2.2-patch049/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch049/synoconfig.h	2020-01-21 10:05:45.000000000 -0500
 +++ ./synoconfig.h	2020-01-21 10:07:39.548219984 -0500
-@@ -75,3 +75,40 @@
-  * See Surveillance bug 1151/1155
+@@ -66,3 +66,28 @@
+  * See Media Server #386
   */
- #define SYNO_FIX_QORIQ_CORE_DUMP
-+
-+/* Fixed aac copy failed on mpegts format.
-+ * See Video Station #1730
-+ */
-+#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
-+ 
-+/* Add ffserver config option to support multiple audio track.
-+ * See Video Station #2245
-+ */
-+#if defined(SYNO_VIDEOSTATION)
-+#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
-+#endif
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
 + 
 +/* Add patch to fix mpegts dvbsub encoding
 + * https://trac.ffmpeg.org/ticket/2024

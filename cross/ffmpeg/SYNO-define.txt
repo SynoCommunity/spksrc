@@ -39,3 +39,7 @@ REJECT:
 #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                         -> DONE - 104 -> REJECT: Is optional and for MediaServer
 #define SYNO_SKIP_FLAC_PARSE_PICTURE                            -> DONE - 105 -> REJECT: Relates to AudioStation...      *** Perhaps worth reconsidering? ***
 Build configs & scripts                                         -> DONE - 110 -> REJECT: Kept for review added build configs from Synology
+
+UNKNOWN AND DELETED:
+#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED                      -> Defined but no trace in code
+#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK                      -> Defined but no trace in code
