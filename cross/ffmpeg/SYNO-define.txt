@@ -3,7 +3,6 @@ Task List:
 ONGOING - Isolate into individual patches
  TODO   - Review code of SYNO_EVANSPORT_DTV_SMD_AVSYNC to use ifdef (currently forced with // comments)
  TODO   - Merge code of patch 086 directly on _smd main patches as this is fix segfault fix
- TODO   - Create a directory SYNO-defines under which every "standalone" define is within a single file to limit patch collisions when possible
 
 PATCH:
 10 -> 49 : Port from Synology FFMPEG 3.3.7
@@ -11,35 +10,35 @@ PATCH:
    100+  : Discarded patches as non-applicable to FFMPEG usage with VideoStation
 
 COMPLETED:
-#define SYNO_VIDEOSTATION_HLS_SEEK_TIME                         -> DONE - 020
-#define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME                -> DONE - 021
-#define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX                    -> DONE - 022
-#define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                        -> DONE - 023
-#define SYNO_SMOOTH_STREAMING                                   -> DONE - 030
-#define SYNO_ALPINE_NEON_LIBSWSCALE                             -> DONE - 031
-#define SYNO_FILTER_SRT_TAGS                                    -> DONE - 032
-#define SYNO_FIX_MP4_REMUX_H264PARSER                           -> DONE - 033
-#define SYNO_FIX_QORIQ_CORE_DUMP                                -> DONE - 034
+#define SYNO_VIDEOSTATION_HLS_SEEK_TIME                     -> 020
+#define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME            -> 021
+#define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX                -> 022
+#define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                    -> 023
+#define SYNO_SMOOTH_STREAMING                               -> 030
+#define SYNO_FILTER_SRT_TAGS                                -> 031
+#define SYNO_FIX_MP4_REMUX_H264PARSER                       -> 032
+#define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                     -> 033 - #3716
+#define SYNO_ALPINE_NEON_LIBSWSCALE                         -> alpine/001
+#define SYNO_FIX_QORIQ_CORE_DUMP                            -> qoriq/001
 
 PENDING:
-#define SYNO_DTV_SKIP_UNKNOWN_TRACK                             -> TODO - 076 *
-#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                     -> TODO - 077 *
-#if defined(SYNO_EVANSPORT_SMD)                                 -> TODO - 084 *
-#ifdef SYNO_EVANSPORT_FLV_EXTRADATA                             -> DONE - 086 -> FIX: To merge with default _smd patches?
-#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC                            -> DONE - 087 -> FIX: Use ifdef instead of //
-#define SYNO_EVANSPORT_HANDBRAKE_MP4                            -> DONE - 088
-#ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE     -> DONE - 089
-#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER                           -> DONE - 099 -> TO MOVE AT 085 (AFTER MASTER _SMD)
+#define SYNO_DTV_SKIP_UNKNOWN_TRACK                         -> TODO - 076 *
+#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                 -> TODO - 077 *
+#if defined(SYNO_EVANSPORT_SMD)                             -> TODO - 084 *
+#ifdef SYNO_EVANSPORT_FLV_EXTRADATA                         -> 086 -> FIX: To merge with default _smd patches?
+#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC                        -> 087 -> FIX: Use ifdef instead of //
+#define SYNO_EVANSPORT_HANDBRAKE_MP4                        -> 088
+#ifdef SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE -> 089
+#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER                       -> 099 -> TO MOVE AT 085 (AFTER MASTER _SMD)
 
 REJECT:
-#define SYNO_CODEC_PATENT_G1                                    -> DONE - 100 -> REJECT: Prevents users of Xpenology from using VideoStation
-#define SYNO_HLS_COSTUMIZED_TS_NAME                             -> DONE - 101 -> REJECT: Relates to Synology SurveillanceStation
-#define SYNO_SKIP_DISABLED_AUDIO_STREAM                         -> DONE - 102 -> REJECT: Unrelated to VideoStation
-#define SYNO_DTV_SKIP_TELETEXT                                  -> DONE - 103 -> REJECT: Empty #define
-#define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                         -> DONE - 104 -> REJECT: Is optional and for MediaServer
-#define SYNO_SKIP_FLAC_PARSE_PICTURE                            -> DONE - 105 -> REJECT: Relates to AudioStation...      *** Perhaps worth reconsidering? ***
-Build configs & scripts                                         -> DONE - 110 -> REJECT: Kept for review added build configs from Synology
+#define SYNO_CODEC_PATENT_G1                                -> 100 -> Prevents users of Xpenology from using VideoStation
+#define SYNO_HLS_COSTUMIZED_TS_NAME                         -> 101 -> Relates to Synology SurveillanceStation
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 102 -> Unrelated to VideoStation
+#define SYNO_DTV_SKIP_TELETEXT                              -> 103 -> Empty #define
+#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 105 -> Relates to AudioStation...   *** To reconsider? ***
+Build configs & scripts                                     -> 110 -> Kept for review added build configs from Synology
 
 UNKNOWN AND DELETED:
-#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED                      -> Defined but no trace in code
-#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK                      -> Defined but no trace in code
+#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED                  -> Defined but no trace in code
+#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK                  -> Defined but no trace in code
