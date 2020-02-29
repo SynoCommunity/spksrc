@@ -22,8 +22,6 @@ COMPLETED:
 #define SYNO_FIX_QORIQ_CORE_DUMP                            -> qoriq/001
 
 PENDING:
-#define SYNO_DTV_SKIP_UNKNOWN_TRACK                         -> TODO - 076 *
-#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK                 -> TODO - 077 *
 #if defined(SYNO_EVANSPORT_SMD)                             -> TODO - 084 *
 #ifdef SYNO_EVANSPORT_FLV_EXTRADATA                         -> 086 -> FIX: To merge with default _smd patches?
 #ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC                        -> 087 -> FIX: Use ifdef instead of //
@@ -37,6 +35,9 @@ REJECT:
 #define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 102 -> Unrelated to VideoStation
 #define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 103 -> Relates to AudioStation...   *** To reconsider? ***
 #define SYNO_DTV_MPEGTS_DVBSUB_ENCODING                     -> 104 -> Fixed upstream
+DTV_SKIP: UNKNOWN OR VISUAL_IMPAIRED TRACK                  -> 105 -> Dropped in v3, to reconsider if usage known
+   #define SYNO_DTV_SKIP_UNKNOWN_TRACK
+   #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
 Empty #define                                               -> 109
    #define SYNO_DTV_SKIP_TELETEXT
    #define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
