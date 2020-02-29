@@ -17,7 +17,7 @@ COMPLETED:
 #define SYNO_SMOOTH_STREAMING                               -> 030
 #define SYNO_FILTER_SRT_TAGS                                -> 031
 #define SYNO_FIX_MP4_REMUX_H264PARSER                       -> 032
-#define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                     -> 033 - #3716
+#define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                     -> 033 - spksrc issue #3716
 #define SYNO_ALPINE_NEON_LIBSWSCALE                         -> alpine/001
 #define SYNO_FIX_QORIQ_CORE_DUMP                            -> qoriq/001
 
@@ -36,7 +36,8 @@ REJECT:
 #define SYNO_HLS_COSTUMIZED_TS_NAME                         -> 101 -> Relates to Synology SurveillanceStation
 #define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 102 -> Unrelated to VideoStation
 #define SYNO_DTV_SKIP_TELETEXT                              -> 103 -> Empty #define
-#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 105 -> Relates to AudioStation...   *** To reconsider? ***
+#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 104 -> Relates to AudioStation...   *** To reconsider? ***
+#define SYNO_DTV_MPEGTS_DVBSUB_ENCODING                     -> 105 -> Fixed upstream
 Build configs & scripts                                     -> 110 -> Kept for review added build configs from Synology
 
 UNKNOWN AND DELETED:
