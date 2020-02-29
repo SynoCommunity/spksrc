@@ -35,11 +35,11 @@ REJECT:
 #define SYNO_CODEC_PATENT_G1                                -> 100 -> Prevents users of Xpenology from using VideoStation
 #define SYNO_HLS_COSTUMIZED_TS_NAME                         -> 101 -> Relates to Synology SurveillanceStation
 #define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 102 -> Unrelated to VideoStation
-#define SYNO_DTV_SKIP_TELETEXT                              -> 103 -> Empty #define
-#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 104 -> Relates to AudioStation...   *** To reconsider? ***
-#define SYNO_DTV_MPEGTS_DVBSUB_ENCODING                     -> 105 -> Fixed upstream
+#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 103 -> Relates to AudioStation...   *** To reconsider? ***
+#define SYNO_DTV_MPEGTS_DVBSUB_ENCODING                     -> 104 -> Fixed upstream
+Empty #define                                               -> 109
+   #define SYNO_DTV_SKIP_TELETEXT
+   #define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
+   #define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
 Build configs & scripts                                     -> 110 -> Kept for review added build configs from Synology
 
-UNKNOWN AND DELETED:
-#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED                  -> Defined but no trace in code
-#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK                  -> Defined but no trace in code

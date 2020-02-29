@@ -13,3 +13,15 @@ diff -uprN ../ffmpeg-4.2.2-patch102/synoconfig.h ./synoconfig.h
 +#if defined(SYNO_VIDEOSTATION)
 +#define SYNO_DTV_SKIP_TELETEXT
 +#endif
++
++/* Fixed aac copy failed on mpegts format.
++ * See Video Station #1730
++ */
++#define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
++
++/* Add ffserver config option to support multiple audio track.
++ * See Video Station #2245
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
++#endif
