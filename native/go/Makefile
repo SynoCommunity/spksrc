@@ -9,17 +9,17 @@ DEPENDS = native/go-1.4
 
 HOMEPAGE   = http://golang.org/
 COMMENT    = Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
-LICENSE    =
+LICENSE    = BSD-style
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = compile-native-go
+COMPILE_TARGET = compile_native_go
 INSTALL_TARGET = nop
 
 GOROOT_BOOTSTRAP14=$(WORK_DIR)/../../go-1.4/work-native/go
 
 include ../../mk/spksrc.native-cc.mk
 
-compile-native-go:
+compile_native_go:
 	@$(MSG) "Building Go for host system"
 	# GO111MODULE disable go.mod per https://github.com/golang/go/issues/26996
 	cd $(WORK_DIR)/$(PKG_NAME)/src && GO111MODULE=off GOARCH="" GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP14) ./make.bash

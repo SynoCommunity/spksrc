@@ -15,7 +15,7 @@ HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy
 COMMENT  = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2.
 LICENSE  = ISC
 
-POST_INSTALL_TARGET = dnscrypt_extra_install
+POST_INSTALL_TARGET = dnscrypt_post_install
 
 GO_SRC_DIR = $(EXTRACT_PATH)/$(PKG_NAME)-$(PKG_VERS)/$(PKG_NAME)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
@@ -23,7 +23,7 @@ GO_LDFLAGS = -s -w
 
 include ../../mk/spksrc.cross-go.mk
 
-dnscrypt_extra_install:
+dnscrypt_post_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/blocklist
 	install -m 644 $(GO_SRC_DIR)/example-* $(STAGING_INSTALL_PREFIX)
 	install -m 644 $(GO_SRC_DIR)/../utils/generate-domains-blacklists/* $(STAGING_INSTALL_PREFIX)/blocklist
