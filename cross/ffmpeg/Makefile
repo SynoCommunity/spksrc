@@ -86,12 +86,12 @@ CONFIGURE_ARGS += --disable-x86asm
 CONFIGURE_ARGS += --extra-cflags=-fasm
 CONFIGURE_ARGS += --extra-cflags=-std=c99
 CONFIGURE_ARGS += --extra-cflags=-pedantic
-CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
 CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities
 CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user
 CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
 CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
+#CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
 #CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
 
