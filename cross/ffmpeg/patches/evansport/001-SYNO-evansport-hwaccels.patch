@@ -41,9 +41,9 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
  enabled libx264           && { check_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
                                 { require libx264 "stdint.h x264.h" x264_encoder_encode "-lx264 $pthreads_extralibs $libm_extralibs" &&
                                   warn "using libx264 without pkg-config"; } } &&
-diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
---- ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./fftools/ffmpeg.c	2020-01-18 13:08:21.900728389 -0500
+diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
+--- ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c	2019-12-31 16:35:22.000000000 -0500
++++ ./fftools/ffmpeg.c	2020-02-29 10:42:04.535361983 -0500
 @@ -106,6 +106,84 @@
  
  #include "libavutil/avassert.h"
@@ -197,7 +197,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
 +                        int pkt_size;
 +                        X264Context *x4 = enc->priv_data;
 +                        smd_h264_picture_t pic_out;
-+                        got_packet = 0; 
++                        int got_packet = 0;                // variable removed > 2.7
 +                        ret = 0; 
 +
 +                        if ((pkt_size = syno_ismd_ffmpeg_video_encoder_get_first_node_size(&vid_enc)) < 0) { 
@@ -213,7 +213,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
 +                                if (ret != pkt_size) {
 +                                        av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
 +                                }
-+                                memset(pkt.data + pkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
++                                memset(pkt.data + pkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 +                        }
 +
 +                        if(ret > 0) 
@@ -312,7 +312,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
      oc = output_files[0]->ctx;
  
      total_size = avio_size(oc->pb);
-@@ -1856,6 +2074,9 @@ static void ifilter_parameters_from_code
+@@ -1856,11 +2074,17 @@ static void ifilter_parameters_from_code
  static void flush_encoders(void)
  {
      int i, ret;
@@ -322,7 +322,15 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
  
      for (i = 0; i < nb_output_streams; i++) {
          OutputStream   *ost = output_streams[i];
-@@ -1919,6 +2140,9 @@ static void flush_encoders(void)
+         AVCodecContext *enc = ost->enc_ctx;
+         OutputFile      *of = output_files[ost->file_index];
++#ifdef SYNO_EVANSPORT_SMD
++        int stop_encoding = 0;
++#endif
+ 
+         if (!ost->encoding_needed)
+             continue;
+@@ -1919,6 +2143,9 @@ static void flush_encoders(void)
                  desc   = "audio";
                  break;
              case AVMEDIA_TYPE_VIDEO:
@@ -332,7 +340,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
                  desc   = "video";
                  break;
              default:
-@@ -1929,6 +2153,10 @@ static void flush_encoders(void)
+@@ -1929,6 +2156,10 @@ static void flush_encoders(void)
              pkt.data = NULL;
              pkt.size = 0;
  
@@ -343,7 +351,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
              update_benchmark(NULL);
  
              while ((ret = avcodec_receive_packet(enc, &pkt)) == AVERROR(EAGAIN)) {
-@@ -1942,6 +2170,104 @@ static void flush_encoders(void)
+@@ -1942,6 +2173,104 @@ static void flush_encoders(void)
              }
  
              update_benchmark("flush_%s %d.%d", desc, ost->file_index, ost->index);
@@ -370,7 +378,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
 +                                               if (ret != pkt_size) {
 +                                                       av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
 +                                               }
-+                                               memset(pkt.data + pkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
++                                               memset(pkt.data + pkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 +                                       }
 +
 +                                       if(ret > 0)
@@ -448,7 +456,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
              if (ret < 0 && ret != AVERROR_EOF) {
                  av_log(NULL, AV_LOG_FATAL, "%s encoding failed: %s\n",
                         desc,
-@@ -1955,6 +2281,9 @@ static void flush_encoders(void)
+@@ -1955,6 +2284,9 @@ static void flush_encoders(void)
                  output_packet(of, &pkt, ost, 1);
                  break;
              }
@@ -458,7 +466,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
              if (ost->finished & MUXER_FINISHED) {
                  av_packet_unref(&pkt);
                  continue;
-@@ -1962,6 +2291,21 @@ static void flush_encoders(void)
+@@ -1962,6 +2294,21 @@ static void flush_encoders(void)
              av_packet_rescale_ts(&pkt, enc->time_base, ost->mux_timebase);
              pkt_size = pkt.size;
              output_packet(of, &pkt, ost, 0);
@@ -473,14 +481,14 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
 +                                                       pkt.pts = av_rescale_q(pkt.pts, enc->time_base, ost->st->time_base);
 +                                               if (pkt.dts != AV_NOPTS_VALUE)
 +                                                       pkt.dts = av_rescale_q(pkt.dts, enc->time_base, ost->st->time_base);
-+                                               write_frame(os, &pkt, ost);
++                                               write_frame(of, &pkt, ost);
 +                                       }
 +                               }
 +#endif
              if (ost->enc_ctx->codec_type == AVMEDIA_TYPE_VIDEO && vstats_filename) {
                  do_video_stats(ost, pkt_size);
              }
-@@ -2293,6 +2637,10 @@ static int decode_audio(InputStream *ist
+@@ -2293,6 +2640,10 @@ static int decode_audio(InputStream *ist
          return AVERROR(ENOMEM);
      decoded_frame = ist->decoded_frame;
  
@@ -491,7 +499,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
      update_benchmark(NULL);
      ret = decode(avctx, decoded_frame, got_output, pkt);
      update_benchmark("decode_audio %d.%d", ist->file_index, ist->st->index);
-@@ -2344,6 +2692,29 @@ static int decode_audio(InputStream *ist
+@@ -2344,6 +2695,29 @@ static int decode_audio(InputStream *ist
  static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_t *duration_pts, int eof,
                          int *decode_failed)
  {
@@ -521,7 +529,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
      AVFrame *decoded_frame;
      int i, ret = 0, err = 0;
      int64_t best_effort_timestamp;
-@@ -2468,6 +2839,251 @@ static int decode_video(InputStream *ist
+@@ -2468,6 +2842,251 @@ static int decode_video(InputStream *ist
  
      err = send_frame_to_filters(ist, decoded_frame);
  
@@ -773,7 +781,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
  fail:
      av_frame_unref(ist->filter_frame);
      av_frame_unref(decoded_frame);
-@@ -2605,7 +3221,12 @@ static int process_input_packet(InputStr
+@@ -2605,7 +3224,12 @@ static int process_input_packet(InputStr
      }
  
      // while we have more to decode or while the decoder did output something on EOF
@@ -786,7 +794,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
          int64_t duration_dts = 0;
          int64_t duration_pts = 0;
          int got_output = 0;
-@@ -3164,6 +3785,26 @@ static int init_output_stream_streamcopy
+@@ -3164,6 +3788,26 @@ static int init_output_stream_streamcopy
      return 0;
  }
  
@@ -813,7 +821,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
  static void set_encoder_id(OutputFile *of, OutputStream *ost)
  {
      AVDictionaryEntry *e;
-@@ -3662,6 +4303,14 @@ static void report_new_stream(int input_
+@@ -3662,6 +4306,14 @@ static void report_new_stream(int input_
  
  static int transcode_init(void)
  {
@@ -828,7 +836,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
      int ret = 0, i, j, k;
      AVFormatContext *oc;
      OutputStream *ost;
-@@ -4501,6 +5150,23 @@ static int process_input(int file_index)
+@@ -4501,6 +5153,23 @@ static int process_input(int file_index)
          }
      }
  
@@ -852,7 +860,7 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.c ./fftools/ffmpeg.c
      if (pkt.dts != AV_NOPTS_VALUE)
          ifile->last_ts = av_rescale_q(pkt.dts, ist->st->time_base, AV_TIME_BASE_Q);
  
-@@ -4520,6 +5186,90 @@ static int process_input(int file_index)
+@@ -4520,6 +5189,90 @@ static int process_input(int file_index)
  discard_packet:
      av_packet_unref(&pkt);
  
