@@ -91,6 +91,13 @@ CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/
 CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
 CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
+# DISABLE
+CONFIGURE_ARGS += --disable-decoder=h264_smd
+CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd
+CONFIGURE_ARGS += --disable-decoder=mpeg4_smd
+CONFIGURE_ARGS += --disable-decoder=vc1_smd
+CONFIGURE_ARGS += --disable-decoder=wmv3_smd
+# ENABLE
 #CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
 #CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
