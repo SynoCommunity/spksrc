@@ -4920,27 +4920,3 @@ diff -uprN ../ffmpeg-4.2.1/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
              if (is_dvb_subtitle) {
                  /* First two fields of DVB subtitles PES data:
                   * data_identifier: for DVB subtitle streams shall be coded with the value 0x20
-diff -uprN ../ffmpeg-4.2.1/libswscale/swscale_internal.h ./libswscale/swscale_internal.h
---- ../ffmpeg-4.2.1/libswscale/swscale_internal.h	2020-01-04 21:07:34.000000000 -0500
-+++ ./libswscale/swscale_internal.h	2020-01-04 21:09:15.871386957 -0500
-@@ -33,6 +33,8 @@
- #include "libavutil/pixdesc.h"
- #include "libavutil/ppc/util_altivec.h"
- 
-+#include "synoconfig.h"
-+
- #define STR(s) AV_TOSTRING(s) // AV_STRINGIFY is too long
- 
- #define YUVRGB_TABLE_HEADROOM 512
-@@ -867,6 +869,11 @@ void ff_sws_init_output_funcs(SwsContext
-                               yuv2packed2_fn *yuv2packed2,
-                               yuv2packedX_fn *yuv2packedX,
-                               yuv2anyX_fn *yuv2anyX);
-+#if defined(SYNO_ALPINE_NEON_LIBSWSCALE)
-+void ff_sws_init_output_funcs_arm(SwsContext *c,
-+                              yuv2planarX_fn *yuv2planeX);
-+void ff_sws_init_swscale_arm(SwsContext *c);
-+#endif
- void ff_sws_init_swscale_ppc(SwsContext *c);
- void ff_sws_init_swscale_vsx(SwsContext *c);
- void ff_sws_init_swscale_x86(SwsContext *c);
