@@ -93,15 +93,14 @@ clean:
 
 all: install plist
 
+### For make kernel-required (used by spksrc.spk.mk)
+include ../../mk/spksrc.kernel-required.mk
+
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
 
-dependency-tree:
-	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; \
-	do \
-	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
-	done
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
@@ -109,17 +108,3 @@ all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
 arch-%:
 	@$(MSG) Building package for arch $*
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
-
-.PHONY: kernel-required
-kernel-required:
-	@if [ -n "$(REQ_KERNEL)" ]; then \
-	  exit 1 ; \
-	fi
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \
-	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
-	    exit 0 ; \
-	  else \
-	    exit 1 ; \
-	  fi ; \
-	done
-

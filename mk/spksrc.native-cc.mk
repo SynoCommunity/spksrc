@@ -47,12 +47,6 @@ include ../../mk/spksrc.install.mk
 cat_PLIST:
 	@true
 
-dependency-tree:
-	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
-	@for depend in $(DEPENDS) ; \
-	do \
-	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
-	done
 
 ### Clean rules
 clean:
@@ -62,6 +56,9 @@ all: install
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
+
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: kernel-required
 kernel-required:
