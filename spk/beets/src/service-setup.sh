@@ -6,15 +6,15 @@ PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env 2>&1 >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG} 2>&1
 
     # Install the wheels
-    ${PIP} install --no-deps --no-index --upgrade --force-reinstall --find-links ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl 2>&1 >> ${INST_LOG}
+    ${PIP} install --no-deps --no-index --upgrade --force-reinstall --find-links ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
 
     # Log installation information
     echo -e "\nInstalled version:" >> ${INST_LOG}
-    ${SYNOPKG_PKGDEST}/env/bin/beet version 2>&1 >> ${INST_LOG}
+    ${SYNOPKG_PKGDEST}/env/bin/beet version >> ${INST_LOG} 2>&1
     echo -e "\nInstalled python modules:" >> ${INST_LOG}
-    ${PIP} freeze 2>&1 >> ${INST_LOG}
+    ${PIP} freeze >> ${INST_LOG} 2>&1
     echo "" >> ${INST_LOG}
 }
