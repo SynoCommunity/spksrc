@@ -82,6 +82,7 @@ ENV += PATH=$(NASM_PATH):$$PATH
 
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
 DEPENDS += cross/ds.evansport cross/json-c
+CONFIGURE_ARGS += --arch=x86 --cpu=atom
 CONFIGURE_ARGS += --disable-x86asm
 CONFIGURE_ARGS += --extra-cflags=-fasm
 CONFIGURE_ARGS += --extra-cflags=-std=c99
@@ -100,7 +101,6 @@ CONFIGURE_ARGS += --disable-decoder=wmv3_smd
 # ENABLE
 #CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
 #CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
-CONFIGURE_ARGS += --arch=x86 --cpu=atom
 
 else
 CONFIGURE_ARGS += --arch=i386
