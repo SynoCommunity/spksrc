@@ -27,7 +27,7 @@ AVAILABLE_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
 
 # Toolchain filters
-SUPPORTED_ARCHS = $(sort $(filter-out powerpc% ppc824% ppc854x%, $(AVAILABLE_ARCHS)))
+SUPPORTED_ARCHS = $(sort $(filter-out powerpc% ppc824% ppc853x% ppc854x%, $(AVAILABLE_ARCHS)))
 LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 # SRM - Synology Router Manager
 SRM_ARCHS = northstarplus ipq806x dakota
