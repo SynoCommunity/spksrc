@@ -6,7 +6,7 @@ PKG_DIST_SITE = http://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
-DEPENDS += cross/libbluray cross/libvorbis cross/speex cross/libvpx cross/shine
+DEPENDS += cross/libbluray cross/libvorbis cross/speex cross/libvpx
 DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265
 DEPENDS += cross/opencore-amr
@@ -28,7 +28,7 @@ CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enabl
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr
 CONFIGURE_ARGS += --enable-libvorbis
-CONFIGURE_ARGS += --enable-libspeex --enable-libshine
+CONFIGURE_ARGS += --enable-libspeex
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 CONFIGURE_ARGS += --disable-debug --disable-doc
@@ -55,6 +55,9 @@ CONFIGURE_ARGS += --extra-cflags=-O3
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
+# Compiling tvheadend for evansport requires #include synology.h
+POST_INSTALL_TARGET = synoheaderPostInstall
+
 include ../../mk/spksrc.cross-cc.mk
 
 # Add AV1 codec to supported ARCH
@@ -69,7 +72,9 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
+ifneq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
@@ -117,7 +122,18 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
+
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --disable-asm --cpu=e500v2
 endif
+
+# libshine - gcc to old on ppc853x: undefined reference to `__builtin_bswap16'
+ifneq ($(findstring $(ARCH),ppc853x),$(ARCH))
+DEPENDS += cross/shine
+CONFIGURE_ARGS += --enable-libshine
 endif
+endif
+
+.PHONY: synoheaderPostInstall
+synoheaderPostInstall:
+	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/synoconfig.h $(WORK_DIR)/install$(INSTALL_PREFIX)/include
