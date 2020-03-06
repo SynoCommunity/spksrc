@@ -10,9 +10,9 @@ BUILD_DEPENDS += cross/openssl
 
 HOMEPAGE = http://www.fossil-scm.org/
 COMMENT  = Fossil is a simple, high-reliability, distributed software configuration management system.
-LICENSE  = http://www.fossil-scm.org/home/doc/trunk/COPYRIGHT-BSD2.txt
+LICENSE  = BSD2
 
-PRE_CONFIGURE_TARGET = fixMakefileIn
+PRE_CONFIGURE_TARGET = fossil-scm_pre_configure
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --static --json 
@@ -22,7 +22,7 @@ CONFIGURE_ARGS += --with-openssl=auto
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: fixMakefileIn
-fixMakefileIn:
+.PHONY: fossil-scm_pre_configure
+fossil-scm_pre_configure:
 	sed -i.orig -e "s|^BCCFLAGS.*$$|BCCFLAGS = |" $(WORK_DIR)/$(PKG_DIR)/Makefile.in
 
