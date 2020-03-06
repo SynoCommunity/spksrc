@@ -28,10 +28,10 @@ diff -uprN ../ffmpeg-4.2.2-patch099/libavformat/segment.c ./libavformat/segment.
 diff -uprN ../ffmpeg-4.2.2-patch099/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch099/synoconfig.h	2020-01-25 11:18:25.000000000 -0500
 +++ ./synoconfig.h	2020-01-25 11:22:26.968159703 -0500
-@@ -160,3 +160,10 @@
- #if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
- #define SYNO_CODEC_PATENT_G1
- #endif
+@@ -66,3 +66,10 @@
+  * See Media Server #386
+  */
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
 +
 +/* Rule out basename logic in filename setting
 + * Set Name length to 64 rather than fix strlen(%d.ts)

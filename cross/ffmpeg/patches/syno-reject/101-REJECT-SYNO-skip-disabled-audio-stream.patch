@@ -1,9 +1,9 @@
-diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
---- ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c	2020-01-21 08:50:01.540024618 -0500
-+++ ./fftools/ffmpeg_opt.c	2020-01-21 08:29:11.000000000 -0500
-@@ -783,6 +783,37 @@ static AVCodec *choose_decoder_smd(Optio
+diff -uprN ../ffmpeg-4.2.2-patch100/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.2.2-patch100/fftools/ffmpeg_opt.c	2019-12-31 16:35:22.000000000 -0500
++++ ./fftools/ffmpeg_opt.c	2020-03-06 08:15:13.203555509 -0500
+@@ -692,6 +692,37 @@ static AVCodec *find_codec_or_die(const
+     return codec;
  }
- #endif
  
 +#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
 +static int IsAudioCopyStream(OptionsContext *o, AVFormatContext *oc)
@@ -39,7 +39,7 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
  static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
  {
      char *codec_name = NULL;
-@@ -2293,6 +2324,12 @@ static int open_output_file(OptionsConte
+@@ -2198,6 +2229,12 @@ static int open_output_file(OptionsConte
              for (i = 0; i < nb_input_streams; i++) {
                  int new_area;
                  ist = input_streams[i];
@@ -52,7 +52,7 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
                  new_area = ist->st->codecpar->width * ist->st->codecpar->height + 100000000*!!ist->st->codec_info_nb_frames
                             + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
                  if (ist->user_set_discard == AVDISCARD_ALL)
-@@ -2418,6 +2455,12 @@ loop_end:
+@@ -2323,6 +2360,12 @@ loop_end:
                      continue;
                  if(o->    data_disable && ist->st->codecpar->codec_type == AVMEDIA_TYPE_DATA)
                      continue;
@@ -65,10 +65,10 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
  
                  ost = NULL;
                  switch (ist->st->codecpar->codec_type) {
-diff -uprN ../ffmpeg-4.2.2-patch060/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch060/synoconfig.h	2020-01-24 06:02:18.000000000 -0500
-+++ ./synoconfig.h	2020-01-24 06:07:40.306962200 -0500
-@@ -167,3 +167,10 @@
+diff -uprN ../ffmpeg-4.2.2-patch100/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch100/synoconfig.h	2020-03-06 08:11:45.732315449 -0500
++++ ./synoconfig.h	2020-03-06 08:15:13.203555509 -0500
+@@ -73,3 +73,10 @@
  #if defined(SYNO_SURVEILLANCESTATION)
  #define SYNO_HLS_COSTUMIZED_TS_NAME
  #endif

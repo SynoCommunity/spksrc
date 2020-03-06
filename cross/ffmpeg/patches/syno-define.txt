@@ -30,17 +30,17 @@ COMPLETED - FFMPEG 2.7.1:
 #define SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE -> evansport/006
 
 REJECT:
-#define SYNO_CODEC_PATENT_G1                                -> 100 -> Prevents users of Xpenology from using VideoStation
-#define SYNO_HLS_COSTUMIZED_TS_NAME                         -> 101 -> Relates to Synology SurveillanceStation
-#define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 102 -> Unrelated to VideoStation
-#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 103 -> Relates to AudioStation...   *** To reconsider? ***
+#define SYNO_HLS_COSTUMIZED_TS_NAME                         -> 100 -> Relates to Synology SurveillanceStation
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 101 -> Unrelated to VideoStation
+#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 102 -> Relates to AudioStation...   *** To reconsider? ***
+#define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK                  -> 103 -> TODO ***********************
 #define SYNO_DTV_MPEGTS_DVBSUB_ENCODING                     -> 104 -> Fixed upstream
 DTV_SKIP: UNKNOWN OR VISUAL_IMPAIRED TRACK                  -> 105 -> Dropped in v3, to reconsider if usage known
    #define SYNO_DTV_SKIP_UNKNOWN_TRACK
    #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
+#define SYNO_CODEC_PATENT_G1                                -> 108 -> Prevents users of Xpenology from using VideoStation
 Empty #define                                               -> 109
    #define SYNO_DTV_SKIP_TELETEXT
    #define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
-   #define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
+   #define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK ***** TO REMOVE
 Synology build configs & scripts                            -> 110 -> Kept for later reference
-
