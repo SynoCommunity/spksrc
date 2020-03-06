@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 BUILD_DEPENDS = cross/zlib
 BUILD_DEPENDS += cross/openssl
 
-HOMEPAGE = http://www.fossil-scm.org/
+HOMEPAGE = https://www.fossil-scm.org/
 COMMENT  = Fossil is a simple, high-reliability, distributed software configuration management system.
 LICENSE  = BSD2
 
