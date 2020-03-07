@@ -1,8 +1,0 @@
-ffmpeg-2.7.1/ffmpeg.c                     done
-ffmpeg-2.7.1/ffmpeg_filter.c              blank lines only
-ffmpeg-2.7.1/ffmpeg.h                     done
-ffmpeg-2.7.1/ffmpeg_opt.c                 done
-ffmpeg-2.7.1/ffplay.c                     blank lines only
-ffmpeg-2.7.1/ffprobe.c                    blank lines only
-ffmpeg-2.7.1/ffserver.c                   SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK - nothing to do - ffserver removed from newer ffmpeg
-ffmpeg-2.7.1/ffserver_config.c            SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK - nothing to do - ffserver removed from newer ffmpeg
