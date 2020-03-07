@@ -51,19 +51,10 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/libavcodec/dvbsub.c ./libavcodec/dvbsub.
 diff -uprN ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h	2020-02-29 07:40:39.603065849 -0500
 +++ ./synoconfig.h	2020-02-29 07:44:27.704735528 -0500
-@@ -66,7 +66,7 @@
-  * See Media Server #386
+@@ -86,3 +86,12 @@
+  * See Audio Station #1013
   */
- #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
-- 
-+
- /* Add skip unknown track config to support dtv streaming with unknown codec track.
-  * add flag "-dtv_skip_unknown" to skip unknown tracks.
-  * See Video Station #2470
-@@ -82,3 +82,12 @@
- #if defined(SYNO_VIDEOSTATION)
- #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
- #endif
+ #define SYNO_SKIP_FLAC_PARSE_PICTURE
 + 
 +/* Add patch to fix mpegts dvbsub encoding
 + * https://trac.ffmpeg.org/ticket/2024

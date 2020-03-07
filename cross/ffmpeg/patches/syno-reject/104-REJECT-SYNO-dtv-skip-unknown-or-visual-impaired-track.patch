@@ -70,15 +70,7 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
                  if (input_streams[input_files[file_idx]->ist_index + i]->user_set_discard == AVDISCARD_ALL) {
                      disabled = 1;
                      continue;
-@@ -1234,7 +1267,6 @@ static int open_input_file(OptionsContex
-         if (!option || foption)
-             continue;
- 
--
-         if (!(option->flags & AV_OPT_FLAG_DECODING_PARAM)) {
-             av_log(NULL, AV_LOG_ERROR, "Codec AVOption %s (%s) specified for "
-                    "input file #%d (%s) is not a decoding option.\n", e->key,
-@@ -3364,6 +3396,15 @@ static int opt_progress(void *optctx, co
+@@ -3407,6 +3439,15 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS
@@ -97,10 +89,10 @@ diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_op
 diff -uprN ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h ./synoconfig.h
 --- ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h	2020-02-25 18:55:30.000000000 -0500
 +++ ./synoconfig.h	2020-02-29 08:06:28.505961834 -0500
-@@ -66,3 +66,19 @@
-  * See Media Server #386
-  */
- #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
+@@ -95,3 +95,19 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_DTV_MPEGTS_DVBSUB_ENCODING
+ #endif
 + 
 +/* Add skip unknown track config to support dtv streaming with unknown codec track.
 + * add flag "-dtv_skip_unknown" to skip unknown tracks.

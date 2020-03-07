@@ -1,7 +1,7 @@
 diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/configure ./configure
 --- ../ffmpeg-4.2.1-orig-fix-vaapi_encode/configure	2019-08-05 17:11:40.000000000 -0400
 +++ ./configure	2019-10-15 22:12:46.384181739 -0400
-@@ -6259,7 +6259,7 @@ enabled libpulse          && require_pkg
+@@ -6255,7 +6255,7 @@ enabled libpulse          && require_pkg
  enabled librsvg           && require_pkg_config librsvg librsvg-2.0 librsvg-2.0/librsvg/rsvg.h rsvg_handle_render_cairo
  enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h RTMP_Socket
  enabled librubberband     && require_pkg_config librubberband "rubberband >= 1.8.1" rubberband/rubberband-c.h rubberband_new -lstdc++ && append librubberband_extralibs "-lstdc++"

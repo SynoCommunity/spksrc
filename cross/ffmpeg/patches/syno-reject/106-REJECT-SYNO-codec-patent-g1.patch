@@ -1,6 +1,6 @@
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/aacdec_template.c ./libavcodec/aacdec_template.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/aacdec_template.c	2019-12-31 16:35:30.000000000 -0500
-+++ ./libavcodec/aacdec_template.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/aacdec_template.c ./libavcodec/aacdec_template.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/aacdec_template.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/aacdec_template.c	2020-03-07 08:22:42.880291379 -0500
 @@ -90,6 +90,8 @@
   */
  
@@ -23,9 +23,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/aacdec_template.c ./libavcode
      if (avctx->extradata_size > 0) {
          if ((ret = decode_audio_specific_config(ac, ac->avctx, &ac->oc[1].m4ac,
                                                  avctx->extradata,
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/aacenc.c ./libavcodec/aacenc.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/aacenc.c	2019-12-31 16:35:22.000000000 -0500
-+++ ./libavcodec/aacenc.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/aacenc.c ./libavcodec/aacenc.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/aacenc.c	2019-12-31 16:35:22.000000000 -0500
++++ ./libavcodec/aacenc.c	2020-03-07 08:22:42.880291379 -0500
 @@ -48,6 +48,9 @@
  
  #include "psymodel.h"
@@ -49,9 +49,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/aacenc.c ./libavcodec/aacenc.
      /* Constants */
      s->last_frame_pb_count = 0;
      avctx->frame_size = 1024;
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/ac3dec.c ./libavcodec/ac3dec.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/ac3dec.c	2019-12-31 16:35:22.000000000 -0500
-+++ ./libavcodec/ac3dec.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/ac3dec.c ./libavcodec/ac3dec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/ac3dec.c	2019-12-31 16:35:22.000000000 -0500
++++ ./libavcodec/ac3dec.c	2020-03-07 08:22:42.880291379 -0500
 @@ -41,6 +41,9 @@
  #include "ac3dec_data.h"
  #include "kbdwin.h"
@@ -75,9 +75,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/ac3dec.c ./libavcodec/ac3dec.
      s->avctx = avctx;
  
      ac3_tables_init();
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/h264dec.c ./libavcodec/h264dec.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/h264dec.c	2019-12-31 16:35:23.000000000 -0500
-+++ ./libavcodec/h264dec.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/h264dec.c ./libavcodec/h264dec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/h264dec.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/h264dec.c	2020-03-07 08:22:42.881291456 -0500
 @@ -55,6 +55,9 @@
  #include "rectangle.h"
  #include "thread.h"
@@ -101,9 +101,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/h264dec.c ./libavcodec/h264de
      ret = h264_init_context(avctx, h);
      if (ret < 0)
          return ret;
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/hevcdec.c ./libavcodec/hevcdec.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/hevcdec.c	2019-12-31 16:35:30.000000000 -0500
-+++ ./libavcodec/hevcdec.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/hevcdec.c ./libavcodec/hevcdec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/hevcdec.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/hevcdec.c	2020-03-07 08:22:42.881291456 -0500
 @@ -44,6 +44,9 @@
  #include "hwaccel.h"
  #include "profiles.h"
@@ -127,9 +127,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/hevcdec.c ./libavcodec/hevcde
      avctx->internal->allocate_progress = 1;
  
      ret = hevc_init_context(avctx);
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacdec.c ./libavcodec/libfdk-aacdec.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacdec.c	2019-12-31 16:35:23.000000000 -0500
-+++ ./libavcodec/libfdk-aacdec.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacdec.c ./libavcodec/libfdk-aacdec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacdec.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/libfdk-aacdec.c	2020-03-07 08:22:42.882291532 -0500
 @@ -25,6 +25,9 @@
  #include "avcodec.h"
  #include "internal.h"
@@ -153,9 +153,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacdec.c ./libavcodec/
      s->handle = aacDecoder_Open(avctx->extradata_size ? TT_MP4_RAW : TT_MP4_ADTS, 1);
      if (!s->handle) {
          av_log(avctx, AV_LOG_ERROR, "Error opening decoder\n");
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacenc.c ./libavcodec/libfdk-aacenc.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacenc.c	2019-12-31 16:35:23.000000000 -0500
-+++ ./libavcodec/libfdk-aacenc.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacenc.c ./libavcodec/libfdk-aacenc.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacenc.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/libfdk-aacenc.c	2020-03-07 08:22:42.882291532 -0500
 @@ -34,6 +34,9 @@
  #define FDKENC_VER_AT_LEAST(vl0, vl1) 0
  #endif
@@ -179,18 +179,20 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libfdk-aacenc.c ./libavcodec/
      if ((err = aacEncOpen(&s->handle, 0, avctx->channels)) != AACENC_OK) {
          av_log(avctx, AV_LOG_ERROR, "Unable to open the encoder: %s\n",
                 aac_get_error(err));
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libx264.c ./libavcodec/libx264.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libx264.c	2020-01-21 08:54:20.000000000 -0500
-+++ ./libavcodec/libx264.c	2020-01-21 08:01:42.000000000 -0500
-@@ -45,6 +45,7 @@
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/libx264.c	2020-03-06 08:08:15.000000000 -0500
++++ ./libavcodec/libx264.c	2020-03-07 08:24:24.870122833 -0500
+@@ -44,6 +44,9 @@
+ // blocks of pixels (with respect to the luma plane)
  #define MB_SIZE 16
  
- #include "synoconfig.h"
++#include "synoconfig.h"
 +#include "synog1codecpatent.h"
- 
- #ifdef SYNO_EVANSPORT_SMD
- #include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
-@@ -727,6 +728,12 @@ static av_cold int X264_init(AVCodecCont
++
+ typedef struct X264Context {
+     AVClass        *class;
+     x264_param_t    params;
+@@ -552,6 +555,12 @@ static av_cold int X264_init(AVCodecCont
      AVCPBProperties *cpb_props;
      int sw,sh;
  
@@ -203,18 +205,20 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/libx264.c ./libavcodec/libx26
      if (avctx->global_quality > 0)
          av_log(avctx, AV_LOG_WARNING, "-qscale is ignored, -crf is recommended.\n");
  
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videodec.c	2019-12-31 16:35:30.000000000 -0500
-+++ ./libavcodec/mpeg4videodec.c	2020-01-21 08:01:42.000000000 -0500
-@@ -40,6 +40,7 @@
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videodec.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/mpeg4videodec.c	2020-03-07 08:26:02.206607285 -0500
+@@ -39,6 +39,9 @@
+ #include "xvididct.h"
  #include "unary.h"
  
- #include "synoconfig.h"
++#include "synoconfig.h"
 +#include "synog1codecpatent.h"
- 
++
  /* The defines below define the number of bits that are read at once for
   * reading vlc values. Changing these may improve speed and data cache needs
-@@ -3508,6 +3509,12 @@ static av_cold int decode_init(AVCodecCo
+  * be aware though that decreasing them may need the number of stages that is
+@@ -3506,6 +3509,12 @@ static av_cold int decode_init(AVCodecCo
      MpegEncContext *s = &ctx->m;
      int ret;
  
@@ -227,9 +231,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videodec.c ./libavcodec/
      ctx->divx_version =
      ctx->divx_build   =
      ctx->xvid_build   =
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videoenc.c ./libavcodec/mpeg4videoenc.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videoenc.c	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/mpeg4videoenc.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videoenc.c ./libavcodec/mpeg4videoenc.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videoenc.c	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/mpeg4videoenc.c	2020-03-07 08:22:42.885291763 -0500
 @@ -28,6 +28,9 @@
  #include "h263.h"
  #include "mpeg4video.h"
@@ -253,9 +257,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/mpeg4videoenc.c ./libavcodec/
      if ((ret = ff_mpv_encode_init(avctx)) < 0)
          return ret;
  
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/synog1codecpatent.c ./libavcodec/synog1codecpatent.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/synog1codecpatent.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/synog1codecpatent.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.c ./libavcodec/synog1codecpatent.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/synog1codecpatent.c	2020-03-07 08:22:42.885291763 -0500
 @@ -0,0 +1,186 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE
@@ -443,9 +447,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/synog1codecpatent.c ./libavco
 +	return iRet;
 +}
 +#endif //SYNO_CODEC_PATENT_G1
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/synog1codecpatent.h ./libavcodec/synog1codecpatent.h
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/synog1codecpatent.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/synog1codecpatent.h	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.h ./libavcodec/synog1codecpatent.h
+--- ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/synog1codecpatent.h	2020-03-07 08:22:42.885291763 -0500
 @@ -0,0 +1,27 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE
@@ -474,9 +478,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/synog1codecpatent.h ./libavco
 +#endif //SYNO_CODEC_PATENT_G1
 +
 +#endif //_SYNO_G1_CODEC_PATENT_H
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vaapi_encode.c ./libavcodec/vaapi_encode.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vaapi_encode.c	2020-01-21 08:54:29.000000000 -0500
-+++ ./libavcodec/vaapi_encode.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/vaapi_encode.c ./libavcodec/vaapi_encode.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/vaapi_encode.c	2020-03-06 08:08:22.000000000 -0500
++++ ./libavcodec/vaapi_encode.c	2020-03-07 08:22:42.886291839 -0500
 @@ -27,6 +27,8 @@
  #include "vaapi_encode.h"
  #include "avcodec.h"
@@ -499,18 +503,19 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vaapi_encode.c ./libavcodec/v
      if (!avctx->hw_frames_ctx) {
          av_log(avctx, AV_LOG_ERROR, "A hardware frames reference is "
                 "required to associate the encoding device.\n");
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vc1dec.c	2019-12-31 16:35:30.000000000 -0500
-+++ ./libavcodec/vc1dec.c	2020-01-21 08:01:42.000000000 -0500
-@@ -41,6 +41,7 @@
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/vc1dec.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/vc1dec.c	2020-03-07 08:27:03.878353753 -0500
+@@ -40,6 +40,8 @@
+ #include "vc1data.h"
  #include "libavutil/avassert.h"
  
- #include "synoconfig.h"
++#include "synoconfig.h"
 +#include "synog1codecpatent.h"
  
  #if CONFIG_WMV3IMAGE_DECODER || CONFIG_VC1IMAGE_DECODER
  
-@@ -434,6 +435,12 @@ static av_cold int vc1_decode_init(AVCod
+@@ -426,6 +428,12 @@ static av_cold int vc1_decode_init(AVCod
      GetBitContext gb;
      int ret;
  
@@ -523,9 +528,9 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavcodec/vc1dec.c ./libavcodec/vc1dec.
      /* save the container output size for WMImage */
      v->output_width  = avctx->width;
      v->output_height = avctx->height;
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavformat/utils.c ./libavformat/utils.c
---- ../ffmpeg-4.2.2-patch005-NEW/libavformat/utils.c	2019-12-31 16:35:24.000000000 -0500
-+++ ./libavformat/utils.c	2020-01-21 08:01:42.000000000 -0500
+diff -uprN ../ffmpeg-4.2.2-patch105/libavformat/utils.c ./libavformat/utils.c
+--- ../ffmpeg-4.2.2-patch105/libavformat/utils.c	2019-12-31 16:35:24.000000000 -0500
++++ ./libavformat/utils.c	2020-03-07 08:22:42.888291993 -0500
 @@ -54,6 +54,10 @@
  #include "url.h"
  
@@ -573,12 +578,12 @@ diff -uprN ../ffmpeg-4.2.2-patch005-NEW/libavformat/utils.c ./libavformat/utils.
      return ret;
  }
  
-diff -uprN ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch005-NEW/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./synoconfig.h	2020-01-21 09:43:11.888128640 -0500
-@@ -152,3 +152,11 @@
- #if defined(SYNO_EVANSPORT_SMD)
- #define SYNO_EVANSPORT_AUTO_HW_DECODER
+diff -uprN ../ffmpeg-4.2.2-patch105/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch105/synoconfig.h	2020-03-07 08:20:37.659694767 -0500
++++ ./synoconfig.h	2020-03-07 08:22:42.888291993 -0500
+@@ -131,3 +131,11 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
  #endif
 +
 +/* add SynoCodecPantent mechanism
