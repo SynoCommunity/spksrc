@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/setuptools
 
-HOMEPAGE = https://bitbucket.org/pypa/wheel
-COMMENT  = A built-package format for Python
+HOMEPAGE = https://wheel.readthedocs.io/en/stable/
+COMMENT  = Reference implementation of the Python wheel packaging standard, as defined in PEP 427.
 LICENSE  = MIT
 
 include ../../mk/spksrc.python-module.mk
