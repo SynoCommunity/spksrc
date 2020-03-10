@@ -3,5 +3,5 @@ Flask-WTF==0.11
 itsdangerous==0.24
 Jinja2==2.7.3
 requests==2.7.0
-Werkzeug==0.10.4
+Werkzeug==0.15.3
 WTForms==2.0.2
