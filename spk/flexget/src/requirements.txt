@@ -9,7 +9,7 @@ CherryPy==10.0.0
 click==6.7
 colorclass==2.2.0
 feedparser==5.2.1
-Flask==0.12
+Flask==1.0
 Flask-Compress==1.4.0
 Flask-Cors==3.0.2
 Flask-Login==0.4.0
