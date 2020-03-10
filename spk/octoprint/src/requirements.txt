@@ -4,7 +4,7 @@ Babel==2.0
 backports.ssl-match-hostname==3.4.0.2
 blinker==1.4
 certifi==2015.9.6.2
-Flask==0.10.1
+Flask==1.0
 Flask-Assets==0.10
 Flask-Babel==0.9
 Flask-Login==0.2.2
