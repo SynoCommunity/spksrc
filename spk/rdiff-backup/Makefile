@@ -1,5 +1,5 @@
 SPK_NAME = rdiff-backup
-SPK_VERS = 1.2.8
+SPK_VERS = 1.3.3
 SPK_REV = 1
 SPK_ICON = src/rdiff-backup.png
 
@@ -16,7 +16,7 @@ DISPLAY_NAME = rdiff-backup
 CHANGELOG = "Initial release"
 BETA = 1
 
-HOMEPAGE = http://www.nongnu.org/rdiff-backup/
+HOMEPAGE = https://rdiff-backup.net
 LICENSE  = GNU GPL
 
 INSTALLER_SCRIPT = src/installer.sh

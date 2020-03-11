@@ -1,0 +1,11 @@
+--- rdiff_backup/eas_acls.py
++++ rdiff_backup/eas_acls.py
+@@ -98,7 +98,7 @@ class ExtendedAttributes:
+ 						continue
+ 					else: raise
+ 		except IOError, exc:
+-			if exc[0] == errno.EOPNOTSUPP or exc[0] == errno.EPERM:
++			if exc[0] == errno.EOPNOTSUPP or exc[0] == errno.EPERM or exc[0] == errno.ENODATA:
+ 				return # if not supported, consider empty
+ 			elif exc[0] == errno.ENOENT: # path is bad
+ 				log.Log("Warning: unable to clear xattrs on %s: %s" %

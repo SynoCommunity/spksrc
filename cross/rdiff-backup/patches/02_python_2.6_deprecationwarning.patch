@@ -1,0 +1,25 @@
+# Description: 02_python_2.6_deprecationwarning.diff
+# Author: by  <andreas@pc13267v15.midgard.liu.se> converted to Quilt by Carl Chenet <chaica@ohmytux.com>
+# from the nmu suggestion by Carlos Alberto Lopez Perez <clopez@igalia.com>
+# patch adapted from the one at https://savannah.nongnu.org/bugs/?26064
+# This fix the following warning: "DeprecationWarning: os.popen2 is 
+# deprecated. Use the subprocess module."
+# Also, the *nix version of rdiff-backup requires shell=True instead of
+# shell=False in the subprocess.Popen call
+
+diff -urNad rdiff_backup/SetConnections.py rdiff-backup-1.2.8/rdiff_backup/SetConnections.py
+--- rdiff_backup/SetConnections.py	2009-03-16 15:36:21.000000000 +0100
++++ rdiff_backup/SetConnections.py	2009-10-03 19:27:54.935647306 +0200
+@@ -135,10 +135,10 @@
+ 	if not remote_cmd: return Globals.local_connection
+ 
+ 	Log("Executing " + remote_cmd, 4)
+-	if os.name == "nt":
++	if map(int, sys.version.split()[0].split('.')[:2]) >= [2, 6]:
+ 		import subprocess
+ 		try:
+-			process = subprocess.Popen(remote_cmd, shell=False, bufsize=0,
++			process = subprocess.Popen(remote_cmd, shell=True, bufsize=0,
+ 								stdin=subprocess.PIPE, 
+ 								stdout=subprocess.PIPE)
+ 			(stdin, stdout) = (process.stdin, process.stdout)

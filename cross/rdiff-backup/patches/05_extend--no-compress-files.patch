@@ -1,0 +1,11 @@
+--- rdiff_backup/Globals.py
++++ rdiff_backup/Globals.py
+@@ -185,7 +185,7 @@ compression = 1
+ # compiled version of the first.
+ no_compression_regexp_string = ("(?i).*\\.(gz|z|bz|bz2|tgz|zip|rpm|deb|"
+     "jpg|jpeg|gif|png|jp2|mp3|ogg|avi|wmv|mpeg|mpg|rm|mov|flac|shn|pgp|"
+-    "gpg|rz|lzh|zoo|lharc|rar|arj|asc)$")
++    "gpg|rz|lzh|zoo|lharc|rar|arj|asc|iso|vob|mdf)$")
+ no_compression_regexp = None
+ 
+ # If true, filelists and directory statistics will be split on
