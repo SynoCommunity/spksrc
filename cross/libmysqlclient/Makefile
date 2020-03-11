@@ -13,7 +13,7 @@ HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
 LICENSE  = GNU GPLv2
 
-CONFIGURE_TARGET = mysql-connector-c_configure_target
+CONFIGURE_TARGET = mysql-connector-c_configure
 
 include ../../mk/spksrc.common.mk
 
@@ -50,6 +50,6 @@ ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/l
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: mysql-connector-c_configure_target
-mysql-connector-c_configure_target:
+.PHONY: mysql-connector-c_configure
+mysql-connector-c_configure:
 	@$(RUN) cmake $(CMAKE_ARGS)

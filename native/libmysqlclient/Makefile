@@ -12,8 +12,8 @@ HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
 LICENSE  = GNU GPLv2
 
-CONFIGURE_TARGET = mysql-connector-c_configure_target
-PRE_INSTALL_TARGET = mysql-connector-c_extra_install
+CONFIGURE_TARGET = mysql-connector-c_configure
+PRE_INSTALL_TARGET = mysql-connector-c_pre_install
 
 CMAKE_ARGS = -DCMAKE_BUILD_TYPE=Release
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
@@ -28,11 +28,11 @@ CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
 
 include ../../mk/spksrc.native-cc.mk
 
-.PHONY: mysql-connector-c_configure_target
-mysql-connector-c_configure_target:
+.PHONY: mysql-connector-c_configure
+mysql-connector-c_configure:
 	$(RUN) cmake $(CMAKE_ARGS) .
 
-.PHONY: mysql-connector-c_extra_install
-mysql-connector-c_extra_install:
+.PHONY: mysql-connector-c_pre_install
+mysql-connector-c_pre_install:
 	$(RUN) install -m 755 -d $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/
 	$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/extra/comp_err $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/

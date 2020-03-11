@@ -13,8 +13,8 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = libcap_compile_target
-INSTALL_TARGET = libcap_install_target
+COMPILE_TARGET = libcap_compile
+INSTALL_TARGET = libcap_install
 
 ADDITIONAL_CFLAGS = -O2 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 
@@ -22,12 +22,12 @@ include ../../mk/spksrc.cross-cc.mk
 
 # force install in /lib rather than /lib64 for x86_64
 # and install lib only (cross compile bin files does not work)
-.PHONY: libcap_install_target
-libcap_install_target:
+.PHONY: libcap_install
+libcap_install:
 	$(RUN) $(MAKE) lib=lib DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) -C libcap install
 
-# _makenames is run with "make libcap", therefor it must be compiled for the host (first)
-.PHONY: libcap_compile_target
-libcap_compile_target:
+# _makenames is run with "make libcap", therefore it must be compiled for the host (first)
+.PHONY: libcap_compile
+libcap_compile:
 	@$(RUN) make -C libcap _makenames
 	@$(RUN) make CC=$(TC_PATH)$(TC_PREFIX)gcc -C libcap

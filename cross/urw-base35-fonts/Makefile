@@ -15,14 +15,12 @@ HOMEPAGE = https://www.ghostscript.com/doc/current/Fonts.htm
 COMMENT  = Core Font Set containing 35 freely distributable fonts from (URW)++
 LICENSE  = GNU AGPLv3
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = urw-base35-fonts
+INSTALL_TARGET = urw-base35-fonts_install
 
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
-.PHONY: urw-base35-fonts
-urw-base35-fonts:
+.PHONY: urw-base35-fonts_install
+urw-base35-fonts_install:
 	$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/fonts
 	$(RUN) cp share/fonts/* $(STAGING_INSTALL_PREFIX)/share/fonts

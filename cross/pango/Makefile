@@ -1,6 +1,6 @@
 PKG_NAME = pango
-PKG_VERS = 1.28.4
 PKG_SHORT_VERS = 1.28
+PKG_VERS = $(PKG_SHORT_VERS).4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.acc.umu.se/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)

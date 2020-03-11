@@ -14,7 +14,7 @@ LICENSE  = MIT
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-gtk
 
-PRE_COMPILE_TARGET = pixman_pre_compile_target
+PRE_COMPILE_TARGET = pixman_pre_compile
 
 
 ifeq ($(ARCH),hi3535)
@@ -24,7 +24,7 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: pixman_pre_compile_target
-pixman_pre_compile_target:
+.PHONY: pixman_pre_compile
+pixman_pre_compile:
 	@$(MSG) "- patch generated Makefile to skip compilation of demos and test code"
 	@$(RUN) sed -i 's|SUBDIRS = pixman demos test|SUBDIRS = pixman|g' ./Makefile

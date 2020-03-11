@@ -9,14 +9,16 @@ DEPENDS =
 
 HOMEPAGE = https://github.com/json-c/
 COMMENT  = JSON-C implements a reference counting object model that allows you to easily construct JSON objects in C, output them as JSON formatted strings and parse JSON formatted strings back into the C representation of JSON objects.
-LICENSE  =
+LICENSE  = https://github.com/json-c/json-c/blob/master/COPYING
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = myPreConf
+PRE_CONFIGURE_TARGET = json-c_pre_configure
 CONFIGURE_ARGS = ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
+
 
 include ../../mk/spksrc.cross-cc.mk
 
-myPreConf:
+.PHONY: json-c_pre_configure
+json-c_pre_configure:
 	$(RUN) ./autogen.sh
 	export ac_cv_func_malloc_0_nonnull=yes && export ac_cv_func_realloc_0_nonnull=yes

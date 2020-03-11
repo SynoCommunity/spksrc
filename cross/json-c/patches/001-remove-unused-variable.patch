@@ -1,3 +1,6 @@
+# avoid compiler warning for unused variable 'size'
+# since the build treats warnings as errors
+
 --- json_tokener.c.orig	2014-04-11 04:35:45.000000000 +0200
 +++ json_tokener.c	2014-11-19 15:08:24.483987405 +0100
 @@ -352,12 +352,10 @@

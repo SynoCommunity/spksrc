@@ -43,9 +43,8 @@ PACKAGE_MACHINE = i686
 endif
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = ntopng_pre_configure_target
-POST_CONFIGURE_TARGET = ntopng_post_configure_target
-PRE_COMPILE_TARGET = ntopng_pre_compile_target
+PRE_CONFIGURE_TARGET = ntopng_pre_configure
+PRE_COMPILE_TARGET = ntopng_pre_compile
 
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
@@ -58,10 +57,10 @@ ENV += DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: ntopng_pre_configure_target
-ntopng_pre_configure_target:
+.PHONY: ntopng_pre_configure
+ntopng_pre_configure:
 	@$(RUN) ./autogen.sh
-	@$(MSG) "- patch configure file to define synology specific package info"
+	@$(MSG) "- patch generated configure file to define synology specific package info"
 	@$(RUN) sed -i 's|#define PACKAGE_OSNAME "$${OSNAME}"|#define PACKAGE_OSNAME "Synology $(SYNOLOGY_OS) $(TCVERSION)+"|g' ./configure
 	@$(RUN) sed -i 's|#define PACKAGE_OS "$${OS}"|#define PACKAGE_OS "$(TC_ARCH)"|g' ./configure
 	@$(RUN) sed -i 's|#define PACKAGE_MACHINE "$$MACHINE"|#define PACKAGE_MACHINE "$(PACKAGE_MACHINE)"|g' ./configure
@@ -76,8 +75,8 @@ ntopng_pre_configure_target:
 	@$(RUN) sed -i 's|copy; 1998-\(..\) - ntop.org"|copy; 1998-20\1 - ntop.org"|g' ./src/LuaEngine.cpp
 	@$(RUN) sed -i 's|"Welcome to %s %s v.%s - (C) 1998-\(..\) ntop.org"|"Welcome to %s %s v.%s - (C) 1998-20\1 ntop.org"|g' ./src/Ntop.cpp
 
-.PHONY: ntopng_pre_compile_target
-ntopng_pre_compile_target:
+.PHONY: ntopng_pre_compile
+ntopng_pre_compile:
 	@$(MSG) "- patch generated Makefile to ignore third-party libs and use cross/* packages instead"
 	@$(RUN) sed -i 's|LIB_TARGETS = $$(LUA_LIB)|LIB_TARGETS =|g' ./Makefile
 	@$(RUN) sed -i 's|$$(LIBPCAP) $$(LUA_LIB) $$(LIBRRDTOOL_LIB)|$$(LIBPCAP) $$(LIBRRDTOOL_LIB)|g' ./Makefile
