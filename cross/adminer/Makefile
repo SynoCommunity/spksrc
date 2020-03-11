@@ -13,7 +13,7 @@ LICENSE  = Apache License 2.0 or GPL 2
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = adminer_install_target
+INSTALL_TARGET = adminer_install
 
 # previous used design "nette" does not contain changes since Adminer 4.6.x
 PKG_DESIGN = rmsoft_blue
@@ -26,8 +26,8 @@ INSTALL_DESIGNS = 0
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: adminer_install_target
-adminer_install_target:
+.PHONY: adminer_install
+adminer_install:
 	(cd $(WORK_DIR)/$(PKG_DIR) && php compile.php && mv $(PKG_NAME)-$(PKG_VERS).php index.php)
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web
 	install -m 644 $(WORK_DIR)/$(PKG_DIR)/index.php $(STAGING_INSTALL_PREFIX)/web

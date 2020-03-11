@@ -38,4 +38,4 @@ adminer_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 -d $(STAGING_DIR)/web
-	install -m 644 src/.htaccess $(STAGING_DIR)/web/.htaccess
+	install -m 644 src/dot-htaccess $(STAGING_DIR)/web/.htaccess

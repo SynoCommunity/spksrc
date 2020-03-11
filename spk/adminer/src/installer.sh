@@ -7,8 +7,6 @@ DNAME="Adminer"
 # Others
 INSTALL_DIR=${SYNOPKG_PKGDEST}/web
 WEB_DIR="/var/services/web"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
-USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
 
 HTACCESS_FILE=${INSTALL_DIR}/.htaccess
 
@@ -48,5 +46,8 @@ preupgrade ()
 
 postupgrade ()
 {
+    # Edit .htaccess according to the wizard
+    sed -i -e "s|@@_wizard_htaccess_allowed_from_@@|${wizard_htaccess_allowed_from}|g" ${HTACCESS_FILE}
+    
     exit 0
 }
