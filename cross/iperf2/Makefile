@@ -15,11 +15,11 @@ LICENSE  =
 
 GNU_CONFIGURE = 1
 
-POST_INSTALL_TARGET = iperf2_post_install_target
+POST_INSTALL_TARGET = iperf2_post_install
 
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: iperf2_post_install_target
-iperf2_post_install_target:
+.PHONY: iperf2_post_install
+iperf2_post_install:
 	cd $(STAGING_INSTALL_PREFIX)/bin; ln -s ./iperf ./iperf2

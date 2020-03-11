@@ -10,11 +10,7 @@ OPTIONAL_DESC =
 # provide htop until DSM 5.0 (later versions already have htop)
 ifneq (5.1,$(firstword $(sort $(TCVERSION) 5.1)))
 DEPENDS += cross/htop
-OPTIONAL_DESC += "htop, "
-endif
-
-ifeq ($(OPTIONAL_DESC),)
-OPTIONAL_DESC = " "
+OPTIONAL_DESC := $(OPTIONAL_DESC)", htop"
 endif
 
 BUSYBOX_CONFIG = procutils
@@ -26,7 +22,7 @@ endif
 
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3,$(OPTIONAL_DESC)and process utilities \(lsof, iostat, pgrep, pmap, watch\).
+DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3$(OPTIONAL_DESC) and process utilities \(lsof, iostat, pgrep, pmap, watch\).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
 CHANGELOG = "Initial release"
