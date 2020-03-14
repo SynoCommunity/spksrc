@@ -27,5 +27,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: mutt_extra_install
 mutt_extra_install:
 	install -m 755 src/mutt-utf8 $(STAGING_DIR)/bin/mutt-utf8
-	install -m 644 src/Muttrc.local $(STAGING_DIR)/etc/Muttrc.local
-	echo "source $(INSTALL_PREFIX)/etc/Muttrc.local" >> $(STAGING_DIR)/etc/Muttrc
+	install -d -m 755 $(STAGING_DIR)/var
+	install -m 644 src/Muttrc.local $(STAGING_DIR)/var/Muttrc.local
+	echo "source $(INSTALL_PREFIX)/var/Muttrc.local" >> $(STAGING_DIR)/etc/Muttrc

@@ -15,7 +15,6 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-ssl=openssl --enable-pop --enable-imap --enable-smtp --with-sasl
 
 INSTALL_TARGET = mutt_install
-POST_INSTALL_TARGET = mutt_post_install
 
 
 include ../../mk/spksrc.cross-cc.mk
@@ -23,7 +22,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: mutt_install
 mutt_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-
-.PHONY: mutt_post_install
-mutt_post_install:
 	cp $(WORK_DIR)/$(PKG_DIR)/doc/Muttrc $(STAGING_INSTALL_PREFIX)/etc/Muttrc
