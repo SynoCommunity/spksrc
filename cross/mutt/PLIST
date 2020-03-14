@@ -1,12 +1,12 @@
-bin:bin/flea
+rsc:bin/flea
 bin:bin/mutt
-bin:bin/muttbug
+bin:bin/mutt_pgpring
+rsc:bin/muttbug
 bin:bin/pgpewrap
-bin:bin/pgpring
-bin:bin/smime_keys
+rsc:bin/smime_keys
+rsc:etc/Muttrc
 rsc:etc/mime.types
 rsc:etc/mime.types.dist
-rsc:etc/Muttrc
 rsc:share/locale/bg/LC_MESSAGES/mutt.mo
 rsc:share/locale/ca/LC_MESSAGES/mutt.mo
 rsc:share/locale/cs/LC_MESSAGES/mutt.mo
@@ -17,6 +17,7 @@ rsc:share/locale/eo/LC_MESSAGES/mutt.mo
 rsc:share/locale/es/LC_MESSAGES/mutt.mo
 rsc:share/locale/et/LC_MESSAGES/mutt.mo
 rsc:share/locale/eu/LC_MESSAGES/mutt.mo
+rsc:share/locale/fi/LC_MESSAGES/mutt.mo
 rsc:share/locale/fr/LC_MESSAGES/mutt.mo
 rsc:share/locale/ga/LC_MESSAGES/mutt.mo
 rsc:share/locale/gl/LC_MESSAGES/mutt.mo

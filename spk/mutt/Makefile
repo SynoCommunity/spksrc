@@ -1,27 +1,26 @@
 SPK_NAME = mutt
-SPK_VERS = 1.5.24
-SPK_REV = 2
+SPK_VERS = 1.13.4
+SPK_REV = 4
 SPK_ICON = src/mutt.png
 
 DEPENDS = cross/mutt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mutt is a small but very powerful text-based mail client for Unix operating systems.
-RELOAD_UI = no
 DISPLAY_NAME = Mutt
 STARTABLE = no
-BETA = 1
-CHANGELOG = Update to 1.5.24
+
+CHANGELOG = "1. Update to 1.13.4<br/>2. Add SASL support"
 
 HOMEPAGE   = http://www.mutt.org
 LICENSE    = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SPK_LINKS = /usr/local/bin/mutt:bin/mutt-utf8
 
 POST_STRIP_TARGET = mutt_extra_install
+
 
 include ../../mk/spksrc.spk.mk
 
