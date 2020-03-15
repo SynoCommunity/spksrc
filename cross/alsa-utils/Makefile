@@ -1,5 +1,5 @@
 PKG_NAME = alsa-utils
-PKG_VERS = 1.0.26
+PKG_VERS = 1.2.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.alsa-project.org/pub/utils
@@ -23,9 +23,8 @@ alsa-utils_configure:
 	sed -i.orig $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses5-config \
 	    -e 's#^prefix=".*"$$#prefix="$(INSTALL_DIR)/$(INSTALL_PREFIX)"#'
 	$(RUN) PATH=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/:$(PATH) ./configure $(REAL_CONFIGURE_ARGS)
-	mv $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses5-config.orig $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses5-config
+	mv $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses6-config.orig $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/ncurses6-config
 
 .PHONY: alsa-utils_install
 alsa-utils_install:
 	$(RUN) make install DESTDIR=$(INSTALL_DIR)
-
