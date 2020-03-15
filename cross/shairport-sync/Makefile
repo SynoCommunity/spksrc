@@ -17,11 +17,11 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-alsa --with-ssl=openssl --with-tinysvcmdns
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
-PRE_CONFIGURE_TARGET = shairport-sync_pre_configure_target
+PRE_CONFIGURE_TARGET = shairport-sync_pre_configure
 
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: shairport-sync_pre_configure_target
-shairport-sync_pre_configure_target:
+.PHONY: shairport-sync_pre_configure
+shairport-sync_pre_configure:
 	$(RUN) autoreconf -i -f
