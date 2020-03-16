@@ -1,10 +1,10 @@
 SPK_NAME = itools
 SPK_VERS = 1.1
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/itools.png
-
+# A collection of tools from ifuse and usbmuxd projects of libimobiledevice.org
+# There exists no source code package "itools" and therefore no cross/itools project
 DEPENDS = cross/usbmuxd cross/ifuse
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 SPK_DEPENDS = "PythonModule"
 
 MAINTAINER = bxxxjxxg
@@ -14,7 +14,7 @@ DISTRIBUTOR_URL = https://synocommunity.com
 DESCRIPTION = A collection toolkit for connecting iOS devices.
 RELOAD_UI = no
 DISPLAY_NAME = iOS Access
-CHANGELOG = Added udev rules and python scripts to auto-detect and mount/umount iOS devices into/from FileStation. 
+CHANGELOG = Update dependencies \(2019.10\).
 
 HOMEPAGE   = https://www.libimobiledevice.org
 LICENSE    = LGPL 2.1

@@ -2,7 +2,8 @@ PKG_NAME = libimobiledevice
 PKG_VERS = 1.2.0
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 26373b334889f5ae2e2737ff447eb25b1700fa2f
+# with commits on Jun 13, 2019
+PKG_GIT_HASH = 6edc36fccb52a963c9ebfbb44ba7b91570e0fd06
 PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME).git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
@@ -15,18 +16,23 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libimobiledevice_pre_configure
-INSTALL_TARGET = libimobiledevice_extra_install
-CONFIGURE_ARGS = --disable-largefile --without-cython --enable-debug-code
+INSTALL_TARGET = libimobiledevice_install
+CONFIGURE_ARGS = --disable-largefile --without-cython --disable-debug-code
+LIBIMOBILEDEVICE_AUTOGEN_ARGS = $(CONFIGURE_ARGS)
 
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
-libimobiledevice_pre_configure:
-	$(RUN) ; ./autogen.sh --disable-largefile --without-cython --enable-debug-code --host=arm-linux
-else
-libimobiledevice_pre_configure:
-	$(RUN) ; ./autogen.sh --disable-largefile --without-cython --enable-debug-code
+	LIBIMOBILEDEVICE_AUTOGEN_ARGS += --host=arm-linux
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+	LIBIMOBILEDEVICE_AUTOGEN_ARGS += --host=ppc-linux
 endif
 
-libimobiledevice_extra_install:
+.PHONY: libimobiledevice_pre_configure
+libimobiledevice_pre_configure:
+	$(RUN) ./autogen.sh $(LIBIMOBILEDEVICE_AUTOGEN_ARGS)
+
+.PHONY: libimobiledevice_install
+libimobiledevice_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

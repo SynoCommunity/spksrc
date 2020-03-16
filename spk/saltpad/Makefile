@@ -1,6 +1,6 @@
 SPK_NAME = saltpad
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/saltpad.png
 DSM_UI_DIR = app
 
@@ -15,7 +15,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = SaltPad
 START_DEP_SERVICES = salt-master
 
-HOMEPAGE   = https://github.com/tinyclues/saltpad
+HOMEPAGE   = https://github.com/Lothiraldan/saltpad
 LICENSE    = GPL
 
 INSTALLER_SCRIPT = src/installer.sh
@@ -39,4 +39,4 @@ saltpad_extra_install: $(STAGING_DIR)/share/saltpad
 
 $(STAGING_DIR)/share/saltpad:
 	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone https://github.com/tinyclues/saltpad.git saltpad
+	cd $(STAGING_DIR)/share && git clone https://github.com/Lothiraldan/saltpad.git saltpad

@@ -18,11 +18,11 @@ CONFIGURE_ARGS = LIBLEPT_HEADERSDIR=$(STAGING_INSTALL_PREFIX)/include/leptonica
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
-# workaround for g++ compiler:
-ADDITIONAL_CXXFLAGS = -D nullptr=NULL
+# workaround and experimental c++ features for g++ compiler:
+ADDITIONAL_CXXFLAGS = -D nullptr=NULL -std=gnu++0x
 endif
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
-# enable experimental feature for (old) g++ compiler:
+# enable experimental features for (old) g++ compiler:
 ADDITIONAL_CXXFLAGS = -std=gnu++0x
 endif
 
