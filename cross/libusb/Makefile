@@ -1,5 +1,5 @@
 PKG_NAME = libusb
-PKG_VERS = 1.0.9
+PKG_VERS = 1.0.23
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libusb/libusb/archive
@@ -14,14 +14,19 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libusb_pre_configure
+CONFIGURE_ARGS = --disable-udev --disable-debug-log --disable-examples-build
+LIBUSB_AUTOGEN_ARGS = $(CONFIGURE_ARGS)
 
 include ../../mk/spksrc.cross-cc.mk
 
-LIBUSB_AUTOGEN_PARAMS =
 
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
-LIBUSB_AUTOGEN_PARAMS += --host=arm-linux
+LIBUSB_AUTOGEN_ARGS += --host=arm-linux
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+LIBUSB_AUTOGEN_ARGS += --host=ppc-linux
 endif
 
+.PHONY: libusb_pre_configure
 libusb_pre_configure:
-	$(RUN) ; ./autogen.sh $(LIBUSB_AUTOGEN_PARAMS)
+	$(RUN) ; ./autogen.sh $(LIBUSB_AUTOGEN_ARGS)
