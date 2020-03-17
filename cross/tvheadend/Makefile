@@ -21,8 +21,6 @@ CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 CONFIGURE_ARGS += --disable-libfdkaac_static --disable-libopus_static --disable-libtheora --disable-libtheora_static
 CONFIGURE_ARGS += --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static
 
-POST_PATCH_TARGET = post_patch_target_tvheadend
-
 ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/ffmpeg
 endif
@@ -32,11 +30,3 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --nowerror
 endif
-
-.PHONY: post_patch_target_tvheadend
-
-post_patch_target_tvheadend:
-	@if [ "$(ARCH)" = "ppc853x" ] || [ "$(ARCH)" = "qoriq" ]; then \
-		cat $(PWD)/patches/ppc/isoc9x.patch | ($(RUN) patch -p0) ;\
-		cat $(PWD)/patches/ppc/hts_strtab-undo-inlining-of-functions.patch | ($(RUN) patch -p0) ;\
-	fi;
