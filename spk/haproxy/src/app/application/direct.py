@@ -20,7 +20,7 @@ class Configuration(Base):
     template = u'/usr/local/haproxy/var/haproxy.cfg.tpl'
     start_stop_status = u'/var/packages/haproxy/scripts/start-stop-status'
     crt_path = u'/usr/local/haproxy/var/crt/default.pem'
-    user = u'haproxy'
+    user = u'sc-haproxy'
 
     def __init__(self):
         self.session = Session()
@@ -83,24 +83,6 @@ class Configuration(Base):
     def reload(self):
         default_config()
         self.write()
-        return {'success': True}
-
-    @expose
-    def generate_certificate(self):
-        if os.path.exists(self.crt_path):
-            os.remove(self.crt_path)
-	listCRT = [u'/usr/syno/etc/ssl/ssl.crt/server.crt', u'/usr/syno/etc/ssl/ssl.crt/ca.crt', u'/usr/syno/etc/ssl/ssl.key/server.key']
-	if os.path.isfile(u'/usr/syno/etc/ssl/ssl.intercrt/server-ca.crt'):
-		listCRT = [u'/usr/syno/etc/ssl/ssl.crt/server.crt', u'/usr/syno/etc/ssl/ssl.intercrt/server-ca.crt', u'/usr/syno/etc/ssl/ssl.key/server.key']
-        with open(self.crt_path, 'w') as crt:
-            for filepath in listCRT:
-                with open(filepath, 'r') as f:
-                    content = f.read()
-                if not content.endswith('\n'):
-                    content += '\n'
-                crt.write(content)
-        os.chown(self.crt_path, pwd.getpwnam(self.user).pw_uid, -1)
-        os.chmod(self.crt_path, 0600)
         return {'success': True}
 
 
