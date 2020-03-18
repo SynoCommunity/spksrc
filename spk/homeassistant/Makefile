@@ -1,11 +1,12 @@
 SPK_NAME = homeassistant
 SPK_VERS = 0.87.1
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/cffi cross/nmap  # for python-libnmap
 DEPENDS += cross/gmp cross/mpfr cross/mpc  # for gmpy2
+DEPENDS += cross/bcrypt
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.6.8"
 
@@ -27,7 +28,8 @@ SERVICE_PORT = 8123
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+# ppc archs except QorIQ
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
 
