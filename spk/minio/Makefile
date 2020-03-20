@@ -1,5 +1,5 @@
 SPK_NAME = minio
-SPK_VERS = 2020-03-14T02-21-58Z
+SPK_VERS = 2020-03-19T21-49-00Z
 SPK_REV = 4
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ MAINTAINER = fgma
 DESCRIPTION = The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage.
 RELOAD_UI = yes
 DISPLAY_NAME = MinIO
-CHANGELOG = "Update to latest release which includes multiple minor bugfix releases. Breaking Change: Use bulk locks in Multi-object delete."
+CHANGELOG = "Update to latest release which includes multiple minor bugfix releases. Breaking Change: Use bulk locks in Multi-object delete and to data usage crawler, so rolling upgrade is not supported."
 HOMEPAGE = https://min.io/
 LICENSE = Apache License 2.0
 STARTABLE = yes
