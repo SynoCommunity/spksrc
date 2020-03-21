@@ -1,9 +1,8 @@
 PKG_NAME = rdiff-backup
-PKG_VERS = 1.3.3
+PKG_VERS = 2.0.0
 PKG_EXT = tar.gz
-# TODO: this pattern will change with future builds
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://download.savannah.nongnu.org/releases/rdiff-backup
+PKG_DIST_SITE = https://github.com/rdiff-backup/rdiff-backup/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/librsync cross/attr cross/acl

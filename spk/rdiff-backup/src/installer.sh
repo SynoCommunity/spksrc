@@ -6,7 +6,7 @@ DNAME="rdiff-backup"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 
@@ -21,13 +21,13 @@ postinst ()
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
     # Create a Python virtualenv
-    ${VIRTUALENV} ${INSTALL_DIR}/env > /dev/null
+    ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the wheels
-    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
+    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null
 
     # Fix shebang
-    sed -i -e "s|^#!.*$|#!${INSTALL_DIR}/env/bin/python|g" ${INSTALL_DIR}/env/bin/rdiff-backup
+    sed -i -e "s|^#!.*$|#!${INSTALL_DIR}/env/bin/python3|g" ${INSTALL_DIR}/env/bin/rdiff-backup ${INSTALL_DIR}/env/bin/rdiff-backup-statistics
 
     # Add symlink
     mkdir -p /usr/local/bin
