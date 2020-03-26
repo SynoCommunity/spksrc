@@ -26,7 +26,7 @@ start_daemon ()
     start-stop-daemon -S -q -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED} -p ${PID_FILE} \
       -- --config ${CFG_DIR} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}
     sleep 3
-    start-stop-daemon -S -q -b -m -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGE_WEB} -p ${DELUGE_WEB_PID} \
+    start-stop-daemon -S -q -b -m -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} -p ${DELUGE_WEB_PID} ${DELUGE_WEB} \
       -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
 }
 
