@@ -5,7 +5,13 @@ PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(subst .,_,$(PKG_VERS))
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
-DEPENDS = cross/boost cross/geoip cross/libiconv cross/openssl
+# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python must appear before cross/boost
+DEPENDS = cross/python cross/boost cross/geoip cross/libiconv cross/openssl
+
+# cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
+UNSUPPORTED_ARCHS = 88f6281 powerpc ppc824x ppc853x ppc854x
+# libtorrent:
+UNSUPPORTED_ARCHS += hi3535
 
 HOMEPAGE = http://www.rasterbar.com/products/libtorrent
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.
@@ -17,11 +23,14 @@ COMPILE_TARGET = compile_target build_python_wheel
 INSTALL_TARGET = install_destdir_target install_python_wheel
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-python-binding --with-libgeoip --with-libiconv
+-include $(WORK_DIR)/python-cc.mk
+CONFIGURE_ARGS  = --enable-python-binding --with-libiconv
 CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python
 CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
-CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/include/python2.7
-ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/python2.7
+CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
+CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
 
 BOOST_LIBRARIES += system python
