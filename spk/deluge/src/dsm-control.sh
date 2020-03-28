@@ -23,30 +23,33 @@ DELUGE_WEB_LOG="${SYNOPKG_PKGDEST}/var/deluge-web.log"
 # since this file is run as the package user anyway
 start_daemon ()
 {
-    start-stop-daemon -S -q -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED} -p ${PID_FILE} \
+    # make sure both daemons are stopped
+    stop_daemon
+    
+    start-stop-daemon -S -q -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED} \
       -- --config ${CFG_DIR} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}
     sleep 3
-    start-stop-daemon -S -q -b -m -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGE_WEB} -p ${DELUGE_WEB_PID} \
-      -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info
+    start-stop-daemon -S -q -x env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGE_WEB} \
+      -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info --pidfile ${DELUGE_WEB_PID}
 }
 
 stop_daemon ()
 {
-    start-stop-daemon -K -q -p ${DELUGE_WEB_PID}
-    start-stop-daemon -K -q -p ${PID_FILE}
+    start-stop-daemon -K -q -p ${DELUGE_WEB_PID}  > /dev/null  2>&1
+    start-stop-daemon -K -q -p ${PID_FILE}        > /dev/null  2>&1
     wait_for_status 1 20
     if [ $? -eq 1 ]; then
-        start-stop-daemon -K -s 9 -q -p ${DELUGE_WEB_PID}
-        start-stop-daemon -K -s 9 -q -p ${PID_FILE}
+        start-stop-daemon -K -s 9 -q -p ${DELUGE_WEB_PID}  > /dev/null  2>&1
+        start-stop-daemon -K -s 9 -q -p ${PID_FILE}        > /dev/null  2>&1
     fi
     rm -f ${PID_FILE} ${DELUGE_WEB_PID}
 }
 
 daemon_status ()
 {
-    start-stop-daemon -K -q -t -p ${DELUGE_WEB_PID}
+    start-stop-daemon -K -q -t -p ${DELUGE_WEB_PID}  > /dev/null  2>&1
     DELUGE_WEB_RETVAL=$?
-    start-stop-daemon -K -q -t -p ${PID_FILE}
+    start-stop-daemon -K -q -t -p ${PID_FILE}        > /dev/null  2>&1
     DELUGED_RETVAL=$?
     [ ${DELUGED_RETVAL} -eq 0 -a ${DELUGE_WEB_RETVAL} -eq 0 ] || return 1
 }

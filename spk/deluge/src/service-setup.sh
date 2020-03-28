@@ -2,7 +2,8 @@ PYTHON_DIR="/usr/local/python"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/core.conf"
+CORE_CFG_FILE="${SYNOPKG_PKGDEST}/var/core.conf"
+WATCH_CFG_FILE="${SYNOPKG_PKGDEST}/var/autoadd.conf"
 
 GROUP="sc-download"
 
@@ -38,22 +39,23 @@ service_postinst ()
     # Correct permissions, otherwise Deluge can't write to cache
     set_unix_permissions "${SYNOPKG_PKGDEST}/env"
 
-    # Edit the configuration according to the wizard
+    # Edit the configuration files according to the wizard
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        for cfg_file in "${CORE_CFG_FILE} ${WATCH_CFG_FILE}"; do
+            sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${cfg_file}
+            if [ -d "${wizard_complete_dir}" ]; then
+                sed -i -e "s|@complete_dir_enabled@|true|g" ${cfg_file}
+                sed -i -e "s|@complete_dir@|${wizard_complete_dir}|g" ${cfg_file}
+            else
+                sed -i -e "s|@complete_dir_enabled@|false|g" ${cfg_file}
+                sed -i -e "/@complete_dir@/d" ${cfg_file}
+            fi
+        done
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
+            sed -i -e "s|\"enabled_plugins\": \[\],|\"enabled_plugins\": \[\n        \"AutoAdd\"\n    \], \n|g" ${CORE_CFG_FILE}
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${WATCH_CFG_FILE}
         else
-            sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
-            sed -i -e "/@watch_dir@/d" ${CFG_FILE}
-        fi
-        if [ -d "${wizard_complete_dir}" ]; then
-            sed -i -e "s|@complete_dir_enabled@|true|g" ${CFG_FILE}
-            sed -i -e "s|@complete_dir@|${wizard_complete_dir}|g" ${CFG_FILE}
-        else
-            sed -i -e "s|@complete_dir_enabled@|false|g" ${CFG_FILE}
-            sed -i -e "/@complete_dir@/d" ${CFG_FILE}
+            sed -i -e "/@watch_dir@/d" ${WATCH_CFG_FILE}
         fi
     fi
 
@@ -66,12 +68,12 @@ service_postinst ()
 
 service_postupgrade ()
 {
-    # Needed to force correct permissions, during update
+    # Needed to force correct permissions, during update from prior version
     # Extract the right paths from config file
-    if [ -r "${CFG_FILE}" ]; then
-        DOWNLOAD_DIR=`sed -n 's/.*"download_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        COMPLETE_DIR=`sed -n 's/.*"move_completed_path"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        WATCHED_DIR=`sed -n 's/.*"autoadd_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
+    if [ -r "${CORE_CFG_FILE}" ]; then
+        DOWNLOAD_DIR=`sed -n 's/.*"download_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CORE_CFG_FILE}`
+        COMPLETE_DIR=`sed -n 's/.*"move_completed_path"[ ]*:[ ]*"\(.*\)",/\1/p' ${CORE_CFG_FILE}`
+        WATCHED_DIR=`sed -n 's/.*"autoadd_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CORE_CFG_FILE}`
 
         # Apply permissions
         if [ -n "${DOWNLOAD_DIR}" ] && [ -d "${DOWNLOAD_DIR}" ]; then
