@@ -23,6 +23,12 @@ CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=None
 CMAKE_ARGS += -DRUN_TEST_SUITE=OFF
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(INSTALL_PREFIX)/lib
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+CMAKE_ARGS += -DCMAKE_C_FLAGS=" -fPIC"
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-std=c++11"
+CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
+CMAKE_ARGS += -DTHREADS_PTHREAD_ARG=2
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -46,9 +52,9 @@ gmmlib_custom_configure:
 .PHONY: gmmlib_custom_compile
 
 gmmlib_custom_compile: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 .PHONY: gmmlib_custom_install
 
 gmmlib_custom_install: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) $(COMPILE_MAKE_OPTIONS) install DESTDIR=$(INSTALL_DIR)

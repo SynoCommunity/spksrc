@@ -8,6 +8,11 @@ PKG_DIR = MediaSDK-$(PKG_NAME)-$(PKG_VERS)
 DEPENDS += cross/intel-media-driver
 UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
 
+ifeq ($(strip $(HANDBRAKE)),)
+PATCHES =
+endif
+
+
 HOMEPAGE = http://mediasdk.intel.com
 COMMENT  = Intel Media SDK provides a plain C API to access hardware-accelerated video decode, encode and filtering on Intel® Gen graphics hardware platforms. Implementation written in C++ 11 with parts in C-for-Media (CM).
 LICENSE  = MIT
@@ -16,17 +21,24 @@ CONFIGURE_TARGET = intel-mediasdk_custom_configure
 COMPILE_TARGET = intel-mediasdk_custom_compile
 INSTALL_TARGET = intel-mediasdk_custom_install
 
-CMAKE_ARGS = -DBUILD_TYPE=release
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
-CMAKE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib
+CMAKE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib/mfx
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS='-std=c++11'
-CMAKE_ARGS += -DBUILD_SAMPLES=OFF
-CMAKE_ARGS += -DBUILD_TUTORIALS=OFF
 CMAKE_ARGS += -Wno-dev
+ENV += LIBVA_DRIVERS_PATH=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib/dri
+CMAKE_ARGS += -DENABLE_OPENCL=OFF
+CMAKE_ARGS += -DBUILD_RUNTIME=ON
+CMAKE_ARGS += -DBUILD_TOOLS=OFF
+CMAKE_ARGS += -DBUILD_SAMPLES=OFF
+CMAKE_ARGS += -DBUILD_TESTS=OFF
+CMAKE_ARGS += -DBUILD_DISPATCHER=ON
+CMAKE_ARGS += -DBUILD_TUTORIALS=OFF
+CMAKE_ARGS += -DCMAKE_INSTALL_FULL_LIBDIR="$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib"
+CMAKE_ARGS += -DBUILD_TYPE=release
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -50,9 +62,9 @@ intel-mediasdk_custom_configure:
 .PHONY: intel-mediasdk_custom_compile
 
 intel-mediasdk_custom_compile: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 .PHONY: intel-mediasdk_custom_install
 
 intel-mediasdk_custom_install: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) $(COMPILE_MAKE_OPTIONS) install DESTDIR=$(INSTALL_DIR)

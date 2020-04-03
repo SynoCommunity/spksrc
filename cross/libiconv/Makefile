@@ -13,4 +13,6 @@ LICENSE  = GNU GPLv3
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS += --enable-relocatable
+
 include ../../mk/spksrc.cross-cc.mk

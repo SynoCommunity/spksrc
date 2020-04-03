@@ -11,7 +11,9 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = x265_custom_configure
+PRE_CONFIGURE_TARGET = x265_pre_configure
+CONFIGURE_TARGET = x265_configure
+POST_COMPILE_TARGET = x265_post_compile
 
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
@@ -73,8 +75,7 @@ CMAKE_ARGS += -DNO_ATOMICS=ON
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
-
-.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure
+.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_pre_configure
 
 # First create specific static libraries with build options for 12 and 10 bit depth
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)
@@ -87,18 +88,28 @@ CMAKE_BITLIB_ARGS += -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LINK_FLAGS="-l
 $(PKG_DIR)/libx265_main12.a:
 	mkdir --parents $(PKG_BUILD_12BIT)
 	cd $(PKG_BUILD_12BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) -DMAIN12=ON ../source
-	cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_OPTIONS)
+	cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
 	$(RUN) ln -sf $(PKG_BUILD_12BIT)/libx265.a libx265_main12.a
 
 $(PKG_DIR)/libx265_main10.a:
 	mkdir --parents $(PKG_BUILD_10BIT)
 	cd $(PKG_BUILD_10BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) ../source
-	cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_OPTIONS)
+	cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
 	$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
 
 # Aggregate them all together in default 8 bit depth build
 CMAKE_MULTILIB_ARGS = -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
 CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
 
-x265_custom_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
-	$(RUN) cmake $(CMAKE_ARGS) $(CMAKE_MULTILIB_ARGS) .
+
+x265_pre_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
+
+
+.PHONY: x265_configure
+x265_configure:
+	$(RUN) cmake $(CMAKE_ARGS) $(CMAKE_MULTILIB_ARGS)  .
+
+.PHONY: x265_post_compile
+x265_post_compile:
+	$(RUN) mv libx265.a libx265_main.a
+	$(RUN)  echo -e 'CREATE libx265.a\nADDLIB libx265_main.a\nADDLIB libx265_main10.a\nADDLIB libx265_main12.a\nSAVE\nEND' | $(AR) -M

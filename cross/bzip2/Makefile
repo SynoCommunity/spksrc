@@ -15,7 +15,7 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = bzip2_compile
 INSTALL_TARGET = bzip2_install
 
-ADDITIONAL_CFLAGS = -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
+ADDITIONAL_CFLAGS =  -m64 -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
 
 include ../../mk/spksrc.cross-cc.mk
 
