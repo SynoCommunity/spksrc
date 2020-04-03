@@ -1,9 +1,8 @@
 PKG_NAME = adminer
-PKG_VERS = 4.2.5
+PKG_VERS = 4.7.6
 PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/vrana/adminer/archive
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/vrana/adminer/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -14,15 +13,27 @@ LICENSE  = Apache License 2.0 or GPL 2
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = adminer_install
+
+# previous used design "nette" does not contain changes since Adminer 4.6.x
+PKG_DESIGN = rmsoft_blue
+
+# Option to install all design files
+# To use a different design manually overwrite adminer.css 
+# on the target system by one found in the designs sub folders
+INSTALL_DESIGNS = 0
+
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: adminer_install
+adminer_install:
 	(cd $(WORK_DIR)/$(PKG_DIR) && php compile.php && mv $(PKG_NAME)-$(PKG_VERS).php index.php)
-	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
-	(cd $(WORK_DIR)/$(PKG_DIR) && wget -O $(PKG_NAME).css https://raw.githubusercontent.com/vrana/adminer/master/designs/nette/adminer.css)
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) ./index.php | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) ./$(PKG_NAME).css | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
-	echo 'Order Deny,Allow\nDeny from all\nAllow from 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8' > $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)/.htaccess
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/index.php $(STAGING_INSTALL_PREFIX)/web
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/designs/$(PKG_DESIGN)/adminer.css $(STAGING_INSTALL_PREFIX)/web
+	@if [ "$(INSTALL_DESIGNS)" = "1" ]; \
+	then \
+		$(MSG) "Install design files" ; \
+		tar -cf - -C $(WORK_DIR)/$(PKG_DIR) ./designs | tar -xf - -C $(STAGING_INSTALL_PREFIX)/web ; \
+	fi

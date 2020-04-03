@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:buster
 MAINTAINER SynoCommunity <https://synocommunity.com>
 
 ENV LANG C.UTF-8
@@ -6,9 +6,10 @@ ENV LANG C.UTF-8
 # Manage i386 arch
 RUN dpkg --add-architecture i386
 
-# Install required packages
-RUN apt-get update && \
-    apt-get install -y automake \
+# Install required packages (in sync with README.rst instructions
+RUN apt-get update && apt-get install --no-install-recommends -y \
+        autogen \
+        automake \
         bc \
         bison \
         build-essential \
@@ -19,6 +20,7 @@ RUN apt-get update && \
         debootstrap \
         expect \
         flex \
+        g++-multilib \
         gettext \
         git \
         gperf \
@@ -29,19 +31,25 @@ RUN apt-get update && \
         libcppunit-dev \
         libffi-dev \
         libgc-dev \
+        libgmp3-dev \
         libltdl-dev \
         libmount-dev \
+        libncurses-dev \
         libpcre3-dev \
         libssl-dev \
+        libtool \
         libunistring-dev \
         lzip \
         mercurial \
         ncurses-dev \
-        php5 \
+        php \
         pkg-config \
         python3 \
+        python3-distutils \
+        scons \
         subversion \
         swig \
+        unzip \
         xmlto \
         zlib1g-dev && \
     apt-get clean && \

@@ -11,10 +11,16 @@ include ../../mk/spksrc.directories.mk
 URLS          = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME          = $(TC_NAME)
 COOKIE_PREFIX = $(TC_NAME)-
-DIST_FILE     = $(TOOLCHAINS_DIR)/$(TC_VERS)/$(TC_DIST_NAME)
-DIST_EXT      = $(TC_EXT)
-DISTRIB_DIR   = $(TOOLCHAINS_DIR)/$(TC_VERS)
+ifneq ($(TC_DIST_FILE),)
+LOCAL_FILE    = $(TC_DIST_FILE)
+# download.mk uses PKG_DIST_FILE
+PKG_DIST_FILE = $(TC_DIST_FILE)
+else
 LOCAL_FILE    = $(TC_DIST_NAME)
+endif
+DISTRIB_DIR   = $(TOOLCHAINS_DIR)/$(TC_VERS)
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT      = $(TC_EXT)
 
 #####
 
@@ -51,8 +57,8 @@ CXXFLAGS += $(TC_CXXFLAGS)
 CXXFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 
 LDFLAGS += $(TC_LDFLAGS)
-LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
-LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib 
+LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
+LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
 
 
@@ -95,5 +101,5 @@ $(DIGESTS_FILE): download
 	    SHA256)   tool=sha256sum ;; \
 	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(LOCAL_FILE) $$type `$$tool $(DISTRIB_DIR)/$(TC_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
 	done

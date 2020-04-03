@@ -1,1 +1,6 @@
 bin:bin/nano
+bin:bin/rnano
+rsc:share/info/
+rsc:share/info/
+rsc:share/locale/
+rsc:share/nano/

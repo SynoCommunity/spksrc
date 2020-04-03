@@ -1,6 +1,6 @@
 {
 	"enabled": true,
-	"username": "@username@",
+	"username": "admin",
 	"password2": "@password@",
 	"wizard": true
 }

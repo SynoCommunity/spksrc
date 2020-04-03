@@ -35,6 +35,10 @@ else
 $(PRE_SERVICE_TARGET): service_msg_target
 endif
 
+ifeq ($(strip $(DSM_UI_DIR)),)
+DSM_UI_DIR=app
+endif
+
 .PHONY: service_target service_msg_target
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
 .PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
@@ -114,6 +118,12 @@ endif
 	@cat $(SPKSRC_MK)spksrc.service.call_func >> $@
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
+endif
+ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
+	@echo "# List of commands to create links for" >> $@
+	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
+	@echo "SPK_LINKS=\"${SPK_LINKS}\"" >> $@
+	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 endif
 DSM_SCRIPTS_ += service-setup
 SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
@@ -205,9 +215,6 @@ SERVICE_PORT_PROTOCOL=http
 endif
 ifeq ($(strip $(SERVICE_PORT_ALL_USERS)),)
 SERVICE_PORT_ALL_USERS=true
-endif
-ifeq ($(strip $(DSM_UI_DIR)),)
-DSM_UI_DIR=app
 endif
 
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:

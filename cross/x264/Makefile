@@ -1,5 +1,5 @@
 PKG_NAME = x264
-PKG_VERS = 20180119-2245-stable
+PKG_VERS = 20190109-2245-stable
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.videolan.org/x264/snapshots

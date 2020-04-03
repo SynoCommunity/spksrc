@@ -1,6 +1,6 @@
 SPK_NAME = gateone
 SPK_VERS = 20171125
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
@@ -24,6 +24,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 # Service configuration
 SERVICE_PORT = 8271
+SERVICE_PORT_PROTOCOL = https
 SERVICE_PORT_TITLE = Gateone (HTTPS)
 
 # Admin link

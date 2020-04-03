@@ -37,8 +37,18 @@ endif
 
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_DSM),)
-  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
-    @$(error Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
+  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
+    ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
+      @$(error DSM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM))
+    endif
+  endif
+endif
+# Check minimum SRM requirements of package
+ifneq ($(REQUIRED_SRM),)
+  ifeq ($(ARCH),$(findstring $(ARCH),$(SRM_ARCHS)))
+    ifneq ($(REQUIRED_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_SRM))))
+      @$(error SRM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_SRM))
+    endif
   endif
 endif
 
@@ -68,6 +78,10 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
+ifeq ($(strip $(PLIST_TRANSFORM)),)
+PLIST_TRANSFORM= cat
+endif
+
 .PHONY: cat_PLIST
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
@@ -76,7 +90,7 @@ cat_PLIST:
 	done
 	@if [ -f PLIST ] ; \
 	then \
-	  cat PLIST ; \
+	  $(PLIST_TRANSFORM) PLIST ; \
 	else \
 	  $(MSG) "No PLIST for $(NAME)" >&2; \
 	fi

@@ -1,19 +1,27 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.6
-SPK_REV = 13
+SPK_SHORT_VERS = 4.3
+SPK_GIT_HASH = 221c29b
+SPK_GIT_DATE = 20191128
+SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
+TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
+SPK_REV = 19
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
-BETA = 1
+
+# Export version to the build where version
+# script gets patched accordingly by:
+# 000-fix-version.patch from cross/tvheadend
+export TVH_VERS
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = m4tt075
+MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update TVH to 4.2.6 (maintenance release), 2. Update libhdhomerun to 20171221, 3. Use DSM 5+6 generic service, 4. Recover recordings from system directories"
-HOMEPAGE = https://www.lonelycoder.com/tvheadend/
+CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868"
+HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
 WIZARDS_DIR = src/wizard/
@@ -35,9 +43,27 @@ POST_STRIP_TARGET = tvheadend_extra_install
 BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
+include ../../mk/spksrc.common.mk
+
+# Reuse ffmpeg libraries
+# Requires to invoke: make [package|publish] ARCH= TCVERSION=
+export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+
+ifneq ($(wildcard $(FFMPEG_DIR)),)
+PRE_DEPEND_TARGET = tvheadend_pre_depend
+SPK_DEPENDS = "ffmpeg>4.1"
+endif
+
 include ../../mk/spksrc.spk.mk
 
-.PHONY: tvheadend_extra_install
+.PHONY: tvheadend_pre_depend tvheadend_extra_install
+
+FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc libswscale.pc libavutil.pc libavformat.pc libavcodec.pc
+
+tvheadend_pre_depend:
+	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
+	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+
 tvheadend_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/accesscontrol

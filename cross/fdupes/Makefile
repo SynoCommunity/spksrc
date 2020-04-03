@@ -11,10 +11,4 @@ LICENSE  = MIT
 
 CONFIGURE_TARGET = none
 
-INSTALL_TARGET = myInstall
-
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)

@@ -14,5 +14,5 @@ bin:bin/iecset
 bin:bin/speaker-test
 bin:sbin/alsaconf
 bin:sbin/alsactl
-shr:share/alsa
-shr:share/sounds
+rsc:share/alsa
+rsc:share/sounds

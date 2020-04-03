@@ -9,7 +9,9 @@
  */
 
 #define REQUIRESSL
+#ifndef PUSHVERSION
 #define PUSHVERSION "dev"
+#endif
 
 #include <znc/znc.h>
 #include <znc/Chan.h>
@@ -73,9 +75,11 @@ class CPushSocket : public CSocket
 };
 #else
 // forward declaration
-CURLcode make_curl_request(const CString& service_host, const CString& service_url,
+long make_curl_request(const CString& service_host, const CString& service_url,
 						   const CString& service_auth, MCString& params, int port,
-						   bool use_ssl, bool use_post, bool debug);
+						   bool use_ssl, bool use_post,
+						   const CString& proxy, bool proxy_ssl_verify,
+						   bool debug);
 #endif // USE_CURL
 
 /**
@@ -128,7 +132,7 @@ class CPushMod : public CModule
 			defaults["target"] = "";
 
 			// Notification settings
-			defaults["message_content"] = "{message}";
+			defaults["message_content"] = "{context}: [{nick}] {message}";
 			defaults["message_length"] = "100";
 			defaults["message_title"] = "{title}";
 			defaults["message_uri"] = "";
@@ -136,6 +140,7 @@ class CPushMod : public CModule
 			defaults["message_uri_title"] = "";
 			defaults["message_priority"] = "0";
 			defaults["message_sound"] = "";
+			defaults["message_escape"] = "";
 
 			// Notification conditions
 			defaults["away_only"] = "no";
@@ -145,7 +150,9 @@ class CPushMod : public CModule
 			defaults["last_active"] = "180";
 			defaults["last_notification"] = "300";
 			defaults["nick_blacklist"] = "";
+			defaults["network_blacklist"] = "";
 			defaults["replied"] = "yes";
+			defaults["context"] = "*";
 
 			// Proxy, for libcurl
 			defaults["proxy"] = "";
@@ -253,8 +260,22 @@ class CPushMod : public CModule
 			replace["{title}"] = title;
 			replace["{username}"] = options["username"];
 			replace["{secret}"] = options["secret"];
-			replace["{network}"] = GetNetwork()->GetName();
 			replace["{target}"] = options["target"];
+			// network is special because it can be nullptr if the user has none set up yet
+			CIRCNetwork* network = GetNetwork();
+			if (network) {
+				replace["{network}"] = network->GetName();
+			} else {
+				replace["{network}"] = "(No network)";
+			}
+
+			if (options["message_escape"] != "")
+			{
+				CString::EEscape esc = CString::ToEscape(options["message_escape"]);
+				for (MCString::iterator i = replace.begin(); i != replace.end(); i++) {
+					i->second = i->second.Escape(esc);
+				}
+			}
 
 			CString message_uri = expand(options["message_uri"], replace);
 			CString message_title = expand(options["message_title"], replace);
@@ -289,14 +310,14 @@ class CPushMod : public CModule
 				{
 					params["device_iden"] = options["target"];
 				}
-				
+
 				if (message_uri == "")
 				{
 					params["type"] = "note";
 				} else {
 					params["type"] = "link";
 					params["url"] = message_uri;
-				}					
+				}
 				params["title"] = message_title;
 				params["body"] = message_content;
 			}
@@ -405,6 +426,67 @@ class CPushMod : public CModule
 					params["priority"] = options["message_priority"];
 				}
 			}
+			else if (service == "pushsafer")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: privatekey (private or alias key) not set");
+					return;
+				}
+
+				service_host = "pushsafer.com";
+				service_url = "/api";
+
+				params["k"] = options["secret"];
+				params["t"] = message_title;
+				params["m"] = message_content;
+
+				if (message_uri != "")
+				{
+					params["u"] = message_uri;
+				}
+
+				if (options["message_uri_title"] != "" )
+				{
+					params["ut"] = options["message_uri_title"];
+				}
+
+				if (options["target"] != "")
+				{
+					params["d"] = options["target"];
+				}
+
+				if (options["message_sound"] != "" )
+				{
+					params["s"] = options["message_sound"];
+				}
+
+			}
+			else if (service == "pushalot")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret (authorization token) not set");
+					return;
+				}
+
+				service_host = "pushalot.com";
+				service_url = "/api/sendmessage";
+
+				params["AuthorizationToken"] = options["secret"];
+				params["Title"] = message_title;
+				params["Body"] = message_content;
+
+				if (message_uri != "")
+				{
+					params["Link"] = message_uri;
+				}
+
+				if (options["message_uri_title"] != "" )
+				{
+					params["LinkTitle"] = options["message_uri_title"];
+				}
+			}
 			else if (service == "prowl")
 			{
 				if (options["secret"] == "")
@@ -470,31 +552,30 @@ class CPushMod : public CModule
 			}
 			else if (service == "nexmo")
 			{
-			  if (options["username"] == "")
-			  {
-			    PutModule("Error: username (api key) not set");
-			    return;
-			  }
-			  if (options["secret"] == "")
-			  {
-			    PutModule("Error: secret (api secret) not set");
-			    return;
-			  }
-			  if (options["target"] == "")
-			  {
-			    PutModule("Error: destination mobile number (in international format) not set");
-			    return;
-			  }
-			  
-			  service_host = "rest.nexmo.com";
-			  service_url = "/sms/json";
-			  
-			  params["api_secret"] = options["secret"];
-			  params["api_key"] = options["username"];
-			  params["from"] = message_title;
-			  params["to"] = options["target"];
-			  params["text"] = message_content;
-			  
+				if (options["username"] == "")
+				{
+					PutModule("Error: username (api key) not set");
+					return;
+				}
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret (api secret) not set");
+					return;
+				}
+				if (options["target"] == "")
+				{
+					PutModule("Error: destination mobile number (in international format) not set");
+					return;
+				}
+
+				service_host = "rest.nexmo.com";
+				service_url = "/sms/json";
+
+				params["api_secret"] = options["secret"];
+				params["api_key"] = options["username"];
+				params["from"] = message_title;
+				params["to"] = options["target"];
+				params["text"] = message_content;
 			}
 			else if (service == "url")
 			{
@@ -572,26 +653,7 @@ class CPushMod : public CModule
 			}
 			else if (service == "airgram")
 			{
-				if (options["target"] == "")
-				{
-					PutModule("Error: target (email) not set");
-					return;
-				}
-
-				service_host = "api.airgramapp.com";
-
-				if (options["username"] != "" && options["secret"] != "")
-				{
-					service_url = "/1/send";
-					service_auth = options["username"] + CString(":") + options["secret"];
-				}
-				else
-				{
-					service_url = "/1/send_as_guest";
-				}
-
-				params["email"] = options["target"];
-				params["msg"] = message_content;
+				PutModule("Error: Airgram service shut down. Please configure another notification provider.");
 			}
 			else if (service == "slack")
 			{
@@ -618,27 +680,90 @@ class CPushMod : public CModule
 
 				PutDebug("payload: " + params["payload"]);
 			}
+            else if (service == "discord")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret (from webhook, e.g. 111111111111111111/abcdefghijklmopqrstuvwxyz1234567890-ABCDEFGHIJKLMNOPQRSTUVWXYZ123456) not set");
+					return;
+				}
+
+				service_host = "discordapp.com";
+				service_url = "/api/webhooks/" + options["secret"];
+
+				if (options["username"] != "")
+				{
+					params["username"] = options["username"];
+				}
+
+				params["content"] = message_content;
+
+			}
+			else if (service == "pushjet")
+			{
+				if (options["secret"] == "")
+				{
+					PutModule("Error: secret (service key) not set");
+					return;
+				}
+
+				service_host = "api.pushjet.io";
+				service_url = "/message";
+
+				params["secret"] = options["secret"];
+				params["title"] = message_title;
+				params["message"] = message_content;
+
+				if (message_uri != "")
+				{
+					params["link"] = message_uri;
+				}
+
+				if (options["message_priority"] != "")
+				{
+					params["level"] = options["message_priority"];
+				}
+			}
+			else if (service == "telegram")
+			{
+				if ((options["secret"] == "") || (options["target"] ==""))
+				{
+					PutModule("Error: secret (API key) or target (chat_id) not set");
+					return;
+				}
+
+				service_host = "api.telegram.org";
+				service_url = "/bot" + options["secret"] + "/sendMessage";
+
+				params["chat_id"] = options["target"];
+				params["text"] = message_content;
+				if (options["message_escape"] == "HTML") {
+					params["parse_mode"] = "HTML";
+				}
+			}
 			else
 			{
 				PutModule("Error: service type not selected");
 				return;
 			}
 
-            PutDebug("service: " + service);
-            PutDebug("service_host: " + service_host);
-            PutDebug("service_url: " + service_url);
-            PutDebug("service_auth: " + service_auth);
-            PutDebug("use_port: " + CString(use_port));
-            PutDebug("use_ssl: " + CString(use_ssl ? 1 : 0));
-            PutDebug("use_post: " + CString(use_post ? 1 : 0));
+			PutDebug("service: " + service);
+			PutDebug("service_host: " + service_host);
+			PutDebug("service_url: " + service_url);
+			PutDebug("service_auth: " + service_auth);
+			PutDebug("use_port: " + CString(use_port));
+			PutDebug("use_ssl: " + CString(use_ssl ? 1 : 0));
+			PutDebug("use_post: " + CString(use_post ? 1 : 0));
 
 #ifdef USE_CURL
-            PutDebug("using libcurl");
-      params["proxy"] = options["proxy"];
-			params["proxy_ssl_verify"] = options["proxy_ssl_verify"];
-      make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
+			PutDebug("using libcurl");
+			long http_code = make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["proxy"], options["proxy_ssl_verify"] != "no", options["debug"] == "on");
+			PutDebug("curl: HTTP status code " + CString(http_code));
+			if (!(http_code >= 200 && http_code < 300)) {
+				PutModule("Error: HTTP status code " + CString(http_code));
+			}
 #else
-            PutDebug("NOT using libcurl");
+			PutDebug("NOT using libcurl");
 			// Create the socket connection, write to it, and add it to the queue
 			CPushSocket *sock = new CPushSocket(this);
 			sock->Connect(service_host, use_port, use_ssl);
@@ -754,7 +879,9 @@ class CPushMod : public CModule
 				expr("last_active", last_active(context))
 				expr("last_notification", last_notification(context))
 				expr("nick_blacklist", nick_blacklist(nick))
+				expr("network_blacklist", network_blacklist())
 				expr("replied", replied(context))
+				expr("context", context_filter(context))
 
 				else
 				{
@@ -816,15 +943,18 @@ class CPushMod : public CModule
 			options["highlight"].Split(" ", values, false);
 			values.push_back("%nick%");
 
+			bool matched = false;
+			bool negated = false;
+
 			for (VCString::iterator i = values.begin(); i != values.end(); i++)
 			{
 				CString value = i->AsLower();
 				char prefix = value[0];
-				bool push = true;
+				bool negate_match = false;
 
 				if (prefix == '-')
 				{
-					push = false;
+					negate_match = true;
 					value.LeftChomp(1);
 				}
 				else if (prefix == '_')
@@ -846,12 +976,62 @@ class CPushMod : public CModule
 
 				if (msg.WildCmp(value))
 				{
+					if (negate_match)
+					{
+						negated = true;
+					}
+					else
+					{
+						matched = true;
+					}
+				}
+			}
+
+			return (matched && !negated);
+		}
+
+		/**
+		 * Determine if the given context matches any context rules.
+		 *
+		 * @param context The context of a message
+		 * @return True if context matches the filter
+		 */
+		bool context_filter(const CString& raw_context)
+		{
+			CString context = raw_context.AsLower();
+
+			if (context == "all" || context == "*")
+				return true;
+
+			VCString values;
+			options["context"].Split(" ", values, false);
+
+			for (VCString::iterator i = values.begin(); i != values.end(); i++)
+			{
+				CString value = i->AsLower();
+				char prefix = value[0];
+				bool push = true;
+
+				if (prefix == '-')
+				{
+					push = false;
+					value.LeftChomp(1);
+				}
+
+				if (value != "*")
+				{
+					value = "*" + value.AsLower() + "*";
+				}
+
+				if (context.WildCmp(value))
+				{
 					return push;
 				}
 			}
 
 			return false;
 		}
+
 
 		/**
 		 * Check if the idle condition is met.
@@ -932,6 +1112,30 @@ class CPushMod : public CModule
 		}
 
 		/**
+		 * Check if the network_blacklist condition is met.
+		 *
+		 * @param network Network that the message was received on
+		 * @return True if network is not in the blacklist
+		 */
+		bool network_blacklist()
+		{
+			VCString blacklist;
+			options["network_blacklist"].Split(" ", blacklist, false);
+
+			CString name = (*m_pNetwork).GetName().AsLower();
+
+			for (VCString::iterator i = blacklist.begin(); i != blacklist.end(); i++)
+			{
+				if (name.WildCmp((*i).AsLower()))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		/**
 		 * Check if the replied condition is met.
 		 *
 		 * @param context Channel or nick context
@@ -970,7 +1174,9 @@ class CPushMod : public CModule
 				&& last_active(context)
 				&& last_notification(context)
 				&& nick_blacklist(nick)
+				&& network_blacklist()
 				&& replied(context)
+				&& context_filter(context)
 				&& true;
 		}
 
@@ -996,6 +1202,7 @@ class CPushMod : public CModule
 				&& last_active(context)
 				&& last_notification(context)
 				&& nick_blacklist(nick)
+				&& network_blacklist()
 				&& replied(context)
 				&& true;
 		}
@@ -1038,11 +1245,8 @@ class CPushMod : public CModule
 			if (notify_channel(nick, channel, message))
 			{
 				CString title = "Highlight";
-				CString msg = channel.GetName();
-				msg += ": [" + nick.GetNick();
-				msg += "] " + message;
 
-				send_message(msg, title, channel.GetName(), nick);
+				send_message(message, title, channel.GetName(), nick);
 			}
 
 			return CONTINUE;
@@ -1060,11 +1264,8 @@ class CPushMod : public CModule
 			if (notify_channel(nick, channel, message))
 			{
 				CString title = "Highlight";
-				CString msg = channel.GetName();
-				msg += ": " + nick.GetNick();
-				msg += " " + message;
 
-				send_message(msg, title, channel.GetName(), nick);
+				send_message(message, title, channel.GetName(), nick);
 			}
 
 			return CONTINUE;
@@ -1081,10 +1282,8 @@ class CPushMod : public CModule
 			if (notify_pm(nick, message))
 			{
 				CString title = "Private Message";
-				CString msg = "From " + nick.GetNick();
-				msg += ": " + message;
 
-				send_message(msg, title, nick.GetNick(), nick);
+				send_message(message, title, nick.GetNick(), nick);
 			}
 
 			return CONTINUE;
@@ -1101,10 +1300,8 @@ class CPushMod : public CModule
 			if (notify_pm(nick, message))
 			{
 				CString title = "Private Message";
-				CString msg = "* " + nick.GetNick();
-				msg += " " + message;
 
-				send_message(msg, title, nick.GetNick(), nick);
+				send_message(message, title, nick.GetNick(), nick);
 			}
 
 			return CONTINUE;
@@ -1250,6 +1447,14 @@ class CPushMod : public CModule
 						{
 							PutModule("Note: Pushover requires setting both the 'username' (to user key) and the 'secret' (to application api key) option");
 						}
+						else if (value == "pushsafer")
+						{
+							PutModule("Note: Pushsafer requires setting the 'private or alias key' option");
+						}
+						else if (value == "pushalot")
+						{
+							PutModule("Note: Pushalot requires setting the 'secret' (to user key) (to authorization token) option");
+						}
 						else if (value == "prowl")
 						{
 							PutModule("Note: Prowl requires setting the 'secret' option");
@@ -1262,10 +1467,6 @@ class CPushMod : public CModule
 						{
 							PutModule("Note: URL requires setting the 'message_uri' option with the full URL");
 						}
-						else if (value == "airgram")
-						{
-							PutModule("Note: Airgram requires setting the 'target' with the email address of the recipient");
-						}
 						else if (value == "faast")
 						{
 							PutModule("Note: Faast requires setting the secret to your apikey");
@@ -1277,6 +1478,18 @@ class CPushMod : public CModule
 						else if (value == "slack")
 						{
 							PutModule("Note: Slack requires setting 'secret' (from webhook) and 'target' (channel or username), optional 'username' (bot name)");
+						}
+						else if (value == "discord")
+						{
+							PutModule("Note: Discord requires setting 'secret' (from webhook), optional 'username' (bot name)");
+						}
+						else if (value == "pushjet")
+						{
+							PutModule("Note: Pushjet requires setting 'secret' (service key) option");
+						}
+						else if (value == "telegram")
+						{
+							PutModule("Note: Telegram requires setting both the 'secret' (api key) and 'target' (chat_id)");
 						}
 						else
 						{
@@ -1521,6 +1734,11 @@ class CPushMod : public CModule
 				table.SetCell("Condition", "idle");
 				table.SetCell("Status", CString(ago) + " seconds");
 
+				table.AddRow();
+				table.SetCell("Condition", "network_blacklist");
+				// network_blacklist() is True if the network is not in a blacklist
+				table.SetCell("Status", network_blacklist() ? "no" : "yes");
+
 				if (token_count > 1)
 				{
 					CString context = tokens[1];
@@ -1588,16 +1806,7 @@ class CPushMod : public CModule
 				}
 				else if (service == "airgram")
 				{
-					if (options["username"] == "" || options["secret"] == "" || options["target"] == "")
-					{
-						PutModule("Error: target, username, and secret must be set");
-						return;
-					}
-
-					service_host = "api.airgramapp.com";
-					service_url = "/1/subscribe";
-					service_auth = options["username"] + CString(":") + options["secret"];
-					params["email"] = options["target"];
+					PutModule("Error: Airgram service shut down. Please configure a different notification provider.");
 				}
 				else
 				{
@@ -1605,11 +1814,12 @@ class CPushMod : public CModule
 					return;
 				}
 
-				params["proxy"] = options["proxy"];
-				params["proxy_ssl_verify"] = options["proxy_ssl_verify"];
-
 #ifdef USE_CURL
-				make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["debug"] == "on");
+				long http_code = make_curl_request(service_host, service_url, service_auth, params, use_port, use_ssl, use_post, options["proxy"], options["proxy_ssl_verify"] != "no", options["debug"] == "on");
+				PutDebug("curl: HTTP status code " + CString(http_code));
+				if (!(http_code >= 200 && http_code < 300)) {
+					PutModule("Error: HTTP status code " + CString(http_code));
+				}
 #else
 				// Create the socket connection, write to it, and add it to the queue
 				CPushSocket *sock = new CPushSocket(this);
@@ -1694,12 +1904,15 @@ CString build_query_string(MCString& params)
  * @param use_ssl Use SSL
  * @param use_post Use POST method
  */
-CURLcode make_curl_request(const CString& service_host, const CString& service_url,
+long make_curl_request(const CString& service_host, const CString& service_url,
 						   const CString& service_auth, MCString& params, int port,
-						   bool use_ssl, bool use_post, bool debug)
+						   bool use_ssl, bool use_post,
+						   const CString& proxy, bool proxy_ssl_verify,
+						   bool debug)
 {
 	CURL *curl;
 	CURLcode result;
+	long http_code;
 
 	curl = curl_easy_init();
 
@@ -1707,6 +1920,10 @@ CURLcode make_curl_request(const CString& service_host, const CString& service_u
 
 	CString url = CString(use_ssl ? "https" : "http") + "://" + service_host + service_url;
 	CString query = build_query_string(params);
+	if (!query.empty())
+	{
+		url = url + "?" + query;
+	}
 
 	if (debug)
 	{
@@ -1734,18 +1951,24 @@ CURLcode make_curl_request(const CString& service_host, const CString& service_u
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query.length());
 	}
 
-	if (params["proxy"] != "") {
-		curl_easy_setopt(curl, CURLOPT_PROXY, params["proxy"].c_str());
+	if (proxy != "") {
+		curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());
 
-		if (params["proxy_ssl_verify"] == "no") {
+		if (!proxy_ssl_verify) {
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		}
 	}
 
 	result = curl_easy_perform(curl);
+	if (result != CURLE_OK) {
+		curl_easy_cleanup(curl);
+		return -1;
+	}
+
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 	curl_easy_cleanup(curl);
 
-	return result;
+	return http_code;
 }
 
 #else

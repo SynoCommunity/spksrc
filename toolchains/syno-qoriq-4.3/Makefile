@@ -4,10 +4,10 @@ TC_ARCH = qoriq
 TC_VERS = 4.3
 TC_FIRMWARE = 3.1-1594
 
-TC_DIST_NAME = gcc4374_eglibc2874_qoriq-GPL.tgz
-
+TC_DIST = gcc4374_eglibc2874_qoriq-GPL
 TC_EXT = tgz
-TC_DIST_SITE = http://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Chains/PowerPC%20QorIQ%20Linux%202.6.32
+TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%204.3%20Tool%20Chains/PowerPC%20QorIQ%20Linux%202.6.32
 
 TC_BASE_DIR = powerpc-none-linux-gnuspe
 TC_PREFIX = powerpc-none-linux-gnuspe

@@ -3,16 +3,12 @@
 # Package
 PACKAGE="adminer"
 DNAME="Adminer"
-SHORTNAME="adminer"
-PACKAGE_NAME="com.synocommunity.packages.${SHORTNAME}"
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
+INSTALL_DIR=${SYNOPKG_PKGDEST}/web
 WEB_DIR="/var/services/web"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
-USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+HTACCESS_FILE=${INSTALL_DIR}/.htaccess
 
 preinst ()
 {
@@ -21,14 +17,11 @@ preinst ()
 
 postinst ()
 {
-    # Link
-    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+    # Edit .htaccess according to the wizard
+    sed -i -e "s|@@_wizard_htaccess_allowed_from_@@|${wizard_htaccess_allowed_from}|g" ${HTACCESS_FILE}
 
     # Install the web interface
-    cp -pR ${INSTALL_DIR}/share/${SHORTNAME} ${WEB_DIR}
-
-    # Fix permissions
-    chown -R ${USER} ${WEB_DIR}/${SHORTNAME}
+    cp -pR ${INSTALL_DIR} ${WEB_DIR}/adminer
 
     exit 0
 }
@@ -40,11 +33,8 @@ preuninst ()
 
 postuninst ()
 {
-    # Remove link
-    rm -f ${INSTALL_DIR}
-
     # Remove the web interface
-    rm -fr ${WEB_DIR}/${SHORTNAME}
+    rm -rf ${WEB_DIR}/adminer
 
     exit 0
 }
@@ -56,5 +46,8 @@ preupgrade ()
 
 postupgrade ()
 {
+    # Edit .htaccess according to the wizard
+    sed -i -e "s|@@_wizard_htaccess_allowed_from_@@|${wizard_htaccess_allowed_from}|g" ${HTACCESS_FILE}
+    
     exit 0
 }

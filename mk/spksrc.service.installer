@@ -64,12 +64,19 @@ log_step ()
 
 save_wizard_variables ()
 {
-    $RM "${INST_VARIABLES}"
+    if [ -e "${INST_VARIABLES}" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
     if [ -n "${GROUP}" ]; then
         echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
     fi
     if [ -n "${SHARE_PATH}" ]; then
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
+    fi
+    # Restriction permissions to protect sensitive options
+    if [ -e "${INST_VARIABLES}" ]; then
+        chmod go-rwx ${INST_VARIABLES}
+        chown ${EFF_USER} ${INST_VARIABLES}
     fi
 }
 
@@ -305,6 +312,7 @@ postinst ()
     $MKDIR "${INST_VAR}"
 
     call_func "service_postinst"
+    call_func "service_create_links"
 
     $CP "${INST_LOG}" "${INST_VAR}"
     if [ -n "${LOG_FILE}" ]; then
@@ -352,6 +360,8 @@ postuninst ()
     fi
 
     call_func "service_postuninst"
+    call_func "service_remove_links"
+
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}"
     fi

@@ -1,26 +1,27 @@
 SPK_NAME = icecast
-SPK_VERS = 2.4.1
-SPK_REV = 1
+SPK_VERS = 2.4.4
+SPK_REV = 2
 SPK_ICON = src/icecast.png
 DSM_UI_DIR = app
-BETA = 1
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = "Icecast is a streaming media server which currently supports Ogg (Vorbis and Theora), Opus, WebM and MP3 audio streams. It can be used to create an Internet radio station or a privately running jukebox and many things in between. It is very versatile in that new formats can be added relatively easily and supports open standards for communication and interaction."
+DESCRIPTION = "Icecast is a streaming media server which currently supports Ogg \(Vorbis and Theora\), Opus, WebM and MP3 audio streams. It can be used to create an Internet radio station or a privately running jukebox and many things in between. It is very versatile in that new formats can be added relatively easily and supports open standards for communication and interaction. This package includes Ezstream, a command line source client for Icecast media streaming servers."
 ADMIN_PORT = 8000
 
 RELOAD_UI = yes
+STARTABLE = yes
 DISPLAY_NAME = icecast
 
 HOMEPAGE   = http://www.icecast.org/
 LICENSE    = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
+WIZARDS_DIR = WIZARD_UIFILES
+
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+NO_SERVICE_SHORTCUT = yes
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

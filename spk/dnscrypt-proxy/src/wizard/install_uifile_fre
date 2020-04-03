@@ -1,0 +1,34 @@
+[{
+    "step_title": "Configuration de dnscrypt-proxy",
+    "items": [{
+        "desc": "Le fichier de configuration est: /var/packages/dnscrypt-proxy/target/var/dnscrypt-proxy.toml"
+    }, {
+        "type": "singleselect",
+        "desc": "IPv6 servers:",
+        "subitems": [{
+            "key": "wizard_ipv6",
+            "desc": "Activer le support IPv6 support (une connection IPv6 est requise)",
+            "defaultValue": false
+        }, {
+            "key": "wizard_noipv6",
+            "desc": "Désactiver le support IPv6",
+            "defaultValue": true
+        }]
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_servers",
+            "desc": "Noms des servers",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^((('[\\w_\\-\\.]+', )+'[\\w_\\-\\.]+')|('[\\w_\\-\\.]+'))$/",
+                    "errorText": "Merci d'utiliser le format suivant: 'cloudflare', 'google'"
+                }
+            }
+        }]
+    }, {
+        "desc": "Sans configuration, le proxy sélectionnera automatiquement le server disponible le plus rapide de sa liste. https://dnscrypt.info/public-servers"
+    }]
+}]
