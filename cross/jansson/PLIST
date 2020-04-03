@@ -1,0 +1,3 @@
+lnk:lib/libjansson.so
+lnk:lib/libjansson.so.4
+lib:lib/libjansson.so.4.11.1

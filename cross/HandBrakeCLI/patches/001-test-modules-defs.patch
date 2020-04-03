@@ -1,0 +1,20 @@
+--- HandBrake-1.3.1/test/module.defs.orig	2020-03-19 23:00:50.189532574 -0500
++++ HandBrake-1.3.1/test/module.defs	2020-03-20 10:01:43.706269865 -0500
+@@ -15,7 +15,7 @@
+ 
+ TEST.GCC.l = \
+         ass avformat avfilter avcodec avutil swresample postproc mp3lame dvdnav \
+-        dvdread fribidi \
++        dvdread fribidi x265 iconv numa drm uuid png \
+         swscale vpx theoraenc theoradec vorbis vorbisenc ogg x264 \
+         bluray freetype xml2 bz2 z jansson harfbuzz opus speex lzma dav1d
+ 
+@@ -65,7 +65,7 @@
+     TEST.GCC.f += IOKit CoreServices CoreText CoreGraphics AudioToolbox VideoToolbox CoreMedia CoreVideo Foundation
+     TEST.GCC.l += iconv
+ else ifeq ($(HOST.system),linux)
+-    TEST.GCC.l += pthread dl m
++    TEST.GCC.l += pthread dl m stdc++ gcc
+ ifeq (1, $(FEATURE.numa))
+     TEST.GCC.l += numa
+ endif
