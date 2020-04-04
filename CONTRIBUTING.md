@@ -68,6 +68,8 @@ Pull requests
 ----------
 Pull requests to add packages to the [SynoCommunity repository](https://synocommunity.com) are always welcome, as are improvements to the spksrc framework or existing packages.
 
+Please create a new branch before pulling your request and avoid using the master branch. Pay attention on [How to make a clean pull request](https://github.com/MarcDiethelm/contributing/blob/master/README.md).
+
 Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people. See the [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO) for information on how to use spksrc.
 
 #### When creating a Pull Request you get a description from a template like this:
