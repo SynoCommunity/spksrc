@@ -1,6 +1,6 @@
 PKG_NAME = libmysqlclient
 PKG_REAL_NAME = mysql-connector-c
-PKG_VERS = 6.1.6
+PKG_VERS = 6.1.11
 PKG_EXT = tar.gz
 DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS)-src
 PKG_DIST_NAME = $(DIST_NAME).$(PKG_EXT)

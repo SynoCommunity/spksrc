@@ -3,4 +3,4 @@ rsc:bin/mysql_config
 bin:bin/perror
 lnk:lib/libmysqlclient.so
 lnk:lib/libmysqlclient.so.18
-lib:lib/libmysqlclient.so.18.3.0
+lib:lib/libmysqlclient.so.18.4.0
