@@ -1,3 +1,15 @@
+# Build go programs
+# 
+# prerequisites:
+# - cross/module depends on native/go only
+# - module does not require kernel (REQ_KERNEL)
+# 
+# remarks:
+# - Restriction for minimal DSM version is not supported (toolchains are not used for go builds)
+# - CONFIGURE_TARGET is not supported/bypassed
+# - most content is taken from spksrc.cc.mk and modified for go build and install
+# 
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
@@ -19,36 +31,48 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 
+##### golang specific configurations
+include ../../mk/spksrc.cross-go-env.mk
+
+# avoid run of make configure
+CONFIGURE_TARGET = nop
+
+
+ifeq ($(strip $(COMPILE_TARGET)),)
+ifneq ($(strip $(GO_SRC_DIR)),)
+COMPILE_TARGET = go_build_target
+endif
+endif
+
+# default go build:
+go_build_target:
+	@$(MSG) - Compile with go build
+	cd $(GO_SRC_DIR) && env $(ENV) go build $(GO_BUILD_ARGS)
+
+
+ifeq ($(strip $(INSTALL_TARGET)),)
+ifneq ($(strip $(GO_BIN_DIR)),)
+INSTALL_TARGET = go_install_target
+endif
+endif
+
+# default go install:
+go_install_target:
+	@$(MSG) - Install go binaries
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
+	install -m 755 $(GO_BIN_DIR) $(STAGING_INSTALL_PREFIX)/bin/
+
 
 #####
 
 ifneq ($(REQ_KERNEL),)
-  ifeq ($(ARCH),x64)
-    @$(error x64 arch cannot be used when REQ_KERNEL is set )
-  endif
+  @$(error go modules cannot build when REQ_KERNEL is set)
 endif
 
 # Check if package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
   ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
     @$(error Arch '$(ARCH)' is not a supported architecture )
-  endif
-endif
-
-# Check minimum DSM requirements of package
-ifneq ($(REQUIRED_DSM),)
-  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
-      @$(error DSM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM))
-    endif
-  endif
-endif
-# Check minimum SRM requirements of package
-ifneq ($(REQUIRED_SRM),)
-  ifeq ($(ARCH),$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_SRM))))
-      @$(error SRM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_SRM))
-    endif
   endif
 endif
 
@@ -84,7 +108,7 @@ include ../../mk/spksrc.plist.mk
 
 ### Clean rules
 smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
+	rm -rf $(EXTRACT_PATH)/
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:

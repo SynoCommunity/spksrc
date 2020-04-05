@@ -1,10 +1,11 @@
 SPK_NAME = dnscrypt-proxy
 SPK_VERS = 2.0.33
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/dnscrypt-proxy.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_CONFLICT = DNSServer
+GENERIC_ARCHS = ARM7
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 MAINTAINER = publicarray
@@ -12,7 +13,7 @@ DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protoc
 DISPLAY_NAME = dnscrypt-proxy
 HELPURL = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
-CHANGELOG = "Update to 2.0.33"
+CHANGELOG = "Build generic ARMv7 packages"
 
 STARTABLE = yes
 
@@ -32,48 +33,22 @@ SERVICE_URL = /webman/3rdparty/dnscrypt-proxy/index.cgi
 
 PRE_COPY_TARGET = dnscrypt_extra_install
 
+GO_LDFLAGS = -s -w
+include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.cross-go-env.mk
+
 include ../../mk/spksrc.spk.mk
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-GO_ARCH = arm
-ENV += GOARM=5
-endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-GO_ARCH = arm
-ENV += GOARM=7
-endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-GO_ARCH = arm64
-endif
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-GO_ARCH = 386
-endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-GO_ARCH = amd64
-endif
-# Go has no ppc32 support for qoriq https://github.com/golang/go/issues/22885
-#ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
-#GO_ARCH = ppc32
-#endif
-ifeq ($(GO_ARCH),)
-$(error Unsupported ARCH $(ARCH))
-endif
-
-CONF_ARGS = -ldflags="-s -w"
-ENV += GOPATH="$(WORK_DIR)" \
-	GOOS=linux \
-	GOARCH="$(GO_ARCH)" \
-	CGO_ENABLED=0 \
-	PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 
 .PHONY: dnscrypt_extra_install
 dnscrypt_extra_install: copy_msg
 	@$(MSG) "Copying files"
-	mkdir -p $(STAGING_DIR)/offline-cache/ $(STAGING_DIR)/blocklist/
+	install -m 755 -d $(STAGING_DIR)/offline-cache/
+	install -m 755 -d $(STAGING_DIR)/blocklist/
 	cp -rf $(CURDIR)/src/offline-cache/* $(STAGING_DIR)/offline-cache/
 	install -m 755 $(CURDIR)/src/update-blocklist.sh $(STAGING_DIR)/blocklist/update-blocklist.sh
 	@$(MSG) "UI - Copying files"
-	mkdir -p $(STAGING_DIR)/$(DSM_UI_DIR)/
+	install -m 755 -d $(STAGING_DIR)/$(DSM_UI_DIR)/
 	cp -rf $(CURDIR)/src/$(DSM_UI_DIR)/* $(STAGING_DIR)/$(DSM_UI_DIR)/
 	@$(MSG) "UI - Compiling cgi"
-	env $(ENV) go build $(CONF_ARGS) -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
+	env $(ENV) go build $(GO_BUILD_ARGS) -o $(STAGING_DIR)/$(DSM_UI_DIR)/index.cgi $(CURDIR)/src/$(DSM_UI_DIR)/cgi.go
