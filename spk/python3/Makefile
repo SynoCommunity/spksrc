@@ -5,7 +5,6 @@ SPK_REV = 11
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
-#Build-time dependencies
 DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
@@ -21,7 +20,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "1. Update to Python 3.6.10<br/>2. Update of dependencies and wheels"
+CHANGELOG = "1. Update to Python 3.6.10<br/>2. Add immutables<br/>3. Update of dependencies and wheels"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF
