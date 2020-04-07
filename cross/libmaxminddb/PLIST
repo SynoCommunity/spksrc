@@ -1,0 +1,4 @@
+bin:bin/mmdblookup
+lnk:lib/libmaxminddb.so
+lnk:lib/libmaxminddb.so.0
+lib:lib/libmaxminddb.so.0.0.7
