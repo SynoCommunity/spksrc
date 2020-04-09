@@ -1,6 +1,6 @@
 SPK_NAME = jackett
 SPK_VERS = 0.11.43
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 BETA = 1
 STARTABLE = yes
-CHANGELOG = "Update Jackett to version 0.11.43"
+CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
 
