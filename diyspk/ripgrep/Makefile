@@ -1,5 +1,5 @@
 SPK_NAME = ripgrep
-SPK_VERS = 11.0.2
+SPK_VERS = 12.0.1
 SPK_REV = 1
 SPK_ICON = src/ripgrep.png
 
@@ -21,6 +21,6 @@ DISPLAY_NAME = ripgrep
 SPK_COMMANDS = bin/rg
 
 HOMEPAGE = https://github.com/BurntSushi/ripgrep
-LICENSE  = MIT/UNLICENSE
+LICENSE  = public domain/Unlicense
 
 include ../../mk/spksrc.spk.mk
