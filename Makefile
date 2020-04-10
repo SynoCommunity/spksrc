@@ -104,6 +104,14 @@ cross-digests:
 	    (cd $${cross} && $(MAKE) digests) ; \
 	done
 
+jsonlint:
+ifeq (,$(shell which jsonlint))
+	$(error "jsonlint not found, install with: npm install -g jsonlint")
+else
+	find spk/ -not -path "*work*" -regextype posix-extended -regex '.*(\.json|install_uifile\w*|upgrade_uifile\w*|app/config)' -print -exec jsonlint -q -c {} \;
+endif
+lint: jsonlint
+
 .PHONY: toolchains kernel-modules
 toolchains: $(addprefix toolchain-,$(AVAILABLE_ARCHS))
 kernel-modules: $(addprefix kernel-,$(AVAILABLE_ARCHS))
