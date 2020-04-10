@@ -1,6 +1,6 @@
 SPK_NAME = jackett
-SPK_VERS = 0.11.43
-SPK_REV = 9
+SPK_VERS = 0.14.485
+SPK_REV = 10
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,6 @@ MAINTAINER = m4tt075
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
-BETA = 1
 STARTABLE = yes
 CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
 HOMEPAGE = https://github.com/Jackett/Jackett
