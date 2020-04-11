@@ -1,7 +1,7 @@
 PKG_NAME = python3
 PKG_VERS_MAJOR = 3
-PKG_VERS_MINOR = 6
-PKG_VERS_PATCH = 10
+PKG_VERS_MINOR = 7
+PKG_VERS_PATCH = 7
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -9,6 +9,10 @@ PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2 cross/xz
+# required for uuid module to be available
+DEPENDS += cross/libuuid
+# required because libffi is no longer bundled with python
+DEPENDS += cross/libffi
 DEPENDS += native/$(PKG_NAME)
 
 HOMEPAGE = http://www.python.org/
@@ -50,6 +54,8 @@ PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)m
 PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin:$(PATH)
 LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib:$(LD_LIBRARY_PATH)
 export PATH LD_LIBRARY_PATH
+
+ENV += LIBFFI_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/
 
 .PHONY: python3_post_patch
 python3_post_patch:

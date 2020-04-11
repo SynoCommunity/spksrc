@@ -1,5 +1,5 @@
 PKG_NAME = python
-PKG_VERS = 3.6.10
+PKG_VERS = 3.7.7
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
