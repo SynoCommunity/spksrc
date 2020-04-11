@@ -1,5 +1,5 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-MONO_PATH="${SYNOPKG_PKGDEST}/../mono/bin"
+MONO_PATH="/var/packages/mono/target/bin"
 MONO="${MONO_PATH}/mono"
 
 # Check versions during upgrade
