@@ -138,6 +138,7 @@ else ifneq ($(strip $(TC_FIRMWARE)),)
 	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
 	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
 else ifneq ($(strip $(TC_OS_MIN_VER)),)
+	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
 	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
 else
 	@echo firmware=\"3.1-1594\" >> $@
