@@ -1,31 +1,46 @@
-# Produced by pip freeze
-# Commented if provided by python package at /usr/local/python/share/wheelhouse/
-beets==1.4.7
-click==7.0
-# For Discogs
-discogs-client==2.2.1
-#enum34==1.1.6
-# For Web Plugin
-Flask==1.0.2
-Flask-Cors==3.0.6
-itsdangerous==0.24
-jellyfish==0.6.1
-Jinja2==2.10
-#MarkupSafe==0.23
-munkres==1.0.11
-musicbrainzngs==0.6
-mutagen==1.41.1
-oauthlib==2.1.0
-# For LastGenre, LastImport plugins
-pylast==1.7.0
+beets==1.4.9
+
+# Direct dependencies
+# six>=1.10.0          ==> included in python3 package installation
+mutagen==1.44.0
+Unidecode==1.1.1
+musicbrainzngs==0.7.1
+#PyYAML>=3.12          ==> included in python3 package installation
+#MarkupSafe>=0.23      ==> included in python3 package installation
+munkres==1.1.2
+
+# Plugin dependencies
+beautifulsoup4==4.8.2
+certifi==2019.11.28
+chardet==3.0.4
+discogs-client==2.2.2
+langdetect==1.0.7
+# Pillow==7.0.0  # arch dependent, would need cross compilation
+oauthlib==3.1.0
+pyacoustid==1.1.7
+pylast==3.2.0
 python-mpd2==1.0.0
-#PyYAML==3.12
-# For most API dependant plugins
-requests==2.19.1
-requests-oauthlib==1.0.0
-#six==1.10.0
-Unidecode==1.0.22
-#virtualenv==15.1.0
-Werkzeug==0.14.1
-# For chroma
-pyacoustid==1.1.5
+pyxdg==0.26
+rarfile==3.1
+requests==2.23.0
+requests-oauthlib==1.3.0
+soupsieve==2.0
+soco==0.18.1
+urllib3==1.25.8
+xmltodict==0.12.0
+
+# For web plugin
+Flask==1.1.1
+Flask-Cors==3.0.8
+Click==7.0
+itsdangerous==1.1.0
+jellyfish==0.7.2
+Jinja2==2.11.1
+Werkzeug==1.0.0
+
+# For gmusic plugin 
+# Despite installing following wheels 'google' is not found at runtime
+#future==0.18.2
+#gmusicapi==12.1.1
+#decorator==4.4.2
+#google==2.0.3

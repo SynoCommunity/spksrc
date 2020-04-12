@@ -1,0 +1,55 @@
+PKG_NAME = libmysqlclient
+PKG_REAL_NAME = mysql-connector-c
+PKG_VERS = 6.1.11
+PKG_EXT = tar.gz
+DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS)-src
+PKG_DIST_NAME = $(DIST_NAME).$(PKG_EXT)
+PKG_DIST_SITE = https://cdn.mysql.com/archives/$(PKG_REAL_NAME)
+PKG_DIR = $(DIST_NAME)
+
+DEPENDS = native/libmysqlclient
+
+HOMEPAGE = https://downloads.mysql.com/archives/c-c
+COMMENT  = MySQL C API (libmysqlclient) 
+LICENSE  = GNU GPLv2
+
+CONFIGURE_TARGET = mysql-connector-c_configure
+
+include ../../mk/spksrc.common.mk
+
+CMAKE_ARGS  = -DCMAKE_BUILD_TYPE=Release
+CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=1
+CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
+CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
+CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
+CMAKE_ARGS += -DCMAKE_EXE_LINKER_FLAGS="-L$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -Wl,--rpath-link,$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -Wl,--rpath,$(INSTALL_PREFIX)/lib"
+CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
+CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
+CMAKE_ARGS += -DHAVE_LLVM_LIBCPP_EXITCODE=1 
+CMAKE_ARGS += -DHAVE_C_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE=1
+CMAKE_ARGS += -DHAVE_CXX_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE=1
+CMAKE_ARGS += -DHAVE_C_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE=1
+CMAKE_ARGS += -DHAVE_C_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE__TRYRUN_OUTPUT=1
+# MySQL specific:
+CMAKE_ARGS += -DSTACK_DIRECTION=1
+CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
+CMAKE_ARGS += -DWITH_EMBEDDED_SERVER=FALSE
+CMAKE_ARGS += -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
+# Fix full lib version:
+CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
+
+# Use gcc builtin atomic functions for ppc architectures
+ifneq ($(findstring $(ARCH),$(PPC_ARCHES)),)
+CMAKE_ARGS += -DHAVE_GCC_ATOMIC_BUILTINS=1
+endif
+
+# give access to comp_err binary on host
+ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$$PATH
+
+
+include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: mysql-connector-c_configure
+mysql-connector-c_configure:
+	@$(RUN) cmake $(CMAKE_ARGS)

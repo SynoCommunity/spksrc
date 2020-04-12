@@ -1,5 +1,5 @@
 PKG_NAME = libhdhomerun
-PKG_VERS = 20180817
+PKG_VERS = 20200225
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://download.silicondust.com/hdhomerun
@@ -20,5 +20,7 @@ include ../../mk/spksrc.cross-cc.mk
 myInstall:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/include/libhdhomerun
 	@install -m 644 $(INSTALL_DIR)/../$(PKG_DIR)/*.h $(STAGING_INSTALL_PREFIX)/include/libhdhomerun/
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
+	@install -m 755 $(INSTALL_DIR)/../$(PKG_DIR)/hdhomerun_config $(STAGING_INSTALL_PREFIX)/bin/
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/lib
 	@install -m 644 $(INSTALL_DIR)/../$(PKG_DIR)/libhdhomerun.so $(STAGING_INSTALL_PREFIX)/lib/

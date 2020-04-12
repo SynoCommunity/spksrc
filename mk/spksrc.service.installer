@@ -64,7 +64,9 @@ log_step ()
 
 save_wizard_variables ()
 {
-    $RM "${INST_VARIABLES}"
+    if [ -e "${INST_VARIABLES}" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
     if [ -n "${GROUP}" ]; then
         echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
     fi
@@ -72,8 +74,10 @@ save_wizard_variables ()
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
     fi
     # Restriction permissions to protect sensitive options
-    chmod go-rwx ${INST_VARIABLES}
-    chown ${EFF_USER} ${INST_VARIABLES}
+    if [ -e "${INST_VARIABLES}" ]; then
+        chmod go-rwx ${INST_VARIABLES}
+        chown ${EFF_USER} ${INST_VARIABLES}
+    fi
 }
 
 # Remove user from system and from groups it is member of
@@ -239,8 +243,6 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
-    $MKDIR /usr/local/bin >> ${INST_LOG}
-
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
 
@@ -310,6 +312,7 @@ postinst ()
     $MKDIR "${INST_VAR}"
 
     call_func "service_postinst"
+    call_func "service_create_links"
 
     $CP "${INST_LOG}" "${INST_VAR}"
     if [ -n "${LOG_FILE}" ]; then
@@ -357,6 +360,8 @@ postuninst ()
     fi
 
     call_func "service_postuninst"
+    call_func "service_remove_links"
+
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}"
     fi

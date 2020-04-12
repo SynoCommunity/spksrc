@@ -1,5 +1,5 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-MONO_PATH="/usr/local/mono/bin"
+MONO_PATH="/var/packages/mono/target/bin"
 MONO="${MONO_PATH}/mono"
 
 # Check versions during upgrade
@@ -13,6 +13,11 @@ PID_FILE="${CONFIG_DIR}/Lidarr/lidarr.pid"
 
 # Some have it stored in the root of package
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
+
+# workaround for mono bug with armv5 (https://github.com/mono/mono/issues/12537)
+if [ "$SYNOPKG_DSM_ARCH" == "88f8621" -o "$SYNOPKG_DSM_ARCH" == "88f8622" ]; then
+    MONO="MONO_ENV_OPTIONS='-O=-aot,-float32' ${MONO_PATH}/mono"
+fi
 
 GROUP="sc-download"
 
@@ -46,7 +51,7 @@ service_preupgrade ()
 
 service_postupgrade ()
 {
-    # Restore Current Lidarr Binary If Current Ver. >= SPK Ver.
+    # Restore Current Lidarr Binary if Current Ver. >= SPK Ver.
     . ${CONFIG_DIR}/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
         echo "Restoring Lidarr version from before upgrade" >> ${INST_LOG}

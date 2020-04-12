@@ -15,6 +15,6 @@ STARTABLE = no
 HOMEPAGE   = http://www.nano-editor.org
 LICENSE    = GPLv2
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/nano bin/rnano
 
 include ../../mk/spksrc.spk.mk

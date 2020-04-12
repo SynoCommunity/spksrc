@@ -1,3 +1,4 @@
+rsc:bin/pcap-config
 lnk:lib/libpcap.so
 lnk:lib/libpcap.so.1
-lib:lib/libpcap.so.1.9.0
+lib:lib/libpcap.so.1.9.1

@@ -9,12 +9,11 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Less is a terminal pager.
 DISPLAY_NAME = Less
 STARTABLE = no
-BETA = 1
 
 HOMEPAGE   = https://www.gnu.org/software/less/
 LICENSE    = GPLv3
 HELP_URL   = http://www.greenwoodsoftware.com/less/faq.html
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/less bin/lessecho bin/lesskey
 
 include ../../mk/spksrc.spk.mk

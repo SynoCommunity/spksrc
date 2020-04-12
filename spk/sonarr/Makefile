@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/sonarr.png
 
 REQUIRED_DSM = 5.0
@@ -18,7 +18,7 @@ DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y tor
 RELOAD_UI = yes
 DISPLAY_NAME = Sonarr
 STARTABLE = yes
-CHANGELOG = "Update Sonarr to v2.0.0.5301."
+CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3

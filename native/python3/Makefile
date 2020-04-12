@@ -1,5 +1,5 @@
 PKG_NAME = python
-PKG_VERS = 3.6.8
+PKG_VERS = 3.6.10
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
@@ -32,7 +32,7 @@ nativepython3_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing setuptools, pip and cffi
 	@$(RUN) wget https://bootstrap.pypa.io/ez_setup.py -O - | $(PYTHON)
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
-	@$(PIP) install "cffi==1.11.5"
+	@$(PIP) install "cffi==1.14.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
