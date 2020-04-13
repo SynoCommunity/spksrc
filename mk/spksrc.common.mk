@@ -32,14 +32,14 @@ LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 # SRM - Synology Router Manager
 SRM_ARCHS = northstarplus ipq806x dakota
 
-# Use x64 when kernels are not needed
-ARCHS_NO_KRNLSUPP = $(filter-out x64%, $(SUPPORTED_ARCHS))
+# Disable kernel builds for generic archs
+ARCHS_WITH_KERNEL_SUPPORT = $(filter-out aarch64% armv7% x64%, $(SUPPORTED_ARCHS))
 
-# remove archs for generic x64 build
+# remove duplicate archs for generic x64 build
 ARCHS_DUPES := $(filter-out apollolake% avoton% braswell% broadwell% broadwellnk% bromolow% cedarview% denverton% dockerx64% grantley% purley% kvmx64% x86% x86_64%, $(SUPPORTED_ARCHS))
-# remove archs for generic aarch64 build
+# remove duplicate archs for generic aarch64 build
 ARCHS_DUPES := $(filter-out rtd1296% armada37xx%, $(ARCHS_DUPES))
-# optional remove archs for generic armv7 build
+# optional remove duplicate archs for generic armv7 build
 ifeq ($(findstring ARM7,$(GENERIC_ARCHS)),ARM7)
   ARCHS_DUPES := $(filter-out alpine% armada370% armada375% armada38x% armadaxp% comcerto2k% monaco% northstarplus% ipq806x% dakota%, $(ARCHS_DUPES))
 else

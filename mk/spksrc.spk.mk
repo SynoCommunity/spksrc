@@ -369,7 +369,7 @@ all-supported:
 	    $(MAKE) latest-arch-$$arch ; \
 	  done \
 	else \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT)))))) ; \
 	  do \
 	    $(MAKE) latest-arch-$$arch ; \
 	  done \
@@ -383,7 +383,7 @@ publish-all-supported:
 	    $(MAKE) publish-latest-arch-$$arch ; \
 	  done \
 	else \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT)))))) ; \
 	  do \
 	    $(MAKE) publish-latest-arch-$$arch ; \
 	  done \
@@ -409,7 +409,7 @@ all-archs-latest:
 	  done \
 	else \
 	  $(MSG) Skipping arches without kernelsupport ; \
-	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
+	  for arch in $(sort $(basename $(ARCHS_WITH_KERNEL_SUPPORT))) ; \
 	  do \
 	    $(MAKE) latest-arch-$$arch ; \
 	  done \
@@ -425,7 +425,7 @@ publish-all-archs-latest:
 	  done \
 	else \
 	  $(MSG) Skipping arches without kernelsupport ; \
-	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
+	  for arch in $(sort $(basename $(ARCHS_WITH_KERNEL_SUPPORT))) ; \
 	  do \
 	    $(MAKE) publish-latest-arch-$$arch ; \
 	  done \
@@ -435,11 +435,11 @@ publish-all-archs-latest:
 
 latest-arch-%:
 	@$(MSG) Building package for arch $* with latest available toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*-%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*-%, $(AVAILABLE_ARCHS)))))))
 
 publish-latest-arch-%:
 	@$(MSG) Building package for arch $* with latest available toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS))))))) publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*-%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*-%, $(AVAILABLE_ARCHS))))))) publish
 
 ####
 

@@ -1,5 +1,5 @@
 ARCH ?= apollolake
-TCVERSION ?= 6.2.2
+TCVERSION ?= 6.2
 PKG_NAME = apollolake
 PKG_BRANCH = 22259
 PKG_ARCH = $(PKG_NAME)
