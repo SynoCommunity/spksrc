@@ -2,7 +2,7 @@ TC_NAME = syno-armada38x
 
 TC_ARCH = armada38x
 TC_VERS = 6.2.2
-TC_OS_MIN_VER = 6.2.2-22259
+TC_OS_MIN_VER = 6.2-22259
 
 TC_DIST = armada38x-gcc493_glibc220_hard-GPL
 TC_EXT = txz
