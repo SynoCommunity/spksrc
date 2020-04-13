@@ -8,7 +8,7 @@ PKG_DIST_SITE = http://www.dest-unreach.org/socat/download
 DEPENDS = cross/openssl
 
 HOMEPAGE = http://www.dest-unreach.org/socat/
-COMMENT  = socat: multipurpose relay
+COMMENT  = socat - Multipurpose relay \(SOcket CAT)\. Socat is a command line based utility that establishes two bidirectional byte streams and transfers data between them. Because the streams can be constructed from a large set of different types of data sinks and sources, and because lots of address options may be applied to the streams, socat can be used for many different purposes.  
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1

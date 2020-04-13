@@ -1,7 +1,6 @@
 SPK_NAME = ser2net
-SPK_VERS = 4.0
+SPK_VERS = 4.1.6
 SPK_REV = 1
-
 SPK_ICON = src/ser2net.png
 
 DEPENDS = cross/ser2net
@@ -18,7 +17,7 @@ STARTABLE = no
 HOMEPAGE = http://ser2net.sourceforge.net/
 LICENSE = GPLv2
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = sbin/ser2net
 
 
 include ../../mk/spksrc.spk.mk

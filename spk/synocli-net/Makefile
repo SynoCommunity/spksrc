@@ -9,12 +9,9 @@ DEPENDS += cross/rsync
 # Requirement for Mosh
 SPK_DEPENDS = "Perl>=5.14"
 
-
-OPTIONAL_DESC =
+OPTIONAL_DEPENDS = cross/fritzctl cross/ser2net
 
 include ../../mk/spksrc.common.mk
-
-OPTIONAL_DEPENDS = cross/fritzctl
 
 OPTIONAL_DESC =
 
@@ -23,20 +20,16 @@ DEPENDS += cross/fritzctl
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fritzctl"
 endif
 
-
-
-# Requirement for Mosh
-SPK_DEPENDS = "Perl>=5.14"
 ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
 DEPENDS += cross/ser2net
-OPTIONAL_DESC +="ser2net, "
+OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
 endif
 
 MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs, rsync$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Add ser2net"
+CHANGELOG = "1. Add rsync<br/>2. Add ser2net"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -50,5 +43,6 @@ SPK_COMMANDS += bin/mosh bin/mosh-client bin/mosh-server
 SPK_COMMANDS += bin/socat bin/procan bin/filan
 SPK_COMMANDS += bin/fritzctl
 SPK_COMMANDS += bin/rsync
+SPK_COMMANDS += sbin/ser2net
 
 include ../../mk/spksrc.spk.mk
