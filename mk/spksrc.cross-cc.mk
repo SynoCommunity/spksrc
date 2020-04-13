@@ -23,8 +23,10 @@ endif
 #####
 
 ifneq ($(REQ_KERNEL),)
-  ifeq ($(findstring $(ARCH), x64 aarch64 armv7),$(ARCH))
-    @$(error Arch '$(ARCH)' cannot be used when REQ_KERNEL is set )
+  ifneq ($(ARCH),)
+    ifeq ($(findstring $(ARCH), x64 aarch64 armv7),$(ARCH))
+      @$(error Arch '$(ARCH)' cannot be used when REQ_KERNEL is set )
+    endif
   endif
 endif
 
