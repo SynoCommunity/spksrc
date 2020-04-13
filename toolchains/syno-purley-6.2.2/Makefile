@@ -2,7 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = purley
 TC_VERS = 6.2.2
-TC_OS_MIN_VER = 6.2.2-24922
+TC_OS_MIN_VER = 6.2-25023
 
 TC_DIST = purley-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz
