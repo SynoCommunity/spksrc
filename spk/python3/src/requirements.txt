@@ -4,7 +4,8 @@
 #pycrypto==2.6.1
 #Pillow==5.3.0
 #pycurl==7.43.0.2
-pyyaml==5.3
+#pyyaml==5.3
+#immutables==0.11
 
 ## Cross-compiled via spksrc.wheel.mk
 markupsafe==1.1.1
