@@ -1,8 +1,10 @@
 PKG_NAME = openssl
-PKG_VERS = 1.0.2n
+OLD_VERSION = 1.0.2
+PATCH_VERS = n
+PKG_VERS = $(OLD_VERSION)$(PATCH_VERS)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.openssl.org/source
+PKG_DIST_SITE = https://www.openssl.org/source/old/$(OLD_VERSION)/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib

@@ -1,0 +1,51 @@
+add byte order dependent definitions that are missing
+in synology toolchain for older ppc archs (ppc853x)
+
+--- src/portable_endian.h.org	2019-06-21 01:12:47.000000000 +0000
++++ src/portable_endian.h	2020-01-19 17:43:21.924798782 +0000
+@@ -17,6 +17,45 @@
+ #elif defined(HAVE_ENDIAN_H)
+ #	include <endian.h>
+ 
++/* taken from more current <endian.h> */
++# if defined __USE_MISC && !defined __ASSEMBLER__
++  /* Conversion interfaces.  */
++#  include <bits/byteswap.h>
++  
++#  if __BYTE_ORDER == __LITTLE_ENDIAN
++#   define htobe16(x) __bswap_16 (x)
++#   define htole16(x) (x)
++#   define be16toh(x) __bswap_16 (x)
++#   define le16toh(x) (x)
++  
++#   define htobe32(x) __bswap_32 (x)
++#   define htole32(x) (x)
++#   define be32toh(x) __bswap_32 (x)
++#   define le32toh(x) (x)
++  
++#   define htobe64(x) __bswap_64 (x)
++#   define htole64(x) (x)
++#   define be64toh(x) __bswap_64 (x)
++#   define le64toh(x) (x)
++  
++#  else
++#   define htobe16(x) (x)
++#   define htole16(x) __bswap_16 (x)
++#   define be16toh(x) (x)
++#   define le16toh(x) __bswap_16 (x)
++  
++#   define htobe32(x) (x)
++#   define htole32(x) __bswap_32 (x)
++#   define be32toh(x) (x)
++#   define le32toh(x) __bswap_32 (x)
++  
++#   define htobe64(x) (x)
++#   define htole64(x) __bswap_64 (x)
++#   define be64toh(x) (x)
++#   define le64toh(x) __bswap_64 (x)
++#  endif
++# endif
++
+ #elif defined(HAVE_SYS_ENDIAN_H)
+ #	include <sys/endian.h>
+ 

@@ -1,18 +1,19 @@
 SPK_NAME = minio
-SPK_VERS = 2019-10-12T01-39-57Z
-SPK_REV = 2
+SPK_VERS = 2020-03-19T21-49-00Z
+SPK_REV = 4
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+GENERIC_ARCHS = ARM7
 
 MAINTAINER = fgma
-DESCRIPTION = The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage.
+DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
 RELOAD_UI = yes
 DISPLAY_NAME = MinIO
-CHANGELOG = "Update to 2019-10-12T01-39-57Z built with go 1.13.1"
+CHANGELOG = "Update to latest release which includes multiple minor bugfix releases. Breaking Change: Use bulk locks in Multi-object delete and to data usage crawler, so rolling upgrade is not supported."
 HOMEPAGE = https://min.io/
 LICENSE = Apache License 2.0
 STARTABLE = yes

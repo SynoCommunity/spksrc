@@ -9,12 +9,11 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = rmlint finds space waste and other broken things on your filesystem and offers to remove it.
 DISPLAY_NAME = rmlint
 STARTABLE = no
-BETA = 1
 
 HOMEPAGE   = https://github.com/sahib/rmlint
 LICENSE    = GPLv3
 HELP_URL   = https://rmlint.readthedocs.io/en/latest/
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/rmlint
 
 include ../../mk/spksrc.spk.mk

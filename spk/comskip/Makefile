@@ -1,6 +1,6 @@
 SPK_NAME = comskip
-SPK_VERS = 0.82.003
-SPK_REV = 2
+SPK_VERS = 0.82.010
+SPK_REV = 3
 SPK_ICON = src/comskip.png
 
 REQUIRED_DSM = 5.2
@@ -19,7 +19,7 @@ LICENSE = GNU/LGPL
 HELPURL = https://github.com/SynoCommunity/spksrc/wiki/Comskip
 SUPPORTURL = http://www.kaashoek.com/comskip/
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/comskip
 
 POST_STRIP_TARGET = comskip_extra_install
 
@@ -30,7 +30,7 @@ export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 PRE_DEPEND_TARGET = comskip_pre_depend
-SPK_DEPENDS = "ffmpeg>4.1"
+SPK_DEPENDS = "ffmpeg>4.2"
 endif
 
 include ../../mk/spksrc.spk.mk

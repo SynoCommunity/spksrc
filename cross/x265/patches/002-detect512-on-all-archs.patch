@@ -1,6 +1,6 @@
---- common/cpu.cpp.orig	2019-01-11 13:49:59.314684910 +0100
-+++ common/cpu.cpp	2019-01-11 13:51:37.011275586 +0100
-@@ -110,6 +110,11 @@
+--- common/cpu.cpp-orig	2019-12-10 22:31:19.000525673 -0500
++++ common/cpu.cpp	2019-12-10 22:28:41.983368481 -0500
+@@ -110,6 +110,11 @@ const cpu_name_t cpu_names[] =
      { "", 0 },
  };
  
@@ -12,7 +12,7 @@
  #if X265_ARCH_X86
  
  extern "C" {
-@@ -123,10 +128,6 @@
+@@ -123,11 +128,6 @@ uint64_t PFX(cpu_xgetbv)(int xcr);
  #pragma warning(disable: 4309) // truncation of constant value
  #endif
  
@@ -20,6 +20,7 @@
 -{
 -    return(enable512);
 -}
+-
  uint32_t cpu_detect(bool benableavx512 )
  {
  

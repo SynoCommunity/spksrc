@@ -7,12 +7,14 @@ PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 
 DEPENDS = cross/ncurses
 
-HOMEPAGE = http://www.gnu.org/software/screen/
+HOMEPAGE = https://www.gnu.org/software/screen/
 COMMENT  = Screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = myPreConfigure
+PRE_CONFIGURE_TARGET = screen_pre_configure_target
+INSTALL_TARGET = screen_install_target
+
 PATCHES_LEVEL = 1
 
 CONFIGURE_ARGS  = --with-pty-mode=0620 --with-pty-group=5
@@ -23,6 +25,10 @@ CONFIGURE_ARGS += screen_cv_sys_terminfo_used=yes
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPreConfigure
-myPreConfigure:
+.PHONY: screen_pre_configure_target
+screen_pre_configure_target:
 	$(RUN) autoconf
+
+.PHONY: screen_install_target
+screen_install_target:
+	$(RUN) install -c screen $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)

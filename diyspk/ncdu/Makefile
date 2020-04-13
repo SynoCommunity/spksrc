@@ -15,6 +15,6 @@ CHANGELOG = "Initial release"
 HOMEPAGE   = https://dev.yorhel.nl/ncdu
 LICENSE    = MIT
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/ncdu
 
 include ../../mk/spksrc.spk.mk

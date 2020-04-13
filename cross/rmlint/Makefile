@@ -12,6 +12,9 @@ HOMEPAGE = http://rmlint.rtfd.org/
 COMMENT = Extremely fast tool to remove duplicates and other lint from your filesystem.
 LICENSE = GPLv3
 
+# PPC_ARCHES except QorIQ are not supported
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+
 CONFIGURE_TARGET = none
 COMPILE_TARGET = rmlint_compile_target
 INSTALL_TARGET = rmlint_install_target
@@ -23,4 +26,4 @@ rmlint_compile_target:
 	$(RUN) scons prefix=${STAGING_INSTALL_PREFIX} actual_prefix=$(INSTALL_PREFIX) VERBOSE=0 DEBUG=0 O=release
 
 rmlint_install_target:
-	$(RUN) install --mode=644 --target-directory=${STAGING_INSTALL_PREFIX}/bin/ ./rmlint
+	$(RUN) install --mode=755 --target-directory=${STAGING_INSTALL_PREFIX}/bin/ ./rmlint

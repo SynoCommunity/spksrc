@@ -17,7 +17,7 @@
             "validator": {
                 "allowBlank": false
             }
-        ]
+        }]
     }]
 }, {
     "step_title": "Attention! DSM6 Permissions",
