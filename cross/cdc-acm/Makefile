@@ -9,14 +9,14 @@ HOMEPAGE = http://sourceforge.net/projects/dsgpl/
 COMMENT  = cdc-acm driver
 LICENSE  = GNU GPL
 
-CONFIGURE_TARGET = nope
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = cdc-acm_compile
+INSTALL_TARGET = cdc-acm_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myCompile
-myCompile:
+.PHONY: cdc-acm_compile
+cdc-acm_compile:
 	@mkdir -p $(WORK_DIR)/$(PKG_DIR)
 	@echo "obj-m += cdc-acm.o" > $(WORK_DIR)/$(PKG_DIR)/Makefile
 	@cp $(KERNEL_DIR)/drivers/usb/class/cdc-acm.c $(WORK_DIR)/$(PKG_DIR)/
@@ -24,7 +24,7 @@ myCompile:
 	CPPFLAGS="" CFLAGS="" LDFLAGS="" \
 	make -C $(KERNEL_DIR) SUBDIRS=$(WORK_DIR)/$(PKG_DIR) modules
 
-.PHONY: myInstall
-myInstall:
+.PHONY: cdc-acm_install
+cdc-acm_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/modules
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME).ko $(STAGING_INSTALL_PREFIX)/modules/

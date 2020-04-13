@@ -9,14 +9,14 @@ HOMEPAGE = http://sourceforge.net/projects/dsgpl/
 COMMENT  = usbserial Drivers
 LICENSE  = GNU GPL
 
-CONFIGURE_TARGET = nope
-COMPILE_TARGET = myCompile
-INSTALL_TARGET = myInstall
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = usbserial_compile
+INSTALL_TARGET = usbserial_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myCompile
-myCompile:
+.PHONY: usbserial_compile
+usbserial_compile:
 	@mkdir -p $(WORK_DIR)/$(PKG_DIR)
 	@echo "obj-m += usbserial.mod.o" > $(WORK_DIR)/$(PKG_DIR)/Makefile
 	@echo "obj-m += usb-serial.o" >> $(WORK_DIR)/$(PKG_DIR)/Makefile
@@ -27,7 +27,7 @@ myCompile:
 	CPPFLAGS="" CFLAGS="" LDFLAGS="" \
 	make -C $(KERNEL_DIR) SUBDIRS=$(WORK_DIR)/$(PKG_DIR) modules
 
-.PHONY: myInstall
-myInstall:
+.PHONY: usbserial_install
+usbserial_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/modules
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME).ko $(STAGING_INSTALL_PREFIX)/modules/
