@@ -1,7 +1,7 @@
 ### Wheel rules
-#   Create wheels for modules listed in WHEELS. 
+#   Create wheels for modules listed in WHEELS.
 #   If CROSS_COMPILE_WHEELS is set via python-cc.mk,
-#   wheels are cross-compiled. If not, pure-python 
+#   wheels are cross-compiled. If not, pure-python
 #   wheels are created.
 
 # Targets are executed in the following order:
@@ -137,3 +137,9 @@ else
 wheel: ;
 endif
 
+clean-wheel:
+	rm --force $(WHEEL_COOKIE)
+	rm --recursive --force $(STAGING_INSTALL_PREFIX)/share/wheelhouse
+	rm --recursive --force $(WORK_DIR)/wheelhouse
+	rm --force $(COPY_COOKIE)
+	rm --force $(WORK_DIR)/package.tgz
