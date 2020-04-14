@@ -1,5 +1,5 @@
 SPK_NAME = ffsync
-SPK_VERS = 1.5.2
+SPK_VERS = 1.8.0
 SPK_REV = 4
 SPK_ICON = src/ffsync.png
 BETA = 1
@@ -7,13 +7,11 @@ BETA = 1
 BUILD_DEPENDS = cross/python2 cross/setuptools_py2 cross/pip_py2 cross/wheel
 BUILD_DEPENDS += cross/gevent cross/greenlet cross/cffi
 
-BUILD_DEPENDS  = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS  += cross/gevent cross/greenlet
 
 MAINTAINER     = SynoCommunity
-DESCRIPTION    = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
-DISPLAY_NAME   = Firefox Sync Server 1.5
-CHANGELOG      = "1. Fix Python requirement<br>2. Fix startup issue when pidfile is not yet written"
+DESCRIPTION    = Firefox Sync Server allows to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
+DISPLAY_NAME   = Firefox Sync Server
+CHANGELOG      = "1. Update to version 1.8"
 
 HOMEPAGE       = https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 LICENSE        = MPL/GPL/LGPL
@@ -21,16 +19,10 @@ HELPURL        = https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Serve
 
 WIZARDS_DIR    = src/wizard/
 
-FWPORTS        = src/${SPK_NAME}.sc
-CONF_DIR       = src/conf/
-
-DEPENDS        = cross/busybox
 WHEELS         = src/requirements.txt
-
 
 INSTALL_DEP_SERVICES = mysql
 START_DEP_SERVICES = mysql
-
 
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
@@ -38,22 +30,17 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_USER = auto
 SERVICE_PORT = 8192
 SERVICE_PORT_TITLE = ffsync(TCP)
-#FWPORTS = src/${SPK_NAME}.sc
 
-POST_STRIP_TARGET = ffsync_extra_install
-
-BUSYBOX_CONFIG  = usermng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+POST_STRIP_TARGET = ffsync_post_strip
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: ffsync_extra_install
-ffsync_extra_install:
+.PHONY: ffsync_post_strip
+ffsync_post_strip:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/ffsync.ini $(STAGING_DIR)/var/
 	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse/requirements.txt
-	sed -i -e "s|https://github.com/mozilla-services/mozservices/archive/e00e1b68130423ad98d0f6185655bde650443da8.zip|mozsvc==0.8|g" \
-	       -e "s|https://github.com/mozilla-services/tokenserver/archive/d7e513e8a4f5c588b70d685a8df1d2e508c341c0.zip|tokenserver==1.2.7|g" \
-	       -e "s|https://github.com/mozilla-services/server-syncstorage/archive/1.5.5.zip|SyncStorage==1.5.5|g" \
-	       -e "s|https://github.com/mozilla-services/syncserver/archive/1.5.2.tar.gz|syncserver==1.5.2|g" \
-                $(STAGING_DIR)/share/wheelhouse/requirements.txt
+	sed -i -e "s|https://github.com/mozilla-services/tokenserver/archive/1.3.0.zip|tokenserver==1.3.0|g" \
+	       -e "s|https://github.com/mozilla-services/server-syncstorage/archive/1.6.13.zip|SyncStorage==1.6.13|g" \
+	       -e "s|https://github.com/mozilla-services/syncserver/archive/1.8.0.tar.gz|syncserver==1.8.0|g" \
+               $(STAGING_DIR)/share/wheelhouse/requirements.txt
