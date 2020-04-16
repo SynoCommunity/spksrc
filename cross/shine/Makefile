@@ -13,7 +13,6 @@ COMMENT  = Super fast fixed-point MP3 encoder
 LICENSE  = GPLv2
 
 PRE_CONFIGURE_TARGET = shine_pre_configure
-#POST_INSTALL_TARGET = shine_post_install
 CONFIGURE_ARGS = --includedir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --disable-static
@@ -26,10 +25,3 @@ include ../../mk/spksrc.cross-cc.mk
 
 shine_pre_configure: 
 	$(RUN) ./bootstrap
-
-#.PHONY: shine_post_install
-#
-# Fix location of include files
-#shine_post_install: 
-#	$(RUN) sed '/^Cflags:/ s/$/\\\\/shine/' $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig/shine.pc
-#	cd $(PKG_WORK_DIR) && env $(ENV) sed '/^Cflags:/ s/$/\/shine/' $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig/shine.pc
