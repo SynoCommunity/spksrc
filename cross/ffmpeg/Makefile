@@ -56,7 +56,7 @@ CONFIGURE_ARGS += --extra-cflags=-O3
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
 # Compiling tvheadend for evansport requires #include synology.h
-POST_INSTALL_TARGET = synoheaderPostInstall
+POST_INSTALL_TARGET = ffmpeg_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -134,6 +134,6 @@ CONFIGURE_ARGS += --enable-libshine
 endif
 endif
 
-.PHONY: synoheaderPostInstall
-synoheaderPostInstall:
+.PHONY: ffmpeg_post_install
+ffmpeg_post_install:
 	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/synoconfig.h $(WORK_DIR)/install$(INSTALL_PREFIX)/include
