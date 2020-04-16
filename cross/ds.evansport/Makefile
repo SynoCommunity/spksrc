@@ -14,9 +14,9 @@ COMMENT  = Synoloy evansport toolkit including headers & libraries for GPU accel
 LICENSE  = unknown
 
 EXTRACT_TARGET = ds.evansport_custom_extract
-CONFIGURE_TARGET = ds.evansport_custom_configure
-COMPILE_TARGET = ds.evansport_custom_compile
-INSTALL_TARGET = ds.evansport_custom_install
+CONFIGURE_TARGET = none
+COMPILE_TARGET = none
+INSTALL_TARGET = none
 
 include ../../mk/spksrc.cross-cc.mk
 
