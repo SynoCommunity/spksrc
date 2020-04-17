@@ -1,0 +1,4930 @@
+diff -uprN ../ffmpeg-4.2.1/configure ./configure
+--- ../ffmpeg-4.2.1/configure	2020-01-04 21:07:34.000000000 -0500
++++ ./configure	2020-01-05 10:11:42.748355139 -0500
+@@ -338,6 +338,7 @@ External library support:
+   --enable-rkmpp           enable Rockchip Media Process Platform code [no]
+   --disable-v4l2-m2m       disable V4L2 mem2mem code [autodetect]
+   --disable-vaapi          disable Video Acceleration API (mainly Unix/Intel) code [autodetect]
++  --enable-smd             enable hardware decoding based on PowerVR [disables software decoding]
+   --disable-vdpau          disable Nvidia Video Decode and Presentation API for Unix code [autodetect]
+   --disable-videotoolbox   disable VideoToolbox code [autodetect]
+ 
+@@ -1715,6 +1716,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+     librubberband
+     libvidstab
+     libx264
++    libh264_smd
+     libx265
+     libxavs
+     libxavs2
+@@ -1811,6 +1813,7 @@ EXTERNAL_LIBRARY_LIST="
+     openal
+     opengl
+     pocketsphinx
++    smd
+     vapoursynth
+ "
+ 
+@@ -3207,6 +3210,7 @@ libwebp_encoder_deps="libwebp"
+ libwebp_anim_encoder_deps="libwebp"
+ libx262_encoder_deps="libx262"
+ libx264_encoder_deps="libx264"
++libh264_smd_encoder_deps="libh264_smd"
+ libx264rgb_encoder_deps="libx264 x264_csp_bgr"
+ libx264rgb_encoder_select="libx264_encoder"
+ libx265_encoder_deps="libx265"
+@@ -6303,6 +6307,7 @@ enabled libwavpack        && require lib
+ enabled libwebp           && {
+     enabled libwebp_encoder      && require_pkg_config libwebp "libwebp >= 0.2.0" webp/encode.h WebPGetEncoderVersion
+     enabled libwebp_anim_encoder && check_pkg_config libwebp_anim_encoder "libwebpmux >= 0.4.0" webp/mux.h WebPAnimEncoderOptionsInit; }
++enabled libh264_smd       && require  libffmpeg_plugin libffmpeg_plugin/ismd_ffmpeg_video_enc.h ismd_ffmpeg_video_encoder_dequeue -lffmpeg_plugin
+ enabled libx264           && { check_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
+                                { require libx264 "stdint.h x264.h" x264_encoder_encode "-lx264 $pthreads_extralibs $libm_extralibs" &&
+                                  warn "using libx264 without pkg-config"; } } &&
+diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
+--- ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c	2019-12-31 16:35:22.000000000 -0500
++++ ./fftools/ffmpeg.c	2020-02-29 10:42:04.535361983 -0500
+@@ -106,6 +106,84 @@
+ 
+ #include "libavutil/avassert.h"
+ 
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++//smd headers
++#include "osal_type.h"
++#include "ismd_vidpproc.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_bitstream.h"
++
++#include "libavcodec/ismd_ffmpeg_audio_util.h"
++#include "libavformat/avformat.h"
++#include "libavcodec/h264_smd.h"
++#include "libavcodec/vc1.h"
++#include "libavcodec/avcodec.h"
++#include "libavcodec/syno_trans_loading.h"
++#if CONFIG_LIBX264_ENCODER
++#include <x264.h>
++#endif
++
++typedef struct X264Context {
++    AVClass        *class;
++#if CONFIG_LIBX264_ENCODER
++    x264_param_t    params;
++    x264_t         *enc;
++    x264_picture_t  pic;
++#endif
++    uint8_t        *sei;
++    int             sei_size;
++    char *preset;
++    char *tune;
++    char *profile;
++    char *level;
++    int fastfirstpass;
++    char *wpredp;
++    char *x264opts;
++    float crf;
++    float crf_max;
++    int cqp;
++    int aq_mode;
++    float aq_strength;
++    char *psy_rd;
++    int psy;
++    int rc_lookahead;
++    int weightp;
++    int weightb;
++    int ssim;
++    int intra_refresh;
++    int bluray_compat;
++    int b_bias;
++    int b_pyramid;
++    int mixed_refs;
++    int dct8x8;
++    int fast_pskip;
++    int aud;
++    int mbtree;
++    char *deblock;
++    float cplxblur;
++    char *partitions;
++    int direct_pred;
++    int slice_max_size;
++    char *stats;
++    int nal_hrd;
++    int avcintra_class;
++    char *x264_params;
++} X264Context;
++
++static viddec_struct_t vid_dec;
++static videnc_struct_t vid_enc;
++bool smd_video_pipeline = false;
++int smd_frame_rate;
++static ismd_codec_type_t get_smd_codec_id(enum AVCodecID ffmpeg_codec_id);
++bool first_read_pts = true;
++int64_t last_pts = -1;
++//smd end
++#endif
++
+ const char program_name[] = "ffmpeg";
+ const int program_birth_year = 2000;
+ 
+@@ -483,12 +561,27 @@ const AVIOInterruptCB int_cb = { decode_
+ static void ffmpeg_cleanup(int ret)
+ {
+     int i, j;
++#ifdef SYNO_EVANSPORT_SMD
++    ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++#endif
+ 
+     if (do_benchmark) {
+         int maxrss = getmaxrss() / 1024;
+         av_log(NULL, AV_LOG_INFO, "bench: maxrss=%ikB\n", maxrss);
+     }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++    /**************** smd code *******************/
++       synoRemovePID(getpid());
++    if(smd_video_pipeline)
++    {
++               ret_val = ismd_ffmpeg_free_vid_enc_res(&vid_enc);
++               if(ret_val != ISMD_SUCCESS)
++                       av_log(NULL,AV_LOG_ERROR,"could not free video encoder resources\n");
++    }
++    /**************** smd code end*******************/
++#endif
++
+     for (i = 0; i < nb_filtergraphs; i++) {
+         FilterGraph *fg = filtergraphs[i];
+         avfilter_graph_free(&fg->graph);
+@@ -1194,6 +1287,12 @@ static void do_video_out(OutputFile *of,
+     }
+     ost->last_dropped = nb_frames == nb0_frames && next_picture;
+ 
++#ifdef SYNO_EVANSPORT_SMD
++       if (smd_video_pipeline) {
++               nb_frames = 1;
++       }
++#endif
++
+     /* duplicates frame if needed */
+     for (i = 0; i < nb_frames; i++) {
+         AVFrame *in_picture;
+@@ -1216,6 +1315,10 @@ static void do_video_out(OutputFile *of,
+         if (!check_recording_time(ost))
+             return;
+ 
++#ifdef SYNO_EVANSPORT_SMD
++               if(!smd_video_pipeline)
++               {
++#endif
+         if (enc->flags & (AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME) &&
+             ost->top_field_first >= 0)
+             in_picture->top_field_first = !!ost->top_field_first;
+@@ -1290,6 +1393,122 @@ static void do_video_out(OutputFile *of,
+         // Make sure Closed Captions will not be duplicated
+         av_frame_remove_side_data(in_picture, AV_FRAME_DATA_A53_CC);
+ 
++#ifdef SYNO_EVANSPORT_SMD
++                } else {
++                        unsigned long fps_num;
++                        unsigned long fps_den;
++                        unsigned long macroblock_per_sec;
++                        unsigned long max_macroblock_per_sec;
++                        char* level;
++                        bool override;
++                        double temp_num;
++                        int pkt_size;
++                        X264Context *x4 = enc->priv_data;
++                        smd_h264_picture_t pic_out;
++                        int got_packet = 0;                // variable removed > 2.7
++                        ret = 0; 
++
++                        if ((pkt_size = syno_ismd_ffmpeg_video_encoder_get_first_node_size(&vid_enc)) < 0) { 
++                                av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue_size_syno\n");
++                                exit_program(1);
++                        }
++                        if (pkt_size > 0) { 
++                                if (syno_alloc_packet(&pkt, pkt_size) < 0) { 
++                                        av_log(NULL, AV_LOG_FATAL, "syno_alloc_packet error at encoder SMD\n");
++                                        exit_program(1);
++                                }
++                                ret = ismd_ffmpeg_video_encoder_dequeue(pkt.data, &pic_out,&vid_enc);
++                                if (ret != pkt_size) {
++                                        av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
++                                }
++                                memset(pkt.data + pkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
++                        }
++
++                        if(ret > 0) 
++                        {
++                                if (enable_dtv_smd) {
++                                        enc->coded_frame->pts = av_rescale_q(pic_out.i_pts, AV_TIME_BASE_Q, enc->time_base);
++                                        if (AV_NOPTS_VALUE != enc->coded_frame->pts) {
++                                                pkt.pts= enc->coded_frame->pts;
++                                        }
++                                } else {
++                                        //TODO call just once
++                                        ismd_result_t ret_smd = ismd_viddec_get_frame_rate(vid_dec.viddec_handle, &fps_num, &fps_den, &override);
++                                        if (ret_smd == ISMD_SUCCESS)
++                                        {
++                                                temp_num = 90000/(double)fps_num;
++                                                smd_frame_rate = temp_num*fps_den;//smd clock resuolution is 90000 ticks
++                                                macroblock_per_sec = ((enc->width*enc->height)/256) *(fps_num/fps_den);
++                                                if(!x4->level)
++                                                        level = "4.1";
++                                                else
++                                                        level = x4->level;
++                                                max_macroblock_per_sec = ismd_ffmpeg_max_macroblock(level);
++                                                if(macroblock_per_sec > max_macroblock_per_sec)
++                                                {
++                                                        av_log(enc,AV_LOG_INFO,"macroblocks_per_sec requested %ld\n",macroblock_per_sec);
++                                                        av_log(enc,AV_LOG_INFO,"max macroblocks_per_sec suppored for level %s are %ld\n",level,max_macroblock_per_sec);
++                                                        av_log(enc,AV_LOG_INFO,"please try transcoding to lower resolution\n");
++                                                        exit_program(1);
++                                                }
++                                        }
++
++                                        enc->coded_frame->pts = pic_out.i_pts/smd_frame_rate;
++                                        if (AV_NOPTS_VALUE != enc->coded_frame->pts) {
++                                                pkt.pts= enc->coded_frame->pts;
++                                                if (ist) {
++                                                        pkt.pts += av_rescale_q(input_files[ist->file_index]->first_pts, AV_TIME_BASE_Q, enc->time_base);
++                                                }
++                                        }
++                                }
++
++                                switch (pic_out.i_type)
++                                {
++                                        case SLICE_P:
++                                                av_log(NULL,AV_LOG_DEBUG,"\n********returning pict type AV_PICTURE_TYPE_P\n");
++                                                enc->coded_frame->pict_type = AV_PICTURE_TYPE_P;
++                                                break;
++                                        case SLICE_B:
++                                                av_log(NULL,AV_LOG_DEBUG,"\n********returning pict type AV_PICTURE_TYPE_B\n");
++                                                enc->coded_frame->pict_type = AV_PICTURE_TYPE_B;
++                                                break;
++                                        case SLICE_I:
++                                                av_log(NULL,AV_LOG_DEBUG,"\n********returning pict type AV_PICTURE_TYPE_I\n");
++                                                enc->coded_frame->pict_type = AV_PICTURE_TYPE_I;
++                                                break;
++                                        default:
++                                                enc->coded_frame->pict_type = AV_PICTURE_TYPE_NONE;
++                                                av_log(NULL,AV_LOG_DEBUG,"\n********ERROR invalid picture type ************\n");
++
++                                }
++                                enc->coded_frame->key_frame = pic_out.b_keyframe;
++                                if (pic_out.b_keyframe) {
++                                         pkt.flags |= AV_PKT_FLAG_KEY;
++                                }
++                                if (enable_dtv_smd) {
++                                        // enable dtv_smd flag, every frame is carryed the same timestamp from input file
++                                        // on hardware pipeline mode. But we encounter problem of non monotonically increasing
++                                        // timestamp. min_heap is reorder frame and filter some abnormal frame.
++                                        ret = syno_smd_push_heap(&pkt);
++                                        if (ret < 0) {
++                                                av_log(NULL, AV_LOG_FATAL, "syno_smd_push_heap failed\n");
++                                                exit_program(1);
++                                        }
++                                        if (0 == syno_smd_get_heap(&pkt, 0)) {
++                                                if (last_pts >= pkt.pts) {
++                                                        av_free_packet(&pkt);
++                                                } else {
++                                                        last_pts = pkt.pts;
++                                                        got_packet = 1;
++                                                }
++                                        }
++                                } else {
++                                        got_packet = 1;
++                                }
++                        }
++                }
++#endif
++
+         while (1) {
+             ret = avcodec_receive_packet(enc, &pkt);
+             update_benchmark("encode_video %d.%d", ost->file_index, ost->index);
+@@ -1674,7 +1893,6 @@ static void print_report(int is_last_rep
+ 
+     t = (cur_time-timer_start) / 1000000.0;
+ 
+-
+     oc = output_files[0]->ctx;
+ 
+     total_size = avio_size(oc->pb);
+@@ -1856,11 +2074,17 @@ static void ifilter_parameters_from_code
+ static void flush_encoders(void)
+ {
+     int i, ret;
++#ifdef SYNO_EVANSPORT_SMD
++	InputStream *ist = NULL;
++#endif
+ 
+     for (i = 0; i < nb_output_streams; i++) {
+         OutputStream   *ost = output_streams[i];
+         AVCodecContext *enc = ost->enc_ctx;
+         OutputFile      *of = output_files[ost->file_index];
++#ifdef SYNO_EVANSPORT_SMD
++        int stop_encoding = 0;
++#endif
+ 
+         if (!ost->encoding_needed)
+             continue;
+@@ -1919,6 +2143,9 @@ static void flush_encoders(void)
+                 desc   = "audio";
+                 break;
+             case AVMEDIA_TYPE_VIDEO:
++#ifdef SYNO_EVANSPORT_SMD
++                               usleep(1000);
++#endif
+                 desc   = "video";
+                 break;
+             default:
+@@ -1929,6 +2156,10 @@ static void flush_encoders(void)
+             pkt.data = NULL;
+             pkt.size = 0;
+ 
++#ifdef SYNO_EVANSPORT_SMD
++                               if (!smd_video_pipeline || AVMEDIA_TYPE_VIDEO != ost->st->codec->codec_type ) {
++#endif
++
+             update_benchmark(NULL);
+ 
+             while ((ret = avcodec_receive_packet(enc, &pkt)) == AVERROR(EAGAIN)) {
+@@ -1942,6 +2173,104 @@ static void flush_encoders(void)
+             }
+ 
+             update_benchmark("flush_%s %d.%d", desc, ost->file_index, ost->index);
++#ifdef SYNO_EVANSPORT_SMD
++                               } else {
++                                       unsigned long fps_num;
++                                       unsigned long fps_den;
++                                       bool override;
++                                       double temp_num;
++                                       int pkt_size;
++                                       smd_h264_picture_t pic_out;
++                                       ret = 0;
++
++                                       if ((pkt_size = syno_ismd_ffmpeg_video_encoder_get_first_node_size(&vid_enc)) < 0) {
++                                               av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue_size_syno\n");
++                                               exit_program(1);
++                                       }
++                                       if (pkt_size > 0) {
++                                               if (syno_alloc_packet(&pkt, pkt_size) < 0) {
++                                                       av_log(NULL, AV_LOG_FATAL, "syno_alloc_packet error at encoder SMD\n");
++                                                       exit_program(1);
++                                               }
++                                               ret = ismd_ffmpeg_video_encoder_dequeue(pkt.data, &pic_out,&vid_enc);
++                                               if (ret != pkt_size) {
++                                                       av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
++                                               }
++                                               memset(pkt.data + pkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
++                                       }
++
++                                       if(ret > 0)
++                                       {
++                                               if (enable_dtv_smd) {
++                                                       enc->coded_frame->pts = av_rescale_q(pic_out.i_pts, AV_TIME_BASE_Q, enc->time_base);
++                                                       if (AV_NOPTS_VALUE != enc->coded_frame->pts) {
++                                                               pkt.pts= enc->coded_frame->pts;
++                                                       }
++                                               } else {
++                                                       //TODO call just once
++                                                       ismd_result_t ret_smd = ismd_viddec_get_frame_rate(vid_dec.viddec_handle, &fps_num, &fps_den, &override);//this actually returns fps
++                                                       if (ret_smd == ISMD_SUCCESS)
++                                                       {
++                                                               temp_num = 90000/(double)fps_num;
++                                                               smd_frame_rate = temp_num*fps_den;//smd clock resuolution is 90000 ticks
++                                                       }
++                                                       av_log(NULL,AV_LOG_DEBUG,"\n********pts from encoder %lld\n",pic_out.i_pts);
++
++                                                       enc->coded_frame->pts = pic_out.i_pts/smd_frame_rate;
++                                                       if (AV_NOPTS_VALUE != enc->coded_frame->pts) {
++                                                               pkt.pts= enc->coded_frame->pts;
++                                                               if (ost->source_index >= 0)
++                                                                       ist = input_streams[ost->source_index];
++                                                               if (ist) {
++                                                                       pkt.pts += av_rescale_q(input_files[ist->file_index]->first_pts, AV_TIME_BASE_Q, enc->time_base);
++                                                               }
++                                                       }
++                                               }
++
++                                               switch (pic_out.i_type)
++                                               {
++                                                       case SLICE_P:
++                                                               av_log(NULL,AV_LOG_DEBUG,"\n*******returning pict type AV_PICTURE_TYPE_P\n");
++                                                               enc->coded_frame->pict_type = AV_PICTURE_TYPE_P;
++                                                               break;
++                                                       case SLICE_B:
++                                                               av_log(NULL,AV_LOG_DEBUG,"\n*****returning pict type AV_PICTURE_TYPE_B\n");
++                                                               enc->coded_frame->pict_type = AV_PICTURE_TYPE_B;
++                                                               break;
++                                                       case SLICE_I:
++                                                               av_log(NULL,AV_LOG_DEBUG,"\n******returning pict type AV_PICTURE_TYPE_I\n");
++                                                               enc->coded_frame->pict_type = AV_PICTURE_TYPE_I;
++                                                               break;
++                                                       default:
++                                                               enc->coded_frame->pict_type = AV_PICTURE_TYPE_NONE;
++                                                               av_log(NULL,AV_LOG_DEBUG,"\n*****ERROR invalid picture type ************\n");
++                                               }
++                                               enc->coded_frame->key_frame = pic_out.b_keyframe;
++                                               if (pic_out.b_keyframe) {
++                                                       pkt.flags |= AV_PKT_FLAG_KEY;
++                                               }
++
++                                               if (enable_dtv_smd) {
++                                                       //TODO we should care about flush heap buffer
++                                                       ret = syno_smd_push_heap(&pkt);
++                                                       if (ret < 0) {
++                                                               av_log(NULL, AV_LOG_FATAL, "syno_smd_push_heap failed\n");
++                                                               exit_program(1);
++                                                       }
++                                                       if (0 == syno_smd_get_heap(&pkt, 1)) {
++                                                               if (last_pts >= pkt.pts) {
++                                                                       av_free_packet(&pkt);
++                                                               } else {
++                                                                       last_pts = pkt.pts;
++                                                                       got_packet = 1;
++                                                               }
++                                                       }
++                                               } else {
++                                                       got_packet = 1;
++                                               }
++                                       }
++                               }
++#endif
+             if (ret < 0 && ret != AVERROR_EOF) {
+                 av_log(NULL, AV_LOG_FATAL, "%s encoding failed: %s\n",
+                        desc,
+@@ -1955,6 +2284,9 @@ static void flush_encoders(void)
+                 output_packet(of, &pkt, ost, 1);
+                 break;
+             }
++#ifdef SYNO_EVANSPORT_SMD
++                               if(!smd_video_pipeline) {
++#endif
+             if (ost->finished & MUXER_FINISHED) {
+                 av_packet_unref(&pkt);
+                 continue;
+@@ -1962,6 +2294,21 @@ static void flush_encoders(void)
+             av_packet_rescale_ts(&pkt, enc->time_base, ost->mux_timebase);
+             pkt_size = pkt.size;
+             output_packet(of, &pkt, ost, 0);
++#ifdef SYNO_EVANSPORT_SMD
++                               } else {
++                                       if ((ret <= 0) && (vid_enc.eos_received)) {
++                                               stop_encoding = 1;
++                                               break;
++                                       }
++                                       if (ret >0)     {
++                                               if (pkt.pts != AV_NOPTS_VALUE)
++                                                       pkt.pts = av_rescale_q(pkt.pts, enc->time_base, ost->st->time_base);
++                                               if (pkt.dts != AV_NOPTS_VALUE)
++                                                       pkt.dts = av_rescale_q(pkt.dts, enc->time_base, ost->st->time_base);
++                                               write_frame(of, &pkt, ost);
++                                       }
++                               }
++#endif
+             if (ost->enc_ctx->codec_type == AVMEDIA_TYPE_VIDEO && vstats_filename) {
+                 do_video_stats(ost, pkt_size);
+             }
+@@ -2293,6 +2640,10 @@ static int decode_audio(InputStream *ist
+         return AVERROR(ENOMEM);
+     decoded_frame = ist->decoded_frame;
+ 
++#ifdef SYNO_EVANSPORT_SMD
++	if(!smd_video_pipeline)
++	{
++#endif
+     update_benchmark(NULL);
+     ret = decode(avctx, decoded_frame, got_output, pkt);
+     update_benchmark("decode_audio %d.%d", ist->file_index, ist->st->index);
+@@ -2344,6 +2695,29 @@ static int decode_audio(InputStream *ist
+ static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_t *duration_pts, int eof,
+                         int *decode_failed)
+ {
++#ifdef SYNO_EVANSPORT_SMD
++       /********************* smd implementation *****************/
++       const uint8_t *buf = pkt->data;
++       int buf_size = pkt->size;
++       uint8_t* buf_with_start_code = NULL;
++       int new_buf_size = buf_size;
++       uint8_t* sps_pps_buf =NULL;
++       AVCodecContext *avctx = ist->dec_ctx;
++
++       ismd_buffer_handle_t ismd_buf = -1;
++       ismd_result_t result = ISMD_SUCCESS;
++       int sps_pps_buf_size =0;
++       bool first_time =true;
++       unsigned char pSeqHeaderRbdu[8];
++       unsigned char SPMP_PESpacket_PayloadFormatHeader[16];
++       int size_SPMP_PESpacket_PayloadFormatHeader;
++       int max_bufsize =0;
++       ismd_codec_type_t smd_codec;
++       H264Context *h;
++       VC1Context *v;
++       /********************* end *****************/
++#endif
++
+     AVFrame *decoded_frame;
+     int i, ret = 0, err = 0;
+     int64_t best_effort_timestamp;
+@@ -2468,6 +2842,251 @@ static int decode_video(InputStream *ist
+ 
+     err = send_frame_to_filters(ist, decoded_frame);
+ 
++#ifdef SYNO_EVANSPORT_SMD
++	} else {
++		int64_t pts;
++		ret = pkt->size;
++		if (pkt->pts != AV_NOPTS_VALUE) {
++			pts = av_rescale_q(pkt->pts, ist->st->time_base, AV_TIME_BASE_Q);
++		} else {
++			pts = av_rescale_q(pkt->dts, ist->st->time_base, AV_TIME_BASE_Q);
++		}
++		/******************** write data to decoder input port *******************/
++		smd_codec = get_smd_codec_id(ist->st->codec->codec_id);
++//		av_log(NULL,AV_LOG_DEBUG,"\nin transcode_video smd_codec %d\n",smd_codec);
++		switch (smd_codec)
++		{
++			//no special handling is required for mpeg2 mpeg4
++			//we are not supporting msmpeg4
++			case ISMD_CODEC_TYPE_MPEG2:
++			case ISMD_CODEC_TYPE_MPEG4:
++				av_log(NULL, AV_LOG_DEBUG, "\n********* in ISMD_CODEC_TYPE_MPEG2/ISMD_CODEC_TYPE_MPEG4 case **************\n");
++				av_log(NULL, AV_LOG_DEBUG, "\navctx->extradata_size %d\n",avctx->extradata_size);
++				//send headers before first packet
++				if((vid_dec.send_sps_pps) && (avctx->extradata_size > 0))
++				{
++					if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++					{
++						av_log(NULL, AV_LOG_DEBUG,"\n********* sending extradata size %d ********\n",avctx->extradata_size);
++						if (enable_dtv_smd) {
++							result = syno_ismd_ffmpeg_fill_viddec_buffer(avctx->extradata, ismd_buf,avctx->extradata_size, pts);
++						} else {
++							result = ismd_ffmpeg_fill_viddec_buffer(avctx->extradata, ismd_buf,avctx->extradata_size);
++						}
++						if (result == ISMD_SUCCESS)
++						{
++							// decode it asynchronously
++							if ((result = ismd_ffmpeg_decoder_port_write(&vid_dec,ismd_buf)) != ISMD_SUCCESS)
++							{
++								av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers11 [%d]\n", result);
++							}
++						}
++					}
++					else
++					{
++						av_log(NULL, AV_LOG_INFO,"error: unable to allocate buffer in decode_frame111 [%d]\n", result);
++					}
++					vid_dec.send_sps_pps = false;
++				}
++				//Mpeg1Context *s = avctx->priv_data;
++				buf_with_start_code = buf;//format is not avc1 so coming buffer is in Byte-stream format.no conversion required
++				if (enable_dtv_smd) {
++					syno_ismd_ffmpeg_decode_vid_buf(&vid_dec, buf_with_start_code, new_buf_size, pts);
++				} else {
++					ismd_ffmpeg_decode_vid_buf(&vid_dec, buf_with_start_code, new_buf_size);
++				}
++				break;
++			case ISMD_CODEC_TYPE_H264:
++				h = avctx->priv_data;
++				if(buf_size > 4)
++				{
++					if(h->is_avc)
++					{
++						buf_with_start_code = av_malloc(pkt->size);//allocate memory for new buffer
++						if(buf_with_start_code == NULL)
++						{
++							av_log(NULL,AV_LOG_ERROR,"\ncould not allocate memory for new buffer \n");
++							assert(0);
++						}
++						if((vid_dec.send_sps_pps) && avctx->extradata_size > 0 && avctx->extradata)
++						{
++							sps_pps_buf_size = ismd_ffmpeg_h264_viddec_extract_sps_pps(avctx->extradata,avctx->extradata_size, &sps_pps_buf);
++						}
++
++						new_buf_size = ismd_ffmpeg_unit_to_byte_stream(&buf_with_start_code, buf, pkt->size, h->nal_length_size);
++					}
++					else
++					{
++						buf_with_start_code = buf;//format is not avc1 so coming buffer is in Byte-stream format.no conversion required
++					}
++				}
++
++				/******************** write sps/pps buffer for avc1 at decoder i/p port ************************************************/
++				if((vid_dec.send_sps_pps) && h->is_avc)
++				{
++					if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++					{
++						av_log(NULL, AV_LOG_DEBUG,"\n********* sending sps pps buffer write size %d ********\n",sps_pps_buf_size);
++						if (enable_dtv_smd) {
++							result = syno_ismd_ffmpeg_fill_viddec_buffer(sps_pps_buf, ismd_buf, sps_pps_buf_size, pts);
++						} else {
++							result = ismd_ffmpeg_fill_viddec_buffer(sps_pps_buf, ismd_buf, sps_pps_buf_size);
++						}
++						if (result == ISMD_SUCCESS)
++						{
++							// decode it asynchronously
++							if ((result = ismd_ffmpeg_decoder_port_write(&vid_dec,ismd_buf)) != ISMD_SUCCESS)
++							{
++								av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers11 [%d]\n", result);
++							}
++						}
++					}
++					else
++					{
++						av_log(NULL, AV_LOG_INFO,"error: unable to allocate buffer in decode_frame111 [%d]\n", result);
++					}
++					vid_dec.send_sps_pps = false;
++				}
++				/******************** write nal data of slice data at decoder i/p port ************************************************/
++				if (enable_dtv_smd) {
++					syno_ismd_ffmpeg_decode_vid_buf(&vid_dec, buf_with_start_code, new_buf_size, pts);
++				} else {
++					ismd_ffmpeg_decode_vid_buf(&vid_dec, buf_with_start_code, new_buf_size);
++				}
++
++				if((h->is_avc)&& buf_with_start_code)
++				{
++					av_free(buf_with_start_code);
++					buf_with_start_code = NULL;
++				}
++				break;
++			case ISMD_CODEC_TYPE_VC1:
++				v = avctx->priv_data;
++				if (first_time && (buf_size >= 4)&& (!IS_MARKER(AV_RB32(buf)))) /*frame starts with marker and needs to be parsed */
++				{
++					vid_dec.vc1_without_start_code = true;//not compatible with smd
++					first_time = false;
++
++				}
++				if(vid_dec.vc1_without_start_code)
++				{
++					//write sps to decoder port first this comes out-of-band in wvc1
++					if((vid_dec.send_sps_pps) && avctx->extradata_size > 0 && avctx->extradata)
++					{
++						uint8_t* seq_header_buf = av_malloc(16);//TODO free buffer
++						switch (v->profile)
++						{
++							case PROFILE_ADVANCED:
++								if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++								{
++									if (enable_dtv_smd) {
++										result = syno_ismd_ffmpeg_fill_viddec_buffer(avctx->extradata+1, ismd_buf, avctx->extradata_size-1, pts);
++									} else {
++										result = ismd_ffmpeg_fill_viddec_buffer(avctx->extradata+1, ismd_buf, avctx->extradata_size-1);
++									}
++									if (result == ISMD_SUCCESS)
++									{
++										// decode it asynchronously
++										if ((result = ismd_ffmpeg_decoder_port_write(&vid_dec,ismd_buf)) != ISMD_SUCCESS)
++										{
++											av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers [%d]\n", result);
++										}
++									}
++								}
++								break;
++							case PROFILE_SIMPLE:
++							case PROFILE_MAIN:
++								size_SPMP_PESpacket_PayloadFormatHeader = ismd_ffmpeg_vc1_viddec_SPMP_PESpacket_PayloadFormatHeader (pSeqHeaderRbdu, SPMP_PESpacket_PayloadFormatHeader, avctx->extradata, avctx->extradata_size, avctx->width, avctx->height);
++
++								if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++								{
++									if (enable_dtv_smd) {
++										result = syno_ismd_ffmpeg_fill_viddec_buffer(SPMP_PESpacket_PayloadFormatHeader, ismd_buf, size_SPMP_PESpacket_PayloadFormatHeader, pts);
++									} else {
++										result = ismd_ffmpeg_fill_viddec_buffer(SPMP_PESpacket_PayloadFormatHeader, ismd_buf, size_SPMP_PESpacket_PayloadFormatHeader);
++									}
++									if (result == ISMD_SUCCESS)
++									{
++										// decode it asynchronously
++										if ((result = ismd_ffmpeg_decoder_port_write(&vid_dec,ismd_buf)) != ISMD_SUCCESS)
++										{
++											av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers [%d]\n", result);
++										}
++									}
++								}
++								break;
++						}
++						vid_dec.send_sps_pps = false;
++						av_free(seq_header_buf);
++					}
++
++					//need to insert start code
++					switch (v->profile)
++					{
++						case PROFILE_ADVANCED:
++							//insert start code
++							av_log(NULL, AV_LOG_DEBUG, "\n***start code not found*** profile %d PROFILE_ADVANCED %d\n",v->profile,PROFILE_ADVANCED);
++							buf_with_start_code = av_malloc(4 + buf_size);//TODO free memory
++
++							new_buf_size = ismd_ffmpeg_vc1_viddec_convert_AP(buf_with_start_code, buf, buf_size);
++
++							break;
++						case PROFILE_SIMPLE:
++						case PROFILE_MAIN:
++							// Calculate maximum buffer size, make room for encapsulation
++							// SMPTE-421M-FDSI doc, Annex-E
++							max_bufsize = ( (pkt->size + 3 ) / 3 ) * 4;
++							buf_with_start_code = av_malloc(max_bufsize);
++							av_log(NULL, AV_LOG_DEBUG, "\n* pkt size %d max_bufsize %d*\n",pkt->size,max_bufsize);
++
++							new_buf_size = ismd_ffmpeg_vc1_viddec_convert_SPMP(buf_with_start_code, pkt->data, pkt->size, max_bufsize);
++
++							break;
++					}
++
++				}
++				else
++					buf_with_start_code = buf;
++				/*********** write buffer data ************************/
++				if (enable_dtv_smd) {
++					syno_ismd_ffmpeg_decode_vid_buf(&vid_dec, buf_with_start_code, new_buf_size, pts);
++				} else {
++					ismd_ffmpeg_decode_vid_buf(&vid_dec, buf_with_start_code, new_buf_size);
++				}
++
++				if((vid_dec.vc1_without_start_code)&& buf_with_start_code)
++				{
++					av_free(buf_with_start_code);
++				}
++
++				break;
++			default:
++				av_log(NULL,AV_LOG_ERROR,"\n********smd can't handle this codec***********\n");
++				return -1;
++		}
++
++		if(vid_dec.eos_written)
++			*got_output = 0;
++		if (!*got_output || ret < 0) {
++			if (!pkt->size) {
++				for (i = 0; i < ist->nb_filters; i++)
++					av_buffersrc_add_ref(ist->filters[i]->filter, NULL, 0);
++			}
++		}
++
++		pkt->size = 0;
++
++		//rate_emu_sleep(ist);
++		for (i = 0; i < nb_output_streams; i++) {
++			OutputStream *ost = output_streams[i];
++
++			if (!check_output_constraints(ist, ost) || !ost->encoding_needed)
++				continue;
++			do_video_out(output_files[ost->file_index]->ctx, ost, decoded_frame, 0);
++		}
++	}
++#endif
++
+ fail:
+     av_frame_unref(ist->filter_frame);
+     av_frame_unref(decoded_frame);
+@@ -2605,7 +3224,12 @@ static int process_input_packet(InputStr
+     }
+ 
+     // while we have more to decode or while the decoder did output something on EOF
++#ifdef SYNO_EVANSPORT_SMD
++    //to resolve ctrl-C issue
++    while (ist->decoding_needed && (avpkt.size > 0 || (!pkt && (got_output >0)))) {
++#else
+     while (ist->decoding_needed) {
++#endif
+         int64_t duration_dts = 0;
+         int64_t duration_pts = 0;
+         int got_output = 0;
+@@ -3164,6 +3788,26 @@ static int init_output_stream_streamcopy
+     return 0;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static ismd_codec_type_t get_smd_codec_id(enum AVCodecID ffmpeg_codec_id)
++{
++	switch (ffmpeg_codec_id)
++	{
++		case AV_CODEC_ID_MPEG2VIDEO_SYNO:
++			return ISMD_CODEC_TYPE_MPEG2;
++		case AV_CODEC_ID_H264_SYNO:
++			return ISMD_CODEC_TYPE_H264;
++		case AV_CODEC_ID_VC1_SYNO:
++		case AV_CODEC_ID_WMV3_SYNO:
++			return ISMD_CODEC_TYPE_VC1;
++		case AV_CODEC_ID_MPEG4_SYNO:
++			return ISMD_CODEC_TYPE_MPEG4;
++		default:
++			return ISMD_CODEC_TYPE_INVALID;
++	}
++}
++#endif
++
+ static void set_encoder_id(OutputFile *of, OutputStream *ost)
+ {
+     AVDictionaryEntry *e;
+@@ -3662,6 +4306,14 @@ static void report_new_stream(int input_
+ 
+ static int transcode_init(void)
+ {
++#ifdef SYNO_EVANSPORT_SMD
++	/************** smd implementation ***********/
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++	char *hw_decoder_name;
++	ismd_codec_type_t smd_codec;
++	/************** end ***********/
++#endif
++
+     int ret = 0, i, j, k;
+     AVFormatContext *oc;
+     OutputStream *ost;
+@@ -4501,6 +5153,23 @@ static int process_input(int file_index)
+         }
+     }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++       if (first_read_pts && AVMEDIA_TYPE_VIDEO == ist->st->codec->codec_type &&
++                       (AV_CODEC_ID_H264_SYNO != ist->st->codec->codec_id || AV_PKT_FLAG_KEY & pkt.flags)) {
++               if (AV_NOPTS_VALUE != pkt.pts) {
++                       first_read_pts = false;
++                       ifile->first_pts = av_rescale_q(pkt.pts, ist->st->time_base, AV_TIME_BASE_Q);
++                       av_log(NULL, AV_LOG_DEBUG, "first_pts %s pts_time %s frome pts\n"
++                                       , av_ts2str(ifile->first_pts), av_ts2timestr(ifile->first_pts, &AV_TIME_BASE_Q));
++               } else if (AV_NOPTS_VALUE != pkt.dts){
++                       first_read_pts = false;
++                       ifile->first_pts = av_rescale_q(pkt.dts, ist->st->time_base, AV_TIME_BASE_Q)+1;
++                       av_log(NULL, AV_LOG_DEBUG, "first_pts %s pts_time %s frome dts\n"
++                                       , av_ts2str(ifile->first_pts), av_ts2timestr(ifile->first_pts, &AV_TIME_BASE_Q));
++               }
++       }
++#endif
++
+     if (pkt.dts != AV_NOPTS_VALUE)
+         ifile->last_ts = av_rescale_q(pkt.dts, ist->st->time_base, AV_TIME_BASE_Q);
+ 
+@@ -4520,6 +5189,90 @@ static int process_input(int file_index)
+ discard_packet:
+     av_packet_unref(&pkt);
+ 
++#ifdef SYNO_EVANSPORT_SMD
++	/******************************* create smd video pipeline here ********************/
++	for (i = 0; i < nb_output_streams; i++)
++	{
++		AVCodecContext *codec = NULL;
++		ost = output_streams[i];
++		codec = ost->st->codec;
++
++		if (codec->codec_id == AV_CODEC_ID_H264)
++			break;
++	}
++	//don't create pipeline in case of stream copy
++	if(!ost->stream_copy)
++	{
++		AVCodecContext *icodec = NULL;
++		AVCodecContext *codec = NULL;
++		codec = ost->enc_ctx;
++		av_log(NULL, AV_LOG_DEBUG,"\n**** encoder codec id  **** %d width %d height %d aspect num %d den %d\n", codec->codec_id,codec->width,codec->height,codec->sample_aspect_ratio.num,codec->sample_aspect_ratio.den);
++
++		for (i = 0; i < nb_input_streams; i++)
++		{
++			ist = input_streams[i];
++			icodec = ist->st->codec;
++		    av_log(NULL,AV_LOG_DEBUG,"\nicodec->codec_id %d\n",icodec->codec_id);
++			if(icodec->codec_type == AVMEDIA_TYPE_VIDEO)
++			{
++				//set up video decoder
++				if(((icodec->codec_id == AV_CODEC_ID_MPEG2VIDEO_SYNO) || (icodec->codec_id == AV_CODEC_ID_H264_SYNO) ||\
++							(icodec->codec_id == AV_CODEC_ID_VC1_SYNO) ||(icodec->codec_id == AV_CODEC_ID_WMV3_SYNO)||\
++					(icodec->codec_id == AV_CODEC_ID_MPEG4_SYNO)) && \
++                                        ((codec->codec_id == AV_CODEC_ID_H264) && (0 == strcmp(codec->codec->name, "h264_smd"))))
++				{
++				    av_log(NULL,AV_LOG_DEBUG,"\npipeline check successful\n");
++					bool smd_video_available = ismd_ffmpeg_is_video_enc_avail();
++					if(!smd_video_available)
++					{
++#if CONFIG_LIBX264_ENCODER
++						av_log( NULL, AV_LOG_INFO, "\nVideo hardware encoder not available for encoding.Falling back to software\n");
++						return 0;
++#else
++					    av_log( NULL, AV_LOG_ERROR, "\nVideo hardware encoder not available for encoding. and software fallback not possible\n");
++						return -1;
++#endif
++					}
++
++					smd_codec = get_smd_codec_id(icodec->codec_id);
++					hw_decoder_name = ismd_ffmpeg_enum_to_string(smd_codec);
++					av_log(NULL, AV_LOG_DEBUG,"\n**** About to open stream for decoding with codec type **** %d smd_codec %d \n", icodec->codec_id, smd_codec);
++					if ((result = ismd_viddec_open(smd_codec, &vid_dec.viddec_handle) != ISMD_SUCCESS))
++					{
++						av_log(NULL, AV_LOG_ERROR,"\n ismd_viddec_open : failed error %d\n",result);
++						return -1;
++					}
++				}
++			}
++		}
++		if(ISMD_SUCCESS == result)
++		{
++			if (ost->encoding_needed)
++			{
++				//close H.264 smd encoder because transcoding will be done through pipeline
++				ost->enc_ctx->codec->close(ost->enc_ctx);
++				ost->enc_ctx->coded_frame = av_frame_alloc();
++				if (!ost->enc_ctx->coded_frame)
++					return AVERROR(ENOMEM);
++			}
++			result = ismd_ffmpeg_create_video_pipeline(codec , &vid_dec , &vid_enc, enable_dtv_smd);
++			if (result != ISMD_SUCCESS)
++			{
++				av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not start video pipeline error: %d\n",result);
++				return -1;
++			}
++			if (!synoAddPID(getpid())) {
++				av_log(NULL, AV_LOG_ERROR, "Syno check hardware transcode falied\n");
++				return -1;
++			}
++			av_log(NULL, AV_LOG_DEBUG, "\nvideo pipeline created successfully\n");
++			av_log( NULL, AV_LOG_INFO, "****** Using SMD H/W %s Decoder and H/W H.264 Encoder(Pipelined Mode)*******\n",hw_decoder_name);
++			smd_video_pipeline = true;
++		}
++	}
++	/******************************* end ********************/
++#endif
++
+     return 0;
+ }
+ 
+diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h ./fftools/ffmpeg.h
+--- ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h	2019-08-05 16:52:21.000000000 -0400
++++ ./fftools/ffmpeg.h	2020-01-18 09:42:59.123197281 -0500
+@@ -46,6 +46,8 @@
+ 
+ #include "libswresample/swresample.h"
+ 
++#include "synoconfig.h"
++
+ #define VSYNC_AUTO       -1
+ #define VSYNC_PASSTHROUGH 0
+ #define VSYNC_CFR         1
+@@ -402,6 +404,9 @@ typedef struct InputFile {
+     int64_t input_ts_offset;
+ 
+     int64_t ts_offset;
++#ifdef SYNO_EVANSPORT_SMD
++	int64_t first_pts;    /* remember first video pts for handle resume problem on VideoStation */
++#endif
+     int64_t last_ts;
+     int64_t start_time;   /* user-specified start time in AV_TIME_BASE or AV_NOPTS_VALUE */
+     int seek_timestamp;
+@@ -621,7 +626,6 @@ extern char *qsv_device;
+ #endif
+ extern HWDevice *filter_hw_device;
+ 
+-
+ void term_init(void);
+ void term_exit(void);
+ 
+diff -uprN ../ffmpeg-4.2.1/libavcodec/aacdec.c ./libavcodec/aacdec.c
+--- ../ffmpeg-4.2.1/libavcodec/aacdec.c	2019-09-06 18:18:26.000000000 -0400
++++ ./libavcodec/aacdec.c	2020-01-04 21:09:06.627249440 -0500
+@@ -475,7 +475,6 @@ static int read_audio_mux_element(struct
+     return 0;
+ }
+ 
+-
+ static int latm_decode_frame(AVCodecContext *avctx, void *out,
+                              int *got_frame_ptr, AVPacket *avpkt)
+ {
+diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
+--- ../ffmpeg-4.2.1/libavcodec/allcodecs.c	2019-08-05 16:52:21.000000000 -0400
++++ ./libavcodec/allcodecs.c	2020-01-04 21:41:08.209443856 -0500
+@@ -137,6 +137,9 @@ extern AVCodec ff_h263p_encoder;
+ extern AVCodec ff_h263p_decoder;
+ extern AVCodec ff_h263_v4l2m2m_decoder;
+ extern AVCodec ff_h264_decoder;
++#ifdef SYNO_EVANSPORT_SMD
++extern AVCodec ff_h264_smd_decoder;
++#endif
+ extern AVCodec ff_h264_crystalhd_decoder;
+ extern AVCodec ff_h264_v4l2m2m_decoder;
+ extern AVCodec ff_h264_mediacodec_decoder;
+@@ -188,8 +191,14 @@ extern AVCodec ff_mpeg1video_encoder;
+ extern AVCodec ff_mpeg1video_decoder;
+ extern AVCodec ff_mpeg2video_encoder;
+ extern AVCodec ff_mpeg2video_decoder;
++#ifdef SYNO_EVANSPORT_SMD
++extern AVCodec ff_mpeg2video_smd_decoder;
++#endif
+ extern AVCodec ff_mpeg4_encoder;
+ extern AVCodec ff_mpeg4_decoder;
++#ifdef SYNO_EVANSPORT_SMD
++extern AVCodec ff_mpeg4_smd_decoder;
++#endif
+ extern AVCodec ff_mpeg4_crystalhd_decoder;
+ extern AVCodec ff_mpeg4_v4l2m2m_decoder;
+ extern AVCodec ff_mpeg4_mmal_decoder;
+@@ -320,6 +329,9 @@ extern AVCodec ff_v410_decoder;
+ extern AVCodec ff_vb_decoder;
+ extern AVCodec ff_vble_decoder;
+ extern AVCodec ff_vc1_decoder;
++#ifdef SYNO_EVANSPORT_SMD
++extern AVCodec ff_vc1_smd_decoder;
++#endif
+ extern AVCodec ff_vc1_crystalhd_decoder;
+ extern AVCodec ff_vc1image_decoder;
+ extern AVCodec ff_vc1_mmal_decoder;
+@@ -352,6 +364,9 @@ extern AVCodec ff_wmv1_decoder;
+ extern AVCodec ff_wmv2_encoder;
+ extern AVCodec ff_wmv2_decoder;
+ extern AVCodec ff_wmv3_decoder;
++#ifdef SYNO_EVANSPORT_SMD
++extern AVCodec ff_wmv3_smd_decoder;
++#endif
+ extern AVCodec ff_wmv3_crystalhd_decoder;
+ extern AVCodec ff_wmv3image_decoder;
+ extern AVCodec ff_wnv1_decoder;
+@@ -739,6 +754,9 @@ extern AVCodec ff_idf_decoder;
+ extern AVCodec ff_h263_v4l2m2m_encoder;
+ extern AVCodec ff_libopenh264_encoder;
+ extern AVCodec ff_libopenh264_decoder;
++#ifdef SYNO_EVANSPORT_SMD
++extern AVCodec ff_h264_smd_decoder;
++#endif
+ extern AVCodec ff_h264_amf_encoder;
+ extern AVCodec ff_h264_cuvid_decoder;
+ extern AVCodec ff_h264_nvenc_encoder;
+diff -uprN ../ffmpeg-4.2.1/libavcodec/avcodec.h ./libavcodec/avcodec.h
+--- ../ffmpeg-4.2.1/libavcodec/avcodec.h	2019-08-05 16:52:21.000000000 -0400
++++ ./libavcodec/avcodec.h	2020-01-05 08:11:20.313092171 -0500
+@@ -43,6 +43,8 @@
+ 
+ #include "version.h"
+ 
++#include "synoconfig.h"
++
+ /**
+  * @defgroup libavc libavcodec
+  * Encoding/Decoding Library
+@@ -196,7 +198,6 @@
+  * @{
+  */
+ 
+-
+ /**
+  * Identify the syntax and semantics of the bitstream.
+  * The principle is roughly:
+@@ -404,6 +405,13 @@ enum AVCodecID {
+     AV_CODEC_ID_HQX,
+     AV_CODEC_ID_TDSC,
+     AV_CODEC_ID_HQ_HQA,
++#ifdef SYNO_EVANSPORT_SMD
++    AV_CODEC_ID_H264_SYNO,
++    AV_CODEC_ID_MPEG2VIDEO_SYNO,
++    AV_CODEC_ID_VC1_SYNO,
++    AV_CODEC_ID_WMV3_SYNO,
++    AV_CODEC_ID_MPEG4_SYNO,
++#endif
+     AV_CODEC_ID_HAP,
+     AV_CODEC_ID_DDS,
+     AV_CODEC_ID_DXV,
+@@ -697,7 +705,6 @@ enum AVCodecID {
+     AV_CODEC_ID_TIMED_ID3,
+     AV_CODEC_ID_BIN_DATA,
+ 
+-
+     AV_CODEC_ID_PROBE = 0x19000, ///< codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it
+ 
+     AV_CODEC_ID_MPEG2TS = 0x20000, /**< _FAKE_ codec to indicate a raw MPEG-2 TS
+@@ -4549,7 +4556,6 @@ uint8_t *av_packet_pack_dictionary(AVDic
+  */
+ int av_packet_unpack_dictionary(const uint8_t *data, int size, AVDictionary **dict);
+ 
+-
+ /**
+  * Convenience function to free all the side data stored.
+  * All the other fields stay untouched.
+@@ -6221,6 +6227,10 @@ const AVCodecDescriptor *avcodec_descrip
+  */
+ AVCPBProperties *av_cpb_properties_alloc(size_t *size);
+ 
++#ifdef SYNO_EVANSPORT_SMD
++int syno_alloc_packet(AVPacket *avpkt, int size);
++#endif
++
+ /**
+  * @}
+  */
+diff -uprN ../ffmpeg-4.2.1/libavcodec/codec_desc.c ./libavcodec/codec_desc.c
+--- ../ffmpeg-4.2.1/libavcodec/codec_desc.c	2019-08-05 16:52:21.000000000 -0400
++++ ./libavcodec/codec_desc.c	2020-01-04 21:09:06.647249738 -0500
+@@ -27,6 +27,8 @@
+ #include "profiles.h"
+ #include "version.h"
+ 
++#include "synoconfig.h"
++
+ #define MT(...) (const char *const[]){ __VA_ARGS__, NULL }
+ 
+ static const AVCodecDescriptor codec_descriptors[] = {
+@@ -1726,6 +1728,43 @@ static const AVCodecDescriptor codec_des
+         .long_name = NULL_IF_CONFIG_SMALL("On2 VP4"),
+         .props     = AV_CODEC_PROP_LOSSY,
+     },
++#ifdef SYNO_EVANSPORT_SMD
++    {
++        .id        = AV_CODEC_ID_WMV3_SYNO,
++        .type      = AVMEDIA_TYPE_VIDEO,
++        .name      = "wmv3_smd",
++        .long_name = NULL_IF_CONFIG_SMALL("Windows Media Video 9 Hardware(SMD) Decoder"),
++        .props     = AV_CODEC_PROP_LOSSY,
++    },
++    {
++        .id        = AV_CODEC_ID_VC1_SYNO,
++        .type      = AVMEDIA_TYPE_VIDEO,
++        .name      = "vc1_smd",
++        .long_name = NULL_IF_CONFIG_SMALL("SMPTE VC-1 Hardware(SMD) Decoder"),
++        .props     = AV_CODEC_PROP_LOSSY,
++    },
++    {
++        .id        = AV_CODEC_ID_MPEG2VIDEO_SYNO,
++        .type      = AVMEDIA_TYPE_VIDEO,
++        .name      = "mpeg2video_smd",
++        .long_name = NULL_IF_CONFIG_SMALL("MPEG-2 video Hardware(SMD) Decoder"),
++        .props     = AV_CODEC_PROP_LOSSY,
++    },
++    {
++        .id        = AV_CODEC_ID_MPEG4_SYNO,
++        .type      = AVMEDIA_TYPE_VIDEO,
++        .name      = "mpeg4_smd",
++        .long_name = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Hardware(SMD) Decoder"),
++        .props     = AV_CODEC_PROP_LOSSY,
++    },
++    {
++        .id        = AV_CODEC_ID_H264_SYNO,
++        .type      = AVMEDIA_TYPE_VIDEO,
++        .name      = "h264_smd",
++        .long_name = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 Hardware(SMD) Decoder"),
++        .props     = AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_LOSSLESS,
++    },
++#endif
+ 
+     /* various PCM "codecs" */
+     {
+diff -uprN ../ffmpeg-4.2.1/libavcodec/encode.c ./libavcodec/encode.c
+--- ../ffmpeg-4.2.1/libavcodec/encode.c	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/encode.c	2020-01-04 21:54:37.528134367 -0500
+@@ -29,6 +29,8 @@
+ #include "frame_thread_encoder.h"
+ #include "internal.h"
+ 
++#include "synoconfig.h"
++
+ int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size, int64_t min_size)
+ {
+     if (avpkt->size < 0) {
+@@ -75,6 +77,13 @@ int ff_alloc_packet(AVPacket *avpkt, int
+     return ff_alloc_packet2(NULL, avpkt, size, 0);
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++int syno_alloc_packet(AVPacket *avpkt, int size)
++{
++    return ff_alloc_packet2(NULL, avpkt, size, 0);
++}
++#endif
++
+ /**
+  * Pad last frame with silence.
+  */
+diff -uprN ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c ./libavcodec/h263dec.c
+--- ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c	2019-08-05 16:52:21.000000000 -0400
++++ ./libavcodec/h263dec.c	2020-01-17 11:01:56.496391874 -0500
+@@ -45,6 +45,16 @@
+ #include "thread.h"
+ #include "wmv2.h"
+ 
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
++#include "libavformat/avformat.h"
++static viddec_struct_t  smd_mpeg4_vid_dec;
++bool smd_mpeg4_vid_dec_available = false;
++#endif
++
+ static enum AVPixelFormat h263_get_format(AVCodecContext *avctx)
+ {
+     /* MPEG-4 Studio Profile only, not supported by hardware */
+@@ -90,6 +100,10 @@ av_cold int ff_h263_decode_init(AVCodecC
+         break;
+     case AV_CODEC_ID_MPEG4:
+         break;
++#ifdef SYNO_EVANSPORT_SMD
++    case AV_CODEC_ID_MPEG4_SYNO:
++        break;
++#endif
+     case AV_CODEC_ID_MSMPEG4V1:
+         s->h263_pred       = 1;
+         s->msmpeg4_version = 1;
+@@ -112,6 +126,10 @@ av_cold int ff_h263_decode_init(AVCodecC
+         break;
+     case AV_CODEC_ID_VC1:
+     case AV_CODEC_ID_WMV3:
++#ifdef SYNO_EVANSPORT_SMD
++    case AV_CODEC_ID_VC1_SYNO:
++    case AV_CODEC_ID_WMV3_SYNO:
++#endif
+     case AV_CODEC_ID_VC1IMAGE:
+     case AV_CODEC_ID_WMV3IMAGE:
+     case AV_CODEC_ID_MSS2:
+@@ -136,9 +154,15 @@ av_cold int ff_h263_decode_init(AVCodecC
+             s->ehc_mode = 1;
+ 
+     /* for H.263, we allocate the images after having read the header */
++#ifdef SYNO_EVANSPORT_SMD
++    if (avctx->codec->id != AV_CODEC_ID_H263 &&
++        avctx->codec->id != AV_CODEC_ID_H263P &&
++        (avctx->codec->id != AV_CODEC_ID_MPEG4 && avctx->codec->id != AV_CODEC_ID_MPEG4_SYNO)) {
++#else
+     if (avctx->codec->id != AV_CODEC_ID_H263 &&
+         avctx->codec->id != AV_CODEC_ID_H263P &&
+         avctx->codec->id != AV_CODEC_ID_MPEG4) {
++#endif
+         avctx->pix_fmt = h263_get_format(avctx);
+         ff_mpv_idct_init(s);
+         if ((ret = ff_mpv_common_init(s)) < 0)
+@@ -152,11 +176,60 @@ av_cold int ff_h263_decode_init(AVCodecC
+     return 0;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++av_cold int ff_h263_decode_init_smd(AVCodecContext *avctx)
++{
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++	if((avctx->codec_id == AV_CODEC_ID_MSMPEG4V1) || (avctx->codec_id == AV_CODEC_ID_MSMPEG4V2) || (avctx->codec_id == AV_CODEC_ID_MSMPEG4V3))
++	{
++		av_log(NULL,AV_LOG_INFO,"\nThis video format is not supported by smd.Falling back to software\n");
++		return 0;
++	}
++
++	smd_mpeg4_vid_dec.codec = ISMD_CODEC_TYPE_MPEG4;
++	// 1. Setup a single stream
++	ret_val = ismd_ffmpeg_setup_viddec_stream(&smd_mpeg4_vid_dec);
++	if(ISMD_SUCCESS == ret_val)
++	{
++		// 2. Start the stream
++		ret_val = ismd_ffmpeg_start_viddec_stream(&smd_mpeg4_vid_dec);
++	}
++	if(ret_val != ISMD_SUCCESS)
++	{
++		av_log(avctx,AV_LOG_INFO,"\nMPEG2 Hardware video decoder not available.Falling Back to software.\n");
++		av_log(avctx,AV_LOG_INFO,"\nMPEG2 can't fall back to software.\n");
++		return -1;
++	}
++	else
++	{
++		av_log(avctx,AV_LOG_INFO,"\n******************Using MPEG4 Hardware video decoder**************\n");
++		smd_mpeg4_vid_dec_available = true;
++		smd_mpeg4_vid_dec.y_mem = NULL;
++		smd_mpeg4_vid_dec.u_mem = NULL;
++		smd_mpeg4_vid_dec.v_mem = NULL;
++		smd_mpeg4_vid_dec.send_sps_pps = true;
++	}
++	return 0;
++}
++#endif
++
+ av_cold int ff_h263_decode_end(AVCodecContext *avctx)
+ {
++#ifdef SYNO_EVANSPORT_SMD
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++#endif
+     MpegEncContext *s = avctx->priv_data;
+ 
+     ff_mpv_common_end(s);
++#ifdef SYNO_EVANSPORT_SMD
++	if(smd_mpeg4_vid_dec_available)
++	{
++		ret_val = ismd_ffmpeg_free_vid_dec_res(&smd_mpeg4_vid_dec);
++		if(ret_val != ISMD_SUCCESS)
++			av_log(avctx,AV_LOG_ERROR,"could not free video decoder resources\n");
++	}
++	smd_mpeg4_vid_dec_available = false;
++#endif
+     return 0;
+ }
+ 
+@@ -726,6 +799,80 @@ frame_end:
+         return get_consumed_bytes(s, buf_size);
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++int ff_h263_decode_frame_smd(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
++{
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++	ismd_buffer_handle_t ismd_buf = -1;
++	const uint8_t *buf = avpkt->data;
++	int buf_size = avpkt->size;
++	AVFrame *pict = data;
++
++	int got_frame = 0;
++	smd_video_frame decoded_frame;
++	struct timespec ts;
++
++	if(smd_mpeg4_vid_dec_available)
++	{
++		//send headers before first packet
++		if((smd_mpeg4_vid_dec.send_sps_pps) && (avctx->extradata_size > 0))
++		{
++			if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++			{
++				if ((result = ismd_ffmpeg_fill_viddec_buffer(avctx->extradata, ismd_buf,avctx->extradata_size)) == ISMD_SUCCESS)
++				{
++					// decode it asynchronously
++					if ((result = ismd_ffmpeg_decoder_port_write(&smd_mpeg4_vid_dec,ismd_buf)) != ISMD_SUCCESS)
++					{
++						av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers11 [%d]\n", result);
++					}
++				}
++			}
++			else
++			{
++				av_log(NULL, AV_LOG_INFO,"error: unable to allocate buffer in decode_frame111 [%d]\n", result);
++			}
++			smd_mpeg4_vid_dec.send_sps_pps = false;
++		}
++
++		ret_val = ismd_ffmpeg_decode_vid_buf(&smd_mpeg4_vid_dec, buf, buf_size);
++		if(ret_val != ISMD_SUCCESS)
++		{
++			av_log(avctx,AV_LOG_ERROR,"\nismd_ffmpeg_decode_buf failed error:%d buf_size %d\n",ret_val,buf_size);
++			return -1;
++		}
++		ts.tv_sec = 0;
++		ts.tv_nsec = 10;
++		nanosleep (&ts, NULL);
++
++		ismd_ffmpeg_get_decoded_data(&decoded_frame, &smd_mpeg4_vid_dec, &got_frame);
++		if(got_frame)
++		{
++			*data_size = sizeof(AVFrame);
++			avctx->width = decoded_frame.width;
++			avctx->height = decoded_frame.height;
++			avctx->pix_fmt = AV_PIX_FMT_YUV420P;
++
++			pict->pkt_pts = AV_NOPTS_VALUE;
++			pict->pts = AV_NOPTS_VALUE ;
++			pict->data[0] = (uint8_t*)decoded_frame.y_mem;
++			pict->data[1] = (uint8_t*)decoded_frame.u_mem;
++			pict->data[2] = (uint8_t*)decoded_frame.v_mem;
++			pict->linesize[0] = decoded_frame.linesize_y;
++			pict->linesize[1] = decoded_frame.linesize_u;
++			pict->linesize[2] = decoded_frame.linesize_v;
++
++		}
++		return buf_size;
++	}
++	else
++	{
++		return ff_h263_decode_frame(avctx, data, data_size, avpkt);
++	}
++}
++#endif
++
+ const enum AVPixelFormat ff_h263_hwaccel_pixfmt_list_420[] = {
+ #if CONFIG_H263_VAAPI_HWACCEL || CONFIG_MPEG4_VAAPI_HWACCEL
+     AV_PIX_FMT_VAAPI,
+diff -uprN ../ffmpeg-4.2.1/libavcodec/h263.h ./libavcodec/h263.h
+--- ../ffmpeg-4.2.1/libavcodec/h263.h	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/h263.h	2020-01-04 21:43:01.346940098 -0500
+@@ -27,6 +27,8 @@
+ #include "h263data.h"
+ #include "rl.h"
+ 
++#include "synoconfig.h"
++
+ #define FF_ASPECT_EXTENDED 15
+ #define INT_BIT (CHAR_BIT * sizeof(int))
+ 
+@@ -47,13 +49,20 @@ extern VLC ff_h263_cbpy_vlc;
+ 
+ extern const enum AVPixelFormat ff_h263_hwaccel_pixfmt_list_420[];
+ 
+-
+ int ff_h263_decode_motion(MpegEncContext * s, int pred, int f_code);
+ av_const int ff_h263_aspect_to_info(AVRational aspect);
+ int ff_h263_decode_init(AVCodecContext *avctx);
++#ifdef SYNO_EVANSPORT_SMD
++int ff_h263_decode_init_smd(AVCodecContext *avctx);
++#endif
+ int ff_h263_decode_frame(AVCodecContext *avctx,
+                              void *data, int *got_frame,
+                              AVPacket *avpkt);
++#ifdef SYNO_EVANSPORT_SMD
++int ff_h263_decode_frame_smd(AVCodecContext *avctx,
++                             void *data, int *data_size,
++                             AVPacket *avpkt);
++#endif
+ int ff_h263_decode_end(AVCodecContext *avctx);
+ void ff_h263_encode_mb(MpegEncContext *s,
+                        int16_t block[6][64],
+@@ -74,7 +83,6 @@ void ff_init_qscale_tab(MpegEncContext *
+ int ff_h263_pred_dc(MpegEncContext * s, int n, int16_t **dc_val_ptr);
+ void ff_h263_pred_acdc(MpegEncContext * s, int16_t *block, int n);
+ 
+-
+ /**
+  * Print picture info if FF_DEBUG_PICT_INFO is set.
+  */
+@@ -95,7 +103,6 @@ void ff_clean_h263_qscales(MpegEncContex
+ int ff_h263_resync(MpegEncContext *s);
+ void ff_h263_encode_motion(PutBitContext *pb, int val, int f_code);
+ 
+-
+ static inline int h263_get_motion_length(int val, int f_code){
+     int l, bit_size, code;
+ 
+diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_parser.c ./libavcodec/h264_parser.c
+--- ../ffmpeg-4.2.1/libavcodec/h264_parser.c	2020-01-04 21:07:34.000000000 -0500
++++ ./libavcodec/h264_parser.c	2020-01-04 21:09:07.155257308 -0500
+@@ -713,7 +713,11 @@ static av_cold int init(AVCodecParserCon
+ }
+ 
+ AVCodecParser ff_h264_parser = {
++#ifdef SYNO_EVANSPORT_SMD
++    .codec_ids      = { AV_CODEC_ID_H264, AV_CODEC_ID_H264_SYNO },
++#else
+     .codec_ids      = { AV_CODEC_ID_H264 },
++#endif
+     .priv_data_size = sizeof(H264ParseContext),
+     .parser_init    = init,
+     .parser_parse   = h264_parse,
+diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_smd.h ./libavcodec/h264_smd.h
+--- ../ffmpeg-4.2.1/libavcodec/h264_smd.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/h264_smd.h	2020-01-04 21:09:07.159257367 -0500
+@@ -0,0 +1,804 @@
++/*
++ * H.26L/H.264/AVC/JVT/14496-10/... encoder/decoder
++ * Copyright (c) 2003 Michael Niedermayer <michaelni@gmx.at>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * H.264 / AVC / MPEG4 part10 codec.
++ * @author Michael Niedermayer <michaelni@gmx.at>
++ */
++
++#ifndef AVCODEC_H264_H
++#define AVCODEC_H264_H
++
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++
++#include "libavutil/intreadwrite.h"
++#include "cabac.h"
++#include "error_resilience.h"
++#include "get_bits.h"
++#include "h264chroma.h"
++#include "h264dsp.h"
++#include "h264pred.h"
++#include "h264qpel.h"
++#include "internal.h"
++#include "mpegutils.h"
++#include "parser.h"
++#include "qpeldsp.h"
++#include "rectangle.h"
++#include "videodsp.h"
++
++#define H264_MAX_PICTURE_COUNT 36
++#define H264_MAX_THREADS       32
++
++#define MAX_SPS_COUNT          32
++#define MAX_PPS_COUNT         256
++
++#define MAX_MMCO_COUNT         66
++
++#define MAX_DELAYED_PIC_COUNT  16
++
++#define MAX_MBPAIR_SIZE (256*1024) // a tighter bound could be calculated if someone cares about a few bytes
++
++/* Compiling in interlaced support reduces the speed
++ * of progressive decoding by about 2%. */
++#define ALLOW_INTERLACE
++
++#define FMO 0
++
++/**
++ * The maximum number of slices supported by the decoder.
++ * must be a power of 2
++ */
++#define MAX_SLICES 32
++
++#ifdef ALLOW_INTERLACE
++#define MB_MBAFF(h)    (h)->mb_mbaff
++#define MB_FIELD(sl)  (sl)->mb_field_decoding_flag
++#define FRAME_MBAFF(h) (h)->mb_aff_frame
++#define FIELD_PICTURE(h) ((h)->picture_structure != PICT_FRAME)
++#define LEFT_MBS 2
++#define LTOP     0
++#define LBOT     1
++#define LEFT(i)  (i)
++#else
++#define MB_MBAFF(h)      0
++#define MB_FIELD(sl)     0
++#define FRAME_MBAFF(h)   0
++#define FIELD_PICTURE(h) 0
++#undef  IS_INTERLACED
++#define IS_INTERLACED(mb_type) 0
++#define LEFT_MBS 1
++#define LTOP     0
++#define LBOT     0
++#define LEFT(i)  0
++#endif
++#define FIELD_OR_MBAFF_PICTURE(h) (FRAME_MBAFF(h) || FIELD_PICTURE(h))
++
++#ifndef CABAC
++#define CABAC(h) (h)->pps.cabac
++#endif
++
++#define CHROMA(h)    ((h)->sps.chroma_format_idc)
++#define CHROMA422(h) ((h)->sps.chroma_format_idc == 2)
++#define CHROMA444(h) ((h)->sps.chroma_format_idc == 3)
++
++#define EXTENDED_SAR       255
++
++#define MB_TYPE_REF0       MB_TYPE_ACPRED // dirty but it fits in 16 bit
++#define MB_TYPE_8x8DCT     0x01000000
++#define IS_REF0(a)         ((a) & MB_TYPE_REF0)
++#define IS_8x8DCT(a)       ((a) & MB_TYPE_8x8DCT)
++
++#define QP_MAX_NUM (51 + 6*6)           // The maximum supported qp
++
++/* NAL unit types */
++enum {
++    NAL_SLICE_SMD           = 1,
++    NAL_DPA_SMD             = 2,
++    NAL_DPB_SMD             = 3,
++    NAL_DPC_SMD             = 4,
++    NAL_IDR_SLICE_SMD       = 5,
++    NAL_SEI_SMD             = 6,
++    NAL_SPS_SMD             = 7,
++    NAL_PPS_SMD             = 8,
++    NAL_AUD_SMD             = 9,
++    NAL_END_SEQUENCE_SMD    = 10,
++    NAL_END_STREAM_SMD      = 11,
++    NAL_FILLER_DATA_SMD     = 12,
++    NAL_SPS_EXT_SMD         = 13,
++    NAL_AUXILIARY_SLICE_SMD = 19,
++    NAL_FF_IGNORE_SMD       = 0xff0f001,
++};
++
++/**
++ * SEI message types
++ */
++typedef enum {
++    SEI_TYPE_BUFFERING_PERIOD       = 0,   ///< buffering period (H.264, D.1.1)
++    SEI_TYPE_PIC_TIMING             = 1,   ///< picture timing
++    SEI_TYPE_USER_DATA_ITU_T_T35    = 4,   ///< user data registered by ITU-T Recommendation T.35
++    SEI_TYPE_USER_DATA_UNREGISTERED = 5,   ///< unregistered user data
++    SEI_TYPE_RECOVERY_POINT         = 6,   ///< recovery point (frame # to decoder sync)
++    SEI_TYPE_FRAME_PACKING          = 45,  ///< frame packing arrangement
++    SEI_TYPE_DISPLAY_ORIENTATION    = 47,  ///< display orientation
++} SEI_Type;
++
++/**
++ * pic_struct in picture timing SEI message
++ */
++typedef enum {
++    SEI_PIC_STRUCT_FRAME             = 0, ///<  0: %frame
++    SEI_PIC_STRUCT_TOP_FIELD         = 1, ///<  1: top field
++    SEI_PIC_STRUCT_BOTTOM_FIELD      = 2, ///<  2: bottom field
++    SEI_PIC_STRUCT_TOP_BOTTOM        = 3, ///<  3: top field, bottom field, in that order
++    SEI_PIC_STRUCT_BOTTOM_TOP        = 4, ///<  4: bottom field, top field, in that order
++    SEI_PIC_STRUCT_TOP_BOTTOM_TOP    = 5, ///<  5: top field, bottom field, top field repeated, in that order
++    SEI_PIC_STRUCT_BOTTOM_TOP_BOTTOM = 6, ///<  6: bottom field, top field, bottom field repeated, in that order
++    SEI_PIC_STRUCT_FRAME_DOUBLING    = 7, ///<  7: %frame doubling
++    SEI_PIC_STRUCT_FRAME_TRIPLING    = 8  ///<  8: %frame tripling
++} SEI_PicStructType;
++
++/**
++ * frame_packing_arrangement types
++ */
++typedef enum {
++    SEI_FPA_TYPE_CHECKERBOARD        = 0,
++    SEI_FPA_TYPE_INTERLEAVE_COLUMN   = 1,
++    SEI_FPA_TYPE_INTERLEAVE_ROW      = 2,
++    SEI_FPA_TYPE_SIDE_BY_SIDE        = 3,
++    SEI_FPA_TYPE_TOP_BOTTOM          = 4,
++    SEI_FPA_TYPE_INTERLEAVE_TEMPORAL = 5,
++    SEI_FPA_TYPE_2D                  = 6,
++} SEI_FpaType;
++
++/**
++ * Sequence parameter set
++ */
++typedef struct SPS {
++    unsigned int sps_id;
++    int profile_idc;
++    int level_idc;
++    int chroma_format_idc;
++    int transform_bypass;              ///< qpprime_y_zero_transform_bypass_flag
++    int log2_max_frame_num;            ///< log2_max_frame_num_minus4 + 4
++    int poc_type;                      ///< pic_order_cnt_type
++    int log2_max_poc_lsb;              ///< log2_max_pic_order_cnt_lsb_minus4
++    int delta_pic_order_always_zero_flag;
++    int offset_for_non_ref_pic;
++    int offset_for_top_to_bottom_field;
++    int poc_cycle_length;              ///< num_ref_frames_in_pic_order_cnt_cycle
++    int ref_frame_count;               ///< num_ref_frames
++    int gaps_in_frame_num_allowed_flag;
++    int mb_width;                      ///< pic_width_in_mbs_minus1 + 1
++    int mb_height;                     ///< pic_height_in_map_units_minus1 + 1
++    int frame_mbs_only_flag;
++    int mb_aff;                        ///< mb_adaptive_frame_field_flag
++    int direct_8x8_inference_flag;
++    int crop;                          ///< frame_cropping_flag
++
++    /* those 4 are already in luma samples */
++    unsigned int crop_left;            ///< frame_cropping_rect_left_offset
++    unsigned int crop_right;           ///< frame_cropping_rect_right_offset
++    unsigned int crop_top;             ///< frame_cropping_rect_top_offset
++    unsigned int crop_bottom;          ///< frame_cropping_rect_bottom_offset
++    int vui_parameters_present_flag;
++    AVRational sar;
++    int video_signal_type_present_flag;
++    int full_range;
++    int colour_description_present_flag;
++    enum AVColorPrimaries color_primaries;
++    enum AVColorTransferCharacteristic color_trc;
++    enum AVColorSpace colorspace;
++    int timing_info_present_flag;
++    uint32_t num_units_in_tick;
++    uint32_t time_scale;
++    int fixed_frame_rate_flag;
++    short offset_for_ref_frame[256]; // FIXME dyn aloc?
++    int bitstream_restriction_flag;
++    int num_reorder_frames;
++    int scaling_matrix_present;
++    uint8_t scaling_matrix4[6][16];
++    uint8_t scaling_matrix8[6][64];
++    int nal_hrd_parameters_present_flag;
++    int vcl_hrd_parameters_present_flag;
++    int pic_struct_present_flag;
++    int time_offset_length;
++    int cpb_cnt;                          ///< See H.264 E.1.2
++    int initial_cpb_removal_delay_length; ///< initial_cpb_removal_delay_length_minus1 + 1
++    int cpb_removal_delay_length;         ///< cpb_removal_delay_length_minus1 + 1
++    int dpb_output_delay_length;          ///< dpb_output_delay_length_minus1 + 1
++    int bit_depth_luma;                   ///< bit_depth_luma_minus8 + 8
++    int bit_depth_chroma;                 ///< bit_depth_chroma_minus8 + 8
++    int residual_color_transform_flag;    ///< residual_colour_transform_flag
++    int constraint_set_flags;             ///< constraint_set[0-3]_flag
++    int new;                              ///< flag to keep track if the decoder context needs re-init due to changed SPS
++} SPS;
++
++/**
++ * Picture parameter set
++ */
++typedef struct PPS {
++    unsigned int sps_id;
++    int cabac;                  ///< entropy_coding_mode_flag
++    int pic_order_present;      ///< pic_order_present_flag
++    int slice_group_count;      ///< num_slice_groups_minus1 + 1
++    int mb_slice_group_map_type;
++    unsigned int ref_count[2];  ///< num_ref_idx_l0/1_active_minus1 + 1
++    int weighted_pred;          ///< weighted_pred_flag
++    int weighted_bipred_idc;
++    int init_qp;                ///< pic_init_qp_minus26 + 26
++    int init_qs;                ///< pic_init_qs_minus26 + 26
++    int chroma_qp_index_offset[2];
++    int deblocking_filter_parameters_present; ///< deblocking_filter_parameters_present_flag
++    int constrained_intra_pred;     ///< constrained_intra_pred_flag
++    int redundant_pic_cnt_present;  ///< redundant_pic_cnt_present_flag
++    int transform_8x8_mode;         ///< transform_8x8_mode_flag
++    uint8_t scaling_matrix4[6][16];
++    uint8_t scaling_matrix8[6][64];
++    uint8_t chroma_qp_table[2][QP_MAX_NUM+1];  ///< pre-scaled (with chroma_qp_index_offset) version of qp_table
++    int chroma_qp_diff;
++} PPS;
++
++/**
++ * Frame Packing Arrangement Type
++ */
++typedef struct FPA {
++    int         frame_packing_arrangement_id;
++    int         frame_packing_arrangement_cancel_flag; ///< is previous arrangement canceled, -1 if never received
++    SEI_FpaType frame_packing_arrangement_type;
++    int         frame_packing_arrangement_repetition_period;
++    int         content_interpretation_type;
++    int         quincunx_sampling_flag;
++} FPA;
++
++/**
++ * Memory management control operation opcode.
++ */
++typedef enum MMCOOpcode {
++    MMCO_END = 0,
++    MMCO_SHORT2UNUSED,
++    MMCO_LONG2UNUSED,
++    MMCO_SHORT2LONG,
++    MMCO_SET_MAX_LONG,
++    MMCO_RESET,
++    MMCO_LONG,
++} MMCOOpcode;
++
++/**
++ * Memory management control operation.
++ */
++typedef struct MMCO {
++    MMCOOpcode opcode;
++    int short_pic_num;  ///< pic_num without wrapping (pic_num & max_pic_num)
++    int long_arg;       ///< index, pic_num, or num long refs depending on opcode
++} MMCO;
++
++typedef struct H264Picture {
++    AVFrame *f;
++    ThreadFrame tf;
++
++    AVBufferRef *qscale_table_buf;
++    int8_t *qscale_table;
++
++    AVBufferRef *motion_val_buf[2];
++    int16_t (*motion_val[2])[2];
++
++    AVBufferRef *mb_type_buf;
++    uint32_t *mb_type;
++
++    AVBufferRef *hwaccel_priv_buf;
++    void *hwaccel_picture_private; ///< hardware accelerator private data
++
++    AVBufferRef *ref_index_buf[2];
++    int8_t *ref_index[2];
++
++    int field_poc[2];       ///< top/bottom POC
++    int poc;                ///< frame POC
++    int frame_num;          ///< frame_num (raw frame_num from slice header)
++    int mmco_reset;         /**< MMCO_RESET set this 1. Reordering code must
++                                 not mix pictures before and after MMCO_RESET. */
++    int pic_id;             /**< pic_num (short -> no wrap version of pic_num,
++                                 pic_num & max_pic_num; long -> long_pic_num) */
++    int long_ref;           ///< 1->long term reference 0->short term reference
++    int ref_poc[2][2][32];  ///< POCs of the frames/fields used as reference (FIXME need per slice)
++    int ref_count[2][2];    ///< number of entries in ref_poc         (FIXME need per slice)
++    int mbaff;              ///< 1 -> MBAFF frame 0-> not MBAFF
++    int field_picture;      ///< whether or not picture was encoded in separate fields
++
++    int reference;
++    int recovered;          ///< picture at IDR or recovery point + recovery count
++    int invalid_gap;
++    int sei_recovery_frame_cnt;
++
++    int crop;
++    int crop_left;
++    int crop_top;
++} H264Picture;
++
++typedef struct H264Ref {
++    uint8_t *data[3];
++    int linesize[3];
++
++    int reference;
++    int poc;
++    int pic_id;
++
++    H264Picture *parent;
++} H264Ref;
++
++typedef struct H264SliceContext {
++    struct H264Context *h264;
++    GetBitContext gb;
++    ERContext er;
++
++    int slice_num;
++    int slice_type;
++    int slice_type_nos;         ///< S free slice type (SI/SP are remapped to I/P)
++    int slice_type_fixed;
++
++    int qscale;
++    int chroma_qp[2];   // QPc
++    int qp_thresh;      ///< QP threshold to skip loopfilter
++    int last_qscale_diff;
++
++    // deblock
++    int deblocking_filter;          ///< disable_deblocking_filter_idc with 1 <-> 0
++    int slice_alpha_c0_offset;
++    int slice_beta_offset;
++
++    // Weighted pred stuff
++    int use_weight;
++    int use_weight_chroma;
++    int luma_log2_weight_denom;
++    int chroma_log2_weight_denom;
++    int luma_weight_flag[2];    ///< 7.4.3.2 luma_weight_lX_flag
++    int chroma_weight_flag[2];  ///< 7.4.3.2 chroma_weight_lX_flag
++    // The following 2 can be changed to int8_t but that causes 10cpu cycles speedloss
++    int luma_weight[48][2][2];
++    int chroma_weight[48][2][2][2];
++    int implicit_weight[48][48][2];
++
++    int prev_mb_skipped;
++    int next_mb_skipped;
++
++    int chroma_pred_mode;
++    int intra16x16_pred_mode;
++
++    int8_t intra4x4_pred_mode_cache[5 * 8];
++    int8_t(*intra4x4_pred_mode);
++
++    int topleft_mb_xy;
++    int top_mb_xy;
++    int topright_mb_xy;
++    int left_mb_xy[LEFT_MBS];
++
++    int topleft_type;
++    int top_type;
++    int topright_type;
++    int left_type[LEFT_MBS];
++
++    const uint8_t *left_block;
++    int topleft_partition;
++
++    unsigned int topleft_samples_available;
++    unsigned int top_samples_available;
++    unsigned int topright_samples_available;
++    unsigned int left_samples_available;
++
++    ptrdiff_t linesize, uvlinesize;
++    ptrdiff_t mb_linesize;  ///< may be equal to s->linesize or s->linesize * 2, for mbaff
++    ptrdiff_t mb_uvlinesize;
++
++    int mb_x, mb_y;
++    int mb_xy;
++    int resync_mb_x;
++    int resync_mb_y;
++    int mb_index_end;
++    int mb_skip_run;
++    int is_complex;
++
++    int mb_field_decoding_flag;
++    int mb_mbaff;               ///< mb_aff_frame && mb_field_decoding_flag
++
++    int redundant_pic_count;
++
++    /**
++     * number of neighbors (top and/or left) that used 8x8 dct
++     */
++    int neighbor_transform_size;
++
++    int direct_spatial_mv_pred;
++    int col_parity;
++    int col_fieldoff;
++
++    int cbp;
++    int top_cbp;
++    int left_cbp;
++
++    int dist_scale_factor[32];
++    int dist_scale_factor_field[2][32];
++    int map_col_to_list0[2][16 + 32];
++    int map_col_to_list0_field[2][2][16 + 32];
++
++    /**
++     * num_ref_idx_l0/1_active_minus1 + 1
++     */
++    unsigned int ref_count[2];          ///< counts frames or fields, depending on current mb mode
++    unsigned int list_count;
++    H264Ref ref_list[2][48];        /**< 0..15: frame refs, 16..47: mbaff field refs.
++                                         *   Reordered version of default_ref_list
++                                         *   according to picture reordering in slice header */
++    int ref2frm[MAX_SLICES][2][64];     ///< reference to frame number lists, used in the loop filter, the first 2 are for -2,-1
++
++    const uint8_t *intra_pcm_ptr;
++    int16_t *dc_val_base;
++
++    uint8_t *bipred_scratchpad;
++    uint8_t *edge_emu_buffer;
++    uint8_t (*top_borders[2])[(16 * 3) * 2];
++    int bipred_scratchpad_allocated;
++    int edge_emu_buffer_allocated;
++    int top_borders_allocated[2];
++
++    /**
++     * non zero coeff count cache.
++     * is 64 if not available.
++     */
++    DECLARE_ALIGNED(8, uint8_t, non_zero_count_cache)[15 * 8];
++
++    /**
++     * Motion vector cache.
++     */
++    DECLARE_ALIGNED(16, int16_t, mv_cache)[2][5 * 8][2];
++    DECLARE_ALIGNED(8,  int8_t, ref_cache)[2][5 * 8];
++    DECLARE_ALIGNED(16, uint8_t, mvd_cache)[2][5 * 8][2];
++    uint8_t direct_cache[5 * 8];
++
++    DECLARE_ALIGNED(8, uint16_t, sub_mb_type)[4];
++
++    ///< as a dct coefficient is int32_t in high depth, we need to reserve twice the space.
++    DECLARE_ALIGNED(16, int16_t, mb)[16 * 48 * 2];
++    DECLARE_ALIGNED(16, int16_t, mb_luma_dc)[3][16 * 2];
++    ///< as mb is addressed by scantable[i] and scantable is uint8_t we can either
++    ///< check that i is not too large or ensure that there is some unused stuff after mb
++    int16_t mb_padding[256 * 2];
++
++    uint8_t (*mvd_table[2])[2];
++
++    /**
++     * Cabac
++     */
++    CABACContext cabac;
++    uint8_t cabac_state[1024];
++    int cabac_init_idc;
++
++    // rbsp buffer used for this slice
++    uint8_t *rbsp_buffer;
++    unsigned int rbsp_buffer_size;
++} H264SliceContext;
++
++/**
++ * H264Context
++ */
++typedef struct H264Context {
++    AVClass *av_class;
++    AVCodecContext *avctx;
++    VideoDSPContext vdsp;
++    H264DSPContext h264dsp;
++    H264ChromaContext h264chroma;
++    H264QpelContext h264qpel;
++    GetBitContext gb;
++
++    H264Picture DPB[H264_MAX_PICTURE_COUNT];
++    H264Picture *cur_pic_ptr;
++    H264Picture cur_pic;
++    H264Picture last_pic_for_ec;
++
++    H264SliceContext *slice_ctx;
++    int            nb_slice_ctx;
++
++    int pixel_shift;    ///< 0 for 8-bit H264, 1 for high-bit-depth H264
++
++    /* coded dimensions -- 16 * mb w/h */
++    int width, height;
++    int chroma_x_shift, chroma_y_shift;
++
++    int droppable;
++    int coded_picture_number;
++    int low_delay;
++
++    int context_initialized;
++    int flags;
++    int workaround_bugs;
++
++    int8_t(*intra4x4_pred_mode);
++    H264PredContext hpc;
++
++    uint8_t (*non_zero_count)[48];
++
++#define LIST_NOT_USED -1 // FIXME rename?
++#define PART_NOT_AVAILABLE -2
++
++    /**
++     * block_offset[ 0..23] for frame macroblocks
++     * block_offset[24..47] for field macroblocks
++     */
++    int block_offset[2 * (16 * 3)];
++
++    uint32_t *mb2b_xy;  // FIXME are these 4 a good idea?
++    uint32_t *mb2br_xy;
++    int b_stride;       // FIXME use s->b4_stride
++
++    unsigned current_sps_id; ///< id of the current SPS
++    SPS sps; ///< current sps
++    PPS pps; ///< current pps
++
++    int au_pps_id; ///< pps_id of current access unit
++
++    uint32_t dequant4_buffer[6][QP_MAX_NUM + 1][16]; // FIXME should these be moved down?
++    uint32_t dequant8_buffer[6][QP_MAX_NUM + 1][64];
++    uint32_t(*dequant4_coeff[6])[16];
++    uint32_t(*dequant8_coeff[6])[64];
++
++    uint16_t *slice_table;      ///< slice_table_base + 2*mb_stride + 1
++
++    // interlacing specific flags
++    int mb_aff_frame;
++    int picture_structure;
++    int first_field;
++
++    uint8_t *list_counts;               ///< Array of list_count per MB specifying the slice type
++
++    /* 0x100 -> non null luma_dc, 0x80/0x40 -> non null chroma_dc (cb/cr), 0x?0 -> chroma_cbp(0, 1, 2), 0x0? luma_cbp */
++    uint16_t *cbp_table;
++
++    /* chroma_pred_mode for i4x4 or i16x16, else 0 */
++    uint8_t *chroma_pred_mode_table;
++    uint8_t (*mvd_table[2])[2];
++    uint8_t *direct_table;
++
++    uint8_t zigzag_scan[16];
++    uint8_t zigzag_scan8x8[64];
++    uint8_t zigzag_scan8x8_cavlc[64];
++    uint8_t field_scan[16];
++    uint8_t field_scan8x8[64];
++    uint8_t field_scan8x8_cavlc[64];
++    uint8_t zigzag_scan_q0[16];
++    uint8_t zigzag_scan8x8_q0[64];
++    uint8_t zigzag_scan8x8_cavlc_q0[64];
++    uint8_t field_scan_q0[16];
++    uint8_t field_scan8x8_q0[64];
++    uint8_t field_scan8x8_cavlc_q0[64];
++
++    int x264_build;
++
++    int mb_y;
++    int mb_height, mb_width;
++    int mb_stride;
++    int mb_num;
++
++    // =============================================================
++    // Things below are not used in the MB or more inner code
++
++    int nal_ref_idc;
++    int nal_unit_type;
++
++    /**
++     * Used to parse AVC variant of h264
++     */
++    int is_avc;           ///< this flag is != 0 if codec is avc1
++    int nal_length_size;  ///< Number of bytes used for nal length (1, 2 or 4)
++
++    int bit_depth_luma;         ///< luma bit depth from sps to detect changes
++    int chroma_format_idc;      ///< chroma format from sps to detect changes
++
++    SPS *sps_buffers[MAX_SPS_COUNT];
++    PPS *pps_buffers[MAX_PPS_COUNT];
++
++    int dequant_coeff_pps;      ///< reinit tables when pps changes
++
++    uint16_t *slice_table_base;
++
++    // POC stuff
++    int poc_lsb;
++    int poc_msb;
++    int delta_poc_bottom;
++    int delta_poc[2];
++    int frame_num;
++    int prev_poc_msb;           ///< poc_msb of the last reference pic for POC type 0
++    int prev_poc_lsb;           ///< poc_lsb of the last reference pic for POC type 0
++    int frame_num_offset;       ///< for POC type 2
++    int prev_frame_num_offset;  ///< for POC type 2
++    int prev_frame_num;         ///< frame_num of the last pic for POC type 1/2
++
++    /**
++     * frame_num for frames or 2 * frame_num + 1 for field pics.
++     */
++    int curr_pic_num;
++
++    /**
++     * max_frame_num or 2 * max_frame_num for field pics.
++     */
++    int max_pic_num;
++
++    H264Ref default_ref_list[2][32]; ///< base reference list for all slices of a coded picture
++    H264Picture *short_ref[32];
++    H264Picture *long_ref[32];
++    H264Picture *delayed_pic[MAX_DELAYED_PIC_COUNT + 2]; // FIXME size?
++    int last_pocs[MAX_DELAYED_PIC_COUNT];
++    H264Picture *next_output_pic;
++    int next_outputed_poc;
++
++    /**
++     * memory management control operations buffer.
++     */
++    MMCO mmco[MAX_MMCO_COUNT];
++    int mmco_index;
++    int mmco_reset;
++
++    int long_ref_count;     ///< number of actual long term references
++    int short_ref_count;    ///< number of actual short term references
++
++    /**
++     * @name Members for slice based multithreading
++     * @{
++     */
++    /**
++     * current slice number, used to initialize slice_num of each thread/context
++     */
++    int current_slice;
++
++    /**
++     * Max number of threads / contexts.
++     * This is equal to AVCodecContext.thread_count unless
++     * multithreaded decoding is impossible, in which case it is
++     * reduced to 1.
++     */
++    int max_contexts;
++
++    int slice_context_count;
++
++    /**
++     *  1 if the single thread fallback warning has already been
++     *  displayed, 0 otherwise.
++     */
++    int single_decode_warning;
++
++    enum AVPictureType pict_type;
++
++    int last_slice_type;
++    unsigned int last_ref_count[2];
++    /** @} */
++
++    /**
++     * pic_struct in picture timing SEI message
++     */
++    SEI_PicStructType sei_pic_struct;
++
++    /**
++     * Complement sei_pic_struct
++     * SEI_PIC_STRUCT_TOP_BOTTOM and SEI_PIC_STRUCT_BOTTOM_TOP indicate interlaced frames.
++     * However, soft telecined frames may have these values.
++     * This is used in an attempt to flag soft telecine progressive.
++     */
++    int prev_interlaced_frame;
++
++    /**
++     * frame_packing_arrangment SEI message
++     */
++    int sei_frame_packing_present;
++    int frame_packing_arrangement_type;
++    int content_interpretation_type;
++    int quincunx_subsampling;
++
++    /**
++     * display orientation SEI message
++     */
++    int sei_display_orientation_present;
++    int sei_anticlockwise_rotation;
++    int sei_hflip, sei_vflip;
++
++    /**
++     * Bit set of clock types for fields/frames in picture timing SEI message.
++     * For each found ct_type, appropriate bit is set (e.g., bit 1 for
++     * interlaced).
++     */
++    int sei_ct_type;
++
++    /**
++     * dpb_output_delay in picture timing SEI message, see H.264 C.2.2
++     */
++    int sei_dpb_output_delay;
++
++    /**
++     * cpb_removal_delay in picture timing SEI message, see H.264 C.1.2
++     */
++    int sei_cpb_removal_delay;
++
++    /**
++     * recovery_frame_cnt from SEI message
++     *
++     * Set to -1 if no recovery point SEI message found or to number of frames
++     * before playback synchronizes. Frames having recovery point are key
++     * frames.
++     */
++    int sei_recovery_frame_cnt;
++
++    /**
++     * Are the SEI recovery points looking valid.
++     */
++    int valid_recovery_point;
++
++    FPA sei_fpa;
++
++    /**
++     * recovery_frame is the frame_num at which the next frame should
++     * be fully constructed.
++     *
++     * Set to -1 when not expecting a recovery point.
++     */
++    int recovery_frame;
++
++/**
++ * We have seen an IDR, so all the following frames in coded order are correctly
++ * decodable.
++ */
++#define FRAME_RECOVERED_IDR  (1 << 0)
++/**
++ * Sufficient number of frames have been decoded since a SEI recovery point,
++ * so all the following frames in presentation order are correct.
++ */
++#define FRAME_RECOVERED_SEI  (1 << 1)
++
++    int frame_recovered;    ///< Initial frame has been completely recovered
++
++    int has_recovery_point;
++
++    int missing_fields;
++
++    // Timestamp stuff
++    int sei_buffering_period_present;   ///< Buffering period SEI flag
++    int initial_cpb_removal_delay[32];  ///< Initial timestamps for CPBs
++
++    int cur_chroma_format_idc;
++    int cur_bit_depth_luma;
++    int16_t slice_row[MAX_SLICES]; ///< to detect when MAX_SLICES is too low
++
++    uint8_t parse_history[6];
++    int parse_history_count;
++    int parse_last_mb;
++
++    int enable_er;
++
++    AVBufferPool *qscale_table_pool;
++    AVBufferPool *mb_type_pool;
++    AVBufferPool *motion_val_pool;
++    AVBufferPool *ref_index_pool;
++
++    /* Motion Estimation */
++    qpel_mc_func (*qpel_put)[16];
++    qpel_mc_func (*qpel_avg)[16];
++} H264Context;
++
++#endif /* SYNO_EVANSPORT_SMD */
++#endif /* AVCODEC_H264_H */
+diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd_ffmpeg_audio_util.c
+--- ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/ismd_ffmpeg_audio_util.c	2020-01-14 14:30:02.609981781 -0500
+@@ -0,0 +1,1213 @@
++/*
++ * This file contains utility functions
++ * Copyright (c) 2012, Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU Lesser General Public License,
++ * version 2.1, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License along with
++ * this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
++ *
++ */
++
++#include "avcodec.h"
++#include "wma.h"
++#include "libavformat/avformat.h"
++#include "libavcodec/h264_smd.h"
++#include "libavcodec/vc1.h"
++#if CONFIG_LIBX264_ENCODER
++#include <x264.h>
++#endif
++
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++#include "osal_type.h"
++#include "ismd_vidpproc.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_bitstream.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_audio_dec.h"  //ISMD HEDAER FILE
++#include "libffmpeg_plugin/ismd_ffmpeg_audio_enc.h"
++#include "ismd_ffmpeg_audio_util.h"
++
++#define SZ_MAX_PACKATES 40
++static AVPacket packets[SZ_MAX_PACKATES];
++static int nb_packet = 0;
++
++typedef struct X264Context {
++    AVClass        *class;
++#if CONFIG_LIBX264_ENCODER
++    x264_param_t    params;
++    x264_t         *enc;
++    x264_picture_t  pic;
++#endif
++    uint8_t        *sei;
++    int             sei_size;
++    char *preset;
++    char *tune;
++    char *profile;
++    char *level;
++    int fastfirstpass;
++    char *wpredp;
++    char *x264opts;
++    float crf;
++    float crf_max;
++    int cqp;
++    int aq_mode;
++    float aq_strength;
++    char *psy_rd;
++    int psy;
++    int rc_lookahead;
++    int weightp;
++    int weightb;
++    int ssim;
++    int intra_refresh;
++    int bluray_compat;
++    int b_bias;
++    int b_pyramid;
++    int mixed_refs;
++    int dct8x8;
++    int fast_pskip;
++    int aud;
++    int mbtree;
++    char *deblock;
++    float cplxblur;
++    char *partitions;
++    int direct_pred;
++    int slice_max_size;
++    char *stats;
++    int nal_hrd;
++    int avcintra_class;
++    char *x264_params;
++} X264Context;
++
++int ismd_ffmpeg_get_ismd_audio_channel_config(AVCodecContext *avctx)
++{
++	int ffmpeg_ch_config =avctx->channel_layout;
++	int ismd_ch_config=0;
++	switch(ffmpeg_ch_config)
++	{
++		case AV_CH_LAYOUT_MONO:             // (AV_CH_FRONT_CENTER)
++			ismd_ch_config =ISMD_AUDIO_CHANNEL_CENTER;//ISMD_AUDIO_DUAL_MONO;
++			break;
++		case AV_CH_LAYOUT_STEREO:           // (AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT)
++			ismd_ch_config = ISMD_AUDIO_CHANNEL_LEFT|ISMD_AUDIO_CHANNEL_RIGHT;//ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_2POINT1:           //(AV_CH_LAYOUT_STEREO|AV_CH_LOW_FREQUENCY)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_2_1:               //(AV_CH_LAYOUT_STEREO|AV_CH_BACK_CENTER)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_SURROUND:          //(AV_CH_LAYOUT_STEREO|AV_CH_FRONT_CENTER)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_3POINT1:           //(AV_CH_LAYOUT_SURROUND|AV_CH_LOW_FREQUENCY)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_4POINT0:           //(AV_CH_LAYOUT_SURROUND|AV_CH_BACK_CENTER)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_4POINT1:           //(AV_CH_LAYOUT_4POINT0|AV_CH_LOW_FREQUENCY)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_2_2:               //(AV_CH_LAYOUT_STEREO|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_QUAD:              //(AV_CH_LAYOUT_STEREO|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_5POINT0:           //(AV_CH_LAYOUT_SURROUND|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_5POINT1:           //(AV_CH_LAYOUT_5POINT0|AV_CH_LOW_FREQUENCY)
++			ismd_ch_config =ISMD_AUDIO_5_1;//ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_5POINT0_BACK:      //(AV_CH_LAYOUT_SURROUND|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_STEREO;
++			break;
++		case AV_CH_LAYOUT_5POINT1_BACK:      //(AV_CH_LAYOUT_5POINT0_BACK|AV_CH_LOW_FREQUENCY)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_6POINT0:           //(AV_CH_LAYOUT_5POINT0|AV_CH_BACK_CENTER)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_6POINT0_FRONT:     //(AV_CH_LAYOUT_2_2|AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_HEXAGONAL:         //(AV_CH_LAYOUT_5POINT0_BACK|AV_CH_BACK_CENTER)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_6POINT1:           //(AV_CH_LAYOUT_5POINT1|AV_CH_BACK_CENTER)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_6POINT1_BACK:      //(AV_CH_LAYOUT_5POINT1_BACK|AV_CH_BACK_CENTER)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_6POINT1_FRONT:     //(AV_CH_LAYOUT_6POINT0_FRONT|AV_CH_LOW_FREQUENCY)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_7POINT0:           //(AV_CH_LAYOUT_5POINT0|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_5_1;
++			break;
++		case AV_CH_LAYOUT_7POINT0_FRONT:     //(AV_CH_LAYOUT_5POINT0|AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER)
++			ismd_ch_config =ISMD_AUDIO_7_1;
++			break;
++		case AV_CH_LAYOUT_7POINT1:           //(AV_CH_LAYOUT_5POINT1|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_7_1;
++			break;
++		case AV_CH_LAYOUT_7POINT1_WIDE:      //(AV_CH_LAYOUT_5POINT1|AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER)
++			ismd_ch_config =ISMD_AUDIO_7_1;
++			break;
++		case AV_CH_LAYOUT_OCTAGONAL:         //(AV_CH_LAYOUT_5POINT0|AV_CH_BACK_LEFT|AV_CH_BACK_CENTER|AV_CH_BACK_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_7_1;
++			break;
++		case AV_CH_LAYOUT_STEREO_DOWNMIX:    //(AV_CH_STEREO_LEFT|AV_CH_STEREO_RIGHT)
++			ismd_ch_config =ISMD_AUDIO_7_1;
++			break;
++		default:
++			av_log(NULL,AV_LOG_ERROR,"Invalid channel layout %llu\n",avctx->channel_layout);
++			return -1;
++	}
++	return ismd_ch_config;
++}
++ismd_result_t ismd_ffmpeg_config_aud_dec(AVCodecContext *avctx , audiodec_struct* p_aud_dec , ismd_audio_format_t ip_aud_fmt, int aac_bs_fmt)
++{
++	int encode_option =0;
++	int ismd_channel_layout;
++	uint8_t *extradata;
++
++	switch(ip_aud_fmt)
++	{
++		case ISMD_AUDIO_MEDIA_FMT_WM9:
++			/* extract flag infos */
++			extradata = avctx->extradata;
++
++			if (avctx->codec->id == AV_CODEC_ID_WMAV1 && avctx->extradata_size >= 4) {
++				encode_option= AV_RL16(extradata+2);
++			} else if (avctx->codec->id == AV_CODEC_ID_WMAV2 && avctx->extradata_size >= 6) {
++				encode_option = AV_RL16(extradata+4);
++			}
++			//FILLING WMA DATA STRUCTURE
++			p_aud_dec->current_input.wma_fmt_param.sample_rate= avctx->sample_rate;
++			p_aud_dec->current_input.wma_fmt_param.num_channels = avctx->channels;
++			p_aud_dec->current_input.wma_fmt_param.bitrate = avctx->bit_rate/8;//byte rate
++			if (avctx->codec->id == AV_CODEC_ID_WMAV1)
++				p_aud_dec->current_input.wma_fmt_param.format_tag = 0x160;
++			else if (avctx->codec->id == AV_CODEC_ID_WMAV2)
++				p_aud_dec->current_input.wma_fmt_param.format_tag = 0x161;
++			if(avctx->sample_fmt== AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.wma_fmt_param.sample_size = 16;
++			else if(avctx->sample_fmt== AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.wma_fmt_param.sample_size = 32;
++			p_aud_dec->current_input.wma_fmt_param.block_align = avctx->block_align;
++			p_aud_dec->current_input.wma_fmt_param.encode_option = encode_option;
++
++			//Setting Audio i/p Config
++			p_aud_dec->current_input.format = ISMD_AUDIO_MEDIA_FMT_WM9;
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.sample_size= 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->out_config.sample_size = 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->out_config.sample_size= 32;
++
++			break;
++		case ISMD_AUDIO_MEDIA_FMT_DTS:
++			//Setting Audio i/p Config
++			if(avctx->profile ==20) //DTS
++				p_aud_dec->current_input.format =ISMD_AUDIO_MEDIA_FMT_DTS; //DTS Audio
++			else if(avctx->profile ==50) //DTS_HD_HRA
++				p_aud_dec->current_input.format =ISMD_AUDIO_MEDIA_FMT_DTS_HD_HRA; //DTS High Defination High Resolution Audio
++			else if(avctx->profile ==30) //DTS_ES
++				p_aud_dec->current_input.format =ISMD_AUDIO_MEDIA_FMT_DTS_HD_MA; //DTS-HD Master Audio
++			else if(avctx->profile ==40) //DTS_96_24
++				p_aud_dec->current_input.format =ISMD_AUDIO_MEDIA_FMT_DTS_HD_MA; //DTS-HD Master Audio
++			else if(avctx->profile ==60)
++				p_aud_dec->current_input.format =ISMD_AUDIO_MEDIA_FMT_DTS_HD_MA; //DTS-HD Master Audio
++			/* DTS Express also known an DTS_LBR DTS Lowbit Rate */
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.sample_size= 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->out_config.sample_size = 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->out_config.sample_size= 32;
++			break;
++		case ISMD_AUDIO_MEDIA_FMT_DD:
++			if(avctx->codec->id == AV_CODEC_ID_AC3)
++				p_aud_dec->current_input.format = ISMD_AUDIO_MEDIA_FMT_DD;
++			else if(avctx->codec->id == AV_CODEC_ID_EAC3)
++				p_aud_dec->current_input.format = ISMD_AUDIO_MEDIA_FMT_DD_PLUS;
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.sample_size= 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->out_config.sample_size = 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->out_config.sample_size= 32;
++			break;
++		case ISMD_AUDIO_MEDIA_FMT_TRUE_HD:
++			p_aud_dec->current_input.format =ISMD_AUDIO_MEDIA_FMT_TRUE_HD;
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_FLT)
++				p_aud_dec->current_input.sample_size= 32;
++			if((avctx->sample_fmt == AV_SAMPLE_FMT_S16)||(avctx->sample_fmt == AV_SAMPLE_FMT_S16P))
++				p_aud_dec->current_input.sample_size= 16;
++			else if((avctx->sample_fmt == AV_SAMPLE_FMT_S32)||(avctx->sample_fmt == AV_SAMPLE_FMT_S32P))
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_FLT)
++				p_aud_dec->out_config.sample_size= 32;
++			if((avctx->sample_fmt == AV_SAMPLE_FMT_S16)||(avctx->sample_fmt == AV_SAMPLE_FMT_S16P))
++				p_aud_dec->out_config.sample_size = 16;
++			else if((avctx->sample_fmt == AV_SAMPLE_FMT_S32)||(avctx->sample_fmt == AV_SAMPLE_FMT_S32P))
++				p_aud_dec->out_config.sample_size= 32;
++			break;
++		case ISMD_AUDIO_MEDIA_FMT_AAC:
++			p_aud_dec->current_input.format = ip_aud_fmt;
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.sample_size= 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->out_config.sample_size = 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->out_config.sample_size= 32;
++
++			p_aud_dec->aac_bs_format = aac_bs_fmt;
++			break;
++		case ISMD_AUDIO_MEDIA_FMT_AAC_LOAS:
++			p_aud_dec->current_input.format = ip_aud_fmt;
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.sample_size= 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->out_config.sample_size = 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->out_config.sample_size= 32;
++
++			break;
++		case ISMD_AUDIO_MEDIA_FMT_MPEG:
++			p_aud_dec->current_input.format = ip_aud_fmt;
++
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->current_input.sample_size= 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->current_input.sample_size= 32;
++
++			//Setting Audio o/p Config
++			if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++				p_aud_dec->out_config.sample_size = 16;
++			else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++				p_aud_dec->out_config.sample_size= 32;
++
++			break;
++		default:
++			av_log(avctx,AV_LOG_ERROR,"\ninput format %d is not supported by smd audio decoder\n",ip_aud_fmt);
++			return ISMD_ERROR_UNSPECIFIED;
++	}
++	//common configuration
++	p_aud_dec->pass_through_config.dts_or_dolby_convert = false;
++	p_aud_dec->pass_through_config.is_pass_through = false;
++
++	//Setting Audio i/p Config
++	p_aud_dec->current_input.ch_config = avctx->channel_layout;
++	p_aud_dec->current_input.channels = avctx->channels;
++	p_aud_dec->current_input.sample_rate = avctx->sample_rate;
++	p_aud_dec->current_input.is_timed_stream = false;
++
++	//Setting Audio o/p Config
++	p_aud_dec->out_config.sample_rate = avctx->sample_rate;
++	ismd_channel_layout = ismd_ffmpeg_get_ismd_audio_channel_config(avctx);
++	if(ismd_channel_layout == -1)
++	{
++		av_log(avctx,AV_LOG_ERROR,"\nthis channel layout is not supported by smd\n");
++		return ISMD_ERROR_UNSPECIFIED;
++	}
++	p_aud_dec->out_config.ch_config = ismd_channel_layout;
++	p_aud_dec->out_config.out_mode = ISMD_AUDIO_OUTPUT_PCM;
++	p_aud_dec->out_config.stream_delay= 0;
++
++	return ISMD_SUCCESS;
++}
++
++ismd_result_t ismd_ffmpeg_config_aud_enc(AVCodecContext *avctx , audenc_struct_t* p_aud_enc , ismd_audio_output_mode_t op_aud_mode)
++{
++	int ismd_channel_layout;
++
++	switch(op_aud_mode)
++	{
++		case ISMD_AUDIO_OUTPUT_ENCODED_DTS:
++			p_aud_enc->out_config.out_mode     = ISMD_AUDIO_OUTPUT_ENCODED_DTS;
++			break;
++		case ISMD_AUDIO_OUTPUT_ENCODED_AAC:
++			p_aud_enc->out_config.out_mode     = ISMD_AUDIO_OUTPUT_ENCODED_AAC;
++			break;
++		case ISMD_AUDIO_OUTPUT_ENCODED_DOLBY_DIGITAL:
++			p_aud_enc->out_config.out_mode     = ISMD_AUDIO_OUTPUT_ENCODED_DOLBY_DIGITAL;
++			break;
++		default:
++			av_log(avctx,AV_LOG_ERROR,"\noutput format %d is not supported by smd audio encoder\n",op_aud_mode);
++			return ISMD_ERROR_UNSPECIFIED;
++	}
++	//common configuration
++
++	//Setting Audio I/P Config
++	p_aud_enc->current_input.sample_size       = 16;
++	p_aud_enc->current_input.sample_rate       = avctx->sample_rate;
++	p_aud_enc->current_input.channels 	    = avctx->channels;
++	ismd_channel_layout = ismd_ffmpeg_get_ismd_audio_channel_config(avctx);
++	if(ismd_channel_layout == -1)
++	{
++		av_log(avctx,AV_LOG_ERROR,"\nthis channel layout is not supported by smd\n");
++		return ISMD_ERROR_UNSPECIFIED;
++	}
++
++	p_aud_enc->current_input.ch_config         = ismd_channel_layout;
++
++	//Setting Audio O/P Config
++	p_aud_enc->out_config.ch_config    = ismd_channel_layout;
++	p_aud_enc->out_config.sample_rate  = avctx->sample_rate;
++	if(avctx->sample_fmt == AV_SAMPLE_FMT_S16)
++		p_aud_enc->out_config.sample_size = 16;
++	else if(avctx->sample_fmt == AV_SAMPLE_FMT_S32)
++		p_aud_enc->out_config.sample_size = 32;
++	else
++	{
++		av_log(NULL,AV_LOG_ERROR,"Invalid Sample size %d\n",avctx->sample_fmt);
++		return ISMD_ERROR_UNSPECIFIED;
++	}
++
++	return ISMD_SUCCESS;
++}
++
++ismd_result_t ismd_ffmpeg_setup_aud_dec(AVCodecContext *avctx , audiodec_struct* p_aud_dec , ismd_audio_format_t ip_aud_fmt, int aac_bs_fmt)
++{
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++
++	//config h/w audio decoder
++	result = ismd_ffmpeg_config_aud_dec(avctx ,p_aud_dec,ip_aud_fmt,aac_bs_fmt);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log( NULL, AV_LOG_ERROR, "SMD audio decoder configuration failed %d\n",result);
++		return result;
++	}
++
++	//initialize audio h/w resources
++	result = ismd_ffmpeg_smd_decode_init(p_aud_dec);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log( NULL, AV_LOG_ERROR, "SMD audio decoder handlers initilization failed error: %d\n",result);
++		return result;
++	}
++	//setup o/p thread for decoder
++	result = ismd_ffmpeg_setup_auddec_op_thread(p_aud_dec);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL, AV_LOG_ERROR, "\nSMD audio decoder o/p thread creation failed file %s\n",__FILE__);
++		return result;
++	}
++
++	return ISMD_SUCCESS;
++}
++
++ismd_result_t ismd_ffmpeg_setup_aud_enc(AVCodecContext *avctx , audenc_struct_t* p_aud_enc , ismd_audio_output_mode_t op_aud_mode)
++{
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++
++	//config h/w audio encoder
++	result = ismd_ffmpeg_config_aud_enc(avctx ,p_aud_enc, op_aud_mode);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log( NULL, AV_LOG_ERROR, "SMD audio encoder configuration failed %d\n",result);
++		return result;
++	}
++
++	//initialize audio h/w resources
++	if((result =ismd_ffmpeg_smd_encode_init(p_aud_enc)) != ISMD_SUCCESS)
++	{
++		av_log(avctx, AV_LOG_ERROR, "SMD audio encoder handlers initilization failed error: %s\n",ismd_ffmpeg_result_to_string(result));
++		return result;
++	}
++
++	av_log(avctx,AV_LOG_DEBUG,"ismd_ffmpeg_smd_encode_init result %d\n",result);
++	//setup o/p thread for encoder
++	result = ismd_ffmpeg_setup_audenc_op_thread(p_aud_enc);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL, AV_LOG_ERROR, "\nSMD audio encoder o/p thread creation failed file %s\n",__FILE__);
++		return result;
++	}
++
++	return ISMD_SUCCESS;
++}
++
++ismd_result_t ismd_ffmpeg_dec_aud_buf(AVCodecContext *avctx ,void *out_data, audiodec_struct* p_aud_dec,const uint8_t *ip_buf,int buf_size,int *got_frame_ptr)
++{
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++	long int data_copied=0;
++	char *decoded_samples;
++	AVFrame frame;
++	struct timespec ts;
++
++	//if inupt pkt has some data to decode
++	if(buf_size > 0)
++	{
++		result = ismd_ffmpeg_audio_port_write(p_aud_dec, ip_buf, buf_size,ISMD_NO_PTS );
++		if (result != ISMD_SUCCESS)
++		{
++			av_log( NULL, AV_LOG_ERROR, "\nismd_ffmpeg_audio_port_write failed error: %d\n",result);
++			return result;
++		}
++	}
++
++	if(buf_size == 0)
++	{
++		//last frame received
++		//need to put some sleep to flush out audio decoder
++		ts.tv_sec = 0;
++		ts.tv_nsec = 100;
++		nanosleep (&ts, NULL);
++	}
++	//Decode data to be returned
++	decoded_samples = (char *)av_malloc(1);
++	decoded_samples = ismd_ffmpeg_aud_dec_dequeue(p_aud_dec, &decoded_samples, &data_copied);
++	if(data_copied > 0)
++	{
++		// get output buffer
++		frame.nb_samples = data_copied/(2* avctx->channels);
++		if ((avctx->get_buffer2(avctx, &frame, 0)) < 0)
++		{
++			av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
++		}
++		memcpy(frame.data[0], decoded_samples, data_copied);
++		*got_frame_ptr   = 1;
++		frame.pts = AV_NOPTS_VALUE;
++		*(AVFrame *)out_data = frame;
++	}
++	else
++	{
++		*got_frame_ptr   = 0;
++	}
++	av_free(decoded_samples);
++
++	return ISMD_SUCCESS;
++}
++ismd_result_t ismd_ffmpeg_enc_aud_samples(AVCodecContext *avctx ,AVPacket *avpkt, audenc_struct_t* p_aud_enc, void *pcm_samples,int frame_bytes)
++{
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++	struct timespec ts;
++	int pkt_size = 0;
++
++	if(pcm_samples)
++	{
++		result = ismd_ffmpeg_audio_encoder_port_write(p_aud_enc ,pcm_samples, frame_bytes, ISMD_NO_PTS );
++		if (result != ISMD_SUCCESS)
++		{
++			av_log( NULL, AV_LOG_ERROR, "\nismd_ffmpeg_audio_encoder_port_write failed error: %d\n",result);
++			return result;
++		}
++	}
++	if(pcm_samples == NULL)
++	{
++		if(p_aud_enc->eos_written == false)
++		{
++			av_log(NULL, AV_LOG_DEBUG, "\n************ writing eos to audio encoder**************\n");
++			ismd_ffmpeg_send_eos_audenc(p_aud_enc);
++			p_aud_enc->eos_written = true;
++		}
++		av_log(NULL, AV_LOG_DEBUG, "\n************ p_aud_enc->eos_received %d***\n",p_aud_enc->eos_received);
++		//last frame received
++		//need to put some sleep to flush out audio encoder
++		ts.tv_sec = 0;
++		ts.tv_nsec = 100;
++		nanosleep (&ts, NULL);
++	}
++
++	if ((pkt_size = syno_ismd_ffmpeg_audio_encoder_get_first_node_size(p_aud_enc)) < 0) {
++		av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue_size_syno\n");
++		return -1;
++	}
++	if (pkt_size > 0) {
++		if (syno_alloc_packet(avpkt, pkt_size) < 0) {
++			av_log(NULL, AV_LOG_FATAL, "syno_alloc_packet error at encoder SMD\n");
++			return -1;
++		}
++		ismd_ffmpeg_aud_encoder_dequeue(p_aud_enc, avpkt->data, &avpkt->size);
++		if (avpkt->size != pkt_size) {
++			av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
++		}
++		memset(avpkt->data + avpkt->size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
++	}
++	if(pcm_samples == NULL)
++		av_log( NULL, AV_LOG_DEBUG, "\nNULL frame received in ismd_ffmpeg_enc_aud_samples data copied %d\n", avpkt->size);
++
++	return ISMD_SUCCESS;
++}
++int ismd_ffmpeg_got_codec_parameters(AVCodecContext *avctx)
++{
++    int val;
++    switch (avctx->codec_type) {
++    case AVMEDIA_TYPE_AUDIO:
++		    av_log(avctx,AV_LOG_DEBUG,"sample rate %d channels %d sample_fmt %d frame_size %d codec id %d channel_layout %lld\n",avctx->sample_rate,avctx->channels,avctx->sample_fmt,avctx->frame_size,avctx->codec_id,avctx->channel_layout);
++	    val =   avctx->sample_rate && avctx->channels && avctx->sample_fmt != AV_SAMPLE_FMT_NONE && avctx->channel_layout;
++        break;
++    case AVMEDIA_TYPE_VIDEO:
++        val = avctx->width && avctx->pix_fmt != AV_PIX_FMT_NONE;
++        break;
++    case AVMEDIA_TYPE_DATA:
++        if(avctx->codec_id == AV_CODEC_ID_NONE) return 1;
++    default:
++        val = 1;
++        break;
++    }
++    return avctx->codec_id != AV_CODEC_ID_NONE && val != 0;
++}
++ismd_result_t ismd_ffmpeg_create_video_pipeline(AVCodecContext *ocodec , viddec_struct_t* p_vid_dec , videnc_struct_t* p_vid_enc, const int dtv_smd)
++{
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++	ismd_dev_t vidpproc_handle;
++	ismd_port_handle_t vidpproc_ip_port;       /* input port */
++	ismd_port_handle_t vidpproc_op_port;       /* output port */
++	ismd_videnc_stream_init_params_t videnc_stream_init_params;
++	ismd_videnc_codec_init_params_t videnc_codec_init_params;
++	ismd_videnc_h264_encoder_params_t videnc_h264_encoder_params;
++	X264Context *x4;
++	int profile,level;
++	int result_temp = -1;
++	uint32_t max_bitrate;
++	osal_result thread_result;
++	char port_read_thread[15];
++	if ((result = ismd_viddec_get_input_port(p_vid_dec->viddec_handle,&p_vid_dec->ip_port)) != ISMD_SUCCESS)
++	{
++		av_log(NULL, AV_LOG_ERROR,"\nismd_viddec_get_input_port: failed error %d\n",result);
++		return result;
++	}
++	// get outport for video decoder
++	if ((result = ismd_viddec_get_output_port(p_vid_dec->viddec_handle,&p_vid_dec->op_port)) != ISMD_SUCCESS)
++
++	{
++		av_log(NULL, AV_LOG_ERROR,"\nismd_viddec_get_output_port: failed error %d\n",result);
++		return result;
++	}
++	result = ismd_event_alloc(&p_vid_dec->input_port_event);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_event_alloc failed error %d\n",result);
++		return result;
++	}
++	result = ismd_port_attach(p_vid_dec->ip_port, p_vid_dec->input_port_event, ISMD_QUEUE_EVENT_NOT_FULL, ISMD_QUEUE_WATERMARK_NONE);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_port_attach failed error %d\n",result);
++		return result;
++	}
++
++	result = ismd_event_reset(p_vid_dec->input_port_event);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n ismd_event_reset failed error %d\n",result);
++		return result;
++	}
++
++	if (dtv_smd) {
++		result = ismd_viddec_set_pts_interpolation_policy(p_vid_dec->viddec_handle, ISMD_VIDDEC_NO_PTS_INTERPOLATION , ISMD_NO_PTS);
++	} else {
++		result = ismd_viddec_set_pts_interpolation_policy(p_vid_dec->viddec_handle, ISMD_VIDDEC_INTERPOLATE_ALL_PTS, ISMD_NO_PTS);
++	}
++
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_viddec_set_pts_interpolation_policy failed error %d\n",result);
++		return result;
++	}
++
++	p_vid_dec->send_sps_pps =true;
++	result = ismd_dev_set_state(p_vid_dec->viddec_handle, ISMD_DEV_STATE_PAUSE);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_dev_set_state failed error %d\n",result);
++		return -1;
++	}
++	//setup video post processor
++	result = ismd_vidpproc_open(&vidpproc_handle) ;
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_open failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_vidpproc_deringing_disable(vidpproc_handle) ;
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_deringing_disable failed error %d\n",result);
++		return -1;
++	}
++
++	result = ismd_vidpproc_gaussian_enable(vidpproc_handle) ;
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_gaussian_enable failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_vidpproc_pan_scan_enable(vidpproc_handle);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_pan_scan_enable failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_vidpproc_get_input_port(vidpproc_handle, &vidpproc_ip_port) ;
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_get_input_port failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_vidpproc_get_output_port(vidpproc_handle, &vidpproc_op_port) ;
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_get_output_port failed error %d\n",result);
++		return -1;
++	}
++	if(ocodec->width > 1920)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\ninvalid dest width requested:%d",ocodec->width);
++		av_log(NULL,AV_LOG_ERROR,"\nmax width supported by smd :1920\n");
++		return -1;
++	}
++	if(ocodec->height > 1400)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\ninvalid dest height requested:%d",ocodec->height);
++		av_log(NULL,AV_LOG_ERROR,"\nmax height supported by smd :1400\n");
++		return -1;
++	}
++	result = ismd_vidpproc_set_dest_params(vidpproc_handle,ocodec->width,ocodec->height,ocodec->sample_aspect_ratio.num,ocodec->sample_aspect_ratio.den);//for scaling
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_vidpproc_set_dest_params failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_dev_set_state(vidpproc_handle, ISMD_DEV_STATE_STOP);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_dev_set_state failed error %d\n",result);
++		return -1;
++	}
++	//setup video encoder
++
++	videnc_stream_init_params.max_frame_width  = 1920;      // Default to HD
++	videnc_stream_init_params.max_frame_height = 1088;
++	videnc_stream_init_params.scene_change_control.lookahead_count = 0;
++	x4 = ocodec->priv_data;
++	if(x4->profile)
++	{
++		profile = ismd_ffmpeg_profile_string_to_int(x4->profile);
++		if(profile < 0)
++		{
++			av_log(NULL, AV_LOG_ERROR, "\nprofile not supported\n");
++			return -1;
++		}
++		else
++		{
++			videnc_codec_init_params.h264_init_params.profile = profile;
++		}
++	}
++	else
++	{
++		videnc_codec_init_params.h264_init_params.profile = ISMD_VIDENC_H264_PROFILE_HIGH;
++	}
++
++	if(x4->level)
++	{
++		level = ismd_ffmpeg_level_string_to_int(x4->level);
++		if(level < 0)
++		{
++			av_log(NULL, AV_LOG_ERROR, "\nlevel %s not supported\n",x4->level);
++			return -1;
++		}
++		else
++		{
++			videnc_codec_init_params.h264_init_params.level = level;
++		}
++	}
++	else
++	{
++		videnc_codec_init_params.h264_init_params.level = ISMD_VIDENC_H264_LEVEL_4_1;
++	}
++
++	videnc_stream_init_params.scene_change_control.scene_change_detect_enabled = false;
++	result = ismd_videnc_open(ISMD_CODEC_TYPE_H264,&videnc_stream_init_params, &videnc_codec_init_params, &p_vid_enc->videnc_handle);
++	if(result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_open error %d\n", result);
++		return -1;
++	}
++	result = ismd_videnc_get_input_port(p_vid_enc->videnc_handle, &p_vid_enc->ip_port);
++	if(result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_get_input_port error %d\n",result);
++		return -1;
++	}
++	result = ismd_videnc_get_output_port(p_vid_enc->videnc_handle, &p_vid_enc->op_port);
++	if(result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_get_output_port error %d\n",result);
++		return -1;
++	}
++	result = ismd_event_alloc(&p_vid_enc->output_port_event);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_event_alloc failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_port_attach(p_vid_enc->op_port, p_vid_enc->output_port_event,ISMD_QUEUE_EVENT_NOT_EMPTY|ISMD_QUEUE_EVENT_FULL, ISMD_QUEUE_EVENT_HIGH_WATERMARK);
++
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nismd_port_attach222 failed error %d\n",result);
++		return -1;
++	}
++	result = ismd_event_reset(p_vid_enc->output_port_event);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: ismd_event_reset222 failed error %d\n",result);
++		return -1;
++	}
++
++	result = ismd_videnc_h264_get_encoding_params(p_vid_enc->videnc_handle, &videnc_h264_encoder_params);
++	if(result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_h264_get_encoding_params error %d\n",result);
++		return -1;
++	}
++
++	videnc_h264_encoder_params.chroma_format = ISMD_VIDENC_H264_CHROMA_FORMAT_4_2_0; //can only be configured at compile time in libx264
++	if((videnc_codec_init_params.h264_init_params.profile != ISMD_VIDENC_H264_PROFILE_BASELINE)&&(ocodec->coder_type != 0))
++	{
++		videnc_h264_encoder_params.entropy = ISMD_VIDENC_H264_ENTROPY_MODE_CABAC;
++	}
++	videnc_h264_encoder_params.aspect_ratio =ISMD_VIDENC_H264_ASPECT_RATIO_NONE;
++	videnc_h264_encoder_params.bitrate_settings.bitrate_mode = ISMD_VIDENC_H264_RATE_CONTROL_VBR;
++	result_temp = ismd_ffmpeg_get_max_bitrate(videnc_codec_init_params.h264_init_params.profile, videnc_codec_init_params.h264_init_params.level,&max_bitrate);
++	if(result_temp < 0)
++	{
++		av_log(NULL, AV_LOG_ERROR, "\nEroor setting max_bitrate error %d\n",result_temp);
++		return -1;
++	}
++	else
++	{
++		videnc_h264_encoder_params.bitrate_settings.max_bitrate = max_bitrate;//    40000000;
++	}
++	if(ocodec->bit_rate)
++	{
++		videnc_h264_encoder_params.bitrate_settings.bitrate = ocodec->bit_rate;
++	}
++	else
++	{
++		videnc_h264_encoder_params.bitrate_settings.bitrate = 3000000;//300000;// 3000000;
++	}
++	if(ocodec->gop_size >= 0)
++	{
++		videnc_h264_encoder_params.gop_settings.GOP_length = ocodec->gop_size;
++	}
++	else
++	{
++		videnc_h264_encoder_params.gop_settings.GOP_length = 24;
++	}
++	if(ocodec->max_b_frames >= 0)
++	{
++		if(ocodec->max_b_frames < 3)
++			videnc_h264_encoder_params.gop_settings.num_of_B_frames = ocodec->max_b_frames;
++		else
++			return -1;
++	}
++	else
++	{
++		videnc_h264_encoder_params.gop_settings.num_of_B_frames = 2;//[0..2] Maximum number of consecutive B Frame in a GOP.
++	}
++	if(ocodec->keyint_min >= 0)
++	{
++		videnc_h264_encoder_params.gop_settings.IDR_Frequency = ocodec->keyint_min;
++	}
++	else
++	{
++		videnc_h264_encoder_params.gop_settings.IDR_Frequency = 24;//0 is a special value to be set when scd(EPU) enabled
++	}
++	videnc_h264_encoder_params.qp_mode = ISMD_VIDENC_H264_QP_UNIFORM;
++
++	if(ismd_ffmpeg_videnc_h264_set_encoding_params(p_vid_enc->videnc_handle,&videnc_h264_encoder_params) != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\nError setting h264 encoding parameters\n");
++		return -1;
++
++	}
++	p_vid_enc->eos_received = false;
++	result = ismd_dev_set_state(p_vid_enc->videnc_handle, ISMD_DEV_STATE_STOP);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not stop video decoder error %d\n",result);
++		return -1;
++	}
++	//now connect the pipeline
++	result = ismd_port_connect(p_vid_dec->op_port, vidpproc_ip_port);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not connect decoder to postproc error %d\n",result);
++		return -1;
++	}
++	result = ismd_port_connect(vidpproc_op_port,p_vid_enc->ip_port);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not connect postproc to encoder error %d\n",result);
++		return -1;
++	}
++
++	//set the pipeline to play state
++	result = ismd_dev_set_state(p_vid_enc->videnc_handle, ISMD_DEV_STATE_PLAY);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not start video encoder error %d\n",result);
++		return -1;
++	}
++	result = ismd_dev_set_state(vidpproc_handle, ISMD_DEV_STATE_PLAY);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not start video post processor error %d\n",result);
++		return -1;
++	}
++	result = ismd_dev_set_state(p_vid_dec->viddec_handle, ISMD_DEV_STATE_PLAY);
++	if (result != ISMD_SUCCESS)
++	{
++		av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not start video decoder error %d\n",result);
++		return -1;
++	}
++	pthread_mutex_init(&p_vid_enc->mutex, NULL);
++	thread_result = os_thread_create(&p_vid_enc->output_thread, ismd_ffmpeg_videnc_output_thread, (void*)(p_vid_enc), 0, 0, port_read_thread);
++	if (thread_result != OSAL_SUCCESS)
++	{
++		av_log(NULL, AV_LOG_ERROR, "\nvideo encoder o/p thread creation failed\n");
++		return -1;
++	}
++
++	return ISMD_SUCCESS;
++}
++
++ismd_result_t ismd_ffmpeg_fill_videnc_buffer(AVCodecContext *ctx, AVFrame* frame,ismd_buffer_handle_t h, int64_t pts, int* data_used)
++{
++	ismd_result_t result = ISMD_SUCCESS;
++	ismd_buffer_descriptor_t d;
++	ismd_frame_attributes_t* attribs;
++	char *virt_addr = NULL;
++	void* y_addr = NULL;
++	void* u_addr = NULL;
++	void* v_addr = NULL;
++	int total_data_copied = 0;
++	unsigned int    image_size;
++	int k = 0;
++	int x = 0;
++	int y = 0;
++	char *y_mem=frame->data[0];
++	char *u_mem=frame->data[1];
++	char *v_mem=frame->data[2];
++	if ((result = ismd_buffer_read_desc(h, &d)) == ISMD_SUCCESS)
++	{
++		if (0 == d.phys.size)
++		{
++			return -1;
++		}
++		image_size = 2048 * ((3*ctx->height)/2);
++		virt_addr = OS_MAP_IO_TO_MEM_NOCACHE(d.phys.base,image_size);
++		av_log(NULL,AV_LOG_DEBUG,"\n **d.phys.base %u d.phys.size %d image_size %d frame size %d virt_addr %p\n",d.phys.base,d.phys.size,image_size,ctx->width*(3*ctx->height)/2,virt_addr);
++		if(virt_addr == NULL)
++			av_log(NULL,AV_LOG_ERROR,"\n *********** ERROR********* OS_MAP_IO_TO_MEM_NOCACHE failed\n");
++		attribs = (ismd_frame_attributes_t *)(&d.attributes);
++		attribs->local_pts = pts;
++		attribs->original_pts = pts;
++		attribs->cont_rate = 3000;
++		attribs->local_cont_rate= 3000;
++		attribs->polarity = ISMD_POLARITY_FRAME;
++		attribs->pixel_format = ISMD_PF_NV12;
++		attribs->cont_size.width = ctx->width;
++		attribs->cont_size.height = ctx->height;
++		attribs->scanline_stride = 2048;
++		av_log(NULL,AV_LOG_DEBUG,"\nctx->width %d ctx->height %d linesize[0] %d linesize[1] %d linesize[2] %d d.phys.base %d attribs->y %d attribs->u %d\n",ctx->width,ctx->height,frame->linesize[0],frame->linesize[1],frame->linesize[2],d.phys.base,attribs->y,attribs->u);
++		attribs->y = 0;
++		attribs->u = attribs->scanline_stride * ctx->height;
++		y_addr = virt_addr + attribs->y;
++		u_addr = virt_addr + attribs->u;
++		v_addr = virt_addr + attribs->u;
++		//LUMA
++		for(k=0; k<ctx->height ; k++)
++		{
++			memmove(y_addr,(y_mem + (k*frame->linesize[0])),ctx->width);
++			total_data_copied +=ctx->width;
++			y_addr =(char*)y_addr+ 2048;
++
++		}
++		total_data_copied -=ctx->width;
++		// similarily CHROMA
++		//Be sure how you feeding Chroma as NV12(interleaved) UV(planar).
++		//Update this accordingly attribs->pixel_format = ISMD_PF_NV12;
++
++		//
++		// UV
++		//
++
++		for ( y = 0; y < ctx->height / 2; y++ )
++		{
++			for (x = 0; x < ctx->width/2; x++ )
++			{
++				((char*)u_addr)[2*x] = u_mem[x];
++				((char*)v_addr)[2*x+1] = v_mem[x];
++				total_data_copied +=2;
++
++			}
++			u_addr=(char*)u_addr+2048;
++			u_mem+=frame->linesize[1];
++
++			v_addr=(char*)v_addr+2048;
++			v_mem+=frame->linesize[2];
++		}
++		av_log(NULL,AV_LOG_DEBUG,"\n linesize[0] %d frame->linesize[1] %d frame->linesize[2] %d\n",frame->linesize[0],frame->linesize[1],frame->linesize[2]);
++		total_data_copied -=2;
++		*data_used = total_data_copied;
++		if(total_data_copied > d.phys.size)
++			av_log(NULL,AV_LOG_ERROR,"\n ********************* ERROR********* d.phys.size %d total_data_copied  %d \n",d.phys.size,total_data_copied);
++
++		result = ismd_buffer_update_desc(h, &d);
++		if(result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"\n######  ff_fill_videnc_buffer ismd_buffer_update_desc failed ISMD_ERROR_OUT_OF_RANGE %d result %d SYSTEM_STRIDE %d ######\n",ISMD_ERROR_OUT_OF_RANGE,result,SYSTEM_STRIDE);
++			return -1;
++		}
++		OS_UNMAP_IO_FROM_MEM(virt_addr, image_size);
++	}
++	return result;
++}
++
++ismd_result_t syno_ismd_ffmpeg_fill_viddec_buffer(const uint8_t *buf, ismd_buffer_handle_t h,size_t buffer_size, int64_t pts)
++{
++	ismd_result_t result = ISMD_SUCCESS;
++	ismd_buffer_descriptor_t d;
++	ismd_frame_attributes_t *frame = NULL;
++	char *virt_addr = NULL;
++
++	if ((result = ismd_buffer_read_desc(h, &d)) == ISMD_SUCCESS)
++	{
++
++		if (0 == d.phys.size) 
++		{
++			return result;
++		}
++		virt_addr = OS_MAP_IO_TO_MEM_CACHE(d.phys.base,d.phys.size);
++		frame = (ismd_frame_attributes_t *) (&d.attributes);
++		frame->local_pts = pts;
++		frame->original_pts = pts;
++
++		memmove((void *)virt_addr,buf,buffer_size);
++		OS_UNMAP_IO_FROM_MEM(virt_addr, d.phys.size);
++		d.phys.level = buffer_size;
++		result = ismd_buffer_update_desc(h, &d);
++	}
++	return result;
++}
++
++ismd_result_t syno_ismd_ffmpeg_decode_vid_buf(viddec_struct_t* viddec, const uint8_t* buf, int buf_size, int64_t pts)
++{
++	ismd_result_t result = ISMD_SUCCESS;
++	int size_quotient;
++	long data_written=0;
++	int loop;
++	long write_size=CHUNK_SIZE;
++	ismd_buffer_handle_t ismd_buf = -1;
++
++	if (buf_size > 0)
++	{
++		size_quotient = buf_size / CHUNK_SIZE;
++		if(size_quotient >0)
++			write_size=CHUNK_SIZE;
++		else
++			write_size=buf_size;
++
++		//write data to video decoder input port in CHUNK_SIZE
++		for(loop = 0;loop <= size_quotient; loop++)
++		{
++			//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_4,("** buf_size %d CHUNK_SIZE %d size_quotient %d *****",buf_size,CHUNK_SIZE,size_quotient));
++
++			if(buf_size > 0)
++			{
++				if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++				{
++					//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_4,("**write size %ld ********",write_size));
++					if ((result = syno_ismd_ffmpeg_fill_viddec_buffer(buf+data_written, ismd_buf,write_size ,pts)) == ISMD_SUCCESS)
++					{
++						// decode it asynchronously
++						if ((result = ismd_ffmpeg_decoder_port_write(viddec,ismd_buf)) != ISMD_SUCCESS)
++						{
++							//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_1,("\n** error: unable to decode smd_buffers22 [%d] buf_size %d\n", result,buf_size));
++						}
++						data_written += write_size;
++						viddec->input_buffers += write_size;
++						if((buf_size - data_written) < CHUNK_SIZE)
++						{
++							write_size = buf_size - data_written;
++						}
++						else
++						{
++							write_size = CHUNK_SIZE;
++						}
++						//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_4,("Total bytes written to i/p port till now %d",viddec->input_buffers));
++					}
++					else
++					{
++						result= ismd_buffer_dereference(ismd_buf);
++						//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_1,("\n********unable to fill out smd_buffer\n"));
++					}
++				}
++				else
++				{
++					// alloc memory failed
++					// retry after a delay
++					if (result == ISMD_ERROR_NO_RESOURCES)
++					{
++						//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_1,("\nunable to allocate buffer in decode_frame error: [%d]\n",result));
++					}
++					else
++					{
++						//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_1,("\narning: unable to allocate input buffer [%d]\n",result));
++					}
++				}
++
++			}
++		}
++	}
++	else
++	{
++		if((buf_size == 0)&&(viddec->eos_written == false))
++		{
++			result = ismd_ffmpeg_send_eos_viddec(viddec);
++			if(ISMD_SUCCESS == result)
++			{
++				//DEBUG_MSG(g_debug_level,DEBUG_VERBOSITY_4,("written eos to video decoder result %d",result));
++				viddec->eos_written = true;
++			}
++		}
++
++	}
++	return result;
++}
++
++static void syno_heap_bubble_up(AVPacket *avpkt, int index)
++{
++    while (index) {
++        int parent = (index - 1) >> 1;
++        if (packets[parent].pts < avpkt->pts) {
++            break;
++		}
++		av_copy_packet(&packets[index], &packets[parent]);
++		av_free_packet(&packets[parent]);
++        index = parent;
++    }
++	av_copy_packet(&packets[index], avpkt);
++	av_free_packet(avpkt);
++
++	//return 0;
++}
++
++static void syno_heap_bubble_down(AVPacket *avpkt, int index)
++{
++    while (1) {
++        int child = 2 * index + 1;
++        if (child >= nb_packet) {
++            break;
++		}
++        if (child+1 < nb_packet && packets[child+1].pts < packets[child].pts) {
++            child++;
++		}
++        if (avpkt->pts < packets[child].pts) {
++            break;
++		}
++		av_copy_packet(&packets[index], &packets[child]);
++		av_free_packet(&packets[child]);
++        index = child;
++    }
++	av_copy_packet(&packets[index], avpkt);
++	av_free_packet(avpkt);
++}
++
++int syno_smd_push_heap(AVPacket *avpkt)
++{
++	if (NULL == avpkt) {
++		return -1;
++	}
++
++	if (nb_packet >= SZ_MAX_PACKATES) {
++		//av_free_packet(packets[nb_packet-1]);
++		av_free_packet(avpkt);
++		return 0;
++	} else {
++		nb_packet++;
++	}
++	syno_heap_bubble_up(avpkt, nb_packet-1);
++	return 0;
++}
++
++//* @return < 0, error.
++//            0, get a packst.
++//            1, finish.
++//            2, not ready.
++int syno_smd_get_heap(AVPacket *avpkt, int flush)
++{
++	if (NULL == avpkt) {
++		return -1;
++	}
++
++	if (1 == flush && nb_packet <= 0) {
++		return 1;
++	}
++
++	if (0 == flush && nb_packet <= 32) {
++		return 2;
++	}
++
++	av_init_packet(avpkt);
++	av_copy_packet(avpkt, &packets[0]);
++	av_free_packet(&packets[0]);
++
++	nb_packet--;
++	if (0 == nb_packet){
++		return 1;//finish
++	}
++	syno_heap_bubble_down(&packets[nb_packet], 0);
++	return 0;
++}
++#endif
+diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.h ./libavcodec/ismd_ffmpeg_audio_util.h
+--- ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/ismd_ffmpeg_audio_util.h	2020-01-04 21:09:07.159257367 -0500
+@@ -0,0 +1,55 @@
++/*
++ * This file contains utility functions
++ * Copyright (c) 2012, Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU Lesser General Public License,
++ * version 2.1, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License along with
++ * this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
++ *
++ */
++
++#ifndef AVCODEC_SMDAUDIOUTILS_H
++#define AVCODEC_SMDAUDIOUTILS_H
++
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
++#include "ismd_audio_defs.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_audio_dec.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_audio_enc.h"
++int ismd_ffmpeg_get_ismd_audio_channel_config(AVCodecContext *avctx);
++
++ismd_result_t ismd_ffmpeg_setup_aud_dec(AVCodecContext *avctx , audiodec_struct* p_aud_dec , ismd_audio_format_t ip_aud_fmt, int aac_bs_fmt);
++
++ismd_result_t ismd_ffmpeg_setup_aud_enc(AVCodecContext *avctx , audenc_struct_t* p_aud_enc , ismd_audio_output_mode_t op_aud_mode);
++
++ismd_result_t ismd_ffmpeg_config_aud_dec(AVCodecContext *avctx , audiodec_struct* p_aud_dec , ismd_audio_format_t ip_aud_fmt, int aac_bs_fmt);
++
++ismd_result_t ismd_ffmpeg_config_aud_enc(AVCodecContext *avctx , audenc_struct_t* p_aud_enc , ismd_audio_output_mode_t op_aud_mode);
++
++ismd_result_t ismd_ffmpeg_create_video_pipeline(AVCodecContext *avctx , viddec_struct_t* p_vid_dec , videnc_struct_t* p_vid_enc, const int dtv_smd);
++
++ismd_result_t ismd_ffmpeg_dec_aud_buf(AVCodecContext *avctx ,void *out_data, audiodec_struct* p_aud_dec,const uint8_t *ip_buf,int buf_size,int *got_frame_ptr);
++
++ismd_result_t ismd_ffmpeg_enc_aud_samples(AVCodecContext *avctx ,AVPacket *avpkt, audenc_struct_t* p_aud_enc, void *pcm_samples,int frame_bytes);
++
++int ismd_ffmpeg_got_codec_parameters(AVCodecContext *avctx);
++ismd_result_t ismd_ffmpeg_fill_videnc_buffer(AVCodecContext *ctx, AVFrame* frame,ismd_buffer_handle_t h, int64_t pts, int* data_used);
++
++ismd_result_t syno_ismd_ffmpeg_decode_vid_buf(viddec_struct_t* viddec, const uint8_t* buf, int buf_size, int64_t pts);
++ismd_result_t syno_ismd_ffmpeg_fill_viddec_buffer(const uint8_t *buf, ismd_buffer_handle_t h,size_t buffer_size, int64_t pts);
++int syno_smd_push_heap(AVPacket *avpkt);
++int syno_smd_get_heap(AVPacket *avpkt, int flush);
++#endif
++#endif
+diff -uprN ../ffmpeg-4.2.1/libavcodec/libavcodec.v ./libavcodec/libavcodec.v
+--- ../ffmpeg-4.2.1/libavcodec/libavcodec.v	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/libavcodec.v	2020-01-04 22:03:44.595352557 -0500
+@@ -1,6 +1,8 @@
+ LIBAVCODEC_MAJOR {
+     global:
+         av*;
++        ismd*;
++        syno*;
+     local:
+         *;
+ };
+diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c	2020-01-21 10:03:16.000000000 -0500
++++ ./libavcodec/libx264.c	2020-01-21 10:20:29.764267921 -0500
+@@ -44,6 +44,19 @@
+ // blocks of pixels (with respect to the luma plane)
+ #define MB_SIZE 16
+ 
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++#include "libffmpeg_plugin/ismd_ffmpeg_video_enc.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
++#include "libavcodec/ismd_ffmpeg_audio_util.h"
++#include "syno_trans_loading.h"
++static videnc_struct_t vid_enc;
++static bool eos_written=false;
++static bool smd_h264_enc_video_available = false;
++static bool x264_closed = false;
++#endif
++
+ typedef struct X264Context {
+     AVClass        *class;
+     x264_param_t    params;
+@@ -473,10 +486,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
+     return 0;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static int X264_frame_smd(AVCodecContext *ctx, AVPacket *pkt, const AVFrame *frame,int *got_packet)
++{
++	ismd_buffer_handle_t ismd_buf = -1;
++	ismd_result_t result = ISMD_SUCCESS;
++	int data_consumed = 0;
++	smd_h264_picture_t pic_out;
++	struct timespec ts;
++	int ret =0, pkt_size;
++
++	if(smd_h264_enc_video_available)
++	{
++		av_log(NULL, AV_LOG_DEBUG,"\n*********using hardware encoder **************\n");
++		if(frame != NULL)
++		{
++			av_log(NULL, AV_LOG_DEBUG,"\n*********i/p frame pts %lld*********\n",frame->pts);
++
++			if ((result = ismd_frame_buffer_alloc(ctx->width, (3*ctx->height)/2, &ismd_buf)) == ISMD_SUCCESS)
++			{
++				av_log(NULL, AV_LOG_DEBUG, "\n********* ismd_frame_buffer_alloc SUCCESS ***********\n");
++				if ((result = ismd_ffmpeg_fill_videnc_buffer(ctx,frame,ismd_buf,frame->pts, &data_consumed)) == ISMD_SUCCESS)
++				{
++					// encode it asynchronously
++					if ((result = ismd_ffmpeg_encode_buf(&vid_enc, ismd_buf)) != ISMD_SUCCESS)
++					{
++						av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers [%d]\n", result);
++					}
++					//av_log(NULL, AV_LOG_INFO, "\n*********after ff_encode_buf **************\n");
++					//data_written += write_size;
++					//vid_enc.input_buffers += write_size;
++					av_log(NULL, AV_LOG_DEBUG,"\n*********  bytes written to i/p port %d ********\n",data_consumed);
++					//av_log(NULL, AV_LOG_INFO,"\n********* Total bytes written to i/p port till now %d ********\n",vid_enc.input_buffers);
++				}
++				else
++				{
++					result= ismd_buffer_dereference(ismd_buf);
++					av_log(NULL, AV_LOG_ERROR,"\nX264_frame unable to fill smd_buffer\n");
++				}
++			}
++			else
++			{
++				// alloc memory failed
++				// retry after a delay
++				if (result == ISMD_ERROR_NO_RESOURCES)
++				{
++					av_log(NULL,AV_LOG_ERROR,"\n**************buffer allocation failed error: [%d]************\n", result);
++				}
++				else
++				{
++					av_log(NULL,AV_LOG_ERROR,"warning: unable to allocate input buffer [%d]\n", result);
++				}
++			}
++		}
++		else
++		{
++			av_log(NULL, AV_LOG_DEBUG, "\n************************** null frame received *************************\n");
++			if(eos_written == false)
++			{
++				av_log(NULL, AV_LOG_DEBUG, "\n******************* writing eos *************************\n");
++				ismd_ffmpeg_send_eos_videnc(&vid_enc);
++				eos_written = true;
++			}
++		}
++
++		if ((pkt_size = syno_ismd_ffmpeg_video_encoder_get_first_node_size(&vid_enc)) < 0) {
++			av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue_size_syno\n");
++			return -1;
++		}
++		if (pkt_size > 0) {
++			if (syno_alloc_packet(pkt, pkt_size) < 0) {
++				av_log(NULL, AV_LOG_FATAL, "syno_alloc_packet error at encoder SMD\n");
++				return -1;
++			}
++			ret = ismd_ffmpeg_video_encoder_dequeue(pkt->data, &pic_out,&vid_enc);
++			if (ret != pkt_size) {
++				av_log(NULL, AV_LOG_FATAL, "ismd_ffmpeg_video_encoder_dequeue size not conform\n");
++			}
++			memset(pkt->data + pkt->size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
++		}
++
++		if(ret <= 0)
++		{
++			ts.tv_sec = 0;
++			ts.tv_nsec = 10;
++			nanosleep (&ts, NULL);
++		}
++		if(ret > 0)
++		{
++
++			switch (pic_out.i_type)
++			{
++				case SLICE_P:
++					av_log(NULL,AV_LOG_DEBUG,"\n********returning pict type AV_PICTURE_TYPE_P\n");
++					ctx->coded_frame->pict_type = AV_PICTURE_TYPE_P;
++					break;
++				case SLICE_B:
++					av_log(NULL,AV_LOG_DEBUG,"\n********returning pict type AV_PICTURE_TYPE_B\n");
++					ctx->coded_frame->pict_type = AV_PICTURE_TYPE_B;
++					break;
++				case SLICE_I:
++					av_log(NULL,AV_LOG_DEBUG,"\n********returning pict type AV_PICTURE_TYPE_I\n");
++					ctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
++					break;
++				default:
++					ctx->coded_frame->pict_type = AV_PICTURE_TYPE_NONE;
++					av_log(NULL,AV_LOG_DEBUG,"\n********ERROR invalid picture type ************\n");
++
++			}
++			ctx->coded_frame->key_frame = pic_out.b_keyframe;
++			ctx->coded_frame->pts = pic_out.i_pts;
++			pkt->pts = pic_out.i_pts;
++			ctx->coded_frame->key_frame = pic_out.b_keyframe;
++			if (pic_out.b_keyframe) {
++				pkt->flags |= AV_PKT_FLAG_KEY;
++			}
++			av_log(NULL,AV_LOG_DEBUG,"\n********frame pts %lld ************\n",pic_out.i_pts);
++		}
++		*got_packet = ret;
++		return 0;
++
++	}
++	else
++	{
++		return X264_frame(ctx, pkt, frame, got_packet);
++	}
++}
++#endif
++
+ static av_cold int X264_close(AVCodecContext *avctx)
+ {
++#ifdef SYNO_EVANSPORT_SMD
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++#endif
+     X264Context *x4 = avctx->priv_data;
+ 
++#ifdef SYNO_EVANSPORT_SMD
++	if (!x264_closed && !x4->dont_free_extradata)
++	{
++#endif
+     av_freep(&avctx->extradata);
+     av_freep(&x4->sei);
+     av_freep(&x4->reordered_opaque);
+@@ -486,6 +634,26 @@ static av_cold int X264_close(AVCodecCon
+         x4->enc = NULL;
+     }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++               x264_closed =true;
++       }
++       av_log(NULL,AV_LOG_DEBUG,"\nin X264_close smd_h264_enc_video_available %d\n",smd_h264_enc_video_available);
++       //SMD CLOSE
++       if(smd_h264_enc_video_available)
++       {
++               if(eos_written == false)
++               {
++                       av_log(NULL, AV_LOG_DEBUG, "\n************* writing eos *************\n");
++                       ismd_ffmpeg_send_eos_videnc(&vid_enc);
++                       eos_written = true;
++                       ret_val = ismd_ffmpeg_free_vid_enc_res(&vid_enc);
++                       if(ret_val != ISMD_SUCCESS)
++                               av_log(NULL,AV_LOG_ERROR,"could not free video encoder resources\n");
++                       smd_h264_enc_video_available = false;
++               }
++       }
++#endif
++
+     return 0;
+ }
+ 
+@@ -949,6 +1117,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
+     return 0;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static av_cold int X264_init_smd(AVCodecContext *avctx)
++{
++	ismd_videnc_stream_init_params_t videnc_stream_init_params;
++	ismd_videnc_codec_init_params_t videnc_codec_init_params;
++	ismd_videnc_h264_encoder_params_t videnc_h264_encoder_params;
++	ismd_result_t result = ISMD_ERROR_UNSPECIFIED;
++	int profile,level;
++	int result_temp = -1;
++	uint32_t max_bitrate;
++	osal_result thread_result;
++	char port_read_thread[15];
++	videnc_struct_t* p_vid_enc = &vid_enc;
++	int ret;
++
++	X264Context *x4 = avctx->priv_data;
++
++	ret = X264_init(avctx);
++
++	if (!synoAddPID(getpid())) {
++		av_log(avctx, AV_LOG_ERROR, "Syno check hardware transcode falied\n");
++		return -1;
++	}
++
++	smd_h264_enc_video_available = ismd_ffmpeg_is_video_enc_avail();
++	av_log(NULL,AV_LOG_DEBUG,"\nin X264_init_smd smd_h264_enc_video_available %d\n",smd_h264_enc_video_available);
++	av_log(avctx,AV_LOG_DEBUG,"in X264_init_smd ismd_ffmpeg_is_video_enc_avail returned %d \n",smd_h264_enc_video_available);
++	if(!smd_h264_enc_video_available)
++	{
++		av_log( NULL, AV_LOG_INFO, "\nVideo hardware encoder not available for encoding.Falling back to software\n");
++	}
++	else
++	{
++		av_log( NULL, AV_LOG_INFO, "\n*********Using Hardware H.264 Encoder **************\n" );
++		//setup video encoder
++
++		videnc_stream_init_params.max_frame_width  = 1920;      // Default to HD
++		videnc_stream_init_params.max_frame_height = 1088;
++		videnc_stream_init_params.scene_change_control.lookahead_count = 0;
++
++		if(x4->profile)
++		{
++			profile = ismd_ffmpeg_profile_string_to_int(x4->profile);
++			if(profile < 0)
++			{
++				av_log(NULL, AV_LOG_ERROR, "\nprofile not supported\n");
++				return -1;
++			}
++			else
++			{
++				videnc_codec_init_params.h264_init_params.profile = profile;
++			}
++		}
++		else
++		{
++			videnc_codec_init_params.h264_init_params.profile = ISMD_VIDENC_H264_PROFILE_HIGH;
++		}
++		if(x4->level)
++		{
++			level = ismd_ffmpeg_level_string_to_int(x4->level);
++			if(level < 0)
++			{
++				av_log(NULL, AV_LOG_ERROR, "\nlevel %s not supported\n",x4->level);
++				return -1;
++			}
++			else
++			{
++				videnc_codec_init_params.h264_init_params.level = level;
++			}
++		}
++		else
++		{
++			videnc_codec_init_params.h264_init_params.level = ISMD_VIDENC_H264_LEVEL_4_1;
++		}
++		videnc_stream_init_params.scene_change_control.scene_change_detect_enabled = false;
++		result = ismd_videnc_open(ISMD_CODEC_TYPE_H264,&videnc_stream_init_params, &videnc_codec_init_params, &p_vid_enc->videnc_handle);
++		if(result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_open error %d\n", result);
++			return -1;
++		}
++		result = ismd_videnc_get_input_port(p_vid_enc->videnc_handle, &p_vid_enc->ip_port);
++		if(result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_get_input_port error %d\n",result);
++			return -1;
++		}
++		result = ismd_videnc_get_output_port(p_vid_enc->videnc_handle, &p_vid_enc->op_port);
++		if(result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_get_output_port error %d\n",result);
++			return -1;
++		}
++		result = ismd_event_alloc(&p_vid_enc->output_port_event);
++		if (result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"\nismd_event_alloc failed error %d\n",result);
++			return -1;
++		}
++		result = ismd_port_attach(p_vid_enc->op_port, p_vid_enc->output_port_event,ISMD_QUEUE_EVENT_NOT_EMPTY|ISMD_QUEUE_EVENT_FULL, ISMD_QUEUE_EVENT_HIGH_WATERMARK);
++		if (result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"\nismd_port_attach222 failed error %d\n",result);
++			return -1;
++		}
++		result = ismd_event_reset(p_vid_enc->output_port_event);
++		if (result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"\n FAILURE: ismd_event_reset222 failed error %d\n",result);
++			return -1;
++		}
++
++		result = ismd_videnc_h264_get_encoding_params(p_vid_enc->videnc_handle, &videnc_h264_encoder_params);
++		if(result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"failed at ismd_videnc_h264_get_encoding_params error %d\n",result);
++			return -1;
++		}
++
++		videnc_h264_encoder_params.chroma_format = ISMD_VIDENC_H264_CHROMA_FORMAT_4_2_0; //can only be configured at compile time in libx264
++		if((videnc_codec_init_params.h264_init_params.profile != ISMD_VIDENC_H264_PROFILE_BASELINE)&&(avctx->coder_type != 0))
++		{
++			videnc_h264_encoder_params.entropy = ISMD_VIDENC_H264_ENTROPY_MODE_CABAC;
++		}
++		videnc_h264_encoder_params.aspect_ratio =ISMD_VIDENC_H264_ASPECT_RATIO_NONE;
++		videnc_h264_encoder_params.bitrate_settings.bitrate_mode = ISMD_VIDENC_H264_RATE_CONTROL_VBR;
++		result_temp = ismd_ffmpeg_get_max_bitrate(videnc_codec_init_params.h264_init_params.profile, videnc_codec_init_params.h264_init_params.level,&max_bitrate);
++		if(result_temp < 0)
++		{
++			av_log(NULL, AV_LOG_ERROR, "\nEroor setting max_bitrate error %d\n",result_temp);
++			return -1;
++		}
++		else
++		{
++			videnc_h264_encoder_params.bitrate_settings.max_bitrate = max_bitrate;//    40000000;
++		}
++		if(avctx->bit_rate)
++		{
++			videnc_h264_encoder_params.bitrate_settings.bitrate = avctx->bit_rate;
++		}
++		else
++		{
++			videnc_h264_encoder_params.bitrate_settings.bitrate = 3000000;//300000;// 3000000;
++		}
++		if(avctx->gop_size >= 0)
++		{
++			videnc_h264_encoder_params.gop_settings.GOP_length = avctx->gop_size;
++		}
++		else
++		{
++			videnc_h264_encoder_params.gop_settings.GOP_length = 24;
++		}
++		if(avctx->max_b_frames >= 0)
++		{
++			if(avctx->max_b_frames < 3)
++				videnc_h264_encoder_params.gop_settings.num_of_B_frames = avctx->max_b_frames;
++			else
++				return -1;
++		}
++		else
++		{
++			videnc_h264_encoder_params.gop_settings.num_of_B_frames = 2;//[0..2] Maximum number of consecutive B Frame in a GOP.
++		}
++		if(avctx->keyint_min >= 0)
++		{
++			videnc_h264_encoder_params.gop_settings.IDR_Frequency = avctx->keyint_min;
++		}
++		else
++		{
++			videnc_h264_encoder_params.gop_settings.IDR_Frequency = 24;//0 is a special value to be set when scd(EPU) enabled
++		}
++		videnc_h264_encoder_params.qp_mode = ISMD_VIDENC_H264_QP_UNIFORM;
++
++		if(ismd_ffmpeg_videnc_h264_set_encoding_params(p_vid_enc->videnc_handle,&videnc_h264_encoder_params) != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"\nError setting h264 encoding parameters\n");
++			return -1;
++
++		}
++		p_vid_enc->eos_received = false;
++
++		//set the video encoder to play state
++		result = ismd_dev_set_state(p_vid_enc->videnc_handle, ISMD_DEV_STATE_PLAY);
++		if (result != ISMD_SUCCESS)
++		{
++			av_log(NULL,AV_LOG_ERROR,"\n FAILURE: could not start video encoder error %d\n",result);
++			return -1;
++		}
++
++		pthread_mutex_init(&p_vid_enc->mutex, NULL);
++		thread_result = os_thread_create(&p_vid_enc->output_thread, ismd_ffmpeg_videnc_output_thread, (void*)(p_vid_enc), 0, 0, port_read_thread);
++		if (thread_result != OSAL_SUCCESS)
++		{
++			av_log(NULL, AV_LOG_ERROR, "\nvideo encoder o/p thread creation failed\n");
++			return -1;
++		}
++	}
++	return ret;
++}
++#endif
++
+ static const enum AVPixelFormat pix_fmts_8bit[] = {
+     AV_PIX_FMT_YUV420P,
+     AV_PIX_FMT_YUVJ420P,
+@@ -1151,6 +1520,15 @@ static const AVClass x264_class = {
+     .version    = LIBAVUTIL_VERSION_INT,
+ };
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static const AVClass x264_class_smd = {
++        .class_name = "h264_smd",
++        .item_name  = av_default_item_name,
++        .option     = options,
++        .version    = LIBAVUTIL_VERSION_INT,
++};
++#endif
++
+ AVCodec ff_libx264_encoder = {
+     .name             = "libx264",
+     .long_name        = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
+@@ -1178,6 +1556,23 @@ static const AVClass rgbclass = {
+     .version    = LIBAVUTIL_VERSION_INT,
+ };
+ 
++#ifdef SYNO_EVANSPORT_SMD
++AVCodec ff_h264_smd_encoder = {
++    .name             = "h264_smd",
++    .long_name        = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
++    .type             = AVMEDIA_TYPE_VIDEO,
++    .id               = AV_CODEC_ID_H264,
++    .priv_data_size   = sizeof(X264Context),
++    .init             = X264_init_smd,
++    .encode2          = X264_frame_smd,
++    .close            = X264_close,
++    .capabilities     = AV_CODEC_CAP_DELAY,
++    .priv_class       = &x264_class_smd,
++    .defaults         = x264_defaults,
++    .init_static_data = X264_init_static,
++};
++#endif
++
+ AVCodec ff_libx264rgb_encoder = {
+     .name           = "libx264rgb",
+     .long_name      = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 RGB"),
+diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-4.2.2-patch049/libavcodec/Makefile	2020-01-21 10:04:33.000000000 -0500
++++ ./libavcodec/Makefile	2020-01-21 10:21:04.244270067 -0500
+@@ -52,6 +52,11 @@ OBJS = ac3_parser.o
+        vorbis_parser.o                                                  \
+        xiph.o                                                           \
+ 
++ifdef CONFIG_SMD
++OBJS += ismd_ffmpeg_audio_util.o
++OBJS += syno_trans_loading.o
++endif
++
+ # subsystems
+ OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+ OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
+diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
+--- ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/mpeg12dec.c	2020-01-04 22:05:42.839778315 -0500
+@@ -50,6 +50,16 @@
+ #include "version.h"
+ #include "xvmc_internal.h"
+ 
++#include "synoconfig.h"
++
++#ifdef SYNO_EVANSPORT_SMD
++#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
++#include "libavformat/avformat.h"
++static viddec_struct_t  smd_mpeg2_vid_dec;
++bool smd_mpeg2_vid_dec_available = false;
++#endif
++
+ typedef struct Mpeg1Context {
+     MpegEncContext mpeg_enc_ctx;
+     int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
+@@ -1081,6 +1091,41 @@ static av_cold int mpeg_decode_init(AVCo
+     return 0;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static av_cold int mpeg_decode_init_smd(AVCodecContext *avctx)
++{
++       ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++       int result;
++       result = mpeg_decode_init(avctx);
++
++       /********************* SMD code *******************/
++       smd_mpeg2_vid_dec.codec = ISMD_CODEC_TYPE_MPEG2;
++       // 1. Setup a single stream
++       ret_val = ismd_ffmpeg_setup_viddec_stream(&smd_mpeg2_vid_dec);
++       if(ISMD_SUCCESS == ret_val)
++       {
++               // 2. Start the stream
++               ret_val = ismd_ffmpeg_start_viddec_stream(&smd_mpeg2_vid_dec);
++       }
++       if(ret_val != ISMD_SUCCESS)
++       {
++               av_log(avctx,AV_LOG_INFO,"\nMPEG2 Hardware video decoder not available.Falling Back to software.\n");
++               av_log(avctx,AV_LOG_INFO,"\nMPEG2 can't fall back to software.\n");
++               result = -1;
++       }
++       else
++       {
++               av_log(avctx,AV_LOG_INFO,"\n******************Using MPEG2 Hardware video decoder**************\n");
++               smd_mpeg2_vid_dec_available = true;
++               smd_mpeg2_vid_dec.y_mem = NULL;
++               smd_mpeg2_vid_dec.u_mem = NULL;
++               smd_mpeg2_vid_dec.v_mem = NULL;
++               smd_mpeg2_vid_dec.send_sps_pps = true;
++       }
++       return result;
++}
++#endif
++
+ #if HAVE_THREADS
+ static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
+                                              const AVCodecContext *avctx_from)
+@@ -2849,6 +2894,57 @@ static int mpeg_decode_frame(AVCodecCont
+     return ret;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static int mpeg_decode_frame_smd(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
++{
++	const uint8_t *buf = avpkt->data;
++	int buf_size = avpkt->size;
++	AVFrame *pict = data;
++
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++	int got_frame = 0;
++	smd_video_frame decoded_frame;
++	struct timespec ts;
++
++	if(smd_mpeg2_vid_dec_available)
++			{
++		ret_val = ismd_ffmpeg_decode_vid_buf(&smd_mpeg2_vid_dec, buf, buf_size);
++		if(ret_val != ISMD_SUCCESS)
++				{
++			av_log(avctx,AV_LOG_ERROR,"\nismd_ffmpeg_decode_buf failed error:%d buf_size %d\n",ret_val,buf_size);
++			return -1;
++		}
++
++		ts.tv_sec = 0;
++		ts.tv_nsec = 10;
++		nanosleep (&ts, NULL);
++
++		ismd_ffmpeg_get_decoded_data(&decoded_frame, &smd_mpeg2_vid_dec, &got_frame);
++		if(got_frame)
++		{
++			*data_size = sizeof(AVFrame);
++			avctx->width = decoded_frame.width;
++			avctx->height = decoded_frame.height;
++			avctx->pix_fmt = AV_PIX_FMT_YUV420P;
++
++			pict->pkt_pts = AV_NOPTS_VALUE;
++			pict->pts = AV_NOPTS_VALUE ;
++			pict->data[0] = (uint8_t*)decoded_frame.y_mem;
++			pict->data[1] = (uint8_t*)decoded_frame.u_mem;
++			pict->data[2] = (uint8_t*)decoded_frame.v_mem;
++			pict->linesize[0] = decoded_frame.linesize_y;
++			pict->linesize[1] = decoded_frame.linesize_u;
++			pict->linesize[2] = decoded_frame.linesize_v;
++		}
++		return buf_size;
++	}
++	else
++	{
++		return mpeg_decode_frame(avctx, data, data_size, avpkt);
++	}
++}
++#endif
++
+ static void flush(AVCodecContext *avctx)
+ {
+     Mpeg1Context *s = avctx->priv_data;
+@@ -2860,11 +2956,25 @@ static void flush(AVCodecContext *avctx)
+ 
+ static av_cold int mpeg_decode_end(AVCodecContext *avctx)
+ {
++#ifdef SYNO_EVANSPORT_SMD
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++#endif
+     Mpeg1Context *s = avctx->priv_data;
+ 
+     if (s->mpeg_enc_ctx_allocated)
+         ff_mpv_common_end(&s->mpeg_enc_ctx);
+     av_freep(&s->a53_caption);
++
++#ifdef SYNO_EVANSPORT_SMD
++	if(smd_mpeg2_vid_dec_available)
++	{
++		ret_val = ismd_ffmpeg_free_vid_dec_res(&smd_mpeg2_vid_dec);
++		if(ret_val != ISMD_SUCCESS)
++			av_log(avctx,AV_LOG_ERROR,"could not free video decoder resources\n");
++	}
++	smd_mpeg2_vid_dec_available = false;
++#endif
++
+     return 0;
+ }
+ 
+@@ -2946,6 +3056,23 @@ AVCodec ff_mpeg2video_decoder = {
+                     },
+ };
+ 
++#ifdef SYNO_EVANSPORT_SMD
++AVCodec ff_mpeg2video_smd_decoder = {
++    .name           = "mpeg2video_smd",
++    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-2 video Hardware(SMD) Decoder"),
++    .type           = AVMEDIA_TYPE_VIDEO,
++    .id             = AV_CODEC_ID_MPEG2VIDEO_SYNO,
++    .priv_data_size = sizeof(Mpeg1Context),
++    .init           = mpeg_decode_init_smd,
++    .close          = mpeg_decode_end,
++    .decode         = mpeg_decode_frame_smd,
++    .capabilities   = AV_CODEC_CAP_DELAY,
++    .flush          = flush,
++    .max_lowres     = 3,
++    .profiles       = NULL_IF_CONFIG_SMALL(ff_mpeg2_video_profiles),
++};
++#endif
++
+ //legacy decoder
+ AVCodec ff_mpegvideo_decoder = {
+     .name           = "mpegvideo",
+diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
+--- ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c	2020-01-04 21:07:34.000000000 -0500
++++ ./libavcodec/mpeg4videodec.c	2020-01-04 22:01:37.869680725 -0500
+@@ -39,6 +39,8 @@
+ #include "xvididct.h"
+ #include "unary.h"
+ 
++#include "synoconfig.h"
++
+ /* The defines below define the number of bits that are read at once for
+  * reading vlc values. Changing these may improve speed and data cache needs
+  * be aware though that decreasing them may need the number of stages that is
+@@ -3529,6 +3531,17 @@ static av_cold int decode_init(AVCodecCo
+     return 0;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static av_cold int decode_init_smd(AVCodecContext *avctx)
++{
++       int result =0;
++       result = decode_init(avctx);
++       if (0 > ff_h263_decode_init_smd(avctx))
++               return -1;
++       return result;
++}
++#endif
++
+ static av_cold int decode_end(AVCodecContext *avctx)
+ {
+     Mpeg4DecContext *ctx = avctx->priv_data;
+@@ -3551,6 +3564,14 @@ static const AVOption mpeg4_options[] =
+     {NULL}
+ };
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static const AVOption mpeg4_options_smd[] = {
++    {"quarter_sample", "1/4 subpel MC", offsetof(MpegEncContext, quarter_sample), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
++    {"divx_packed", "divx style packed b frames", offsetof(MpegEncContext, divx_packed), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
++    {NULL}
++};
++#endif
++
+ static const AVClass mpeg4_class = {
+     .class_name = "MPEG4 Video Decoder",
+     .item_name  = av_default_item_name,
+@@ -3558,6 +3579,15 @@ static const AVClass mpeg4_class = {
+     .version    = LIBAVUTIL_VERSION_INT,
+ };
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static const AVClass mpeg4_class_smd = {
++    "MPEG4 Video Decoder",
++    av_default_item_name,
++    mpeg4_options_smd,
++    LIBAVUTIL_VERSION_INT,
++};
++#endif
++
+ AVCodec ff_mpeg4_decoder = {
+     .name                  = "mpeg4",
+     .long_name             = NULL_IF_CONFIG_SMALL("MPEG-4 part 2"),
+@@ -3593,3 +3623,23 @@ AVCodec ff_mpeg4_decoder = {
+                                NULL
+                            },
+ };
++
++#ifdef SYNO_EVANSPORT_SMD
++AVCodec ff_mpeg4_smd_decoder = {
++     .name                  = "mpeg4_smd",
++     .long_name             = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Hardware(SMD) Decoder"),
++     .type                  = AVMEDIA_TYPE_VIDEO,
++     .id                    = AV_CODEC_ID_MPEG4_SYNO,
++     .priv_data_size        = sizeof(Mpeg4DecContext),
++     .init                  = decode_init_smd,
++     .close                 = ff_h263_decode_end,
++     .decode                = ff_h263_decode_frame_smd,
++     .capabilities          = AV_CODEC_CAP_DELAY,
++     .flush                 = ff_mpeg_flush,
++     .max_lowres            = 3,
++     .pix_fmts              = ff_h263_hwaccel_pixfmt_list_420,
++     .profiles              = NULL_IF_CONFIG_SMALL(ff_mpeg4_video_profiles),
++     .update_thread_context = ONLY_IF_THREADS_ENABLED(ff_mpeg_update_thread_context),
++     .priv_class            = &mpeg4_class_smd,
++};
++#endif
+diff -uprN ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c ./libavcodec/mpegvideo_parser.c
+--- ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/mpegvideo_parser.c	2020-01-04 21:09:07.243258617 -0500
+@@ -24,6 +24,8 @@
+ #include "mpeg12.h"
+ #include "internal.h"
+ 
++#include "synoconfig.h"
++
+ struct MpvParseContext {
+     ParseContext pc;
+     AVRational frame_rate;
+@@ -31,7 +33,6 @@ struct MpvParseContext {
+     int width, height;
+ };
+ 
+-
+ static void mpegvideo_extract_headers(AVCodecParserContext *s,
+                                       AVCodecContext *avctx,
+                                       const uint8_t *buf, int buf_size)
+@@ -76,7 +77,13 @@ static void mpegvideo_extract_headers(AV
+                 frame_rate_index = buf[3] & 0xf;
+                 pc->frame_rate = avctx->framerate = ff_mpeg12_frame_rate_tab[frame_rate_index];
+                 bit_rate = (buf[4]<<10) | (buf[5]<<2) | (buf[6]>>6);
++#ifdef SYNO_EVANSPORT_SMD
++				if (AV_CODEC_ID_MPEG2VIDEO_SYNO != avctx->codec_id) {
++#endif
+                 avctx->codec_id = AV_CODEC_ID_MPEG1VIDEO;
++#ifdef SYNO_EVANSPORT_SMD
++				}
++#endif
+                 avctx->ticks_per_frame = 1;
+             }
+             break;
+@@ -108,7 +115,13 @@ static void mpegvideo_extract_headers(AV
+                             set_dim_ret = ff_set_dimensions(avctx, pc->width, pc->height);
+                         avctx->framerate.num = pc->frame_rate.num * (frame_rate_ext_n + 1);
+                         avctx->framerate.den = pc->frame_rate.den * (frame_rate_ext_d + 1);
++#ifdef SYNO_EVANSPORT_SMD
++						if (AV_CODEC_ID_MPEG2VIDEO_SYNO != avctx->codec_id) {
++#endif
+                         avctx->codec_id = AV_CODEC_ID_MPEG2VIDEO;
++#ifdef SYNO_EVANSPORT_SMD
++						}
++#endif
+                         avctx->ticks_per_frame = 2;
+                     }
+                     break;
+@@ -237,7 +250,11 @@ static int mpegvideo_parse_init(AVCodecP
+ }
+ 
+ AVCodecParser ff_mpegvideo_parser = {
++#ifdef SYNO_EVANSPORT_SMD
++    .codec_ids      = { AV_CODEC_ID_MPEG1VIDEO, AV_CODEC_ID_MPEG2VIDEO, AV_CODEC_ID_MPEG2VIDEO_SYNO },
++#else
+     .codec_ids      = { AV_CODEC_ID_MPEG1VIDEO, AV_CODEC_ID_MPEG2VIDEO },
++#endif
+     .priv_data_size = sizeof(struct MpvParseContext),
+     .parser_init    = mpegvideo_parse_init,
+     .parser_parse   = mpegvideo_parse,
+diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.c ./libavcodec/syno_trans_loading.c
+--- ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/syno_trans_loading.c	2020-01-04 21:09:07.459261832 -0500
+@@ -0,0 +1,243 @@
++#include <errno.h>
++#include <fcntl.h>
++#include <signal.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <sys/file.h>
++#include "json-c/json.h"
++#include "libavutil/log.h"
++#include "syno_trans_loading.h"
++
++#define SZ_DIR_TMP_VIDEO "/tmp/VideoStation"
++#define SZ_FILE_TRANS_ENABLE SZ_DIR_TMP_VIDEO"/enabled"
++#define SZ_JSON_KEY_PID "PID"
++#define SZ_JSON_KEY_HARDWARE_TRANSCODE "hardware_transcode"
++
++#ifdef SYNO_EVANSPORT_SMD
++static int IsProcAlive(int pid)
++{
++	if (!kill(pid, 0) || errno == EPERM)
++		return 1;
++	else
++		return 0;
++}
++
++static int CheckPIDIsAlive(json_object *pTmpObj)
++{
++	int iRet = 0, iPID = 0;
++	json_object *pPIDObj = NULL;
++
++	if (!pTmpObj) {
++		goto Exit;
++	}
++	if (!json_object_is_type(pTmpObj, json_type_object)) {
++		goto Exit;
++	}
++	pPIDObj = json_object_object_get(pTmpObj, SZ_JSON_KEY_PID);
++	if (!json_object_is_type(pPIDObj, json_type_int)) {
++		goto Exit;
++	}
++	iPID = json_object_get_int(pPIDObj);
++	if (!IsProcAlive(iPID)) {
++		goto Exit;
++	}
++	iRet = iPID;
++Exit:
++	return iRet;
++}
++
++static int CheckIsUseHardware(json_object *pTmpObj)
++{
++	int iRet = 0;
++	json_object *pHardwareObj = NULL;
++
++	if (!pTmpObj) {
++		goto Exit;
++	}
++	pHardwareObj = json_object_object_get(pTmpObj, SZ_JSON_KEY_HARDWARE_TRANSCODE);
++	if (!json_object_is_type(pHardwareObj, json_type_boolean)) {
++		goto Exit;
++	}
++	if (json_object_get_boolean(pHardwareObj)) {
++		iRet = 1;
++	}
++
++Exit:
++	return iRet;
++}
++
++static int WriteJosnToFile(json_object *pRootObj)
++{
++	int iRet = -1;
++	if (!pRootObj) {
++		goto Exit;
++	}
++
++	if (0 > json_object_to_file(SZ_FILE_TRANS_ENABLE, pRootObj)) {
++		goto Exit;
++	}
++
++	if (0 != chmod(SZ_FILE_TRANS_ENABLE, 0777)) {
++		goto Exit;
++	}
++	iRet = 0;
++Exit:
++	return iRet;
++}
++
++static int LockFile()
++{
++	int fdLock = -1;
++	struct stat statBuf;
++
++	if (0 != stat(SZ_DIR_TMP_VIDEO , &statBuf)) {
++		if (0 > mkdir(SZ_DIR_TMP_VIDEO, S_IRWXU | S_IRWXG | S_IRWXO)) {
++			goto Exit;
++		}
++	}
++	fdLock = open(SZ_FILE_TRANS_ENABLE, O_RDONLY | O_CREAT, 0777);
++	if (0 <= fdLock) {
++		flock(fdLock, LOCK_EX);
++	}
++
++Exit:
++	return fdLock;
++}
++
++/* @brief check Hardware transcode enable and add PID to file
++ * @param pidFFmpeg [in] pid of ffmpeg process
++ * @return [out] 1: success
++ *               0: failed
++ */
++int synoAddPID(const pid_t pidFFmpeg)
++{
++	int iRet = 0;
++	int i = 0, fdLock = -1, iHardwareUsage = 0, iPIDExist = 0, iPID = 0;
++	json_object *pRootObj = NULL, *pNewObj = NULL, *pTmpObj = NULL,
++				*pNewArray = NULL;
++
++	if (0 >= pidFFmpeg) {
++		av_log(NULL, AV_LOG_ERROR, "pidFFmpeg %d failed\n", pidFFmpeg);
++		goto Exit;
++	}
++
++	if (0 > (fdLock = LockFile())) {
++		av_log(NULL, AV_LOG_ERROR, "LockFile failed, fdLock %d\n", fdLock);
++		goto Exit;
++	}
++
++	pNewArray = json_object_new_array();
++	if (NULL == (pRootObj = json_object_from_file(SZ_FILE_TRANS_ENABLE))) {
++		goto Write;
++	}
++
++	if (!json_object_is_type(pRootObj, json_type_array)) {
++		goto Write;
++	}
++
++	for (i = 0; i < json_object_array_length(pRootObj); i++) {
++		pTmpObj = json_object_array_get_idx(pRootObj, i);
++		if (0 == (iPID = CheckPIDIsAlive(pTmpObj))) {
++			continue;
++		}
++
++		if (pidFFmpeg == iPID) {
++			iPIDExist = 1;
++		} else if (CheckIsUseHardware(pTmpObj)) {
++			iHardwareUsage++;
++		}
++		json_object_array_add(pNewArray, pTmpObj);
++	}
++
++	if (1 <= iHardwareUsage) {
++		av_log(NULL, AV_LOG_ERROR, "Hardware transcoding is busy!!\n");
++		goto Exit;
++	}
++
++Write:
++	if (!iPIDExist) {
++		pNewObj = json_object_new_object();
++		json_object_object_add(pNewObj, SZ_JSON_KEY_PID, json_object_new_int(pidFFmpeg));
++		json_object_object_add(pNewObj, SZ_JSON_KEY_HARDWARE_TRANSCODE, json_object_new_boolean(1));
++		json_object_array_add(pNewArray, pNewObj);
++	}
++	WriteJosnToFile(pNewArray);
++
++	iRet = 1;
++Exit:
++	if (0 <= fdLock) {
++		flock(fdLock, LOCK_UN);
++		close(fdLock);
++	}
++
++	if (pRootObj) {
++		json_object_put(pRootObj);
++	}
++	if (pNewObj) {
++		json_object_put(pNewObj);
++	}
++	if (pNewArray) {
++		json_object_put(pNewArray);
++	}
++	return iRet;
++}
++
++/* @brief remove pid from file
++ * @param pidFFmpeg [in] pid of ffmpeg process
++ * @return [out] 1: success
++ *               0: failed
++ */
++int synoRemovePID(const pid_t pidFFmpeg)
++{
++	int iRet = 0;
++	int i = 0, fdLock = -1, iPID = 0;
++	json_object *pRootObj = NULL, *pTmpObj = NULL, *pNewArray = NULL;
++
++	if (0 >= pidFFmpeg) {
++		av_log(NULL, AV_LOG_ERROR, "pidFFmpeg %d failed\n", pidFFmpeg);
++		goto Exit;
++	}
++
++	if (0 > (fdLock = LockFile())) {
++		av_log(NULL, AV_LOG_ERROR, "LockFile failed, fdLock %d\n", fdLock);
++		goto Exit;
++	}
++
++	if (NULL == (pRootObj = json_object_from_file(SZ_FILE_TRANS_ENABLE))) {
++		goto Exit;
++	}
++
++	if (!json_object_is_type(pRootObj, json_type_array)) {
++		goto Exit;
++	}
++
++	pNewArray = json_object_new_array();
++	for (i = 0; i < json_object_array_length(pRootObj); i++) {
++		pTmpObj = json_object_array_get_idx(pRootObj, i);
++		if (0 == (iPID = CheckPIDIsAlive(pTmpObj))) {
++			continue;
++		}
++		if (pidFFmpeg == iPID) {
++			continue;
++		}
++		json_object_array_add(pNewArray, pTmpObj);
++	}
++	WriteJosnToFile(pNewArray);
++
++	iRet = 1;
++Exit:
++	if (0 <= fdLock) {
++		flock(fdLock, LOCK_UN);
++		close(fdLock);
++	}
++	if (pRootObj) {
++		json_object_put(pRootObj);
++	}
++	if (pNewArray) {
++		json_object_put(pNewArray);
++	}
++	return iRet;
++}
++#endif// SYNO_EVANSPORT_SMD
+diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.h ./libavcodec/syno_trans_loading.h
+--- ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/syno_trans_loading.h	2020-01-04 21:09:07.459261832 -0500
+@@ -0,0 +1,11 @@
++#ifndef _SYNO_TRANS_LOADING_H
++#define _SYNO_TRANS_LOADING_H
++
++#include "synoconfig.h"
++#ifdef SYNO_EVANSPORT_SMD
++
++int synoAddPID(const pid_t pidFFmpeg);
++int synoRemovePID(const pid_t pidFFmpeg);
++
++#endif //SYNO_EVANSPORT_SMD
++#endif //_SYNO_TRANS_LOADING_H
+diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
+--- ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c	2020-01-21 10:03:16.000000000 -0500
++++ ./libavcodec/vc1dec.c	2020-01-21 10:29:20.824300974 -0500
+@@ -40,6 +40,7 @@
+ #include "vc1data.h"
+ #include "libavutil/avassert.h"
+ 
++#include "synoconfig.h"
+ 
+ #if CONFIG_WMV3IMAGE_DECODER || CONFIG_VC1IMAGE_DECODER
+ 
+@@ -268,6 +269,13 @@ static void vc1_draw_sprites(VC1Context
+     }
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++#include "libffmpeg_plugin/ismd_ffmpeg_util.h"
++#include "libffmpeg_plugin/ismd_ffmpeg_video_dec.h"
++#include "libavformat/avformat.h"
++static viddec_struct_t  smd_vc1_vid_dec;
++bool smd_vc1_vid_dec_available = false;
++#endif
+ 
+ static int vc1_decode_sprites(VC1Context *v, GetBitContext* gb)
+ {
+@@ -437,7 +445,12 @@ static av_cold int vc1_decode_init(AVCod
+     if ((ret = ff_vc1_init_common(v)) < 0)
+         return ret;
+ 
++#ifdef SYNO_EVANSPORT_SMD
++    if ((avctx->codec_id == AV_CODEC_ID_WMV3 || avctx->codec_id == AV_CODEC_ID_WMV3_SYNO) || avctx->codec_id == AV_CODEC_ID_WMV3IMAGE) {
++#else
+     if (avctx->codec_id == AV_CODEC_ID_WMV3 || avctx->codec_id == AV_CODEC_ID_WMV3IMAGE) {
++#endif
++
+         int count = 0;
+ 
+         // looks like WMV3 has a sequence header stored in the extradata
+@@ -593,11 +606,49 @@ error:
+     return ret;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static av_cold int vc1_decode_init_smd(AVCodecContext *avctx)
++{
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++	int result;
++	result = vc1_decode_init(avctx);
++	/********************* SMD code *******************/
++	smd_vc1_vid_dec.codec = ISMD_CODEC_TYPE_VC1;
++	// 1. Setup a single stream
++	ret_val = ismd_ffmpeg_setup_viddec_stream(&smd_vc1_vid_dec);
++	if(ISMD_SUCCESS == ret_val)
++	{
++		// 2. Start the stream
++		ret_val = ismd_ffmpeg_start_viddec_stream(&smd_vc1_vid_dec);
++	}
++	if(ret_val != ISMD_SUCCESS)
++	{
++		av_log(avctx,AV_LOG_INFO,"\nVC1 Hardware video decoder not available.Falling Back to software.\n");
++		av_log(avctx,AV_LOG_INFO,"\nVC1 can't fall back to software.\n");
++		result = -1;
++	}
++	else
++	{
++		av_log(avctx,AV_LOG_INFO,"\n******************Using VC1 Hardware video decoder**************\n");
++		smd_vc1_vid_dec_available = true;
++		smd_vc1_vid_dec.y_mem = NULL;
++		smd_vc1_vid_dec.u_mem = NULL;
++		smd_vc1_vid_dec.v_mem = NULL;
++		smd_vc1_vid_dec.send_sps_pps = true;
++	}
++	/********************** SMD END *********************/
++	return result;
++}
++#endif
++
+ /** Close a VC1/WMV3 decoder
+  * @warning Initial try at using MpegEncContext stuff
+  */
+ av_cold int ff_vc1_decode_end(AVCodecContext *avctx)
+ {
++#ifdef SYNO_EVANSPORT_SMD
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++#endif
+     VC1Context *v = avctx->priv_data;
+     int i;
+ 
+@@ -624,9 +675,19 @@ av_cold int ff_vc1_decode_end(AVCodecCon
+     av_freep(&v->is_intra_base); // FIXME use v->mb_type[]
+     av_freep(&v->luma_mv_base);
+     ff_intrax8_common_end(&v->x8);
+-    return 0;
++
++#ifdef SYNO_EVANSPORT_SMD
++	if(smd_vc1_vid_dec_available)
++	{
++		ret_val = ismd_ffmpeg_free_vid_dec_res(&smd_vc1_vid_dec);
++		if(ret_val != ISMD_SUCCESS)
++			av_log(avctx,AV_LOG_ERROR,"could not free video decoder resources\n");
+ }
++	smd_vc1_vid_dec_available = false;
++#endif
+ 
++    return 0;
++}
+ 
+ /** Decode a VC1/WMV3 frame
+  * @todo TODO: Handle VC-1 IDUs (Transport level?)
+@@ -1178,6 +1239,147 @@ err:
+     return ret;
+ }
+ 
++#ifdef SYNO_EVANSPORT_SMD
++static int vc1_decode_frame_smd(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
++{
++	ismd_result_t ret_val = ISMD_ERROR_UNSPECIFIED;
++	const uint8_t *buf = avpkt->data;
++	int buf_size = avpkt->size;
++	VC1Context *v = avctx->priv_data;
++	AVFrame *pict = data;
++	uint8_t* buf_with_start_code =NULL;
++	int new_buf_size = buf_size;
++	ismd_buffer_handle_t ismd_buf = -1;
++	ismd_result_t result = ISMD_SUCCESS;
++	static bool first_time = true;
++	int max_bufsize =0;
++	unsigned char pSeqHeaderRbdu[8];
++	unsigned char SPMP_PESpacket_PayloadFormatHeader[16];
++	int size_SPMP_PESpacket_PayloadFormatHeader;
++	int got_frame = 0;
++	smd_video_frame decoded_frame;
++	struct timespec ts;
++	if(smd_vc1_vid_dec_available)
++	{
++
++		if ((buf_size >= 4)&& (!IS_MARKER(AV_RB32(buf))) && first_time) /* frame starts with marker and needs to be parsed */
++		{
++			smd_vc1_vid_dec.vc1_without_start_code = true;//not compatible with smd
++			first_time = false;
++
++		}
++
++		if(smd_vc1_vid_dec.vc1_without_start_code)
++		{
++			//write sps to decoder port first this comes out-of-band in wvc1
++			if((smd_vc1_vid_dec.send_sps_pps) && avctx->extradata_size > 0 && avctx->extradata)
++			{
++				uint8_t* seq_header_buf = av_malloc(16);
++				switch (v->profile)
++				{
++					case PROFILE_ADVANCED:
++						/***** write sps buffer for wvc1 at decoder i/p port **********************/
++						if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++						{
++							if ((result = ismd_ffmpeg_fill_viddec_buffer(avctx->extradata+1, ismd_buf,avctx->extradata_size-1)) == ISMD_SUCCESS)
++							{
++								// decode it asynchronously
++								if ((result = ismd_ffmpeg_decoder_port_write(&smd_vc1_vid_dec,ismd_buf)) != ISMD_SUCCESS)
++								{
++									av_log(avctx, AV_LOG_ERROR,"error: unable to decode smd_buffers [%d]\n", result);
++								}
++							}
++						}
++						break;
++					case PROFILE_SIMPLE:
++					case PROFILE_MAIN:
++						size_SPMP_PESpacket_PayloadFormatHeader = ismd_ffmpeg_vc1_viddec_SPMP_PESpacket_PayloadFormatHeader (pSeqHeaderRbdu, SPMP_PESpacket_PayloadFormatHeader, avctx->extradata, avctx->extradata_size, avctx->width, avctx->height);
++
++						if ((result = ismd_buffer_alloc(CHUNK_SIZE, &ismd_buf)) == ISMD_SUCCESS)
++						{
++							if ((result = ismd_ffmpeg_fill_viddec_buffer(SPMP_PESpacket_PayloadFormatHeader, ismd_buf,size_SPMP_PESpacket_PayloadFormatHeader)) == ISMD_SUCCESS)
++							{
++								// decode it asynchronously
++								if ((result = ismd_ffmpeg_decoder_port_write(&smd_vc1_vid_dec,ismd_buf)) != ISMD_SUCCESS)
++								{
++									av_log(NULL, AV_LOG_ERROR,"error: unable to decode smd_buffers [%d]\n", result);
++								}
++							}
++						}
++						break;
++				}
++				smd_vc1_vid_dec.send_sps_pps = false;
++				av_free(seq_header_buf);
++			}
++
++			//need to insert start code
++			switch (v->profile)
++			{
++				case PROFILE_ADVANCED:
++					//insert start code
++					buf_with_start_code = av_malloc(4 + buf_size);//TODO free memory
++
++					new_buf_size = ismd_ffmpeg_vc1_viddec_convert_AP(buf_with_start_code, buf, buf_size);
++
++					break;
++				case PROFILE_SIMPLE:
++				case PROFILE_MAIN:
++					// Calculate maximum buffer size, make room for encapsulation
++					// SMPTE-421M-FDSI doc, Annex-E
++					max_bufsize = ( (avpkt->size + 3 ) / 3 ) * 4;
++					buf_with_start_code = av_malloc(max_bufsize);
++					//insert start code
++
++					new_buf_size = ismd_ffmpeg_vc1_viddec_convert_SPMP(buf_with_start_code, avpkt->data, avpkt->size, max_bufsize);
++
++					break;
++			}
++
++		}
++		else
++			buf_with_start_code = buf;
++		/*********** write buffer data ************************/
++		ret_val = ismd_ffmpeg_decode_vid_buf(&smd_vc1_vid_dec, buf_with_start_code, new_buf_size);
++
++		if(ret_val != ISMD_SUCCESS)
++					{
++			av_log(avctx,AV_LOG_ERROR,"\nismd_ffmpeg_decode_buf failed error:%d buf_size %d\n",ret_val,buf_size);
++			return -1;
++				}
++
++		if((smd_vc1_vid_dec.vc1_without_start_code)&& buf_with_start_code)
++			{
++			av_free(buf_with_start_code);
++		}
++		ts.tv_sec = 0;
++		ts.tv_nsec = 10;
++		nanosleep (&ts, NULL);
++
++		ismd_ffmpeg_get_decoded_data(&decoded_frame, &smd_vc1_vid_dec, &got_frame);
++		if(got_frame)
++		{
++			*data_size = 1;
++			avctx->width = decoded_frame.width;
++			avctx->height = decoded_frame.height;
++			avctx->pix_fmt = AV_PIX_FMT_YUV420P;
++
++			pict->pkt_pts = AV_NOPTS_VALUE;
++			pict->pts = AV_NOPTS_VALUE ;
++			pict->data[0] = (uint8_t*)decoded_frame.y_mem;
++			pict->data[1] = (uint8_t*)decoded_frame.u_mem;
++			pict->data[2] = (uint8_t*)decoded_frame.v_mem;
++			pict->linesize[0] = decoded_frame.linesize_y;
++			pict->linesize[1] = decoded_frame.linesize_u;
++			pict->linesize[2] = decoded_frame.linesize_v;
++		}
++		return buf_size;
++	}
++	else
++	{
++		return  vc1_decode_frame(avctx, data, data_size, avpkt);
++	}
++}
++#endif
+ 
+ static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
+ #if CONFIG_VC1_DXVA2_HWACCEL
+@@ -1236,6 +1438,22 @@ AVCodec ff_vc1_decoder = {
+     .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
+ };
+ 
++#ifdef SYNO_EVANSPORT_SMD
++AVCodec ff_vc1_smd_decoder = {
++	.name           = "vc1_smd",
++	.type           = AVMEDIA_TYPE_VIDEO,
++	.id             = AV_CODEC_ID_VC1_SYNO,
++	.priv_data_size = sizeof(VC1Context),
++	.init           = vc1_decode_init_smd,
++	.close          = ff_vc1_decode_end,
++	.decode         = vc1_decode_frame_smd,
++	.capabilities   = AV_CODEC_CAP_DELAY,
++	.long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 Hardware(SMD) Decoder"),
++	.pix_fmts       = vc1_hwaccel_pixfmt_list_420,
++	.profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
++};
++#endif
++
+ #if CONFIG_WMV3_DECODER
+ AVCodec ff_wmv3_decoder = {
+     .name           = "wmv3",
+@@ -1273,6 +1491,22 @@ AVCodec ff_wmv3_decoder = {
+     .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
+ };
+ #endif
++
++#ifdef SYNO_EVANSPORT_SMD
++AVCodec ff_wmv3_smd_decoder = {
++    .name           = "wmv3_smd",
++    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 Hardware(SMD) Decoder"),
++    .type           = AVMEDIA_TYPE_VIDEO,
++    .id             = AV_CODEC_ID_WMV3_SYNO,
++    .priv_data_size = sizeof(VC1Context),
++    .init           = vc1_decode_init_smd,
++    .close          = ff_vc1_decode_end,
++    .decode         = vc1_decode_frame_smd,
++    .capabilities   = AV_CODEC_CAP_DELAY,
++    .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
++    .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
++};
++#endif
+ 
+ #if CONFIG_WMV3IMAGE_DECODER
+ AVCodec ff_wmv3image_decoder = {
+diff -uprN ../ffmpeg-4.2.1/libavformat/flacdec.c ./libavformat/flacdec.c
+--- ../ffmpeg-4.2.1/libavformat/flacdec.c	2020-01-04 21:07:34.000000000 -0500
++++ ./libavformat/flacdec.c	2020-01-04 21:09:07.467261951 -0500
+@@ -45,6 +45,8 @@ static void reset_index_position(int64_t
+     }
+ }
+ 
++#include "synoconfig.h"
++
+ static int flac_read_header(AVFormatContext *s)
+ {
+     int ret, metadata_last=0, metadata_type, metadata_size, found_streaminfo=0;
+diff -uprN ../ffmpeg-4.2.1/libavformat/matroskaenc.c ./libavformat/matroskaenc.c
+--- ../ffmpeg-4.2.1/libavformat/matroskaenc.c	2020-01-04 21:07:34.000000000 -0500
++++ ./libavformat/matroskaenc.c	2020-01-04 21:09:07.471262011 -0500
+diff -uprN ../ffmpeg-4.2.1/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
+--- ../ffmpeg-4.2.1/libavformat/mpegtsenc.c	2019-08-05 16:52:21.000000000 -0400
++++ ./libavformat/mpegtsenc.c	2020-01-04 21:09:07.475262070 -0500
+@@ -34,6 +34,8 @@
+ #include "internal.h"
+ #include "mpegts.h"
+ 
++#include "synoconfig.h"
++
+ #define PCR_TIME_BASE 27000000
+ 
+ /* write DVB SI sections */
+@@ -1377,7 +1379,6 @@ static void mpegts_write_pes(AVFormatCon
+                       *q++ = 0x00 | 0x71; /* for AC3 Audio (specifically on blue-rays) */
+               }
+ 
+-
+             if (is_dvb_subtitle) {
+                 /* First two fields of DVB subtitles PES data:
+                  * data_identifier: for DVB subtitle streams shall be coded with the value 0x20

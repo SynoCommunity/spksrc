@@ -15,4 +15,5 @@ bin:bin/vppblending
 bin:bin/vppchromasitting
 bin:bin/vppdenoise
 bin:bin/vppscaling_csc
+bin:bin/vppscaling_n_out_usrptr
 bin:bin/vppsharpness

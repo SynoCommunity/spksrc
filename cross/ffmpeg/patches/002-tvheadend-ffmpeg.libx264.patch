@@ -1,7 +1,6 @@
 --- ./libavcodec/libx264.c.orig
 +++ ./libavcodec/libx264.c
-@@ -902,7 +902,8 @@
- static const AVOption options[] = {
+@@ -1026,6 +1026,7 @@ static const AVOption options[] = {
      { "preset",        "Set the encoding preset (cf. x264 --fullhelp)",   OFFSET(preset),        AV_OPT_TYPE_STRING, { .str = "medium" }, 0, 0, VE},
      { "tune",          "Tune the encoding params (cf. x264 --fullhelp)",  OFFSET(tune),          AV_OPT_TYPE_STRING, { 0 }, 0, 0, VE},
      { "profile",       "Set profile restrictions (cf. x264 --fullhelp) ", OFFSET(profile),       AV_OPT_TYPE_STRING, { 0 }, 0, 0, VE},

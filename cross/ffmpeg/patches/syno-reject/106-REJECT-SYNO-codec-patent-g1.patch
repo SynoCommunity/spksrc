@@ -1,0 +1,595 @@
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/aacdec_template.c ./libavcodec/aacdec_template.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/aacdec_template.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/aacdec_template.c	2020-03-07 08:22:42.880291379 -0500
+@@ -90,6 +90,8 @@
+  */
+ 
+ #include "libavutil/thread.h"
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
+ 
+ static VLC vlc_scalefactors;
+ static VLC vlc_spectral[11];
+@@ -1174,6 +1176,12 @@ static av_cold int aac_decode_init(AVCod
+     avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+ #endif /* USE_FIXED */
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("aac_dec")) {
++		return -1;
++	}
++#endif
++
+     if (avctx->extradata_size > 0) {
+         if ((ret = decode_audio_specific_config(ac, ac->avctx, &ac->oc[1].m4ac,
+                                                 avctx->extradata,
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/aacenc.c ./libavcodec/aacenc.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/aacenc.c	2019-12-31 16:35:22.000000000 -0500
++++ ./libavcodec/aacenc.c	2020-03-07 08:22:42.880291379 -0500
+@@ -48,6 +48,9 @@
+ 
+ #include "psymodel.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ static AVOnce aac_table_init = AV_ONCE_INIT;
+ 
+ static void put_pce(PutBitContext *pb, AVCodecContext *avctx)
+@@ -964,6 +967,12 @@ static av_cold int aac_encode_init(AVCod
+     uint8_t grouping[AAC_MAX_CHANNELS];
+     int lengths[2];
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("aac_enc")) {
++		return -1;
++	}
++#endif
++
+     /* Constants */
+     s->last_frame_pb_count = 0;
+     avctx->frame_size = 1024;
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/ac3dec.c ./libavcodec/ac3dec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/ac3dec.c	2019-12-31 16:35:22.000000000 -0500
++++ ./libavcodec/ac3dec.c	2020-03-07 08:22:42.880291379 -0500
+@@ -41,6 +41,9 @@
+ #include "ac3dec_data.h"
+ #include "kbdwin.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ /**
+  * table for ungrouping 3 values in 7 bits.
+  * used for exponents and bap=2 mantissas
+@@ -186,6 +189,12 @@ static av_cold int ac3_decode_init(AVCod
+     AC3DecodeContext *s = avctx->priv_data;
+     int i;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("ac3_dec")) {
++		return -1;
++	}
++#endif
++
+     s->avctx = avctx;
+ 
+     ac3_tables_init();
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/h264dec.c ./libavcodec/h264dec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/h264dec.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/h264dec.c	2020-03-07 08:22:42.881291456 -0500
+@@ -55,6 +55,9 @@
+ #include "rectangle.h"
+ #include "thread.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ const uint16_t ff_h264_mb_sizes[4] = { 256, 384, 512, 768 };
+ 
+ int avpriv_h264_has_num_reorder_frames(AVCodecContext *avctx)
+@@ -394,6 +397,12 @@ static av_cold int h264_decode_init(AVCo
+     H264Context *h = avctx->priv_data;
+     int ret;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("h264_dec")) {
++		return -1;
++	}
++#endif
++
+     ret = h264_init_context(avctx, h);
+     if (ret < 0)
+         return ret;
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/hevcdec.c ./libavcodec/hevcdec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/hevcdec.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/hevcdec.c	2020-03-07 08:22:42.881291456 -0500
+@@ -44,6 +44,9 @@
+ #include "hwaccel.h"
+ #include "profiles.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ const uint8_t ff_hevc_pel_weight[65] = { [2] = 0, [4] = 1, [6] = 2, [8] = 3, [12] = 4, [16] = 5, [24] = 6, [32] = 7, [48] = 8, [64] = 9 };
+ 
+ /**
+@@ -3478,6 +3481,12 @@ static av_cold int hevc_decode_init(AVCo
+     HEVCContext *s = avctx->priv_data;
+     int ret;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("hevc_dec")) {
++		return -1;
++	}
++#endif
++
+     avctx->internal->allocate_progress = 1;
+ 
+     ret = hevc_init_context(avctx);
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacdec.c ./libavcodec/libfdk-aacdec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacdec.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/libfdk-aacdec.c	2020-03-07 08:22:42.882291532 -0500
+@@ -25,6 +25,9 @@
+ #include "avcodec.h"
+ #include "internal.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ #ifdef AACDECODER_LIB_VL0
+ #define FDKDEC_VER_AT_LEAST(vl0, vl1) \
+     ((AACDECODER_LIB_VL0 > vl0) || \
+@@ -224,6 +227,12 @@ static av_cold int fdk_aac_decode_init(A
+     FDKAACDecContext *s = avctx->priv_data;
+     AAC_DECODER_ERROR err;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("aac_dec")) {
++		return -1;
++	}
++#endif
++
+     s->handle = aacDecoder_Open(avctx->extradata_size ? TT_MP4_RAW : TT_MP4_ADTS, 1);
+     if (!s->handle) {
+         av_log(avctx, AV_LOG_ERROR, "Error opening decoder\n");
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacenc.c ./libavcodec/libfdk-aacenc.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/libfdk-aacenc.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/libfdk-aacenc.c	2020-03-07 08:22:42.882291532 -0500
+@@ -34,6 +34,9 @@
+ #define FDKENC_VER_AT_LEAST(vl0, vl1) 0
+ #endif
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ typedef struct AACContext {
+     const AVClass *class;
+     HANDLE_AACENCODER handle;
+@@ -126,6 +129,12 @@ static av_cold int aac_encode_init(AVCod
+     int aot = FF_PROFILE_AAC_LOW + 1;
+     int sce = 0, cpe = 0;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("aac_enc")) {
++		return -1;
++	}
++#endif
++
+     if ((err = aacEncOpen(&s->handle, 0, avctx->channels)) != AACENC_OK) {
+         av_log(avctx, AV_LOG_ERROR, "Unable to open the encoder: %s\n",
+                aac_get_error(err));
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/libx264.c	2020-03-06 08:08:15.000000000 -0500
++++ ./libavcodec/libx264.c	2020-03-07 08:24:24.870122833 -0500
+@@ -44,6 +44,9 @@
+ // blocks of pixels (with respect to the luma plane)
+ #define MB_SIZE 16
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ typedef struct X264Context {
+     AVClass        *class;
+     x264_param_t    params;
+@@ -552,6 +555,12 @@ static av_cold int X264_init(AVCodecCont
+     AVCPBProperties *cpb_props;
+     int sw,sh;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("h264_enc")) {
++		return -1;
++	}
++#endif
++
+     if (avctx->global_quality > 0)
+         av_log(avctx, AV_LOG_WARNING, "-qscale is ignored, -crf is recommended.\n");
+ 
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videodec.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/mpeg4videodec.c	2020-03-07 08:26:02.206607285 -0500
+@@ -39,6 +39,9 @@
+ #include "xvididct.h"
+ #include "unary.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ /* The defines below define the number of bits that are read at once for
+  * reading vlc values. Changing these may improve speed and data cache needs
+  * be aware though that decreasing them may need the number of stages that is
+@@ -3506,6 +3509,12 @@ static av_cold int decode_init(AVCodecCo
+     MpegEncContext *s = &ctx->m;
+     int ret;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("mpeg4part2_dec")) {
++		return -1;
++	}
++#endif
++
+     ctx->divx_version =
+     ctx->divx_build   =
+     ctx->xvid_build   =
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videoenc.c ./libavcodec/mpeg4videoenc.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/mpeg4videoenc.c	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/mpeg4videoenc.c	2020-03-07 08:22:42.885291763 -0500
+@@ -28,6 +28,9 @@
+ #include "h263.h"
+ #include "mpeg4video.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
++
+ /* The uni_DCtab_* tables below contain unified bits+length tables to encode DC
+  * differences in MPEG-4. Unified in the sense that the specification specifies
+  * this encoding in several steps. */
+@@ -1279,6 +1282,12 @@ static av_cold int encode_init(AVCodecCo
+         return AVERROR(EINVAL);
+     }
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("mpeg4part2_enc")) {
++		return -1;
++	}
++#endif
++
+     if ((ret = ff_mpv_encode_init(avctx)) < 0)
+         return ret;
+ 
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.c ./libavcodec/synog1codecpatent.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/synog1codecpatent.c	2020-03-07 08:22:42.885291763 -0500
+@@ -0,0 +1,186 @@
++#ifndef MY_ABC_HERE
++#define MY_ABC_HERE
++#endif
++#include "synoconfig.h"
++
++#ifdef SYNO_CODEC_PATENT_G1
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <stdarg.h>
++#include <string.h>
++
++#include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/wait.h>
++
++#include "synog1codecpatent.h"
++
++#if defined(SYNO_VIDEOSTATION)
++#define SZ_BIN_SYNOCODECPATENT "/var/packages/VideoStation/target/bin/synocodectool"
++#elif defined(SYNO_AUDIOSTATION)
++#define SZ_BIN_SYNOCODECPATENT "/var/packages/AudioStation/target/bin/synocodectool"
++#elif defined(SYNO_MEDIASERVER)
++#define SZ_BIN_SYNOCODECPATENT "/var/packages/MediaServer/target/bin/synocodectool"
++#else
++#define SZ_BIN_SYNOCODECPATENT "/usr/syno/bin/synocodectool"
++#endif
++
++static pid_t SYNOProcForkEx(void)
++{
++	int pid = -1;
++	int fd = -1;
++	int	status = 0;
++	int waitRet = 0;
++	char *pEnvPath = NULL;
++
++	fflush(NULL);
++
++	pid = fork();
++	if (0 > pid) {
++		return -1;
++	} else if (pid > 0) {
++		while (-1 == (waitRet = waitpid(pid, &status, 0)) && EINTR == errno) {
++			//do nothing
++		}
++		if (-1 != waitRet && 0 == WEXITSTATUS(status)) {
++			return 1;
++		} else if (-1 == waitRet && errno == ECHILD) {
++			return 1;
++		}
++		return -1;
++	}
++
++	pEnvPath = getenv("PATH");
++	if (pEnvPath) {
++		setenv("PATH", pEnvPath, 1);
++	}
++
++	if (-1 != (fd = open("/dev/null", O_RDWR, 0))) {
++		(void) dup2(fd, STDIN_FILENO);
++		(void) dup2(fd, STDOUT_FILENO);
++		(void) dup2(fd, STDERR_FILENO);
++		if (2 < fd)
++			(void) close(fd);
++	}
++
++	setsid();
++	chdir("/");
++
++	return 0;
++}
++
++static int SYNOExecl(const char *szPath, const char* szArg, ...)
++{
++    int ret=-1, pid, nowait, status=0;
++	int	fChildAlive = 0;
++	struct sigaction	saOrg;
++	size_t i = 0;
++	size_t argc = 0;
++	const char *arg = NULL;
++	const char **argv = NULL;
++	va_list ap;
++
++	// remove SA_NOCLDWAIT flags if set
++	sigaction(SIGCHLD, NULL, &saOrg);
++	nowait = (saOrg.sa_flags & SA_NOCLDWAIT);
++	saOrg.sa_flags &= ~SA_NOCLDWAIT;
++	sigaction(SIGCHLD, &saOrg, NULL);
++
++	if ((pid = SYNOProcForkEx()) == 0) {
++		arg = szArg;
++		va_start(ap, szArg);
++		for(argc = 2; NULL != arg; ++argc) {
++			arg = va_arg(ap, const char*);
++		}
++		va_end(ap);
++
++		argv = (const char**) calloc (argc, sizeof(const char*));
++
++		arg = szArg;
++		argv[0] = szPath;
++		argv[1] = szArg;
++		va_start(ap, szArg);
++		for (i = 2; NULL != arg; ++i) {
++			arg = va_arg(ap, const char*);
++			argv[i] = arg;
++		}
++		va_end(ap);
++
++		execv(szPath, (char *const *) argv);
++
++		free(argv);
++		// If any of the exec functions returns, an error will have occurred.  The return value is 255
++		_exit(-1);
++	} else if (pid != -1) {
++		while (-1 == (fChildAlive = waitpid(pid, &status, 0)) && EINTR == errno);
++		if (-1 != fChildAlive && WIFEXITED(status)) {
++			//child alive --> wait until child done and check its exit code.
++			ret = WEXITSTATUS(status);
++		} else if ( fChildAlive == -1 && errno == ECHILD ) {
++			//child doesn't alive --> see as success
++			ret = 0;
++		}
++	}
++	// restore SA_NOCLDWAIT flag if orginal set
++	if (nowait) {
++		sigaction(SIGCHLD, NULL, &saOrg);
++		saOrg.sa_flags |= SA_NOCLDWAIT;
++		sigaction(SIGCHLD, &saOrg, NULL);
++	}
++	return ret;
++}
++
++static int FileExit(const char *szPath)
++{
++	int iRet = 0;
++	struct stat statBuf;
++
++	if (!szPath) {
++		goto Exit;
++	}
++	if (0 == stat(szPath, &statBuf) && S_ISREG(statBuf.st_mode)) {
++		iRet = 1;
++	}
++Exit:
++	return iRet;
++
++}
++
++/**
++ * check the codec can use,
++ * active, 0
++ * not active or error, -1
++ */
++int ActivateCodec(const char *szCodecName)
++{
++	int iRet = -1;
++	char *szEnvSkipActivate = NULL;
++
++	//for some case like avformat_find_stream_info, don't need avtivate mechanism.
++	szEnvSkipActivate = getenv(SZ_SYNO_CODEC_SKIP_ACTIVATION);
++	if (szEnvSkipActivate && 0 == strcmp(szEnvSkipActivate, "yes")) {
++		return 0;
++	}
++
++	if (!szCodecName) {
++		goto Exit;
++	}
++
++	if (!FileExit(SZ_BIN_SYNOCODECPATENT)) {
++		goto Exit;
++	}
++
++	if (0 != SYNOExecl(SZ_BIN_SYNOCODECPATENT, "--check_codec_activated", szCodecName, "--pkgname", SZ_PKG_NAME, NULL)) {
++		if (0 != SYNOExecl(SZ_BIN_SYNOCODECPATENT, "--activate_codec", szCodecName, "--pkgname", SZ_PKG_NAME, NULL)) {
++			goto Exit;
++		}
++	}
++
++	iRet = 0;
++Exit:
++	return iRet;
++}
++#endif //SYNO_CODEC_PATENT_G1
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.h ./libavcodec/synog1codecpatent.h
+--- ../ffmpeg-4.2.2-patch105/libavcodec/synog1codecpatent.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/synog1codecpatent.h	2020-03-07 08:22:42.885291763 -0500
+@@ -0,0 +1,27 @@
++#ifndef MY_ABC_HERE
++#define MY_ABC_HERE
++#endif
++#ifndef _SYNO_G1_CODEC_PATENT_H
++#define _SYNO_G1_CODEC_PATENT_H
++
++#include "synoconfig.h"
++
++#ifdef SYNO_CODEC_PATENT_G1
++
++#define SZ_SYNO_CODEC_SKIP_ACTIVATION "SYNO_CODEC_SKIP_ACTIVATION"
++
++//TODO must change by define by package
++#if defined(SYNO_VIDEOSTATION)
++#define SZ_PKG_NAME "videostation"
++#elif defined(SYNO_AUDIOSTATION)
++#define SZ_PKG_NAME "audiostation"
++#elif defined(SYNO_MEDIASERVER)
++#define SZ_PKG_NAME "mediaserver"
++#else
++#define SZ_PKG_NAME "dsm"
++#endif
++
++int ActivateCodec(const char *szCodecName);
++#endif //SYNO_CODEC_PATENT_G1
++
++#endif //_SYNO_G1_CODEC_PATENT_H
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/vaapi_encode.c ./libavcodec/vaapi_encode.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/vaapi_encode.c	2020-03-06 08:08:22.000000000 -0500
++++ ./libavcodec/vaapi_encode.c	2020-03-07 08:22:42.886291839 -0500
+@@ -27,6 +27,8 @@
+ #include "vaapi_encode.h"
+ #include "avcodec.h"
+ #include "internal.h"
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
+ 
+ static const char * const picture_type_name[] = { "IDR", "I", "P", "B" };
+ 
+@@ -2111,6 +2113,12 @@ av_cold int ff_vaapi_encode_init(AVCodec
+     VAStatus vas;
+     int err;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("h264_enc")) {
++		return -1;
++	}
++#endif
++
+     if (!avctx->hw_frames_ctx) {
+         av_log(avctx, AV_LOG_ERROR, "A hardware frames reference is "
+                "required to associate the encoding device.\n");
+diff -uprN ../ffmpeg-4.2.2-patch105/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
+--- ../ffmpeg-4.2.2-patch105/libavcodec/vc1dec.c	2019-12-31 16:35:30.000000000 -0500
++++ ./libavcodec/vc1dec.c	2020-03-07 08:27:03.878353753 -0500
+@@ -40,6 +40,8 @@
+ #include "vc1data.h"
+ #include "libavutil/avassert.h"
+ 
++#include "synoconfig.h"
++#include "synog1codecpatent.h"
+ 
+ #if CONFIG_WMV3IMAGE_DECODER || CONFIG_VC1IMAGE_DECODER
+ 
+@@ -426,6 +428,12 @@ static av_cold int vc1_decode_init(AVCod
+     GetBitContext gb;
+     int ret;
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	if (0 != ActivateCodec("vc1_dec")) {
++		return -1;
++	}
++#endif
++
+     /* save the container output size for WMImage */
+     v->output_width  = avctx->width;
+     v->output_height = avctx->height;
+diff -uprN ../ffmpeg-4.2.2-patch105/libavformat/utils.c ./libavformat/utils.c
+--- ../ffmpeg-4.2.2-patch105/libavformat/utils.c	2019-12-31 16:35:24.000000000 -0500
++++ ./libavformat/utils.c	2020-03-07 08:22:42.888291993 -0500
+@@ -54,6 +54,10 @@
+ #include "url.h"
+ 
+ #include "libavutil/ffversion.h"
++
++#include "synoconfig.h"
++#include "libavcodec/synog1codecpatent.h"
++
+ const char av_format_ffversion[] = "FFmpeg version " FFMPEG_VERSION;
+ 
+ static AVMutex avformat_mutex = AV_MUTEX_INITIALIZER;
+@@ -3553,7 +3557,14 @@ static int extract_extradata(AVStream *s
+                 sti->avctx->extradata = av_mallocz(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
+             if (!sti->avctx->extradata) {
+                 av_packet_unref(pkt_ref);
++#ifdef SYNO_CODEC_PATENT_G1
++		{
++		unsetenv(SZ_SYNO_CODEC_SKIP_ACTIVATION);
++#endif
+                 return AVERROR(ENOMEM);
++#ifdef SYNO_CODEC_PATENT_G1
++		}
++#endif
+             }
+             memcpy(sti->avctx->extradata, extradata, extradata_size);
+             sti->avctx->extradata_size = extradata_size;
+@@ -3582,6 +3593,10 @@ int avformat_find_stream_info(AVFormatCo
+     int eof_reached = 0;
+     int *missing_streams = av_opt_ptr(ic->iformat->priv_class, ic->priv_data, "missing_streams");
+ 
++#ifdef SYNO_CODEC_PATENT_G1
++	setenv(SZ_SYNO_CODEC_SKIP_ACTIVATION, "yes", 1);
++#endif
++
+     flush_codecs = probesize > 0;
+ 
+     av_opt_set(ic, "skip_clear", "1", AV_OPT_SEARCH_CHILDREN);
+@@ -4163,6 +4178,9 @@ find_stream_info_err:
+     if (ic->pb)
+         av_log(ic, AV_LOG_DEBUG, "After avformat_find_stream_info() pos: %"PRId64" bytes read:%"PRId64" seeks:%d frames:%d\n",
+                avio_tell(ic->pb), ic->pb->bytes_read, ic->pb->seek_count, count);
++#ifdef SYNO_CODEC_PATENT_G1
++	unsetenv(SZ_SYNO_CODEC_SKIP_ACTIVATION);
++#endif
+     return ret;
+ }
+ 
+diff -uprN ../ffmpeg-4.2.2-patch105/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch105/synoconfig.h	2020-03-07 08:20:37.659694767 -0500
++++ ./synoconfig.h	2020-03-07 08:22:42.888291993 -0500
+@@ -131,3 +131,11 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK
+ #endif
++
++/* add SynoCodecPantent mechanism
++ * h264, mpe4part2, aac , vc1 enc/dec should actived at the first time.
++ * See Video Station #1291
++ */
++#if defined(SYNO_VIDEOSTATION) || defined(SYNO_AUDIOSTATION) || defined(SYNO_MEDIASERVER) || defined(SYNO_DSM)
++#define SYNO_CODEC_PATENT_G1
++#endif

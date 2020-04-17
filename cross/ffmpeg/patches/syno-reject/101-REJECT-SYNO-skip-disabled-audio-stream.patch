@@ -1,0 +1,81 @@
+diff -uprN ../ffmpeg-4.2.2-patch100/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.2.2-patch100/fftools/ffmpeg_opt.c	2019-12-31 16:35:22.000000000 -0500
++++ ./fftools/ffmpeg_opt.c	2020-03-06 08:15:13.203555509 -0500
+@@ -692,6 +692,37 @@ static AVCodec *find_codec_or_die(const
+     return codec;
+ }
+ 
++#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
++static int IsAudioCopyStream(OptionsContext *o, AVFormatContext *oc)
++{
++	int ret = 0;
++	char *audio_codec_name = NULL;
++
++	MATCH_PER_TYPE_OPT(codec_names, str, audio_codec_name, oc, "a");
++
++	if (audio_codec_name && 0 == strcmp(audio_codec_name, "copy")) {
++		ret = 1;
++	}
++
++	return ret;
++}
++
++static int IsSkipAudioStream(const InputStream *ist, OptionsContext *o, AVFormatContext *oc)
++{
++	if (ist->st->codec->codec_id == AV_CODEC_ID_DTS
++		|| ist->st->codec->codec_id == AV_CODEC_ID_EAC3
++		|| ist->st->codec->codec_id == AV_CODEC_ID_TRUEHD)
++	{
++		// if not stream copy
++		if (!IsAudioCopyStream(o, oc)) {
++			return 1;
++		}
++	}
++
++	return 0;
++}
++#endif
++
+ static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
+ {
+     char *codec_name = NULL;
+@@ -2198,6 +2229,12 @@ static int open_output_file(OptionsConte
+             for (i = 0; i < nb_input_streams; i++) {
+                 int new_area;
+                 ist = input_streams[i];
++#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
++                               if (IsSkipAudioStream(ist, o, oc)) {
++                                       // if not stream copy
++                                       continue;
++                               }
++#endif
+                 new_area = ist->st->codecpar->width * ist->st->codecpar->height + 100000000*!!ist->st->codec_info_nb_frames
+                            + 5000000*!!(ist->st->disposition & AV_DISPOSITION_DEFAULT);
+                 if (ist->user_set_discard == AVDISCARD_ALL)
+@@ -2323,6 +2360,12 @@ loop_end:
+                     continue;
+                 if(o->    data_disable && ist->st->codecpar->codec_type == AVMEDIA_TYPE_DATA)
+                     continue;
++#ifdef SYNO_SKIP_DISABLED_AUDIO_STREAM
++				if (IsSkipAudioStream(ist, o, oc)) {
++					// if not stream copy
++					continue;
++				}
++#endif
+ 
+                 ost = NULL;
+                 switch (ist->st->codecpar->codec_type) {
+diff -uprN ../ffmpeg-4.2.2-patch100/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch100/synoconfig.h	2020-03-06 08:11:45.732315449 -0500
++++ ./synoconfig.h	2020-03-06 08:15:13.203555509 -0500
+@@ -73,3 +73,10 @@
+ #if defined(SYNO_SURVEILLANCESTATION)
+ #define SYNO_HLS_COSTUMIZED_TS_NAME
+ #endif
++
++/* let ffmpeg skip audio stream with disabled codec.
++ * e.g. DTS dec/enc ,AC3 enc
++ */
++#if !defined(STANDALONE) && !defined(SYNO_VIDEOSTATION) && !defined(SYNO_MEDIASERVER)
++#define SYNO_SKIP_DISABLED_AUDIO_STREAM
++#endif
