@@ -1,0 +1,67 @@
+diff -uprN ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg.c ./fftools/ffmpeg.c
+--- ../ffmpeg-4.2.1-patch060-NEW/fftools/ffmpeg.c	2020-01-18 13:08:21.900728389 -0500
++++ ./fftools/ffmpeg.c	2020-01-18 13:05:36.190370148 -0500
+@@ -172,6 +172,9 @@ typedef struct X264Context {
+     int nal_hrd;
+     int avcintra_class;
+     char *x264_params;
++#ifdef SYNO_EVANSPORT_FLV_EXTRADATA
++	bool dont_free_extradata;
++#endif
+ } X264Context;
+ 
+ static viddec_struct_t vid_dec;
+@@ -5247,7 +5250,14 @@ discard_packet:
+ 			if (ost->encoding_needed)
+ 			{
+ 				//close H.264 smd encoder because transcoding will be done through pipeline
++#ifdef SYNO_EVANSPORT_FLV_EXTRADATA
++				X264Context *x4 = ost->enc_ctx->priv_data;
++				x4->dont_free_extradata = true;
++#endif
+ 				ost->enc_ctx->codec->close(ost->enc_ctx);
++#ifdef SYNO_EVANSPORT_FLV_EXTRADATA
++				x4->dont_free_extradata = false;
++#endif
+ 				ost->enc_ctx->coded_frame = av_frame_alloc();
+ 				if (!ost->enc_ctx->coded_frame)
+ 					return AVERROR(ENOMEM);
+diff -uprN ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.2.2-patch079/libavcodec/libx264.c	2020-01-24 06:02:18.000000000 -0500
++++ ./libavcodec/libx264.c	2020-01-24 06:14:09.775061127 -0500
+@@ -112,6 +112,11 @@ typedef struct X264Context {
+ 
+     int nb_reordered_opaque, next_reordered_opaque;
+     int64_t *reordered_opaque;
++#ifdef SYNO_EVANSPORT_SMD
++#ifdef SYNO_EVANSPORT_FLV_EXTRADATA
++       bool dont_free_extradata;
++#endif
++#endif
+ } X264Context;
+ 
+ static void X264_log(void *p, int level, const char *fmt, va_list args)
+@@ -622,7 +627,9 @@ static av_cold int X264_close(AVCodecCon
+     X264Context *x4 = avctx->priv_data;
+ 
+ #ifdef SYNO_EVANSPORT_SMD
++#ifdef SYNO_EVANSPORT_FLV_EXTRADATA
+ 	if (!x264_closed && !x4->dont_free_extradata)
++#endif
+ 	{
+ #endif
+     av_freep(&avctx->extradata);
+diff -uprN ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.1-patch060-NEW/synoconfig.h	2020-01-18 13:09:17.841500651 -0500
++++ ./synoconfig.h	2020-01-18 13:05:36.226370673 -0500
+@@ -74,3 +74,10 @@
+ #if defined(SYNO_EVANSPORT_SMD)
+ #define SYNO_EVANSPORT_AUTO_HW_DECODER
+ #endif
++ 
++/* Fixed evansport coredump transcode to flv on pipeline mode
++ * See Video Station #2132
++ */
++#if defined(SYNO_EVANSPORT_SMD)
++#define SYNO_EVANSPORT_FLV_EXTRADATA
++#endif

@@ -1,17 +1,17 @@
 --- configure.orig
 +++ configure
-@@ -6868,7 +6868,7 @@
+@@ -7266,7 +7266,7 @@ ifndef MAIN_MAKEFILE
  SRC_PATH:=\$(SRC_PATH:.%=..%)
  endif
  CC_IDENT=$cc_ident
 -ARCH=$arch
 +FFMPEG_ARCH=$arch
  INTRINSICS=$intrinsics
+ EXTERN_PREFIX=$extern_prefix
  CC=$cc
- CXX=$cxx
 --- ffbuild/common.mak.orig
 +++ ffbuild/common.mak
-@@ -137,8 +137,8 @@
+@@ -136,8 +136,8 @@ DEP_LIBS := $(foreach lib,$(FFLIBS),$(ca
  STATIC_DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
  
  SRC_DIR    := $(SRC_PATH)/lib$(NAME)
@@ -20,16 +20,16 @@
 +ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(FFMPEG_ARCH)/*.h))
 +SKIPHEADERS += $(ARCH_HEADERS:%=$(FFMPEG_ARCH)/%) $(SKIPHEADERS-)
  SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
+ HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
  PTXOBJS      = $(filter %.ptx.o,$(OBJS))
- $(HOBJS):     CCFLAGS += $(CFLAGS_HEADERS)
 --- Makefile.orig
 +++ Makefile
-@@ -83,7 +83,7 @@
+@@ -86,7 +86,7 @@ define DOSUBDIR
  $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
  SUBDIR := $(1)/
  include $(SRC_PATH)/$(1)/Makefile
 --include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
 +-include $(SRC_PATH)/$(1)/$(FFMPEG_ARCH)/Makefile
  -include $(SRC_PATH)/$(1)/$(INTRINSICS)/Makefile
- include $(SRC_PATH)/library.mak
+ include $(SRC_PATH)/ffbuild/library.mak
  endef
