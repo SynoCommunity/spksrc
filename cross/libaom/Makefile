@@ -2,7 +2,8 @@ PKG_NAME = libaom
 PKG_VERS = v1.0.0-990~4b8a01d4f
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 4b8a01d4febdb331f825a8c69bc9974700f7efb4
+PKG_GIT_HASH = 4eb1e7795b9700d532af38a2d9489458a8038233
+# Tag v1.0.0-errata1-avif: 4eb1e7795b9700d532af38a2d9489458a8038233
 # Tag v1.0.0-errata1: add4b15580e410c00c927ee366fa65545045a5d9
 # Error in generated pkgconfig still at 0.1.0
 PKG_DIST_SITE = https://aomedia.googlesource.com/aom
