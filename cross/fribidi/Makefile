@@ -1,6 +1,6 @@
 PKG_NAME = fribidi
-PKG_VERS = 1.0.5
-PKG_EXT = tar.bz2
+PKG_VERS = 1.0.9
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fribidi/fribidi/releases/download/v$(PKG_VERS)
 
