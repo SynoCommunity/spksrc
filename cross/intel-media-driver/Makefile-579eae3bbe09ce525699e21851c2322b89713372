@@ -1,9 +1,11 @@
 PKG_NAME = intel-media
-PKG_VERS = 19.4.0r
+PKG_VERS = 20.1.1
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/intel/media-driver/archive
-PKG_DIR = media-driver-$(PKG_NAME)-$(PKG_VERS)
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = 579eae3bbe09ce525699e21851c2322b89713372
+PKG_DIST_SITE = https://github.com/intel/media-driver.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS += cross/gmmlib
 UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
