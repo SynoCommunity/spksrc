@@ -33,12 +33,12 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 endif
 
 ifeq ($(BUILD_ARCH),)
-	  $(error Unsupported ARCH $(ARCH))
+	$(error Unsupported ARCH $(ARCH))
 endif
 
 .PHONY: stockfish_fishnet_compile
 stockfish_fishnet_compile:
-	cd $(PKG_WORK_DIR) && $(ENV) $(MAKE) build ARCH=$(BUILD_ARCH) COMP_CXX=$(CXX)
+	cd $(PKG_WORK_DIR) && $(ENV) $(MAKE) build ARCH=$(BUILD_ARCH) COMPCXX=$(CXX)
 
 .PHONY: stockfish_fishnet_install
 stockfish_fishnet_install:

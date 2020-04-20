@@ -38,7 +38,7 @@ endif
 
 .PHONY: stockfish_compile
 stockfish_compile:
-	cd $(PKG_WORK_DIR) && $(ENV) $(MAKE) build ARCH=$(BUILD_ARCH) COMP_CXX=$(CXX)
+	cd $(PKG_WORK_DIR) && $(ENV) $(MAKE) build ARCH=$(BUILD_ARCH) COMPCXX=$(CXX)
 
 .PHONY: stockfish_install
 stockfish_install:
