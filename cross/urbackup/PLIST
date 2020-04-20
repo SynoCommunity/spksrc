@@ -1,0 +1,4 @@
+rsc:share/urbackup
+bin:bin/urbackupsrv
+bin:bin/urbackup_snapshot_helper
+bin:bin/urbackup_mount_helper
