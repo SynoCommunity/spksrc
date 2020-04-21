@@ -42,13 +42,11 @@ endif
 ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7 -DAOM_TARGET_CPU=arm
-#CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(WORK_DIR)/$(PKG_DIR)/build/cmake/toolchains/armv7-linux-gcc.cmake
 endif
 
 ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DAOM_TARGET_CPU=arm64
-#CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(WORK_DIR)/$(PKG_DIR)/build/cmake/toolchains/arm64-linux-gcc.cmake
 endif
 
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
@@ -61,7 +59,6 @@ DEPENDS += native/nasm cross/libnuma
 ENV += PATH=$(NASM_PATH):$$PATH
 ENV += AS=$(NASM_PATH)/nasm
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DAOM_TARGET_CPU=x86_64
-#CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(WORK_DIR)/$(PKG_DIR)/build/cmake/toolchains/x86-linux.cmake
 endif
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
@@ -70,7 +67,6 @@ ENV += PATH=$(NASM_PATH):$$PATH
 ENV += AS=$(NASM_PATH)/nasm
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86 -DAOM_TARGET_CPU=x86
-#CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(WORK_DIR)/$(PKG_DIR)/build/cmake/toolchains/x86-linux.cmake
 endif
 
 .PHONY: svt-av1_custom_configure
