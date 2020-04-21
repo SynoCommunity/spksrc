@@ -60,10 +60,17 @@ POST_INSTALL_TARGET = ffmpeg_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Add AV1 codec to supported ARCH
+# Add libaom AV1 codec to supported ARCH
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
+endif
+
+# Add SVT-AV1 codec to supported ARCH
+# Patch for support from: https://github.com/OpenVisualCloud/SVT-AV1/tree/master/ffmpeg_plugin
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x64_ARCHES)),$(ARCH))
+DEPENDS += cross/svt-av1
+CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
