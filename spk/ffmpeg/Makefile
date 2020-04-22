@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.2.2
 SPK_REV = 29
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 4.2.2<br/>2. Update Intel libva to v2.7 and gmmlib 20Q1 v20.1.1<br/>3. Update all trivial dependencies (x264, x265, libaom, libogg, freetype, fribidi, libbluray)<br/>4. Add experimental support for SVT-AV1"
+CHANGELOG = "1. Update ffmpeg to 4.2.2<br/>2. Update Intel libva to v2.7 and gmmlib 20Q1 v20.1.1<br/>3. Update all trivial dependencies (x264, x265, libaom, libogg, freetype, fribidi, libbluray)<br/>4. Add experimental support for SVT-AV1 and SVT-HEVC"
 
 DEPENDS = cross/$(SPK_NAME)
 
