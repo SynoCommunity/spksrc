@@ -1,27 +1,15 @@
 [{
     "step_title": "Urbackup",
     "items": [{
-        "type": "textfield",
-        "desc": "Configure the fork to use",
+	"type": "textfield",
+        "desc": "Urbackup backup location",
         "subitems": [{
-            "key": "wizard_fork_url",
-            "desc": "Fork URL",
-            "defaultValue": "https://github.com/uroni/urbackup_backend",
+            "key": "wizard_backup_dir",
+            "desc": "Download location",
+            "defaultValue": "/mnt/backups/urbackup",
             "validator": {
-                "allowBlank": false
-            }
-        }, {
-            "key": "wizard_fork_branch",
-            "desc": "Fork branch",
-            "defaultValue": "dev",
-            "validator": {
-                "allowBlank": false
-            }
-        ]
-    }]
-}, {
-    "step_title": "Attention! DSM6 Permissions",
-    "items": [{
-        "desc": "Permissions are managed with the group 'sc-urbackup' in DSM."
-    }]
+              "allowBlank": false
+             }
+          }]
+     }]
 }]
