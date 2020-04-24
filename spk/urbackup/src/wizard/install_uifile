@@ -2,6 +2,7 @@
     "step_title": "Urbackup",
     "items": [{
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"type": "textfield",
         "desc": "Urbackup backup location. At this location client backup files are saved",
         "subitems": [{
@@ -16,11 +17,16 @@
 =======
         "type": "textfield",
         "desc": "Configure the fork to use",
+=======
+	"type": "textfield",
+        "desc": "Urbackup backup location",
+>>>>>>> aa831382... many improvements
         "subitems": [{
-            "key": "wizard_fork_url",
-            "desc": "Fork URL",
-            "defaultValue": "https://github.com/uroni/urbackup_backend",
+            "key": "wizard_backup_dir",
+            "desc": "Download location",
+            "defaultValue": "/mnt/backups/urbackup",
             "validator": {
+<<<<<<< HEAD
                 "allowBlank": false
             }
         }, {
@@ -38,4 +44,10 @@
         "desc": "Permissions are managed with the group 'sc-urbackup' in DSM."
     }]
 >>>>>>> e697f224... add urbackup support
+=======
+              "allowBlank": false
+             }
+          }]
+     }]
+>>>>>>> aa831382... many improvements
 }]

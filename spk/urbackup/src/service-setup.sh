@@ -2,6 +2,7 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 service_postinst ()
 {
     mkdir -p "${SHARE_PATH}"
@@ -30,11 +31,19 @@ service_postinst ()
     $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
     $BIN/deluser "${USER}" >> ${INST_LOG}
 >>>>>>> e697f224... add urbackup support
+=======
+service_postinst ()
+{
+    mkdir -p "${SHARE_PATH}"
+    chown ${PRIV_PREFIX}${USER}: "${SHARE_PATH}"
+    chmod 770 "${SHARE_PATH}"
+>>>>>>> aa831382... many improvements
 }
 
 service_prestart ()
 {
     CONFIG_DIR="${SYNOPKG_PKGDEST}/var"
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     URBACKUP_OPTIONS="run -d -v error -u sc-urbackup"
@@ -46,6 +55,11 @@ service_prestart ()
 
     SERVICE_OPTIONS=$URBACKUP_OPTIONS
 >>>>>>> e697f224... add urbackup support
+=======
+#    URBACKUP_OPTIONS="run -d -v error -u sc-urbackup"
+
+#    SERVICE_OPTIONS=$URBACKUP_OPTIONS
+>>>>>>> aa831382... many improvements
 
     # Required: start-stop-daemon do not set environment variables
     HOME=${SYNOPKG_PKGDEST}/var

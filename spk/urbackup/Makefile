@@ -17,22 +17,26 @@ RELOAD_UI = yes
 DISPLAY_NAME = Urbackup
 =======
 
-DEPENDS  = cross/busybox cross/$(SPK_NAME) 
+DEPENDS = cross/$(SPK_NAME) 
 
 MAINTAINER = Josef
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
 ADMIN_URL = /urbackup/
 RELOAD_UI = yes
+<<<<<<< HEAD
 DISPLAY_NAME = Urbackup
 CHANGELOG = " urbackup"
 BETA = 1
 PARALLEL_MAKE=4
 >>>>>>> e697f224... add urbackup support
+=======
+>>>>>>> aa831382... many improvements
 
 HOMEPAGE   = http://www.urbackup.org/
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 # 'auto' reserved value grabs SPK_NAME
@@ -49,28 +53,40 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/urbackupsrv run -d -v error -u sc-urbackup --pidfile $${PID_FILE} --logfile $${LOG_FILE}
 =======
 #CONF_DIR = src/conf/
+=======
+>>>>>>> aa831382... many improvements
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER         = auto
+SERVICE_WIZARD_SHARE = wizard_backup_dir
 SERVICE_SETUP        = src/service-setup.sh
 STARTABLE            = yes
+
+
 
 SERVICE_PORT = 55414
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
+<<<<<<< HEAD
 SERVICE_EXE = $${SYNOPKG_PKGDEST}/bin/urbackupsrv
 >>>>>>> e697f224... add urbackup support
+=======
+SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/urbackupsrv run -d -v error -u sc-urbackup --pidfile $${PID_FILE} --logfile $${LOG_FILE}
+>>>>>>> aa831382... many improvements
 
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 #FWPORTS = src/${SPK_NAME}.sc
 
 #PRE_COPY_TARGET = urbackup_extra_install
 >>>>>>> e697f224... add urbackup support
+=======
+>>>>>>> aa831382... many improvements
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 DEFAULT_BACKUP_FOLDER = $(STAGING_DIR)/var/backup
@@ -78,23 +94,30 @@ DEFAULT_BACKUP_FOLDER = $(STAGING_DIR)/var/backup
 POST_STRIP_TARGET = urbackup_extra_install
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 BUSYBOX_CONFIG = usrmng daemon nice
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 
 >>>>>>> e697f224... add urbackup support
+=======
+>>>>>>> aa831382... many improvements
 include ../../mk/spksrc.spk.mk
 
 .PHONY: urbackup_extra_install
 urbackup_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 <<<<<<< HEAD
+<<<<<<< HEAD
 	@mkdir -p $(STAGING_DIR)/var/urbackup
 
 =======
 	mkdir $(STAGING_DIR)/var/urbackup
 >>>>>>> e697f224... add urbackup support
+=======
+	@mkdir -p $(STAGING_DIR)/var/urbackup
+>>>>>>> aa831382... many improvements
 
         
 
