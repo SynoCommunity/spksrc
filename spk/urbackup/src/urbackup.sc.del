@@ -1,6 +1,0 @@
-[urbackup]
-title="urbackup"
-desc="urbackup"
-port_forward="yes"
-dst.ports="55414/tcp"
-

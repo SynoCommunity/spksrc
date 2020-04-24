@@ -2,7 +2,7 @@ PKG_NAME = urbackup-server
 PKG_VERS = 2.4.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://hndl.urbackup.org/Server/2.4.12
+PKG_DIST_SITE = https://hndl.urbackup.org/Server/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/curl cross/openssl cross/zlib
@@ -25,6 +25,6 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) # PREFIX=$(INSTALL_PREFIX)
 	
 
