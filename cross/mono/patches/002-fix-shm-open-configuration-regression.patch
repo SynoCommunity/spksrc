@@ -1,0 +1,11 @@
+--- configure.ac.orig	2018-11-28 22:52:48.627913158 +0100
++++ configure.ac	2018-11-28 22:49:15.415078165 +0100
+@@ -3172,6 +3172,8 @@
+ 	AC_MSG_CHECKING(for shm_open that works well enough with mmap)
+ 	if test "x$ac_cv_func_shm_open" = "xno" -o "x$ac_cv_func_shm_open_working_with_mmap" = "xno" ; then
+ 		AC_MSG_RESULT(no)
++	elif test "x$cross_compiling" = "xyes"; then
++		AC_MSG_RESULT(cross compiling, assuming yes)
+ 	else
+ 		AC_TRY_RUN([
+ 			#include <sys/mman.h>

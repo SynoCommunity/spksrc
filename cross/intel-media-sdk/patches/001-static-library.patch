@@ -1,0 +1,20 @@
+--- api/mfx_dispatch//linux/CMakeLists.txt	2020-03-23 19:16:20.986175410 -0500
++++ api/mfx_dispatch/linux/CMakeLists.txt.new	2020-03-23 19:16:50.221735793 -0500
+@@ -94,7 +94,7 @@
+   ${MFX_API_FOLDER}
+ )
+ 
+-add_library(mfx SHARED ${sources})
++add_library(mfx STATIC ${sources})
+ target_link_libraries(mfx dl)
+ 
+ get_api_version(MFX_VERSION_MAJOR MFX_VERSION_MINOR)
+@@ -105,7 +105,7 @@
+ set_target_properties( mfx PROPERTIES   VERSION ${MFX_VERSION_MAJOR}.${MFX_VERSION_MINOR})
+ set_target_properties( mfx PROPERTIES SOVERSION ${MFX_VERSION_MAJOR})
+ 
+-install(TARGETS mfx LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(TARGETS mfx ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+ set( PKG_CONFIG_FNAME "${CMAKE_LIB_DIR}/${CMAKE_BUILD_TYPE}/lib${PROJECT_NAME}.pc")
+ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkg-config.pc.cmake" ${PKG_CONFIG_FNAME} @ONLY)

@@ -1,0 +1,160 @@
+--- libavcodec/qsvdec.c.orig
++++ libavcodec/qsvdec.c
+@@ -120,7 +120,7 @@ static inline unsigned int qsv_fifo_size(const AVFifoBuffer* fifo)
+     return av_fifo_size(fifo) / qsv_fifo_item_size();
+ }
+ 
+-static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q)
++static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q, AVPacket *avpkt)
+ {
+     const AVPixFmtDescriptor *desc;
+     mfxSession session = NULL;
+@@ -129,6 +129,17 @@ static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q)
+     int frame_width  = avctx->coded_width;
+     int frame_height = avctx->coded_height;
+     int ret;
++    mfxBitstream bs = { { { 0 } } };
++
++    if (avpkt->size) {
++        bs.Data       = avpkt->data;
++        bs.DataLength = avpkt->size;
++        bs.MaxLength  = bs.DataLength;
++        bs.TimeStamp  = avpkt->pts;
++        if (avctx->field_order == AV_FIELD_PROGRESSIVE)
++            bs.DataFlag   |= MFX_BITSTREAM_COMPLETE_FRAME;
++    } else
++        return AVERROR_INVALIDDATA;
+ 
+     desc = av_pix_fmt_desc_get(avctx->sw_pix_fmt);
+     if (!desc)
+@@ -174,32 +185,19 @@ static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q, AVPacket *avpkt)
+     if (ret < 0)
+         return ret;
+ 
+-    param.mfx.CodecId      = ret;
+-    param.mfx.CodecProfile = ff_qsv_profile_to_mfx(avctx->codec_id, avctx->profile);
+-    param.mfx.CodecLevel   = ff_qsv_level_to_mfx(avctx->codec_id, avctx->level);
+-
+-    param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
+-    param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
+-    param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
+-    param.mfx.FrameInfo.FourCC         = q->fourcc;
+-    param.mfx.FrameInfo.Width          = frame_width;
+-    param.mfx.FrameInfo.Height         = frame_height;
+-    param.mfx.FrameInfo.ChromaFormat   = MFX_CHROMAFORMAT_YUV420;
+-
+-    switch (avctx->field_order) {
+-    case AV_FIELD_PROGRESSIVE:
+-        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;
+-        break;
+-    case AV_FIELD_TT:
+-        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_FIELD_TFF;
+-        break;
+-    case AV_FIELD_BB:
+-        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_FIELD_BFF;
+-        break;
+-    default:
+-        param.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_UNKNOWN;
+-        break;
+-    }
++    param.mfx.CodecId = ret;
++    ret = MFXVideoDECODE_DecodeHeader(q->session, &bs, &param);
++    if (ret < 0)
++        return ff_qsv_print_error(avctx, ret,
++                "Error decoding stream header");
++
++    avctx->width        = param.mfx.FrameInfo.CropW;
++    avctx->height       = param.mfx.FrameInfo.CropH;
++    avctx->coded_width  = param.mfx.FrameInfo.Width;
++    avctx->coded_height = param.mfx.FrameInfo.Height;
++    avctx->level        = param.mfx.CodecProfile;
++    avctx->profile      = param.mfx.CodecLevel;
++    avctx->field_order  = ff_qsv_map_picstruct(param.mfx.FrameInfo.PicStruct);
+ 
+     param.IOPattern   = q->iopattern;
+     param.AsyncDepth  = q->async_depth;
+@@ -521,62 +519,22 @@ int ff_qsv_process_data(AVCodecContext *avctx, QSVContext *q,
+                      pkt->data, pkt->size, pkt->pts, pkt->dts,
+                      pkt->pos);
+ 
+-    avctx->field_order  = q->parser->field_order;
+     /* TODO: flush delayed frames on reinit */
+-    if (q->parser->format       != q->orig_pix_fmt    ||
+-        FFALIGN(q->parser->coded_width, 16)  != FFALIGN(avctx->coded_width, 16) ||
+-        FFALIGN(q->parser->coded_height, 16) != FFALIGN(avctx->coded_height, 16)) {
++
++    if (!q->initialized){
+         enum AVPixelFormat pix_fmts[3] = { AV_PIX_FMT_QSV,
+-                                           AV_PIX_FMT_NONE,
++                                           AV_PIX_FMT_NV12,
+                                            AV_PIX_FMT_NONE };
+-        enum AVPixelFormat qsv_format;
+-        AVPacket zero_pkt = {0};
+-
+-        if (q->buffered_count) {
+-            q->reinit_flag = 1;
+-            /* decode zero-size pkt to flush the buffered pkt before reinit */
+-            q->buffered_count--;
+-            return qsv_decode(avctx, q, frame, got_frame, &zero_pkt);
+-        }
+-
+-        q->reinit_flag = 0;
+-
+-        qsv_format = ff_qsv_map_pixfmt(q->parser->format, &q->fourcc);
+-        if (qsv_format < 0) {
+-            av_log(avctx, AV_LOG_ERROR,
+-                   "Decoding pixel format '%s' is not supported\n",
+-                   av_get_pix_fmt_name(q->parser->format));
+-            ret = AVERROR(ENOSYS);
+-            goto reinit_fail;
+-        }
+-
+-        q->orig_pix_fmt     = q->parser->format;
+-        avctx->pix_fmt      = pix_fmts[1] = qsv_format;
+-        avctx->width        = q->parser->width;
+-        avctx->height       = q->parser->height;
+-        avctx->coded_width  = FFALIGN(q->parser->coded_width, 16);
+-        avctx->coded_height = FFALIGN(q->parser->coded_height, 16);
+-        avctx->level        = q->avctx_internal->level;
+-        avctx->profile      = q->avctx_internal->profile;
+-
+         ret = ff_get_format(avctx, pix_fmts);
+         if (ret < 0)
+             goto reinit_fail;
+ 
+         avctx->pix_fmt = ret;
+ 
+-        desc = av_pix_fmt_desc_get(avctx->pix_fmt);
+-        if (!desc)
+-            goto reinit_fail;
+-
+-         if (desc->comp[0].depth > 8) {
+-            avctx->coded_width =  FFALIGN(q->parser->coded_width, 32);
+-            avctx->coded_height = FFALIGN(q->parser->coded_height, 32);
+-        }
+-
+-        ret = qsv_decode_init(avctx, q);
++        ret = qsv_decode_init(avctx, q, pkt);
+         if (ret < 0)
+             goto reinit_fail;
++        q->initialized = 1;
+     }
+ 
+     return qsv_decode(avctx, q, frame, got_frame, pkt);
+@@ -589,4 +547,5 @@ reinit_fail:
+ void ff_qsv_decode_flush(AVCodecContext *avctx, QSVContext *q)
+ {
+     q->orig_pix_fmt = AV_PIX_FMT_NONE;
++    q->initialized = 0;
+ }
+--- libavcodec/qsvdec.h.orig
++++ libavcodec/qsvdec.h
+@@ -63,6 +63,8 @@ typedef struct QSVContext {
+     uint32_t fourcc;
+     mfxFrameInfo frame_info;
+ 
++    int initialized;
++
+     // options set by the caller
+     int async_depth;
+     int iopattern;

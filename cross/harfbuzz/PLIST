@@ -1,0 +1,6 @@
+lnk:lib/libharfbuzz.so
+lnk:lib/libharfbuzz.so.0
+lib:lib/libharfbuzz.so.0.20600.4
+lnk:lib/libharfbuzz-subset.so
+lnk:lib/libharfbuzz-subset.so.0
+lib:lib/libharfbuzz-subset.so.0.20600.4

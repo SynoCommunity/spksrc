@@ -1,5 +1,5 @@
 PKG_NAME = libvpx
-PKG_VERS = 1.8.2
+PKG_VERS = 1.6.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/webmproject/libvpx/archive
@@ -16,11 +16,9 @@ INSTALL_TARGET = myInstall
 
 YASM_PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
-CONFIGURE_ARGS += --disable-static --enable-shared --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-vp8 --enable-vp9 --disable-examples --disable-docs --disable-unit_tests
 CONFIGURE_ARGS += --enable-postproc --enable-vp9-postproc --enable-pic
-CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
-CONFIGURE_ARGS += --disable-multithread
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -52,6 +50,8 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 
+
 .PHONY: myInstall
 myInstall:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+

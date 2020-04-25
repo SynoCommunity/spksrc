@@ -1,4 +1,2 @@
-bin:bin/aomdec
-bin:bin/aomenc
 lib:lib/libaom.so.0
 lnk:lib/libaom.so

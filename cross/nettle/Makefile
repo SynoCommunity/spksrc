@@ -32,7 +32,8 @@ endif
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 CONFIGURE_ARGS = --target=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu
 endif
-CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX) --enable-shared --libdir=$(INSTALL_PREFIX)/lib
+
+CONFIGURE_ARGS = --prefix=$(INSTALL_PREFIX) --libdir=$(INSTALL_PREFIX)/lib
 
 # Fix for evansport builds to find gmp libraries
 CONFIGURE_ARGS += --with-include-path=$(STAGING_INSTALL_PREFIX)/include --with-lib-path=$(STAGING_INSTALL_PREFIX)/lib

@@ -1,0 +1,50 @@
+--- HandBrake-1.3.1/make/include/main.defs	2020-01-04 10:28:06.000000000 -0600
++++ HandBrake-1.3.1/make/include/main.defs.new	2020-03-19 17:29:55.329363813 -0500
+@@ -13,6 +13,8 @@
+ endif
+ endif
+ 
++ifneq ($(HOST.system),linux)
++
+ ifneq (,$(filter $(HOST.system),darwin cygwin mingw))
+     MODULES += contrib/freetype
+     MODULES += contrib/fribidi
+@@ -46,12 +48,11 @@
+     MODULES += contrib/x265_12bit
+ endif
+ 
+-MODULES += contrib/libdav1d
+-MODULES += contrib/ffmpeg
+-MODULES += contrib/libdvdread
+-MODULES += contrib/libdvdnav
+-MODULES += contrib/libbluray
+-
++    MODULES += contrib/libdav1d
++    MODULES += contrib/ffmpeg
++    MODULES += contrib/libdvdread
++    MODULES += contrib/libdvdnav
++    MODULES += contrib/libbluray
+ ifeq (1,$(FEATURE.qsv))
+     MODULES += contrib/libmfx
+ endif
+@@ -87,7 +88,7 @@
+     MODULES += contrib/libiconv
+ endif
+ 
+-
++endif # (system linux)
+ ## these must come after contrib since some contrib modules are optional
+ MODULES += libhb
+ 
+@@ -105,11 +106,6 @@
+     MODULES += gtk
+ endif
+ 
+-ifeq (1-linux,$(FEATURE.gtk)-$(HOST.system))
+-    ## build gtk when gtk+linux
+-    MODULES += gtk
+-endif
+-
+ ifeq (1-freebsd,$(FEATURE.gtk)-$(HOST.system))
+     ## build gtk when gtk+freebsd
+     MODULES += gtk

@@ -13,7 +13,7 @@ LICENSE =
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-radeon
+CONFIGURE_ARGS = --disable-radeon --with-pic
 CONFIGURE_ARGS += --disable-amdgpu
 CONFIGURE_ARGS += --disable-nouveau
 

@@ -14,7 +14,7 @@ COMMENT  = Random collection of Linux utilities
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --without-ncurses --without-python
+CONFIGURE_ARGS  = --without-ncurses --without-python --enable-libmount --enable-libblkid
 CONFIGURE_ARGS += --disable-all-programs --enable-libuuid
 
 ifeq ($(findstring $(ARCH), hi3535),$(ARCH))

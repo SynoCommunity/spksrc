@@ -33,6 +33,6 @@ CONFIGURE_ARGS = --target=x86_64-pc-linux-gnu --host=x86_64-pc-linux-gnu
 endif
 
 # cross/rnm depends on c++ library of gmp
-CONFIGURE_ARGS += --enable-cxx
+CONFIGURE_ARGS = --enable-cxx
 
 include ../../mk/spksrc.cross-cc.mk

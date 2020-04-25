@@ -1,0 +1,11 @@
+--- cmrtlib/CMakeLists.txt	2019-02-03 03:49:50.000000000 -0600
++++ ../media-driver/cmrtlib/CMakeLists.txt	2019-09-02 13:18:57.657694782 -0500
+@@ -19,7 +19,7 @@
+ # OTHER DEALINGS IN THE SOFTWARE.
+ 
+ set(BUILD_ALL $ENV{BUILD_ALL})
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ project(CM_RT)
+ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/linux)
+ 

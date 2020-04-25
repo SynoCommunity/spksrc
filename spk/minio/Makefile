@@ -7,10 +7,9 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-GENERIC_ARCHS = ARM7
 
 MAINTAINER = fgma
-DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
+DESCRIPTION = The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage.
 RELOAD_UI = yes
 DISPLAY_NAME = MinIO
 CHANGELOG = "Update to latest release which includes multiple minor bugfix releases. Breaking Change: Use bulk locks in Multi-object delete and to data usage crawler, so rolling upgrade is not supported."

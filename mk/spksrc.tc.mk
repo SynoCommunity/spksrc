@@ -61,7 +61,6 @@ LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
 
-
 .PHONY: tc_vars
 tc_vars: patch
 	@echo TC_ENV :=
@@ -75,7 +74,7 @@ tc_vars: patch
 	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\"
 	@echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\"
 	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
-	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
+	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=x86_64-pc-linux
 	@echo TC_TARGET := $(TC_TARGET)
 	@echo TC_PREFIX := $(TC_PREFIX)-
 	@echo TC_PATH := $(WORK_DIR)/$(TC_BASE_DIR)/bin/
@@ -92,5 +91,14 @@ tc_vars: patch
 clean:
 	rm -fr $(WORK_DIR)
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
+$(DIGESTS_FILE): download
+	@$(MSG) "Generating digests for $(TC_NAME)"
+	@rm -f $@ && touch -f $@
+	@for type in SHA1 SHA256 MD5; do \
+	  case $$type in \
+	    SHA1)     tool=sha1sum ;; \
+	    SHA256)   tool=sha256sum ;; \
+	    MD5)      tool=md5sum ;; \
+	  esac ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
+	done

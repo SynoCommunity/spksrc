@@ -1,0 +1,3 @@
+lnk:lib/libdvdread.so
+lnk:lib/libdvdread.so.7
+lib:lib/libdvdread.so.7.0.0

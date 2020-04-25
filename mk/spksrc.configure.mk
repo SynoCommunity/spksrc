@@ -15,6 +15,17 @@
 
 CONFIGURE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)configure_done
 
+LIB_TYPE_ARG = 
+ifeq ($(strip $(CONFIGURE_LINK_ARG)),)
+ifeq ($(strip $(PKG_LINK_TYPE)),static)
+LIB_TYPE_ARG = --enable-static --disable-shared
+else ifeq ($(strip $(PKG_LINK_TYPE)),shared)
+LIB_TYPE_ARG = --disable-static --enable-shared
+endif
+else
+LIB_TYPE_ARG = $(CONFIGURE_LINK_ARG)
+endif
+
 ifeq ($(strip $(PRE_CONFIGURE_TARGET)),)
 PRE_CONFIGURE_TARGET = pre_configure_target
 else
@@ -39,7 +50,7 @@ ifneq ($(strip $(GNU_CONFIGURE)),)
 REAL_CONFIGURE_ARGS += $(TC_CONFIGURE_ARGS)
 REAL_CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 endif
-REAL_CONFIGURE_ARGS += $(CONFIGURE_ARGS)
+REAL_CONFIGURE_ARGS += $(CONFIGURE_ARGS) $(LIB_TYPE_ARG)
 
 configure_msg:
 	@$(MSG) "Configuring for $(NAME)"
