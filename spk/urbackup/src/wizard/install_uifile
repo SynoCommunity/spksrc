@@ -1,8 +1,6 @@
 [{
     "step_title": "Urbackup",
     "items": [{
-<<<<<<< HEAD
-<<<<<<< HEAD
 	"type": "textfield",
         "desc": "Urbackup backup location. At this location client backup files are saved",
         "subitems": [{
@@ -14,40 +12,4 @@
              }
           }]
      }]
-=======
-        "type": "textfield",
-        "desc": "Configure the fork to use",
-=======
-	"type": "textfield",
-        "desc": "Urbackup backup location",
->>>>>>> aa831382... many improvements
-        "subitems": [{
-            "key": "wizard_backup_dir",
-            "desc": "Download location",
-            "defaultValue": "/mnt/backups/urbackup",
-            "validator": {
-<<<<<<< HEAD
-                "allowBlank": false
-            }
-        }, {
-            "key": "wizard_fork_branch",
-            "desc": "Fork branch",
-            "defaultValue": "dev",
-            "validator": {
-                "allowBlank": false
-            }
-        ]
-    }]
-}, {
-    "step_title": "Attention! DSM6 Permissions",
-    "items": [{
-        "desc": "Permissions are managed with the group 'sc-urbackup' in DSM."
-    }]
->>>>>>> e697f224... add urbackup support
-=======
-              "allowBlank": false
-             }
-          }]
-     }]
->>>>>>> aa831382... many improvements
 }]
