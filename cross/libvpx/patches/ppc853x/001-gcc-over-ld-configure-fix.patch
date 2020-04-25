@@ -1,0 +1,13 @@
+diff -uprN ../libvpx-1.8.2/build/make/configure.sh ./build/make/configure.sh
+--- ../libvpx-1.8.2/build/make/configure.sh	2019-12-09 18:09:20.000000000 -0500
++++ ./build/make/configure.sh	2020-02-23 19:52:19.777660739 -0500
+@@ -689,7 +689,8 @@ setup_gnu_toolchain() {
+   CC=${CC:-${CROSS}gcc}
+   CXX=${CXX:-${CROSS}g++}
+   AR=${AR:-${CROSS}ar}
+-  LD=${LD:-${CROSS}${link_with_cc:-ld}}
++  #LD=${LD:-${CROSS}${link_with_cc:-ld}}
++  LD=${CC}
+   AS=${AS:-${CROSS}as}
+   STRIP=${STRIP:-${CROSS}strip}
+   NM=${NM:-${CROSS}nm}

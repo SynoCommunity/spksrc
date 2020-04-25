@@ -1,0 +1,18 @@
+--- ./cmrtlib/linux/CMakeLists.txt.orig	2020-04-23 00:11:29.485477023 -0500
++++ ./cmrtlib/linux/CMakeLists.txt	2020-04-23 00:20:37.585672711 -0500
+@@ -26,13 +26,13 @@
+ set(LIBRARY_OUTPUT_PATH    ${MDF_OPTION__OUTPUT_DIR})
+ 
+ # Set up compile options that will be used for the Linux build
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fPIC -fpermissive -fstack-protector-all -Werror")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -fpermissive -fstack-protector-all -Werror")
+ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+ endif()
+ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-strict-aliasing -D_FORTIFY_SOURCE=2")
+ set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -D__DEBUG -O0")
+-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++17 -fPIC -fpermissive -fstack-protector-all -Werror")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++14 -fPIC -fpermissive -fstack-protector-all -Werror")
+ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse4.1")
+ endif()

@@ -4,8 +4,8 @@
  
  TEST.GCC.l = \
          ass avformat avfilter avcodec avutil swresample postproc mp3lame dvdnav \
--        dvdread fribidi x265 iconv numa drm uuid png \
-+        dvdread fribidi x265 iconv numa drm uuid png fdk-aac \
+-        dvdread fribidi x265 iconv numa drm uuid png mfx va va-drm pciaccess \
++        dvdread fribidi x265 iconv numa drm uuid png mfx va va-drm pciaccess fdk-aac \
          swscale vpx theoraenc theoradec vorbis vorbisenc ogg x264 \
          bluray freetype xml2 bz2 z jansson harfbuzz opus speex lzma dav1d
  

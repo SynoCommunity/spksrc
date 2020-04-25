@@ -16,7 +16,7 @@ GNU_CONFIGURE = 1
 
 PYTHON_PATH = $(HOME)/spksrc/native/python3/work-native/install/usr/local/bin
 ENV += PATH=$(PYTHON_PATH):$$PATH
-CONFIGURE_ARGS += --enable-shared=no --enable-shared=yes --enable-installed-tests=no --enable-always-build-tests=no 
+CONFIGURE_ARGS = --enable-installed-tests=no --enable-always-build-tests=no 
 CONFIGURE_ARGS += --enable-gtk-doc-html=no --enable-man=no  --enable-libmount=no --with-pcre=internal
 CONFIGURE_ARGS += --with-pic  --with-libiconv=gnu
 CONFIGURE_ARGS += --with-python="$(PYTHON_PATH)/python3"

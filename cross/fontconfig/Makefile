@@ -13,7 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS += --with-pic --enable-shared --disable-docs --with-arch=x86_64 --enable-iconv --enable-libxml2
+CONFIGURE_ARGS = --with-pic --disable-docs --with-arch=x86_64 --enable-iconv --enable-libxml2
 CONFIGURE_ARGS += LIBXML2_CFLAGS="-I$(INSTALL_DIR)$(INSTALL_PREFIX)/include/libxml2"
 CONFIGURE_ARGS += LIBXML2_LIBS="-L$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -lxml2 -lz -liconv -lpthread -lm -ldl"
 

@@ -13,7 +13,7 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --enable-shared=yes --with-pic --enable-freetype-config --with-zlib=yes --with-png=yes --with-bzip2=yes
+CONFIGURE_ARGS = --enable-freetype-config --with-zlib=yes --with-png=yes --with-bzip2=yes
 
 include ../../mk/spksrc.cross-cc.mk
 

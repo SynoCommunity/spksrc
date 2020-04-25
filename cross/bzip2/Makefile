@@ -21,8 +21,11 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: bzip2_compile
 bzip2_compile:
+ifeq ($(strip $(PKG_LINK_TYPE)),static)
 	$(RUN) $(MAKE) bzip2 bzip2recover PREFIX=$(INSTALL_PREFIX)
+else
 	$(RUN) $(MAKE) -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
+endif
 
 .PHONY: bzip2_install
 bzip2_install:
@@ -33,5 +36,7 @@ bzip2_install:
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzegrep
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzfgrep
 	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
+ifneq ($(strip $(PKG_LINK_TYPE)),static)
 	@$(RUN) cp libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/
 	ln -sf libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0
+endif

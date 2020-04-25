@@ -61,7 +61,6 @@ LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
 
-
 .PHONY: tc_vars
 tc_vars: patch
 	@echo TC_ENV :=

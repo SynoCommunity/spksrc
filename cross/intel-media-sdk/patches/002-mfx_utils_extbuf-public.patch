@@ -1,0 +1,11 @@
+--- _studio/mfx_lib/shared/include/mfx_utils_extbuf.h.orig	2020-04-23 05:59:19.737648583 -0500
++++ _studio/mfx_lib/shared/include/mfx_utils_extbuf.h	2020-04-23 05:53:53.376492202 -0500
+@@ -79,7 +79,7 @@
+             return (it == m_eb.end()) ? nullptr : (mfxExtBuffer*)m_eb.at(id).get();
+         }
+ 
+-    protected:
++    public:
+         using TEBMap = std::map<mfxU32, std::unique_ptr<mfxU8[]>>;
+         using TEBIt  = TEBMap::iterator;
+ 

@@ -12,12 +12,12 @@ HOMEPAGE = https://01.org/linuxmedia
 COMMENT = Libva-utils is a collection of tests for VA-API (Video Acceleration API)
 LICENSE = MIT
 
-PRE_CONFIGURE_TARGET = libva_utils_configure
-
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS += --disable-x11 --disable-wayland
-ADDITIONAL_CXXFLAGS += -std=c++11
+PRE_CONFIGURE_TARGET = libva_utils_configure
+
+CONFIGURE_ARGS = --disable-x11 --disable-wayland --with-pic
+ADDITIONAL_CXXFLAGS += -std=c++14
 
 include ../../mk/spksrc.cross-cc.mk
 

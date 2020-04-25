@@ -1,8 +1,8 @@
 SPK_NAME = HandBrakeCLI
 SPK_VERS = 1.3.1
-SPK_REV = 1	
+SPK_REV = 12	
 SPK_ICON = src/HandBrake.png
-CHANGELOG = "1. HandBrake CLI (Command Line Interface) v1.3.1 with Intel QuickSync Media Driver 19.4.0 <br/>"
+CHANGELOG = "1. HandBrake CLI (Command Line Interface) v1.3.1 with Intel QuickSync Media Driver 20.1.1 <br/>"
 
 DEPENDS = cross/HandBrakeCLI
 

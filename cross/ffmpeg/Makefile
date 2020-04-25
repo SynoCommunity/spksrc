@@ -12,9 +12,9 @@ DEPENDS += cross/fribidi cross/xz cross/libvpx cross/fribidi
 DEPENDS += cross/opus cross/speex cross/lame cross/dav1d 
 
 ifeq ($(strip $(HANDBRAKE)),)
-PATCHES = $(sort $(wildcard patches/00*.patch))
+PATCHES = $(sort $(wildcard patches/0*.patch))
 DEPENDS += cross/x265 cross/soxr cross/gnutls cross/flac cross/libsamplerate
-DEPENDS += cross/libdvdnav cross/libdvdread cross/harfbuzz native/nasm cross/x264 
+DEPENDS += cross/harfbuzz native/nasm cross/x264 
 DEPENDS += cross/libass cross/libbluray cross/libtheora cross/libvorbis cross/gmp
 else
 PATCHES = $(sort $(wildcard patches/*.patch))
@@ -26,20 +26,26 @@ LICENSE  = GPLv2
 
 NASM_PATH=$(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
-CONFIGURE_ARGS += --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --enable-shared
-CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include -DSYNO_VIDEOSTATION -DSYNO_AUDIOSTATION -DSYNO_MEDIASERVER -DSYNO_DSM -fno-if-conversion"
+CONFIGURE_ARGS += --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic --enable-gpl
-CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib" 
-CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
+CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"  
+CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
+CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include -DSYNO_VIDEOSTATION -DSYNO_AUDIOSTATION -DSYNO_MEDIASERVER -DSYNO_DSM -fno-if-conversion"
+
+ifeq ($(strip $(PKG_LINK_TYPE)),static)
+CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lpthread -lm" --pkg-config-flags="--static"
+else
+CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" 
+endif
 
 #Generic build
 ifeq ($(strip $(HANDBRAKE)),)
 CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libdav1d
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr --enable-libspeex --enable-gmp
-CONFIGURE_ARGS += --enable-libvorbis --enable-libx265 --enable-version3  --enable-avresample
+CONFIGURE_ARGS += --enable-libvorbis --enable-libx265 --enable-version3 
 CONFIGURE_ARGS += --enable-libvpx --enable-gnutls  --enable-libx264 --enable-libbluray
-CONFIGURE_ARGS += --disable-debug --disable-doc  --enable-libtheora --disable-static
+CONFIGURE_ARGS += --disable-debug --disable-doc  --enable-libtheora
 else
 #HandBrake required build configuration
 CONFIGURE_ARGS += --disable-doc --disable-programs  --disable-avdevice  --disable-muxers 
@@ -72,8 +78,10 @@ include ../../mk/spksrc.cross-cc.mk
 
 # Add AV1 codec to supported ARCH
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
+ifeq ($(strip $(HANDBRAKE)),)
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
+endif
 endif
 
 
@@ -96,7 +104,7 @@ CONFIGURE_ARGS += --arch=i386
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/nasm cross/intel-media-sdk
+DEPENDS += native/nasm cross/libva-utils cross/intel-media-sdk
 ENV += PATH=$(NASM_PATH):$$PATH
 ENV += LIBVA_DRIVERS_PATH=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib/dri
 ENV += LIBVA_DRIVER_NAME=iHD

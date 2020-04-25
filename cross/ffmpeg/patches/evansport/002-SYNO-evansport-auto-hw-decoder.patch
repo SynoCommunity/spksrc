@@ -1,0 +1,111 @@
+diff -uprN ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c	2019-12-31 16:35:22.000000000 -0500
++++ ./fftools/ffmpeg_opt.c	2020-02-29 08:39:19.544147373 -0500
+@@ -122,6 +122,10 @@ static int ignore_unknown_streams = 0;
+ static int copy_unknown_streams = 0;
+ static int find_stream_info = 1;
+ 
++#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER
++static int auto_detect_HWdecoder = 0;
++#endif
++
+ static void uninit_options(OptionsContext *o)
+ {
+     const OptionDef *po = options;
+@@ -692,6 +696,57 @@ static AVCodec *find_codec_or_die(const
+     return codec;
+ }
+ 
++#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER
++static AVCodec *choose_decoder_smd(OptionsContext *o, AVFormatContext *s, AVStream *st)
++{
++    char *codec_name = NULL;
++	AVCodec *result_codec;
++	enum AVCodecID smd_codecID;
++
++    MATCH_PER_STREAM_OPT(codec_names, str, codec_name, s, st);
++    if (codec_name) {
++        AVCodec *codec = find_codec_or_die(codec_name, st->codec->codec_type, 0);
++        st->codec->codec_id = codec->id;
++		result_codec = codec;
++    } else {
++		result_codec = avcodec_find_decoder(st->codec->codec_id);
++	}
++
++	if (!result_codec || !auto_detect_HWdecoder) {
++		return result_codec;
++	}
++
++	switch (result_codec->id) {
++		case AV_CODEC_ID_H264:
++			if (FF_PROFILE_H264_HIGH_10 == st->codec->profile || FF_PROFILE_H264_HIGH_10_INTRA == st->codec->profile) {
++				return result_codec;
++			}
++			smd_codecID = AV_CODEC_ID_H264_SYNO;
++			break;
++		case AV_CODEC_ID_MPEG2VIDEO:
++			smd_codecID = AV_CODEC_ID_MPEG2VIDEO_SYNO;
++			break;
++		case AV_CODEC_ID_VC1:
++			smd_codecID = AV_CODEC_ID_VC1_SYNO;
++			break;
++		case AV_CODEC_ID_WMV3:
++			smd_codecID = AV_CODEC_ID_WMV3_SYNO;
++			break;
++		case AV_CODEC_ID_MPEG4:
++			smd_codecID = AV_CODEC_ID_MPEG4_SYNO;
++			break;
++		default:
++			smd_codecID = AV_CODEC_ID_NONE;
++	}
++	if (AV_CODEC_ID_NONE != smd_codecID) {
++		result_codec = avcodec_find_decoder(smd_codecID);
++		st->codec->codec_id = result_codec->id;
++	}
++
++	return result_codec;
++}
++#endif
++
+ static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
+ {
+     char *codec_name = NULL;
+@@ -752,7 +807,12 @@ static void add_input_streams(OptionsCon
+             st->codecpar->codec_tag = tag;
+         }
+ 
++#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER
++        ist->dec = choose_decoder_smd(o, ic, st);
++#else
+         ist->dec = choose_decoder(o, ic, st);
++#endif
++
+         ist->decoder_opts = filter_codec_opts(o->g->codec_opts, ist->st->codecpar->codec_id, ic, st, ist->dec);
+ 
+         ist->reinit_filters = -1;
+@@ -3364,6 +3424,10 @@ static int opt_progress(void *optctx, co
+ const OptionDef options[] = {
+     /* main options */
+     CMDUTILS_COMMON_OPTIONS
++#ifdef SYNO_EVANSPORT_AUTO_HW_DECODER
++    { "prefer_smd",   OPT_BOOL,                                      {              &auto_detect_HWdecoder },
++        "enable auto detect Hardware decoder" },
++#endif
+     { "f",              HAS_ARG | OPT_STRING | OPT_OFFSET |
+                         OPT_INPUT | OPT_OUTPUT,                      { .off       = OFFSET(format) },
+         "force format", "fmt" },
+diff -uprN ../ffmpeg-4.2.2-evansport-patch001/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-evansport-patch001/synoconfig.h	2020-02-25 18:55:30.000000000 -0500
++++ ./synoconfig.h	2020-02-29 08:39:59.764248751 -0500
+@@ -66,3 +66,11 @@
+  * See Media Server #386
+  */
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
++ 
++/* on Evansport, default always using software decoder.
++ * add new flag "-prefer_smd" can auto using hardware decoder.
++ * See Video Station #1234, DSM #50422
++ */
++#if defined(SYNO_EVANSPORT_SMD)
++#define SYNO_EVANSPORT_AUTO_HW_DECODER
++#endif

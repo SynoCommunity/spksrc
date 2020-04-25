@@ -87,20 +87,25 @@ CMAKE_BITLIB_ARGS += -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LINK_FLAGS="-l
 
 $(PKG_DIR)/libx265_main12.a:
 	mkdir --parents $(PKG_BUILD_12BIT)
-	cd $(PKG_BUILD_12BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) -DMAIN12=ON ../source
-	cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	$(RUN) && cd $(PKG_BUILD_12BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) -DMAIN12=ON ../source
+	$(RUN) && cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
 	$(RUN) ln -sf $(PKG_BUILD_12BIT)/libx265.a libx265_main12.a
 
 $(PKG_DIR)/libx265_main10.a:
 	mkdir --parents $(PKG_BUILD_10BIT)
-	cd $(PKG_BUILD_10BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) ../source
-	cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	$(RUN) && cd $(PKG_BUILD_10BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) ../source
+	$(RUN) && cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
 	$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
 
 # Aggregate them all together in default 8 bit depth build
 CMAKE_MULTILIB_ARGS = -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
-CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
+CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON
 
+ifeq ($(strip $(PKG_LINK_TYPE)),static)
+CMAKE_MULTILIB_ARGS += -DENABLE_SHARED=OFF
+else
+CMAKE_MULTILIB_ARGS += -DENABLE_SHARED=ON
+endif
 
 x265_pre_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
 

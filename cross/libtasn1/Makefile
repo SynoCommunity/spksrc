@@ -12,7 +12,7 @@ COMMENT  = ASN.1 library
 LICENSE  = LGPLv2.1
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-gcc-warnings --disable-static
+CONFIGURE_ARGS = --disable-gcc-warnings
 PRE_COMPILE_TARGET = myPreCompile
 
 include ../../mk/spksrc.cross-cc.mk

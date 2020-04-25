@@ -1,9 +1,9 @@
 PKG_NAME = gmmlib
-PKG_VERS = 19.4.1
+PKG_VERS = 20.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = intel-$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/gmmlib/archive
-PKG_DIR = $(PKG_NAME)-intel-$(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)/build
 
 DEPENDS += cross/libva
 
@@ -11,6 +11,7 @@ HOMEPAGE = https://github.com/intel/gmmlib
 COMMENT  = Intel Graphics Memory Management Library provides device specific and buffer management for the Intel Graphics Compute Runtime for OpenCL and the Intel Media Driver for VAAPI.
 LICENSE  = MIT
 
+POST_EXTRACT_TARGET = gmmlib_custom_post_extract
 CONFIGURE_TARGET = gmmlib_custom_configure
 COMPILE_TARGET = gmmlib_custom_compile
 INSTALL_TARGET = gmmlib_custom_install
@@ -21,7 +22,7 @@ CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
-CMAKE_ARGS += -DCMAKE_BUILD_TYPE=None
+CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
 CMAKE_ARGS += -DRUN_TEST_SUITE=OFF
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(INSTALL_PREFIX)/lib
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
@@ -41,20 +42,26 @@ CMAKE_ARGS += -DARCH=64
 endif
 
 # Set working directory
-PKG_WORK_DIR = $(WORK_DIR)/$(PKG_DIR)/build
+#PKG_WORK_DIR = $(WORK_DIR)/$(PKG_DIR)/build
+
+
+.PHONY: gmmlib_custom_post_extract
+
+gmmlib_custom_post_extract:
+	cd $(WORK_DIR) && mv $(PKG_NAME)-intel-$(PKG_NAME)-$(PKG_VERS) $(PKG_NAME) && mkdir $(PKG_NAME)/build
 
 .PHONY: gmmlib_custom_configure
 
-gmmlib_custom_configure: 
-	mkdir --parents $(PKG_WORK_DIR)/build
-	cd $(PKG_WORK_DIR) && env $(ENV) cmake $(CMAKE_ARGS) ..
+gmmlib_custom_configure:
+	$(RUN) cmake $(CMAKE_ARGS) ..
 
 .PHONY: gmmlib_custom_compile
 
 gmmlib_custom_compile: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS) $(MAKE_ARGS)
 
 .PHONY: gmmlib_custom_install
 
 gmmlib_custom_install: 
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) $(COMPILE_MAKE_OPTIONS) install DESTDIR=$(INSTALL_DIR)
+	$(RUN) $(MAKE) install $(MAKE_ARGS) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+	$(RUN) cp igdgmm.pc $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig/

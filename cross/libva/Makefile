@@ -1,5 +1,5 @@
 PKG_NAME = libva
-PKG_VERS = 2.6.0
+PKG_VERS = 2.7.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/libva/archive
@@ -17,7 +17,7 @@ PRE_CONFIGURE_TARGET = libva_custom_preconfigure
 POST_INSTALL_TARGET = libva_custom_postinstall
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-drivers-path=$(INSTALL_PREFIX)/lib/dri
+CONFIGURE_ARGS = --with-drivers-path=$(INSTALL_PREFIX)/lib/dri LIBS="-ldrm" --with-pic
 
 include ../../mk/spksrc.cross-cc.mk
 

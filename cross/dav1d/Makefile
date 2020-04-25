@@ -11,7 +11,6 @@ HOMEPAGE = https://www.videolan.org/projects/dav1d.html
 COMMENT  = dav1d is a new AV1 cross-platform decoder, open-source, and focused on speed and correctness.
 LICENSE  = BSD 2
 
-GNU_CONFIGURE = 1
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 ENV += NASM=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
@@ -20,9 +19,15 @@ CONFIGURE_TARGET = myConf
 COMPILE_TARGET = myComp
 INSTALL_TARGET = myInstall
 
-#CONFIGURE_ARGS = -Ddefault_library=shared  -Denable_tools=false -Denable_tests=false
-
 include ../../mk/spksrc.cross-cc.mk
+
+MESON_ARGS = --prefix=$(INSTALL_PREFIX) --libdir=$(INSTALL_PREFIX)/lib -Dbuildtype=release -Denable_tools=false -Denable_tests=false
+
+ifeq ($(strip $(PKG_LINK_TYPE)),static)
+MESON_ARGS += -Ddefault_library=static
+else
+MESON_ARGS += -Ddefault_library=shared
+endif
 
 .PHONY: myPreConf
 myPreConf:
@@ -30,8 +35,7 @@ myPreConf:
 
 .PHONY: myConf
 myConf:
-	$(RUN) && mkdir -p build && cd build && meson --prefix=$(INSTALL_PREFIX) --libdir=$(INSTALL_PREFIX)/lib -Dbuildtype=release -Denable_tools=false -Denable_tests=false  ..
-#-Ddefault_library=static ..
+	$(RUN) && mkdir -p build && cd build && meson $(MESON_ARGS) ..
 
 .PHONY: myComp
 myComp:

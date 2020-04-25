@@ -18,6 +18,8 @@ export HANDBRAKE = "YES"
 
 PATCHES = $(sort $(wildcard patches/0*.patch))
 
+export PKG_LINK_TYPE = static
+
 DEPENDS = cross/bzip2 native/nasm cross/libxml2
 DEPENDS += cross/harfbuzz cross/jansson cross/xz 
 DEPENDS += cross/ffmpeg cross/libvorbis
