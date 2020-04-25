@@ -2,10 +2,10 @@
     "step_title": "Urbackup",
     "items": [{
 	"type": "textfield",
-        "desc": "Urbackup backup location. If you change this, change it also in Urbackup Server",
+        "desc": "Urbackup backup Pfad. Wenn sie den ändern muss das auch bei den Einstellungen des Servers unter Sicherungsspeicherpfad angepasst werden",
         "subitems": [{
             "key": "wizard_backup_dir",
-            "desc": "Backup location",
+            "desc": "Urbackup Sicherungspfad",
             "defaultValue": "/mnt/backups/urbackup",
             "validator": {
               "allowBlank": false
