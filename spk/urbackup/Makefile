@@ -10,6 +10,7 @@ MAINTAINER = Josef
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
 ADMIN_URL = /urbackup/
 RELOAD_UI = yes
+DISPLAY_NAME = Urbackup
 
 HOMEPAGE   = http://www.urbackup.org/
 LICENSE    = GPLv3
