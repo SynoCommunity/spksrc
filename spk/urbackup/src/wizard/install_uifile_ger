@@ -2,7 +2,7 @@
     "step_title": "Urbackup",
     "items": [{
 	"type": "textfield",
-        "desc": "Urbackup backup Pfad. Wenn sie den ändern muss das auch bei den Einstellungen des Servers unter Sicherungsspeicherpfad angepasst werden",
+        "desc": "Urbackup backup Pfad. Hier werden die Dateien der Backupclients gespeichert.",
         "subitems": [{
             "key": "wizard_backup_dir",
             "desc": "Urbackup Sicherungspfad",
