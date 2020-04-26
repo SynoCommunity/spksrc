@@ -13,7 +13,7 @@
             "validator": {
               "allowBlank": false,
               "regex": {
-                "expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                "expr": "/^\\\/[Vv]olume[0-9]{1,2}\\\/[^<>: */?\"]*/",
                 "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume (1-99)"
               }
             }
