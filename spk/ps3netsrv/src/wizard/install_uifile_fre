@@ -10,7 +10,7 @@
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "expr": "/^\\\/[Vv]olume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
                     "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
                 }
             }

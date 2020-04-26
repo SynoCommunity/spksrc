@@ -23,7 +23,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 				"validator": {
 				  "allowBlank": false,
 				  "regex": {
-					"expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
+					"expr": "/^\\\/[Vv]olume[0-9]{1,2}\\\/[^<>: */?\"]*/",
 					"errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
 				  }
 				}
