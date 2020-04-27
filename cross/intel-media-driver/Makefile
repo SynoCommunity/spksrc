@@ -21,23 +21,20 @@ CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
-#CMAKE_ARGS += -DCMAKE_C_FLAGS=-Wno-delete-incomplete                        # ERROR
 CMAKE_ARGS += -DCMAKE_C_FLAGS=-Wno-error=delete-incomplete
 CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11                                   # *** DEFAULT ***
-#CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11 -Wno-error=delete-incomplete     # ERROR
-#CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11 -Wno-delete-incomplete           # ERROR
-#CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-Wdelete-incomplete                         # ERROR
-#CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-Wno-delete-incomplete                      # ERROR
-## A TESTER:
-# -Werror=delete-incomplete
-# -Wno-error=delete-incomplete
-#  ********************************
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11
 CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
-#CMAKE_ARGS += -Wno-delete-incomplete                                        # ERROR
 
 include ../../mk/spksrc.cross-cc.mk
+
+# Build errod with gen12:
+# https://github.com/intel/media-driver/issues/907
+#
+# Disabling gen12 only doesn't work:
+# https://github.com/intel/media-driver/issues/813
+#CMAKE_ARGS += -DGEN12=OFF
 
 ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DARCH=32
