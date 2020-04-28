@@ -7,6 +7,7 @@ BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/$(SPK_NAME)
 DEPENDS = cross/librsync cross/bash cross/duply
 WHEELS = src/requirements.txt
+
 SPK_DEPENDS = "python>=2.7.8-9:gnupg>=2.1.6-1"
 
 MAINTAINER = SynoCommunity
@@ -22,5 +23,7 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+
+SPK_COMMANDS = "env/bin/duplicity share/duply/duply"
 
 include ../../mk/spksrc.spk.mk
