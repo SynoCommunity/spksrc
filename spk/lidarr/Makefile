@@ -1,6 +1,6 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/lidarr.png
 
 REQUIRED_DSM = 5.0
@@ -16,7 +16,7 @@ DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent us
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Lidarr
-CHANGELOG = "Update Lidarr to v0.5.0.583"
+CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
 
 HOMEPAGE = http://lidarr.audio/
 LICENSE  = GPLv3

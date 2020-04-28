@@ -5,12 +5,16 @@
 service_prestart ()
 {
     # Replace generic service startup
-
-    MONO_PATH="${SYNOPKG_PKGDEST}/../mono/bin"
+    MONO_PATH="/var/packages/mono/target/bin"
     PATH="${SYNOPKG_PKGDEST}/bin:${MONO_PATH}:${PATH}"
     MONO="${MONO_PATH}/mono"
     JACKETT="${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/JackettConsole.exe"
     HOME_DIR="${SYNOPKG_PKGDEST}/var"
+
+    # workaround for mono bug with armv5 (https://github.com/mono/mono/issues/12537)
+    if [ "$SYNOPKG_DSM_ARCH" == "88f8621" -o "$SYNOPKG_DSM_ARCH" == "88f8622" ]; then
+        MONO="MONO_ENV_OPTIONS='-O=-aot,-float32' ${MONO_PATH}/mono"
+    fi
 
     echo "Starting Jackett as user ${EFF_USER}" >> ${LOG_FILE}
     COMMAND="env HOME=${HOME_DIR} PATH=${PATH} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${JACKETT} --PIDFile ${PID_FILE}"
@@ -30,5 +34,5 @@ service_postinst ()
     $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
     $BIN/deluser "${USER}" >> ${INST_LOG}
 
-    echo "service_postinst ${SYNOPKG_PKG_STATUS}" >> $INST_LOG
+    echo "service_postinst ${SYNOPKG_PKG_STATUS}" >> ${INST_LOG}
 }

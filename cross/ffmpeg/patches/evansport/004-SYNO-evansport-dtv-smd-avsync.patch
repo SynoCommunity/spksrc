@@ -1,0 +1,53 @@
+diff -uprN ../ffmpeg-4.2.2-evansport-patch003/fftools/ffmpeg.h ./fftools/ffmpeg.h
+--- ../ffmpeg-4.2.2-evansport-patch003/fftools/ffmpeg.h	2020-02-29 08:35:20.000000000 -0500
++++ ./fftools/ffmpeg.h	2020-02-29 08:45:10.184229932 -0500
+@@ -608,6 +608,9 @@ extern int print_stats;
+ extern int qp_hist;
+ extern int stdin_interaction;
+ extern int frame_bits_per_raw_sample;
++// SYNO_EVANSPORT_DTV_SMD_AVSYNC
++extern int enable_dtv_smd;
++// SYNO_EVANSPORT_DTV_SMD_AVSYNC
+ extern AVIOContext *progress_avio;
+ extern float max_error_rate;
+ extern char *videotoolbox_pixfmt;
+diff -uprN ../ffmpeg-4.2.2-evansport-patch003/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.2.2-evansport-patch003/fftools/ffmpeg_opt.c	2020-02-29 08:41:39.683960073 -0500
++++ ./fftools/ffmpeg_opt.c	2020-02-29 08:47:46.118298117 -0500
+@@ -107,6 +107,9 @@ int qp_hist           = 0;
+ int stdin_interaction = 1;
+ int frame_bits_per_raw_sample = 0;
+ float max_error_rate  = 2.0/3;
++#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC
++int enable_dtv_smd = 0;
++#endif
+ int filter_nbthreads = 0;
+ int filter_complex_nbthreads = 0;
+ int vstats_version = 2;
+@@ -3428,6 +3431,10 @@ const OptionDef options[] = {
+     { "prefer_smd",   OPT_BOOL,                                      {              &auto_detect_HWdecoder },
+         "enable auto detect Hardware decoder" },
+ #endif
++#ifdef SYNO_EVANSPORT_DTV_SMD_AVSYNC
++    { "dtv_smd",        OPT_BOOL,                                    {              &enable_dtv_smd},
++        "enable passthough timestamp in hardware pipeline mode" },
++#endif
+     { "f",              HAS_ARG | OPT_STRING | OPT_OFFSET |
+                         OPT_INPUT | OPT_OUTPUT,                      { .off       = OFFSET(format) },
+         "force format", "fmt" },
+diff -uprN ../ffmpeg-4.2.2-evansport-patch003/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-evansport-patch003/synoconfig.h	2020-02-29 08:42:40.053623085 -0500
++++ ./synoconfig.h	2020-02-29 08:45:10.186230087 -0500
+@@ -81,3 +81,12 @@
+ #if defined(SYNO_EVANSPORT_SMD)
+ #define SYNO_EVANSPORT_FLV_EXTRADATA
+ #endif
++ 
++/* Fixed DTV recoded file or DTV streaming A/V issue on Evansport.
++ * add flag "-dtv_smd" is used other way to calculate timestamp.
++ * in hardware pipeline mode.
++ * See Video Station #1652, #1716
++ */
++#if defined(SYNO_EVANSPORT_SMD)
++#define SYNO_EVANSPORT_DTV_SMD_AVSYNC
++#endif

@@ -138,6 +138,7 @@ else ifneq ($(strip $(TC_FIRMWARE)),)
 	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
 	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
 else ifneq ($(strip $(TC_OS_MIN_VER)),)
+	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
 	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
 else
 	@echo firmware=\"3.1-1594\" >> $@
@@ -473,15 +474,7 @@ changelog:
 
 ####
 
-.PHONY: kernel-required
-kernel-required:
-	@if [ -n "$(REQ_KERNEL)" ]; then \
-	  exit 1 ; \
-	fi
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \
-	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
-	    exit 0 ; \
-	  else \
-	    exit 1 ; \
-	  fi ; \
-	done
+### For make kernel-required
+include ../../mk/spksrc.kernel-required.mk
+
+####

@@ -1,14 +1,15 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.2.1
+PKG_VERS = 4.2.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
-DEPENDS += cross/libbluray cross/libvorbis cross/libvpx
+DEPENDS += cross/libbluray cross/libvorbis cross/speex cross/libvpx
 DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265
+DEPENDS += cross/opencore-amr
 
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
@@ -22,14 +23,17 @@ CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
 CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
-CONFIGURE_ARGS += --enable-gpl
+CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enable-avresample
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr
 CONFIGURE_ARGS += --enable-libvorbis
+CONFIGURE_ARGS += --enable-libspeex
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
+CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
+CONFIGURE_ARGS += --enable-debug=1
 
 # fdk-acc is now considered compatible with (L)GPL.
 # It requires --enable-nonfree if you're also using --enable-gpl
@@ -42,10 +46,17 @@ DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
 # Enable Synology specific -hls_seek_time option and other optimizations
-CONFIGURE_ARGS += --extra-cflags="-DSYNO_VIDEOSTATION -DSYNO_AUDIOSTATION -DSYNO_MEDIASERVER -DSYNO_DSM"
+CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
 
 # Compiler workaround to enable DTS-HD MA stream decoding
-CONFIGURE_ARGS += --extra-cflags="-fno-if-conversion"
+CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
+# Synology default optimization
+CONFIGURE_ARGS += --extra-cflags=-O3
+# Remove some of the noise while compiling
+CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
+
+# Compiling tvheadend for evansport requires #include synology.h
+POST_INSTALL_TARGET = ffmpeg_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -61,6 +72,9 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
+ifneq ($(findstring $(ARCH),alpine),$(ARCH))
+CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
@@ -70,7 +84,32 @@ endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
+
+ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
+DEPENDS += cross/ds.evansport cross/json-c
+CONFIGURE_ARGS += --arch=x86 --cpu=atom
+CONFIGURE_ARGS += --disable-x86asm
+CONFIGURE_ARGS += --extra-cflags=-fasm
+CONFIGURE_ARGS += --extra-cflags=-std=c99
+CONFIGURE_ARGS += --extra-cflags=-pedantic
+CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user
+CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
+# DISABLE
+CONFIGURE_ARGS += --disable-decoder=h264_smd
+CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd
+CONFIGURE_ARGS += --disable-decoder=mpeg4_smd
+CONFIGURE_ARGS += --disable-decoder=vc1_smd
+CONFIGURE_ARGS += --disable-decoder=wmv3_smd
+# ENABLE
+#CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
+#CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
+
+else
 CONFIGURE_ARGS += --arch=i386
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
@@ -83,7 +122,18 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
+
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --disable-asm --cpu=e500v2
 endif
+
+# libshine - gcc to old on ppc853x: undefined reference to `__builtin_bswap16'
+ifneq ($(findstring $(ARCH),ppc853x),$(ARCH))
+DEPENDS += cross/shine
+CONFIGURE_ARGS += --enable-libshine
 endif
+endif
+
+.PHONY: ffmpeg_post_install
+ffmpeg_post_install:
+	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/synoconfig.h $(WORK_DIR)/install$(INSTALL_PREFIX)/include
