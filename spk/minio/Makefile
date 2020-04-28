@@ -1,6 +1,6 @@
 SPK_NAME = minio
-SPK_VERS = 2020-03-19T21-49-00Z
-SPK_REV = 4
+SPK_VERS = 2020-04-23T00-58-49Z
+SPK_REV = 5
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
 RELOAD_UI = yes
 DISPLAY_NAME = MinIO
-CHANGELOG = "Update to latest release which includes multiple minor bugfix releases. Breaking Change: Use bulk locks in Multi-object delete and to data usage crawler, so rolling upgrade is not supported."
+CHANGELOG = "Critical security release to address authentication bypass issue in admin API. Please upgrade immediately. Breaking Change related to force deletion of non-empty bucket. So, rolling upgrade is not supported."
 HOMEPAGE = https://min.io/
 LICENSE = Apache License 2.0
 STARTABLE = yes
