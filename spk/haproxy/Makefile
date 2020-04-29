@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.HAProxy.AppInstance
 
 DEPENDS = cross/$(SPK_NAME)
-WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
+WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = Diaoul
