@@ -10,7 +10,7 @@
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "expr": "/^\\\/[Vv]olume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
                     "errorText": "Путь должен начинаться с /volumename?/ где volumename может быть 'volume' или 'volumeUSB' и ? номер раздела (1-99)."
                 }
             }

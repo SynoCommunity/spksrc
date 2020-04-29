@@ -10,7 +10,7 @@
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "expr": "/^\\\/[Vv]olume[0-9]+\\\//",
                     "errorText": "Path should begin with /volume?/ with ? the number of the volume"
                 }
             }
@@ -24,7 +24,7 @@
             "validator": {
                 "allowBlank": true,
                 "regex": {
-                    "expr": "/^\\\/volume[0-9]+\\\//",
+                    "expr": "/^\\\/[Vv]olume[0-9]+\\\//",
                     "errorText": "Path should begin with /volume?/ with ? the number of the volume"
                 }
             }
