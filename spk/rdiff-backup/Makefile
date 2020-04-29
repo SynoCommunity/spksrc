@@ -1,23 +1,24 @@
 SPK_NAME = rdiff-backup
-SPK_VERS = 1.2.8
-SPK_REV = 1
+SPK_VERS = 2.0.0
+SPK_REV = 2
 SPK_ICON = src/rdiff-backup.png
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/$(SPK_NAME)
-DEPENDS = cross/librsync
+PIP = pip3
+BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/librsync cross/attr cross/acl
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.8-9"
+
+SPK_DEPENDS = "python3>=3.5"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = A remote incremental backup of all your files
+DESCRIPTION = rdiff-backup is reverse differential backup.
 STARTABLE = no
 DISPLAY_NAME = rdiff-backup
-CHANGELOG = "Initial release"
+CHANGELOG = "Update to v2.0.0 and update dependencies for python3."
 BETA = 1
 
-HOMEPAGE = http://www.nongnu.org/rdiff-backup/
-LICENSE  = GNU GPL
+HOMEPAGE = https://rdiff-backup.net/
+LICENSE  = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
