@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/librsync/$(PKG_NAME)/archive/
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/popt
+DEPENDS = cross/popt cross/zlib cross/bzip2
 
 HOMEPAGE = http://librsync.sourcefrog.net
 COMMENT  = remote delta-compression library.
@@ -19,6 +19,8 @@ CMAKE_ARGS += -D CMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -D CMAKE_CROSSCOMPILING=true
 CMAKE_ARGS += -D CMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -D CMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
+CMAKE_ARGS += -D BZIP2_LIBRARIES=$(STAGING_INSTALL_PREFIX)/lib
+CMAKE_ARGS += -D ZLIB_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib
 CMAKE_ARGS += -Wno-dev
 
 include ../../mk/spksrc.cross-cc.mk
