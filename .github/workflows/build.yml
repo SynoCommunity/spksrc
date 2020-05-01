@@ -5,7 +5,7 @@ on:
     paths:
     - 'spk/**'
     - 'cross/**'
-    # - 'native/**'
+    - 'native/**'
   push:
     tags:
       - "*-*"
@@ -14,13 +14,13 @@ on:
     paths:
     - 'spk/**'
     - 'cross/**'
-    # - 'native/**'
+    - 'native/**'
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: startsWith(github.ref, 'refs/tags/')
     strategy:
       fail-fast: false
       matrix:
@@ -64,13 +64,13 @@ jobs:
         uses: docker://synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build-tag.sh
-          # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
         env:
+          # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: arch-${{ matrix.arch }}
           #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
 
       - name: List packages
-        run: ls packages
+        run: mkdir -p packages; ls packages
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2

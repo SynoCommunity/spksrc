@@ -17,10 +17,10 @@ jobs:
 
       - name: Lint
         run: |
-          sudo npm install -g jsonlint
+          npm install jsonlint
           find spk/ \
            -not -path "*work*" \
            -not -path "spk/transmission/src/settings.json" \
            -regextype posix-extended \
            -regex '.*(\.json|install_uifile\w*|upgrade_uifile\w*|app/config)' \
-           | xargs -i jsonlint -q -c {};
+           | xargs -i node_modules/jsonlint/lib/cli.js -q -c {};
