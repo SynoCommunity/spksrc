@@ -1,17 +1,9 @@
 #!/bin/bash
 
-cat <<EOF > local.mk
-PUBLISH_URL=https://api.synocommunity.com
-PUBLISH_API_KEY=$API_KEY
-MAINTAINER?=
-MAINTAINER_URL=
-DISTRIBUTOR=SynoCommunity
-DISTRIBUTOR_URL=https://synocommunity.com/
-REPORT_URL=https://github.com/SynoCommunity/spksrc/issues
-SUPPORT_URL=https://github.com/SynoCommunity/spksrc/issues
-DEFAULT_TC=6.1
-PARALLEL_MAKE=4
-EOF
+make setup-synocommunity
+sed -i -e "s|#PARALLEL_MAKE=.*|PARALLEL_MAKE=4|" \
+    -e "s|PUBLISH_API_KEY=.*|PUBLISH_API_KEY=$API_KEY|" \
+    local.mk
 
 # PACKAGE=$(echo "refs/tags/dnscrypt-proxy-2.0.42" | grep -oE "([0-9a-zA-Z]*-)*")
 GH_PACKAGE=$(echo "$GITHUB_REF" | grep -oE "([0-9a-zA-Z]*-)*")
