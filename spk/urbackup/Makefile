@@ -3,6 +3,7 @@ SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/urbackup.png
 DSM_UI_DIR = app
+REQUIRED_DSM = 6.0
 
 DEPENDS = cross/$(SPK_NAME) 
 
