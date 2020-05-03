@@ -1,0 +1,5 @@
+# please update SPK_VERS in spk/fishneht/Makefile to match the fishnet version defined here
+fishnet==1.17.2
+
+# dependencies
+requests==2.23.0
