@@ -3,13 +3,17 @@ SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/urbackup.png
 DSM_UI_DIR = app
+REQUIRED_DSM = 6.0
 
 DEPENDS = cross/$(SPK_NAME) 
 
 MAINTAINER = Josef
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
-ADMIN_URL = /urbackup/
+
+DISTRIBUTOR = SynoCommunity
+DISTRIBUTOR_URL = https://synocommunity.com
 RELOAD_UI = yes
+DISPLAY_NAME = Urbackup
 
 HOMEPAGE   = http://www.urbackup.org/
 LICENSE    = GPLv3
@@ -45,6 +49,7 @@ include ../../mk/spksrc.spk.mk
 urbackup_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	@mkdir -p $(STAGING_DIR)/var/urbackup
+
 
         
 
