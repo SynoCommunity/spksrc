@@ -16,8 +16,8 @@ INSTALL_TARGET = stockfish_install
 
 include ../../mk/spksrc.common.mk
 
-# Toolchains lacking c++11 compiler and aarch64
-UNSUPPORTED_ARCHS = $(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x $(ARMV8_ARCHES)
+# Toolchains lacking c++11 compiler ar not supported
+UNSUPPORTED_ARCHS = $(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 # use builtin atomic support
@@ -27,6 +27,9 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+	BUILD_ARCH=arm64
+endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 	BUILD_ARCH=armv7
 endif
@@ -40,7 +43,7 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 	BUILD_ARCH=ppc-32
 endif
 ifeq ($(BUILD_ARCH),)
-	$(error ARCH $(ARCH) not expected.)
+$(error "ARCH $(ARCH) not expected.")
 endif
 
 COMPILE_MAKE_OPTIONS = build ARCH=$(BUILD_ARCH)
