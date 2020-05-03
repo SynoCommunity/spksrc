@@ -1,9 +1,10 @@
-PKG_NAME = sf
+PKG_NAME = stockfish
+PKG_DIST_FILE=sf
 PKG_VERS = 11
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_DIST_FILE)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/official-stockfish/Stockfish/archive/
-PKG_DIR = Stockfish-$(PKG_NAME)_$(PKG_VERS)
+PKG_DIR = Stockfish-$(PKG_DIST_FILE)_$(PKG_VERS)
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_DIR)/src/
 
 HOMEPAGE = https://stockfishchess.org/ 

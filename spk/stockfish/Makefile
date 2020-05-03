@@ -4,10 +4,10 @@ SPK_ICON= src/sf_icon.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = Guillaume
+MAINTAINER = mayweed
 DESCRIPTION = Stockfish is a strong open source chess engine 
 DISPLAY_NAME = Stockfish 
-STARTABLE=no
+STARTABLE=yes
 HOMEPAGE = https://stockfishchess.org/
 LICENSE  = GPLv2/GPLv3
 
