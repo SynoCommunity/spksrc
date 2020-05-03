@@ -1,15 +1,25 @@
 SPK_NAME = stockfish
 SPK_VERS = 11
-SPK_ICON= src/sf_icon.png
+SPK_REV = 1
+SPK_ICON= src/stockfish.png
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = mayweed
-DESCRIPTION = Stockfish is a strong open source chess engine 
-DISPLAY_NAME = Stockfish 
-STARTABLE=yes
+DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
+CHANGELOG = "Initial package version."
+
+DISPLAY_NAME = Stockfish
+STARTABLE = no
 HOMEPAGE = https://stockfishchess.org/
 LICENSE  = GPLv2/GPLv3
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.common.mk
 
+# Toolchains lacking c++11 compiler and aarch64
+UNSUPPORTED_ARCHS = $(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x $(ARMV8_ARCHES)
+
+
+SPK_COMMANDS = "bin/stockfish"
+
+include ../../mk/spksrc.spk.mk
