@@ -35,7 +35,7 @@ blocklist_setup () {
 
 blocklist_cron_uninstall () {
     # remove cron job
-    if [ "$OS" == 'dsm' ]; then
+    if [ "$OS" = "dsm" ]; then
         rm -f /etc/cron.d/dnscrypt-proxy-update-blocklist
     else
         sed -i '/.*update-blocklist.sh/d' /etc/crontab
@@ -44,7 +44,7 @@ blocklist_cron_uninstall () {
 }
 
 pgrep () {
-    if [ "$OS" == 'dsm' ]; then
+    if [ "$OS" = 'dsm' ]; then
         # shellcheck disable=SC2009,SC2153
         ps aux | grep "$1" >> "${LOG_FILE}" 2>&1
     else
@@ -59,16 +59,16 @@ restart_dhcpd () {
 
 forward_dns_dhcpd () {
     echo "dns forwarding - $1" >> "${LOG_FILE}"
-    if [ "$1" == "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
-        if [ "$OS" == 'dsm' ]; then
+    if [ "$1" = "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
+        if [ "$OS" = "dsm" ]; then
             echo "enable=no" > /etc/dhcpd/dhcpd-dns-dns.info
         else
             echo "enable=no" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
         fi
         restart_dhcpd
-    elif [ "$1" == "yes" ]; then
+    elif [ "$1" = "yes" ]; then
         if pgrep "dhcpd.conf"; then  # if dhcpd (dnsmasq) is enabled and running
-            if [ "$OS" == 'dsm ' ]; then
+            if [ "$OS" = "dsm" ]; then
                 echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dns-dns.conf
                 echo "enable=yes" > /etc/dhcpd/dhcpd-dns-dns.info
                 # /etc/dhcpd/dhcpd-vendor.conf
@@ -88,7 +88,7 @@ service_prestart () {
     echo "service_preinst ${SYNOPKG_PKG_STATUS}" >> "${INST_LOG}"
 
     # Install daily cron job (3 minutes past midnight), to update the block list
-    if [ "$OS" == 'dsm' ]; then
+    if [ "$OS" = 'dsm' ]; then
         mkdir -p /etc/cron.d
         echo "3       0       *       *       *       root    /var/packages/dnscrypt-proxy/target/var/update-blocklist.sh" >> /etc/cron.d/dnscrypt-proxy-update-blocklist
     else # RSM
@@ -164,7 +164,7 @@ service_postinst () {
             "${CFG_FILE}" >> "${INST_LOG}" 2>&1
     fi
 
-    echo "Fixing permissions for cgi GUI... on SRM" >> "${INST_LOG}"
+    echo "Fixing permissions for cgi GUI... " >> "${INST_LOG}"
     # Fixes https://github.com/publicarray/spksrc/issues/3
     # https://originhelp.synology.com/developer-guide/privilege/privilege_specification.html
     chmod 0777 "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
@@ -187,7 +187,7 @@ service_postuninst () {
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf" >> "${INST_LOG}" 2>&1
     pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf" >> "${INST_LOG}" 2>&1
     disable_dhcpd_dns_port "no"
-    if [ "$OS" == 'dsm ' ]; then
+    if [ "$OS" = "dsm" ]; then
         rm -f /etc/dhcpd/dhcpd-dns-dns.conf
         rm -f /etc/dhcpd/dhcpd-dns-dns.info
     else
