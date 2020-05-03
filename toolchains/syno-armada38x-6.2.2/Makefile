@@ -1,14 +1,13 @@
-TC_NAME = syno-$(TC_ARCH)
+TC_NAME = syno-armada38x
 
-TC_ARCH = dakota
-TC_VERS = 1.2
-TC_OS_MIN_VER = 1.2-7742
+TC_ARCH = armada38x
+TC_VERS = 6.2.2
+TC_OS_MIN_VER = 6.2-22259
 
-TC_DIST = gcc493_glibc220_hard-GPL
-TC_EXT = tgz
+TC_DIST = armada38x-gcc493_glibc220_hard-GPL
+TC_EXT = txz
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/SRM%201.2%20Tool%20Chains/QUALCOMM%20IPQ4019%20dakota%20Linux%204.4.60
-TC_DIST_FILE = $(TC_ARCH)-$(TC_DIST_NAME)
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%206.2.2%20Tool%20Chains/Marvell%20Armada%2038x%20Linux%203.10.105
 
 TC_BASE_DIR = arm-unknown-linux-gnueabi
 TC_PREFIX = arm-unknown-linux-gnueabi

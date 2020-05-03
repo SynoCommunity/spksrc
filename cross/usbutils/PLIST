@@ -1,0 +1,9 @@
+bin:bin/lsusb
+rsc:bin/lsusb.py
+rsc:bin/usb-devices
+bin:bin/usbhid-dump
+rsc:sbin/update-usbids.sh
+rsc:share/usb.ids
+lnk:lib/libusb-1.0.so
+lnk:lib/libusb-1.0.so.0
+lib:lib/libusb-1.0.so.0.1.0

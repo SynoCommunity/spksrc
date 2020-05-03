@@ -22,6 +22,9 @@ LIBUSB_AUTOGEN_PARAMS =
 ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 LIBUSB_AUTOGEN_PARAMS += --host=arm-linux
 endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+LIBUSB_AUTOGEN_PARAMS += --host=ppc-linux
+endif
 
 libusb_pre_configure:
 	$(RUN) ; ./autogen.sh $(LIBUSB_AUTOGEN_PARAMS)
