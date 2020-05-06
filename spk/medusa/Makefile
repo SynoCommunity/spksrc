@@ -3,7 +3,7 @@ SPK_VERS = 1.5
 SPK_REV = 2
 SPK_ICON = src/${SPK_NAME}.png
 
-SPK_DEPENDS = "python>=2.7.3-3:git"
+SPK_DEPENDS = "python3>=3.5.6-8:git"
 
 MAINTAINER = pymedusa
 DESCRIPTION = Medusa is a fork of SickBeard, a video file manager for TV Shows. It watches for new episodes of your favorite shows and when they are posted it does its magic..
