@@ -1,7 +1,7 @@
 USER=${SYNOPKG_PKGNAME}
 PRIV_PREFIX=sc-
 SYNOUSER_PREFIX=svc-
-if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="${SYNOUSER_PREFIX}${USER}"; else EFF_USER="${PRIV_PREFIX}${USER}"; fi
+if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="${SYNOUSER_PREFIX}${USER}"; else EFF_USER="${P$
 # Service port
 SERVICE_PORT=${SYNOPKG_PKGPORT}
 # start-stop-status script redirect stdout/stderr to LOG_FILE
@@ -19,14 +19,14 @@ call_func ()
     fi
 }
 
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 GIT_DIR="/usr/local/git"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GIT="${GIT_DIR}/bin/git"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
-SICKBEARD="${SYNOPKG_PKGDEST}/var/SickBeard/SickBeard.py"
+MEDUSA="${SYNOPKG_PKGDEST}/var/Medusa/start.py"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
 FORK_URL="https://github.com/pymedusa/Medusa.git"
 BRANCH="master"
@@ -36,11 +36,17 @@ CFG_WEB_PORT="web_port = ${SYNOPKG_PKGPORT}"
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
 
-SERVICE_COMMAND="${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
+SERVICE_COMMAND="${PYTHON} ${MEDUSA} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
 
 service_preinst ()
 {
-  echo 'No service pre-install routine' > ${INST_LOG}
+  echo 'No service pre-uninstall routine' > ${INST_LOG}
+}
+
+service_prestart ()
+{
+  echo "Setting up correct locale"
+  export LANG=en_US.UTF-8
 }
 
 service_postinst ()
@@ -48,7 +54,7 @@ service_postinst ()
   echo "Create a Python virtualenv" >> ${INST_LOG}
   ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG} 2>&1
   echo "Clone the repository" >> ${INST_LOG}
-  ${GIT} clone --depth 10 --recursive -q -b ${BRANCH} ${FORK_URL} ${SYNOPKG_PKGDEST}/var/SickBeard >>  ${INST_LOG} 2>&1 
+  ${GIT} clone --depth 10 --recursive -q -b ${BRANCH} ${FORK_URL} ${SYNOPKG_PKGDEST}/var/Medusa >>  ${INST_LOG} 2>&1
 }
 
 service_preuninst ()
