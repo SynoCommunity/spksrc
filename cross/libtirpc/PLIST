@@ -1,0 +1,5 @@
+rsc:etc/bindresvport.blacklist
+rsc:etc/netconfig
+lnk:lib/libtirpc.so
+lnk:lib/libtirpc.so.3
+lib:lib/libtirpc.so.3.0.0

@@ -1,0 +1,3 @@
+lnk:lib/libmspack.so
+lnk:lib/libmspack.so.0
+lib:lib/libmspack.so.0.1.0
