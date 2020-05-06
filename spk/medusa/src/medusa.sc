@@ -2,4 +2,4 @@
 title="Medusa"
 desc="Medusa"
 port_forward="yes"
-dst.ports="8083/tcp"
+dst.ports="8183/tcp"
