@@ -1,0 +1,15 @@
+[
+  {"step_title": "This github will be used to install the source from",
+    "items":
+      [ {"desc":  "Fork:&emsp;&nbsp;<b> git://github.com/pymedusa/Medusa.git</b><br>
+                   Branch: <b>master</b>"
+        },
+        {"desc":  "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>
+                   The group 'users' is no longer used as of DSM 6<br>
+                   Package user will not appear on most UI settings.<br>
+                   Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">P$
+        }
+      ]
+  }
+]
+

@@ -1,0 +1,10 @@
+[{
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The gro$
+    },
+    {
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your fol$
+    }]
+}]
+
