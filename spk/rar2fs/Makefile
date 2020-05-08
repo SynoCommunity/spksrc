@@ -12,7 +12,7 @@ STARTABLE = no
 CHANGELOG = "Initial version"
 BETA = 1
 
-HOMEPAGE   = https://github.com/hasse69/rar2fshttps://github.com/hasse69/rar2fs
+HOMEPAGE   = https://github.com/hasse69/rar2fs
 LICENSE    = GPLv3, LGPLv2.1 (libfuse.so), UnRAR License (unrar)
 
 INSTALLER_SCRIPT = src/installer.sh
