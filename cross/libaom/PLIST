@@ -1,4 +1,5 @@
 bin:bin/aomdec
 bin:bin/aomenc
-lib:lib/libaom.so.0
+lib:lib/libaom.so.2.0.0
+lnk:lib/libaom.so.2
 lnk:lib/libaom.so
