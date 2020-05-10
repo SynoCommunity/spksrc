@@ -6,7 +6,6 @@ GIT="${GIT_DIR}/bin/git"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PLEXPY="${SYNOPKG_PKGDEST}/var/plexpy/PlexPy.py"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
-LOG_FILE="${SYNOPKG_PKGDEST}/var/logs/plexpy.log"
 
 SERVICE_COMMAND="${PYTHON} ${PLEXPY} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
 
@@ -32,9 +31,6 @@ service_postinst ()
         # Clone the repository
         ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/Tautulli/Tautulli.git} ${SYNOPKG_PKGDEST}/var/plexpy >> ${INST_LOG} 2>&1
     fi
-
-    # Create logs directory, otherwise it doesn't start
-    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 
     # Remove legacy user
     # Commands of busybox from spk/python

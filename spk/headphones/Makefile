@@ -1,9 +1,9 @@
 SPK_NAME = headphones
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/headphones.png
 
-DEPENDS  =
+DEPENDS =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = Diaoul
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Headphones permet le téléchargement automatique de musique v
 DESCRIPTION_SPN = Headphones permite descargar automáticamente música mediante NZB o torrent. Puedes marcar albumes y estos serán descargados en cuanto estén disponibles. Es posible utilizar diferentes calidades, incluido lossless \(sin pedida\). Con Headphones tambien puedes administrar tu libreria: mover, taguear, renombrar e indexar en el DiskStation
 RELOAD_UI = yes
 DISPLAY_NAME = Headphones
-CHANGELOG = "Integrate with DSM5+6 Generic Service support and added to 'sc-download' group."
+CHANGELOG = "Fix DSM 6 service start."
 
 HOMEPAGE   = https://github.com/rembo10/headphones
 LICENSE    = GPLv3

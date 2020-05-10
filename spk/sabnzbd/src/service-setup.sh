@@ -3,7 +3,6 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
-LOG_FILE="${SYNOPKG_PKGDEST}/var/logs/sabnzbd.log"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
@@ -23,9 +22,6 @@ service_postinst ()
         # Edit the configuration according to the wizard
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
     fi
-
-    # Create logs directory, otherwise it might not start
-    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin

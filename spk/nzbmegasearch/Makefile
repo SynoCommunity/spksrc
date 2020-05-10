@@ -1,10 +1,10 @@
 SPK_NAME = nzbmegasearch
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/nzbmegasearch.png
 DSM_UI_DIR = app
 
-DEPENDS  = 
+DEPENDS =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = SynoCommunity
@@ -12,11 +12,11 @@ DESCRIPTION = Aggregate automatically NZB search results. Easy. Quick. Clean. NZ
 ADMIN_PORT = 8086
 RELOAD_UI = yes
 DISPLAY_NAME = NZBmegasearcH
-BETA = 1
-CHANGELOG = "1. Update to 0.47, fixes tvrage<br>2. Allow built-in updater to work"
 
-HOMEPAGE   = http://pillone.github.io/usntssearch/
-LICENSE    = GPLv2
+CHANGELOG = "Fix DSM 6 service start."
+
+HOMEPAGE  = http://pillone.github.io/usntssearch/
+LICENSE   = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
