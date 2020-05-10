@@ -6,7 +6,6 @@ VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GIT="${GIT_DIR}/bin/git"
 COUCHPOTATOSERVER="${SYNOPKG_PKGDEST}/var/CouchPotatoServer/CouchPotato.py"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.conf"
-LOG_FILE="${SYNOPKG_PKGDEST}/var/logs/CouchPotato.log"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"

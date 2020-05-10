@@ -1,6 +1,6 @@
 SPK_NAME = couchpotatoserver
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/couchpotatoserver.png
 
 DEPENDS =
@@ -12,13 +12,13 @@ DESCRIPTION_FRE = CouchPotato permet le téléchargement automatique de films vi
 DESCRIPTION_SPN = CouchPotato es un sistema automático de descarga de peliculas via NZB y torrent. Puedes tener una \"lista de películas para ver\" y el sistema buscará automáticamente cada X horas. Cuando el release es encotrado con la calidad que especificaste el sistema la enviará al programa de descargas SABnzbd/NZBGet/Transmision o descargá el .nzb o .torrent al directorio que especifiques. Cuando la pelicula se termine de descargar será movida y renombrada automaticamente a tu gusto, además de ser indexada por tu DiskStation.
 RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato
-CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
+CHANGELOG = "Fix DSM 6 service start."
 
-HOMEPAGE   = http://couchpota.to/
-LICENSE    = GPL
+HOMEPAGE  = http://couchpota.to/
+LICENSE   = GPL
 STARTABLE = yes
 
-WIZARDS_DIR      = src/wizard/
+WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
