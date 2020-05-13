@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868<br/>4. Enable Intel VAAPI"
+CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868<br/>4. Enable Intel VAAPI<br/>5. Disable bintray cache<br/>6. Enable tracing"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
