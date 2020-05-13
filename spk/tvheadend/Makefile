@@ -4,7 +4,7 @@ SPK_GIT_HASH = 221c29b
 SPK_GIT_DATE = 20191128
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 19
+SPK_REV = 20
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868"
+CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868<br/>4. Enable Intel VAAPI"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -58,7 +58,13 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: tvheadend_pre_depend tvheadend_extra_install
 
+# Use FFMPEG package shared libraries
 FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc libswscale.pc libavutil.pc libavformat.pc libavcodec.pc
+
+# Add Intel VAAPI libraries on Intel platforms
+#ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+#FFMPEG_LIBS += libdrm.pc libdrm_intel.pc libkms.pc libva.pc libva-drm.pc pciaccess.pc
+#endif
 
 tvheadend_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
