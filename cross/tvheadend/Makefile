@@ -21,6 +21,11 @@ CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 CONFIGURE_ARGS += --disable-libfdkaac_static --disable-libopus_static --disable-libtheora --disable-libtheora_static
 CONFIGURE_ARGS += --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static
 
+# Build failure with pngquant option
+# https://tvheadend.org/issues/5894
+#DEPENDS += cross/pngquant
+#CONFIGURE_ARGS += --enable-pngquant
+
 ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/ffmpeg
 endif
