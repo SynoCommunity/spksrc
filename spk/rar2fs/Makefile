@@ -5,7 +5,7 @@ SPK_ICON = src/rar2fs.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = github.com/rohtang
+MAINTAINER = Kristofer Hammarskold
 DESCRIPTION = rar2fs is a FUSE based file system that can mount a source RAR archive/volume or a directory containing any number of RAR archives and read the contents as regular files on-the-fly.
 DISPLAY_NAME = rar2fs
 STARTABLE = no
