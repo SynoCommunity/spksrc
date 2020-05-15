@@ -1,0 +1,27 @@
+From b2752bc4a5e867e5fdfba7fab66ead49efe4de5a Mon Sep 17 00:00:00 2001
+From: Yannis Aribaud <yannis.aribaud@iguanesolutions.com>
+Date: Mon, 30 Mar 2020 14:12:28 +0200
+Subject: [PATCH] Fix segfault on python plugin stop #3867
+
+---
+ hardware/plugins/Plugins.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+index 2fc430555..31b0ee581 100644
+--- hardware/plugins/Plugins.cpp
++++ hardware/plugins/Plugins.cpp
+@@ -1532,10 +1532,10 @@ Error:
+ 			PyErr_Clear();
+ 
+ 			// Stop Python
++			Py_XDECREF(m_PyModule);
+ 			if (m_DeviceDict) Py_XDECREF(m_DeviceDict);
+ 			if (m_ImageDict) Py_XDECREF(m_ImageDict);
+ 			if (m_SettingsDict) Py_XDECREF(m_SettingsDict);
+ 			if (m_PyInterpreter) Py_EndInterpreter((PyThreadState*)m_PyInterpreter);
+-			Py_XDECREF(m_PyModule);
+ 		}
+ 		catch (std::exception *e)
+-- 
+2.29.2
+

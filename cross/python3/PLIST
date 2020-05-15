@@ -6,13 +6,10 @@ lnk:bin/pydoc3
 rsc:bin/pydoc@PKG_SHORT_VERS@
 lnk:bin/python3
 bin:bin/python@PKG_SHORT_VERS@
-bin:bin/python@PKG_SHORT_VERS@m
-lnk:bin/pyvenv
-rsc:bin/pyvenv-@PKG_SHORT_VERS@
 rsc:etc/mime.types
-rsc:include/python@PKG_SHORT_VERS@m/pyconfig.h
-lnk:lib/libpython@PKG_SHORT_VERS@m.so
-lib:lib/libpython@PKG_SHORT_VERS@m.so.1.0
+rsc:include/python@PKG_SHORT_VERS@/pyconfig.h
+lnk:lib/libpython@PKG_SHORT_VERS@.so
+lib:lib/libpython@PKG_SHORT_VERS@.so.1.0
 lib:lib/libpython3.so
 rsc:lib/python@PKG_SHORT_VERS@
 

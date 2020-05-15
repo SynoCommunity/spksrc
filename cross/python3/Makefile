@@ -1,5 +1,5 @@
 PKG_NAME = python3
-PKG_VERS = 3.7.7
+PKG_VERS = 3.8.6
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -19,7 +19,7 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
-CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions PGEN_FOR_BUILD=$(HOSTPGEN)
+CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 
 POST_PATCH_TARGET = python3_post_patch
@@ -36,7 +36,6 @@ HOST_ARCH = $(shell uname -m)
 BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/$(PKG_NAME)
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
-PGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 HOSTPGEN = $(WORK_DIR)/$(PKG_DIR)/hostpgen
 HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR_MINOR)
@@ -62,7 +61,6 @@ python3_post_patch:
 .PHONY: python3_pre_configure
 python3_pre_configure:
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
-	cp $(PGEN_NATIVE) $(HOSTPGEN)
 	$(RUN) autoreconf
 	# create phantom header and library to succeed add_dir_to_list in setup.py
 	# so that future-promised libsqlite3.so and sqlite3.h will be used.  Yep,

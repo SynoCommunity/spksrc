@@ -1,6 +1,6 @@
 SPK_NAME = domoticz
 SPK_VERS = 4.9700
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/domoticz.png
 DSM_UI_DIR = app
 
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Domoticz est un système domotique qui vous permet de surveill
 ADMIN_PORT = 8084
 RELOAD_UI = yes
 DISPLAY_NAME = Domoticz
-CHANGELOG = "Update openssl to 1.1."
+CHANGELOG = "Add support for Python 3.8+"
 
 HOMEPAGE = https://www.domoticz.com/
 LICENSE  = GPLv3
