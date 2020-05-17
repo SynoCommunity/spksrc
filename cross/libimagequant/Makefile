@@ -16,6 +16,8 @@ ADDITIONAL_CFLAGS = -O3
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --enable-sse
+else
+CONFIGURE_ARGS += --disable-sse
 endif
 
 include ../../mk/spksrc.cross-cc.mk
