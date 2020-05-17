@@ -13,12 +13,13 @@ SALT_MASTER="${INSTALL_DIR}/env/bin/salt-master"
 SALT_API="${INSTALL_DIR}/env/bin/salt-api"
 MASTER_PID_FILE="${INSTALL_DIR}/var/run/salt-master.pid"
 API_PID_FILE="${INSTALL_DIR}/var/run/salt-api.pid"
+API_LOG_FILE="${INSTALL_DIR}/var/log/salt/api"
 
 
 start_daemon ()
 {
-    ${SALT_MASTER} -c ${INSTALL_DIR}/etc -d
-    ${SALT_API} -c ${INSTALL_DIR}/etc -d
+    ${SALT_MASTER} --config-dir=${INSTALL_DIR}/etc --daemon
+    ${SALT_API} --config-dir=${INSTALL_DIR}/etc --log-file ${API_LOG_FILE} --daemon 
 }
 
 stop_daemon ()
