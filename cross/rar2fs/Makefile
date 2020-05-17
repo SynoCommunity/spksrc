@@ -2,7 +2,7 @@ PKG_NAME = rar2fs
 PKG_VERS = 1.29.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-2PKG_DIST_SITE = https://github.com/hasse69/rar2fs/releases/download/v$(PKG_VERS)/
+PKG_DIST_SITE = https://github.com/hasse69/rar2fs/releases/download/v$(PKG_VERS)/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 CONFIGURE_ARGS = --with-fuse=$(WORK_DIR)/libfuse-fuse-2.9.9/include --with-fuse-lib=$(WORK_DIR)/install/usr/local/rar2fs/lib --with-unrar=$(WORK_DIR)/unrar

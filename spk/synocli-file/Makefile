@@ -6,7 +6,7 @@ SPK_ICON = src/synocli-file.png
 include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
-DEPENDS += cross/detox
+DEPENDS += cross/detox cross/rar2fs
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
@@ -42,8 +42,9 @@ SPK_COMMANDS += bin/file
 SPK_COMMANDS += bin/detox
 SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/rnm
-
 SPK_COMMANDS += bin/rhash
+SPK_COMMANDS += bin/rar2fs
+
 SPK_LINKS  = /usr/local/bin/ed2k-link:bin/rhash 
 SPK_LINKS += /usr/local/bin/edonr256-hash:bin/rhash 
 SPK_LINKS += /usr/local/bin/edonr512-hash:bin/rhash 
@@ -54,6 +55,6 @@ SPK_LINKS += /usr/local/bin/sfv-hash:bin/rhash
 SPK_LINKS += /usr/local/bin/tiger-hash:bin/rhash 
 SPK_LINKS += /usr/local/bin/tth-hash:bin/rhash 
 SPK_LINKS += /usr/local/bin/whirlpool-hash:bin/rhash 
-
+SPK_LINKS += /usr/local/bin/rar2fs:bin/rar2fs
 
 include ../../mk/spksrc.spk.mk
