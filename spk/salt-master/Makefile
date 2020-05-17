@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
-SPK_VERS = 2015.5.3
-SPK_REV = 8
+SPK_VERS = 2015.5.11
+SPK_REV = 9
 SPK_ICON = src/salt-master.png
 
 DEPENDS =
@@ -11,16 +11,14 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 RELOAD_UI = yes
 DISPLAY_NAME = Salt Master
-CHANGELOG = "Update to 2015.5.3"
+CHANGELOG = "1. Update to 2015.5.11<br/>2. Fix salt-api<br/>3. Update dependencies"
 
 HOMEPAGE   = https://www.saltstack.com/
-LICENSE    = Apache
+LICENSE    = Apache v2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = salt-master_extra_install
 
