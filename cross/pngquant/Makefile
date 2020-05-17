@@ -17,6 +17,8 @@ CONFIGURE_ARGS = --with-libimagequant
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --enable-sse
+else
+CONFIGURE_ARGS += --disable-sse
 endif
 
 include ../../mk/spksrc.cross-cc.mk

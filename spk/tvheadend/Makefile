@@ -4,7 +4,7 @@ SPK_GIT_HASH = 6be200b
 SPK_GIT_DATE = 20200515
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868<br/>4. Enable Intel VAAPI<br/>5. Disable bintray cache<br/>6. Enable tracing"
+CHANGELOG = "1. Update to latest version of libhdhomerun<br/>2. qoriq arch fix<br/>3. SurveillanceStation-DSCam fix for issue no. 3868<br/>4. Enable Intel VAAPI<br/>5. Disable bintray cache<br/>6. Enable tracing<br/>7. Enable pngquant"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
