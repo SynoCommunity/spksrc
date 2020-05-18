@@ -55,6 +55,5 @@ SPK_LINKS += /usr/local/bin/sfv-hash:bin/rhash
 SPK_LINKS += /usr/local/bin/tiger-hash:bin/rhash 
 SPK_LINKS += /usr/local/bin/tth-hash:bin/rhash 
 SPK_LINKS += /usr/local/bin/whirlpool-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/rar2fs:bin/rar2fs
 
 include ../../mk/spksrc.spk.mk
