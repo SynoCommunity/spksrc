@@ -7,7 +7,8 @@ PKG_DIST_SITE = https://github.com/tvheadend/tvheadend.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
-DEPENDS = cross/openssl cross/libhdhomerun cross/uriparser cross/libdvbcsa cross/pcre2 cross/dvb-apps cross/libiconv cross/pngquant native/python
+DEPENDS = cross/openssl cross/uriparser cross/pcre2 cross/libiconv native/python
+DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/libtheora cross/pngquant
 
 HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
@@ -15,13 +16,23 @@ LICENSE  = GPL v3
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --enable-imagecache --disable-avahi --enable-dvbcsa --enable-bundle --release
+CONFIGURE_ARGS = --enable-imagecache --enable-bundle --enable-trace --release
+CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
+CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
-CONFIGURE_ARGS += --disable-libfdkaac_static --disable-libopus_static --disable-libtheora --disable-libtheora_static
-CONFIGURE_ARGS += --disable-libvorbis_static --disable-libvpx_static --disable-libx264_static --disable-libx265_static
-CONFIGURE_ARGS += --enable-pngquant
-CONFIGURE_ARGS += --disable-bintray_cache --enable-trace
+CONFIGURE_ARGS += --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static
+CONFIGURE_ARGS += --disable-libvpx_static --disable-libx264_static --disable-libx265_static
+
+# fdk-acc is now considered compatible with (L)GPL.
+# It requires --enable-nonfree if you're also using --enable-gpl
+#
+# https://en.wikipedia.org/wiki/Fraunhofer_FDK_AAC
+# It was classified as free by Fedora after a review by the legal department at Red Hat.
+# See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
+#
+DEPENDS += cross/fdk-aac
+CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
 
 ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/ffmpeg
