@@ -6,32 +6,32 @@ DNAME="pyLoad"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 PYLOAD="${INSTALL_DIR}/share/pyload/pyLoadCore.py"
-LOG_FILE="${INSTALL_DIR}/etc/Logs/log.txt"
 PID_FILE="${INSTALL_DIR}/var/pyload.pid"
+CFG_DIR="${INSTALL_DIR}/var"
 
-SC_USER="sc-pyload"
-LEGACY_USER="pyload"
-USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+EXECUTE_SERVICE="${PYTHON} ${PYLOAD} --configdir=${CFG_DIR} --pidfile=${PID_FILE}"
 
 
 start_daemon ()
 {
-    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --daemon"
+    ${EXECUTE_SERVICE} --daemon  >> /dev/null 2>&1
 }
 
 stop_daemon ()
 {
-    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --quit"
+    ${EXECUTE_SERVICE} --quit  >> /dev/null 2>&1
 }
 
 daemon_status ()
 {
-    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${PYLOAD} --pidfile=${PID_FILE} --status" > /dev/null
+    if [ "$(${EXECUTE_SERVICE} --status)" == "false" ]; then
+        return 1;
+    else
+        return 0;
+    fi
 }
 
 
@@ -43,14 +43,18 @@ case $1 in
         else
             echo "Starting ${DNAME} ..."
             start_daemon
-            exit $?
+            status=$?
+            echo "Status = ${status}"
+            exit ${status}
         fi
         ;;
     stop)
         if daemon_status; then
             echo "Stopping ${DNAME} ..."
             stop_daemon
-            exit $?
+            status=$?
+            echo "Status = ${status}"
+            exit ${status}
         else
             echo "${DNAME} is not running"
             exit 0
@@ -62,13 +66,6 @@ case $1 in
             exit 0
         else
             echo "${DNAME} is not running"
-            exit 1
-        fi
-        ;;
-    log)
-        if [ -f "${LOG_FILE}" ]; then
-            echo "${LOG_FILE}"
-        else
             exit 1
         fi
         ;;
