@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 4.2.2
+SPK_VERS = 4.2.3
 SPK_REV = 30
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 4.2.2<br/>2. Update Intel libva to v2.7 and Intel driver toolstack to 20Q1 v20.1.1<br/>3. Update all trivial dependencies (x264, x265, libaom, libogg, freetype, fribidi, libbluray)br/>4. Update libaom to version 2.0.0-rc1<br/>5. Add experimental support for SVT-AV1 and SVT-HEVC<br/>6. Simplify access to vainfo binary (intel platforms only)"
+CHANGELOG = "1. Update ffmpeg to 4.2.3<br/>2. Update Intel libva to v2.7 and Intel driver toolstack to 20Q1 v20.1.1<br/>3. Update all trivial dependencies (x264, x265, libaom, libogg, freetype, fribidi, libbluray)br/>4. Update libaom to version 2.0.0-rc1<br/>5. Add experimental support for SVT-AV1 and SVT-HEVC<br/>6. Simplify access to vainfo binary (intel platforms only)"
 
 DEPENDS = cross/$(SPK_NAME)
 
