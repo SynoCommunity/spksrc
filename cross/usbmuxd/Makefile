@@ -31,4 +31,4 @@ endif
 
 .PHONY: usbmuxd_pre_configure
 usbmuxd_pre_configure:
-	$(RUN) ./autogen.sh $(USBMUXD_AUTOGEN_ARGS)
+	$(RUN) NOCONFIGURE=1 ./autogen.sh $(USBMUXD_AUTOGEN_ARGS)

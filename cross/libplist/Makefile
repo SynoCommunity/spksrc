@@ -1,12 +1,10 @@
 PKG_NAME = libplist
-PKG_VERS = 2.0.0
+PKG_VERS = 2.1.0
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-# with Commits on Sep 3, 2019
-PKG_GIT_HASH = 6a53de92e2b5029ee293c79d481ff5fd9528f8c3
-PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME).git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME)/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
@@ -33,7 +31,7 @@ endif
 
 .PHONY: libplist_pre_configure
 libplist_pre_configure:
-	$(RUN) ; ./autogen.sh $(LIBPLIST_AUTOGEN_ARGS)
+	$(RUN) ; NOCONFIGURE=1 ./autogen.sh $(LIBPLIST_AUTOGEN_ARGS)
 
 .PHONY: libplist_install
 libplist_install:

@@ -50,7 +50,7 @@ def main():
         logger.error('Failed to get device info!')
         return
 
-    device_name = output.split(' ')[1].strip()
+    device_name = output.replace('DeviceName: ', '').strip().replace(' ', '-')
     mount_dir = os.path.join(VOLUME_DIR, device_name)
     output = os.popen('mount | grep %s' % device_name).read().strip()
     if len(output) > 0:
@@ -79,7 +79,7 @@ def main():
 
     # magic: we have to enter the folder first time
     os.system('cd %s && ls' % mount_dir)
-    notify('%s is ready to be access in FileStation.' % device_name)
+    notify('%s is ready for access in FileStation.' % device_name)
 
 if __name__ == '__main__':
     logger.info('--- mounting.py started ---')

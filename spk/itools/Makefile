@@ -1,5 +1,5 @@
 SPK_NAME = itools
-SPK_VERS = 1.1
+SPK_VERS = 1.2
 SPK_REV = 3
 SPK_ICON = src/itools.png
 # A collection of tools from ifuse and usbmuxd projects of libimobiledevice.org
@@ -11,10 +11,10 @@ MAINTAINER = bxxxjxxg
 MAINTAINER_URL = https://www.linkedin.com/in/bingjing-chang/
 DISTRIBUTOR = SynoCommunity
 DISTRIBUTOR_URL = https://synocommunity.com
-DESCRIPTION = A collection toolkit for connecting iOS devices.
+DESCRIPTION = "This package mounts an iOS® device \(connected by USB\) to a shared folder of your Diskstation. You can access such folders locally or from remote with Synology FileStation. Some command line tools are included to communicate with connected devices."
 RELOAD_UI = no
 DISPLAY_NAME = iOS Access
-CHANGELOG = Update dependencies \(2019.10\).
+CHANGELOG = "1. Update dependencies \(2019.11\).<br>2. Fix DSM 6 service user privileges.<br>3. Use full device name as shared folder \(mount point\)."
 
 HOMEPAGE   = https://www.libimobiledevice.org
 LICENSE    = LGPL 2.1
@@ -22,6 +22,10 @@ LICENSE    = LGPL 2.1
 SERVICE_SETUP   = src/service-setup.sh
 SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/sbin/usbmuxd
 STARTABLE       = yes
+# use custom privilege file: 
+# use root for start/stop service to add/remove udev rule and to mount/umount devices
+# omit SERVICE_USER (this would overwrite the privilege file with a generic one).
+CONF_DIR        = src/conf
 
 POST_STRIP_TARGET = itools_extra_install
 
@@ -43,6 +47,7 @@ SPK_COMMANDS += bin/ideviceprovision
 SPK_COMMANDS += bin/idevicescreenshot
 SPK_COMMANDS += bin/idevicesyslog
 SPK_COMMANDS += bin/ifuse
+SPK_COMMANDS += bin/inetcat
 SPK_COMMANDS += bin/iproxy
 SPK_COMMANDS += bin/plistutil
 
@@ -51,9 +56,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: itools_extra_install
 itools_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/run/
-	install -m 755 -d $(STAGING_DIR)/var/log/
 	install -m 644 src/39-libimobiledevice.rules $(STAGING_DIR)/39-libimobiledevice.rules
 	install -m 755 src/on-inserted.sh $(STAGING_DIR)/on-inserted.sh
 	install -m 755 src/on-removed.sh $(STAGING_DIR)/on-removed.sh

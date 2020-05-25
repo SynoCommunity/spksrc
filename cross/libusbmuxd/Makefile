@@ -1,12 +1,12 @@
 PKG_NAME = libusbmuxd
-PKG_VERS = 1.0.10
+PKG_VERS = 2.0.1
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-# with commits on Sep 28, 2019 
-PKG_GIT_HASH = c2db27c92341e1ba257102f6fb29a61f66c2fb6d
-PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME).git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME)/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+# https://github.com/libimobiledevice/libusbmuxd/archive/2.0.1.tar.gz
 
 DEPENDS = cross/libplist
 
@@ -32,7 +32,7 @@ endif
 
 .PHONY: libusbmuxd_pre_configure
 libusbmuxd_pre_configure:
-	$(RUN) ./autogen.sh $(LIBUSBMUXD_AUTOGEN_ARGS)
+	$(RUN) NOCONFIGURE=1 ./autogen.sh $(LIBUSBMUXD_AUTOGEN_ARGS)
 
 .PHONY: libusbmuxd_install
 libusbmuxd_install:

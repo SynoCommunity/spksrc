@@ -31,7 +31,7 @@ endif
 
 .PHONY: libimobiledevice_pre_configure
 libimobiledevice_pre_configure:
-	$(RUN) ./autogen.sh $(LIBIMOBILEDEVICE_AUTOGEN_ARGS)
+	$(RUN) NOCONFIGURE=1 ./autogen.sh $(LIBIMOBILEDEVICE_AUTOGEN_ARGS)
 
 .PHONY: libimobiledevice_install
 libimobiledevice_install:
