@@ -33,7 +33,7 @@ endif
 
 # default cmake configure:
 cmake_configure_target:
-	@$(MSG) - CMAKE configure
+	@$(MSG) - CMake configure
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(PKG_WORK_DIR)
 	cd $(PKG_WORK_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
@@ -42,14 +42,14 @@ cmake_configure_target:
 
 # default compile:
 cmake_compile_target:
-	@$(MSG) - CMAKE compile
+	@$(MSG) - CMake compile
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
 
 .PHONY: cmake_install_target
 
 # default isntall:
 cmake_install_target:
-	@$(MSG) - CMAKE install
+	@$(MSG) - CMake install
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
 
 # call-up regular build process
