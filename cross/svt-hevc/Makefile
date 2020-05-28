@@ -4,6 +4,8 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/OpenVisualCloud/SVT-HEVC/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+# Set an appropriate filename as release files on github doesn't
+PKG_DIST_FILE = svt-hevc_v$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = 
 
