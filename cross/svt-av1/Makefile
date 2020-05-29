@@ -1,25 +1,23 @@
-PKG_NAME = libaom
-PKG_VERS = v2.0.0-rc1
+PKG_NAME = SVT-AV1
+PKG_VERS = 0.8.3
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 52fcf205565d5530773933cf38eb4c45357b6ad1
-# Tag v2.0.0-rc1: 52fcf205565d5530773933cf38eb4c45357b6ad1
-# Tag v1.0.0-errata1-avif: 4eb1e7795b9700d532af38a2d9489458a8038233
-PKG_DIST_SITE = https://aomedia.googlesource.com/aom
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/OpenVisualCloud/SVT-AV1/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+# Set an appropriate filename as release files on github doesn't
+PKG_DIST_FILE = svt-av1_v$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = 
 
-HOMEPAGE = https://aomedia.googlesource.com/aom/
-COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format designed for video transmissions over the Internet.
-LICENSE  = Royalty-free
+HOMEPAGE = https://github.com/OpenVisualCloud/SVT-AV1
+COMMENT  = The Scalable Video Technology for AV1 (SVT-AV1 Encoder and Decoder) is an AV1-compliant encoder/decoder library core.
+LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 
 UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
 
-CONFIGURE_TARGET = libaom_custom_configure
-COMPILE_TARGET = libaom_custom_compile
-INSTALL_TARGET = libaom_custom_install
+CONFIGURE_TARGET = svt-av1_custom_configure
+COMPILE_TARGET = svt-av1_custom_compile
+INSTALL_TARGET = svt-av1_custom_install
 
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
@@ -73,20 +71,20 @@ CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86 -DAOM_TARGET_CPU=x86
 endif
 
-.PHONY: libaom_custom_configure
+.PHONY: svt-av1_custom_configure
 
-libaom_custom_configure: 
+svt-av1_custom_configure: 
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(PKG_WORK_DIR)
 	cd $(PKG_WORK_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
-.PHONY: libaom_custom_compile
+.PHONY: svt-av1_custom_compile
 
-libaom_custom_compile: 
+svt-av1_custom_compile: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
 
-.PHONY: libaom_custom_install
+.PHONY: svt-av1_custom_install
 
-libaom_custom_install: 
+svt-av1_custom_install: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
 

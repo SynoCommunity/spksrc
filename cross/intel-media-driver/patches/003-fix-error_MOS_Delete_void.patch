@@ -1,0 +1,12 @@
+diff -uprN ../media-driver-intel-media-20.1.1-ORIG/media_driver/media_driver_next/agnostic/common/shared/features/media_feature_const_settings.h ./media_driver/media_driver_next/agnostic/common/shared/features/media_feature_const_settings.h
+--- ../media-driver-intel-media-20.1.1-ORIG/media_driver/media_driver_next/agnostic/common/shared/features/media_feature_const_settings.h	2020-04-08 11:27:57.000000000 -0400
++++ ./media_driver/media_driver_next/agnostic/common/shared/features/media_feature_const_settings.h	2020-05-06 07:05:04.392486938 -0400
+@@ -53,7 +53,7 @@ public:
+     {
+         if (m_featureSetting != nullptr)
+         {
+-            MOS_Delete(m_featureSetting);
++            MOS_FreeMemory(m_featureSetting);
+         }
+     }
+ 

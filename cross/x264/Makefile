@@ -1,9 +1,10 @@
 PKG_NAME = x264
-PKG_VERS = 20190109-2245-stable
+PKG_VERS = 20200419-stable
+PKG_GIT_HASH = 296494a4011f58f32adc54304a2654627558c59a
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.videolan.org/x264/snapshots
-PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
+PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/stable/
+PKG_DIR = $(PKG_NAME)-stable-$(PKG_GIT_HASH)
 
 DEPENDS =
 

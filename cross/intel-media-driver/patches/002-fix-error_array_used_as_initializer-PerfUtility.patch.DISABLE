@@ -1,0 +1,14 @@
+diff -uprN ../intel-media-gitb64b2febf799c6be76479a809fcf1a41455334a6-ORIG/media_driver/agnostic/common/os/mos_utilities.h ./media_driver/agnostic/common/os/mos_utilities.h
+--- ../intel-media-gitb64b2febf799c6be76479a809fcf1a41455334a6-ORIG/media_driver/agnostic/common/os/mos_utilities.h	2020-01-15 23:02:53.000000000 -0500
++++ ./media_driver/agnostic/common/os/mos_utilities.h	2020-04-18 09:39:26.080234481 -0400
+@@ -73,8 +73,8 @@ public:
+     void setupFilePath(char *perfFilePath);
+     void setupFilePath();
+     bool bPerfUtilityKey;
+-    char sSummaryFileName[MOS_MAX_PERF_FILENAME_LEN + 1] = "";
+-    char sDetailsFileName[MOS_MAX_PERF_FILENAME_LEN + 1] = "";
++    char sSummaryFileName[MOS_MAX_PERF_FILENAME_LEN + 1] = {'\0'};
++    char sDetailsFileName[MOS_MAX_PERF_FILENAME_LEN + 1] = {'\0'};
+     int32_t dwPerfUtilityIsEnabled;
+ 
+ private:

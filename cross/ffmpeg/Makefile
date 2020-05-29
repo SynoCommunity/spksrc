@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.2.2
+PKG_VERS = 4.2.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases
@@ -60,10 +60,17 @@ POST_INSTALL_TARGET = ffmpeg_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Add AV1 codec to supported ARCH
+# Add libaom AV1 codec to supported ARCH
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
+endif
+
+# Add SVT-AV1 codec to supported ARCH
+# Patch for support from: https://github.com/OpenVisualCloud/SVT-AV1/tree/master/ffmpeg_plugin
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x64_ARCHES)),$(ARCH))
+DEPENDS += cross/svt-av1
+CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
@@ -113,9 +120,9 @@ endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
-DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
+DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
 ENV += PATH=$(NASM_PATH):$$PATH
-CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
+CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libsvthevc
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
