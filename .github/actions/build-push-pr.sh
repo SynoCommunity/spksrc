@@ -54,8 +54,8 @@ echo "===> PACKAGES to Build: $packages"
 for package in $packages
 do
     # make sure that the package exists
-    if [ -d "spk/$package" ]; then
-        cd spk/"$package" && make "$GH_ARCH"
+    if [ -d "/github/workspace/spk/$package" ]; then
+        cd /github/workspace/spk/"$package" && make "$GH_ARCH"
     else
         echo "$package is not found"
     fi
