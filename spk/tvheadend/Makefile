@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 2a7cb68<br/>2. Enable Intel VAAPI on Intel platforms<br/>3. Disable bintray cache<br/>4. Enable tracing<br/>5. Enable pngquant"
+CHANGELOG = "1. Update to latest git version 2a7cb68<br/>2. Enable Intel VAAPI on Intel platforms<br/>3. Disable bintray cache<br/>4. Enable tracing<br/>5. Enable pngquant<br/>6. Enable libtheora"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
