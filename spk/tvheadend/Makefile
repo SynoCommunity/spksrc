@@ -4,7 +4,7 @@ SPK_GIT_HASH = e59b92e
 SPK_GIT_DATE = 20200521
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 2a7cb68<br/>2. Enable Intel VAAPI on Intel platforms<br/>3. Disable bintray cache<br/>4. Enable tracing<br/>5. Enable pngquant<br/>6. Enable libtheora<br/>5. Enable fdk-acc"
+CHANGELOG = "1. Update to latest git version 2a7cb68<br/>2. Enable Intel VAAPI on Intel platforms<br/>3. Disable bintray cache<br/>4. Enable tracing<br/>5. Enable pngquant<br/>6. Enable libtheora<br/>7. Enable fdk-acc<br/>8. Enable re-using FFMPEG media and vaapi shared librairies"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -61,6 +61,9 @@ include ../../mk/spksrc.spk.mk
 # Use FFMPEG package shared libraries
 FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc libswscale.pc libavutil.pc libavformat.pc libavcodec.pc
 
+# Use other media libraries through FFMPEG package shared libraries
+MEDIA_LIBS = fdk-aac.pc numa.pc ogg.pc opus.pc theoradec.pc theoraenc.pc theora.pc vorbisenc.pc vorbisfile.pc vorbis.pc vpx.pc x264.pc x265.pc
+
 # Add Intel VAAPI libraries on Intel platforms
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 VAAPI_LIBS = libdrm.pc libdrm_intel.pc libkms.pc libva.pc libva-drm.pc pciaccess.pc
@@ -69,6 +72,7 @@ endif
 tvheadend_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 
 tvheadend_extra_install:
