@@ -4,7 +4,7 @@ SPK_GIT_HASH = e59b92e
 SPK_GIT_DATE = 20200521
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 2a7cb68<br/>"
+CHANGELOG = "1. Update to latest git version 2a7cb68<br/>2. Disable bintray cache<br/>3. Enable tracing"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 

@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/tvheadend/tvheadend.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
-DEPENDS = cross/openssl cross/uriparser cross/pcre2 cross/libiconv
+DEPENDS = cross/openssl cross/uriparser cross/pcre2 cross/libiconv native/python
 DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps
 
 HOMEPAGE = https://tvheadend.org/
@@ -16,8 +16,8 @@ LICENSE  = GPL v3
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --enable-imagecache --enable-bundle --release
-CONFIGURE_ARGS += --disable-avahi
+CONFIGURE_ARGS = --enable-imagecache --enable-bundle --enable-trace --release
+CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 CONFIGURE_ARGS += --enable-dvbcsa
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
