@@ -33,3 +33,10 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --nowerror
 endif
+
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --enable-vaapi
+ifeq ($(wildcard $(FFMPEG_DIR)),)
+DEPENDS += cross/libva
+endif
+endif
