@@ -24,6 +24,16 @@ CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 CONFIGURE_ARGS += --disable-libopus_static --disable-libtheora_static --disable-libvorbis_static
 CONFIGURE_ARGS += --disable-libvpx_static --disable-libx264_static --disable-libx265_static
 
+# fdk-acc is now considered compatible with (L)GPL.
+# It requires --enable-nonfree if you're also using --enable-gpl
+#
+# https://en.wikipedia.org/wiki/Fraunhofer_FDK_AAC
+# It was classified as free by Fedora after a review by the legal department at Red Hat.
+# See also: http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#FDK_License
+#
+DEPENDS += cross/fdk-aac
+CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
+
 ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/ffmpeg
 endif
