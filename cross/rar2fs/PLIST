@@ -1,0 +1,3 @@
+bin:bin/mkr2i
+bin:bin/rar2fs
+lnk:sbin/mount.rar2fs
