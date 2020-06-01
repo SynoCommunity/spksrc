@@ -4,6 +4,8 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ImageOptim/libimagequant/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+# Set an appropriate filename as release files on github doesn't
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = 
 
