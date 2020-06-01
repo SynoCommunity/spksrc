@@ -20,11 +20,3 @@ CMAKE_ARGS += -DCMAKE_C_FLAGS=-Wno-error=delete-incomplete
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11
 CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
-
-ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
-CMAKE_ARGS += -DARCH=32
-endif
-
-ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
-CMAKE_ARGS += -DARCH=64
-endif

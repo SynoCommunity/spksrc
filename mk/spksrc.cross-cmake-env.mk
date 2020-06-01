@@ -44,11 +44,12 @@ ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
   DEPENDS += native/nasm cross/libnuma
   ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
-  CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
+  CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
+  CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86 -DARCH=32
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
   DEPENDS += native/nasm cross/libnuma
   ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
-  CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
+  CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DARCH=64
 endif
