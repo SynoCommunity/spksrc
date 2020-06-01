@@ -36,6 +36,9 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+            fetch-depth: 2
+            persist-credentials: false
 
       - name: Get changed files
         if: startsWith(github.ref, 'refs/tags/') == false
