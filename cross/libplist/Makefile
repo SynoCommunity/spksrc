@@ -14,7 +14,6 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libplist_pre_configure
-INSTALL_TARGET = libplist_install
 CONFIGURE_ARGS = --without-cython
 LIBPLIST_AUTOGEN_ARGS = $(CONFIGURE_ARGS)
 
@@ -32,7 +31,3 @@ endif
 .PHONY: libplist_pre_configure
 libplist_pre_configure:
 	$(RUN) ; NOCONFIGURE=1 ./autogen.sh $(LIBPLIST_AUTOGEN_ARGS)
-
-.PHONY: libplist_install
-libplist_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

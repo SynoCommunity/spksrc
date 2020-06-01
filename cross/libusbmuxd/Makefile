@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME)/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# https://github.com/libimobiledevice/libusbmuxd/archive/2.0.1.tar.gz
-
 DEPENDS = cross/libplist
 
 HOMEPAGE = https://github.com/libimobiledevice/libusbmuxd/
@@ -16,7 +14,6 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libusbmuxd_pre_configure
-INSTALL_TARGET = libusbmuxd_install
 CONFIGURE_ARGS = ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 LIBUSBMUXD_AUTOGEN_ARGS =
 
@@ -33,7 +30,3 @@ endif
 .PHONY: libusbmuxd_pre_configure
 libusbmuxd_pre_configure:
 	$(RUN) NOCONFIGURE=1 ./autogen.sh $(LIBUSBMUXD_AUTOGEN_ARGS)
-
-.PHONY: libusbmuxd_install
-libusbmuxd_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

@@ -7,22 +7,22 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://kernel.org/
-COMMENT  = Extended attribute package
+HOMEPAGE = https://savannah.nongnu.org/projects/attr/
+COMMENT  = Commands for Manipulating Filesystem Extended Attributes
 LICENSE  = GPLv2+
 
-PRE_CONFIGURE_TARGET = myPreConfigure
-INSTALL_TARGET = myInstall
+PRE_CONFIGURE_TARGET = attr_pre_configure
+INSTALL_TARGET = attr_install
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-static=no
 
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPreConfigure
-myPreConfigure:
+.PHONY: attr_pre_configure
+attr_pre_configure:
 	$(RUN) autoconf
 
-.PHONY: myInstall
-myInstall:
+.PHONY: attr_install
+attr_install:
 	$(RUN) $(MAKE) DIST_ROOT=$(INSTALL_DIR) install-lib install-dev

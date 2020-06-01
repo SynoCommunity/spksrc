@@ -16,8 +16,7 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libimobiledevice_pre_configure
-INSTALL_TARGET = libimobiledevice_install
-CONFIGURE_ARGS = --disable-largefile --without-cython --disable-debug-code
+CONFIGURE_ARGS = --disable-largefile --without-cython
 LIBIMOBILEDEVICE_AUTOGEN_ARGS = $(CONFIGURE_ARGS)
 
 include ../../mk/spksrc.cross-cc.mk
@@ -32,7 +31,3 @@ endif
 .PHONY: libimobiledevice_pre_configure
 libimobiledevice_pre_configure:
 	$(RUN) NOCONFIGURE=1 ./autogen.sh $(LIBIMOBILEDEVICE_AUTOGEN_ARGS)
-
-.PHONY: libimobiledevice_install
-libimobiledevice_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
