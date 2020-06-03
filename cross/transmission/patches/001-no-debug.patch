@@ -1,3 +1,5 @@
+# Replace GCC debug flags by optimization flags
+#
 --- configure	2018-02-10 05:00:56.988001000 -0500
 +++ configure.orig	2018-01-23 14:18:00.000000000 -0500
 @@ -17143,7 +17143,7 @@
@@ -5,7 +7,7 @@
  if test "x$GCC" = "xyes" ; then
  
 -    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
-+    CFLAGS="$CFLAGS -std=gnu99 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
++    CFLAGS="$CFLAGS -std=gnu99 -O1 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
  
          { $as_echo "$as_me:${as_lineno-$LINENO}: checking gcc version" >&5
  $as_echo_n "checking gcc version... " >&6; }
