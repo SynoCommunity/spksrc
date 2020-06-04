@@ -3,10 +3,10 @@ bin:bin/pcregrep
 bin:bin/pcretest
 lnk:lib/libpcrecpp.so
 lnk:lib/libpcrecpp.so.0
-lib:lib/libpcrecpp.so.0.0.1
+lib:lib/libpcrecpp.so.0.0.2
 lnk:lib/libpcreposix.so
 lnk:lib/libpcreposix.so.0
-lib:lib/libpcreposix.so.0.0.6
+lib:lib/libpcreposix.so.0.0.7
 lnk:lib/libpcre.so
 lnk:lib/libpcre.so.1
-lib:lib/libpcre.so.1.2.11
+lib:lib/libpcre.so.1.2.12
