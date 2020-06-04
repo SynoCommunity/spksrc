@@ -3,6 +3,7 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 
 service_postinst ()
 {
+   	mkdir -p ${SYNOPKG_PKGDEST}/var/urbackup
     mkdir -p "${SHARE_PATH}"
     chown ${PRIV_PREFIX}${USER}: "${SHARE_PATH}"
     chmod 770 "${SHARE_PATH}"

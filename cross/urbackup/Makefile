@@ -17,14 +17,14 @@ ADDITIONAL_CXXFLAGS = -Os
 ADDITIONAL_CFLAGS = -Os
 
 
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = urbackup_install
 
 
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: urbackup_install
+urbackup_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) # PREFIX=$(INSTALL_PREFIX)
 	
 

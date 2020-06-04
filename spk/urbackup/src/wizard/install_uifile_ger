@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_backup_dir",
             "desc": "Urbackup Sicherungspfad",
-            "defaultValue": "/mnt/backups/urbackup",
+            "defaultValue": "/volume1/urbackup",
             "validator": {
               "allowBlank": false
              }
