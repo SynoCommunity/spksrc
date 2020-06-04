@@ -33,12 +33,6 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/urbackupsrv run -d -v error -u sc-urbackup --pidfile $${PID_FILE} --logfile $${LOG_FILE}
 
-
-# Admin link for in DSM UI
-ADMIN_PORT = $(SERVICE_PORT)
-
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 DEFAULT_BACKUP_FOLDER = $(STAGING_DIR)/var/backup
 
 POST_STRIP_TARGET = urbackup_extra_install
@@ -48,8 +42,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: urbackup_extra_install
 urbackup_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	@mkdir -p $(STAGING_DIR)/var/urbackup
-
 
         
 
