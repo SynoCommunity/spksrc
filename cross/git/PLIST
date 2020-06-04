@@ -1,5 +1,5 @@
 bin:bin/git
-bin:bin/git-cvsserver
+rsc:bin/git-cvsserver
 lnk:bin/git-receive-pack
 bin:bin/git-shell
 lnk:bin/git-upload-archive
