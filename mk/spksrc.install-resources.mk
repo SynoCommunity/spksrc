@@ -1,4 +1,9 @@
 # include this file to install arch independent resources
+#
+# packages using this have to:
+# - implement a custom INSTALL_TARGET to copy the required files to the 
+#   target location under $(STAGING_INSTALL_PREFIX)
+# - create a PLIST file to include the target file(s)/folder(s)
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -20,7 +25,7 @@ DIST_EXT      = $(PKG_EXT)
 #####
 
 ifneq ($(REQ_KERNEL),)
-  @$(error install-resources cannot be used when REQ_KERNEL is set )
+  @$(error install-resources cannot be used when REQ_KERNEL is set)
 endif
 
 #####
@@ -88,12 +93,8 @@ $(DIGESTS_FILE): download
 	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
 	done
 
-dependency-tree:
-	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; \
-	do \
-	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
-	done
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))

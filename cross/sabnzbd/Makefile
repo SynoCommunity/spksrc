@@ -11,14 +11,11 @@ HOMEPAGE = http://sabnzbd.org
 COMMENT  = Usenet binary downloader
 LICENSE  = GPL
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = sabnzbd_install
 
-include ../../mk/spksrc.cross-cc.mk
-include ../../mk/spksrc.python-wheel.mk
+
+include ../../mk/spksrc.install-resources.mk
 
 sabnzbd_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/SABnzbd
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/SABnzbd
-
