@@ -37,14 +37,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-            fetch-depth: 3
+            fetch-depth: 0
             persist-credentials: false
 
       - name: Get changed files PR
         if: github.event_name == 'pull_request'
         id: getfile_pr
         run: |
-          git diff-tree --no-commit-id --name-only -r ${{github.event.pull_request.head.sha}} | xargs
+          git diff-tree --no-commit-id --name-only -r master ${{github.event.pull_request.head.sha}} | xargs
           echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{github.event.pull_request.head.sha}} | xargs)"
 
       - name: Get changed files PUSH
