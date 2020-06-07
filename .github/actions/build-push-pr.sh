@@ -26,7 +26,7 @@ do
     SPK_TO_BUILD+=$packages
 done
 
-# de-duplicate packages
+# remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 if [ -z "$packages" ]; then
@@ -34,15 +34,18 @@ if [ -z "$packages" ]; then
     exit 0
 fi
 
+echo ""
 echo "===> PACKAGES to Build: $packages"
 
 # Build
 for package in $packages
 do
+    echo "----------------------------------------"
     # make sure that the package exists
-    if [ -d "/github/workspace/spk/$package" ]; then
-        cd /github/workspace/spk/"$package" && make "$GH_ARCH"
+    if [ -f "/github/workspace/spk/$package/Makefile" ]; then
+        # use TCVERSION and ARCH parameters to get real exit code.
+        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C /github/workspace/spk/"$package"
     else
-        echo "$package is not found"
+        echo "/github/workspace/spk/$package/Makefile not found"
     fi
 done

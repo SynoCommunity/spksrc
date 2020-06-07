@@ -10,7 +10,7 @@ REQ_KERNEL = 1
 
 HOMEPAGE = http://www.lirc.org/
 COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
-LICENSE  =
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
