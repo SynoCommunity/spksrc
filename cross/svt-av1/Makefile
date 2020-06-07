@@ -7,7 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # Set an appropriate filename as release files on github doesn't
 PKG_DIST_FILE = svt-av1_v$(PKG_VERS).$(PKG_EXT)
 
-DEPENDS = 
+DEPENDS =
+OPTIONAL_DEPENDS = native/nasm cross/libnuma
 
 HOMEPAGE = https://github.com/OpenVisualCloud/SVT-AV1
 COMMENT  = The Scalable Video Technology for AV1 (SVT-AV1 Encoder and Decoder) is an AV1-compliant encoder/decoder library core.
@@ -72,19 +73,15 @@ CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86 -DAOM_TARGET_CPU=x86
 endif
 
 .PHONY: svt-av1_custom_configure
-
 svt-av1_custom_configure: 
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(PKG_WORK_DIR)
 	cd $(PKG_WORK_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: svt-av1_custom_compile
-
 svt-av1_custom_compile: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
 
 .PHONY: svt-av1_custom_install
-
 svt-av1_custom_install: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-

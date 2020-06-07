@@ -7,6 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
+OPTIONAL_DEPENDS = native/yasm
 
 HOMEPAGE = http://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec

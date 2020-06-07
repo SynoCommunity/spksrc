@@ -4,6 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox
+OPTIONAL_DEPENDS = cross/htop
 
 OPTIONAL_DESC =
 

@@ -6,6 +6,7 @@ SPK_ICON = src/synocli-disk.png
 include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/e2fsprogs cross/fuse cross/testdisk cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
+OPTIONAL_DEPENDS = cross/dar
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli Disk Tools
@@ -15,14 +16,11 @@ OPTIONAL_DESC =
 ifneq ($(findstring $(ARCH),$(ARM5_ARCHES) hi3535 powerpc ppc824x ppc853x ppc854x),$(ARCH))
 # DAR: archs without C++11 support are not supported
 DEPENDS += cross/dar
-OPTIONAL_DESC += "dar, "
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
 endif
 
-ifeq ($(OPTIONAL_DESC),)
-OPTIONAL_DESC = " "
-endif
 
-DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, testdisk, ncdu, davfs2, lsscsi,$(OPTIONAL_DESC)ddrescure."
+DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG = "1. Add ddrescue<br/>2. Fix symlinks"
 

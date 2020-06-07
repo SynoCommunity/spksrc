@@ -6,6 +6,7 @@ PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265/downloads
 PKG_DIR = $(PKG_NAME)_$(PKG_VERS)/source
 
 DEPENDS =
+OPTIONAL_DEPENDS = native/nasm cross/libnuma
 
 HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.

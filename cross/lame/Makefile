@@ -7,6 +7,7 @@ PKG_DIST_SITE = http://downloads.sourceforge.net/project/lame/$(PKG_NAME)/$(PKG_
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
+OPTIONAL_DEPENDS = native/nasm
 
 HOMEPAGE = http://lame.sourceforge.net/
 COMMENT  = High quality MPEG Audio Layer III encoder

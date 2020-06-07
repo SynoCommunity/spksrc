@@ -21,6 +21,7 @@ LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif
 
 DEPENDS = cross/$(SPK_NAME)-$(SPK_VERS)
+OPTIONAL_DEPENDS = cross/lirc-0.8.7
 
 MAINTAINER = bru7us
 DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
