@@ -22,7 +22,7 @@ dependency-tree:
 .PHONY: dependency-list
 dependency-list:
 	@echo -n "$(NAME): "
-	@$(MAKE) -s dependency-flat | grep -P "^(cross|native)" | sort | uniq | tr '\n' ' \0'
+	@$(MAKE) -s dependency-flat | grep -P "^(cross|native)" | sort -u | tr '\n' ' \0'
 	@echo ""
 
 

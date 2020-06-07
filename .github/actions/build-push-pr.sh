@@ -3,45 +3,31 @@
 make setup-synocommunity
 sed -i -e "s|#PARALLEL_MAKE=.*|PARALLEL_MAKE=4|" local.mk
 
-# get dependency tree
-DEPENDENCY_TREE=
-echo "Building dependency tree..."
+# filter for changes made in the spk directories and take unique package name
+SPK_TO_BUILD=$(echo "$GH_FILES" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
+
+# filter for changes made in the cross and native directories and take unique package name
+DEPENDENT_PACKAGES=$(echo "$GH_FILES" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
+
+# get dependency list
+DEPENDENCY_LIST=
+echo "Building dependency list..."
 for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
 do
-    pushd "spk/$package" > /dev/null || exit
-    DEPENDENCY_TREE+=$(make dependency-tree)$'\n'
-    popd > /dev/null || exit
+    DEPENDENCY_LIST+=$(make -s -C spk/$package dependency-list)$'\n'
 done
 
-# filter for changes made in the cross and spk directories
-GH_FILES=$(echo "$GH_FILES" | grep -oE "(spk.*)|(cross.*)|(native.*)")
-
-# create array of potential packages where files have changed
-GH_PACKAGES_ARR=()
-for file in $GH_FILES
+# search for dependent spk packages
+for package in $DEPENDENT_PACKAGES
 do
-    # remove leading spk/cross/native from string
-    file=${file#spk/}
-    file=${file#cross/}
-    file=${file#native/}
-    # get package name / folder name
-    package=$(echo "$file" | grep -oE "^[^\/]*")
     echo "===> Searching for dependent package: $package"
-    packages=$(echo "$DEPENDENCY_TREE" \
-        | awk -v package="$package" \
-        'NF == 2 {x=$2} $2 == package {print x}' \
-         | sort -u)
-
+    packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: $packages"
-    for package in $packages
-    do
-        GH_PACKAGES_ARR+=("$package")
-    done
-
+    SPK_TO_BUILD+=$packages
 done
 
 # de-duplicate packages
-packages=$(printf %s "${GH_PACKAGES_ARR[*]}" | tr ' ' '\n' | sort -u)
+packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 if [ -z "$packages" ]; then
     echo "===> No packages built <==="
