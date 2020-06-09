@@ -54,6 +54,21 @@ native-%: native/%/Makefile
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
+# build dependency tree for all packages
+# and take the tree output only (starting with a tab)
+dependency-tree:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${spk} dependency-tree | grep -P "^[\t]"; \
+	done
+
+# build dependency list for all packages
+dependency-list:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	    $(MAKE) -s -C $${spk} dependency-list ; \
+	done
+
 # define a template that instantiates a 'python3-avoton-6.1' -style target for
 # every ($2) arch, every ($1) spk
 define SPK_ARCH_template =
@@ -148,4 +163,3 @@ setup-synocommunity: setup
 		-e "s|DISTRIBUTOR_URL=.*|DISTRIBUTOR_URL=https://synocommunity.com|" \
 		-e "s|REPORT_URL=.*|REPORT_URL=https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk
-

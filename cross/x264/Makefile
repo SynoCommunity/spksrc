@@ -7,6 +7,7 @@ PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/stable/
 PKG_DIR = $(PKG_NAME)-stable-$(PKG_GIT_HASH)
 
 DEPENDS =
+OPTIONAL_DEPENDS = native/nasm
 
 HOMEPAGE = http://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma

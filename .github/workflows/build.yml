@@ -23,9 +23,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # x64,  #evansport=x86, aarch64=armv8, armv7, 88f6281=armv5, ppc853x/qoriq=ppc
+        # x64=x86_64, evansport=x86, aarch64=armv8, armv7, 88f6281=armv5, ppc853x/qoriq=ppc
         # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        arch: [x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1]
+        arch: [x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
+
     steps:
       - name: Cache toolchains
         uses: actions/cache@v1
@@ -44,8 +45,8 @@ jobs:
         if: github.event_name == 'pull_request'
         id: getfile_pr
         run: |
-          git diff-tree --no-commit-id --name-only -r master ${{github.event.pull_request.head.sha}} | xargs
-          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{github.event.pull_request.head.sha}} | xargs)"
+          git diff-tree --no-commit-id --name-only -r origin/master ${{github.event.pull_request.head.sha}} | xargs
+          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r origin/master ${{github.event.pull_request.head.sha}} | xargs)"
 
       - name: Get changed files PUSH
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') == false
@@ -56,13 +57,14 @@ jobs:
 
       - name: Build Package (file changes)
         if: startsWith(github.ref, 'refs/tags/') == false
+        continue-on-error: true
         uses: docker://synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build-push-pr.sh
         env:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
-          GH_ARCH: arch-${{ matrix.arch }}
+          GH_ARCH: ${{ matrix.arch }}
 
       - name: Build Package (Tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -72,7 +74,7 @@ jobs:
           entrypoint: ./.github/actions/build-tag.sh
         env:
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
-          GH_ARCH: arch-${{ matrix.arch }}
+          GH_ARCH: ${{ matrix.arch }}
           #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
 
       - name: List packages
@@ -105,4 +107,3 @@ jobs:
           files: 'packages/*.spk'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

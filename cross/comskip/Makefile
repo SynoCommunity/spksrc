@@ -8,6 +8,7 @@ PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = cross/argtable
+OPTIONAL_DEPENDS = cross/ffmpeg
 
 HOMEPAGE = http://www.kaashoek.com/comskip
 COMMENT  = Commercial detector

@@ -7,24 +7,22 @@ include ../../mk/spksrc.common.mk
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/sshfs cross/mosh cross/socat
 DEPENDS += cross/rsync
+OPTIONAL_DEPENDS = cross/fritzctl
 
 OPTIONAL_DESC =
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += cross/fritzctl
-OPTIONAL_DESC += "fritzctl, "
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fritzctl"
 endif
 
-ifeq ($(OPTIONAL_DESC),)
-OPTIONAL_DESC = " "
-endif
 
 
 # Requirement for Mosh
 SPK_DEPENDS = "Perl>=5.14"
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs,$(OPTIONAL_DESC)rsync. Credits to Sebastian Schmidt \(publicarray\) for icons"
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs, rsync$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
 CHANGELOG = "1. Add rsync"

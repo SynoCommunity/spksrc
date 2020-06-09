@@ -11,6 +11,11 @@ DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265
 DEPENDS += cross/opencore-amr
 
+OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/ds.evansport cross/json-c
+OPTIONAL_DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
+OPTIONAL_DEPENDS += cross/shine
+
+
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2

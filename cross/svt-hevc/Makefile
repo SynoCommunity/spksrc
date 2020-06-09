@@ -8,6 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_FILE = svt-hevc_v$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = 
+OPTIONAL_DEPENDS = native/nasm cross/libnuma
 
 HOMEPAGE = https://github.com/OpenVisualCloud/SVT-HEVC
 COMMENT  = Scalable Video Technology (SVT) is a software-based video coding technology that is highly optimized for Intel® Xeon® processors allowing to spread video encoding processing across multiple processors to achieve a real advantage of processing efficiency.
@@ -45,19 +46,15 @@ CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
 endif
 
 .PHONY: svt_hevc_custom_configure
-
 svt_hevc_custom_configure: 
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(PKG_WORK_DIR)
 	cd $(PKG_WORK_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: svt_hevc_custom_compile
-
 svt_hevc_custom_compile: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
 
 .PHONY: svt_hevc_custom_install
-
 svt_hevc_custom_install: 
 	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-

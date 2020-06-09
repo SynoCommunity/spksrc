@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Intel-Media-SDK/MediaSDK/archive
 PKG_DIR = MediaSDK-$(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS += cross/intel-media-driver
+DEPENDS = cross/intel-media-driver
 UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
 
 HOMEPAGE = http://mediasdk.intel.com
