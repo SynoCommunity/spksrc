@@ -10,7 +10,6 @@ PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = 
-OPTIONAL_DEPENDS = native/nasm cross/libnuma
 
 HOMEPAGE = https://aomedia.googlesource.com/aom/
 COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format designed for video transmissions over the Internet.
@@ -24,7 +23,7 @@ PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 include ../../mk/spksrc.cross-cmake.mk
 
 # libaom specific cmake options
-CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1 -DBUILD_SHARED_LIBS=1
+CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
 
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm
