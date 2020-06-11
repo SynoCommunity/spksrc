@@ -6,9 +6,10 @@ PKG_DIST_SITE = http://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
-DEPENDS += cross/libbluray cross/libvorbis cross/speex cross/libvpx
+DEPENDS += cross/libbluray cross/speex
+DEPENDS += cross/libtheora
 DEPENDS += cross/gnutls cross/opus
-DEPENDS += cross/soxr cross/x264 cross/x265
+DEPENDS += cross/soxr cross/x264 cross/x265 cross/libvpx
 DEPENDS += cross/opencore-amr
 
 OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/ds.evansport cross/json-c
@@ -32,7 +33,7 @@ CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enable-avresample
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr
-CONFIGURE_ARGS += --enable-libvorbis
+CONFIGURE_ARGS += --enable-libtheora --enable-libvorbis
 CONFIGURE_ARGS += --enable-libspeex
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
