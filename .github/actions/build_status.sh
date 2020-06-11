@@ -9,7 +9,7 @@
 
 if [ -f "${BUILD_ERROR_FILE}" ]; then
     if [ $(cat "${BUILD_ERROR_FILE}" | wc -l) -gt 0 ]; then
-        cat "${GH_BUILD_ERROR_FILE}"
+        cat "${BUILD_ERROR_FILE}"
         echo ""
         echo "Please analyze the log file of the build job."
         exit 1
