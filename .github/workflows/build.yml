@@ -103,8 +103,7 @@ jobs:
       - name: Build Status
         # We need this status since we don't want to stop the build on errors.
         # Here we fail on build errors found in the build error file.
-        with:
-          entrypoint: ./.github/actions/build_status.sh
+        run: ./.github/actions/build_status.sh
         env:
           BUILD_ERROR_FILE: build_errors.txt
           BUILD_SUCCESS_FILE: build_success.txt
