@@ -6,6 +6,13 @@ SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
 
 all: $(SUPPORTED_SPKS)
 
+all-noarch:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
+	done
+
+
 clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean
 

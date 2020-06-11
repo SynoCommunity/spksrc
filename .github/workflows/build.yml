@@ -25,7 +25,7 @@ jobs:
       matrix:
         # x64=x86_64, evansport=x86, aarch64=armv8, armv7, 88f6281=armv5, ppc853x/qoriq=ppc
         # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        arch: [x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
+        arch: [noarch, x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
 
     steps:
       - name: Cache toolchains
@@ -57,6 +57,8 @@ jobs:
 
       - name: Build Package (file changes)
         if: startsWith(github.ref, 'refs/tags/') == false
+        # We don't want to stop the build on errors. 
+        # Errors are reported in "Build Status"
         continue-on-error: true
         uses: docker://synocommunity/spksrc:latest
         with:
@@ -65,9 +67,13 @@ jobs:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
+          BUILD_ERROR_FILE: build_errors.txt
+          BUILD_SUCCESS_FILE: build_success.txt
 
       - name: Build Package (Tag)
         if: startsWith(github.ref, 'refs/tags/')
+        # We don't want to stop the build on errors. 
+        # Errors are reported in "Build Status"
         continue-on-error: true
         uses: docker://synocommunity/spksrc:latest
         with:
@@ -76,6 +82,8 @@ jobs:
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          BUILD_ERROR_FILE: build_errors.txt
+          BUILD_SUCCESS_FILE: build_success.txt
 
       - name: List packages
         run: mkdir -p packages; ls packages
@@ -91,6 +99,15 @@ jobs:
         with:
           name: packages
           path: packages/*.spk
+
+      - name: Build Status
+        # We need this status since we don't want to stop the build on errors.
+        # Here we fail on build errors found in the build error file.
+        with:
+          entrypoint: ./.github/actions/build_status.sh
+        env:
+          BUILD_ERROR_FILE: build_errors.txt
+          BUILD_SUCCESS_FILE: build_success.txt
 
   release:
     needs: build
