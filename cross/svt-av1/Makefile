@@ -16,5 +16,3 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
 
 include ../../mk/spksrc.cross-cmake.mk
-
-CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1 -DBUILD_SHARED_LIBS=1
