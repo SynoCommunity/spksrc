@@ -6,7 +6,7 @@ SPK_ICON = src/${SPK_NAME}.png
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/cffi cross/nmap  # for python-libnmap
 DEPENDS += cross/gmp cross/mpfr cross/mpc  # for gmpy2
-DEPENDS += cross/bcrypt
+DEPENDS += cross/libyaml cross/bcrypt
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.7.7"
 
@@ -30,7 +30,5 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 # ppc archs except QorIQ
 UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
-
-PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
 
 include ../../mk/spksrc.spk.mk

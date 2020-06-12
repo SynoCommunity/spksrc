@@ -11,7 +11,7 @@ attrs==18.2.0
 certifi>=2018.11.29
 Jinja2>=2.10
 PyJWT==1.6.4
-cryptography==2.3.1
+
 ed25519
 pip>=8.0.3
 pytz>=2018.9
@@ -466,7 +466,8 @@ gTTS-token==1.1.1
 # homeassistant.components.frontend
 home-assistant-frontend==20180903.0
 user_agents		# discovered during first run
-ua_parser		# discovered during first run
+# discovered during first run
+ua_parser==0.10.0
 
 # homeassistant.components.homekit_controller
 homekit==0.10
