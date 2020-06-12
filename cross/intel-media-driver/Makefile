@@ -12,11 +12,19 @@ HOMEPAGE = https://github.com/intel/media-driver
 COMMENT  = The Intel Media Driver for VAAPI is a new VA-API (Video Acceleration API) user mode driver supporting hardware accelerated decoding, encoding, and video post processing for GEN based graphics hardware.
 LICENSE  = MIT
 
+INSTALL_TARGET = intel-media_custom_install
+
 include ../../mk/spksrc.cross-cmake.mk
 
 # intel-media-driver specific args
 # for succesfull build
+CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_C_FLAGS=-Wno-error=delete-incomplete
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11
 CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
+
+.PHONY: intel-media_custom_install
+
+intel-media_custom_install:
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install
