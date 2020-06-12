@@ -17,6 +17,16 @@ CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 # set default build directory
+ifeq ($(strip $(CMAKE_USE_DESTDIR)),)
+CMAKE_USE_DESTDIR = 0
+endif
+
+# set default build directory
+ifeq ($(strip $(CMAKE_DESTDIR)),)
+CMAKE_DESTDIR = $(INSTALL_DIR)
+endif
+
+# set default build directory
 ifeq ($(strip $(PKG_WORK_DIR)),)
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_DIR)/build
 endif

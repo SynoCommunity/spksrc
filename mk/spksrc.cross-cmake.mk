@@ -50,7 +50,12 @@ cmake_compile_target:
 # default isntall:
 cmake_install_target:
 	@$(MSG) - CMake install
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install
+endif
+ifeq ($(strip $(CMAKE_USE_DESTDIR)),1)
+	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
+endif
 
 # call-up regular build process
 include ../../mk/spksrc.cross-cc.mk

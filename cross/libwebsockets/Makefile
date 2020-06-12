@@ -12,4 +12,6 @@ HOMEPAGE = http://libevent.org/
 COMMENT  = An event notification library
 LICENSE  = http://libevent.org/LICENSE.txt
 
+CMAKE_USE_DESTDIR = 1
+
 include ../../mk/spksrc.cross-cmake.mk
