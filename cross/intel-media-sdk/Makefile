@@ -16,6 +16,7 @@ include ../../mk/spksrc.cross-cmake.mk
 
 # intel-media-sdk specific args
 # for succesfull build
+CMAKE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS='-std=c++11'
 CMAKE_ARGS += -DBUILD_SAMPLES=OFF
 CMAKE_ARGS += -DBUILD_TUTORIALS=OFF
