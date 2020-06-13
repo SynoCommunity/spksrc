@@ -67,8 +67,9 @@ jobs:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
-          BUILD_ERROR_FILE: build_errors.txt
-          BUILD_SUCCESS_FILE: build_success.txt
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
       - name: Build Package (Tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -82,8 +83,9 @@ jobs:
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
-          BUILD_ERROR_FILE: build_errors.txt
-          BUILD_SUCCESS_FILE: build_success.txt
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
       - name: List packages
         run: mkdir -p packages; ls packages
@@ -103,10 +105,13 @@ jobs:
       - name: Build Status
         # We need this status since we don't want to stop the build on errors.
         # Here we fail on build errors found in the build error file.
-        run: ./.github/actions/build_status.sh
+        uses: docker://synocommunity/spksrc:latest
+        with:
+          entrypoint: ./.github/actions/build_status.sh
         env:
-          BUILD_ERROR_FILE: build_errors.txt
-          BUILD_SUCCESS_FILE: build_success.txt
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
   release:
     needs: build
