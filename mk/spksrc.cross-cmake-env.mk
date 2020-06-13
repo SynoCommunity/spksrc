@@ -48,7 +48,7 @@ ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_C_FLAGS=-maltivec -DENABLE_ALTIVEC=OFF -DCPU_POWER8=OFF
+  CMAKE_ARGS += -DCMAKE_C_FLAGS=-mcpu=8548 -mhard-float -mfloat-gprs=double
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
