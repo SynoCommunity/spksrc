@@ -35,15 +35,15 @@ endif
 cmake_configure_target:
 	@$(MSG) - CMake configure
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) mkdir --parents $(PKG_WORK_DIR)
-	cd $(PKG_WORK_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: cmake_compile_target
 
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE)
 
 .PHONY: cmake_install_target
 
@@ -51,10 +51,10 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install
 endif
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),1)
-	cd $(PKG_WORK_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
 endif
 
 # call-up regular build process

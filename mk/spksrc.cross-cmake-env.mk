@@ -27,8 +27,8 @@ CMAKE_DESTDIR = $(INSTALL_DIR)
 endif
 
 # set default build directory
-ifeq ($(strip $(PKG_WORK_DIR)),)
-PKG_WORK_DIR = $(WORK_DIR)/$(PKG_DIR)/build
+ifeq ($(strip $(CMAKE_BUILD_DIR)),)
+CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/build
 endif
 
 # set path to assembler
