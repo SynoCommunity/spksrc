@@ -15,4 +15,6 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 
 UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
 
+CMAKE_USE_DESTDIR = 1
+
 include ../../mk/spksrc.cross-cmake.mk
