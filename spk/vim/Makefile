@@ -1,6 +1,6 @@
 SPK_NAME = vim
-SPK_VERS = 7.4
-SPK_REV = 2
+SPK_VERS = 8.2
+SPK_REV = 3
 SPK_ICON = src/vim.png
 
 DEPENDS = cross/$(SPK_NAME)
