@@ -80,6 +80,6 @@ ntopng_pre_compile:
 	@$(MSG) "- patch generated Makefile to ignore third-party libs and use cross/* packages instead"
 	@$(RUN) sed -i 's|LIB_TARGETS = $$(LUA_LIB)|LIB_TARGETS =|g' ./Makefile
 	@$(RUN) sed -i 's|$$(LIBPCAP) $$(LUA_LIB) $$(LIBRRDTOOL_LIB)|$$(LIBPCAP) $$(LIBRRDTOOL_LIB)|g' ./Makefile
-	@$(RUN) sed -i 's| -L/spksrc/.*$(INSTALL_PREFIX)/lib -l   -L/spksrc/| -L/spksrc/|g' ./Makefile
+	@$(RUN) sed -i 's| -l   -L/| -L/|g' ./Makefile
 	@$(RUN) sed -i 's| -lssl -lssl | -lssl -lcurl -llua -lmysqlclient |g' ./Makefile
 	@$(RUN) sed -i 's|-L/usr/local/lib -lrt -lz -ldl -lcurl |-L/usr/local/lib -lrt -lz -ldl |g' ./Makefile
