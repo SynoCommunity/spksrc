@@ -44,6 +44,7 @@ do
     fi
 done
 
+echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${arch_packages}"
 echo "===> NOARCH packages: ${noarch_packages}"
 
@@ -66,18 +67,18 @@ for package in ${build_packages}
 do
     echo "----------------------------------------"
     # make sure that the package exists
-    if [ -f "/github/workspace/spk/$package/Makefile" ]; then
-        # use TCVERSION and ARCH parameters to get real exit code.
-        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C /github/workspace/spk/${package}
+    if [ -f "./spk/${package}/Makefile" ]; then
+        # use TCVERSION and ARCH to get real exit codes.
+        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}
         result=$?
         
         if [ $result -eq 0 ];
         then
-            echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - $package ($GH_ARCH) DONE"               >> ${BUILD_SUCCESS_FILE}
+            echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - $package: ($GH_ARCH) DONE"      >> ${BUILD_SUCCESS_FILE}
         else
-            echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - $package ($GH_ARCH) FAILED ($result)"   >> ${BUILD_ERROR_FILE}
+            echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - $package: ($GH_ARCH) FAILED"    >> ${BUILD_ERROR_FILE}
         fi
     else
-        echo "/github/workspace/spk/${package}/Makefile not found"
+        echo "spk/${package}/Makefile not found"
     fi
 done

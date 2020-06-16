@@ -21,31 +21,7 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 
 #####
 
-# Check if package supports ARCH
-ifneq ($(UNSUPPORTED_ARCHS),)
-  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
-    @$(error Arch '$(ARCH)' is not a supported architecture )
-  endif
-endif
-
-# Check minimum DSM requirements of package
-ifneq ($(REQUIRED_DSM),)
-  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
-      @$(error DSM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM))
-    endif
-  endif
-endif
-# Check minimum SRM requirements of package
-ifneq ($(REQUIRED_SRM),)
-  ifeq ($(ARCH),$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_SRM))))
-      @$(error SRM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_SRM))
-    endif
-  endif
-endif
-
-#####
+include ../../mk/spksrc.pre-check.mk
 
 # Even though this makefile doesn't cross compile, we need this to setup the cross environment.
 include ../../mk/spksrc.cross-env.mk
@@ -104,7 +80,6 @@ ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
 
-.PHONY: $(WORK_DIR)/INFO
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"

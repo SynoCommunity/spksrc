@@ -22,37 +22,7 @@ endif
 
 #####
 
-ifneq ($(REQ_KERNEL),)
-  ifeq ($(ARCH),x64)
-    @$(error x64 arch cannot be used when REQ_KERNEL is set )
-  endif
-endif
-
-# Check if package supports ARCH
-ifneq ($(UNSUPPORTED_ARCHS),)
-  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
-    @$(error Arch '$(ARCH)' is not a supported architecture )
-  endif
-endif
-
-# Check minimum DSM requirements of package
-ifneq ($(REQUIRED_DSM),)
-  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
-      @$(error DSM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM))
-    endif
-  endif
-endif
-# Check minimum SRM requirements of package
-ifneq ($(REQUIRED_SRM),)
-  ifeq ($(ARCH),$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_SRM))))
-      @$(error SRM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_SRM))
-    endif
-  endif
-endif
-
-#####
+include ../../mk/spksrc.pre-check.mk
 
 include ../../mk/spksrc.cross-env.mk
 
@@ -105,6 +75,10 @@ include ../../mk/spksrc.dependency-tree.mk
 .PHONY: all-archs
 all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
 
+####
+
 arch-%:
 	@$(MSG) Building package for arch $*
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+
+####
