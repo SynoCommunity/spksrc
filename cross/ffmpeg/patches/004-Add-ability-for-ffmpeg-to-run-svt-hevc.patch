@@ -1,7 +1,7 @@
-diff -uprN ../ffmpeg-4.2.2-ORIG/configure ./configure
---- ../ffmpeg-4.2.2-ORIG/configure	2019-12-31 16:35:22.000000000 -0500
-+++ ./configure	2020-04-21 20:04:52.735055129 -0400
-@@ -264,6 +264,7 @@ External library support:
+diff -uprN ../ffmpeg-4.3-003/configure ./configure
+--- ../ffmpeg-4.3-003/configure	2020-06-16 17:34:08.000000000 -0400
++++ ./configure	2020-06-16 18:57:35.419651626 -0400
+@@ -267,6 +267,7 @@ External library support:
    --enable-libspeex        enable Speex de/encoding via libspeex [no]
    --enable-libsrt          enable Haivision SRT protocol via libsrt [no]
    --enable-libssh          enable SFTP protocol via libssh [no]
@@ -9,7 +9,7 @@ diff -uprN ../ffmpeg-4.2.2-ORIG/configure ./configure
    --enable-libtensorflow   enable TensorFlow as a DNN module backend
                             for DNN based filters like sr [no]
    --enable-libtesseract    enable Tesseract, needed for ocr filter [no]
-@@ -1793,6 +1794,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1803,6 +1804,7 @@ EXTERNAL_LIBRARY_LIST="
      libspeex
      libsrt
      libssh
@@ -17,7 +17,7 @@ diff -uprN ../ffmpeg-4.2.2-ORIG/configure ./configure
      libtensorflow
      libtesseract
      libtheora
-@@ -3191,6 +3193,7 @@ libshine_encoder_select="audio_frame_que
+@@ -3240,6 +3242,7 @@ libshine_encoder_select="audio_frame_que
  libspeex_decoder_deps="libspeex"
  libspeex_encoder_deps="libspeex"
  libspeex_encoder_select="audio_frame_queue"
@@ -25,7 +25,7 @@ diff -uprN ../ffmpeg-4.2.2-ORIG/configure ./configure
  libtheora_encoder_deps="libtheora"
  libtwolame_encoder_deps="libtwolame"
  libvo_amrwbenc_encoder_deps="libvo_amrwbenc"
-@@ -6263,6 +6266,7 @@ enabled libsoxr           && require lib
+@@ -6369,6 +6372,7 @@ enabled libsoxr           && require lib
  enabled libssh            && require_pkg_config libssh libssh libssh/sftp.h sftp_init
  enabled libspeex          && require_pkg_config libspeex speex speex/speex.h speex_decoder_init
  enabled libsrt            && require_pkg_config libsrt "srt >= 1.3.0" srt/srt.h srt_socket
@@ -33,10 +33,10 @@ diff -uprN ../ffmpeg-4.2.2-ORIG/configure ./configure
  enabled libtensorflow     && require libtensorflow tensorflow/c/c_api.h TF_Version -ltensorflow
  enabled libtesseract      && require_pkg_config libtesseract tesseract tesseract/capi.h TessBaseAPICreate
  enabled libtheora         && require libtheora theora/theoraenc.h th_info_init -ltheoraenc -ltheoradec -logg
-diff -uprN ../ffmpeg-4.2.2-ORIG/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
---- ../ffmpeg-4.2.2-ORIG/libavcodec/allcodecs.c	2019-12-31 16:35:23.000000000 -0500
-+++ ./libavcodec/allcodecs.c	2020-04-21 20:04:52.735055129 -0400
-@@ -707,6 +707,7 @@ extern AVCodec ff_librsvg_decoder;
+diff -uprN ../ffmpeg-4.3-003/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
+--- ../ffmpeg-4.3-003/libavcodec/allcodecs.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/allcodecs.c	2020-06-16 18:57:35.419651626 -0400
+@@ -728,6 +728,7 @@ extern AVCodec ff_librsvg_decoder;
  extern AVCodec ff_libshine_encoder;
  extern AVCodec ff_libspeex_encoder;
  extern AVCodec ff_libspeex_decoder;
@@ -44,9 +44,9 @@ diff -uprN ../ffmpeg-4.2.2-ORIG/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_libtheora_encoder;
  extern AVCodec ff_libtwolame_encoder;
  extern AVCodec ff_libvo_amrwbenc_encoder;
-diff -uprN ../ffmpeg-4.2.2-ORIG/libavcodec/libsvt_hevc.c ./libavcodec/libsvt_hevc.c
---- ../ffmpeg-4.2.2-ORIG/libavcodec/libsvt_hevc.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/libsvt_hevc.c	2020-04-21 20:04:52.735055129 -0400
+diff -uprN ../ffmpeg-4.3-003/libavcodec/libsvt_hevc.c ./libavcodec/libsvt_hevc.c
+--- ../ffmpeg-4.3-003/libavcodec/libsvt_hevc.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/libsvt_hevc.c	2020-06-16 18:57:35.420651690 -0400
 @@ -0,0 +1,559 @@
 +/*
 +* Scalable Video Technology for HEVC encoder library plugin
@@ -607,10 +607,10 @@ diff -uprN ../ffmpeg-4.2.2-ORIG/libavcodec/libsvt_hevc.c ./libavcodec/libsvt_hev
 +    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 +    .wrapper_name   = "libsvt_hevc",
 +};
-diff -uprN ../ffmpeg-4.2.2-ORIG/libavcodec/Makefile ./libavcodec/Makefile
---- ../ffmpeg-4.2.2-ORIG/libavcodec/Makefile	2019-12-31 16:35:22.000000000 -0500
-+++ ./libavcodec/Makefile	2020-04-21 20:04:52.735055129 -0400
-@@ -991,6 +991,7 @@ OBJS-$(CONFIG_LIBOPUS_ENCODER)
+diff -uprN ../ffmpeg-4.3-003/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-4.3-003/libavcodec/Makefile	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/Makefile	2020-06-16 18:57:35.420651690 -0400
+@@ -1024,6 +1024,7 @@ OBJS-$(CONFIG_LIBRAV1E_ENCODER)
  OBJS-$(CONFIG_LIBSHINE_ENCODER)           += libshine.o
  OBJS-$(CONFIG_LIBSPEEX_DECODER)           += libspeexdec.o
  OBJS-$(CONFIG_LIBSPEEX_ENCODER)           += libspeexenc.o
