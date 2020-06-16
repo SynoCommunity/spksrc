@@ -1,6 +1,7 @@
---- configure.orig
-+++ configure
-@@ -7266,7 +7266,7 @@ ifndef MAIN_MAKEFILE
+diff -uprN ../ffmpeg-4.3/configure ./configure
+--- ../ffmpeg-4.3/configure	2020-06-15 14:54:23.000000000 -0400
++++ ./configure	2020-06-16 17:31:32.432716874 -0400
+@@ -7382,7 +7382,7 @@ ifndef MAIN_MAKEFILE
  SRC_PATH:=\$(SRC_PATH:.%=..%)
  endif
  CC_IDENT=$cc_ident
@@ -9,8 +10,9 @@
  INTRINSICS=$intrinsics
  EXTERN_PREFIX=$extern_prefix
  CC=$cc
---- ffbuild/common.mak.orig
-+++ ffbuild/common.mak
+diff -uprN ../ffmpeg-4.3/ffbuild/common.mak ./ffbuild/common.mak
+--- ../ffmpeg-4.3/ffbuild/common.mak	2020-06-15 14:54:23.000000000 -0400
++++ ./ffbuild/common.mak	2020-06-16 17:31:32.433716941 -0400
 @@ -136,8 +136,8 @@ DEP_LIBS := $(foreach lib,$(FFLIBS),$(ca
  STATIC_DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
  
@@ -22,9 +24,10 @@
  SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
  HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
  PTXOBJS      = $(filter %.ptx.o,$(OBJS))
---- Makefile.orig
-+++ Makefile
-@@ -86,7 +86,7 @@ define DOSUBDIR
+diff -uprN ../ffmpeg-4.3/Makefile ./Makefile
+--- ../ffmpeg-4.3/Makefile	2020-06-15 14:54:23.000000000 -0400
++++ ./Makefile	2020-06-16 17:31:32.433716941 -0400
+@@ -89,7 +89,7 @@ define DOSUBDIR
  $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
  SUBDIR := $(1)/
  include $(SRC_PATH)/$(1)/Makefile
