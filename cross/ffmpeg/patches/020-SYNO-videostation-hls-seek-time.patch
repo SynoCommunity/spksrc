@@ -1,6 +1,6 @@
-diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavformat/segment.c
---- ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavformat/segment.c	2019-10-15 22:12:46.428182072 -0400
+diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
+--- ../ffmpeg-4.3-005/libavformat/segment.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavformat/segment.c	2020-06-16 19:54:41.332482718 -0400
 @@ -43,6 +43,8 @@
  #include "libavutil/time_internal.h"
  #include "libavutil/timestamp.h"
@@ -10,7 +10,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  typedef struct SegmentListEntry {
      int index;
      double start_time, end_time;
-@@ -124,6 +126,12 @@ typedef struct SegmentContext {
+@@ -123,6 +125,12 @@ typedef struct SegmentContext {
      SegmentListEntry cur_entry;
      SegmentListEntry *segment_list_entries;
      SegmentListEntry *segment_list_entries_end;
@@ -23,7 +23,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  } SegmentContext;
  
  static void print_csv_escaped_str(AVIOContext *ctx, const char *str)
-@@ -864,6 +872,10 @@ static int seg_write_header(AVFormatCont
+@@ -854,6 +862,10 @@ static int seg_write_header(AVFormatCont
          if (!seg->individual_header_trailer)
              oc->pb->seekable = 0;
      }
@@ -34,7 +34,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  
      return 0;
  }
-@@ -896,6 +908,40 @@ static int seg_write_packet(AVFormatCont
+@@ -885,6 +897,40 @@ static int seg_write_packet(AVFormatCont
          }
      }
  
@@ -75,22 +75,23 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
  calc_times:
      if (seg->times) {
          end_pts = seg->segment_count < seg->nb_times ?
-@@ -982,6 +1028,14 @@ calc_times:
+@@ -971,6 +1017,15 @@ calc_times:
             av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, &st->time_base),
             av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, &st->time_base));
  
 +#ifdef SYNO_VIDEOSTATION_HLS_SEEK_TIME
-+	if (0 < seg->seek_time) {
-+		if (pkt->pts != AV_NOPTS_VALUE)
-+			pkt->pts += av_rescale_q(seg->seek_time, (AVRational) {1, 1000}, st->time_base);
-+		if (pkt->dts != AV_NOPTS_VALUE)
-+			pkt->dts += av_rescale_q(seg->seek_time, (AVRational) {1, 1000}, st->time_base);
-+	}
++       if (0 < seg->seek_time) {
++               if (pkt->pts != AV_NOPTS_VALUE)
++                       pkt->pts += av_rescale_q(seg->seek_time, (AVRational) {1, 1000}, st->time_base);
++               if (pkt->dts != AV_NOPTS_VALUE)
++                       pkt->dts += av_rescale_q(seg->seek_time, (AVRational) {1, 1000}, st->time_base);
++       }
 +#endif
-     ret = ff_write_chained(seg->avf, pkt->stream_index, pkt, s, seg->initial_offset || seg->reset_timestamps);
++
+     ret = ff_write_chained(seg->avf, pkt->stream_index, pkt, s,
+                            seg->initial_offset || seg->reset_timestamps || seg->avf->oformat->interleave_packet);
  
- fail:
-@@ -1098,6 +1152,9 @@ static const AVOption options[] = {
+@@ -1085,6 +1140,9 @@ static const AVOption options[] = {
      { "reset_timestamps", "reset timestamps at the beginning of each segment", OFFSET(reset_timestamps), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, E },
      { "initial_offset", "set initial timestamp offset", OFFSET(initial_offset), AV_OPT_TYPE_DURATION, {.i64 = 0}, -INT64_MAX, INT64_MAX, E },
      { "write_empty_segments", "allow writing empty 'filler' segments", OFFSET(write_empty), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, E },
@@ -100,9 +101,10 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/segment.c ./libavfo
      { NULL },
  };
  
-diff -uprN ../ffmpeg-4.2.2-patch004/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch004/synoconfig.h	2020-01-21 09:52:22.956162937 -0500
-+++ ./synoconfig.h	2020-01-21 09:51:02.368157922 -0500
+Binary files ../ffmpeg-4.3-005/libavformat/.segment.c.rej.swp and ./libavformat/.segment.c.rej.swp differ
+diff -uprN ../ffmpeg-4.3-005/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.3-005/synoconfig.h	1969-12-31 19:00:00.000000000 -0500
++++ ./synoconfig.h	2020-06-16 19:53:14.125668365 -0400
 @@ -0,0 +1,12 @@
 +#ifndef MY_ABC_HERE
 +#define MY_ABC_HERE

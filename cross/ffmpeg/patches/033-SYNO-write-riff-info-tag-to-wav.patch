@@ -1,6 +1,6 @@
-diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/wavenc.c ./libavformat/wavenc.c
---- ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/wavenc.c	2019-07-08 13:45:26.000000000 -0400
-+++ ./libavformat/wavenc.c	2019-10-15 22:12:46.432182104 -0400
+diff -uprN ../ffmpeg-4.3-032/libavformat/wavenc.c ./libavformat/wavenc.c
+--- ../ffmpeg-4.3-032/libavformat/wavenc.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavformat/wavenc.c	2020-06-16 20:10:39.073227980 -0400
 @@ -46,6 +46,8 @@
  #include "internal.h"
  #include "riff.h"
@@ -20,7 +20,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/wavenc.c ./libavfor
  } WAVMuxContext;
  
  #if CONFIG_WAV_MUXER
-@@ -356,7 +361,13 @@ static int wav_write_header(AVFormatCont
+@@ -355,7 +360,13 @@ static int wav_write_header(AVFormatCont
  
      if (wav->write_peak != PEAK_ONLY) {
          /* info header */
@@ -34,7 +34,7 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/wavenc.c ./libavfor
  
          /* data header */
          wav->data = ff_start_tag(pb, "data");
-@@ -506,6 +517,9 @@ static const AVOption options[] = {
+@@ -491,6 +502,9 @@ static const AVOption options[] = {
      { "peak_block_size", "Number of audio samples used to generate each peak frame.",   OFFSET(peak_block_size), AV_OPT_TYPE_INT, { .i64 = 256 }, 0, 65536, ENC },
      { "peak_format",     "The format of the peak envelope data (1: uint8, 2: uint16).", OFFSET(peak_format), AV_OPT_TYPE_INT,     { .i64 = PEAK_FORMAT_UINT16 }, PEAK_FORMAT_UINT8, PEAK_FORMAT_UINT16, ENC },
      { "peak_ppv",        "Number of peak points per peak value (1 or 2).",              OFFSET(peak_ppv), AV_OPT_TYPE_INT, { .i64 = 2 }, 1, 2, ENC },
@@ -44,9 +44,9 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/wavenc.c ./libavfor
      { NULL },
  };
  
-diff -uprN ../ffmpeg-4.2.2-patch020/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch020/synoconfig.h	2020-01-24 05:51:33.733043313 -0500
-+++ ./synoconfig.h	2020-01-21 10:04:33.000000000 -0500
+diff -uprN ../ffmpeg-4.3-032/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.3-032/synoconfig.h	2020-06-16 20:10:09.000000000 -0400
++++ ./synoconfig.h	2020-06-16 20:10:39.074228048 -0400
 @@ -61,3 +61,8 @@
  #if defined(SYNO_VIDEOSTATION)
  #define SYNO_FIX_MP4_REMUX_H264PARSER
