@@ -24,6 +24,10 @@ CHANGELOG = "1. Update to latest git version 51a4c5b as of June 10th 2020<br/>2.
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
+# PPC_ARCHES except qoriq are not supported
+# https://tvheadend.org/issues/5060
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
 

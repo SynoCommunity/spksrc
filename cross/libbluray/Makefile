@@ -15,5 +15,9 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava-jar
 
-include ../../mk/spksrc.cross-cc.mk
+# For ppc853x-5.2, define GNU_SOURCE
+ifeq ($(ARCH)-$(TCVERSION), ppc853x-5.2)
+ADDITIONAL_CFLAGS = -D_GNU_SOURCE
+endif
 
+include ../../mk/spksrc.cross-cc.mk
