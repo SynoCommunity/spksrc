@@ -1,6 +1,6 @@
 diff -uprN ../ffmpeg-4.3-004/configure ./configure
---- ../ffmpeg-4.3-004/configure	2020-06-16 18:57:35.419651626 -0400
-+++ ./configure	2020-06-16 19:02:00.974629306 -0400
+--- ../ffmpeg-4.3-004/configure	2020-06-16 20:34:21.915744696 -0400
++++ ./configure	2020-06-16 20:36:43.842819905 -0400
 @@ -268,6 +268,7 @@ External library support:
    --enable-libsrt          enable Haivision SRT protocol via libsrt [no]
    --enable-libssh          enable SFTP protocol via libssh [no]
@@ -34,8 +34,8 @@ diff -uprN ../ffmpeg-4.3-004/configure ./configure
  enabled libtesseract      && require_pkg_config libtesseract tesseract tesseract/capi.h TessBaseAPICreate
  enabled libtheora         && require libtheora theora/theoraenc.h th_info_init -ltheoraenc -ltheoradec -logg
 diff -uprN ../ffmpeg-4.3-004/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
---- ../ffmpeg-4.3-004/libavcodec/allcodecs.c	2020-06-16 18:57:35.419651626 -0400
-+++ ./libavcodec/allcodecs.c	2020-06-16 19:02:00.974629306 -0400
+--- ../ffmpeg-4.3-004/libavcodec/allcodecs.c	2020-06-16 20:34:21.916744767 -0400
++++ ./libavcodec/allcodecs.c	2020-06-16 20:36:43.842819905 -0400
 @@ -729,6 +729,7 @@ extern AVCodec ff_libshine_encoder;
  extern AVCodec ff_libspeex_encoder;
  extern AVCodec ff_libspeex_decoder;
@@ -46,8 +46,8 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_libvo_amrwbenc_encoder;
 diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 --- ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/libsvt_av1.c	2020-06-16 19:02:00.975629370 -0400
-@@ -0,0 +1,528 @@
++++ ./libavcodec/libsvt_av1.c	2020-06-16 20:36:43.843819976 -0400
+@@ -0,0 +1,551 @@
 +/*
 +* Scalable Video Technology for AV1 encoder library plugin
 +*
@@ -81,6 +81,9 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +#include "libavutil/avassert.h"
 +
 +#include "internal.h"
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(58, 90, 100)
++#include "packet_internal.h"
++#endif
 +#include "avcodec.h"
 +
 +typedef enum eos_status {
@@ -97,6 +100,7 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +
 +    EbBufferHeaderType         *in_buf;
 +    int                         raw_size;
++    int                         max_tu_size;
 +
 +    AVBufferPool* pool;
 +
@@ -197,11 +201,6 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +
 +    svt_enc->in_buf->size        = sizeof(*svt_enc->in_buf);
 +    svt_enc->in_buf->p_app_private  = NULL;
-+
-+    svt_enc->pool = av_buffer_pool_init(svt_enc->raw_size, NULL);
-+    if (!svt_enc->pool) {
-+        return AVERROR(ENOMEM);
-+    }
 +
 +    return 0;
 +
@@ -399,6 +398,30 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    return 0;
 +}
 +
++static AVBufferRef* get_output_ref(AVCodecContext *avctx, SvtContext  *svt_enc, int filled_len)
++{
++    if (filled_len > svt_enc->max_tu_size) {
++        const int MAX_FRAMES = 8;
++        int max_tu_size;
++        if (filled_len > svt_enc->raw_size * MAX_FRAMES) {
++            av_log(avctx, AV_LOG_ERROR, "something wrong in libsvtav1, the tu size > %d raw frame size.\n", MAX_FRAMES);
++            return NULL;
++        }
++        max_tu_size = 1 << av_ceil_log2(filled_len);
++        av_buffer_pool_uninit(&svt_enc->pool);
++        svt_enc->pool = av_buffer_pool_init(max_tu_size, NULL);
++        if (!svt_enc->pool) {
++            return NULL;
++        }
++        svt_enc->max_tu_size = max_tu_size;
++    }
++    if (!svt_enc->pool) {
++         av_log(avctx, AV_LOG_ERROR, "bug, no buffer pool.\n");
++         return NULL;
++    }
++    return av_buffer_pool_get(svt_enc->pool);
++}
++
 +static int eb_receive_packet(AVCodecContext *avctx, AVPacket *pkt)
 +{
 +    SvtContext  *svt_enc = avctx->priv_data;
@@ -414,7 +437,7 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    if (svt_ret == EB_NoErrorEmptyQueue)
 +        return AVERROR(EAGAIN);
 +
-+    ref = av_buffer_pool_get(svt_enc->pool);
++    ref = get_output_ref(avctx, svt_enc, headerPtr->n_filled_len);
 +    if (!ref) {
 +        av_log(avctx, AV_LOG_ERROR, "Failed to allocate output packet.\n");
 +        svt_av1_enc_release_out_buffer(&headerPtr);
@@ -577,8 +600,8 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    .wrapper_name   = "libsvt_av1",
 +};
 diff -uprN ../ffmpeg-4.3-004/libavcodec/Makefile ./libavcodec/Makefile
---- ../ffmpeg-4.3-004/libavcodec/Makefile	2020-06-16 18:57:35.420651690 -0400
-+++ ./libavcodec/Makefile	2020-06-16 19:02:00.975629370 -0400
+--- ../ffmpeg-4.3-004/libavcodec/Makefile	2020-06-16 20:34:21.915744696 -0400
++++ ./libavcodec/Makefile	2020-06-16 20:36:43.842819905 -0400
 @@ -1025,6 +1025,7 @@ OBJS-$(CONFIG_LIBSHINE_ENCODER)
  OBJS-$(CONFIG_LIBSPEEX_DECODER)           += libspeexdec.o
  OBJS-$(CONFIG_LIBSPEEX_ENCODER)           += libspeexenc.o

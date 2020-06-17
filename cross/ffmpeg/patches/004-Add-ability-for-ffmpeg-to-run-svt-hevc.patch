@@ -1,6 +1,6 @@
 diff -uprN ../ffmpeg-4.3-003/configure ./configure
 --- ../ffmpeg-4.3-003/configure	2020-06-16 17:34:08.000000000 -0400
-+++ ./configure	2020-06-16 18:57:35.419651626 -0400
++++ ./configure	2020-06-16 20:34:21.915744696 -0400
 @@ -267,6 +267,7 @@ External library support:
    --enable-libspeex        enable Speex de/encoding via libspeex [no]
    --enable-libsrt          enable Haivision SRT protocol via libsrt [no]
@@ -35,7 +35,7 @@ diff -uprN ../ffmpeg-4.3-003/configure ./configure
  enabled libtheora         && require libtheora theora/theoraenc.h th_info_init -ltheoraenc -ltheoradec -logg
 diff -uprN ../ffmpeg-4.3-003/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
 --- ../ffmpeg-4.3-003/libavcodec/allcodecs.c	2020-06-15 14:54:24.000000000 -0400
-+++ ./libavcodec/allcodecs.c	2020-06-16 18:57:35.419651626 -0400
++++ ./libavcodec/allcodecs.c	2020-06-16 20:34:21.916744767 -0400
 @@ -728,6 +728,7 @@ extern AVCodec ff_librsvg_decoder;
  extern AVCodec ff_libshine_encoder;
  extern AVCodec ff_libspeex_encoder;
@@ -46,7 +46,7 @@ diff -uprN ../ffmpeg-4.3-003/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_libvo_amrwbenc_encoder;
 diff -uprN ../ffmpeg-4.3-003/libavcodec/libsvt_hevc.c ./libavcodec/libsvt_hevc.c
 --- ../ffmpeg-4.3-003/libavcodec/libsvt_hevc.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/libsvt_hevc.c	2020-06-16 18:57:35.420651690 -0400
++++ ./libavcodec/libsvt_hevc.c	2020-06-16 20:34:21.916744767 -0400
 @@ -0,0 +1,559 @@
 +/*
 +* Scalable Video Technology for HEVC encoder library plugin
@@ -609,7 +609,7 @@ diff -uprN ../ffmpeg-4.3-003/libavcodec/libsvt_hevc.c ./libavcodec/libsvt_hevc.c
 +};
 diff -uprN ../ffmpeg-4.3-003/libavcodec/Makefile ./libavcodec/Makefile
 --- ../ffmpeg-4.3-003/libavcodec/Makefile	2020-06-15 14:54:24.000000000 -0400
-+++ ./libavcodec/Makefile	2020-06-16 18:57:35.420651690 -0400
++++ ./libavcodec/Makefile	2020-06-16 20:34:21.915744696 -0400
 @@ -1024,6 +1024,7 @@ OBJS-$(CONFIG_LIBRAV1E_ENCODER)
  OBJS-$(CONFIG_LIBSHINE_ENCODER)           += libshine.o
  OBJS-$(CONFIG_LIBSPEEX_DECODER)           += libspeexdec.o
