@@ -1,4 +1,4 @@
-bin:bin/ndiff
+rsc:bin/ndiff
 bin:bin/nmap
 bin:bin/nping
 rsc:share/nmap
