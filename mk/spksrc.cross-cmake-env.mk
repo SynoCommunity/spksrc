@@ -31,7 +31,7 @@ endif
 
 # set default build directory
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),)
-CMAKE_USE_DESTDIR = 0
+CMAKE_USE_DESTDIR = 1
 endif
 
 # set default build directory

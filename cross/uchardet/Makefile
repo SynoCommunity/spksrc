@@ -11,6 +11,4 @@ HOMEPAGE = https://www.freedesktop.org/wiki/Software/uchardet/
 COMMENT  = uchardet is an encoding detector library, which takes a sequence of bytes in an unknown character encoding without any additional information, and attempts to determine the encoding of the text. Returned encoding names are iconv-compatible.
 LICENSE  = Mozilla 1.1, GPLv2+, LGPLv2.1+
 
-CMAKE_USE_DESTDIR = 1
-
 include ../../mk/spksrc.cross-cmake.mk

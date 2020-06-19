@@ -12,6 +12,8 @@ HOMEPAGE = https://github.com/umurmur/umurmur
 COMMENT  = Minimalistic Murmur (Mumble server)
 LICENSE  = BSD 3-clause License
 
+CMAKE_USE_DESTDIR = 0
+
 include ../../mk/spksrc.cross-cmake.mk
 
 # Mandatory umurmur cmake

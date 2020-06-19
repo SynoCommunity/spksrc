@@ -20,8 +20,6 @@ UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 
-CMAKE_USE_DESTDIR = 1
-
 include ../../mk/spksrc.cross-cmake.mk
 
 # libaom specific cmake options

@@ -12,6 +12,8 @@ HOMEPAGE = https://github.com/intel/media-driver
 COMMENT  = The Intel Media Driver for VAAPI is a new VA-API (Video Acceleration API) user mode driver supporting hardware accelerated decoding, encoding, and video post processing for GEN based graphics hardware.
 LICENSE  = MIT
 
+CMAKE_USE_DESTDIR = 0
+
 include ../../mk/spksrc.cross-cmake.mk
 
 # intel-media-driver specific args
