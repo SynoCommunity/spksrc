@@ -34,6 +34,11 @@ endif
 # default cmake configure:
 cmake_configure_target:
 	@$(MSG) - CMake configure
+	@$(MSG)    - Dependencies = $(DEPENDS)
+	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
+	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
+	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
+	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)

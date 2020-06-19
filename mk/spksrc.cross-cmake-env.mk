@@ -16,6 +16,19 @@ CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
+# set default ASM build environment
+$(warning now we reached ifeq CMAKE_USE_NASM=$(CMAKE_USE_NASM))
+ifeq ($(strip $(CMAKE_USE_NASM)),1)
+DEPENDS += native/nasm 
+NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
+ENV += PATH=$(NASM_PATH):$$PATH
+ENV += AS=$(NASM_PATH)/nasm
+CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
+else
+CMAKE_USE_NASM = 0
+CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
+endif
+
 # set default build directory
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),)
 CMAKE_USE_DESTDIR = 0
@@ -31,20 +44,17 @@ ifeq ($(strip $(CMAKE_BUILD_DIR)),)
 CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/build
 endif
 
-# set path to assembler
-NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
-
 # Define GO_ARCH for go compiler
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-  CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
+  CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
