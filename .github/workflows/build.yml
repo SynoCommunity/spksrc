@@ -41,14 +41,14 @@ jobs:
             fetch-depth: 0
             persist-credentials: false
 
-      - name: Get changed files PR
+      - name: Get changed files for pull request
         if: github.event_name == 'pull_request'
         id: getfile_pr
         run: |
           git diff-tree --no-commit-id --name-only -r origin/master ${{github.event.pull_request.head.sha}} | xargs
           echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r origin/master ${{github.event.pull_request.head.sha}} | xargs)"
 
-      - name: Get changed files PUSH
+      - name: Get changed files for push
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') == false
         id: getfile
         run: |
@@ -87,22 +87,8 @@ jobs:
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
-      - name: List packages
-        run: mkdir -p packages; ls packages
-
-      - name: Upload build artifacts per arch
-        uses: actions/upload-artifact@v2
-        with:
-          name: package-${{ matrix.arch }}
-          path: packages/*.spk
-
-      - name: Upload build all artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: packages
-          path: packages/*.spk
-
       - name: Build Status
+        id: build_status
         # We need this status since we don't want to stop the build on errors.
         # Here we fail on build errors found in the build error file.
         uses: docker://synocommunity/spksrc:latest
@@ -112,6 +98,13 @@ jobs:
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: packages/*.spk
 
   release:
     needs: build

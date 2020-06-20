@@ -65,7 +65,7 @@ echo "===> PACKAGES to Build: ${build_packages}"
 # Build
 for package in ${build_packages}
 do
-    echo "----------------------------------------"
+    echo "::group:: ------ build ${package}"
     # make sure that the package exists
     if [ -f "./spk/${package}/Makefile" ]; then
         # use TCVERSION and ARCH to get real exit codes.
@@ -81,4 +81,5 @@ do
     else
         echo "spk/${package}/Makefile not found"
     fi
+    echo "::endgroup::"
 done
