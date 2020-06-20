@@ -24,6 +24,12 @@ echo ""
 echo "SUCCESS:"
 if [ -f "${BUILD_SUCCESS_FILE}" ]; then
     cat "${BUILD_SUCCESS_FILE}"
+    if [ -d packages ]; then
+        # show built package files
+        echo ""
+        ls -gh --time-style +"%Y.%m.%d %H:%M:%S"  packages/*
+        echo ""
+    fi
 else
     echo "none."
 fi
