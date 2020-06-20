@@ -12,13 +12,5 @@ COMMENT  = bc is an arbitrary precision numeric processing language.
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS =
-
-INSTALL_TARGET = myInstall
-POST_INSTALL_TARGET = myPostInstall
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

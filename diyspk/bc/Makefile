@@ -9,15 +9,12 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = bc is an arbitrary precision numeric processing language.
 DISPLAY_NAME = bc
 STARTABLE = no
-BETA = 1
 
 HOMEPAGE = https://www.gnu.org/software/bc/
 LICENSE = GPLv3
 HELP_URL = https://www.gnu.org/software/bc/manual/html_mono/bc.html
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SPK_COMMANDS = bin/bc bin/dc
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
