@@ -1,7 +1,7 @@
-bin:bin/2to3
-bin:bin/idle
-bin:bin/pydoc
-bin:bin/smtpd.py
+rsc:bin/2to3
+rsc:bin/idle
+rsc:bin/pydoc
+rsc:bin/smtpd.py
 lnk:bin/python
 lnk:bin/python2
 bin:bin/python@PKG_SHORT_VERS@
