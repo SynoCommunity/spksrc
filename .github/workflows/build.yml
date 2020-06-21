@@ -62,7 +62,7 @@ jobs:
         continue-on-error: true
         uses: docker://synocommunity/spksrc:latest
         with:
-          entrypoint: ./.github/actions/build-push-pr.sh
+          entrypoint: ./.github/actions/build.sh
         env:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
