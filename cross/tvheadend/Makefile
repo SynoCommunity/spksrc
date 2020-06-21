@@ -15,6 +15,7 @@ COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD an
 LICENSE  = GPL v3
 
 GNU_CONFIGURE = 1
+PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 
 CONFIGURE_ARGS = --enable-imagecache --enable-bundle --enable-trace --release
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
@@ -50,3 +51,8 @@ ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/libva
 endif
 endif
+
+.PHONY: tvheadend_pre_configure
+tvheadend_pre_configure:
+	# Fix so mkbundle finds the pngquant binary
+	@$(RUN) sed -i.bak "s|^pngquant_bin = '/usr|pngquant_bin = '$(STAGING_INSTALL_PREFIX)|g" support/mkbundle
