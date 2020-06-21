@@ -115,7 +115,6 @@ do
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE"   >> ${BUILD_SUCCESS_FILE}
     else
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
-        echo "::error::Build of ${package} (${GH_ARCH}) FAILED"
     fi
 
     if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then

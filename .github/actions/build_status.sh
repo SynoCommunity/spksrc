@@ -50,10 +50,9 @@ else
 fi
 
 echo ""
-echo "ERRORS:"
 if [ -f "${BUILD_ERROR_FILE}" ]; then
     if [ $(cat "${BUILD_ERROR_FILE}" | wc -l) -gt 0 ]; then
-        cat "${BUILD_ERROR_FILE}"
+        echo "::error::ERRORS:%0A$(cat ${BUILD_ERROR_FILE} | sed ':a;N;$!ba;s/\n/%0A/g')"
         echo ""
         echo "See log file of the build job to analyze the error(s)."
         echo ""
@@ -61,5 +60,7 @@ if [ -f "${BUILD_ERROR_FILE}" ]; then
         exit 1
     fi
 fi
+
+echo "ERRORS:"
 echo "none."
 echo ""
