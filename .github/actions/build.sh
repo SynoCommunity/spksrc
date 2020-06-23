@@ -106,8 +106,12 @@ for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"
 
-    # use TCVERSION and ARCH to get real exit codes.
-    make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}
+    if [ "${GH_ARCH}" != "noarch" ]; then
+        # use TCVERSION and ARCH to get real exit codes.
+        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}
+    else
+        make -C ./spk/${package}
+    fi
     result=$?
 
     if [ ${result} -eq 0 ];
