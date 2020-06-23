@@ -44,7 +44,7 @@ ifeq ($(strip $(CMAKE_BUILD_DIR)),)
 CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/build
 endif
 
-# Define GO_ARCH for go compiler
+# Define per arch specific common options
 ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
   CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
