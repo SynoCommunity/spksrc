@@ -1,5 +1,5 @@
 PKG_NAME = openssh
-PKG_VERS = 5.9p1
+PKG_VERS = 7.9p1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable
@@ -9,9 +9,10 @@ DEPENDS = cross/zlib cross/openssl
 
 HOMEPAGE = http://www.openssh.com/
 COMMENT  = Open source version of SSH connectivity tools
-LICENSE  =
+LICENSE  = BSD-style
 
 CONFIGURE_ARGS += cross_compiling=yes --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx
 CONFIGURE_ARGS += --disable-strip LD=$$CC
+ADDITIONAL_CFLAGS = -O1
 
 include ../../mk/spksrc.cross-cc.mk
