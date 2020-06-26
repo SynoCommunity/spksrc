@@ -11,4 +11,6 @@ HOMEPAGE = http://cffi.readthedocs.org
 COMMENT  = Foreign Function Interface for Python calling C code
 LICENSE  = MIT
 
+PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
+
 include ../../mk/spksrc.python-module.mk
