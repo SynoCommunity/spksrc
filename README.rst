@@ -26,7 +26,7 @@ A virtual machine based on an 64-bit version of Debian 10 stable OS is recommend
 * Install the requirements (in sync with Dockerfile)::
 
     sudo dpkg --add-architecture i386 && sudo apt-get update
-    sudo apt install autogen automake bc bison build-essential check cmake curl cython debootstrap expect flex g++-multilib gettext git gperf imagemagick intltool libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial ncurses-dev php pkg-config python3 python3-distutils scons subversion swig unzip xmlto zlib1g-dev
+    sudo apt install autogen automake bc bison build-essential check cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf imagemagick intltool libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial ncurses-dev php pkg-config python3 python3-distutils rename scons subversion swig texinfo unzip xmlto zlib1g-dev
     sudo pip install -U setuptools pip wheel httpie
 
 * You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.

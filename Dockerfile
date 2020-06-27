@@ -6,54 +6,58 @@ ENV LANG C.UTF-8
 # Manage i386 arch
 RUN dpkg --add-architecture i386
 
-# Install required packages (in sync with README.rst instructions
+# Install required packages (in sync with README.rst instructions)
 RUN apt-get update && apt-get install --no-install-recommends -y \
-        autogen \
-        automake \
-        bc \
-        bison \
-        build-essential \
-        check \
-        cmake \
-        curl \
-        cython \
-        debootstrap \
-        expect \
-        flex \
-        g++-multilib \
-        gettext \
-        git \
-        gperf \
-        imagemagick \
-        intltool \
-        libbz2-dev \
-        libc6-i386 \
-        libcppunit-dev \
-        libffi-dev \
-        libgc-dev \
-        libgmp3-dev \
-        libltdl-dev \
-        libmount-dev \
-        libncurses-dev \
-        libpcre3-dev \
-        libssl-dev \
-        libtool \
-        libunistring-dev \
-        lzip \
-        mercurial \
-        ncurses-dev \
-        php \
-        pkg-config \
-        python3 \
-        python3-distutils \
-        scons \
-        subversion \
-        swig \
-        unzip \
-        xmlto \
-        zlib1g-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+		autogen \
+		automake \
+		bc \
+		bison \
+		build-essential \
+		check \
+		cmake \
+		curl \
+		cython \
+		debootstrap \
+		ed \
+		expect \
+		flex \
+		g++-multilib \
+		gawk \
+		gettext \
+		git \
+		gperf \
+		imagemagick \
+		intltool \
+		libbz2-dev \
+		libc6-i386 \
+		libcppunit-dev \
+		libffi-dev \
+		libgc-dev \
+		libgmp3-dev \
+		libltdl-dev \
+		libmount-dev \
+		libncurses-dev \
+		libpcre3-dev \
+		libssl-dev \
+		libtool \
+		libunistring-dev \
+		lzip \
+		mercurial \
+		ncurses-dev \
+		php \
+		pkg-config \
+		python3 \
+		python3-distutils \
+		rename \
+		scons \
+		subversion \
+		swig \
+		texinfo \
+		unzip \
+		xmlto \
+		zlib1g-dev && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install setuptools, wheel and pip for Python3
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
