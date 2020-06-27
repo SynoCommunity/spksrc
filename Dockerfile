@@ -46,8 +46,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		ncurses-dev \
 		php \
 		pkg-config \
-		pngquant \
-		python3 python3-distutils \
+		python3 \
+		python3-distutils \
 		rename \
 		scons \
 		subversion \
