@@ -13,19 +13,9 @@ HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
 LICENSE  = GNU GPLv2
 
-CONFIGURE_TARGET = mysql-connector-c_configure
+include ../../mk/spksrc.cross-cmake.mk
 
-include ../../mk/spksrc.common.mk
-
-CMAKE_ARGS  = -DCMAKE_BUILD_TYPE=Release
-CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
-CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=1
-CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
-CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
-CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
-CMAKE_ARGS += -DCMAKE_EXE_LINKER_FLAGS="-L$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -Wl,--rpath-link,$(INSTALL_DIR)$(INSTALL_PREFIX)/lib -Wl,--rpath,$(INSTALL_PREFIX)/lib"
-CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
-CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
+# Mandatory for build
 CMAKE_ARGS += -DHAVE_LLVM_LIBCPP_EXITCODE=1 
 CMAKE_ARGS += -DHAVE_C_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE=1
 CMAKE_ARGS += -DHAVE_CXX_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE=1
@@ -46,10 +36,3 @@ endif
 
 # give access to comp_err binary on host
 ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$$PATH
-
-
-include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: mysql-connector-c_configure
-mysql-connector-c_configure:
-	@$(RUN) cmake $(CMAKE_ARGS)
