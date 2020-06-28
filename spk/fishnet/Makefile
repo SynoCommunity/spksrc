@@ -1,5 +1,6 @@
 SPK_NAME = fishnet
-SPK_VERS = 17.2.1
+# SPK_VERS must be in sync with src/requirements.txt
+SPK_VERS = 1.18.1
 SPK_REV = 1
 SPK_ICON= src/fishnet.png
 
@@ -12,18 +13,20 @@ MAINTAINER = mayweed
 DESCRIPTION = FishNet is a distributed Stockfish analysis service for lichess.org. You need an api key from lichess.org to run this service.
 DISPLAY_NAME = FishNet
 HOMEPAGE = https://github.com/niklasf/fishnet#readme
-CHANGELOG = "Initial package version."
+CHANGELOG = "Initial release with fishnet-20200613."
 
 LICENSE  = GPLv3
 STARTABLE = no
 
-WHEELS = src/requirements.txt
+UNSUPPORTED_ARCHS =$(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x
 
+WHEELS = src/requirements.txt
 SERVICE_SETUP = src/service-setup.sh
 
 POST_STRIP_TARGET = fishnet_extra_install
 
 include ../../mk/spksrc.spk.mk
+
 
 .PHONY: fishnet_extra_install
 fishnet_extra_install:

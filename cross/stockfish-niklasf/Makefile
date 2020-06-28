@@ -1,5 +1,5 @@
 PKG_NAME = Stockfish-fishnet
-PKG_VERS = 180120
+PKG_VERS = 20200613
 PKG_EXT = tar.gz
 PKG_DIST_NAME = fishnet-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/niklasf/Stockfish/archive
