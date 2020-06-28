@@ -17,7 +17,7 @@ LICENSE  = GPLv2/GPLv3
 include ../../mk/spksrc.common.mk
 
 # Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 SPK_COMMANDS = "bin/stockfish"
 

@@ -15,7 +15,7 @@ INSTALL_TARGET = Stockfish-fishnet_install
 include ../../mk/spksrc.common.mk
 
 # Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 # use builtin atomic support
@@ -39,9 +39,6 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 	BUILD_ARCH=ppc-32
-endif
-ifeq ($(BUILD_ARCH),)
-$(error "ARCH $(ARCH) not expected.")
 endif
 
 COMPILE_MAKE_OPTIONS = build ARCH=$(BUILD_ARCH)

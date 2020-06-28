@@ -18,7 +18,7 @@ CHANGELOG = "Initial release with fishnet-20200613."
 LICENSE  = GPLv3
 STARTABLE = no
 
-UNSUPPORTED_ARCHS =$(ARMV5_ARCHS) powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 WHEELS = src/requirements.txt
 SERVICE_SETUP = src/service-setup.sh
