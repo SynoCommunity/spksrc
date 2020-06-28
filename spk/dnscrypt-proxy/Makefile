@@ -1,6 +1,6 @@
 SPK_NAME = dnscrypt-proxy
-SPK_VERS = 2.0.42
-SPK_REV = 4
+SPK_VERS = 2.0.44
+SPK_REV = 5
 SPK_ICON = src/dnscrypt-proxy.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION = A flexible DNS proxy, with support for modern encrypted DNS protoc
 DISPLAY_NAME = dnscrypt-proxy
 HELPURL = https://github.com/jedisct1/dnscrypt-proxy/wiki
 LICENSE = ISC
-CHANGELOG = "Build generic ARMv7 packages"
+CHANGELOG = "Update to 2.0.44"
 
 STARTABLE = yes
 
