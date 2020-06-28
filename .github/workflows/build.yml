@@ -45,8 +45,8 @@ jobs:
         if: github.event_name == 'pull_request'
         id: getfile_pr
         run: |
-          git diff-tree --no-commit-id --name-only -r origin/master ${{github.event.pull_request.head.sha}} | xargs
-          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r origin/master ${{github.event.pull_request.head.sha}} | xargs)"
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
+          echo "::set-output name=files::$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)"
 
       - name: Get changed files for push
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') == false

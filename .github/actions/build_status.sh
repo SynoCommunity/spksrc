@@ -27,6 +27,7 @@ if [ -f "${BUILD_SUCCESS_FILE}" ]; then
     if [ -d packages ]; then
         # show built package files
         echo ""
+        echo "ARTIFACTS:"
         ls -gh --time-style +"%Y.%m.%d %H:%M:%S"  packages/*
         echo ""
     fi
