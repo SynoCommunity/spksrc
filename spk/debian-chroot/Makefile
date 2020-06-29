@@ -26,20 +26,27 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = debian-chroot_extra_install
 
+include ../../mk/spksrc.common.mk
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHES) $(ARM8_ARCHES)
+
 DEBIAN_ARCH =
-ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+DEBIAN_ARCH = arm64
+endif
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEBIAN_ARCH = i386
 endif
-ifeq ($(findstring $(ARCH),braswell bromolow cedarview x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DEBIAN_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEBIAN_ARCH = powerpc
 endif
 ifeq ($(strip $(DEBIAN_ARCH)),)
