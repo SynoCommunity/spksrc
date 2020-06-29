@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.3
-SPK_REV = 32
+SPK_REV = 33
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 4.3<br/>2. Update Intel libva to version 2.8<br/>4. DEBUG: tvheadend-ffmpeg.vaapi_encode patch disabled"
+CHANGELOG = "1. Update ffmpeg to 4.3<br/>2. Update Intel libva to version 2.8<br/>3. Enable ZeroMQ support<br/>4. DEBUG: tvheadend-ffmpeg.vaapi_encode patch disabled"
 
 DEPENDS = cross/$(SPK_NAME)
 
