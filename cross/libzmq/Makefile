@@ -14,3 +14,8 @@ COMMENT  = ZeroMQ (also known as ØMQ, 0MQ, or zmq) looks like an embeddable net
 LICENSE  = GPLv3
 
 include ../../mk/spksrc.cross-cmake.mk
+
+ifeq ($(findstring $(ARCH), 88f6281 ppc853x),$(ARCH))
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-lrt
+CMAKE_ARGS += -DCMAKE_C_FLAGS=-std=gnu99
+endif
