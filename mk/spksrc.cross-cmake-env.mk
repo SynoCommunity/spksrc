@@ -17,7 +17,6 @@ CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 # set default ASM build environment
-$(warning now we reached ifeq CMAKE_USE_NASM=$(CMAKE_USE_NASM))
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
 DEPENDS += native/nasm 
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin

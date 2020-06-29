@@ -33,7 +33,8 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
   GO_ARCH = amd64
 endif
 ifeq ($(GO_ARCH),)
-  $(error Unsupported ARCH $(ARCH))
+  # don't report error to use regular UNSUPPORTED_ARCHS logging
+  $(warning Unsupported ARCH $(ARCH))
 endif
 
 ifeq ($(strip $(GO_STATIC_BINARIES)),1)

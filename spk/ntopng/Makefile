@@ -19,10 +19,6 @@ DISPLAY_NAME = ntopng
 HELPURL = https://www.ntop.org/guides/ntopng/index.html
 LICENSE = GNU GPLv3
 
-# PPC_ARCHES except qoriq are not supported
-# https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
-
 # 'auto' (reserved value) grabs SPK_NAME
 SERVICE_USER   = auto
 SSS_SCRIPT     = src/start-stop-status.sh

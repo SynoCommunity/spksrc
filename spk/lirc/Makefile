@@ -7,9 +7,7 @@ FIRMWARE = 4.3-3776
 LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
-ifneq ($(findstring $(ARCH),powerpc),)
-$(error Sorry, this package does not support the $(ARCH) architecture)
-endif
+UNSUPPORTED_ARCHS = powerpc
 
 # include definition of PPC_ARCHES...
 include ../../mk/spksrc.common.mk
