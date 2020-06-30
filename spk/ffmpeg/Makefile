@@ -7,8 +7,8 @@ CHANGELOG = "1. Update ffmpeg to 4.2.3<br/>2. Update Intel libva to v2.7 and Int
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = th0ma7
-DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.
-DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.
+DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library. SynoCommunity ffmpeg binary is accessible at /usr/local/ffmpeg/bin/ffmpeg (pre-installed Synology ffmpeg command is not overwritten).
+DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo. La commande ffmpeg de SynoCommunity est /usr/local/ffmpeg/bin/ffmpeg (la commande pré-installée de Synology n'est pas écrasée).
 DISPLAY_NAME = ffmpeg
 STARTABLE = no
 
