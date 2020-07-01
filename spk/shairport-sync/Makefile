@@ -18,8 +18,8 @@ SERVICE_USER = auto
 FWPORTS = src/${SPK_NAME}.sc
 
 # the path of the pid file must be configured in the configfile
-# (sessioncontrol.daemon_pid_dir) as "/usr/local/$(SPK_NAME)/var"
-SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/$(SPK_NAME) --daemon --configfile=/usr/local/$(SPK_NAME)/var/$(SPK_NAME).conf
+# (sessioncontrol.daemon_pid_dir) as "/var/packages/$(SPK_NAME)/target/var"
+SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/$(SPK_NAME) --daemon --configfile=$(INSTALL_PREFIX)/var/$(SPK_NAME).conf
 
 POST_STRIP_TARGET = shairport_extra_install
 
@@ -30,4 +30,4 @@ include ../../mk/spksrc.spk.mk
 shairport_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
-	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf
+	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/$(SPK_NAME).conf
