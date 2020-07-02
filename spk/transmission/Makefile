@@ -33,7 +33,11 @@ POST_STRIP_TARGET = transmission_extra_install
 BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
+# build cross/curl without bundle of ca certificates (cert.pem)
+export CURL_SKIP_CA_BUNDLE = true
+
 include ../../mk/spksrc.spk.mk
+
 
 .PHONY: transmission_extra_install
 transmission_extra_install:
