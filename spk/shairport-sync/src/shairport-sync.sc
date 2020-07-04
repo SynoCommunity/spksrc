@@ -9,3 +9,9 @@ title="Shairport Sync UDP"
 desc="Shairport Sync UDP"
 port_forward="yes"
 dst.ports="8304:8313/udp"
+
+[shairport-sync-avahi]
+title="Shairport avahi UDP"
+desc="Shairport Sync avahi UDP"
+port_forward="yes"
+dst.ports="5353/udp"
