@@ -1,24 +1,25 @@
-diff -uprN ../ffmpeg-4.3-002/libavcodec/vaapi_encode.c ./libavcodec/vaapi_encode.c
---- ../ffmpeg-4.3-002/libavcodec/vaapi_encode.c	2020-06-15 14:54:24.000000000 -0400
-+++ ./libavcodec/vaapi_encode.c	2020-06-16 17:54:29.886074140 -0400
-@@ -26,6 +26,7 @@
+Binary files ../ffmpeg-4.3/libavcodec/.libx265.c.swp and ./libavcodec/.libx265.c.swp differ
+diff -uprN ../ffmpeg-4.3/libavcodec/vaapi_encode.c ./libavcodec/vaapi_encode.c
+--- ../ffmpeg-4.3/libavcodec/vaapi_encode.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/vaapi_encode.c	2020-07-05 10:35:03.647873029 -0400
+@@ -26,6 +26,8 @@
  
  #include "vaapi_encode.h"
  #include "avcodec.h"
 +#include "internal.h"
++#include "packet_internal.h"
  
  const AVCodecHWConfigInternal *ff_vaapi_encode_hw_configs[] = {
      HW_CONFIG_ENCODER_FRAMES(VAAPI, VAAPI),
-@@ -586,7 +587,7 @@ static int vaapi_encode_output(AVCodecCo
-     VAStatus vas;
+@@ -587,6 +589,7 @@ static int vaapi_encode_output(AVCodecCo
      int total_size = 0;
      uint8_t *ptr;
--    int err;
-+    int err, pict_type;
+     int err;
++    int pict_type;
  
      err = vaapi_encode_wait(avctx, pic);
      if (err < 0)
-@@ -624,6 +625,30 @@ static int vaapi_encode_output(AVCodecCo
+@@ -624,6 +627,30 @@ static int vaapi_encode_output(AVCodecCo
  
      pkt->pts = pic->pts;
  
@@ -34,8 +35,8 @@ diff -uprN ../ffmpeg-4.3-002/libavcodec/vaapi_encode.c ./libavcodec/vaapi_encode
 +        pict_type = AV_PICTURE_TYPE_B;
 +        break;
 +    default:
-+        pict_type = AV_PICTURE_TYPE_NONE;
-+        break;
++        av_log(avctx, AV_LOG_ERROR, "Unknown picture type encountered.\n");
++        return AVERROR_EXTERNAL;
 +    }
 +
 +#if FF_API_CODED_FRAME
