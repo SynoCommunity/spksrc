@@ -1,5 +1,5 @@
 PKG_NAME = SABnzbd
-PKG_VERS = 2.3.9
+PKG_VERS = 3.0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sabnzbd/sabnzbd/releases/download/$(PKG_VERS)
@@ -12,7 +12,6 @@ COMMENT  = Usenet binary downloader
 LICENSE  = GPL
 
 INSTALL_TARGET = sabnzbd_install
-
 
 include ../../mk/spksrc.install-resources.mk
 
