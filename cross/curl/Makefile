@@ -21,12 +21,16 @@ POST_INSTALL_TARGET = curl_post_install
 # 
 # definitive attempt would be to invert the logic and to
 # define CURL_CREATE_CA_BUNDLE only for packages that need such a bundle
+# - OR -
+# adjust all packages to use the DSM bundled ca certificates
 # 
-ifdef CURL_SKIP_CA_BUNDLE
+ifeq (true,$(CURL_SKIP_CA_BUNDLE))
 PLIST_TRANSFORM = sed -e '/rsc:cert.pem/d'
+CONFIGURE_ARGS += --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 EXTRA_POST_INSTALL =
 else
 EXTRA_POST_INSTALL = generate_ca_bundle
+CONFIGURE_ARGS += --with-ca-bundle=$(INSTALL_PREFIX)/cert.pem
 endif
 
 

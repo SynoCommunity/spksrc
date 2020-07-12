@@ -1,6 +1,6 @@
 SPK_NAME = transmission
 SPK_VERS = 3.00
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/transmission.png
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
@@ -12,7 +12,7 @@ DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "Update to v3.00."
+CHANGELOG = "1. Update to v3.00.<br/>2. Use DSM ca certificates for https"
 
 HOMEPAGE = https://transmissionbt.com
 LICENSE  = GPLv2/GPLv3
