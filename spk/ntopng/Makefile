@@ -1,6 +1,6 @@
 SPK_NAME = ntopng
 SPK_VERS = 3.8.1
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/$(SPK_NAME).png
 
 DEPENDS = cross/$(SPK_NAME)
