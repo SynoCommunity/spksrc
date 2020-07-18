@@ -1,5 +1,5 @@
 ### Download rules
-#   Download $(URLS) from the internet, and place them in $(DISTRIB_DIR).
+#   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR). 
 # Target are executed in the following order:
 #  download_msg_target
 #  pre_download_target   (override with PRE_DOWNLOAD_TARGET)
@@ -7,7 +7,7 @@
 #  post_download_target  (override with POST_DOWNLOAD_TARGET)
 # Variables:
 #  URLS:                 List of URL to download
-#  DISTRIB_DIR:          Downloaded files will be placed there.
+#  DISTRIB_DIR:          Downloaded files will be placed there.  
 
 
 DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
@@ -17,13 +17,15 @@ PRE_DOWNLOAD_TARGET = pre_download_target
 else
 $(PRE_DOWNLOAD_TARGET): download_msg
 endif
-
-ifeq ($(strip $(DOWNLOAD_TARGET)),)
-DOWNLOAD_TARGET = download_target
+ifneq (,$(findstring manual,$(strip $(DOWNLOAD_TARGET))))
+DOWNLOAD_TARGET = manual_dl_target
 else
-$(DOWNLOAD_TARGET): $(PRE_DOWNLOAD_TARGET)
+  ifeq ($(strip $(DOWNLOAD_TARGET)),)
+  DOWNLOAD_TARGET = download_target
+  else
+  $(DOWNLOAD_TARGET): $(PRE_DOWNLOAD_TARGET)
+  endif
 endif
-  
 ifeq ($(strip $(POST_DOWNLOAD_TARGET)),)
 POST_DOWNLOAD_TARGET = post_download_target
 else
@@ -35,6 +37,18 @@ endif
 
 download_msg:
 	@$(MSG) "Downloading files for $(NAME)"
+
+manual_dl_target:
+	@manual_dl=$(PKG_DIST_FILE) ; \
+	if [ -z "$$manual_dl" ] ; then \
+	  manual_dl=$(PKG_DIST_NAME) ; \
+	fi ; \
+	if [ -f "$(DISTRIB_DIR)/$$manual_dl" ] ; then \
+	  $(MSG) "File $$manual_dl already downloaded" ; \
+	else \
+	  $(MSG) "*** Manually download $$manual_dl from $(PKG_DIST_SITE) and place in $(DISTRIB_DIR). Stop." ; \
+	exit 1 ; \
+	fi ; \
 
 pre_download_target: download_msg
 
@@ -112,9 +126,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      fi ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -f $${localFile}.part ; \
-	        url=`echo $${url} | sed -e 's#^\(https\?://\(.*\.\)\?sourceforge\.net/.*\)$$#\1?use_mirror=autoselect#g'` ; \
-	        echo "curl $${url}" ; \
-	        curl --location --silent --output $${localFile}.part $${url} ; \
+	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
+	        echo "wget $${url}" ; \
+	        wget --secure-protocol=TLSv1_2 -nv -O $${localFile}.part $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
