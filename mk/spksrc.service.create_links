@@ -5,9 +5,9 @@ service_create_links ()
     for cmd in ${SPK_COMMANDS}
     do
         if [ -e "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-            mkdir -p "$(dirname /usr/local/${cmd})"
+            mkdir -p "$(dirname /usr/local/${cmd})"  >> "${INST_LOG}" 2>&1
             echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"  >> "${INST_LOG}"
-            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"
+            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"  >> "${INST_LOG}" 2>&1
         fi
     done
 
@@ -16,9 +16,9 @@ service_create_links ()
         _link=$(echo ${item} | sed "s/:.*//g")
         _target=$(echo ${item} | sed "s/.*://g")
         if [ -e "${SYNOPKG_PKGDEST}/${_target}" ]; then
-            mkdir -p "$(dirname ${_link})"
+            mkdir -p "$(dirname ${_link})"  >> "${INST_LOG}" 2>&1
             echo "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"  >> "${INST_LOG}"
-            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"
+            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"  >> "${INST_LOG}" 2>&1
         fi
     done
 }
@@ -31,8 +31,12 @@ service_remove_links ()
         if [ -L "/usr/local/${cmd}" ]; then
             if [ "$(readlink /usr/local/${cmd})" == "${SYNOPKG_PKGDEST}/${cmd}" ]; then
                 echo "remove link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"  >> "${INST_LOG}"
-                rm -f "/usr/local/${cmd}"
+                rm -f "/usr/local/${cmd}"  >> "${INST_LOG}" 2>&1
+            else
+                echo "skip remove link: /usr/local/${cmd} -> $(readlink /usr/local/${cmd})"  >> "${INST_LOG}"
             fi
+        else
+           echo "link to remove not found: /usr/local/${cmd}"  >> "${INST_LOG}"
         fi
     done
 
@@ -43,8 +47,12 @@ service_remove_links ()
         if [ -L "${_link}" ]; then
             if [ "$(readlink ${_link})" == "${SYNOPKG_PKGDEST}/${_target}" ]; then
                 echo "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"  >> "${INST_LOG}"
-                rm -f "${_link}"
+                rm -f "${_link}"  >> "${INST_LOG}" 2>&1
+            else
+                echo "skip remove link: ${_link} -> $(readlink ${_link})"  >> "${INST_LOG}"
             fi
+        else
+           echo "link to remove not found: ${_link}"  >> "${INST_LOG}"
         fi
     done
 }
