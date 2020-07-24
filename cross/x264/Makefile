@@ -1,10 +1,11 @@
 PKG_NAME = x264
-PKG_VERS = 20200419-stable
-PKG_GIT_HASH = 296494a4011f58f32adc54304a2654627558c59a
-PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/stable/
-PKG_DIR = $(PKG_NAME)-stable-$(PKG_GIT_HASH)
+PKG_VERS = 20200702-stable
+PKG_EXT = tar.gz
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = 4c2aafd864dd201832ec2be0fef4484925146650
+PKG_DIST_SITE = https://github.com/mirror/x264.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm
