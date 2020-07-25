@@ -1,9 +1,7 @@
 SPK_NAME = aria2
-SPK_VERS = 1.33.1
-SPK_REV = 6
+SPK_VERS = 1.35.0
+SPK_REV = 1
 SPK_ICON = src/aria2.png
-
-# override ARCH=arch-rtd1296
 
 DEPENDS = cross/$(SPK_NAME)
 
