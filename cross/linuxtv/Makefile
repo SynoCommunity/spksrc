@@ -36,6 +36,6 @@ linuxtv_configure:
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
-	$(RUN) env
-#	$(RUN) make allyesconfig
+	$(RUN) make allyesconfig
+	$(RUN) make MAKEFLAGS=
 #	$(RUN) make v4l MAKEFLAGS=
