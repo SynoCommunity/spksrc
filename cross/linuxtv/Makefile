@@ -33,9 +33,14 @@ linuxtv_configure:
 	$(RUN) make -C linux/ untar
 	$(RUN) wget $(FIRMWARE_URL)/$(FIRMWARE_PKG) -O $(FIRMWARE_PKG)
 	$(RUN) tar xvfj $(FIRMWARE_PKG) -C v4l
+	$(RUN) make allyesconfig
+	# Disable modules that do not compile
+	$(RUN) sed -i 's/CONFIG_VIDEOBUF_DMA_SG=m/# CONFIG_VIDEOBUF_DMA_SG is not set/' v4l/.config
+	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_V4L2=m/# CONFIG_VIDEOBUF2_V4L2 is not set/' v4l/.config
+	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_MEMOPS=m/# CONFIG_VIDEOBUF2_MEMOPS is not set/' v4l/.config
+	$(RUN) sed -i 's/CONFIG_VIDEO_IVTV=m/# CONFIG_VIDEO_IVTV is not set/' v4l/.config
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
-	$(RUN) make allyesconfig
-	$(RUN) make MAKEFLAGS=
+	$(RUN) make -j`nproc` MAKEFLAGS=
 #	$(RUN) make v4l MAKEFLAGS=
