@@ -77,4 +77,5 @@ kernel_configure_target:
 	# Update the Makefile
 	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
 	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
+	sed -i -r 's,^EXTRAVERSION\s*.+,EXTRAVERSION = +,' $(KERNEL_DIR)/Makefile
 	test -e $(WORK_DIR)/$(KERNEL_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_DIR)/arch/$(ARCH)
