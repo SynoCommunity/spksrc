@@ -28,7 +28,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: linuxtv_configure
 linuxtv_configure:
-	$(RUN) env
+	$(RUN) make release DIR=/home/spksrc/git-linuxtv/spksrc/kernel/syno-apollolake-6.1/work/source/linux
 	$(RUN) make -C linux/ download
 	$(RUN) make -C linux/ untar
 	$(RUN) wget $(FIRMWARE_URL)/$(FIRMWARE_PKG) -O $(FIRMWARE_PKG)
@@ -37,3 +37,5 @@ linuxtv_configure:
 .PHONY: linuxtv_compile
 linuxtv_compile:
 	$(RUN) env
+#	$(RUN) make allyesconfig
+#	$(RUN) make v4l MAKEFLAGS=
