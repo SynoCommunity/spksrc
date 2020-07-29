@@ -2,7 +2,8 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = apollolake
 TC_VERS = 6.2.2
-TC_FIRMWARE = 6.1-15047
+TC_FIRMWARE = 6.2.2-24922
+TC_KERNEL = 4.4.59+
 
 TC_DIST = apollolake-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz

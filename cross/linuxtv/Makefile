@@ -25,13 +25,13 @@ COMPILE_TARGET = linuxtv_compile
 
 # Blacklist modules that does not compile
 BLACKLIST = CONFIG_VIDEO_IVTV
-BLACKLIST = CONFIG_VIDEOBUF_DMA_SG
+BLACKLIST += CONFIG_VIDEOBUF_DMA_SG
 BLACKLIST += CONFIG_VIDEOBUF2_MEMOPS
 
 include ../../mk/spksrc.cross-cc.mk
 
 # does not compile under kernerl 4.15
-ifeq ($(findstring $(TCVERSION),6.1),$(TCVERSION))
+ifeq ($(findstring $(TC_KERNEL),4.4.59+),$(TC_KERNEL))
 BLACKLIST += CONFIG_VIDEOBUF2_V4L2
 endif
 

@@ -84,6 +84,7 @@ tc_vars: patch
 	@echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)
 	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
 	@echo TC_FIRMWARE := $(TC_FIRMWARE)
+	@echo TC_KERNEL := $(TC_KERNEL)
 	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)
 
