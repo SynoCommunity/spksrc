@@ -27,7 +27,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: linuxtv_configure
 linuxtv_configure:
-	$(RUN) make release DIR=/home/spksrc/git-linuxtv/spksrc/kernel/syno-apollolake-6.1/work/source/linux
+	$(RUN) make release DIR=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
 	$(RUN) make -C linux/ download
 	$(RUN) make -C linux/ untar
 	$(RUN) wget $(FIRMWARE_URL)/$(FIRMWARE_PKG) -O $(FIRMWARE_PKG)
@@ -36,8 +36,8 @@ linuxtv_configure:
 	$(RUN) make allyesconfig
 	# Disable modules that do not compile
 	$(RUN) sed -i 's/CONFIG_VIDEOBUF_DMA_SG=m/# CONFIG_VIDEOBUF_DMA_SG is not set/' v4l/.config
-	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_V4L2=m/# CONFIG_VIDEOBUF2_V4L2 is not set/' v4l/.config
-	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_MEMOPS=m/# CONFIG_VIDEOBUF2_MEMOPS is not set/' v4l/.config
+#	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_V4L2=m/# CONFIG_VIDEOBUF2_V4L2 is not set/' v4l/.config
+#	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_MEMOPS=m/# CONFIG_VIDEOBUF2_MEMOPS is not set/' v4l/.config
 	$(RUN) sed -i 's/CONFIG_VIDEO_IVTV=m/# CONFIG_VIDEO_IVTV is not set/' v4l/.config
 
 .PHONY: linuxtv_compile
