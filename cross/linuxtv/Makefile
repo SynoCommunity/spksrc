@@ -22,7 +22,6 @@ FIRMWARE_PKG = dvb-firmwares.tar.bz2
 
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
-INSTALL_TARGET = nop
 
 include ../../mk/spksrc.cross-cc.mk
 

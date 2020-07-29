@@ -1,6 +1,6 @@
 diff -uprN ../linuxtv-gitea2766f182b3a4e03543be2ded0845fca4d4fa80-ORIG/v4l/Makefile ./v4l/Makefile
---- ../linuxtv-gitea2766f182b3a4e03543be2ded0845fca4d4fa80-ORIG/v4l/Makefile	2020-07-20 04:26:22.000000000 -0400
-+++ ./v4l/Makefile	2020-07-28 20:26:51.043908729 -0400
+--- ../linuxtv-gitea2766f182b3a4e03543be2ded0845fca4d4fa80-ORIG/v4l/Makefile	2020-07-20 08:26:22.000000000 +0000
++++ ./v4l/Makefile	2020-07-29 00:38:55.941571653 +0000
 @@ -51,13 +51,13 @@ default:: prepare
  	@echo Kernel build directory is $(OUTDIR)
  	$(MAKE) -C ../linux apply_patches
@@ -17,3 +17,12 @@ diff -uprN ../linuxtv-gitea2766f182b3a4e03543be2ded0845fca4d4fa80-ORIG/v4l/Makef
  
  # Anything in this target shouldn't be build in parallel.
  prepare:: config-compat.h Makefile.media links
+@@ -416,7 +416,7 @@ old-install:: rminstall
+ 	-install -d $(DEST)
+ 	-install -m 644 -c $(inst-m) $(DEST)
+ 
+-	/sbin/depmod -a ${KERNELRELEASE}
++#	/sbin/depmod -a ${KERNELRELEASE}
+ 
+ #################################################
+ # Tree management rules
