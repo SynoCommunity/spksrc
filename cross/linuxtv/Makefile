@@ -43,3 +43,5 @@ linuxtv_configure:
 .PHONY: linuxtv_compile
 linuxtv_compile:
 	$(RUN) make -j`nproc` MAKEFLAGS=
+	# Disable depmod call for later install
+	$(RUN) sed -i '/depmod/s/^/#/' v4l/Makefile.media
