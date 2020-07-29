@@ -23,7 +23,17 @@ FIRMWARE_PKG = dvb-firmwares.tar.bz2
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
 
+# Blacklist modules that does not compile
+BLACKLIST = CONFIG_VIDEO_IVTV
+BLACKLIST = CONFIG_VIDEOBUF_DMA_SG
+BLACKLIST += CONFIG_VIDEOBUF2_MEMOPS
+
 include ../../mk/spksrc.cross-cc.mk
+
+# does not compile under kernerl 4.15
+ifeq ($(findstring $(TCVERSION),6.1),$(TCVERSION))
+BLACKLIST += CONFIG_VIDEOBUF2_V4L2
+endif
 
 .PHONY: linuxtv_configure
 linuxtv_configure:
@@ -35,10 +45,7 @@ linuxtv_configure:
 	# Final preparation for build
 	$(RUN) make allyesconfig
 	# Disable modules that do not compile
-	$(RUN) sed -i 's/CONFIG_VIDEOBUF_DMA_SG=m/# CONFIG_VIDEOBUF_DMA_SG is not set/' v4l/.config
-#	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_V4L2=m/# CONFIG_VIDEOBUF2_V4L2 is not set/' v4l/.config
-#	$(RUN) sed -i 's/CONFIG_VIDEOBUF2_MEMOPS=m/# CONFIG_VIDEOBUF2_MEMOPS is not set/' v4l/.config
-	$(RUN) sed -i 's/CONFIG_VIDEO_IVTV=m/# CONFIG_VIDEO_IVTV is not set/' v4l/.config
+	$(RUN) $(foreach kmodule,$(BLACKLIST),sed -i 's/$(kmodule)=m/# $(kmodule) is not set/' v4l/.config ;)
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
