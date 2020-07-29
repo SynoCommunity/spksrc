@@ -33,6 +33,7 @@ linuxtv_configure:
 	$(RUN) make -C linux/ untar
 	$(RUN) wget $(FIRMWARE_URL)/$(FIRMWARE_PKG) -O $(FIRMWARE_PKG)
 	$(RUN) tar xvfj $(FIRMWARE_PKG) -C v4l
+	# Final preparation for build
 	$(RUN) make allyesconfig
 	# Disable modules that do not compile
 	$(RUN) sed -i 's/CONFIG_VIDEOBUF_DMA_SG=m/# CONFIG_VIDEOBUF_DMA_SG is not set/' v4l/.config
@@ -43,4 +44,3 @@ linuxtv_configure:
 .PHONY: linuxtv_compile
 linuxtv_compile:
 	$(RUN) make -j`nproc` MAKEFLAGS=
-#	$(RUN) make v4l MAKEFLAGS=
