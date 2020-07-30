@@ -19,4 +19,6 @@ LICENSE  = GPLv2
 
 #SERVICE_SETUP = src/service-setup.sh
 
+PLIST_TRANSFORM = sed -e 's,TC_KERNEL,$(TC_KERNEL),'
+
 include ../../mk/spksrc.spk.mk

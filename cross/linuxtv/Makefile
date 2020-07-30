@@ -8,8 +8,10 @@ PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 MOD_DIR = /lib/modules
 
-REQ_KERNEL = 1
 DEPENDS =
+
+REQ_KERNEL = 1
+UNSUPPORTED_KERNEL = 3.10.102
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several userspace libraries and applications.
@@ -22,6 +24,7 @@ FIRMWARE_PKG = dvb-firmwares.tar.bz2
 
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
+INSTALL_TARGET = linuxtv_install
 
 # Blacklist modules that does not compile
 BLACKLIST = CONFIG_VIDEO_IVTV
@@ -31,12 +34,14 @@ BLACKLIST += CONFIG_VIDEOBUF2_MEMOPS
 include ../../mk/spksrc.cross-cc.mk
 
 # does not compile under kernerl 4.15
-ifeq ($(findstring $(TC_KERNEL),4.4.59+),$(TC_KERNEL))
+ifeq ($(findstring $(TC_KERNEL),4.4.15+),$(TC_KERNEL))
 BLACKLIST += CONFIG_VIDEOBUF2_V4L2
 endif
 
 .PHONY: linuxtv_configure
 linuxtv_configure:
+	@$(MSG) "TC_KERNEL=$(TC_KERNEL)"
+	@$(MSG) "BLACKLIST=$(BLACKLIST)"
 	$(RUN) make release DIR=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
 	$(RUN) make -C linux/ download
 	$(RUN) make -C linux/ untar
@@ -52,3 +57,11 @@ linuxtv_compile:
 	$(RUN) make -j`nproc` MAKEFLAGS=
 	# Disable depmod call for later install
 	$(RUN) sed -i '/depmod/s/^/#/' v4l/Makefile.media
+
+.PHONY: linuxtv_install
+linuxtv_install:
+	$(RUN) make install DESTDIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+	# Figure out how to install firmware
+#	$(RUN) cd v4l/firmware && make install FW_DIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+	# Look into potentially dynamically creating PLIST as needed, something similar to...
+#	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f | sed -e 's,.*\(module\),\1,g' -e 's,^,lib:lib/,' -e s',$(TC_KERNEL),TC_KERNEL,g' > ../PLIST
