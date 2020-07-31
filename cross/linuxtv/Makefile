@@ -12,6 +12,7 @@ DEPENDS =
 
 REQ_KERNEL = 1
 UNSUPPORTED_KERNEL = 3.10.102+
+UNSUPPORTED_KERNEL += 3.2.40+
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several userspace libraries and applications.
@@ -36,7 +37,10 @@ include ../../mk/spksrc.cross-cc.mk
 
 # Unsupported kernels
 ifeq ($(findstring $(TC_KERNEL),$(UNSUPPORTED_KERNEL)),$(TC_KERNEL))
-@$(error Kernel version '$(TC_KERNEL)' unsupported)
+  ifneq (,$(BUILD_UNSUPPORTED_FILE))
+    $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): Kernel version '$(TC_KERNEL)' is not supported >> $(BUILD_UNSUPPORTED_FILE))
+  endif
+  @$(error Kernel version '$(TC_KERNEL)' is not supported)
 endif
 
 # Modules that does not compile under kernel 4.15
