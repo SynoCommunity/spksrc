@@ -11,7 +11,7 @@ MOD_DIR = /lib/modules
 DEPENDS =
 
 REQ_KERNEL = 1
-UNSUPPORTED_KERNEL = 3.10.102
+UNSUPPORTED_KERNEL = 3.10.102+
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several userspace libraries and applications.
@@ -26,6 +26,7 @@ CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
 INSTALL_TARGET = linuxtv_install
 
+# (All non-USB modules should be disabled as well)
 # Blacklist modules that does not compile
 BLACKLIST = CONFIG_VIDEO_IVTV
 BLACKLIST += CONFIG_VIDEOBUF_DMA_SG
@@ -33,7 +34,12 @@ BLACKLIST += CONFIG_VIDEOBUF2_MEMOPS
 
 include ../../mk/spksrc.cross-cc.mk
 
-# does not compile under kernerl 4.15
+# Unsupported kernels
+ifeq ($(findstring $(TC_KERNEL),$(UNSUPPORTED_KERNEL)),$(TC_KERNEL))
+@$(error Kernel version '$(TC_KERNEL)' unsupported)
+endif
+
+# Modules that does not compile under kernel 4.15
 ifeq ($(findstring $(TC_KERNEL),4.4.15+),$(TC_KERNEL))
 BLACKLIST += CONFIG_VIDEOBUF2_V4L2
 endif
@@ -61,7 +67,8 @@ linuxtv_compile:
 .PHONY: linuxtv_install
 linuxtv_install:
 	$(RUN) make install DESTDIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
-	# Figure out how to install firmware
-#	$(RUN) cd v4l/firmware && make install FW_DIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
-	# Look into potentially dynamically creating PLIST as needed, something similar to...
-#	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f | sed -e 's,.*\(module\),\1,g' -e 's,^,lib:lib/,' -e s',$(TC_KERNEL),TC_KERNEL,g' > ../PLIST
+	# Install firmwares
+	$(RUN) tar xvfj $(FIRMWARE_PKG) -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
+	# Dynamically create PLIST for driver modules & firmwares
+	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f -name *.ko | sed -e 's,.*\(module\),\1,g' -e 's,^,lib:lib/,'    > ../PLIST
+	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f -name *.fw | sed -e 's,.*\(firmware\),\1,g' -e 's,^,bin:lib/,' >> ../PLIST
