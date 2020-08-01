@@ -19,4 +19,6 @@ LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
+STRIP_TARGET = nop
+
 include ../../mk/spksrc.spk.mk
