@@ -69,6 +69,6 @@ else
 NCPUS = $(PARALLEL_MAKE)
 endif
 ifeq ($(filter $(NCPUS),0 1),)
-COMPILE_MAKE_OPTIONS = -j$(NCPUS)
+COMPILE_MAKE_OPTIONS += -j$(NCPUS)
 endif
 endif
