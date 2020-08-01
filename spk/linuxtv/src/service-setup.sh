@@ -1,0 +1,66 @@
+FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
+KO_PATH=/var/packages/linuxtv/target/lib/modules/$(uname -r)/kernel/drivers/media
+KO="common/tveeprom.ko \
+    v4l2-core/v4l2-common.ko \
+    usb/dvb-usb/dvb-usb.ko \
+    usb/dvb-usb-v2/dvb_usb_v2.ko \
+    rc/rc-core.ko \
+    dvb-core/dvb-core.ko \
+    common/videobuf2/videobuf2-vmalloc.ko \
+    common/videobuf2/videobuf2-memops.ko \
+    common/videobuf2/videobuf2-v4l2.ko \
+    common/videobuf2/videobuf2-common.ko \
+    common/videobuf2/videodev.ko \
+    v4l2-core/media.ko"
+
+ModuleLOAD() {
+   echo "Loading kernel modules... "
+   for ko in $KO
+   do
+      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
+      printf '\t%-30s' $module
+
+      status=$(lsmod | grep "^$module ")
+      if [ $? -eq 0 -a "status" ]; then
+         echo "Already Loaded"
+      else
+         if [ -f $KO_PATH/$ko ]; then
+            insmod $KO_PATH/$ko
+            [ $? -eq 0 ] && echo "OK" || echo "ERROR"
+         else
+            echo "ERROR: Module $KO_PATH/$ko not found!"
+         fi
+      fi
+   done
+}
+
+ModuleUNLOAD() {
+   # Unload drivers in reverse order
+   echo "Unloading kernel modules... "
+   for item in $KO; do echo $item; done | tac | while read ko
+   do
+      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
+      printf '\t%-30s' $module
+
+      status=$(lsmod | grep "^$module ")
+      if [ $? -eq 0 -a "status" ]; then
+         rmmod $module
+         echo -ne "OK\n"
+      else
+         echo -ne "N/A\n"
+      fi
+   done
+}
+
+service_prestart ()
+{
+    echo "Starting LinuxTV" >> ${LOG_FILE}
+    ModuleLOAD              >> ${LOG_FILE}
+    echo "$FIRMWARE_PATH" > /sys/module/firmware_class/parameters/path
+}
+
+service_poststop ()
+{
+    echo "Starting LinuxTV" >> ${LOG_FILE}
+    ModuleUNLOAD            >> ${LOG_FILE}
+}

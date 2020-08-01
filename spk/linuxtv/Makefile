@@ -12,11 +12,11 @@ MAINTAINER = th0ma7
 DESCRIPTION = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several libraries and applications.
 DESCRIPTION_FRE = La communauté LinuxTV développe et maintient les sous-systèmes multimédia du noyau Linux et plusieurs bibliothèques et applications.
 DISPLAY_NAME = linuxtv
-STARTABLE = no
+STARTABLE = yes
 
 HOMEPAGE = https://linuxtv.org/
 LICENSE  = GPLv2
 
-#SERVICE_SETUP = src/service-setup.sh
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
