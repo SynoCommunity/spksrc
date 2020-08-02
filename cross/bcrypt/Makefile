@@ -11,4 +11,6 @@ HOMEPAGE = https://github.com/pyca/bcrypt
 COMMENT  = Modern password hashing for your software and your servers
 LICENSE  = Apache 2.0
 
+PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
+
 include ../../mk/spksrc.python-module.mk

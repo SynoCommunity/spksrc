@@ -25,10 +25,22 @@ PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$
 
 ### Python module rules
 compile_python_module:
+ifeq ($(strip $(CROSSENV)),)
+# Python 2 way
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
+else
+# Python 3 case: using crossenv helper
+	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
+endif
 
 install_python_module:
+ifeq ($(strip $(CROSSENV)),)
+# Python 2 way
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
+else
+# Python 3 case: using crossenv helper
+	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
+endif
 
 fix_shebang_python_module:
 	@cat PLIST | sed 's/:/ /' | while read type file ; do \

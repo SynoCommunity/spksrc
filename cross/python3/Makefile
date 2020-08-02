@@ -1,7 +1,7 @@
 PKG_NAME = python3
 PKG_VERS_MAJOR = 3
-PKG_VERS_MINOR = 6
-PKG_VERS_PATCH = 10
+PKG_VERS_MINOR = 7
+PKG_VERS_PATCH = 7
 PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -9,6 +9,10 @@ PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2 cross/xz
+# required for uuid module to be available
+DEPENDS += cross/libuuid
+# required because libffi is no longer bundled with python
+DEPENDS += cross/libffi
 DEPENDS += native/$(PKG_NAME)
 
 HOMEPAGE = http://www.python.org/
@@ -51,6 +55,8 @@ PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bi
 LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib:$(LD_LIBRARY_PATH)
 export PATH LD_LIBRARY_PATH
 
+ENV += LIBFFI_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/
+
 .PHONY: python3_post_patch
 python3_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
@@ -82,12 +88,18 @@ python3_custom_install:
 python3_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR) $(WORK_DIR)/crossenv/
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | build-python
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | python
+	. $(WORK_DIR)/crossenv/bin/activate && build-pip install "setuptools==44.1.0"  "wheel==0.33.6"
+	. $(WORK_DIR)/crossenv/bin/activate && pip install "setuptools==44.1.0" "wheel==0.33.6"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
 
 $(WORK_DIR)/python-cc.mk:
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
+	@echo CROSSENV=$(WORK_DIR)/crossenv/bin/activate >> $@
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_SITE_PACKAGES_NATIVE=$(PYTHON_SITE_PACKAGES_NATIVE) >> $@
