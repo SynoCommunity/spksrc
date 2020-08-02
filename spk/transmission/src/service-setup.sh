@@ -3,11 +3,12 @@
 PYTHON_DIR="/usr/local/python"
 PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.json"
+ENV="CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
 GROUP="sc-download"
 
-SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGDEST}/var/ -x ${PID_FILE} -e ${LOG_FILE}"
+SERVICE_COMMAND="env $(ENV) ${TRANSMISSION} -g ${SYNOPKG_PKGDEST}/var/ -x ${PID_FILE} -e ${LOG_FILE}"
 
 service_preinst ()
 {
