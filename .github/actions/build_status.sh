@@ -1,11 +1,11 @@
 #!/bin/bash
 # List the successfully built, the unsupported and the failed packages 
-# by name an timestamp.
+# by name and timestamp.
 # 
 # We do not want to terminate the build on errors as we want to build all 
 # packages.
 # Therfore failed builds are logged in the build error file defined by the 
-# env variable $BUILD_ERROR_FILE
+# env variable $BUILD_ERROR_FILE.
 # If this file exists and contains at least one line, we exit with error.
 # A special log file $BUILD_UNSUPPORTED_FILE contains known make errors that
 # are ignore here (unsupported ARCH or version of Toolchain)
@@ -42,6 +42,10 @@ if [ -f "${BUILD_UNSUPPORTED_FILE}" ]; then
     if [ -f "${BUILD_ERROR_FILE}" ]; then
         # remove unsupported packages from errors:
         unsupported_packages=$(cat "${BUILD_UNSUPPORTED_FILE}" | grep -Po "\- \K.*:" | sort -u | tr '\n' '|' | sed -e 's/|$//')
+        # fix for packages with different name
+        if [ "$(echo ${unsupported_packages} | grep -ow nzbdrone)" != "" ]; then
+            unsupported_packages=$(echo "${unsupported_packages}|sonarr")
+        fi
         cat "${BUILD_ERROR_FILE}" | grep -Pv "\- (${unsupported_packages}) " > "${BUILD_ERROR_FILE}.tmp"
         rm -f "${BUILD_ERROR_FILE}"
         mv "${BUILD_ERROR_FILE}.tmp" "${BUILD_ERROR_FILE}"
