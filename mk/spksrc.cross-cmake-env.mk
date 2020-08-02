@@ -49,13 +49,11 @@ ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -D__ARM_NEON__
-  CMAKE_ARGS += -DCMAKE_C_FLAGS=-mfpu=neon -D__ARM_NEON__
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
   CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON
-  CMAKE_ARGS += -DCMAKE_C_FLAGS=-mfloat-abi=softfp -mfpu=neon
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
