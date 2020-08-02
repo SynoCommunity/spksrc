@@ -16,8 +16,6 @@ service_postinst ()
     sed -i -e "s|@@_wizard_thinking_time_ms_@@|${wizard_thinking_time_ms}|g" ${CONFIG_FILE} >> ${INST_LOG} 2>&1
 
     ln -sf ${SYNOPKG_PKGDEST}/bin/stockfish /usr/local/bin/stockfish  >> ${INST_LOG} 2>&1
-
-    exit 0
 }
 
 
@@ -27,6 +25,4 @@ service_postuninst ()
     rm -rf ${WEB_DIR}  >> ${INST_LOG} 2>&1
 
     rm -f /usr/local/bin/stockfish  >> ${INST_LOG} 2>&1
-
-    exit 0
 }
