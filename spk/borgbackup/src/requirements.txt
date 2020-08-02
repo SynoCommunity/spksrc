@@ -1,7 +1,7 @@
 # Cross compiled packages dependencies
 #borgbackup==1.1.9
 #msgpack-python==0.5.6
-#ruamel.yaml==0.15.78
+ruamel.yaml==0.15.78
 
 # Downloaded dependencies
 borgmatic==1.2.15
