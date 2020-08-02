@@ -7,7 +7,7 @@ DNAME="OctoPrint"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
@@ -32,14 +32,14 @@ postinst ()
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-    # Create a Python virtualenv
+    # Create a Python3 virtualenv
     ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env > /dev/null
 
     # Install the wheels
-    ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
+    ${INSTALL_DIR}/env/bin/pip3 install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
 
     # Install OctoPrint
-    cd ${INSTALL_DIR}/share/OctoPrint && ${INSTALL_DIR}/env/bin/python setup.py install > /dev/null 2>&1
+    cd ${INSTALL_DIR}/share/OctoPrint && ${INSTALL_DIR}/env/bin/python3 setup.py install > /dev/null 2>&1
 
     # Create legacy user
     if [ "${BUILDNUMBER}" -lt "7321" ]; then

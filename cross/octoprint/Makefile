@@ -1,15 +1,16 @@
 PKG_NAME = OctoPrint
-PKG_VERS = 1.2.9
+PKG_VERS = 1.4.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/foosel/OctoPrint/archive
+PKG_DIST_SITE = https://github.com/OctoPrint/$(PKG_NAME)/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
 HOMEPAGE = https://octoprint.org/
-COMMENT  = OctoPrint is a so called host software for 3D printers that controls your 3D printer and sends it the actual commands to do its job.
+COMMENT  = OctoPrint provides a snappy web interface for controlling consumer 3D printers.
 LICENSE  = AGPLv3
 
 CONFIGURE_TARGET = nop
