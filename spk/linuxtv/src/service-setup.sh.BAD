@@ -55,13 +55,12 @@ ModuleUNLOAD() {
 
 service_prestart ()
 {
-    echo "Starting LinuxTV" >> ${LOG_FILE}
     ModuleLOAD              >> ${LOG_FILE}
     echo "$FIRMWARE_PATH" > /sys/module/firmware_class/parameters/path
 }
 
 service_poststop ()
 {
-    echo "Starting LinuxTV" >> ${LOG_FILE}
+    echo "Stopping linuxtv" >> ${LOG_FILE}
     ModuleUNLOAD            >> ${LOG_FILE}
 }
