@@ -1,0 +1,8 @@
+bin:bin/fftw-wisdom
+bin:bin/fftw-wisdom-to-conf
+lnk:lib/libfftw3f.so
+lnk:lib/libfftw3f.so.3
+lib:lib/libfftw3f.so.3.5.8
+lnk:lib/libfftw3f_threads.so
+lnk:lib/libfftw3f_threads.so.3
+lib:lib/libfftw3f_threads.so.3.5.8
