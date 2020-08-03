@@ -11,6 +11,7 @@ DEPENDS += cross/fribidi
 DEPENDS += cross/lame
 DEPENDS += cross/gnutls
 DEPENDS += cross/libtheora
+DEPENDS += cross/libxml2
 DEPENDS += cross/opencore-amr
 DEPENDS += cross/opus
 DEPENDS += cross/soxr
