@@ -6,6 +6,7 @@ PKG_DIST_SITE = http://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/flac
+DEPENDS += cross/fontconfig
 DEPENDS += cross/freetype
 DEPENDS += cross/fribidi
 DEPENDS += cross/lame
