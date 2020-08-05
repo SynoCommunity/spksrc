@@ -21,3 +21,4 @@ CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
 include ../../mk/spksrc.cross-cmake.mk
 
 CMAKE_ARGS += -DBUILD_TOOLS=ON
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_RPATH)

@@ -27,13 +27,15 @@ endif
 
 SPK_COMMANDS = bin/fpcalc
 
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: chromaprint_pre_depend
 
 # From library detection at cmake/modules/FindFFmpeg.cmake
-FFMPEG_LIBS = libavutil.pc libavformat.pc libavcodec.pc
+FFMPEG_LIBS = libavcodec.pc
+FFMPEG_LIBS += libavformat.pc
+FFMPEG_LIBS += libavutil.pc
+
 chromaprint_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
