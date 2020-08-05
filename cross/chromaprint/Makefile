@@ -9,15 +9,18 @@ HOMEPAGE = http://acoustid.org/chromaprint
 COMMENT  = Chromaprint is the core component of the AcoustID project. It\'s a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
 LICENSE  = LGPL2.1+
 
-include ../../mk/spksrc.cross-cmake.mk
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
-CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=/var/packages/ffmpeg/target/lib
+CMAKE_RPATH = /var/packages/ffmpeg/target/lib
 else
 DEPENDS = cross/ffmpeg
+CMAKE_RPATH =
 endif
 
-# chromaprint specific for proper build
+CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
+
+include ../../mk/spksrc.cross-cmake.mk
+
 CMAKE_ARGS += -DBUILD_TOOLS=ON
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_RPATH)

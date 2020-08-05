@@ -4,7 +4,7 @@ SPK_GIT_HASH = ce09077
 SPK_GIT_DATE = 20200713
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 23
+SPK_REV = 24
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -20,7 +20,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version ce09077 as of July 13th 2020<br/>2. Enable Intel VAAPI on Intel platforms<br/>3. Disable bintray cache<br/>4. Enable tracing<br/>5. Enable pngquant<br/>6. Enable libtheora<br/>7. Enable fdk-acc<br/>8. Enable re-using FFMPEG media and vaapi shared librairies"
+CHANGELOG = "1. Update to latest git version ce09077 as of July 13th 2020<br/>2. Enable Intel VAAPI on Intel platforms<br/>3. Disable bintray cache<br/>4. Enable tracing<br/>5. Enable pngquant<br/>6. Enable libtheora<br/>7. Enable fdk-acc<br/>8. Enable re-using FFMPEG media and vaapi shared librairies<br/>9. Update to ffmpeg 4.2.4"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
