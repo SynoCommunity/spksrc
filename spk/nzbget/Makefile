@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 25
+SPK_REV = 26
 SPK_ICON = src/nzbget.png
 
 DEPENDS = cross/busybox cross/p7zip cross/unrar

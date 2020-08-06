@@ -1,6 +1,6 @@
 SPK_NAME = git
 SPK_VERS = 2.26.2
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/git.png
 
 DEPENDS = cross/$(SPK_NAME)
