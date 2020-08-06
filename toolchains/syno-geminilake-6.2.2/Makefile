@@ -1,6 +1,6 @@
 TC_NAME = syno-$(TC_ARCH)
 
-TC_ARCH = apollolake
+TC_ARCH = geminilake
 TC_VERS = 6.2.2
 TC_FIRMWARE = 6.2.2-24922
 
