@@ -1,5 +1,5 @@
 PKG_NAME = SVT-HEVC
-PKG_VERS = 1.4.3
+PKG_VERS = 1.5.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/OpenVisualCloud/SVT-HEVC/archive
@@ -15,5 +15,7 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 
 # SVT-HEVC is only supported on x86_64 Intel platforms
 UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(ARM7_ARCHES) $(ARM8_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
+
+CMAKE_USE_NASM = 1
 
 include ../../mk/spksrc.cross-cmake.mk
