@@ -73,12 +73,6 @@ RUN pip3 install meson==0.56.0
 RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python
 RUN pip install virtualenv httpie
 
-# Install rustup
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
-        CARGO_HOME=/opt/cargo/ sh -s -- -y && . /opt/cargo/env
-
-ENV PATH="${PATH}:/opt/cargo/bin"
-
 # Volume pointing to spksrc sources
 VOLUME /spksrc
 

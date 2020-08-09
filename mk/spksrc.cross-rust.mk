@@ -40,6 +40,8 @@ ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = nop
 endif
 
+RUST_TOOLCHAIN ?= stable
+
 RUST_TARGET =
 # map archs to rust targets
 ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
@@ -65,31 +67,29 @@ ifeq ($(RUST_TARGET),)
 $(error Arch $(ARCH) not supported)
 endif
 
+# Use distrib folder as cargo download cache
+CARGO_HOME_PATH=/spksrc/distrib/cargo
+ENV += CARGO_HOME=$(CARGO_HOME_PATH)
+ENV += PATH=:$(CARGO_HOME_PATH)/bin/:$(PATH)
 
-# Default use release channel 'stable'
-ifeq ($(strip $(RUST_RELEASE_CHANNEL)),)
-RUST_RELEASE_CHANNEL = stable
+ifeq (,$(shell $(ENV) which rustup))
+install_rustup:
+	@echo "  ==> install rustup" ; \
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+	        CARGO_HOME=$(CARGO_HOME_PATH) sh -s -- -y
+else
+install_rustup:
+	@echo "  ==> rustup alredy installed" ;
 endif
 
-install_rust_toolchain:
-	@echo "  ==> install rust toolchain [$(RUST_RELEASE_CHANNEL)]" ; \
-	rustup toolchain install $(RUST_RELEASE_CHANNEL) ;  \
-	rustup default $(RUST_RELEASE_CHANNEL) ;
-
+install_rust_toolchain: install_rustup
+	@echo "  ==> install rust toolchain [$(RUST_TOOLCHAIN)]" ; \
+	env $(ENV) rustup toolchain install $(RUST_TOOLCHAIN) ;
 
 # Install rust target on demand:
-INSTALLED_RUST_TARGETS := $(shell rustup target list --installed)
-ifneq ($(findstring $(RUST_TARGET),${INSTALLED_RUST_TARGETS}),$(RUST_TARGET))
-install_rust_target:
+install_rust_target: install_rust_toolchain
 	@echo "  ==> install rust target [$(RUST_TARGET)]" ; \
-	rustup target install $(RUST_TARGET) ;
-
-else
-install_rust_target:
-	@echo "  ==> rust target [$(RUST_TARGET)] is already installed" ;
-
-endif
-
+	env $(ENV) rustup target install $(RUST_TARGET) ;
 
 # Set default RUST_SRC_DIR
 ifeq ($(strip $(RUST_SRC_DIR)),)
@@ -99,9 +99,6 @@ endif
 # Set linker environment variable
 RUST_LINKER_ENV=CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER
 CARGO_ENV=$(RUST_LINKER_ENV)=$(TC_PATH)$(TC_PREFIX)gcc
-
-# Use distrib folder as cargo download cache
-ENV += CARGO_HOME=/spksrc/distrib/cargo
 
 # Set the cargo parameters
 CARCO_BUILD_ARGS += --target=$(RUST_TARGET)
@@ -116,7 +113,7 @@ endif
 # Default rust build and installation with cargo
 rust_build_and_install_target:
 	@echo "  ==> Cargo install rust package $(PKG_NAME)"
-	$(CARGO_ENV) cargo install $(CARCO_BUILD_ARGS)
+	$(ENV) $(CARGO_ENV) cargo install $(CARCO_BUILD_ARGS)
 
 
 #####
