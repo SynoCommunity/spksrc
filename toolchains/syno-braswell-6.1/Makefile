@@ -3,6 +3,7 @@ TC_NAME = syno-$(TC_ARCH)
 TC_ARCH = braswell
 TC_VERS = 6.1
 TC_OS_MIN_VER = 6.1-15047
+TC_KERNEL = 3.10.102+
 
 TC_DIST = braswell-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz
