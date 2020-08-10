@@ -1,7 +1,7 @@
 ARCH ?= armada37xx
 TCVERSION ?= 6.2.2
 PKG_NAME = armada37xx
-PKG_BRANCH = 22259
+PKG_BRANCH = 24922
 PKG_ARCH = rtd1296
 PKG_EXT = txz
 PKG_DIST_NAME = linux-4.4.x.$(PKG_EXT)

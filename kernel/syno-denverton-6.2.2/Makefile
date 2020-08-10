@@ -1,7 +1,7 @@
 ARCH ?= denverton
 TCVERSION ?= 6.2.2
 PKG_NAME = denverton
-PKG_BRANCH = 15152
+PKG_BRANCH = 24922
 PKG_ARCH = $(PKG_NAME)
 PKG_EXT = txz
 PKG_DIST_NAME = linux-4.4.x.$(PKG_EXT)

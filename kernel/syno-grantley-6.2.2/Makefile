@@ -1,7 +1,7 @@
 ARCH ?= grantley
 TCVERSION ?= 6.2.2
 PKG_NAME = grantley
-PKG_BRANCH = 22259
+PKG_BRANCH = 24922
 PKG_ARCH = $(PKG_NAME)
 PKG_EXT = txz
 PKG_DIST_NAME = linux-3.10.x.$(PKG_EXT)
