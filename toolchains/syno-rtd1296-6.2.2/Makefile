@@ -3,6 +3,7 @@ TC_NAME = syno-$(TC_ARCH)
 TC_ARCH = rtd1296
 TC_VERS = 6.2.2
 TC_OS_MIN_VER = 6.2.2-24922
+TC_KERNEL = 4.4.59+
 
 TC_DIST = rtd1296-gcc494_glibc220_armv8-GPL
 TC_EXT = txz

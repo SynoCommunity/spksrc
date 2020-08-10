@@ -3,6 +3,7 @@ TC_NAME = syno-$(TC_ARCH)
 TC_ARCH = comcerto2k
 TC_VERS = 6.2.2
 TC_OS_MIN_VER = 6.2.2-24922
+TC_KERNEL = 3.2.40+
 
 TC_DIST = comcerto2k-gcc493_glibc220_hard-GPL
 TC_EXT = txz
