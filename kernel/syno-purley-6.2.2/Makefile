@@ -1,4 +1,4 @@
-ARCH ?= geminilake
+ARCH ?= purley
 TCVERSION ?= 6.2.2
 PKG_NAME = purley
 PKG_BRANCH = 24922
