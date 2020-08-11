@@ -3,6 +3,7 @@ TC_NAME = syno-alpine
 TC_ARCH = alpine alpine4k
 TC_VERS = 5.2
 TC_FIRMWARE = 5.2-5644
+TC_KERNEL = 3.2.40+
 
 TC_DIST = alpine-gcc464_glibc217_alpine-GPL
 TC_EXT = txz

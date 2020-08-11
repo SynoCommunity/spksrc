@@ -3,6 +3,7 @@ TC_NAME = syno-$(TC_ARCH)
 TC_ARCH = ppc853x
 TC_VERS = 5.2
 TC_FIRMWARE = 5.2-5644
+TC_KERNEL = 2.6.32.12+
 
 TC_DIST = 853x-gcc4374_eglibc2874_qoriq-GPL
 TC_EXT = txz

@@ -3,6 +3,7 @@ TC_NAME = syno-$(TC_ARCH)
 TC_ARCH = avoton
 TC_VERS = 5.2
 TC_FIRMWARE = 5.2-5644
+TC_KERNEL = 3.10.35+
 
 TC_DIST = avoton-gcc473_glibc217_x86_64-GPL
 TC_EXT = txz
