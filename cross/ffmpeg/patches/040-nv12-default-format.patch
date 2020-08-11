@@ -1,0 +1,11 @@
+--- a/libavfilter/vf_scale_vaapi.c
++++ ./libavfilter/vf_scale_vaapi.c
+@@ -206,7 +206,7 @@ static const AVOption scale_vaapi_options[] = {
+     { "h", "Output video height",
+       OFFSET(h_expr), AV_OPT_TYPE_STRING, {.str = "ih"}, .flags = FLAGS },
+     { "format", "Output video format (software format of hardware frames)",
+-      OFFSET(output_format_string), AV_OPT_TYPE_STRING, .flags = FLAGS },
++      OFFSET(output_format_string), AV_OPT_TYPE_STRING, {.str = "nv12"}, .flags = FLAGS },
+     { "mode", "Scaling mode",
+       OFFSET(mode), AV_OPT_TYPE_INT, { .i64 = VA_FILTER_SCALING_HQ },
+       0, VA_FILTER_SCALING_NL_ANAMORPHIC, FLAGS, "mode" },
