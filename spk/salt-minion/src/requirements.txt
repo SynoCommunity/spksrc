@@ -1,0 +1,15 @@
+salt==3001.1
+msgpack>=1.0.0
+Jinja2
+tornado==6.0.4
+singledispatch
+requests>=1.0.0
+distro
+pyzmq>=17.0.0
+pycryptodomex>=3.9.7
+certifi>=2017.4.17
+idna<3,>=2.5
+urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1
+chardet<4,>=3.0.2
+#CherryPy
+futures>=2.0
