@@ -1,10 +1,15 @@
-# Cross compiled packages dependencies
-#borgbackup==1.1.9
-#msgpack-python==0.5.6
-#ruamel.yaml==0.15.78
-
-# Downloaded dependencies
-borgmatic==1.2.15
-pykwalify==1.6.1
+#borgbackup==1.1.13
+borgmatic==1.5.9
+certifi==2020.6.20
+chardet==3.0.4
+colorama==0.4.3
 docopt==0.6.2
-python-dateutil==2.8.0
+idna==2.10
+pykwalify==1.7.0
+python-dateutil==2.8.1
+PyYAML==5.3.1
+requests==2.24.0
+#ruamel.yaml==0.16.10
+ruamel.yaml.clib==0.2.0
+six==1.15.0
+urllib3==1.25.10
