@@ -137,6 +137,7 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=ppc
+endif
 
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --disable-asm --cpu=e500v2
@@ -146,7 +147,6 @@ endif
 ifneq ($(findstring $(ARCH),ppc853x),$(ARCH))
 DEPENDS += cross/shine
 CONFIGURE_ARGS += --enable-libshine
-endif
 endif
 
 .PHONY: ffmpeg_post_install
