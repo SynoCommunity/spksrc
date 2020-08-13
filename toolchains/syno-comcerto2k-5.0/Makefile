@@ -7,7 +7,7 @@ TC_FIRMWARE = 5.0-4458
 TC_DIST = gcc464_glibc217_neon_comcerto-GPL
 TC_EXT = tgz
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/DSM%205.0%20Tool%20Chains/Mindspeed%20comcerto%202000%20Linux%203.2.40
+TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.0%20Tool%20Chains/Mindspeed%20comcerto%202000%20Linux%203.2.40
 
 TC_BASE_DIR = arm-cortexa9-linux-gnueabi
 TC_PREFIX = arm-cortexa9-linux-gnueabi
