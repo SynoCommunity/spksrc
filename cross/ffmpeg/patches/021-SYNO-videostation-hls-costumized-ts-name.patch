@@ -1,7 +1,7 @@
-diff -uprN ../ffmpeg-4.2.2-patch020/libavformat/segment.c ./libavformat/segment.c
---- ../ffmpeg-4.2.2-patch020/libavformat/segment.c	2020-01-25 07:06:19.384517161 -0500
-+++ ./libavformat/segment.c	2020-01-25 07:02:43.311726845 -0500
-@@ -238,9 +238,15 @@ static int set_segment_filename(AVFormat
+diff -uprN ../ffmpeg-4.3-020/libavformat/segment.c ./libavformat/segment.c
+--- ../ffmpeg-4.3-020/libavformat/segment.c	2020-06-16 19:54:41.000000000 -0400
++++ ./libavformat/segment.c	2020-06-16 19:57:31.891853716 -0400
+@@ -237,9 +237,15 @@ static int set_segment_filename(AVFormat
  
      if ((ret = av_reallocp(&seg->cur_entry.filename, size)) < 0)
          return ret;
@@ -17,9 +17,9 @@ diff -uprN ../ffmpeg-4.2.2-patch020/libavformat/segment.c ./libavformat/segment.
  
      return 0;
  }
-diff -uprN ../ffmpeg-4.2.2-patch020/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch020/synoconfig.h	2020-01-25 07:06:47.753218031 -0500
-+++ ./synoconfig.h	2020-01-25 07:03:03.793376048 -0500
+diff -uprN ../ffmpeg-4.3-020/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.3-020/synoconfig.h	2020-06-16 19:53:14.000000000 -0400
++++ ./synoconfig.h	2020-06-16 19:57:31.891853716 -0400
 @@ -10,3 +10,7 @@
  #if defined(SYNO_VIDEOSTATION)
  #define SYNO_VIDEOSTATION_HLS_SEEK_TIME

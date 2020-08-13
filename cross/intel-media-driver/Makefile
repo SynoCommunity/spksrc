@@ -1,5 +1,5 @@
 PKG_NAME = intel-media
-PKG_VERS = 20.1.1
+PKG_VERS = 20.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/media-driver/archive

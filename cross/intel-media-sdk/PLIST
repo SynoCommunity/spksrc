@@ -1,7 +1,7 @@
-lib:lib/libmfx.so.1.32
+lib:lib/libmfx.so.1.33
 lnk:lib/libmfx.so.1
 lnk:lib/libmfx.so
-lib:lib/libmfxhw64.so.1.32
+lib:lib/libmfxhw64.so.1.33
 lnk:lib/libmfxhw64.so.1
 lnk:lib/libmfxhw64.so
 lib:lib/libmfx_h264la_hw64.so

@@ -1,7 +1,7 @@
-diff -uprN ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
---- ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c	2019-12-31 16:35:22.000000000 -0500
-+++ ./fftools/ffmpeg_opt.c	2020-02-29 08:39:19.544147373 -0500
-@@ -122,6 +122,10 @@ static int ignore_unknown_streams = 0;
+diff -uprN ../ffmpeg-4.3-033-evansport-001/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.3-033-evansport-001/fftools/ffmpeg_opt.c	2020-06-15 14:54:23.000000000 -0400
++++ ./fftools/ffmpeg_opt.c	2020-06-28 08:07:33.445068259 -0400
+@@ -183,6 +183,10 @@ static int ignore_unknown_streams = 0;
  static int copy_unknown_streams = 0;
  static int find_stream_info = 1;
  
@@ -12,7 +12,7 @@ diff -uprN ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c ./fftools/ffm
  static void uninit_options(OptionsContext *o)
  {
      const OptionDef *po = options;
-@@ -692,6 +696,57 @@ static AVCodec *find_codec_or_die(const
+@@ -745,6 +749,57 @@ static AVCodec *find_codec_or_die(const
      return codec;
  }
  
@@ -70,7 +70,7 @@ diff -uprN ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c ./fftools/ffm
  static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *st)
  {
      char *codec_name = NULL;
-@@ -752,7 +807,12 @@ static void add_input_streams(OptionsCon
+@@ -805,7 +860,12 @@ static void add_input_streams(OptionsCon
              st->codecpar->codec_tag = tag;
          }
  
@@ -83,7 +83,7 @@ diff -uprN ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c ./fftools/ffm
          ist->decoder_opts = filter_codec_opts(o->g->codec_opts, ist->st->codecpar->codec_id, ic, st, ist->dec);
  
          ist->reinit_filters = -1;
-@@ -3364,6 +3424,10 @@ static int opt_progress(void *optctx, co
+@@ -3388,6 +3448,10 @@ static int opt_progress(void *optctx, co
  const OptionDef options[] = {
      /* main options */
      CMDUTILS_COMMON_OPTIONS
@@ -94,9 +94,9 @@ diff -uprN ../ffmpeg-4.2.2-evansport-patch001/fftools/ffmpeg_opt.c ./fftools/ffm
      { "f",              HAS_ARG | OPT_STRING | OPT_OFFSET |
                          OPT_INPUT | OPT_OUTPUT,                      { .off       = OFFSET(format) },
          "force format", "fmt" },
-diff -uprN ../ffmpeg-4.2.2-evansport-patch001/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-evansport-patch001/synoconfig.h	2020-02-25 18:55:30.000000000 -0500
-+++ ./synoconfig.h	2020-02-29 08:39:59.764248751 -0500
+diff -uprN ../ffmpeg-4.3-033-evansport-001/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.3-033-evansport-001/synoconfig.h	2020-06-28 07:35:35.109600070 -0400
++++ ./synoconfig.h	2020-06-28 08:07:33.445068259 -0400
 @@ -66,3 +66,11 @@
   * See Media Server #386
   */

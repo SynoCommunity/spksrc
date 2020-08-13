@@ -1,28 +1,28 @@
-diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/matroskaenc.c ./libavformat/matroskaenc.c
---- ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/matroskaenc.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavformat/matroskaenc.c	2019-10-15 22:12:46.424182043 -0400
-@@ -57,6 +57,8 @@
- #include "libavcodec/mpeg4audio.h"
- #include "libavcodec/internal.h"
+diff -uprN ../ffmpeg-4.3-022/libavformat/matroskaenc.c ./libavformat/matroskaenc.c
+--- ../ffmpeg-4.3-022/libavformat/matroskaenc.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavformat/matroskaenc.c	2020-06-27 16:37:13.468256460 -0400
+@@ -67,6 +67,8 @@ enum {
+     DEFAULT_MODE_PASSTHROUGH,
+ };
  
 +#include "synoconfig.h"
 +
  typedef struct ebml_master {
      int64_t         pos;                ///< absolute offset in the containing AVIOContext where the master's elements start
      int             sizebytes;          ///< how many bytes were reserved for the size
-@@ -161,6 +163,11 @@ typedef struct MatroskaMuxContext {
-     int64_t *stream_duration_offsets;
+@@ -157,6 +159,11 @@ typedef struct MatroskaMuxContext {
+     int                 default_mode;
  
-     int allow_raw_vfw;
+     uint32_t            segment_uid[4];
 +#ifdef SYNO_VIDEOSTATION_WEBM_SEEK_TIME
-+	int64_t seek_time;
-+	AVPacket old_key_packet;
-+	int unfilled;
++       int64_t seek_time;
++       AVPacket old_key_packet;
++       int unfilled;
 +#endif
  } MatroskaMuxContext;
  
  /** 2 bytes * 7 for EBML IDs, 7 1-byte EBML lengths, 6 1-byte uint,
-@@ -2036,6 +2043,11 @@ static int mkv_write_header(AVFormatCont
+@@ -1935,6 +1942,11 @@ static int mkv_write_header(AVFormatCont
              mkv->cluster_size_limit = 32 * 1024;
      }
  
@@ -32,63 +32,63 @@ diff -uprN ../ffmpeg-4.2.1-orig-fix-vaapi_encode/libavformat/matroskaenc.c ./lib
 +#endif
 +
      return 0;
- fail:
-     mkv_free(mkv);
-@@ -2471,6 +2483,41 @@ static int mkv_write_packet(AVFormatCont
+ }
+ 
+@@ -2374,6 +2386,41 @@ static int mkv_write_packet(AVFormatCont
      if (ret < 0)
          return ret;
  
 +#ifdef SYNO_VIDEOSTATION_WEBM_SEEK_TIME
-+	int64_t pts = AV_NOPTS_VALUE;
-+	if (0 < mkv->seek_time && mkv->unfilled) {
-+		if (codec_type != AVMEDIA_TYPE_VIDEO) {
-+			return 0;
-+		}
++       int64_t pts = AV_NOPTS_VALUE;
++       if (0 < mkv->seek_time && mkv->unfilled) {
++               if (codec_type != AVMEDIA_TYPE_VIDEO) {
++                       return 0;
++               }
 +
-+		if (pkt->pts != AV_NOPTS_VALUE) {
-+			pts = pkt->pts;
-+		} else if (pkt->dts != AV_NOPTS_VALUE) {
-+			pts = pkt->dts;
-+		}
-+		if (pts >= 0) {
-+			if (pkt->flags & AV_PKT_FLAG_KEY) {
-+				mkv->unfilled = 0;
-+			} else if (NULL != mkv->old_key_packet.data) {
-+				mkv->old_key_packet.pts = pkt->pts;
-+				mkv->old_key_packet.dts = pkt->dts;
-+				mkv->old_key_packet.duration = pkt->duration;
-+				av_free_packet(pkt);
-+				av_init_packet(pkt);
-+				av_copy_packet(pkt, &mkv->old_key_packet);
-+				mkv->unfilled = 0;
-+			}
-+			av_free_packet(&mkv->old_key_packet);
-+		} else {
-+			if (pkt->flags & AV_PKT_FLAG_KEY) {
-+				av_free_packet(&mkv->old_key_packet);
-+				av_copy_packet(&mkv->old_key_packet, pkt);
-+			}
-+			return 0;
-+		}
-+	}
++               if (pkt->pts != AV_NOPTS_VALUE) {
++                       pts = pkt->pts;
++               } else if (pkt->dts != AV_NOPTS_VALUE) {
++                       pts = pkt->dts;
++               }
++               if (pts >= 0) {
++                       if (pkt->flags & AV_PKT_FLAG_KEY) {
++                               mkv->unfilled = 0;
++                       } else if (NULL != mkv->old_key_packet.data) {
++                               mkv->old_key_packet.pts = pkt->pts;
++                               mkv->old_key_packet.dts = pkt->dts;
++                               mkv->old_key_packet.duration = pkt->duration;
++                               av_packet_unref(pkt);
++                               av_init_packet(pkt);
++                               av_copy_packet(pkt, &mkv->old_key_packet);
++                               mkv->unfilled = 0;
++                       }
++                       av_packet_unref(&mkv->old_key_packet);
++               } else {
++                       if (pkt->flags & AV_PKT_FLAG_KEY) {
++                               av_packet_unref(&mkv->old_key_packet);
++                               av_copy_packet(&mkv->old_key_packet, pkt);
++                       }
++                       return 0;
++               }
++       }
 +#endif
 +
-     if (mkv->tracks[pkt->stream_index].write_dts)
-         cluster_time = pkt->dts - mkv->cluster_pts;
-     else
-@@ -2787,6 +2834,9 @@ static const AVOption options[] = {
+     if (mkv->cluster_pos != -1) {
+         if (mkv->tracks[pkt->stream_index].write_dts)
+             cluster_time = pkt->dts - mkv->cluster_pts;
+@@ -2788,6 +2835,9 @@ static const AVOption options[] = {
+     { "dash", "Create a WebM file conforming to WebM DASH specification", OFFSET(is_dash), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
+     { "dash_track_number", "Track number for the DASH stream", OFFSET(dash_track_number), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, INT_MAX, FLAGS },
      { "live", "Write files assuming it is a live stream.", OFFSET(is_live), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
-     { "allow_raw_vfw", "allow RAW VFW mode", OFFSET(allow_raw_vfw), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
-     { "write_crc32", "write a CRC32 element inside every Level 1 element", OFFSET(write_crc), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
 +#ifdef SYNO_VIDEOSTATION_WEBM_SEEK_TIME
 +    { "webm_seek_time",    "seek time", OFFSET(seek_time), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, FLAGS },
 +#endif
-     { NULL },
- };
- 
-diff -uprN ../ffmpeg-4.2.2-patch029/synoconfig.h ./synoconfig.h
---- ../ffmpeg-4.2.2-patch029/synoconfig.h	2020-01-26 18:12:44.638839411 -0500
-+++ ./synoconfig.h	2020-01-26 18:17:30.946139082 -0500
+     { "allow_raw_vfw", "allow RAW VFW mode", OFFSET(allow_raw_vfw), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
+     { "write_crc32", "write a CRC32 element inside every Level 1 element", OFFSET(write_crc), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
+     { "default_mode", "Controls how a track's FlagDefault is inferred", OFFSET(default_mode), AV_OPT_TYPE_INT, { .i64 = DEFAULT_MODE_INFER }, DEFAULT_MODE_INFER, DEFAULT_MODE_PASSTHROUGH, FLAGS, "default_mode" },
+diff -uprN ../ffmpeg-4.3-022/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.3-022/synoconfig.h	2020-06-16 20:00:07.000000000 -0400
++++ ./synoconfig.h	2020-06-27 16:35:13.221186636 -0400
 @@ -22,3 +22,12 @@
  #if defined(SYNO_VIDEOSTATION)
  #define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX

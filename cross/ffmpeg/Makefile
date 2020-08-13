@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.2.4
+PKG_VERS = 4.3.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.ffmpeg.org/releases
@@ -11,6 +11,7 @@ DEPENDS += cross/libtheora
 DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265 cross/libvpx
 DEPENDS += cross/opencore-amr
+DEPENDS += cross/libzmq
 
 OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/ds.evansport cross/json-c
 OPTIONAL_DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
@@ -37,6 +38,7 @@ CONFIGURE_ARGS += --enable-libtheora --enable-libvorbis
 CONFIGURE_ARGS += --enable-libspeex
 CONFIGURE_ARGS += --enable-libvpx --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+CONFIGURE_ARGS += --enable-libzmq
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --enable-debug=1

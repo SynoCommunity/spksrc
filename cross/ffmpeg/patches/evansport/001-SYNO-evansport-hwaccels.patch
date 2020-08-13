@@ -1,7 +1,7 @@
-diff -uprN ../ffmpeg-4.2.1/configure ./configure
---- ../ffmpeg-4.2.1/configure	2020-01-04 21:07:34.000000000 -0500
-+++ ./configure	2020-01-05 10:11:42.748355139 -0500
-@@ -338,6 +338,7 @@ External library support:
+diff -uprN ../ffmpeg-4.3-033/configure ./configure
+--- ../ffmpeg-4.3-033/configure	2020-06-16 19:53:06.000000000 -0400
++++ ./configure	2020-06-28 07:35:48.841501435 -0400
+@@ -345,6 +345,7 @@ External library support:
    --enable-rkmpp           enable Rockchip Media Process Platform code [no]
    --disable-v4l2-m2m       disable V4L2 mem2mem code [autodetect]
    --disable-vaapi          disable Video Acceleration API (mainly Unix/Intel) code [autodetect]
@@ -9,7 +9,7 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
    --disable-vdpau          disable Nvidia Video Decode and Presentation API for Unix code [autodetect]
    --disable-videotoolbox   disable VideoToolbox code [autodetect]
  
-@@ -1715,6 +1716,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1724,6 +1725,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
      librubberband
      libvidstab
      libx264
@@ -17,7 +17,7 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
      libx265
      libxavs
      libxavs2
-@@ -1811,6 +1813,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1825,6 +1827,7 @@ EXTERNAL_LIBRARY_LIST="
      openal
      opengl
      pocketsphinx
@@ -25,7 +25,7 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
      vapoursynth
  "
  
-@@ -3207,6 +3210,7 @@ libwebp_encoder_deps="libwebp"
+@@ -3262,6 +3265,7 @@ libwebp_encoder_deps="libwebp"
  libwebp_anim_encoder_deps="libwebp"
  libx262_encoder_deps="libx262"
  libx264_encoder_deps="libx264"
@@ -33,7 +33,7 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
  libx264rgb_encoder_deps="libx264 x264_csp_bgr"
  libx264rgb_encoder_select="libx264_encoder"
  libx265_encoder_deps="libx265"
-@@ -6303,6 +6307,7 @@ enabled libwavpack        && require lib
+@@ -6417,6 +6421,7 @@ enabled libwavpack        && require lib
  enabled libwebp           && {
      enabled libwebp_encoder      && require_pkg_config libwebp "libwebp >= 0.2.0" webp/encode.h WebPGetEncoderVersion
      enabled libwebp_anim_encoder && check_pkg_config libwebp_anim_encoder "libwebpmux >= 0.4.0" webp/mux.h WebPAnimEncoderOptionsInit; }
@@ -41,9 +41,9 @@ diff -uprN ../ffmpeg-4.2.1/configure ./configure
  enabled libx264           && { check_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
                                 { require libx264 "stdint.h x264.h" x264_encoder_encode "-lx264 $pthreads_extralibs $libm_extralibs" &&
                                   warn "using libx264 without pkg-config"; } } &&
-diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
---- ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c	2019-12-31 16:35:22.000000000 -0500
-+++ ./fftools/ffmpeg.c	2020-02-29 10:42:04.535361983 -0500
+diff -uprN ../ffmpeg-4.3-033/fftools/ffmpeg.c ./fftools/ffmpeg.c
+--- ../ffmpeg-4.3-033/fftools/ffmpeg.c	2020-06-15 14:54:23.000000000 -0400
++++ ./fftools/ffmpeg.c	2020-06-28 07:35:48.843501566 -0400
 @@ -106,6 +106,84 @@
  
  #include "libavutil/avassert.h"
@@ -129,7 +129,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
  const char program_name[] = "ffmpeg";
  const int program_birth_year = 2000;
  
-@@ -483,12 +561,27 @@ const AVIOInterruptCB int_cb = { decode_
+@@ -491,12 +569,27 @@ const AVIOInterruptCB int_cb = { decode_
  static void ffmpeg_cleanup(int ret)
  {
      int i, j;
@@ -157,7 +157,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      for (i = 0; i < nb_filtergraphs; i++) {
          FilterGraph *fg = filtergraphs[i];
          avfilter_graph_free(&fg->graph);
-@@ -1194,6 +1287,12 @@ static void do_video_out(OutputFile *of,
+@@ -1183,6 +1276,12 @@ static void do_video_out(OutputFile *of,
      }
      ost->last_dropped = nb_frames == nb0_frames && next_picture;
  
@@ -170,7 +170,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      /* duplicates frame if needed */
      for (i = 0; i < nb_frames; i++) {
          AVFrame *in_picture;
-@@ -1216,6 +1315,10 @@ static void do_video_out(OutputFile *of,
+@@ -1205,6 +1304,10 @@ static void do_video_out(OutputFile *of,
          if (!check_recording_time(ost))
              return;
  
@@ -181,7 +181,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
          if (enc->flags & (AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME) &&
              ost->top_field_first >= 0)
              in_picture->top_field_first = !!ost->top_field_first;
-@@ -1290,6 +1393,122 @@ static void do_video_out(OutputFile *of,
+@@ -1280,6 +1383,122 @@ static void do_video_out(OutputFile *of,
          // Make sure Closed Captions will not be duplicated
          av_frame_remove_side_data(in_picture, AV_FRAME_DATA_A53_CC);
  
@@ -304,15 +304,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
          while (1) {
              ret = avcodec_receive_packet(enc, &pkt);
              update_benchmark("encode_video %d.%d", ost->file_index, ost->index);
-@@ -1674,7 +1893,6 @@ static void print_report(int is_last_rep
- 
-     t = (cur_time-timer_start) / 1000000.0;
- 
--
-     oc = output_files[0]->ctx;
- 
-     total_size = avio_size(oc->pb);
-@@ -1856,11 +2074,17 @@ static void ifilter_parameters_from_code
+@@ -1846,11 +2064,17 @@ static void ifilter_parameters_from_code
  static void flush_encoders(void)
  {
      int i, ret;
@@ -330,7 +322,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
  
          if (!ost->encoding_needed)
              continue;
-@@ -1919,6 +2143,9 @@ static void flush_encoders(void)
+@@ -1906,6 +2130,9 @@ static void flush_encoders(void)
                  desc   = "audio";
                  break;
              case AVMEDIA_TYPE_VIDEO:
@@ -340,7 +332,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
                  desc   = "video";
                  break;
              default:
-@@ -1929,6 +2156,10 @@ static void flush_encoders(void)
+@@ -1916,6 +2143,10 @@ static void flush_encoders(void)
              pkt.data = NULL;
              pkt.size = 0;
  
@@ -351,7 +343,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
              update_benchmark(NULL);
  
              while ((ret = avcodec_receive_packet(enc, &pkt)) == AVERROR(EAGAIN)) {
-@@ -1942,6 +2173,104 @@ static void flush_encoders(void)
+@@ -1929,6 +2160,104 @@ static void flush_encoders(void)
              }
  
              update_benchmark("flush_%s %d.%d", desc, ost->file_index, ost->index);
@@ -456,7 +448,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
              if (ret < 0 && ret != AVERROR_EOF) {
                  av_log(NULL, AV_LOG_FATAL, "%s encoding failed: %s\n",
                         desc,
-@@ -1955,6 +2284,9 @@ static void flush_encoders(void)
+@@ -1942,6 +2271,9 @@ static void flush_encoders(void)
                  output_packet(of, &pkt, ost, 1);
                  break;
              }
@@ -466,7 +458,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
              if (ost->finished & MUXER_FINISHED) {
                  av_packet_unref(&pkt);
                  continue;
-@@ -1962,6 +2294,21 @@ static void flush_encoders(void)
+@@ -1949,6 +2281,21 @@ static void flush_encoders(void)
              av_packet_rescale_ts(&pkt, enc->time_base, ost->mux_timebase);
              pkt_size = pkt.size;
              output_packet(of, &pkt, ost, 0);
@@ -488,7 +480,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
              if (ost->enc_ctx->codec_type == AVMEDIA_TYPE_VIDEO && vstats_filename) {
                  do_video_stats(ost, pkt_size);
              }
-@@ -2293,6 +2640,10 @@ static int decode_audio(InputStream *ist
+@@ -2270,6 +2617,10 @@ static int decode_audio(InputStream *ist
          return AVERROR(ENOMEM);
      decoded_frame = ist->decoded_frame;
  
@@ -499,7 +491,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      update_benchmark(NULL);
      ret = decode(avctx, decoded_frame, got_output, pkt);
      update_benchmark("decode_audio %d.%d", ist->file_index, ist->st->index);
-@@ -2344,6 +2695,29 @@ static int decode_audio(InputStream *ist
+@@ -2321,6 +2672,29 @@ static int decode_audio(InputStream *ist
  static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_t *duration_pts, int eof,
                          int *decode_failed)
  {
@@ -529,7 +521,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      AVFrame *decoded_frame;
      int i, ret = 0, err = 0;
      int64_t best_effort_timestamp;
-@@ -2468,6 +2842,251 @@ static int decode_video(InputStream *ist
+@@ -2445,6 +2819,251 @@ static int decode_video(InputStream *ist
  
      err = send_frame_to_filters(ist, decoded_frame);
  
@@ -781,7 +773,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
  fail:
      av_frame_unref(ist->filter_frame);
      av_frame_unref(decoded_frame);
-@@ -2605,7 +3224,12 @@ static int process_input_packet(InputStr
+@@ -2582,7 +3201,12 @@ static int process_input_packet(InputStr
      }
  
      // while we have more to decode or while the decoder did output something on EOF
@@ -794,7 +786,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
          int64_t duration_dts = 0;
          int64_t duration_pts = 0;
          int got_output = 0;
-@@ -3164,6 +3788,26 @@ static int init_output_stream_streamcopy
+@@ -3134,6 +3758,26 @@ static int init_output_stream_streamcopy
      return 0;
  }
  
@@ -821,7 +813,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
  static void set_encoder_id(OutputFile *of, OutputStream *ost)
  {
      AVDictionaryEntry *e;
-@@ -3662,6 +4306,14 @@ static void report_new_stream(int input_
+@@ -3623,6 +4267,14 @@ static void report_new_stream(int input_
  
  static int transcode_init(void)
  {
@@ -836,7 +828,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      int ret = 0, i, j, k;
      AVFormatContext *oc;
      OutputStream *ost;
-@@ -4501,6 +5153,23 @@ static int process_input(int file_index)
+@@ -4474,6 +5126,23 @@ static int process_input(int file_index)
          }
      }
  
@@ -860,7 +852,7 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      if (pkt.dts != AV_NOPTS_VALUE)
          ifile->last_ts = av_rescale_q(pkt.dts, ist->st->time_base, AV_TIME_BASE_Q);
  
-@@ -4520,6 +5189,90 @@ static int process_input(int file_index)
+@@ -4493,6 +5162,90 @@ static int process_input(int file_index)
  discard_packet:
      av_packet_unref(&pkt);
  
@@ -951,9 +943,9 @@ diff -uprN ../ffmpeg-4.2.2-patch033/fftools/ffmpeg.c ./fftools/ffmpeg.c
      return 0;
  }
  
-diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h ./fftools/ffmpeg.h
---- ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h	2019-08-05 16:52:21.000000000 -0400
-+++ ./fftools/ffmpeg.h	2020-01-18 09:42:59.123197281 -0500
+diff -uprN ../ffmpeg-4.3-033/fftools/ffmpeg.h ./fftools/ffmpeg.h
+--- ../ffmpeg-4.3-033/fftools/ffmpeg.h	2020-06-15 14:54:23.000000000 -0400
++++ ./fftools/ffmpeg.h	2020-06-28 07:35:48.843501566 -0400
 @@ -46,6 +46,8 @@
  
  #include "libswresample/swresample.h"
@@ -973,29 +965,10 @@ diff -uprN ../ffmpeg-4.2.1-patch049/fftools/ffmpeg.h ./fftools/ffmpeg.h
      int64_t last_ts;
      int64_t start_time;   /* user-specified start time in AV_TIME_BASE or AV_NOPTS_VALUE */
      int seek_timestamp;
-@@ -621,7 +626,6 @@ extern char *qsv_device;
- #endif
- extern HWDevice *filter_hw_device;
- 
--
- void term_init(void);
- void term_exit(void);
- 
-diff -uprN ../ffmpeg-4.2.1/libavcodec/aacdec.c ./libavcodec/aacdec.c
---- ../ffmpeg-4.2.1/libavcodec/aacdec.c	2019-09-06 18:18:26.000000000 -0400
-+++ ./libavcodec/aacdec.c	2020-01-04 21:09:06.627249440 -0500
-@@ -475,7 +475,6 @@ static int read_audio_mux_element(struct
-     return 0;
- }
- 
--
- static int latm_decode_frame(AVCodecContext *avctx, void *out,
-                              int *got_frame_ptr, AVPacket *avpkt)
- {
-diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
---- ../ffmpeg-4.2.1/libavcodec/allcodecs.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavcodec/allcodecs.c	2020-01-04 21:41:08.209443856 -0500
-@@ -137,6 +137,9 @@ extern AVCodec ff_h263p_encoder;
+diff -uprN ../ffmpeg-4.3-033/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
+--- ../ffmpeg-4.3-033/libavcodec/allcodecs.c	2020-06-16 19:53:06.000000000 -0400
++++ ./libavcodec/allcodecs.c	2020-06-28 07:35:48.844501632 -0400
+@@ -138,6 +138,9 @@ extern AVCodec ff_h263p_encoder;
  extern AVCodec ff_h263p_decoder;
  extern AVCodec ff_h263_v4l2m2m_decoder;
  extern AVCodec ff_h264_decoder;
@@ -1005,7 +978,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_h264_crystalhd_decoder;
  extern AVCodec ff_h264_v4l2m2m_decoder;
  extern AVCodec ff_h264_mediacodec_decoder;
-@@ -188,8 +191,14 @@ extern AVCodec ff_mpeg1video_encoder;
+@@ -190,8 +193,14 @@ extern AVCodec ff_mpeg1video_encoder;
  extern AVCodec ff_mpeg1video_decoder;
  extern AVCodec ff_mpeg2video_encoder;
  extern AVCodec ff_mpeg2video_decoder;
@@ -1020,7 +993,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_mpeg4_crystalhd_decoder;
  extern AVCodec ff_mpeg4_v4l2m2m_decoder;
  extern AVCodec ff_mpeg4_mmal_decoder;
-@@ -320,6 +329,9 @@ extern AVCodec ff_v410_decoder;
+@@ -326,6 +335,9 @@ extern AVCodec ff_v410_decoder;
  extern AVCodec ff_vb_decoder;
  extern AVCodec ff_vble_decoder;
  extern AVCodec ff_vc1_decoder;
@@ -1030,7 +1003,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_vc1_crystalhd_decoder;
  extern AVCodec ff_vc1image_decoder;
  extern AVCodec ff_vc1_mmal_decoder;
-@@ -352,6 +364,9 @@ extern AVCodec ff_wmv1_decoder;
+@@ -358,6 +370,9 @@ extern AVCodec ff_wmv1_decoder;
  extern AVCodec ff_wmv2_encoder;
  extern AVCodec ff_wmv2_decoder;
  extern AVCodec ff_wmv3_decoder;
@@ -1040,8 +1013,8 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
  extern AVCodec ff_wmv3_crystalhd_decoder;
  extern AVCodec ff_wmv3image_decoder;
  extern AVCodec ff_wnv1_decoder;
-@@ -739,6 +754,9 @@ extern AVCodec ff_idf_decoder;
- extern AVCodec ff_h263_v4l2m2m_encoder;
+@@ -763,6 +778,9 @@ extern AVCodec ff_h263_v4l2m2m_encoder;
+ extern AVCodec ff_libaom_av1_decoder;
  extern AVCodec ff_libopenh264_encoder;
  extern AVCodec ff_libopenh264_decoder;
 +#ifdef SYNO_EVANSPORT_SMD
@@ -1049,12 +1022,12 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
 +#endif
  extern AVCodec ff_h264_amf_encoder;
  extern AVCodec ff_h264_cuvid_decoder;
- extern AVCodec ff_h264_nvenc_encoder;
-diff -uprN ../ffmpeg-4.2.1/libavcodec/avcodec.h ./libavcodec/avcodec.h
---- ../ffmpeg-4.2.1/libavcodec/avcodec.h	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavcodec/avcodec.h	2020-01-05 08:11:20.313092171 -0500
-@@ -43,6 +43,8 @@
- 
+ extern AVCodec ff_h264_mf_encoder;
+diff -uprN ../ffmpeg-4.3-033/libavcodec/avcodec.h ./libavcodec/avcodec.h
+--- ../ffmpeg-4.3-033/libavcodec/avcodec.h	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/avcodec.h	2020-06-28 07:35:48.845501697 -0400
+@@ -49,6 +49,8 @@
+ #include "packet.h"
  #include "version.h"
  
 +#include "synoconfig.h"
@@ -1062,45 +1035,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/avcodec.h ./libavcodec/avcodec.h
  /**
   * @defgroup libavc libavcodec
   * Encoding/Decoding Library
-@@ -196,7 +198,6 @@
-  * @{
-  */
- 
--
- /**
-  * Identify the syntax and semantics of the bitstream.
-  * The principle is roughly:
-@@ -404,6 +405,13 @@ enum AVCodecID {
-     AV_CODEC_ID_HQX,
-     AV_CODEC_ID_TDSC,
-     AV_CODEC_ID_HQ_HQA,
-+#ifdef SYNO_EVANSPORT_SMD
-+    AV_CODEC_ID_H264_SYNO,
-+    AV_CODEC_ID_MPEG2VIDEO_SYNO,
-+    AV_CODEC_ID_VC1_SYNO,
-+    AV_CODEC_ID_WMV3_SYNO,
-+    AV_CODEC_ID_MPEG4_SYNO,
-+#endif
-     AV_CODEC_ID_HAP,
-     AV_CODEC_ID_DDS,
-     AV_CODEC_ID_DXV,
-@@ -697,7 +705,6 @@ enum AVCodecID {
-     AV_CODEC_ID_TIMED_ID3,
-     AV_CODEC_ID_BIN_DATA,
- 
--
-     AV_CODEC_ID_PROBE = 0x19000, ///< codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it
- 
-     AV_CODEC_ID_MPEG2TS = 0x20000, /**< _FAKE_ codec to indicate a raw MPEG-2 TS
-@@ -4549,7 +4556,6 @@ uint8_t *av_packet_pack_dictionary(AVDic
-  */
- int av_packet_unpack_dictionary(const uint8_t *data, int size, AVDictionary **dict);
- 
--
- /**
-  * Convenience function to free all the side data stored.
-  * All the other fields stay untouched.
-@@ -6221,6 +6227,10 @@ const AVCodecDescriptor *avcodec_descrip
+@@ -4135,6 +4135,10 @@ int avcodec_is_open(AVCodecContext *s);
   */
  AVCPBProperties *av_cpb_properties_alloc(size_t *size);
  
@@ -1111,10 +1046,10 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/avcodec.h ./libavcodec/avcodec.h
  /**
   * @}
   */
-diff -uprN ../ffmpeg-4.2.1/libavcodec/codec_desc.c ./libavcodec/codec_desc.c
---- ../ffmpeg-4.2.1/libavcodec/codec_desc.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavcodec/codec_desc.c	2020-01-04 21:09:06.647249738 -0500
-@@ -27,6 +27,8 @@
+diff -uprN ../ffmpeg-4.3-033/libavcodec/codec_desc.c ./libavcodec/codec_desc.c
+--- ../ffmpeg-4.3-033/libavcodec/codec_desc.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/codec_desc.c	2020-06-28 07:35:48.846501763 -0400
+@@ -29,6 +29,8 @@
  #include "profiles.h"
  #include "version.h"
  
@@ -1123,9 +1058,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/codec_desc.c ./libavcodec/codec_desc.c
  #define MT(...) (const char *const[]){ __VA_ARGS__, NULL }
  
  static const AVCodecDescriptor codec_descriptors[] = {
-@@ -1726,6 +1728,43 @@ static const AVCodecDescriptor codec_des
-         .long_name = NULL_IF_CONFIG_SMALL("On2 VP4"),
-         .props     = AV_CODEC_PROP_LOSSY,
+@@ -1777,6 +1779,43 @@ static const AVCodecDescriptor codec_des
+         .long_name = NULL_IF_CONFIG_SMALL("PFM (Portable FloatMap) image"),
+         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
      },
 +#ifdef SYNO_EVANSPORT_SMD
 +    {
@@ -1167,9 +1102,26 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/codec_desc.c ./libavcodec/codec_desc.c
  
      /* various PCM "codecs" */
      {
-diff -uprN ../ffmpeg-4.2.1/libavcodec/encode.c ./libavcodec/encode.c
---- ../ffmpeg-4.2.1/libavcodec/encode.c	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/encode.c	2020-01-04 21:54:37.528134367 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/codec_id.h ./libavcodec/codec_id.h
+--- ../ffmpeg-4.3-033/libavcodec/codec_id.h	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/codec_id.h	2020-06-28 07:40:07.700554997 -0400
+@@ -235,6 +235,13 @@ enum AVCodecID {
+     AV_CODEC_ID_HQX,
+     AV_CODEC_ID_TDSC,
+     AV_CODEC_ID_HQ_HQA,
++#ifdef SYNO_EVANSPORT_SMD
++    AV_CODEC_ID_H264_SYNO,
++    AV_CODEC_ID_MPEG2VIDEO_SYNO,
++    AV_CODEC_ID_VC1_SYNO,
++    AV_CODEC_ID_WMV3_SYNO,
++    AV_CODEC_ID_MPEG4_SYNO,
++#endif
+     AV_CODEC_ID_HAP,
+     AV_CODEC_ID_DDS,
+     AV_CODEC_ID_DXV,
+diff -uprN ../ffmpeg-4.3-033/libavcodec/encode.c ./libavcodec/encode.c
+--- ../ffmpeg-4.3-033/libavcodec/encode.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/encode.c	2020-06-28 07:35:48.846501763 -0400
 @@ -29,6 +29,8 @@
  #include "frame_thread_encoder.h"
  #include "internal.h"
@@ -1179,8 +1131,8 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/encode.c ./libavcodec/encode.c
  int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size, int64_t min_size)
  {
      if (avpkt->size < 0) {
-@@ -75,6 +77,13 @@ int ff_alloc_packet(AVPacket *avpkt, int
-     return ff_alloc_packet2(NULL, avpkt, size, 0);
+@@ -70,6 +72,13 @@ int ff_alloc_packet2(AVCodecContext *avc
+     }
  }
  
 +#ifdef SYNO_EVANSPORT_SMD
@@ -1193,9 +1145,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/encode.c ./libavcodec/encode.c
  /**
   * Pad last frame with silence.
   */
-diff -uprN ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c ./libavcodec/h263dec.c
---- ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavcodec/h263dec.c	2020-01-17 11:01:56.496391874 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/h263dec.c ./libavcodec/h263dec.c
+--- ../ffmpeg-4.3-033/libavcodec/h263dec.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/h263dec.c	2020-06-28 07:35:48.847501828 -0400
 @@ -45,6 +45,16 @@
  #include "thread.h"
  #include "wmv2.h"
@@ -1393,9 +1345,9 @@ diff -uprN ../ffmpeg-4.2.1-patch059/libavcodec/h263dec.c ./libavcodec/h263dec.c
  const enum AVPixelFormat ff_h263_hwaccel_pixfmt_list_420[] = {
  #if CONFIG_H263_VAAPI_HWACCEL || CONFIG_MPEG4_VAAPI_HWACCEL
      AV_PIX_FMT_VAAPI,
-diff -uprN ../ffmpeg-4.2.1/libavcodec/h263.h ./libavcodec/h263.h
---- ../ffmpeg-4.2.1/libavcodec/h263.h	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/h263.h	2020-01-04 21:43:01.346940098 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/h263.h ./libavcodec/h263.h
+--- ../ffmpeg-4.3-033/libavcodec/h263.h	2020-05-21 11:55:31.000000000 -0400
++++ ./libavcodec/h263.h	2020-06-28 07:35:48.847501828 -0400
 @@ -27,6 +27,8 @@
  #include "h263data.h"
  #include "rl.h"
@@ -1427,26 +1379,10 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h263.h ./libavcodec/h263.h
  int ff_h263_decode_end(AVCodecContext *avctx);
  void ff_h263_encode_mb(MpegEncContext *s,
                         int16_t block[6][64],
-@@ -74,7 +83,6 @@ void ff_init_qscale_tab(MpegEncContext *
- int ff_h263_pred_dc(MpegEncContext * s, int n, int16_t **dc_val_ptr);
- void ff_h263_pred_acdc(MpegEncContext * s, int16_t *block, int n);
- 
--
- /**
-  * Print picture info if FF_DEBUG_PICT_INFO is set.
-  */
-@@ -95,7 +103,6 @@ void ff_clean_h263_qscales(MpegEncContex
- int ff_h263_resync(MpegEncContext *s);
- void ff_h263_encode_motion(PutBitContext *pb, int val, int f_code);
- 
--
- static inline int h263_get_motion_length(int val, int f_code){
-     int l, bit_size, code;
- 
-diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_parser.c ./libavcodec/h264_parser.c
---- ../ffmpeg-4.2.1/libavcodec/h264_parser.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavcodec/h264_parser.c	2020-01-04 21:09:07.155257308 -0500
-@@ -713,7 +713,11 @@ static av_cold int init(AVCodecParserCon
+diff -uprN ../ffmpeg-4.3-033/libavcodec/h264_parser.c ./libavcodec/h264_parser.c
+--- ../ffmpeg-4.3-033/libavcodec/h264_parser.c	2020-06-16 20:10:09.000000000 -0400
++++ ./libavcodec/h264_parser.c	2020-06-28 07:35:48.847501828 -0400
+@@ -710,7 +710,11 @@ static av_cold int init(AVCodecParserCon
  }
  
  AVCodecParser ff_h264_parser = {
@@ -1458,9 +1394,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_parser.c ./libavcodec/h264_parser.c
      .priv_data_size = sizeof(H264ParseContext),
      .parser_init    = init,
      .parser_parse   = h264_parse,
-diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_smd.h ./libavcodec/h264_smd.h
---- ../ffmpeg-4.2.1/libavcodec/h264_smd.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/h264_smd.h	2020-01-04 21:09:07.159257367 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/h264_smd.h ./libavcodec/h264_smd.h
+--- ../ffmpeg-4.3-033/libavcodec/h264_smd.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/h264_smd.h	2020-06-28 07:35:48.848501894 -0400
 @@ -0,0 +1,804 @@
 +/*
 + * H.26L/H.264/AVC/JVT/14496-10/... encoder/decoder
@@ -2266,9 +2202,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/h264_smd.h ./libavcodec/h264_smd.h
 +
 +#endif /* SYNO_EVANSPORT_SMD */
 +#endif /* AVCODEC_H264_H */
-diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd_ffmpeg_audio_util.c
---- ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/ismd_ffmpeg_audio_util.c	2020-01-14 14:30:02.609981781 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd_ffmpeg_audio_util.c
+--- ../ffmpeg-4.3-033/libavcodec/ismd_ffmpeg_audio_util.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/ismd_ffmpeg_audio_util.c	2020-06-28 07:35:48.848501894 -0400
 @@ -0,0 +1,1213 @@
 +/*
 + * This file contains utility functions
@@ -3483,9 +3419,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.c ./libavcodec/ismd
 +	return 0;
 +}
 +#endif
-diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.h ./libavcodec/ismd_ffmpeg_audio_util.h
---- ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/ismd_ffmpeg_audio_util.h	2020-01-04 21:09:07.159257367 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/ismd_ffmpeg_audio_util.h ./libavcodec/ismd_ffmpeg_audio_util.h
+--- ../ffmpeg-4.3-033/libavcodec/ismd_ffmpeg_audio_util.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/ismd_ffmpeg_audio_util.h	2020-06-28 07:35:48.848501894 -0400
 @@ -0,0 +1,55 @@
 +/*
 + * This file contains utility functions
@@ -3542,9 +3478,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/ismd_ffmpeg_audio_util.h ./libavcodec/ismd
 +int syno_smd_get_heap(AVPacket *avpkt, int flush);
 +#endif
 +#endif
-diff -uprN ../ffmpeg-4.2.1/libavcodec/libavcodec.v ./libavcodec/libavcodec.v
---- ../ffmpeg-4.2.1/libavcodec/libavcodec.v	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/libavcodec.v	2020-01-04 22:03:44.595352557 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/libavcodec.v ./libavcodec/libavcodec.v
+--- ../ffmpeg-4.3-033/libavcodec/libavcodec.v	2020-05-21 11:55:31.000000000 -0400
++++ ./libavcodec/libavcodec.v	2020-06-28 07:35:48.848501894 -0400
 @@ -1,6 +1,8 @@
  LIBAVCODEC_MAJOR {
      global:
@@ -3554,10 +3490,10 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/libavcodec.v ./libavcodec/libavcodec.v
      local:
          *;
  };
-diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
---- ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c	2020-01-21 10:03:16.000000000 -0500
-+++ ./libavcodec/libx264.c	2020-01-21 10:20:29.764267921 -0500
-@@ -44,6 +44,19 @@
+diff -uprN ../ffmpeg-4.3-033/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.3-033/libavcodec/libx264.c	2020-06-16 17:34:12.000000000 -0400
++++ ./libavcodec/libx264.c	2020-06-28 07:46:54.543515438 -0400
+@@ -46,6 +46,19 @@
  // blocks of pixels (with respect to the luma plane)
  #define MB_SIZE 16
  
@@ -3574,10 +3510,10 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
 +static bool x264_closed = false;
 +#endif
 +
- typedef struct X264Context {
-     AVClass        *class;
-     x264_param_t    params;
-@@ -473,10 +486,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
+ typedef struct X264Opaque {
+     int64_t reordered_opaque;
+     int64_t wallclock;
+@@ -503,10 +516,145 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return 0;
  }
  
@@ -3723,7 +3659,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
      av_freep(&avctx->extradata);
      av_freep(&x4->sei);
      av_freep(&x4->reordered_opaque);
-@@ -486,6 +634,26 @@ static av_cold int X264_close(AVCodecCon
+@@ -516,6 +664,26 @@ static av_cold int X264_close(AVCodecCon
          x4->enc = NULL;
      }
  
@@ -3750,7 +3686,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
      return 0;
  }
  
-@@ -949,6 +1117,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -966,6 +1134,207 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return 0;
  }
  
@@ -3958,7 +3894,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  static const enum AVPixelFormat pix_fmts_8bit[] = {
      AV_PIX_FMT_YUV420P,
      AV_PIX_FMT_YUVJ420P,
-@@ -1151,6 +1520,15 @@ static const AVClass x264_class = {
+@@ -1168,6 +1537,15 @@ static const AVClass x264_class = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -3974,7 +3910,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  AVCodec ff_libx264_encoder = {
      .name             = "libx264",
      .long_name        = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
-@@ -1178,6 +1556,23 @@ static const AVClass rgbclass = {
+@@ -1199,6 +1577,23 @@ static const AVClass rgbclass = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -3998,10 +3934,10 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/libx264.c ./libavcodec/libx264.c
  AVCodec ff_libx264rgb_encoder = {
      .name           = "libx264rgb",
      .long_name      = NULL_IF_CONFIG_SMALL("libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 RGB"),
-diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/Makefile ./libavcodec/Makefile
---- ../ffmpeg-4.2.2-patch049/libavcodec/Makefile	2020-01-21 10:04:33.000000000 -0500
-+++ ./libavcodec/Makefile	2020-01-21 10:21:04.244270067 -0500
-@@ -52,6 +52,11 @@ OBJS = ac3_parser.o
+diff -uprN ../ffmpeg-4.3-033/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-4.3-033/libavcodec/Makefile	2020-06-16 19:53:06.000000000 -0400
++++ ./libavcodec/Makefile	2020-06-28 07:35:48.849501960 -0400
+@@ -58,6 +58,11 @@ OBJS = ac3_parser.o
         vorbis_parser.o                                                  \
         xiph.o                                                           \
  
@@ -4013,9 +3949,9 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/Makefile ./libavcodec/Makefile
  # subsystems
  OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
  OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
-diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
---- ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/mpeg12dec.c	2020-01-04 22:05:42.839778315 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
+--- ../ffmpeg-4.3-033/libavcodec/mpeg12dec.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/mpeg12dec.c	2020-06-28 07:35:48.850502025 -0400
 @@ -50,6 +50,16 @@
  #include "version.h"
  #include "xvmc_internal.h"
@@ -4033,7 +3969,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
  typedef struct Mpeg1Context {
      MpegEncContext mpeg_enc_ctx;
      int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
-@@ -1081,6 +1091,41 @@ static av_cold int mpeg_decode_init(AVCo
+@@ -1079,6 +1089,41 @@ static av_cold int mpeg_decode_init(AVCo
      return 0;
  }
  
@@ -4075,7 +4011,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
  #if HAVE_THREADS
  static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
                                               const AVCodecContext *avctx_from)
-@@ -2849,6 +2894,57 @@ static int mpeg_decode_frame(AVCodecCont
+@@ -2860,6 +2905,57 @@ static int mpeg_decode_frame(AVCodecCont
      return ret;
  }
  
@@ -4133,7 +4069,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
  static void flush(AVCodecContext *avctx)
  {
      Mpeg1Context *s = avctx->priv_data;
-@@ -2860,11 +2956,25 @@ static void flush(AVCodecContext *avctx)
+@@ -2871,11 +2967,25 @@ static void flush(AVCodecContext *avctx)
  
  static av_cold int mpeg_decode_end(AVCodecContext *avctx)
  {
@@ -4159,7 +4095,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
      return 0;
  }
  
-@@ -2946,6 +3056,23 @@ AVCodec ff_mpeg2video_decoder = {
+@@ -2957,6 +3067,23 @@ AVCodec ff_mpeg2video_decoder = {
                      },
  };
  
@@ -4183,9 +4119,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg12dec.c ./libavcodec/mpeg12dec.c
  //legacy decoder
  AVCodec ff_mpegvideo_decoder = {
      .name           = "mpegvideo",
-diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
---- ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavcodec/mpeg4videodec.c	2020-01-04 22:01:37.869680725 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec.c
+--- ../ffmpeg-4.3-033/libavcodec/mpeg4videodec.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/mpeg4videodec.c	2020-06-28 07:35:48.850502025 -0400
 @@ -39,6 +39,8 @@
  #include "xvididct.h"
  #include "unary.h"
@@ -4195,7 +4131,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  /* The defines below define the number of bits that are read at once for
   * reading vlc values. Changing these may improve speed and data cache needs
   * be aware though that decreasing them may need the number of stages that is
-@@ -3529,6 +3531,17 @@ static av_cold int decode_init(AVCodecCo
+@@ -3563,6 +3565,17 @@ static av_cold int decode_init(AVCodecCo
      return 0;
  }
  
@@ -4213,7 +4149,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  static av_cold int decode_end(AVCodecContext *avctx)
  {
      Mpeg4DecContext *ctx = avctx->priv_data;
-@@ -3551,6 +3564,14 @@ static const AVOption mpeg4_options[] =
+@@ -3583,6 +3596,14 @@ static const AVOption mpeg4_options[] =
      {NULL}
  };
  
@@ -4228,7 +4164,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  static const AVClass mpeg4_class = {
      .class_name = "MPEG4 Video Decoder",
      .item_name  = av_default_item_name,
-@@ -3558,6 +3579,15 @@ static const AVClass mpeg4_class = {
+@@ -3590,6 +3611,15 @@ static const AVClass mpeg4_class = {
      .version    = LIBAVUTIL_VERSION_INT,
  };
  
@@ -4244,7 +4180,7 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
  AVCodec ff_mpeg4_decoder = {
      .name                  = "mpeg4",
      .long_name             = NULL_IF_CONFIG_SMALL("MPEG-4 part 2"),
-@@ -3593,3 +3623,23 @@ AVCodec ff_mpeg4_decoder = {
+@@ -3626,3 +3656,23 @@ AVCodec ff_mpeg4_decoder = {
                                 NULL
                             },
  };
@@ -4268,9 +4204,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpeg4videodec.c ./libavcodec/mpeg4videodec
 +     .priv_class            = &mpeg4_class_smd,
 +};
 +#endif
-diff -uprN ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c ./libavcodec/mpegvideo_parser.c
---- ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c	2019-07-08 13:45:25.000000000 -0400
-+++ ./libavcodec/mpegvideo_parser.c	2020-01-04 21:09:07.243258617 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/mpegvideo_parser.c ./libavcodec/mpegvideo_parser.c
+--- ../ffmpeg-4.3-033/libavcodec/mpegvideo_parser.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/mpegvideo_parser.c	2020-06-28 07:35:48.851502091 -0400
 @@ -24,6 +24,8 @@
  #include "mpeg12.h"
  #include "internal.h"
@@ -4280,14 +4216,6 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c ./libavcodec/mpegvideo_
  struct MpvParseContext {
      ParseContext pc;
      AVRational frame_rate;
-@@ -31,7 +33,6 @@ struct MpvParseContext {
-     int width, height;
- };
- 
--
- static void mpegvideo_extract_headers(AVCodecParserContext *s,
-                                       AVCodecContext *avctx,
-                                       const uint8_t *buf, int buf_size)
 @@ -76,7 +77,13 @@ static void mpegvideo_extract_headers(AV
                  frame_rate_index = buf[3] & 0xf;
                  pc->frame_rate = avctx->framerate = ff_mpeg12_frame_rate_tab[frame_rate_index];
@@ -4328,9 +4256,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/mpegvideo_parser.c ./libavcodec/mpegvideo_
      .priv_data_size = sizeof(struct MpvParseContext),
      .parser_init    = mpegvideo_parse_init,
      .parser_parse   = mpegvideo_parse,
-diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.c ./libavcodec/syno_trans_loading.c
---- ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/syno_trans_loading.c	2020-01-04 21:09:07.459261832 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/syno_trans_loading.c ./libavcodec/syno_trans_loading.c
+--- ../ffmpeg-4.3-033/libavcodec/syno_trans_loading.c	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/syno_trans_loading.c	2020-06-28 07:35:48.851502091 -0400
 @@ -0,0 +1,243 @@
 +#include <errno.h>
 +#include <fcntl.h>
@@ -4575,9 +4503,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.c ./libavcodec/syno_tra
 +	return iRet;
 +}
 +#endif// SYNO_EVANSPORT_SMD
-diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.h ./libavcodec/syno_trans_loading.h
---- ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/syno_trans_loading.h	2020-01-04 21:09:07.459261832 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/syno_trans_loading.h ./libavcodec/syno_trans_loading.h
+--- ../ffmpeg-4.3-033/libavcodec/syno_trans_loading.h	1969-12-31 19:00:00.000000000 -0500
++++ ./libavcodec/syno_trans_loading.h	2020-06-28 07:35:48.851502091 -0400
 @@ -0,0 +1,11 @@
 +#ifndef _SYNO_TRANS_LOADING_H
 +#define _SYNO_TRANS_LOADING_H
@@ -4590,9 +4518,9 @@ diff -uprN ../ffmpeg-4.2.1/libavcodec/syno_trans_loading.h ./libavcodec/syno_tra
 +
 +#endif //SYNO_EVANSPORT_SMD
 +#endif //_SYNO_TRANS_LOADING_H
-diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
---- ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c	2020-01-21 10:03:16.000000000 -0500
-+++ ./libavcodec/vc1dec.c	2020-01-21 10:29:20.824300974 -0500
+diff -uprN ../ffmpeg-4.3-033/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
+--- ../ffmpeg-4.3-033/libavcodec/vc1dec.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/vc1dec.c	2020-06-28 07:35:48.851502091 -0400
 @@ -40,6 +40,7 @@
  #include "vc1data.h"
  #include "libavutil/avassert.h"
@@ -4699,7 +4627,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  /** Decode a VC1/WMV3 frame
   * @todo TODO: Handle VC-1 IDUs (Transport level?)
-@@ -1178,6 +1239,147 @@ err:
+@@ -1183,6 +1244,147 @@ err:
      return ret;
  }
  
@@ -4847,7 +4775,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
  #if CONFIG_VC1_DXVA2_HWACCEL
-@@ -1236,6 +1438,22 @@ AVCodec ff_vc1_decoder = {
+@@ -1241,6 +1443,22 @@ AVCodec ff_vc1_decoder = {
      .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
  };
  
@@ -4870,7 +4798,7 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  #if CONFIG_WMV3_DECODER
  AVCodec ff_wmv3_decoder = {
      .name           = "wmv3",
-@@ -1273,6 +1491,22 @@ AVCodec ff_wmv3_decoder = {
+@@ -1278,6 +1496,22 @@ AVCodec ff_wmv3_decoder = {
      .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
  };
  #endif
@@ -4893,9 +4821,9 @@ diff -uprN ../ffmpeg-4.2.2-patch049/libavcodec/vc1dec.c ./libavcodec/vc1dec.c
  
  #if CONFIG_WMV3IMAGE_DECODER
  AVCodec ff_wmv3image_decoder = {
-diff -uprN ../ffmpeg-4.2.1/libavformat/flacdec.c ./libavformat/flacdec.c
---- ../ffmpeg-4.2.1/libavformat/flacdec.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavformat/flacdec.c	2020-01-04 21:09:07.467261951 -0500
+diff -uprN ../ffmpeg-4.3-033/libavformat/flacdec.c ./libavformat/flacdec.c
+--- ../ffmpeg-4.3-033/libavformat/flacdec.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavformat/flacdec.c	2020-06-28 07:35:48.852502157 -0400
 @@ -45,6 +45,8 @@ static void reset_index_position(int64_t
      }
  }
@@ -4905,12 +4833,9 @@ diff -uprN ../ffmpeg-4.2.1/libavformat/flacdec.c ./libavformat/flacdec.c
  static int flac_read_header(AVFormatContext *s)
  {
      int ret, metadata_last=0, metadata_type, metadata_size, found_streaminfo=0;
-diff -uprN ../ffmpeg-4.2.1/libavformat/matroskaenc.c ./libavformat/matroskaenc.c
---- ../ffmpeg-4.2.1/libavformat/matroskaenc.c	2020-01-04 21:07:34.000000000 -0500
-+++ ./libavformat/matroskaenc.c	2020-01-04 21:09:07.471262011 -0500
-diff -uprN ../ffmpeg-4.2.1/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
---- ../ffmpeg-4.2.1/libavformat/mpegtsenc.c	2019-08-05 16:52:21.000000000 -0400
-+++ ./libavformat/mpegtsenc.c	2020-01-04 21:09:07.475262070 -0500
+diff -uprN ../ffmpeg-4.3-033/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
+--- ../ffmpeg-4.3-033/libavformat/mpegtsenc.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavformat/mpegtsenc.c	2020-06-28 07:35:48.852502157 -0400
 @@ -34,6 +34,8 @@
  #include "internal.h"
  #include "mpegts.h"
@@ -4920,11 +4845,3 @@ diff -uprN ../ffmpeg-4.2.1/libavformat/mpegtsenc.c ./libavformat/mpegtsenc.c
  #define PCR_TIME_BASE 27000000
  
  /* write DVB SI sections */
-@@ -1377,7 +1379,6 @@ static void mpegts_write_pes(AVFormatCon
-                       *q++ = 0x00 | 0x71; /* for AC3 Audio (specifically on blue-rays) */
-               }
- 
--
-             if (is_dvb_subtitle) {
-                 /* First two fields of DVB subtitles PES data:
-                  * data_identifier: for DVB subtitle streams shall be coded with the value 0x20

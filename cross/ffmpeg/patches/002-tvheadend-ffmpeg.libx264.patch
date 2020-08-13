@@ -1,6 +1,7 @@
---- ./libavcodec/libx264.c.orig
-+++ ./libavcodec/libx264.c
-@@ -1026,6 +1026,7 @@ static const AVOption options[] = {
+diff -uprN ../ffmpeg-4.3-001/libavcodec/libx264.c ./libavcodec/libx264.c
+--- ../ffmpeg-4.3-001/libavcodec/libx264.c	2020-06-15 14:54:24.000000000 -0400
++++ ./libavcodec/libx264.c	2020-06-16 17:34:12.885426468 -0400
+@@ -1043,6 +1043,7 @@ static const AVOption options[] = {
      { "preset",        "Set the encoding preset (cf. x264 --fullhelp)",   OFFSET(preset),        AV_OPT_TYPE_STRING, { .str = "medium" }, 0, 0, VE},
      { "tune",          "Tune the encoding params (cf. x264 --fullhelp)",  OFFSET(tune),          AV_OPT_TYPE_STRING, { 0 }, 0, 0, VE},
      { "profile",       "Set profile restrictions (cf. x264 --fullhelp) ", OFFSET(profile),       AV_OPT_TYPE_STRING, { 0 }, 0, 0, VE},
