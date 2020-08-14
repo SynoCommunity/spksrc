@@ -24,10 +24,12 @@ CHANGELOG = "Update to 3001.1"
 HOMEPAGE   = https://www.saltstack.com/
 LICENSE    = Apache
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
 POST_STRIP_TARGET = salt-minion_extra_install
+
+CONF_DIR = src/conf
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = yes
 
 # Pure Python package, make sure ARCH is not defined
 #override ARCH=
