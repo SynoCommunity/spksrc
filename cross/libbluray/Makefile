@@ -16,7 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava-jar
 
 # For ppc853x-5.2, define GNU_SOURCE
-ifeq ($(ARCH)-$(TCVERSION), ppc853x-5.2)
+ifeq ($(findstring $(ARCH)-$(TCVERSION), ppc853x-5.2 qoriq-5.2),$(ARCH)-$(TCVERSION))
 ADDITIONAL_CFLAGS = -D_GNU_SOURCE
 endif
 
