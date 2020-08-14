@@ -5,10 +5,15 @@ SPK_ICON = src/salt-minion.png
 
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
 BUILD_DEPENDS = cross/python3
-#DEPENDS = cross/python3
-
-WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.7"
+
+# Requirements file generation
+# /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env
+# virtualenv --python=python3  salt-env
+# source salt-env/bin/activate
+# pip install salt
+# pip freeze > requirements.txt
+WHEELS = src/requirements.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
@@ -21,8 +26,6 @@ LICENSE    = Apache
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = salt-minion_extra_install
 
@@ -38,7 +41,7 @@ salt-minion_extra_install:
 	install -m 755 -d $(STAGING_DIR)/etc/salt
 	install -m 755 -d $(STAGING_DIR)/etc/salt/minion.d
 	install -m 644 src/rsax931.py $(STAGING_DIR)/share
-	install -m 644 src/minion $(STAGING_DIR)/etc/salt
+	install -m 644 src/minion.conf $(STAGING_DIR)/etc/salt
 	echo "root_dir: /usr/local/salt-minion" > $(STAGING_DIR)/etc/salt/minion.d/00-root-dir.conf
 	echo "master: salt" > $(STAGING_DIR)/etc/salt/minion.d/99-master-address.conf
 	echo "id: myname" > $(STAGING_DIR)/etc/salt/minion.d/98-minion-id.conf
