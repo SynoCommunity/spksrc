@@ -5,6 +5,7 @@ SPK_ICON = src/salt-minion.png
 
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
 BUILD_DEPENDS = cross/python3
+DEPENDS = cross/busybox
 SPK_DEPENDS = "python3>=3.7"
 
 # Requirements file generation
@@ -26,10 +27,15 @@ LICENSE    = Apache
 
 POST_STRIP_TARGET = salt-minion_extra_install
 
+# Service configuration
 CONF_DIR = src/conf
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
+
+# Busybox config
+BUSYBOX_CONFIG = salt-minion
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 # Pure Python package, make sure ARCH is not defined
 #override ARCH=
@@ -42,7 +48,7 @@ salt-minion_extra_install:
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 -d $(STAGING_DIR)/etc/salt
 	install -m 755 -d $(STAGING_DIR)/etc/salt/minion.d
-	install -m 644 src/rsax931.py $(STAGING_DIR)/share
+	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/minion.conf $(STAGING_DIR)/etc/salt
 	echo "root_dir: /usr/local/salt-minion" > $(STAGING_DIR)/etc/salt/minion.d/00-root-dir.conf
 	echo "master: salt" > $(STAGING_DIR)/etc/salt/minion.d/99-master-address.conf
