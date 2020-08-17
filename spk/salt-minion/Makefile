@@ -5,7 +5,6 @@ SPK_ICON = src/salt-minion.png
 
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
 BUILD_DEPENDS = cross/python3
-DEPENDS = cross/busybox
 SPK_DEPENDS = "python3>=3.7"
 
 # Requirements file generation
@@ -32,10 +31,6 @@ CONF_DIR = src/conf
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
-
-# Busybox config
-BUSYBOX_CONFIG = salt-minion
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 # Pure Python package, make sure ARCH is not defined
 #override ARCH=

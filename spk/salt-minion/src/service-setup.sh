@@ -16,11 +16,9 @@ service_postinst ()
     # Install wheels
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG}
 
-    # Install busybox stuff
-    ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
-
     # Patch rsax931.py file to find libcrypto lib
-    ${SYNOPKG_PKGDEST}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.7/site-packages/salt/utils/rsax931.py < ${SYNOPKG_PKGDEST}/share/rsax931.py.patch >> ${INST_LOG} 2>&1
+    # (Rely on patch util bundled with python3's busybox)
+    ${PYTHON_DIR}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.7/site-packages/salt/utils/rsax931.py < ${SYNOPKG_PKGDEST}/share/rsax931.py.patch >> ${INST_LOG} 2>&1
 
 }
 
