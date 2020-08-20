@@ -39,14 +39,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 755 -d $(STAGING_DIR)/etc/salt
-	install -m 755 -d $(STAGING_DIR)/etc/salt/minion.d
+	install -m 755 -d $(STAGING_DIR)/var/salt/etc
+	install -m 755 -d $(STAGING_DIR)/var/salt/etc/minion.d
 	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/minion.conf $(STAGING_DIR)/etc/salt
-	echo "root_dir: /usr/local/salt-minion" > $(STAGING_DIR)/etc/salt/minion.d/00-root-dir.conf
-	echo "master: salt" > $(STAGING_DIR)/etc/salt/minion.d/99-master-address.conf
-	echo "id: myname" > $(STAGING_DIR)/etc/salt/minion.d/98-minion-id.conf
-
-
+	install -m 644 src/minion.conf $(STAGING_DIR)/share
