@@ -18,6 +18,6 @@ TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/usr/include
 TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/usr/include
 TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/lib
 
-TC_SYSROOT = $(TC_BASE_DIR)/sys-root
+TC_SYSROOT = $(TC_BASE_DIR)/sysroot
 
 include ../../mk/spksrc.tc.mk
