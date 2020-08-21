@@ -20,10 +20,6 @@ TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sys-root/usr/include
 TC_LIBDIR = $(TC_BASE_DIR)/sys-root/lib
 TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_LIBDIR)
 
-FIX_TARGET = myFix
+TC_SYSROOT = $(TC_BASE_DIR)/sys-root
 
 include ../../mk/spksrc.tc.mk
-
-.PHONY: myFix
-myFix:
-	chmod -R u+w $(WORK_DIR)

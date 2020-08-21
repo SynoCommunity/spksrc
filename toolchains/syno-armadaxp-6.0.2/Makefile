@@ -18,11 +18,6 @@ TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include -m
 TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include -mhard-float -mfpu=vfpv3-d16
 TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/lib -mhard-float -mfpu=vfpv3-d16
 
-FIX_TARGET = myFix
+TC_SYSROOT = $(TC_BASE_DIR)/sysroot
 
 include ../../mk/spksrc.tc.mk
-
-.PHONY: myFix
-myFix:
-	chmod -R u+w $(WORK_DIR)
-	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/lib'|" {} \;

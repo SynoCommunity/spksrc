@@ -20,11 +20,6 @@ TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include
 TC_CXXFLAGS = -I$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/usr/include
 TC_LDFLAGS = -L$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/lib
 
-FIX_TARGET = tc_fix_armv7
+TC_SYSROOT = $(TC_BASE_DIR)/sysroot
 
 include ../../mk/spksrc.tc.mk
-
-.PHONY: tc_fix_armv7
-tc_fix_armv7:
-	chmod -R u+w $(WORK_DIR)
-	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_BASE_DIR)/sysroot/lib'|" {} \;
