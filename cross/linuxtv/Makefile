@@ -46,11 +46,6 @@ ifeq ($(findstring $(TC_KERNEL),$(UNSUPPORTED_KERNEL)),$(TC_KERNEL))
   @$(error Kernel version '$(TC_KERNEL)' is not supported)
 endif
 
-# Modules that does not compile under kernel 4.15
-ifeq ($(findstring $(TC_KERNEL),4.4.15+),$(TC_KERNEL))
-BLACKLIST += CONFIG_VIDEOBUF2_V4L2
-endif
-
 .PHONY: linuxtv_configure
 linuxtv_configure:
 	@$(MSG) "TC_KERNEL=$(TC_KERNEL)"
