@@ -9,6 +9,7 @@
 #  DEPENDS             List of dependencies to go through
 #  REQ_KERNEL          If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
+#  REQ_TOOLKIT         If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
@@ -47,7 +48,7 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(KERNEL_DEPEND) $(TK_DEPEND); \
+	@for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TK_DEPEND) $(DEPENDS); \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done
