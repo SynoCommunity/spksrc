@@ -72,13 +72,18 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-# libaom   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2
 # libshine - gcc to old: undefined reference to `__builtin_bswap16' : ppc853x, qoriq-5.2
 # libvpx   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2
 # libzmq   - gcc to old: requires forcing -std=c99 or -std=gnu99    : evansport-5.2
 ifneq ($(findstring $(ARCH)-$(TCVERSION), alpine-5.2 comcerto2k-5.2 evansport-5.2 ppc853x-5.2 ppc853x-6.1 ppc853x-6.2 qoriq-5.2),$(ARCH)-$(TCVERSION))
-DEPENDS += cross/libaom cross/shine cross/libvpx cross/libzmq
-CONFIGURE_ARGS += --enable-libaom --enable-libshine --enable-libvpx --enable-libzmq
+DEPENDS += cross/shine cross/libvpx cross/libzmq
+CONFIGURE_ARGS += --enable-libshine --enable-libvpx --enable-libzmq
+
+# libaom   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2, armv7, qoriq, 88f6281
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
+DEPENDS += cross/libaom
+CONFIGURE_ARGS += --enable-libaom
+endif
 endif
 
 # Add SVT-AV1 codec to supported ARCH
