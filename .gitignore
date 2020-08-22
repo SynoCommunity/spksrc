@@ -7,6 +7,7 @@ spk/*/work*
 diyspk/*/work*
 toolchains/*/work*
 toolchains/*/*_done
+toolkits/*/work*
 local.mk
 *.DS_Store
 *~
