@@ -1,0 +1,13 @@
+diff -uprN ../linuxtv-gitea2766f182b3a4e03543be2ded0845fca4d4fa80-ORIG/v4l/config-mycompat.h ./v4l/config-mycompat.h
+--- ../linuxtv-gitea2766f182b3a4e03543be2ded0845fca4d4fa80-ORIG/v4l/config-mycompat.h	1970-01-01 00:00:00.000000000 +0000
++++ ./v4l/config-mycompat.h	2020-07-27 19:07:51.472843354 +0000
+@@ -0,0 +1,9 @@
++#undef NEED_PM_RUNTIME_GET
++
++#define replace_fops(f, fops) \
++	do {	\
++		struct file *__file = (f); \
++		fops_put(__file->f_op); \
++		BUG_ON(!(__file->f_op = (fops))); \
++	} while(0);
++
