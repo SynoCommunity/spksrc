@@ -13,7 +13,7 @@ DEPENDS += cross/soxr cross/x264 cross/x265
 DEPENDS += cross/opencore-amr
 DEPENDS += cross/libzmq
 
-OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/ds.evansport cross/json-c
+OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/json-c
 OPTIONAL_DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
 OPTIONAL_DEPENDS += cross/shine cross/libvpx
 
@@ -104,17 +104,18 @@ DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
-DEPENDS += cross/ds.evansport cross/json-c
+REQ_TOOLKIT = 1
+DEPENDS += cross/json-c
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
 CONFIGURE_ARGS += --disable-x86asm
 CONFIGURE_ARGS += --extra-cflags=-fasm
 CONFIGURE_ARGS += --extra-cflags=-std=c99
 CONFIGURE_ARGS += --extra-cflags=-pedantic
-CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities
-CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include/intelce-utilities/linux_user
-CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/install$(INSTALL_PREFIX)/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/include/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/include/intelce-utilities/linux_user
+CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/lib
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/lib/intelce-utilities
 # DISABLE
 CONFIGURE_ARGS += --disable-decoder=h264_smd
 CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd
