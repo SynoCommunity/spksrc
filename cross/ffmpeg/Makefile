@@ -66,6 +66,10 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 # Compiling tvheadend for evansport requires #include synology.h
 POST_INSTALL_TARGET = ffmpeg_post_install
 
+ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
+REQ_TOOLKIT = 1
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 # Add libaom AV1 codec to supported ARCH
@@ -104,7 +108,6 @@ DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
-REQ_TOOLKIT = 1
 DEPENDS += cross/json-c
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
 CONFIGURE_ARGS += --disable-x86asm
