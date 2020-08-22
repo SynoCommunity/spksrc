@@ -11,7 +11,6 @@ DEPENDS += cross/libtheora
 DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265
 DEPENDS += cross/opencore-amr
-DEPENDS += cross/libzmq
 
 OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/json-c
 OPTIONAL_DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
@@ -38,7 +37,6 @@ CONFIGURE_ARGS += --enable-libtheora --enable-libvorbis
 CONFIGURE_ARGS += --enable-libspeex
 CONFIGURE_ARGS += --enable-libx264 --enable-libx265 --enable-gnutls
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
-CONFIGURE_ARGS += --enable-libzmq
 CONFIGURE_ARGS += --disable-debug --disable-doc
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --enable-debug=1
@@ -66,19 +64,21 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 # Compiling tvheadend for evansport requires #include synology.h
 POST_INSTALL_TARGET = ffmpeg_post_install
 
+# For evansport arch hardware acceleration requires
+# intelce-toolchain from the DSM toolkit
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
 REQ_TOOLKIT = 1
 endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Add libaom AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHES) $(x86_ARCHES) $(x64_ARCHES)),$(ARCH))
-# libaom - gcc to old: requires c++11 support
-ifneq ($(findstring $(ARCH)-$(TCVERSION), alpine-5.2 comcerto2k-5.2 evansport-5.2),$(ARCH)-$(TCVERSION))
-DEPENDS += cross/libaom
-CONFIGURE_ARGS += --enable-libaom
-endif
+# libaom   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2
+# libshine - gcc to old: undefined reference to `__builtin_bswap16' : ppc853x, qoriq-5.2
+# libvpx   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2
+# libzmq   - gcc to old: requires forcing -std=c99 or -std=gnu99    : evansport-5.2
+ifneq ($(findstring $(ARCH)-$(TCVERSION), alpine-5.2 comcerto2k-5.2 evansport-5.2 ppc853x-5.2 ppc853x-6.1 ppc853x-6.2 qoriq-5.2),$(ARCH)-$(TCVERSION))
+DEPENDS += cross/libaom cross/shine cross/libvpx cross/libzmq
+CONFIGURE_ARGS += --enable-libaom --enable-libshine --enable-libvpx --enable-libzmq
 endif
 
 # Add SVT-AV1 codec to supported ARCH
@@ -148,20 +148,6 @@ endif
 
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --disable-asm --cpu=e500v2
-endif
-
-# libvpx - gcc to old: requires c++11 support
-# alpine-5.2, comcerto2k-5.2, evansport-5.2
-ifneq ($(findstring $(ARCH)-$(TCVERSION), alpine-5.2 comcerto2k-5.2 evansport-5.2),$(ARCH)-$(TCVERSION))
-DEPENDS += cross/libvpx
-CONFIGURE_ARGS += --enable-libvpx
-endif
-
-# libshine - gcc to old on ppc853x: undefined reference to `__builtin_bswap16'
-# ppc853x, qoriq-5.2
-ifneq ($(findstring $(ARCH)-$(TCVERSION), ppc853x-5.2 ppc853x-6.1 ppc853x-6.2 qoriq-5.2),$(ARCH)-$(TCVERSION))
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
 endif
 
 .PHONY: ffmpeg_post_install
