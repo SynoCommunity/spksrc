@@ -9,7 +9,7 @@
 #  DEPENDS             List of dependencies to go through
 #  REQ_KERNEL          If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
-#  REQ_TOOLKIT         If set, will download and extract matching toolkit
+#  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
@@ -30,7 +30,7 @@ else
 $(POST_DEPEND_TARGET): $(DEPEND_TARGET)
 endif
 
-ifeq ($(strip $(REQ_TOOLKIT)),)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),)
 TK_DEPEND = 
 else
 TK_DEPEND = toolkits/syno-$(ARCH)-$(TCVERSION)

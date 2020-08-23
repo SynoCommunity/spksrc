@@ -67,7 +67,7 @@ POST_INSTALL_TARGET = ffmpeg_post_install
 # For evansport arch hardware acceleration requires
 # intelce-toolchain from the DSM toolkit
 ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
-REQ_TOOLKIT = 1
+REQUIRE_TOOLKIT = 1
 endif
 
 include ../../mk/spksrc.cross-cc.mk
