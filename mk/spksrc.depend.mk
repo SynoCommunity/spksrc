@@ -7,7 +7,7 @@
 #  post_depend_target  (override with POST_DEPEND_TARGET)
 # Variables:
 #  DEPENDS             List of dependencies to go through
-#  REQ_KERNEL          If set, will compile kernel modules and allow
+#  REQUIRE_KERNEL      If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
 #  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
@@ -36,7 +36,7 @@ else
 TK_DEPEND = toolkits/syno-$(ARCH)-$(TCVERSION)
 endif
 
-ifeq ($(strip $(REQ_KERNEL)),)
+ifeq ($(strip $(REQUIRE_KERNEL)),)
 KERNEL_DEPEND = 
 else
 KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)

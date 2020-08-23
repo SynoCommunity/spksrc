@@ -23,8 +23,8 @@ DIST_EXT      = $(PKG_EXT)
 
 #####
 
-ifneq ($(REQ_KERNEL),)
-  @$(error install-resources cannot be used when REQ_KERNEL is set)
+ifneq ($(REQUIRE_KERNEL),)
+  @$(error install-resources cannot be used when REQUIRE_KERNEL is set)
 endif
 
 #####

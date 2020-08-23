@@ -1,12 +1,12 @@
 # Common requirement checks
 
 # Check for build for generic archs, these are not supporting `require kernel`.
-ifneq ($(REQ_KERNEL),)
+ifneq ($(REQUIRE_KERNEL),)
   ifneq (,$(findstring $(ARCH),x64 aarch64 armv7))
     ifneq ($(BUILD_UNSUPPORTED_FILE),)
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): Arch '$(ARCH)' cannot be used when REQ_KERNEL is set >> $(BUILD_UNSUPPORTED_FILE))
+      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): Arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set >> $(BUILD_UNSUPPORTED_FILE))
     endif
-    @$(error Arch '$(ARCH)' cannot be used when REQ_KERNEL is set)
+    @$(error Arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set)
   endif
 endif
 
