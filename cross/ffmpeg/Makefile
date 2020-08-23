@@ -16,7 +16,6 @@ OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/json-c
 OPTIONAL_DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
 OPTIONAL_DEPENDS += cross/shine cross/libvpx
 
-
 HOMEPAGE = http://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
@@ -124,11 +123,11 @@ CONFIGURE_ARGS += --disable-x86asm
 CONFIGURE_ARGS += --extra-cflags=-fasm
 CONFIGURE_ARGS += --extra-cflags=-std=c99
 CONFIGURE_ARGS += --extra-cflags=-pedantic
-CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/include/intelce-utilities
-CONFIGURE_ARGS += --extra-cflags=-I$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/include/intelce-utilities/linux_user
-CONFIGURE_ARGS += --extra-ldflags=-L$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/lib/intelce-utilities
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/lib
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(WORK_DIR)/../../../toolkits/syno-$(ARCH)-$(TCVERSION)/work/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(TK_ROOT)/include/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(TK_ROOT)/include/intelce-utilities/linux_user
+CONFIGURE_ARGS += --extra-ldflags=-L$(TK_ROOT)/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TK_ROOT)/lib
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TK_ROOT)/lib/intelce-utilities
 # DISABLE
 CONFIGURE_ARGS += --disable-decoder=h264_smd
 CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd
