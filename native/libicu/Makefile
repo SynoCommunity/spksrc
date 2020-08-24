@@ -16,11 +16,4 @@ LICENSE  = http://www.unicode.org/copyright.html#License
 
 GNU_CONFIGURE = 1
 
-#POST_INSTALL_TARGET = myPostInstall
-
 include ../../mk/spksrc.native-cc.mk
-
-#.PHONY: myPostInstall
-#myPostInstall:
-#	sed -i -e 's#/usr/local#/usr/local/mono#g' $(WORK_DIR)/install/usr/local/bin/*
-#	sed -i -e 's#/usr/local#/usr/local/mono#g' $(WORK_DIR)/install/usr/local/etc/mono/config
