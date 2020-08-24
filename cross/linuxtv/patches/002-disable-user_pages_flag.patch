@@ -1,0 +1,11 @@
+--- backports/backports.txt.old	2020-07-20 08:26:22.000000000 +0000
++++ backports/backports.txt	2020-08-24 20:50:42.676026795 +0000
+@@ -114,6 +114,8 @@ add v4.5_copy_to_user_warning.patch
+ 
+ [4.4.255]
+ add v4.4_gpio_chip_parent.patch
++
++[4.4.58]
+ add v4.4_user_pages_flag.patch
+ 
+ [4.3.255]

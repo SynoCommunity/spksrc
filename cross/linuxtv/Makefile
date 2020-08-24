@@ -24,6 +24,7 @@ LICENSE  = GPLv2
 FIRMWARE_URL = http://www.linuxtv.org/downloads/firmware/
 FIRMWARE_PKG = dvb-firmwares.tar.bz2
 
+PRE_PATCH_TARGET = linuxtv_pre_patch
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
 INSTALL_TARGET = linuxtv_install
@@ -33,8 +34,6 @@ include blacklist.mk
 
 # Blacklist modules that does not compile
 BLACKLIST += CONFIG_VIDEO_IVTV
-BLACKLIST += CONFIG_VIDEOBUF_DMA_SG
-BLACKLIST += CONFIG_VIDEOBUF2_MEMOPS
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -46,8 +45,8 @@ ifeq ($(findstring $(TC_KERNEL),$(UNSUPPORTED_KERNEL)),$(TC_KERNEL))
   @$(error Kernel version '$(TC_KERNEL)' is not supported)
 endif
 
-.PHONY: linuxtv_configure
-linuxtv_configure:
+.PHONY: linuxtv_pre_patch
+linuxtv_pre_patch:
 	@$(MSG) "TC_KERNEL=$(TC_KERNEL)"
 	@$(MSG) "BLACKLIST=$(BLACKLIST)"
 	$(RUN) make release DIR=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
@@ -55,6 +54,9 @@ linuxtv_configure:
 	$(RUN) make -C linux/ untar
 	$(RUN) wget $(FIRMWARE_URL)/$(FIRMWARE_PKG) -O $(FIRMWARE_PKG)
 	$(RUN) tar xvfj $(FIRMWARE_PKG) -C v4l
+
+.PHONY: linuxtv_configure
+linuxtv_configure:
 	# Final preparation for build
 	$(RUN) make allyesconfig
 	# Disable modules that do not compile
