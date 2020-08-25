@@ -7,7 +7,7 @@ DNAME="LinuxTV"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-LINUXTV="${INSTALL_DIR}/bin/linuxtv.sh"
+LINUXTV="${INSTALL_DIR}/bin/linuxtv.sh -n $DNAME -a"
 
 KO="rc/rc-core.ko \
     mc/mc.ko \
@@ -21,24 +21,12 @@ KO="rc/rc-core.ko \
 
 case $1 in
     start)
-        if ${LINUXTV} status; then
-            echo ${DNAME} is already running
-            exit 0
-        else
-            echo Starting ${DNAME} ...
-            ${LINUXTV} load $KO
-            exit $?
-        fi
+        ${LINUXTV} load $KO
+        exit $?
         ;;
     stop)
-        if ${LINUXTV} status; then
-            echo Stopping ${DNAME} ...
-            ${LINUXTV} unload $KO
-            exit $?
-        else
-            echo ${DNAME} is not running
-            exit 0
-        fi
+        ${LINUXTV}unload $KO
+        exit $?
         ;;
     restart)
         ${LINUXTV} unload $KO
@@ -46,11 +34,9 @@ case $1 in
         exit $?
         ;;
     status)
-        if ${LINUXTV} status; then
-            echo ${DNAME} is running
+        if ${LINUXTV} status $KO; then
             exit 0
         else
-            echo ${DNAME} is not running
             exit 1
         fi
         ;;
