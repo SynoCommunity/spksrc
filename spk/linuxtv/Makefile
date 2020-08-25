@@ -24,8 +24,6 @@ POST_STRIP_TARGET = linuxtv_extra_install
 
 include ../../mk/spksrc.spk.mk
 
-include ../../mk/spksrc.spk.mk
-
 .PHONY: linuxtv_extra_install
 linuxtv_extra_install:
 	install -m 755 src/linuxtv.sh $(STAGING_DIR)/bin/
