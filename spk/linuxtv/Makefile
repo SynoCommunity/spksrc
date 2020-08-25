@@ -26,4 +26,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: linuxtv_extra_install
 linuxtv_extra_install:
+	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/linuxtv.sh $(STAGING_DIR)/bin/
