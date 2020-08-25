@@ -5,7 +5,7 @@
  [4.4.255]
  add v4.4_gpio_chip_parent.patch
 +
-+[4.4.58]
++[4.4.14]
  add v4.4_user_pages_flag.patch
  
  [4.3.255]
