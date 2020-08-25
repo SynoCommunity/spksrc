@@ -8,14 +8,17 @@ KO_PATH=/var/packages/linuxtv/target/lib/modules/$(uname -r)/kernel/drivers/medi
 
 
 # Make sure an argument was passed 
-usage() { echo "Usage: $0 [-n <name>] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2 }
+usage ()
+{
+echo "Usage: $0 [-n <name>] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2
+}
 [ $# -eq 0 ] && usage && exit 1
 
 
 # Get basic options
 while getopts ":h:n:a:" arg; do
   case $arg in
-    n) NAME=${OPTARG};;
+    n) DNAME=${OPTARG};;
     a) ACTION=${OPTARG};;
     h) usage;;
   esac
@@ -25,7 +28,6 @@ done
 shift $((OPTIND-1))
 KO=$@
 
-
 # load the requested modules
 load ()
 {
@@ -33,7 +35,7 @@ load ()
    for ko in $KO
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%30s %-15s' $ko "[$module]"
+      printf '%40s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -61,14 +63,14 @@ unload ()
    for item in $KO; do echo $item; done | tac | while read ko
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%30s %-15s' $ko "[$module]"
+      printf '%40s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
          rmmod $module
-         echo -ne "OK\n"
-      else
          echo -ne "N/A\n"
+      else
+         echo -ne "ERROR\n"
       fi
    done
 }
@@ -82,8 +84,8 @@ status ()
 
    for ko in $KO
    do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%30s %-15s' $ko "[$module]"
+	  module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
+      printf '%40s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -137,3 +139,4 @@ case $ACTION in
        exit 1
        ;;
 esac
+
