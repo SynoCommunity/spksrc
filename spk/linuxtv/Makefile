@@ -4,7 +4,7 @@ SPK_GIT_DATE = 20200719
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 SPK_REV = 1
 SPK_ICON = src/linuxtv.png
-CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. More to come..."
+CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Add default generic statup scripts for other packages usage"
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -15,7 +15,6 @@ DISPLAY_NAME = linuxtv
 
 STARTABLE = yes
 SSS_SCRIPT = src/dsm-control.sh
-#SERVICE_SETUP = src/service-setup.sh
 
 HOMEPAGE = https://linuxtv.org/
 LICENSE  = GPLv2
