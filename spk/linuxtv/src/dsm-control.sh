@@ -5,6 +5,8 @@ PACKAGE="linuxtv"
 DNAME="LinuxTV"
 
 # Others
+INSTALL_DIR="/usr/local/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:${PATH}"
 LINUXTV="${INSTALL_DIR}/bin/linuxtv.sh"
 
 KO="rc/rc-core.ko \
