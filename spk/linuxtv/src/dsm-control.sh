@@ -7,20 +7,15 @@ DNAME="LinuxTV"
 FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
 KO_PATH=/var/packages/linuxtv/target/lib/modules/$(uname -r)/kernel/drivers/media
 
-KO=" rc/rc-core.ko \
-    common/tveeprom.ko"
-#KO="v4l2-core/media.ko \
-#    common/videobuf2/videodev.ko \
-#    common/videobuf2/videobuf2-common.ko \
-#    common/videobuf2/videobuf2-v4l2.ko \
-#    common/videobuf2/videobuf2-memops.ko \
-#    common/videobuf2/videobuf2-vmalloc.ko \
-#    dvb-core/dvb-core.ko \
-#    rc/rc-core.ko \
-#    usb/dvb-usb-v2/dvb_usb_v2.ko \
-#    usb/dvb-usb/dvb-usb.ko \
-#    v4l2-core/v4l2-common.ko \
-#    common/tveeprom.ko"
+KO="rc/rc-core.ko \
+    mc/mc.ko \
+    v4l2-core/videodev.ko \
+    common/tveeprom.ko \
+    common/videobuf2/videobuf2-common.ko \
+    common/videobuf2/videobuf2-v4l2.ko \
+    common/videobuf2/videobuf2-memops.ko \
+    common/videobuf2/videobuf2-vmalloc.ko \
+    dvb-core/dvb-core.ko"
 
 start_daemon ()
 {

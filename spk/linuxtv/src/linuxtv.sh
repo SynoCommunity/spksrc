@@ -7,22 +7,17 @@ DNAME="LinuxTV"
 FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
 KO_PATH=/var/packages/linuxtv/target/lib/modules/$(uname -r)/kernel/drivers/media
 
-KO=" rc/rc-core.ko \
-    common/tveeprom.ko"
-#KO="v4l2-core/media.ko \
-#    common/videobuf2/videodev.ko \
-#    common/videobuf2/videobuf2-common.ko \
-#    common/videobuf2/videobuf2-v4l2.ko \
-#    common/videobuf2/videobuf2-memops.ko \
-#    common/videobuf2/videobuf2-vmalloc.ko \
-#    dvb-core/dvb-core.ko \
-#    rc/rc-core.ko \
-#    usb/dvb-usb-v2/dvb_usb_v2.ko \
-#    usb/dvb-usb/dvb-usb.ko \
-#    v4l2-core/v4l2-common.ko \
-#    common/tveeprom.ko"
+KO="rc/rc-core.ko \
+    mc/mc.ko \
+    v4l2-core/videodev.ko \
+    common/tveeprom.ko \
+    common/videobuf2/videobuf2-common.ko \
+    common/videobuf2/videobuf2-v4l2.ko \
+    common/videobuf2/videobuf2-memops.ko \
+    common/videobuf2/videobuf2-vmalloc.ko \
+    dvb-core/dvb-core.ko"
 
-start_daemon ()
+load ()
 {
    echo "Loading kernel modules... "
    for ko in $KO
@@ -47,7 +42,7 @@ start_daemon ()
    echo "$FIRMWARE_PATH" > /sys/module/firmware_class/parameters/path
 }
 
-stop_daemon ()
+unload ()
 {
    # Unload drivers in reverse order
    echo "Unloading kernel modules... "
@@ -66,7 +61,7 @@ stop_daemon ()
    done
 }
 
-daemon_status ()
+status ()
 {
    echo "Status of kernel modules... "
    error=0
@@ -89,33 +84,33 @@ daemon_status ()
 }
 
 case $1 in
-    start)
-        if daemon_status; then
+    load)
+        if status; then
             echo ${DNAME} is already running
             exit 0
         else
             echo Starting ${DNAME} ...
-            start_daemon
+            load
             exit $?
         fi
         ;;
-    stop)
-        if daemon_status; then
+    unload)
+        if status; then
             echo Stopping ${DNAME} ...
-            stop_daemon
+            unload
             exit $?
         else
             echo ${DNAME} is not running
             exit 0
         fi
         ;;
-    restart)
-        stop_daemon
-        start_daemon
+    reload)
+        unload
+        load
         exit $?
         ;;
     status)
-        if daemon_status; then
+        if status; then
             echo ${DNAME} is running
             exit 0
         else
