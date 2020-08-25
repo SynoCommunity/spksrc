@@ -1,22 +1,32 @@
 #!/bin/sh
 
-# Package
-PACKAGE="linuxtv"
-DNAME="LinuxTV"
 
+# Firmware path
 FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
+# Kernel object path
 KO_PATH=/var/packages/linuxtv/target/lib/modules/$(uname -r)/kernel/drivers/media
 
-KO="rc/rc-core.ko \
-    mc/mc.ko \
-    v4l2-core/videodev.ko \
-    common/tveeprom.ko \
-    common/videobuf2/videobuf2-common.ko \
-    common/videobuf2/videobuf2-v4l2.ko \
-    common/videobuf2/videobuf2-memops.ko \
-    common/videobuf2/videobuf2-vmalloc.ko \
-    dvb-core/dvb-core.ko"
 
+# Make sure an argument was passed 
+usage() { echo "Usage: $0 [-n <name>] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2 }
+[ $# -eq 0 ] && usage && exit 1
+
+
+# Get basic options
+while getopts ":h:n:a:" arg; do
+  case $arg in
+    n) NAME=${OPTARG};;
+    a) ACTION=${OPTARG};;
+    h) usage;;
+  esac
+done
+
+# Gather the remaining kernel modules passed as parameters
+shift $((OPTIND-1))
+KO=$@
+
+
+# load the requested modules
 load ()
 {
    echo "Loading kernel modules... "
@@ -42,6 +52,8 @@ load ()
    echo "$FIRMWARE_PATH" > /sys/module/firmware_class/parameters/path
 }
 
+
+# unload the requested modules in a reversed order
 unload ()
 {
    # Unload drivers in reverse order
@@ -61,6 +73,8 @@ unload ()
    done
 }
 
+
+# Provide a status of the loaded modules
 status ()
 {
    echo "Status of kernel modules... "
@@ -83,42 +97,43 @@ status ()
    return $error
 }
 
-case $1 in
+
+case $ACTION in
     load)
-        if status; then
-            echo ${DNAME} is already running
-            exit 0
-        else
-            echo Starting ${DNAME} ...
-            load
-            exit $?
-        fi
-        ;;
+       if status; then
+           echo ${DNAME} is already running
+           exit 0
+       else
+           echo Starting ${DNAME} ...
+           load
+           exit $?
+       fi
+       ;;
     unload)
-        if status; then
-            echo Stopping ${DNAME} ...
-            unload
-            exit $?
-        else
-            echo ${DNAME} is not running
-            exit 0
-        fi
-        ;;
+       if status; then
+           echo Stopping ${DNAME} ...
+           unload
+           exit $?
+       else
+           echo ${DNAME} is not running
+           exit 0
+       fi
+       ;;
     reload)
-        unload
-        load
-        exit $?
-        ;;
+       unload
+       load
+       exit $?
+       ;;
     status)
-        if status; then
-            echo ${DNAME} is running
-            exit 0
-        else
-            echo ${DNAME} is not running
-            exit 1
-        fi
-        ;;
-    *)
-        exit 1
-        ;;
+       if status; then
+           echo ${DNAME} is running
+           exit 0
+       else
+           echo ${DNAME} is not running
+           exit 1
+       fi
+       ;;
+    *) usage
+       exit 1
+       ;;
 esac

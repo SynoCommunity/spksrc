@@ -4,8 +4,8 @@
 PACKAGE="linuxtv"
 DNAME="LinuxTV"
 
-FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
-KO_PATH=/var/packages/linuxtv/target/lib/modules/$(uname -r)/kernel/drivers/media
+# Others
+LINUXTV="${INSTALL_DIR}/bin/linuxtv.sh"
 
 KO="rc/rc-core.ko \
     mc/mc.ko \
@@ -17,87 +17,21 @@ KO="rc/rc-core.ko \
     common/videobuf2/videobuf2-vmalloc.ko \
     dvb-core/dvb-core.ko"
 
-start_daemon ()
-{
-   echo "Loading kernel modules... "
-   for ko in $KO
-   do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%30s %-15s' $ko "[$module]"
-
-      status=$(lsmod | grep "^$module ")
-      if [ $? -eq 0 -a "status" ]; then
-         echo "Already Loaded"
-      else
-         if [ -f $KO_PATH/$ko ]; then
-            insmod $KO_PATH/$ko
-            [ $? -eq 0 ] && echo "OK" || echo "ERROR"
-         else
-            echo "ERROR: Module $KO_PATH/$ko not found!"
-         fi
-      fi
-   done
-
-   # Add firmware path to running kernel
-   echo "$FIRMWARE_PATH" > /sys/module/firmware_class/parameters/path
-}
-
-stop_daemon ()
-{
-   # Unload drivers in reverse order
-   echo "Unloading kernel modules... "
-   for item in $KO; do echo $item; done | tac | while read ko
-   do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%30s %-15s' $ko "[$module]"
-
-      status=$(lsmod | grep "^$module ")
-      if [ $? -eq 0 -a "status" ]; then
-         rmmod $module
-         echo -ne "OK\n"
-      else
-         echo -ne "N/A\n"
-      fi
-   done
-}
-
-daemon_status ()
-{
-   echo "Status of kernel modules... "
-   error=0
-
-   for ko in $KO
-   do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%30s %-15s' $ko "[$module]"
-
-      status=$(lsmod | grep "^$module ")
-      if [ $? -eq 0 -a "status" ]; then
-         echo -ne "OK\n"
-      else
-         error=1
-         echo -ne "N/A\n"
-      fi
-   done
-
-   return $error
-}
-
 case $1 in
     start)
-        if daemon_status; then
+        if ${LINUXTV} status; then
             echo ${DNAME} is already running
             exit 0
         else
             echo Starting ${DNAME} ...
-            start_daemon
+            ${LINUXTV} load $KO
             exit $?
         fi
         ;;
     stop)
-        if daemon_status; then
+        if ${LINUXTV} status; then
             echo Stopping ${DNAME} ...
-            stop_daemon
+            ${LINUXTV} unload $KO
             exit $?
         else
             echo ${DNAME} is not running
@@ -105,12 +39,12 @@ case $1 in
         fi
         ;;
     restart)
-        stop_daemon
-        start_daemon
+        ${LINUXTV} unload $KO
+        ${LINUXTV} load $KO
         exit $?
         ;;
     status)
-        if daemon_status; then
+        if ${LINUXTV} status; then
             echo ${DNAME} is running
             exit 0
         else
