@@ -1,18 +1,17 @@
 PKG_NAME = libtorrent
-PKG_VERS = 1.1.14
+PKG_VERS = 1.2.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(subst .,_,$(PKG_VERS))
+PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
-# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python2 must appear before cross/boost
+# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python3 must appear before cross/boost
+DEPENDS = cross/python3 cross/boost cross/geoip cross/libiconv cross/openssl
 BUILD_DEPENDS = cross/python2 
-DEPENDS = cross/boost cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-# libtorrent:
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
+# libtorrent: qoriq(ppc) evansport(x86) lack some recent linux includes network definitions (if_link.h IFLA_CARRIER IFLA_PROMISCUITY)
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARM5_ARCHES) $(PPC_ARCHS) $(x86_ARCHS)
 
 HOMEPAGE = https://www.rasterbar.com/products/libtorrent
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.
@@ -28,9 +27,8 @@ include ../../mk/spksrc.common.mk
 GNU_CONFIGURE = 1
 -include $(WORK_DIR)/python-cc.mk
 CONFIGURE_ARGS  = --enable-python-binding --with-libiconv
-CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python
-CONFIGURE_ARGS += --with-boost-chrono=boost_chrono --with-boost-random=boost_random
-CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python2/work-native/install/usr/local/bin/python
+CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python37
+CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/python3
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
