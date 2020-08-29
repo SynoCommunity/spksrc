@@ -8,19 +8,20 @@ include ../../mk/spksrc.directories.mk
 
 
 # Configure the included makefiles
-URLS          = $(TC_DIST_SITE)/$(TC_DIST_NAME)
-NAME          = $(TC_NAME)
-COOKIE_PREFIX = $(TC_NAME)-
+URLS             = $(TC_DIST_SITE)/$(TC_DIST_NAME)
+NAME             = $(TC_NAME)
+COOKIE_PREFIX    = $(TC_NAME)-
 ifneq ($(TC_DIST_FILE),)
-LOCAL_FILE    = $(TC_DIST_FILE)
+LOCAL_FILE       = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE = $(TC_DIST_FILE)
+PKG_DIST_FILE    = $(TC_DIST_FILE)
 else
-LOCAL_FILE    = $(TC_DIST_NAME)
+LOCAL_FILE       = $(TC_DIST_NAME)
 endif
-DISTRIB_DIR   = $(TOOLCHAINS_DIR)/$(TC_VERS)
-DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT      = $(TC_EXT)
+DISTRIB_DIR      = $(TOOLCHAINS_DIR)/$(TC_VERS)
+DIST_FILE        = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT         = $(TC_EXT)
+TC_LOCAL_VARS_MK = $(WORK_DIR)/tc_vars.mk
 
 #####
 
@@ -38,35 +39,23 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-vers: patch
+flags: patch
 include ../../mk/spksrc.tc-vers.mk
+
+vers: flags
+include ../../mk/spksrc.tc-flags.mk
 
 fix: vers
 include ../../mk/spksrc.tc-fix.mk
 
+all: $(TC_LOCAL_VARS_MK)
 
-all: fix
-
-
-TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
-
-CFLAGS += $(TC_CFLAGS)
-CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
-
-CPPFLAGS += $(TC_CPPFLAGS)
-CPPFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
-
-CXXFLAGS += $(TC_CXXFLAGS)
-CXXFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
-
-LDFLAGS += $(TC_LDFLAGS)
-LDFLAGS += -L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
-LDFLAGS += -Wl,--rpath-link,$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
-LDFLAGS += -Wl,--rpath,$(INSTALL_PREFIX)/lib
-
+.PHONY: $(TC_LOCAL_VARS_MK)
+$(TC_LOCAL_VARS_MK): fix
+	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
 
 .PHONY: tc_vars
-tc_vars: patch
+tc_vars: fix
 	@echo TC_ENV :=
 	@for tool in $(TOOLS) ; \
 	do \
