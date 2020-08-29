@@ -38,7 +38,10 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-fix: patch
+vers: patch
+include ../../mk/spksrc.tc-vers.mk
+
+fix: vers
 include ../../mk/spksrc.tc-fix.mk
 
 

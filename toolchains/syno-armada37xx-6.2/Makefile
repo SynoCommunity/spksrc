@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = armada37xx
 TC_VERS = 6.2
-TC_OS_MIN_VER = 6.2-22259
 
 # No toolchain available for armada37xx so use equivalent rtd1296
 TC_DIST = rtd1296-gcc494_glibc220_armv8-GPL

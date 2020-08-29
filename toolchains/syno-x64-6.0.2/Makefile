@@ -2,7 +2,6 @@ TC_NAME = syno-x64
 
 TC_ARCH = avoton braswell broadwell bromolow cedarview grantley x86 x86_64
 TC_VERS = 6.0.2
-TC_FIRMWARE = 6.0.2-8451
 
 TC_DIST = x64-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz

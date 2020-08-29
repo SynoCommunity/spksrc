@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = comcerto2k
 TC_VERS = 5.0
-TC_FIRMWARE = 5.0-4458
 
 TC_DIST = gcc464_glibc217_neon_comcerto-GPL
 TC_EXT = tgz

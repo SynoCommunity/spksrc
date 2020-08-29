@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = denverton
 TC_VERS = 6.2
-TC_OS_MIN_VER = 6.2-22259
 
 TC_DIST = denverton-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz

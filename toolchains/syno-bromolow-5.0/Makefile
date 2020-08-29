@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = bromolow
 TC_VERS = 5.0
-TC_FIRMWARE = 5.0-4458
 
 TC_DIST = gcc473_glibc217_x86_64_bromolow-GPL
 TC_EXT = tgz

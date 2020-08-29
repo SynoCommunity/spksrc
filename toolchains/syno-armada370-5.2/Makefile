@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = armada370
 TC_VERS = 5.2
-TC_FIRMWARE = 5.2-5644
 TC_KERNEL = 3.2.40+
 
 TC_DIST = armada370-gcc464_glibc215_hard_armada-GPL

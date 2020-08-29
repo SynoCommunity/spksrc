@@ -2,7 +2,6 @@ TC_NAME = syno-alpine
 
 TC_ARCH = alpine alpine4k
 TC_VERS = 6.1
-TC_OS_MIN_VER = 6.1-15047
 TC_KERNEL = 3.10.102+
 
 TC_DIST = alpine4k-gcc493_glibc220_hard-GPL

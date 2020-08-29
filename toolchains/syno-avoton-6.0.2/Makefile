@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = avoton
 TC_VERS = 6.0.2
-TC_FIRMWARE = 6.0.2-8451
 
 TC_DIST = avoton-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz

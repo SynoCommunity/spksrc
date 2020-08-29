@@ -2,7 +2,6 @@ TC_NAME = syno-aarch64
 
 TC_ARCH = rtd1296 armada37xx aarch64
 TC_VERS = 6.1
-TC_OS_MIN_VER = 6.1-15047
 
 TC_DIST = rtd1296-gcc494_glibc220_armv8-GPL
 TC_EXT = txz

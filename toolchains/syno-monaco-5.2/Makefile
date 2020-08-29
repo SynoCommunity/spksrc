@@ -2,7 +2,6 @@ TC_NAME = syno-monaco
 
 TC_ARCH = monaco
 TC_VERS = 5.2
-TC_FIRMWARE = 5.2-5644
 TC_KERNEL = 3.10.35+
 
 TC_DIST = monaco-gcc483_glibc219_hard-GPL

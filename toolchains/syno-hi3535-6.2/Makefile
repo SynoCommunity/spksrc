@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = hi3535
 TC_VERS = 6.2
-TC_OS_MIN_VER = 6.2-22259
 
 TC_DIST = hi3535-gcc483_glibc219_hi3535-GPL
 TC_EXT = txz

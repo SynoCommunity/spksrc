@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = armada37xx
 TC_VERS = 6.2.2
-TC_OS_MIN_VER = 6.2.2-24922
 TC_KERNEL = 4.4.59+
 
 TC_DIST = armada37xx-gcc494_glibc220_armv8-GPL

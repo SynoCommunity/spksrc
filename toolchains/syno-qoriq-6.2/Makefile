@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = qoriq
 TC_VERS = 6.2
-TC_OS_MIN_VER = 6.2-22259
 TC_KERNEL = 2.6.32.12+
 
 TC_DIST = qoriq-gcc493_glibc220_hard_qoriq-GPL

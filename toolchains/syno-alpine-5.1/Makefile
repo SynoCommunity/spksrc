@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = alpine
 TC_VERS = 5.1
-TC_FIRMWARE = 5.1-5004
 
 TC_DIST = gcc464_glibc217_alpine-GPL
 TC_EXT = tgz

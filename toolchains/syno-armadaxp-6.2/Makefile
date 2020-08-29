@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = armadaxp
 TC_VERS = 6.2
-TC_OS_MIN_VER = 6.2-22259
 TC_KERNEL = 3.2.40+
 
 TC_DIST = armadaxp-gcc493_glibc220_hard-GPL

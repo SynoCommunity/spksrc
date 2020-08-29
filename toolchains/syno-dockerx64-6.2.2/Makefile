@@ -2,7 +2,6 @@ TC_NAME = syno-dockerx64
 
 TC_ARCH = dockerx64
 TC_VERS = 6.2.2
-TC_OS_MIN_VER = 6.2.2-24922
 TC_KERNEL = 3.10.105+
 
 TC_DIST = dockerx64-gcc493_glibc220_linaro_x86_64-GPL

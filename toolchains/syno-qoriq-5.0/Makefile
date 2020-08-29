@@ -2,7 +2,6 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = qoriq
 TC_VERS = 5.0
-TC_FIRMWARE = 5.0-4458
 
 TC_DIST = gcc4374_eglibc2874_qoriq-GPL
 TC_EXT = tgz
