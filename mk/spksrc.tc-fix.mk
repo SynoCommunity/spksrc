@@ -34,7 +34,7 @@ pre_fix_target: fix_msg
 
 fix_target:  $(PRE_FIX_TARGET) 
 	chmod -R u+w $(WORK_DIR)
-	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/$(TC_SYSROOT)/lib'|" {} \;
+	@find $(WORK_DIR)/$(TC_PREFIX) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_PREFIX)/$(TC_SYSROOT)/lib'|" {} \;
 
 post_fix_target: $(FIX_TARGET)
 

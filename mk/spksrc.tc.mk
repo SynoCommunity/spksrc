@@ -24,7 +24,7 @@ DIST_EXT      = $(TC_EXT)
 
 #####
 
-RUN = cd $(WORK_DIR)/$(TC_BASE_DIR) && env $(ENV)
+RUN = cd $(WORK_DIR)/$(TC_PREFIX) && env $(ENV)
 MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk
@@ -69,7 +69,7 @@ tc_vars: patch
 	do \
 	  target=`echo $${tool} | sed 's/\(.*\):\(.*\)/\1/'` ; \
 	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
-	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=\"$(WORK_DIR)/$(TC_BASE_DIR)/bin/$(TC_PREFIX)-$${source}\" ; \
+	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=\"$(WORK_DIR)/$(TC_PREFIX)/bin/$(TC_PREFIX)-$${source}\" ; \
 	done
 	@echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\)\"
 	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\"
@@ -78,7 +78,7 @@ tc_vars: patch
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
 	@echo TC_TARGET := $(TC_TARGET)
 	@echo TC_PREFIX := $(TC_PREFIX)-
-	@echo TC_PATH := $(WORK_DIR)/$(TC_BASE_DIR)/bin/
+	@echo TC_PATH := $(WORK_DIR)/$(TC_PREFIX)/bin/
 	@echo CFLAGS := $(CFLAGS) $$\(ADDITIONAL_CFLAGS\)
 	@echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)
 	@echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)
