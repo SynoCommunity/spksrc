@@ -23,11 +23,11 @@ busybox_custom_configure:
 	cat $(addprefix configs/, $(BUSYBOX_CONFIG)) | while IFS== read option value; do \
 	  sed -i -r -e "s/^(# )?$$option.*$$/$$option=$$value/" $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig ; \
 	done
-	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) spksrc_defconfig
+	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX)- $(MAKE) spksrc_defconfig
 
 .PHONY: busybox_custom_compile
 busybox_custom_compile:
-	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) busybox
+	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX)- $(MAKE) busybox
 
 .PHONY: busybox_custom_install
 busybox_custom_install:

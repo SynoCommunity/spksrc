@@ -20,10 +20,10 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: lua_custom_compile
 lua_custom_compile:
 	@$(RUN) $(MAKE) linux \
-		CC="$(TC_PATH)$(TC_PREFIX)gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline" \
-		CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline" \
-		AR="$(TC_PATH)$(TC_PREFIX)ar rcu \$$(ALLFLAGS)" \
-		RANLIB="$(TC_PATH)$(TC_PREFIX)ranlib \$$(ALLFLAGS)" \
+		CC="$(TC_PATH)$(TC_PREFIX)-gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline" \
+		CXX="$(TC_PATH)$(TC_PREFIX)-g++ \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline" \
+		AR="$(TC_PATH)$(TC_PREFIX)-ar rcu \$$(ALLFLAGS)" \
+		RANLIB="$(TC_PATH)$(TC_PREFIX)-ranlib \$$(ALLFLAGS)" \
 		CPPFLAGS="$(CPPFLAGS)" \
 		LDFLAGS="$(LDFLAGS) -Wl,--rpath,$(INSTALL_PREFIX)/lib" \
 		MYLIBS="-lncurses"
