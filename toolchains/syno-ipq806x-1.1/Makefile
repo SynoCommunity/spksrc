@@ -11,7 +11,6 @@ TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/SRM%201
 TC_DIST_FILE = $(TC_ARCH)-$(TC_DIST_NAME)
 
 TC_PREFIX = arm-unknown-linux-gnueabi
-TC_TARGET = arm-unknown-linux-gnueabi
 
 TC_CFLAGS = -I$(WORK_DIR)/$(TC_PREFIX)/$(TC_PREFIX)/sysroot/usr/include
 TC_CPPFLAGS = -I$(WORK_DIR)/$(TC_PREFIX)/$(TC_PREFIX)/sysroot/usr/include

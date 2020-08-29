@@ -17,7 +17,7 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-CONFIGURE_ARGS  = --enable-shared --enable-unicode=ucs4 --target=$(TC_TARGET) --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE)
+CONFIGURE_ARGS  = --enable-shared --enable-unicode=ucs4 --target=$(TC_PREFIX) --enable-ipv6 PYTHON_FOR_BUILD=$(HOSTPYTHON) PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE)
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ac_cv_buggy_getaddrinfo=no
 
 POST_PATCH_TARGET = python_post_patch
@@ -30,7 +30,7 @@ PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 include ../../mk/spksrc.cross-cc.mk
 
 HOST_ARCH = $(shell uname -m)
-BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
+BUILD_ARCH = $(shell expr "$(TC_PREFIX)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
