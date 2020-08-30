@@ -32,9 +32,6 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 
-# Pure Python package, make sure ARCH is not defined
-#override ARCH=
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-minion_extra_install
