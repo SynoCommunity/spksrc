@@ -11,6 +11,6 @@ TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206
 
 TC_PREFIX = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_PREFIX)/sysroot
-TC_CFLAGS = -mhard-float -mfpu=vfpv3-d16
+TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3-d16
 
 include ../../mk/spksrc.tc.mk

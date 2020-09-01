@@ -11,7 +11,7 @@ TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205
 TC_PREFIX = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_PREFIX)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
-TC_CFLAGS = -mhard-float -mfpu=vfpv3
+TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3
 
 PRE_FIX_TARGET = myFix
 

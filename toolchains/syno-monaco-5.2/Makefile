@@ -11,6 +11,6 @@ TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205
 
 TC_PREFIX = arm-cortexa9hf-linux-gnueabi
 TC_SYSROOT = $(TC_PREFIX)/sysroot
-TC_CFLAGS = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
+TC_EXTRA_CFLAGS = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 
 include ../../mk/spksrc.tc.mk

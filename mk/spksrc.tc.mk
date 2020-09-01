@@ -76,7 +76,7 @@ tc_vars: fix
 	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
 	@echo TC_LIBRARY := $(TC_LIBRARY)
 	@echo TC_INCLUDE := $(TC_INCLUDE)
-	@echo TC_CFLAGS := $(TC_CFLAGS)
+	@echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS)
 	@echo TC_FIRMWARE := $(TC_FIRMWARE)
 	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)

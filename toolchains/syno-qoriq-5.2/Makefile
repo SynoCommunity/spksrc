@@ -12,6 +12,6 @@ TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205
 TC_PREFIX = powerpc-none-linux-gnuspe
 TC_SYSROOT = $(TC_PREFIX)
 TC_INCLUDE = $(TC_SYSROOT)/include
-TC_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
+TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 
 include ../../mk/spksrc.tc.mk

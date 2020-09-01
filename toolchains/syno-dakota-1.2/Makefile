@@ -12,6 +12,6 @@ TC_DIST_FILE = $(TC_ARCH)-$(TC_DIST_NAME)
 
 TC_PREFIX = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_PREFIX)/sysroot
-TC_CFLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
+TC_EXTRA_CFLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
 
 include ../../mk/spksrc.tc.mk
