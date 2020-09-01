@@ -1,6 +1,6 @@
 PKG_NAME = openssl
 OLD_VERSION = 1.0.2
-PATCH_VERS = n
+PATCH_VERS = u
 PKG_VERS = $(OLD_VERSION)$(PATCH_VERS)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -52,7 +52,7 @@ endif
 
 .PHONY: openssl_configure
 openssl_configure:
-	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
+	$(RUN) ./Configure --openssldir=/etc/ssl --prefix=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
 
 .PHONY: openssl_install
 openssl_install:
