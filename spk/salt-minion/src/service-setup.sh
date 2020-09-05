@@ -1,13 +1,12 @@
 PYTHON_DIR="/usr/local/python3"
-SALT_PKG_DIR="/usr/local/salt-minion"
-PATH="${SALT_PKG_DIR}/bin:${SALT_PKG_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PYTHON="${SALT_PKG_DIR=}/env/bin/python"
+PYTHON="${SYNOPKG_PKGDEST=}/env/bin/python"
 LANGUAGE="env LANG=en_US.UTF-8"
-SALT_MINION="${SALT_PKG_DIR}/env/bin/salt-minion"
-PID_FILE="${SALT_PKG_DIR}/var/run/salt-minion.pid"
+SALT_MINION="${SYNOPKG_PKGDEST}/env/bin/salt-minion"
+PID_FILE="${SYNOPKG_PKGDEST}/var/run/salt-minion.pid"
 
-SERVICE_COMMAND="${SALT_MINION} -c ${SALT_PKG_DIR}/var -d"
+SERVICE_COMMAND="${SALT_MINION} -c ${SYNOPKG_PKGDEST}/var -d"
 
 service_postinst ()
 {
