@@ -24,7 +24,7 @@ service_postinst ()
     install -m 755 -d ${SYNOPKG_PKGDEST}/var
     install -m 755 -d ${SYNOPKG_PKGDEST}/var/minion.d
     install -m 644 ${SYNOPKG_PKGDEST}/share/minion.conf ${SYNOPKG_PKGDEST}/var
-    echo "pidfile: ${SYNOPKG_PKGDEST}/var/run/salt-minion.pid" > ${SYNOPKG_PKGDEST}/var/minion.d/02_pidfile.conf
+    echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/var/minion.d/02_pidfile.conf
     # Populate salt master address and minion_id only if file don't already exist
     test -f ${SYNOPKG_PKGDEST}/var/minion.d/99-master-address.conf || echo "master: salt" > ${SYNOPKG_PKGDEST}/var/minion.d/99-master-address.conf
     test -f ${SYNOPKG_PKGDEST}/var/minion.d/98-minion-id.conf || echo "id: myname" > ${SYNOPKG_PKGDEST}/var/minion.d/98-minion-id.conf
