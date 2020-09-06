@@ -8,7 +8,7 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncurses cross/bzip2 cross/xz
+DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for uuid module to be available
 DEPENDS += cross/libuuid
 # required because libffi is no longer bundled with python

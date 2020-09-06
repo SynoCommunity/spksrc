@@ -1,7 +1,7 @@
 SPK_NAME = python3
 SPK_SHORT_VERS = 3.7
 SPK_VERS = $(SPK_SHORT_VERS).7
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "1. Update to Python 3.7.7"
+CHANGELOG = "1. Fixed curses native module"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF
