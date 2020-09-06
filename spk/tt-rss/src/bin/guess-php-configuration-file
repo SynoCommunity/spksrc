@@ -1,0 +1,14 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+source "${SCRIPT_DIR}/settings.sh"
+
+php_bin="$1"
+web_station_configuration_file="${WEB_STATION_HOME_DIR}/etc/${php_bin}/php.ini"
+if [ -f "${web_station_configuration_file}" ]
+then
+    echo -n "${web_station_configuration_file}"
+else
+    echo -n "/usr/local/etc/${php_bin}/php.ini"
+fi
+

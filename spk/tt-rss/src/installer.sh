@@ -12,7 +12,7 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
-PHP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
+PHP="${INSTALL_DIR}/bin/virtual-php"
 MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
 MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="ttrss"
@@ -64,12 +64,14 @@ postinst ()
         [ ${MYSQL_DATABASE_EXISTS} ] || ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
         [ ${MYSQL_USER_EXISTS} ] || ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
-        sed -e "s|define('DB_TYPE', \".*\");|define('DB_TYPE', 'mysql');|" \
-            -e "s|define('DB_USER', \".*\");|define('DB_USER', '${MYSQL_USER}');|" \
-            -e "s|define('DB_NAME', \".*\");|define('DB_NAME', '${MYSQL_DATABASE}');|" \
-            -e "s|define('DB_PASS', \".*\");|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
+        sed -e "s|define('DB_TYPE', '.*');|define('DB_TYPE', 'mysql');|" \
+            -e "s|define('DB_HOST', '.*');|define('DB_HOST', 'localhost');|" \
+            -e "s|define('DB_USER', '.*');|define('DB_USER', '${MYSQL_USER}');|" \
+            -e "s|define('DB_NAME', '.*');|define('DB_NAME', '${MYSQL_DATABASE}');|" \
+            -e "s|define('DB_PASS', '.*');|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
             -e "s|define('SINGLE_USER_MODE', .*);|define('SINGLE_USER_MODE', ${single_user_mode});|" \
             -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
+            -e "s|define('DB_PORT', '.*');|define('DB_PORT', '3306');|" \
             -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
             ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php
     fi

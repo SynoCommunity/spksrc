@@ -1,11 +1,11 @@
 PKG_NAME = tt-rss
-PKG_VERS = 17.4
+PKG_VERS = 67f02e2aa7
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://git.tt-rss.org/fox/tt-rss/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)
-
+PKG_GIT_HASH = 67f02e2aa7b246ef7ca2b2aa4c62e2826327d219
+PKG_DIST_SITE = https://git.tt-rss.org/fox/tt-rss.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DOWNLOAD_METHOD = git
 DEPENDS =
 
 HOMEPAGE = http://tt-rss.org/
