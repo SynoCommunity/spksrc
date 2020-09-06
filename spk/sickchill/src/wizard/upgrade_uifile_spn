@@ -1,0 +1,9 @@
+[{
+    "step_title": "¡Atención! Permisos DSM",
+    "items": [{
+        "desc": "Los permisos para los paquetes relacionados con descargas son manejados por el grupo <b>'sc-download'</b> en DSM.<br>El grupo 'users' no se usa en DSM 6.<br>El usuario del paquete no aparecerá en algunas configuraciones.<br>Por favor, lea <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Manejo de Permisos (en inglés)</a> para mayor detalle."
+    },
+    {
+        "desc": "<strong style='color:red'>NOTA:</strong> La actualización del paquete intentará establecer los permisos adecuados en las carpetas. Si obtiene errores de permisos en SickChill, establezca manualmente los permisos de Lectura/Escritura para el grupo 'sc-download' en las carpetas que se mencionen, usando File Station."
+    }]
+}]
