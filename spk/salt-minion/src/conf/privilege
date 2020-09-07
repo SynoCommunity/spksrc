@@ -22,6 +22,9 @@
 		"action": "postupgrade",
 		"run-as": "root"
 	}, {
+		"action": "status",
+		"run-as": "root"
+	}, {
 		"action": "start",
 		"run-as": "root"
 	}, {
