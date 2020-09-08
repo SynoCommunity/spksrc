@@ -1,21 +1,23 @@
 [{
-    "step_title": "Elija su fork",
+    "step_title": "Configurar credenciales (Puede editarlas tras la instalación desde la propia aplicación)",
     "items": [{
         "type": "textfield",
-        "desc": "Configurar el fork a usar",
+        "desc": "Nombre de usuario HTTP (deje en blanco para no requerir usuario)",
         "subitems": [{
-            "key": "wizard_fork_url",
-            "desc": "Fork URL",
-            "defaultValue": "git://github.com/SickChill/SickChill.git",
+            "key": "wizard_username",
+            "desc": "Usuario",
             "validator": {
-                "allowBlank": false
+                "allowBlank": true
             }
-        }, {
-            "key": "wizard_fork_branch",
-            "desc": "Rama",
-            "defaultValue": "master",
+        }]
+    },{
+        "type": "password",
+        "desc": "Contraseña HTTP (en blanco = sin autenticación)",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Contraseña",
             "validator": {
-                "allowBlank": false
+                "allowBlank": true
             }
         }]
     },

@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 8
+SPK_REV = 0
 SPK_ICON = src/sickchill.png
 
 SPK_DEPENDS = "python3>=3.6:git"

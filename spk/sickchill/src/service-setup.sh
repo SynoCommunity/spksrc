@@ -13,14 +13,6 @@ GROUP="sc-download"
 
 SERVICE_COMMAND="${PYTHON} ${SICKCHILL} --daemon --nolaunch --pidfile ${PID_FILE} --config ${SC_CFG_FILE} --datadir ${SC_DATA_DIR}"
 
-service_preinst ()
-{
-    # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/SickChill/SickChill.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
-        echo "Incorrect fork"
-        exit 1
-    fi
-}
 
 service_postinst ()
 {
@@ -29,6 +21,15 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
-        ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/SickChill/SickChill.git} ${SYNOPKG_PKGDEST}/var/SickChill > /dev/null 2>&1
+        ${GIT} clone --depth 10 --recursive -q -b master git://github.com/SickChill/SickChill.git ${SYNOPKG_PKGDEST}/var/SickChill > /dev/null 2>&1
+
+      if [ -n "${wizard_username}" ] && [ -n "${wizard_password}" ]; then
+        mkdir -p ${SC_DATA_DIR}
+        cat << EOF > ${SC_CFG_FILE}
+[General]
+web_username = ${wizard_username}
+web_password = ${wizard_password}
+EOF
+      fi
     fi
 }
