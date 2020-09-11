@@ -24,12 +24,17 @@ service_postinst ()
         ${GIT} clone --depth 10 --recursive -q -b master git://github.com/SickChill/SickChill.git ${SYNOPKG_PKGDEST}/var/SickChill > /dev/null 2>&1
 
       if [ -n "${wizard_username}" ] && [ -n "${wizard_password}" ]; then
-        mkdir -p ${SC_DATA_DIR}
-        cat << EOF > ${SC_CFG_FILE}
+        if [ -f "${SC_CFG_FILE}" ]; then
+          sed -i "/^\s*web_username\s*=/s/\s*=\s*.*/ = ${wizard_username}/" ${SC_CFG_FILE}
+          sed -i "/^\s*web_password\s*=/s/\s*=\s*.*/ = ${wizard_password}/" ${SC_CFG_FILE}
+        else
+          mkdir -p ${SC_DATA_DIR}
+          cat << EOF > ${SC_CFG_FILE}
 [General]
 web_username = ${wizard_username}
 web_password = ${wizard_password}
 EOF
+        fi
       fi
     fi
 }

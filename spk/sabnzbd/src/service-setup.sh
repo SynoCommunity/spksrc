@@ -33,7 +33,7 @@ service_postupgrade ()
     # Extract the right paths from config file
     if [ -r "${CFG_FILE}" ]; then
         INCOMPLETE_FOLDER=`sed -n 's/^download_dir[ ]*=[ ]*//p' ${CFG_FILE}`
-        COMPLETE_FOLDER= `sed -n 's/^complete_dir[ ]*=[ ]*//p' ${CFG_FILE}`
+        COMPLETE_FOLDER=`sed -n 's/^complete_dir[ ]*=[ ]*//p' ${CFG_FILE}`
         WATCHED_FOLDER=`sed -n 's/^dirscan_dir[ ]*=[ ]*//p' ${CFG_FILE}`
 
         # Apply permissions
