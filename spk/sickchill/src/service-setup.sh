@@ -23,7 +23,7 @@ service_postinst ()
         # Clone the repository
         ${GIT} clone --depth 10 --recursive -q -b master git://github.com/SickChill/SickChill.git ${SYNOPKG_PKGDEST}/var/SickChill > /dev/null 2>&1
 
-      if [ -n "${wizard_username}" ] && [ -n "${wizard_password}" ]; then
+      if [ -n "${wizard_username}" ] && [ -n "${wizard_password}" ] && [ ! -f "${SC_CFG_FILE}" ]; then
         mkdir -p ${SC_DATA_DIR}
         cat << EOF > ${SC_CFG_FILE}
 [General]

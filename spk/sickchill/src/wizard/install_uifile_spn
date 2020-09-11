@@ -1,6 +1,8 @@
 [{
     "step_title": "Configurar credenciales (Puede editarlas tras la instalación desde la propia aplicación)",
     "items": [{
+        "desc": "<i>ADVERTENCIA: Si el fichero de configuración ya existe, esto no tendrá ningún efecto.</i>"
+    },{
         "type": "textfield",
         "desc": "Nombre de usuario HTTP (deje en blanco para no requerir usuario)",
         "subitems": [{
