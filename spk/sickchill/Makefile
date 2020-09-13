@@ -8,14 +8,12 @@ SPK_DEPENDS = "python3>=3.6:git"
 MAINTAINER = Nyaran
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
-RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
+CHANGELOG = "Initial SickChill version"
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPL
-HELPURL    = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SickChill
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
