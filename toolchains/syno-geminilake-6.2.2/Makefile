@@ -2,6 +2,7 @@ TC_NAME = syno-$(TC_ARCH)
 
 TC_ARCH = geminilake
 TC_VERS = 6.2.2
+TC_KERNEL = 4.4.59+
 
 TC_DIST = geminilake-gcc493_glibc220_linaro_x86_64-GPL
 TC_EXT = txz
