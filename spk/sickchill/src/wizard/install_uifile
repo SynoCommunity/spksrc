@@ -1,8 +1,6 @@
 [{
-    "step_title": "Setup credentials (You can edit after install on the application itself)",
+    "step_title": "Setup credentials (You can edit these after install in the application settings)",
     "items": [{
-        "desc": "<i>WARNING: If the configuration file exists, this will have no effect.</i>"
-    },{
         "type": "textfield",
         "desc": "HTTP username (set blank for no login)",
         "subitems": [{
