@@ -33,7 +33,7 @@ endif
 ifeq ($(strip $(REQUIRE_TOOLKIT)),)
 TK_DEPEND = 
 else
-TK_DEPEND = toolkits/syno-$(ARCH)-$(TCVERSION)
+TK_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
 endif
 
 ifeq ($(strip $(REQUIRE_KERNEL)),)
