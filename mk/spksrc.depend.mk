@@ -31,9 +31,9 @@ $(POST_DEPEND_TARGET): $(DEPEND_TARGET)
 endif
 
 ifeq ($(strip $(REQUIRE_TOOLKIT)),)
-TK_DEPEND = 
+TOOLKIT_DEPEND = 
 else
-TK_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
+TOOLKIT_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
 endif
 
 ifeq ($(strip $(REQUIRE_KERNEL)),)
@@ -48,7 +48,7 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-	@for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TK_DEPEND) $(DEPENDS); \
+	@for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TOOLKIT_DEPEND) $(DEPENDS); \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done

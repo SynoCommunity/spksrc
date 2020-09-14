@@ -123,11 +123,11 @@ CONFIGURE_ARGS += --disable-x86asm
 CONFIGURE_ARGS += --extra-cflags=-fasm
 CONFIGURE_ARGS += --extra-cflags=-std=c99
 CONFIGURE_ARGS += --extra-cflags=-pedantic
-CONFIGURE_ARGS += --extra-cflags=-I$(TK_ROOT)/include/intelce-utilities
-CONFIGURE_ARGS += --extra-cflags=-I$(TK_ROOT)/include/intelce-utilities/linux_user
-CONFIGURE_ARGS += --extra-ldflags=-L$(TK_ROOT)/lib/intelce-utilities
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TK_ROOT)/lib
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TK_ROOT)/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(TOOLKIT_ROOT)/include/intelce-utilities
+CONFIGURE_ARGS += --extra-cflags=-I$(TOOLKIT_ROOT)/include/intelce-utilities/linux_user
+CONFIGURE_ARGS += --extra-ldflags=-L$(TOOLKIT_ROOT)/lib/intelce-utilities
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TOOLKIT_ROOT)/lib
+CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TOOLKIT_ROOT)/lib/intelce-utilities
 # DISABLE
 CONFIGURE_ARGS += --disable-decoder=h264_smd
 CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd

@@ -8,24 +8,24 @@ include ../../mk/spksrc.directories.mk
 
 
 # Configure the included makefiles
-URLS          = $(TK_DIST_SITE)/$(TK_DIST_NAME)
-NAME          = $(TK_NAME)
-COOKIE_PREFIX = $(TK_NAME)-
-ifneq ($(TK_DIST_FILE),)
-LOCAL_FILE    = $(TK_DIST_FILE)
+URLS          = $(TOOLKIT_DIST_SITE)/$(TOOLKIT_DIST_NAME)
+NAME          = $(TOOLKIT_NAME)
+COOKIE_PREFIX = $(TOOLKIT_NAME)-
+ifneq ($(TOOLKIT_DIST_FILE),)
+LOCAL_FILE    = $(TOOLKIT_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE = $(TK_DIST_FILE)
+PKG_DIST_FILE = $(TOOLKIT_DIST_FILE)
 else
-LOCAL_FILE    = $(TK_DIST_NAME)
+LOCAL_FILE    = $(TOOLKIT_DIST_NAME)
 endif
-DISTRIB_DIR   = $(TOOLKIT_DIR)/$(TK_VERS)
+DISTRIB_DIR   = $(TOOLKIT_DIR)/$(TOOLKIT_VERS)
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT      = $(TK_EXT)
-EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TK_STRIP) usr/$(TK_PREFIX)/$(TK_BASE_DIR)/$(TK_SYSROOT)
+DIST_EXT      = $(TOOLKIT_EXT)
+EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TOOLKIT_STRIP) usr/$(TOOLKIT_PREFIX)/$(TOOLKIT_BASE_DIR)/$(TOOLKIT_SYSROOT)
 
 #####
 
-RUN = cd $(WORK_DIR)/$(TK_BASE_DIR) && env $(ENV)
+RUN = cd $(WORK_DIR)/$(TOOLKIT_BASE_DIR) && env $(ENV)
 MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk

@@ -10,8 +10,8 @@ KERNEL_ROOT=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/li
 endif
 
 ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
-ENV += TK_ROOT=$(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
-TK_ROOT=$(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
+ENV += TOOLKIT_ROOT=$(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
+TOOLKIT_ROOT=$(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 endif
 
 ifneq ($(strip $(TC)),)
