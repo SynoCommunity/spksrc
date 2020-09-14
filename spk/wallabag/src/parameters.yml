@@ -13,8 +13,7 @@ parameters:
     # with PostgreSQL and SQLite, you must set "utf8"
     database_charset: utf8mb4
 
-    # Todo replace with ip address
-    domain_name: http://localhost
+    domain_name: @protocoll_and_domain_name@
 
     mailer_transport:  smtp
     mailer_user:       ~
