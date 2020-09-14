@@ -22,8 +22,13 @@
                {
                   "key":"wizard_mysql_database_password",
                   "desc":"User password",
-                  "validator":{
-                     "allowBlank":false
+                  "validator": {
+                    "allowBlank": false,
+                    "minLength": 10,
+                    "regex": {
+                        "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*?{}()\[\]\-=_+\\;':"<>/,.])[A-Za-z\d!@#$%^&*?{}()\[\]\-=_+\\;':"<>/,.]{10,}$/",
+                        "errorText": "Minimal password length 10, Include mixed case, Include numeric characters, Include special characters, Exclude common password, Exclude name of user from password"
+                    }
                   }
                }
             ]

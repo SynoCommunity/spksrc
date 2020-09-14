@@ -13,7 +13,8 @@ parameters:
     # with PostgreSQL and SQLite, you must set "utf8"
     database_charset: utf8mb4
 
-    domain_name: localhost
+    # Todo replace with ip address
+    domain_name: http://localhost
 
     mailer_transport:  smtp
     mailer_user:       ~
@@ -31,12 +32,12 @@ parameters:
     locale: en
 
     # two factor stuff
-    twofactor_auth: true
+    twofactor_auth: false
     twofactor_sender: no-reply@wallabag.org
 
     # fosuser stuff
-    fosuser_registration: true
-    fosuser_confirmation: true
+    fosuser_registration: false
+    fosuser_confirmation: false
 
     # how long the access token should live in seconds for the API
     fos_oauth_server_access_token_lifetime: 3600
