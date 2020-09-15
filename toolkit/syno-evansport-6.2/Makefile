@@ -13,4 +13,4 @@ TOOLKIT_STRIP = 6
 TOOLKIT_BASE_DIR = i686-pc-linux-gnu
 TOOLKIT_SYSROOT = $(TOOLKIT_BASE_DIR)/sys-root/usr
 
-include ../../mk/spksrc.tk.mk
+include ../../mk/spksrc.toolkit.mk

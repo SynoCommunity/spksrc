@@ -13,4 +13,4 @@ TOOLKIT_STRIP = 2
 TOOLKIT_BASE_DIR = 
 TOOLKIT_SYSROOT = 
 
-include ../../mk/spksrc.tk.mk
+include ../../mk/spksrc.toolkit.mk

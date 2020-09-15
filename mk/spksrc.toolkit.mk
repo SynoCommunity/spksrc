@@ -40,7 +40,7 @@ patch: extract
 include ../../mk/spksrc.patch.mk
 
 fix: patch
-include ../../mk/spksrc.tk-fix.mk
+include ../../mk/spksrc.toolkit-fix.mk
 
 all: fix
 
