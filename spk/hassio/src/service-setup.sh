@@ -40,7 +40,7 @@ service_preuninst() {
 
         # Remove supervisor and extra containers.
         docker rm --force hassio_supervisor && docker image rm ${SUPERVISOR}
-        for CONTAINER in "hassio_dns hassio_multicast hassio_cli hassio_audio"; do
+        for CONTAINER in "hassio_dns hassio_multicast hassio_cli hassio_audio hassio_observer"; do
             IMAGE = docker inspect --format='{{.Image}}' $CONTAINER
             docker rm --force $CONTAINER && docker image rm $IMAGE
         done
