@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.0.1
-SPK_REV = 42
+SPK_VERS = 3.0.2
+SPK_REV = 43
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
@@ -18,7 +18,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.0.1. Please note that SABnzbd now runs on Python 3. Make sure your post/pre-processing scripts work with Python 3!"
+CHANGELOG = "Update SABnzbd to 3.0.2. Please note that SABnzbd now runs on Python 3. Make sure your post/pre-processing scripts work with Python 3!"
 
 HOMEPAGE  = http://sabnzbd.org
 LICENSE   = GPL
