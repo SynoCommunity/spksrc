@@ -74,7 +74,7 @@ def default_config():
     session.add(Backend(id=2, name=u'dsm', servers=u'dsm localhost:5000 check'))
     session.add(Backend(id=3, name=u'sabnzbd', servers=u'sabnzbd localhost:8080 check'))
     session.add(Backend(id=4, name=u'nzbget', servers=u'nzbget localhost:6789 check'))
-    session.add(Backend(id=5, name=u'sickbeard', servers=u'sickbeard localhost:8083 check'))
+    session.add(Backend(id=5, name=u'sickbeard', servers=u'sickbeard localhost:8081 check'))
     session.add(Backend(id=6, name=u'couchpotatoserver', servers=u'couchpotatoserver localhost:5050 check'))
     session.add(Backend(id=7, name=u'headphones', servers=u'headphones localhost:8181 check'))
     session.add(Backend(id=8, name=u'maraschino', servers=u'maraschino localhost:8260 check'))
