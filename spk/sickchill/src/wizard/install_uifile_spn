@@ -22,6 +22,6 @@
         }]
     },
     {
-        "desc": "Los permisos para los paquetes relacionados con descargas son manejados por el grupo <b>'sc-download'</b> en DSM.<br>El grupo 'users' no se usa en DSM 6.<br>El usuario del paquete no aparecerá en algunas configuraciones.<br>Por favor, lea <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Manejo de Permisos (en inglés)</a> para mayor detalle."
+        "desc": "Los permisos para los paquetes relacionados con descargas son manejados por el grupo <b>'sc-download'</b> en DSM.<br>Por favor, lea <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Manejo de Permisos (en inglés)</a> para mayor detalle."
     }]
 }]
