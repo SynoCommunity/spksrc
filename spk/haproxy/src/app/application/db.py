@@ -110,4 +110,5 @@ def default_config():
     session.add(Association(frontend_id=2, backend_id=17, condition=u'if { hdr_beg(Host) -i file. }'))
     session.add(Association(frontend_id=2, backend_id=18, condition=u'if { hdr_beg(Host) -i haproxy. }'))
     session.add(Association(frontend_id=2, backend_id=19, condition=u'if { hdr_beg(Host) -i deluge. }'))
+    session.add(Association(frontend_id=2, backend_id=20, condition=u'if { hdr_beg(Host) -i sickchill. }'))
     session.commit()
