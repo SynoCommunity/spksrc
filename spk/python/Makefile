@@ -32,7 +32,15 @@ LICENSE  = PSF
 SERVICE_SETUP = src/service-setup.sh
 
 PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
-PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
+# Also remove the following part openssl-1.1 PLIST
+#      lib/engines-1.1/*.so
+#      lib/libcrypto.so.1.1
+#      lib/libssl.so.1.1
+# I don't know why PLIST from cross/openssl do
+# get apended to default PLIST as cross/openssl
+# is not being built.  This is a fix in lack of
+# having a better method for now.
+PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%' -e '/engines-1.1/d' -e '/libcrypto.so.1.1/d' -e '/libssl.so.1.1/d'
 
 POST_STRIP_TARGET = python_extra_install
 

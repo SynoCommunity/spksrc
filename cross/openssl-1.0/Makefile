@@ -52,7 +52,7 @@ endif
 
 .PHONY: openssl_configure
 openssl_configure:
-	$(RUN) ./Configure --openssldir=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
+	$(RUN) ./Configure --prefix=$(INSTALL_PREFIX) --openssldir=/etc/ssl $(OPENSSL_ARCH) zlib-dynamic shared threads
 
 .PHONY: openssl_install
 openssl_install:
