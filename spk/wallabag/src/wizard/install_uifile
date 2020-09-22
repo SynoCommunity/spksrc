@@ -1,38 +1,62 @@
 [
-   {
-      "step_title":"Wallabag database configuration",
-      "items":[
-               {
-            "type":"password",
-            "desc":"Enter your MySQL password.",
-            "subitems":[
-               {
-                  "key":"wizard_mysql_password_root",
-                  "desc":"Root password",
-                  "validator":{
-                     "allowBlank":false
-                  }
-               }
-            ]
-         },
-         {
-            "type":"password",
-            "desc":"A 'wallabag' MySQL user and database will be created. Please enter a password for the 'wallabag' user.",
-            "subitems":[
-               {
-                  "key":"wizard_mysql_database_password",
-                  "desc":"User password",
-                  "validator":{
-                     "allowBlank":false
-                  }
-               }
-            ]
-         }
-      ]
-   }, {
+  {
+    "step_title": "Wallabag database configuration",
+    "items": [
+      {
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [
+          {
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },
+      {
+        "type": "password",
+        "desc": "A 'wallabag' MySQL user and database will be created. Please enter a password for the 'wallabag' user.",
+        "subitems": [
+          {
+            "key": "wizard_mysql_database_password",
+            "desc": "User password",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.])[A-Za-z\\d!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.]{10,}$/",
+                "errorText": "Minimal password length 10, Include mixed case, Include numeric characters, Include special characters, Exclude common password, Exclude name of user from password"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "step_title": "First login",
-    "items": [{
+    "items": [
+      {
         "desc": "The default credentials for the web interface is wallabag:wallabag. Change it on 'User Management' page."
-    }]
-}
+      },
+      {
+        "type": "textfield",
+        "desc": "Enter your NAS domain name or IP address. e.g https://192.168.0.2",
+        "subitems": [
+          {
+            "key": "wizard_protocoll_and_domain_name",
+            "desc": "Protocol and Domain Name",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/http(s)?\\:\\/\\/.+\\..+/i",
+                "errorText": "Must be a valid URL"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
 ]

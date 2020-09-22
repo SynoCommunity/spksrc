@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Package
 PACKAGE="wallabag"
 DNAME="Wallabag"
@@ -11,14 +9,28 @@ WEB_DIR="/var/services/web"
 USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 PHP="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 7135 ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
+if command -v /usr/local/bin/php70 &> /dev/null; then
+    PHP="/usr/local/bin/php70"
+fi
+if command -v /usr/local/bin/php72 &> /dev/null; then
+    PHP="/usr/local/bin/php72"
+fi
+if command -v /usr/local/bin/php73 &> /dev/null; then
+    PHP="/usr/local/bin/php73"
+fi
 MYSQL="/usr/bin/mysql"
 MYSQLDUMP="/usr/bin/mysqldump"
+if command -v /var/packages/MariaDB10/target/usr/local/mariadb10/bin/mysql &> /dev/null; then
+    MYSQL="/var/packages/MariaDB10/target/usr/local/mariadb10/bin/mysql"
+fi
+if command -v /var/packages/MariaDB10/target/usr/local/mariadb10/bin/mysqldump &> /dev/null; then
+    MYSQLDUMP="/var/packages/MariaDB10/target/usr/local/mariadb10/bin/mysqldump"
+fi
 CFG_FILE="${WEB_DIR}/${PACKAGE}/app/config/parameters.yml"
 MYSQL_USER="wallabag"
 MYSQL_DATABASE="wallabag"
 
-
-preinst ()
+service_preinst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -38,7 +50,7 @@ preinst ()
     exit 0
 }
 
-postinst ()
+service_postinst ()
 {
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
@@ -53,6 +65,7 @@ postinst ()
         # render properties
         sed -i -e "s|@database_password@|${wizard_mysql_database_password}|g" \
             -e "s|@database_name@|${MYSQL_DATABASE}|g" \
+            -e "s|@protocoll_and_domain_name@|${wizard_protocoll_and_domain_name}/wallabag/web|g" \
             -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" \
             ${CFG_FILE}
 
@@ -69,7 +82,7 @@ postinst ()
     exit 0
 }
 
-preuninst ()
+service_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
@@ -88,7 +101,7 @@ preuninst ()
     exit 0
 }
 
-postuninst ()
+service_postuninst ()
 {
     # Remove link
     rm -f ${INSTALL_DIR}
@@ -108,7 +121,7 @@ postuninst ()
     exit 0
 }
 
-preupgrade ()
+service_preupgrade ()
 {
     rm -rf ${TMP_DIR}/${PACKAGE}
     mkdir -p ${TMP_DIR}/${PACKAGE}
@@ -117,7 +130,7 @@ preupgrade ()
     exit 0
 }
 
-postupgrade ()
+service_postupgrade ()
 {
     mv ${TMP_DIR}/${PACKAGE}/parameters.yml ${CFG_FILE}
     mv ${TMP_DIR}/${PACKAGE}/db ${WEB_DIR}/${PACKAGE}/data/db
