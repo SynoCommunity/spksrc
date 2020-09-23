@@ -35,7 +35,7 @@ PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 include ../../mk/spksrc.cross-cc.mk
 
 HOST_ARCH = $(shell uname -m)
-BUILD_ARCH = $(shell expr "$(TC_PREFIX)" : '\([^-]*\)' )
+BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR)
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 PGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/Parser/pgen
@@ -76,13 +76,13 @@ python3_pre_configure:
 
 .PHONY: python3_custom_compile
 python3_custom_compile:
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_PREFIX) $(MAKE)
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE)
 
 .PHONY: python3_custom_install
 python3_custom_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_PREFIX) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: python3_post_install
 python3_post_install: $(WORK_DIR)/python-cc.mk
