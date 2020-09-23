@@ -5,7 +5,7 @@ TC_KERNEL = 4.4.59+
 TC_DIST = rtd1296-gcc494_glibc220_armv8-GPL
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Rtd1296%29
 
-TC_PREFIX = aarch64-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_PREFIX)/sysroot
+TC_TARGET = aarch64-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.tc.mk

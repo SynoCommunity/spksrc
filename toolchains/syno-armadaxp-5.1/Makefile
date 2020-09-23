@@ -6,8 +6,8 @@ TC_DIST = gcc464_glibc215_hard_armada-GPL
 TC_EXT = tgz
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.1%20Tool%20Chains/Marvell%20Armada%20XP%20Linux%203.2.40
 
-TC_PREFIX = arm-marvell-linux-gnueabi
-TC_SYSROOT = $(TC_PREFIX)/libc
+TC_TARGET = arm-marvell-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3-d16
 

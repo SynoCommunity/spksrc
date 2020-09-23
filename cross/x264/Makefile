@@ -19,7 +19,7 @@ GNU_CONFIGURE = 1
 # YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
-CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross-prefix=$(TC_PATH)$(TC_PREFIX)-
+CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross-prefix=$(TC_PATH)$(TC_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 

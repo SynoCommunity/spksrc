@@ -6,8 +6,8 @@ TC_VERS = 6.0.2
 TC_DIST = alpine4k-gcc493_glibc220_hard-GPL
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.0.2%20Tool%20Chains/Annapurna%20Alpine%20Linux%203.10.77
 
-TC_PREFIX = arm-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_PREFIX)/sysroot
+TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
 
 include ../../mk/spksrc.tc.mk

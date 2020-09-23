@@ -30,4 +30,4 @@ libcap_install:
 .PHONY: libcap_compile
 libcap_compile:
 	@$(RUN) make -C libcap _makenames
-	@$(RUN) make CC=$(TC_PATH)$(TC_PREFIX)-gcc -C libcap
+	@$(RUN) make CC=$(TC_PATH)$(TC_PREFIX)gcc -C libcap

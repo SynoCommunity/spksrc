@@ -5,7 +5,7 @@ TC_KERNEL = 3.10.35+
 TC_DIST = armada38x-gcc493_glibc220_hard-GPL
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.2%20Tool%20Chains/Marvell%20Armada%2038x%20Linux%203.10.35
 
-TC_PREFIX = arm-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_PREFIX)/sysroot
+TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.tc.mk

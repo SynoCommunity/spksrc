@@ -6,7 +6,7 @@ TC_EXT = tgz
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/SRM%201.1%20Tool%20Chains/QUALCOMM%20IPQ806X%20Linux%203.4.103
 TC_DIST_FILE = $(TC_ARCH)-$(TC_DIST_NAME)
 
-TC_PREFIX = arm-unknown-linux-gnueabi
-TC_SYSROOT = $(TC_PREFIX)/sysroot
+TC_TARGET = arm-unknown-linux-gnueabi
+TC_SYSROOT = $(TC_TARGET)/sysroot
 
 include ../../mk/spksrc.tc.mk

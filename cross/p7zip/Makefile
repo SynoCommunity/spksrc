@@ -23,7 +23,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myCompile
 myCompile:
-	$(RUN) $(MAKE) all3 CC="$(TC_PATH)$(TC_PREFIX)-gcc \$$(ALLFLAGS) $(OFLAG)" CXX="$(TC_PATH)$(TC_PREFIX)-g++ \$$(ALLFLAGS) $(OFLAG)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
+	$(RUN) $(MAKE) all3 CC="$(TC_PATH)$(TC_PREFIX)gcc \$$(ALLFLAGS) $(OFLAG)" CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) $(OFLAG)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 .PHONY: myInstall
 myInstall:
