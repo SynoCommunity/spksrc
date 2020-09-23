@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = cedarview
 TC_VERS = 6.1
 TC_KERNEL = 3.10.102+

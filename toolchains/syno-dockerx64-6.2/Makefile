@@ -1,5 +1,3 @@
-TC_NAME = syno-dockerx64
-
 TC_ARCH = dockerx64
 TC_VERS = 6.2
 TC_KERNEL = 3.10.105+

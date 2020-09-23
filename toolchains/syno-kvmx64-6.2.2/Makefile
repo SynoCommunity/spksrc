@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = kvmx64
 TC_VERS = 6.2.2
 TC_KERNEL = 4.4.59+

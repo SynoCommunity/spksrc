@@ -1,5 +1,3 @@
-TC_NAME = syno-armada38x
-
 TC_ARCH = armada38x
 TC_VERS = 6.2.2
 TC_KERNEL = 3.10.105+

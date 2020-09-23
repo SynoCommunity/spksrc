@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = apollolake
 TC_VERS = 6.1
 TC_KERNEL = 4.4.15+

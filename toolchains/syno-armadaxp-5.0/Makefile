@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = armadaxp
 TC_VERS = 5.0
 

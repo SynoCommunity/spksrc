@@ -1,5 +1,3 @@
-TC_NAME = syno-monaco
-
 TC_ARCH = monaco
 TC_VERS = 6.0.2
 

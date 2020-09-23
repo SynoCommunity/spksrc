@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = ppc853x
 TC_VERS = 4.2
 TC_FIRMWARE = 3.1-1594

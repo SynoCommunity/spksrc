@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = northstarplus
 TC_VERS = 1.2
 TC_KERNEL = 3.6.11+

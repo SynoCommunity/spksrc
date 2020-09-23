@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = powerpc
 TC_VERS = 4.0
 TC_FIRMWARE = 3.1-1594

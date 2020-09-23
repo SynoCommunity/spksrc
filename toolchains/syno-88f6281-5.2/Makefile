@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = 88f6281
 TC_VERS = 5.2
 TC_KERNEL = 2.6.32.12+

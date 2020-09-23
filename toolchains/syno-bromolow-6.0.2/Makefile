@@ -1,5 +1,3 @@
-TC_NAME = syno-$(TC_ARCH)
-
 TC_ARCH = bromolow
 TC_VERS = 6.0.2
 

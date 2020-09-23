@@ -1,5 +1,3 @@
-TC_NAME = syno-monaco
-
 TC_ARCH = monaco
 TC_VERS = 6.2
 TC_KERNEL = 3.10.105+
