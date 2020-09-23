@@ -2,7 +2,6 @@ TC_ARCH = evansport
 TC_VERS = 6.0.2
 
 TC_DIST = evansport-gcc493_glibc220_linaro_i686-GPL
-TC_EXT = txz
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.0.2%20Tool%20Chains/Intel%20x86%20Linux%203.2.40%20%28Evansport%29
 
