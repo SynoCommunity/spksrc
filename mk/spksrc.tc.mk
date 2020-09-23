@@ -39,13 +39,13 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-flags: patch
+vers: patch
 include ../../mk/spksrc.tc-vers.mk
 
-vers: flags
+flag: vers
 include ../../mk/spksrc.tc-flags.mk
 
-fix: vers
+fix: flag
 include ../../mk/spksrc.tc-fix.mk
 
 all: $(TC_LOCAL_VARS_MK)
