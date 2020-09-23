@@ -39,7 +39,10 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-toolkit_fix: patch
+flags: patch
+include ../../mk/spksrc.toolkit-flags.mk
+
+toolkit_fix: flags
 include ../../mk/spksrc.toolkit-fix.mk
 
 all: toolkit_fix
