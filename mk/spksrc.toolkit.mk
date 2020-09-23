@@ -39,10 +39,10 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-fix: patch
+toolkit_fix: patch
 include ../../mk/spksrc.toolkit-fix.mk
 
-all: fix
+all: toolkit_fix
 
 ### Clean rules
 clean:
