@@ -6,7 +6,6 @@ TC_FIRMWARE = 5.0-4458
 
 TC_DIST = gcc473_glibc217_x86_64-GPL
 TC_EXT = tgz
-TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.1%20Tool%20Chains/Intel%20x86%20Linux%203.2.40%20%28Pineview%29
 
 TC_PREFIX = x86_64-pc-linux-gnu

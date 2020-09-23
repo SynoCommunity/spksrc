@@ -4,7 +4,6 @@ TC_FIRMWARE = 3.1-1594
 
 TC_DIST = gcc420_glibc236_x64_bromolow-GPL
 TC_EXT = tgz
-TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%204.3%20Tool%20Chains/Intel%20x86%20Linux%203.2.40%20%28Bromolow%29
 
 TC_PREFIX = x86_64-linux-gnu

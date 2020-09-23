@@ -1,5 +1,6 @@
 TC_NAME = syno-$(TC_ARCH)
 TC_EXT = txz
+TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
 
 TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
 

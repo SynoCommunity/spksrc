@@ -4,7 +4,6 @@ TC_FIRMWARE = 3.1-1594
 
 TC_DIST = gcc343_glibc234_ppc853x-GPL
 TC_EXT = tgz
-TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
 TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%204.2%20Tool%20Chains/PowerPC%20853x%20Linux%202.6.32
 
 TC_PREFIX = powerpc-linux-gnuspe
