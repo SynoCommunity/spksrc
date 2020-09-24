@@ -3,7 +3,7 @@ TC_VERS = 5.2
 TC_KERNEL = 3.10.35+
 
 TC_DIST = braswell-gcc473_glibc217_x86_64-GPL
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.2%20Tool%20Chains/Intel%20x86%20Linux%203.10.35%20%28Braswell%29
+TC_DIST_SITE_PATH = Intel%20x86%20Linux%203.10.35%20%28Braswell%29
 
 TC_TARGET = x86_64-pc-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root

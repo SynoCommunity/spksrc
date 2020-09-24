@@ -3,7 +3,7 @@ TC_VERS = 5.0
 
 TC_DIST = gcc4374_eglibc2874_qoriq-GPL
 TC_EXT = tgz
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.0%20Tool%20Chains/PowerPC%20853x%20Linux%202.6.32
+TC_DIST_SITE_PATH = PowerPC%20853x%20Linux%202.6.32
 
 TC_TARGET = powerpc-none-linux-gnuspe
 TC_SYSROOT = $(TC_TARGET)

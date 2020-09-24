@@ -3,7 +3,7 @@ TC_VERS = 5.1
 
 TC_DIST = gcc464_glibc217_alpine-GPL
 TC_EXT = tgz
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.1%20Tool%20Chains/Annapurna%20Alpine%20Linux%203.2.40
+TC_DIST_SITE_PATH = Annapurna%20Alpine%20Linux%203.2.40
 
 TC_TARGET = arm-cortex_a15-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot

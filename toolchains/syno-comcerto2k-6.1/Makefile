@@ -3,7 +3,7 @@ TC_VERS = 6.1
 TC_KERNEL = 3.2.40+
 
 TC_DIST = comcerto2k-gcc493_glibc220_hard-GPL
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.1%20Tool%20Chains/Mindspeed%20Comcerto%202000%20Linux%203.2.40
+TC_DIST_SITE_PATH = Mindspeed%20Comcerto%202000%20Linux%203.2.40
 
 TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot

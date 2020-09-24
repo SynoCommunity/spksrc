@@ -3,7 +3,7 @@ TC_VERS = 5.1
 
 TC_DIST = gcc464_glibc215_hard_armada375-GPL
 TC_EXT = tgz
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.1%20Tool%20Chains/Marvell%20Armada%20375%20Linux%203.2.40
+TC_DIST_SITE_PATH = Marvell%20Armada%20375%20Linux%203.2.40
 
 TC_TARGET = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/libc

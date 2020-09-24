@@ -4,7 +4,7 @@ TC_FIRMWARE = 3.1-1594
 
 TC_DIST = gcc343_glibc234_ppc854x-GPL
 TC_EXT = tgz
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%204.0%20Tool%20Chains/PowerPC%20854x%20Linux%202.6.32
+TC_DIST_SITE_PATH = PowerPC%20854x%20Linux%202.6.32
 
 TC_TARGET = powerpc-linux-gnuspe
 TC_SYSROOT = $(TC_TARGET)

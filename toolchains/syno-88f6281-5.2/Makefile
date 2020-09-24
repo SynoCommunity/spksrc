@@ -3,7 +3,7 @@ TC_VERS = 5.2
 TC_KERNEL = 2.6.32.12+
 
 TC_DIST = 6281-gcc464_glibc215_88f6281-GPL
-TC_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%205.2%20Tool%20Chains/Marvell%2088F628x%20Linux%202.6.32
+TC_DIST_SITE_PATH = Marvell%2088F628x%20Linux%202.6.32
 
 TC_TARGET = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/libc
