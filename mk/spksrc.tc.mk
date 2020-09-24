@@ -10,7 +10,7 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 URLS             = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME             = $(TC_NAME)
-COOKIE_PREFIX    = $(TC_NAME)-
+COOKIE_PREFIX    = 
 ifneq ($(TC_DIST_FILE),)
 LOCAL_FILE       = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
