@@ -7,7 +7,7 @@ TOOLKIT_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/toolkit/evanspo
 TOOLKIT_TARGET = i686-pc-linux-gnu
 TOOLKIT_PREFIX = syno
 TOOLKIT_STRIP = 2
-TOOLKIT_BASE_DIR = 
-TOOLKIT_SYSROOT = 
+TOOLKIT_BASE_DIR = nop
+TOOLKIT_SYSROOT = nop
 
 include ../../mk/spksrc.toolkit.mk
