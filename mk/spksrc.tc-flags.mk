@@ -1,12 +1,20 @@
+TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
+
+ifeq ($(strip $(TC_NAME)),)
 TC_NAME = syno-$(TC_ARCH)
+endif
+
+ifeq ($(strip $(TC_EXT)),)
 TC_EXT = txz
+endif
+
+ifeq ($(strip $(TC_DIST_NAME)),)
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
+endif
 
 ifeq ($(strip $(TC_PREFIX)),)
 TC_PREFIX = $(TC_TARGET)-
 endif
-
-TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
 
 ifeq ($(strip $(TC_INCLUDE)),)
 TC_INCLUDE = $(TC_SYSROOT)/usr/include
