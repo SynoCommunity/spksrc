@@ -14,7 +14,7 @@ PRE_FIX_TARGET = myFix
 
 include ../../mk/spksrc.tc.mk
 
-.PHONY: myFix
-myFix:
+.PHONY: syno_armada375_fix
+syno_armada375_fix:
 	@$(MSG) "Fixing libtool files for $(NAME)"
 	@mv $(WORK_DIR)/armv7-marvell-linux-gnueabi-hard $(WORK_DIR)/$(TC_TARGET)
