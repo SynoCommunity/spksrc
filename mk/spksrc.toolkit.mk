@@ -10,7 +10,7 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 URLS          = $(TOOLKIT_DIST_SITE)/$(TOOLKIT_DIST_NAME)
 NAME          = $(TOOLKIT_NAME)
-COOKIE_PREFIX = $(TOOLKIT_NAME)-
+COOKIE_PREFIX = 
 ifneq ($(TOOLKIT_DIST_FILE),)
 LOCAL_FILE    = $(TOOLKIT_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
