@@ -21,11 +21,11 @@ endif
 DISTRIB_DIR   = $(TOOLKIT_DIR)/$(TOOLKIT_VERS)
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(TOOLKIT_EXT)
-EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TOOLKIT_STRIP) usr/$(TOOLKIT_PREFIX)/$(TOOLKIT_BASE_DIR)/$(TOOLKIT_SYSROOT)
+EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TOOLKIT_STRIP) usr/$(TOOLKIT_PREFIX)/$(TOOLKIT_TARGET)/$(TOOLKIT_SYSROOT)
 
 #####
 
-RUN = cd $(WORK_DIR)/$(TOOLKIT_BASE_DIR) && env $(ENV)
+RUN = cd $(WORK_DIR)/$(TOOLKIT_TARGET) && env $(ENV)
 MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk
