@@ -3,7 +3,7 @@ TOOLKIT_NAME = syno-$(TOOLKIT_ARCH)
 endif
 
 ifeq ($(strip $(TOOLKIT_DIST)),)
-TOOLKIT_DIST = ds.evansport-$(TOOLKIT_VERS).dev
+TOOLKIT_DIST = ds.$(TOOLKIT_ARCH)-$(TOOLKIT_VERS).dev
 endif
 
 ifeq ($(strip $(TOOLKIT_EXT)),)
