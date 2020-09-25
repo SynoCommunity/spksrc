@@ -3,6 +3,7 @@ TC_NAME = syno-armv7
 # generic toolchain for arm7hf SRM
 TC_ARCH = northstarplus ipq806x dakota
 TC_VERS = 1.2
+TC_TYPE = SRM
 
 TC_DIST = gcc493_glibc220_hard-GPL
 TC_EXT = tgz

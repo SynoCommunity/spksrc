@@ -68,6 +68,7 @@ tc_vars: fix
 	@echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\"
 	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
+	@echo TC_TYPE := $(TC_TYPE)
 	@echo TC_TARGET := $(TC_TARGET)
 	@echo TC_PREFIX := $(TC_PREFIX)
 	@echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/

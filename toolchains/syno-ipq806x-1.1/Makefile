@@ -1,5 +1,6 @@
 TC_ARCH = ipq806x
 TC_VERS = 1.1
+TC_TYPE = SRM
 
 TC_DIST = gcc493_glibc220_hard-GPL
 TC_EXT = tgz

@@ -12,8 +12,12 @@ ifeq ($(strip $(TC_DIST_NAME)),)
 TC_DIST_NAME = $(TC_DIST).$(TC_EXT)
 endif
 
+ifeq ($(strip $(TC_TYPE)),)
+TC_TYPE = DSM
+endif
+
 ifeq ($(strip $(TC_DIST_SITE_URL)),)
-TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%20$(TC_VERS)%20Tool%20Chains/
+TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20Tool%20Chains/
 endif
 
 ifeq ($(strip $(TC_DIST_SITE)),)

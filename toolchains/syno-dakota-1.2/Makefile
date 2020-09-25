@@ -1,6 +1,7 @@
 TC_ARCH = dakota
 TC_VERS = 1.2
 TC_KERNEL = 4.4.60+
+TC_TYPE = SRM
 
 TC_DIST = gcc493_glibc220_hard-GPL
 TC_EXT = tgz
