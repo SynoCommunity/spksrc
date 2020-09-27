@@ -1,0 +1,23 @@
+# update url for iab.txt
+# fix wide character output
+
+--- get-iab.org	2013-04-15 09:24:43.000000000 +0000
++++ get-iab	2020-09-27 14:49:27.962936234 +0000
+@@ -36,7 +36,7 @@
+ use Getopt::Std;
+ use LWP::Simple;
+ #
+-my $default_url = 'http://standards.ieee.org/develop/regauth/iab/iab.txt';
++my $default_url = 'http://standards-oui.ieee.org/iab/iab.txt';
+ my $default_filename='ieee-iab.txt';
+ #
+ my $usage =
+@@ -99,6 +99,8 @@
+ #
+ print "Opening output file $filename\n" if $verbose;
+ open OUTPUT, ">$filename" || die "Could not open $filename for writing";
++# avoid error "Wide character in print at /usr/local/bin/get-iab line 147."
++binmode(OUTPUT, ":utf8");
+ #
+ # Write the header comments to the output file.
+ #

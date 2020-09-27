@@ -1,0 +1,23 @@
+# update url for out.txt
+# fix wide character output
+
+--- get-oui.org	2013-04-15 09:24:43.000000000 +0000
++++ get-oui	2020-09-27 15:04:28.802007198 +0000
+@@ -32,7 +32,7 @@
+ use Getopt::Std;
+ use LWP::Simple;
+ #
+-my $default_url = 'http://standards.ieee.org/develop/regauth/oui/oui.txt';
++my $default_url = 'http://standards-oui.ieee.org/oui/oui.txt';
+ my $default_filename='ieee-oui.txt';
+ #
+ my $usage =
+@@ -93,6 +93,8 @@
+ #
+ print "Opening output file $filename\n" if $verbose;
+ open OUTPUT, ">$filename" || die "Could not open $filename for writing";
++# avoid error "Wide character in print at /usr/local/bin/get-oui line 135."
++binmode(OUTPUT, ":utf8");
+ #
+ # Write the header comments to the output file.
+ #

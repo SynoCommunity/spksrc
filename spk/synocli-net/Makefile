@@ -1,10 +1,10 @@
 SPK_NAME = synocli-net
-SPK_VERS = 1.4
+SPK_VERS = 1.5
 SPK_REV = 5
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/sshfs cross/mosh cross/socat
-DEPENDS += cross/rsync cross/autossh
+DEPENDS += cross/rsync cross/autossh cross/arp-scan
 
 # Requirement for Mosh
 SPK_DEPENDS = "Perl>=5.14"
@@ -26,10 +26,10 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
 endif
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs, rsync, autossh$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons"
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, arp-scan, sshfs, rsync, autossh$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. update openssl to 1.1 for all included packages \(tmux, nmap, mosh, socat, autossh, ser2net\)."
+CHANGELOG = "1. update openssl to 1.1 for all included packages \(tmux, nmap, mosh, socat, autossh, ser2net\).<br/>2. Add autossh<br/>3. Add arp-scan<br/>4. Update nmap to version 7.80<br/>5. Update screen to version 4.8.0<br/>6. Update socat to version 1.7.3.4"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -37,6 +37,7 @@ LICENSE  = Each tool is licensed under it\'s respective license.
 SPK_COMMANDS = bin/screen
 SPK_LINKS = /usr/local/bin/tmux:bin/tmux-utf8
 SPK_COMMANDS += bin/nmap bin/nping bin/ndiff
+SPK_COMMANDS += bin/arp-scan bin/arp-finder bin/get-iab bin/get-oui
 SPK_COMMANDS += bin/sshfs
 SPK_COMMANDS += bin/fusermount
 SPK_COMMANDS += bin/mosh bin/mosh-client bin/mosh-server

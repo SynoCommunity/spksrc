@@ -333,6 +333,36 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 ####
 
+all-general:
+	@$(MSG) Build general packages
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  for arch_tc in $(sort $(ALL_GENERAL_ARCH_TC)) ; \
+	  do \
+	    $(MAKE) arch-$$arch_tc ; \
+	  done \
+	else \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  do \
+	    $(MAKE) arch-$$arch ; \
+	  done \
+	fi
+
+publish-all-general:
+	@$(MSG) Publish general packages
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  for arch_tc in $(sort $(ALL_GENERAL_ARCH_TC)) ; \
+	  do \
+	    $(MAKE) publish-arch-$$arch_tc ; \
+	  done \
+	else \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  do \
+	    $(MAKE) publish-arch-$$arch ; \
+	  done \
+	fi
+
+####
+
 all-supported:
 	@$(MSG) Build supported archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
