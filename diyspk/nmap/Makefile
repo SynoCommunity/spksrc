@@ -6,7 +6,7 @@ SPK_ICON = src/nmap.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing
+DESCRIPTION = Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
 DISPLAY_NAME = nmap
 STARTABLE = no
 

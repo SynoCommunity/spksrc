@@ -16,4 +16,12 @@ CONFIGURE_ARGS = --without-zenmap --without-ncat --with-liblua=included --with-l
 # needed for compilation to avoid warning "_FORTIFY_SOURCE requires compiling with optimization (-O)"
 ADDITIONAL_CPPFLAGS = -O3
 
+POST_INSTALL_TARGET = nmap_post_install
+
 include ../../mk/spksrc.cross-cc.mk
+
+
+.PHONY: nmap_post_install
+nmap_post_install:
+	sed -i -e  '1 s|^#!/usr/bin/python2|#!/usr/bin/python|g' $(STAGING_INSTALL_PREFIX)/bin/ndiff
+	cp $(STAGING_INSTALL_PREFIX)/lib/python2.7/site-packages/ndiff.py $(STAGING_INSTALL_PREFIX)/bin/
