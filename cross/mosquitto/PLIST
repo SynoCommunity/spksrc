@@ -1,6 +1,7 @@
 bin:sbin/mosquitto
 bin:bin/mosquitto_passwd
 bin:bin/mosquitto_pub
+bin:bin/mosquitto_rr
 bin:bin/mosquitto_sub
 lnk:lib/libmosquitto.so
 lib:lib/libmosquitto.so.1

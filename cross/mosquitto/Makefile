@@ -9,15 +9,15 @@ DEPENDS = cross/c-ares cross/openssl cross/util-linux cross/libwebsockets
 
 HOMEPAGE = http://www.mosquitto.org/
 COMMENT  = Mosquitto is an open source message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
-LICENSE  = EPL/EDL licensed
+LICENSE  = EPL 1.0 and EDL 1.0
 
 CONFIGURE_TARGET = nop
-#INSTALL_TARGET = mosquitto_install
 
 COMPILE_MAKE_OPTIONS = "WITH_WEBSOCKETS=yes WITH_SRV=yes WITH_DOCS=no"
 
-include ../../mk/spksrc.cross-cc.mk
+ifeq ($(findstring $(ARCH), 88f6281 ppc853x),$(ARCH))
+# use clock_gettime of librt
+ADDITIONAL_LDFLAGS = -lrt 
+endif
 
-#.PHONY: mosquitto_install
-#mosquitto_install:
-#	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+include ../../mk/spksrc.cross-cc.mk
