@@ -7,6 +7,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/c-ares cross/openssl cross/util-linux cross/libwebsockets
 
+# since version 1.6.11 at least glibc 2.12 is required
+# https://github.com/eclipse/mosquitto/issues/1792
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+
 HOMEPAGE = http://www.mosquitto.org/
 COMMENT  = Mosquitto is an open source message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
 LICENSE  = EPL 1.0 and EDL 1.0
@@ -15,7 +19,7 @@ CONFIGURE_TARGET = nop
 
 COMPILE_MAKE_OPTIONS = "WITH_WEBSOCKETS=yes WITH_SRV=yes WITH_DOCS=no"
 
-ifeq ($(findstring $(ARCH), 88f6281 ppc853x),$(ARCH))
+ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
 # use clock_gettime of librt
 ADDITIONAL_LDFLAGS = -lrt 
 endif
