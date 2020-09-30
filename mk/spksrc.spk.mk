@@ -362,11 +362,11 @@ publish-all-default:
 	fi
 
 all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
-	$(MAKE) all-toolchain-4.3
+	$(MAKE) all-toolchain-5.2
 	@$(MSG) Built legacy archs
 
 publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
-	$(MAKE) all-toolchain-4.3
+	$(MAKE) all-toolchain-5.2
 	@$(MSG) Published legacy archs
 
 ####
