@@ -333,8 +333,8 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 ####
 
-all-supported:
-	@$(MSG) Build supported archs
+all-default:
+	@$(MSG) Build default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
 	  do \
@@ -347,8 +347,8 @@ all-supported:
 	  done \
 	fi
 
-publish-all-supported:
-	@$(MSG) Publish supported archs
+publish-all-default:
+	@$(MSG) Publish default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
 	  do \
