@@ -333,6 +333,36 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 ####
 
+all-supported:
+	@$(MSG) Build officially supported archs
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  do \
+	    $(MAKE) supported-arch-$$arch ; \
+	  done \
+	else \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  do \
+	    $(MAKE) supported-arch-$$arch ; \
+	  done \
+	fi
+
+publish-all-supported:
+	@$(MSG) Publish officially supported archs
+	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  do \
+	    $(MAKE) publish-supported-arch-$$arch ; \
+	  done \
+	else \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
+	  do \
+	    $(MAKE) publish-supported-arch-$$arch ; \
+	  done \
+	fi
+
+####
+
 all-default:
 	@$(MSG) Build default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
@@ -360,6 +390,8 @@ publish-all-default:
 	    $(MAKE) publish-latest-arch-$$arch ; \
 	  done \
 	fi
+
+####
 
 all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
 	$(MAKE) all-toolchain-5.2
@@ -402,6 +434,16 @@ publish-all-archs-latest:
 	    $(MAKE) publish-latest-arch-$$arch ; \
 	  done \
 	fi
+
+####
+
+supported-arch-%:
+	@$(MSG) Building package for arch $* with SynoCommunity supported toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+
+supported-latest-arch-%:
+	@$(MSG) Building package for arch $* with SynoCommunity supported toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS))))))) publish
 
 ####
 
