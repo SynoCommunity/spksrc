@@ -404,40 +404,6 @@ publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
 
 ####
 
-all-archs-latest:
-	@$(MSG) Build all archs with latest DSM per FIRMWARE
-	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  $(MSG) Skipping duplicate arches; \
-	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
-	  do \
-	    $(MAKE) latest-arch-$$arch ; \
-	  done \
-	else \
-	  $(MSG) Skipping arches without kernelsupport ; \
-	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
-	  do \
-	    $(MAKE) latest-arch-$$arch ; \
-	  done \
-	fi
-
-publish-all-archs-latest:
-	@$(MSG) Publish all archs with latest DSM per FIRMWARE
-	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  $(MSG) Skipping duplicate arches; \
-	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
-	  do \
-	    $(MAKE) publish-latest-arch-$$arch ; \
-	  done \
-	else \
-	  $(MSG) Skipping arches without kernelsupport ; \
-	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
-	  do \
-	    $(MAKE) publish-latest-arch-$$arch ; \
-	  done \
-	fi
-
-####
-
 supported-arch-%:
 	@$(MSG) Building package for arch $* with SynoCommunity supported toolchain
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
