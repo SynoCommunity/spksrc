@@ -1,5 +1,5 @@
 PKG_NAME = intel-mediasdk
-PKG_VERS = 20.3.pre6
+PKG_VERS = 20.3.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Intel-Media-SDK/MediaSDK/archive
