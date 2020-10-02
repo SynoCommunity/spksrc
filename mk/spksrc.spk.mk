@@ -335,8 +335,9 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 all-supported:
 	@$(MSG) Build officially supported archs
+	@$(MSG) $(SUPPORTED_ARCHS)
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))) ; \
 	  do \
 	    $(MAKE) supported-arch-$$arch ; \
 	  done \
@@ -350,7 +351,7 @@ all-supported:
 publish-all-supported:
 	@$(MSG) Publish officially supported archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))) ; \
 	  do \
 	    $(MAKE) publish-supported-arch-$$arch ; \
 	  done \
@@ -366,7 +367,7 @@ publish-all-supported:
 all-default:
 	@$(MSG) Build default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS)))))) ; \
 	  do \
 	    $(MAKE) latest-arch-$$arch ; \
 	  done \
@@ -380,7 +381,7 @@ all-default:
 publish-all-default:
 	@$(MSG) Publish default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
+	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS)))))) ; \
 	  do \
 	    $(MAKE) publish-latest-arch-$$arch ; \
 	  done \
