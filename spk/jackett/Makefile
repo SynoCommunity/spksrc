@@ -1,6 +1,6 @@
 SPK_NAME = jackett
-SPK_VERS = 0.14.485
-SPK_REV = 11
+SPK_VERS = 0.16.1340
+SPK_REV = 12
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 

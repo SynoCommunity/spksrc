@@ -18,9 +18,6 @@ INSTALL_TARGET = wallabag_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
-
 .PHONY: wallabag_install
 wallabag_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/wallabag
