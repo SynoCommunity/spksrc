@@ -8,7 +8,7 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-DEPENDS  = cross/zlib cross/openssl-1.0 cross/sqlite cross/readline cross/ncursesw cross/bzip2
+DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2
 DEPENDS += cross/berkeleydb-5.3 native/$(PKG_NAME)
 
 HOMEPAGE = http://www.python.org
