@@ -1,6 +1,6 @@
 SPK_NAME = mtproxy
 SPK_VERS = 1
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/${SPK_NAME}.jpg
 
 REQUIRED_DSM = 5.2
@@ -15,7 +15,7 @@ DESCRIPTION_RUS = Простой MT-Proto прокси сервер
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = MTProxy
-CHANGELOG =
+CHANGELOG = "1. Update openssl to 1.1."
 
 UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES)
 

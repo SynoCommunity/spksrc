@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox
@@ -26,7 +26,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3$(OPTIONAL_DESC) and process utilities \(lsof, iostat, pgrep, pmap, watch\).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "Initial release"
+CHANGELOG = "1. Update openssl to 1.1. \(iperf3\)"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.

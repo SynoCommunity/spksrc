@@ -18,7 +18,7 @@ DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y tor
 RELOAD_UI = yes
 DISPLAY_NAME = Sonarr
 STARTABLE = yes
-CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
+CHANGELOG = "Update openssl to 1.1."
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
