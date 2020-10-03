@@ -2,7 +2,7 @@
 # 
 # prerequisites:
 # - cross/module depends on native/go only
-# - module does not require kernel (REQ_KERNEL)
+# - module does not require kernel (REQUIRE_KERNEL)
 # 
 # remarks:
 # - Restriction for minimal DSM version is not supported (toolchains are not used for go builds)
@@ -65,8 +65,8 @@ go_install_target:
 
 #####
 
-ifneq ($(REQ_KERNEL),)
-  @$(error go modules cannot build when REQ_KERNEL is set)
+ifneq ($(REQUIRE_KERNEL),)
+  @$(error go modules cannot build when REQUIRE_KERNEL is set)
 endif
 
 include ../../mk/spksrc.pre-check.mk
