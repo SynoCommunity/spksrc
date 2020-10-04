@@ -48,7 +48,7 @@ ARCHS_DUPES_DEFAULT += powerpc% ppc824% ppc854x%
 # remove archs for generic aarch64 build
 ARCHS_DUPES_DEFAULT += rtd1296% armada37xx%
 # optional remove archs for generic armv7 build
-ifeq ($(findstring ARM7,$(GENERIC_ARCHS)),ARM7)
+ifneq ($(findstring ARM7,$(GENERIC_ARCHS)),ARM7)
   ARCHS_DUPES_DEFAULT += alpine% armada370% armada375% armada38x% armadaxp% comcerto2k% monaco% northstarplus% ipq806x% dakota%
 else
   ARCHS_DUPES_DEFAULT += armv7%
