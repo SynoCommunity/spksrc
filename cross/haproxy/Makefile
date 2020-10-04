@@ -6,7 +6,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.haproxy.org/download/$(PKG_MAIN_VERS)/src
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/zlib
+DEPENDS = cross/zlib cross/openssl cross/lua cross/pcre
 
 MAINTAINER = SynoCommunity
 HOMEPAGE   = https://www.haproxy.org
