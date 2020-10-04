@@ -4,7 +4,7 @@ SPK_REV = 8
 SPK_ICON = src/umurmur.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/openssl cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = Diaoul
 DESCRIPTION = uMurmur is a minimalistic VoIP server based on the open source software Mumble. It allows simultaneous communications between multiple users. Its low latency makes it especially suitable for communications during online gaming. The Mumble client is available at http://mumble.sourceforge.net/ \(Windows, Mac, Linux and iOS\).

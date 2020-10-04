@@ -1,8 +1,8 @@
 PKG_NAME = htop
-PKG_VERS = 2.2.0
+PKG_VERS = 3.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://hisham.hm/htop/releases/$(PKG_VERS)
+PKG_DIST_SITE = https://bintray.com/htop/source/download_file?file_path=
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = powerpc ppc824x

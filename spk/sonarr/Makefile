@@ -3,7 +3,6 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 18
 SPK_ICON = src/sonarr.png
 
-REQUIRED_DSM = 5.0
 # Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
