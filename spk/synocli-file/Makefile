@@ -1,5 +1,5 @@
 SPK_NAME = synocli-file
-SPK_VERS = 1.1
+SPK_VERS = 1.2
 SPK_REV = 4
 SPK_ICON = src/synocli-file.png
 
@@ -28,7 +28,7 @@ endif
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, rhash, mc \(midnight commander\), nano, file, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update openssl to 1.1 \(mc\)."
+CHANGELOG = "1. Update Midnight Commander to 4.2.25<br/>2. Update openssl to 1.1 \(mc\)."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it\'s respective license.
