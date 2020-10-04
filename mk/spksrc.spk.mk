@@ -364,7 +364,7 @@ publish-all-supported:
 
 ####
 
-all-default:
+all-latest:
 	@$(MSG) Build default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS)))))) ; \
@@ -378,7 +378,7 @@ all-default:
 	  done \
 	fi
 
-publish-all-default:
+publish-all-latest:
 	@$(MSG) Publish default archs
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS)))))) ; \
