@@ -25,6 +25,22 @@ PRE_CONFIGURE_TARGET = glib_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifneq ($(findstring $(ARCH), ppc853x),$(ARCH))
+CONFIGURE_ARGS += --host=ppc
+endif
+
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=arm
+endif
+
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=armv7
+endif
+
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=aarch64
+endif
+
 .PHONY: glib_pre_configure
 
 glib_pre_configure: 
