@@ -13,7 +13,7 @@ COMMENT  = General-purpose utility library
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-gtk-doc --disable-man --disable-libmount --disable-static
+CONFIGURE_ARGS = --disable-man --disable-libmount --enable-shared=yes --enable-static=no
 CONFIGURE_ARGS += glib_cv_long_long_format=ll glib_cv_stack_grows=no glib_cv_uscore=no ac_cv_func_posix_getpwuid_r=yes ac_cv_func_posix_getgrgid_r=yes
 CONFIGURE_ARGS += GLIB_GENMARSHAL=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gobject/glib-genmarshal
 CONFIGURE_ARGS += GLIB_COMPILE_SCHEMAS=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gio/glib-compile-schemas
@@ -25,20 +25,12 @@ PRE_CONFIGURE_TARGET = glib_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifneq ($(findstring $(ARCH), ppc853x),$(ARCH))
-CONFIGURE_ARGS += --host=ppc
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=ppc-linux
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --host=arm
-endif
-
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --host=armv7
-endif
-
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --host=aarch64
+ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=arm-linux
 endif
 
 .PHONY: glib_pre_configure
