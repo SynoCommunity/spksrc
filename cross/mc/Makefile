@@ -12,7 +12,7 @@ COMMENT  = GNU Midnight Commander is a visual file manager. It\'s a feature rich
 LICENSE  = GNU GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = fu_cv_sys_stat_statfs2_bsize=yes --with-screen=slang  LIBS="-lglib-2.0"
+CONFIGURE_ARGS = fu_cv_sys_stat_statfs2_bsize=yes --with-screen=slang
 ADDITIONAL_CFLAGS = -O3
 
 include ../../mk/spksrc.cross-cc.mk
