@@ -15,8 +15,4 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-z=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-pcre=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 
-# disable parallel make
-# https://github.com/osresearch/heads/issues/385#issuecomment-382926111
-# https://github.com/osresearch/heads/commit/acf16c7304de8675f66ecc204b2abea25f0f67a3
-COMPILE_MAKE_OPTIONS += -j1
 include ../../mk/spksrc.cross-cc.mk
