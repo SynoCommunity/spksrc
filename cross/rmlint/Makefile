@@ -1,5 +1,5 @@
 PKG_NAME = rmlint
-PKG_VERS = 2.9.0
+PKG_VERS = 2.10.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sahib/rmlint/archive
@@ -23,7 +23,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: rmlint_compile_target rmlint_install_target
 rmlint_compile_target:
-	$(RUN) scons prefix=${STAGING_INSTALL_PREFIX} actual_prefix=$(INSTALL_PREFIX) VERBOSE=0 DEBUG=0 O=release
+	$(RUN) scons config --prefix=${INSTALL_PREFIX} VERBOSE=0 DEBUG=0 O=release
+	$(RUN) scons --prefix=${INSTALL_PREFIX} VERBOSE=0 DEBUG=0 O=release
 
 rmlint_install_target:
-	$(RUN) install --mode=755 --target-directory=${STAGING_INSTALL_PREFIX}/bin/ ./rmlint
+	$(RUN) install --mode=755 --target-directory=${INSTALL_DIR}${INSTALL_PREFIX}/bin/ ./rmlint
