@@ -33,6 +33,14 @@ ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --host=arm-linux
 endif
 
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=x86_64-linux-gnu
+endif
+
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += --host=i686-linux-gnu
+endif
+
 .PHONY: glib_pre_configure
 
 glib_pre_configure: 
