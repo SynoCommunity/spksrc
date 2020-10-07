@@ -7,6 +7,8 @@ PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+# arm-cortexa9-linux-gnueabi-g++: internal compiler error: Segmentation fault (program cc1plus)
+UNSUPPORTED_ARCHS += hi3535
 
 DEPENDS = cross/ncurses cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 

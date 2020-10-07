@@ -18,9 +18,6 @@ BETA = 1
 HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
 
-# arm-cortexa9-linux-gnueabi-g++: internal compiler error: Segmentation fault (program cc1plus)
-UNSUPPORTED_ARCHS = hi3535
-
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
