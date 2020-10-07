@@ -1,12 +1,12 @@
 PKG_NAME = rtorrent
-PKG_VERS = 0.9.6
+PKG_VERS = 0.9.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc854x
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/ncurses cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 
