@@ -335,7 +335,6 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 all-supported:
 	@$(MSG) Build officially supported archs
-	@$(MSG) $(SUPPORTED_ARCHS)
 	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
 	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))) ; \
 	  do \
