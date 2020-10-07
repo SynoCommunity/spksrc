@@ -1,12 +1,3 @@
-lnk:bin/lzcat
-lnk:bin/lzma
-bin:bin/lzmadec
-bin:bin/lzmainfo
-lnk:bin/unlzma
-lnk:bin/unxz
-bin:bin/xz
-lnk:bin/xzcat
-bin:bin/xzdec
-lnk:lib/liblzma.so
-lnk:lib/liblzma.so.5
-lib:lib/liblzma.so.5.2.3
+lnk:lib/libcppunit.so
+lnk:lib/libcppunit-1.15.so.1
+lib:lib/libcppunit-1.15.so.1.0.0
