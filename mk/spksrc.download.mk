@@ -128,8 +128,8 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        rm -f $${localFile}.part ; \
 	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
 	        echo "wget $${url}" ; \
-	        wget --secure-protocol=TLSv1_2 -nv -O $${localFile}.part $${url} ; \
-	        mv $${localFile}.part $${localFile} ; \
+	        flock --timeout 120 --exclusive /tmp/wget.lock wget --secure-protocol=TLSv1_2 -nv -O $${localFile}.part$$$$ -nc $${url} ; \
+	        mv $${localFile}.part$$$$ $${localFile} ; \
 	      else \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      fi ; \
