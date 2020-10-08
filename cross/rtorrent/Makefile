@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 # arm-cortexa9-linux-gnueabi-g++: internal compiler error: Segmentation fault (program cc1plus)
 UNSUPPORTED_ARCHS += hi3535
 
-DEPENDS = cross/ncurses cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
+DEPENDS = cross/ncursesw cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 
 HOMEPAGE = https://rakshasa.github.com
 COMMENT  = rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
