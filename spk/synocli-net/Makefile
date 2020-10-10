@@ -26,7 +26,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, sshfs, rsync, autossh$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. update openssl to 1.1 for all included packages \(tmux, nmap, mosh, socat, autossh, ser2net\).<br/>2. Add autossh<br/>3. Add arp-scan<br/>4. Update nmap to version 7.80<br/>5. Update screen to version 4.8.0<br/>6. Update socat to version 1.7.3.4<br/>7. Remove mosh and remove dependency of Perl \(mosh is provided as dedicated package now\)"
+CHANGELOG = "1. update openssl to 1.1 for all included packages \(tmux, nmap, mosh, socat, autossh, ser2net\).<br/>2. Add autossh<br/>3. Add arp-scan v1.9.7<br/>4. Update nmap to version 7.80<br/>5. Update screen to version 4.8.0<br/>6. Update socat to version 1.7.3.4<br/>7. Remove mosh and remove dependency of Perl \(mosh is provided as dedicated package now\)"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.

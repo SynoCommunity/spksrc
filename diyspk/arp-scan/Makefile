@@ -1,5 +1,5 @@
 SPK_NAME = arp-scan
-SPK_VERS = 1.9
+SPK_VERS = 1.9.7
 SPK_REV = 1
 
 DEPENDS = cross/$(SPK_NAME)
@@ -12,6 +12,8 @@ STARTABLE = no
 HOMEPAGE = http://www.royhills.co.uk/wiki/index.php/Arp-scan_User_Guide
 LICENSE  = MIT
 
-SPK_COMMANDS = bin/arp-scan bin/arp-fingerprint bin/get-iab bin/get-oui
+SPK_COMMANDS = bin/arp-scan 
+# perl scripts (work only when perl package is installed)
+SPK_COMMANDS += bin/arp-fingerprint bin/get-iab bin/get-oui
 
 include ../../mk/spksrc.spk.mk
