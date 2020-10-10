@@ -14,7 +14,7 @@ LICENSE  = EPL 1.0 and EDL 1.0
 
 CONFIGURE_TARGET = nop
 
-COMPILE_MAKE_OPTIONS = "WITH_WEBSOCKETS=yes WITH_SRV=yes WITH_DOCS=no"
+COMPILE_MAKE_OPTIONS = WITH_WEBSOCKETS=yes WITH_SRV=yes WITH_DOCS=no
 
 ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
 # use clock_gettime of librt
