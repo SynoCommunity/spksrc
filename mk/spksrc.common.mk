@@ -33,10 +33,6 @@ LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS), $(AVAILABLE_ARCHS)))
 # SRM - Synology Router Manager
 SRM_ARCHS = northstarplus ipq806x dakota
 
-# arch-tc to build 
-# make all-general is now provided to build the general packages - same as built by github-build-action
-ALL_GENERAL_ARCH_TC = 88f6281-6.1 armv7-6.1 armv7-1.2 x64-6.1 aarch64-6.1 evansport-6.1 ppc853x-5.2 qoriq-6.1
-
 # Use generic archs when kernels are not needed
 ARCHS_NO_KRNLSUPP = $(filter-out x64% armv7% aarch64%, $(SUPPORTED_ARCHS))
 
