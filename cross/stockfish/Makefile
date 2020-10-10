@@ -7,8 +7,8 @@ PKG_DIST_SITE = https://github.com/official-stockfish/$(PKG_NAME)/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_SHORT_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_SHORT_NAME)_$(PKG_VERS)/src
 
-HOMEPAGE = https://stockfishchess.org/ 
-COMMENT  = Stockfish is a strong open source chess engine 
+HOMEPAGE = https://stockfishchess.org/
+COMMENT  = Stockfish is a strong open source chess engine
 LICENSE  = GPLv2/GPLv3
 
 CONFIGURE_TARGET = nop

@@ -14,8 +14,6 @@ service_postinst ()
     # Edit config file according to the wizard
     sed -i -e "s|@@_wizard_security_code_@@|${wizard_security_code}|g" ${CONFIG_FILE}       >> ${INST_LOG} 2>&1
     sed -i -e "s|@@_wizard_thinking_time_ms_@@|${wizard_thinking_time_ms}|g" ${CONFIG_FILE} >> ${INST_LOG} 2>&1
-
-    ln -sf ${SYNOPKG_PKGDEST}/bin/stockfish /usr/local/bin/stockfish  >> ${INST_LOG} 2>&1
 }
 
 
@@ -23,6 +21,4 @@ service_postuninst ()
 {
     # Remove the web interface
     rm -rf ${WEB_DIR}  >> ${INST_LOG} 2>&1
-
-    rm -f /usr/local/bin/stockfish  >> ${INST_LOG} 2>&1
 }

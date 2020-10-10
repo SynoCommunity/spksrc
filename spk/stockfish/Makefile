@@ -1,6 +1,6 @@
 SPK_NAME = stockfish
 SPK_VERS = 11
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON= src/stockfish.png
 DSM_UI_DIR = app
 
@@ -30,8 +30,9 @@ include ../../mk/spksrc.common.mk
 # Toolchains lacking c++11 compiler ar not supported
 UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
-include ../../mk/spksrc.spk.mk
+SPK_COMMANDS  = bin/stockfish
 
+include ../../mk/spksrc.spk.mk
 
 .PHONY: stockfish_extra_install
 stockfish_extra_install:
