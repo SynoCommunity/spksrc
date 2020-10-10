@@ -1,9 +1,7 @@
 bin:bin/libwebsockets-test-client
-bin:bin/libwebsockets-test-echo
-bin:bin/libwebsockets-test-fraggle
-bin:bin/libwebsockets-test-ping
+bin:bin/libwebsockets-test-lejp
 bin:bin/libwebsockets-test-server
 bin:bin/libwebsockets-test-server-extpoll
 lnk:lib/libwebsockets.so
-lib:lib/libwebsockets.so.12
+lib:lib/libwebsockets.so.15
 rsc:share/libwebsockets-test-server

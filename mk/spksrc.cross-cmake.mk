@@ -1,11 +1,8 @@
-# Build go programs
-# 
+# Build CMake programs
+#
 # prerequisites:
 # - cross/module depends on cmake
-# 
-# remarks:
-# - improvised from spksrc.cross-go.mk
-# 
+#
 
 # Common makefiles
 include ../../mk/spksrc.common.mk

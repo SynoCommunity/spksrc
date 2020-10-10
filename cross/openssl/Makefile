@@ -56,4 +56,4 @@ openssl_configure:
 
 .PHONY: openssl_install
 openssl_install:
-	$(RUN) $(MAKE) install_sw DESTDIR=$(INSTALL_DIR)
+	$(RUN) $(MAKE) install_sw INSTALL_PREFIX=$(INSTALL_DIR)
