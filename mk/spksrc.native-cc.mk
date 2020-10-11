@@ -19,6 +19,8 @@ DIST_EXT      = $(PKG_EXT)
 
 #####
 
+.NOTPARALLEL:
+
 include ../../mk/spksrc.native-env.mk
 
 include ../../mk/spksrc.download.mk

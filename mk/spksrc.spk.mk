@@ -353,14 +353,23 @@ endif
 
 ####
 
-.PHONY: publish-all-$(ACTION) all-$(ACTION) $(ALL_ACTION)
+.PHONY: publish-all-$(ACTION) all-$(ACTION) pre-build-native
 
-all-$(ACTION): $(ALL_ACTION)
+pre-build-native:
+	@$(MSG) Pre-build native dependencies for parallel build
+	@for depend in `$(MAKE) dependency-list` ; \
+	do \
+	  if [ "$${depend%/*}" = "native" ]; then \
+	    echo "Pre-processing $${depend}" ; \
+	    echo "env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend ; \
+	  fi ; \
+	done
+	$(MAKE) $(addprefix $(ACTION)-arch-,$(ALL_ACTION))
 
-publish-all-$(ACTION): $(ALL_ACTION)
+all-$(ACTION): | pre-build-native
 
-$(ALL_ACTION):
-	$(MAKE) $(ACTION)-arch-$@
+publish-all-$(ACTION): | pre-build-native
 
 supported-arch-%:
 	@$(MSG) Building package for arch $* with SynoCommunity ${ACTION} toolchain
