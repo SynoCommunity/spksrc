@@ -1,8 +1,9 @@
 SPK_NAME = sickchill
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 0
+SPK_VERS = v2020.09.28-2
+SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
+DEPENDS  = cross/$(SPK_NAME)
 SPK_DEPENDS = "python3>=3.6:git"
 
 MAINTAINER = Nyaran
@@ -25,7 +26,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
 
-COPY_TARGET = nop
 POST_STRIP_TARGET = sickchill_extra_install
 
 # Pure Python package, make sure ARCH is not defined
