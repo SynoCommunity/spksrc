@@ -16,7 +16,7 @@ DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent us
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Lidarr
-CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
+CHANGELOG = "Update openssl to 1.1."
 
 HOMEPAGE = http://lidarr.audio/
 LICENSE  = GPLv3

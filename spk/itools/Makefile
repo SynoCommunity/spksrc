@@ -1,6 +1,6 @@
 SPK_NAME = itools
 SPK_VERS = 1.2
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/itools.png
 # A collection of tools from ifuse and usbmuxd projects of libimobiledevice.org
 # There exists no source code package "itools" and therefore no cross/itools project
@@ -14,7 +14,7 @@ DISTRIBUTOR_URL = https://synocommunity.com
 DESCRIPTION = "This package mounts an iOS® device \(connected by USB\) to a shared folder of your Diskstation. You can access such folders locally or from remote with Synology FileStation. Some command line tools are included to communicate with connected devices."
 RELOAD_UI = no
 DISPLAY_NAME = iOS Access
-CHANGELOG = "1. Update dependencies \(2019.11\).<br>2. Fix DSM 6 service user privileges.<br>3. Use full device name as shared folder \(mount point\)."
+CHANGELOG = "Update openssl to 1.1."
 
 HOMEPAGE   = https://www.libimobiledevice.org
 LICENSE    = LGPL 2.1

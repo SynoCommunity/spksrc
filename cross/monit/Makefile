@@ -1,5 +1,5 @@
 PKG_NAME = monit
-PKG_VERS = 5.17.1
+PKG_VERS = 5.27.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://mmonit.com/monit/dist
@@ -13,5 +13,15 @@ LICENSE  = AGPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --without-pam libmonit_cv_setjmp_available=yes libmonit_cv_vsnprintf_c99_conformant=yes --with-ssl-incl-dir=$(STAGING_INSTALL_PREFIX)/include
+
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += ac_cv_c_bigendian=yes
+else
+CONFIGURE_ARGS += ac_cv_c_bigendian=no
+endif
+
 
 include ../../mk/spksrc.cross-cc.mk

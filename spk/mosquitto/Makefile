@@ -1,15 +1,18 @@
 SPK_NAME = mosquitto
 SPK_VERS = 1.6.12
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/mosquitto.png
 DEPENDS = cross/busybox cross/$(SPK_NAME)
+
+# libwebsockets is not supported for ppc except qoriq
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x 
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mosquitto is an open source message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
 RELOAD_UI = yes
 DISPLAY_NAME = Mosquitto
 STARTABLE = yes
-CHANGELOG = "Update to 1.6.12"
+CHANGELOG = "Update openssl to 1.1."
 HOMEPAGE = http://www.mosquitto.org/
 LICENSE  = EPL/EDL licensed
 

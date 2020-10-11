@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
 SPK_VERS = 1.4
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/sshfs cross/mosh cross/socat
@@ -29,7 +29,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, mosh, socat, nmap, sshfs, rsync, autossh$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons"
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Add autossh"
+CHANGELOG = "1. update openssl to 1.1 for all included packages \(tmux, nmap, mosh, socat, autossh, ser2net\)."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.

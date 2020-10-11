@@ -1,7 +1,7 @@
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
 SPK_VERS = $(SPK_SHORT_VERS).18
-SPK_REV = 24
+SPK_REV = 25
 SPK_ICON = src/python.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -24,7 +24,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python 2.7.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python
-CHANGELOG = "1. Fix SSL CA certicates location"
+CHANGELOG = "Update openssl to 1.1"
 
 HOMEPAGE = http://www.python.org
 LICENSE  = PSF

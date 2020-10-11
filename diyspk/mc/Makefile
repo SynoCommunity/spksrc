@@ -1,6 +1,6 @@
 SPK_NAME = mc
-SPK_VERS = 4.8.23
-SPK_REV = 7
+SPK_VERS = 4.8.25
+SPK_REV = 8
 SPK_ICON = src/mc.png
 
 DEPENDS = cross/mc
@@ -11,7 +11,7 @@ DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\'inter
 RELOAD_UI = no
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
-CHANGELOG = "1. Add sftp support<br>2. Fix subshell for /bin/sh as link to /bin/bash<br>3. Fix mouse support<br>4. Fix mcedit, mcview and mcdiff"
+CHANGELOG = "1. Update mc 4.8.25.<br/>2. Update openssl to 1.1."
 
 HOMEPAGE = http://www.midnight-commander.org
 LICENSE  = GNU GPL

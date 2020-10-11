@@ -1,32 +1,29 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/synocli-monitor.png
 
-DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox
+DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox cross/htop
 OPTIONAL_DEPENDS = cross/htop
 
 OPTIONAL_DESC =
 
-# provide htop until DSM 5.0 (later versions already have htop)
-ifneq (5.1,$(firstword $(sort $(TCVERSION) 5.1)))
-DEPENDS += cross/htop
-OPTIONAL_DESC := $(OPTIONAL_DESC)", htop"
-endif
-
 BUSYBOX_CONFIG = procutils
 
-# include process utilities not contained in DSM<6 (pstree)
+# include process utilities not contained in DSM<6 and DSM>2 (pstree)
 ifneq (6, $(firstword $(sort $(TCVERSION) 6)))
+ifeq (6, $(firstword $(sort $(TCVERSION) 2)))
 BUSYBOX_CONFIG += procutils.dsm5
+OPTIONAL_DESC := $(OPTIONAL_DESC)", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
+endif
 endif
 
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3$(OPTIONAL_DESC) and process utilities \(lsof, iostat, pgrep, pmap, watch\).
+DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3, htop$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "Initial release"
+CHANGELOG = "1. Update htop to 3.0.2 and include it in all DSM versions.<br/>2. Update openssl to 1.1. \(iperf3\)"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
