@@ -14,9 +14,6 @@ CHANGELOG = "1. Update links to 2.21.<br/>2. Update openssl to 1.1."
 HOMEPAGE = http://links.twibright.com/
 LICENSE = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SPK_COMMANDS = bin/links
 
 include ../../mk/spksrc.spk.mk
