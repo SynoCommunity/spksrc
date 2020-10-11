@@ -18,16 +18,16 @@ LICENSE  = BSD/GPL
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-random=/dev/urandom box_cv_have_large_file_support=yes
 
-PRE_CONFIGURE_TARGET = BoxBackup-configure
-INSTALL_TARGET = BoxBackup-install
+PRE_CONFIGURE_TARGET = boxbackup_pre_configure
+INSTALL_TARGET = boxbackup_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: BoxBackup-configure
-BoxBackup-configure:
+.PHONY: boxbackup_pre_configure
+boxbackup_pre_configure:
 	$(RUN) ./bootstrap
 
-.PHONY: BoxBackup-install
-BoxBackup-install:
+.PHONY: boxbackup_install
+boxbackup_install:
 	$(RUN) $(MAKE) install-backup-client DESTDIR=$(INSTALL_DIR)
 	$(RUN) $(MAKE) install-backup-server DESTDIR=$(INSTALL_DIR)

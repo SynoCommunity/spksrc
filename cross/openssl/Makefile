@@ -13,11 +13,8 @@ HOMEPAGE = http://www.openssl.org
 COMMENT  = TLS/SSL and crypto library.
 LICENSE  = Apache-2.0
 
-GNU_CONFIGURE = 1
-
 CONFIGURE_TARGET = openssl_configure
 INSTALL_TARGET = openssl_install
-
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -51,7 +48,6 @@ ifeq ($(strip $(OPENSSL_ARCH)),)
 # Unexpected CPU architecture. Please add arch to mk/spksrc.common.mk
 $(error Arch $(ARCH) not expected yet)
 endif
-
 
 .PHONY: openssl_configure
 openssl_configure:

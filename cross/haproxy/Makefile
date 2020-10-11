@@ -14,7 +14,6 @@ COMMENT    = HAProxy is a free, very fast and reliable solution offering high av
 LICENSE    = GPLv2
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = haproxy_compile
 INSTALL_TARGET = haproxy_install
 
 BUILD_OPTIONS = USE_TPROXY=1 USE_PTHREAD_PSHARED=1 USE_OPENSSL=1 USE_ZLIB=1
@@ -38,12 +37,9 @@ ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 ARCH_OPTIONS = ARCH=x86_64
 endif
 
+COMPILE_MAKE_OPTIONS += TARGET=generic $(ARCH_OPTIONS) $(BUILD_OPTIONS) SPKSRC_CFLAGS="$(CFLAGS)" SPKSRC_LDFLAGS="$(LDFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: haproxy_compile
-haproxy_compile: 
-	$(RUN) $(MAKE) TARGET=generic $(ARCH_OPTIONS) $(BUILD_OPTIONS) SPKSRC_CFLAGS="$(CFLAGS)" SPKSRC_LDFLAGS="$(LDFLAGS)"
 
 .PHONY: haproxy_install
 haproxy_install:

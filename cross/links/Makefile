@@ -14,10 +14,4 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-ssl=openssl
 
-INSTALL_TARGET = links_install
-
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: links_install
-links_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
