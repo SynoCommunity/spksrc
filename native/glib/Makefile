@@ -24,4 +24,3 @@ glib_pre_configure:
 	# force autogen to first use internal pcre instead of provided to prevent
 	# build failure.  Subsequent default configure will superseed this afterwards
 	$(RUN) ./autogen.sh
-#	$(RUN) ./autogen.sh --with-pcre
