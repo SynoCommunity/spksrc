@@ -58,4 +58,8 @@ endif
 ifeq ($(TC_VERS),6.2.2)
 TC_OS_MIN_VER = $(TC_VERS)-24922
 endif
+
+ifeq ($(TC_VERS),6.2.3)
+TC_OS_MIN_VER = $(TC_VERS)-25423
+endif
 endif
