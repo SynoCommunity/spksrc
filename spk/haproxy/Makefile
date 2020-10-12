@@ -1,6 +1,6 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.8.26
-SPK_REV = 21
+SPK_VERS = 2.2.4
+SPK_REV = 22
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.HAProxy.AppInstance
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT = 8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Update haproxy 1.8.26.<br/>2. Update openssl to 1.1."
+CHANGELOG = "1. Update haproxy 2.2.4.<br/>2. Update openssl to 1.1."
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
