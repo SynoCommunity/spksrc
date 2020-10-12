@@ -127,9 +127,9 @@ endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
 else
-  ifneq ($(strip $(HOMEPAGE)),)
+ifneq ($(strip $(HOMEPAGE)),)
 	@echo helpurl=\"$(HOMEPAGE)\" >> $@
-  endif
+endif
 endif
 ifneq ($(strip $(SUPPORTURL)),)
 	@echo support_url=\"$(SUPPORTURL)\" >> $@
@@ -143,15 +143,28 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
-ifneq ($(strip $(RELOAD_UI)),)
+ifeq ($(RELOAD_UI),yes)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 endif
+
+ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+# old behaviour
 ifeq ($(STARTABLE),no)
 ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 	@echo startable=\"$(STARTABLE)\" >> $@
 endif
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
+else
+# since 7.0 use Synology resource acquisition
+ifeq ($(STARTABLE),no)
+ifeq ($(strip $(SPK_COMMANDS)),)
+# STARTABLE needs to be yes, Resource linking and unlinking works on start and stop
+	@echo ctl_stop=\"$(STARTABLE)\" >> $@
+endif
+endif
+endif
+
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@
