@@ -57,3 +57,7 @@ endif
 ifeq ($(TC_VERS),6.2.3)
 TC_BUILD = 25423
 endif
+
+ifeq ($(TC_VERS),7.0)
+TC_BUILD = 4000
+endif
