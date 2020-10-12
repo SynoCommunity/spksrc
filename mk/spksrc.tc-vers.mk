@@ -1,5 +1,5 @@
-ifeq ($(strip $(TC_OS_MIN_VER)),)
-TC_OS_MIN_VER = $(TC_OS_MIN_VER)
+ifeq ($(strip $(TC_FIRMWARE)),)
+TC_FIRMWARE = $(TC_OS_MIN_VER)
 endif
 
 ifeq ($(strip $(TC_OS_MIN_VER)),)
