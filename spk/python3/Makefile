@@ -34,7 +34,7 @@ PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packag
 
 POST_STRIP_TARGET = python3_extra_install
 
-BUSYBOX_CONFIG = usrmng nice daemon
+BUSYBOX_CONFIG = usrmng nice daemon patch
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
