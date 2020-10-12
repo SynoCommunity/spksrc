@@ -42,7 +42,8 @@ endif
 .PHONY: service_target service_msg_target
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
 .PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
-.PHONY: $(DSM_CONF_DIR)/privilege $(DSM_CONF_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
+.PHONY: $(DSM_CONF_DIR)/privilege $(DSM_CONF_DIR)/resource
+.PHONY: $(DSM_CONF_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
 
 service_msg_target:
 	@$(MSG) "Generating service scripts for $(NAME)"
@@ -59,9 +60,11 @@ endif
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT)),)
 ifeq ($(strip $(SERVICE_COMMAND)),)
+ifeq ($(strip $(SPK_COMMANDS)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 ifeq ($(strip $(STARTABLE)),)
-$(error Set STARTABLE=no or provide either SERVICE_COMMAND or specific SSS_SCRIPT)
+$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SPK_COMMANDS or specific SSS_SCRIPT)
+endif
 endif
 endif
 endif
@@ -123,12 +126,25 @@ endif
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
+
+ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
 	@echo "# List of commands to create links for" >> $@
 	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
 	@echo "SPK_LINKS=\"${SPK_LINKS}\"" >> $@
 	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 endif
+else
+SPK_COMMANDS_IN_JSON = $(shell printf '"%s",' ${SPK_COMMANDS} | sed 's/.$$//')
+$(DSM_CONF_DIR)/resource: $(SPKSRC_MK)spksrc.service.resource-linker
+	$(create_target_dir)
+	@sed 's|"BINARIES"|${SPK_COMMANDS_IN_JSON}|' $< > $@
+SERVICE_FILES += $(DSM_CONF_DIR)/resource
+# STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
+# see spsrc.spk.mk
+endif
+
+
 DSM_SCRIPTS_ += service-setup
 SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 
@@ -159,19 +175,24 @@ endif
 
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
-ifneq ($(strip $(SPK_USER)),)
-ifeq ($(strip $(SERVICE_EXE)),)
+ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
+else ifeq ($(strip $(SERVICE_EXE)),)
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
 	$(create_target_dir)
+ifneq ($(strip $(SPK_USER)),)
 	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
+else
+	@sed 's|USER|sc-$(SPK_NAME)|' $< > $@
+# 	@sed '/.*USER.*/d' $< > $@
+endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/privilege
-endif
 
 
 # Generate service configuration for admin port

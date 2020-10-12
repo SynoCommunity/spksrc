@@ -36,9 +36,9 @@ start_daemon ()
                 SVC_CD="cd ${SVC_CWD}; "
             fi
             if [ -z "${SVC_BACKGROUND}" ]; then
-                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
+                ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
             else
-                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
+                ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
             fi
         else
             # DSM 6 user is set by conf/privilege
