@@ -25,7 +25,7 @@ jobs:
       matrix:
         # x64=x86_64, evansport=x86, aarch64=armv8, armv7, 88f6281=armv5, ppc853x/qoriq=ppc
         # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        arch: [noarch, x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
+        arch: [noarch, x64-6.1, x64-7.0, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
 
     steps:
       - name: Cache toolchains
