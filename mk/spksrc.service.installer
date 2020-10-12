@@ -4,10 +4,16 @@
 #  Cannot remove user as still in use or may be DSM service itself
 # Require warning in ChangeLog and manual user/group cleanup
 
-INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+    INST_LOG="${SYNOPKG_TEMP_LOGFILE}"
+else
+    INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
+fi
+
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
 INST_VAR="${SYNOPKG_PKGDEST}/var"
+# INST_VAR="${SYNOPKG_PKGVAR}"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
@@ -243,9 +249,10 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
-    # Link for backward compatibility of binaries location
-    $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
-
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+        # Link for backward compatibility of binaries location
+        $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
+    fi
     # Add firewall config
     if [ -r "${FWPORTS_FILE}" ]; then
         echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
