@@ -1,12 +1,12 @@
 PKG_NAME = haproxy
-PKG_VERS = 1.8.26
+PKG_VERS = 2.2.4
 PKG_MAIN_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.haproxy.org/download/$(PKG_MAIN_VERS)/src
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl cross/lua cross/pcre
+DEPENDS = cross/zlib cross/openssl cross/lua cross/pcre2
 
 MAINTAINER = SynoCommunity
 HOMEPAGE   = https://www.haproxy.org
@@ -17,7 +17,7 @@ CONFIGURE_TARGET = nop
 INSTALL_TARGET = haproxy_install
 
 BUILD_OPTIONS = USE_TPROXY=1 USE_PTHREAD_PSHARED=1 USE_OPENSSL=1 USE_ZLIB=1
-BUILD_OPTIONS += USE_PCRE=1 USE_STATIC_PCRE=1 PCRE_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include
+BUILD_OPTIONS += USE_PCRE2=1 PCRE2_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include PCRE2_LIB=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 BUILD_OPTIONS += USE_LUA=1 LUA_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include LUA_LIB=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 
 include ../../mk/spksrc.common.mk

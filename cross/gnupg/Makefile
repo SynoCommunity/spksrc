@@ -1,5 +1,5 @@
 PKG_NAME = gnupg
-PKG_VERS = 2.1.6
+PKG_VERS = 2.2.23
 PKG_EXT = tar.bz2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)

@@ -1,5 +1,5 @@
 PKG_NAME = glibmm
-PKG_SHORT_VERS = 2.34
+PKG_SHORT_VERS = 2.58
 PKG_VERS = $(PKG_SHORT_VERS).1
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -13,7 +13,7 @@ COMMENT  =
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-documentation
+CONFIGURE_ARGS = --disable-documentation --disable-static
 CONFIGURE_ARGS += GLIB_COMPILE_SCHEMAS=$(WORK_DIR)/../../../native/glib/work-native/glib-*/gio/glib-compile-schemas
 
 include ../../mk/spksrc.cross-cc.mk

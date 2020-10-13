@@ -1,9 +1,12 @@
 PKG_NAME = sslh
-PKG_VERS = 1.19c
+PKG_VERS = 1.21c
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.rutschle.net/tech/sslh
-PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/yrutschle/sslh/archive
+#https://codeload.github.com/yrutschle/sslh/tar.gz/v1.21c
+#https://github.com/yrutschle/sslh/archive/v1.21c.tar.gz
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libconfig cross/pcre
 

@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Irssi is a terminal based IRC client for UNIX systems. It also supports SILC and ICB protocols via plugins.
 DISPLAY_NAME = Irssi
 STARTABLE = no
-CHANGELOG = "Update openssl to 1.1."
+CHANGELOG = "Update openssl to 1.1.<br/>2. Update glib to 2.58"
 BETA = 1
 
 HOMEPAGE = http://www.irssi.org/
