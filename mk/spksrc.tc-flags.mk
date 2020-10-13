@@ -17,7 +17,7 @@ TC_TYPE = DSM
 endif
 
 ifeq ($(strip $(TC_OS_MIN_VER)),)
-TC_OS_MIN_VER = $(firstword $(subst ., ,$(TC_VERS))).$(firstword $(subst ., ,$(subst $(firstword $(subst ., ,$(TC_VERS))),,$(TC_VERS))))-$(TC_BUILD)
+TC_OS_MIN_VER = $(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$(TC_BUILD)
 endif
 
 ifeq ($(strip $(TC_FIRMWARE)),)
