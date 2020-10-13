@@ -15,6 +15,8 @@ BETA = 1
 HOMEPAGE = http://www.gnupg.org/
 LICENSE  = GNU General Public License
 
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
+
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 
