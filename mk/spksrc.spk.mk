@@ -104,17 +104,18 @@ endif
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
 
+ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+endif
+ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
-else ifneq ($(strip $(OS_MIN_VER)),)
-	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else
+	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
 endif
-	@if (( $(echo $${TC_OS_MIN_VER}' <= 6.1' | bc -l) )); then
-	  @echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@ ; \
-	else ; \
-	  @echo firmware=\"$(TC_OS_MIN_VER)\" >> $@ ; \
-	  @echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@ ; \
-	fi
+endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
 endif
