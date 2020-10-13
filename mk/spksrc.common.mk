@@ -28,7 +28,7 @@ AVAILABLE_TCS = $(notdir $(wildcard ../../toolchains/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
 
 # Toolchain filters
-SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_ARCHS)) apollolake-6.2 geminilake-6.2 purley-6.2)
+SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_ARCHS)) apollolake-6.2.3 geminilake-6.2.3 purley-6.2.3)
 DEFAULT_ARCHS = $(sort $(filter-out $(ARCHS_DUPES_DEFAULT), $(AVAILABLE_ARCHS)))
 LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS) $(ARCHS_DUPES), $(AVAILABLE_ARCHS)))
 # SRM - Synology Router Manager
