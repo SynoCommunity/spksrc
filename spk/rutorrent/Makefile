@@ -4,6 +4,8 @@ SPK_REV = 3
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
+
 DEPENDS  = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 
 MAINTAINER = moneytoo
