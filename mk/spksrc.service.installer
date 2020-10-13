@@ -4,11 +4,11 @@
 #  Cannot remove user as still in use or may be DSM service itself
 # Require warning in ChangeLog and manual user/group cleanup
 
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-    INST_LOG="${SYNOPKG_TEMP_LOGFILE}"
-else
+# if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
     INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
-fi
+# else
+#     INST_LOG="${SYNOPKG_TEMP_LOGFILE}"
+# fi
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
@@ -95,9 +95,9 @@ syno_remove_user ()
         if synouser --get "${RM_USER}" &> /dev/null; then
             echo "Removing user ${RM_USER}" >> ${INST_LOG}
             synouser --del "${RM_USER}" >> ${INST_LOG} 2>&1
-            synouser --rebuild all
+            synouser --rebuild all >> ${INST_LOG} 2>&1
             # Also rebuild groups so users are removed
-            synogroup --rebuild all
+            synogroup --rebuild all >> ${INST_LOG} 2>&1
         fi
     fi
 }
@@ -109,9 +109,9 @@ syno_group_create ()
     if [ -n "${EFF_USER}" ]; then
         echo "Creating group ${GROUP}" >> ${INST_LOG}
         # Create syno group
-        synogroup --add "${GROUP}" "${EFF_USER}" >> ${INST_LOG}
+        synogroup --add "${GROUP}" "${EFF_USER}" >> ${INST_LOG} 2>&1
         # Set description of the syno group
-        synogroup --descset "${GROUP}" "${GROUP_DESC}" >> ${INST_LOG}
+        synogroup --descset "${GROUP}" "${GROUP_DESC}" >> ${INST_LOG} 2>&1
     fi
 }
 
@@ -125,7 +125,7 @@ syno_group_remove ()
             echo "Removing group ${RM_GROUP}" >> ${INST_LOG}
             # Remove syno group
             synogroup --del "${RM_GROUP}" >> ${INST_LOG} 2>&1
-            synogroup --rebuild all
+            synogroup --rebuild all >> ${INST_LOG} 2>&1
         fi
     fi
 }
@@ -142,7 +142,7 @@ syno_user_add_to_group ()
         MEMBERS="$(synogroup --get $ADD_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
         # The "synogroup --member" command clears all users before adding new ones
         # so all the users must be listed on the command line
-        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}" >> ${INST_LOG}
+        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}" >> ${INST_LOG} 2>&1
     fi
 }
 
@@ -161,7 +161,7 @@ set_syno_permissions ()
         if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:rwxpdDaARWcC-:fd--\"`" ]; then
             # First Unix permissions, but only if it's in Linux mode
             if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
-                set_unix_permissions "${DIRNAME}"
+                set_unix_permissions "${DIRNAME}" >> ${INST_LOG} 2>&1
                 # If it is linux mode (due to old package) we need to add "administrators"-group,
                 # otherwise the folder is not accessible from File Station anymore!
                 synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" >> ${INST_LOG} 2>&1
@@ -221,7 +221,7 @@ syno_user_add_to_legacy_group () {
         MEMBERS=${MEMBERS//$LEGACY_USER}
         # The "synogroup --member" command clears all users before adding new ones
         # so all the users must be listed on the command line
-        synogroup --member "$LEGACY_GROUP" $MEMBERS "${NEW_USER}" >> ${INST_LOG}
+        synogroup --member "$LEGACY_GROUP" $MEMBERS "${NEW_USER}" >> ${INST_LOG} 2>&1
     fi
 }
 
@@ -298,7 +298,7 @@ postinst ()
         # Create share if does not exist
         #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
         if ! synoshare --get "${SHARE_NAME}" &> /dev/null ; then
-            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG}
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG} 2>&1
         fi
 
         # Add user permission if no GROUP is set in UI
@@ -306,7 +306,7 @@ postinst ()
         if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
             synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" >> ${INST_LOG} 2>&1
         fi
-        synoshare --build
+        synoshare --build >> ${INST_LOG} 2>&1
 
         $MKDIR "${SHARE_PATH}"
 
@@ -316,12 +316,12 @@ postinst ()
         fi
     fi
 
-    $MKDIR "${INST_VAR}"
+    $MKDIR "${INST_VAR}" >> ${INST_LOG} 2>&1
 
     call_func "service_postinst"
     call_func "service_create_links"
 
-    $CP "${INST_LOG}" "${INST_VAR}"
+    $CP "${INST_LOG}" "${INST_VAR}" >> ${INST_LOG} 2>&1
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
     fi
@@ -357,7 +357,7 @@ postuninst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         # Remove link
-        $RM "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG}
+        $RM "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG} 2>&1
 
         # Remove syno group if empty
         syno_group_remove "${GROUP}"
@@ -370,7 +370,7 @@ postuninst ()
     call_func "service_remove_links"
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        $RM "${INST_VARIABLES}"
+        $RM "${INST_VARIABLES}" >> ${INST_LOG} 2>&1
     fi
     exit 0
 }
@@ -381,14 +381,14 @@ preupgrade ()
     call_func "service_preupgrade"
 
     # Save some stuff
-    $RM "$TMP_DIR" >> ${INST_LOG}
-    $MKDIR "$TMP_DIR" >> ${INST_LOG}
+    $RM "$TMP_DIR" >> ${INST_LOG} 2>&1
+    $MKDIR "$TMP_DIR" >> ${INST_LOG} 2>&1
 
     call_func "service_save"
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
-    $CP "${INST_VAR}"/. "$TMP_DIR" >> ${INST_LOG}
+    $CP "${INST_VAR}"/. "$TMP_DIR" >> ${INST_LOG} 2>&1
     exit 0
 }
 
@@ -399,12 +399,12 @@ postupgrade ()
     call_func "service_restore"
 
     # Restore some stuff, has to be cp otherwise fails on directories
-    $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG}
+    $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG} 2>&1
 
     # Correct permissions of var folder
     set_unix_permissions "${INST_VAR}"
 
-    $RM "$TMP_DIR" >> ${INST_LOG}
+    $RM "$TMP_DIR" >> ${INST_LOG} 2>&1
 
     call_func "service_postupgrade"
 
