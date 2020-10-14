@@ -1,6 +1,6 @@
 SPK_NAME = chromaprint
 SPK_VERS = 1.5.0
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/chromaprint.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ STARTABLE = no
 MAINTAINER = ymartin59
 DESCRIPTION = Chromaprint is the core component of the AcoustID project. It\'s a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
 DISPLAY_NAME = Chromaprint
-CHANGELOG = "1. Update version 1.5.0<br/>2. Update to ffmpeg 4.2.4<br/>3. Fix shared library build"
+CHANGELOG = "1. Update to ffmpeg 4.3.1"
 
 HOMEPAGE   = http://acoustid.org/chromaprint
 LICENSE    = LGPL2.1+
