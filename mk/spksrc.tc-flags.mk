@@ -16,6 +16,10 @@ ifeq ($(strip $(TC_TYPE)),)
 TC_TYPE = DSM
 endif
 
+ifeq ($(strip $(TC_OS_MIN_VER)),)
+TC_OS_MIN_VER = $(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$(TC_BUILD)
+endif
+
 ifeq ($(strip $(TC_DIST_SITE_URL)),)
 TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20Tool%20Chains/
 endif

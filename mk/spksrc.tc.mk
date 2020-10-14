@@ -79,7 +79,8 @@ tc_vars: fix
 	@echo TC_LIBRARY := $(TC_LIBRARY)
 	@echo TC_INCLUDE := $(TC_INCLUDE)
 	@echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS)
-	@echo TC_FIRMWARE := $(TC_FIRMWARE)
+	@echo TC_VERS := $(TC_VERS)
+	@echo TC_BUILD := $(TC_BUILD)
 	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)
 

@@ -84,7 +84,6 @@ $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
-	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@/bin/echo -n "description=\"" >> $@
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
@@ -104,19 +103,17 @@ endif
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
 
+ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+endif
+ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
-else ifneq ($(strip $(OS_MIN_VER)),)
-	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
-else ifneq ($(strip $(TC_FIRMWARE)),)
-	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
-	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
-else ifneq ($(strip $(TC_OS_MIN_VER)),)
-	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
-	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
 else
-	@echo firmware=\"3.1-1594\" >> $@
-	@echo os_min_ver=\"3.1-1594\" >> $@
+	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
+endif
 endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
@@ -148,7 +145,9 @@ ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 endif
 ifeq ($(STARTABLE),no)
+ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 	@echo startable=\"$(STARTABLE)\" >> $@
+endif
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
