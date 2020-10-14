@@ -145,7 +145,9 @@ ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 endif
 ifeq ($(STARTABLE),no)
+ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 	@echo startable=\"$(STARTABLE)\" >> $@
+endif
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
