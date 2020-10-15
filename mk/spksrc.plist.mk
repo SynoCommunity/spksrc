@@ -9,14 +9,13 @@ endif
 
 .PHONY: cat_PLIST
 cat_PLIST:
-	@for depend in $(DEPENDS) ; \
+	@echo Processing PLIST dependencies 1>&2
+	@for depend in `$(MAKE) dependency-list` ; \
 	do                          \
-	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
-	done
-	@if [ -f PLIST ] ; \
-	then \
-	  $(PLIST_TRANSFORM) PLIST ; \
-	else \
-	  $(MSG) "No PLIST for $(NAME)" >&2; \
-	fi
-
+	  if [ "$${depend%/*}" = "cross" ] && [ -s ../../$${depend}/PLIST ]; then \
+	    echo "$${depend}" 1>&2 ; \
+	    cat ../../$${depend}/PLIST 1>&2 ; \
+	    $(PLIST_TRANSFORM) ../../$${depend}/PLIST ; \
+	  fi ; \
+	done ; \
+	$(PLIST_TRANSFORM) $(WORK_DIR)/../PLIST
