@@ -62,7 +62,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	    git) \
 	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
 	      localFile=$${localFolder}.tar.gz ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || break; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -fr $${localFolder}.part /tmp/git.$${localFolder}.lock ; \
 	        echo "git clone $${url}" ; \
@@ -83,7 +83,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      localFolder=$(NAME)-r$${rev} ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      localHead=$(NAME)-rHEAD.tar.gz ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || break; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -fr $${localFolder}.part /tmp/svn.$${localFolder}.lock ; \
 	        echo "svn co -r $${rev} $${url}" ; \
@@ -108,7 +108,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      localFolder=$(NAME)-r$${rev} ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      localTip=$(NAME)-rtip.tar.gz ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || break; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -fr $${localFolder}.part /tmp/hg.$${localFolder}.lock ; \
 	        echo "hg clone -r $${rev} $${url}" ; \
@@ -129,7 +129,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -z "$${localFile}" ]; then \
 	        localFile=`basename $${url}` ; \
 	      fi ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFile}.part ] && sleep 10 || break; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFile}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
 	        rm -f $${localFile}.part /tmp/wget.$${localFile}.lock ; \
 	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
