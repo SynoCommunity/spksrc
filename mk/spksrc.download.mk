@@ -62,9 +62,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	    git) \
 	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
 	      localFile=$${localFolder}.tar.gz ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || continue ; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -d $${localFolder}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
-	        rm -fr $${localFolder}.part /tmp/git.$${localFolder}.lock ; \
+	        rm -fr $${localFolder}.part ; \
 	        echo "git clone $${url}" ; \
 	        flock --timeout $(FLOCK_TIMEOUT) --exclusive /tmp/git.$${localFolder}.lock git clone --no-checkout --quiet $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
@@ -83,9 +83,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      localFolder=$(NAME)-r$${rev} ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      localHead=$(NAME)-rHEAD.tar.gz ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || continue ; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -d $${localFolder}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
-	        rm -fr $${localFolder}.part /tmp/svn.$${localFolder}.lock ; \
+	        rm -fr $${localFolder}.part ; \
 	        echo "svn co -r $${rev} $${url}" ; \
 	        flock --timeout $(FLOCK_TIMEOUT) --exclusive /tmp/svn.$${localFolder}.lock svn export -q -r $${rev} $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
@@ -108,9 +108,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      localFolder=$(NAME)-r$${rev} ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      localTip=$(NAME)-rtip.tar.gz ; \
-	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFolder}.part ] && sleep 10 || continue ; done ; \
+	      for i in {1..$${WAIT_MAX}}; do [ -d $${localFolder}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
-	        rm -fr $${localFolder}.part /tmp/hg.$${localFolder}.lock ; \
+	        rm -fr $${localFolder}.part ; \
 	        echo "hg clone -r $${rev} $${url}" ; \
 	        flock --timeout $(FLOCK_TIMEOUT) --exclusive /tmp/hg.$${localFolder}.lock hg clone -r $${rev} $${url} $${localFolder}.part ; \
 	        mv $${localFolder}.part $${localFolder} ; \
@@ -131,7 +131,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      fi ; \
 	      for i in {1..$${WAIT_MAX}}; do [ -f $${localFile}.part ] && sleep 10 || continue ; done ; \
 	      if [ ! -f $${localFile} ]; then \
-	        rm -f $${localFile}.part /tmp/wget.$${localFile}.lock ; \
+	        rm -f $${localFile}.part ; \
 	        url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
 	        echo "wget $${url}" ; \
 	        flock --timeout $(FLOCK_TIMEOUT) --exclusive /tmp/wget.$${localFile}.lock wget --secure-protocol=TLSv1_2 -nv -O $${localFile}.part -nc $${url} ; \
