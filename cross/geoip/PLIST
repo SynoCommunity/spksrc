@@ -2,4 +2,4 @@ bin:bin/geoiplookup
 bin:bin/geoiplookup6
 lnk:lib/libGeoIP.so
 lnk:lib/libGeoIP.so.1
-lib:lib/libGeoIP.so.1.6.9
+lib:lib/libGeoIP.so.1.6.12

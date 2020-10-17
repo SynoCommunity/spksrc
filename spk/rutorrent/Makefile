@@ -1,8 +1,10 @@
 SPK_NAME = rutorrent
-SPK_VERS = 3.8
-SPK_REV = 1
+SPK_VERS = 3.10
+SPK_REV = 3
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
+
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
 
 DEPENDS  = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 
@@ -12,7 +14,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG ="1. Update rutorrent to 3.8"
+CHANGELOG ="1. Update rutorrent to 3.10<br/>2. Update to rtorrent 0.9.8<br/>3. Update to libtorrent 0.13.8<br/>4. Update to xmlrpc-c 1.51.06<br/>5. Update openssl to 1.1"
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent

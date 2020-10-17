@@ -2,7 +2,7 @@
     "step_title": "Basic configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Download directory",
+        "desc": "Choose a download directory.<br>The directory must exist before you start the installation.",
         "subitems": [{
             "key": "wizard_download_dir",
             "desc": "Download directory",
@@ -30,8 +30,8 @@
         }]
     }]
 }, {
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "DSM6 Permissions",
     "items": [{
-    "desc": "Permissions are managed with the group 'sc-download' in DSM.<br><br>During package installation, this group will be added with correct permissions to the chosen directory(s)."
+    "desc": "DSM access permissions for this package are managed with the group <b>'sc-download'</b>.<br><br>Package installation will ensure, the group exists and the permissions are set for the chosen directory.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
 }]

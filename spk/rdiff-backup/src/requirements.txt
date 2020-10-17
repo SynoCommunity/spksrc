@@ -1,0 +1,3 @@
+rdiff-backup==2.0.3
+pylibacl==0.5.4
+pyxattr==0.7.1

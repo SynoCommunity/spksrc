@@ -1,0 +1,16 @@
+bin:bin/ntfs-3g.probe
+bin:bin/ntfscat
+bin:bin/ntfscluster
+bin:bin/ntfscmp
+bin:bin/ntfsfix
+bin:bin/ntfsinfo
+bin:bin/ntfsls
+lnk:lib/libntfs-3g.so
+lnk:lib/libntfs-3g.so.88
+lib:lib/libntfs-3g.so.88.0.0
+bin:sbin/mkntfs
+bin:sbin/ntfsclone
+bin:sbin/ntfscp
+bin:sbin/ntfslabel
+bin:sbin/ntfsresize
+bin:sbin/ntfsundelete

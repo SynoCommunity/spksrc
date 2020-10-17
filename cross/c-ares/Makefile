@@ -12,7 +12,7 @@ COMMENT  = c-ares is a C library that performs DNS requests and name resolves as
 LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = CFLAGS=$(TC_CFLAGS)
+CONFIGURE_ARGS = CFLAGS="$(TC_EXTRA_CFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
 

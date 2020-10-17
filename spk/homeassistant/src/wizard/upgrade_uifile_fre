@@ -1,0 +1,6 @@
+[{
+    "step_title": "FAQ HomeAssistant concernant la configuration",
+    "items": [{
+        "desc": "Avertissement: il est possible que votre configuration nécessite des corrections après l'upgrade. Merci de consulter <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-HomeAssistant\">la FAQ dédiée</a> à la configuration HA. Ce package pour Python 3 ne contient pas nécessairement les composants requis par les addon que vous souhaitez."
+    }]
+}]

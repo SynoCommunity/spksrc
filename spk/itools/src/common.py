@@ -32,8 +32,8 @@ from logging.handlers import RotatingFileHandler
 
 INSTALL_DIR = '/usr/local/itools'
 VOLUME_DIR = os.path.join(INSTALL_DIR, 'volume')
-LOGFILE = os.path.join(INSTALL_DIR, 'var/log/access.log')
-LOCKFILE = os.path.join(INSTALL_DIR, 'var/run/access.lock')
+LOGFILE = os.path.join(INSTALL_DIR, 'var/access.log')
+LOCKFILE = os.path.join(INSTALL_DIR, 'var/access.lock')
 
 logger = logging.getLogger('Rotating Log')
 logger.setLevel(logging.INFO)

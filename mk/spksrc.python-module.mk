@@ -25,20 +25,31 @@ PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$
 
 ### Python module rules
 compile_python_module:
+ifeq ($(strip $(CROSSENV)),)
+# Python 2 way
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
+else
+# Python 3 case: using crossenv helper
+	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
+endif
 
 install_python_module:
+ifeq ($(strip $(CROSSENV)),)
+# Python 2 way
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
+else
+# Python 3 case: using crossenv helper
+	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
+endif
 
 fix_shebang_python_module:
-	@cat PLIST | sed 's/:/ /' | while read type file ; \
-	do \
-	  case $${type} in \
-	    bin) \
-	      echo -n "Fixing shebang for $${file}... " ; \
-	      sed -i -e 's|^#!.*$$|#!$(PYTHON_INTERPRETER)|g' $(INSTALL_DIR)$(INSTALL_PREFIX)/$${file} > /dev/null 2>&1 && echo "ok" || echo "failed!" \
-	      ;; \
-	  esac ; \
+	@cat PLIST | sed 's/:/ /' | while read type file ; do \
+	  for script in $(INSTALL_DIR)$(INSTALL_PREFIX)/$${file} ; do \
+	    if file $${script} | grep -iq "python script" ; then \
+	        echo -n "Fixing shebang for $${script} ... " ; \
+	        sed -i -e '1 s|^#!.*$$|#!$(PYTHON_INTERPRETER)|g' $${script} > /dev/null 2>&1 && echo "ok" || echo "failed!" ; \
+	    fi ; \
+	  done ; \
 	done
 
 all: install fix_shebang_python_module

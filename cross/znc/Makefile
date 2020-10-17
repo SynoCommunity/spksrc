@@ -1,5 +1,5 @@
 PKG_NAME = znc
-PKG_VERS = 1.7.1
+PKG_VERS = 1.7.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://znc.in/releases/archive
@@ -13,13 +13,13 @@ LICENSE  = Apache License 2.0
 
 GNU_CONFIGURE = 1
 ifneq ($(wildcard modules/*),)
-POST_INSTALL_TARGET = myPostInstall
+POST_INSTALL_TARGET = znc_post_install
 endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPostInstall
-myPostInstall:
+.PHONY: znc_post_install
+znc_post_install:
 	# The following extra modules are stored in cross/znc/modules and are built via the znc-buildmod command. Adapt as needed.
 	# wget https://raw.githubusercontent.com/colloquy/colloquypush/master/znc/colloquy.cpp
 	# wget -O identd.cpp https://raw.githubusercontent.com/cynix/znc-identd/master/identd.cc

@@ -1,19 +1,32 @@
 SPK_NAME = tvheadend
-SPK_VERS = 4.2.8
-SPK_REV = 16
+SPK_SHORT_VERS = 4.3
+SPK_GIT_HASH = 9ed76c0
+SPK_GIT_DATE = 20201011
+SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
+TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
+SPK_REV = 26
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
+# Export version to the build where version
+# script gets patched accordingly by:
+# 000-fix-version.patch from cross/tvheadend
+export TVH_VERS
+
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
-MAINTAINER = m4tt075
+MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Fix CA module support regression<br/>2. Fix regression of upgrading legacy packages<br/>3. Simplify and fix initial login credential setting"
-HOMEPAGE = https://www.lonelycoder.com/tvheadend/
+CHANGELOG = "1. Update to latest git version 9ed76c0 as of October 11th 2020<br/>2. Update openssl to 1.1"
+HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
+
+# PPC_ARCHES except qoriq are not supported
+# https://tvheadend.org/issues/5060
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
@@ -49,11 +62,22 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: tvheadend_pre_depend tvheadend_extra_install
 
+# Use FFMPEG package shared libraries
 FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc libswscale.pc libavutil.pc libavformat.pc libavcodec.pc
+
+# Use other media libraries through FFMPEG package shared libraries
+MEDIA_LIBS = fdk-aac.pc numa.pc ogg.pc opus.pc theoradec.pc theoraenc.pc theora.pc vorbisenc.pc vorbisfile.pc vorbis.pc vpx.pc x264.pc x265.pc
+
+# Add Intel VAAPI libraries on Intel platforms
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+VAAPI_LIBS = libdrm.pc libdrm_intel.pc libkms.pc libva.pc libva-drm.pc pciaccess.pc
+endif
 
 tvheadend_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG_LIBS),ln -s $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 
 tvheadend_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var

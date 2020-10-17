@@ -1,0 +1,11 @@
+lnk:lib/libdal.so
+lnk:lib/libdal-0.3.so.0
+lib:lib/libdal-0.3.so.0.0.1
+lnk:lib/libreiserfs.so
+lnk:lib/libreiserfs-0.3.so.0
+lib:lib/libreiserfs-0.3.so.0.0.1
+bin:sbin/cpfs.reiserfs
+bin:sbin/fsck.reiserfs
+bin:sbin/mkfs.reiserfs
+bin:sbin/resizefs.reiserfs
+bin:sbin/tunefs.reiserfs

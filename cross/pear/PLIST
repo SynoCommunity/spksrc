@@ -1,5 +1,5 @@
 bin:bin/pear
 bin:bin/peardev
 bin:bin/pecl
-shr:share/pear
-data:data
+rsc:share/pear
+rsc:data

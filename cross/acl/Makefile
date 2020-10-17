@@ -7,16 +7,17 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/attr
 
-HOMEPAGE = http://kernel.org/
-COMMENT  = 
-LICENSE  = 
+HOMEPAGE = https://savannah.nongnu.org/projects/acl/
+COMMENT  = Commands for Manipulating POSIX Access Control Lists.
+LICENSE  = GPLv2+
 
 GNU_CONFIGURE = 1
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = acl_install
 CONFIGURE_ARGS = --enable-static=no
+
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: acl_install
+acl_install:
 	$(RUN) $(MAKE) DIST_ROOT=$(INSTALL_DIR) install install-lib install-dev

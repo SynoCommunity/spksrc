@@ -1,0 +1,13 @@
+certifi==2020.6.20
+chardet==3.0.4
+distro==1.5.0
+idna==2.10
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+msgpack==1.0.0
+pycryptodomex==3.9.8
+PyYAML==5.3.1
+pyzmq==19.0.2
+requests==2.24.0
+salt==3001.1
+urllib3==1.25.10

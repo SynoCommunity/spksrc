@@ -1,6 +1,6 @@
 SPK_NAME = znc
-SPK_VERS = 1.7.1
-SPK_REV = 12
+SPK_VERS = 1.7.5
+SPK_REV = 14
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -12,15 +12,14 @@ DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un 
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "1. Update to ZNC 1.7.1<br/>2. Update modules<br/>3. Add generic DSM5+6 service support"
-BETA = 1
+CHANGELOG = "Update openssl to 1.1."
 
 STARTABLE = yes
 HOMEPAGE = http://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARM5_ARCHES)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 
 WIZARDS_DIR = src/wizard/

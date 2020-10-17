@@ -1,0 +1,11 @@
+bin:bin/ewfacquire
+bin:bin/ewfacquirestream
+bin:bin/ewfdebug
+bin:bin/ewfexport
+bin:bin/ewfinfo
+bin:bin/ewfmount
+bin:bin/ewfrecover
+bin:bin/ewfverify
+lnk:lib/libewf.so
+lnk:lib/libewf.so.3
+lib:lib/libewf.so.3.0.0

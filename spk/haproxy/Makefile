@@ -1,12 +1,13 @@
 SPK_NAME = haproxy
-SPK_VERS = 1.5.14
-SPK_REV = 19
+SPK_VERS = 2.2.4
+SPK_REV = 22
 SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
+DSM_APP_NAME = SYNOCOMMUNITY.HAProxy.AppInstance
 
 DEPENDS = cross/$(SPK_NAME)
-WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
-SPK_DEPENDS = "python>2.7.3-3"
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python>2.7.18-25"
 
 MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
@@ -14,7 +15,7 @@ DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet 
 ADMIN_PORT = 8280
 RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Update to 1.5.14<br>2. Added gzip compression support<br>3. Fix listening on <1024 ports"
+CHANGELOG = "1. Update haproxy 2.2.4.<br/>2. Update openssl to 1.1."
 
 HOMEPAGE   = http://haproxy.1wt.eu/
 LICENSE    = GNU GPL 2
@@ -24,6 +25,7 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

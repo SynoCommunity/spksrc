@@ -1,0 +1,3 @@
+lnk:lib/libjson-c.so
+lnk:lib/libjson-c.so.4
+lib:lib/libjson-c.so.4.0.0

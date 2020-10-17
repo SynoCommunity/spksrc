@@ -1,9 +1,8 @@
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
+PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
-LOG_FILE="${SYNOPKG_PKGDEST}/var/logs/sabnzbd.log"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
@@ -24,14 +23,8 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
     fi
 
-    # Create logs directory, otherwise it might not start
+    # Create logs directory, otherwise it does not start due to permissions errors
     mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN >> ${INST_LOG}
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 service_postupgrade ()

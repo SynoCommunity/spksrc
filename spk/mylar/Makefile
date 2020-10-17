@@ -1,9 +1,9 @@
 SPK_NAME = mylar
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/mylar.png
 
-DEPENDS  =
+DEPENDS =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = Diaoul
@@ -11,7 +11,7 @@ DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
 DESCRIPTION_FRE = Mylar permet le téléchargement automatique de Comic Book \(cbr/cbz\)
 RELOAD_UI = yes
 DISPLAY_NAME = Mylar
-CHANGELOG = "Integrate with DSM5+6 Generic Service support and added to 'sc-download' group."
+CHANGELOG = "Fix DSM 6 service start."
 
 HOMEPAGE   = https://github.com/evilhero/mylar
 LICENSE    = GPLv3

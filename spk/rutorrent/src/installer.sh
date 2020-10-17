@@ -200,7 +200,7 @@ preupgrade ()
 
     # Revision 8 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
-        sed -i -e "s|http_cacert = .*|http_cacert = ${INSTALL_DIR}/cert.pem|g" ${INSTALL_DIR}/var/.rtorrent.rc
+        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${INSTALL_DIR}/var/.rtorrent.rc
     fi
 
     # Save the configuration file

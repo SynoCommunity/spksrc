@@ -1,0 +1,11 @@
+--- ntfsprogs/Makefile.in.org	2017-03-23 09:43:00.000000000 +0000
++++ ntfsprogs/Makefile.in	2020-02-12 23:37:20.805446300 +0000
+@@ -1344,7 +1344,7 @@
+ 
+ install-exec-am: install-binPROGRAMS install-sbinPROGRAMS
+ 	@$(NORMAL_INSTALL)
+-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
++
+ install-html: install-html-am
+ 
+ install-html-am:

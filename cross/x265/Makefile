@@ -1,11 +1,13 @@
 PKG_NAME = x265
-PKG_VERS = 2.9
+PKG_VERS = 3.4
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265/downloads
-PKG_DIR = $(PKG_NAME)_$(PKG_VERS)/source
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/videolan/x265/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/source
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS =
+OPTIONAL_DEPENDS = native/nasm cross/libnuma
 
 HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
@@ -77,7 +79,7 @@ endif
 .PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure
 
 # First create specific static libraries with build options for 12 and 10 bit depth
-PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)
+PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
 PKG_BUILD_12BIT = $(PKG_WORK_DIR)/build12bit
 PKG_BUILD_10BIT = $(PKG_WORK_DIR)/build10bit
 

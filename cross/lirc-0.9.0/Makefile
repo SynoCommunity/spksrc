@@ -6,11 +6,11 @@ PKG_DIST_SITE = http://downloads.sourceforge.net/project/lirc/LIRC/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 MOD_DIR = /lib/modules
 
-REQ_KERNEL = 1
+REQUIRE_KERNEL = 1
 
 HOMEPAGE = http://www.lirc.org/
 COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
-LICENSE  =
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-transmitter --with-driver=userspace --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)

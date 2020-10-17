@@ -1,1 +1,1 @@
-bin/mktemp
+bin:bin/mktemp

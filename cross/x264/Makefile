@@ -1,11 +1,14 @@
 PKG_NAME = x264
-PKG_VERS = 20190109-2245-stable
-PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.videolan.org/x264/snapshots
-PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
+PKG_VERS = 20200702-stable
+PKG_EXT = tar.gz
+PKG_DOWNLOAD_METHOD = git
+PKG_GIT_HASH = 4c2aafd864dd201832ec2be0fef4484925146650
+PKG_DIST_SITE = https://github.com/mirror/x264.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS =
+OPTIONAL_DEPENDS = native/nasm
 
 HOMEPAGE = http://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma

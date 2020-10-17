@@ -1,0 +1,4 @@
+bin:bin/iperf3
+lnk:lib/libiperf.so
+lnk:lib/libiperf.so.0
+lib:lib/libiperf.so.0.0.0

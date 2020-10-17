@@ -1,0 +1,25 @@
+Disables pseudo logic made to enforce setting of macros which are actually already defined in corresponding headers.
+
+--- setup.py
++++ setup.py
+@@ -804,20 +804,16 @@ if not on_rtd:
+                                                system_prefix=libb2_prefix, system=libb2_system,
+                                                **crypto_ext_kwargs)
+ 
+-    msgpack_endian = '__BIG_ENDIAN__' if (sys.byteorder == 'big') else '__LITTLE_ENDIAN__'
+-    msgpack_macros = [(msgpack_endian, '1')]
+     msgpack_packer_ext_kwargs = dict(
+         sources=[msgpack_packer_source],
+         include_dirs=include_dirs,
+         library_dirs=library_dirs,
+-        define_macros=msgpack_macros,
+         language='c++',
+     )
+     msgpack_unpacker_ext_kwargs = dict(
+         sources=[msgpack_unpacker_source],
+         include_dirs=include_dirs,
+         library_dirs=library_dirs,
+-        define_macros=msgpack_macros,
+         language='c++',
+     )
+ 

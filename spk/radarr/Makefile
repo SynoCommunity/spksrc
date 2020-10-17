@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 8
+SPK_REV = 12
 SPK_ICON = src/radarr.png
 
 REQUIRED_DSM = 5.0
@@ -16,7 +16,7 @@ DESCRIPTION  = Radarr is a movie manager like Couchpotato, but based on the Sona
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "Update Radarr to v0.2.0.1293."
+CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
 
 HOMEPAGE = https://radarr.video/
 LICENSE  = GPLv3

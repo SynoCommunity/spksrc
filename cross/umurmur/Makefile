@@ -12,14 +12,11 @@ HOMEPAGE = https://github.com/umurmur/umurmur
 COMMENT  = Minimalistic Murmur (Mumble server)
 LICENSE  = BSD 3-clause License
 
-CONFIGURE_TARGET = umurmur_configure
-INSTALL_TARGET = install_target
+CMAKE_USE_DESTDIR = 0
 
-CMAKE_ARGS = -DSSL=openssl -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+include ../../mk/spksrc.cross-cmake.mk
+
+# Mandatory umurmur cmake
+# args for proper build
+CMAKE_ARGS += -DSSL=openssl
 CMAKE_ARGS += -DCMAKE_STAGING_PREFIX=$(STAGING_INSTALL_PREFIX)
-
-include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: umurmur_configure
-umurmur_configure:
-	$(RUN) cmake ${CMAKE_ARGS} .

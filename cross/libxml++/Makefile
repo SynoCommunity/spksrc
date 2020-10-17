@@ -1,8 +1,9 @@
 PKG_NAME = libxml++
-PKG_VERS = 2.36.0
+PKG_SHORT_VERS = 2.40
+PKG_VERS = $(PKG_SHORT_VERS).1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/libxml++/2.36
+PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/glibmm

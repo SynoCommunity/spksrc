@@ -6,6 +6,13 @@ SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
 
 all: $(SUPPORTED_SPKS)
 
+all-noarch:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
+	done
+
+
 clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean
 
@@ -53,6 +60,21 @@ native-%: native/%/Makefile
 
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
+
+# build dependency tree for all packages
+# and take the tree output only (starting with a tab)
+dependency-tree:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${spk} dependency-tree | grep -P "^[\t]"; \
+	done
+
+# build dependency list for all packages
+dependency-list:
+	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	do \
+	    $(MAKE) -s -C $${spk} dependency-list ; \
+	done
 
 # define a template that instantiates a 'python3-avoton-6.1' -style target for
 # every ($2) arch, every ($1) spk
@@ -104,6 +126,14 @@ cross-digests:
 	    (cd $${cross} && $(MAKE) digests) ; \
 	done
 
+jsonlint:
+ifeq (,$(shell which jsonlint))
+	$(error "jsonlint not found, install with: npm install -g jsonlint")
+else
+	find spk/ -not -path "*work*" -regextype posix-extended -regex '.*(\.json|install_uifile\w*|upgrade_uifile\w*|app/config)' -print -exec jsonlint -q -c {} \;
+endif
+lint: jsonlint
+
 .PHONY: toolchains kernel-modules
 toolchains: $(addprefix toolchain-,$(AVAILABLE_ARCHS))
 kernel-modules: $(addprefix kernel-,$(AVAILABLE_ARCHS))
@@ -126,6 +156,7 @@ local.mk:
 	@echo "DISTRIBUTOR_URL=" >> $@
 	@echo "REPORT_URL=" >> $@
 	@echo "DEFAULT_TC=" >> $@
+	@echo "#PARALLEL_MAKE=max" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
@@ -139,4 +170,3 @@ setup-synocommunity: setup
 		-e "s|DISTRIBUTOR_URL=.*|DISTRIBUTOR_URL=https://synocommunity.com|" \
 		-e "s|REPORT_URL=.*|REPORT_URL=https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk
-

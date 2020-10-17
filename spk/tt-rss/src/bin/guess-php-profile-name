@@ -1,0 +1,17 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+source "${SCRIPT_DIR}/settings.sh"
+
+profile_name=$(jq -r .default.php "${WEB_STATION_HOME_DIR}/etc/WebStation.json")
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+
+if [ -z "${profile_name}" ]
+then
+    exit 2
+fi
+
+echo -n "${profile_name}"

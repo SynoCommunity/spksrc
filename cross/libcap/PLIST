@@ -1,0 +1,3 @@
+lnk:lib/libcap.so
+lnk:lib/libcap.so.2
+lib:lib/libcap.so.2.31

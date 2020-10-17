@@ -68,4 +68,32 @@ Pull requests
 ----------
 Pull requests to add packages to the [SynoCommunity repository](https://synocommunity.com) are always welcome, as are improvements to the spksrc framework or existing packages.
 
+Please create a new branch before pulling your request and avoid using the master branch. Pay attention on [How to make a clean pull request](https://github.com/MarcDiethelm/contributing/blob/master/README.md).
+
 Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people. See the [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO) for information on how to use spksrc.
+
+#### When creating a Pull Request you get a description from a template like this:
+
+> _Motivation:_  Explain here what the reason for the pull request is.<br>
+> _Linked issues:_  Optionally, add links to existing issues or other PR's
+> 
+> ### Checklist
+> - [ ] Build rule `all-supported` completed successfully
+> - [ ] Package upgrade completed successfully
+> - [ ] New installation of package completed successfully
+
+
+For _Linked issues_ (or anywhere in the description), you can use the auto link feature of github, to get the issues linked to the PR and closed when the PR is merged, 
+see: [linking a pull request to an issue](https://help.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue).
+
+Example:<br>
+_Linked issues:_ fixed #1234
+
+The Checklist is for minimal Tests required for new and updated packages.<br>
+- The Build rule `all-supported` builds the currently supported archs with the default toolchain version. All affected archs must successfully build - or be declared as UNSUPPORTED_ARCHS in the spk/ Makefile of the package.
+- Package upgrade must successfully complete for new packages and upgrades. For new packages, the upgrade can be tested by manually install the same version that is already installed. The install wizzard will show `upgrade` in the dialog title, upgrade wizard pages must work (when available) and manually changed configuration files must be preserved.
+- A new installation must succeed. There must not appear error messages while installation or in the install log file found in `/var/packages/{package-name}/target/var/{package-name}_install.log`
+
+#### Pull Requests not ready for merging
+Even when your changes are not ready for merging into the production code (master-branch), you can create a Pull Request. This is very useful for discussing implementation details or specific tasks.
+You can prefix the PR Title temporary with [WIP] for work in progress, or apply a specific label like `status/work-in-progress`, `status/do-not-merge` or `status/help-wanted`.

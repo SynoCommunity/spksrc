@@ -1,15 +1,15 @@
 SPK_NAME = mono
-SPK_VERS = 5.18.0.240
-SPK_REV = 12
+SPK_VERS = 5.20.1.34
+SPK_REV = 15
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hg59
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "Update to 5.18.0.240"
+CHANGELOG = "Update to version 5.20.1.34"
 
 HOMEPAGE = http://mono-project.com
 LICENSE  = http://www.mono-project.com/docs/faq/licensing
@@ -19,6 +19,9 @@ SERVICE_SETUP = src/service-setup.sh
 POST_STRIP_TARGET = mono_extra_install
 
 MONO_NATIVE_INSTALL = $(WORK_DIR)/../../../native/$(SPK_NAME)/work-native/install
+
+SPK_COMMANDS = bin/mono bin/mcs bin/gacutil bin/gacutil2 bin/makecert
+
 
 include ../../mk/spksrc.spk.mk
 

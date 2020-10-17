@@ -11,32 +11,36 @@ GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
+MAJOR_VERSION="$(/bin/get_key_value /etc.defaults/VERSION majorversion)"
 NZBMEGASEARCH="${INSTALL_DIR}/share/NZBmegasearch/mega2.py"
 PID_FILE="${INSTALL_DIR}/var/nzbmegasearch.pid"
-LOG_FILE="${INSTALL_DIR}/share/NZBmegasearch/logs/nzbmegasearch.log"
 
 SC_USER="sc-nzbmegasearch"
 LEGACY_USER="nzbmegasearch"
 USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
-
+SUDO="$([ "${MAJOR_VERSION}" -ge "6" ] && echo 'sudo -u' || echo 'su' )" 
 
 start_daemon ()
 {
-    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${NZBMEGASEARCH} daemon"
+    ${SUDO} ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${NZBMEGASEARCH} daemon"
     sleep 1
-    ps w | grep [${INSTALL_DIR}]/share/NZBmegasearch/mega2.py | awk '{print $1}' > ${PID_FILE}
+    if [ "${MAJOR_VERSION}" -ge "6" ]; then
+        ps aux | grep [${INSTALL_DIR}]/share/NZBmegasearch/mega2.py | awk '{print $2}' > ${PID_FILE}
+    else
+        ps w | grep [${INSTALL_DIR}]/share/NZBmegasearch/mega2.py | awk '{print $1}' > ${PID_FILE}
+    fi
 }
 
 stop_daemon ()
 {
-    kill `cat ${PID_FILE}`
-    wait_for_status 1 20 || kill -9 `cat ${PID_FILE}`
+    kill $(cat ${PID_FILE})
+    wait_for_status 1 20 || kill -9 $(cat ${PID_FILE})
     rm -f ${PID_FILE}
 }
 
 daemon_status ()
 {
-    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+    if [ -f ${PID_FILE} ] && kill -0 $(cat ${PID_FILE}) > /dev/null 2>&1; then
         return
     fi
     rm -f ${PID_FILE}

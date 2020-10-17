@@ -1,5 +1,5 @@
 PKG_NAME = ruTorrent
-PKG_VERS = 3.8
+PKG_VERS = 3.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Novik/ruTorrent/archive
@@ -21,7 +21,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: myInstall
 myInstall:
-	rm $(WORK_DIR)/$(PKG_DIR)/.htaccess
+	rm -f $(WORK_DIR)/$(PKG_DIR)/.htaccess
 	chmod -R u+w $(WORK_DIR)/$(PKG_DIR)
 	cp src/favicon.ico $(WORK_DIR)/$(PKG_DIR)
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/rutorrent

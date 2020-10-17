@@ -1,17 +1,20 @@
 SPK_NAME = mosquitto
-SPK_VERS = 1.4.14
-SPK_REV = 9
+SPK_VERS = 1.6.12
+SPK_REV = 11
 SPK_ICON = src/mosquitto.png
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
+# libwebsockets is not supported for ppc except qoriq
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x 
+
 MAINTAINER = SynoCommunity
-DESCRIPTION = Mosquitto is an open source message broker that implements the MQ Telemetry Transport protocol version 3.1.1.
+DESCRIPTION = Mosquitto is an open source message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
 RELOAD_UI = yes
 DISPLAY_NAME = Mosquitto
 STARTABLE = yes
-CHANGELOG = "1. Update to 1.4.14. 2. Use DSM 5+6 generic service"
+CHANGELOG = "Update openssl to 1.1."
 HOMEPAGE = http://www.mosquitto.org/
-LICENSE  = BSD licensed
+LICENSE  = EPL/EDL licensed
 
 SERVICE_USER = auto
 # SERVICE_COMMAND is provided there

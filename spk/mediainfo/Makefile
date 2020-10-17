@@ -1,7 +1,8 @@
 SPK_NAME = mediainfo
-SPK_VERS = 19.04
-SPK_REV = 8
+SPK_VERS = 20.08
+SPK_REV = 11
 SPK_ICON = src/mediainfo.png
+CHANGELOG = "Update to version 20.08"
 
 DEPENDS  = cross/$(SPK_NAME)
 
@@ -15,6 +16,6 @@ DISPLAY_NAME = MediaInfo
 HOMEPAGE   = https://mediaarea.net/en/MediaInfo
 LICENSE    = BSD
 
-SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS = bin/mediainfo
 
 include ../../mk/spksrc.spk.mk

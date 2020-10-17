@@ -1,6 +1,7 @@
---- src/Makefile.in.orig	2012-04-20 09:00:08.000000000 +0200
-+++ src/Makefile.in	2013-08-12 15:08:04.000000000 +0200
-@@ -307,6 +307,7 @@
+diff -uprN ../rtorrent-0.9.8-old/src/Makefile.am ./src/Makefile.am
+--- ../rtorrent-0.9.8-old/src/Makefile.am	2019-07-19 11:38:33.000000000 +0000
++++ ./src/Makefile.am	2020-10-07 00:30:17.409997779 +0000
+@@ -29,6 +29,7 @@ libsub_root_a_SOURCES = \
  	control.h \
  	globals.cc \
  	globals.h \
@@ -8,7 +9,18 @@
  	option_parser.cc \
  	option_parser.h \
  	signal_handler.cc \
-@@ -324,6 +325,7 @@
+diff -uprN ../rtorrent-0.9.8-old/src/Makefile.in ./src/Makefile.in
+--- ../rtorrent-0.9.8-old/src/Makefile.in	2020-10-07 00:30:12.573969139 +0000
++++ ./src/Makefile.in	2020-10-07 00:30:17.405997755 +0000
+@@ -444,6 +444,7 @@ libsub_root_a_SOURCES = \
+ 	control.h \
+ 	globals.cc \
+ 	globals.h \
++	linux-atomic.c \
+ 	option_parser.cc \
+ 	option_parser.h \
+ 	signal_handler.cc \
+@@ -461,6 +462,7 @@ rtorrent_LDADD = \
  	input/libsub_input.a \
  	rpc/libsub_rpc.a \
  	utils/libsub_utils.a \
@@ -16,23 +28,13 @@
  	@PTHREAD_LIBS@
  
  rtorrent_SOURCES = \
-@@ -453,6 +455,9 @@
+@@ -604,6 +606,9 @@ am--depfiles: $(am__depfiles_remade)
  @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
- @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+ @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
  
 +.c.o:
 +@am__fastdepCXX_TRUE@	$(LTCOMPILE) -c -o $@ $<
 +
  .cc.obj:
- @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
- @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
---- src/Makefile.am.orig	2012-03-13 12:10:49.000000000 +0100
-+++ src/Makefile.am	2013-08-12 09:20:03.000000000 +0200
-@@ -28,6 +28,7 @@
- 	control.h \
- 	globals.cc \
- 	globals.h \
-+	linux-atomic.c \
- 	option_parser.cc \
- 	option_parser.h \
- 	signal_handler.cc \
+ @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+ @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
