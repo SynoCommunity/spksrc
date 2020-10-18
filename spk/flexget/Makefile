@@ -1,19 +1,19 @@
 SPK_NAME = flexget
-SPK_VERS = 2.21.14
+SPK_VERS = 3.1.77
 SPK_REV = 7
 SPK_ICON = src/flexget.png
 
+BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.8-11"
+SPK_DEPENDS = "python3>=3.7.7"
 
 MAINTAINER = Diaoul
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-BETA = 0
-CHANGELOG = "Update FlexGet to version 2.21.14"
+CHANGELOG = "Update FlexGet to version 3.1.77"
 
 HOMEPAGE   = http://flexget.com/
-LICENSE    = GPL
+LICENSE    = MIT
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -24,8 +24,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = flexget_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 include ../../mk/spksrc.spk.mk
 
