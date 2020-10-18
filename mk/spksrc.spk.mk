@@ -171,8 +171,12 @@ ifneq ($(strip $(DSM_UI_DIR)),)
 endif
 ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
+	@echo dsmapppage=\"$(DSM_APP_NAME)\" >> $@
+	@echo dsmapplaunchname=\"$(DSM_APP_NAME)\" >> $@
 else
 	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
+	@echo dsmapppage=\"com.synocommunity.$(SPK_NAME)\" >> $@
+	@echo dsmapplaunchname=\"com.synocommunity.$(SPK_NAME)\" >> $@
 endif
 ifneq ($(strip $(ADMIN_PROTOCOL)),)
 	@echo adminprotocol=\"$(ADMIN_PROTOCOL)\" >> $@
