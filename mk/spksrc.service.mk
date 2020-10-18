@@ -152,8 +152,13 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
 DSM_SCRIPTS_ += installer
+ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
+	@$(dsm_script_copy)
+else
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
 	@$(dsm_script_copy)
+endif
 endif
 
 # Control use of generic start-stop-status scripts
