@@ -22,15 +22,3 @@ service_postinst ()
     install -m 755 -d ${SYNOPKG_PKGDEST}/var
     install -m 644 ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGDEST}/var
 }
-
-service_preupgrade ()
-{
-    # Stop the package
-    /var/packages/${PACKAGE}/scripts/start-stop-status stop > /dev/null
-}
-
-service_preuninst ()
-{
-    # Stop the package
-    /var/packages/${PACKAGE}/scripts/start-stop-status stop > /dev/null
-}
