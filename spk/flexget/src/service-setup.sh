@@ -18,7 +18,7 @@ service_postinst ()
     # Install the wheels
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
 
-    # Prepare salt-minion config in /var/salt
+    # Copying "config.yml" file to the "var/" folder
     install -m 755 -d ${SYNOPKG_PKGDEST}/var
     install -m 644 ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGDEST}/var
 }
