@@ -1,5 +1,5 @@
-# Produced by pip freeze
-# Commented if provided by python package at /usr/local/python/share/wheelhouse/
+# This file is a copy of the https://github.com/Flexget/Flexget/blob/v3.1.80/requirements.txt file.
+# Additionally added the flexget and the transmissionrpc packages.
 aniso8601==1.2.1
 apscheduler==3.5.0
 babelfish==0.5.5
@@ -18,7 +18,7 @@ flask-cors==3.0.2
 flask-login==0.4.0
 flask-restful==0.3.6
 flask-restx==0.2.0
-flexget==3.1.79
+flexget==3.1.80
 guessit==3.1.0
 html5lib==0.999999999
 idna==2.8
