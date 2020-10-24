@@ -19,8 +19,12 @@ USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGAC
 
 start_daemon ()
 {
-    export HOME=${INSTALL_DIR}/var
-    start-stop-daemon -S -q -m -b -N 10 -x screen -c ${USER} -u ${USER} -p ${PID_FILE} -- -D -m ${RTORRENT}
+    start-stop-daemon -S -q -m -b -N 10 -x screen -c ${USER} -u ${USER} -p ${PID_FILE} -- \
+        -D -m \
+        /bin/bash -c "export HOME=${INSTALL_DIR}/var \
+            && export PATH=\"${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:\${PATH}\" \
+            && export LD_LIBRARY_PATH=\"${INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}\" \
+            && ${RTORRENT}"
 }
 
 stop_daemon ()

@@ -7,6 +7,7 @@ DSM_UI_DIR = app
 UNSUPPORTED_ARCHS = $(ARM5_ARCHES) $(PPC_ARCHES)
 
 DEPENDS  = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
+DEPENDS  += cross/sox
 
 MAINTAINER = moneytoo
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
@@ -14,13 +15,24 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG ="1. Update rutorrent to 3.10<br/>2. Update to rtorrent 0.9.8<br/>3. Update to libtorrent 0.13.8<br/>4. Update to xmlrpc-c 1.51.06<br/>5. Update openssl to 1.1"
+CHANGELOG = "1. Update rutorrent to 3.10<br/>
+CHANGELOG += 2. Update to rtorrent 0.9.8<br/>
+CHANGELOG += 3. Update to libtorrent 0.13.8<br/>
+CHANGELOG += 4. Update to xmlrpc-c 1.51.06<br/>
+CHANGELOG += 5. Update openssl to 1.1<br/>
+CHANGELOG += 6. Embed missing binary requirements<br/>"
 BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
 
-INSTALLER_SCRIPT = src/installer.sh
+SERVICE_USER = auto
+
+SPK_USER = rutorrent
+
+SERVICE_SETUP    = src/service-setup.sh
+SERVICE_WIZARD_SHARE=wizard_download_dir
+
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
 CONF_DIR         = src/conf/
@@ -34,7 +46,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = rutorrent_extra_install
 
-BUSYBOX_CONFIG = usrmng daemon nice
+BUSYBOX_CONFIG = usrmng daemon nice procutils
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
@@ -47,3 +59,5 @@ rutorrent_extra_install:
 	install -m 775 -d $(STAGING_DIR)/tmp
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/etc/php/conf.d/
+	install -m 644 src/etc/php/conf.d/com.synocommunity.rutorrent.ini $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.rutorrent.ini
