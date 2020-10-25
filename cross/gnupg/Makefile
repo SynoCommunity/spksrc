@@ -1,7 +1,7 @@
 PKG_NAME = gnupg
 PKG_VERS = 2.2.23
 PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.gnupg.org/gcrypt/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
