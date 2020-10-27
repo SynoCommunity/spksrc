@@ -12,12 +12,13 @@ PIP = pip3
 SPK_DEPENDS = "python3>=3.7"
 
 MAINTAINER   = SynoCommunity
-DESCRIPTION  = OctoPrint provides a snappy web interface for controlling consumer 3D printers.
+DESCRIPTION  = The snappy web interface for your 3D printer.
 ADMIN_PORT   = 8088
 RELOAD_UI    = yes
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
+CHANGELOG    = "Update OctoPrint to v1.4.2 and python3"
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

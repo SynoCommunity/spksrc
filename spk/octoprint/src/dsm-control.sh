@@ -6,7 +6,7 @@ DNAME="OctoPrint"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 PYTHON="${INSTALL_DIR}/env/bin/python"
