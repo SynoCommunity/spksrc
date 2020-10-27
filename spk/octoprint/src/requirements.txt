@@ -3,7 +3,7 @@
 # the order and grouping is also taken from there.
 
 # additional OctoPrint plugins that are maintained on a different release cycle
-OctoPrint-FirmwareCheck==2020.6.22
+OctoPrint-FirmwareCheck==2020.09.23
 OctoPrint-FileCheck==2020.8.7
 
 # the following dependencies are non trivial to update since later versions introduce backwards incompatible
