@@ -1,9 +1,8 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.4.0
+SPK_VERS   = 1.4.2
 SPK_REV    = 5
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
-
 
 BUILD_DEPENDS = cross/python2 cross/setuptools_py2 cross/pip_py2 cross/wheel
 DEPENDS = cross/$(SPK_NAME)
