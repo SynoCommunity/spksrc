@@ -13,7 +13,7 @@ STARTABLE = no
 CHANGELOG = "1. Update fossil-scm to 2.12.1.<br/>2. Update openssl to 1.1."
 
 HOMEPAGE = https://www.fossil-scm.org/
-LICENSE  = BSD2
+LICENSE  = 2-clause BSD
 
 SPK_COMMANDS = bin/fossil
 

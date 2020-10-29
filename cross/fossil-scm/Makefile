@@ -2,15 +2,14 @@ PKG_NAME = fossil-scm
 PKG_VERS = 2.12.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.fossil-scm.org/index.html/tarball/version-$(PKG_VERS)
+PKG_DIST_SITE = https://www.fossil-scm.org/index.html/tarball/version-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 
-BUILD_DEPENDS = cross/zlib
-BUILD_DEPENDS += cross/openssl
+DEPENDS = cross/zlib cross/openssl
 
 HOMEPAGE = https://www.fossil-scm.org/
 COMMENT  = Fossil is a simple, high-reliability, distributed software configuration management system.
-LICENSE  = BSD2
+LICENSE  = 2-clause BSD
 
 PRE_CONFIGURE_TARGET = fossil-scm_pre_configure
 
