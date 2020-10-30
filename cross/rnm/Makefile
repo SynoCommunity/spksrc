@@ -1,5 +1,5 @@
 PKG_NAME = rnm
-PKG_VERS = 4.0.6
+PKG_VERS = 4.0.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/neurobin/rnm/archive
@@ -14,13 +14,13 @@ LICENSE = GPL v3.0
 
 GNU_CONFIGURE = 1
 
-PRE_CONFIGURE_TARGET = rnm_pre_configure_target
+PRE_CONFIGURE_TARGET = rnm_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
 # requires gnu GCC >= 4.8
 UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x $(ARM5_ARCHES)
 
-.PHONY: rnm_pre_configure_target
-rnm_pre_configure_target:
+.PHONY: rnm_pre_configure
+rnm_pre_configure:
 		$(RUN) ./autogen.sh
