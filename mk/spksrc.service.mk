@@ -80,7 +80,7 @@ ifneq ($(strip $(SPK_USER)),)
 	@echo USER=\"$(SPK_USER)\" >> $@
 	@echo "PRIV_PREFIX=sc-" >> $@
 	@echo "SYNOUSER_PREFIX=svc-" >> $@
-	@echo 'if [ -n "$${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "$${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
+	@echo 'case $${SYNOPKG_DSM_VERSION_MAJOR} in [12345] ) EFF_USER="$${SYNOUSER_PREFIX}$${USER}" ;; * ) EFF_USER="$${PRIV_PREFIX}$${USER}" ;; esac' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo "# Group name from UI if provided" >> $@
