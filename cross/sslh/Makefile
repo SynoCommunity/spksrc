@@ -8,19 +8,24 @@ PKG_DIST_SITE = https://github.com/yrutschle/sslh/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libconfig cross/pcre
+DEPENDS = cross/libconfig cross/pcre cross/libcap
 
 HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
 COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
 LICENSE  = GPLv2
 
+PRE_CONFIGURE_TARGET = sslh_pre_configure
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = sslh_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: sslh_pre_configure
+sslh_pre_configure:
+	@$(RUN) sed -i -e '/^USELIBCAP=/s/=.*/=1/' $(WORK_DIR)/$(PKG_DIR)/Makefile 
+
+.PHONY: sslh_install
+sslh_install:
 	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 	@$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/sslh-fork $(STAGING_INSTALL_PREFIX)/bin/sslh
 
