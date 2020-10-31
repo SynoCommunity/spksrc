@@ -8,6 +8,9 @@ web_station_configuration_file="${WEB_STATION_HOME_DIR}/etc/${php_bin}/php.ini"
 if [ -f "${web_station_configuration_file}" ]
 then
     echo -n "${web_station_configuration_file}"
+elif [ -f "/usr/local/etc/${php_bin}/cli/php.ini" ]
+then
+    echo -n "/usr/local/etc/${php_bin}/cli/php.ini"
 else
     echo -n "/usr/local/etc/${php_bin}/php.ini"
 fi

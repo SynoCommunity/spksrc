@@ -18,21 +18,21 @@ HT_ACCESS_SECTION_DELIMITER="#Synology PHP"
 
 compute_generated_htaccess_section()
 {
-    local php_fpm="$1"
+    local php_profile_name="$1"
     echo "${HT_ACCESS_SECTION_DELIMITER}
 AddHandler default-handler .htm .html .shtml
 AddHandler php-fastcgi .php
 AddType text/html .php
-Action php-fastcgi /${php_fpm}-handler.fcgi
+Action php-fastcgi /default-php-${php_profile_name}.fcgi
 ${HT_ACCESS_SECTION_DELIMITER}"
 }
 
 regenerate_htaccess()
 {
-    local php_fpm="$1"
+    local php_profile_name="$1"
     if [ ! -f "${HT_ACCESS_FILE}" ]
     then
-        echo "$(compute_generated_htaccess_section ${php_fpm})"
+        echo "$(compute_generated_htaccess_section ${php_profile_name})"
         return 0
     fi
     local temp_file
@@ -41,7 +41,7 @@ regenerate_htaccess()
     section=($(grep -n "${HT_ACCESS_SECTION_DELIMITER}" "${HT_ACCESS_FILE}" | cut -f 1 -d ':'))
     if [ $? -ne 0 ]
     then
-        echo "$(compute_generated_htaccess_section ${php_fpm})">"$temp_file"
+        echo "$(compute_generated_htaccess_section ${php_profile_name})">"$temp_file"
         cat "${HT_ACCESS_FILE}">>"$temp_file"
     else
         if [ "${#section[@]}" == "2" ]
@@ -51,10 +51,10 @@ regenerate_htaccess()
             header_end=$(expr ${section[0]} - 1)
             trailer_start=$(expr ${section[1]} + 1)
             head -n ${header_end} "${HT_ACCESS_FILE}" >"${temp_file}"
-            echo "$(compute_generated_htaccess_section ${php_fpm})" >>"${temp_file}"
+            echo "$(compute_generated_htaccess_section ${php_profile_name})" >>"${temp_file}"
             tail -n +${trailer_start} "${HT_ACCESS_FILE}" >>"${temp_file}"
         else
-            echo "$(compute_generated_htaccess_section ${php_fpm})">"${temp_file}"
+            echo "$(compute_generated_htaccess_section ${php_profile_name})">"${temp_file}"
             cat "${HT_ACCESS_FILE}">>"$temp_file"
         fi
     fi
@@ -66,20 +66,22 @@ regenerate_htaccess()
 start_daemon ()
 {
     source "${INSTALL_DIR}/bin/php-settings.sh"
-    if [ ! -z "${php_fpm}" ]
+    if [ ! -z "${profile_name}" ]
     then
-        echo "$(regenerate_htaccess ${php_fpm})" >"${HT_ACCESS_FILE}"
+        echo "$(regenerate_htaccess ${profile_name})" >"${HT_ACCESS_FILE}"
+        # Ensure .htaccess file is still appropriately owned
+        chmod 770 "${HT_ACCESS_FILE}"
+        chown -R "${USER}:${USER}" "${HT_ACCESS_FILE}"
     fi
-    start-stop-daemon -S -q -m -b -N 10 -x "${php}" \
-        -c ${USER} -u ${USER} -p ${PID_FILE} --  \
-        -c "${php_configuration_file}" $(php-options) \
-        ${TTRSS} --daemon
+    start-stop-daemon -S -q -m -b -N 10 -a /bin/bash \
+        -c ${USER} -u ${USER} -p ${PID_FILE} \
+        -- -c "exec ${php} -c '${php_configuration_file}' $(php-options) ${TTRSS} --quiet --daemon >>'${LOGS_DIR}/daemon.log' 2>&1"
 }
 
 stop_daemon ()
 {
     start-stop-daemon -K -q -u ${USER} -p ${PID_FILE}
-    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -p ${PID_FILE}
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -u ${USER} -q -p ${PID_FILE}
 }
 
 daemon_status ()

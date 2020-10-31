@@ -14,3 +14,8 @@ if [ -z "${INSTALL_DIR}" ]
 then
     INSTALL_DIR="/usr/local/${PACKAGE}"
 fi
+
+if [ -z "${LOGS_DIR}" ]
+then
+    LOGS_DIR="${INSTALL_DIR}/var/logs"
+fi

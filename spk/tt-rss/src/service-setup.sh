@@ -6,15 +6,14 @@ DNAME="Tiny Tiny RSS"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
-USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+USER="http"
+EFF_USER="http"
 PHP="${INSTALL_DIR}/bin/virtual-php"
-MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
-MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
+MYSQL=/bin/mysql
+MYSQLDUMP=/bin/mysqldump
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 MYSQL_USER_EXISTS=0
@@ -22,7 +21,7 @@ MYSQL_DATABASE_EXISTS=0
 
 
 
-preinst ()
+service_preinst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -45,24 +44,19 @@ preinst ()
     exit 0
 }
 
-postinst ()
+service_postinst ()
 {
-    # Link
-    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
-
-    # Create conf dir for 4.3 and add dependencies
-    mkdir -p /var/packages/${PACKAGE}/conf && echo -e "[MariaDB]\ndsm_min_ver=5.0-4300" > /var/packages/${PACKAGE}/conf/PKG_DEPS
 
     # Install busybox stuff
-    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin >> "$INST_LOG" 2>&1
 
     # Install the web interface
-    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR} >> "$INST_LOG" 2>&1
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        [ ${MYSQL_DATABASE_EXISTS} ] || ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
-        [ ${MYSQL_USER_EXISTS} ] || ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
+        [ ${MYSQL_DATABASE_EXISTS} ] || ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';" >> "$INST_LOG" 2>&1
+        [ ${MYSQL_USER_EXISTS} ] || ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql  >> "$INST_LOG" 2>&1
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
         sed -e "s|define('DB_TYPE', '.*');|define('DB_TYPE', 'mysql');|" \
             -e "s|define('DB_HOST', '.*');|define('DB_HOST', 'localhost');|" \
@@ -73,18 +67,25 @@ postinst ()
             -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
             -e "s|define('DB_PORT', '.*');|define('DB_PORT', '3306');|" \
             -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
-            ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php
+            ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php 2> "$INST_LOG"
     fi
 
     # Fix permissions
-    chown ${USER} ${WEB_DIR}/${PACKAGE}/lock
-    chown ${USER} ${WEB_DIR}/${PACKAGE}/feed-icons
-    chown -R ${USER} ${WEB_DIR}/${PACKAGE}/cache
+    set_syno_permissions "${INSTALL_DIR}/var/logs" "${USER}"
+
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/lock"
+    chmod -R ug+rwx "${WEB_DIR}/${PACKAGE}/lock" >> "$INST_LOG" 2>&1
+
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/feed-icons"
+    chmod -R ug+rwx "${WEB_DIR}/${PACKAGE}/feed-icons" >> "$INST_LOG" 2>&1
+
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/cache"
+    chmod -R ug+rwx "${WEB_DIR}/${PACKAGE}/cache" >> "$INST_LOG" 2>&1
 
     exit 0
 }
 
-preuninst ()
+service_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
@@ -100,56 +101,48 @@ preuninst ()
         fi
     fi
 
-    # Stop the package
-    ${SSS} stop > /dev/null
-
     exit 0
 }
 
-postuninst ()
+service_postuninst ()
 {
-    # Remove link
-    rm -f ${INSTALL_DIR}
 
     # Export and remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         if [ -n "${wizard_dbexport_path}" ]; then
-            mkdir -p ${wizard_dbexport_path}
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql
+            mkdir -p ${wizard_dbexport_path} >> "$INST_LOG" 2>&1
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql 2> "$INST_LOG"
         fi
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"  >> "$INST_LOG" 2>&1
     fi
 
     # Remove the web interface
-    rm -fr ${WEB_DIR}/${PACKAGE}
+    rm -fr "${WEB_DIR}/${PACKAGE}" >> "$INST_LOG" 2>&1
 
     exit 0
 }
 
-preupgrade ()
+service_save ()
 {
-    # Stop the package
-    ${SSS} stop > /dev/null
-
     # Save the configuration file
-    rm -fr ${TMP_DIR}/${PACKAGE}
-    mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${WEB_DIR}/${PACKAGE}/config.php ${TMP_DIR}/${PACKAGE}/
+    mkdir -p "${TMP_DIR}/${PACKAGE}" >> "$INST_LOG" 2>&1
 
-    mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/
-    mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/
+    mv ${WEB_DIR}/${PACKAGE}/config.php ${TMP_DIR}/${PACKAGE}/ >> "$INST_LOG" 2>&1
 
-    mv ${WEB_DIR}/${PACKAGE}/plugins.local ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/${PACKAGE}/themes.local ${TMP_DIR}/${PACKAGE}/
+    mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/ >> "$INST_LOG" 2>&1
+    mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/ >> "$INST_LOG" 2>&1
+
+    mv ${WEB_DIR}/${PACKAGE}/plugins.local ${TMP_DIR}/${PACKAGE}/ >> "$INST_LOG" 2>&1
+    mv ${WEB_DIR}/${PACKAGE}/themes.local ${TMP_DIR}/${PACKAGE}/ >> "$INST_LOG" 2>&1
 
     exit 0
 }
 
-postupgrade ()
+service_restore ()
 {
     # Restore the configuration file
-    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config-bak.php
-    cp ${WEB_DIR}/${PACKAGE}/config.php-dist ${WEB_DIR}/${PACKAGE}/config.php
+    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config-bak.php >> "$INST_LOG" 2>&1
+    cp ${WEB_DIR}/${PACKAGE}/config.php-dist ${WEB_DIR}/${PACKAGE}/config.php >> "$INST_LOG" 2>&1
 
     # Parse configuration and save to new config
     while read line
@@ -161,14 +154,19 @@ postupgrade ()
         fi
         sed -i -e "s|define('$key', .*);|define('$key', $val);|g" \
                -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
-            ${WEB_DIR}/${PACKAGE}/config.php
+            ${WEB_DIR}/${PACKAGE}/config.php >> "$INST_LOG" 2>&1
     done < ${WEB_DIR}/${PACKAGE}/config-bak.php
 
-    mv -f ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/
-    mv -f ${TMP_DIR}/${PACKAGE}/plugins.local/* ${WEB_DIR}/${PACKAGE}/plugins.local/
-    mv -f ${TMP_DIR}/${PACKAGE}/themes.local/* ${WEB_DIR}/${PACKAGE}/themes.local/
+    set_unix_permissions ${WEB_DIR}/${PACKAGE}/config.php
 
-    rm -fr ${TMP_DIR}/${PACKAGE}
+    mv -f ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/ >> "$INST_LOG" 2>&1
+    set_unix_permissions ${WEB_DIR}/${PACKAGE}/feed-icons/
+
+    mv -f ${TMP_DIR}/${PACKAGE}/plugins.local/* ${WEB_DIR}/${PACKAGE}/plugins.local/ >> "$INST_LOG" 2>&1
+    set_unix_permissions ${WEB_DIR}/${PACKAGE}/plugins.local/
+
+    mv -f ${TMP_DIR}/${PACKAGE}/themes.local/* ${WEB_DIR}/${PACKAGE}/themes.local/ >> "$INST_LOG" 2>&1
+    set_unix_permissions ${WEB_DIR}/${PACKAGE}/themes.local/
 
     exit 0
 }
