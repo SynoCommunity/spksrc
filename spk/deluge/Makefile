@@ -17,7 +17,8 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARM5_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
 
 MAINTAINER = Strangelovian
-DESCRIPTION = Deluge is a full-featured BitTorrent client for Linux, OS X, Unix and Windows. It uses libtorrent in its backend and features multiple user-interfaces including: GTK+, web and console. It has been designed using the client server model with a daemon process that handles all the bittorrent activity. The Deluge daemon is able to run on headless machines with the user-interfaces being able to connect remotely from any platform. This package is intended for advanced users.
+DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. 
+DESCRIPTION += This syno community package runs the deluge deamon (deluged), as well as the deluge web daemon (deluge-web), which serves the deluge web UI. 
 STARTABLE = yes
 CHANGELOG = Build 2.0.4 from bleeding edge, i.e. not released by the deluge team as of 08/30/2020
 DISPLAY_NAME = Deluge
