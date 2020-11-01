@@ -14,14 +14,13 @@ HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
 COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
 LICENSE  = GPLv2
 
-PRE_CONFIGURE_TARGET = sslh_pre_configure
-CONFIGURE_TARGET = nop
+CONFIGURE_TARGET = sslh_configure
 INSTALL_TARGET = sslh_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: sslh_pre_configure
-sslh_pre_configure:
+.PHONY: sslh_configure
+sslh_configure:
 	@$(RUN) sed -i -e '/^USELIBCAP=/s/=.*/=1/' $(WORK_DIR)/$(PKG_DIR)/Makefile 
 
 .PHONY: sslh_install
