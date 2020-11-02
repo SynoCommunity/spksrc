@@ -3,8 +3,6 @@ PKG_VERS = 1.21c
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/yrutschle/sslh/archive
-#https://codeload.github.com/yrutschle/sslh/tar.gz/v1.21c
-#https://github.com/yrutschle/sslh/archive/v1.21c.tar.gz
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
@@ -14,13 +12,24 @@ HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
 COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
 LICENSE  = GPLv2
 
+# Error on ppc853x - libcap.so: undefined reference to `pipe2'
+ifeq ($(findstring $(ARCH), ppc853x),$(ARCH))
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = myInstall
+else
+DEPENDS += cross/libcap
+CONFIGURE_TARGET = sslh_configure
+endif
+
+INSTALL_TARGET = sslh_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: sslh_configure
+sslh_configure:
+	@$(RUN) sed -i -e '/^USELIBCAP=/s/=.*/=1/' $(WORK_DIR)/$(PKG_DIR)/Makefile 
+
+.PHONY: sslh_install
+sslh_install:
 	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/bin
 	@$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/sslh-fork $(STAGING_INSTALL_PREFIX)/bin/sslh
 

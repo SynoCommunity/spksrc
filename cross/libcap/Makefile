@@ -1,5 +1,5 @@
 PKG_NAME = libcap
-PKG_VERS = 2.31
+PKG_VERS = 2.44
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mirrors.edge.kernel.org/pub/linux/libs/security/linux-privs/libcap2/
@@ -25,9 +25,11 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: libcap_install
 libcap_install:
 	$(RUN) $(MAKE) lib=lib DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) -C libcap install
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) -C progs install
 
 # _makenames is run with "make libcap", therefore it must be compiled for the host (first)
 .PHONY: libcap_compile
 libcap_compile:
 	@$(RUN) make -C libcap _makenames
 	@$(RUN) make CC=$(TC_PATH)$(TC_PREFIX)gcc -C libcap
+	@$(RUN) make CC=$(TC_PATH)$(TC_PREFIX)gcc -C progs
