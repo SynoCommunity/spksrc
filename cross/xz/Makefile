@@ -1,11 +1,13 @@
 PKG_NAME = xz
-PKG_VERS = 5.2.3
+PKG_VERS = 5.2.5
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://tukaani.org/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-HOMEPAGE = http://tukaani.org
+DEPENDS =
+
+HOMEPAGE = https://tukaani.org
 COMMENT  = Free general-purpose data compression software with high compression ratio
 LICENSE  =
 

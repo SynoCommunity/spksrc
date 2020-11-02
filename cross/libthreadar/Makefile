@@ -1,5 +1,5 @@
 PKG_NAME = libthreadar
-PKG_VERS = 1.2.1
+PKG_VERS = 1.2.3
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)

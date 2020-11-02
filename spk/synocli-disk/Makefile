@@ -1,5 +1,5 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 3.0
+SPK_VERS = 3.1
 SPK_REV = 4
 SPK_ICON = src/synocli-disk.png
 
@@ -23,7 +23,7 @@ endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update openssl to 1.1 \(davfs2\)."
+CHANGELOG = "1. Update e2fsprogs to v1.45.6.<br/>2. Update davfs2 to v1.6.0 and openssl 1.1.<br/>3. Update lsscsi to v0.31.<br/>4. Update ddrescue to v1.25."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.

@@ -10,4 +10,4 @@ bin:bin/bzip2recover
 lnk:bin/bzless
 rsc:bin/bzmore
 lnk:lib/libbz2.so.1.0
-lib:lib/libbz2.so.1.0.6
+lib:lib/libbz2.so.1.0.8

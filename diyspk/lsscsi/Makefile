@@ -1,6 +1,6 @@
 SPK_NAME = lsscsi
-SPK_VERS = 0.30
-SPK_REV = 1
+SPK_VERS = 0.31
+SPK_REV = 2
 
 DEPENDS = cross/lsscsi
 
@@ -9,9 +9,8 @@ DESCRIPTION = The lsscsi command lists information about SCSI devices in Linux.
 DISPLAY_NAME = lsscsi
 STARTABLE = no
 
-HOMEPAGE   = http://sg.danny.cz/scsi/lsscsi.html
-LICENSE    = MIT
-HELP_URL   = http://sg.danny.cz/scsi/lsscsi.html
+HOMEPAGE = http://sg.danny.cz/scsi/lsscsi.html
+LICENSE = GPLv2
 
 SPK_COMMANDS = bin/lsscsi
 

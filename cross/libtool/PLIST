@@ -2,4 +2,4 @@ rsc:bin/libtool
 rsc:bin/libtoolize
 lnk:lib/libltdl.so
 lnk:lib/libltdl.so.7
-lib:lib/libltdl.so.7.3.0
+lib:lib/libltdl.so.7.3.1
