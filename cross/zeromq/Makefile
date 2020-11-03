@@ -1,4 +1,4 @@
-PKG_NAME = libzmq
+PKG_NAME = zeromq
 PKG_VERS = 4.3.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
