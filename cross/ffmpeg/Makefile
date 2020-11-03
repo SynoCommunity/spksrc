@@ -74,9 +74,9 @@ include ../../mk/spksrc.cross-cc.mk
 # libaom   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2, armv7, qoriq, 88f6281
 # libshine - gcc to old: undefined reference to `__builtin_bswap16' : ppc853x, qoriq-5.2
 # libvpx   - gcc to old: requires c++11 support                     : alpine-5.2, comcerto2k-5.2, evansport-5.2
-# zeromq   - gcc to old: requires forcing -std=c99 or -std=gnu99    : evansport-5.2
+# libzmq   - gcc to old: requires forcing -std=c99 or -std=gnu99    : evansport-5.2
 ifneq ($(findstring $(TCVERSION), 5.2),$(TCVERSION))
-DEPENDS += cross/libvpx cross/zeromq
+DEPENDS += cross/libvpx cross/libzmq
 CONFIGURE_ARGS += --enable-libvpx --enable-libzmq
 
 ifneq ($(findstring $(ARCH), ppc853x),$(ARCH))
