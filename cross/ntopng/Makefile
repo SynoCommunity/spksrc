@@ -64,8 +64,6 @@ ntopng_pre_patch:
 
 .PHONY: ntopng_pre_configure
 ntopng_pre_configure:
-	@$(MSG) "- patch generated configure file to disable -Wno-address-of-packed-member c++ option"
-	@$(RUN) sed -i 's|CPPFLAGS="$${CPPFLAGS} -Wno-address-of-packed-member -Wno-unused-function"|CPPFLAGS="$${CPPFLAGS} -Wno-unused-function"|g' ./configure
 	@$(MSG) "- patch generated configure file to define synology specific package info"
 	@$(RUN) sed -i 's|#define PACKAGE_OSNAME "$${OSNAME}"|#define PACKAGE_OSNAME "Synology $(SYNOLOGY_OS) $(TCVERSION)+"|g' ./configure
 	@$(RUN) sed -i 's|#define PACKAGE_OS "$${OS}"|#define PACKAGE_OS "$(TC_ARCH)"|g' ./configure
