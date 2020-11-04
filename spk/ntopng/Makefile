@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 MAINTAINER = hgy59
 DESCRIPTION = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.
-CHANGELOG = Update to version 4.2
+CHANGELOG = "1. Update to version 4.2<br/>2. Update nDPI to version nDPI"
 RELOAD_UI = yes
 DISPLAY_NAME = ntopng
 
