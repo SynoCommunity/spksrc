@@ -1,15 +1,13 @@
 bin:bin/scp
 bin:bin/sftp
-bin:bin/slogin
+lnk:bin/slogin
 bin:bin/ssh
 bin:bin/ssh-add
 bin:bin/ssh-agent
 bin:bin/ssh-keygen
 bin:bin/ssh-keyscan
-rsc:etc/moduli
-bin:etc/ssh_config
-bin:etc/sshd_config
 bin:libexec/sftp-server
 bin:libexec/ssh-keysign
 bin:libexec/ssh-pkcs11-helper
+bin:libexec/ssh-sk-helper
 bin:sbin/sshd
