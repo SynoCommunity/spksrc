@@ -1,6 +1,6 @@
 SPK_NAME = lua
-SPK_VERS = 5.3.5
-SPK_REV = 1
+SPK_VERS = 5.4.1
+SPK_REV = 2
 SPK_ICON = src/lua.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION = Lua is a powerful, efficient, lightweight, embeddable scripting la
 RELOAD_UI = no
 DISPLAY_NAME = Lua
 STARTABLE = no
-CHANGELOG = "First Synology package release"
+CHANGELOG = "Update lua to v5.4.1"
 
 HOMEPAGE = https://www.lua.org
 LICENSE = MIT
