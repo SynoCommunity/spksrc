@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.harding.motd.ca/autossh
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/openssh
+DEPENDS = cross/openssh
 
 HOMEPAGE = https://www.harding.motd.ca/autossh/
 COMMENT  = Automatically restart SSH sessions and tunnels.

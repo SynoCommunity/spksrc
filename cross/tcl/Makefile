@@ -7,7 +7,6 @@ PKG_DIST_SITE = https://prdownloads.sourceforge.net/tcl/
 PKG_DIR = $(PKG_NAME)$(PKG_VERS)/unix
 
 DEPENDS =
-BUILD_DEPENDS = cross/zlib
 
 HOMEPAGE = https://www.tcl.tk/
 COMMENT  = Tcl (Tool Command Language) is a very powerful but easy to learn dynamic programming language, suitable for a very wide range of uses, including web and desktop applications, networking, administration, testing and many more. Open source and business-friendly, Tcl is a mature yet evolving language that is truly cross platform, easily deployed and highly extensible.

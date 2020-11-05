@@ -5,13 +5,13 @@ PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/hphde/$(PKG_NAME)/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_NAME)-v$(PKG_VERS)
 
-BUILD_DEPENDS = cross/libusb
+DEPENDS = cross/libusb
 
 HOMEPAGE = https://github.com/hphde/$(PKG_NAME)
 COMMENT  = HomeEasy HE853 USB device executable
 LICENSE  = GPLv2
 
-CONFIGURE_TARGET = none
+CONFIGURE_TARGET = nop
 
 INSTALL_TARGET = he853_install
 
