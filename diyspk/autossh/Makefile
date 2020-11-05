@@ -1,7 +1,7 @@
 SPK_NAME = autossh
 SPK_VERS = 1.4g
-SPK_REV = 1
-CHANGELOG = "initial package version"
+SPK_REV = 2
+CHANGELOG = "1. Update OpenSSL to v1.1.<br/>2. Update OpenSSH to v8.4."
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -13,5 +13,8 @@ STARTABLE = no
 HOMEPAGE = https://www.harding.motd.ca/autossh/
 
 SPK_COMMANDS = bin/autossh
+SPK_COMMANDS += bin/scp bin/sftp bin/slogin bin/ssh bin/ssh-add bin/ssh-agent bin/ssh-keygen bin/ssh-keyscan
+SPK_COMMANDS += libexec/sftp-server libexec/ssh-keysign libexec/ssh-pkcs11-helper libexec/ssh-sk-helper
+SPK_COMMANDS += sbin/sshd
 
 include ../../mk/spksrc.spk.mk
