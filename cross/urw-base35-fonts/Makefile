@@ -17,7 +17,6 @@ LICENSE  = GNU AGPLv3
 
 INSTALL_TARGET = urw-base35-fonts_install
 
-
 include ../../mk/spksrc.install-resources.mk
 
 .PHONY: urw-base35-fonts_install
