@@ -24,7 +24,14 @@ CONFIGURE_ARGS += vi_cv_path_python3_epfx=$(PYTHON_EXEC_PREFIX)
 CONFIGURE_ARGS += vi_cv_path_python3path=$(PYTHONPATH)
 
 # Avoid warning that _FORTIFY_SOURCE requires compiling with optimization
-ADDITIONAL_CFLAGS = -O2
+ifeq ($(findstring $(ARCH),powerpc ppc824x ppc853x ppc854x),$(ARCH))
+# With -O2 optimization there is an ICE with older ppc cross compilers
+# usercmd.c:1535: internal compiler error: in set_uids_in_ptset, at tree-ssa-structalias.c:4775
+# bug of GCC 4.2/4.3 in tree-optimization
+   ADDITIONAL_CFLAGS = -O
+else
+   ADDITIONAL_CFLAGS = -O2
+endif
 
 # Add the Python 3 SPK's installed lib dir to vim's rpath to allow loading of libpython dynamically if it's available
 ADDITIONAL_LDFLAGS = -Wl,--rpath,/var/packages/python3/target/lib
