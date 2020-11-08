@@ -7,14 +7,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libzmq
 
-HOMEPAGE = http://zeromq.org/
+HOMEPAGE = https://zeromq.org/
 COMMENT  = ØMQ (also known as ZeroMQ, 0MQ, or zmq) looks like an embeddable networking library but acts like a concurrency framework.
 LICENSE  = LGPL
 
-POST_EXTRACT_TARGET = myPostExtract
+POST_EXTRACT_TARGET = pyzmq_post_extract
 
 include ../../mk/spksrc.python-wheel.mk
 
-.PHONY: myPostExtract
-myPostExtract:
-	cp setup.cfg $(WORK_DIR)/$(PKG_DIR)/
+.PHONY: pyzmq_post_extract
+pyzmq_post_extract:
+	cp src/setup.cfg $(WORK_DIR)/$(PKG_DIR)/

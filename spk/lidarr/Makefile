@@ -18,7 +18,7 @@ STARTABLE = yes
 DISPLAY_NAME = Lidarr
 CHANGELOG = "Update openssl to 1.1."
 
-HOMEPAGE = http://lidarr.audio/
+HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
 
 SERVICE_USER = auto

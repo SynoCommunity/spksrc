@@ -15,7 +15,7 @@ DISPLAY_NAME = Jappix
 CHANGELOG = "1. DSM 5.0 compatibility"
 BETA = 1
 
-HOMEPAGE   = http://jappix.org/
+HOMEPAGE   = https://jappix.org/
 LICENSE    = AGPL
 
 INSTALLER_SCRIPT = src/installer.sh

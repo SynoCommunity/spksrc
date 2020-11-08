@@ -14,7 +14,7 @@ DISPLAY_NAME = Git Server
 BETA = 1
 
 RELOAD_UI = yes
-HOMEPAGE = http://git-scm.com/
+HOMEPAGE = https://git-scm.com/
 LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh

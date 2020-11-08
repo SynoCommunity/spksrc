@@ -8,23 +8,23 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/glib
 
-HOMEPAGE = http://rmlint.rtfd.org/
-COMMENT = Extremely fast tool to remove duplicates and other lint from your filesystem.
+HOMEPAGE = https://rmlint.readthedocs.io
+COMMENT = rmlint finds space waste and other broken things on your filesystem and offers to remove it.
 LICENSE = GPLv3
 
 # PPC_ARCHES except QorIQ are not supported
 UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
 
-CONFIGURE_TARGET = none
-COMPILE_TARGET = rmlint_compile_target
-INSTALL_TARGET = rmlint_install_target
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = rmlint_compile
+INSTALL_TARGET = rmlint_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: rmlint_compile_target rmlint_install_target
-rmlint_compile_target:
+.PHONY: rmlint_compile rmlint_install
+rmlint_compile:
 	$(RUN) scons config --prefix=${INSTALL_PREFIX} VERBOSE=0 DEBUG=0 O=release
 	$(RUN) scons --prefix=${INSTALL_PREFIX} VERBOSE=0 DEBUG=0 O=release
 
-rmlint_install_target:
+rmlint_install:
 	$(RUN) install --mode=755 --target-directory=${INSTALL_DIR}${INSTALL_PREFIX}/bin/ ./rmlint

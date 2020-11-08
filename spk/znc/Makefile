@@ -16,7 +16,7 @@ DISPLAY_NAME = ZNC
 CHANGELOG = "Update to ZNC 1.8.1 - now built with libicu+python support."
 
 STARTABLE = yes
-HOMEPAGE = http://wiki.znc.in/
+HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility

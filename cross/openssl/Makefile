@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-HOMEPAGE = http://www.openssl.org
+HOMEPAGE = https://www.openssl.org
 COMMENT  = TLS/SSL and crypto library.
 LICENSE  = Apache-2.0
 

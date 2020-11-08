@@ -2,12 +2,12 @@ PKG_NAME = libksba
 PKG_VERS = 1.4.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.gnupg.org/ftp/gcrypt/$(PKG_NAME)
+PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libgpg-error
 
-HOMEPAGE = https://www.gnupg.org/related_software/libksba/
+HOMEPAGE = https://gnupg.org/related_software/libksba/
 COMMENT  = Libksba is a library to make the tasks of working with X.509 certificates, CMS data and related objects more easy. 
 LICENSE  = LGPL
 

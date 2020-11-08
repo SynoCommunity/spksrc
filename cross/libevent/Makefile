@@ -9,9 +9,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
 
 DEPENDS = cross/openssl
 
-HOMEPAGE = http://libevent.org
+HOMEPAGE = https://libevent.org
 COMMENT  = Event notification library
-LICENSE  = http://libevent.org/LICENSE.txt
+LICENSE  = 3-clause BSD
 
 GNU_CONFIGURE = 1
 

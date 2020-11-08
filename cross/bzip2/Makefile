@@ -33,5 +33,5 @@ bzip2_install:
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzegrep
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzfgrep
 	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
-	@$(RUN) cp libbz2.so.1.0.8 $(STAGING_INSTALL_PREFIX)/lib/
-	ln -sf libbz2.so.1.0.8 $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0
+	@$(RUN) cp libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/
+	ln -sf libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0

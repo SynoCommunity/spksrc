@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = 88f6281 powerpc ppc824x ppc853x ppc854x
 # libtorrent:
 UNSUPPORTED_ARCHS += hi3535
 
-HOMEPAGE = http://www.rasterbar.com/products/libtorrent
+HOMEPAGE = https://www.rasterbar.com/products/libtorrent
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.
 LICENSE  = BSD
 

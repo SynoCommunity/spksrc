@@ -20,9 +20,9 @@ CHANGELOG = "Update openssl to 1.1."
 
 DISPLAY_NAME = Deluge
 
-HOMEPAGE = http://deluge-torrent.org
+HOMEPAGE = https://deluge-torrent.org
 LICENSE  = GPL
-HELPURL  = http://dev.deluge-torrent.org/wiki/UserGuide
+HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
 # Custom start-stop script needed due to double-daemon
 SSS_SCRIPT= src/dsm-control.sh

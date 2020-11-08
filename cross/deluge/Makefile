@@ -2,12 +2,12 @@ PKG_NAME = deluge
 PKG_VERS = 2.0.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://download.deluge-torrent.org/source/2.0
+PKG_DIST_SITE = https://download.deluge-torrent.org/source/2.0
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libtorrent
 
-HOMEPAGE = http://deluge-torrent.org/
+HOMEPAGE = https://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
 LICENSE  = MIT License
 

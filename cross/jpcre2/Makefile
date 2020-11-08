@@ -21,4 +21,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: jpcre2_pre_configure_target
 jpcre2_pre_configure_target:
-		$(RUN) ./autogen.sh
+	$(RUN) ./autogen.sh

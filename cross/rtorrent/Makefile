@@ -2,8 +2,8 @@ PKG_NAME = rtorrent
 PKG_VERS = 0.9.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)

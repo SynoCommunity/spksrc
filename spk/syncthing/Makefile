@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie s√
 RELOAD_UI = yes
 DISPLAY_NAME = Syncthing
 CHANGELOG = "Update to upstream version 1.7.1."
-HOMEPAGE = http://www.syncthing.net
+HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
 

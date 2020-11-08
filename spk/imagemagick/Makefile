@@ -12,7 +12,7 @@ CHANGELOG = Update to ImageMagick 7.0.8-53
 
 STARTABLE = no
 
-HOMEPAGE = http://www.imagemagick.org/
+HOMEPAGE = https://www.imagemagick.org/
 LICENSE  = Apache 2.0
 
 include ../../mk/spksrc.spk.mk

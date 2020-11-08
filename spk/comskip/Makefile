@@ -12,10 +12,9 @@ DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how t
 DISPLAY_NAME = Comskip
 CHANGELOG = "1. Update to ffmpeg 4.3.1"
 
-HOMEPAGE = http://www.kaashoek.com/comskip/
-LICENSE = GNU/LGPL
+HOMEPAGE = https://www.kaashoek.com/comskip/
+LICENSE = LGPL
 HELPURL = https://github.com/SynoCommunity/spksrc/wiki/Comskip
-SUPPORTURL = http://www.kaashoek.com/comskip/
 
 SPK_COMMANDS = bin/comskip
 

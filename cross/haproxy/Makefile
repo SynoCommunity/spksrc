@@ -3,13 +3,13 @@ PKG_VERS = 2.2.4
 PKG_MAIN_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.haproxy.org/download/$(PKG_MAIN_VERS)/src
+PKG_DIST_SITE = https://www.haproxy.org/download/$(PKG_MAIN_VERS)/src
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl cross/lua cross/pcre2
 
 MAINTAINER = SynoCommunity
-HOMEPAGE   = https://www.haproxy.org
+HOMEPAGE   = http://www.haproxy.org
 COMMENT    = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 LICENSE    = GPLv2
 
@@ -42,5 +42,6 @@ COMPILE_MAKE_OPTIONS += TARGET=generic $(ARCH_OPTIONS) $(BUILD_OPTIONS) SPKSRC_C
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: haproxy_install
+# define PREFIX (upper case letters)
 haproxy_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)

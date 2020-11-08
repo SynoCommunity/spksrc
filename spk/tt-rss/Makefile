@@ -14,7 +14,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
 CHANGELOG = "Update Tiny Tiny RSS to Git revision 67f02e2aa7 (20200829)"
 
-HOMEPAGE   = http://tt-rss.org/
+HOMEPAGE   = https://tt-rss.org/
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/

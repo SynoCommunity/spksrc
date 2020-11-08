@@ -2,7 +2,7 @@ PKG_NAME = screen
 PKG_VERS = 4.8.0
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_SITE = http://ftp.gnu.org/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
 
 DEPENDS = cross/ncursesw

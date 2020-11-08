@@ -3,11 +3,11 @@ PKG_VERS = 7.6
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.gnu.org/gnu/gdb
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
 
 DEPENDS = cross/termcap
 
-HOMEPAGE = http://www.gnu.org/software/gdb/
+HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger
 LICENSE  =
 

@@ -12,7 +12,7 @@ DEPENDS += cross/libmaxminddb cross/sqlite cross/libmysqlclient
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 
-HOMEPAGE = http://www.ntop.org/
+HOMEPAGE = https://www.ntop.org/
 COMMENT  = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.
 LICENSE  = GPLv3
 

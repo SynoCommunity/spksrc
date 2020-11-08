@@ -14,8 +14,8 @@ RELOAD_UI = yes
 DISPLAY_NAME = DarkStat
 CHANGELOG = "1. Update to 3.0.719<br>2. Use default interface instead of hardcoded eth0"
 
-HOMEPAGE   = http://unix4lyfe.org/darkstat
-LICENSE    = GPL v2
+HOMEPAGE   = https://unix4lyfe.org/darkstat
+LICENSE    = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

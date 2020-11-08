@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-HOMEPAGE = http://code.google.com/p/rutorrent/
+HOMEPAGE = https://github.com/Novik/ruTorrent
 COMMENT  = Yet another web front-end for rTorrent.
 LICENSE  = GPLv3
 

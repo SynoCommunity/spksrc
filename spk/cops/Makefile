@@ -16,7 +16,7 @@ CHANGELOG = "1. Update to 1.0.1<br>2. Improved DSM6 compatibility"
 
 BETA=1
 
-HOMEPAGE   = http://blog.slucas.fr/en/oss/calibre-opds-php-server
+HOMEPAGE   = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/

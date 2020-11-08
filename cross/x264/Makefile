@@ -10,7 +10,7 @@ PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm
 
-HOMEPAGE = http://www.videolan.org/developers/x264.html
+HOMEPAGE = https://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma
 LICENSE  = GPLv2
 

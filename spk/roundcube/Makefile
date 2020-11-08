@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Roundcube Webmail
 CHANGELOG = DSM6 compatible
 
-HOMEPAGE   = http://www.roundcube.net
+HOMEPAGE   = https://www.roundcube.net
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/

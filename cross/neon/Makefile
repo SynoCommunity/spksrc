@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/zlib cross/openssl
 
-HOMEPAGE = http://www.webdav.org/neon/
+HOMEPAGE = https://notroj.github.io/neon/
 COMMENT  = Neon is an HTTP and WebDAV client library, with a C interface.
 LICENSE  = LGPL
 

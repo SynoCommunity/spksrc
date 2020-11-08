@@ -3,11 +3,11 @@ PKG_VERS = 1.26.2
 PKG_EXT = tar.bz2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://busybox.net/downloads
+PKG_DIST_SITE = https://busybox.net/downloads
 
 DEPENDS =
 
-HOMEPAGE = http://busybox.net
+HOMEPAGE = https://busybox.net
 COMMENT  = Fairly comprehensive set of programs needed to run a Linux system
 LICENSE  = GPL
 

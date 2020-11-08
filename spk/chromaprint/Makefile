@@ -12,7 +12,7 @@ DESCRIPTION = Chromaprint is the core component of the AcoustID project. It\'s a
 DISPLAY_NAME = Chromaprint
 CHANGELOG = "1. Update to ffmpeg 4.3.1"
 
-HOMEPAGE   = http://acoustid.org/chromaprint
+HOMEPAGE   = https://acoustid.org/chromaprint
 LICENSE    = LGPL2.1+
 
 include ../../mk/spksrc.common.mk

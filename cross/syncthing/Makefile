@@ -9,18 +9,16 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS = native/go
 
-HOMEPAGE = http://www.syncthing.net/
+HOMEPAGE = https://www.syncthing.net/
 COMMENT  = Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how ...
 LICENSE  = MPL-2.0
 
 COMPILE_TARGET = syncthing_compile
 
-
 GO_SRC_DIR = $(EXTRACT_PATH)/$(PKG_NAME)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
 include ../../mk/spksrc.cross-go.mk
-
 
 BUILD_ARGS = -goos=$(GOOS) -goarch=$(GO_ARCH) -version=v$(PKG_VERS)
 

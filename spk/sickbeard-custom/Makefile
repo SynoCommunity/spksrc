@@ -13,7 +13,7 @@ STARTABLE = yes
 DISPLAY_NAME = SickBeard Custom
 CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 
-HOMEPAGE   = http://sickbeard.com
+HOMEPAGE   = https://sickbeard.com
 LICENSE    = GPL
 HELPURL    = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SickBeard-custom
 

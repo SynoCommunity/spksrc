@@ -3,12 +3,12 @@ PKG_VERS = 1.6.0
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://download.savannah.gnu.org/releases/$(PKG_NAME)
+PKG_DIST_SITE = https://download.savannah.gnu.org/releases/$(PKG_NAME)
 
 DEPENDS = cross/neon cross/libtool
 DESCRIPTION = Mount a WebDAV resource as a regular file system
 
-HOMEPAGE = http://savannah.nongnu.org/projects/davfs2
+HOMEPAGE = https://savannah.nongnu.org/projects/davfs2
 LICENSE  = GPLv3
 
 export ssbindir=$(STAGING_INSTALL_PREFIX)/sbin/
@@ -23,7 +23,6 @@ ifeq ($(findstring $(ARCH),$(ARM5_ARCHES) ppc853x hi3535),$(ARCH))
 # see https://savannah.nongnu.org/bugs/?51004
 POST_CONFIGURE_TARGET = davfs2_post_configure
 endif
-
 
 include ../../mk/spksrc.cross-cc.mk
 

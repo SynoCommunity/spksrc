@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://sabnzbd.org
+HOMEPAGE = https://sabnzbd.org
 COMMENT  = Usenet binary downloader
 LICENSE  = GPL
 

@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libconfig cross/pcre
 
-HOMEPAGE = http://www.rutschle.net/tech/sslh.shtml
+HOMEPAGE = https://www.rutschle.net/tech/sslh/README.html
 COMMENT  = sslh accepts HTTPS, SSH and OpenVPN connections on the same port
 LICENSE  = GPLv2
 

@@ -12,7 +12,7 @@ DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregis
 DISPLAY_NAME = ffmpeg
 STARTABLE = no
 
-HOMEPAGE = http://www.ffmpeg.org/
+HOMEPAGE = https://www.ffmpeg.org/
 LICENSE  = GPLv3
 
 SERVICE_SETUP = src/service-setup.sh

@@ -14,7 +14,7 @@ DESCRIPTION = Monit is a small Open Source utility for managing and monitoring U
 RELOAD_UI = yes
 DISPLAY_NAME = Monit
 
-HOMEPAGE = http://mmonit.com/monit
+HOMEPAGE = https://mmonit.com/monit
 LICENSE  = AGPL
 
 INSTALLER_SCRIPT = src/installer.sh

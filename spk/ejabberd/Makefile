@@ -14,9 +14,9 @@ RELOAD_UI = yes
 DISPLAY_NAME = ejabberd
 BETA = 1
 
-HOMEPAGE   = http://www.ejabberd.im
+HOMEPAGE   = https://www.ejabberd.im
 LICENSE    = GPLv2
-HELPURL    = http://docs.ejabberd.im/admin/guide
+HELPURL    = https://docs.ejabberd.im/admin/guide
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
