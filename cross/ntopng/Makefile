@@ -6,7 +6,6 @@ PKG_DIST_SITE = https://github.com/ntop/$(PKG_NAME)/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-
 DEPENDS  = cross/libcap cross/ndpi cross/curl
 DEPENDS += cross/libmaxminddb cross/sqlite cross/libmysqlclient
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
@@ -54,7 +53,6 @@ CONFIGURE_ARGS += --with-ndpi-static-lib=$(STAGING_INSTALL_PREFIX)/lib
 # let ./configure find mysql_config (it is a script and works for cross compile)
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
 ENV += DESTDIR=$(INSTALL_DIR)
-
 
 include ../../mk/spksrc.cross-cc.mk
 

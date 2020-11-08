@@ -1,9 +1,9 @@
 PKG_NAME = screen
 PKG_VERS = 4.8.0
 PKG_EXT = tar.gz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
-PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
 
@@ -14,14 +14,13 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = screen_pre_configure
 INSTALL_TARGET = screen_install
-
  
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: screen_pre_configure
 screen_pre_configure:
-	$(RUN) autoconf
+	@$(RUN) autoconf
 
 .PHONY: screen_install
 screen_install:
-	$(RUN) install -c screen $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)
+	@$(RUN) install -c screen $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)

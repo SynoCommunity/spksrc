@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libyaml
 
-HOMEPAGE = http://pyyaml.org/
+HOMEPAGE = https://pyyaml.org/
 COMMENT  = PyYAML is a YAML parser and emitter for the Python programming language
 LICENSE  = MIT
 

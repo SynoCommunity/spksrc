@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/pycparser cross/libffi
 
-HOMEPAGE = http://cffi.readthedocs.org
+HOMEPAGE = https://cffi.readthedocs.org
 COMMENT  = Foreign Function Interface for Python calling C code
 LICENSE  = MIT
 

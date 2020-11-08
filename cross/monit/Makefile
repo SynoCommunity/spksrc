@@ -13,8 +13,9 @@ LICENSE  = AGPLv3
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-ssl-incl-dir=$(STAGING_INSTALL_PREFIX)/include
+CONFIGURE_ARGS += --with-zlib=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS = --without-pam 
-CONFIGURE_ARGS += --enable-optimized
+#CONFIGURE_ARGS += --enable-optimized
 CONFIGURE_ARGS += libmonit_cv_setjmp_available=yes libmonit_cv_vsnprintf_c99_conformant=yes 
 
 include ../../mk/spksrc.common.mk

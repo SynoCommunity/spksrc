@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://msgpack.org/
+HOMEPAGE = https://msgpack.org/
 COMMENT  = It\'s like JSON. but fast and small.
 LICENSE  = Apache
 

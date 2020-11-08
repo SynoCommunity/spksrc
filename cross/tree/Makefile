@@ -17,6 +17,7 @@ CONFIGURE_TARGET = nop
 INSTALL_TARGET = tree_install
 
 include ../../mk/spksrc.cross-cc.mk
+
 .PHONY: tree_install
 tree_install:
 	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)

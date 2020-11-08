@@ -12,7 +12,7 @@ BUILD_DEPENDS = native/$(PKG_NAME)
 
 HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode
-LICENSE  = http://www.unicode.org/copyright.html#License
+LICENSE  = https://www.unicode.org/copyright.html#License
 
 GNU_CONFIGURE = 1
 ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))

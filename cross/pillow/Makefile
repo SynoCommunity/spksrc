@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/freetype cross/libjpeg cross/zlib
 
-HOMEPAGE = http://python-pillow.github.io
+HOMEPAGE = https://python-pillow.org
 COMMENT  = The friendly PIL fork
 LICENSE  = https://github.com/python-pillow/Pillow/blob/master/LICENSE
 

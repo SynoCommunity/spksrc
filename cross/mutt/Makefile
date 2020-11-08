@@ -16,7 +16,6 @@ CONFIGURE_ARGS = --with-ssl=openssl --enable-pop --enable-imap --enable-smtp --w
 
 INSTALL_TARGET = mutt_install
 
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: mutt_install

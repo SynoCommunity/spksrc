@@ -7,7 +7,7 @@ PKG_DIR = node-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = 88f6281 hi3535 ppc853x qoriq
 
-HOMEPAGE = http://www.nodejs.org
+HOMEPAGE = https://www.nodejs.org
 COMMENT  = A JavaScript runtime built on Chrome\'s V8 JavaScript engine.
 LICENSE  = https://github.com/nodejs/node/raw/master/LICENSE
 

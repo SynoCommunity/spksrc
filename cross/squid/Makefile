@@ -19,9 +19,10 @@ HOSTCFGEN_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR
 HOSTCFGEN = $(WORK_DIR)/$(PKG_DIR)/src/cf_gen
 
 # Compile
-PRE_COMPILE_TARGET = myPreCompile
+PRE_COMPILE_TARGET = squid_pre_compile
 
 include ../../mk/spksrc.cross-cc.mk
 
-myPreCompile:
+.PHONY: squid_pre_compile
+squid_pre_compile:
 	cp $(HOSTCFGEN_NATIVE) $(HOSTCFGEN)

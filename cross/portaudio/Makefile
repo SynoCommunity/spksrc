@@ -1,9 +1,9 @@
 PKG_NAME = portaudio
 PKG_VERS = 190600_20161030
 PKG_EXT = tgz
-PKG_DIR = $(PKG_NAME)
 PKG_DIST_NAME = pa_stable_v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.portaudio.com/archives
+PKG_DIR = $(PKG_NAME)
 
 DEPENDS = cross/alsa-oss
 

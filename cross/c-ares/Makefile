@@ -7,12 +7,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://c-ares.haxx.se/
+HOMEPAGE = https://c-ares.haxx.se/
 COMMENT  = c-ares is a C library that performs DNS requests and name resolves asynchronously
-LICENSE  =
+LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = CFLAGS="$(TC_EXTRA_CFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
-

@@ -18,7 +18,6 @@ INSTALL_TARGET = unzip_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-
 .PHONY: unzip_compile
 unzip_compile:
 	$(RUN) $(MAKE) -f unix/Makefile generic CC="$(TC_PATH)$(TC_PREFIX)gcc"

@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://doc.libsodium.org/
+HOMEPAGE = https://doc.libsodium.org/
 COMMENT  = Sodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing and more.
 LICENSE  = ISC
 

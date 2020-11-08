@@ -9,9 +9,8 @@ DEPENDS =
 
 HOMEPAGE = https://hboehm.info/gc/
 COMMENT  = A garbage collector for C and C++
-LICENSE  = http://hboehm.info/gc/license.txt
+LICENSE  = https://hboehm.info/gc/license.txt
 
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
-
