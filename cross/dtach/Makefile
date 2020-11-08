@@ -19,4 +19,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: dtach_install
 dtach_install:
 	mkdir -p $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin
-	cp $(SRC_DIR)dtach $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin/
+	cp $(WORK_DIR)/$(PKG_DIR)/dtach $(WORK_DIR)/install/$(INSTALL_PREFIX)/bin/
