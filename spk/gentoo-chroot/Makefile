@@ -14,10 +14,10 @@ RELOAD_UI = yes
 DISPLAY_NAME = Gentoo Chroot
 CHANGELOG =
 
-HOMEPAGE   = http://www.gentoo.org/
+HOMEPAGE   = https://www.gentoo.org/
 LICENSE    =
 HELPURL    = 3rdparty/gentoo-chroot/help/enu/index.html
-SUPPORTURL = http://www.gentoo.org/main/en/support.xml
+SUPPORTURL = https://www.gentoo.org/main/en/support.xml
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

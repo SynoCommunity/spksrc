@@ -3,7 +3,7 @@ PKG_VERS = 3.6.15
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_MAIN_VERS=v$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
-PKG_DIST_SITE = https://www.gnupg.org/ftp/gcrypt/$(PKG_NAME)/$(PKG_MAIN_VERS)
+PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/$(PKG_NAME)/$(PKG_MAIN_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libunistring cross/libtasn1 cross/nettle cross/zlib

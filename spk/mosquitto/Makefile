@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Mosquitto
 STARTABLE = yes
 CHANGELOG = "Update openssl to 1.1."
-HOMEPAGE = http://www.mosquitto.org/
+HOMEPAGE = https://www.mosquitto.org/
 LICENSE  = EPL/EDL licensed
 
 SERVICE_USER = auto

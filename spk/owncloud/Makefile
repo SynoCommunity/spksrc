@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = ownCloud
 CHANGELOG = "1. Update ownCloud to 8.1.12"
 
-HOMEPAGE   = http://owncloud.org/
+HOMEPAGE   = https://owncloud.org/
 LICENSE    = AGPL
 
 REQUIRED_DSM = 5.0

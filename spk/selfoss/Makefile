@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Selfoss
 CHANGELOG = "1. Update Selfoss to 2.13<br>2. Fix DSM4.3 compatibility"
 
-HOMEPAGE   = http://selfoss.aditu.de/
+HOMEPAGE   = https://selfoss.aditu.de/
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/

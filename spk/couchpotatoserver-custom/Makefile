@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato Custom
 CHANGELOG = "Fix DSM 6 service start."
 
-HOMEPAGE  = http://couchpota.to/
+HOMEPAGE  = https://couchpota.to/
 LICENSE   = GPL
 STARTABLE = yes
 

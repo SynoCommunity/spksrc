@@ -7,16 +7,17 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE   = http://golang.org/
-COMMENT    = Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
-LICENSE    =
+HOMEPAGE = https://golang.org
+COMMENT  = Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
+LICENSE  = BSD-style
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myComp
+INSTALL_TARGET = go_bootstrap_install
 
 include ../../mk/spksrc.native-cc.mk
 
-myComp:
+.PHONY: go_bootstrap_install
+go_bootstrap_install:
 	@$(MSG) "Building Go 1.4"
 	cd $(WORK_DIR)/$(PKG_NAME)/src && GOARCH="" ./make.bash

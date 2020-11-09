@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Memcached
 CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
-HOMEPAGE = http://memcached.org/
+HOMEPAGE = https://memcached.org/
 LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh

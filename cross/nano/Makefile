@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
 
-HOMEPAGE = http://www.nano-editor.org
+HOMEPAGE = https://www.nano-editor.org
 COMMENT  = nano is a text editor for Unix-like computing systems or operating environments using a command line interface.
 LICENSE  = GPLv2
 

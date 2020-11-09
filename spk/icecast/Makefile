@@ -15,7 +15,7 @@ RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Icecast
 
-HOMEPAGE   = http://www.icecast.org/
+HOMEPAGE   = https://www.icecast.org/
 LICENSE    = GPLv2
 
 WIZARDS_DIR = WIZARD_UIFILES

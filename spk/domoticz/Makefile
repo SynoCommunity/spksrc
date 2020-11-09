@@ -17,7 +17,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Domoticz
 CHANGELOG = "Update openssl to 1.1."
 
-HOMEPAGE = http://www.domoticz.com/
+HOMEPAGE = https://www.domoticz.com/
 LICENSE  = GPLv3
 
 INSTALLER_SCRIPT = src/installer.sh

@@ -3,8 +3,8 @@ PKG_VERS = 3.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/videolan/x265/archive
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/source
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/source
 
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm cross/libnuma
@@ -13,7 +13,7 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = x265_custom_configure
+CONFIGURE_TARGET = x265_configure
 
 NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
@@ -76,7 +76,7 @@ CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
 
-.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_custom_configure
+.PHONY: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a x265_configure
 
 # First create specific static libraries with build options for 12 and 10 bit depth
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
@@ -90,17 +90,17 @@ $(PKG_DIR)/libx265_main12.a:
 	mkdir --parents $(PKG_BUILD_12BIT)
 	cd $(PKG_BUILD_12BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) -DMAIN12=ON ../source
 	cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_OPTIONS)
-	$(RUN) ln -sf $(PKG_BUILD_12BIT)/libx265.a libx265_main12.a
+	@$(RUN) ln -sf $(PKG_BUILD_12BIT)/libx265.a libx265_main12.a
 
 $(PKG_DIR)/libx265_main10.a:
 	mkdir --parents $(PKG_BUILD_10BIT)
 	cd $(PKG_BUILD_10BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) ../source
 	cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_OPTIONS)
-	$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
+	@$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
 
 # Aggregate them all together in default 8 bit depth build
 CMAKE_MULTILIB_ARGS = -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
 CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
 
-x265_custom_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
-	$(RUN) cmake $(CMAKE_ARGS) $(CMAKE_MULTILIB_ARGS) .
+x265_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a
+	@$(RUN) cmake $(CMAKE_ARGS) $(CMAKE_MULTILIB_ARGS) .

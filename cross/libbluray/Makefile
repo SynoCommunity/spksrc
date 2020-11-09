@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/freetype cross/fontconfig
 
-HOMEPAGE = http://www.videolan.org/developers/libbluray.html
+HOMEPAGE = https://www.videolan.org/developers/libbluray.html
 COMMENT  = libbluray is an open-source library designed for Blu-Ray Discs playback for media players.
 LICENSE  = LGPL
 

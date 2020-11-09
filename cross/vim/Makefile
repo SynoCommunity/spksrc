@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)$(subst .,,$(PKG_VERS))
 BUILD_DEPENDS = cross/python3
 DEPENDS = cross/ncurses
 
-HOMEPAGE = http://www.vim.org/
+HOMEPAGE = https://www.vim.org/
 COMMENT  = Vim is a highly configurable text editor built to enable efficient text editing. It is an improved version of the vi editor distributed with most UNIX systems.
 LICENSE  = Charityware
 

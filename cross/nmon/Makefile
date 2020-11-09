@@ -2,7 +2,7 @@ PKG_NAME = nmon
 PKG_VERS = 16m
 PKG_EXT = c
 PKG_DIST_NAME = lmon$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files
+PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
@@ -19,9 +19,7 @@ NMON_TARGET=$(PKG_NAME)
 
 ADDITIONAL_CFLAGS = -g -O3 -Wall -D JFS -D GETUSER -D LARGEMEM -lncursesw -lm -o $(NMON_TARGET)
 
-
 include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: nmon_configure
 nmon_configure:
@@ -29,11 +27,9 @@ nmon_configure:
 	mkdir -p $(WORK_DIR)/$(PKG_DIR)
 	cp $(DISTRIB_DIR)/$(PKG_DIST_NAME) $(WORK_DIR)/$(PKG_DIR)
 
-
 .PHONY: nmon_compile
 nmon_compile:
-	$(RUN) $(CC) $(PKG_DIST_NAME) $(CFLAGS) $(LDFLAGS)
-
+	@$(RUN) $(CC) $(PKG_DIST_NAME) $(CFLAGS) $(LDFLAGS)
 
 .PHONY: nmon_install
 nmon_install:

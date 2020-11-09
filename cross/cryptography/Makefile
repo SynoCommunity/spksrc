@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl cross/cffi
 
-HOMEPAGE = http://github.com/pyca/cryptography
+HOMEPAGE = https://github.com/pyca/cryptography
 COMMENT  = Provide cryptographic recipes and primitives to Python developers
 LICENSE  = BSD/ASL2
 

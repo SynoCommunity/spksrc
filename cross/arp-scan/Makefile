@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpcap
 
-HOMEPAGE = http://www.royhills.co.uk/wiki/index.php/Arp-scan_User_Guide
+HOMEPAGE = https://www.royhills.co.uk/wiki/index.php/Arp-scan_User_Guide
 COMMENT  = Command-line tool for system discovery and fingerprinting. It constructs and sends ARP requests to the specified IP addresses, and displays any responses that are received. 
 LICENSE  = MIT
 

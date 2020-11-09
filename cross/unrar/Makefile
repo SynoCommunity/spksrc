@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE = http://rarlab.com
-COMMENT  = Extract files from rar archives
+HOMEPAGE = https://rarlab.com
+COMMENT  = Extract files from rar archives.
 LICENSE  = freeware
 
 CONFIGURE_TARGET = nop

@@ -7,17 +7,16 @@ PKG_DIR = $(PKG_NAME)$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://infozip.org/UnZip.html
+HOMEPAGE = http://infozip.sourceforge.net/UnZip.html
 COMMENT  = UnZip is an extraction utility for archives compressed in .zip format
-LICENSE  = http://infozip.org/license.html
+LICENSE  = http://infozip.sourceforge.net/license.html
 
 GNU_CONFIGURE = 1
-CONFIGURE_TARGET = none
+CONFIGURE_TARGET = nop
 COMPILE_TARGET = unzip_compile
 INSTALL_TARGET = unzip_install
 
 include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: unzip_compile
 unzip_compile:

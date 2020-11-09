@@ -20,7 +20,7 @@ DISPLAY_NAME = SABnzbd
 STARTABLE = yes
 CHANGELOG = "Update SABnzbd to 3.1.0. Enabled support for nice and ionice on all architectures. Included SabToSyno.py script to add downloaded files automatically to the Synology DLNA server."
 
-HOMEPAGE  = http://sabnzbd.org
+HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
 
 WIZARDS_DIR = src/wizard/

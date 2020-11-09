@@ -7,9 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://www.esn.me
+HOMEPAGE = https://github.com/esnme/ultramemcache
 COMMENT  = Ultra fast memcache client written in highly optimized C++ with Python bindings
 LICENSE  = BSD
 
 include ../../mk/spksrc.python-wheel.mk
-

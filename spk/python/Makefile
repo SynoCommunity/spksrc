@@ -26,7 +26,7 @@ STARTABLE = no
 DISPLAY_NAME = Python
 CHANGELOG = "Update openssl to 1.1"
 
-HOMEPAGE = http://www.python.org
+HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh

@@ -4,11 +4,11 @@ PKG_VERS = $(PKG_SHORT_VERS).3
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
+PKG_DIST_SITE = https://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://developer.gnome.org/glib/
+HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library
 LICENSE  = GPLv2
 
@@ -22,5 +22,5 @@ include ../../mk/spksrc.native-cc.mk
 
 glib_pre_configure: 
 	# force autogen to first use internal pcre instead of provided to prevent
-	# build failure.  Subsequent default configure will superseed this afterwards
+	# build failure. Subsequent default configure will superseed this afterwards
 	$(RUN) ./autogen.sh

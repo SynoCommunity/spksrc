@@ -12,7 +12,7 @@ STARTABLE = no
 CHANGELOG = "Update openssl to 1.1.<br/>2. Update glib to 2.58"
 BETA = 1
 
-HOMEPAGE = http://www.irssi.org/
+HOMEPAGE = https://www.irssi.org/
 LICENSE = GPLv2
 HELP_URL = https://irssi.org/documentation/
 

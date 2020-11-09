@@ -13,25 +13,28 @@ DEPENDS =
 
 HOMEPAGE = http://www.squidguard.org/
 COMMENT  = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid.
-LICENSE  = GNU PL
+LICENSE  = GPL
 
 DESTDIR = $(INSTALL_DIR)
 GNU_CONFIGURE = 1
-POST_INSTALL_TARGET = myInstall
+POST_INSTALL_TARGET = squidguard_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-CONFIGURE_ARGS  = --with-db=$(INSTALL_DIR)/$(INSTALL_PREFIX) --exec-prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX) -with-sg-dbhome=$(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db --with-sg-config=$(INSTALL_DIR)/$(INSTALL_PREFIX)/etc/squidguard.conf --with-sg-logdir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/var/logs --with-squiduser=$(USER) -with-mysql=no --with-ldap-inc=no
+CONFIGURE_ARGS = --with-db=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --exec-prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += -with-sg-dbhome=$(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
+CONFIGURE_ARGS += --with-sg-config=$(INSTALL_DIR)/$(INSTALL_PREFIX)/etc/squidguard.conf
+CONFIGURE_ARGS += --with-sg-logdir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/var/logs
+CONFIGURE_ARGS += --with-squiduser=$(USER)
+CONFIGURE_ARGS += -with-mysql=no
+CONFIGURE_ARGS += --with-ldap-inc=no
 
-
-.PHONY: myInstall
-myInstall:
+.PHONY: squidguard_post_install
+squidguard_post_install:
 	@$(RUN) install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
 	@$(RUN) wget $(DB_FILE) -O $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists.tar.gz
 	@$(RUN) tar xvzf $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists.tar.gz -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
 	@$(RUN) cp -R $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists/* $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/
 	@$(RUN) rm -Rf $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists*
 	@$(RUN) install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
-
-
-

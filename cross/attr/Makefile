@@ -2,7 +2,7 @@ PKG_NAME = attr
 PKG_VERS = 2.4.46
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).src.$(PKG_EXT)
-PKG_DIST_SITE = http://download.savannah.gnu.org/releases/attr
+PKG_DIST_SITE = https://download.savannah.gnu.org/releases/attr
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

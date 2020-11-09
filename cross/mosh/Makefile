@@ -1,9 +1,9 @@
 PKG_NAME = mosh
 PKG_VERS = 1.3.2
 PKG_EXT = tar.gz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mobile-shell/mosh/releases/download/$(PKG_DIR)
+PKG_DIST_SITE = https://github.com/mobile-shell/mosh/releases/download/$(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl cross/protobuf cross/ncurses
 

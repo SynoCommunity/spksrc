@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libev cross/c-ares
 
-HOMEPAGE = http://www.gevent.org/
+HOMEPAGE = https://www.gevent.org
 COMMENT  = gevent is a coroutine-based Python networking library that uses greenlet to provide a high-level synchronous API on top of the libev event loop
 LICENSE  = MIT
 

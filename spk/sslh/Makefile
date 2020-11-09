@@ -12,7 +12,7 @@ RELOAD_UI = no
 DISPLAY_NAME = sslh
 CHANGELOG = "1. Update to version 1.21c<br/>2. Enable libcap support"
 
-HOMEPAGE   = http://www.rutschle.net/tech/sslh/README.html
+HOMEPAGE   = https://www.rutschle.net/tech/sslh/README.html
 LICENSE    = GPLv2
 STARTABLE  = yes
 

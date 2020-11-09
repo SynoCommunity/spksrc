@@ -13,11 +13,11 @@ DESCRIPTION = Dante implements the socks standard and can function as a firewall
 DESCRIPTION_FRE = Dante fournit le service socks et peut servir de firewall entre réseaux. Le package contient sockd - un serveur proxy socks.
 RELOAD_UI = yes
 STARTABLE = yes
-DISPLAY_NAME = Dante Sockd
+DISPLAY_NAME = Dante SOCKS-server
 CHANGELOG =
 
 HOMEPAGE = https://www.inet.no/dante/
-LICENSE  = BSD
+LICENSE  = BSD/CMU
 
 WIZARDS_DIR = src/wizard/
 

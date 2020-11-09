@@ -11,7 +11,7 @@ DESCRIPTION = Box Backup is an open source, completely automatic, on-line backup
 DISPLAY_NAME = Box Backup Client
 CHANGELOG = "1. Update BoxBackup to 0.12.<br/>2. Update openssl to 1.1."
 
-HOMEPAGE = http://www.boxbackup.org/
+HOMEPAGE = https://www.boxbackup.org/
 LICENSE  = BSD/GPL
 
 INSTALLER_SCRIPT = src/installer.sh

@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
 
-HOMEPAGE = http://curl.haxx.se
+HOMEPAGE = https://curl.haxx.se
 COMMENT  = Command line tool and library for transferring data with URLs
 LICENSE  = https://curl.haxx.se/docs/copyright.html
 

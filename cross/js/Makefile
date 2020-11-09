@@ -46,7 +46,6 @@ PRE_COMPILE_ARGS = -DCROSS_COMPILE=1 -DNDEBUG $(PRE_COMPILE_HOST_CPU)
 
 include ../../mk/spksrc.cross-cc.mk
 
-
 .PHONY: js_pre_compile
 # Compile jscpucfg executable for local cpu. 
 # Regular build will use this to generate jsautocfg.h for host cpu.

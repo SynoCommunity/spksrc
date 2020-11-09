@@ -12,7 +12,7 @@ STARTABLE = no
 DISPLAY_NAME = Git
 CHANGELOG = "1. Update git to 28.0.<br/>2. Update openssl to 1.1."
 
-HOMEPAGE = http://git-scm.com
+HOMEPAGE = https://git-scm.com
 LICENSE  = GPLv2
 
 SPK_COMMANDS = bin/git bin/git-cvsserver bin/git-receive-pack bin/git-shell bin/git-upload-archive bin/git-upload-pack

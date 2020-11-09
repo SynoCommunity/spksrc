@@ -9,7 +9,7 @@ DEPENDS = cross/gmp cross/mpfr
 
 HOMEPAGE = http://www.multiprecision.org/mpc/home.html
 COMMENT  = C library for the arithmetic of complex numbers with arbitrarily high precision and correct rounding of the result.
-LICENSE  = GNU Lesser GPL v3
+LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
 

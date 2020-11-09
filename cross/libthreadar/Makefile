@@ -1,9 +1,9 @@
 PKG_NAME = libthreadar
 PKG_VERS = 1.2.3
 PKG_EXT = tar.gz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/libthreadar/files/$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 

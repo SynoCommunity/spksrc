@@ -2,11 +2,12 @@ PKG_NAME = protobuf
 PKG_VERS = 3.5.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-cpp-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/google/protobuf/releases/download/v$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/protocolbuffers/protobuf/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-HOMEPAGE = https://github.com/google/protobuf
+HOMEPAGE = https://developers.google.com/protocol-buffers
 COMMENT  = Protocol Buffers implementation in CPP
+LICENSE  = https://github.com/protocolbuffers/protobuf/blob/master/LICENSE
 
 GNU_CONFIGURE = 1
 

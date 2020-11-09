@@ -15,7 +15,7 @@ DISPLAY_NAME = NZBmegasearcH
 
 CHANGELOG = "Fix DSM 6 service start."
 
-HOMEPAGE  = http://pillone.github.io/usntssearch/
+HOMEPAGE  = https://pillone.github.io/usntssearch/
 LICENSE   = GPLv2
 
 INSTALLER_SCRIPT = src/installer.sh

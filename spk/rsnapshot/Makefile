@@ -12,7 +12,7 @@ STARTABLE = no
 DISPLAY_NAME = rsnapshot
 CHANGELOG = "Initial release"
 
-HOMEPAGE = http://rsnapshot.org/
+HOMEPAGE = https://rsnapshot.org
 LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh

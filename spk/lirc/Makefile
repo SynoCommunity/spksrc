@@ -26,7 +26,7 @@ DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix d
 RELOAD_UI = no
 DISPLAY_NAME = LIRC
 
-HOMEPAGE = http://www.lirc.org/
+HOMEPAGE = https://www.lirc.org/
 LICENSE  =
 
 WIZARDS_DIR = $(WORK_DIR)/wizard

@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-HOMEPAGE = http://dev.maxmind.com/geoip/
+HOMEPAGE = https://dev.maxmind.com/geoip/
 COMMENT  = The GeoIP product is available in a variety of downloadable databases. These databases use a custom binary format to maximize lookup speed. MaxMind also offers CSV versions of the same data. This is useful if you would like to import this data into a SQL RDBMS, for example.
 LICENSE  = LGPL
 

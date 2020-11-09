@@ -9,11 +9,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 OPTIONAL_DEPENDS = native/yasm
 
-HOMEPAGE = http://www.webmproject.org/code/
+HOMEPAGE = https://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec
 LICENSE = https://raw.githubusercontent.com/webmproject/libvpx/master/LICENSE
 
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = libvpx_install
 
 YASM_PATH=$(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
 
@@ -53,6 +53,6 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+.PHONY: libvpx_install
+libvpx_install:
+	@$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

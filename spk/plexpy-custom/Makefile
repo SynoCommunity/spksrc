@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = PlexPy Custom
 CHANGELOG = "Fix DSM 6 service start."
 
-HOMEPAGE   = http://tautulli.com/
+HOMEPAGE   = https://tautulli.com
 LICENSE    = GPL
 STARTABLE  = yes
 

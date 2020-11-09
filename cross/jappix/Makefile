@@ -2,7 +2,7 @@ PKG_NAME = jappix
 PKG_VERS = 1.0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://github.com/jappix/jappix/archive
+PKG_DIST_SITE = https://github.com/jappix/jappix/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
@@ -15,14 +15,14 @@ LICENSE  = AGPL
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = jappix_install
 
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: jappix_install
+jappix_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/jappix
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/jappix

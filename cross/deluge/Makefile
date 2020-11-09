@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libtorrent
 
-HOMEPAGE = http://deluge-torrent.org/
+HOMEPAGE = https://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
 LICENSE  = MIT License
 

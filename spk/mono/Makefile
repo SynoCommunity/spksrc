@@ -11,8 +11,8 @@ DISPLAY_NAME = Mono
 STARTABLE = no
 CHANGELOG = "Update to version 5.20.1.34"
 
-HOMEPAGE = http://mono-project.com
-LICENSE  = http://www.mono-project.com/docs/faq/licensing
+HOMEPAGE = https://mono-project.com
+LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
 SERVICE_SETUP = src/service-setup.sh
 

@@ -7,16 +7,16 @@ PKG_DIR = numactl-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://oss.sgi.com/projects/libnuma/
+HOMEPAGE = https://linux.die.net/man/8/numactl
 COMMENT  = NUMA stands for Non-Uniform Memory Access.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-PRE_CONFIGURE_TARGET = myPreConfigure
+PRE_CONFIGURE_TARGET = libnuma_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPreConfigure
-myPreConfigure:
-	$(RUN) ./autogen.sh
+.PHONY: libnuma_pre_configure
+libnuma_pre_configure:
+	@$(RUN) ./autogen.sh

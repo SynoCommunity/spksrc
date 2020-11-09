@@ -13,7 +13,7 @@ STARTABLE = no
 DISPLAY_NAME = Mercurial
 CHANGELOG = Update to 4.8.1
 
-HOMEPAGE = http://mercurial.selenic.com/
+HOMEPAGE = https://www.mercurial-scm.org/
 LICENSE  = MPL1.1
 
 INSTALLER_SCRIPT = src/installer.sh

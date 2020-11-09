@@ -23,4 +23,4 @@ UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x $(ARM5_ARCHES)
 
 .PHONY: rnm_pre_configure
 rnm_pre_configure:
-		$(RUN) ./autogen.sh
+	$(RUN) ./autogen.sh

@@ -7,18 +7,18 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://code.google.com/p/phpmemcacheadmin/
+HOMEPAGE = https://github.com/elijaa/phpmemcachedadmin
 COMMENT  = Graphic stand-alone administration for memcached to monitor and debug purpose
 LICENSE  = Apache License 2.0
 
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = phpmemcachedadmin_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: phpmemcachedadmin_install
+phpmemcachedadmin_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/phpMemcachedAdmin
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/phpMemcachedAdmin

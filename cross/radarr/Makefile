@@ -13,10 +13,11 @@ LICENSE  = GNU GPL v3
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = radarr_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-myInstall:
+.PHONY: radarr_install
+radarr_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
