@@ -14,39 +14,45 @@ all-noarch:
 
 
 clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
-clean: native-clean
+clean: native-clean cross-clean
 
 dist-clean: clean
-dist-clean: toolchain-clean
+dist-clean: kernel-clean toolchain-clean toolkit-clean
 
 native-clean:
 	@for native in $(dir $(wildcard native/*/Makefile)) ; \
 	do \
-	    (cd $${native} && $(MAKE) clean) ; \
+	    $(MAKE) -C $${native} clean ; \
 	done
 
 toolchain-clean:
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
-	    (cd $${tc} && $(MAKE) clean) ; \
+	    $(MAKE) -C $${tc} clean ; \
+	done
+
+toolkit-clean:
+	@for tk in $(dir $(wildcard toolkit/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${tk} clean ; \
 	done
 
 kernel-clean:
 	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
 	do \
-	    (cd $${kernel} && $(MAKE) clean) ; \
+	    rm -rf $${kernel}/work* ; \
 	done
 
 cross-clean:
 	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
 	do \
-	    (cd $${cross} && $(MAKE) clean) ; \
+	    $(MAKE) -C $${cross} clean ; \
 	done
 
 spk-clean:
 	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
 	do \
-	    (cd $${spk} && $(MAKE) clean) ; \
+	    $(MAKE) -C $${spk} clean ; \
 	done
 
 %: spk/%/Makefile
@@ -87,43 +93,43 @@ $(foreach arch,$(AVAILABLE_ARCHS),$(foreach spk,$(SUPPORTED_SPKS),$(eval $(call 
 prepare: downloads
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
-	    (cd $${tc} && $(MAKE)) ; \
+	    $(MAKE) -C $${tc} ; \
 	done
 
 downloads:
 	@for dl in $(dir $(wildcard cross/*/Makefile)) ; \
 	do \
-	    (cd $${dl} && $(MAKE) download) ; \
+	    $(MAKE) -C $${tc} download ; \
 	done
 
 natives:
 	@for n in $(dir $(wildcard native/*/Makefile)) ; \
 	do \
-	    (cd $${n} && $(MAKE)) ; \
+	    $(MAKE) -C $${n} ; \
 	done
 
 native-digests:
 	@for n in $(dir $(wildcard native/*/Makefile)) ; \
 	do \
-	    (cd $${n} && $(MAKE) digests) ; \
+	    $(MAKE) -C $${n} digests ; \
 	done
 
 toolchain-digests:
 	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
 	do \
-	    (cd $${tc} && $(MAKE) digests) ; \
+	    $(MAKE) -C $${tc} digests ; \
 	done
 
 kernel-digests:
 	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
 	do \
-	    (cd $${kernel} && $(MAKE) digests) ; \
+	    $(MAKE) -C $${kernel} digests ; \
 	done
 
 cross-digests:
 	@for cross in $(dir $(wildcard cross/*/Makefile)) ; \
 	do \
-	    (cd $${cross} && $(MAKE) digests) ; \
+	    $(MAKE) -C $${cross} digests ; \
 	done
 
 jsonlint:
