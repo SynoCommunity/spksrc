@@ -1,13 +1,13 @@
 
 AVAILABLE_TCS = $(notdir $(wildcard toolchains/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
-SUPPORTED_SPKS = $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile))
+SUPPORTED_SPKS = $(sort $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile)))
 
 
 all: $(SUPPORTED_SPKS)
 
 all-noarch:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	@for spk in $(sort $(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
 	done
@@ -72,7 +72,7 @@ native-%-clean: native/%/Makefile
 dependency-tree:
 	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
 	do \
-	    $(MAKE) -C $${spk} dependency-tree | grep -P "^[\t]"; \
+	    $(MAKE) -C $${spk} dependency-tree | grep -P "^[\t]" ; \
 	done
 
 # build dependency list for all packages
