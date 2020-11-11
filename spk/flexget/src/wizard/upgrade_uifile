@@ -1,6 +1,6 @@
 [{
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "FlexGet Documentation",
     "items": [{
-    "desc": "Permissions are managed with the group 'sc-media' in DSM. The group 'users' is no longer used."
+        "desc": "Warning: your configuration may require changes after update. Please refer to <a target=\"_blank\" href=\"https://flexget.com/Configuration\">documentation</a> for FlexGet configuration."
     }]
 }]

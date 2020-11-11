@@ -1,0 +1,37 @@
+# try to avoid build errors by disabling parallel make
+# 
+--- autoconf/Makefile.in.org	2011-04-11 02:37:07.000000000 +0000
++++ autoconf/Makefile.in	2020-10-06 19:22:35.175361801 +0000
+@@ -97,3 +97,5 @@
+ #
+ .PHONY: all help static elf install clean check install-elf install-static makefiles install-pkgconfig
+ #
++.NOTPARALLEL:
++#
+
+--- src/Makefile.in.org	2011-04-11 02:37:07.000000000 +0000
++++ src/Makefile.in	2020-10-06 19:28:52.395123281 +0000
+@@ -247,3 +247,5 @@
+ #---------------------------------------------------------------------------
+ # Object Rules : These are created from the configure script (hopefully)
+ #---------------------------------------------------------------------------
++
++.NOTPARALLEL:
+
+--- slsh/Makefile.in.org	2020-10-06 19:40:56.828016639 +0000
++++ slsh/Makefile.in	2020-10-06 19:41:05.660705644 +0000
+@@ -163,3 +163,5 @@
+   install_lib_files install_rline_files install_scripts install_help \
+   install_docs
+ 
++.NOTPARALLEL:
++
+
+--- modules/Makefile.in.org	2011-04-11 02:37:07.000000000 +0000
++++ modules/Makefile.in	2020-10-06 19:28:36.270244972 +0000
+@@ -169,3 +169,5 @@
+ 	-/bin/rm -f Makefile
+ 
+ .PHONY: $(MODULES) clean distclean all install
++
++.NOTPARALLEL:

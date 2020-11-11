@@ -1,6 +1,6 @@
 SPK_NAME = sslh
-SPK_VERS = 1.19c
-SPK_REV = 3
+SPK_VERS = 1.21c
+SPK_REV = 5
 SPK_ICON = src/sslh.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,8 +10,9 @@ DESCRIPTION = sslh accepts HTTPS, SSH, OpenVPN, tinc and XMPP connections on the
 DESCRIPTION_FRE = sslh accepte des connexions HTTPS, SSH, OpenVPN, tinc et XMPP sur le même port TCP. Il est ainsi possible de se connecter à l\'un de ces services sur le port 443 \(par exemple depuis derrière un firewall d\'entrepise qui ne bloque en général pas le port 443\) tout en préservant les accès HTTPS sur ce même port.
 RELOAD_UI = no
 DISPLAY_NAME = sslh
+CHANGELOG = "1. Update to version 1.21c<br/>2. Enable libcap support"
 
-HOMEPAGE   = http://www.rutschle.net/tech/sslh/README.html
+HOMEPAGE   = https://www.rutschle.net/tech/sslh/README.html
 LICENSE    = GPLv2
 STARTABLE  = yes
 

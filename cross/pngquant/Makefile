@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/libimagequant
 
-HOMEPAGE = http://pngquant.org/
+HOMEPAGE = https://pngquant.org/
 COMMENT  = pngquant is a command-line utility and a library for lossy compression of PNG images.
 LICENSE  = GPL
 

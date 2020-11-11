@@ -14,7 +14,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = MantisBT
 CHANGELOG = Fix issue where new installs on DSM6 did not work
 
-HOMEPAGE   = http://www.mantisbt.org
+HOMEPAGE   = https://www.mantisbt.org
 LICENSE    = GPL
 
 WIZARDS_DIR = src/wizard/

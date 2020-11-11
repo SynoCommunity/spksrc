@@ -7,18 +7,18 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://selfoss.aditu.de/
-COMMENT  = The new multipurpose rss reader, live stream, mashup, aggregation web application
+HOMEPAGE = https://selfoss.aditu.de/
+COMMENT  = The new multipurpose rss reader, live stream, mashup, aggregation web application.
 LICENSE  = GPLv3
 
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = selfoss_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
+.PHONY: selfoss_install
+selfoss_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/selfoss
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/selfoss

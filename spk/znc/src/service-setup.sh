@@ -5,7 +5,8 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 ZNC="${SYNOPKG_PKGDEST}/bin/znc"
 CERT_FILE="${SYNOPKG_PKGDEST}/var/znc.pem"
-SERVICE_COMMAND="${ZNC} -d ${SYNOPKG_PKGDEST}/var"
+PYTHON3_PATH="/var/packages/python3/target"
+SERVICE_COMMAND="env LD_LIBRARY_PATH=${PYTHON3_PATH}/lib ${ZNC} -d ${SYNOPKG_PKGDEST}/var"
 SVC_BACKGROUND=yes
 
 service_postinst ()

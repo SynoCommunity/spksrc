@@ -2,7 +2,7 @@ PKG_NAME = urw-base35-fonts
 PKG_VERS = 20151005
 PKG_EXT = zip
 PKG_DIST_NAME = urw-base35-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.icm.edu.pl/pub/unix/postscript/ghostscript/fonts
+PKG_DIST_SITE = https://ftp.icm.edu.pl/pub/unix/postscript/ghostscript/fonts
 # download and extract only
 EXTRACT_PATH = $(WORK_DIR)/share/fonts
 
@@ -13,10 +13,9 @@ override ARCH=
 
 HOMEPAGE = https://www.ghostscript.com/doc/current/Fonts.htm
 COMMENT  = Core Font Set containing 35 freely distributable fonts from (URW)++
-LICENSE  = GNU AGPLv3
+LICENSE  = AGPLv3
 
 INSTALL_TARGET = urw-base35-fonts_install
-
 
 include ../../mk/spksrc.install-resources.mk
 

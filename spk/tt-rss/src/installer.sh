@@ -12,11 +12,13 @@ TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
-PHP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /usr/local/bin/php56 || echo -n /usr/bin/php)"
+PHP="${INSTALL_DIR}/bin/virtual-php"
 MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
 MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
+MYSQL_USER_EXISTS=0
+MYSQL_DATABASE_EXISTS=0
 
 
 
@@ -29,12 +31,14 @@ preinst ()
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
-            echo "MySQL user ${MYSQL_USER} already exists"
-            exit 1
+            echo "MySQL user ${MYSQL_USER} already exists and will be re-used"
+            MYSQL_USER_EXISTS=1
+            #exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
-            echo "MySQL database ${MYSQL_DATABASE} already exists"
-            exit 1
+            echo "MySQL database ${MYSQL_DATABASE} already exists and will be re-used"
+            MYSQL_DATABASE_EXISTS=1
+            #exit 1
         fi
     fi
 
@@ -57,15 +61,17 @@ postinst ()
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
-        ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
+        [ ${MYSQL_DATABASE_EXISTS} ] || ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"
+        [ ${MYSQL_USER_EXISTS} ] || ${MYSQL} -u ${MYSQL_USER} -p"${wizard_mysql_password_ttrss}" ${MYSQL_DATABASE} < ${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
-        sed -e "s|define('DB_TYPE', \".*\");|define('DB_TYPE', 'mysql');|" \
-            -e "s|define('DB_USER', \".*\");|define('DB_USER', '${MYSQL_USER}');|" \
-            -e "s|define('DB_NAME', \".*\");|define('DB_NAME', '${MYSQL_DATABASE}');|" \
-            -e "s|define('DB_PASS', \".*\");|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
+        sed -e "s|define('DB_TYPE', '.*');|define('DB_TYPE', 'mysql');|" \
+            -e "s|define('DB_HOST', '.*');|define('DB_HOST', 'localhost');|" \
+            -e "s|define('DB_USER', '.*');|define('DB_USER', '${MYSQL_USER}');|" \
+            -e "s|define('DB_NAME', '.*');|define('DB_NAME', '${MYSQL_DATABASE}');|" \
+            -e "s|define('DB_PASS', '.*');|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
             -e "s|define('SINGLE_USER_MODE', .*);|define('SINGLE_USER_MODE', ${single_user_mode});|" \
             -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
+            -e "s|define('DB_PORT', '.*');|define('DB_PORT', '3306');|" \
             -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
             ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php
     fi

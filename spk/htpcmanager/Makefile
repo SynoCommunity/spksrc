@@ -14,7 +14,7 @@ ADMIN_PORT = 8087
 RELOAD_UI = yes
 DISPLAY_NAME = HTPC-Manager
 
-HOMEPAGE   = http://htpc.io
+HOMEPAGE   = https://htpc.io
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

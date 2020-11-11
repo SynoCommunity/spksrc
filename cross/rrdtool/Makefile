@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-1.x-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/glib cross/pango cross/groff cross/lua
 
-HOMEPAGE = http://www.rrdtool.org
+HOMEPAGE = https://www.rrdtool.org
 COMMENT  = RRDtool 1.x - Round Robin Database
 LICENSE  = GPLv2
 
@@ -21,6 +21,5 @@ ADDITIONAL_CFLAGS = -DENABLE_NLS=0
 
 # let it find glib-mkenums
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
-
 
 include ../../mk/spksrc.cross-cc.mk

@@ -47,11 +47,11 @@
 }, {
     "step_title": "First login",
     "items": [{
-        "desc": "The default password for the web interface is 'deluge'.<br><br>Remote access is disabled by default. To allow clients to remotely connect to the daemon, see <a target=\"blank\" href=\"https://dev.deluge-torrent.org/wiki/UserGuide/ThinClient\">the ThinClient guide of Deluge</a>."
+        "desc": "The default password for the web interface is 'deluge'.<br><br>."
     }]
 }, {
     "step_title": "Attention! DSM6 Permissions",
     "items": [{
-        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
 }]

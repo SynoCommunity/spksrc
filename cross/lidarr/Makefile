@@ -1,7 +1,7 @@
 PKG_NAME = Lidarr
-PKG_VERS = 0.5.0.583
+PKG_VERS = 0.7.1.1381
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux.$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).linux.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Lidarr/Lidarr/releases/download/v$(PKG_VERS)
 PKG_DIR = Lidarr
 
@@ -13,11 +13,10 @@ LICENSE  = GPLv3
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = lidarr_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-myInstall:
+lidarr_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
-

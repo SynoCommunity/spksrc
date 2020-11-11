@@ -1,15 +1,15 @@
 PKG_NAME = boost
 PKG_VERS = 1.63.0
 PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
+PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
-PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
-PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
 
 DEPENDS = cross/bzip2 cross/zlib
 
-HOMEPAGE = http://www.boost.org/
+HOMEPAGE = https://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
-LICENSE  = http://www.boost.org/LICENSE_1_0.txt
+LICENSE  = https://www.boost.org/LICENSE_1_0.txt
 
 CONFIGURE_TARGET = boost_configure
 COMPILE_TARGET = boost_compile
@@ -29,7 +29,6 @@ else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
 # exclude python library if "all" selected
 CONFIGURE_ARGS += --without-libraries=python
 endif
-
 
 # Useful variables for subst
 comma:= ,

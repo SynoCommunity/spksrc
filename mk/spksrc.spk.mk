@@ -84,7 +84,6 @@ $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@echo package=\"$(SPK_NAME)\" > $@
-	@echo thirdparty=\"yes\" >> $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@/bin/echo -n "description=\"" >> $@
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
@@ -104,19 +103,17 @@ endif
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
 
+ifneq ($(strip $(OS_MIN_VER)),)
+	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
+else
+	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
+endif
+ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
-else ifneq ($(strip $(OS_MIN_VER)),)
-	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
-else ifneq ($(strip $(TC_FIRMWARE)),)
-	@echo firmware=\"$(TC_FIRMWARE)\" >> $@
-	@echo os_min_ver=\"$(TC_FIRMWARE)\" >> $@
-else ifneq ($(strip $(TC_OS_MIN_VER)),)
-	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
-	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
 else
-	@echo firmware=\"3.1-1594\" >> $@
-	@echo os_min_ver=\"3.1-1594\" >> $@
+	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
+endif
 endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
@@ -148,7 +145,9 @@ ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 endif
 ifeq ($(STARTABLE),no)
+ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 	@echo startable=\"$(STARTABLE)\" >> $@
+endif
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
@@ -333,85 +332,67 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 ####
 
-all-supported:
-	@$(MSG) Build supported archs
-	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
-	  do \
-	    $(MAKE) latest-arch-$$arch ; \
-	  done \
-	else \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
-	  do \
-	    $(MAKE) latest-arch-$$arch ; \
-	  done \
-	fi
+ifeq (supported,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
+ACTION = supported
+ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS))))))
+else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
+ACTION = latest
+ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS))))))
+endif
 
-publish-all-supported:
-	@$(MSG) Publish supported archs
-	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_DUPES)))))) ; \
-	  do \
-	    $(MAKE) publish-latest-arch-$$arch ; \
-	  done \
-	else \
-	  for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP)))))) ; \
-	  do \
-	    $(MAKE) publish-latest-arch-$$arch ; \
-	  done \
-	fi
+ifeq (publish,$(subst -all-latest,,$(subst -all-supported,,$(firstword $(MAKECMDGOALS)))))
+PUBLISH = publish-
+.NOTPARALLEL:
+endif
 
-all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
-	$(MAKE) all-toolchain-4.3
-	@$(MSG) Built legacy archs
-
-publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
-	$(MAKE) all-toolchain-4.3
-	@$(MSG) Published legacy archs
+KERNEL_REQUIRED = $(MAKE) kernel-required
+ifeq ($(strip $(KERNEL_REQUIRED)),)
+ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP))))))
+endif
 
 ####
 
-all-archs-latest:
-	@$(MSG) Build all archs with latest DSM per FIRMWARE
-	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  $(MSG) Skipping duplicate arches; \
-	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
-	  do \
-	    $(MAKE) latest-arch-$$arch ; \
-	  done \
-	else \
-	  $(MSG) Skipping arches without kernelsupport ; \
-	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
-	  do \
-	    $(MAKE) latest-arch-$$arch ; \
-	  done \
-	fi
+.PHONY: publish-all-$(ACTION) all-$(ACTION) pre-build-native
 
-publish-all-archs-latest:
-	@$(MSG) Publish all archs with latest DSM per FIRMWARE
-	@if $(MAKE) kernel-required >/dev/null 2>&1 ; then \
-	  $(MSG) Skipping duplicate arches; \
-	  for arch in $(sort $(basename $(ARCHS_DUPES))) ; \
-	  do \
-	    $(MAKE) publish-latest-arch-$$arch ; \
-	  done \
-	else \
-	  $(MSG) Skipping arches without kernelsupport ; \
-	  for arch in $(sort $(basename $(ARCHS_NO_KRNLSUPP))) ; \
-	  do \
-	    $(MAKE) publish-latest-arch-$$arch ; \
-	  done \
-	fi
+pre-build-native:
+	@$(MSG) Pre-build native dependencies for parallel build
+	@for depend in `$(MAKE) dependency-list` ; \
+	do \
+	  if [ "$${depend%/*}" = "native" ]; then \
+	    echo "Pre-processing $${depend}" ; \
+	    echo "env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend ; \
+	  fi ; \
+	done
+	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
 
-####
+$(PUBLISH)all-$(ACTION): | pre-build-native
+
+supported-arch-%:
+	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
+	-@MAKEFLAGS= PUBLISH=$(PUBLISH) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+
+publish-supported-arch-%:
+	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS))))))) publish
 
 latest-arch-%:
-	@$(MSG) Building package for arch $* with latest available toolchain
+	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))))
 
 publish-latest-arch-%:
-	@$(MSG) Building package for arch $* with latest available toolchain
+	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS))))))) publish
+
+####
+
+all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
+	$(MAKE) all-toolchain-5.2 all-toolchain-1.1
+	@$(MSG) Built legacy archs
+
+publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
+	$(MAKE) all-toolchain-5.2
+	@$(MSG) Published legacy archs
 
 ####
 

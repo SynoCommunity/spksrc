@@ -17,7 +17,7 @@ DISPLAY_NAME = Z shell
 STARTABLE = no
 CHANGELOG = "Update to 5.8"
 
-HOMEPAGE = http://www.zsh.org
+HOMEPAGE = https://www.zsh.org
 LICENSE = Custom
 
 SPK_COMMANDS = bin/zsh

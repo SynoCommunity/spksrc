@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = 0.114.2
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel cross/bcrypt
@@ -13,7 +13,7 @@ SPK_DEPENDS = "python3>=3.7.7"
 MAINTAINER = ymartin59
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
 DISPLAY_NAME = Home Assistant
-CHANGELOG = "1. Update to 0.87.1<br/>2. Support for DSM 6"
+CHANGELOG = "1. Update to 0.114.2.<br/>2. Update openssl to 1.1."
 RELOAD_UI = yes
 STARTABLE = yes
 

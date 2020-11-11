@@ -16,7 +16,7 @@ STARTABLE = yes
 DISPLAY_NAME = NZBGet Testing
 CHANGELOG = "1) Use generic NZBGet installer, allows for in-app upgrading. 2) Use DSM 5+6 generic service approach for correct permissions."
 
-HOMEPAGE = http://nzbget.net
+HOMEPAGE = https://nzbget.net
 LICENSE  = GPLv2
 
 WIZARDS_DIR = src/wizard/

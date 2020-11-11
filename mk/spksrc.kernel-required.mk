@@ -1,8 +1,8 @@
-#### used as subroutine to test whether any dependency has REQ_KERNEL defined
+#### used as subroutine to test whether any dependency has REQUIRE_KERNEL defined
 
 .PHONY: kernel-required
 kernel-required:
-	@if [ -n "$(REQ_KERNEL)" ]; then \
+	@if [ -n "$(REQUIRE_KERNEL)" ]; then \
 	  exit 1 ; \
 	fi
 	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \

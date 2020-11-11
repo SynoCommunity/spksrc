@@ -1,6 +1,6 @@
 SPK_NAME = deluge
 SPK_VERS = 2.0.3
-SPK_REV = 11
+SPK_REV = 13
 SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
@@ -16,12 +16,13 @@ MAINTAINER = Safihre
 DESCRIPTION = Deluge is a full-featured BitTorrent client for Linux, OS X, Unix and Windows. It uses libtorrent in its backend and features multiple user-interfaces including: GTK+, web and console. It has been designed using the client server model with a daemon process that handles all the bittorrent activity. The Deluge daemon is able to run on headless machines with the user-interfaces being able to connect remotely from any platform. This package is intended for advanced users.
 RELOAD_UI = yes
 STARTABLE = yes
-CHANGELOG = Update to version 2.0.3
+CHANGELOG = "Update openssl to 1.1."
+
 DISPLAY_NAME = Deluge
 
-HOMEPAGE = http://deluge-torrent.org
+HOMEPAGE = https://deluge-torrent.org
 LICENSE  = GPL
-HELPURL  = http://dev.deluge-torrent.org/wiki/UserGuide
+HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
 # Custom start-stop script needed due to double-daemon
 SSS_SCRIPT= src/dsm-control.sh

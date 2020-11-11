@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://sourceware.org/pub/$(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE = http://sourceware.org/libffi/
+HOMEPAGE = https://sourceware.org/libffi/
 COMMENT  = A Portable Foreign Function Interface Library
 LICENSE  = libffi BSD-like
 

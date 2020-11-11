@@ -8,7 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/zlib cross/bzip2 cross/libgcrypt cross/e2fsprogs cross/lzo cross/xz cross/libthreadar
 
 HOMEPAGE = http://dar.linux.free.fr/
-
 COMMENT = dar is a shell command that backs up from a single file to a whole filesystems, taking care of hard links, Extended Attributes, sparse files, etc.
 LICENSE = GPLv3
 

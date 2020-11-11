@@ -8,9 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/boost cross/sqlite cross/curl cross/python3
 
-HOMEPAGE = http://www.domoticz.com/
+HOMEPAGE = https://www.domoticz.com/
 COMMENT  = Domoticz is a Home Automation System.
-LICENSE  = GPL-3.0
+LICENSE  = GPLv3
 
 CONFIGURE_TARGET = domoticz_configure
 INSTALL_TARGET = domoticz_install

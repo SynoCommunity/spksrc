@@ -1,15 +1,18 @@
 PKG_NAME = libwebsockets
-PKG_VERS = 2.4.1
+PKG_VERS = 3.2.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/warmcat/libwebsockets/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl
 
-HOMEPAGE = http://libevent.org/
-COMMENT  = An event notification library
-LICENSE  = http://libevent.org/LICENSE.txt
+# ppc except qoriq
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x 
+
+HOMEPAGE = https://libwebsockets.org/
+COMMENT  = Libwebsockets (LWS) is a flexible, lightweight pure C library for implementing modern network protocols easily with a tiny footprint, using a nonblocking event loop.
+LICENSE  = MIT
 
 include ../../mk/spksrc.cross-cmake.mk

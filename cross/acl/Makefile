@@ -2,7 +2,7 @@ PKG_NAME = acl
 PKG_VERS = 2.2.52
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).src.$(PKG_EXT)
-PKG_DIST_SITE = http://download.savannah.gnu.org/releases/acl
+PKG_DIST_SITE = https://download.savannah.gnu.org/releases/acl
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/attr

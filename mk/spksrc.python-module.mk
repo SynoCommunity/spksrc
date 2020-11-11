@@ -4,7 +4,7 @@
 
 # Python module targets
 ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = nope
+CONFIGURE_TARGET = nop
 endif
 ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = compile_python_module

@@ -13,7 +13,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = Feng Office
 CHANGELOG = "1. DSM 5.0 compatibility"
 
-HOMEPAGE   = http://www.fengoffice.com/
+HOMEPAGE   = https://www.fengoffice.com/
 LICENSE    = AGPL
 
 WIZARDS_DIR = src/wizard/

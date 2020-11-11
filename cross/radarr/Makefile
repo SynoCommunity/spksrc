@@ -1,5 +1,5 @@
 PKG_NAME = Radarr
-PKG_VERS = 0.2.0.1293
+PKG_VERS = 0.2.0.1504
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Radarr/Radarr/releases/download/v$(PKG_VERS)
@@ -13,10 +13,11 @@ LICENSE  = GNU GPL v3
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = radarr_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-myInstall:
+.PHONY: radarr_install
+radarr_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)

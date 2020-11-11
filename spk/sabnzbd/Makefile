@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.0.1
-SPK_REV = 42
+SPK_VERS = 3.1.0
+SPK_REV = 44
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
@@ -18,9 +18,9 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.0.1. Please note that SABnzbd now runs on Python 3. Make sure your post/pre-processing scripts work with Python 3!"
+CHANGELOG = "Update SABnzbd to 3.1.0. Enabled support for nice and ionice on all architectures. Included SabToSyno.py script to add downloaded files automatically to the Synology DLNA server."
 
-HOMEPAGE  = http://sabnzbd.org
+HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
 
 WIZARDS_DIR = src/wizard/
@@ -36,16 +36,14 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-BUSYBOX_CONFIG = nice
-# Add ionice for ARCHs that support it
-ifeq ($(findstring $(ARCH),88f6281 qoriq),$(ARCH))
-BUSYBOX_CONFIG += ionice
-endif
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# Add nice and ionice commands
+ENV += BUSYBOX_CONFIG="nice ionice"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/scripts
+	install -m 755 src/SabToSyno.py $(STAGING_DIR)/var/scripts/SabToSyno.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini

@@ -1,6 +1,6 @@
 SPK_NAME = davfs2
-SPK_VERS = 1.5.5
-SPK_REV = 1
+SPK_VERS = 1.6.0
+SPK_REV = 2
 SPK_ICON = src/davfs2.png
 
 DEPENDS = cross/$(SPK_NAME)

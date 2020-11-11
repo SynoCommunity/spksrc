@@ -7,7 +7,7 @@ bin:bin/psktool
 bin:bin/srptool
 lnk:lib/libgnutls.so
 lnk:lib/libgnutls.so.30
-lib:lib/libgnutls.so.30.24.0
+lib:lib/libgnutls.so.30.28.1
 lnk:lib/libgnutlsxx.so
 lnk:lib/libgnutlsxx.so.28
 lib:lib/libgnutlsxx.so.28.1.0

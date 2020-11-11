@@ -14,7 +14,7 @@ DISPLAY_NAME = Horde
 CHANGELOG = "1. DSM 5.0 compatibility<br>2. Synology Pear dependency"
 BETA = 1
 
-HOMEPAGE   = http://www.horde.org/
+HOMEPAGE   = https://www.horde.org/
 LICENSE    = LGPL
 
 WIZARDS_DIR = src/wizard/

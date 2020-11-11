@@ -16,7 +16,7 @@ DESCRIPTION = Download Station Magnet Handler. Register Download Station as the 
 DISPLAY_NAME = Download Station Magnet
 CHANGELOG = "Initial Version"
 
-HOMEPAGE   = http://github.com/neykov/syno-magnet
+HOMEPAGE   = https://github.com/neykov/syno-magnet
 LICENSE    = Apache 2.0
 
 STARTABLE  = no

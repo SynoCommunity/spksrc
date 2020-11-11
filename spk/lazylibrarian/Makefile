@@ -12,7 +12,7 @@ RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
 CHANGELOG = "Fix DSM 6 service start."
 
-HOMEPAGE   = http://github.com/DobyTang/LazyLibrarian
+HOMEPAGE   = https://lazylibrarian.gitlab.io/
 LICENSE    = GPLv3
 STARTABLE  = yes
 

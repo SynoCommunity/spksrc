@@ -5,6 +5,6 @@ bin:bin/local_thr
 bin:bin/proxy_thr
 bin:bin/remote_lat
 bin:bin/remote_thr
-lib:lib/libzmq.so.5.2.2
-lnk:lib/libzmq.so.5
 lnk:lib/libzmq.so
+lnk:lib/libzmq.so.5
+lib:lib/libzmq.so.5.2.3

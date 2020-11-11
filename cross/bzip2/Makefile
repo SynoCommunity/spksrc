@@ -1,6 +1,6 @@
 PKG_NAME = bzip2
-PKG_VERS = 1.0.6
-PKG_EXT = tar.bz2
+PKG_VERS = 1.0.8
+PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
 PKG_DIST_SITE = http://http.debian.net/debian/pool/main/b/bzip2
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 
 HOMEPAGE = http://bzip.org/
-COMMENT  = High-quality data compressor
+COMMENT  = High-quality data compressor.
 LICENSE  = BSD License
 
 CONFIGURE_TARGET = nop
@@ -33,5 +33,5 @@ bzip2_install:
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzegrep
 	ln -sf bzgrep $(STAGING_INSTALL_PREFIX)/bin/bzfgrep
 	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
-	@$(RUN) cp libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/
-	ln -sf libbz2.so.1.0.6 $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0
+	@$(RUN) cp libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/
+	ln -sf libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0

@@ -1,6 +1,6 @@
 SPK_NAME = mono
 SPK_VERS = 5.20.1.34
-SPK_REV = 13
+SPK_REV = 15
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -11,8 +11,8 @@ DISPLAY_NAME = Mono
 STARTABLE = no
 CHANGELOG = "Update to version 5.20.1.34"
 
-HOMEPAGE = http://mono-project.com
-LICENSE  = http://www.mono-project.com/docs/faq/licensing
+HOMEPAGE = https://mono-project.com
+LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
 SERVICE_SETUP = src/service-setup.sh
 

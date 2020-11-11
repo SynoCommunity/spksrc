@@ -13,7 +13,7 @@ Setup Development Environment
 -----------------------------
 Docker
 ^^^^^^
-* Fork and clone spksrc: ``git clone https://You@github.com/You/spksrc.git ~/spksrc``
+* `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc ~/spksrc``
 * Install Docker on your host OS: `Docker installation`_. A wget-based alternative for linux: `Install Docker with wget`_.
 * Download the spksrc docker container: ``docker pull synocommunity/spksrc``
 * Run the container with ``docker run -it -v ~/spksrc:/spksrc synocommunity/spksrc /bin/bash``
@@ -55,6 +55,7 @@ When not explicitly set, files are placed under a `3 clause BSD license`_
 .. _3 clause BSD license: http://www.opensource.org/licenses/BSD-3-Clause
 .. _bug tracker: https://github.com/SynoCommunity/spksrc/issues
 .. _CONTRIBUTING: https://github.com/SynoCommunity/spksrc/blob/master/CONTRIBUTING.md
+.. _Fork and clone: https://docs.github.com/en/github/getting-started-with-github/fork-a-repo
 .. _Developers HOW TO: https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO
 .. _Docker installation: https://docs.docker.com/engine/installation
 .. _FAQ: https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions

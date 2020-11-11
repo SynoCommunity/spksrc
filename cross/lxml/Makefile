@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/libxslt
 
-HOMEPAGE = http://lxml.de/
-COMMENT  = The lxml XML toolkit is a Pythonic binding for the C libraries libxml2 and libxslt
+HOMEPAGE = https://lxml.de/
+COMMENT  = The lxml XML toolkit is a Pythonic binding for the C libraries libxml2 and libxslt.
 LICENSE  = BSD
 
 BUILD_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config

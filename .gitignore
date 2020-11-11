@@ -6,6 +6,8 @@ kernel/*/work*
 spk/*/work*
 diyspk/*/work*
 toolchains/*/work*
+toolchains/*/*_done
+toolkit/*/work*
 local.mk
 *.DS_Store
 *~

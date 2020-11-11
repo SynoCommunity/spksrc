@@ -15,8 +15,8 @@ RELOAD_UI = yes
 DISPLAY_NAME = Maraschino
 CHANGELOG = "1. Update to latest version<br>2. Enable built-in updater"
 
-HOMEPAGE   = http://www.maraschinoproject.com/
-LICENSE    = GPL
+HOMEPAGE   = https://github.com/mrkipling/maraschino
+LICENSE    = MIT
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

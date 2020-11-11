@@ -1,6 +1,6 @@
 SPK_NAME = wallabag
-SPK_VERS = 2.2.3
-SPK_REV = 2
+SPK_VERS = 2.3.8
+SPK_REV = 3
 SPK_ICON = src/wallabag.png
 DSM_UI_DIR = app
 BETA = 1
@@ -13,16 +13,14 @@ ADMIN_URL = /wallabag/web/
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Wallabag
-CHANGELOG = "Initial release"
+CHANGELOG = "Update to 2.3.8, Update to generic service script"
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT
 
 WIZARDS_DIR = src/wizard/
-
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = no
 
 INSTALL_DEP_SERVICES = apache-web mysql
 START_DEP_SERVICES = apache-web mysql

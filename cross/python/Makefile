@@ -1,11 +1,9 @@
 PKG_NAME = python
-PKG_VERS_MAJOR = 2
-PKG_VERS_MINOR = 7
-PKG_VERS_PATCH = 18
-PKG_VERS = $(PKG_VERS_MAJOR).$(PKG_VERS_MINOR).$(PKG_VERS_PATCH)
+PKG_VERS = 2.7.18
+PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.python.org/ftp/python/$(PKG_VERS)
+PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2
@@ -25,7 +23,7 @@ PRE_CONFIGURE_TARGET = python_pre_configure
 PRE_INSTALL_TARGET = python_pre_install
 POST_INSTALL_TARGET = python_post_install
 
-PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)%'
+PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR_MINOR)%'
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -34,12 +32,12 @@ BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
-HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
-PYTHON_LIB_NATIVE = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
-PYTHON_SITE_PACKAGES_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)/site-packages
-PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux2-$(BUILD_ARCH)-$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
-PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
-PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR)
+HOSTPYTHON_LIB_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR_MINOR)
+PYTHON_LIB_NATIVE = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PKG_VERS_MAJOR_MINOR)
+PYTHON_SITE_PACKAGES_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib/python$(PKG_VERS_MAJOR_MINOR)/site-packages
+PYTHON_LIB_CROSS = $(WORK_DIR)/$(PKG_DIR)/build/lib.linux2-$(BUILD_ARCH)-$(PKG_VERS_MAJOR_MINOR)
+PYTHON_LIB_DIR = lib/python$(PKG_VERS_MAJOR_MINOR)
+PYTHON_INC_DIR = include/python$(PKG_VERS_MAJOR_MINOR)
 
 .PHONY: python_post_patch
 python_post_patch:
@@ -72,7 +70,7 @@ $(WORK_DIR)/python-cc.mk:
 	@echo PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_SITE_PACKAGES_NATIVE=$(PYTHON_SITE_PACKAGES_NATIVE) >> $@
 	@echo PYTHON_INTERPRETER=$(INSTALL_PREFIX)/bin/python >> $@
-	@echo PYTHON_VERSION=$(PKG_VERS_MAJOR).$(PKG_VERS_MINOR) >> $@
+	@echo PYTHON_VERSION=$(PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
 	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@

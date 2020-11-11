@@ -14,7 +14,7 @@ STARTABLE = no
 DISPLAY_NAME = BicBucStriim
 CHANGELOG = Update to 1.3.6
 
-HOMEPAGE   = http://projekte.textmulch.de/bicbucstriim
+HOMEPAGE   = https://projekte.textmulch.de/bicbucstriim
 LICENSE    = MIT
 
 INSTALLER_SCRIPT = src/installer.sh

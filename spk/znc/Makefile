@@ -1,25 +1,26 @@
 SPK_NAME = znc
-SPK_VERS = 1.7.5
-SPK_REV = 13
+SPK_VERS = 1.8.1
+SPK_REV = 15
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/busybox cross/$(SPK_NAME)
+SPK_DEPENDS = "python3>=3.7.7-15"
 
-MAINTAINER = m4tt075
+MAINTAINER = worstje
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
 DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un proxy IRC. ZNC restera connecté en permanence à vos salons de discussions et fera office de passerelle entre vos clients et vos serveurs IRC. Vous pourrez, par exemple, consultez des messages diffusés en votre absence ou masquer votre identité.
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "Update to ZNC 1.7.5"
+CHANGELOG = "Update to ZNC 1.8.1 - now built with libicu+python support."
 
 STARTABLE = yes
-HOMEPAGE = http://wiki.znc.in/
+HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARM5_ARCHES)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 
 WIZARDS_DIR = src/wizard/

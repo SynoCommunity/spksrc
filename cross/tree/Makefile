@@ -14,9 +14,10 @@ LICENSE  = GPLv2
 ADDITIONAL_CFLAGS = -fomit-frame-pointer
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = tree_install_target
+INSTALL_TARGET = tree_install
 
 include ../../mk/spksrc.cross-cc.mk
-.PHONY: tree_install_target
-tree_install_target:
+
+.PHONY: tree_install
+tree_install:
 	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)

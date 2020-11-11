@@ -1,5 +1,5 @@
 PKG_NAME = libzen
-PKG_VERS = 0.4.37
+PKG_VERS = 0.4.38
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaArea/ZenLib/archive/v$(PKG_VERS)

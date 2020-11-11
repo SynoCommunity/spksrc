@@ -2,17 +2,16 @@ PKG_NAME = redis
 PKG_VERS = 5.0.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://download.redis.io/releases
+PKG_DIST_SITE = https://download.redis.io/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://redis.io
+HOMEPAGE = https://redis.io
 COMMENT  = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 LICENSE  = BSD
 
 include ../../mk/spksrc.common.mk
-
 
 GNU_CONFIGURE = 1
 
@@ -23,7 +22,7 @@ else
 CONFIGURE_TARGET = nop
 endif
 
-INSTALL_TARGET = redis_custom_install
+INSTALL_TARGET = redis_install
 
 # use jemalloc for intel arches
 ifeq ($(findstring $(ARCH),$(x64_ARCHES) $(x86_ARCHES)),$(ARCH))
@@ -38,6 +37,6 @@ include ../../mk/spksrc.cross-cc.mk
 redis_patch_makefile_to_use_atomic_library:
 	$(RUN) sed -i 's/^FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $(WORK_DIR)/$(PKG_DIR)/src/Makefile
 
-.PHONY: redis_custom_install
-redis_custom_install:
+.PHONY: redis_install
+redis_install:
 	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)

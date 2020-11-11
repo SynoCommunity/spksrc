@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.1.13
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
@@ -20,7 +20,8 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 RELOAD_UI = no
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = Update to 1.1.13 with borgmatic 1.5.9
+CHANGELOG = "Update openssl to 1.1."
+
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause

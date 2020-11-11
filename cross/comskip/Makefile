@@ -10,7 +10,7 @@ PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 DEPENDS = cross/argtable
 OPTIONAL_DEPENDS = cross/ffmpeg
 
-HOMEPAGE = http://www.kaashoek.com/comskip
+HOMEPAGE = https://www.kaashoek.com/comskip
 COMMENT  = Commercial detector
 LICENSE  = GNU/LGPL
 

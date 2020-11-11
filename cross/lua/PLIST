@@ -1,6 +1,6 @@
 bin:bin/lua
 bin:bin/luac
 lib:lib/liblua.so
-lnk:lib/liblua.so.5.3
-lnk:lib/liblua.so.5.3.4
+lnk:lib/liblua.so.5.4
+lnk:lib/liblua.so.5.4.1
 
