@@ -6,8 +6,11 @@ PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-# arm-cortexa9-linux-gnueabi-g++: internal compiler error: Segmentation fault (program cc1plus)
+# PPC_ARCHES except qoriq
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+
+# error: template instantiation depth exceeds maximum of 900 (requires gcc >= 4.9)
+# see: https://github.com/rakshasa/rtorrent/issues/223
 UNSUPPORTED_ARCHS += hi3535
 
 DEPENDS = cross/ncursesw cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c

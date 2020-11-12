@@ -1,5 +1,5 @@
 bin:bin/funzip
 bin:bin/unzip
 bin:bin/unzipsfx
-bin:bin/zipgrep
+rsc:bin/zipgrep
 bin:bin/zipinfo
