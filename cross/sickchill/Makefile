@@ -1,9 +1,13 @@
 PKG_NAME = SickChill
-PKG_VERS = 2020.09.28-2
+PKG_VERS = 2020.10.22-2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SickChill/SickChill/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+SC_GIT_BRANCH=master
+SC_GIT_COMMIT_HASH=51c493fcbf154c456a86b511f1bc610cca18751c
+SC_GIT_COMMIT_BRANCH=v$(PKG_VERS)
 
 DEPENDS =
 
@@ -21,3 +25,6 @@ include ../../mk/spksrc.cross-cc.mk
 sickchill_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
 	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
+	echo SC_GIT_BRANCH=${SC_GIT_BRANCH} > $(STAGING_INSTALL_PREFIX)/share/git_data
+	echo SC_GIT_COMMIT_HASH=${SC_GIT_COMMIT_HASH} >> $(STAGING_INSTALL_PREFIX)/share/git_data
+	echo SC_GIT_COMMIT_BRANCH=${SC_GIT_COMMIT_BRANCH} >> $(STAGING_INSTALL_PREFIX)/share/git_data

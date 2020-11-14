@@ -1,10 +1,13 @@
 SPK_NAME = sickchill
-SPK_VERS = v2020.09.28-2
+SPK_VERS = v2020.10.22-2
 SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python3>=3.6:git"
+PIP=pip3
+
+WHEELS = src/requirements.txt
 
 MAINTAINER = Nyaran
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
