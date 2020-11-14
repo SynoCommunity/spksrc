@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.urbackup": {
+            "title": "Urbackup",
+            "desc": "Urbackup",
+            "icon": "images/urbackup-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/urbackup",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
