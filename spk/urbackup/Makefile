@@ -1,20 +1,23 @@
 SPK_NAME = urbackup
-SPK_VERS = 2.4.12
+SPK_VERS = 2.4.13
 SPK_REV = 1
 SPK_ICON = src/urbackup.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME) 
+DEPENDS = cross/$(SPK_NAME)
+
+# see cross/cryptopp
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854
 
 MAINTAINER = josef109
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
 ADMIN_URL = /urbackup/
 RELOAD_UI = yes
-DISPLAY_NAME = Urbackup
+DISPLAY_NAME = UrBackup
 CHANGELOG = "Initial package release"
 
 HOMEPAGE = https://www.urbackup.org/
-LICENSE  = GPLv3
+LICENSE  = AGPL-3.0
 
 WIZARDS_DIR = src/wizard/
 
@@ -31,10 +34,4 @@ SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/urbackupsrv run -d -v error -u sc-urba
 
 DEFAULT_BACKUP_FOLDER = $(STAGING_DIR)/var/backup
 
-POST_STRIP_TARGET = urbackup_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: urbackup_extra_install
-urbackup_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
