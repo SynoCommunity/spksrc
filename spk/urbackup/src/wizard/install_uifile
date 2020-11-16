@@ -1,15 +1,19 @@
 [{
-    "step_title": "Urbackup",
+    "step_title": "Basic configuration",
     "items": [{
-	"type": "textfield",
-        "desc": "Urbackup backup location. At this location client backup files are saved",
+	      "type": "textfield",
+        "desc": "Backup folder. Shared folder to save the client backup files. This folder will be created if it does not already exist.",
         "subitems": [{
             "key": "wizard_backup_dir",
-            "desc": "Backup path",
+            "desc": "Backup folder",
             "defaultValue": "/volume1/urbackup",
             "validator": {
-              "allowBlank": false
-             }
-          }]
-     }]
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or 'volumeUSB' and ? is the volume number (1-99)."
+                }
+            }
+        }]
+    }]
 }]
