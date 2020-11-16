@@ -11,9 +11,9 @@ PKG_DIR = $(PKG_NAME)-$(DIST_BASE_NAME)
 # ppc_power9.cpp:104: error: 'NULL' was not declared in this scope
 UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854
 
-HOMEPAGE = 
-COMMENT  = 
-LICENSE  =
+HOMEPAGE = https://cryptopp.com/
+COMMENT  = Crypto++ Library is a free C++ class library of cryptographic schemes.
+LICENSE  = Boost Software License 1.0
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = cryptopp_compile
@@ -38,3 +38,4 @@ cryptopp_compile:
 .PHONY: cryptopp_install
 cryptopp_install:
 	@$(RUN) make -f $(MAKEFILE) HAS_SOLIB_VERSION=1 install-lib DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+	@cd $(STAGING_INSTALL_PREFIX)/lib && ln -sf libcryptopp.so.$(PKG_VERS) libcryptopp.so.$(firstword $(subst ., ,$(PKG_VERS)))

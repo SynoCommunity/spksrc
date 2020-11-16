@@ -4,14 +4,13 @@ SPK_REV = 1
 SPK_ICON = src/urbackup.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/urbackup-server
 
 # see cross/cryptopp
 UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854
 
 MAINTAINER = josef109
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
-ADMIN_URL = /urbackup/
 RELOAD_UI = yes
 DISPLAY_NAME = UrBackup
 CHANGELOG = "Initial package release"
