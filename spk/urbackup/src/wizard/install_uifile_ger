@@ -1,15 +1,19 @@
 [{
-    "step_title": "Urbackup",
+    "step_title": "Grundkonfiguration",
     "items": [{
-	"type": "textfield",
-        "desc": "Urbackup backup Pfad. Hier werden die Dateien der Backupclients gespeichert.",
+	      "type": "textfield",
+        "desc": "Backup Verzeichnis. Hier werden Backup-Dateien der Clients gespeichert. Dieser 'Gemeinsame Ordner' wird bei Bedarf durch die Installation angelegt.",
         "subitems": [{
             "key": "wizard_backup_dir",
-            "desc": "Urbackup Sicherungspfad",
+            "desc": "Sicherungsverzeichnis",
             "defaultValue": "/volume1/urbackup",
             "validator": {
-              "allowBlank": false
-             }
-          }]
-     }]
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Das Verzeichnis muss mit /volumename?/ beginnen, wobei für volumename 'volume' oder 'volumeUSB' verwendet werden muss und ? steht die Nummer des Volumes (1-99)."
+                }
+            }
+        }]
+    }]
 }]
