@@ -1,5 +1,5 @@
 PKG_NAME = postgresql
-PKG_VERS = 11.6
+PKG_VERS = 11.10
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)/
@@ -14,7 +14,8 @@ LICENSE  = PostgreSQL Licence
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --with-template=linux --with-openssl --with-system-tzdata=/usr/share/zoneinfo
+CONFIGURE_ARGS = --with-template=linux --with-openssl
+CONFIGURE_ARGS += --with-system-tzdata=/usr/share/zoneinfo
 
 # If you want to invoke the build from another makefile rather than manually,
 # you must unset MAKELEVEL or set it to zero.
@@ -22,5 +23,3 @@ CONFIGURE_ARGS = --with-template=linux --with-openssl --with-system-tzdata=/usr/
 ENV += MAKELEVEL=
 
 include ../../mk/spksrc.cross-cc.mk
-
-
