@@ -176,6 +176,10 @@ service_postinst ()
     # Ensure that the apache user has full rights on the web directory
     set_syno_permissions "${WEB_DIR}/${PACKAGE}" "${APACHE_USER}"
 
+    # Ensure that the app directory (which contains DSM Web integration resources) 
+    # are accessible in read and execute mode to everyone
+    grant_basic_permissions "${INSTALL_DIR}/app" "everyone:\*"
+
     grant_basic_permissions "${INSTALL_DIR}/bin" "user:${APACHE_USER}"
     grant_basic_permissions "${INSTALL_DIR}/lib" "user:${APACHE_USER}"
     grant_basic_permissions "${INSTALL_DIR}/env" "user:${APACHE_USER}"
