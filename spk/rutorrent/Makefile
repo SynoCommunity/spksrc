@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS += hi3535
 DEPENDS  = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 DEPENDS  += cross/sox
 
-MAINTAINER = moneytoo
+MAINTAINER = smaarn
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
