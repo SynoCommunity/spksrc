@@ -24,7 +24,6 @@ CHANGELOG += 3. Update to libtorrent 0.13.8<br/>
 CHANGELOG += 4. Update to xmlrpc-c 1.51.06<br/>
 CHANGELOG += 5. Update openssl to 1.1<br/>
 CHANGELOG += 6. Embed missing binary requirements<br/>"
-BETA = 1
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
