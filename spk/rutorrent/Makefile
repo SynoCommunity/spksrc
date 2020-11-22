@@ -30,12 +30,10 @@ LICENSE    = GPLv3
 
 SERVICE_USER = auto
 
-SPK_USER = rutorrent
-
 SERVICE_SETUP    = src/service-setup.sh
 SERVICE_WIZARD_SHARE=wizard_download_dir
 
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_COMMAND  = /usr/local/$(SPK_NAME)/bin/$(SPK_NAME)-daemon
 FWPORTS          = src/${SPK_NAME}.sc
 CONF_DIR         = src/conf/
 WIZARDS_DIR      = src/wizard/
@@ -48,13 +46,15 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = rutorrent_extra_install
 
-BUSYBOX_CONFIG = usrmng daemon nice procutils
+BUSYBOX_CONFIG = usrmng nice procutils
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 src/bin/rutorrent-daemon $(STAGING_DIR)/bin/rutorrent-daemon
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session

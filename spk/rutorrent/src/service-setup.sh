@@ -20,6 +20,11 @@ LEGACY_GROUP="users"
 PYTHON_DIR="/usr/local/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
+SVC_BACKGROUND=y
+PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
+LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
+SVC_WRITE_PID=y
+
 # Sets recursive read / execute permissions for ${KEY} on specified directory
 # Usage: grant_basic_permissions "${SHARE_FOLDER}" "user:<user>"
 # Usage: grant_basic_permissions "${SHARE_FOLDER}" "group:<group>"
