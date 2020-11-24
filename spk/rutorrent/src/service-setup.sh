@@ -25,52 +25,6 @@ PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
 LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
 SVC_WRITE_PID=y
 
-# Sets recursive read / execute permissions for ${KEY} on specified directory
-# Usage: grant_basic_permissions "${SHARE_FOLDER}" "user:<user>"
-# Usage: grant_basic_permissions "${SHARE_FOLDER}" "group:<group>"
-grant_basic_permissions ()
-{
-    DIRNAME=`realpath "${1}"`
-    KEY="${2}"
-
-    VOLUME=$(echo "${DIRNAME}" | awk -F/ '{print "/"$2}')
-
-    # Ensure directory resides in /volumeX before setting GROUP permissions
-    if [ "`echo ${VOLUME} | cut -c2-7`" = "volume" ]; then
-        # Set read & execute permissions for KEY for folder and subfolders
-        if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"${KEY}:allow:r.x...a.R....:fd..\"`" ]; then
-            # First Unix permissions, but only if it's in Linux mode
-            if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
-                set_unix_permissions "${DIRNAME}"
-                # If it is linux mode (due to old package) we need to add "administrators"-group,
-                # otherwise the folder is not accessible from File Station anymore!
-                synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc:fd" >> ${INST_LOG} 2>&1
-            fi
-
-            # Then fix the Synology permissions
-            echo "Granting '${KEY}' basic permissions on ${DIRNAME}" >> ${INST_LOG}
-            synoacltool -add "${DIRNAME}" "${KEY}:allow:rxaR:fd" >> ${INST_LOG} 2>&1
-            find "${DIRNAME}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \; >> ${INST_LOG} 2>&1
-        fi
-
-        # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
-        while [ "${DIRNAME}" != "${VOLUME}" ]; do
-            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"${KEY}:allow:r.x...a.R\"`" ]; then
-                # Here we also need to make sure the admin can access data via File Station
-                if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
-                    synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" >> ${INST_LOG} 2>&1
-                fi
-                # Add the new group permissions
-                echo "Granting '${KEY}' basic permissions on ${DIRNAME}" >> ${INST_LOG}
-                synoacltool -add "${DIRNAME}" "${KEY}:allow:rxaR:n" >> ${INST_LOG} 2>&1
-            fi
-            DIRNAME="$(dirname "${DIRNAME}")"
-        done
-    else
-        echo "Skip granting '${KEY}' basic permissions on ${DIRNAME} as the directory does not reside in '/volumeX'. Set manually if needed." >> ${INST_LOG}
-    fi
-}
-
 service_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -171,25 +125,6 @@ service_postinst ()
         # Install the cloudscraper wheels
         ${INSTALL_DIR}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
     fi
-
-    # Ensure that the rutorrent group still owns the installation directory
-    set_syno_permissions "${INSTALL_DIR}" "rutorrent"
-
-    # Ensure that the web user has read access to var/.session directory
-    grant_basic_permissions "${INSTALL_DIR}/var/.session" "user:${APACHE_USER}"
-
-    # Ensure that the apache user has full rights on the web directory
-    set_syno_permissions "${WEB_DIR}/${PACKAGE}" "${APACHE_USER}"
-
-    # Ensure that the app directory (which contains DSM Web integration resources) 
-    # are accessible in read and execute mode to everyone
-    grant_basic_permissions "${INSTALL_DIR}/app" "everyone:\*"
-
-    grant_basic_permissions "${INSTALL_DIR}/bin" "user:${APACHE_USER}"
-    grant_basic_permissions "${INSTALL_DIR}/lib" "user:${APACHE_USER}"
-    grant_basic_permissions "${INSTALL_DIR}/env" "user:${APACHE_USER}"
-    grant_basic_permissions "${WEB_DIR}/${PACKAGE}" "user:${EFF_USER}"
-    grant_basic_permissions "${WEB_DIR}/${PACKAGE}/php/test.sh" "user:${EFF_USER}"
 
     fix_shared_folders_rights "${INSTALL_DIR}/tmp"
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
