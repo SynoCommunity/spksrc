@@ -10,6 +10,6 @@ DEPENDS =
 
 HOMEPAGE = https://cython.org
 COMMENT  = Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex).
-LICENSE  = ASL2
+LICENSE  = Apache-2.0
 
 include ../../mk/spksrc.python-module.mk
