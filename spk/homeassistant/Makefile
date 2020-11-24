@@ -15,6 +15,8 @@ DEPENDS = cross/nmap
 DEPENDS += cross/gmp cross/mpfr cross/mpc
 # for mobile_app
 DEPENDS += cross/PyNaCl
+# for iqvia
+DEPENDS += cross/numpy
 
 WHEELS = src/requirements.txt
 
