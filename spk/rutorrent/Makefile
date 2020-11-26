@@ -18,7 +18,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = 9. Update rutorrent to 3.10<br/>
+CHANGELOG = "9. Update rutorrent to 3.10<br/>"
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
