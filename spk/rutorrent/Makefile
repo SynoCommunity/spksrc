@@ -18,22 +18,17 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Update rutorrent to 3.10<br/>
-CHANGELOG += 2. Update to rtorrent 0.9.8<br/>
-CHANGELOG += 3. Update to libtorrent 0.13.8<br/>
-CHANGELOG += 4. Update to xmlrpc-c 1.51.06<br/>
-CHANGELOG += 5. Update openssl to 1.1<br/>
-CHANGELOG += 6. Embed missing binary requirements<br/>"
+CHANGELOG = 9. Update rutorrent to 3.10<br/>
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
 
 SERVICE_USER = auto
 
-SERVICE_SETUP    = src/service-setup.sh
-SERVICE_WIZARD_SHARE=wizard_download_dir
+SERVICE_SETUP        = src/service-setup.sh
+SERVICE_WIZARD_SHARE = wizard_download_dir
 
-SERVICE_COMMAND  = /usr/local/$(SPK_NAME)/bin/$(SPK_NAME)-daemon
+SERVICE_COMMAND  = /var/packages/${SPK_NAME}/target/bin/$(SPK_NAME)-daemon
 FWPORTS          = src/${SPK_NAME}.sc
 CONF_DIR         = src/conf/
 WIZARDS_DIR      = src/wizard/
@@ -41,8 +36,6 @@ WIZARDS_DIR      = src/wizard/
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
 INSTUNINST_RESTART_SERVICES = apache-web
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = rutorrent_extra_install
 

@@ -6,9 +6,8 @@ DNAME="ruTorrent"
 PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
 WEB_DIR="/var/services/web"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
+PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PATH}"
 APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
@@ -21,8 +20,8 @@ PYTHON_DIR="/usr/local/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
 SVC_BACKGROUND=y
-PID_FILE="${INSTALL_DIR}/var/rtorrent.pid"
-LOG_FILE="${INSTALL_DIR}/var/rtorrent.log"
+PID_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.pid"
+LOG_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.log"
 SVC_WRITE_PID=y
 
 service_preinst ()
@@ -38,7 +37,7 @@ service_preinst ()
         fi
     fi
 
-    exit 0
+    return 0
 }
 
 fix_shared_folders_rights()
@@ -58,12 +57,12 @@ service_postinst ()
 {
 
     # Install busybox stuff
-    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+    ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
 
     syno_user_add_to_legacy_group "${EFF_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
 
     # Install the web interface
-    cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR} >>"${INST_LOG}" 2>&1
+    cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR} >>"${INST_LOG}" 2>&1
 
     # Configure open_basedir
     if [ "${APACHE_USER}" == "nobody" ]; then
@@ -81,13 +80,13 @@ service_postinst ()
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
-               -e "s|tempDirectory = null;|tempDirectory = '${INSTALL_DIR}/tmp/';|g" \
-               -e "s|\"python\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"python\"\1=>\2'${INSTALL_DIR}/env/bin/python3'\3,\4|g" \
-               -e "s|\"pgrep\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"pgrep\"\1=>\2'${INSTALL_DIR}/bin/pgrep'\3,\4|g" \
-               -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${INSTALL_DIR}/bin/sox'\3,\4|g" \
-               -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${INSTALL_DIR}/bin/mediainfo'\3,\4|g" \
+               -e "s|tempDirectory = null;|tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|g" \
+               -e "s|\"python\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"python\"\1=>\2'${SYNOPKG_PKGDEST}/env/bin/python3'\3,\4|g" \
+               -e "s|\"pgrep\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"pgrep\"\1=>\2'${SYNOPKG_PKGDEST}/bin/pgrep'\3,\4|g" \
+               -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${SYNOPKG_PKGDEST}/bin/sox'\3,\4|g" \
+               -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${SYNOPKG_PKGDEST}/bin/mediainfo'\3,\4|g" \
                -e "s|\"stat\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"stat\"\1=>\2'/bin/stat'\3,\4|g" \
-               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${INSTALL_DIR}/bin/curl'\3,\4|g" \
+               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${SYNOPKG_PKGDEST}/bin/curl'\3,\4|g" \
                -e "s|\"id\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"id\"\1=>\2'/bin/id'\3,\4|g" \
                -e "s|\"gzip\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"gzip\"\1=>\2'/bin/gzip'\3,\4|g" \
                -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
@@ -96,12 +95,12 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
-               ${INSTALL_DIR}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+               ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
 
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${INSTALL_DIR}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
         else
-            sed -i -e "/@watch_dir@/d" ${INSTALL_DIR}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+            sed -i -e "/@watch_dir@/d" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
         fi
 
         if [ "${wizard_disable_openbasedir}" == "true" ] && [ "${APACHE_USER}" == "http" ]; then
@@ -123,20 +122,15 @@ service_postinst ()
     #If python3 is available setup a virtual environment with cloudscraper
     if [ -f "${PYTHON_DIR}/bin/python3" ]; then
         # Create a Python virtualenv
-        ${VIRTUALENV} --system-site-packages ${INSTALL_DIR}/env >> "${INST_LOG}" 2>&1
+        ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> "${INST_LOG}" 2>&1
         # Install the cloudscraper wheels
-        ${INSTALL_DIR}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
+        ${SYNOPKG_PKGDEST}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
     fi
 
-    fix_shared_folders_rights "${INSTALL_DIR}/tmp"
+    fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
 
-    exit 0
-}
-
-service_preuninst ()
-{
-    exit 0
+    return 0
 }
 
 service_postuninst ()
@@ -145,14 +139,14 @@ service_postuninst ()
     log_step "Removing web interface"
     rm -fr "${WEB_DIR}/${PACKAGE}" >>"${INST_LOG}" 2>&1
 
-    exit 0
+    return 0
 }
 
 service_save ()
 {
     # Revision 8 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
-        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${INSTALL_DIR}/var/.rtorrent.rc
+        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc
     fi
 
     # Save the configuration file
@@ -161,10 +155,10 @@ service_save ()
         mv "${WEB_DIR}/${PACKAGE}/.htaccess" "${TMP_DIR}/" >>"${INST_LOG}" 2>&1
     fi
     cp -pr ${WEB_DIR}/${PACKAGE}/share/ ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
-    mv ${INSTALL_DIR}/var/.rtorrent.rc ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
-    mv ${INSTALL_DIR}/var/.session ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+    mv ${SYNOPKG_PKGDEST}/var/.session ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
 
-    exit 0
+    return 0
 }
 
 is_not_defined_external_program()
@@ -196,22 +190,22 @@ service_restore ()
     # In previous versions the python entry had nothing defined, 
     # here we define it if, and only if, python3 is actually installed
     if [ -f "${PYTHON_DIR}/bin/python3" ] && `is_not_defined_external_program 'python'`; then
-        define_external_program 'python' "${INSTALL_DIR}/env/bin/python3" '/usr/bin/python3'
+        define_external_program 'python' "${SYNOPKG_PKGDEST}/env/bin/python3" '/usr/bin/python3'
     fi
 
     # In previous versions the pgrep entry had nothing defined
     if `is_not_defined_external_program 'pgrep'`; then
-        define_external_program 'pgrep' "${INSTALL_DIR}/bin/pgrep" '/usr/bin/pgrep'
+        define_external_program 'pgrep' "${SYNOPKG_PKGDEST}/bin/pgrep" '/usr/bin/pgrep'
     fi
 
     # In previous versions the sox entry had nothing defined
     if `is_not_defined_external_program 'sox'`; then
-        define_external_program 'sox' "${INSTALL_DIR}/bin/sox" '/usr/bin/sox'
+        define_external_program 'sox' "${SYNOPKG_PKGDEST}/bin/sox" '/usr/bin/sox'
     fi
 
     # In previous versions the mediainfo entry had nothing defined
     if `is_not_defined_external_program 'mediainfo'`; then
-        define_external_program 'mediainfo' "${INSTALL_DIR}/bin/mediainfo" '/usr/bin/mediainfo'
+        define_external_program 'mediainfo' "${SYNOPKG_PKGDEST}/bin/mediainfo" '/usr/bin/mediainfo'
     fi
 
     # In previous versions the stat entry had nothing defined
@@ -228,7 +222,7 @@ service_restore ()
     fi
 
     if `is_not_defined_external_program 'curl'`; then
-        define_external_program 'curl' "${INSTALL_DIR}/bin/curl" '/usr/bin/curl'
+        define_external_program 'curl' "${SYNOPKG_PKGDEST}/bin/curl" '/usr/bin/curl'
     fi
 
     if `is_not_defined_external_program 'php'`; then
@@ -240,17 +234,17 @@ service_restore ()
     cp -pr ${TMP_DIR}/share/*/ ${WEB_DIR}/${PACKAGE}/share/ >>"${INST_LOG}" 2>&1
     set_syno_permissions "${WEB_DIR}/${PACKAGE}/share/" "${APACHE_USER}"
 
-    mv ${TMP_DIR}/.rtorrent.rc ${INSTALL_DIR}/var/ >>"${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/.rtorrent.rc ${SYNOPKG_PKGDEST}/var/ >>"${INST_LOG}" 2>&1
     
-    if [ ! `grep 'http_cacert = ' "${INSTALL_DIR}/var/.rtorrent.rc" | wc -l` -eq 0 ]; then
+    if [ ! `grep 'http_cacert = ' "${SYNOPKG_PKGDEST}/var/.rtorrent.rc" | wc -l` -eq 0 ]; then
         # http_cacert command has been moved to network.http.cacert
-        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${INSTALL_DIR}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
     fi
 
-    mv ${TMP_DIR}/.session ${INSTALL_DIR}/var/ >>"${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >>"${INST_LOG}" 2>&1
 
     # Restore appropriate rights on the var directory
-    set_unix_permissions "${INSTALL_DIR}/var/"
+    set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
 
-    exit 0
+    return 0
 }
