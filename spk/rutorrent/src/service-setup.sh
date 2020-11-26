@@ -45,10 +45,12 @@ fix_shared_folders_rights()
 {
     local folder=$1
     echo "Fixing shared folder rights for ${folder}" >> "${INST_LOG}"
-    chown -R "${APACHE_USER}:${USER}" "${folder}" >> "${INST_LOG}" 2>&1
-    chmod ug+rwx "${folder}" >> "${INST_LOG}" 2>&1
-    synoacltool -add "${folder}" "user:${EFF_USER}:allow:rwxpdDaARWcC:fd" >> "${INST_LOG}" 2>&1
-    synoacltool -add "${folder}" "user:${APACHE_USER}:allow:rwxpdDaARWcC:fd" >> "${INST_LOG}" 2>&1
+    chown -R "${EFF_USER}:${APACHE_USER}" "${folder}" >> "${INST_LOG}" 2>&1
+    synoacltool -add "${folder}" "everyone::allow:r-x----------:fd--" >> "${INST_LOG}" 2>&1
+    synoacltool -add "${folder}" "user:${EFF_USER}:allow:rwxpdDaARWc--:fd" >> "${INST_LOG}" 2>&1
+    synoacltool -add "${folder}" "group:${USER}:allow:rwxpdDaARWc--:fd" >> "${INST_LOG}" 2>&1
+    synoacltool -add "${folder}" "user:${APACHE_USER}:allow:rwxp-D------:fd" >> "${INST_LOG}" 2>&1
+    synoacltool -add "${folder}" "group:${APACHE_USER}:allow:rwxp-D------:fd--" >> "${INST_LOG}" 2>&1
     find "${folder}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \; >> ${INST_LOG} 2>&1
 }
 
