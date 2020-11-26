@@ -3,7 +3,7 @@
 # Package
 PACKAGE="rutorrent"
 
-INSTALL_DIR="/var/packages/${SPK_NAME}/target/"
+INSTALL_DIR="/var/packages/${SPK_NAME}/target"
 
 export HOME=${INSTALL_DIR}/var
 export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
