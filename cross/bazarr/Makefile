@@ -20,8 +20,7 @@ LICENSE = GPLv3
 
 include ../../mk/spksrc.python-module.mk
 
-$(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME):
-	mkdir -p $@
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $@
-
-bazarr_custom_install: $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
+.PHONY: bazarr_custom_install
+bazarr_custom_install: 
+	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
+	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
