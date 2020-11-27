@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE_NAME=bazarr
+PACKAGE=bazarr
 
 INSTALL_DIR="/var/packages/${PACKAGE}/target"
 FFMPEG_DIR="/usr/local/ffmpeg"
