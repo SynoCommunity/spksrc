@@ -12,24 +12,29 @@ COMMENT  = Zsh is a shell designed for interactive use, although it is also a po
 LICENSE  = Custom
 
 GNU_CONFIGURE = 1
+PRE_COMPILE_TARGET = zsh_pre_compile
 
-ifdef ZSH_STATIC_MODULES
-$(info Building zsh with statically linked modules.)
-POST_CONFIGURE_TARGET = link-zsh-modules
+ifeq ($(ZSH_STATIC_MODULES),true)
+	BUILD_MSG = "Building zsh with statically linked modules."
+	POST_CONFIGURE_TARGET = link-zsh-modules
 else
-$(info Building zsh with dynamically linked modules.)
+	BUILD_MSG = "Building zsh with dynamically linked modules."
 endif
 
 INSTALL_TARGET = zsh_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: zsh_install
-zsh_install:
-	umask 022; $(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-
 .PHONY: link-zsh-modules
 link-zsh-modules:
 	@$(RUN) sed -i 's/link=no/link=static/' config.modules
 	# gdbm is not available, so don't try to compile it.
 	@$(RUN) sed -i 's|\(name=zsh/db/gdbm.*\)link=static|\1link=no|' config.modules
+
+.PHONY: zsh_pre_compile
+zsh_pre_compile:
+	@$(MSG) $(BUILD_MSG)
+
+.PHONY: zsh_install
+zsh_install:
+	umask 022; $(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
