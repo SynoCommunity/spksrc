@@ -7,6 +7,7 @@ SPK_DEPENDS = "python3>=3.7.7"
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/poetry
+OPTIONAL_DEPENDS += cross/numpy
 
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography
 # for python-libnmap
@@ -15,8 +16,15 @@ DEPENDS = cross/nmap
 DEPENDS += cross/gmp cross/mpfr cross/mpc
 # for mobile_app
 DEPENDS += cross/PyNaCl
+
+
+include ../../mk/spksrc.common.mk
+
+# unable to compile numpy 1.19.1 for x64 archs
+ifneq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 # for iqvia
 DEPENDS += cross/numpy
+endif
 
 WHEELS = src/requirements.txt
 
