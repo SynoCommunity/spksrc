@@ -1,6 +1,6 @@
 SPK_NAME = minio
-SPK_VERS = 2020-09-26T03-44-56Z
-SPK_REV = 7
+SPK_VERS = 2020-11-25T22-36-25Z
+SPK_REV = 8
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
 RELOAD_UI = yes
 DISPLAY_NAME = MinIO
-CHANGELOG = "Multiple minor bugfix releases."
+CHANGELOG = "Major release, multiple feature and bugfix releases."
 HOMEPAGE = https://min.io/
 LICENSE = Apache License 2.0
 STARTABLE = yes
