@@ -9,7 +9,7 @@ SPK_RADARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/Radarr/Radarr.exe"
 # Radarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGDEST}/var"
 CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
-PID_FILE="${CONFIG_DIR}/Radarr/nzbdrone.pid"
+PID_FILE="${CONFIG_DIR}/Radarr/radarr.pid"
 
 # Some have it stored in the root of package
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
