@@ -64,6 +64,7 @@ isodate==0.6.0
 httpx==0.16.1
 h11==0.11.0
 zeep[async]==4.0.0
+pyrfc3339==1.1
 
 
 ### Dependencies for components below
