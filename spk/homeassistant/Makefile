@@ -12,8 +12,6 @@ OPTIONAL_DEPENDS += cross/numpy
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography
 # for python-libnmap
 DEPENDS = cross/nmap
-# for gmpy2
-DEPENDS += cross/gmp cross/mpfr cross/mpc
 # for mobile_app
 DEPENDS += cross/PyNaCl
 
@@ -31,13 +29,13 @@ WHEELS = src/requirements.txt
 MAINTAINER = ymartin59
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
 DISPLAY_NAME = Home Assistant
-CHANGELOG = "1. Update to 0.114.2.<br/>2. Update openssl to 1.1.<br/>"
-CHANGELOG += "3. Added missing core requirements<br/>"
-CHANGELOG += "4. Added media_player.dlna_dmr requirements<br/>"
-CHANGELOG += "5. Added device_tracker.upc_connect requirements<br/>"
-CHANGELOG += "6. Added accuweather requirements<br/>"
-CHANGELOG += "7. Added songpal requirements<br/>"
-CHANGELOG += "8. Added syncthru requirements<br/>"
+CHANGELOG = "1. Update Home Assistant to v0.114.2.<br/>2. Update openssl to 1.1.<br/>"
+CHANGELOG += "3. Include all dependencies for core and cloud module.<br/>"
+CHANGELOG += "4. Add media_player.dlna_dmr integration<br/>"
+CHANGELOG += "5. Add device_tracker.upc_connect integration<br/>"
+CHANGELOG += "6. Add accuweather integration<br/>"
+CHANGELOG += "7. Add songpal integration<br/>"
+CHANGELOG += "8. Add syncthru integration<br/>"
 RELOAD_UI = yes
 STARTABLE = yes
 

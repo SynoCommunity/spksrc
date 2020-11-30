@@ -1,6 +1,6 @@
 [{
-    "step_title": "HomeAssistant FAQ for configuration",
+    "step_title": "HomeAssistant configuration FAQ",
     "items": [{
-        "desc": "This native Python 3 package may not provide components required by addons you may be interested in. Please refer to <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-HomeAssistant\">dedicated FAQ</a> for HA configuration."
+        "desc": "This package includes the dependencies for the core stuff and most of the default components. But it does not contain all the components required by addons you may be interested in. Please refer to <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-HomeAssistant\">dedicated FAQ</a> for further configuration."
     }]
 }]
