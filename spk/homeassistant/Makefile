@@ -28,7 +28,7 @@ WHEELS = src/requirements.txt
 
 MAINTAINER = ymartin59
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
-DISPLAY_NAME = Home Assistant
+DISPLAY_NAME = Home Assistant Core
 CHANGELOG = "1. Update Home Assistant to v0.114.2.<br/>2. Update openssl to 1.1.<br/>"
 CHANGELOG += "3. Include all dependencies for core and cloud module.<br/>"
 CHANGELOG += "4. Include all supported default integrations.<br/>"
