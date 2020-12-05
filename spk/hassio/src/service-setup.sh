@@ -76,6 +76,9 @@ service_postupgrade() {
         mkdir -p /usr/local/${SYNOPKG_PKGNAME}/etc 
         mv /tmp/hassio.json ${CFG_FILE}
     fi
+    if [ ! -f "${HASSIO_DATA}/jobs.json" ]; then
+        echo '{"ignore_conditions": ["healthy"]}' > "${HASSIO_DATA}/jobs.json"
+    fi
 
     # Move config.json from data dir if there is no homeassistant container.
     HASSIO_DATA="$(jq --raw-output '.data // "/usr/share/hassio"' ${CFG_FILE})"
