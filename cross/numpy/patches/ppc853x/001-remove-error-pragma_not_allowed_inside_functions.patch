@@ -1,0 +1,22 @@
+# Suppress error for ppc compiler "#pragma GCC diagnostic not allowed inside functions"
+# 
+--- numpy/core/src/multiarray/einsum.c.src.orig	2020-07-20 20:33:00.000000000 +0000
++++ numpy/core/src/multiarray/einsum.c.src	2020-11-23 20:32:27.175290941 +0000
+@@ -2153,9 +2153,6 @@
+         /* A repeated label, find the original one and merge them. */
+         else {
+ #ifdef __GNUC__
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wuninitialized"
+-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+ #endif
+             int i = icombinemap[idim + label];
+ 
+@@ -2170,7 +2167,6 @@
+             }
+             new_strides[i] += stride;
+ #ifdef __GNUC__
+-#pragma GCC diagnostic pop
+ #endif
+         }
+     }

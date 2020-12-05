@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = https://bitbucket.org/ruamel/yaml
+HOMEPAGE = https://github.com/pycontribs/ruyaml
 COMMENT  = YAML 1.2 loader/dumper package for python
 LICENSE  = MIT
 
