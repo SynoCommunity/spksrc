@@ -23,5 +23,3 @@ ifneq ($(strip $(CROSSENV)),)
 		&& build-pip install "$(PKG_NAME)==$(PKG_VERS)" \
 		&& pip install "$(PKG_NAME)==$(PKG_VERS)"
 endif
-
-

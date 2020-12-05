@@ -9,7 +9,7 @@ BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/poetry
 OPTIONAL_DEPENDS += cross/numpy
 
-DEPENDS += cross/cffi cross/libyaml cross/bcrypt cross/cryptography
+DEPENDS += cross/libyaml cross/bcrypt cross/cryptography
 # for python-libnmap
 DEPENDS = cross/nmap
 # for mobile_app
