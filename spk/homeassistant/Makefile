@@ -9,7 +9,7 @@ BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/poetry
 OPTIONAL_DEPENDS += cross/numpy
 
-DEPENDS += cross/libyaml cross/bcrypt cross/cryptography
+DEPENDS += cross/cffi cross/libyaml cross/bcrypt cross/cryptography
 # for python-libnmap
 DEPENDS = cross/nmap
 # for mobile_app
@@ -31,11 +31,7 @@ DESCRIPTION = Home Assistant is an open-source home automation platform running 
 DISPLAY_NAME = Home Assistant
 CHANGELOG = "1. Update Home Assistant to v0.114.2.<br/>2. Update openssl to 1.1.<br/>"
 CHANGELOG += "3. Include all dependencies for core and cloud module.<br/>"
-CHANGELOG += "4. Add media_player.dlna_dmr integration<br/>"
-CHANGELOG += "5. Add device_tracker.upc_connect integration<br/>"
-CHANGELOG += "6. Add accuweather integration<br/>"
-CHANGELOG += "7. Add songpal integration<br/>"
-CHANGELOG += "8. Add syncthru integration<br/>"
+CHANGELOG += "4. Include all supported default integrations.<br/>"
 RELOAD_UI = yes
 STARTABLE = yes
 

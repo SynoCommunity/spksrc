@@ -1,0 +1,20 @@
+# Suppress error for ppc compiler "#pragma GCC diagnostic not allowed inside functions"
+# 
+--- c/_cffi_backend.c.orig	2020-11-24 14:08:38.000000000 +0000
++++ c/_cffi_backend.c	2020-12-05 08:04:28.269755146 +0000
+@@ -6341,15 +6341,12 @@
+ #  pragma clang diagnostic push
+ #  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+ # elif defined(__GNUC__)
+-#  pragma GCC diagnostic push
+-#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ # endif
+         status = ffi_prep_closure(closure, &cif_descr->cif,
+                                   invoke_callback, infotuple);
+ # if defined(__clang__)
+ #  pragma clang diagnostic pop
+ # elif defined(__GNUC__)
+-#  pragma GCC diagnostic pop
+ # endif
+ #endif
+     }
