@@ -12,6 +12,6 @@ COMMENT  = Automatically restart SSH sessions and tunnels.
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = ac_cv_func_realloc_0_nonnull=yes ac_cv_func_malloc_0_nonnull=yes
-CONFIGURE_ARGS += ac_cv_path_ssh=$(STAGING_INSTALL_PREFIX)/bin
+CONFIGURE_ARGS += ac_cv_path_ssh=$(INSTALL_PREFIX)/bin
 
 include ../../mk/spksrc.cross-cc.mk
