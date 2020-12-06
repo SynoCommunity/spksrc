@@ -28,4 +28,4 @@ openssh_install:
 
 .PHONY: openssh_post_install
 openssh_post_install:
-	ln -sf $(STAGING_INSTALL_PREFIX)/bin/ssh $(STAGING_INSTALL_PREFIX)/bin/slogin
+	cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ssh slogin
