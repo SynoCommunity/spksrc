@@ -319,6 +319,21 @@ endif
 clean:
 	rm -fr work work-*
 
+spkclean:
+	rm -fr work-*/.copy_done \
+	       work-*/.depend_done \
+	       work-*/.icon_done \
+	       work-*/.strip_done \
+	       work-*/.wheel_done \
+	       work-*/conf \
+	       work-*/scripts \
+	       work-*/staging \
+	       work-*/package.tgz \
+	       work-*/INFO \
+	       work-*/PLIST \
+	       work-*/PACKAGE_ICON* \
+	       work-*/WIZARD_UIFILES
+
 all: package
 
 ### For make dependency-tree
