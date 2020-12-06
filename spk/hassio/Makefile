@@ -1,6 +1,6 @@
 SPK_NAME = hassio
-SPK_VERS = 20200910
-SPK_REV = 2
+SPK_VERS = 20201206
+SPK_REV = 3
 SPK_ICON = src/$(SPK_NAME).png
 SPK_DEPENDS = "Docker>=18.09.0-0506"
 DSM_UI_DIR = app
@@ -10,7 +10,7 @@ REQUIRED_DSM = 6.2
 DEPENDS =
 
 MAINTAINER = fredrike+hassio@gmail.com
-DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the hass.io folder."
+DESCRIPTION = "Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Note: identified USB devices will be added to the file usb_devices.txt located in the hass.io folder. This is an unsupported installation method and is not maintained by the core developers group. For support please see this forum thread: https://community.home-assistant.io/t/hass-io-on-synology-dsm-native-package/"
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Hass.io
