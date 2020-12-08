@@ -4,7 +4,7 @@ aniso8601==1.2.0
 APScheduler==3.3.1
 babelfish==0.5.5
 beautifulsoup4==4.5.3
-cheroot==5.1.0
+cheroot==6.3.2
 CherryPy==10.0.0
 click==6.7
 colorclass==2.2.0
