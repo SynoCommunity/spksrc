@@ -37,13 +37,13 @@ pyparsing==2.4.7
 pyrss2gen==1.1
 python-dateutil==2.6.1
 pytz==2017.2
-pyyaml==5.1.2
+pyyaml==5.2
 rebulk==2.0.0
 requests==2.24.0
 rpyc==4.0.1
 six==1.13.0
 soupsieve==1.9.5
-sqlalchemy==1.3.11
+sqlalchemy==1.3.19
 tempora==1.8
 terminaltables==3.1.0
 transmissionrpc==0.11
