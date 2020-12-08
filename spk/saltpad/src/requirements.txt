@@ -1,9 +1,9 @@
-Flask==0.10.1
+Flask==0.12.3
 Flask-WTF==0.11
 itsdangerous==0.24
-Jinja2==2.7.3
+Jinja2==2.10.1
 requests==2.20
-Werkzeug==0.10.4
+Werkzeug==0.11.6
 WTForms==2.0.2
 
 urllib3>=1.25.9 # not directly required, pinned by Snyk to avoid a vulnerability
