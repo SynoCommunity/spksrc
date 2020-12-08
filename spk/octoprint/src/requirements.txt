@@ -3,7 +3,7 @@ awesome-slugify==1.6.5
 Babel==2.0
 backports.ssl-match-hostname==3.4.0.2
 blinker==1.4
-certifi==2015.9.6.2
+certifi==2017.04.17.2
 Flask==0.10.1
 Flask-Assets==0.10
 Flask-Babel==0.9
@@ -33,3 +33,5 @@ unidecode==0.04.19
 watchdog==0.8.3
 webassets==0.11.1
 Werkzeug==0.11.6
+
+urllib3>=1.25.9 # not directly required, pinned by Snyk to avoid a vulnerability
