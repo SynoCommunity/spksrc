@@ -1,0 +1,6 @@
+[{
+    "step_title": "FlexGet Documentation",
+    "items": [{
+        "desc": "Your need to configure FlexGet after fresh install. Please refer to <a target=\"_blank\" href=\"https://flexget.com/Configuration\">documentation</a> for FlexGet configuration."
+    }]
+}]

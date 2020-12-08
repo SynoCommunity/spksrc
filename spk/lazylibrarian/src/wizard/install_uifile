@@ -1,0 +1,27 @@
+[{
+    "step_title": "Choose your fork",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configure the fork to use",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "Fork URL",
+            "defaultValue": "git://github.com/DobyTang/LazyLibrarian.git",
+            "validator": {
+                "allowBlank": false
+            }
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Fork branch",
+            "defaultValue": "master",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}, {
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings.<br>Please read <a <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }]
+}]

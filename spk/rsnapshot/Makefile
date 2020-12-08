@@ -1,24 +1,25 @@
 SPK_NAME = rsnapshot
 SPK_VERS = 1.4.2
-SPK_REV = 1
-SPK_ICON = src/rdiff-backup.png
+SPK_REV = 2
+SPK_ICON = src/rsnapshot.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "Perl"
 
-MAINTAINER = Peeter123
-DESCRIPTION = Rsnapshot is a filesystem snapshot utility. It can take incremental snapshots of local and remote filesystems. 
+MAINTAINER = ymartin59
+DESCRIPTION = Rsnapshot is a filesystem snapshot utility. It can take incremental snapshots of local and remote filesystems.
 STARTABLE = no
 DISPLAY_NAME = rsnapshot
 CHANGELOG = "Initial release"
-BETA = 1
 
-HOMEPAGE = http://rsnapshot.org/
-LICENSE  = GNU-GPL
+HOMEPAGE = https://rsnapshot.org
+LICENSE  = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Pure Perl package, make sure ARCH is not defined
+override ARCH=
+
+SPK_COMMANDS = bin/rsnapshot bin/rsnapshot-diff
 
 include ../../mk/spksrc.spk.mk

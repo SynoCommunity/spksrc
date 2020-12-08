@@ -9,12 +9,16 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="octoprint"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 OCTOPRINT="${INSTALL_DIR}/share/OctoPrint/run"
 PID_FILE="${INSTALL_DIR}/var/octoprint.pid"
 LOG_FILE="${INSTALL_DIR}/var/.octoprint/logs/octoprint.log"
 PORT="8088"
+
+SC_USER="sc-octoprint"
+LEGACY_USER="octoprint"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()
@@ -27,7 +31,7 @@ start_daemon ()
     test -e /dev/ttyACM0 || mknod /dev/ttyACM0 c 166 0
     chmod 777 /dev/ttyACM0
 
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${OCTOPRINT} --daemon start --port=${PORT} --pid ${PID_FILE}"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${OCTOPRINT} --daemon start --port=${PORT} --pid ${PID_FILE}"
 }
 
 stop_daemon ()

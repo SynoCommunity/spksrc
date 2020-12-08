@@ -1,42 +1,43 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 2.1.0
-SPK_REV = 29
+SPK_VERS = 3.1.0
+SPK_REV = 44
 SPK_ICON = src/sabnzbd.png
-DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/unzip cross/$(SPK_NAME)
+BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
+SPK_DEPENDS = "python3>=3.7.7-12"
+
+# To generate full requirements.txt, extend SABnzbd's own
+# requirements.txt with the depedencies of cherrypy and cheroot
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.9-12"
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
-DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\\\'avez qu\\\'a ajouter un .nzb, SABnzbd s\\\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
+DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\'avez qu\'a ajouter un .nzb, SABnzbd s\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
-ADMIN_PORT = 8080
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
-CHANGELOG = "Updated to 2.1.0. Includes par2cmdline version 0.7.2 with multicore support."
+STARTABLE = yes
+CHANGELOG = "Update SABnzbd to 3.1.0. Enabled support for nice and ionice on all architectures. Included SabToSyno.py script to add downloaded files automatically to the Synology DLNA server."
 
-HOMEPAGE   = http://sabnzbd.org
-LICENSE    = GPL
+HOMEPAGE  = https://sabnzbd.org
+LICENSE   = GPL
 
 WIZARDS_DIR = src/wizard/
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+SERVICE_USER = auto
+SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8080
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-BUSYBOX_CONFIG  = nice
-# Add ionice for ARCHs that support it
-ifeq ($(findstring $(ARCH),88f6281 qoriq),$(ARCH))
-BUSYBOX_CONFIG += ionice
-endif
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# Add nice and ionice commands
+ENV += BUSYBOX_CONFIG="nice ionice"
 
 include ../../mk/spksrc.spk.mk
 
@@ -44,7 +45,5 @@ include ../../mk/spksrc.spk.mk
 sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
-	install -m 755 src/CharTranslator.py $(STAGING_DIR)/var/scripts/CharTranslator.py
+	install -m 755 src/SabToSyno.py $(STAGING_DIR)/var/scripts/SabToSyno.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config

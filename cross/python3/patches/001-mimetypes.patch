@@ -1,6 +1,13 @@
+
+DSM does not have the default mime-type files available,
+need to bring our own for the module to work.
+
+Equivalent of cross/python/patches/004-mimetypes.patch
+Added by Diaoul 2013-03-24_23:25:49+0100
+
 --- Lib/mimetypes.py.orig	2011-10-16 21:07:51.000000000 +0200
 +++ Lib/mimetypes.py	2011-10-16 21:07:58.000000000 +0200
-@@ -38,15 +38,7 @@
+@@ -40,15 +40,7 @@
  ]
  
  knownfiles = [

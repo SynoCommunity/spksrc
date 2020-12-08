@@ -1,0 +1,123 @@
+name: Build
+
+on:
+  pull_request:
+    paths:
+    - 'spk/**'
+    - 'cross/**'
+    - 'native/**'
+  push:
+    tags:
+      - "*-*"
+    branches:
+      - "**"
+    paths:
+    - 'spk/**'
+    - 'cross/**'
+    - 'native/**'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # x64=x86_64, evansport=x86, aarch64=armv8, armv7, 88f6281=armv5, ppc853x/qoriq=ppc
+        # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
+        arch: [noarch, x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
+
+    steps:
+      - name: Cache toolchains
+        uses: actions/cache@v1
+        with:
+          path: toolchains
+          key: toolchains-${{ matrix.arch }}-v2
+          restore-keys: toolchains-${{ matrix.arch }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+            persist-credentials: false
+
+      - name: Get changed files for pull request
+        if: github.event_name == 'pull_request'
+        id: getfile_pr
+        run: |
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
+          echo "::set-output name=files::$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)"
+
+      - name: Get changed files for push
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') == false
+        id: getfile
+        run: |
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
+          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+
+      - name: Build Package (file changes)
+        if: startsWith(github.ref, 'refs/tags/') == false
+        # We don't want to stop the build on errors. 
+        # Errors are reported in "Build Status"
+        continue-on-error: true
+        uses: docker://synocommunity/spksrc:latest
+        with:
+          entrypoint: ./.github/actions/build.sh
+        env:
+          GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
+          # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
+          GH_ARCH: ${{ matrix.arch }}
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      - name: Build Package (Tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        # We don't want to stop the build on errors. 
+        # Errors are reported in "Build Status"
+        continue-on-error: true
+        uses: docker://synocommunity/spksrc:latest
+        with:
+          entrypoint: ./.github/actions/build-tag.sh
+        env:
+          # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
+          GH_ARCH: ${{ matrix.arch }}
+          #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      - name: Build Status
+        id: build_status
+        # We need this status since we don't want to stop the build on errors.
+        # Here we fail on build errors found in the build error file.
+        uses: docker://synocommunity/spksrc:latest
+        with:
+          entrypoint: ./.github/actions/build_status.sh
+        env:
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: packages/*.spk
+
+  release:
+    needs: build
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'packages/*.spk'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

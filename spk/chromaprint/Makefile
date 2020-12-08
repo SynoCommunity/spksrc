@@ -1,23 +1,41 @@
 SPK_NAME = chromaprint
-SPK_VERS = 1.3.1
-SPK_REV = 3
+SPK_VERS = 1.5.0
+SPK_REV = 13
 SPK_ICON = src/chromaprint.png
 
-DEPENDS  = cross/lame cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
 STARTABLE = no
 
-MAINTAINER = cytec
-DESCRIPTION = "Chromaprint is the core component of the AcoustID project. It's a client-side library that implements a custom algorithm for extracting fingerprints from any audio source. "
+MAINTAINER = ymartin59
+DESCRIPTION = Chromaprint is the core component of the AcoustID project. It\'s a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
 DISPLAY_NAME = Chromaprint
-CHANGELOG = "update to 1.3.1"
+CHANGELOG = "1. Update to ffmpeg 4.3.1"
 
-HOMEPAGE   = http://acoustid.org/chromaprint
+HOMEPAGE   = https://acoustid.org/chromaprint
 LICENSE    = LGPL2.1+
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+include ../../mk/spksrc.common.mk
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Reuse FFmpeg libraries
+export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+
+ifneq ($(wildcard $(FFMPEG_DIR)),)
+PRE_DEPEND_TARGET = chromaprint_pre_depend
+SPK_DEPENDS = "ffmpeg>4.2"
+endif
+
+SPK_COMMANDS = bin/fpcalc
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: chromaprint_pre_depend
+
+# From library detection at cmake/modules/FindFFmpeg.cmake
+FFMPEG_LIBS = libavcodec.pc
+FFMPEG_LIBS += libavformat.pc
+FFMPEG_LIBS += libavutil.pc
+
+chromaprint_pre_depend:
+	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
+	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)

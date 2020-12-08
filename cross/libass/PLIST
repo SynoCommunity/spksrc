@@ -1,3 +1,3 @@
 lnk:lib/libass.so
-lnk:lib/libass.so.5
-lib:lib/libass.so.5.3.0
+lnk:lib/libass.so.9
+lib:lib/libass.so.9.0.2

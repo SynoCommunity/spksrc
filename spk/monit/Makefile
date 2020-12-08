@@ -1,21 +1,22 @@
 SPK_NAME = monit
-SPK_VERS = 5.17.1
-SPK_REV = 8
+SPK_VERS = 5.27.1
+SPK_REV = 9
 SPK_ICON = src/monit.png
-DSM_UI_DIR = app
-CHANGELOG = Update monit to 5.17.1
-ADMIN_PORT = 2812
-BETA = 1
 
 DEPENDS =  cross/$(SPK_NAME)
+
+DSM_UI_DIR = app
+CHANGELOG = Update monit to 5.27.1
+ADMIN_PORT = 2812
+BETA = 1
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
 RELOAD_UI = yes
 DISPLAY_NAME = Monit
 
-HOMEPAGE = http://mmonit.com/monit
-LICENSE  = AGPL
+HOMEPAGE = https://mmonit.com/monit
+LICENSE  = AGPLv3
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

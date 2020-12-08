@@ -1,4 +1,4 @@
-bin:bin/npth-config
+rsc:bin/npth-config
 lnk:lib/libnpth.so
 lnk:lib/libnpth.so.0
-lib:lib/libnpth.so.0.0.5
+lib:lib/libnpth.so.0.1.2

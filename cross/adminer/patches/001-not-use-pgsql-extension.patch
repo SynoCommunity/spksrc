@@ -1,15 +1,15 @@
 # See https://github.com/SynoCommunity/spksrc/issues/2662
 # Remove the extension pgsql because the extension pgsql does not work with the PostgreSQL server from DSM. The Extension pdo_pgsql works perfectly.
---- adminer/drivers/pgsql.inc.php.old	2015-11-29 14:59:46.433067414 +0100
-+++ adminer/drivers/pgsql.inc.php	2015-11-29 14:59:52.581069610 +0100
-@@ -4,128 +4,7 @@
+--- adminer/drivers/pgsql.inc.php.org	2020-01-31 10:23:04.000000000 +0000
++++ adminer/drivers/pgsql.inc.php	2020-02-23 16:59:43.482304615 +0000
+@@ -4,146 +4,8 @@
  if (isset($_GET["pgsql"])) {
  	$possible_drivers = array("PgSQL", "PDO_PgSQL");
  	define("DRIVER", "pgsql");
 -	if (extension_loaded("pgsql")) {
 -		class Min_DB {
--			var $extension = "PgSQL", $_link, $_result, $_string, $_database = true, $server_info, $affected_rows, $error;
--
+-			var $extension = "PgSQL", $_link, $_result, $_string, $_database = true, $server_info, $affected_rows, $error, $timeout;
+ 
 -			function _error($errno, $error) {
 -				if (ini_bool("html_errors")) {
 -					$error = html_entity_decode(strip_tags($error));
@@ -39,7 +39,15 @@
 -			}
 -
 -			function quote($string) {
--				return "'" . pg_escape_string($this->_link, $string) . "'"; //! bytea
+-				return "'" . pg_escape_string($this->_link, $string) . "'";
+-			}
+-
+-			function value($val, $field) {
+-				return ($field["type"] == "bytea" ? pg_unescape_bytea($val) : $val);
+-			}
+-
+-			function quoteBinary($string) {
+-				return "'" . pg_escape_bytea($this->_link, $string) . "'";
 -			}
 -
 -			function select_db($database) {
@@ -63,12 +71,18 @@
 -				$this->error = "";
 -				if (!$result) {
 -					$this->error = pg_last_error($this->_link);
--					return false;
+-					$return = false;
 -				} elseif (!pg_num_fields($result)) {
 -					$this->affected_rows = pg_affected_rows($result);
--					return true;
+-					$return = true;
+-				} else {
+-					$return = new Min_Result($result);
 -				}
--				return new Min_Result($result);
+-				if ($this->timeout) {
+-					$this->timeout = 0;
+-					$this->query("RESET statement_timeout");
+-				}
+-				return $return;
 -			}
 -
 -			function multi_query($query) {
@@ -90,6 +104,10 @@
 -					return false;
 -				}
 -				return pg_fetch_result($result->_result, 0, $field);
+-			}
+-
+-			function warnings() {
+-				return h(pg_last_notice($this->_link)); // second parameter is available since PHP 7.1.0
 -			}
 -		}
 -
@@ -130,5 +148,5 @@
 -	} elseif (extension_loaded("pdo_pgsql")) {
 +	if (extension_loaded("pdo_pgsql")) {
  		class Min_DB extends Min_PDO {
- 			var $extension = "PDO_PgSQL";
+ 			var $extension = "PDO_PgSQL", $timeout;
  

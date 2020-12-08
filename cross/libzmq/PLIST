@@ -1,0 +1,10 @@
+bin:bin/inproc_lat
+bin:bin/inproc_thr
+bin:bin/local_lat
+bin:bin/local_thr
+bin:bin/proxy_thr
+bin:bin/remote_lat
+bin:bin/remote_thr
+lnk:lib/libzmq.so
+lnk:lib/libzmq.so.5
+lib:lib/libzmq.so.5.2.3

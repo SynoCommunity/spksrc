@@ -6,6 +6,7 @@ lib:lib/slang/v2/modules/csv-module.so
 lib:lib/slang/v2/modules/fcntl-module.so
 lib:lib/slang/v2/modules/fork-module.so
 lib:lib/slang/v2/modules/iconv-module.so
+lib:lib/slang/v2/modules/pcre-module.so
 lib:lib/slang/v2/modules/rand-module.so
 lib:lib/slang/v2/modules/select-module.so
 lib:lib/slang/v2/modules/slsmg-module.so
@@ -14,4 +15,4 @@ lib:lib/slang/v2/modules/sysconf-module.so
 lib:lib/slang/v2/modules/termios-module.so
 lib:lib/slang/v2/modules/varray-module.so
 lib:lib/slang/v2/modules/zlib-module.so
-shr:share/slsh
+rsc:share/slsh

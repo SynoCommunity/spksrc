@@ -13,11 +13,12 @@ RELOAD_UI = yes
 DISPLAY_NAME = Memcached
 CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
 
-HOMEPAGE = http://memcached.org/
+HOMEPAGE = https://memcached.org/
 LICENSE  =
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+CONF_DIR         = src/conf/
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web

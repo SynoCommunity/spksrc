@@ -1,9 +1,17 @@
 /*
- * Copyright (C) 2004-2014  See the AUTHORS file for details.
+ * Copyright (C) 2015 J-P Nurmi
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <znc/Modules.h>
@@ -14,11 +22,15 @@
 #include <znc/Query.h>
 #include <znc/Chan.h>
 #include <znc/znc.h>
+#include <znc/version.h>
 #include <sys/time.h>
 #include <cfloat>
 
+#if (VERSION_MAJOR < 1) || (VERSION_MAJOR == 1 && VERSION_MINOR < 6)
+#error The playback module requires ZNC version 1.6.0 or later.
+#endif
+
 static const char* PlaybackCap = "znc.in/playback";
-static const char* EchoMessageCap = "znc.in/echo-message";
 
 class CPlaybackMod : public CModule
 {
@@ -36,12 +48,11 @@ public:
     void OnClientCapLs(CClient* client, SCString& caps) override
     {
         caps.insert(PlaybackCap);
-        caps.insert(EchoMessageCap);
     }
 
     bool IsClientCapSupported(CClient* client, const CString& cap, bool state) override
     {
-        return cap.Equals(PlaybackCap) || cap.Equals(EchoMessageCap);
+        return cap.Equals(PlaybackCap);
     }
 
     EModRet OnChanBufferStarting(CChan& chan, CClient& client) override
@@ -178,37 +189,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnUserMsg(CString& target, CString& message) override
-    {
-        return EchoMessage("PRIVMSG " + target + " :" + message);
-    }
-
-    EModRet OnUserNotice(CString& target, CString& message) override
-    {
-        return EchoMessage("NOTICE " + target + " :" + message);
-    }
-
-    EModRet OnUserAction(CString& target, CString& message) override
-    {
-        return EchoMessage("PRIVMSG " + target + " :\001ACTION " + message + "\001");
-    }
-
 private:
-    EModRet EchoMessage(CString message)
-    {
-        CClient* client = GetClient();
-        if (client && client->IsCapEnabled(EchoMessageCap)) {
-            message.insert(0, ":" + client->GetNickMask() + " ");
-            if (client->HasServerTime()) {
-                MCString tags = CUtils::GetMessageTags(message);
-                tags["time"] = CUtils::FormatServerTime(LocalTime());
-                CUtils::SetMessageTags(message, tags);
-            }
-            client->PutClient(message);
-        }
-        return CONTINUE;
-    }
-
     static double Timestamp(timeval tv)
     {
         return tv.tv_sec + tv.tv_usec / 1000000.0;
@@ -305,4 +286,3 @@ private:
 };
 
 GLOBALMODULEDEFS(CPlaybackMod, "An advanced playback module for ZNC")
-

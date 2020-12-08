@@ -1,0 +1,104 @@
+#!/bin/sh
+
+# Default display name
+DNAME="${SYNOPKG_PKGNAME}"
+
+# Source package specific variable and functions
+SVC_SETUP=`dirname $0`"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
+
+start_daemon ()
+{
+    if [ -z "${SVC_QUIET}" ]; then
+        if [ -z "${SVC_KEEP_LOG}" ]; then
+            date > ${LOG_FILE}
+        else
+            date >> ${LOG_FILE}
+        fi
+    fi
+    call_func "service_prestart"
+    if [ -z "${SVC_QUIET}" ]; then
+        echo "Starting ${DNAME} command ${SERVICE_EXE} ${SERVICE_OPTIONS} " >> ${LOG_FILE}
+    fi
+    if [ -n "${SERVICE_EXE}" ]; then
+        if [ -n "${SERVICE_OPTIONS}" ]; then
+            start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}" -- ${SERVICE_OPTIONS}
+        else
+            start-stop-daemon -o -S -b -p ${PID_FILE} -m -c ${EFF_USER} -k 002 -x "${SERVICE_EXE}"
+        fi
+    fi
+}
+
+stop_daemon ()
+{
+    start-stop-daemon -o -K -u ${EFF_USER} -x "${SERVICE_EXE}"
+    wait_for_status 1 20 || start-stop-daemon -K -s 9 -q -x "${SERVICE_EXE}"
+    call_func "service_poststop"
+}
+
+daemon_status ()
+{
+    start-stop-daemon -K -q -t -u ${EFF_USER} -x "${SERVICE_EXE}"
+    [ $? -eq 0 ] || return 1
+}
+
+wait_for_status ()
+{
+    counter=$2
+    while [ ${counter} -gt 0 ]; do
+        daemon_status
+        [ $? -eq $1 ] && return
+        let counter=counter-1
+        sleep 1
+    done
+    return 1
+}
+
+
+case $1 in
+    start)
+        if daemon_status; then
+            echo "${DNAME} is already running"
+            exit 0
+        else
+            echo "Starting ${DNAME} ..."
+            start_daemon
+            exit $?
+        fi
+        ;;
+    stop)
+        if daemon_status; then
+            echo "Stopping ${DNAME} ..."
+            stop_daemon
+            exit $?
+        else
+            echo "${DNAME} is not running"
+            exit 0
+        fi
+        ;;
+    status)
+        if daemon_status; then
+            echo "${DNAME} is running"
+            exit 0
+        else
+            echo "${DNAME} is not running"
+            exit 3
+        fi
+        ;;
+    log)
+        if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
+            # Shorten long logs to last 100 lines
+            TEMP_LOG_FILE="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_temp.log"
+            # Clear any previous log
+            echo "Full log: ${LOG_FILE}" > "${TEMP_LOG_FILE}"
+            tail -n100 "${LOG_FILE}" >> "${TEMP_LOG_FILE}"
+            echo "${TEMP_LOG_FILE}"
+        fi
+        exit 0
+        ;;
+    *)
+        exit 1
+        ;;
+esac

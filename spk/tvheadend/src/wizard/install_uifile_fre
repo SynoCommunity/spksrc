@@ -1,0 +1,16 @@
+[{
+    "step_title": "Configuration du mot de passe administrateur",
+    "items": [{
+        "type": "password",
+        "desc": "Mot de passe administrateur. Par défaut, admin",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Mot de passe"
+        }]
+    }]
+}, {
+    "step_title": "Attention! Permissions DSM",
+    "items": [{
+        "desc": "Les permissions sont gérées par le groupe <b>'sc-media'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>En particulier:<br>- Visionneuse de permission des Privilèges d'Applications<br>- Choix de l'utisateur du dossier root FTP<br>- Les actions de File Stations<br>- Changement de propriétaire<br>- Gestionnaire de liens partagés -> Activer le partage sécurisé<br><br>Les seules exceptions sont:<br>- Panneau de configuration > Dossier partagé > Modifier > Permissions > Utilisateur du système interne<br>- Éditeur de permissions.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+    }]
+}]

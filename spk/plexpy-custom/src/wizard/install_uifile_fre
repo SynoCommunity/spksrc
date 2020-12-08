@@ -1,0 +1,22 @@
+[{
+    "step_title": "Indiquez la variante de PlexPy",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configurez la variante à déployer",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "Adresse du dépôt Git",
+            "defaultValue": "git://github.com/Tautulli/Tautulli.git",
+            "validator": {
+                "allowBlank": false
+            }
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Branche de la variante",
+            "defaultValue": "master",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}]

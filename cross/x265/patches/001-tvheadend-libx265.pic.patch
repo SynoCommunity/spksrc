@@ -1,0 +1,15 @@
+--- ./CMakeLists.txt.orig	2019-01-11 08:52:11.894748017 +0100
++++ ./CMakeLists.txt	2019-01-11 08:53:56.490216603 +0100
+@@ -116,11 +116,7 @@
+     endif()
+ endif(UNIX)
+ 
+-if(X64 AND NOT WIN32)
+-    option(ENABLE_PIC "Enable Position Independent Code" ON)
+-else()
+-    option(ENABLE_PIC "Enable Position Independent Code" OFF)
+-endif(X64 AND NOT WIN32)
++option(ENABLE_PIC "Enable Position Independent Code" ON)
+ 
+ # Compiler detection
+ if(CMAKE_GENERATOR STREQUAL "Xcode")

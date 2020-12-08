@@ -1,61 +1,28 @@
 PKG_NAME = syncthing
-PKG_VERS = 0.14.30
+PKG_VERS = 1.7.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)
 
 DEPENDS = native/go
 
-HOMEPAGE = http://www.syncthing.net/
+HOMEPAGE = https://www.syncthing.net/
 COMMENT  = Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how ...
 LICENSE  = MPL-2.0
 
-CONFIGURE_TARGET = nope
-COMPILE_TARGET = myComp
-INSTALL_TARGET = myInstall
+COMPILE_TARGET = syncthing_compile
 
-GOOS = linux
-CGO_ENABLED=0
+GO_SRC_DIR = $(EXTRACT_PATH)/$(PKG_NAME)
+GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
-# set this to 1 to create static linked binaries
-STATIC_BINARIES = 0
+include ../../mk/spksrc.cross-go.mk
 
-# Define SYNCTHING_ARCH as per Syncthing standards
-ifeq ($(findstring $(ARCH),88f5281 88f6281 alpine armada370 armada375 armada38x armadaxp comcerto2k monaco),$(ARCH))
-SYNCTHING_ARCH = arm
-ENV += GOARM=5
-endif
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-SYNCTHING_ARCH = 386
-endif
-ifeq ($(findstring $(ARCH),avoton braswell bromolow cedarview x86 x64),$(ARCH))
-SYNCTHING_ARCH = amd64
-endif
-ifeq ($(SYNCTHING_ARCH),)
-$(error Unsupported ARCH $(ARCH))
-endif
+BUILD_ARGS = -goos=$(GOOS) -goarch=$(GO_ARCH) -version=v$(PKG_VERS)
 
-SYNCTHING_DIR = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)
-EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
-SYNCTHING_BIN = $(WORK_DIR)/src/github.com/$(PKG_NAME)/$(PKG_NAME)/syncthing
+# use custom build to remove GOARCH from ENV and for custom BUILD_ARGS
+syncthing_compile:
+	cd $(GO_SRC_DIR) && env $(filter-out GOARCH=%, $(ENV)) go run build.go $(BUILD_ARGS) build
 
-include ../../mk/spksrc.cross-cc.mk
-
-# use workdir as gopath
-ENV += GOPATH=$(WORK_DIR)
-ENV += CGO_ENABLED=$(CGO_ENABLED)
-ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
-
-CONF_ARGS = -goos=$(GOOS) -goarch=$(SYNCTHING_ARCH) -version=v$(PKG_VERS)
-
-ifeq ($(strip $(STATIC_BINARIES)),1)
-CONF_ARGS += -no-upgrade
-endif
-
-myComp:
-	cd $(SYNCTHING_DIR) && env $(ENV) go run build.go $(CONF_ARGS) build
-
-myInstall:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(SYNCTHING_BIN) $(STAGING_INSTALL_PREFIX)/bin/

@@ -3,7 +3,7 @@ bin:bin/c-icap-client
 bin:bin/c-icap-config
 bin:bin/c-icap-libicapapi-config
 bin:bin/c-icap-stretch
-etc:etc/c-icap.magic
+rsc:etc/c-icap.magic
 lib:lib/c_icap/dnsbl_tables.so
 lib:lib/c_icap/srv_echo.so
 lib:lib/c_icap/srv_ex206.so

@@ -1,30 +1,31 @@
 SPK_NAME = sickbeard-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 8
 SPK_ICON = src/sickbeard-custom.png
-DSM_UI_DIR = app
 
-DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = Diaoul
 DESCRIPTION = SickBeard Custom allows you to run the fork of your choice of SickBeard. You will be asked for the fork\'s git URL during install.
-DESCRIPTION_FRE = SickBeard Custom vous permet d\\\'exécuter le fork de votre choix de SickBeard. Vous aurez besoin de saisir l\\\'URL git du fork durant l\\\'installation.
-ADMIN_PORT = 8083
+DESCRIPTION_FRE = SickBeard Custom vous permet d\'exécuter la variante de votre choix de SickBeard. Vous aurez besoin de saisir l\'URL git de la variante à l\'installation.
 RELOAD_UI = yes
+STARTABLE = yes
 DISPLAY_NAME = SickBeard Custom
-CHANGELOG = "Maintenance release"
+CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 
-HOMEPAGE   = http://sickbeard.com
+HOMEPAGE   = https://sickbeard.com
 LICENSE    = GPL
+HELPURL    = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SickBeard-custom
+
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8083
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
-
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 COPY_TARGET = nop
 POST_STRIP_TARGET = sickbeard-custom_extra_install
@@ -38,5 +39,3 @@ include ../../mk/spksrc.spk.mk
 sickbeard-custom_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config

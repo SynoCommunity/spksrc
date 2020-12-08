@@ -1,0 +1,6 @@
+[{
+    "step_title": "FlexGet Documentation",
+    "items": [{
+        "desc": "Warning: your configuration may require changes after update. Please refer to <a target=\"_blank\" href=\"https://flexget.com/Configuration\">documentation</a> for FlexGet configuration."
+    }]
+}]

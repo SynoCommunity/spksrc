@@ -1,0 +1,23 @@
+# remove doc from makefile
+# cross compiled makedoc is not executable on host system
+
+--- Makefile.in.org	2020-01-12 21:08:53.000000000 +0000
++++ Makefile.in	2020-02-11 21:02:01.550316103 +0000
+@@ -326,7 +326,7 @@
+ ETAGS = etags
+ CTAGS = ctags
+ CSCOPE = cscope
+-DIST_SUBDIRS = m4 po intl doc contrib imap autocrypt
++DIST_SUBDIRS = m4 po intl contrib imap autocrypt
+ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
+ 	$(srcdir)/hcachever.sh.in $(top_srcdir)/flymake.am \
+ 	$(top_srcdir)/intl/Makefile.in ABOUT-NLS ChangeLog INSTALL \
+@@ -540,7 +540,7 @@
+ @BUILD_IMAP_TRUE@IMAP_INCLUDES = -I$(top_srcdir)/imap
+ @BUILD_AUTOCRYPT_TRUE@AUTOCRYPT_SUBDIR = autocrypt
+ @BUILD_AUTOCRYPT_TRUE@AUTOCRYPT_INCLUDES = -I$(top_srcdir)/autocrypt
+-SUBDIRS = m4 po intl doc contrib $(IMAP_SUBDIR) $(AUTOCRYPT_SUBDIR)
++SUBDIRS = m4 po intl contrib $(IMAP_SUBDIR) $(AUTOCRYPT_SUBDIR)
+ bin_SCRIPTS = muttbug flea $(SMIMEAUX_TARGET)
+ @BUILD_HCACHE_TRUE@HCVERSION = hcversion.h
+ BUILT_SOURCES = keymap_defs.h patchlist.c reldate.h conststrings.c version.h $(HCVERSION)

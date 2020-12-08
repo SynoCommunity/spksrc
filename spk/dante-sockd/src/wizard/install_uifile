@@ -1,0 +1,41 @@
+[{
+    "step_title": "Sockd configuration",
+    "items": [{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_proxy_port",
+            "desc": "Proxy port",
+            "defaultValue": "1080",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[1-9][0-9]{2,4}$/",
+                    "errorText": "Port must be in range 100-65535"
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Prevent access to local network through proxy",
+        "subitems": [{
+            "key": "wizard_proxy_block",
+            "desc": "Local network",
+            "defaultValue": "192.168.0.0/16",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^(([1-9]?\\d|1\\d\\d|2[0-5][0-5]|2[0-4]\\d)\\.){3}0\\\/[1-9]\\d{1}$/",
+                    "errorText": "Network must be in format 192.168.0.0/16"
+                }
+            }
+        }]
+    }, {
+        "type": "multiselect",
+        "desc": "If authentification required, only users from group <code>'sockd-users'</code> will have access to proxy",
+        "subitems": [{
+            "key": "wizard_proxy_auth",
+            "desc": "Authentification required",
+            "defaultValue": true
+        }]
+    }]
+}]

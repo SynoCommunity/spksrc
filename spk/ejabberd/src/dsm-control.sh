@@ -7,10 +7,14 @@ DNAME="ejabberd"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-USER="ejabberd"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 EJABBERD="${INSTALL_DIR}/sbin/ejabberdctl"
 PID_FILE="${INSTALL_DIR}/var/ejabberd.pid"
 LOG_FILE="${INSTALL_DIR}/var/log/ejabberd/ejabberd.log"
+
+SC_USER="sc-ejabberd"
+LEGACY_USER="ejabberd"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
 
 
 start_daemon ()

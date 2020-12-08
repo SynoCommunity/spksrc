@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://www.openldap.org
+HOMEPAGE = https://www.openldap.org
 COMMENT  = OpenLDAP Software is an open source implementation of the Lightweight Directory Access Protocol
 LICENSE  = open source
 
@@ -16,4 +16,3 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-yielding_select=no --disable-slapd
 
 include ../../mk/spksrc.cross-cc.mk
-

@@ -1,0 +1,10 @@
+bin:bin/dar
+bin:bin/dar_cp
+bin:bin/dar_manager
+bin:bin/dar_slave
+bin:bin/dar_split
+bin:bin/dar_xform
+rsc:etc/darrc
+lnk:lib/libdar64.so
+lnk:lib/libdar64.so.5000
+lib:lib/libdar64.so.5000.13.5

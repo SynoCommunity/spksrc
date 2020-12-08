@@ -1,0 +1,7 @@
+bin:bin/play
+bin:bin/rec
+bin:bin/sox
+bin:bin/soxi
+lnk:lib/libsox.so
+lnk:lib/libsox.so.3
+lib:lib/libsox.so.3.0.0

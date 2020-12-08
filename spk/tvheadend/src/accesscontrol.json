@@ -1,7 +1,7 @@
 {
 	"index": 1,
 	"enabled": true,
-	"username": "@username@",
+	"username": "admin",
 	"prefix": "0.0.0.0/0",
 	"change": [
 		"change_rights",
@@ -26,7 +26,10 @@
 	],
 	"dvr": [
 		"basic",
-		"htsp"
+		"htsp",
+		"all",
+		"all_rw",
+		"failed"
 	],
 	"htsp_anonymize": false,
 	"dvr_config": [

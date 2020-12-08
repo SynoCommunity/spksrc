@@ -33,7 +33,8 @@ fix_msg:
 pre_fix_target: fix_msg
 
 fix_target:  $(PRE_FIX_TARGET) 
-	@find $(WORK_DIR)/$(TC_BASE_DIR) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_BASE_DIR)/lib'|" {} \;
+	chmod -R u+w $(WORK_DIR)
+	@find $(WORK_DIR)/$(TC_TARGET) -type f -name '*.la' -exec sed -i -e "s|^libdir=.*$$|libdir='$(WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY)'|" {} \;
 
 post_fix_target: $(FIX_TARGET)
 
@@ -46,4 +47,3 @@ $(FIX_COOKIE): $(POST_FIX_TARGET)
 else
 fix: ;
 endif
-

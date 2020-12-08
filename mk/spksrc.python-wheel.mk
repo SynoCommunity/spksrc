@@ -25,7 +25,13 @@ PYTHONPATH = $(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_D
 
 ### Python wheel rules
 build_python_wheel:
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel -b $(WORK_DIR)/wheelbuild -d $(WORK_DIR)/wheelhouse
+ifeq ($(strip $(CROSSENV)),)
+# Python 2 way
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel -d $(WORK_DIR)/wheelhouse
+else
+# Python 3 case: using crossenv helper
+	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel -d $(WORK_DIR)/wheelhouse
+endif
 
 install_python_wheel: $(WHEEL_TARGET)
 	@if [ -d "$(WORK_DIR)/wheelhouse" ] ; then \

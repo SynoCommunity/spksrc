@@ -7,12 +7,19 @@ WORK_DIR := $(PWD)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
-NAME          = native-$(PKG_NAME) 
+NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+ifneq ($(PKG_DIST_FILE),)
+LOCAL_FILE    = $(PKG_DIST_FILE)
+else
+LOCAL_FILE    = $(PKG_DIST_NAME)
+endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 #####
+
+.NOTPARALLEL:
 
 include ../../mk/spksrc.native-env.mk
 
@@ -42,12 +49,6 @@ include ../../mk/spksrc.install.mk
 cat_PLIST:
 	@true
 
-dependency-tree:
-	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
-	@for depend in $(DEPENDS) ; \
-	do \
-	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
-	done
 
 ### Clean rules
 clean:
@@ -55,15 +56,10 @@ clean:
 
 all: install
 
-.PHONY: kernel-required
-kernel-required:
-	@if [ -n "$(REQ_KERNEL)" ]; then \
-	  exit 1 ; \
-	fi
-	@for depend in $(DEPENDS) ; do \
-	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
-	    exit 0 ; \
-	  else \
-	    exit 1 ; \
-	  fi ; \
-	done
+### For make digests
+include ../../mk/spksrc.generate-digests.mk
+
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
+
+####

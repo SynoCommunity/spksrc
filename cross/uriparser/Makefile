@@ -1,5 +1,5 @@
 PKG_NAME = uriparser
-PKG_VERS = 0.8.4
+PKG_VERS = 0.9.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://downloads.sourceforge.net/project/$(PKG_NAME)/Sources/$(PKG_VERS)

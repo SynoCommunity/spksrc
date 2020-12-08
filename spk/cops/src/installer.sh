@@ -10,28 +10,29 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 DEFAULT_CFG_FILE="/usr/local/${PACKAGE}/config_local.php.synology"
 WEB_DIR="/var/services/web"
 CFG_FILE="${WEB_DIR}/${PACKAGE}/config_local.php"
+TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
-HTTPUSER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
 PHP_CONFIG_LOCATION="$([ "${BUILDNUMBER}" -ge "7135" ] && echo -n /usr/local/etc/php56/conf.d || echo -n /etc/php/conf.d)"
-SYNO_GROUP="http"
+SC_GROUP="http"
 
 
 set_syno_permissions ()
 {
-    # Sets recursive permissions for ${SYNO_GROUP} on specified directory
+    # Sets recursive permissions for ${SC_GROUP} on specified directory
     # Usage: set_syno_permissions "${wizard_download_dir}"
     DIRNAME=$1
     VOLUME=`echo $1 | awk -F/ '{print "/"$2}'`
-    # Set read/write permissions for SYNO_GROUP on target directory
-    if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SYNO_GROUP}:allow:rwxpdDaARWc--:fd--"`" ]; then
-        synoacltool -add "${DIRNAME}" "group:${SYNO_GROUP}:allow:rwxpdDaARWc--:fd--" > /dev/null 2>&1
+    # Set read/write permissions for SC_GROUP on target directory
+    if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--"`" ]; then
+        synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:rwxpdDaARWc--:fd--" > /dev/null 2>&1
     fi
     # Walk up the tree and set traverse permissions up to VOLUME
     DIRNAME="$(dirname "${DIRNAME}")"
     while [ "${DIRNAME}" != "${VOLUME}" ]; do
-        if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SYNO_GROUP}:allow:..x"`" ]; then
-            synoacltool -add "${DIRNAME}" "group:${SYNO_GROUP}:allow:--x----------:---n" > /dev/null 2>&1
+        if [ ! "`synoacltool -get "${DIRNAME}"| grep "group:${SC_GROUP}:allow:..x"`" ]; then
+            synoacltool -add "${DIRNAME}" "group:${SC_GROUP}:allow:--x----------:---n" > /dev/null 2>&1
         fi
         DIRNAME="$(dirname "${DIRNAME}")"
     done
@@ -83,8 +84,8 @@ postinst ()
             # Set permissions on directory structure
             set_syno_permissions "${wizard_calibre_dir}"
             # Set permissions on metadata.db
-            if [ ! "`synoacltool -get "${wizard_calibre_dir}/metadata.db"| grep "group:${SYNO_GROUP}:allow:rwxpdDaARWc."`" ]; then
-                synoacltool -add "${wizard_calibre_dir}/metadata.db" "group:${SYNO_GROUP}:allow:rwxpdDaARWc:----" > /dev/null 2>&1
+            if [ ! "`synoacltool -get "${wizard_calibre_dir}/metadata.db"| grep "group:${SC_GROUP}:allow:rwxpdDaARWc."`" ]; then
+                synoacltool -add "${wizard_calibre_dir}/metadata.db" "group:${SC_GROUP}:allow:rwxpdDaARWc:----" > /dev/null 2>&1
             fi
         else
             #DSM4

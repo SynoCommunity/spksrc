@@ -42,7 +42,7 @@ pre_icon_target: icon_msg
 $(ICON_DIR): $(PRE_ICON_TARGET)
 	@mkdir -p $@
 	@for size in 16 24 32 48 64 72 256; do \
-	  convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+	  convert $(SPK_ICON) -thumbnail $${size}x$${size} -strip \
 	          $@/$(SPK_NAME)-$${size}.png ; \
 	done ; \
 

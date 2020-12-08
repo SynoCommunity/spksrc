@@ -9,7 +9,12 @@ include ../../mk/spksrc.directories.mk
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
-DIST_FILE     = $(DISTRIB_DIR)/$(PKG_DIST_NAME)
+ifneq ($(PKG_DIST_FILE),)
+LOCAL_FILE    = $(PKG_DIST_FILE)
+else
+LOCAL_FILE    = $(PKG_DIST_NAME)
+endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 DISTRIB_DIR   = $(KERNELS_DIR)/$(PKG_BRANCH)
 COMPILE_TARGET = kernel_module_compile_target
@@ -54,17 +59,8 @@ all: compile
 clean:
 	rm -fr $(WORK_DIR)
 
-$(DIGESTS_FILE): download
-	@$(MSG) "Generating digests for $(PKG_NAME)"
-	@rm -f $@ && touch -f $@
-	@for type in SHA1 SHA256 MD5; do \
-	  case $$type in \
-	    SHA1|sha1)     tool=sha1sum ;; \
-	    SHA256|sha256) tool=sha256sum ;; \
-	    MD5|md5)       tool=md5sum ;; \
-	  esac ; \
-	  echo "$(PKG_DIST_NAME) $$type `$$tool $(DISTRIB_DIR)/$(PKG_DIST_NAME) | cut -d\" \" -f1`" >> $@ ; \
-	done
+### For make digests
+include ../../mk/spksrc.generate-digests.mk
 
 kernel_module_compile_target:
 	$(RUN) $(MAKE) modules
@@ -81,4 +77,5 @@ kernel_configure_target:
 	# Update the Makefile
 	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
 	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
+	sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' $(KERNEL_DIR)/Makefile
 	test -e $(WORK_DIR)/$(KERNEL_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_DIR)/arch/$(ARCH)

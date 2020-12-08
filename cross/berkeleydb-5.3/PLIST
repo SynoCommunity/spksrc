@@ -1,0 +1,17 @@
+bin:bin/db_archive
+bin:bin/db_checkpoint
+bin:bin/db_deadlock
+bin:bin/db_dump
+bin:bin/db_hotbackup
+bin:bin/db_load
+bin:bin/db_log_verify
+bin:bin/db_printlog
+bin:bin/db_recover
+bin:bin/db_replicate
+bin:bin/db_stat
+bin:bin/db_tuner
+bin:bin/db_upgrade
+bin:bin/db_verify
+lib:lib/libdb-5.3.so
+lnk:lib/libdb-5.so
+lnk:lib/libdb.so

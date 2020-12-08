@@ -1,25 +1,31 @@
 PKG_NAME = openssh
-PKG_VERS = 5.9p1
+PKG_VERS = 8.4p1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable
+PKG_DIST_SITE = https://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
 
-HOMEPAGE = http://www.openssh.com/
+HOMEPAGE = https://www.openssh.com/
 COMMENT  = Open source version of SSH connectivity tools
-LICENSE  =
+LICENSE  = BSD-style
 
-DESTDIR = $(INSTALL_DIR)
+GNU_CONFIGURE = 1
+INSTALL_TARGET = openssh_install
+POST_INSTALL_TARGET = openssh_post_install
 
-CONFIGURE_ARGS  = cross_compiling=yes --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx
-CONFIGURE_ARGS += --disable-strip --with-zlib=$(STAGING_INSTALL_PREFIX) --with-ssl-dir=$(STAGING_INSTALL_PREFIX) LD=$$CC
-INSTALL_TARGET = myInstall
+CONFIGURE_ARGS = --with-privsep-path=$(INSTALL_PREFIX)/var/empty
+CONFIGURE_ARGS += --disable-lastlog --disable-strip
+CONFIGURE_ARGS += --disable-utmp --disable-utmpx
+CONFIGURE_ARGS += --disable-wtmp --disable-wtmpx
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myInstall
-myInstall:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
+.PHONY: openssh_install
+openssh_install:
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install-nosysconf prefix=$(INSTALL_PREFIX)
 
+.PHONY: openssh_post_install
+openssh_post_install:
+	cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ssh slogin

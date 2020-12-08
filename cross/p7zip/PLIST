@@ -1,6 +1,6 @@
-bin:bin/7z
-bin:bin/7za
-bin:bin/7zr
+rsc:bin/7z
+rsc:bin/7za
+rsc:bin/7zr
 lib:lib/p7zip/7z
 lib:lib/p7zip/7za
 lib:lib/p7zip/7zCon.sfx

@@ -17,12 +17,13 @@ DESCRIPTION  = OctoPrint is a so called host software for 3D printers that contr
 ADMIN_PORT   = 8088
 RELOAD_UI    = yes
 DISPLAY_NAME = OctoPrint
-HOMEPAGE     = http://octoprint.org/
+HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/$(SPK_NAME).sc
+FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

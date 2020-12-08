@@ -1,5 +1,4 @@
 bin:bin/domoticz
-rsc:svnversion.h
 rsc:www
 rsc:Config
 rsc:scripts

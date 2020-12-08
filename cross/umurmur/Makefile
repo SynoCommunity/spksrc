@@ -1,5 +1,5 @@
 PKG_NAME = umurmur
-PKG_VERS = 0.2.16
+PKG_VERS = 0.2.17
 PKG_EXT = tar.gz
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
@@ -10,16 +10,13 @@ DEPENDS = cross/libconfig cross/protobuf-c cross/openssl
 
 HOMEPAGE = https://github.com/umurmur/umurmur
 COMMENT  = Minimalistic Murmur (Mumble server)
-LICENSE  =
-PRE_CONFIGURE_TARGET = myPreConfigure
+LICENSE  = BSD 3-clause License
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-ssl=openssl
+CMAKE_USE_DESTDIR = 0
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-cmake.mk
 
-
-.PHONY: myPreConfigure
-myPreConfigure:
-	$(RUN) ./autogen.sh
-
+# Mandatory umurmur cmake
+# args for proper build
+CMAKE_ARGS += -DSSL=openssl
+CMAKE_ARGS += -DCMAKE_STAGING_PREFIX=$(STAGING_INSTALL_PREFIX)

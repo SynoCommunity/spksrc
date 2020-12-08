@@ -1,7 +1,6 @@
 bin:bin/attr
 bin:bin/getfattr
 bin:bin/setfattr
-lnk::libexec/libattr.so
 lnk:lib/libattr.so
 lnk:lib/libattr.so.1
 lib:lib/libattr.so.1.1.0

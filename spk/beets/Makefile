@@ -1,24 +1,27 @@
 SPK_NAME = beets
-SPK_VERS = 1.4.3
-SPK_REV = 1
+SPK_VERS = 1.4.9
+SPK_REV = 5
 SPK_ICON = src/beets.png
 
-WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.8-11"
+PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
+BUILD_DEPENDS = native/python3
 
-MAINTAINER = Y.Martin
-DESCRIPTION = "Beets is the media library management system for obsessive-compulsive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Chromaprint/Acoustid and ReplayGain plugins are not available because of lacking dependencies."
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python3>=3.7.7"
+
+MAINTAINER = ymartin59
+DESCRIPTION = "Beets is the media library management system for obsessive-compulsive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AcousticBrainz Submit, Gmusic, ReplayGain."
 DISPLAY_NAME = beets
-BETA = 1
-CHANGELOG = "1. First package release"
+
+CHANGELOG = "1. Upgraded minimum version of python 3."
 
 HOMEPAGE   = http://beets.io/
 LICENSE    = GPL
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
+SPK_LINKS = /usr/local/bin/beet:env/bin/beet
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+STARTABLE = no
 
 # Pure Python package, make sure ARCH is not defined
 override ARCH=

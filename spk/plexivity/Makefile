@@ -1,6 +1,6 @@
 SPK_NAME = plexivity
 SPK_VERS = 0.9.9
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/plexivity.png
 DSM_UI_DIR = app
 BETA = 1
@@ -22,6 +22,7 @@ LICENSE    = GPL
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

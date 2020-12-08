@@ -6,18 +6,22 @@ DNAME="Memcached"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-USER="memcached"
+PATH="${INSTALL_DIR}/bin:${PATH}"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 MEMCACHED="${INSTALL_DIR}/bin/memcached"
 PID_FILE="${INSTALL_DIR}/var/memcached.pid"
 
 # Use 15% of total physical memory with maximum of 64MB
 MEMORY=`awk '/MemTotal/{memory=$2/1024*0.15; if (memory > 64) memory=64; printf "%0.f", memory}' /proc/meminfo`
 
+SC_USER="sc-memcached"
+LEGACY_USER="memcached"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "${MEMCACHED} -d -m ${MEMORY} -P ${PID_FILE}"
+    su ${USER} -s /bin/sh -c "${MEMCACHED} -d -m ${MEMORY} -P ${PID_FILE}"
 }
 
 stop_daemon ()

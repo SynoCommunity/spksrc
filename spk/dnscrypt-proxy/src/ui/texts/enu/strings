@@ -1,0 +1,6 @@
+[app]
+description = "A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS. https://github.com/jedisct1/dnscrypt-proxy"
+displayname = "dnscrypt-proxy"
+
+[help]
+credits = "Credits"

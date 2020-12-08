@@ -9,17 +9,21 @@ INSTALL_DIR="/usr/local/${PACKAGE}"
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-USER="htpcmanager"
 PYTHON="${INSTALL_DIR}/env/bin/python"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 HTPCMANAGER="${INSTALL_DIR}/var/HTPC-Manager/Htpc.py"
 DATA_DIR="${INSTALL_DIR}/var"
 PID_FILE="${DATA_DIR}/htpcmanager.pid"
 LOG_FILE="${DATA_DIR}/htpcmanager.log"
 
+SC_USER="sc-htpcmanager"
+LEGACY_USER="htpcmanager"
+USER="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n ${SC_USER} || echo -n ${LEGACY_USER})"
+
 
 start_daemon ()
 {
-    su - ${USER} -c "PATH=${PATH} ${PYTHON} ${HTPCMANAGER} --datadir ${DATA_DIR} --pid ${PID_FILE} --daemon --port 8087"
+    su ${USER} -s /bin/sh -c "PATH=${PATH} ${PYTHON} ${HTPCMANAGER} --datadir ${DATA_DIR} --pid ${PID_FILE} --daemon --port 8087"
 }
 
 stop_daemon ()

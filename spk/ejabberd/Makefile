@@ -14,15 +14,14 @@ RELOAD_UI = yes
 DISPLAY_NAME = ejabberd
 BETA = 1
 
-HOMEPAGE   = http://www.ejabberd.im
+HOMEPAGE   = https://www.ejabberd.im
 LICENSE    = GPLv2
-HELPURL    = http://docs.ejabberd.im/admin/guide
-
-WIZARDS_DIR = src/wizard/
+HELPURL    = https://docs.ejabberd.im/admin/guide
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 

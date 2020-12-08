@@ -1,4 +1,4 @@
-bin:bin/libassuan-config
+rsc:bin/libassuan-config
 lnk:lib/libassuan.so
 lnk:lib/libassuan.so.0
-lib:lib/libassuan.so.0.5.1
+lib:lib/libassuan.so.0.8.4

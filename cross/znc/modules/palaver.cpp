@@ -1,12 +1,13 @@
 /*
  * ZNC Palaver Module
  *
- * Copyright (c) 2013 Kyle Fuller
+ * Copyright (c) 2013-2015 Cocode LTD
  * License under the MIT license
  */
 
 #define REQUIRESSL
 
+#define PALAVER_VERSION "1.1.2"
 
 #include <znc/Modules.h>
 #include <znc/User.h>
@@ -14,18 +15,16 @@
 #include <znc/Client.h>
 #include <znc/Chan.h>
 #include <znc/FileUtils.h>
+#include <znc/IRCSock.h>
 
 #if defined VERSION_MAJOR && defined VERSION_MINOR && VERSION_MAJOR >= 1 && VERSION_MINOR >= 5
-#if defined(__has_include)
-#if __has_include(<regex>)
 #define HAS_REGEX
 #include <regex>
 #endif
-#endif
-#endif
 
-#ifndef PALAVER_VERSION
-	#define PALAVER_VERSION "unknown"
+
+#if defined VERSION_MAJOR && defined VERSION_MINOR && VERSION_MAJOR >= 1 && VERSION_MINOR < 6
+	#error "Palaver ZNC Modules requires ZNC 1.6 or newer."
 #endif
 
 
@@ -38,6 +37,7 @@ const char *kPLVMentionNickKey = "MENTION-NICK";
 const char *kPLVIgnoreKeywordKey = "IGNORE-KEYWORD";
 const char *kPLVIgnoreChannelKey = "IGNORE-CHANNEL";
 const char *kPLVIgnoreNickKey = "IGNORE-NICK";
+const char *kPLVShowMessagePreviewKey = "SHOW-MESSAGE-PREVIEW";
 
 
 #ifdef HAS_REGEX
@@ -81,7 +81,7 @@ public:
 		CString sTemp = sURL.Token(1, true, "://");
 		CString sAddress = sTemp.Token(0, false, "/");
 
-		CString sHostname = sAddress.Token(0, false, ":");
+		m_sHostname = sAddress.Token(0, false, ":");
 		CString sPort = sAddress.Token(1, true, ":");
 		CString sPath = "/" + sTemp.Token(1, true, "/");
 
@@ -98,18 +98,18 @@ public:
 		mcsHeaders["Connection"] = "close";
 		mcsHeaders["User-Agent"] = "ZNC";
 
-		if (sMethod.Equals("GET") == false) {
+		if (sMethod.Equals("GET") == false || sContent.length() > 0) {
 			mcsHeaders["Content-Length"] = CString(sContent.length());
 		}
 
 		bool useSSL = sScheme.Equals("https");
 
-		DEBUG("Palaver: Connecting to '" << sHostname << "' on port " << uPort << (useSSL ? " with" : " without") << " TLS (" << sMethod << " " << sPath << ")");
+		DEBUG("Palaver: Connecting to '" << m_sHostname << "' on port " << uPort << (useSSL ? " with" : " without") << " TLS (" << sMethod << " " << sPath << ")");
 
-		Connect(sHostname, uPort, useSSL);
+		Connect(m_sHostname, uPort, useSSL);
 		EnableReadLine();
 		Write(sMethod + " " + sPath + " HTTP/1.1\r\n");
-		Write("Host: " + sHostname + "\r\n");
+		Write("Host: " + m_sHostname + "\r\n");
 
 		for (MCString::const_iterator it = mcsHeaders.begin(); it != mcsHeaders.end(); ++it) {
 			const CString &sKey = it->first;
@@ -123,8 +123,10 @@ public:
 		if (sContent.length() > 0) {
 			Write(sContent);
 		}
+	}
 
-		Close(Csock::CLT_AFTERWRITE);
+	virtual void HandleStatusCode(unsigned int status) {
+
 	}
 
 	void ReadLine(const CString& sData) {
@@ -138,7 +140,11 @@ public:
 
 				if (uStatus < 200 || uStatus > 299) {
 					DEBUG("Palaver: Received HTTP Response code: " << uStatus);
+				} else {
+					DEBUG("Palaver: Successfully send notification ('" << uStatus << "')");
 				}
+
+				HandleStatusCode(uStatus);
 
 				m_eState = Headers;
 				break;
@@ -153,11 +159,13 @@ public:
 			}
 
 			case Body: {
+				Close(Csock::CLT_AFTERWRITE);
 				break;
 			}
 
 			case Closed: {
-				 break;
+				Close(Csock::CLT_AFTERWRITE);
+				break;
 			 }
 		}
 	}
@@ -165,6 +173,38 @@ public:
 	void Disconnected() {
 		Close(CSocket::CLT_AFTERWRITE);
 	}
+
+	void Timeout() {
+		DEBUG("Palaver: HTTP Request timed out '" << m_sHostname << "'");
+	}
+
+	void ConnectionRefused() {
+		DEBUG("Palaver: Connection refused to '" << m_sHostname << "'");
+	}
+
+	virtual void SockError(int iErrno, const CString &sDescription) {
+		DEBUG("Palaver: HTTP Request failed '" << m_sHostname << "' - " << sDescription);
+	}
+
+	virtual bool SNIConfigureClient(CS_STRING &sHostname) {
+		sHostname = m_sHostname;
+		return true;
+	}
+
+private:
+	CString m_sHostname;
+};
+
+class PLVHTTPNotificationSocket : public PLVHTTPSocket {
+public:
+	PLVHTTPNotificationSocket(CModule *pModule, const CString &sToken, const CString &sMethod, const CString &sURL, MCString &mcsHeaders, const CString &sContent) : PLVHTTPSocket(pModule, sMethod, sURL, mcsHeaders, sContent) {
+		m_sToken = sToken;
+	}
+
+	virtual void HandleStatusCode(unsigned int status);
+
+private:
+	CString m_sToken;
 };
 
 class CDevice {
@@ -203,12 +243,19 @@ public:
 		return m_sPushEndpoint;
 	}
 
+	void SetShowMessagePreview(bool bShowMessagePreview) {
+		m_bShowMessagePreview = bShowMessagePreview;
+	}
+
+	bool GetShowMessagePreview() const {
+		return m_bShowMessagePreview;
+	}
+
 	bool HasClient(const CClient& client) const {
 		bool bHasClient = false;
 
-		for (std::vector<CClient*>::const_iterator it = m_vClients.begin();
-				it != m_vClients.end(); ++it) {
-			CClient *pCurrentClient = *it;
+		for (std::map<CClient*, CString>::const_iterator it = m_mClientNetworkIDs.begin(); it != m_mClientNetworkIDs.end(); ++it) {
+			CClient *pCurrentClient = it->first;
 
 			if (&client == pCurrentClient) {
 				bHasClient = true;
@@ -219,37 +266,48 @@ public:
 		return bHasClient;
 	}
 
-	void AddClient(CClient& client) {
+	void AddClient(CClient &client, const CString& sNetworkID) {
 		if (HasClient(client) == false) {
-			m_vClients.push_back(&client);
+			m_mClientNetworkIDs[&client] = sNetworkID;
 		}
 	}
 
 	void RemoveClient(const CClient& client) {
-		for (std::vector<CClient*>::iterator it = m_vClients.begin();
-				it != m_vClients.end(); ++it) {
-			CClient *pCurrentClient = *it;
+		for (std::map<CClient*, CString>::iterator it = m_mClientNetworkIDs.begin(); it != m_mClientNetworkIDs.end(); ++it) {
+			CClient *pCurrentClient = it->first;
 
 			if (&client == pCurrentClient) {
-				m_vClients.erase(it);
+				m_mClientNetworkIDs.erase(it);
 				break;
 			}
 		}
 	}
 
-	bool AddNetwork(CIRCNetwork& network) {
-		return AddNetworkNamed(network.GetUser()->GetUserName(), network.GetName());
+	const CString GetNetworkID(const CClient &client) const {
+		for (std::map<CClient*, CString>::const_iterator it = m_mClientNetworkIDs.begin(); it != m_mClientNetworkIDs.end(); ++it) {
+			CClient *pCurrentClient = it->first;
+
+			if (&client == pCurrentClient) {
+				return it->second;
+			}
+		}
+
+		return CString();
+	}
+
+	bool AddNetwork(const CIRCNetwork& network, const CString& sNetworkID) {
+		return AddNetworkNamed(network.GetUser()->GetUserName(), network.GetName(), sNetworkID);
 	}
 
 	bool HasNetworkNamed(const CString& sUsername, const CString& sNetwork) const {
 		bool bHasNetwork = false;
 
-		std::map<CString, VCString>::const_iterator it = m_msvsNetworks.find(sUsername);
-		if (it != m_msvsNetworks.end()) {
-			const VCString& vNetworks = it->second;
+		std::map<CString, MCString>::const_iterator it = m_msmsNetworks.find(sUsername);
+		if (it != m_msmsNetworks.end()) {
+			const MCString& mNetworks = it->second;
 
-			for (VCString::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-				const CString &name = *it2;
+			for (MCString::const_iterator it2 = mNetworks.begin(); it2 != mNetworks.end(); ++it2) {
+				const CString &name = it2->first;
 
 				if (name.Equals(sNetwork)) {
 					bHasNetwork = true;
@@ -261,11 +319,24 @@ public:
 		return bHasNetwork;
 	}
 
-	bool AddNetworkNamed(const CString& sUsername, const CString& sNetwork) {
+	bool IsNetworkConnected(const CIRCNetwork& network) const {
+		bool bIsConnected = false;
+
+		for (CClient* pClient : network.GetClients()) {
+			if (pClient && this->HasClient(*pClient)){
+				bIsConnected = true;
+				break;
+			}
+		}
+
+		return bIsConnected;
+	}
+
+	bool AddNetworkNamed(const CString& sUsername, const CString& sNetwork, const CString& sNetworkID) {
 		bool bDidAddNetwork = false;
 
 		if (HasNetworkNamed(sUsername, sNetwork) == false) {
-			m_msvsNetworks[sUsername].push_back(sNetwork);
+			m_msmsNetworks[sUsername][sNetwork] = sNetworkID;
 			bDidAddNetwork = true;
 		}
 
@@ -276,12 +347,12 @@ public:
 		const CUser *user = network.GetUser();
 		const CString& sUsername = user->GetUserName();
 
-		std::map<CString, VCString>::iterator it = m_msvsNetworks.find(sUsername);
-		if (it != m_msvsNetworks.end()) {
-			VCString &networks = it->second;
+		std::map<CString, MCString>::iterator it = m_msmsNetworks.find(sUsername);
+		if (it != m_msmsNetworks.end()) {
+			MCString &networks = it->second;
 
-			for (VCString::iterator it2 = networks.begin(); it2 != networks.end(); ++it2) {
-				CString &name = *it2;
+			for (MCString::iterator it2 = networks.begin(); it2 != networks.end(); ++it2) {
+				const CString &name = it2->first;
 
 				if (name.Equals(network.GetName())) {
 					networks.erase(it2);
@@ -290,7 +361,7 @@ public:
 			}
 
 			if (networks.empty()) {
-				m_msvsNetworks.erase(it);
+				m_msmsNetworks.erase(it);
 			}
 		}
 	}
@@ -301,12 +372,12 @@ public:
 		const CUser *user = network.GetUser();
 		const CString& sUsername = user->GetUserName();
 
-		std::map<CString, VCString>::iterator it = m_msvsNetworks.find(sUsername);
-		if (it != m_msvsNetworks.end()) {
-			VCString &networks = it->second;
+		std::map<CString, MCString>::const_iterator it = m_msmsNetworks.find(sUsername);
+		if (it != m_msmsNetworks.end()) {
+			const MCString &networks = it->second;
 
-			for (VCString::iterator it2 = networks.begin(); it2 != networks.end(); ++it2) {
-				CString &name = *it2;
+			for (MCString::const_iterator it2 = networks.begin(); it2 != networks.end(); ++it2) {
+				const CString &name = it2->first;
 
 				if (name.Equals(network.GetName())) {
 					hasNetwork = true;
@@ -318,10 +389,29 @@ public:
 		return hasNetwork;
 	}
 
+	const CString GetNetworkID(const CIRCNetwork& network) const {
+		const CString sUsername = network.GetUser()->GetUserName();
+		std::map<CString, MCString>::const_iterator it = m_msmsNetworks.find(sUsername);
+		if (it != m_msmsNetworks.end()) {
+			const MCString &networks = it->second;
+
+			for (MCString::const_iterator it2 = networks.begin(); it2 != networks.end(); ++it2) {
+				const CString &name = it2->first;
+
+				if (name.Equals(network.GetName())) {
+					return it2->second;
+				}
+			}
+		}
+
+		return "";
+	}
+
 	void ResetDevice() {
 		m_bInNegotiation = false;
 		m_sVersion = "";
 		m_sPushEndpoint = "";
+		m_bShowMessagePreview = true;
 
 		m_vMentionKeywords.clear();
 		m_vMentionChannels.clear();
@@ -434,14 +524,27 @@ public:
 
 #ifdef HAS_REGEX
 			std::smatch match;
-			std::regex expression = std::regex("\\b" + re_escape(sKeyword) + "\\b",
-					std::regex_constants::ECMAScript | std::regex_constants::icase);
+			CString sExpression = "\\b" + re_escape(sKeyword) + "\\b";
 
-			std::regex_search(sMessage, match, expression);
+			try {
+				std::regex expression = std::regex(sExpression,
+					std::regex_constants::ECMAScript | std::regex_constants::icase);
+				std::regex_search(sMessage, match, expression);
+			} catch (std::regex_error& error) {
+				DEBUG("Caught regex error '" << error.code() << "' from '" << sExpression << "'.");
+			}
 
 			if (!match.empty()) {
 				bResult = true;
 				break;
+			}
+
+			// If that didn't match, and the keyword contains a word boundary
+			if (!bResult && (sKeyword.find("[") != std::string::npos || sKeyword.find("]") != std::string::npos)) {
+				if (sMessage.find(sKeyword) != std::string::npos) {
+					bResult = true;
+					break;
+				}
 			}
 #else
 			if (sMessage.find(sKeyword) != std::string::npos) {
@@ -487,6 +590,8 @@ public:
 				SetVersion(sValue);
 			} else if (sKey.Equals(kPLVPushEndpointKey)) {
 				SetPushEndpoint(sValue);
+			} else if (sKey.Equals(kPLVShowMessagePreviewKey)) {
+				SetShowMessagePreview(sValue.Equals("true"));
 			}
 		} else if (sCommand.Equals("ADD")) {
 			CString sKey = sLine.Token(1);
@@ -505,10 +610,12 @@ public:
 			} else if (sKey.Equals(kPLVMentionNickKey)) {
 				AddMentionNick(sValue);
 			} else if (sKey.Equals("NETWORK")) {
+				// Only from config file
 				CString sUsername = sValue.Token(0);
 				CString sNetwork = sValue.Token(1);
+				CString sNetworkID = sValue.Token(2);
 
-				AddNetworkNamed(sUsername, sNetwork);
+				AddNetworkNamed(sUsername, sNetwork, sNetworkID);
 			}
 		} else if (sCommand.Equals("END")) {
 			SetInNegotiation(false);
@@ -520,6 +627,12 @@ public:
 
 		if (GetVersion().empty() == false) {
 			File.Write("SET VERSION " + GetVersion() + "\n");
+		}
+
+		if (GetShowMessagePreview()) {
+			File.Write("SET " + CString(kPLVShowMessagePreviewKey) + " true\n");
+		} else {
+			File.Write("SET " + CString(kPLVShowMessagePreviewKey) + " false\n");
 		}
 
 		if (GetPushEndpoint().empty() == false) {
@@ -568,16 +681,16 @@ public:
 			File.Write("ADD " + CString(kPLVIgnoreNickKey) + " " + sNick + "\n");
 		}
 
-		for (std::map<CString, VCString>::const_iterator it = m_msvsNetworks.begin();
-				it != m_msvsNetworks.end(); ++it) {
+		for (std::map<CString, MCString>::const_iterator it = m_msmsNetworks.begin(); it != m_msmsNetworks.end(); ++it) {
 			const CString& sUsername = it->first;
-			const VCString& networks = it->second;
+			const MCString& networks = it->second;
 
-			for (VCString::const_iterator it2 = networks.begin();
+			for (MCString::const_iterator it2 = networks.begin();
 					it2 != networks.end(); ++it2) {
-				const CString& sNetwork = *it2;
+				const CString& sNetwork = it2->first;
+				const CString& sNetworkID = it2->second;
 
-				File.Write("ADD NETWORK " + sUsername + " " + sNetwork + "\n");
+				File.Write("ADD NETWORK " + sUsername + " " + sNetwork + " " + sNetworkID + "\n");
 			}
 		}
 
@@ -586,7 +699,7 @@ public:
 
 #pragma mark - Notifications
 
-	void SendNotification(CModule& module, const CString& sSender, const CString& sNotification, const CChan *pChannel) {
+	void SendNotification(CModule& module, const CString& sSender, const CString& sNotification, const CChan *pChannel, CString sIntent = "") {
 		++m_uiBadge;
 
 		MCString mcsHeaders;
@@ -596,14 +709,27 @@ public:
 
 		CString sJSON = "{";
 		sJSON += "\"badge\": " + CString(m_uiBadge);
-		sJSON += ",\"message\": \"" + sNotification.Replace_n("\"", "\\\"") + "\"";
+
+		if (GetShowMessagePreview()) {
+			sJSON += ",\"message\": \"" + sNotification.Replace_n("\"", "\\\"") + "\"";
+		} else {
+			sJSON += ",\"private\": true";
+		}
+
 		sJSON += ",\"sender\": \"" + sSender.Replace_n("\"", "\\\"") + "\"";
 		if (pChannel) {
 			sJSON += ",\"channel\": \"" + pChannel->GetName().Replace_n("\"", "\\\"") + "\"";
 		}
+		if (module.GetNetwork()) {
+			const CString sNetworkID = GetNetworkID(*module.GetNetwork());
+			sJSON += ",\"network\": \"" + sNetworkID.Replace_n("\"", "\\\"") + "\"";
+		}
+		if (!sIntent.empty()) {
+			sJSON += ",\"intent\": \"" + sIntent + "\"";
+		}
 		sJSON += "}";
 
-		PLVHTTPSocket *pSocket = new PLVHTTPSocket(&module, "POST", GetPushEndpoint(), mcsHeaders, sJSON);
+		PLVHTTPSocket *pSocket = new PLVHTTPNotificationSocket(&module, GetToken(), "POST", GetPushEndpoint(), mcsHeaders, sJSON);
 		module.AddSocket(pSocket);
 	}
 
@@ -616,15 +742,15 @@ public:
 
 			CString sJSON = "{\"badge\": 0}";
 
-			PLVHTTPSocket *pSocket = new PLVHTTPSocket(&module, "POST", GetPushEndpoint(), mcsHeaders, sJSON);
+			PLVHTTPSocket *pSocket = new PLVHTTPNotificationSocket(&module, GetToken(), "POST", GetPushEndpoint(), mcsHeaders, sJSON);
 			module.AddSocket(pSocket);
 
 			m_uiBadge = 0;
 		}
 	}
 
-	std::map<CString, VCString> GetNetworks() const {
-		return m_msvsNetworks;
+	std::map<CString, MCString> GetNetworks() const {
+		return m_msmsNetworks;
 	}
 
 private:
@@ -632,9 +758,10 @@ private:
 	CString m_sVersion;
 	CString m_sPushEndpoint;
 
-	std::map<CString, VCString> m_msvsNetworks;
+	std::map<CString, MCString> m_msmsNetworks;
 
-	std::vector<CClient*> m_vClients;
+	// Connected clients along with the clients network ID
+	std::map<CClient*, CString> m_mClientNetworkIDs;
 
 	VCString m_vMentionKeywords;
 	VCString m_vMentionChannels;
@@ -644,6 +771,7 @@ private:
 	VCString m_vIgnoreChannels;
 	VCString m_vIgnoreNicks;
 
+	bool m_bShowMessagePreview;
 	bool m_bInNegotiation;
 	unsigned int m_uiBadge;
 };
@@ -702,6 +830,7 @@ public:
 
 				CString sToken = sLine.Token(2);
 				CString sVersion = sLine.Token(3);
+				CString sNetworkID = sLine.Token(4);
 
 				CDevice& device = DeviceWithToken(sToken);
 
@@ -710,24 +839,32 @@ public:
 					device.SetInNegotiation(true);
 				}
 
-				device.AddClient(*pClient);
+				device.AddClient(*pClient, sNetworkID);
 
 				CIRCNetwork *pNetwork = pClient->GetNetwork();
 				if (pNetwork) {
-					if (device.AddNetwork(*pNetwork) && device.InNegotiation() == false) {
+					if (device.AddNetwork(*pNetwork, sNetworkID) && device.InNegotiation() == false) {
 						Save();
 					}
 				}
 			} else if (sCommand.Equals("BEGIN")) {
+				CDevice *pDevice = DeviceForClient(*pClient);
+				if (pDevice == NULL) {
+					// BEGIN before we received an client identification
+					return HALT;
+				}
+
 				CString sToken = sLine.Token(2);
 				CString sVersion = sLine.Token(3);
-				CDevice& device = DeviceWithToken(sToken);
 
-				device.ResetDevice();
-				device.SetInNegotiation(true);
-				device.SetVersion(sVersion);
+				if (!pDevice->GetToken().Equals(sToken)) {
+					// Setting was for a different device than the one the user registered with
+					return HALT;
+				}
 
-				device.AddClient(*pClient);
+				pDevice->ResetDevice();
+				pDevice->SetInNegotiation(true);
+				pDevice->SetVersion(sVersion);
 			} else if (sCommand.Equals("SET") || sCommand.Equals("ADD") || sCommand.Equals("END")) {
 				CDevice *pDevice = DeviceForClient(*pClient);
 
@@ -749,22 +886,25 @@ public:
 #pragma mark -
 
 	virtual void OnClientLogin() {
+		CIRCNetwork *pNetwork = GetClient()->GetNetwork();
+
 		// Associate client with the user/network
 		CDevice *pDevice = DeviceForClient(*m_pClient);
-		if (pDevice && m_pNetwork) {
-			if (pDevice->AddNetwork(*m_pNetwork)) {
+		if (pDevice && pNetwork) {
+			const CString sNetworkID = pDevice->GetNetworkID(*m_pClient);
+			if (pDevice->AddNetwork(*pNetwork, sNetworkID)) {
 				Save();
 			}
 		}
 
-		if (m_pNetwork) {
+		if (pNetwork) {
 			// Let's reset any other devices for this client
 
 			for (std::vector<CDevice*>::const_iterator it = m_vDevices.begin();
 					it != m_vDevices.end(); ++it) {
 				CDevice& device = **it;
 
-				if (device.HasClient(*m_pClient) == false && device.HasNetwork(*m_pNetwork)) {
+				if (device.HasClient(*m_pClient) == false && device.HasNetwork(*pNetwork)) {
 					device.ClearBadges(*this);
 				}
 			}
@@ -816,6 +956,21 @@ public:
 		}
 
 		return pDevice;
+	}
+
+	bool RemoveDeviceWithToken(const CString& sToken) {
+		for (std::vector<CDevice*>::iterator it = m_vDevices.begin();
+				it != m_vDevices.end(); ++it) {
+			CDevice& device = **it;
+
+			if (device.GetToken().Equals(sToken)) {
+				m_vDevices.erase(it);
+				Save();
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 #pragma mark - Serialization
@@ -908,10 +1063,10 @@ public:
 
 #pragma mark -
 
-	void ParseMessage(CNick& Nick, CString& sMessage, CChan *pChannel = NULL) {
+	void ParseMessage(CNick& Nick, CString& sMessage, CChan *pChannel = NULL, CString sIntent = "") {
 		if (m_pNetwork->IsUserOnline() == false) {
 #if defined VERSION_MAJOR && defined VERSION_MINOR && VERSION_MAJOR >= 1 && VERSION_MINOR >= 2
-			CString sCleanMessage = sMessage.StripControls();
+			CString sCleanMessage = sMessage.StripControls_n();
 #else
 			CString &sCleanMessage = sMessage;
 #endif
@@ -920,6 +1075,10 @@ public:
 					it != m_vDevices.end(); ++it)
 			{
 				CDevice& device = **it;
+
+				if (device.IsNetworkConnected(*m_pNetwork)) {
+					continue;
+				}
 
 				if (device.HasNetwork(*m_pNetwork)) {
 					bool bMention = (
@@ -936,7 +1095,7 @@ public:
 					}
 
 					if (bMention) {
-						device.SendNotification(*this, Nick.GetNick(), sCleanMessage, pChannel);
+						device.SendNotification(*this, Nick.GetNick(), sCleanMessage, pChannel, sIntent);
 					}
 				}
 			}
@@ -948,8 +1107,23 @@ public:
 		return CONTINUE;
 	}
 
+	virtual EModRet OnChanAction(CNick& Nick, CChan& Channel, CString& sMessage) {
+		ParseMessage(Nick, sMessage, &Channel, "ACTION");
+		return CONTINUE;
+	}
+
 	virtual EModRet OnPrivMsg(CNick& Nick, CString& sMessage) {
 		ParseMessage(Nick, sMessage, NULL);
+		return CONTINUE;
+	}
+
+	virtual EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) {
+		ParseMessage(Nick, sMessage, &Channel);
+		return CONTINUE;
+	}
+
+	virtual EModRet OnPrivAction(CNick& Nick, CString& sMessage) {
+		ParseMessage(Nick, sMessage, NULL, "ACTION");
 		return CONTINUE;
 	}
 
@@ -994,14 +1168,14 @@ public:
 		{
 			CDevice &device = **it;
 
-			const std::map<CString, VCString> msvsNetworks = device.GetNetworks();
-			std::map<CString, VCString>::const_iterator it2 = msvsNetworks.begin();
-			for (;it2 != msvsNetworks.end(); ++it2) {
+			const std::map<CString, MCString> msmsNetworks = device.GetNetworks();
+			std::map<CString, MCString>::const_iterator it2 = msmsNetworks.begin();
+			for (;it2 != msmsNetworks.end(); ++it2) {
 				const CString sUsername = it2->first;
-				const VCString &networks = it2->second;
+				const MCString &networks = it2->second;
 
-				for (VCString::const_iterator it3 = networks.begin(); it3 != networks.end(); ++it3) {
-					const CString sNetwork = *it3;
+				for (MCString::const_iterator it3 = networks.begin(); it3 != networks.end(); ++it3) {
+					const CString sNetwork = it3->first;
 
 					Table.AddRow();
 					Table.SetCell("Device", device.GetToken());
@@ -1019,7 +1193,7 @@ public:
 				}
 			}
 
-			if (msvsNetworks.size() == 0) {
+			if (msmsNetworks.size() == 0) {
 				Table.AddRow();
 				Table.SetCell("Device", device.GetToken());
 				Table.SetCell("User", "");
@@ -1059,6 +1233,15 @@ private:
 
 	std::vector<CDevice*> m_vDevices;
 };
+
+void PLVHTTPNotificationSocket::HandleStatusCode(unsigned int status) {
+	if (status == 401) {
+		if (CPalaverMod *pModule = dynamic_cast<CPalaverMod *>(m_pModule)) {
+			DEBUG("palaver: Removing device");
+			pModule->RemoveDeviceWithToken(m_sToken);
+		}
+	}
+}
 
 template<> void TModInfo<CPalaverMod>(CModInfo& Info) {
 	Info.SetWikiPage("palaver");

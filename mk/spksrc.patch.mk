@@ -14,8 +14,17 @@
 ifeq ($(strip $(PATCHES_LEVEL)),)
 PATCHES_LEVEL = 0
 endif
+
+# find patches into the following directory order:
+#    patches/*.patch
+#    patches/$(arch)/*.patch
+#    patches/DSM-$(TCVERSION)/*.patch
+#    patches/$(subarch)/*.patch
+#    patches/$(subarch)-$(TCVERSION)/*.patch
 ifeq ($(strip $(PATCHES)),)
-PATCHES = $(sort $(wildcard patches/*.patch))
+PATCHES = $(foreach arch,ARM5_ARCHES ARM7_ARCHES ARM8_ARCHES PPC_ARCHES x86_ARCHES x64_ARCHES, \
+	$(foreach subarch,$($(arch)), \
+	$(if $(filter $(ARCH),$(subarch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${arch} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch patches/$(subarch)/*.patch patches/$(subarch)-$(TCVERSION)/*.patch)),)))
 endif
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done

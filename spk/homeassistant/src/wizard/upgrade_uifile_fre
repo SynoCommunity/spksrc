@@ -1,0 +1,6 @@
+[{
+    "step_title": "Merci de prendre en compte",
+    "items": [{
+        "desc": "<b>Ce package contient la plupart des intégrations par défaut de Home Assistant.</b><p>&nbsp;<p><b>Indication:</b> Votre installation pourrait nécessiter des modifications suite à la mise à jour.<p>Merci de vous référer à <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-HomeAssistant\">la FAQ de configuration HomeAssistant</a> pour plus de détails. Il pourrait ne pas contenir d'autres composants requis par des addons qui pourraient vous intéresser.<p>&nbsp;<p><b>ATTENTION:</b><p>Ce package prend beaucoup de place et l'installation peut prendre du temps et afficher une erreur. Si c'est le cas, veuillez annuler et ne pas réessayer l'installation. L'installeur du package affichera \"Mise à jour en cours...\" et enfin \"En cours d'exécution\". Pour les systèmes disposant de peu de resources il peut s'écouler jusqu'à 30 avant que la façade web ne soit opérationnelle et n'affiche plus \"Home Assistant is starting. ...\"."
+    }]
+}]

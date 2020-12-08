@@ -4,8 +4,6 @@ SPK_REV = 3
 SPK_ICON = src/ffsync.png
 BETA = 1
 
-UNSUPPORTED_ARCHS = 88f5281
-
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/gevent cross/greenlet
 
@@ -21,11 +19,10 @@ HOMEPAGE     = https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 LICENSE      = MPL/GPL/LGPL
 HELPURL      = https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Server-1.5
 
-WIZARDS_DIR      = src/wizard/
-CONF_DIR         = src/conf/
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
 
 INSTALL_DEP_SERVICES = mysql
 START_DEP_SERVICES = mysql
@@ -45,6 +42,6 @@ ffsync_extra_install:
 	install -m 644 src/ffsync.ini $(STAGING_DIR)/var/
 	sed -i -e "s|https://github.com/mozilla-services/mozservices/archive/e00e1b68130423ad98d0f6185655bde650443da8.zip|mozsvc==0.8|g" \
 	       -e "s|https://github.com/mozilla-services/tokenserver/archive/d7e513e8a4f5c588b70d685a8df1d2e508c341c0.zip|tokenserver==1.2.7|g" \
-	       -e "s|http://github.com/mozilla-services/server-syncstorage/archive/1.5.5.zip|SyncStorage==1.5.5|g" \
+	       -e "s|https://github.com/mozilla-services/server-syncstorage/archive/1.5.5.zip|SyncStorage==1.5.5|g" \
 	       -e "s|https://github.com/mozilla-services/syncserver/archive/1.5.2.tar.gz|syncserver==1.5.2|g" \
                 $(STAGING_DIR)/share/wheelhouse/requirements.txt

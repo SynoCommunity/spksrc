@@ -1,22 +1,20 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 3.1.2
-SPK_REV = 4
+SPK_VERS = 4.3.1
+SPK_REV = 35
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 3.1<br>2. Support nasm 2.12.02 and yasm 1.3 added. Added 12 new libs/codecs and update all depends : fdk-acc 0.1.4, fontconfig 2.12.1, freetype 2.6.5, fribidi 0.19.7, lame 3.99.5, libass 0.13.2, libbluray 0.9.3, libnuma 2.0.11, libvorbis 1.3.5, libvpx 1.6.0, opencore-amr 0.1.3, openjpeg 2.1.0, opus 1.1.3, rtmdpdump 550a0ca, soxr 0.1.2, vo-amrwbenc 0.1.3, x264 20160816-2245-stable, x265 2.0"
+CHANGELOG = "1. Update ffmpeg to 4.3.1<br/>2. Update Intel libva to version 2.8 and media drivers 2020Q2<br/>3. Enable ZeroMQ support<br/>4. Update svt-hevc to 1.5.0<br/>5. Update x264 to July 2nd git hash and use github mirror<br/>6. Update libaom to version 2.0.0<br/>7. Update SVT-AV1 to version 0.8.4<br/>8. Update x265 to version 3.4<br/>9. Enable libzmq support with version 4.3.2<br/>10. Fix a build issue with libshine"
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = cytec
-DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.
+MAINTAINER = th0ma7
+DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
+DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
 DISPLAY_NAME = ffmpeg
 STARTABLE = no
 
-HOMEPAGE = http://www.ffmpeg.org/
-LICENSE  = LGPL 2.1
+HOMEPAGE = https://www.ffmpeg.org/
+LICENSE  = GPLv3
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk

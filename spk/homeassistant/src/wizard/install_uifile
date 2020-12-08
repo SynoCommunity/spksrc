@@ -1,0 +1,6 @@
+[{
+    "step_title": "Please consider",
+    "items": [{
+        "desc": "<b>This package includes most of the default Home Assistant integrations.</b><p>&nbsp;<p> It does not contain other components required by addons you may be interested in. Please refer to <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-HomeAssistant\">HomeAssistant configuration FAQ</a> for further configuration. This package may not provide components required by addons you may be interested in.<p>&nbsp;<p><b>WARNING:</b><p>This is a huge package and installation may take some time and display an error. In this case please press abort and do not retry installation. The package installer will display \"Update...\" and finally \"Running\". For systems with low resources it may take up to 30 minutes until the web frontend is running and does not display \"Home Assistant is starting. ...\" anymore."
+    }]
+}]

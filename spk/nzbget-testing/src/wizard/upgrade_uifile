@@ -1,0 +1,27 @@
+[{
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings.<br>Please read <a <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    },
+    {
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within NZBGet, manually set Read/Write permissions for the 'sc-download' group on the reported folders using File Station."
+    }]
+}, {
+    "step_title": "NZBGet installation",
+    "items": [{
+        "desc": "The installer will now download the desired version of NZBGet from NZBget.net and install it. <br>In the future you should update from within NZBGet (Config > System)."
+    },
+    {
+        "type": "singleselect",
+        "desc": "Version to install:",
+        "subitems": [{
+            "key": "wizard_stable_release",
+            "desc": "Latest stable NZBGet version",
+            "defaultValue": false
+        }, {
+            "key": "wizard_testing_release",
+            "desc": "Latest testing (beta) NZBGet version",
+            "defaultValue": true
+        }]
+    }]
+}]

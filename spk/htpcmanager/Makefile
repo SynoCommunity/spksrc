@@ -1,6 +1,6 @@
 SPK_NAME = htpcmanager
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 4
 SPK_ICON = src/htpcmanager.png
 DSM_UI_DIR = app
 
@@ -14,12 +14,13 @@ ADMIN_PORT = 8087
 RELOAD_UI = yes
 DISPLAY_NAME = HTPC-Manager
 
-HOMEPAGE   = http://htpc.io
-WIZARDS_DIR = src/wizard/
+HOMEPAGE   = https://htpc.io
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+WIZARDS_DIR      = src/wizard/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop

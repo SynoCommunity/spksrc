@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" class="dnscrypt-proxy">
+    <head>
+        <meta charset="utf-8">
+        <title>{{.Title}}</title>
+        <link rel="stylesheet" type="text/css" href="/webman/3rdparty/dnscrypt-proxy/style.css">
+        <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    </head>
+    <body>
+        <div class="message">
+            <p class="error">{{.ErrorMessage}}</p>
+            <p class="success">{{.SuccessMessage}}</p>
+        </div>
+        <div class="spinner">
+            <div class="centerBox">
+                <span class="animation">
+                    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <rect x="0" y="0" width="40" height="40" fill="#C8D2DD" shape-rendering="crispEdges">
+                            <animate attributeName="fill" values="#2A5790;#C8D2DD;#C8D2DD" keyTimes="0;0.25;1" dur="0.8s" repeatCount="indefinite" begin="0s" calcMode="discrete"></animate>
+                        </rect>
+                        <rect x="50" y="0" width="40" height="40" fill="#C8D2DD" shape-rendering="crispEdges">
+                            <animate attributeName="fill" values="#2A5790;#C8D2DD;#C8D2DD" keyTimes="0;0.25;1" dur="0.8s" repeatCount="indefinite" begin="0.2s" calcMode="discrete"></animate>
+                        </rect>
+                        <rect x="0" y="50" width="40" height="40" fill="#C8D2DD" shape-rendering="crispEdges">
+                            <animate attributeName="fill" values="#2A5790;#C8D2DD;#C8D2DD" keyTimes="0;0.25;1" dur="0.8s" repeatCount="indefinite" begin="0.6s" calcMode="discrete"></animate>
+                        </rect>
+                        <rect x="50" y="50" width="40" height="40" fill="#C8D2DD" shape-rendering="crispEdges">
+                            <animate attributeName="fill" values="#2A5790;#C8D2DD;#C8D2DD" keyTimes="0;0.25;1" dur="0.8s" repeatCount="indefinite" begin="0.4s" calcMode="discrete"></animate>
+                        </rect>
+                    </svg>
+                </span>
+                <p>Processing. Please wait...</p>
+            </div>
+        </div>
+        <form method="get" class="fileSelector">
+            <span class="fileSelect">
+                <select name="file">
+                    {{- $File := .File -}}
+                    {{- range $key, $value := .Files -}}
+                        {{- if eq $File $key }}
+                    <option value="{{ $key }}" selected>{{ $value }}</option>
+                        {{- else }}
+                    <option value="{{ $key }}">{{ $value }}</option>
+                        {{- end -}}
+                    {{- end }}
+                </select>
+            </span>
+        </form>
+        <form method="post" class="updateBlocklist updateBlacklist">
+            <input class="btn" type="submit" name="generateBlocklist" value="Generate Blocklist">
+        </form>
+        <form method="post" class="fileEditor">
+            <input type="hidden" name="file" value="{{.File}}">
+            <div class="fileContent">
+                <textarea name="fileContent" autocomplete="off" autofocus>{{.FileData}}</textarea>
+            </div>
+            <input class="btn primary" type="submit" value="Save">
+        </form>
+
+        <script src="codemirror/lib/codemirror.js"></script>
+        <script src="codemirror/mode/toml/toml.js"></script>
+        <!-- Search -->
+        <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css">
+        <script src="codemirror/addon/dialog/dialog.js"></script>
+        <script src="codemirror/addon/search/searchcursor.js"></script>
+        <script src="codemirror/addon/search/search.js"></script>
+        <script>
+            const textArea = document.querySelector('.dnscrypt-proxy textarea')
+            if (typeof CodeMirror === "undefined") {
+                textArea.style.opacity = 1
+            } else {
+                CodeMirror.fromTextArea(textArea, {
+                    lineNumbers: true
+                });
+            }
+
+            function setGetParameter (key, value) {
+                var baseUrl = [location.protocol, '//', location.host, location.pathname].join('')
+                var param = '?' + key + '=' + value
+                document.location = baseUrl + param
+            }
+
+            function ajax (method, data, successFn) {
+                const request = new XMLHttpRequest()
+                request.onload = function() {
+                    if (request.status >= 200 && request.status < 400) {
+                        const successMessage = document.querySelector('.dnscrypt-proxy .success')
+                        // restart fade animation
+                        successMessage.style.animation = 'none';
+                        successMessage.offsetHeight //  trigger reflow
+                        successMessage.innerText = "Saved changes!"
+                        successMessage.style.animation = null;
+                    } else {
+                        console.error(request.status, request.responseText)
+                        errorMessage = document.querySelector('.dnscrypt-proxy .error')
+                        errorMessage.innerText = request.responseText
+                    }
+                    toggleSpinner()
+                }
+                request.onerror = function() {
+                    console.error(request.status, request.responseText)
+                    const errorMessage = document.querySelector('.dnscrypt-proxy .error')
+                    errorMessage.innerText = "Something went wrong :'("
+                    toggleSpinner()
+                }
+                if (method === 'POST') {
+                    request.open(method, '', true)
+                    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
+                    request.send(data)
+                } else {
+                    request.open(method, data, true);
+                    request.send()
+                }
+            }
+
+            function toggleSpinner () {
+                const spinner = document.querySelector('.dnscrypt-proxy .spinner')
+                spinner.style.visibility = (spinner.style.visibility === 'visible') ? 'hidden' : 'visible'
+            }
+
+            const select = document.querySelector('.dnscrypt-proxy select')
+            select.addEventListener('change', function(e) {
+                setGetParameter(e.target.name, e.target.value)
+            }, false)
+
+            const updateBlocklist = document.querySelector('.dnscrypt-proxy .updateBlocklist')
+            updateBlocklist.addEventListener('submit', function(e) {
+                const urlParams = new URLSearchParams(window.location.search)
+                if (urlParams.get('file') !== 'blocklist') {
+                    if (e.preventDefault) e.preventDefault()
+                    toggleSpinner()
+                    ajax('POST', 'generateBlocklist=true')
+                }
+            }, false)
+
+        </script>
+    </body>
+</html>

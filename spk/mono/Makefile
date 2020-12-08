@@ -1,31 +1,27 @@
 SPK_NAME = mono
-SPK_VERS = 4.6.2.7
-SPK_REV = 8
+SPK_VERS = 5.20.1.34
+SPK_REV = 17
 SPK_ICON = src/mono.png
-BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hg59
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "Update to 4.6.2.7"
+CHANGELOG = "1. Update to version 5.20.1.34<br/>2. Fix workaround for ARMv5 (88f628x archs)"
 
-HOMEPAGE = http://mono-project.com
-LICENSE  = http://www.mono-project.com/docs/faq/licensing
+HOMEPAGE = https://mono-project.com
+LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
 
 POST_STRIP_TARGET = mono_extra_install
 
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 MONO_NATIVE_INSTALL = $(WORK_DIR)/../../../native/$(SPK_NAME)/work-native/install
+
+SPK_COMMANDS = bin/mono bin/mcs bin/gacutil bin/gacutil2 bin/makecert
+
 
 include ../../mk/spksrc.spk.mk
 

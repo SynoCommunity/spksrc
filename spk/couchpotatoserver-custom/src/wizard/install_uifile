@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Fork URL",
-            "defaultValue": "https://github.com/RuudBurger/CouchPotatoServer.git",
+            "defaultValue": "git://github.com/CouchPotato/CouchPotatoServer.git",
             "validator": {
                 "allowBlank": false
             }
@@ -17,6 +17,9 @@
             "validator": {
                 "allowBlank": false
             }
-        ]
+        }]
+    },
+    {
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
     }]
 }]

@@ -1,6 +1,6 @@
 lnk:lib/libconfig.so
-lnk:lib/libconfig.so.9
-lib:lib/libconfig.so.9.1.3
+lnk:lib/libconfig.so.11
+lib:lib/libconfig.so.11.0.2
 lnk:lib/libconfig++.so
-lnk:lib/libconfig++.so.9
-lib:lib/libconfig++.so.9.1.3
+lnk:lib/libconfig++.so.11
+lib:lib/libconfig++.so.11.0.2

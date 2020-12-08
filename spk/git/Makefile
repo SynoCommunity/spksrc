@@ -1,26 +1,20 @@
 SPK_NAME = git
-SPK_VERS = 2.11.0
-SPK_REV = 10
+SPK_VERS = 2.28.0
+SPK_REV = 16
 SPK_ICON = src/git.png
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = Diaoul
-DESCRIPTION = Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
-DESCRIPTION_FRE = Git est un logiciel de gestion de version décentralisée gratuit et open source destiné à gérer aussi bien les petits que les très gros projets avec vitesse et efficacité.
+MAINTAINER = Safihre
+DESCRIPTION = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
+DESCRIPTION_FRE = Git est un système de gestion de révision rapide, extensible et distribué avec un ensemble de commandes inhabituellement riche qui fournit à la fois des opérations de haut niveau et un accès complet aux structures de bas niveau.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = Update Git to 2.11.0
+CHANGELOG = "1. Update git to 28.0.<br/>2. Update openssl to 1.1."
 
-HOMEPAGE = http://git-scm.com
+HOMEPAGE = https://git-scm.com
 LICENSE  = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
-BUSYBOX_CONFIG = tr
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+SPK_COMMANDS = bin/git bin/git-cvsserver bin/git-receive-pack bin/git-shell bin/git-upload-archive bin/git-upload-pack
 
 include ../../mk/spksrc.spk.mk
