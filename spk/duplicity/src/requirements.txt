@@ -4,7 +4,7 @@
 # Main requirements
 boto==2.45.0
 lockfile==0.12.2
-paramiko==2.1.1 # SCP
+paramiko==2.1.5 # SCP
 pycryptopp==0.7.1.869544967005693312591928092448767568728501330214
 
 pyrax==1.9.8
