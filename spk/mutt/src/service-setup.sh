@@ -8,4 +8,3 @@ service_save ()
         mv ${INSTALL_TARGET_DIR}/etc/Muttrc.local ${TMP_DIR}/Muttrc.local  >> "${INST_LOG}"
     fi
 }
-
