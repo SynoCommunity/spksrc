@@ -16,7 +16,7 @@ pbr==0.10.8
 pyextdirect
 pysrt>=0.5.0
 python-dateutil==2.4.2
-pyxdg==0.25
+pyxdg==0.26
 requests>=2.0.1
 stevedore==1.3.0
 Werkzeug
