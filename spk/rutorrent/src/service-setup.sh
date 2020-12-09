@@ -186,6 +186,9 @@ service_restore ()
         mv -f "${TMP_DIR}/.htaccess" "${WEB_DIR}/${PACKAGE}/" >>"${INST_LOG}" 2>&1
         set_syno_permissions "${WEB_DIR}/${PACKAGE}/.htaccess" "${APACHE_USER}"
     fi
+
+    # Force new line at EOF (#4295)
+    echo >> "${WEB_DIR}/${PACKAGE}/conf/config.php"
     
     # In previous versions the python entry had nothing defined, 
     # here we define it if, and only if, python3 is actually installed
