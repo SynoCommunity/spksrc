@@ -9,13 +9,7 @@ SPK_RADARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/Radarr/Radarr.exe"
 # Radarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGDEST}/var"
 CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
-# Workaround for v3 PID file
-CUR_VER=$(${MONO_PATH}/monodis --assembly ${RADARR} | grep "Version:" | awk '{print $2}')
-if [ "${CUR_VER:0:1}" -lt 3 ]; then
-    PID_FILE="${CONFIG_DIR}/Radarr/nzbdrone.pid"
-else
-    PID_FILE="${CONFIG_DIR}/Radarr/radarr.pid"
-fi
+PID_FILE="${CONFIG_DIR}/Radarr/radarr.pid"
 
 # Some have it stored in the root of package
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
@@ -56,10 +50,10 @@ service_preupgrade ()
     # The /var/ folder gets automatically copied by service-installer after this
     if [ -d "${LEGACY_CONFIG_DIR}" ]; then
         echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
-        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${LOG_FILE} 2>&1
+        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${INST_LOG} 2>&1
     else
         # Create, in case it's missing for some reason
-        mkdir ${CONFIG_DIR} >> ${LOG_FILE} 2>&1
+        mkdir ${CONFIG_DIR} >> ${INST_LOG} 2>&1
     fi
 
     # Is Installed Radarr Binary Ver. >= SPK Radarr Binary Ver.?
@@ -83,8 +77,8 @@ service_postupgrade ()
     . ${CONFIG_DIR}/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
         echo "Restoring Radarr version from before upgrade" >> ${INST_LOG}
-        rm -fr ${SYNOPKG_PKGDEST}/share >> $INST_LOG 2>&1
-        mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> $INST_LOG 2>&1
+        rm -fr ${SYNOPKG_PKGDEST}/share >> ${INST_LOG} 2>&1
+        mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> ${INST_LOG} 2>&1
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
     set_unix_permissions "${CONFIG_DIR}"
