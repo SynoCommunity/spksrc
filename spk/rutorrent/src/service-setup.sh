@@ -130,6 +130,9 @@ service_postinst ()
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
 
+    # Allow passing through ${WEB_DIR} for sc-rutorrent user (#4295)
+    synoacltool -add "${folder}" "user:${EFF_USER}:allow:--x----------:---n" >> "${INST_LOG}" 2>&1
+
     return 0
 }
 
