@@ -37,7 +37,7 @@ pyparsing==2.4.7
 pyrss2gen==1.1
 python-dateutil==2.6.1
 pytz==2017.2
-pyyaml==5.2
+pyyaml==5.3.1
 rebulk==2.0.0
 requests==2.24.0
 rpyc==4.0.1
