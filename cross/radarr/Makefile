@@ -6,12 +6,13 @@ PKG_EXT = tar.gz
 
 # Define PKG_ARCH for compiler
 PKG_ARCH =
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
-	PKG_ARCH = arm
-endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-	PKG_ARCH = arm64
-endif
+# Excluding arm plafrorms for testing
+# ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+# 	PKG_ARCH = arm
+# endif
+# ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+# 	PKG_ARCH = arm64
+# endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 	PKG_ARCH = x64
 endif
