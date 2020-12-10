@@ -129,7 +129,14 @@ service_postinst ()
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
 
     # Allow passing through ${WEB_DIR} for sc-rutorrent user (#4295)
-    synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n" >> "${INST_LOG}" 2>&1
+    check_acl=$(synoacltool -get-perm ${WEB_DIR} ${EFF_USER} | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
+    if [ -z "${check_acl}" -o "${check_acl}" = "-------------" ]; then
+       echo "Fixing shared folder access for ${WEB_DIR}" >> "${INST_LOG}" 2>&1
+       synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n" >> "${INST_LOG}" 2>&1
+    else
+       synoacltool -get-perm ${WEB_DIR} ${EFF_USER} >> "${INST_LOG}" 2>&1
+    fi
+
     # Allow read/write/execute over the share web/rutorrent/share directory
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
 
