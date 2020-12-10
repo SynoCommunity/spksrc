@@ -2,13 +2,13 @@ PKG_NAME = Radarr
 PKG_VERS = 3.0.0.4204
 PKG_EXT = tar.gz
 # Define PKG_ARCH for compiler
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(ARCH),arm)
 	PKG_ARCH = arm
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+ifeq ($(ARCH),arm64)
 	PKG_ARCH = arm64
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(ARCH),x86_64)
 	PKG_ARCH = x64
 endif
 ifeq ($(PKG_ARCH),)
