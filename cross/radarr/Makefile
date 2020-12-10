@@ -20,7 +20,6 @@ PKG_DIST_SITE = https://github.com/Radarr/Radarr/releases/download/v$(PKG_VERS)
 PKG_DIR = Radarr
 
 DEPENDS =
-UNSUPPORTED_ARCHS += $(PPC_ARCHES) $(ARM5_ARCHES) $(x86_ARCHES)
 
 HOMEPAGE = https://radarr.video/
 COMMENT  = Radarr is a movie manager like Couchpotato, but based on the Sonarr codebase. It can monitor multiple RSS feeds for new movie releases and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
