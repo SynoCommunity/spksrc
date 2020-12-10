@@ -44,7 +44,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
-SPK_DEPENDS = "python3:php5.6"
+SPK_DEPENDS = "python3>=3.7.7:php5.6"
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
