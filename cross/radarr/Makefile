@@ -3,6 +3,7 @@ include ../../mk/spksrc.cross-cc.mk
 PKG_NAME = Radarr
 PKG_VERS = 3.0.0.4204
 PKG_EXT = tar.gz
+
 # Define PKG_ARCH for compiler
 PKG_ARCH =
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
@@ -18,6 +19,7 @@ ifeq ($(PKG_ARCH),)
 	# don't report error to use regular UNSUPPORTED_ARCHS logging
 	$(warning Unsupported ARCH $(ARCH))
 endif
+
 PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).linux-core-$(PKG_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Radarr/Radarr/releases/download/v$(PKG_VERS)
 PKG_DIR = Radarr
