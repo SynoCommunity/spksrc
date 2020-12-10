@@ -4,12 +4,10 @@ SPK_REV = 13
 SPK_ICON = src/radarr.png
 
 REQUIRED_DSM = 5.0
-# Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+# .NET Core not supported on ppc or x86 platforms.
+UNSUPPORTED_ARCHS = $(PPC_ARCHES) $(ARM5_ARCHES) $(x86_ARCHES)
 
 DEPENDS = cross/busybox cross/curl cross/mediainfo cross/sqlite cross/radarr
-
-SPK_DEPENDS = "mono>3.6"
 
 MAINTAINER = ressu
 DESCRIPTION  = Radarr is a movie manager like Couchpotato, but based on the Sonarr codebase. It can monitor multiple RSS feeds for new movie releases and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
