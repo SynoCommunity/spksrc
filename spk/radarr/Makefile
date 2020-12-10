@@ -6,6 +6,8 @@ SPK_ICON = src/radarr.png
 REQUIRED_DSM = 5.0
 # .NET Core not supported on ppc or x86 platforms.
 UNSUPPORTED_ARCHS = $(PPC_ARCHES) $(ARM5_ARCHES) $(x86_ARCHES)
+# Exclude additional arm platforms for testing
+UNSUPPORTED_ARCHS += $(ARM7_ARCHES) $(ARM8_ARCHES)
 
 DEPENDS = cross/busybox cross/curl cross/mediainfo cross/sqlite cross/radarr
 
