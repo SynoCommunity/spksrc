@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.10
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
@@ -43,6 +43,8 @@ BUSYBOX_CONFIG = usrmng nice procutils
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
+
+SPK_DEPENDS = "python3:php5.6"
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
