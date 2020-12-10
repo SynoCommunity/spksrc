@@ -1,14 +1,17 @@
+include ../../mk/spksrc.cross-cc.mk
+
 PKG_NAME = Radarr
 PKG_VERS = 3.0.0.4204
 PKG_EXT = tar.gz
 # Define PKG_ARCH for compiler
-ifeq ($(ARCH),arm)
+PKG_ARCH =
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 	PKG_ARCH = arm
 endif
-ifeq ($(ARCH),arm64)
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
 	PKG_ARCH = arm64
 endif
-ifeq ($(ARCH),x86_64)
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 	PKG_ARCH = x64
 endif
 ifeq ($(PKG_ARCH),)
@@ -28,8 +31,6 @@ LICENSE  = GNU GPL v3
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = radarr_install
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: radarr_install
 radarr_install:
