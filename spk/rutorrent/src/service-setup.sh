@@ -118,13 +118,11 @@ service_postinst ()
         fi
     fi
 
-    # If python3 is available setup a virtual environment with cloudscraper
-    if [ -f "${PYTHON_DIR}/bin/python3" ]; then
-        # Create a Python virtualenv
-        ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> "${INST_LOG}" 2>&1
-        # Install the cloudscraper wheels
-        ${SYNOPKG_PKGDEST}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
-    fi
+    # Setup a virtual environment with cloudscraper
+    # Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> "${INST_LOG}" 2>&1
+    # Install the cloudscraper wheels
+    ${SYNOPKG_PKGDEST}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
 
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
 
