@@ -18,7 +18,7 @@ ADMIN_URL = /rutorrent/
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Update rutorrent to 3.10<br/>2. Update rtorrent to 0.9.8<br/>3. Update openssl to 1.1"
+CHANGELOG = "1. Update rutorrent to 3.10<br/>2. Update rtorrent to 0.9.8<br/>3. Update openssl to 1.1<br/>4. Fix bug issue no. 4295<br/>5. Move rtorrent configuration file to web volume for direct user access"
 
 HOMEPAGE   = https://github.com/Novik/ruTorrent
 LICENSE    = GPLv3
@@ -49,7 +49,7 @@ SPK_DEPENDS = "python3>=3.7.7:php5.6"
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 src/bin/rutorrent-daemon $(STAGING_DIR)/bin/rutorrent-daemon
+	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session
