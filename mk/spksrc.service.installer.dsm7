@@ -85,24 +85,28 @@ save_wizard_variables ()
 # Remove user from system and from groups it is member of
 syno_remove_user ()
 {
+    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_remove_user() is no longer supported."
     return 0
 }
 
 # Create syno group $GROUP with parameter user as member
 syno_group_create ()
 {
+    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_group_create() is no longer supported."
     return 0
 }
 
 # Delete syno group if empty
 syno_group_remove ()
 {
+    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_group_remove() is no longer supported."
     return 0
 }
 
 # Add user to existing group
 syno_user_add_to_group ()
 {
+    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_user_add_to_group() is no longer supported."
     return 0
 }
 
@@ -110,6 +114,7 @@ syno_user_add_to_group ()
 # Usage: set_syno_permissions "${SHARE_FOLDER}" "${GROUP}"
 set_syno_permissions ()
 {
+    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: set_syno_permissions() is no longer supported."
     return 0
 }
 
@@ -117,6 +122,7 @@ set_syno_permissions ()
 # also to the old group. Only if the legacy user was in the old group.
 # Usage: syno_user_add_to_legacy_group "${NEW_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
 syno_user_add_to_legacy_group () {
+    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_user_add_to_legacy_group() is no longer supported."
     return 0
 }
 
