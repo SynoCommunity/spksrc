@@ -5,11 +5,7 @@
 # DSM 6 -> 7 upgrade path:
 # Not supported (yet)
 
-# if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-    INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
-# else
-#     INST_LOG="${SYNOPKG_TEMP_LOGFILE}"
-# fi
+INST_LOG="${SYNOPKG_TEMP_LOGFILE}"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
@@ -19,12 +15,7 @@ INST_VAR="${SYNOPKG_PKGDEST}/var"
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
 
-# Versions lower then DSM 6 don't support an upgrade folder
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-    TMP_DIR="/var/tmp/${SYNOPKG_PKGNAME}/var"
-else
-    TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
-fi
+TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
 # Source package specific variable and functions
 SVC_SETUP=`dirname $0`"/service-setup"
@@ -82,45 +73,36 @@ save_wizard_variables ()
     fi
 }
 
-# Remove user from system and from groups it is member of
 syno_remove_user ()
 {
     echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_remove_user() is no longer supported."
     return 0
 }
 
-# Create syno group $GROUP with parameter user as member
 syno_group_create ()
 {
     echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_group_create() is no longer supported."
     return 0
 }
 
-# Delete syno group if empty
 syno_group_remove ()
 {
     echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_group_remove() is no longer supported."
     return 0
 }
 
-# Add user to existing group
 syno_user_add_to_group ()
 {
     echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_user_add_to_group() is no longer supported."
     return 0
 }
 
-# Sets recursive permissions for ${GROUP} on specified directory
-# Usage: set_syno_permissions "${SHARE_FOLDER}" "${GROUP}"
 set_syno_permissions ()
 {
     echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: set_syno_permissions() is no longer supported."
     return 0
 }
 
-# If package was moved to new group, we need to add the new package user
-# also to the old group. Only if the legacy user was in the old group.
-# Usage: syno_user_add_to_legacy_group "${NEW_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
 syno_user_add_to_legacy_group () {
     echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_user_add_to_legacy_group() is no longer supported."
     return 0
@@ -149,30 +131,6 @@ postinst ()
 {
     log_step "postinst"
     save_wizard_variables
-
-    # # Share management
-    # if [ -n "${SHARE_PATH}" ]; then
-    #     echo "Configuring ${SHARE_PATH}" >> ${INST_LOG}
-    #     # Create share if does not exist
-    #     #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
-    #     if ! synoshare --get "${SHARE_NAME}" &> /dev/null ; then
-    #         synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG} 2>&1
-    #     fi
-
-    #     # Add user permission if no GROUP is set in UI
-    #     # GROUP permission will be added in set_syno_permissions
-    #     if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
-    #         synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" >> ${INST_LOG} 2>&1
-    #     fi
-    #     synoshare --build >> ${INST_LOG} 2>&1
-
-    #     $MKDIR "${SHARE_PATH}"
-
-    #     # Permissions for folder, up to volume
-    #     if [ -n "$GROUP" ]; then
-    #         set_syno_permissions "${SHARE_PATH}" "${GROUP}"
-    #     fi
-    # fi
 
     $MKDIR "${INST_VAR}" >> ${INST_LOG} 2>&1
 
