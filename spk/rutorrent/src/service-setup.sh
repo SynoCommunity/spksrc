@@ -102,12 +102,12 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
-               ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+               ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
 
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
         else
-            sed -i -e "/@watch_dir@/d" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+            sed -i -e "/@watch_dir@/d" ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
         fi
 
         if [ "${wizard_disable_openbasedir}" == "true" ] && [ "${APACHE_USER}" == "http" ]; then
@@ -161,7 +161,7 @@ service_save ()
 {
     # Revision 8 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
-        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc
+        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${RTORRENT_RC}
     fi
 
     # Save the configuration file
@@ -175,10 +175,10 @@ service_save ()
 
     # Save rtorrent configuration file (new location)
     if [ -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
-       mv ${RTORRENT_RC} ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+       mv ${RTORRENT_RC} ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
     # Save rtorrent configuration file (old location -> prior to symlink)
     elif [ ! -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ]; then
-       mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+       mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/rtorrent.rc >> "${INST_LOG}" 2>&1
     fi
 
     return 0
@@ -202,27 +202,27 @@ define_external_program()
 
 service_restore ()
 {
-    # Restore the configuration file
-    mv -f "${TMP_DIR}/config.php" "${WEB_DIR}/${PACKAGE}/conf/" >>"${INST_LOG}" 2>&1
-    set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/config.php"
-    chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/config.php"
-
     if [ -f "${TMP_DIR}/.htaccess" ]; then
-        mv -f "${TMP_DIR}/.htaccess" "${WEB_DIR}/${PACKAGE}/" >>"${INST_LOG}" 2>&1
+        mv -f "${TMP_DIR}/.htaccess" "${WEB_DIR}/${PACKAGE}/" >> "${INST_LOG}" 2>&1
         set_unix_permissions "${WEB_DIR}/${PACKAGE}/.htaccess"
         chmod 0644 "${WEB_DIR}/${PACKAGE}/.htaccess"
     fi
 
     # Restore rtorrent configuration (assumes ${SYNOPKG_PKGDEST}/var/.rtorrent.rc symlink)
-    mv ${TMP_DIR}/.rtorrent.rc ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/rtorrent.rc ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
     # http_cacert command has been moved to network.http.cacert
     if [ ! `grep 'http_cacert = ' "${RTORRENT_RC}" | wc -l` -eq 0 ]; then
-        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
+        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
     fi
 
     # Restore previous session files
-    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >>"${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >> "${INST_LOG}" 2>&1
     set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
+
+    # Restore the configuration file
+    mv -f "${TMP_DIR}/config.php" "${WEB_DIR}/${PACKAGE}/conf/" >>"${INST_LOG}" 2>&1
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/config.php"
+    chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/config.php"
 
     # Force new line at EOF for older rutorrent upgrade when missing (#4295)
     [ ! -z "$(tail -c1 ${WEB_DIR}/${PACKAGE}/conf/config.php)" ] && echo >> "${WEB_DIR}/${PACKAGE}/conf/config.php"
