@@ -5,12 +5,12 @@
 # DSM 6 -> 7 upgrade path:
 # Not supported (yet)
 
-INST_LOG="${SYNOPKG_TEMP_LOGFILE}"
+
+INST_LOG="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_install.log"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
-INST_VAR="${SYNOPKG_PKGDEST}/var"
-# INST_VAR="${SYNOPKG_PKGVAR}"
+INST_VAR="${SYNOPKG_PKGVAR}"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
