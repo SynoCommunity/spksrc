@@ -28,7 +28,7 @@ SERVICE_USER = auto
 SERVICE_SETUP        = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_download_dir
 
-SERVICE_COMMAND  = /var/packages/$(SPK_NAME)/target/bin/$(SPK_NAME)-daemon
+SERVICE_COMMAND  = /var/packages/$(SPK_NAME)/target/bin/rtorrent-daemon
 FWPORTS          = src/$(SPK_NAME).sc
 CONF_DIR         = src/conf/
 WIZARDS_DIR      = src/wizard/
