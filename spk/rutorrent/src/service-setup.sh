@@ -11,6 +11,9 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PATH}"
 APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
+# rtorrent configuration file location
+RTORRENT_RC=${WEB_DIR}/${PACKAGE}/conf/.rtorrent.rc
+
 GROUP="sc-download"
 GROUP_DESC="SynoCommunity's download related group"
 LEGACY_USER="rutorrent"
@@ -63,6 +66,10 @@ service_postinst ()
 
     # Install the web interface
     cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR} >>"${INST_LOG}" 2>&1
+
+    # Allow direct-user access to rtorrent configuration file
+    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
+    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
 
     # Configure open_basedir
     if [ "${APACHE_USER}" == "nobody" ]; then
@@ -162,8 +169,17 @@ service_save ()
     if [ -f "${WEB_DIR}/${PACKAGE}/.htaccess" ]; then
         mv "${WEB_DIR}/${PACKAGE}/.htaccess" "${TMP_DIR}/" >>"${INST_LOG}" 2>&1
     fi
-    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+
+    # Save session files
     mv ${SYNOPKG_PKGDEST}/var/.session ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+
+    # Save rtorrent configuration file (new location)
+    if [ -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
+       mv ${RTORRENT_RC} ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+    # Save rtorrent configuration file (old location -> prior to symlink)
+    elif [ ! -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ]; then
+       mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+    fi
 
     return 0
 }
@@ -197,11 +213,11 @@ service_restore ()
         chmod 0644 "${WEB_DIR}/${PACKAGE}/.htaccess"
     fi
 
-    # Restore rtorrent configuration
-    mv ${TMP_DIR}/.rtorrent.rc ${SYNOPKG_PKGDEST}/var/ >>"${INST_LOG}" 2>&1
+    # Restore rtorrent configuration (assumes ${SYNOPKG_PKGDEST}/var/.rtorrent.rc symlink)
+    mv ${TMP_DIR}/.rtorrent.rc ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
     # http_cacert command has been moved to network.http.cacert
-    if [ ! `grep 'http_cacert = ' "${SYNOPKG_PKGDEST}/var/.rtorrent.rc" | wc -l` -eq 0 ]; then
-        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+    if [ ! `grep 'http_cacert = ' "${RTORRENT_RC}" | wc -l` -eq 0 ]; then
+        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
     fi
 
     # Restore previous session files
