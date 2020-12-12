@@ -12,7 +12,7 @@ APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 # rtorrent configuration file location
-RTORRENT_RC=${WEB_DIR}/${PACKAGE}/conf/.rtorrent.rc
+RTORRENT_RC=${WEB_DIR}/${PACKAGE}/conf/rtorrent.rc
 
 GROUP="sc-download"
 GROUP_DESC="SynoCommunity's download related group"
