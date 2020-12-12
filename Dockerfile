@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		gperf \
 		imagemagick \
 		intltool \
+		jq \
 		libbz2-dev \
 		libc6-i386 \
 		libcppunit-dev \
