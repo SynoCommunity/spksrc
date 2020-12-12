@@ -43,17 +43,47 @@ service_preinst ()
     return 0
 }
 
+check_acl()
+{
+    acl_path=$1
+    acl_user=$2
+    acl_permissions=$(synoacltool -get-perm ${acl_path} ${acl_user} | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
+    if [ -z "${acl_permissions}" -o "${acl_permissions}" = "-------------" ]; then
+        return 1
+    else
+        synoacltool -get-perm ${acl_path} ${acl_user} >> "${INST_LOG}" 2>&1
+        return 0
+    fi
+}
+
 fix_shared_folders_rights()
 {
     local folder=$1
     echo "Fixing shared folder rights for ${folder}" >> "${INST_LOG}"
+
+    # Delete any previous ACL to limite duplicates
+    synoacltool -del "${folder}" >> "${INST_LOG}" 2>&1
+
+    # Set default user to sc-rutorrent and group to http
     chown -R "${EFF_USER}:${APACHE_USER}" "${folder}" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for everyone" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "everyone::allow:r-x----------:fd--" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for user:${EFF_USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "user:${EFF_USER}:allow:rwxpdDaARWc--:fd" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for group:${USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "group:${USER}:allow:rwxpdDaARWc--:fd" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for user:${APACHE_USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "user:${APACHE_USER}:allow:rwxp-D------:fd" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for group:${APACHE_USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "group:${APACHE_USER}:allow:rwxp-D------:fd" >> "${INST_LOG}" 2>&1
-    echo 'find "${folder}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \;' >> ${INST_LOG} 2>&1
+
+    # Enforce permissions to sub-folders
+    echo 'find ${folder} -mindepth 1 -type d -exec synoacltool -enforce-inherit {} \;' >> ${INST_LOG} 2>&1
     find "${folder}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \; >> ${INST_LOG} 2>&1
 }
 
@@ -134,13 +164,10 @@ service_postinst ()
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
 
     # Allow passing through ${WEB_DIR} for sc-rutorrent user (#4295)
-    check_acl=$(synoacltool -get-perm ${WEB_DIR} ${EFF_USER} | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
-    if [ -z "${check_acl}" -o "${check_acl}" = "-------------" ]; then
-       echo "Fixing shared folder access for ${WEB_DIR}" >> "${INST_LOG}" 2>&1
-       synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n" >> "${INST_LOG}" 2>&1
-    else
-       synoacltool -get-perm ${WEB_DIR} ${EFF_USER} >> "${INST_LOG}" 2>&1
-    fi
+    echo "Fixing shared folder access for ${WEB_DIR}" >> "${INST_LOG}" 2>&1
+    check_acl "${WEB_DIR}" "${EFF_USER}" >> "${INST_LOG}" 2>&1
+    [ $? -eq 1 ] \
+       && synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n" >> "${INST_LOG}" 2>&1
 
     # Allow read/write/execute over the share web/rutorrent/share directory
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
@@ -181,6 +208,13 @@ service_save ()
        mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/rtorrent.rc >> "${INST_LOG}" 2>&1
     fi
 
+    # Save rutorrent share directory
+    mv ${WEB_DIR}/${PACKAGE}/share ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
+
+    # Save plugins directory for any user-added plugins
+    mv ${WEB_DIR}/${PACKAGE}/conf/plugins.ini ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
+    mv ${WEB_DIR}/${PACKAGE}/plugins ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
+
     return 0
 }
 
@@ -202,24 +236,42 @@ define_external_program()
 
 service_restore ()
 {
+    echo "Restoring http custom security file ${WEB_DIR}/${PACKAGE}/.htaccess" >> "${INST_LOG}" 2>&1
     if [ -f "${TMP_DIR}/.htaccess" ]; then
         mv -f "${TMP_DIR}/.htaccess" "${WEB_DIR}/${PACKAGE}/" >> "${INST_LOG}" 2>&1
         set_unix_permissions "${WEB_DIR}/${PACKAGE}/.htaccess"
         chmod 0644 "${WEB_DIR}/${PACKAGE}/.htaccess"
     fi
 
-    # Restore rtorrent configuration (assumes ${SYNOPKG_PKGDEST}/var/.rtorrent.rc symlink)
+    echo "Restoring rtorrent configuration ${RTORRENT_RC}" >> "${INST_LOG}" 2>&1
     mv ${TMP_DIR}/rtorrent.rc ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
     # http_cacert command has been moved to network.http.cacert
     if [ ! `grep 'http_cacert = ' "${RTORRENT_RC}" | wc -l` -eq 0 ]; then
         sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
     fi
 
-    # Restore previous session files
+    echo "Restoring rtorrent session files ${SYNOPKG_PKGDEST}/var/.session" >> "${INST_LOG}" 2>&1
     mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >> "${INST_LOG}" 2>&1
     set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
 
-    # Restore the configuration file
+    echo "Restoring rutorrent web shared directory ${WEB_DIR}/${PACKAGE}/share" >> "${INST_LOG}" 2>&1
+    cp -pnr ${TMP_DIR}/share ${WEB_DIR}/${PACKAGE}/ >> "${INST_LOG}" 2>&1
+    fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
+    # Remove unecessary backup files post-recovery
+    rm -fr ${TMP_DIR}/share
+
+    echo "Restoring rutorrent custom plugins configuration ${WEB_DIR}/${PACKAGE}/conf/plugins.ini" >> "${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/plugins.ini ${WEB_DIR}/${PACKAGE}/conf/ >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
+    chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
+
+    echo "Restoring rutorrent custom plugins ${WEB_DIR}/${PACKAGE}/plugins" >> "${INST_LOG}" 2>&1
+    cp -pnr ${TMP_DIR}/plugins ${WEB_DIR}/${PACKAGE}/ >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/plugins"
+    # Remove unecessary backup files post-recovery
+    rm -fr ${TMP_DIR}/plugins
+
+    echo "Restoring rutorrent global configuration ${WEB_DIR}/${PACKAGE}/conf/config.php" >> "${INST_LOG}" 2>&1
     mv -f "${TMP_DIR}/config.php" "${WEB_DIR}/${PACKAGE}/conf/" >>"${INST_LOG}" 2>&1
     set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/config.php"
     chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/config.php"
