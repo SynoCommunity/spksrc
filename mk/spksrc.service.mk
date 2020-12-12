@@ -188,12 +188,7 @@ else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
 	$(create_target_dir)
-ifneq ($(strip $(EFF_USER)),)
-	@sed 's|USER|$(EFF_USER)|' $< > $@
-else
-	@sed 's|USER|$(SPK_NAME)|' $< > $@
-# 	@sed '/.*USER.*/d' $< > $@
-endif
+	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
