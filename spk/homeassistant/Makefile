@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
-SPK_VERS = 0.114.2
-SPK_REV = 9
+SPK_VERS = 0.118.5
+SPK_REV = 10
 SPK_ICON = src/${SPK_NAME}.png
 
 SPK_DEPENDS = "python3>=3.7.7"
@@ -10,8 +10,9 @@ BUILD_DEPENDS += cross/poetry
 OPTIONAL_DEPENDS += cross/numpy
 
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography
+DEPENDS += cross/pillow
 # for python-libnmap
-DEPENDS = cross/nmap
+DEPENDS += cross/nmap
 # for mobile_app
 DEPENDS += cross/PyNaCl
 
@@ -29,9 +30,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = ymartin59
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update Home Assistant to v0.114.2.<br/>2. Update openssl to 1.1.<br/>"
-CHANGELOG += "3. Include all dependencies for core and cloud module.<br/>"
-CHANGELOG += "4. Include all supported default integrations.<br/>"
+CHANGELOG = "1. Update Home Assistant to v0.118.5<br/>2. Update dependencies"
 RELOAD_UI = yes
 STARTABLE = yes
 
