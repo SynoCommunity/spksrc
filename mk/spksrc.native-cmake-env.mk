@@ -14,6 +14,7 @@ CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 # Use native cmake
+DEPENDS += native/cmake
 CMAKE_PATH = $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin
 ENV += PATH=$(CMAKE_PATH):$$PATH
 
