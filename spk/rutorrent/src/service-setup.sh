@@ -11,6 +11,9 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PATH}"
 APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
+# rtorrent configuration file location
+RTORRENT_RC=${WEB_DIR}/${PACKAGE}/conf/rtorrent.rc
+
 GROUP="sc-download"
 GROUP_DESC="SynoCommunity's download related group"
 LEGACY_USER="rutorrent"
@@ -40,22 +43,52 @@ service_preinst ()
     return 0
 }
 
+check_acl()
+{
+    acl_path=$1
+    acl_user=$2
+    acl_permissions=$(synoacltool -get-perm ${acl_path} ${acl_user} | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
+    if [ -z "${acl_permissions}" -o "${acl_permissions}" = "-------------" ]; then
+        return 1
+    else
+        synoacltool -get-perm ${acl_path} ${acl_user} >> "${INST_LOG}" 2>&1
+        return 0
+    fi
+}
+
 fix_shared_folders_rights()
 {
     local folder=$1
     echo "Fixing shared folder rights for ${folder}" >> "${INST_LOG}"
+
+    # Delete any previous ACL to limite duplicates
+    synoacltool -del "${folder}" >> "${INST_LOG}" 2>&1
+
+    # Set default user to sc-rutorrent and group to http
     chown -R "${EFF_USER}:${APACHE_USER}" "${folder}" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for everyone" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "everyone::allow:r-x----------:fd--" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for user:${EFF_USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "user:${EFF_USER}:allow:rwxpdDaARWc--:fd" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for group:${USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "group:${USER}:allow:rwxpdDaARWc--:fd" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for user:${APACHE_USER}" >> "${INST_LOG}" 2>&1
     synoacltool -add "${folder}" "user:${APACHE_USER}:allow:rwxp-D------:fd" >> "${INST_LOG}" 2>&1
-    synoacltool -add "${folder}" "group:${APACHE_USER}:allow:rwxp-D------:fd--" >> "${INST_LOG}" 2>&1
+
+    echo "Fixing shared folder access for group:${APACHE_USER}" >> "${INST_LOG}" 2>&1
+    synoacltool -add "${folder}" "group:${APACHE_USER}:allow:rwxp-D------:fd" >> "${INST_LOG}" 2>&1
+
+    # Enforce permissions to sub-folders
+    echo 'find ${folder} -mindepth 1 -type d -exec synoacltool -enforce-inherit {} \;' >> ${INST_LOG} 2>&1
     find "${folder}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \; >> ${INST_LOG} 2>&1
 }
 
 service_postinst ()
 {
-
     # Install busybox stuff
     ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
 
@@ -63,6 +96,10 @@ service_postinst ()
 
     # Install the web interface
     cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR} >>"${INST_LOG}" 2>&1
+
+    # Allow direct-user access to rtorrent configuration file
+    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
+    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
 
     # Configure open_basedir
     if [ "${APACHE_USER}" == "nobody" ]; then
@@ -95,12 +132,12 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
-               ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+               ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
 
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
         else
-            sed -i -e "/@watch_dir@/d" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+            sed -i -e "/@watch_dir@/d" ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
         fi
 
         if [ "${wizard_disable_openbasedir}" == "true" ] && [ "${APACHE_USER}" == "http" ]; then
@@ -118,16 +155,21 @@ service_postinst ()
         fi
     fi
 
-
-    #If python3 is available setup a virtual environment with cloudscraper
-    if [ -f "${PYTHON_DIR}/bin/python3" ]; then
-        # Create a Python virtualenv
-        ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> "${INST_LOG}" 2>&1
-        # Install the cloudscraper wheels
-        ${SYNOPKG_PKGDEST}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
-    fi
+    # Setup a virtual environment with cloudscraper
+    # Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> "${INST_LOG}" 2>&1
+    # Install the cloudscraper wheels
+    ${SYNOPKG_PKGDEST}/env/bin/pip install -U cloudscraper==1.2.48 >> "${INST_LOG}" 2>&1
 
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
+
+    # Allow passing through ${WEB_DIR} for sc-rutorrent user (#4295)
+    echo "Fixing shared folder access for ${WEB_DIR}" >> "${INST_LOG}" 2>&1
+    check_acl "${WEB_DIR}" "${EFF_USER}" >> "${INST_LOG}" 2>&1
+    [ $? -eq 1 ] \
+       && synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n" >> "${INST_LOG}" 2>&1
+
+    # Allow read/write/execute over the share web/rutorrent/share directory
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
 
     return 0
@@ -146,7 +188,7 @@ service_save ()
 {
     # Revision 8 introduces backward incompatible changes
     if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
-        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${SYNOPKG_PKGDEST}/var/.rtorrent.rc
+        sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${RTORRENT_RC}
     fi
 
     # Save the configuration file
@@ -154,9 +196,24 @@ service_save ()
     if [ -f "${WEB_DIR}/${PACKAGE}/.htaccess" ]; then
         mv "${WEB_DIR}/${PACKAGE}/.htaccess" "${TMP_DIR}/" >>"${INST_LOG}" 2>&1
     fi
-    cp -pr ${WEB_DIR}/${PACKAGE}/share/ ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
-    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+
+    # Save session files
     mv ${SYNOPKG_PKGDEST}/var/.session ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+
+    # Save rtorrent configuration file (new location)
+    if [ -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
+       mv ${RTORRENT_RC} ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
+    # Save rtorrent configuration file (old location -> prior to symlink)
+    elif [ ! -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ]; then
+       mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/rtorrent.rc >> "${INST_LOG}" 2>&1
+    fi
+
+    # Save rutorrent share directory
+    mv ${WEB_DIR}/${PACKAGE}/share ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
+
+    # Save plugins directory for any user-added plugins
+    mv ${WEB_DIR}/${PACKAGE}/conf/plugins.ini ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
+    mv ${WEB_DIR}/${PACKAGE}/plugins ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
 
     return 0
 }
@@ -179,14 +236,49 @@ define_external_program()
 
 service_restore ()
 {
-    # Restore the configuration file
-    mv -f "${TMP_DIR}/config.php" "${WEB_DIR}/${PACKAGE}/conf/" >>"${INST_LOG}" 2>&1
-
+    echo "Restoring http custom security file ${WEB_DIR}/${PACKAGE}/.htaccess" >> "${INST_LOG}" 2>&1
     if [ -f "${TMP_DIR}/.htaccess" ]; then
-        mv -f "${TMP_DIR}/.htaccess" "${WEB_DIR}/${PACKAGE}/" >>"${INST_LOG}" 2>&1
-        set_syno_permissions "${WEB_DIR}/${PACKAGE}/.htaccess" "${APACHE_USER}"
+        mv -f "${TMP_DIR}/.htaccess" "${WEB_DIR}/${PACKAGE}/" >> "${INST_LOG}" 2>&1
+        set_unix_permissions "${WEB_DIR}/${PACKAGE}/.htaccess"
+        chmod 0644 "${WEB_DIR}/${PACKAGE}/.htaccess"
     fi
-    
+
+    echo "Restoring rtorrent configuration ${RTORRENT_RC}" >> "${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/rtorrent.rc ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
+    # http_cacert command has been moved to network.http.cacert
+    if [ ! `grep 'http_cacert = ' "${RTORRENT_RC}" | wc -l` -eq 0 ]; then
+        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
+    fi
+
+    echo "Restoring rtorrent session files ${SYNOPKG_PKGDEST}/var/.session" >> "${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
+
+    echo "Restoring rutorrent web shared directory ${WEB_DIR}/${PACKAGE}/share" >> "${INST_LOG}" 2>&1
+    cp -pnr ${TMP_DIR}/share ${WEB_DIR}/${PACKAGE}/ >> "${INST_LOG}" 2>&1
+    fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
+    # Remove unecessary backup files post-recovery
+    rm -fr ${TMP_DIR}/share
+
+    echo "Restoring rutorrent custom plugins configuration ${WEB_DIR}/${PACKAGE}/conf/plugins.ini" >> "${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/plugins.ini ${WEB_DIR}/${PACKAGE}/conf/ >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
+    chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
+
+    echo "Restoring rutorrent custom plugins ${WEB_DIR}/${PACKAGE}/plugins" >> "${INST_LOG}" 2>&1
+    cp -pnr ${TMP_DIR}/plugins ${WEB_DIR}/${PACKAGE}/ >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/plugins"
+    # Remove unecessary backup files post-recovery
+    rm -fr ${TMP_DIR}/plugins
+
+    echo "Restoring rutorrent global configuration ${WEB_DIR}/${PACKAGE}/conf/config.php" >> "${INST_LOG}" 2>&1
+    mv -f "${TMP_DIR}/config.php" "${WEB_DIR}/${PACKAGE}/conf/" >>"${INST_LOG}" 2>&1
+    set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/config.php"
+    chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/config.php"
+
+    # Force new line at EOF for older rutorrent upgrade when missing (#4295)
+    [ ! -z "$(tail -c1 ${WEB_DIR}/${PACKAGE}/conf/config.php)" ] && echo >> "${WEB_DIR}/${PACKAGE}/conf/config.php"
+
     # In previous versions the python entry had nothing defined, 
     # here we define it if, and only if, python3 is actually installed
     if [ -f "${PYTHON_DIR}/bin/python3" ] && `is_not_defined_external_program 'python'`; then
@@ -228,23 +320,6 @@ service_restore ()
     if `is_not_defined_external_program 'php'`; then
         define_external_program 'php' '/bin/php' '/usr/bin/php'
     fi
-
-    set_syno_permissions "${WEB_DIR}/${PACKAGE}/conf/config.php" "${APACHE_USER}"
-
-    cp -pr ${TMP_DIR}/share/*/ ${WEB_DIR}/${PACKAGE}/share/ >>"${INST_LOG}" 2>&1
-    set_syno_permissions "${WEB_DIR}/${PACKAGE}/share/" "${APACHE_USER}"
-
-    mv ${TMP_DIR}/.rtorrent.rc ${SYNOPKG_PKGDEST}/var/ >>"${INST_LOG}" 2>&1
-    
-    if [ ! `grep 'http_cacert = ' "${SYNOPKG_PKGDEST}/var/.rtorrent.rc" | wc -l` -eq 0 ]; then
-        # http_cacert command has been moved to network.http.cacert
-        sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
-    fi
-
-    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >>"${INST_LOG}" 2>&1
-
-    # Restore appropriate rights on the var directory
-    set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
 
     return 0
 }
