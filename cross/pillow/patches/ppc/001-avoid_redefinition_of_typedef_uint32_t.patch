@@ -1,0 +1,14 @@
+# avoid error: /src/libImaging/raqm.h:36: error: redefinition of typedef 'uint32_t'
+# 
+--- src/libImaging/raqm.h.orig	2020-06-30 08:55:24.000000000 +0000
++++ src/libImaging/raqm.h	2020-12-13 03:39:54.620270901 +0000
+@@ -32,9 +32,6 @@
+ #ifndef bool
+ typedef int bool;
+ #endif
+-#ifndef uint32_t
+-typedef UINT32 uint32_t;
+-#endif
+ #include <ft2build.h>
+ #include FT_FREETYPE_H
+ 

@@ -1,0 +1,98 @@
+--- setup.py.orig	2017-01-02 12:47:11.000000000 +0100
++++ setup.py	2017-01-07 13:07:26.387452602 +0100
+@@ -136,12 +136,13 @@
+ 
+ NAME = 'Pillow'
+ PILLOW_VERSION = get_version()
++lib_include = os.path.join(os.environ['STAGING_INSTALL_PREFIX'], "lib"), os.path.join(os.environ['STAGING_INSTALL_PREFIX'], "include")
+-JPEG_ROOT = None
++JPEG_ROOT = lib_include
+ JPEG2K_ROOT = None
+-ZLIB_ROOT = None
++ZLIB_ROOT = lib_include
+ IMAGEQUANT_ROOT = None
+ TIFF_ROOT = None
+-FREETYPE_ROOT = None
++FREETYPE_ROOT = lib_include
+ LCMS_ROOT = None
+ 
+ 
+@@ -339,62 +340,6 @@
+                 _add_directory(library_dirs, "/usr/X11/lib")
+                 _add_directory(include_dirs, "/usr/X11/include")
+ 
+-        elif sys.platform.startswith("linux"):
+-            arch_tp = (plat.processor(), plat.architecture()[0])
+-            # This should be correct on debian derivatives.
+-            if os.path.exists('/etc/debian_version'):
+-                # If this doesn't work, don't just silently patch
+-                # downstream because it's going to break when people
+-                # try to build pillow from source instead of
+-                # installing from the system packages.
+-                self.add_multiarch_paths()
+-
+-            elif arch_tp == ("x86_64", "32bit"):
+-                # Special Case: 32-bit build on 64-bit machine.
+-                _add_directory(library_dirs, "/usr/lib/i386-linux-gnu")
+-            else:
+-                libdirs = {
+-                    'x86_64':  ["/lib64", "/usr/lib64",
+-                                "/usr/lib/x86_64-linux-gnu"],
+-                    '64bit':   ["/lib64", "/usr/lib64",
+-                                "/usr/lib/x86_64-linux-gnu"],
+-                    'i386':    ["/usr/lib/i386-linux-gnu"],
+-                    'i686':    ["/usr/lib/i386-linux-gnu"],
+-                    '32bit':   ["/usr/lib/i386-linux-gnu"],
+-                    'aarch64': ["/usr/lib64", "/usr/lib/aarch64-linux-gnu"],
+-                    'arm':     ["/usr/lib/arm-linux-gnueabi"],
+-                    'armv71':  ["/usr/lib/arm-linux-gnueabi"],
+-                    'armv7l':  ["/usr/lib"],
+-                    'ppc64':   ["/usr/lib64", "/usr/lib/ppc64-linux-gnu",
+-                                "/usr/lib/powerpc64-linux-gnu"],
+-                    'ppc64le':   ["/usr/lib64"],
+-                    'ppc':     ["/usr/lib/ppc-linux-gnu",
+-                                "/usr/lib/powerpc-linux-gnu"],
+-                    's390x':   ["/usr/lib64", "/usr/lib/s390x-linux-gnu"],
+-                    's390':    ["/usr/lib/s390-linux-gnu"],
+-                    }
+-
+-                for platform_ in arch_tp:
+-                    dirs = libdirs.get(platform_, None)
+-                    if not dirs:
+-                        continue
+-                    for path in dirs:
+-                        _add_directory(library_dirs, path)
+-                    break
+-
+-                else:
+-                    raise ValueError(
+-                        "Unable to identify Linux platform: `%s`" % platform_)
+-
+-                # termux support for android.
+-                # system libraries (zlib) are installed in /system/lib
+-                # headers are at $PREFIX/include
+-                # user libs are at $PREFIX/lib
+-                if os.environ.get('ANDROID_ROOT', None):
+-                    _add_directory(library_dirs,
+-                                   os.path.join(os.environ['ANDROID_ROOT'],
+-                                                'lib'))
+-
+         elif sys.platform.startswith("gnu"):
+             self.add_multiarch_paths()
+ 
+@@ -414,13 +357,8 @@
+ 
+         # standard locations
+         if not self.disable_platform_guessing:
+-            _add_directory(library_dirs, "/usr/local/lib")
+-            _add_directory(include_dirs, "/usr/local/include")
+-
+-            _add_directory(library_dirs, "/usr/lib")
+-            _add_directory(include_dirs, "/usr/include")
+-            # alpine, at least
+-            _add_directory(library_dirs, "/lib")
++            _add_directory(library_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/lib")
++            _add_directory(include_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/include")
+ 
+         # on Windows, look for the OpenJPEG libraries in the location that
+         # the official installer puts them
