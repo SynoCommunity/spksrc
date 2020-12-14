@@ -866,7 +866,7 @@ guppy3==3.1.0
 #holidays==0.10.3
 
 # homeassistant.components.frontend
-home-assistant-frontend==20201111.2
+home-assistant-frontend==20201212.0
 user_agents		# discovered during first run
 # discovered during first run
 ua_parser==0.10.0
