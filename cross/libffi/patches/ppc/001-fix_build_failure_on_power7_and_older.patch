@@ -1,0 +1,13 @@
+# powerpc: fix build failure on power7 and older #532
+# 
+--- src/powerpc/ffi_powerpc.h.orig	2019-11-23 15:24:58.000000000 +0000
++++ src/powerpc/ffi_powerpc.h	2020-12-12 12:34:02.349855336 +0000
+@@ -62,7 +62,7 @@
+ #elif defined(__FLOAT128__)
+ typedef __float128 float128;
+ #else
+-typedef __int128 float128;
++typedef char float128[16] __attribute__((aligned(16)));
+ #endif
+ 
+ void FFI_HIDDEN ffi_closure_SYSV (void);

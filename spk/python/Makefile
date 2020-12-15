@@ -10,7 +10,7 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cryptography cross/cffi cross/bcrypt
 
 # Cross-compiled wheels
-DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow
+DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow_py2
 DEPENDS += cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/pyzmq cross/uwsgi
 
