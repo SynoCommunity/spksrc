@@ -87,8 +87,8 @@ python3_post_install: $(WORK_DIR)/python-cc.mk
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | build-python
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | python
-	. $(WORK_DIR)/crossenv/bin/activate && build-pip install "setuptools==44.1.0"  "wheel==0.33.6"
-	. $(WORK_DIR)/crossenv/bin/activate && pip install "setuptools==44.1.0" "wheel==0.33.6"
+	. $(WORK_DIR)/crossenv/bin/activate && build-pip install "setuptools==44.1.0"  "wheel==0.33.6" "cffi==1.14.1"
+	. $(WORK_DIR)/crossenv/bin/activate && pip install "setuptools==44.1.0" "wheel==0.33.6" "cffi==1.14.1"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
