@@ -34,7 +34,7 @@ ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv8.cfg
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
-  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/ppc64.cfg
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/ppc.cfg
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG)/x86.cfg
