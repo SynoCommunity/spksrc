@@ -12,6 +12,7 @@ include ../../mk/spksrc.directories.mk
 DEPENDS += native/ninja
 NINJA_PATH = $(WORK_DIR)/../../../native/ninja/work-native/install/usr/local/bin
 ENV += PATH=$(NINJA_PATH):$$PATH
+ENV += PKG_CONFIG=/usr/bin/pkg-config
 
 # meson cross-compilation definitions
 MESON_CFG=$(WORK_DIR)/../../../mk/meson
