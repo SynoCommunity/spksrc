@@ -13,11 +13,35 @@ DEPENDS += native/ninja
 NINJA_PATH = $(WORK_DIR)/../../../native/ninja/work-native/install/usr/local/bin
 ENV += PATH=$(NINJA_PATH):$$PATH
 
+# meson cross-compilation definitions
+MESON_CFG=$(WORK_DIR)/../../../mk/meson
+
 # Define build directory
 BUILDDIR=builddir/
 
 # Set other build options
 CONFIGURE_ARGS += -Dbuildtype=release
+
+# Define per arch specific common options
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv5.cfg
+endif
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv7.cfg
+endif
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv8.cfg
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/ppc64.cfg
+endif
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/x86.cfg
+endif
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/x86_64.cfg
+endif
+
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
