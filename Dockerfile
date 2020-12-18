@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 # Install setuptools, wheel and pip for Python3
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
+RUN pip3 install meson==0.56.0
 
 # Install setuptools, pip, virtualenv, wheel and httpie for Python2
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python
