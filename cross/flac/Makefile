@@ -20,7 +20,7 @@ CONFIGURE_ARGS = --disable-thorough-tests --disable-doxygen-docs --disable-oggte
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# avoid error: AltiVec and SPE instructions cannot coexist
 CONFIGURE_ARGS += --disable-altivec
 endif
-

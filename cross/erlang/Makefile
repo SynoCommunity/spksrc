@@ -12,11 +12,11 @@ COMMENT  = Erlang is a programming language used to build massively scalable sof
 LICENSE  = Erlang Public License
 
 # Get arch-defs now
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.archs.mk
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX) erl_xcomp_sysroot=$(INSTALL_DIR)
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-smp-require-native-atomics
 endif
 

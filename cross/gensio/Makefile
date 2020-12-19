@@ -11,7 +11,7 @@ COMMENT  = gensio - General Stream I/O
 LICENSE  = GPLv2
 
 # qoriq is the only PPC arch that is supported
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/openssl
 
@@ -22,7 +22,7 @@ CONFIGURE_ARGS  = --with-python=no --with-swig=no
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # archs/toolchains without compatible RS485 support (linux serial.h)
 CONFIGURE_ARGS += ac_cv_have_decl_TIOCSRS485=no
 endif

@@ -20,7 +20,7 @@ HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(OLD_PCC_ARCHS)
 
 
 WIZARDS_DIR = src/wizard/

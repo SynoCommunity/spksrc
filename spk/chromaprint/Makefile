@@ -15,8 +15,6 @@ CHANGELOG = "1. Update to ffmpeg 4.3.1"
 HOMEPAGE   = https://acoustid.org/chromaprint
 LICENSE    = LGPL2.1+
 
-include ../../mk/spksrc.common.mk
-
 # Reuse FFmpeg libraries
 export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
 

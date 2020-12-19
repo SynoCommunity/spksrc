@@ -12,8 +12,8 @@ HOMEPAGE = https://rmlint.readthedocs.io
 COMMENT = rmlint finds space waste and other broken things on your filesystem and offers to remove it.
 LICENSE = GPLv3
 
-# PPC_ARCHES except QorIQ are not supported
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+# PPC archs except QorIQ are not supported
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = rmlint_compile

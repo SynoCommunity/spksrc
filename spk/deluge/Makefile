@@ -10,7 +10,7 @@ SPK_DEPENDS = "python>=2.7.18"
 
 REQUIRED_DSM = 5.0
 # archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ) required by cross/libtorrent
-UNSUPPORTED_ARCHS = 88f6281 hi3535 powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARM7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = Safihre
 DESCRIPTION = Deluge is a full-featured BitTorrent client for Linux, OS X, Unix and Windows. It uses libtorrent in its backend and features multiple user-interfaces including: GTK+, web and console. It has been designed using the client server model with a daemon process that handles all the bittorrent activity. The Deluge daemon is able to run on headless machines with the user-interfaces being able to connect remotely from any platform. This package is intended for advanced users.

@@ -43,7 +43,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 include ../../mk/spksrc.spk.mk
 
 # Wheel "cryptography" lacks libpthread when cross-compile for ARM
-ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 WHEELS_CFLAGS = "-pthread"
 WHEELS_LDFLAGS = "-lpthread"
 endif

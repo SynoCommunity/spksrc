@@ -14,11 +14,11 @@ LICENSE  = https://tcl.tk/software/tcltk/license.html
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
 # Enable 64-bit support in Tcl for x64 architectures
 # aarch64 does not support 64-bit (don't know magic for this platform)
-ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   CONFIGURE_ARGS = --enable-64bit
 endif
 

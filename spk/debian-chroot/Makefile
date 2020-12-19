@@ -13,7 +13,7 @@ DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 2900
 DESCRIPTION_FRE = Debian est un système d\'exploitation \(SE\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
-CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 arches"
+CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 archs"
 
 HOMEPAGE = https://www.debian.org
 LICENSE  = https://www.debian.org/legal/licenses
@@ -26,27 +26,27 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = debian-chroot_extra_install
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHES) $(ARM8_ARCHES)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARM8_ARCHS)
 
 DEBIAN_ARCH =
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
 DEBIAN_ARCH = arm64
 endif
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 DEBIAN_ARCH = i386
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEBIAN_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 DEBIAN_ARCH = powerpc
 endif
 ifeq ($(strip $(DEBIAN_ARCH)),)

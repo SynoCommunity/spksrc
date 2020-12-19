@@ -25,31 +25,31 @@ CONFIGURE_ARGS += --disable-multithread
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv7-linux-gcc
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv8-linux-gcc
 endif
 
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 DEPENDS += native/yasm
 ENV += PATH=$(YASM_PATH):$$PATH
 CONFIGURE_ARGS += --target=x86-linux-gcc --as=yasm
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += native/yasm
 ENV += PATH=$(YASM_PATH):$$PATH
 CONFIGURE_ARGS += --target=x86_64-linux-gcc --as=yasm
 endif
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 

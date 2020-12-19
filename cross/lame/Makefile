@@ -18,7 +18,7 @@ NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
 DEPENDS += native/nasm
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH

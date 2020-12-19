@@ -15,39 +15,38 @@ CONFIGURE_ARGS = --cross-compiling --dest-os=linux --prefix=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
 ENV += CC_host="gcc -m32"
 ENV += CXX_host="g++ -m32"
 CONFIGURE_ARGS += --dest-cpu=arm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
 ENV += CC_host="gcc -m32"
 ENV += CXX_host="g++ -m32"
 CONFIGURE_ARGS += --dest-cpu=arm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
 ENV += CC_host=gcc
 ENV += CXX_host=g++
 CONFIGURE_ARGS += --dest-cpu=arm64
 endif
 
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 ENV += CC_host="gcc -m32"
 ENV += CXX_host="g++ -m32"
 CONFIGURE_ARGS += --dest-cpu=x86
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ENV += CC_host=gcc
 ENV += CXX_host=g++
 CONFIGURE_ARGS += --dest-cpu=x86_64 --openssl-no-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 ENV += CC_host="gcc -m32"
 ENV += CXX_host="g++ -m32"
 CONFIGURE_ARGS += --dest-cpu=ppc
 endif
-
