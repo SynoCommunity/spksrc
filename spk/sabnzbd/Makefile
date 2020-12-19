@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.1.0
-SPK_REV = 44
+SPK_VERS = 3.1.1
+SPK_REV = 46
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
@@ -18,7 +18,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.1.0. Enabled support for nice and ionice on all architectures. Included SabToSyno.py script to add downloaded files automatically to the Synology DLNA server."
+CHANGELOG = "Update SABnzbd to 3.1.1."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
