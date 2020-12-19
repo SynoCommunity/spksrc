@@ -1,7 +1,7 @@
 # Build CMake programs
 #
 # prerequisites:
-# - cross/module depends on cmake
+# - native/module depends on cmake
 #
 
 # Common makefiles
