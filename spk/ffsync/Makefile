@@ -1,6 +1,6 @@
 SPK_NAME = ffsync
 SPK_VERS = 1.5.2
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/ffsync.png
 BETA = 1
 
@@ -40,6 +40,7 @@ include ../../mk/spksrc.spk.mk
 ffsync_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/ffsync.ini $(STAGING_DIR)/var/
+	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse/requirements.txt
 	sed -i -e "s|https://github.com/mozilla-services/mozservices/archive/e00e1b68130423ad98d0f6185655bde650443da8.zip|mozsvc==0.8|g" \
 	       -e "s|https://github.com/mozilla-services/tokenserver/archive/d7e513e8a4f5c588b70d685a8df1d2e508c341c0.zip|tokenserver==1.2.7|g" \
 	       -e "s|https://github.com/mozilla-services/server-syncstorage/archive/1.5.5.zip|SyncStorage==1.5.5|g" \
