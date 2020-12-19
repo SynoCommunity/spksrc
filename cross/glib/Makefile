@@ -24,4 +24,4 @@ endif
 # https://developer.gnome.org/glib/stable/glib-building.html
 CONFIGURE_ARGS += -Dman=false -Dlibmount=disabled -Ddefault_library=shared
 
-include ../../mk/spksrc.cross-meson-ninja.mk
+include ../../mk/spksrc.cross-meson.mk

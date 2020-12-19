@@ -17,4 +17,4 @@ CONFIGURE_ARGS += -Damdgpu=false
 CONFIGURE_ARGS += -Dnouveau=false
 CONFIGURE_ARGS += -Dvmwgfx=false
 
-include ../../mk/spksrc.cross-meson-ninja.mk
+include ../../mk/spksrc.cross-meson.mk
