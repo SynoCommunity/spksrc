@@ -22,7 +22,7 @@ endif
 #    patches/$(subarch)/*.patch
 #    patches/$(subarch)-$(TCVERSION)/*.patch
 ifeq ($(strip $(PATCHES)),)
-PATCHES = $(foreach arch,ARM5_ARCHES ARM7_ARCHES ARM8_ARCHES PPC_ARCHES x86_ARCHES x64_ARCHES, \
+PATCHES = $(foreach arch,ALL_ARCHS, \
 	$(foreach subarch,$($(arch)), \
 	$(if $(filter $(ARCH),$(subarch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${arch} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch patches/$(subarch)/*.patch patches/$(subarch)-$(TCVERSION)/*.patch)),)))
 endif

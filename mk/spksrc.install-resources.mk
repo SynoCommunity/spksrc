@@ -96,7 +96,7 @@ $(DIGESTS_FILE): download
 include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
+all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
 

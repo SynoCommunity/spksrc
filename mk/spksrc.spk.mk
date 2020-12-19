@@ -340,10 +340,10 @@ all: package
 include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
+all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 .PHONY: publish-all-archs
-publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
+publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
 
@@ -362,7 +362,7 @@ endif
 
 KERNEL_REQUIRED = $(MAKE) kernel-required
 ifeq ($(strip $(KERNEL_REQUIRED)),)
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP))))))
+ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
 endif
 
 ####
@@ -393,11 +393,11 @@ publish-supported-arch-%:
 
 latest-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))))
 
 publish-latest-arch-%:
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS))))))) publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish
 
 ####
 
@@ -413,14 +413,14 @@ publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
 
 all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_TOOLCHAINS))))))) ; \
 	do \
 	  $(MAKE) arch-$$arch-$* ; \
 	done \
 
 publish-all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_TOOLCHAINS))))))) ; \
 	do \
 	  $(MAKE) publish-arch-$$arch-$* ; \
 	done \
