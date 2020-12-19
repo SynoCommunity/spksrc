@@ -9,7 +9,6 @@ PKG_DIR =  $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = native/go
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-GENERIC_ARCHS = ARM7
 
 HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy
 COMMENT  = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2.

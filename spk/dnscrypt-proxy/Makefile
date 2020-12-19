@@ -5,7 +5,6 @@ SPK_ICON = src/dnscrypt-proxy.png
 
 DEPENDS = cross/$(SPK_NAME)
 SPK_CONFLICT = DNSServer
-GENERIC_ARCHS = ARM7
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 MAINTAINER = publicarray

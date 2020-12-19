@@ -1,7 +1,6 @@
 # Configuration for go build
 # 
 
-GENERIC_ARCHS = ARM7
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 GOOS = linux
@@ -19,17 +18,17 @@ ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
   GO_ARCH = arm
   ENV += GOARM=5
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ALL_ARM7_ARCHS)),$(ARCH))
   GO_ARCH = arm
   ENV += GOARM=7
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ALL_ARM8_ARCHS)),$(ARCH))
   GO_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
   GO_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ALL_x64_ARCHS)),$(ARCH))
   GO_ARCH = amd64
 endif
 ifeq ($(GO_ARCH),)

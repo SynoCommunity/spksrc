@@ -7,7 +7,6 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-GENERIC_ARCHS = ARM7
 
 MAINTAINER = Safihre
 DESCRIPTION = Automatically sync files via secure, distributed technology.
