@@ -14,11 +14,6 @@ LICENSE  = GPLv2
 
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += -Dc_args=-Wno-unused-value
-# https://gitlab.gnome.org/GNOME/glib/-/issues/1715
-CONFIGURE_ARGS += -Dinstalled_tests=false -Dgtester=false -Dgtester-report=false
-# -Dgtester=false -Dgtester-report=false
-####
-## https://gitlab.gnome.org/GNOME/glib/-/issues/1363
 endif
 
 # https://developer.gnome.org/glib/stable/glib-building.html
