@@ -92,11 +92,11 @@ repoze.lru==0.6
 #requests==2.4.3
 simplejson==3.6.5
 six==1.8
-testfixtures==4.1.0
+#testfixtures==4.1.0
 tokenlib==0.3.1
 translationstring==1.1
 umemcache==1.6.3
-unittest2==0.6
+#unittest2==0.6
 venusian==1.0
 waitress==0.8.9
 wsgiref==0.1.2
