@@ -25,30 +25,35 @@ LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus 
 
 # Available toolchains formatted as '{ARCH}-{TC}'
 AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard ../../toolchains/syno-*))))
+AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
 
 # Global arch definitions
 include ../../mk/spksrc.archs.mk
-
-# Archs that are supported by generic archs
-ARCHS_DUPES_DEFAULT = $(foreach ar,$(ARCHS_WITH_GENERIC_SUPPORT),$(ar)%)
-# remove unsupported (outdated) archs
-ARCHS_DUPES_DEFAULT += $(foreach ar,$(OBSOLETE_ARCHS),$(ar)%)
-
-# add specific DSM targets
-ARCHS_DUPES = $(ARCHS_DUPES_DEFAULT) %6.2 %6.2.2 %6.2.3
-
-DEFAULT_ARCHS = $(sort $(filter-out $(ARCHS_DUPES_DEFAULT), $(AVAILABLE_TOOLCHAINS)))
-SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
-LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS) $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
-
-# Avoid generic archs when kernel support is used
-ARCHS_WITH_KERNEL_SUPPORT = $(filter-out $(GENERIC_x64_ARCH)% $(GENERIC_x86_ARCH)% $(GENERIC_ARMv7_ARCH)% $(GENERIC_ARM64_ARCH)%, $(SUPPORTED_ARCHS))
 
 # Load local configuration
 LOCAL_CONFIG_MK = ../../local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
 include $(LOCAL_CONFIG_MK)
 endif
+
+# Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
+TCVERSION_DUPES = $(addprefix %,$(shell echo "$(AVAILABLE_TCVERSIONS) " | sed 's|.*\<$(DEFAULT_TC)[^.]||g'))
+
+# Archs that are supported by generic archs
+ARCHS_DUPES_DEFAULT = $(addsuffix %,$(ARCHS_WITH_GENERIC_SUPPORT))
+
+# remove unsupported (outdated) archs
+ARCHS_DUPES_DEFAULT += $(addsuffix %,$(OBSOLETE_ARCHS))
+
+# Filter for all-supported
+ARCHS_DUPES = $(ARCHS_DUPES_DEFAULT) $(TCVERSION_DUPES)
+
+DEFAULT_ARCHS = $(sort $(filter-out $(ARCHS_DUPES_DEFAULT), $(AVAILABLE_TOOLCHAINS)))
+SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS) $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+
+# Avoid generic archs when kernel support is used
+ARCHS_WITH_KERNEL_SUPPORT = $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(SUPPORTED_ARCHS))
 
 # Relocate to set conditionally according to existing parallel options in caller
 ifneq ($(PARALLEL_MAKE),)
