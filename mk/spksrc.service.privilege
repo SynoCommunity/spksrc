@@ -1,6 +1,0 @@
-{
-	"defaults":{
-		"run-as": "package"
-	},
-	"username": "USER"
-}
