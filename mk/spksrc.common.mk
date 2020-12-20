@@ -42,7 +42,7 @@ TCVERSION_DUPES = $(addprefix %,$(shell echo "$(AVAILABLE_TCVERSIONS) " | sed 's
 # Archs that are supported by generic archs
 ARCHS_DUPES_DEFAULT = $(addsuffix %,$(ARCHS_WITH_GENERIC_SUPPORT))
 # remove unsupported (outdated) archs
-ARCHS_DUPES_DEFAULT += $(addsuffix %,$(OBSOLETE_ARCHS))
+ARCHS_DUPES_DEFAULT += $(addsuffix %,$(DEPRECATED_ARCHS))
 
 # Filter for all-supported
 ARCHS_DUPES = $(ARCHS_DUPES_DEFAULT) $(TCVERSION_DUPES)
