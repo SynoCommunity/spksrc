@@ -16,7 +16,7 @@ LOCAL_FILE    = $(PKG_DIST_NAME)
 endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
-DISTRIB_DIR   = $(KERNELS_DIR)/$(PKG_BRANCH)
+DISTRIB_DIR   = $(KERNEL_DIR)/$(PKG_BRANCH)
 COMPILE_TARGET = kernel_module_compile_target
 EXTRACT_TARGET = kernel_extract_target
 CONFIGURE_TARGET = kernel_configure_target

@@ -31,9 +31,9 @@ jobs:
       - name: Cache toolchains
         uses: actions/cache@v1
         with:
-          path: toolchains
-          key: toolchains-${{ matrix.arch }}-v2
-          restore-keys: toolchains-${{ matrix.arch }}
+          path: toolchain
+          key: toolchain-${{ matrix.arch }}-v2
+          restore-keys: toolchain-${{ matrix.arch }}
 
       - name: Checkout repository
         uses: actions/checkout@v2

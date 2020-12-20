@@ -1,5 +1,5 @@
 
-AVAILABLE_TCS = $(notdir $(wildcard toolchains/syno-*))
+AVAILABLE_TCS = $(notdir $(wildcard toolchain/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
 SUPPORTED_SPKS = $(sort $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile)))
 
@@ -26,7 +26,7 @@ native-clean:
 	done
 
 toolchain-clean:
-	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	@for tc in $(dir $(wildcard toolchain/*/Makefile)) ; \
 	do \
 	    $(MAKE) -C $${tc} clean ; \
 	done
@@ -91,7 +91,7 @@ endef
 $(foreach arch,$(AVAILABLE_ARCHS),$(foreach spk,$(SUPPORTED_SPKS),$(eval $(call SPK_ARCH_template,$(spk),$(arch)))))
 
 prepare: downloads
-	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	@for tc in $(dir $(wildcard toolchain/*/Makefile)) ; \
 	do \
 	    $(MAKE) -C $${tc} ; \
 	done
@@ -115,7 +115,7 @@ native-digests:
 	done
 
 toolchain-digests:
-	@for tc in $(dir $(wildcard toolchains/*/Makefile)) ; \
+	@for tc in $(dir $(wildcard toolchain/*/Makefile)) ; \
 	do \
 	    $(MAKE) -C $${tc} digests ; \
 	done
@@ -145,7 +145,7 @@ toolchains: $(addprefix toolchain-,$(AVAILABLE_ARCHS))
 kernel-modules: $(addprefix kernel-,$(AVAILABLE_ARCHS))
 
 toolchain-%:
-	-@cd toolchains/syno-$*/ && MAKEFLAGS= $(MAKE)
+	-@cd toolchain/syno-$*/ && MAKEFLAGS= $(MAKE)
 
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
