@@ -6,4 +6,4 @@ rsc:bin/zstdgrep
 rsc:bin/zstdless
 lnk:lib/libzstd.so
 lnk:lib/libzstd.so.1
-lib:lib/libzstd.so.1.4.3
+lib:lib/libzstd.so.1.4.8
