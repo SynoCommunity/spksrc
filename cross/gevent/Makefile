@@ -14,9 +14,11 @@ LICENSE  = MIT
 
 INSTALL_TARGET = gevent_install
 
+ENV += EMBED=false LIBEV_EMBED=false CARES_EMBED=false 
+
 include ../../mk/spksrc.python-wheel.mk
 
 .PHONY: gevent_install
 gevent_install:
-	@$(RUN) LIBEV_EMBED=FALSE CARES_EMBED=FALSE PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" bdist_wheel -d $(WORK_DIR)/wheelhouse
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" bdist_wheel -d $(WORK_DIR)/wheelhouse
 	@rename -f 's/linux_i686/any/g' $(WORK_DIR)/wheelhouse/*.whl
