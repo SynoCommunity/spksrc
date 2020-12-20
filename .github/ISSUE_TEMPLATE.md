@@ -21,6 +21,8 @@ _3._
 
 #### Package log
 _Check Package Center or `/usr/local/{package}/var/`_
+
+_DSM7: `/var/log/packages/{package}.log`_
 ```
 Insert the package log here
 ```
