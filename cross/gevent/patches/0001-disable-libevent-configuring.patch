@@ -1,0 +1,22 @@
+Disabled libev configure command which would 
+1. would not work "as is" 
+2. is not required since libev is already present
+
+diff --git a/setup.py.old b/setup.py
+index 9c229add..02b3219b 100755
+--- setup.py
++++ setup.py
+@@ -117,13 +117,6 @@ if ((len(sys.argv) >= 2
+ 
+ def run_setup(ext_modules, run_make):
+     if run_make:
+-        if (not LIBEV_EMBED and not WIN and cffi_modules) or PYPY:
+-            # We're not embedding libev but we do want
+-            # to build the CFFI module. We need to configure libev
+-            # because the CORE Extension won't.
+-            # TODO: Generalize this.
+-            system(libev_configure_command)
+-
+         MakeSdist.make()
+ 
+     setup(
