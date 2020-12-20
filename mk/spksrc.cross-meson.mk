@@ -11,8 +11,10 @@ include ../../mk/spksrc.directories.mk
 # meson cross-compilation definitions
 MESON_CFG=$(WORK_DIR)/../../../mk/meson
 
-# Define build directory
-BUILDDIR=builddir/
+# Set default build directory
+ifeq ($(strip $(MESON_BUILD_DIR)),)
+MESON_BUILD_DIR = builddir
+endif
 
 # Set other build options
 CONFIGURE_ARGS += -Dbuildtype=release
@@ -48,10 +50,10 @@ endif
 meson_configure_target:
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(BUILDDIR)
+	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(STAGING_INSTALL_PREFIX)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson builddir/ -Dprefix=$(STAGING_INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(STAGING_INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 # call-up ninja build process
 include ../../mk/spksrc.cross-ninja.mk

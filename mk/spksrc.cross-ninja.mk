@@ -7,6 +7,11 @@
 # Force path to pkg-config for cross-building
 ENV += PKG_CONFIG=/usr/bin/pkg-config
 
+# Set default build directory
+ifeq ($(strip $(NINJA_BUILD_DIR)),)
+NINJA_BUILD_DIR = $(MESON_BUILD_DIR)
+endif
+
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = ninja_compile_target
@@ -22,16 +27,16 @@ endif
 # default ninja compile:
 ninja_compile_target:
 	@$(MSG) - Ninja compile
-	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(BUILDDIR)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C builddir/
+	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(NINJA_BUILD_DIR)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C $(NINJA_BUILD_DIR)
 
 .PHONY: ninja_install_target
 
 # default ninja install:
 ninja_install_target:
 	@$(MSG) - Ninja install
-	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(BUILDDIR)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C builddir/ install
+	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(NINJA_BUILD_DIR)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C $(NINJA_BUILD_DIR) install
 
 # call-up regular build process
 include ../../mk/spksrc.cross-cc.mk
