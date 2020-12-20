@@ -3,7 +3,7 @@
 #   scripts/installer
 #   scripts/start-stop-status
 #   scripts/service-setup
-#   conf/privilege        if SERVICE_USER
+#   conf/privilege        if SERVICE_USER or DSM7
 #   conf/SPK_NAME.sc      if SERVICE_PORT
 #   app/config            if DSM_UI_DIR
 #
@@ -59,6 +59,12 @@ endif
 ifeq ($(strip $(SPK_USER)),)
 SPK_USER = $(SPK_NAME)
 endif
+
+# Temporary Shim
+ifeq ($(strip $(GROUP)),)
+GROUP = $(shell grep '^GROUP=' src/service-setup.sh 2>/dev/null | awk -F = '{print $$2}' | sed 's/"//g')
+endif
+# end shim
 
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT)),)
@@ -206,6 +212,11 @@ endif
 #- 1<> $@
 #+ | sponge $@
 	jq '.username = "sc-$(SPK_USER)"' $@ 1<>$@
+ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifneq ($(strip $(GROUP)),)
+	jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
+endif
+endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
