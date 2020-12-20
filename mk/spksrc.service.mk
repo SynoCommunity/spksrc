@@ -56,6 +56,9 @@ SPK_USER = $(SPK_NAME)
 else
 SPK_USER = $(SERVICE_USER)
 endif
+ifeq ($(strip $(SPK_USER)),)
+SPK_USER = $(SPK_NAME)
+endif
 
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT)),)
@@ -142,10 +145,11 @@ ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
 	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 endif
 else
-SPK_COMMANDS_IN_JSON = $(shell printf '"%s",' ${SPK_COMMANDS} | sed 's/.$$//')
-$(DSM_CONF_DIR)/resource: $(SPKSRC_MK)spksrc.service.resource-linker
+
+SPK_COMMANDS_IN_JSON = $(shell echo ${SPK_COMMANDS} | jq -Rc '. | split(" ")')
+$(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
-	@sed 's|"BINARIES"|${SPK_COMMANDS_IN_JSON}|' $< > $@
+	@jq -n '."usr-local-linker" = {"bin": $$binaries}' --argjson binaries '$(SPK_COMMANDS_IN_JSON)' > $@
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 # STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
 # see spsrc.spk.mk
@@ -188,14 +192,20 @@ endif
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
 ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
-$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
-else ifeq ($(strip $(SERVICE_EXE)),)
+$(DSM_CONF_DIR)/privilege:
+	$(create_target_dir)
+	jq -n '.defaults = {"run-as": "package"}' > $@
+else
+ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
-	$(create_target_dir)
-	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
+endif
+# TODO add moreutils package, use sponge to prevent overriding file with 0 content
+#- 1<> $@
+#+ | sponge $@
+	jq '.username = "sc-$(SPK_USER)"' $@ 1<>$@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
