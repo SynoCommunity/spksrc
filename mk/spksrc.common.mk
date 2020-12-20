@@ -41,19 +41,22 @@ TCVERSION_DUPES = $(addprefix %,$(shell echo "$(AVAILABLE_TCVERSIONS) " | sed 's
 
 # Archs that are supported by generic archs
 ARCHS_DUPES_DEFAULT = $(addsuffix %,$(ARCHS_WITH_GENERIC_SUPPORT))
-
 # remove unsupported (outdated) archs
 ARCHS_DUPES_DEFAULT += $(addsuffix %,$(OBSOLETE_ARCHS))
 
 # Filter for all-supported
 ARCHS_DUPES = $(ARCHS_DUPES_DEFAULT) $(TCVERSION_DUPES)
 
+# default: used for all-latest target
 DEFAULT_ARCHS = $(sort $(filter-out $(ARCHS_DUPES_DEFAULT), $(AVAILABLE_TOOLCHAINS)))
-SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
-LEGACY_ARCHS = $(sort $(filter-out $(SUPPORTED_ARCHS) $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
 
-# Avoid generic archs when kernel support is used
-ARCHS_WITH_KERNEL_SUPPORT = $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(SUPPORTED_ARCHS))
+# supported: used for all-supported target
+SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+
+# legacy: used for all-legacy and when kernel support is used
+#         all archs except generic archs
+LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))
+
 
 # Relocate to set conditionally according to existing parallel options in caller
 ifneq ($(PARALLEL_MAKE),)

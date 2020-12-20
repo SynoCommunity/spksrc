@@ -401,26 +401,26 @@ publish-latest-arch-%:
 
 ####
 
-all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
-	$(MAKE) all-toolchain-5.2 all-toolchain-1.2
-	@$(MSG) Built legacy archs
+all-legacy:
+	$(MAKE) legacy-toolchain-5.2 legacy-toolchain-1.2
+	@$(MSG) Built legacy DSM and SRM archs
 
-publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
-	$(MAKE) all-toolchain-5.2
-	@$(MSG) Published legacy archs
+publish-all-legacy:
+	$(MAKE) publish-legacy-toolchain-5.2
+	@$(MSG) Published legacy DSM archs
 
 ####
 
-all-toolchain-%:
+legacy-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_TOOLCHAINS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
 	do \
 	  $(MAKE) arch-$$arch-$* ; \
 	done \
 
-publish-all-toolchain-%:
+publish-legacy-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_TOOLCHAINS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
 	do \
 	  $(MAKE) publish-arch-$$arch-$* ; \
 	done \
