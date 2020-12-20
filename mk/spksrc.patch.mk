@@ -17,14 +17,16 @@ endif
 
 # find patches into the following directory order:
 #    patches/*.patch
-#    patches/$(arch)/*.patch
 #    patches/DSM-$(TCVERSION)/*.patch
-#    patches/$(subarch)/*.patch
-#    patches/$(subarch)-$(TCVERSION)/*.patch
+#    patches/$(group)/*.patch
+#    patches/$(group)-$(TCVERSION)/*.patch
+#    patches/$(arch)/*.patch
+#    patches/$(arch)-$(TCVERSION)/*.patch
+# supported groups: arm5, arm7, arm7l, arm8, ppc, i686, x64
 ifeq ($(strip $(PATCHES)),)
-PATCHES = $(foreach arch,ALL_ARCHS, \
-	$(foreach subarch,$($(arch)), \
-	$(if $(filter $(ARCH),$(subarch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${arch} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch patches/$(subarch)/*.patch patches/$(subarch)-$(TCVERSION)/*.patch)),)))
+PATCHES = $(foreach group,ARM5_ARCHS ARM7_ARCHS ARM7L_ARCHS ARM8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
+	$(foreach arch,$($(group)), \
+	$(if $(filter $(ARCH),$(arch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch  patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')-$(TCVERSION)/*.patch patches/$(arch)/*.patch patches/$(arch)-$(TCVERSION)/*.patch)),)))
 endif
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
