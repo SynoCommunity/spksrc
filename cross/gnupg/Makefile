@@ -26,7 +26,7 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += ac_cv_func_inotify_init=no
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # use clock_gettime of librt
 ADDITIONAL_LDFLAGS = -lrt
 endif

@@ -31,22 +31,22 @@ include ../../mk/spksrc.cross-cc.mk
 # gcc version above 4.8 required to support hdr10plus
 PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
 ifeq ($(findstring $(TCVERSION), "6.0.2 6.1 6.2"),$(TCVERSION))
-ifneq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
 PLIST_TRANSFORM = cat
 endif
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif

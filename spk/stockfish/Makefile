@@ -26,7 +26,7 @@ WIZARDS_DIR = src/wizard
 POST_STRIP_TARGET = stockfish_extra_install
 
 # Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 SPK_COMMANDS  = bin/stockfish
 

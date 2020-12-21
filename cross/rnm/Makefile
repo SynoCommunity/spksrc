@@ -19,7 +19,7 @@ PRE_CONFIGURE_TARGET = rnm_pre_configure
 include ../../mk/spksrc.cross-cc.mk
 
 # requires gnu GCC >= 4.8
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 .PHONY: rnm_pre_configure
 rnm_pre_configure:

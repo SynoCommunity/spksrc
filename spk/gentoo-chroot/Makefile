@@ -28,18 +28,18 @@ POST_STRIP_TARGET = gentoo-chroot_extra_install
 
 include ../../mk/spksrc.archs.mk
 
-UNSUPPORTED_ARCHS = $(ARM8_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv8_ARCHS)
 
 GENTOO_ARCH =
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 GENTOO_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

@@ -14,7 +14,7 @@ HOMEPAGE = https://aomedia.googlesource.com/aom/
 COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format designed for video transmissions over the Internet.
 LICENSE  = Royalty-free
 
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
@@ -26,15 +26,15 @@ include ../../mk/spksrc.cross-cmake.mk
 # libaom specific cmake options
 CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm64
 endif
 

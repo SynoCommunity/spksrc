@@ -25,13 +25,13 @@ endif
 # similar to 'uname -m' on the target plattform (not essential, for information only)
 PACKAGE_MACHINE = x86_64
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = armv7l
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = aarch64
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))

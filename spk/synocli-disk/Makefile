@@ -14,7 +14,7 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.archs.mk
 
-ifneq ($(findstring $(ARCH),$(ARM5_ARCHS) $(ARM7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # DAR: archs without C++11 support are not supported
 DEPENDS += cross/dar
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"

@@ -22,7 +22,7 @@ DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARM5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 # to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"

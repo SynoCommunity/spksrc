@@ -18,7 +18,7 @@ CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=y
 
 include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS) $(ARM7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # patch Makefile.in for gcc -lt 4.9
 # see https://savannah.nongnu.org/bugs/?51004
 POST_CONFIGURE_TARGET = davfs2_post_configure

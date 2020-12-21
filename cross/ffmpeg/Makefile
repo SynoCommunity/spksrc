@@ -84,7 +84,7 @@ DEPENDS += cross/shine
 CONFIGURE_ARGS += --enable-libshine
 endif
 
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
@@ -92,23 +92,23 @@ endif
 
 # Add SVT-AV1 codec to supported ARCH
 # Patch for support from: https://github.com/OpenVisualCloud/SVT-AV1/tree/master/ffmpeg_plugin
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARM8_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon --disable-yasm --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-yasm --disable-asm
 ifneq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-yasm --disable-asm
 endif
 

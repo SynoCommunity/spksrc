@@ -16,7 +16,7 @@ include ../../mk/spksrc.archs.mk
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX) erl_xcomp_sysroot=$(INSTALL_DIR)
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-smp-require-native-atomics
 endif
 

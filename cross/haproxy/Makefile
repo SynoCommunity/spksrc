@@ -24,8 +24,8 @@ include ../../mk/spksrc.archs.mk
 
 ARCH_OPTIONS =
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# ARM5 and PPC archs (except QorIQ) have older kernels and need rt library for clock_gettime()
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# ARMv5 and PPC archs (except QorIQ) have older kernels and need rt library for clock_gettime()
 BUILD_OPTIONS += USE_RT=1
 ADDITIONAL_CFLAGS += -DLUA_32BITS
 endif

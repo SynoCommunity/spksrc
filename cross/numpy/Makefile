@@ -13,7 +13,7 @@ LICENSE  = https://numpy.org/doc/stable/license.html
 
 include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 # workaround for compiler bug, see: https://github.com/numpy/numpy/issues/13622
 ADDITIONAL_CFLAGS += -O0
 endif

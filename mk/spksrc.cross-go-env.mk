@@ -14,21 +14,21 @@ ifeq ($(strip $(GO_STATIC_BINARIES)),)
 endif
 
 # Define GO_ARCH for go compiler
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   GO_ARCH = arm
   ENV += GOARM=5
 endif
-ifeq ($(findstring $(ARCH),$(ALL_ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
   GO_ARCH = arm
   ENV += GOARM=7
 endif
-ifeq ($(findstring $(ARCH),$(ALL_ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
   GO_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
   GO_ARCH = 386
 endif
-ifeq ($(findstring $(ARCH),$(ALL_x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   GO_ARCH = amd64
 endif
 ifeq ($(GO_ARCH),)

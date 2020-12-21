@@ -15,7 +15,7 @@ INSTALL_TARGET = Stockfish-fishnet_install
 include ../../mk/spksrc.archs.mk
 
 # Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # use builtin atomic support
@@ -25,10 +25,10 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	BUILD_ARCH=arm64
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 	BUILD_ARCH=armv7
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

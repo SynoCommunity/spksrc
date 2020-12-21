@@ -25,15 +25,15 @@ CONFIGURE_ARGS += --disable-multithread
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv7-linux-gcc
 endif
 
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv8-linux-gcc
 endif
 

@@ -14,10 +14,10 @@ LICENSE  = MIT
 
 include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS) $(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --target=arm-linux
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --target=aarch64-linux
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))

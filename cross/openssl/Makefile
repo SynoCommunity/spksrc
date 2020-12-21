@@ -31,13 +31,13 @@ endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-x86
 endif
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-armv4 -march=armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-armv4
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-aarch64
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))

@@ -4,9 +4,11 @@ SPK_REV = 7
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
-DEPENDS  =
+DEPENDS =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>=2.7.6-8"
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv8_ARCHS)
 
 MAINTAINER = Diaoul
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
@@ -28,16 +30,14 @@ POST_STRIP_TARGET = debian-chroot_extra_install
 
 include ../../mk/spksrc.archs.mk
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARM8_ARCHS)
-
 DEBIAN_ARCH =
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 DEBIAN_ARCH = arm64
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

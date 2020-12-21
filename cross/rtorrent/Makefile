@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
 
 # error: template instantiation depth exceeds maximum of 900 (requires gcc >= 4.9)
 # see: https://github.com/rakshasa/rtorrent/issues/223
-UNSUPPORTED_ARCHS += $(ARM7L_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 DEPENDS = cross/ncursesw cross/libsigc++ cross/curl cross/libtorrent-rakshasa cross/xmlrpc-c
 

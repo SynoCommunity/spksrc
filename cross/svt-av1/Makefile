@@ -12,7 +12,7 @@ HOMEPAGE = https://github.com/OpenVisualCloud/SVT-AV1
 COMMENT  = The Scalable Video Technology for AV1 (SVT-AV1 Encoder and Decoder) is an AV1-compliant encoder/decoder library core.
 LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 CMAKE_USE_NASM = 1
 

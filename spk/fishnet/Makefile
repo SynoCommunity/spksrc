@@ -18,7 +18,7 @@ CHANGELOG = "Initial release with fishnet-20200613."
 LICENSE  = GPLv3
 STARTABLE = no
 
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 WHEELS = src/requirements.txt
 SERVICE_SETUP = src/service-setup.sh

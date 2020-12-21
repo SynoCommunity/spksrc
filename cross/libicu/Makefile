@@ -15,13 +15,13 @@ COMMENT  = International Components for Unicode
 LICENSE  = https://www.unicode.org/copyright.html#License
 
 GNU_CONFIGURE = 1
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=arm-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=arm-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))

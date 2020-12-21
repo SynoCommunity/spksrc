@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = powerpc
 include ../../mk/spksrc.archs.mk
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH),$(ARM5_ARCHS) $(PPC_ARCHS)),)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),)
 SPK_VERS = 0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif

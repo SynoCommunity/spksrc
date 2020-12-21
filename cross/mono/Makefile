@@ -30,17 +30,17 @@ ADDITIONAL_CFLAGS = -Os
 include ../../mk/spksrc.cross-cc.mk
 
 PLIST_TRANSFORM = cat
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
 	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
 	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
 		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 	endif
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	AG_ARGS = --host=aarch64-linux
 	PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
 endif

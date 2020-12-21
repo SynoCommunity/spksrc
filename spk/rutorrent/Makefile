@@ -5,9 +5,9 @@ SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
 # some dependents require C++11 support
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
 # unsupported with cross/rtorrent
-UNSUPPORTED_ARCHS += $(ARM7L_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 DEPENDS = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 DEPENDS += cross/sox

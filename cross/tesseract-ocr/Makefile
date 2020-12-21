@@ -21,7 +21,7 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # workaround and experimental c++ features for g++ compiler:
 ADDITIONAL_CXXFLAGS = -D nullptr=NULL -std=gnu++0x
 endif
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # enable experimental features for (old) g++ compiler:
 ADDITIONAL_CXXFLAGS = -std=gnu++0x
 endif
