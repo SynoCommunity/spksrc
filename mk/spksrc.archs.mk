@@ -29,8 +29,12 @@ x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk
 # Arch groups
 ALL_ARCHS = $(x64_ARCHS) $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
 ARCHS_WITH_GENERIC_SUPPORT = $(filter-out $(GENERIC_ARCHS), $(ARMv7_ARCHS) $(ARMv8_ARCHS) $(x64_ARCHS))
+
 # PPC_ARCHS except qoriq
-OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
+LEGACY_PPC_ARCHS = $(DEPRECATED_PPC_ARCHS) ppc853x
+LEGACY_ARCHS = $(LEGACY_PPC_ARCHS) $(ARMv5_ARCHS)
 
 # outdated unsupported archs
-DEPRECATED_ARCHS = powerpc ppc824x ppc854x x86
+DEPRECATED_PPC_ARCHS = powerpc ppc824x ppc854x
+DEPRECATED_i686_ARCHS = x86
+DEPRECATED_ARCHS = $(DEPRECATED_PPC_ARCHS) $(DEPRECATED_i686_ARCHS)
