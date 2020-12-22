@@ -28,7 +28,7 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=armv7
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

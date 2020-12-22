@@ -30,7 +30,7 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	BUILD_ARCH=arm64
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	BUILD_ARCH=armv7
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

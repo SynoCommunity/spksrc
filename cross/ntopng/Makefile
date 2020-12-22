@@ -28,8 +28,11 @@ PACKAGE_MACHINE = x86_64
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = armv7l
+endif
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+PACKAGE_MACHINE = armv7
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PACKAGE_MACHINE = aarch64

@@ -35,6 +35,10 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+GENTOO_CPU = arm
+GENTOO_ARCH = armv7a
+endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp

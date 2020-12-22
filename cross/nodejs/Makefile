@@ -21,7 +21,7 @@ ENV += CXX_host="g++ -m32"
 CONFIGURE_ARGS += --dest-cpu=arm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 ENV += CC_host="gcc -m32"
 ENV += CXX_host="g++ -m32"
 CONFIGURE_ARGS += --dest-cpu=arm

@@ -14,7 +14,7 @@ INSTALL_TARGET = Stockfish-fishnet_install
 
 include ../../mk/spksrc.archs.mk
 
-# Toolchains lacking c++11 compiler ar not supported
+# Toolchains lacking c++11 compiler are not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
@@ -28,7 +28,7 @@ include ../../mk/spksrc.cross-cc.mk
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	BUILD_ARCH=arm64
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	BUILD_ARCH=armv7
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

@@ -34,7 +34,7 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
 	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
 	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
 		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
