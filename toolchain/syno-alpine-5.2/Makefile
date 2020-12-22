@@ -2,7 +2,9 @@ TC_NAME = syno-alpine
 
 TC_ARCH = alpine alpine4k
 TC_VERS = 5.2
-TC_KERNEL = 3.2.40+
+TC_KERNEL = 3.2.40
+TC_GCC = 4.6.4
+TC_GLIBC = 2.17
 
 TC_DIST = alpine-gcc464_glibc217_alpine-GPL
 TC_DIST_SITE_PATH = Annapurna%20Alpine%20Linux%203.2.40
