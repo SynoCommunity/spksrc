@@ -24,7 +24,7 @@ endif
 #    patches/$(arch)-$(TCVERSION)/*.patch
 # supported groups: arm5, arm7, arm7l, arm8, ppc, i686, x64
 ifeq ($(strip $(PATCHES)),)
-PATCHES = $(foreach group,ARM5_ARCHS ARM7_ARCHS ARM7L_ARCHS ARM8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
+PATCHES = $(foreach group,ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
 	$(foreach arch,$($(group)), \
 	$(if $(filter $(ARCH),$(arch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch  patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')-$(TCVERSION)/*.patch patches/$(arch)/*.patch patches/$(arch)-$(TCVERSION)/*.patch)),)))
 endif
