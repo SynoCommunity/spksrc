@@ -16,6 +16,10 @@ ifeq ($(strip $(MESON_BUILD_DIR)),)
 MESON_BUILD_DIR = builddir
 endif
 
+#ifeq ($(strip $(MESON_DESTDIR)),)
+#MESON_DESTDIR = $(INSTALL_DIR)
+#endif
+
 # Set other build options
 CONFIGURE_ARGS += -Dbuildtype=release
 
@@ -52,8 +56,8 @@ meson_configure_target:
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
-	@$(MSG)    - Install prefix = $(STAGING_INSTALL_PREFIX)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(STAGING_INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 # call-up ninja build process
 include ../../mk/spksrc.cross-ninja.mk
