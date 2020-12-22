@@ -59,7 +59,7 @@ pre_wheel_target: wheel_msg_target
 
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ ! -z "$(WHEELS)" ] ; then \
-		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk 2> /dev/null),$(eval $(e))) \
+		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
 		if [ ! -z "$(CROSS_COMPILE_WHEELS)" ] ; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
