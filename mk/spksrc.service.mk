@@ -60,12 +60,6 @@ ifeq ($(strip $(SPK_USER)),)
 SPK_USER = $(SPK_NAME)
 endif
 
-# Temporary Shim
-ifeq ($(strip $(GROUP)),)
-GROUP = $(shell grep '^GROUP=' src/service-setup.sh 2>/dev/null | awk -F = '{print $$2}' | sed 's/"//g')
-endif
-# end shim
-
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT)),)
 ifeq ($(strip $(SERVICE_COMMAND)),)
@@ -212,8 +206,12 @@ endif
 #- 1<> $@
 #+ | sponge $@
 	jq '.username = "sc-$(SPK_USER)"' $@ 1<>$@
+	jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
 ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 ifneq ($(strip $(GROUP)),)
+	# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
+	# For DSM7 I recommend setting permissions for individual packages (System Internal User)
+	# or use the shared folder resource worker to add permissions, ask user from wizard
 	jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
 endif
 endif
