@@ -83,6 +83,9 @@ tc_vars: fix
 	@echo TC_BUILD := $(TC_BUILD)
 	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)
+	@echo TC_KERNEL := $(TC_KERNEL)
+	@echo TC_GCC := $(TC_GCC)
+	@echo TC_GLIBC := $(TC_GLIBC)
 
 
 ### Clean rules
