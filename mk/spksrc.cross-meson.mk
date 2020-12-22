@@ -30,6 +30,9 @@ endif
 ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv7.cfg
 endif
+ifeq ($(findstring $(ARCH),hi3535),$(ARCH))
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv7l.cfg
+endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG)/armv8.cfg
 endif
