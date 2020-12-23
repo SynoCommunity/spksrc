@@ -11,6 +11,12 @@ HOMEPAGE = https://www.cairographics.org
 COMMENT  = Pixman is a low-level software library for pixel manipulation, providing features such as image compositing and trapezoid rasterization.
 LICENSE  = MIT
 
-CONFIGURE_ARGS = -Denable_gtk=false
+CONFIGURE_ARGS = -Dgtk=disabled
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+CONFIGURE_ARGS += -Diwmmxt=disabled
+endif
 
 include ../../mk/spksrc.cross-meson.mk
