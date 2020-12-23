@@ -12,19 +12,13 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library
 LICENSE  = GPLv2
 
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += -Dc_args=-Wno-unused-value
-endif
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 # https://developer.gnome.org/glib/
 # https://developer.gnome.org/glib/stable/glib-building.html
-# 2.66.3
-#CONFIGURE_ARGS += -Dman=false -Dlibmount=disabled -Ddefault_library=shared
-# 2.58.3
-#CONFIGURE_ARGS += -Dman=false -Dlibmount=false -Ddefault_library=shared -Dselinux=false
-# 2.60.7, 2.62.6, 2.63.0, 2.63.3-OK, 2.63.4-ERROR
+# 2.62.6, 2.63.3-OK, 2.63.4-ERROR
 CONFIGURE_ARGS += -Dman=false -Dlibmount=false -Ddefault_library=shared -Dselinux=disabled
-# 2.63.5, 2.64.0, 2.64.6
+# 2.63.5, 2.66.3
 #CONFIGURE_ARGS += -Dman=false -Dlibmount=disabled -Ddefault_library=shared -Dselinux=disabled
 
 include ../../mk/spksrc.cross-meson.mk
