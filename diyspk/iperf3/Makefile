@@ -1,6 +1,6 @@
 SPK_NAME = iperf3
-SPK_VERS = 3.7
-SPK_REV = 1
+SPK_VERS = 3.9
+SPK_REV = 2
 SPK_ICON = src/iperf3.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -11,9 +11,8 @@ DISPLAY_NAME = iperf3
 STARTABLE = no
 
 HOMEPAGE = https://iperf.fr/
-LICENSE = three-clause BSD
+LICENSE = 3-clause BSD
 
 SPK_COMMANDS = bin/iperf3
-
 
 include ../../mk/spksrc.spk.mk
