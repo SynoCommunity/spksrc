@@ -42,6 +42,3 @@ ninja_install_target:
 	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(NINJA_BUILD_DIR)
 	@$(MSG)    - Installation path = $(NINJA_DESTDIR)
 	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) DESTDIR=$(NINJA_DESTDIR) ninja -C $(NINJA_BUILD_DIR) install
-
-# call-up regular build process
-include ../../mk/spksrc.cross-cc.mk
