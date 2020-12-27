@@ -1,3 +1,5 @@
+TOOLKIT_ROOT=$(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
+
 ifeq ($(strip $(TOOLKIT_NAME)),)
 TOOLKIT_NAME = syno-$(TOOLKIT_ARCH)
 endif
@@ -36,4 +38,35 @@ ifeq ($(strip $(TOOLKIT_SYSROOT)),)
 TOOLKIT_SYSROOT ?= $(TOOLKIT_BASE_DIR)/sys-root/usr
 else ifeq ($(strip $(TOOLKIT_SYSROOT)),nop)
 TOOLKIT_SYSROOT = 
+endif
+
+TOOLKIT_CFLAGS = -I$(TOOLKIT_ROOT)/include
+TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/scsi
+TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/mtd
+TOOLKIT_CPPFLAGS = -I$(TOOLKIT_ROOT)/include
+TOOLKIT_CXXFLAGS = -I$(TOOLKIT_ROOT)/include
+#
+TOOLKIT_LDFLAGS = -L$(TOOLKIT_ROOT)/lib
+TOOLKIT_LDFLAGS += -Wl,-rpath-link,$(TOOLKIT_ROOT)/lib
+TOOLKIT_LDFLAGS += -Wl,-rpath,$(TOOLKIT_ROOT)/lib
+
+include ../../mk/spksrc.common.mk
+
+# Add lib64 for x86_64 archs
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+TOOLKIT_LDFLAGS += -L$(TOOLKIT_ROOT)/lib64
+TOOLKIT_LDFLAGS += -Wl,-rpath-link,$(TOOLKIT_ROOT)/lib64
+TOOLKIT_LDFLAGS += -Wl,-rpath,$(TOOLKIT_ROOT)/lib64
+TOOLKIT_PKG_CONFIG_PATH += $(TOOLKIT_ROOT)/lib/pkgconfig:$(TOOLKIT_ROOT)/lib64/pkgconfig
+else
+TOOLKIT_PKG_CONFIG_PATH = $(TOOLKIT_ROOT)/lib/pkgconfig
+endif
+
+# Add native hardware acceleration libraries and include files for evansport
+ifeq ($(findstring $(ARCH),'evansport'),$(ARCH))
+TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/intelce-utilities
+TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/intelce-utilities/linux_user
+TOOLKIT_LDFLAGS += -L$(TOOLKIT_ROOT)/lib/intelce-utilities
+TOOLKIT_LDFLAGS += -Wl,-rpath-link,$(TOOLKIT_ROOT)/lib/intelce-utilities
+TOOLKIT_LDFLAGS += -Wl,-rpath,$(TOOLKIT_ROOT)/lib/intelce-utilities
 endif
