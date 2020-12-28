@@ -1,6 +1,3 @@
-# meson cross-compilation definitions
-MESON_CFG=$(WORK_DIR)/../../../mk/meson
-
 # Set default build directory
 ifeq ($(strip $(MESON_BUILD_DIR)),)
 MESON_BUILD_DIR = builddir
