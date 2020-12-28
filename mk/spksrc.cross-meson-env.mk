@@ -20,7 +20,7 @@ ifeq ($(findstring $(ARCH),hi3535),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/armv7l.cfg
 endif
 ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
-  CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/armv8.cfg
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/aarch64.cfg
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/ppc.cfg
