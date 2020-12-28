@@ -33,4 +33,4 @@ ARCHS_WITH_GENERIC_SUPPORT = $(filter-out $(GENERIC_ARCHS), $(ARMv7_ARCHS) $(ARM
 OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 # outdated unsupported archs
-DEPRECATED_ARCHS = powerpc ppc824x ppc854x
+DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
