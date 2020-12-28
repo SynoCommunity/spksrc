@@ -26,7 +26,7 @@ ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG)/ppc.cfg
 endif
 ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
-  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/x86.cfg
+  CONFIGURE_ARGS += --cross-file $(MESON_CFG)/i686.cfg
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG)/x86_64.cfg
