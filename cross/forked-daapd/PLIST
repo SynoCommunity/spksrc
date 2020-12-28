@@ -1,0 +1,4 @@
+rsc:etc/forked-daapd.conf
+lib:lib/forked-daapd/forked-daapd-sqlext.so
+bin:sbin/forked-daapd
+rsc:share/forked-daapd/htdocs/
