@@ -13,6 +13,9 @@ HOMEPAGE = https://github.com/libfuse/sshfs
 COMMENT  = sshfs is a network filesystem client to connect to SSH servers.
 LICENSE  = GPLv2
 
+REQUIRE_TOOLKIT = 1
+TOOLKIT = glib
+
 include ../../mk/spksrc.cross-meson.mk
 
 # Force indlude path to toolkit dbus & glib
