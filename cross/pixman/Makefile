@@ -13,9 +13,9 @@ LICENSE  = MIT
 
 CONFIGURE_ARGS = -Dgtk=disabled
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += -Diwmmxt=disabled
 endif
 

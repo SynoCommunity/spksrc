@@ -12,7 +12,10 @@ COMMENT  = General-purpose parser generator
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-ifeq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
+
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(OLD_PCC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = gl_cv_func_signbit_gcc=no
 endif
 

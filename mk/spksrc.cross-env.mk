@@ -24,9 +24,9 @@ export INSTALL_PREFIX
 $(TC_VARS_MK):
 	$(create_target_dir)
 	@$(MSG) "Set up toolchain "
-	@if env $(MAKE) --no-print-directory -C ../../toolchains/$(TC) ; \
+	@if env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) ; \
 	then \
-	  env $(MAKE) --no-print-directory -C ../../toolchains/$(TC) tc_vars > $@ ; \
+	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $@ ; \
 	else \
 	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
 	fi

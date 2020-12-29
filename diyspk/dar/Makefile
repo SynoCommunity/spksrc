@@ -11,7 +11,7 @@ DISPLAY_NAME = DAR
 STARTABLE = no
 
 # archs without C++11 support are not supported (libthreadar):
-UNSUPPORTED_ARCHS = $(ARM5_ARCHES) hi3535 powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = http://dar.linux.free.fr/
 

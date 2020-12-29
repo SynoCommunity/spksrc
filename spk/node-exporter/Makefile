@@ -5,8 +5,7 @@ SPK_ICON = src/node-exporter.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
-GENERIC_ARCHS = ARM7
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = FatMinMin
 DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels

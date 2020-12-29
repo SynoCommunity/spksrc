@@ -30,7 +30,7 @@ CMAKE_ARGS += -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
 CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
 
 # Use gcc builtin atomic functions for ppc architectures
-ifneq ($(findstring $(ARCH),$(PPC_ARCHES)),)
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),)
 CMAKE_ARGS += -DHAVE_GCC_ATOMIC_BUILTINS=1
 endif
 

@@ -47,7 +47,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 ADDRESS_MODEL = 32
-ifeq ($(findstring $(ARCH),$(x64_ARCHES) $(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
 ADDRESS_MODEL = 64
 endif
 

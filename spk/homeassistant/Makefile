@@ -16,11 +16,10 @@ DEPENDS += cross/nmap
 # for mobile_app
 DEPENDS += cross/PyNaCl
 
-
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
 # unable to compile numpy 1.19.1 for x64 archs
-ifneq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # for iqvia
 DEPENDS += cross/numpy
 endif

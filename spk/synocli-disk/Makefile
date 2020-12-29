@@ -3,8 +3,6 @@ SPK_VERS = 3.1
 SPK_REV = 4
 SPK_ICON = src/synocli-disk.png
 
-include ../../mk/spksrc.common.mk
-
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
 DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
 OPTIONAL_DEPENDS = cross/dar
@@ -14,7 +12,9 @@ DISPLAY_NAME = SynoCli Disk Tools
 
 OPTIONAL_DESC =
 
-ifneq ($(findstring $(ARCH),$(ARM5_ARCHES) hi3535 powerpc ppc824x ppc853x ppc854x),$(ARCH))
+include ../../mk/spksrc.archs.mk
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # DAR: archs without C++11 support are not supported
 DEPENDS += cross/dar
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"

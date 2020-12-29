@@ -12,7 +12,7 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library
 LICENSE  = GPLv2
 
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 # https://developer.gnome.org/glib/
 # https://developer.gnome.org/glib/stable/glib-building.html

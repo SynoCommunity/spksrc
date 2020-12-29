@@ -3,8 +3,6 @@ SPK_VERS = 2.1
 SPK_REV = 6
 SPK_ICON = src/synocli-file.png
 
-include ../../mk/spksrc.common.mk
-
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
 DEPENDS += cross/detox cross/pcre2
 DEPENDS += cross/zstd
@@ -16,13 +14,15 @@ DISPLAY_NAME = SynoCli File Tools
 
 OPTIONAL_DESC =
 
-# PPC_ARCHES except QorIQ
-ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
+include ../../mk/spksrc.archs.mk
+
+# PPC archs except QorIQ
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
-ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x $(ARM5_ARCHES)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 # to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"

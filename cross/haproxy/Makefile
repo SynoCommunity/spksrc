@@ -20,12 +20,12 @@ BUILD_OPTIONS = USE_TPROXY=1 USE_PTHREAD_PSHARED=1 USE_OPENSSL=1 USE_ZLIB=1
 BUILD_OPTIONS += USE_PCRE2=1 PCRE2_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include PCRE2_LIB=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 BUILD_OPTIONS += USE_LUA=1 LUA_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include LUA_LIB=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
 ARCH_OPTIONS =
 
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x),$(ARCH))
-# ARM5_ARCHES and PPC_ARCHES (except QorIQ) have older kernels and need rt library for clock_gettime()
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# ARMv5 and PPC archs (except QorIQ) have older kernels and need rt library for clock_gettime()
 BUILD_OPTIONS += USE_RT=1
 ADDITIONAL_CFLAGS += -DLUA_32BITS
 endif
@@ -33,7 +33,7 @@ ifeq ($(findstring $(ARCH), qoriq),$(ARCH))
 BUILD_OPTIONS += ADDLIB=-latomic
 endif
 
-ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ARCH_OPTIONS = ARCH=x86_64
 endif
 

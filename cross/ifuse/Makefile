@@ -21,13 +21,12 @@ IFUSE_AUTOGEN_ARGS =
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 IFUSE_AUTOGEN_ARGS += --host=arm-linux
 endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 IFUSE_AUTOGEN_ARGS += --host=ppc-linux
 endif
-
 
 .PHONY ifuse_pre_configure:
 ifuse_pre_configure:

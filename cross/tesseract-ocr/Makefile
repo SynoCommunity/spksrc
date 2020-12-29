@@ -15,13 +15,13 @@ LICENSE  = Apache License 2.0
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = LIBLEPT_HEADERSDIR=$(STAGING_INSTALL_PREFIX)/include/leptonica
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # workaround and experimental c++ features for g++ compiler:
 ADDITIONAL_CXXFLAGS = -D nullptr=NULL -std=gnu++0x
 endif
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # enable experimental features for (old) g++ compiler:
 ADDITIONAL_CXXFLAGS = -std=gnu++0x
 endif
@@ -29,7 +29,6 @@ endif
 PRE_CONFIGURE_TARGET = tesseract_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: tesseract_pre_configure
 tesseract_pre_configure:

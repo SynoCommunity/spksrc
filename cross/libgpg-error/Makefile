@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 # rename aarch64-unknown-linux-gnueabi to aarch64-unknown-linux-gnu
 # to match provided syscfg/lock-obj-pub.aarch64-unknown-linux-gnu.h
 CONFIGURE_ARGS = --host=aarch64-unknown-linux-gnu

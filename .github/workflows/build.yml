@@ -23,17 +23,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # x64=x86_64, evansport=x86, aarch64=armv8, armv7, 88f6281=armv5, ppc853x/qoriq=ppc
+        # x64=x86_64, evansport=i686, aarch64=armv8, armv7, hi3535=armv7l, 88f6281=armv5, qoriq=ppc
         # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        arch: [noarch, x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, armv7-1.2, 88f6281-6.1, qoriq-6.1, ppc853x-5.2]
+        arch: [noarch, x64-6.1, evansport-6.1, aarch64-6.1, armv7-6.1, hi3535-6.1, 88f6281-6.1, qoriq-6.1]
 
     steps:
       - name: Cache toolchains
         uses: actions/cache@v1
         with:
-          path: toolchains
-          key: toolchains-${{ matrix.arch }}-v2
-          restore-keys: toolchains-${{ matrix.arch }}
+          path: toolchain
+          key: toolchain-${{ matrix.arch }}-v2
+          restore-keys: toolchain-${{ matrix.arch }}
 
       - name: Checkout repository
         uses: actions/checkout@v2

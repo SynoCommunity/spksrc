@@ -32,7 +32,7 @@ POST_STRIP_TARGET = jackett_extra_install
 
 REQUIRED_DSM = 5.0
 # no PPC support for mono, see cross/mono/Makefile for details
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 BUSYBOX_CONFIG = usrmng daemon
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
