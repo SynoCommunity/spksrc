@@ -3,6 +3,7 @@
 # DSM 5 -> 7 upgrade path:
 # Not supported
 # DSM 6 -> 7 upgrade path:
+# files are migrated from ${SYNOPKG_PKGDEST}/var to ${SYNOPKG_PKGVAR}
 # Not supported (yet)
 
 
@@ -172,6 +173,12 @@ postuninst ()
 preupgrade ()
 {
     log_step "preupgrade"
+
+    # dsm6 -> dsm7
+    # Migrate data to permanent storage
+
+    $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+
     call_func "service_preupgrade"
 
     # Save some stuff
