@@ -18,7 +18,7 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   GO_ARCH = arm
   ENV += GOARM=5
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
   GO_ARCH = arm
   ENV += GOARM=7
 endif
