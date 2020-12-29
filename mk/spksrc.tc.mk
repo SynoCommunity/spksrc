@@ -89,6 +89,8 @@ tc_vars: fix
 	@echo TC_BUILD := $(TC_BUILD)
 	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)
+	@echo REQUIRE_TOOLKIT := $(REQUIRE_TOOLKIT)
+	@echo TOOLKIT := $(TOOLKIT)
 	@echo TOOLKIT_ROOT := $(TOOLKIT_ROOT)
 	@echo TOOLKIT_SYSROOT := $(TOOLKIT_SYSROOT)
 	@echo TOOLKIT_CFLAGS := $(TOOLKIT_CFLAGS)

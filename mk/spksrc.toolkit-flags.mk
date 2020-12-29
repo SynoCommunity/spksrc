@@ -41,8 +41,17 @@ TOOLKIT_SYSROOT =
 endif
 
 TOOLKIT_CFLAGS = -I$(TOOLKIT_ROOT)/include
+
+# Specic TOOLKIT to add to include search path
+ifeq ($(findstring 'scsi',$(TOOLKIT)),'scsi')
 TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/scsi
+endif
+ifeq ($(findstring 'mtd',$(TOOLKIT)),'mtd')
 TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/mtd
+endif
+ifeq ($(findstring 'glib',$(TOOLKIT)),'glib')
+TOOLKIT_CFLAGS += -I$(TOOLKIT_ROOT)/include/glib-2.0
+endif
 TOOLKIT_CPPFLAGS = -I$(TOOLKIT_ROOT)/include
 TOOLKIT_CXXFLAGS = -I$(TOOLKIT_ROOT)/include
 #
