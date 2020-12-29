@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = 0.118.5
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/${SPK_NAME}.png
 
 SPK_DEPENDS = "python3>=3.7.7"
@@ -29,7 +29,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = ymartin59
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update Home Assistant to v0.118.5<br/>2. Update dependencies"
+CHANGELOG = "Fix xiaomi device integrations"
 RELOAD_UI = yes
 STARTABLE = yes
 
