@@ -1,5 +1,5 @@
 SPK_NAME = sshfs
-SPK_VERS = 2.10
+SPK_VERS = 3.7.1
 SPK_REV = 1
 
 DEPENDS = cross/$(SPK_NAME)
@@ -14,6 +14,5 @@ HOMEPAGE = https://github.com/libfuse/sshfs
 LICENSE = GPLv2
 
 SPK_COMMANDS = bin/sshfs
-
 
 include ../../mk/spksrc.spk.mk
