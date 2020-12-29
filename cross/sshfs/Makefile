@@ -6,7 +6,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libfuse/sshfs/archive/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/fuse cross/glib
+DEPENDS = cross/fuse3
+# Already available through the toolkit:
+# cross/glib
 
 HOMEPAGE = https://github.com/libfuse/sshfs
 COMMENT  = sshfs is a network filesystem client to connect to SSH servers.
