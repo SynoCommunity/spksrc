@@ -1794,6 +1794,8 @@ pysabnzbd==1.1.0
 
 # homeassistant.components.snmp
 pysnmp==4.4.12
+pysmi==0.3.4
+pycryptodomex==3.9.9
 
 # homeassistant.components.soma
 #pysoma==0.0.10
