@@ -11,7 +11,6 @@ HOMEPAGE = https://www.erlang.org
 COMMENT  = Erlang is a programming language used to build massively scalable soft real-time systems with requirements on high availability.
 LICENSE  = Erlang Public License
 
-# Get arch-defs now
 include ../../mk/spksrc.archs.mk
 
 GNU_CONFIGURE = 1
@@ -23,6 +22,8 @@ endif
 INSTALL_TARGET = erlang_install
 
 ENV += PATH=$(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin:$$PATH
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: erlang_install
 erlang_install:
