@@ -29,7 +29,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = ymartin59
 DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Fix xiaomi device integrations"
+CHANGELOG = "Fix integrations: Xiaomi Gateway (Aqara), Xiaomi Miio, Sony PlayStation 4, IKEA TRÅDFRI, Apple iCloud, Minut Point"
 RELOAD_UI = yes
 STARTABLE = yes
 
