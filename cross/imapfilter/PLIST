@@ -7,3 +7,5 @@ rsc:share/imapfilter/message.lua
 rsc:share/imapfilter/options.lua
 rsc:share/imapfilter/regex.lua
 rsc:share/imapfilter/set.lua
+rsc:var/config.lua
+rsc:var/extend.lua
