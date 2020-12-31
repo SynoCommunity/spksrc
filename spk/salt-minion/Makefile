@@ -1,11 +1,11 @@
 SPK_NAME = salt-minion
 SPK_VERS = 3001.1
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/salt-minion.png
 
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
 BUILD_DEPENDS = cross/python3
-SPK_DEPENDS = "python3>=3.7"
+SPK_DEPENDS = "python3>=3.8"
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 # Requirements file generation
@@ -20,7 +20,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 RELOAD_UI = yes
 DISPLAY_NAME = Salt Minion
-CHANGELOG = "Update to 3001.1"
+CHANGELOG = "Upgraded to Python 3.8"
 
 HOMEPAGE   = https://www.saltstack.com/
 LICENSE    = Apache
