@@ -1,12 +1,12 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.1.13
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/$(SPK_NAME)
 DEPENDS = cross/bash cross/acl cross/attr
-SPK_DEPENDS = "python3>=3.7"
+SPK_DEPENDS = "python3>=3.8"
 
 # Requirements file generation
 # virtualenv --python=python3 borg-env
