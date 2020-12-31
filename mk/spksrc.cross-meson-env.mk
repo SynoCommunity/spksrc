@@ -13,21 +13,21 @@ CONFIGURE_ARGS += -Dbuildtype=release
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/armv5.cfg
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/armv7.cfg
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/armv7l.cfg
 endif
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/aarch64.cfg
 endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/ppc.cfg
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/i686.cfg
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/x86_64.cfg
 endif
