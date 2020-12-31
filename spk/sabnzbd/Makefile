@@ -1,11 +1,11 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 3.1.1
-SPK_REV = 46
+SPK_REV = 47
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python3>=3.7.7-12"
+SPK_DEPENDS = "python3>=3.8.6"
 
 # To generate full requirements.txt, extend SABnzbd's own
 # requirements.txt with the depedencies of cherrypy and cheroot
@@ -18,7 +18,7 @@ DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatiza
 RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.1.1."
+CHANGELOG = "Upgraded to Python 3.8"
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
