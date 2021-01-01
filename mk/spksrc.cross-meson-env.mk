@@ -9,7 +9,7 @@ endif
 CONFIGURE_ARGS += -Dbuildtype=release
 
 # Use arch specific configuration file
-MESON_CFG_DIR=$(realpath $(WORK_DIR)/../../../mk/meson)
+MESON_CFG_DIR = $(realpath $(WORK_DIR)/../../../mk/meson)
 MESON_CFG_FILE =
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -35,10 +35,10 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 endif
 
 ifeq ($(strip $(MESON_CFG_FILE)),)
-  $(error No meson config file defined for $(ARCH))
+  $(warning No meson config file defined for $(ARCH))
 else
   ifeq ($(wildcard $(MESON_CFG_DIR)/$(MESON_CFG_FILE)),)
-    $(error meson config file not found: $(MESON_CFG_DIR)/$(MESON_CFG_FILE))
+    $(warning meson config file not found: $(MESON_CFG_DIR)/$(MESON_CFG_FILE))
   endif
 endif
 
