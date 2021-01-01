@@ -23,4 +23,7 @@ ADDITIONAL_SCRIPTS =
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
+SPK_COMMANDS  = bin/bundle bin/bundler bin/erb bin/gem bin/irb bin/racc
+SPK_COMMANDS += bin/rake bin/rbs bin/rdoc bin/ri bin/ruby bin/typeprof
+
 include ../../mk/spksrc.spk.mk
