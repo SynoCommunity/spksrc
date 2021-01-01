@@ -371,7 +371,7 @@ endif
 
 pre-build-native:
 	@$(MSG) Pre-build native dependencies for parallel build
-	@for depend in `$(MAKE) dependency-list` ; \
+	@for depend in $(sort $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)) ; \
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
 	    echo "Pre-processing $${depend}" ; \
