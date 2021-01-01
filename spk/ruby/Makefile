@@ -1,6 +1,6 @@
 SPK_NAME = ruby
-SPK_VERS = 2.0.0-p353
-SPK_REV = 6
+SPK_VERS = 3.0.0
+SPK_REV = 0
 SPK_ICON = src/ruby.png
 
 DEPENDS  = cross/$(SPK_NAME)
