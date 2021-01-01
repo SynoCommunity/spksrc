@@ -18,9 +18,17 @@ RUBYTOOLS = bundle bundler erb gem irb racc rake rbs rdoc ri typeprof
 
 # Configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-baseruby=$(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)/ruby --prefix=$(STAGING_INSTALL_PREFIX) --disable-install-doc
+CONFIGURE_ARGS = --with-baseruby=$(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/ruby --prefix=$(INSTALL_PREFIX) --disable-install-doc
+
+# Ruby's configure remembers its own --prefix and uses it during `make install`,
+# _in addition to_ any prefix/DESTDIR passed to `make install`.
+# Without this override, the install ends up nested in a doubled prefix.
+INSTALL_TARGET = install_destdir_unprefixed_target
 
 include ../../mk/spksrc.cross-cc.mk
+
+install_destdir_unprefixed_target: $(PRE_INSTALL_TARGET)
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install
 
 # Desactivate fstack-protect because we couldn't link to libspp on synology
 .PHONY: myPreConfigure
