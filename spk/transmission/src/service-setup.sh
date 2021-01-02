@@ -30,7 +30,7 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${volume_path}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@download_dir@|${wizard_volume}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
         sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
         sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
         if [ -d "${wizard_watch_dir}" ]; then

@@ -7,7 +7,7 @@
                 "desc": "Please select a volume to use for the download folder",
                 "subitems": [
                     {
-                        "key": "volume",
+                        "key": "wizard_volume",
                         "desc": "volume name",
                         "displayField": "display_name",
                         "valueField": "volume_path",
