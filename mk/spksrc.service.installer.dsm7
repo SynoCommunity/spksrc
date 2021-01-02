@@ -185,7 +185,10 @@ preupgrade ()
     # dsm6 -> dsm7
     # Migrate data to permanent storage
 
-    $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+    if [ ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
+        # only migrate when destination is empty
+        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+    fi
 
     call_func "service_preupgrade"
 
