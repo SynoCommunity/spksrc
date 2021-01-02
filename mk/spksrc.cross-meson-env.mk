@@ -34,11 +34,14 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   MESON_CFG_FILE = x86_64.cfg
 endif
 
-ifeq ($(strip $(MESON_CFG_FILE)),)
-  $(warning No meson config file defined for $(ARCH))
-else
-  ifeq ($(wildcard $(MESON_CFG_DIR)/$(MESON_CFG_FILE)),)
-    $(warning meson config file not found: $(MESON_CFG_DIR)/$(MESON_CFG_FILE))
+# disable error handling for target dependency-list
+ifneq ($(strip $(DEPENDENCY_WALK)),1)
+  ifeq ($(strip $(MESON_CFG_FILE)),)
+    $(error No meson config file defined for $(ARCH))
+  else
+    ifeq ($(wildcard $(MESON_CFG_DIR)/$(MESON_CFG_FILE)),)
+      $(error meson config file not found: $(MESON_CFG_DIR)/$(MESON_CFG_FILE))
+    endif
   endif
 endif
 
