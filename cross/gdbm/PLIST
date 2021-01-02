@@ -1,0 +1,6 @@
+bin:bin/gdbm_dump
+bin:bin/gdbm_load
+bin:bin/gdbmtool
+lnk:lib/libgdbm.so
+lnk:lib/libgdbm.so.6
+lib:lib/libgdbm.so.6.0.0
