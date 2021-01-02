@@ -11,20 +11,12 @@ HOMEPAGE = https://www.cairographics.org
 COMMENT  = Pixman is a low-level software library for pixel manipulation, providing features such as image compositing and trapezoid rasterization.
 LICENSE  = MIT
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-gtk
+CONFIGURE_ARGS = -Dgtk=disabled
 
-PRE_COMPILE_TARGET = pixman_pre_compile
+include ../../mk/spksrc.archs.mk
 
-
-ifeq ($(ARCH),hi3535)
-CONFIGURE_ARGS += --disable-arm-iwmmxt
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -Diwmmxt=disabled
 endif
 
-
-include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: pixman_pre_compile
-pixman_pre_compile:
-	@$(MSG) "- patch generated Makefile to skip compilation of demos and test code"
-	@$(RUN) sed -i 's|SUBDIRS = pixman demos test|SUBDIRS = pixman|g' ./Makefile
+include ../../mk/spksrc.cross-meson.mk

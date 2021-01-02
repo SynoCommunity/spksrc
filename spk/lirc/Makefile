@@ -9,11 +9,11 @@ LIRC_SUPPORTED_DRIVERS =
 # Abort for ARCHs that won't compile LIRC cleanly
 UNSUPPORTED_ARCHS = powerpc
 
-# include definition of PPC_ARCHES...
-include ../../mk/spksrc.common.mk
+# include arch definitions
+include ../../mk/spksrc.archs.mk
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH), $(ARM5_ARCHES) $(PPC_ARCHES)),)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),)
 SPK_VERS = 0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
 endif

@@ -5,8 +5,8 @@ cross/*/work*
 kernel/*/work*
 spk/*/work*
 diyspk/*/work*
-toolchains/*/work*
-toolchains/*/*_done
+toolchain/*/work*
+toolchain/*/*_done
 toolkit/*/work*
 local.mk
 *.DS_Store

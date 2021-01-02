@@ -17,7 +17,7 @@ STARTABLE = yes
 DISPLAY_NAME = MTProxy
 CHANGELOG = "1. Update openssl to 1.1."
 
-UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES)
+UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS)
 
 HOMEPAGE = https://github.com/TelegramMessenger/MTProxy
 LICENSE  = GPL

@@ -17,7 +17,9 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --without-ncurses --without-python
 CONFIGURE_ARGS += --disable-all-programs --enable-libuuid
 
-ifeq ($(findstring $(ARCH), hi3535),$(ARCH))
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-schedutils
 else
 CONFIGURE_ARGS += --enable-schedutils

@@ -11,9 +11,9 @@ HOMEPAGE = https://numpy.org/
 COMMENT  = The fundamental package for scientific computing with Python
 LICENSE  = https://numpy.org/doc/stable/license.html
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 # workaround for compiler bug, see: https://github.com/numpy/numpy/issues/13622
 ADDITIONAL_CFLAGS += -O0
 endif

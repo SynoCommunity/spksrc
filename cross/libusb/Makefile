@@ -20,10 +20,10 @@ LIBUSB_AUTOGEN_ARGS = $(CONFIGURE_ARGS)
 include ../../mk/spksrc.cross-cc.mk
 
 
-ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 LIBUSB_AUTOGEN_ARGS += --host=arm-linux
 endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 LIBUSB_AUTOGEN_ARGS += --host=ppc-linux
 endif
 

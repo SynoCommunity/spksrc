@@ -1,26 +1,19 @@
 PKG_NAME = glib
-PKG_SHORT_VERS = 2.58
-PKG_VERS = $(PKG_SHORT_VERS).3
+PKG_VERS = 2.62.6
+PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
 
-DEPENDS =
+DEPENDS = 
 
 HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library
 LICENSE  = GPLv2
 
-GNU_CONFIGURE = 1
+UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
 
-PRE_CONFIGURE_TARGET = glib_pre_configure
+CONFIGURE_ARGS += -Dman=false -Dlibmount=false -Ddefault_library=shared -Dselinux=disabled
 
-include ../../mk/spksrc.native-cc.mk
-
-.PHONY: glib_pre_configure
-
-glib_pre_configure: 
-	# force autogen to first use internal pcre instead of provided to prevent
-	# build failure. Subsequent default configure will superseed this afterwards
-	$(RUN) ./autogen.sh
+include ../../mk/spksrc.native-meson.mk

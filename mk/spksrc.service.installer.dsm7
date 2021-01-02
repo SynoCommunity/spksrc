@@ -1,0 +1,191 @@
+#!/bin/sh
+
+# DSM 5 -> 7 upgrade path:
+# Not supported
+# DSM 6 -> 7 upgrade path:
+# files are migrated from ${SYNOPKG_PKGDEST}/var to ${SYNOPKG_PKGVAR}
+# Not supported (yet)
+
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
+INST_VAR="${SYNOPKG_PKGVAR}"
+
+# Optional FWPORTS file
+FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
+
+TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
+
+# Source package specific variable and functions
+SVC_SETUP=`dirname $0`"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
+
+# Reload wizard variables stored by postinst
+if [ -r "${INST_VARIABLES}" ]; then
+    . "${INST_VARIABLES}"
+fi
+
+# Expect user to be set from package specific variables
+if [ -n "${USER}" -a -z "${USER_DESC}" ]; then
+    USER_DESC="User running $SYNOPKG_PKGNAME"
+fi
+
+# Default description if group name provided by UI
+if [ -n "${GROUP}" -a -z "${GROUP_DESC}" ]; then
+    GROUP_DESC="SynoCommunity Package Group"
+fi
+
+# Extract share volume and share name from download location if provided
+if [ -n "${SHARE_PATH}" ]; then
+    SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
+    SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
+fi
+
+# Tools shortcuts
+MV="/bin/mv -f"
+RM="/bin/rm -rf"
+CP="/bin/cp -rfp"
+MKDIR="/bin/mkdir -p"
+LN="/bin/ln -nsf"
+TEE="/usr/bin/tee -a"
+
+### Functions library
+
+log ()
+{
+    echo "$1" 1>&2 # /var/log/packages/{package}.log
+}
+
+
+log_step ()
+{
+    log $(date)
+    log "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
+}
+
+save_wizard_variables ()
+{
+    if [ -e "${INST_VARIABLES}" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
+    if [ -n "${GROUP}" ]; then
+        echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
+    fi
+    if [ -n "${SHARE_PATH}" ]; then
+        echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
+    fi
+}
+
+set_unix_permissions ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_unix_permissions() is no longer supported."
+}
+
+syno_remove_user ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_remove_user() is no longer supported."
+}
+
+syno_group_create ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_create() is no longer supported."
+}
+
+syno_group_remove ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_remove() is no longer supported."
+}
+
+syno_user_add_to_group ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_group() is no longer supported."
+}
+
+set_syno_permissions ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_syno_permissions() is no longer supported."
+}
+
+syno_user_add_to_legacy_group () {
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
+}
+
+
+### Generic package behaviors
+
+preinst ()
+{
+    log_step "preinst"
+    call_func "service_preinst"
+
+    # Check volume exists
+    if [ -n "${SHARE_PATH}" ]; then
+        if [ ! -d "${SHARE_VOLUME}" ]; then
+            echo "Volume ${SHARE_VOLUME} does not exist." | $TEE 1>&2
+            exit 1
+        fi
+    fi
+
+    exit 0
+}
+
+postinst ()
+{
+    log_step "postinst"
+    save_wizard_variables
+
+    $MKDIR "${INST_VAR}"
+
+    call_func "service_postinst"
+    call_func "service_create_links"
+
+    exit 0
+}
+
+preuninst ()
+{
+    log_step "preuninst"
+    call_func "service_preuninst"
+    exit 0
+}
+
+postuninst ()
+{
+    log_step "postuninst"
+
+    call_func "service_postuninst"
+    call_func "service_remove_links"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
+    exit 0
+}
+
+preupgrade ()
+{
+    log_step "preupgrade"
+
+    # dsm6 -> dsm7
+    # Migrate data to permanent storage
+
+    $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+
+    call_func "service_preupgrade"
+
+    call_func "service_save"
+
+    exit 0
+}
+
+postupgrade ()
+{
+    log_step "postupgrade"
+
+    call_func "service_restore"
+
+    call_func "service_postupgrade"
+
+    exit 0
+}

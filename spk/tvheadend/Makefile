@@ -24,9 +24,9 @@ CHANGELOG = "1. Update to latest git version 9ed76c0 as of October 11th 2020<br/
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
-# PPC_ARCHES except qoriq are not supported
+# PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
 
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
@@ -46,8 +46,6 @@ POST_STRIP_TARGET = tvheadend_extra_install
 
 BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
-include ../../mk/spksrc.common.mk
 
 # Reuse ffmpeg libraries
 # Requires to invoke: make [package|publish] ARCH= TCVERSION=
@@ -69,7 +67,7 @@ FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc li
 MEDIA_LIBS = fdk-aac.pc numa.pc ogg.pc opus.pc theoradec.pc theoraenc.pc theora.pc vorbisenc.pc vorbisfile.pc vorbis.pc vpx.pc x264.pc x265.pc
 
 # Add Intel VAAPI libraries on Intel platforms
-ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 VAAPI_LIBS = libdrm.pc libdrm_intel.pc libkms.pc libva.pc libva-drm.pc pciaccess.pc
 endif
 

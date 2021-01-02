@@ -105,7 +105,7 @@ curve25519-donna==1.3	# https://github.com/ikalchev/HAP-python/blob/dev/requirem
 ecdsa==0.16.1
 ed25519==1.5
 pycryptodome==3.9.9
-tlslite-ng==0.7.5
+tlslite-ng==0.7.6
 
 
 # homeassistant.components.mastodon
@@ -159,7 +159,7 @@ PyTurboJPEG==1.4.0
 #PyViCare==0.2.0
 
 # homeassistant.components.xiaomi_aqara
-#PyXiaomiGateway==0.13.4
+PyXiaomiGateway==0.13.4
 
 # homeassistant.components.bmp280
 # homeassistant.components.mcp23017
@@ -542,7 +542,7 @@ connect-box==0.2.8
 # homeassistant.components.eddystone_temperature
 # homeassistant.components.eq3btsmart
 # homeassistant.components.xiaomi_miio
-#construct==2.9.45
+construct==2.9.45
 
 # homeassistant.components.coronavirus
 #coronavirus==1.1.1
@@ -786,6 +786,7 @@ gTTS-token==1.1.3
 
 # homeassistant.components.nest
 #google-nest-sdm==0.1.14
+#grpcio==1.34.0   # fails to cross-compile wheel
 
 # homeassistant.components.google_travel_time
 #googlemaps==2.5.1
@@ -945,10 +946,10 @@ ua_parser==0.10.0
 #keba-kecontact==1.1.0
 
 # homeassistant.scripts.keyring
-#keyring==21.2.0
+keyring==21.2.0
 
 # homeassistant.scripts.keyring
-#keyrings.alt==3.4.0
+keyrings.alt==3.4.0
 
 # homeassistant.components.kiwi
 #kiwiki-client==0.1.1
@@ -1540,6 +1541,7 @@ pygatt[GATTTOOL]==4.0.5
 
 # homeassistant.components.icloud
 pyicloud==0.9.7
+future==0.18.2
 
 # homeassistant.components.insteon
 #pyinsteon==1.0.8
@@ -1711,7 +1713,11 @@ pyotp==2.3.0
 #pypjlink2==1.2.1
 
 # homeassistant.components.point
-#pypoint==2.0.0
+pypoint==2.0.0
+Authlib==0.15.2
+httpcore==0.12.2
+sniffio==1.2.0
+rfc3986==1.4.0
 
 # homeassistant.components.profiler
 #pyprof2calltree==1.4.5
@@ -1794,6 +1800,8 @@ pysabnzbd==1.1.0
 
 # homeassistant.components.snmp
 pysnmp==4.4.12
+pysmi==0.3.4
+pycryptodomex==3.9.9
 
 # homeassistant.components.soma
 #pysoma==0.0.10
@@ -1878,7 +1886,9 @@ demjson==2.2.4
 # python-lirc==1.2.3
 
 # homeassistant.components.xiaomi_miio
-#python-miio==0.5.3
+python-miio==0.5.3
+croniter==0.3.36
+natsort==7.1.0
 
 # homeassistant.components.mpd
 #python-mpd2==1.0.0
@@ -1962,6 +1972,7 @@ python-wink==1.10.5
 
 # homeassistant.components.tradfri
 pytradfri[async]==7.0.4
+aiocoap==0.4b3
 
 # homeassistant.components.trafikverket_train
 # homeassistant.components.trafikverket_weatherstation

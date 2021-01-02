@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 # archs lacking C++11 compiler (arm5 archs, ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = Diaoul
 DESCRIPTION = Domoticz is a Home Automation System that lets you monitor and configure various devices like: Lights, Switches, various sensors/meters like Temperature, Rain, Wind, UV, Electra, Gas, Water and much more. Notifications/Alerts can be sent to any mobile device.

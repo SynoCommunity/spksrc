@@ -19,14 +19,14 @@ CONFIGURE_ARGS += --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ksba-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-npth-prefix=$(STAGING_INSTALL_PREFIX)
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # kernel before 2.6.36 do not support inotify
 CONFIGURE_ARGS += ac_cv_func_inotify_init=no
 endif
 
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # use clock_gettime of librt
 ADDITIONAL_LDFLAGS = -lrt
 endif

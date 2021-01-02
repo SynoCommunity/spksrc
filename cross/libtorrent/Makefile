@@ -9,9 +9,9 @@ PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 DEPENDS = cross/python cross/boost cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = 88f6281 powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
 # libtorrent:
-UNSUPPORTED_ARCHS += hi3535
+UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://www.rasterbar.com/products/libtorrent
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.

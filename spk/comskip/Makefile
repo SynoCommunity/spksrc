@@ -20,8 +20,6 @@ SPK_COMMANDS = bin/comskip
 
 POST_STRIP_TARGET = comskip_extra_install
 
-include ../../mk/spksrc.common.mk
-
 # Reuse FFmpeg libraries
 export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
 

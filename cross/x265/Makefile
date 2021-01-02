@@ -31,38 +31,38 @@ include ../../mk/spksrc.cross-cc.mk
 # gcc version above 4.8 required to support hdr10plus
 PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
 ifeq ($(findstring $(TCVERSION), "6.0.2 6.1 6.2"),$(TCVERSION))
-ifneq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
 PLIST_TRANSFORM = cat
 endif
 endif
 
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 
-ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 endif
 
-ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON -DENABLE_ASSEMBLY=OFF
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64 -DENABLE_ALTIVEC=OFF -DCPU_POWER8=OFF
 endif
 
-ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += native/nasm cross/libnuma
 ENV += PATH=$(NASM_PATH):$$PATH
 ENV += AS=$(NASM_PATH)/nasm
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
 endif
 
-ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 DEPENDS += native/nasm cross/libnuma
 ENV += PATH=$(NASM_PATH):$$PATH
 ENV += AS=$(NASM_PATH)/nasm

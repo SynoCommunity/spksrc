@@ -18,8 +18,8 @@ INSTALL_TARGET = imagemagick_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x),$(ARCH))
-# ARM5_ARCHES and PPC_ARCHES (except QorIQ) have older kernels
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# ARMv5 and PPC archs (except QorIQ) have older kernels
 # linking to lib rt fixes unreferenced clock_gettime
 CONFIGURE_ARGS += CFLAGS=-lrt
 endif

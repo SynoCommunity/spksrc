@@ -15,8 +15,8 @@ DISPLAY_NAME = redis
 
 CHANGELOG = "Update to 5.0.7"
 
-# PPC_ARCHES except qoriq are not supported anymore
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+# PPC archs except qoriq are not supported anymore
+UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD

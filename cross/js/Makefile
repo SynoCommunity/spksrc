@@ -22,19 +22,19 @@ CONFIGURE_ARGS = ac_cv_va_copy=C99 --disable-dependency-tracking --disable-stati
 
 PRE_COMPILE_TARGET = js_pre_compile
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
 PRE_COMPILE_HOST_CPU =
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PRE_COMPILE_HOST_CPU = -D__x86_64__
 endif
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PRE_COMPILE_HOST_CPU = -D__i386__
 endif
-ifeq ($(findstring $(ARCH),$(ARM_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 PRE_COMPILE_HOST_CPU = -D__arm__
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 PRE_COMPILE_HOST_CPU = -D__powerpc__
 endif
 

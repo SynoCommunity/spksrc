@@ -25,27 +25,27 @@ OPENSSL_DATA_DIR=/etc/ssl
 # Map ARCH to arch expected by openssl Configure
 OPENSSL_ARCH =
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-x86_64
 endif
-ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-x86
 endif
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-armv4 -march=armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-armv4
 endif
-ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-aarch64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 OPENSSL_ARCH = linux-ppc
 endif
 
 ifeq ($(strip $(OPENSSL_ARCH)),)
-# Unexpected CPU architecture. Please add arch to mk/spksrc.common.mk
+# Unexpected CPU architecture. Please add arch to mk/spksrc.archs.mk
 $(error Arch $(ARCH) not expected yet)
 endif
 

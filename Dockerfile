@@ -45,6 +45,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		lzip \
 		mercurial \
 		ncurses-dev \
+		ninja-build \
 		php \
 		pkg-config \
 		python3 \

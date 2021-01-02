@@ -6,7 +6,7 @@ SPK_ICON = src/salt-minion.png
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
 BUILD_DEPENDS = cross/python3
 SPK_DEPENDS = "python3>=3.7"
-UNSUPPORTED_ARCHS = $(PPC_ARCHES) $(ARM5_ARCHES)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 # Requirements file generation
 # /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env

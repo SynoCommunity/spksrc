@@ -14,7 +14,7 @@ LICENSE  = https://www.mono-project.com/docs/faq/licensing
 REQUIRED_DSM = 5.0
 # Although qoriq can be compiled successfully it won't run as classic floating point unit not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
-UNSUPPORTED_ARCHS = $(PPC_ARCHES)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 PRE_CONFIGURE_TARGET = mono_pre_configure
 GNU_CONFIGURE = 1
@@ -30,21 +30,21 @@ ADDITIONAL_CFLAGS = -Os
 include ../../mk/spksrc.cross-cc.mk
 
 PLIST_TRANSFORM = cat
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
 	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 endif
-ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
 	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
 		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 	endif
 endif
-ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	AG_ARGS = --host=aarch64-linux
 	PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
 endif
-ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
 		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 	endif
