@@ -18,7 +18,7 @@ CHANGELOG = "Initial release with fishnet-20200613."
 LICENSE  = GPLv3
 STARTABLE = no
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 WHEELS = src/requirements.txt
 SERVICE_SETUP = src/service-setup.sh
@@ -26,6 +26,7 @@ SERVICE_SETUP = src/service-setup.sh
 POST_STRIP_TARGET = fishnet_extra_install
 
 include ../../mk/spksrc.spk.mk
+
 
 .PHONY: fishnet_extra_install
 fishnet_extra_install:

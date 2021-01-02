@@ -4,18 +4,16 @@ SPK_REV = 7
 SPK_ICON = src/debian.png
 DSM_UI_DIR = app
 
-DEPENDS =
+DEPENDS  =
 WHEELS = pyextdirect==0.3.1 flask Werkzeug Jinja2 itsdangerous
 SPK_DEPENDS = "python>=2.7.6-8"
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv8_ARCHS)
 
 MAINTAINER = Diaoul
 DESCRIPTION = Debian is a free operating system \(OS\) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation. Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
 DESCRIPTION_FRE = Debian est un système d\'exploitation \(SE\) qui rend disponible plus de 29000 paquets, logiciels précompilés et empaquetés dans un joli format pour rendre son installation facile sur votre DiskStation. Debian Chroot vous permet de bénéficier du SE Debian au sein de votre DiskStation, aux cotés de DSM. Ce paquet est destiné aux utilisateurs avancés uniquement.
 RELOAD_UI = yes
 DISPLAY_NAME = Debian Chroot
-CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 archs"
+CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 arches"
 
 HOMEPAGE = https://www.debian.org
 LICENSE  = https://www.debian.org/legal/licenses
@@ -28,25 +26,27 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = debian-chroot_extra_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHES) $(ARM8_ARCHES)
 
 DEBIAN_ARCH =
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 DEBIAN_ARCH = armel
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 DEBIAN_ARCH = armhf
 endif
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
 DEBIAN_ARCH = arm64
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 DEBIAN_ARCH = i386
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 DEBIAN_ARCH = amd64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEBIAN_ARCH = powerpc
 endif
 ifeq ($(strip $(DEBIAN_ARCH)),)

@@ -26,35 +26,31 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = gentoo-chroot_extra_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-UNSUPPORTED_ARCHS = $(ARMv8_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM8_ARCHES)
 
 GENTOO_ARCH =
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-GENTOO_CPU = arm
-GENTOO_ARCH = armv7a
-endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
 GENTOO_ARCH = arm64
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 GENTOO_CPU = x86
 GENTOO_ARCH = i386
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 GENTOO_CPU = x86
 GENTOO_ARCH = i686
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 GENTOO_CPU = ppc
 GENTOO_ARCH = ppc
 endif

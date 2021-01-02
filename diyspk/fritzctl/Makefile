@@ -16,6 +16,7 @@ LICENSE = MIT
 
 SPK_COMMANDS = bin/fritzctl
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+GENERIC_ARCHS = ARM7
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 include ../../mk/spksrc.spk.mk

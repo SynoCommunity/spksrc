@@ -15,9 +15,7 @@ GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
 CONFIGURE_ARGS = --with-libimagequant
 
-include ../../mk/spksrc.archs.mk
-
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += --enable-sse
 else
 CONFIGURE_ARGS += --disable-sse

@@ -17,16 +17,14 @@ endif
 
 # find patches into the following directory order:
 #    patches/*.patch
-#    patches/DSM-$(TCVERSION)/*.patch
-#    patches/$(group)/*.patch
-#    patches/$(group)-$(TCVERSION)/*.patch
 #    patches/$(arch)/*.patch
-#    patches/$(arch)-$(TCVERSION)/*.patch
-# supported groups: armv5, armv7, armv7l, armv8, ppc, i686, x64
+#    patches/DSM-$(TCVERSION)/*.patch
+#    patches/$(subarch)/*.patch
+#    patches/$(subarch)-$(TCVERSION)/*.patch
 ifeq ($(strip $(PATCHES)),)
-PATCHES = $(foreach group,ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
-	$(foreach arch,$($(group)), \
-	$(if $(filter $(ARCH),$(arch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch  patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')-$(TCVERSION)/*.patch patches/$(arch)/*.patch patches/$(arch)-$(TCVERSION)/*.patch)),)))
+PATCHES = $(foreach arch,ARM5_ARCHES ARM7_ARCHES ARM8_ARCHES PPC_ARCHES x86_ARCHES x64_ARCHES, \
+	$(foreach subarch,$($(arch)), \
+	$(if $(filter $(ARCH),$(subarch)),$(sort $(wildcard patches/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${arch} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch patches/$(subarch)/*.patch patches/$(subarch)-$(TCVERSION)/*.patch)),)))
 endif
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
@@ -75,3 +73,4 @@ $(PATCH_COOKIE): $(POST_PATCH_TARGET)
 else
 patch: ;
 endif
+

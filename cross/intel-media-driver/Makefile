@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/intel/media-driver/archive
 PKG_DIR = media-driver-$(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/gmmlib
-UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
 
 HOMEPAGE = https://github.com/intel/media-driver
 COMMENT  = The Intel Media Driver for VAAPI is a new VA-API (Video Acceleration API) user mode driver supporting hardware accelerated decoding, encoding, and video post processing for GEN based graphics hardware.

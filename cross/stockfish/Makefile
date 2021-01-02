@@ -14,12 +14,12 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 # use builtin atomic support
 ADDITIONAL_LDFLAGS = -latomic
 endif
@@ -27,19 +27,19 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM8_ARCHES)),$(ARCH))
 	BUILD_ARCH=arm64
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM7_ARCHES)),$(ARCH))
 	BUILD_ARCH=armv7
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x86_ARCHES)),$(ARCH))
 	BUILD_ARCH=x86-32
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
 	BUILD_ARCH=x86-64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 	BUILD_ARCH=ppc-32
 endif
 ifeq ($(BUILD_ARCH),)

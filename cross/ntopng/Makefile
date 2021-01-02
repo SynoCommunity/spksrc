@@ -15,32 +15,29 @@ HOMEPAGE = https://www.ntop.org/
 COMMENT  = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.
 LICENSE  = GPLv3
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 SYNOLOGY_OS = DSM
-ifeq ($(findstring $(ARCH),$(SRM_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(SRM_ARCHS)),$(ARCH))
 SYNOLOGY_OS = SRM
 endif
 
 # similar to 'uname -m' on the target plattform (not essential, for information only)
 PACKAGE_MACHINE = x86_64
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 PACKAGE_MACHINE = armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
 PACKAGE_MACHINE = armv7l
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-PACKAGE_MACHINE = armv7
-endif
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 PACKAGE_MACHINE = aarch64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 PACKAGE_MACHINE = ppc
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 PACKAGE_MACHINE = i686
 endif
 

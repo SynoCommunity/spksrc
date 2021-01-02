@@ -8,16 +8,16 @@ DEPENDS += cross/rsync cross/autossh cross/arp-scan
 
 OPTIONAL_DEPENDS = cross/fritzctl cross/ser2net
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 OPTIONAL_DESC =
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 DEPENDS += cross/fritzctl
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fritzctl"
 endif
 
-ifneq ($(findstring $(ARCH),$(OLD_PCC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
 DEPENDS += cross/ser2net
 OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
 endif

@@ -23,29 +23,29 @@ CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES) $(ARM7_ARCHES)),$(ARCH))
 ENV += x264_ARCH=ARM
 CONFIGURE_ARGS += --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 ENV += x264_ARCH=aarch64
 CONFIGURE_ARGS += --disable-asm --host=arm-linux
 endif
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 ENV += x264_ARCH=PPC
 CONFIGURE_ARGS += --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 ENV += x264_ARCH=X86_64
 endif
 
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 DEPENDS += native/nasm
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH

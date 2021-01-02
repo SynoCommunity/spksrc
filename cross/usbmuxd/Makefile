@@ -21,12 +21,13 @@ USBMUXD_AUTOGEN_ARGS = --without-cpython
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 USBMUXD_AUTOGEN_ARGS += --host=arm-linux
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 USBMUXD_AUTOGEN_ARGS += --host=ppc-linux
 endif
+
 
 .PHONY: usbmuxd_pre_configure
 usbmuxd_pre_configure:
