@@ -291,7 +291,7 @@ postinst ()
         # Create share if does not exist
         #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
         if ! synoshare --get "${SHARE_NAME}" &> /dev/null ; then
-            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 >> ${INST_LOG}
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "$USER" "" 1 0 >> ${INST_LOG} 2>&1
         fi
 
         # Add user permission if no GROUP is set in UI
