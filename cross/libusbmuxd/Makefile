@@ -19,12 +19,13 @@ LIBUSBMUXD_AUTOGEN_ARGS =
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 	LIBUSBMUXD_AUTOGEN_ARGS += --host=arm-linux
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 	LIBUSBMUXD_AUTOGEN_ARGS += --host=ppc-linux
 endif
+
 
 .PHONY: libusbmuxd_pre_configure
 libusbmuxd_pre_configure:

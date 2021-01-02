@@ -18,9 +18,9 @@ CONFIGURE_ARGS = --without-pam
 #CONFIGURE_ARGS += --enable-optimized
 CONFIGURE_ARGS += libmonit_cv_setjmp_available=yes libmonit_cv_vsnprintf_c99_conformant=yes 
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHES)),$(ARCH))
 CONFIGURE_ARGS += ac_cv_c_bigendian=yes
 else
 CONFIGURE_ARGS += ac_cv_c_bigendian=no

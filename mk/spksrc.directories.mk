@@ -13,9 +13,9 @@ PWD := $(shell pwd)
 
 BASE_DISTRIB_DIR  = $(PWD)/../../distrib
 PIP_DIR = $(BASE_DISTRIB_DIR)/pip
-TOOLCHAIN_DIR = $(BASE_DISTRIB_DIR)/toolchain
+TOOLCHAINS_DIR = $(BASE_DISTRIB_DIR)/toolchains
 TOOLKIT_DIR = $(BASE_DISTRIB_DIR)/toolkit
-KERNEL_DIR = $(BASE_DISTRIB_DIR)/kernel
+KERNELS_DIR = $(BASE_DISTRIB_DIR)/kernels
 PACKAGES_DIR = $(PWD)/../../packages
 # Default download location, see spksrc.download.mk
 DISTRIB_DIR = $(BASE_DISTRIB_DIR)

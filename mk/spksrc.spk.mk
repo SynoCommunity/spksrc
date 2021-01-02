@@ -125,9 +125,9 @@ endif
 ifneq ($(strip $(HELPURL)),)
 	@echo helpurl=\"$(HELPURL)\" >> $@
 else
-ifneq ($(strip $(HOMEPAGE)),)
+  ifneq ($(strip $(HOMEPAGE)),)
 	@echo helpurl=\"$(HOMEPAGE)\" >> $@
-endif
+  endif
 endif
 ifneq ($(strip $(SUPPORTURL)),)
 	@echo support_url=\"$(SUPPORTURL)\" >> $@
@@ -141,40 +141,23 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
-ifeq ($(RELOAD_UI),yes)
+ifneq ($(strip $(RELOAD_UI)),)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 endif
-
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
-# old behaviour
 ifeq ($(STARTABLE),no)
 ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
 	@echo startable=\"$(STARTABLE)\" >> $@
 endif
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
-else
-# since 7.0 use Synology resource acquisition
-ifeq ($(STARTABLE),no)
-ifeq ($(strip $(SPK_COMMANDS)),)
-# STARTABLE needs to be yes, Resource linking and unlinking works on start and stop
-	@echo ctl_stop=\"$(STARTABLE)\" >> $@
-endif
-endif
-endif
-
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@
 endif
 ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
-	@echo dsmapppage=\"$(DSM_APP_NAME)\" >> $@
-	@echo dsmapplaunchname=\"$(DSM_APP_NAME)\" >> $@
 else
 	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
-	@echo dsmapppage=\"com.synocommunity.$(SPK_NAME)\" >> $@
-	@echo dsmapplaunchname=\"com.synocommunity.$(SPK_NAME)\" >> $@
 endif
 ifneq ($(strip $(ADMIN_PROTOCOL)),)
 	@echo adminprotocol=\"$(ADMIN_PROTOCOL)\" >> $@
@@ -277,14 +260,10 @@ icons:
 ifneq ($(strip $(SPK_ICON)),)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 	(convert $(SPK_ICON) -thumbnail 72x72 -strip - > $(WORK_DIR)/PACKAGE_ICON.PNG)
-else
-	(convert $(SPK_ICON) -thumbnail 64x64 -strip - > $(WORK_DIR)/PACKAGE_ICON.PNG)
-endif  
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
 	(convert $(SPK_ICON) -thumbnail 256x256 -strip - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
-	$(eval SPK_CONTENT += PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
+	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
 .PHONY: info-checksum
@@ -340,31 +319,16 @@ endif
 clean:
 	rm -fr work work-*
 
-spkclean:
-	rm -fr work-*/.copy_done \
-	       work-*/.depend_done \
-	       work-*/.icon_done \
-	       work-*/.strip_done \
-	       work-*/.wheel_done \
-	       work-*/conf \
-	       work-*/scripts \
-	       work-*/staging \
-	       work-*/package.tgz \
-	       work-*/INFO \
-	       work-*/PLIST \
-	       work-*/PACKAGE_ICON* \
-	       work-*/WIZARD_UIFILES
-
 all: package
 
 ### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
+all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
 
 .PHONY: publish-all-archs
-publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_TOOLCHAINS))
+publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_ARCHS))
 
 ####
 
@@ -383,7 +347,7 @@ endif
 
 KERNEL_REQUIRED = $(MAKE) kernel-required
 ifeq ($(strip $(KERNEL_REQUIRED)),)
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
+ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_NO_KRNLSUPP))))))
 endif
 
 ####
@@ -392,7 +356,7 @@ endif
 
 pre-build-native:
 	@$(MSG) Pre-build native dependencies for parallel build
-	@for depend in $(sort $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)) ; \
+	@for depend in `$(MAKE) dependency-list` ; \
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
 	    echo "Pre-processing $${depend}" ; \
@@ -414,34 +378,34 @@ publish-supported-arch-%:
 
 latest-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))))
 
 publish-latest-arch-%:
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_ARCHS)))))),$(sort $(filter $*%, $(AVAILABLE_ARCHS))))))) publish
 
 ####
 
-all-legacy:
-	$(MAKE) legacy-toolchain-5.2 legacy-toolchain-1.2
-	@$(MSG) Built legacy DSM and SRM archs
+all-legacy: $(addprefix arch-,$(LEGACY_ARCHS))
+	$(MAKE) all-toolchain-5.2 all-toolchain-1.1
+	@$(MSG) Built legacy archs
 
-publish-all-legacy:
-	$(MAKE) publish-legacy-toolchain-5.2
-	@$(MSG) Published legacy DSM archs
+publish-all-legacy: $(addprefix publish-arch-,$(LEGACY_ARCHS))
+	$(MAKE) all-toolchain-5.2
+	@$(MSG) Published legacy archs
 
 ####
 
-legacy-toolchain-%:
+all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
 	  $(MAKE) arch-$$arch-$* ; \
 	done \
 
-publish-legacy-toolchain-%:
+publish-all-toolchain-%:
 	@$(MSG) Built packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
+	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(AVAILABLE_ARCHS))))))) ; \
 	do \
 	  $(MAKE) publish-arch-$$arch-$* ; \
 	done \

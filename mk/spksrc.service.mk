@@ -3,7 +3,7 @@
 #   scripts/installer
 #   scripts/start-stop-status
 #   scripts/service-setup
-#   conf/privilege        if SERVICE_USER or DSM7
+#   conf/privilege        if SERVICE_USER
 #   conf/SPK_NAME.sc      if SERVICE_PORT
 #   app/config            if DSM_UI_DIR
 #
@@ -42,8 +42,7 @@ endif
 .PHONY: service_target service_msg_target
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
 .PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
-.PHONY: $(DSM_CONF_DIR)/privilege $(DSM_CONF_DIR)/resource
-.PHONY: $(DSM_CONF_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
+.PHONY: $(DSM_CONF_DIR)/privilege $(DSM_CONF_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
 
 service_msg_target:
 	@$(MSG) "Generating service scripts for $(NAME)"
@@ -56,18 +55,13 @@ SPK_USER = $(SPK_NAME)
 else
 SPK_USER = $(SERVICE_USER)
 endif
-ifeq ($(strip $(SPK_USER)),)
-SPK_USER = $(SPK_NAME)
-endif
 
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT)),)
 ifeq ($(strip $(SERVICE_COMMAND)),)
-ifeq ($(strip $(SPK_COMMANDS)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 ifeq ($(strip $(STARTABLE)),)
-$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SPK_COMMANDS or specific SSS_SCRIPT)
-endif
+$(error Set STARTABLE=no or provide either SERVICE_COMMAND or specific SSS_SCRIPT)
 endif
 endif
 endif
@@ -101,17 +95,10 @@ ifneq ($(strip $(SERVICE_PORT)),)
 	@echo 'SERVICE_PORT="$(SERVICE_PORT)"' >> $@
 endif
 ifneq ($(STARTABLE),no)
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
 	@echo 'LOG_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.log"' >> $@
 	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
 	@echo 'PID_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.pid"' >> $@
-else
-	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
-	@echo 'LOG_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.log"' >> $@
-	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
-	@echo 'PID_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.pid"' >> $@
-endif
 endif
 ifneq ($(strip $(SERVICE_COMMAND)),)
 ifneq ($(strip $(SERVICE_SHELL)),)
@@ -132,26 +119,12 @@ endif
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
-
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
 	@echo "# List of commands to create links for" >> $@
 	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
 	@echo "SPK_LINKS=\"${SPK_LINKS}\"" >> $@
 	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 endif
-else
-
-SPK_COMMANDS_IN_JSON = $(shell echo ${SPK_COMMANDS} | jq -Rc '. | split(" ")')
-$(DSM_CONF_DIR)/resource:
-	$(create_target_dir)
-	@jq -n '."usr-local-linker" = {"bin": $$binaries}' --argjson binaries '$(SPK_COMMANDS_IN_JSON)' > $@
-SERVICE_FILES += $(DSM_CONF_DIR)/resource
-# STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
-# see spsrc.spk.mk
-endif
-
-
 DSM_SCRIPTS_ += service-setup
 SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 
@@ -159,13 +132,8 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
 DSM_SCRIPTS_ += installer
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
-	@$(dsm_script_copy)
-else
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
 	@$(dsm_script_copy)
-endif
 endif
 
 # Control use of generic start-stop-status scripts
@@ -187,35 +155,19 @@ endif
 
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
-$(DSM_CONF_DIR)/privilege:
-	$(create_target_dir)
-	jq -n '.defaults = {"run-as": "package"}' > $@
-else
+ifneq ($(strip $(SPK_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
-$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
-endif
-# TODO add moreutils package, use sponge to prevent overriding file with 0 content
-#- 1<> $@
-#+ | sponge $@
 	$(create_target_dir)
-	jq '.username = "sc-$(SPK_USER)"' $@ 1<>$@
-	jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
-ifneq ($(strip $(GROUP)),)
-	# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
-	# For DSM7 I recommend setting permissions for individual packages (System Internal User)
-	# or use the shared folder resource worker to add permissions, ask user from wizard
-	jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
-endif
-endif
+	@sed 's|USER|sc-$(SPK_USER)|' $< > $@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/privilege
+endif
 
 
 # Generate service configuration for admin port

@@ -16,8 +16,6 @@ CONFIGURE_ARGS += --enable-jit
 CONFIGURE_ARGS += --enable-pcre2-16 --enable-pcre2-32
 CONFIGURE_ARGS += --enable-pcre2grep-libz --enable-pcre2grep-libbz2 --enable-pcre2grep-callout 
 CONFIGURE_ARGS += --enable-pcre2test-libreadline
-else
-PLIST_TRANSFORM = sed -e '/:lib\/libpcre2-16.so\|:lib\/libpcre2-32.so/d'
 endif
 
 HOMEPAGE = https://www.pcre.org

@@ -5,7 +5,7 @@ SPK_ICON = src/lidarr.png
 
 REQUIRED_DSM = 5.0
 # Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHES)
 
 DEPENDS = cross/curl cross/mediainfo cross/sqlite cross/lidarr
 

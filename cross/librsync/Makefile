@@ -25,22 +25,22 @@ CMAKE_ARGS += -Wno-dev
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=armv5
 endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=armv7
 endif
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=x86_64
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=i686
 endif
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=aarch64
 endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=ppc
 endif
 

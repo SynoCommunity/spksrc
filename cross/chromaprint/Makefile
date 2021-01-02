@@ -12,7 +12,7 @@ LICENSE  = LGPL2.1+
 OPTIONAL_DEPENDS = cross/ffmpeg
 
 # compiler too old
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHES) powerpc ppc824x ppc853x ppc854x
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 CMAKE_RPATH = /var/packages/ffmpeg/target/lib

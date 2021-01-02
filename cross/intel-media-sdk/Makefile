@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/Intel-Media-SDK/MediaSDK/archive
 PKG_DIR = MediaSDK-$(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/intel-media-driver
-UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
 
 HOMEPAGE = http://mediasdk.intel.com
 COMMENT  = Intel Media SDK provides a plain C API to access hardware-accelerated video decode, encode and filtering on Intel® Gen graphics hardware platforms. Implementation written in C++ 11 with parts in C-for-Media (CM).
