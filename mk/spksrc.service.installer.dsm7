@@ -135,6 +135,12 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
+    # Add firewall config
+    if [ -r "${FWPORTS_FILE}" ]; then
+        echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
+        servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
+    fi
+
     $MKDIR "${INST_VAR}"
 
     call_func "service_postinst"
@@ -146,6 +152,15 @@ postinst ()
 preuninst ()
 {
     log_step "preuninst"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall config
+        if [ -r "${FWPORTS_FILE}" ]; then
+            echo "Removing service configuration ${SYNOPKG_PKGNAME}.sc" >> ${INST_LOG}
+            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" >> ${INST_LOG} 2>&1
+        fi
+    fi
+
     call_func "service_preuninst"
     exit 0
 }
