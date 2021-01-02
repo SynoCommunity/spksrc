@@ -8,6 +8,7 @@ INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
 INST_VAR="${SYNOPKG_PKGDEST}/var"
+SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var" # backwards compatability
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
