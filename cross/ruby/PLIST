@@ -10,7 +10,5 @@ rsc:bin/rdoc
 rsc:bin/ri
 rsc:bin/ruby
 rsc:bin/typeprof
-lib:lib/libruby-static.a
-rsc:lib/pkgconfig/ruby-3.0.pc
 rsc:lib/ruby/3.0.0
 rsc:lib/ruby/gems
