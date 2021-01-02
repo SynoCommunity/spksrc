@@ -6,9 +6,6 @@
 # files are migrated from ${SYNOPKG_PKGDEST}/var to ${SYNOPKG_PKGVAR}
 # Not supported (yet)
 
-
-INST_LOG="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_install.log"
-
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
 INST_VAR="${SYNOPKG_PKGVAR}"
@@ -55,10 +52,16 @@ TEE="/usr/bin/tee -a"
 
 ### Functions library
 
+log ()
+{
+    echo "$1" 1>&2 # /var/log/packages/{package}.log
+}
+
+
 log_step ()
 {
-    date >> ${INST_LOG}
-    echo "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}" >> ${INST_LOG}
+    log $(date)
+    log "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
 }
 
 save_wizard_variables ()
@@ -74,39 +77,38 @@ save_wizard_variables ()
     fi
 }
 
+set_unix_permissions ()
+{
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_unix_permissions() is no longer supported."
+}
+
 syno_remove_user ()
 {
-    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_remove_user() is no longer supported."
-    return 0
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_remove_user() is no longer supported."
 }
 
 syno_group_create ()
 {
-    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_group_create() is no longer supported."
-    return 0
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_create() is no longer supported."
 }
 
 syno_group_remove ()
 {
-    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_group_remove() is no longer supported."
-    return 0
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_remove() is no longer supported."
 }
 
 syno_user_add_to_group ()
 {
-    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_user_add_to_group() is no longer supported."
-    return 0
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_group() is no longer supported."
 }
 
 set_syno_permissions ()
 {
-    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: set_syno_permissions() is no longer supported."
-    return 0
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_syno_permissions() is no longer supported."
 }
 
 syno_user_add_to_legacy_group () {
-    echo "This package has not been updated to DSM7 yet. Please open a new issue, mentioning this text: syno_user_add_to_legacy_group() is no longer supported."
-    return 0
+    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
 }
 
 
@@ -120,7 +122,7 @@ preinst ()
     # Check volume exists
     if [ -n "${SHARE_PATH}" ]; then
         if [ ! -d "${SHARE_VOLUME}" ]; then
-            echo "Volume ${SHARE_VOLUME} does not exist." | $TEE ${INST_LOG}
+            echo "Volume ${SHARE_VOLUME} does not exist." | $TEE 1>&2
             exit 1
         fi
     fi
@@ -133,15 +135,11 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
-    $MKDIR "${INST_VAR}" >> ${INST_LOG} 2>&1
+    $MKDIR "${INST_VAR}"
 
     call_func "service_postinst"
     call_func "service_create_links"
 
-    $CP "${INST_LOG}" "${INST_VAR}" >> ${INST_LOG} 2>&1
-    if [ -n "${LOG_FILE}" ]; then
-        echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
-    fi
     exit 0
 }
 
@@ -156,16 +154,11 @@ postuninst ()
 {
     log_step "postuninst"
 
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        # Remove link
-        $RM "/usr/local/${SYNOPKG_PKGNAME}" >> ${INST_LOG} 2>&1
-    fi
-
     call_func "service_postuninst"
     call_func "service_remove_links"
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        $RM "${INST_VARIABLES}" >> ${INST_LOG} 2>&1
+        $RM "${INST_VARIABLES}"
     fi
     exit 0
 }
@@ -181,15 +174,8 @@ preupgrade ()
 
     call_func "service_preupgrade"
 
-    # Save some stuff
-    $RM "$TMP_DIR" >> ${INST_LOG} 2>&1
-    $MKDIR "$TMP_DIR" >> ${INST_LOG} 2>&1
-
     call_func "service_save"
 
-    # Beware of /. outside the quotes
-    # Needed to copy all files including hidden ones
-    $CP "${INST_VAR}"/. "$TMP_DIR" >> ${INST_LOG} 2>&1
     exit 0
 }
 
@@ -199,14 +185,7 @@ postupgrade ()
 
     call_func "service_restore"
 
-    # Restore some stuff, has to be cp otherwise fails on directories
-    $CP "${TMP_DIR}"/. "${INST_VAR}" >> ${INST_LOG} 2>&1
-
-    $RM "$TMP_DIR" >> ${INST_LOG} 2>&1
-
     call_func "service_postupgrade"
 
-    # Make sure we also have the logging for this step
-    $CP "${INST_LOG}" "${INST_VAR}"
     exit 0
 }
