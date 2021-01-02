@@ -44,7 +44,7 @@ ruby_post_configure:
 # _in addition to_ any prefix/DESTDIR passed to `make install`.
 # Without this override, the install ends up nested in a doubled prefix.
 # Finally fix path to ruby in scripts
-ruby_install: $(PRE_INSTALL_TARGET)
+ruby_install:
 	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install
 	@for tool in $(RUBYTOOLS) ; \
 	do \
