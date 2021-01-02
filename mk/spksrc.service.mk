@@ -205,6 +205,7 @@ endif
 # TODO add moreutils package, use sponge to prevent overriding file with 0 content
 #- 1<> $@
 #+ | sponge $@
+	$(create_target_dir)
 	jq '.username = "sc-$(SPK_USER)"' $@ 1<>$@
 	jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
 ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
