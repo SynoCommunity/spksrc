@@ -181,6 +181,10 @@ postuninst ()
             rm -rf ${SYNOPKG_PKGVAR}/.
         fi
 
+        if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" ]; then
+            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/.
+        fi
+
         if [ "$(ls -A ${SYNOPKG_PKGTMP})" ]; then
             rm -rf ${SYNOPKG_PKGTMP}/.
         fi
