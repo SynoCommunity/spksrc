@@ -25,10 +25,6 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8384
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-# Use busybox start-stop-daemon support
-# Options and environment are provided in service-setup.sh
-SERVICE_EXE = $${SYNOPKG_PKGDEST}/bin/syncthing
-
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 

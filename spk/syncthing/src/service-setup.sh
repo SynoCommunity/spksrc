@@ -1,6 +1,10 @@
 # Setup environment
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/syncthing --home=${SYNOPKG_PKGVAR}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
+
 GROUP="sc-syncthing"
 LEGACY_GROUP="users"
 
