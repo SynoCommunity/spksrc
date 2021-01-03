@@ -8,13 +8,13 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 SPK_NAME = $(PKG_NAME)
 SPK_VERS = $(PKG_VERS)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/magnet.png
 
 MAINTAINER = neykov
 DESCRIPTION = Download Station Magnet Handler. Register Download Station as the application to download magnet links from your browser. No plugins required.
 DISPLAY_NAME = Download Station Magnet
-CHANGELOG = "Initial Version"
+CHANGELOG = Re-packaged to add support for DSM 7
 
 HOMEPAGE   = https://github.com/neykov/syno-magnet
 LICENSE    = Apache 2.0
