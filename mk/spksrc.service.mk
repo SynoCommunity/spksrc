@@ -126,6 +126,13 @@ endif
 	@echo 'SERVICE_COMMAND="$(SERVICE_COMMAND)"' >> $@
 endif
 ifneq ($(strip $(SERVICE_EXE)),)
+ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+	@echo "${RED}ERROR: SERVICE_EXE (start-stop-daemon) is unsupported in DSM7${NC}"
+	@echo "${GREEN}Please migrate to SERVICE_COMMAND=${NC}"
+	@echo "SVC_BACKGROUND=y"
+	@echo "SVC_WRITE_PID=y"
+	@exit 1
+endif
 	@echo "# Service command to execute with start-stop-daemon" >> $@
 	@echo 'SERVICE_EXE="$(SERVICE_EXE)"' >> $@
 ifneq ($(strip $(SERVICE_OPTIONS)),)
