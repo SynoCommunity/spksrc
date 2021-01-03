@@ -135,13 +135,16 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
-    # Add firewall config
-    if [ -r "${FWPORTS_FILE}" ]; then
-        echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
-        servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
-    fi
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # copy target/var data to permanent storage
+        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
 
-    $MKDIR "${INST_VAR}"
+        # Add firewall config
+        if [ -r "${FWPORTS_FILE}" ]; then
+            echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
+            servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
+        fi
+    fi
 
     call_func "service_postinst"
     call_func "service_create_links"
@@ -198,7 +201,6 @@ preupgrade ()
 
     # dsm6 -> dsm7
     # Migrate data to permanent storage
-
     if [ ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
         # only migrate when destination is empty
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
