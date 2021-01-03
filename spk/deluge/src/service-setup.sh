@@ -2,8 +2,8 @@ PYTHON_DIR="/usr/local/python"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
-CORE_CFG_FILE="${SYNOPKG_PKGDEST}/var/core.conf"
-WATCH_CFG_FILE="${SYNOPKG_PKGDEST}/var/autoadd.conf"
+CORE_CFG_FILE="${SYNOPKG_PKGVAR}/core.conf"
+WATCH_CFG_FILE="${SYNOPKG_PKGVAR}/autoadd.conf"
 
 GROUP="sc-download"
 

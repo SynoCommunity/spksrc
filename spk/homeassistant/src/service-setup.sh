@@ -6,11 +6,11 @@ PYTHON_DIR="/usr/local/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
 
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var/config"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
 
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/env/bin/hass -v --config ${CONFIG_DIR} --pid-file ${PID_FILE} --log-file ${LOG_FILE} --daemon"
-SVC_CWD="${SYNOPKG_PKGDEST}/var/"
-HOME="${SYNOPKG_PKGDEST}/var/"
+SVC_CWD="${SYNOPKG_PKGVAR}/"
+HOME="${SYNOPKG_PKGVAR}/"
 
 service_postinst ()
 {

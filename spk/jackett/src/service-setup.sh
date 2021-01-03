@@ -9,7 +9,7 @@ service_prestart ()
     PATH="${SYNOPKG_PKGDEST}/bin:${MONO_PATH}:${PATH}"
     MONO="${MONO_PATH}/mono"
     JACKETT="${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/JackettConsole.exe"
-    HOME_DIR="${SYNOPKG_PKGDEST}/var"
+    HOME_DIR="${SYNOPKG_PKGVAR}"
 
     # workaround for mono bug with armv5 (https://github.com/mono/mono/issues/12537)
     if [ "$SYNOPKG_DSM_ARCH" == "88f8621" -o "$SYNOPKG_DSM_ARCH" == "88f8622" ]; then

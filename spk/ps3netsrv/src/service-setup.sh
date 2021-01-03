@@ -1,4 +1,4 @@
-CFG_FILE="${SYNOPKG_PKGDEST}/var/ps3netsrv.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/ps3netsrv.conf"
 
 export PID_FILE CFG_FILE
 

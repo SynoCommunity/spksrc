@@ -19,7 +19,7 @@ service_postinst ()
 
 service_prestart ()
 {
-    CONFIG_DIR="${SYNOPKG_PKGDEST}/var"
+    CONFIG_DIR="${SYNOPKG_PKGVAR}"
     SYNCTHING_OPTIONS="-home=${CONFIG_DIR}"
 
     # Read additional startup options from /usr/local/syncthing/var/options.conf
@@ -30,6 +30,6 @@ service_prestart ()
     SERVICE_OPTIONS=$SYNCTHING_OPTIONS
 
     # Required: start-stop-daemon do not set environment variables
-    HOME=${SYNOPKG_PKGDEST}/var
+    HOME=${SYNOPKG_PKGVAR}
     export HOME
 }

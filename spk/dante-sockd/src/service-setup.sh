@@ -1,4 +1,4 @@
-CFG_FILE="${SYNOPKG_PKGDEST}/var/sockd.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/sockd.conf"
 BIN="${SYNOPKG_PKGDEST}/sbin/sockd"
 
 SC_GROUP="sockd-users"

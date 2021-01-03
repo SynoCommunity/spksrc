@@ -1,7 +1,7 @@
 
 INSTALL_DIR=${SYNOPKG_PKGDEST}/webgui
 WEB_DIR="/var/services/web/stockfish"
-CONFIG_TEMPLATE=${SYNOPKG_PKGDEST}/var/webgui-config-template.php
+CONFIG_TEMPLATE=${SYNOPKG_PKGVAR}/webgui-config-template.php
 CONFIG_FILE="${WEB_DIR}/config.php"
 
 service_postinst ()

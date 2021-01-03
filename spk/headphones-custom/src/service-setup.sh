@@ -4,10 +4,10 @@ GIT="${GIT_DIR}/bin/git"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-HEADPHONES="${SYNOPKG_PKGDEST}/var/Headphones/Headphones.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+HEADPHONES="${SYNOPKG_PKGVAR}/Headphones/Headphones.py"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 
-SERVICE_COMMAND="${PYTHON} ${HEADPHONES} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
+SERVICE_COMMAND="${PYTHON} ${HEADPHONES} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGVAR}/"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
@@ -29,7 +29,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
-        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/rembo10/headphones.git} ${SYNOPKG_PKGDEST}/var/Headphones
+        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/rembo10/headphones.git} ${SYNOPKG_PKGVAR}/Headphones
     fi
 
     # If nessecary, add user also to the old group

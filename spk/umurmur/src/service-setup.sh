@@ -3,7 +3,7 @@
 # Sourced script by generic installer and start-stop-status scripts
 
 UMURMUR="${SYNOPKG_PKGDEST}/bin/umurmurd"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/umurmur.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/umurmur.conf"
 GEN_CERT="${SYNOPKG_PKGDEST}/sbin/gencert.sh"
 
 SERVICE_COMMAND="${UMURMUR} -c ${CFG_FILE} -p ${PID_FILE}"

@@ -4,8 +4,8 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GIT="${GIT_DIR}/bin/git"
-COUCHPOTATOSERVER="${SYNOPKG_PKGDEST}/var/CouchPotatoServer/CouchPotato.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.conf"
+COUCHPOTATOSERVER="${SYNOPKG_PKGVAR}/CouchPotatoServer/CouchPotato.py"
+CFG_FILE="${SYNOPKG_PKGVAR}/settings.conf"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
@@ -28,7 +28,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
-         ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/CouchPotato/CouchPotatoServer.git} ${SYNOPKG_PKGDEST}/var/CouchPotatoServer >> ${INST_LOG} 2>&1
+         ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/CouchPotato/CouchPotatoServer.git} ${SYNOPKG_PKGVAR}/CouchPotatoServer >> ${INST_LOG} 2>&1
     fi
 
     # Create logs directory, otherwise it might not start
