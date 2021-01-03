@@ -135,10 +135,13 @@ postinst ()
     log_step "postinst"
     save_wizard_variables
 
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        # copy target/var data to permanent storage
+    # copy target/var data to permanent storage
+    # and don't override old configurations
+    if [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+    fi
 
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Add firewall config
         if [ -r "${FWPORTS_FILE}" ]; then
             echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
@@ -175,21 +178,22 @@ postuninst ()
     call_func "service_postuninst"
     call_func "service_remove_links"
 
-    if [ "$wizard_delete_data" ]; then
-        if [ "$(ls -A ${SYNOPKG_PKGHOME})" ]; then
-            rm -rf ${SYNOPKG_PKGHOME}/.
+    if [ "$wizard_delete_data" = "true" ]; then
+
+        if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
+            rm -rf ${SYNOPKG_PKGHOME}/
         fi
 
-        if [ "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
-            rm -rf ${SYNOPKG_PKGVAR}/.
+        if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
+            rm -rf ${SYNOPKG_PKGVAR}/
         fi
 
-        if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" ]; then
-            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/.
+        if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
+            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/
         fi
 
-        if [ "$(ls -A ${SYNOPKG_PKGTMP})" ]; then
-            rm -rf ${SYNOPKG_PKGTMP}/.
+        if ["$(ls -A ${SYNOPKG_PKGTMP})" != "" ]; then
+            rm -rf ${SYNOPKG_PKGTMP}/
         fi
     fi
     exit 0
