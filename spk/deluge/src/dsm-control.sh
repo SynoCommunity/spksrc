@@ -13,10 +13,10 @@ fi
 # We use Generic Service variables for main deamon
 DELUGED="${SYNOPKG_PKGDEST}/env/bin/deluged"
 DELUGE_WEB="${SYNOPKG_PKGDEST}/env/bin/deluge-web"
-CFG_DIR="${SYNOPKG_PKGDEST}/var/"
+CFG_DIR="${SYNOPKG_PKGVAR}/"
 PYTHON_EGG_CACHE="${SYNOPKG_PKGDEST}/env/cache"
-DELUGE_WEB_PID="${SYNOPKG_PKGDEST}/var/deluge-web.pid"
-DELUGE_WEB_LOG="${SYNOPKG_PKGDEST}/var/deluge-web.log"
+DELUGE_WEB_PID="${SYNOPKG_PKGVAR}/deluge-web.pid"
+DELUGE_WEB_LOG="${SYNOPKG_PKGVAR}/deluge-web.log"
 
 
 # We do not need to specify a user,

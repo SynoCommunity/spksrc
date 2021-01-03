@@ -4,9 +4,9 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 MYLAR="${SYNOPKG_PKGDEST}/share/mylar/Mylar.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 
-SERVICE_COMMAND="${PYTHON} ${MYLAR} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/data"
+SERVICE_COMMAND="${PYTHON} ${MYLAR} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGVAR}/data"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"

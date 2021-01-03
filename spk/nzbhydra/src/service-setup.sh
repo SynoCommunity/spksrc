@@ -4,8 +4,8 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 NZBHYDRA="${SYNOPKG_PKGDEST}/share/nzbhydra/nzbhydra.py"
-DB_FILE="${SYNOPKG_PKGDEST}/var/nzbhydra.db"
-CONF_FILE="${SYNOPKG_PKGDEST}/var/settings.cfg"
+DB_FILE="${SYNOPKG_PKGVAR}/nzbhydra.db"
+CONF_FILE="${SYNOPKG_PKGVAR}/settings.cfg"
 
 SERVICE_COMMAND="${PYTHON} ${NZBHYDRA} --daemon --nobrowser --database ${DB_FILE} --config ${CONF_FILE} --logfile ${LOG_FILE} --pidfile ${PID_FILE}"
 

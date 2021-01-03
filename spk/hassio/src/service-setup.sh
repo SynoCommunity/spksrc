@@ -18,8 +18,8 @@ service_postinst() {
         /usr/local/bin/docker tag "${HASSIO_DOCKER}:${HASSIO_VERSION}" "${HASSIO_DOCKER}:latest" >/dev/null
 
         if [ ! -f ${CFG_FILE} ]; then
-            mkdir -p /usr/local/${SYNOPKG_PKGNAME}/etc 
-            cp ${SYNOPKG_PKGDEST}/var/hassio.dist ${CFG_FILE}
+            mkdir -p /usr/local/${SYNOPKG_PKGNAME}/etc
+            cp ${SYNOPKG_PKGVAR}/hassio.dist ${CFG_FILE}
             # Write config
             sed -i -e "s|@supervisor@|${HASSIO_DOCKER}|g" ${CFG_FILE}
             sed -i -e "s|@homeassistant@|${HOMEASSISTANT_DOCKER}|g" ${CFG_FILE}
@@ -62,8 +62,8 @@ service_preuninst() {
 
 service_preupgrade() {
     # Move old config file in var into etc.
-    if [ -f "${SYNOPKG_PKGDEST}/var/hassio.json" ]; then
-        mv "${SYNOPKG_PKGDEST}/var/hassio.json" /tmp/hassio.json
+    if [ -f "${SYNOPKG_PKGVAR}/hassio.json" ]; then
+        mv "${SYNOPKG_PKGVAR}/hassio.json" /tmp/hassio.json
     fi
 
     if [ -f ${CFG_FILE} ]; then

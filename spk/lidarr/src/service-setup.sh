@@ -7,8 +7,8 @@ LIDARR="${SYNOPKG_PKGDEST}/share/Lidarr/Lidarr.exe"
 SPK_LIDARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/Lidarr/Lidarr.exe"
 
 # Lidarr uses custom Config and PID directories
-HOME_DIR="${SYNOPKG_PKGDEST}/var"
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
+HOME_DIR="${SYNOPKG_PKGVAR}"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
 PID_FILE="${CONFIG_DIR}/Lidarr/lidarr.pid"
 
 # Some have it stored in the root of package

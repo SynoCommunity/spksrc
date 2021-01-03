@@ -3,7 +3,7 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
 GROUP="sc-download"

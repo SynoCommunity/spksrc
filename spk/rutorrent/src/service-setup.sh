@@ -23,8 +23,8 @@ PYTHON_DIR="/usr/local/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
 SVC_BACKGROUND=y
-PID_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.pid"
-LOG_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.log"
+PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
+LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
 service_preinst ()
@@ -98,8 +98,8 @@ service_postinst ()
     cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR} >>"${INST_LOG}" 2>&1
 
     # Allow direct-user access to rtorrent configuration file
-    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
-    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGDEST}/var/.rtorrent.rc >>"${INST_LOG}" 2>&1
+    mv ${SYNOPKG_PKGVAR}/.rtorrent.rc ${RTORRENT_RC} >>"${INST_LOG}" 2>&1
+    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGVAR}/.rtorrent.rc >>"${INST_LOG}" 2>&1
 
     # Configure open_basedir
     if [ "${APACHE_USER}" == "nobody" ]; then
@@ -198,14 +198,14 @@ service_save ()
     fi
 
     # Save session files
-    mv ${SYNOPKG_PKGDEST}/var/.session ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
+    mv ${SYNOPKG_PKGVAR}/.session ${TMP_DIR}/ >>"${INST_LOG}" 2>&1
 
     # Save rtorrent configuration file (new location)
-    if [ -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
+    if [ -L ${SYNOPKG_PKGVAR}/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
        mv ${RTORRENT_RC} ${TMP_DIR}/ >> "${INST_LOG}" 2>&1
     # Save rtorrent configuration file (old location -> prior to symlink)
-    elif [ ! -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ]; then
-       mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/rtorrent.rc >> "${INST_LOG}" 2>&1
+    elif [ ! -L ${SYNOPKG_PKGVAR}/.rtorrent.rc -a -f ${SYNOPKG_PKGVAR}/.rtorrent.rc ]; then
+       mv ${SYNOPKG_PKGVAR}/.rtorrent.rc ${TMP_DIR}/rtorrent.rc >> "${INST_LOG}" 2>&1
     fi
 
     # Save rutorrent share directory
@@ -250,9 +250,9 @@ service_restore ()
         sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC} >> "${INST_LOG}" 2>&1
     fi
 
-    echo "Restoring rtorrent session files ${SYNOPKG_PKGDEST}/var/.session" >> "${INST_LOG}" 2>&1
-    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/ >> "${INST_LOG}" 2>&1
-    set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
+    echo "Restoring rtorrent session files ${SYNOPKG_PKGVAR}/.session" >> "${INST_LOG}" 2>&1
+    mv ${TMP_DIR}/.session ${SYNOPKG_PKGVAR}/ >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${SYNOPKG_PKGVAR}/"
 
     echo "Restoring rutorrent web shared directory ${WEB_DIR}/${PACKAGE}/share" >> "${INST_LOG}" 2>&1
     cp -pnr ${TMP_DIR}/share ${WEB_DIR}/${PACKAGE}/ >> "${INST_LOG}" 2>&1

@@ -1,9 +1,9 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 NZBGET="${SYNOPKG_PKGDEST}/bin/nzbget"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/nzbget.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/nzbget.conf"
 TEMPLATE_CFG_FILE="${SYNOPKG_PKGDEST}/share/nzbget/nzbget.conf"
 WEBDIR="${SYNOPKG_PKGDEST}/bin/webui"
-NZBGET_INSTALLER="${SYNOPKG_PKGDEST}/var/nzbget.run"
+NZBGET_INSTALLER="${SYNOPKG_PKGVAR}/nzbget.run"
 GROUP="sc-download"
 
 # Force-overwrite the PID-file and WebDir setting
@@ -64,7 +64,7 @@ service_postinst ()
 
         # Update to match our paths
         sed -i -e "s|ScriptDir=.*$|ScriptDir=${SYNOPKG_PKGDEST}/share/nzbget/scripts|g" \
-               -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGDEST}/var/nzbget.log|g" \
+               -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGVAR}/nzbget.log|g" \
                -e "s|ConfigTemplate=.*$|ConfigTemplate=${TEMPLATE_CFG_FILE}|g" \
                ${CFG_FILE}
     fi
