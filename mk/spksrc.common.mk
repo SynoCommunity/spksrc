@@ -69,3 +69,8 @@ ifeq ($(filter $(NCPUS),0 1),)
 COMPILE_MAKE_OPTIONS += -j$(NCPUS)
 endif
 endif
+
+# Terminal colors
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+NC=`tput sgr0`
