@@ -172,8 +172,18 @@ postuninst ()
     call_func "service_postuninst"
     call_func "service_remove_links"
 
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        $RM "${INST_VARIABLES}"
+    if [ "$wizard_delete_data" ]; then
+        if [ "$(ls -A ${SYNOPKG_PKGHOME})" ]; then
+            rm -rf ${SYNOPKG_PKGHOME}/.
+        fi
+
+        if [ "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
+            rm -rf ${SYNOPKG_PKGVAR}/.
+        fi
+
+        if [ "$(ls -A ${SYNOPKG_PKGTMP})" ]; then
+            rm -rf ${SYNOPKG_PKGTMP}/.
+        fi
     fi
     exit 0
 }
