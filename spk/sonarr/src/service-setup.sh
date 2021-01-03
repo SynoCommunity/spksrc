@@ -3,8 +3,8 @@ MONO_PATH="/var/packages/mono/target/bin"
 MONO="${MONO_PATH}/mono"
 
 # Sonarr uses the home directory to store it's ".config"
-HOME_DIR="${SYNOPKG_PKGDEST}/var"
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
+HOME_DIR="${SYNOPKG_PKGVAR}"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
 
 # Sonarr v2 -> v3 compatibility:
 if [ -f "${SYNOPKG_PKGDEST}/share/NzbDrone/NzbDrone.exe" ]; then

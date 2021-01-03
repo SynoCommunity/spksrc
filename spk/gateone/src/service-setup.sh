@@ -3,8 +3,8 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GATEONE="${SYNOPKG_PKGDEST}/env/bin/gateone"
-SETTINGS_DIR="${SYNOPKG_PKGDEST}/var/conf.d"
-CONF_FILE="${SYNOPKG_PKGDEST}/var/conf.d/90custom.conf"
+SETTINGS_DIR="${SYNOPKG_PKGVAR}/conf.d"
+CONF_FILE="${SYNOPKG_PKGVAR}/conf.d/90custom.conf"
 if [ $SYNOPKG_DSM_VERSION_MAJOR -ge 6 ]; then
     CERTPATH="/usr/syno/etc/certificate/system/default/"
     CERTIFICATE="cert.pem"

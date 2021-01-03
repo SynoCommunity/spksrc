@@ -1,17 +1,17 @@
 PYTHON_DIR="/usr/local/python"
 GIT_DIR="/usr/local/git"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
-HOME="${SYNOPKG_PKGDEST}/var"
+HOME="${SYNOPKG_PKGVAR}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 GIT="${GIT_DIR}/bin/git"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
-SICKBEARD="${SYNOPKG_PKGDEST}/var/SickBeard/SickBeard.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+SICKBEARD="${SYNOPKG_PKGVAR}/SickBeard/SickBeard.py"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
 
-SERVICE_COMMAND="${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
+SERVICE_COMMAND="${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGVAR}/"
 
 service_preinst ()
 {
@@ -29,8 +29,8 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
-        ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/midgetspy/Sick-Beard.git} ${SYNOPKG_PKGDEST}/var/SickBeard > /dev/null 2>&1
-        cp ${SYNOPKG_PKGDEST}/var/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${SYNOPKG_PKGDEST}/var/SickBeard/autoProcessTV/autoProcessTV.cfg
+        ${GIT} clone --depth 10 --recursive -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/midgetspy/Sick-Beard.git} ${SYNOPKG_PKGVAR}/SickBeard > /dev/null 2>&1
+        cp ${SYNOPKG_PKGVAR}/SickBeard/autoProcessTV/autoProcessTV.cfg.sample ${SYNOPKG_PKGVAR}/SickBeard/autoProcessTV/autoProcessTV.cfg
     fi
 
     # If nessecary, add user also to the old group before removing it

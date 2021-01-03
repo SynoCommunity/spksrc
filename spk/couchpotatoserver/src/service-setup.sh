@@ -4,7 +4,7 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 COUCHPOTATOSERVER="${SYNOPKG_PKGDEST}/share/CouchPotatoServer/CouchPotato.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/settings.conf"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"

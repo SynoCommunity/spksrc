@@ -31,6 +31,6 @@ service_prestart ()
     export MINIO_SECRET_KEY=$WIZARD_SECRET_KEY
 
     # Required: start-stop-daemon do not set environment variables
-    HOME=${SYNOPKG_PKGDEST}/var
+    HOME=${SYNOPKG_PKGVAR}
     export HOME
 }
