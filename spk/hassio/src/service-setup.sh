@@ -15,7 +15,7 @@ service_postinst() {
 
         # Pull supervisor image
         /usr/local/bin/docker pull "${HASSIO_DOCKER}:${HASSIO_VERSION}" >/dev/null &&
-            /usr/local/bin/docker tag "${HASSIO_DOCKER}:${HASSIO_VERSION}" "${HASSIO_DOCKER}:latest" >/dev/null
+        /usr/local/bin/docker tag "${HASSIO_DOCKER}:${HASSIO_VERSION}" "${HASSIO_DOCKER}:latest" >/dev/null
 
         if [ ! -f ${CFG_FILE} ]; then
             mkdir -p /usr/local/${SYNOPKG_PKGNAME}/etc 
