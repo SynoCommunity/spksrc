@@ -1,6 +1,6 @@
 SPK_NAME = duplicity
 SPK_VERS = 0.7.19
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/duplicity.png
 
 BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
@@ -14,7 +14,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm using a command line interface. Also contains duply wrapper script.
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = Update to version 0.7.19
+CHANGELOG = "Added evansport support"
 
 HOMEPAGE = http://duplicity.nongnu.org/
 LICENSE  = GNU GPL v2
