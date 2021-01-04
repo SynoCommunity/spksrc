@@ -10,7 +10,7 @@ service_postinst() {
         HASSIO_DOCKER="homeassistant/amd64-hassio-supervisor"
 
         # Read infos from web
-        URL_VERSION="https://s3.amazonaws.com/hassio-version/stable.json"
+        URL_VERSION="https://version.home-assistant.io/stable.json"
         HASSIO_VERSION=$(curl -s $URL_VERSION | jq -e -r '.supervisor')
 
         # Pull supervisor image
