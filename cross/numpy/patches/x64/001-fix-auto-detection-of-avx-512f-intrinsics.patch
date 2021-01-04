@@ -1,0 +1,30 @@
+#From 39c915c1236d61debb4b3e10dfadf910da6c9b30 Mon Sep 17 00:00:00 2001
+#From: Raghuveer Devulapalli <raghuveer.devulapalli@intel.com>
+#Date: Tue, 14 Jul 2020 13:34:55 -0700
+#Subject: [PATCH] BUG: Update compiler check for AVX-512F
+#
+#gcc-4.9 is missing a few AVX-512F intrisics, see
+#https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61878. We use some of these
+#missing intrinsics to check for compiler support of AVX-512F.
+#---diff --git numpy/core/setup_common.py numpy/core/setup_common.py
+#index 8c0149497bc..f15425c8763 100644
+--- numpy/core/setup_common.py
++++ numpy/core/setup_common.py
+@@ -171,6 +171,9 @@ def check_api_version(apiversion, codegen_dir):
+ # gcc 4.8.4 support attributes but not with intrisics
+ # tested via "#include<%s> int %s %s(void *){code; return 0;};" % (header, attribute, name, code)
+ # function name will be converted to HAVE_<upper-case-name> preprocessor macro
++# The _mm512_castps_si512 instruction is specific check for AVX-512F support
++# in gcc-4.9 which is missing a subset of intrinsics. See
++# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61878
+ OPTIONAL_FUNCTION_ATTRIBUTES_WITH_INTRINSICS = [('__attribute__((target("avx2,fma")))',
+                                 'attribute_target_avx2_with_intrinsics',
+                                 '__m256 temp = _mm256_set1_ps(1.0); temp = \
+@@ -178,6 +181,6 @@ def check_api_version(apiversion, codegen_dir):
+                                 'immintrin.h'),
+                                 ('__attribute__((target("avx512f")))',
+                                 'attribute_target_avx512f_with_intrinsics',
+-                                '__m512 temp = _mm512_set1_ps(1.0)',
++                                '__m512i temp = _mm512_castps_si512(_mm512_set1_ps(1.0))',
+                                 'immintrin.h'),
+                                 ]

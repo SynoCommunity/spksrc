@@ -19,3 +19,8 @@ ADDITIONAL_CFLAGS += -O0
 endif
 
 include ../../mk/spksrc.python-wheel.mk
+
+ifeq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
+LD_LIBRARY_PATH := $(INSTALL_DIR)$(INSTALL_PREFIX)/lib:$(LD_LIBRARY_PATH)
+export LD_LIBRARY_PATH
+endif
