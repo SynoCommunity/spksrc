@@ -93,10 +93,12 @@ service_prestart ()
     ${COMMAND} >> ${LOG_FILE} 2>&1 &
     echo "$!" > "${PID_FILE}"
 
+    # Start containers
     docker start homeassistant
 }
 
 service_poststop ()
 {
+    # Stop containers
     docker stop hassio_supervisor homeassistant
 }
