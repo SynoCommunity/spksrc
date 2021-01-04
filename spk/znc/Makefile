@@ -1,6 +1,6 @@
 SPK_NAME = znc
 SPK_VERS = 1.8.1
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un 
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "Update to ZNC 1.8.1 - now built with libicu+python support."
+CHANGELOG = "Added hi3535 architecture support."
 
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/

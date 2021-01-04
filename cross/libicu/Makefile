@@ -35,5 +35,7 @@ CONFIGURE_ARGS = --host=x86_64-pc-linux-gnu
 endif
 NATIVE_BUILD_DIR = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)
 CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) --prefix=$(INSTALL_PREFIX)
+ADDITIONAL_CPPFLAGS = -std=c++11
+ADDITIONAL_CXXFLAGS = -std=c++11
 
 include ../../mk/spksrc.cross-cc.mk
