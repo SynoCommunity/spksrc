@@ -6,6 +6,8 @@ DSM_UI_DIR = app
 
 DEPENDS  = cross/busybox cross/erlang cross/ejabberd
 
+UNSUPPORTED_ARCHS = $(ALL_ARCHS)
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = ejabberd is high-performace enterprise Jabber/XMPP instant messaging server written in Erlang/OTP. It\'s cross-platform, fault-tolerant, clusterable and modular.
 ADMIN_URL = /admin/
