@@ -11,9 +11,6 @@ HOMEPAGE = https://github.com/adrianlopezroche/fdupes
 COMMENT  = FDUPES is a program for identifying or deleting duplicate files residing within specified directories.
 LICENSE  = MIT
 
-# fdupes needs pcre2-32
-ENV += PCRE2_CLI_FULL=1 
-
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk

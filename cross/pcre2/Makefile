@@ -8,16 +8,15 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 OPTIONAL_DEPENDS = cross/readline cross/zlib cross/bzip2
 
-ifeq ($(PCRE2_CLI_FULL),1)
+CONFIGURE_ARGS = --enable-pcre2-32
+
+ifeq ($(strip $(PCRE2_CLI_FULL)),1)
 # add additional features to pcre2grep and pcre2test
 DEPENDS += cross/readline cross/zlib cross/bzip2
 
 CONFIGURE_ARGS += --enable-jit
-CONFIGURE_ARGS += --enable-pcre2-16 --enable-pcre2-32
 CONFIGURE_ARGS += --enable-pcre2grep-libz --enable-pcre2grep-libbz2 --enable-pcre2grep-callout 
 CONFIGURE_ARGS += --enable-pcre2test-libreadline
-else
-PLIST_TRANSFORM = sed -e '/:lib\/libpcre2-16.so\|:lib\/libpcre2-32.so/d'
 endif
 
 HOMEPAGE = https://www.pcre.org

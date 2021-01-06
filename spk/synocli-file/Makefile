@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.1
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/synocli-file.png
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
@@ -28,14 +28,13 @@ DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
 endif
 
-# activate additional features for 
-# - pcre2grep and pcre2test
-# - fdupes
-ENV += PCRE2_CLI_FULL=1
+# activate additional features for pcre2grep and pcre2test
+PCRE2_CLI_FULL=1
+export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "Add fdupes v2.1.2"
+CHANGELOG = "Fix fdupes and pcre2 tools"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it\'s respective license.
