@@ -52,3 +52,5 @@ endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=x86
 endif
+
+ENV += CXXFLAGS=-D_GLIBCXX_USE_C99_MATH
