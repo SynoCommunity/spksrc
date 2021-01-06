@@ -1,0 +1,12 @@
+bin:bin/fish
+bin:bin/fish_indent
+bin:bin/fish_key_reader
+lib:lib/libpcre2-32.so.0.10.0
+lnk:lib/libpcre2-32.so
+lnk:lib/libpcre2-32.so.0
+rsc:etc/fish
+rsc:share/doc
+rsc:share/fish
+rsc:share/locale
+rsc:share/man
+rsc:share/pkgconfig
