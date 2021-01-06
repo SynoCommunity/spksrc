@@ -5,6 +5,8 @@ SPK_ICON = src/monit.png
 
 DEPENDS =  cross/$(SPK_NAME)
 
+UNSUPPORTED_ARCHS = $(ALL_ARCHS)
+
 DSM_UI_DIR = app
 CHANGELOG = Update monit to 5.27.1
 ADMIN_PORT = 2812

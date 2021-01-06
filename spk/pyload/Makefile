@@ -7,6 +7,8 @@ DSM_UI_DIR = app
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python>2.7.3-3"
 
+UNSUPPORTED_ARCHS = $(ALL_ARCHS)
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = pyLoad is a fast, lightweight and full featured download manager for many One-Click-Hoster, container formats like DLC, video sites or just plain http/ftp links.
 RELOAD_UI = yes

@@ -10,6 +10,8 @@ BUILD_DEPENDS += cross/gevent cross/greenlet
 DEPENDS     = cross/busybox
 WHEELS      = src/requirements.txt
 
+UNSUPPORTED_ARCHS = $(ALL_ARCHS)
+
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
 DISPLAY_NAME = Firefox Sync Server 1.5

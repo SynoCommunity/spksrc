@@ -7,6 +7,8 @@ DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
 DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
 OPTIONAL_DEPENDS = cross/dar
 
+UNSUPPORTED_ARCHS = $(ALL_ARCHS)
+
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli Disk Tools
 
