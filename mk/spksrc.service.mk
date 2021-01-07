@@ -157,9 +157,8 @@ SPK_COMMANDS_IN_JSON = $(shell echo ${SPK_COMMANDS} | jq -Rc '. | split(" ")')
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@jq -n '."usr-local-linker" = {"bin": $$binaries}' --argjson binaries '$(SPK_COMMANDS_IN_JSON)' > $@
-	@echo ${SERVICE_WIZARD_SHARE}
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-	jq -n --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} '."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' > $@
+	@jq -n --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} '."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' > $@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 # STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
@@ -225,6 +224,10 @@ ifneq ($(strip $(GROUP)),)
 	# For DSM7 I recommend setting permissions for individual packages (System Internal User)
 	# or use the shared folder resource worker to add permissions, ask user from wizard
 	jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
+endif
+ifneq ($(strip $(SYSTEM_GROUP)),)
+    # options: http, system
+	jq --arg group $(SYSTEM_GROUP) '."join-groupname" = $$group' $@ 1<>$@
 endif
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
