@@ -6,15 +6,11 @@ PKG_DIST_SITE = https://github.com/fish-shell/fish-shell/releases/download/$(PKG
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncurses cross/pcre2
-OPTIONAL_DEPENDS = cross/bzip2 cross/readline cross/zlib
 
 HOMEPAGE = https://fishshell.com
 COMMENT = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
 LICENSE = Custom
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
-
-# fish needs pcre2-32
-ENV += PCRE2_CLI_FULL=1
 
 include ../../mk/spksrc.cross-cmake.mk
