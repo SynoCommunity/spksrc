@@ -5,8 +5,6 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
-GROUP="sc-transmission"
-
 SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
 
 service_preinst ()
