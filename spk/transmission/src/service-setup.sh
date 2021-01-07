@@ -5,7 +5,7 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
-GROUP="sc-download"
+GROUP="sc-transmission"
 
 SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
 
@@ -56,12 +56,6 @@ service_postinst ()
             set_syno_permissions "${wizard_incomplete_dir}" "${GROUP}"
         fi
     fi
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN >> ${INST_LOG}
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 
