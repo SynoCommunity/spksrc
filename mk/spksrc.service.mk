@@ -156,9 +156,14 @@ else
 SPK_COMMANDS_IN_JSON = $(shell echo ${SPK_COMMANDS} | jq -Rc '. | split(" ")')
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
-	@jq -n '."usr-local-linker" = {"bin": $$binaries}' --argjson binaries '$(SPK_COMMANDS_IN_JSON)' > $@
+	@echo '{}' > $@
+ifneq ($(strip $(SPK_COMMANDS)),)
+	@jq --argjson binaries '$(SPK_COMMANDS_IN_JSON)' \
+		'."usr-local-linker" = {"bin": $$binaries}' $@ 1<>$@
+endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-	@jq -n --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} '."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' > $@
+	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
+		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 # STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
@@ -204,32 +209,34 @@ endif
 ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
-	jq -n '.defaults = {"run-as": "package"}' > $@
+	@jq -n '."defaults" = {"run-as": "package"}' > $@
 else
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
+	@$(dsm_script_copy)
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
+	@$(dsm_script_copy)
 endif
 endif
-# TODO add moreutils package, use sponge to prevent overriding file with 0 content
-#- 1<> $@
-#+ | sponge $@
-	$(create_target_dir)
-	jq '.username = "sc-$(SPK_USER)"' $@ 1<>$@
-	jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
+# Apply variables to privilege file
 ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 ifneq ($(strip $(GROUP)),)
 	# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
 	# For DSM7 I recommend setting permissions for individual packages (System Internal User)
-	# or use the shared folder resource worker to add permissions, ask user from wizard
-	jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
+	# or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
+	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
+endif
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
-    # options: http, system
-	jq --arg group $(SYSTEM_GROUP) '."join-groupname" = $$group' $@ 1<>$@
+	# options: http, system
+	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
 endif
+ifneq ($(strip $(SPK_USER)),)
+	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
+	@jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
 endif
+
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
