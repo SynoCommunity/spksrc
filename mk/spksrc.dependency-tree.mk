@@ -8,14 +8,24 @@
 ###   the list is sorted and does not include duplicate dependencies.
 ###   sample:
 ###   minio: cross/busybox cross/minio native/go native/go-1.4
-
+### 
+### NOTES:
+### o Packages with conditional dependencies must define such dependencies 
+###   additionally with OPTIONAL_DEPENDS, otherwise not all dependencies are found.
+### 
+### o dependency-tree and dependency-list call make for all dependencies without 
+###   the definition of specific ARCH nor TCVERSION.
+###   Therefore every Makefile (including mk/*.mk) must not abort nor put 
+###   output with error, warning or info directive when the variable 
+###   DEPENDENCY_WALK is set to 1.
+### 
 
 .PHONY: dependency-tree
 dependency-tree:
 	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
 	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS) ; \
 	do \
-	  $(MAKE) -s -C ../../$$depend dependency-tree ; \
+	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-tree ; \
 	done
 
 
@@ -30,5 +40,5 @@ dependency-flat:
 	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk)/.*"
 	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS) ; \
 	do \
-	  $(MAKE) -s -C ../../$$depend dependency-flat ; \
+	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat ; \
 	done
