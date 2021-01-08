@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/ejabberd
 
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
@@ -19,12 +19,17 @@ HOMEPAGE = https://www.ejabberd.im
 LICENSE  = GPLv2
 HELPURL  = https://docs.ejabberd.im/admin/guide
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/sbin/ejabberdctl start"
-
 WIZARDS_DIR = src/wizard
+
 SERVICE_SETUP = src/service-setup.sh
+# custom start-stop-status script required, as
+# SERVICE_COMMAND is not a single command
+SSS_SCRIPT = src/service-start-stop.sh
+
 FWPORTS = src/${SPK_NAME}.sc
 CONF_DIR = src/conf
+
+SKP_COMMANDS = sbin/ejabberdctl
 
 POST_STRIP_TARGET = ejabberd_extra_install
 

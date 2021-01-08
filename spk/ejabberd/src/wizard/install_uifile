@@ -33,7 +33,7 @@
                 "allowBlank": false
             }
         }]
-	}, {
+    }, {
         "desc": "Note: To log in, use 'account@domain' (default: admin@localhost)"
     }]
 }]

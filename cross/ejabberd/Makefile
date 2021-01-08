@@ -9,7 +9,7 @@ BUILD_DEPENDS = native/erlang
 DEPENDS = cross/ncurses cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
 
 # PPC archs except qoriq have too old compiler
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.ejabberd.im
 COMMENT  = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
@@ -47,3 +47,6 @@ ejabberd_post_install:
 	sed -e "s#$(INSTALL_DIR)##g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
 	sed -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
 	sed -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
+	sed -e "s#/etc/ejabberd\"#/var\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
+	sed -e "s#/var/lib/ejabberd\"#/var/lib\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
+	sed -e "s#/var/log/ejabberd\"#/var/log\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
