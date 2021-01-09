@@ -3,14 +3,18 @@
 
 service_postinst ()
 {
-    # setuid for proper vaapi access
-    chmod u+s /var/packages/ffmpeg/target/bin/ffmpeg
-    chmod u+s /var/packages/ffmpeg/target/bin/vainfo
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+        # setuid for proper vaapi access
+        chmod u+s /var/packages/ffmpeg/target/bin/ffmpeg
+        chmod u+s /var/packages/ffmpeg/target/bin/vainfo
+    fi
 }
 
 service_postupgrade ()
 {
-    # setuid for proper vaapi access
-    chmod u+s /var/packages/ffmpeg/target/bin/ffmpeg
-    chmod u+s /var/packages/ffmpeg/target/bin/vainfo
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+        # setuid for proper vaapi access
+        chmod u+s /var/packages/ffmpeg/target/bin/ffmpeg
+        chmod u+s /var/packages/ffmpeg/target/bin/vainfo
+    fi
 }
