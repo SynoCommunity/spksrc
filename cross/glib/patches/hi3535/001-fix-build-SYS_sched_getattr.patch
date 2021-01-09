@@ -1,4 +1,6 @@
---- meson.build-old	2021-01-09 14:43:01.994870325 +0000
+# see https://gitlab.gnome.org/GNOME/glib/-/issues/2274
+# as this will not be maintained upstream we will have to maintain this patch
+--- meson.build.orig	2021-01-09 14:43:01.994870325 +0000
 +++ meson.build	2021-01-09 14:44:35.463405360 +0000
 @@ -1835,7 +1835,16 @@ else
      glib_conf.set('HAVE_PTHREAD_GETNAME_NP', 1)
