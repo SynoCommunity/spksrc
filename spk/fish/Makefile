@@ -17,6 +17,7 @@ LICENSE = Custom
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
+SERVICE_SETUP = src/service-setup.sh
 SPK_COMMANDS = bin/fish bin/fish_indent bin/fish_key_reader
 
 include ../../mk/spksrc.spk.mk
