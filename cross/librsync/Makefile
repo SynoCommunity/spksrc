@@ -34,7 +34,7 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=x86_64
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCES)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CMAKE_ARGS += -D CMAKE_SYSTEM_PROCESSOR=i686
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
