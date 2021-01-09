@@ -1,0 +1,244 @@
+# inspired by  http://www.linuxfromscratch.org/patches/blfs/5.1/tcp_wrappers-7.6-shared-lib-plus-plus.patch
+# adjusted for SynoCommunity
+# - relocate patch file ro source path
+# - avoid patch and installation of man pages
+# - limit patch to linux target
+# remarks:
+# - only libwrap is used, binaries are lacking to find shared lib at runtime
+--- Makefile.org	1997-03-21 18:27:21.000000000 +0000
++++ Makefile	2020-11-07 14:01:31.027674067 +0000
+@@ -1,5 +1,8 @@
+ # @(#) Makefile 1.23 97/03/21 19:27:20
+ 
++# unset the HOSTNAME environment variable
++HOSTNAME =
++
+ what:
+ 	@echo
+ 	@echo "Usage: edit the REAL_DAEMON_DIR definition in the Makefile then:"
+@@ -143,8 +146,9 @@
+ 
+ linux:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+-	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=setenv.o \
+-	NETGROUP= TLI= EXTRA_CFLAGS="-DBROKEN_SO_LINGER" all
++	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ=weak_symbols.o \
++	NETGROUP=-DNETGROUP TLI= VSYSLOG= BUGS= all \
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_WEAKSYMS -D_REENTRANT"
+ 
+ # This is good for many SYSV+BSD hybrids with NIS, probably also for HP-UX 7.x.
+ hpux hpux8 hpux9 hpux10:
+@@ -391,7 +395,7 @@
+ # the ones provided with this source distribution. The environ.c module
+ # implements setenv(), getenv(), and putenv().
+ 
+-AUX_OBJ= setenv.o
++#AUX_OBJ= setenv.o
+ #AUX_OBJ= environ.o
+ #AUX_OBJ= environ.o strcasecmp.o
+ 
+@@ -454,7 +458,8 @@
+ # host name aliases. Compile with -DSOLARIS_24_GETHOSTBYNAME_BUG to work
+ # around this. The workaround does no harm on other Solaris versions.
+ 
+-BUGS = -DGETPEERNAME_BUG -DBROKEN_FGETS -DLIBC_CALLS_STRTOK
++BUGS =
++#BUGS = -DGETPEERNAME_BUG -DBROKEN_FGETS -DLIBC_CALLS_STRTOK
+ #BUGS = -DGETPEERNAME_BUG -DBROKEN_FGETS -DINET_ADDR_BUG
+ #BUGS = -DGETPEERNAME_BUG -DBROKEN_FGETS -DSOLARIS_24_GETHOSTBYNAME_BUG
+ 
+@@ -464,7 +469,7 @@
+ # If your system supports NIS or YP-style netgroups, enable the following
+ # macro definition. Netgroups are used only for host access control.
+ #
+-#NETGROUP= -DNETGROUP
++NETGROUP= -DNETGROUP
+ 
+ ###############################################################
+ # System dependencies: whether or not your system has vsyslog()
+@@ -514,7 +519,7 @@
+ #
+ # The LOG_XXX names below are taken from the /usr/include/syslog.h file.
+ 
+-FACILITY= LOG_MAIL	# LOG_MAIL is what most sendmail daemons use
++FACILITY= LOG_DAEMON	# LOG_MAIL is what most sendmail daemons use
+ 
+ # The syslog priority at which successful connections are logged.
+ 
+@@ -610,7 +615,7 @@
+ # Paranoid mode implies hostname lookup. In order to disable hostname
+ # lookups altogether, see the next section.
+ 
+-PARANOID= -DPARANOID
++#PARANOID= -DPARANOID
+ 
+ ########################################
+ # Optional: turning off hostname lookups
+@@ -623,7 +628,7 @@
+ # In order to perform selective hostname lookups, disable paranoid
+ # mode (see previous section) and comment out the following definition.
+ 
+-HOSTNAME= -DALWAYS_HOSTNAME
++#HOSTNAME= -DALWAYS_HOSTNAME
+ 
+ #############################################
+ # Optional: Turning on host ADDRESS checking
+@@ -649,7 +654,7 @@
+ # source-routed traffic in the kernel. Examples: 4.4BSD derivatives,
+ # Solaris 2.x, and Linux. See your system documentation for details.
+ #
+-# KILL_OPT= -DKILL_IP_OPTIONS
++KILL_OPT= -DKILL_IP_OPTIONS
+ 
+ ## End configuration options
+ ############################
+@@ -657,20 +662,37 @@
+ # Protection against weird shells or weird make programs.
+ 
+ SHELL	= /bin/sh
+-.c.o:;	$(CC) $(CFLAGS) -c $*.c
++.c.o:;	$(CC) $(CFLAGS) -o $*.o -c $*.c
+ 
+-CFLAGS	= -O -DFACILITY=$(FACILITY) $(ACCESS) $(PARANOID) $(NETGROUP) \
++SOMAJOR = 0
++SOMINOR = 7.6
++
++LIB	= libwrap.a
++SHLIB	= shared/libwrap.so.$(SOMAJOR).$(SOMINOR)
++SHLIBSOMAJ= shared/libwrap.so.$(SOMAJOR)
++SHLIBSO	= shared/libwrap.so
++SHLIBFLAGS = -Lshared -lwrap
++
++shared/%.o: %.c
++	$(CC) $(CFLAGS) $(SHCFLAGS) -c $< -o $@
++
++CFLAGS	= -O2 -DFACILITY=$(FACILITY) $(ACCESS) $(PARANOID) $(NETGROUP) \
+ 	$(BUGS) $(SYSTYPE) $(AUTH) $(UMASK) \
+ 	-DREAL_DAEMON_DIR=\"$(REAL_DAEMON_DIR)\" $(STYLE) $(KILL_OPT) \
+ 	-DSEVERITY=$(SEVERITY) -DRFC931_TIMEOUT=$(RFC931_TIMEOUT) \
+ 	$(UCHAR) $(TABLES) $(STRINGS) $(TLI) $(EXTRA_CFLAGS) $(DOT) \
+ 	$(VSYSLOG) $(HOSTNAME)
+ 
++SHLINKFLAGS = -shared -Xlinker -soname -Xlinker libwrap.so.$(SOMAJOR) -lc $(LIBS)
++SHCFLAGS = -fPIC -shared -D_REENTRANT
++
+ LIB_OBJ= hosts_access.o options.o shell_cmd.o rfc931.o eval.o \
+ 	hosts_ctl.o refuse.o percent_x.o clean_exit.o $(AUX_OBJ) \
+ 	$(FROM_OBJ) fix_options.o socket.o tli.o workarounds.o \
+ 	update.o misc.o diag.o percent_m.o myvsyslog.o
+ 
++SHLIB_OBJ= $(addprefix shared/, $(LIB_OBJ));
++
+ FROM_OBJ= fromhost.o
+ 
+ KIT	= README miscd.c tcpd.c fromhost.c hosts_access.c shell_cmd.c \
+@@ -684,46 +706,73 @@
+ 	refuse.c tcpdchk.8 setenv.c inetcf.c inetcf.h scaffold.c \
+ 	scaffold.h tcpdmatch.8 README.NIS
+ 
+-LIB	= libwrap.a
+-
+-all other: config-check tcpd tcpdmatch try-from safe_finger tcpdchk
++all other: config-check tcpd tcpdmatch try-from safe_finger tcpdchk $(LIB)
+ 
+ # Invalidate all object files when the compiler options (CFLAGS) have changed.
+ 
+ config-check:
+ 	@set +e; test -n "$(REAL_DAEMON_DIR)" || { make; exit 1; }
+-	@set +e; echo $(CFLAGS) >/tmp/cflags.$$$$ ; \
+-	if cmp cflags /tmp/cflags.$$$$ ; \
+-	then rm /tmp/cflags.$$$$ ; \
+-	else mv /tmp/cflags.$$$$ cflags ; \
++	@set +e; echo $(CFLAGS) >cflags.new ; \
++	if cmp cflags cflags.new ; \
++	then rm cflags.new ; \
++	else mv cflags.new cflags ; \
+ 	fi >/dev/null 2>/dev/null
++	@if [ ! -d shared ]; then mkdir shared; fi
+ 
+ $(LIB):	$(LIB_OBJ)
+ 	rm -f $(LIB)
+ 	$(AR) $(ARFLAGS) $(LIB) $(LIB_OBJ)
+ 	-$(RANLIB) $(LIB)
+ 
+-tcpd:	tcpd.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ tcpd.o $(LIB) $(LIBS)
++$(SHLIB): $(SHLIB_OBJ)
++	rm -f $(SHLIB)
++	$(CC) -o $(SHLIB) $(SHLINKFLAGS) $(SHLIB_OBJ)
++	ln -s $(notdir $(SHLIB)) $(SHLIBSOMAJ)
++	ln -s $(notdir $(SHLIBSOMAJ)) $(SHLIBSO)
+ 
+-miscd:	miscd.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ miscd.o $(LIB) $(LIBS)
++tcpd:	tcpd.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ tcpd.o $(SHLIBFLAGS)
+ 
+-safe_finger: safe_finger.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ safe_finger.o $(LIB) $(LIBS)
++miscd:	miscd.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ miscd.o $(SHLIBFLAGS)
++
++safe_finger: safe_finger.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ safe_finger.o $(SHLIBFLAGS)
+ 
+ TCPDMATCH_OBJ = tcpdmatch.o fakelog.o inetcf.o scaffold.o
+ 
+-tcpdmatch: $(TCPDMATCH_OBJ) $(LIB)
+-	$(CC) $(CFLAGS) -o $@ $(TCPDMATCH_OBJ) $(LIB) $(LIBS)
++tcpdmatch: $(TCPDMATCH_OBJ) $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ $(TCPDMATCH_OBJ) $(SHLIBFLAGS)
+ 
+-try-from: try-from.o fakelog.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ try-from.o fakelog.o $(LIB) $(LIBS)
++try-from: try-from.o fakelog.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ try-from.o fakelog.o $(SHLIBFLAGS)
+ 
+ TCPDCHK_OBJ = tcpdchk.o fakelog.o inetcf.o scaffold.o
+ 
+-tcpdchk: $(TCPDCHK_OBJ) $(LIB)
+-	$(CC) $(CFLAGS) -o $@ $(TCPDCHK_OBJ) $(LIB) $(LIBS)
++tcpdchk: $(TCPDCHK_OBJ) $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ $(TCPDCHK_OBJ) $(SHLIBFLAGS)
++
++install: install-lib install-bin install-dev
++
++install-lib:
++	install -m 0755 -d ${DESTDIR}/${prefix}/lib
++	install -m 0755 $(SHLIB) ${DESTDIR}/${prefix}/lib/
++	ln -sf $(notdir $(SHLIB)) ${DESTDIR}/${prefix}/lib/$(notdir $(SHLIBSOMAJ))
++	ln -sf $(notdir $(SHLIBSOMAJ)) ${DESTDIR}/${prefix}/lib/$(notdir $(SHLIBSO))
++
++install-bin:
++	install -m 0755 -d ${DESTDIR}/${prefix}/sbin
++	install -m 0755 tcpd ${DESTDIR}/${prefix}/sbin/
++	install -m 0755 tcpdchk ${DESTDIR}/${prefix}/sbin/
++	install -m 0755 tcpdmatch ${DESTDIR}/${prefix}/sbin/
++	install -m 0755 try-from ${DESTDIR}/${prefix}/sbin/
++	install -m 0755 safe_finger ${DESTDIR}/${prefix}/sbin/
++
++install-dev:
++	install -m 0755 -d ${DESTDIR}/${prefix}/include
++	install -m 0644 tcpd.h ${DESTDIR}/${prefix}/include/
++	install -m 0755 -d ${DESTDIR}/${prefix}/lib
++	install -m 0644 $(LIB) ${DESTDIR}/${prefix}/lib/
+ 
+ shar:	$(KIT)
+ 	@shar $(KIT)
+@@ -739,7 +788,8 @@
+ 
+ clean:
+ 	rm -f tcpd miscd safe_finger tcpdmatch tcpdchk try-from *.[oa] core \
+-	cflags
++	cflags libwrap*.so*
++	rm -rf shared
+ 
+ tidy:	clean
+ 	chmod -R a+r .
+@@ -885,5 +935,6 @@
+ update.o: mystdarg.h
+ update.o: tcpd.h
+ vfprintf.o: cflags
++weak_symbols.o: tcpd.h
+ workarounds.o: cflags
+ workarounds.o: tcpd.h
