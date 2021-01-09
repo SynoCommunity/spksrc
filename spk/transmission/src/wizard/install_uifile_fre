@@ -64,6 +64,6 @@
 }, {
      "step_title": "Permissions DSM",
      "items": [{
-         "desc": "Les permissions de toutes les applications de SynoCommunity liés au téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+         "desc": "Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
      }]
 }]
