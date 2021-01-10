@@ -1,29 +1,27 @@
 SPK_NAME = duplicity
 SPK_VERS = 0.8.08
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/duplicity.png
 
-BUILD_DEPENDS = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
-BUILD_DEPENDS += cross/$(SPK_NAME)
-DEPENDS = cross/librsync cross/bash cross/duply
+BUILD_DEPENDS = cross/python3
+DEPENDS = cross/cffi cross/duplicity cross/duply
+
 WHEELS = src/requirements.txt
 
-SPK_DEPENDS = "python>=2.7.8-9:gnupg>=2.1.6-1"
+SPK_DEPENDS = "python3>=3.7.7-15:gnupg>=2.1.6"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm using a command line interface. Also contains duply wrapper script.
+DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = Add pyrax dependency
+CHANGELOG = "1. Update duplicity to v0.8.08 and duply to v2.3</br>2. Update to Python 3</br>3. Include some backend libraries (dropbox, pydrive, pyrax and requests-oauthlib)"
 
 HOMEPAGE = http://duplicity.nongnu.org/
-LICENSE  = GNU GPL v2
+LICENSE  = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
-SPK_COMMANDS = "env/bin/duplicity share/duply/duply"
+SPK_COMMANDS = bin/duply
+SPK_LINKS = /usr/local/bin/duplicity:env/bin/duplicity
 
 include ../../mk/spksrc.spk.mk
