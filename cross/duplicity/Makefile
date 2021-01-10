@@ -1,5 +1,5 @@
 PKG_NAME = duplicity
-PKG_VERS = 0.8.08
+PKG_VERS = 0.8.18
 PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -12,4 +12,12 @@ HOMEPAGE = http://duplicity.nongnu.org/
 COMMENT  = Encrypted bandwidth-efficient backup using the rsync algorithm.
 LICENSE  = GPLv2
 
+PRE_CONFIGURE_TARGET = duplicity_pre_configure
+
 include ../../mk/spksrc.python-wheel.mk
+
+.PHONY: duplicity_pre_configure
+# adjust shebang in python scripts
+duplicity_pre_configure:
+	$(RUN) ; sed -i -e  '1 s|^#!/.*|#!/usr/local/duplicity/env/bin/python|g' bin/duplicity
+	$(RUN) ; sed -i -e  '1 s|^#!/.*|#!/usr/local/duplicity/env/bin/python|g' bin/rdiffdir

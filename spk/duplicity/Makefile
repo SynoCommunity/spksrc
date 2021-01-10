@@ -1,5 +1,5 @@
 SPK_NAME = duplicity
-SPK_VERS = 0.8.08
+SPK_VERS = 0.8.18
 SPK_REV = 7
 SPK_ICON = src/duplicity.png
 
@@ -14,7 +14,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v0.8.08 and duply to v2.3</br>2. Update to Python 3</br>3. Include some backend libraries (dropbox, pydrive, pyrax and requests-oauthlib)"
+CHANGELOG = "1. Update duplicity to v0.8.18 and duply to v2.3</br>2. Update to Python 3</br>3. Include some backend libraries (dropbox, pydrive, pyrax and requests-oauthlib)"
 
 HOMEPAGE = http://duplicity.nongnu.org/
 LICENSE  = GPLv2
