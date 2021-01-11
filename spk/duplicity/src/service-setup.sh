@@ -14,3 +14,13 @@ service_postinst ()
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --upgrade --no-index --find-links ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
 }
 
+
+# use alternate TMPDIR for service_postinst
+# /tmp might be too small and you get errors like:
+# Could not install packages due to an EnvironmentError: [Errno 28] No space left on device
+TMPDIR=${SYNOPKG_PKGDEST}/tmp
+if [[ ! -e "${TMPDIR}" ]]; then
+    mkdir -p "${TMPDIR}"
+    chown ${EFF_USER} "${TMPDIR}"
+fi
+export TMPDIR=${SYNOPKG_PKGDEST}/tmp
