@@ -39,4 +39,7 @@ SERVICE_PORT = 8123
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
+# use alternate TMPDIR as /tmp might have < 400MB free.
+USE_ALTERNATE_TMPDIR = 1
+
 include ../../mk/spksrc.spk.mk

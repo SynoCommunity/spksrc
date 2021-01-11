@@ -21,6 +21,9 @@ LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
+# use alternate TMPDIR as /tmp might be too small.
+USE_ALTERNATE_TMPDIR = 1
+
 SPK_COMMANDS = bin/duply
 SPK_LINKS = /usr/local/bin/duplicity:env/bin/duplicity
 
