@@ -4,7 +4,7 @@
 # NOTE: 32bit (x86) is not supported:
 # https://github.com/dotnet/core/issues/5403
 # https://github.com/dotnet/core/issues/4595
-UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
 
 DOTNET_OS = linux
 
@@ -29,7 +29,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 endif
 ifeq ($(DOTNET_ARCH),)
 	# don't report error to use regular UNSUPPORTED_ARCHS logging
-	$(warning Unsupported ARCH $(ARCH))
+	$(error Unsupported ARCH $(ARCH))
 endif
 
 ifeq ($(strip $(DOTNET_ROOT)),)
