@@ -1,5 +1,5 @@
 PKG_NAME = libewf
-PKG_VERS = 20171104
+PKG_VERS = 20201230
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-experimental-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libyal/libewf/releases/download/$(PKG_VERS)
