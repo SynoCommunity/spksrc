@@ -236,7 +236,12 @@ ifneq ($(strip $(SYSTEM_GROUP)),)
 endif
 ifneq ($(strip $(SPK_USER)),)
 	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
+ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 	@jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
+endif
+endif
+ifneq ($(strip $(SPK_GROUP)),)
+	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
 endif
 
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
