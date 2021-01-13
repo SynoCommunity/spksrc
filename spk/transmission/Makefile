@@ -30,12 +30,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = transmission_extra_install
 
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
-
 include ../../mk/spksrc.spk.mk
-
 
 .PHONY: transmission_extra_install
 transmission_extra_install:
