@@ -56,12 +56,6 @@ service_postinst ()
             set_syno_permissions "${wizard_incomplete_dir}" "${GROUP}"
         fi
     fi
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN >> ${INST_LOG}
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 
