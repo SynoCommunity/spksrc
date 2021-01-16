@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.cairographics.org/releases/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libpng cross/freetype cross/pixman
+DEPENDS = cross/libpng cross/freetype cross/pixman cross/fontconfig
 
 HOMEPAGE = https://www.cairographics.org
 COMMENT  = Cairo is a 2D graphics library with support for multiple output devices.
