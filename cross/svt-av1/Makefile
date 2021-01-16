@@ -1,5 +1,5 @@
 PKG_NAME = SVT-AV1
-PKG_VERS = 0.8.4
+PKG_VERS = 0.8.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/OpenVisualCloud/SVT-AV1/archive
