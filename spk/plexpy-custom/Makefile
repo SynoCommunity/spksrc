@@ -4,14 +4,14 @@ SPK_REV = 4
 SPK_ICON = src/plexpy-custom.png
 
 DEPENDS =
-SPK_DEPENDS = "python>2.7.3-3:git"
+SPK_DEPENDS = "python3>3.7.7:git"
 
 MAINTAINER = cytec
 DESCRIPTION = PlexPy Custom allows you to run the fork of your choice of PlexPy. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = PlexPy Custom vous permet d\'exécuter la variante de PlexPy votre choix. Il vous sera demandé l\'URL git de la variante à l\'installation.
 RELOAD_UI = yes
 DISPLAY_NAME = PlexPy Custom
-CHANGELOG = "Fix DSM 6 service start."
+CHANGELOG = "Update to Python3."
 
 HOMEPAGE   = https://tautulli.com
 LICENSE    = GPL
