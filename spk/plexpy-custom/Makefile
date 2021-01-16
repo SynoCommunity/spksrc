@@ -1,6 +1,6 @@
 SPK_NAME = plexpy-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/plexpy-custom.png
 
 DEPENDS =
