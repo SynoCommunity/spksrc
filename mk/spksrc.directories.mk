@@ -1,4 +1,4 @@
-# * all goes in $(WORK_DIR) : work-arch, or simple work, in the current directory
+# * all goes in $(WORK_DIR) : work-arch (for noarch: work-all or work-dsm7), in the current directory
 # * it will be installed in $(INSTALL_PREFIX) on the target system (/usr/local/transmission)
 # * each source package is unpacked in $(WORK_DIR)
 # * the install target installs files in $(WORK_DIR)/install/, known as $(INSTALL_DIR)
