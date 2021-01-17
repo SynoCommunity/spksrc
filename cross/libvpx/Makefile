@@ -23,10 +23,12 @@ CONFIGURE_ARGS += --enable-postproc --enable-vp9-postproc --enable-pic
 CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
 CONFIGURE_ARGS += --disable-multithread
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
+ADDITIONAL_CPPFLAGS = -std=c++0x
+ADDITIONAL_CXXFLAGS = -std=c++0x
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
@@ -52,6 +54,8 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libvpx_install
 libvpx_install:
