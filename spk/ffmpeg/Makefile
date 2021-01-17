@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.3.1
-SPK_REV = 35
+SPK_REV = 36
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update ffmpeg to 4.3.1<br/>2. Update Intel libva to version 2.8 and media drivers 2020Q2<br/>3. Enable ZeroMQ support<br/>4. Update svt-hevc to 1.5.0<br/>5. Update x264 to July 2nd git hash and use github mirror<br/>6. Update libaom to version 2.0.0<br/>7. Update SVT-AV1 to version 0.8.4<br/>8. Update x265 to version 3.4<br/>9. Enable libzmq support with version 4.3.2<br/>10. Fix a build issue with libshine"
+CHANGELOG = "1. Update Intel libva to version 2.10 and media drivers 2020Q4<br/>2. Multiple depedency updates (libass, SVT-AV1, libaom, x264, libbluray, libvpx)"
 
 DEPENDS = cross/$(SPK_NAME)
 
