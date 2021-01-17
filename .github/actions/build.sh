@@ -91,7 +91,7 @@ echo "===> ARCH   packages: ${arch_packages}"
 echo "===> NOARCH packages: ${noarch_packages}"
 echo "::endgroup::"
 
-if [ "${GH_ARCH}" = "noarch" ]; then
+if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${noarch_packages}
 else
     build_packages=${arch_packages}
