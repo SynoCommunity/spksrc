@@ -14,16 +14,15 @@ TC = syno$(ARCH_SUFFIX)
 else
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
+ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+SPK_TCVERS = dsm7
+OS_MIN_VER = 7.0-4000
+else
 SPK_TCVERS = all
 OS_MIN_VER = 3.1-1594
-FIRMWARE = $(OS_MIN_VER)
 endif
-
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
-TC_VERS=$(TCVERSION)
-SPK_TCVERS=$(TCVERSION)
-include ../../mk/spksrc.tc-vers.mk
-TC_OS_MIN_VER = $(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$(TC_BUILD)
+ARCH_SUFFIX = -$(SPK_TCVERS)
+FIRMWARE = $(OS_MIN_VER)
 endif
 
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
@@ -293,7 +292,7 @@ else
 endif
 	@$(MSG) "Creating PACKAGE_ICON_256.PNG for $(SPK_NAME)"
 	(convert $(SPK_ICON) -thumbnail 256x256 -strip - > $(WORK_DIR)/PACKAGE_ICON_256.PNG)
-	$(eval SPK_CONTENT += PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
+	$(eval SPK_CONTENT +=  PACKAGE_ICON.PNG PACKAGE_ICON_256.PNG)
 endif
 
 .PHONY: info-checksum
@@ -459,10 +458,6 @@ publish-legacy-toolchain-%:
 	done \
 
 ####
-noarch-%:
-	@$(MSG) Building package for noarch $*
-	-@MAKEFLAGS= $(MAKE) ARCH= TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
-
 
 arch-%:
 	@$(MSG) Building package for arch $*
