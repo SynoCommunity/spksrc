@@ -1,5 +1,5 @@
 PKG_NAME = go
-PKG_VERS = 1.15.5
+PKG_VERS = 1.15.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://storage.googleapis.com/golang
@@ -23,4 +23,4 @@ include ../../mk/spksrc.native-cc.mk
 go_native_compile:
 	@$(MSG) "Building Go for host system"
 	# GO111MODULE disable go.mod per https://github.com/golang/go/issues/26996
-	cd $(WORK_DIR)/$(PKG_NAME)/src && GO111MODULE=off GOARCH="" GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP14) ./make.bash
+	cd $(WORK_DIR)/$(PKG_NAME)/src && CC=gcc CXX=g++ GOOS="linux" GOHOSTARCH="amd64" GOARCH="amd64" GO111MODULE=off GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP14) ./make.bash
