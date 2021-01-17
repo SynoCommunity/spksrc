@@ -1,10 +1,10 @@
 SPK_NAME = znc
-SPK_VERS = 1.8.1
-SPK_REV = 16
+SPK_VERS = 1.8.2
+SPK_REV = 17
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python3>=3.7.7-15"
 
 MAINTAINER = worstje
@@ -38,9 +38,6 @@ SERVICE_PORT_TITLE = ZNC(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = znc_extra_install
-
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 

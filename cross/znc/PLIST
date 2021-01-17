@@ -13,8 +13,8 @@ lib:lib/znc/block_motd.so
 lib:lib/znc/blockuser.so
 lib:lib/znc/bouncedcc.so
 lib:lib/znc/buffextras.so
-lib:lib/znc/certauth.so
 lib:lib/znc/cert.so
+lib:lib/znc/certauth.so
 lib:lib/znc/chansaver.so
 lib:lib/znc/clearbufferonmsg.so
 lib:lib/znc/clientnotify.so

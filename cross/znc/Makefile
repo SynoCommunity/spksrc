@@ -1,5 +1,5 @@
 PKG_NAME = znc
-PKG_VERS = 1.8.1
+PKG_VERS = 1.8.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
@@ -10,7 +10,7 @@ DEPENDS = cross/openssl cross/libicu
 
 HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
-LICENSE  = Apache License 2.0
+LICENSE  = Apache 2.0
 
 CONFIGURE_ARGS = --enable-python
 

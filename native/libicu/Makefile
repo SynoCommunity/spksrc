@@ -1,5 +1,5 @@
 PKG_NAME = libicu
-PKG_VERS = 67.1
+PKG_VERS = 68.2
 PKG_EXT = tgz
 PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
@@ -12,7 +12,5 @@ COMMENT  = International Components for Unicode
 LICENSE  = http://www.unicode.org/copyright.html#License
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CPPFLAGS = -std=c++11
-ADDITIONAL_CXXFLAGS = -std=c++11
 
 include ../../mk/spksrc.native-cc.mk
