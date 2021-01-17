@@ -116,7 +116,12 @@ do
         # use TCVERSION and ARCH to get real exit codes.
         make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}
     else
-        make TCVERSION=${GH_ARCH##*-} ARCH= -C ./spk/${package}
+        if [ "${GH_ARCH}" = "noarch" ]; then
+            TCVERSION=
+        else
+            TCVERSION=${GH_ARCH##*-}
+        fi
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}
     fi
     result=$?
 
