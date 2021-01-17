@@ -302,6 +302,7 @@ postinst ()
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
     call_func "service_postinst" install_log
+    call_func "service_clean_tmpdir"
 
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}

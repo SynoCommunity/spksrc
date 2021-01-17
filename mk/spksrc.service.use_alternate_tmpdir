@@ -12,3 +12,25 @@ if [[ ! -e "${TMPDIR}" ]]; then
 fi
 export TMPDIR=${TMPDIR}
 
+
+# Normally files in the temp folder are removed after usage (e.g. by pip)
+# but if not, this is done after installation with this function.
+# NOTE:
+# Do not remove the TMPDIR, as it may be used by the service later.
+service_clean_tmpdir ()
+{
+  if [[ -e "${TMPDIR}" ]]; then
+    if [ -n "$(ls -A ${TMPDIR})" ]; then
+       echo "Cleanup ${TMPDIR}"   >> "${INST_LOG}"
+       rm -rvf ${TMPDIR}/* >> "${INST_LOG}" 2>&1
+    fi
+    if [ -n "$(ls -A ${TMPDIR})" ]; then
+       echo "Cleanup hidden files in ${TMPDIR}"   >> "${INST_LOG}"
+       rm -rvf ${TMPDIR}/.*  >> "${INST_LOG}" 2>&1
+    fi
+    if [ -n "$(ls -A ${TMPDIR})" ]; then
+       echo "WARNING: Failed to remove all files in ${TMPDIR}"   >> "${INST_LOG}"
+    fi
+  fi
+}
+
