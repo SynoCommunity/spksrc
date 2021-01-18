@@ -75,7 +75,7 @@ SERVICE_FILES =
 $(DSM_SCRIPTS_DIR)/service-setup:
 	$(create_target_dir)
 	@echo "### Package specific variables and functions" > $@
-	@echo 'if [ -z "$${SYNOPKG_PKGNAME}" ] || [ -z "$${SYNOPKG_PKGDEST}" ] || [ -z "$${SYNOPKG_DSM_VERSION_MAJOR}" ]; then' >> $@
+	@echo 'if [ -z "$${SYNOPKG_PKGNAME}" ] || [ -z "$${SYNOPKG_DSM_VERSION_MAJOR}" ]; then' >> $@
 	@echo '  echo "Error: Environment variables are not set." 1>&2;' >> $@
 	@echo '  echo "Please run me using \"synopkg start [packagename]\" instead." 1>&2;' >> $@
 	@echo 'exit 1; fi' >> $@
