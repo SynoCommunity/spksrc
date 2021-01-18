@@ -77,7 +77,7 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo "### Package specific variables and functions" > $@
 	@echo 'if [ -z "$${SYNOPKG_PKGNAME}" ] || [ -z "$${SYNOPKG_DSM_VERSION_MAJOR}" ]; then' >> $@
 	@echo '  echo "Error: Environment variables are not set." 1>&2;' >> $@
-	@echo '  echo "Please run me using \"synopkg start [packagename]\" instead." 1>&2;' >> $@
+	@echo '  echo "Please run me using synopkg instead. Example: \"synopkg start [packagename]\"" 1>&2;' >> $@
 	@echo 'exit 1; fi' >> $@
 ifneq ($(strip $(SPK_USER)),)
 	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
