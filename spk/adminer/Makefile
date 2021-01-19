@@ -21,7 +21,11 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT = src/dsm-control.sh
 WIZARDS_DIR = src/wizard/
 
-SPK_DEPENDS = "WebStation>=2.1.0:PHP7.4>=7.4.0:Apache2.4>=2.4.0"
+# if dsm7
+SPK_DEPENDS = "WebStation>=3.0.0-0226:PHP7.4>=7.4.9-0104:Apache2.4>=2.4.43-0109"
+install_provide_packages="WEBSTATION_SERVICE"
+# end if
+
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
 INSTUNINST_RESTART_SERVICES = apache-web
