@@ -16,7 +16,7 @@ SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
 ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
 SPK_TCVERS = dsm7
-OS_MIN_VER = 7.0-4000
+OS_MIN_VER = 7.0-40000
 else
 SPK_TCVERS = all
 OS_MIN_VER = 3.1-1594
