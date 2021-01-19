@@ -4,6 +4,6 @@
         "desc": "Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
     },
     {
-        "desc": "En cas d'erreur de permission dans Transmission, donner les droits de Lecture/Ecriture sur les repertoires mentionnès depuis File Station."
+        "desc": "En cas d'erreur de permission dans Transmission, donner les droits de Lecture/Ecriture sur les repertoires mentionnés depuis File Station."
     }]
 }]
