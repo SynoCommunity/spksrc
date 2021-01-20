@@ -6,17 +6,17 @@ WORK_DIR := $(shell pwd)/work
 include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
-URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
-NAME          = $(PKG_NAME)
-COOKIE_PREFIX = $(PKG_NAME)-
+URLS           = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
+NAME           = $(PKG_NAME)
+COOKIE_PREFIX  = $(PKG_NAME)-
 ifneq ($(PKG_DIST_FILE),)
-LOCAL_FILE    = $(PKG_DIST_FILE)
+LOCAL_FILE     = $(PKG_DIST_FILE)
 else
-LOCAL_FILE    = $(PKG_DIST_NAME)
+LOCAL_FILE     = $(PKG_DIST_NAME)
 endif
-DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT      = $(PKG_EXT)
-DISTRIB_DIR   = $(KERNEL_DIR)/$(PKG_BRANCH)
+DIST_FILE      = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT       = $(PKG_EXT)
+DISTRIB_DIR    = $(KERNEL_DIR)/$(PKG_BRANCH)
 COMPILE_TARGET = kernel_module_compile_target
 EXTRACT_TARGET = kernel_extract_target
 CONFIGURE_TARGET = kernel_configure_target
@@ -30,7 +30,7 @@ include ../../mk/spksrc.cross-env.mk
 KERNEL_ENV ?=
 KERNEL_ENV += PATH=$$PATH
 
-RUN = cd $(KERNEL_DIR) && env -i $(KERNEL_ENV)
+RUN = cd $(KERNEL_SOURCE_DIR) && env -i $(KERNEL_ENV)
 MSG = echo "===>   "
 
 .PHONY: kernel_module_compile_target kernel_extract_target kernel_configure_target
@@ -66,16 +66,16 @@ kernel_module_compile_target:
 	$(RUN) $(MAKE) modules
 
 kernel_extract_target:
-	mkdir -p $(KERNEL_DIR)
-	rm -rf $(KERNEL_DIR)
+	mkdir -p $(KERNEL_SOURCE_DIR)
+	rm -rf $(KERNEL_SOURCE_DIR)
 	tar -xpf $(DIST_FILE) -C $(EXTRACT_PATH) $(PKG_EXTRACT)
-	mv $(EXTRACT_PATH)/$(PKG_EXTRACT) $(KERNEL_DIR)
+	mv $(EXTRACT_PATH)/$(PKG_EXTRACT) $(KERNEL_SOURCE_DIR)
 
 kernel_configure_target: 
 	@$(MSG) "Configuring depended kernel source"
-	cp $(KERNEL_DIR)/$(SYNO_CONFIG) $(KERNEL_DIR)/.config
+	cp $(KERNEL_SOURCE_DIR)/$(SYNO_CONFIG) $(KERNEL_SOURCE_DIR)/.config
 	# Update the Makefile
-	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_DIR)/Makefile
-	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_DIR)/Makefile
-	sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' $(KERNEL_DIR)/Makefile
-	test -e $(WORK_DIR)/$(KERNEL_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_DIR)/arch/$(ARCH)
+	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_SOURCE_DIR)/Makefile
+	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_SOURCE_DIR)/Makefile
+	sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' $(KERNEL_SOURCE_DIR)/Makefile
+	test -e $(WORK_DIR)/$(KERNEL_SOURCE_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_SOURCE_DIR)/arch/$(ARCH)

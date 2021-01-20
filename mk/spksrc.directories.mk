@@ -41,8 +41,8 @@ endif
 endif
 endif
 
-ifndef KERNEL_DIR
-KERNEL_DIR = $(PWD)/../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
+ifndef KERNEL_SOURCE_DIR
+KERNEL_SOURCE_DIR = $(PWD)/../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
 endif
 
 ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
