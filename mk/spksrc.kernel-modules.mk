@@ -6,21 +6,22 @@ WORK_DIR := $(shell pwd)/work
 include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
-URLS           = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
-NAME           = $(PKG_NAME)
-COOKIE_PREFIX  = $(PKG_NAME)-
+URLS               = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
+NAME               = $(PKG_NAME)
+COOKIE_PREFIX      = $(PKG_NAME)-
 ifneq ($(PKG_DIST_FILE),)
-LOCAL_FILE     = $(PKG_DIST_FILE)
+LOCAL_FILE         = $(PKG_DIST_FILE)
 else
-LOCAL_FILE     = $(PKG_DIST_NAME)
+LOCAL_FILE         = $(PKG_DIST_NAME)
 endif
-DIST_FILE      = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT       = $(PKG_EXT)
-DISTRIB_DIR    = $(KERNEL_DIR)/$(PKG_BRANCH)
-COMPILE_TARGET = kernel_module_compile_target
-EXTRACT_TARGET = kernel_extract_target
-CONFIGURE_TARGET = kernel_configure_target
-COPY_TARGET = nop
+DIST_FILE          = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT           = $(PKG_EXT)
+DISTRIB_DIR        = $(KERNEL_DIR)/$(PKG_BRANCH)
+PRE_COMPILE_TARGET = kernel_module_prepare_target
+COMPILE_TARGET     = nop
+EXTRACT_TARGET     = kernel_extract_target
+CONFIGURE_TARGET   = kernel_configure_target
+COPY_TARGET        = nop
 
 TC ?= syno-$(ARCH)-$(TCVERSION)
 
@@ -33,7 +34,7 @@ KERNEL_ENV += PATH=$$PATH
 RUN = cd $(KERNEL_SOURCE_DIR) && env -i $(KERNEL_ENV)
 MSG = echo "===>   "
 
-.PHONY: kernel_module_compile_target kernel_extract_target kernel_configure_target
+.PHONY: kernel_module_prepare_target kernel_module_compile_target kernel_extract_target kernel_configure_target
 
 include ../../mk/spksrc.download.mk
 
@@ -52,7 +53,6 @@ include ../../mk/spksrc.configure.mk
 compile: configure
 include ../../mk/spksrc.compile.mk
 
-
 all: compile
 
 ### Clean rules
@@ -61,6 +61,9 @@ clean:
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
+
+kernel_module_prepare_target:
+	$(RUN) $(MAKE) modules_prepare
 
 kernel_module_compile_target:
 	$(RUN) $(MAKE) modules
@@ -73,6 +76,7 @@ kernel_extract_target:
 
 kernel_configure_target: 
 	@$(MSG) "Configuring depended kernel source"
+	$(RUN) $(MAKE) mrproper
 	cp $(KERNEL_SOURCE_DIR)/$(SYNO_CONFIG) $(KERNEL_SOURCE_DIR)/.config
 	# Update the Makefile
 	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_SOURCE_DIR)/Makefile
