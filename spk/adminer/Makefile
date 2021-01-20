@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet di
 ADMIN_URL = /adminer/
 RELOAD_UI = yes
 DISPLAY_NAME = Adminer
-CHANGELOG = "1. Update to 4.7.6<br/>2. Add wizard to configure networks for client access \(.htaccess\)<br/>3. Switch to design \'rmsoft_blue\', due design \'nette\' is outdated"
+CHANGELOG = "1. Update to 4.7.6<br/>2. Add wizard to configure networks for client access (.htaccess)<br/>3. Switch to design 'rmsoft_blue', due design 'nette' is outdated"
 
 HOMEPAGE = https://www.adminer.org
 LICENSE  = Apache License 2.0 or GPL 2
@@ -21,6 +21,7 @@ INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT = src/dsm-control.sh
 WIZARDS_DIR = src/wizard/
 
+SPK_DEPENDS = "WebStation>=2.1.0:PHP7.4>=7.4.0:Apache2.4>=2.4.0"
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
 INSTUNINST_RESTART_SERVICES = apache-web
