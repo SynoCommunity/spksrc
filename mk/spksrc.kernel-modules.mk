@@ -63,7 +63,12 @@ clean:
 include ../../mk/spksrc.generate-digests.mk
 
 kernel_module_prepare_target:
+	@$(MSG) "Prepare kernel source for module build"
 	$(RUN) $(MAKE) modules_prepare
+ifeq ($(shell expr "$(word 1,$(subst ., ,$(TC_KERNEL)))" \>= 3),1)
+	@$(MSG) "Get kernel version"
+	$(RUN) $(MAKE) kernelversion
+endif
 
 kernel_module_compile_target:
 	$(RUN) $(MAKE) modules
@@ -81,5 +86,7 @@ kernel_configure_target:
 	# Update the Makefile
 	sed -i -r 's,^ARCH\s*.+,ARCH\t= $(BASE_ARCH),' $(KERNEL_SOURCE_DIR)/Makefile
 	sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' $(KERNEL_SOURCE_DIR)/Makefile
+ifeq ($(shell expr "$(word 1,$(subst ., ,$(TC_KERNEL)))" \>= 4),1)
 	sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' $(KERNEL_SOURCE_DIR)/Makefile
+endif
 	test -e $(WORK_DIR)/$(KERNEL_SOURCE_DIR)/arch/$(ARCH) || ln -sf $(BASE_ARCH) $(KERNEL_SOURCE_DIR)/arch/$(ARCH)
