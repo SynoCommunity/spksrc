@@ -7,7 +7,7 @@ PKG_EXT = txz
 PKG_DIST_NAME = linux-4.4.x.$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/$(PKG_BRANCH)branch/$(PKG_ARCH)-source
 PKG_DIST_FILE = $(PKG_NAME)-linux-4.4.x.$(PKG_EXT)
-PKG_EXTRACT = linux-4.4.x-glk
+PKG_EXTRACT = linux-4.4.x
 SYNO_CONFIG = synoconfigs/$(ARCH)
 BASE_ARCH = x86
 
