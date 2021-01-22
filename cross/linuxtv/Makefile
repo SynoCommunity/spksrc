@@ -12,8 +12,8 @@ DEPENDS =
 
 SUPPORTED_ARCHS = apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton geminilake grantley purley
 REQ_KERNEL = 1
-UNSUPPORTED_KERNEL = 3.10.102+
-UNSUPPORTED_KERNEL += 3.2.40+
+UNSUPPORTED_KERNEL = 3.10.102
+UNSUPPORTED_KERNEL += 3.2.40
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several userspace libraries and applications.
