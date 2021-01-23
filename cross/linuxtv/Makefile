@@ -10,16 +10,20 @@ MOD_DIR = /lib/modules
 
 DEPENDS =
 
-SUPPORTED_ARCHS = apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton geminilake grantley purley
-REQ_KERNEL = 1
-UNSUPPORTED_KERNEL = 3.10.102
+# archs where kernel is too old (2.6 and 3.2)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(i686_ARCHS) $(PPC_ARCHS) armada370 armada375 armadaxp comcerto2k
+# Currently fails to build - Error
+#UNSUPPORTED_ARCHS += alpine armada380 cedarview monaco
+# Currently fails to build - ld.bfd unrecognized option '-Wl,--rpath-link,...
+#UNSUPPORTED_ARCHS += armada37xx rtd1296
+
+REQUIRE_KERNEL = 1
+UNSUPPORTED_KERNEL = 2.6.32
 UNSUPPORTED_KERNEL += 3.2.40
 
 HOMEPAGE = https://linuxtv.org/
 COMMENT  = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several userspace libraries and applications.
 LICENSE  = GPLv2
-
-#CONFIGURE_ARGS = 
 
 FIRMWARE_URL = http://www.linuxtv.org/downloads/firmware/
 FIRMWARE_PKG = dvb-firmwares.tar.bz2
