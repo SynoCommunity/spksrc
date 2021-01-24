@@ -18,7 +18,9 @@ TOOLKIT_DIR = $(BASE_DISTRIB_DIR)/toolkit
 KERNEL_DIR = $(BASE_DISTRIB_DIR)/kernel
 PACKAGES_DIR = $(PWD)/../../packages
 # Default download location, see spksrc.download.mk
+ifeq ($(strip $(DISTRIB_DIR)),)
 DISTRIB_DIR = $(BASE_DISTRIB_DIR)
+endif
 
 ifndef WORK_DIR
 WORK_DIR = $(PWD)/work$(ARCH_SUFFIX)
