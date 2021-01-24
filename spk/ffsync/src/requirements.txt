@@ -54,8 +54,8 @@ traceback2==1.4.0
 translationstring==1.3
 #unittest2==1.1.0
 urllib3==1.25.8
-venusian==2.1.0
-webencodings==0.5.1
+venusian==3.0.0
+#webencodings==0.5.1    # for python2 only
 WebOb==1.4.1
 zope.component==4.2.1
 zope.deprecation==4.4.0

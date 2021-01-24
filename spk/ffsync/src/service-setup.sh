@@ -1,6 +1,6 @@
 PACKAGE="${SYNOPKG_PKGNAME}"
 
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
