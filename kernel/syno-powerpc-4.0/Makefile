@@ -1,21 +1,15 @@
-ARCH ?= powerpc
-TCVERSION ?= 4.0
-PKG_NAME = synogpl
-PKG_BRANCH = 2198
-PKG_ARCH = ppc
-PKG_EXT = tbz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_BRANCH)-$(PKG_ARCH).$(PKG_EXT)
-PKG_DIST_SITE = https://downloads.sourceforge.net/project/dsgpl/Synology%20NAS%20GPL%20Source/$(PKG_BRANCH)branch
-PKG_EXTRACT = source/uclinux2422/linux-2.4.x
-SYNO_CONFIG = powerpc-config
-BASE_ARCH = ppc
-
-HOMEPAGE = http://www.synology.com/
+KERNEL_ARCH = powerpc
+KERNEL_VERS = 4.0
+KERNEL_BUILD = 2198
+KERNEL_EXT = tbz
+KERNEL_DIST = source/uclinux2422/linux-2.4.x
+KERNEL_CONFIG = powerpc-config
+KERNEL_BASE_ARCH = ppc
 
 POST_EXTRACT_TARGET = copy_powerpc_makefile
 PRE_COMPILE_TARGET = kernel_make_oldconfig
 
-include ../../mk/spksrc.kernel-modules.mk
+include ../../mk/spksrc.kernel.mk
 
 .PHONY: copy_powerpc_makefile kernel_make_oldconfig
 
