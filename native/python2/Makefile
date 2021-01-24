@@ -1,4 +1,4 @@
-PKG_NAME = python
+PKG_NAME = python2
 PKG_VERS = 2.7.18
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -22,9 +22,10 @@ PYTHON = $(WORK_DIR)/install/usr/local/bin/python
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 
 .PHONY: python_native_post_install
+# install latest pip that supports python2
 python_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing setuptools, pip and cffi
-	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | $(PYTHON)
+	@$(RUN) wget https://bootstrap.pypa.io/2.7/get-pip.py -O - | $(PYTHON)
 	@$(PIP) install "setuptools==44.1.0"
 	@$(PIP) install "cffi==1.14.1"
 

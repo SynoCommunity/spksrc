@@ -1,4 +1,4 @@
-PKG_NAME = python
+PKG_NAME = python2
 PKG_VERS = 2.7.18
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz

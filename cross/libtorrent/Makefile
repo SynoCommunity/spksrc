@@ -5,8 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(subst .,_,$(PKG_VERS))
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
-# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python must appear before cross/boost
-DEPENDS = cross/python cross/boost cross/geoip cross/libiconv cross/openssl
+# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python2 must appear before cross/boost
+DEPENDS = cross/python2 cross/boost cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
@@ -27,7 +27,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-python-binding --with-libiconv
 CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python
 CONFIGURE_ARGS += --with-boost-chrono=boost_chrono --with-boost-random=boost_random
-CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
+CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python2/work-native/install/usr/local/bin/python
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)

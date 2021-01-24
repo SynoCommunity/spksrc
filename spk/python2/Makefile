@@ -1,12 +1,14 @@
+# keep python as SPK_NAME, as SPK_NAME=python2 would create a different package
 SPK_NAME = python
 SPK_SHORT_VERS = 2.7
 SPK_VERS = $(SPK_SHORT_VERS).18
-SPK_REV = 25
+SPK_REV = 26
 SPK_ICON = src/python.png
 
-DEPENDS  = cross/busybox cross/$(SPK_NAME)
-# Build-time dependencies
-DEPENDS += cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/busybox cross/python2
+
+# Cross-compiled libraries and tools
+DEPENDS += cross/setuptools cross/wheel cross/pip_py2
 DEPENDS += cross/cryptography cross/cffi cross/bcrypt
 
 # Cross-compiled wheels
@@ -23,8 +25,8 @@ DESCRIPTION_FRE = Langage de programmation Python 2.7.
 DESCRIPTION_SPN = Lenguaje de programación Python 2.7.
 RELOAD_UI = yes
 STARTABLE = no
-DISPLAY_NAME = Python
-CHANGELOG = "Update openssl to 1.1"
+DISPLAY_NAME = Python2
+CHANGELOG = "Include pip compatible with python 2 after pip v21 is released in Jan 2021. Use \"pip<21.0\"."
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
