@@ -1,8 +1,7 @@
 KERNEL_ARCH = armada375
 KERNEL_VERS = 5.2
 KERNEL_BUILD = 5565
-KERNEL_DIST = source/linux-3.x
-KERNEL_CONFIG = synoconfigs/$(PKG_ARCH)
+KERNEL_DIST = linux-3.x
 KERNEL_BASE_ARCH = arm
 
 PRE_COMPILE_TARGET = kernel_platv2_pre_compile

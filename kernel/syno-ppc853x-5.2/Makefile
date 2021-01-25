@@ -1,7 +1,8 @@
 KERNEL_ARCH = ppc853x
 KERNEL_VERS = 5.2
 KERNEL_BUILD = 5565
-KERNEL_DIST = source/linux-2.6.32
+KERNEL_DIST = linux-2.6.32
+KERNEL_DIST_NAME = 853x-source.txz
 KERNEL_CONFIG = synoconfigs/ppc8533
 KERNEL_BASE_ARCH = powerpc
 
