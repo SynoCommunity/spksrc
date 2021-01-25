@@ -6,6 +6,7 @@ include ../../mk/spksrc.directories.mk
 include ../../mk/spksrc.kernel-flags.mk
 
 # Configure the included makefiles
+NAME          = $(KERNEL_NAME)
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
 PKG_DIR       = linux
 ifneq ($(KERNEL_DIST_FILE),)
@@ -18,7 +19,7 @@ endif
 DISTRIB_DIR   = $(KERNEL_DIR)/$(KERNEL_VERS)
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(KERNEL_EXT)
-EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components=$(KERNEL_STRIP)
+EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components=$(KERNEL_STRIP) $(KERNEL_PREFIX)
 
 #####
 
