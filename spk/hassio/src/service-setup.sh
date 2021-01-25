@@ -10,12 +10,12 @@ service_postinst() {
         HASSIO_DOCKER="homeassistant/amd64-hassio-supervisor"
 
         # Read infos from web
-        URL_VERSION="https://s3.amazonaws.com/hassio-version/stable.json"
+        URL_VERSION="https://www.home-assistant.io/version.json"
         HASSIO_VERSION=$(curl -s $URL_VERSION | jq -e -r '.supervisor')
 
         # Pull supervisor image
         /usr/local/bin/docker pull "${HASSIO_DOCKER}:${HASSIO_VERSION}" >/dev/null &&
-            /usr/local/bin/docker tag "${HASSIO_DOCKER}:${HASSIO_VERSION}" "${HASSIO_DOCKER}:latest" >/dev/null
+        /usr/local/bin/docker tag "${HASSIO_DOCKER}:${HASSIO_VERSION}" "${HASSIO_DOCKER}:latest" >/dev/null
 
         if [ ! -f ${CFG_FILE} ]; then
             mkdir -p /usr/local/${SYNOPKG_PKGNAME}/etc 
@@ -93,10 +93,12 @@ service_prestart ()
     ${COMMAND} >> ${LOG_FILE} 2>&1 &
     echo "$!" > "${PID_FILE}"
 
+    # Start containers
     docker start homeassistant
 }
 
 service_poststop ()
 {
+    # Stop containers
     docker stop hassio_supervisor homeassistant
 }
