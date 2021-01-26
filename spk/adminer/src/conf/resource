@@ -12,7 +12,6 @@
           "profile_name": "adminer Profile",
           "profile_desc": "PHP Profile for adminer",
           "backend": 8,
-          "open_basedir": "/var/services/web_packages/adminer:/tmp:/var/services/tmp",
           "extensions": [
             "mysqli",
             "pgsql",
