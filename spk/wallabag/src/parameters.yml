@@ -2,7 +2,7 @@ parameters:
     database_driver: pdo_mysql
     database_driver_class: ~
     database_host: 127.0.0.1
-    database_port: 3306
+    database_port: @database_port@
     database_name: @database_name@
     database_user: wallabag
     database_password: @database_password@
@@ -14,6 +14,7 @@ parameters:
     database_charset: utf8mb4
 
     domain_name: @protocoll_and_domain_name@
+    server_name: "wallabag"
 
     mailer_transport:  smtp
     mailer_user:       ~
@@ -27,7 +28,7 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret: @wallabag_secret@
-    
+
     locale: en
 
     # two factor stuff

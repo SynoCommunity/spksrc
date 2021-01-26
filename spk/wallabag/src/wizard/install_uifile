@@ -16,17 +16,19 @@
         ]
       },
       {
-        "type": "password",
-        "desc": "A 'wallabag' MySQL user and database will be created. Please enter a password for the 'wallabag' user.",
+        "type": "textfield",
+        "desc": "Enter your database port",
         "subitems": [
           {
-            "key": "wizard_mysql_database_password",
-            "desc": "User password",
+            "key": "wizard_database_port",
+            "desc": "Database port",
+            "defaultValue": "3307",
+            "emptyText": "3307",
             "validator": {
               "allowBlank": false,
               "regex": {
-                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.])[A-Za-z\\d!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.]{10,}$/",
-                "errorText": "Minimal password length 10, Include mixed case, Include numeric characters, Include special characters, Exclude common password, Exclude name of user from password"
+                "expr": "/\\d{1,6}/",
+                "errorText": "Must be a valid port number"
               }
             }
           }
@@ -47,6 +49,8 @@
           {
             "key": "wizard_protocoll_and_domain_name",
             "desc": "Protocol and Domain Name",
+            "defaultValue": "http://127.0.0.1",
+            "emptyText": "http://",
             "validator": {
               "allowBlank": false,
               "regex": {

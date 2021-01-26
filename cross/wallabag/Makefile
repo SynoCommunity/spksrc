@@ -1,5 +1,5 @@
 PKG_NAME = wallabag
-PKG_VERS = 2.3.8
+PKG_VERS = 2.4.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-release-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://static.wallabag.org/releases
