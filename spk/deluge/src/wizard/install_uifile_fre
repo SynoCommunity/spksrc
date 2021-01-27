@@ -48,7 +48,7 @@
 }, {
     "step_title": "Premier login",
     "items": [{
-        "desc": "Le mot de passe par défaut de l'interface web est 'deluge'.<br><br>L'accès distant est désactivé par défaut. Pour autoriser des clients à se connecter au service, consulter <a target=\"blank\" href=\"https://dev.deluge-torrent.org/wiki/UserGuide/ThinClient\">le guide ThinClient de Deluge</a>."
+        "desc": "Le mot de passe par défaut de l'interface web est 'deluge'.<br><br>L'interface web est disponible via http//*:8112.<br><br>Pour https, créer une source https dans le paneau de contrôle Synology / Portail des applications / proxy inversé."
     }]
 }, {
     "step_title": "Attention! Permissions DSM",

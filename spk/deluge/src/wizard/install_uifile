@@ -47,7 +47,7 @@
 }, {
     "step_title": "First login",
     "items": [{
-        "desc": "The default password for the web interface is 'deluge'.<br><br>."
+        "desc": "The default password for the web interface is 'deluge'.<br><br>The web UI is served on http//*:8112.<br><br>For https, create a new https source in Synology control panel / application portal / inverse proxy."
     }]
 }, {
     "step_title": "Attention! DSM6 Permissions",
