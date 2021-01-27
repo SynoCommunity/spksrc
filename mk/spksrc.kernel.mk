@@ -24,11 +24,11 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 #####
 
 # Configure the included makefiles
-PRE_COMPILE_TARGET  = kernel_module_prepare_target
-COMPILE_TARGET      = nop
-POST_EXTRACT_TARGET = kernel_post_extract_target
-CONFIGURE_TARGET    = kernel_configure_target
-COPY_TARGET         = nop
+PRE_CONFIGURE_TARGET = kernel_pre_configure_target
+CONFIGURE_TARGET     = kernel_configure_target
+PRE_COMPILE_TARGET   = kernel_module_prepare_target
+COMPILE_TARGET       = nop
+COPY_TARGET          = nop
 
 #####
 
@@ -63,25 +63,9 @@ all: compile
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
 
-.PHONY: kernel_module_prepare_target
+.PHONY: kernel_pre_configure_target
 
-kernel_module_prepare_target:
-	@$(MSG) "DISTRIB_DIR = $(DISTRIB_DIR)"
-	@$(MSG) "Prepare kernel source for module build"
-	$(RUN) $(MAKE) modules_prepare
-ifeq ($(shell expr "$(word 1,$(subst ., ,$(TC_KERNEL)))" \>= 3),1)
-	@$(MSG) "Get kernel version"
-	$(RUN) $(MAKE) kernelversion
-endif
-
-.PHONY: kernel_module_compile_target
-
-kernel_module_compile_target:
-	$(RUN) $(MAKE) modules
-
-.PHONY: kernel_post_extract_target
-
-kernel_post_extract_target:
+kernel_pre_configure_target:
 	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/linux
 
 .PHONY: kernel_configure_target
@@ -107,3 +91,19 @@ ifeq ($(shell printf '%s\n' "$(TC_KERNEL)" "3.3" | sort -V | head -1),$(TC_KERNE
 else
 	$(RUN) $(MAKE) olddefconfig
 endif
+
+.PHONY: kernel_module_prepare_target
+
+kernel_module_prepare_target:
+	@$(MSG) "DISTRIB_DIR = $(DISTRIB_DIR)"
+	@$(MSG) "Prepare kernel source for module build"
+	$(RUN) $(MAKE) modules_prepare
+ifeq ($(shell expr "$(word 1,$(subst ., ,$(TC_KERNEL)))" \>= 3),1)
+	@$(MSG) "Get kernel version"
+	$(RUN) $(MAKE) kernelversion
+endif
+
+.PHONY: kernel_module_compile_target
+
+kernel_module_compile_target:
+	$(RUN) $(MAKE) modules
