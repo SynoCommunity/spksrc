@@ -1,6 +1,6 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/lidarr.png
 
 REQUIRED_DSM = 5.0
@@ -16,7 +16,7 @@ DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent us
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Lidarr
-CHANGELOG = "Update openssl to 1.1."
+CHANGELOG = "Update Lidarr to v0.8.0.2041"
 
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
