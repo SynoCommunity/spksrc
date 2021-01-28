@@ -3,7 +3,7 @@ SPK_VERS = 0.7.19
 SPK_REV = 6
 SPK_ICON = src/duplicity.png
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
 BUILD_DEPENDS += cross/$(SPK_NAME)
 DEPENDS = cross/librsync cross/bash cross/duply
 WHEELS = src/requirements.txt

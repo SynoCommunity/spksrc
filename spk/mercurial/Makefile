@@ -3,7 +3,8 @@ SPK_VERS = 4.8.1
 SPK_REV = 6
 SPK_ICON = src/mercurial.png
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel cross/$(SPK_NAME)
+BUILD_DEPENDS = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
+BUILD_DEPENDS += cross/$(SPK_NAME)
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.6-8"
 

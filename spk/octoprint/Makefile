@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 BETA = 1
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
 DEPENDS = cross/$(SPK_NAME)
 WHEELS  = src/requirements.txt
 

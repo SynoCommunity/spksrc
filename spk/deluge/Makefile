@@ -3,7 +3,7 @@ SPK_VERS = 2.0.3
 SPK_REV = 13
 SPK_ICON = src/deluge.png
 
-BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
 DEPENDS = cross/$(SPK_NAME)
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.18"
