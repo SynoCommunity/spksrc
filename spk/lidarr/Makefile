@@ -16,7 +16,7 @@ DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent us
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Lidarr
-CHANGELOG = "Update Lidarr to v0.8.0.2041"
+CHANGELOG = "Update Lidarr to v0.8.0.2042"
 
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
