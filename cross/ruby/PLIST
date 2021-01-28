@@ -1,0 +1,14 @@
+rsc:bin/bundle
+rsc:bin/bundler
+rsc:bin/erb
+rsc:bin/gem
+rsc:bin/irb
+rsc:bin/racc
+rsc:bin/rake
+rsc:bin/rbs
+rsc:bin/rdoc
+rsc:bin/ri
+rsc:bin/ruby
+rsc:bin/typeprof
+rsc:lib/ruby/3.0.0
+rsc:lib/ruby/gems

@@ -1,0 +1,11 @@
+--- ext/socket/extconf.rb.orig  2020-12-25 03:33:01.000000000 +0000
++++ ext/socket/extconf.rb  2021-01-01 20:19:22.158204952 +0000
+@@ -507,7 +507,7 @@
+   end
+
+   ipv6 = false
+-  default_ipv6 = /haiku/ !~ RUBY_PLATFORM
++  default_ipv6 = false
+   if enable_config("ipv6", default_ipv6)
+     if checking_for("ipv6") {try_link(AF_INET6_SOCKET_CREATION_TEST)}
+       $defs << "-DENABLE_IPV6" << "-DINET6"
