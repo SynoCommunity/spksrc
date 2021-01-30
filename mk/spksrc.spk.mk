@@ -14,7 +14,7 @@ TC = syno$(ARCH_SUFFIX)
 else
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_TCVERS = dsm7
 OS_MIN_VER = 7.0-40000
 else
@@ -116,7 +116,7 @@ ifneq ($(strip $(OS_MIN_VER)),)
 else
 	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
 endif
-ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
+ifeq ($(call version_le, ${TC_OS_MIN_VER}, 6.1),1)
 ifneq ($(strip $(FIRMWARE)),)
 	@echo firmware=\"$(FIRMWARE)\" >> $@
 else
@@ -153,10 +153,10 @@ ifeq ($(RELOAD_UI),yes)
 	@echo reloadui=\"$(RELOAD_UI)\" >> $@
 endif
 
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # old behaviour
 ifeq ($(STARTABLE),no)
-ifeq ($(shell expr "$(TC_OS_MIN_VER)" \<= 6.1),1)
+ifeq ($(call version_le, ${TC_OS_MIN_VER}, 6.1),1)
 	@echo startable=\"$(STARTABLE)\" >> $@
 endif
 	@echo ctl_stop=\"$(STARTABLE)\" >> $@
@@ -285,7 +285,7 @@ icons:
 ifneq ($(strip $(SPK_ICON)),)
 	$(create_target_dir)
 	@$(MSG) "Creating PACKAGE_ICON.PNG for $(SPK_NAME)"
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	(convert $(SPK_ICON) -thumbnail 72x72 -strip - > $(WORK_DIR)/PACKAGE_ICON.PNG)
 else
 	(convert $(SPK_ICON) -thumbnail 64x64 -strip - > $(WORK_DIR)/PACKAGE_ICON.PNG)
@@ -307,7 +307,7 @@ wizards:
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 endif
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@find $(SPKSRC_MK)wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 endif
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
