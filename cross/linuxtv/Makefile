@@ -2,11 +2,18 @@ PKG_NAME = linuxtv
 PKG_VERS = ea2766f
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
+# git hash from	2021-01-13
 PKG_GIT_HASH = 	f6e3542673d19355e8e42be40f5fc78431d611c5
 PKG_DIST_SITE = https://git.linuxtv.org/media_build.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 MOD_DIR = /lib/modules
+
+# Specify linux-media driver version
+#   Linux-media patchset and linuxtv git hash must
+#   be aligned in date of releases.  Versions post
+#   Jan. 2021 only support kernel 4.4+
+MEDIA_VERSION = 2021-01-08-321af22a3d2f
 
 DEPENDS =
 
@@ -53,7 +60,9 @@ endif
 linuxtv_pre_patch:
 	@$(MSG) "TC_KERNEL=$(TC_KERNEL)"
 	@$(MSG) "BLACKLIST=$(BLACKLIST)"
-	$(RUN) make release DIR=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
+	# Set linux-media patchset version to download
+	$(RUN) sed -i 's/linux-media-LATEST/linux-media-$(MEDIA_VERSION)/' linux/Makefile
+	$(RUN) make release DIR=$(WORK_DIR)/linux
 	$(RUN) make -C linux/ download
 	$(RUN) make -C linux/ untar
 	$(RUN) wget $(FIRMWARE_URL)/$(FIRMWARE_PKG) -O $(FIRMWARE_PKG)
