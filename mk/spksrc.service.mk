@@ -105,7 +105,7 @@ ifneq ($(strip $(SERVICE_PORT)),)
 	@echo 'SERVICE_PORT="$(SERVICE_PORT)"' >> $@
 endif
 ifneq ($(STARTABLE),no)
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
 	@echo 'LOG_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.log"' >> $@
 	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
@@ -128,7 +128,7 @@ endif
 	@echo 'SERVICE_COMMAND="$(SERVICE_COMMAND)"' >> $@
 endif
 ifneq ($(strip $(SERVICE_EXE)),)
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo "${RED}ERROR: SERVICE_EXE (start-stop-daemon) is unsupported in DSM7${NC}"
 	@echo "${GREEN}Please migrate to SERVICE_COMMAND=${NC}"
 	@echo "SVC_BACKGROUND=y"
@@ -146,7 +146,7 @@ ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
 
-ifneq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
 	@echo "# List of commands to create links for" >> $@
 	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
@@ -180,7 +180,7 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
 DSM_SCRIPTS_ += installer
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
 else
@@ -208,7 +208,7 @@ endif
 
 
 # Generate privilege file for service user (prefixed to avoid collision with busybox account)
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
@@ -222,7 +222,7 @@ $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
 endif
 # Apply variables to privilege file
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(GROUP)),)
 	# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
 	# For DSM7 I recommend setting permissions for individual packages (System Internal User)
@@ -236,7 +236,7 @@ ifneq ($(strip $(SYSTEM_GROUP)),)
 endif
 ifneq ($(strip $(SPK_USER)),)
 	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
-ifeq ($(shell expr "$(TCVERSION)" \>= 7.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
 endif
 endif
