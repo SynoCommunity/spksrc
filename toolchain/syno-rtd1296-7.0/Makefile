@@ -6,7 +6,6 @@ TC_GLIBC = 2.26
 
 TC_DIST = rtd1296-gcc730_glibc226_armv8-GPL
 TC_DIST_SITE_PATH = Realtek%20RTD129x%20Linux%204.4.180
-TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%207.0%20preview%20Tool%20Chains/
 
 TC_TARGET = aarch64-unknown-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sysroot
