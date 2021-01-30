@@ -1,20 +1,13 @@
-ARCH ?= qoriq
-TCVERSION ?= 5.2
-PKG_NAME = qoriq
-PKG_BRANCH = 5565
-PKG_ARCH = $(PKG_NAME)
-PKG_EXT = txz
-PKG_DIST_NAME = $(PKG_ARCH)-source.$(PKG_EXT)
-PKG_DIST_SITE = https://downloads.sourceforge.net/project/dsgpl/Synology%20NAS%20GPL%20Source/$(PKG_BRANCH)branch
-PKG_EXTRACT = source/linux-2.6.32
-SYNO_CONFIG = synoconfigs/ppcQorIQ
-BASE_ARCH = powerpc
-
-HOMEPAGE = http://www.synology.com/
+KERNEL_ARCH = qoriq
+KERNEL_VERS = 5.2
+KERNEL_BUILD = 5565
+KERNEL_DIST = linux-2.6.32
+KERNEL_CONFIG = synoconfigs/ppcQorIQ
+KERNEL_BASE_ARCH = powerpc
 
 PRE_COMPILE_TARGET = kernel_ppc_premake
 
-include ../../mk/spksrc.kernel-modules.mk
+include ../../mk/spksrc.kernel.mk
 
 .PHONY: kernel_ppc_premake
 

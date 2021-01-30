@@ -1,16 +1,7 @@
-ARCH ?= hi3535
-TCVERSION ?= 6.1
-PKG_NAME = hi3535
-PKG_BRANCH = 15152
-PKG_ARCH = $(PKG_NAME)
-PKG_EXT = txz
-PKG_DIST_NAME = linux-3.4.x.$(PKG_EXT)
-PKG_DIST_SITE = https://downloads.sourceforge.net/project/dsgpl/Synology%20NAS%20GPL%20Source/$(PKG_BRANCH)branch/$(PKG_ARCH)-source
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
-PKG_EXTRACT = linux-3.4.x
-SYNO_CONFIG = synoconfigs/$(ARCH)
-BASE_ARCH = arm
+KERNEL_ARCH = hi3535
+KERNEL_VERS = 6.1
+KERNEL_BUILD = 15152
+KERNEL_DIST = linux-3.4.x
+KERNEL_BASE_ARCH = arm
 
-HOMEPAGE = http://www.synology.com/
-
-include ../../mk/spksrc.kernel-modules.mk
+include ../../mk/spksrc.kernel.mk
