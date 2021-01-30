@@ -10,10 +10,6 @@ service_postinst ()
     echo -e "\nSystem installed modules:" >> ${INST_LOG}
     ${SYNOPKG_PKGDEST}/bin/pip freeze >> ${INST_LOG}
 
-    # Install busybox stuff
-    # So pure-Python spk's can use the functions
-    ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
-
     # Byte-compile in background
     PYTHON_SHORT_VER=$(${SYNOPKG_PKGDEST}/bin/python3 -c 'import sys; print("{0}.{1}".format(*sys.version_info[:2]))')
     ${SYNOPKG_PKGDEST}/bin/python3 -m compileall -q -f ${SYNOPKG_PKGDEST}/lib/python${PYTHON_SHORT_VER} >> ${INST_LOG} &

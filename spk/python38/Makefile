@@ -4,7 +4,7 @@ SPK_VERS = $(SPK_SHORT_VERS).7
 SPK_REV = 1
 SPK_ICON = src/python3.png
 
-DEPENDS  = cross/busybox cross/$(SPK_NAME)
+DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
@@ -33,9 +33,6 @@ PYTHON_LIB_DIR = lib/python$(SPK_SHORT_VERS)
 PLIST_TRANSFORM = sed -e 's%@PYTHON_SITE_PACKAGES@%$(PYTHON_LIB_DIR)/site-packages%' -e 's%@PYTHON_VERSION@%$(SPK_SHORT_VERS)%'
 
 POST_STRIP_TARGET = python3_extra_install
-
-BUSYBOX_CONFIG = usrmng nice daemon patch
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
