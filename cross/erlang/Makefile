@@ -15,9 +15,6 @@ LICENSE  = Apache 2.0
 NATIVE_ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 ENV = PATH=$$PATH:$(NATIVE_ERLANG_BIN_DIR)
 
-# for archs definitions
-include ../../mk/spksrc.archs.mk
-
 GNU_CONFIGURE = 1
 
 PRE_CONFIGURE_TARGET = erlang_pre_configure
@@ -29,10 +26,6 @@ CONFIGURE_ARGS += --without-odbc
 CONFIGURE_ARGS += --enable-dynamic-ssl-lib 
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
-
-ifeq ($(findstring $(ARCH),$(ARM5_ARCHES)),$(ARCH))
-CONFIGURE_ARGS += --disable-smp-require-native-atomics
-endif
 
 include ../../mk/spksrc.cross-cc.mk
 

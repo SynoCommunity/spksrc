@@ -1,8 +1,6 @@
 
-
 # service ctl file
 EJABBERD_CTL="${SYNOPKG_PKGDEST}/sbin/ejabberdctl"
-
 
 service_postinst ()
 {
@@ -16,3 +14,4 @@ service_postinst ()
         ${EJABBERD_CTL} stopped     >> ${INST_LOG} 2>&1
     fi
 }
+

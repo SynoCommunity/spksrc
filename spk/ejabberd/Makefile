@@ -22,14 +22,14 @@ HELPURL  = https://docs.ejabberd.im/admin/guide
 WIZARDS_DIR = src/wizard
 
 SERVICE_SETUP = src/service-setup.sh
-# custom start-stop-status script required, as
-# SERVICE_COMMAND is not a single command
+# custom start-stop-status script is required, 
+# as SERVICE_COMMAND is not a single command
 SSS_SCRIPT = src/service-start-stop.sh
 
 FWPORTS = src/${SPK_NAME}.sc
 CONF_DIR = src/conf
 
-SKP_COMMANDS = sbin/ejabberdctl
+SPK_COMMANDS = sbin/ejabberdctl
 
 POST_STRIP_TARGET = ejabberd_extra_install
 
