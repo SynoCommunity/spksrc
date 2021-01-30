@@ -15,7 +15,7 @@ DISPLAY_NAME = Tiny Tiny RSS
 CHANGELOG = "
 CHANGELOG += 1. Update Tiny Tiny RSS to Git revision 328d7b55c8 (20201114).<br />
 CHANGELOG += 2. add troubleshooting logs generation.<br />
-CHANGELOG += 3. fixed rights issue occurring when upgrading on a live installation.<br />
+CHANGELOG += 3. fixed access rights issue occurring when upgrading on a live installation.<br />
 CHANGELOG += "
 
 HOMEPAGE   = https://tt-rss.org/
