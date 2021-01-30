@@ -69,3 +69,6 @@ ifeq ($(filter $(NCPUS),0 1),)
 COMPILE_MAKE_OPTIONS += -j$(NCPUS)
 endif
 endif
+
+version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -V -C ; then echo 1; fi)
+version_ge = $(shell if printf '%s\n' "$(2)" "$(1)" | sort -V -C ; then echo 1; fi)
