@@ -73,16 +73,16 @@ kernel_pre_configure_target:
 kernel_configure_target: 
 	@$(MSG) "Updating kernel Makefile"
 	$(RUN) sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' Makefile
-	@$(MSG) "Cleaning the kernel source"
-	$(RUN) $(MAKE) mrproper
-	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
-	$(RUN) cp $(KERNEL_CONFIG) .config
 	$(RUN) sed -i -r 's,^ARCH\s*.+,ARCH\t= $(KERNEL_ARCH),' Makefile
 # Add "+" to EXTRAVERSION for kernels version >= 4.x
 ifeq ($(shell expr "$(word 1,$(subst ., ,$(TC_KERNEL)))" \>= 4),1)
 	$(RUN) sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' Makefile
 endif
 	test -e $(WORK_DIR)/arch/$(KERNEL_ARCH) || $(RUN) ln -sf $(KERNEL_BASE_ARCH) arch/$(KERNEL_ARCH)
+	@$(MSG) "Cleaning the kernel source"
+	$(RUN) $(MAKE) mrproper
+	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
+	$(RUN) cp $(KERNEL_CONFIG) .config
 	@$(MSG) "Set any new symbols to their default value"
 # olddefconfig is not available <= 3.2
 ifeq ($(shell printf '%s\n' "$(TC_KERNEL)" "3.3" | sort -V | head -1),$(TC_KERNEL))
