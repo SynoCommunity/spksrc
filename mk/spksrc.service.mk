@@ -154,15 +154,26 @@ ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
 	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 endif
 else
-
+ifneq ($(strip $(SPK_LINKS)),)
+	@echo "${RED}ERROR: SPK_LINKS is unsupported in DSM7${NC}"
+	@echo "${GREEN}Please migrate to SPK_USR_LOCAL_LINKS=${NC}"
+	@exit 1
+endif
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
 ifneq ($(strip $(SPK_COMMANDS)),)
+	# e.g. SPK_COMMANDS=bin/foo bin/bar
 	@jq --arg binaries '$(SPK_COMMANDS)' \
 		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ 1<>$@
 endif
+ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
+	# e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
+	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
+		'. as $$in | $$links_str | split (" ") as $$l | $$l | map(split(":")[1]) as $$links | $$l | map(split(":")[0]) | unique | map( . as $$key | $$key | {(.): $$links } ) | add as $$arr | $$in |."usr-local-linker" += $$arr' $@ 1<>$@
+endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
+	# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
