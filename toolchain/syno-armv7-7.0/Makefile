@@ -9,7 +9,6 @@ TC_GLIBC = 2.26
 
 TC_DIST = armada38x-gcc730_glibc226_hard-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%2038x%20Linux%203.10.108
-TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%207.0%20preview%20Tool%20Chains/
 
 TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot

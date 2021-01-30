@@ -6,7 +6,6 @@ TC_GLIBC = 2.20
 
 TC_DIST = comcerto2k-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = Mindspeed%20Comcerto%202000%20Linux%203.2.101
-TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%207.0%20preview%20Tool%20Chains/
 
 TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
