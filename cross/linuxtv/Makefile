@@ -13,6 +13,7 @@ MOD_DIR = /lib/modules
 #   Linux-media patchset and linuxtv git hash must
 #   be aligned in date of releases.  Versions post
 #   Jan. 2021 only support kernel 4.4+
+#   https://linuxtv.org/downloads/drivers/
 MEDIA_VERSION = 2021-01-08-321af22a3d2f
 
 DEPENDS =
