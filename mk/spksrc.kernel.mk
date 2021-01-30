@@ -7,6 +7,7 @@ include ../../mk/spksrc.kernel-flags.mk
 
 # Configure the included makefiles
 NAME          = $(KERNEL_NAME)
+COOKIE_PREFIX = linux-
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
 PKG_DIR       = linux
 ifneq ($(KERNEL_DIST_FILE),)
