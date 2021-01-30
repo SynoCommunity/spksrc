@@ -20,7 +20,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
-DISPLAY_NAME = Python3.8
+DISPLAY_NAME = Python 3.8
 CHANGELOG = "Initial Python 3.8.7 release"
 
 HOMEPAGE = https://www.python.org
