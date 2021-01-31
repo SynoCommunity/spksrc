@@ -9,7 +9,7 @@ WEB_DIR="/var/services/web_packages"
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
 WEB_DIR="/var/services/web"
 fi
-USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
+HTTP_USER="$([ $(/bin/get_key_value /etc.defaults/VERSION buildnumber) -ge 4418 ] && echo -n http || echo -n nobody)"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 PHP="/usr/local/bin/php74"
 MYSQL="/usr/bin/mysql"
@@ -26,6 +26,8 @@ MYSQL_DATABASE="wallabag"
 
 service_preinst ()
 {
+    mkdir -p ${WEB_DIR}/${PACKAGE}
+
     # if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 5 ];then
         # Check database
         if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -46,20 +48,23 @@ service_preinst ()
     # fi
 }
 
-service_postinst ()
-{
-    if [ -z $SYNOPKG_DB_USER_RAND_PW ]; then
-        echo "error with install wizard, no db password" 1>&2;
-        exit 1
-    fi
+service_postinst () {
+    # 'rand-pw' is not fully implemented on DSM 6 it requires 'user-pw'
+    # $ cat /var/log/messages
+    # > dsm6 synoscgi_SYNO.Core.Package.Installation_1_install[27600]: synomariadbworker.cpp:483 Illegal field [grant-user][user-pw].
+    # > dsm6 synoscgi_SYNO.Core.Package.Installation_1_install[27600]: resource_api.cpp:190 Acquire mariadb10-db for wallabag when 0x0001 (fail)
+    # > dsm6 synoscgi_SYNO.Core.Package.Installation_1_install[27600]: resource_api.cpp:205 Rollback mariadb10-db for wallabag when 0x0001 (done)
+    # > dsm6 synoscgi_SYNO.Core.Package.Installation_1_install[26609]: pkginstall.cpp:735 Failed to acquire resource before install wallabag [0xD900 manager.cpp:204]
 
-    #if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-        # Link
-        # ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+    # if [ -z $SYNOPKG_DB_USER_RAND_PW ]; then
+    #     echo "error with install wizard, no db password" 1>&2;
+    #     #exit 1
+    # fi
 
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         # Install the web interface
-        # cp -pR ${INSTALL_DIR}/share/${PACKAGE} ${WEB_DIR}
-    #fi
+        cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR}
+    fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # create wallabag database and user
@@ -68,13 +73,13 @@ service_postinst ()
         # fi
 
         # render properties
-        sed -i -e "s|@database_password@|${SYNOPKG_DB_USER_RAND_PW}|g" \
+        sed -i -e "s|@database_password@|${wizard_wallabag_password_root}|g" \
             -e "s|@database_name@|${MYSQL_DATABASE}|g" \
             -e "s|@database_port@|${wizard_database_port}|g" \
             -e "s|@protocoll_and_domain_name@|${wizard_protocoll_and_domain_name}/wallabag/web|g" \
-            -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" \
-            ${CFG_FILE} 1>&2;
+            -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" ${CFG_FILE}
 
+# sed -i -e "s|@database_password@|pass|g" -e "s|@database_name@|wallabag|g" -e "s|@database_port@|3307|g" -e "s|@protocoll_and_domain_name@|https://127.0.0.1/wallabag/web|g" -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" /var/packages/wallabag/target/share/wallabag/app/config/parameters.yml
         # install wallabag
         if ! ${PHP} ${WEB_DIR}/${PACKAGE}/bin/console wallabag:install --env=prod --reset -n -vvv > ${WEB_DIR}/${PACKAGE}/install.log 2>&1; then
             echo "Failed to install wallabag. Please check the log: ${WEB_DIR}/${PACKAGE}/install.log"
@@ -82,11 +87,10 @@ service_postinst ()
         fi
     fi
 
-    #if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
-
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
         # permissions
-        # chown -R ${USER} ${WEB_DIR}/${PACKAGE}
-    #fi
+        chown -R ${HTTP_USER} ${WEB_DIR}/${PACKAGE}
+    fi
     exit 0
 }
 
@@ -122,13 +126,10 @@ service_postuninst ()
     #     # fi
     # fi
 
-    # if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-    #     # Remove link
-    #     rm -f ${INSTALL_DIR}
-
-    #     # Remove the web interface
-    #     rm -rf ${WEB_DIR}/${PACKAGE}
-    # fi
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+        # Remove the web interface
+        rm -rf ${WEB_DIR}/${PACKAGE}
+    fi
     exit 0
 }
 
@@ -146,8 +147,8 @@ service_postupgrade ()
     mv ${TMP_DIR}/${PACKAGE}/parameters.yml ${CFG_FILE}
     mv ${TMP_DIR}/${PACKAGE}/db ${WEB_DIR}/${PACKAGE}/data/db
 
-
-    # if !server_name
+    # Add new parameters to parameters.yml for new version
+    # if [ grep server_name ${CFG_FILE} ]
     #     echo 'server_name: "wallabag"' >> ${CFG_FILE}
     # fi
 

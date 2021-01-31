@@ -4,15 +4,30 @@
     "items": [
       {
         "type": "password",
-        "desc": "Enter your MySQL password.",
+        "desc": "Enter your MySQL root password.",
         "subitems": [
           {
             "key": "wizard_mysql_password_root",
             "desc": "Root password",
+            "defaultValue": "",
             "validator": {
               "allowBlank": false
             }
           }
+        ]
+      },
+      {
+        "type": "password",
+        "desc": "Enter your MySQL wallabag password.",
+        "subitems": [
+            {
+                "key": "wizard_wallabag_password_root",
+                "desc": "Root password",
+                "defaultValue": "Wallabag1!",
+                "validator": {
+                    "allowBlank": false
+                }
+            }
         ]
       },
       {
