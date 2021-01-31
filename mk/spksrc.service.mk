@@ -170,7 +170,7 @@ endif
 ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 	# e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
 	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
-		'. as $$in | $$links_str | split (" ") as $$l | $$l | map(split(":")[1]) as $$links | $$l | map(split(":")[0]) | unique | map( . as $$key | $$key | {(.): $$links } ) | add as $$arr | $$in |."usr-local-linker" += $$arr' $@ 1<>$@
+		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ 1<>$@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 	# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
