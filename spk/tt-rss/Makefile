@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20200829
-SPK_REV = 12
+SPK_VERS = 20201114
+SPK_REV = 13
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,11 @@ DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "Update Tiny Tiny RSS to Git revision 67f02e2aa7 (20200829)"
+CHANGELOG = "
+CHANGELOG += 1. Update Tiny Tiny RSS to Git revision 328d7b55c8 (20201114).<br />
+CHANGELOG += 2. add troubleshooting logs generation.<br />
+CHANGELOG += 3. fixed access rights issue occurring when upgrading on a live installation.<br />
+CHANGELOG += "
 
 HOMEPAGE   = https://tt-rss.org/
 LICENSE    = GPL
@@ -33,13 +37,14 @@ POST_STRIP_TARGET = tt-rss_extra_install
 BUSYBOX_CONFIG = daemon nice
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
-PHP_EXTENSIONS = curl gd intl mysql mysqli pdo_mysql posix
+PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_DSM = 6.0
 
 INSTUNINST_RESTART_SERVICES = apache-web
 
+SPK_DEPENDS = "WebStation"
 
 include ../../mk/spksrc.spk.mk
 
@@ -51,13 +56,11 @@ $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini:
 .PHONY: tt-rss_extra_install
 tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/logs
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/bin/guess-php-fpm-bin $(STAGING_DIR)/bin/guess-php-fpm-bin
-	install -m 755 src/bin/guess-php-configuration-file $(STAGING_DIR)/bin/guess-php-configuration-file
-	install -m 755 src/bin/guess-php-profile-name $(STAGING_DIR)/bin/guess-php-profile-name
-	install -m 755 src/bin/php-options $(STAGING_DIR)/bin/php-options
-	install -m 644 src/bin/php-settings.sh $(STAGING_DIR)/bin/php-settings.sh
 	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
+	install -m 755 src/bin/tt-rss-daemon $(STAGING_DIR)/bin/tt-rss-daemon
+	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
 	install -m 755 src/bin/virtual-php $(STAGING_DIR)/bin/virtual-php
 

@@ -1,0 +1,11 @@
+[{
+    "step_title": "WebStation PHP Configuration",
+    "items": [
+        {
+            "desc": "Tiny Tiny RSS requiert que les extensions PHP suivantes soient activ&eacute;es pour le profil PHP courant (configurables dans <code>Web Station</code> &gt; <code>Param&egrave;tres PHP</code> dans l'onglet  <code>Param&egrave;tres de serveur par d&eacute;faut</code>):"
+        },
+        {
+            "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
+        }
+    ]
+}]

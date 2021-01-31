@@ -10,17 +10,5 @@
 			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
 			"destpath": "/usr/local/etc/php70/conf.d"
 		}]
-    },
-    "php72": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
-			"destpath": "/usr/local/etc/php72/conf.d"
-		}]
-    },
-    "php73": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
-			"destpath": "/usr/local/etc/php73/conf.d"
-		}]
     }
 }
