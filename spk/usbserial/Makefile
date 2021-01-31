@@ -5,10 +5,7 @@ SPK_ICON = src/usb.png
 DSM_UI_DIR = app
 CHANGELOG = "USB drivers and USB utils, including HGI80 and usbserial.ko"
 
-DEPENDS = 
-#DEPENDS = cross/usbutils
-#module/ch341
-#module/cp210x module/pl2303 module/ti_usb_3410_5052
+DEPENDS = cross/usbutils
 
 REQUIRED_DSM = 6.2.3
 REQUIRE_KERNEL = 1
