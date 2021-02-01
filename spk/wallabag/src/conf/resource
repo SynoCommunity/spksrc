@@ -1,9 +1,7 @@
 {
     "mariadb10-db": {
         "admin-account-m10": "root",
-        "admin-account-m5": "root",
         "admin-pw-m10": "{{wizard_mysql_password_root}}",
-        "admin-pw-m5": "{{wizard_mysql_password_root}}",
         "create-db": {
             "flag": true,
             "db-collision": "skip",
@@ -15,16 +13,6 @@
             "user-name": "wallabag",
             "db-collision": "skip",
             "user-pw": "{{wizard_wallabag_password_root}}"
-        },
-        "drop-db-inst": {
-            "flag": true,
-            "db-name": "wallabag",
-            "ver": "m5"
-        },
-        "migrate-db": {
-            "db-collision": "error",
-            "m10-db-name": "wallabag",
-            "m5-db-name": "wallabag"
         }
     },
     "webservice": {
