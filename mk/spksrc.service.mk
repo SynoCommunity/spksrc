@@ -163,17 +163,17 @@ $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
 ifneq ($(strip $(SPK_COMMANDS)),)
-	# e.g. SPK_COMMANDS=bin/foo bin/bar
+# e.g. SPK_COMMANDS=bin/foo bin/bar
 	@jq --arg binaries '$(SPK_COMMANDS)' \
 		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ 1<>$@
 endif
 ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
-	# e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
+# e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
 	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
 		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ 1<>$@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-	# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
+# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
@@ -234,14 +234,14 @@ endif
 # Apply variables to privilege file
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(GROUP)),)
-	# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
-	# For DSM7 I recommend setting permissions for individual packages (System Internal User)
-	# or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
+# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
+# For DSM7 I recommend setting permissions for individual packages (System Internal User)
+# or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
 	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
 endif
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
-	# options: http, system
+# options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
 endif
 ifneq ($(strip $(SPK_USER)),)
