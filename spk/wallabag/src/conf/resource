@@ -17,31 +17,15 @@
             "user-pw": "{{wizard_wallabag_password_root}}"
         },
         "drop-db-inst": {
+            "flag": true,
             "db-name": "wallabag",
-            "ver": "m10"
+            "ver": "m5"
         },
         "migrate-db": {
             "db-collision": "error",
             "m10-db-name": "wallabag",
             "m5-db-name": "wallabag"
-        },
-        "drop-db-uninst": "{{wizard_delete_data}}",
-        "drop-user-uninst": "{{wizard_delete_data}}"
-    },
-    "mysql-db": {
-        "info": {
-            "db-name": "wallabag"
-        },
-        "root-pw": "{{wizard_mysql_password_root}}",
-        "create-db": {
-            "db-collision": "skip"
-        },
-        "grant-user": {
-            "user-name": "wallabag",
-            "rand-pw": true
-        },
-        "drop-db-uninst": "{{wizard_delete_data}}",
-        "drop-user-uninst": "{{wizard_delete_data}}"
+        }
     },
     "webservice": {
         "services": [

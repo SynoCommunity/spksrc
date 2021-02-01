@@ -49,7 +49,7 @@ service_preinst ()
 }
 
 service_postinst () {
-    # 'rand-pw' is not fully implemented on DSM 6 it requires 'user-pw'
+    # 'rand-pw' is not fully implemented on DSM 6 it requires 'user-pw' (mariadb10-db)
     # $ cat /var/log/messages
     # > dsm6 synoscgi_SYNO.Core.Package.Installation_1_install[27600]: synomariadbworker.cpp:483 Illegal field [grant-user][user-pw].
     # > dsm6 synoscgi_SYNO.Core.Package.Installation_1_install[27600]: resource_api.cpp:190 Acquire mariadb10-db for wallabag when 0x0001 (fail)
@@ -79,7 +79,6 @@ service_postinst () {
             -e "s|@protocoll_and_domain_name@|${wizard_protocoll_and_domain_name}/wallabag/web|g" \
             -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" ${CFG_FILE}
 
-# sed -i -e "s|@database_password@|pass|g" -e "s|@database_name@|wallabag|g" -e "s|@database_port@|3307|g" -e "s|@protocoll_and_domain_name@|https://127.0.0.1/wallabag/web|g" -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" /var/packages/wallabag/target/share/wallabag/app/config/parameters.yml
         # install wallabag
         if ! ${PHP} ${WEB_DIR}/${PACKAGE}/bin/console wallabag:install --env=prod --reset -n -vvv > ${WEB_DIR}/${PACKAGE}/install.log 2>&1; then
             echo "Failed to install wallabag. Please check the log: ${WEB_DIR}/${PACKAGE}/install.log"
@@ -148,9 +147,9 @@ service_postupgrade ()
     mv ${TMP_DIR}/${PACKAGE}/db ${WEB_DIR}/${PACKAGE}/data/db
 
     # Add new parameters to parameters.yml for new version
-    # if [ grep server_name ${CFG_FILE} ]
-    #     echo 'server_name: "wallabag"' >> ${CFG_FILE}
-    # fi
+    if ! grep -q '^    server_name:' ${CFG_FILE}
+        echo '    server_name: "wallabag"' >> ${CFG_FILE}
+    fi
 
     # migrate database
     if ! ${PHP} ${WEB_DIR}/${PACKAGE}/bin/console doctrine:migrations:migrate --env=prod -n -vvv > ${WEB_DIR}/${PACKAGE}/migration.log 2>&1; then
