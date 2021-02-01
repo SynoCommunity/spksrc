@@ -137,7 +137,7 @@ postinst ()
 
     # copy target/var data to permanent storage
     # and don't override old configurations
-    if [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
+    if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
     fi
 
