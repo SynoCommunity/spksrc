@@ -1,11 +1,11 @@
-SPK_NAME = UsbSerialDrivers
+SPK_NAME = kernel-usbserial
 SPK_VERS = 6
 SPK_REV = 8
 SPK_ICON = src/usb.png
 DSM_UI_DIR = app
 CHANGELOG = "USB drivers and USB utils, including HGI80 and usbserial.ko"
 
-DEPENDS = cross/usbutils
+DEPENDS = 
 
 REQUIRED_DSM = 6.2.3
 REQUIRE_KERNEL = 1
@@ -22,17 +22,17 @@ DESCRIPTION = "USBSerialDrivers includes usbserial.ko ch341.ko cp210x.ko pl2303.
 
 RELOAD_UI = no
 STARTABLE = no
-DISPLAY_NAME = UsbSerialDrivers
+DISPLAY_NAME = Kernel USB Serial drivers
 
-HOMEPAGE = http://www.jadahl.com/
-LICENSE  = GPL
+HOMEPAGE = https://www.kernel.org/
+LICENSE  = GPLv2
 
-SSS_SCRIPT    = src/dsm-control.sh
-SERVICE_SETUP = src/service-setup.sh
-STRIP_TARGET = nop
+SPK_DEPENDS = synocli-kernel
+
+SSS_SCRIPT        = src/dsm-control.sh
+SERVICE_SETUP     = src/service-setup.sh
+STRIP_TARGET      = nop
 POST_STRIP_TARGET = usbserial_extra_install
-
-SPK_COMMANDS = bin/usb-devices bin/usbhid-dump
 
 include ../../mk/spksrc.spk.mk
 
