@@ -1,4 +1,4 @@
-SPK_NAME = kernel-usbserial
+SPK_NAME = synokernel-usbserial
 SPK_VERS = 6
 SPK_REV = 8
 SPK_ICON = src/usb.png
@@ -22,7 +22,7 @@ DESCRIPTION = "USBSerialDrivers includes usbserial.ko ch341.ko cp210x.ko pl2303.
 
 RELOAD_UI = no
 STARTABLE = no
-DISPLAY_NAME = Kernel USB Serial drivers
+DISPLAY_NAME = SynoKernel USB Serial drivers
 
 HOMEPAGE = https://www.kernel.org/
 LICENSE  = GPLv2
