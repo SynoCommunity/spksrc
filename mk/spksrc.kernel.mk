@@ -31,9 +31,6 @@ PRE_COMPILE_TARGET   = kernel_module_prepare_target
 ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 COMPILE_TARGET       = nop
 else
-KERNEL_MODULE_CONFIG = $(firstword $(subst :, ,$(REQUIRE_KERNEL_MODULE)))
-KERNEL_MODULE_PATH   = $(word 2,$(subst :, ,$(REQUIRE_KERNEL_MODULE)))
-KERNEL_MODULE_OBJECT = $(lastword $(subst :, ,$(REQUIRE_KERNEL_MODULE)))
 COMPILE_TARGET       = kernel_module_compile_target
 endif
 COPY_TARGET          = nop
