@@ -66,7 +66,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 RUN pip3 install meson==0.56.0
 
 # Install setuptools, pip, virtualenv, wheel and httpie for Python2
-RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python
+RUN wget https://bootstrap.pypa.io/2.7/get-pip.py -O - | python
 RUN pip install virtualenv httpie
 
 # Volume pointing to spksrc sources
