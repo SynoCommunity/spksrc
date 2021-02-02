@@ -1,17 +1,41 @@
 #!/bin/sh
 
+#########################################################################
+# Written by: th0ma7@gmail.com
+# Part of SynoCommunity Developpers
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#########################################################################
+
 # Make sure an argument was passed 
 usage ()
 {
-echo "Usage: $0 [-m <path> ] [-k <version> ] [-n <name>] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2
+echo "Usage: $0 [-m <path> ] [-f <path>] [-k <version> ] [-n <name>] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2
+echo 1>&2
+printf '%30s %s' "[-m <path> ]" ": Kernel module base path" 1>&2
+printf '%30s %s' "[-f <path> ]" ": Firmware base path (OPTIONAL)" 1>&2
+printf '%30s %s' "[-k <path> ]" ": Kernel version (ex: 4.4.59+)" 1>&2
+printf '%30s %s' "[-n <path> ]" ": Name of the SynoCommunity package invoking the script" 1>&2
+printf '%30s %s' "[-a <load|unload|status> ]" ": Action to be performed" 1>&2
 }
 [ $# -eq 0 ] && usage && exit 1
 
-
 # Get basic options
-while getopts ":h:k:n:a:" arg; do
+while getopts ":h:m:f:k:n:a:" arg; do
   case $arg in
     m) MPATH=${OPTARG};;
+    f) FPATH=${OPTARG};;
     k) KVER=${OPTARG};;
     n) DNAME=${OPTARG};;
     a) ACTION=${OPTARG};;
@@ -24,13 +48,13 @@ shift $((OPTIND-1))
 KO=$@
 
 # Set default kernel version
-[ -z "${KVER} ] && KVER=$(uname -r)
+[ -z "${KVER}" ] && KVER=$(uname -r)
 
 # Set kernel module .ko object base path
 KPATH=${MPATH}/${KVER}/kernel/drivers
 
-# Firmware path
-FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
+# Set system module firmware path file index
+SYS_FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
 
 # load the requested modules
 load ()
@@ -55,7 +79,7 @@ load ()
    done
 
    # Add firmware path to running kernel
-   echo "$FIRMWARE_PATH" > /sys/module/firmware_class/parameters/path
+   [ -n "${FPATH}" ] && echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
 }
 
 
@@ -102,7 +126,6 @@ status ()
 
    return $error
 }
-
 
 case $ACTION in
     load)
