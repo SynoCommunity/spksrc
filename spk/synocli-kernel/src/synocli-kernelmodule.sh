@@ -21,13 +21,19 @@
 # Make sure an argument was passed 
 usage ()
 {
-echo "Usage: $0 [-m <path> ] [-f <path>] [-k <version> ] [-n <name>] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2
+printf '%10s %s\n' "Usage :" "$0 [-m <path> ] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2
+printf '%10s %s\n' "Optional :" "[-f <path>] [-k <version> ] [-n <name>]" 1>&2
 echo 1>&2
-printf '%30s %s' "[-m <path> ]" ": Kernel module base path" 1>&2
-printf '%30s %s' "[-f <path> ]" ": Firmware base path (OPTIONAL)" 1>&2
-printf '%30s %s' "[-k <path> ]" ": Kernel version (ex: 4.4.59+)" 1>&2
-printf '%30s %s' "[-n <path> ]" ": Name of the SynoCommunity package invoking the script" 1>&2
-printf '%30s %s' "[-a <load|unload|status> ]" ": Action to be performed" 1>&2
+printf '%30s %s\n' "[-m <path> ] : " "Kernel module base path" 1>&2
+printf '%30s %s\n' "[-f <path> ] : " "Additional firmware base path (OPTIONAL)" 1>&2
+printf '%30s %s\n' "[-k <path> ] : " "Kernel version (OPTIONAL: uses \`uname -r\` if not provided)" 1>&2
+printf '%30s %s\n' "[-n <path> ] : " "Name of the SynoCommunity package invoking this script for logging purpose" 1>&2
+printf '%30s %s\n' "[-a <load|unload|status> ] : " "Action to be performed" 1>&2
+echo 1>&2
+printf '%10s %s\n' "" "Example :" "$0 -a load -k 4.4.59+ \\" 1>&2
+printf '%35s %s\n' "" "-m /var/package/synokernel-usbserial/target/lib/modules \\" 1>&2
+printf '%38s %s\n' "" "usb/serial/usbserial.ko usb/serial/ftdi_sio.ko" 1>&2
+echo 1>&2
 }
 [ $# -eq 0 ] && usage && exit 1
 
