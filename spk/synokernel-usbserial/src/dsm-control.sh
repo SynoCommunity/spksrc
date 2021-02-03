@@ -1,40 +1,52 @@
 #!/bin/sh
 
 # Package
-PACKAGE="UsbSerialDrivers"
+PACKAGE="synokernel-usbserial"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
+PATH="${INSTALL_DIR}/bin:${PATH}"
+SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${PACKAGE} -a"
+UDEV_RULE=60-${PACKAGE}.rules
 
+KO="usb/serial/usbserial.ko \
+    usb/serial/ftdi_sio.ko \
+    usb/serial/cp210x.ko \
+    usb/serial/pl2303.ko \
+    usb/serial/ch341.ko \
+    usb/serial/ti_usb_3410_5052.ko"
 
 case $1 in
     start)
-
-        insmod /lib/modules/usbserial.ko > /dev/null
-        insmod /lib/modules/ftdi_sio.ko >/dev/null	
-        insmod ${INSTALL_DIR}/modules/cp210x.ko >/dev/null
-        insmod ${INSTALL_DIR}/modules/pl2303.ko >/dev/null
-        insmod ${INSTALL_DIR}/modules/ch341.ko >/dev/null
-        insmod ${INSTALL_DIR}/modules/ti_usb_3410_5052.ko >/dev/null
+        ${SYNOCLI_KMODULE} load $KO
 
         # Create udev rules to set permissions to 666 
         # Doing this at package start so it gets done even after DSM upgrade.  
-        ln -s ${INSTALL_DIR}/rules.d/60-jadahl.usbserial.rules /lib/udev/rules.d/60-jadahl.usbserial.rules
+        ln -s ${INSTALL_DIR}/rules.d/${UDEV_RULE} /lib/udev/rules.d/${UDEV_RULE}
         udevadm control --reload-rules
 
-        exit 0
+        exit $?
         ;;
     stop)
+        ${SYNOCLI_KMODULE}unload $KO
+
         # remove udev rules for USB serial permissions
-        rm -f /lib/udev/rules.d/60-jadahl.usbserial.rules	
+        rm -f /lib/udev/rules.d/${UDEV_RULE}
         udevadm control --reload-rules
-        exit 0
+
+        exit $?
+        ;;
+    restart)
+        ${SYNOCLI_KMODULE} unload $KO
+        ${SYNOCLI_KMODULE} load $KO
+        exit $?
         ;;
     status)
-        exit 0
-        ;;
-    log)
-        exit 1
+        if ${SYNOCLI_KMODULE} status $KO; then
+            exit 0
+        else
+            exit 1
+        fi
         ;;
     *)
         exit 1
