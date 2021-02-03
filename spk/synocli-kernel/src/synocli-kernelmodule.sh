@@ -24,10 +24,10 @@ usage ()
 printf '%10s %s\n' "Usage :" "$0 [-m <path> ] [-a <load|unload|status>] module1.ko module2.ko ..." 1>&2
 printf '%10s %s\n' "Optional :" "[-f <path>] [-k <version> ] [-n <name>]" 1>&2
 echo 1>&2
-printf '%30s %s\n' "[-m <path> ] : " "Kernel module base path" 1>&2
+printf '%30s %s\n' "[-m <path> ] : " "Kernel module base path (OPTIONAL if -n <package> is provided)" 1>&2
 printf '%30s %s\n' "[-f <path> ] : " "Additional firmware base path (OPTIONAL)" 1>&2
 printf '%30s %s\n' "[-k <path> ] : " "Kernel version (OPTIONAL: uses \`uname -r\` if not provided)" 1>&2
-printf '%30s %s\n' "[-n <path> ] : " "Name of the SynoCommunity package invoking this script for logging purpose" 1>&2
+printf '%30s %s\n' "[-n <package> ] : " "Name of the SynoCommunity package invoking this script for logging purpose" 1>&2
 printf '%30s %s\n' "[-a <load|unload|status> ] : " "Action to be performed" 1>&2
 echo 1>&2
 printf '%10s %s\n' "" "Example :" "$0 -a load -k 4.4.59+ \\" 1>&2
@@ -53,14 +53,34 @@ done
 shift $((OPTIND-1))
 KO=$@
 
+# Set system module firmware path file index
+SYS_FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
+
+# Set LOG output
+SYNOLOG=/tmp/synocli-kernelmodule.log
+[ -n "${DNAME}" ] && SYNOLOG=/tmp/synocli-kernelmodule-${DNAME}.log
+
+exec >> $SYNOLOG
+
 # Set default kernel version
 [ -z "${KVER}" ] && KVER=$(uname -r)
 
+# If neither the module path or name is being provided, exit
+if [ -z "${MPATH}" ]; then
+   [ -z "{DNAME}" ] \
+      && usage \
+	  || MPATH=/var/packages/${DNAME}/target/lib/modules
+fi
+
+# If module path does not exists, exit
+if [ ! -d ${MPATH} ]; then
+   echo "ERROR: Module path [${MPATH}] does not exist or inaccessible..." 1>&2
+   echo 1>&2
+   usage
+fi
+
 # Set kernel module .ko object base path
 KPATH=${MPATH}/${KVER}/kernel/drivers
-
-# Set system module firmware path file index
-SYS_FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
 
 # load the requested modules
 load ()
