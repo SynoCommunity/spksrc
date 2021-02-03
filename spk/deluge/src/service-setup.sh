@@ -1,7 +1,7 @@
-PYTHON_DIR="/usr/local/python"
+PYTHON_DIR="/usr/local/python3"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
+PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 CORE_CFG_FILE="${SYNOPKG_PKGVAR}/core.conf"
 WATCH_CFG_FILE="${SYNOPKG_PKGVAR}/autoadd.conf"
 
@@ -58,11 +58,8 @@ service_postinst ()
             sed -i -e "/@watch_dir@/d" ${WATCH_CFG_FILE}
         fi
     fi
-
-    # Discard legacy obsolete busybox user account
-    # Commands of busybox from spk/python
-    delgroup "${USER}" "users" >> ${INST_LOG}
-    deluser "${USER}" >> ${INST_LOG}
+    # Create logs directory, otherwise it does not start due to permissions errors
+    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 }
 
 

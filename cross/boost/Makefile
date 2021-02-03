@@ -1,5 +1,5 @@
 PKG_NAME = boost
-PKG_VERS = 1.63.0
+PKG_VERS = 1.75.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
