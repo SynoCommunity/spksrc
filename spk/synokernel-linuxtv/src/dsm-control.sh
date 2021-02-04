@@ -1,40 +1,43 @@
 #!/bin/sh
 
 # Package
-PACKAGE="linuxtv"
-DNAME="LinuxTV"
+PACKAGE="synokernel-linuxtv"
 
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-LINUXTV="${INSTALL_DIR}/bin/linuxtv.sh -n $DNAME -a"
+SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${PACKAGE} -a"
 
-KO="rc/rc-core.ko \
-    mc/mc.ko \
-    v4l2-core/videodev.ko \
-    common/tveeprom.ko \
-    common/videobuf2/videobuf2-common.ko \
-    common/videobuf2/videobuf2-v4l2.ko \
-    common/videobuf2/videobuf2-memops.ko \
-    common/videobuf2/videobuf2-vmalloc.ko \
-    dvb-core/dvb-core.ko"
+KO="media/rc/rc-core.ko \
+    media/mc/mc.ko \
+    media/v4l2-core/videodev.ko \
+    media/common/tveeprom.ko \
+    media/common/videobuf2/videobuf2-common.ko \
+    media/common/videobuf2/videobuf2-v4l2.ko \
+    media/common/videobuf2/videobuf2-memops.ko \
+    media/common/videobuf2/videobuf2-vmalloc.ko \
+    media/dvb-core/dvb-core.ko \
+    media/tuners/si2157.ko \
+    media/dvb-frontends/lgdt3306a.ko \
+    media/usb/em28xx/em28xx.ko \
+    media/usb/em28xx/em28xx-dvb.ko"
 
 case $1 in
     start)
-        ${LINUXTV} load $KO
+        ${SYNOCLI_KMODULE} load $KO
         exit $?
         ;;
     stop)
-        ${LINUXTV}unload $KO
+        ${SYNOCLI_KMODULE}unload $KO
         exit $?
         ;;
     restart)
-        ${LINUXTV} unload $KO
-        ${LINUXTV} load $KO
+        ${SYNOCLI_KMODULE} unload $KO
+        ${SYNOCLI_KMODULE} load $KO
         exit $?
         ;;
     status)
-        if ${LINUXTV} status $KO; then
+        if ${SYNOCLI_KMODULE} status $KO; then
             exit 0
         else
             exit 1

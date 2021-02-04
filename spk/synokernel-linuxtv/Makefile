@@ -1,4 +1,4 @@
-SPK_NAME = linuxtv
+SPK_NAME = synokernel-linuxtv
 SPK_GIT_HASH = f6e3542
 SPK_GIT_DATE = 20210113
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
@@ -20,11 +20,5 @@ HOMEPAGE = https://linuxtv.org/
 LICENSE  = GPLv2
 
 STRIP_TARGET = nop
-POST_STRIP_TARGET = linuxtv_extra_install
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: linuxtv_extra_install
-linuxtv_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 src/linuxtv.sh $(STAGING_DIR)/bin/
