@@ -6,19 +6,22 @@ SPK_REV = 1
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Add default generic statup scripts for other packages usage"
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/linuxtv
 
 MAINTAINER = th0ma7
 DESCRIPTION = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several libraries and applications.
 DESCRIPTION_FRE = La communauté LinuxTV développe et maintient les sous-systèmes multimédia du noyau Linux et plusieurs bibliothèques et applications.
-DISPLAY_NAME = linuxtv
 
+RELOAD_UI = no
 STARTABLE = yes
-SSS_SCRIPT = src/dsm-control.sh
+DISPLAY_NAME = SynoKernel LinuxTV media drivers
 
 HOMEPAGE = https://linuxtv.org/
 LICENSE  = GPLv2
 
+SPK_DEPENDS = synocli-kernel
+
+SSS_SCRIPT = src/dsm-control.sh
 STRIP_TARGET = nop
 
 include ../../mk/spksrc.spk.mk
