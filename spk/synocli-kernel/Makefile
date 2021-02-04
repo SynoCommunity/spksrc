@@ -3,10 +3,10 @@ SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/synocli-kernel.png
 
-DEPENDS = cross/usbutils
+DEPENDS = cross/usbutils cross/psmisc
 
 MAINTAINER    = th0ma7
-DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: usb-devices, usbhid-dump"
+DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump"
 OPTIONAL_DESC =
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
@@ -16,7 +16,8 @@ HOMEPAGE = https://synocommunity.com/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_LINKS     = /usr/local/bin/synocli-kernelmodule:bin/synocli-kernelmodule.sh
-SPK_COMMANDS  = bin/usb-devices
+SPK_COMMANDS  = bin/fuser
+SPK_COMMANDS += bin/usb-devices
 SPK_COMMANDS += bin/usbhid-dump
 SPK_COMMANDS += bin/lsusb.py
 
