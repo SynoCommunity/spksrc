@@ -1,5 +1,5 @@
 PKG_NAME = linuxtv
-PKG_VERS = ea2766f
+PKG_VERS = f6e3542
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
 # git hash from	2021-01-13
