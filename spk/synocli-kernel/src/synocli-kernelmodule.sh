@@ -102,7 +102,7 @@ load ()
             [ $? -eq 0 ] && echo "OK" || echo "ERROR"
          else
             echo "ERROR: Module $KPATH/$ko not found!"
-			error=1
+            error=1
          fi
       fi
    done
@@ -110,8 +110,16 @@ load ()
    # Add firmware path to running kernel
    if [ -n "${FPATH}" ]; then
       echo -ne "\tAdd optional firmware path...\n"
+	  printf '%75s' "[${FPATH}]"
       echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
-      error=$?
+
+      if [ $? -eq 0 ]; then
+         error=0
+         echo -ne " OK\n"
+      else
+         error=1
+         echo -ne " N/A\n"
+      fi
    fi
 
    return $error
@@ -136,7 +144,7 @@ unload ()
          echo -ne "N/A\n"
       else
          echo -ne "ERROR\n"
-		 error=1
+         error=1
       fi
    done
 
@@ -159,7 +167,7 @@ status ()
    echo -ne "\tStatus of kernel modules...\n"
    for ko in $KO
    do
-	  module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
+      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
       printf '%50s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
@@ -178,12 +186,12 @@ status ()
 	  printf '%75s' "[${FPATH}]"
 
       grep -q ${FPATH} ${SYS_FIRMWARE_PATH}
-	  if [ $? -eq 0 ]; then
-	     error=0
-		 echo -ne " OK\n"
+      if [ $? -eq 0 ]; then
+         error=0
+         echo -ne " OK\n"
       else
-	     error=1
-		 echo -ne " N/A\n"
+         error=1
+         echo -ne " N/A\n"
       fi
    fi
 
