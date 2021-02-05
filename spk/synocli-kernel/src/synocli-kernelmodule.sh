@@ -85,11 +85,13 @@ KPATH=${MPATH}/${KVER}/kernel/drivers
 # load the requested modules
 load ()
 {
-   echo "Loading kernel modules... "
+   error=0
+
+   echo -ne "\tLoading kernel modules...\n"
    for ko in $KO
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%40s %-25s' $ko "[$module]"
+      printf '%50s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -100,24 +102,33 @@ load ()
             [ $? -eq 0 ] && echo "OK" || echo "ERROR"
          else
             echo "ERROR: Module $KPATH/$ko not found!"
+			error=1
          fi
       fi
    done
 
    # Add firmware path to running kernel
-   [ -n "${FPATH}" ] && echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
+   if [ -n "${FPATH}" ]; then
+      echo -ne "\tAdd optional firmware path...\n"
+      echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
+      error=$?
+   fi
+
+   return $error
 }
 
 
 # unload the requested modules in a reversed order
 unload ()
 {
+   error=0
+
    # Unload drivers in reverse order
-   echo "Unloading kernel modules... "
+   echo -ne "\tUnloading kernel modules...\n"
    for item in $KO; do echo $item; done | tac | while read ko
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%40s %-25s' $ko "[$module]"
+      printf '%50s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -125,30 +136,56 @@ unload ()
          echo -ne "N/A\n"
       else
          echo -ne "ERROR\n"
+		 error=1
       fi
    done
+
+   # Remove firmware path to running kernel
+   if [ -n "${FPATH}" ]; then
+      echo -ne "\tUnloading of optional firmware path...\n"
+      echo "" > ${SYS_FIRMWARE_PATH}
+      error=$?
+   fi
+
+   return $error
 }
 
 
 # Provide a status of the loaded modules
 status ()
 {
-   echo "Status of kernel modules... "
    error=0
 
+   echo -ne "\tStatus of kernel modules...\n"
    for ko in $KO
    do
 	  module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%40s %-25s' $ko "[$module]"
+      printf '%50s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
+         error=0
          echo -ne "OK\n"
       else
          error=1
          echo -ne "N/A\n"
       fi
    done
+
+   # Validate option firmware path
+   if [ -n "${FPATH}" ]; then
+      echo -ne "\tStatus of optional firmware path...\n"
+	  printf '%75s' "[${FPATH}]"
+
+      grep -q ${FPATH} ${SYS_FIRMWARE_PATH}
+	  if [ $? -eq 0 ]; then
+	     error=0
+		 echo -ne " OK\n"
+      else
+	     error=1
+		 echo -ne " N/A\n"
+      fi
+   fi
 
    return $error
 }
