@@ -6,7 +6,8 @@ PACKAGE="synokernel-linuxtv"
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${PACKAGE} -a"
+FIRMWARE_PATH="/var/packages/${PACKAGE}/target/lib/firmware/"
+SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${PACKAGE} -f ${FIRMWARE_PATH} -a"
 
 KO="media/rc/rc-core.ko \
     media/mc/mc.ko \
