@@ -114,7 +114,6 @@ load ()
       echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
 
       if [ $? -eq 0 ]; then
-         error=0
          echo -ne " OK\n"
       else
          error=1
@@ -172,7 +171,6 @@ status ()
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
-         error=0
          echo -ne "OK\n"
       else
          error=1
@@ -187,7 +185,6 @@ status ()
 
       grep -q ${FPATH} ${SYS_FIRMWARE_PATH}
       if [ $? -eq 0 ]; then
-         error=0
          echo -ne " OK\n"
       else
          error=1
