@@ -23,6 +23,8 @@ RELOAD_UI = no
 STARTABLE = yes
 DISPLAY_NAME = SynoKernel USB Serial drivers
 
+WIZARDS_DIR = src/wizard/
+
 HOMEPAGE = https://www.kernel.org/
 LICENSE  = GPLv2
 
