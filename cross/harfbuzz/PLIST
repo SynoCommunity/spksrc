@@ -1,0 +1,9 @@
+lnk:lib/libharfbuzz-icu.so
+lnk:lib/libharfbuzz-icu.so.0
+lib:lib/libharfbuzz-icu.so.0.20704.0
+lnk:lib/libharfbuzz.so
+lnk:lib/libharfbuzz.so.0
+lib:lib/libharfbuzz.so.0.20704.0
+lnk:lib/libharfbuzz-subset.so
+lnk:lib/libharfbuzz-subset.so.0
+lib:lib/libharfbuzz-subset.so.0.20704.0

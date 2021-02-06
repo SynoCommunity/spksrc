@@ -1,0 +1,123 @@
+From 09c90e4cfb602b9a247a8a256923bdbddaf2ed9b Mon Sep 17 00:00:00 2001
+From: Slawomir Pawlowski <slawomir.pawlowski@intel.com>
+Date: Fri, 18 Dec 2020 16:47:20 +0100
+Subject: [PATCH] Fix C only build
+
+---
+ CMakeLists.txt                            | 5 ++++-
+ Source/Lib/Common/Codec/common_dsp_rtcd.c | 5 ++++-
+ Source/Lib/Common/Codec/common_dsp_rtcd.h | 2 ++
+ Source/Lib/Decoder/CMakeLists.txt         | 5 ++++-
+ Source/Lib/Encoder/CMakeLists.txt         | 5 ++++-
+ Source/Lib/Encoder/Codec/firstpass.c      | 2 +-
+ 6 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git CMakeLists.txt CMakeLists.txt
+index 8baff740..efdd7385 100644
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -302,6 +302,9 @@ if(BUILD_TESTING)
+ endif()
+ 
+ add_subdirectory(third_party/fastfeat)
+-add_subdirectory(third_party/cpuinfo)
++
++if(NOT COMPILE_C_ONLY AND HAVE_X86_PLATFORM)
++    add_subdirectory(third_party/cpuinfo)
++endif()
+ 
+ install(DIRECTORY ${PROJECT_SOURCE_DIR}/Source/API/ DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}/svt-av1" FILES_MATCHING PATTERN "*.h")
+diff --git Source/Lib/Common/Codec/common_dsp_rtcd.c Source/Lib/Common/Codec/common_dsp_rtcd.c
+index e24f99f6..c09f088b 100644
+--- Source/Lib/Common/Codec/common_dsp_rtcd.c
++++ Source/Lib/Common/Codec/common_dsp_rtcd.c
+@@ -17,8 +17,10 @@
+ #include "EbPackUnPack_C.h"
+ #include "EbAvcStyleMcp.h"
+ 
++#ifdef ARCH_X86_64
+ // for get_cpu_flags
+ #include "cpuinfo.h"
++#endif
+ 
+ /*
+  * DSP deprecated flags
+@@ -69,7 +71,7 @@ int64_t svt_av1_block_error_c(const TranLow *coeff, const TranLow *dqcoeff,
+ /**************************************
+  * Instruction Set Support
+  **************************************/
+-
++#ifdef ARCH_X86_64
+ CPU_FLAGS get_cpu_flags() {
+     CPU_FLAGS flags = 0;
+ 
+@@ -105,6 +107,7 @@ CPU_FLAGS get_cpu_flags_to_use() {
+ #endif
+     return flags;
+ }
++#endif /*ARCH_X86_64*/
+ 
+ #ifdef ARCH_X86_64
+ #ifndef NON_AVX512_SUPPORT
+diff --git Source/Lib/Common/Codec/common_dsp_rtcd.h Source/Lib/Common/Codec/common_dsp_rtcd.h
+index b76882b0..f67243f3 100644
+--- Source/Lib/Common/Codec/common_dsp_rtcd.h
++++ Source/Lib/Common/Codec/common_dsp_rtcd.h
+@@ -67,8 +67,10 @@ extern "C" {
+ #endif
+ 
+     // Helper Functions
++#ifdef ARCH_X86_64
+     CPU_FLAGS get_cpu_flags();
+     CPU_FLAGS get_cpu_flags_to_use();
++#endif
+     void setup_common_rtcd_internal(CPU_FLAGS flags);
+     void svt_aom_blend_a64_vmask_c(uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h);
+     RTCD_EXTERN void(*svt_aom_blend_a64_vmask)(uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h);
+diff --git Source/Lib/Decoder/CMakeLists.txt Source/Lib/Decoder/CMakeLists.txt
+index c8ffc576..c71c4da0 100644
+--- Source/Lib/Decoder/CMakeLists.txt
++++ Source/Lib/Decoder/CMakeLists.txt
+@@ -99,7 +99,9 @@ set_target_properties(SvtAv1Dec PROPERTI
+ set_target_properties(SvtAv1Dec PROPERTIES SOVERSION ${DEC_VERSION_MAJOR})
+ add_dependencies(SvtAv1Dec EbVersionHeaderGen)
+ target_link_libraries(SvtAv1Dec PUBLIC ${PLATFORM_LIBS})
+-target_link_libraries(SvtAv1Dec PRIVATE cpuinfo_public)
++if(NOT COMPILE_C_ONLY AND HAVE_X86_PLATFORM)
++    target_link_libraries(SvtAv1Dec PRIVATE cpuinfo_public)
++endif()
+ install(TARGETS SvtAv1Dec DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+ configure_file(pkg-config.pc.in ${CMAKE_BINARY_DIR}/SvtAv1Dec.pc @ONLY)
+diff --git Source/Lib/Encoder/CMakeLists.txt Source/Lib/Encoder/CMakeLists.txt
+index 936592e1..ab310dce 100644
+--- Source/Lib/Encoder/CMakeLists.txt
++++ Source/Lib/Encoder/CMakeLists.txt
+@@ -130,7 +130,9 @@ endif()
+ set_target_properties(SvtAv1Enc PROPERTIES VERSION ${ENC_VERSION})
+ set_target_properties(SvtAv1Enc PROPERTIES SOVERSION ${ENC_VERSION_MAJOR})
+ target_link_libraries(SvtAv1Enc PUBLIC ${PLATFORM_LIBS})
+-target_link_libraries(SvtAv1Enc PRIVATE cpuinfo_public)
++if(NOT COMPILE_C_ONLY AND HAVE_X86_PLATFORM)
++    target_link_libraries(SvtAv1Enc PRIVATE cpuinfo_public)
++endif()
+ install(TARGETS SvtAv1Enc DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+ configure_file(pkg-config.pc.in ${CMAKE_BINARY_DIR}/SvtAv1Enc.pc @ONLY)
+diff --git Source/Lib/Encoder/Codec/firstpass.c Source/Lib/Encoder/Codec/firstpass.c
+index feb7a1fa..80b7dd05 100644
+--- Source/Lib/Encoder/Codec/firstpass.c
++++ Source/Lib/Encoder/Codec/firstpass.c
+@@ -1189,8 +1189,8 @@ static void first_pass_setup_me_context(MotionEstimationContext_t *context_ptr,
+     // set search method
+     context_ptr->me_context_ptr->hme_search_method = SUB_SAD_SEARCH;
+ 
+-    uint8_t *src_ptr = &(input_picture_ptr->buffer_y[buffer_index]);
+ #ifdef ARCH_X86_64
++    uint8_t *src_ptr = &(input_picture_ptr->buffer_y[buffer_index]);
+     //_MM_HINT_T0     //_MM_HINT_T1    //_MM_HINT_T2    //_MM_HINT_NTA
+     uint32_t i;
+     for (i = 0; i < sb_height; i++) {
+-- 
+2.20.1
+

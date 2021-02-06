@@ -5,13 +5,14 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame cross/libass
+DEPENDS = cross/flac cross/freetype cross/fribidi cross/lame
 DEPENDS += cross/libbluray cross/speex
 DEPENDS += cross/libtheora
 DEPENDS += cross/gnutls cross/opus
 DEPENDS += cross/soxr cross/x264 cross/x265
 DEPENDS += cross/opencore-amr
 
+OPTIONAL_DEPENDS = cross/libass
 OPTIONAL_DEPENDS = cross/libaom cross/svt-av1 native/nasm cross/json-c
 OPTIONAL_DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk cross/svt-hevc
 OPTIONAL_DEPENDS += cross/shine cross/libvpx
@@ -29,7 +30,7 @@ CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
-CONFIGURE_ARGS += --enable-fontconfig --enable-libass --enable-libbluray --enable-avresample
+CONFIGURE_ARGS += --enable-fontconfig --enable-libbluray --enable-avresample
 CONFIGURE_ARGS += --enable-libfreetype --enable-libfribidi --enable-libmp3lame
 CONFIGURE_ARGS += --enable-libopus --enable-libsoxr
 CONFIGURE_ARGS += --enable-libtheora --enable-libvorbis
@@ -78,6 +79,12 @@ include ../../mk/spksrc.cross-cc.mk
 ifneq ($(findstring $(TCVERSION), 5.2),$(TCVERSION))
 DEPENDS += cross/libvpx cross/libzmq
 CONFIGURE_ARGS += --enable-libvpx --enable-libzmq
+
+# Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/libass
+CONFIGURE_ARGS += --enable-libass
+endif
 
 ifneq ($(findstring $(ARCH), ppc853x),$(ARCH))
 DEPENDS += cross/shine
