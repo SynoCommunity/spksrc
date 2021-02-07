@@ -14,7 +14,7 @@
             "defaultValue": false
         },
         {
-            "key": "cdc-acm",
+            "key": "cdc_acm",
             "desc": "CDC-ACM - Communication Device Class Abstract Control Model (cdc-acm.ko)",
             "defaultValue": false
         },
