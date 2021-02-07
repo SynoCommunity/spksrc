@@ -1,8 +1,8 @@
 SPK_NAME = synokernel-usbserial
 SPK_VERS = 1.0
 SPK_REV = 1
-SPK_ICON = src/usb.png
-CHANGELOG = "1. Kernel USB serial drivers, including HGI80 and usbserial.ko"
+SPK_ICON = src/synokernel-usbserial.png
+CHANGELOG = "1. Kernel USB serial drivers"
 
 DEPENDS = 
 
@@ -41,3 +41,5 @@ include ../../mk/spksrc.spk.mk
 usbserial_extra_install:
 	install -m 755 -d $(STAGING_DIR)/rules.d
 	install -m 644 src/60-$(SPK_NAME).rules $(STAGING_DIR)/rules.d/60-$(SPK_NAME).rules
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/synokernel-usbserial.cfg $(STAGING_DIR)/etc/synokernel-usbserial.cfg
