@@ -1,7 +1,7 @@
 PKG_NAME = Lidarr
-PKG_VERS = 0.7.1.1381
+PKG_VERS = 0.8.0.2042
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).linux.$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Lidarr/Lidarr/releases/download/v$(PKG_VERS)
 PKG_DIR = Lidarr
 
