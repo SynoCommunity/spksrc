@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = R16B03-1
+PKG_VERS = 23.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = otp_src_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://erlang.org/download/
@@ -18,7 +18,8 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: erlang_configure
 erlang_configure:
-	$(RUN) ./configure --prefix=$(INSTALL_DIR)$(INSTALL_PREFIX)
+	$(RUN) ./otp_build autoconf
+	$(RUN) ./configure --prefix=$(INSTALL_DIR)$(INSTALL_PREFIX) CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 .PHONY: erlang_install
 erlang_install:

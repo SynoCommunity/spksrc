@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = R16B03-1
+PKG_VERS = 23.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = otp_src_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.erlang.org/download/
@@ -14,7 +14,7 @@ LICENSE  = Erlang Public License
 include ../../mk/spksrc.archs.mk
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX) erl_xcomp_sysroot=$(INSTALL_DIR)
+CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX) erl_xcomp_sysroot=$(INSTALL_DIR) CFLAGS="-O2 -g -D_GNU_SOURCE"
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-smp-require-native-atomics
 endif
