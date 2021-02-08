@@ -1,9 +1,9 @@
 SPK_NAME = wireguard
-SPK_VERS = 0.0.20190406
-SPK_REV = 0
+SPK_VERS = 1.0.20200827
+SPK_REV = 1
 SPK_ICON = src/wireguard.png
 
-DEPENDS = cross/bash cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME) cross/$(SPK_NAME)-tools
 UNSUPPORTED_ARCHES = $(PPC_ARCHES)
 
 MAINTAINER = publicarray
