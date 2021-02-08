@@ -7,10 +7,17 @@
 UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
 
 DOTNET_OS = linux
+DOTNET_DEFAULT_VERSION = 3.1
 
+ifeq ($(strip $(DOTNET_VERSION)),)
+	DOTNET_VERSION=$(DOTNET_DEFAULT_VERSION)
+endif
 
 ifeq ($(strip $(DOTNET_FRAMEWORK)),)
-	DOTNET_FRAMEWORK=netcoreapp3.1
+	DOTNET_FRAMEWORK=net$(DOTNET_VERSION)
+	ifeq ($(call version_lt, $(DOTNET_VERSION), 5.0),1)
+		DOTNET_FRAMEWORK=netcoreapp$(DOTNET_VERSION)
+	endif
 endif
 DOTNET_BUILD_ARGS += -f $(DOTNET_FRAMEWORK)
 
@@ -34,13 +41,13 @@ endif
 
 ifeq ($(strip $(DOTNET_ROOT)),)
 	# dotnet sdk path
-	DOTNET_ROOT=$(WORK_DIR)/../../../native/dotnet-sdk-3.1/work-native
+	DOTNET_ROOT=$(WORK_DIR)/../../../native/dotnet-sdk-$(DOTNET_VERSION)/work-native
 endif
 
 ifeq ($(strip $(DOTNET_ROOT_X86)),)
 	# dotnet sdk-32bit path
 	DOTNET_ROOT_X86=""
-	# DOTNET_ROOT_X86=$(WORK_DIR)/../../../native/dotnet-x86-sdk-3.1/work-native
+	# DOTNET_ROOT_X86=$(WORK_DIR)/../../../native/dotnet-x86-sdk-$(DOTNET_VERSION)/work-native
 endif
 
 
