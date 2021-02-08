@@ -14,7 +14,7 @@ DOTNET_VERSION=3.1
 BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
 
 DOTNET_OPTIMIZE=1
-DOTNET_SINGLE_FILE=1
+DOTNET_OUTPUT_PATH=share
 DOTNET_PACKAGE_NAME=Jellyfin.Server
 
 include ../../mk/spksrc.cross-dotnet.mk
