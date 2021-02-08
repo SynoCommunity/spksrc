@@ -10,11 +10,11 @@ HOMEPAGE = https://jellyfin.org
 COMMENT  = The Free Software Media System. It is an alternative to the proprietary Emby and Plex.
 LICENSE  = GPLv2
 
-
-BUILD_DEPENDS = native/dotnet-sdk-3.1
+DOTNET_VERSION=3.1
+BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
 
 DOTNET_OPTIMIZE=1
-DOTNET_SELF_CONTAINED=1
+DOTNET_SINGLE_FILE=1
 DOTNET_PACKAGE_NAME=Jellyfin.Server
 
 include ../../mk/spksrc.cross-dotnet.mk
