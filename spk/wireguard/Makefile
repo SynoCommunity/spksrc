@@ -12,9 +12,12 @@ DISPLAY_NAME = WireGuard
 HELPURL = https://www.wireguard.com
 LICENSE = GPLv2
 
-FWPORTS = src/${SPK_NAME}.sc
+FWPORTS = src/$(SPK_NAME).sc
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_USER = auto
 STARTABLE = yes
+
+SPK_COMMANDS += /bin/wg
+SPK_COMMANDS += /bin/wg-quick
 
 include ../../mk/spksrc.spk.mk

@@ -6,7 +6,7 @@ INTERFACE=eth0
 
 config() {
     # if the config does not exist make one
-    if [ ! -f "/var/packages/${SYNOPKG_PKGNAME}/target/var/wg0.conf" ]; then
+    if [ ! -f "${SYNOPKG_PKGDEST}/var/wg0.conf" ]; then
         echo "Creating config file" >> "${LOG_FILE}" 2>&1
         DDNS=$(grep -m 1 hostname= /etc/ddns.conf | cut -d = -f 2)
         if [ -z "$DDNS" ]; then
@@ -15,7 +15,7 @@ config() {
         echo "Endpoint = $DDNS" >> "${LOG_FILE}" 2>&1
         server_privkey=$(wg genkey)
         client_privkey=$(wg genkey)
-cat<<EOF > "/var/packages/${SYNOPKG_PKGNAME}/target/var/wg0.conf"
+cat<<EOF > "${SYNOPKG_PKGDEST}/var/wg0.conf"
 # NOTICE - Work in Progress
 # WireGuard is not yet complete. You should not rely on this code.
 # It has not undergone proper degrees of security auditing and the protocol
@@ -57,44 +57,38 @@ AllowedIPs = 172.23.0.2/32 # select a unique ip inside of $NETWORK
 ## # Optional
 ## # MTU = 1432
 EOF
+        echo "$server_privkey" | wg pubkey > "${SYNOPKG_PKGDEST}/var/publickey"
         # Allow synoedit to edit these files
-        echo "$server_privkey" | wg pubkey > "/var/packages/${SYNOPKG_PKGNAME}/target/var/publickey"
-        chmod 775 "/var/packages/${SYNOPKG_PKGNAME}/target/var/" >> "${LOG_FILE}" 2>&1
-        chown :system "/var/packages/${SYNOPKG_PKGNAME}/target/var/" >> "${LOG_FILE}" 2>&1
+        # chmod 775 "${SYNOPKG_PKGDEST}/var/" >> "${LOG_FILE}" 2>&1
+        # chown :system "${SYNOPKG_PKGDEST}/var/" >> "${LOG_FILE}" 2>&1
     fi
 }
 
 service_postinst () {
-    # Link binaries into the PATH
-    mkdir -p /usr/local/bin "/var/packages/${SYNOPKG_PKGNAME}/target/etc/" >> "${INST_LOG}" 2>&1
-    ln -fs "/var/packages/${SYNOPKG_PKGNAME}/target/bin/wg" /usr/local/bin/wg >> "${INST_LOG}" 2>&1
-    ln -fs "/var/packages/${SYNOPKG_PKGNAME}/target/bin/wg-quick" /usr/local/bin/wg-quick >> "${INST_LOG}" 2>&1
+    mkdir -p "${SYNOPKG_PKGDEST}/etc/" >> "${INST_LOG}" 2>&1
     # load kernel module and verify that is is loaded
-    insmod "/var/packages/${SYNOPKG_PKGNAME}/target/wireguard.ko" >> "${INST_LOG}" 2>&1
-    lsmod | grep wireguard >> "${INST_LOG}" 2>&1
+    insmod "${SYNOPKG_PKGDEST}/wireguard.ko" >> "${INST_LOG}" 2>&1
+    lsmod | grep ^wireguard >> "${INST_LOG}" 2>&1
 
-    if [ -x "/bin/bash" ]; then
-        # change shebang to packaged bash
-        sed -i 's/#!\/bin\/bash/#!\/var\/packages\/wireguard\/target\/bin\/bash/' /usr/local/bin/wg-quick
-    fi
+    # if [ -x "/bin/bash" ]; then
+    #     # change shebang to packaged bash
+    #     sed -i 's/#!\/bin\/bash/#!\/var\/packages\/wireguard\/target\/bin\/bash/' /usr/local/bin/wg-quick
+    # fi
 
 }
 
 service_prestart() {
     echo "service_prestart" >> "${LOG_FILE}" 2>&1
     config
-    wg-quick up "/var/packages/${SYNOPKG_PKGNAME}/target/var/wg0.conf" >> "${LOG_FILE}" 2>&1
+    wg-quick up "${SYNOPKG_PKGDEST}/var/wg0.conf" >> "${LOG_FILE}" 2>&1
 }
 service_poststop () {
     echo "service_poststop" >> "${LOG_FILE}" 2>&1
-    wg-quick down "/var/packages/${SYNOPKG_PKGNAME}/target/var/wg0.conf" >> "${LOG_FILE}" 2>&1
-    chmod 744 "/var/packages/${SYNOPKG_PKGNAME}/target/var/wg0.conf"  >> "${LOG_FILE}" 2>&1
+    wg-quick down "${SYNOPKG_PKGDEST}/var/wg0.conf" >> "${LOG_FILE}" 2>&1
+    chmod 744 "${SYNOPKG_PKGDEST}/var/wg0.conf"  >> "${LOG_FILE}" 2>&1
 }
 
 service_postuninst () {
-    # Remove link
-    rm -f /usr/local/bin/wg
-    rm -f /usr/local/bin/wg-quick
     # remove interface
     ip link del wg0 2>/dev/null || true
 }
