@@ -11,7 +11,7 @@ DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps 
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 STARTABLE = yes
-CHANGELOG = "Compile using .NET Core"
+CHANGELOG = "Update Jackett 17.474 and compile using .NET"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
 
@@ -30,17 +30,10 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # Mono build for unsupported .NET archs
 include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS = cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
-endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-DEPENDS = cross/$(SPK_NAME)-mono
-SERVICE_SETUP = src/service-setup-mono.sh
-endif
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS = cross/$(SPK_NAME)-mono
-SERVICE_SETUP = src/service-setup-mono.sh
+CHANGELOG = "Update Jackett 17.474 and fix mono build (88f6281 and 88f6282)"
 endif
 
 POST_STRIP_TARGET = jackett_extra_install
