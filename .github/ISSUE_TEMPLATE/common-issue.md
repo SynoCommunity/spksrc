@@ -1,6 +1,6 @@
 ---
 name: Common issue
-about: Describe this issue template's purpose here.
+about: Issue not related to any package.
 title: ''
 labels: ''
 assignees: ''
