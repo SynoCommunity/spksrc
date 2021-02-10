@@ -33,12 +33,6 @@ service_postinst ()
         FONT_NAME=`basename "${FONT_FILE}"`
         $LN "${FONTS_DIR}/${FONT_NAME}" "${CONFD_DIR}/${FONT_NAME}" >> ${INST_LOG}
     done
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 service_preupgrade ()
@@ -108,7 +102,7 @@ service_postupgrade ()
         TRUNC_DIR=$(echo "$(realpath ${DVR_DIR})" | awk -F/ '{print "/"$3}')
         if [ "${TRUNC_DIR}" = "/@appstore" ]; then
             echo "Skip: ${DVR_DIR} (system directory)" >> ${INST_LOG}
-        else
+        elif [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
             echo "Done: ${DVR_DIR}" >> ${INST_LOG}
             set_syno_permissions "${DVR_DIR}" "${GROUP}"
         fi
@@ -119,7 +113,7 @@ service_postupgrade ()
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
         synoacltool -del "${SYNOPKG_PKGDEST}" >> ${INST_LOG} 2>&1
         chown ${EFF_USER}:root "/var/packages/tvheadend" >> ${INST_LOG} 2>&1
-    else
+    elif [ $SYNOPKG_DSM_VERSION_MAJOR == 6 ]; then
         chown ${EFF_USER}:${USER} "/var/packages/tvheadend/target" >> ${INST_LOG} 2>&1
         set_unix_permissions "${SYNOPKG_PKGVAR}"
     fi
