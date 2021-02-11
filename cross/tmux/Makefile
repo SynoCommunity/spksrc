@@ -1,5 +1,5 @@
 PKG_NAME = tmux
-PKG_VERS = 2.9a
+PKG_VERS = 3.1c
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/$(PKG_NAME)/$(PKG_NAME)/releases/download/$(PKG_VERS)
