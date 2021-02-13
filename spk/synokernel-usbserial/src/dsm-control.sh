@@ -3,18 +3,45 @@
 # Package
 PACKAGE="synokernel-usbserial"
 
+# Configs
+CFG=/var/packages/${PACKAGE}/target/etc/${PACKAGE}.cfg
+INI=/var/packages/${PACKAGE}/target/etc/${PACKAGE}.ini
+
 # Others
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${PACKAGE} -a"
 UDEV_RULE=60-${PACKAGE}.rules
 
-KO="usb/serial/usbserial.ko \
-    usb/serial/ftdi_sio.ko \
-    usb/serial/cp210x.ko \
-    usb/serial/pl2303.ko \
-    usb/serial/ch341.ko \
-    usb/serial/ti_usb_3410_5052.ko"
+# Load kernel objects values
+if [ -f ${CFG} ]; then
+   . ${CFG}
+else
+   echo "Configuration file not found! [${CFG}]" 1>&2
+   exit 1
+fi
+
+# First assign default modules
+if [ "${default}" ]; then
+   KO=${default}
+else
+   echo "Undifined default kernel modules! [default:${CFG}]" 1>&2
+   exit 1
+fi
+
+# Add all modules set to true
+if [ -f ${INI} ]; then
+   for module in $(cat ${INI}); do
+      ko="${module%%=*}"
+	  [ "${module#*=}" = "true" -a ! "${module%%=*}" = "default" ] && KO="${KO} ${!ko}"
+   done
+fi
+
+# Ensure KO is not empty
+if [ ! "${KO}" ]; then
+   echo "No kernel modules enabled in configuration! [${INI}]" 1>&2
+   exit 1
+fi
 
 case $1 in
     start)
