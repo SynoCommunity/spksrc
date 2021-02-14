@@ -1,19 +1,17 @@
 SPK_NAME = jackett
-SPK_VERS = 0.16.1340
+SPK_VERS = 0.17.474
 SPK_REV = 12
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/curl cross/$(SPK_NAME)
-# depend on mono 5.4 for BTLS HttpWebClient support
-SPK_DEPENDS = "mono>=5.4"
+DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = m4tt075
+MAINTAINER = SynoCommunity
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 STARTABLE = yes
-CHANGELOG = "Add workaround for mono bug with armv5/88f6281"
+CHANGELOG = "Update Jackett 17.474 and compile using .NET"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
 
@@ -28,14 +26,17 @@ SERVICE_PORT_TITLE = Jackett(HTTP)
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
-POST_STRIP_TARGET = jackett_extra_install
-
-REQUIRED_DSM = 5.0
-# no PPC support for mono, see cross/mono/Makefile for details
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-BUSYBOX_CONFIG = usrmng daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# Mono build for unsupported .NET archs
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS = cross/$(SPK_NAME)-mono
+SERVICE_SETUP = src/service-setup-mono.sh
+CHANGELOG = "Update Jackett 17.474 and fix mono build (88f6281 and 88f6282)"
+endif
+
+POST_STRIP_TARGET = jackett_extra_install
 
 include ../../mk/spksrc.spk.mk
 
@@ -44,5 +45,3 @@ jackett_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/.config
 	install -m 755 -d $(STAGING_DIR)/var/.config/Jackett
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
