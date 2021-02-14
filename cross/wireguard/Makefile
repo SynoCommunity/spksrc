@@ -5,6 +5,8 @@ PKG_DIST_SITE = https://git.zx2c4.com/wireguard-linux-compat/snapshot
 PKG_DIST_NAME = wireguard-linux-compat-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR =  wireguard-linux-compat-$(PKG_VERS)
 
+DEPENDS = cross/libmnl
+
 REQUIRE_KERNEL = 1
 
 HOMEPAGE = https://www.wireguard.com

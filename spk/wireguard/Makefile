@@ -13,9 +13,11 @@ HELPURL = https://www.wireguard.com
 LICENSE = GPLv2
 
 FWPORTS = src/$(SPK_NAME).sc
-SERVICE_SETUP = src/service-setup.sh
-SERVICE_USER = auto
+
+SSS_SCRIPT = src/start-stop-status.sh
+INSTALLER_SCRIPT = src/install.sh
 STARTABLE = yes
+SERVICE_USER = auto
 
 SPK_COMMANDS += /bin/wg
 SPK_COMMANDS += /bin/wg-quick
