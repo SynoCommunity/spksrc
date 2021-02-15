@@ -89,9 +89,9 @@ endif
 	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
 	$(RUN) cp $(KERNEL_CONFIG) .config
 	@$(MSG) "Set any new symbols to their default value"
-# olddefconfig is not available <= 3.2
-ifeq ($(shell printf '%s\n' "$(TC_KERNEL)" "3.3" | sort -V | head -1),$(TC_KERNEL))
-	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) <= 3.2"
+# olddefconfig is not available < 3.5
+ifeq ($(shell printf '%s\n' "$(TC_KERNEL)" "3.5" | sort -V | head -1),$(TC_KERNEL))
+	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) <= 3.4"
 	$(RUN) yes "" | $(MAKE) oldconfig
 else
 	$(RUN) $(MAKE) olddefconfig
@@ -120,7 +120,7 @@ kernel_module_compile_target:
 
 kernel_module_build:
 	@$(MSG) Building kernel module module=$(module)
-	$(RUN) $(MAKE) -C $(WORK_DIR)/linux INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
+	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/linux INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
 ifeq ($(shell expr "$(word 1,$(subst ., ,$(TC_KERNEL)))" \>= 4),1)
 	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/$(word 2,$(subst :, ,$(module)))
 else
