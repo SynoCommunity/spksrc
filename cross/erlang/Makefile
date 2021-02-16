@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 22.3.4.13
+PKG_VERS = 23.2.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.erlang.org/download/
@@ -20,20 +20,19 @@ GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = erlang_pre_configure
 INSTALL_TARGET = erlang_install
 
-CONFIGURE_ARGS = --without-javac
+CONFIGURE_ARGS  = --without-javac
 CONFIGURE_ARGS += --without-jinterface
 CONFIGURE_ARGS += --without-odbc
 CONFIGURE_ARGS += --enable-dynamic-ssl-lib 
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
+CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: erlang_pre_configure
 erlang_pre_configure:
 	$(RUN) ./otp_build autoconf
-
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: erlang_pre_configure
 erlang_pre_configure:

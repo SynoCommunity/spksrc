@@ -1,5 +1,5 @@
 SPK_NAME = ejabberd
-SPK_VERS = 20.12
+SPK_VERS = 21.01
 SPK_REV = 2
 SPK_ICON = src/ejabberd.png
 DSM_UI_DIR = app

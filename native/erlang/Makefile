@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 22.3.4.13
+PKG_VERS = 23.2.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -17,11 +17,12 @@ CONFIGURE_TARGET = erlang_configure
 COMPILE_TARGET = erlang_compile
 INSTALL_TARGET = erlang_install
 
-CONFIGURE_ARGS += -without-javac
+CONFIGURE_ARGS  = --without-javac
 CONFIGURE_ARGS += --without-jinterface
 CONFIGURE_ARGS += --without-odbc
 CONFIGURE_ARGS += --enable-dynamic-ssl-lib
 CONFIGURE_ARGS += --prefix=$(INSTALL_DIR)$(INSTALL_PREFIX)
+CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
 include ../../mk/spksrc.native-cc.mk
 

@@ -1,5 +1,5 @@
 PKG_NAME = ejabberd
-PKG_VERS = 20.12
+PKG_VERS = 21.01
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://static.process-one.net/ejabberd/downloads/$(PKG_VERS)
