@@ -1,8 +1,8 @@
 PKG_NAME = rabbitmq-server
-PKG_VERS = 3.7.15
+PKG_VERS = 3.8.12
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.15/
+PKG_DIST_SITE = https://github.com/rabbitmq/rabbitmq-server/releases/download/v$(PKG_VERS)/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/elixir

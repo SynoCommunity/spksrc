@@ -1,5 +1,5 @@
 PKG_NAME = elixir
-PKG_VERS = 1.8.2
+PKG_VERS = 1.11.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/elixir-lang/elixir/archive

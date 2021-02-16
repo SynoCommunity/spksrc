@@ -1,6 +1,6 @@
 SPK_NAME = rabbitmq-server
-SPK_VERS = 3.7.15
-SPK_REV = 2
+SPK_VERS = 3.8.12
+SPK_REV = 3
 SPK_ICON = src/rabbitmq.png
 
 DEPENDS = cross/$(SPK_NAME)
