@@ -5,6 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.15/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+BUILD_DEPENDS = native/elixir
+
 DEPENDS = 
 
 HOMEPAGE = https://www.rabbitmq.com
