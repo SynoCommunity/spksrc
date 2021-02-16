@@ -27,5 +27,6 @@ myConfigure:
 
 .PHONY: myInstall
 myInstall:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR) 
+#	$(RUN) make install DESTDIR=$(INSTALL_DIR) 
+	$(RUN) DESTDIR=$(INSTALL_DIR) $(MAKE) install PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
 

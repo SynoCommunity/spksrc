@@ -5,23 +5,26 @@ PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/elixir-lang/elixir/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS = native/erlang
 
 HOMEPAGE = https://elixir-lang.org
 COMMENT  = Elixir is a dynamic, functional language designed for building scalable and maintainable applications. Elixir leverages the Erlang VM, known for running low-latency, distributed and fault-tolerant systems, while also being successfully used in web development and the embedded software domain.
 
 LICENSE = Apache License
 
-CONFIGURE_TARGET = elixir_configure
+ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
+
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = elixir_compile
 INSTALL_TARGET = elixir_install
 
 include ../../mk/spksrc.native-cc.mk
 
-.PHONY: elixir_configure
-elixir_configure:
-	$(RUN) echo "No configure needed"
+.PHONY: elixir_compile
+elixir_compile:
+	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) $(MAKE_COMPILE_OPTIONS)
 
 .PHONY: elixir_install
 elixir_install:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
+	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) install
 
