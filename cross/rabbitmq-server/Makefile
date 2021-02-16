@@ -18,17 +18,12 @@ include ../../mk/spksrc.archs.mk
 # Build is requiring native for erlang and elixir
 ENV += PATH=$(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/elixir/work-native/install/usr/local/bin:$$PATH
 
-CONFIGURE_TARGET = myConfigure
-INSTALL_TARGET = myInstall
+CONFIGURE_TARGET = nop
+INSTALL_TARGET = rabbitmq_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myConfigure
-myConfigure:
-	$(RUN) echo "No configure needed"
-
-.PHONY: myInstall
-myInstall:
-#	$(RUN) make install DESTDIR=$(INSTALL_DIR) 
+.PHONY: rabbitmq_install
+rabbitmq_install:
 	$(RUN) DESTDIR=$(INSTALL_DIR) $(MAKE) install PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
 
