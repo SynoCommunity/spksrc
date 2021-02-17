@@ -1,6 +1,6 @@
 SPK_NAME = erlang
 SPK_VERS = 23.2
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/erlang.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -13,6 +13,8 @@ DISPLAY_NAME = Erlang
 
 HOMEPAGE   = http://www.erlang.org
 LICENSE    = MPL
+
+SPK_LINKS = /usr/local/bin/erl:bin/erl /usr/local/bin/erlc:bin/erlc
 
 INSTALLER_SCRIPT = src/installer.sh
 
