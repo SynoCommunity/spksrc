@@ -6,29 +6,29 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+BUILD_DEPENDS = native/$(PKG_NAME)
+
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
-# required for uuid module to be available
+# required for uuid module
 DEPENDS += cross/libuuid
-# required because libffi is no longer bundled with python
+# libffi is no longer bundled with python
 DEPENDS += cross/libffi
-DEPENDS += native/$(PKG_NAME)
 
 HOMEPAGE = https://www.python.org/
 COMMENT  = Python Programming Language
 LICENSE  = PSF
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 
+ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
+
 POST_PATCH_TARGET = python38_post_patch
 PRE_CONFIGURE_TARGET = python38_pre_configure
-COMPILE_TARGET = python38_custom_compile
-INSTALL_TARGET = python38_custom_install
+COMPILE_TARGET = python38_compile
+INSTALL_TARGET = python38_install
 POST_INSTALL_TARGET = python38_post_install
-
-PLIST_TRANSFORM = sed -e 's%@PKG_SHORT_VERS@%$(PKG_VERS_MAJOR_MINOR)%'
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -70,12 +70,12 @@ python38_pre_configure:
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(STAGING_INSTALL_PREFIX)/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(STAGING_INSTALL_PREFIX)/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
-.PHONY: python38_custom_compile
-python38_custom_compile:
+.PHONY: python38_compile
+python38_compile:
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE)
 
-.PHONY: python38_custom_install
-python38_custom_install:
+.PHONY: python38_install
+python38_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
