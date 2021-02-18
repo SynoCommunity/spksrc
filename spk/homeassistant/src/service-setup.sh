@@ -2,7 +2,7 @@
 # - installer
 # - start-stop-status
 
-PYTHON_DIR="/usr/local/python3"
+PYTHON_DIR="/var/packages/python38/target"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
 
