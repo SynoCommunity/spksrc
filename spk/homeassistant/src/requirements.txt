@@ -1975,7 +1975,8 @@ python-wink==1.10.5
 
 # homeassistant.components.tradfri
 pytradfri[async]==7.0.6
-aiocoap==0.4b3
+aiocoap==0.4.1
+#DTLSSocket==0.1.12       # cross-compiled wheel
 
 # homeassistant.components.trafikverket_train
 # homeassistant.components.trafikverket_weatherstation

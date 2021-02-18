@@ -16,6 +16,8 @@ DEPENDS += cross/numpy
 DEPENDS += cross/nmap
 # for mobile_app
 DEPENDS += cross/PyNaCl
+# for tradfri
+DEPENDS += cross/dtlssocket
 
 WHEELS = src/requirements.txt
 
