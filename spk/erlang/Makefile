@@ -14,7 +14,7 @@ DISPLAY_NAME = Erlang
 HOMEPAGE   = http://www.erlang.org
 LICENSE    = MPL
 
-SPK_LINKS = /usr/local/bin/erl:bin/erl /usr/local/bin/erlc:bin/erlc
+SPK_COMMANDS = bin/erl bin/erlc
 
 INSTALLER_SCRIPT = src/installer.sh
 

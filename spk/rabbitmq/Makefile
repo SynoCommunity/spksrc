@@ -1,4 +1,4 @@
-SPK_NAME = rabbitmq-server
+SPK_NAME = rabbitmq
 SPK_VERS = 3.8.12
 SPK_REV = 3
 SPK_ICON = src/rabbitmq.png
@@ -10,7 +10,7 @@ SPK_DEPENDS = "erlang"
 MAINTAINER = DigitalBox98
 DESCRIPTION = RabbitMQ is one of the most popular open source message brokers. From T-Mobile to Runtastic, RabbitMQ is used worldwide at small startups and large enterprises. RabbitMQ is lightweight and easy to deploy on premises and in the cloud. It supports multiple messaging protocols. RabbitMQ can be deployed in distributed and federated configurations to meet high-scale, high-availability requirements.
 
-DISPLAY_NAME = RabbitMQ Server
+DISPLAY_NAME = RabbitMQ
 
 HOMEPAGE   = https://www.rabbitmq.com
 LICENSE    = MPL 2.0
@@ -21,7 +21,7 @@ STARTABLE      = yes
 
 # Service configuration
 SERVICE_PORT = 15672
-SERVICE_PORT_TITLE = RabbitMQ Server(HTTP)
+SERVICE_PORT_TITLE = RabbitMQ(HTTP)
 
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
@@ -41,9 +41,9 @@ rabbitmq_extra_install:
 	install -m 755 -d ${STAGING_DIR}/etc/var/lib/rabbitmq/mnesia
 	# RabbitMQ Config
 	echo "loopback_users.guest = false \n" > ${STAGING_DIR}/etc/rabbitmq/rabbitmq.conf
-	echo "log.dir = /var/packages/rabbitmq-server/var/" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq.conf
+	echo "log.dir = /var/packages/rabbitmq/var/" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq.conf
 	# RabbitMQ ENV variables
 	echo "RABBITMQ_CONFIG_FILE=${INSTALL_PREFIX}/etc/rabbitmq/rabbitmq.conf" > ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
 	echo "RABBITMQ_MNESIA_BASE=${INSTALL_PREFIX}/etc/var/lib/rabbitmq/mnesia" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
-	echo "RABBITMQ_LOG_BASE=/var/packages/rabbitmq-server/var" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
+	echo "RABBITMQ_LOG_BASE=/var/packages/rabbitmq/var" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
 	echo "RABBITMQ_ENABLED_PLUGINS_FILE=${INSTALL_PREFIX}/etc/rabbitmq/enabled_plugins" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf

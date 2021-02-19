@@ -4,8 +4,8 @@
  ##  Copyright (c) 2007-2021 VMware, Inc. or its affiliates.  All rights reserved.
  ##
 
-+export HOME=/var/packages/rabbitmq-server/home
-+export RABBITMQ_HOME=/var/packages/rabbitmq-server/target
++export HOME=/var/packages/rabbitmq/home
++export RABBITMQ_HOME=/var/packages/rabbitmq/target
 +export RABBITMQ_CONF_ENV_FILE=${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq-env.conf
 +
  set -e
