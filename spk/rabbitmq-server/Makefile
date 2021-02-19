@@ -12,12 +12,12 @@ DESCRIPTION = RabbitMQ is one of the most popular open source message brokers. F
 
 DISPLAY_NAME = RabbitMQ Server
 
-HOMEPAGE   = http://www.rabbitmq.com
-LICENSE    = MPL
+HOMEPAGE   = https://www.rabbitmq.com
+LICENSE    = MPL 2.0
 
-SERVICE_USER         = auto
-SERVICE_SETUP        = src/service-setup.sh
-STARTABLE            = yes
+SERVICE_USER	= auto
+SERVICE_SETUP 	= src/service-setup.sh
+STARTABLE      = yes
 
 # Service configuration
 SERVICE_PORT = 15672
@@ -47,4 +47,3 @@ rabbitmq_extra_install:
 	echo "RABBITMQ_MNESIA_BASE=${INSTALL_PREFIX}/etc/var/lib/rabbitmq/mnesia" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
 	echo "RABBITMQ_LOG_BASE=/var/packages/rabbitmq-server/var" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
 	echo "RABBITMQ_ENABLED_PLUGINS_FILE=${INSTALL_PREFIX}/etc/rabbitmq/enabled_plugins" >> ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
-
