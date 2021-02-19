@@ -32,7 +32,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: rabbitmq_extra_install
 rabbitmq_extra_install:
-	$(RUN) patch -i $(WORK_DIR)/../poststrip_patches/001_rabbitmq-server.patch $(STAGING_DIR)/lib/rabbitmq_server-$(SPK_VERS)/sbin/rabbitmq-server
+	# Create required directories
 	install -m 755 -d ${STAGING_DIR}/etc/
 	install -m 755 -d ${STAGING_DIR}/etc/rabbitmq/	
 	install -m 755 -d ${STAGING_DIR}/etc/var/
