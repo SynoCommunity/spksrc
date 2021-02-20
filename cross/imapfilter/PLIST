@@ -1,0 +1,11 @@
+bin:bin/imapfilter
+rsc:share/imapfilter/account.lua
+rsc:share/imapfilter/auxiliary.lua
+rsc:share/imapfilter/common.lua
+rsc:share/imapfilter/mailbox.lua
+rsc:share/imapfilter/message.lua
+rsc:share/imapfilter/options.lua
+rsc:share/imapfilter/regex.lua
+rsc:share/imapfilter/set.lua
+rsc:var/config.lua
+rsc:var/extend.lua
