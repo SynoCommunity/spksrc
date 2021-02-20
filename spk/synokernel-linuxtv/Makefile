@@ -1,4 +1,6 @@
 SPK_NAME = synokernel-linuxtv
+SPK_GIT_HASH = a236fdd
+SPK_GIT_DATE = 20210208
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 SPK_REV = 1
 SPK_ICON = src/linuxtv.png
@@ -21,8 +23,9 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-SSS_SCRIPT = src/dsm-control.sh
-STRIP_TARGET = nop
+SSS_SCRIPT        = src/dsm-control.sh
+SERVICE_SETUP     = src/service-setup.sh
+STRIP_TARGET      = nop
 POST_STRIP_TARGET = linuxtv_extra_install
 
 include ../../mk/spksrc.spk.mk
@@ -35,6 +38,7 @@ else
 SPK_GIT_HASH = a236fdd
 SPK_GIT_DATE = 20210208
 endif
+SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 
 .PHONY: linuxtv_extra_install
 linuxtv_extra_install:

@@ -4,7 +4,7 @@
         "type": "multiselect",
         "subitems": [{
             "key": "default",
-            "desc": V4L2-core (mc.ko, videodev.ko, tveeprom.ko, videobuf2-*.ko, dvb-core.ko)",
+            "desc": "V4L2-core (mc.ko, videodev.ko, tveeprom.ko, videobuf2-*.ko, dvb-core.ko)",
             "disabled": true,
             "defaultValue": true
         },
