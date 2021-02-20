@@ -1,5 +1,5 @@
 SPK_NAME = jackett
-SPK_VERS = 0.17.474
+SPK_VERS = 0.17.568
 SPK_REV = 13
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
@@ -11,9 +11,10 @@ DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps 
 RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 STARTABLE = yes
-CHANGELOG = "Update Jackett 17.474 and compile using .NET"
+CHANGELOG = "Update Jackett 0.17.568 and compile using .NET"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
+LICENSE_FILE = $(WORK_DIR)/Jackett-$(SPK_VERS)/LICENSE
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
