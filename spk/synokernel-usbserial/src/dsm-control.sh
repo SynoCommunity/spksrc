@@ -1,17 +1,21 @@
 #!/bin/sh
 
-# Package
-PACKAGE="synokernel-usbserial"
-
 # Configs
-CFG=/var/packages/${PACKAGE}/target/etc/${PACKAGE}.cfg
-INI=/var/packages/${PACKAGE}/target/etc/${PACKAGE}.ini
+CFG=/var/packages/${SYNOPKG_PKGNAME}/target/etc/${SYNOPKG_PKGNAME}.cfg
+INI=/var/packages/${SYNOPKG_PKGNAME}/target/etc/${SYNOPKG_PKGNAME}.ini
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
+INSTALL_DIR="/usr/local/${SYNOPKG_PKGNAME}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
-SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${PACKAGE} -a"
-UDEV_RULE=60-${PACKAGE}.rules
+UDEV_RULE=60-${SYNOPKG_PKGNAME}.rules
+FIRMWARE_PATH="/var/packages/${SYNOPKG_PKGNAME}/target/lib/firmware/"
+
+# Initiate exec call-up
+if [ -d ${FIRMWARE_PATH} ]; then
+   SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${SYNOPKG_PKGNAME} -f ${FIRMWARE_PATH} -a"
+else
+   SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${SYNOPKG_PKGNAME} -a"
+fi
 
 # Load kernel objects values
 if [ -f ${CFG} ]; then
@@ -43,23 +47,30 @@ if [ ! "${KO}" ]; then
    exit 1
 fi
 
+# Remove duplicates entries but do not change order
+KO=$(echo $KO | tr ' ' '\n' | awk '!x[$1]++ { print $1 }' | tr '\n' ' ')
+
 case $1 in
     start)
         ${SYNOCLI_KMODULE} load $KO
 
-        # Create udev rules to set permissions to 666 
-        # Doing this at package start so it gets done even after DSM upgrade.  
-        ln -s ${INSTALL_DIR}/rules.d/${UDEV_RULE} /lib/udev/rules.d/${UDEV_RULE}
-        udevadm control --reload-rules
+        # Create udev rules to set permissions to 666
+        # Doing this at package start so it gets done even after DSM upgrade.
+        if [ -f ${INSTALL_DIR}/rules.d/${UDEV_RULE} ]; then
+           ln -s ${INSTALL_DIR}/rules.d/${UDEV_RULE} /lib/udev/rules.d/${UDEV_RULE}
+           udevadm control --reload-rules
+        fi
 
         exit $?
         ;;
     stop)
-        ${SYNOCLI_KMODULE}unload $KO
+        ${SYNOCLI_KMODULE} unload $KO
 
         # remove udev rules for USB serial permissions
-        rm -f /lib/udev/rules.d/${UDEV_RULE}
-        udevadm control --reload-rules
+        if [ -h /lib/udev/rules.d/${UDEV_RULE} ]; then
+           rm -f /lib/udev/rules.d/${UDEV_RULE}
+           udevadm control --reload-rules
+        fi
 
         exit $?
         ;;

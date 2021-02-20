@@ -17,7 +17,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_PL2303:drivers/usb/serial:pl2303
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_5052
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Includes usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko. USB utils: Log in to your Synology with Telnet or ssh and type: lsusb -v, lsusb.py -ciu or usb-devices."
+DESCRIPTION = "Includes usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko"
 
 RELOAD_UI = no
 STARTABLE = yes
@@ -42,4 +42,4 @@ usbserial_extra_install:
 	install -m 755 -d $(STAGING_DIR)/rules.d
 	install -m 644 src/60-$(SPK_NAME).rules $(STAGING_DIR)/rules.d/60-$(SPK_NAME).rules
 	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/synokernel-usbserial.cfg $(STAGING_DIR)/etc/synokernel-usbserial.cfg
+	install -m 644 src/$(SPK_NAME).cfg $(STAGING_DIR)/etc/$(SPK_NAME).cfg
