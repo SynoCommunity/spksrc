@@ -34,9 +34,9 @@ SPK_GIT_DATE = 20210113
 else
 SPK_GIT_HASH = a236fdd
 SPK_GIT_DATE = 20210208
-fi
+endif
 
 .PHONY: linuxtv_extra_install
 linuxtv_extra_install:
-        install -m 755 -d $(STAGING_DIR)/etc
-        install -m 644 src/$(SPK_NAME).cfg $(STAGING_DIR)/etc/$(SPK_NAME).cfg
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/$(SPK_NAME).cfg $(STAGING_DIR)/etc/$(SPK_NAME).cfg
