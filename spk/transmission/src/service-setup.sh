@@ -2,12 +2,12 @@
 # This gives tranmission the power to execute python scripts on completion (like TorrentToMedia).
 PYTHON_DIR="/usr/local/python"
 PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.json"
+CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
 GROUP="sc-download"
 
-SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGDEST}/var/ -x ${PID_FILE} -e ${LOG_FILE}"
+SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
 
 service_preinst ()
 {
@@ -30,7 +30,7 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@download_dir@|${wizard_volume}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
         sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
         sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
         if [ -d "${wizard_watch_dir}" ]; then
