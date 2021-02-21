@@ -1,69 +1,125 @@
-[{
-    "step_title": "Basic configuration",
-    "items": [{
-        "type": "textfield",
-        "desc": "Download directory",
-        "subitems": [{
-            "key": "wizard_download_dir",
-            "desc": "Download directory",
-            "defaultValue": "/volume1/downloads",
-            "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
-                }
+[
+    {
+        "step_title": "Basic configuration",
+        "items": [
+            {
+                "type": "combobox",
+                "desc": "Please select a volume to use for the download folder",
+                "subitems": [
+                    {
+                        "key": "wizard_volume",
+                        "desc": "volume name",
+                        "displayField": "display_name",
+                        "valueField": "volume_path",
+                        "editable": false,
+                        "mode": "remote",
+                        "api_store": {
+                            "api": "SYNO.Core.Storage.Volume",
+                            "method": "list",
+                            "version": 1,
+                            "baseParams": {
+                                "limit": -1,
+                                "offset": 0,
+                                "location": "internal"
+                            },
+                            "root": "volumes",
+                            "idProperty": "volume_path",
+                            "fields": [
+                                "display_name",
+                                "volume_path"
+                            ]
+                        },
+                        "validator": {
+                            "fn": "{console.log(arguments);return true;}"
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Download shared folder (using the volume chosen above)",
+                "subitems": [
+                    {
+                        "key": "wizard_download_dir",
+                        "desc": "Download shared folder",
+                        "defaultValue": "downloads",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[\\w _-]+$/",
+                                "errorText": "Subdirectories are not supported."
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable",
+                "subitems": [
+                    {
+                        "key": "wizard_watch_dir",
+                        "desc": "Watch directory",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                                "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Directory to keep files in until torrent is complete. Leave empty to disable",
+                "subitems": [
+                    {
+                        "key": "wizard_incomplete_dir",
+                        "desc": "Incomplete directory",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                                "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
+                            }
+                        }
+                    }
+                ]
             }
-        }]
-    }, {
-        "type": "textfield",
-        "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable",
-        "subitems": [{
-            "key": "wizard_watch_dir",
-            "desc": "Watch directory",
-            "validator": {
-                "allowBlank": true,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
-                }
+        ]
+    },
+    {
+        "step_title": "Basic configuration",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Web interface username. Defaults to admin",
+                "subitems": [
+                    {
+                        "key": "wizard_username",
+                        "desc": "Username"
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "desc": "Web interface password. Defaults to admin",
+                "subitems": [
+                    {
+                        "key": "wizard_password",
+                        "desc": "Password"
+                    }
+                ]
             }
-        }]
-    }, {
-        "type": "textfield",
-        "desc": "Directory to keep files in until torrent is complete. Leave empty to disable",
-        "subitems": [{
-            "key": "wizard_incomplete_dir",
-            "desc": "Incomplete directory",
-            "validator": {
-                "allowBlank": true,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or also 'volumeUSB' and ? is the volume number (1-99)."
-                }
+        ]
+    },
+    {
+        "step_title": "DSM Permissions",
+        "items": [
+            {
+                "desc": "Permissions for all download-related packages of SynoCommunity are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
             }
-        }]
-    }]
-}, {
-    "step_title": "Basic configuration",
-    "items": [{
-        "type": "textfield",
-        "desc": "Web interface username. Defaults to admin",
-        "subitems": [{
-            "key": "wizard_username",
-            "desc": "Username"
-        }]
-    }, {
-        "type": "password",
-        "desc": "Web interface password. Defaults to admin",
-        "subitems": [{
-            "key": "wizard_password",
-            "desc": "Password"
-        }]
-    }]
-}, {
-    "step_title": "DSM Permissions",
-    "items": [{
-        "desc": "Permissions for all download-related packages of SynoCommunity are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
-    }]
-}]
+        ]
+    }
+]
