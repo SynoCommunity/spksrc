@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-server-$(PKG_VERS)
 
 BUILD_DEPENDS = native/erlang native/elixir native/rsync native/zip
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = https://www.rabbitmq.com
 COMMENT  = RabbitMQ is the most widely deployed open source message broker.
@@ -30,4 +30,3 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: rabbitmq_install
 rabbitmq_install:
 	$(RUN) DESTDIR=$(INSTALL_DIR) $(MAKE) install PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
-

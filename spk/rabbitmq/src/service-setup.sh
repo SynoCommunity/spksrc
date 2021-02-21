@@ -1,21 +1,14 @@
-SERVICE_COMMAND='/var/packages/rabbitmq/target/lib/rabbitmq_server-3.8.12/sbin/rabbitmq-server'
+
+RABBITMQ_SBIN=${SYNOPKG_PKGDEST}/lib/rabbitmq_server-3.8.12/sbin
+SERVICE_COMMAND="${RABBITMQ_SBIN}/rabbitmq-server"
 SVC_CWD="${SYNOPKG_PKGDEST}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-# HOME useful at installation time
-export HOME=/var/packages/rabbitmq/home
-
-MQ_BIN=/var/packages/rabbitmq/target/lib/rabbitmq_server-3.8.12/sbin
+# HOME to place the erlang cookie into
+export HOME=${SYNOPKG_PKGDEST}
 
 service_postinst ()
 {
-
-    sed -i 's/SYS_PREFIX\=/SYS_PREFIX\=\/var\/packages\/rabbitmq\/target\//g' ${MQ_BIN}/rabbitmq-d
-efaults
-
-    # install plugins for rabbitmq management
-    ${MQ_BIN}/rabbitmq-plugins enable rabbitmq_management
-
+    sed -i "s%SYS_PREFIX=%SYS_PREFIX=${SYNOPKG_PKGDEST}%g" ${RABBITMQ_SBIN}/rabbitmq-defaults  >> ${INST_LOG} 2>&1
 }
-
