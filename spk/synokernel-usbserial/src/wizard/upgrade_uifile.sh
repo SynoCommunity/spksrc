@@ -1,7 +1,7 @@
 #!/bin/sh
 set +x
 
-CFG_FILE="/usr/local/${SYNOPKG_PKGNAME}/etc/synokernel-usbserial.ini"
+CFG_FILE="/usr/local/${SYNOPKG_PKGNAME}/etc/${SYNOPKG_PKGNAME}.ini"
 . ${CFG_FILE}
 
 FIRST=`/bin/cat<<EOF
