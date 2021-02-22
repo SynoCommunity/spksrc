@@ -20,11 +20,9 @@ SERVICE_SETUP  = src/service-setup.sh
 STARTABLE      = yes
 
 # Service configuration
-SERVICE_PORT = 15672
-SERVICE_PORT_TITLE = RabbitMQ(HTTP)
-
+CONF_DIR = src/conf/
 # Admin link
-ADMIN_PORT = $(SERVICE_PORT)
+ADMIN_PORT = 15672
 
 POST_STRIP_TARGET = rabbitmq_extra_install
 
