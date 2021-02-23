@@ -27,8 +27,10 @@ CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
 INSTALL_TARGET = linuxtv_install
 
-# Disable all PCI adapters
-include blacklist.mk
+# Disable all PCI adaptors
+include ko-blacklist.mk
+# Enable specific USB adaptors
+include ko-whitelist.mk
 
 # Blacklist modules that does not compile
 BLACKLIST += CONFIG_VIDEO_IVTV
@@ -70,8 +72,12 @@ linuxtv_pre_patch:
 linuxtv_configure:
 	# Final preparation for build
 	$(RUN) make allyesconfig
-	# Disable modules that do not compile
+	# Disable unneaded modules or that do not compile
 	$(RUN) $(foreach kmodule,$(BLACKLIST),sed -i 's/$(kmodule)=m/# $(kmodule) is not set/' v4l/.config ;)
+	# Enable modules otherwise disabled (only >= 4.4)
+ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
+	$(RUN) $(foreach kmodule,$(WHITELIST),sed -i 's/# $(kmodule) is not set/$(kmodule)=m/' v4l/.config ;)
+endif
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
