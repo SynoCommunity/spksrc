@@ -1,4 +1,4 @@
 #!/bin/sh
 
-LOC=$(dirname "$(readlink -f "$0")")
-LC_ALL=en_US.UTF8 exec $LOC/tmux "$@"
+TMUX=$(realpath $(dirname "$(readlink -f "$0")")/../orig/tmux)
+LC_ALL=en_US.UTF8 exec ${TMUX} "$@"

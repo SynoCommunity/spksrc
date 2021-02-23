@@ -12,10 +12,9 @@ DISPLAY_NAME = Tmux
 STARTABLE = no
 CHANGELOG = Updated tmux to version 3.1c
 
-HOMEPAGE  = http://tmux.github.io
-LICENSE   = BSD License
+HOMEPAGE = https://github.com/tmux/tmux/wiki
+LICENSE  = BSD License
 
-SPK_LINKS = /usr/local/bin/tmux:bin/tmux-utf8
+SPK_COMMANDS = bin/tmux
 
 include ../../mk/spksrc.spk.mk
-
