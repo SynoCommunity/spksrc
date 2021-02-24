@@ -1,7 +1,6 @@
 PKG_NAME = erlang
 PKG_VERS = 23.2.5
 PKG_EXT = tar.gz
-PKG_DIR = otp-OTP-$(PKG_VERS)
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
 PKG_DIST_FILE = $(PKG_NAME)-OTP-$(PKG_VERS).$(PKG_EXT)
