@@ -1,3 +1,9 @@
+lnk:bin/ct_run
+lnk:bin/dialyzer
+lnk:bin/epmd
+lnk:bin/erl
+lnk:bin/erlc
+lnk:bin/escript
 lnk:bin/run_erl
 lnk:bin/to_erl
 lnk:bin/typer
