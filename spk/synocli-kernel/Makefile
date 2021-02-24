@@ -1,6 +1,6 @@
 SPK_NAME = synocli-kernel
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/synocli-kernel.png
 
 DEPENDS = cross/usbutils cross/psmisc
@@ -29,3 +29,4 @@ include ../../mk/spksrc.spk.mk
 synocli-kernel_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/synocli-kernelmodule.sh $(STAGING_DIR)/bin/
+	install -m 755 src/synocli-kernelmodule-dbg.sh $(STAGING_DIR)/bin/
