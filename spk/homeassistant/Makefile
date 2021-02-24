@@ -1,29 +1,30 @@
 SPK_NAME = homeassistant
-SPK_VERS = 0.118.5
-SPK_REV = 12
+SPK_VERS = 2021.1.5
+SPK_REV = 13
 SPK_ICON = src/${SPK_NAME}.png
 
-SPK_DEPENDS = "python3>=3.7.7"
+SPK_DEPENDS = "python38"
 
-BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/poetry
 
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography
 DEPENDS += cross/pillow
 # for iqvia
 DEPENDS += cross/numpy
-
 # for python-libnmap
 DEPENDS += cross/nmap
 # for mobile_app
 DEPENDS += cross/PyNaCl
+# for tradfri
+DEPENDS += cross/dtlssocket
 
 WHEELS = src/requirements.txt
 
 MAINTAINER = ymartin59
-DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
+DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Added x64 iqvia support."
+CHANGELOG = "Update homeassistant to 2021.1.5 and Python 3.8."
 RELOAD_UI = yes
 STARTABLE = yes
 
