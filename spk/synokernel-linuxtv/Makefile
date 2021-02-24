@@ -2,7 +2,7 @@ SPK_NAME = synokernel-linuxtv
 SPK_GIT_HASH = a236fdd
 SPK_GIT_DATE = 20210208
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Backport of MYGICA T230A driver for 4.4.59 kernel"
 
