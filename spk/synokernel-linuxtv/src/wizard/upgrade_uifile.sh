@@ -11,19 +11,29 @@ FIRST=`/bin/cat<<EOF
         "type": "multiselect",
         "subitems": [{
             "key": "default",
-            "desc": "V4L2-core (mc.ko, videodev.ko, tveeprom.ko, videobuf2-*.ko, dvb-core.ko)",
+            "desc": "V4L2-core",
             "disabled": true,
             "defaultValue": true
         },
         {
+            "key": "PCTV461E",
+            "desc": "Allegro A8293, Empia EM28178, Montage M88DS3103, Montage M88TS2022",
+            "defaultValue": $PCTV461E
+        },
+        {
             "key": "HAUPPAUGE_WINTV_DUALHD",
-            "desc": "Hauppauge WinTV Dual-HD (si2157.ko, lgdt3306a.ko, em28xx.ko, em28xx-dvb.ko)",
+            "desc": "Hauppauge WinTV Dual-HD",
             "defaultValue": $HAUPPAUGE_WINTV_DUALHD
         },
         {
             "key": "MYGICA_T230A",
-            "desc": "Mygica T230A (si2157.ko, si2168.ko, dvb_usb_v2.ko)",
+            "desc": "MyGica T230A",
             "defaultValue": $MYGICA_T230A
+        },
+        {
+            "key": "SMS_SIANO_MDTV",
+            "desc": "Siano Mobile Digital MDTV Receiver",
+            "defaultValue": $SMS_SIANO_MDTV
         }]
     }]
 }
