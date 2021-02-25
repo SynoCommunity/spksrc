@@ -1,6 +1,6 @@
 SPK_NAME = synocli-kernel
 SPK_VERS = 1.0
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/synocli-kernel.png
 
 DEPENDS = cross/usbutils cross/psmisc
