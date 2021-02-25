@@ -26,9 +26,9 @@ FIRST=`/bin/cat<<EOF
             "defaultValue": $HAUPPAUGE_WINTV_DUALHD
         },
         {
-            "key": "MYGICA_T230A",
-            "desc": "MyGica T230A",
-            "defaultValue": $MYGICA_T230A
+            "key": "MYGICA_T230",
+            "desc": "MyGica T230A, MyGica T230C, MyGica T230C2, MyGica T230C2 Lite",
+            "defaultValue": $MYGICA_T230
         },
         {
             "key": "SMS_SIANO_MDTV",
