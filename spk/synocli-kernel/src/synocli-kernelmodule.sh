@@ -134,7 +134,7 @@ unload ()
    echo -ne "\tUnloading kernel modules...\n"
    for item in $KO; do echo $item; done | tac | while read ko
    do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
+      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
       printf '%50s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
@@ -166,7 +166,7 @@ status ()
    echo -ne "\tStatus of kernel modules...\n"
    for ko in $KO
    do
-      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
+      module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
       printf '%50s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
