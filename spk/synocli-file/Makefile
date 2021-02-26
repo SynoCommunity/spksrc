@@ -1,13 +1,13 @@
 SPK_NAME = synocli-file
-SPK_VERS = 2.1
-SPK_REV = 7
+SPK_VERS = 2.2
+SPK_REV = 8
 SPK_ICON = src/synocli-file.png
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
 DEPENDS += cross/detox cross/pcre2
 DEPENDS += cross/zstd
 DEPENDS += cross/fdupes
-OPTIONAL_DEPENDS = cross/rmlint cross/rnm
+OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
@@ -28,16 +28,22 @@ DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
 endif
 
+# PPC archs are not supported with golang
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/micro
+OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor)"
+endif
+
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL=1
 export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "Fix fdupes and pcre2 tools"
+CHANGELOG = "Add micro (editor)"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
-LICENSE  = Each tool is licensed under it\'s respective license.
+LICENSE  = Each tool is licensed under it's respective license.
 
 SPK_COMMANDS  = bin/less bin/lessecho bin/lesskey
 SPK_COMMANDS += bin/tree
@@ -52,6 +58,7 @@ SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/rnm
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/fdupes
+SPK_COMMANDS += bin/micro
 
 SPK_COMMANDS += bin/rhash
 SPK_LINKS  = /usr/local/bin/ed2k-link:bin/rhash 
