@@ -8,6 +8,10 @@ CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/
 
 DEPENDS = cross/linuxtv
 
+REQUIRED_DSM = 6.2.3
+REQUIRE_KERNEL = 1
+REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c
+
 MAINTAINER = th0ma7
 DESCRIPTION = The LinuxTV community develops and maintains the Linux Kernel Media Subsystems and several libraries and applications.
 DESCRIPTION_FRE = La communauté LinuxTV développe et maintient les sous-systèmes multimédia du noyau Linux et plusieurs bibliothèques et applications.
