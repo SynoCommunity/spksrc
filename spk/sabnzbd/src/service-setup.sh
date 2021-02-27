@@ -1,4 +1,4 @@
-PYTHON_DIR="/usr/local/python3"
+PYTHON_DIR="/usr/local/python38"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
@@ -8,7 +8,7 @@ LANGUAGE="env LANG=en_US.UTF-8"
 
 GROUP="sc-download"
 
-SERVICE_COMMAND="${LANGUAGE} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
+SERVICE_COMMAND="${LANGUAGE} ${PYTHON} -OO ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 
 service_postinst ()
 {
