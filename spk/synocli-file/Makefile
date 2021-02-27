@@ -5,7 +5,7 @@ SPK_ICON = src/synocli-file.png
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
 DEPENDS += cross/detox cross/pcre2
-DEPENDS += cross/zstd
+DEPENDS += cross/zstd cross/lzip cross/plzip
 DEPENDS += cross/fdupes
 OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro
 
@@ -38,9 +38,9 @@ endif
 PCRE2_CLI_FULL=1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd, lzip, plzip$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "Add micro (editor)"
+CHANGELOG = "Add micro (editor), add Lzip and Plzip"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
@@ -57,6 +57,7 @@ SPK_COMMANDS += bin/pcre2grep bin/pcre2test
 SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/rnm
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
+SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 
