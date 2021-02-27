@@ -87,6 +87,20 @@ load ()
 {
    error=0
 
+   # Add firmware path to running kernel
+   if [ -n "${FPATH}" ]; then
+      echo -ne "\tAdd optional firmware path...\n"
+	  printf '%75s' "[${FPATH}]"
+      echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
+
+      if [ $? -eq 0 ]; then
+         echo -ne " OK\n"
+      else
+         error=1
+         echo -ne " N/A\n"
+      fi
+   fi
+
    echo -ne "\tLoading kernel modules...\n"
    for ko in $KO
    do
@@ -106,20 +120,6 @@ load ()
          fi
       fi
    done
-
-   # Add firmware path to running kernel
-   if [ -n "${FPATH}" ]; then
-      echo -ne "\tAdd optional firmware path...\n"
-	  printf '%75s' "[${FPATH}]"
-      echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
-
-      if [ $? -eq 0 ]; then
-         echo -ne " OK\n"
-      else
-         error=1
-         echo -ne " N/A\n"
-      fi
-   fi
 
    return $error
 }
