@@ -40,7 +40,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd, lzip, plzip$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "Add micro (editor), add Lzip and Plzip, add fzf (fuzzy finder)"
+CHANGELOG = "1. Add micro (editor)<br/>2. Add Lzip and Plzip<br/>3. Add fzf (fuzzy finder)<br/>4. Update mc to version 4.8.26"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
