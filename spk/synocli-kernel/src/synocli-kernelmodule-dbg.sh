@@ -53,6 +53,11 @@ echo "/var/packages/synocli-kernel/target/bin/usb-devices"
 echo
 
 echo "--------------------------------------"
+echo "device files: ls -la /dev/dvb/adapter[0-9]/*"
+ls -la /dev/dvb/adapter[0-9]/*
+echo
+
+echo "--------------------------------------"
 echo "lsusb -I"
 lsusb -I
 echo
