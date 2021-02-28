@@ -13,4 +13,6 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS = --program-prefix=$(TC_TARGET)-
+
 include ../../mk/spksrc.cross-cc.mk
