@@ -18,22 +18,22 @@ FIRST=`/bin/cat<<EOF
         {
             "key": "PCTV461E",
             "desc": "Allegro A8293, Empia EM28178, Montage M88DS3103, Montage M88TS2022",
-            "defaultValue": $PCTV461E
+            "defaultValue": "$PCTV461E"
         },
         {
             "key": "HAUPPAUGE_WINTV_DUALHD",
             "desc": "Hauppauge WinTV Dual-HD",
-            "defaultValue": $HAUPPAUGE_WINTV_DUALHD
+            "defaultValue": "$HAUPPAUGE_WINTV_DUALHD"
         },
         {
             "key": "MYGICA_T230",
             "desc": "MyGica T230A, MyGica T230C, MyGica T230C2, MyGica T230C2 Lite",
-            "defaultValue": $MYGICA_T230
+            "defaultValue": "$MYGICA_T230"
         },
         {
             "key": "SMS_SIANO_MDTV",
             "desc": "Siano Mobile Digital MDTV Receiver",
-            "defaultValue": $SMS_SIANO_MDTV
+            "defaultValue": "$SMS_SIANO_MDTV"
         }]
     }]
 }
