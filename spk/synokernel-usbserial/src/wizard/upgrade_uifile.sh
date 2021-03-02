@@ -4,6 +4,18 @@ set +x
 CFG_FILE="/usr/local/${SYNOPKG_PKGNAME}/etc/${SYNOPKG_PKGNAME}.ini"
 . ${CFG_FILE}
 
+# Ensure to add any new entries in the $OPTIONS
+# variable below so it always get a value
+# even though it didn't exist previously in the
+# .ini configuration file
+OPTIONS=( ch341 cdc_acm cp210x ftdi_sio pl2303 ti_usb_3410_5052 )
+
+for option in "${OPTIONS[@]}"; do
+   var=${option%%=*}
+   [ -z "${!var}" ] \
+      && eval ${var}=false
+done
+
 FIRST=`/bin/cat<<EOF
 {
     "step_title": "SynoKernel USB Serial kernel module configuration",
