@@ -1,8 +1,19 @@
 SPK_NAME = synokernel-linuxtv
+
+# Set package version based on kernel
+# kernel < 4.4 is frozon at version f6e3542
+# and too early in the build process to use
+# version_lt from spksrc.common.mk
+ifeq ($(findstring $(ARCH),avoton braswell broadwell bromolow dockerx64 grantley),$(ARCH))
+SPK_GIT_HASH = f6e3542
+SPK_GIT_DATE = 20210113
+else
 SPK_GIT_HASH = a236fdd
 SPK_GIT_DATE = 20210208
+endif
+
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
-SPK_REV = 3
+SPK_REV = 5
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Backport of MYGICA T230A driver for 4.4.59 kernel"
 
@@ -33,16 +44,6 @@ STRIP_TARGET      = nop
 POST_STRIP_TARGET = linuxtv_extra_install
 
 include ../../mk/spksrc.spk.mk
-
-# Set package version based on kernel
-ifeq ($(call version_lt, ${TC_KERNEL}, 4.4),1)
-SPK_GIT_HASH = f6e3542
-SPK_GIT_DATE = 20210113
-else
-SPK_GIT_HASH = a236fdd
-SPK_GIT_DATE = 20210208
-endif
-SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
 
 .PHONY: linuxtv_extra_install
 linuxtv_extra_install:
