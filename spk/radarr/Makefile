@@ -1,22 +1,24 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 14
+SPK_REV = 15
 SPK_ICON = src/radarr.png
 
 REQUIRED_DSM = 5.0
-# Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-DEPENDS = cross/busybox cross/curl cross/mediainfo cross/sqlite cross/radarr
+# .NET is not support on PPC, ARM5 or x86
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARM5_ARCHES) $(x86_ARCHES)
 
-SPK_DEPENDS = "mono>3.6"
+DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
 
-MAINTAINER = ressu
-DESCRIPTION  = Radarr is a movie manager like Couchpotato, but based on the Sonarr codebase. It can monitor multiple RSS feeds for new movie releases and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
+MAINTAINER = Team Radarr
+HELPURL    = https://wiki.servarr.com/Radarr
+SUPPORTURL = https://radarr.video/\#support
+
+DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
 RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "Update Radarr to v3.0.1.4259"
+CHANGELOG = "Update Radarr to v3.0.2.4552 .NET Core"
 
 HOMEPAGE = https://radarr.video/
 LICENSE  = GPLv3
@@ -33,12 +35,10 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = radarr_extra_install
 
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: radarr_extra_install
 radarr_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
+	echo "PackageVersion=$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)\nPackageAuthor=[Team Radarr](https://radarr.video)" > $(STAGING_DIR)/share/Radarr/package_info

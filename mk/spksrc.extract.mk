@@ -18,6 +18,7 @@ EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.lzma = tar --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.lz = tar --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH)
+EXTRACT_CMD.deb = dpkg-deb -R $(DIST_FILE) $(EXTRACT_PATH)
 endif
 
 ifeq ($(strip $(EXTRACT_CMD)),)
