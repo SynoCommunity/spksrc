@@ -1,5 +1,5 @@
 PKG_NAME = binutils
-PKG_VERS = 2.36
+PKG_VERS = 2.36.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.gnu.org/gnu/$(PKG_NAME)
