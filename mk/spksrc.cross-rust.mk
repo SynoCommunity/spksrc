@@ -44,23 +44,23 @@ RUST_TOOLCHAIN ?= stable
 
 RUST_TARGET =
 # map archs to rust targets
-ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 RUST_TARGET=x86_64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(x86_ARCHS)),$(ARCH))
 RUST_TARGET=i686-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHS)),$(ARCH))
 # may be not supported for cargo
 RUST_TARGET=armv5te-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH), $(ARM7_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM7_ARCHS)),$(ARCH))
 RUST_TARGET=armv7-unknown-linux-gnueabihf
 endif
-ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHS)),$(ARCH))
 RUST_TARGET=aarch64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
 RUST_TARGET=powerpc-unknown-linux-gnu
 endif
 ifeq ($(RUST_TARGET),)
@@ -101,9 +101,9 @@ RUST_LINKER_ENV=CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_
 CARGO_ENV=$(RUST_LINKER_ENV)=$(TC_PATH)$(TC_PREFIX)gcc
 
 # Set the cargo parameters
-CARCO_BUILD_ARGS += --target=$(RUST_TARGET)
-CARCO_BUILD_ARGS += --path $(RUST_SRC_DIR)
-CARCO_BUILD_ARGS += --root $(STAGING_INSTALL_PREFIX)
+CARGO_BUILD_ARGS += --target=$(RUST_TARGET)
+CARGO_BUILD_ARGS += --path $(RUST_SRC_DIR)
+CARGO_BUILD_ARGS += --root $(STAGING_INSTALL_PREFIX)
 
 
 ifeq ($(strip $(INSTALL_TARGET)),)
@@ -113,7 +113,7 @@ endif
 # Default rust build and installation with cargo
 rust_build_and_install_target:
 	@echo "  ==> Cargo install rust package $(PKG_NAME)"
-	$(ENV) $(CARGO_ENV) cargo install $(CARCO_BUILD_ARGS)
+	$(ENV) $(CARGO_ENV) cargo install $(CARGO_BUILD_ARGS)
 
 
 #####
