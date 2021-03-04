@@ -3,12 +3,40 @@
 # Configs
 CFG=/var/packages/${SYNOPKG_PKGNAME}/target/etc/${SYNOPKG_PKGNAME}.cfg
 INI=/var/packages/${SYNOPKG_PKGNAME}/target/etc/${SYNOPKG_PKGNAME}.ini
+# Logs - only used if exit prior to calling synocli-kernelmodule
+LOG=/tmp/synocli-kernelmodule-${SYNOPKG_PKGNAME}.log
+# VideoStation DTS status
+VIDEOSTATION_DTS=$(cat /lib/udev/script/DTV_enabled 2>/dev/null)
 
 # Others
 INSTALL_DIR="/usr/local/${SYNOPKG_PKGNAME}"
 PATH="${INSTALL_DIR}/bin:${PATH}"
 UDEV_RULE=60-${SYNOPKG_PKGNAME}.rules
 FIRMWARE_PATH="/var/packages/${SYNOPKG_PKGNAME}/target/lib/firmware/"
+
+check_videostation_dts() {
+   if [ "$VIDEOSTATION_DTS" = "yes" ]; then
+      exec >> $LOG
+
+      echo "################################################################################################"
+      echo "################################################################################################"
+      echo "DETECTED: VideoStation DTS is enabled !!!!"
+	  echo
+	  echo "You must either:"
+	  echo -e "\t1. uninstall VideoStation"
+	  echo -e "\tor"
+	  echo -e "\t2. disable DTV function in VideoStation under:"
+	  echo -e "\t\tSettings (tab) > DTV > Advanced > Disable the DTV function"
+	  echo -e "Then reboot your NAS in order to remove any Synology default DVB modules from memory."
+	  echo
+	  echo "For more details please refer to"
+	  echo -e "\thttps://github.com/SynoCommunity/spksrc/wiki/FAQ-SynocliKernel-%28usbserial,-linuxtv%29"
+      echo "################################################################################################"
+      echo "################################################################################################"
+
+      exit 1
+   fi
+}
 
 # Initiate exec call-up
 if [ -d ${FIRMWARE_PATH} ]; then
@@ -49,6 +77,9 @@ fi
 
 # Remove duplicates entries but do not change order
 KO=$(echo $KO | tr ' ' '\n' | awk '!x[$1]++ { print $1 }' | tr '\n' ' ')
+
+# Check VideoStation DTS status
+check_videostation_dts
 
 case $1 in
     start)
