@@ -38,6 +38,63 @@ check_videostation_dts() {
    fi
 }
 
+#
+# Return pid:username of all used
+# DVB adapter by checking all
+# opened device files from /dev/dvb/adapter*
+#
+check_dvb_odev() {
+   default_list=""
+   user_list=""
+   pid_list=""
+   device_list=""
+
+   for device in $(ls -1 /dev/dvb/adapter[0-9]/*); do
+      pid=$(lsof | grep $device | awk -F' ' '{print $1}')
+      echo $pid >> /tmp/synokernel-linuxtv.out
+      if [ "$pid" ]; then
+         user=$(ps -o uname= -p $pid)
+         default_list="$default_list $pid:$user:$device"
+         device_list="$device_list $device"
+
+         # user & pid can be repeated multiple time
+         # ensure to return only unique elements
+         [ ! "$(echo $user_list | grep $user)" ] && user_list="$user_list $user"
+         [ ! "$(echo $pid_list | grep $pid)" ] && pid_list="$pid_list $pid"
+      fi
+   done
+
+   case $1 in
+        user) echo $user_list;;
+         pid) echo $pid_list;;
+      device) echo $device_list;;
+           *) echo $default_list;;
+   esac
+}
+
+#
+# stop|start any of program accessing
+# DVB device files
+#
+mgmnt_dvb_odev() {
+   action=$1
+   status_file=/tmp/synokernel-linuxtv_procs.lock
+   read -ra process <<<"$(check_dvb_odev)"
+   read -ra users <<<"$(check_dvb_odev user)"
+
+   exec >> $LOG
+
+#   echo "process[@]: [${process[@]}]"
+#   echo "users[@]: [${users[@]}]"
+
+   case $1 in
+#    start) echo -ne "\tStatus of DVB device files\n";;
+   status) echo -ne "\tStatus of DVB device files\n"
+           for pinfo in "${process[@]}"; do echo -ne "\t\t$pinfo\n"; done
+           ;;
+   esac
+}
+
 # Initiate exec call-up
 if [ -d ${FIRMWARE_PATH} ]; then
    SYNOCLI_KMODULE="/usr/local/bin/synocli-kernelmodule -n ${SYNOPKG_PKGNAME} -f ${FIRMWARE_PATH} -a"
@@ -92,9 +149,15 @@ case $1 in
            udevadm control --reload-rules
         fi
 
+        # Resume any application that was started previously
+        mgmnt_dvb_odev start
+
         exit $?
         ;;
     stop)
+        # Stop any application using DVB device files
+        mgmnt_dvb_odev stop
+
         ${SYNOCLI_KMODULE} unload $KO
 
         # remove udev rules for USB serial permissions
@@ -105,12 +168,10 @@ case $1 in
 
         exit $?
         ;;
-    restart)
-        ${SYNOCLI_KMODULE} unload $KO
-        ${SYNOCLI_KMODULE} load $KO
-        exit $?
-        ;;
     status)
+        # Stop any application using DVB device files
+        mgmnt_dvb_odev status
+
         if ${SYNOCLI_KMODULE} status $KO; then
             exit 0
         else
