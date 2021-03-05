@@ -90,7 +90,11 @@ mgmnt_dvb_odev() {
    case $1 in
 #    start) echo -ne "\tStatus of DVB device files\n";;
    status) echo -ne "\tStatus of DVB device files\n"
-           for pinfo in "${process[@]}"; do echo -ne "\t\t$pinfo\n"; done
+           if [ ! "${process[@]}" ]; then
+              echo -ne "\t\t[No device in usage]\n"
+           else
+              for pinfo in "${process[@]}"; do echo -ne "\t\t$pinfo\n"; done
+           fi
            ;;
    esac
 }
