@@ -1,14 +1,18 @@
 {
-    "php56": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
-			"destpath": "/usr/local/etc/php56/conf.d"
-		}]
+  "mysql-db": {
+    "info": {
+      "db-name": "ttrss"
     },
-	"php70": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
-			"destpath": "/usr/local/etc/php70/conf.d"
-		}]
-    }
+    "root-pw": "{{wizard_mysql_password_root}}",
+    "create-db": {
+      "db-collision": "skip"
+    },
+    "grant-user": {
+      "user-name": "ttrss",
+      "host": "localhost",
+      "user-pw": "{{wizard_mysql_password_ttrss}}"
+    },
+    "drop-db-uninst": "true",
+    "drop-user-uninst": "true"
+  }
 }
