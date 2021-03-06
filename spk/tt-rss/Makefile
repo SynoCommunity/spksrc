@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20201114
-SPK_REV = 13
+SPK_VERS = 20210306
+SPK_REV = 14
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -13,9 +13,7 @@ ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
 CHANGELOG = "
-CHANGELOG += 1. Update Tiny Tiny RSS to Git revision 328d7b55c8 (20201114).<br />
-CHANGELOG += 2. add troubleshooting logs generation.<br />
-CHANGELOG += 3. fixed access rights issue occurring when upgrading on a live installation.<br />
+CHANGELOG += Update Tiny Tiny RSS to Git revision 473ea6255c (20210306).<br />
 CHANGELOG += "
 
 HOMEPAGE   = https://tt-rss.org/
