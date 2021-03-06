@@ -21,16 +21,16 @@ check_videostation_dts() {
       echo "################################################################################################"
       echo "################################################################################################"
       echo "DETECTED: VideoStation DTS is enabled !!!!"
-	  echo
-	  echo "You must either:"
-	  echo -e "\t1. uninstall VideoStation"
-	  echo -e "\tor"
-	  echo -e "\t2. disable DTV function in VideoStation under:"
-	  echo -e "\t\tSettings (tab) > DTV > Advanced > Disable the DTV function"
-	  echo -e "Then reboot your NAS in order to remove any Synology default DVB modules from memory."
-	  echo
-	  echo "For more details please refer to"
-	  echo -e "\thttps://github.com/SynoCommunity/spksrc/wiki/FAQ-SynocliKernel-%28usbserial,-linuxtv%29"
+      echo
+      echo "You must either:"
+      echo -e "\t1. uninstall VideoStation"
+      echo -e "\tor"
+      echo -e "\t2. disable DTV function in VideoStation under:"
+      echo -e "\t\tSettings (tab) > DTV > Advanced > Disable the DTV function"
+      echo -e "Then reboot your NAS in order to remove any Synology default DVB modules from memory."
+      echo
+      echo "For more details please refer to"
+      echo -e "\thttps://github.com/SynoCommunity/spksrc/wiki/FAQ-SynocliKernel-%28usbserial,-linuxtv%29"
       echo "################################################################################################"
       echo "################################################################################################"
 
@@ -48,19 +48,23 @@ check_dvb_odev() {
    user_list=""
    pid_list=""
    device_list=""
+   service_list=""
 
    for device in $(ls -1 /dev/dvb/adapter[0-9]/*); do
       pid=$(lsof | grep $device | awk -F' ' '{print $1}')
       echo $pid >> /tmp/synokernel-linuxtv.out
       if [ "$pid" ]; then
          user=$(ps -o uname= -p $pid)
-         default_list="$default_list $pid:$user:$device"
+         service=$(synoservice --list | grep -i ${user#*-})
+
+         default_list="$default_list $pid:$user:$service:$device"
          device_list="$device_list $device"
 
-         # user & pid can be repeated multiple time
+         # user, pid and services can be repeated
          # ensure to return only unique elements
          [ ! "$(echo $user_list | grep $user)" ] && user_list="$user_list $user"
          [ ! "$(echo $pid_list | grep $pid)" ] && pid_list="$pid_list $pid"
+         [ ! "$(echo $service_list | grep $service)" ] && service_list="$service_list $service"
       fi
    done
 
@@ -68,6 +72,7 @@ check_dvb_odev() {
         user) echo $user_list;;
          pid) echo $pid_list;;
       device) echo $device_list;;
+     service) echo $service_list;;
            *) echo $default_list;;
    esac
 }
@@ -80,15 +85,54 @@ mgmnt_dvb_odev() {
    action=$1
    status_file=/tmp/synokernel-linuxtv_procs.lock
    read -ra process <<<"$(check_dvb_odev)"
-   read -ra users <<<"$(check_dvb_odev user)"
+   read -ra services <<<"$(check_dvb_odev service)"
 
    exec >> $LOG
 
-#   echo "process[@]: [${process[@]}]"
-#   echo "users[@]: [${users[@]}]"
+   # DEBUG
+   #echo "process[@]: [${process[@]}]"
+   #echo "services[@]: [${services[@]}]"
 
    case $1 in
-#    start) echo -ne "\tStatus of DVB device files\n";;
+    start) echo -ne "\tStarting DVB applications\n"
+           for serv in $(cat $status_file 2>/dev/null)
+           do
+              #printf '%75s' "[${serv}]"
+              printf '%50s %-25s' "" "[$serv]"
+              synoservice --status $serv 1>/dev/null 2>&1
+              if [ $? -ne 0 ]; then
+                 synoservice --start $serv 1>/dev/null 2>&1;
+                 echo -ne "OK\n"
+              else
+                 # Service already started
+                 echo -ne "N/A\n"
+              fi
+           done
+           rm -f $status_file
+           ;;
+     stop) echo -ne "\tStopping DVB applications\n"
+           # Clean-up any previous status file
+           rm -f $status_file
+
+           for serv in "${services[@]}"
+           do
+              echo -ne "\tShutting down DVB applications\n"
+              printf '%50s %-25s' "" "[$serv]"
+              #printf '%69s' "[${serv}]"
+              synoservice --stop $serv 1>/dev/null 2>&1
+              if [ $? -eq 0 ]; then
+                 echo $serv >> $status_file
+                 echo -ne "OK\n"
+              else
+                 echo -ne "ERROR\n"
+                 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                 echo "UNABLE TO UNLOAD KERNEL MODULES"
+                 echo "DUE TO RUNNING SERVICE : [$serv]"
+                 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                 exit 1
+              fi
+           done
+           ;;
    status) echo -ne "\tStatus of DVB device files\n"
            if [ ! "${process[@]}" ]; then
               echo -ne "\t\t[No device in usage]\n"
