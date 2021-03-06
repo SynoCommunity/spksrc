@@ -13,7 +13,7 @@ SPK_GIT_DATE = 20210208
 endif
 
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Backport of MYGICA T230A driver for 4.4.59 kernel"
 

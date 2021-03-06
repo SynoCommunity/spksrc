@@ -97,7 +97,6 @@ mgmnt_dvb_odev() {
     start) echo -ne "\tStarting DVB applications\n"
            for serv in $(cat $status_file 2>/dev/null)
            do
-              #printf '%75s' "[${serv}]"
               printf '%50s %-25s' "" "[$serv]"
               synoservice --status $serv 1>/dev/null 2>&1
               if [ $? -ne 0 ]; then
@@ -116,9 +115,7 @@ mgmnt_dvb_odev() {
 
            for serv in "${services[@]}"
            do
-              echo -ne "\tShutting down DVB applications\n"
               printf '%50s %-25s' "" "[$serv]"
-              #printf '%69s' "[${serv}]"
               synoservice --stop $serv 1>/dev/null 2>&1
               if [ $? -eq 0 ]; then
                  echo $serv >> $status_file
