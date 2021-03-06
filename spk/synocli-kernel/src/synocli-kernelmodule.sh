@@ -82,6 +82,23 @@ fi
 # Set kernel module .ko object base path
 KPATH=${MPATH}/${KVER}/kernel/drivers
 
+fix_ko_path ()
+{
+   KO_TMP=""
+   for ko in $KO
+   do
+      if [ ! "$(echo $ko | grep '/')" ]; then
+         # Ensure to add .ko if needed
+         [ ! "$(echo $ko | grep '.ko$')" ] && ko=$ko.ko
+         # Find full module kernel object path
+         ko=$(find $KPATH -name $ko | awk -F'drivers/' '{print $2}')
+      fi
+      KO_TMP="$KO_TMP $ko"
+   done
+
+   KO="$KO_TMP"
+}
+
 # load the requested modules
 load ()
 {
@@ -194,6 +211,11 @@ status ()
 
    return $error
 }
+
+# Fis Kernel object path in order to allow
+# receiving full path kernel module or
+# kernel object name only
+fix_ko_path
 
 case $ACTION in
     load)
