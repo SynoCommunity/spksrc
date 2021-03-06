@@ -12,47 +12,22 @@ WEB_DIR="/var/services/web"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
+VERSION_FILE="var/version.txt"
+
 USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
 PHP="${SYNOPKG_PKGDEST}/bin/virtual-php"
 MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
 MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
-MYSQL_USER_EXISTS=0
-MYSQL_DATABASE_EXISTS=0
-
-MYSQL_STATUS_VARS="${TMP_DIR}/mysql-status-vars"
 
 preinst ()
 {
-    # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        mkdir -p "${TMP_DIR}"
-        if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-            echo "Incorrect MySQL root password"
-            exit 1
-        fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
-            echo "MySQL user ${MYSQL_USER} already exists and will be re-used"
-            echo "MYSQL_USER_EXISTS=1">>"${MYSQL_STATUS_VARS}"
-            #exit 1
-        fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
-            echo "MySQL database ${MYSQL_DATABASE} already exists and will be re-used"
-            echo "MYSQL_DATABASE_EXISTS=1">>"${MYSQL_STATUS_VARS}"
-            #exit 1
-        fi
-    fi
-
     return 0
 }
 
 postinst ()
 {
-    if [ -f "${MYSQL_STATUS_VARS}" ]; then
-        . "${MYSQL_STATUS_VARS}"
-        rm "${MYSQL_STATUS_VARS}"
-    fi
     # Link
     ln -s ${SYNOPKG_PKGDEST} ${LINK_DIR} >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
 
@@ -64,24 +39,21 @@ postinst ()
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ "${MYSQL_DATABASE_EXISTS}" == "0" ]; then
-            "${MYSQL}" -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE};"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-        fi
-        if [ "${MYSQL_USER_EXISTS}" == "0" ]; then
-            "${MYSQL}" -u root -p"${wizard_mysql_password_root}" -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_ttrss}';"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-        fi
         "${MYSQL}" -u "${MYSQL_USER}" -p"${wizard_mysql_password_ttrss}" "${MYSQL_DATABASE}" < "${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
-        sed -e "s|define('DB_TYPE', '.*');|define('DB_TYPE', 'mysql');|" \
-            -e "s|define('DB_HOST', '.*');|define('DB_HOST', 'localhost');|" \
-            -e "s|define('DB_USER', '.*');|define('DB_USER', '${MYSQL_USER}');|" \
-            -e "s|define('DB_NAME', '.*');|define('DB_NAME', '${MYSQL_DATABASE}');|" \
-            -e "s|define('DB_PASS', '.*');|define('DB_PASS', '${wizard_mysql_password_ttrss}');|" \
-            -e "s|define('SINGLE_USER_MODE', .*);|define('SINGLE_USER_MODE', ${single_user_mode});|" \
-            -e "s|define('SELF_URL_PATH', '.*');|define('SELF_URL_PATH', 'http://${wizard_domain_name}/${PACKAGE}/');|" \
-            -e "s|define('DB_PORT', '.*');|define('DB_PORT', '3306');|" \
-            -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
-            ${WEB_DIR}/${PACKAGE}/config.php-dist > ${WEB_DIR}/${PACKAGE}/config.php 2>> "${LOGS_DIR}/${PACKAGE}_install.log"
+        cp "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
+        {
+          echo "putenv('TTRSS_DB_TYPE=mysql');";
+          echo "putenv('TTRSS_DB_HOST=localhost');";
+          echo "putenv('TTRSS_DB_USER=${MYSQL_USER}');";
+          echo "putenv('TTRSS_DB_NAME=${MYSQL_DATABASE}');";
+          echo "putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');";
+          echo "putenv('TTRSS_SINGLE_USER_MODE=${single_user_mode}');";
+          echo "putenv('TTRSS_SELF_URL_PATH=http://${wizard_domain_name}/${PACKAGE}/');";
+          echo "putenv('TTRSS_DB_PORT=3306');";
+          echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');";
+        } >>"${WEB_DIR}/${PACKAGE}/config.php"
+        echo "0">"${SYNOPKG_PKGDEST}/${VERSION_FILE}"
     fi
 
     # Fix permissions
@@ -89,7 +61,10 @@ postinst ()
     chown "${USER}" "${WEB_DIR}/${PACKAGE}/feed-icons"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
     chown -R "${USER}" "${WEB_DIR}/${PACKAGE}/cache"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
     chown -R "${USER}" "${LOGS_DIR}" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    chmod +x "${WEB_DIR}/${PACKAGE}/index.php"
+    chmod +x "${WEB_DIR}/${PACKAGE}/index.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+       "${SYNOPKG_PKGDEST}/bin/update-schema" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    fi
     return 0
 }
 
@@ -126,7 +101,6 @@ postuninst ()
             mkdir -p ${wizard_dbexport_path}
             ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql
         fi
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
     fi
 
     # Remove the web interface
@@ -151,27 +125,35 @@ preupgrade ()
     mv ${WEB_DIR}/${PACKAGE}/plugins.local ${TMP_DIR}/${PACKAGE}/
     mv ${WEB_DIR}/${PACKAGE}/themes.local ${TMP_DIR}/${PACKAGE}/
 
+    if [ -f "${SYNOPKG_PKGDEST}/${VERSION_FILE}" ]
+    then
+      cp "${SYNOPKG_PKGDEST}/${VERSION_FILE}" "${TMP_DIR}/${VERSION_FILE}"
+    fi
     exit 0
 }
 
 postupgrade ()
 {
     # Restore the configuration file
-    mv ${TMP_DIR}/${PACKAGE}/config.php ${WEB_DIR}/${PACKAGE}/config-bak.php  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    cp ${WEB_DIR}/${PACKAGE}/config.php-dist ${WEB_DIR}/${PACKAGE}/config.php >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-
-    # Parse configuration and save to new config
-    while read line
-    do
-        key=`echo $line | sed -n "s|^define('\(.*\)',\(.*\));.*|\1|p"`
-        val=`echo $line | sed -n "s|^define('\(.*\)',\(.*\));.*|\2|p"`
-        if [ "$key" == "" ]; then
-            continue
-        fi
-        sed -i -e "s|define('$key', .*);|define('$key', $val);|g" \
-               -e "s|define('PHP_EXECUTABLE', '.*');|define('PHP_EXECUTABLE', '${PHP}');|" \
-            ${WEB_DIR}/${PACKAGE}/config.php >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    done < ${WEB_DIR}/${PACKAGE}/config-bak.php
+    cp "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    if [ -f "${TMP_DIR}/${VERSION_FILE}" ]
+    then
+      mv "${TMP_DIR}/${VERSION_FILE}" "${SYNOPKG_PKGDEST}/${VERSION_FILE}"
+    else
+      # Parse old configuration and save to new config format
+      sed -i -e "s|define('DB_TYPE', \(.*\));|putenv('TTRSS_DB_TYPE', \1);|" \
+        -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
+        -e "s|define('DB_USER', '\(.*\)');|putenv('TTRSS_DB_USER=\1');|" \
+        -e "s|define('DB_NAME', '\(.*\)');|putenv('TTRSS_DB_NAME=\1');|" \
+        -e "s|define('DB_PASS', '\(.*\)');|putenv('TTRSS_DB_PASS=\1');|" \
+        -e "s|define('SINGLE_USER_MODE', \(.*\));|putenv('TTRSS_SINGLE_USER_MODE=\1');|" \
+        -e "s|define('SELF_URL_PATH', '\(.*\)');|putenv('TTRSS_SELF_URL_PATH=\1');|" \
+        -e "s|define('DB_PORT', '\(.*\)');|putenv('TTRSS_DB_PORT=\1');|" \
+        -e "s|define('PHP_EXECUTABLE', \(.*\));||" \
+        "${WEB_DIR}/${PACKAGE}/config.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php" 2>>"${LOGS_DIR}/${PACKAGE}_install.log"
+      echo "0" >"${SYNOPKG_PKGDEST}/${VERSION_FILE}"
+    fi
 
     mv -f ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
     mv -f ${TMP_DIR}/${PACKAGE}/plugins.local/* ${WEB_DIR}/${PACKAGE}/plugins.local/  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
