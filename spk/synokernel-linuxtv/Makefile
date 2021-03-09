@@ -19,7 +19,12 @@ CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/
 
 DEPENDS = cross/linuxtv
 
+ifeq ($(strip $(TC_TYPE)),DSM)
 REQUIRED_DSM = 6.2.3
+else ifeq ($(strip $(TC_TYPE)),SRM)
+REQUIRED_SRM = 1.2
+endif
+
 REQUIRE_KERNEL = 1
 REQUIRE_KERNEL_MODULE = CONFIG_REGMAP_I2C:drivers/base/regmap:regmap-i2c
 
