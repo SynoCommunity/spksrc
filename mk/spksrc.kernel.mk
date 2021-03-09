@@ -89,9 +89,9 @@ endif
 	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
 	$(RUN) cp $(KERNEL_CONFIG) .config
 	@$(MSG) "Set any new symbols to their default value"
-# olddefconfig is not available < 3.5
-ifeq ($(call version_lt, ${TC_KERNEL}, 3.5),1)
-	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.5"
+# olddefconfig is not available < 3.8
+ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
+	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
 	$(RUN) yes "" | $(MAKE) oldconfig
 else
 	$(RUN) $(MAKE) olddefconfig
