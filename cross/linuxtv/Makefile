@@ -74,8 +74,10 @@ linuxtv_configure:
 	$(RUN) make allyesconfig
 	# Disable unneaded modules or that do not compile
 	$(RUN) $(foreach kmodule,$(BLACKLIST),sed -i 's/$(kmodule)=m/# $(kmodule) is not set/' v4l/.config ;)
-	# Enable modules otherwise disabled
+	# Enable modules otherwise disabled (kernel >= 4.4)
+ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	$(RUN) $(foreach kmodule,$(WHITELIST),sed -i 's/# $(kmodule) is not set/$(kmodule)=m/' v4l/.config ;)
+endif
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
