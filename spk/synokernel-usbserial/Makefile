@@ -6,7 +6,12 @@ CHANGELOG = "1. Kernel USB serial drivers"
 
 DEPENDS = 
 
+ifeq ($(strip $(TC_TYPE)),DSM)
 REQUIRED_DSM = 6.2.3
+else ifeq ($(strip $(TC_TYPE)),SRM)
+REQUIRED_SRM = 1.2
+endif
+
 REQUIRE_KERNEL = 1
 REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341

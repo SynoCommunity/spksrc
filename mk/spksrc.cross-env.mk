@@ -37,6 +37,9 @@ ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
 
+# Always export the TC_TYPE (DSM or SRM)
+ENV += TC_TYPE=$(TC_TYPE)
+
 #ifneq ($(COMPILE_MAKE_OPTIONS),)
 #ENV += MAKEFLAGS="$(COMPILE_MAKE_OPTIONS)"
 #endif
