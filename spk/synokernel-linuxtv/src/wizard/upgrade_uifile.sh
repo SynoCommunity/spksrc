@@ -34,7 +34,7 @@ FIRST=`/bin/cat<<EOF
         },
         {
             "key": "PCTV461E",
-            "desc": "Allegro A8293, Empia EM28178, Montage M88DS3103, Montage M88TS2022",
+            "desc": "PCTV 461e - Allegro A8293, Empia EM28178, Montage M88DS3103, Montage M88TS2022",
             "defaultValue": $PCTV461E
         },
         {
