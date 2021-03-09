@@ -1,0 +1,24 @@
+diff -uprN ../linuxtv.orig/v4l/Makefile ./v4l/Makefile
+--- ../linuxtv.orig/v4l/Makefile	2021-02-08 10:24:43.000000000 +0000
++++ ./v4l/Makefile	2021-03-09 22:22:26.523087176 +0000
+@@ -411,7 +411,7 @@ cx88-ivtv::
+ old-install:: rminstall
+ 	@echo -e "\nInstalling new V4L modules at $(DEST)..."
+ 
+-	@strip --strip-debug $(inst-m)
++	$(STRIP) --strip-debug $(inst-m)
+ 
+ 	-install -d $(DEST)
+ 	-install -m 644 -c $(inst-m) $(DEST)
+diff -uprN ../linuxtv.orig/v4l/scripts/make_makefile.pl ./v4l/scripts/make_makefile.pl
+--- ../linuxtv.orig/v4l/scripts/make_makefile.pl	2021-02-08 10:24:43.000000000 +0000
++++ ./v4l/scripts/make_makefile.pl	2021-03-09 22:22:15.195008999 +0000
+@@ -254,7 +254,7 @@ while (my ($dir, $files) = each %instdir
+ 	print OUT "echo -n \"\$\$i \"; ";
+ 	print OUT "install -m 644 -c \$\$i \$(DESTDIR)\$(KDIR26)/$dir; fi; done; ";
+ 	print OUT "if [  \$\$n -ne 0 ]; then echo; ";
+-	print OUT "strip --strip-debug \$(DESTDIR)\$(KDIR26)/$dir/*.ko; ";
++	print OUT "\$(STRIP) --strip-debug \$(DESTDIR)\$(KDIR26)/$dir/*.ko; ";
+ 	print OUT "fi;\n\n";
+ }
+ print OUT "\t@echo\n";
