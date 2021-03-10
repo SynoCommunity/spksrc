@@ -1,5 +1,3 @@
-PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-
 RADARR="${SYNOPKG_PKGDEST}/share/Radarr/bin/Radarr"
 
 # Radarr uses custom Config and PID directories
