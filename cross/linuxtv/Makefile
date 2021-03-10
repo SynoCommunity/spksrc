@@ -18,7 +18,7 @@ include ../../mk/spksrc.archs.mk
 # Currently only build on:
 #   x64 archs with kernel >= 3.10
 #   SRM ARMv7 archs >= 4.4.60
-#UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(DSM_ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS) $(i686_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(DSM_ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS) $(i686_ARCHS) $(PPC_ARCHS)
 
 REQUIRE_KERNEL = 1
 
