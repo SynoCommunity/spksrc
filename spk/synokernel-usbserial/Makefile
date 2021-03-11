@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-usbserial
 SPK_VERS = 1.0
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/synokernel-usbserial.png
 CHANGELOG = "1. Kernel USB serial drivers"
 
