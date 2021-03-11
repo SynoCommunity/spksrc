@@ -1,5 +1,5 @@
 PKG_NAME = dotnet-sdk-5.0
-PKG_VERS = 5.0.100
+PKG_VERS = 5.0.201
 PKG_EXT = tar.gz
 PKG_DIST_SITE = https://dotnetcli.azureedge.net/dotnet/Sdk/${PKG_VERS}
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
