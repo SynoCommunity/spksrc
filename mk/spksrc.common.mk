@@ -70,6 +70,11 @@ COMPILE_MAKE_OPTIONS += -j$(NCPUS)
 endif
 endif
 
+# Terminal colors
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+NC=`tput sgr0`
+
 # Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)

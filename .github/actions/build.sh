@@ -91,7 +91,7 @@ echo "===> ARCH   packages: ${arch_packages}"
 echo "===> NOARCH packages: ${noarch_packages}"
 echo "::endgroup::"
 
-if [ "${GH_ARCH}" = "noarch" ]; then
+if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${noarch_packages}
 else
     build_packages=${arch_packages}
@@ -112,11 +112,16 @@ for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"
 
-    if [ "${GH_ARCH}" != "noarch" ]; then
+    if [ "${GH_ARCH%%-*}" != "noarch" ]; then
         # use TCVERSION and ARCH to get real exit codes.
         make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}
     else
-        make -C ./spk/${package}
+        if [ "${GH_ARCH}" = "noarch" ]; then
+            TCVERSION=
+        else
+            TCVERSION=${GH_ARCH##*-}
+        fi
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}
     fi
     result=$?
 

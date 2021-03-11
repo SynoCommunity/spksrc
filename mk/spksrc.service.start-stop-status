@@ -35,11 +35,17 @@ start_daemon ()
             else
                 SVC_CD="cd ${SVC_CWD}; "
             fi
-            if [ -z "${SVC_BACKGROUND}" ]; then
-                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
+            if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+                SU="su ${EFF_USER} -s"
             else
-                su ${EFF_USER} -s ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
+                SU=""
             fi
+            if [ -z "${SVC_BACKGROUND}" ]; then
+                $SU ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
+            else
+                $SU ${SERVICE_SHELL} -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
+            fi
+
         else
             # DSM 6 user is set by conf/privilege
             if [ -n "${SVC_CWD}" ]; then

@@ -22,6 +22,10 @@ endif
 
 ifeq ($(strip $(TC_DIST_SITE_URL)),)
 TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20Tool%20Chains/
+ifeq ($(TC_VERS),7.0)
+# we are in beta, please remove me when DSM7.0 is released
+TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20preview%20Tool%20Chains/
+endif
 endif
 
 ifeq ($(strip $(TC_DIST_SITE)),)
