@@ -47,16 +47,15 @@ include ../../mk/spksrc.cross-cc.mk
 #   Jan. 2021 only support kernel 4.4+
 #   https://linuxtv.org/downloads/drivers/
 ifeq ($(call version_lt, ${TC_KERNEL}, 4.4),1)
-PKG_VERS = f6e3542
-PKG_GIT_HASH = f6e3542673d19355e8e42be40f5fc78431d611c5
+PKG_VERS      = f6e3542
+PKG_GIT_HASH  = f6e3542673d19355e8e42be40f5fc78431d611c5
 MEDIA_VERSION = 2021-01-08-321af22a3d2f
 else
 # Do not use LATEST by default so
 # builds can be reproducible
-# git hash from	2021-02-08
-PKG_VERS = a236fdd
-PKG_GIT_HASH = a236fddff61e8357f3070effdf23e9b5f20b26e6
-MEDIA_VERSION = 2021-02-15-8f202f8e9ff3
+PKG_VERS      = 0691923
+PKG_GIT_HASH  = 069192365e2cec8b47f6e6701fb2aa50f763c602
+MEDIA_VERSION = 2021-03-07-1c5ab1e2286f
 endif
 
 .PHONY: linuxtv_pre_patch

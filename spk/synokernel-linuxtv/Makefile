@@ -8,8 +8,8 @@ ifeq ($(findstring $(ARCH),avoton braswell broadwell bromolow dockerx64 grantley
 SPK_GIT_HASH = f6e3542
 SPK_GIT_DATE = 20210113
 else
-SPK_GIT_HASH = a236fdd
-SPK_GIT_DATE = 20210208
+SPK_GIT_HASH = 0691923
+SPK_GIT_DATE = 20210307
 endif
 
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
