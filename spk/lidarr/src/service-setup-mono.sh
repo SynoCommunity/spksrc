@@ -1,4 +1,4 @@
-PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
+PATH="${SYNOPKG_PKGDEST}/bin:/var/packages/chromaprint/target/bin/:${PATH}"
 MONO_PATH="/var/packages/mono/target/bin"
 MONO="${MONO_PATH}/mono"
 
