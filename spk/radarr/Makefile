@@ -6,7 +6,7 @@ SPK_ICON = src/radarr.png
 REQUIRED_DSM = 5.0
 
 # .NET is not supported on PPC, ARM5 or x86
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARM5_ARCHES) $(x86_ARCHES)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARM5_ARCHS) $(x86_ARCHS)
 
 DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
 
