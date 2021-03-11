@@ -43,16 +43,6 @@ SVC_BACKGROUND=y
 service_postinst ()
 {
     set_unix_permissions "${CONFIG_DIR}"
-
-    # If necessary, add user also to the old group before removing it
-    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
-    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "users"
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN >> ${INST_LOG}
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 service_preupgrade ()
