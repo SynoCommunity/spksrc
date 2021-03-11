@@ -11,11 +11,11 @@
    width="800"
    height="800"
    id="svg2434"
-   sodipodi:docname="USB-Logo_generic.svg"
+   sodipodi:docname="synokernel-usbserial.svg"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   inkscape:export-filename="/home/th0ma7/Images/USB-Logo_generic.png"
-   inkscape:export-xdpi="110.99"
-   inkscape:export-ydpi="110.99">
+   inkscape:export-filename="/home/th0ma7/image/synokernel-usbserial.png"
+   inkscape:export-xdpi="103.74"
+   inkscape:export-ydpi="103.74">
   <metadata
      id="metadata11">
     <rdf:RDF>
@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,7 +47,8 @@
      inkscape:window-x="72"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0" />
   <defs
      id="defs2436" />
   <g
@@ -64,14 +65,14 @@
     <text
        xml:space="preserve"
        style="font-size:82.3639px;line-height:1.25;font-family:sans-serif;word-spacing:0px;stroke-width:1"
-       x="609.18811"
+       x="627.74585"
        y="261.02795"
        id="text18"
-       transform="scale(0.96994097,1.0309906)"><tspan
+       transform="scale(0.96994095,1.0309906)"><tspan
          sodipodi:role="line"
          id="tspan16"
-         x="609.18811"
+         x="627.74585"
          y="261.02795"
-         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:82.3639px;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold Italic';fill:#ee3d00;fill-opacity:1;stroke-width:1">SERIAL ADAPTORS</tspan></text>
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:82.3639px;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold Italic';fill:#ee3d00;fill-opacity:1;stroke-width:1">SERIAL ADAPTERS</tspan></text>
   </g>
 </svg>
