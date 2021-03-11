@@ -29,7 +29,9 @@ service_preupgrade ()
     if [ -d "${LEGACY_CONFIG_DIR}" ]; then
         echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
         mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${INST_LOG} 2>&1
-    else
+    fi
+
+    if [ ! -d "${CONFIG_DIR}" ]; then
         # Create, in case it's missing for some reason
         mkdir -p ${CONFIG_DIR} >> ${INST_LOG} 2>&1
     fi
