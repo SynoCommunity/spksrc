@@ -7,7 +7,7 @@ write_config() {
    # generate the .ini configuration file
    # based on user option selection
    echo "default=true" > ${INI}
-   for option in $(cat ${CFG} | grep -v -e default -e '^#' | tr -d '\\' | grep '^[A-z0-9].*=' | sort -u); do
+   for option in $(cat ${CFG} | grep -v -e default -e '^#' | tr -d '\\' | grep '^[A-z0-9].*=' | cut -f1 -d"=" | sort -u); do
       var=${option%%=*}
       [ -n "${!var}" ] \
          && echo "${var}=${!var}" >> ${INI} \
