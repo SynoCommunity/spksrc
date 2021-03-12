@@ -12,3 +12,8 @@ echo "$GH_PACKAGE"
 
 # use TCVERSION and ARCH parameters to get real exit code.
 make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C spk/${GH_PACKAGE}
+
+# publish to synocommunity.com when the API key is set
+if [-n $API_KEY ]; then
+    make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} publish -C spk/${GH_PACKAGE}
+fi
