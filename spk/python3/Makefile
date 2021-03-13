@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "Update Python3 to v3.7.10 (final)"
+CHANGELOG = "Update Python3 to v3.7.10"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
