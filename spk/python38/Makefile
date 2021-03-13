@@ -1,7 +1,7 @@
 SPK_NAME = python38
-SPK_VERS = 3.8.7
+SPK_VERS = 3.8.8
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python 3.8
-CHANGELOG = "Initial Python 3.8 release"
+CHANGELOG = "Python 3.8.8 update"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
