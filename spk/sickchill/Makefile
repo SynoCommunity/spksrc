@@ -1,5 +1,5 @@
 SPK_NAME = sickchill
-SPK_VERS = v2020.11.24-1
+SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
