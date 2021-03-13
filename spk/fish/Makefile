@@ -1,6 +1,6 @@
 SPK_NAME = fish
-SPK_VERS = 3.1.2
-SPK_REV = 1
+SPK_VERS = 3.2.0
+SPK_REV = 2
 SPK_ICON = src/ascii_fish.png
 
 DEPENDS = cross/fish
@@ -10,7 +10,7 @@ DESCRIPTION = fish is a smart and user-friendly command line shell for Linux, ma
 RELOAD_UI = no
 DISPLAY_NAME = fish
 STARTABLE = no
-CHANGELOG = "Initial release"
+CHANGELOG = "1. Update to 3.2.0<br/>2. Use ncursesw instead of ncurses"
 
 HOMEPAGE = https://fishshell.com
 LICENSE = Custom
