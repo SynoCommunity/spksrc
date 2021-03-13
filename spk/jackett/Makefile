@@ -35,6 +35,7 @@ DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
 CHANGELOG = "Update Jackett 0.17.668"
 LICENSE_FILE = $(WORK_DIR)/Jackett/LICENSE
+SPK_DEPENDS = "mono>3.6"
 endif
 
 POST_STRIP_TARGET = jackett_extra_install
