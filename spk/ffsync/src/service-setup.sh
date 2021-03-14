@@ -1,6 +1,6 @@
 PACKAGE="${SYNOPKG_PKGNAME}"
 
-PYTHON_DIR="/usr/local/python3"
+PYTHON_DIR="/usr/local/python"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
@@ -15,11 +15,6 @@ LOG_FILE="${HOME}/pserve.log"
 LEGACY_GROUP="nobody"
 
 SERVICE_COMMAND="${PSERVE} ${INI_FILE} --daemon --pid-file=${PID_FILE} --log-file=${LOG_FILE}"
-
-# mock wizard vars which are used right now
-#wizard_mysql_root_password=""
-#wizard_password_ffsync="ffsync"
-#wizard_ffsync_public_url=""
 
 # mysql vars
 #@TODO: Will be filled from wizard
@@ -82,7 +77,7 @@ service_preinst ()
 
 service_postinst ()
 {
-    MYSQL_FFSYNC_PASS = "${wizard_password_ffsync:=ffsync}"
+    MYSQL_FFSYNC_PASS = "${wizard_mysql_password_ffsync:=ffsync}"
     # Edit the configuration according to the wizard
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         ${MYSQL_CMD} -e "CREATE DATABASE ${PACKAGE}; GRANT ALL PRIVILEGES ON ${PACKAGE}.* TO '${MYSQL_FFSYNC_USER}'@'localhost' IDENTIFIED BY '${MYSQL_FFSYNC_PASS}';" >> ${INST_LOG} 2>&1

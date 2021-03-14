@@ -4,7 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/ffsync.png
 BETA = 1
 
-BUILD_DEPENDS  = cross/python3 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS  = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
 BUILD_DEPENDS += cross/gevent cross/greenlet
 BUILD_DEPENDS += cross/cryptography
 
@@ -12,13 +12,14 @@ BUILD_DEPENDS += cross/cryptography
 MAINTAINER     = SynoCommunity
 DESCRIPTION    = Firefox Sync Server allows to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
 DISPLAY_NAME   = Firefox Sync Server
-CHANGELOG      = "1. Update to version 1.8<br>2. Update to Python 3"
+CHANGELOG      = "Update to version 1.8"
 
 HOMEPAGE       = https://mozilla-services.readthedocs.io/en/latest/howtos/run-sync-1.5.html
 LICENSE        = MPL/GPL/LGPL
 HELPURL        = https://github.com/SynoCommunity/spksrc/wiki/Firefox-Sync-Server-1.5
 
 WIZARDS_DIR    = src/wizard/
+CONF_DIR       = src/conf/
 
 WHEELS         = src/requirements.txt
 
