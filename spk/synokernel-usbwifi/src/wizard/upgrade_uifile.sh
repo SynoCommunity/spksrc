@@ -23,13 +23,13 @@ FIRST=`/bin/cat<<EOF
         "type": "multiselect",
         "subitems": [{
             "key": "default",
-            "desc": "USB WI-FI (cfg80211.ko)",
+            "desc": "USB WI-FI (cfg80211.ko, mac80211.ko)",
             "disabled": true,
             "defaultValue": true
         },
         {
             "key": "AT76C50X",
-            "desc": "Atmel at76c503/at76c505/at76c505a USB",
+            "desc": "Atmel AT76c503/AT76c505/AT76c505a USB",
             "defaultValue": $AT76C50X
         },
         {
@@ -49,7 +49,7 @@ FIRST=`/bin/cat<<EOF
         },
         {
             "key": "RT2800",
-            "desc": "Ralink rt27xx/rt28xx/rt30xx USB",
+            "desc": "Ralink RT27xx/RT28xx/RT30xx USB",
             "defaultValue": $RT2800
         },
         {
