@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/jellyfin.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME) cross/$(SPK_NAME)-web
+DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-web
 
 MAINTAINER = publicarray
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
