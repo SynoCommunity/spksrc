@@ -2,7 +2,7 @@ SPK_NAME = synokernel-usbwifi
 SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
-CHANGELOG = "1. Kernel WIFI drivers"
+CHANGELOG = "1. Synology Kernel WIFI drivers"
 
 DEPENDS = 
 
