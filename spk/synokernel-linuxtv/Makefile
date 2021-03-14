@@ -45,6 +45,7 @@ SPK_DEPENDS = synocli-kernel
 
 SSS_SCRIPT        = src/dsm-control.sh
 SERVICE_SETUP     = src/service-setup.sh
+# LinuxTV media-build does the strip at install time
 STRIP_TARGET      = nop
 POST_STRIP_TARGET = linuxtv_extra_install
 
