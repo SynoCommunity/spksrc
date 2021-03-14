@@ -14,6 +14,8 @@ STARTABLE = yes
 CHANGELOG = "First version"
 HOMEPAGE = https://jellyfin.org
 LICENSE = GPLv2
+LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
+SPK_DEPENDS = "ffmpeg>=4.2"
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
