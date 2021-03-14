@@ -2,7 +2,7 @@ SPK_NAME = synokernel-usbwifi
 SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
-CHANGELOG = "1. Synology Kernel WIFI drivers"
+CHANGELOG = "1. Synology Kernel Wireless drivers"
 
 DEPENDS = 
 
@@ -29,7 +29,7 @@ DESCRIPTION = "Includes Atmel, MediaTek, Ralink, ZyDAS USB WIFI adapters"
 
 RELOAD_UI = no
 STARTABLE = yes
-DISPLAY_NAME = SynoKernel WIFI drivers
+DISPLAY_NAME = SynoKernel Wireless drivers
 
 WIZARDS_DIR = src/wizard/
 
