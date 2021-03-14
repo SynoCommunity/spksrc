@@ -73,7 +73,7 @@ linuxtv_pre_patch:
 .PHONY: linuxtv_configure
 linuxtv_configure:
 	# Final preparation for build
-	$(RUN) make allyesconfig
+	$(RUN) CROSS_COMPILE=y make allyesconfig
 	# Disable unneaded modules or that do not compile
 	$(RUN) $(foreach kmodule,$(BLACKLIST),sed -i 's/$(kmodule)=m/# $(kmodule) is not set/' v4l/.config ;)
 	# Enable modules otherwise disabled (kernel >= 4.4)
@@ -83,13 +83,11 @@ endif
 
 .PHONY: linuxtv_compile
 linuxtv_compile:
-	$(RUN) LDFLAGS="" make -j`nproc` MAKEFLAGS=
-	# Disable depmod call for later install
-	$(RUN) sed -i '/depmod/s/^/#/' v4l/Makefile.media
+	$(RUN) LDFLAGS="" CROSS_COMPILE=y make -j`nproc` MAKEFLAGS=
 
 .PHONY: linuxtv_install
 linuxtv_install:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+	$(RUN) CROSS_COMPILE=y make install DESTDIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 	# Install firmwares
 	$(RUN) tar xvfj $(FIRMWARE_PKG) -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 	# Dynamically create PLIST for driver modules & firmwares
