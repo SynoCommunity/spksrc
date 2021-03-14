@@ -13,6 +13,8 @@ BETA = 1
 STARTABLE = yes
 CHANGELOG = "First version"
 HOMEPAGE = https://jellyfin.org
+HELPURL    = https://jellyfin.org/docs/general/server/settings.html
+SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
 LICENSE = GPLv2
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
 SPK_DEPENDS = "ffmpeg>=4.2"
