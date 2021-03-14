@@ -11,7 +11,7 @@ HOMEPAGE = https://fishshell.com
 COMMENT = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
 LICENSE = Custom
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.cross-cmake.mk
 
