@@ -3,10 +3,10 @@
 
 JELLYFIN_ARGS="--service \
  --package-name synology \
- -d ${SYNOPKG_PKGDEST}/var/data \
- -C ${SYNOPKG_PKGDEST}/var/cache \
- -c ${SYNOPKG_PKGDEST}/var/config \
- -l ${SYNOPKG_PKGDEST}/var/log \
+ -d ${SYNOPKG_PKGVAR}/data \
+ -C ${SYNOPKG_PKGVAR}/cache \
+ -c ${SYNOPKG_PKGVAR}/config \
+ -l ${SYNOPKG_PKGVAR}/log \
  -w ${SYNOPKG_PKGDEST}/web \
  --ffmpeg /var/packages/ffmpeg/target/bin/ffmpeg"
 
@@ -19,6 +19,8 @@ GROUP=sc-media
 
 service_postinst ()
 {
-    # allow ffmpeg access
-    chmod 775 /volume1/@appstore/jellyfin/var/data/transcodes
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+        # allow ffmpeg access
+        chmod 775 /volume1/@appstore/jellyfin/var/data/transcodes
+    fi
 }
