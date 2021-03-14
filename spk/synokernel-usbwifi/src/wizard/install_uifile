@@ -1,0 +1,42 @@
+[{
+    "step_title": "SynoKernel USB WI-FI kernel module configuration",
+    "items": [{
+        "type": "multiselect",
+        "subitems": [{
+            "key": "default",
+            "desc": "USB WI-FI (cfg80211.ko)",
+            "disabled": true,
+            "defaultValue": true
+        },
+        {
+            "key": "AT76C50X",
+            "desc": "Atmel at76c503/at76c505/at76c505a USB",
+            "defaultValue": false
+        },
+        {
+            "key": "MT7601U",
+            "desc": "MediaTek MT7601U USB",
+            "defaultValue": false
+        },
+        {
+            "key": "RT2570",
+            "desc": "Ralink RT2500 USB",
+            "defaultValue": false
+        },
+        {
+            "key": "RT73",
+            "desc": "Ralink RT2501/RT73 USB",
+            "defaultValue": false
+        },
+        {
+            "key": "RT2800",
+            "desc": "Ralink rt27xx/rt28xx/rt30xx USB",
+            "defaultValue": false
+        },
+        {
+            "key": "ZD1201",
+            "desc": "ZyDAS ZD1211/ZD1211B USB",
+            "defaultValue": false
+        }]
+    }]
+}]
