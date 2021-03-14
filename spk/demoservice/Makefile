@@ -1,29 +1,26 @@
 SPK_NAME = demoservice
 SPK_VERS = 1.2
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/demoservice.png
 
+# force noarch target
 override ARCH=
 
 MAINTAINER = ymartin59
-DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service
+DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service. <br>Further more this package creates a demo MySQL database. Upon deinstallation the demo database and/or user can be kept or droped.
 DISPLAY_NAME = DemoService
-CHANGELOG = "1. Update with new installer logs<br/>2. Update for DSM7"
+CHANGELOG = "1. Update with new installer logs<br/>2. Update for DSM7.<br/>3. Add db creation demo."
 
 LICENSE = GPLv2
 
 WIZARDS_DIR = src/wizard/
+# The demo database is created by definitions in conf/resource and controlled by wizard variables.
+CONF_DIR    = src/conf/
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER         = auto
 SERVICE_WIZARD_GROUP = wizard_group
-
-include ../../mk/spksrc.common.mk
-ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# SERVICE_WIZARD_SHARE is not supported for DSM7 yet
 SERVICE_WIZARD_SHARE = wizard_download_dir
-endif
-
 SERVICE_SETUP        = src/service-setup.sh
 STARTABLE            = yes
 
@@ -41,7 +38,8 @@ include ../../mk/spksrc.spk.mk
 .PHONY: demoservice_install
 # Replace standard copy/install targets, no sources, no content
 demoservice_pre_copy:
-	rm -fr $(STAGING_DIR)
+	rm -rf $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mkdir --parents $(STAGING_INSTALL_PREFIX)/var
-	echo "Test file for $(INSTALL_PREFIX)/var" > $(STAGING_INSTALL_PREFIX)/var/README
+	echo "No files package with MySQL DB creation." > $(STAGING_INSTALL_PREFIX)/var/README
+

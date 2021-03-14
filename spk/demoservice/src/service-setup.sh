@@ -15,7 +15,7 @@ SERVICE_COMMAND="python -m ${SERVER_MODULE} ${SERVICE_PORT}"
 SVC_CWD="${SYNOPKG_PKGVAR}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
-
+DEMOSERVICE_INI=${SYNOPKG_PKGDEST}/var/demoservice.ini
 
 # These functions are for demonstration purpose of DSM sequence call
 # and installation logging capabilities.
@@ -69,13 +69,16 @@ service_preinst ()
 service_postinst ()
 {
     echo "service_postinst ${SYNOPKG_PKG_STATUS}"
-    
-    ln -sf ${INST_LOG} ${SYNOPKG_PKGVAR}/installer.log
+    echo "# Database created with random password:"     > ${DEMOSERVICE_INI}
+    echo "${SYNOPKG_DB_USER_RAND_PW}"                   >> ${DEMOSERVICE_INI}
+    echo "ini file created: ${DEMOSERVICE_INI}"
 }
 
 service_preuninst ()
 {
     echo "service_preuninst ${SYNOPKG_PKG_STATUS}"
+    echo "wizard_mysql_drop_database = ${wizard_mysql_drop_database}"   >> $INST_LOG
+    echo "wizard_mysql_drop_db_user = ${wizard_mysql_drop_db_user}"     >> $INST_LOG
 }
 
 service_postuninst ()

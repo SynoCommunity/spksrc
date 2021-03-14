@@ -1,0 +1,17 @@
+{
+  "mysql-db": {
+    "info": {
+      "db-name": "demoservice"
+    },
+    "root-pw": "{{wizard_mysql_password_root}}",
+    "create-db" : {
+      "db-collision": "skip"
+    },
+    "grant-user": {
+      "user-name" : "demoservice",
+      "rand-pw" : true
+    },
+    "drop-db-uninst": "{{wizard_mysql_drop_database}}",
+    "drop-user-uninst": "{{wizard_mysql_drop_db_user}}"
+  }
+}
