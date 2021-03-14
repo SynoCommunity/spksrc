@@ -1,5 +1,5 @@
 PKG_NAME = jellyfin
-PKG_VERS = 10.6.4
+PKG_VERS = 10.7.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jellyfin/jellyfin/archive
@@ -10,7 +10,7 @@ HOMEPAGE = https://jellyfin.org
 COMMENT  = The Free Software Media System. It is an alternative to the proprietary Emby and Plex.
 LICENSE  = GPLv2
 
-DOTNET_VERSION=3.1
+DOTNET_VERSION=5.0
 BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
 
 DOTNET_OPTIMIZE=1

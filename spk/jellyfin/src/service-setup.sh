@@ -1,6 +1,3 @@
-# Package specific behaviours
-# Sourced script by generic installer and start-stop-status scripts
-
 # https://github.com/dotnet/core/issues/4011
 [ -z "$DOTNET_BUNDLE_EXTRACT_BASE_DIR" ] && export DOTNET_BUNDLE_EXTRACT_BASE_DIR="${XDG_CACHE_HOME:-"/var/packages/jellyfin/target/var/"}/dotnet_bundle_extract"
 
