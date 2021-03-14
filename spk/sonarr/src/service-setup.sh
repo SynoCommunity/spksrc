@@ -42,6 +42,7 @@ SVC_BACKGROUND=y
 
 service_postinst ()
 {
+    mkdir -p ${CONFIG_DIR}
     set_unix_permissions "${CONFIG_DIR}"
 }
 
@@ -53,9 +54,10 @@ service_preupgrade ()
     if [ -d "${LEGACY_CONFIG_DIR}" ]; then
         echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
         mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${INST_LOG} 2>&1
-    else
+    fi
+    if [ ! -d ${CONFIG_DIR} ]; then
         # Create, in case it's missing for some reason
-        mkdir ${CONFIG_DIR} >> ${INST_LOG} 2>&1
+        mkdir -p ${CONFIG_DIR} >> ${INST_LOG} 2>&1
     fi
 
     # Is Installed Sonarr Binary Ver. >= SPK Sonarr Binary Ver.?
@@ -89,10 +91,12 @@ service_postupgrade ()
 
     # If backup was created before new-style packages
     # new updates/backups will fail due to permissions (see #3185)
-    set_unix_permissions "/tmp/nzbdrone_backup"
-    set_unix_permissions "/tmp/nzbdrone_update"
-    set_unix_permissions "/tmp/sonarr_backup"
-    set_unix_permissions "/tmp/sonarr_update"
+    if [ -d "/tmp/nzbdrone_backup" ] || [ -d "/tmp/nzbdrone_update" ] || [ -d "/tmp/sonarr_backup" ] || [ -d "/tmp/sonarr_update" ]; then
+        set_unix_permissions "/tmp/nzbdrone_backup"
+        set_unix_permissions "/tmp/nzbdrone_update"
+        set_unix_permissions "/tmp/sonarr_backup"
+        set_unix_permissions "/tmp/sonarr_update"
+    fi
 
     # Remove upgrade Flag
     rm ${CONFIG_DIR}/KEEP_VAR
