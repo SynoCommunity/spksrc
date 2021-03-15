@@ -80,18 +80,20 @@ if [ ! -d ${MPATH} ]; then
 fi
 
 # Set kernel module .ko object base path
-KPATH=${MPATH}/${KVER}/kernel/drivers
+KPATH=${MPATH}/${KVER}/kernel
 
 fix_ko_path ()
 {
    KO_TMP=""
    for ko in $KO
    do
+      # first check if the name
+	  # matches to a path
       if [ ! "$(echo $ko | grep '/')" ]; then
          # Ensure to add .ko if needed
          [ ! "$(echo $ko | grep '.ko$')" ] && ko=$ko.ko
          # Find full module kernel object path
-         ko=$(find $KPATH -name $ko | awk -F'drivers/' '{print $2}')
+         ko=$(find $KPATH -name $ko | awk -F'kernel/' '{print $2}')
       fi
       KO_TMP="$KO_TMP $ko"
    done
@@ -107,7 +109,7 @@ load ()
    # Add firmware path to running kernel
    if [ -n "${FPATH}" ]; then
       echo -ne "\tAdd optional firmware path...\n"
-	  printf '%75s' "[${FPATH}]"
+	  printf '%65s' "[${FPATH}]"
       echo "${FPATH}" > ${SYS_FIRMWARE_PATH}
 
       if [ $? -eq 0 ]; then
@@ -122,7 +124,7 @@ load ()
    for ko in $KO
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%50s %-25s' $ko "[$module]"
+      printf '%40s %-25s' $(basename $ko) "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -152,7 +154,7 @@ unload ()
    for item in $KO; do echo $item; done | tac | while read ko
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%50s %-25s' $ko "[$module]"
+      printf '%40s %-25s' $(basename $ko) "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -184,7 +186,7 @@ status ()
    for ko in $KO
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%50s %-25s' $ko "[$module]"
+      printf '%40s %-25s' $(basename $ko) "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -198,7 +200,7 @@ status ()
    # Validate option firmware path
    if [ -n "${FPATH}" ]; then
       echo -ne "\tStatus of optional firmware path...\n"
-	  printf '%75s' "[${FPATH}]"
+	  printf '%65s' "[${FPATH}]"
 
       grep -q ${FPATH} ${SYS_FIRMWARE_PATH}
       if [ $? -eq 0 ]; then
