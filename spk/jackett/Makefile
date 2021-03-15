@@ -1,17 +1,16 @@
 SPK_NAME = jackett
-SPK_VERS = 0.17.568
-SPK_REV = 13
+SPK_VERS = 0.17.668
+SPK_REV = 14
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/libstdc++ cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
-RELOAD_UI = yes
 DISPLAY_NAME = Jackett
 STARTABLE = yes
-CHANGELOG = "Update Jackett 0.17.568 and compile using .NET"
+CHANGELOG = "Update Jackett 0.17.668 and compile using .NET"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
 LICENSE_FILE = $(WORK_DIR)/Jackett-$(SPK_VERS)/LICENSE
@@ -32,10 +31,11 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # Mono build for unsupported .NET archs
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS = cross/$(SPK_NAME)-mono
+DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
-CHANGELOG = "Update Jackett 17.474 and fix mono build (88f6281 and 88f6282)"
+CHANGELOG = "Update Jackett 0.17.668"
 LICENSE_FILE = $(WORK_DIR)/Jackett/LICENSE
+SPK_DEPENDS = "mono>3.6"
 endif
 
 POST_STRIP_TARGET = jackett_extra_install
