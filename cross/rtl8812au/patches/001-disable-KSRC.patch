@@ -1,0 +1,14 @@
+--- ../rtl8812au-5.6.4.2.orig/Makefile	2021-02-03 12:55:29.000000000 +0000
++++ Makefile	2021-03-16 01:15:38.187098920 +0000
+@@ -1137,9 +1137,11 @@ EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211
+ SUBARCH := $(shell uname -m | sed -e "s/i.86/i386/; s/ppc/powerpc/; s/armv.l/arm/; s/aarch64/arm64/;")
+ ARCH ?= $(SUBARCH)
+ CROSS_COMPILE ?=
++ifeq ($(strip $(KSRC)),)
+ KVER  := $(shell uname -r)
+ KSRC := /lib/modules/$(KVER)/build
+ MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
++endif
+ INSTALL_PREFIX :=
+ STAGINGMODDIR := /lib/modules/$(KVER)/kernel/drivers/staging
+ endif
