@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 CHANGELOG = "1. Synology Kernel Wireless drivers"
 
-DEPENDS = 
+DEPENDS = cross/rtl8812au cross/rtl8814au
 
 ifeq ($(strip $(TC_TYPE)),DSM)
 REQUIRED_DSM = 6.2.3
@@ -26,7 +26,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/rt2x00:rt2800usb
 REQUIRE_KERNEL_MODULE += CONFIG_USB_ZD1201:drivers/net/wireless:zd1201
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Includes Atmel, MediaTek, Ralink, ZyDAS USB WIFI adapters"
+DESCRIPTION = "Includes Atmel, MediaTek, Ralink, ZyDAS USB WIFI adapters as well as out-of-tree Realtek RTL8812AU/21AU and RTL8814AU"
 
 RELOAD_UI = no
 STARTABLE = yes
