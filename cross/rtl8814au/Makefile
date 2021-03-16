@@ -29,7 +29,7 @@ endif
 
 .PHONY: rtl8814au_compile
 rtl8814au_compile:
-	$(RUN) ARCH=$(TC_ARCH) CROSS_COMPILE= KSRC=$(WORK_DIR)/linux make modules
+	$(RUN) ARCH=$(TC_ARCH) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) KSRC=$(WORK_DIR)/linux make modules
 
 .PHONY: rtl8814au_install
 rtl8814au_install:
@@ -41,3 +41,9 @@ else
 	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
 	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/8814au.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
 endif
+#################
+# TODO:
+#    1) faire pointer le Makefile vers les cross-compilers                          - DONE
+#    2) faire patch pour desactiver -Wimplicit-fallthrough=0 (rtl8812au uniquement) - TODO
+#    3) AJOUTER $(STRIP) --strip-debug                                              - TODO
+#################

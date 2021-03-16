@@ -29,7 +29,7 @@ endif
 
 .PHONY: rtl8812au_compile
 rtl8812au_compile:
-	$(RUN) ARCH=$(TC_ARCH) CROSS_COMPILE= KSRC=$(WORK_DIR)/linux make modules
+	$(RUN) ARCH=$(TC_ARCH) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) KSRC=$(WORK_DIR)/linux make modules
 
 .PHONY: rtl8812au_install
 rtl8812au_install:
