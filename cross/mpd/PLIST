@@ -1,1 +1,3 @@
 bin:bin/mpd
+rsc:share/doc/mpd/mpdconf.example
+rsc:share/icons/hicolor/scalable/apps/mpd.svg
