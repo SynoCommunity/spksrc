@@ -34,6 +34,16 @@
             "defaultValue": false
         },
         {
+            "key": "RTL88XXAU",
+            "desc": "RTL8812AU/21AU Wireless",
+            "defaultValue": false
+        },
+        {
+            "key": "RTL8814AU",
+            "desc": "RTL8814AU Wireless",
+            "defaultValue": false
+        },
+        {
             "key": "ZD1201",
             "desc": "ZyDAS ZD1211/ZD1211B USB",
             "defaultValue": false

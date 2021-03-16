@@ -8,7 +8,7 @@ CFG_FILE="/usr/local/${SYNOPKG_PKGNAME}/etc/${SYNOPKG_PKGNAME}.ini"
 # variable below so it always get a value
 # even though it didn't exist previously in the
 # .ini configuration file
-OPTIONS=( AT76C50X MT7601U RT2570 RT73 RT2800 ZD1201 )
+OPTIONS=( AT76C50X MT7601U RT2570 RT73 RT2800 RTL88XXAU RTL8814AU ZD1201 )
 
 for option in "${OPTIONS[@]}"; do
    var=${option%%=*}
@@ -51,6 +51,16 @@ FIRST=`/bin/cat<<EOF
             "key": "RT2800",
             "desc": "Ralink RT27xx/RT28xx/RT30xx USB",
             "defaultValue": $RT2800
+        },
+        {
+            "key": "RTL88XXAU",
+            "desc": "RTL8812AU/21AU Wireless",
+            "defaultValue": $RTL88XXAU
+        },
+        {
+            "key": "RTL8814AU",
+            "desc": "RTL8814AU Wireless",
+            "defaultValue": $RTL8814AU
         },
         {
             "key": "ZD1201",
