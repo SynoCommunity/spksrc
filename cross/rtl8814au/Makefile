@@ -21,6 +21,12 @@ INSTALL_TARGET = rtl8814au_install
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifeq ($(call version_ge, ${TC_KERNEL}, 4),1)
+PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)+%'
+else
+PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)%'
+endif
+
 .PHONY: rtl8814au_compile
 rtl8814au_compile:
 	$(RUN) ARCH=$(TC_ARCH) CROSS_COMPILE= KSRC=$(WORK_DIR)/linux make modules
