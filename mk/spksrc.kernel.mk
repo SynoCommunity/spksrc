@@ -123,11 +123,5 @@ kernel_module_build:
 	@$(MSG) Building kernel module module=$(module)
 	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/linux INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
 	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/linux/modules.order
-# Install in directory tree with + suffix for kernels >= 4.0
-ifeq ($(call version_ge, ${TC_KERNEL}, 4),1)
-	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/$(word 2,$(subst :, ,$(module)))
-	install -m 644 $(WORK_DIR)/linux/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/$(word 2,$(subst :, ,$(module)))
-else
 	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
 	install -m 644 $(WORK_DIR)/linux/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
-endif

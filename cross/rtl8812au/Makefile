@@ -17,15 +17,9 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = rtl8812au_compile
 INSTALL_TARGET = rtl8812au_install
 
-#UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
-
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(call version_ge, ${TC_KERNEL}, 4),1)
-PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)+%'
-else
 PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)%'
-endif
 
 .PHONY: rtl8812au_compile
 rtl8812au_compile:
@@ -33,11 +27,6 @@ rtl8812au_compile:
 
 .PHONY: rtl8812au_install
 rtl8812au_install:
-# Add "+" to EXTRAVERSION for kernels version >= 4.x
-ifeq ($(call version_ge, ${TC_KERNEL}, 4),1)
-	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/drivers/net/wireless/
-	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/88XXau.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/drivers/net/wireless/
-else
 	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
 	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/88XXau.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
-endif
+	$(RUN) $(STRIP) --strip-debug $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/88XXau.ko

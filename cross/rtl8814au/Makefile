@@ -17,15 +17,9 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = rtl8814au_compile
 INSTALL_TARGET = rtl8814au_install
 
-#UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
-
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(call version_ge, ${TC_KERNEL}, 4),1)
-PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)+%'
-else
 PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)%'
-endif
 
 .PHONY: rtl8814au_compile
 rtl8814au_compile:
@@ -33,17 +27,16 @@ rtl8814au_compile:
 
 .PHONY: rtl8814au_install
 rtl8814au_install:
-# Add "+" to EXTRAVERSION for kernels version >= 4.x
-ifeq ($(call version_ge, ${TC_KERNEL}, 4),1)
-	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/drivers/net/wireless/
-	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/8814au.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)+/kernel/drivers/net/wireless/
-else
 	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
 	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/8814au.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
-endif
+	$(RUN) $(STRIP) --strip-debug $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/8814au.ko
+
 #################
 # TODO:
 #    1) faire pointer le Makefile vers les cross-compilers                          - DONE
-#    2) faire patch pour desactiver -Wimplicit-fallthrough=0 (rtl8812au uniquement) - TODO
-#    3) AJOUTER $(STRIP) --strip-debug                                              - TODO
+#    2) faire patch pour desactiver -Wimplicit-fallthrough=0 (rtl8812au uniquement) - DONE
+#    3) AJOUTER $(STRIP) --strip-debug                                              - DONE
+#    4) corriger le tc_vars pour TC_KERNEL avec + pour simplifier le code           - DONE
+#    5) corriger le spkclean vs REQUIRE_KERNEL                                      - *TODO*
+#    5) Repenser l'approche pour TC_TYPE                                            - *TODO*
 #################
