@@ -63,15 +63,15 @@ SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
 
 SPK_COMMANDS += bin/rhash
-SPK_LINKS  = /usr/local/bin/ed2k-link:bin/rhash 
-SPK_LINKS += /usr/local/bin/edonr256-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/edonr512-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/gost-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/has160-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/magnet-link:bin/rhash 
-SPK_LINKS += /usr/local/bin/sfv-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/tiger-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/tth-hash:bin/rhash 
-SPK_LINKS += /usr/local/bin/whirlpool-hash:bin/rhash 
+SPK_COMMANDS += bin/ed2k-link
+SPK_COMMANDS += bin/edonr256-hash
+SPK_COMMANDS += bin/edonr512-hash
+SPK_COMMANDS += bin/gost-hash
+SPK_COMMANDS += bin/has160-hash
+SPK_COMMANDS += bin/magnet-link
+SPK_COMMANDS += bin/sfv-hash
+SPK_COMMANDS += bin/tiger-hash
+SPK_COMMANDS += bin/tth-hash
+SPK_COMMANDS += bin/whirlpool-hash
 
 include ../../mk/spksrc.spk.mk
