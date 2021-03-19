@@ -1,0 +1,29 @@
+[{
+    "step_title": "Settings for MPD server",
+    "items": [{
+        "type": "textfield",
+        "desc": "Music folder",
+        "subitems": [{
+            "key": "wizard_music_folder",
+            "desc": "Path",
+            "defaultValue": "/volume1/music/"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "NAS IP address for MPD clients",
+        "subitems": [{
+            "key": "wizard_bind_address",
+            "desc": "Address",
+            "defaultValue": "192.168.1.1"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "MPD server port. Defaults to 6600",
+        "subitems": [{
+            "key": "wizard_port",
+            "desc": "Port",
+            "defaultValue": "6600"
+        }]
+    }]
+
+}]

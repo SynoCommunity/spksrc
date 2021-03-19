@@ -16,5 +16,18 @@ DISPLAY_NAME = MPD
 HOMEPAGE   = https://www.musicpd.org/
 LICENSE    = GPLv2
 
+WIZARDS_DIR = WIZARD_UIFILES
+
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+NO_SERVICE_SHORTCUT = yes
+
+POST_STRIP_TARGET = mpd_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: mpd_extra_install
+mpd_extra_install:
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/mpd.conf $(STAGING_DIR)/etc/mpd.conf
 
