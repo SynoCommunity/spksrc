@@ -24,7 +24,7 @@ html5lib==0.999999999
 idna==2.8
 itsdangerous==0.24
 jaraco.functools==2.0
-jinja2==2.10.1
+jinja2==2.11.3
 jsonschema==2.6.0
 loguru==0.5.3
 markupsafe==1.1.1
