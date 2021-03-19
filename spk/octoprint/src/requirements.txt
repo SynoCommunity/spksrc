@@ -11,7 +11,7 @@ Flask-Login==0.2.2
 Flask-Markdown==0.3
 Flask-Principal==0.3.5
 itsdangerous==0.24
-Jinja2==2.8
+Jinja2==2.11.3
 Markdown==2.6.2
 netaddr==0.7.17
 netifaces==0.10.4
