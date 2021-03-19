@@ -26,7 +26,7 @@ docutils==0.12
 # gevent==1.0.1 Built via DEPENDS
 # greenlet==0.4.5 Built via DEPENDS
 #hawkauthlib==0.1.1
-Jinja2==2.7.3
+Jinja2==2.11.3
 #konfig==0.9
 Mako==1.0
 #MarkupSafe==0.23
