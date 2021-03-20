@@ -6,7 +6,7 @@
  DEFAULT_GPG_KEY='_KEY_ID_'
  DEFAULT_GPG_PW='_GPG_PASSWORD_'
 -DEFAULT_PYTHON='python2'
-+DEFAULT_PYTHON='/usr/local/duplicity/env/bin/python'
++DEFAULT_PYTHON='/var/packages/duplicity/target/env/bin/python'
  
  # function definitions ##########################
  
