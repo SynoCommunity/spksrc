@@ -19,5 +19,5 @@ include ../../mk/spksrc.python-wheel.mk
 .PHONY: duplicity_pre_configure
 # adjust shebang in python scripts
 duplicity_pre_configure:
-	$(RUN) ; sed -i -e  '1 s|^#!/.*|#!/usr/local/duplicity/env/bin/python|g' bin/duplicity
-	$(RUN) ; sed -i -e  '1 s|^#!/.*|#!/usr/local/duplicity/env/bin/python|g' bin/rdiffdir
+	$(RUN) ; sed -i -e  '1 s|^#!/.*|#!/var/packages/duplicity/target/env/bin/python|g' bin/duplicity
+	$(RUN) ; sed -i -e  '1 s|^#!/.*|#!/var/packages/duplicity/target/env/bin/python|g' bin/rdiffdir
