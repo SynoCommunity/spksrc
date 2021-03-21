@@ -1,2 +1,1 @@
-bin:orig/tmux
-rsc:bin/tmux
+bin:bin/tmux
