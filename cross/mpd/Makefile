@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = MPD-$(PKG_VERS)
 
 DEPENDS  = cross/glib cross/alsa-lib cross/libmad cross/libogg cross/flac
-DEPENDS += cross/audiofile cross/libid3tag cross/libvorbis cross/lame cross/boost
+DEPENDS += cross/audiofile cross/libid3tag cross/libvorbis cross/lame cross/libshout cross/boost
 
 HOMEPAGE = http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki
 COMMENT  = Flexible, powerful, server-side application for playing music
