@@ -28,7 +28,7 @@ include ../../mk/spksrc.common.mk
 ## make && make TCVERSION=6.0 && make TCVERSION=7.0 
 ##
 
-ifeq ($(call version_ge, ${TCVERSION}, 6.1),1)
+ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 SPK_DEPENDS = "WebStation>=2.1.0:PHP7.4>=7.4.0:Apache2.4>=2.4.0"
 CONF_DIR = src/conf
 APACHE_VERSION = 2.4
