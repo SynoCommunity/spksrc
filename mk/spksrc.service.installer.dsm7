@@ -79,7 +79,7 @@ save_wizard_variables ()
 
 set_unix_permissions ()
 {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_unix_permissions() is no longer supported."
+    log "Notice: set_unix_permissions() is no longer required on DSM7."
 }
 
 syno_remove_user ()
