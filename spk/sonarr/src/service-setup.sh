@@ -40,8 +40,23 @@ LEGACY_GROUP="sc-media"
 SERVICE_COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${SONARR}"
 SVC_BACKGROUND=y
 
+service_preinst ()
+{
+    # Migrate from nzbdrone to sonarr
+    OLD_PACKAGE_VAR="/var/packages/nzbdrone/target/var"
+    if [ -d "${OLD_PACKAGE_VAR}" ]; then
+        echo "Migrating from ${OLD_PACKAGE_VAR} to /tmp/nzbdrone_to_sonarr" 1>&2
+        cp -rT ${OLD_PACKAGE_VAR} "/tmp/nzbdrone_to_sonarr"
+    fi
+}
+
 service_postinst ()
 {
+    # Restore folder from nzbdrone
+    if [ -d "/tmp/nzbdrone_to_sonarr" ]; then
+        echo "Migrating from /tmp/nzbdrone_to_sonarr to ${SYNOPKG_PKGDEST}/var" 1>&2
+        mv -T "/tmp/nzbdrone_to_sonarr" "${SYNOPKG_PKGDEST}/var" 1>&2
+    fi
     mkdir -p ${CONFIG_DIR}
     set_unix_permissions "${CONFIG_DIR}"
 }
@@ -52,7 +67,7 @@ service_preupgrade ()
     # It should go, after the upgrade, into /var/.config/
     # The /var/ folder gets automatically copied by service-installer after this
     if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-        echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
+        echo "Moving ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}" >> ${INST_LOG}
         mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${INST_LOG} 2>&1
     fi
     if [ ! -d ${CONFIG_DIR} ]; then

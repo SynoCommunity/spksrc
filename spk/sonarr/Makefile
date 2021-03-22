@@ -1,5 +1,5 @@
-SPK_NAME = nzbdrone
-SPK_VERS = $(shell date +%Y%m%d)
+SPK_NAME = sonarr
+SPK_VERS = 3.0.5.1144
 SPK_REV = 19
 SPK_ICON = src/sonarr.png
 
@@ -25,6 +25,10 @@ LICENSE  = GPLv3
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8989
+# allow conflicting ports for smoth migration
+CHECKPORT = no
+REPLACE_PACKAGES = "nzbdrone"
+
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 # Admin link for in DSM UI
