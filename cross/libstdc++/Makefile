@@ -6,13 +6,21 @@ PKG_EXT = deb
 
 PKG_ARCH = amd64
 LIB_DIR = x86_64-linux-gnu
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 PKG_ARCH = armhf
 LIB_DIR = arm-linux-gnueabihf
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_ARCH = arm64
 LIB_DIR = aarch64-linux-gnu
+else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+PKG_ARCH = armel
+LIB_DIR = arm-linux-gnueabi
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PKG_ARCH = i386
+LIB_DIR = i386-linux-gnu
 endif
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS)_$(PKG_ARCH).deb
 PKG_DIST_SITE = http://http.us.debian.org/debian/pool/main/g/gcc-6/
