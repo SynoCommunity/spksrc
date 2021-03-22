@@ -26,14 +26,6 @@
         }
       }
     ],
-    "migrate": {
-      "root": [
-        {
-          "old": "adminer",
-          "new": "adminer"
-        }
-      ]
-    },
     "portals": [
       {
         "service": "adminer",
