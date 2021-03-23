@@ -15,4 +15,4 @@ if [ -f "${VAR_DIR}/profile" ]; then
 	source "${VAR_DIR}/profile"
 fi
 
-exec python3 bazarr.py --no-update --config "${VAR_DIR}/data">>"${VAR_DIR}/bazarr.log" 2>&1
+exec python3 bazarr.py --no-update --config "${VAR_DIR}/data" >> "${VAR_DIR}/bazarr.log" 2>&1
