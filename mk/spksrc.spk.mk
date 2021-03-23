@@ -140,15 +140,6 @@ endif
 ifneq ($(strip $(START_DEP_SERVICES)),)
 	@echo start_dep_services=\"$(START_DEP_SERVICES)\" >> $@
 endif
-ifneq ($(strip $(REPLACE_PACKAGES)),)
-	@echo install_replace_packages=\"$(REPLACE_PACKAGES)\" >> $@
-endif
-ifneq ($(strip $(BREAK_PACKAGES)),)
-	@echo install_break_packages=\"$(BREAK_PACKAGES)\" >> $@
-endif
-ifneq ($(strip $(CHECKPORT)),)
-	@echo checkport=\"$(CHECKPORT)\" >> $@
-endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
