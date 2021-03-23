@@ -13,7 +13,7 @@ SPK_GIT_DATE = 20210307
 endif
 
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Backport of MYGICA T230A driver for 4.4.59 kernel"
 
@@ -41,7 +41,7 @@ WIZARDS_DIR = src/wizard/
 HOMEPAGE = https://linuxtv.org/
 LICENSE  = GPLv2
 
-SPK_DEPENDS = synocli-kernel
+SPK_DEPENDS = synocli-kernel synocli-monitor
 
 SSS_SCRIPT        = src/dsm-control.sh
 SERVICE_SETUP     = src/service-setup.sh
