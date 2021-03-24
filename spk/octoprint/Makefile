@@ -1,10 +1,10 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.5.2
+SPK_VERS   = 1.5.3
 SPK_REV    = 5
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python2 cross/setuptools_py2 cross/pip_py2 cross/wheel
+BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/$(SPK_NAME)
 WHEELS  = src/requirements.txt
 PIP = pip3
@@ -18,7 +18,7 @@ RELOAD_UI    = yes
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.5.2 and python3"
+CHANGELOG    = "Update OctoPrint to v1.5.3 and python3"
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
