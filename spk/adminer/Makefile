@@ -24,7 +24,7 @@ include ../../mk/spksrc.common.mk
 
 ##
 ## This package can be built for DSM <6.0, DSM >=6.0;<7.0 and DSM >=7.0
-## To bild all versions call:
+## To build all versions call:
 ## make && make TCVERSION=6.0 && make TCVERSION=7.0 
 ##
 
