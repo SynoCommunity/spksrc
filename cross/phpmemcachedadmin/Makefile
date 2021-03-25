@@ -1,8 +1,9 @@
 PKG_NAME = phpMemcachedAdmin
-PKG_VERS = 1.2.2-r262
+PKG_VERS = 1.3.0
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/phpmemcacheadmin
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/elijaa/phpmemcachedadmin/archive/refs/tags
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -20,5 +21,5 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: phpmemcachedadmin_install
 phpmemcachedadmin_install:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/share/phpMemcachedAdmin
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/phpMemcachedAdmin
+	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
+	tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/phpmemcachedadmin-$(PKG_VERS) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
