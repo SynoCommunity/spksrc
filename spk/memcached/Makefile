@@ -1,6 +1,6 @@
 SPK_NAME = memcached
-SPK_VERS = 1.4.15
-SPK_REV = 2
+SPK_VERS = 1.6.9
+SPK_REV = 3
 SPK_ICON = src/memcached.png
 DSM_UI_DIR = app
 
@@ -10,19 +10,20 @@ MAINTAINER = Diaoul
 DESCRIPTION = Free \& open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load. It comes with phpMemcachedAdmin, a graphic stand-alone administration for memcached to monitor and debug purpose.
 ADMIN_URL = /phpMemcachedAdmin/
 DISPLAY_NAME = Memcached
-CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
+CHANGELOG = "1. Bump 1.4.13 -> 1.6.9"
 
 HOMEPAGE = https://memcached.org/
 LICENSE  =
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-CONF_DIR         = src/conf/
+SPK_USER = auto
+
+SERVICE_SETUP    = src/service-setup.sh
+# This is a bogus value to ensure that everything is tailored for a SERVICE_COMMAND
+# The real value is defined by the setup file
+SERVICE_COMMAND  = memcached
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = memcached_extra_install
 
