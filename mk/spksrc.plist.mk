@@ -18,7 +18,8 @@ cat_PLIST:
 	@if [ -f PLIST ] ; \
 	then \
 	  $(PLIST_TRANSFORM) PLIST ; \
-	elif [ -f PLIST.auto ] ; \
+	# If there is a PLIST.auto file or if parent directory is kernel \
+	elif [ -f PLIST.auto -o $$(basename $$(dirname $$(pwd))) = "kernel" ] ; \
 	then \
 	  for file in $$(cat $(WORK_DIR)/$(PKG_NAME).plist.auto | sort) ; \
 	  do \
