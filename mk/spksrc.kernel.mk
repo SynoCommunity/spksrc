@@ -28,7 +28,11 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 PRE_CONFIGURE_TARGET = kernel_pre_configure_target
 CONFIGURE_TARGET     = kernel_configure_target
 PRE_COMPILE_TARGET   = kernel_module_prepare_target
+ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 COMPILE_TARGET       = nop
+else
+COMPILE_TARGET       = kernel_module_compile_target
+endif
 COPY_TARGET          = nop
 
 #####
@@ -87,7 +91,7 @@ endif
 	@$(MSG) "Set any new symbols to their default value"
 # olddefconfig is not available < 3.8
 ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
-	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) <= 3.2"
+	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
 	$(RUN) yes "" | $(MAKE) oldconfig
 else
 	$(RUN) $(MAKE) olddefconfig
@@ -108,4 +112,16 @@ endif
 .PHONY: kernel_module_compile_target
 
 kernel_module_compile_target:
-	$(RUN) $(MAKE) modules
+	@for module in $(REQUIRE_KERNEL_MODULE); \
+	do \
+	  $(MAKE) kernel_module_build module=$$module ; \
+	done \
+	# Create PLIST including all modules
+	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f -name *.ko | sed -e 's,.*\(module\),\1,g' -e 's,^,lib:lib/,' > ../PLIST
+
+kernel_module_build:
+	@$(MSG) Building kernel module module=$(module)
+	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/linux INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
+	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/linux/modules.order
+	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
+	install -m 644 $(WORK_DIR)/linux/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
