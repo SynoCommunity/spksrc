@@ -33,4 +33,7 @@
         <tempIndexMinBlocks>10</tempIndexMinBlocks>
         <weakHashSelectionMethod>auto</weakHashSelectionMethod>
     </options>
+    <defaults>
+        <folder id="" ignorePerms="true" />
+    </defaults>
 </configuration>
