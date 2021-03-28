@@ -126,7 +126,7 @@ kernel_module_compile_target:
 	@for module in $(REQUIRE_KERNEL_MODULE); \
 	do \
 	  $(MAKE) kernel_module_build module=$$module ; \
-	done \
+	done
 
 kernel_module_build:
 	@$(MSG) Building kernel module module=$(module)
