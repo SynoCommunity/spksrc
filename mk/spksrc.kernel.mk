@@ -9,7 +9,8 @@ include ../../mk/spksrc.kernel-flags.mk
 NAME          = $(KERNEL_NAME)
 COOKIE_PREFIX = linux-
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
-PKG_DIR       = linux
+PKG_NAME      = linux
+PKG_DIR       = $(PKG_NAME)
 ifneq ($(KERNEL_DIST_FILE),)
 LOCAL_FILE    = $(KERNEL_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
@@ -33,7 +34,11 @@ COMPILE_TARGET       = nop
 else
 COMPILE_TARGET       = kernel_module_compile_target
 endif
-COPY_TARGET          = nop
+# spksrc.install.mk called for PRE_INSTALL_PLIST
+# in order to generate a work*/linux.plist.tmp
+# later used by spksr.plist.mk to generate the
+# diff based on .ko kernel objects
+INSTALL_TARGET       = nop
 
 #####
 
@@ -60,10 +65,16 @@ include ../../mk/spksrc.configure.mk
 compile: configure
 include ../../mk/spksrc.compile.mk
 
+install: compile
+include ../../mk/spksrc.install.mk
+
+plist: install
+include ../../mk/spksrc.plist.mk
+
 clean:
 	rm -fr work work-*
 
-all: compile
+all: install plist
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
@@ -116,8 +127,6 @@ kernel_module_compile_target:
 	do \
 	  $(MAKE) kernel_module_build module=$$module ; \
 	done \
-	# Create PLIST including all modules
-	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f -name *.ko | sed -e 's,.*\(module\),\1,g' -e 's,^,lib:lib/,' > ../PLIST
 
 kernel_module_build:
 	@$(MSG) Building kernel module module=$(module)

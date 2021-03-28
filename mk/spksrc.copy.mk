@@ -62,6 +62,10 @@ ifeq ($(strip $(PLIST_TRANSFORM)),)
 PLIST_TRANSFORM= cat
 endif
 
+ifeq ($(strip $(REQUIRE_KERNEL)),1)
+DEPENDS += kernel/syno-$(TC_ARCH)-$(TC_VERS)
+endif
+
 $(INSTALL_PLIST):
 	@(\
 	  for depend in $(DEPENDS) ; \
