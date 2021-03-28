@@ -35,7 +35,7 @@ else
 COMPILE_TARGET       = kernel_module_compile_target
 endif
 # spksrc.install.mk called for PRE_INSTALL_PLIST
-# in order to generate a work*/linux.plist.tmp
+# in order to generate a work*/linux.plist.auto
 # later used by spksr.plist.mk to generate the
 # diff based on .ko kernel objects
 INSTALL_TARGET       = nop
