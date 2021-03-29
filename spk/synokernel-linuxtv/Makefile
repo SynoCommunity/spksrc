@@ -17,7 +17,7 @@ SPK_REV = 11
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Backport of MYGICA T230A driver for 4.4.59 kernel"
 
-DEPENDS = cross/linuxtv
+DEPENDS = driver/linuxtv
 
 ifeq ($(strip $(TC_TYPE)),DSM)
 REQUIRED_DSM = 6.2.3
