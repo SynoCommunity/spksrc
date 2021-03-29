@@ -90,6 +90,3 @@ linuxtv_install:
 	$(RUN) CROSS_COMPILE=y make install DESTDIR=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 	# Install firmwares
 	$(RUN) tar xvfj $(FIRMWARE_PKG) -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
-	# Dynamically create PLIST for driver modules & firmwares
-	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f -name *.ko | sed -e 's,.*\(module\),\1,g' -e 's,^,lib:lib/,'    > ../PLIST
-	$(RUN) find $(INSTALL_DIR)/$(INSTALL_PREFIX) -type f -name *.fw | sed -e 's,.*\(firmware\),\1,g' -e 's,^,lib:lib/,' >> ../PLIST
