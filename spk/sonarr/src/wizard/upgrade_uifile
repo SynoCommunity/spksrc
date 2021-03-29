@@ -1,7 +1,12 @@
 [{
+    "step_title": "RECOMMENDATION: Download A Backup Before Upgrading",
+    "items": [{
+        "desc": "<strong style='color:red'>IMPORTANT:</strong> This update is an upgrade to Sonarr v3. We suggest that you download a manual backup as a precautionary measure before installing this update.<br><br>You can download a backup via Sonarr's built-in web-interface.<br>To do this, navigate to <b>System>Backup</b> in the Sonarr UI.<br><br>Create a backup and then download a copy of that backup before installing this upgrade."
+    }]
+},{
     "step_title": "Updating Sonarr",
     "items": [{
-        "desc": "Keep Sonarr up-to-date by using Sonarr's built-in updater.<br>Navigate to System>Updates in the Sonarr UI."
+        "desc": "Keep Sonarr up-to-date by using Sonarr's built-in updater.<br>Navigate to <b>System>Updates</b> in the Sonarr UI."
     }]
 },{
     "step_title": "Attention! DSM Permissions",
