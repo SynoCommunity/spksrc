@@ -4,7 +4,8 @@
 # NOTE: 32bit (x86) is not supported:
 # https://github.com/dotnet/core/issues/5403
 # https://github.com/dotnet/core/issues/4595
-UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
+# https://github.com/SynoCommunity/spksrc/pull/4464#issuecomment-808184517
+UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) armada370
 
 DOTNET_OS = linux
 DOTNET_DEFAULT_VERSION = 3.1
