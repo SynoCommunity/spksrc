@@ -6,8 +6,8 @@ ENV += INSTALL_PREFIX=$(INSTALL_PREFIX)
 
 ifeq ($(strip $(REQUIRE_KERNEL)),1)
 ENV += REQUIRE_KERNEL_MODULE="$(REQUIRE_KERNEL_MODULE)"
-ENV += KERNEL_ROOT=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
-KERNEL_ROOT=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
+ENV += KERNEL_ROOT=$(WORK_DIR)/linux
+KERNEL_ROOT=$(WORK_DIR)/linux
 endif
 
 ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
@@ -36,9 +36,6 @@ $(TC_VARS_MK):
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
-
-# Always export the TC_TYPE (DSM or SRM)
-ENV += TC_TYPE=$(TC_TYPE)
 
 #ifneq ($(COMPILE_MAKE_OPTIONS),)
 #ENV += MAKEFLAGS="$(COMPILE_MAKE_OPTIONS)"
