@@ -16,10 +16,19 @@ REQUIRE_KERNEL = 1
 REQUIRE_KERNEL_MODULE  = CONFIG_CFG80211:net/wireless:cfg80211
 REQUIRE_KERNEL_MODULE += CONFIG_MAC80211:net/mac80211:mac80211
 REQUIRE_KERNEL_MODULE += CONFIG_AT76C50X_USB:drivers/net/wireless:at76c50x-usb
+REQUIRE_KERNEL_MODULE += CONFIG_AR5523:drivers/net/wireless/ath/ar5523:ar5523
+REQUIRE_KERNEL_MODULE += CONFIG_ATH9K:drivers/net/wireless/ath/ath9k:ath9k
+REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_COMMON:drivers/net/wireless/ath/ath9k:ath9k_common
+REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_HTC:drivers/net/wireless/ath/ath9k:ath9k_htc
+REQUIRE_KERNEL_MODULE += CONFIG_ATH9K_HW:drivers/net/wireless/ath/ath9k:ath9k_hw
+REQUIRE_KERNEL_MODULE += CONFIG_CARL9170:drivers/net/wireless/ath/carl9170:carl9170
 REQUIRE_KERNEL_MODULE += CONFIG_MT7601U:drivers/net/wireless/mediatek/mt7601u:mt7601u
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8187:drivers/net/wireless/realtek/rtl818x/rtl8187:rtl8187
+REQUIRE_KERNEL_MODULE += CONFIG_RTL8192C_COMMON:drivers/net/wireless/realtek/rtlwifi/rtl8192c:rtl8192c-common
+REQUIRE_KERNEL_MODULE += CONFIG_RTL8192CU:drivers/net/wireless/realtek/rtlwifi/rtl8192c:rtl8192cu
 REQUIRE_KERNEL_MODULE += CONFIG_RTL8XXXU:drivers/net/wireless/realtek/rtl8xxxu:rtl8xxxu
-REQUIRE_KERNEL_MODULE += CONFIG_RTL8XXXU:drivers/net/wireless/realtek/rtlwifi:rtlwifi
+REQUIRE_KERNEL_MODULE += CONFIG_RTLWIFI:drivers/net/wireless/realtek/rtlwifi:rtlwifi
+REQUIRE_KERNEL_MODULE += CONFIG_RTLWIFI_USB:drivers/net/wireless/realtek/rtlwifi:rtl_usb
 REQUIRE_KERNEL_MODULE += CONFIG_RT2X00_LIB_USB:drivers/net/wireless/rt2x00:rt2x00lib
 REQUIRE_KERNEL_MODULE += CONFIG_RT2X00_LIB_USB:drivers/net/wireless/rt2x00:rt2x00usb
 REQUIRE_KERNEL_MODULE += CONFIG_RT2500USB:drivers/net/wireless/rt2x00:rt2500usb
@@ -27,6 +36,11 @@ REQUIRE_KERNEL_MODULE += CONFIG_RT73USB:drivers/net/wireless/rt2x00:rt73usb
 REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/rt2x00:rt2800lib
 REQUIRE_KERNEL_MODULE += CONFIG_RT2800USB:drivers/net/wireless/rt2x00:rt2800usb
 REQUIRE_KERNEL_MODULE += CONFIG_USB_ZD1201:drivers/net/wireless:zd1201
+REQUIRE_KERNEL_MODULE += CONFIG_ZD1211RW:drivers/net/wireless/zd1211rw:zd1211rw
+
+# TODO: Add to wizard
+# ATH9K_HTC, RTL8187, RTL8XXXU, RTLWIFI, RTL8192CU
+# ZD1201, ZD1211RW, AR5523, CARL9170
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Includes Atmel, MediaTek, Ralink, ZyDAS USB WIFI adapters as well as out-of-tree Realtek RTL8812AU/21AU and RTL8814AU"
