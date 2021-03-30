@@ -17,6 +17,9 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = rtl8812au_compile
 INSTALL_TARGET = rtl8812au_install
 
+KO = 88XXau.ko
+KO_DIR = $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/realtek
+
 include ../../mk/spksrc.cross-cc.mk
 
 PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)%'
@@ -27,6 +30,6 @@ rtl8812au_compile:
 
 .PHONY: rtl8812au_install
 rtl8812au_install:
-	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
-	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/88XXau.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
-	$(RUN) $(STRIP) --strip-debug $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/88XXau.ko
+	$(RUN) mkdir -p $(KO_DIR)
+	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/$(KO) $(KO_DIR)
+	$(RUN) $(STRIP) --strip-debug $(KO_DIR)/$(KO)

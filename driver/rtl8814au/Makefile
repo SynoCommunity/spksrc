@@ -17,6 +17,9 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = rtl8814au_compile
 INSTALL_TARGET = rtl8814au_install
 
+KO = 8814au.ko
+KO_DIR = $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/realtek
+
 include ../../mk/spksrc.cross-cc.mk
 
 PLIST_TRANSFORM = sed -e 's%@TC_KERNEL@%$(TC_KERNEL)%'
@@ -27,16 +30,6 @@ rtl8814au_compile:
 
 .PHONY: rtl8814au_install
 rtl8814au_install:
-	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
-	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/8814au.ko $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/
-	$(RUN) $(STRIP) --strip-debug $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/drivers/net/wireless/8814au.ko
-
-#################
-# TODO:
-#    1) faire pointer le Makefile vers les cross-compilers                          - DONE
-#    2) faire patch pour desactiver -Wimplicit-fallthrough=0 (rtl8812au uniquement) - DONE
-#    3) AJOUTER $(STRIP) --strip-debug                                              - DONE
-#    4) corriger le tc_vars pour TC_KERNEL avec + pour simplifier le code           - DONE
-#    5) corriger le spkclean vs REQUIRE_KERNEL                                      - *TODO*
-#    5) Repenser l'approche pour TC_TYPE                                            - *TODO*
-#################
+	$(RUN) mkdir -p $(KO_DIR)
+	@install -p -m 644 $(WORK_DIR)/$(PKG_DIR)/$(KO) $(KO_DIR)
+	$(RUN) $(STRIP) --strip-debug $(KO_DIR)/$(KO)
