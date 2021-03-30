@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 CHANGELOG = "1. Synology Kernel Wireless drivers"
 
-DEPENDS = cross/rtl8812au cross/rtl8814au
+DEPENDS = driver/rtl8812au driver/rtl8814au
 
 ifeq ($(strip $(TC_TYPE)),DSM)
 REQUIRED_DSM = 6.2.3
