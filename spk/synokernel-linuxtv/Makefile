@@ -8,12 +8,12 @@ ifeq ($(findstring $(ARCH),avoton braswell broadwell bromolow dockerx64 grantley
 SPK_GIT_HASH = f6e3542
 SPK_GIT_DATE = 20210113
 else
-SPK_GIT_HASH = 0691923
-SPK_GIT_DATE = 20210307
+SPK_GIT_HASH = 70188fd
+SPK_GIT_DATE = 20210323
 endif
 
 SPK_VERS = $(SPK_GIT_DATE)~$(SPK_GIT_HASH)
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/linuxtv.png
 CHANGELOG = "1. First experimental linuxtv driver package set for apollolake<br/>2. Backport of MYGICA T230A driver for 4.4.59 kernel"
 
