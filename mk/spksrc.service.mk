@@ -226,14 +226,16 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
-else ifeq ($(strip $(SERVICE_EXE)),)
+# If DSM <= 6 and privilege file exists
+else ifneq ("$(wildcard $(DSM_CONF_DIR)/privilege)","")
+ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 	@$(dsm_script_copy)
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 	@$(dsm_script_copy)
 endif
-
+endif
 
 # Apply variables to privilege file
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -244,6 +246,9 @@ ifneq ($(strip $(GROUP)),)
 	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
 endif
 endif
+
+# If privilege file exists
+ifneq ("$(wildcard $(DSM_CONF_DIR)/privilege)","")
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
@@ -262,7 +267,7 @@ ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/privilege
-
+endif
 
 # Generate service configuration for admin port
 ifeq ($(strip $(FWPORTS)),)
