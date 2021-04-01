@@ -3,17 +3,20 @@ SPK_VERS = 1.2
 SPK_REV = 6
 SPK_ICON = src/demoservice.png
 
+# force noarch target
 override ARCH=
 
 MAINTAINER = ymartin59
-DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service
+DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service. <br>Further more this package creates a demo MySQL database. Upon deinstallation the demo database and/or user can be kept or droped.
 RELOAD_UI = yes
 DISPLAY_NAME = DemoService
-CHANGELOG = "Initial version"
+CHANGELOG = "Add db creation demo."
 
 LICENSE  = GPLv2
 
-WIZARDS_DIR      = src/wizard/
+WIZARDS_DIR = src/wizard/
+# The demo database is created by definitions in conf/resource and controlled by wizard variables.
+CONF_DIR    = src/conf/
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER         = auto
@@ -36,8 +39,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: demoservice_install
 # Replace standard copy/install targets, no sources, no content
 demoservice_install:
-	rm -fr $(STAGING_DIR)
+	rm -rf $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mkdir --parents $(STAGING_INSTALL_PREFIX)
-	echo "No files package" > $(STAGING_INSTALL_PREFIX)/README
-
+	echo "No files package with MySQL DB creation." > $(STAGING_INSTALL_PREFIX)/README

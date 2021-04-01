@@ -1,0 +1,25 @@
+[
+  {
+    "step_title": "MySQL Demo Database",
+    "items": [{
+      "type": "password",
+      "desc": "Enter your MySQL root password if you want to drop the database and/or the db user.",
+      "subitems": [{
+          "key": "wizard_mysql_password_root",
+          "desc": "MySQL root password"
+      }]
+      },{
+      "type": "multiselect",
+      "desc": "Cleanup the Demo Database:",
+      "subitems": [{
+        "key": "wizard_mysql_drop_database",
+        "desc": "Drop demo database",
+        "defaultValue": true
+        },{
+        "key": "wizard_mysql_drop_db_user",
+        "desc": "Drop demo db user",
+        "defaultValue": true
+      }]
+    }]
+  }
+]
