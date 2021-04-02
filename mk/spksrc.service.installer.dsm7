@@ -15,6 +15,22 @@ FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
 
 TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
+
+install_log ()
+{
+    local _msg_="$@"
+    if [ -z "${_msg_}" ]; then
+        # read multiline from stdin
+        while IFS=$'\n' read -r line; do
+            install_log "${line}"
+        done
+    else
+        # /var/log/packages/{package}.log
+        echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" 1>&2
+    fi
+}
+
+
 # Source package specific variable and functions
 SVC_SETUP=`dirname $0`"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
@@ -52,16 +68,9 @@ TEE="/usr/bin/tee -a"
 
 ### Functions library
 
-log ()
-{
-    echo "$1" 1>&2 # /var/log/packages/{package}.log
-}
-
-
 log_step ()
 {
-    log $(date)
-    log "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
+    install_log "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
 }
 
 save_wizard_variables ()
@@ -79,36 +88,36 @@ save_wizard_variables ()
 
 set_unix_permissions ()
 {
-    log "Notice: set_unix_permissions() is no longer required on DSM7."
+    install_log "Notice: set_unix_permissions() is no longer required on DSM7."
 }
 
 syno_remove_user ()
 {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_remove_user() is no longer supported."
+    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_remove_user() is no longer supported."
 }
 
 syno_group_create ()
 {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_create() is no longer supported."
+    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_create() is no longer supported."
 }
 
 syno_group_remove ()
 {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_remove() is no longer supported."
+    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_remove() is no longer supported."
 }
 
 syno_user_add_to_group ()
 {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_group() is no longer supported."
+    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_group() is no longer supported."
 }
 
 set_syno_permissions ()
 {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_syno_permissions() is no longer supported."
+    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_syno_permissions() is no longer supported."
 }
 
 syno_user_add_to_legacy_group () {
-    log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
+    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
 }
 
 
@@ -136,16 +145,16 @@ postinst ()
     save_wizard_variables
 
     # copy target/var data to permanent storage
-    # and don't override old configurations
-    if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
-        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+    # and do overwrite with configurations found in old location
+    if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGDEST}/var -mindepth 1 -not -name '*.log' -print)" = "" ]; then
+        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Add firewall config
         if [ -r "${FWPORTS_FILE}" ]; then
-            echo "Installing service configuration ${FWPORTS_FILE}" >> ${INST_LOG}
-            servicetool --install-configure-file --package "${FWPORTS_FILE}" >> ${INST_LOG} 2>&1
+            install_log "Installing service configuration ${FWPORTS_FILE}"
+            servicetool --install-configure-file --package "${FWPORTS_FILE}" 2>&1 | install_log
         fi
     fi
 
@@ -162,8 +171,8 @@ preuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         # Remove firewall config
         if [ -r "${FWPORTS_FILE}" ]; then
-            echo "Removing service configuration ${SYNOPKG_PKGNAME}.sc" >> ${INST_LOG}
-            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" >> ${INST_LOG} 2>&1
+            install_log "Removing service configuration ${SYNOPKG_PKGNAME}.sc"
+            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" 2>&1 | install_log
         fi
     fi
 
