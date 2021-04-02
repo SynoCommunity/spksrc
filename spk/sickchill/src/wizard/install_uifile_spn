@@ -20,6 +20,17 @@
                 "allowBlank": true
             }
         }]
+    },{
+                    "type": "textfield",
+                    "desc": "La rama para conseguir",
+                    "subitems": [{
+                        "key": "wizard_branch",
+                        "desc": "Rama",
+                        "defaultValue": "master",
+                        "validator": {
+                            "allowBlank": false
+                        }
+                    }]
     },
     {
         "desc": "Los permisos para los paquetes relacionados con descargas son manejados por el grupo <b>'sc-download'</b> en DSM.<br>Por favor, lea <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Manejo de Permisos (en inglés)</a> para mayor detalle."
