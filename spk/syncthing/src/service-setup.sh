@@ -8,8 +8,7 @@ service_prestart ()
 {
     # Read additional startup options from /usr/local/syncthing/var/options.conf
     if [ -f ${SYNOPKG_PKGVAR}/options.conf ]; then
-        # subshell is safer - won't override variables in current script
-        (. ${SYNOPKG_PKGVAR}/options.conf)
+        . ${SYNOPKG_PKGVAR}/options.conf
         SERVICE_COMMAND="${SERVICE_COMMAND} ${SYNCTHING_OPTIONS}"
     fi
 
