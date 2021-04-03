@@ -53,10 +53,10 @@ pre_service_target: service_msg_target
 # auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
 SPK_USER = $(SPK_NAME)
-else
+else ifneq ($(strip $(SERVICE_USER)),)
 SPK_USER = $(SERVICE_USER)
-endif
-ifeq ($(strip $(SPK_USER)),)
+# else always enforce setting SPK_USER on DSM >= 7
+else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_USER = $(SPK_NAME)
 endif
 
@@ -226,17 +226,18 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
-# If DSM <= 6 and privilege file exists
-else ifneq ("$(wildcard $(DSM_CONF_DIR)/privilege)","")
+# DSM <= 6 and SERVICE_USER defined
+else ifneq ($(strip $(SPK_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
+	@$(MSG) "spksrc.service.privilege-installasroot"
 	@$(dsm_script_copy)
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
+	@$(MSG) "spksrc.service.privilege-startasroot"
 	@$(dsm_script_copy)
 endif
 endif
-
 # Apply variables to privilege file
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(GROUP)),)
@@ -245,29 +246,39 @@ ifneq ($(strip $(GROUP)),)
 # or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
 	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
 endif
-endif
-
-# If privilege file exists
-ifneq ("$(wildcard $(DSM_CONF_DIR)/privilege)","")
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
 endif
 ifneq ($(strip $(SPK_USER)),)
 	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
-endif
 endif
 ifneq ($(strip $(SPK_GROUP)),)
 	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
 endif
+else
+ifneq ($(strip $(SYSTEM_GROUP)),)
+# options: http, system
+	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
+endif
+ifneq ($(strip $(SPK_USER)),)
+	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
+endif
+ifneq ($(strip $(SPK_GROUP)),)
+	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
+endif
+endif
 
+ifneq ("$(wildcard $(DSM_CONF_DIR)/privilege)","")
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
-SERVICE_FILES += $(DSM_CONF_DIR)/privilege
 endif
+
+# Call $(DSM_CONF_DIR)/privilege:
+SERVICE_FILES += $(DSM_CONF_DIR)/privilege
+
 
 # Generate service configuration for admin port
 ifeq ($(strip $(FWPORTS)),)
