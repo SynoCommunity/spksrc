@@ -1,9 +1,10 @@
 PYTHON_DIR="/usr/local/python38"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+BIN="${SYNOPKG_PKGDEST}/bin"
+PATH="${BIN}:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
 GROUP="sc-download"
@@ -25,6 +26,9 @@ service_postinst ()
 
     # Create logs directory, otherwise it does not start due to permissions errors
     mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
+
+    # Install nice/ionice
+    ${BIN}/busybox --install ${BIN} >> ${INST_LOG} 2>&1
 }
 
 service_postupgrade ()
