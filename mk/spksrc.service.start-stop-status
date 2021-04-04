@@ -9,6 +9,18 @@ if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
+
+# Invoke shell function if available
+call_func ()
+{
+    FUNC=$1
+    if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
+        "Invoke ${FUNC}" >> ${LOG_FILE}
+        eval ${FUNC}     >> ${LOG_FILE}
+    fi
+}
+
+
 start_daemon ()
 {
     if [ -z "${SVC_QUIET}" ]; then

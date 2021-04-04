@@ -141,7 +141,6 @@ ifneq ($(strip $(SERVICE_OPTIONS)),)
 	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
 endif
 endif
-	@cat $(SPKSRC_MK)spksrc.service.call_func >> $@
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif

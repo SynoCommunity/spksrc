@@ -33,12 +33,22 @@ install_log ()
         install_log "${line}"
       done
   else
-    echo $(date +'%Y/%m/%d %H:%M:%S')$'\t'${_msg_} >> ${INST_LOG} 2>&1
+    echo -e "$(date +'%Y/%m/%d %H:%M:%S')$\t${_msg_}" >> ${INST_LOG} 2>&1
   fi
 }
 
+# Invoke shell function if available
+call_func ()
+{
+    FUNC=$1
+    if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
+        install_log "Invoke ${FUNC}"
+        eval ${FUNC}
+    fi
+}
 
-# Source package specific variable and functions
+
+# Source package specific variables and functions
 SVC_SETUP=`dirname $0`"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
@@ -106,7 +116,7 @@ syno_remove_user ()
         # Check if user exists
         if synouser --get "${RM_USER}" &> /dev/null; then
             install_log "Removing user ${RM_USER}"
-            synouser --del "${RM_USER}" | install_log
+            synouser --del "${RM_USER}" 2>&1 | install_log
             synouser --rebuild all
             # Also rebuild groups so users are removed
             synogroup --rebuild all
@@ -121,9 +131,9 @@ syno_group_create ()
     if [ -n "${EFF_USER}" ]; then
         install_log "Creating group ${GROUP}"
         # Create syno group
-        synogroup --add "${GROUP}" "${EFF_USER}" | install_log
+        synogroup --add "${GROUP}" "${EFF_USER}" 2>&1 | install_log
         # Set description of the syno group
-        synogroup --descset "${GROUP}" "${GROUP_DESC}" | install_log
+        synogroup --descset "${GROUP}" "${GROUP_DESC}" 2>&1 | install_log
     fi
 }
 
@@ -136,8 +146,8 @@ syno_group_remove ()
         if ! synogroup --get "${RM_GROUP}" | grep -q "0:\["; then
             install_log "Removing group ${RM_GROUP}"
             # Remove syno group
-            synogroup --del "${RM_GROUP}" | install_log
-            synogroup --rebuild all | install_log
+            synogroup --del "${RM_GROUP}" 2>&1 | install_log
+            synogroup --rebuild all 2>&1 | install_log
         fi
     fi
 }
@@ -154,7 +164,7 @@ syno_user_add_to_group ()
         MEMBERS="$(synogroup --get $ADD_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
         # The "synogroup --member" command clears all users before adding new ones
         # so all the users must be listed on the command line
-        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}" | install_log
+        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}" 2>&1 | install_log
     fi
 }
 
@@ -243,12 +253,13 @@ syno_user_add_to_legacy_group () {
 preinst ()
 {
     log_step "preinst"
-    call_func "service_preinst"
+    call_func "validate_preinst"
+    call_func "service_preinst" 2>&1 | install_log
 
     # Check volume exists
     if [ -n "${SHARE_PATH}" ]; then
         if [ ! -d "${SHARE_VOLUME}" ]; then
-            echo "Volume ${SHARE_VOLUME} does not exist." | $TEE | install_log
+            echo "ERROR: Volume ${SHARE_VOLUME} does not exist." | $TEE 1>&2
             exit 1
         fi
     fi
@@ -262,7 +273,7 @@ postinst ()
     save_wizard_variables
 
     # Link for backward compatibility of binaries location
-    $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" | install_log
+    $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
 
     # Add firewall config
     if [ -r "${FWPORTS_FILE}" ]; then
@@ -329,8 +340,8 @@ postinst ()
 
     $MKDIR "${INST_VAR}"
 
-    call_func "service_postinst"
-    call_func "service_create_links"
+    call_func "service_postinst" 2>&1 | install_log
+    call_func "service_create_links" 2>&1 | install_log
 
     $CP "${INST_LOG}" "${INST_VAR}"
     if [ -n "${LOG_FILE}" ]; then
@@ -349,6 +360,7 @@ postinst ()
 preuninst ()
 {
     log_step "preuninst"
+    call_func "validate_preuninst"
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         # Remove firewall config
@@ -358,7 +370,7 @@ preuninst ()
         fi
     fi
 
-    call_func "service_preuninst"
+    call_func "service_preuninst" 2>&1 | install_log
     exit 0
 }
 
@@ -377,8 +389,8 @@ postuninst ()
         syno_remove_user "${EFF_USER}"
     fi
 
-    call_func "service_postuninst"
-    call_func "service_remove_links"
+    call_func "service_postuninst" 2>&1 | install_log
+    call_func "service_remove_links" 2>&1 | install_log
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}"
@@ -389,13 +401,14 @@ postuninst ()
 preupgrade ()
 {
     log_step "preupgrade"
-    call_func "service_preupgrade"
+    call_func "validate_preupgrade"
+    call_func "service_preupgrade" 2>&1 | install_log
 
     # Save some stuff
     $RM "$TMP_DIR" 2>&1 | install_log
     $MKDIR "$TMP_DIR" 2>&1 | install_log
 
-    call_func "service_save"
+    call_func "service_save" 2>&1 | install_log
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
@@ -417,9 +430,9 @@ postupgrade ()
 
     $RM "$TMP_DIR" 2>&1 | install_log
 
-    call_func "service_postupgrade"
+    call_func "service_postupgrade" 2>&1 | install_log
 
     # Make sure we also have the logging for this step
-    $CP "${INST_LOG}" "${INST_VAR}"
+    $CP "${INST_LOG}" "${INST_VAR}" 2>&1 | install_log
     exit 0
 }

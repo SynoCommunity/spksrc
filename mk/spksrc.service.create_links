@@ -5,9 +5,9 @@ service_create_links ()
     for cmd in ${SPK_COMMANDS}
     do
         if [ -e "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-            mkdir -p "$(dirname /usr/local/${cmd})" 2>&1 | install_log
-            install_log "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
-            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}" 2>&1 | install_log
+            mkdir -p "$(dirname /usr/local/${cmd})"
+            echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
+            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"
         fi
     done
 
@@ -16,9 +16,9 @@ service_create_links ()
         _link=$(echo ${item} | sed "s/:.*//g")
         _target=$(echo ${item} | sed "s/.*://g")
         if [ -e "${SYNOPKG_PKGDEST}/${_target}" ]; then
-            mkdir -p "$(dirname ${_link})" 2>&1 | install_log
-            install_log "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
-            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}" 2>&1 | install_log
+            mkdir -p "$(dirname ${_link})"
+            echo "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
+            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"
         fi
     done
 }
@@ -30,13 +30,13 @@ service_remove_links ()
     do
         if [ -L "/usr/local/${cmd}" ]; then
             if [ "$(readlink /usr/local/${cmd})" == "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-                install_log "remove link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
-                rm -f "/usr/local/${cmd}" 2>&1 | install_log
+                echo "remove link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
+                rm -f "/usr/local/${cmd}"
             else
-                install_log "skip remove link: /usr/local/${cmd} -> $(readlink /usr/local/${cmd})"
+                echo "skip remove link: /usr/local/${cmd} -> $(readlink /usr/local/${cmd})"
             fi
         else
-           install_log "link to remove not found: /usr/local/${cmd}"
+           echo "link to remove not found: /usr/local/${cmd}"
         fi
     done
 
@@ -46,13 +46,13 @@ service_remove_links ()
         _target=$(echo ${item} | sed "s/.*://g")
         if [ -L "${_link}" ]; then
             if [ "$(readlink ${_link})" == "${SYNOPKG_PKGDEST}/${_target}" ]; then
-                install_log "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
-                rm -f "${_link}" 2>&1 | install_log
+                echo "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
+                rm -f "${_link}"
             else
-                install_log "skip remove link: ${_link} -> $(readlink ${_link})"
+                echo "skip remove link: ${_link} -> $(readlink ${_link})"
             fi
         else
-           install_log "link to remove not found: ${_link}"
+           echo "link to remove not found: ${_link}"
         fi
     done
 }
