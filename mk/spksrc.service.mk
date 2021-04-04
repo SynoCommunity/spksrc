@@ -226,17 +226,23 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
+	@$(MSG) "Creating $@"
+	@$(MSG) '(privilege) run-as: package'
 # DSM <= 6 and SERVICE_USER defined
 else ifneq ($(strip $(SPK_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
-	@$(MSG) "spksrc.service.privilege-installasroot"
 	@$(dsm_script_copy)
+	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
-	@$(MSG) "spksrc.service.privilege-startasroot"
 	@$(dsm_script_copy)
+	@$(MSG) "(privilege) spksrc.service.privilege-startasroot"
 endif
+else
+$(DSM_CONF_DIR)/privilege:
+	@$(MSG) "Creating $@"
+	@$(MSG) "(privilege) DSM <= 6 and SERVICE_USER undefined"
 endif
 # Apply variables to privilege file
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
