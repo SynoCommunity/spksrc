@@ -257,6 +257,8 @@ endif
 ifneq ($(strip $(SPK_GROUP)),)
 	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
 endif
+
+# Less then DSM 7
 else
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
