@@ -4,14 +4,15 @@
 #  Cannot remove user as still in use or may be DSM service itself
 # Require warning in ChangeLog and manual user/group cleanup
 
-# INST_LOG is not valid for DSM >= 7
-# package specific install scripts must not use INST_LOG anymore; use install_log function instead.
+# INST_LOG is not writable for DSM >= 7
+# package specific install scripts must not use INST_LOG anymore to 
+# be compatible for all DSM versions
 INST_LOG="/tmp/${SYNOPKG_PKGNAME}_install.log"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
-INST_VAR="${SYNOPKG_PKGDEST}/var"
-SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var" # backwards compatibility
+# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
+SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
@@ -160,7 +161,7 @@ syno_user_add_to_group ()
     # Check user already in group
     if ! synogroup --get "$ADD_GROUP" | grep "^[0-9]:\[${ADD_USER}\]" &> /dev/null; then
         # Add user, not in group yet
-        echo  "Adding '${ADD_USER}' to '${ADD_GROUP}'"
+        echo "Adding '${ADD_USER}' to '${ADD_GROUP}'"
         MEMBERS="$(synogroup --get $ADD_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
         # The "synogroup --member" command clears all users before adding new ones
         # so all the users must be listed on the command line
@@ -338,21 +339,21 @@ postinst ()
         fi
     fi
 
-    $MKDIR "${INST_VAR}" 2>&1 | install_log
+    $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
     call_func "service_postinst" 2>&1 | install_log
     call_func "service_create_links" 2>&1 | install_log
 
-    $CP "${INST_LOG}" "${INST_VAR}" 2>&1 | install_log
+    $CP "${INST_LOG}" "${SYNOPKG_PKGVAR}" 2>&1 | install_log
     if [ -n "${LOG_FILE}" ]; then
-        echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
+        echo "Installation log: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
     fi
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
         # On DSM 5 set package files permissions for consistency with DSM 6
         set_unix_permissions "${SYNOPKG_PKGDEST}" 2>&1 | install_log
     else
         # On DSM 6 only var is concerned
-        set_unix_permissions "${INST_VAR}" 2>&1 | install_log
+        set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
     fi
     exit 0
 }
@@ -412,7 +413,7 @@ preupgrade ()
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
-    $CP "${INST_VAR}"/. "$TMP_DIR" 2>&1 | install_log
+    $CP "${SYNOPKG_PKGVAR}"/. "$TMP_DIR" 2>&1 | install_log
     exit 0
 }
 
@@ -423,16 +424,16 @@ postupgrade ()
     call_func "service_restore"
 
     # Restore some stuff, has to be cp otherwise fails on directories
-    $CP "${TMP_DIR}"/. "${INST_VAR}" 2>&1 | install_log
+    $CP "${TMP_DIR}"/. "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
     # Correct permissions of var folder
-    set_unix_permissions "${INST_VAR}" 2>&1 | install_log
+    set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
     $RM "$TMP_DIR" 2>&1 | install_log
 
     call_func "service_postupgrade" 2>&1 | install_log
 
     # Make sure we also have the logging for this step
-    $CP "${INST_LOG}" "${INST_VAR}" 2>&1 | install_log
+    $CP "${INST_LOG}" "${SYNOPKG_PKGVAR}" 2>&1 | install_log
     exit 0
 }

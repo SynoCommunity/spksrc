@@ -106,18 +106,13 @@ ifneq ($(strip $(SERVICE_PORT)),)
 endif
 ifneq ($(STARTABLE),no)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
-	@echo 'LOG_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.log"' >> $@
-	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
-	@echo 'PID_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.pid"' >> $@
-	@echo "# backwards compatibility" >> $@
+	@echo "# define SYNOPKG_PKGVAR for compatibility with DSM7" >> $@
 	@echo 'SYNOPKG_PKGVAR="$${SYNOPKG_PKGDEST}/var"' >> $@
-else
+endif
 	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
 	@echo 'LOG_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.log"' >> $@
 	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
 	@echo 'PID_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.pid"' >> $@
-endif
 endif
 ifneq ($(strip $(SERVICE_COMMAND)),)
 ifneq ($(strip $(SERVICE_SHELL)),)

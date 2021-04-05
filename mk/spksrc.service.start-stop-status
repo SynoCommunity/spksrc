@@ -152,9 +152,10 @@ case $1 in
         fi
         ;;
     log)
+        # log output for DSM < 6
         if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
             # Shorten long logs to last 100 lines
-            TEMP_LOG_FILE="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_temp.log"
+            TEMP_LOG_FILE="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_temp.log"
             # Clear any previous log
             echo "Full log: ${LOG_FILE}" > "${TEMP_LOG_FILE}"
             tail -n100 "${LOG_FILE}" >> "${TEMP_LOG_FILE}"
