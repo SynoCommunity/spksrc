@@ -33,7 +33,7 @@ install_log ()
         install_log "${line}"
       done
   else
-    echo -e "$(date +'%Y/%m/%d %H:%M:%S')$\t${_msg_}" >> ${INST_LOG} 2>&1
+    echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" >> ${INST_LOG} 2>&1
   fi
 }
 
@@ -115,8 +115,8 @@ syno_remove_user ()
     if [ -n "${RM_USER}" ]; then
         # Check if user exists
         if synouser --get "${RM_USER}" &> /dev/null; then
-            install_log "Removing user ${RM_USER}"
-            synouser --del "${RM_USER}" 2>&1 | install_log
+            echo "Removing user ${RM_USER}"
+            synouser --del "${RM_USER}"
             synouser --rebuild all
             # Also rebuild groups so users are removed
             synogroup --rebuild all
@@ -129,11 +129,11 @@ syno_group_create ()
 {
     EFF_USER=$1
     if [ -n "${EFF_USER}" ]; then
-        install_log "Creating group ${GROUP}"
+        echo "Creating group ${GROUP}"
         # Create syno group
-        synogroup --add "${GROUP}" "${EFF_USER}" 2>&1 | install_log
+        synogroup --add "${GROUP}" "${EFF_USER}"
         # Set description of the syno group
-        synogroup --descset "${GROUP}" "${GROUP_DESC}" 2>&1 | install_log
+        synogroup --descset "${GROUP}" "${GROUP_DESC}"
     fi
 }
 
@@ -144,10 +144,10 @@ syno_group_remove ()
     if [ -n "${RM_GROUP}" ]; then
         # Check if syno group is empty
         if ! synogroup --get "${RM_GROUP}" | grep -q "0:\["; then
-            install_log "Removing group ${RM_GROUP}"
+            echo "Removing group ${RM_GROUP}"
             # Remove syno group
-            synogroup --del "${RM_GROUP}" 2>&1 | install_log
-            synogroup --rebuild all 2>&1 | install_log
+            synogroup --del "${RM_GROUP}"
+            synogroup --rebuild all
         fi
     fi
 }
@@ -160,11 +160,11 @@ syno_user_add_to_group ()
     # Check user already in group
     if ! synogroup --get "$ADD_GROUP" | grep "^[0-9]:\[${ADD_USER}\]" &> /dev/null; then
         # Add user, not in group yet
-        install_log  "Adding '${ADD_USER}' to '${ADD_GROUP}'"
+        echo  "Adding '${ADD_USER}' to '${ADD_GROUP}'"
         MEMBERS="$(synogroup --get $ADD_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
         # The "synogroup --member" command clears all users before adding new ones
         # so all the users must be listed on the command line
-        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}" 2>&1 | install_log
+        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}"
     fi
 }
 
@@ -186,13 +186,13 @@ set_syno_permissions ()
                 set_unix_permissions "${DIRNAME}"
                 # If it is linux mode (due to old package) we need to add "administrators"-group,
                 # otherwise the folder is not accessible from File Station anymore!
-                synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" 2>&1 | install_log
+                synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--"
             fi
 
             # Then fix the Synology permissions
-            install_log "Granting '${GROUP}' group permissions on ${DIRNAME}"
-            synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:rwxpdDaARWcC-:fd--" 2>&1 | install_log
-            find "${DIRNAME}" -type d -exec synoacltool -enforce-inherit "{}" \; 2>&1 | install_log
+            echo "Granting '${GROUP}' group permissions on ${DIRNAME}"
+            synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:rwxpdDaARWcC-:fd--"
+            find "${DIRNAME}" -type d -exec synoacltool -enforce-inherit "{}" \;
         fi
 
         # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
@@ -200,16 +200,16 @@ set_syno_permissions ()
             if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:r.x\"`" ]; then
                 # Here we also need to make sure the admin can access data via File Station
                 if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
-                    synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--" 2>&1 | install_log
+                    synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--"
                 fi
                 # Add the new group permissions
-                install_log "Granting '${GROUP}' group basic permissions on ${DIRNAME}"
-                synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:r-x---a-R----:---n" 2>&1 | install_log
+                echo "Granting '${GROUP}' group basic permissions on ${DIRNAME}"
+                synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:r-x---a-R----:---n"
             fi
             DIRNAME="$(dirname "${DIRNAME}")"
         done
     else
-        install_log "Skip granting '${GROUP}' group permissions on ${DIRNAME} as the directory does not reside in '/volumeX'. Set manually if needed."
+        echo "Skip granting '${GROUP}' group permissions on ${DIRNAME} as the directory does not reside in '/volumeX'. Set manually if needed."
     fi
 }
 
@@ -218,11 +218,11 @@ set_unix_permissions ()
 {
     DIRNAME=$1
     if [ -n "${EFF_USER}" ]; then
-        install_log "Granting '${EFF_USER}' unix ownership on ${DIRNAME}"
+        echo "Granting '${EFF_USER}' unix ownership on ${DIRNAME}"
         if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-            chown -R ${EFF_USER}:root "${DIRNAME}" 2>&1 | install_log
+            chown -R ${EFF_USER}:root "${DIRNAME}"
         else
-            chown -R ${EFF_USER}:${USER} "${DIRNAME}" 2>&1 | install_log
+            chown -R ${EFF_USER}:${USER} "${DIRNAME}"
         fi
     fi
 }
@@ -238,12 +238,12 @@ syno_user_add_to_legacy_group () {
     # Check if user in old group
     if synogroup --get "$LEGACY_GROUP" | grep "^[0-9]:\[${LEGACY_USER}\]" &> /dev/null; then
         # Add new user and remove old one
-        install_log "Adding '${NEW_USER}' to '${LEGACY_GROUP}' for backwards compatibility"
+        echo "Adding '${NEW_USER}' to '${LEGACY_GROUP}' for backwards compatibility"
         MEMBERS="$(synogroup --get $LEGACY_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
         MEMBERS=${MEMBERS//$LEGACY_USER}
         # The "synogroup --member" command clears all users before adding new ones
         # so all the users must be listed on the command line
-        synogroup --member "$LEGACY_GROUP" $MEMBERS "${NEW_USER}" 2>&1 | install_log
+        synogroup --member "$LEGACY_GROUP" $MEMBERS "${NEW_USER}"
     fi
 }
 
@@ -270,7 +270,7 @@ preinst ()
 postinst ()
 {
     log_step "postinst"
-    save_wizard_variables
+    save_wizard_variables 2>&1 | install_log
 
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
@@ -290,13 +290,13 @@ postinst ()
                 synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 2>&1 | install_log
                 # Set HOME for consistency with DSM 6, location available even if homes not enabled
                 BACKUP_PASSWD="/tmp/install_${SYNOPKG_PKGNAME}_passwd"
-                cp /etc/passwd ${BACKUP_PASSWD}
-                sed -i "s#/var/services/homes/${EFF_USER}#/var/packages/${SYNOPKG_PKGNAME}/target#" /etc/passwd
+                cp /etc/passwd ${BACKUP_PASSWD} 2>&1 | install_log
+                sed -i "s#/var/services/homes/${EFF_USER}#/var/packages/${SYNOPKG_PKGNAME}/target#" /etc/passwd 2>&1 | install_log
             fi
         fi
         # Register service in "users" group to access any content
         if [ "$ADD_USER_IN_USERS" = "yes" ]; then
-            syno_user_add_to_group "${EFF_USER}" "users"
+            syno_user_add_to_group "${EFF_USER}" "users" 2>&1 | install_log
         fi
     fi
 
@@ -305,13 +305,13 @@ postinst ()
         # Check if group already exists
         if ! synogroup --get "$GROUP" &> /dev/null; then
             # Group does not exist yet: create with user as member
-            syno_group_create "${EFF_USER}"
+            syno_group_create "${EFF_USER}" 2>&1 | install_log
         fi
         if synogroup --get "$GROUP" &> /dev/null; then
-            syno_user_add_to_group "${EFF_USER}" "${GROUP}"
+            syno_user_add_to_group "${EFF_USER}" "${GROUP}" 2>&1 | install_log
         fi
         # Not sure but invoked with hope DSM is updated
-        synogroup --rebuild all
+        synogroup --rebuild all 2>&1 | install_log
     fi
 
     # Share management
@@ -328,31 +328,31 @@ postinst ()
         if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
             synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
         fi
-        synoshare --build
+        synoshare --build 2>&1 | install_log
 
         $MKDIR "${SHARE_PATH}"
 
         # Permissions for folder, up to volume
         if [ -n "$GROUP" ]; then
-            set_syno_permissions "${SHARE_PATH}" "${GROUP}"
+            set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
         fi
     fi
 
-    $MKDIR "${INST_VAR}"
+    $MKDIR "${INST_VAR}" 2>&1 | install_log
 
     call_func "service_postinst" 2>&1 | install_log
     call_func "service_create_links" 2>&1 | install_log
 
-    $CP "${INST_LOG}" "${INST_VAR}"
+    $CP "${INST_LOG}" "${INST_VAR}" 2>&1 | install_log
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_VAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
     fi
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
         # On DSM 5 set package files permissions for consistency with DSM 6
-        set_unix_permissions "${SYNOPKG_PKGDEST}"
+        set_unix_permissions "${SYNOPKG_PKGDEST}" 2>&1 | install_log
     else
         # On DSM 6 only var is concerned
-        set_unix_permissions "${INST_VAR}"
+        set_unix_permissions "${INST_VAR}" 2>&1 | install_log
     fi
     exit 0
 }
@@ -383,17 +383,17 @@ postuninst ()
         $RM "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
 
         # Remove syno group if empty
-        syno_group_remove "${GROUP}"
+        syno_group_remove "${GROUP}" 2>&1 | install_log
 
         # Remove user
-        syno_remove_user "${EFF_USER}"
+        syno_remove_user "${EFF_USER}" 2>&1 | install_log
     fi
 
     call_func "service_postuninst" 2>&1 | install_log
     call_func "service_remove_links" 2>&1 | install_log
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        $RM "${INST_VARIABLES}"
+        $RM "${INST_VARIABLES}" 2>&1 | install_log
     fi
     exit 0
 }
@@ -426,7 +426,7 @@ postupgrade ()
     $CP "${TMP_DIR}"/. "${INST_VAR}" 2>&1 | install_log
 
     # Correct permissions of var folder
-    set_unix_permissions "${INST_VAR}"
+    set_unix_permissions "${INST_VAR}" 2>&1 | install_log
 
     $RM "$TMP_DIR" 2>&1 | install_log
 

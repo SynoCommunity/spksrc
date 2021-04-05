@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # DSM 5 -> 7 upgrade path:
-# Not supported
+# - Not supported
 # DSM 6 -> 7 upgrade path:
-# files are migrated from ${SYNOPKG_PKGDEST}/var to ${SYNOPKG_PKGVAR}
-# Not supported (yet)
+# - files are migrated from ${SYNOPKG_PKGDEST}/var to ${SYNOPKG_PKGVAR}
+# - Not supported (yet)
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
@@ -31,7 +31,6 @@ install_log ()
     fi
 }
 
-
 # Invoke shell function if available
 call_func ()
 {
@@ -41,6 +40,7 @@ call_func ()
         eval ${FUNC}
     fi
 }
+
 
 # Source package specific variables and functions
 SVC_SETUP=`dirname $0`"/service-setup"
@@ -87,7 +87,7 @@ log_step ()
 save_wizard_variables ()
 {
     if [ -e "${INST_VARIABLES}" ]; then
-        $RM "${INST_VARIABLES}" 2>&1 | install_log
+        $RM "${INST_VARIABLES}"
     fi
     if [ -n "${GROUP}" ]; then
         echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
@@ -99,36 +99,36 @@ save_wizard_variables ()
 
 set_unix_permissions ()
 {
-    install_log "Notice: set_unix_permissions() is no longer required on DSM7."
+    echo "Notice: set_unix_permissions() is no longer required on DSM7."
 }
 
 syno_remove_user ()
 {
-    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_remove_user() is no longer supported."
+    echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_remove_user() is no longer supported."
 }
 
 syno_group_create ()
 {
-    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_create() is no longer supported."
+    echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_create() is no longer supported."
 }
 
 syno_group_remove ()
 {
-    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_remove() is no longer supported."
+    echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_group_remove() is no longer supported."
 }
 
 syno_user_add_to_group ()
 {
-    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_group() is no longer supported."
+    echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_group() is no longer supported."
 }
 
 set_syno_permissions ()
 {
-    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_syno_permissions() is no longer supported."
+    echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. set_syno_permissions() is no longer supported."
 }
 
 syno_user_add_to_legacy_group () {
-    install_log "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
+    echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
 }
 
 
@@ -154,10 +154,10 @@ preinst ()
 postinst ()
 {
     log_step "postinst"
-    save_wizard_variables
+    save_wizard_variables 2>&1 | install_log
 
     # copy target/var data to permanent storage
-    # and do overwrite with configurations found in old location
+    # and overwrite with configurations found in old location
     if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGDEST}/var -mindepth 1 -not -name '*.log' -print)" = "" ]; then
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
@@ -199,15 +199,15 @@ postuninst ()
     if [ "$wizard_delete_data" = "true" ]; then
 
         if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
-            rm -rf ${SYNOPKG_PKGHOME}/
+            rm -rf ${SYNOPKG_PKGHOME}/* 2>&1 | install_log
         fi
 
         if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
-            rm -rf ${SYNOPKG_PKGVAR}/
+            rm -rf ${SYNOPKG_PKGVAR}/* 2>&1 | install_log
         fi
 
         if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
-            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/
+            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/* 2>&1 | install_log
         fi
     fi
     exit 0
@@ -222,7 +222,7 @@ preupgrade ()
     # Migrate data to permanent storage
     if [ ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
         # only migrate when destination is empty
-        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
 
     call_func "service_preupgrade" 2>&1 | install_log
