@@ -162,14 +162,6 @@ postinst ()
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
 
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        # Add firewall config
-        if [ -r "${FWPORTS_FILE}" ]; then
-            install_log "Installing service configuration ${FWPORTS_FILE}"
-            servicetool --install-configure-file --package "${FWPORTS_FILE}" 2>&1 | install_log
-        fi
-    fi
-
     call_func "service_postinst" 2>&1 | install_log
     exit 0
 }
@@ -178,15 +170,6 @@ preuninst ()
 {
     log_step "preuninst"
     call_func "validate_preuninst"
-
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        # Remove firewall config
-        if [ -r "${FWPORTS_FILE}" ]; then
-            install_log "Removing service configuration ${SYNOPKG_PKGNAME}.sc"
-            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" 2>&1 | install_log
-        fi
-    fi
-
     call_func "service_preuninst" 2>&1 | install_log
     exit 0
 }

@@ -233,6 +233,9 @@ ifneq ($(strip $(GROUP)),)
 # or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
 	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
 endif
+ifeq ($(strip $(FWPORTS)),)
+	@jq '."port-config"."protocol-file" = "$(SPK_NAME).sc"' $@ 1<>$@
+endif
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
