@@ -156,6 +156,12 @@ endif
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
+ifneq ($(strip $(SERVICE_PORT)),)
+	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ 1<>$@
+endif
+ifneq ($(strip $(FWPORTS)),)
+	@jq '."port-config"."protocol-file" = "$(FWPORTS)"' $@ 1<>$@
+endif
 ifneq ($(strip $(SPK_COMMANDS)),)
 # e.g. SPK_COMMANDS=bin/foo bin/bar
 	@jq --arg binaries '$(SPK_COMMANDS)' \
@@ -233,9 +239,6 @@ ifneq ($(strip $(GROUP)),)
 # or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
 	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
 endif
-ifeq ($(strip $(FWPORTS)),)
-	@jq '."port-config"."protocol-file" = "$(SPK_NAME).sc"' $@ 1<>$@
-endif
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
@@ -275,10 +278,18 @@ else
 endif
 	@echo "port_forward=\"yes\"" >> $@
 	@echo "dst.ports=\"${SERVICE_PORT}/tcp\"" >> $@
+ifneq ($(strip $(SERVICE_PORT)),)
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/$(SPK_NAME).sc
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# On DSM7 the .sc file's relative path is under /var/package/{$package}/target/
+$(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc:
+	cp $(DSM_CONF_DIR)/$(SPK_NAME).sc $@
+SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
+endif
+endif
 endif
 else
 $(DSM_CONF_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
