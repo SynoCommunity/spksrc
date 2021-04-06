@@ -15,7 +15,7 @@ INST_VARIABLES="${INST_ETC}/installer-variables"
 SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
 
 # Optional FWPORTS file
-FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
+FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
 # Versions lower then DSM 6 don't support an upgrade folder
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
