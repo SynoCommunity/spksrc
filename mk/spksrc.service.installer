@@ -44,7 +44,12 @@ call_func ()
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Invoke ${FUNC}"
-        eval ${FUNC}
+        LOG=$2
+        if [ -z "${LOG}" ]; then
+            eval ${FUNC}
+        else
+            eval ${FUNC} 2>&1 | ${LOG}
+        fi
     fi
 }
 
@@ -255,7 +260,7 @@ preinst ()
 {
     log_step "preinst"
     call_func "validate_preinst"
-    call_func "service_preinst" 2>&1 | install_log
+    call_func "service_preinst" install_log
 
     # Check volume exists
     if [ -n "${SHARE_PATH}" ]; then
@@ -341,8 +346,8 @@ postinst ()
 
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
-    call_func "service_postinst" 2>&1 | install_log
-    call_func "service_create_links" 2>&1 | install_log
+    call_func "service_postinst" install_log
+    call_func "service_create_links" install_log
 
     $CP "${INST_LOG}" "${SYNOPKG_PKGVAR}" 2>&1 | install_log
     if [ -n "${LOG_FILE}" ]; then
@@ -371,7 +376,7 @@ preuninst ()
         fi
     fi
 
-    call_func "service_preuninst" 2>&1 | install_log
+    call_func "service_preuninst" install_log
     exit 0
 }
 
@@ -390,8 +395,8 @@ postuninst ()
         syno_remove_user "${EFF_USER}" 2>&1 | install_log
     fi
 
-    call_func "service_postuninst" 2>&1 | install_log
-    call_func "service_remove_links" 2>&1 | install_log
+    call_func "service_postuninst" install_log
+    call_func "service_remove_links" install_log
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}" 2>&1 | install_log
@@ -403,13 +408,13 @@ preupgrade ()
 {
     log_step "preupgrade"
     call_func "validate_preupgrade"
-    call_func "service_preupgrade" 2>&1 | install_log
+    call_func "service_preupgrade" install_log
 
     # Save some stuff
     $RM "$TMP_DIR" 2>&1 | install_log
     $MKDIR "$TMP_DIR" 2>&1 | install_log
 
-    call_func "service_save" 2>&1 | install_log
+    call_func "service_save" install_log
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
@@ -431,7 +436,7 @@ postupgrade ()
 
     $RM "$TMP_DIR" 2>&1 | install_log
 
-    call_func "service_postupgrade" 2>&1 | install_log
+    call_func "service_postupgrade" install_log
 
     # Make sure we also have the logging for this step
     $CP "${INST_LOG}" "${SYNOPKG_PKGVAR}" 2>&1 | install_log

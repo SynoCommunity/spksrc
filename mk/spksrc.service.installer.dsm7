@@ -37,7 +37,12 @@ call_func ()
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Invoke ${FUNC}"
-        eval ${FUNC}
+        LOG=$2
+        if [ -z "${LOG}" ]; then
+            eval ${FUNC}
+        else
+            eval ${FUNC} 2>&1 | ${LOG}
+        fi
     fi
 }
 
@@ -138,7 +143,7 @@ preinst ()
 {
     log_step "preinst"
     call_func "validate_preinst"
-    call_func "service_preinst" 2>&1 | install_log
+    call_func "service_preinst" install_log
 
     # Check volume exists
     if [ -n "${SHARE_PATH}" ]; then
@@ -162,7 +167,7 @@ postinst ()
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
 
-    call_func "service_postinst" 2>&1 | install_log
+    call_func "service_postinst" install_log
     exit 0
 }
 
@@ -170,14 +175,14 @@ preuninst ()
 {
     log_step "preuninst"
     call_func "validate_preuninst"
-    call_func "service_preuninst" 2>&1 | install_log
+    call_func "service_preuninst" install_log
     exit 0
 }
 
 postuninst ()
 {
     log_step "postuninst"
-    call_func "service_postuninst" 2>&1 | install_log
+    call_func "service_postuninst" install_log
 
     if [ "$wizard_delete_data" = "true" ]; then
 
@@ -208,8 +213,8 @@ preupgrade ()
         $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
 
-    call_func "service_preupgrade" 2>&1 | install_log
-    call_func "service_save" 2>&1 | install_log
+    call_func "service_preupgrade" install_log
+    call_func "service_save" install_log
     exit 0
 }
 
@@ -217,8 +222,8 @@ postupgrade ()
 {
     log_step "postupgrade"
 
-    call_func "service_restore" 2>&1 | install_log
-    call_func "service_postupgrade" 2>&1 | install_log
+    call_func "service_restore" install_log
+    call_func "service_postupgrade" install_log
     exit 0
 }
 
