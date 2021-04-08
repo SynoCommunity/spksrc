@@ -1,5 +1,5 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.14.0
+SPK_VERS = 1.15.1
 SPK_REV = 21
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ MAINTAINER = Safihre, acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Update to upstream version 1.14.0. Clean up default config file template. Drop DSM 5 support"
+CHANGELOG = "Update to upstream version 1.15.1.  Clean up default config file template.  Drop DSM 5 support."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
