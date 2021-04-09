@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 BUILD_DEPENDS = native/erlang 
 DEPENDS = cross/ncurses cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
 
-# PPC archs except qoriq have too old compiler
+# PPC archs except qoriq have compiler errors with 64 bit values
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.ejabberd.im
@@ -25,6 +25,8 @@ CONFIGURE_ARGS += --enable-mysql
 # for 'rebar configure-deps' + 'rebar compile' to find cross compiled libei.a and liberl_interface.a
 # remarks: arguments for rebar are collected in 'vars.config'
 ADDITIONAL_LDFLAGS = -L$(STAGING_INSTALL_PREFIX)/lib/erlang/usr/lib
+ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/lib/erlang/usr/include
+ADDITIONAL_CPPFLAGS = $(ADDITIONAL_CFLAGS)
 
 PRE_CONFIGURE_TARGET = ejabberd_pre_configure
 POST_INSTALL_TARGET = ejabberd_post_install

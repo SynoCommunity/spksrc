@@ -14,7 +14,6 @@ LICENSE  = Apache 2.0
 
 PRE_CONFIGURE_TARGET = erlang_pre_configure
 CONFIGURE_TARGET = erlang_configure
-COMPILE_TARGET = erlang_compile
 INSTALL_TARGET = erlang_install
 
 CONFIGURE_ARGS  = --without-javac
@@ -34,9 +33,6 @@ erlang_pre_configure:
 erlang_configure:
 	$(RUN) ./otp_build configure $(CONFIGURE_ARGS)
 
-.PHONY: erlang_compile
-erlang_compile:
-	$(RUN) make
 
 .PHONY: erlang_install
 erlang_install:
