@@ -1,0 +1,11 @@
+--- fish-3.2.0/CMakeLists.txt   2021-03-01 23:47:02.000000000 +1100
++++ ./CMakeLists.txt    2021-04-10 13:12:07.280990507 +1000
+@@ -16,6 +16,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ set(CMAKE_CXX_STANDARD 11)
+ set(DEFAULT_BUILD_TYPE "RelWithDebInfo")
+
++find_package(Threads REQUIRED)
++
+ # Use the default flags (#6296) but remove -DNDEBUG so that asserts remain enabled.
+ string(REPLACE "-DNDEBUG" ""
+   CMAKE_CXX_FLAGS_RELWITHDEBINFO
