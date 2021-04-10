@@ -180,8 +180,6 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
-# STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
-# see spsrc.spk.mk
 endif
 
 
@@ -195,14 +193,12 @@ DSM_SCRIPTS_ += installer
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
-else
-ifeq ($(call version_lt, ${TCVERSION}, 6.0),1)
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
-	@$(dsm_script_copy)
-else  
+else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
 	@$(dsm_script_copy)
-endif
+else  
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
+	@$(dsm_script_copy)
 endif
 endif
 
@@ -213,14 +209,12 @@ DSM_SCRIPTS_ += start-stop-status
 ifeq ($(STARTABLE),no)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
 	@$(dsm_script_copy)
-else
-ifneq ($(strip $(SERVICE_EXE)),)
+else ifneq ($(strip $(SERVICE_EXE)),)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-daemon
 	@$(dsm_script_copy)
 else
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-status
 	@$(dsm_script_copy)
-endif
 endif
 endif
 
@@ -230,15 +224,15 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
-else
-ifeq ($(strip $(SERVICE_EXE)),)
+else ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 	@$(dsm_script_copy)
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 	@$(dsm_script_copy)
 endif
-endif
+
+
 # Apply variables to privilege file
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(GROUP)),)
