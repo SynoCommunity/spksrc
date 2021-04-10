@@ -1,6 +1,6 @@
-PYTHON_DIR="/usr/local/python3"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
+PYTHON_DIR="/var/packages/python3/target/bin"
+VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 CONFIG_FILE="${SYNOPKG_PKGDEST}/var/config.yml"
 
@@ -13,12 +13,14 @@ HOME="${SYNOPKG_PKGDEST}/var/"
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install the wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
 
     # Copying "config.yml" file to the "var/" folder
     install -m 755 -d ${SYNOPKG_PKGDEST}/var
     install -m 644 ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGDEST}/var
 }
+
