@@ -6,9 +6,11 @@
 # - files are migrated from ${SYNOPKG_PKGDEST}/var to ${SYNOPKG_PKGVAR}
 # - Not supported (yet)
 
+# installer log is not writable, use for reference only.
+INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
+
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
-INST_VAR="${SYNOPKG_PKGVAR}"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# installer log is not writable, use for reference only.
+INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
