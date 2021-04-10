@@ -15,8 +15,9 @@ call_func ()
 {
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
-        echo "Invoke ${FUNC}" >> ${LOG_FILE}
-        eval ${FUNC}     >> ${LOG_FILE}
+        echo "Begin ${FUNC}" >> ${LOG_FILE}
+        eval ${FUNC}         >> ${LOG_FILE}
+        echo "End ${FUNC}"   >> ${LOG_FILE}
     fi
 }
 
