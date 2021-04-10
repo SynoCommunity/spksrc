@@ -39,8 +39,9 @@ call_func ()
 {
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
-        install_log "Invoke ${FUNC}"
+        install_log "Begin ${FUNC}"
         eval ${FUNC} 2>&1 | install_log
+        install_log "End ${FUNC}"
     fi
 }
 
