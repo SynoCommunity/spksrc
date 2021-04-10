@@ -5,12 +5,11 @@ PACKAGE="pyload"
 DNAME="pyLoad"
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
-PATH="${INSTALL_DIR}/bin:${PATH}"
-PYTHON="${INSTALL_DIR}/env/bin/python"
-PYLOAD="${INSTALL_DIR}/share/pyload/pyLoadCore.py"
-PID_FILE="${INSTALL_DIR}/var/pyload.pid"
-CFG_DIR="${INSTALL_DIR}/var"
+PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
+PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
+PYLOAD="${SYNOPKG_PKGDEST}/share/pyload/pyLoadCore.py"
+PID_FILE="${SYNOPKG_PKGDEST}/var/pyload.pid"
+CFG_DIR="${SYNOPKG_PKGDEST}/var"
 
 EXECUTE_SERVICE="${PYTHON} ${PYLOAD} --configdir=${CFG_DIR} --pidfile=${PID_FILE}"
 
@@ -38,25 +37,25 @@ daemon_status ()
 case $1 in
     start)
         if daemon_status; then
-            echo "${DNAME} is already running"
+            echo "${DNAME} is already running" >> ${LOG_FILE}
             exit 0
         else
-            echo "Starting ${DNAME} ..."
+            echo "Starting ${DNAME} ..." >> ${LOG_FILE}
             start_daemon
             status=$?
-            echo "Status = ${status}"
+            echo "Status = ${status}" >> ${LOG_FILE}
             exit ${status}
         fi
         ;;
     stop)
         if daemon_status; then
-            echo "Stopping ${DNAME} ..."
+            echo "Stopping ${DNAME} ..." >> ${LOG_FILE}
             stop_daemon
             status=$?
-            echo "Status = ${status}"
+            echo "Status = ${status}" >> ${LOG_FILE}
             exit ${status}
         else
-            echo "${DNAME} is not running"
+            echo "${DNAME} is not running" >> ${LOG_FILE}
             exit 0
         fi
         ;;
