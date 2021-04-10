@@ -27,13 +27,13 @@ service_preupgrade ()
     # It should go, after the upgrade, into /var/.config/
     # The /var/ folder gets automatically copied by service-installer after this
     if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-        echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
-        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${INST_LOG} 2>&1
+        echo "Moving ${LEGACY_CONFIG_DIR} to ${SYNOPKG_PKGVAR}"
+        mv ${LEGACY_CONFIG_DIR} ${SYNOPKG_PKGVAR}
     fi
 
     if [ ! -d "${CONFIG_DIR}" ]; then
         # Create, in case it's missing for some reason
-        mkdir -p ${CONFIG_DIR} >> ${INST_LOG} 2>&1
+        mkdir -p ${CONFIG_DIR}
     fi
 
 }

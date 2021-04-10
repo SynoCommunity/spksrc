@@ -36,16 +36,16 @@ service_preupgrade ()
 {
     # Is Installed Lidarr Binary Ver. >= SPK Lidarr Binary Ver.?
     CUR_VER=$(${MONO_PATH}/monodis --assembly ${LIDARR} | grep "Version:" | awk '{print $2}')
-    echo "Installed Lidarr Binary: ${CUR_VER}" >> ${INST_LOG}
+    echo "Installed Lidarr Binary: ${CUR_VER}"
     SPK_VER=$(${MONO_PATH}/monodis --assembly ${SPK_LIDARR} | grep "Version:" | awk '{print $2}')
-    echo "Requested Lidarr Binary: ${SPK_VER}" >> ${INST_LOG}
+    echo "Requested Lidarr Binary: ${SPK_VER}"
     if [ "${CUR_VER//.}" -ge "${SPK_VER//.}" ]; then
         echo 'KEEP_CUR="yes"' > ${CONFIG_DIR}/KEEP_VAR
-        echo "[KEEPING] Installed Lidarr Binary - Upgrading Package Only" >> ${INST_LOG}
+        echo "[KEEPING] Installed Lidarr Binary - Upgrading Package Only"
         mv ${SYNOPKG_PKGDEST}/share ${INST_VAR}
     else
         echo 'KEEP_CUR="no"' > ${CONFIG_DIR}/KEEP_VAR
-        echo "[REPLACING] Installed Lidarr Binary" >> ${INST_LOG}
+        echo "[REPLACING] Installed Lidarr Binary"
     fi
 }
 
@@ -54,9 +54,9 @@ service_postupgrade ()
     # Restore Current Lidarr Binary if Current Ver. >= SPK Ver.
     . ${CONFIG_DIR}/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
-        echo "Restoring Lidarr version from before upgrade" >> ${INST_LOG}
-        rm -fr ${SYNOPKG_PKGDEST}/share >> ${INST_LOG} 2>&1
-        mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> ${INST_LOG} 2>&1
+        echo "Restoring Lidarr version from before upgrade"
+        rm -fr ${SYNOPKG_PKGDEST}/share
+        mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
     set_unix_permissions "${CONFIG_DIR}"
