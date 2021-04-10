@@ -196,10 +196,16 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
 else
+ifeq ($(call version_lt, ${TCVERSION}, 6.0),1)
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
+	@$(dsm_script_copy)
+else  
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
 	@$(dsm_script_copy)
 endif
 endif
+endif
+
 
 # Control use of generic start-stop-status scripts
 ifeq ($(strip $(SSS_SCRIPT)),)
