@@ -1,13 +1,11 @@
 #!/bin/sh
 
-# Package
-PACKAGE="pyload"
 DNAME="pyLoad"
 
-# Others
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 PYLOAD="${SYNOPKG_PKGDEST}/share/pyload/pyLoadCore.py"
+LOG_FILE="${SYNOPKG_PKGDEST}/var/pyload.log"
 PID_FILE="${SYNOPKG_PKGDEST}/var/pyload.pid"
 CFG_DIR="${SYNOPKG_PKGDEST}/var"
 
