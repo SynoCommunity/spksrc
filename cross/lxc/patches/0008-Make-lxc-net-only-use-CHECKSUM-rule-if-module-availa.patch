@@ -1,0 +1,36 @@
+From bd3cea26ae3b569106fbf502362abd366017e0b8 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 19:22:31 +0000
+Subject: [PATCH] Make lxc-net only use CHECKSUM rule if module available
+
+---
+ config/init/common/lxc-net.in | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git config/init/common/lxc-net.in config/init/common/lxc-net.in
+index 35b4a58..3181d42 100644
+--- config/init/common/lxc-net.in
++++ config/init/common/lxc-net.in
+@@ -116,7 +116,9 @@ start() {
+     iptables $use_iptables_lock -I FORWARD -i ${LXC_BRIDGE} -j ACCEPT
+     iptables $use_iptables_lock -I FORWARD -o ${LXC_BRIDGE} -j ACCEPT
+     iptables $use_iptables_lock -t nat -A POSTROUTING -s ${LXC_NETWORK} ! -d ${LXC_NETWORK} -j MASQUERADE
+-    iptables $use_iptables_lock -t mangle -A POSTROUTING -o ${LXC_BRIDGE} -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill
++    if lsmod | grep -q "xt_CHECKSUM"; then
++        iptables $use_iptables_lock -t mangle -A POSTROUTING -o ${LXC_BRIDGE} -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill
++    fi
+ 
+     LXC_DOMAIN_ARG=""
+     if [ -n "$LXC_DOMAIN" ]; then
+@@ -169,7 +171,7 @@ stop() {
+         iptables $use_iptables_lock -D FORWARD -i ${LXC_BRIDGE} -j ACCEPT
+         iptables $use_iptables_lock -D FORWARD -o ${LXC_BRIDGE} -j ACCEPT
+         iptables $use_iptables_lock -t nat -D POSTROUTING -s ${LXC_NETWORK} ! -d ${LXC_NETWORK} -j MASQUERADE
+-        iptables $use_iptables_lock -t mangle -D POSTROUTING -o ${LXC_BRIDGE} -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill
++        iptables $use_iptables_lock -t mangle -D POSTROUTING -o ${LXC_BRIDGE} -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill 2>/dev/null || true
+ 
+         if [ "$LXC_IPV6_NAT" = "true" ]; then
+             ip6tables $use_iptables_lock -t nat -D POSTROUTING -s ${LXC_IPV6_NETWORK} ! -d ${LXC_IPV6_NETWORK} -j MASQUERADE
+-- 
+2.25.1
+
