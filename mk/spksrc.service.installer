@@ -342,15 +342,12 @@ postinst ()
     call_func "service_create_links" install_log
 
     if [ -n "${LOG_FILE}" ]; then
-        echo "Installation log: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_install.log" >> ${LOG_FILE}
+        echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
     fi
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        # On DSM 5 set package files permissions for consistency with DSM 6
-        set_unix_permissions "${SYNOPKG_PKGDEST}" 2>&1 | install_log
-    else
-        # On DSM 6 only var is concerned
-        set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
-    fi
+
+    # On DSM 6 only var is concerned
+    set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
+
     exit 0
 }
 
