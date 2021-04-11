@@ -14,10 +14,12 @@ service_postinst ()
 {
     # Download latest NZBGet
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
-        wget -O "${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run"
+        echo "Download nzbget installer: latest"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run"
     fi
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
-        wget -O "${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run"
+        echo "Download nzbget installer: latest-testing"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run"
     fi
 
     # Stop if download failed
@@ -25,6 +27,7 @@ service_postinst ()
         echo "Failed to download installer, please check the internet connection of your device."
         exit 1
     fi
+    echo "Download completed"
 
     # On DSM5 the lib-dir is not owned by the package-user
     set_unix_permissions "${SYNOPKG_PKGDEST}/bin"
