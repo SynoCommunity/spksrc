@@ -278,7 +278,7 @@ ifneq ($(strip $(SPK_GROUP)),)
 endif
 endif
 
-ifneq ("$(wildcard $(DSM_CONF_DIR)/privilege)","")
+ifneq ("$(wildcard $(DSM_CONF_DIR))","")
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
