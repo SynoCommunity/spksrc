@@ -127,7 +127,7 @@ service_postinst () {
     mkdir -p "${SYNOPKG_PKGDEST}"/var
     if [ ! -e "${CFG_FILE}" ]; then
         # shellcheck disable=SC2086
-        cp -f "${EXAMPLE_FILES}" "${SYNOPKG_PKGDEST}/var/"
+        cp -f ${EXAMPLE_FILES} "${SYNOPKG_PKGDEST}/var/"
         cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGDEST}/var/"
         cp -f "${SYNOPKG_PKGDEST}"/blocklist/* "${SYNOPKG_PKGDEST}/var/"
         # shellcheck disable=SC2231
@@ -200,4 +200,3 @@ service_postupgrade () {
     # upgrade script when the offline-cache is also updated
     cp -f "${SYNOPKG_PKGDEST}"/blocklist/generate-domains-blacklist.py "${SYNOPKG_PKGDEST}/var/"
 }
-
