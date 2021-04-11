@@ -1,6 +1,6 @@
-PYTHON_DIR="/usr/local/python3"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+PYTHON_DIR="/var/packages/python3/target/bin"
+PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
+VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST=}/env/bin/python"
 LANGUAGE="env LANG=en_US.UTF-8"
 SALT_MINION="${SYNOPKG_PKGDEST}/env/bin/salt-minion"
@@ -11,14 +11,15 @@ SERVICE_COMMAND="${SALT_MINION} -c ${SYNOPKG_PKGDEST}/var -d"
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG}
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --force-reinstall --no-index --find-links ${wheelhouse} ${wheelhouse}/*.whl
 
     # Patch rsax931.py file to find libcrypto lib
     # (Rely on patch util bundled with python3's busybox)
-    ${PYTHON_DIR}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.7/site-packages/salt/utils/rsax931.py < ${SYNOPKG_PKGDEST}/share/rsax931.py.patch >> ${INST_LOG} 2>&1
+    ${PYTHON_DIR}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.7/site-packages/salt/utils/rsax931.py < ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
     # Prepare salt-minion config in /var/salt
     install -m 755 -d ${SYNOPKG_PKGDEST}/var

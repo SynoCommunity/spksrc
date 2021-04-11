@@ -43,7 +43,7 @@ endif
 .PHONY: $(PRE_SERVICE_TARGET) $(SERVICE_TARGET) $(POST_SERVICE_TARGET)
 .PHONY: $(DSM_SCRIPTS_DIR)/service-setup $(DSM_SCRIPTS_DIR)/start-stop-status
 .PHONY: $(DSM_CONF_DIR)/privilege $(DSM_CONF_DIR)/resource
-.PHONY: $(DSM_CONF_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
+.PHONY: $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc $(STAGING_DIR)/$(DSM_UI_DIR)/config
 
 service_msg_target:
 	@$(MSG) "Generating service scripts for $(NAME)"
@@ -84,7 +84,9 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo 'if [ -z "$${SYNOPKG_PKGNAME}" ] || [ -z "$${SYNOPKG_DSM_VERSION_MAJOR}" ]; then' >> $@
 	@echo '  echo "Error: Environment variables are not set." 1>&2;' >> $@
 	@echo '  echo "Please run me using synopkg instead. Example: \"synopkg start [packagename]\"" 1>&2;' >> $@
-	@echo 'exit 1; fi' >> $@
+	@echo '  exit 1' >> $@
+	@echo 'fi' >> $@
+	@echo '' >> $@
 ifneq ($(strip $(SPK_USER)),)
 	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
 	@echo USER=\"$(SPK_USER)\" >> $@
@@ -106,18 +108,13 @@ ifneq ($(strip $(SERVICE_PORT)),)
 endif
 ifneq ($(STARTABLE),no)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
-	@echo 'LOG_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.log"' >> $@
-	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
-	@echo 'PID_FILE="$${SYNOPKG_PKGDEST}/var/$${SYNOPKG_PKGNAME}.pid"' >> $@
-	@echo "# backwards compatibility" >> $@
+	@echo "# define SYNOPKG_PKGVAR for compatibility with DSM7" >> $@
 	@echo 'SYNOPKG_PKGVAR="$${SYNOPKG_PKGDEST}/var"' >> $@
-else
+endif
 	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
 	@echo 'LOG_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.log"' >> $@
 	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
 	@echo 'PID_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.pid"' >> $@
-endif
 endif
 ifneq ($(strip $(SERVICE_COMMAND)),)
 ifneq ($(strip $(SERVICE_SHELL)),)
@@ -141,7 +138,6 @@ ifneq ($(strip $(SERVICE_OPTIONS)),)
 	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
 endif
 endif
-	@cat $(SPKSRC_MK)spksrc.service.call_func >> $@
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
@@ -162,6 +158,12 @@ endif
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
+ifneq ($(strip $(SERVICE_PORT)),)
+	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ 1<>$@
+endif
+ifneq ($(strip $(FWPORTS)),)
+	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(FWPORTS)"' $@ 1<>$@
+endif
 ifneq ($(strip $(SPK_COMMANDS)),)
 # e.g. SPK_COMMANDS=bin/foo bin/bar
 	@jq --arg binaries '$(SPK_COMMANDS)' \
@@ -178,8 +180,6 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
-# STARTABLE needs to be yes, the resource linking and unlinking works on start and stop
-# see spsrc.spk.mk
 endif
 
 
@@ -193,11 +193,15 @@ DSM_SCRIPTS_ += installer
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
-else
+else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
+	@$(dsm_script_copy)
+else  
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
 	@$(dsm_script_copy)
 endif
 endif
+
 
 # Control use of generic start-stop-status scripts
 ifeq ($(strip $(SSS_SCRIPT)),)
@@ -205,14 +209,12 @@ DSM_SCRIPTS_ += start-stop-status
 ifeq ($(STARTABLE),no)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
 	@$(dsm_script_copy)
-else
-ifneq ($(strip $(SERVICE_EXE)),)
+else ifneq ($(strip $(SERVICE_EXE)),)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-daemon
 	@$(dsm_script_copy)
 else
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-status
 	@$(dsm_script_copy)
-endif
 endif
 endif
 
@@ -222,15 +224,15 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_CONF_DIR)/privilege:
 	$(create_target_dir)
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
-else
-ifeq ($(strip $(SERVICE_EXE)),)
+else ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 	@$(dsm_script_copy)
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 	@$(dsm_script_copy)
 endif
-endif
+
+
 # Apply variables to privilege file
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(GROUP)),)
@@ -263,7 +265,7 @@ SERVICE_FILES += $(DSM_CONF_DIR)/privilege
 # Generate service configuration for admin port
 ifeq ($(strip $(FWPORTS)),)
 ifneq ($(strip $(SERVICE_PORT)),)
-$(DSM_CONF_DIR)/$(SPK_NAME).sc:
+$(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc:
 	$(create_target_dir)
 	@echo "[$(SPK_NAME)]" > $@
 ifneq ($(strip $(SERVICE_PORT_TITLE)),)
@@ -281,15 +283,15 @@ endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
-SERVICE_FILES += $(DSM_CONF_DIR)/$(SPK_NAME).sc
+SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 else
-$(DSM_CONF_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
+$(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
 	@$(dsm_script_copy)
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
-SERVICE_FILES += $(DSM_CONF_DIR)/$(SPK_NAME).sc
+SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 
 # Generate DSM UI configuration

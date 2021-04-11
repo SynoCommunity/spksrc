@@ -10,5 +10,6 @@ export HOME=${SYNOPKG_PKGDEST}
 
 service_postinst ()
 {
-    sed -i "s%SYS_PREFIX=%SYS_PREFIX=${SYNOPKG_PKGDEST}%g" ${RABBITMQ_SBIN}/rabbitmq-defaults  >> ${INST_LOG} 2>&1
+    sed -i "s%SYS_PREFIX=%SYS_PREFIX=${SYNOPKG_PKGDEST}%g" ${RABBITMQ_SBIN}/rabbitmq-defaults
 }
+

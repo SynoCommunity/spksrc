@@ -7,6 +7,7 @@ service_postinst ()
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin
     $BIN/busybox --install $BIN
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
+    $BIN/delgroup "${USER}" "users"
+    $BIN/deluser "${USER}"
 }
+

@@ -14,10 +14,12 @@ service_postinst ()
 {
     # Download latest NZBGet
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
-        wget -O "${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run" >> ${INST_LOG} 2>&1
+        echo "Download nzbget installer: latest"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run"
     fi
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
-        wget -O "${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run" >> ${INST_LOG} 2>&1
+        echo "Download nzbget installer: latest-testing"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run"
     fi
 
     # Stop if download failed
@@ -25,13 +27,14 @@ service_postinst ()
         echo "Failed to download installer, please check the internet connection of your device."
         exit 1
     fi
+    echo "Download completed"
 
     # On DSM5 the lib-dir is not owned by the package-user
     set_unix_permissions "${SYNOPKG_PKGDEST}/bin"
 
     # Install as nzbget user, for correct permissions
     chmod +x "${NZBGET_INSTALLER}"
-    su ${EFF_USER} -s /bin/sh -c "${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin" >> ${INST_LOG} 2>&1
+    su ${EFF_USER} -s /bin/sh -c "${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin"
 
     # Make sure installation worked
     if [ ! -r "${NZBGET}" ]; then
@@ -67,9 +70,9 @@ service_postinst ()
 
     # Discard legacy obsolete busybox user account
     BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN >> ${INST_LOG}
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
+    $BIN/busybox --install $BIN
+    $BIN/delgroup "${USER}" "users"
+    $BIN/deluser "${USER}"
 }
 
 service_postupgrade ()
@@ -83,3 +86,4 @@ service_postupgrade ()
         fi
     fi
 }
+

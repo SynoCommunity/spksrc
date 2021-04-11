@@ -1,46 +1,47 @@
 #!/bin/sh
 
-# installer log is not writable, use for reference only.
-INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
+# DSM 5 -> 6 upgrade path:
+#  Cannot remove user as still in use or may be DSM service itself
+# Require warning in ChangeLog and manual user/group cleanup
+
+# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
+SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
+
+# Temp. INST_LOG for DSM < 6
+# package specific install scripts must not use INST_LOG
+INST_LOG_TEMP="/tmp/${SYNOPKG_PKGNAME}_install.log"
+INST_LOG="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_install.log"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
-# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
-SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
-TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
-
+# Versions lower then DSM 6 don't support an upgrade folder
+TMP_DIR="/var/tmp/${SYNOPKG_PKGNAME}/var"
 
 install_log ()
 {
-    local _msg_="$@"
-    if [ -z "${_msg_}" ]; then
-        # read multiline from stdin
-        while IFS=$'\n' read -r line; do
-            install_log "${line}"
-        done
-    else
-        # stderr goes to /var/log/packages/{package}.log
-        # stdout goes to dialog in package manager ui.
-        echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" 1>&2
-    fi
+  local _msg_="$@"
+  if [ -z "${_msg_}" ]; then
+      # read multiline from stdin
+      while IFS=$'\n' read -r line; do
+        install_log "${line}"
+      done
+  else
+    echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" >> ${INST_LOG_TEMP} 2>&1
+  fi
 }
 
 # Invoke shell function if available
+# DSM < 6 do not support user notifications by stdout
 call_func ()
 {
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Begin ${FUNC}"
-        LOG=$2
-        if [ -z "${LOG}" ]; then
-            eval ${FUNC}
-        else
-            eval ${FUNC} 2>&1 | ${LOG}
-        fi
+        eval ${FUNC} 2>&1 | install_log
         install_log "End ${FUNC}"
     fi
 }
@@ -252,7 +253,7 @@ preinst ()
 {
     log_step "preinst"
     call_func "validate_preinst"
-    call_func "service_preinst" install_log
+    call_func "service_preinst"
 
     # Check volume exists
     if [ -n "${SHARE_PATH}" ]; then
@@ -338,16 +339,17 @@ postinst ()
 
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
-    call_func "service_postinst" install_log
-    call_func "service_create_links" install_log
+    call_func "service_postinst"
+    call_func "service_create_links"
 
+    $CP "${INST_LOG_TEMP}" "${INST_LOG}" 2>&1 | install_log
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
     fi
-
-    # On DSM 6 only var is concerned
-    set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
-
+    
+    # On DSM 5 set package files permissions for consistency with DSM 6
+    set_unix_permissions "${SYNOPKG_PKGDEST}" 2>&1 | install_log
+    
     exit 0
 }
 
@@ -364,7 +366,7 @@ preuninst ()
         fi
     fi
 
-    call_func "service_preuninst" install_log
+    call_func "service_preuninst"
     exit 0
 }
 
@@ -383,8 +385,8 @@ postuninst ()
         syno_remove_user "${EFF_USER}" 2>&1 | install_log
     fi
 
-    call_func "service_postuninst" install_log
-    call_func "service_remove_links" install_log
+    call_func "service_postuninst"
+    call_func "service_remove_links"
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}" 2>&1 | install_log
@@ -396,13 +398,13 @@ preupgrade ()
 {
     log_step "preupgrade"
     call_func "validate_preupgrade"
-    call_func "service_preupgrade" install_log
+    call_func "service_preupgrade"
 
     # Save some stuff
     $RM "$TMP_DIR" 2>&1 | install_log
     $MKDIR "$TMP_DIR" 2>&1 | install_log
 
-    call_func "service_save" install_log
+    call_func "service_save"
 
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
@@ -424,7 +426,9 @@ postupgrade ()
 
     $RM "$TMP_DIR" 2>&1 | install_log
 
-    call_func "service_postupgrade" install_log
+    call_func "service_postupgrade"
 
+    # Make sure we also have the logging for this step
+    $CP "${INST_LOG_TEMP}" "${INST_LOG}" 2>&1 | install_log
     exit 0
 }
