@@ -1,0 +1,24 @@
+PKG_NAME = openssh
+PKG_VERS = 8.4p1
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+HOMEPAGE = https://www.openssh.com/
+COMMENT  = Open source version of SSH connectivity tools
+LICENSE  = BSD-style
+
+GNU_CONFIGURE = 1
+INSTALL_TARGET = openssh_install
+
+CONFIGURE_ARGS = --with-privsep-path=$(INSTALL_PREFIX)/var/empty
+CONFIGURE_ARGS += --disable-lastlog --disable-strip
+CONFIGURE_ARGS += --disable-utmp --disable-utmpx
+CONFIGURE_ARGS += --disable-wtmp --disable-wtmpx
+
+include ../../mk/spksrc.native-cc.mk
+
+.PHONY: openssh_install
+openssh_install:
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install-nosysconf prefix=$(INSTALL_PREFIX)
