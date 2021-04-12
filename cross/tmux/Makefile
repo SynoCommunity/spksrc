@@ -13,13 +13,4 @@ LICENSE  = BSD License
 
 GNU_CONFIGURE = 1
 
-INSTALL_TARGET = tmux_install
-
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: tmux_install
-tmux_install:
-	@$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-	install -m 755 -d $(STAGING_INSTALL_PREFIX)/orig
-	mv $(STAGING_INSTALL_PREFIX)/bin/tmux $(STAGING_INSTALL_PREFIX)/orig/tmux
-	install -m 755 src/tmux-utf8 $(STAGING_INSTALL_PREFIX)/bin/tmux

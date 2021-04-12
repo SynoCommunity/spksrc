@@ -1,6 +1,6 @@
 SPK_NAME = vim
 SPK_VERS = 8.2
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/vim.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -13,19 +13,11 @@ RELOAD_UI = no
 DISPLAY_NAME = Vim
 STARTABLE = no
 
-CHANGELOG = "1. Update to vim 8.2<br>2. Enable Python 3 support if Python >= 3.6.1 is installed."
+CHANGELOG = "1. You now need Python 3.8 to enable Python support.<br/>2. utf-8 wrapper removed."
 
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware
 
-POST_STRIP_TARGET = vim_extra_install
-
-SPK_COMMANDS = bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
-SPK_LINKS  = /usr/local/bin/vim:bin/vim-utf8
-SPK_LINKS += /usr/local/bin/vim$(subst .,,$(SPK_VERS)):bin/vim-utf8
+SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: vim_extra_install
-vim_extra_install:
-	install -m 755 src/vim-utf8 $(STAGING_DIR)/bin/vim-utf8
