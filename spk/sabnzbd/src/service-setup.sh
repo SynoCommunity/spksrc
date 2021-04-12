@@ -14,10 +14,10 @@ SERVICE_COMMAND="${LANGUAGE} ${PYTHON} -OO ${SABNZBD} -f ${CFG_FILE} --pidfile $
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG}
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
@@ -25,10 +25,10 @@ service_postinst ()
     fi
 
     # Create logs directory, otherwise it does not start due to permissions errors
-    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
+    mkdir "$(dirname ${LOG_FILE})"
 
     # Install nice/ionice
-    ${BIN}/busybox --install ${BIN} >> ${INST_LOG} 2>&1
+    ${BIN}/busybox --install ${BIN}
 }
 
 service_postupgrade ()
