@@ -228,24 +228,8 @@ $(DSM_CONF_DIR)/privilege:
 	@jq -n '."defaults" = {"run-as": "package"}' > $@
 	@$(MSG) "Creating $@"
 	@$(MSG) '(privilege) run-as: package'
-# DSM <= 6 and SERVICE_USER defined
-else ifneq ($(strip $(SPK_USER)),)
-ifeq ($(strip $(SERVICE_EXE)),)
-$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
-	@$(dsm_script_copy)
-	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
-else
-$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
-	@$(dsm_script_copy)
-	@$(MSG) "(privilege) spksrc.service.privilege-startasroot"
-endif
-else
-$(DSM_CONF_DIR)/privilege:
-	@$(MSG) "Creating $@"
-	@$(MSG) "(privilege) DSM <= 6 and SERVICE_USER undefined"
-endif
+	@$(MSG) "(privilege) DSM >= 7 $(DSM_CONF_DIR)/privilege"
 # Apply variables to privilege file
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(GROUP)),)
 # Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
 # For DSM7 I recommend setting permissions for individual packages (System Internal User)
@@ -263,9 +247,21 @@ endif
 ifneq ($(strip $(SPK_GROUP)),)
 	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
 endif
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 
-# Less then DSM 7
+# DSM <= 6 and SERVICE_USER defined
+else ifneq ($(strip $(SPK_USER)),)
+ifeq ($(strip $(SERVICE_EXE)),)
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
+	@$(dsm_script_copy)
+	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
 else
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
+	@$(dsm_script_copy)
+	@$(MSG) "(privilege) spksrc.service.privilege-startasroot"
+endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
@@ -276,12 +272,15 @@ endif
 ifneq ($(strip $(SPK_GROUP)),)
 	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
 endif
-endif
-
-ifneq ("$(wildcard $(DSM_CONF_DIR))","")
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
+
+# DSM <= 6 and SERVICE_USER is NOT defined
+else
+$(DSM_CONF_DIR)/privilege:
+	@$(MSG) "NOT creating $@"
+	@$(MSG) "(privilege) DSM <= 6 and SERVICE_USER undefined"
 endif
 
 # Call $(DSM_CONF_DIR)/privilege:
