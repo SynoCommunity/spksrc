@@ -1,6 +1,6 @@
 SPK_NAME = rsnapshot
-SPK_VERS = 1.4.2
-SPK_REV = 2
+SPK_VERS = 1.4.3
+SPK_REV = 3
 SPK_ICON = src/rsnapshot.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = Rsnapshot is a filesystem snapshot utility. It can take incremental snapshots of local and remote filesystems.
 STARTABLE = no
 DISPLAY_NAME = rsnapshot
-CHANGELOG = "Initial release"
+CHANGELOG = "Update rsnapshot to v1.4.3 released on 17 Nov 2019"
 
 HOMEPAGE = https://rsnapshot.org
 LICENSE  = GPLv2
