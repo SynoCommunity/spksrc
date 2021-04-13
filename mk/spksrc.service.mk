@@ -162,7 +162,9 @@ ifneq ($(strip $(SERVICE_PORT)),)
 	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ 1<>$@
 endif
 ifneq ($(strip $(FWPORTS)),)
-	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(FWPORTS)"' $@ 1<>$@
+# e.g. FWPORTS=src/foo.sc
+	@jq --arg file $(FWPORTS) \
+		'."port-config"."protocol-file" = "$(DSM_UI_DIR)/"+($$file | split("/")[-1])' $@ 1<>$@
 endif
 ifneq ($(strip $(SPK_COMMANDS)),)
 # e.g. SPK_COMMANDS=bin/foo bin/bar
@@ -196,7 +198,7 @@ $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
 	@$(dsm_script_copy)
-else  
+else
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
 	@$(dsm_script_copy)
 endif
