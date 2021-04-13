@@ -1,6 +1,6 @@
 SPK_NAME = chromaprint
 SPK_VERS = 1.5.0
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/chromaprint.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -19,6 +19,7 @@ LICENSE    = LGPL2.1+
 export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
+export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg/target/lib
 PRE_DEPEND_TARGET = chromaprint_pre_depend
 SPK_DEPENDS = "ffmpeg>4.2"
 endif
