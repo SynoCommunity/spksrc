@@ -1,0 +1,5 @@
+lnk:lib/liblldpctl.so.4
+lib:lib/liblldpctl.so.4.9.0
+bin:sbin/lldpcli
+bin:sbin/lldpctl
+bin:sbin/lldpd
