@@ -19,8 +19,9 @@ GROUP=sc-media
 
 service_postinst ()
 {
+    mkdir -p /var/packages/jellyfin/var/data/transcodes
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         # allow ffmpeg access
-        chmod 775 /volume1/@appstore/jellyfin/var/data/transcodes
+        chmod 775 /var/packages/jellyfin/var/data/transcodes
     fi
 }
