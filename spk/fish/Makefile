@@ -1,6 +1,6 @@
 SPK_NAME = fish
-SPK_VERS = 3.2.0
-SPK_REV = 2
+SPK_VERS = 3.2.2
+SPK_REV = 3
 SPK_ICON = src/ascii_fish.png
 
 DEPENDS = cross/fish
