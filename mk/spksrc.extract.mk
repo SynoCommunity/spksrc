@@ -9,7 +9,7 @@
 EXTRACT_PATH ?= $(WORK_DIR)
 
 # Extract commands
-TAR_CMD = fakeroot tar
+TAR_CMD ?= tar
 ifeq ($(strip $(EXTRACT_CMD.$(DIST_EXT))),)
 EXTRACT_CMD.tgz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.txz = $(TAR_CMD) -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
