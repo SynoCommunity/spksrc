@@ -1,4 +1,4 @@
 bin:bin/xmlwf
 lnk:lib/libexpat.so
 lnk:lib/libexpat.so.1
-lib:lib/libexpat.so.1.6.9
+lib:lib/libexpat.so.1.7.0
