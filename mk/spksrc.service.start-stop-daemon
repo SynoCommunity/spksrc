@@ -4,7 +4,7 @@
 DNAME="${SYNOPKG_PKGNAME}"
 
 if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
-    # define SYNOPKG_PKGVAR for backwards compatibility
+    # define SYNOPKG_PKGVAR for forward compatibility
     SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
 fi
 
