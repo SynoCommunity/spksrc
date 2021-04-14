@@ -167,7 +167,7 @@ postinst ()
     # copy target/var data to permanent storage
     # and don't override old configurations
     if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
-        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR}
+        $CP -RT ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi    
 
     call_func "service_postinst" install_log
