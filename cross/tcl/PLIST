@@ -1,4 +1,5 @@
 rsc:bin/sqlite3_analyzer
+lnk:bin/tclsh
 bin:bin/tclsh8.6
 rsc:lib/itcl4.2.0/itcl.tcl
 rsc:lib/itcl4.2.0/itclConfig.sh

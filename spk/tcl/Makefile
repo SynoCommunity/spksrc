@@ -21,6 +21,6 @@ CHANGELOG = "1. 64-bit support for x64 archs added.<br/>2. zlib compression fixe
 HOMEPAGE = https://www.tcl.tk
 LICENSE = Tcl/Tk License
 
-SPK_LINKS = /usr/local/bin/tclsh:bin/tclsh$(SPK_MAIN_VERS)
+SPK_COMMANDS = bin/tclsh bin/tclsh$(SPK_MAIN_VERS)
 
 include ../../mk/spksrc.spk.mk

@@ -31,3 +31,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: tcl_post_install
 tcl_post_install:
 	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/lib/libtcl$(PKG_MAIN_VERS).so $(STAGING_INSTALL_PREFIX)/lib/libtcl.so
+	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/bin/tclsh$(PKG_MAIN_VERS) $(STAGING_INSTALL_PREFIX)/bin/tclsh
