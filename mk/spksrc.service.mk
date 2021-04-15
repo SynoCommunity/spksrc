@@ -60,12 +60,6 @@ else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_USER = $(SPK_NAME)
 endif
 
-ifeq ($(strip $(STARTABLE)),yes)
-# we only evaluate for STARTABLE=no
-# STARTABLE=yes is default (same as STARTABLE not defined)
-STARTABLE=
-endif
-
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT) $(SERVICE_COMMAND) $(SERVICE_EXE) $(STARTABLE)),)
 ifeq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
@@ -183,8 +177,15 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
+else
+ifneq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
+	@echo "# List of commands to create links for" >> $@
+	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
+	@echo "SPK_USR_LOCAL_LINKS=\"${SPK_USR_LOCAL_LINKS}\"" >> $@
+	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
+endif
 endif
 
 # Less than DSM 6.0
