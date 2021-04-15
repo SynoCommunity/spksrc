@@ -35,9 +35,11 @@ start_daemon ()
         else
             date >> ${LOG_FILE}
         fi
-        echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
     fi
     call_func "service_prestart"
+    if [ -z "${SVC_QUIET}" ]; then
+        echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
+    fi
     if [ -n "${SERVICE_COMMAND}" ]; then
         if [ -n "${SVC_NO_REDIRECT}" ]; then
             OUT="/dev/null"
