@@ -1,12 +1,16 @@
 #!/bin/sh
 
+# DSM 5 -> 6 upgrade path:
+# - Not supported anymore
+
+# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
+SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
+
 # installer log is not writable, use for reference only.
 INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
-# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
-SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
@@ -273,12 +277,6 @@ postinst ()
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
 
-    # Add firewall config
-    if [ -r "${FWPORTS_FILE}" ]; then
-        install_log "Installing service configuration ${FWPORTS_FILE}"
-        servicetool --install-configure-file --package "${FWPORTS_FILE}" 2>&1 | install_log
-    fi
-
     # Service user management
     if [ -n "${EFF_USER}" ]; then
         if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
@@ -312,34 +310,9 @@ postinst ()
         synogroup --rebuild all 2>&1 | install_log
     fi
 
-    # Share management
-    if [ -n "${SHARE_PATH}" ]; then
-        install_log "Configuring ${SHARE_PATH}"
-        # Create share if does not exist
-        #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
-        if ! synoshare --get "${SHARE_NAME}" &> /dev/null; then
-            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 2>&1 | install_log
-        fi
-
-        # Add user permission if no GROUP is set in UI
-        # GROUP permission will be added in set_syno_permissions
-        if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
-            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
-        fi
-        synoshare --build 2>&1 | install_log
-
-        $MKDIR "${SHARE_PATH}"
-
-        # Permissions for folder, up to volume
-        if [ -n "$GROUP" ]; then
-            set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
-        fi
-    fi
-
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
     call_func "service_postinst" install_log
-    call_func "service_create_links" install_log
 
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
@@ -355,15 +328,6 @@ preuninst ()
 {
     log_step "preuninst"
     call_func "validate_preuninst"
-
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        # Remove firewall config
-        if [ -r "${FWPORTS_FILE}" ]; then
-            install_log "Removing service configuration ${SYNOPKG_PKGNAME}.sc"
-            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" 2>&1 | install_log
-        fi
-    fi
-
     call_func "service_preuninst" install_log
     exit 0
 }
@@ -384,7 +348,6 @@ postuninst ()
     fi
 
     call_func "service_postuninst" install_log
-    call_func "service_remove_links" install_log
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}" 2>&1 | install_log

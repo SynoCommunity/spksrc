@@ -171,11 +171,11 @@ postinst ()
     fi    
 
     call_func "service_postinst" install_log
-    
+
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
     fi
-    
+
     exit 0
 }
 
