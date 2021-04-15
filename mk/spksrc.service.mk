@@ -60,16 +60,16 @@ else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_USER = $(SPK_NAME)
 endif
 
+ifeq ($(strip $(STARTABLE)),yes)
+# we only evaluate for STARTABLE=no
+# STARTABLE=yes is default (same as STARTABLE not defined)
+STARTABLE=
+endif
+
 # Recommend explicit STARTABLE=no
-ifeq ($(strip $(SSS_SCRIPT)),)
-ifeq ($(strip $(SERVICE_COMMAND)),)
-ifeq ($(strip $(SPK_COMMANDS)),)
-ifeq ($(strip $(SERVICE_EXE)),)
-ifeq ($(strip $(STARTABLE)),)
-$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SPK_COMMANDS or specific SSS_SCRIPT)
-endif
-endif
-endif
+ifeq ($(strip $(SSS_SCRIPT) $(SERVICE_COMMAND) $(SERVICE_EXE) $(STARTABLE)),)
+ifeq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
+$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SERVICE_EXE, SSS_SCRIPT, SPK_COMMANDS or SPK_USR_LOCAL_LINKS)
 endif
 endif
 
@@ -143,18 +143,13 @@ ifneq ($(strip $(SERVICE_SETUP)),)
 endif
 
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
-ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
+ifneq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
 	@echo "# List of commands to create links for" >> $@
 	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
-	@echo "SPK_LINKS=\"${SPK_LINKS}\"" >> $@
+	@echo "SPK_USR_LOCAL_LINKS=\"${SPK_USR_LOCAL_LINKS}\"" >> $@
 	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
 endif
 else
-ifneq ($(strip $(SPK_LINKS)),)
-	@echo "${RED}ERROR: SPK_LINKS is unsupported in DSM7${NC}"
-	@echo "${GREEN}Please migrate to SPK_USR_LOCAL_LINKS=${NC}"
-	@exit 1
-endif
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@

@@ -28,11 +28,6 @@ LICENSE  = BSD-3-Clause
 
 SERVICE_SETUP = src/service-setup.sh
 
-include ../../mk/spksrc.common.mk
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic
-else
-SPK_LINKS = /usr/local/bin/borg:env/bin/borg /usr/local/bin/borgmatic:env/bin/borgmatic
-endif
 
 include ../../mk/spksrc.spk.mk
