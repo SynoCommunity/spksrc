@@ -60,6 +60,12 @@ else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_USER = $(SPK_NAME)
 endif
 
+ifeq ($(strip $(STARTABLE)),yes)
+# we only evaluate for STARTABLE=no
+# STARTABLE=yes is default (same as STARTABLE not defined)
+STARTABLE=
+endif
+
 # Recommend explicit STARTABLE=no
 ifeq ($(strip $(SSS_SCRIPT) $(SERVICE_COMMAND) $(SERVICE_EXE) $(STARTABLE)),)
 ifeq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
