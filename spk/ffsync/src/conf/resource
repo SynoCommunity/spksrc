@@ -1,0 +1,20 @@
+{
+    "mysql-db": {
+        "info": {
+            "db-name": "ffsync",
+        },
+        "root-pw": "{{wizard_mysql_password_root}}",
+        "create-db" : {
+          "char-set": "utf8",
+          "collate": "utf8_general_ci",
+          "db-collision": "skip"
+        },
+        "grant-user": {
+            "user-name": "ffsync",
+            "host": "localhost",
+            "user-pw": "{{wizard_mysql_password_ffsync}}",
+        },
+        "drop-db-uninst": false,
+        "drop-user-uninst": false
+    }
+}

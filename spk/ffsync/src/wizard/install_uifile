@@ -5,24 +5,24 @@
         "desc": "Enter your MySQL root password",
         "subitems": [{
             "key": "wizard_mysql_password_root",
-            "desc": "Root password"
+            "desc": "MySQL root password"
         }]
     }, {
         "type": "password",
-        "desc": "A 'ffsync' user and database will be created. Please enter a password for the 'ffsync' user.",
+        "desc": "A MySQL 'ffsync' user and database will be created. Please enter a password for the 'ffsync' user.",
         "subitems": [{
-            "key": "wizard_password_ffsync",
-            "desc": "ffsync password"
+            "key": "wizard_mysql_password_ffsync",
+            "desc": "MySQL ffsync password"
         }]
     }]
 }, {
     "step_title": "Public URL",
     "items": [{
         "type": "textfield",
-        "desc": "Provide the client-visible URL. The URL to configure on your device is:<br/><br>http://public-url:8132/token/1.0/sync/1.5<br/><br>Note: Configure a reverse proxy for SSL support",
+        "desc": "Provide the client-visible URL. The URL to configure on your device is:<br/><br><b>Public URL</b>/token/1.0/sync/1.5<br/><br>Note: Configure a reverse proxy for SSL support",
         "subitems": [{
             "key": "wizard_ffsync_public_url",
-            "desc": "Public URL"
+            "desc": "Public URL (http://diskstation:8132/ or https://myhostname/)"
         }]
     }]
 }]
