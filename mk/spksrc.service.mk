@@ -193,7 +193,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
 else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm6
 	@$(dsm_script_copy)
 else
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
