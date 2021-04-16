@@ -177,6 +177,8 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
+
+# Less than DSM 6.0
 else
 ifneq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
 	@echo "# List of commands to create links for" >> $@
