@@ -1,9 +1,9 @@
-PKG_NAME = wireguard
-PKG_VERS = 1.0.20210124
+PKG_NAME = wireguard-linux-compat
+PKG_VERS = 1.0.20210219
 PKG_EXT = tar.xz
-PKG_DIST_SITE = https://git.zx2c4.com/wireguard-linux-compat/snapshot
-PKG_DIST_NAME = wireguard-linux-compat-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR =  wireguard-linux-compat-$(PKG_VERS)
+PKG_DIST_SITE = https://git.zx2c4.com/$(PKG_NAME)/snapshot
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR =  $(PKG_NAME)-$(PKG_VERS)/src
 
 DEPENDS = cross/libmnl
 
@@ -15,14 +15,11 @@ LICENSE  = GPLv2
 
 ENV += KERNELDIR=$(WORK_DIR)/linux
 
-CONFIGURE_TARGET = noop
-COMPILE_TARGET = wireguard-compile
+CONFIGURE_TARGET = nop
 INSTALL_TARGET = wireguard-install
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: wireguard-compile wireguard-install
-wireguard-compile:
-	$(RUN) DESTDIR=$(STAGING_INSTALL_PREFIX) $(MAKE) -C src/ module
 wireguard-install:
-	install -m 644 $(WORK_DIR)/$(PKG_DIR)/src/wireguard.ko $(STAGING_INSTALL_PREFIX)/
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/wireguard.ko $(STAGING_INSTALL_PREFIX)/
