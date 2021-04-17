@@ -10,12 +10,12 @@ CONFIG="$SYNOPKG_PKGVAR/wg0.conf"
 config() {
     # if the config does not exist make one
     if [ ! -f "${CONFIG}" ]; then
-        echo "Creating config file" >> "${LOG_FILE}" 2>&1
-        DDNS=$(grep -m 1 hostname= /etc/ddns.conf | cut -d = -f 2)  >> "${LOG_FILE}" 2>&1
+        echo "Creating config file"
+        DDNS=$(grep -m 1 hostname= /etc/ddns.conf | cut -d = -f 2)
         if [ -z "$DDNS" ]; then
-            DDNS=$(nslookup myip.opendns.com resolver1.opendns.com | tail -n +3 | grep 'Address' | awk -F ':' '{print $2}') || DDNS=$(wget -qO- https://checkip.amazonaws.com)  >> "${LOG_FILE}" 2>&1
+            DDNS=$(nslookup myip.opendns.com resolver1.opendns.com | tail -n +3 | grep 'Address' | awk -F ':' '{print $2}') || DDNS=$(wget -qO- https://checkip.amazonaws.com)
         fi
-        echo "Endpoint = $DDNS"  >> "${LOG_FILE}" 2>&1
+        echo "Endpoint = $DDNS"
         server_privkey=$($WG genkey)
         client_privkey=$($WG genkey)
 cat<<EOF > "${CONFIG}"
@@ -57,15 +57,12 @@ service_postinst () {
     fi
     # load kernel module and verify that is is loaded
     insmod "${SYNOPKG_PKGDEST}/wireguard.ko"
-    lsmod | grep wireguard
+    lsmod | grep '^wireguard'
     config
 }
 
-daemon_status () {
-    lsmod | grep wireguard
-}
-
 service_postuninst () {
+    rmmod "${SYNOPKG_PKGDEST}/wireguard.ko"
     # remove interface
     ip link del wg0 2>/dev/null || true
 }
