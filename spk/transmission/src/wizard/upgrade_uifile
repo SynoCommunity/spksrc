@@ -5,5 +5,56 @@
     },
     {
         "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within Transmission, manually set Read/Write permissions on the reported folders using File Station."
+    },
+    {
+        "type": "combobox",
+        "desc": "Please select a volume to use for the download folder",
+        "subitems": [
+            {
+                "key": "wizard_volume",
+                "desc": "volume name",
+                "displayField": "display_name",
+                "valueField": "volume_path",
+                "editable": false,
+                "mode": "remote",
+                "api_store": {
+                    "api": "SYNO.Core.Storage.Volume",
+                    "method": "list",
+                    "version": 1,
+                    "baseParams": {
+                        "limit": -1,
+                        "offset": 0,
+                        "location": "internal"
+                    },
+                    "root": "volumes",
+                    "idProperty": "volume_path",
+                    "fields": [
+                        "display_name",
+                        "volume_path"
+                    ]
+                },
+                "validator": {
+                    "fn": "{console.log(arguments);return true;}"
+                }
+            }
+        ]
+    },
+    {
+        "type": "textfield",
+        "desc": "Download shared folder (using the volume chosen above)",
+        "subitems": [
+            {
+                "key": "wizard_download_dir",
+                "desc": "Download shared folder",
+                "defaultValue": "downloads",
+                "validator": {
+                    "allowBlank": false,
+                    "regex": {
+                        "expr": "/^[\\w _-]+$/",
+                        "errorText": "Subdirectories are not supported."
+                    }
+                }
+            }
+        ]
     }]
 }]
