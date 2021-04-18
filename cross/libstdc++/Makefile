@@ -36,10 +36,10 @@ PKG_ARCH = i386
 LIB_DIR = i386-linux-gnu
 endif
 
-# digests file containes check sum for all PKG_ARCH specific sourc files.
+# digests file contains check sums for all PKG_ARCH specific source files.
 # Use 'make update-digests' to update digests file once for new PKG_VERS
 # This will download the sources and create the cumulated digests file.
-# ARCH mapping used here: 
+# ARCH mappings: 
 # - amd64: GENERIC_x64_ARCH
 # - armhf: GENERIC_ARMv7_ARCH
 # - arm64: GENERIC_ARMv8_ARCH
