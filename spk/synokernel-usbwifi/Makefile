@@ -41,6 +41,8 @@ REQUIRE_KERNEL_MODULE += CONFIG_ZD1211RW:drivers/net/wireless/zd1211rw:zd1211rw
 # TODO: Add to wizard
 # ATH9K_HTC, RTL8187, RTL8XXXU, RTLWIFI, RTL8192CU
 # ZD1201, ZD1211RW, AR5523, CARL9170
+#
+# TODO: Add RTL8192EU from https://github.com/Mange/rtl8192eu-linux-driver
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Includes Atmel, MediaTek, Ralink, ZyDAS USB WIFI adapters as well as out-of-tree Realtek RTL8812AU/21AU and RTL8814AU"
