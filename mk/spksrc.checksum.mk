@@ -39,18 +39,13 @@ pre_checksum_target: checksum_msg
 
 # validate file integrity with the provided digests.
 checksum_target: $(PRE_CHECKSUM_TARGET)
-	@if [ -f $(DIGESTS_FILE) ] ; \
-	then \
-	  cat $(DIGESTS_FILE) | (cd $(DISTRIB_DIR) && while read file type value ; \
+	@if [ -f $(DIGESTS_FILE) ] ; then \
+	  cat $(DIGESTS_FILE) | grep $(LOCAL_FILE) | ( \
+	  count=0 ; \
+	  cd $(DISTRIB_DIR) ; \
+	  while read file type value ; \
 	  do \
-	    if [ $$file != $(LOCAL_FILE) ] ; \
-	    then \
-	      $(MSG) "  Downloaded file $(LOCAL_FILE) not in digests file" ; \
-	      rm $(DOWNLOAD_COOKIE) ; \
-	      exit 1 ; \
-	    fi ; \
-	    if [ ! -f $$file ] ; \
-	    then \
+	    if [ ! -f $$file ] ; then \
 	      $(MSG) "  File $$file not downloaded" ; \
 	      rm $(DOWNLOAD_COOKIE) ; \
 	      exit 1 ; \
@@ -62,9 +57,8 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 	      *) $(MSG) "Unsupported digest type $$type" ; exit 1 ;; \
 	    esac ; \
 	    $(MSG) "  Checking $$tool of file $$file"; \
-	    if echo "$$value  $$file" | $$tool --status -c - ; \
-	    then \
-	      true ; \
+	    if echo "$$value  $$file" | $$tool --status -c - ; then \
+	      count=$$(($$count+1)) ; \
 	    else  \
 	      $(MSG) "    Wrong $$tool for file $$file" ; \
 	      [ -f $$file.wrong ] && rm $$file.wrong ; \
@@ -73,8 +67,14 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 	      rm $(DOWNLOAD_COOKIE) ; \
 	      $(MSG) "    Download cookie removed to trigger the download again" ; \
 	      exit 1 ; \
-	    fi \
-	  done) ; \
+	    fi ; \
+	  done ; \
+	  if [ $$count -eq 0 ] ; then \
+	    $(MSG) "  Downloaded file $(LOCAL_FILE) is not in digests file" ; \
+	    rm $(DOWNLOAD_COOKIE) ; \
+	    exit 1 ; \
+	  fi ; \
+	  ) ; \
 	else \
 	  $(MSG) "No digests file for $(NAME)" ; \
 	fi
