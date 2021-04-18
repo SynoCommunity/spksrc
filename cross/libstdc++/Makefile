@@ -36,6 +36,15 @@ PKG_ARCH = i386
 LIB_DIR = i386-linux-gnu
 endif
 
+include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: libstdc++6_install
+libstdc++6_install:
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/lib
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/usr/lib/$(LIB_DIR)/libstdc++.so.6.0.22 $(STAGING_INSTALL_PREFIX)/lib
+	ln -s libstdc++.so.6.0.22 $(STAGING_INSTALL_PREFIX)/lib/libstdc++.so.6
+
+
 # digests file contains check sums for all PKG_ARCH specific source files.
 # Use 'make update-digests' to update digests file once for new PKG_VERS
 # This will download the sources and create the cumulated digests file.
@@ -45,6 +54,7 @@ endif
 # - arm64: GENERIC_ARMv8_ARCH
 # - armel: hi3535
 # - i386:  evansport
+.PHONY: update-digests
 update-digests:
 	@echo "=== Create digests file ==="; \
 	export TCVERSION=6.1 ; \
@@ -61,11 +71,3 @@ update-digests:
 	cat digests ; \
 	exit 0
 
-
-include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: libstdc++6_install
-libstdc++6_install:
-	install -m 755 -d $(STAGING_INSTALL_PREFIX)/lib
-	install -m 644 $(WORK_DIR)/$(PKG_DIR)/usr/lib/$(LIB_DIR)/libstdc++.so.6.0.22 $(STAGING_INSTALL_PREFIX)/lib
-	ln -s libstdc++.so.6.0.22 $(STAGING_INSTALL_PREFIX)/lib/libstdc++.so.6

@@ -19,7 +19,8 @@ REQUIRED_DSM = 5.0
 # Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-DEPENDS = cross/libstdc++ cross/sqlite cross/$(SPK_NAME)
+OPTIONAL_DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-mono
+DEPENDS = cross/sqlite 
 
 STARTABLE = yes
 SERVICE_USER = auto
@@ -35,10 +36,12 @@ WIZARDS_DIR = src/wizard/
 # Mono build for unsupported .NET archs
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS = cross/sqlite cross/$(SPK_NAME)-mono
+DEPENDS += cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
 CHANGELOG = "no change"
 SPK_DEPENDS = "mono>3.6:chromaprint>=1.5"
+else
+DEPENDS += cross/libstdc++ cross/$(SPK_NAME)
 endif
 
 POST_STRIP_TARGET = lidarr_extra_install
