@@ -39,7 +39,10 @@ pre_checksum_target: checksum_msg
 
 # validate file integrity with the provided digests.
 checksum_target: $(PRE_CHECKSUM_TARGET)
-	@if [ -f $(DIGESTS_FILE) ] ; then \
+	@if [ ! -f $(DIGESTS_FILE) ] ; then \
+	  $(MSG) "No digests file for $(NAME)" ; \
+	  exit 1 ; \
+	else \
 	  # validate file in digests \
 	  if [ $$(cat $(DIGESTS_FILE) | grep -c $(LOCAL_FILE) || true) -eq 0 ]; then \
 	     $(MSG) "  Downloaded file $(LOCAL_FILE) is not in digests file" ; \
@@ -80,8 +83,6 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 	      done ; \
 	    ) ; \
 	  fi ; \
-	else \
-	  $(MSG) "No digests file for $(NAME)" ; \
 	fi
 
 	@echo $(DIST_FILE)
