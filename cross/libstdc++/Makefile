@@ -1,8 +1,24 @@
-include ../../mk/spksrc.archs.mk
-
 PKG_NAME = libstdc++6
 PKG_VERS = 6.3.0-18+deb9u1
 PKG_EXT = deb
+PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS)_$(PKG_ARCH).$(PKG_EXT)
+PKG_DIST_SITE = http://http.us.debian.org/debian/pool/main/g/gcc-6/
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
+
+DEPENDS =
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
+HOMEPAGE = https://gcc.gnu.org/
+COMMENT  = The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Ada, Go, and D, as well as libraries for these languages (libstdc++,...). GCC was originally written as the compiler for the GNU operating system. The GNU system was developed to be 100% free software, free in the sense that it respects the user\'s freedom.
+LICENSE  = GNU GPL v3
+
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = libstdc++6_install
+
+include ../../mk/spksrc.archs.mk
 
 PKG_ARCH = amd64
 LIB_DIR = x86_64-linux-gnu
@@ -19,21 +35,6 @@ else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PKG_ARCH = i386
 LIB_DIR = i386-linux-gnu
 endif
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
-PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS)_$(PKG_ARCH).deb
-PKG_DIST_SITE = http://http.us.debian.org/debian/pool/main/g/gcc-6/
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-HOMEPAGE = https://gcc.gnu.org/
-COMMENT  = The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Ada, Go, and D, as well as libraries for these languages (libstdc++,...). GCC was originally written as the compiler for the GNU operating system. The GNU system was developed to be 100% free software, free in the sense that it respects the user\'s freedom.
-LICENSE  = GNU GPL v3
-
-EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = libstdc++6_install
 
 include ../../mk/spksrc.cross-cc.mk
 
