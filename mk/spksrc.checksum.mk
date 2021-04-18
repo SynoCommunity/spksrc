@@ -74,6 +74,11 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 	    rm $(DOWNLOAD_COOKIE) ; \
 	    exit 1 ; \
 	  fi ; \
+	  if [ $$count -lt 3 ] ; then \
+	    $(MSG) "  Downloaded file $(LOCAL_FILE) has only $$count/3 checksum entries. Please update the digests file" ; \
+	    rm $(DOWNLOAD_COOKIE) ; \
+	    exit 1 ; \
+	  fi ; \
 	  ) ; \
 	else \
 	  $(MSG) "No digests file for $(NAME)" ; \
