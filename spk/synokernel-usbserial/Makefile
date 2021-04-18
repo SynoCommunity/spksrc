@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-usbserial
 SPK_VERS = 1.0
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/$(SPK_NAME).png
 CHANGELOG = "1. Synology Kernel USB serial drivers"
 
