@@ -1,9 +1,12 @@
 [
   {
-    "step_title": "DSM Permissions",
+    "step_title": "Important information",
     "items": [
       {
-        "desc": "Permissions are managed as a \"System internal user\" named <b>sc-jellyfin</b>.<br>For DSM 6 and below there is also the generic <b>sc-media</b> group.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Permissions for the package are managed by a \"System internal user\" named <b>sc-jellyfin</b>.<br>For DSM 6 and below there is also the generic <b>sc-media</b> group.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      },
+      {
+        "desc": "Information regarding Jellyfin troubleshooting and hardware acceleration support for your NAS can be found <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Jellyfin\">here</a>"
       }
     ]
   }
