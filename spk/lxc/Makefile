@@ -8,13 +8,16 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = rbrownwsws
 DESCRIPTION = LXC is the well-known and heavily tested low-level Linux container runtime
-STARTABLE = yes
 DISPLAY_NAME = LXC
 CHANGELOG = "Initial version"
 
 HOMEPAGE = https://linuxcontainers.org/lxc/
 LICENSE  = GPLv2/LGPLv2.1
 
+CONF_DIR = src/conf
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = yes
 SSS_SCRIPT = src/dsm-control.sh
 
 SPK_COMMANDS = bin/lxc-attach \
