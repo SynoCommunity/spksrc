@@ -19,5 +19,7 @@ GROUP=sc-media
 
 service_postinst ()
 {
-    mkdir -p --mode=0775 /var/packages/jellyfin/var/data/transcodes
+    if [ "$SYNOPKG_DSM_VERSION_MAJOR" -ge 7 ]; then
+        mkdir -p --mode=0777 /var/packages/jellyfin/var/data/transcodes
+    fi
 }
