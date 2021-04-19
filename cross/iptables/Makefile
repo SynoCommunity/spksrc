@@ -5,13 +5,18 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.netfilter.org/pub/iptables
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-include ../../mk/spksrc.archs.mk
-
-DEPENDS =
-
 HOMEPAGE = https://www.netfilter.org/projects/iptables/index.html
 COMMENT  = The userspace command line program used to configure the Linux 2.4.x and later packet filtering ruleset.
 LICENSE  = GPLv2
+
+include ../../mk/spksrc.archs.mk
+# Too old
+UNSUPPORTED_ARCHS  = $(DEPRECATED_ARCHS)
+
+# `powerpc-e500v2-linux-gnuspe-ld: cannot find arch/powerpc/lib/crtsavres.o`
+UNSUPPORTED_ARCHS += qoriq
+
+DEPENDS =
 
 PRE_CONFIGURE_TARGET = iptables_pre_configure
 GNU_CONFIGURE = 1
