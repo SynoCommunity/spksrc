@@ -3,7 +3,7 @@
     "step_title": "DSM Permissions",
     "items": [
       {
-        "desc": "Permissions are managed as a \"System internal user\": <b>sc-jellyfin</b> or via the <b>'sc-media'</b> group (DSM 6 and below only).<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Permissions are managed as a \"System internal user\" named <b>sc-jellyfin</b>.<br>For DSM 6 and below there is also the generic <b>sc-media</b> group.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
       }
     ]
   }
