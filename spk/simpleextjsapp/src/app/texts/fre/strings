@@ -1,0 +1,4 @@
+[app]
+app_name = "App Simple ExtJS"
+description = "Application ExtJS de démonstration"
+index_title = "Aide"
