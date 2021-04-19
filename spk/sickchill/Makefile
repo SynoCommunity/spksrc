@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
-SPK_VERS = 20210410
-SPK_REV = 2
+SPK_VERS = 20210419
+SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
 SPK_DEPENDS = "python3>=3.6:git"
@@ -13,7 +13,7 @@ DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new e
 DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Fix package migration and allow selection of branch"
+CHANGELOG = "Update git clone url and requirements.txt"
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPL

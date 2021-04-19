@@ -54,7 +54,7 @@ service_postinst() {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config
 
-        ${GIT} clone --depth 10 --recursive -q -b ${wizard_branch} git://github.com/SickChill/SickChill.git ${SC_INSTALL_DIR} > /dev/null 2>&1
+        ${GIT} clone --depth 10 --recursive -q -b ${wizard_branch} https://github.com/SickChill/SickChill.git ${SC_INSTALL_DIR} > /dev/null 2>&1
     fi
 }
 
