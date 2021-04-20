@@ -23,21 +23,73 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 			minimizable: true,
 			width: 600,
 			height: 400,
-			items: [{
-				xtype: 'label',
-				text: 'Welcome: '
-			}, {
-				xtype: "syno_button",
-				btnStyle: "blue",
-				text: 'Call CGI',
-				handler: this.onSureBtnClick.bind(this)
-			}]
+			items: [
+			{
+				xtype: 'syno_displayfield',
+				value: 'Welcome to the Demo DSM App: '
+			},
+			this.createDisplayCall(),
+			this.createDisplayGUI()
+			]
 		}, config);
 
 		this.callParent([config]);
 	},
+	createDisplayCall: function() {
+        return new SYNO.ux.FieldSet({
+            title: "Call to CGI or API",
+            collapsible: false,
+            items: [
+			    {
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'Button :',
+                }, {
+                    xtype: "syno_button",
+                    btnStyle: "blue",
+                    text: 'Click to call Server CGI ',
+                    handler: this.onSureBtnClick.bind(this)
+                }]
+            },
+
+			]
+        });
+	},
+    createDisplayGUI: function() {
+        return new SYNO.ux.FieldSet({
+            title: "GUI components ",
+            collapsible: false,
+            items: [
+	          {
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'Text Field :'
+                }, {
+                    xtype: "syno_textfield",
+                    fieldLabel: "TextField: ",
+                    value: "Text"
+                }]
+		      },
+              {
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'CheckBox :'
+                }, {
+                    xtype: "syno_checkbox",
+                    boxLabel: "Activate option"
+                }]
+              }
+
+            ]
+        });
+    },
 	onSureBtnClick: function() {
-		//window.alert('Button click');
 		Ext.Ajax.request({
 			url: '/webman/3rdparty/simpleextjsapp/test.cgi',
 			method: 'GET',
@@ -65,4 +117,5 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
 	}
 });
+
 
