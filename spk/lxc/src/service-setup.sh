@@ -14,10 +14,11 @@ service_postinst ()
     done
     echo "[end]   Linking to AppArmor tunables"
 
-    aa_profile_lxc_start_complain
+    aa_save_wizard_settings
+    aa_profiles_activate
 }
 
 service_preuninst ()
 {
-    aa_profile_lxc_start_remove
+    aa_profiles_deactivate
 }

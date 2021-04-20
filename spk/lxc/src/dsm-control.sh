@@ -28,7 +28,7 @@ start ()
         echo "We do not have the xt_CHECKSUM kernel module"
     fi
 
-    aa_profile_lxc_start_complain
+    aa_profiles_activate
 
     ${SYNOPKG_PKGDEST}/etc/init.d/lxc-net start
     ${SYNOPKG_PKGDEST}/etc/init.d/lxc start

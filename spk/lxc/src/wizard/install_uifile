@@ -1,0 +1,28 @@
+[
+  {
+    "step_title": "AppArmor",
+    "items": [
+      {
+        "type": "singleselect",
+        "desc": "What mode should the AppArmor profiles be put in?",
+        "subitems": [
+          {
+            "key": "wizard_aa_disable",
+            "desc": "Disabled [recommended]",
+            "defaultVaule": true
+          },
+          {
+            "key": "wizard_aa_complain",
+            "desc": "Complain [broken - development only]",
+            "defaultVaule": false
+          },
+          {
+            "key": "wizard_aa_enforce",
+            "desc": "Enforce [broken - development only]",
+            "defaultVaule": false
+          }
+        ]
+      }
+    ]
+  }
+]

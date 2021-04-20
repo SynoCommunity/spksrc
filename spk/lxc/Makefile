@@ -24,6 +24,8 @@ HOMEPAGE = https://linuxcontainers.org/lxc/
 LICENSE  = GPLv2/LGPLv2.1
 
 CONF_DIR = src/conf
+WIZARDS_DIR = src/wizard/
+
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
