@@ -1,0 +1,25 @@
+From f0874bc3bcbd007bbc3ff8fa670648b98e060267 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Mon, 19 Apr 2021 02:52:45 +0000
+Subject: [PATCH] Template aa.py
+
+---
+ utils/apparmor/aa.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git utils/apparmor/aa.py utils/apparmor/aa.py
+index f724f6e..6288cd9 100644
+--- utils/apparmor/aa.py
++++ utils/apparmor/aa.py
+@@ -2518,7 +2518,7 @@ def logger_path():
+ 
+ ######Initialisations######
+ 
+-def init_aa(confdir="/etc/apparmor", profiledir=None):
++def init_aa(confdir="@AA_PREFIX@/etc/apparmor", profiledir=None):
+     global CONFDIR
+     global conf
+     global cfg
+-- 
+2.25.1
+

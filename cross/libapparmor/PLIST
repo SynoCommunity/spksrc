@@ -1,0 +1,9 @@
+lnk:lib/libapparmor.so
+lnk:lib/libapparmor.so.1
+lib:lib/libapparmor.so.1.8.0
+rsc:lib/python3.8/site-packages/LibAppArmor-3.0.1-py3.8.egg-info
+rsc:lib/python3.8/site-packages/LibAppArmor/LibAppArmor.py
+lib:lib/python3.8/site-packages/LibAppArmor/_LibAppArmor.cpython-38-x86_64-linux-gnu.so
+rsc:lib/python3.8/site-packages/LibAppArmor/__init__.py
+rsc:lib/python3.8/site-packages/LibAppArmor/__pycache__/LibAppArmor.cpython-38.pyc
+rsc:lib/python3.8/site-packages/LibAppArmor/__pycache__/__init__.cpython-38.pyc

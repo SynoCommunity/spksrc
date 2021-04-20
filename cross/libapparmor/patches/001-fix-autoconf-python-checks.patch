@@ -1,0 +1,114 @@
+--- libraries/libapparmor/m4/ac_python_devel.m4	2020-12-02 11:01:37.000000000 +0000
++++ libraries/libapparmor/m4/ac_python_devel.m4.new	2021-04-16 11:30:45.526846912 +0000
+@@ -1,21 +1,8 @@
+ AC_DEFUN([AC_PYTHON_DEVEL],[
+-        #
+-        # Allow the use of a (user set) custom python version
+-        #
+-        AC_ARG_VAR([PYTHON_VERSION],[The installed Python
+-                version to use, for example '2.3'. This string
+-                will be appended to the Python interpreter
+-                canonical name.])
+ 
+-        AC_PATH_PROG([PYTHON],[python[$PYTHON_VERSION]])
++        AC_MSG_CHECKING([for python])
+         if test -z "$PYTHON"; then
+-           AC_MSG_ERROR([Cannot find python$PYTHON_VERSION in your system path])
+-           PYTHON_VERSION=""
+-        fi
+-
+-        AC_PATH_PROG([PYTHON_CONFIG],[`basename [$PYTHON]-config`])
+-        if test -z "$PYTHON_CONFIG"; then
+-           AC_MSG_ERROR([Cannot find python$PYTHON_VERSION-config in your system path])
++                AC_MSG_ERROR([PYTHON has not been set])
+         fi
+ 
+         #
+@@ -84,16 +71,8 @@
+         # Check for Python include path
+         #
+         AC_MSG_CHECKING([for Python include path])
+-        if type $PYTHON_CONFIG; then
+-                PYTHON_CPPFLAGS=`$PYTHON_CONFIG --includes`
+-        fi
+         if test -z "$PYTHON_CPPFLAGS"; then
+-                python_path=`$PYTHON -c "import sys; import distutils.sysconfig;\
+-sys.stdout.write('%s\n' % distutils.sysconfig.get_python_inc());"`
+-                if test -n "${python_path}"; then
+-                        python_path="-I$python_path"
+-                fi
+-                PYTHON_CPPFLAGS=$python_path
++                AC_MSG_ERROR([PYTHON_CPPFLAGS has not been set])
+         fi
+         AC_MSG_RESULT([$PYTHON_CPPFLAGS])
+         AC_SUBST([PYTHON_CPPFLAGS])
+@@ -102,26 +81,8 @@
+         # Check for Python library path
+         #
+         AC_MSG_CHECKING([for Python library path])
+-        if type $PYTHON_CONFIG; then
+-                PYTHON_LDFLAGS=`$PYTHON_CONFIG --ldflags`
+-        fi
+         if test -z "$PYTHON_LDFLAGS"; then
+-                # (makes two attempts to ensure we've got a version number
+-                # from the interpreter)
+-                py_version=`$PYTHON -c "import sys; from distutils.sysconfig import *; \
+-sys.stdout.write('%s\n' % ''.join(get_config_vars('VERSION')))"`
+-                if test "$py_version" == "[None]"; then
+-                        if test -n "$PYTHON_VERSION"; then
+-                                py_version=$PYTHON_VERSION
+-                        else
+-                                py_version=`$PYTHON -c "import sys; \
+-sys.stdout.write("%s\n" % sys.version[[:3]])"`
+-                        fi
+-                fi
+-
+-                PYTHON_LDFLAGS=`$PYTHON -c "import sys; from distutils.sysconfig import *; \
+-sys.stdout.write('-L' + get_python_lib(0,1) + ' -lpython\n')"`$py_version`$PYTHON -c \
+-"import sys; sys.stdout.write('%s' % getattr(sys,'abiflags',''))"`
++                AC_MSG_ERROR([PYTHON_LDFLAGS has not been set])
+         fi
+         AC_MSG_RESULT([$PYTHON_LDFLAGS])
+         AC_SUBST([PYTHON_LDFLAGS])
+@@ -131,8 +92,7 @@
+         #
+         AC_MSG_CHECKING([for Python site-packages path])
+         if test -z "$PYTHON_SITE_PKG"; then
+-                PYTHON_SITE_PKG=`$PYTHON -c "import sys; import distutils.sysconfig; \
+-sys.stdout.write('%s\n' % distutils.sysconfig.get_python_lib(0,0));"`
++                AC_MSG_ERROR([PYTHON_SITE_PKG has not been set])
+         fi
+         AC_MSG_RESULT([$PYTHON_SITE_PKG])
+         AC_SUBST([PYTHON_SITE_PKG])
+@@ -141,14 +101,8 @@
+         # libraries which must be linked in when embedding
+         #
+         AC_MSG_CHECKING(python extra libraries)
+-        if type $PYTHON_CONFIG; then
+-                PYTHON_EXTRA_LIBS=`$PYTHON_CONFIG --libs --embed` || \
+-                        PYTHON_EXTRA_LIBS=''
+-        fi
+         if test -z "$PYTHON_EXTRA_LIBS"; then
+-           PYTHON_EXTRA_LIBS=`$PYTHON -c "import sys; import distutils.sysconfig; \
+-conf = distutils.sysconfig.get_config_var; \
+-sys.stdout.write('%s %s %s\n' % (conf('BLDLIBRARY'), conf('LOCALMODLIBS'), conf('LIBS')))"`
++                AC_MSG_ERROR([PYTHON_EXTRA_LIBS has not been set])
+         fi
+         AC_MSG_RESULT([$PYTHON_EXTRA_LIBS])
+         AC_SUBST(PYTHON_EXTRA_LIBS)
+@@ -157,14 +111,8 @@
+         # linking flags needed when embedding
+         #
+         AC_MSG_CHECKING(python extra linking flags)
+-        if type $PYTHON_CONFIG; then
+-                PYTHON_EXTRA_LDFLAGS=`$PYTHON_CONFIG --ldflags --embed` || \
+-                        PYTHON_EXTRA_LDFLAGS=''
+-        fi
+         if test -z "$PYTHON_EXTRA_LDFLAGS"; then
+-                PYTHON_EXTRA_LDFLAGS=`$PYTHON -c "import sys; import distutils.sysconfig; \
+-conf = distutils.sysconfig.get_config_var; \
+-sys.stdout.write('%s\n' % conf('LINKFORSHARED'))"`
++                AC_MSG_ERROR([PYTHON_EXTRA_LDFLAGS has not been set])
+         fi
+         AC_MSG_RESULT([$PYTHON_EXTRA_LDFLAGS])
+         AC_SUBST(PYTHON_EXTRA_LDFLAGS)

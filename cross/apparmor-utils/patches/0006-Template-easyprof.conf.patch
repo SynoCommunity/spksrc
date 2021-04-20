@@ -1,0 +1,24 @@
+From a1ce813f1cb6501fe3919f8f8f2379ae8894935e Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Mon, 19 Apr 2021 04:15:15 +0000
+Subject: [PATCH] Template easyprof.conf
+
+---
+ utils/easyprof/easyprof.conf | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git utils/easyprof/easyprof.conf utils/easyprof/easyprof.conf
+index fdd9cc8..0e367e4 100644
+--- utils/easyprof/easyprof.conf
++++ utils/easyprof/easyprof.conf
+@@ -1,5 +1,5 @@
+ # Location of system policygroups
+-POLICYGROUPS_DIR="/usr/share/apparmor/easyprof/policygroups"
++POLICYGROUPS_DIR="@AA_PREFIX@/share/apparmor/easyprof/policygroups"
+ 
+ # Location of system templates
+-TEMPLATES_DIR="/usr/share/apparmor/easyprof/templates"
++TEMPLATES_DIR="@AA_PREFIX@/share/apparmor/easyprof/templates"
+-- 
+2.25.1
+
