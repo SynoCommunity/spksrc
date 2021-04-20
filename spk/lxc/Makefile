@@ -28,6 +28,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 SSS_SCRIPT = src/dsm-control.sh
+ADDITIONAL_SCRIPTS = src/aa-profiles.sh
 
 SPK_COMMANDS = bin/lxc-attach \
 	bin/lxc-autostart \

@@ -1,4 +1,6 @@
-#!/bin/sh
+#! /bin/sh
+
+. "$(dirname $0)/aa-profiles"
 
 . /usr/syno/etc/iptables_modules_list
 
@@ -14,11 +16,6 @@ SYNOMODULETOOL="/usr/syno/bin/synomoduletool"
 
 MODULE_XT_CHECKSUM="${SYNOPKG_PKGDEST}/lib/modules/$(uname -r)/kernel/net/netfilter/xt_CHECKSUM.ko"
 
-AA_PARSER_BIN=${SYNOPKG_PKGDEST}/sbin/apparmor_parser
-AA_PARSER="${AA_PARSER_BIN} --config-file ${SYNOPKG_PKGDEST}/etc/apparmor/parser.conf"
-
-AA_PROFILE_LXC_START="${SYNOPKG_PKGDEST}/etc/apparmor.d/usr.bin.lxc-start"
-
 start ()
 {
     echo "Inserting synology provided kernel modules"
@@ -31,13 +28,7 @@ start ()
         echo "We do not have the xt_CHECKSUM kernel module"
     fi
 
-    if [ -x ${AA_PARSER_BIN} ]; then
-        echo "Updating AppArmor profile"
-        ${AA_PARSER} -r -C ${AA_PROFILE_LXC_START}
-    else
-        echo "We do not have an up-to-date AppArmor parser"
-        echo "LXC containers will have to run unconfined"
-    fi
+    aa_profile_lxc_start_complain
 
     ${SYNOPKG_PKGDEST}/etc/init.d/lxc-net start
     ${SYNOPKG_PKGDEST}/etc/init.d/lxc start
