@@ -1,4 +1,4 @@
-From bd3cea26ae3b569106fbf502362abd366017e0b8 Mon Sep 17 00:00:00 2001
+From f4c4e648886f992d3686fd1bafca91c77415e214 Mon Sep 17 00:00:00 2001
 From: Ross Brown <rbrownwsws@googlemail.com>
 Date: Sat, 17 Apr 2021 19:22:31 +0000
 Subject: [PATCH] Make lxc-net only use CHECKSUM rule if module available

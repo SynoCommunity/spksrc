@@ -4,7 +4,16 @@ SPK_REV = 1
 BETA = 1
 SPK_ICON = src/containers.png
 
+include ../../mk/spksrc.archs.mk
+include ../../cross/libapparmor/apparmor.info.mk
+
 DEPENDS = cross/$(SPK_NAME)
+
+ifneq ($(findstring $(ARCH),$(AA_UNSUPPORTED_ARCHS)),$(ARCH))
+# We need an up-to-date apparmor_parser that can understand the LXC
+# AppArmor profile.
+DEPENDS += cross/apparmor-parser
+endif
 
 MAINTAINER = rbrownwsws
 DESCRIPTION = LXC is the well-known and heavily tested low-level Linux container runtime
@@ -54,3 +63,6 @@ include ../../mk/spksrc.spk.mk
 lxc_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/lock
 	install -m 755 -d $(STAGING_DIR)/var/lib/misc
+	install -m 755 -d $(STAGING_DIR)/etc/apparmor.d/tunables
+	install -m 755 -d $(STAGING_DIR)/etc/apparmor
+	echo "Include $(INSTALL_PREFIX)/etc/apparmor.d/" > $(STAGING_DIR)/etc/apparmor/parser.conf
