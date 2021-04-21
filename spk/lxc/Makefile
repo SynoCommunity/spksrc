@@ -30,7 +30,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 SSS_SCRIPT = src/dsm-control.sh
-ADDITIONAL_SCRIPTS = src/aa-profiles.sh
+ADDITIONAL_SCRIPTS = src/utils.sh
 
 SPK_COMMANDS = bin/lxc-attach \
 	bin/lxc-autostart \
@@ -66,6 +66,7 @@ include ../../mk/spksrc.spk.mk
 lxc_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/lock
 	install -m 755 -d $(STAGING_DIR)/var/lib/misc
+	install -m 755 -d $(STAGING_DIR)/var/lib/lxc
 	install -m 755 -d $(STAGING_DIR)/etc/apparmor.d/tunables
 	install -m 755 -d $(STAGING_DIR)/etc/apparmor
 	echo "Include $(INSTALL_PREFIX)/etc/apparmor.d/" > $(STAGING_DIR)/etc/apparmor/parser.conf

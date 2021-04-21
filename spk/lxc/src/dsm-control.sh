@@ -1,6 +1,6 @@
 #! /bin/sh
 
-. "$(dirname $0)/aa-profiles"
+. "$(dirname $0)/utils"
 
 . /usr/syno/etc/iptables_modules_list
 

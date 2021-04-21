@@ -1,11 +1,55 @@
 #! /bin/sh
 
-AA_SETTINGS="/var/packages/${SYNOPKG_PKGNAME}/etc/aa_settings"
+SETTINGS_FILE="/var/packages/${SYNOPKG_PKGNAME}/etc/lxc_install_settings"
 
 AA_PARSER_BIN=${SYNOPKG_PKGDEST}/sbin/apparmor_parser
 AA_PARSER="${AA_PARSER_BIN} --config-file ${SYNOPKG_PKGDEST}/etc/apparmor/parser.conf"
 
 AA_PROFILE_LXC_START="${SYNOPKG_PKGDEST}/etc/apparmor.d/usr.bin.lxc-start"
+
+save_wizard_settings ()
+{
+    if [ -e "${SETTINGS_FILE}" ]; then
+        rm "${SETTINGS_FILE}"
+    fi
+
+    if [ "${wizard_aa_enforce}" = "true" ]; then
+        echo "AA_MODE=ENFORCE" >> "${SETTINGS_FILE}"
+    elif [ "${wizard_aa_complain}" = "true" ]; then
+        echo "AA_MODE=COMPLAIN" >> "${SETTINGS_FILE}"
+    elif [ "${wizard_aa_disable}" = "true" ]; then
+        echo "AA_MODE=DISABLE" >> "${SETTINGS_FILE}"
+    else
+        echo "Something has gone wrong saving the AppArmor mode setting: The wizard provided no AppArmor mode."
+        exit 1
+    fi
+
+    if [ -n "${wizard_lxc_volume}" ]; then
+        echo "LXC_VOLUME=\"${wizard_lxc_volume}\"" >> "${SETTINGS_FILE}"
+    else
+        echo "Something went wrong saving the LXC volume setting: The wizard provided no LXC volume."
+        exit 1
+    fi
+
+    if [ -n "${wizard_lxc_share_name}" ]; then
+        echo "LXC_SHARE_NAME=\"${wizard_lxc_share_name}\"" >> "${SETTINGS_FILE}"
+    else
+        echo "Something went wrong saving the LXC share setting: The wizard provided no LXC share."
+        exit 1
+    fi
+}
+
+load_settings ()
+{
+    if [ -r "${SETTINGS_FILE}" ]; then
+        . "${SETTINGS_FILE}"
+
+        LXC_SHARE_PATH="${LXC_VOLUME}/${LXC_SHARE_NAME}"
+    else
+        echo "Could not open the settings file."
+        exit 1
+    fi
+}
 
 aa_log_old_parser ()
 {
@@ -13,28 +57,9 @@ aa_log_old_parser ()
     echo "       LXC containers will have to run unconfined"
 }
 
-aa_save_wizard_settings ()
-{
-    if [ -e "${AA_SETTINGS}" ]; then
-        rm "${AA_SETTINGS}"
-    fi
-
-    if [ "${wizard_aa_enforce}" = "true" ]; then
-        echo "AA_MODE=ENFORCE" >> "${AA_SETTINGS}"
-    elif [ "${wizard_aa_complain}" = "true" ]; then
-        echo "AA_MODE=COMPLAIN" >> "${AA_SETTINGS}"
-    elif [ "${wizard_aa_disable}" = "true" ]; then
-        echo "AA_MODE=DISABLE" >> "${AA_SETTINGS}"
-    else
-        echo "Something has gone wrong saving AppArmor setting: The wizard provided no AppArmor mode."
-    fi
-}
-
 aa_profiles_activate ()
 {
-    if [ -r "${AA_SETTINGS}" ]; then
-        . "${AA_SETTINGS}"
-    fi
+    load_settings
 
     if [ "${AA_MODE}" = "ENFORCE" ]; then
         aa_profiles_mode_enforce
