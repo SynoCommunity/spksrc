@@ -14,6 +14,8 @@ CHANGELOG = "Initial version"
 
 LICENSE  = GPLv2
 
+UNSUPPORTED_ARCHS = $(AA_UNSUPPORTED_ARCHS)
+
 # We need the libapparmor python binding
 ENV += AA_BINDING_PYTHON=y
 
