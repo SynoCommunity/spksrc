@@ -26,8 +26,8 @@ service_postinst ()
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
 
-    # Copying "config.yml" file to the "var/" folder
-    install -m 755 -d ${SYNOPKG_PKGVAR}
-    install -m 644 ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGVAR}
+    # Copy "config.yml" file to the "var/" folder
+    mkdir -p ${SYNOPKG_PKGVAR}
+    cp -f ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGVAR}/
 }
 
