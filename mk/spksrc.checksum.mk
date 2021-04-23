@@ -39,44 +39,50 @@ pre_checksum_target: checksum_msg
 
 # validate file integrity with the provided digests.
 checksum_target: $(PRE_CHECKSUM_TARGET)
-	@if [ -f $(DIGESTS_FILE) ] ; \
-	then \
-	  cat $(DIGESTS_FILE) | (cd $(DISTRIB_DIR) && while read file type value ; \
-	  do \
-	    if [ $$file != $(LOCAL_FILE) ] ; \
-	    then \
-	      $(MSG) "  Downloaded file $(LOCAL_FILE) not in digests file" ; \
-	      rm $(DOWNLOAD_COOKIE) ; \
-	      exit 1 ; \
-	    fi ; \
-	    if [ ! -f $$file ] ; \
-	    then \
-	      $(MSG) "  File $$file not downloaded" ; \
-	      rm $(DOWNLOAD_COOKIE) ; \
-	      exit 1 ; \
-	    fi ; \
-	    case $$type in \
-	      SHA1|sha1)     tool=sha1sum ;; \
-	      SHA256|sha256) tool=sha256sum ;; \
-	      MD5|md5)       tool=md5sum ;; \
-	      *) $(MSG) "Unsupported digest type $$type" ; exit 1 ;; \
-	    esac ; \
-	    $(MSG) "  Checking $$tool of file $$file"; \
-	    if echo "$$value  $$file" | $$tool --status -c - ; \
-	    then \
-	      true ; \
-	    else  \
-	      $(MSG) "    Wrong $$tool for file $$file" ; \
-	      [ -f $$file.wrong ] && rm $$file.wrong ; \
-	      mv $$file $$file.wrong ; \
-	      $(MSG) "    Renamed as $$file.wrong" ; \
-	      rm $(DOWNLOAD_COOKIE) ; \
-	      $(MSG) "    Download cookie removed to trigger the download again" ; \
-	      exit 1 ; \
-	    fi \
-	  done) ; \
-	else \
+	@if [ ! -f $(DIGESTS_FILE) ] ; then \
 	  $(MSG) "No digests file for $(NAME)" ; \
+	  exit 1 ; \
+	else \
+	  # validate file in digests \
+	  if [ $$(cat $(DIGESTS_FILE) | grep -c $(LOCAL_FILE) || true) -eq 0 ]; then \
+	     $(MSG) "  Downloaded file $(LOCAL_FILE) is not in digests file" ; \
+	     exit 1 ; \
+	  # validate checksum entries in digests \
+	  elif [ $$(cat $(DIGESTS_FILE) | sed '/MD5/{/SHA1/{/SHA256/p;};}' | grep -c $(LOCAL_FILE)) -lt 3 ]; then \
+	     $(MSG) "  Downloaded file $(LOCAL_FILE) has less than 3 checksum entries. Please update the digests file" ; \
+	     exit 1 ; \
+	  # validated, proceed \
+	  else \
+	    cat $(DIGESTS_FILE) | grep $(LOCAL_FILE) | ( \
+	      cd $(DISTRIB_DIR) ; \
+	      while read file type value ; \
+	      do \
+	        if [ ! -f $$file ] ; then \
+	          $(MSG) "  File $$file not downloaded" ; \
+	          rm $(DOWNLOAD_COOKIE) ; \
+	          exit 1 ; \
+	        fi ; \
+	        case $$type in \
+	          SHA1|sha1)     tool=sha1sum ;; \
+	          SHA256|sha256) tool=sha256sum ;; \
+	          MD5|md5)       tool=md5sum ;; \
+	          *) $(MSG) "Unsupported digest type $$type" ; exit 1 ;; \
+	        esac ; \
+	        $(MSG) "  Checking $$tool of file $$file"; \
+	        if echo "$$value $$file" | $$tool --status -c - ; then \
+	          true; \
+	        else  \
+	          $(MSG) "    Wrong $$tool for file $$file" ; \
+	          [ -f $$file.wrong ] && rm $$file.wrong ; \
+	          mv $$file $$file.wrong ; \
+	          $(MSG) "    Renamed as $$file.wrong" ; \
+	          rm $(DOWNLOAD_COOKIE) ; \
+	          $(MSG) "    Download cookie removed to trigger the download again" ; \
+	          exit 1 ; \
+	        fi ; \
+	      done ; \
+	    ) ; \
+	  fi ; \
 	fi
 
 	@echo $(DIST_FILE)
