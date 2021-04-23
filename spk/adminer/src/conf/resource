@@ -1,0 +1,47 @@
+{
+  "webservice": {
+    "services": [
+      {
+        "service": "adminer",
+        "display_name": "Adminer",
+        "type": "apache_php",
+        "root": "adminer",
+        "backend": 2,
+        "icon": "app/images/adminer-{0}.png",
+        "php": {
+          "profile_name": "adminer Profile",
+          "profile_desc": "PHP Profile for adminer",
+          "backend": 8,
+          "extensions": [
+            "mysqli",
+            "pgsql",
+            "pdo_mysql",
+            "pdo_pgsql",
+            "pdo_dblib",
+            "pdo_sqlite"
+          ],
+          "user": "sc-adminer",
+          "group": "http"
+        }
+      }
+    ],
+    "portals": [
+      {
+        "service": "adminer",
+        "type": "alias",
+        "name": "Adminer",
+        "alias": "adminer",
+        "app": "com.synocommunity.packages.adminer"
+      }
+    ],
+    "pkg_dir_prepare": [
+      {
+        "source": "/var/packages/adminer/target/web",
+        "target": "adminer",
+        "mode": "0755",
+        "user": "sc-adminer",
+        "group": "http"
+      }
+    ]
+  }
+}

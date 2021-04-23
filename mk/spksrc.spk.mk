@@ -21,8 +21,13 @@ else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 SPK_TCVERS = dsm6
 OS_MIN_VER = 6.0-7321
 else
+ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+SPK_TCVERS = dsm6
+OS_MIN_VER = 6.0-7321
+else
 SPK_TCVERS = all
 OS_MIN_VER = 3.1-1594
+endif
 endif
 ARCH_SUFFIX = -$(SPK_TCVERS)
 FIRMWARE = $(OS_MIN_VER)
