@@ -38,7 +38,11 @@ endif
 .PHONY: $(PRE_DOWNLOAD_TARGET) $(DOWNLOAD_TARGET) $(POST_DOWNLOAD_TARGET)
 
 download_msg:
+ifeq ($(strip $(PKG_DIST_ARCH)),)
 	@$(MSG) "Downloading files for $(NAME)"
+else
+	@$(MSG) "Downloading files for $(NAME), PKG_DIST_ARCH = $(PKG_DIST_ARCH)"
+endif
 
 manual_dl_target:
 	@manual_dl=$(PKG_DIST_FILE) ; \
