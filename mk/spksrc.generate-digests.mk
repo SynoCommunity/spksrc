@@ -3,7 +3,7 @@
 # include this file after the rule "all:"
 #
 
-ifeq ($(strip $(PKG_DIST_ARCHS)),)
+ifeq ($(strip $(PKG_DIST_ARCH_LIST)),)
 
 $(DIGESTS_FILE): download
 	@$(MSG) "Generate digests for $(NAME) - PKG_DIST_ARCH=$(PKG_DIST_ARCH)"
@@ -19,7 +19,7 @@ $(DIGESTS_FILE): download
 
 else
 
-# download different files for multiple PKG_DIST_ARCHS and add digests for all of them
+# download different files for multiple PKG_DIST_ARCH and add digests for all of them
 
 digests-%:
 	$(MSG) "Add digests for PKG_DIST_ARCH = $*"
@@ -33,12 +33,12 @@ digests-%:
 	done
 
 $(DIGESTS_FILE): download
-	@for pkg_arch in $(PKG_DIST_ARCHS); do \
+	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  rm $(DOWNLOAD_COOKIE) ; \
 	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} download ; \
 	done ; \
 	rm -f $(DIGESTS_FILE) && touch -f $(DIGESTS_FILE) ; \
-	for pkg_arch in $(PKG_DIST_ARCHS); do \
+	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} digests-$${pkg_arch} ; \
 	done ; \
 

@@ -16,7 +16,7 @@ LICENSE  = GPLv3
 INSTALL_TARGET = radarr_install
 
 # use digests with multiple files
-PKG_DIST_ARCHS = x64 arm arm64
+PKG_DIST_ARCH_LIST = x64 arm arm64
 
 include ../../mk/spksrc.archs.mk
 PKG_DIST_ARCH = x64

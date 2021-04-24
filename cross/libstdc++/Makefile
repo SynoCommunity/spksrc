@@ -19,7 +19,7 @@ INSTALL_TARGET = libstdc++6_install
 include ../../mk/spksrc.archs.mk
 
 # use digests with multiple files
-PKG_DIST_ARCHS = amd64 armhf arm64 armel i386
+PKG_DIST_ARCH_LIST = amd64 armhf arm64 armel i386
 
 PKG_DIST_ARCH = amd64
 LIB_DIR = x86_64-linux-gnu
