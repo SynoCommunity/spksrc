@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2021.1.5
-SPK_REV = 13
+SPK_VERS = 2021.4.6
+SPK_REV = 14
 SPK_ICON = src/${SPK_NAME}.png
 
 SPK_DEPENDS = "python38"
@@ -24,8 +24,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = ymartin59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Update homeassistant to 2021.1.5 and Python 3.8."
-RELOAD_UI = yes
+CHANGELOG = "Update homeassistant to 2021.4.6"
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
