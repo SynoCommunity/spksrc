@@ -51,6 +51,16 @@ ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
 STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif
 
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+STAGING_SPKVAR  = $(STAGING_DIR)/@appdata
+STAGING_SPKTMP  = $(STAGING_DIR)/@apptemp
+STAGING_SPKHOME = $(STAGING_DIR)/@apphome
+else
+STAGING_SPKVAR  = $(STAGING_DIR)/var
+STAGING_SPKTMP  = $(STAGING_DIR)/tmp
+STAGING_SPKHOME = $(STAGING_DIR)
+endif
+
 define create_target_dir
 @mkdir -p `dirname $@`
 endef

@@ -17,7 +17,6 @@ FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
 
 TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
-
 install_log ()
 {
     local _msg_="$@"
@@ -84,6 +83,7 @@ CP="/bin/cp -rfp"
 MKDIR="/bin/mkdir -p"
 LN="/bin/ln -nsf"
 TEE="/usr/bin/tee -a"
+RSYNC="/bin/rsync -avh"
 
 ### Functions library
 
@@ -139,6 +139,19 @@ syno_user_add_to_legacy_group () {
     echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
 }
 
+#
+# New DSM7 folders: copy no-verwrite + remove source
+# directories: @appdata, @apptemp and @apphome
+#
+syno_sync_app_folders () {
+    for appdir in $(find ${SYNOPKG_PKGDEST} -mindepth 1 -maxdepth 1 -not -empty -type d -name "@app*");
+    do
+        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME}" 1>&2
+        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME}
+        $RM ${SYNOPKG_PKGDEST}/@${appdir##*@}
+    done
+}
+
 
 ### Generic package behaviors
 
@@ -169,6 +182,8 @@ postinst ()
     if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
         $CP ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi    
+
+    syno_sync_app_folders >> ${LOG_FILE}
 
     call_func "service_postinst" install_log
 
@@ -231,6 +246,7 @@ postupgrade ()
     log_step "postupgrade"
 
     call_func "service_restore" install_log
+    syno_sync_app_folders >> ${LOG_FILE}
     call_func "service_postupgrade" install_log
     exit 0
 }
