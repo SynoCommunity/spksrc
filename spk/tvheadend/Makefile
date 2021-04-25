@@ -75,9 +75,8 @@ tvheadend_pre_depend:
 	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 
 tvheadend_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/accesscontrol
-	install -m 755 -d $(STAGING_DIR)/var/passwd
+	install -p -m 700 -d $(STAGING_SPKVAR)/accesscontrol
+	install -p -m 700 -d $(STAGING_SPKVAR)/passwd
 	# The following filenames stem from an arbitrary (valid) combination created by TVH
-	install -m 644 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
-	install -m 644 src/passwd.json $(STAGING_DIR)/var/passwd/a927e30a755504f9784f23a4efac5109
+	install -m 640 src/accesscontrol.json $(STAGING_SPKVAR)/accesscontrol/d80ccc09630261ffdcae1497a690acc8
+	install -m 640 src/passwd.json $(STAGING_SPKVAR)/passwd/a927e30a755504f9784f23a4efac5109
