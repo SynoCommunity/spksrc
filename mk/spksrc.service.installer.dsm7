@@ -84,6 +84,7 @@ MKDIR="/bin/mkdir -p"
 LN="/bin/ln -nsf"
 TEE="/usr/bin/tee -a"
 RSYNC="/bin/rsync -avh"
+TAR="/bin/tar"
 
 ### Functions library
 
@@ -226,10 +227,12 @@ preupgrade ()
     call_func "validate_preupgrade"
 
     # dsm6 -> dsm7
-    # Migrate data to permanent storage
+    # Backup & Migrate data once
+    # to permanent storage
     if [ -d ${SYNOPKG_PKGDEST}/var -a ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
-        # only migrate when destination is empty
-        $CP ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
+        $RSYNC --ignore-existing ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR} 2>&1 | install_log && chk=$?
+        $TAR -C ${SYNOPKG_PKGDEST} -Jcf - var > ${SYNOPKG_PKGVAR}/var-preDSM7-$(date +%Y%m%d-%H%M).tar.xz && chk="${chk}$?"
+        [ "${chk}" = "00" ] && rm -fr ${SYNOPKG_PKGDEST}/var || true
     fi
 
     call_func "service_preupgrade" install_log
