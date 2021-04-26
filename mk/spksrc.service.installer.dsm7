@@ -142,13 +142,18 @@ syno_user_add_to_legacy_group () {
 
 #
 # New DSM7 folders: copy no-verwrite + remove source
-# directories: @appdata, @apptemp and @apphome
+# directories: @etc, @appdata, @apptemp and @apphome
 #
 syno_sync_app_folders () {
-    for appdir in $(find ${SYNOPKG_PKGDEST} -mindepth 1 -maxdepth 1 -not -empty -type d -name "@app*");
+    for appdir in $(find ${SYNOPKG_PKGDEST} -mindepth 1 -maxdepth 1 -not -empty -type d -name "@*");
     do
-        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME}" 1>&2
-        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME}
+        case "${appdir##*@}" in
+           etc ) dest=/usr/syno/etc/packages/${SYNOPKG_PKGNAME};;
+             * ) dest=${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME};;
+        esac
+
+        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${dest}" 1>&2
+        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${dest}
         $RM ${SYNOPKG_PKGDEST}/@${appdir##*@}
     done
 }

@@ -38,7 +38,7 @@ endif
 copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
 	@rm -fr $(STAGING_DIR)
-	@mkdir -p $(STAGING_DIR) $(STAGING_SPKVAR) $(STAGING_SPKTMP) $(STAGING_SPKHOME)
+	@mkdir -p $(STAGING_DIR) $(STAGING_SPKETC) $(STAGING_SPKHOME) $(STAGING_SPKTMP) $(STAGING_SPKVAR)
 
 pre_copy_target: copy_msg
 
