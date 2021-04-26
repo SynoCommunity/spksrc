@@ -5,4 +5,4 @@ bin:bin/rdjpgcom
 bin:bin/wrjpgcom
 lnk:lib/libjpeg.so
 lnk:lib/libjpeg.so.9
-lib:lib/libjpeg.so.9.3.0
+lib:lib/libjpeg.so.9.4.0
