@@ -14,9 +14,6 @@ LICENSE  = https://github.com/webmproject/libwebp/blob/master/COPYING
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libwebp_pre_configure
-ADDITIONAL_CFLAGS = -std=c++11
-ADDITIONAL_CPPFLAGS = $(ADDITIONAL_CFLAGS)
-ADDITIONAL_CXXFLAGS = $(ADDITIONAL_CPPFLAGS)
 
 include ../../mk/spksrc.cross-cc.mk
 

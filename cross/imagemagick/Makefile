@@ -6,17 +6,20 @@ PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/libwebp
+OPTIONAL_DEPENDS = cross/libwebp cross/libheif
 
 DEPENDS += cross/libtiff cross/libpng cross/libjpeg cross/openjpeg
 DEPENDS += cross/bzip2 cross/xz cross/libxml2
 DEPENDS += cross/freetype cross/fontconfig
 DEPENDS += cross/libtool cross/urw-base35-fonts
-DEPENDS += cross/libheif cross/libwmf
+DEPENDS += cross/libwmf
 
 include ../../mk/spksrc.archs.mk
 ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 DEPENDS += cross/libwebp
+endif
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/libheif
 endif
 
 HOMEPAGE = https://www.imagemagick.org/
