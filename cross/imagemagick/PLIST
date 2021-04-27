@@ -12,6 +12,8 @@ lnk:bin/mogrify
 lnk:bin/montage
 lnk:bin/stream
 rsc:etc/ImageMagick-7
+lib:lib/ImageMagick-7.0.11/modules-Q16HDRI/coders/*.so
+lib:lib/ImageMagick-7.0.11/modules-Q16HDRI/filters/*.so
 lnk:lib/libMagickCore-7.Q16HDRI.so
 lnk:lib/libMagickCore-7.Q16HDRI.so.9
 lib:lib/libMagickCore-7.Q16HDRI.so.9.0.0

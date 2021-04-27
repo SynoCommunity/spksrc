@@ -6,16 +6,30 @@ PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/freetype cross/libpng cross/libxml2 cross/libtiff cross/libjpeg
+OPTIONAL_DEPENDS = cross/libwebp
+
+DEPENDS += cross/libtiff cross/libpng cross/libjpeg cross/openjpeg
+DEPENDS += cross/bzip2 cross/xz cross/libxml2
+DEPENDS += cross/freetype cross/fontconfig
+DEPENDS += cross/libtool cross/urw-base35-fonts
+DEPENDS += cross/libheif cross/libwmf
+
+include ../../mk/spksrc.archs.mk
+ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+DEPENDS += cross/libwebp
+endif
 
 HOMEPAGE = https://www.imagemagick.org/
 COMMENT  = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
 LICENSE  = Apache 2.0
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-installed --without-perl --without-x --without-fpx --without-wmf --disable-openmp
 
-include ../../mk/spksrc.cross-cc.mk
+CONFIGURE_ARGS  = --disable-installed --disable-docs
+CONFIGURE_ARGS += --without-perl --without-x --without-fpx
+CONFIGURE_ARGS += --with-modules
+CONFIGURE_ARGS += --with-urw-base35-font-dir==$(INSTALL_PREFIX)/share/fonts
+CONFIGURE_ARGS += --with-windows-font-dir=$(INSTALL_PREFIX)/share/libwmf/fonts
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # ARMv5 and PPC archs (except QorIQ) have older kernels
@@ -23,3 +37,4 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += CFLAGS=-lrt
 endif
 
+include ../../mk/spksrc.cross-cc.mk
