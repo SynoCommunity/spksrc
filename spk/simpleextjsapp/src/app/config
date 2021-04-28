@@ -1,4 +1,17 @@
 {
+    ".url": {
+        "com.synocommunity.packages.simpleextjsapp": {
+            "title": "SynoExtJS API Docs",
+            "desc": "SynoExtJS API Docs",
+            "icon": "images/simpleextjsapp-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/simpleextjsapp",
+            "allUsers": false,
+            "grantPrivilege": "local"
+        }
+    },
     "simpleextjsapp.js": {
         "SYNOCOMMUNITY.SimpleExtJSApp.AppInstance": {
             "type": "app",

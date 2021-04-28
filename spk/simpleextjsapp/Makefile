@@ -6,13 +6,18 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = DigitalBox
+MAINTAINER = DigitalBox98
 DESCRIPTION = Simple Ext JS Application demo
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = SimpleExtJSApp
 
 HOMEPAGE = https://github.com/DigitalBox98/SimpleExtJSApp
+
+ADMIN_URL = /simpleextjsapp/
+
+CONF_DIR = src/conf
+SYSTEM_GROUP = http
 
 SERVICE_USER   = auto
 SERVICE_SETUP  = src/service-setup.sh
@@ -24,6 +29,8 @@ include ../../mk/spksrc.spk.mk
 .PHONY: simpleextjsapp_extra_install
 simpleextjsapp_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/
+	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
+	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/simpleextjsapp.js $(STAGING_DIR)/app/simpleextjsapp.js
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
