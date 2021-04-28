@@ -152,8 +152,8 @@ syno_sync_app_folders () {
              * ) dest=${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME};;
         esac
 
-        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${dest}" 1>&2
-        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/* ${dest}
+        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/ ${dest}" 1>&2
+        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/ ${dest}
         $RM ${SYNOPKG_PKGDEST}/@${appdir##*@}
     done
 }
