@@ -1,3 +1,17 @@
+### Rules to create the spk package
+#   Most of the rules are imported from spksrc.*.mk files
+# 
+# Variables used in this file:
+#  NAME:              The internal name of the package.
+#                     Note that all synocoummunity packages use lowercase names.
+#                     This enables to have concurrent packages with synology.com, that use 
+#                     package names starting with upper case letters. 
+#                     (e.g. Mono => synology.com, mono => synocommunity.com)
+#  SPK_FILE_NAME:     The full spk name with folder, package name, arch, tc- and package version.
+#  SPK_CONTENT:       List of files and folders that are added to package.tgz within the spk file.
+#  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
+#  
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
@@ -58,26 +72,26 @@ include ../../mk/spksrc.strip.mk
 DSM_SCRIPTS_DIR = $(WORK_DIR)/scripts
 
 # Generated scripts
-DSM_SCRIPTS_  = preinst postinst
-DSM_SCRIPTS_ += preuninst postuninst
-DSM_SCRIPTS_ += preupgrade postupgrade
+DSM_SCRIPT_FILES  = preinst postinst
+DSM_SCRIPT_FILES += preuninst postuninst
+DSM_SCRIPT_FILES += preupgrade postupgrade
 
 # SPK specific scripts
 ifneq ($(strip $(SSS_SCRIPT)),)
-DSM_SCRIPTS_ += start-stop-status
+DSM_SCRIPT_FILES += start-stop-status
 
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SSS_SCRIPT)
 	@$(dsm_script_copy)
 endif
 
 ifneq ($(strip $(INSTALLER_SCRIPT)),)
-DSM_SCRIPTS_ += installer
+DSM_SCRIPT_FILES += installer
 
 $(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
 	@$(dsm_script_copy)
 endif
 
-DSM_SCRIPTS_ += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
+DSM_SCRIPT_FILES += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
 
 SPK_CONTENT = package.tgz INFO scripts
 
@@ -249,7 +263,7 @@ $(WORK_DIR)/package.tgz: icon service
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
 
-DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPTS_))
+DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
 
 define dsm_script_redirect
 $(create_target_dir)
