@@ -44,9 +44,12 @@ do
     SPK_TO_BUILD+=${packages}
 done
 
-# fix for packages with different name
+# fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
     SPK_TO_BUILD+=sonarr
+fi
+if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
+    SPK_TO_BUILD+=python2
 fi
 
 # remove duplicate packages
