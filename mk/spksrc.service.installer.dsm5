@@ -1,8 +1,7 @@
 #!/bin/sh
 
 # DSM 5 -> 6 upgrade path:
-#  Cannot remove user as still in use or may be DSM service itself
-# Require warning in ChangeLog and manual user/group cleanup
+# - Not supported anymore
 
 # define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
 SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
@@ -23,15 +22,15 @@ TMP_DIR="/var/tmp/${SYNOPKG_PKGNAME}/var"
 
 install_log ()
 {
-  local _msg_="$@"
-  if [ -z "${_msg_}" ]; then
-      # read multiline from stdin
-      while IFS=$'\n' read -r line; do
-        install_log "${line}"
-      done
-  else
-    echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" >> ${INST_LOG_TEMP} 2>&1
-  fi
+    local _msg_="$@"
+    if [ -z "${_msg_}" ]; then
+        # read multiline from stdin
+        while IFS=$'\n' read -r line; do
+            install_log "${line}"
+        done
+    else
+        echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" >> ${INST_LOG_TEMP} 2>&1
+    fi
 }
 
 # Invoke shell function if available

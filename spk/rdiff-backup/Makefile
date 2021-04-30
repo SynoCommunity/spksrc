@@ -21,11 +21,6 @@ LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
-include ../../mk/spksrc.common.mk
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_USR_LOCAL_LINKS = bin:env/bin/rdiff-backup bin:env/bin/rdiff-backup-statistics
-else
-SPK_LINKS = /usr/local/bin/rdiff-backup:env/bin/rdiff-backup /usr/local/bin/rdiff-backup-statistics:env/bin/rdiff-backup-statistics
-endif
 
 include ../../mk/spksrc.spk.mk

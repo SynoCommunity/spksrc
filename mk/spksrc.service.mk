@@ -61,15 +61,9 @@ SPK_USER = $(SPK_NAME)
 endif
 
 # Recommend explicit STARTABLE=no
-ifeq ($(strip $(SSS_SCRIPT)),)
-ifeq ($(strip $(SERVICE_COMMAND)),)
-ifeq ($(strip $(SPK_COMMANDS)),)
-ifeq ($(strip $(SERVICE_EXE)),)
-ifeq ($(strip $(STARTABLE)),)
-$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SPK_COMMANDS or specific SSS_SCRIPT)
-endif
-endif
-endif
+ifeq ($(strip $(SSS_SCRIPT) $(SERVICE_COMMAND) $(SERVICE_EXE) $(STARTABLE)),)
+ifeq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
+$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SERVICE_EXE, SSS_SCRIPT, SPK_COMMANDS or SPK_USR_LOCAL_LINKS)
 endif
 endif
 
@@ -142,19 +136,13 @@ ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
 
-ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
-ifneq ($(strip $(SPK_COMMANDS) $(SPK_LINKS)),)
-	@echo "# List of commands to create links for" >> $@
-	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
-	@echo "SPK_LINKS=\"${SPK_LINKS}\"" >> $@
-	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
-endif
-else
-ifneq ($(strip $(SPK_LINKS)),)
-	@echo "${RED}ERROR: SPK_LINKS is unsupported in DSM7${NC}"
-	@echo "${GREEN}Please migrate to SPK_USR_LOCAL_LINKS=${NC}"
-	@exit 1
-endif
+# Define resources for
+# - firewall rules/port definitions (DSM >= 6.0-5936)
+# - usr local links (DSM >= 6.0-5941)
+# - SERVICE_WIZARD_SHARE (DSM >= 6.0-5914)
+# for DSM<6.0 link creation is provided by spksrc.service.create_links
+# and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
+ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
@@ -182,6 +170,15 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
+
+# Less than DSM 6.0
+else
+ifneq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
+	@echo "# List of commands to create links for" >> $@
+	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
+	@echo "SPK_USR_LOCAL_LINKS=\"${SPK_USR_LOCAL_LINKS}\"" >> $@
+	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
+endif
 endif
 
 
@@ -196,7 +193,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
 else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm6
 	@$(dsm_script_copy)
 else
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
