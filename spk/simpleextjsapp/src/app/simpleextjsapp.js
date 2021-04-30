@@ -74,7 +74,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     items: [{
                         xtype: 'syno_displayfield',
                         value: 'CGI in C :',
-                        width: 100
+                        width: 110
                     }, {
                         xtype: "syno_button",
                         btnStyle: "green",
@@ -88,7 +88,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     items: [{
                         xtype: 'syno_displayfield',
                         value: 'CGI in Perl :',
-                        width: 100
+                        width: 110
                     }, {
                         xtype: "syno_button",
                         btnStyle: "red",
@@ -102,12 +102,25 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     items: [{
                         xtype: 'syno_displayfield',
                         value: 'CGI in Python :',
-                        width: 100
+                        width: 110
                     }, {
                         xtype: "syno_button",
                         btnStyle: "blue",
                         text: 'Call Python CGI ',
                         handler: this.onPythonCGIClick.bind(this)
+                    }]
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'CGI in bash :',
+                        width: 110
+                    }, {
+                        xtype: "syno_button",
+                        text: 'Call bash CGI ',
+                        handler: this.onBashCGIClick.bind(this)
                     }]
                 }
             ]
@@ -124,7 +137,8 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'Button Field :'
+                        value: 'Button Field :',
+                        width: 100
                     }, {
                         xtype: "syno_button",
                         text: "Confirm"
@@ -135,7 +149,8 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'Text Field :'
+                        value: 'Text Field :',
+                        width: 100
                     }, {
                         xtype: "syno_textfield",
                         fieldLabel: "TextField: ",
@@ -147,7 +162,8 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'CheckBox :'
+                        value: 'CheckBox :',
+                        width: 100
                     }, {
                         xtype: "syno_checkbox",
                         boxLabel: "Activate option"
@@ -217,6 +233,29 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             success: function(response) {
                 var result = response.responseText;
                 window.alert('Perl CGI called : ' + result);
+            },
+            failure: function(response) {
+                window.alert('Request Failed.');
+
+            }
+
+        });
+
+    },
+    onBashCGIClick: function() {
+        Ext.Ajax.request({
+            url: '/webman/3rdparty/simpleextjsapp/bash.cgi',
+            method: 'GET',
+            timeout: 60000,
+            params: {
+                id: 1 // loads results whose Id is 1
+            },
+            headers: {
+                'Content-Type': 'text/html'
+            },
+            success: function(response) {
+                var result = response.responseText;
+                window.alert('Bash CGI called : ' + result);
             },
             failure: function(response) {
                 window.alert('Request Failed.');

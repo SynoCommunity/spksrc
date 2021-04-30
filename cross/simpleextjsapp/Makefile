@@ -21,5 +21,3 @@ simpleextjsapp_install:
 	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) 
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web 
 	tar -xvf $(WORK_DIR)/$(PKG_DIR)/docs/synoextjsdocs.tar.gz -C $(STAGING_INSTALL_PREFIX)/web/
-
-

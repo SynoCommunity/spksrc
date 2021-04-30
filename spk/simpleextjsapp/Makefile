@@ -31,6 +31,7 @@ simpleextjsapp_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app/
 	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
 	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
+	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/simpleextjsapp.js $(STAGING_DIR)/app/simpleextjsapp.js
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
