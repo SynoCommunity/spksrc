@@ -170,6 +170,9 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
+ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
+SPK_CONTENT += conf
+endif
 
 # Less than DSM 6.0
 else
@@ -182,13 +185,13 @@ endif
 endif
 
 
-DSM_SCRIPTS_ += service-setup
+DSM_SCRIPT_FILES += service-setup
 SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 
 
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
-DSM_SCRIPTS_ += installer
+DSM_SCRIPT_FILES += installer
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
 	@$(dsm_script_copy)
@@ -204,7 +207,7 @@ endif
 
 # Control use of generic start-stop-status scripts
 ifeq ($(strip $(SSS_SCRIPT)),)
-DSM_SCRIPTS_ += start-stop-status
+DSM_SCRIPT_FILES += start-stop-status
 ifeq ($(STARTABLE),no)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
 	@$(dsm_script_copy)
