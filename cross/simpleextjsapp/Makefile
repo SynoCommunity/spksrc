@@ -1,14 +1,14 @@
 PKG_NAME = SimpleExtJSApp
-PKG_VERS = 0.1
+PKG_VERS = 0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/DigitalBox98/SimpleExtJSApp/releases/download/v0.1/
+PKG_DIST_SITE = https://github.com/DigitalBox98/SimpleExtJSApp/releases/download/v0.2/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
 HOMEPAGE = https://github.com/DigitalBox98/
-COMMENT  = A simple ExtJS Application for DSM 7.0
+COMMENT  = A simple ExtJS Application for DSM 
 
 GNU_CONFIGURE = 1
 

@@ -23,7 +23,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
             // Tab for CGI calls
             allTabs.push({
-                title: "CGI Call",
+                title: "Server Calls",
                 layout: "fit",
                 items: [
                     this.createDisplayCall()
@@ -109,7 +109,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                         text: 'Call Python CGI ',
                         handler: this.onPythonCGIClick.bind(this)
                     }]
-                },
+		},
                 {
                     xtype: "syno_compositefield",
                     hideLabel: true,
@@ -138,7 +138,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     items: [{
                         xtype: 'syno_displayfield',
                         value: 'Button Field :',
-                        width: 100
+			width: 100
                     }, {
                         xtype: "syno_button",
                         text: "Confirm"
@@ -150,7 +150,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     items: [{
                         xtype: 'syno_displayfield',
                         value: 'Text Field :',
-                        width: 100
+			width: 100
                     }, {
                         xtype: "syno_textfield",
                         fieldLabel: "TextField: ",
@@ -163,14 +163,74 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     items: [{
                         xtype: 'syno_displayfield',
                         value: 'CheckBox :',
-                        width: 100
+			width: 100
                     }, {
                         xtype: "syno_checkbox",
                         boxLabel: "Activate option"
                     }]
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'ComboBox :',
+			width: 100
+                    }, {
+						xtype: "syno_combobox",
+						store: this.createTimeItemStore("min"),
+						displayField: "display",
+						itemId: "minute",
+						valueField: "value",
+						value: 0,
+						triggerAction: "all",
+						width: 145,
+						mode: "local",
+						editable: false
+					}]
                 }
-
             ]
+        });
+    }, 
+    createTimeItemStore: function(e) {
+		var a = [];
+		var c = {
+			hour: 24,
+			min: 60
+		};
+		if (e in c) {
+			for (var d = 0; d < c[e]; d++) {
+				a.push([d, String.leftPad(String(d), 2, "0")])
+			}
+			var b = new Ext.data.SimpleStore({
+				id: 0,
+				fields: ["value", "display"],
+				data: a
+			});
+			return b
+		}
+		return null
+    },
+    onBashCGIClick: function() {
+        Ext.Ajax.request({
+            url: '/webman/3rdparty/simpleextjsapp/bash.cgi',
+            method: 'GET',
+            timeout: 60000,
+            params: {
+                id: 1 // loads results whose Id is 1
+            },
+            headers: {
+                'Content-Type': 'text/html'
+            },
+            success: function(response) {
+                var result = response.responseText;
+                window.alert('Bash CGI called : ' + result);
+            },
+            failure: function(response) {
+                window.alert('Request Failed.');
+
+            }
+
         });
     },
     onCGIClick: function() {
@@ -233,29 +293,6 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             success: function(response) {
                 var result = response.responseText;
                 window.alert('Perl CGI called : ' + result);
-            },
-            failure: function(response) {
-                window.alert('Request Failed.');
-
-            }
-
-        });
-
-    },
-    onBashCGIClick: function() {
-        Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/bash.cgi',
-            method: 'GET',
-            timeout: 60000,
-            params: {
-                id: 1 // loads results whose Id is 1
-            },
-            headers: {
-                'Content-Type': 'text/html'
-            },
-            success: function(response) {
-                var result = response.responseText;
-                window.alert('Bash CGI called : ' + result);
             },
             failure: function(response) {
                 window.alert('Request Failed.');
