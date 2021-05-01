@@ -8,7 +8,7 @@
 #  post_extract_target  (override with POST_EXTRACT_TARGET)
 EXTRACT_PATH ?= $(WORK_DIR)
 
-# Extract commands
+# Extract commands (optionally use TAR_CMD="fakeroot tar" as workaround on OSX)
 TAR_CMD ?= tar
 ifeq ($(strip $(EXTRACT_CMD.$(DIST_EXT))),)
 EXTRACT_CMD.tgz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)

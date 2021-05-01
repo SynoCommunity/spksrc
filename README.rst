@@ -32,7 +32,9 @@ Docker
 * `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc ~/spksrc``
 * Install Docker on your host OS: `Docker installation`_. A wget-based alternative for linux: `Install Docker with wget`_.
 * Download the spksrc docker container: ``docker pull synocommunity/spksrc``
-* Run the container with ``docker run -it -v ~/spksrc:/spksrc synocommunity/spksrc /bin/bash``
+* Run the container with ``docker run -it -v ~/spksrc:/spksrc synocommunity/spksrc /bin/bash``. 
+  On Mac hosts running OSX you might need to use fakeroot with tar to avoid permission errors while extracting the synology toolchain archives.
+  For that reason run the container with ``docker run -it -v~/spksrc:/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash``.
 
 
 Virtual machine
