@@ -1,4 +1,4 @@
 bin:bin/rdiff
 lnk:lib/librsync.so
 lnk:lib/librsync.so.2
-lib:lib/librsync.so.2.3.0
+lib:lib/librsync.so.2.3.2
