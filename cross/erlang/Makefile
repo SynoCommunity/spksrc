@@ -34,10 +34,6 @@ include ../../mk/spksrc.cross-cc.mk
 erlang_pre_configure:
 	$(RUN) ./otp_build autoconf
 
-.PHONY: erlang_pre_configure
-erlang_pre_configure:
-	$(RUN) ./otp_build autoconf
-
 .PHONY: erlang_install
 erlang_install:
 	$(RUN) make install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
