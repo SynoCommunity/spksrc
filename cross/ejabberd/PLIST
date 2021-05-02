@@ -1,4 +1,5 @@
 rsc:sbin/ejabberdctl
+lnk:bin/ejabberdctl
 rsc:var/ejabberd.yml
 rsc:var/ejabberdctl.cfg
 rsc:var/inetrc

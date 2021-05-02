@@ -45,10 +45,13 @@ ejabberd_pre_configure:
 
 .PHONY: ejabberd_post_install
 # patch the generated ejabberdctl script
+# and link bin/ejabberdctl (DSM7 does not support executables in sbin folders).
 ejabberd_post_install:
-	sed -e "s#$(INSTALL_DIR)##g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#/etc/ejabberd\"#/var\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#/var/lib/ejabberd\"#/var/lib\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#/var/log/ejabberd\"#/var/log\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
+	sed -e "s#$(INSTALL_DIR)##g" 										\
+		 -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g"	\
+		 -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g"	\
+		 -e "s#/etc/ejabberd\"#/var\"#g"								\
+		 -e "s#/var/lib/ejabberd\"#/var/lib\"#g"					\
+		 -e "s#/var/log/ejabberd\"#/var/log\"#g"					\
+		 -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
+	cd $(STAGING_INSTALL_PREFIX)/bin && ln -s ../sbin/ejabberdctl .

@@ -12,7 +12,6 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
 ADMIN_URL = /admin/
 ADMIN_PORT = 5280
-RELOAD_UI = yes
 DISPLAY_NAME = ejabberd
 
 HOMEPAGE = https://www.ejabberd.im
@@ -27,9 +26,15 @@ SERVICE_SETUP = src/service-setup.sh
 SSS_SCRIPT = src/service-start-stop.sh
 
 FWPORTS = src/${SPK_NAME}.sc
-CONF_DIR = src/conf
 
-SPK_COMMANDS = sbin/ejabberdctl
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf.dsm7
+else
+CONF_DIR = src/conf.dsm6
+endif
+
+SPK_COMMANDS = bin/ejabberdctl
 
 POST_STRIP_TARGET = ejabberd_extra_install
 
