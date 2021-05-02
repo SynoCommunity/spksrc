@@ -149,7 +149,7 @@ syno_sync_app_folders () {
     do
         case "${appdir##*@}" in
            etc ) dest=/usr/syno/etc/packages/${SYNOPKG_PKGNAME};;
-             * ) dest=${SYNOPKG_PKGDEST}/../../@${appdir##*@}/${SYNOPKG_PKGNAME};;
+             * ) dest=/var/packages/${SYNOPKG_PKGNAME}/${appdir##*@};;
         esac
 
         echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/@${appdir##*@}/ ${dest}" 1>&2
