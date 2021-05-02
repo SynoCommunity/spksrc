@@ -6,7 +6,7 @@
 ifeq ($(strip $(PKG_DIST_ARCH_LIST)),)
 
 $(DIGESTS_FILE): download
-	@$(MSG) "Generate digests for $(NAME) - PKG_DIST_ARCH=$(PKG_DIST_ARCH)"
+	@$(MSG) "Generate digests for $(NAME)"
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
