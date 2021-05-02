@@ -1,7 +1,7 @@
 SPK_NAME = tcl
-SPK_VERS = 8.6.10
+SPK_VERS = 8.6.11
 SPK_MAIN_VERS=$(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/tcl.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -16,11 +16,11 @@ DESCRIPTION = "Tcl \(Tool Command Language\) is a very powerful but easy to lear
 RELOAD_UI = no
 DISPLAY_NAME = Tcl
 STARTABLE = no
-CHANGELOG = "1. 64-bit support for x64 archs added.<br/>2. zlib compression fixed."
+CHANGELOG = "1. Update tcl to 8.6.11 released 2021-04-02.<br/>2. Add 64-bit support for all 64-bit archs."
 
 HOMEPAGE = https://www.tcl.tk
 LICENSE = Tcl/Tk License
 
-SPK_LINKS = /usr/local/bin/tclsh:bin/tclsh$(SPK_MAIN_VERS)
+SPK_COMMANDS = bin/tclsh bin/tclsh$(SPK_MAIN_VERS)
 
 include ../../mk/spksrc.spk.mk

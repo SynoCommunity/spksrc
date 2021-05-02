@@ -1,5 +1,5 @@
 PKG_NAME = tcl
-PKG_VERS = 8.6.10
+PKG_VERS = 8.6.11
 PKG_MAIN_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS)-src.$(PKG_EXT)
@@ -16,9 +16,8 @@ GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.archs.mk
 
-# Enable 64-bit support in Tcl for x64 architectures
-# aarch64 does not support 64-bit (don't know magic for this platform)
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+# Enable 64-bit support in Tcl for 64-bit architectures (amd64 and arm64)
+ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
   CONFIGURE_ARGS = --enable-64bit
 endif
 
@@ -31,3 +30,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: tcl_post_install
 tcl_post_install:
 	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/lib/libtcl$(PKG_MAIN_VERS).so $(STAGING_INSTALL_PREFIX)/lib/libtcl.so
+	$(RUN) ln -s -r $(STAGING_INSTALL_PREFIX)/bin/tclsh$(PKG_MAIN_VERS) $(STAGING_INSTALL_PREFIX)/bin/tclsh
