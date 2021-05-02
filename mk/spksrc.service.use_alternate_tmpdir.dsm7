@@ -1,0 +1,32 @@
+
+# use DSM7 package specific tmp folder as alternate TMPDIR, this can be useful to avoid errors like:
+# Could not install packages due to an EnvironmentError: [Errno 28] No space left on device
+# as /tmp might be too small.
+# typically used to install a huge amount of wheels with pip (see homeassistant package)
+# TMPDIR is supported by pip https://github.com/pypa/pip/issues/4462 ('--build dir' is not supported anymore)
+
+TMPDIR=${SYNOPKG_PKGTMP}
+export TMPDIR=${TMPDIR}
+
+
+# Normally files in the temp folder are removed after usage (e.g. by pip)
+# but if not, this is done after installation with this function.
+# NOTE:
+# Do not remove the TMPDIR, as it may be used by the service later.
+service_clean_tmpdir ()
+{
+  if [[ -e "${TMPDIR}" ]]; then
+    if [ -n "$(ls -A ${TMPDIR})" ]; then
+       echo "Cleanup ${TMPDIR}"
+       rm -rvf ${TMPDIR}/*
+    fi
+    if [ -n "$(ls -A ${TMPDIR})" ]; then
+       echo "Cleanup hidden files in ${TMPDIR}"
+       rm -rvf ${TMPDIR}/.*
+    fi
+    if [ -n "$(ls -A ${TMPDIR})" ]; then
+       echo "WARNING: Failed to remove all files in ${TMPDIR}"
+    fi
+  fi
+}
+

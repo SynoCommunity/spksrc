@@ -132,6 +132,13 @@ ifneq ($(strip $(SERVICE_OPTIONS)),)
 	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
 endif
 endif
+ifeq ($(strip $(USE_ALTERNATE_TMPDIR)),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@cat $(SPKSRC_MK)spksrc.service.use_alternate_tmpdir.dsm7 >> $@
+else
+	@cat $(SPKSRC_MK)spksrc.service.use_alternate_tmpdir >> $@
+endif
+endif
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
