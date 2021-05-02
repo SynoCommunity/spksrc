@@ -1,0 +1,7 @@
+{
+  "defaults": {
+    "run-as": "package"
+  },
+  "username": "sc-ejabberd",
+  "groupname": "sc-ejabberd"
+}

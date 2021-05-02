@@ -1,39 +1,46 @@
 SPK_NAME = ejabberd
-SPK_VERS = 2.1.13
-SPK_REV = 1
+SPK_VERS = 21.01
+SPK_REV = 2
 SPK_ICON = src/ejabberd.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/erlang cross/ejabberd
+DEPENDS = cross/ejabberd
+
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = ejabberd is high-performace enterprise Jabber/XMPP instant messaging server written in Erlang/OTP. It\'s cross-platform, fault-tolerant, clusterable and modular.
+DESCRIPTION = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
 ADMIN_URL = /admin/
 ADMIN_PORT = 5280
-RELOAD_UI = yes
 DISPLAY_NAME = ejabberd
-BETA = 1
 
-HOMEPAGE   = https://www.ejabberd.im
-LICENSE    = GPLv2
-HELPURL    = https://docs.ejabberd.im/admin/guide
+HOMEPAGE = https://www.ejabberd.im
+LICENSE  = GPLv2
+HELPURL  = https://docs.ejabberd.im/admin/guide
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
+WIZARDS_DIR = src/wizard
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SERVICE_SETUP = src/service-setup.sh
+# custom start-stop-status script is required, 
+# as SERVICE_COMMAND is not a single command
+SSS_SCRIPT = src/service-start-stop.sh
+
+FWPORTS = src/${SPK_NAME}.sc
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf.dsm7
+else
+CONF_DIR = src/conf.dsm6
+endif
+
+SPK_COMMANDS = bin/ejabberdctl
 
 POST_STRIP_TARGET = ejabberd_extra_install
-
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: ejabberd_extra_install
 ejabberd_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

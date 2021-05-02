@@ -1,33 +1,57 @@
 PKG_NAME = ejabberd
-PKG_VERS = 2.1.13
+PKG_VERS = 21.01
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.process-one.net/downloads/ejabberd/$(PKG_VERS)/
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/src
+PKG_DIST_SITE = https://static.process-one.net/ejabberd/downloads/$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/expat cross/zlib cross/openssl native/erlang
+BUILD_DEPENDS = native/erlang 
+DEPENDS = cross/ncurses cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
+
+# PPC archs except qoriq have compiler errors with 64 bit values
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.ejabberd.im
-COMMENT  = ejabberd is high-performace enterprise Jabber/XMPP instant messaging server written in Erlang/OTP. It's cross-platform, fault-tolerant, clusterable and modular.
+COMMENT  = Robust, Scalable and Extensible Realtime Platform XMPP Server + MQTT Broker + SIP Service.
 LICENSE  = GPLv2
 
+NATIVE_ERLANG_ROOT_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local)
+NATIVE_ERLANG_BIN = $(NATIVE_ERLANG_ROOT_DIR)/bin
+
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --with-erlang=$(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin
+# force native erlang root dir
+CONFIGURE_ARGS = ac_cv_erlang_root_dir=$(NATIVE_ERLANG_ROOT_DIR)
+CONFIGURE_ARGS += --enable-mysql
+# for 'rebar configure-deps' + 'rebar compile' to find cross compiled libei.a and liberl_interface.a
+# remarks: arguments for rebar are collected in 'vars.config'
+ADDITIONAL_LDFLAGS = -L$(STAGING_INSTALL_PREFIX)/lib/erlang/usr/lib
+ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/lib/erlang/usr/include
+ADDITIONAL_CPPFLAGS = $(ADDITIONAL_CFLAGS)
 
 PRE_CONFIGURE_TARGET = ejabberd_pre_configure
 POST_INSTALL_TARGET = ejabberd_post_install
 
+# let configure find the host erlang executables
+ENV += PATH=$(NATIVE_ERLANG_BIN):$$PATH
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: ejabberd_pre_configure
+# fix cross compile of dependent packages
+# patch rebar.config.script for 'rebar configure-deps' to add --host and --build
+# related to: https://github.com/processone/ejabberd/issues/139
 ejabberd_pre_configure:
-	@$(RUN) sed -e "s#-I\$$ERLANG_EI_DIR#-I$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/erlang/lib/erl_interface-3.7.15#g" -i configure
-	@$(RUN) sed -e "s#-L\$$ERLANG_EI_LIB#-L$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/erlang/lib/erl_interface-3.7.15/lib#g" -i configure
+	sed -e "s#\" ./configure \"#\" ./configure $(TC_CONFIGURE_ARGS)\"#g" -i $(WORK_DIR)/$(PKG_DIR)/rebar.config.script
 
 .PHONY: ejabberd_post_install
+# patch the generated ejabberdctl script
+# and link bin/ejabberdctl (DSM7 does not support executables in sbin folders).
 ejabberd_post_install:
-	sed -e "s#$(INSTALL_DIR)##g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#^INSTALLUSER=#INSTALLUSER=ejabberd#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#ERL=$(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin/erl#ERL=$(INSTALL_PREFIX)/bin/erl#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s#! -x \"\$$FLOCK\"#\"1\"#g" -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	sed -e "s|^#EJABBERD_PID_PATH=/var/run/ejabberd/ejabberd.pid|EJABBERD_PID_PATH=/usr/local/ejabberd/var/ejabberd.pid|g" -i $(STAGING_INSTALL_PREFIX)/etc/ejabberd/ejabberdctl.cfg
+	sed -e "s#$(INSTALL_DIR)##g" 										\
+		 -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g"	\
+		 -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g"	\
+		 -e "s#/etc/ejabberd\"#/var\"#g"								\
+		 -e "s#/var/lib/ejabberd\"#/var/lib\"#g"					\
+		 -e "s#/var/log/ejabberd\"#/var/log\"#g"					\
+		 -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
+	cd $(STAGING_INSTALL_PREFIX)/bin && ln -s ../sbin/ejabberdctl .
