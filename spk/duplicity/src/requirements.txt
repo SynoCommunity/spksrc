@@ -3,11 +3,11 @@
 ## cd ./spksrc/cross/duplicity
 ## download current package:
 ##   make digests (or make download)
-## extract reqirements.txt:
+## extract requirements.txt:
 ##   tar -ztvf ../../distrib/duplicity.{PKG_VERS}.tar.gz --no-anchored requirements.txt
-## copy and rename reqirements.txt:
+## copy and rename requirements.txt:
 ##   cp duplicity-{PKG_VERS}/requirements.txt ./spksrc/spk/duplicity/src/requirements.original.txt
-## create update requierments file for package:
+## create update requirements file for package:
 ##   cd ./spksrc/spk/duplicity/src
 ##   /spksrc/native/python38/work-native/install/usr/local/bin/python3 -m venv venv
 ##   . venv/bin/activate
