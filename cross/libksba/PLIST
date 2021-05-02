@@ -1,4 +1,4 @@
 rsc:bin/ksba-config
 lnk:lib/libksba.so
 lnk:lib/libksba.so.8
-lib:lib/libksba.so.8.12.0
+lib:lib/libksba.so.8.13.1

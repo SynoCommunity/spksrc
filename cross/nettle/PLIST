@@ -5,7 +5,7 @@ bin:bin/pkcs1-conv
 bin:bin/sexp-conv
 lnk:lib/libhogweed.so
 lnk:lib/libhogweed.so.6
-lib:lib/libhogweed.so.6.0
+lib:lib/libhogweed.so.6.3
 lnk:lib/libnettle.so
 lnk:lib/libnettle.so.8
-lib:lib/libnettle.so.8.0
+lib:lib/libnettle.so.8.3
