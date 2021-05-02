@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libjpeg cross/libpng cross/libde265 cross/x265
 
-# ARMv5 fails on cross/libde265
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# ARMv5 and OLD_PPC_ARCHS fail on cross/libde265
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = http://www.libheif.org
 COMMENT  = libheif is a ISO/IEC 23008-12:2017 HEIF file format decoder and encoder.

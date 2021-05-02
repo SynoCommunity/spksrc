@@ -18,7 +18,7 @@ include ../../mk/spksrc.archs.mk
 ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 DEPENDS += cross/libwebp
 endif
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/libheif
 endif
 

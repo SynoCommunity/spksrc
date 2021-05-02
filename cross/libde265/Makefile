@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = http://www.libheif.org
 COMMENT  = Open h.265 video codec implementation. 
