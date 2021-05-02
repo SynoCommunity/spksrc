@@ -1,5 +1,5 @@
 PKG_NAME = pinentry
-PKG_VERS = 1.1.0
+PKG_VERS = 1.1.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.gnupg.org/ftp/gcrypt/$(PKG_NAME)
