@@ -1,5 +1,5 @@
 SPK_NAME = flexget
-SPK_VERS = 3.1.110
+SPK_VERS = 3.1.117
 SPK_REV = 8
 SPK_ICON = src/${SPK_NAME}.png
 
@@ -10,7 +10,7 @@ SPK_DEPENDS = "python3>=3.7.7"
 MAINTAINER = manowark
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "Update FlexGet to version 3.1.110. Includes security update for CVE-2019-20477 and CVE-2020-28493."
+CHANGELOG = "Update FlexGet to version 3.1.117. Includes security updates for urllib3 and CVE-2019-20477, CVE-2020-28493."
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/
