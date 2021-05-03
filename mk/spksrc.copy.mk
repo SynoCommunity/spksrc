@@ -43,8 +43,14 @@ copy_msg:
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
+	# Copy target to staging
 	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
+	# Copy non-target to staging @
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX_ETC) && find . -mindepth 1 -maxdepth 1 | tar cpf - --files-from=/dev/stdin) | tar xpf - -C $(STAGING_SPKETC)
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && find . -mindepth 1 -maxdepth 1 | tar cpf - --files-from=/dev/stdin) | tar xpf - -C $(STAGING_SPKVAR)
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX_TMP) && find . -mindepth 1 -maxdepth 1 | tar cpf - --files-from=/dev/stdin) | tar xpf - -C $(STAGING_SPKTMP)
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX_HOME) && find . -mindepth 1 -maxdepth 1 | tar cpf - --files-from=/dev/stdin) | tar xpf - -C $(STAGING_SPKHOME)
 
 post_copy_target: $(COPY_TARGET)
 
