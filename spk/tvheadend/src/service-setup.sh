@@ -21,16 +21,6 @@ service_postinst ()
 
     # Edit the password configuration according to the wizard
     sed -i -e "s/@password@/${wizard_password}/g" ${SYNOPKG_PKGVAR}/passwd/a927e30a755504f9784f23a4efac5109
-
-    # Fix fontconfig links
-    CONFD_DIR="${SYNOPKG_PKGDEST}/etc/fonts/conf.d"
-    FONTS_DIR="${SYNOPKG_PKGDEST}/share/fontconfig/conf.avail"
-    echo "Fixing fontconfig links"
-    for FONT_FILE in ${CONFD_DIR}/*.conf
-    do
-        FONT_NAME=$(basename "${FONT_FILE}")
-        $LN "${FONTS_DIR}/${FONT_NAME}" "${CONFD_DIR}/${FONT_NAME}"
-    done
 }
 
 service_preupgrade ()
