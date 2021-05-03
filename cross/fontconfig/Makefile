@@ -13,6 +13,8 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-docs --enable-iconv
+CONFIGURE_ARGS  = --sysconfdir=$(INSTALL_PREFIX_ETC)
+CONFIGURE_ARGS += --localstatedir=$(INSTALL_PREFIX_VAR)
+CONFIGURE_ARGS += --disable-docs --enable-iconv
 
 include ../../mk/spksrc.cross-cc.mk
