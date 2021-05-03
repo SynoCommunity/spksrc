@@ -7,7 +7,7 @@ docopt==0.6.2
 idna==2.10
 pykwalify==1.7.0
 python-dateutil==2.8.1
-PyYAML==5.3.1
+PyYAML==5.4
 requests==2.24.0
 #ruamel.yaml==0.16.10
 ruamel.yaml.clib==0.2.0
