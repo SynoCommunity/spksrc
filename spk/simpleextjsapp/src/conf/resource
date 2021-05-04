@@ -8,7 +8,16 @@
         "root": "simpleextjsapp",
         "backend": 2,
         "icon": "app/images/simpleextjsapp-{0}.png"
+      },
+      {
+        "service": "synoapps",
+        "display_name": "SynoApps",
+        "type": "static",
+        "root": "synoapps",
+        "backend": 2,
+        "icon": "app/images/simpleextjsapp-{0}.png"
       }
+
     ],
     "migrate": {
       "root": [
@@ -25,7 +34,15 @@
         "name": "SynoExtJS API Docs",
         "alias": "simpleextjsapp",
         "app": "com.synocommunity.packages.simpleextjsapp"
+      },
+      {
+        "service": "synoapps",
+        "type": "alias",
+        "name": "Syno Apps Docs",
+        "alias": "synoapps",
+        "app": "com.synocommunity.packages.synoapps"
       }
+
     ],
     "pkg_dir_prepare": [
       {
@@ -34,7 +51,15 @@
         "mode": "0755",
         "user": "sc-simpleextjsapp",
         "group": "http"
+      },
+      {
+        "source": "/var/packages/simpleextjsapp/target/apps/docs/",
+        "target": "synoapps",
+        "mode": "0755",
+        "user": "sc-simpleextjsapp",
+        "group": "http"
       }
+
     ]
   }
 }

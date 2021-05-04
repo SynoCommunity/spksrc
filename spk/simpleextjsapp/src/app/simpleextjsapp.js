@@ -35,7 +35,8 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                 title: "GUI Components",
                 layout: "fit",
                 items: [
-                    this.createDisplayGUI()
+                    this.createStandardGUI(),
+                    this.createAdvancedGUI()
                 ]
             });
 
@@ -67,7 +68,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
     createDisplayCGI: function() {
         return new SYNO.ux.FieldSet({
             title: "Call to CGI",
-            collapsible: false,
+            collapsible: true,
             items: [{
                     xtype: "syno_compositefield",
                     hideLabel: true,
@@ -128,8 +129,8 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
     },
     createDisplayAPI: function() {
         return new SYNO.ux.FieldSet({
-            title: "Call to API",
-            collapsible: false,
+            title: "Call to Syno API",
+            collapsible: true,
             items: [{
                 xtype: "syno_compositefield",
                 hideLabel: true,
@@ -146,10 +147,11 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             }]
         });
     },
-    createDisplayGUI: function() {
+    createStandardGUI: function() {
         return new SYNO.ux.FieldSet({
-            title: "GUI components ",
-            collapsible: false,
+            title: "Standard components",
+            collapsible: true,
+            autoHeight: true,
             items: [
 
                 {
@@ -157,7 +159,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'Button Field :',
+                        value: 'Button :',
                         width: 100
                     }, {
                         xtype: "syno_button",
@@ -169,7 +171,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'Text Field :',
+                        value: 'TextField :',
                         width: 100
                     }, {
                         xtype: "syno_textfield",
@@ -182,7 +184,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'CheckBox :',
+                        value: 'Checkbox :',
                         width: 100
                     }, {
                         xtype: "syno_checkbox",
@@ -225,10 +227,99 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                         autoFlexcroll: !0,
                         selectOnFocus: !0
                     }]
-                }
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: 'Radio :',
+                        width: 100
+                    }, {
+                        xtype: "syno_radio",
+                        name: "policy",
+                        checked: true,
+                        boxLabel: "Option 1",
+                        inputValue: 1
+                    }]
+                },
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                        xtype: 'syno_displayfield',
+                        value: '',
+                        width: 100
+                    }, {
+                        xtype: "syno_radio",
+                        name: "policy",
+                        boxLabel: "Option 2",
+                        inputValue: 2
+                    }]
+                }                                 
             ]
         });
     },
+    createAdvancedGUI: function() {
+        return new SYNO.ux.FieldSet({
+            title: "Advanced components",
+            collapsible: true,
+            autoHeight: true,
+            items: [
+
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'ColorField',
+                            width: 100
+                        },
+
+                        {
+                            xtype: "syno_colorfield",
+                            value: "#993300"
+                        }
+                    ]
+                },
+
+
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Switch',
+                            width: 100
+                        },
+
+                        {
+                            xtype: "syno_switch"
+                        }
+                    ]
+                },
+
+                {
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'TimeField',
+                            width: 100
+                        },
+
+                        {
+                            xtype: "syno_timefield",
+                            value: "test",
+                        }
+                    ]
+                }
+
+
+            ]
+        });
+    },
+
     createTimeItemStore: function(e) {
         var a = [];
         var c = {
@@ -262,8 +353,10 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                 'Content-Type': 'application/json'
             },
             success: function(response) {
-                var result = Ext.decode(response.responseText).data.cpu_clock_speed;
-                window.alert('API called : cpu clock speed = ' + result);
+                var data = Ext.decode(response.responseText).data;
+                var cpu_clock = data.cpu_clock_speed;
+                var temp = data.sys_temp;
+                window.alert('API called : cpu clock speed = ' + cpu_clock + ' and temperature = ' + temp);
             },
             failure: function(response) {
                 window.alert('Request Failed.');
@@ -278,7 +371,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             method: 'GET',
             timeout: 60000,
             params: {
-                id: 1 // loads results whose Id is 1
+                id: 1 // add params if needed
             },
             headers: {
                 'Content-Type': 'text/html'
@@ -300,7 +393,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             method: 'GET',
             timeout: 60000,
             params: {
-                id: 1 // loads results whose Id is 1
+                id: 1 // add params if needed
             },
             headers: {
                 'Content-Type': 'text/html'
@@ -323,7 +416,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             method: 'GET',
             timeout: 60000,
             params: {
-                id: 1 // loads results whose Id is 1
+                id: 1 // add params if needed
             },
             headers: {
                 'Content-Type': 'text/html'
@@ -346,7 +439,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             method: 'GET',
             timeout: 60000,
             params: {
-                id: 1 // loads results whose Id is 1
+                id: 1 // add params if needed
             },
             headers: {
                 'Content-Type': 'text/html'
