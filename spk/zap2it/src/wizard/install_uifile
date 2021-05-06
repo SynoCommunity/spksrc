@@ -1,0 +1,44 @@
+[{
+    "step_title": "Set username and password for zap2it",
+    "items": [{
+        "type": "textfield",
+        "desc": "User account to connect to tvlistings.zap2it.com",
+        "subitems": [{
+            "key": "wizard_user",
+            "desc": "Username:"
+        }]
+    },{
+        "type": "password",
+        "desc": "Password",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Password:"
+        }]
+    },{
+        "type": "singleselect",
+        "desc": "Location",
+        "subitems": [{
+            "key": "wizard_CAD",
+            "desc": "Canada",
+            "defaultValue": true
+        },{
+            "key": "wizard_US",
+            "desc": "United States",
+            "defaultValue": false,
+            "validator": {
+                "fn": "{return arguments[0];}"
+           }
+        }]
+    },{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_zip",
+            "desc": "ZIP or Postal Code"
+        }]
+    }]
+}, {
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions are managed with the group <b>'sc-media'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= svc-tvheadend on DSM5 and sc-tvheadend on DSM6+) will not appear on most UI settings.<br>Including the following:<br>- Application privilege's permission viewer<br>- FTP's chroot user selector<br>- File Stations's<br>- Change owner<br>- Shared Links Manager -> Enable secure sharing<br><br>The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }]
+}]
