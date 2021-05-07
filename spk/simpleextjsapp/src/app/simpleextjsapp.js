@@ -26,19 +26,39 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                 title: "Server Calls",
                 items: [
                     this.createDisplayCGI(),
-                    this.createDisplayAPI()
+                    this.createDisplayAPI(),
+                    this.createDisplayExternalAPI()
                 ]
             });
 
-            // Tab for GUI components
+            // Tab for Form components
             allTabs.push({
-                title: "GUI Components",
+                title: "Form Components",
                 layout: "fit",
                 items: [
                     this.createStandardGUI(),
                     this.createAdvancedGUI()
                 ]
             });
+
+            // Tab for Menu & Toolbar components
+            allTabs.push({
+                title: "Menu & Toolbar Components",
+                layout: "fit",
+                items: [
+                    this.createMenuGUI()
+                ]
+            });
+
+            // Tab for User interaction
+            allTabs.push({
+                title: "User interaction",
+                layout: "fit",
+                items: [
+                    this.createInteraction()
+                ]
+            });
+
 
             return allTabs;
         }).call(this);
@@ -65,6 +85,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
         this.callParent([config]);
     },
+    // Create the display of CGI calls
     createDisplayCGI: function() {
         return new SYNO.ux.FieldSet({
             title: "Call to CGI",
@@ -127,6 +148,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             ]
         });
     },
+    // Create the display of API calls
     createDisplayAPI: function() {
         return new SYNO.ux.FieldSet({
             title: "Call to Syno API",
@@ -147,9 +169,31 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             }]
         });
     },
+    // Create the display of external API calls
+    createDisplayExternalAPI: function() {
+        return new SYNO.ux.FieldSet({
+            title: "Call to external API",
+            collapsible: true,
+            items: [{
+                xtype: "syno_compositefield",
+                hideLabel: true,
+                items: [{
+                    xtype: 'syno_displayfield',
+                    value: 'www.boredapi.com :',
+                    width: 140
+                }, {
+                    xtype: "syno_button",
+                    btnStyle: "green",
+                    text: 'Words of Day',
+                    handler: this.onExternalAPIClick.bind(this)
+                }]
+            }]
+        });
+    },
+    // Create the display of Form Components / Standard
     createStandardGUI: function() {
         return new SYNO.ux.FieldSet({
-            title: "Standard components",
+            title: "Standard",
             collapsible: true,
             autoHeight: true,
             items: [
@@ -166,6 +210,8 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                         text: "Confirm"
                     }]
                 },
+
+
                 {
                     xtype: "syno_compositefield",
                     hideLabel: true,
@@ -256,13 +302,14 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                         boxLabel: "Option 2",
                         inputValue: 2
                     }]
-                }                                 
+                }
             ]
         });
     },
+    // Create the display of Form Components / Advanced
     createAdvancedGUI: function() {
         return new SYNO.ux.FieldSet({
-            title: "Advanced components",
+            title: "Advanced",
             collapsible: true,
             autoHeight: true,
             items: [
@@ -319,7 +366,133 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             ]
         });
     },
+    // Create the display of Menu & Toolbar Components / Standard
+    createMenuGUI: function() {
+        return new SYNO.ux.FieldSet({
+            title: "Standard",
+            collapsible: true,
+            autoHeight: true,
+            items: [{
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'Menu :',
+                            width: 100
+                        },
+                        {
+                            xtype: "syno_button",
+                            text: "Menu button",
+                            menu: {
+                                items: [{
+                                    text: "Undo",
+                                    disabled: true
+                                }, {
+                                    text: "Redo",
+                                    disabled: true
+                                }, {
+                                    xtype: "menuseparator"
+                                }, {
+                                    text: "Select All",
+                                    disabled: false
+                                }, {
+                                    xtype: "menuseparator"
+                                }, {
+                                    text: "Lang",
+                                    hideOnClick: false,
+                                    disabled: false,
+                                    menu: {
+                                        xtype: "syno_menu",
+                                        items: [{
+                                            text: "FR"
+                                        }, {
+                                            text: "US"
+                                        }]
+                                    }
+                                }]
+                            }
+                        }
 
+
+                    ]
+                }
+
+
+
+            ]
+        });
+    },
+
+    // Create the display of User Interaction
+    createInteraction: function() {
+        return new SYNO.ux.FieldSet({
+            title: "Standard",
+            collapsible: true,
+            autoHeight: true,
+            items: [{
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'ModalWindow :',
+                            width: 100
+                        },
+                        {
+                            xtype: "syno_button",
+                            text: 'Open window',
+                            handler: this.onModalButtonClick.bind(this)
+                        }
+
+
+                    ]
+                }
+
+
+
+            ]
+        });
+    },
+
+    // Handle display for ModalWindow
+    onModalButtonClick: function() {
+
+        var window = new SYNO.SDS.ModalWindow({
+            closeAction: "hide",
+            layout: "fit",
+            width: 400,
+            height: 200,
+            resizable: !1,
+            title: "Modal Window",
+            buttons: [{
+                text: "Close",
+                handler: function() {
+                    window.close();
+                }
+            }, {
+                text: "Confirm",
+                itemId: "confirm",
+                btnStyle: "blue",
+                handler: function() {
+                    window.close();
+                }
+            }],
+            items: [
+                {
+
+                    xtype: 'syno_displayfield',
+                    value: 'Message for the user',
+
+                }
+
+            ],
+
+        });
+        window.open();
+
+
+    },
+
+    // Create the content for the ComboBox
     createTimeItemStore: function(e) {
         var a = [];
         var c = {
@@ -339,6 +512,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         }
         return null
     },
+    // Call Syno API on click
     onAPIClick: function() {
         var t = this.getBaseURL({
             api: "SYNO.Core.System",
@@ -365,6 +539,30 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         });
 
     },
+    // Call external API on click
+    onExternalAPIClick: function() {
+        Ext.Ajax.request({
+            url: '/webman/3rdparty/simpleextjsapp/externalapi.cgi',
+            method: 'GET',
+            timeout: 60000,
+            params: {
+                id: 1 // add params if needed
+            },
+            headers: {
+                'Content-Type': 'text/html'
+            },
+            success: function(response) {
+                var result = response.responseText;
+                window.alert('External API called : ' + result);
+            },
+            failure: function(response) {
+                window.alert('Request Failed.');
+
+            }
+
+        });
+    },
+    // Call bash CGI on click
     onBashCGIClick: function() {
         Ext.Ajax.request({
             url: '/webman/3rdparty/simpleextjsapp/bash.cgi',
@@ -387,6 +585,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
         });
     },
+    // Call C CGI on click
     onCGIClick: function() {
         Ext.Ajax.request({
             url: '/webman/3rdparty/simpleextjsapp/test.cgi',
@@ -410,6 +609,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         });
 
     },
+    // Call Python CGI on click
     onPythonCGIClick: function() {
         Ext.Ajax.request({
             url: '/webman/3rdparty/simpleextjsapp/python.cgi',
@@ -433,6 +633,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         });
 
     },
+    // Call Perl CGI on click
     onPerlCGIClick: function() {
         Ext.Ajax.request({
             url: '/webman/3rdparty/simpleextjsapp/perl.cgi',

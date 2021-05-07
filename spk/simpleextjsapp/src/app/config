@@ -12,19 +12,6 @@
             "grantPrivilege": "local"
         }
     },
-    ".url": {
-        "com.synocommunity.packages.synoapps": {
-            "title": "Syno Apps Docs",
-            "desc": "Syno Apps Docs",
-            "icon": "images/simpleextjsapp-{0}.png",
-            "type": "url",
-            "protocol": "http",
-            "port": "80",
-            "url": "/synoapps",
-            "allUsers": false,
-            "grantPrivilege": "local"
-        }
-    },
     "simpleextjsapp.js": {
         "SYNOCOMMUNITY.SimpleExtJSApp.AppInstance": {
             "type": "app",

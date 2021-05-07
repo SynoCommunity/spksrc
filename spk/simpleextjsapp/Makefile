@@ -1,6 +1,6 @@
 SPK_NAME = simpleextjsapp
-SPK_VERS = 0.3
-SPK_REV = 3
+SPK_VERS = 0.4
+SPK_REV = 4
 SPK_ICON = src/simpleextjsapp.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -9,7 +9,7 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = DigitalBox98
 
-DESCRIPTION = Simple Ext JS Application demo
+DESCRIPTION = SimpleExtJS Application demo to illustrate the usage of Syno ExtJS framework for DSM applications. This package is for experienced users.
 STARTABLE = no
 DISPLAY_NAME = SimpleExtJSApp
 
@@ -33,6 +33,7 @@ simpleextjsapp_extra_install:
 	install -m 755 src/app/perl.cgi $(STAGING_DIR)/app/perl.cgi
 	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
 	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi
+	install -m 755 src/app/externalapi.cgi $(STAGING_DIR)/app/externalapi.cgi
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/simpleextjsapp.js $(STAGING_DIR)/app/simpleextjsapp.js
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
