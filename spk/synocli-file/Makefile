@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.2
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/synocli-file.png
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
@@ -40,7 +40,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd, lzip, plzip$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add micro (editor)<br/>2. Add Lzip and Plzip<br/>3. Add fzf (fuzzy finder)<br/>4. Update mc to version 4.8.26"
+CHANGELOG = "1. Add micro (editor)<br/>2. Add Lzip and Plzip<br/>3. Add fzf (fuzzy finder)<br/>4. Update mc to version 4.8.26<br/>Fix rmlint and zstd."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
