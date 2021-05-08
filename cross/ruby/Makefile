@@ -8,6 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/openssl cross/readline cross/gdbm cross/berkeleydb native/$(PKG_NAME)
 
+# even it compiles with older cross/gdbm, ruby crashes at runtime
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 HOMEPAGE = http://www.ruby-lang.org/
 COMMENT  = Ruby Programming Language.
 LICENSE  = 2-clause BSDL

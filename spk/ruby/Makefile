@@ -5,6 +5,9 @@ SPK_ICON = src/ruby.png
 
 DEPENDS = cross/$(SPK_NAME)
 
+# even it compiles with older cross/gdbm, ruby crashes at runtime
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 CHANGELOG = "Restore package and update to v3.3.0, due to the fact that Synology retired Ruby v2.4.3-0067."
 
 MAINTAINER = SynoCommunity
