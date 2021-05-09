@@ -1,11 +1,10 @@
 PKG_NAME = libaom
-PKG_VERS = v3.0.0
+PKG_VERS = v3.1.0
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = d853caa2ab62d161e5edf344ffee7b597449dc0d
+PKG_GIT_HASH = 33aff8586e35ffe385637f6aa2c991858c0fb58e
+# Tag v3.1.0: 33aff8586e35ffe385637f6aa2c991858c0fb58e
 # Tag v3.0.0: d853caa2ab62d161e5edf344ffee7b597449dc0d
-# Tag v2.0.1: b52ee6d44adaef8a08f6984390de050d64df9faa
-# Tag v2.0.0: bb35ba9148543f22ba7d8642e4fbd29ae301f5dc
 PKG_DIST_SITE = https://aomedia.googlesource.com/aom
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
