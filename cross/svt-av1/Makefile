@@ -1,10 +1,9 @@
 PKG_NAME = SVT-AV1
-PKG_VERS = 0.8.6
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/OpenVisualCloud/SVT-AV1/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_VERS = 0.8.7
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v$(PKG_VERS)/
+PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 
 DEPENDS =
 
