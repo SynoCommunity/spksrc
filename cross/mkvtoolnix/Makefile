@@ -5,27 +5,34 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/python 
-DEPENDS  = cross/libogg cross/libvorbis cross/zlib cross/curl cross/flac cross/boost cross/libmatroska
+BUILD_DEPENDS = native/ruby
+DEPENDS = cross/boost cross/libogg cross/libvorbis cross/zlib cross/libebml cross/libmatroska
+DEPENDS += cross/flac cross/file
 
 HOMEPAGE = https://mkvtoolnix.download/index.html
-COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files under Linux, other Unices and Windows.
+COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+COMPILE_TARGET = mkvtoolnix_compile
+INSTALL_TARGET = mkvtoolnix_install
 
-COMPILE_TARGET=myCompile
-INSTALL_TARGET=myInstall
+CONFIGURE_ARGS = --prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-boost-libdir=$(STAGING_INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += --without-curl
+
+BOOST_LIBRARIES = system filesystem regex date_time
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+
+NATIVE_RUBY_DIR = $(realpath $(WORK_DIR)/../../../native/ruby/work-native/install/usr/local/bin)
+ENV += PATH=$(NATIVE_RUBY_DIR):$$PATH
 
 include ../../mk/spksrc.cross-cc.mk
 
-CONFIGURE_ARGS = --with-boost-libdir=$(STAGING_INSTALL_PREFIX)/lib --prefix=$(STAGING_INSTALL_PREFIX)
-
-
-.PHONY: myCompile
-myCompile:
+.PHONY: mkvtoolnix_compile
+mkvtoolnix_compile:
 	$(RUN) ./drake
 
-.PHONY: myInstall
-myInstall:
+.PHONY: mkvtoolnix_install
+mkvtoolnix_install:
 	$(RUN) ./drake install
