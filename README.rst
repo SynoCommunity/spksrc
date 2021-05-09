@@ -30,6 +30,7 @@ Setup Development Environment
 -----------------------------
 Docker
 ^^^^^^
+* You need a host system running ``linux``. Mac OSX may work with ``fakeroot tar`` (see below: how to run the container). Docker on Windows is not supported due to limitations of the underlying file system.
 * `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc ~/spksrc``
 * Install Docker on your host OS: `Docker installation`_. A wget-based alternative for linux: `Install Docker with wget`_.
 * Download the spksrc docker container: ``docker pull synocommunity/spksrc``
