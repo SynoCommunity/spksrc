@@ -1,13 +1,17 @@
 PKG_NAME = mkvtoolnix
-PKG_VERS = 8.5.2
+PKG_VERS = 9.7.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# compiler too old (C++14 required, gnu c++ >= v4.9.x.)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+
 BUILD_DEPENDS = native/ruby
-DEPENDS = cross/boost cross/libogg cross/libvorbis cross/zlib cross/libebml cross/libmatroska
+DEPENDS = cross/boost cross/libogg cross/libvorbis cross/zlib 
 DEPENDS += cross/flac cross/file
+DEPENDS += cross/libebml cross/libmatroska
 
 HOMEPAGE = https://mkvtoolnix.download/index.html
 COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
