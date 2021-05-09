@@ -1,5 +1,5 @@
 PKG_NAME = mercurial
-PKG_VERS = 4.8.1
+PKG_VERS = 5.7.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.mercurial-scm.org/release
