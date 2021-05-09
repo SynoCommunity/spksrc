@@ -1,4 +1,4 @@
 bin:bin/x265
 lib:lib/libhdr10plus.so
 lnk:lib/libx265.so
-lib:lib/libx265.so.192
+lib:lib/libx265.so.199
