@@ -10,7 +10,7 @@ DEPENDS =
 
 HOMEPAGE = https://github.com/daniel-widrick/zap2it-GuideScraping
 COMMENT  = Take TV listings from zap2it and convert them to xmltv for use with applications such as Jellyfin/Emby
-LICENSE  = none
+LICENSE  = MIT
 
 INSTALL_TARGET = zap2it_install
 

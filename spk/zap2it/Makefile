@@ -16,7 +16,7 @@ CHANGELOG = "Initial package"
 
 STARTABLE = no
 HOMEPAGE = https://github.com/daniel-widrick/zap2it-GuideScraping
-LICENSE  = none
+LICENSE  = MIT
 
 WIZARDS_DIR = src/wizard/
 
