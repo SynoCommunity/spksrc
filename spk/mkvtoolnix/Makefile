@@ -1,11 +1,11 @@
 SPK_NAME = mkvtoolnix
-SPK_VERS = 9.7.1
+SPK_VERS = 22.0.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
 DEPENDS = cross/$(SPK_NAME)
 
-# toolchain compiler too old (C++14 required)
+# compiler too old, gcc >= 4.9.x required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = cytec
