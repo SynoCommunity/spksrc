@@ -1,5 +1,5 @@
 PKG_NAME = libvorbis
-PKG_VERS = 1.3.6
+PKG_VERS = 1.3.7
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.osuosl.org/pub/xiph/releases/vorbis
