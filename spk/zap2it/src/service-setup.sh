@@ -21,13 +21,17 @@ service_postinst ()
     fi
 
     # Encrypt password
-    wizard_password=`echo -n "TVHeadend-Hide-${wizard_password:=admin}" | openssl enc -a`
+    zap2it_password=$(echo -n "TVHeadend-Hide-${zap2it_password}" | openssl enc -a)
+    [ "${zap2it_CAN}" = "true" ] && zap2it_country=CAN || zap2it_country=USA
+    # Remove spaces from CAD postal code
+    zap2it_code=$(echo ${zap2it_code} | sed 's/ //g')
 
     # Set configuration according to the wizard
-    sed -i -e "s/example\$/${wizard_user}/g" ${CONF}
-    sed -i -e "s/examplePass\$/${wizard_password}/g" ${CONF}
-    sed -i -e "s/USA\$/${wizard_country}/g" ${CONF}
-    sed -i -e "s/55555\$/${wizard_zipcode}/g" ${CONF}
+    sed -i "/^Username: /s/ .*/ ${zap2it_user}/" ${CONF}
+    sed -i "/^Password: /s/ .*/ ${zap2it_password}/" ${CONF}
+    sed -i "/^country: /s/ .*/ ${zap2it_country}/" ${CONF}
+    sed -i "/^zipCode: /s/ .*/ ${zap2it_code}/" ${CONF}
+    sed -i "/^historicalGuideDays: /s/ .*/ ${zap2it_days}/" ${CONF}
 }
 
 service_preupgrade ()
