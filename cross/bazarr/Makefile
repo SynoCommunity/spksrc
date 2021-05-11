@@ -1,6 +1,6 @@
 PKG_NAME = bazarr
 
-PKG_VERS = 0.9.4
+PKG_VERS = 0.9.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
