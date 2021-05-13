@@ -17,6 +17,7 @@
         "subitems": [{
             "key": "zap2it_code",
             "desc": "Postal or ZIP code",
+            "emptyText": "90210 or J9J1Z1",
             "validator": {
                 "vtype": "alphanum",
                 "regex": {
@@ -53,7 +54,7 @@
         }]
     },{
         "type": "password",
-        "desc": "Password",
+        "desc": " ",
         "subitems": [{
             "key": "zap2it_password",
             "desc": "Password"
