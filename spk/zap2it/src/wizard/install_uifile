@@ -42,7 +42,7 @@
     "step_title": "Set username and password",
     "items": [{
         "type": "textfield",
-        "desc": "User account to connect to tvlistings.zap2it.com",
+        "desc": "User account to connect to <a target=\"_blank\" href=\"https://tvlistings.zap2it.com\">tvlistings.zap2it.com</a>",
         "subitems": [{
             "key": "zap2it_user",
             "desc": "Username",
