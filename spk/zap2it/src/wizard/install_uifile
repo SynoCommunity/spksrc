@@ -16,14 +16,26 @@
         "type": "textfield",
         "subitems": [{
             "key": "zap2it_code",
-            "desc": "Postal or ZIP code"
+            "desc": "Postal or ZIP code",
+            "validator": {
+                "vtype": "alphanum",
+                "regex": {
+                    "expr": "/^[0-9]{5}$|^[A-Z][0-9][A-Z][ ]?[0-9][A-Z][0-9]$/i"
+                }
+            }
         }]
     },{
         "type": "textfield",
         "subitems": [{
             "key": "zap2it_days",
             "desc": "TV Guide Numbers of days (max. 14)",
-            "defaultValue": 14
+            "defaultValue": "14",
+            "validator": {
+                "vtype": "alphanum",
+                "regex": {
+                    "expr": "/^[1-9]$|^1[0-4]$/i"
+                }
+            }
         }]
     }]
 }, {
@@ -33,7 +45,11 @@
         "desc": "User account to connect to tvlistings.zap2it.com",
         "subitems": [{
             "key": "zap2it_user",
-            "desc": "Username"
+            "desc": "Username",
+            "emptyText": "abc@xyz.com",
+            "validator": {
+                "vtype": "email"
+            }
         }]
     },{
         "type": "password",
