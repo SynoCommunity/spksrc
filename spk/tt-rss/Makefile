@@ -12,9 +12,7 @@ DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "
-CHANGELOG += Update Tiny Tiny RSS to Git revision 473ea6255c (20210306).<br />
-CHANGELOG += "
+CHANGELOG = Update Tiny Tiny RSS to Git revision 473ea6255c (20210306).
 
 HOMEPAGE   = https://tt-rss.org/
 LICENSE    = GPL
@@ -42,7 +40,7 @@ REQUIRED_DSM = 6.0
 
 INSTUNINST_RESTART_SERVICES = apache-web
 
-SPK_DEPENDS = "WebStation;PHP7.2;MariaDB"
+SPK_DEPENDS = "WebStation:PHP7.2:MariaDB"
 
 include ../../mk/spksrc.spk.mk
 
