@@ -20,5 +20,6 @@ include ../../mk/spksrc.install-resources.mk
 zap2it_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/zap2it-GuideScrape.py $(STAGING_INSTALL_PREFIX)/bin
+	@sed -i '1 i\#!/usr/bin/env python3' $(STAGING_INSTALL_PREFIX)/bin/zap2it-GuideScrape.py
 	install -m 750 -d $(STAGING_INSTALL_PREFIX)/etc
 	install -m 640 $(WORK_DIR)/$(PKG_DIR)/zap2itconfig.ini.dist $(STAGING_INSTALL_PREFIX)/etc/zap2itconfig.ini
