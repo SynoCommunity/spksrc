@@ -24,4 +24,10 @@ WIZARDS_DIR = src/wizard/
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
+POST_STRIP_TARGET = zap2it_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: zap2it_extra_install
+zap2it_extra_install:
+	install -m 644 src/zap2it.synocron $(STAGING_DIR)/etc/zap2it.synocron

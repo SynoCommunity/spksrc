@@ -5,6 +5,7 @@
 GROUP=sc-media
 
 # Default configuration file
+SYNOCRON=/usr/local/etc/synocron.d/
 CONF=${SYNOPKG_PKGDEST}/etc/zap2itconfig.ini
 CACHE=${SYNOPKG_PKGVAR}
 
@@ -32,6 +33,10 @@ service_postinst ()
     sed -i "/^country: /s/ .*/ ${zap2it_country}/" ${CONF}
     sed -i "/^zipCode: /s/ .*/ ${zap2it_code}/" ${CONF}
     sed -i "/^historicalGuideDays: /s/ .*/ ${zap2it_days}/" ${CONF}
+
+    # Install the synocron
+    cp ${SYNOPKG_PKGDEST}/etc/zap2it.synocron ${SYNOCRON}/zap2it.conf
+    sudo synoservice --restart synocrond
 }
 
 service_preupgrade ()

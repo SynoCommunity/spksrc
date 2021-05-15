@@ -1,0 +1,10 @@
+[
+   {
+      "cmd" : "/var/packages/zap2it/target/bin/zap2it-GuideScrape.py -i /var/packages/zap2it/target/etc/zap2itconfig.ini -o /var/packages/zap2it/target/var/xmlguide.xmltv",
+      "crontab" : "* */8 * * *",
+      "name" : "zap2it",
+      "package_username" : "sc-zap2it",
+      "period" : "crontab",
+      "user" : "package"
+   }
+]
