@@ -10,6 +10,32 @@ CONF=${SYNOPKG_PKGDEST}/etc/zap2itconfig.ini
 CACHE=${SYNOPKG_PKGVAR}
 SPKETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INSTALLER_VARIABLES="${SPKETC}/installer-variables"
+ZAP2IT_BACKUP=/tmp/zap2it
+
+write_zap2it_config()
+{
+    # Set default country
+    [ "${zap2it_CAN}" = "true" ] && zap2it_country=CAN || zap2it_country=USA
+    # Remove spaces from CAD postal code
+    zap2it_code=$(echo ${zap2it_code} | sed 's/ //g')
+
+    # Set configuration according to the wizard
+    sed -i "/^Username: /s/ .*/ ${zap2it_user}/" ${CONF}
+    sed -i "/^Password: /s/ .*/ ${zap2it_password}/" ${CONF}
+    sed -i "/^country: /s/ .*/ ${zap2it_country}/" ${CONF}
+    sed -i "/^zipCode: /s/ .*/ ${zap2it_code}/" ${CONF}
+    sed -i "/^historicalGuideDays: /s/ .*/ ${zap2it_days}/" ${CONF}
+
+    # Encrypt password
+    zap2it_password=$(echo -n "TVHeadend-Hide-${zap2it_password}" | openssl enc -a)
+    # Backup installer variables
+    sed -i -n -e '/^USER=/!p' -e "\$aUSER=\"${zap2it_user}\"" ${INSTALLER_VARIABLES}
+    sed -i -n -e '/^PASSWD=/!p' -e "\$aPASSWD=\"${zap2it_password}\"" ${INSTALLER_VARIABLES}
+    sed -i -n -e '/^CAN=/!p' -e "\$aCAN=\"${zap2it_CAN}\"" ${INSTALLER_VARIABLES}
+    sed -i -n -e '/^US=/!p' -e "\$aUS=\"${zap2it_US}\"" ${INSTALLER_VARIABLES}
+    sed -i -n -e '/^CODE=/!p' -e "\$aCODE=\"${zap2it_code}\"" ${INSTALLER_VARIABLES}
+    sed -i -n -e '/^DAYS=/!p' -e "\$aDAYS=\"${zap2it_days}\"" ${INSTALLER_VARIABLES}
+}
 
 service_postinst ()
 {
@@ -23,25 +49,8 @@ service_postinst ()
         set_unix_permissions "${SYNOPKG_PKGVAR}"
     fi
 
-    # Encrypt password
-    zap2it_password=$(echo -n "TVHeadend-Hide-${zap2it_password}" | openssl enc -a)
-    [ "${zap2it_CAN}" = "true" ] && zap2it_country=CAN || zap2it_country=USA
-    # Remove spaces from CAD postal code
-    zap2it_code=$(echo ${zap2it_code} | sed 's/ //g')
-
-    # Set configuration according to the wizard
-    sed -i "/^Username: /s/ .*/ ${zap2it_user}/" ${CONF}
-    sed -i "/^Password: /s/ .*/ ${zap2it_password}/" ${CONF}
-    sed -i "/^country: /s/ .*/ ${zap2it_country}/" ${CONF}
-    sed -i "/^zipCode: /s/ .*/ ${zap2it_code}/" ${CONF}
-    sed -i "/^historicalGuideDays: /s/ .*/ ${zap2it_days}/" ${CONF}
-
-    # Backup installer variables
-    echo "zap2it_user=${zap2it_user}"         >> ${INSTALLER_VARIABLES}
-    echo "zap2it_password=${zap2it_password}" >> ${INSTALLER_VARIABLES}
-    echo "zap2it_country=${zap2it_country}"   >> ${INSTALLER_VARIABLES}
-    echo "zap2it_code=${zap2it_code}"         >> ${INSTALLER_VARIABLES}
-    echo "zap2it_days=${zap2it_days}"         >> ${INSTALLER_VARIABLES}
+    # Adjust configuration files
+    write_zap2it_config
 
     # Install the synocron
     cp ${SYNOPKG_PKGDEST}/etc/zap2it.synocron ${SYNOCRON}/zap2it.conf
@@ -57,8 +66,18 @@ service_postuninst ()
 
 service_preupgrade ()
 {
+    # Create a backup copy
+    mkdir -p ${ZAP2IT_BACKUP}
+    rsync -avh ${SYNOPKG_PKGDEST}/var ${ZAP2IT_BACKUP}
 }
 
 service_postupgrade ()
 {
+    # Adjust configuration files
+    write_zap2it_config
+
+    # Recover backup
+    rsync -avh --ignore-existing --remove-source-files ${ZAP2IT_BACKUP}/var/ ${SYNOPKG_PKGDEST}/var
+    # Remove backup directory
+    rm -fr ${ZAP2IT_BACKUP}
 }
