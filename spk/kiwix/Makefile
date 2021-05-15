@@ -5,7 +5,7 @@ SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
 
-# libicu limits
+# compiler too old
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.kiwix.org/

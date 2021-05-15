@@ -6,6 +6,9 @@ PKG_DIST_SITE = https://github.com/kiwix/$(PKG_NAME)/archive/
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# compiler too old
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 DEPENDS = cross/libicu cross/libzim cross/pugixml cross/curl cross/libmicrohttpd cross/mustache
 
 HOMEPAGE = https://www.kiwix.org/
