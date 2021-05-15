@@ -6,7 +6,7 @@ PKG_DIST_SITE =https://github.com/kiwix/$(PKG_NAME)/archive/
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/kiwix-lib
+DEPENDS = cross/libkiwix
 
 HOMEPAGE = https://www.kiwix.org/
 COMMENT  = Command line Kiwix tools: kiwix-serve, kiwix-manage, ...
