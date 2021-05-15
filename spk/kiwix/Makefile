@@ -16,8 +16,19 @@ MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
 CHANGELOG = "Initial package release"
 
-STARTABLE = no
+STARTABLE = yes
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8092
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+ADMIN_PORT = $(SERVICE_PORT)
+
+POST_STRIP_TARGET = kiwix_extra_install
 
 SPK_COMMANDS = bin/kiwix-manage bin/kiwix-read bin/kiwix-search bin/kiwix-serve
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: kiwix_extra_install
+kiwix_extra_install:
+	install -d -m 755 $(STAGING_DIR)/var
+	install -m 644 src/empty_library.xml  $(STAGING_DIR)/var/empty_library.xml
