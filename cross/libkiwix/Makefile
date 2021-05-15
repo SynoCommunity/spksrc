@@ -1,4 +1,4 @@
-PKG_NAME = kiwix-lib
+PKG_NAME = libkiwix
 PKG_VERS = 9.4.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
