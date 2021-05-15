@@ -1,13 +1,15 @@
 # Package specific behaviors
 # Sourced script by generic installer and start-stop-status scripts
 
-# Group configuration to manage permissions of recording folders
+# Group to access XMLTV files
 GROUP=sc-media
 
 # Default configuration file
 SYNOCRON=/usr/local/etc/synocron.d/
 CONF=${SYNOPKG_PKGDEST}/etc/zap2itconfig.ini
 CACHE=${SYNOPKG_PKGVAR}
+SPKETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INSTALLER_VARIABLES="${SPKETC}/installer-variables"
 
 service_postinst ()
 {
@@ -34,9 +36,23 @@ service_postinst ()
     sed -i "/^zipCode: /s/ .*/ ${zap2it_code}/" ${CONF}
     sed -i "/^historicalGuideDays: /s/ .*/ ${zap2it_days}/" ${CONF}
 
+    # Backup installer variables
+    echo "zap2it_user=${zap2it_user}"         >> ${INSTALLER_VARIABLES}
+    echo "zap2it_password=${zap2it_password}" >> ${INSTALLER_VARIABLES}
+    echo "zap2it_country=${zap2it_country}"   >> ${INSTALLER_VARIABLES}
+    echo "zap2it_code=${zap2it_code}"         >> ${INSTALLER_VARIABLES}
+    echo "zap2it_days=${zap2it_days}"         >> ${INSTALLER_VARIABLES}
+
     # Install the synocron
     cp ${SYNOPKG_PKGDEST}/etc/zap2it.synocron ${SYNOCRON}/zap2it.conf
-    sudo synoservice --restart synocrond
+    synoservice --restart synocrond
+}
+
+service_postuninst ()
+{
+    # Remove synocron
+    rm -f ${SYNOCRON}/zap2it.conf
+    synoservice --restart synocrond
 }
 
 service_preupgrade ()

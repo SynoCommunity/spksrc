@@ -30,4 +30,4 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: zap2it_extra_install
 zap2it_extra_install:
-	install -m 644 src/zap2it.synocron $(STAGING_DIR)/etc/zap2it.synocron
+	install -m 600 src/zap2it.synocron $(STAGING_DIR)/etc/zap2it.synocron
