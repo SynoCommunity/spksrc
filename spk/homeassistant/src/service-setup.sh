@@ -1,3 +1,4 @@
+
 # no shebang, this file is included by following scripts
 # - installer
 # - start-stop-status
@@ -6,34 +7,40 @@ PYTHON_DIR="/var/packages/python38/target/bin"
 VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var/config"
-
+CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/env/bin/hass -v --config ${CONFIG_DIR} --pid-file ${PID_FILE} --log-file ${LOG_FILE} --daemon"
-SVC_CWD="${SYNOPKG_PKGDEST}/var/"
-HOME="${SYNOPKG_PKGDEST}/var/"
+SVC_CWD="${SYNOPKG_PKGVAR}"
+HOME="${SYNOPKG_PKGVAR}"
+
 
 service_postinst ()
 {
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
+    
+    # ensure current pip (>= 20.3)
+    # older versions with old dependency resolver will complain about double dependencies while
+    # install is done with local *.whl files and requirements from the index.
+    ${SYNOPKG_PKGDEST}/env/bin/python3 -m pip install --upgrade pip
 
-    # Install the wheels
+    echo "Install packages"
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --upgrade --no-index --find-links ${wheelhouse} ${wheelhouse}/*.whl
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input ${wheelhouse}/*.whl --requirement ${wheelhouse}/requirements.txt
 
     mkdir -p "${CONFIG_DIR}"
-    # For pip to install pure python module (others have to be provided as wheels in requirement.txt)
-    chown -R ${EFF_USER} ${SYNOPKG_PKGDEST}/env
 }
 
-
-# use alternate TMPDIR for service_postinst and start_daemon (start-stop-status)
-# /tmp might have <400MB free space
-# TMPDIR is supported by pip https://github.com/pypa/pip/issues/4462 ('--build dir' is not supported anymore)
-TMPDIR=${SYNOPKG_PKGDEST}/tmp
-if [[ ! -e "${TMPDIR}" ]]; then
-    mkdir -p "${TMPDIR}"
-    chown ${EFF_USER} "${TMPDIR}"
-fi
-export TMPDIR=${SYNOPKG_PKGDEST}/tmp
+service_preupgrade ()
+{
+    # migrate configuration
+    # move config folder from DSM<7 to DSM7 destination
+    OLD_CONFIG_DIR="${SYNOPKG_PKGDEST}/var/config"
+    if [ -d "${OLD_CONFIG_DIR}" ]; then
+        # on DSM<7 "${SYNOPKG_PKGDEST}/var" is the same folder as "${SYNOPKG_PKGVAR}"
+        if [ "$(realpath ${OLD_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
+            echo "Move configuration from ${OLD_CONFIG_DIR} to ${CONFIG_DIR}"
+            mv -f "${OLD_CONFIG_DIR}" "${SYNOPKG_PKGVAR}"
+        fi
+    fi
+}
 
