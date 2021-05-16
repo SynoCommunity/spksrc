@@ -1,5 +1,5 @@
 
-PYTHON_DIR="/var/packages/python3/target/bin"
+PYTHON_DIR="/var/packages/python38/target/bin"
 VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"

@@ -3,16 +3,16 @@ SPK_VERS = 1.1.16
 SPK_REV = 8
 SPK_ICON = src/$(SPK_NAME).png
 
-BUILD_DEPENDS = cross/python3
+BUILD_DEPENDS = cross/python38
 DEPENDS = cross/$(SPK_NAME)
 
-SPK_DEPENDS = "python3>=3.7"
+SPK_DEPENDS = "python38"
 
 # Requirements file generation
 # cd src
-# /spksrc/native/python3/work-native/install/usr/local/bin/python3 -m venv borg-env
+# /spksrc/native/python38/work-native/install/usr/local/bin/python3 -m venv borg-env
 # . borg-env/bin/activate
-# pip install  ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup-1.1.16-cp37-none-any.whl borgmatic
+# pip install  ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic
 # pip freeze | sed -r 's/^(borgbackup |ruamel\.yaml=)/#\1/' > requirements.txt
 # deactivate
 # adjust the first line in requirements.txt to "#borgbackup==1.1.16"
@@ -23,7 +23,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgbackup to v1.1.16<br/>2. Security fix CVE-2020-14343 (PyYAML dependency removed)."
+CHANGELOG = "1. Update borgbackup to v1.1.16 and Python 3.8<br/>2. Security fix CVE-2020-14343 (PyYAML dependency removed)."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause
