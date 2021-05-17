@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/b/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/attr cross/acl cross/lz4 cross/openssl cross/zstd
+DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd
 
 HOMEPAGE = https://borgbackup.readthedocs.io/
 COMMENT  = Deduplicating backup program with compression and authenticated encryption
