@@ -1,14 +1,16 @@
 # avoid the use of system include and lib directories
 # take the STAGING_INSTALL_PREFIX variable from environment as defined by spk Makefile
---- setup.py.orig	2020-06-30 08:55:24.000000000 +0000
-+++ setup.py	2020-12-14 21:30:38.387665662 +0000
-@@ -29,13 +29,14 @@
+--- setup.py.orig	2021-04-01 17:58:27.000000000 +0000
++++ setup.py	2021-05-13 11:53:05.171525534 +0000
+@@ -28,15 +28,16 @@
  
  NAME = "Pillow"
  PILLOW_VERSION = get_version()
 -FREETYPE_ROOT = None
 +lib_include = os.path.join(os.environ['STAGING_INSTALL_PREFIX'], "lib"), os.path.join(os.environ['STAGING_INSTALL_PREFIX'], "include")
 +FREETYPE_ROOT = lib_include
+ HARFBUZZ_ROOT = None
+ FRIBIDI_ROOT = None
  IMAGEQUANT_ROOT = None
  JPEG2K_ROOT = None
 -JPEG_ROOT = None
@@ -17,10 +19,10 @@
  TIFF_ROOT = None
 -ZLIB_ROOT = None
 +ZLIB_ROOT = lib_include
+ FUZZING_BUILD = "LIB_FUZZING_ENGINE" in os.environ
  
- 
- if sys.platform == "win32" and sys.version_info >= (3, 9):
-@@ -508,13 +509,8 @@
+ if sys.platform == "win32" and sys.version_info >= (3, 10):
+@@ -574,13 +575,8 @@
  
          # standard locations
          if not self.disable_platform_guessing:
@@ -35,4 +37,4 @@
 +            _add_directory(include_dirs, os.environ['STAGING_INSTALL_PREFIX'] + "/include")
  
          if sys.platform == "win32":
-             if PLATFORM_MINGW:
+             # on Windows, look for the OpenJPEG libraries in the location that
