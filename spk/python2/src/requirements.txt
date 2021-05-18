@@ -9,7 +9,7 @@
 #pyaudio==0.2.9
 #pycrypto==2.6.1
 #pycurl==7.43.0
-#PyYAML==5.3
+#PyYAML==5.4.1
 #pyzmq==16.0.2
 #uwsgi==2.0.14
 #pycparser==2.19
@@ -21,7 +21,7 @@ pymongo==3.10.1
 sqlalchemy==1.3.17
 
 # General support
-six==1.15.0
+six==1.16.0
 virtualenv==16.7.10
 
 # Cheetah and dependencies
@@ -36,7 +36,7 @@ pyOpenSSL==19.1.0
 pyasn1==0.4.8
 asn1crypto==1.3.0
 enum34==1.1.10
-idna==2.9
+idna==2.10
 ipaddress==1.0.23
 typing==3.7.4.1
 
@@ -46,14 +46,14 @@ zope.interface==5.1.0
 Automat==20.2.0
 constantly==15.1.0
 hyperlink==19.0.0
-attrs==19.3.0
+attrs==21.2.0
 incremental==17.5.0
 
 # Requests and dependencies
 # Always get latest certificates!
 requests==2.23.0
-urllib3==1.25.9
-chardet==3.0.4
+urllib3==1.26.4
+chardet==4.0.0
 certifi
 
 # pillow dependencies
