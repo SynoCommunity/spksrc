@@ -8,7 +8,7 @@ f = os.popen('/usr/syno/synoman/webman/modules/authenticate.cgi','r')
 user = f.read()
 
 if len(user)>0:
-    print("User authenticated : "+user)
+    print("Security : user authenticated "+user)
 else:
-    print ("No user authenticated")
+    print ("Security : no user authenticated")
 

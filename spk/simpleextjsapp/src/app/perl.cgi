@@ -6,11 +6,11 @@ $user =  `/usr/syno/synoman/webman/modules/authenticate.cgi`;
 
 if ($user eq "")
 {
-  print "User not authenticated\n";
+  print "Security : user not authenticated\n";
 }
 else
 {
-  print "User authenticated : $user\n";
+  print "Security : user authenticated $user\n";
 }
 
 

@@ -1,6 +1,6 @@
 SPK_NAME = simpleextjsapp
-SPK_VERS = 0.4
-SPK_REV = 4
+SPK_VERS = 0.5
+SPK_REV = 5
 SPK_ICON = src/simpleextjsapp.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -34,9 +34,13 @@ simpleextjsapp_extra_install:
 	install -m 755 src/app/python.cgi $(STAGING_DIR)/app/python.cgi
 	install -m 755 src/app/bash.cgi $(STAGING_DIR)/app/bash.cgi
 	install -m 755 src/app/externalapi.cgi $(STAGING_DIR)/app/externalapi.cgi
+	install -m 755 src/app/storepythonsqlapi.cgi $(STAGING_DIR)/app/storepythonsqlapi.cgi
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/simpleextjsapp.js $(STAGING_DIR)/app/simpleextjsapp.js
 	install -m 644 src/app/helptoc.conf $(STAGING_DIR)/app/helptoc.conf
+	install -m 755 src/app/createsqlitedata.sql $(STAGING_DIR)/app/createsqlitedata.sql
+	install -m 755 src/app/storepythonsynoapi.cgi $(STAGING_DIR)/app/storepythonsynoapi.cgi
+	install -m 755 src/app/storebashratesapi.cgi $(STAGING_DIR)/app/storebashratesapi.cgi
 	install -m 755 -d $(STAGING_DIR)/app/help
 	for language in enu fre; do \
 		install -m 755 -d $(STAGING_DIR)/app/help/$${language}; \
