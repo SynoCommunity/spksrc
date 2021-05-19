@@ -17,11 +17,11 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
         "subitems": [{
             "key": "zap2it_CAN",
             "desc": "Canada",
-            "defaultValue": "${CAN}"
+            "defaultValue": "${ZAP2IT_CAN}"
         },{
             "key": "zap2it_US",
             "desc": "United States",
-            "defaultValue": "${US}"
+            "defaultValue": "${ZAP2IT_US}"
         }]
     },{
         "type": "textfield",
@@ -29,7 +29,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
             "key": "zap2it_code",
             "desc": "Postal or ZIP code",
             "emptyText": "90210 or J9J1Z1",
-            "defaultValue": "${CODE}",
+            "defaultValue": "${ZAP2IT_CODE}",
             "validator": {
                 "vtype": "alphanum",
                 "regex": {
@@ -42,7 +42,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
         "subitems": [{
             "key": "zap2it_days",
             "desc": "TV Guide Numbers of days (max. 14)",
-            "defaultValue": "${DAYS}",
+            "defaultValue": "${ZAP2IT_DAYS}",
             "validator": {
                 "vtype": "alphanum",
                 "regex": {
@@ -60,7 +60,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
             "key": "zap2it_user",
             "desc": "Username",
             "emptyText": "abc@xyz.com",
-            "defaultValue": "${USER}",
+            "defaultValue": "${ZAP2IT_USER}",
             "validator": {
                 "vtype": "email"
             }
@@ -70,8 +70,9 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
         "desc": " ",
         "subitems": [{
             "key": "zap2it_password",
-            "desc": "Password"
-            "defaultValue": "${PASSWD}",
+            "desc": "Password",
+            "emptyText": "(leave blank to keep existing password)",
+            "defaultValue": ""
         }]
     }]
 }]
