@@ -1,0 +1,212 @@
+# avoid  errors like: declaration of 'syslog' shadows a global declaration
+# patch is required for ARMv5 and OLD_PPC_ARCHS only, but does
+# not harm other archives.
+# 
+--- src/inotifywait.c.orig	2020-11-13 10:52:25.000000000 +0000
++++ src/inotifywait.c	2021-05-22 23:03:20.266454222 +0000
+@@ -33,8 +33,8 @@
+ 
+ // METHODS
+ bool parse_opts(int *argc, char ***argv, int *events, bool *monitor, int *quiet,
+-                long int *timeout, int *recursive, bool *csv, bool *daemon,
+-                bool *syslog, bool *no_dereference, char **format,
++                long int *timeout, int *recursive, bool *csv, bool *do_daemon,
++                bool *use_syslog, bool *no_dereference, char **format,
+                 char **timefmt, char **fromfile, char **outfile,
+                 char **exc_regex, char **exc_iregex, char **inc_regex,
+                 char **inc_iregex, bool *no_newline);
+@@ -116,10 +116,10 @@
+     printf("\n");
+ }
+ 
+-void output_error(bool syslog, char *fmt, ...) {
++void output_error(bool use_syslog, char *fmt, ...) {
+     va_list va;
+     va_start(va, fmt);
+-    if (syslog) {
++    if (use_syslog) {
+         vsyslog(LOG_INFO, fmt, va);
+     } else {
+         vfprintf(stderr, fmt, va);
+@@ -135,8 +135,8 @@
+     long int timeout = BLOCKING_TIMEOUT;
+     int recursive = 0;
+     bool csv = false;
+-    bool dodaemon = false;
+-    bool syslog = false;
++    bool do_daemon = false;
++    bool use_syslog = false;
+     bool no_dereference = false;
+     char *format = NULL;
+     char *timefmt = NULL;
+@@ -151,7 +151,7 @@
+ 
+     // Parse commandline options, aborting if something goes wrong
+     if (!parse_opts(&argc, &argv, &events, &monitor, &quiet, &timeout,
+-                    &recursive, &csv, &dodaemon, &syslog, &no_dereference,
++                    &recursive, &csv, &do_daemon, &use_syslog, &no_dereference,
+                     &format, &timefmt, &fromfile, &outfile, &exc_regex,
+                     &exc_iregex, &inc_regex, &inc_iregex, &no_newline)) {
+         return EXIT_FAILURE;
+@@ -205,7 +205,7 @@
+     }
+ 
+     // Daemonize - BSD double-fork approach
+-    if (dodaemon) {
++    if (do_daemon) {
+         // Absolute path for outfile before entering the child.
+         char *logfile = calloc(PATH_MAX + 1, sizeof(char));
+         if (realpath(outfile, logfile) == NULL) {
+@@ -285,16 +285,16 @@
+         }
+     }
+ 
+-    if (syslog) {
++    if (use_syslog) {
+         openlog("inotifywait", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_DAEMON);
+     }
+ 
+     if (!quiet) {
+         if (recursive) {
+-            output_error(syslog, "Setting up watches.  Beware: since -r "
++            output_error(use_syslog, "Setting up watches.  Beware: since -r "
+                                  "was given, this may take a while!\n");
+         } else {
+-            output_error(syslog, "Setting up watches.\n");
++            output_error(use_syslog, "Setting up watches.\n");
+         }
+     }
+ 
+@@ -306,16 +306,16 @@
+                  this_file, events, list.exclude_files)) ||
+             (!recursive && !inotifytools_watch_file(this_file, events))) {
+             if (inotifytools_error() == ENOSPC) {
+-                output_error(syslog,
++                output_error(use_syslog,
+                              "Failed to watch %s; upper limit on inotify "
+                              "watches reached!\n",
+                              this_file);
+-                output_error(syslog,
++                output_error(use_syslog,
+                              "Please increase the amount of inotify watches "
+                              "allowed per user via `/proc/sys/fs/inotify/"
+                              "max_user_watches'.\n");
+             } else {
+-                output_error(syslog, "Couldn't watch %s: %s\n", this_file,
++                output_error(use_syslog, "Couldn't watch %s: %s\n", this_file,
+                              strerror(inotifytools_error()));
+             }
+             return EXIT_FAILURE;
+@@ -323,7 +323,7 @@
+     }
+ 
+     if (!quiet) {
+-        output_error(syslog, "Watches established.\n");
++        output_error(use_syslog, "Watches established.\n");
+     }
+ 
+     // Now wait till we get event
+@@ -336,7 +336,7 @@
+             if (!inotifytools_error()) {
+                 return EXIT_TIMEOUT;
+             } else {
+-                output_error(syslog, "%s\n", strerror(inotifytools_error()));
++                output_error(use_syslog, "%s\n", strerror(inotifytools_error()));
+                 return EXIT_FAILURE;
+             }
+         }
+@@ -355,7 +355,7 @@
+         // moved_from file must have been moved outside of tree - so unwatch it.
+         if (moved_from && !(event->mask & IN_MOVED_TO)) {
+             if (!inotifytools_remove_watch_by_filename(moved_from)) {
+-                output_error(syslog, "Error removing watch on %s: %s\n",
++                output_error(use_syslog, "Error removing watch on %s: %s\n",
+                              moved_from, strerror(inotifytools_error()));
+             }
+             free(moved_from);
+@@ -374,7 +374,7 @@
+ 
+                 if (isdir(new_file) &&
+                     !inotifytools_watch_recursively(new_file, events)) {
+-                    output_error(syslog,
++                    output_error(use_syslog,
+                                  "Couldn't watch new directory %s: %s\n",
+                                  new_file, strerror(inotifytools_error()));
+                 }
+@@ -417,8 +417,8 @@
+ }
+ 
+ bool parse_opts(int *argc, char ***argv, int *events, bool *monitor, int *quiet,
+-                long int *timeout, int *recursive, bool *csv, bool *daemon,
+-                bool *syslog, bool *no_dereference, char **format,
++                long int *timeout, int *recursive, bool *csv, bool *do_daemon,
++                bool *use_syslog, bool *no_dereference, char **format,
+                 char **timefmt, char **fromfile, char **outfile,
+                 char **exc_regex, char **exc_iregex, char **inc_regex,
+                 char **inc_iregex, bool *no_newline) {
+@@ -429,8 +429,8 @@
+     assert(quiet);
+     assert(timeout);
+     assert(csv);
+-    assert(daemon);
+-    assert(syslog);
++    assert(do_daemon);
++    assert(use_syslog);
+     assert(no_dereference);
+     assert(format);
+     assert(timefmt);
+@@ -519,14 +519,14 @@
+ 
+         // --daemon or -d
+         case 'd':
+-            (*daemon) = true;
++            (*do_daemon) = true;
+             (*monitor) = true;
+-            (*syslog) = true;
++            (*use_syslog) = true;
+             break;
+ 
+         // --syslog or -s
+         case 's':
+-            (*syslog) = true;
++            (*use_syslog) = true;
+             break;
+ 
+         // --no-dereference or -P
+@@ -673,7 +673,7 @@
+         return false;
+     }
+ 
+-    if (*daemon && *outfile == NULL) {
++    if (*do_daemon && *outfile == NULL) {
+         fprintf(stderr, "-o must be specified with -d.\n");
+         return false;
+     }
+
+--- src/inotifywatch.c.orig	2020-11-13 10:52:25.000000000 +0000
++++ src/inotifywatch.c	2021-05-22 22:56:53.967470971 +0000
+@@ -37,7 +37,7 @@
+ 
+ static bool done;
+ 
+-void handle_impatient_user(int signal __attribute__((unused))) {
++void handle_impatient_user(int signal_type __attribute__((unused))) {
+     static int times_called = 0;
+     if (times_called) {
+         fprintf(stderr, "No statistics collected, asked to abort before all "
+@@ -52,13 +52,13 @@
+     ++times_called;
+ }
+ 
+-void handle_signal(int signal __attribute__((unused))) {
++void handle_signal(int signal_type __attribute__((unused))) {
+     done = true;
+ }
+ 
+ int print_info();
+ 
+-void print_info_now(int signal __attribute__((unused))) {
++void print_info_now(int signal_type __attribute__((unused))) {
+     print_info();
+     printf("\n");
+ }
