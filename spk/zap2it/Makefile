@@ -1,5 +1,5 @@
 SPK_NAME = zap2it
-SPK_VERS = 20210504
+SPK_VERS = 20210519
 SPK_REV = 1
 SPK_ICON = src/zap2it.png
 DSM_UI_DIR = app

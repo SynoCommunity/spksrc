@@ -1,5 +1,5 @@
 PKG_NAME = zap2it
-PKG_VERS = 20210504
+PKG_VERS = 20210519
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/daniel-widrick/zap2it-GuideScraping/archive
