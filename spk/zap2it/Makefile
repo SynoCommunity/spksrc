@@ -10,7 +10,6 @@ SPK_DEPENDS = "python3>=3.7.7-15"
 MAINTAINER = th0ma7
 DESCRIPTION = Takes TV listings from zap2it and convert them to XMLTV for use with applications such as Jellyfin / Emby / TVheadEnd
 DESCRIPTION_FRE = Prend la programmation télé de zap2it et la convertis en XMLTV pour une utilisation avec des applications telles que Jellyfin / Emby / TVheadEnd
-RELOAD_UI = no
 DISPLAY_NAME = zap2it XMLTV Scrapper
 CHANGELOG = "Initial package"
 
