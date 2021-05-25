@@ -1,11 +1,12 @@
 SPK_NAME = synocli-net
-SPK_VERS = 1.5
+SPK_VERS = 1.6
 SPK_REV = 9
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
 DEPENDS += cross/rsync cross/autossh cross/arp-scan
 DEPENDS += cross/mtr
+DEPENDS += cross/etherwake
 
 OPTIONAL_DEPENDS = cross/sshfs cross/fritzctl cross/ser2net
 
@@ -25,10 +26,10 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", sshfs, ser2net"
 endif
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, sshfs, rsync, autossh$(OPTIONAL_DESC).<br/>Credits to Sebastian Schmidt \(publicarray\) for icons."
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, sshfs, rsync, autossh, etherwake$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update tmux to version 3.1c without utf-8 wrapper.<br/>2. Add mtr (My traceroute)."
+CHANGELOG = "1. Update tmux to version 3.1c without utf-8 wrapper.<br/>2. Add mtr (My traceroute).<br/>3. Add etherwake."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -49,5 +50,6 @@ SPK_COMMANDS += libexec/sftp-server libexec/ssh-keysign libexec/ssh-pkcs11-helpe
 SPK_COMMANDS += sbin/sshd
 SPK_COMMANDS += sbin/ser2net
 SPK_COMMANDS += sbin/mtr sbin/mtr-packet
+SPK_COMMANDS += bin/etherwake
 
 include ../../mk/spksrc.spk.mk
