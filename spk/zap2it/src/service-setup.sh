@@ -52,7 +52,12 @@ service_postinst ()
 {
     # Create cache directory if it does not exist
     echo "Create cache directory if it does not exist (${ZAP2IT_CACHE})"
-    mkdir -p --mode=0755 ${ZAP2IT_CACHE}
+    if [ ! -d ${ZAP2IT_CACHE} ]; then
+        mkdir --mode=0755 ${ZAP2IT_CACHE} && echo "cache directory created" || "error creating cache directory"
+    else
+        echo "cache directory already exists"
+    fi
+        
     # For backwards compatibility, set ownership of package system directories
     if [ $SYNOPKG_DSM_VERSION_MAJOR == 6 ]; then
         echo "Set unix permissions on configuration directory"
