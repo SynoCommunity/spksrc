@@ -52,14 +52,15 @@ service_msg_target:
 
 pre_service_target: service_msg_target
 
-# auto uses SPK_NAME
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# always use SPK_USER on DSM >= 7, not only when SERVICE_USER is defined
+SPK_USER = $(SPK_NAME)
+else
+# SERVICE_USER=auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
 SPK_USER = $(SPK_NAME)
 else ifneq ($(strip $(SERVICE_USER)),)
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# always use SPK_USER on DSM >= 7
-SPK_USER = $(SPK_NAME)
-else
+$(warning Only 'SERVICE_USER=auto' is compatible with DSM7)
 SPK_USER = $(SERVICE_USER)
 endif
 endif
@@ -85,7 +86,7 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo '  exit 1' >> $@
 	@echo 'fi' >> $@
 	@echo '' >> $@
-ifneq ($(strip $(SPK_USER)),)
+ifneq ($(strip $(SERVICE_USER)),)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo USER=\"sc-$(SPK_USER)\" >> $@
 	@echo EFF_USER=\"sc-$(SPK_USER)\" >> $@
@@ -277,7 +278,7 @@ SPK_CONTENT += conf
 endif
 
 # DSM <= 6 and SERVICE_USER defined
-else ifneq ($(strip $(SPK_USER)),)
+else ifneq ($(strip $(SERVICE_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 	@$(dsm_script_copy)
