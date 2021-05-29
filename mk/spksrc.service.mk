@@ -86,11 +86,12 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo 'fi' >> $@
 	@echo '' >> $@
 ifneq ($(strip $(SPK_USER)),)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@echo USER=\"sc-$(SPK_USER)\" >> $@
+	@echo EFF_USER=\"sc-$(SPK_USER)\" >> $@
+else
 	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
 	@echo USER=\"$(SPK_USER)\" >> $@
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo EFF_USER=\"$(SPK_USER)\" >> $@
-else
 	@echo "PRIV_PREFIX=sc-" >> $@
 	@echo "SYNOUSER_PREFIX=svc-" >> $@
 	@echo 'if [ -n "$${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "$${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
