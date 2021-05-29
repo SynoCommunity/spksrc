@@ -103,7 +103,7 @@ save_wizard_variables ()
     if [ -n "${SHARE_PATH}" ]; then
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
     fi
-    # Restriction permissions to protect sensitive options
+    # Restrict permissions to protect sensitive options
     if [ -e "${INST_VARIABLES}" ]; then
         chmod go-rwx ${INST_VARIABLES}
         chown ${EFF_USER} ${INST_VARIABLES}
