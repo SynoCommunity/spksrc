@@ -4,7 +4,9 @@
 #   scripts/start-stop-status
 #   scripts/service-setup
 #   conf/privilege        if SERVICE_USER or DSM7
-#   conf/SPK_NAME.sc      if SERVICE_PORT
+#   conf/SPK_NAME.sc      if SERVICE_PORT and DSM<7
+#   conf/resource         if DSM7
+#   app/SPK_NAME.sc       if SERVICE_PORT and DSM7
 #   app/config            if DSM_UI_DIR
 #
 # Target are executed in the following order:
@@ -146,7 +148,6 @@ endif
 # Define resources for
 # - firewall rules/port definitions (DSM >= 6.0-5936)
 # - usr local links (DSM >= 6.0-5941)
-# - SERVICE_WIZARD_SHARE (DSM >= 6.0-5914)
 # for DSM<6.0 link creation is provided by spksrc.service.create_links
 # and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
@@ -173,8 +174,10 @@ ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
+endif
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
