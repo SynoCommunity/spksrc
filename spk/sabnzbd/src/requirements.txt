@@ -9,9 +9,9 @@ jaraco.classes==3.2.1
 jaraco.collections==3.3.0
 jaraco.functools==3.3.0
 jaraco.text==3.5.0
-more-itertools==8.7.0
+more-itertools==8.8.0
 portend==2.7.1
 pytz==2021.1
 sabyenc3==4.0.2
-tempora==4.0.1
+tempora==4.0.2
 zc.lockfile==2.0
