@@ -172,12 +172,10 @@ ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
 		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ 1<>$@
 endif
-ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
+ifneq ($(strip $(SERVICE_WIZARD_SHARE_NAME)),)
+# e.g. SERVICE_WIZARD_SHARE_NAME=wizard_share_name
+	@jq --arg share "{{${SERVICE_WIZARD_SHARE_NAME}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
-endif
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
