@@ -22,6 +22,9 @@ SERVICE_PORT = 8092
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
+WIZARDS_DIR = src/wizard
+SERVICE_WIZARD_SHARE_NAME = wizard_share_folder_name
+
 POST_STRIP_TARGET = kiwix_extra_install
 
 SPK_COMMANDS = bin/kiwix-manage bin/kiwix-read bin/kiwix-search bin/kiwix-serve
