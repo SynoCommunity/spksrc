@@ -12,7 +12,7 @@ Flask==1.1.2
 guessit==0.9.4
 html5lib==1.1
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 pbr==5.5.1
 pyextdirect==0.3.1
 pysrt==1.1.2
