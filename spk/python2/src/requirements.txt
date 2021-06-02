@@ -52,7 +52,7 @@ incremental==17.5.0
 # Requests and dependencies
 # Always get latest certificates!
 requests==2.23.0
-urllib3==1.26.4
+urllib3==1.26.5
 chardet==4.0.0
 certifi
 
