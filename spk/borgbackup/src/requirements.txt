@@ -11,4 +11,4 @@ requests==2.25.1
 #ruamel.yaml==0.17.4
 ruamel.yaml.clib==0.2.2
 six==1.16.0
-urllib3==1.26.4
+urllib3==1.26.5
