@@ -1,7 +1,7 @@
 DSM 7
 =====
 
-PLEASE consider: DSM 7 is not officially released yet. The beta release is available since December 08 2020 and there will (hopefully) be a Release Candidate (RC 1) in the near future. We expect an official Release of DSM 7 by Synology later in 2021 (be not surprised when DSM 7 is not officially released before summer 2021).
+PLEASE consider: DSM 7 is not officially released yet. The beta release is available since December 08 2020 and a Release Candidate (DSM 7.0-41882) was created on June 01 2021. We expect an official Release of DSM 7 by Synology later in 2021.
 
 In SynoCommunity only few DSM 7 compatible packages released yet.
 ---------------------------------------------------------------------
