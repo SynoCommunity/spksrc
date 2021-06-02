@@ -58,7 +58,7 @@ tempora==4.0.2
 terminaltables==3.1.0
 typing-extensions==3.7.4.3
 tzlocal==2.1
-urllib3==1.26.4
+urllib3==1.26.5
 webencodings==0.5.1
 werkzeug==1.0.1
 zc.lockfile==2.0
