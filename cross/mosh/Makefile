@@ -14,6 +14,7 @@ LICENSE  = GPLv3+
 GNU_CONFIGURE = 1
 # avoid warning: _FORTIFY_SOURCE requires compiling with optimization (-O)
 ADDITIONAL_CPPFLAGS = -O2
+CONFIGURE_ARGS += --with-utempter
 
 include ../../mk/spksrc.cross-cc.mk
 
