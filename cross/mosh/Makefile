@@ -12,6 +12,7 @@ COMMENT  = Mosh: the mobile shell
 LICENSE  = GPLv3+
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS += --with-utempter
 
 include ../../mk/spksrc.cross-cc.mk
 
