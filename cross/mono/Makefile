@@ -1,6 +1,6 @@
 PKG_NAME = mono
-PKG_VERS = 5.20.1.34
-PKG_EXT = tar.bz2
+PKG_VERS = 6.12.0.122
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -25,7 +25,7 @@ CONFIGURE_ARGS = --disable-mcs-build
 # patches/001-add-boringssl-alignas-support.patch adds the necessary compatibility
 CONFIGURE_ARGS += --enable-btls
 # Optimize compilation for size
-ADDITIONAL_CFLAGS = -Os
+ADDITIONAL_CFLAGS = -Os -I./libatomic_ops/src
 
 include ../../mk/spksrc.cross-cc.mk
 
