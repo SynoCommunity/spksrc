@@ -1,0 +1,2 @@
+bin:bin/gerrit.war
+lib:lib/bc*.jar
