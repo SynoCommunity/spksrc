@@ -6,7 +6,8 @@ PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NA
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
 # for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python2 must appear before cross/boost
-DEPENDS = cross/python2 cross/boost cross/geoip cross/libiconv cross/openssl
+BUILD_DEPENDS = cross/python2 
+DEPENDS = cross/boost cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
