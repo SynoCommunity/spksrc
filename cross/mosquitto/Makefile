@@ -7,7 +7,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/c-ares cross/openssl cross/util-linux cross/libwebsockets
 
-
 HOMEPAGE = https://www.mosquitto.org/
 COMMENT  = Mosquitto is an open source message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
 LICENSE  = EPL 1.0 and EDL 1.0
