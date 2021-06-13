@@ -1,0 +1,5 @@
+bin:bin/MinOZW
+rsc:bin/ozw_config
+rsc:etc/openzwave/
+lnk:lib/libopenzwave.so
+lib:lib/libopenzwave.so.1.6
