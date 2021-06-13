@@ -8,7 +8,7 @@ In SynoCommunity only few DSM 7 compatible packages released yet.
 
 * Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, most of the packages are not compatible with DSM 7.
 * PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7.
-* All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges".
+* All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
 * We have the framework part of the DSM 7 branch merged and the issue `#4524`_ created that gives an overview of the packages, whether available for DSM 7 or not.
 * We also have started to publish some packages for DSM 7. Please regard those as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
 * If you want to try preview versions of packages for DSM 7 that are built on the master branch, you can find artifacts of the related github actions for manual download and installation (all artifacts are packed into one zip archive).
