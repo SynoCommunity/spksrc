@@ -15,7 +15,7 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 # Use native cmake
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
-  DEPENDS += native/cmake
+  BUILD_DEPENDS += native/cmake
   CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
 endif
