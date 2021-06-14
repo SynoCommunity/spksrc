@@ -1,5 +1,5 @@
 SPK_NAME = synocli-net
-SPK_VERS = 1.6
+SPK_VERS = 2.0
 SPK_REV = 10
 SPK_ICON = src/synocli-net.png
 
