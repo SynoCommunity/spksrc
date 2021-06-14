@@ -1,0 +1,7 @@
+{
+	"defaults":{
+		"run-as": "package"
+	},
+	"username": "sc-domoticz",
+	"group": "sc-domoticz"
+}

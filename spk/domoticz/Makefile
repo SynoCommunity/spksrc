@@ -19,6 +19,7 @@ HOMEPAGE = https://www.domoticz.com/
 LICENSE  = GPLv3
 
 STARTABLE = yes
+CONF_DIR = src/conf
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8084
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
