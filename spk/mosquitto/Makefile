@@ -33,3 +33,6 @@ include ../../mk/spksrc.spk.mk
 mosquitto_extra_install:
 	install -d $(STAGING_DIR)/var
 	install -m 644 src/mosquitto.conf $(STAGING_DIR)/var/mosquitto.conf
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	sed -e 's|mosquitto/target/var/|mosquitto/var/|g' -i $(STAGING_DIR)/var/mosquitto.conf
+endif
