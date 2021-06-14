@@ -1,6 +1,9 @@
 # Package specific behaviors
 # Sourced script by generic installer and start-stop-status scripts
 
+# Add ffmpeg and ifself to path
+PATH="${SYNOPKG_PKGDEST}/bin:/var/packages/ffmpeg/target/bin:${PATH}"
+
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
 HTTP=9981
 HTSP=9982
