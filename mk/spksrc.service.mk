@@ -52,14 +52,17 @@ service_msg_target:
 
 pre_service_target: service_msg_target
 
-# auto uses SPK_NAME
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# always use SPK_USER on DSM >= 7, not only when SERVICE_USER is defined
+SPK_USER = $(SPK_NAME)
+else
+# SERVICE_USER=auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
 SPK_USER = $(SPK_NAME)
 else ifneq ($(strip $(SERVICE_USER)),)
+$(warning Only 'SERVICE_USER=auto' is compatible with DSM7)
 SPK_USER = $(SERVICE_USER)
-# else always enforce setting SPK_USER on DSM >= 7
-else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-SPK_USER = $(SPK_NAME)
+endif
 endif
 
 # Recommend explicit STARTABLE=no
@@ -83,49 +86,61 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo '  exit 1' >> $@
 	@echo 'fi' >> $@
 	@echo '' >> $@
-ifneq ($(strip $(SPK_USER)),)
+ifneq ($(strip $(SERVICE_USER)),)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@echo USER=\"sc-$(SPK_USER)\" >> $@
+	@echo EFF_USER=\"sc-$(SPK_USER)\" >> $@
+else
 	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
 	@echo USER=\"$(SPK_USER)\" >> $@
 	@echo "PRIV_PREFIX=sc-" >> $@
 	@echo "SYNOUSER_PREFIX=svc-" >> $@
 	@echo 'if [ -n "$${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "$${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
 endif
+	@echo '' >> $@
+endif
 ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo "# Group name from UI if provided" >> $@
 	@echo 'if [ -n "$${$(SERVICE_WIZARD_GROUP)}" ]; then GROUP="$${$(SERVICE_WIZARD_GROUP)}"; fi' >> $@
+	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 	@echo "# Share download location from UI if provided" >> $@
 	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"; fi' >> $@
+	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_PORT)),)
 	@echo "# Service port" >> $@
 	@echo 'SERVICE_PORT="$(SERVICE_PORT)"' >> $@
+	@echo '' >> $@
 endif
 ifneq ($(STARTABLE),no)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo "# define SYNOPKG_PKGVAR for compatibility with DSM7" >> $@
 	@echo 'SYNOPKG_PKGVAR="$${SYNOPKG_PKGDEST}/var"' >> $@
+	@echo '' >> $@
 endif
 	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
 	@echo 'LOG_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.log"' >> $@
+	@echo '' >> $@
 	@echo "# Service command has to deliver its pid into PID_FILE" >> $@
 	@echo 'PID_FILE="$${SYNOPKG_PKGVAR}/$${SYNOPKG_PKGNAME}.pid"' >> $@
+	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_COMMAND)),)
 ifneq ($(strip $(SERVICE_SHELL)),)
 	@echo "# Service shell to run command" >> $@
 	@echo 'SERVICE_SHELL="$(SERVICE_SHELL)"' >> $@
+	@echo '' >> $@
 endif
 	@echo "# Service command to execute (either with shell or as is)" >> $@
 	@echo 'SERVICE_COMMAND="$(SERVICE_COMMAND)"' >> $@
+	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_EXE)),)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo "${RED}ERROR: SERVICE_EXE (start-stop-daemon) is unsupported in DSM7${NC}"
 	@echo "${GREEN}Please migrate to SERVICE_COMMAND=${NC}"
-	@echo "SVC_BACKGROUND=y"
-	@echo "SVC_WRITE_PID=y"
 	@exit 1
 endif
 	@echo "# Service command to execute with start-stop-daemon" >> $@
@@ -133,6 +148,7 @@ endif
 ifneq ($(strip $(SERVICE_OPTIONS)),)
 	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
 endif
+	@echo '' >> $@
 endif
 ifeq ($(strip $(USE_ALTERNATE_TMPDIR)),1)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -262,7 +278,7 @@ SPK_CONTENT += conf
 endif
 
 # DSM <= 6 and SERVICE_USER defined
-else ifneq ($(strip $(SPK_USER)),)
+else ifneq ($(strip $(SERVICE_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 	@$(dsm_script_copy)
