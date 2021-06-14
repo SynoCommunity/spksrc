@@ -40,8 +40,8 @@ CONFIGURE_ARGS += --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),
 
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
-ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
-ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
+ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
 endif
 
 include ../../mk/spksrc.cross-cc.mk
