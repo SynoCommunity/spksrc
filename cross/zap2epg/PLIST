@@ -1,2 +1,2 @@
-bin:bin/zap2it-GuideScrape.py
-rsc:etc/zap2itconfig.ini
+rsc:bin/tv_grab_zap2epg
+rsc:var/epggrab/conf/zap2epg.xml
