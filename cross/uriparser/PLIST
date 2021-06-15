@@ -1,4 +1,4 @@
 bin:bin/uriparse
 lnk:lib/liburiparser.so
 lnk:lib/liburiparser.so.1
-lib:lib/liburiparser.so.1.0.24
+lib:lib/liburiparser.so.1.0.28
