@@ -1,5 +1,6 @@
 PKG_NAME = minio
 PKG_VERS = 2021-06-14T01-29-23Z
+PKG_VERS_TIMESTAMP = 2021-06-14T01:29:23Z
 PKG_EXT = tar.gz
 PKG_DIST_PREFIX = RELEASE.$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_DIST_PREFIX).$(PKG_EXT)
@@ -25,7 +26,7 @@ ENV += GO111MODULE=on
 GO_BUILD_ARGS = -tags kqueue
 
 GO_LDFLAGS  = -s -w
-GO_LDFLAGS += -X github.com/minio/minio/cmd.Version=$(PKG_VERS)
+GO_LDFLAGS += -X github.com/minio/minio/cmd.Version=$(PKG_VERS_TIMESTAMP)
 GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_VERS)
 
 include ../../mk/spksrc.cross-go.mk
