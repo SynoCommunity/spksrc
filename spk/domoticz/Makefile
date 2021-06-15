@@ -19,11 +19,17 @@ HOMEPAGE = https://www.domoticz.com/
 LICENSE  = GPLv3
 
 STARTABLE = yes
-CONF_DIR = src/conf
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8084
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
+SERVICE_USER = auto
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# privilege file for DSM<=6 (use default for DSM >=7)
+CONF_DIR = src/conf
+endif
 
 POST_STRIP_TARGET = domoticz_extra_install
 
