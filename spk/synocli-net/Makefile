@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
-SPK_VERS = 1.6
-SPK_REV = 9
+SPK_VERS = 2.0
+SPK_REV = 10
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
@@ -8,16 +8,11 @@ DEPENDS += cross/rsync cross/autossh cross/arp-scan
 DEPENDS += cross/mtr
 DEPENDS += cross/etherwake
 
-OPTIONAL_DEPENDS = cross/sshfs cross/fritzctl cross/ser2net
+OPTIONAL_DEPENDS = cross/sshfs cross/ser2net
 
 include ../../mk/spksrc.archs.mk
 
 OPTIONAL_DESC =
-
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/fritzctl
-OPTIONAL_DESC := $(OPTIONAL_DESC)", fritzctl"
-endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/ser2net
@@ -29,7 +24,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, sshfs, rsync, autossh, etherwake$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update tmux to version 3.1c without utf-8 wrapper.<br/>2. Add mtr (My traceroute).<br/>3. Add etherwake."
+CHANGELOG = "Remove fritzctl because it is unsupported on golang 1.16."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -42,7 +37,6 @@ SPK_COMMANDS += bin/links
 SPK_COMMANDS += bin/sshfs
 SPK_COMMANDS += bin/fusermount
 SPK_COMMANDS += bin/socat bin/procan bin/filan
-SPK_COMMANDS += bin/fritzctl
 SPK_COMMANDS += bin/rsync
 SPK_COMMANDS += bin/autossh
 SPK_COMMANDS += bin/scp bin/sftp bin/slogin bin/ssh bin/ssh-add bin/ssh-agent bin/ssh-keygen bin/ssh-keyscan
