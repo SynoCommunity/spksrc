@@ -1,0 +1,11 @@
+--- ../rtl8812au-5.6.4.2.orig/Makefile	2021-03-16 23:44:52.178036688 +0000
++++ Makefile	2021-03-16 23:45:45.542495171 +0000
+@@ -5,7 +5,7 @@ EXTRA_CFLAGS += -Wno-unused-variable
+ EXTRA_CFLAGS += -Wno-unused-label
+ #EXTRA_CFLAGS += -Wno-unused-parameter
+ EXTRA_CFLAGS += -Wno-unused-function
+-EXTRA_CFLAGS += -Wimplicit-fallthrough=0
++#EXTRA_CFLAGS += -Wimplicit-fallthrough=0
+ #EXTRA_CFLAGS += -Wno-parentheses-equality
+ #EXTRA_CFLAGS += -Wno-pointer-bool-conversion
+ EXTRA_CFLAGS += -Wno-unknown-pragmas
