@@ -1,3 +1,6 @@
 bin:bin/tvheadend
+rsc:bin/tvhmeta
+rsc:bin/tv_meta_tmdb.py
+rsc:bin/tv_meta_tvdb.py
 rsc:share/tvheadend
 rsc:share/fontconfig
