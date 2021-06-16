@@ -14,7 +14,7 @@ DSM_UI_DIR = app
 export TVH_VERS
 
 DEPENDS = cross/$(SPK_NAME) cross/zap2epg
-WHEELS = requests
+WHEELS = certifi chardet requests urllib3
 SPK_DEPENDS = "python3>=3.7"
 
 MAINTAINER = th0ma7

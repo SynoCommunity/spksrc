@@ -2,7 +2,12 @@
 # Sourced script by generic installer and start-stop-status scripts
 
 # Add ffmpeg and ifself to path
-PATH="${SYNOPKG_PKGDEST}/bin:/var/packages/ffmpeg/target/bin:${PATH}"
+PYTHON_DIR="/var/packages/python38/target"
+PYTHONENV="${SYNOPKG_PKGDEST}/env"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+WHEELHOUSE=${SYNOPKG_PKGDEST}/share/wheelhouse
+FFMPEG_DIR="/usr/local/ffmpeg"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${FFMPEG_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
 HTTP=9981
@@ -24,6 +29,18 @@ service_postinst ()
 
     # Edit the password configuration according to the wizard
     sed -i -e "s/@password@/${wizard_password}/g" ${SYNOPKG_PKGVAR}/passwd/a927e30a755504f9784f23a4efac5109
+
+    # EPG Grabber (zap2epg) - Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${PYTHONENV} >> ${INST_LOG}
+
+    # EPG Grabber (zap2epg) - Install the wheels/requirements
+    ${SYNOPKG_PKGDEST}/env/bin/pip install \
+             --no-deps --no-index --no-input --upgrade \
+             --force-reinstall --find-links \
+             ${WHEELHOUSE} ${WHEELHOUSE}/*.whl >> ${INST_LOG}  2>&1
+
+    # EPG Grabber (zap2epg) - Adjust permissions
+    set_unix_permissions "${PYTHONENV}"
 }
 
 service_preupgrade ()
