@@ -6,7 +6,7 @@ PYTHON_DIR="/var/packages/python38/target"
 PYTHONENV="${SYNOPKG_PKGDEST}/env"
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 WHEELHOUSE=${SYNOPKG_PKGDEST}/share/wheelhouse
-FFMPEG_DIR="/usr/local/ffmpeg"
+FFMPEG_DIR="/var/packages/ffmpeg/target"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${FFMPEG_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
