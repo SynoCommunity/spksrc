@@ -38,9 +38,6 @@ service_postinst ()
              --no-deps --no-index --no-input --upgrade \
              --force-reinstall --find-links \
              ${WHEELHOUSE} ${WHEELHOUSE}/*.whl
-
-    # EPG Grabber (zap2epg) - Adjust permissions
-    set_unix_permissions "${PYTHONENV}"
 }
 
 service_preupgrade ()
