@@ -15,7 +15,7 @@ export TVH_VERS
 
 DEPENDS = cross/$(SPK_NAME) cross/zap2epg
 WHEELS = certifi chardet requests urllib3
-SPK_DEPENDS = "python3>=3.7"
+SPK_DEPENDS = "python38"
 
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
