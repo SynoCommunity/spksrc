@@ -31,13 +31,13 @@ service_postinst ()
     sed -i -e "s/@password@/${wizard_password}/g" ${SYNOPKG_PKGVAR}/passwd/a927e30a755504f9784f23a4efac5109
 
     # EPG Grabber (zap2epg) - Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${PYTHONENV} >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${PYTHONENV}
 
     # EPG Grabber (zap2epg) - Install the wheels/requirements
     ${SYNOPKG_PKGDEST}/env/bin/pip install \
              --no-deps --no-index --no-input --upgrade \
              --force-reinstall --find-links \
-             ${WHEELHOUSE} ${WHEELHOUSE}/*.whl >> ${INST_LOG}  2>&1
+             ${WHEELHOUSE} ${WHEELHOUSE}/*.whl
 
     # EPG Grabber (zap2epg) - Adjust permissions
     set_unix_permissions "${PYTHONENV}"
