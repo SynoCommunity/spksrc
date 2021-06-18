@@ -1,5 +1,5 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.3.0
+SPK_VERS = 3.3.1
 SPK_REV = 49
 SPK_ICON = src/sabnzbd.png
 
@@ -17,7 +17,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.3.0. Update Unrar to 6.0.1."
+CHANGELOG = "Update SABnzbd to 3.3.1. Update Unrar to 6.0.1."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
