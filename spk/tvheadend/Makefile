@@ -13,7 +13,7 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-DEPENDS = cross/$(SPK_NAME) cross/zap2epg
+DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python38"
 
