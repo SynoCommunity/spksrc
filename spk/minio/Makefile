@@ -1,6 +1,6 @@
 SPK_NAME = minio
 SPK_VERS = 2021.06.14
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -10,15 +10,14 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
-RELOAD_UI = yes
 DISPLAY_NAME = MinIO
-CHANGELOG = "Major release, multiple feature and bugfix releases."
+CHANGELOG = "Update to MinIO 2021-06-14T01:29:23Z. Major release, multiple feature and bugfix releases."
 HOMEPAGE = https://min.io/
-LICENSE = Apache License 2.0
-STARTABLE = yes
+LICENSE = AGPLv3.0
 
 WIZARDS_DIR = src/wizard/
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9000
