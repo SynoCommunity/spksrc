@@ -13,6 +13,13 @@ CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
+# Use native cmake
+ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
+  BUILD_DEPENDS += native/cmake
+  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
+  ENV += PATH=$(CMAKE_PATH):$$PATH
+endif
+
 # set default ASM build environment
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
@@ -25,12 +32,12 @@ else
   CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
-# set default build directory
+# set default use destdir
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),)
   CMAKE_USE_DESTDIR = 1
 endif
 
-# set default build directory
+# set default destdir directory
 ifeq ($(strip $(CMAKE_DESTDIR)),)
   CMAKE_DESTDIR = $(INSTALL_DIR)
 endif
@@ -54,7 +61,7 @@ ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_C_FLAGS=-mcpu=8548 -mhard-float -mfloat-gprs=double
+  CMAKE_ARGS += -DCMAKE_C_FLAGS="-mcpu=8548 -mhard-float -mfloat-gprs=double"
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

@@ -1,0 +1,16 @@
+# Set place holders vor version an year, as the build process fails to read this from History.txt
+# Remove display of git hash in version, as we build from source outside a git repository,
+# display build date and synocommunity specific information instead.
+--- main/domoticz.cpp.orig	2020-04-26 15:49:25.000000000 +0200
++++ main/domoticz.cpp	2021-06-13 01:16:59.799865857 +0200
+@@ -685,8 +685,8 @@
+ 
+ void DisplayAppVersion()
+ {
+-	_log.Log(LOG_STATUS, "Domoticz V%s (c)2012-%d GizMoCuz", szAppVersion.c_str(), ActYear);
+-	_log.Log(LOG_STATUS, "Build Hash: %s, Date: %s", szAppHash.c_str(), szAppDate.c_str());
++	_log.Log(LOG_STATUS, "Domoticz V@_version_@ (c)2012-@_year_@ GizMoCuz");
++	_log.Log(LOG_STATUS, "Built by SynoCommunity for synology NAS devices. Date: @_date_@");
+ }
+ 
+ time_t m_LastHeartbeat = 0;
