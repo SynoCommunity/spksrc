@@ -4,6 +4,8 @@ SPK_REV = 36
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update Intel libva to version 2.10 and media drivers 2020Q4<br/>2. Multiple depedency updates (libass, SVT-AV1, libaom, x264, libbluray, libvpx)"
 
+CONF_DIR = src/conf
+
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = th0ma7
