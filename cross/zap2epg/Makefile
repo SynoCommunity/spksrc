@@ -13,12 +13,12 @@ HOMEPAGE = https://github.com/edit4ever/script.module.zap2epg
 COMMENT  = zap2epg will generate an xmltv.xml file for USA/Canada TV lineups using zap2it source
 LICENSE  = GPLv3
 
-INSTALL_TARGET = zap2it_install
+INSTALL_TARGET = zap2epg_install
 
 include ../../mk/spksrc.install-resources.mk
 
-.PHONY: zap2it_install
-zap2it_install:
+.PHONY: zap2epg_install
+zap2epg_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/tv_grab_zap2epg $(STAGING_INSTALL_PREFIX)/bin
 	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var/epggrab/conf
