@@ -1,12 +1,11 @@
 PKG_NAME = zap2epg
 PKG_VERS = 3.0
 PKG_EXT = tar.gz
-#PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_NAME = Python3-th0ma7-updates.$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/daniel-widrick/zap2it-GuideScraping/archive
+PKG_GIT_HASH = 65336f7e6d24c32df392aadc0c9140429bbbe1d7
+PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/th0ma7/script.module.zap2epg/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = script.module.zap2epg-Python3-th0ma7-updates
+PKG_DIR = script.module.zap2epg-$(PKG_GIT_HASH)
 
 DEPENDS =
 
