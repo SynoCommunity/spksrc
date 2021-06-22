@@ -17,6 +17,7 @@ LICENSE  = GPL v3
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
+POST_INSTALL_TARGET = tvheadend_post_install
 
 CONFIGURE_ARGS = --enable-imagecache --enable-bundle --enable-trace --release
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
@@ -57,3 +58,9 @@ endif
 tvheadend_pre_configure:
 	# Fix so mkbundle finds the pngquant binary
 	@$(RUN) sed -i.bak "s|^pngquant_bin = '/usr|pngquant_bin = '$(STAGING_INSTALL_PREFIX)|g" support/mkbundle
+
+.PHONY: tvheadend_post_install
+tvheadend_post_install:
+	# Enforce python3
+	@$(RUN) sed -i 's|env python$$|env python3|g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_meta_tmdb.py
+	@$(RUN) sed -i 's|env python$$|env python3|g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/tv_meta_tvdb.py
