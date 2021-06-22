@@ -1,5 +1,5 @@
 PKG_NAME = libhdhomerun
-PKG_VERS = 20200521
+PKG_VERS = 20210224
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.silicondust.com/hdhomerun
