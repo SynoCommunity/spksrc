@@ -1,6 +1,6 @@
 SPK_NAME = comskip
 SPK_VERS = 0.82.010
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/comskip.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ STARTABLE = no
 MAINTAINER = schumi2004
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to ffmpeg 4.3.1"
+CHANGELOG = "1. Update to ffmpeg 4.3.2"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
