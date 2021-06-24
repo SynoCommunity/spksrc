@@ -8,8 +8,6 @@ PKG_DIR = $(PKG_NAME)-master
 
 DEPENDS =
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = dtv_scan_tables_install
 
 HOMEPAGE = https://github.com/crazycat69/dtv-scan-tables
