@@ -40,10 +40,6 @@ service_postinst ()
              ${WHEELHOUSE} ${WHEELHOUSE}/*.whl
 }
 
-service_preupgrade ()
-{
-}
-
 service_postupgrade ()
 {
     # Need to enforce correct permissions for recording directories on upgrades

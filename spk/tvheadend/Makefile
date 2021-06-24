@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 9ed76c0
-SPK_GIT_DATE = 20201011
+SPK_GIT_HASH = eb59284
+SPK_GIT_DATE = 20210612
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 27
+SPK_REV = 28
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-DEPENDS = cross/$(SPK_NAME) cross/zap2epg
+DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python38"
 
@@ -22,7 +22,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 9ed76c0 as of October 11th 2020<br/>2. Update openssl to 1.1"
+CHANGELOG = "1. Update to latest git version eb59284 as of June 12th 2021<br/>2. Update openssl to 1.1<br/>3. Updated to use FFMPEG 4.3.2<br/>4. Updated libhdhomerun to version 20210224"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
