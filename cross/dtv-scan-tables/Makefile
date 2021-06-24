@@ -14,7 +14,7 @@ INSTALL_TARGET = dtv_scan_tables_install
 
 HOMEPAGE = https://github.com/crazycat69/dtv-scan-tables
 COMMENT  = Digital TV scan tables
-LICENSE  = N/A
+LICENSE  = GPLv2
 
 include ../../mk/spksrc.cross-cc.mk
 
