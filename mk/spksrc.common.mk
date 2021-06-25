@@ -37,7 +37,7 @@ include $(LOCAL_CONFIG_MK)
 endif
 
 # Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
-TCVERSION_DUPES = $(addprefix %,$(shell echo "$(AVAILABLE_TCVERSIONS) " | sed 's|.*\<$(DEFAULT_TC)[^.]||g'))
+TCVERSION_DUPES = $(addprefix %,$(filter-out $(DEFAULT_TC),$(AVAILABLE_TCVERSIONS)))
 
 # Archs that are supported by generic archs
 ARCHS_DUPES_DEFAULT = $(addsuffix %,$(ARCHS_WITH_GENERIC_SUPPORT))

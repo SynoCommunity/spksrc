@@ -406,15 +406,18 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
-
+# make all-supported
 ifeq (supported,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = supported
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS))))))
+ALL_ACTION = $(SUPPORTED_ARCHS)
+
+# make all-latest
 else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = latest
 ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS))))))
 endif
 
+# make publish-all-supported | make publish-all-latest
 ifeq (publish,$(subst -all-latest,,$(subst -all-supported,,$(firstword $(MAKECMDGOALS)))))
 PUBLISH = publish-
 .NOTPARALLEL:
@@ -444,19 +447,19 @@ pre-build-native:
 $(PUBLISH)all-$(ACTION): | pre-build-native
 
 supported-arch-%:
-	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= PUBLISH=$(PUBLISH) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
 
 publish-supported-arch-%:
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS))))))) publish
+	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish
 
 latest-arch-%:
-	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))))
 
 publish-latest-arch-%:
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
+	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish
 
 ####
