@@ -409,7 +409,12 @@ publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_TOOLCHAINS))
 # make all-supported
 ifeq (supported,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = supported
+# make setup not invoked
+ifeq ($(strip $(SUPPORTED_ARCHS)),)
+ALL_ACTION = error
+else
 ALL_ACTION = $(SUPPORTED_ARCHS)
+endif
 
 # make all-latest
 else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
@@ -445,6 +450,11 @@ pre-build-native:
 	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
 
 $(PUBLISH)all-$(ACTION): | pre-build-native
+
+supported-arch-error:
+	@$(MSG) ########################################################
+	@$(MSG) ERROR - Please run make setup from spksrc root directory
+	@$(MSG) ########################################################
 
 supported-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
