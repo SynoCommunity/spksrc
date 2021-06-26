@@ -1,5 +1,5 @@
 PKG_NAME = nasm
-PKG_VERS = 2.14.02
+PKG_VERS = 2.15.05
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.nasm.us/pub/nasm/releasebuilds/$(PKG_VERS)
