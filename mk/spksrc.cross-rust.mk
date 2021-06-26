@@ -82,12 +82,13 @@ install_rustup:
 	        CARGO_HOME=$(CARGO_HOME_PATH) sh -s -- -y
 else
 install_rustup:
-	@echo "  ==> rustup alredy installed" ;
+	@echo "  ==> rustup already installed" ;
 endif
 
 install_rust_toolchain: install_rustup
 	@echo "  ==> install rust toolchain [$(RUST_TOOLCHAIN)]" ; \
 	env $(ENV) rustup toolchain install $(RUST_TOOLCHAIN) ;
+	env $(ENV) rustup default $(RUST_TOOLCHAIN) ;
 
 # Install rust target on demand:
 install_rust_target: install_rust_toolchain
