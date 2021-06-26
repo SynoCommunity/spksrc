@@ -65,7 +65,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	    git) \
 	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
 	      localFile=$${localFolder}.tar.gz ; \
-	      exec 6> /tmp/git.$${localFolder}.lock ;\
+	      exec 6> /tmp/git.$${localFolder}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 6 || exit 1 ; \
 	      pid=$$$$ ; \
 	      echo "$${pid}" 1>&6 ; \
