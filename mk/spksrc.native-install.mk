@@ -1,5 +1,5 @@
 # include this file to install native package without building from source
-# adjusted for native packages based on of spksrc.install-resources.mk
+# adjusted for native packages based on spksrc.install-resources.mk
 #
 # native packages using this have to:
 # - implement a custom INSTALL_TARGET to copy the required files to the 
