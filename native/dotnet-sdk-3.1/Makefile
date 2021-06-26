@@ -1,7 +1,7 @@
 PKG_NAME = dotnet-sdk-3.1
-# Version 3.1.13, SDK 3.1.407
-# https://github.com/dotnet/core/blob/main/release-notes/3.1/3.1.13/3.1.407-download.md
-PKG_VERS = 3.1.407
+# Version 3.1.16, SDK 3.1.410
+# https://github.com/dotnet/core/blob/main/release-notes/3.1/3.1.16/3.1.410-download.md
+PKG_VERS = 3.1.410
 PKG_EXT = tar.gz
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
 PKG_DIST_SITE = https://dotnetcli.azureedge.net/dotnet/Sdk/${PKG_VERS}
