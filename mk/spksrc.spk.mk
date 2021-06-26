@@ -380,7 +380,7 @@ endif
 
 ### Clean rules
 clean:
-	rm -fr work work-*
+	rm -fr work work-* build-*.log
 
 spkclean:
 	rm -fr work-*/.copy_done \
@@ -466,19 +466,19 @@ supported-arch-error:
 
 supported-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) | tee build-$*.log
 
 publish-supported-arch-%:
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish | tee build-$*.log
 
 latest-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) | tee build-$*.log
 
 publish-latest-arch-%:
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish | tee build-$*.log
 
 ####
 
