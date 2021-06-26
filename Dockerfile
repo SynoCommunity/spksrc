@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		bison \
 		build-essential \
 		check \
-		clang \
 		cmake \
 		curl \
 		cython \
@@ -34,7 +33,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		jq \
 		libbz2-dev \
 		libc6-i386 \
-		libclang-dev \
 		libcppunit-dev \
 		libffi-dev \
 		libgc-dev \
