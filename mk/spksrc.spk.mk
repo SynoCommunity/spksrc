@@ -19,6 +19,9 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
+# Configure file descriptor lock timeout
+FLOCK_TIMEOUT = 300
+
 ifneq ($(ARCH),)
 SPK_ARCH = $(TC_ARCH)
 SPK_NAME_ARCH = $(ARCH)
@@ -443,6 +446,7 @@ pre-build-native:
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
 	    exec 5> /tmp/native.$${depend}.lock ; \
+	    flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
 	    pid=$$$$ ; \
 	    echo "$${pid}" 1>&5 ; \
 	    $(MSG) "Pre-processing $${depend}" ; \

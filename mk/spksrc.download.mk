@@ -9,9 +9,12 @@
 #  URLS:                 List of URL to download
 #  DISTRIB_DIR:          Downloaded files will be placed there.  
 
+# Configure file descriptor lock timeout
+ifeq ($(strip $(FLOCK_TIMEOUT)),)
+FLOCK_TIMEOUT = 300
+endif
 
 DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
-FLOCK_TIMEOUT = 300
 
 ifeq ($(strip $(PRE_DOWNLOAD_TARGET)),)
 PRE_DOWNLOAD_TARGET = pre_download_target
