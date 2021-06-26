@@ -1,7 +1,7 @@
 # Build rust programs
 # 
 # prerequisites:
-# - module does not require kernel (REQ_KERNEL)
+# - module does not require kernel (REQUIRE_KERNEL)
 # 
 # remarks:
 # - most content is taken from spksrc.cc.mk and modified for rust
@@ -47,17 +47,20 @@ RUST_TARGET =
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 RUST_TARGET=x86_64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(x86_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
 RUST_TARGET=i686-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(ARM5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
 # may be not supported for cargo
 RUST_TARGET=armv5te-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH), $(ARM7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 RUST_TARGET=armv7-unknown-linux-gnueabihf
 endif
-ifeq ($(findstring $(ARCH), $(ARM8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+RUST_TARGET=armv7-unknown-linux-gnueabi
+endif
+ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
 RUST_TARGET=aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
@@ -155,17 +158,24 @@ smart-clean:
 clean:
 	rm -fr work work-*
 
-all: install
+all: install plist
 
+### For make kernel-required (used by spksrc.spk.mk)
+include ../../mk/spksrc.kernel-required.mk
+
+### For make digests
 include ../../mk/spksrc.generate-digests.mk
 
+### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
 
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
+all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
+
+####
 
 arch-%:
 	@$(MSG) Building package for arch $*
 	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
 
-include ../../mk/spksrc.kernel-required.mk
+####
