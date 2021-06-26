@@ -442,9 +442,13 @@ pre-build-native:
 	@for depend in $(sort $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)) ; \
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
-	    echo "Pre-processing $${depend}" ; \
-	    echo "env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    exec 5> /tmp/native.$${depend}.lock ; \
+	    pid=$$$$ ; \
+	    echo "$${pid}" 1>&5 ; \
+	    $(MSG) "Pre-processing $${depend}" ; \
+	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
 	    env $(ENV) $(MAKE) -C ../../$$depend ; \
+	    flock -u 5 ; \
 	  fi ; \
 	done
 	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
