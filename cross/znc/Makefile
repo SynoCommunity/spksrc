@@ -12,9 +12,8 @@ HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
-CONFIGURE_ARGS = --enable-python
-
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-python
 
 ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = znc_post_install
@@ -22,15 +21,21 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
+# The following extra modules are stored in cross/znc/modules and are built via the znc-buildmod command.
+# Adapt as needed (-O is used to overwrite existing files, and to rename to *.cpp where needed).
+# call "make znc_update_modules" in cross/znc folder to get the latest versions.
+.PHONY: znc_update_modules
+znc_update_modules:
+	wget -O modules/colloquy.cpp      https://raw.githubusercontent.com/colloquy/colloquypush/master/znc/colloquy.cpp
+	wget -O modules/identd.cpp        https://raw.githubusercontent.com/cynix/znc-identd/master/identd.cc
+	wget -O modules/palaver.cpp       https://raw.githubusercontent.com/cocodelabs/znc-palaver/master/palaver.cpp
+	wget -O modules/playback.cpp      https://raw.githubusercontent.com/jpnurmi/znc-playback/master/playback.cpp
+	wget -O modules/privmsg.cpp       https://raw.githubusercontent.com/kylef/znc-contrib/master/privmsg.cpp
+	wget -O modules/push.cpp          https://raw.githubusercontent.com/jreese/znc-push/master/push.cpp
+	wget -O modules/clientbuffer.cpp  https://raw.githubusercontent.com/CyberShadow/znc-clientbuffer/master/clientbuffer.cpp
+
 .PHONY: znc_post_install
 znc_post_install:
-	# The following extra modules are stored in cross/znc/modules and are built via the znc-buildmod command. Adapt as needed.
-	# wget https://raw.githubusercontent.com/colloquy/colloquypush/master/znc/colloquy.cpp
-	# wget -O identd.cpp https://raw.githubusercontent.com/cynix/znc-identd/master/identd.cc
-	# wget https://raw.githubusercontent.com/cocodelabs/znc-palaver/master/palaver.cpp
-	# wget https://raw.githubusercontent.com/jpnurmi/znc-playback/master/playback.cpp
-	# wget https://raw.githubusercontent.com/kylef/znc-contrib/master/privmsg.cpp
-	# wget https://raw.githubusercontent.com/jreese/znc-push/master/push.cpp
 	@$(MSG) "Building extra modules"
 	@chmod +x $(WORK_DIR)/$(PKG_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules

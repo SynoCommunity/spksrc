@@ -1,6 +1,6 @@
 SPK_NAME = znc
 SPK_VERS = 1.8.2
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un 
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
 RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "Update znc to v1.8.2."
+CHANGELOG = "1. Add clientbuffer module.<br/>2. Update palaver module to v1.2.1.<br/>3. Update push module."
 
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/
@@ -43,7 +43,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: znc_extra_install
 znc_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/modules
 	install -m 755 -d $(STAGING_DIR)/var/configs
 	install -m 644 src/znc.conf $(STAGING_DIR)/var/configs/znc.conf
