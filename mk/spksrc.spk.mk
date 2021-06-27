@@ -19,6 +19,9 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
+# Configure file descriptor lock timeout
+FLOCK_TIMEOUT = 300
+
 ifneq ($(ARCH),)
 SPK_ARCH = $(TC_ARCH)
 SPK_NAME_ARCH = $(ARCH)
@@ -377,7 +380,7 @@ endif
 
 ### Clean rules
 clean:
-	rm -fr work work-*
+	rm -fr work work-* build-*.log
 
 spkclean:
 	rm -fr work-*/.copy_done \
@@ -406,15 +409,23 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
-
+# make all-supported
 ifeq (supported,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = supported
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS))))))
+# make setup not invoked
+ifeq ($(strip $(SUPPORTED_ARCHS)),)
+ALL_ACTION = error
+else
+ALL_ACTION = $(SUPPORTED_ARCHS)
+endif
+
+# make all-latest
 else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = latest
 ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS))))))
 endif
 
+# make publish-all-supported | make publish-all-latest
 ifeq (publish,$(subst -all-latest,,$(subst -all-supported,,$(firstword $(MAKECMDGOALS)))))
 PUBLISH = publish-
 .NOTPARALLEL:
@@ -434,30 +445,40 @@ pre-build-native:
 	@for depend in $(sort $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)) ; \
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
-	    echo "Pre-processing $${depend}" ; \
-	    echo "env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    exec 5> /tmp/native.$${depend}.lock ; \
+	    flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
+	    pid=$$$$ ; \
+	    echo "$${pid}" 1>&5 ; \
+	    $(MSG) "Pre-processing $${depend}" ; \
+	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
 	    env $(ENV) $(MAKE) -C ../../$$depend ; \
+	    flock -u 5 ; \
 	  fi ; \
 	done
 	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
 
 $(PUBLISH)all-$(ACTION): | pre-build-native
 
+supported-arch-error:
+	@$(MSG) ########################################################
+	@$(MSG) ERROR - Please run make setup from spksrc root directory
+	@$(MSG) ########################################################
+
 supported-arch-%:
-	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= PUBLISH=$(PUBLISH) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))))
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) | tee build-$*.log
 
 publish-supported-arch-%:
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(SUPPORTED_ARCHS)))))),$(sort $(filter $*%, $(SUPPORTED_ARCHS))))))) publish
+	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish | tee build-$*.log
 
 latest-arch-%:
-	@$(MSG) BUILDING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))))
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) | tee build-$*.log
 
 publish-latest-arch-%:
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity ${ACTION} toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish
+	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish | tee build-$*.log
 
 ####
 
