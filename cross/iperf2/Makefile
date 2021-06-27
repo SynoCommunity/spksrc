@@ -1,5 +1,5 @@
 PKG_NAME = iperf2
-PKG_VERS = 2.0.13
+PKG_VERS = 2.1.1
 PKG_EXT = tar.gz
 PKG_NAME_REAL = iperf
 PKG_DIST_NAME = $(PKG_NAME_REAL)-$(PKG_VERS).$(PKG_EXT)/download
@@ -16,7 +16,6 @@ LICENSE  =
 GNU_CONFIGURE = 1
 
 POST_INSTALL_TARGET = iperf2_post_install
-
 
 include ../../mk/spksrc.cross-cc.mk
 
