@@ -21,6 +21,13 @@ CONFIGURE_ARGS  = --enable-unicode
 CONFIGURE_ARGS += HTOP_NCURSESW6_CONFIG_SCRIPT=$(STAGING_INSTALL_PREFIX)/bin/ncursesw6-config
 CONFIGURE_ARGS += --disable-dependency-tracking
 
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# use clock_gettime of librt
+ADDITIONAL_LDFLAGS = -lrt
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: htop_pre_configure
