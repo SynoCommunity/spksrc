@@ -82,31 +82,28 @@ CONFIGURE_ARGS += --enable-libopus
 DEPENDS += cross/soxr
 CONFIGURE_ARGS += --enable-libsoxr
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/x264
-CONFIGURE_ARGS += --enable-libx264
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/x265
-CONFIGURE_ARGS += --enable-libx265
-endif
-
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/x264
+CONFIGURE_ARGS += --enable-libx264
+
+DEPENDS += cross/x265
+CONFIGURE_ARGS += --enable-libx265
+
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --enable-libvpx
+
+DEPENDS += cross/shine
+CONFIGURE_ARGS += --enable-libshine
+
+# end ifneq $(OLD_PPC_ARCHS)
 endif
 
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
-endif
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
