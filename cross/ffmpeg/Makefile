@@ -19,9 +19,9 @@ CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --enable-fontconfig --enable-avresample
-CONFIGURE_ARGS += --disable-debug --disable-doc
+CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
-CONFIGURE_ARGS += --enable-debug=1
+CONFIGURE_ARGS += --disable-doc
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
