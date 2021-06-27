@@ -1,9 +1,9 @@
 PKG_NAME = squid
-PKG_VERS = 3.1.22
+PKG_VERS = 5.0.4
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://www.squid-cache.org/Versions/v$(word 1,$(subst ., ,$(PKG_VERS)))/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(shell echo '$(PKG_NAME)' | tr '[:lower:]' '[:upper:]')_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/squid-cache/squid/archive
+PKG_DIR = $(PKG_NAME)-$(shell echo '$(PKG_NAME)' | tr '[:lower:]' '[:upper:]')_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = 
 
@@ -14,10 +14,15 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = $(TC_CONFIGURE_ARGS) --prefix=$(INSTALL_PREFIX) --enable-icap-client --disable-strict-error-checking
 
+PRE_CONFIGURE_TARGET = squid_native_pre_configure
 COMPILE_TARGET = squid_native_compile
 INSTALL_TARGET = nop
 
 include ../../mk/spksrc.native-cc.mk
+
+.PHONY: squid_native_pre_configure
+squid_native_pre_configure:
+	$(RUN) ./bootstrap.sh
 
 .PHONY: squid_native_compile
 squid_native_compile:
