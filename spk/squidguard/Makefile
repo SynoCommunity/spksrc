@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/squidguard.png
 BETA = 1
 
-DEPENDS = cross/zlib cross/c_icap cross/busybox cross/unrar cross/squidclamav cross/berkeleydb cross/squidguard cross/squid cross/squidguardmanager
+DEPENDS = cross/busybox cross/unrar cross/squidclamav cross/squidguard cross/squid cross/squidguardmanager
 
 SPK_DEPENDS = "AntiVirus>1.2"
 
