@@ -1,5 +1,5 @@
 SPK_NAME = ripgrep
-SPK_VERS = 12.0.1
+SPK_VERS = 13.0.0
 SPK_REV = 1
 SPK_ICON = src/ripgrep.png
 
