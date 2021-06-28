@@ -23,6 +23,7 @@ CONFIGURE_ARGS += squid_cv_check_marchnative=yes
 
 # Toolchains lacking c++11 in conjunction with
 # march=native compiler are not supported
+include ../../mk/spksrc.common.mk
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
