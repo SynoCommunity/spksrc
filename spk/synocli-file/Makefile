@@ -7,7 +7,7 @@ DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cro
 DEPENDS += cross/detox cross/pcre2
 DEPENDS += cross/zstd cross/lzip cross/plzip
 DEPENDS += cross/fdupes
-OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep
+OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
@@ -37,6 +37,8 @@ endif
 ifneq ($(findstring $(ARCH), $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg \(ripgrep\)"
+DEPENDS += cross/fd
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fd \(fd-find\)"
 endif
 
 
@@ -46,7 +48,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add rg (ripgrep)."
+CHANGELOG = "1. Add rg (ripgrep).<br/>2. Add fd (fd-find)."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
@@ -68,6 +70,7 @@ SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
 SPK_COMMANDS += bin/rg
+SPK_COMMANDS += bin/fd
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
