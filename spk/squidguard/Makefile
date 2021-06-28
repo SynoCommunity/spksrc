@@ -1,6 +1,6 @@
 SPK_NAME = squidguard
-SPK_VERS = 1.5
-SPK_REV = 1
+SPK_VERS = 1.6
+SPK_REV = 2
 SPK_ICON = src/squidguard.png
 BETA = 1
 
@@ -16,6 +16,14 @@ DISPLAY_NAME = SquidGuard
 
 HOMEPAGE = http://www.squidguard.org/
 LICENSE  = GPL - Copyright © 1990,2007 Oracle.  All rights reserved for berkeley db library. See LICENSE file.
+
+# Toolchains lacking c++11 in conjunction with
+# march=native compiler are not supported
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+UNSUPPORTED_ARCHS += $(ARM_ARCHS)
+endif
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
