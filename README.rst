@@ -1,18 +1,30 @@
 DSM 7
 =====
 
-PLEASE consider: DSM 7 is not officially released yet. The beta release is available since December 08 2020 and a Release Candidate (DSM 7.0-41882) was created on June 01 2021. We expect an official Release of DSM 7 by Synology later in 2021.
+DSM 7 was release on June 29 2021 as Version 7.0.41890.
 
-In SynoCommunity only few DSM 7 compatible packages released yet.
----------------------------------------------------------------------
 
-* Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, most of the packages are not compatible with DSM 7.
-* PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7.
-* All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
-* We have the framework part of the DSM 7 branch merged and the issue `#4524`_ created that gives an overview of the packages, whether available for DSM 7 or not.
-* We also have started to publish some packages for DSM 7. Please regard those as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
-* If you want to try preview versions of packages for DSM 7 that are built on the master branch, you can find artifacts of the related github actions for manual download and installation (all artifacts are packed into one zip archive).
-* You are welcome to contribute: create your branch and try to build and test the installation of your favorite package and give related feedback. This will shorten the time from official DSM 7 release until the package is available in the SynoCommunity Package Center for download.
+In SynoCommunity some package are available for DSM 7 but some are not.
+-----------------------------------------------------------------------
+
+* You find the status of the packages in the issue `#4524`_ **Meta: DSM7 package status**
+
+* Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, some of the packages are not compatible with DSM 7.
+
+* PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7. All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
+
+* Please regard all DSM 7 packages as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
+
+* Packages of the follwing kind will need some time to make DSM 7 compatible:
+
+  * Packages depending MySQL database must be migrated to MariaDB 10
+  
+  * Packages with installation Wizard to configure a shared folder (all download related packages and others)
+  
+  * Packages that integrate into DSM webstation
+  
+  * 
+  
 * As this is a community project where people spend there spare time for contribution, it may take a long time until most of the packages are ported to DSM 7. (There are still packages here that are not ported from DSM 5 to DSM 6 yet).
 
 spksrc
