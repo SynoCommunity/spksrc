@@ -11,6 +11,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 DEPENDS = cross/openssl cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
 DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/pngquant
 
+# PPC archs except qoriq are not supported
+# https://tvheadend.org/issues/5060
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 LICENSE  = GPL v3

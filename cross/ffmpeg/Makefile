@@ -19,9 +19,9 @@ CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --enable-fontconfig --enable-avresample
-CONFIGURE_ARGS += --disable-debug --disable-doc
+CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
-CONFIGURE_ARGS += --enable-debug=1
+CONFIGURE_ARGS += --disable-doc
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
@@ -32,6 +32,24 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 CONFIGURE_ARGS += --extra-cflags=-O3
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
+
+include ../../mk/spksrc.common.mk
+
+OPTIONAL_DEPENDS  = native/nasm
+OPTIONAL_DEPENDS += cross/json-c
+OPTIONAL_DEPENDS += cross/libass
+OPTIONAL_DEPENDS += cross/libaom
+OPTIONAL_DEPENDS += cross/libvpx
+OPTIONAL_DEPENDS += cross/svt-av1
+OPTIONAL_DEPENDS += cross/svt-hevc
+OPTIONAL_DEPENDS += cross/libva
+OPTIONAL_DEPENDS += cross/libva-utils
+OPTIONAL_DEPENDS += cross/intel-vaapi-driver
+OPTIONAL_DEPENDS += cross/intel-media-driver
+OPTIONAL_DEPENDS += cross/intel-media-sdk
+OPTIONAL_DEPENDS += cross/x264
+OPTIONAL_DEPENDS += cross/x265
+OPTIONAL_DEPENDS += cross/shine
 
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
@@ -64,23 +82,28 @@ CONFIGURE_ARGS += --enable-libopus
 DEPENDS += cross/soxr
 CONFIGURE_ARGS += --enable-libsoxr
 
+DEPENDS += cross/opencore-amr
+CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
 
-DEPENDS += cross/opencore-amr
-CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
-
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --enable-libvpx
+
+DEPENDS += cross/shine
+CONFIGURE_ARGS += --enable-libshine
+
+# end ifneq $(OLD_PPC_ARCHS)
+endif
 
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
@@ -93,8 +116,6 @@ CONFIGURE_ARGS += --enable-libshine
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
-include ../../mk/spksrc.archs.mk
-
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 # Compiling tvheadend for evansport requires #include synology.h
 POST_INSTALL_TARGET = ffmpeg_post_install
@@ -103,23 +124,9 @@ POST_INSTALL_TARGET = ffmpeg_post_install
 REQUIRE_TOOLKIT = 1
 endif
 
-include ../../mk/spksrc.common.mk
-
-OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/json-c
-OPTIONAL_DEPENDS += cross/libass
-OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libvpx
-OPTIONAL_DEPENDS += cross/svt-av1
-OPTIONAL_DEPENDS += cross/svt-hevc
-OPTIONAL_DEPENDS += cross/libva
-OPTIONAL_DEPENDS += cross/libva-utils
-OPTIONAL_DEPENDS += cross/intel-vaapi-driver
-OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/intel-media-sdk
 
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
 DEPENDS += cross/libass
 CONFIGURE_ARGS += --enable-libass
@@ -161,23 +168,24 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-yasm --dis
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += native/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
+CONFIGURE_ARGS += --disable-asm
 CONFIGURE_ARGS += --arch=ppc
-endif
-
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
-CONFIGURE_ARGS += --disable-asm --cpu=e500v2
+CONFIGURE_ARGS += --cpu=e500v2
+else
+CONFIGURE_ARGS += --cpu=e500 --disable-altivec
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += native/nasm cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
+BUILD_DEPENDS += native/nasm
+DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-DEPENDS += native/nasm
+BUILD_DEPENDS += native/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 
 DEPENDS += cross/json-c
