@@ -4,8 +4,8 @@ DSM 7
 DSM 7 was release on June 29 2021 as Version 7.0.41890.
 
 
-In SynoCommunity some package are available for DSM 7 but some are not.
------------------------------------------------------------------------
+In SynoCommunity some packages are available for DSM 7 but some are not.
+------------------------------------------------------------------------
 
 * You find the status of the packages in the issue `#4524`_ **Meta: DSM7 package status**
 
