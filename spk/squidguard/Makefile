@@ -17,14 +17,11 @@ DISPLAY_NAME = SquidGuard
 HOMEPAGE = http://www.squidguard.org/
 LICENSE  = GPL - Copyright © 1990,2007 Oracle.  All rights reserved for berkeley db library. See LICENSE file.
 
+include ../../mk/spksrc.common.mk
+
 # Toolchains lacking c++11 in conjunction with
 # march=native compiler are not supported
-include ../../mk/spksrc.common.mk
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
-UNSUPPORTED_ARCHS += $(ARM_ARCHS)
-endif
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
