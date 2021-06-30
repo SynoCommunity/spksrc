@@ -1,3 +1,3 @@
-go1.16.5.src.tar.gz SHA1 b3d00525ea5af180149fafca8da730c6f988f29f
-go1.16.5.src.tar.gz SHA256 7bfa7e5908c7cc9e75da5ddf3066d7cbcf3fd9fa51945851325eebc17f50ba80
-go1.16.5.src.tar.gz MD5 f3c06704e536dcca1814b16dbcdc4a36
+go1.16.5.linux-amd64.tar.gz SHA1 140cc28aab2e6fc7ae3f1bfe7065290f8c4dac0f
+go1.16.5.linux-amd64.tar.gz SHA256 b12c23023b68de22f74c0524f10b753e7b08b1504cb7e417eccebdd3fae49061
+go1.16.5.linux-amd64.tar.gz MD5 bf3d789f51aa25d098411f393988fb82
