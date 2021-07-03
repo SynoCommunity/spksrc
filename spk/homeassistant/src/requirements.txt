@@ -26,7 +26,7 @@ PyJWT==1.7.1
 #cryptography==3.2       # cross-compiled wheel
 python-slugify==4.0.1
 pytz==2020.4
-pyyaml==5.3.1
+pyyaml==5.4
 requests==2.25.0
 ruamel.yaml==0.15.100
 six==1.15.0
