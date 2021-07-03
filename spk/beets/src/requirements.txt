@@ -35,7 +35,7 @@ Flask-Cors==3.0.8
 Click==7.0
 itsdangerous==1.1.0
 jellyfish==0.7.2
-Jinja2==2.11.1
+Jinja2==2.11.3
 Werkzeug==1.0.0
 
 # For gmusic plugin 
