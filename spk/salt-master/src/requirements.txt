@@ -1,5 +1,5 @@
 salt==2015.5.11
-Jinja2==2.11.2
+Jinja2==2.11.3
 requests==2.23.0
 CherryPy==11.2.0
 more-itertools==5.0.0
