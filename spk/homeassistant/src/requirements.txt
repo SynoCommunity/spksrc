@@ -40,7 +40,7 @@ yarl==1.6.3
 ### -----------------------------------
 multidict==4.7.6          # for aiohttp
 idna-ssl==1.1.0           # for aiohttp
-urllib3==1.26.3           # for requests
+urllib3==1.26.5           # for requests
 typing-extensions==3.7.4.3
 
 
