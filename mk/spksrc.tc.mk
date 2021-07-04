@@ -46,6 +46,9 @@ include ../../mk/spksrc.tc-vers.mk
 
 flag: vers
 include ../../mk/spksrc.tc-flags.mk
+#ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+include ../../mk/spksrc.toolkit-flags.mk
+#endif
 
 fix: flag
 include ../../mk/spksrc.tc-fix.mk
@@ -65,10 +68,11 @@ tc_vars: fix
 	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
 	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
 	done
-	@echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\)\"
-	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\"
-	@echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\"
-	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
+	@echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\) $(TOOLKIT_CFLAGS)\"
+	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\) $(TOOLKIT_CPPFLAGS)\"
+	@echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\) $(TOOLKIT_CXXFLAGS)\"
+	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) $(TOOLKIT_LDFLAGS)\"
+	@echo TC_ENV += PKG_CONFIG_PATH=\"$(PKG_CONFIG_PATH):$(TOOLKIT_PKG_CONFIG_PATH)\"
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
 	@echo TC_TYPE := $(TC_TYPE)
 	@echo TC_TARGET := $(TC_TARGET)
@@ -85,6 +89,15 @@ tc_vars: fix
 	@echo TC_BUILD := $(TC_BUILD)
 	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
 	@echo TC_ARCH := $(TC_ARCH)
+	@echo REQUIRE_TOOLKIT := $(REQUIRE_TOOLKIT)
+	@echo TOOLKIT := $(TOOLKIT)
+	@echo TOOLKIT_ROOT := $(TOOLKIT_ROOT)
+	@echo TOOLKIT_SYSROOT := $(TOOLKIT_SYSROOT)
+	@echo TOOLKIT_CFLAGS := $(TOOLKIT_CFLAGS)
+	@echo TOOLKIT_CPPFLAGS := $(TOOLKIT_CPPFLAGS)
+	@echo TOOLKIT_CXXFLAGS := $(TOOLKIT_CXXFLAGS)
+	@echo TOOLKIT_LDFLAGS := $(TOOLKIT_LDFLAGS)
+	@echo TOOLKIT_PKG_CONFIG_PATH := $(TOOLKIT_PKG_CONFIG_PATH)
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@echo TC_KERNEL := $(TC_KERNEL)+
@@ -93,7 +106,6 @@ else
 endif
 	@echo TC_GCC := $(TC_GCC)
 	@echo TC_GLIBC := $(TC_GLIBC)
-
 
 ### Clean rules
 clean:
