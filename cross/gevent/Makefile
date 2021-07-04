@@ -12,4 +12,7 @@ HOMEPAGE = https://www.gevent.org
 COMMENT  = gevent is a coroutine-based Python networking library that uses greenlet to provide a high-level synchronous API on top of the libev event loop
 LICENSE  = MIT
 
+ENV += GEVENTSETUP_EMBED_CARES=FALSE
+ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+
 include ../../mk/spksrc.python-wheel.mk
