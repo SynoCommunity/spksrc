@@ -17,8 +17,6 @@ DISPLAY_NAME = SquidGuard
 HOMEPAGE = http://www.squidguard.org/
 LICENSE  = GPL - Copyright © 1990,2007 Oracle.  All rights reserved for berkeley db library. See LICENSE file.
 
-include ../../mk/spksrc.common.mk
-
 # Toolchains lacking c++11 in conjunction with
 # march=native compiler are not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -62,4 +60,3 @@ xz-compress:
 	            $(STAGING_DIR)/share/www/squidguardmgr/images/icon$${size}.png ; \
 	done	
 	chmod 644 $(STAGING_DIR)/share/www/squidguardmgr/images/i*.png
-
