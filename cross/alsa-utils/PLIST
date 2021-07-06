@@ -1,6 +1,8 @@
 bin:bin/aconnect
+bin:bin/alsabat
 bin:bin/alsaloop
 bin:bin/alsamixer
+bin:bin/alsatplg
 bin:bin/alsaucm
 bin:bin/amidi
 bin:bin/amixer
@@ -11,8 +13,9 @@ bin:bin/arecordmidi
 bin:bin/aseqdump
 bin:bin/aseqnet
 bin:bin/iecset
+bin:bin/axfer
 bin:bin/speaker-test
-bin:sbin/alsaconf
+rsc:sbin/alsaconf
 bin:sbin/alsactl
 rsc:share/alsa
 rsc:share/sounds
