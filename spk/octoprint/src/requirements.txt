@@ -1,35 +1,52 @@
-argh==0.26.1
-awesome-slugify==1.6.5
-Babel==2.0
-backports.ssl-match-hostname==3.4.0.2
-blinker==1.4
-certifi==2015.9.6.2
-Flask==0.10.1
-Flask-Assets==0.10
-Flask-Babel==0.9
-Flask-Login==0.2.2
-Flask-Markdown==0.3
-Flask-Principal==0.3.5
-itsdangerous==0.24
-Jinja2==2.8
-Markdown==2.6.2
-netaddr==0.7.17
-netifaces==0.10.4
-pathtools==0.1.2
-pkginfo==1.2.1
-pyasn1==0.1.8
-pylru==1.0.9
-pyserial==2.7
-pytz==2015.6
-regex==2016.03.02
-requests==2.7.0
-rsa==3.2
-sarge==0.1.4
-semantic-version==2.4.2
-sockjs-tornado==1.0.1
-speaklater==1.3
-tornado==4.0.1
-unidecode==0.04.19
-watchdog==0.8.3
-webassets==0.11.1
-Werkzeug==0.8.3
+# all requirements are taken from the list "INSTALL_REQUIRES" in the 
+# original setup.py at: https://github.com/OctoPrint/OctoPrint/blob/master/setup.py
+# the order and grouping is also taken from there.
+
+# additional OctoPrint plugins that are maintained on a different release cycle
+OctoPrint-FirmwareCheck==2020.09.23
+OctoPrint-FileCheck==2020.08.07
+
+# the following dependencies are non trivial to update since later versions introduce backwards incompatible
+# changes that might affect plugins, or due to other observed problems
+markupsafe==1.1.1     # Jinja dependency, newer versions require Python 3
+tornado==5.1.1        # newer versions require Python 3
+markdown==3.1.1       # newer versions require Python 3
+rsa==4.0              # newer versions require Python 3
+regex==2020.10.23     # avoid broken 2018.11.6. See #2874
+
+# anything below this should be checked on releases for new versions
+Flask==1.1.2
+Jinja2==2.11.2
+Flask-Login==0.5.0
+Flask-Babel==2.0.0
+Flask-Assets==2.0
+Werkzeug==1.0.1
+itsdangerous==1.1.0
+cachelib==0.1.1
+PyYAML==5.3.1
+pyserial==3.4
+netaddr==0.8.0
+watchdog==0.10.3
+sarge==0.1.5.post0
+netifaces==0.10.9
+pylru==1.2.0
+pkginfo==1.6.1
+requests==2.24.0
+semantic_version==2.8.5
+psutil==5.7.3
+click==7.1.2
+future==0.18.2
+websocket_client==0.57.0
+wrapt==1.12.1
+emoji==0.6.0
+frozendict==1.2
+sentry-sdk==0.19.1
+filetype==1.0.7
+
+# vendor bundled dependencies
+unidecode==0.04.21    # dependency of awesome-slugify
+blinker==1.4          # dependency of flask_principal
+
+# Python 3 specific requirements
+feedparser==6.0.2
+zeroconf==0.24.5
