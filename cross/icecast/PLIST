@@ -1,15 +1,2 @@
 bin:bin/icecast
-bin:bin/ezstream
-rsc:bin/ezstream-file.sh
 rsc:share/icecast/
-rsc:share/examples/ezstream/ezstream-file_template.xml
-rsc:share/examples/ezstream/ezstream_metadata.xml
-rsc:share/examples/ezstream/ezstream_mp3.xml
-rsc:share/examples/ezstream/ezstream_reencode_mp3.xml
-rsc:share/examples/ezstream/ezstream_reencode_theora.xml
-rsc:share/examples/ezstream/ezstream_reencode_vorbis.xml
-rsc:share/examples/ezstream/ezstream_stdin_vorbis.xml
-rsc:share/examples/ezstream/ezstream_vorbis.xml
-rsc:share/examples/ezstream/meta.sh
-rsc:share/examples/ezstream/playlist-logger.sh
-rsc:share/examples/ezstream/play.sh
