@@ -1,6 +1,6 @@
 SPK_NAME = jellyfin
-SPK_VERS = 10.7.2
-SPK_REV = 1
+SPK_VERS = 10.7.6
+SPK_REV = 2
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
@@ -11,7 +11,7 @@ MAINTAINER = publicarray
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "Initial Release"
+CHANGELOG = "Update jellyfin to 10.7.6"
 HOMEPAGE = https://jellyfin.org
 HELPURL    = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
