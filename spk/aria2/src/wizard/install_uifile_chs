@@ -1,0 +1,152 @@
+[
+    {
+        "step_title": "Aria2 配置",
+        "invalid_next_disabled": true,
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "群晖 DSM 设置",
+                "subitems": [
+                    {
+                        "key": "wizard_group",
+                        "desc": "用户组",
+                        "defaultValue": "sc-aria2",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[^<>:*/?\"]*$/",
+                                "errorText": "用户组不应含有^[^<>:*/?\"]*等特殊字符"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Aria2 设置",
+                "subitems": [
+                    {
+                        "key": "wizard_download_dir",
+                        "desc": "下载路径",
+                        "defaultValue": "/volume1/downloads",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\/volume[0-9]{1,2}\\/[^<>: */?\"]*/",
+                                "errorText": "下载路径应以 /volume?/ 开头，?为存储空间顺序数字"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_rpc_secret",
+                        "desc": "RPC密钥",
+                        "defaultValue": "RA3CAVdZ6hfvdkMWNgvLxeTJsgYmPRsA",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/",
+                                "errorText": "最小8个字符，含有至少1个数字、1个小写字母、1个大写字母"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_max_concurrent_downloads",
+                        "desc": "最大同时下载数",
+                        "defaultValue": "10",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^([1-9]|[12][0-9]|30)$/",
+                                "errorText": "取值范围 1-30 默认 10"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_max_connection_per_server",
+                        "desc": "单服务器最大连接数",
+                        "defaultValue": "5",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^([1-9]|1[0-5])$/",
+                                "errorText": "取值范围 1-15 默认 5"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_max_upload_limit",
+                        "desc": "最大上传速度",
+                        "defaultValue": "16K",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\d+(|K|M)$/",
+                                "errorText": "0不限制；或使用K/M作为单位 (1K = 1024, 1M = 1024K)."
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_seed_ratio",
+                        "desc": "最小分享率",
+                        "defaultValue": "0.0",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(1\\.0)|(0\\.[0-9])$/",
+                                "errorText": "取值范围 0.0-1.0 默认 0.0"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_seed_time",
+                        "desc": "最小做种时间",
+                        "defaultValue": "0",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\d+$/",
+                                "errorText": "以分钟为单位的数字"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_disk_cache",
+                        "desc": "磁盘缓存",
+                        "defaultValue": "32M",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\d+(|K|M)$/",
+                                "errorText": "使用K/M作为单位 (1K = 1024, 1M = 1024K), 默认 32M"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_file_allocation",
+                        "desc": "文件分配方式",
+                        "defaultValue": "falloc",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(none|prealloc|trunc|falloc)$/",
+                                "errorText": "可能的取值 none/prealloc/trunc/falloc, 默认 falloc"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_log_level",
+                        "desc": "日志级别",
+                        "defaultValue": "error",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(debug|info|notice|warn|error)$/",
+                                "errorText": "可能的取值 debug/info/notice/warn/error, 默认 error"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

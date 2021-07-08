@@ -72,7 +72,7 @@ done
 
 
 # find all noarch packages
-all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "override ARCH" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "^override ARCH" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
 # separate noarch and arch specific packages 
 # and filter out packages that are removed or do not exist (e.g. nzbdrone)

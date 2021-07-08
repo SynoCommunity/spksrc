@@ -1,0 +1,152 @@
+[
+    {
+        "step_title": "Aria2 Configuration",
+        "invalid_next_disabled": true,
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Synology DSM Settings",
+                "subitems": [
+                    {
+                        "key": "wizard_group",
+                        "desc": "DSM group",
+                        "defaultValue": "sc-aria2",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[^<>:*/?\"]*$/",
+                                "errorText": "Not allowed character in group name"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Aria2 Settings",
+                "subitems": [
+                    {
+                        "key": "wizard_download_dir",
+                        "desc": "dir",
+                        "defaultValue": "/volume1/downloads",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\/volume[0-9]{1,2}\\/[^<>: */?\"]*/",
+                                "errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_rpc_secret",
+                        "desc": "rpc-secret",
+                        "defaultValue": "RA3CAVdZ6hfvdkMWNgvLxeTJsgYmPRsA",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/",
+                                "errorText": "Minimum eight characters, at least one uppercase letter, one lowercase letter and one number"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_max_concurrent_downloads",
+                        "desc": "max-concurrent-downloads",
+                        "defaultValue": "10",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^([1-9]|[12][0-9]|30)$/",
+                                "errorText": "Range 1-30, default 10"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_max_connection_per_server",
+                        "desc": "max-connection-per-server",
+                        "defaultValue": "5",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^([1-9]|1[0-5])$/",
+                                "errorText": "Range 1-15, default 5"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_max_upload_limit",
+                        "desc": "max-upload-limit",
+                        "defaultValue": "16K",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\d+(|K|M)$/",
+                                "errorText": "0 means unrestricted. You can append K or M (1K = 1024, 1M = 1024K)."
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_seed_ratio",
+                        "desc": "seed-ratio",
+                        "defaultValue": "0.0",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(1\\.0)|(0\\.[0-9])$/",
+                                "errorText": "Range 0.0-1.0, default 0.0"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_seed_time",
+                        "desc": "seed-time",
+                        "defaultValue": "0",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\d+$/",
+                                "errorText": "Specify seeding time in (fractional) minutes"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_disk_cache",
+                        "desc": "disk-cache",
+                        "defaultValue": "32M",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^\\d+(|K|M)$/",
+                                "errorText": "SIZE can include K or M (1K = 1024, 1M = 1024K), default: 32M"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_file_allocation",
+                        "desc": "file-allocation",
+                        "defaultValue": "falloc",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(none|prealloc|trunc|falloc)$/",
+                                "errorText": "Possible Values: none/prealloc/trunc/falloc, default: prealloc"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wizard_log_level",
+                        "desc": "log-level",
+                        "defaultValue": "error",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(debug|info|notice|warn|error)$/",
+                                "errorText": "LEVEL is either debug/info/notice/warn/error, default: error"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]
