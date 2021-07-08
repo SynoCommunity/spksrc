@@ -1,0 +1,6 @@
+CFG_FILE="${SYNOPKG_PKGDEST}/var/minetest.conf"
+PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/minetestserver --config ${CFG_FILE}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
+export HOME=${SYNOPKG_PKGDEST}/var
