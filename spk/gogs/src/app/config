@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.gogs": {
+            "title": "Gogs",
+            "desc": "Gogs - Go Git Service",
+            "icon": "images/gogs-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "3000",
+            "url": "/",
+            "allUsers": true
+        }
+    }
+}
