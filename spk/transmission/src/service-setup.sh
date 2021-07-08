@@ -64,10 +64,9 @@ service_postupgrade ()
     # Needed to force correct permissions, during update
     # Extract the right paths from config file
     if [ -r "${CFG_FILE}" ]; then
-        DOWNLOAD_DIR=`sed -n 's/.*"download-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        INCOMPLETE_DIR=`sed -n 's/.*"incomplete-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        WATCHED_DIR=`sed -n 's/.*"watch-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-
+        DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
+        INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
+        WATCHED_DIR=$(sed -n 's/.*"watch-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
         # Apply permissions
         if [ -n "${DOWNLOAD_DIR}" ] && [ -d "${DOWNLOAD_DIR}" ]; then
             set_syno_permissions "${DOWNLOAD_DIR}" "${GROUP}"
