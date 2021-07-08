@@ -1,0 +1,55 @@
+From 3b9f651ece73e9bae57a2e8ab4f5080b00c1515b Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sun, 18 Apr 2021 23:03:51 +0000
+Subject: [PATCH] Fix install dirs for misc extra files
+
+---
+ common/Make-po.rules | 2 +-
+ common/Make.rules    | 4 ++--
+ utils/vim/Makefile   | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git common/Make-po.rules common/Make-po.rules
+index 6fa852b..2c6a88a 100644
+--- common/Make-po.rules
++++ common/Make-po.rules
+@@ -19,7 +19,7 @@
+ # The including makefile needs to define LANG, which lists the lang
+ # files to include; e.g. LANG=en_US de_DE, where en_US.po and de_DE.po
+ # exist
+-LOCALEDIR=/usr/share/locale
++LOCALEDIR=/share/locale
+ 
+ XGETTEXT_ARGS=--copyright-holder="Canonical Ltd" --msgid-bugs-address=apparmor@lists.ubuntu.com -d ${NAME}
+ 
+diff --git common/Make.rules common/Make.rules
+index 9e9d213..617e876 100644
+--- common/Make.rules
++++ common/Make.rules
+@@ -92,8 +92,8 @@ pod_clean:
+ 
+ POD2MAN                         = /usr/bin/pod2man
+ POD2HTML                        = /usr/bin/pod2html
+-MANDIR                          = /usr/share/man
+-DOCDIR                          = /usr/share/doc/${NAME}-${VERSION}
++MANDIR                          = /share/man
++DOCDIR                          = /share/doc/${NAME}-${VERSION}
+ 
+ # get list of directory numbers based on definition of MANPAGES variable
+ MANDIRS=$(sort $(foreach dir, 1 2 3 4 5 6 7 8, $(patsubst %.${dir}, ${dir}, $(filter %.${dir}, ${MANPAGES}))))
+diff --git utils/vim/Makefile utils/vim/Makefile
+index 7d107dd..2c499e4 100644
+--- utils/vim/Makefile
++++ utils/vim/Makefile
+@@ -4,7 +4,7 @@ all:
+ include $(COMMONDIR)/Make.rules
+ 
+ MANPAGES=apparmor.vim.5
+-VIM_INSTALL_PATH=${DESTDIR}/usr/share/apparmor
++VIM_INSTALL_PATH=${DESTDIR}/share/apparmor
+ 
+ all: apparmor.vim manpages htmlmanpages
+ 
+-- 
+2.25.1
+

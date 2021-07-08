@@ -1,0 +1,24 @@
+From 4395e434e27ddc1db34c383527f65e80fe60bec3 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Mon, 19 Apr 2021 02:50:19 +0000
+Subject: [PATCH] Add template for profile dir to parser.conf
+
+---
+ parser/parser.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git parser/parser.conf parser/parser.conf
+index 1d1c0da..37732f4 100644
+--- parser/parser.conf
++++ parser/parser.conf
+@@ -21,6 +21,7 @@
+ #Include /etc/apparmor.d/
+ # or
+ #Include /usr/share/apparmor
++Include @AA_PROFILE_DIR@
+ 
+ 
+ ## Set location of apparmor filesystem
+-- 
+2.25.1
+

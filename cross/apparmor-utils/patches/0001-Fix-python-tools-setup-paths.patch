@@ -1,0 +1,41 @@
+From d3f7c00fe23748e361db988cf4d6e363617f4851 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sun, 18 Apr 2021 22:31:57 +0000
+Subject: [PATCH] Fix python tools setup paths
+
+---
+ utils/python-tools-setup.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git utils/python-tools-setup.py utils/python-tools-setup.py
+index 30ce0cb..95c007c 100644
+--- utils/python-tools-setup.py
++++ utils/python-tools-setup.py
+@@ -34,10 +34,10 @@ class Install(_install, object):
+ 
+         prefix = self.prefix
+         if self.root != None:
+-            prefix = self.root
++            prefix = self.root + "/" + prefix
+ 
+         # Install scripts, configuration files and data
+-        scripts = ['/usr/bin/aa-easyprof']
++        scripts = ['/bin/aa-easyprof']
+         self.mkpath(prefix + os.path.dirname(scripts[0]))
+         for s in scripts:
+             f = prefix + s
+@@ -49,9 +49,9 @@ class Install(_install, object):
+             self.copy_file(c, os.path.join(prefix + "/etc/apparmor", os.path.basename(c)))
+ 
+         data = ['easyprof/templates', 'easyprof/policygroups']
+-        self.mkpath(prefix + "/usr/share/apparmor/easyprof")
++        self.mkpath(prefix + "/share/apparmor/easyprof")
+         for d in data:
+-            self.copy_tree(d, os.path.join(prefix + "/usr/share/apparmor/easyprof", os.path.basename(d)))
++            self.copy_tree(d, os.path.join(prefix + "/share/apparmor/easyprof", os.path.basename(d)))
+ 
+ 
+ if os.path.exists('staging'):
+-- 
+2.25.1
+

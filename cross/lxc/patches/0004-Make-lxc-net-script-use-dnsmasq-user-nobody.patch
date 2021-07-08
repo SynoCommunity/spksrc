@@ -1,0 +1,33 @@
+From 6fa6d8bbd733336211262834f13203255df86e91 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 14:22:04 +0000
+Subject: [PATCH] Make lxc-net script use dnsmasq user "nobody"
+
+---
+ config/init/common/lxc-net.in | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git config/init/common/lxc-net.in config/init/common/lxc-net.in
+index 8274d10..801dc63 100644
+--- config/init/common/lxc-net.in
++++ config/init/common/lxc-net.in
+@@ -122,13 +122,9 @@ start() {
+     # it does by default if `--conf-file` is not present
+     LXC_DHCP_CONFILE_ARG="--conf-file=${LXC_DHCP_CONFILE:-/dev/null}"
+ 
+-    # https://lists.linuxcontainers.org/pipermail/lxc-devel/2014-October/010561.html
+-    for DNSMASQ_USER in lxc-dnsmasq dnsmasq nobody
+-    do
+-        if getent passwd ${DNSMASQ_USER} >/dev/null; then
+-            break
+-        fi
+-    done
++    # Just use "nobody". We know we do not have "lxc-dnsmasq" or "dnsmasq" on
++    # synology devices
++    DNSMASQ_USER="nobody"
+ 
+     LXC_DHCP_PING_ARG=""
+     if [ "x$LXC_DHCP_PING" = "xfalse" ]; then
+-- 
+2.25.1
+

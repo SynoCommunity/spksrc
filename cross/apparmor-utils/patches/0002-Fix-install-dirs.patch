@@ -1,0 +1,29 @@
+From 4c7f2cc2861dde7acd237c3a7904ff0d9e40bd1b Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sun, 18 Apr 2021 22:32:44 +0000
+Subject: [PATCH] Fix install dirs
+
+---
+ utils/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git utils/Makefile utils/Makefile
+index 1f08f25..fb61982 100644
+--- utils/Makefile
++++ utils/Makefile
+@@ -55,9 +55,9 @@ install: ${MANPAGES} ${HTMLMANPAGES}
+ 	install -d ${BINDIR}
+ 	# aa-easyprof is installed by python-tools-setup.py
+ 	install -m 755 $(filter-out aa-easyprof, ${TOOLS}) ${BINDIR}
+-	$(MAKE) -C po install DESTDIR=${DESTDIR} NAME=${NAME}
+-	$(MAKE) install_manpages DESTDIR=${DESTDIR}
+-	$(MAKE) -C vim install DESTDIR=${DESTDIR}
++	$(MAKE) -C po install DESTDIR=${DESTDIR}/${PYPREFIX} NAME=${NAME}
++	$(MAKE) install_manpages DESTDIR=${DESTDIR}/${PYPREFIX}
++	$(MAKE) -C vim install DESTDIR=${DESTDIR}/${PYPREFIX}
+ 	${PYTHON} ${PYSETUP} install --prefix=${PYPREFIX} --root=${DESTDIR} --version=${VERSION}
+ 
+ .PHONY: clean
+-- 
+2.25.1
+

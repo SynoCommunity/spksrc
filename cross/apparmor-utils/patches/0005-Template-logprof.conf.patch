@@ -1,0 +1,34 @@
+From a7bbd7bf8cf82a0369ed258e728e923d24d633f4 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Mon, 19 Apr 2021 04:13:04 +0000
+Subject: [PATCH] Template logprof.conf
+
+---
+ utils/logprof.conf | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git utils/logprof.conf utils/logprof.conf
+index a778792..e2ee362 100644
+--- utils/logprof.conf
++++ utils/logprof.conf
+@@ -10,12 +10,12 @@
+ # ------------------------------------------------------------------
+ 
+ [settings]
+-  profiledir = /etc/apparmor.d /etc/subdomain.d
+-  inactive_profiledir = /usr/share/apparmor/extra-profiles 
+-  logfiles = /var/log/audit/audit.log /var/log/syslog /var/log/messages
++  profiledir = @AA_PREFIX@/etc/apparmor.d
++  inactive_profiledir = @AA_PREFIX@/share/apparmor/extra-profiles 
++  logfiles = /var/log/apparmor.log /var/log/syslog.log /var/log/messages
+ 
+-  parser = /sbin/apparmor_parser /sbin/subdomain_parser
+-  ldd = /usr/bin/ldd
++  parser = @AA_PREFIX@/sbin/apparmor_parser
++  ldd = @AA_PREFIX@/bin/ldd
+   logger = /bin/logger /usr/bin/logger
+ 
+   # customize how file ownership permissions are presented
+-- 
+2.25.1
+

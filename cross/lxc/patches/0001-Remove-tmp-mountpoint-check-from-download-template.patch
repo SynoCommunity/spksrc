@@ -1,0 +1,28 @@
+From 865aa5bbe2e2a7a5d90ef6be1179940ef7b07e2b Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 14:12:33 +0000
+Subject: [PATCH] Remove tmp mountpoint check from download template
+
+---
+ templates/lxc-download.in | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git templates/lxc-download.in templates/lxc-download.in
+index d688b8f..11f5e0a 100644
+--- templates/lxc-download.in
++++ templates/lxc-download.in
+@@ -324,10 +324,7 @@ fi
+ # Trap all exit signals
+ trap cleanup EXIT HUP INT TERM
+ 
+-# /tmp may be mounted in tmpfs or noexec
+-if mountpoint -q /tmp; then
+-  DOWNLOAD_TEMP="${LXC_PATH}"
+-fi
++DOWNLOAD_TEMP="${LXC_PATH}"
+ 
+ if ! command -V mktemp >/dev/null 2>&1; then
+   DOWNLOAD_TEMP="${DOWNLOAD_TEMP}/tmp/lxc-download.$$"
+-- 
+2.25.1
+

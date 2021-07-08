@@ -1,0 +1,18 @@
+[
+  {
+    "step_title": "Delete LXC data",
+    "items": [
+      {
+        "type": "multiselect",
+        "desc": "Do you want to delete the LXC share? You will lose all container data you have not backed up elsewhere.",
+        "subitems": [
+          {
+            "key": "wizard_lxc_delete_share",
+            "desc": "Delete all container data",
+            "defaultVaule": false
+          }
+        ]
+      }
+    ]
+  }
+]

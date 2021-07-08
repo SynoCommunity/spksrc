@@ -1,0 +1,25 @@
+From 0da0fcc9bfafb36314a63c9fa3f3f27836d3b1c7 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 14:19:30 +0000
+Subject: [PATCH] Make lxc-net script use bundled tools
+
+---
+ config/init/common/lxc-net.in | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git config/init/common/lxc-net.in config/init/common/lxc-net.in
+index 999f42c..8274d10 100644
+--- config/init/common/lxc-net.in
++++ config/init/common/lxc-net.in
+@@ -1,5 +1,8 @@
+ #!/bin/sh -
+ 
++# Add package local path so we can use some updated tools
++PATH="@BINDIR@:@SBINDIR@:$PATH"
++
+ distrosysconfdir="@LXC_DISTRO_SYSCONF@"
+ varrun="@RUNTIME_PATH@/lxc"
+ varlib="@LOCALSTATEDIR@/lib"
+-- 
+2.25.1
+

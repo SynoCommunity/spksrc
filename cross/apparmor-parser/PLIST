@@ -1,0 +1,3 @@
+rsc:etc/apparmor/parser.conf
+rsc:lib/apparmor/rc.apparmor.functions
+bin:sbin/apparmor_parser

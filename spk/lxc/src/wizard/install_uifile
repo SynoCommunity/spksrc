@@ -1,0 +1,80 @@
+[
+    {
+    "step_title": "Storage",
+    "items": [
+      {
+        "type": "combobox",
+        "desc": "Which volume do you want to use to store LXC data?",
+        "subitems": [
+          {
+            "key": "wizard_lxc_volume",
+            "desc": "Volume name",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "What do you want to call the share LXC will use?",
+        "subitems": [
+          {
+            "key": "wizard_lxc_share_name",
+            "desc": "Share name",
+            "defaultValue": "lxc",
+            "validator": {
+              "vtype": "alphanum",
+              "allowBlank": false,
+              "minLength": 1,
+              "maxLength": 32
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "AppArmor",
+    "items": [
+      {
+        "type": "singleselect",
+        "desc": "What mode should the AppArmor profiles be put in?",
+        "subitems": [
+          {
+            "key": "wizard_aa_disable",
+            "desc": "Disabled [recommended]",
+            "defaultVaule": true
+          },
+          {
+            "key": "wizard_aa_complain",
+            "desc": "Complain [broken - development only]",
+            "defaultVaule": false
+          },
+          {
+            "key": "wizard_aa_enforce",
+            "desc": "Enforce [broken - development only]",
+            "defaultVaule": false
+          }
+        ]
+      }
+    ]
+  }
+]

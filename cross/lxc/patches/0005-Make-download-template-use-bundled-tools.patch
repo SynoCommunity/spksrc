@@ -1,0 +1,26 @@
+From 4ad016a9a174336f9b7f7399b5e3cf06ecd698dd Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 14:27:11 +0000
+Subject: [PATCH] Make download template use bundled tools
+
+---
+ templates/lxc-download.in | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git templates/lxc-download.in templates/lxc-download.in
+index 11f5e0a..3ab8b44 100644
+--- templates/lxc-download.in
++++ templates/lxc-download.in
+@@ -68,6 +68,9 @@ fi
+ # Make sure the usual locations are in PATH
+ export PATH=$PATH:/usr/sbin:/usr/bin:/sbin:/bin
+ 
++# Add package local path so we can use some updated tools
++export PATH="@BINDIR@:@SBINDIR@:$PATH"
++
+ # Some useful functions
+ cleanup() {
+   if [ -d "${DOWNLOAD_TEMP}" ]; then
+-- 
+2.25.1
+
