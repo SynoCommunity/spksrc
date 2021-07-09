@@ -50,10 +50,9 @@ Docker
   On Mac hosts running OSX you might need to use fakeroot with tar to avoid permission errors while extracting the synology toolchain archives.
   For that reason run the container with ``docker run -it -v~/spksrc:/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash``.
 
-
 Virtual machine
 ^^^^^^^^^^^^^^^
-A virtual machine based on an 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.
+A virtual machine based on an 64-bit version of Debian 10 stable OS is recommended (or, use the Vagrant configuration, described below). Non-x86 architectures are not supported.
 
 * Install the requirements (in sync with Dockerfile)::
 
@@ -68,6 +67,21 @@ A virtual machine based on an 64-bit version of Debian 10 stable OS is recommend
 * You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
 * Some older toolchains may require 32-bit development versions of packages, e.g. `zlib1g-dev:i386`
 
+
+Vagrant
+^^^^^^^
+Using `Vagrant`_ automates the setup for a virtual machine build.
+
+.. code-block:: sh
+
+    vagrant up  # Bring up the development environment.
+    vagrant ssh # Log in to the development environment.
+    cd /vagrant # Go to the dev env's working directory.
+
+    # From here, follow the instructions in the linked
+    # Developer's Guide. For example:
+    make setup
+    # ...and so on.
 
 Usage
 -----
@@ -98,3 +112,4 @@ When not explicitly set, files are placed under a `3 clause BSD license`_
 .. _FAQ: https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions
 .. _Install Docker with wget: https://docs.docker.com/linux/step_one
 .. _SynoCommunity repository: http://www.synocommunity.com
+.. _Vagrant: https://vagrantup.com/

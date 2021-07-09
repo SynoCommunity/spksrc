@@ -13,3 +13,4 @@ toolkit/*/work*
 local.mk
 *.DS_Store
 *~
+.vagrant
