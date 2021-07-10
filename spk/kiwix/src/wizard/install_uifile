@@ -1,0 +1,24 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Shared folder for zim files. This must be a name for the shared folder only, without any path. This share is created at installation when it does not already exist.",
+        "subitems": [{
+            "key": "wizard_share_folder_name",
+            "desc": "Shared folder",
+            "defaultValue": "kiwix-share",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[^<>: */?\"]*/",
+                    "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "Content management and DSM permissions.",
+    "items": [{
+        "desc": "kiwix-serve runs as internal service user <b>'sc-kiwix'</b> in DSM. The shared folder is configured at installation time to be accessible by this user. If you add content with <strong>kiwix-manage</strong> make sure, 'sc-kiwix' has permissions to access *.zim files in this folder.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }]
+}]
