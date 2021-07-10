@@ -62,6 +62,7 @@ domoticz_install:
 	install -d $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/var
 	install -m 755 $(CMAKE_BUILD_DIR)/domoticz $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(CMAKE_BUILD_DIR)/extern/minizip/libminizip.so $(STAGING_INSTALL_PREFIX)/lib
+	tar -cf - --exclude=.gitignore -C $(WORK_DIR)/$(PKG_DIR) dzVents | tar -xf - -C $(STAGING_INSTALL_PREFIX)/bin
 	@$(RUN) cp -R www $(STAGING_INSTALL_PREFIX)
 	@$(RUN) cp -R Config $(STAGING_INSTALL_PREFIX)
 	@$(RUN) cp -R scripts $(STAGING_INSTALL_PREFIX)
