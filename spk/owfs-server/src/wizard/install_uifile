@@ -1,0 +1,61 @@
+[{
+    "step_title": "Server configuration",
+    "items": [{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_OWdriver",
+            "desc": "Driver",
+            "defaultValue": "FAKE = DS18S20,DS2405",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    },{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_OWport",
+            "desc": "Port",
+            "defaultValue": "4304",
+            "validator": {
+                "allowBlank": false,
+                "fn": "{var v=Number(arguments[0]); if ( v<=1024 || v>=65535 || isNaN(v) ) return 'Must be a number between 1024 and 65535';return true;}"
+            }
+        }]
+    },{
+        "desc": "See http://owfs.org/index.php?page=owserver for available options in section 'Device Option'"
+    },{
+        "desc": "Enter options without '--' before"
+    },{
+        "desc": "You can change option later by mofying file /usr/local/owfs/var/owfs.conf"
+    },{
+        "desc": "OWserver is only accessible by the Nas (binded to localhost)"
+    }]
+},{
+    "step_title": "Http configuration",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Enable the Http server ?",
+        "subitems": [{
+            "key": "wizard_OW_httpyes",
+            "desc": "Yes",
+            "defaultValue": false
+        },{
+            "key": "wizard_OW_httpno",
+            "desc": "No",
+            "defaultValue": true
+        }]
+    },{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_OWhttpport",
+            "desc": "Port",
+            "defaultValue": "2121",
+            "validator": {
+                "allowBlank": false,
+                "fn": "{var v=Number(arguments[0]); if ( v<=1024 || v>=65535 || isNaN(v) ) return 'Must be a number between 1024 and 65535';return true;}"
+            }
+        }]
+    },{
+        "desc": "You can change option later by mofying file /usr/local/owfs/var/owfs.conf"
+    }]
+}]

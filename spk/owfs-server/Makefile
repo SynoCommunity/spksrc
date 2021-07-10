@@ -1,0 +1,43 @@
+SPK_NAME = owfs-server
+SPK_VERS = 3.1p0
+SPK_REV = 1
+SPK_ICON = src/owfs-server.png
+
+DEPENDS = cross/busybox cross/$(SPK_NAME)
+
+MAINTAINER = SynoCommunity
+DESCRIPTION = OWFS is an easy way to use the powerful 1-wire system of Dallas. This package implements the server part of OWFS.
+DISPLAY_NAME = OWFS-Server
+CHANGELOG = "Initial release"
+
+RELOAD_UI = yes
+
+HOMEPAGE = http://owfs.org
+LICENSE  = GPL-2.0+
+
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
+WIZARDS_DIR      = src/wizard/
+
+POST_STRIP_TARGET = owfs_extra_install
+
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+
+include ../../mk/spksrc.spk.mk
+
+.PHONY: owfs_extra_install
+owfs_extra_install:
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/owfs.conf $(STAGING_DIR)/var/owfs.conf
+	install -m 755 -d $(STAGING_DIR)/rules.d
+	install -m 644 src/60-synocommunity.owfs-server.rules $(STAGING_DIR)/rules.d/60-synocommunity.owfs-server.rules
+	install -m 755 -d $(STAGING_DIR)/app/images
+	for size in 16 24 32 48 72 ; \
+	do \
+	    convert $(SPK_ICON) -thumbnail $${size}x$${size} \
+	            $(STAGING_DIR)/app/images/$(SPK_NAME)-$${size}.png ; \
+	done
