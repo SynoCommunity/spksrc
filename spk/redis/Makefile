@@ -1,33 +1,31 @@
 SPK_NAME = redis
-SPK_VERS = 5.0.7
-SPK_REV = 6
+SPK_VERS = 5.0.12
+SPK_REV = 7
 SPK_ICON = src/redis.png
-DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 
-RELOAD_UI = yes
-STARTABLE = yes
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update to 5.0.7"
+CHANGELOG = "Update redis to v5.0.12"
 
 # PPC archs except qoriq are not supported anymore
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-NO_SERVICE_SHORTCUT = yes
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = redis_extra_install
+
+# add links for tools
+SPK_COMMANDS = bin/redis-benchmark bin/redis-check-aof bin/redis-check-rdb bin/redis-cli
 
 include ../../mk/spksrc.spk.mk
 
