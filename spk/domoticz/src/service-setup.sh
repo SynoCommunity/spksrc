@@ -11,7 +11,7 @@ WWW_OPTIONS="${WWW_PORT} ${WWW_ROOT} ${WWW_DISABLE_HTTPS}"
 LOG_OPTIONS="-log ${LOG_FILE} -loglevel status,error -debuglevel normal,webserver"
 
 DB_FILE="${SYNOPKG_PKGVAR}/domoticz.db"
-DATA_OPTIONS="-dbase ${DB_FILE} -userdata ${SYNOPKG_PKGVAR}"
+DATA_OPTIONS="-dbase ${DB_FILE} -userdata ${SYNOPKG_PKGDEST}"
 
 DAEMON_OPTIONS="-daemon -pidfile ${PID_FILE} -noupdates"
 
