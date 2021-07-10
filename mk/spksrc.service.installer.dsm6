@@ -277,6 +277,9 @@ postinst ()
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
 
+    # Link for DSM7 forward compatibility of var location
+    $LN "${SYNOPKG_PKGDEST}/var" "/var/packages/${SYNOPKG_PKGNAME}/var" 2>&1 | install_log
+
     # Service user management
     if [ -n "${EFF_USER}" ]; then
         # Register service in "users" group to access any content
