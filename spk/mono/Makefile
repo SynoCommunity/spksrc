@@ -5,7 +5,7 @@ SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = hg59
+MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
@@ -21,7 +21,6 @@ POST_STRIP_TARGET = mono_extra_install
 MONO_NATIVE_INSTALL = $(WORK_DIR)/../../../native/$(SPK_NAME)/work-native/install
 
 SPK_COMMANDS = bin/mono bin/mcs bin/gacutil bin/gacutil2 bin/makecert
-
 
 include ../../mk/spksrc.spk.mk
 
