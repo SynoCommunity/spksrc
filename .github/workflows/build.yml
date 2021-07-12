@@ -82,7 +82,7 @@ jobs:
         env:
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
-          #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
