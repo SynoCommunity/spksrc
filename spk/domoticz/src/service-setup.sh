@@ -21,6 +21,9 @@ UDEV_RULES=/usr/lib/udev/rules.d/70-sc-domoticz.rules
 
 service_postinst ()
 {
+    # link scripts folder into userdata
+    ln -sf ${SYNOPKG_PKGVAR}/scripts ${SYNOPKG_PKGDEST}/scripts
+
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         > ${UDEV_RULES}
         echo "#author: SynoCommunity Team"  >> ${UDEV_RULES}
