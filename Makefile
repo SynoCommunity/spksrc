@@ -169,10 +169,10 @@ dsm-%: local.mk
 	@grep -q "^DEFAULT_TC.*=.*$*.*" local.mk || sed -i "/^DEFAULT_TC =/s/$$/ $*/" local.mk
 
 setup-synocommunity: setup
-	@sed -i -e "s|PUBLISH_URL=.*|PUBLISH_URL=https://api.synocommunity.com|" \
-		-e "s|MAINTAINER?=.*|MAINTAINER?=SynoCommunity|" \
-		-e "s|MAINTAINER_URL?=.*|MAINTAINER_URL?=https://synocommunity.com|" \
-		-e "s|DISTRIBUTOR=.*|DISTRIBUTOR=SynoCommunity|" \
-		-e "s|DISTRIBUTOR_URL=.*|DISTRIBUTOR_URL=https://synocommunity.com|" \
-		-e "s|REPORT_URL=.*|REPORT_URL=https://github.com/SynoCommunity/spksrc/issues|" \
+	@sed -i -e "s|PUBLISH_URL =.*|PUBLISH_URL = https://api.synocommunity.com|" \
+		-e "s|MAINTAINER ?=.*|MAINTAINER ?= SynoCommunity|" \
+		-e "s|MAINTAINER_URL ?=.*|MAINTAINER_URL ?= https://synocommunity.com|" \
+		-e "s|DISTRIBUTOR =.*|DISTRIBUTOR = SynoCommunity|" \
+		-e "s|DISTRIBUTOR_URL =.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
+		-e "s|REPORT_URL =.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk
