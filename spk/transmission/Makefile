@@ -3,7 +3,7 @@ SPK_VERS = 3.00
 SPK_REV = 19
 SPK_ICON = src/transmission.png
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Transmission is an easy and fast BitTorrent client. You can control it remotely with its web interface or dedicated applications.
@@ -30,12 +30,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = transmission_extra_install
 
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
-
 include ../../mk/spksrc.spk.mk
-
 
 .PHONY: transmission_extra_install
 transmission_extra_install:
