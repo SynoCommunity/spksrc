@@ -3,5 +3,4 @@ rsc:bin/dzVents/
 lib:lib/libminizip.so
 rsc:www
 rsc:Config
-rsc:scripts
 rsc:var

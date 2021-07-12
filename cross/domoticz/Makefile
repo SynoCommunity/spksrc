@@ -1,10 +1,11 @@
 PKG_NAME = domoticz
 PKG_VERS = 2020.2
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/domoticz/domoticz/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DOWNLOAD_METHOD = git-repository
+PKG_GIT_HASH = aad65002eea99b8336cefd773e7422f0a7f1873f
+PKG_DIST_SITE = https://github.com/domoticz/domoticz.git
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
 DEPENDS = cross/boost_1.68 cross/sqlite cross/curl cross/python38 cross/lua cross/zlib
 DEPENDS += cross/jsoncpp
@@ -16,9 +17,9 @@ HOMEPAGE = https://www.domoticz.com/
 COMMENT  = Domoticz is a Home Automation System.
 LICENSE  = GPLv3
 
-POST_EXTRACT_TARGET = domoticz_post_extract
-PRE_COMPILE_TARGET = domoticz_pre_compile
 INSTALL_TARGET = domoticz_install
+# with "PKG_DOWNLOAD_METHOD = git-repository" each download has different checksums.
+CHECKSUM_TARGET = nop
 
 # for domoticz
 BOOST_LIBRARIES = atomic chrono date_time system thread
@@ -44,19 +45,6 @@ USE_NATIVE_CMAKE = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
-.PHONY: domoticz_post_extract
-# sub module: load minizip from git
-domoticz_post_extract:
-	@$(RUN); cd extern; git clone https://github.com/domoticz/minizip.git ./minizip
-
-.PHONY: domoticz_pre_compile
-# inject version information
-domoticz_pre_compile:
-	$(RUN) ; sed -e "s/@_version_@/$(PKG_VERS)/g" \
-	             -e "s/@_year_@/$(firstword $(subst ., ,$(PKG_VERS)))/g" \
-	             -e "s/@_date_@/$(shell date +'%Y-%m-%d %H:%M:%S')/g" \
-	             -i main/domoticz.cpp
-
 .PHONY: domoticz_install
 domoticz_install:
 	install -d $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/var
@@ -65,4 +53,6 @@ domoticz_install:
 	tar -cf - --exclude=.gitignore -C $(WORK_DIR)/$(PKG_DIR) dzVents | tar -xf - -C $(STAGING_INSTALL_PREFIX)/bin
 	@$(RUN) cp -R www $(STAGING_INSTALL_PREFIX)
 	@$(RUN) cp -R Config $(STAGING_INSTALL_PREFIX)
-	@$(RUN) cp -R scripts $(STAGING_INSTALL_PREFIX)
+	# install scripts folder to var and create link at original location
+	@$(RUN) cp -R scripts $(STAGING_INSTALL_PREFIX)/var
+	ln -sf $(STAGING_INSTALL_PREFIX)/var/scripts $(STAGING_INSTALL_PREFIX)/scripts
