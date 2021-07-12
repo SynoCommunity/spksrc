@@ -1,20 +1,19 @@
 SPK_NAME = sickchill
-SPK_VERS = $(shell date +%Y%m%d)
+SPK_VERS = 20210419
 SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
-DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python3>=3.6:git"
 PIP=pip3
 
 WHEELS = src/requirements.txt
 
-MAINTAINER = Nyaran
+MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Initial SickChill version"
+CHANGELOG = "Update git clone url and requirements.txt"
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPL
