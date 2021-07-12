@@ -11,7 +11,7 @@ WWW_OPTIONS="${WWW_PORT} ${WWW_ROOT} ${WWW_DISABLE_HTTPS}"
 LOG_OPTIONS="-log ${LOG_FILE} -loglevel status,error -debuglevel normal,webserver"
 
 DB_FILE="${SYNOPKG_PKGVAR}/domoticz.db"
-DATA_OPTIONS="-dbase ${DB_FILE} -userdata ${SYNOPKG_PKGVAR}"
+DATA_OPTIONS="-dbase ${DB_FILE} -userdata ${SYNOPKG_PKGDEST}"
 
 DAEMON_OPTIONS="-daemon -pidfile ${PID_FILE} -noupdates"
 
@@ -21,6 +21,9 @@ UDEV_RULES=/usr/lib/udev/rules.d/70-sc-domoticz.rules
 
 service_postinst ()
 {
+    # link scripts folder into userdata
+    ln -sf ${SYNOPKG_PKGVAR}/scripts ${SYNOPKG_PKGDEST}/scripts
+
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         > ${UDEV_RULES}
         echo "#author: SynoCommunity Team"  >> ${UDEV_RULES}
