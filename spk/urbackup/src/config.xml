@@ -1,0 +1,5 @@
+<configuration version="18">
+    <gui enabled="true" tls="false">
+        <address>0.0.0.0:55414</address>
+    </gui>
+</configuration>
