@@ -1,10 +1,9 @@
 SPK_NAME = mtproxy
 SPK_VERS = 1
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/${SPK_NAME}.jpg
 
 REQUIRED_DSM = 5.2
-BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
 
