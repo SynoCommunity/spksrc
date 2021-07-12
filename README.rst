@@ -42,14 +42,25 @@ Setup Development Environment
 -----------------------------
 Docker
 ^^^^^^
-* You need a host system running ``linux``. Mac OSX may work with ``fakeroot tar`` (see below: how to run the container). Docker on Windows is not supported due to limitations of the underlying file system.
-* `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc ~/spksrc``
-* Install Docker on your host OS: `Docker installation`_. A wget-based alternative for linux: `Install Docker with wget`_.
-* Download the spksrc docker container: ``docker pull synocommunity/spksrc``
-* Run the container with ``docker run -it -v ~/spksrc:/spksrc synocommunity/spksrc /bin/bash``. 
-  On Mac hosts running OSX you might need to use fakeroot with tar to avoid permission errors while extracting the synology toolchain archives.
-  For that reason run the container with ``docker run -it -v~/spksrc:/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash``.
 
+    ℹ️  The Docker development environment supports Linux and macOS systems, but not Windows due to limitations of the underlying file system.
+
+#. `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc``
+#. Install Docker on your host OS (see `Docker installation`_, or use a ``wget``-based alternative for linux `Install Docker with wget`_).
+#. Download the spksrc Docker container: ``docker pull synocommunity/spksrc``
+#. Run the container with the repository mounted into the ``/spksrc`` directory with the appropriate command for your host Operating System:
+
+.. code-block:: sh
+
+   cd spksrc # Go to the cloned repository's root folder.
+
+   # If running on Linux:
+   docker run -it -v $(pwd):/spksrc synocommunity/spksrc /bin/bash
+
+   # If running on macOS:
+   docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash
+
+5. From there, follow the instructions in the `Developers HOW-TO`_.
 
 Virtual machine
 ^^^^^^^^^^^^^^^
