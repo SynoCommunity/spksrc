@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.watcher3": {
+            "title": "Watcher 3",
+            "desc": "Watcher is an automated movie NZB & Torrent searcher and snatcher.",
+            "icon": "images/watcher3-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "9090",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
