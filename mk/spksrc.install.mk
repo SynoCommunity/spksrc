@@ -47,7 +47,7 @@ install_msg_target:
 
 $(PRE_INSTALL_PLIST):
 	$(create_target_dir)
-	@mkdir -p $(INSTALL_DIR)/$(INSTALL_PREFIX)
+	@mkdir -p $(INSTALL_DIR)/$(INSTALL_PREFIX) $(INSTALL_DIR)/$(INSTALL_PREFIX_ETC) $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) $(INSTALL_DIR)/$(INSTALL_PREFIX_TMP) $(INSTALL_DIR)/$(INSTALL_PREFIX_HOME)
 	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort > $@
 
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
