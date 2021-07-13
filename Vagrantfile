@@ -2,16 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vagrant.plugins = [
-    "vagrant-vbguest" # Automates VirtualBox Guest Additions builds.
-  ]
-
   config.vm.box = "debian/buster64"
-
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = 1024 # Minimum RAM required for VBox Guest Additions.
-  end
-
   config.vm.provision "shell", inline: <<~EOF
     dpkg --add-architecture i386
     apt-get update
@@ -29,10 +20,6 @@ Vagrant.configure("2") do |config|
     wget https://bootstrap.pypa.io/get-pip.py -O - | python3
     pip3 install meson==0.56.0
   EOF
-
-  # The upstream base box explicitly sets this type to `rsync`, but we
-  # want VirtualBox Shared Folders, so we have to override that here.
-  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
 
   config.vm.post_up_message = <<~EOF
     For further instructions, see:
