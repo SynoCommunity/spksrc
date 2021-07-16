@@ -60,7 +60,7 @@ Docker
    # If running on macOS:
    docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash
 
-5. From there, follow the instructions in the `Developers HOW-TO`_.
+5. From there, follow the instructions in the `Developers HOW TO`_.
 
 Virtual machine
 ^^^^^^^^^^^^^^^
