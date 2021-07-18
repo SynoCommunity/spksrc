@@ -1,7 +1,7 @@
 SPK_NAME = python3
-SPK_VERS = 3.7.10
+SPK_VERS = 3.7.11
 SPK_SHORT_VERS = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -21,7 +21,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "Update depencencies (PyYAML, cryptography and others) including security fixes for CVE-2020-14343."
+CHANGELOG = "Update to Python 3.7.11."
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

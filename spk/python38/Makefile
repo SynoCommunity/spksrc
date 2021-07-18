@@ -1,7 +1,7 @@
 SPK_NAME = python38
-SPK_VERS = 3.8.10
+SPK_VERS = 3.8.11
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -20,7 +20,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.8
-CHANGELOG = "1. Update to Python 3.8.10<br/>2. Update depencencies (PyYAML, cryptography, and others) including security fixes for CVE-2020-14343."
+CHANGELOG = "Update to Python 3.8.11."
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

@@ -1,11 +1,9 @@
 PKG_NAME = python38
-PKG_VERS = 3.8.10
+PKG_VERS = 3.8.11
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
-
-DEPENDS =
 
 HOMEPAGE = https://www.python.org/
 COMMENT  = Python Programming Language
