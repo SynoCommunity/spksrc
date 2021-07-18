@@ -16,6 +16,7 @@ HOMEPAGE   = https://www.rutschle.net/tech/sslh/README.html
 LICENSE    = GPLv2
 STARTABLE  = yes
 
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
 POST_STRIP_TARGET = sslh_extra_install
