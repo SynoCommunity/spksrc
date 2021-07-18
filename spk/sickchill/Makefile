@@ -5,7 +5,7 @@ SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python38
 # python38 includes the other depends cross/cryptography cross/lxml cross/cffi cross/sqlite
-DEPENDS += cross/PyNaCl cross/mediainfo cross/poetry
+DEPENDS += cross/PyNaCl cross/mediainfo
 
 SPK_DEPENDS = "python38"
 PIP=pip3
