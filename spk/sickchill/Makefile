@@ -10,7 +10,7 @@ DEPENDS += cross/PyNaCl cross/mediainfo cross/poetry
 SPK_DEPENDS = "python38"
 PIP=pip3
 
-WHEELS = sickchill==2021.7.14.post8
+WHEELS = src/requirements.txt
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
