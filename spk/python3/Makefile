@@ -18,7 +18,7 @@ MAINTAINER = Allan Clark
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
-RELOAD_UI = yes
+
 STARTABLE = no
 DISPLAY_NAME = Python3
 CHANGELOG = "Update to Python 3.7.11."
