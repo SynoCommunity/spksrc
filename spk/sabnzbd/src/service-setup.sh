@@ -21,11 +21,11 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@download_dir@|/${wizard_volume:=volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
     fi
 
     # Create logs directory, otherwise it does not start due to permissions errors
-    mkdir "$(dirname ${LOG_FILE})"
+    mkdir -p "$(dirname ${LOG_FILE})"
 
     # Install nice/ionice
     ${BIN}/busybox --install ${BIN}
