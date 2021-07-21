@@ -5,7 +5,7 @@ SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = digitalbox98
+MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
