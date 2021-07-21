@@ -13,5 +13,6 @@ more-itertools==8.8.0
 portend==2.7.1
 pytz==2021.1
 sabyenc3==4.0.2
+six==1.16.0
 tempora==4.0.2
 zc.lockfile==2.0
