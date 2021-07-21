@@ -22,6 +22,7 @@ service_postinst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
         sed -i -e "s|@download_dir@|${wizard_volume:=volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
     fi
 
     # Create logs directory, otherwise it does not start due to permissions errors
@@ -50,5 +51,7 @@ service_postupgrade ()
         if [ -n "${WATCHED_FOLDER}" ] && [ -d "${WATCHED_FOLDER}" ]; then
             set_syno_permissions "${WATCHED_FOLDER}" "${GROUP}"
         fi
+        # DSM6 -> DSM7 migration
+        sed -i -e "s|script_dir\s*=.*|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
     fi
 }
