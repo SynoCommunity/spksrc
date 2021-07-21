@@ -15,13 +15,14 @@ DISPLAY_NAME = beets
 
 CHANGELOG = "1. Upgraded minimum version of python 3."
 
-HOMEPAGE   = http://beets.io/
-LICENSE    = GPL
+HOMEPAGE = http://beets.io/
+LICENSE  = GPL
 
 SERVICE_SETUP = src/service-setup.sh
-SPK_LINKS = /usr/local/bin/beet:env/bin/beet
 
 STARTABLE = no
+
+SPK_USR_LOCAL_LINKS = bin:env/bin/beet
 
 # Pure Python package, make sure ARCH is not defined
 override ARCH=

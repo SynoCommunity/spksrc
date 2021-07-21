@@ -1,7 +1,5 @@
 PKG_NAME = openssl
-VERSION = 1.1.1
-PATCH_VERS = i
-PKG_VERS = $(VERSION)$(PATCH_VERS)
+PKG_VERS = 1.1.1k
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source

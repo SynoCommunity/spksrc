@@ -1,13 +1,12 @@
-VIRTUALENV="/usr/local/python/bin/virtualenv"
+VIRTUALENV="/var/packages/python/target/bin/virtualenv"
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 
 GROUP="sc-download"
-INST_LOG="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_installer.log"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/pyload.conf"
 PYLOAD="${SYNOPKG_PKGDEST}/env/bin/python ${SYNOPKG_PKGDEST}/share/pyload/pyLoadCore.py"
 DOWNLOAD_DIR="${wizard_download_dir:=/volume1/downloads}"
 
-service_preinst ()
+validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Check directory
@@ -44,44 +43,45 @@ lng2iso()
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env  >> ${INST_LOG}  2>&1
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Adjust ownership
-    chown -R ${EFF_USER}:${GROUP} ${SYNOPKG_PKGDEST}  >> ${INST_LOG}  2>&1
+    chown -R ${EFF_USER}:${GROUP} ${SYNOPKG_PKGDEST}
 
     # Log installation information
-    ${PYLOAD} --version >> ${INST_LOG}  2>&1
+    ${PYLOAD} --version
 
-    echo -e "\nSystem check:" >> ${INST_LOG}
+    echo "System check:"
     # result of system check (only DSM>=6 have grep with perl capabilities -P)
     if [ "$(grep --version 2> /dev/null | grep -o "GNU grep")" == "GNU grep" ]; then
-        echo -e "\n\n" | ${PYLOAD} --setup 2> /dev/null | grep -Pzo "##(.|\n)*^You can abort.*$" | grep -v "^$\|hit enter\|^You can abort"  >> ${INST_LOG}
+        echo -e "\n\n" | ${PYLOAD} --setup 2> /dev/null | grep -Pzo "##(.|\n)*^You can abort.*$" | grep -v "^$\|hit enter\|^You can abort"
     else
-        echo -e "\n\n" | ${PYLOAD} --setup 2> /dev/null | tail -n +12 | grep -v "^$\|hit enter\|^You can abort\|^Continue with setup"  >> ${INST_LOG}
+        echo -e "\n\n" | ${PYLOAD} --setup 2> /dev/null | tail -n +12 | grep -v "^$\|hit enter\|^You can abort\|^Continue with setup"
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
 
         # Edit the configuration according to the wizard
-        sed -i -e "s|@W_DOWNLOAD_DIR@|${DOWNLOAD_DIR}|" "${CFG_FILE}"  >> ${INST_LOG}  2>&1
+        sed -i -e "s|@W_DOWNLOAD_DIR@|${DOWNLOAD_DIR}|" "${CFG_FILE}"
         # Set language to the DSM language
-        sed -i -e "s|@LNG@|$(lng2iso ${SYNOPKG_DSM_LANGUAGE})|" "${CFG_FILE}"  >> ${INST_LOG}  2>&1
+        sed -i -e "s|@LNG@|$(lng2iso ${SYNOPKG_DSM_LANGUAGE})|" "${CFG_FILE}"
         # Set user and group for permissions
-        sed -i -e "s|@GROUP_NAME@|${GROUP}|" "${CFG_FILE}"  >> ${INST_LOG}  2>&1
-        sed -i -e "s|@USER_NAME@|${EFF_USER}|" "${CFG_FILE}"  >> ${INST_LOG}  2>&1
+        sed -i -e "s|@GROUP_NAME@|${GROUP}|" "${CFG_FILE}"
+        sed -i -e "s|@USER_NAME@|${EFF_USER}|" "${CFG_FILE}"
 
         # hash password
-        SALT=$((RANDOM%99999+10000))  >> ${INST_LOG}  2>&1
-        SALTED_PW_HASH=${SALT}$(echo -n "${SALT}${wizard_password}" | openssl dgst -sha1 2>/dev/null | cut -d" " -f2)  >> ${INST_LOG}  2>&1
+        SALT=$((RANDOM%99999+10000))
+        SALTED_PW_HASH=${SALT}$(echo -n "${SALT}${wizard_password}" | openssl dgst -sha1 2>/dev/null | cut -d" " -f2)
 
         # init DB & add 'admin' user
         echo -n "4" > "${SYNOPKG_PKGDEST}/var/files.version"
-        sqlite3 "${SYNOPKG_PKGDEST}/var/files.db" < "${SYNOPKG_PKGDEST}/var/pyload_init.sql" || exit 1  >> ${INST_LOG}  2>&1
-        sqlite3 "${SYNOPKG_PKGDEST}/var/files.db" "INSERT INTO users (name, password) VALUES ('admin', '${SALTED_PW_HASH}')" || exit 1  >> ${INST_LOG}  2>&1
+        sqlite3 "${SYNOPKG_PKGDEST}/var/files.db" < "${SYNOPKG_PKGDEST}/var/pyload_init.sql" || exit 1
+        sqlite3 "${SYNOPKG_PKGDEST}/var/files.db" "INSERT INTO users (name, password) VALUES ('admin', '${SALTED_PW_HASH}')" || exit 1
 
         # Adjust ownership of installed files
-        chown -R ${EFF_USER}:${GROUP} ${SYNOPKG_PKGDEST}/var  >> ${INST_LOG}  2>&1
+        chown -R ${EFF_USER}:${GROUP} ${SYNOPKG_PKGDEST}/var
     fi
 
     exit 0
 }
+

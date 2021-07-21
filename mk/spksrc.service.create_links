@@ -5,20 +5,20 @@ service_create_links ()
     for cmd in ${SPK_COMMANDS}
     do
         if [ -e "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-            mkdir -p "$(dirname /usr/local/${cmd})"  >> "${INST_LOG}" 2>&1
-            echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"  >> "${INST_LOG}"
-            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"  >> "${INST_LOG}" 2>&1
+            mkdir -p "$(dirname /usr/local/${cmd})"
+            echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
+            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"
         fi
     done
 
-    for item in ${SPK_LINKS}
+    for item in ${SPK_USR_LOCAL_LINKS}
     do
-        _link=$(echo ${item} | sed "s/:.*//g")
         _target=$(echo ${item} | sed "s/.*://g")
+        _link=/usr/local/$(echo ${item} | sed "s/:.*//g")/${_target##*/}
         if [ -e "${SYNOPKG_PKGDEST}/${_target}" ]; then
-            mkdir -p "$(dirname ${_link})"  >> "${INST_LOG}" 2>&1
-            echo "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"  >> "${INST_LOG}"
-            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"  >> "${INST_LOG}" 2>&1
+            mkdir -p "$(dirname ${_link})"
+            echo "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
+            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"
         fi
     done
 }
@@ -30,29 +30,29 @@ service_remove_links ()
     do
         if [ -L "/usr/local/${cmd}" ]; then
             if [ "$(readlink /usr/local/${cmd})" == "${SYNOPKG_PKGDEST}/${cmd}" ]; then
-                echo "remove link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"  >> "${INST_LOG}"
-                rm -f "/usr/local/${cmd}"  >> "${INST_LOG}" 2>&1
+                echo "remove link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
+                rm -f "/usr/local/${cmd}"
             else
-                echo "skip remove link: /usr/local/${cmd} -> $(readlink /usr/local/${cmd})"  >> "${INST_LOG}"
+                echo "skip remove link: /usr/local/${cmd} -> $(readlink /usr/local/${cmd})"
             fi
         else
-           echo "link to remove not found: /usr/local/${cmd}"  >> "${INST_LOG}"
+           echo "link to remove not found: /usr/local/${cmd}"
         fi
     done
 
-    for item in ${SPK_LINKS}
+    for item in ${SPK_USR_LOCAL_LINKS}
     do
-        _link=$(echo ${item} | sed "s/:.*//g")
         _target=$(echo ${item} | sed "s/.*://g")
+        _link=/usr/local/$(echo ${item} | sed "s/:.*//g")/${_target##*/}
         if [ -L "${_link}" ]; then
             if [ "$(readlink ${_link})" == "${SYNOPKG_PKGDEST}/${_target}" ]; then
-                echo "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"  >> "${INST_LOG}"
-                rm -f "${_link}"  >> "${INST_LOG}" 2>&1
+                echo "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
+                rm -f "${_link}"
             else
-                echo "skip remove link: ${_link} -> $(readlink ${_link})"  >> "${INST_LOG}"
+                echo "skip remove link: ${_link} -> $(readlink ${_link})"
             fi
         else
-           echo "link to remove not found: ${_link}"  >> "${INST_LOG}"
+           echo "link to remove not found: ${_link}"
         fi
     done
 }

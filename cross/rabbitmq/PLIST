@@ -1,0 +1,12 @@
+rsc:lib/rabbitmq_server-3.8.16/INSTALL
+rsc:lib/rabbitmq_server-3.8.16/LICENSE*
+rsc:lib/rabbitmq_server-3.8.16/escript/
+rsc:lib/rabbitmq_server-3.8.16/plugins/
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-defaults
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-diagnostics
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-env
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-plugins
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-queues
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-server
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmq-upgrade
+rsc:lib/rabbitmq_server-3.8.16/sbin/rabbitmqctl

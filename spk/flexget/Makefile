@@ -1,17 +1,17 @@
 SPK_NAME = flexget
-SPK_VERS = 3.1.79
-SPK_REV = 7
+SPK_VERS = 3.1.129
+SPK_REV = 9
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/poetry
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.7.7"
 
 MAINTAINER = manowark
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "Update FlexGet to version 3.1.79 which now runs on Python 3."
-RELOAD_UI = yes
+CHANGELOG = "1. Update FlexGet to version 3.1.129.<br/>2. Include transmission-rpc again."
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/

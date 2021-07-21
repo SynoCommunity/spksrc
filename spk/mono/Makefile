@@ -25,7 +25,6 @@ MONO_NATIVE_INSTALL = $(WORK_DIR)/../../../native/$(SPK_NAME)/work-native/instal
 
 SPK_COMMANDS = bin/mono bin/mcs bin/gacutil bin/gacutil2 bin/makecert
 
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: mono_extra_install

@@ -1,59 +1,154 @@
-# Included for reference
-#duplicity==0.7.11
+## To update this file:
+## --------------------
+## cd ./spksrc/cross/duplicity
+## download current package:
+##   make digests (or make download)
+## extract requirements.txt:
+##   tar -ztvf ../../distrib/duplicity.{PKG_VERS}.tar.gz --no-anchored requirements.txt
+## copy and rename requirements.txt:
+##   cp duplicity-{PKG_VERS}/requirements.txt ./spksrc/spk/duplicity/src/requirements.original.txt
+## create update requirements file for package:
+##   cd ./spksrc/spk/duplicity/src
+##   /spksrc/native/python38/work-native/install/usr/local/bin/python3 -m venv venv
+##   . venv/bin/activate
+##   pip install --upgrade pip
+### make some modification in requirements.original.txt
+### - remove testing dependencies
+### - comment out packages included as cross compiled wheels
+### - comment out unsupported dependencies
+##   pip install -r requirements.original.txt
+##   pip freeze > requirements.txt
+##   deactivate
+## --------------------
 
-# Main requirements
-boto==2.45.0
-lockfile==0.12.2
-paramiko==2.7.1 # SCP
-pycryptopp==0.7.1.869544967005693312591928092448767568728501330214
-fasteners==0.15
-dropbox==6.9.0
-pep8==1.7.1
-pexpect==4.8.0
-PyDrive==1.3.1
-pylint==1.9.5
-python-cloudfiles==1.7.11
-tox==3.14.3
-urllib3==1.25.7
+## This content is generated following the instructions above, except
+## that the base and backend requirements are updated separately and
+## the results are merged together.
 
-pyrax==1.9.8
 
-#pyrax dependencies
-appdirs==1.4.0
-Babel==2.3.4
+##### Included for reference #####
+#duplicity==0.8.19
+
+
+##### basic requirements #####
+certifi==2020.12.5
+chardet==4.0.0
+fasteners==0.16
+future==0.18.2
+### idna==2.10    # idna==2.9 is included in python38
+python-gettext==4.0
+requests==2.25.1
+#setuptools-scm==6.0.1
+setuptools-scm==5.0.2
+six==1.15.0
+urllib3==1.26.4
+
+
+##### backend libraries #####
+# some libs no longer support py27
+# some libs never supported py36+
+#azure-storage-blob      ; python_version >= '3.6'
+#b2sdk                   ; python_version >= '3.6'
+#boto
+#boto3
+#boxsdk[jwt]             ; python_version >= '3.6'
+#dropbox
+### gdata                   ; python_version == '2.7'
+#google_auth_oauthlib
+#jottalib
+### mediafire           ###  Development Status 3 - Alpha: outdated (Nov 2016), not supported by Python >3.4
+#pydrive                 ; python_version >= '3.6'
+#pyrax                   ; python_version >= '3.6'
+#python-swiftclient
+#requests_oauthlib
+
+
+### backend libraries except gdata mediafire
+args==0.1.0
+arrow==0.17.0
+attrs==20.3.0
+azure-core==1.13.0
+azure-storage-blob==12.8.1
+b2sdk==1.7.0
+Babel==2.9.1
+boto==2.49.0
+boto3==1.17.62
+botocore==1.20.62
+boxsdk==2.12.0
+cachetools==4.2.2
+### cffi==1.14.5          # cffi==1.14.1 is included as cross compiled wheel
+clint==0.5.1
+### cryptography==3.4.7   # cryptography==2.9.2 is included in python38
 debtcollector==1.11.0
+dropbox==11.7.0
 funcsigs==1.0.2
+google-api-core==1.26.3
+google-api-python-client==2.3.0
+google-auth==1.30.0
+google-auth-httplib2==0.1.0
+google-auth-oauthlib==0.4.4
+googleapis-common-protos==1.53.0
+httplib2==0.19.1
+# humanize==3.5.0  # metadata has 0.0.0
+humanize
+### importlib-metadata==4.0.1   # importlib-metadata==1.5.0 is included in python38
 ip-associations-python-novaclient-ext==0.2
-iso8601==0.1.11
-keyring==10.2
+iso8601==0.1.14
+isodate==0.6.0
+#jeepney==0.6.0  ### cross compile wheel fails to find flit_core
+jmespath==0.10.0
+jottalib==0.5.1
+keyring==23.0.1
 keystoneauth1==2.18.0
-mock==2.0.0
-monotonic==1.2
-netaddr==0.7.19
-netifaces==0.10.4 # Pinned to 0.10.4, 0.10.5 is broken for older Linux kernels
+logfury==0.1.2
+### lxml==4.6.3             # lxml==4.6.3 is included as cross compiled wheel
+#monotonic==1.6
+### msgpack-python==0.5.6   # msgpack-python==0.5.6 is included in python38
+msrest==0.6.21
+netaddr==0.8.0
+netifaces==0.10.9
+oauth2client==4.1.3
+oauthlib==3.1.0
 os-diskconfig-python-novaclient-ext==0.1.3
 os-networksv2-python-novaclient-ext==0.26
 os-virtual-interfacesv2-python-novaclient-ext==0.20
-oslo.config==3.22.0
+oslo.config==4.12.0
 oslo.i18n==3.12.0
-oslo.serialization==2.16.0
-oslo.utils==3.22.0
-packaging==16.8
+oslo.serialization==2.16.1
+oslo.utils==3.22.3
+packaging==20.9
 pbr==1.10.0
-positional==1.1.1
+ply==3.11
+positional==1.2.1
 prettytable==0.7.2
-pyparsing==2.1.10
+protobuf==3.15.8
+### pyasn1==0.4.8       # pyasn1==0.4.8 is included in python38
+pyasn1-modules==0.2.8
+### pycparser==2.20     # pycparser==2.19 is included in python38
+PyDrive==1.3.1
+PyJWT==2.1.0
+pyparsing==2.4.7
+pyrax==1.10.0
+python-dateutil==2.8.1
 python-keystoneclient==3.10.0
 python-novaclient==2.27.0
-pytz==2016.10
+python-swiftclient==3.11.1
+pytz==2021.1
+### PyYAML==5.4.1       # PyYAML==5.3 is included as module in python38
 rackspace-auth-openstack==1.3
 rackspace-novaclient==2.1
 rax-default-network-flags-python-novaclient-ext==0.4.0
 rax-scheduled-images-python-novaclient-ext==0.3.1
-requests==2.23.0
-rfc3986==0.4.1
-SecretStorage==2.3.1
-simplejson==3.10.0
-six==1.10.0
-stevedore==1.20.0
-wrapt==1.10.8
+requests-oauthlib==1.3.0
+requests-toolbelt==0.9.1
+rfc3986==1.4.0
+rsa==4.7.2
+s3transfer==0.4.2
+SecretStorage==3.3.1
+simplejson==3.17.2
+stevedore==1.20.1
+stone==3.2.1
+tqdm==4.60.0
+uritemplate==3.0.1
+wrapt==1.12.1
+### zipp==3.4.1  # zipp==3.1.0 is included in python38

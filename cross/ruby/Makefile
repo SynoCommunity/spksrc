@@ -1,12 +1,16 @@
 PKG_NAME = ruby
-PKG_VERS = 3.0.0
+PKG_VERS = 3.0.1
 PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://cache.ruby-lang.org/pub/$(PKG_NAME)/$(PKG_SHORT_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS  = cross/openssl cross/readline cross/gdbm cross/berkeleydb native/$(PKG_NAME)
+BUILD_DEPENDS = native/ruby
+DEPENDS = cross/openssl cross/readline cross/gdbm cross/berkeleydb
+
+# even it compiles with older cross/gdbm, ruby crashes at runtime
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = http://www.ruby-lang.org/
 COMMENT  = Ruby Programming Language.

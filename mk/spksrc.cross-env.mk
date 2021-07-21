@@ -5,8 +5,9 @@ ENV += WORK_DIR=$(WORK_DIR)
 ENV += INSTALL_PREFIX=$(INSTALL_PREFIX)
 
 ifeq ($(strip $(REQUIRE_KERNEL)),1)
-ENV += KERNEL_ROOT=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
-KERNEL_ROOT=$(WORK_DIR)/../../../kernel/syno-$(ARCH)-$(TCVERSION)/work/source/linux
+ENV += REQUIRE_KERNEL_MODULE="$(REQUIRE_KERNEL_MODULE)"
+ENV += KERNEL_ROOT=$(WORK_DIR)/linux
+KERNEL_ROOT=$(WORK_DIR)/linux
 endif
 
 ifeq ($(strip $(REQUIRE_TOOLKIT)),1)

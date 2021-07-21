@@ -2,5 +2,5 @@ bin:bin/gpg-error
 rsc:bin/gpg-error-config
 lnk:lib/libgpg-error.so
 lnk:lib/libgpg-error.so.0
-lib:lib/libgpg-error.so.0.30.0
+lib:lib/libgpg-error.so.0.32.0
 rsc:share/libgpg-error/errorref.txt

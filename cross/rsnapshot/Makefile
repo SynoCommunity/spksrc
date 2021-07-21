@@ -1,5 +1,5 @@
 PKG_NAME = rsnapshot
-PKG_VERS = 1.4.2
+PKG_VERS = 1.4.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://rsnapshot.org/downloads
@@ -12,7 +12,8 @@ COMMENT  = Rsnapshot is a filesystem snapshot utility. It can take incremental s
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-perl=/usr/bin/perl --with-rsync=/usr/bin/rsync --with-ssh=/usr/bin/ssh
+
+CONFIGURE_ARGS = ac_cv_path_RSYNC=/bin/rsync ac_cv_path_PERL=/bin/perl ac_cv_path_SSH=/bin/ssh
 
 INSTALL_TARGET = rsnapshot_install
 

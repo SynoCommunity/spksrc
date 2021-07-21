@@ -1,8 +1,10 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 4.3.1
-SPK_REV = 36
+SPK_VERS = 4.3.2
+SPK_REV = 37
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update Intel libva to version 2.10 and media drivers 2020Q4<br/>2. Multiple depedency updates (libass, SVT-AV1, libaom, x264, libbluray, libvpx)"
+CHANGELOG = "1. Update to FFMPEG 4.3.2<br/>2. Update Intel libva to version 2.10 and media drivers 2021Q1<br/>3. Multiple depedency updates (libass, SVT-AV1, libaom, x264, libbluray, libvpx)"
+
+CONF_DIR = src/conf
 
 DEPENDS = cross/$(SPK_NAME)
 

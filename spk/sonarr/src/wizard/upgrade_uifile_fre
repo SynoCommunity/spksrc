@@ -1,7 +1,12 @@
 [{
+    "step_title": "RECOMMENDATION: Télécharger une sauvegarde avant la mise à niveau",
+    "items": [{
+        "desc": "<strong style='color:red'>IMPORTANT:</strong> Cette mise à jour est une mise à niveau vers Sonarr v3. Nous vous suggérons de télécharger une sauvegarde manuelle par mesure de précaution avant d'installer cette mise à jour.<br><br>Vous pouvez télécharger une sauvegarde via l'interface Web intégrée de Sonarr.<br>Pour ce faire, accédez à <b>System>Backup</b> dans l'interface utilisateur Sonarr.<br><br>Créez une sauvegarde, puis téléchargez une copie de cette sauvegarde avant d'installer cette mise à niveau."
+    }]
+},{
     "step_title": "Mettre à jour Sonarr",
     "items": [{
-        "desc": "Garder Sonarr à jour en utilisant System>Updates dans l'interface Sonarr."
+        "desc": "Garder Sonarr à jour en utilisant <b>System>Updates</b> dans l'interface Sonarr."
     }]
 },{
     "step_title": "Attention! Permissions DSM",

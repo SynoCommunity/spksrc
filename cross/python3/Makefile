@@ -1,26 +1,27 @@
 PKG_NAME = python3
-PKG_VERS = 3.7.7
+PKG_VERS = 3.7.10
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+BUILD_DEPENDS = native/$(PKG_NAME)
+
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for uuid module to be available
 DEPENDS += cross/libuuid
 # required because libffi is no longer bundled with python
 DEPENDS += cross/libffi
-DEPENDS += native/$(PKG_NAME)
 
 HOMEPAGE = https://www.python.org/
 COMMENT  = Python Programming Language
 LICENSE  = PSF
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions PGEN_FOR_BUILD=$(HOSTPGEN)
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
+ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
 POST_PATCH_TARGET = python3_post_patch
 PRE_CONFIGURE_TARGET = python3_pre_configure
@@ -89,8 +90,8 @@ python3_post_install: $(WORK_DIR)/python-cc.mk
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | build-python
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | python
-	. $(WORK_DIR)/crossenv/bin/activate && build-pip install "setuptools==44.1.0"  "wheel==0.33.6"
-	. $(WORK_DIR)/crossenv/bin/activate && pip install "setuptools==44.1.0" "wheel==0.33.6"
+	. $(WORK_DIR)/crossenv/bin/activate && build-pip install "setuptools==44.1.0"  "wheel==0.36.2"
+	. $(WORK_DIR)/crossenv/bin/activate && pip install "setuptools==44.1.0" "wheel==0.36.2"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

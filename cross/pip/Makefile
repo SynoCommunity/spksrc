@@ -1,5 +1,6 @@
 PKG_NAME = pip
-PKG_VERS = 20.0.2
+# use the same version in native/python3/Makefile (python3_native_post_install)
+PKG_VERS = 21.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/$(PKG_NAME)

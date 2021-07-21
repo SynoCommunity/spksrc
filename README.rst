@@ -1,17 +1,30 @@
 DSM 7
 =====
 
-PLEASE consider: DSM 7 is not officially released yet. The beta release is available since December 08 2020 and there will (hopefully) be a Release Candidate (RC 1) in the near future. We expect an official Release of DSM 7 by Synology later in 2021 (be not surprised when DSM 7 is not officially released before summer 2021).
+DSM 7 was release on June 29 2021 as Version 7.0.41890.
 
-In SynoCommunity there are no DSM 7 compatible packages released yet.
----------------------------------------------------------------------
 
-* Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, these packages are not compatible with DSM 7.
-* PLEASE do not create issues saying that package _xy_ cannot be installed on DSM 7.
-* We will create an issue here that will give an overview of the packages, whether available for DSM 7 or not. But this will not start before the dsm7 branch is merged back into master and we have official DSM 7 toolchains available from synology.
-* If you want to try preview versions of packages for DSM 7 that are built on the dsm7 branch, you can look into PR #4395 https://github.com/SynoCommunity/spksrc/pull/4395. From time to time you will find preview versions for manual installation on DSM 7.
-* And we have issue #4215 for DSM 7 related discussions https://github.com/SynoCommunity/spksrc/issues/4215.
-* You are welcome to contribute: checkout the dsm7 branch and try to build and test the installation of your favorite package and give related feedback. This will shorten the time from official DSM 7 release until the package is available in the SynoCommunity Package Center for download.
+In SynoCommunity some packages are available for DSM 7 but some are not.
+------------------------------------------------------------------------
+
+* You find the status of the packages in the issue `#4524`_ **Meta: DSM7 package status**
+
+* Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, some of the packages are not compatible with DSM 7.
+
+* PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7. All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
+
+* Please regard all DSM 7 packages as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
+
+* Packages of the follwing kind will need some time to make DSM 7 compatible:
+
+  * Packages depending MySQL database must be migrated to MariaDB 10
+  
+  * Packages with installation Wizard to configure a shared folder (all download related packages and others)
+  
+  * Packages that integrate into DSM webstation
+  
+  * 
+  
 * As this is a community project where people spend there spare time for contribution, it may take a long time until most of the packages are ported to DSM 7. (There are still packages here that are not ported from DSM 5 to DSM 6 yet).
 
 spksrc
@@ -29,11 +42,25 @@ Setup Development Environment
 -----------------------------
 Docker
 ^^^^^^
-* `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc ~/spksrc``
-* Install Docker on your host OS: `Docker installation`_. A wget-based alternative for linux: `Install Docker with wget`_.
-* Download the spksrc docker container: ``docker pull synocommunity/spksrc``
-* Run the container with ``docker run -it -v ~/spksrc:/spksrc synocommunity/spksrc /bin/bash``
 
+    ℹ️  The Docker development environment supports Linux and macOS systems, but not Windows due to limitations of the underlying file system.
+
+#. `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc``
+#. Install Docker on your host OS (see `Docker installation`_, or use a ``wget``-based alternative for linux `Install Docker with wget`_).
+#. Download the spksrc Docker container: ``docker pull synocommunity/spksrc``
+#. Run the container with the repository mounted into the ``/spksrc`` directory with the appropriate command for your host Operating System:
+
+.. code-block:: sh
+
+   cd spksrc # Go to the cloned repository's root folder.
+
+   # If running on Linux:
+   docker run -it -v $(pwd):/spksrc synocommunity/spksrc /bin/bash
+
+   # If running on macOS:
+   docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash
+
+5. From there, follow the instructions in the `Developers HOW TO`_.
 
 Virtual machine
 ^^^^^^^^^^^^^^^
@@ -43,8 +70,8 @@ A virtual machine based on an 64-bit version of Debian 10 stable OS is recommend
 
     sudo dpkg --add-architecture i386 && sudo apt-get update
     sudo apt update
-    sudo apt install autogen automake bc bison build-essential check cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial ncurses-dev ninja-build php pkg-config python3 python3-distutils rename scons subversion swig texinfo unzip xmlto zlib1g-dev
-    wget https://bootstrap.pypa.io/2.7/get-pip.py -O - | sudo python2
+    sudo apt install autoconf-archive autogen automake bc bison build-essential check cmake curl cython debootstrap ed expect fakeroot flex g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial ncurses-dev ninja-build php pkg-config python3 python3-distutils rename scons subversion swig texinfo unzip xmlto zlib1g-dev
+    wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
     sudo pip2 install wheel httpie
     wget https://bootstrap.pypa.io/get-pip.py -O - | sudo python3
     sudo pip3 install meson==0.56.0
@@ -72,6 +99,7 @@ License
 When not explicitly set, files are placed under a `3 clause BSD license`_
 
 .. _3 clause BSD license: http://www.opensource.org/licenses/BSD-3-Clause
+.. _#4524: https://github.com/SynoCommunity/spksrc/issues/4524
 
 .. _bug tracker: https://github.com/SynoCommunity/spksrc/issues
 .. _CONTRIBUTING: https://github.com/SynoCommunity/spksrc/blob/master/CONTRIBUTING.md

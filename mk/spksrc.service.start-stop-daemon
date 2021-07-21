@@ -3,11 +3,29 @@
 # Default display name
 DNAME="${SYNOPKG_PKGNAME}"
 
+if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
+    # define SYNOPKG_PKGVAR for forward compatibility
+    SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
+fi
+
 # Source package specific variable and functions
 SVC_SETUP=`dirname $0`"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
+
+
+# Invoke shell function if available
+call_func ()
+{
+    FUNC=$1
+    if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
+        echo "Begin ${FUNC}" >> ${LOG_FILE}
+        eval ${FUNC}         >> ${LOG_FILE}
+        echo "End ${FUNC}"   >> ${LOG_FILE}
+    fi
+}
+
 
 start_daemon ()
 {
@@ -46,7 +64,9 @@ daemon_status ()
 
 wait_for_status ()
 {
-    counter=$2
+    timeout=$2
+    # default value: 20 seconds
+    counter=${timeout:=20}
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
@@ -60,21 +80,21 @@ wait_for_status ()
 case $1 in
     start)
         if daemon_status; then
-            echo "${DNAME} is already running"
+            echo "${DNAME} is already running" >> ${LOG_FILE}
             exit 0
         else
-            echo "Starting ${DNAME} ..."
+            echo "Starting ${DNAME} ..." >> ${LOG_FILE}
             start_daemon
             exit $?
         fi
         ;;
     stop)
         if daemon_status; then
-            echo "Stopping ${DNAME} ..."
+            echo "Stopping ${DNAME} ..." >> ${LOG_FILE}
             stop_daemon
             exit $?
         else
-            echo "${DNAME} is not running"
+            echo "${DNAME} is not running" >> ${LOG_FILE}
             exit 0
         fi
         ;;
@@ -88,9 +108,10 @@ case $1 in
         fi
         ;;
     log)
+        # log output for DSM < 6
         if [ -n "${LOG_FILE}" -a -r "${LOG_FILE}" ]; then
             # Shorten long logs to last 100 lines
-            TEMP_LOG_FILE="${SYNOPKG_PKGDEST}/var/${SYNOPKG_PKGNAME}_temp.log"
+            TEMP_LOG_FILE="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_temp.log"
             # Clear any previous log
             echo "Full log: ${LOG_FILE}" > "${TEMP_LOG_FILE}"
             tail -n100 "${LOG_FILE}" >> "${TEMP_LOG_FILE}"

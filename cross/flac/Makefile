@@ -1,13 +1,13 @@
 PKG_NAME = flac
-PKG_VERS = 1.3.2
+PKG_VERS = 1.3.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://downloads.sourceforge.net/project/flac/$(PKG_NAME)-src
+PKG_DIST_SITE = https://ftp.osuosl.org/pub/xiph/releases/$(PKG_NAME)/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libogg
 
-HOMEPAGE = http://flac.sourceforge.net/
+HOMEPAGE = https://xiph.org/flac/download.html
 COMMENT  = Free Lossless Audio Codec
 LICENSE  = GPL
 

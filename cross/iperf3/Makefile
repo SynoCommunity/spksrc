@@ -1,5 +1,5 @@
 PKG_NAME = iperf3
-PKG_VERS = 3.9
+PKG_VERS = 3.10.1
 PKG_EXT = tar.gz
 PKG_NAME_REAL = iperf
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)

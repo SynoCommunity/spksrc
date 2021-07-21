@@ -1,22 +1,23 @@
-PYTHON_DIR="/usr/local/python3"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+BIN="${SYNOPKG_PKGDEST}/bin"
+PYTHON_DIR="/var/packages/python38/target/bin"
+PATH="${BIN}:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
 GROUP="sc-download"
 
-SERVICE_COMMAND="${LANGUAGE} ${PYTHON} ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
+SERVICE_COMMAND="${LANGUAGE} ${PYTHON} -OO ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG}
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
@@ -24,7 +25,10 @@ service_postinst ()
     fi
 
     # Create logs directory, otherwise it does not start due to permissions errors
-    mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
+    mkdir "$(dirname ${LOG_FILE})"
+
+    # Install nice/ionice
+    ${BIN}/busybox --install ${BIN}
 }
 
 service_postupgrade ()

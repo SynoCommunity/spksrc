@@ -37,7 +37,7 @@ include $(LOCAL_CONFIG_MK)
 endif
 
 # Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
-TCVERSION_DUPES = $(addprefix %,$(shell echo "$(AVAILABLE_TCVERSIONS) " | sed 's|.*\<$(DEFAULT_TC)[^.]||g'))
+TCVERSION_DUPES = $(addprefix %,$(filter-out $(DEFAULT_TC),$(AVAILABLE_TCVERSIONS)))
 
 # Archs that are supported by generic archs
 ARCHS_DUPES_DEFAULT = $(addsuffix %,$(ARCHS_WITH_GENERIC_SUPPORT))
@@ -69,6 +69,11 @@ ifeq ($(filter $(NCPUS),0 1),)
 COMPILE_MAKE_OPTIONS += -j$(NCPUS)
 endif
 endif
+
+# Terminal colors
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+NC=`tput sgr0`
 
 # Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)

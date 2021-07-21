@@ -1,11 +1,11 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.1.1
-SPK_REV = 46
+SPK_VERS = 3.2.1
+SPK_REV = 48
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python3>=3.7.7-12"
+SPK_DEPENDS = "python38>=3.8.1-1"
 
 # To generate full requirements.txt, extend SABnzbd's own
 # requirements.txt with the depedencies of cherrypy and cheroot
@@ -15,10 +15,9 @@ MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
 DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\'avez qu\'a ajouter un .nzb, SABnzbd s\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
-RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.1.1."
+CHANGELOG = "Update SABnzbd to 3.2.1 and restore ionice. Requires the Python 3.8 package."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL

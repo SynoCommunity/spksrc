@@ -1,0 +1,242 @@
+#From c1fb9225a1b8e26875cb9b4e2b3ae2f4d68c5630 Mon Sep 17 00:00:00 2001
+#From: nyanmisaka <nst799610810@gmail.com>
+#Date: Sun, 24 Jan 2021 19:58:04 +0800
+#Subject: [PATCH] lavfi: add a filter for uploading normal frames to VAAPI
+#Source: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
+Index: configure
+===================================================================
+--- configure.orig
++++ configure
+@@ -3538,6 +3538,7 @@ fspp_filter_deps="gpl"
+ headphone_filter_select="fft"
+ histeq_filter_deps="gpl"
+ hqdn3d_filter_deps="gpl"
++hwupload_vaapi_filter_deps="vaapi"
+ interlace_filter_deps="gpl"
+ kerndeint_filter_deps="gpl"
+ ladspa_filter_deps="ladspa libdl"
+Index: libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile.orig
++++ libavfilter/Makefile
+@@ -279,6 +279,7 @@ OBJS-$(CONFIG_HUE_FILTER)
+ OBJS-$(CONFIG_HWDOWNLOAD_FILTER)             += vf_hwdownload.o
+ OBJS-$(CONFIG_HWMAP_FILTER)                  += vf_hwmap.o
+ OBJS-$(CONFIG_HWUPLOAD_CUDA_FILTER)          += vf_hwupload_cuda.o
++OBJS-$(CONFIG_HWUPLOAD_VAAPI_FILTER)         += vf_hwupload_vaapi.o
+ OBJS-$(CONFIG_HWUPLOAD_FILTER)               += vf_hwupload.o
+ OBJS-$(CONFIG_HYSTERESIS_FILTER)             += vf_hysteresis.o framesync.o
+ OBJS-$(CONFIG_IDET_FILTER)                   += vf_idet.o
+Index: libavfilter/allfilters.c
+===================================================================
+--- libavfilter/allfilters.c.orig
++++ libavfilter/allfilters.c
+@@ -265,6 +265,7 @@ extern AVFilter ff_vf_hwdownload;
+ extern AVFilter ff_vf_hwmap;
+ extern AVFilter ff_vf_hwupload;
+ extern AVFilter ff_vf_hwupload_cuda;
++extern AVFilter ff_vf_hwupload_vaapi;
+ extern AVFilter ff_vf_hysteresis;
+ extern AVFilter ff_vf_idet;
+ extern AVFilter ff_vf_il;
+Index: libavfilter/vf_hwupload_vaapi.c
+===================================================================
+--- /dev/null
++++ libavfilter/vf_hwupload_vaapi.c
+@@ -0,0 +1,196 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include "libavutil/buffer.h"
++#include "libavutil/hwcontext.h"
++#include "libavutil/log.h"
++#include "libavutil/opt.h"
++
++#include "avfilter.h"
++#include "formats.h"
++#include "internal.h"
++#include "video.h"
++
++typedef struct VaapiUploadContext {
++    const AVClass *class;
++    int device_idx;
++
++    AVBufferRef *hwdevice;
++    AVBufferRef *hwframe;
++} VaapiUploadContext;
++
++static av_cold int vaapiupload_init(AVFilterContext *ctx)
++{
++    VaapiUploadContext *s = ctx->priv;
++    return av_hwdevice_ctx_create(&s->hwdevice, AV_HWDEVICE_TYPE_VAAPI, NULL, NULL, 0);
++}
++
++static av_cold void vaapiupload_uninit(AVFilterContext *ctx)
++{
++    VaapiUploadContext *s = ctx->priv;
++
++    av_buffer_unref(&s->hwframe);
++    av_buffer_unref(&s->hwdevice);
++}
++
++static int vaapiupload_query_formats(AVFilterContext *ctx)
++{
++    int ret;
++
++    static const enum AVPixelFormat input_pix_fmts[] = {
++        AV_PIX_FMT_NV12, AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
++        AV_PIX_FMT_UYVY422, AV_PIX_FMT_YUYV422, AV_PIX_FMT_Y210,
++        AV_PIX_FMT_YUV411P, AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P,
++        AV_PIX_FMT_GRAY8, AV_PIX_FMT_P010, AV_PIX_FMT_BGRA,
++        AV_PIX_FMT_BGR0, AV_PIX_FMT_RGBA, AV_PIX_FMT_RGB0,
++        AV_PIX_FMT_ABGR, AV_PIX_FMT_0BGR, AV_PIX_FMT_ARGB,
++        AV_PIX_FMT_0RGB, AV_PIX_FMT_NONE,
++    };
++    static const enum AVPixelFormat output_pix_fmts[] = {
++        AV_PIX_FMT_VAAPI, AV_PIX_FMT_NONE,
++    };
++    AVFilterFormats *in_fmts  = ff_make_format_list(input_pix_fmts);
++    AVFilterFormats *out_fmts;
++
++    ret = ff_formats_ref(in_fmts, &ctx->inputs[0]->out_formats);
++    if (ret < 0)
++        return ret;
++
++    out_fmts = ff_make_format_list(output_pix_fmts);
++
++    ret = ff_formats_ref(out_fmts, &ctx->outputs[0]->in_formats);
++    if (ret < 0)
++        return ret;
++
++    return 0;
++}
++
++static int vaapiupload_config_output(AVFilterLink *outlink)
++{
++    AVFilterContext *ctx = outlink->src;
++    AVFilterLink *inlink = ctx->inputs[0];
++    VaapiUploadContext *s = ctx->priv;
++
++    AVHWFramesContext *hwframe_ctx;
++    int ret;
++
++    av_buffer_unref(&s->hwframe);
++    s->hwframe = av_hwframe_ctx_alloc(s->hwdevice);
++    if (!s->hwframe)
++        return AVERROR(ENOMEM);
++
++    hwframe_ctx            = (AVHWFramesContext*)s->hwframe->data;
++    hwframe_ctx->format    = AV_PIX_FMT_VAAPI;
++    if (inlink->hw_frames_ctx) {
++        AVHWFramesContext *in_hwframe_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++        hwframe_ctx->sw_format = in_hwframe_ctx->sw_format;
++    } else {
++        hwframe_ctx->sw_format = inlink->format;
++    }
++    hwframe_ctx->width     = inlink->w;
++    hwframe_ctx->height    = inlink->h;
++
++    ret = av_hwframe_ctx_init(s->hwframe);
++    if (ret < 0)
++        return ret;
++
++    outlink->hw_frames_ctx = av_buffer_ref(s->hwframe);
++    if (!outlink->hw_frames_ctx)
++        return AVERROR(ENOMEM);
++
++    return 0;
++}
++
++static int vaapiupload_filter_frame(AVFilterLink *link, AVFrame *in)
++{
++    AVFilterContext   *ctx = link->dst;
++    AVFilterLink  *outlink = ctx->outputs[0];
++
++    AVFrame *out = NULL;
++    int ret;
++
++    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
++    if (!out) {
++        ret = AVERROR(ENOMEM);
++        goto fail;
++    }
++
++    out->width  = in->width;
++    out->height = in->height;
++
++    ret = av_hwframe_transfer_data(out, in, 0);
++    if (ret < 0) {
++        av_log(ctx, AV_LOG_ERROR, "Error transferring data to the GPU\n");
++        goto fail;
++    }
++
++    ret = av_frame_copy_props(out, in);
++    if (ret < 0)
++        goto fail;
++
++    av_frame_free(&in);
++
++    return ff_filter_frame(ctx->outputs[0], out);
++fail:
++    av_frame_free(&in);
++    av_frame_free(&out);
++    return ret;
++}
++
++static const AVClass vaapiupload_class = {
++    .class_name = "vaapiupload",
++    .item_name  = av_default_item_name,
++    .option     = NULL,
++    .version    = LIBAVUTIL_VERSION_INT,
++};
++
++static const AVFilterPad vaapiupload_inputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .filter_frame = vaapiupload_filter_frame,
++    },
++    { NULL }
++};
++
++static const AVFilterPad vaapiupload_outputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .config_props = vaapiupload_config_output,
++    },
++    { NULL }
++};
++
++AVFilter ff_vf_hwupload_vaapi = {
++    .name        = "hwupload_vaapi",
++    .description = NULL_IF_CONFIG_SMALL("Upload a system memory frame to a VAAPI device."),
++
++    .init      = vaapiupload_init,
++    .uninit    = vaapiupload_uninit,
++
++    .query_formats = vaapiupload_query_formats,
++
++    .priv_size  = sizeof(VaapiUploadContext),
++    .priv_class = &vaapiupload_class,
++
++    .inputs    = vaapiupload_inputs,
++    .outputs   = vaapiupload_outputs,
++
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++};

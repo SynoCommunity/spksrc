@@ -1,9 +1,10 @@
 lnk:bin/unzstd
-lnk:bin/zstdcat
-lnk:bin/zstdmt
 bin:bin/zstd
+bin:bin/zstd-frugal
+lnk:bin/zstdcat
 rsc:bin/zstdgrep
 rsc:bin/zstdless
+lnk:bin/zstdmt
 lnk:lib/libzstd.so
 lnk:lib/libzstd.so.1
-lib:lib/libzstd.so.1.4.8
+lib:lib/libzstd.so.1.5.0

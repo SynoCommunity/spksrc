@@ -1,0 +1,436 @@
+#!/bin/sh
+
+# DSM 5 -> 6 upgrade path:
+# - Not supported anymore
+
+# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
+SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
+
+# Temp. INST_LOG for DSM < 6
+# package specific install scripts must not use INST_LOG
+INST_LOG_TEMP="/tmp/${SYNOPKG_PKGNAME}_install.log"
+INST_LOG="${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}_install.log"
+
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
+
+# Optional FWPORTS file
+FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
+
+# Versions lower then DSM 6 don't support an upgrade folder
+TMP_DIR="/var/tmp/${SYNOPKG_PKGNAME}/var"
+
+install_log ()
+{
+    local _msg_="$@"
+    if [ -z "${_msg_}" ]; then
+        # read multiline from stdin
+        while IFS=$'\n' read -r line; do
+            install_log "${line}"
+        done
+    else
+        echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" >> ${INST_LOG_TEMP} 2>&1
+    fi
+}
+
+# Invoke shell function if available
+# DSM < 6 do not support user notifications by stdout
+call_func ()
+{
+    FUNC=$1
+    if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
+        install_log "Begin ${FUNC}"
+        eval ${FUNC} 2>&1 | install_log
+        install_log "End ${FUNC}"
+    fi
+}
+
+
+# Source package specific variables and functions
+SVC_SETUP=`dirname $0`"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
+
+# Reload wizard variables stored by postinst
+if [ -r "${INST_VARIABLES}" ]; then
+    . "${INST_VARIABLES}"
+fi
+
+# Expect user to be set from package specific variables
+if [ -n "${USER}" -a -z "${USER_DESC}" ]; then
+    USER_DESC="User running $SYNOPKG_PKGNAME"
+fi
+
+# Default description if group name provided by UI
+if [ -n "${GROUP}" -a -z "${GROUP_DESC}" ]; then
+    GROUP_DESC="SynoCommunity Package Group"
+fi
+
+# Extract share volume and share name from download location if provided
+if [ -n "${SHARE_PATH}" ]; then
+    SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
+    SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
+fi
+
+# Tools shortcuts
+MV="/bin/mv -f"
+RM="/bin/rm -rf"
+CP="/bin/cp -rfp"
+MKDIR="/bin/mkdir -p"
+LN="/bin/ln -nsf"
+TEE="/usr/bin/tee -a"
+
+### Functions library
+
+log_step ()
+{
+    install_log "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
+}
+
+save_wizard_variables ()
+{
+    if [ -e "${INST_VARIABLES}" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
+    if [ -n "${GROUP}" ]; then
+        echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
+    fi
+    if [ -n "${SHARE_PATH}" ]; then
+        echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
+    fi
+    # Restrict permissions to protect sensitive options
+    if [ -e "${INST_VARIABLES}" ]; then
+        chmod go-rwx ${INST_VARIABLES}
+        chown ${EFF_USER} ${INST_VARIABLES}
+    fi
+}
+
+# Remove user from system and from groups it is member of
+syno_remove_user ()
+{
+    RM_USER=$1
+    if [ -n "${RM_USER}" ]; then
+        # Check if user exists
+        if synouser --get "${RM_USER}" &> /dev/null; then
+            echo "Removing user ${RM_USER}"
+            synouser --del "${RM_USER}"
+            synouser --rebuild all
+            # Also rebuild groups so users are removed
+            synogroup --rebuild all
+        fi
+    fi
+}
+
+# Create syno group $GROUP with parameter user as member
+syno_group_create ()
+{
+    EFF_USER=$1
+    if [ -n "${EFF_USER}" ]; then
+        echo "Creating group ${GROUP}"
+        # Create syno group
+        synogroup --add "${GROUP}" "${EFF_USER}"
+        # Set description of the syno group
+        synogroup --descset "${GROUP}" "${GROUP_DESC}"
+    fi
+}
+
+# Delete syno group if empty
+syno_group_remove ()
+{
+    RM_GROUP=$1
+    if [ -n "${RM_GROUP}" ]; then
+        # Check if syno group is empty
+        if ! synogroup --get "${RM_GROUP}" | grep -q "0:\["; then
+            echo "Removing group ${RM_GROUP}"
+            # Remove syno group
+            synogroup --del "${RM_GROUP}"
+            synogroup --rebuild all
+        fi
+    fi
+}
+
+# Add user to existing group
+syno_user_add_to_group ()
+{
+    ADD_USER=$1
+    ADD_GROUP=$2
+    # Check user already in group
+    if ! synogroup --get "$ADD_GROUP" | grep "^[0-9]:\[${ADD_USER}\]" &> /dev/null; then
+        # Add user, not in group yet
+        echo "Adding '${ADD_USER}' to '${ADD_GROUP}'"
+        MEMBERS="$(synogroup --get $ADD_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
+        # The "synogroup --member" command clears all users before adding new ones
+        # so all the users must be listed on the command line
+        synogroup --member "$ADD_GROUP" $MEMBERS "${ADD_USER}"
+    fi
+}
+
+# Sets recursive permissions for ${GROUP} on specified directory
+# Usage: set_syno_permissions "${SHARE_FOLDER}" "${GROUP}"
+set_syno_permissions ()
+{
+    DIRNAME=`realpath "${1}"`
+    GROUP="${2}"
+
+    VOLUME=$(echo "${DIRNAME}" | awk -F/ '{print "/"$2}')
+
+    # Ensure directory resides in /volumeX before setting GROUP permissions
+    if [ "`echo ${VOLUME} | cut -c2-7`" = "volume" ]; then
+        # Set read/write permissions for GROUP for folder and subfolders
+        if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:rwxpdDaARWcC-:fd--\"`" ]; then
+            # First Unix permissions, but only if it's in Linux mode
+            if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+                set_unix_permissions "${DIRNAME}"
+                # If it is linux mode (due to old package) we need to add "administrators"-group,
+                # otherwise the folder is not accessible from File Station anymore!
+                synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--"
+            fi
+
+            # Then fix the Synology permissions
+            echo "Granting '${GROUP}' group permissions on ${DIRNAME}"
+            synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:rwxpdDaARWcC-:fd--"
+            find "${DIRNAME}" -type d -exec synoacltool -enforce-inherit "{}" \;
+        fi
+
+        # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
+        while [ "${DIRNAME}" != "${VOLUME}" ]; do
+            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:r.x\"`" ]; then
+                # Here we also need to make sure the admin can access data via File Station
+                if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+                    synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--"
+                fi
+                # Add the new group permissions
+                echo "Granting '${GROUP}' group basic permissions on ${DIRNAME}"
+                synoacltool -add "${DIRNAME}" "group:${GROUP}:allow:r-x---a-R----:---n"
+            fi
+            DIRNAME="$(dirname "${DIRNAME}")"
+        done
+    else
+        echo "Skip granting '${GROUP}' group permissions on ${DIRNAME} as the directory does not reside in '/volumeX'. Set manually if needed."
+    fi
+}
+
+# Set recursive permissions using chown
+set_unix_permissions ()
+{
+    DIRNAME=$1
+    if [ -n "${EFF_USER}" ]; then
+        echo "Granting '${EFF_USER}' unix ownership on ${DIRNAME}"
+        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+            chown -R ${EFF_USER}:root "${DIRNAME}"
+        else
+            chown -R ${EFF_USER}:${USER} "${DIRNAME}"
+        fi
+    fi
+}
+
+# If package was moved to new group, we need to add the new package user
+# also to the old group. Only if the legacy user was in the old group.
+# Usage: syno_user_add_to_legacy_group "${NEW_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
+syno_user_add_to_legacy_group () {
+    NEW_USER=$1
+    LEGACY_USER=$2
+    LEGACY_GROUP=$3
+
+    # Check if user in old group
+    if synogroup --get "$LEGACY_GROUP" | grep "^[0-9]:\[${LEGACY_USER}\]" &> /dev/null; then
+        # Add new user and remove old one
+        echo "Adding '${NEW_USER}' to '${LEGACY_GROUP}' for backwards compatibility"
+        MEMBERS="$(synogroup --get $LEGACY_GROUP | grep '^[0-9]' | sed 's/.*\[\([^]]*\)].*/\1/' | tr '\n' ' ')"
+        MEMBERS=${MEMBERS//$LEGACY_USER}
+        # The "synogroup --member" command clears all users before adding new ones
+        # so all the users must be listed on the command line
+        synogroup --member "$LEGACY_GROUP" $MEMBERS "${NEW_USER}"
+    fi
+}
+
+
+### Generic package behaviors
+
+preinst ()
+{
+    log_step "preinst"
+    call_func "validate_preinst"
+    call_func "service_preinst"
+
+    # Check volume exists
+    if [ -n "${SHARE_PATH}" ]; then
+        if [ ! -d "${SHARE_VOLUME}" ]; then
+            echo "ERROR: Volume ${SHARE_VOLUME} does not exist." | $TEE 1>&2
+            exit 1
+        fi
+    fi
+
+    exit 0
+}
+
+postinst ()
+{
+    log_step "postinst"
+    save_wizard_variables 2>&1 | install_log
+
+    # Link for backward compatibility of binaries location
+    $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
+
+    # Link for DSM7 forward compatibility of var location
+    $LN "${SYNOPKG_PKGDEST}/var" "/var/packages/${SYNOPKG_PKGNAME}/var" 2>&1 | install_log
+
+    # Add firewall config
+    if [ -r "${FWPORTS_FILE}" ]; then
+        install_log "Installing service configuration ${FWPORTS_FILE}"
+        servicetool --install-configure-file --package "${FWPORTS_FILE}" 2>&1 | install_log
+    fi
+
+    # Service user management
+    if [ -n "${EFF_USER}" ]; then
+        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+            # DSM 5 specific operations
+            # Create prefixed synouser
+            if ! cat /etc/passwd | grep "${EFF_USER}:x:" &> /dev/null; then
+                synouser --add "${EFF_USER}" "" "$USER_DESC" 0 "" 0 2>&1 | install_log
+                # Set HOME for consistency with DSM 6, location available even if homes not enabled
+                BACKUP_PASSWD="/tmp/install_${SYNOPKG_PKGNAME}_passwd"
+                cp /etc/passwd ${BACKUP_PASSWD} 2>&1 | install_log
+                sed -i "s#/var/services/homes/${EFF_USER}#/var/packages/${SYNOPKG_PKGNAME}/target#" /etc/passwd 2>&1 | install_log
+            fi
+        fi
+        # Register service in "users" group to access any content
+        if [ "$ADD_USER_IN_USERS" = "yes" ]; then
+            syno_user_add_to_group "${EFF_USER}" "users" 2>&1 | install_log
+        fi
+    fi
+
+    # Only if a group is provided via UI or set by script
+    if [ -n "$GROUP" ]; then
+        # Check if group already exists
+        if ! synogroup --get "$GROUP" &> /dev/null; then
+            # Group does not exist yet: create with user as member
+            syno_group_create "${EFF_USER}" 2>&1 | install_log
+        fi
+        if synogroup --get "$GROUP" &> /dev/null; then
+            syno_user_add_to_group "${EFF_USER}" "${GROUP}" 2>&1 | install_log
+        fi
+        # Not sure but invoked with hope DSM is updated
+        synogroup --rebuild all 2>&1 | install_log
+    fi
+
+    # Share management
+    if [ -n "${SHARE_PATH}" ]; then
+        install_log "Configuring ${SHARE_PATH}"
+        # Create share if does not exist
+        #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
+        if ! synoshare --get "${SHARE_NAME}" &> /dev/null; then
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 2>&1 | install_log
+        fi
+
+        # Add user permission if no GROUP is set in UI
+        # GROUP permission will be added in set_syno_permissions
+        if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
+        fi
+        synoshare --build 2>&1 | install_log
+
+        $MKDIR "${SHARE_PATH}"
+
+        # Permissions for folder, up to volume
+        if [ -n "$GROUP" ]; then
+            set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
+        fi
+    fi
+
+    $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
+
+    call_func "service_postinst"
+    call_func "service_create_links"
+
+    $CP "${INST_LOG_TEMP}" "${INST_LOG}" 2>&1 | install_log
+    if [ -n "${LOG_FILE}" ]; then
+        echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
+    fi
+    
+    # On DSM 5 set package files permissions for consistency with DSM 6
+    set_unix_permissions "${SYNOPKG_PKGDEST}" 2>&1 | install_log
+    
+    exit 0
+}
+
+preuninst ()
+{
+    log_step "preuninst"
+    call_func "validate_preuninst"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove firewall config
+        if [ -r "${FWPORTS_FILE}" ]; then
+            install_log "Removing service configuration ${SYNOPKG_PKGNAME}.sc"
+            servicetool --remove-configure-file --package "${SYNOPKG_PKGNAME}.sc" 2>&1 | install_log
+        fi
+    fi
+
+    call_func "service_preuninst"
+    exit 0
+}
+
+postuninst ()
+{
+    log_step "postuninst"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        # Remove link
+        $RM "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
+
+        # Remove syno group if empty
+        syno_group_remove "${GROUP}" 2>&1 | install_log
+
+        # Remove user
+        syno_remove_user "${EFF_USER}" 2>&1 | install_log
+    fi
+
+    call_func "service_postuninst"
+    call_func "service_remove_links"
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        $RM "${INST_VARIABLES}" 2>&1 | install_log
+    fi
+    exit 0
+}
+
+preupgrade ()
+{
+    log_step "preupgrade"
+    call_func "validate_preupgrade"
+    call_func "service_preupgrade"
+
+    # Save some stuff
+    $RM "$TMP_DIR" 2>&1 | install_log
+    $MKDIR "$TMP_DIR" 2>&1 | install_log
+
+    call_func "service_save"
+
+    # Beware of /. outside the quotes
+    # Needed to copy all files including hidden ones
+    $CP "${SYNOPKG_PKGVAR}"/. "$TMP_DIR" 2>&1 | install_log
+    exit 0
+}
+
+postupgrade ()
+{
+    log_step "postupgrade"
+
+    call_func "service_restore"
+
+    # Restore some stuff, has to be cp otherwise fails on directories
+    $CP "${TMP_DIR}"/. "${SYNOPKG_PKGVAR}" 2>&1 | install_log
+
+    # Correct permissions of var folder
+    set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
+
+    $RM "$TMP_DIR" 2>&1 | install_log
+
+    call_func "service_postupgrade"
+
+    # Make sure we also have the logging for this step
+    $CP "${INST_LOG_TEMP}" "${INST_LOG}" 2>&1 | install_log
+    exit 0
+}

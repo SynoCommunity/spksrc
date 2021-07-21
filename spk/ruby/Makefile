@@ -1,11 +1,14 @@
 SPK_NAME = ruby
-SPK_VERS = 3.0.0
-SPK_REV = 7
+SPK_VERS = 3.0.1
+SPK_REV = 8
 SPK_ICON = src/ruby.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-CHANGELOG = "Restore package and update to v3.3.0, due to the fact that Synology retired Ruby v2.4.3-0067."
+# even it compiles with older cross/gdbm, ruby crashes at runtime
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
+CHANGELOG = "Update ruby to v3.0.1."
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Ruby Programming Language.

@@ -1,0 +1,12 @@
+# Adjust path of bash and python
+--- duply.org	2020-02-24 11:53:51.000000000 +0000
++++ duply	2020-04-28 23:39:36.695912643 +0000
+@@ -531,7 +531,7 @@
+ DEFAULT_GPG='gpg'
+ DEFAULT_GPG_KEY='_KEY_ID_'
+ DEFAULT_GPG_PW='_GPG_PASSWORD_'
+-DEFAULT_PYTHON='python2'
++DEFAULT_PYTHON='/var/packages/duplicity/target/env/bin/python'
+ 
+ # function definitions ##########################
+ 

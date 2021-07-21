@@ -1,5 +1,5 @@
 PKG_NAME = lsscsi
-PKG_VERS = 0.31
+PKG_VERS = 0.32
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://sg.danny.cz/scsi

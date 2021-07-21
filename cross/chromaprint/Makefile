@@ -27,3 +27,4 @@ include ../../mk/spksrc.cross-cmake.mk
 
 CMAKE_ARGS += -DBUILD_TOOLS=ON
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_RPATH)
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"

@@ -19,5 +19,5 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: mono_native_post_install
 mono_native_post_install:
-	sed -i -e 's#/usr/local#/usr/local/mono#g' $(WORK_DIR)/install/usr/local/bin/*
-	sed -i -e 's#/usr/local#/usr/local/mono#g' $(WORK_DIR)/install/usr/local/etc/mono/config
+	sed -i -e 's#/usr/local#/var/packages/mono/target#g' $(WORK_DIR)/install/usr/local/bin/*
+	sed -i -e 's#/usr/local#/var/packages/mono/target#g' $(WORK_DIR)/install/usr/local/etc/mono/config

@@ -2,9 +2,9 @@
 # - installer
 # - start-stop-status
 
-PYTHON_DIR="/usr/local/python3"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
+PYTHON_DIR="/var/packages/python38/target/bin"
+VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 CONFIG_DIR="${SYNOPKG_PKGDEST}/var/config"
 
@@ -15,10 +15,11 @@ HOME="${SYNOPKG_PKGDEST}/var/"
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install the wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --upgrade --no-index --find-links ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --upgrade --no-index --find-links ${wheelhouse} ${wheelhouse}/*.whl
 
     mkdir -p "${CONFIG_DIR}"
     # For pip to install pure python module (others have to be provided as wheels in requirement.txt)
@@ -35,3 +36,4 @@ if [[ ! -e "${TMPDIR}" ]]; then
     chown ${EFF_USER} "${TMPDIR}"
 fi
 export TMPDIR=${SYNOPKG_PKGDEST}/tmp
+

@@ -1,5 +1,0 @@
-{
-    "supervisor": "@supervisor@",
-    "homeassistant": "@homeassistant@",
-    "data": "@data_dir@"
-}

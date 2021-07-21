@@ -25,9 +25,10 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 # install latest pip that supports python2
 python_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing setuptools, pip and cffi
-	@$(RUN) wget https://bootstrap.pypa.io/2.7/get-pip.py -O - | $(PYTHON)
+	@$(RUN) wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | $(PYTHON)
+	# setuptools==44.1.0 is the last version for python2
 	@$(PIP) install "setuptools==44.1.0"
-	@$(PIP) install "cffi==1.14.1"
+	@$(PIP) install "cffi==1.14.5"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

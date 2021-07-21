@@ -8,6 +8,7 @@ RUN dpkg --add-architecture i386
 
 # Install required packages (in sync with README.rst instructions)
 RUN apt-get update && apt-get install --no-install-recommends -y \
+		autoconf-archive \
 		autogen \
 		automake \
 		bc \
@@ -20,6 +21,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		debootstrap \
 		ed \
 		expect \
+		fakeroot \
 		flex \
 		g++-multilib \
 		gawk \
@@ -66,7 +68,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 RUN pip3 install meson==0.56.0
 
 # Install setuptools, pip, virtualenv, wheel and httpie for Python2
-RUN wget https://bootstrap.pypa.io/2.7/get-pip.py -O - | python
+RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python
 RUN pip install virtualenv httpie
 
 # Volume pointing to spksrc sources

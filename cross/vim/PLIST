@@ -4,6 +4,7 @@ lnk:bin/rvim
 lnk:bin/view
 lnk:bin/vimdiff
 bin:bin/vim
+lnk:bin/vim@SPECIFIC_VERSION@
 bin:bin/xxd
 rsc:bin/vimtutor
 rsc:share/vim

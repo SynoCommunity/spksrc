@@ -21,5 +21,6 @@ LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
+SPK_USR_LOCAL_LINKS = bin:env/bin/rdiff-backup bin:env/bin/rdiff-backup-statistics
 
 include ../../mk/spksrc.spk.mk

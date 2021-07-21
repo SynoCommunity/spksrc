@@ -1,6 +1,6 @@
 
 PACKAGE="itools"
-INSTALL_DIR="/usr/local/${PACKAGE}"
+INSTALL_DIR="/var/packages/${PACKAGE}/target"
 VOLUME_DIR="${INSTALL_DIR}/volume"
 
 SVC_CWD="${SYNOPKG_PKGDEST}"
@@ -9,24 +9,25 @@ SVC_WRITE_PID=y
 
 service_postinst ()
 {
-    easy_install lockfile  >> ${INST_LOG} 2>&1
-    ln -s ${SYNOPKG_PKGDEST_VOL} ${VOLUME_DIR}  >> ${INST_LOG} 2>&1
+    easy_install lockfile
+    ln -s ${SYNOPKG_PKGDEST_VOL} ${VOLUME_DIR}
 }
 
 service_postuninst ()
 {
-    rm -f ${VOLUME_DIR}  >> ${INST_LOG} 2>&1
+    rm -f ${VOLUME_DIR}
 }
 
 service_prestart ()
 {
-    cp ${SYNOPKG_PKGDEST}/39-libimobiledevice.rules /usr/lib/udev/rules.d/  >> ${LOG_FILE} 2>&1 
-    udevadm control --reload-rules  >> ${LOG_FILE} 2>&1
+    cp ${SYNOPKG_PKGDEST}/39-libimobiledevice.rules /usr/lib/udev/rules.d/
+    udevadm control --reload-rules
 }
 
 service_poststop ()
 {
-    ${INSTALL_DIR}/umounting.py  >> ${LOG_FILE} 2>&1
-    rm -f /usr/lib/udev/rules.d/39-libimobiledevice.rules  >> ${LOG_FILE} 2>&1
-    udevadm control --reload-rules  >> ${LOG_FILE} 2>&1
+    ${INSTALL_DIR}/umounting.py
+    rm -f /usr/lib/udev/rules.d/39-libimobiledevice.rules
+    udevadm control --reload-rules
 }
+

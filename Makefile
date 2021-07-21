@@ -150,29 +150,29 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
-setup: local.mk dsm-6.1
+setup: local.mk dsm-6.1 dsm-7.0
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
-	@echo "PUBLISH_URL=" > $@
-	@echo "PUBLISH_API_KEY=" >> $@
-	@echo "MAINTAINER?=" >> $@
-	@echo "MAINTAINER_URL=" >> $@
-	@echo "DISTRIBUTOR=" >> $@
-	@echo "DISTRIBUTOR_URL=" >> $@
-	@echo "REPORT_URL=" >> $@
-	@echo "DEFAULT_TC=" >> $@
-	@echo "#PARALLEL_MAKE=max" >> $@
+	@echo "PUBLISH_URL =" > $@
+	@echo "PUBLISH_API_KEY =" >> $@
+	@echo "MAINTAINER ?=" >> $@
+	@echo "MAINTAINER_URL ?=" >> $@
+	@echo "DISTRIBUTOR =" >> $@
+	@echo "DISTRIBUTOR_URL =" >> $@
+	@echo "REPORT_URL =" >> $@
+	@echo "DEFAULT_TC =" >> $@
+	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
-	@sed -i "s|DEFAULT_TC.*|DEFAULT_TC=$*|" local.mk
+	@grep -q "^DEFAULT_TC.*=.*$*.*" local.mk || sed -i "/^DEFAULT_TC =/s/$$/ $*/" local.mk
 
 setup-synocommunity: setup
-	@sed -i -e "s|PUBLISH_URL=.*|PUBLISH_URL=https://api.synocommunity.com|" \
-		-e "s|MAINTAINER?=.*|MAINTAINER?=SynoCommunity|" \
-		-e "s|MAINTAINER_URL=.*|MAINTAINER_URL=https://synocommunity.com|" \
-		-e "s|DISTRIBUTOR=.*|DISTRIBUTOR=SynoCommunity|" \
-		-e "s|DISTRIBUTOR_URL=.*|DISTRIBUTOR_URL=https://synocommunity.com|" \
-		-e "s|REPORT_URL=.*|REPORT_URL=https://github.com/SynoCommunity/spksrc/issues|" \
+	@sed -i -e "s|PUBLISH_URL\s*=.*|PUBLISH_URL = https://api.synocommunity.com|" \
+		-e "s|MAINTAINER\s*?=.*|MAINTAINER ?= SynoCommunity|" \
+		-e "s|MAINTAINER_URL\s*?=.*|MAINTAINER_URL ?= https://synocommunity.com|" \
+		-e "s|DISTRIBUTOR\s*=.*|DISTRIBUTOR = SynoCommunity|" \
+		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
+		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk

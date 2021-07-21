@@ -1,5 +1,5 @@
 PKG_NAME = git
-PKG_VERS = 2.28.0
+PKG_VERS = 2.32.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://kernel.org/pub/software/scm/$(PKG_NAME)

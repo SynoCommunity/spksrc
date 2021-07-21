@@ -63,6 +63,8 @@ post_install_target: $(INSTALL_TARGET)
 $(INSTALL_PLIST):
 	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort | \
 	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | cut -d' ' -f2- > $@
+	# Generate $(PKG_NAME).plist.auto for newly added files (diff against .tmp)
+	comm -3 $(PRE_INSTALL_PLIST) $(INSTALL_PLIST) > $(INSTALL_PLIST).auto
 
 install_correct_lib_files: $(INSTALL_PLIST)
 	@for pc_file in `grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)` ; \

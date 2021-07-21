@@ -2,10 +2,10 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-# Force build in native tool directrory, not cross directory.
+# Force build in native tool directory, not cross directory.
 WORK_DIR := $(PWD)/work-native
 
-# Package dependend
+# Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-

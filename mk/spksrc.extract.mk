@@ -7,17 +7,20 @@
 #  extract_target       (override with EXTRACT_TARGET)
 #  post_extract_target  (override with POST_EXTRACT_TARGET)
 EXTRACT_PATH ?= $(WORK_DIR)
-# Extract commands
+
+# Extract commands (optionally use TAR_CMD="fakeroot tar" as workaround on OSX)
+TAR_CMD ?= tar
 ifeq ($(strip $(EXTRACT_CMD.$(DIST_EXT))),)
-EXTRACT_CMD.tgz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.txz = tar -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.gz = tar -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.bz2 = tar -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tbz = tar -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.xz = tar -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.lzma = tar --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.lz = tar --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tgz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.txz = $(TAR_CMD) -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tar.gz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tar.bz2 = $(TAR_CMD) -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tbz = $(TAR_CMD) -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tar.xz = $(TAR_CMD) -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tar.lzma = $(TAR_CMD) --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
+EXTRACT_CMD.tar.lz = $(TAR_CMD) --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH)
+EXTRACT_CMD.deb = dpkg-deb -R $(DIST_FILE) $(EXTRACT_PATH)
 endif
 
 ifeq ($(strip $(EXTRACT_CMD)),)

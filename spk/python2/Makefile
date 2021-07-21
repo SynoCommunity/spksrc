@@ -26,7 +26,7 @@ DESCRIPTION_SPN = Lenguaje de programación Python 2.7.
 RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python2
-CHANGELOG = "Include pip compatible with python 2 after pip v21 is released in Jan 2021. Use \"pip<21.0\"."
+CHANGELOG = "Update depencencies (PyYAML, cryptography and others) including security fixes for CVE-2020-14343."
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

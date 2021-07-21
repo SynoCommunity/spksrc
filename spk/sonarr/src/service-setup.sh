@@ -3,8 +3,8 @@ MONO_PATH="/var/packages/mono/target/bin"
 MONO="${MONO_PATH}/mono"
 
 # Sonarr uses the home directory to store it's ".config"
-HOME_DIR="${SYNOPKG_PKGDEST}/var"
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
+HOME_DIR="${SYNOPKG_PKGVAR}"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
 
 # Sonarr v2 -> v3 compatibility:
 if [ -f "${SYNOPKG_PKGDEST}/share/NzbDrone/NzbDrone.exe" ]; then
@@ -31,7 +31,7 @@ LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
 
 # workaround for mono bug with armv5 (https://github.com/mono/mono/issues/12537)
 if [ "$SYNOPKG_DSM_ARCH" == "88f6281" -o "$SYNOPKG_DSM_ARCH" == "88f6282" ]; then
-    MONO="MONO_ENV_OPTIONS='-O=-aot,-float32' ${MONO_PATH}/mono"
+    MONO="MONO_ENV_OPTIONS='-O=-aot,-float32' ${MONO}"
 fi
 
 GROUP="sc-download"
@@ -42,17 +42,8 @@ SVC_BACKGROUND=y
 
 service_postinst ()
 {
+    mkdir -p ${CONFIG_DIR}
     set_unix_permissions "${CONFIG_DIR}"
-
-    # If necessary, add user also to the old group before removing it
-    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
-    syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "users"
-
-    # Discard legacy obsolete busybox user account
-    BIN=${SYNOPKG_PKGDEST}/bin
-    $BIN/busybox --install $BIN >> ${INST_LOG}
-    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
-    $BIN/deluser "${USER}" >> ${INST_LOG}
 }
 
 service_preupgrade ()
@@ -61,26 +52,27 @@ service_preupgrade ()
     # It should go, after the upgrade, into /var/.config/
     # The /var/ folder gets automatically copied by service-installer after this
     if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-        echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}" >> ${INST_LOG}
-        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${LOG_FILE} 2>&1
-    else
+        echo "Moving ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
+        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} >> ${INST_LOG} 2>&1
+    fi
+    if [ ! -d ${CONFIG_DIR} ]; then
         # Create, in case it's missing for some reason
-        mkdir ${CONFIG_DIR} >> ${LOG_FILE} 2>&1
+        mkdir -p ${CONFIG_DIR} >> ${INST_LOG} 2>&1
     fi
 
     # Is Installed Sonarr Binary Ver. >= SPK Sonarr Binary Ver.?
     CUR_VER=$(${MONO_PATH}/monodis --assembly ${SONARR} | grep "Version:" | awk '{print $2}')
-    echo "Installed Sonarr Binary: ${CUR_VER}" >> ${INST_LOG}
+    echo "Installed Sonarr Binary: ${CUR_VER}"
     SPK_VER=$(${MONO_PATH}/monodis --assembly ${SPK_SONARR} | grep "Version:" | awk '{print $2}')
-    echo "Requested Sonarr Binary: ${SPK_VER}" >> ${INST_LOG}
+    echo "Requested Sonarr Binary: ${SPK_VER}"
     function version_compare() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
     if version_compare $CUR_VER $SPK_VER; then
         echo 'KEEP_CUR="yes"' > ${CONFIG_DIR}/KEEP_VAR
-        echo "[KEEPING] Installed Sonarr Binary - Upgrading Package Only" >> ${INST_LOG}
-        mv ${SYNOPKG_PKGDEST}/share ${INST_VAR}
+        echo "[KEEPING] Installed Sonarr Binary - Upgrading Package Only"
+        mv ${SYNOPKG_PKGDEST}/share ${SYNOPKG_PKGVAR}
     else
         echo 'KEEP_CUR="no"' > ${CONFIG_DIR}/KEEP_VAR
-        echo "[REPLACING] Installed Sonarr Binary" >> ${INST_LOG}
+        echo "[REPLACING] Installed Sonarr Binary"
     fi
 }
 
@@ -89,9 +81,9 @@ service_postupgrade ()
     # Restore Current Sonarr Binary If Current Ver. >= SPK Ver.
     . ${CONFIG_DIR}/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
-        echo "Restoring Sonarr version from before upgrade" >> ${INST_LOG}
-        rm -fr ${SYNOPKG_PKGDEST}/share >> $INST_LOG 2>&1
-        mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> $INST_LOG 2>&1
+        echo "Restoring Sonarr version from before upgrade"
+        rm -fr ${SYNOPKG_PKGDEST}/share
+        mv ${SYNOPKG_PKGVAR}/share ${SYNOPKG_PKGDEST}/
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
 
@@ -99,8 +91,12 @@ service_postupgrade ()
 
     # If backup was created before new-style packages
     # new updates/backups will fail due to permissions (see #3185)
-    set_unix_permissions "/tmp/nzbdrone_backup"
-    set_unix_permissions "/tmp/nzbdrone_update"
+    if [ -d "/tmp/nzbdrone_backup" ] || [ -d "/tmp/nzbdrone_update" ] || [ -d "/tmp/sonarr_backup" ] || [ -d "/tmp/sonarr_update" ]; then
+        set_unix_permissions "/tmp/nzbdrone_backup"
+        set_unix_permissions "/tmp/nzbdrone_update"
+        set_unix_permissions "/tmp/sonarr_backup"
+        set_unix_permissions "/tmp/sonarr_update"
+    fi
 
     # Remove upgrade Flag
     rm ${CONFIG_DIR}/KEEP_VAR

@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 9ed76c0
-SPK_GIT_DATE = 20201011
-SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)~$(SPK_GIT_HASH)
+SPK_GIT_HASH = eb59284
+SPK_GIT_DATE = 20210612
+SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 26
+SPK_REV = 29
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -13,14 +13,16 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python38"
 
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 9ed76c0 as of October 11th 2020<br/>2. Update openssl to 1.1"
+CHANGELOG = "1. Update to latest git version eb59284 as of June 12th 2021<br/>2. Update openssl to 1.1<br/>3. Updated to use FFMPEG 4.3.2<br/>4. Updated libhdhomerun to version 20210224<br/>5. Update dtv-scan-tables"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -43,9 +45,6 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = tvheadend_extra_install
-
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 # Reuse ffmpeg libraries
 # Requires to invoke: make [package|publish] ARCH= TCVERSION=
@@ -78,9 +77,8 @@ tvheadend_pre_depend:
 	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 
 tvheadend_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/accesscontrol
-	install -m 755 -d $(STAGING_DIR)/var/passwd
+	install -p -m 700 -d $(STAGING_DIR)/var/accesscontrol
+	install -p -m 700 -d $(STAGING_DIR)/var/passwd
 	# The following filenames stem from an arbitrary (valid) combination created by TVH
-	install -m 644 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
-	install -m 644 src/passwd.json $(STAGING_DIR)/var/passwd/a927e30a755504f9784f23a4efac5109
+	install -m 640 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
+	install -m 640 src/passwd.json $(STAGING_DIR)/var/passwd/a927e30a755504f9784f23a4efac5109

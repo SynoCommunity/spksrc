@@ -3,9 +3,12 @@ PKG_VERS = 8.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.nluug.nl/pub/vim/unix
-PKG_DIR = $(PKG_NAME)$(subst .,,$(PKG_VERS))
+SPECIFIC_VERSION=$(subst .,,$(PKG_VERS))
+PKG_DIR = $(PKG_NAME)$(SPECIFIC_VERSION)
 
-BUILD_DEPENDS = cross/python3
+PYTHON_PACKAGE=python38
+
+BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
 DEPENDS = cross/ncurses
 
 HOMEPAGE = https://www.vim.org/
@@ -35,8 +38,10 @@ else
    ADDITIONAL_CFLAGS = -O2
 endif
 
-# Add the Python 3 SPK's installed lib dir to vim's rpath to allow loading of libpython dynamically if it's available
-ADDITIONAL_LDFLAGS = -Wl,--rpath,/var/packages/python3/target/lib
+# Add the Python SPK's installed lib dir to vim's rpath to allow loading of libpython dynamically if it's available
+ADDITIONAL_LDFLAGS = -Wl,--rpath,/var/packages/$(PYTHON_PACKAGE)/target/lib
+
+PLIST_TRANSFORM = sed -e 's%@SPECIFIC_VERSION@%$(SPECIFIC_VERSION)%'
 
 INSTALL_TARGET = vim_install
 
@@ -59,3 +64,4 @@ ENV += PYTHONPATH=$(PYTHONPATH)
 vim_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
 	install -m 644 src/vimrc $(STAGING_INSTALL_PREFIX)/share/vim/vimrc
+	cd $(STAGING_INSTALL_PREFIX)/bin; ln -s vim vim$(SPECIFIC_VERSION)

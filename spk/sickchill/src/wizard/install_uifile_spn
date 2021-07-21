@@ -1,0 +1,27 @@
+[{
+    "step_title": "Configurar credenciales (Puede editarlas tras la instalación desde la propia aplicación)",
+    "items": [{
+        "type": "textfield",
+        "desc": "Nombre de usuario HTTP (deje en blanco para no requerir usuario)",
+        "subitems": [{
+            "key": "wizard_username",
+            "desc": "Usuario",
+            "validator": {
+                "allowBlank": true
+            }
+        }]
+    },{
+        "type": "password",
+        "desc": "Contraseña HTTP (en blanco = sin autenticación)",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Contraseña",
+            "validator": {
+                "allowBlank": true
+            }
+        }]
+    },
+    {
+        "desc": "Los permisos para los paquetes relacionados con descargas son manejados por el grupo <b>'sc-download'</b> en DSM.<br>Por favor, lea <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Manejo de Permisos (en inglés)</a> para mayor detalle."
+    }]
+}]

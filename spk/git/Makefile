@@ -1,6 +1,6 @@
 SPK_NAME = git
-SPK_VERS = 2.28.0
-SPK_REV = 16
+SPK_VERS = 2.32.0
+SPK_REV = 18
 SPK_ICON = src/git.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DESCRIPTION = Git is a fast, scalable, distributed revision control system with 
 DESCRIPTION_FRE = Git est un système de gestion de révision rapide, extensible et distribué avec un ensemble de commandes inhabituellement riche qui fournit à la fois des opérations de haut niveau et un accès complet aux structures de bas niveau.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = "1. Update git to 28.0.<br/>2. Update openssl to 1.1."
+CHANGELOG = "Update git to v2.32.0"
 
 HOMEPAGE = https://git-scm.com
 LICENSE  = GPLv2
