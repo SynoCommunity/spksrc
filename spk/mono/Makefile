@@ -10,10 +10,14 @@ DESCRIPTION = Cross platform, open source .NET development framework
 DISPLAY_NAME = Mono
 STARTABLE = no
 
+CHANGELOG = "Update to version 6.12"
+
 HOMEPAGE = https://mono-project.com
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
 SERVICE_SETUP = src/service-setup.sh
+
+UNSUPPORTED_ARCHS = 88f6281
 
 POST_STRIP_TARGET = mono_extra_install
 
