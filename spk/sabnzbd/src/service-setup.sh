@@ -21,9 +21,11 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_volume:=volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
         sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
     fi
+    # add group (DSM6)
+    set_syno_permissions "${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}" "${GROUP}"
 
     # Create logs directory, otherwise it does not start due to permissions errors
     mkdir -p "$(dirname ${LOG_FILE})"
@@ -34,14 +36,20 @@ service_postinst ()
 
 service_postupgrade ()
 {
-    # Needed to force correct permissions, during update
-    # Extract the right paths from config file
     if [ -r "${CFG_FILE}" ]; then
+        # DSM6 -> DSM7 migration
+        sed -i -e "s|script_dir\s*=\s*/usr/local/sabnzbd/var/scripts|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
+        if [ "/var/packages/sabnzbd/target/var" != "${SYNOPKG_PKGVAR}" ]; then
+            sed -i -e "s|script_dir\s*=\s*/var/packages/sabnzbd/target/var/scripts|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
+        fi
+        # update download folder from wizard (wizard is used to add the package user to the shared folder)
+        sed -i -e "s|download_dir\s*=.*|download_dir = ${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+
+        # add group (DSM6)
         INCOMPLETE_FOLDER=$(sed -n 's/^download_dir[ ]*=[ ]*//p' ${CFG_FILE})
         COMPLETE_FOLDER=$(sed -n 's/^complete_dir[ ]*=[ ]*//p' ${CFG_FILE})
         WATCHED_FOLDER=$(sed -n 's/^dirscan_dir[ ]*=[ ]*//p' ${CFG_FILE})
 
-        # Apply permissions
         if [ -n "${INCOMPLETE_FOLDER}" ] && [ -d "${INCOMPLETE_FOLDER}" ]; then
             set_syno_permissions "${INCOMPLETE_FOLDER}" "${GROUP}"
         fi
@@ -51,7 +59,5 @@ service_postupgrade ()
         if [ -n "${WATCHED_FOLDER}" ] && [ -d "${WATCHED_FOLDER}" ]; then
             set_syno_permissions "${WATCHED_FOLDER}" "${GROUP}"
         fi
-        # DSM6 -> DSM7 migration
-        sed -i -e "s|script_dir\s*=.*|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
     fi
 }
