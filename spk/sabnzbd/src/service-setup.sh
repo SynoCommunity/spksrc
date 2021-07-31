@@ -24,8 +24,6 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
         sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
     fi
-    # add group (DSM6)
-    set_syno_permissions "${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}" "${GROUP}"
 
     # Create logs directory, otherwise it does not start due to permissions errors
     mkdir -p "$(dirname ${LOG_FILE})"
