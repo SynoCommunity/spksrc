@@ -6,7 +6,7 @@ DOTNET="${SYNOPKG_PKGDEST}/dotnet"
 
 service_postinst ()
 {
-    wget -O "${DOTNET_INSTALLER}" "https://dotnet.microsoft.com/download/dotnet-core/scripts/v1/dotnet-install.sh" >> ${INST_LOG} 2>&1
+    wget -O "${DOTNET_INSTALLER}" "https://dotnet.microsoft.com/download/dotnet-core/scripts/v1/dotnet-install.sh"
 
     # Stop if download failed
     if [ ! -r "${DOTNET_INSTALLER}" ]; then
@@ -19,9 +19,9 @@ service_postinst ()
     if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         # Install as sc-dotnet-runtime user, for correct permissions
         chmod +x "${NZBGET_INSTALLER}"
-        su ${EFF_USER} -s /bin/sh -c "${install_command}" >> ${INST_LOG} 2>&1
+        su ${EFF_USER} -s /bin/sh -c "${install_command}"
     else
-        env HOME=${SYNOPKG_PKGHOME} /bin/sh -c "${install_command}" >> ${INST_LOG} 2>&1
+        env HOME=${SYNOPKG_PKGHOME} /bin/sh -c "${install_command}"
     fi
 
     if [ ! -r "${DOTNET}" ]; then

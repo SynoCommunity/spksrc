@@ -1,5 +1,5 @@
 SPK_NAME = dotnet-sdk
-SPK_VERS = 5.0.8
+SPK_VERS = 5.0.302
 SPK_REV = 1
 SPK_ICON = src/dotnet.png
 
