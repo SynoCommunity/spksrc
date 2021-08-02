@@ -1,11 +1,11 @@
-SPK_NAME = dotnet-runtime
+SPK_NAME = dotnet-sdk
 SPK_VERS = 5.0.8
 SPK_REV = 1
 SPK_ICON = src/dotnet.png
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = .NET Runtime
-DISPLAY_NAME = .NET
+DESCRIPTION = .NET SDK
+DISPLAY_NAME = .NET SDK
 STARTABLE = no
 CHANGELOG = "Initial version"
 
