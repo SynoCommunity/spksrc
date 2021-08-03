@@ -3,6 +3,8 @@ SPK_VERS = 5.0.302
 SPK_REV = 1
 SPK_ICON = src/dotnet.png
 
+DEPENDS = cross/libstdc++
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = .NET SDK
 DISPLAY_NAME = .NET SDK
@@ -14,7 +16,7 @@ LICENSE  = https://github.com/dotnet/core/blob/master/LICENSE.TXT
 
 SERVICE_SETUP = src/service-setup.sh
 
-SPK_COMMANDS = dotnet
+SPK_COMMANDS = dotnet dotnet-env
 
 PRE_COPY_TARGET = dotnet_extra_install
 include ../../mk/spksrc.spk.mk

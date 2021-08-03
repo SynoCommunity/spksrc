@@ -2,7 +2,7 @@ DOTNET_INSTALLER="${SYNOPKG_PKGDEST}/dotnet-install.sh"
 DOTNET="${SYNOPKG_PKGDEST}/dotnet"
 
 # Packages that depend on .NET must set
-# DOTNET_ROOT=/volume1/@appstore/dotnet-runtime
+# DOTNET_ROOT=/volume1/@appstore/dotnet-sdk
 
 service_postinst ()
 {
@@ -29,4 +29,16 @@ service_postinst ()
         echo "${INST_LOG}"
         exit 1
     fi
+
+    ## add dotnet cli script with environment variables
+    cat >"${DOTNET}-env" <<EOL
+#!/bin/sh
+
+if [ $(echo "$$PATH"|grep -c .dotnet/tools) -eq 0 ]; then
+    export PATH="$$PATH:$HOME/.dotnet/tools"
+fi
+
+env DOTNET_ROOT=${SYNOPKG_PKGDEST} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib $@
+EOL
+    chmod +x "${DOTNET}-env"
 }
