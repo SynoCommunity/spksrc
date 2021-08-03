@@ -34,11 +34,11 @@ service_postinst ()
     cat >"${DOTNET}-env" <<EOL
 #!/bin/sh
 
-if [ $(echo "$$PATH"|grep -c .dotnet/tools) -eq 0 ]; then
-    export PATH="$$PATH:$HOME/.dotnet/tools"
+if [ \$(echo "\$PATH"|grep -c .dotnet/tools) -eq 0 ]; then
+    export PATH="\$PATH:\$HOME/.dotnet/tools"
 fi
 
-env DOTNET_ROOT=${SYNOPKG_PKGDEST} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib $@
+env DOTNET_ROOT=${SYNOPKG_PKGDEST} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib \$@
 EOL
     chmod +x "${DOTNET}-env"
 }
