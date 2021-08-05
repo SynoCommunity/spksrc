@@ -1,5 +1,5 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2021.5.4
+SPK_VERS = 2021.7.4
 SPK_REV = 14
 SPK_ICON = src/${SPK_NAME}.png
 
