@@ -1,5 +1,5 @@
 PKG_NAME = numpy
-PKG_VERS = 1.20.0
+PKG_VERS = 1.20.3
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/n/$(PKG_NAME)

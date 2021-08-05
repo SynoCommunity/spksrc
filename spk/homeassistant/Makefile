@@ -26,7 +26,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = ymartin59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Update homeassistant to 2021.5.4. <br/>Includes security updates for dependencies:<ul><li>CVE-2020-14343 (PyYAML)</li><li>CVE-2020-28493 (Jinja2)</li><li>CVE-2021-28363 (urllib3)</li><br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "Update homeassistant to 2021.7.4. <br/>Includes security updates for dependencies:<ul><li>CVE-2020-14343 (PyYAML)</li><li>CVE-2020-28493 (Jinja2)</li><li>CVE-2021-28363 (urllib3)</li><br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
