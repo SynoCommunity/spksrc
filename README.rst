@@ -15,7 +15,7 @@ In SynoCommunity some packages are available for DSM 7 but some are not.
 
 * Please regard all DSM 7 packages as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
 
-* **ATTENTION**: As reported, with a `Package repair` you will lose all the settings of installed packages. So make sure you backup the settings and configuration data before upgrading a package under DSM 7. A package `repair` will not succeed and you have to make a clean intallation on DSM 7 after completlty removing the former installation.
+* **ATTENTION**: As reported, package configuration settings may be lost following the upgrade to DSM 7 and the execution of a Package repair. Make sure to backup your settings and configuration for your SynoCommunity packages before installation of DSM 7 to facilitate restoration if needed.
 
 * Packages of the follwing kind will need some time to make DSM 7 compatible:
 
