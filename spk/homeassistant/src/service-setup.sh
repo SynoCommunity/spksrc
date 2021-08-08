@@ -23,9 +23,12 @@ service_postinst ()
     # install is done with local *.whl files and requirements from the index.
     ${SYNOPKG_PKGDEST}/env/bin/python3 -m pip install --upgrade pip
 
-    echo "Install packages"
+    echo "Install packages from wheels"
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input ${wheelhouse}/*.whl --requirement ${wheelhouse}/requirements.txt
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --no-index ${wheelhouse}/*.whl
+    
+    echo "Install packages from index"
+    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --requirement ${SYNOPKG_PKGVAR}/postinst_requirements.txt
 
     mkdir -p "${CONFIG_DIR}"
 }

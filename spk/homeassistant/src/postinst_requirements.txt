@@ -1,32 +1,27 @@
 # Home Assistant core
-# requirements.txt
-# file is kept for reference only
-# requirements are splitted into two files
-# - wheels_requirements.txt
-# - postinst_requirements.txt
+# pure python package requirements that are installed
+# at post installation
 
 # SPK_VERS must match:
 homeassistant==2021.8.3
-
 
 ### requirements taken from requirements.txt
 ### ----------------------------------------
 ### except cross-compiled wheels
 # Home Assistant Core
-aiohttp==3.7.4.post0
+### aiohttp==3.7.4.post0
 astral==2.2
 async_timeout==3.0.1
 attrs==21.2.0
 awesomeversion==21.4.0
-backports.zoneinfo;python_version<"3.9"
+### backports.zoneinfo;python_version<"3.9"
 #bcrypt==3.1.7          # cross-compiled wheel
 certifi==2020.12.5
 chardet==4.0.0
-ciso8601==2.1.3
+### ciso8601==2.1.3
 httpx==0.18.2
-#jinja2==3.0.1          # fails to bild wheel with explicit version 3.0.1
-jinja2
-MarkupSafe==2.0.1
+jinja2==3.0.1           # fails to bild wheel
+### MarkupSafe==2.0.1
 #pyMetno==0.7.0
 #pycparser==2.20
 PyJWT==1.7.1
@@ -35,39 +30,40 @@ python-slugify==4.0.1
 pytz==2021.1
 pyyaml==5.4.1
 requests==2.25.1
-ruamel.yaml==0.15.100
+### ruamel.yaml==0.15.100
 six==1.16.0
 text-unidecode==1.3
 voluptuous==0.12.1
 voluptuous-serialize==2.4.0
-yarl==1.6.3
+### yarl==1.6.3
 
 
 ### Dependencies for requirements above
 ### -----------------------------------
-multidict==4.7.6          # for aiohttp
+### multidict==4.7.6          # for aiohttp
 idna-ssl==1.1.0           # for aiohttp
 urllib3==1.26.4           # for requests
 typing-extensions==3.7.4.3
-idna==3.2
-    
+#idna==3.2
+idna==2.9
+deepmerge==0.3.0
 
 ### Dependencies for cloud
 ### ----------------------
 hass-nabucasa==0.44.0
 atomicwrites==1.4.0
 jose==1.0.0
-python-jose==3.2.0
+python-jose==3.3.0
 httplib2==0.19.0
-botocore==1.19.63
-s3transfer==0.3.4
-python-dateutil==2.8.1
+botocore==1.21.16
+s3transfer==0.5.0
+python-dateutil==2.8.2
 jmespath==0.10.0
 pycognito==2021.3.1
 envs==1.3
-snitun==0.20
-acme==1.13.0
-josepy==1.6.0
+snitun==0.24.0
+acme==1.15.0
+josepy==1.8.0
 requests_toolbelt==0.9.1
 cached-property==1.5.2
 isodate==0.6.0
@@ -88,8 +84,8 @@ python-libnmap==0.7.0     # for python-nmap
 
 # for flunearyou
 pyflunearyou==1.0.7
-msgpack==0.6.2
-ujson==1.35
+### msgpack==0.6.2
+### ujson==1.35
 aiocache==0.11.1
 # for aiocache
 aioredis==1.3.1
@@ -110,10 +106,10 @@ Adafruit-SHT31==1.0.2
 
 # homeassistant.components.homekit
 HAP-python==3.6.0
-curve25519-donna==1.3	# https://github.com/ikalchev/HAP-python/blob/dev/requirements.txt
-ecdsa==0.16.1
-ed25519==1.5
-pycryptodome==3.9.9
+### curve25519-donna==1.3	# https://github.com/ikalchev/HAP-python/blob/dev/requirements.txt
+ecdsa==0.17.0
+### ed25519==1.5          #
+### pycryptodome==3.9.9   #
 tlslite-ng==0.7.6
 
 
@@ -280,7 +276,7 @@ aiodns==3.0.0
 aioharmony==0.2.7
 argparse==1.4.0
 sleekxmpp==1.3.3
-pycares==4.0.0
+### pycares==4.0.0
 
 # homeassistant.components.homekit_controller
 aiohomekit==0.6.0
@@ -509,7 +505,7 @@ bimmer_connected==0.7.16
 
 # homeassistant.components.amazon_polly
 # homeassistant.components.route53
-boto3==1.16.52
+boto3==1.18.16
 
 # homeassistant.components.braviatv
 #bravia-tv==1.0.11
@@ -608,7 +604,7 @@ defusedxml==0.7.1
 
 # homeassistant.components.denonavr
 denonavr==0.10.8
-#asyncstdlib==3.9.2       # added as wheel
+### asyncstdlib==3.9.2       # added as wheel
 
 # homeassistant.components.devolo_home_control
 #devolo-home-control-api==0.17.4
@@ -686,7 +682,7 @@ distro==1.5.0
 #envoy_reader==0.19.0
 
 # homeassistant.components.season
-ephem==3.7.7.0
+### ephem==3.7.7.0
 
 # homeassistant.components.epson
 #epson-projector==0.4.2
@@ -712,7 +708,6 @@ ephem==3.7.7.0
 
 # homeassistant.components.fastdotcom
 #fastdotcom==0.0.3
-
 # homeassistant.components.feedreader
 feedparser==6.0.2
 
@@ -842,7 +837,7 @@ gTTS==2.2.3
 #gstreamer-player==1.1.2
 
 # homeassistant.components.profiler
-guppy3==3.1.0
+### guppy3==3.1.0
 
 # homeassistant.components.ffmpeg
 #ha-ffmpeg==3.0.2
@@ -1126,7 +1121,7 @@ mutagen==1.45.1
 
 # homeassistant.components.discovery
 netdisco==2.9.0
-netifaces		# discovered during first run
+### netifaces		# discovered during first run
 
 # homeassistant.components.nam
 #nettigo-air-monitor==1.0.0
@@ -1196,8 +1191,8 @@ oauth2client==4.0.0
 #onkyo-eiscp==1.2.7
 
 # homeassistant.components.onvif
-onvif-zeep-async==1.0.0
-requests_file==1.5.1
+#onvif-zeep-async==1.0.0
+#requests_file==1.5.1
 
 # homeassistant.components.opengarage
 #open-garage==0.1.5
@@ -1302,7 +1297,7 @@ paho-mqtt==1.5.1
 # homeassistant.components.plugwise
 plugwise==0.8.5
 semver==2.13.0
-crcmod==1.7
+### crcmod==1.7
 pyserial==3.5
 
 # homeassistant.components.plum_lightpad
@@ -1490,6 +1485,7 @@ pyatv==0.8.2
 #pycoolmasternet-async==0.1.2
 
 # homeassistant.components.microsoft
+#pycsspeechtts==1.0.4
 pycsspeechtts==1.0.6
 
 # homeassistant.components.cups
@@ -1630,8 +1626,7 @@ tzlocal==2.0.0
 #pyipma==2.0.5
 
 # homeassistant.components.ipp
-#pyipp==0.11.0
-pyipp
+pyipp==0.11.0     # fails to bild wheel
 
 # homeassistant.components.iqvia
 #pyiqvia==1.0.0
@@ -1816,7 +1811,7 @@ pyotp==2.3.0
 # homeassistant.components.point
 pypoint==2.1.0
 Authlib==0.15.2
-httpcore==0.12.2
+httpcore==0.13.6
 sniffio==1.2.0
 rfc3986==1.4.0
 
@@ -2081,7 +2076,7 @@ python-wink==1.10.5
 # homeassistant.components.tradfri
 pytradfri[async]==7.0.6
 aiocoap==0.4.1
-#DTLSSocket==0.1.12      # cross-compiled wheel
+### DTLSSocket==0.1.12      # cross-compiled wheel
 
 # homeassistant.components.trafikverket_train
 # homeassistant.components.trafikverket_weatherstation
@@ -2326,7 +2321,7 @@ aiocoap==0.4.1
 
 # homeassistant.components.recorder
 # homeassistant.components.sql
-sqlalchemy==1.4.17
+### sqlalchemy==1.4.17
 
 # homeassistant.components.srp_energy
 #srpenergy==1.3.2

@@ -1,5 +1,5 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2021.7.4
+SPK_VERS = 2021.8.3
 SPK_REV = 14
 SPK_ICON = src/${SPK_NAME}.png
 
@@ -32,7 +32,7 @@ STARTABLE = yes
 HOMEPAGE = https://www.home-assistant.io/
 LICENSE  = Apache-2.0
 
-WIZARDS_DIR = src/wizard/
+WIZARDS_DIR = src/wizard
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -42,7 +42,14 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 USE_ALTERNATE_TMPDIR = 1
 
+POST_STRIP_TARGET = homeassistant_extra_install
+
 # The package installer downloads pure python wheels at installation time.
 EXCLUDE_PURE_PYTHON_WHEELS = yes
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: homeassistant_extra_install
+homeassistant_extra_install:
+	@install -m 755 -d $(STAGING_DIR)/var
+	@install -m 644 src/postinst_requirements.txt $(STAGING_DIR)/var/
