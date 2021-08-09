@@ -30,7 +30,7 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_volume}/${wizard_download_dir:=/downloads}|g" ${CFG_FILE}
+        sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}|g" ${CFG_FILE}
         sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
         sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
         if [ -d "${wizard_watch_dir}" ]; then
@@ -65,7 +65,7 @@ service_postupgrade ()
     # Extract the right paths from config file
     if [ -r "${CFG_FILE}" ]; then
         # update folder
-        sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${wizard_volume}/${wizard_download_dir:=/downloads}\",|g" ${CFG_FILE}
+        sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}\",|g" ${CFG_FILE}
 
         DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
         INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
