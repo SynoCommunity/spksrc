@@ -1,0 +1,3 @@
+lib:lib/aclocal/xorg-macros.m4
+lib:lib/pkgconfig/xorg-macros.pc
+lib:lib/util-macros/INSTALL

@@ -1,0 +1,18 @@
+diff -uNr openjdk/src/java.desktop/share/classes/java/awt/Toolkit.java jdk8/jdk/src/java.desktop/share/classes/java/awt/Toolkit.java
+--- openjdk/src/java.desktop/share/classes/java/awt/Toolkit.java
++++ openjdk/src/java.desktop/share/classes/java/awt/Toolkit.java
+@@ -883,9 +883,13 @@
+                     return null;
+                 }
+             });
+             if (!GraphicsEnvironment.isHeadless()) {
+-                loadAssistiveTechnologies();
++                try {
++                    loadAssistiveTechnologies();
++                } catch (AWTError error) {
++                    // ignore silently
++                }
+             }
+         }
+         return toolkit;
+     }

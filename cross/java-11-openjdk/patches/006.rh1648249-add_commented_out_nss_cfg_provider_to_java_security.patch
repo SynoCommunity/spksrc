@@ -1,0 +1,11 @@
+diff -r 5b86f66575b7 src/share/lib/security/java.security-linux
+--- openjdk/src/java.base/share/conf/security/java.security	Tue May 16 13:29:05 2017 -0700
++++ openjdk/src/java.base/share/conf/security/java.security	Tue Jun 06 14:05:12 2017 +0200
+@@ -83,6 +83,7 @@
+ #ifndef solaris
+ security.provider.tbd=SunPKCS11
+ #endif
++#security.provider.tbd=SunPKCS11 ${java.home}/lib/security/nss.cfg
+ 
+ #
+ # A list of preferred providers for specific algorithms. These providers will
