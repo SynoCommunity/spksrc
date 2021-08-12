@@ -2,7 +2,7 @@ PKG_NAME = expat
 PKG_VERS = 2.4.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)/$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/libexpat/lib$(PKG_NAME)/releases/download/R_$(subst .,_,$(PKG_VERS))
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
