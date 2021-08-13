@@ -7,6 +7,7 @@ PKG_HG_REV = jdk-11.0.12+7
 PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_HG_REV).$(PKG_EXT)
 PKG_DOWNLOAD_METHOD = hg
 PKG_DIR = $(PKG_NAME)-r$(PKG_HG_REV)
+CHECKSUM_TARGET = nop 
 
 DEPENDS = cross/cups cross/fontconfig cross/expat
 BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib
