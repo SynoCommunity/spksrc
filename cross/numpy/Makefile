@@ -1,5 +1,5 @@
 PKG_NAME = numpy
-PKG_VERS = 1.20.3
+PKG_VERS = 1.21.1
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/n/$(PKG_NAME)
@@ -15,7 +15,7 @@ include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 # workaround for compiler bug, see: https://github.com/numpy/numpy/issues/13622
-# still required for numpy 1.20.0
+# still required for numpy 1.21.1
 ADDITIONAL_CFLAGS += -O0
 endif
 
