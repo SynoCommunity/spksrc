@@ -1,0 +1,20 @@
+--- openjdk/src/java.base/share/conf/security/java.security
++++ openjdk/src/java.base/share/conf/security/java.security
+@@ -304,6 +304,8 @@
+ #
+ package.access=sun.misc.,\
+                sun.reflect.,\
++               org.GNOME.Accessibility.,\
++               org.GNOME.Bonobo.,\
+ 
+ #
+ # List of comma-separated packages that start with or equal this string
+@@ -316,6 +318,8 @@
+ #
+ package.definition=sun.misc.,\
+                    sun.reflect.,\
++                   org.GNOME.Accessibility.,\
++                   org.GNOME.Bonobo.,\
+ 
+ #
+ # Determines whether this properties file can be appended to

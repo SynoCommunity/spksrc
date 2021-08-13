@@ -1,0 +1,15 @@
+rsc:include/X11/Xauth.h
+lib:lib/libXau.la
+lnk:lib/libXau.so
+lnk:lib/libXau.so.6
+lib:lib/libXau.so.6.0.0
+rsc:lib/man/man3/Xau.3
+rsc:lib/man/man3/XauDisposeAuth.3
+rsc:lib/man/man3/XauFileName.3
+rsc:lib/man/man3/XauGetAuthByAddr.3
+rsc:lib/man/man3/XauGetBestAuthByAddr.3
+rsc:lib/man/man3/XauLockAuth.3
+rsc:lib/man/man3/XauReadAuth.3
+rsc:lib/man/man3/XauUnlockAuth.3
+rsc:lib/man/man3/XauWriteAuth.3
+lib:lib/pkgconfig/xau.pc

@@ -1,0 +1,75 @@
+From 6a92ea98544e0d03d4ce0563ad765ae21773b0fd Mon Sep 17 00:00:00 2001
+From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Date: Tue, 25 Apr 2017 11:00:36 +0200
+Subject: [PATCH libICE 2/2] Add getentropy emulation through syscall
+
+RHEL/f24/f25 only patch
+
+Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+---
+ src/iceauth.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/src/iceauth.c b/src/iceauth.c
+index 9b77eac..9af62f5 100644
+--- a/src/iceauth.c
++++ b/src/iceauth.c
+@@ -78,6 +78,55 @@ emulate_getrandom_buf (
+     }
+ }
+ 
++#ifndef HAVE_GETENTROPY
++#include <sys/syscall.h>
++#include <errno.h>
++
++/* code taken from libressl, license: */
++/*
++ * Copyright (c) 2014 Theo de Raadt <deraadt@openbsd.org>
++ * Copyright (c) 2014 Bob Beck <beck@obtuse.com>
++ *
++ * Permission to use, copy, modify, and distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ *
++ * Emulation of getentropy(2) as documented at:
++ * http://man.openbsd.org/getentropy.2
++ */
++#ifdef __NR_getrandom
++static int
++getentropy(void *buf, size_t len)
++{
++	int pre_errno = errno;
++	int ret;
++	if (len > 256)
++		return (-1);
++	do {
++		ret = syscall(__NR_getrandom, buf, len, 0);
++	} while (ret == -1 && errno == EINTR);
++
++	if (ret != len)
++		return (-1);
++	errno = pre_errno;
++
++	fprintf(stderr, "generating cookie with syscall\n");
++
++	return (0);
++}
++#define HAVE_GETENTROPY 1
++#endif /* __NR_getrandom */
++
++#endif /* HAVE_GETENTROPY */
++
+ static void
+ arc4random_buf (
+ 	char *auth,
+-- 
+2.9.3
+
