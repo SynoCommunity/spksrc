@@ -171,28 +171,28 @@ $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
 ifneq ($(strip $(SERVICE_PORT)),)
-	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ | sponge $@ 1<>$@
+	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ | sponge $@
 endif
 ifneq ($(strip $(FWPORTS)),)
 # e.g. FWPORTS=src/foo.sc
 	@jq --arg file $(FWPORTS) \
-		'."port-config"."protocol-file" = "$(DSM_UI_DIR)/"+($$file | split("/")[-1])' $@ | sponge $@ 1<>$@
+		'."port-config"."protocol-file" = "$(DSM_UI_DIR)/"+($$file | split("/")[-1])' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_COMMANDS)),)
 # e.g. SPK_COMMANDS=bin/foo bin/bar
 	@jq --arg binaries '$(SPK_COMMANDS)' \
-		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ | sponge $@ 1<>$@
+		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 # e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
 	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
-		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ | sponge $@ 1<>$@
+		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ | sponge $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
-		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@ 1<>$@
+		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
 endif
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
@@ -260,19 +260,19 @@ ifneq ($(strip $(GROUP)),)
 # Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
 # For DSM7 I recommend setting permissions for individual packages (System Internal User)
 # or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
-	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ | sponge $@ 1<>$@
+	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ | sponge $@
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
-	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@ 1<>$@
+	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USER)),)
-	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@ 1<>$@
+	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_GROUP)),)
-	@jq '."groupname" = "$(SPK_GROUP)"' $@ | sponge $@ 1<>$@
+	@jq '."groupname" = "$(SPK_GROUP)"' $@ | sponge $@
 else
-	@jq '."groupname" = "sc-$(SPK_USER)"' $@ | sponge $@ 1<>$@
+	@jq '."groupname" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -291,13 +291,13 @@ $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
-	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@ 1<>$@
+	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USER)),)
-	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@ $@ 1<>$@
+	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_GROUP)),)
-	@jq '."groupname" = "$(SPK_GROUP)"' $@ | sponge $@ 1<>$@
+	@jq '."groupname" = "$(SPK_GROUP)"' $@ | sponge $@
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
