@@ -1,0 +1,8 @@
+bin:bin/zip
+bin:bin/zipcloak
+bin:bin/zipnote
+bin:bin/zipsplit
+rsc:man/man1/zip.1
+rsc:man/man1/zipcloak.1
+rsc:man/man1/zipnote.1
+rsc:man/man1/zipsplit.1

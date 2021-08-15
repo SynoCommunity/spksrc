@@ -10,7 +10,7 @@ PKG_DIR = $(PKG_NAME)-r$(PKG_HG_REV)
 CHECKSUM_TARGET = nop 
 
 DEPENDS = cross/cups cross/fontconfig cross/expat
-BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib
+BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip
 
 HOMEPAGE = http://openjdk.java.net/
 COMMENT  = The OpenJDK 11 runtime environment

@@ -1,0 +1,24 @@
+From b0b6660d474738a23e6ef84afadd4f87793e3ad0 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 13 Nov 2018 12:57:13 +0100
+Subject: [PATCH] XXX
+
+---
+ zip.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/zip.h b/zip.h
+index ba03160..d62de9a 100644
+--- a/zip.h
++++ b/zip.h
+@@ -609,7 +609,7 @@ extern int bflag;
+ void zipmessage_nl OF((ZCONST char *, int));
+ void zipmessage OF((ZCONST char *, ZCONST char *));
+ void zipwarn OF((ZCONST char *, ZCONST char *));
+-void ziperr OF((int, ZCONST char *));
++void ziperr OF((int, ZCONST char *)) __attribute__ ((noreturn));
+ #ifdef UTIL
+ #  define error(msg)    ziperr(ZE_LOGIC, msg)
+ #else
+-- 
+2.17.2

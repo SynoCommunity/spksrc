@@ -1,0 +1,12 @@
+diff -up zip30/unix/configure.nostrip zip30/unix/configure
+--- zip30/unix/configure.nostrip	2009-11-30 10:18:09.000000000 +0100
++++ zip30/unix/configure	2009-11-30 10:21:08.354264213 +0100
+@@ -17,7 +17,7 @@ CFLAGSR=${CFLAGS}
+ CC=${1-cc}
+ CFLAGS=${2-"-I. -DUNIX"}
+ LFLAGS1=''
+-LFLAGS2=''
++LFLAGS2="${LFLAGS2}"
+ LN="ln -s"
+ 
+ CFLAGS_OPT=''
