@@ -1,0 +1,148 @@
+# HG changeset patch
+# User sgehwolf
+# Date 1525714161 -3600
+#      Mon May 07 18:29:21 2018 +0100
+# Node ID afb31413c73cbc06420fdb447aa90a7a38258904
+# Parent  bcbc64dfb629c5f188bbf59b8f986ad95963ed60
+8143245, PR3548: Zero build requires disabled warnings
+Reviewed-by: dholmes, coleenp
+
+diff --git openjdk.orig/hotspot/make/linux/makefiles/zeroshark.make openjdk/hotspot/make/linux/makefiles/zeroshark.make
+--- openjdk.orig/hotspot/make/linux/makefiles/zeroshark.make
++++ openjdk/hotspot/make/linux/makefiles/zeroshark.make
+@@ -1,5 +1,5 @@
+ #
+-# Copyright (c) 2003, 2015, Oracle and/or its affiliates. All rights reserved.
++# Copyright (c) 2003, 2016, Oracle and/or its affiliates. All rights reserved.
+ # Copyright 2007, 2008 Red Hat, Inc.
+ # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ #
+@@ -29,12 +29,7 @@
+ ifeq ($(JVM_VARIANT_ZEROSHARK), true)
+   WARNING_FLAGS += -Wno-undef
+ endif
+-# Suppress some warning flags that are normally turned on for hotspot,
+-# because some of the zero code has not been updated accordingly.
+-WARNING_FLAGS += -Wno-return-type \
+-  -Wno-format-nonliteral -Wno-format-security \
+-  -Wno-maybe-uninitialized
+- 
++
+ 
+ # If FDLIBM_CFLAGS is non-empty it holds CFLAGS needed to be passed to
+ # the compiler so as to be able to produce optimized objects
+diff --git openjdk.orig/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp openjdk/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp
+--- openjdk.orig/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp
++++ openjdk/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp
+@@ -102,7 +102,7 @@
+       return result;
+     default:
+       ShouldNotReachHere();
+-      return result; // silence compiler warnings
++      return NULL_WORD; // silence compiler warnings
+   }
+ }
+ 
+diff --git openjdk.orig/hotspot/src/cpu/zero/vm/interpreterRT_zero.cpp openjdk/hotspot/src/cpu/zero/vm/interpreterRT_zero.cpp
+--- openjdk.orig/hotspot/src/cpu/zero/vm/interpreterRT_zero.cpp
++++ openjdk/hotspot/src/cpu/zero/vm/interpreterRT_zero.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2003, 2012, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2003, 2016, Oracle and/or its affiliates. All rights reserved.
+  * Copyright 2007, 2008, 2010 Red Hat, Inc.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+@@ -62,7 +62,7 @@
+ }
+ 
+ void InterpreterRuntime::SignatureHandlerGeneratorBase::push(BasicType type) {
+-  ffi_type *ftype;
++  ffi_type *ftype = NULL;
+   switch (type) {
+   case T_VOID:
+     ftype = &ffi_type_void;
+diff --git openjdk.orig/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.cpp openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.cpp
+--- openjdk.orig/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.cpp
++++ openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.cpp
+@@ -1,6 +1,6 @@
+ /*
+  * Copyright (c) 2003, 2018, Oracle and/or its affiliates. All rights reserved.
+- * Copyright 2007, 2008, 2009, 2010 Red Hat, Inc.
++ * Copyright 2016 Red Hat, Inc.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -61,6 +61,7 @@
+ 
+ frame os::get_sender_for_C_frame(frame* fr) {
+   ShouldNotCallThis();
++  return frame(NULL, NULL); // silence compile warning.
+ }
+ 
+ frame os::current_frame() {
+@@ -98,16 +99,19 @@
+ 
+ address os::Linux::ucontext_get_pc(ucontext_t* uc) {
+   ShouldNotCallThis();
++  return NULL; // silence compile warnings
+ }
+ 
+ ExtendedPC os::fetch_frame_from_context(void* ucVoid,
+                                         intptr_t** ret_sp,
+                                         intptr_t** ret_fp) {
+   ShouldNotCallThis();
++  return NULL; // silence compile warnings
+ }
+ 
+ frame os::fetch_frame_from_context(void* ucVoid) {
+   ShouldNotCallThis();
++  return frame(NULL, NULL); // silence compile warnings
+ }
+ 
+ extern "C" JNIEXPORT int
+@@ -247,11 +251,16 @@
+   }
+ #endif // !PRODUCT
+ 
+-  const char *fmt = "caught unhandled signal %d";
+   char buf[64];
+ 
+-  sprintf(buf, fmt, sig);
++  sprintf(buf, "caught unhandled signal %d", sig);
++
++// Silence -Wformat-security warning for fatal()
++PRAGMA_DIAG_PUSH
++PRAGMA_FORMAT_NONLITERAL_IGNORED
+   fatal(buf);
++PRAGMA_DIAG_POP
++  return true; // silence compiler warnings
+ }
+ 
+ void os::Linux::init_thread_fpu_state(void) {
+@@ -260,6 +269,7 @@
+ 
+ int os::Linux::get_fpu_control_word() {
+   ShouldNotCallThis();
++  return -1; // silence compile warnings
+ }
+ 
+ void os::Linux::set_fpu_control_word(int fpu) {
+diff --git openjdk.orig/hotspot/src/os_cpu/linux_zero/vm/thread_linux_zero.hpp openjdk/hotspot/src/os_cpu/linux_zero/vm/thread_linux_zero.hpp
+--- openjdk.orig/hotspot/src/os_cpu/linux_zero/vm/thread_linux_zero.hpp
++++ openjdk/hotspot/src/os_cpu/linux_zero/vm/thread_linux_zero.hpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2000, 2010, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+  * Copyright 2007, 2008, 2009, 2010 Red Hat, Inc.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+@@ -110,6 +110,7 @@
+                                            void* ucontext,
+                                            bool isInJava) {
+     ShouldNotCallThis();
++    return false; // silence compile warning
+   }
+ 
+   bool pd_get_top_frame_for_profiling(frame* fr_addr,

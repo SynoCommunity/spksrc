@@ -1,0 +1,12 @@
+diff --git a/src/share/vm/runtime/globals.hpp b/src/share/vm/runtime/globals.hpp
+--- openjdk/hotspot/src/share/vm/runtime/globals.hpp
++++ openjdk/hotspot/src/share/vm/runtime/globals.hpp
+@@ -530,7 +530,7 @@
+   lp64_product(intx, ObjectAlignmentInBytes, 8,                             \
+           "Default object alignment in bytes, 8 is minimum")                \
+                                                                             \
+-  product(bool, AssumeMP, false,                                            \
++  product(bool, AssumeMP, true,                                             \
+           "Instruct the VM to assume multiple processors are available")    \
+                                                                             \
+   /* UseMembar is theoretically a temp flag used for memory barrier         \

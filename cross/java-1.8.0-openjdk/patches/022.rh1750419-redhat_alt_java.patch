@@ -1,0 +1,128 @@
+diff --git openjdk.orig/jdk/make/CompileLaunchers.gmk openjdk/jdk/make/CompileLaunchers.gmk
+--- openjdk.orig/jdk/make/CompileLaunchers.gmk
++++ openjdk/jdk/make/CompileLaunchers.gmk
+@@ -255,6 +255,32 @@
+   endif
+ endif
+ 
++$(eval $(call SetupLauncher,alt-java, \
++    -DEXPAND_CLASSPATH_WILDCARDS -DREDHAT_ALT_JAVA,,,user32.lib comctl32.lib, \
++    $(JDK_OUTPUTDIR)/objs/jli_static.lib, $(JAVA_RC_FLAGS), \
++    $(JDK_TOPDIR)/src/windows/resource/java.rc, $(JDK_OUTPUTDIR)/objs/java_objs,true))
++
++$(JDK_OUTPUTDIR)/bin$(OUTPUT_SUBDIR)/alt-java$(EXE_SUFFIX): $(BUILD_LAUNCHER_alt-java)
++	$(MKDIR) -p $(@D)
++	$(RM) $@
++	$(CP) $(JDK_OUTPUTDIR)/objs/java_objs$(OUTPUT_SUBDIR)/alt-java$(EXE_SUFFIX) $@
++
++$(JDK_OUTPUTDIR)/bin$(OUTPUT_SUBDIR)/alt-java$(DEBUGINFO_EXT): $(BUILD_LAUNCHER_alt-java)
++	$(MKDIR) -p $(@D)
++	$(RM) $@
++	$(CP) $(JDK_OUTPUTDIR)/objs/java_objs$(OUTPUT_SUBDIR)/alt-java$(DEBUGINFO_EXT) $@
++
++ifeq ($(OPENJDK_TARGET_OS), linux)
++  BUILD_LAUNCHERS += $(JDK_OUTPUTDIR)/bin$(OUTPUT_SUBDIR)/alt-java$(EXE_SUFFIX)
++  ifeq ($(ENABLE_DEBUG_SYMBOLS), true)
++    ifneq ($(POST_STRIP_CMD), )
++      ifneq ($(STRIP_POLICY), no_strip)
++        BUILD_LAUNCHERS += $(JDK_OUTPUTDIR)/bin$(OUTPUT_SUBDIR)/alt-java$(DEBUGINFO_EXT)
++      endif
++    endif
++  endif
++endif
++
+ ifeq ($(OPENJDK_TARGET_OS), windows)
+   $(eval $(call SetupLauncher,javaw, \
+       -DJAVAW -DEXPAND_CLASSPATH_WILDCARDS,,,user32.lib comctl32.lib, \
+diff --git openjdk.orig/jdk/src/share/bin/alt_main.h openjdk/jdk/src/share/bin/alt_main.h
+new file mode 100644
+--- /dev/null
++++ openjdk/jdk/src/share/bin/alt_main.h
+@@ -0,0 +1,73 @@
++/*
++ * Copyright (c) 2019, Red Hat, Inc. All rights reserved.
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 only, as
++ * published by the Free Software Foundation.  Oracle designates this
++ * particular file as subject to the "Classpath" exception as provided
++ * by Oracle in the LICENSE file that accompanied this code.
++ *
++ * This code is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * version 2 for more details (a copy is included in the LICENSE file that
++ * accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License version
++ * 2 along with this work; if not, write to the Free Software Foundation,
++ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
++ *
++ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
++ * or visit www.oracle.com if you need additional information or have any
++ * questions.
++ */
++
++#ifdef REDHAT_ALT_JAVA
++
++#include <sys/prctl.h>
++
++
++/* Per task speculation control */
++#ifndef PR_GET_SPECULATION_CTRL
++# define PR_GET_SPECULATION_CTRL    52
++#endif
++#ifndef PR_SET_SPECULATION_CTRL
++# define PR_SET_SPECULATION_CTRL    53
++#endif
++/* Speculation control variants */
++#ifndef PR_SPEC_STORE_BYPASS
++# define PR_SPEC_STORE_BYPASS          0
++#endif
++/* Return and control values for PR_SET/GET_SPECULATION_CTRL */
++
++#ifndef PR_SPEC_NOT_AFFECTED
++# define PR_SPEC_NOT_AFFECTED          0
++#endif
++#ifndef PR_SPEC_PRCTL
++# define PR_SPEC_PRCTL                 (1UL << 0)
++#endif
++#ifndef PR_SPEC_ENABLE
++# define PR_SPEC_ENABLE                (1UL << 1)
++#endif
++#ifndef PR_SPEC_DISABLE
++# define PR_SPEC_DISABLE               (1UL << 2)
++#endif
++#ifndef PR_SPEC_FORCE_DISABLE
++# define PR_SPEC_FORCE_DISABLE         (1UL << 3)
++#endif
++#ifndef PR_SPEC_DISABLE_NOEXEC
++# define PR_SPEC_DISABLE_NOEXEC        (1UL << 4)
++#endif
++
++static void set_speculation() __attribute__((constructor));
++static void set_speculation() {
++  if ( prctl(PR_SET_SPECULATION_CTRL,
++             PR_SPEC_STORE_BYPASS,
++             PR_SPEC_DISABLE_NOEXEC, 0, 0) == 0 ) {
++    return;
++  }
++  prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_STORE_BYPASS, PR_SPEC_DISABLE, 0, 0);
++}
++
++#endif // REDHAT_ALT_JAVA
+diff --git openjdk.orig/jdk/src/share/bin/main.c openjdk/jdk/src/share/bin/main.c
+--- openjdk.orig/jdk/src/share/bin/main.c
++++ openjdk/jdk/src/share/bin/main.c
+@@ -32,6 +32,10 @@
+ 
+ #include "defines.h"
+ 
++#if defined(linux) && defined(__x86_64)
++#include "alt_main.h"
++#endif
++
+ #ifdef _MSC_VER
+ #if _MSC_VER > 1400 && _MSC_VER < 1600
+ 

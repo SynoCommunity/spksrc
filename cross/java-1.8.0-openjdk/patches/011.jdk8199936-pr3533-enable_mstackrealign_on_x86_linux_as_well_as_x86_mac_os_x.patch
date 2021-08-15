@@ -1,0 +1,58 @@
+# HG changeset patch
+# User andrew
+# Date 1526122977 -3600
+#      Sat May 12 12:02:57 2018 +0100
+# Node ID 00ccc73498628a51a45301322e64ce2ad06e49be
+# Parent  aecf9f48f7b5c6148b62713a6b746301435b57cc
+PR3533: HotSpot generates code with unaligned stack, crashes on SSE operations
+Summary: Enable -mstackrealign on x86 Linux as well as x86 Mac OS X
+
+diff --git openjdk.orig///common/autoconf/flags.m4 openjdk///common/autoconf/flags.m4
+--- openjdk.orig///common/autoconf/flags.m4
++++ openjdk///common/autoconf/flags.m4
+@@ -402,6 +402,21 @@
+     AC_SUBST($2CXXSTD_CXXFLAG)
+   fi
+ 
++  #
++  # NOTE: check for -mstackrealign needs to be below potential addition of -m32
++  #
++  if test "x$OPENJDK_TARGET_CPU" = xx86 && test "x$OPENJDK_TARGET_OS" = xmacosx -o \
++                                                "x$OPENJDK_TARGET_OS" = xlinux; then
++    # On 32-bit MacOSX the OS requires C-entry points to be 16 byte aligned.
++    # While waiting for a better solution, the current workaround is to use -mstackrealign
++    # This is also required on Linux systems which use libraries compiled with SSE instructions
++    REALIGN_CFLAG="-mstackrealign"
++    FLAGS_COMPILER_CHECK_ARGUMENTS([$REALIGN_CFLAG -Werror], [],
++      AC_MSG_ERROR([The selected compiler $CXX does not support -mstackrealign! Try to put another compiler in the path.])
++    )
++    AC_SUBST([REALIGN_CFLAG])
++  fi
++
+   if test "x$CFLAGS" != "x${ADDED_CFLAGS}"; then
+     AC_MSG_WARN([Ignoring CFLAGS($CFLAGS) found in environment. Use --with-extra-cflags])
+   fi
+diff --git openjdk.orig///common/autoconf/hotspot-spec.gmk.in openjdk///common/autoconf/hotspot-spec.gmk.in
+--- openjdk.orig///common/autoconf/hotspot-spec.gmk.in
++++ openjdk///common/autoconf/hotspot-spec.gmk.in
+@@ -112,7 +112,8 @@
+ RC:=@HOTSPOT_RC@
+ 
+ EXTRA_CFLAGS=@LEGACY_EXTRA_CFLAGS@ $(NO_DELETE_NULL_POINTER_CHECKS_CFLAG) \
+-				   $(NO_LIFETIME_DSE_CFLAG) $(CXXSTD_CXXFLAG)
++				   $(NO_LIFETIME_DSE_CFLAG) $(CXXSTD_CXXFLAG) \
++				   $(REALIGN_CFLAG)
+ EXTRA_CXXFLAGS=@LEGACY_EXTRA_CXXFLAGS@
+ EXTRA_LDFLAGS=@LEGACY_EXTRA_LDFLAGS@
+ EXTRA_ASFLAGS=@LEGACY_EXTRA_ASFLAGS@
+diff --git openjdk.orig///common/autoconf/spec.gmk.in openjdk///common/autoconf/spec.gmk.in
+--- openjdk.orig///common/autoconf/spec.gmk.in
++++ openjdk///common/autoconf/spec.gmk.in
+@@ -366,6 +366,7 @@
+ 
+ NO_DELETE_NULL_POINTER_CHECKS_CFLAG=@NO_DELETE_NULL_POINTER_CHECKS_CFLAG@
+ NO_LIFETIME_DSE_CFLAG=@NO_LIFETIME_DSE_CFLAG@
++REALIGN_CFLAG=@REALIGN_CFLAG@
+ CXXSTD_CXXFLAG=@CXXSTD_CXXFLAG@
+ 
+ CXX:=@FIXPATH@ @CCACHE@ @CXX@

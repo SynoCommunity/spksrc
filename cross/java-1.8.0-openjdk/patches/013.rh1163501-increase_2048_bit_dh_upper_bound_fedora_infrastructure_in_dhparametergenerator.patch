@@ -1,0 +1,66 @@
+diff --git a/src/share/classes/com/sun/crypto/provider/DHParameterGenerator.java b/src/share/classes/com/sun/crypto/provider/DHParameterGenerator.java
+--- openjdk/jdk/src/share/classes/com/sun/crypto/provider/DHParameterGenerator.java
++++ openjdk/jdk/src/share/classes/com/sun/crypto/provider/DHParameterGenerator.java
+@@ -1,5 +1,6 @@
+ /*
+  * Copyright (c) 1997, 2017, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2014 Red Hat Inc.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -61,13 +62,13 @@
+ 
+     private static void checkKeySize(int keysize)
+             throws InvalidParameterException {
+-        boolean supported = ((keysize == 2048) || (keysize == 3072) ||
++        boolean supported = ((keysize == 2048) || (keysize == 3072) || (keysize == 4096) ||
+             ((keysize >= 512) && (keysize <= 1024) && ((keysize & 0x3F) == 0)));
+ 
+         if (!supported) {
+             throw new InvalidParameterException(
+                     "DH key size must be multiple of 64 and range " +
+-                    "from 512 to 1024 (inclusive), or 2048, 3072. " +
++                    "from 512 to 1024 (inclusive), or 2048, 3072, 4096. " +
+                     "The specific key size " + keysize + " is not supported");
+         }
+     }
+diff --git a/test/com/sun/crypto/provider/KeyAgreement/TestExponentSize.java b/test/com/sun/crypto/provider/KeyAgreement/TestExponentSize.java
+--- openjdk/jdk/test/com/sun/crypto/provider/KeyAgreement/TestExponentSize.java
++++ openjdk/jdk/test/com/sun/crypto/provider/KeyAgreement/TestExponentSize.java
+@@ -1,5 +1,6 @@
+ /*
+  * Copyright (c) 2005, 2017, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2014 Red Hat Inc.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -58,7 +59,7 @@
+      */
+     private enum Sizes {
+         two56(256), three84(384), five12(512), seven68(768), ten24(1024),
+-        twenty48(2048);
++        twenty48(2048), forty96(4096);
+ 
+         private final int intSize;
+         private final BigInteger bigIntValue;
+@@ -130,6 +131,19 @@
+         kp = kpg.generateKeyPair();
+         checkKeyPair(kp, Sizes.twenty48, Sizes.five12);
+ 
++        kpg.initialize(Sizes.forty96.getIntSize());
++        kp = kpg.generateKeyPair();
++        checkKeyPair(kp, Sizes.forty96, Sizes.twenty48);
++
++        publicKey = (DHPublicKey)kp.getPublic();
++        p = publicKey.getParams().getP();
++        g = publicKey.getParams().getG();
++
++        // test w/ all values specified
++        kpg.initialize(new DHParameterSpec(p, g, Sizes.ten24.getIntSize()));
++        kp = kpg.generateKeyPair();
++        checkKeyPair(kp, Sizes.forty96, Sizes.ten24);
++
+         System.out.println("OK");
+     }
+ 
+

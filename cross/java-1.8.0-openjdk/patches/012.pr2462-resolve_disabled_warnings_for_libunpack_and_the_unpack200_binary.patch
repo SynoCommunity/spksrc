@@ -1,0 +1,302 @@
+# HG changeset patch
+# User mikael
+# Date 1426870964 25200
+#      Fri Mar 20 10:02:44 2015 -0700
+# Node ID ee13ce369705a700b867f8c77423580b7b22cc13
+# Parent  7847ccfb240b35ed0dd328f0404b713b20e0905a
+8074839: Resolve disabled warnings for libunpack and the unpack200 binary
+Reviewed-by: dholmes, ksrini
+
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/bytes.h openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/bytes.h
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/bytes.h
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/bytes.h
+@@ -63,7 +63,7 @@
+     bytes res;
+     res.ptr = ptr + beg;
+     res.len = end - beg;
+-    assert(res.len == 0 || inBounds(res.ptr) && inBounds(res.limit()-1));
++    assert(res.len == 0 || (inBounds(res.ptr) && inBounds(res.limit()-1)));
+     return res;
+   }
+   // building C strings inside byte buffers:
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/jni.cpp openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/jni.cpp
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/jni.cpp
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/jni.cpp
+@@ -292,7 +292,7 @@
+ 
+   if (uPtr->aborting()) {
+     THROW_IOE(uPtr->get_abort_message());
+-    return false;
++    return null;
+   }
+ 
+   // We have fetched all the files.
+@@ -310,7 +310,7 @@
+ JNIEXPORT jlong JNICALL
+ Java_com_sun_java_util_jar_pack_NativeUnpack_finish(JNIEnv *env, jobject pObj) {
+   unpacker* uPtr = get_unpacker(env, pObj, false);
+-  CHECK_EXCEPTION_RETURN_VALUE(uPtr, NULL);
++  CHECK_EXCEPTION_RETURN_VALUE(uPtr, 0);
+   size_t consumed = uPtr->input_consumed();
+   free_unpacker(env, pObj, uPtr);
+   return consumed;
+@@ -320,6 +320,7 @@
+ Java_com_sun_java_util_jar_pack_NativeUnpack_setOption(JNIEnv *env, jobject pObj,
+                                        jstring pProp, jstring pValue) {
+   unpacker*   uPtr  = get_unpacker(env, pObj);
++  CHECK_EXCEPTION_RETURN_VALUE(uPtr, false);
+   const char* prop  = env->GetStringUTFChars(pProp, JNI_FALSE);
+   CHECK_EXCEPTION_RETURN_VALUE(prop, false);
+   const char* value = env->GetStringUTFChars(pValue, JNI_FALSE);
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/main.cpp openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/main.cpp
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/main.cpp
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/main.cpp
+@@ -142,31 +142,28 @@
+   return progname;
+ }
+ 
+-static const char* usage_lines[] = {
+-  "Usage:  %s [-opt... | --option=value]... x.pack[.gz] y.jar\n",
+-    "\n",
+-    "Unpacking Options\n",
+-    "  -H{h}, --deflate-hint={h}     override transmitted deflate hint: true, false, or keep (default)\n",
+-    "  -r, --remove-pack-file        remove input file after unpacking\n",
+-    "  -v, --verbose                 increase program verbosity\n",
+-    "  -q, --quiet                   set verbosity to lowest level\n",
+-    "  -l{F}, --log-file={F}         output to the given log file, or '-' for standard output (default)\n",
+-    "  -?, -h, --help                print this message\n",
+-    "  -V, --version                 print program version\n",
+-    "  -J{X}                         Java VM argument (ignored)\n",
+-    null
+-};
++#define USAGE_HEADER "Usage:  %s [-opt... | --option=value]... x.pack[.gz] y.jar\n"
++#define USAGE_OPTIONS \
++    "\n" \
++    "Unpacking Options\n" \
++    "  -H{h}, --deflate-hint={h}     override transmitted deflate hint: true, false, or keep (default)\n" \
++    "  -r, --remove-pack-file        remove input file after unpacking\n" \
++    "  -v, --verbose                 increase program verbosity\n" \
++    "  -q, --quiet                   set verbosity to lowest level\n" \
++    "  -l{F}, --log-file={F}         output to the given log file, or '-' for standard output (default)\n" \
++    "  -?, -h, --help                print this message\n" \
++    "  -V, --version                 print program version\n" \
++    "  -J{X}                         Java VM argument (ignored)\n"
+ 
+ static void usage(unpacker* u, const char* progname, bool full = false) {
+   // WinMain does not set argv[0] to the progrname
+   progname = (progname != null) ? nbasename(progname) : "unpack200";
+-  for (int i = 0; usage_lines[i] != null; i++) {
+-    fprintf(u->errstrm, usage_lines[i], progname);
+-    if (!full) {
+-      fprintf(u->errstrm,
+-              "(For more information, run %s --help .)\n", progname);
+-      break;
+-    }
++
++  fprintf(u->errstrm, USAGE_HEADER, progname);
++  if (full) {
++    fprintf(u->errstrm, USAGE_OPTIONS);
++  } else {
++    fprintf(u->errstrm, "(For more information, run %s --help .)\n", progname);
+   }
+ }
+ 
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.cpp openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.cpp
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.cpp
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.cpp
+@@ -222,9 +222,9 @@
+   }
+ 
+ #ifdef PRODUCT
+-  char* string() { return 0; }
++  const char* string() { return NULL; }
+ #else
+-  char* string();  // see far below
++  const char* string();  // see far below
+ #endif
+ };
+ 
+@@ -715,13 +715,13 @@
+   // Now we can size the whole archive.
+   // Read everything else into a mega-buffer.
+   rp = hdr.rp;
+-  int header_size_0 = (int)(rp - input.base()); // used-up header (4byte + 3int)
+-  int header_size_1 = (int)(rplimit - rp);      // buffered unused initial fragment
+-  int header_size   = header_size_0+header_size_1;
++  size_t header_size_0 = (rp - input.base()); // used-up header (4byte + 3int)
++  size_t header_size_1 = (rplimit - rp);      // buffered unused initial fragment
++  size_t header_size   = header_size_0 + header_size_1;
+   unsized_bytes_read = header_size_0;
+   CHECK;
+   if (foreign_buf) {
+-    if (archive_size > (size_t)header_size_1) {
++    if (archive_size > header_size_1) {
+       abort("EOF reading fixed input buffer");
+       return;
+     }
+@@ -735,7 +735,7 @@
+       return;
+     }
+     input.set(U_NEW(byte, add_size(header_size_0, archive_size, C_SLOP)),
+-              (size_t) header_size_0 + archive_size);
++              header_size_0 + archive_size);
+     CHECK;
+     assert(input.limit()[0] == 0);
+     // Move all the bytes we read initially into the real buffer.
+@@ -958,13 +958,13 @@
+   nentries = next_entry;
+ 
+   // place a limit on future CP growth:
+-  int generous = 0;
++  size_t generous = 0;
+   generous = add_size(generous, u->ic_count); // implicit name
+   generous = add_size(generous, u->ic_count); // outer
+   generous = add_size(generous, u->ic_count); // outer.utf8
+   generous = add_size(generous, 40); // WKUs, misc
+   generous = add_size(generous, u->class_count); // implicit SourceFile strings
+-  maxentries = add_size(nentries, generous);
++  maxentries = (uint)add_size(nentries, generous);
+ 
+   // Note that this CP does not include "empty" entries
+   // for longs and doubles.  Those are introduced when
+@@ -982,8 +982,9 @@
+   }
+ 
+   // Initialize *all* our entries once
+-  for (int i = 0 ; i < maxentries ; i++)
++  for (uint i = 0 ; i < maxentries ; i++) {
+     entries[i].outputIndex = REQUESTED_NONE;
++  }
+ 
+   initGroupIndexes();
+   // Initialize hashTab to a generous power-of-two size.
+@@ -3677,21 +3678,22 @@
+ 
+ unpacker* debug_u;
+ 
+-static bytes& getbuf(int len) {  // for debugging only!
++static bytes& getbuf(size_t len) {  // for debugging only!
+   static int bn = 0;
+   static bytes bufs[8];
+   bytes& buf = bufs[bn++ & 7];
+-  while ((int)buf.len < len+10)
++  while (buf.len < len + 10) {
+     buf.realloc(buf.len ? buf.len * 2 : 1000);
++  }
+   buf.ptr[0] = 0;  // for the sake of strcat
+   return buf;
+ }
+ 
+-char* entry::string() {
++const char* entry::string() {
+   bytes buf;
+   switch (tag) {
+   case CONSTANT_None:
+-    return (char*)"<empty>";
++    return "<empty>";
+   case CONSTANT_Signature:
+     if (value.b.ptr == null)
+       return ref(0)->string();
+@@ -3711,26 +3713,28 @@
+     break;
+   default:
+     if (nrefs == 0) {
+-      buf = getbuf(20);
+-      sprintf((char*)buf.ptr, TAG_NAME[tag]);
++      return TAG_NAME[tag];
+     } else if (nrefs == 1) {
+       return refs[0]->string();
+     } else {
+-      char* s1 = refs[0]->string();
+-      char* s2 = refs[1]->string();
+-      buf = getbuf((int)strlen(s1) + 1 + (int)strlen(s2) + 4 + 1);
++      const char* s1 = refs[0]->string();
++      const char* s2 = refs[1]->string();
++      buf = getbuf(strlen(s1) + 1 + strlen(s2) + 4 + 1);
+       buf.strcat(s1).strcat(" ").strcat(s2);
+       if (nrefs > 2)  buf.strcat(" ...");
+     }
+   }
+-  return (char*)buf.ptr;
++  return (const char*)buf.ptr;
+ }
+ 
+ void print_cp_entry(int i) {
+   entry& e = debug_u->cp.entries[i];
+-  char buf[30];
+-  sprintf(buf, ((uint)e.tag < CONSTANT_Limit)? TAG_NAME[e.tag]: "%d", e.tag);
+-  printf(" %d\t%s %s\n", i, buf, e.string());
++
++  if ((uint)e.tag < CONSTANT_Limit) {
++    printf(" %d\t%s %s\n", i, TAG_NAME[e.tag], e.string());
++  } else {
++    printf(" %d\t%d %s\n", i, e.tag, e.string());
++  }
+ }
+ 
+ void print_cp_entries(int beg, int end) {
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.h openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.h
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.h
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/unpack.h
+@@ -209,7 +209,7 @@
+   byte*     rp;          // read pointer (< rplimit <= input.limit())
+   byte*     rplimit;     // how much of the input block has been read?
+   julong    bytes_read;
+-  int       unsized_bytes_read;
++  size_t    unsized_bytes_read;
+ 
+   // callback to read at least one byte, up to available input
+   typedef jlong (*read_input_fn_t)(unpacker* self, void* buf, jlong minlen, jlong maxlen);
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/utils.cpp openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/utils.cpp
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/utils.cpp
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/utils.cpp
+@@ -81,7 +81,7 @@
+ int assert_failed(const char* p) {
+   char message[1<<12];
+   sprintf(message, "@assert failed: %s\n", p);
+-  fprintf(stdout, 1+message);
++  fprintf(stdout, "%s", 1+message);
+   breakpoint();
+   unpack_abort(message);
+   return 0;
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.cpp openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.cpp
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.cpp
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.cpp
+@@ -84,7 +84,7 @@
+ }
+ 
+ // Write data to the ZIP output stream.
+-void jar::write_data(void* buff, int len) {
++void jar::write_data(void* buff, size_t len) {
+   while (len > 0) {
+     int rc = (int)fwrite(buff, 1, len, jarfp);
+     if (rc <= 0) {
+@@ -323,12 +323,12 @@
+     // Total number of disks (int)
+     header64[36] = (ushort)SWAP_BYTES(1);
+     header64[37] = 0;
+-    write_data(header64, (int)sizeof(header64));
++    write_data(header64, sizeof(header64));
+   }
+ 
+   // Write the End of Central Directory structure.
+   PRINTCR((2, "end-of-directory at %d\n", output_file_offset));
+-  write_data(header, (int)sizeof(header));
++  write_data(header, sizeof(header));
+ 
+   PRINTCR((2, "writing zip comment\n"));
+   // Write the comment.
+diff --git openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.h openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.h
+--- openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.h
++++ openjdk/jdk/src/share/native/com/sun/java/util/jar/pack/zip.h
+@@ -68,8 +68,8 @@
+   }
+ 
+   // Private Methods
+-  void write_data(void* ptr, int len);
+-  void write_data(bytes& b) { write_data(b.ptr, (int)b.len); }
++  void write_data(void* ptr, size_t len);
++  void write_data(bytes& b) { write_data(b.ptr, b.len); }
+   void add_to_jar_directory(const char* fname, bool store, int modtime,
+                             int len, int clen, uLong crc);
+   void write_jar_header(const char* fname, bool store, int modtime,

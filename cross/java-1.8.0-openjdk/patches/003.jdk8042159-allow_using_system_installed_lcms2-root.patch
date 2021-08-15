@@ -1,0 +1,50 @@
+diff -ruN openjdk/common/autoconf/libraries.m4 openjdk/common/autoconf/libraries.m4
+--- openjdk/common/autoconf/libraries.m4	2013-11-14 22:04:38.039440136 -0500
++++ openjdk/common/autoconf/libraries.m4	2013-11-14 22:05:11.474356424 -0500
+@@ -676,6 +676,46 @@
+ 
+   ###############################################################################
+   #
++  # Check for the lcms2 library
++  #
++
++  AC_ARG_WITH(lcms, [AS_HELP_STRING([--with-lcms],
++  	[use lcms2 from build system or OpenJDK source (system, bundled) @<:@bundled@:>@])])
++
++  AC_CHECK_LIB(lcms2, cmsOpenProfileFromFile,
++               [ LCMS_FOUND=yes ],
++               [ LCMS_FOUND=no ])
++
++  AC_MSG_CHECKING([for which lcms to use])
++
++  DEFAULT_LCMS=bundled
++
++  #
++  # If user didn't specify, use DEFAULT_LCMS
++  #
++  if test "x${with_lcms}" = "x"; then
++      with_lcms=${DEFAULT_LCMS}
++  fi
++
++  if test "x${with_lcms}" = "xbundled"; then
++      USE_EXTERNAL_LCMS=false
++      AC_MSG_RESULT([bundled])
++  elif test "x${with_lcms}" = "xsystem"; then
++      if test "x${LCMS_FOUND}" = "xyes"; then
++          USE_EXTERNAL_LCMS=true
++          AC_MSG_RESULT([system])
++      else
++          AC_MSG_RESULT([system not found])
++          AC_MSG_ERROR([--with-lcms=system specified, but no lcms found!])
++      fi
++  else
++      AC_MSG_ERROR([Invalid value for --with-lcms: ${with_lcms}, use 'system' or 'bundled'])
++  fi
++
++  AC_SUBST(USE_EXTERNAL_LCMS)
++
++  ###############################################################################
++  #
+   # Check for the png library
+   #
+ 

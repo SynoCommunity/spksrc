@@ -1,0 +1,25 @@
+diff --git openjdk.orig/jdk/src/share/lib/security/java.security-linux openjdk/jdk/src/share/lib/security/java.security-linux
+--- openjdk.orig/jdk/src/share/lib/security/java.security-linux
++++ openjdk/jdk/src/share/lib/security/java.security-linux
+@@ -226,7 +226,9 @@
+                com.sun.activation.registries.,\
+                jdk.jfr.events.,\
+                jdk.jfr.internal.,\
+-               jdk.management.jfr.internal.
++               jdk.management.jfr.internal.,\
++               org.GNOME.Accessibility.,\
++               org.GNOME.Bonobo.
+ 
+ #
+ # List of comma-separated packages that start with or equal this string
+@@ -279,7 +281,9 @@
+                    com.sun.activation.registries.,\
+                    jdk.jfr.events.,\
+                    jdk.jfr.internal.,\
+-                   jdk.management.jfr.internal.
++                   jdk.management.jfr.internal.,\
++                   org.GNOME.Accessibility.,\
++                   org.GNOME.Bonobo.
+ 
+ #
+ # Determines whether this properties file can be appended to

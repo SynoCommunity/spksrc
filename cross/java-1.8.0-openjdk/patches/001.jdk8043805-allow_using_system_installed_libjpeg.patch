@@ -1,0 +1,227 @@
+diff -ruN jdk8/common/autoconf/libraries.m4 jdk8/common/autoconf/libraries.m4
+--- jdk8/common/autoconf/libraries.m4	2013-10-31 19:24:33.000000000 -0400
++++ jdk8/common/autoconf/libraries.m4	2013-11-14 21:55:20.249903347 -0500
+@@ -601,12 +601,42 @@
+   #
+ 
+   USE_EXTERNAL_LIBJPEG=true
+-  AC_CHECK_LIB(jpeg, main, [],
+-      [ USE_EXTERNAL_LIBJPEG=false
+-      AC_MSG_NOTICE([Will use jpeg decoder bundled with the OpenJDK source])
+-  ])
++  AC_ARG_WITH(libjpeg, [AS_HELP_STRING([--with-libjpeg],
++      [use libjpeg from build system or OpenJDK sources (system, bundled) @<:@bundled@:>@])])
++
++  AC_CHECK_LIB(jpeg, jpeg_destroy_compress,
++               [ LIBJPEG_FOUND=yes ],
++               [ LIBJPEG_FOUND=no ])
++
++  AC_MSG_CHECKING([for which libjpeg to use])
++
++  # default is bundled
++  DEFAULT_LIBJPEG=bundled
++
++  #
++  # if user didn't specify, use DEFAULT_LIBJPEG
++  #
++  if test "x${with_libjpeg}" = "x"; then
++      with_libjpeg=${DEFAULT_LIBJPEG}
++  fi
++
++  if test "x${with_libjpeg}" = "xbundled"; then
++      USE_EXTERNAL_LIBJPEG=false
++      AC_MSG_RESULT([bundled])
++  elif test "x${with_libjpeg}" = "xsystem"; then
++      if test "x${LIBJPEG_FOUND}" = "xyes"; then
++          USE_EXTERNAL_LIBJPEG=true
++          AC_MSG_RESULT([system])
++      else
++          AC_MSG_RESULT([system not found])
++          AC_MSG_ERROR([--with-libjpeg=system specified, but no libjpeg found])
++      fi
++  else
++      AC_MSG_ERROR([Invalid use of --with-libjpeg: ${with_libjpeg}, use 'system' or 'bundled'])
++  fi
+   AC_SUBST(USE_EXTERNAL_LIBJPEG)
+ 
++
+   ###############################################################################
+   #
+   # Check for the gif library
+diff -ruN jdk8/jdk/make/lib/Awt2dLibraries.gmk jdk8/jdk/make/lib/Awt2dLibraries.gmk
+--- jdk8/jdk/make/lib/Awt2dLibraries.gmk	2013-10-31 19:44:18.000000000 -0400
++++ jdk8/jdk/make/lib/Awt2dLibraries.gmk	2013-11-14 21:56:01.020796703 -0500
+@@ -696,17 +696,17 @@
+ ##########################################################################################
+ 
+ ifdef OPENJDK
+-  BUILD_LIBJPEG_MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libjpeg/mapfile-vers
++  BUILD_LIBJAVAJPEG_MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libjpeg/mapfile-vers
+ else
+-  BUILD_LIBJPEG_MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libjpeg/mapfile-vers-closed
+-  BUILD_LIBJPEG_CLOSED_SRC := $(JDK_TOPDIR)/src/closed/share/native/sun/awt/image/jpeg
+-  BUILD_LIBJPEG_CLOSED_INCLUDES := -I$(BUILD_LIBJPEG_CLOSED_SRC)
++  BUILD_LIBJAVAJPEG_MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libjpeg/mapfile-vers-closed
++  BUILD_LIBJAVAJPEG_CLOSED_SRC := $(JDK_TOPDIR)/src/closed/share/native/sun/awt/image/jpeg
++  BUILD_LIBJAVAJPEG_CLOSED_INCLUDES := -I$(BUILD_LIBJPEG_CLOSED_SRC)
+ endif
+ 
+-BUILD_LIBJPEG_REORDER :=
++BUILD_LIBJAVAJPEG_REORDER :=
+ ifeq ($(OPENJDK_TARGET_OS), solaris)
+   ifneq ($(OPENJDK_TARGET_CPU), x86_64)
+-    BUILD_LIBJPEG_REORDER := $(JDK_TOPDIR)/make/mapfiles/libjpeg/reorder-$(OPENJDK_TARGET_CPU)
++    BUILD_LIBJAVAJPEG_REORDER := $(JDK_TOPDIR)/make/mapfiles/libjpeg/reorder-$(OPENJDK_TARGET_CPU)
+   endif
+ endif
+ 
+@@ -721,37 +721,37 @@
+ #      $(shell $(EXPR) $(CC_MAJORVER) \> 4 \| \
+ #          \( $(CC_MAJORVER) = 4 \& $(CC_MINORVER) \>= 3 \) )
+ #  ifeq ($(CC_43_OR_NEWER), 1)
+-#    BUILD_LIBJPEG_CFLAGS_linux += -Wno-clobbered
++#    BUILD_LIBJAVAJPEG_CFLAGS_linux += -Wno-clobbered
+ #  endif
+ #endif
+ 
+-$(eval $(call SetupNativeCompilation,BUILD_LIBJPEG, \
+-    LIBRARY := jpeg, \
++$(eval $(call SetupNativeCompilation,BUILD_LIBJAVAJPEG, \
++    LIBRARY := javajpeg, \
+     OUTPUT_DIR := $(INSTALL_LIBRARIES_HERE), \
+-    SRC := $(BUILD_LIBJPEG_CLOSED_SRC) \
++    SRC := $(BUILD_LIBJAVAJPEG_CLOSED_SRC) \
+         $(JDK_TOPDIR)/src/share/native/sun/awt/image/jpeg, \
+     LANG := C, \
+     OPTIMIZATION := HIGHEST, \
+     CFLAGS := $(CFLAGS_JDKLIB) \
+-        $(BUILD_LIBJPEG_CLOSED_INCLUDES) \
++        $(BUILD_LIBJAVAJPEG_CLOSED_INCLUDES) \
+         -I$(JDK_TOPDIR)/src/share/native/sun/awt/image/jpeg, \
+-    MAPFILE := $(BUILD_LIBJPEG_MAPFILE), \
+-    LDFLAGS := $(LDFLAGS_JDKLIB) \
++    MAPFILE := $(BUILD_LIBJAVAJPEG_MAPFILE), \
++    LDFLAGS := $(LDFLAGS_JDKLIB) -ljpeg \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LDFLAGS_windows := $(WIN_JAVA_LIB) jvm.lib, \
+     LDFLAGS_SUFFIX := $(LDFLAGS_JDKLIB_SUFFIX), \
+     VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
+     RC_FLAGS := $(RC_FLAGS) \
+-        -D "JDK_FNAME=jpeg.dll" \
+-        -D "JDK_INTERNAL_NAME=jpeg" \
++        -D "JDK_FNAME=javajpeg.dll" \
++        -D "JDK_INTERNAL_NAME=javajpeg" \
+         -D "JDK_FTYPE=0x2L", \
+-    REORDER := $(BUILD_LIBJPEG_REORDER), \
+-    OBJECT_DIR := $(JDK_OUTPUTDIR)/objs/libjpeg, \
++    REORDER := $(BUILD_LIBJAVAJPEG_REORDER), \
++    OBJECT_DIR := $(JDK_OUTPUTDIR)/objs/libjavajpeg, \
+     DEBUG_SYMBOLS := $(DEBUG_ALL_BINARIES)))
+ 
+-$(BUILD_LIBJPEG): $(BUILD_LIBJAVA)
++$(BUILD_LIBJAVAJPEG): $(BUILD_LIBJAVA)
+ 
+-BUILD_LIBRARIES += $(BUILD_LIBJPEG)
++BUILD_LIBRARIES += $(BUILD_LIBJAVAJPEG)
+ 
+ ##########################################################################################
+ 
+@@ -1183,7 +1183,6 @@
+ 
+ ifndef BUILD_HEADLESS_ONLY
+   LIBSPLASHSCREEN_DIRS := \
+-    $(JDK_TOPDIR)/src/share/native/sun/awt/image/jpeg \
+     $(JDK_TOPDIR)/src/share/native/sun/awt/libpng \
+     $(JDK_TOPDIR)/src/share/native/sun/awt/splashscreen
+ 
+@@ -1194,6 +1193,13 @@
+     GIFLIB_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/sun/awt/giflib
+   endif
+ 
++  ifeq ($(USE_EXTERNAL_LIBJPEG), true)
++    LIBJPEG_LDFLAGS := -ljpeg
++  else
++    LIBSPLASHSCREEN_DIRS += $(JDK_TOPDIR)/src/share/native/sun/awt/image/jpeg
++    LIBJPEG_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/sun/awt/jpeg
++  endif
++
+   ifneq ($(OPENJDK_TARGET_OS), macosx)
+     LIBSPLASHSCREEN_DIRS += $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/awt/splashscreen
+   else
+@@ -1256,11 +1262,13 @@
+       EXCLUDE_FILES := imageioJPEG.c jpegdecoder.c pngtest.c, \
+       LANG := C, \
+       OPTIMIZATION := LOW, \
+-      CFLAGS := $(LIBSPLASHSCREEN_CFLAGS) $(CFLAGS_JDKLIB) $(GIFLIB_CFLAGS), \
++      CFLAGS := $(LIBSPLASHSCREEN_CFLAGS) $(CFLAGS_JDKLIB) \
++          $(GIFLIB_CFLAGS) $(LIBJPEG_CFLAGS), \
+       MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libsplashscreen/mapfile-vers, \
+       LDFLAGS := $(LDFLAGS_JDKLIB) \
+           $(call SET_SHARED_LIBRARY_ORIGIN), \
+-      LDFLAGS_SUFFIX := $(LIBSPLASHSCREEN_LDFLAGS_SUFFIX) $(LIBZ) $(GIFLIB_LDFLAGS), \
++      LDFLAGS_SUFFIX := $(LIBSPLASHSCREEN_LDFLAGS_SUFFIX) \
++          $(LIBZ) $(GIFLIB_LDFLAGS) $(LIBJPEG_LDFLAGS), \
+       LDFLAGS_SUFFIX_solaris := -lc, \
+       VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
+       RC_FLAGS := $(RC_FLAGS) \
+diff -ruN jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java
+--- jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java	2013-10-31 19:44:18.000000000 -0400
++++ jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java	2013-11-14 21:55:20.250903340 -0500
+@@ -89,7 +89,7 @@
+         java.security.AccessController.doPrivileged(
+             new java.security.PrivilegedAction<Void>() {
+                 public Void run() {
+-                    System.loadLibrary("jpeg");
++                    System.loadLibrary("javajpeg");
+                     return null;
+                 }
+             });
+diff -ruN jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java
+--- jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java	2013-10-31 19:44:18.000000000 -0400
++++ jdk8/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java	2013-11-14 21:55:20.250903340 -0500
+@@ -179,7 +179,7 @@
+         java.security.AccessController.doPrivileged(
+             new java.security.PrivilegedAction<Void>() {
+                 public Void run() {
+-                    System.loadLibrary("jpeg");
++                    System.loadLibrary("javajpeg");
+                     return null;
+                 }
+             });
+diff -ruN jdk8/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java jdk8/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java
+--- jdk8/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java	2013-10-31 19:44:18.000000000 -0400
++++ jdk8/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java	2013-11-14 21:55:20.251903376 -0500
+@@ -56,7 +56,7 @@
+         java.security.AccessController.doPrivileged(
+             new java.security.PrivilegedAction<Void>() {
+                 public Void run() {
+-                    System.loadLibrary("jpeg");
++                    System.loadLibrary("javajpeg");
+                     return null;
+                 }
+             });
+diff -ruN jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_jpeg.c jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_jpeg.c
+--- jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_jpeg.c	2013-10-31 19:44:18.000000000 -0400
++++ jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_jpeg.c	2013-11-14 21:55:20.251903376 -0500
+@@ -25,7 +25,6 @@
+ 
+ #include "splashscreen_impl.h"
+ 
+-#include "jinclude.h"
+ #include "jpeglib.h"
+ #include "jerror.h"
+ 
+@@ -107,11 +106,11 @@
+     if (cinfo->src == NULL) {   /* first time for this JPEG object? */
+         cinfo->src = (struct jpeg_source_mgr *)
+             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo,
+-            JPOOL_PERMANENT, SIZEOF(stream_source_mgr));
++            JPOOL_PERMANENT, sizeof(stream_source_mgr));
+         src = (stream_src_ptr) cinfo->src;
+         src->buffer = (JOCTET *)
+             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo,
+-            JPOOL_PERMANENT, INPUT_BUF_SIZE * SIZEOF(JOCTET));
++            JPOOL_PERMANENT, INPUT_BUF_SIZE * sizeof(JOCTET));
+     }
+ 
+     src = (stream_src_ptr) cinfo->src;
