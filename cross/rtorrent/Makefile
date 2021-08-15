@@ -40,4 +40,4 @@ rtorrent_pre_patch:
 rtorrent_compile:
 	@$(RUN) ./libtool --tag=CC --mode=compile $(TC_PATH)$(TC_PREFIX)gcc -g -O2 -MT src/linux-atomic.lo -MD -MP -MF src/linux-atomic.Tpo -c -o src/linux-atomic.lo src/linux-atomic.c
 	@$(RUN) ./libtool --tag=CC --mode=link $(TC_PATH)$(TC_PREFIX)gcc -g -O2 -o src/liblinux-atomic.la src/linux-atomic.lo
-	@$(RUN) $(MAKE)
+	@$(RUN) $(MAKE) -j$(NCPUS)

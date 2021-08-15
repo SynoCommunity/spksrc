@@ -21,7 +21,7 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: python3_native_compile
 python3_native_compile:
-	@$(RUN) $(MAKE) Parser/pgen all
+	@$(RUN) $(MAKE) -j$(NCPUS) Parser/pgen all
 
 PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip

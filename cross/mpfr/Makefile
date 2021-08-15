@@ -26,7 +26,7 @@ include ../../mk/spksrc.cross-cc.mk
 # Do not build test nor doc
 .PHONY: mpfr_compile
 mpfr_compile:
-	@$(RUN) $(MAKE) SUBDIRS=src
+	@$(RUN) $(MAKE) -j$(NCPUS) SUBDIRS=src
 
 .PHONY: mpfr_install
 mpfr_install:

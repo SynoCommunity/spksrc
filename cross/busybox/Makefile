@@ -27,7 +27,7 @@ busybox_configure:
 
 .PHONY: busybox_compile
 busybox_compile:
-	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) busybox
+	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) -j$(NCPUS) busybox
 
 .PHONY: busybox_install
 busybox_install:

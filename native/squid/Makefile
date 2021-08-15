@@ -21,4 +21,4 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: squid_native_compile
 squid_native_compile:
-	$(RUN) ;cd src;$(MAKE) cf_gen_defines.cci cf_gen
+	$(RUN) ;cd src;$(MAKE) -j$(NCPUS) cf_gen_defines.cci cf_gen

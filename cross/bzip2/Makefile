@@ -21,8 +21,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: bzip2_compile
 bzip2_compile:
-	$(RUN) $(MAKE) bzip2 bzip2recover PREFIX=$(INSTALL_PREFIX)
-	$(RUN) $(MAKE) -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) -j$(NCPUS) bzip2 bzip2recover PREFIX=$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) -j$(NCPUS) -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
 
 .PHONY: bzip2_install
 bzip2_install:

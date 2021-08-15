@@ -23,7 +23,7 @@ udns_pre_configure:
 
 .PHONY: udns_compile
 udns_compile:
-	$(RUN) $(MAKE) shared
+	$(RUN) $(MAKE) -j$(NCPUS) shared
 
 .PHONY: udns_install
 udns_install:

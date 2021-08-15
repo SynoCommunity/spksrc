@@ -20,7 +20,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: unzip_compile
 unzip_compile:
-	$(RUN) $(MAKE) -f unix/Makefile generic CC="$(TC_PATH)$(TC_PREFIX)gcc"
+	$(RUN) $(MAKE) -j$(NCPUS) -f unix/Makefile generic CC="$(TC_PATH)$(TC_PREFIX)gcc"
 
 .PHONY: unzip_install
 unzip_install:
