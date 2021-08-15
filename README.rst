@@ -57,7 +57,7 @@ Docker
    cd spksrc # Go to the cloned repository's root folder.
 
    # If running on Linux:
-   docker run -it -v $(pwd):/spksrc synocommunity/spksrc /bin/bash
+   docker run -it --cpus="$(($(nproc)/2))" -v $(pwd):/spksrc synocommunity/spksrc /bin/bash
 
    # If running on macOS:
    docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash
