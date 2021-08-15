@@ -1,1 +1,2 @@
 bin:bin/rsync
+bin:bin/rsync-ssl
