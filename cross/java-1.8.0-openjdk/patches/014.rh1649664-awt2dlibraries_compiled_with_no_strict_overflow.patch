@@ -1,0 +1,16 @@
+diff --git openjdk.orig/jdk/make/lib/Awt2dLibraries.gmk openjdk/jdk/make/lib/Awt2dLibraries.gmk
+--- openjdk.orig/jdk/make/lib/Awt2dLibraries.gmk
++++ openjdk/jdk/make/lib/Awt2dLibraries.gmk
+@@ -891,6 +891,12 @@
+   BUILD_LIBFONTMANAGER_ExtensionSubtables.cpp_CXXFLAGS := -fno-strict-aliasing
+ endif
+ 
++# Turn off strict overflow with GCC for IndicRearrangementProcessor.cpp
++ifeq ($(OPENJDK_TARGET_OS), linux)
++  BUILD_LIBFONTMANAGER_IndicRearrangementProcessor.cpp_CXXFLAGS := -fno-strict-overflow
++  BUILD_LIBFONTMANAGER_IndicRearrangementProcessor2.cpp_CXXFLAGS := -fno-strict-overflow
++endif
++
+ # LDFLAGS clarification:
+ #   Filter relevant linker flags disallowing unresolved symbols as we cannot
+ #   build-time decide to which library to link against (libawt_headless or

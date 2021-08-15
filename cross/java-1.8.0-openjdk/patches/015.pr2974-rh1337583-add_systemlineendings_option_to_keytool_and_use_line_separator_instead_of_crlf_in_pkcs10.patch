@@ -1,0 +1,140 @@
+# HG changeset patch
+# User andrew
+# Date 1464316115 -3600
+#      Fri May 27 03:28:35 2016 +0100
+# Node ID 794541fbbdc323f7da8a5cee75611f977eee66ee
+# Parent  0be28a33e12dfc9ae1e4be381530643f691d351a
+PR2974: PKCS#10 certificate requests now use CRLF line endings rather than system line endings
+Summary: Add -systemlineendings option to keytool to allow system line endings to be used again.
+
+diff --git openjdk.orig/jdk/src/share/classes/sun/security/pkcs10/PKCS10.java openjdk/jdk/src/share/classes/sun/security/pkcs10/PKCS10.java
+--- openjdk.orig/jdk/src/share/classes/sun/security/pkcs10/PKCS10.java
++++ openjdk/jdk/src/share/classes/sun/security/pkcs10/PKCS10.java
+@@ -35,6 +35,7 @@
+ 
+ import java.util.Base64;
+ 
++import sun.security.action.GetPropertyAction;
+ import sun.security.util.*;
+ import sun.security.x509.AlgorithmId;
+ import sun.security.x509.X509Key;
+@@ -74,6 +75,14 @@
+  * @author Hemma Prafullchandra
+  */
+ public class PKCS10 {
++
++    private static final byte[] sysLineEndings;
++
++    static {
++        sysLineEndings =
++	    AccessController.doPrivileged(new GetPropertyAction("line.separator")).getBytes();
++    }
++
+     /**
+      * Constructs an unsigned PKCS #10 certificate request.  Before this
+      * request may be used, it must be encoded and signed.  Then it
+@@ -303,13 +312,39 @@
+      */
+     public void print(PrintStream out)
+     throws IOException, SignatureException {
++        print(out, false);
++    }
++
++    /**
++     * Prints an E-Mailable version of the certificate request on the print
++     * stream passed.  The format is a common base64 encoded one, supported
++     * by most Certificate Authorities because Netscape web servers have
++     * used this for some time.  Some certificate authorities expect some
++     * more information, in particular contact information for the web
++     * server administrator.
++     *
++     * @param out the print stream where the certificate request
++     *  will be printed.
++     * @param systemLineEndings true if the request should be terminated
++     *  using the system line endings.
++     * @exception IOException when an output operation failed
++     * @exception SignatureException when the certificate request was
++     *  not yet signed.
++     */
++    public void print(PrintStream out, boolean systemLineEndings)
++    throws IOException, SignatureException {
++        byte[] lineEndings;
++
+         if (encoded == null)
+             throw new SignatureException("Cert request was not signed");
+ 
++        if (systemLineEndings)
++            lineEndings = sysLineEndings;
++        else
++            lineEndings = new byte[] {'\r', '\n'}; // CRLF
+ 
+-        byte[] CRLF = new byte[] {'\r', '\n'};
+         out.println("-----BEGIN NEW CERTIFICATE REQUEST-----");
+-        out.println(Base64.getMimeEncoder(64, CRLF).encodeToString(encoded));
++        out.println(Base64.getMimeEncoder(64, lineEndings).encodeToString(encoded));
+         out.println("-----END NEW CERTIFICATE REQUEST-----");
+     }
+ 
+diff --git openjdk.orig/jdk/src/share/classes/sun/security/tools/keytool/Main.java openjdk/jdk/src/share/classes/sun/security/tools/keytool/Main.java
+--- openjdk.orig/jdk/src/share/classes/sun/security/tools/keytool/Main.java
++++ openjdk/jdk/src/share/classes/sun/security/tools/keytool/Main.java
+@@ -126,6 +126,7 @@
+     private String infilename = null;
+     private String outfilename = null;
+     private String srcksfname = null;
++    private boolean systemLineEndings = false;
+ 
+     // User-specified providers are added before any command is called.
+     // However, they are not removed before the end of the main() method.
+@@ -188,7 +189,7 @@
+         CERTREQ("Generates.a.certificate.request",
+             ALIAS, SIGALG, FILEOUT, KEYPASS, KEYSTORE, DNAME,
+             STOREPASS, STORETYPE, PROVIDERNAME, PROVIDERCLASS,
+-            PROVIDERARG, PROVIDERPATH, V, PROTECTED),
++            PROVIDERARG, PROVIDERPATH, SYSTEMLINEENDINGS, V, PROTECTED),
+         CHANGEALIAS("Changes.an.entry.s.alias",
+             ALIAS, DESTALIAS, KEYPASS, KEYSTORE, STOREPASS,
+             STORETYPE, PROVIDERNAME, PROVIDERCLASS, PROVIDERARG,
+@@ -321,6 +322,7 @@
+         STARTDATE("startdate", "<startdate>", "certificate.validity.start.date.time"),
+         STOREPASS("storepass", "<arg>", "keystore.password"),
+         STORETYPE("storetype", "<storetype>", "keystore.type"),
++        SYSTEMLINEENDINGS("systemlineendings", null, "system.line.endings"),
+         TRUSTCACERTS("trustcacerts", null, "trust.certificates.from.cacerts"),
+         V("v", null, "verbose.output"),
+         VALIDITY("validity", "<valDays>", "validity.number.of.days");
+@@ -561,6 +563,8 @@
+                 protectedPath = true;
+             } else if (collator.compare(flags, "-srcprotected") == 0) {
+                 srcprotectedPath = true;
++            } else if (collator.compare(flags, "-systemlineendings") == 0) {
++                systemLineEndings = true;
+             } else  {
+                 System.err.println(rb.getString("Illegal.option.") + flags);
+                 tinyHelp();
+@@ -1464,7 +1468,7 @@
+ 
+         // Sign the request and base-64 encode it
+         request.encodeAndSign(subject, signature);
+-        request.print(out);
++        request.print(out, systemLineEndings);
+ 
+         checkWeak(rb.getString("the.generated.certificate.request"), request);
+     }
+@@ -4544,4 +4548,3 @@
+         return new Pair<>(a,b);
+     }
+ }
+-
+diff --git openjdk.orig/jdk/src/share/classes/sun/security/tools/keytool/Resources.java openjdk/jdk/src/share/classes/sun/security/tools/keytool/Resources.java
+--- openjdk.orig/jdk/src/share/classes/sun/security/tools/keytool/Resources.java
++++ openjdk/jdk/src/share/classes/sun/security/tools/keytool/Resources.java
+@@ -168,6 +168,8 @@
+                 "keystore password"}, //-storepass
+         {"keystore.type",
+                 "keystore type"}, //-storetype
++	{"system.line.endings",
++	        "use system line endings rather than CRLF to terminate output"}, //-systemlineendings
+         {"trust.certificates.from.cacerts",
+                 "trust certificates from cacerts"}, //-trustcacerts
+         {"verbose.output",

@@ -1,0 +1,328 @@
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/concurrentMarkSweep/compactibleFreeListSpace.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/compactibleFreeListSpace.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/compactibleFreeListSpace.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -2689,7 +2689,7 @@
+   if (ResizeOldPLAB && CMSOldPLABResizeQuicker) {
+     size_t multiple = _num_blocks[word_sz]/(CMSOldPLABToleranceFactor*CMSOldPLABNumRefills*n_blks);
+     n_blks +=  CMSOldPLABReactivityFactor*multiple*n_blks;
+-    n_blks = MIN2(n_blks, CMSOldPLABMax);
++    n_blks = MIN2(n_blks, (size_t)CMSOldPLABMax);
+   }
+   assert(n_blks > 0, "Error");
+   _cfls->par_get_chunk_of_blocks(word_sz, n_blks, fl);
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/concurrentMarkSweep/concurrentMarkSweepGeneration.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -961,7 +961,7 @@
+   if (free_percentage < desired_free_percentage) {
+     size_t desired_capacity = (size_t)(used() / ((double) 1 - desired_free_percentage));
+     assert(desired_capacity >= capacity(), "invalid expansion size");
+-    size_t expand_bytes = MAX2(desired_capacity - capacity(), MinHeapDeltaBytes);
++    size_t expand_bytes = MAX2(desired_capacity - capacity(), (size_t)MinHeapDeltaBytes);
+     if (PrintGCDetails && Verbose) {
+       size_t desired_capacity = (size_t)(used() / ((double) 1 - desired_free_percentage));
+       gclog_or_tty->print_cr("\nFrom compute_new_size: ");
+@@ -6591,7 +6591,7 @@
+     HeapWord* curAddr = _markBitMap.startWord();
+     while (curAddr < _markBitMap.endWord()) {
+       size_t remaining  = pointer_delta(_markBitMap.endWord(), curAddr);
+-      MemRegion chunk(curAddr, MIN2(CMSBitMapYieldQuantum, remaining));
++      MemRegion chunk(curAddr, MIN2((size_t)CMSBitMapYieldQuantum, remaining));
+       _markBitMap.clear_large_range(chunk);
+       if (ConcurrentMarkSweepThread::should_yield() &&
+           !foregroundGCIsActive() &&
+@@ -6889,7 +6889,7 @@
+     return;
+   }
+   // Double capacity if possible
+-  size_t new_capacity = MIN2(_capacity*2, MarkStackSizeMax);
++  size_t new_capacity = MIN2(_capacity*2, (size_t)MarkStackSizeMax);
+   // Do not give up existing stack until we have managed to
+   // get the double capacity that we desired.
+   ReservedSpace rs(ReservedSpace::allocation_align_size_up(
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/concurrentMark.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/concurrentMark.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/concurrentMark.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -3916,7 +3916,7 @@
+   // of things to do) or totally (at the very end).
+   size_t target_size;
+   if (partially) {
+-    target_size = MIN2((size_t)_task_queue->max_elems()/3, GCDrainStackTargetSize);
++    target_size = MIN2((size_t)_task_queue->max_elems()/3, (size_t)GCDrainStackTargetSize);
+   } else {
+     target_size = 0;
+   }
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/g1BiasedArray.hpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/g1BiasedArray.hpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1BiasedArray.hpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -78,7 +78,8 @@
+     size_t num_target_elems = pointer_delta(end, bottom, mapping_granularity_in_bytes);
+     idx_t bias = (uintptr_t)bottom / mapping_granularity_in_bytes;
+     address base = create_new_base_array(num_target_elems, target_elem_size_in_bytes);
+-    initialize_base(base, num_target_elems, bias, target_elem_size_in_bytes, log2_intptr(mapping_granularity_in_bytes));
++    initialize_base(base, num_target_elems, bias, target_elem_size_in_bytes,
++		    log2_intptr((uintptr_t)mapping_granularity_in_bytes));
+   }
+ 
+   size_t bias() const { return _bias; }
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/g1CollectedHeap.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/g1CollectedHeap.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1CollectedHeap.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -1729,7 +1729,7 @@
+ 
+   verify_region_sets_optional();
+ 
+-  size_t expand_bytes = MAX2(word_size * HeapWordSize, MinHeapDeltaBytes);
++  size_t expand_bytes = MAX2(word_size * HeapWordSize, (size_t)MinHeapDeltaBytes);
+   ergo_verbose1(ErgoHeapSizing,
+                 "attempt heap expansion",
+                 ergo_format_reason("allocation request failed")
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/g1ConcurrentMarkObjArrayProcessor.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/g1ConcurrentMarkObjArrayProcessor.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1ConcurrentMarkObjArrayProcessor.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -41,7 +41,7 @@
+ }
+ 
+ size_t G1CMObjArrayProcessor::process_array_slice(objArrayOop obj, HeapWord* start_from, size_t remaining) {
+-  size_t words_to_scan = MIN2(remaining, ObjArrayMarkingStride);
++  size_t words_to_scan = MIN2(remaining, (size_t)ObjArrayMarkingStride);
+ 
+   if (remaining > ObjArrayMarkingStride) {
+     push_array_slice(start_from + ObjArrayMarkingStride);
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/g1PageBasedVirtualSpace.hpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/g1PageBasedVirtualSpace.hpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1PageBasedVirtualSpace.hpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -89,7 +89,7 @@
+   void pretouch_internal(size_t start_page, size_t end_page);
+ 
+   // Returns the index of the page which contains the given address.
+-  uintptr_t  addr_to_page_index(char* addr) const;
++  size_t  addr_to_page_index(char* addr) const;
+   // Returns the address of the given page index.
+   char*  page_start(size_t index) const;
+ 
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/g1StringDedupQueue.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupQueue.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupQueue.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -38,7 +38,7 @@
+   _cancel(false),
+   _empty(true),
+   _dropped(0) {
+-  _nqueues = MAX2(ParallelGCThreads, (size_t)1);
++  _nqueues = MAX2(ParallelGCThreads, (uintx)1);
+   _queues = NEW_C_HEAP_ARRAY(G1StringDedupWorkerQueue, _nqueues, mtGC);
+   for (size_t i = 0; i < _nqueues; i++) {
+     new (_queues + i) G1StringDedupWorkerQueue(G1StringDedupWorkerQueue::default_segment_size(), _max_cache_size, _max_size);
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/g1StringDedupTable.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupTable.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1StringDedupTable.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -120,7 +120,7 @@
+ };
+ 
+ G1StringDedupEntryCache::G1StringDedupEntryCache(size_t max_size) :
+-  _nlists(MAX2(ParallelGCThreads, (size_t)1)),
++  _nlists(MAX2(ParallelGCThreads, (uintx)1)),
+   _max_list_length(0),
+   _cached(PaddedArray<G1StringDedupEntryList, mtGC>::create_unfreeable((uint)_nlists)),
+   _overflowed(PaddedArray<G1StringDedupEntryList, mtGC>::create_unfreeable((uint)_nlists)) {
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/g1/heapRegion.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/g1/heapRegion.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/heapRegion.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -110,7 +110,7 @@
+   if (FLAG_IS_DEFAULT(G1HeapRegionSize)) {
+     size_t average_heap_size = (initial_heap_size + max_heap_size) / 2;
+     region_size = MAX2(average_heap_size / HeapRegionBounds::target_number(),
+-                       (uintx) HeapRegionBounds::min_size());
++                       HeapRegionBounds::min_size());
+   }
+ 
+   int region_size_log = log2_long((jlong) region_size);
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/parNew/parNewGeneration.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/parNew/parNewGeneration.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/parNew/parNewGeneration.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -194,7 +194,7 @@
+   const size_t num_overflow_elems = of_stack->size();
+   const size_t space_available = queue->max_elems() - queue->size();
+   const size_t num_take_elems = MIN3(space_available / 4,
+-                                     ParGCDesiredObjsFromOverflowList,
++                                     (size_t)ParGCDesiredObjsFromOverflowList,
+                                      num_overflow_elems);
+   // Transfer the most recent num_take_elems from the overflow
+   // stack to our work queue.
+diff -r 4689eaf1a5c9 src/share/vm/gc_implementation/parallelScavenge/psParallelCompact.cpp
+--- openjdk.orig/hotspot/src/share/vm/gc_implementation/parallelScavenge/psParallelCompact.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/gc_implementation/parallelScavenge/psParallelCompact.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -912,7 +912,7 @@
+ 
+ void PSParallelCompact::initialize_dead_wood_limiter()
+ {
+-  const size_t max = 100;
++  const uintx max = 100;
+   _dwl_mean = double(MIN2(ParallelOldDeadWoodLimiterMean, max)) / 100.0;
+   _dwl_std_dev = double(MIN2(ParallelOldDeadWoodLimiterStdDev, max)) / 100.0;
+   _dwl_first_term = 1.0 / (sqrt(2.0 * M_PI) * _dwl_std_dev);
+diff -r 4689eaf1a5c9 src/share/vm/memory/collectorPolicy.cpp
+--- openjdk.orig/hotspot/src/share/vm/memory/collectorPolicy.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/memory/collectorPolicy.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -385,7 +385,7 @@
+       uintx calculated_size = NewSize + OldSize;
+       double shrink_factor = (double) MaxHeapSize / calculated_size;
+       uintx smaller_new_size = align_size_down((uintx)(NewSize * shrink_factor), _gen_alignment);
+-      FLAG_SET_ERGO(uintx, NewSize, MAX2(young_gen_size_lower_bound(), smaller_new_size));
++      FLAG_SET_ERGO(uintx, NewSize, MAX2((uintx)young_gen_size_lower_bound(), smaller_new_size));
+       _initial_gen0_size = NewSize;
+ 
+       // OldSize is already aligned because above we aligned MaxHeapSize to
+@@ -433,7 +433,7 @@
+     // yield a size that is too small) and bound it by MaxNewSize above.
+     // Ergonomics plays here by previously calculating the desired
+     // NewSize and MaxNewSize.
+-    max_new_size = MIN2(MAX2(max_new_size, NewSize), MaxNewSize);
++    max_new_size = MIN2(MAX2(max_new_size, (size_t)NewSize), (size_t)MaxNewSize);
+   }
+   assert(max_new_size > 0, "All paths should set max_new_size");
+ 
+@@ -455,23 +455,25 @@
+       // lower limit.
+       _min_gen0_size = NewSize;
+       desired_new_size = NewSize;
+-      max_new_size = MAX2(max_new_size, NewSize);
++      max_new_size = MAX2(max_new_size, (size_t)NewSize);
+     } else if (FLAG_IS_ERGO(NewSize)) {
+       // If NewSize is set ergonomically, we should use it as a lower
+       // limit, but use NewRatio to calculate the initial size.
+       _min_gen0_size = NewSize;
+       desired_new_size =
+-        MAX2(scale_by_NewRatio_aligned(_initial_heap_byte_size), NewSize);
+-      max_new_size = MAX2(max_new_size, NewSize);
++        MAX2(scale_by_NewRatio_aligned(_initial_heap_byte_size), (size_t)NewSize);
++      max_new_size = MAX2(max_new_size, (size_t)NewSize);
+     } else {
+       // For the case where NewSize is the default, use NewRatio
+       // to size the minimum and initial generation sizes.
+       // Use the default NewSize as the floor for these values.  If
+       // NewRatio is overly large, the resulting sizes can be too
+       // small.
+-      _min_gen0_size = MAX2(scale_by_NewRatio_aligned(_min_heap_byte_size), NewSize);
++      _min_gen0_size = MAX2(scale_by_NewRatio_aligned(_min_heap_byte_size),
++			    (size_t)NewSize);
+       desired_new_size =
+-        MAX2(scale_by_NewRatio_aligned(_initial_heap_byte_size), NewSize);
++        MAX2(scale_by_NewRatio_aligned(_initial_heap_byte_size),
++	     (size_t)NewSize);
+     }
+ 
+     assert(_min_gen0_size > 0, "Sanity check");
+@@ -573,7 +575,7 @@
+   } else {
+     // It's been explicitly set on the command line.  Use the
+     // OldSize and then determine the consequences.
+-    _min_gen1_size = MIN2(OldSize, _min_heap_byte_size - _min_gen0_size);
++    _min_gen1_size = MIN2((size_t)OldSize, _min_heap_byte_size - _min_gen0_size);
+     _initial_gen1_size = OldSize;
+ 
+     // If the user has explicitly set an OldSize that is inconsistent
+diff -r 4689eaf1a5c9 src/share/vm/memory/metaspace.cpp
+--- openjdk.orig/hotspot/src/share/vm/memory/metaspace.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/memory/metaspace.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -1482,7 +1482,7 @@
+ 
+ void MetaspaceGC::post_initialize() {
+   // Reset the high-water mark once the VM initialization is done.
+-  _capacity_until_GC = MAX2(MetaspaceAux::committed_bytes(), MetaspaceSize);
++  _capacity_until_GC = MAX2(MetaspaceAux::committed_bytes(), (size_t)MetaspaceSize);
+ }
+ 
+ bool MetaspaceGC::can_expand(size_t word_size, bool is_class) {
+@@ -1542,7 +1542,7 @@
+     (size_t)MIN2(min_tmp, double(MaxMetaspaceSize));
+   // Don't shrink less than the initial generation size
+   minimum_desired_capacity = MAX2(minimum_desired_capacity,
+-                                  MetaspaceSize);
++                                  (size_t)MetaspaceSize);
+ 
+   if (PrintGCDetails && Verbose) {
+     gclog_or_tty->print_cr("\nMetaspaceGC::compute_new_size: ");
+@@ -1600,7 +1600,7 @@
+     const double max_tmp = used_after_gc / minimum_used_percentage;
+     size_t maximum_desired_capacity = (size_t)MIN2(max_tmp, double(MaxMetaspaceSize));
+     maximum_desired_capacity = MAX2(maximum_desired_capacity,
+-                                    MetaspaceSize);
++                                    (size_t)MetaspaceSize);
+     if (PrintGCDetails && Verbose) {
+       gclog_or_tty->print_cr("  "
+                              "  maximum_free_percentage: %6.2f"
+@@ -3320,7 +3320,7 @@
+     // Make the first class chunk bigger than a medium chunk so it's not put
+     // on the medium chunk list.   The next chunk will be small and progress
+     // from there.  This size calculated by -version.
+-    _first_class_chunk_word_size = MIN2((size_t)MediumChunk*6,
++    _first_class_chunk_word_size = MIN2((uintx)MediumChunk*6,
+                                        (CompressedClassSpaceSize/BytesPerWord)*2);
+     _first_class_chunk_word_size = align_word_size_up(_first_class_chunk_word_size);
+     // Arbitrarily set the initial virtual space to a multiple
+diff -r 4689eaf1a5c9 src/share/vm/oops/objArrayKlass.inline.hpp
+--- openjdk.orig/hotspot/src/share/vm/oops/objArrayKlass.inline.hpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/oops/objArrayKlass.inline.hpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -48,7 +48,7 @@
+   const size_t beg_index = size_t(index);
+   assert(beg_index < len || len == 0, "index too large");
+ 
+-  const size_t stride = MIN2(len - beg_index, ObjArrayMarkingStride);
++  const size_t stride = MIN2(len - beg_index, (size_t)ObjArrayMarkingStride);
+   const size_t end_index = beg_index + stride;
+   T* const base = (T*)a->base();
+   T* const beg = base + beg_index;
+@@ -82,7 +82,7 @@
+   const size_t beg_index = size_t(index);
+   assert(beg_index < len || len == 0, "index too large");
+ 
+-  const size_t stride = MIN2(len - beg_index, ObjArrayMarkingStride);
++  const size_t stride = MIN2(len - beg_index, (size_t)ObjArrayMarkingStride);
+   const size_t end_index = beg_index + stride;
+   T* const base = (T*)a->base();
+   T* const beg = base + beg_index;
+diff -r 4689eaf1a5c9 src/share/vm/runtime/arguments.cpp
+--- openjdk.orig/hotspot/src/share/vm/runtime/arguments.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/runtime/arguments.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -1301,7 +1301,7 @@
+     // NewSize was set on the command line and it is larger than
+     // preferred_max_new_size.
+     if (!FLAG_IS_DEFAULT(NewSize)) {   // NewSize explicitly set at command-line
+-      FLAG_SET_ERGO(uintx, MaxNewSize, MAX2(NewSize, preferred_max_new_size));
++      FLAG_SET_ERGO(uintx, MaxNewSize, MAX2((size_t)NewSize, preferred_max_new_size));
+     } else {
+       FLAG_SET_ERGO(uintx, MaxNewSize, preferred_max_new_size);
+     }
+@@ -1326,8 +1326,8 @@
+       // Unless explicitly requested otherwise, make young gen
+       // at least min_new, and at most preferred_max_new_size.
+       if (FLAG_IS_DEFAULT(NewSize)) {
+-        FLAG_SET_ERGO(uintx, NewSize, MAX2(NewSize, min_new));
+-        FLAG_SET_ERGO(uintx, NewSize, MIN2(preferred_max_new_size, NewSize));
++        FLAG_SET_ERGO(uintx, NewSize, MAX2((size_t)NewSize, min_new));
++        FLAG_SET_ERGO(uintx, NewSize, MIN2(preferred_max_new_size, (size_t)NewSize));
+         if (PrintGCDetails && Verbose) {
+           // Too early to use gclog_or_tty
+           tty->print_cr("CMS ergo set NewSize: " SIZE_FORMAT, NewSize);
+@@ -1337,7 +1337,7 @@
+       // so it's NewRatio x of NewSize.
+       if (FLAG_IS_DEFAULT(OldSize)) {
+         if (max_heap > NewSize) {
+-          FLAG_SET_ERGO(uintx, OldSize, MIN2(NewRatio*NewSize, max_heap - NewSize));
++          FLAG_SET_ERGO(uintx, OldSize, MIN2((size_t)(NewRatio*NewSize), max_heap - NewSize));
+           if (PrintGCDetails && Verbose) {
+             // Too early to use gclog_or_tty
+             tty->print_cr("CMS ergo set OldSize: " SIZE_FORMAT, OldSize);
+diff -r 4689eaf1a5c9 src/share/vm/runtime/os.cpp
+--- openjdk.orig/hotspot/src/share/vm/runtime/os.cpp	Mon Aug 31 07:09:56 2020 +0100
++++ openjdk/hotspot/src/share/vm/runtime/os.cpp	Tue Sep 08 22:20:44 2020 -0400
+@@ -1272,7 +1272,7 @@
+ }
+ 
+ void os::set_memory_serialize_page(address page) {
+-  int count = log2_intptr(sizeof(class JavaThread)) - log2_int(64);
++  int count = log2_intptr((uintptr_t)sizeof(class JavaThread)) - log2_int(64);
+   _mem_serialize_page = (volatile int32_t *)page;
+   // We initialize the serialization page shift count here
+   // We assume a cache line size of 64 bytes

@@ -1,0 +1,63 @@
+# HG changeset patch
+# User andrew
+# Date 1459487045 -3600
+#      Fri Apr 01 06:04:05 2016 +0100
+# Node ID 3334efeacd8327a14b7d2f392f4546e3c29c594b
+# Parent  6b81fd2227d14226f2121f2d51b464536925686e
+PR2888: OpenJDK should check for system cacerts database (e.g. /etc/pki/java/cacerts)
+PR3575: System cacerts database handling should not affect jssecacerts
+
+diff --git openjdk.orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java openjdk/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
+--- openjdk.orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
++++ openjdk/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
+@@ -72,7 +72,7 @@
+      * The preference of the default trusted KeyStore is:
+      *    javax.net.ssl.trustStore
+      *    jssecacerts
+-     *    cacerts
++     *    cacerts (system and local)
+      */
+     private static final class TrustStoreDescriptor {
+         private static final String fileSep = File.separator;
+@@ -83,6 +83,10 @@
+                 defaultStorePath + fileSep + "cacerts";
+         private static final String jsseDefaultStore =
+                 defaultStorePath + fileSep + "jssecacerts";
++        /* Check system cacerts DB: /etc/pki/java/cacerts */
++        private static final String systemStore =
++                fileSep + "etc" + fileSep + "pki" +
++                fileSep + "java" + fileSep + "cacerts";
+ 
+         // the trust store name
+         private final String storeName;
+@@ -146,7 +150,8 @@
+                     long temporaryTime = 0L;
+                     if (!"NONE".equals(storePropName)) {
+                         String[] fileNames =
+-                                new String[] {storePropName, defaultStore};
++                                new String[] {storePropName,
++                                              systemStore, defaultStore};
+                         for (String fileName : fileNames) {
+                             File f = new File(fileName);
+                             if (f.isFile() && f.canRead()) {
+diff --git openjdk.orig/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java openjdk/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
+--- openjdk.orig/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
++++ openjdk/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
+@@ -108,9 +108,14 @@
+         throws Exception
+     {
+         String sep = File.separator;
+-        File file = new File(System.getProperty("java.home") + sep
+-                             + "lib" + sep + "security" + sep
+-                             + "cacerts");
++        /* Check system cacerts DB first; /etc/pki/java/cacerts */
++        File file = new File(sep + "etc" + sep + "pki" + sep
++                             + "java" + sep + "cacerts");
++        if (!file.exists()) {
++            file = new File(System.getProperty("java.home") + sep
++                            + "lib" + sep + "security" + sep
++                            + "cacerts");
++        }
+         if (!file.exists()) {
+             return null;
+         }

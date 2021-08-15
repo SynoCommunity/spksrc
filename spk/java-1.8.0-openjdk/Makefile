@@ -1,60 +1,72 @@
-SPK_NAME = java-11-openjdk
-SPK_VERS = 11.0
+SPK_NAME = java-1.8.0-openjdk
+SPK_VERS = 312.2
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = The OpenJDK 11 runtime environment
+DESCRIPTION = The OpenJDK 8 runtime environment
 RELOAD_UI = no
 STARTABLE = no
-DISPLAY_NAME = java-11-openjdk
-CHANGELOG = "Initial version. Based on CentOS 7's java-11-openjdk-11.0.12.0.7-0.el7_9.src.rpm"
+DISPLAY_NAME = java-1.8.0-openjdk
+CHANGELOG = "Java 1.8.0 version 312 b02"
 
 HOMEPAGE = http://openjdk.java.net/
 LICENSE_FILE = src/LICENSE
 
 SPK_COMMANDS  = bin/alt-java
-SPK_COMMANDS += bin/jaotc
+SPK_COMMANDS += bin/appletviewer
+SPK_COMMANDS += bin/clhsdb
+SPK_COMMANDS += bin/extcheck
+SPK_COMMANDS += bin/hsdb
+SPK_COMMANDS += bin/idlj
 SPK_COMMANDS += bin/jar
 SPK_COMMANDS += bin/jarsigner
 SPK_COMMANDS += bin/java
 SPK_COMMANDS += bin/javac
 SPK_COMMANDS += bin/javadoc
+SPK_COMMANDS += bin/javah
 SPK_COMMANDS += bin/javap
+SPK_COMMANDS += bin/java-rmi.cgi
 SPK_COMMANDS += bin/jcmd
 SPK_COMMANDS += bin/jconsole
 SPK_COMMANDS += bin/jdb
-SPK_COMMANDS += bin/jdeprscan
 SPK_COMMANDS += bin/jdeps
 SPK_COMMANDS += bin/jfr
-SPK_COMMANDS += bin/jhsdb
-SPK_COMMANDS += bin/jimage
+SPK_COMMANDS += bin/jhat
 SPK_COMMANDS += bin/jinfo
 SPK_COMMANDS += bin/jjs
-SPK_COMMANDS += bin/jlink
 SPK_COMMANDS += bin/jmap
-SPK_COMMANDS += bin/jmod
 SPK_COMMANDS += bin/jps
 SPK_COMMANDS += bin/jrunscript
-SPK_COMMANDS += bin/jshell
+SPK_COMMANDS += bin/jsadebugd
 SPK_COMMANDS += bin/jstack
 SPK_COMMANDS += bin/jstat
 SPK_COMMANDS += bin/jstatd
 SPK_COMMANDS += bin/keytool
+SPK_COMMANDS += bin/native2ascii
+SPK_COMMANDS += bin/orbd
 SPK_COMMANDS += bin/pack200
+SPK_COMMANDS += bin/policytool
 SPK_COMMANDS += bin/rmic
 SPK_COMMANDS += bin/rmid
 SPK_COMMANDS += bin/rmiregistry
+SPK_COMMANDS += bin/schemagen
 SPK_COMMANDS += bin/serialver
+SPK_COMMANDS += bin/servertool
+SPK_COMMANDS += bin/tnameserv
+SPK_COMMANDS += bin/unpack200
+SPK_COMMANDS += bin/wsgen
+SPK_COMMANDS += bin/wsimport
+SPK_COMMANDS += bin/xjc
 
 # Replace wrong symlinks
-POST_STRIP_TARGET = java-11-openjdk_extra_install
+POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: java-11-openjdk_extra_install
-java-11-openjdk_extra_install:
+.PHONY: $(SPK_NAME)_extra_install
+$(SPK_NAME)_extra_install:
 	cd $(STAGING_DIR)/bin ; \
-	ln -sf ../jvm/openjdk-11.0.12/bin/* .
+	ln -sf ../jvm/openjdk-1.8.0_312/bin/* .

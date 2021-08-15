@@ -1,0 +1,115 @@
+diff -ruN jdk8/common/autoconf/libraries.m4 jdk8/common/autoconf/libraries.m4
+--- jdk8/common/autoconf/libraries.m4	2013-11-14 20:08:01.845065585 -0500
++++ jdk8/common/autoconf/libraries.m4	2013-11-14 20:10:56.186553066 -0500
+@@ -676,6 +676,47 @@
+ 
+   ###############################################################################
+   #
++  # Check for the png library
++  #
++
++  AC_ARG_WITH(libpng, [AS_HELP_STRING([--with-libpng],
++     [use libpng from build system or OpenJDK source (system, bundled) @<:@bundled@:>@])])
++
++  AC_CHECK_LIB(png, png_sig_cmp,
++               [ LIBPNG_FOUND=yes ],
++               [ LIBPNG_FOUND=no ])
++
++  AC_MSG_CHECKING([for which libpng to use])
++
++  # default is bundled
++  DEFAULT_LIBPNG=bundled
++
++  #
++  # if user didn't specify, use DEFAULT_LIBPNG
++  #
++  if test "x${with_libpng}" = "x"; then
++      with_libpng=${DEFAULT_libpng}
++  fi
++
++
++  if test "x${with_libpng}" = "xbundled"; then
++      USE_EXTERNAL_LIBPNG=false
++      AC_MSG_RESULT([bundled])
++  elif test "x${with_libpng}" = "xsystem"; then
++      if test "x${LIBPNG_FOUND}" = "xyes"; then
++          USE_EXTERNAL_LIBPNG=true
++          AC_MSG_RESULT([system])
++      else
++          AC_MSG_RESULT([system not found])
++          AC_MSG_ERROR([--with-libpng=system specified, but no libpng found!])
++      fi
++  else
++      AC_MSG_ERROR([Invalid value of --with-libpng: ${with_libpng}, use 'system' or 'bundled'])
++  fi
++  AC_SUBST(USE_EXTERNAL_LIBPNG)
++
++  ###############################################################################
++  #
+   # Check for the zlib library
+   #
+ 
+diff -ruN jdk8/common/autoconf/spec.gmk.in jdk8/common/autoconf/spec.gmk.in
+--- jdk8/common/autoconf/spec.gmk.in	2013-10-31 19:24:33.000000000 -0400
++++ jdk8/common/autoconf/spec.gmk.in	2013-11-14 21:10:56.365976518 -0500
+@@ -548,6 +548,7 @@
+ ENABLE_JFR=@ENABLE_JFR@
+ ENABLE_INTREE_EC=@ENABLE_INTREE_EC@
+ USE_EXTERNAL_LIBJPEG:=@USE_EXTERNAL_LIBJPEG@
++USE_EXTERNAL_LIBPNG:=@USE_EXTERNAL_LIBPNG@
+ USE_EXTERNAL_LIBGIF:=@USE_EXTERNAL_LIBGIF@
+ USE_EXTERNAL_LIBZ:=@USE_EXTERNAL_LIBZ@
+ LIBZIP_CAN_USE_MMAP:=@LIBZIP_CAN_USE_MMAP@
+diff -ruN jdk8/jdk/make/lib/Awt2dLibraries.gmk jdk8/jdk/make/lib/Awt2dLibraries.gmk
+--- jdk8/jdk/make/lib/Awt2dLibraries.gmk	2013-11-14 20:08:01.845065585 -0500
++++ jdk8/jdk/make/lib/Awt2dLibraries.gmk	2013-11-14 20:14:10.791982343 -0500
+@@ -1183,7 +1183,6 @@
+ 
+ ifndef BUILD_HEADLESS_ONLY
+   LIBSPLASHSCREEN_DIRS := \
+-    $(JDK_TOPDIR)/src/share/native/sun/awt/libpng \
+     $(JDK_TOPDIR)/src/share/native/sun/awt/splashscreen
+ 
+   ifeq ($(USE_EXTERNAL_LIBGIF), true)
+@@ -1200,6 +1199,13 @@
+     LIBJPEG_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/sun/awt/jpeg
+   endif
+ 
++  ifeq ($(USE_EXTERNAL_LIBPNG), true)
++    LIBPNG_LDFLAGS := -lpng
++  else
++    LIBSPLASHSCREEN_DIRS += $(JDK_TOPDIR)/src/share/native/sun/awt/image/libpng
++    LIBPNG_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/sun/awt/libpng
++  endif
++
+   ifneq ($(OPENJDK_TARGET_OS), macosx)
+     LIBSPLASHSCREEN_DIRS += $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/awt/splashscreen
+   else
+@@ -1263,12 +1269,12 @@
+       LANG := C, \
+       OPTIMIZATION := LOW, \
+       CFLAGS := $(LIBSPLASHSCREEN_CFLAGS) $(CFLAGS_JDKLIB) \
+-          $(GIFLIB_CFLAGS) $(LIBJPEG_CFLAGS), \
++          $(GIFLIB_CFLAGS) $(LIBJPEG_CFLAGS) $(LIBPNG_CFLAGS), \
+       MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libsplashscreen/mapfile-vers, \
+       LDFLAGS := $(LDFLAGS_JDKLIB) \
+           $(call SET_SHARED_LIBRARY_ORIGIN), \
+       LDFLAGS_SUFFIX := $(LIBSPLASHSCREEN_LDFLAGS_SUFFIX) \
+-          $(LIBZ) $(GIFLIB_LDFLAGS) $(LIBJPEG_LDFLAGS), \
++          $(LIBZ) $(GIFLIB_LDFLAGS) $(LIBJPEG_LDFLAGS) $(LIBPNG_LDFLAGS), \
+       LDFLAGS_SUFFIX_solaris := -lc, \
+       VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
+       RC_FLAGS := $(RC_FLAGS) \
+diff -ruN jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c
+--- jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c	2013-10-31 19:44:18.000000000 -0400
++++ jdk8/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c	2013-11-14 20:14:41.363892797 -0500
+@@ -25,8 +25,7 @@
+ 
+ #include "splashscreen_impl.h"
+ 
+-#include "../libpng/png.h"
+-
++#include <png.h>
+ #include <setjmp.h>
+ 
+ #define SIG_BYTES 8

@@ -1,0 +1,20 @@
+# HG changeset patch
+# User andrew
+# Date 1526489197 -3600
+#      Wed May 16 17:46:37 2018 +0100
+# Node ID 64e87a408afd2b56d59dad73dee28d4b99463810
+# Parent  00ccc73498628a51a45301322e64ce2ad06e49be
+PR3591: Fix for bug 3533 doesn't add -mstackrealign to JDK code
+
+diff --git openjdk.orig///common/autoconf/flags.m4 openjdk///common/autoconf/flags.m4
+--- openjdk.orig///common/autoconf/flags.m4
++++ openjdk///common/autoconf/flags.m4
+@@ -401,6 +401,8 @@
+     FLAGS_COMPILER_CHECK_ARGUMENTS([$REALIGN_CFLAG -Werror], [],
+       AC_MSG_ERROR([The selected compiler $CXX does not support -mstackrealign! Try to put another compiler in the path.])
+     )
++    CFLAGS_JDK="${CFLAGS_JDK} ${REALIGN_CFLAG}"
++    CXXFLAGS_JDK="${CXXFLAGS_JDK} ${REALIGN_CFLAG}"
+     AC_SUBST([REALIGN_CFLAG])
+   fi
+ 

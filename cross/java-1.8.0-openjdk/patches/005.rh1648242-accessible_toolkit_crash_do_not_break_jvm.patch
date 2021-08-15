@@ -1,0 +1,16 @@
+diff -uNr openjdk-orig/jdk/src/share/classes/java/awt/Toolkit.java jdk8/jdk/src/share/classes/java/awt/Toolkit.java
+--- openjdk-orig/jdk/src/share/classes/java/awt/Toolkit.java	2009-01-23 11:59:47.000000000 -0500
++++ jdk8/jdk/src/share/classes/java/awt/Toolkit.java	2009-01-23 12:05:20.000000000 -0500
+@@ -883,7 +883,11 @@
+                     return null;
+                 }
+             });
+-            loadAssistiveTechnologies();
++         try {
++                 loadAssistiveTechnologies();
++             } catch ( AWTError error) {
++                 // ignore silently
++             }
+         }
+         return toolkit;
+     }
