@@ -1,0 +1,9 @@
+lib:lib/pkgconfig/xorg-sgml-doctools.pc
+lib:lib/sgml/X11/dbs/masterdb.html.xml
+lib:lib/sgml/X11/dbs/masterdb.pdf.xml
+lib:lib/sgml/X11/defs.ent
+lib:lib/sgml/X11/xorg-chunk.xsl
+lib:lib/sgml/X11/xorg.css
+lib:lib/sgml/X11/xorg-fo.xsl
+lib:lib/sgml/X11/xorg-xhtml.xsl
+lib:lib/sgml/X11/xorg.xsl

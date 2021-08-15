@@ -1,0 +1,14 @@
+diff -up xorgproto-2018.4/Makefile.am.jx xorgproto-2018.4/Makefile.am
+--- xorgproto-2018.4/Makefile.am.jx	2018-02-28 11:45:07.000000000 -0500
++++ xorgproto-2018.4/Makefile.am	2018-04-06 17:52:41.757078945 -0400
+@@ -185,10 +185,6 @@ print_HEADERS = \
+ printprotopkgconfigdir = $(datadir)/pkgconfig
+ printprotopkgconfig_DATA = printproto.pc
+ 
+-miscmandir = $(MISC_MAN_DIR)
+-miscman_DATA =	man/Xprint.$(MISC_MAN_SUFFIX)
+-CLEANFILES = $(miscman_DATA)
+-
+ printproto_EXTRA_DIST = 	printproto.pc.in	\
+ 		man/Xprint.man		\
+ 		man/Xprint.sgml		\

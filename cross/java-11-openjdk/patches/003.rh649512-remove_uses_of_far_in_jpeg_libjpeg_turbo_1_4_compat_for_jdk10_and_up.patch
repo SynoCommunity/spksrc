@@ -1,0 +1,19 @@
+Remove uses of FAR in jpeg code
+
+Upstream libjpeg-trubo removed the (empty) FAR macro:
+http://sourceforge.net/p/libjpeg-turbo/code/1312/
+
+Adjust our code to not use the undefined FAR macro anymore.
+
+diff --git a/jdk/src/java.desktop/share/native/libjavajpeg/imageioJPEG.c b/jdk/src/java.desktop/share/native/libjavajpeg/imageioJPEG.c
+--- openjdk/src/java.desktop/share/native/libjavajpeg/imageioJPEG.c
++++ openjdk/src/java.desktop/share/native/libjavajpeg/imageioJPEG.c
+@@ -1385,7 +1385,7 @@
+     /* and fill it in */
+     dst_ptr = icc_data;
+     for (seq_no = first; seq_no < last; seq_no++) {
+-        JOCTET FAR *src_ptr = icc_markers[seq_no]->data + ICC_OVERHEAD_LEN;
++        JOCTET *src_ptr = icc_markers[seq_no]->data + ICC_OVERHEAD_LEN;
+         unsigned int length =
+             icc_markers[seq_no]->data_length - ICC_OVERHEAD_LEN;
+ 
