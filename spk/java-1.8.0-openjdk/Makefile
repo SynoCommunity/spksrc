@@ -13,7 +13,7 @@ DISPLAY_NAME = java-1.8.0-openjdk
 CHANGELOG = "Java 1.8.0 version 312 b02"
 
 HOMEPAGE = http://openjdk.java.net/
-LICENSE  = ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
+LICENSE_FILE = src/LICENSE
 
 SPK_COMMANDS  = bin/alt-java
 SPK_COMMANDS += bin/appletviewer

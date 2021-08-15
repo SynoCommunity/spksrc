@@ -13,7 +13,7 @@ DISPLAY_NAME = java-11-openjdk
 CHANGELOG = "Initial version. Based on CentOS 7's java-11-openjdk-11.0.12.0.7-0.el7_9.src.rpm"
 
 HOMEPAGE = http://openjdk.java.net/
-LICENSE  = ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
+LICENSE_FILE = src/LICENSE
 
 SPK_COMMANDS  = bin/alt-java
 SPK_COMMANDS += bin/jaotc
