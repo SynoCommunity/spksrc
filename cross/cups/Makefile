@@ -6,6 +6,7 @@ PKG_DIST_SITE = https://github.com/apple/$(PKG_NAME).git
 PKG_DIR = $(PKG_NAME)-gitv$(PKG_VERS)
 PKG_DOWNLOAD_METHOD = git
 PKG_GIT_HASH = v$(PKG_VERS)
+CHECKSUM_TARGET = nop
 
 DEPENDS = cross/openssl cross/gnutls
 
