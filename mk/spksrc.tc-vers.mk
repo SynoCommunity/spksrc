@@ -63,5 +63,5 @@ TC_BUILD = 25556
 endif
 
 ifeq ($(TC_VERS),7.0)
-TC_BUILD = 40000
+TC_BUILD = 41890
 endif

@@ -1,10 +1,10 @@
 TC_ARCH = armada375
 TC_VERS = 7.0
 TC_KERNEL = 3.2.101
-TC_GCC = 7.3.0
+TC_GCC = 7.5.0
 TC_GLIBC = 2.26
 
-TC_DIST = armada375-gcc730_glibc226_hard-GPL
+TC_DIST = armada375-gcc750_glibc226_hard-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%20375%20Linux%203.2.101
 
 TC_TARGET = arm-unknown-linux-gnueabi
