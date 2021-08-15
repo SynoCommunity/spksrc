@@ -38,14 +38,14 @@ cmake_configure_target:
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -j$(NCPUS) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: cmake_compile_target
 
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) -j$(NCPUS)
 
 .PHONY: cmake_install_target
 
