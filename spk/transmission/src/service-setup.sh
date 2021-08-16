@@ -13,11 +13,11 @@ service_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # If chosen, they need to exist
-        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
+        if [ -n "${wizard_watch_dir}" ] && [ ! -d "${wizard_watch_dir}" ]; then
             echo "Watch directory ${wizard_watch_dir} does not exist."
             exit 1
         fi
-        if [ -n "${wizard_incomplete_dir}" -a ! -d "${wizard_incomplete_dir}" ]; then
+        if [ -n "${wizard_incomplete_dir}" ] && [ ! -d "${wizard_incomplete_dir}" ]; then
             echo "Incomplete directory ${wizard_incomplete_dir} does not exist."
             exit 1
         fi
