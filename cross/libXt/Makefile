@@ -1,5 +1,5 @@
 PKG_NAME = libXt
-PKG_VERS = 1.1.5
+PKG_VERS = 1.2.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.x.org/archive/individual/lib
@@ -14,17 +14,13 @@ LICENSE  = GPLv2/GPLv3
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
 	--enable-malloc0returnsnull \
+	--without-xmlto \
+	--without-fop \
 	--disable-static
 PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
-
-ifeq ($(findstring $(ARCH), ppc824x ppc853x),$(ARCH))
-ifneq (5,$(firstword $(sort $(TCVERSION) 5)))
-# toolchains before version 5 require the old linux quota version
-# related issue: https://github.com/transmission/transmission/issues/591
-ADDITIONAL_CFLAGS = -D_LINUX_QUOTA_VERSION=1
-endif
-endif
-
+PATCHES_LEVEL = 1
+# ensure gnu/hard-float.h is used
+TC_EXTRA_CFLAGS = -D__ARM_PCS_VFP=1
 
 include ../../mk/spksrc.cross-cc.mk
 

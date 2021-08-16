@@ -4,9 +4,7 @@ rsc:include/X11/ICE/ICElib.h
 rsc:include/X11/ICE/ICEmsg.h
 rsc:include/X11/ICE/ICEproto.h
 rsc:include/X11/ICE/ICEutil.h
-lib:lib/libICE.a
-lib:lib/libICE.la
 lnk:lib/libICE.so
 lnk:lib/libICE.so.6
 lib:lib/libICE.so.6.3.0
-lib:lib/pkgconfig/ice.pc
+rsc:lib/pkgconfig/ice.pc

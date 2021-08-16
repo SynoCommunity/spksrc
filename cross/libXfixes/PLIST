@@ -1,6 +1,5 @@
 rsc:include/X11/extensions/Xfixes.h
-lib:lib/libXfixes.la
 lnk:lib/libXfixes.so
 lnk:lib/libXfixes.so.3
 lib:lib/libXfixes.so.3.1.0
-lib:lib/pkgconfig/xfixes.pc
+rsc:lib/pkgconfig/xfixes.pc

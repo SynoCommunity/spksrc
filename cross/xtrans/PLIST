@@ -5,5 +5,5 @@ rsc:include/X11/Xtrans/Xtransint.h
 rsc:include/X11/Xtrans/Xtranslcl.c
 rsc:include/X11/Xtrans/Xtranssock.c
 rsc:include/X11/Xtrans/Xtransutil.c
-lib:lib/aclocal/xtrans.m4
-lib:lib/pkgconfig/xtrans.pc
+rsc:lib/aclocal/xtrans.m4
+rsc:lib/pkgconfig/xtrans.pc

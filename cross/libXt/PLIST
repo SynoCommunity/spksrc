@@ -31,8 +31,7 @@ rsc:include/X11/VarargsI.h
 rsc:include/X11/Vendor.h
 rsc:include/X11/VendorP.h
 rsc:include/X11/Xtos.h
-lib:lib/libXt.la
 lnk:lib/libXt.so
 lnk:lib/libXt.so.6
 lib:lib/libXt.so.6.0.0
-lib:lib/pkgconfig/xt.pc
+rsc:lib/pkgconfig/xt.pc

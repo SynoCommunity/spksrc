@@ -12,14 +12,6 @@ HOMEPAGE = http://infozip.sourceforge.net/Zip.html
 COMMENT  = A file compression and packaging utility compatible with PKZIP
 LICENSE  = BSD
 
-
-ifeq ($(findstring $(ARCH), ppc824x ppc853x),$(ARCH))
-ifneq (5,$(firstword $(sort $(TCVERSION) 5)))
-# toolchains before version 5 require the old linux quota version
-# related issue: https://github.com/transmission/transmission/issues/591
-ADDITIONAL_CFLAGS = -D_LINUX_QUOTA_VERSION=1
-endif
-endif
 PATCHES_LEVEL = 1
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = $(PKG_NAME)_compile_target

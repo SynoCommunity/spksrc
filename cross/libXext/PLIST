@@ -14,8 +14,7 @@ rsc:include/X11/extensions/Xge.h
 rsc:include/X11/extensions/XLbx.h
 rsc:include/X11/extensions/XShm.h
 rsc:include/X11/extensions/xtestext1.h
-lib:lib/libXext.la
 lnk:lib/libXext.so
 lnk:lib/libXext.so.6
 lib:lib/libXext.so.6.4.0
-lib:lib/pkgconfig/xext.pc
+rsc:lib/pkgconfig/xext.pc

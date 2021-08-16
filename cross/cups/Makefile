@@ -23,15 +23,7 @@ CONFIGURE_ARGS = --with-cupsd-file-perm=0755 \
         --with-access-log-level=actions \
         --enable-page-logging \
         --enable-sync-on-close
-#--datarootdir=$$INSTALL_PREFIX/lib
 
-ifeq ($(findstring $(ARCH), ppc824x ppc853x),$(ARCH))
-ifneq (5,$(firstword $(sort $(TCVERSION) 5)))
-# toolchains before version 5 require the old linux quota version
-# related issue: https://github.com/transmission/transmission/issues/591
-ADDITIONAL_CFLAGS = -D_LINUX_QUOTA_VERSION=1
-endif
-endif
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk

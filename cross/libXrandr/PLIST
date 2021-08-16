@@ -1,6 +1,5 @@
 rsc:include/X11/extensions/Xrandr.h
-lib:lib/libXrandr.la
 lnk:lib/libXrandr.so
 lnk:lib/libXrandr.so.2
 lib:lib/libXrandr.so.2.2.0
-lib:lib/pkgconfig/xrandr.pc
+rsc:lib/pkgconfig/xrandr.pc
