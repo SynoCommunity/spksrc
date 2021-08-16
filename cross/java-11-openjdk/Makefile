@@ -1,13 +1,12 @@
 PKG_NAME = java-11-openjdk
 PKG_VERS = 11.0
+JAVA_MINOR = 12
+JAVA_RELEASE = 7
+JAVA_VERS = $(PKG_VERS).$(JAVA_MINOR)+$(JAVA_RELEASE)
 PKG_EXT = tar.gz
-PKG_DIST_NAME = jdk11u
-PKG_DIST_SITE = https://hg.openjdk.java.net/jdk-updates
-PKG_HG_REV = jdk-11.0.12+7
-PKG_DIST_FILE = $(PKG_NAME)-r$(PKG_HG_REV).$(PKG_EXT)
-PKG_DOWNLOAD_METHOD = hg
-PKG_DIR = $(PKG_NAME)-r$(PKG_HG_REV)
-CHECKSUM_TARGET = nop 
+PKG_DIST_NAME = jdk-$(JAVA_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/openjdk/jdk11u/archive/refs/tags
+PKG_DIR = jdk11u-jdk-$(PKG_VERS).$(JAVA_MINOR)-$(JAVA_RELEASE)
 
 DEPENDS = cross/cups cross/fontconfig cross/expat
 BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip
@@ -48,15 +47,9 @@ CONFIGURE_ARGS = --openjdk-target=$(TC_TARGET) \
 	--with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX) \
 	--with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX) \
 	--prefix=$(INSTALL_PREFIX) \
-	--exec-prefix=$(INSTALL_PREFIX)
+	--exec-prefix=$(INSTALL_PREFIX) \
+	ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
 
-ifeq ($(findstring $(ARCH), ppc824x ppc853x),$(ARCH))
-ifneq (5,$(firstword $(sort $(TCVERSION) 5)))
-# toolchains before version 5 require the old linux quota version
-# related issue: https://github.com/transmission/transmission/issues/591
-ADDITIONAL_CFLAGS = -D_LINUX_QUOTA_VERSION=1
-endif
-endif
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk

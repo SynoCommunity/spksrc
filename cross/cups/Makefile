@@ -1,12 +1,9 @@
 PKG_NAME = cups
 PKG_VERS = 2.3.3
 PKG_EXT = tar.gz
-PKG_DIST_FILE = $(PKG_NAME)-gitv$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/apple/$(PKG_NAME).git
-PKG_DIR = $(PKG_NAME)-gitv$(PKG_VERS)
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = v$(PKG_VERS)
-CHECKSUM_TARGET = nop
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-source.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/apple/$(PKG_NAME)/releases/download/v$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl cross/gnutls
 

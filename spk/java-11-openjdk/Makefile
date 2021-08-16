@@ -6,11 +6,11 @@ SPK_ICON = src/$(SPK_NAME).png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = The OpenJDK 11 runtime environment
+DESCRIPTION = The OpenJDK 11 runtime environment. Version 11.0.12+7
 RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = java-11-openjdk
-CHANGELOG = "Initial version. Based on CentOS 7's java-11-openjdk-11.0.12.0.7-0.el7_9.src.rpm"
+CHANGELOG = "Initial version for Synology NAS's"
 
 HOMEPAGE = http://openjdk.java.net/
 LICENSE_FILE = src/LICENSE
