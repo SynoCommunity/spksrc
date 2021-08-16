@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		libunistring-dev \
 		lzip \
 		mercurial \
+		moreutils \
 		ncurses-dev \
 		ninja-build \
 		php \
@@ -55,13 +56,17 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		rename \
 		scons \
 		subversion \
+		sudo \
 		swig \
 		texinfo \
 		unzip \
 		xmlto \
 		zlib1g-dev && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+	adduser --disabled-password --gecos '' user && \
+	adduser user sudo && \
+	echo "%users ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
 
 # Install setuptools, wheel and pip for Python3
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
