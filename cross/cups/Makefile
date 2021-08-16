@@ -22,7 +22,7 @@ CONFIGURE_ARGS = --with-cupsd-file-perm=0755 \
         --with-xinetd=no \
         --with-access-log-level=actions \
         --enable-page-logging \
-	'LDFLAGS=-Wl,-rpath,$(STAGING_INSTALL_PREFIX)/lib'
+	'LDFLAGS=-Wl,-rpath,$(STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib'
 
 PATCHES_LEVEL = 1
 
