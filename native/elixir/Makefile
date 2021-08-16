@@ -22,7 +22,7 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: elixir_compile
 elixir_compile:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) -j$(NCPUS) $(MAKE_COMPILE_OPTIONS)
+	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) $(MAKE_COMPILE_OPTIONS)
 
 .PHONY: elixir_install
 elixir_install:

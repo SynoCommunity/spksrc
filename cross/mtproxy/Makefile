@@ -22,7 +22,7 @@ include ../../mk/spksrc.cross-cc.mk
 # Only Intel supported https://github.com/TelegramMessenger/MTProxy/issues/18
 .PHONY: mtproxy_compile
 mtproxy_compile:
-		$(RUN) $(MAKE) -j$(NCPUS) SPKSRC_CFLAGS="$(CFLAGS)" SPKSRC_LDFLAGS="$(LDFLAGS)" COMMIT="$(PKG_GIT_HASH)" ARCH=
+		$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS) SPKSRC_CFLAGS="$(CFLAGS)" SPKSRC_LDFLAGS="$(LDFLAGS)" COMMIT="$(PKG_GIT_HASH)" ARCH=
 
 .PHONY: mtproxy_install
 mtproxy_install:

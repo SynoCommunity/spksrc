@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.squid-cache.org/Versions/v$(word 1,$(subst ., ,$(PKG_VERS)))/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = http://www.squid-cache.org
 COMMENT  = Squid is a fully-featured HTTP/1.0 proxy which is almost HTTP/1.1 compliant.
@@ -21,4 +21,4 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: squid_native_compile
 squid_native_compile:
-	$(RUN) ;cd src;$(MAKE) -j$(NCPUS) cf_gen_defines.cci cf_gen
+	$(RUN) ;cd src;$(MAKE) $(COMPILE_MAKE_OPTIONS) cf_gen_defines.cci cf_gen

@@ -90,13 +90,13 @@ CMAKE_BITLIB_ARGS += -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LINK_FLAGS="-l
 $(PKG_DIR)/libx265_main12.a:
 	mkdir --parents $(PKG_BUILD_12BIT)
 	cd $(PKG_BUILD_12BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) -DMAIN12=ON ../source
-	cd $(PKG_BUILD_12BIT) && $(MAKE) -j$(NCPUS) $(COMPILE_OPTIONS)
+	cd $(PKG_BUILD_12BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
 	@$(RUN) ln -sf $(PKG_BUILD_12BIT)/libx265.a libx265_main12.a
 
 $(PKG_DIR)/libx265_main10.a:
 	mkdir --parents $(PKG_BUILD_10BIT)
 	cd $(PKG_BUILD_10BIT) && cmake $(CMAKE_ARGS) $(CMAKE_BITLIB_ARGS) ../source
-	cd $(PKG_BUILD_10BIT) && $(MAKE) -j$(NCPUS) $(COMPILE_OPTIONS)
+	cd $(PKG_BUILD_10BIT) && $(MAKE) $(COMPILE_MAKE_OPTIONS)
 	@$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
 
 # Aggregate them all together in default 8 bit depth build

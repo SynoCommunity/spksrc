@@ -17,7 +17,7 @@ include ../../mk/spksrc.native-cc.mk
 
 .PHONY: native_zip_compile
 native_zip_compile:
-	$(RUN) $(MAKE) -j$(NCPUS) -f unix/Makefile generic
+	$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS) -f unix/Makefile generic
 
 .PHONY: native_zip_install
 native_zip_install:

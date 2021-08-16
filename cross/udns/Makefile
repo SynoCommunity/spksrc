@@ -5,10 +5,10 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.corpit.ru/mjt/udns
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = https://www.corpit.ru/mjt/udns.html
-COMMENT  = UDNS is a stub DNS resolver library with ability to perform both syncronous and asyncronous DNS queries. 
+COMMENT  = UDNS is a stub DNS resolver library with ability to perform both syncronous and asyncronous DNS queries.
 LICENSE  = LGPL
 
 PRE_CONFIGURE_TARGET = udns_pre_configure
@@ -23,7 +23,7 @@ udns_pre_configure:
 
 .PHONY: udns_compile
 udns_compile:
-	$(RUN) $(MAKE) -j$(NCPUS) shared
+	$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS) shared
 
 .PHONY: udns_install
 udns_install:

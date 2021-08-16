@@ -11,8 +11,9 @@ HOMEPAGE = https://busybox.net
 COMMENT  = Fairly comprehensive set of programs needed to run a Linux system
 LICENSE  = GPL
 
+COMPILE_MAKE_OPTIONS += CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) busybox
+
 CONFIGURE_TARGET = busybox_configure
-COMPILE_TARGET = busybox_compile
 INSTALL_TARGET = busybox_install
 
 include ../../mk/spksrc.cross-cc.mk
@@ -24,10 +25,6 @@ busybox_configure:
 	  sed -i -r -e "s/^(# )?$$option.*$$/$$option=$$value/" $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig ; \
 	done
 	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) spksrc_defconfig
-
-.PHONY: busybox_compile
-busybox_compile:
-	$(RUN) CROSS_COMPILE=$(TC_PATH)$(TC_PREFIX) $(MAKE) -j$(NCPUS) busybox
 
 .PHONY: busybox_install
 busybox_install:

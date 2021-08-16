@@ -75,7 +75,7 @@ python3_pre_configure:
 
 .PHONY: python3_custom_compile
 python3_custom_compile:
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) -j$(NCPUS)
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 .PHONY: python3_custom_install
 python3_custom_install:
