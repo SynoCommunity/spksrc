@@ -14,18 +14,13 @@ LICENSE = GPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS =
+COMPILE_MAKE_OPTIONS = -f Makefile.linux -C polarssl-1.3.2/library
 
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = ps3netsrv_install
-
 PRE_COMPILE_TARGET = ps3netsrv_pre_compile
-COMPILE_MAKE_OPTIONS = -f Makefile.linux
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PNONY: ps3netsrv_pre_compile
-ps3netsrv_pre_compile:
-		@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS) -C polarssl-1.3.2/library
 
 .PHONY: ps3netsrv_install
 ps3netsrv_install:

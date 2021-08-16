@@ -13,17 +13,13 @@ COMMENT  = Elixir is a dynamic, functional language designed for building scalab
 LICENSE = Apache 2.0
 
 ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
+ENV += PATH=$$PATH:$(ERLANG_BIN_DIR)
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = elixir_compile
 INSTALL_TARGET = elixir_install
 
 include ../../mk/spksrc.native-cc.mk
 
-.PHONY: elixir_compile
-elixir_compile:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) $(MAKE_COMPILE_OPTIONS)
-
 .PHONY: elixir_install
 elixir_install:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) install
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) install

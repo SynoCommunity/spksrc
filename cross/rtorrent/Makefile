@@ -20,11 +20,12 @@ COMMENT  = rTorrent is a BitTorrent client for ncurses, using the libtorrent lib
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --with-xmlrpc-c=$(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
+
 PRE_CONFIGURE_TARGET = rtorrent_pre_configure
 PRE_PATCH_TARGET = rtorrent_pre_patch
 COMPILE_TARGET = rtorrent_compile
 
-CONFIGURE_ARGS = --with-xmlrpc-c=$(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -15,18 +15,12 @@ LICENSE  = GNU Lesser GPL
 # for version 4.0.2-p1
 
 GNU_CONFIGURE = 1
-
 CONFIGURE_ARGS = --with-gmp=$(STAGING_INSTALL_PREFIX)
+COMPILE_MAKE_OPTIONS = SUBDIRS=src
 
-COMPILE_TARGET = mpfr_compile
 INSTALL_TARGET = mpfr_install
 
 include ../../mk/spksrc.cross-cc.mk
-
-# Do not build test nor doc
-.PHONY: mpfr_compile
-mpfr_compile:
-	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS) SUBDIRS=src
 
 .PHONY: mpfr_install
 mpfr_install:
