@@ -28,7 +28,7 @@ PRE_COMPILE_TARGET  = $(PKG_NAME)_pre_compile_target
 POST_INSTALL_TARGET = $(PKG_NAME)_post_install_target
 
 CONFIGURE_ARGS = --openjdk-target=$(TC_TARGET) \
-	--with-boot-jdk=./java-se-7u75-ri \
+	--with-boot-jdk=./jdk-11 \
 	--with-version-build=7 \
 	--with-version-pre= \
 	--with-version-opt=LTS \
@@ -57,8 +57,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: $(PKG_NAME)_configure
 $(PKG_NAME)_configure:
-	$(RUN) wget https://download.java.net/openjdk/jdk7u75/ri/openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz
-	$(RUN) tar xf openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz
+	$(RUN) wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
+	$(RUN) tar xf openjdk-11+28_linux-x64_bin.tar.gz
 	$(RUN) bash ./configure $(REAL_CONFIGURE_ARGS)
 
 .PHONY: $(PKG_NAME)_pre_compile_target
