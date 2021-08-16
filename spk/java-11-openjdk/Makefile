@@ -3,7 +3,7 @@ SPK_VERS = 11.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME) cross/cups
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = The OpenJDK 11 runtime environment. Version 11.0.12+7

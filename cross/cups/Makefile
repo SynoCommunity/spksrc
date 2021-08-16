@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-source.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/apple/$(PKG_NAME)/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/gnutls
+DEPENDS = cross/openssl
 
 HOMEPAGE = https://www.cups.org/
 COMMENT  = CUPS printing system
@@ -22,7 +22,7 @@ CONFIGURE_ARGS = --with-cupsd-file-perm=0755 \
         --with-xinetd=no \
         --with-access-log-level=actions \
         --enable-page-logging \
-        --enable-sync-on-close
+	'LDFLAGS=-Wl,-rpath,$(STAGING_INSTALL_PREFIX)/lib'
 
 PATCHES_LEVEL = 1
 
