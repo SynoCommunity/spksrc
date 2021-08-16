@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-source.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/apple/$(PKG_NAME)/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl cross/gnutls
 
 HOMEPAGE = https://www.cups.org/
 COMMENT  = CUPS printing system
