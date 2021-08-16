@@ -55,7 +55,7 @@
             },
             {
                 "type": "textfield",
-                "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable",
+                "desc": "Watch a directory for torrent files and add them to transmission. Leave empty to disable. Please create the folder with the correct permissions manually",
                 "subitems": [
                     {
                         "key": "wizard_watch_dir",
@@ -72,7 +72,7 @@
             },
             {
                 "type": "textfield",
-                "desc": "Directory to keep files in until torrent is complete. Leave empty to disable",
+                "desc": "Directory to keep files in until torrent is complete. Leave empty to disable. Please create the folder with the correct permissions manually",
                 "subitems": [
                     {
                         "key": "wizard_incomplete_dir",

@@ -4,7 +4,7 @@
         "desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     },
     {
-        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within Transmission, manually set Read/Write permissions on the reported folders using File Station."
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within Transmission, manually set Read/Write permissions on the reported folders using File Station. If you are upgrading to DSM7 and you set a watched or incomplete folder please ensure to update the permission for those folders manually."
     },
     {
         "type": "combobox",

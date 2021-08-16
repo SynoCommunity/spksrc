@@ -9,7 +9,7 @@ GROUP="sc-download"
 
 SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
 
-service_preinst ()
+validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # If chosen, they need to exist
