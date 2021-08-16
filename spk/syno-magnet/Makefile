@@ -47,21 +47,6 @@ include ../../mk/spksrc.extract.mk
 
 .PHONY: syno_magnet_copy
 
-# Override because we need type: legacy
-$(WORK_DIR)/config:
-	$(create_target_dir)
-	@echo '{ ".url": { ' > $@
-	@echo "  \"com.synocommunity.packages.SynoMagnet\": {" >> $@
-	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
-	@/bin/echo -n "    \"desc\": \"" >> $@
-	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
-	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
-	@echo "    \"type\": \"$(SERVICE_TYPE)\"," >> $@
-	@echo "    \"url\": \"${SERVICE_URL}\"," >> $@
-	@echo "    \"allUsers\": ${SERVICE_PORT_ALL_USERS}" >> $@
-	@echo '} } }' >> $@
-	cat $@ | python -m json.tool > /dev/null
-
 syno_magnet_copy: extract $(WORK_DIR)/config
 	install -m 755 -d $(STAGING_DIR)/$(DSM_UI_DIR)
 	install -m 644 $(WORK_DIR)/config $(STAGING_DIR)/$(DSM_UI_DIR)/config

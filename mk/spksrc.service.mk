@@ -360,6 +360,9 @@ endif
 ifeq ($(strip $(SERVICE_PORT_ALL_USERS)),)
 SERVICE_PORT_ALL_USERS=true
 endif
+ifeq ($(strip $(SERVICE_TYPE)),)
+SERVICE_TYPE=url
+endif
 
 DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
@@ -371,8 +374,9 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 		--arg prot "${SERVICE_PORT_PROTOCOL}" \
 		--arg port "${SERVICE_PORT}" \
 		--arg url "${SERVICE_URL}" \
+		--arg type "${SERVICE_TYPE}" \
 		--arg allUsers "${SERVICE_PORT_ALL_USERS}" \
-		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":"url", "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":"all"}}}' > $@
+		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":"all"}}}' > $@
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif
