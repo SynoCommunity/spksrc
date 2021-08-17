@@ -336,7 +336,9 @@ endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Look for DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(WIZARDS_DIR)$(TCVERSION) -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
+		find $(WIZARDS_DIR)$(TCVERSION) -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
+	fi
 endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
