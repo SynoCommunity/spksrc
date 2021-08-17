@@ -28,6 +28,9 @@ ADDITIONAL_LDFLAGS = -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/l
 
 PATCHES_LEVEL = 1
 
+# disable parallel build. ppdc sub package will fail building in parallel on some platforms
+PARALLEL_MAKE = 0
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: cups_pre_configure
