@@ -27,29 +27,29 @@ PRE_COMPILE_TARGET  = $(PKG_NAME)_pre_compile_target
 # copy the staged files to final installation so spksrc.plist.mk can run as normal
 POST_INSTALL_TARGET = $(PKG_NAME)_post_install_target
 
-CONFIGURE_ARGS = --openjdk-target=$(TC_TARGET) \
-	--with-boot-jdk=./jdk-11 \
-	--with-version-build=7 \
-	--with-version-pre= \
-	--with-version-opt=LTS \
-	--with-debug-level=release \
-	--with-native-debug-symbols=internal \
-	--enable-unlimited-crypto \
-	--with-zlib=bundled \
-	--with-libjpeg=bundled \
-	--with-giflib=bundled \
-	--with-libpng=bundled \
-	--with-lcms=bundled \
-	--with-stdc++lib=dynamic \
-	--disable-javac-server \
-	--with-jvm-features=shenandoahgc,-zgc \
-	--disable-warnings-as-errors \
-	--with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX) \
-	--with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX) \
-	--with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX) \
-	--prefix=$(INSTALL_PREFIX) \
-	--exec-prefix=$(INSTALL_PREFIX) \
-	ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
+CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
+CONFIGURE_ARGS += --with-boot-jdk=./jdk-11
+CONFIGURE_ARGS += --with-version-build=7
+CONFIGURE_ARGS += --with-version-pre=
+CONFIGURE_ARGS += --with-version-opt=LTS
+CONFIGURE_ARGS += --with-debug-level=release
+CONFIGURE_ARGS += --with-native-debug-symbols=internal
+CONFIGURE_ARGS += --enable-unlimited-crypto
+CONFIGURE_ARGS += --with-zlib=bundled
+CONFIGURE_ARGS += --with-libjpeg=bundled
+CONFIGURE_ARGS += --with-giflib=bundled
+CONFIGURE_ARGS += --with-libpng=bundled
+CONFIGURE_ARGS += --with-lcms=bundled
+CONFIGURE_ARGS += --with-stdc++lib=dynamic
+CONFIGURE_ARGS += --disable-javac-server
+CONFIGURE_ARGS += --with-jvm-features=shenandoahgc,-zgc
+CONFIGURE_ARGS += --disable-warnings-as-errors
+CONFIGURE_ARGS += --with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --exec-prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS += ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
 
 PATCHES_LEVEL = 1
 

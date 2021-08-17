@@ -11,18 +11,18 @@ HOMEPAGE = https://www.x.org
 COMMENT  = Development files for libX11
 LICENSE  = GPLv2/GPLv3
 
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-malloc0returnsnull \
-	--disable-silent-rules \
-	--without-xmlto \
-	--without-fop \
-	--disable-static
-PRE_CONFIGURE_TARGET = libX11_pre_configure
+CONFIGURE_ARGS  = --enable-malloc0returnsnull
+CONFIGURE_ARGS += --disable-silent-rules
+CONFIGURE_ARGS += --without-xmlto
+CONFIGURE_ARGS += --without-fop
+CONFIGURE_ARGS += --disable-static
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: libX11_pre_configure
-libX11_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	$(RUN) autoreconf -i -f -v -I $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/aclocal
 

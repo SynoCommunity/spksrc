@@ -11,15 +11,14 @@ HOMEPAGE = https://www.x.org
 COMMENT  = A C binding to the X11 protocol
 LICENSE  = GPLv2/GPLv3
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--disable-static \
-	--enable-xinput \
-	--enable-xkb \
-	--enable-sendfds \
-	--without-doxygen
-
 PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --disable-static
+CONFIGURE_ARGS += --enable-xinput
+CONFIGURE_ARGS += --enable-xkb
+CONFIGURE_ARGS += --enable-sendfds
+CONFIGURE_ARGS += --without-doxygen
 
 include ../../mk/spksrc.cross-cc.mk
 

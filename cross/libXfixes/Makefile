@@ -11,17 +11,16 @@ HOMEPAGE = https://www.x.org
 COMMENT  = X Fixes library
 LICENSE  = GPLv2/GPLv3
 
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--without-xmlto \
-	--without-fop \
-	--disable-static
-
-PRE_CONFIGURE_TARGET = libXfixes_pre_configure
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --without-xmlto
+CONFIGURE_ARGS += --without-fop
+CONFIGURE_ARGS += --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: libXfixes_pre_configure
-libXfixes_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	$(RUN) autoreconf -i -f -v -I $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/aclocal
 

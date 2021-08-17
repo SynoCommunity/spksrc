@@ -11,14 +11,15 @@ HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 ICE runtime library
 LICENSE  = GPLv2/GPLv3
 
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--without-fop \
-	--without-xmlto
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --without-fop
+CONFIGURE_ARGS += --without-xmlto
 PRE_CONFIGURE_TARGET = libICE_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: libICE_pre_configure
-libICE_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	$(RUN) autoreconf -i -f -v -I $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/aclocal

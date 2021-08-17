@@ -11,10 +11,10 @@ HOMEPAGE = https://www.x.org
 COMMENT  = Sample Authorization Protocol for X
 LICENSE  = GPLv2/GPLv3
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--disable-static
 PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 

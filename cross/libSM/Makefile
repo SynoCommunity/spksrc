@@ -11,18 +11,17 @@ HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 SM runtime library
 LICENSE  = GPLv2/GPLv3
 
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--with-libuuid \
-	--disable-static \
-	--without-xmlto \
-	--without-fop
-
-PRE_CONFIGURE_TARGET = libICE_pre_configure
+CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --with-libuuid
+CONFIGURE_ARGS += --disable-static
+CONFIGURE_ARGS += --without-xmlto
+CONFIGURE_ARGS += --without-fop
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: libSM_pre_configure
-libSM_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	$(RUN) autoreconf -i -f -v -I $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/aclocal
 

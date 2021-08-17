@@ -11,13 +11,12 @@ HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 Protocol headers
 LICENSE  = GPLv2/GPLv3
 
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
 PKG_CONFIG_PATH = install/usr/local/xorgproto/share/pkgconfig
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--without-xmlto \
-	--disable-specs
-
-PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib \
+CONFIGURE_ARGS += --without-xmlto \
+CONFIGURE_ARGS += --disable-specs
 
 include ../../mk/spksrc.cross-cc.mk
 

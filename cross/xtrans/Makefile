@@ -12,8 +12,8 @@ COMMENT  = X.Org X11 developmental X transport library
 LICENSE  = GPLv2/GPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--disable-docs
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --disable-docs
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk

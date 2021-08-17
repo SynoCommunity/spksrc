@@ -11,18 +11,18 @@ HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 libXi runtime library
 LICENSE  = GPLv2/GPLv3
 
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --datarootdir=$$INSTALL_PREFIX/lib \
-	--enable-malloc0returnsnull \
-	--disable-specs \
-	--without-xmlto \
-	--without-fop \
-	--disable-static
-PRE_CONFIGURE_TARGET = libXi_pre_configure
+CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS += --enable-malloc0returnsnull
+CONFIGURE_ARGS += --disable-specs
+CONFIGURE_ARGS += --without-xmlto
+CONFIGURE_ARGS += --without-fop
+CONFIGURE_ARGS += --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: libXi_pre_configure
-libXi_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	$(RUN) autoreconf -i -f -v -I $(INSTALL_DIR)$(INSTALL_PREFIX)/lib/aclocal
 
