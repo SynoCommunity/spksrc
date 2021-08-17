@@ -32,6 +32,7 @@ authcaptureproxy==1.0.2
 authlib==0.15.4
 axis==44
 backoff==1.11.1
+beautifulsoup4==4.9.3
 bidict==0.21.2
 bimmer-connected==0.7.18
 bitstring==3.1.9
