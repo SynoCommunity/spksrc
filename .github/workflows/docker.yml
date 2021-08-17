@@ -39,5 +39,5 @@ jobs:
         with:
           push: true
           tags: |
-            publicarray/spksrc:latest
-            ghcr.io/publicarray/spksrc:latest
+            SynoCommunity/spksrc:latest
+            ghcr.io/SynoCommunity/spksrc:latest
