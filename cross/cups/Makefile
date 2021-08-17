@@ -5,8 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-source.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/apple/$(PKG_NAME)/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/gnutls
-
 HOMEPAGE = https://www.cups.org/
 COMMENT  = CUPS printing system
 LICENSE  = GPLv2
@@ -17,19 +15,16 @@ CONFIGURE_ARGS  = --with-cupsd-file-perm=0755
 CONFIGURE_ARGS += --with-log-file-perm=0600
 CONFIGURE_ARGS += --enable-relro
 CONFIGURE_ARGS += --enable-threads
-CONFIGURE_ARGS += --enable-gnutls
 CONFIGURE_ARGS += --enable-webif
 CONFIGURE_ARGS += --with-xinetd=no
 CONFIGURE_ARGS += --with-access-log-level=actions
 CONFIGURE_ARGS += --enable-page-logging
+CONFIGURE_ARGS += --with-components=libcups
 # Disable multilib
 CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
 ADDITIONAL_LDFLAGS = -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib
 
 PATCHES_LEVEL = 1
-
-# disable parallel build. ppdc sub package will fail building in parallel on some platforms
-.NOTPARALLEL:
 
 include ../../mk/spksrc.cross-cc.mk
 
