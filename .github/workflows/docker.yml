@@ -1,7 +1,15 @@
 name: Docker
 
-on: workflow_dispatch
-
+on:
+    # Trigger build manually
+    # https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow#configuring-a-workflow-to-run-manually
+    workflow_dispatch:
+    # Trigger build on a schedule
+    schedule:
+        # every fist day of the month
+        - cron: '0 0 1 * *'
+        # every 14 days
+        # - cron: '0 0 */14 * *'
 jobs:
   docker:
     runs-on: ubuntu-latest
