@@ -375,8 +375,8 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 		--arg port "${SERVICE_PORT}" \
 		--arg url "${SERVICE_URL}" \
 		--arg type "${SERVICE_TYPE}" \
-		--arg allUsers "${SERVICE_PORT_ALL_USERS}" \
-		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":"all"}}}' > $@
+		--argjson allUsers ${SERVICE_PORT_ALL_USERS} \
+		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":true}}}' > $@
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif
