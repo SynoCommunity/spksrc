@@ -1,16 +1,16 @@
 ### Rules to create the spk package
 #   Most of the rules are imported from spksrc.*.mk files
-# 
+#
 # Variables used in this file:
 #  NAME:              The internal name of the package.
 #                     Note that all synocoummunity packages use lowercase names.
-#                     This enables to have concurrent packages with synology.com, that use 
-#                     package names starting with upper case letters. 
+#                     This enables to have concurrent packages with synology.com, that use
+#                     package names starting with upper case letters.
 #                     (e.g. Mono => synology.com, mono => synocommunity.com)
 #  SPK_FILE_NAME:     The full spk name with folder, package name, arch, tc- and package version.
 #  SPK_CONTENT:       List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
-#  
+#
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -331,7 +331,12 @@ endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Create DSM Wizards"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(WIZARDS_DIR) -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+endif
+ifneq ($(strip $(WIZARDS_DIR)),)
+	@$(MSG) "Look for DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"
+	@mkdir -p $(DSM_WIZARDS_DIR)
+	@find $(WIZARDS_DIR)$(TCVERSION) -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
@@ -350,7 +355,7 @@ conf:
 ifneq ($(strip $(CONF_DIR)),)
 	@$(MSG) "Preparing conf"
 	@mkdir -p $(DSM_CONF_DIR)
-	@find $${SPKSRC_CONF_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
+	@find $(CONF_DIR) -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
