@@ -19,9 +19,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
         name: Build and push
-        id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: publicarray/spksrc:latest
+          tags: |
+            publicarray/spksrc:latest
+            ghcr.io/publicarray/spksrc:latest
