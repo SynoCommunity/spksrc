@@ -23,6 +23,8 @@ CONFIGURE_ARGS += --with-components=libcups
 # Disable multilib
 CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
 ADDITIONAL_LDFLAGS = -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib
+# 88f6281 might need this
+ADDITIONAL_LDFLAGS += -lrt
 
 PATCHES_LEVEL = 1
 
