@@ -94,8 +94,10 @@ service_postupgrade ()
     # Needed to force correct permissions, during update
     # Extract the right paths from config file
     if [ -r "${CFG_FILE}" ]; then
-        # update folder
-        sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}\",|g" ${CFG_FILE}
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+            # update folder
+            sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}\",|g" ${CFG_FILE}
+        fi
 
         DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
         INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
