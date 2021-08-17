@@ -30,7 +30,11 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Attempt to create the folders after the user/group/shared folder has been created by the package (DSM7+)
+        # Let the package manage the "watch" and "incomplete" folders for DSM7
+        # https://github.com/SynoCommunity/spksrc/issues/4766#issuecomment-899875151
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+            wizard_watch_dir="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+            wizard_incomplete_dir="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
             mkdir -p "${wizard_watch_dir}"
             mkdir -p "${wizard_incomplete_dir}"
         fi
