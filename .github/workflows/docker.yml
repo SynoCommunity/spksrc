@@ -49,4 +49,4 @@ jobs:
         #   tags: |
         #     SynoCommunity/spksrc:latest
         #     ghcr.io/SynoCommunity/spksrc:latest
-          tags: ghcr.io/publicarray/spksrc:latest
+          tags: ghcr.io/SynoCommunity/spksrc:latest
