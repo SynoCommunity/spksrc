@@ -35,10 +35,10 @@ rsc:include/cups/raster.h
 rsc:include/cups/sidechannel.h
 rsc:include/cups/transcode.h
 rsc:include/cups/versioning.h
-lnk:lib64/libcupsimage.so
-lib:lib64/libcupsimage.so.2
-lnk:lib64/libcups.so
-lib:lib64/libcups.so.2
+lnk:lib/libcupsimage.so
+lib:lib/libcupsimage.so.2
+lnk:lib/libcups.so
+lib:lib/libcups.so.2
 lib:lib/cups/backend/http
 lib:lib/cups/backend/ipp
 lib:lib/cups/backend/lpd

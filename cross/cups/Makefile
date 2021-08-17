@@ -13,16 +13,18 @@ LICENSE  = GPLv2
 
 PRE_CONFIGURE_TARGET = cups_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-cupsd-file-perm=0755 \
-	--with-log-file-perm=0600 \
-	--enable-relro \
-        --enable-threads \
-        --enable-gnutls \
-        --enable-webif \
-        --with-xinetd=no \
-        --with-access-log-level=actions \
-        --enable-page-logging \
-	LDFLAGS="$(LDFLAGS) -Wl,-rpath,$(STAGING_INSTALL_PREFIX)/lib -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib"
+CONFIGURE_ARGS  = --with-cupsd-file-perm=0755
+CONFIGURE_ARGS += --with-log-file-perm=0600
+CONFIGURE_ARGS += --enable-relro
+CONFIGURE_ARGS += --enable-threads
+CONFIGURE_ARGS += --enable-gnutls
+CONFIGURE_ARGS += --enable-webif
+CONFIGURE_ARGS += --with-xinetd=no
+CONFIGURE_ARGS += --with-access-log-level=actions
+CONFIGURE_ARGS += --enable-page-logging
+# Disable multilib
+CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
+ADDITIONAL_LDFLAGS = -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib
 
 PATCHES_LEVEL = 1
 
