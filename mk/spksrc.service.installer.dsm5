@@ -348,10 +348,10 @@ postinst ()
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
     fi
-    
+
     # On DSM 5 set package files permissions for consistency with DSM 6
     set_unix_permissions "${SYNOPKG_PKGDEST}" 2>&1 | install_log
-    
+
     exit 0
 }
 
@@ -393,6 +393,9 @@ postuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}" 2>&1 | install_log
     fi
+
+    call_func "validate_postinst"
+
     exit 0
 }
 
