@@ -38,13 +38,16 @@ endif
 copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
 	@rm -fr $(STAGING_DIR)
-	@mkdir $(STAGING_DIR)
+	@mkdir -p $(STAGING_DIR) $(STAGING_SPKVAR)
 
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
+	# Copy target to staging
 	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
+	# Copy non-target to STAGING_SPK*
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && find . -mindepth 1 -maxdepth 1 | tar cpf - --files-from=/dev/stdin) | tar xpf - -C $(STAGING_SPKVAR)
 
 post_copy_target: $(COPY_TARGET)
 

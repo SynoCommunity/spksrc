@@ -29,7 +29,6 @@ endif
 ifndef INSTALL_DIR
 INSTALL_DIR = $(WORK_DIR)/install
 endif
-STAGING_DIR = $(WORK_DIR)/staging
 
 ifndef INSTALL_PREFIX
 ifneq ($(strip $(SPK_NAME)),)
@@ -51,6 +50,22 @@ ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
 STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif
 
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+INSTALL_PREFIX_ETC  = $(INSTALL_PREFIX)/../var
+else
+INSTALL_PREFIX_ETC  = $(INSTALL_PREFIX)/var
+endif
+
+ifeq ($(strip $(STAGING_DIR)),)
+STAGING_DIR = $(WORK_DIR)/staging
+endif
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+STAGING_SPKVAR  = $(STAGING_DIR)/_var
+else
+STAGING_SPKVAR  = $(STAGING_DIR)/var
+endif
+
 # python wheelhouse directories
 ifndef WHEELHOUSE
 WHEELHOUSE = $(WORK_DIR)/wheelhouse
@@ -58,9 +73,7 @@ endif
 
 ifndef STAGING_INSTALL_WHEELHOUSE
 STAGING_INSTALL_WHEELHOUSE = $(STAGING_INSTALL_PREFIX)/share/wheelhouse
-endif
 
 define create_target_dir
 @mkdir -p `dirname $@`
 endef
-
