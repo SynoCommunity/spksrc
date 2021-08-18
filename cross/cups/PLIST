@@ -1,4 +1,6 @@
 bin:bin/cups-config
+bin:bin/ippeveprinter
+bin:bin/ipptool
 rsc:include/cups/adminutil.h
 rsc:include/cups/array.h
 rsc:include/cups/backend.h
@@ -14,7 +16,11 @@ rsc:include/cups/raster.h
 rsc:include/cups/sidechannel.h
 rsc:include/cups/transcode.h
 rsc:include/cups/versioning.h
-lib:lib/libcups.so
+lib:lib/cups/command/ippevepcl
+lib:lib/cups/command/ippeveps
+lnk:lib/libcupsimage.so
+lib:lib/libcupsimage.so.2
+lnk:lib/libcups.so
 lib:lib/libcups.so.2
 rsc:share/locale/ca/cups_ca.po
 rsc:share/locale/cs/cups_cs.po

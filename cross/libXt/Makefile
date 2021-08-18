@@ -19,8 +19,6 @@ CONFIGURE_ARGS += --without-xmlto
 CONFIGURE_ARGS += --without-fop
 CONFIGURE_ARGS += --disable-static
 PATCHES_LEVEL = 1
-# ensure gnu/hard-float.h is used
-TC_EXTRA_CFLAGS = -D__ARM_PCS_VFP=1
 
 include ../../mk/spksrc.cross-cc.mk
 

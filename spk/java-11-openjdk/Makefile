@@ -7,7 +7,6 @@ DEPENDS = cross/$(SPK_NAME) cross/cups
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = The OpenJDK 11 runtime environment. Version 11.0.12+7
-RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = java-11-openjdk
 CHANGELOG = "Initial version for Synology NAS's"

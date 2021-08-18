@@ -19,7 +19,7 @@ CONFIGURE_ARGS += --enable-webif
 CONFIGURE_ARGS += --with-xinetd=no
 CONFIGURE_ARGS += --with-access-log-level=actions
 CONFIGURE_ARGS += --enable-page-logging
-CONFIGURE_ARGS += --with-components=libcups
+CONFIGURE_ARGS += --with-components=core
 # Disable multilib
 CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
 ADDITIONAL_LDFLAGS = -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib
