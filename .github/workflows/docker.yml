@@ -49,6 +49,6 @@ jobs:
         with:
           push: true
         #   tags: |
-        #     SynoCommunity/spksrc:latest
-        #     ghcr.io/SynoCommunity/spksrc:latest
-          tags: ghcr.io/SynoCommunity/spksrc:latest
+        #     synocommunity/spksrc:latest
+        #     ghcr.io/synocommunity/spksrc:latest
+          tags: ghcr.io/synocommunity/spksrc:latest
