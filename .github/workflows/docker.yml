@@ -6,7 +6,6 @@ on:
         paths:
             - 'Dockerfile'
         branches:
-            - main
             - master
     pull_request:
         paths:
