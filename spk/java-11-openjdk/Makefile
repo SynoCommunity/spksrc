@@ -14,6 +14,8 @@ CHANGELOG = "Initial version for Synology NAS's"
 HOMEPAGE = http://openjdk.java.net/
 LICENSE_FILE = src/LICENSE
 
+# hi3535 is armv7l, 88f6281 is armv5 and qoriq is ppc(32 bit)
+UNSUPPORTED_ARCHS = hi3535 88f6281 qoriq
 
 SPK_COMMANDS  = bin/alt-java
 SPK_COMMANDS += bin/jaotc
