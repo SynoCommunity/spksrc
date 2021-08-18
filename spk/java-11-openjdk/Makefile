@@ -14,6 +14,7 @@ CHANGELOG = "Initial version for Synology NAS's"
 HOMEPAGE = http://openjdk.java.net/
 LICENSE_FILE = src/LICENSE
 
+
 SPK_COMMANDS  = bin/alt-java
 SPK_COMMANDS += bin/jaotc
 SPK_COMMANDS += bin/jar
