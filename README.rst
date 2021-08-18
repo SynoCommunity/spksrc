@@ -17,7 +17,7 @@ In SynoCommunity some packages are available for DSM 7 but some are not.
 
 * **ATTENTION**: As reported, package configuration settings may be lost following the upgrade to DSM 7 and the execution of a Package repair. Make sure to backup your settings and configuration for your SynoCommunity packages before installation of DSM 7 to facilitate restoration if needed.
 
-* Packages of the follwing kind will need some time to make DSM 7 compatible:
+* Packages of the following kind will need some time to make DSM 7 compatible:
 
   * Packages depending MySQL database must be migrated to MariaDB 10
   
@@ -49,7 +49,7 @@ Docker
 
 #. `Fork and clone`_ spksrc: ``git clone https://github.com/YOUR-USERNAME/spksrc``
 #. Install Docker on your host OS (see `Docker installation`_, or use a ``wget``-based alternative for linux `Install Docker with wget`_).
-#. Download the spksrc Docker container: ``docker pull synocommunity/spksrc``
+#. Download the spksrc Docker container: ``docker pull ghcr.io/synocommunity/spksrc``
 #. Run the container with the repository mounted into the ``/spksrc`` directory with the appropriate command for your host Operating System:
 
 .. code-block:: sh
@@ -57,10 +57,10 @@ Docker
    cd spksrc # Go to the cloned repository's root folder.
 
    # If running on Linux:
-   docker run -it -v $(pwd):/spksrc synocommunity/spksrc /bin/bash
+   docker run -it -v $(pwd):/spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
    # If running on macOS:
-   docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" synocommunity/spksrc /bin/bash
+   docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 
 5. From there, follow the instructions in the `Developers HOW TO`_.
 

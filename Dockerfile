@@ -1,5 +1,8 @@
 FROM debian:buster
-MAINTAINER SynoCommunity <https://synocommunity.com>
+LABEL description="Framework for maintaining and compiling native community packages for Synology devices"
+LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/contributors>"
+LABEL url="https://synocommunity.com"
+LABEL vcs-url="https://github.com/SynoCommunity/spksrc"
 
 ENV LANG C.UTF-8
 
