@@ -57,10 +57,10 @@ jobs:
 
       - name: Build Package (file changes)
         if: startsWith(github.ref, 'refs/tags/') == false
-        # We don't want to stop the build on errors. 
+        # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
         continue-on-error: true
-        uses: docker://synocommunity/spksrc:latest
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build.sh
         env:
@@ -73,10 +73,10 @@ jobs:
 
       - name: Build Package (Tag)
         if: startsWith(github.ref, 'refs/tags/')
-        # We don't want to stop the build on errors. 
+        # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
         continue-on-error: true
-        uses: docker://synocommunity/spksrc:latest
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build-tag.sh
         env:
@@ -91,7 +91,7 @@ jobs:
         id: build_status
         # We need this status since we don't want to stop the build on errors.
         # Here we fail on build errors found in the build error file.
-        uses: docker://synocommunity/spksrc:latest
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build_status.sh
         env:
