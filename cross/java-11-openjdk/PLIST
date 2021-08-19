@@ -1,4 +1,5 @@
 lnk:bin/alt-java
+lnk:bin/jaotc
 lnk:bin/jar
 lnk:bin/jarsigner
 lnk:bin/java
@@ -32,6 +33,7 @@ lnk:bin/rmiregistry
 lnk:bin/serialver
 lnk:bin/unpack200
 bin:jvm/openjdk-11.0.12/bin/alt-java
+bin:jvm/openjdk-11.0.12/bin/jaotc
 bin:jvm/openjdk-11.0.12/bin/jar
 bin:jvm/openjdk-11.0.12/bin/jarsigner
 bin:jvm/openjdk-11.0.12/bin/java
@@ -109,6 +111,7 @@ rsc:jvm/openjdk-11.0.12/jmods/java.transaction.xa.jmod
 rsc:jvm/openjdk-11.0.12/jmods/java.xml.crypto.jmod
 rsc:jvm/openjdk-11.0.12/jmods/java.xml.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.accessibility.jmod
+rsc:jvm/openjdk-11.0.12/jmods/jdk.aot.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.attach.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.charsets.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.compiler.jmod
@@ -122,6 +125,9 @@ rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.ed.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.jvmstat.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.le.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.opt.jmod
+rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.vm.ci.jmod
+rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.vm.compiler.jmod
+rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.vm.compiler.management.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.jartool.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.javadoc.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.jcmd.jmod
@@ -244,6 +250,9 @@ rsc:jvm/openjdk-11.0.12/legal/java.xml/xerces.md
 lnk:jvm/openjdk-11.0.12/legal/jdk.accessibility/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.accessibility/ASSEMBLY_EXCEPTION
 lnk:jvm/openjdk-11.0.12/legal/jdk.accessibility/LICENSE
+lnk:jvm/openjdk-11.0.12/legal/jdk.aot/ADDITIONAL_LICENSE_INFO
+lnk:jvm/openjdk-11.0.12/legal/jdk.aot/ASSEMBLY_EXCEPTION
+lnk:jvm/openjdk-11.0.12/legal/jdk.aot/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.attach/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.attach/ASSEMBLY_EXCEPTION
 lnk:jvm/openjdk-11.0.12/legal/jdk.attach/LICENSE
@@ -289,12 +298,22 @@ lnk:jvm/openjdk-11.0.12/legal/jdk.internal.opt/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.internal.opt/ASSEMBLY_EXCEPTION
 rsc:jvm/openjdk-11.0.12/legal/jdk.internal.opt/jopt-simple.md
 lnk:jvm/openjdk-11.0.12/legal/jdk.internal.opt/LICENSE
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.ci/ADDITIONAL_LICENSE_INFO
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.ci/ASSEMBLY_EXCEPTION
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.ci/LICENSE
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.compiler/ADDITIONAL_LICENSE_INFO
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.compiler/ASSEMBLY_EXCEPTION
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.compiler/LICENSE
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.compiler.management/ADDITIONAL_LICENSE_INFO
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.compiler.management/ASSEMBLY_EXCEPTION
+lnk:jvm/openjdk-11.0.12/legal/jdk.internal.vm.compiler.management/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.jartool/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.jartool/ASSEMBLY_EXCEPTION
 lnk:jvm/openjdk-11.0.12/legal/jdk.jartool/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.javadoc/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.javadoc/ASSEMBLY_EXCEPTION
 rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jquery.md
+rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jquery-migrate.md
 rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jqueryUI.md
 rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jszip.md
 lnk:jvm/openjdk-11.0.12/legal/jdk.javadoc/LICENSE

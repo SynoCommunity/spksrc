@@ -10,6 +10,9 @@ PKG_DIR = jdk11u-jdk-$(PKG_VERS).$(JAVA_MINOR)-$(JAVA_RELEASE)
 
 DEPENDS = cross/cups cross/fontconfig cross/expat
 BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip
+ifeq ($(findstring $(ARCH),hi3535 qotiq 88f6281),$(ARCH))
+BUILD_DEPENDS += cross/libffi
+endif
 
 HOMEPAGE = http://openjdk.java.net/
 COMMENT  = The OpenJDK 11 runtime environment
@@ -49,9 +52,20 @@ CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --exec-prefix=$(INSTALL_PREFIX)
+ifeq ($(findstring $(ARCH),hi3535 qoriq 88f6281),$(ARCH))
+CONFIGURE_ARGS += --with-jvm-variants=zero
+endif
 CONFIGURE_ARGS += ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
 
 PATCHES_LEVEL = 1
+
+COMPILE_MAKE_OPTIONS += bootcycle-images
+
+PLIST_TRANSFORM = cat
+ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
+	PLIST_TRANSFORM = sed -e '/.*aot.*/d'
+	#PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -59,6 +73,9 @@ include ../../mk/spksrc.cross-cc.mk
 $(PKG_NAME)_configure:
 	$(RUN) wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
 	$(RUN) tar xf openjdk-11+28_linux-x64_bin.tar.gz
+ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
+	$(RUN) sed -i -e "s|-Wno-format-zero-length||g" make/autoconf/flags-cflags.m4
+endif
 	$(RUN) bash ./configure $(REAL_CONFIGURE_ARGS)
 
 .PHONY: $(PKG_NAME)_pre_compile_target
