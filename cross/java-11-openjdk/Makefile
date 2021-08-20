@@ -79,8 +79,7 @@ ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
 		-e '.*libsaproc.*/d' \
 		-e '.*jdk.hotspot.agent.*/d' \
 		-e '.*jdk.internal.vm.*/d' \
-		-e '.*jquery-migrate.md.*/d' \
-		-e '$ a lib:jvm\/openjdk-$(PKG_VERS).$(JAVA_MINOR)\/lib\/libharfbuzz.so'
+		-e '.*jquery-migrate.md.*/d'
 endif
 
 # AOT and HotSpot are not available on  ARMv7L_ARCHS
