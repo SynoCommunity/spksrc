@@ -72,7 +72,7 @@ ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH)),$(ARCH))
 endif
 
 # AOT and HotSpot are not available on ARMv5_ARCHS
-ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
 		-e '/.*jhsdb.*/d' \
 		-e '/.*classlist.*/d' \
