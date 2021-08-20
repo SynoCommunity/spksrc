@@ -1,4 +1,4 @@
-bin:bin/cups-config
+rsc:bin/cups-config
 bin:bin/ippeveprinter
 bin:bin/ipptool
 rsc:include/cups/adminutil.h

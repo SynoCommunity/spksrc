@@ -10,7 +10,9 @@ PKG_DIR = jdk11u-jdk-$(PKG_VERS).$(JAVA_MINOR)-$(JAVA_RELEASE)
 
 DEPENDS = cross/cups cross/fontconfig cross/expat
 BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip
-ifeq ($(findstring $(ARCH),hi3535 qotiq 88f6281),$(ARCH))
+
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
 BUILD_DEPENDS += cross/libffi
 endif
 
@@ -52,7 +54,7 @@ CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --exec-prefix=$(INSTALL_PREFIX)
-ifeq ($(findstring $(ARCH),hi3535 qoriq 88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-jvm-variants=zero
 endif
 CONFIGURE_ARGS += ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
@@ -62,9 +64,31 @@ PATCHES_LEVEL = 1
 COMPILE_MAKE_OPTIONS += bootcycle-images
 
 PLIST_TRANSFORM = cat
-ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
-	PLIST_TRANSFORM = sed -e '/.*aot.*/d'
-	#PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
+# AOT is not available on i686_ARCHS and GENERIC_ARMv7_ARCH
+ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH)),$(ARCH))
+	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
+		-e '.*jdk.internal.vm.*/d' \
+		-e '.*jquery-migrate.md.*/d'
+endif
+
+# AOT and HotSpot are not available on ARMv5_ARCHS
+ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
+	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
+		-e '/.*jhsdb.*/d' \
+		-e '/.*classlist.*/d' \
+		-e '.*libsaproc.*/d' \
+		-e '.*jdk.hotspot.agent.*/d' \
+		-e '.*jdk.internal.vm.*/d' \
+		-e '.*jquery-migrate.md.*/d' \
+		-e '$ a lib:jvm\/openjdk-$(PKG_VERS).$(JAVA_MINOR)\/lib\/libharfbuzz.so'
+endif
+
+# AOT and HotSpot are not available on  ARMv7L_ARCHS
+ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
+		-e '.*jdk.hotspot.agent.*/d' \
+		-e '.*jdk.internal.vm.*/d' \
+		-e '.*jquery-migrate.md.*/d'
 endif
 
 include ../../mk/spksrc.cross-cc.mk
