@@ -1,12 +1,13 @@
 PKG_NAME = java-11-openjdk
-PKG_VERS = 11.0
-JAVA_MINOR = 12
+JAVA_REPO_NAME = jdk11u
+JAVA_NAME = jdk
 JAVA_RELEASE = 7
-JAVA_VERS = $(PKG_VERS).$(JAVA_MINOR)+$(JAVA_RELEASE)
+JAVA_VERSION = 11.0.12
+PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
-PKG_DIST_NAME = jdk-$(JAVA_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/openjdk/jdk11u/archive/refs/tags
-PKG_DIR = jdk11u-jdk-$(PKG_VERS).$(JAVA_MINOR)-$(JAVA_RELEASE)
+PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/openjdk/$(JAVA_REPO_NAME)/archive/refs/tags
+PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
 DEPENDS = cross/cups cross/fontconfig cross/expat
 BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip
@@ -17,7 +18,7 @@ BUILD_DEPENDS += cross/libffi
 endif
 
 HOMEPAGE = http://openjdk.java.net/
-COMMENT  = The OpenJDK 11 runtime environment
+COMMENT  = The OpenJDK 11 runtime environment. Version $(PKG_VERS)
 LICENSE  = ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 
 # Disable the normal host build target triplets since openjdk use its own openjdk-target

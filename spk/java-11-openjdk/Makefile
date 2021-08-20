@@ -1,11 +1,11 @@
 SPK_NAME = java-11-openjdk
-SPK_VERS = 11.0
+JAVA_REPO_NAME = jdk11u
+JAVA_NAME = jdk
+JAVA_RELEASE = 7
+JAVA_VERSION = 11.0.12
+SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
-
-JAVA_MINOR = 12
-JAVA_RELEASE = 7
-JAVA_VERS = $(SPK_VERS).$(JAVA_MINOR)+$(JAVA_RELEASE)
 
 DEPENDS  = cross/$(SPK_NAME) cross/cups
 
@@ -15,7 +15,7 @@ BUILD_DEPENDS += cross/libffi
 endif
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = The OpenJDK 11 runtime environment. Version $(JAVA_VERS)
+DESCRIPTION = The OpenJDK 11 runtime environment. Version $(JAVA_VERSION)+$(JAVA_RELEASE)
 STARTABLE = no
 DISPLAY_NAME = java-11-openjdk
 CHANGELOG = "Initial version for Synology NAS's"
@@ -24,7 +24,10 @@ HOMEPAGE = http://openjdk.java.net/
 LICENSE_FILE = src/LICENSE
 
 SPK_COMMANDS  = bin/alt-java
+include ../../mk/spksrc.archs.mk
+ifneq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH) $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 SPK_COMMANDS += bin/jaotc
+endif
 SPK_COMMANDS += bin/jar
 SPK_COMMANDS += bin/jarsigner
 SPK_COMMANDS += bin/java
@@ -65,4 +68,4 @@ include ../../mk/spksrc.spk.mk
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:
 	cd $(STAGING_DIR)/bin ; \
-	ln -sf ../jvm/openjdk-$(SPK_VERS).$(JAVA_MINOR)/bin/* .
+	ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
