@@ -13,8 +13,11 @@ LICENSE  = GPLv2/GPLv3
 
 PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --datarootdir=$$INSTALL_PREFIX/lib
+CONFIGURE_ARGS  = --datarootdir=$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --disable-static
+
+ADDITIONAL_CFLAGS = -Os
+
 
 include ../../mk/spksrc.cross-cc.mk
 

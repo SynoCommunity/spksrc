@@ -20,11 +20,15 @@ CONFIGURE_ARGS += --with-xinetd=no
 CONFIGURE_ARGS += --with-access-log-level=actions
 CONFIGURE_ARGS += --enable-page-logging
 CONFIGURE_ARGS += --with-components=core
-# Disable multilib
 CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
-ADDITIONAL_LDFLAGS = -Wl,-rpath,$(INSTALL_DIR)/var/packages/$(PKG_NAME)/target/lib
-# 88f6281 might need this
+
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_LDFLAGS += -lrt
+endif
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_CFLAGS = -DIP_FREEBIND=15
+endif
 
 PATCHES_LEVEL = 1
 

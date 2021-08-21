@@ -20,6 +20,8 @@ CONFIGURE_ARGS += --without-fop
 CONFIGURE_ARGS += --disable-static
 PATCHES_LEVEL = 1
 
+ADDITIONAL_CFLAGS = -Os
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: $(PKG_NAME)_pre_configure
