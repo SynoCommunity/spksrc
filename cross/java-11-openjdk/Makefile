@@ -28,10 +28,10 @@ TC_CONFIGURE_ARGS =
 CONFIGURE_TARGET    = $(PKG_NAME)_configure
 
 # openjdk's make also run the install part and spksrc.plist.mk gets confused
-PRE_COMPILE_TARGET  = $(PKG_NAME)_pre_compile_target
+PRE_COMPILE_TARGET  = $(PKG_NAME)_pre_compile
 
 # copy the staged files to final installation so spksrc.plist.mk can run as normal
-POST_INSTALL_TARGET = $(PKG_NAME)_post_install_target
+POST_INSTALL_TARGET = $(PKG_NAME)_post_install
 
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=./jdk-11
@@ -64,12 +64,14 @@ PATCHES_LEVEL = 1
 
 COMPILE_MAKE_OPTIONS += bootcycle-images
 
+ADDITIONAL_CFLAGS = -Os
+
 PLIST_TRANSFORM = cat
 # AOT is not available on i686_ARCHS and GENERIC_ARMv7_ARCH
 ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH)),$(ARCH))
 	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
-		-e '.*jdk.internal.vm.*/d' \
-		-e '.*jquery-migrate.md.*/d'
+		-e '/.*jdk.internal.vm.*/d' \
+		-e '/.*jquery-migrate.md.*/d'
 endif
 
 # AOT and HotSpot are not available on ARMv5_ARCHS
@@ -77,18 +79,18 @@ ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
 		-e '/.*jhsdb.*/d' \
 		-e '/.*classlist.*/d' \
-		-e '.*libsaproc.*/d' \
-		-e '.*jdk.hotspot.agent.*/d' \
-		-e '.*jdk.internal.vm.*/d' \
-		-e '.*jquery-migrate.md.*/d'
+		-e '/.*libsaproc.*/d' \
+		-e '/.*jdk.hotspot.agent.*/d' \
+		-e '/.*jdk.internal.vm.*/d' \
+		-e '/.*jquery-migrate.md.*/d'
 endif
 
 # AOT and HotSpot are not available on  ARMv7L_ARCHS
 ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
 	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
-		-e '.*jdk.hotspot.agent.*/d' \
-		-e '.*jdk.internal.vm.*/d' \
-		-e '.*jquery-migrate.md.*/d'
+		-e '/.*jdk.hotspot.agent.*/d' \
+		-e '/.*jdk.internal.vm.*/d' \
+		-e '/.*jquery-migrate.md.*/d'
 endif
 
 include ../../mk/spksrc.cross-cc.mk
@@ -97,16 +99,16 @@ include ../../mk/spksrc.cross-cc.mk
 $(PKG_NAME)_configure:
 	$(RUN) wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
 	$(RUN) tar xf openjdk-11+28_linux-x64_bin.tar.gz
-ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 	$(RUN) sed -i -e "s|-Wno-format-zero-length||g" make/autoconf/flags-cflags.m4
 endif
 	$(RUN) bash ./configure $(REAL_CONFIGURE_ARGS)
 
-.PHONY: $(PKG_NAME)_pre_compile_target
-$(PKG_NAME)_pre_compile_target:
+.PHONY: $(PKG_NAME)_pre_compile
+$(PKG_NAME)_pre_compile:
 	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_DIR)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
 
-.PHONY: $(PKG_NAME)_post_install_target
-$(PKG_NAME)_post_install_target:
+.PHONY: $(PKG_NAME)_post_install
+$(PKG_NAME)_post_install:
 	cp -ar $(STAGING_DIR)/* $(INSTALL_DIR)/$(INSTALL_PREFIX)
 
