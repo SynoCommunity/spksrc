@@ -17,7 +17,7 @@ endif
 MAINTAINER = SynoCommunity
 DESCRIPTION = The OpenJDK 11 runtime environment. Version $(JAVA_VERSION)+$(JAVA_RELEASE)
 STARTABLE = no
-DISPLAY_NAME = java-11-openjdk
+DISPLAY_NAME = Java 11 openjdk
 CHANGELOG = "Initial version for Synology NAS's"
 
 HOMEPAGE = http://openjdk.java.net/
