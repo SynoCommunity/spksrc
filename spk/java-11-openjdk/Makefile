@@ -7,7 +7,7 @@ SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
-DEPENDS  = cross/$(SPK_NAME) cross/cups
+DEPENDS  = cross/$(SPK_NAME)
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))

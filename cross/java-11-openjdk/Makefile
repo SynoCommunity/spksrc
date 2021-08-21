@@ -9,8 +9,7 @@ PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/openjdk/$(JAVA_REPO_NAME)/archive/refs/tags
 PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
-DEPENDS = cross/cups cross/fontconfig cross/expat
-BUILD_DEPENDS = cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip
+BUILD_DEPENDS = cross/cups cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip cross/fontconfig
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
@@ -39,7 +38,7 @@ CONFIGURE_ARGS += --with-version-build=$(JAVA_RELEASE)
 CONFIGURE_ARGS += --with-version-pre=
 CONFIGURE_ARGS += --with-version-opt=LTS
 CONFIGURE_ARGS += --with-debug-level=release
-CONFIGURE_ARGS += --with-native-debug-symbols=internal
+CONFIGURE_ARGS += --with-native-debug-symbols=none
 CONFIGURE_ARGS += --enable-unlimited-crypto
 CONFIGURE_ARGS += --with-zlib=bundled
 CONFIGURE_ARGS += --with-libjpeg=bundled
@@ -54,6 +53,9 @@ CONFIGURE_ARGS += --with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS)"
+CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS)"
+CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS)"
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-jvm-variants=zero
 endif
@@ -61,6 +63,7 @@ CONFIGURE_ARGS += ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
 
 PATCHES_LEVEL = 1
 
+# Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += bootcycle-images
 
 ADDITIONAL_CFLAGS = -Os
@@ -69,19 +72,17 @@ PLIST_TRANSFORM = cat
 # AOT is not available on i686_ARCHS and GENERIC_ARMv7_ARCH
 ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH)),$(ARCH))
 	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
-		-e '/.*jdk.internal.vm.*/d' \
-		-e '/.*jquery-migrate.md.*/d'
+		-e '/.*jdk.internal.vm.*/d'
 endif
 
-# AOT and HotSpot are not available on ARMv5_ARCHS, ARMv7L_ARCHS and PPC_ARCHS
+# AOT and some HotSpot components are not available on ARMv5_ARCHS, ARMv7L_ARCHS and PPC_ARCHS
 ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
 	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
 		-e '/.*jhsdb.*/d' \
 		-e '/.*classlist.*/d' \
 		-e '/.*libsaproc.*/d' \
 		-e '/.*jdk.hotspot.agent.*/d' \
-		-e '/.*jdk.internal.vm.*/d' \
-		-e '/.*jquery-migrate.md.*/d'
+		-e '/.*jdk.internal.vm.*/d'
 endif
 
 include ../../mk/spksrc.cross-cc.mk

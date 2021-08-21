@@ -313,7 +313,6 @@ lnk:jvm/openjdk-11.0.12/legal/jdk.jartool/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.javadoc/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.javadoc/ASSEMBLY_EXCEPTION
 rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jquery.md
-rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jquery-migrate.md
 rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jqueryUI.md
 rsc:jvm/openjdk-11.0.12/legal/jdk.javadoc/jszip.md
 lnk:jvm/openjdk-11.0.12/legal/jdk.javadoc/LICENSE
