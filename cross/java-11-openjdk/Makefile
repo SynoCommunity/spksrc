@@ -9,31 +9,33 @@ PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/openjdk/$(JAVA_REPO_NAME)/archive/refs/tags
 PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
-BUILD_DEPENDS = cross/cups cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/zip cross/fontconfig
+BUILD_DEPENDS = native/openjdk-11 native/zip
+# cups, cups dependencies and X11 dependencies are required at build time only.
+BUILD_DEPENDS += cross/cups cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/fontconfig
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
 BUILD_DEPENDS += cross/libffi
 endif
 
+ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
+ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
+
 HOMEPAGE = http://openjdk.java.net/
 COMMENT  = The OpenJDK 11 runtime environment. Version $(PKG_VERS)
 LICENSE  = ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 
-# Disable the normal host build target triplets since openjdk use its own openjdk-target
-TC_CONFIGURE_ARGS =
-
 # Use our own configure since the on supplied by openjdk has no shebang
-CONFIGURE_TARGET    = $(PKG_NAME)_configure
+CONFIGURE_TARGET    = java-11-openjdk_configure
 
 # openjdk's make also run the install part and spksrc.plist.mk gets confused
-PRE_COMPILE_TARGET  = $(PKG_NAME)_pre_compile
+PRE_COMPILE_TARGET  = java-11-openjdk_pre_compile
 
 # copy the staged files to final installation so spksrc.plist.mk can run as normal
-POST_INSTALL_TARGET = $(PKG_NAME)_post_install
+POST_INSTALL_TARGET = java-11-openjdk_post_install
 
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
-CONFIGURE_ARGS += --with-boot-jdk=./jdk-11
+CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-11/work-native/jdk-11
 CONFIGURE_ARGS += --with-version-build=$(JAVA_RELEASE)
 CONFIGURE_ARGS += --with-version-pre=
 CONFIGURE_ARGS += --with-version-opt=LTS
@@ -56,51 +58,40 @@ CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS)"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS)"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS)"
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --enable-aot=no
+CONFIGURE_ARGS += --disable-manpages
+CONFIGURE_ARGS += --disable-hotspot-gtest
 CONFIGURE_ARGS += --with-jvm-variants=zero
-endif
-CONFIGURE_ARGS += ZIPEXE=$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/zip
 
 PATCHES_LEVEL = 1
 
-# Build images twice, second time with newly built JDK
-COMPILE_MAKE_OPTIONS += bootcycle-images
+# Build the JDK image
+COMPILE_MAKE_OPTIONS += images
 
 ADDITIONAL_CFLAGS = -Os
 
 PLIST_TRANSFORM = cat
-# AOT is not available on i686_ARCHS and GENERIC_ARMv7_ARCH
-ifeq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH)),$(ARCH))
-	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
-		-e '/.*jdk.internal.vm.*/d'
-endif
-
-# AOT and some HotSpot components are not available on ARMv5_ARCHS, ARMv7L_ARCHS and PPC_ARCHS
+# Some HotSpot components are not available on ARMv5_ARCHS, ARMv7L_ARCHS and PPC_ARCHS
 ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
-	PLIST_TRANSFORM = sed -e '/.*aot.*/d' \
-		-e '/.*jhsdb.*/d' \
+	PLIST_TRANSFORM = sed -e '/.*jhsdb.*/d' \
 		-e '/.*classlist.*/d' \
 		-e '/.*libsaproc.*/d' \
-		-e '/.*jdk.hotspot.agent.*/d' \
-		-e '/.*jdk.internal.vm.*/d'
+		-e '/.*jdk.hotspot.agent.*/d'
 endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: $(PKG_NAME)_configure
-$(PKG_NAME)_configure:
-	$(RUN) wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
-	$(RUN) tar xf openjdk-11+28_linux-x64_bin.tar.gz
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-	$(RUN) sed -i -e "s|-Wno-format-zero-length||g" make/autoconf/flags-cflags.m4
-endif
-	$(RUN) bash ./configure $(REAL_CONFIGURE_ARGS)
+.PHONY: java-11-openjdk_configure
+# use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS
+# to disable the normal host build target triplets since openjdk use its own openjdk-target
+java-11-openjdk_configure:
+	$(RUN) bash ./configure $(CONFIGURE_ARGS)
 
-.PHONY: $(PKG_NAME)_pre_compile
-$(PKG_NAME)_pre_compile:
+.PHONY: java-11-openjdk_pre_compile
+java-11-openjdk_pre_compile:
 	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_DIR)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
 
-.PHONY: $(PKG_NAME)_post_install
-$(PKG_NAME)_post_install:
+.PHONY: java-11-openjdk_post_install
+java-11-openjdk_post_install:
 	cp -ar $(STAGING_DIR)/* $(INSTALL_DIR)/$(INSTALL_PREFIX)
 
