@@ -9,10 +9,17 @@ PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/openjdk/$(JAVA_REPO_NAME)/archive/refs/tags
 PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
+# build instructions:
+# https://openjdk.java.net/groups/build/doc/building.html
+
 BUILD_DEPENDS = native/openjdk-11 native/zip
-# cups, cups dependencies and X11 dependencies are required at build time only.
-BUILD_DEPENDS += cross/cups cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/fontconfig
-DEPENDS += cross/libffi
+# Dependencies are required at build time only.
+BUILD_DEPENDS += cross/cups
+BUILD_DEPENDS += cross/alsa-lib
+BUILD_DEPENDS += cross/fontconfig
+BUILD_DEPENDS += cross/libX11 cross/libXext cross/libXrender cross/libXrandr cross/libXtst cross/libXt
+# We build the zero version of HotSpot
+BUILD_DEPENDS += cross/libffi
 
 ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
@@ -68,20 +75,11 @@ COMPILE_MAKE_OPTIONS += bootcycle-images
 
 ADDITIONAL_CFLAGS = -Os
 
-PLIST_TRANSFORM = cat
-# Some HotSpot components are not available on ARMv5_ARCHS, ARMv7L_ARCHS and PPC_ARCHS
-ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
-	PLIST_TRANSFORM = sed -e '/.*jhsdb.*/d' \
-		-e '/.*classlist.*/d' \
-		-e '/.*libsaproc.*/d' \
-		-e '/.*jdk.hotspot.agent.*/d'
-endif
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: java-11-openjdk_configure
-# use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS
-# to disable the normal host build target triplets since openjdk use its own openjdk-target
+# Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
+# Disables the normal host build target triplets since openjdk use its own openjdk-target
 java-11-openjdk_configure:
 	$(RUN) bash ./configure $(CONFIGURE_ARGS)
 
@@ -92,4 +90,3 @@ java-11-openjdk_pre_compile:
 .PHONY: java-11-openjdk_post_install
 java-11-openjdk_post_install:
 	cp -ar $(STAGING_DIR)/* $(INSTALL_DIR)/$(INSTALL_PREFIX)
-

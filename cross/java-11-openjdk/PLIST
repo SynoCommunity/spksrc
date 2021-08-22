@@ -11,7 +11,6 @@ lnk:bin/jdb
 lnk:bin/jdeprscan
 lnk:bin/jdeps
 lnk:bin/jfr
-lnk:bin/jhsdb
 lnk:bin/jimage
 lnk:bin/jinfo
 lnk:bin/jjs
@@ -44,7 +43,6 @@ bin:jvm/openjdk-11.0.12/bin/jdb
 bin:jvm/openjdk-11.0.12/bin/jdeprscan
 bin:jvm/openjdk-11.0.12/bin/jdeps
 bin:jvm/openjdk-11.0.12/bin/jfr
-bin:jvm/openjdk-11.0.12/bin/jhsdb
 bin:jvm/openjdk-11.0.12/bin/jimage
 bin:jvm/openjdk-11.0.12/bin/jinfo
 bin:jvm/openjdk-11.0.12/bin/jjs
@@ -116,7 +114,6 @@ rsc:jvm/openjdk-11.0.12/jmods/jdk.crypto.cryptoki.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.crypto.ec.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.dynalink.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.editpad.jmod
-rsc:jvm/openjdk-11.0.12/jmods/jdk.hotspot.agent.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.httpserver.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.ed.jmod
 rsc:jvm/openjdk-11.0.12/jmods/jdk.internal.jvmstat.jmod
@@ -269,9 +266,6 @@ lnk:jvm/openjdk-11.0.12/legal/jdk.dynalink/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.editpad/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.editpad/ASSEMBLY_EXCEPTION
 lnk:jvm/openjdk-11.0.12/legal/jdk.editpad/LICENSE
-lnk:jvm/openjdk-11.0.12/legal/jdk.hotspot.agent/ADDITIONAL_LICENSE_INFO
-lnk:jvm/openjdk-11.0.12/legal/jdk.hotspot.agent/ASSEMBLY_EXCEPTION
-lnk:jvm/openjdk-11.0.12/legal/jdk.hotspot.agent/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.httpserver/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.httpserver/ASSEMBLY_EXCEPTION
 lnk:jvm/openjdk-11.0.12/legal/jdk.httpserver/LICENSE
@@ -387,7 +381,6 @@ lnk:jvm/openjdk-11.0.12/legal/jdk.xml.dom/LICENSE
 lnk:jvm/openjdk-11.0.12/legal/jdk.zipfs/ADDITIONAL_LICENSE_INFO
 lnk:jvm/openjdk-11.0.12/legal/jdk.zipfs/ASSEMBLY_EXCEPTION
 lnk:jvm/openjdk-11.0.12/legal/jdk.zipfs/LICENSE
-rsc:jvm/openjdk-11.0.12/lib/classlist
 rsc:jvm/openjdk-11.0.12/lib/ct.sym
 bin:jvm/openjdk-11.0.12/lib/jexec
 rsc:jvm/openjdk-11.0.12/lib/jfr/default.jfc
@@ -402,6 +395,7 @@ lib:jvm/openjdk-11.0.12/lib/libawt.so
 lib:jvm/openjdk-11.0.12/lib/libawt_xawt.so
 lib:jvm/openjdk-11.0.12/lib/libdt_socket.so
 lib:jvm/openjdk-11.0.12/lib/libextnet.so
+lib:jvm/openjdk-11.0.12/lib/libffi.so.7
 lib:jvm/openjdk-11.0.12/lib/libfontmanager.so
 lib:jvm/openjdk-11.0.12/lib/libharfbuzz.so
 lib:jvm/openjdk-11.0.12/lib/libinstrument.so
@@ -425,7 +419,6 @@ lib:jvm/openjdk-11.0.12/lib/libnet.so
 lib:jvm/openjdk-11.0.12/lib/libnio.so
 lib:jvm/openjdk-11.0.12/lib/libprefs.so
 lib:jvm/openjdk-11.0.12/lib/librmi.so
-lib:jvm/openjdk-11.0.12/lib/libsaproc.so
 lib:jvm/openjdk-11.0.12/lib/libsctp.so
 lib:jvm/openjdk-11.0.12/lib/libsplashscreen.so
 lib:jvm/openjdk-11.0.12/lib/libsunec.so
