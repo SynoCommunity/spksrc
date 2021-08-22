@@ -20,11 +20,11 @@ BUILD_DEPENDS += cross/fontconfig
 BUILD_DEPENDS += cross/libX11 cross/libXext cross/libXrender cross/libXrandr cross/libXtst cross/libXt
 # libffi is required by the Zero version of Hotspot.
 BUILD_DEPENDS += cross/libffi
-BUILD_DEPENDS += cross/zlib
-BUILD_DEPENDS += cross/libpng
-BUILD_DEPENDS += cross/libjpeg
-BUILD_DEPENDS += cross/giflib
-BUILD_DEPENDS += cross/lcms2
+DEPENDS += cross/zlib
+DEPENDS += cross/libpng
+DEPENDS += cross/libjpeg
+DEPENDS += cross/giflib
+DEPENDS += cross/lcms2
 
 ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
