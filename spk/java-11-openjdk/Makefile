@@ -10,7 +10,7 @@ SPK_ICON = src/$(SPK_NAME).png
 DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = The OpenJDK 11 runtime environment. Version $(JAVA_VERSION)+$(JAVA_RELEASE)
+DESCRIPTION = OpenJDK 11 version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 11 is the open-source reference implementation of version 11 of the Java SE Platform as specified by by JSR 384 in the Java Community Process.
 STARTABLE = no
 DISPLAY_NAME = Java 11 OpenJDK
 CHANGELOG = "Initial version for Synology NAS's"

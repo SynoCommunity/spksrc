@@ -18,20 +18,20 @@ BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
 BUILD_DEPENDS += cross/fontconfig
 BUILD_DEPENDS += cross/libX11 cross/libXext cross/libXrender cross/libXrandr cross/libXtst cross/libXt
-# We build the zero version of HotSpot
+# libffi is required by the Zero version of Hotspot.
 BUILD_DEPENDS += cross/libffi
 
 ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
 
 HOMEPAGE = http://openjdk.java.net/
-COMMENT  = The OpenJDK 11 runtime environment. Version $(PKG_VERS)
+COMMENT  = OpenJDK 11 is the open-source reference implementation of version 11 of the Java SE Platform as specified by by JSR 384 in the Java Community Process.
 LICENSE  = ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 
-# Use our own configure since the on supplied by openjdk has no shebang
+# Use our own configure since the one supplied by openjdk has no shebang
 CONFIGURE_TARGET    = java-11-openjdk_configure
 
-# openjdk's make also run the install part and spksrc.plist.mk gets confused
+# Force openjdk to install into the package install folder
 PRE_COMPILE_TARGET  = java-11-openjdk_pre_compile
 
 # Fix symlinks
@@ -86,6 +86,7 @@ java-11-openjdk_configure:
 	$(RUN) bash ./configure $(CONFIGURE_ARGS)
 
 .PHONY: java-11-openjdk_pre_compile
+# As DESTDIR is not supported we must patch the make file for make install.
 java-11-openjdk_pre_compile:
 	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
 
