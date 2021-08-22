@@ -34,9 +34,6 @@ CONFIGURE_TARGET    = java-11-openjdk_configure
 # openjdk's make also run the install part and spksrc.plist.mk gets confused
 PRE_COMPILE_TARGET  = java-11-openjdk_pre_compile
 
-# copy the staged files to final installation so spksrc.plist.mk can run as normal
-POST_INSTALL_TARGET = java-11-openjdk_post_install
-
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-11/work-native/jdk-11
 CONFIGURE_ARGS += --with-version-build=$(JAVA_RELEASE)
@@ -85,8 +82,4 @@ java-11-openjdk_configure:
 
 .PHONY: java-11-openjdk_pre_compile
 java-11-openjdk_pre_compile:
-	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_DIR)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
-
-.PHONY: java-11-openjdk_post_install
-java-11-openjdk_post_install:
-	cp -ar $(STAGING_DIR)/* $(INSTALL_DIR)/$(INSTALL_PREFIX)
+	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
