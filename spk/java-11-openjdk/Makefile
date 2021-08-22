@@ -50,12 +50,4 @@ SPK_COMMANDS += bin/rmiregistry
 SPK_COMMANDS += bin/serialver
 SPK_COMMANDS += bin/unpack200
 
-# Replace wrong symlinks
-POST_STRIP_TARGET = java-11-openjdk_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: java-11-openjdk_extra_install
-java-11-openjdk_extra_install:
-	cd $(STAGING_DIR)/bin ; \
-	ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .

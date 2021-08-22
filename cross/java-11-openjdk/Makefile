@@ -34,6 +34,9 @@ CONFIGURE_TARGET    = java-11-openjdk_configure
 # openjdk's make also run the install part and spksrc.plist.mk gets confused
 PRE_COMPILE_TARGET  = java-11-openjdk_pre_compile
 
+# Fix symlinks
+POST_INSTALL_TARGET = java-11-openjdk_post_compile
+
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-11/work-native/jdk-11
 CONFIGURE_ARGS += --with-version-build=$(JAVA_RELEASE)
@@ -64,6 +67,8 @@ CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-aot=no
 CONFIGURE_ARGS += --disable-manpages
 CONFIGURE_ARGS += --disable-hotspot-gtest
+# Disable all GUI related
+CONFIGURE_ARGS += --enable-headless-only
 
 PATCHES_LEVEL = 1
 
@@ -83,3 +88,8 @@ java-11-openjdk_configure:
 .PHONY: java-11-openjdk_pre_compile
 java-11-openjdk_pre_compile:
 	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
+
+.PHONY: java-11-openjdk_post_compile
+java-11-openjdk_post_compile:
+	cd $(STAGING_INSTALL_PREFIX)/bin ; \
+	ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
