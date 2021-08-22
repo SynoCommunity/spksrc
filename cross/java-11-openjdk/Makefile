@@ -73,7 +73,7 @@ CONFIGURE_ARGS += --enable-headless-only
 PATCHES_LEVEL = 1
 
 # Build images twice, second time with newly built JDK
-COMPILE_MAKE_OPTIONS += bootcycle-images
+COMPILE_MAKE_OPTIONS += product-images
 
 ADDITIONAL_CFLAGS = -Os
 

@@ -7,7 +7,7 @@ SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/$(SPK_NAME) cross/zlib cross/libpng
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = OpenJDK 11 version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 11 is the open-source reference implementation of version 11 of the Java SE Platform as specified by by JSR 384 in the Java Community Process.
