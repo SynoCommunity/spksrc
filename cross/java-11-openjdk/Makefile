@@ -63,8 +63,8 @@ CONFIGURE_ARGS += --with-jvm-variants=zero
 
 PATCHES_LEVEL = 1
 
-# Build the JDK image
-COMPILE_MAKE_OPTIONS += images
+# Build images twice, second time with newly built JDK
+COMPILE_MAKE_OPTIONS += bootcycle-images
 
 ADDITIONAL_CFLAGS = -Os
 
