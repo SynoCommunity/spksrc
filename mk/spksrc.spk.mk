@@ -431,15 +431,6 @@ PUBLISH = publish-
 .NOTPARALLEL:
 endif
 
-# make arch-<arch> | make arch-<arch>-X.Y
-ifeq ($(firstword $(subst -, ,$(MAKECMDGOALS))),arch)
-ifneq ($(word 2,$(subst -, ,$(MAKECMDGOALS))),$(lastword $(subst -, ,$(MAKECMDGOALS))))
-BUILD_ARCH_VERSION=$(lastword $(subst -, ,$(MAKECMDGOALS)))
-else
-BUILD_ARCH_VERSION=$(strip $(subst $(word 2,$(subst -, ,$(MAKECMDGOALS)))-, , $(sort $(filter $(addprefix %, $(DEFAULT_TC)), $(filter $(word 2,$(subst -, ,$(MAKECMDGOALS)))%, $(AVAILABLE_TOOLCHAINS))))))
-endif
-endif
-
 KERNEL_REQUIRED = $(MAKE) kernel-required
 ifeq ($(strip $(KERNEL_REQUIRED)),)
 ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
@@ -513,12 +504,13 @@ publish-legacy-toolchain-%:
 ####
 
 arch-%:
+	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
+	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
+	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+
+build-arch-%:
 	@$(MSG) Building package for arch $*
-	@for version in $(BUILD_ARCH_VERSION) ; \
-	do \
-	  $(MSG) MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$$version \| tee build-$(firstword $(subst -, ,$*))-$$version.log ; \
-	  MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$$version | tee build-$(firstword $(subst -, ,$*))-$$version.log ; \
-	done \
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) | tee build-$*.log
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
