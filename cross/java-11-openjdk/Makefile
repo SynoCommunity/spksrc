@@ -52,6 +52,7 @@ CONFIGURE_ARGS += --with-libpng=bundled
 CONFIGURE_ARGS += --with-lcms=bundled
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
+CONFIGURE_ARGS += --with-jvm-variants=zero
 CONFIGURE_ARGS += --with-jvm-features=shenandoahgc,-zgc
 CONFIGURE_ARGS += --disable-warnings-as-errors
 CONFIGURE_ARGS += --with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX)
@@ -66,12 +67,11 @@ CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-aot=no
 CONFIGURE_ARGS += --disable-manpages
 CONFIGURE_ARGS += --disable-hotspot-gtest
-CONFIGURE_ARGS += --with-jvm-variants=zero
 
 PATCHES_LEVEL = 1
 
-# Build images twice, second time with newly built JDK
-COMPILE_MAKE_OPTIONS += bootcycle-images
+# Build the JDK image
+COMPILE_MAKE_OPTIONS += product-images
 
 ADDITIONAL_CFLAGS = -Os
 

@@ -9,25 +9,15 @@ SPK_ICON = src/$(SPK_NAME).png
 
 DEPENDS  = cross/$(SPK_NAME)
 
-include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
-BUILD_DEPENDS += cross/libffi
-endif
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = The OpenJDK 11 runtime environment. Version $(JAVA_VERSION)+$(JAVA_RELEASE)
 STARTABLE = no
-DISPLAY_NAME = Java 11 openjdk
+DISPLAY_NAME = Java 11 OpenJDK
 CHANGELOG = "Initial version for Synology NAS's"
 
 HOMEPAGE = http://openjdk.java.net/
 LICENSE_FILE = src/LICENSE
 
-SPK_COMMANDS  = bin/alt-java
-include ../../mk/spksrc.archs.mk
-ifneq ($(findstring $(ARCH), $(i686_ARCHS) $(GENERIC_ARMv7_ARCH) $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-SPK_COMMANDS += bin/jaotc
-endif
 SPK_COMMANDS += bin/jar
 SPK_COMMANDS += bin/jarsigner
 SPK_COMMANDS += bin/java
@@ -40,7 +30,6 @@ SPK_COMMANDS += bin/jdb
 SPK_COMMANDS += bin/jdeprscan
 SPK_COMMANDS += bin/jdeps
 SPK_COMMANDS += bin/jfr
-SPK_COMMANDS += bin/jhsdb
 SPK_COMMANDS += bin/jimage
 SPK_COMMANDS += bin/jinfo
 SPK_COMMANDS += bin/jjs
@@ -59,13 +48,14 @@ SPK_COMMANDS += bin/rmic
 SPK_COMMANDS += bin/rmid
 SPK_COMMANDS += bin/rmiregistry
 SPK_COMMANDS += bin/serialver
+SPK_COMMANDS += bin/unpack200
 
 # Replace wrong symlinks
-POST_STRIP_TARGET = $(SPK_NAME)_extra_install
+POST_STRIP_TARGET = java-11-openjdk_extra_install
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: $(SPK_NAME)_extra_install
-$(SPK_NAME)_extra_install:
+.PHONY: java-11-openjdk_extra_install
+java-11-openjdk_extra_install:
 	cd $(STAGING_DIR)/bin ; \
 	ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
