@@ -392,7 +392,6 @@ rsc:jvm/openjdk-11.0.12/lib/jvm.cfg
 lib:jvm/openjdk-11.0.12/lib/libattach.so
 lib:jvm/openjdk-11.0.12/lib/libawt_headless.so
 lib:jvm/openjdk-11.0.12/lib/libawt.so
-lib:jvm/openjdk-11.0.12/lib/libawt_xawt.so
 lib:jvm/openjdk-11.0.12/lib/libdt_socket.so
 lib:jvm/openjdk-11.0.12/lib/libextnet.so
 lib:jvm/openjdk-11.0.12/lib/libffi.so.7
@@ -405,7 +404,6 @@ lib:jvm/openjdk-11.0.12/lib/libj2pkcs11.so
 lib:jvm/openjdk-11.0.12/lib/libjaas.so
 lib:jvm/openjdk-11.0.12/lib/libjavajpeg.so
 lib:jvm/openjdk-11.0.12/lib/libjava.so
-lib:jvm/openjdk-11.0.12/lib/libjawt.so
 lib:jvm/openjdk-11.0.12/lib/libjdwp.so
 lib:jvm/openjdk-11.0.12/lib/libjimage.so
 lib:jvm/openjdk-11.0.12/lib/libjsig.so
@@ -420,7 +418,6 @@ lib:jvm/openjdk-11.0.12/lib/libnio.so
 lib:jvm/openjdk-11.0.12/lib/libprefs.so
 lib:jvm/openjdk-11.0.12/lib/librmi.so
 lib:jvm/openjdk-11.0.12/lib/libsctp.so
-lib:jvm/openjdk-11.0.12/lib/libsplashscreen.so
 lib:jvm/openjdk-11.0.12/lib/libsunec.so
 lib:jvm/openjdk-11.0.12/lib/libunpack.so
 lib:jvm/openjdk-11.0.12/lib/libverify.so
