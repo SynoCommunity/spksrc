@@ -20,6 +20,11 @@ BUILD_DEPENDS += cross/fontconfig
 BUILD_DEPENDS += cross/libX11 cross/libXext cross/libXrender cross/libXrandr cross/libXtst cross/libXt
 # libffi is required by the Zero version of Hotspot.
 BUILD_DEPENDS += cross/libffi
+BUILD_DEPENDS += cross/zlib
+BUILD_DEPENDS += cross/libpng
+BUILD_DEPENDS += cross/libjpeg
+BUILD_DEPENDS += cross/giflib
+BUILD_DEPENDS += cross/lcms2
 
 ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
@@ -45,11 +50,11 @@ CONFIGURE_ARGS += --with-version-opt=LTS
 CONFIGURE_ARGS += --with-debug-level=release
 CONFIGURE_ARGS += --with-native-debug-symbols=none
 CONFIGURE_ARGS += --enable-unlimited-crypto
-CONFIGURE_ARGS += --with-zlib=bundled
-CONFIGURE_ARGS += --with-libjpeg=bundled
-CONFIGURE_ARGS += --with-giflib=bundled
-CONFIGURE_ARGS += --with-libpng=bundled
-CONFIGURE_ARGS += --with-lcms=bundled
+CONFIGURE_ARGS += --with-zlib=system
+CONFIGURE_ARGS += --with-libjpeg=system
+CONFIGURE_ARGS += --with-giflib=system
+CONFIGURE_ARGS += --with-libpng=system
+CONFIGURE_ARGS += --with-lcms=system
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
 CONFIGURE_ARGS += --with-jvm-variants=zero
