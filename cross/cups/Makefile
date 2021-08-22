@@ -38,6 +38,3 @@ include ../../mk/spksrc.cross-cc.mk
 cups_pre_configure:
 	$(RUN) aclocal -I config-scripts
 	$(RUN) autoconf -f -I config-scripts
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-	$(RUN) sed -i '/-Wno-unused-result/d' configure
-endif

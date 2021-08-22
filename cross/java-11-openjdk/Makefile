@@ -12,11 +12,7 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 BUILD_DEPENDS = native/openjdk-11 native/zip
 # cups, cups dependencies and X11 dependencies are required at build time only.
 BUILD_DEPENDS += cross/cups cross/libX11 cross/libXrender cross/libXtst cross/libXt cross/libXrandr cross/alsa-lib cross/fontconfig
-
-include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
-BUILD_DEPENDS += cross/libffi
-endif
+DEPENDS += cross/libffi
 
 ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
@@ -58,6 +54,8 @@ CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS)"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS)"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS)"
+CONFIGURE_ARGS += --enable-libffi-bundling
+CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-aot=no
 CONFIGURE_ARGS += --disable-manpages
 CONFIGURE_ARGS += --disable-hotspot-gtest
