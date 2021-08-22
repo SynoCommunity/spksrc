@@ -431,6 +431,15 @@ PUBLISH = publish-
 .NOTPARALLEL:
 endif
 
+# make arch-<arch> | make arch-<arch>-X.Y
+ifeq ($(firstword $(subst -, ,$(MAKECMDGOALS))),arch)
+ifneq ($(word 2,$(subst -, ,$(MAKECMDGOALS))),$(lastword $(subst -, ,$(MAKECMDGOALS))))
+BUILD_ARCH_VERSION=$(lastword $(subst -, ,$(MAKECMDGOALS)))
+else
+BUILD_ARCH_VERSION=$(strip $(subst $(word 2,$(subst -, ,$(MAKECMDGOALS)))-, , $(sort $(filter $(addprefix %, $(DEFAULT_TC)), $(filter $(word 2,$(subst -, ,$(MAKECMDGOALS)))%, $(AVAILABLE_TOOLCHAINS))))))
+endif
+endif
+
 KERNEL_REQUIRED = $(MAKE) kernel-required
 ifeq ($(strip $(KERNEL_REQUIRED)),)
 ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
@@ -505,7 +514,11 @@ publish-legacy-toolchain-%:
 
 arch-%:
 	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+	@for version in $(BUILD_ARCH_VERSION) ; \
+	do \
+	  $(MSG) MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$$version \| tee build-$(firstword $(subst -, ,$*))-$$version.log ; \
+	  MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$$version | tee build-$(firstword $(subst -, ,$*))-$$version.log ; \
+	done \
 
 publish-arch-%:
 	@$(MSG) Building and publishing package for arch $*
