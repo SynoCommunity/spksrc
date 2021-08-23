@@ -141,5 +141,5 @@ kernel_module_build:
 
 .PHONY: install_headers_destdir_target
 install_headers_destdir_target:
-	$(RUN) $(MAKE) headers_install INSTALL_HDR_PATH=$(INSTALL_DIR)$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) headers_install INSTALL_HDR_PATH=$(STAGING_INSTALL_PREFIX)
 
