@@ -37,6 +37,7 @@ ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
 
-#ifneq ($(COMPILE_MAKE_OPTIONS),)
-#ENV += MAKEFLAGS="$(COMPILE_MAKE_OPTIONS)"
-#endif
+# Set parallel options in caller
+ifeq ($(PARALLEL_MAKE),max)
+MAKEFLAGS += -j$(shell nproc)
+endif

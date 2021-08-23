@@ -6,6 +6,8 @@
 #  compile_target       (override with COMPILE_TARGET)
 #  post_compile_target  (override with POST_COMPILE_TARGET)
 
+.PARALLEL:
+
 COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)compile_done
 
 ifeq ($(strip $(PRE_COMPILE_TARGET)),)
@@ -46,4 +48,3 @@ $(COMPILE_COOKIE): $(POST_COMPILE_TARGET)
 else
 compile: ;
 endif
-

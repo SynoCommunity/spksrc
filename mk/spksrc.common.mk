@@ -57,19 +57,6 @@ SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
 #         all archs except generic archs
 LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))
 
-
-# Relocate to set conditionally according to existing parallel options in caller
-ifneq ($(PARALLEL_MAKE),)
-ifeq ($(PARALLEL_MAKE),max)
-NCPUS = $(shell grep -c ^processor /proc/cpuinfo)
-else
-NCPUS = $(PARALLEL_MAKE)
-endif
-ifeq ($(filter $(NCPUS),0 1),)
-COMPILE_MAKE_OPTIONS += -j$(NCPUS)
-endif
-endif
-
 # Terminal colors
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`

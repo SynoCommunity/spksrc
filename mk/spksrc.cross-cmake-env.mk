@@ -13,6 +13,13 @@ CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
+# Check if single target to allow parallel build
+ifeq ($(PARALLEL_MAKE),)
+ifeq ($(call version_le, ${MAKECMDGOALS}, 1),1)
+PARALLEL_MAKE=max
+endif
+endif
+
 # Use native cmake
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake

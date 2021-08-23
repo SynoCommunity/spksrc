@@ -1,3 +1,8 @@
+# Default make programs
+#
+
+.NOTPARALLEL:
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
@@ -19,6 +24,12 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 
+# Check if single target to allow parallel build
+ifeq ($(PARALLEL_MAKE),)
+ifeq ($(call version_le, ${MAKECMDGOALS}, 1),1)
+PARALLEL_MAKE=max
+endif
+endif
 
 #####
 
@@ -78,7 +89,11 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 ####
 
 arch-%:
+	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
+	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+
+build-arch-%:
 	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) | tee build-$*.log
 
 ####

@@ -436,6 +436,13 @@ ifeq ($(strip $(KERNEL_REQUIRED)),)
 ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
 endif
 
+# Check if single target to allow parallel build
+ifeq ($(PARALLEL_MAKE),)
+ifeq ($(call version_le, ${MAKECMDGOALS}, 1),1)
+PARALLEL_MAKE=max
+endif
+endif
+
 ####
 
 .PHONY: publish-all-$(ACTION) all-$(ACTION) pre-build-native
