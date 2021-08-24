@@ -159,11 +159,7 @@ rsc:jvm/openjdk-11.0.12/legal/java.base/LICENSE
 rsc:jvm/openjdk-11.0.12/legal/java.base/public_suffix.md
 rsc:jvm/openjdk-11.0.12/legal/java.base/unicode.md
 rsc:jvm/openjdk-11.0.12/legal/java.desktop/colorimaging.md
-rsc:jvm/openjdk-11.0.12/legal/java.desktop/giflib.md
 rsc:jvm/openjdk-11.0.12/legal/java.desktop/harfbuzz.md
-rsc:jvm/openjdk-11.0.12/legal/java.desktop/jpeg.md
-rsc:jvm/openjdk-11.0.12/legal/java.desktop/lcms.md
-rsc:jvm/openjdk-11.0.12/legal/java.desktop/libpng.md
 rsc:jvm/openjdk-11.0.12/legal/java.desktop/mesa3d.md
 rsc:jvm/openjdk-11.0.12/legal/java.desktop/xwd.md
 rsc:jvm/openjdk-11.0.12/legal/java.smartcardio/pcsclite.md
