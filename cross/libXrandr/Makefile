@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.x.org/archive/individual/lib
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/xorg-x11-util-macros cross/libX11 cross/libXext cross/libXrender cross/x11proto
+DEPENDS = cross/xorg-x11-util-macros cross/libX11 cross/libXext cross/libXrender cross/xorgproto
 
 HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 libXrandr runtime library

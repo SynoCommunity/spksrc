@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.x.org/archive/individual/lib
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/xorg-x11-util-macros cross/x11proto cross/xtrans cross/libICE cross/libuuid
+DEPENDS = cross/xorg-x11-util-macros cross/xorgproto cross/xtrans cross/libICE cross/libuuid
 
 HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 SM runtime library

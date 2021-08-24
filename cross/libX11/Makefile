@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://xorg.freedesktop.org/archive/individual/lib
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/x11proto cross/xcb-proto cross/xcb cross/xtrans cross/xorg-sgml-doctools cross/libICE cross/libSM
+DEPENDS = cross/xorgproto cross/xcb-proto cross/libxcb cross/xtrans cross/xorg-sgml-doctools cross/libICE cross/libSM
 
 HOMEPAGE = https://www.x.org
 COMMENT  = Development files for libX11

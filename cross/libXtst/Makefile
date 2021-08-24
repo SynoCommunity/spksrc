@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.x.org/archive/individual/lib
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/xorg-x11-util-macros cross/x11proto cross/libX11 cross/libXext cross/libXi
+DEPENDS = cross/xorg-x11-util-macros cross/xorgproto cross/libX11 cross/libXext cross/libXi
 
 HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 libXtst runtime library

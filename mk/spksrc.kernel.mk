@@ -38,11 +38,7 @@ endif
 # in order to generate a work*/linux.plist.auto
 # later used by spksr.plist.mk to generate the
 # diff based on .ko kernel objects
-ifeq ($(strip $(REQUIRE_KERNEL_HEADERS)),)
 INSTALL_TARGET       = nop
-else
-INSTALL_TARGET       = install_headers_destdir_target
-endif
 
 #####
 
@@ -138,8 +134,3 @@ kernel_module_build:
 	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/linux/modules.order
 	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
 	install -m 644 $(WORK_DIR)/linux/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
-
-.PHONY: install_headers_destdir_target
-install_headers_destdir_target:
-	$(RUN) $(MAKE) headers_install INSTALL_HDR_PATH=$(INSTALL_DIR)$(INSTALL_PREFIX)
-
