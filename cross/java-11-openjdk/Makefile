@@ -64,9 +64,9 @@ CONFIGURE_ARGS += --with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS)"
-CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS)"
-CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS)"
+CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
+CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
+CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --enable-libffi-bundling
 CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-aot=no
