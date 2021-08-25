@@ -6,7 +6,6 @@ PROWLARR="${SYNOPKG_PKGDEST}/share/Prowlarr/bin/Prowlarr"
 # Prowlarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGVAR}"
 CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
-PID_FILE="${CONFIG_DIR}/Prowlarr/prowlarr.pid"
 
 # Some have it stored in the root of package
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
@@ -27,16 +26,6 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    # We have to account for legacy folder in the root
-    # It should go, after the upgrade, into /var/.config/
-    # The /var/ folder gets automatically copied by service-installer after this
-    if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-        echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}"
-        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
-    else
-        # Create, in case it's missing for some reason
-        mkdir ${CONFIG_DIR} 2>&1
-    fi
 }
 
 service_postupgrade ()
