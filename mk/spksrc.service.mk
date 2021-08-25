@@ -360,24 +360,23 @@ endif
 ifeq ($(strip $(SERVICE_PORT_ALL_USERS)),)
 SERVICE_PORT_ALL_USERS=true
 endif
+ifeq ($(strip $(SERVICE_TYPE)),)
+SERVICE_TYPE=url
+endif
 
+DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
-	@echo '{ ".url": { ' > $@
-	@echo "  \"com.synocommunity.packages.${SPK_NAME}\": {" >> $@
-	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
-	@/bin/echo -n "    \"desc\": \"" >> $@
-	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
-	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
-	@echo "    \"type\": \"url\"," >> $@
-	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
-	@echo "    \"port\": \"${SERVICE_PORT}\"," >> $@
-	@echo "    \"url\": \"${SERVICE_URL}\"," >> $@
-	@echo "    \"allUsers\": ${SERVICE_PORT_ALL_USERS}," >> $@
-	@echo "    \"grantPrivilege\": \"all\"," >> $@
-	@echo "    \"advanceGrantPrivilege\": true" >> $@
-	@echo '} } }' >> $@
-	cat $@ | python -m json.tool > /dev/null
+	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
+		--arg desc "${DESC}" \
+		--arg id "com.synocommunity.packages.${SPK_NAME}" \
+		--arg icon "images/${SPK_NAME}-{0}.png" \
+		--arg prot "${SERVICE_PORT_PROTOCOL}" \
+		--arg port "${SERVICE_PORT}" \
+		--arg url "${SERVICE_URL}" \
+		--arg type "${SERVICE_TYPE}" \
+		--argjson allUsers ${SERVICE_PORT_ALL_USERS} \
+		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":true}}}' > $@
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif
