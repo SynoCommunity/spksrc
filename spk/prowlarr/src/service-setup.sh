@@ -6,6 +6,7 @@ PROWLARR="${SYNOPKG_PKGDEST}/share/Prowlarr/bin/Prowlarr"
 # Prowlarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGVAR}"
 CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
+PID_FILE="${CONFIG_DIR}/Prowlarr/prowlarr.pid"
 
 # Some have it stored in the root of package
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
