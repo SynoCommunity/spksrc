@@ -21,16 +21,11 @@ service_clean_tmpdir ()
 {
   if [[ -e "${TMPDIR}" ]]; then
     if [ -n "$(ls -A ${TMPDIR})" ]; then
-       echo "Cleanup ${TMPDIR}"   >> "${INST_LOG}"
-       rm -rvf ${TMPDIR}/* >> "${INST_LOG}" 2>&1
+       echo "Cleanup ${TMPDIR}"
+       find ${TMPDIR} -mindepth 1 -delete -print
     fi
     if [ -n "$(ls -A ${TMPDIR})" ]; then
-       echo "Cleanup hidden files in ${TMPDIR}"   >> "${INST_LOG}"
-       rm -rvf ${TMPDIR}/.*  >> "${INST_LOG}" 2>&1
-    fi
-    if [ -n "$(ls -A ${TMPDIR})" ]; then
-       echo "WARNING: Failed to remove all files in ${TMPDIR}"   >> "${INST_LOG}"
+       echo "WARNING: Failed to remove all files in ${TMPDIR}"
     fi
   fi
 }
-

@@ -171,7 +171,7 @@ postinst ()
     fi
 
     call_func "service_postinst" install_log
-    call_func "service_clean_tmpdir"
+    call_func "service_clean_tmpdir" install_log
 
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
@@ -194,17 +194,17 @@ postuninst ()
     call_func "service_postuninst" install_log
 
     if [ "$wizard_delete_data" = "true" ]; then
-
+        echo "Removing files..."
         if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
-            find ${SYNOPKG_PKGHOME} -mindepth 1 -delete | install_log
+            find ${SYNOPKG_PKGHOME} -mindepth 1 -delete -print | install_log
         fi
 
         if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
-            find ${SYNOPKG_PKGVAR} -mindepth 1 -delete | install_log
+            find ${SYNOPKG_PKGVAR} -mindepth 1 -delete -print | install_log
         fi
 
         if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
-            find /var/packages/${SYNOPKG_PKGNAME}/etc -mindepth 1 -delete | install_log
+            find /var/packages/${SYNOPKG_PKGNAME}/etc -mindepth 1 -delete -print | install_log
         fi
     fi
     exit 0
