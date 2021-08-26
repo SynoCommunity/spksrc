@@ -27,6 +27,7 @@ GNU_CONFIGURE = 1
 -include $(WORK_DIR)/python-cc.mk
 CONFIGURE_ARGS  = --enable-python-binding --with-libiconv
 CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python
+CONFIGURE_ARGS += --with-boost-libdir=$(STAGING_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --with-boost-chrono=boost_chrono --with-boost-random=boost_random
 CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python2/work-native/install/usr/local/bin/python
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
