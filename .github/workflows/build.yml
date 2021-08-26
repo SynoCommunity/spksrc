@@ -7,6 +7,10 @@ on:
         description: 'Package to build'
         required: true
         default: 'syno-magnet'
+      publish:
+        description: 'Publish to repository'
+        required: false
+        default: 'false'
   pull_request:
     paths:
     - 'spk/**'
@@ -72,6 +76,8 @@ jobs:
         env:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
+          PUBLISH: ${{ github.event.inputs.publish }}
+          API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
@@ -90,7 +96,7 @@ jobs:
         env:
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
-          #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt

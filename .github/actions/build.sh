@@ -17,7 +17,9 @@ set -o pipefail
 
 echo "::group:: ---- initialize build"
 make setup-synocommunity
-sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" local.mk
+sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" \
+    -e "s|PUBLISH_API_KEY\s*=.*|PUBLISH_API_KEY=$API_KEY|" \
+    local.mk
 echo "::endgroup::"
 
 echo "::group:: ---- find dependent packages"
@@ -111,6 +113,12 @@ fi
 
 echo "===> PACKAGES to Build: ${build_packages}"
 
+# publish to synocommunity.com when the API key is set
+MAKE_ARGS=
+if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
+    MAKE_ARGS=publish
+fi
+
 # Build
 PACKAGES_TO_KEEP="ffmpeg"
 for package in ${build_packages}
@@ -120,7 +128,7 @@ do
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
         # use TCVERSION and ARCH to get real exit codes.
         echo "$ make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}" >>build.log
-        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package} ${MAKE_ARGS} |& tee >(tail -15 >>build.log)
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
             TCVERSION=
@@ -128,7 +136,7 @@ do
             TCVERSION=${GH_ARCH##*-}
         fi
         echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS} |& tee >(tail -15 >>build.log)
     fi
     result=$?
 
