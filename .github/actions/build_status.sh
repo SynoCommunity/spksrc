@@ -61,7 +61,7 @@ if [ -f "${BUILD_ERROR_FILE}" ]; then
         echo ""
         echo "See log file of the build job to analyze the error(s)."
         echo
-        echo "Last 10 lines of every error:"
+        echo "Last 15 lines before the error:"
         cat "${BUILD_ERROR_LOGFILE}"
         echo ""
         # let build status job fail
