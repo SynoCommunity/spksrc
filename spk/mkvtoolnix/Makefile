@@ -1,5 +1,5 @@
 SPK_NAME = mkvtoolnix
-SPK_VERS = 22.0.0
+SPK_VERS = 53.0.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = cytec
 DESCRIPTION = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
-CHANGELOG = "Initial package release"
+CHANGELOG = "Updated to version $(SPK_VERS)"
 DISPLAY_NAME = MKVToolNix
 STARTABLE = no
 
