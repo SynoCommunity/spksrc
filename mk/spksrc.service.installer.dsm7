@@ -168,9 +168,10 @@ postinst ()
     # and don't override old configurations
     if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
         $CP ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
-    fi    
+    fi
 
     call_func "service_postinst" install_log
+    call_func "service_clean_tmpdir"
 
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
@@ -196,14 +197,17 @@ postuninst ()
 
         if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
             rm -rf ${SYNOPKG_PKGHOME}/* 2>&1 | install_log
+            rm -rf ${SYNOPKG_PKGHOME}/.* 2>&1 | install_log
         fi
 
         if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
             rm -rf ${SYNOPKG_PKGVAR}/* 2>&1 | install_log
+            rm -rf ${SYNOPKG_PKGVAR}/.* 2>&1 | install_log
         fi
 
         if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
             rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/* 2>&1 | install_log
+            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/.* 2>&1 | install_log
         fi
     fi
     exit 0
@@ -234,4 +238,3 @@ postupgrade ()
     call_func "service_postupgrade" install_log
     exit 0
 }
-
