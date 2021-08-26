@@ -13,6 +13,8 @@
 # - ffmpeg is not cleaned to be available for dependents.
 # - Therefore ffmpeg is built first if triggered by its own or a dependent.
 
+set -o pipefail
+
 echo "::group:: ---- initialize build"
 make setup-synocommunity
 sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" local.mk
