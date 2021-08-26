@@ -196,18 +196,15 @@ postuninst ()
     if [ "$wizard_delete_data" = "true" ]; then
 
         if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
-            rm -rf ${SYNOPKG_PKGHOME}/* 2>&1 | install_log
-            rm -rf ${SYNOPKG_PKGHOME}/.* 2>&1 | install_log
+            find ${SYNOPKG_PKGHOME} -mindepth 1 -delete | install_log
         fi
 
         if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
-            rm -rf ${SYNOPKG_PKGVAR}/* 2>&1 | install_log
-            rm -rf ${SYNOPKG_PKGVAR}/.* 2>&1 | install_log
+            find ${SYNOPKG_PKGVAR} -mindepth 1 -delete | install_log
         fi
 
         if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
-            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/* 2>&1 | install_log
-            rm -rf /var/packages/${SYNOPKG_PKGNAME}/etc/.* 2>&1 | install_log
+            find /var/packages/${SYNOPKG_PKGNAME}/etc -mindepth 1 -delete | install_log
         fi
     fi
     exit 0
