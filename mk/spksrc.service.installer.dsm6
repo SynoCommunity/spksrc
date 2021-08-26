@@ -314,8 +314,6 @@ postinst ()
     # On DSM 6 only var is concerned
     set_unix_permissions "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
-    call_func "validate_postinst"
-
     exit 0
 }
 

@@ -40,22 +40,22 @@ service_postinst ()
         fi
 
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}|g" ${CFG_FILE}
-        sed -i -e "s|@username@|${wizard_username:=admin}|g" ${CFG_FILE}
-        sed -i -e "s|@password@|${wizard_password:=admin}|g" ${CFG_FILE}
+        sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}|g" "${CFG_FILE}"
+        sed -i -e "s|@username@|${wizard_username:=admin}|g" "${CFG_FILE}"
+        sed -i -e "s|@password@|${wizard_password:=admin}|g" "${CFG_FILE}"
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir_enabled@|true|g" ${CFG_FILE}
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${CFG_FILE}
+            sed -i -e "s|@watch_dir_enabled@|true|g" "${CFG_FILE}"
+            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" "${CFG_FILE}"
         else
-            sed -i -e "s|@watch_dir_enabled@|false|g" ${CFG_FILE}
-            sed -i -e "/@watch_dir@/d" ${CFG_FILE}
+            sed -i -e "s|@watch_dir_enabled@|false|g" "${CFG_FILE}"
+            sed -i -e "/@watch_dir@/d" "${CFG_FILE}"
         fi
         if [ -d "${wizard_incomplete_dir}" ]; then
-            sed -i -e "s|@incomplete_dir_enabled@|true|g" ${CFG_FILE}
-            sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" ${CFG_FILE}
+            sed -i -e "s|@incomplete_dir_enabled@|true|g" "${CFG_FILE}"
+            sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" "${CFG_FILE}"
         else
-            sed -i -e "s|@incomplete_dir_enabled@|false|g" ${CFG_FILE}
-            sed -i -e "/@incomplete_dir@/d" ${CFG_FILE}
+            sed -i -e "s|@incomplete_dir_enabled@|false|g" "${CFG_FILE}"
+            sed -i -e "/@incomplete_dir@/d" "${CFG_FILE}"
         fi
 
         # Set permissions for optional folders
@@ -68,27 +68,6 @@ service_postinst ()
     fi
 }
 
-validate_postinst()
-{
-    # Need to make sure the user/group has been created by the package
-    # before checking that the folder exists (chicken egg problem)
-    # https://github.com/SynoCommunity/spksrc/issues/4766#issuecomment-899535272
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        # If chosen, they need to exist
-        if [ -n "${wizard_watch_dir}" ] && [ ! -d "${wizard_watch_dir}" ]; then
-            echo "<p style=\"color:red\">Watch directory ${wizard_watch_dir} does not exist. And the package could not create it. <br> Please uninstall the package, check permissions and try again.</p>"
-            exit 1
-        fi
-        if [ -n "${wizard_incomplete_dir}" ] && [ ! -d "${wizard_incomplete_dir}" ]; then
-            echo "<p style=\"color:red\">Incomplete directory ${wizard_incomplete_dir} does not exist. And the package could not create it. <br> Please uninstall the package, check permissions and try again.</p>"
-            exit 1
-        fi
-    fi
-
-    exit 0
-}
-
-
 service_postupgrade ()
 {
     # Needed to force correct permissions, during update
@@ -96,12 +75,12 @@ service_postupgrade ()
     if [ -r "${CFG_FILE}" ]; then
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
             # update folder
-            sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}\",|g" ${CFG_FILE}
+            sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}\",|g" "${CFG_FILE}"
         fi
 
-        DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
-        INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
-        WATCHED_DIR=$(sed -n 's/.*"watch-dir"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE})
+        DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"[ ]*:[ ]*"\(.*\)",/\1/p' "${CFG_FILE}")
+        INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"[ ]*:[ ]*"\(.*\)",/\1/p' "${CFG_FILE}")
+        WATCHED_DIR=$(sed -n 's/.*"watch-dir"[ ]*:[ ]*"\(.*\)",/\1/p' "${CFG_FILE}")
         # Apply permissions
         if [ -n "${DOWNLOAD_DIR}" ] && [ -d "${DOWNLOAD_DIR}" ]; then
             set_syno_permissions "${DOWNLOAD_DIR}" "${GROUP}"

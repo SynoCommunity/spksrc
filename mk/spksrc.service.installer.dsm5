@@ -394,8 +394,6 @@ postuninst ()
         $RM "${INST_VARIABLES}" 2>&1 | install_log
     fi
 
-    call_func "validate_postinst"
-
     exit 0
 }
 

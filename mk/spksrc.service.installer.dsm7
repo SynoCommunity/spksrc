@@ -176,8 +176,6 @@ postinst ()
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
     fi
 
-    call_func "validate_postinst"
-
     exit 0
 }
 
