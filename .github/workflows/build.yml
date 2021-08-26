@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: 'Package path to build'
+        description: 'Package to build'
         required: true
-        default: 'spk/syno-magnet'
+        default: 'syno-magnet'
   pull_request:
     paths:
     - 'spk/**'
