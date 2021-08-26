@@ -119,7 +119,7 @@ do
 
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
         # use TCVERSION and ARCH to get real exit codes.
-        echo "make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}" >>build.log
+        echo "$ make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}" >>build.log
         make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package} |& tee >(tail -15 >>build.log)
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
@@ -127,7 +127,7 @@ do
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        echo "make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
+        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
         make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
     fi
     result=$?
