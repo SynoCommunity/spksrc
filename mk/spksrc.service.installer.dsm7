@@ -194,7 +194,7 @@ postuninst ()
     call_func "service_postuninst" install_log
 
     if [ "$wizard_delete_data" = "true" ]; then
-        echo "Removing files..."
+        echo "Removing files..." | install_log
         if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
             find ${SYNOPKG_PKGHOME} -mindepth 1 -delete -print | install_log
         fi
