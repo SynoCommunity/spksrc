@@ -1,6 +1,12 @@
 name: Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package path to build'
+        required: true
+        default: 'spk/syno-magnet'
   pull_request:
     paths:
     - 'spk/**'
@@ -65,6 +71,7 @@ jobs:
           entrypoint: ./.github/actions/build.sh
         env:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
+          SPK_TO_BUILD: ${{ github.event.inputs.package }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
@@ -84,6 +91,7 @@ jobs:
           GH_ARCH: ${{ matrix.arch }}
           #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
@@ -96,6 +104,7 @@ jobs:
           entrypoint: ./.github/actions/build_status.sh
         env:
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
