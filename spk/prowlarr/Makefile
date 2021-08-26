@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/prowlarr.png
 
 # .NET is not supported on PPC, ARM5, ARM7L and x86
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armadaxp alpine
 
 DEPENDS = cross/curl cross/sqlite cross/prowlarr
 
