@@ -1,9 +1,7 @@
 SPK_NAME = prowlarr
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 16
+SPK_VERS = 0.1.1.875
+SPK_REV = 1
 SPK_ICON = src/prowlarr.png
-
-REQUIRED_DSM = 5.0
 
 # .NET is not supported on PPC, ARM5, ARM7L and x86
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
