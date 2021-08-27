@@ -24,10 +24,12 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 
-# Check if single target to allow parallel build
-ifeq ($(PARALLEL_MAKE),)
-ifeq ($(call version_le, ${MAKECMDGOALS}, 1),1)
-PARALLEL_MAKE=max
+# Set parallel options in caller
+ifeq ($(PMAKE),max)
+MAKEFLAGS += -j$(shell nproc)
+else ifneq ($(PMAKE),)
+ifneq ($(PMAKE),nop)
+MAKEFLAGS += -j$(PMAKE)
 endif
 endif
 
@@ -73,6 +75,9 @@ clean:
 
 
 all: install plist
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+endif
 
 ### For make kernel-required (used by spksrc.spk.mk)
 include ../../mk/spksrc.kernel-required.mk
@@ -88,12 +93,17 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
 
+cross-cc_msg:
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(subst build-arch-,,$(MAKECMDGOALS)) >> $(PSTAT_LOG)
+endif
+
 arch-%:
 	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
-build-arch-%:
+build-arch-%: cross-cc_msg
 	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) | tee build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
 
 ####

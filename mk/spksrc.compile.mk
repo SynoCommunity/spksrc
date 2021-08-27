@@ -31,6 +31,9 @@ endif
 
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+endif
 
 pre_compile_target: compile_msg
 

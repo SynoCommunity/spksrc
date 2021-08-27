@@ -67,3 +67,26 @@ version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+
+# Set parallel build mode
+ifeq ($(PMAKE),)
+# If -j or -l argument passed user must
+# manually specify the value of PMAKE
+# as otherwise this will create too high load
+ifneq ($(strip $(filter -j% -l%, $(shell ps T $$PPID))),)
+PMAKE = nop
+ENV += PMAKE=nop
+else
+# If not set, force max parallel build mode
+PMAKE = max
+ENV += PMAKE=max
+endif
+endif
+
+# Enable stats over parallel build mode
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+PSTAT_TIME = time -o $(PSTAT_LOG) --append
+else
+PSTAT_TIME =
+endif
+PSTAT_LOG = build.stats

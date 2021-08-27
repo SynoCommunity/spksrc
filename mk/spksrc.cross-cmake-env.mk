@@ -13,10 +13,12 @@ CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
-# Check if single target to allow parallel build
-ifeq ($(PARALLEL_MAKE),)
-ifeq ($(call version_le, ${MAKECMDGOALS}, 1),1)
-PARALLEL_MAKE=max
+# Set parallel options in caller
+ifeq ($(PMAKE),max)
+MAKEFLAGS += -j$(shell nproc)
+else ifneq ($(PMAKE),)
+ifneq ($(PMAKE),nop)
+MAKEFLAGS += -j$(PMAKE)
 endif
 endif
 
