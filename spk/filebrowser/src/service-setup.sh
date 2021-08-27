@@ -1,0 +1,3 @@
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/filebrowser -a 0.0.0.0 -p ${SERVICE_PORT} --noauth -r /"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
