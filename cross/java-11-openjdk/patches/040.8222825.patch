@@ -1,0 +1,150 @@
+--- a/src/hotspot/cpu/arm/arm.ad
++++ b/src/hotspot/cpu/arm/arm.ad
+@@ -5317,7 +5317,7 @@ instruct loadConD(regD dst, immD src, iR
+ // Must be safe to execute with invalid address (cannot fault).
+ 
+ instruct prefetchAlloc_mp( memoryP mem ) %{
+-  predicate(os::is_MP());
++  predicate(VM_Version::has_multiprocessing_extensions());
+   match( PrefetchAllocation mem );
+   ins_cost(MEMORY_REF_COST);
+   size(4);
+--- a/src/hotspot/cpu/arm/assembler_arm_32.hpp
++++ b/src/hotspot/cpu/arm/assembler_arm_32.hpp
+@@ -434,7 +434,9 @@ class Assembler : public AbstractAssembl
+   }
+ 
+   void pldw(Address addr) {
+-    assert(VM_Version::arm_arch() >= 7 && os::is_MP(), "no pldw on this processor");
++    assert(!VM_Version::is_initialized() ||
++           (VM_Version::arm_arch() >= 7 && VM_Version::has_multiprocessing_extensions()),
++           "PLDW is available on ARMv7 with Multiprocessing Extensions only");
+     emit_int32(0xf510f000 | addr.encoding2());
+   }
+ 
+--- a/src/hotspot/cpu/arm/vm_version_arm.hpp
++++ b/src/hotspot/cpu/arm/vm_version_arm.hpp
+@@ -32,6 +32,7 @@ class VM_Version: public Abstract_VM_Ver
+   friend class JVMCIVMStructs;
+ 
+   static bool _has_simd;
++  static bool _has_mp_ext;
+ 
+  protected:
+   // Are we done with vm version initialization
+@@ -64,6 +65,7 @@ class VM_Version: public Abstract_VM_Ver
+     vfp = 0,
+     vfp3_32 = 1,
+     simd = 2,
++    mp_ext = 3
+   };
+ 
+   enum Feature_Flag_Set {
+@@ -73,6 +75,7 @@ class VM_Version: public Abstract_VM_Ver
+     vfp_m     = 1 << vfp,
+     vfp3_32_m = 1 << vfp3_32,
+     simd_m    = 1 << simd,
++    mp_ext_m  = 1 << mp_ext
+   };
+ 
+   // The value stored by "STR PC, [addr]" instruction can be either
+@@ -115,6 +118,7 @@ class VM_Version: public Abstract_VM_Ver
+   static bool has_vfp()             { return (_features & vfp_m) != 0; }
+   static bool has_vfp3_32()         { return (_features & vfp3_32_m) != 0; }
+   static bool has_simd()            { return (_features & simd_m) != 0; }
++  static bool has_multiprocessing_extensions() { return (_features & mp_ext_m) != 0; }
+ 
+   static bool simd_math_is_compliant() { return false; }
+ 
+--- a/src/hotspot/cpu/arm/vm_version_arm_32.cpp
++++ b/src/hotspot/cpu/arm/vm_version_arm_32.cpp
+@@ -40,6 +40,7 @@ extern "C" {
+   typedef int (*get_cpu_info_t)();
+   typedef bool (*check_vfp_t)(double *d);
+   typedef bool (*check_simd_t)();
++  typedef bool (*check_mp_ext_t)(int *addr);
+ }
+ 
+ #define __ _masm->
+@@ -95,6 +96,20 @@ class VM_Version_StubGenerator: public S
+ 
+     return start;
+   };
++
++  address generate_check_mp_ext() {
++    StubCodeMark mark(this, "VM_Version", "check_mp_ext");
++    address start = __ pc();
++
++    // PLDW is available with Multiprocessing Extensions only
++    __ pldw(Address(R0));
++    // Return true if instruction caused no signals
++    __ mov(R0, 1);
++    // JVM_handle_linux_signal moves PC here if SIGILL happens
++    __ bx(LR);
++
++    return start;
++  };
+ };
+ 
+ #undef __
+@@ -103,6 +118,7 @@ class VM_Version_StubGenerator: public S
+ extern "C" address check_vfp3_32_fault_instr;
+ extern "C" address check_vfp_fault_instr;
+ extern "C" address check_simd_fault_instr;
++extern "C" address check_mp_ext_fault_instr;
+ 
+ void VM_Version::early_initialize() {
+ 
+@@ -165,6 +181,13 @@ void VM_Version::initialize() {
+ #endif
+ #endif
+ 
++  address check_mp_ext_pc = g.generate_check_mp_ext();
++  check_mp_ext_t check_mp_ext = CAST_TO_FN_PTR(check_mp_ext_t, check_mp_ext_pc);
++  check_mp_ext_fault_instr = (address)check_mp_ext;
++  int dummy_local_variable;
++  if (check_mp_ext(&dummy_local_variable)) {
++    _features |= mp_ext_m;
++  }
+ 
+   if (UseAESIntrinsics && !FLAG_IS_DEFAULT(UseAESIntrinsics)) {
+     warning("AES intrinsics are not available on this CPU");
+@@ -247,11 +270,12 @@ void VM_Version::initialize() {
+          && _supports_atomic_getset8 && _supports_atomic_getadd8, "C2: atomic operations must be supported");
+ #endif
+   char buf[512];
+-  jio_snprintf(buf, sizeof(buf), "(ARMv%d)%s%s%s",
++  jio_snprintf(buf, sizeof(buf), "(ARMv%d)%s%s%s%s",
+                _arm_arch,
+                (has_vfp() ? ", vfp" : ""),
+                (has_vfp3_32() ? ", vfp3-32" : ""),
+-               (has_simd() ? ", simd" : ""));
++               (has_simd() ? ", simd" : ""),
++               (has_multiprocessing_extensions() ? ", mp_ext" : ""));
+ 
+   // buf is started with ", " or is empty
+   _features_string = os::strdup(buf);
+--- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
++++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+@@ -259,9 +259,11 @@ frame os::current_frame() {
+ #ifndef AARCH64
+ extern "C" address check_vfp_fault_instr;
+ extern "C" address check_vfp3_32_fault_instr;
++extern "C" address check_mp_ext_fault_instr;
+ 
+ address check_vfp_fault_instr = NULL;
+ address check_vfp3_32_fault_instr = NULL;
++address check_mp_ext_fault_instr = NULL;
+ #endif // !AARCH64
+ extern "C" address check_simd_fault_instr;
+ address check_simd_fault_instr = NULL;
+@@ -283,7 +285,8 @@ extern "C" int JVM_handle_linux_signal(i
+   if (sig == SIGILL &&
+       ((info->si_addr == (caddr_t)check_simd_fault_instr)
+        NOT_AARCH64(|| info->si_addr == (caddr_t)check_vfp_fault_instr)
+-       NOT_AARCH64(|| info->si_addr == (caddr_t)check_vfp3_32_fault_instr))) {
++       NOT_AARCH64(|| info->si_addr == (caddr_t)check_vfp3_32_fault_instr)
++       NOT_AARCH64(|| info->si_addr == (caddr_t)check_mp_ext_fault_instr))) {
+     // skip faulty instruction + instruction that sets return value to
+     // success and set return value to failure.
+     os::Linux::ucontext_set_pc(uc, (address)info->si_addr + 8);
