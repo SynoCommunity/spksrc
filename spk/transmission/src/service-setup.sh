@@ -94,14 +94,16 @@ service_postupgrade ()
             # move files
             # not moving download dir because it could contain data not from this package
             # if [ "$OLD_DOWNLOAD_DIR" != "$NEW_DOWNLOAD_DIR" ]; then
-            #     mv "$OLD_DOWNLOAD_DIR"/* "$NEW_DOWNLOAD_DIR"
+            #     mv -nv "$OLD_DOWNLOAD_DIR"/* "$NEW_DOWNLOAD_DIR"
             # fi
+            shopt -s dotglob # copy hidden folder/files too
             if [ -n "${OLD_INCOMPLETE_DIR}" ] &&  [ "$OLD_INCOMPLETE_DIR" != "$NEW_INCOMPLETE_DIR" ]; then
                 mv -nv "$OLD_INCOMPLETE_DIR"/* "$NEW_INCOMPLETE_DIR/"
             fi
             if [ -n "${OLD_WATCHED_DIR}" ] && [ "$OLD_WATCHED_DIR" != "$NEW_WATCHED_DIR" ]; then
                 mv -nv "$OLD_WATCHED_DIR"/* "$NEW_WATCHED_DIR/"
             fi
+            shopt -d dotglob
         else
             # Extract the right paths from config file and update Permissions
             DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
