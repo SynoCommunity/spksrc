@@ -1,5 +1,5 @@
 SPK_NAME = filebrowser
-SPK_VERS = 2.17.1
+SPK_VERS = 2.17.2
 SPK_REV = 1
 SPK_ICON = src/filebrowser.png
 
@@ -16,12 +16,13 @@ CHANGELOG = "First Version"
 SPK_GROUP = synocommunity
 GROUP = synocommunity
 
+WIZARDS_DIR = src/wizard/
+
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8091
 ADMIN_PORT = $(SERVICE_PORT)
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-# SERVICE_PORT_ALL_USERS = false
 
 include ../../mk/spksrc.spk.mk
