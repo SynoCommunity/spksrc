@@ -86,17 +86,18 @@ service_postupgrade ()
             sed -i -e "s|\s\"watch-dir\".*|    \"watch-dir\": \"${NEW_INCOMPLETE_DIR}\",|g" "${CFG_FILE}"
             sed -i -e "s|\s\"incomplete-dir\".*|    \"incomplete-dir\": \"${NEW_WATCHED_DIR}\",|g" "${CFG_FILE}"
 
+            mkdir -p "$NEW_INCOMPLETE_DIR"
+            mkdir -p "$NEW_WATCHED_DIR"
+
             # move files
             # not moving download dir because it could contain data not from this package
             # if [ "$OLD_DOWNLOAD_DIR" != "$NEW_DOWNLOAD_DIR" ]; then
             #     mv "$OLD_DOWNLOAD_DIR"/* "$NEW_DOWNLOAD_DIR"
             # fi
             if [ -n "${OLD_INCOMPLETE_DIR}" ] &&  [ "$OLD_INCOMPLETE_DIR" != "$NEW_INCOMPLETE_DIR" ]; then
-                mkdir -p "$NEW_INCOMPLETE_DIR"
                 mv -nv "$OLD_INCOMPLETE_DIR"/* "$NEW_INCOMPLETE_DIR/"
             fi
             if [ -n "${OLD_WATCHED_DIR}" ] && [ "$OLD_WATCHED_DIR" != "$NEW_WATCHED_DIR" ]; then
-                mkdir -p "$NEW_WATCHED_DIR"
                 mv -nv "$OLD_WATCHED_DIR"/* "$NEW_WATCHED_DIR/"
             fi
         fi
