@@ -1,10 +1,10 @@
 #!/bin/bash
-# List the successfully built, the unsupported and the failed packages 
+# List the successfully built, the unsupported and the failed packages
 # by name and timestamp.
-# 
-# We do not want to terminate the build on errors as we want to build all 
+#
+# We do not want to terminate the build on errors as we want to build all
 # packages.
-# Therfore failed builds are logged in the build error file defined by the 
+# Therfore failed builds are logged in the build error file defined by the
 # env variable $BUILD_ERROR_FILE.
 # If this file exists and contains at least one line, we exit with error.
 # A special log file $BUILD_UNSUPPORTED_FILE contains known make errors that
@@ -60,6 +60,10 @@ if [ -f "${BUILD_ERROR_FILE}" ]; then
         echo "::error::ERRORS:%0A$(cat ${BUILD_ERROR_FILE} | sed ':a;N;$!ba;s/\n/%0A/g')"
         echo ""
         echo "See log file of the build job to analyze the error(s)."
+        echo
+        echo "Last 15 lines of the build log:"
+        echo
+        cat "${BUILD_ERROR_LOGFILE}"
         echo ""
         # let build status job fail
         exit 1
