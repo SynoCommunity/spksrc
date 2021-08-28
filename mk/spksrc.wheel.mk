@@ -84,12 +84,12 @@ post_wheel_target: $(WHEEL_TARGET)
 			echo "Pure python wheels are excluded from the package wheelhouse." ; \
 			for w in *.whl; do \
 				if echo $${w} | grep -viq "-none-any\.whl" ; then \
-					cp -f $$w $(STAGING_INSTALL_PREFIX)/share/wheelhouse/$$w; \
+					cp -f $$w $(STAGING_INSTALL_PREFIX)/share/wheelhouse/`echo $$w | cut -d"-" -f -3`-none-any.whl; \
 				fi ; \
 			done ; \
 		else \
 			for w in *.whl; do \
-				cp -f $$w $(STAGING_INSTALL_PREFIX)/share/wheelhouse/$$w; \
+				cp -f $$w $(STAGING_INSTALL_PREFIX)/share/wheelhouse/`echo $$w | cut -d"-" -f -3`-none-any.whl; \
 			done ; \
 		fi ; \
 	fi

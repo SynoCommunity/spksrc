@@ -1,10 +1,12 @@
 # Home Assistant core
-# requirements are splitted into two files
-# - requirements.txt                      (this file, containing all requirements that need cross compilation)
+# requirements are splitted into multiple files
+# - requirements.txt                      (this file, containing requirements that need cross compilation)
 # - postinst_default_requirements.txt     (requirements for default_config)
 # - postinst_integration_requirements.txt (requirements for integrations)
+# postinst requirements must be pure python wheels.
+# To minimize the package size the spk wheelhouse does not contain dependent wheels that are pure python.
 
-#homeassistant==2021.8.7
+#homeassistant==2021.8.8
 
 # Home Assistant Core
 aiohttp==3.7.4.post0
@@ -17,7 +19,7 @@ bcrypt==3.1.7
 #certifi==2021.5.30
 ciso8601==2.1.3
 #httpx==0.18.2
-## jinja2==3.0.1      # fails to build
+## jinja2==3.0.1      # fails to build, moved to postinst_default_config_requirements.txt
 PyJWT==1.7.1
 ## cryptography==3.3.2
 ## pip>=8.0.3,<20.3
@@ -72,4 +74,3 @@ websockets==9.1
 # pandas==1.3.1  # depends on numpy...
 guppy3==3.1.0
 wrapt==1.12.1
-

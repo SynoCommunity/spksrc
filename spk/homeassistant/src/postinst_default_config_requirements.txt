@@ -35,7 +35,7 @@ gTTS==2.2.3
 h11==0.12.0
 hass-nabucasa==0.46.0
 home-assistant-frontend==20210809.0
-homeassistant==2021.8.7
+homeassistant==2021.8.8
 httpcore==0.13.6
 httpx==0.18.2
 idna==2.9

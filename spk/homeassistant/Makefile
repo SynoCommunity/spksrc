@@ -1,5 +1,5 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2021.8.7
+SPK_VERS = 2021.8.8
 SPK_REV = 14
 SPK_ICON = src/${SPK_NAME}.png
 
@@ -26,7 +26,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Update homeassistant to 2021.8.7. <br/>Includes security updates for dependencies:<ul><li>CVE-2020-14343 (PyYAML)</li><li>CVE-2020-28493 (Jinja2)</li><li>CVE-2021-28363 (urllib3)</li><br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "Update homeassistant to 2021.8.8. <br/>Includes security updates for dependencies:<ul><li>CVE-2020-14343 (PyYAML)</li><li>CVE-2020-28493 (Jinja2)</li><li>CVE-2021-28363 (urllib3)</li><br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -48,11 +48,6 @@ POST_STRIP_TARGET = homeassistant_extra_install
 EXCLUDE_PURE_PYTHON_WHEELS = yes
 
 include ../../mk/spksrc.spk.mk
-
-# TODO: remove pycryptodome==* from postinst_requirements.txt for armv7
-# or remove for all and manually install in service_postinst () depending 
-# on arch (only x86_64, i686 and aarch64 are supported)
-# 
 
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:
