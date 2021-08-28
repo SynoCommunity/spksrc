@@ -1,0 +1,21 @@
+# remove #pragma GCC diagnostic
+# for outdated gcc compiler of ppc arch toolchain
+#
+--- libX11-1.6.3/src/xkb/XKBBind.orig.c	2021-06-06 18:48:53.000000000 +0200
++++ libX11-1.6.3/src/xkb/XKBBind.c	2021-08-20 23:31:52.117734400 +0200
+@@ -226,15 +226,10 @@
+ #ifdef __clang__
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+-#elif defined(__GNUC__)
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+     return XKeycodeToKeysym(dpy, event->keycode, col);
+ #ifdef __clang__
+ #pragma clang diagnostic pop
+-#elif defined(__GNUC__)
+-#pragma GCC diagnostic pop
+ #endif
+ 
+ }

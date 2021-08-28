@@ -1,10 +1,10 @@
 TC_ARCH = monaco
 TC_VERS = 7.0
 TC_KERNEL = 3.10.108
-TC_GCC = 7.3.0
+TC_GCC = 7.5.0
 TC_GLIBC = 2.26
 
-TC_DIST = monaco-gcc730_glibc226_hard-GPL
+TC_DIST = monaco-gcc750_glibc226_hard-GPL
 TC_DIST_SITE_PATH = STMicroelectronics%20Monaco%20Linux%203.10.108
 
 TC_TARGET = arm-unknown-linux-gnueabi

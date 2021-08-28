@@ -7,6 +7,8 @@ TC_GLIBC = 2.8
 TC_DIST = gcc4374_eglibc2874_qoriq-GPL
 TC_EXT = tgz
 TC_DIST_SITE_PATH = PowerPC%20853x%20Linux%202.6.32
+# avoid name conflict with toolchain/syno-qoriq-5.0
+TC_DIST_FILE = gcc4374_eglibc2874_ppx853x-GPL.$(TC_EXT)
 
 TC_TARGET = powerpc-none-linux-gnuspe
 TC_SYSROOT = $(TC_TARGET)
