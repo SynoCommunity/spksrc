@@ -35,6 +35,7 @@ rtorrent_pre_configure:
 .PHONY: rtorrent_pre_patch
 rtorrent_pre_patch:
 	@$(RUN) ./autogen.sh
+	$(RUN) sed -i 's,LIBXML=`xml2-config --libs`,LIBXML=`$(STAGING_INSTALL_PREFIX)/bin/xml2-config --libs`,g' $(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
 
 .PHONY: rtorrent_compile
 rtorrent_compile:
