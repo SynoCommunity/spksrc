@@ -16,6 +16,7 @@ CHANGELOG = "1. Update to 3.3.1"
 
 HOMEPAGE = https://fishshell.com
 LICENSE = Custom
+LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/doc_src/license.rst
 
 SERVICE_SETUP = src/service-setup.sh
 
