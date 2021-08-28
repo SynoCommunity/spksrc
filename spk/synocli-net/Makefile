@@ -1,5 +1,5 @@
 SPK_NAME = synocli-net
-SPK_VERS = 2.0
+SPK_VERS = 2.1
 SPK_REV = 11
 SPK_ICON = src/synocli-net.png
 
@@ -46,8 +46,6 @@ SPK_COMMANDS += sbin/sshd
 SPK_COMMANDS += sbin/ser2net
 SPK_COMMANDS += sbin/mtr sbin/mtr-packet
 SPK_COMMANDS += bin/etherwake
-
 SPK_COMMANDS += bin/imapfilter
-SPK_LINKS += /usr/local/share/imapfilter:share/imapfilter
 
 include ../../mk/spksrc.spk.mk

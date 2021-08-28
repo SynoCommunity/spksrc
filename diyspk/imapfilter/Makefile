@@ -13,6 +13,5 @@ HOMEPAGE = http://github.com/lefcha/imapfilter
 LICENSE  = MIT
 
 SPK_COMMANDS = bin/imapfilter
-SPK_LINKS = /usr/local/share/imapfilter:share/imapfilter
 
 include ../../mk/spksrc.spk.mk

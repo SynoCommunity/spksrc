@@ -15,6 +15,8 @@ LICENSE  = MIT
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = imapfilter_install
 
+ENV += SHAREDIR="$(INSTALL_PREFIX)/share/imapfilter"
+
 include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
