@@ -393,7 +393,6 @@ postuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}" 2>&1 | install_log
     fi
-
     exit 0
 }
 

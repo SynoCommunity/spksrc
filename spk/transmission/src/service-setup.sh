@@ -14,11 +14,11 @@ validate_preinst()
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # If chosen, they need to exist
         if [ -n "${wizard_watch_dir}" ] && [ ! -d "${wizard_watch_dir}" ]; then
-            echo "Watch directory ${wizard_watch_dir} does not exist. And the package could not create it."
+            echo "Watch directory ${wizard_watch_dir} does not exist."
             exit 1
         fi
         if [ -n "${wizard_incomplete_dir}" ] && [ ! -d "${wizard_incomplete_dir}" ]; then
-            echo "Incomplete directory ${wizard_incomplete_dir} does not exist. And the package could not create it."
+            echo "Incomplete directory ${wizard_incomplete_dir} does not exist."
             exit 1
         fi
     fi
