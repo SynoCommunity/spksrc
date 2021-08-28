@@ -20,8 +20,7 @@ ENV += SHAREDIR="$(INSTALL_PREFIX)/share/imapfilter"
 include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# PPC_ARCHES except QorIQ
-ADDITIONAL_CPPFLAGS = -DLUA_32BITS
+ADDITIONAL_CFLAGS = -DLUA_USE_C89
 endif
 
 include ../../mk/spksrc.cross-cc.mk
