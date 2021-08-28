@@ -69,17 +69,17 @@ version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | so
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
 # Set parallel build mode
-ifeq ($(PMAKE),)
+ifeq ($(PARALLEL_MAKE),)
 # If -j or -l argument passed user must
-# manually specify the value of PMAKE
+# manually specify the value of PARALLEL_MAKE
 # as otherwise this will create too high load
 ifneq ($(strip $(filter -j% -l%, $(shell ps T $$PPID))),)
-PMAKE = nop
-ENV += PMAKE=nop
+PARALLEL_MAKE = nop
+ENV += PARALLEL_MAKE=nop
 else
 # If not set, force max parallel build mode
-PMAKE = max
-ENV += PMAKE=max
+PARALLEL_MAKE = max
+ENV += PARALLEL_MAKE=max
 endif
 endif
 

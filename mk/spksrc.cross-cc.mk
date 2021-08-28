@@ -25,11 +25,11 @@ TC = syno$(ARCH_SUFFIX)
 endif
 
 # Set parallel options in caller
-ifeq ($(PMAKE),max)
+ifeq ($(PARALLEL_MAKE),max)
 MAKEFLAGS += -j$(shell nproc)
-else ifneq ($(PMAKE),)
-ifneq ($(PMAKE),nop)
-MAKEFLAGS += -j$(PMAKE)
+else ifneq ($(PARALLEL_MAKE),)
+ifneq ($(PARALLEL_MAKE),nop)
+MAKEFLAGS += -j$(PARALLEL_MAKE)
 endif
 endif
 
@@ -76,7 +76,7 @@ clean:
 
 all: install plist
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
 endif
 
 ### For make kernel-required (used by spksrc.spk.mk)
@@ -95,7 +95,7 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 cross-cc_msg:
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(subst build-arch-,,$(MAKECMDGOALS)) >> $(PSTAT_LOG)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(subst build-arch-,,$(MAKECMDGOALS)) >> $(PSTAT_LOG)
 endif
 
 arch-%:

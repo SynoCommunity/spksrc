@@ -14,11 +14,11 @@ CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 # Set parallel options in caller
-ifeq ($(PMAKE),max)
+ifeq ($(PARALLEL_MAKE),max)
 MAKEFLAGS += -j$(shell nproc)
-else ifneq ($(PMAKE),)
-ifneq ($(PMAKE),nop)
-MAKEFLAGS += -j$(PMAKE)
+else ifneq ($(PARALLEL_MAKE),)
+ifneq ($(PARALLEL_MAKE),nop)
+MAKEFLAGS += -j$(PARALLEL_MAKE)
 endif
 endif
 

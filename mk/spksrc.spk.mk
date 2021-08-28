@@ -399,7 +399,7 @@ spkclean:
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
 endif
 
 ### For make dependency-tree
@@ -459,7 +459,7 @@ $(PUBLISH)all-$(ACTION): | pre-build-native
 
 spk_msg:
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PMAKE: $(PMAKE), ARCH: $(MAKECMDGOALS) >> $(PSTAT_LOG)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(MAKECMDGOALS) >> $(PSTAT_LOG)
 endif
 
 supported-arch-error:
