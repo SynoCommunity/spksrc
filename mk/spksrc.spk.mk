@@ -375,7 +375,7 @@ endif
 ifeq ($(PUBLISH_API_KEY),)
 	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	http --verify=no --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
+	http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
 
 
 ### Clean rules

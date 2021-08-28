@@ -1,6 +1,16 @@
 name: Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to build'
+        required: true
+        default: 'syno-magnet'
+      publish:
+        description: 'Publish to repository'
+        required: false
+        default: 'false'
   pull_request:
     paths:
     - 'spk/**'
@@ -57,33 +67,38 @@ jobs:
 
       - name: Build Package (file changes)
         if: startsWith(github.ref, 'refs/tags/') == false
-        # We don't want to stop the build on errors. 
+        # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
         continue-on-error: true
-        uses: docker://synocommunity/spksrc:latest
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build.sh
         env:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
+          SPK_TO_BUILD: ${{ github.event.inputs.package }}
+          PUBLISH: ${{ github.event.inputs.publish }}
+          API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
       - name: Build Package (Tag)
         if: startsWith(github.ref, 'refs/tags/')
-        # We don't want to stop the build on errors. 
+        # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
         continue-on-error: true
-        uses: docker://synocommunity/spksrc:latest
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build-tag.sh
         env:
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
-          #   API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
@@ -91,11 +106,12 @@ jobs:
         id: build_status
         # We need this status since we don't want to stop the build on errors.
         # Here we fail on build errors found in the build error file.
-        uses: docker://synocommunity/spksrc:latest
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build_status.sh
         env:
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 

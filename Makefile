@@ -120,6 +120,12 @@ toolchain-digests:
 	    $(MAKE) -C $${tc} digests ; \
 	done
 
+toolkit-digests:
+	@for tk in $(dir $(wildcard toolkit/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${tk} digests ; \
+	done
+
 kernel-digests:
 	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
 	do \
