@@ -70,8 +70,8 @@ service_postinst ()
 
 service_postupgrade ()
 {
-    # Extract the right paths from config file
     if [ -r "${CFG_FILE}" ]; then
+        # Migrate to DSM7
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
             OLD_DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
             OLD_INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
@@ -81,10 +81,12 @@ service_postupgrade ()
             NEW_INCOMPLETE_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
             NEW_WATCHED_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
 
-            # update folder
+            # update folders
             sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${NEW_DOWNLOAD_DIR}\",|g" "${CFG_FILE}"
             sed -i -e "s|\s\"watch-dir\".*|    \"watch-dir\": \"${NEW_INCOMPLETE_DIR}\",|g" "${CFG_FILE}"
+            sed -i -e "s|\s\"watch-dir-enabled\".*|    \"watch-dir-enabled\": true,|g" "${CFG_FILE}"
             sed -i -e "s|\s\"incomplete-dir\".*|    \"incomplete-dir\": \"${NEW_WATCHED_DIR}\",|g" "${CFG_FILE}"
+            sed -i -e "s|\s\"incomplete-dir-enabled\".*|    \"incomplete-dir-enabled\": true,|g" "${CFG_FILE}"
 
             mkdir -p "$NEW_INCOMPLETE_DIR"
             mkdir -p "$NEW_WATCHED_DIR"
@@ -100,20 +102,21 @@ service_postupgrade ()
             if [ -n "${OLD_WATCHED_DIR}" ] && [ "$OLD_WATCHED_DIR" != "$NEW_WATCHED_DIR" ]; then
                 mv -nv "$OLD_WATCHED_DIR"/* "$NEW_WATCHED_DIR/"
             fi
-        fi
-
-        DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-        INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-        WATCHED_DIR=$(sed -n 's/.*"watch-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-        # Apply permissions
-        if [ -n "${DOWNLOAD_DIR}" ] && [ -d "${DOWNLOAD_DIR}" ]; then
-            set_syno_permissions "${DOWNLOAD_DIR}" "${GROUP}"
-        fi
-        if [ -n "${INCOMPLETE_DIR}" ] && [ -d "${INCOMPLETE_DIR}" ]; then
-            set_syno_permissions "${INCOMPLETE_DIR}" "${GROUP}"
-        fi
-        if [ -n "${WATCHED_DIR}" ] && [ -d "${WATCHED_DIR}" ]; then
-            set_syno_permissions "${WATCHED_DIR}" "${GROUP}"
+        else
+            # Extract the right paths from config file and update Permissions
+            DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
+            INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
+            WATCHED_DIR=$(sed -n 's/.*"watch-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
+            # Apply permissions
+            if [ -n "${DOWNLOAD_DIR}" ] && [ -d "${DOWNLOAD_DIR}" ]; then
+                set_syno_permissions "${DOWNLOAD_DIR}" "${GROUP}"
+            fi
+            if [ -n "${INCOMPLETE_DIR}" ] && [ -d "${INCOMPLETE_DIR}" ]; then
+                set_syno_permissions "${INCOMPLETE_DIR}" "${GROUP}"
+            fi
+            if [ -n "${WATCHED_DIR}" ] && [ -d "${WATCHED_DIR}" ]; then
+                set_syno_permissions "${WATCHED_DIR}" "${GROUP}"
+            fi
         fi
     fi
 }
