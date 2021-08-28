@@ -1,5 +1,5 @@
 PKG_NAME = domoticz
-PKG_VERS = 2020.2
+PKG_VERS = 2021.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/domoticz/domoticz/archive
@@ -43,9 +43,10 @@ USE_NATIVE_CMAKE = 1
 include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: domoticz_post_extract
-# sub module: load minizip from git
+# sub modules: download required minizip and fmtlib from git
 domoticz_post_extract:
 	@$(RUN); cd extern; git clone https://github.com/domoticz/minizip.git ./minizip
+	@$(RUN); cd extern; git clone https://github.com/fmtlib/fmt.git ./fmtlib
 
 .PHONY: domoticz_pre_compile
 # inject version information
