@@ -24,4 +24,4 @@ include ../../mk/spksrc.cross-go.mk
 
 .PHONY: filebrowser_pre_compile
 filebrowser_pre_compile:
-	$(RUN) make build-frontend
+	$(RUN) $(MAKE) build-frontend
