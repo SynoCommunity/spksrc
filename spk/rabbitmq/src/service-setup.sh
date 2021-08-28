@@ -1,7 +1,10 @@
 
-# evaluate version dependent path
-PATTERN=( ${SYNOPKG_PKGDEST}/lib/rabbitmq_server-*/sbin )
-RABBITMQ_SBIN=${PATTERN[0]}
+
+# evaluate version dependent path (do it /bin/sh compatible)
+for config_dir in ${SYNOPKG_PKGDEST}/lib/rabbitmq_server-*/sbin; do
+    RABBITMQ_SBIN=${config_dir}
+    break
+done
 
 SERVICE_COMMAND="${RABBITMQ_SBIN}/rabbitmq-server"
 SVC_CWD="${SYNOPKG_PKGDEST}"
