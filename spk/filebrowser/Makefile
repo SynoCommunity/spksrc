@@ -13,8 +13,8 @@ HELPURL = https://github.com/filebrowser/filebrowser/issues
 LICENSE = Apache-2.0
 CHANGELOG = "First Version"
 
-SPK_GROUP=synocommunity
-GROUP=synocommunity
+SPK_GROUP = synocommunity
+GROUP = synocommunity
 
 STARTABLE = yes
 SERVICE_USER = auto
