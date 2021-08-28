@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
-DEPENDS = cross/bzip2 cross/zlib
+DEPENDS = cross/bzip2 cross/zlib cross/python3
 
 HOMEPAGE = https://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
