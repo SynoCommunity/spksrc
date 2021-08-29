@@ -4,8 +4,6 @@
 # - cross/module depends on cmake
 #
 
-.NOTPARALLEL:
-
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
