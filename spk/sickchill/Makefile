@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python3>=3.6:git"
+SPK_DEPENDS = "git"
 PIP=pip3
 
 WHEELS = src/requirements.txt
