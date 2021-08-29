@@ -9,6 +9,8 @@
 #  URLS:                 List of URL to download
 #  DISTRIB_DIR:          Downloaded files will be placed there.  
 
+.NOTPARALLEL:
+
 # Configure file descriptor lock timeout
 ifeq ($(strip $(FLOCK_TIMEOUT)),)
 FLOCK_TIMEOUT = 300

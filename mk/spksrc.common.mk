@@ -57,6 +57,38 @@ SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
 #         all archs except generic archs
 LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))
 
+# Set parallel build mode
+ifeq ($(PARALLEL_MAKE),)
+# If not set but -j or -l argument passed, must
+# manually specify the value of PARALLEL_MAKE
+# as otherwise this will create too high load
+ifneq ($(strip $(filter -j% -l%, $(shell ps T $$PPID))),)
+PARALLEL_MAKE = nop
+ENV += PARALLEL_MAKE=nop
+# If not set, force max parallel build mode
+else
+PARALLEL_MAKE = max
+ENV += PARALLEL_MAKE=max
+endif
+endif
+
+# Set NCPUS based on PARALLEL_MAKE
+ifeq ($(PARALLEL_MAKE),nop)
+NCPUS = 1
+else ifeq ($(PARALLEL_MAKE),max)
+NCPUS = $(shell grep -c ^processor /proc/cpuinfo)
+else
+NCPUS = $(PARALLEL_MAKE)
+endif
+
+# Enable stats over parallel build mode
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+PSTAT_TIME = time -o $(PSTAT_LOG) --append
+else
+PSTAT_TIME =
+endif
+PSTAT_LOG = build.stats.log
+
 # Terminal colors
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
@@ -67,26 +99,3 @@ version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
-
-# Set parallel build mode
-ifeq ($(PARALLEL_MAKE),)
-# If -j or -l argument passed user must
-# manually specify the value of PARALLEL_MAKE
-# as otherwise this will create too high load
-ifneq ($(strip $(filter -j% -l%, $(shell ps T $$PPID))),)
-PARALLEL_MAKE = nop
-ENV += PARALLEL_MAKE=nop
-else
-# If not set, force max parallel build mode
-PARALLEL_MAKE = max
-ENV += PARALLEL_MAKE=max
-endif
-endif
-
-# Enable stats over parallel build mode
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-PSTAT_TIME = time -o $(PSTAT_LOG) --append
-else
-PSTAT_TIME =
-endif
-PSTAT_LOG = build.stats

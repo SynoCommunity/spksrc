@@ -1,8 +1,6 @@
 # Default make programs
 #
 
-.NOTPARALLEL:
-
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
@@ -25,12 +23,8 @@ TC = syno$(ARCH_SUFFIX)
 endif
 
 # Set parallel options in caller
-ifeq ($(PARALLEL_MAKE),max)
-MAKEFLAGS += -j$(shell nproc)
-else ifneq ($(PARALLEL_MAKE),)
 ifneq ($(PARALLEL_MAKE),nop)
-MAKEFLAGS += -j$(PARALLEL_MAKE)
-endif
+MAKEFLAGS += -j$(NCPUS)
 endif
 
 #####
@@ -71,8 +65,7 @@ smart-clean:
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:
-	rm -fr work work-*
-
+	rm -fr work work-* build-*.log
 
 all: install plist
 ifneq ($(filter 1 on ON,$(PSTAT)),)

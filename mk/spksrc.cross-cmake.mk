@@ -40,8 +40,8 @@ cmake_configure_target:
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-ifeq ($(PARALLEL_MAKE),max)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) --parallel $(shell nproc) $(WORK_DIR)/$(PKG_DIR)
+ifneq ($(PARALLEL_MAKE),nop)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) --parallel $(NCPUS) $(WORK_DIR)/$(PKG_DIR)
 else
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 endif
