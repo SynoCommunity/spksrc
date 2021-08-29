@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
-DEPENDS = cross/bzip2 cross/zlib cross/python38
+DEPENDS = cross/bzip2 cross/zlib cross/libicu
 
 HOMEPAGE = https://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
@@ -36,7 +36,10 @@ empty:=
 space:= $(empty) $(empty)
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-toolset=gcc
+CONFIGURE_ARGS += --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES)))
+CONFIGURE_ARGS += --prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-icu
 
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
@@ -55,6 +58,8 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # fix compilation with newer compilers
 CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 endif
+
+PATCHES_LEVEL = 1
 
 .PHONY: boost_configure
 boost_configure:

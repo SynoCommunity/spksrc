@@ -1,0 +1,27 @@
+From 62fcbde69aae70af24a51cb6582a2a95f65441c2 Mon Sep 17 00:00:00 2001
+From: Thomas Rodgers <rodgert@twrodgers.com>
+Date: Wed, 4 Aug 2021 13:22:35 -0700
+Subject: [PATCH] Fix duplicate typedef in mp.hpp [#671]
+
+https://github.com/boostorg/math/pull/671
+---
+ boost/math/tools/mp.hpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/boost/math/tools/mp.hpp b/boost/math/tools/mp.hpp
+index dc8440988..3100a0bb6 100644
+--- a/boost/math/tools/mp.hpp
++++ b/boost/math/tools/mp.hpp
+@@ -426,9 +426,6 @@ struct make_integer_sequence_impl
+ template<typename T, T N>
+ using make_integer_sequence = typename detail::make_integer_sequence_impl<T, N>::type;
+ 
+-template<std::size_t... I>
+-using index_sequence = integer_sequence<std::size_t, I...>;
+-
+ template<std::size_t N>
+ using make_index_sequence = make_integer_sequence<std::size_t, N>;
+ 
+-- 
+2.31.1
+

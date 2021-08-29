@@ -28,9 +28,10 @@ GNU_CONFIGURE = 1
 
 ifneq ($(strip $(PYTHON_INTERPRETER)),)
 PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
+PYTHON_NAME_SHORTVER = $(word 1,$(subst ., ,$(PYTHON_VERSION)))$(word 2,$(subst ., ,$(PYTHON_VERSION)))
 CONFIGURE_ARGS  = --enable-python-binding
 CONFIGURE_ARGS +=  --with-boost-python=boost_python
-CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
+CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python$(PYTHON_NAME_SHORTVER)/work-native/install/usr/local/bin/$(PYTHON_NAME)
 CONFIGURE_ARGS += LIB=-L$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)

@@ -1,0 +1,33 @@
+From f6818a161d3f835d246aceea0804243c887ac10b Mon Sep 17 00:00:00 2001
+From: Thomas Rodgers <rodgert@twrodgers.com>
+Date: Wed, 4 Aug 2021 13:09:57 -0700
+Subject: [PATCH] Fix include inside boost namespace [#670]
+
+https://github.com/boostorg/math/pull/670/commits/1ec5c98d80de97f9e962c5627e1a0e6096099894
+---
+ boost/math/tools/mp.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/boost/math/tools/mp.hpp b/boost/math/tools/mp.hpp
+index 35565646f..dc8440988 100644
+--- a/boost/math/tools/mp.hpp
++++ b/boost/math/tools/mp.hpp
+@@ -13,6 +13,7 @@
+ 
+ #include <type_traits>
+ #include <cstddef>
++#include <utility>
+ 
+ namespace boost { namespace math { namespace tools { namespace meta_programming {
+ 
+@@ -338,7 +339,6 @@ using mp_remove_if_q = mp_remove_if<L, Q::template fn>;
+ // Index sequence
+ // Use C++14 index sequence if available
+ #if defined(__cpp_lib_integer_sequence) && (__cpp_lib_integer_sequence >= 201304)
+-#include <utility>
+ template<std::size_t... I>
+ using index_sequence = std::index_sequence<I...>;
+ 
+-- 
+2.31.1
+
