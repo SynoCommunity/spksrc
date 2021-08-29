@@ -22,11 +22,6 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 
-# Set parallel options in caller
-ifneq ($(PARALLEL_MAKE),nop)
-MAKEFLAGS += -j$(NCPUS)
-endif
-
 #####
 
 include ../../mk/spksrc.pre-check.mk

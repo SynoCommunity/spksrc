@@ -8,6 +8,13 @@
 
 .PARALLEL:
 
+# Set parallel options in caller
+ifneq ($(PARALLEL_MAKE),nop)
+ifeq ($(call version_ge, ${MAKELEVEL}, 2),1)
+MAKEFLAGS += -j$(NCPUS)
+endif
+endif
+
 COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)compile_done
 
 ifeq ($(strip $(PRE_COMPILE_TARGET)),)
