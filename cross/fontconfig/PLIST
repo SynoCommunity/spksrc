@@ -7,8 +7,6 @@ bin:bin/fc-pattern
 bin:bin/fc-query
 bin:bin/fc-scan
 bin:bin/fc-validate
-rsc:etc/fonts/conf.d/
-rsc:etc/fonts/fonts.conf
 lnk:lib/libfontconfig.so
 lnk:lib/libfontconfig.so.1
 lib:lib/libfontconfig.so.1.12.0

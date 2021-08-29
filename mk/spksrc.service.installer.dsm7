@@ -17,7 +17,6 @@ FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
 
 TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
-
 install_log ()
 {
     local _msg_="$@"
@@ -84,6 +83,8 @@ CP="/bin/cp -rfp"
 MKDIR="/bin/mkdir -p"
 LN="/bin/ln -nsf"
 TEE="/usr/bin/tee -a"
+RSYNC="/bin/rsync -avh"
+TAR="/bin/tar"
 
 ### Functions library
 
@@ -139,6 +140,24 @@ syno_user_add_to_legacy_group () {
     echo "${SYNOPKG_PKGNAME} has not been updated to DSM7 yet. syno_user_add_to_legacy_group() is no longer supported."
 }
 
+#
+# New DSM7 folders: copy no-verwrite + remove source
+# directories: @etc, @appdata, @apptemp and @apphome
+#
+syno_sync_app_folders () {
+    for appdir in $(find ${SYNOPKG_PKGDEST} -mindepth 1 -maxdepth 1 -not -empty -type d -name "_*");
+    do
+        case "${appdir##*@}" in
+           etc ) dest=/usr/syno/etc/packages/${SYNOPKG_PKGNAME};;
+             * ) dest=/var/packages/${SYNOPKG_PKGNAME}/${appdir##*_};;
+        esac
+
+        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/_${appdir##*_}/ ${dest}" 1>&2
+        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/_${appdir##*_}/ ${dest}
+        $RM ${SYNOPKG_PKGDEST}/_${appdir##*_}
+    done
+}
+
 
 ### Generic package behaviors
 
@@ -166,9 +185,7 @@ postinst ()
 
     # copy target/var data to permanent storage
     # and don't override old configurations
-    if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
-        $CP ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
-    fi    
+    syno_sync_app_folders >> ${LOG_FILE}
 
     call_func "service_postinst" install_log
 
@@ -215,10 +232,12 @@ preupgrade ()
     call_func "validate_preupgrade"
 
     # dsm6 -> dsm7
-    # Migrate data to permanent storage
+    # Backup & Migrate data once
+    # to permanent storage
     if [ -d ${SYNOPKG_PKGDEST}/var -a ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
-        # only migrate when destination is empty
-        $CP ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
+        $RSYNC --ignore-existing ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR} 2>&1 | install_log && chk=$?
+        $TAR -C ${SYNOPKG_PKGDEST} -Jcf - var > ${SYNOPKG_PKGVAR}/var-preDSM7-$(date +%Y%m%d-%H%M).tar.xz && chk="${chk}$?"
+        [ "${chk}" = "00" ] && rm -fr ${SYNOPKG_PKGDEST}/var || true
     fi
 
     call_func "service_preupgrade" install_log
@@ -231,6 +250,7 @@ postupgrade ()
     log_step "postupgrade"
 
     call_func "service_restore" install_log
+    syno_sync_app_folders >> ${LOG_FILE}
     call_func "service_postupgrade" install_log
     exit 0
 }
