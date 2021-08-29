@@ -266,7 +266,11 @@ endif
 ifneq ($(strip $(GROUP)),)
 	@jq '."groupname" = "$(GROUP)"' $@ | sponge $@
 else
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@jq '."groupname" = "synocommunity"' $@ | sponge $@
+else
 	@jq '."groupname" = "sc-$(SPK_USER)"' $@ | sponge $@
+endif
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
