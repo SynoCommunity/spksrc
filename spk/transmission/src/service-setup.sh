@@ -1,7 +1,12 @@
 # Add python to path
 # This gives tranmission the power to execute python scripts on completion (like TorrentToMedia).
-PYTHON_DIR="/usr/local/python"
-PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}/bin:${PATH}"
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+    # use system python
+    PYTHON_BIN_PATHS=""
+else
+    PYTHON_BIN_PATHS="/var/packages/python38/target/bin:/var/packages/python3/target/bin:"
+fi
+PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_BIN_PATHS}${PATH}"
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
