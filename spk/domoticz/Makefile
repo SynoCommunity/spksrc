@@ -39,3 +39,4 @@ include ../../mk/spksrc.spk.mk
 domoticz_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+
