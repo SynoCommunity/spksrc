@@ -29,16 +29,16 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 PRE_CONFIGURE_TARGET = kernel_pre_configure_target
 CONFIGURE_TARGET     = kernel_configure_target
 PRE_COMPILE_TARGET   = kernel_module_prepare_target
+ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 COMPILE_TARGET       = nop
+else
+COMPILE_TARGET       = kernel_module_compile_target
+endif
 # spksrc.install.mk called for PRE_INSTALL_PLIST
 # in order to generate a work*/linux.plist.auto
 # later used by spksr.plist.mk to generate the
 # diff based on .ko kernel objects
-ifeq ($(strip $(REQUIRE_KERNEL_HEADERS)),)
 INSTALL_TARGET       = nop
-else
-INSTALL_TARGET       = install_headers_destdir_target
-endif
 
 #####
 
