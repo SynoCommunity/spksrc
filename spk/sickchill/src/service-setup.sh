@@ -1,4 +1,4 @@
-PYTHON_DIR="/usr/local/python3"
+PYTHON_DIR="/usr/local/python38"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
@@ -48,8 +48,20 @@ service_postinst() {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config
     fi
+    
+    set_unix_permissions "${SYNOPKG_PKGDEST}"
 }
 
-service_postupgrade() {
-    set_config
+service_postupgrade() {  
+    # set_config
+    set_unix_permissions "${SYNOPKG_PKGDEST}"
+}
+
+service_preupgrade ()
+{
+    # We have to reset /env folder to 3.8 so remove entire folder as it gets rebuilt in postinst and this avoids any conflicts.
+    if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ]; then
+        echo "Removing old ${SYNOPKG_PKGDEST}/env for new Python 3.8" >> ${INST_LOG}
+        rm -rf ${SYNOPKG_PKGDEST}/env >> ${INST_LOG} 2>&1
+    fi
 }
