@@ -6,8 +6,6 @@
 #  compile_target       (override with COMPILE_TARGET)
 #  post_compile_target  (override with POST_COMPILE_TARGET)
 
-.PARALLEL:
-
 # Set parallel options in caller
 ifneq ($(PARALLEL_MAKE),nop)
 ifeq ($(call version_ge, ${MAKELEVEL}, 2),1)

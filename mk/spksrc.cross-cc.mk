@@ -1,6 +1,22 @@
 # Default make programs
 #
 
+#
+# When compiling from cross/* it's not possible
+# to build in parallel using both -jX command
+# line argument in conjunction with flag
+# PARALLEL_MAKE=X.  The .NOTPARALLEL is needed
+# in order to disable the -jX flag when called
+# within cross/* only.
+#
+# This does not affect building from spk/*
+# where .NOTPARALLE is mandatory but will still
+# obey to both -jX + PARALLEL_MAKE options.
+#
+ifneq ($(PARALLEL_MAKE),nop)
+.NOTPARALLEL:
+endif
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
