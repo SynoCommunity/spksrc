@@ -1,0 +1,31 @@
+# do not overwrite CFLAGS and LDFLAGS
+# make dirs like SHAREDIR overwriteable
+--- src/Makefile.orig	2020-12-05 21:35:02.000000000 +0000
++++ src/Makefile	2020-12-30 17:29:41.411880384 +0000
+@@ -1,8 +1,8 @@
+ DESTDIR ?=
+ PREFIX ?= /usr/local
+-BINDIR = $(PREFIX)/bin
+-SHAREDIR = $(PREFIX)/share/imapfilter
+-MANDIR = $(PREFIX)/man
++BINDIR ?= $(PREFIX)/bin
++SHAREDIR ?= $(PREFIX)/share/imapfilter
++MANDIR ?= $(PREFIX)/man
+ 
+ SSLCAPATH = /etc/ssl/certs
+ SSLCAFILE = /etc/ssl/cert.pem
+@@ -19,12 +19,12 @@
+ LIBSSL = -lssl
+ LIBCRYPTO = -lcrypto
+ 
+-CFLAGS = -Wall -Wextra -O \
++CFLAGS += -Wall -Wextra -O \
+ 	 -DCONFIG_SHAREDIR='"$(SHAREDIR)"' \
+ 	 -DCONFIG_SSL_CAPATH='"$(SSLCAPATH)"' \
+ 	 -DCONFIG_SSL_CAFILE='"$(SSLCAFILE)"' \
+ 	 $(INCDIRS) $(MYCFLAGS)
+-LDFLAGS = $(LIBDIRS) $(MYLDFLAGS)
++LDFLAGS += $(LIBDIRS) $(MYLDFLAGS)
+ LIBS = -lm -ldl $(LIBLUA) $(LIBPCRE) $(LIBSSL) $(LIBCRYPTO) $(MYLIBS)
+ 
+ MAN1 = imapfilter.1
