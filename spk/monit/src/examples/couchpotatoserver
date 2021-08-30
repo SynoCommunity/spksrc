@@ -1,6 +1,6 @@
 #default file provided by monit spk
 
-check process CouchPotato with pidfile /usr/local/couchpotatoserver/var/couchpotatoserver.pid
+check process CouchPotato with pidfile /var/packages/couchpotatoserver/var/couchpotatoserver.pid
     start program = "/var/packages/couchpotatoserver/scripts/start-stop-status start"
     stop program  = "/var/packages/couchpotatoserver/scripts/start-stop-status stop"
     if failed host localhost port 5050 for 2 cycles then restart
