@@ -168,7 +168,7 @@ postinst ()
     # and don't override old configurations
     if [ -d ${SYNOPKG_PKGDEST}/var ] && [ "$(find ${SYNOPKG_PKGVAR} -mindepth 1 -not -name '*.log' -print)" = "" ]; then
         $CP ${SYNOPKG_PKGDEST}/var/. ${SYNOPKG_PKGVAR} 2>&1 | install_log
-    fi    
+    fi
 
     call_func "service_postinst" install_log
 
@@ -234,4 +234,3 @@ postupgrade ()
     call_func "service_postupgrade" install_log
     exit 0
 }
-
