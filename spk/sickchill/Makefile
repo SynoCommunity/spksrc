@@ -4,7 +4,12 @@ SPK_REV = 1
 SPK_ICON = src/sickchill.png
 
 DEPENDS = cross/$(SPK_NAME)
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = "git"
+else
+SPK_DEPENDS = "python3>=3.6;git"
+endif
 PIP=pip3
 
 WHEELS = src/requirements.txt
