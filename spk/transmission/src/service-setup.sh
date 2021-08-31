@@ -10,7 +10,9 @@ PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_BIN_PATHS}${PATH}"
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
-GROUP="sc-download"
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+    GROUP="sc-download"
+fi
 
 SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
 
