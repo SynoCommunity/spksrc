@@ -40,8 +40,11 @@ service_postupgrade ()
         if [ "/var/packages/sabnzbd/target/var" != "${SYNOPKG_PKGVAR}" ]; then
             sed -i -e "s|script_dir\s*=\s*/var/packages/sabnzbd/target/var/scripts|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
         fi
-        # update download folder from wizard (wizard is used to add the package user to the shared folder)
-        sed -i -e "s|download_dir\s*=.*|download_dir = ${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+            # update download folder from wizard (wizard is used to add the package user to the shared folder)
+            sed -i -e "s|download_dir\s*=.*|download_dir = ${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+        fi
 
         # add group (DSM6)
         INCOMPLETE_FOLDER=$(sed -n 's/^download_dir[ ]*=[ ]*//p' ${CFG_FILE})
