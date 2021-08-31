@@ -1,13 +1,15 @@
 BIN="${SYNOPKG_PKGDEST}/bin"
 PYTHON_DIR="/var/packages/python38/target/bin"
-PATH="${BIN}:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${BIN}:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
-GROUP="sc-download"
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+    GROUP="sc-download"
+fi
 
 SERVICE_COMMAND="${LANGUAGE} ${PYTHON} -OO ${SABNZBD} -f ${CFG_FILE} --pidfile ${PID_FILE} -d"
 
@@ -44,21 +46,21 @@ service_postupgrade ()
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
             # update download folder from wizard (wizard is used to add the package user to the shared folder)
             sed -i -e "s|download_dir\s*=.*|download_dir = ${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
-        fi
+        else
+            # add group (DSM6)
+            INCOMPLETE_FOLDER=$(sed -n 's/^download_dir[ ]*=[ ]*//p' ${CFG_FILE})
+            COMPLETE_FOLDER=$(sed -n 's/^complete_dir[ ]*=[ ]*//p' ${CFG_FILE})
+            WATCHED_FOLDER=$(sed -n 's/^dirscan_dir[ ]*=[ ]*//p' ${CFG_FILE})
 
-        # add group (DSM6)
-        INCOMPLETE_FOLDER=$(sed -n 's/^download_dir[ ]*=[ ]*//p' ${CFG_FILE})
-        COMPLETE_FOLDER=$(sed -n 's/^complete_dir[ ]*=[ ]*//p' ${CFG_FILE})
-        WATCHED_FOLDER=$(sed -n 's/^dirscan_dir[ ]*=[ ]*//p' ${CFG_FILE})
-
-        if [ -n "${INCOMPLETE_FOLDER}" ] && [ -d "${INCOMPLETE_FOLDER}" ]; then
-            set_syno_permissions "${INCOMPLETE_FOLDER}" "${GROUP}"
-        fi
-        if [ -n "${COMPLETE_FOLDER}" ] && [ -d "${COMPLETE_FOLDER}" ]; then
-            set_syno_permissions "${COMPLETE_FOLDER}" "${GROUP}"
-        fi
-        if [ -n "${WATCHED_FOLDER}" ] && [ -d "${WATCHED_FOLDER}" ]; then
-            set_syno_permissions "${WATCHED_FOLDER}" "${GROUP}"
+            if [ -n "${INCOMPLETE_FOLDER}" ] && [ -d "${INCOMPLETE_FOLDER}" ]; then
+                set_syno_permissions "${INCOMPLETE_FOLDER}" "${GROUP}"
+            fi
+            if [ -n "${COMPLETE_FOLDER}" ] && [ -d "${COMPLETE_FOLDER}" ]; then
+                set_syno_permissions "${COMPLETE_FOLDER}" "${GROUP}"
+            fi
+            if [ -n "${WATCHED_FOLDER}" ] && [ -d "${WATCHED_FOLDER}" ]; then
+                set_syno_permissions "${WATCHED_FOLDER}" "${GROUP}"
+            fi
         fi
     fi
 }
