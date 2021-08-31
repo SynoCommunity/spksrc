@@ -66,6 +66,7 @@ service_postupgrade ()
             # update folders
             sed -i -e "s|complete_dir\s*=.*|complete_dir = ${NEW_COMPLETE_FOLDER}|g" ${CFG_FILE}
             sed -i -e "s|download_dir\s*=.*|download_dir = ${NEW_INCOMPLETE_DIR}|g" ${CFG_FILE}
+            sed -i -e "s|dirscan_dir\s*=.*|dirscan_dir = ${NEW_WATCH_FOLDER}|g" ${CFG_FILE}
 
             shopt -s dotglob # copy hidden folder/files too
             if [ -n "${OLD_INCOMPLETE_FOLDER}" ] &&  [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_DIR" ]; then
@@ -78,7 +79,6 @@ service_postupgrade ()
             fi
             if [ -n "${OLD_WATCH_FOLDER}" ] &&  [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
                 mkdir -p "$NEW_WATCH_FOLDER"
-                sed -i -e "s|dirscan_dir\s*=.*|dirscan_dir = ${NEW_WATCH_FOLDER}|g" ${CFG_FILE}
                 mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
             fi
             shopt -d dotglob
