@@ -86,11 +86,12 @@ service_postupgrade ()
             NEW_WATCHED_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
 
             # update folders
-            sed -i -e "s|\s\"download-dir\".*|    \"download-dir\": \"${NEW_DOWNLOAD_DIR}\",|g" "${CFG_FILE}"
-            sed -i -e "s|\s\"watch-dir\".*|    \"watch-dir\": \"${NEW_INCOMPLETE_DIR}\",|g" "${CFG_FILE}"
-            sed -i -e "s|\s\"watch-dir-enabled\".*|    \"watch-dir-enabled\": true,|g" "${CFG_FILE}"
-            sed -i -e "s|\s\"incomplete-dir\".*|    \"incomplete-dir\": \"${NEW_WATCHED_DIR}\",|g" "${CFG_FILE}"
-            sed -i -e "s|\s\"incomplete-dir-enabled\".*|    \"incomplete-dir-enabled\": true,|g" "${CFG_FILE}"
+            SETTINGS=$(cat "${CFG_FILE}")
+            SETTINGS=$(echo "$SETTINGS" | jq '."watch-dir-enabled"=true | ."incomplete-dir-enabled"=true')
+            SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_DOWNLOAD_DIR} '."download-dir"=$path')
+            SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_INCOMPLETE_DIR} '."incomplete-dir"=$path')
+            SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_WATCHED_DIR} '."watch-dir"=$path')
+            echo "$SETTINGS" > "${CFG_FILE}"
 
             mkdir -p "$NEW_INCOMPLETE_DIR"
             mkdir -p "$NEW_WATCHED_DIR"
