@@ -23,12 +23,21 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+        shared_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}"
+        sed -i -e "s|@shared_folder@|${shared_folder}|g" ${CFG_FILE}
         sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
+
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+            sed -i -e "s|permissions\s*=.*|permissions = ""|g" ${CFG_FILE}
+        fi
+
+        # Create logs directory, otherwise it does not start due to permissions errors
+        mkdir -p "$(dirname ${LOG_FILE})"
+        mkdir -p "${shared_folder}/incomplete"
+        mkdir -p "${shared_folder}/complete"
+        mkdir -p "${shared_folder}/watch"
     fi
 
-    # Create logs directory, otherwise it does not start due to permissions errors
-    mkdir -p "$(dirname ${LOG_FILE})"
 
     # Install nice/ionice
     ${BIN}/busybox --install ${BIN}
@@ -37,20 +46,48 @@ service_postinst ()
 service_postupgrade ()
 {
     if [ -r "${CFG_FILE}" ]; then
-        # DSM6 -> DSM7 migration
+        # /usr/local/ migration
         sed -i -e "s|script_dir\s*=\s*/usr/local/sabnzbd/var/scripts|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
-        if [ "/var/packages/sabnzbd/target/var" != "${SYNOPKG_PKGVAR}" ]; then
-            sed -i -e "s|script_dir\s*=\s*/var/packages/sabnzbd/target/var/scripts|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
-        fi
+        mkdir -p "${SYNOPKG_PKGVAR}/scripts"
 
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-            # update download folder from wizard (wizard is used to add the package user to the shared folder)
-            sed -i -e "s|download_dir\s*=.*|download_dir = ${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}|g" ${CFG_FILE}
+            # DSM6 -> DSM7 migration
+            sed -i -e "s|script_dir\s*=\s*/var/packages/sabnzbd/target/var/scripts|script_dir = ${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
+            sed -i -e "s|permissions\s*=.*|permissions = ""|g" ${CFG_FILE}
+
+            OLD_INCOMPLETE_FOLDER=$(sed -n 's/^download_dir\s*=\s*//p' ${CFG_FILE})
+            OLD_COMPLETE_FOLDER=$(sed -n 's/^complete_dir\s*=\s*//p' ${CFG_FILE})
+            OLD_WATCH_FOLDER=$(sed -n 's/^dirscan_dir\s*=\s*//p' ${CFG_FILE})
+
+            NEW_INCOMPLETE_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
+            NEW_COMPLETE_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
+            NEW_WATCH_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+
+            # update folders
+            sed -i -e "s|complete_dir\s*=.*|complete_dir = ${NEW_COMPLETE_FOLDER}|g" ${CFG_FILE}
+            sed -i -e "s|download_dir\s*=.*|download_dir = ${NEW_INCOMPLETE_DIR}|g" ${CFG_FILE}
+
+            shopt -s dotglob # copy hidden folder/files too
+            if [ -n "${OLD_INCOMPLETE_FOLDER}" ] &&  [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_DIR" ]; then
+                mkdir -p "$NEW_COMPLETE_FOLDER"
+                mv -nv "$OLD_INCOMPLETE_FOLDER"/* "$NEW_INCOMPLETE_DIR/"
+            fi
+            if [ -n "${OLD_COMPLETE_FOLDER}" ] && [ "$OLD_COMPLETE_FOLDER" != "$NEW_WATCHED_DIR" ]; then
+                mkdir -p "$NEW_INCOMPLETE_DIR"
+                mv -nv "$OLD_COMPLETE_FOLDER"/* "$NEW_WATCHED_DIR/"
+            fi
+            if [ -n "${OLD_WATCH_FOLDER}" ] &&  [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
+                mkdir -p "$NEW_WATCH_FOLDER"
+                sed -i -e "s|dirscan_dir\s*=.*|dirscan_dir = ${NEW_WATCH_FOLDER}|g" ${CFG_FILE}
+                mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
+            fi
+            shopt -d dotglob
+
         else
             # add group (DSM6)
-            INCOMPLETE_FOLDER=$(sed -n 's/^download_dir[ ]*=[ ]*//p' ${CFG_FILE})
-            COMPLETE_FOLDER=$(sed -n 's/^complete_dir[ ]*=[ ]*//p' ${CFG_FILE})
-            WATCHED_FOLDER=$(sed -n 's/^dirscan_dir[ ]*=[ ]*//p' ${CFG_FILE})
+            INCOMPLETE_FOLDER=$(sed -n 's/^download_dir\s*=\s*//p' ${CFG_FILE})
+            COMPLETE_FOLDER=$(sed -n 's/^complete_dir\s*=\s*//p' ${CFG_FILE})
+            WATCHED_FOLDER=$(sed -n 's/^dirscan_dir\s*=\s*//p' ${CFG_FILE})
 
             if [ -n "${INCOMPLETE_FOLDER}" ] && [ -d "${INCOMPLETE_FOLDER}" ]; then
                 set_syno_permissions "${INCOMPLETE_FOLDER}" "${GROUP}"
