@@ -54,7 +54,7 @@
         ]
       },
       {
-        "desc": "If the specified share does not exist, it will be created. You can use an existing share by specifying the full path to the folder. Make sure to specify paths to existing shares correctly, for example external USB-drive paths are of the form <em>/volumeUSB1/usbshare</em>."
+        "desc": "If the specified share does not exist, it will be created. You can use an existing share by specifying the name of the folder."
       },
       {
         "desc": "Package user and group will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
