@@ -1,6 +1,6 @@
 SPK_NAME = deluge
 SPK_VERS = 2.0.4
-SPK_REV = 1
+SPK_REV = 14
 SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
