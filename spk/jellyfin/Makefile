@@ -33,6 +33,6 @@ SERVICE_PORT_TITLE = Jellyfin (HTTP)
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) armadaxp alpine
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
 
 include ../../mk/spksrc.spk.mk
