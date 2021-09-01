@@ -38,10 +38,6 @@ service_postinst ()
         mkdir -p "${shared_folder}/watch"
     fi
 
-    # add group (DSM6)
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        set_syno_permissions "${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}" "${GROUP}"
-    fi
 
     # Install nice/ionice
     ${BIN}/busybox --install ${BIN}

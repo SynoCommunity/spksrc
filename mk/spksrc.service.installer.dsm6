@@ -305,6 +305,30 @@ postinst ()
         synogroup --rebuild all 2>&1 | install_log
     fi
 
+    # Share management
+    if [ -n "${SHARE_PATH}" ]; then
+        install_log "Configuring ${SHARE_PATH}"
+        # Create share if does not exist
+        #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
+        if ! synoshare --get "${SHARE_NAME}" &> /dev/null; then
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 2>&1 | install_log
+        fi
+
+        # Add user permission if no GROUP is set in UI
+        # GROUP permission will be added in set_syno_permissions
+        if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
+        fi
+        synoshare --build 2>&1 | install_log
+
+        $MKDIR "${SHARE_PATH}"
+
+        # Permissions for folder, up to volume
+        if [ -n "$GROUP" ]; then
+            set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
+        fi
+    fi
+
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
     call_func "service_postinst" install_log
