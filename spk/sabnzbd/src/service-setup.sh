@@ -59,24 +59,24 @@ service_postupgrade ()
             OLD_COMPLETE_FOLDER=$(sed -n 's/^complete_dir\s*=\s*//p' ${CFG_FILE})
             OLD_WATCH_FOLDER=$(sed -n 's/^dirscan_dir\s*=\s*//p' ${CFG_FILE})
 
-            NEW_INCOMPLETE_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
+            NEW_INCOMPLETE_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
             NEW_COMPLETE_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
             NEW_WATCH_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
 
             # update folders
             sed -i -e "s|complete_dir\s*=.*|complete_dir = ${NEW_COMPLETE_FOLDER}|g" ${CFG_FILE}
-            sed -i -e "s|download_dir\s*=.*|download_dir = ${NEW_INCOMPLETE_DIR}|g" ${CFG_FILE}
+            sed -i -e "s|download_dir\s*=.*|download_dir = ${NEW_INCOMPLETE_FOLDER}|g" ${CFG_FILE}
             sed -i -e "s|dirscan_dir\s*=.*|dirscan_dir = ${NEW_WATCH_FOLDER}|g" ${CFG_FILE}
 
             shopt -s dotglob # copy hidden folder/files too
-            if [ -n "${OLD_INCOMPLETE_FOLDER}" ] &&  [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_DIR" ]; then
-                mkdir -p "$NEW_COMPLETE_FOLDER"
-                mv -nv "$OLD_INCOMPLETE_FOLDER"/* "$NEW_INCOMPLETE_DIR/"
+            if [ -n "${OLD_INCOMPLETE_FOLDER}" ] &&  [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_FOLDER" ]; then
+                mkdir -p "$NEW_INCOMPLETE_FOLDER"
+                mv -nv "$OLD_INCOMPLETE_FOLDER"/* "$NEW_INCOMPLETE_FOLDER/"
             fi
-            if [ -n "${OLD_COMPLETE_FOLDER}" ] && [ "$OLD_COMPLETE_FOLDER" != "$NEW_WATCHED_DIR" ]; then
-                mkdir -p "$NEW_INCOMPLETE_DIR"
-                mv -nv "$OLD_COMPLETE_FOLDER"/* "$NEW_WATCHED_DIR/"
-            fi
+            # if [ -n "${OLD_COMPLETE_FOLDER}" ] && [ "$OLD_COMPLETE_FOLDER" != "$NEW_COMPLETE_FOLDER" ]; then
+            #     mkdir -p "$NEW_COMPLETE_FOLDER"
+            #     mv -nv "$OLD_COMPLETE_FOLDER"/* "$NEW_COMPLETE_FOLDER/"
+            # fi
             if [ -n "${OLD_WATCH_FOLDER}" ] &&  [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
                 mkdir -p "$NEW_WATCH_FOLDER"
                 mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
