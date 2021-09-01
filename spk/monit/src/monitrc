@@ -1,10 +1,10 @@
 set daemon 60
-set pidfile /usr/local/monit/var/monit.pid
-set statefile /usr/local/monit/var/monit.state
-set idfile /usr/local/monit/var/monit.id
+set pidfile /var/packages/monit/var/monit.pid
+set statefile /var/packages/monit/var/monit.state
+set idfile /var/packages/monit/var/monit.id
 
 set eventqueue
-    basedir /usr/local/monit/var/events
+    basedir /var/packages/monit/var/events
     slots 100
 
 set httpd
@@ -13,4 +13,4 @@ set httpd
     use address 0.0.0.0
 
 #include files in subdir
-include /usr/local/monit/var/monit.d/*
+include /var/packages/monit/var/monit.d/*
