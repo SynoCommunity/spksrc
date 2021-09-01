@@ -1,0 +1,29 @@
+commit 76e775847f4954b63dc72afe34d9d921c6688b31
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Tue Jul 16 01:16:28 2019 +0200
+
+    Fix failed assertion 'outstate->after_newline'
+    
+    The assertion triggers when the -o FILE option is used, more than one output
+    file is written into FILE, and one of those files (except the last one) ends in
+    the middle of a line.
+    * src/patch.c (main): Fix the case described above.
+
+diff --git a/src/patch.c b/src/patch.c
+index 02fd982..3794319 100644
+--- a/src/patch.c
++++ b/src/patch.c
+@@ -369,6 +369,13 @@ main (int argc, char **argv)
+ 	    /* outstate.ofp now owns the file descriptor */
+ 	    outfd = -1;
+ 	  }
++	else
++	  {
++	    /* When writing to a single output file (-o FILE), always pretend
++	       that the output file ends in a newline.  Otherwise, when another
++	       file is written to the same output file, apply_hunk will fail.  */
++	    outstate.after_newline = true;
++	  }
+ 
+ 	/* find out where all the lines are */
+ 	if (!skip_rest_of_patch) {

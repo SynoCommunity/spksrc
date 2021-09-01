@@ -1,0 +1,24 @@
+commit 3bbebbb29f6fbbf2988b9f2e75695b7c0b1f1c9b
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Wed Feb 7 12:01:22 2018 +0100
+
+    Avoid set_file_attributes sign conversion warnings
+    
+    * src/util.c (set_file_attributes): Avoid sign conversion warnings when
+    assigning -1 to uid_t / gid_t.
+
+diff --git a/src/util.c b/src/util.c
+index b1c7266..1cc08ba 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -256,8 +256,8 @@ set_file_attributes (char const *to, enum file_attributes attr,
+     }
+   if (attr & FA_IDS)
+     {
+-      static uid_t euid = -1;
+-      static gid_t egid = -1;
++      static uid_t euid = (uid_t)-1;
++      static gid_t egid = (gid_t)-1;
+       uid_t uid;
+       uid_t gid;
+ 

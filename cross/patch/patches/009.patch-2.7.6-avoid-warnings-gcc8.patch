@@ -1,0 +1,85 @@
+commit ae81be0024ea4eaf139b7ba57e9a8ce9e4a163ec
+Author: Jim Meyering <jim@meyering.net>
+Date:   Fri Apr 6 17:17:11 2018 -0700
+
+    maint: avoid warnings from GCC8
+    
+    Hi Andreas,
+    
+    I configured with --enable-gcc-warnings and bleeding-edge gcc
+    (version 8.0.1 20180406) and hit some warning-escalated-to-errors.
+    This fixes them:
+    
+    >From a71ddb200dbe7ac0f9258796b5a51979b2740e88 Mon Sep 17 00:00:00 2001
+    From: Jim Meyering <meyering@fb.com>
+    Date: Fri, 6 Apr 2018 16:47:00 -0700
+    Subject: [PATCH] maint: avoid warnings from GCC8
+    
+    * src/common.h (FALLTHROUGH): Define.
+    * src/patch.c (abort_hunk_context): Use FALLTHROUGH macro in place of
+    a comment.  This avoids a warning from -Wimplicit-fallthrough=.
+    * src/pch.c (do_ed_script): Add otherwise unnecessary initialization
+    to avoid warning from -Wmaybe-uninitialized.
+    (another_hunk): Use FALLTHROUGH macro here, too, twice.
+
+diff --git a/src/common.h b/src/common.h
+index ec50b40..904a3f8 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -218,3 +218,11 @@ bool merge_hunk (int hunk, struct outstate *, lin where, bool *);
+ #else
+ # define merge_hunk(hunk, outstate, where, somefailed) false
+ #endif
++
++#ifndef FALLTHROUGH
++# if __GNUC__ < 7
++#  define FALLTHROUGH ((void) 0)
++# else
++#  define FALLTHROUGH __attribute__ ((__fallthrough__))
++# endif
++#endif
+diff --git a/src/patch.c b/src/patch.c
+index 0fe6d72..1ae91d9 100644
+--- a/src/patch.c
++++ b/src/patch.c
+@@ -1381,7 +1381,7 @@ abort_hunk_context (bool header, bool reverse)
+ 	    break;
+ 	case ' ': case '-': case '+': case '!':
+ 	    fprintf (rejfp, "%c ", pch_char (i));
+-	    /* fall into */
++	    FALLTHROUGH;
+ 	case '\n':
+ 	    pch_write_line (i, rejfp);
+ 	    break;
+diff --git a/src/pch.c b/src/pch.c
+index 1055542..cda3dfa 100644
+--- a/src/pch.c
++++ b/src/pch.c
+@@ -1735,7 +1735,7 @@ another_hunk (enum diff difftype, bool rev)
+ 		break;
+ 	    case '=':
+ 		ch = ' ';
+-		/* FALL THROUGH */
++		FALLTHROUGH;
+ 	    case ' ':
+ 		if (fillsrc > p_ptrn_lines) {
+ 		    free(s);
+@@ -1756,7 +1756,7 @@ another_hunk (enum diff difftype, bool rev)
+ 		    p_end = fillsrc-1;
+ 		    return -1;
+ 		}
+-		/* FALL THROUGH */
++		FALLTHROUGH;
+ 	    case '+':
+ 		if (filldst > p_end) {
+ 		    free(s);
+@@ -2394,8 +2394,7 @@ do_ed_script (char const *inname, char const *outname,
+     size_t chars_read;
+     FILE *tmpfp = 0;
+     char const *tmpname;
+-    int tmpfd;
+-    pid_t pid;
++    int tmpfd = -1; /* placate gcc's -Wmaybe-uninitialized */
+     int exclusive = *outname_needs_removal ? 0 : O_EXCL;
+     char const **ed_argv;
+     int stdin_dup, status;

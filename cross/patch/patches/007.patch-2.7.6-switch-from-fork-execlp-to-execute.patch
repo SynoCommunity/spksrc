@@ -1,0 +1,1774 @@
+diff -up patch-2.7.6/lib/execute.c.switch-from-fork-execlp-to-execute patch-2.7.6/lib/execute.c
+--- patch-2.7.6/lib/execute.c.switch-from-fork-execlp-to-execute	2019-07-29 14:40:53.264464824 +0200
++++ patch-2.7.6/lib/execute.c	2019-07-29 14:40:53.264464824 +0200
+@@ -0,0 +1,273 @@
++/* Creation of autonomous subprocesses.
++   Copyright (C) 2001-2004, 2006-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++
++#include <config.h>
++
++/* Specification.  */
++#include "execute.h"
++
++#include <errno.h>
++#include <fcntl.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <signal.h>
++#include <unistd.h>
++
++#include "error.h"
++#include "fatal-signal.h"
++#include "wait-process.h"
++#include "gettext.h"
++
++#define _(str) gettext (str)
++
++#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
++
++/* Native Windows API.  */
++# include <process.h>
++# include "w32spawn.h"
++
++#else
++
++/* Unix API.  */
++# include <spawn.h>
++
++#endif
++
++
++#if defined EINTR && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
++
++/* EINTR handling for close(), open().
++   These functions can return -1/EINTR even though we don't have any
++   signal handlers set up, namely when we get interrupted via SIGSTOP.  */
++
++static int
++nonintr_close (int fd)
++{
++  int retval;
++
++  do
++    retval = close (fd);
++  while (retval < 0 && errno == EINTR);
++
++  return retval;
++}
++#define close nonintr_close
++
++static int
++nonintr_open (const char *pathname, int oflag, mode_t mode)
++{
++  int retval;
++
++  do
++    retval = open (pathname, oflag, mode);
++  while (retval < 0 && errno == EINTR);
++
++  return retval;
++}
++#undef open /* avoid warning on VMS */
++#define open nonintr_open
++
++#endif
++
++
++/* Execute a command, optionally redirecting any of the three standard file
++   descriptors to /dev/null.  Return its exit code.
++   If it didn't terminate correctly, exit if exit_on_error is true, otherwise
++   return 127.
++   If slave_process is true, the child process will be terminated when its
++   creator receives a catchable fatal signal.  */
++int
++execute (const char *progname,
++         const char *prog_path, char **prog_argv,
++         bool ignore_sigpipe,
++         bool null_stdin, bool null_stdout, bool null_stderr,
++         bool slave_process, bool exit_on_error,
++         int *termsigp)
++{
++#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
++
++  /* Native Windows API.  */
++  int orig_stdin;
++  int orig_stdout;
++  int orig_stderr;
++  int exitcode;
++  int nullinfd;
++  int nulloutfd;
++
++  /* FIXME: Need to free memory allocated by prepare_spawn.  */
++  prog_argv = prepare_spawn (prog_argv);
++
++  /* Save standard file handles of parent process.  */
++  if (null_stdin)
++    orig_stdin = dup_safer_noinherit (STDIN_FILENO);
++  if (null_stdout)
++    orig_stdout = dup_safer_noinherit (STDOUT_FILENO);
++  if (null_stderr)
++    orig_stderr = dup_safer_noinherit (STDERR_FILENO);
++  exitcode = -1;
++
++  /* Create standard file handles of child process.  */
++  nullinfd = -1;
++  nulloutfd = -1;
++  if ((!null_stdin
++       || ((nullinfd = open ("NUL", O_RDONLY, 0)) >= 0
++           && (nullinfd == STDIN_FILENO
++               || (dup2 (nullinfd, STDIN_FILENO) >= 0
++                   && close (nullinfd) >= 0))))
++      && (!(null_stdout || null_stderr)
++          || ((nulloutfd = open ("NUL", O_RDWR, 0)) >= 0
++              && (!null_stdout
++                  || nulloutfd == STDOUT_FILENO
++                  || dup2 (nulloutfd, STDOUT_FILENO) >= 0)
++              && (!null_stderr
++                  || nulloutfd == STDERR_FILENO
++                  || dup2 (nulloutfd, STDERR_FILENO) >= 0)
++              && ((null_stdout && nulloutfd == STDOUT_FILENO)
++                  || (null_stderr && nulloutfd == STDERR_FILENO)
++                  || close (nulloutfd) >= 0))))
++    /* Use spawnvpe and pass the environment explicitly.  This is needed if
++       the program has modified the environment using putenv() or [un]setenv().
++       On Windows, programs have two environments, one in the "environment
++       block" of the process and managed through SetEnvironmentVariable(), and
++       one inside the process, in the location retrieved by the 'environ'
++       macro.  When using spawnvp() without 'e', the child process inherits a
++       copy of the environment block - ignoring the effects of putenv() and
++       [un]setenv().  */
++    {
++      exitcode = spawnvpe (P_WAIT, prog_path, (const char **) prog_argv,
++                           (const char **) environ);
++      if (exitcode < 0 && errno == ENOEXEC)
++        {
++          /* prog is not a native executable.  Try to execute it as a
++             shell script.  Note that prepare_spawn() has already prepended
++             a hidden element "sh.exe" to prog_argv.  */
++          --prog_argv;
++          exitcode = spawnvpe (P_WAIT, prog_argv[0], (const char **) prog_argv,
++                               (const char **) environ);
++        }
++    }
++  if (nulloutfd >= 0)
++    close (nulloutfd);
++  if (nullinfd >= 0)
++    close (nullinfd);
++
++  /* Restore standard file handles of parent process.  */
++  if (null_stderr)
++    undup_safer_noinherit (orig_stderr, STDERR_FILENO);
++  if (null_stdout)
++    undup_safer_noinherit (orig_stdout, STDOUT_FILENO);
++  if (null_stdin)
++    undup_safer_noinherit (orig_stdin, STDIN_FILENO);
++
++  if (termsigp != NULL)
++    *termsigp = 0;
++
++  if (exitcode == -1)
++    {
++      if (exit_on_error || !null_stderr)
++        error (exit_on_error ? EXIT_FAILURE : 0, errno,
++               _("%s subprocess failed"), progname);
++      return 127;
++    }
++
++  return exitcode;
++
++#else
++
++  /* Unix API.  */
++  /* Note about 127: Some errors during posix_spawnp() cause the function
++     posix_spawnp() to return an error code; some other errors cause the
++     subprocess to exit with return code 127.  It is implementation
++     dependent which error is reported which way.  We treat both cases as
++     equivalent.  */
++  sigset_t blocked_signals;
++  posix_spawn_file_actions_t actions;
++  bool actions_allocated;
++  posix_spawnattr_t attrs;
++  bool attrs_allocated;
++  int err;
++  pid_t child;
++
++  if (slave_process)
++    {
++      sigprocmask (SIG_SETMASK, NULL, &blocked_signals);
++      block_fatal_signals ();
++    }
++  actions_allocated = false;
++  attrs_allocated = false;
++  if ((err = posix_spawn_file_actions_init (&actions)) != 0
++      || (actions_allocated = true,
++          (null_stdin
++            && (err = posix_spawn_file_actions_addopen (&actions,
++                                                        STDIN_FILENO,
++                                                        "/dev/null", O_RDONLY,
++                                                        0))
++               != 0)
++          || (null_stdout
++              && (err = posix_spawn_file_actions_addopen (&actions,
++                                                          STDOUT_FILENO,
++                                                          "/dev/null", O_RDWR,
++                                                          0))
++                 != 0)
++          || (null_stderr
++              && (err = posix_spawn_file_actions_addopen (&actions,
++                                                          STDERR_FILENO,
++                                                          "/dev/null", O_RDWR,
++                                                          0))
++                 != 0)
++          || (slave_process
++              && ((err = posix_spawnattr_init (&attrs)) != 0
++                  || (attrs_allocated = true,
++                      (err = posix_spawnattr_setsigmask (&attrs,
++                                                         &blocked_signals))
++                      != 0
++                      || (err = posix_spawnattr_setflags (&attrs,
++                                                        POSIX_SPAWN_SETSIGMASK))
++                         != 0)))
++          || (err = posix_spawnp (&child, prog_path, &actions,
++                                  attrs_allocated ? &attrs : NULL, prog_argv,
++                                  environ))
++             != 0))
++    {
++      if (actions_allocated)
++        posix_spawn_file_actions_destroy (&actions);
++      if (attrs_allocated)
++        posix_spawnattr_destroy (&attrs);
++      if (slave_process)
++        unblock_fatal_signals ();
++      if (termsigp != NULL)
++        *termsigp = 0;
++      if (exit_on_error || !null_stderr)
++        error (exit_on_error ? EXIT_FAILURE : 0, err,
++               _("%s subprocess failed"), progname);
++      return 127;
++    }
++  posix_spawn_file_actions_destroy (&actions);
++  if (attrs_allocated)
++    posix_spawnattr_destroy (&attrs);
++  if (slave_process)
++    {
++      register_slave_subprocess (child);
++      unblock_fatal_signals ();
++    }
++
++  return wait_subprocess (child, progname, ignore_sigpipe, null_stderr,
++                          slave_process, exit_on_error, termsigp);
++
++#endif
++}
+diff -up patch-2.7.6/lib/execute.h.switch-from-fork-execlp-to-execute patch-2.7.6/lib/execute.h
+--- patch-2.7.6/lib/execute.h.switch-from-fork-execlp-to-execute	2019-07-29 14:40:53.264464824 +0200
++++ patch-2.7.6/lib/execute.h	2019-07-29 14:40:53.264464824 +0200
+@@ -0,0 +1,44 @@
++/* Creation of autonomous subprocesses.
++   Copyright (C) 2001-2003, 2008-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++#ifndef _EXECUTE_H
++#define _EXECUTE_H
++
++#include <stdbool.h>
++
++/* Execute a command, optionally redirecting any of the three standard file
++   descriptors to /dev/null.  Return its exit code.
++   If it didn't terminate correctly, exit if exit_on_error is true, otherwise
++   return 127.
++   If ignore_sigpipe is true, consider a subprocess termination due to SIGPIPE
++   as equivalent to a success.  This is suitable for processes whose only
++   purpose is to write to standard output.
++   If slave_process is true, the child process will be terminated when its
++   creator receives a catchable fatal signal.
++   If termsigp is not NULL, *termsig will be set to the signal that terminated
++   the subprocess (if supported by the platform: not on native Windows
++   platforms), otherwise 0.
++   It is recommended that no signal is blocked or ignored while execute()
++   is called.  See pipe.h for the reason.  */
++extern int execute (const char *progname,
++                    const char *prog_path, char **prog_argv,
++                    bool ignore_sigpipe,
++                    bool null_stdin, bool null_stdout, bool null_stderr,
++                    bool slave_process, bool exit_on_error,
++                    int *termsigp);
++
++#endif /* _EXECUTE_H */
+diff -up patch-2.7.6/lib/fatal-signal.c.switch-from-fork-execlp-to-execute patch-2.7.6/lib/fatal-signal.c
+--- patch-2.7.6/lib/fatal-signal.c.switch-from-fork-execlp-to-execute	2019-07-29 14:51:00.441882754 +0200
++++ patch-2.7.6/lib/fatal-signal.c	2019-07-29 14:51:00.441882754 +0200
+@@ -0,0 +1,286 @@
++/* Emergency actions in case of a fatal signal.
++   Copyright (C) 2003-2004, 2006-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <bruno@clisp.org>, 2003.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++
++#include <config.h>
++
++/* Specification.  */
++#include "fatal-signal.h"
++
++#include <stdbool.h>
++#include <stdlib.h>
++#include <signal.h>
++#include <unistd.h>
++
++#include "sig-handler.h"
++#include "xalloc.h"
++
++#define SIZEOF(a) (sizeof(a) / sizeof(a[0]))
++
++/* ========================================================================= */
++
++
++/* The list of fatal signals.
++   These are those signals whose default action is to terminate the process
++   without a core dump, except
++     SIGKILL - because it cannot be caught,
++     SIGALRM SIGUSR1 SIGUSR2 SIGPOLL SIGIO SIGLOST - because applications
++       often use them for their own purpose,
++     SIGPROF SIGVTALRM - because they are used for profiling,
++     SIGSTKFLT - because it is more similar to SIGFPE, SIGSEGV, SIGBUS,
++     SIGSYS - because it is more similar to SIGABRT, SIGSEGV,
++     SIGPWR - because it of too special use,
++     SIGRTMIN...SIGRTMAX - because they are reserved for application use.
++   plus
++     SIGXCPU, SIGXFSZ - because they are quite similar to SIGTERM.  */
++
++static int fatal_signals[] =
++  {
++    /* ISO C 99 signals.  */
++#ifdef SIGINT
++    SIGINT,
++#endif
++#ifdef SIGTERM
++    SIGTERM,
++#endif
++    /* POSIX:2001 signals.  */
++#ifdef SIGHUP
++    SIGHUP,
++#endif
++#ifdef SIGPIPE
++    SIGPIPE,
++#endif
++    /* BSD signals.  */
++#ifdef SIGXCPU
++    SIGXCPU,
++#endif
++#ifdef SIGXFSZ
++    SIGXFSZ,
++#endif
++    /* Native Windows signals.  */
++#ifdef SIGBREAK
++    SIGBREAK,
++#endif
++    0
++  };
++
++#define num_fatal_signals (SIZEOF (fatal_signals) - 1)
++
++/* Eliminate signals whose signal handler is SIG_IGN.  */
++
++static void
++init_fatal_signals (void)
++{
++  static bool fatal_signals_initialized = false;
++  if (!fatal_signals_initialized)
++    {
++      size_t i;
++
++      for (i = 0; i < num_fatal_signals; i++)
++        {
++          struct sigaction action;
++
++          if (sigaction (fatal_signals[i], NULL, &action) >= 0
++              && get_handler (&action) == SIG_IGN)
++            fatal_signals[i] = -1;
++        }
++
++      fatal_signals_initialized = true;
++    }
++}
++
++
++/* ========================================================================= */
++
++
++typedef void (*action_t) (void);
++
++/* Type of an entry in the actions array.
++   The 'action' field is accessed from within the fatal_signal_handler(),
++   therefore we mark it as 'volatile'.  */
++typedef struct
++{
++  volatile action_t action;
++}
++actions_entry_t;
++
++/* The registered cleanup actions.  */
++static actions_entry_t static_actions[32];
++static actions_entry_t * volatile actions = static_actions;
++static sig_atomic_t volatile actions_count = 0;
++static size_t actions_allocated = SIZEOF (static_actions);
++
++
++/* The saved signal handlers.
++   Size 32 would not be sufficient: On HP-UX, SIGXCPU = 33, SIGXFSZ = 34.  */
++static struct sigaction saved_sigactions[64];
++
++
++/* Uninstall the handlers.  */
++static void
++uninstall_handlers (void)
++{
++  size_t i;
++
++  for (i = 0; i < num_fatal_signals; i++)
++    if (fatal_signals[i] >= 0)
++      {
++        int sig = fatal_signals[i];
++        if (saved_sigactions[sig].sa_handler == SIG_IGN)
++          saved_sigactions[sig].sa_handler = SIG_DFL;
++        sigaction (sig, &saved_sigactions[sig], NULL);
++      }
++}
++
++
++/* The signal handler.  It gets called asynchronously.  */
++static void
++fatal_signal_handler (int sig)
++{
++  for (;;)
++    {
++      /* Get the last registered cleanup action, in a reentrant way.  */
++      action_t action;
++      size_t n = actions_count;
++      if (n == 0)
++        break;
++      n--;
++      actions_count = n;
++      action = actions[n].action;
++      /* Execute the action.  */
++      action ();
++    }
++
++  /* Now execute the signal's default action.
++     If the signal being delivered was blocked, the re-raised signal would be
++     delivered when this handler returns.  But the way we install this handler,
++     no signal is blocked, and the re-raised signal is delivered already
++     during raise().  */
++  uninstall_handlers ();
++  raise (sig);
++}
++
++
++/* Install the handlers.  */
++static void
++install_handlers (void)
++{
++  size_t i;
++  struct sigaction action;
++
++  action.sa_handler = &fatal_signal_handler;
++  /* If we get a fatal signal while executing fatal_signal_handler, enter
++     fatal_signal_handler recursively, since it is reentrant.  Hence no
++     SA_RESETHAND.  */
++  action.sa_flags = SA_NODEFER;
++  sigemptyset (&action.sa_mask);
++  for (i = 0; i < num_fatal_signals; i++)
++    if (fatal_signals[i] >= 0)
++      {
++        int sig = fatal_signals[i];
++
++        if (!(sig < sizeof (saved_sigactions) / sizeof (saved_sigactions[0])))
++          abort ();
++        sigaction (sig, &action, &saved_sigactions[sig]);
++      }
++}
++
++
++/* Register a cleanup function to be executed when a catchable fatal signal
++   occurs.  */
++void
++at_fatal_signal (action_t action)
++{
++  static bool cleanup_initialized = false;
++  if (!cleanup_initialized)
++    {
++      init_fatal_signals ();
++      install_handlers ();
++      cleanup_initialized = true;
++    }
++
++  if (actions_count == actions_allocated)
++    {
++      /* Extend the actions array.  Note that we cannot use xrealloc(),
++         because then the cleanup() function could access an already
++         deallocated array.  */
++      actions_entry_t *old_actions = actions;
++      size_t old_actions_allocated = actions_allocated;
++      size_t new_actions_allocated = 2 * actions_allocated;
++      actions_entry_t *new_actions =
++        XNMALLOC (new_actions_allocated, actions_entry_t);
++      size_t k;
++
++      /* Don't use memcpy() here, because memcpy takes non-volatile arguments
++         and is therefore not guaranteed to complete all memory stores before
++         the next statement.  */
++      for (k = 0; k < old_actions_allocated; k++)
++        new_actions[k] = old_actions[k];
++      actions = new_actions;
++      actions_allocated = new_actions_allocated;
++      /* Now we can free the old actions array.  */
++      if (old_actions != static_actions)
++        free (old_actions);
++    }
++  /* The two uses of 'volatile' in the types above (and ISO C 99 section
++     5.1.2.3.(5)) ensure that we increment the actions_count only after
++     the new action has been written to the memory location
++     actions[actions_count].  */
++  actions[actions_count].action = action;
++  actions_count++;
++}
++
++
++/* ========================================================================= */
++
++
++static sigset_t fatal_signal_set;
++
++static void
++init_fatal_signal_set (void)
++{
++  static bool fatal_signal_set_initialized = false;
++  if (!fatal_signal_set_initialized)
++    {
++      size_t i;
++
++      init_fatal_signals ();
++
++      sigemptyset (&fatal_signal_set);
++      for (i = 0; i < num_fatal_signals; i++)
++        if (fatal_signals[i] >= 0)
++          sigaddset (&fatal_signal_set, fatal_signals[i]);
++
++      fatal_signal_set_initialized = true;
++    }
++}
++
++/* Temporarily delay the catchable fatal signals.  */
++void
++block_fatal_signals (void)
++{
++  init_fatal_signal_set ();
++  sigprocmask (SIG_BLOCK, &fatal_signal_set, NULL);
++}
++
++/* Stop delaying the catchable fatal signals.  */
++void
++unblock_fatal_signals (void)
++{
++  init_fatal_signal_set ();
++  sigprocmask (SIG_UNBLOCK, &fatal_signal_set, NULL);
++}
+diff -up patch-2.7.6/lib/fatal-signal.h.switch-from-fork-execlp-to-execute patch-2.7.6/lib/fatal-signal.h
+--- patch-2.7.6/lib/fatal-signal.h.switch-from-fork-execlp-to-execute	2019-07-29 14:51:09.977920729 +0200
++++ patch-2.7.6/lib/fatal-signal.h	2019-07-29 14:51:09.977920729 +0200
+@@ -0,0 +1,76 @@
++/* Emergency actions in case of a fatal signal.
++   Copyright (C) 2003-2004, 2009-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <bruno@clisp.org>, 2003.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++
++/* It is often useful to do some cleanup action when a usually fatal signal
++   terminates the process, like removing a temporary file or killing a
++   subprocess that may be stuck waiting for a device, pipe or network input.
++   Such signals are SIGHUP, SIGINT, SIGPIPE, SIGTERM, and possibly others.
++   The limitation of this facility is that it cannot work for SIGKILL.
++
++   Signals with a SIG_IGN handler are considered to be non-fatal.  The
++   functions in this file assume that when a SIG_IGN handler is installed
++   for a signal, it was installed before any functions in this file were
++   called and it stays so for the whole lifetime of the process.  */
++
++/* Register a cleanup function to be executed when a catchable fatal signal
++   occurs.
++
++   Restrictions for the cleanup function:
++     - The cleanup function can do all kinds of system calls.
++     - It can also access application dependent memory locations and data
++       structures provided they are in a consistent state. One way to ensure
++       this is through block_fatal_signals()/unblock_fatal_signals(), see
++       below.  Another - more tricky - way to ensure this is the careful use
++       of 'volatile'.
++   However,
++     - malloc() and similarly complex facilities are not safe to be called
++       because they are not guaranteed to be in a consistent state.
++     - Also, the cleanup function must not block the catchable fatal signals
++       and leave them blocked upon return.
++
++   The cleanup function is executed asynchronously.  It is unspecified
++   whether during its execution the catchable fatal signals are blocked
++   or not.  */
++extern void at_fatal_signal (void (*function) (void));
++
++
++/* Sometimes it is necessary to block the usually fatal signals while the
++   data structures being accessed by the cleanup action are being built or
++   reorganized.  This is the case, for example, when a temporary file or
++   directory is created through mkstemp() or mkdtemp(), because these
++   functions create the temporary file or directory _before_ returning its
++   name to the application.  */
++
++/* Temporarily delay the catchable fatal signals.
++   The signals will be blocked (= delayed) until the next call to
++   unblock_fatal_signals().  If the signals are already blocked, a further
++   call to block_fatal_signals() has no effect.  */
++extern void block_fatal_signals (void);
++
++/* Stop delaying the catchable fatal signals.  */
++extern void unblock_fatal_signals (void);
++
++
++#ifdef __cplusplus
++}
++#endif
+diff -up patch-2.7.6/lib/gnulib.mk.switch-from-fork-execlp-to-execute patch-2.7.6/lib/gnulib.mk
+--- patch-2.7.6/lib/gnulib.mk.switch-from-fork-execlp-to-execute	2018-02-03 14:31:15.000000000 +0100
++++ patch-2.7.6/lib/gnulib.mk	2019-07-29 14:49:33.437536285 +0200
+@@ -21,7 +21,7 @@
+ # the same distribution terms as the rest of that program.
+ #
+ # Generated by gnulib-tool.
+-# Reproduce by: gnulib-tool --import --local-dir=gl --lib=libpatch --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --makefile-name=gnulib.mk --no-conditional-dependencies --no-libtool --macro-prefix=gl argmatch backupfile clock-time diffseq dirname dup2 errno exitfail extensions faccessat fchmodat fchownat fcntl-h fstatat full-write getdate getopt-gnu gettime git-version-gen gitlog-to-changelog gnupload hash ignore-value intprops largefile linked-list maintainer-makefile malloc manywarnings memchr minmax mkdirat nstrftime openat progname quotearg readlinkat realloc renameat setenv signal size_max ssize_t stat-time stdbool stdlib symlinkat sys_stat tempname time unistd unlinkat update-copyright utimensat verror xalloc xlist xmemdup0
++# Reproduce by: gnulib-tool --import --local-dir=gl --lib=libpatch --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --makefile-name=gnulib.mk --no-conditional-dependencies --no-libtool --macro-prefix=gl argmatch backupfile clock-time diffseq dirname dup2 errno execute exitfail extensions faccessat fchmodat fchownat fcntl-h fstatat full-write getdate getopt-gnu gettime git-version-gen gitlog-to-changelog gnupload hash ignore-value intprops largefile linked-list maintainer-makefile malloc manywarnings memchr minmax mkdirat nstrftime openat progname quotearg readlinkat realloc renameat setenv signal size_max ssize_t stat-time stdbool stdlib symlinkat sys_stat tempname time unistd unlinkat update-copyright utimensat verror xalloc xlist xmemdup0 wait-process fatal-signal
+ 
+ 
+ MOSTLYCLEANFILES += core *.stackdump
+@@ -378,6 +378,12 @@ EXTRA_libpatch_a_SOURCES += euidaccess.c
+ 
+ ## end   gnulib module euidaccess
+ 
++## begin gnulib module execute
++
++libpatch_a_SOURCES += execute.h execute.c w32spawn.h
++
++## end   gnulib module execute
++
+ ## begin gnulib module exitfail
+ 
+ libpatch_a_SOURCES += exitfail.c
+@@ -2481,6 +2487,28 @@ libpatch_a_SOURCES += verror.h verror.c
+ 
+ ## end   gnulib module verror
+ 
++## begin gnulib module wait-process
++
++libpatch_a_SOURCES += wait-process.h wait-process.c
++
++## end   gnulib module wait-process
++
++## begin gnulib module fatal-signal
++
++libpatch_a_SOURCES += fatal-signal.h fatal-signal.c
++
++## end   gnulib module fatal-signal
++
++## begin gnulib module sigaction
++
++libpatch_a_SOURCES += sig-handler.c
++
++EXTRA_DIST += sig-handler.h sigaction.c
++
++EXTRA_libpatch_a_SOURCES += sigaction.c
++
++## end   gnulib module sigaction
++
+ ## begin gnulib module wchar
+ 
+ BUILT_SOURCES += wchar.h
+@@ -2694,6 +2722,7 @@ EXTRA_libpatch_a_SOURCES += xmemdup0.c
+ 
+ ## end   gnulib module xmemdup0
+ 
++
+ ## begin gnulib module xsize
+ 
+ libpatch_a_SOURCES += xsize.h xsize.c
+diff -up patch-2.7.6/lib/sigaction.c.switch-from-fork-execlp-to-execute patch-2.7.6/lib/sigaction.c
+--- patch-2.7.6/lib/sigaction.c.switch-from-fork-execlp-to-execute	2019-07-29 14:50:31.833768833 +0200
++++ patch-2.7.6/lib/sigaction.c	2019-07-29 14:50:31.833768833 +0200
+@@ -0,0 +1,204 @@
++/* POSIX compatible signal blocking.
++   Copyright (C) 2008-2018 Free Software Foundation, Inc.
++   Written by Eric Blake <ebb9@byu.net>, 2008.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++#include <config.h>
++
++/* Specification.  */
++#include <signal.h>
++
++#include <errno.h>
++#include <stdint.h>
++#include <stdlib.h>
++
++/* This implementation of sigaction is tailored to native Windows behavior:
++   signal() has SysV semantics (ie. the handler is uninstalled before
++   it is invoked).  This is an inherent data race if an asynchronous
++   signal is sent twice in a row before we can reinstall our handler,
++   but there's nothing we can do about it.  Meanwhile, sigprocmask()
++   is not present, and while we can use the gnulib replacement to
++   provide critical sections, it too suffers from potential data races
++   in the face of an ill-timed asynchronous signal.  And we compound
++   the situation by reading static storage in a signal handler, which
++   POSIX warns is not generically async-signal-safe.  Oh well.
++
++   Additionally:
++     - We don't implement SA_NOCLDSTOP or SA_NOCLDWAIT, because SIGCHLD
++       is not defined.
++     - We don't implement SA_ONSTACK, because sigaltstack() is not present.
++     - We ignore SA_RESTART, because blocking native Windows API calls are
++       not interrupted anyway when an asynchronous signal occurs, and the
++       MSVCRT runtime never sets errno to EINTR.
++     - We don't implement SA_SIGINFO because it is impossible to do so
++       portably.
++
++   POSIX states that an application should not mix signal() and
++   sigaction().  We support the use of signal() within the gnulib
++   sigprocmask() substitute, but all other application code linked
++   with this module should stick with only sigaction().  */
++
++/* Check some of our assumptions.  */
++#if defined SIGCHLD || defined HAVE_SIGALTSTACK || defined HAVE_SIGINTERRUPT
++# error "Revisit the assumptions made in the sigaction module"
++#endif
++
++/* Out-of-range substitutes make a good fallback for uncatchable
++   signals.  */
++#ifndef SIGKILL
++# define SIGKILL (-1)
++#endif
++#ifndef SIGSTOP
++# define SIGSTOP (-1)
++#endif
++
++/* On native Windows, as of 2008, the signal SIGABRT_COMPAT is an alias
++   for the signal SIGABRT.  Only one signal handler is stored for both
++   SIGABRT and SIGABRT_COMPAT.  SIGABRT_COMPAT is not a signal of its own.  */
++#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
++# undef SIGABRT_COMPAT
++# define SIGABRT_COMPAT 6
++#endif
++
++/* A signal handler.  */
++typedef void (*handler_t) (int signal);
++
++/* Set of current actions.  If sa_handler for an entry is NULL, then
++   that signal is not currently handled by the sigaction handler.  */
++static struct sigaction volatile action_array[NSIG] /* = 0 */;
++
++/* Signal handler that is installed for signals.  */
++static void
++sigaction_handler (int sig)
++{
++  handler_t handler;
++  sigset_t mask;
++  sigset_t oldmask;
++  int saved_errno = errno;
++  if (sig < 0 || NSIG <= sig || !action_array[sig].sa_handler)
++    {
++      /* Unexpected situation; be careful to avoid recursive abort.  */
++      if (sig == SIGABRT)
++        signal (SIGABRT, SIG_DFL);
++      abort ();
++    }
++
++  /* Reinstall the signal handler when required; otherwise update the
++     bookkeeping so that the user's handler may call sigaction and get
++     accurate results.  We know the signal isn't currently blocked, or
++     we wouldn't be in its handler, therefore we know that we are not
++     interrupting a sigaction() call.  There is a race where any
++     asynchronous instance of the same signal occurring before we
++     reinstall the handler will trigger the default handler; oh
++     well.  */
++  handler = action_array[sig].sa_handler;
++  if ((action_array[sig].sa_flags & SA_RESETHAND) == 0)
++    signal (sig, sigaction_handler);
++  else
++    action_array[sig].sa_handler = NULL;
++
++  /* Block appropriate signals.  */
++  mask = action_array[sig].sa_mask;
++  if ((action_array[sig].sa_flags & SA_NODEFER) == 0)
++    sigaddset (&mask, sig);
++  sigprocmask (SIG_BLOCK, &mask, &oldmask);
++
++  /* Invoke the user's handler, then restore prior mask.  */
++  errno = saved_errno;
++  handler (sig);
++  saved_errno = errno;
++  sigprocmask (SIG_SETMASK, &oldmask, NULL);
++  errno = saved_errno;
++}
++
++/* Change and/or query the action that will be taken on delivery of
++   signal SIG.  If not NULL, ACT describes the new behavior.  If not
++   NULL, OACT is set to the prior behavior.  Return 0 on success, or
++   set errno and return -1 on failure.  */
++int
++sigaction (int sig, const struct sigaction *restrict act,
++           struct sigaction *restrict oact)
++{
++  sigset_t mask;
++  sigset_t oldmask;
++  int saved_errno;
++
++  if (sig < 0 || NSIG <= sig || sig == SIGKILL || sig == SIGSTOP
++      || (act && act->sa_handler == SIG_ERR))
++    {
++      errno = EINVAL;
++      return -1;
++    }
++
++#ifdef SIGABRT_COMPAT
++  if (sig == SIGABRT_COMPAT)
++    sig = SIGABRT;
++#endif
++
++  /* POSIX requires sigaction() to be async-signal-safe.  In other
++     words, if an asynchronous signal can occur while we are anywhere
++     inside this function, the user's handler could then call
++     sigaction() recursively and expect consistent results.  We meet
++     this rule by using sigprocmask to block all signals before
++     modifying any data structure that could be read from a signal
++     handler; this works since we know that the gnulib sigprocmask
++     replacement does not try to use sigaction() from its handler.  */
++  if (!act && !oact)
++    return 0;
++  sigfillset (&mask);
++  sigprocmask (SIG_BLOCK, &mask, &oldmask);
++  if (oact)
++    {
++      if (action_array[sig].sa_handler)
++        *oact = action_array[sig];
++      else
++        {
++          /* Safe to change the handler at will here, since all
++             signals are currently blocked.  */
++          oact->sa_handler = signal (sig, SIG_DFL);
++          if (oact->sa_handler == SIG_ERR)
++            goto failure;
++          signal (sig, oact->sa_handler);
++          oact->sa_flags = SA_RESETHAND | SA_NODEFER;
++          sigemptyset (&oact->sa_mask);
++        }
++    }
++
++  if (act)
++    {
++      /* Safe to install the handler before updating action_array,
++         since all signals are currently blocked.  */
++      if (act->sa_handler == SIG_DFL || act->sa_handler == SIG_IGN)
++        {
++          if (signal (sig, act->sa_handler) == SIG_ERR)
++            goto failure;
++          action_array[sig].sa_handler = NULL;
++        }
++      else
++        {
++          if (signal (sig, sigaction_handler) == SIG_ERR)
++            goto failure;
++          action_array[sig] = *act;
++        }
++    }
++  sigprocmask (SIG_SETMASK, &oldmask, NULL);
++  return 0;
++
++ failure:
++  saved_errno = errno;
++  sigprocmask (SIG_SETMASK, &oldmask, NULL);
++  errno = saved_errno;
++  return -1;
++}
+diff -up patch-2.7.6/lib/sig-handler.c.switch-from-fork-execlp-to-execute patch-2.7.6/lib/sig-handler.c
+--- patch-2.7.6/lib/sig-handler.c.switch-from-fork-execlp-to-execute	2019-07-29 14:50:17.265710820 +0200
++++ patch-2.7.6/lib/sig-handler.c	2019-07-29 14:48:19.707242671 +0200
+@@ -0,0 +1,3 @@
++#include <config.h>
++#define SIG_HANDLER_INLINE _GL_EXTERN_INLINE
++#include "sig-handler.h"
+diff -up patch-2.7.6/lib/sig-handler.h.switch-from-fork-execlp-to-execute patch-2.7.6/lib/sig-handler.h
+--- patch-2.7.6/lib/sig-handler.h.switch-from-fork-execlp-to-execute	2019-07-29 14:50:12.249690845 +0200
++++ patch-2.7.6/lib/sig-handler.h	2019-07-29 14:48:23.099256180 +0200
+@@ -0,0 +1,54 @@
++/* Convenience declarations when working with <signal.h>.
++
++   Copyright (C) 2008-2018 Free Software Foundation, Inc.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++#ifndef _GL_SIG_HANDLER_H
++#define _GL_SIG_HANDLER_H
++
++#include <signal.h>
++
++#ifndef _GL_INLINE_HEADER_BEGIN
++ #error "Please include config.h first."
++#endif
++_GL_INLINE_HEADER_BEGIN
++#ifndef SIG_HANDLER_INLINE
++# define SIG_HANDLER_INLINE _GL_INLINE
++#endif
++
++/* Convenience type when working with signal handlers.  */
++typedef void (*sa_handler_t) (int);
++
++/* Return the handler of a signal, as a sa_handler_t value regardless
++   of its true type.  The resulting function can be compared to
++   special values like SIG_IGN but it is not portable to call it.  */
++SIG_HANDLER_INLINE sa_handler_t _GL_ATTRIBUTE_PURE
++get_handler (struct sigaction const *a)
++{
++#ifdef SA_SIGINFO
++  /* POSIX says that special values like SIG_IGN can only occur when
++     action.sa_flags does not contain SA_SIGINFO.  But in Linux 2.4,
++     for example, sa_sigaction and sa_handler are aliases and a signal
++     is ignored if sa_sigaction (after casting) equals SIG_IGN.  So
++     use (and cast) sa_sigaction in that case.  */
++  if (a->sa_flags & SA_SIGINFO)
++    return (sa_handler_t) a->sa_sigaction;
++#endif
++  return a->sa_handler;
++}
++
++_GL_INLINE_HEADER_END
++
++#endif /* _GL_SIG_HANDLER_H */
+diff -up patch-2.7.6/lib/w32spawn.h.switch-from-fork-execlp-to-execute patch-2.7.6/lib/w32spawn.h
+--- patch-2.7.6/lib/w32spawn.h.switch-from-fork-execlp-to-execute	2019-07-29 14:40:53.265464828 +0200
++++ patch-2.7.6/lib/w32spawn.h	2019-07-29 14:40:53.265464828 +0200
+@@ -0,0 +1,233 @@
++/* Auxiliary functions for the creation of subprocesses.  Native Windows API.
++   Copyright (C) 2001, 2003-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <bruno@clisp.org>, 2003.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++#ifndef __KLIBC__
++/* Get declarations of the native Windows API functions.  */
++# define WIN32_LEAN_AND_MEAN
++# include <windows.h>
++#endif
++
++/* Get _open_osfhandle().  */
++#include <io.h>
++
++#include <stdbool.h>
++#include <string.h>
++#include <unistd.h>
++#include <errno.h>
++
++/* Get _get_osfhandle().  */
++# if GNULIB_MSVC_NOTHROW
++#  include "msvc-nothrow.h"
++# else
++#  include <io.h>
++# endif
++
++#include "cloexec.h"
++#include "xalloc.h"
++
++/* Duplicates a file handle, making the copy uninheritable.
++   Returns -1 for a file handle that is equivalent to closed.  */
++static int
++dup_noinherit (int fd)
++{
++  fd = dup_cloexec (fd);
++  if (fd < 0 && errno == EMFILE)
++    error (EXIT_FAILURE, errno, _("_open_osfhandle failed"));
++
++  return fd;
++}
++
++/* Returns a file descriptor equivalent to FD, except that the resulting file
++   descriptor is none of STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO.
++   FD must be open and non-inheritable.  The result will be non-inheritable as
++   well.
++   If FD < 0, FD itself is returned.  */
++static int
++fd_safer_noinherit (int fd)
++{
++  if (STDIN_FILENO <= fd && fd <= STDERR_FILENO)
++    {
++      /* The recursion depth is at most 3.  */
++      int nfd = fd_safer_noinherit (dup_noinherit (fd));
++      int saved_errno = errno;
++      close (fd);
++      errno = saved_errno;
++      return nfd;
++    }
++  return fd;
++}
++
++/* Duplicates a file handle, making the copy uninheritable and ensuring the
++   result is none of STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO.
++   Returns -1 for a file handle that is equivalent to closed.  */
++static int
++dup_safer_noinherit (int fd)
++{
++  return fd_safer_noinherit (dup_noinherit (fd));
++}
++
++/* Undoes the effect of TEMPFD = dup_safer_noinherit (ORIGFD);  */
++static void
++undup_safer_noinherit (int tempfd, int origfd)
++{
++  if (tempfd >= 0)
++    {
++      if (dup2 (tempfd, origfd) < 0)
++        error (EXIT_FAILURE, errno, _("cannot restore fd %d: dup2 failed"),
++               origfd);
++      close (tempfd);
++    }
++  else
++    {
++      /* origfd was closed or open to no handle at all.  Set it to a closed
++         state.  This is (nearly) equivalent to the original state.  */
++      close (origfd);
++    }
++}
++
++/* Prepares an argument vector before calling spawn().
++   Note that spawn() does not by itself call the command interpreter
++     (getenv ("COMSPEC") != NULL ? getenv ("COMSPEC") :
++      ({ OSVERSIONINFO v; v.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
++         GetVersionEx(&v);
++         v.dwPlatformId == VER_PLATFORM_WIN32_NT;
++      }) ? "cmd.exe" : "command.com").
++   Instead it simply concatenates the arguments, separated by ' ', and calls
++   CreateProcess().  We must quote the arguments since Windows CreateProcess()
++   interprets characters like ' ', '\t', '\\', '"' (but not '<' and '>') in a
++   special way:
++   - Space and tab are interpreted as delimiters. They are not treated as
++     delimiters if they are surrounded by double quotes: "...".
++   - Unescaped double quotes are removed from the input. Their only effect is
++     that within double quotes, space and tab are treated like normal
++     characters.
++   - Backslashes not followed by double quotes are not special.
++   - But 2*n+1 backslashes followed by a double quote become
++     n backslashes followed by a double quote (n >= 0):
++       \" -> "
++       \\\" -> \"
++       \\\\\" -> \\"
++   - '*', '?' characters may get expanded through wildcard expansion in the
++     callee: By default, in the callee, the initialization code before main()
++     takes the result of GetCommandLine(), wildcard-expands it, and passes it
++     to main(). The exceptions to this rule are:
++       - programs that inspect GetCommandLine() and ignore argv,
++       - mingw programs that have a global variable 'int _CRT_glob = 0;',
++       - Cygwin programs, when invoked from a Cygwin program.
++ */
++#ifndef __KLIBC__
++# define SHELL_SPECIAL_CHARS "\"\\ \001\002\003\004\005\006\007\010\011\012\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037*?"
++# define SHELL_SPACE_CHARS " \001\002\003\004\005\006\007\010\011\012\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037"
++#else
++# define SHELL_SPECIAL_CHARS ""
++# define SHELL_SPACE_CHARS ""
++#endif
++static char **
++prepare_spawn (char **argv)
++{
++  size_t argc;
++  char **new_argv;
++  size_t i;
++
++  /* Count number of arguments.  */
++  for (argc = 0; argv[argc] != NULL; argc++)
++    ;
++
++  /* Allocate new argument vector.  */
++  new_argv = XNMALLOC (1 + argc + 1, char *);
++
++  /* Add an element upfront that can be used when argv[0] turns out to be a
++     script, not a program.
++     On Unix, this would be "/bin/sh". On native Windows, "sh" is actually
++     "sh.exe".  We have to omit the directory part and rely on the search in
++     PATH, because the mingw "mount points" are not visible inside Windows
++     CreateProcess().  */
++  *new_argv++ = "sh.exe";
++
++  /* Put quoted arguments into the new argument vector.  */
++  for (i = 0; i < argc; i++)
++    {
++      const char *string = argv[i];
++
++      if (string[0] == '\0')
++        new_argv[i] = xstrdup ("\"\"");
++      else if (strpbrk (string, SHELL_SPECIAL_CHARS) != NULL)
++        {
++          bool quote_around = (strpbrk (string, SHELL_SPACE_CHARS) != NULL);
++          size_t length;
++          unsigned int backslashes;
++          const char *s;
++          char *quoted_string;
++          char *p;
++
++          length = 0;
++          backslashes = 0;
++          if (quote_around)
++            length++;
++          for (s = string; *s != '\0'; s++)
++            {
++              char c = *s;
++              if (c == '"')
++                length += backslashes + 1;
++              length++;
++              if (c == '\\')
++                backslashes++;
++              else
++                backslashes = 0;
++            }
++          if (quote_around)
++            length += backslashes + 1;
++
++          quoted_string = (char *) xmalloc (length + 1);
++
++          p = quoted_string;
++          backslashes = 0;
++          if (quote_around)
++            *p++ = '"';
++          for (s = string; *s != '\0'; s++)
++            {
++              char c = *s;
++              if (c == '"')
++                {
++                  unsigned int j;
++                  for (j = backslashes + 1; j > 0; j--)
++                    *p++ = '\\';
++                }
++              *p++ = c;
++              if (c == '\\')
++                backslashes++;
++              else
++                backslashes = 0;
++            }
++          if (quote_around)
++            {
++              unsigned int j;
++              for (j = backslashes; j > 0; j--)
++                *p++ = '\\';
++              *p++ = '"';
++            }
++          *p = '\0';
++
++          new_argv[i] = quoted_string;
++        }
++      else
++        new_argv[i] = (char *) string;
++    }
++  new_argv[argc] = NULL;
++
++  return new_argv;
++}
+diff -up patch-2.7.6/lib/wait-process.c.switch-from-fork-execlp-to-execute patch-2.7.6/lib/wait-process.c
+--- patch-2.7.6/lib/wait-process.c.switch-from-fork-execlp-to-execute	2019-07-29 14:50:49.937840928 +0200
++++ patch-2.7.6/lib/wait-process.c	2019-07-29 14:45:17.196515863 +0200
+@@ -0,0 +1,361 @@
++/* Waiting for a subprocess to finish.
++   Copyright (C) 2001-2003, 2005-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++
++#include <config.h>
++
++/* Specification.  */
++#include "wait-process.h"
++
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
++#include <signal.h>
++
++#include <sys/types.h>
++#include <sys/wait.h>
++
++#include "error.h"
++#include "fatal-signal.h"
++#include "xalloc.h"
++#include "gettext.h"
++
++#define _(str) gettext (str)
++
++#define SIZEOF(a) (sizeof(a) / sizeof(a[0]))
++
++
++#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
++
++# define WIN32_LEAN_AND_MEAN
++# include <windows.h>
++
++/* The return value of spawnvp() is really a process handle as returned
++   by CreateProcess().  Therefore we can kill it using TerminateProcess.  */
++# define kill(pid,sig) TerminateProcess ((HANDLE) (pid), sig)
++
++#endif
++
++
++/* Type of an entry in the slaves array.
++   The 'used' bit determines whether this entry is currently in use.
++   (If pid_t was an atomic type like sig_atomic_t, we could just set the
++   'child' field to 0 when unregistering a slave process, and wouldn't need
++   the 'used' field.)
++   The 'used' and 'child' fields are accessed from within the cleanup_slaves()
++   action, therefore we mark them as 'volatile'.  */
++typedef struct
++{
++  volatile sig_atomic_t used;
++  volatile pid_t child;
++}
++slaves_entry_t;
++
++/* The registered slave subprocesses.  */
++static slaves_entry_t static_slaves[32];
++static slaves_entry_t * volatile slaves = static_slaves;
++static sig_atomic_t volatile slaves_count = 0;
++static size_t slaves_allocated = SIZEOF (static_slaves);
++
++/* The termination signal for slave subprocesses.
++   2003-10-07:  Terminator becomes Governator.  */
++#ifdef SIGHUP
++# define TERMINATOR SIGHUP
++#else
++# define TERMINATOR SIGTERM
++#endif
++
++/* The cleanup action.  It gets called asynchronously.  */
++static void
++cleanup_slaves (void)
++{
++  for (;;)
++    {
++      /* Get the last registered slave.  */
++      size_t n = slaves_count;
++      if (n == 0)
++        break;
++      n--;
++      slaves_count = n;
++      /* Skip unused entries in the slaves array.  */
++      if (slaves[n].used)
++        {
++          pid_t slave = slaves[n].child;
++
++          /* Kill the slave.  */
++          kill (slave, TERMINATOR);
++        }
++    }
++}
++
++/* Register a subprocess as being a slave process.  This means that the
++   subprocess will be terminated when its creator receives a catchable fatal
++   signal or exits normally.  Registration ends when wait_subprocess()
++   notices that the subprocess has exited.  */
++void
++register_slave_subprocess (pid_t child)
++{
++  static bool cleanup_slaves_registered = false;
++  if (!cleanup_slaves_registered)
++    {
++      atexit (cleanup_slaves);
++      at_fatal_signal (cleanup_slaves);
++      cleanup_slaves_registered = true;
++    }
++
++  /* Try to store the new slave in an unused entry of the slaves array.  */
++  {
++    slaves_entry_t *s = slaves;
++    slaves_entry_t *s_end = s + slaves_count;
++
++    for (; s < s_end; s++)
++      if (!s->used)
++        {
++          /* The two uses of 'volatile' in the slaves_entry_t type above
++             (and ISO C 99 section 5.1.2.3.(5)) ensure that we mark the
++             entry as used only after the child pid has been written to the
++             memory location s->child.  */
++          s->child = child;
++          s->used = 1;
++          return;
++        }
++  }
++
++  if (slaves_count == slaves_allocated)
++    {
++      /* Extend the slaves array.  Note that we cannot use xrealloc(),
++         because then the cleanup_slaves() function could access an already
++         deallocated array.  */
++      slaves_entry_t *old_slaves = slaves;
++      size_t new_slaves_allocated = 2 * slaves_allocated;
++      slaves_entry_t *new_slaves =
++        (slaves_entry_t *)
++        malloc (new_slaves_allocated * sizeof (slaves_entry_t));
++      if (new_slaves == NULL)
++        {
++          /* xalloc_die() will call exit() which will invoke cleanup_slaves().
++             Additionally we need to kill child, because it's not yet among
++             the slaves list.  */
++          kill (child, TERMINATOR);
++          xalloc_die ();
++        }
++      memcpy (new_slaves, old_slaves,
++              slaves_allocated * sizeof (slaves_entry_t));
++      slaves = new_slaves;
++      slaves_allocated = new_slaves_allocated;
++      /* Now we can free the old slaves array.  */
++      if (old_slaves != static_slaves)
++        free (old_slaves);
++    }
++  /* The three uses of 'volatile' in the types above (and ISO C 99 section
++     5.1.2.3.(5)) ensure that we increment the slaves_count only after the
++     new slave and its 'used' bit have been written to the memory locations
++     that make up slaves[slaves_count].  */
++  slaves[slaves_count].child = child;
++  slaves[slaves_count].used = 1;
++  slaves_count++;
++}
++
++/* Unregister a child from the list of slave subprocesses.  */
++static void
++unregister_slave_subprocess (pid_t child)
++{
++  /* The easiest way to remove an entry from a list that can be used by
++     an asynchronous signal handler is just to mark it as unused.  For this,
++     we rely on sig_atomic_t.  */
++  slaves_entry_t *s = slaves;
++  slaves_entry_t *s_end = s + slaves_count;
++
++  for (; s < s_end; s++)
++    if (s->used && s->child == child)
++      s->used = 0;
++}
++
++
++/* Wait for a subprocess to finish.  Return its exit code.
++   If it didn't terminate correctly, exit if exit_on_error is true, otherwise
++   return 127.  */
++int
++wait_subprocess (pid_t child, const char *progname,
++                 bool ignore_sigpipe, bool null_stderr,
++                 bool slave_process, bool exit_on_error,
++                 int *termsigp)
++{
++#if HAVE_WAITID && defined WNOWAIT && 0
++  /* Commented out because waitid() without WEXITED and with WNOWAIT doesn't
++     work: On Solaris 7 and OSF/1 4.0, it returns -1 and sets errno = ECHILD,
++     and on HP-UX 10.20 it just hangs.  */
++  /* Use of waitid() with WNOWAIT avoids a race condition: If slave_process is
++     true, and this process sleeps a very long time between the return from
++     waitpid() and the execution of unregister_slave_subprocess(), and
++     meanwhile another process acquires the same PID as child, and then - still
++     before unregister_slave_subprocess() - this process gets a fatal signal,
++     it would kill the other totally unrelated process.  */
++  siginfo_t info;
++
++  if (termsigp != NULL)
++    *termsigp = 0;
++  for (;;)
++    {
++      if (waitid (P_PID, child, &info, WEXITED | (slave_process ? WNOWAIT : 0))
++          < 0)
++        {
++# ifdef EINTR
++          if (errno == EINTR)
++            continue;
++# endif
++          if (exit_on_error || !null_stderr)
++            error (exit_on_error ? EXIT_FAILURE : 0, errno,
++                   _("%s subprocess"), progname);
++          return 127;
++        }
++
++      /* info.si_code is set to one of CLD_EXITED, CLD_KILLED, CLD_DUMPED,
++         CLD_TRAPPED, CLD_STOPPED, CLD_CONTINUED.  Loop until the program
++         terminates.  */
++      if (info.si_code == CLD_EXITED
++          || info.si_code == CLD_KILLED || info.si_code == CLD_DUMPED)
++        break;
++    }
++
++  /* The child process has exited or was signalled.  */
++
++  if (slave_process)
++    {
++      /* Unregister the child from the list of slave subprocesses, so that
++         later, when we exit, we don't kill a totally unrelated process which
++         may have acquired the same pid.  */
++      unregister_slave_subprocess (child);
++
++      /* Now remove the zombie from the process list.  */
++      for (;;)
++        {
++          if (waitid (P_PID, child, &info, WEXITED) < 0)
++            {
++# ifdef EINTR
++              if (errno == EINTR)
++                continue;
++# endif
++              if (exit_on_error || !null_stderr)
++                error (exit_on_error ? EXIT_FAILURE : 0, errno,
++                       _("%s subprocess"), progname);
++              return 127;
++            }
++          break;
++        }
++    }
++
++  switch (info.si_code)
++    {
++    case CLD_KILLED:
++    case CLD_DUMPED:
++      if (termsigp != NULL)
++        *termsigp = info.si_status; /* TODO: or info.si_signo? */
++# ifdef SIGPIPE
++      if (info.si_status == SIGPIPE && ignore_sigpipe)
++        return 0;
++# endif
++      if (exit_on_error || (!null_stderr && termsigp == NULL))
++        error (exit_on_error ? EXIT_FAILURE : 0, 0,
++               _("%s subprocess got fatal signal %d"),
++               progname, info.si_status);
++      return 127;
++    case CLD_EXITED:
++      if (info.si_status == 127)
++        {
++          if (exit_on_error || !null_stderr)
++            error (exit_on_error ? EXIT_FAILURE : 0, 0,
++                   _("%s subprocess failed"), progname);
++          return 127;
++        }
++      return info.si_status;
++    default:
++      abort ();
++    }
++#else
++  /* waitpid() is just as portable as wait() nowadays.  */
++  int status;
++
++  if (termsigp != NULL)
++    *termsigp = 0;
++  status = 0;
++  for (;;)
++    {
++      int result = waitpid (child, &status, 0);
++
++      if (result != child)
++        {
++# ifdef EINTR
++          if (errno == EINTR)
++            continue;
++# endif
++# if 0 /* defined ECHILD */
++          if (errno == ECHILD)
++            {
++              /* Child process nonexistent?! Assume it terminated
++                 successfully.  */
++              status = 0;
++              break;
++            }
++# endif
++          if (exit_on_error || !null_stderr)
++            error (exit_on_error ? EXIT_FAILURE : 0, errno,
++                   _("%s subprocess"), progname);
++          return 127;
++        }
++
++      /* One of WIFSIGNALED (status), WIFEXITED (status), WIFSTOPPED (status)
++         must always be true, since we did not specify WCONTINUED in the
++         waitpid() call.  Loop until the program terminates.  */
++      if (!WIFSTOPPED (status))
++        break;
++    }
++
++  /* The child process has exited or was signalled.  */
++
++  if (slave_process)
++    /* Unregister the child from the list of slave subprocesses, so that
++       later, when we exit, we don't kill a totally unrelated process which
++       may have acquired the same pid.  */
++    unregister_slave_subprocess (child);
++
++  if (WIFSIGNALED (status))
++    {
++      if (termsigp != NULL)
++        *termsigp = WTERMSIG (status);
++# ifdef SIGPIPE
++      if (WTERMSIG (status) == SIGPIPE && ignore_sigpipe)
++        return 0;
++# endif
++      if (exit_on_error || (!null_stderr && termsigp == NULL))
++        error (exit_on_error ? EXIT_FAILURE : 0, 0,
++               _("%s subprocess got fatal signal %d"),
++               progname, (int) WTERMSIG (status));
++      return 127;
++    }
++  if (!WIFEXITED (status))
++    abort ();
++  if (WEXITSTATUS (status) == 127)
++    {
++      if (exit_on_error || !null_stderr)
++        error (exit_on_error ? EXIT_FAILURE : 0, 0,
++               _("%s subprocess failed"), progname);
++      return 127;
++    }
++  return WEXITSTATUS (status);
++#endif
++}
+diff -up patch-2.7.6/lib/wait-process.h.switch-from-fork-execlp-to-execute patch-2.7.6/lib/wait-process.h
+--- patch-2.7.6/lib/wait-process.h.switch-from-fork-execlp-to-execute	2019-07-29 14:50:46.505827261 +0200
++++ patch-2.7.6/lib/wait-process.h	2019-07-29 14:45:20.715529876 +0200
+@@ -0,0 +1,74 @@
++/* Waiting for a subprocess to finish.
++   Copyright (C) 2001-2003, 2006, 2008-2018 Free Software Foundation, Inc.
++   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++#ifndef _WAIT_PROCESS_H
++#define _WAIT_PROCESS_H
++
++/* Get pid_t.  */
++#include <stdlib.h>
++#include <unistd.h>
++#include <sys/types.h>
++
++#include <stdbool.h>
++
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++
++/* Wait for a subprocess to finish.  Return its exit code.
++   If it didn't terminate correctly, exit if exit_on_error is true, otherwise
++   return 127.
++   Arguments:
++   - child is the pid of the subprocess.
++   - progname is the name of the program executed by the subprocess, used for
++     error messages.
++   - If ignore_sigpipe is true, consider a subprocess termination due to
++     SIGPIPE as equivalent to a success.  This is suitable for processes whose
++     only purpose is to write to standard output.  This flag can be safely set
++     to false when the process' standard output is known to go to DEV_NULL.
++   - If null_stderr is true, the usual error message to stderr will be omitted.
++     This is suitable when the subprocess does not fulfill an important task.
++   - slave_process should be set to true if the process has been launched as a
++     slave process.
++   - If exit_on_error is true, any error will cause the main process to exit
++     with an error status.
++   - If termsigp is not NULL: *termsig will be set to the signal that
++     terminated the subprocess (if supported by the platform: not on native
++     Windows platforms), otherwise 0, and the error message about the signal
++     that terminated the subprocess will be omitted.
++   Prerequisites: The signal handler for SIGCHLD should not be set to SIG_IGN,
++   otherwise this function will not work.  */
++extern int wait_subprocess (pid_t child, const char *progname,
++                            bool ignore_sigpipe, bool null_stderr,
++                            bool slave_process, bool exit_on_error,
++                            int *termsigp);
++
++/* Register a subprocess as being a slave process.  This means that the
++   subprocess will be terminated when its creator receives a catchable fatal
++   signal or exits normally.  Registration ends when wait_subprocess()
++   notices that the subprocess has exited.  */
++extern void register_slave_subprocess (pid_t child);
++
++
++#ifdef __cplusplus
++}
++#endif
++
++
++#endif /* _WAIT_PROCESS_H */
+diff -up patch-2.7.6/src/pch.c.switch-from-fork-execlp-to-execute patch-2.7.6/src/pch.c
+--- patch-2.7.6/src/pch.c.switch-from-fork-execlp-to-execute	2019-07-29 14:40:53.262464816 +0200
++++ patch-2.7.6/src/pch.c	2019-07-29 15:01:10.338312098 +0200
+@@ -33,7 +33,8 @@
+ # include <io.h>
+ #endif
+ #include <safe.h>
+-#include <sys/wait.h>
++#include <alloca.h>
++#include "execute.h"
+ 
+ #define INITHUNKMAX 125			/* initial dynamic allocation size */
+ 
+@@ -2453,6 +2463,9 @@ do_ed_script (char const *inname, char c
+ 
+     if (! dry_run && ! skip_rest_of_patch) {
+ 	int exclusive = *outname_needs_removal ? 0 : O_EXCL;
++	char const **ed_argv;
++	int stdin_dup, status;
++
+ 	*outname_needs_removal = true;
+ 	if (inerrno != ENOENT)
+ 	  {
+@@ -2461,24 +2474,22 @@ do_ed_script (char const *inname, char c
+ 	  }
+ 	fflush (stdout);
+ 
+-	pid = fork();
+-	if (pid == -1)
+-	  pfatal ("Can't fork");
+-	else if (pid == 0)
+-	  {
+-	    dup2 (tmpfd, 0);
+-	    assert (outname[0] != '!' && outname[0] != '-');
+-	    execlp (editor_program, editor_program, "-", outname, (char  *) NULL);
+-	    _exit (2);
+-	  }
+-	else
+-	  {
+-	    int wstatus;
+-	    if (waitpid (pid, &wstatus, 0) == -1
+-	        || ! WIFEXITED (wstatus)
+-		|| WEXITSTATUS (wstatus) != 0)
+-	      fatal ("%s FAILED", editor_program);
+-	  }
++	if ((stdin_dup = dup (0)) == -1
++	    || dup2 (tmpfd, 0) == -1)
++	  pfatal ("Failed to duplicate standard input");
++	assert (outname[0] != '!' && outname[0] != '-');
++	ed_argv = alloca (4 * sizeof * ed_argv);
++	ed_argv[0] = editor_program;
++	ed_argv[1] = "-";
++	ed_argv[2] = outname;
++	ed_argv[3] = (char  *) NULL;
++	status = execute (editor_program, editor_program, (char **)ed_argv,
++			  false, false, false, false, true, false, NULL);
++	if (status)
++	  fatal ("%s FAILED", editor_program);
++	if (dup2 (stdin_dup, 0) == -1
++	    || close (stdin_dup) == -1)
++	  pfatal ("Failed to duplicate standard input");
+     }
+ 
+     fclose (tmpfp);

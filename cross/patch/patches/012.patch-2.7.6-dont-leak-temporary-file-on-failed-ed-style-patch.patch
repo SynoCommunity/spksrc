@@ -1,0 +1,95 @@
+commit 19599883ffb6a450d2884f081f8ecf68edbed7ee
+Author: Jean Delvare <jdelvare@suse.de>
+Date:   Thu May 3 14:31:55 2018 +0200
+
+    Don't leak temporary file on failed ed-style patch
+    
+    Now that we write ed-style patches to a temporary file before we
+    apply them, we need to ensure that the temporary file is removed
+    before we leave, even on fatal error.
+    
+    * src/pch.c (do_ed_script): Use global TMPEDNAME instead of local
+      tmpname. Don't unlink the file directly, instead tag it for removal
+      at exit time.
+    * src/patch.c (cleanup): Unlink TMPEDNAME at exit.
+    
+    This closes bug #53820:
+    https://savannah.gnu.org/bugs/index.php?53820
+    
+    Fixes: 123eaff0d5d1 ("Fix arbitrary command execution in ed-style patches (CVE-2018-1000156)")
+
+diff --git a/src/common.h b/src/common.h
+index 904a3f8..53c5e32 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -94,10 +94,12 @@ XTERN char const *origsuff;
+ XTERN char const * TMPINNAME;
+ XTERN char const * TMPOUTNAME;
+ XTERN char const * TMPPATNAME;
++XTERN char const * TMPEDNAME;
+ 
+ XTERN bool TMPINNAME_needs_removal;
+ XTERN bool TMPOUTNAME_needs_removal;
+ XTERN bool TMPPATNAME_needs_removal;
++XTERN bool TMPEDNAME_needs_removal;
+ 
+ #ifdef DEBUGGING
+ XTERN int debug;
+diff --git a/src/patch.c b/src/patch.c
+index 3fcaec5..9146597 100644
+--- a/src/patch.c
++++ b/src/patch.c
+@@ -1999,6 +1999,7 @@ cleanup (void)
+   remove_if_needed (TMPINNAME, &TMPINNAME_needs_removal);
+   remove_if_needed (TMPOUTNAME, &TMPOUTNAME_needs_removal);
+   remove_if_needed (TMPPATNAME, &TMPPATNAME_needs_removal);
++  remove_if_needed (TMPEDNAME, &TMPEDNAME_needs_removal);
+   remove_if_needed (TMPREJNAME, &TMPREJNAME_needs_removal);
+   output_files (NULL);
+ }
+diff --git a/src/pch.c b/src/pch.c
+index 79a3c99..1bb3153 100644
+--- a/src/pch.c
++++ b/src/pch.c
+@@ -2396,7 +2396,6 @@ do_ed_script (char const *inname, char const *outname,
+     file_offset beginning_of_this_line;
+     size_t chars_read;
+     FILE *tmpfp = 0;
+-    char const *tmpname;
+     int tmpfd = -1; /* placate gcc's -Wmaybe-uninitialized */
+     int exclusive = *outname_needs_removal ? 0 : O_EXCL;
+     char const **ed_argv;
+@@ -2411,12 +2410,13 @@ do_ed_script (char const *inname, char const *outname,
+ 	   invalid commands and treats the next line as a new command, which
+ 	   can lead to arbitrary command execution.  */
+ 
+-	tmpfd = make_tempfile (&tmpname, 'e', NULL, O_RDWR | O_BINARY, 0);
++	tmpfd = make_tempfile (&TMPEDNAME, 'e', NULL, O_RDWR | O_BINARY, 0);
+ 	if (tmpfd == -1)
+-	  pfatal ("Can't create temporary file %s", quotearg (tmpname));
++	  pfatal ("Can't create temporary file %s", quotearg (TMPEDNAME));
++	TMPEDNAME_needs_removal = true;
+ 	tmpfp = fdopen (tmpfd, "w+b");
+ 	if (! tmpfp)
+-	  pfatal ("Can't open stream for file %s", quotearg (tmpname));
++	  pfatal ("Can't open stream for file %s", quotearg (TMPEDNAME));
+       }
+ 
+     for (;;) {
+@@ -2457,7 +2457,7 @@ do_ed_script (char const *inname, char const *outname,
+       write_fatal ();
+ 
+     if (lseek (tmpfd, 0, SEEK_SET) == -1)
+-      pfatal ("Can't rewind to the beginning of file %s", quotearg (tmpname));
++      pfatal ("Can't rewind to the beginning of file %s", quotearg (TMPEDNAME));
+ 
+     if (inerrno != ENOENT)
+       {
+@@ -2484,7 +2484,6 @@ do_ed_script (char const *inname, char const *outname,
+       pfatal ("Failed to duplicate standard input");
+ 
+     fclose (tmpfp);
+-    safe_unlink (tmpname);
+ 
+     if (ofp)
+       {

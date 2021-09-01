@@ -1,0 +1,84 @@
+commit 61d7788b83b302207a67b82786f4fd79e3538f30
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Thu Jun 27 11:10:43 2019 +0200
+
+    Don't crash when RLIMIT_NOFILE is set to RLIM_INFINITY
+    
+    * src/safe.c (min_cached_fds): Define minimum number of cached dir file
+    descriptors.
+    (max_cached_fds): Change type to rlim_t to allow storing RLIM_INFINITY.
+    (init_dirfd_cache): Set max_cached_fds to RLIM_INFINITY when RLIMIT_NOFILE is
+    RLIM_INFINITY.  Set the initial hash table size to min_cached_fds, independent
+    of RLIMIT_NOFILE: patches commonly only affect one or a few files, so a small
+    hash table will usually suffice; if needed, the hash table will grow.
+    (insert_cached_dirfd): Don't shrink the cache when max_cached_fds is
+    RLIM_INFINITY.
+
+diff --git a/src/safe.c b/src/safe.c
+index 5a7202f..f147b0e 100644
+--- a/src/safe.c
++++ b/src/safe.c
+@@ -67,7 +67,8 @@ struct cached_dirfd {
+ };
+ 
+ static Hash_table *cached_dirfds = NULL;
+-static size_t max_cached_fds;
++static rlim_t min_cached_fds = 8;
++static rlim_t max_cached_fds;
+ LIST_HEAD (lru_list);
+ 
+ static size_t hash_cached_dirfd (const void *entry, size_t table_size)
+@@ -98,11 +99,17 @@ static void init_dirfd_cache (void)
+ {
+   struct rlimit nofile;
+ 
+-  max_cached_fds = 8;
+   if (getrlimit (RLIMIT_NOFILE, &nofile) == 0)
+-    max_cached_fds = MAX (nofile.rlim_cur / 4, max_cached_fds);
++    {
++      if (nofile.rlim_cur == RLIM_INFINITY)
++        max_cached_fds = RLIM_INFINITY;
++      else
++	max_cached_fds = MAX (nofile.rlim_cur / 4, min_cached_fds);
++    }
++  else
++    max_cached_fds = min_cached_fds;
+ 
+-  cached_dirfds = hash_initialize (max_cached_fds,
++  cached_dirfds = hash_initialize (min_cached_fds,
+ 				   NULL,
+ 				   hash_cached_dirfd,
+ 				   compare_cached_dirfds,
+@@ -148,20 +155,23 @@ static void insert_cached_dirfd (struct cached_dirfd *entry, int keepfd)
+   if (cached_dirfds == NULL)
+     init_dirfd_cache ();
+ 
+-  /* Trim off the least recently used entries */
+-  while (hash_get_n_entries (cached_dirfds) >= max_cached_fds)
++  if (max_cached_fds != RLIM_INFINITY)
+     {
+-      struct cached_dirfd *last =
+-	list_entry (lru_list.prev, struct cached_dirfd, lru_link);
+-      if (&last->lru_link == &lru_list)
+-	break;
+-      if (last->fd == keepfd)
++      /* Trim off the least recently used entries */
++      while (hash_get_n_entries (cached_dirfds) >= max_cached_fds)
+ 	{
+-	  last = list_entry (last->lru_link.prev, struct cached_dirfd, lru_link);
++	  struct cached_dirfd *last =
++	    list_entry (lru_list.prev, struct cached_dirfd, lru_link);
+ 	  if (&last->lru_link == &lru_list)
+ 	    break;
++	  if (last->fd == keepfd)
++	    {
++	      last = list_entry (last->lru_link.prev, struct cached_dirfd, lru_link);
++	      if (&last->lru_link == &lru_list)
++		break;
++	    }
++	  remove_cached_dirfd (last);
+ 	}
+-      remove_cached_dirfd (last);
+     }
+ 
+   /* Only insert if the parent still exists. */

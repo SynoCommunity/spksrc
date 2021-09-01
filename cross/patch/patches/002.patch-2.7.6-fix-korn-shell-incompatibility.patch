@@ -1,0 +1,21 @@
+commit 074e2395f81d0ecaa66b71a6c228c70b49db72e5
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Wed Feb 7 17:05:00 2018 +0100
+
+    Test suite: fix Korn shell incompatibility
+    
+    tests/merge: In a Korn shell, shift apparently fails when $# is 0.
+
+diff --git a/tests/merge b/tests/merge
+index b628891..e950b92 100644
+--- a/tests/merge
++++ b/tests/merge
+@@ -32,7 +32,7 @@ x2() {
+ 	shift
+     done > b.sed
+     echo "$body" | sed -f b.sed > b
+-    shift
++    test $# -eq 0 || shift
+     while test $# -gt 0 ; do
+ 	echo "$1"
+ 	shift

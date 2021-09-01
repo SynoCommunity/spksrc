@@ -1,0 +1,75 @@
+commit 1e9104c18019e7dc6b5590aea4b1d4f9d8ecfd56
+Author: Bruno Haible <bruno@clisp.org>
+Date:   Sat Apr 7 12:21:04 2018 +0200
+
+    Fix check of return value of fwrite().
+    
+    * src/patch.c (copy_till): Consider incomplete fwrite() write as an error.
+    * src/pch.c (pch_write_line, do_ed_script): Likewise.
+
+diff --git a/src/patch.c b/src/patch.c
+index 1ae91d9..3fcaec5 100644
+--- a/src/patch.c
++++ b/src/patch.c
+@@ -2,7 +2,7 @@
+ 
+ /* Copyright (C) 1984, 1985, 1986, 1987, 1988 Larry Wall
+ 
+-   Copyright (C) 1989-1993, 1997-1999, 2002-2003, 2006, 2009-2012 Free Software
++   Copyright (C) 1989-1993, 1997-1999, 2002-2003, 2006, 2009-2018 Free Software
+    Foundation, Inc.
+ 
+    This program is free software: you can redistribute it and/or modify
+@@ -1641,7 +1641,7 @@ copy_till (struct outstate *outstate, lin lastline)
+ 	if (size)
+ 	  {
+ 	    if ((! outstate->after_newline  &&  putc ('\n', fp) == EOF)
+-		|| ! fwrite (s, sizeof *s, size, fp))
++		|| fwrite (s, sizeof *s, size, fp) < size)
+ 	      write_fatal ();
+ 	    outstate->after_newline = s[size - 1] == '\n';
+ 	    outstate->zero_output = false;
+diff --git a/src/pch.c b/src/pch.c
+index cda3dfa..79a3c99 100644
+--- a/src/pch.c
++++ b/src/pch.c
+@@ -2279,8 +2279,11 @@ pfetch (lin line)
+ bool
+ pch_write_line (lin line, FILE *file)
+ {
+-  bool after_newline = (p_len[line] > 0) && (p_line[line][p_len[line] - 1] == '\n');
+-  if (! fwrite (p_line[line], sizeof (*p_line[line]), p_len[line], file))
++  bool after_newline =
++    (p_len[line] > 0) && (p_line[line][p_len[line] - 1] == '\n');
++
++  if (fwrite (p_line[line], sizeof (*p_line[line]), p_len[line], file)
++      < p_len[line])
+     write_fatal ();
+   return after_newline;
+ }
+@@ -2427,13 +2430,14 @@ do_ed_script (char const *inname, char const *outname,
+ 	ed_command_letter = get_ed_command_letter (buf);
+ 	if (ed_command_letter) {
+ 	    if (tmpfp)
+-		if (! fwrite (buf, sizeof *buf, chars_read, tmpfp))
++		if (fwrite (buf, sizeof *buf, chars_read, tmpfp) < chars_read)
+ 		    write_fatal ();
+ 	    if (ed_command_letter != 'd' && ed_command_letter != 's') {
+ 	        p_pass_comments_through = true;
+ 		while ((chars_read = get_line ()) != 0) {
+ 		    if (tmpfp)
+-			if (! fwrite (buf, sizeof *buf, chars_read, tmpfp))
++			if (fwrite (buf, sizeof *buf, chars_read, tmpfp)
++			    < chars_read)
+ 			    write_fatal ();
+ 		    if (chars_read == 2  &&  strEQ (buf, ".\n"))
+ 			break;
+@@ -2448,7 +2452,7 @@ do_ed_script (char const *inname, char const *outname,
+     }
+     if (dry_run || skip_rest_of_patch)
+       return;
+-    if (fwrite ("w\nq\n", sizeof (char), (size_t) 4, tmpfp) == 0
++    if (fwrite ("w\nq\n", sizeof (char), (size_t) 4, tmpfp) < (size_t) 4
+ 	|| fflush (tmpfp) != 0)
+       write_fatal ();
+ 

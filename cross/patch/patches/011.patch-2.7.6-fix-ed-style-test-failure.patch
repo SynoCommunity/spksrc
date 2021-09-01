@@ -1,0 +1,22 @@
+commit 458ac51a05426c1af9aa6bf1342ecf60728c19b4
+Author: Bruno Haible <bruno@clisp.org>
+Date:   Sat Apr 7 12:34:03 2018 +0200
+
+    Fix 'ed-style' test failure.
+    
+    * tests/ed-style: Remove '?' line from expected output.
+
+diff --git a/tests/ed-style b/tests/ed-style
+index d8c0689..6b6ef9d 100644
+--- a/tests/ed-style
++++ b/tests/ed-style
+@@ -31,8 +31,7 @@ r !echo bar
+ ,p
+ EOF
+ 
+-check 'patch -e foo -i ed2.diff 2> /dev/null || echo "Status: $?"' <<EOF
+-?
++check 'patch -e foo -i ed2.diff > /dev/null 2> /dev/null || echo "Status: $?"' <<EOF
+ Status: 2
+ EOF
+ 

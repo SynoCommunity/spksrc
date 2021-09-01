@@ -1,0 +1,91 @@
+commit 2a32bf09f5e9572da4be183bb0dbde8164351474
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Fri Apr 6 20:32:46 2018 +0200
+
+    Minor cleanups in do_ed_script
+    
+    * src/pch.c (do_ed_script): Minor cleanups.
+
+diff --git a/src/pch.c b/src/pch.c
+index 1f14624..1055542 100644
+--- a/src/pch.c
++++ b/src/pch.c
+@@ -2396,6 +2396,10 @@ do_ed_script (char const *inname, char const *outname,
+     char const *tmpname;
+     int tmpfd;
+     pid_t pid;
++    int exclusive = *outname_needs_removal ? 0 : O_EXCL;
++    char const **ed_argv;
++    int stdin_dup, status;
++
+ 
+     if (! dry_run && ! skip_rest_of_patch)
+       {
+@@ -2443,7 +2447,7 @@ do_ed_script (char const *inname, char const *outname,
+ 	    break;
+ 	}
+     }
+-    if (!tmpfp)
++    if (dry_run || skip_rest_of_patch)
+       return;
+     if (fwrite ("w\nq\n", sizeof (char), (size_t) 4, tmpfp) == 0
+ 	|| fflush (tmpfp) != 0)
+@@ -2452,36 +2456,29 @@ do_ed_script (char const *inname, char const *outname,
+     if (lseek (tmpfd, 0, SEEK_SET) == -1)
+       pfatal ("Can't rewind to the beginning of file %s", quotearg (tmpname));
+ 
+-    if (! dry_run && ! skip_rest_of_patch) {
+-	int exclusive = *outname_needs_removal ? 0 : O_EXCL;
+-	char const **ed_argv;
+-	int stdin_dup, status;
+-
++    if (inerrno != ENOENT)
++      {
+ 	*outname_needs_removal = true;
+-	if (inerrno != ENOENT)
+-	  {
+-	    *outname_needs_removal = true;
+-	    copy_file (inname, outname, 0, exclusive, instat.st_mode, true);
+-	  }
+-	fflush (stdout);
+-
+-	if ((stdin_dup = dup (0)) == -1
+-	    || dup2 (tmpfd, 0) == -1)
+-	  pfatal ("Failed to duplicate standard input");
+-	assert (outname[0] != '!' && outname[0] != '-');
+-	ed_argv = alloca (4 * sizeof * ed_argv);
+-	ed_argv[0] = editor_program;
+-	ed_argv[1] = "-";
+-	ed_argv[2] = outname;
+-	ed_argv[3] = (char  *) NULL;
+-	status = execute (editor_program, editor_program, (char **)ed_argv,
+-			  false, false, false, false, true, false, NULL);
+-	if (status)
+-	  fatal ("%s FAILED", editor_program);
+-	if (dup2 (stdin_dup, 0) == -1
+-	    || close (stdin_dup) == -1)
+-	  pfatal ("Failed to duplicate standard input");
+-    }
++	copy_file (inname, outname, 0, exclusive, instat.st_mode, true);
++      }
++    fflush (stdout);
++
++    if ((stdin_dup = dup (0)) == -1
++	|| dup2 (tmpfd, 0) == -1)
++      pfatal ("Failed to duplicate standard input");
++    assert (outname[0] != '!' && outname[0] != '-');
++    ed_argv = alloca (4 * sizeof * ed_argv);
++    ed_argv[0] = editor_program;
++    ed_argv[1] = "-";
++    ed_argv[2] = outname;
++    ed_argv[3] = (char  *) NULL;
++    status = execute (editor_program, editor_program, (char **)ed_argv,
++		      false, false, false, false, true, false, NULL);
++    if (status)
++      fatal ("%s FAILED", editor_program);
++    if (dup2 (stdin_dup, 0) == -1
++	|| close (stdin_dup) == -1)
++      pfatal ("Failed to duplicate standard input");
+ 
+     fclose (tmpfp);
+     safe_unlink (tmpname);

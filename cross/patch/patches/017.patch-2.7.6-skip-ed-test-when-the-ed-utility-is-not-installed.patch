@@ -1,0 +1,20 @@
+commit a5b442ce01b80a758606ede316f739426a12bc33
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Thu Jun 27 11:09:31 2019 +0200
+
+    Skip "ed" test when the ed utility is not installed
+    
+    * tests/ed-style: Require ed.
+
+diff --git a/tests/ed-style b/tests/ed-style
+index 504e6e5..9907cb6 100644
+--- a/tests/ed-style
++++ b/tests/ed-style
+@@ -7,6 +7,7 @@
+ . $srcdir/test-lib.sh
+ 
+ require cat
++require ed
+ use_local_patch
+ use_tmpdir
+ 

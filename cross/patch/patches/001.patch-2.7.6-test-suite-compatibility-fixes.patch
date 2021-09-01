@@ -1,0 +1,124 @@
+commit f6bc5b14bd193859851d15a049bafb1007acd288
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Wed Feb 7 12:10:41 2018 +0100
+
+    Test suite compatibility fixes
+    
+    * tests/crlf-handling, tests/git-cleanup, tests/test-lib.sh: Use printf
+    instead of echo -e / echo -n for compatibility with systems that don't
+    support these echo options.
+    * tests/merge: Minor other cleanups.
+
+diff --git a/tests/crlf-handling b/tests/crlf-handling
+index 239149c..c192cac 100644
+--- a/tests/crlf-handling
++++ b/tests/crlf-handling
+@@ -14,7 +14,7 @@ use_local_patch
+ use_tmpdir
+ 
+ lf2crlf() {
+-    while read l; do echo -e "$l\r"; done
++    while read l; do printf "%s\r\n" "$l"; done
+ }
+ 
+ echo 1 > a
+diff --git a/tests/git-cleanup b/tests/git-cleanup
+index 2e3e4c6..ca527a1 100644
+--- a/tests/git-cleanup
++++ b/tests/git-cleanup
+@@ -36,8 +36,8 @@ BAD PATCH
+ EOF
+ 
+ echo 1 > f
+-echo -n '' > g
+-echo -n '' > h
++printf '' > g
++printf '' > h
+ 
+ check 'patch -f -i 1.diff || echo status: $?' <<EOF
+ patching file f
+diff --git a/tests/merge b/tests/merge
+index 22d787b..b628891 100644
+--- a/tests/merge
++++ b/tests/merge
+@@ -30,30 +30,28 @@ x2() {
+     while test $# -gt 0 && test "$1" != -- ; do
+ 	echo "$1"
+ 	shift
+-    done > a.sed
+-    echo "$body" | sed -f a.sed > b
++    done > b.sed
++    echo "$body" | sed -f b.sed > b
+     shift
+     while test $# -gt 0 ; do
+ 	echo "$1"
+ 	shift
+-    done > b.sed
+-    echo "$body" | sed -f b.sed > c
+-    rm -f a.sed b.sed
++    done > c.sed
++    echo "$body" | sed -f c.sed > c
++    rm -f b.sed c.sed
+     output=`diff -u a b | patch $ARGS -f c`
+     status=$?
+     echo "$output" | sed -e '/^$/d' -e '/^patching file c$/d'
+     cat c
+-    test $status == 0 || echo "Status: $status"
++    test $status = 0 || echo "Status: $status"
+ }
+ 
+ x() {
+-    ARGS="$ARGS --merge" x2 "$@"
++    ARGS="--merge" x2 "$@"
+     echo
+-    ARGS="$ARGS --merge=diff3" x2 "$@"
++    ARGS="--merge=diff3" x2 "$@"
+ }
+ 
+-unset ARGS
+-
+ # ==============================================================
+ 
+ check 'x 3' <<EOF
+diff --git a/tests/test-lib.sh b/tests/test-lib.sh
+index be0d7e3..661da52 100644
+--- a/tests/test-lib.sh
++++ b/tests/test-lib.sh
+@@ -41,7 +41,7 @@ use_local_patch() {
+ 
+     eval 'patch() {
+ 	if test -n "$GDB" ; then
+-	  echo -e "\n" >&3
++	  printf "\n\n" >&3
+ 	  gdbserver localhost:53153 $PATCH "$@" 2>&3
+ 	else
+           $PATCH "$@"
+@@ -113,22 +113,15 @@ cleanup() {
+     exit $status
+ }
+ 
+-if test -z "`echo -n`"; then
+-    if eval 'test -n "${BASH_LINENO[0]}" 2>/dev/null'; then
+-	eval '
+-	    _start_test() {
+-		echo -n "[${BASH_LINENO[2]}] $* -- "
+-	    }'
+-    else
+-	eval '
+-	    _start_test() {
+-		echo -n "* $* -- "
+-	    }'
+-    fi
++if eval 'test -n "${BASH_LINENO[0]}" 2>/dev/null'; then
++    eval '
++	_start_test() {
++	    printf "[${BASH_LINENO[2]}] %s -- " "$*"
++	}'
+ else
+     eval '
+ 	_start_test() {
+-	    echo "* $*"
++	    printf "* %s -- " "$*"
+ 	}'
+ fi
+ 

@@ -1,0 +1,48 @@
+commit 2b584aec9e5f2806b1eccadcabe7e901fcfa0b0a
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Thu Jun 27 11:02:02 2019 +0200
+
+    Improve support for memory leak detection
+    
+    When building with the address sanitizer on, free some more resources before
+    exiting.  (This is unnecessary when not looking for memory leaks.)
+    * src/patch.c (init_files_to_delete): Add dispose function for freeing
+    filenames.
+
+diff --git a/src/patch.c b/src/patch.c
+index 81c7a02..4616a48 100644
+--- a/src/patch.c
++++ b/src/patch.c
+@@ -36,6 +36,10 @@
+ #include <minmax.h>
+ #include <safe.h>
+ 
++#ifdef __SANITIZE_ADDRESS__
++# define FREE_BEFORE_EXIT
++#endif
++
+ /* procedures */
+ 
+ static FILE *create_output_file (char const *, int);
+@@ -1777,10 +1781,20 @@ struct file_to_delete {
+ 
+ static gl_list_t files_to_delete;
+ 
++#ifdef FREE_BEFORE_EXIT
++void dispose_file_to_delete (const void *elt)
++{
++	free ((void *) elt);
++}
++#else
++#define dispose_file_to_delete NULL
++#endif
++
+ static void
+ init_files_to_delete (void)
+ {
+-  files_to_delete = gl_list_create_empty (GL_LINKED_LIST, NULL, NULL, NULL, true);
++  files_to_delete = gl_list_create_empty (GL_LINKED_LIST, NULL, NULL,
++					  dispose_file_to_delete, true);
+ }
+ 
+ static void

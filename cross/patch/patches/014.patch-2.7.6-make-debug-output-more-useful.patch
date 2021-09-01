@@ -1,0 +1,40 @@
+commit ff81775f4eb6ab9a91b75e4031e8216654c0c76a
+Author: Andreas Gruenbacher <agruen@gnu.org>
+Date:   Fri Aug 17 10:31:22 2018 +0200
+
+    Make the (debug & 2) output more useful
+    
+    * src/pch.c (another_hunk): In the (debug & 2) output, fix how empty
+    lines that are not part of the patch context are printed.  Also, add
+    newlines to lines that are missing them to keep the output readable.
+
+diff --git a/src/pch.c b/src/pch.c
+index 1bb3153..e92bc64 100644
+--- a/src/pch.c
++++ b/src/pch.c
+@@ -1916,8 +1916,13 @@ another_hunk (enum diff difftype, bool rev)
+ 	lin i;
+ 
+ 	for (i = 0; i <= p_end + 1; i++) {
+-	    fprintf (stderr, "%s %c",
+-		     format_linenum (numbuf0, i),
++	    fputs (format_linenum (numbuf0, i), stderr);
++	    if (p_Char[i] == '\n')
++	      {
++	        fputc('\n', stderr);
++		continue;
++	      }
++	    fprintf (stderr, " %c",
+ 		     p_Char[i]);
+ 	    if (p_Char[i] == '*')
+ 	      fprintf (stderr, " %s,%s\n",
+@@ -1930,7 +1935,8 @@ another_hunk (enum diff difftype, bool rev)
+ 	    else if (p_Char[i] != '^')
+ 	      {
+ 		fputs(" |", stderr);
+-		pch_write_line (i, stderr);
++		if (! pch_write_line (i, stderr))
++		  fputc('\n', stderr);
+ 	      }
+ 	    else
+ 	      fputc('\n', stderr);
