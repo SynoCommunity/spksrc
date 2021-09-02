@@ -1,0 +1,19 @@
+certifi==2021.5.30
+charset-normalizer==2.0.4
+contextvars==2.4
+distro==1.6.0
+idna==3.2
+immutables==0.16
+Jinja2==3.0.1
+MarkupSafe==2.0.1
+msgpack==1.0.2
+# Avoid 3.10.1 since it has 
+# [bdist_wheel]
+# py-limited-api = cp35
+pycryptodomex!=3.10.1
+PyYAML==5.4.1
+pyzmq==17.0.0
+requests==2.26.0
+salt==3003.2
+typing-extensions==3.10.0.2
+urllib3==1.26.6

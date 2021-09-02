@@ -3,9 +3,11 @@ SPK_VERS = 3003.2
 SPK_REV = 1
 SPK_ICON = src/salt-minion.png
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS += cross/$(SPK_NAME)
 DEPENDS = cross/patch
+
+include ../../mk/spksrc.archs.mk
 
 # Requirements file generation
 # /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env
@@ -13,7 +15,11 @@ DEPENDS = cross/patch
 # source salt-env/bin/activate
 # pip install salt
 # pip freeze > requirements.txt
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS = src/requirements_gcc46.txt
+else
 WHEELS = src/requirements.txt
+endif
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
