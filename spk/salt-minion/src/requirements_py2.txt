@@ -7,6 +7,7 @@ Jinja2==2.11.3
 MarkupSafe==1.1.1
 msgpack==0.6.2
 pycrypto==2.6.1
+python-dateutil==2.8.2
 PyYAML==5.4.1
 pyzmq==19.0.2
 requests==2.26.0
