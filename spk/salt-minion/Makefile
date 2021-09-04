@@ -48,7 +48,7 @@ CHANGELOG = "Last version for Python2 on DSM 6.x is 3000.9"
 endif
 
 HOMEPAGE   = https://www.saltstack.com/
-LICENSE    = Apache
+LICENSE_FILE = src/LICENSE
 
 POST_STRIP_TARGET = salt-minion_extra_install
 
