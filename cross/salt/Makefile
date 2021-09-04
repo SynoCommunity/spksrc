@@ -1,5 +1,10 @@
 PKG_NAME = salt
+# on DSM6 with Python2 last supported version of salt is 3000.9
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 PKG_VERS = 3003.2
+else
+PKG_VERS = 3000.9
+endif
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/s/$(PKG_NAME)
@@ -23,4 +28,3 @@ else
 	@. $(CROSSENV) && $(RUN) build-pip install "markupsafe"  --no-build-isolation
 	@. $(CROSSENV) && $(RUN) pip install "markupsafe"  --no-build-isolation
 endif
-
