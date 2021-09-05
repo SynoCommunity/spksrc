@@ -38,7 +38,6 @@ service_postinst ()
         mkdir -p "${shared_folder}/watch"
     fi
 
-
     # Install nice/ionice
     ${BIN}/busybox --install ${BIN}
 }
@@ -56,7 +55,6 @@ service_postupgrade ()
             sed -i -e "s|permissions\s*=.*|permissions = ""|g" ${CFG_FILE}
 
             OLD_INCOMPLETE_FOLDER=$(sed -n 's/^download_dir\s*=\s*//p' ${CFG_FILE})
-            OLD_COMPLETE_FOLDER=$(sed -n 's/^complete_dir\s*=\s*//p' ${CFG_FILE})
             OLD_WATCH_FOLDER=$(sed -n 's/^dirscan_dir\s*=\s*//p' ${CFG_FILE})
 
             NEW_INCOMPLETE_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
@@ -73,10 +71,6 @@ service_postupgrade ()
                 mkdir -p "$NEW_INCOMPLETE_FOLDER"
                 mv -nv "$OLD_INCOMPLETE_FOLDER"/* "$NEW_INCOMPLETE_FOLDER/"
             fi
-            # if [ -n "${OLD_COMPLETE_FOLDER}" ] && [ "$OLD_COMPLETE_FOLDER" != "$NEW_COMPLETE_FOLDER" ]; then
-            #     mkdir -p "$NEW_COMPLETE_FOLDER"
-            #     mv -nv "$OLD_COMPLETE_FOLDER"/* "$NEW_COMPLETE_FOLDER/"
-            # fi
             if [ -n "${OLD_WATCH_FOLDER}" ] &&  [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
                 mkdir -p "$NEW_WATCH_FOLDER"
                 mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
