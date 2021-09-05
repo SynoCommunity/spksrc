@@ -73,6 +73,9 @@ fi
 
 # Extract share volume and share name from download location if provided
 if [ -n "${SHARE_PATH}" ]; then
+    if [ -n "${wizard_volume}" ]; then
+        SHARE_PATH="${wizard_volume}/${SHARE_PATH}"
+    fi
     SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
     SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
 fi
@@ -300,6 +303,30 @@ postinst ()
         fi
         # Not sure but invoked with hope DSM is updated
         synogroup --rebuild all 2>&1 | install_log
+    fi
+
+    # Share management
+    if [ -n "${SHARE_PATH}" ]; then
+        install_log "Configuring ${SHARE_PATH}"
+        # Create share if does not exist
+        #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
+        if ! synoshare --get "${SHARE_NAME}" &> /dev/null; then
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 2>&1 | install_log
+        fi
+
+        # Add user permission if no GROUP is set in UI
+        # GROUP permission will be added in set_syno_permissions
+        if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
+            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
+        fi
+        synoshare --build 2>&1 | install_log
+
+        $MKDIR "${SHARE_PATH}"
+
+        # Permissions for folder, up to volume
+        if [ -n "$GROUP" ]; then
+            set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
+        fi
     fi
 
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
