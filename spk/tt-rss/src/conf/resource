@@ -1,18 +1,33 @@
 {
-  "mysql-db": {
-    "info": {
-      "db-name": "ttrss"
+  "mariadb10-db": {
+    "migrate-db": {
+      "flag": "{{wizard_run_migration}}",
+      "m5-db-name": "ttrss",
+      "m10-db-name": "ttrss",
+      "db-collision": "replace"
     },
-    "root-pw": "{{wizard_mysql_password_root}}",
+    "admin-account-m10": "root",
+    "admin-pw-m10": "{{wizard_mysql_password_root}}",
+    "admin-account-m5": "root",
+    "admin-pw-m5": "{{wizard_mariadb5_password_root}}",
     "create-db": {
+      "flag": "{{wizard_create_db}}",  
+      "db-name": "ttrss",
       "db-collision": "skip"
     },
     "grant-user": {
+      "flag": "{{mysql_grant_user}}",
+      "db-name": "ttrss",
       "user-name": "ttrss",
       "host": "localhost",
       "user-pw": "{{wizard_mysql_password_ttrss}}"
     },
-    "drop-db-uninst": "true",
-    "drop-user-uninst": "true"
+    "drop-db-inst": {
+        "flag": "{{wizard_run_migration}}",
+        "ver": "m5",
+        "db-name": "ttrss"
+    },
+    "drop-db-uninst": true,
+    "drop-user-uninst": true
   }
 }
