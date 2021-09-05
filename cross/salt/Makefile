@@ -20,11 +20,19 @@ PRE_INSTALL_TARGET = pre_install_into_cross_env
 
 include ../../mk/spksrc.python-wheel.mk
 
+#ifeq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
+#LD_LIBRARY_PATH := $(INSTALL_DIR)$(INSTALL_PREFIX)/lib:$(LD_LIBRARY_PATH)
+#export LD_LIBRARY_PATH
+#endif
+
 .PHONY: pre_install_into_cross_env
 pre_install_into_cross_env:
 ifeq ($(strip $(CROSSENV)),)
 	$(RUN) $(PIP) install "markupsafe"
+	$(RUN) $(PIP) install "Cython"
 else
 	@. $(CROSSENV) && $(RUN) build-pip install "markupsafe"  --no-build-isolation
 	@. $(CROSSENV) && $(RUN) pip install "markupsafe"  --no-build-isolation
+	@. $(CROSSENV) && $(RUN) build-pip install "Cython" --no-build-isolation
+	@. $(CROSSENV) && $(RUN) pip install "Cython" --no-build-isolation
 endif
