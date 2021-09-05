@@ -2,22 +2,22 @@
 
 # Package
 PACKAGE="tt-rss"
-DNAME="Tiny Tiny RSS"
 
 # Others
 LINK_DIR="/usr/local/${PACKAGE}"
 LOGS_DIR="${SYNOPKG_PKGDEST}/var/logs"
-SSS="/var/packages/${PACKAGE}/scripts/start-stop-status"
 WEB_DIR="/var/services/web"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
-VERSION_FILE="var/version.txt"
+VERSION_FILE_DIRECTORY="var"
+VERSION_FILE="${VERSION_FILE_DIRECTORY}/version.txt"
 
-USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
+USER=http
 PHP="${SYNOPKG_PKGDEST}/bin/virtual-php"
-MYSQL="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysql || echo -n /usr/syno/mysql/bin/mysql)"
-MYSQLDUMP="$([ "${BUILDNUMBER}" -ge "7321" ] && echo -n /bin/mysqldump || echo -n /usr/syno/mysql/bin/mysqldump)"
+MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
+MARIADB_10_BIN_DIRECTORY="${MARIADB_10_INSTALL_DIRECTORY}/target/usr/local/mariadb10/bin"
+MYSQL="${MARIADB_10_BIN_DIRECTORY}/mysql"
+MYSQLDUMP="${MARIADB_10_BIN_DIRECTORY}/mysqldump"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 
@@ -28,18 +28,19 @@ preinst ()
 
 postinst ()
 {
-    # Link
-    ln -s ${SYNOPKG_PKGDEST} ${LINK_DIR} >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-
-    # Install busybox stuff
-    ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-
-    # Install the web interface
-    cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR} >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    {
+      # Link
+      ln -s "${SYNOPKG_PKGDEST}" "${LINK_DIR}";
+          
+      # Install busybox stuff
+      "${SYNOPKG_PKGDEST}/bin/busybox" --install ${SYNOPKG_PKGDEST}/bin;
+      # Install the web interface
+      cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
+    } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        "${MYSQL}" -u "${MYSQL_USER}" -p"${wizard_mysql_password_ttrss}" "${MYSQL_DATABASE}" < "${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+        "${MYSQL}" -u "${MYSQL_USER}" -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" < "${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
         cp "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
         {
@@ -50,18 +51,20 @@ postinst ()
           echo "putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');";
           echo "putenv('TTRSS_SINGLE_USER_MODE=${single_user_mode}');";
           echo "putenv('TTRSS_SELF_URL_PATH=http://${wizard_domain_name}/${PACKAGE}/');";
-          echo "putenv('TTRSS_DB_PORT=3306');";
           echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');";
+          echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');"
         } >>"${WEB_DIR}/${PACKAGE}/config.php"
-        echo "0">"${SYNOPKG_PKGDEST}/${VERSION_FILE}"
     fi
 
     # Fix permissions
-    chown "${USER}" "${WEB_DIR}/${PACKAGE}/lock" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    chown "${USER}" "${WEB_DIR}/${PACKAGE}/feed-icons"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    chown -R "${USER}" "${WEB_DIR}/${PACKAGE}/cache"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    chown -R "${USER}" "${LOGS_DIR}" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    chmod +x "${WEB_DIR}/${PACKAGE}/index.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    {
+      chown "${USER}" "${WEB_DIR}/${PACKAGE}/lock";
+      chown "${USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
+      chown -R "${USER}" "${WEB_DIR}/${PACKAGE}/cache";
+      chown -R "${USER}" "${LOGS_DIR}";
+      chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
+    } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
        "${SYNOPKG_PKGDEST}/bin/update-schema" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
     fi
@@ -83,9 +86,6 @@ preuninst ()
             exit 1
         fi
     fi
-
-    # Stop the package
-    ${SSS} stop > /dev/null
 
     return 0
 }
@@ -111,35 +111,30 @@ postuninst ()
 
 preupgrade ()
 {
-    # Stop the package
-    ${SSS} stop > /dev/null
-
     # Save the configuration file
-    rm -fr ${TMP_DIR}/${PACKAGE}
-    mkdir -p ${TMP_DIR}/${PACKAGE}
-    mv ${WEB_DIR}/${PACKAGE}/config.php ${TMP_DIR}/${PACKAGE}/
+    rm -fr "${TMP_DIR}/${PACKAGE}"
+    mkdir -p "${TMP_DIR}/${PACKAGE}"
+    mv "${WEB_DIR}/${PACKAGE}/config.php" "${TMP_DIR}/${PACKAGE}/"
 
-    mkdir ${TMP_DIR}/${PACKAGE}/feed-icons/
-    mv ${WEB_DIR}/${PACKAGE}/feed-icons/*.ico ${TMP_DIR}/${PACKAGE}/feed-icons/
+    mkdir "${TMP_DIR}/${PACKAGE}/feed-icons/"
+    mv "${WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${TMP_DIR}/${PACKAGE}/feed-icons/"
 
-    mv ${WEB_DIR}/${PACKAGE}/plugins.local ${TMP_DIR}/${PACKAGE}/
-    mv ${WEB_DIR}/${PACKAGE}/themes.local ${TMP_DIR}/${PACKAGE}/
+    mv "${WEB_DIR}/${PACKAGE}/plugins.local" "${TMP_DIR}/${PACKAGE}/"
+    mv "${WEB_DIR}/${PACKAGE}/themes.local" "${TMP_DIR}/${PACKAGE}/"
 
-    if [ -f "${SYNOPKG_PKGDEST}/${VERSION_FILE}" ]
-    then
-      cp "${SYNOPKG_PKGDEST}/${VERSION_FILE}" "${TMP_DIR}/${VERSION_FILE}"
-    fi
-    exit 0
+    mkdir -p "${TMP_DIR}/${PACKAGE}/${VERSION_FILE_DIRECTORY}"
+    echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/" >"${TMP_DIR}/${PACKAGE}/${VERSION_FILE}"
+
+    return 0
 }
 
 postupgrade ()
 {
     # Restore the configuration file
     cp "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    if [ -f "${TMP_DIR}/${VERSION_FILE}" ]
+    SPK_REV=$(cat "${TMP_DIR}/${PACKAGE}/${VERSION_FILE}")
+    if [ "${SPK_REV}" -lt "14" ]
     then
-      mv "${TMP_DIR}/${VERSION_FILE}" "${SYNOPKG_PKGDEST}/${VERSION_FILE}"
-    else
       # Parse old configuration and save to new config format
       sed -i -e "s|define('DB_TYPE', \(.*\));|putenv('TTRSS_DB_TYPE', \1);|" \
         -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
@@ -152,16 +147,21 @@ postupgrade ()
         -e "s|define('PHP_EXECUTABLE', \(.*\));||" \
         "${WEB_DIR}/${PACKAGE}/config.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
       echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php" 2>>"${LOGS_DIR}/${PACKAGE}_install.log"
-      echo "0" >"${SYNOPKG_PKGDEST}/${VERSION_FILE}"
+    fi
+    if [ "${SPK_REV}" -lt "15" ]
+    then
+      sed -i -e "s|putenv('TTRSS_DB_PASS=.*');|putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');|" \
+        "${WEB_DIR}/${PACKAGE}/config.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+      echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php" 2>>"${LOGS_DIR}/${PACKAGE}_install.log"
     fi
 
-    mv -f ${TMP_DIR}/${PACKAGE}/feed-icons/*.ico ${WEB_DIR}/${PACKAGE}/feed-icons/  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    mv -f ${TMP_DIR}/${PACKAGE}/plugins.local/* ${WEB_DIR}/${PACKAGE}/plugins.local/  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-    mv -f ${TMP_DIR}/${PACKAGE}/themes.local/* ${WEB_DIR}/${PACKAGE}/themes.local/  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    {
+      mv -f "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/;
+      mv -f "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
+      mv -f "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
 
-    rm -fr ${TMP_DIR}/${PACKAGE} >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-
-    ${SYNOPKG_PKGDEST}/bin/update-schema >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+      "${SYNOPKG_PKGDEST}"/bin/update-schema;
+    } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
 
     return 0
 }

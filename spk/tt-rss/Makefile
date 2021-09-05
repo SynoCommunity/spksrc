@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20210306
-SPK_REV = 14
+SPK_VERS = 20210902
+SPK_REV = 15
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et
 ADMIN_URL = /tt-rss/
 RELOAD_UI = yes
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "Update Tiny Tiny RSS to Git revision 473ea6255c (20210306)."
+CHANGELOG = "1. Update Tiny Tiny RSS to Git revision 36e174750e (20210902) <br /> 2. Migrated to Maria DB 10 <br /> 3. Fixed installation procedures"
 
 HOMEPAGE   = https://tt-rss.org/
 LICENSE    = GPL
@@ -40,7 +40,7 @@ REQUIRED_DSM = 6.0
 
 INSTUNINST_RESTART_SERVICES = apache-web
 
-SPK_DEPENDS = "WebStation:PHP7.2:MariaDB"
+SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10"
 
 include ../../mk/spksrc.spk.mk
 
@@ -59,4 +59,3 @@ tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
 	install -m 755 src/bin/tt-rss-daemon $(STAGING_DIR)/bin/tt-rss-daemon
 	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
 	install -m 755 src/bin/virtual-php $(STAGING_DIR)/bin/virtual-php
-
