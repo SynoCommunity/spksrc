@@ -6,7 +6,7 @@ source ${SCRIPT_DIR}/settings.sh
 if [ "$(whoami)" == "root" ]
 then
   # tt rss should always be running as http user
-  sudo -u http "${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema --yes
+  sudo -u http "${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema=force-yes
 else
-  "${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema --yes
+  "${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema=force-yes
 fi
