@@ -73,6 +73,9 @@ fi
 
 # Extract share volume and share name from download location if provided
 if [ -n "${SHARE_PATH}" ]; then
+    if [ -n "${wizard_volume}" ]; then
+        SHARE_PATH="${wizard_volume}/${SHARE_PATH}"
+    fi
     SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
     SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
 fi
