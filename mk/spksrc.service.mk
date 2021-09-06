@@ -190,7 +190,7 @@ ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
@@ -256,12 +256,6 @@ $(DSM_CONF_DIR)/privilege:
 	@$(MSG) '(privilege) run-as: package'
 	@$(MSG) "(privilege) DSM >= 7 $(DSM_CONF_DIR)/privilege"
 # Apply variables to privilege file
-ifneq ($(strip $(GROUP)),)
-# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
-# For DSM7 I recommend setting permissions for individual packages (System Internal User)
-# or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
-	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ | sponge $@
-endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@
@@ -269,10 +263,14 @@ endif
 ifneq ($(strip $(SPK_USER)),)
 	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
-ifneq ($(strip $(SPK_GROUP)),)
-	@jq '."groupname" = "$(SPK_GROUP)"' $@ | sponge $@
+ifneq ($(strip $(GROUP)),)
+	@jq '."groupname" = "$(GROUP)"' $@ | sponge $@
+else
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@jq '."groupname" = "synocommunity"' $@ | sponge $@
 else
 	@jq '."groupname" = "sc-$(SPK_USER)"' $@ | sponge $@
+endif
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
