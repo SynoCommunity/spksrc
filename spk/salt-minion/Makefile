@@ -1,9 +1,9 @@
 SPK_NAME = salt-minion
 SPK_VERS = 3003.3
-SPK_REV = 1
+SPK_REV  = 1
 SPK_ICON = src/salt-minion.png
 
-SPK_DEPENDS = "python>=3.0"
+SPK_DEPENDS = "python38"
 
 DEPENDS = cross/patch
 
@@ -25,14 +25,14 @@ else
 WHEELS = src/requirements.txt
 endif
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI = yes
+MAINTAINER   = SynoCommunity
+DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
+RELOAD_UI    = yes
 DISPLAY_NAME = Salt Minion
-CHANGELOG = "Update to 3003.3"
+CHANGELOG    = "Update to 3003.3"
 
-HOMEPAGE   = https://www.saltstack.com/
-LICENSE = Apache
+HOMEPAGE     = https://www.saltstack.com/
+LICENSE      = Apache
 LICENSE_FILE = src/LICENSE
 
 POST_STRIP_TARGET = salt-minion_extra_install

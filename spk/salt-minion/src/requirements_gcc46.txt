@@ -14,6 +14,6 @@ pycryptodomex!=3.10.1
 PyYAML==5.4.1
 pyzmq==17.0.0
 requests==2.26.0
-salt==3003.2
+salt==3003.3
 typing-extensions==3.10.0.2
 urllib3==1.26.6
