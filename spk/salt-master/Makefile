@@ -41,6 +41,6 @@ STARTABLE = yes
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
-salt-minion_extra_install:
+salt-master_extra_install:
 	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/master.conf $(STAGING_DIR)/share
