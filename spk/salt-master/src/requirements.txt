@@ -14,7 +14,8 @@ pycryptodomex>=3.9.8,!=3.10.1
 python-dateutil==2.8.2
 PyYAML==5.4.1
 pyzmq<=20.0.0 ; python_version < "3.6"
-pyzmq>=17.0.0 ; python_version < "3.9"
+pyzmq>=17.0.0 ; "arm" not in platform_machine
+pyzmq==17.0.0 ; "arm" in platform_machine
 pyzmq>=19.0.2 ; python_version >= "3.9"
 requests>=1.0.0
 salt==3003.3
