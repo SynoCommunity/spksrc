@@ -38,6 +38,13 @@ CONF_DIR = src/conf
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-call
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-cp
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-key
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-run
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-ssh
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
