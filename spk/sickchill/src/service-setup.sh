@@ -1,4 +1,4 @@
-PYTHON_DIR="/usr/local/python38"
+PYTHON_DIR="/var/packages/python38/target"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
