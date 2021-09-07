@@ -19,11 +19,7 @@ include ../../mk/spksrc.archs.mk
 # source salt-env/bin/activate
 # pip install salt
 # pip freeze > requirements.txt
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS = src/requirements_gcc46.txt
-else
 WHEELS = src/requirements.txt
-endif
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
@@ -42,9 +38,15 @@ CONF_DIR = src/conf
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-call
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-minion
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-proxy
+SPK_USR_LOCAL_LINKS = bin:env/bin/spm
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
 	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/minion.conf $(STAGING_DIR)/share
+	install -m 644 src/minion $(STAGING_DIR)/share
+	install -m 644 src/proxy $(STAGING_DIR)/share

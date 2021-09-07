@@ -39,15 +39,16 @@ SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/salt
-SPK_USR_LOCAL_LINKS = bin:env/bin/salt-call
 SPK_USR_LOCAL_LINKS = bin:env/bin/salt-cp
 SPK_USR_LOCAL_LINKS = bin:env/bin/salt-key
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-master
 SPK_USR_LOCAL_LINKS = bin:env/bin/salt-run
-SPK_USR_LOCAL_LINKS = bin:env/bin/salt-ssh
+SPK_USR_LOCAL_LINKS = bin:env/bin/salt-unity
+SPK_USR_LOCAL_LINKS = bin:env/bin/spm
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
 	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/master.conf $(STAGING_DIR)/share
+	install -m 644 src/master $(STAGING_DIR)/share
