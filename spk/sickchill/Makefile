@@ -1,6 +1,5 @@
 SPK_NAME = sickchill
-SPK_VERS = 20210329
-# temporary version name instead of $(shell date +%Y%m%d)
+SPK_VERS = 20210729
 SPK_REV = 2
 SPK_ICON = src/sickchill.png
 
