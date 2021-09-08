@@ -22,7 +22,7 @@ Flask-Compress==1.9.0
 Flask-Cors==3.0.10
 Flask-Login==0.5.0
 Flask-RESTful==0.3.8
-flask-restx==0.4.0
+flask-restx==0.5.1
 FlexGet==3.1.129
 greenlet==1.0.0
 guessit==3.2.0
