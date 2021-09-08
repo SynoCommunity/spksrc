@@ -21,5 +21,5 @@ include ../../mk/spksrc.install-resources.mk
 zap2epg_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/tv_grab_zap2epg $(STAGING_INSTALL_PREFIX)/bin
-	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var/epggrab/conf
-	install -m 640 $(WORK_DIR)/$(PKG_DIR)/epggrab/conf/zap2epg.xml $(STAGING_INSTALL_PREFIX)/var/epggrab/conf
+	install -m 750 -d $(STAGING_INSTALL_PREFIX_VAR)/epggrab/conf
+	install -m 640 $(WORK_DIR)/$(PKG_DIR)/epggrab/conf/zap2epg.xml $(STAGING_INSTALL_PREFIX_VAR)/epggrab/conf
