@@ -189,12 +189,11 @@ preupgrade ()
     call_func "validate_preupgrade"
 
     # dsm6 -> dsm7
-    # Backup & Migrate data once to permanent storage
+    # Migrate data once to permanent storage
     if [ -d ${SYNOPKG_PKGDEST}/var -a ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
         echo "$RSYNC --ignore-existing ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}" | install_log
         $RSYNC --ignore-existing ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR} 2>&1 | install_log && chk=$?
-        $TAR -C ${SYNOPKG_PKGDEST} -Jcf - var > ${SYNOPKG_PKGVAR}/var-preDSM7-$(date +%Y%m%d-%H%M).tar.xz | install_log && chk="${chk}$?"
-        [ "${chk}" = "00" ] && rm -fr ${SYNOPKG_PKGDEST}/var || true
+        [ "${chk}" = "0" ] && rm -fr ${SYNOPKG_PKGDEST}/var || true
     fi
 
     call_func "service_preupgrade" install_log
@@ -209,5 +208,6 @@ postupgrade ()
     call_func "service_restore" install_log
     call_func "syno_sync_app_folders" install_log
     call_func "service_postupgrade" install_log
+
     exit 0
 }
