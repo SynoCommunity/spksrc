@@ -16,6 +16,16 @@ NINJA_BUILD_DIR = $(MESON_BUILD_DIR)
 endif
 endif
 
+# set default use destdir
+ifeq ($(strip $(NINJA_USE_DESTDIR)),)
+ifneq ($(strip $(CMAKE_USE_DESTDIR)),)
+NINJA_USE_DESTDIR = $(CMAKE_USE_DESTDIR)
+else
+NINJA_USE_DESTDIR = 1
+endif
+endif
+
+# set default destdir directory
 ifeq ($(strip $(NINJA_DESTDIR)),)
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 NINJA_DESTDIR = $(CMAKE_DESTDIR)
@@ -51,10 +61,8 @@ endif
 ninja_install_target:
 	@$(MSG) - Ninja install
 	@$(MSG)    - Ninja installation path = $(NINJA_DESTDIR)
-ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-	@$(MSG)    - Use CMAKE_USE_DESTDIR = $(CMAKE_USE_DESTDIR)
-endif
-ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
+	@$(MSG)    - Ninja use DESTDIR = $(NINJA_USE_DESTDIR)
+ifeq ($(strip $(NINJA_USE_DESTDIR)),0)
 	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C $(NINJA_BUILD_DIR) install
 else
 	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) DESTDIR=$(NINJA_DESTDIR) ninja -C $(NINJA_BUILD_DIR) install
