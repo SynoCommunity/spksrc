@@ -9,11 +9,19 @@ ENV += PKG_CONFIG=/usr/bin/pkg-config
 
 # Set default build directory
 ifeq ($(strip $(NINJA_BUILD_DIR)),)
+ifeq ($(strip $(CMAKE_USE_NINJA)),1)
+NINJA_BUILD_DIR = $(CMAKE_BUILD_DIR)
+else
 NINJA_BUILD_DIR = $(MESON_BUILD_DIR)
+endif
 endif
 
 ifeq ($(strip $(NINJA_DESTDIR)),)
+ifeq ($(strip $(CMAKE_USE_NINJA)),1)
+NINJA_DESTDIR = $(CMAKE_DESTDIR)
+else
 NINJA_DESTDIR = $(INSTALL_DIR)
+endif
 endif
 
 # compile

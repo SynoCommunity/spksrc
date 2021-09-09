@@ -20,6 +20,11 @@ ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   ENV += PATH=$(CMAKE_PATH):$$PATH
 endif
 
+# Use ninja to build
+ifeq ($(strip $(CMAKE_USE_NINJA)),1)
+  CMAKE_ARGS := -G Ninja $(CMAKE_ARGS)
+endif
+
 # set default ASM build environment
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
