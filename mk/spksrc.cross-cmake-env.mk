@@ -21,8 +21,11 @@ ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
 endif
 
 # Use ninja to build
+ifeq ($(strip $(CMAKE_USE_NINJA)),)
+  CMAKE_USE_NINJA = 1
+endif
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-  CMAKE_ARGS := -G Ninja $(CMAKE_ARGS)
+  CMAKE_ARGS += -G Ninja
 endif
 
 # set default ASM build environment
