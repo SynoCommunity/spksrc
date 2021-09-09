@@ -35,9 +35,9 @@ ifeq ($(strip $(CMAKE_USE_NASM)),1)
   ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
   CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
+  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(AS)
 else
   CMAKE_USE_NASM = 0
-  CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
 # set default use destdir
