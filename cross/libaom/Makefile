@@ -21,7 +21,6 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 
 CMAKE_USE_NASM = 1
-CMAKE_USE_NINJA = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
