@@ -64,8 +64,7 @@ cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install
-endif
-ifeq ($(strip $(CMAKE_USE_DESTDIR)),1)
+else
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
 endif
 endif
