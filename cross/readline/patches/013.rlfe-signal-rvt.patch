@@ -1,0 +1,13 @@
+Index: b/examples/rlfe/pty.c
+===================================================================
+--- a/examples/rlfe/pty.c
++++ b/examples/rlfe/pty.c
+@@ -254,7 +254,7 @@
+ #if defined(HAVE_GETPT) && defined(linux)
+   int getpt __P((void));
+ #endif
+-  sigret_t (*sigcld)__P(SIGPROTOARG);
++  sighandler_t sigcld;
+ 
+   strcpy(PtyName, "/dev/ptmx");
+ #if defined(HAVE_GETPT) && defined(linux)

@@ -1,0 +1,17 @@
+rl-no-rpath.dpatch by  <doko@debian.org>
+
+Don't set a runtime path for linking the shared libraries
+
+Index: b/support/shobj-conf
+===================================================================
+--- a/support/shobj-conf
++++ b/support/shobj-conf
+@@ -128,7 +128,7 @@
+ 	SHOBJ_LD='${CC}'
+ 	SHOBJ_LDFLAGS='-shared -Wl,-soname,$@'
+ 
+-	SHLIB_XLDFLAGS='-Wl,-rpath,$(libdir) -Wl,-soname,`basename $@ $(SHLIB_MINOR)`'
++	SHLIB_XLDFLAGS='-Wl,-soname,`basename $@ $(SHLIB_MINOR)`'
+ 	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)$(SHLIB_MINOR)'
+ 	;;
+ 

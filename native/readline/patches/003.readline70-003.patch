@@ -1,0 +1,38 @@
+			   READLINE PATCH REPORT
+			   =====================
+
+Readline-Release: 7.0
+Patch-ID: readline70-003
+
+Bug-Reported-by:	Frédéric Brière <fbriere@fbriere.net>
+Bug-Reference-ID:	<20170120180724.7ydq7fb2hsp366dj@fabul.fbriere.net>
+Bug-Reference-URL:	http://lists.gnu.org/archive/html/bug-readline/2017-01/msg00002.html
+
+Bug-Description:
+
+Readline-7.0 uses pselect(2) to allow readline to handle signals that do not
+interrupt read(2), such as SIGALRM, before reading another character.  The
+signal mask used in the pselect call did not take into account signals the
+calling application blocked before calling readline().
+
+Index: b/input.c
+===================================================================
+--- a/input.c
++++ b/input.c
+@@ -513,6 +513,7 @@ rl_getc (stream)
+       result = 0;
+ #if defined (HAVE_PSELECT)
+       sigemptyset (&empty_set);
++      sigprocmask (SIG_BLOCK, (sigset_t *)NULL, &empty_set);
+       FD_ZERO (&readfds);
+       FD_SET (fileno (stream), &readfds);
+       result = pselect (fileno (stream) + 1, &readfds, NULL, NULL, NULL, &empty_set);
+Index: b/patchlevel
+===================================================================
+--- a/patchlevel
++++ b/patchlevel
+@@ -1,3 +1,3 @@
+ # Do not edit -- exists only for use by patch
+ 
+-2
++3

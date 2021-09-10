@@ -1,0 +1,81 @@
+			   READLINE PATCH REPORT
+			   =====================
+
+Readline-Release: 7.0
+Patch-ID: readline70-002
+
+Bug-Reported-by:	Hong Cho <hong.cho@citrix.com>
+Bug-Reference-ID:	<c30b5fe62b2543af8297e47ca487c29c@SJCPEX02CL02.citrite.net>
+Bug-Reference-URL:	http://lists.gnu.org/archive/html/bug-readline/2016-12/msg00002.html
+
+Bug-Description:
+
+There is a race condition in add_history() that can be triggered by a fatal
+signal arriving between the time the history length is updated and the time
+the history list update is completed. A later attempt to reference an
+invalid history entry can cause a crash.
+
+Index: b/history.c
+===================================================================
+--- a/history.c
++++ b/history.c
+@@ -279,6 +279,7 @@ add_history (string)
+      const char *string;
+ {
+   HIST_ENTRY *temp;
++  int new_length;
+ 
+   if (history_stifled && (history_length == history_max_entries))
+     {
+@@ -295,13 +296,9 @@ add_history (string)
+ 
+       /* Copy the rest of the entries, moving down one slot.  Copy includes
+ 	 trailing NULL.  */
+-#if 0
+-      for (i = 0; i < history_length; i++)
+-	the_history[i] = the_history[i + 1];
+-#else
+       memmove (the_history, the_history + 1, history_length * sizeof (HIST_ENTRY *));
+-#endif
+ 
++      new_length = history_length;
+       history_base++;
+     }
+   else
+@@ -315,7 +312,7 @@ add_history (string)
+ 	  else
+ 	    history_size = DEFAULT_HISTORY_INITIAL_SIZE;
+ 	  the_history = (HIST_ENTRY **)xmalloc (history_size * sizeof (HIST_ENTRY *));
+-	  history_length = 1;
++	  new_length = 1;
+ 	}
+       else
+ 	{
+@@ -325,14 +322,15 @@ add_history (string)
+ 	      the_history = (HIST_ENTRY **)
+ 		xrealloc (the_history, history_size * sizeof (HIST_ENTRY *));
+ 	    }
+-	  history_length++;
++	  new_length = history_length + 1;
+ 	}
+     }
+ 
+   temp = alloc_history_entry ((char *)string, hist_inittime ());
+ 
+-  the_history[history_length] = (HIST_ENTRY *)NULL;
+-  the_history[history_length - 1] = temp;
++  the_history[new_length] = (HIST_ENTRY *)NULL;
++  the_history[new_length - 1] = temp;
++  history_length = new_length;
+ }
+ 
+ /* Change the time stamp of the most recent history entry to STRING. */
+Index: b/patchlevel
+===================================================================
+--- a/patchlevel
++++ b/patchlevel
+@@ -1,3 +1,3 @@
+ # Do not edit -- exists only for use by patch
+ 
+-1
++2

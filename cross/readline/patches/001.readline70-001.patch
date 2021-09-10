@@ -1,0 +1,50 @@
+			   READLINE PATCH REPORT
+			   =====================
+
+Readline-Release: 7.0
+Patch-ID: readline70-001
+
+Bug-Reported-by:        Sean Zha <freeman_cha@hotmail.com>
+Bug-Reference-ID:       <BN3PR01MB13657D9303EB94BF6E54216E8CCA0@BN3PR01MB1365.prod.exchangelabs.com>
+Bug-Reference-URL:      http://lists.gnu.org/archive/html/bug-bash/2016-09/msg00107.html
+
+Bug-Description:
+
+Readline-7.0 changed the way the history list is initially allocated to reduce
+the number of reallocations and copies.  Users who set the readline
+history-size variable to a very large number to essentially unlimit the size
+of the history list will get memory allocation errors 
+
+Index: b/history.c
+===================================================================
+--- a/history.c
++++ b/history.c
+@@ -57,6 +57,8 @@ extern int errno;
+ /* How big to make the_history when we first allocate it. */
+ #define DEFAULT_HISTORY_INITIAL_SIZE	502
+ 
++#define MAX_HISTORY_INITIAL_SIZE	8192
++
+ /* The number of slots to increase the_history by. */
+ #define DEFAULT_HISTORY_GROW_SIZE 50
+ 
+@@ -307,7 +309,9 @@ add_history (string)
+       if (history_size == 0)
+ 	{
+ 	  if (history_stifled && history_max_entries > 0)
+-	    history_size = history_max_entries + 2;
++	    history_size = (history_max_entries > MAX_HISTORY_INITIAL_SIZE)
++				? MAX_HISTORY_INITIAL_SIZE
++				: history_max_entries + 2;
+ 	  else
+ 	    history_size = DEFAULT_HISTORY_INITIAL_SIZE;
+ 	  the_history = (HIST_ENTRY **)xmalloc (history_size * sizeof (HIST_ENTRY *));
+Index: b/patchlevel
+===================================================================
+--- a/patchlevel
++++ b/patchlevel
+@@ -1,3 +1,3 @@
+ # Do not edit -- exists only for use by patch
+ 
+-0
++1

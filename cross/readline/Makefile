@@ -14,4 +14,6 @@ LICENSE  = https://www.gnu.org/licenses/gpl.html
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = bash_cv_wcwidth_broken=no
 
+PATCHES_LEVEL = 1
+
 include ../../mk/spksrc.cross-cc.mk

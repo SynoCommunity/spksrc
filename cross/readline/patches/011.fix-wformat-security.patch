@@ -1,0 +1,16 @@
+Description: Fix compiling with -Werror=format-security.
+ Prevents format string attacks.
+Author: Simon Ruderich <simon@ruderich.org>
+Last-Update: 2012-09-15
+
+--- readline6-6.2.orig/examples/rlfe/rlfe.c
++++ readline6-6.2/examples/rlfe/rlfe.c
+@@ -273,7 +273,7 @@ static void maybe_emphasize_input (int o
+   if (on == current_emphasize_input
+       || (on && ! do_emphasize_input))
+     return;
+-  fprintf (rl_outstream, on ? start_input_mode : end_input_mode);
++  fprintf (rl_outstream, "%s", on ? start_input_mode : end_input_mode);
+   fflush (rl_outstream);
+   current_emphasize_input = on;
+ }

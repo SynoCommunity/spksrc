@@ -12,6 +12,11 @@ HOMEPAGE = https://github.com/pyca/pynacl/
 COMMENT  = PyNaCl is a Python binding to libsodium, which is a fork of the Networking and Cryptography library.
 LICENSE  = Apache License 2.0
 
+ifeq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
+LD_LIBRARY_PATH := $(INSTALL_DIR)$(INSTALL_PREFIX)/lib:$(LD_LIBRARY_PATH)
+export LD_LIBRARY_PATH
+endif
+
 include ../../mk/spksrc.python-wheel.mk
 
 # libsodium shall be taken from the system libraries

@@ -1,0 +1,52 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## rlfe-history.dpatch by  <andrew@pimlott.net>
+##
+## DP: Fix rlfe, always writing a history file.
+
+@DPATCH@
+Index: b/examples/rlfe/rlfe.c
+===================================================================
+--- a/examples/rlfe/rlfe.c
++++ b/examples/rlfe/rlfe.c
+@@ -154,21 +154,27 @@
+ static pid_t child = -1;
+ 
+ static void
+-sig_child (int signo)
++finish_up()
+ {
+-  int status;
+-  wait (&status);
+   if (hist_file != 0)
+     {
+       write_history (hist_file);
+       if (hist_size)
+ 	history_truncate_file (hist_file, hist_size);
+     }
+-  DPRINT0 ("(Child process died.)\n");
+   tcsetattr(STDIN_FILENO, TCSANOW, &orig_term);
+   exit (0);
+ }
+ 
++static void
++sig_child (int signo)
++{
++  int status;
++  wait (&status);
++  DPRINT0 ("(Child process died.)\n");
++  finish_up();
++}
++
+ volatile int propagate_sigwinch = 0;
+ 
+ /* sigwinch_handler
+@@ -710,8 +716,7 @@
+ 	  if (count <= 0)
+ 	    {
+ 	      DPRINT0 ("(Connection closed by foreign host.)\n");
+-	      tcsetattr(STDIN_FILENO, TCSANOW, &orig_term);
+-	      exit (0);
++              finish_up();
+ 	    }
+ 	  old_count = buf_count;
+ 

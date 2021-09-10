@@ -1,0 +1,28 @@
+rl-header.dpatch by  <doko@debian.org>
+
+Include stdio.h in readline.h and history.h
+
+Index: b/history.h
+===================================================================
+--- a/history.h	2010-04-10 12:05:07.792336522 +0000
++++ b/history.h	2010-04-10 12:12:39.462336737 +0000
+@@ -32,6 +32,7 @@
+ #  include "rlstdc.h"
+ #  include "rltypedefs.h"
+ #else
++#  include <stdio.h>
+ #  include <readline/rlstdc.h>
+ #  include <readline/rltypedefs.h>
+ #endif
+Index: b/readline.h
+===================================================================
+--- a/readline.h	2010-04-10 12:12:39.302337290 +0000
++++ b/readline.h	2010-04-10 12:12:39.462336737 +0000
+@@ -32,6 +32,7 @@
+ #  include "keymaps.h"
+ #  include "tilde.h"
+ #else
++#  include <stdio.h>
+ #  include <readline/rlstdc.h>
+ #  include <readline/rltypedefs.h>
+ #  include <readline/keymaps.h>

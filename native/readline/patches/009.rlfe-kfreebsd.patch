@@ -1,0 +1,13 @@
+Index: readline6-6.1/examples/rlfe/pty.c
+===================================================================
+--- readline6-6.1.orig/examples/rlfe/pty.c	2010-05-30 18:30:54.000000000 +0000
++++ readline6-6.1/examples/rlfe/pty.c	2010-05-30 18:30:58.000000000 +0000
+@@ -133,7 +133,7 @@
+ {
+   if (f < 0)
+     return;
+-#if defined(I_PUSH) && defined(HAVE_SVR4_PTYS) && !defined(sgi) && !defined(linux) && !defined(__osf__) && !defined(M_UNIX)
++#if defined(I_PUSH) && defined(HAVE_SVR4_PTYS) && !defined(sgi) && !defined(linux) && !defined(__osf__) && !defined(M_UNIX) && !defined(__FreeBSD_kernel__)
+   if (ioctl(f, I_PUSH, "ptem"))
+     Panic(errno, "InitPTY: cannot I_PUSH ptem");
+   if (ioctl(f, I_PUSH, "ldterm"))
