@@ -8,7 +8,7 @@ PKG_DIR = Python-$(PKG_VERS)
 
 BUILD_DEPENDS = native/$(PKG_NAME)
 
-DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
+DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz cross/gdbm cross/expat
 # required for uuid module
 DEPENDS += cross/libuuid
 # libffi is no longer bundled with python
@@ -20,7 +20,12 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions
+CONFIGURE_ARGS += --with-computed-gotos=yes --with-dbmliborder=gdbm:ndbm:bdb --with-system-expat --with-system-ffi --enable-loadable-sqlite-extensions --with-ssl-default-suites=openssl --enable-optimizations
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
+include ../../mk/spksrc.archs.mk
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --with-lto 
+endif
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
 POST_PATCH_TARGET = python38_post_patch
@@ -86,8 +91,8 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | build-python
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | python
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==44.1.0"  "wheel==0.36.2" "cffi==1.14.5"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==44.1.0" "wheel==0.36.2" "cffi==1.14.5"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==49.6.0"  "wheel==0.36.2" "cffi==1.14.6"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==49.6.0" "wheel==0.36.2" "cffi==1.14.6"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

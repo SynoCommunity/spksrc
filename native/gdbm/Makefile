@@ -11,10 +11,9 @@ HOMEPAGE = https://www.gnu.org/software/gdbm/
 COMMENT  = GNU dbm is a library of functions implementing a hashed database on a disk file.
 LICENSE  = GPLv2/LGPLv2
 
-GNU_CONFIGURE = 1
-
+GNU_CONFIGURE   = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --disable-largefile
 CONFIGURE_ARGS += --enable-libgdbm-compat
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.native-cc.mk
