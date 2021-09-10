@@ -47,6 +47,9 @@ REAL_CONFIGURE_ARGS += $(CONFIGURE_ARGS)
 
 configure_msg:
 	@$(MSG) "Configuring for $(NAME)"
+	@$(MSG)     - Configure ARGS: $(CONFIGURE_ARGS)
+	@$(MSG)     - Install prefix: $(INSTALL_PREFIX)
+	@$(MSG)     - Install prefix [var]:  $(INSTALL_PREFIX_VAR)
 
 pre_configure_target: configure_msg
 

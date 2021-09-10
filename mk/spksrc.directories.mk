@@ -53,12 +53,12 @@ endif
 #
 # When building packages set var directory
 # under target/../var to be consequent
-# new directory structure.  But only do
-# so under spk/* and not under cross/* as
-# it is unecessary.
+# new directory structure.  But only do so
+# when building under spk/* and not under
+# cross/* as unecessary.
 #
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-ifneq ($(strip $(SPK_NAME)),)
+ifeq ($(lastword $(subst /, ,$(INSTALL_PREFIX))),target)
 INSTALL_PREFIX_VAR  = $(INSTALL_PREFIX)/../var
 endif
 endif
