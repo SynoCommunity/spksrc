@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
 SPK_VERS = 3003.3
-SPK_REV  = 1
+SPK_REV  = 10
 SPK_ICON = src/salt-master.png
 
 SPK_DEPENDS = "python38"

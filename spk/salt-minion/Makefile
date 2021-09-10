@@ -23,7 +23,6 @@ WHEELS = src/requirements.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI    = yes
 DISPLAY_NAME = Salt Minion
 CHANGELOG    = "Update to 3003.3"
 
