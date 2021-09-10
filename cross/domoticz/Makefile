@@ -57,7 +57,7 @@ domoticz_pre_compile:
 
 .PHONY: domoticz_install
 domoticz_install:
-	install -d $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/var
+	install -d $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX_VAR)
 	install -m 755 $(CMAKE_BUILD_DIR)/domoticz $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(CMAKE_BUILD_DIR)/extern/minizip/libminizip.so $(STAGING_INSTALL_PREFIX)/lib
 	@$(RUN) cp -R www $(STAGING_INSTALL_PREFIX)

@@ -23,9 +23,9 @@ include ../../mk/spksrc.cross-cc.mk
 
 CONFIGURE_ARGS = --with-db=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-sg-dbhome=$(INSTALL_PREFIX)/var/db
 CONFIGURE_ARGS += --with-sg-config=$(INSTALL_PREFIX)/etc/squidguard.conf
-CONFIGURE_ARGS += --with-sg-logdir=$(INSTALL_PREFIX)/var/logs
+CONFIGURE_ARGS += --with-sg-dbhome=$(INSTALL_PREFIX_VAR)/var/db
+CONFIGURE_ARGS += --with-sg-logdir=$(INSTALL_PREFIX_VAR)/var/logs
 CONFIGURE_ARGS += --with-squiduser=$(USER)
 CONFIGURE_ARGS += -with-mysql=no
 CONFIGURE_ARGS += --with-ldap-inc=no
@@ -36,9 +36,9 @@ squidguard_pre_configure:
 
 .PHONY: squidguard_post_install
 squidguard_post_install:
-	@$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX)/var/db
-	@$(RUN) wget $(DB_FILE) -O $(STAGING_INSTALL_PREFIX)/var/db/blacklists.tar.gz
-	@$(RUN) tar xvzf $(STAGING_INSTALL_PREFIX)/var/db/blacklists.tar.gz -C $(STAGING_INSTALL_PREFIX)/var/db
-	@$(RUN) cp -R $(STAGING_INSTALL_PREFIX)/var/db/blacklists/* $(STAGING_INSTALL_PREFIX)/var/db/
-	@$(RUN) rm -Rf $(STAGING_INSTALL_PREFIX)/var/db/blacklists*
-	@$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX)/var/www/squidguardmgr/
+	@$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX_VAR)/db
+	@$(RUN) wget $(DB_FILE) -O $(STAGING_INSTALL_PREFIX_VAR)/db/blacklists.tar.gz
+	@$(RUN) tar xvzf $(STAGING_INSTALL_PREFIX_VAR)/db/blacklists.tar.gz -C $(STAGING_INSTALL_PREFIX_VAR)/db
+	@$(RUN) cp -R $(STAGING_INSTALL_PREFIX_VAR)/db/blacklists/* $(STAGING_INSTALL_PREFIX_VAR)/db/
+	@$(RUN) rm -Rf $(STAGING_INSTALL_PREFIX_VAR)/db/blacklists*
+	@$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX_VAR)/www/squidguardmgr/

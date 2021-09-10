@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 INSTALL_TARGET = openssh_install
 POST_INSTALL_TARGET = openssh_post_install
 
-CONFIGURE_ARGS = --with-privsep-path=$(INSTALL_PREFIX)/var/empty
+CONFIGURE_ARGS = --with-privsep-path=$(INSTALL_PREFIX_VAR)/empty
 CONFIGURE_ARGS += --disable-lastlog --disable-strip
 CONFIGURE_ARGS += --disable-utmp --disable-utmpx
 CONFIGURE_ARGS += --disable-wtmp --disable-wtmpx
