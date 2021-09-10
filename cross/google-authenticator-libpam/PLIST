@@ -1,0 +1,8 @@
+bin/google-authenticator
+lib/security/pam_google_authenticator.la
+lib/security/pam_google_authenticator.so
+share/doc/google-authenticator/FILEFORMAT
+share/doc/google-authenticator/README.md
+share/doc/google-authenticator/totp.html
+share/man/man1/google-authenticator.1
+share/man/man8/pam_google_authenticator.8
