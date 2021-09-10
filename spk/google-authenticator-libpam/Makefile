@@ -7,7 +7,6 @@ DEPENDS = cross/google-authenticator-libpam
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = google-authenticator for the pam module
-RELOAD_UI = no
 DISPLAY_NAME = Google Authenticator for libpam
 STARTABLE = no
 CHANGELOG = "init"

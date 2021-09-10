@@ -9,5 +9,13 @@ HOMEPAGE = https://github.com/linux-pam/linux-pam
 COMMENT = Linux PAM (Pluggable Authentication Modules for Linux) project
 LICENSE = Custom
 
+GNU_CONFIGURE=1
+POST_INSTALL_TARGET=google_auth_post_install_target
+
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: google_auth_post_install_target
+google_auth_post_install_target:
+	mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/include/security
+	mv $(wildcard $(INSTALL_DIR)$(INSTALL_PREFIX)/include/*pam*.h) $(INSTALL_DIR)$(INSTALL_PREFIX)/include/security
 

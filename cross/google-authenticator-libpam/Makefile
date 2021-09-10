@@ -11,15 +11,14 @@ HOMEPAGE = https://github.com/google/google-authenticator-libpam
 COMMENT = PAM module for two-factor authentication logging into servers via SSH, OpenVPN, etc.
 LICENSE = Apache-2.0
 
-# need to include headers and library of libpam dependency
-ADDITIONAL_CFLAGS = -I$(INSTALL_DIR)/usr/include
-ADDITIONAL_CXXFLAGS = -I$(INSTALL_DIR)/usr/include
-ADDITIONAL_LDFLAGS = -L$(INSTALL_DIR)/lib64
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+
+GNU_CONFIGURE = 1
+PRE_CONFIGURE_TARGET = google_auth_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: glib_pre_configure
-configure_target:
+.PHONY: google_auth_pre_configure
+google_auth_pre_configure:
 	$(RUN) ./bootstrap.sh
-	$(RUN) ./configure $(REAL_CONFIGURE_ARGS)
 
