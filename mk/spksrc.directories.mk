@@ -50,9 +50,19 @@ ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
 STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif
 
+#
+# When building packages set var directory
+# under target/../var to be consequent
+# new directory structure.  But only do
+# so under spk/* and not under cross/* as
+# it is unecessary.
+#
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifneq ($(strip $(SPK_NAME)),)
 INSTALL_PREFIX_VAR  = $(INSTALL_PREFIX)/../var
-else
+endif
+endif
+ifeq ($(strip $(INSTALL_PREFIX_VAR)),)
 INSTALL_PREFIX_VAR  = $(INSTALL_PREFIX)/var
 endif
 STAGING_INSTALL_PREFIX_VAR  = $(INSTALL_DIR)$(INSTALL_PREFIX_VAR)
