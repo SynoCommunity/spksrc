@@ -32,9 +32,9 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: monit_extra_install
 monit_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var/monit.d
-	install -m 755 -d $(STAGING_DIR)/var/events
-	install -m 700 src/monitrc $(STAGING_DIR)/var/monitrc
-	install -m 700 src/monit.d/monit $(STAGING_DIR)/var/monit.d/monit
+	install -m 755 -d $(STAGING_SPKVAR)/monit.d
+	install -m 755 -d $(STAGING_SPKVAR)/events
+	install -m 700 src/monitrc $(STAGING_SPKVAR)/monitrc
+	install -m 700 src/monit.d/monit $(STAGING_SPKVAR)/monit.d/monit
 	install -m 755 -d $(STAGING_DIR)/share/examples
 	install -m 644 src/examples/* $(STAGING_DIR)/share/examples/

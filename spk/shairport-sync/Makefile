@@ -31,6 +31,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: shairport_extra_install
 shairport_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
-	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf
+	install -m 644 src/shairport-sync.conf $(STAGING_SPKVAR)/shairport-sync.conf

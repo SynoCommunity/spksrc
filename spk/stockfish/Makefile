@@ -36,5 +36,5 @@ include ../../mk/spksrc.spk.mk
 stockfish_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/webgui-config-template.php $(STAGING_DIR)/var/webgui-config-template.php
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/webgui-config-template.php $(STAGING_SPKVAR)/webgui-config-template.php

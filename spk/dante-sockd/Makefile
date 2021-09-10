@@ -27,5 +27,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sockd_extra_install
 sockd_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/sockd.conf $(STAGING_DIR)/var/sockd.conf
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/sockd.conf $(STAGING_SPKVAR)/sockd.conf

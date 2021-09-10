@@ -44,4 +44,4 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sickchill_extra_install
 sickchill_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)

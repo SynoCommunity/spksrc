@@ -55,8 +55,8 @@ $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini:
 
 .PHONY: tt-rss_extra_install
 tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/logs
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/logs
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh

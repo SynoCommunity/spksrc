@@ -38,7 +38,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: horde_extra_install
 horde_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 src/horde.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app

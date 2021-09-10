@@ -36,10 +36,10 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: haproxy_extra_install
 haproxy_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/crt
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/crt
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/haproxy.cfg $(STAGING_DIR)/var/haproxy.cfg.tpl
+	install -m 644 src/haproxy.cfg $(STAGING_SPKVAR)/haproxy.cfg.tpl
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css
 	install -m 644 src/app/haproxy.js $(STAGING_DIR)/app/haproxy.js

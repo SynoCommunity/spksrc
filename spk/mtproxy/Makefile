@@ -32,5 +32,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: mtproxy_extra_install
 mtproxy_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/mtproxy.conf $(STAGING_DIR)/var/mtproxy.conf
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/mtproxy.conf $(STAGING_SPKVAR)/mtproxy.conf

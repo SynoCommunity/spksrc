@@ -25,5 +25,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sslh_extra_install
 sslh_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/sslh.cfg $(STAGING_DIR)/var/sslh.cfg
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/sslh.cfg $(STAGING_SPKVAR)/sslh.cfg

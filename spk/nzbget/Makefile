@@ -33,7 +33,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: nzbget_extra_install
 nzbget_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var $(STAGING_DIR)/share/nzbget/scripts
+	install -m 755 -d $(STAGING_SPKVAR) $(STAGING_DIR)/share/nzbget/scripts
 	# Include usefull scripts
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/nzbToMedia.git
 	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/GetScripts.git

@@ -29,5 +29,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: fishnet_extra_install
 fishnet_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/fishnet_template.ini $(STAGING_DIR)/var/fishnet_template.ini
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/fishnet_template.ini $(STAGING_SPKVAR)/fishnet_template.ini

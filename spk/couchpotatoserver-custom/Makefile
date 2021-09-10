@@ -37,5 +37,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: couchpotatoserver-custom_extra_install
 couchpotatoserver-custom_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 600 src/settings.conf $(STAGING_DIR)/var/settings.conf
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 600 src/settings.conf $(STAGING_SPKVAR)/settings.conf

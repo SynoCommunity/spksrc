@@ -37,5 +37,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: plexpy-custom_extra_install
 plexpy-custom_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 600 src/config.ini $(STAGING_SPKVAR)/config.ini

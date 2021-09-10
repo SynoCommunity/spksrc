@@ -34,5 +34,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: transmission_extra_install
 transmission_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/settings.json $(STAGING_DIR)/var/settings.json
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/settings.json $(STAGING_SPKVAR)/settings.json

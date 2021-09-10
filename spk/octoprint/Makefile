@@ -35,5 +35,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: octoprint_extra_install
 octoprint_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var/.octoprint
-	install -m 600 src/config.yaml $(STAGING_DIR)/var/.octoprint/config.yaml
+	install -m 755 -d $(STAGING_SPKVAR)/.octoprint
+	install -m 600 src/config.yaml $(STAGING_SPKVAR)/.octoprint/config.yaml

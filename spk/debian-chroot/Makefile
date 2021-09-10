@@ -58,11 +58,11 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: debian-chroot_extra_install
 debian-chroot_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	debootstrap --foreign --arch $(DEBIAN_ARCH) jessie $(STAGING_DIR)/var/chroottarget "http://ftp.debian.org/debian"
-	install -m 644 src/sources.list $(STAGING_DIR)/var/chroottarget/etc/apt/sources.list.default
-	install -m 644 src/preferences $(STAGING_DIR)/var/chroottarget/etc/apt/preferences.default
-	install -m 644 src/policy-rc.d $(STAGING_DIR)/var/chroottarget/usr/sbin/policy-rc.d
+	install -m 755 -d $(STAGING_SPKVAR)
+	debootstrap --foreign --arch $(DEBIAN_ARCH) jessie $(STAGING_SPKVAR)/chroottarget "http://ftp.debian.org/debian"
+	install -m 644 src/sources.list $(STAGING_SPKVAR)/chroottarget/etc/apt/sources.list.default
+	install -m 644 src/preferences $(STAGING_SPKVAR)/chroottarget/etc/apt/preferences.default
+	install -m 644 src/policy-rc.d $(STAGING_SPKVAR)/chroottarget/usr/sbin/policy-rc.d
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/app/style.css $(STAGING_DIR)/app/style.css

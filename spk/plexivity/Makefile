@@ -35,9 +35,9 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: plexivity_extra_install
 plexivity_extra_install: $(STAGING_DIR)/share/plexivity
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 600 src/config.ini $(STAGING_SPKVAR)/config.ini
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 
 $(STAGING_DIR)/share/plexivity:

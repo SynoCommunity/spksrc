@@ -42,7 +42,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/scripts
-	install -m 755 src/SabToSyno.py $(STAGING_DIR)/var/scripts/SabToSyno.py
-	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/scripts
+	install -m 755 src/SabToSyno.py $(STAGING_SPKVAR)/scripts/SabToSyno.py
+	install -m 600 src/config.ini $(STAGING_SPKVAR)/config.ini

@@ -39,7 +39,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: ntopng_extra_install
 ntopng_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var/data
+	install -m 755 -d $(STAGING_SPKVAR)/data
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/ntopng.conf $(STAGING_DIR)/etc/ntopng.conf
 	unzip -o src/GeoLite2.mmdb.zip -d $(STAGING_DIR)/share/ntopng/httpdocs/geoip/

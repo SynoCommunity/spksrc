@@ -35,7 +35,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: nzbhydra_extra_install
 nzbhydra_extra_install: $(STAGING_DIR)/share/NZBHydra
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 
 $(STAGING_DIR)/share/NZBHydra:
 	install -m 755 -d $(STAGING_DIR)/share

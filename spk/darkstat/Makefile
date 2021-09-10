@@ -29,6 +29,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: darkstat_extra_install
 darkstat_extra_install:
-	install -m 777 -d $(STAGING_DIR)/var
+	install -m 777 -d $(STAGING_SPKVAR)
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

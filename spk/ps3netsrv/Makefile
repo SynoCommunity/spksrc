@@ -34,6 +34,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: ps3netsrv_extra_install
 ps3netsrv_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/ps3netsrv.conf $(STAGING_DIR)/var/ps3netsrv.conf
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/ps3netsrv.conf $(STAGING_SPKVAR)/ps3netsrv.conf
 	install -m 755 src/ps3netsrv-starter.sh $(STAGING_DIR)/ps3netsrv-starter.sh

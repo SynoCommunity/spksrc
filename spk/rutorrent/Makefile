@@ -50,9 +50,9 @@ SPK_DEPENDS = "python3>=3.7.7:php5.6"
 rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
-	install -m 755 -d $(STAGING_DIR)/var/.session
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/.rtorrent.rc $(STAGING_SPKVAR)/
+	install -m 755 -d $(STAGING_SPKVAR)/.session
 	install -m 775 -d $(STAGING_DIR)/tmp
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

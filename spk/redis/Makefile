@@ -31,5 +31,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: redis_extra_install
 redis_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/redis.conf $(STAGING_DIR)/var/redis.conf
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/redis.conf $(STAGING_SPKVAR)/redis.conf

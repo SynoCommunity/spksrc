@@ -71,9 +71,9 @@ include ../../mk/spksrc.spk.mk
 .PHONY: gentoo-chroot_extra_install
 gentoo-chroot_extra_install:
 	wget -nv -c -O $(WORK_DIR)/$(GENTOO_STAGE3_FILE) $(GENTOO_STAGE3_URL)
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/chroottarget
-	tar xjpf $(WORK_DIR)/$(GENTOO_STAGE3_FILE) -C $(STAGING_DIR)/var/chroottarget --exclude './dev/*'
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/chroottarget
+	tar xjpf $(WORK_DIR)/$(GENTOO_STAGE3_FILE) -C $(STAGING_SPKVAR)/chroottarget --exclude './dev/*'
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/mounts $(STAGING_DIR)/etc/mounts
 	install -m 755 -d $(STAGING_DIR)/app

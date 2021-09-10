@@ -34,7 +34,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: saltpad_extra_install
 saltpad_extra_install: $(STAGING_DIR)/share/saltpad
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 
 $(STAGING_DIR)/share/saltpad:
 	install -m 755 -d $(STAGING_DIR)/share

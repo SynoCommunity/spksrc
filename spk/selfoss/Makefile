@@ -36,7 +36,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: selfoss_extra_install
 selfoss_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 src/selfoss.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

@@ -36,7 +36,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: fengoffice_extra_install
 fengoffice_extra_install: 
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 src/fengoffice.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

@@ -38,9 +38,9 @@ include ../../mk/spksrc.spk.mk
 .PHONY: git_server_extra_install
 git_server_extra_install:
 	install -m 755 -d $(STAGING_DIR)/tmp
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 755 -d $(STAGING_DIR)/var/repositories
+	install -m 755 -d $(STAGING_SPKVAR)/repositories
 	install -m 755 -d $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/share/gitweb
 	install -m 644 src/gitweb.conf $(STAGING_DIR)/etc/

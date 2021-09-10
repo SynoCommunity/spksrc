@@ -29,7 +29,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/master $(STAGING_DIR)/etc/master
 	install -m 755 -d $(STAGING_DIR)/share/extensions

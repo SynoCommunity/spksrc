@@ -31,7 +31,7 @@ include ../../mk/spksrc.spk.mk
 pyload_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/pyload.conf $(STAGING_DIR)/var/pyload.conf
-	install -m 644 src/pyload_init.sql $(STAGING_DIR)/var/pyload_init.sql
-	install -m 644 src/htaccess.example $(STAGING_DIR)/var/htaccess.example
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/pyload.conf $(STAGING_SPKVAR)/pyload.conf
+	install -m 644 src/pyload_init.sql $(STAGING_SPKVAR)/pyload_init.sql
+	install -m 644 src/htaccess.example $(STAGING_SPKVAR)/htaccess.example

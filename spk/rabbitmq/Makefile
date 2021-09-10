@@ -32,8 +32,8 @@ include ../../mk/spksrc.spk.mk
 .PHONY: rabbitmq_extra_install
 rabbitmq_extra_install:
 	# Create directories
-	install -m 755 -d ${STAGING_DIR}/etc/rabbitmq ${STAGING_DIR}/var
+	install -m 755 -d $(STAGING_DIR)/etc/rabbitmq $(STAGING_SPKVAR)
 	# Install RabbitMQ configurations
-	install -m 644 src/etc/rabbitmq-env.conf ${STAGING_DIR}/etc/rabbitmq/rabbitmq-env.conf
-	install -m 644 src/rabbitmq.conf ${STAGING_DIR}/var/rabbitmq.conf
-	install -m 644 src/enabled_plugins ${STAGING_DIR}/var/enabled_plugins
+	install -m 644 src/etc/rabbitmq-env.conf $(STAGING_DIR)/etc/rabbitmq/rabbitmq-env.conf
+	install -m 644 src/rabbitmq.conf $(STAGING_SPKVAR)/rabbitmq.conf
+	install -m 644 src/enabled_plugins $(STAGING_SPKVAR)/enabled_plugins

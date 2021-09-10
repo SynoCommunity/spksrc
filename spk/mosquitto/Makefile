@@ -31,8 +31,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: mosquitto_extra_install
 mosquitto_extra_install:
-	install -d $(STAGING_DIR)/var
-	install -m 644 src/mosquitto.conf $(STAGING_DIR)/var/mosquitto.conf
+	install -d $(STAGING_SPKVAR)
+	install -m 644 src/mosquitto.conf $(STAGING_SPKVAR)/mosquitto.conf
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	sed -e 's|mosquitto/target/var/|mosquitto/var/|g' -i $(STAGING_DIR)/var/mosquitto.conf
+	sed -e 's|mosquitto/target/var/|mosquitto/var/|g' -i $(STAGING_SPKVAR)/mosquitto.conf
 endif

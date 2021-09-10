@@ -42,8 +42,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: lirc_extra_install lirc_abort
 lirc_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/log
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/log
 	install -m 755 -d $(STAGING_DIR)/etc/lirc/scripts
 	install -m 755 src/send_ir.sh $(STAGING_DIR)/etc/lirc/scripts/send_ir.sh
 	install -m 644 src/lircrc $(STAGING_DIR)/etc/lirc/lircrc

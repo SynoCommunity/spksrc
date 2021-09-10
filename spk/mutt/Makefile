@@ -25,6 +25,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: mutt_extra_install
 mutt_extra_install:
-	install -d -m 755 $(STAGING_DIR)/var
-	install -m 644 src/Muttrc.local $(STAGING_DIR)/var/Muttrc.local
-	echo "source $(INSTALL_PREFIX)/var/Muttrc.local" >> $(STAGING_DIR)/var/Muttrc
+	install -d -m 755 $(STAGING_SPKVAR)
+	install -m 644 src/Muttrc.local $(STAGING_SPKVAR)/Muttrc.local
+	echo "source $(INSTALL_PREFIX_VAR)/Muttrc.local" >> $(STAGING_DIR)/var/Muttrc

@@ -38,6 +38,6 @@ comskip_pre_depend:
 	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 
 comskip_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/comskip.ini $(STAGING_DIR)/var/comskip.ini
-	install -m 644 src/comskip.dictionary $(STAGING_DIR)/var/comskip.dictionary
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 644 src/comskip.ini $(STAGING_SPKVAR)/comskip.ini
+	install -m 644 src/comskip.dictionary $(STAGING_SPKVAR)/comskip.dictionary

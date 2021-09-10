@@ -41,7 +41,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: gateone_extra_install
 gateone_extra_install:
 	install -m 755 -d $(STAGING_DIR)/ssl
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/conf.d
-	install -m 644 src/90custom.conf $(STAGING_DIR)/var/conf.d/
-	install -m 644 src/95users.conf $(STAGING_DIR)/var/conf.d/
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/conf.d
+	install -m 644 src/90custom.conf $(STAGING_SPKVAR)/conf.d/
+	install -m 644 src/95users.conf $(STAGING_SPKVAR)/conf.d/

@@ -34,6 +34,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: htpcmanager_extra_install
 htpcmanager_extra_install: 
-	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_SPKVAR)
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

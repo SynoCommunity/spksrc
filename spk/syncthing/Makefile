@@ -35,6 +35,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: syncthing_extra_install
 syncthing_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 600 src/config.xml $(STAGING_DIR)/var/config.xml
-	install -m 644 src/options.conf $(STAGING_DIR)/var/options.conf
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 600 src/config.xml $(STAGING_SPKVAR)/config.xml
+	install -m 644 src/options.conf $(STAGING_SPKVAR)/options.conf

@@ -41,11 +41,11 @@ xz-compress:
 	install -m 755 -d $(STAGING_DIR)/share/c_icap/templates/
 	install -m 755 -d $(STAGING_DIR)/share/icons
 	install -m 755 -d $(STAGING_DIR)/share/errors
-	install -m 755 -d $(STAGING_DIR)/var/logs
-	install -m 755 -d $(STAGING_DIR)/var/run/c-icap
-	install -m 755 -d $(STAGING_DIR)/var/run/clamd
-	install -m 755 -d $(STAGING_DIR)/var/cache
-	install -m 755 -d $(STAGING_DIR)/var/db
+	install -m 755 -d $(STAGING_SPKVAR)/logs
+	install -m 755 -d $(STAGING_SPKVAR)/run/c-icap
+	install -m 755 -d $(STAGING_SPKVAR)/run/clamd
+	install -m 755 -d $(STAGING_SPKVAR)/cache
+	install -m 755 -d $(STAGING_SPKVAR)/db
 	install -m 755 src/update_db.sh $(STAGING_DIR)/bin/
 	install -m 755 src/etc/* $(STAGING_DIR)/etc/
 	install -m 644 src/app/config $(STAGING_DIR)/var/www/squidguardmgr/

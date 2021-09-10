@@ -44,6 +44,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: jackett_extra_install
 jackett_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/.config
-	install -m 755 -d $(STAGING_DIR)/var/.config/Jackett
+	install -m 755 -d $(STAGING_SPKVAR)
+	install -m 755 -d $(STAGING_SPKVAR)/.config
+	install -m 755 -d $(STAGING_SPKVAR)/.config/Jackett
