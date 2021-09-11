@@ -87,7 +87,11 @@ PSTAT_TIME = time -o $(PSTAT_LOG) --append
 else
 PSTAT_TIME =
 endif
-PSTAT_LOG = build.stats.log
+ifneq ($(wildcard $(WORK_DIR)),)
+PSTAT_LOG = $(WORK_DIR)/../build.stats.log
+else
+PSTAT_LOG = $(shell pwd)/build.stats.log
+endif
 
 # Terminal colors
 RED=`tput setaf 1`

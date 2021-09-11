@@ -51,11 +51,10 @@ else
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-ifneq ($(PARALLEL_MAKE),nop)
-	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
-else
-	env $(ENV) cmake --build $(CMAKE_BUILD_DIR)
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
 endif
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(PSTAT_TIME) $(MAKE)
 
 .PHONY: cmake_install_target
 

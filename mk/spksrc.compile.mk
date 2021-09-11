@@ -9,7 +9,9 @@
 # Set parallel options in caller
 ifneq ($(PARALLEL_MAKE),nop)
 ifeq ($(call version_ge, ${MAKELEVEL}, 2),1)
+ifneq ($(filter -j%,$(MAKEFLAGS)),-j$(NCPUS))
 MAKEFLAGS += -j$(NCPUS)
+endif
 endif
 endif
 
@@ -37,13 +39,13 @@ endif
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
 endif
 
 pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
-	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 post_compile_target: $(COMPILE_TARGET)
 
