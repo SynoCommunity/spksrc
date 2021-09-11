@@ -31,5 +31,6 @@ GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_RELEASE_TAG)
 include ../../mk/spksrc.cross-go.mk
 
 # rename extracted folder to make imports work when used as GOPATH
+.PHONY: minio_post_extract
 minio_post_extract:
 	cd $(EXTRACT_PATH) && [ -d $(PKG_DIR) ] && mv $(PKG_DIR) $(PKG_NAME)
