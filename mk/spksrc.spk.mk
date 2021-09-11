@@ -466,7 +466,7 @@ $(PUBLISH)all-$(ACTION): | pre-build-native
 
 spk_msg:
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(MAKECMDGOALS) >> $(PSTAT_LOG)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(MAKECMDGOALS), SPK: $(SPK_NAME) >> $(PSTAT_LOG)
 endif
 
 supported-arch-error:
@@ -525,7 +525,13 @@ arch-%:
 
 build-arch-%: spk_msg
 	@$(MSG) BUILDING package for arch $*
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
+endif
 	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
+endif
 
 publish-arch-%: spk_msg
 	@$(MSG) BUILDING and PUBLISHING package for arch $*
