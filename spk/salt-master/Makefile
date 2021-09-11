@@ -36,8 +36,9 @@ POST_STRIP_TARGET = salt-master_extra_install
 # Service configuration
 CONF_DIR = src/conf
 FWPORTS = src/${SPK_NAME}.sc
-SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT = 4505,tcp/4506,tcp/8282
+SERVICE_USER       = auto
+SERVICE_SETUP      = src/service-setup.sh
+SERVICE_PORT       = 4505,tcp/4506,tcp/8282
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 STARTABLE = yes
 
