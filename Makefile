@@ -184,4 +184,4 @@ setup-synocommunity: setup
 		local.mk
 
 docker:
-	docker run -it -v $$(pwd):/spksrc ghcr.io/synocommunity/spksrc /bin/bash
+	docker run -it -v $$(pwd):/spksrc ghcr.io/synocommunity/spksrc

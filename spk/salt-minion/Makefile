@@ -1,11 +1,11 @@
 SPK_NAME = salt-minion
 SPK_VERS = 3003.3
-SPK_REV = 1
+SPK_REV  = 1
 SPK_ICON = src/salt-minion.png
 
-SPK_DEPENDS = "python>=3.0"
+SPK_DEPENDS = "python38"
 
-DEPENDS = cross/patch
+DEPENDS =
 
 BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
@@ -19,20 +19,15 @@ include ../../mk/spksrc.archs.mk
 # source salt-env/bin/activate
 # pip install salt
 # pip freeze > requirements.txt
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS = src/requirements_gcc46.txt
-else
 WHEELS = src/requirements.txt
-endif
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI = yes
+MAINTAINER   = SynoCommunity
+DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG = "Update to 3003.3"
+CHANGELOG    = "Update to 3003.3"
 
-HOMEPAGE   = https://www.saltstack.com/
-LICENSE = Apache
+HOMEPAGE     = https://www.saltstack.com/
+LICENSE      = Apache
 LICENSE_FILE = src/LICENSE
 
 POST_STRIP_TARGET = salt-minion_extra_install
@@ -42,9 +37,14 @@ CONF_DIR = src/conf
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 
+SPK_USR_LOCAL_LINKS  = bin:env/bin/salt-call
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-minion
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-proxy
+SPK_USR_LOCAL_LINKS += bin:env/bin/spm
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
-	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/minion.conf $(STAGING_DIR)/share
+	install -m 644 src/minion $(STAGING_DIR)/share
+	install -m 644 src/proxy $(STAGING_DIR)/share

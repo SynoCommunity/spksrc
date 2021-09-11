@@ -1,8 +1,0 @@
-bin:bin/virtualenv
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv.py
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv.pyc
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv_support/__init__.py
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv_support/argparse-1.4.0-py2.py3-none-any.whl
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv_support/pip-9.0.1-py2.py3-none-any.whl
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv_support/setuptools-28.8.0-py2.py3-none-any.whl
-rsc:@PYTHON_SITE_PACKAGES@/virtualenv_support/wheel-0.29.0-py2.py3-none-any.whl

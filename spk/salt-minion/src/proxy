@@ -1,6 +1,7 @@
 ##### Primary configuration settings #####
 ##########################################
-# This configuration file is used to manage the behavior of the Salt Minion.
+# This configuration file is used to manage the behavior of all Salt Proxy
+# Minions on this host.
 # With the exception of the location of the Salt Master Server, values that are
 # commented out but have an empty line after the comment are defaults that need
 # not be set in the config. If there is no blank line after the comment, the
@@ -11,26 +12,51 @@
 # as the main minion config file).
 #default_include: minion.d/*.conf
 
+# Backwards compatibility option for proxymodules created before 2015.8.2
+# This setting will default to 'False' in the 2016.3.0 release
+# Setting this to True adds proxymodules to the __opts__ dictionary.
+# This breaks several Salt features (basically anything that serializes
+# __opts__ over the wire) but retains backwards compatibility.
+#add_proxymodule_to_opts: True
+
 # Set the location of the salt master server. If the master server cannot be
 # resolved, then the minion will fail to start.
 #master: salt
 
-# Set http proxy information for the minion when doing requests
-#proxy_host:
-#proxy_port:
-#proxy_username:
-#proxy_password:
+# If a proxymodule has a function called 'grains', then call it during
+# regular grains loading and merge the results with the proxy's grains
+# dictionary.  Otherwise it is assumed that the module calls the grains
+# function in a custom way and returns the data elsewhere
+#
+# Default to False for 2016.3 and 2016.11. Switch to True for 2017.7.0.
+# proxy_merge_grains_in_module: True
+
+# If a proxymodule has a function called 'alive' returning a boolean
+# flag reflecting the state of the connection with the remove device,
+# when this option is set as True, a scheduled job on the proxy will
+# try restarting the connection. The polling frequency depends on the
+# next option, 'proxy_keep_alive_interval'. Added in 2017.7.0.
+# proxy_keep_alive: True
+
+# The polling interval (in minutes) to check if the underlying connection
+# with the remote device is still alive. This option requires
+# 'proxy_keep_alive' to be configured as True and the proxymodule to
+# implement the 'alive' function. Added in 2017.7.0.
+# proxy_keep_alive_interval: 1
+
+# By default, any proxy opens the connection with the remote device when
+# initialized. Some proxymodules allow through this option to open/close
+# the session per command. This requires the proxymodule to have this
+# capability. Please consult the documentation to see if the proxy type
+# used can be that flexible. Added in 2017.7.0.
+# proxy_always_alive: True
 
 # If multiple masters are specified in the 'master' setting, the default behavior
 # is to always try to connect to them in the order they are listed. If random_master is
 # set to True, the order will be randomized instead. This can be helpful in distributing
 # the load of many minions executing salt-call requests, for example, from a cron job.
 # If only one master is listed, this setting is ignored and a warning will be logged.
-# NOTE: If master_type is set to failover, use master_shuffle instead.
 #random_master: False
-
-# Use if master_type is set to failover.
-#master_shuffle: False
 
 # Minions can connect to multiple masters simultaneously (all masters
 # are "hot"), or can be configured to failover if a master becomes
@@ -38,25 +64,11 @@
 # value to "str".  Failover masters can be requested by setting
 # to "failover".  MAKE SURE TO SET master_alive_interval if you are
 # using failover.
-# Setting master_type to 'disable' let's you have a running minion (with engines and
-# beacons) without a master connection
 # master_type: str
 
 # Poll interval in seconds for checking if the master is still there.  Only
-# respected if master_type above is "failover". To disable the interval entirely,
-# set the value to -1. (This may be necessary on machines which have high numbers
-# of TCP connections, such as load balancers.)
+# respected if master_type above is "failover".
 # master_alive_interval: 30
-
-# If the minion is in multi-master mode and the master_type configuration option
-# is set to "failover", this setting can be set to "True" to force the minion
-# to fail back to the first master in the list if the first master is back online.
-#master_failback: False
-
-# If the minion is in multi-master mode, the "master_type" configuration is set to
-# "failover", and the "master_failback" option is enabled, the master failback
-# interval can be set to ping the top master with this interval, in seconds.
-#master_failback_interval: 0
 
 # Set whether the minion should connect to the master via IPv6:
 #ipv6: False
@@ -72,15 +84,11 @@
 # The user to run salt.
 #user: root
 
-# The user to run salt remote execution commands as via sudo. If this option is
-# enabled then sudo will be used to change the active user executing the remote
-# command. If enabled the user will need to be allowed access via the sudoers
-# file for the user that the salt minion is configured to run as. The most
-# common option would be to use the root user. If this option is set the user
-# option should also be set to a non-root user. If migrating from a root minion
-# to a non root minion the minion cache should be cleared and the minion pki
-# directory will need to be changed to the ownership of the new user.
-#sudo_user: root
+# Setting sudo_user will cause salt to run all execution modules under an sudo
+# to the user given in sudo_user.  The user under which the salt minion process
+# itself runs will still be that provided in the user config above, but all
+# execution modules run by the minion will be rerouted through sudo.
+#sudo_user: saltdev
 
 # Specify the location of the daemon process ID file.
 #pidfile: /var/run/salt-minion.pid
@@ -89,42 +97,9 @@
 # sock_dir, pidfile.
 #root_dir: /
 
-# The path to the minion's configuration file.
-#conf_file: /etc/salt/minion
-
 # The directory to store the pki information in
 #pki_dir: /etc/salt/pki/minion
 
-# Explicitly declare the id for this minion to use, if left commented the id
-# will be the hostname as returned by the python call: socket.getfqdn()
-# Since salt uses detached ids it is possible to run multiple minions on the
-# same machine but with different ids, this can be useful for salt compute
-# clusters.
-#id:
-
-# Cache the minion id to a file when the minion's id is not statically defined
-# in the minion config. Defaults to "True". This setting prevents potential
-# problems when automatic minion id resolution changes, which can cause the
-# minion to lose connection with the master. To turn off minion id caching,
-# set this config to ``False``.
-#minion_id_caching: True
-
-# Append a domain to a hostname in the event that it does not exist.  This is
-# useful for systems where socket.getfqdn() does not actually result in a
-# FQDN (for instance, Solaris).
-#append_domain:
-
-# Custom static grains for this minion can be specified here and used in SLS
-# files just like all other grains. This example sets 4 custom grains, with
-# the 'roles' grain having two values that can be matched against.
-#grains:
-#  roles:
-#    - webserver
-#    - memcache
-#  deployment: datacenter4
-#  cabinet: 13
-#  cab_u: 14-15
-#
 # Where cache data goes.
 # This data may contain sensitive data and should be protected accordingly.
 #cachedir: /var/cache/salt/minion
@@ -134,7 +109,10 @@
 # Allowed elements in the list: pki_dir, cachedir, extension_modules
 # Normally not needed unless running several proxies and/or minions on the same machine
 # Defaults to ['cachedir'] for proxies, [] (empty list) for regular minions
-#append_minionid_config_dirs:
+# append_minionid_config_dirs:
+#   - cachedir
+
+
 
 # Verify and set permissions on configuration directories at startup.
 #verify_env: True
@@ -151,11 +129,7 @@
 # Set the default outputter used by the salt-call command. The default is
 # "nested".
 #output: nested
-
-# To set a list of additional directories to search for salt outputters, set the
-# outputter_dirs option.
-#outputter_dirs: []
-
+#
 # By default output is colored. To disable colored output, set the color value
 # to False.
 #color: True
@@ -197,15 +171,6 @@
 # The wait-time will be a random number of seconds between 0 and the defined value.
 #random_reauth_delay: 60
 
-
-# To avoid overloading a master when many minions startup at once, a randomized
-# delay may be set to tell the minions to wait before connecting to the master.
-# This value is the number of seconds to choose from for a random number. For
-# example, setting this value to 60 will choose a random number of seconds to delay
-# on startup between zero seconds and sixty seconds. Setting to '0' will disable
-# this feature.
-#random_startup_delay: 0
-
 # When waiting for a master to accept the minion's public key, salt will
 # continuously attempt to reconnect until successful. This is the timeout value,
 # in seconds, for each individual attempt. After this timeout expires, the minion
@@ -217,20 +182,6 @@
 # authenticate.
 #auth_tries: 7
 
-# The number of attempts to connect to a master before giving up.
-# Set this to -1 for unlimited attempts. This allows for a master to have
-# downtime and the minion to reconnect to it later when it comes back up.
-# In 'failover' mode, it is the number of attempts for each set of masters.
-# In this mode, it will cycle through the list of masters for each attempt.
-#
-# This is different than auth_tries because auth_tries attempts to
-# retry auth attempts with a single master. auth_tries is under the
-# assumption that you can connect to the master but not gain
-# authorization from it. master_tries will still cycle through all
-# the masters in a given try, so it is appropriate if you expect
-# occasional downtime from the master(s).
-#master_tries: 1
-
 # If authentication fails due to SaltReqTimeoutError during a ping_interval,
 # cause sub minion process to restart.
 #auth_safemode: False
@@ -241,7 +192,7 @@
 # To auto recover minions if master changes IP address (DDNS)
 #    auth_tries: 10
 #    auth_safemode: False
-#    ping_interval: 2
+#    ping_interval: 90
 #
 # Minions won't know master is missing until a ping fails. After the ping fail,
 # the minion will attempt authentication and likely fails out and cause a restart.
@@ -309,23 +260,10 @@
 #
 #
 # The loop_interval sets how long in seconds the minion will wait between
-# evaluating the scheduler and running cleanup tasks.  This defaults to 1
-# second on the minion scheduler.
-#loop_interval: 1
-
-# Some installations choose to start all job returns in a cache or a returner
-# and forgo sending the results back to a master. In this workflow, jobs
-# are most often executed with --async from the Salt CLI and then results
-# are evaluated by examining job caches on the minions or any configured returners.
-# WARNING: Setting this to False will **disable** returns back to the master.
-#pub_ret: True
-
-
-# The grains can be merged, instead of overridden, using this option.
-# This allows custom grains to defined different subvalues of a dictionary
-# grain. By default this feature is disabled, to enable set grains_deep_merge
-# to ``True``.
-#grains_deep_merge: False
+# evaluating the scheduler and running cleanup tasks. This defaults to a
+# sane 60 seconds, but if the minion scheduler needs to be evaluated more
+# often lower this value
+#loop_interval: 60
 
 # The grains_refresh_every setting allows for a minion to periodically check
 # its grains to see if they have changed and, if so, to inform the master
@@ -342,39 +280,11 @@
 # Cache grains on the minion. Default is False.
 #grains_cache: False
 
-# Cache rendered pillar data on the minion. Default is False.
-# This may cause 'cachedir'/pillar to contain sensitive data that should be
-# protected accordingly.
-#minion_pillar_cache: False
-
 # Grains cache expiration, in seconds. If the cache file is older than this
 # number of seconds then the grains cache will be dumped and fully re-populated
 # with fresh data. Defaults to 5 minutes. Will have no effect if 'grains_cache'
 # is not enabled.
 # grains_cache_expiration: 300
-
-# Determines whether or not the salt minion should run scheduled mine updates.
-# Defaults to "True". Set to "False" to disable the scheduled mine updates
-# (this essentially just does not add the mine update function to the minion's
-# scheduler).
-#mine_enabled: True
-
-# Determines whether or not scheduled mine updates should be accompanied by a job
-# return for the job cache. Defaults to "False". Set to "True" to include job
-# returns in the job cache for mine updates.
-#mine_return_job: False
-
-# Example functions that can be run via the mine facility
-# NO mine functions are established by default.
-# Note these can be defined in the minion's pillar as well.
-#mine_functions:
-#  test.ping: []
-#  network.ip_addrs:
-#    interface: eth0
-#    cidr: '10.0.0.0/8'
-
-# The number of minutes between mine updates.
-#mine_interval: 60
 
 # Windows platforms lack posix IPC and must rely on slower TCP based inter-
 # process communications. Set ipc_mode to 'tcp' on such systems
@@ -409,33 +319,16 @@
 #include:
 #  - /etc/salt/extra_config
 #  - /etc/roles/webserver
-
-# The syndic minion can verify that it is talking to the correct master via the
-# key fingerprint of the higher-level master with the "syndic_finger" config.
-#syndic_finger: ''
 #
 #
 #
 #####   Minion module management     #####
 ##########################################
 # Disable specific modules. This allows the admin to limit the level of
-# access the master has to the minion.  The default here is the empty list,
-# below is an example of how this needs to be formatted in the config file
-#disable_modules:
-#  - cmdmod
-#  - test
+# access the master has to the minion.
+#disable_modules: [cmd,test]
 #disable_returners: []
-
-# This is the reverse of disable_modules.  The default, like disable_modules, is the empty list,
-# but if this option is set to *anything* then *only* those modules will load.
-# Note that this is a very large hammer and it can be quite difficult to keep the minion working
-# the way you think it should since Salt uses many modules internally itself.  At a bare minimum
-# you need the following enabled or else the minion won't start.
-#whitelist_modules:
-#  - cmdmod
-#  - test
-#  - config
-
+#
 # Modules can be loaded from arbitrary paths. This enables the easy deployment
 # of third party modules. Modules for returners and minions can be loaded.
 # Specify a list of extra directories to search for minion modules and
@@ -463,19 +356,18 @@
 
 #####    State Management Settings    #####
 ###########################################
-# The state management system executes all of the state templates on the minion
-# to enable more granular control of system state management. The type of
-# template and serialization used for state management needs to be configured
-# on the minion, the default renderer is yaml_jinja. This is a yaml file
-# rendered from a jinja template, the available options are:
-# yaml_jinja
-# yaml_mako
-# yaml_wempy
-# json_jinja
-# json_mako
-# json_wempy
+# The default renderer to use in SLS files. This is configured as a
+# pipe-delimited expression. For example, jinja|yaml will first run jinja
+# templating on the SLS file, and then load the result as YAML. This syntax is
+# documented in further depth at the following URL:
 #
-#renderer: yaml_jinja
+# https://docs.saltstack.com/en/latest/ref/renderers/#composing-renderers
+#
+# NOTE: The "shebang" prefix (e.g. "#!jinja|yaml") described in the
+# documentation linked above is for use in an SLS file to override the default
+# renderer, it should not be used when configuring the renderer here.
+#
+#renderer: jinja|yaml
 #
 # The failhard option tells the minions to stop immediately after the first
 # failure detected in the state execution. Defaults to False.
@@ -495,20 +387,6 @@
 # by statically setting it. Remember that the recommended way to manage
 # environments is to isolate via the top file.
 #environment: None
-#
-# Isolates the pillar environment on the minion side. This functions the same
-# as the environment setting, but for pillar instead of states.
-#pillarenv: None
-#
-# Set this option to True to force the pillarenv to be the same as the
-# effective saltenv when running states. Note that if pillarenv is specified,
-# this option will be ignored.
-#pillarenv_from_saltenv: False
-#
-# Set this option to 'True' to force a 'KeyError' to be raised whenever an
-# attempt to retrieve a named value from pillar fails. When this option is set
-# to 'False', the failed attempt returns an empty string. Default is 'False'.
-#pillar_raise_on_missing: False
 #
 # If using the local file directory, then the state top file name needs to be
 # defined, by default this is top.sls.
@@ -569,18 +447,6 @@
 #  base:
 #    - /srv/salt
 
-# Uncomment the line below if you do not want the file_server to follow
-# symlinks when walking the filesystem tree. This is set to True
-# by default. Currently this only applies to the default roots
-# fileserver_backend.
-#fileserver_followsymlinks: False
-#
-# Uncomment the line below if you do not want symlinks to be
-# treated as the files they are pointing to. By default this is set to
-# False. By uncommenting the line below, any detected symlink while listing
-# files on the Master will not be returned to the Minion.
-#fileserver_ignoresymlinks: True
-#
 # By default, the Salt fileserver recurses fully into all defined environments
 # to attempt to find files. To limit this behavior so that the fileserver only
 # traverses directories with SLS files and special Salt directories like _modules,
@@ -589,12 +455,15 @@
 # is False.
 #fileserver_limit_traversal: False
 
-# The hash_type is the hash to use when discovering the hash of a file on
-# the local fileserver. The default is sha256, but md5, sha1, sha224, sha384
-# and sha512 are also supported.
+# The hash_type is the hash to use when discovering the hash of a file in
+# the local fileserver. The default is sha256 but sha224, sha384 and sha512
+# are also supported.
 #
-# WARNING: While md5 and sha1 are also supported, do not use them due to the
-# high chance of possible collisions and thus security breach.
+# WARNING: While md5 and sha1 are also supported, do not use it due to the high chance
+# of possible collisions and thus security breach.
+#
+# WARNING: While md5 is also supported, do not use it due to the high chance
+# of possible collisions and thus security breach.
 #
 # Warning: Prior to changing this value, the minion should be stopped and all
 # Salt caches should be cleared.
@@ -606,10 +475,6 @@
 #pillar_roots:
 #  base:
 #    - /srv/pillar
-
-# Set a hard-limit on the size of the files that can be pushed to the master.
-# It will be interpreted as megabytes. Default: 100
-#file_recv_max_size: 100
 #
 #
 ######        Security settings       #####
@@ -619,9 +484,6 @@
 # the situation where your keys end up in a bad state. If you run in open mode
 # you do so at your own risk!
 #open_mode: False
-
-# The size of key that should be generated when creating new keys.
-#keysize: 2048
 
 # Enable permissive access to the salt keys.  This allows you to run the
 # master or minion as root, but have a non-root group be given access to
@@ -654,55 +516,15 @@
 
 # Fingerprint of the master public key to validate the identity of your Salt master
 # before the initial key exchange. The master fingerprint can be found by running
-# "salt-key -f master.pub" on the Salt master.
+# "salt-key -F master" on the Salt master.
 #master_finger: ''
-
-# Use TLS/SSL encrypted connection between master and minion.
-# Can be set to a dictionary containing keyword arguments corresponding to Python's
-# 'ssl.wrap_socket' method.
-# Default is None.
-#ssl:
-#    keyfile: <path_to_keyfile>
-#    certfile: <path_to_certfile>
-#    ssl_version: PROTOCOL_TLSv1_2
-
-# Grains to be sent to the master on authentication to check if the minion's key
-# will be accepted automatically. Needs to be configured on the master.
-#autosign_grains:
-#  - uuid
-#  - server_id
-
-
-######        Reactor Settings        #####
-###########################################
-# Define a salt reactor. See https://docs.saltstack.com/en/latest/topics/reactor/
-#reactor: []
-
-#Set the TTL for the cache of the reactor configuration.
-#reactor_refresh_interval: 60
-
-#Configure the number of workers for the runner/wheel in the reactor.
-#reactor_worker_threads: 10
-
-#Define the queue size for workers in the reactor.
-#reactor_worker_hwm: 10000
 
 
 ######         Thread settings        #####
 ###########################################
 # Disable multiprocessing support, by default when a minion receives a
 # publication a new process is spawned and the command is executed therein.
-#
-# WARNING: Disabling multiprocessing may result in substantial slowdowns
-# when processing large pillars. See https://github.com/saltstack/salt/issues/38758
-# for a full explanation.
 #multiprocessing: True
-
-# Limit the maximum amount of processes or threads created by salt-minion.
-# This is useful to avoid resource exhaustion in case the minion receives more
-# publications than it is able to handle, as it limits the number of spawned
-# processes or threads. -1 is the default and disables the limit.
-#process_count_max: -1
 
 
 #####         Logging settings       #####
@@ -720,7 +542,7 @@
 #key_logfile: /var/log/salt/key
 
 # The level of messages to send to the console.
-# One of 'garbage', 'trace', 'debug', info', 'warning', 'error', 'critical'.
+# One of 'garbage', 'trace', 'debug', 'info', 'warning', 'error', 'critical'.
 #
 # The following log levels are considered INSECURE and may log sensitive data:
 # ['garbage', 'trace', 'debug']
@@ -768,7 +590,7 @@
 #log_granular_levels: {}
 
 # To diagnose issues with minions disconnecting or missing returns, ZeroMQ
-# supports the use of monitor sockets to log connection events. This
+# supports the use of monitor sockets # to log connection events. This
 # feature requires ZeroMQ 4.0 or higher.
 #
 # To enable ZeroMQ monitor sockets, set 'zmq_monitor' to 'True' and log at a
@@ -780,15 +602,11 @@
 # 'value': 27, 'description': 'EVENT_DISCONNECTED'}
 #
 # All events logged will include the string 'ZeroMQ event'. A connection event
-# should be logged as the minion starts up and initially connects to the
+# should be logged on the as the minion starts up and initially connects to the
 # master. If not, check for debug log level and that the necessary version of
 # ZeroMQ is installed.
 #
 #zmq_monitor: False
-
-# Number of times to try to authenticate with the salt master when reconnecting
-# to the master
-#tcp_authentication_retries: 5
 
 ######      Module configuration      #####
 ###########################################
@@ -860,19 +678,5 @@
 
 ######      Returner  settings        ######
 ############################################
-# Default Minion returners. Can be a comma delimited string or a list:
-#
+# Which returner(s) will be used for minion's result:
 #return: mysql
-#
-#return: mysql,slack,redis
-#
-#return:
-#  - mysql
-#  - hipchat
-#  - slack
-
-
-######    Miscellaneous  settings     ######
-############################################
-# Default match type for filtering events tags: startswith, endswith, find, regex, fnmatch
-#event_match_type: startswith

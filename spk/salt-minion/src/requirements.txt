@@ -1,20 +1,22 @@
 certifi==2021.5.30
 charset-normalizer==2.0.4
-contextvars==2.4
-distro==1.6.0
+contextvars
+distro>=1.0.1
 idna==3.2
 immutables==0.16
-Jinja2==3.0.1
-MarkupSafe==2.0.1
-msgpack==1.0.2
+Jinja2
+MarkupSafe
+msgpack>=0.5,!=0.5.5
 # Avoid 3.10.1 since it has 
 # [bdist_wheel]
 # py-limited-api = cp35
-pycryptodomex!=3.10.1
+pycryptodomex>=3.9.8,!=3.10.1
 python-dateutil==2.8.2
 PyYAML==5.4.1
-pyzmq==22.2.1
-requests==2.26.0
-salt==3003.2
+pyzmq<=20.0.0 ; python_version < "3.6"
+pyzmq>=17.0.0 ; "arm" not in platform_machine
+pyzmq==17.0.0 ; "arm" in platform_machine
+pyzmq>=19.0.2 ; python_version >= "3.9"
+requests>=1.0.0
 typing-extensions==3.10.0.2
 urllib3==1.26.6
