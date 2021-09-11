@@ -17,10 +17,6 @@ service_postinst ()
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index --upgrade --force-reinstall -f ${wheelhouse} ${wheelhouse}/*.whl
 
-    # Patch rsax931.py file to find libcrypto lib
-    # (Rely on patch util bundled with python3's busybox)
-    ${SYNOPKG_PKGDEST}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.8/site-packages/salt/utils/rsax931.py -i ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
-
     # Prepare salt-master config in /var/packages/salt-minion/
     ln -s /var/packages/${SYNOPKG_PKGNAME}/etc ${SYNOPKG_PKGDEST}/env/etc
     test -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d || install -m 755 -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d
