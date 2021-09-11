@@ -5,14 +5,14 @@ SPK_ICON = src/google-authenticator.png
 
 DEPENDS = cross/google-authenticator-libpam
 
-MAINTAINER = SynoCommunity
+MAINTAINER = Soraxas
 DESCRIPTION = google-authenticator for the pam module
 DISPLAY_NAME = Google Authenticator for libpam
 STARTABLE = no
 CHANGELOG = "init"
 
 HOMEPAGE = https://github.com/google/google-authenticator-libpam
-LICENSE = Custom
+LICENSE = Apache-2.0
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
 
 SPK_COMMANDS = bin/google-auehenticator

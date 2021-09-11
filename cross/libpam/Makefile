@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 HOMEPAGE = https://github.com/linux-pam/linux-pam
 COMMENT = Linux PAM (Pluggable Authentication Modules for Linux) project
-LICENSE = Custom
+LICENSE = BSD-3-Clause
 
 GNU_CONFIGURE=1
 POST_INSTALL_TARGET=google_auth_post_install_target
