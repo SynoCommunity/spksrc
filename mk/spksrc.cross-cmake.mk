@@ -52,9 +52,9 @@ else
 cmake_compile_target:
 	@$(MSG) - CMake compile
 ifneq ($(PARALLEL_MAKE),nop)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake --build -j $(NCPUS)
+	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake --build
+	env $(ENV) cmake --build $(CMAKE_BUILD_DIR)
 endif
 
 .PHONY: cmake_install_target
