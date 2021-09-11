@@ -13,7 +13,6 @@ HELPURL = https://github.com/filebrowser/filebrowser/issues
 LICENSE = Apache-2.0
 CHANGELOG = "First Version"
 
-SPK_GROUP = synocommunity
 GROUP = synocommunity
 
 WIZARDS_DIR = src/wizard/
