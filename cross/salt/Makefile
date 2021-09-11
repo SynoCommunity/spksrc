@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = 
 
 HOMEPAGE = https://pypi.python.org/pypi/salt
-COMMENT  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with tho$
+COMMENT  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 LICENSE  = Apache
 
 PRE_INSTALL_TARGET = pre_install_into_cross_env

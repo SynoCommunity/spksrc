@@ -37,10 +37,10 @@ CONF_DIR = src/conf
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
 
-SPK_USR_LOCAL_LINKS = bin:env/bin/salt-call
-SPK_USR_LOCAL_LINKS = bin:env/bin/salt-minion
-SPK_USR_LOCAL_LINKS = bin:env/bin/salt-proxy
-SPK_USR_LOCAL_LINKS = bin:env/bin/spm
+SPK_USR_LOCAL_LINKS  = bin:env/bin/salt-call
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-minion
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-proxy
+SPK_USR_LOCAL_LINKS += bin:env/bin/spm
 
 include ../../mk/spksrc.spk.mk
 
