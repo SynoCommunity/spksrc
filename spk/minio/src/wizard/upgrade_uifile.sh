@@ -19,7 +19,11 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                 "subitems": [
                     {
                         "key": "wizard_data_volume",
+<<<<<<< HEAD
                         "desc": "Volume name",
+=======
+                        "desc": "volume name",
+>>>>>>> f906ee9d (minio: update wizard)
 						"defaultValue": "${WIZARD_DATA_VOLUME}",
                         "displayField": "display_name",
                         "valueField": "volume_path",
