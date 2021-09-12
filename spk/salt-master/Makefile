@@ -29,7 +29,7 @@ CHANGELOG    = "Update to 3003.3"
 
 HOMEPAGE     = https://www.saltstack.com/
 LICENSE      = Apache
-LICENSE_FILE = src/LICENSE
+LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 
 POST_STRIP_TARGET = salt-master_extra_install
 
