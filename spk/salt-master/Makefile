@@ -5,8 +5,6 @@ SPK_ICON = src/salt-master.png
 
 SPK_DEPENDS = "python38"
 
-DEPENDS =
-
 BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
 BUILD_DEPENDS += cross/salt
@@ -23,7 +21,6 @@ WHEELS = src/requirements.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI    = yes
 DISPLAY_NAME = Salt Master
 CHANGELOG    = "Update to 3003.3"
 
@@ -38,8 +35,6 @@ CONF_DIR = src/conf
 FWPORTS = src/${SPK_NAME}.sc
 SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
-SERVICE_PORT       = 4505,tcp/4506,tcp/8282
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 STARTABLE = yes
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
