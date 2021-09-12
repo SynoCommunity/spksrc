@@ -5,6 +5,8 @@ SPK_ICON = src/salt-minion.png
 
 SPK_DEPENDS = "python38"
 
+DEPENDS = cross/patch
+
 BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
 BUILD_DEPENDS += cross/salt
@@ -45,5 +47,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
+	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/minion $(STAGING_DIR)/share
 	install -m 644 src/proxy $(STAGING_DIR)/share

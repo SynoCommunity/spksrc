@@ -5,6 +5,8 @@ SPK_ICON = src/salt-master.png
 
 SPK_DEPENDS = "python38"
 
+DEPENDS = cross/patch
+
 BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
 BUILD_DEPENDS += cross/salt
@@ -49,4 +51,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
+	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/master $(STAGING_DIR)/share
