@@ -11,12 +11,12 @@ HOMEPAGE = https://pypi.python.org/pypi/salt
 COMMENT  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 LICENSE  = Apache
 
-PRE_INSTALL_TARGET = salt_pre_install
+PRE_INSTALL_TARGET = pre_install_into_cross_env
 
 include ../../mk/spksrc.python-wheel.mk
 
-.PHONY: salt_pre_install
-salt_pre_install:
+.PHONY: pre_install_into_cross_env
+pre_install_into_cross_env:
 ifeq ($(strip $(CROSSENV)),)
 	$(RUN) $(PIP) install "markupsafe"
 else

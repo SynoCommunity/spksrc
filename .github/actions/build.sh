@@ -124,6 +124,7 @@ PACKAGES_TO_KEEP="ffmpeg"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"
+    echo >build.log
 
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
         # use TCVERSION and ARCH to get real exit codes.
@@ -145,7 +146,6 @@ do
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE"   >> ${BUILD_SUCCESS_FILE}
     else
         cat build.log >> ${BUILD_ERROR_LOGFILE}
-        printf "\n\n" >build.log
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
     fi
 

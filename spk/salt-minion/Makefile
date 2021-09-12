@@ -26,7 +26,7 @@ CHANGELOG    = "Update to 3003.3"
 
 HOMEPAGE     = https://www.saltstack.com/
 LICENSE      = Apache
-LICENSE_FILE = src/LICENSE
+LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 
 POST_STRIP_TARGET = salt-minion_extra_install
 
@@ -44,5 +44,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
+	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/minion $(STAGING_DIR)/share
 	install -m 644 src/proxy $(STAGING_DIR)/share

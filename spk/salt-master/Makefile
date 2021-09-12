@@ -21,13 +21,12 @@ WHEELS = src/requirements.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI    = yes
 DISPLAY_NAME = Salt Master
 CHANGELOG    = "Update to 3003.3"
 
 HOMEPAGE     = https://www.saltstack.com/
 LICENSE      = Apache
-LICENSE_FILE = src/LICENSE
+LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 
 POST_STRIP_TARGET = salt-master_extra_install
 
@@ -51,6 +50,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
+	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/master $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/share/extensions
 	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
