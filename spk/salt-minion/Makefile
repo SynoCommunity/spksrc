@@ -33,7 +33,6 @@ LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 POST_STRIP_TARGET = salt-minion_extra_install
 
 # Service configuration
-CONF_DIR = src/conf
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
