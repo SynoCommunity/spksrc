@@ -18,6 +18,5 @@ pyzmq>=17.0.0 ; "arm" not in platform_machine
 pyzmq==17.0.0 ; "arm" in platform_machine
 pyzmq>=19.0.2 ; python_version >= "3.9"
 requests>=1.0.0
-salt==3003.3
 typing-extensions==3.10.0.2
 urllib3==1.26.6
