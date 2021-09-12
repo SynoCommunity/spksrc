@@ -22,7 +22,7 @@ LICENSE  = GPL
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = rtorrent_pre_configure
 PRE_PATCH_TARGET = rtorrent_pre_patch
-COMPILE_TARGET = rtorrent_compile
+PRE_COMPILE_TARGET = rtorrent_pre_compile
 
 CONFIGURE_ARGS = --with-xmlrpc-c=$(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
 
@@ -36,8 +36,7 @@ rtorrent_pre_configure:
 rtorrent_pre_patch:
 	@$(RUN) ./autogen.sh
 
-.PHONY: rtorrent_compile
-rtorrent_compile:
+.PHONY: rtorrent_pre_compile
+rtorrent_pre_compile:
 	@$(RUN) ./libtool --tag=CC --mode=compile $(TC_PATH)$(TC_PREFIX)gcc -g -O2 -MT src/linux-atomic.lo -MD -MP -MF src/linux-atomic.Tpo -c -o src/linux-atomic.lo src/linux-atomic.c
 	@$(RUN) ./libtool --tag=CC --mode=link $(TC_PATH)$(TC_PREFIX)gcc -g -O2 -o src/liblinux-atomic.la src/linux-atomic.lo
-	@$(RUN) $(MAKE)

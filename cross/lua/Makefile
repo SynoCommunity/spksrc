@@ -12,21 +12,18 @@ COMMENT = Lua is a powerful, efficient, lightweight, embeddable scripting langua
 LICENSE = MIT
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = lua_compile
 INSTALL_TARGET = lua_install
 
-include ../../mk/spksrc.cross-cc.mk
+COMPILE_MAKE_OPTIONS += linux-readline
+COMPILE_MAKE_OPTIONS += CC="$(TC_PATH)$(TC_PREFIX)gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
+COMPILE_MAKE_OPTIONS += CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
+COMPILE_MAKE_OPTIONS += AR="$(TC_PATH)$(TC_PREFIX)ar rcu \$$(ALLFLAGS)"
+COMPILE_MAKE_OPTIONS += RANLIB="$(TC_PATH)$(TC_PREFIX)ranlib \$$(ALLFLAGS)"
+COMPILE_MAKE_OPTIONS += CPPFLAGS="$(CPPFLAGS)"
+COMPILE_MAKE_OPTIONS += LDFLAGS="$(LDFLAGS) -Wl,--rpath,$(INSTALL_PREFIX)/lib"
+COMPILE_MAKE_OPTIONS += MYLIBS="-lncursesw"
 
-.PHONY: lua_compile
-lua_compile:
-	@$(RUN) $(MAKE) linux-readline \
-		CC="$(TC_PATH)$(TC_PREFIX)gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline" \
-		CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline" \
-		AR="$(TC_PATH)$(TC_PREFIX)ar rcu \$$(ALLFLAGS)" \
-		RANLIB="$(TC_PATH)$(TC_PREFIX)ranlib \$$(ALLFLAGS)" \
-		CPPFLAGS="$(CPPFLAGS)" \
-		LDFLAGS="$(LDFLAGS) -Wl,--rpath,$(INSTALL_PREFIX)/lib" \
-		MYLIBS="-lncursesw"
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: lua_install
 lua_install:
