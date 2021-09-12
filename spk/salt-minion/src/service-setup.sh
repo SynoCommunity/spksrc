@@ -19,12 +19,19 @@ service_postinst ()
 
     # Prepare salt-minion config in /var/packages/salt-minion/
     ln -s /var/packages/${SYNOPKG_PKGNAME}/etc ${SYNOPKG_PKGDEST}/env/etc
-    test -d ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d || install -m 755 -d ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGDEST}/env/etc/salt/minion
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGDEST}/env/etc/salt/proxy
+    test -d ${SYNOPKG_PKGDEST}/env/etc/salt || install -m 755 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} -d ${SYNOPKG_PKGDEST}/env/etc/salt
+    test -d ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d || install -m 755 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} -d ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion || install -m 644 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGDEST}/env/etc/salt/minion
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/proxy || install -m 644 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGDEST}/env/etc/salt/proxy
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/02_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/02_pidfile.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/01_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGDEST}/env" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/01_rootdir.conf
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf || echo "log_file: udp://localhost:10514" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf || echo "log_level_logfile: info" >> ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf
+
     # Populate salt master address and minion_id only if file don't already exist
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf || echo "master: salt" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf || echo -n "id: " > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf && hostname -s >> ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf
+
+    # DSM 6
+    set_unix_permissions "${SYNOPKG_PKGDEST}"
 }

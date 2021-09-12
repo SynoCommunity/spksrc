@@ -11,8 +11,6 @@ BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
 BUILD_DEPENDS += cross/salt
 
-include ../../mk/spksrc.archs.mk
-
 # Requirements file generation
 # /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env
 # virtualenv --python=python3  salt-env
@@ -34,12 +32,11 @@ LICENSE_FILE = src/LICENSE
 POST_STRIP_TARGET = salt-master_extra_install
 
 # Service configuration
-CONF_DIR = src/conf
-FWPORTS = src/${SPK_NAME}.sc
 SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
 SERVICE_PORT       = 4505,tcp/4506,tcp/8282
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+FWPORTS = src/${SPK_NAME}.sc
 STARTABLE = yes
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
@@ -55,3 +52,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
 	install -m 644 src/master $(STAGING_DIR)/share
+	install -m 755 -d $(STAGING_DIR)/share/extensions
+	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
+	install -m 644 src/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py

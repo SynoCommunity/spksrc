@@ -185,3 +185,6 @@ setup-synocommunity: setup
 
 docker:
 	docker run -it -v $$(pwd):/spksrc ghcr.io/synocommunity/spksrc
+
+docker-clean:
+	docker rm $$(docker ps -a -q -f ancestor=ghcr.io/synocommunity/spksrc)

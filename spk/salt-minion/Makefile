@@ -1,6 +1,6 @@
 SPK_NAME = salt-minion
 SPK_VERS = 3003.3
-SPK_REV  = 1
+SPK_REV  = 2
 SPK_ICON = src/salt-minion.png
 
 SPK_DEPENDS = "python38"
@@ -10,8 +10,6 @@ DEPENDS =
 BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
 BUILD_DEPENDS += cross/salt
-
-include ../../mk/spksrc.archs.mk
 
 # Requirements file generation
 # /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env
@@ -33,7 +31,6 @@ LICENSE_FILE = src/LICENSE
 POST_STRIP_TARGET = salt-minion_extra_install
 
 # Service configuration
-CONF_DIR = src/conf
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
