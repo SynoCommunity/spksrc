@@ -22,7 +22,7 @@ endif
 
 # Use ninja to build
 ifeq ($(strip $(CMAKE_USE_NINJA)),)
-  CMAKE_USE_NINJA = 1
+  CMAKE_USE_NINJA = 0
 endif
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
   CMAKE_ARGS += -G Ninja
