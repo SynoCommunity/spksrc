@@ -460,7 +460,9 @@ pre-build-native:
 	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee build-$${depend%/*}-$${depend#*/}.log ; \
 	  fi ; \
 	done
+ifneq ($(filter all,$(subst -, ,$(MAKECMDGOALS))),)
 	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
+endif
 
 $(PUBLISH)all-$(ACTION): | pre-build-native
 
@@ -518,7 +520,7 @@ publish-legacy-toolchain-%: spk_msg
 
 ####
 
-arch-%:
+arch-%: | pre-build-native
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
