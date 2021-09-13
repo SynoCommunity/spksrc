@@ -11,15 +11,12 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-ipv6 --without-ensurepip
+COMPILE_MAKE_OPTIONS += Parser/pgen
+COMPILE_MAKE_OPTIONS += all
 
-COMPILE_TARGET = python38_native_compile
 POST_INSTALL_TARGET = python38_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
-
-.PHONY: python38_native_compile
-python38_native_compile:
-	@$(RUN) $(MAKE) Parser/pgen all
 
 PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip

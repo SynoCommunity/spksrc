@@ -9,15 +9,13 @@ HOMEPAGE = http://infozip.sourceforge.net/
 COMMENT  = Zip - a compressor/archiver for creating and modifying zipfiles.
 LICENSE  = BSD-like
 
+COMPILE_MAKE_OPTIONS += -f unix/Makefile
+COMPILE_MAKE_OPTIONS += generic
+
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = native_zip_compile
 INSTALL_TARGET = native_zip_install
 
 include ../../mk/spksrc.native-cc.mk
-
-.PHONY: native_zip_compile
-native_zip_compile:
-	$(RUN) $(MAKE) -f unix/Makefile generic
 
 .PHONY: native_zip_install
 native_zip_install:
