@@ -36,3 +36,7 @@ $(TC_VARS_MK):
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
+
+ifeq ($(filter $(NCPUS),0 1),)
+COMPILE_MAKE_OPTIONS += -j$(NCPUS)
+endif

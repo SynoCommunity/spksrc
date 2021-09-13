@@ -36,7 +36,7 @@ endif
 pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
-	@$(RUN) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 post_compile_target: $(COMPILE_TARGET)
 
