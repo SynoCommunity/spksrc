@@ -86,8 +86,7 @@ include ../../mk/spksrc.cross-cc.mk
 
 # Filter out any -jN since java's configure will autodetect number of CPU's
 # Use make JOBS=N to set number of CPU's in this package
-TMP_MAKEFLAGS:= $(COMPILE_MAKE_OPTIONS)
-COMPILE_MAKE_OPTIONS = $(filter-out -j%, $(TMP_MAKEFLAGS))
+DISABLE_PARALLEL_MAKE = 1
 
 .PHONY: java-11-openjdk_configure
 # Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS

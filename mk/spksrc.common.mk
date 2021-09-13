@@ -72,6 +72,11 @@ ENV += PARALLEL_MAKE=max
 endif
 endif
 
+# Allow parallel make to be disabled per package
+ifeq ($(DISABLE_PARALLEL_MAKE),1)
+PARALLEL_MAKE = nop
+endif
+
 # Set NCPUS based on PARALLEL_MAKE
 ifeq ($(PARALLEL_MAKE),nop)
 NCPUS = 1
