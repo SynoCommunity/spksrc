@@ -1,7 +1,7 @@
 SPK_NAME = python3
 SPK_VERS = 3.7.11
 SPK_SHORT_VERS = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 19
+SPK_REV = 18
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
