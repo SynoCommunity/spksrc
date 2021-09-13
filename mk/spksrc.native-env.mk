@@ -3,7 +3,7 @@ PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig
 INSTALL_DIR = $(WORK_DIR)/install
 INSTALL_PREFIX = /usr/local
 
-# Undifined variables MUST always be first
+# Unsetting variables MUST always be first
 # as otherwise it fails silently
 ENV := -u LDSHARED -u PKG_CONFIG -u PKG_CONFIG_LIBDIR -u PKG_CONFIG_PATH $(ENV)
 
