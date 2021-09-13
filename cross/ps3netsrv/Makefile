@@ -12,7 +12,6 @@ HOMEPAGE = https://github.com/aldostools/webMAN-MOD
 COMMENT = Allows PS3 content to be loaded from network
 LICENSE = GPL
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS =
 
 CONFIGURE_TARGET = nop

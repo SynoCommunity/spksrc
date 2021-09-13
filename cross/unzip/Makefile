@@ -11,8 +11,6 @@ HOMEPAGE = http://infozip.sourceforge.net/UnZip.html
 COMMENT  = UnZip is an extraction utility for archives compressed in .zip format
 LICENSE  = http://infozip.sourceforge.net/license.html
 
-GNU_CONFIGURE = 1
-
 COMPILE_MAKE_OPTIONS += -f unix/Makefile
 COMPILE_MAKE_OPTIONS += generic
 COMPILE_MAKE_OPTIONS += CC="$(TC_PATH)$(TC_PREFIX)gcc"
