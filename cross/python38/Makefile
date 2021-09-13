@@ -25,6 +25,7 @@ ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_IN
 
 POST_PATCH_TARGET = python38_post_patch
 PRE_CONFIGURE_TARGET = python38_pre_configure
+COMPILE_TARGET = python38_compile
 INSTALL_TARGET = python38_install
 POST_INSTALL_TARGET = python38_post_install
 
@@ -51,7 +52,6 @@ LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/u
 export PATH LD_LIBRARY_PATH
 
 ENV += LIBFFI_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/
-ENV += _PYTHON_HOST_PLATFORM=$(TC_TARGET)
 
 .PHONY: python38_post_patch
 python38_post_patch:
@@ -69,11 +69,15 @@ python38_pre_configure:
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(STAGING_INSTALL_PREFIX)/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(STAGING_INSTALL_PREFIX)/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
+.PHONY: python38_compile
+python38_compile:
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE)
+
 .PHONY: python38_install
 python38_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
-	$(RUN) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
 .PHONY: python38_post_install
 python38_post_install: $(WORK_DIR)/python-cc.mk
