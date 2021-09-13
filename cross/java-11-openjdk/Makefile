@@ -38,6 +38,7 @@ CONFIGURE_TARGET    = java-11-openjdk_configure
 
 # Force openjdk to install into the package install folder
 PRE_COMPILE_TARGET  = java-11-openjdk_pre_compile
+COMPILE_TARGET  = java-11-openjdk_compile
 
 # Fix symlinks
 POST_INSTALL_TARGET = java-11-openjdk_post_compile
@@ -75,6 +76,8 @@ CONFIGURE_ARGS += --disable-hotspot-gtest
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
 
+COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
+
 PATCHES_LEVEL = 1
 
 # Build images twice, second time with newly built JDK
@@ -99,6 +102,11 @@ java-11-openjdk_configure:
 # As DESTDIR is not supported we must patch the make file for make install.
 java-11-openjdk_pre_compile:
 	sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
+
+.PHONY: java-11-openjdk_compile
+# Doesn't honor -j flag and require using 'make JOBS=N'
+java-11-openjdk_compile:
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 
 .PHONY: java-11-openjdk_post_compile
 java-11-openjdk_post_compile:
