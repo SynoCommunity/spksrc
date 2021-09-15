@@ -44,7 +44,7 @@ jobs:
             fetch-depth: 0
             persist-credentials: false
 
-    - name: Cache toolchains
+      - name: Cache toolchains
         uses: actions/cache@v2
         with:
           path: toolchain
