@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.3.2
+PKG_VERS = 4.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -104,6 +104,8 @@ endif
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
