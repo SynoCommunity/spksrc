@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: toolchain
-          key: toolchain-${{ matrix.arch }}-${{ hashFiles("toolchain/*/digests") }}
+          key: toolchain-${{ matrix.arch }}-${{ hashFiles('toolchain/*/digests') }}
           restore-keys: toolchain-${{ matrix.arch }}
 
       - name: Get changed files for pull request
