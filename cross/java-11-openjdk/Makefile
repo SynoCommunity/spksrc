@@ -85,6 +85,7 @@ ADDITIONAL_CFLAGS = -Os
 # Filter out any -jN since java's configure will autodetect number of CPU's
 # Use make JOBS=N to set number of CPU's in this package
 DISABLE_PARALLEL_MAKE = 1
+COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
