@@ -24,10 +24,6 @@ else
 $(POST_COMPILE_TARGET): $(COMPILE_TARGET)
 endif
 
-ifeq ($(filter $(NCPUS),0 1),)
-COMPILE_MAKE_OPTIONS += -j$(NCPUS)
-endif
-
 .PHONY: compile compile_msg
 .PHONY: $(PRE_COMPILE_TARGET) $(COMPILE_TARGET) $(POST_COMPILE_TARGET)
 
@@ -40,7 +36,12 @@ endif
 pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
+ifeq ($(filter $(NCPUS),0 1),)
+	@$(RUN) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+else
 	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+endif
+
 
 post_compile_target: $(COMPILE_TARGET)
 
