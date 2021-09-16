@@ -33,4 +33,5 @@ service_postinst ()
 
     # DSM 6
     set_unix_permissions "${SYNOPKG_PKGDEST}"
+    set_unix_permissions "${SYNOPKG_PKGDEST}/env/etc/"
 }
