@@ -52,7 +52,7 @@ OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
 
 DEPENDS += cross/libxml2
-CONFIGURE_ARGS += --enable-demuxer=dash
+CONFIGURE_ARGS += --enable-demuxer=dash --enable-libxml2
 
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
