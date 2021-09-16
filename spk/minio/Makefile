@@ -1,9 +1,5 @@
 SPK_NAME = minio
-SPK_VERS = 2021.09.18
 SPK_REV = 9
-SPK_ICON = src/minio.png
-DSM_UI_DIR = app
-
 DEPENDS = cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
