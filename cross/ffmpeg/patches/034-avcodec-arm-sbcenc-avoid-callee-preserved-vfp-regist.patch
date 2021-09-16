@@ -26,8 +26,8 @@ Signed-off-by: James Cowgill <jcowgill@debian.org>
 
 diff --git a/libavcodec/arm/sbcdsp_neon.S b/libavcodec/arm/sbcdsp_neon.S
 index d83d21d..914abfb 100644
---- a/libavcodec/arm/sbcdsp_neon.S
-+++ b/libavcodec/arm/sbcdsp_neon.S
+--- ./libavcodec/arm/sbcdsp_neon.S
++++ ./libavcodec/arm/sbcdsp_neon.S
 @@ -38,49 +38,49 @@ function ff_sbc_analyze_4_neon, export=1
          /* TODO: merge even and odd cases (or even merge all four calls to this
           * function) in order to have only aligned reads from 'in' array
