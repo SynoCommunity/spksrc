@@ -7,12 +7,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng
 
-HOMEPAGE = https://transmissionbt.com
-COMMENT  = A Fast, Easy, and Free BitTorrent Client
-LICENSE  = GPLv2/GPLv3
+HOMEPAGE = https://zapping.sf.net/ZVBI
+COMMENT  = Vertical Blanking Interval capture and decoding library
+LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS =
 
 PATCHES_LEVEL = 1
 
