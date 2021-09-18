@@ -72,6 +72,11 @@ ENV += PARALLEL_MAKE=max
 endif
 endif
 
+# Allow parallel make to be disabled per package
+ifeq ($(DISABLE_PARALLEL_MAKE),1)
+PARALLEL_MAKE = nop
+endif
+
 # Set NCPUS based on PARALLEL_MAKE
 ifeq ($(PARALLEL_MAKE),nop)
 NCPUS = 1
@@ -87,7 +92,16 @@ PSTAT_TIME = time -o $(PSTAT_LOG) --append
 else
 PSTAT_TIME =
 endif
-PSTAT_LOG = build.stats.log
+
+# Always send PSTAT output to proper log file
+# independantly from active Makefile location
+ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
+PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build.stats.log
+else ifneq ($(wildcard $(WORK_DIR)),)
+PSTAT_LOG = $(WORK_DIR)/../build.stats.log
+else
+PSTAT_LOG = $(shell pwd)/build.stats.log
+endif
 
 # Terminal colors
 RED=`tput setaf 1`

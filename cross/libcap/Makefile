@@ -11,7 +11,6 @@ HOMEPAGE = https://sites.google.com/site/fullycapable/
 COMMENT  = POSIX 1003.1e capabilities (library). Libcap implements the user-space interfaces to the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. 
 LICENSE  = GPLv2
 
-GNU_CONFIGURE = 1
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = libcap_compile
 INSTALL_TARGET = libcap_install

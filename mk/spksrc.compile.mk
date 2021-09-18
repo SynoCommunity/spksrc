@@ -6,13 +6,6 @@
 #  compile_target       (override with COMPILE_TARGET)
 #  post_compile_target  (override with POST_COMPILE_TARGET)
 
-# Set parallel options in caller
-ifneq ($(PARALLEL_MAKE),nop)
-ifeq ($(call version_ge, ${MAKELEVEL}, 2),1)
-MAKEFLAGS += -j$(NCPUS)
-endif
-endif
-
 COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)compile_done
 
 ifeq ($(strip $(PRE_COMPILE_TARGET)),)
@@ -37,13 +30,22 @@ endif
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+ifeq ($(filter cross spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(dir $(abspath $(dir $$PWD)))), NAME: $(NAME) >> $(PSTAT_LOG)
+else
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
+endif
 endif
 
 pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
-	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+ifeq ($(filter $(NCPUS),0 1),)
+	@$(RUN) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+else
+	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+endif
+
 
 post_compile_target: $(COMPILE_TARGET)
 

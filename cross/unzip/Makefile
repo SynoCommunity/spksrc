@@ -11,16 +11,14 @@ HOMEPAGE = http://infozip.sourceforge.net/UnZip.html
 COMMENT  = UnZip is an extraction utility for archives compressed in .zip format
 LICENSE  = http://infozip.sourceforge.net/license.html
 
-GNU_CONFIGURE = 1
+COMPILE_MAKE_OPTIONS += -f unix/Makefile
+COMPILE_MAKE_OPTIONS += generic
+COMPILE_MAKE_OPTIONS += CC="$(TC_PATH)$(TC_PREFIX)gcc"
+
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = unzip_compile
 INSTALL_TARGET = unzip_install
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: unzip_compile
-unzip_compile:
-	$(RUN) $(MAKE) -f unix/Makefile generic CC="$(TC_PATH)$(TC_PREFIX)gcc"
 
 .PHONY: unzip_install
 unzip_install:

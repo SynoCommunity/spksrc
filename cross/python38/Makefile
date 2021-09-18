@@ -76,7 +76,7 @@ python38_pre_configure:
 
 .PHONY: python38_compile
 python38_compile:
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE)
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) -j $(NCPUS)
 
 .PHONY: python38_install
 python38_install:

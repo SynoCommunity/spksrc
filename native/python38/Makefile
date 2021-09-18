@@ -12,36 +12,11 @@ LICENSE  = PSF
 DEPENDS = native/expat native/readline native/xz native/gdbm native/sqlite
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-ipv6
-CONFIGURE_ARGS += --without-ensurepip
-CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
-CONFIGURE_ARGS += --with-computed-gotos=yes
-CONFIGURE_ARGS += --with-dbmliborder=gdbm:ndbm:bdb
-CONFIGURE_ARGS += --with-system-expat
-CONFIGURE_ARGS += --with-system-ffi
-CONFIGURE_ARGS += --with-ssl-default-suites=openssl
-CONFIGURE_ARGS += --enable-optimizations
 
-NATIVE_CFLAGS   = -I$(realpath $(WORK_DIR)/../../../native/expat/work-native/install/usr/local/include )
-NATIVE_CFLAGS  += -I$(realpath $(WORK_DIR)/../../../native/readline/work-native/install/usr/local/include )
-NATIVE_CFLAGS  += -I$(realpath $(WORK_DIR)/../../../native/xz/work-native/install/usr/local/include )
-NATIVE_CFLAGS  += -I$(realpath $(WORK_DIR)/../../../native/gdbm/work-native/install/usr/local/include )
-NATIVE_CFLAGS  += -I$(realpath $(WORK_DIR)/../../../native/sqlite/work-native/install/usr/local/include )
 
-NATIVE_LDFLAGS  = -L$(realpath $(WORK_DIR)/../../../native/expat/work-native/install/usr/local/lib )
-NATIVE_LDFLAGS += -L$(realpath $(WORK_DIR)/../../../native/readline/work-native/install/usr/local/lib )
-NATIVE_LDFLAGS += -L$(realpath $(WORK_DIR)/../../../native/xz/work-native/install/usr/local/lib )
-NATIVE_LDFLAGS += -L$(realpath $(WORK_DIR)/../../../native/gdbm/work-native/install/usr/local/lib )
-NATIVE_LDFLAGS += -L$(realpath $(WORK_DIR)/../../../native/sqlite/work-native/install/usr/local/lib )
-
-COMPILE_TARGET = python38_native_compile
 POST_INSTALL_TARGET = python38_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
-
-.PHONY: python38_native_compile
-python38_native_compile:
-	@$(RUN) $(MAKE) Parser/pgen all
 
 PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
