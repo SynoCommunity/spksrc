@@ -93,7 +93,6 @@ if [ -z "${packages}" ]; then
     echo "::set-output name=download_packages::"
 else
     echo "===> PACKAGES to download references for: ${packages}"
-    echo "::group:: ---- download"
     DOWNLOAD_LIST=
     for package in ${packages}
     do
@@ -102,5 +101,4 @@ else
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
     echo "::set-output name=download_packages::${downloads}"
-    echo "::endgroup::"
 fi

@@ -58,9 +58,7 @@ jobs:
 
       - name: Evaluate dependencies
         id: dependencies
-        uses: docker://ghcr.io/synocommunity/spksrc:latest
-        with:
-          entrypoint: ./.github/actions/prepare.sh
+        run: ./.github/actions/prepare.sh
         env:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
@@ -84,9 +82,7 @@ jobs:
           key: distrib-${{ github.run_id }}
 
       - name: Download source files
-        uses: docker://ghcr.io/synocommunity/spksrc:latest
-        with:
-          entrypoint: ./.github/actions/download.sh
+        run: ./.github/actions/download.sh
         env:
           DOWNLOAD_PACKAGES: ${{ needs.prepare.outputs.download_packages }}
 
