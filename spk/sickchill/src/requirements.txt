@@ -1,4 +1,4 @@
-appdirs==1.4.4
+###appdirs==1.4.4		# python38 site-package
 attrdict==2.0.1
 babelfish==0.5.5
 beautifulsoup4==4.9.3
@@ -23,18 +23,18 @@ gntp==1.0.3
 guessit==3.1.1
 html5lib==1.1
 httplib2==0.18.1
-idna==2.10
+###idna==2.10			# python38 site-package
 ifaddr==0.1.7
 imagesize==1.2.0
 IMDbPY==2020.9.25
-ipaddress==1.0.23
+###ipaddress==1.0.23	# python38 site-package
 Js2Py==0.70
 jsonrpclib-pelix==0.4.2
 ###kodipydent==0.3.1
 ###lxml==4.6.1
 Mako==1.1.3
 markdown2==2.3.10
-MarkupSafe==1.1.1
+###MarkupSafe==1.1.1	# python38 site-package
 msgpack==1.0.0
 new-rtorrent-python==1.0.1a0
 oauthlib==3.1.0
@@ -43,13 +43,13 @@ pbr==5.5.1
 profilehooks==1.12.0
 putio.py==8.7.0
 pyaes==1.6.1
-pycparser==2.20
+###pycparser==2.20		# python38 site-package
 PyGithub==1.53
 pyjsparser==2.7.1
 PyJWT==1.7.1
 pymediainfo==4.3
 PyNMA==1.0
-pyOpenSSL==19.1.0
+###pyOpenSSL==19.1.0	# python38 site-package
 pyparsing==2.4.7
 PySocks==1.7.1
 pysrt==1.1.2
@@ -66,9 +66,9 @@ requests-oauthlib==1.3.0
 requests-toolbelt==0.9.1
 Send2Trash==1.5.0
 sgmllib3k==1.0.0
-six==1.15.0
+###six==1.15.0			# python38 site-package
 soupsieve==2.0.1
-SQLAlchemy==1.3.20
+###SQLAlchemy==1.3.20	# python38 site-package
 stevedore==3.2.2
 subliminal==2.1.0
 text-unidecode==1.3

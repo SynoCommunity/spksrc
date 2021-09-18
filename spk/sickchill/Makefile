@@ -1,11 +1,12 @@
 SPK_NAME = sickchill
 SPK_VERS = 20210729
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/sickchill.png
 
+BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/$(SPK_NAME)
+
 SPK_DEPENDS = "python38:git"
-PIP=pip3
 
 WHEELS = src/requirements.txt
 
@@ -14,10 +15,10 @@ DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new e
 DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Initial SickChill env fix and move to Python 3.8"
+CHANGELOG = "Fix for non intel archs and python38"
 
 HOMEPAGE   = https://sickchill.github.io/
-LICENSE    = GPL
+LICENSE    = GPLv3+
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -30,9 +31,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = sickchill_extra_install
-
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
