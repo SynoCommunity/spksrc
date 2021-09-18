@@ -25,6 +25,7 @@ echo "::endgroup::"
 echo "::group:: ---- find dependent packages"
 
 # filter for changes made in the spk directories and take unique package name (without spk folder)
+SPK_TO_BUILD+=" "
 SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
 
 # filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
@@ -50,10 +51,10 @@ done
 
 # fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD+=sonarr
+    SPK_TO_BUILD+=" sonarr"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD+=python2
+    SPK_TO_BUILD+=" python2"
 fi
 
 # remove duplicate packages

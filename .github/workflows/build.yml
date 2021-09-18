@@ -27,8 +27,49 @@ on:
     - 'native/**'
 
 jobs:
+  download:
+    name: Download
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+            persist-credentials: false
+
+      - name: Get changed files for pull request
+        if: github.event_name == 'pull_request'
+        id: getfile_pr
+        run: |
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
+          echo "::set-output name=files::$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)"
+
+      - name: Get changed files for push
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') == false
+        id: getfile
+        run: |
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
+          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+
+      - name: Download source files
+        continue-on-error: true
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
+        with:
+          entrypoint: ./.github/actions/download.sh
+        env:
+          GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
+          SPK_TO_BUILD: ${{ github.event.inputs.package }}
+
+      - name: Cache downloaded files
+        uses: actions/cache@v2
+        with:
+          path: distrib
+          # use run_id in key to cache within workflow only.
+          key: distrib-${{ github.run_id }}
+
   build:
     name: Build
+    needs: download    
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -50,6 +91,12 @@ jobs:
           path: toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v2-${{ hashFiles('toolchain/*/digests') }}
           restore-keys: toolchain-${{ matrix.arch }}
+
+      - name: Use cache of downloaded files
+        uses: actions/cache@v2
+        with:
+          path: distrib
+          key: distrib-${{ github.run_id }}
 
       - name: Get changed files for pull request
         if: github.event_name == 'pull_request'
