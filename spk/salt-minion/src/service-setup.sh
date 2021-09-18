@@ -18,8 +18,7 @@ service_postinst ()
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index --upgrade --force-reinstall -f ${wheelhouse} ${wheelhouse}/*.whl
 
     # Prepare salt-minion config in /var/packages/salt-minion/
-    ln -s /var/packages/${SYNOPKG_PKGNAME}/etc ${SYNOPKG_PKGDEST}/env/etc
-    test -d ${SYNOPKG_PKGDEST}/env/etc/salt || install -m 755 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} -d ${SYNOPKG_PKGDEST}/env/etc/salt
+    test -L ${SYNOPKG_PKGDEST}/env/etc || ln -s /var/packages/${SYNOPKG_PKGNAME}/etc ${SYNOPKG_PKGDEST}/env/etc
     test -d ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d || install -m 755 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} -d ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion || install -m 644 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGDEST}/env/etc/salt/minion
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/proxy || install -m 644 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGDEST}/env/etc/salt/proxy
@@ -34,4 +33,5 @@ service_postinst ()
 
     # DSM 6
     set_unix_permissions "${SYNOPKG_PKGDEST}"
+    set_unix_permissions "${SYNOPKG_PKGDEST}/env/etc/"
 }
