@@ -12,13 +12,9 @@ HOMEPAGE = https://github.com/prometheus/node_exporter
 COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels
 LICENSE  = Apache License 2.0
 
-COMPILE_TARGET = node_exporter_compile
+COMPILE_MAKE_OPTIONS += build
 
 CGO_ENABLED = 1
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 
 include ../../mk/spksrc.cross-go.mk
-
-
-node_exporter_compile:
-	$(RUN) make build

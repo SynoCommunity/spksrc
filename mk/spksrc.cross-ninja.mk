@@ -63,7 +63,7 @@ ninja_install_target:
 	@$(MSG)    - Ninja installation path = $(NINJA_DESTDIR)
 	@$(MSG)    - Ninja use DESTDIR = $(NINJA_USE_DESTDIR)
 ifeq ($(strip $(NINJA_USE_DESTDIR)),0)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C $(NINJA_BUILD_DIR) install
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) $(PSTAT_TIME) ninja -j $(NCPUS) -C $(NINJA_BUILD_DIR) install
 else
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) DESTDIR=$(NINJA_DESTDIR) ninja -C $(NINJA_BUILD_DIR) install
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) DESTDIR=$(NINJA_DESTDIR) $(PSTAT_TIME) ninja -j $(NCPUS) -C $(NINJA_BUILD_DIR) install
 endif

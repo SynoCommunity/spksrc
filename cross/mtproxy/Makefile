@@ -13,16 +13,16 @@ HOMEPAGE = https://github.com/TelegramMessenger/MTProxy
 COMMENT = Simple MT-Proto proxy server
 LICENSE = GPL
 
+# Only Intel supported https://github.com/TelegramMessenger/MTProxy/issues/18
+COMPILE_MAKE_OPTIONS += SPKSRC_CFLAGS="$(CFLAGS)"
+COMPILE_MAKE_OPTIONS += SPKSRC_LDFLAGS="$(LDFLAGS)"
+COMPILE_MAKE_OPTIONS += COMMIT="$(PKG_GIT_HASH)"
+COMPILE_MAKE_OPTIONS += ARCH=
+
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = mtproxy_compile
 INSTALL_TARGET = mtproxy_install
 
 include ../../mk/spksrc.cross-cc.mk
-
-# Only Intel supported https://github.com/TelegramMessenger/MTProxy/issues/18
-.PHONY: mtproxy_compile
-mtproxy_compile:
-		$(RUN) $(MAKE) SPKSRC_CFLAGS="$(CFLAGS)" SPKSRC_LDFLAGS="$(LDFLAGS)" COMMIT="$(PKG_GIT_HASH)" ARCH=
 
 .PHONY: mtproxy_install
 mtproxy_install:
