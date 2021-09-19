@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.3.2
 SPK_REV = 38
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Added zvbi library"
+CHANGELOG = "1. Added zvbi library<br/>2. Add dash demuxer support"
 
 CONF_DIR = src/conf
 
