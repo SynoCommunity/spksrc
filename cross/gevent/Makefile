@@ -1,5 +1,5 @@
 PKG_NAME = gevent
-PKG_VERS = 21.1.2
+PKG_VERS = 21.8.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/$(PKG_NAME)/$(PKG_NAME)/archive
