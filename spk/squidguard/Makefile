@@ -4,10 +4,9 @@ SPK_REV = 2
 SPK_ICON = src/squidguard.png
 BETA = 1
 
-BUILD_DEPENDS = cross/python38
 DEPENDS = cross/busybox cross/unrar cross/squidclamav cross/squidguard cross/squid cross/squidguardmanager
 
-SPK_DEPENDS = "AntiVirus>1.2:python38"
+SPK_DEPENDS = "AntiVirus>1.2"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid. This package also includes SquidClamav for viruses protection and SquidGuard Manager.
