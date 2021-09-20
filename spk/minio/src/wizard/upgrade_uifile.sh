@@ -58,7 +58,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                         "validator": {
                             "allowBlank": false,
                             "regex": {
-                                "expr": "/^[\\w _-]+$/",
+                                "expr": "/^[\\\\w _-]+$/",
                                 "errorText": "Subdirectories are not supported."
                             }
                         }
