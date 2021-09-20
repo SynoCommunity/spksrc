@@ -108,6 +108,8 @@ endif
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
