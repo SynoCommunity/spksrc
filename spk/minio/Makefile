@@ -12,6 +12,7 @@ MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
 DISPLAY_NAME = MinIO
 CHANGELOG = "Update to MinIO 2021-06-14T01:29:23Z. Major release, multiple feature and bugfix releases."
+LICENSE_FILE = $(WORK_DIR)/src/github.com/minio/minio/LICENSE
 HOMEPAGE = https://min.io/
 LICENSE = AGPLv3.0
 
