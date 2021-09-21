@@ -23,6 +23,8 @@ CONFIGURE_TARGET = configure_target
 COMPILE_TARGET = compile_target build_python_wheel
 INSTALL_TARGET = install_destdir_target install_python_wheel
 
+include ../../mk/spksrc.common.mk
+
 GNU_CONFIGURE = 1
 -include $(WORK_DIR)/python-cc.mk
 CONFIGURE_ARGS  = --enable-python-binding --with-libiconv
@@ -32,7 +34,11 @@ CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python2/work-native/install
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
-ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+ADDITIONAL_CXXFLAGS  = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+# Required for DSM-6 using gcc-4.9
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+ADDITIONAL_CXXFLAGS += -std=c++11
+endif
 ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
 
 BOOST_LIBRARIES += system python chrono random
