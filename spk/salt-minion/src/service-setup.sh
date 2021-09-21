@@ -24,7 +24,7 @@ service_postinst ()
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGDEST}/env/etc/salt/proxy
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/02_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/02_pidfile.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/01_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGDEST}/env" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/01_rootdir.conf
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf || echo "log_file: udp://localhost:10514" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf || echo "log_level_logfile: info" >> ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf
 
     # Populate salt master address and minion_id only if file don't already exist
