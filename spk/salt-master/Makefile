@@ -5,8 +5,6 @@ SPK_ICON = src/salt-master.png
 
 SPK_DEPENDS = "python38"
 
-DEPENDS =
-
 BUILD_DEPENDS  = cross/python38 cross/setuptools cross/pip
 BUILD_DEPENDS += cross/wheel
 BUILD_DEPENDS += cross/salt
