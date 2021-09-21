@@ -43,7 +43,7 @@ SPK_USR_LOCAL_LINKS += bin:env/bin/salt-master
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-run
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-unity
 SPK_USR_LOCAL_LINKS += bin:env/bin/spm
-
+PK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
