@@ -108,7 +108,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v2-${{ hashFiles('toolchain/*/digests') }}
+          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/*/digests') }}
 
       - name: Use cache of downloaded files
         uses: actions/cache@v2
