@@ -19,7 +19,7 @@ service_postinst ()
 
     # Prepare salt-master config in /var/packages/salt-minion/
     test -L ${SYNOPKG_PKGDEST}/env/etc || ln -s /var/packages/${SYNOPKG_PKGNAME}/etc ${SYNOPKG_PKGDEST}/env/etc
-    test -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d || install -m 755 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d
+    test -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d || install -m 755 -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master || install -m 644 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} ${SYNOPKG_PKGDEST}/share/master ${SYNOPKG_PKGDEST}/env/etc/salt/master
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/02_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/02_pidfile.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/01_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGDEST}/env" > ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/01_rootdir.conf
