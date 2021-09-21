@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.3
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/synocli-file.png
 
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
@@ -49,7 +49,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add rg (ripgrep).<br/>2. Add fd (fd-find).<br/>3. Add mg (emacs-like text editor)."
+CHANGELOG = "fix ripgrep"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
