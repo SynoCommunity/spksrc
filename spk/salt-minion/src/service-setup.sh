@@ -28,7 +28,7 @@ service_postinst ()
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf || echo "log_level_logfile: info" >> ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/03_logging.conf
 
     # Populate salt master address and minion_id only if file don't already exist
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf || echo "master: salt" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf || echo "master: localhost" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf || echo -n "id: " > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf && hostname -s >> ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf
 
     # DSM 6
