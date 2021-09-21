@@ -4,7 +4,7 @@ TC_NAME = syno-armv7
 TC_ARCH = armada370 armada375 armada38x alpine alpine4k armadaxp comcerto2k monaco
 TC_VERS = 7.0
 TC_KERNEL = 3.2.101
-TC_GCC = 7.5.0
+TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = comcerto2k-gcc493_glibc220_hard-GPL
