@@ -51,6 +51,10 @@ OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
 
+DEPENDS += cross/libxml2
+CONFIGURE_ARGS += --enable-libxml2
+CONFIGURE_ARGS += --enable-demuxer=dash
+
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
 
@@ -104,6 +108,8 @@ endif
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
