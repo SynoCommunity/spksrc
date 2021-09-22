@@ -5,7 +5,7 @@ TC_ARCH = alpine alpine4k armada370 armada375 armada38x armadaxp monaco
 TC_VERS = 7.0
 TC_KERNEL = 3.10.108
 TC_GCC = 7.5.0
-TC_GLIBC = 2.20
+TC_GLIBC = 2.26
 
 TC_DIST = armada38x-gcc750_glibc226_hard-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%2038x%20Linux%203.10.108
