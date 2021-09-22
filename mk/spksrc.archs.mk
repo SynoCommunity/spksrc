@@ -6,7 +6,9 @@
 # SRM - Synology Router Manager
 SRM_ARMv7_ARCHS = northstarplus ipq806x dakota
 # DSM - all ARMv7 except SRM specific archs
-DSM_ARMv7_ARCHS = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco
+DSM_ARMv7_ARCHS = alpine armada370 armada375 armada38x armadaxp monaco
+# comcerto2k is the only ARMv7 arch that uses an GCC (4.9.3) and GLIBC (2.20)
+OLD_DSM_ARMv7_ARCHS = comcerto2k
 
 # Generic archs used for packages supporting multiple archs (where applicable)
 GENERIC_ARMv7_ARCH = armv7
@@ -15,7 +17,7 @@ GENERIC_x64_ARCH = x64
 GENERIC_ARCHS = $(GENERIC_ARMv7_ARCH) $(GENERIC_ARMv8_ARCH) $(GENERIC_x64_ARCH)
 
 ARMv5_ARCHS = 88f6281
-ARMv7_ARCHS = $(GENERIC_ARMv7_ARCH) $(DSM_ARMv7_ARCHS) $(SRM_ARMv7_ARCHS)
+ARMv7_ARCHS = $(GENERIC_ARMv7_ARCH) $(DSM_ARMv7_ARCHS) $(SRM_ARMv7_ARCHS) $(OLD_DSM_ARMv7_ARCHS)
 # hi3535 is not supported by generic ARMv7 arch
 ARMv7L_ARCHS = hi3535
 ARMv8_ARCHS = $(GENERIC_ARMv8_ARCH) rtd1296 armada37xx
