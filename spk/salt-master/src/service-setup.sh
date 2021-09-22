@@ -20,10 +20,10 @@ service_postinst ()
     # Prepare salt-master config in /var/packages/salt-minion/
     test -L ${SYNOPKG_PKGDEST}/env/etc || ln -s /var/packages/${SYNOPKG_PKGNAME}/etc ${SYNOPKG_PKGDEST}/env/etc
     test -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d || install -m 755 -d ${SYNOPKG_PKGDEST}/env/etc/salt/master.d
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master || install -m 644 -o sc-${SYNOPKG_PKGNAME} -g ${SYNOPKG_PKGNAME} ${SYNOPKG_PKGDEST}/share/master ${SYNOPKG_PKGDEST}/env/etc/salt/master
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master || install -m 644 ${SYNOPKG_PKGDEST}/share/master ${SYNOPKG_PKGDEST}/env/etc/salt/master
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/02_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/02_pidfile.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/01_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGDEST}/env" > ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/01_rootdir.conf
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/03_logging.conf || echo "log_file: udp://localhost:10514" > ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/03_logging.conf
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/03_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/03_logging.conf
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/03_logging.conf || echo "log_level_logfile: info" >> ${SYNOPKG_PKGDEST}/env/etc/salt/master.d/03_logging.conf
 
     # DSM 6

@@ -31,7 +31,7 @@ POST_STRIP_TARGET = salt-master_extra_install
 # Service configuration
 SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
-SERVICE_PORT       = 4505,tcp/4506,tcp/8282
+SERVICE_PORT       = 4505,4506,8282
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 FWPORTS = src/${SPK_NAME}.sc
 STARTABLE = yes
@@ -43,7 +43,7 @@ SPK_USR_LOCAL_LINKS += bin:env/bin/salt-master
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-run
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-unity
 SPK_USR_LOCAL_LINKS += bin:env/bin/spm
-PK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
 include ../../mk/spksrc.spk.mk
 
 .PHONY: salt-master_extra_install
