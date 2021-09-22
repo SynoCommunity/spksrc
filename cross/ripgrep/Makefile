@@ -15,7 +15,7 @@ HOMEPAGE = https://github.com/BurntSushi/ripgrep
 COMMENT  = ripgrep recursively searches directories for a regex pattern
 LICENSE  = public domain/Unlicense
 
-# https://github.com/SynoCommunity/spksrc/issues/4878
+# Force static build when pcre2 is detected in synocli-file build environment
 ENV += PCRE2_SYS_STATIC=1
 CARGO_BUILD_ARGS += --features 'pcre2'
 
