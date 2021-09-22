@@ -5,7 +5,7 @@
  #include <stdlib.h>
  
 -#define SQUID_BINARY "/usr/sbin/squid"
-+#define SQUID_BINARY "/var/packages/squidguard/sbin/squid"
++#define SQUID_BINARY "/var/packages/squidguard/target/sbin/squid"
  
  int main(int argc, char **argv, char **envp) {
    char *squidprog[] = { SQUID_BINARY, "-k", "reconfigure", NULL };
