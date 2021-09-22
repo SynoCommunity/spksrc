@@ -1,9 +1,9 @@
 PKG_NAME = squid
 PKG_VERS = 5.0.4
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(shell echo '$(PKG_NAME)' | tr '[:lower:]' '[:upper:]')_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
+PKG_DIST_NAME = SQUID_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/squid-cache/squid/archive
-PKG_DIR = $(PKG_NAME)-$(shell echo '$(PKG_NAME)' | tr '[:lower:]' '[:upper:]')_$(subst .,_,$(PKG_VERS))
+PKG_DIR = $(PKG_NAME)-SQUID_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/openssl
 
