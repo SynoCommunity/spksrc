@@ -4,10 +4,12 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
 PKG_DIST_SITE = http://deb.debian.org/debian/pool/main/s/squidguard
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
 # http://dsi.ut-capitole.fr/blacklists/index_en.php
 # repository: http://dsi.ut-capitole.fr/blacklists/download/
 DB_FILE= http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz
-DEPENDS = 
+
+DEPENDS = cross/squidclamav
 
 HOMEPAGE = http://www.squidguard.org/
 COMMENT  = SquidGuard is a URL redirector used to use blacklists with the proxysoftware Squid.
