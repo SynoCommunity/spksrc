@@ -6,7 +6,9 @@
 # SRM - Synology Router Manager
 SRM_ARMv7_ARCHS = northstarplus ipq806x dakota
 # DSM - all ARMv7 except SRM specific archs
-DSM_ARMv7_ARCHS = alpine armada370 armada375 armada38x armadaxp comcerto2k monaco
+DSM_ARMv7_ARCHS = alpine alpine4k armada370 armada375 armada38x armadaxp monaco
+# comcerto2k is the only ARMv7 arch that uses an GCC (4.9.3) and GLIBC (2.20)
+DSM_ARMv7_ARCHS += comcerto2k
 
 # Generic archs used for packages supporting multiple archs (where applicable)
 GENERIC_ARMv7_ARCH = armv7
