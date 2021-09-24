@@ -33,7 +33,6 @@ SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
 SERVICE_PORT       = 4505,4506,8282
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-FWPORTS = src/${SPK_NAME}.sc
 STARTABLE = yes
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
