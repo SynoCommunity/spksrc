@@ -36,9 +36,9 @@ squidguard_pre_configure:
 
 .PHONY: squidguard_post_install
 squidguard_post_install:
-	@$(RUN) install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
-	@$(RUN) wget $(DB_FILE) -O $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists.tar.gz
-	@$(RUN) tar xvzf $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists.tar.gz -C $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db
-	@$(RUN) cp -R $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists/* $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/
-	@$(RUN) rm -Rf $(INSTALL_DIR)/$(INSTALL_PREFIX)/var/db/blacklists*
-	@$(RUN) install -m 755 -d $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/www/squidguardmgr/
+	@$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX)/var/db
+	@$(RUN) wget $(DB_FILE) -O $(STAGING_INSTALL_PREFIX)/var/db/blacklists.tar.gz
+	@$(RUN) tar xvzf $(STAGING_INSTALL_PREFIX)/var/db/blacklists.tar.gz -C $(STAGING_INSTALL_PREFIX)/var/db
+	@$(RUN) cp -R $(STAGING_INSTALL_PREFIX)/var/db/blacklists/* $(STAGING_INSTALL_PREFIX)/var/db/
+	@$(RUN) rm -Rf $(STAGING_INSTALL_PREFIX)/var/db/blacklists*
+	@$(RUN) install -m 755 -d $(STAGING_INSTALL_PREFIX)/var/www/squidguardmgr/
