@@ -1,3 +1,2 @@
-bin/google-authenticator
-lib/security/pam_google_authenticator.la
-lib/security/pam_google_authenticator.so
+bin:bin/google-authenticator
+lib:lib/security/pam_google_authenticator.so
