@@ -25,9 +25,13 @@ endif
 #    patches/$(arch)-$(TCVERSION)/*.patch
 # supported groups: arm, armv5, armv7, armv7l, armv8, ppc, i686, x64
 ifeq ($(strip $(PATCHES)),)
+ifneq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
 PATCHES = $(sort $(foreach group,ARM_ARCHS ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
 	$(foreach arch,$($(group)), \
 	$(if $(filter $(ARCH),$(arch)),$(sort $(wildcard patches/*.patch patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch  patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')-$(TCVERSION)/*.patch patches/$(arch)/*.patch patches/$(arch)-$(TCVERSION)/*.patch)),))))
+else
+PATCHES = $(sort $(wildcard patches/*.patch))
+endif
 endif
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
