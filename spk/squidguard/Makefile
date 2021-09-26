@@ -48,8 +48,8 @@ xz-compress:
 	install -m 755 -d $(STAGING_DIR)/var/db
 	install -m 755 src/update_db.sh $(STAGING_DIR)/bin/
 	install -m 755 src/etc/* $(STAGING_DIR)/etc/
-	install -m 644 src/app/config $(STAGING_DIR)/share/www/squidguardmgr/
-	install -m 755 src/app/squidGuard.cgi $(STAGING_DIR)/share/www/squidguardmgr/
-	install -m 644 src/app/babel.* $(STAGING_DIR)/share/www/squidguardmgr/
-	install -m 644 src/app/synocommunity.png $(STAGING_DIR)/share/www/squidguardmgr/
-	install -m 644 src/app/blocked.gif $(STAGING_DIR)/share/www/squidguardmgr/
+	install -m 644 src/app/config $(STAGING_DIR)/var/www/squidguardmgr/
+	install -m 755 src/app/squidGuard.cgi $(STAGING_DIR)/var/www/squidguardmgr/
+	install -m 644 src/app/babel.* $(STAGING_DIR)/var/www/squidguardmgr/
+	install -m 644 src/app/synocommunity.png $(STAGING_DIR)/var/www/squidguardmgr/
+	install -m 644 src/app/blocked.gif $(STAGING_DIR)/var/www/squidguardmgr/
