@@ -3,8 +3,8 @@
 #
 
 # Global variables
-logdir	/var/packages/squidguard/var/logs
-dbhome	/var/packages/squidguard/var/db
+logdir	/var/packages/squidguard/target/var/logs
+dbhome	/var/packages/squidguard/target/var/db
 
 # Time rules
 # abbrev for weekdays:
