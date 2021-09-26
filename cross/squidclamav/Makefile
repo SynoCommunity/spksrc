@@ -12,13 +12,14 @@ COMMENT  = SquidClamav is an antivirus for Squid proxy based on the Awards winni
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-PRE_COMPILE_TARGET = squidclamav_pre_compile
 
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX) --with-c-icap=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 ADDITIONAL_CFLAGS = -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/c_icap
 
+POST_INSTALL_TARGET = squidclamav_post_install
+
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: squidclamav_pre_compile
-squidclamav_pre_compile:
-	sed -i 's/"\/etc\/squidclamav.conf"/"\/usr\/local\/squidguard\/etc\/squidclamav.conf"/' $(WORK_DIR)/$(PKG_DIR)/src/squidclamav.h
+.PHONY: squidclamav_post_install
+squidclamav_post_install:
+	@$(RUN) sed -i 's?^clamd_local .*?clamd_local $(INSTALL_PREFIX)/var/run/clamd/clamd.ctl?' $(STAGING_INSTALL_PREFIX)/etc/squidclamav.conf
