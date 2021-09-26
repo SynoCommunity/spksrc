@@ -12,6 +12,8 @@ COMMENT  = c-icap is an implementation of an ICAP server. It can be used with HT
 LICENSE  = LGPLv2.1
 
 PRE_CONFIGURE_TARGET = c_icap_pre_configure
+POST_INSTALL_TARGET = c_icap_post_install
+
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-large-files --disable-static --with-zlib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib -C
 
@@ -21,3 +23,9 @@ include ../../mk/spksrc.cross-cc.mk
 c_icap_pre_configure:
 	cp src/config.cache $(WORK_DIR)/$(PKG_DIR)
 	$(RUN) ; autoconf
+
+.PHONY: c_icap_post_install
+c_icap_post_install:
+	@$(RUN) sed -i 's?^PidFile .*?PidFile $(INSTALL_PREFIX)/var/run/c-icap/c-icap.pid?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
+	@$(RUN) sed -i 's?^CommandsSocket .*?CommandsSocket $(INSTALL_PREFIX)/var/run/c-icap/c-icap.ctl?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
+	@$(RUN) sed -i 's?^Port .*?Port 10344?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
