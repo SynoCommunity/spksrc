@@ -53,9 +53,3 @@ xz-compress:
 	install -m 644 src/app/babel.* $(STAGING_DIR)/share/www/squidguardmgr/
 	install -m 644 src/app/synocommunity.png $(STAGING_DIR)/share/www/squidguardmgr/
 	install -m 644 src/app/blocked.gif $(STAGING_DIR)/share/www/squidguardmgr/
-	for size in 16 24 32 48 72 ; \
-	do \
-	    convert $(SPK_ICON) -thumbnail $${size}x$${size} -transparent white -strip \
-	            $(STAGING_DIR)/share/www/squidguardmgr/images/icon$${size}.png ; \
-	done	
-	chmod 644 $(STAGING_DIR)/share/www/squidguardmgr/images/i*.png
