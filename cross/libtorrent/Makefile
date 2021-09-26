@@ -34,12 +34,12 @@ CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python2/work-native/install
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
-ADDITIONAL_CXXFLAGS  = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
-# Required for DSM-6 using gcc-4.9
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-ADDITIONAL_CXXFLAGS += -std=c++11
-endif
+ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
+
+# Only required for DSM <= 6.* using gcc-4.9 along with comcerto2k-7.0
+# Leaving enabled by default for all as no negative impact
+ADDITIONAL_CXXFLAGS += -std=c++11
 
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
