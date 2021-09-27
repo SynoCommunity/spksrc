@@ -16,6 +16,13 @@ SUPPORTURL = https://github.com/SynoCommunity/spksrc/wiki/Google-Authenticator-P
 LICENSE = Apache-2.0
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
 
-SPK_COMMANDS = bin/google-authenticator
+# As DSM has google-authenticator installed, create a SynoCommunity specific link
+CUSTOM_AUTHENTICATOR_NAME = sc-google-authenticator
+POST_STRIP_TARGET = google-authenticator-libpam_extra_install
+SPK_COMMANDS = bin/$(CUSTOM_AUTHENTICATOR_NAME)
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: google-authenticator-libpam_extra_install
+google-authenticator-libpam_extra_install:
+	$(RUN) ; cd $(STAGING_DIR)/bin; ln -sf google-authenticator $(CUSTOM_AUTHENTICATOR_NAME)
