@@ -227,6 +227,7 @@ ifneq ($(strip $(SPK_CONFLICT)),)
 	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
 endif
 	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\" >> $@
+	@echo extractsize=\"`du -sk "$(STAGING_DIR)" | awk '{print $1}'`\" >> $@
 
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
