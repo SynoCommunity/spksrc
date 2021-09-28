@@ -43,5 +43,10 @@ include ../../mk/spksrc.spk.mk
 demoservice_install:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
+	mkdir --parents $(STAGING_INSTALL_PREFIX)/bin $(STAGING_INSTALL_PREFIX)/etc $(STAGING_INSTALL_PREFIX)/tmp
 	mkdir --parents $(STAGING_INSTALL_PREFIX_VAR)
-	echo "No files package" > $(STAGING_INSTALL_PREFIX_VAR)/README
+	echo "No files package" > $(STAGING_INSTALL_PREFIX)/README.target
+	echo "No files package" > $(STAGING_INSTALL_PREFIX)/bin/README.bin
+	echo "No files package" > $(STAGING_INSTALL_PREFIX)/etc/README.etc
+	echo "No files package" > $(STAGING_INSTALL_PREFIX)/tmp/README.tmp
+	echo "No files package" > $(STAGING_INSTALL_PREFIX_VAR)/README.var
