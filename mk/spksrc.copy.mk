@@ -51,7 +51,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	  tar xpf - -C $(STAGING_SPKVAR)
 else
 	# Copy target to staging
-	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
+	(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
 endif
 
