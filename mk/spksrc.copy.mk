@@ -37,20 +37,22 @@ endif
 
 copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
-	@rm -fr $(STAGING_DIR)
-	@mkdir -p $(STAGING_DIR) $(STAGING_SPKVAR)
 
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	# Copy target to staging, discard var directory
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2 | grep -v ^var`) | \
+	  tar xpf - -C $(STAGING_DIR)
+	# Copy var to STAGING_SPKVAR (_var)
+	(mkdir -p $(STAGING_SPKVAR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
+	  tar xpf - -C $(STAGING_SPKVAR)
+else
 	# Copy target to staging
 	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
-	# Copy non-target to STAGING_SPK* if directory exists
-	@if [ -d $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) ] ; then \
-	  (cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && find . -mindepth 1 -maxdepth 1 | tar cpf - --files-from=/dev/stdin) | \
-	    tar xpf - -C $(STAGING_SPKVAR) ; \
-	fi
+endif
 
 post_copy_target: $(COPY_TARGET)
 
