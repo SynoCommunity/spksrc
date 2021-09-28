@@ -37,13 +37,14 @@ endif
 
 copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
+	@rm -fr $(STAGING_DIR)
 
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	# Copy target to staging, discard var directory
-	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2 | grep -v ^var`) | \
+	(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2 | grep -v ^var`) | \
 	  tar xpf - -C $(STAGING_DIR)
 	# Copy var to STAGING_SPKVAR (_var)
 	(mkdir -p $(STAGING_SPKVAR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
