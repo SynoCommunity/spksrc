@@ -227,7 +227,7 @@ ifneq ($(strip $(SPK_CONFLICT)),)
 	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
 endif
 	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\" >> $@
-ifeq ($(call version_le, ${TC_OS_MIN_VER}, 5.2),1)
+ifeq ($(call version_le, ${TCVERSION}, 5.2),1)
 # In DSM 5.2 or older, the size based on byte units.
 	@echo extractsize=\"`du -sb "$(STAGING_DIR)" | awk '{print $1}'`\" >> $@
 else
