@@ -43,15 +43,17 @@ pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	# Copy target to staging, discard var directory
-	(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2 | grep -v ^var`) | \
+	@$(MSG) Copy target to staging, discard var directory [DSM7]
+	@(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | sed -e '/^.*:var\/.*/d' -e 's/^.*://g'`) | \
 	  tar xpf - -C $(STAGING_DIR)
-	# Copy var to STAGING_SPKVAR (_var)
-	(mkdir -p $(STAGING_SPKVAR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
-	  tar xpf - -C $(STAGING_SPKVAR)
+	@$(MSG) Copy var to STAGING_SPKVAR
+	@if [ "`cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`" ] ; then \
+	  (mkdir -p $(STAGING_SPKVAR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
+	  tar xpf - -C $(STAGING_SPKVAR) ; \
+	fi
 else
-	# Copy target to staging
-	(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
+	@$(MSG) Copy target to staging [DSM6]
+	@(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
 endif
 
