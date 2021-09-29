@@ -16,6 +16,7 @@ CHANGELOG = "1. Update to 2015.5.11<br/>2. Fix salt-api<br/>3. Update dependenci
 HOMEPAGE   = https://www.saltstack.com/
 LICENSE    = Apache v2
 
+SERVICE_USER     = auto
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
 FWPORTS          = src/${SPK_NAME}.sc
