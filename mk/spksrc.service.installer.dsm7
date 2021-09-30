@@ -201,9 +201,9 @@ preupgrade ()
     # dsm6 -> dsm7
     # Copy first to temporary directory is upgrading from DSM6 -> DSM7
     # Then migrate data once to permanent storage at postupgrade
-    if [ -d ${SYNOPKG_PKGDEST}/var -a ! "$(ls -A ${SYNOPKG_PKGVAR})" ]; then
-        echo "$RSYNC --ignore-existing ${SYNOPKG_PKGDEST}/var/ ${TMP_DIR}" | install_log
-        $RSYNC --ignore-existing ${SYNOPKG_PKGDEST}/var/ ${TMP_DIR} 2>&1 | install_log && chk=$?
+    if [ -d ${SYNOPKG_PKGDEST}/var -a "$(ls -A ${SYNOPKG_PKGDEST}/var 2>/dev/null)" ]; then
+        echo "$RSYNC ${SYNOPKG_PKGDEST}/var/ ${TMP_DIR}" | install_log
+        $RSYNC ${SYNOPKG_PKGDEST}/var/ ${TMP_DIR} 2>&1 | install_log && chk=$?
         [ "${chk}" = "0" ] && rm -fr ${SYNOPKG_PKGDEST}/var || true
     fi
 
@@ -220,9 +220,9 @@ postupgrade ()
 
     # dsm6 -> dsm7
     # Migrate data once to permanent storage at postupgrade
-    if [ -d ${TMP_DIR} -a ! "$(ls -A ${TMP_DIR})" ]; then
-        echo "$RSYNC --ignore-existing ${TMP_DIR} ${SYNOPKG_PKGVAR}" | install_log
-        $RSYNC --ignore-existing ${TMP_DIR} ${SYNOPKG_PKGVAR} 2>&1 | install_log && chk=$?
+    if [ -d ${TMP_DIR} -a "$(ls -A ${TMP_DIR} 2>/dev/null)" ]; then
+        echo "$RSYNC --backup --suffix=.new ${TMP_DIR}/ ${SYNOPKG_PKGVAR}" | install_log
+        $RSYNC --backup --suffix=.new ${TMP_DIR}/ ${SYNOPKG_PKGVAR} 2>&1 | install_log && chk=$?
         [ "${chk}" = "0" ] && rm -fr ${TMP_DIR} || true
     fi
 
