@@ -22,4 +22,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: squidclamav_post_install
 squidclamav_post_install:
-	@$(RUN) sed -i 's?^clamd_local .*?clamd_local $(INSTALL_PREFIX)/var/run/clamd/clamd.ctl?' $(STAGING_INSTALL_PREFIX)/etc/squidclamav.conf
+	@$(RUN) sed -i 's?^clamd_local .*?clamd_local $(INSTALL_PREFIX_VAR)/run/clamd/clamd.ctl?' $(STAGING_INSTALL_PREFIX)/etc/squidclamav.conf
