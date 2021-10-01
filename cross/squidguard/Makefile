@@ -24,8 +24,8 @@ include ../../mk/spksrc.cross-cc.mk
 CONFIGURE_ARGS = --with-db=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-sg-config=$(INSTALL_PREFIX)/etc/squidguard.conf
-CONFIGURE_ARGS += --with-sg-dbhome=$(INSTALL_PREFIX_VAR)/var/db
-CONFIGURE_ARGS += --with-sg-logdir=$(INSTALL_PREFIX_VAR)/var/logs
+CONFIGURE_ARGS += --with-sg-dbhome=$(INSTALL_PREFIX_VAR)/db
+CONFIGURE_ARGS += --with-sg-logdir=$(INSTALL_PREFIX_VAR)/logs
 CONFIGURE_ARGS += --with-squiduser=$(USER)
 CONFIGURE_ARGS += -with-mysql=no
 CONFIGURE_ARGS += --with-ldap-inc=no
