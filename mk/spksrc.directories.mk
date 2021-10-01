@@ -51,11 +51,11 @@ STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif
 
 #
-# When building packages set var directory
-# under target/../var to be consequent
-# new directory structure.  But only do so
-# when building under spk/* and not under
-# cross/* as unecessary.
+# When building spk packages set var directory under
+# target/../var to be consequent with the new directory
+# structure using localstatedir flag.  But only do so
+# when invoking make from under spk/*.  Setting var when
+# test-building dependencies from under cross/* is unecessary.
 #
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifeq ($(lastword $(subst /, ,$(INSTALL_PREFIX))),target)
