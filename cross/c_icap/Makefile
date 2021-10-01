@@ -26,6 +26,6 @@ c_icap_pre_configure:
 
 .PHONY: c_icap_post_install
 c_icap_post_install:
-	@$(RUN) sed -i 's?^PidFile .*?PidFile $(INSTALL_PREFIX)/var/run/c-icap/c-icap.pid?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
-	@$(RUN) sed -i 's?^CommandsSocket .*?CommandsSocket $(INSTALL_PREFIX)/var/run/c-icap/c-icap.ctl?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
+	@$(RUN) sed -i 's?^PidFile .*?PidFile $(INSTALL_PREFIX_VAR)/run/c-icap/c-icap.pid?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
+	@$(RUN) sed -i 's?^CommandsSocket .*?CommandsSocket $(INSTALL_PREFIX_VAR)/run/c-icap/c-icap.ctl?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
 	@$(RUN) sed -i 's?^Port .*?Port 10344?' $(STAGING_INSTALL_PREFIX)/etc/c-icap.conf
