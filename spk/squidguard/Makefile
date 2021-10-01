@@ -48,6 +48,7 @@ xz-compress:
 	install -m 755 -d $(STAGING_SPKVAR)/db
 	install -m 755 src/update_db.sh $(STAGING_DIR)/bin/
 	install -m 755 src/etc/* $(STAGING_DIR)/etc/
+	@$(RUN) sed -i 's?_INSTALL_PREFIX_VAR_?$(INSTALL_PREFIX_VAR)?' $(STAGING_DIR)/etc/*.conf $(STAGING_DIR)/etc/*.tpl
 	install -m 644 src/app/config $(STAGING_SPKVAR)/www/squidguardmgr/
 	install -m 755 src/app/squidGuard.cgi $(STAGING_SPKVAR)/www/squidguardmgr/
 	install -m 644 src/app/babel.* $(STAGING_SPKVAR)/www/squidguardmgr/
