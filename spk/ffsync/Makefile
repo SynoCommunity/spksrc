@@ -5,7 +5,7 @@ SPK_ICON = src/ffsync.png
 BETA = 1
 
 BUILD_DEPENDS = cross/python2 cross/setuptools_py2 cross/pip_py2 cross/wheel
-BUILD_DEPENDS += cross/gevent cross/greenlet
+BUILD_DEPENDS += cross/gevent cross/greenlet cross/cffi
 
 DEPENDS     = cross/busybox
 WHEELS      = src/requirements.txt
