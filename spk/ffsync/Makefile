@@ -27,8 +27,6 @@ CONF_DIR         = src/conf/
 INSTALL_DEP_SERVICES = mysql
 START_DEP_SERVICES = mysql
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
 POST_STRIP_TARGET = ffsync_extra_install
 
 BUSYBOX_CONFIG  = usermng
