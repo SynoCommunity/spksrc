@@ -22,6 +22,7 @@ CONF_DIR = src/conf/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
+SYSTEM_GROUP	 = http
 
 INSTALL_DEP_SERVICES = apache-web mysql
 START_DEP_SERVICES = apache-web mysql
