@@ -3,7 +3,7 @@ PKG_VERS = 36e174750e
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
 PKG_GIT_HASH = 36e174750ee61e1a7856e9459e2d91deb4f8f93f
-PKG_DIST_SITE = https://github.com/smaarn/tt-rss.git
+PKG_DIST_SITE = https://git.tt-rss.org/fox/tt-rss.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
 
