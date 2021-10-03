@@ -1,6 +1,6 @@
 SPK_NAME = bazarr
 
-SPK_VERS = 0.9.6
+SPK_VERS = 0.9.9
 SPK_REV = 1
 
 SPK_ICON = src/bazarr.png
