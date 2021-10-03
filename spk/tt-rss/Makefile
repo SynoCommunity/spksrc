@@ -44,6 +44,7 @@ SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10"
 
 include ../../mk/spksrc.spk.mk
 
+
 $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini: 
 	@$(MSG) Generating $@
 	$(create_target_dir)
@@ -55,7 +56,12 @@ tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
 	install -m 755 -d $(STAGING_DIR)/var/logs
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
 	install -m 755 src/bin/tt-rss-daemon $(STAGING_DIR)/bin/tt-rss-daemon
-	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
 	install -m 755 src/bin/virtual-php $(STAGING_DIR)/bin/virtual-php
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	install -m 644 src/bin.dsm7/settings.sh $(STAGING_DIR)/bin/settings.sh
+	install -m 755 src/bin.dsm7/update-schema $(STAGING_DIR)/bin/update-schema
+else
+	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
+	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
+endif

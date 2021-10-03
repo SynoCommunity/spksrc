@@ -29,5 +29,40 @@
     },
     "drop-db-uninst": true,
     "drop-user-uninst": true
+  },
+  "webservice": {
+    "services": [{
+      "service": "apache_php",
+      "display_name": "tt-rss",
+      "backend": 1,
+      "php": {
+        "profile_name": "tt-rss",
+        "profile_desc": "PHP profile used by tt-rss",
+        "backend": 6,
+        "extensions": [
+          "curl",
+          "gd",
+          "intl",
+          "mysqli",
+          "pdo_mysql"
+        ],
+        "user": "tt-rss",
+        "group": "http"
+      }
+    }],
+    "portals": [],
+    "migrate": {
+      "root": [{
+        "old": "tt-rss",
+        "new": "tt-rss"
+      }]
+    },
+    "pkg_dir_prepare": [{
+      "source": "/var/packages/tt-rss/target/share/tt-rss/",
+      "target": "tt-rss",
+      "mode": "0755",
+      "user": "tt-rss",
+      "group": "http"
+    }]
   }
 }
