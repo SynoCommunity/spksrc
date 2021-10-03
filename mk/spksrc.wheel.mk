@@ -79,7 +79,9 @@ post_wheel_target: $(WHEEL_TARGET)
 	@if [ -d "$(WORK_DIR)/wheelhouse" ] ; then \
 		mkdir -p $(STAGING_INSTALL_PREFIX)/share/wheelhouse ; \
 		cd $(WORK_DIR)/wheelhouse ; \
-		cp requirements.txt $(STAGING_INSTALL_PREFIX)/share/wheelhouse/ ; \
+		if [ -f requirements.txt ]; then \
+			cp requirements.txt $(STAGING_INSTALL_PREFIX)/share/wheelhouse/ ; \
+		fi; \
 		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
 			echo "Pure python wheels are excluded from the package wheelhouse." ; \
 			for w in *.whl; do \
