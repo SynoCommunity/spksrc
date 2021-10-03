@@ -5,7 +5,7 @@ PACKAGE="tt-rss"
 
 # Others
 LINK_DIR="/usr/local/${PACKAGE}"
-LOGS_DIR="${SYNOPKG_PKGDEST}/var/logs"
+LOGS_DIR="${SYNOPKG_PKGVAR}/logs"
 WEB_DIR="/var/services/web"
 TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
 
