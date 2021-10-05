@@ -4,10 +4,10 @@ GIT="${GIT_DIR}/git"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${GIT_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 VIRTUALENV="${PYTHON_DIR}/virtualenv"
-LAZYLIBRARIAN="${SYNOPKG_PKGDEST}/var/LazyLibrarian/LazyLibrarian.py"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
+LAZYLIBRARIAN="${SYNOPKG_PKGVAR}/LazyLibrarian/LazyLibrarian.py"
+CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 
-SERVICE_COMMAND="${PYTHON} ${LAZYLIBRARIAN} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
+SERVICE_COMMAND="${PYTHON} ${LAZYLIBRARIAN} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGVAR}/"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
@@ -29,7 +29,7 @@ service_postinst ()
     # Clone the repository for new installs or upgrades
     # Upgrades from the old package had the repo in /share/
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] || [ ! -d "${TMP_DIR}/LazyLibrarian" ]; then
-        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/DobyTang/LazyLibrarian.git} ${SYNOPKG_PKGDEST}/var/LazyLibrarian
+        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/DobyTang/LazyLibrarian.git} ${SYNOPKG_PKGVAR}/LazyLibrarian
     fi
 
     # If nessecary, add user also to the old group

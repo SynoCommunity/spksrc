@@ -2,7 +2,7 @@ VIRTUALENV="/var/packages/python/target/bin/virtualenv"
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 
 GROUP="sc-download"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/pyload.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/pyload.conf"
 PYLOAD="${SYNOPKG_PKGDEST}/env/bin/python ${SYNOPKG_PKGDEST}/share/pyload/pyLoadCore.py"
 DOWNLOAD_DIR="${wizard_download_dir:=/volume1/downloads}"
 
@@ -74,12 +74,12 @@ service_postinst ()
         SALTED_PW_HASH=${SALT}$(echo -n "${SALT}${wizard_password}" | openssl dgst -sha1 2>/dev/null | cut -d" " -f2)
 
         # init DB & add 'admin' user
-        echo -n "4" > "${SYNOPKG_PKGDEST}/var/files.version"
-        sqlite3 "${SYNOPKG_PKGDEST}/var/files.db" < "${SYNOPKG_PKGDEST}/var/pyload_init.sql" || exit 1
-        sqlite3 "${SYNOPKG_PKGDEST}/var/files.db" "INSERT INTO users (name, password) VALUES ('admin', '${SALTED_PW_HASH}')" || exit 1
+        echo -n "4" > "${SYNOPKG_PKGVAR}/files.version"
+        sqlite3 "${SYNOPKG_PKGVAR}/files.db" < "${SYNOPKG_PKGVAR}/pyload_init.sql" || exit 1
+        sqlite3 "${SYNOPKG_PKGVAR}/files.db" "INSERT INTO users (name, password) VALUES ('admin', '${SALTED_PW_HASH}')" || exit 1
 
         # Adjust ownership of installed files
-        chown -R ${EFF_USER}:${GROUP} ${SYNOPKG_PKGDEST}/var
+        chown -R ${EFF_USER}:${GROUP} ${SYNOPKG_PKGVAR}
     fi
 
     exit 0

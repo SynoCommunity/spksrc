@@ -70,7 +70,7 @@ service_postinst ()
 
         # Update to match our paths
         sed -i -e "s|ScriptDir=.*$|ScriptDir=${SYNOPKG_PKGDEST}/share/nzbget/scripts|g" \
-               -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGDEST}/var/nzbget.log|g" \
+               -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGVAR}/nzbget.log|g" \
                -e "s|ConfigTemplate=.*$|ConfigTemplate=${TEMPLATE_CFG_FILE}|g" \
                ${CFG_FILE}
     fi
