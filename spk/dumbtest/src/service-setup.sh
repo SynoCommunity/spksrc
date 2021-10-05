@@ -4,8 +4,8 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH
 HOME="${SYNOPKG_PKGVAR}"
 VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
-SC_INSTALL_DIR="${SYNOPKG_PKGDEST}/share/SickChill"
-SC_BINARY="${SC_INSTALL_DIR}/SickChill.py"
+SC_INSTALL_DIR="${SYNOPKG_PKGDEST}/share/dumbtest"
+SC_BINARY="${SC_INSTALL_DIR}/dumbtest.py"
 SC_DATA_DIR="${SYNOPKG_PKGVAR}/var/data"
 SC_CFG_FILE="${SC_DATA_DIR}/config.ini"
 
