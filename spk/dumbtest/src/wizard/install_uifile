@@ -1,0 +1,27 @@
+[{
+    "step_title": "Setup credentials (You can edit these after install in the application settings)",
+    "items": [{
+        "type": "textfield",
+        "desc": "HTTP username (set blank for no login)",
+        "subitems": [{
+            "key": "wizard_username",
+            "desc": "User name",
+            "validator": {
+                "allowBlank": true
+            }
+        }]
+    },{
+        "type": "password",
+        "desc": "HTTP password (blank = no authentication)",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": true
+            }
+        }]
+    },
+    {
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }]
+}]
