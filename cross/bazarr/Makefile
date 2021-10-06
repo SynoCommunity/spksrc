@@ -18,6 +18,7 @@ DEPENDS += cross/webrtcvad
 DEPENDS += cross/gevent
 DEPENDS += cross/gevent-websocket
 DEPENDS += cross/greenlet
+DEPENDS += cross/zope.event
 
 HOMEPAGE = https://www.bazarr.media
 LICENSE = GPLv3
