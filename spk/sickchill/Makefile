@@ -1,11 +1,12 @@
 SPK_NAME = sickchill
-SPK_VERS = 20210729
-SPK_REV = 2
+SPK_VERS = 20210329
+SPK_REV = 16
 SPK_ICON = src/sickchill.png
 
-DEPENDS = cross/$(SPK_NAME)
+BUILD_DEPENDS = cross/python38 cross/poetry
+# cross/cffi cross/setuptools cross/pip cross/wheel cross/cryptography
+DEPENDS = cross/cryptography cross/PyNaCl cross/lxml cross/$(SPK_NAME)
 SPK_DEPENDS = "python38:git"
-PIP=pip3
 
 WHEELS = src/requirements.txt
 
@@ -17,7 +18,7 @@ DISPLAY_NAME = SickChill
 CHANGELOG = "Initial SickChill env fix and move to Python 3.8"
 
 HOMEPAGE   = https://sickchill.github.io/
-LICENSE    = GPL
+LICENSE    = GPLv3+
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -30,9 +31,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = sickchill_extra_install
-
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
