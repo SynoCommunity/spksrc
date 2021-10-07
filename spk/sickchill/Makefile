@@ -1,21 +1,20 @@
 SPK_NAME = sickchill
-SPK_VERS = 20210329
-SPK_REV = 16
+SPK_VERS = 20210729
+SPK_REV = 17
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python38 cross/poetry
-# cross/cffi cross/setuptools cross/pip cross/wheel cross/cryptography
-DEPENDS = cross/cryptography cross/PyNaCl cross/lxml cross/$(SPK_NAME)
-SPK_DEPENDS = "python38:git"
+BUILD_DEPENDS = cross/python38 cross/poetry cross/lxml cross/cryptography cross/PyNaCl
+# cross/cffi cross/setuptools cross/pip cross/wheel cross/cryptography to DEPENDS cross/lxml
+DEPENDS =cross/$(SPK_NAME)
+SPK_DEPENDS = "python38"
 
 WHEELS = src/requirements.txt
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
-DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Initial SickChill env fix and move to Python 3.8"
+CHANGELOG = "Initial SickChill env fix and move to Python 3.8 without git"
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+

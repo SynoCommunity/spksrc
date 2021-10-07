@@ -6,7 +6,7 @@ VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SC_INSTALL_DIR="${SYNOPKG_PKGDEST}/share/SickChill"
 SC_BINARY="${SC_INSTALL_DIR}/SickChill.py"
-SC_DATA_DIR="${SYNOPKG_PKGVAR}/var/data"
+SC_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 SC_CFG_FILE="${SC_DATA_DIR}/config.ini"
 
 
