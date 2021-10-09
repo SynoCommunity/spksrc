@@ -1,5 +1,5 @@
 PKG_NAME = python38
-PKG_VERS = 3.8.11
+PKG_VERS = 3.8.12
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -23,11 +23,13 @@ CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loa
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
-POST_PATCH_TARGET = python38_post_patch
+POST_PATCH_TARGET    = python38_post_patch
 PRE_CONFIGURE_TARGET = python38_pre_configure
-COMPILE_TARGET = python38_compile
-INSTALL_TARGET = python38_install
-POST_INSTALL_TARGET = python38_post_install
+COMPILE_TARGET       = python38_compile
+INSTALL_TARGET       = python38_install
+POST_INSTALL_TARGET  = python38_post_install
+
+PIP_WHEEL_ARGS_EXTRA = --use-deprecated=legacy-resolver
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -84,10 +86,11 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | build-python
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py -O - | python
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==44.1.0"  "wheel==0.36.2" "cffi==1.14.5"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==44.1.0" "wheel==0.36.2" "cffi==1.14.5"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.2.4"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.2.4"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools>=58.2.0"  "wheel>=0.37.0" "cffi>=1.14.6"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools>=58.2.0"  "wheel>=0.37.0" "cffi>=1.14.6"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
