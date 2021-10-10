@@ -13,4 +13,7 @@ LICENSE  = GPLv2/LGPLv2
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --enable-libgdbm-compat
+
 include ../../mk/spksrc.cross-cc.mk
