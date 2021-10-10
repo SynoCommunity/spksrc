@@ -11,8 +11,6 @@ BUILD_DEPENDS = native/$(PKG_NAME)
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for uuid module
 DEPENDS += cross/libuuid
-# libffi is no longer bundled with python
-DEPENDS += cross/libffi
 
 HOMEPAGE = https://www.python.org/
 COMMENT  = Python Programming Language
@@ -40,6 +38,10 @@ CONFIGURE_ARGS += --with-dbmliborder=gdbm:ndbm:bdb
 
 DEPENDS += cross/expat
 CONFIGURE_ARGS += --with-system-expat
+
+# libffi is no longer bundled with python
+DEPENDS += cross/libffi
+CONFIGURE_ARGS += --with-system-ffi
 
 include ../../mk/spksrc.archs.mk
 
