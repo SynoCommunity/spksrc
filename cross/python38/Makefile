@@ -8,7 +8,7 @@ PKG_DIR = Python-$(PKG_VERS)
 
 BUILD_DEPENDS = native/$(PKG_NAME)
 
-DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
+DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for uuid module
 DEPENDS += cross/libuuid
 # libffi is no longer bundled with python
@@ -19,8 +19,35 @@ COMMENT  = Python Programming Language
 LICENSE  = PSF
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-shared --enable-ipv6 --without-ensurepip --enable-loadable-sqlite-extensions
-CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes
+
+CONFIGURE_ARGS  = --enable-shared
+CONFIGURE_ARGS += --enable-ipv6
+CONFIGURE_ARGS += --without-ensurepip
+CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
+CONFIGURE_ARGS += --with-computed-gotos=yes
+CONFIGURE_ARGS += --enable-optimizations
+
+CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
+CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
+CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
+CONFIGURE_ARGS += ac_cv_have_long_long_format=yes
+
+DEPENDS += cross/openssl
+CONFIGURE_ARGS += --with-ssl-default-suites=openssl
+
+DEPENDS += cross/gdbm
+CONFIGURE_ARGS += --with-dbmliborder=gdbm:ndbm:bdb
+
+DEPENDS += cross/expat
+CONFIGURE_ARGS += --with-system-expat
+
+include ../../mk/spksrc.archs.mk
+
+# Enable Link-Time Optimization
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --with-lto
+endif
+
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
 POST_PATCH_TARGET    = python38_post_patch
