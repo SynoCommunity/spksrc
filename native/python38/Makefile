@@ -27,7 +27,7 @@ python38_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip, setuptools, cffi and cross env
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==21.2.4"
-	@$(PIP) install "setuptools>=58.2.0" "cffi>=1.14.6" "crossenv>=1.1.4"
+	@$(PIP) install "setuptools==58.2.0" "cffi==1.14.6" "crossenv>=1.1.4"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
