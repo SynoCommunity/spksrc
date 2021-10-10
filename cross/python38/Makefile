@@ -89,8 +89,8 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.2.4"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.2.4"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==56.0.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==56.0.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.2.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.2.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.14.6"
