@@ -1,11 +1,11 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/radarr.png
 
 REQUIRED_DSM = 5.0
 
-# .NET is not supported on PPC, ARM5 or x86
+# .NET is not supported on PPC, ARM5, ARM7L and x86
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
 
 DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
@@ -34,6 +34,9 @@ ADMIN_PORT = $(SERVICE_PORT)
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = radarr_extra_install
+
+# use alternate TMPDIR as /tmp might be too small.
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 

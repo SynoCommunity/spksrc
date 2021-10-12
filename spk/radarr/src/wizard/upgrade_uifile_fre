@@ -4,7 +4,7 @@
         "desc": "Garder Radarr à jour en utilisant System>Updates dans l'interface Radarr."
     }]
 },{
-    "step_title": "Attention! Permissions DSM",
+    "step_title": "Permissions DSM",
     "items": [{
         "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM."
     },{
