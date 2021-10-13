@@ -58,8 +58,6 @@ COMPILE_TARGET       = python38_compile
 INSTALL_TARGET       = python38_install
 POST_INSTALL_TARGET  = python38_post_install
 
-PIP_WHEEL_ARGS_EXTRA = --use-deprecated=legacy-resolver
-
 include ../../mk/spksrc.cross-cc.mk
 
 HOST_ARCH = $(shell uname -m)
