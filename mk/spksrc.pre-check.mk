@@ -1,5 +1,12 @@
 # Common requirement checks
 
+ifneq ($(wildcard BROKEN),)
+  ifneq ($(BUILD_UNSUPPORTED_FILE),)
+    $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): Broken package >> $(BUILD_UNSUPPORTED_FILE))
+  endif
+  @$(error $(NAME): Broken package)
+endif
+
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
   ifneq ($(strip $(INSTALLER_SCRIPT)),)
     ifneq ($(BUILD_UNSUPPORTED_FILE),)
