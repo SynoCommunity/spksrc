@@ -47,6 +47,82 @@ docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 
+### LXC
+A container based on 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your `lxd` environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC knowledge :
+1. Create a new container (will use x864_64/amd64 arch by default): `lxc launch images:debian/10 spksrc`
+2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
+3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
+4. Install all required packages:
+```
+lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake bc bison build-essential check \
+                                cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf \
+                                imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev \
+                                libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev \
+                                libtool libunistring-dev lzip mercurial ncurses-dev ninja-buld php pkg-config \
+                                python3 python3-distutils rename scons subversion swig texinfo unzip \
+                                xmlto zlib1g-dev
+```
+5. Install `python2` wheels:
+```
+lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python2"
+lxc exec spksrc -- /bin/bash -c "pip2 install virtualenv httpie"
+```
+6. Install `python3` wheels:
+```
+lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python3"
+lxc exec spksrc -- /bin/bash -c "pip3 install virtualenv httpie"
+```
+7. Install `meson` (requires `autoconf-archive`):
+```lxc exec $image -- /bin/bash -c "pip3 install meson==0.56.0"```
+8. (OPTIONAL) Install misc base tools:
+```
+lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrem rsync tree time
+lxc exec spksrc -- /usr/bin/updatedb
+```
+
+#### LXC: Shared `spksrc` user (OPTIONAL)
+You can create a shared user between your Ubuntu and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already create a user `spksrc` with uid 1001 in your Ubuntu environment and that you which to share its `/home` userspace.
+1. Create the `spksrc` user: `lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc`
+2. Create a mapping rule between the hosts and the LXC image:
+```
+lxc config set spksrc raw.idmap "both 1001 1001"
+lxc restart spksrc
+Remapping container filesystem
+```
+3. Add `/home/spksrc` from the hsot to the LXC container:
+```
+lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
+Device home added to spksrc-debian10
+```
+4. Connect as `spksrc` user:
+```
+lxc exec spksrc -- su --login spksrc
+spksrc@spksrc:~$
+```
+5. Set a defualt shell environment:
+```
+lxc exec spksrc -- su --login spksrc
+spksrc@spksrc:~$ cp /etc/skel/.profile /etc/skel/.bashrc .
+```
+#### LXC: Proxy (OPTIONAL)
+The following assume you have a running proxy on your LAN setup at IP 192.168.1.1 listening on port 3128 that will allow caching files.
+1. Enforce using a proxy:
+```
+lxc config set spksrc environment.http_proxy http://192.168.1.1:3128
+lxc config set spksrc environment.https_proxy http://192.168.1.1:3128
+```
+2. Enforce using a proxy with `wget` in the spksrc container user account:
+```
+lxc exec spksrc -- su --login spksrc
+spksrc@spksrc:~$ cat << EOF > $HOME/.wgetrc
+use_proxy = on
+http_proxy = http://192.168.80.10:3128/
+https_proxy = http://192.168.80.10:3128/
+ftp_proxy = http://192.168.80.10:3128/
+EOF
+```
+
+
 ### Virtual machine
 A virtual machine based on an 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.
 
