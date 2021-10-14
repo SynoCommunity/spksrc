@@ -16,8 +16,6 @@ LICENSE  = Apache 2.0
 NATIVE_ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 ENV = PATH=$$PATH:$(NATIVE_ERLANG_BIN_DIR)
 
-GNU_CONFIGURE = 1
-
 INSTALL_TARGET = erlang_install
 
 CONFIGURE_ARGS  = --without-javac
@@ -28,6 +26,22 @@ CONFIGURE_ARGS += --enable-dynamic-ssl-lib
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
 CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
+
+
+include ../../mk/spksrc.archs.mk
+# custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
+CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
+
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+# force cross compilation for i686 to avoid the following error:
+# We are cross compiling since the '--host=i686-pc-linux-gnu' and the '--build=i686-pc-linux' arguments differ.
+# When cross compiling Erlang/OTP also the canonicalized values of the '--build' and the '--host' arguments *must* differ.
+# The canonicalized values of these arguments however both equals: i686-pc-linux-gnu
+CONFIGURE_ARGS += --build=x86_64-pc-linux
+else
+CONFIGURE_ARGS += --build=i686-pc-linux
+endif
+
 
 include ../../mk/spksrc.cross-cc.mk
 
