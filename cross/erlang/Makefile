@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 23.3.4.1
+PKG_VERS = 24.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -33,4 +33,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: erlang_install
 erlang_install:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
