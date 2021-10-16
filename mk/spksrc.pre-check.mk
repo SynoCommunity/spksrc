@@ -10,7 +10,7 @@ endif
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
   ifneq ($(strip $(INSTALLER_SCRIPT)),)
     ifneq ($(BUILD_UNSUPPORTED_FILE),)
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used whith DSM7+ >> $(BUILD_UNSUPPORTED_FILE))
+      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used with DSM7+ >> $(BUILD_UNSUPPORTED_FILE))
     endif
     @$(error INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used for DSM7+ packages)
   endif
