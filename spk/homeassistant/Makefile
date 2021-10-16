@@ -6,7 +6,6 @@ SPK_ICON = src/${SPK_NAME}.png
 SPK_DEPENDS = "python38"
 
 BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/poetry
 
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex
 DEPENDS += cross/pillow

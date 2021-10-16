@@ -7,7 +7,7 @@ aniso8601==9.0.1
 APScheduler==3.7.0
 attrs==20.3.0
 babelfish==0.5.5
-beautifulsoup4==4.9.3
+beautifulsoup4==4.10.0
 Brotli==1.0.9
 certifi==2020.12.5
 chardet==4.0.0

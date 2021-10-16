@@ -1,7 +1,7 @@
 SPK_NAME = python38
-SPK_VERS = 3.8.11
+SPK_VERS = 3.8.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -20,7 +20,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.8
-CHANGELOG = "1. Update to Python 3.8.11.<br/>2. Update OpenSSL to v1.1.1l"
+CHANGELOG = "1. Update to Python 3.8.12<br/>2. Update OpenSSL to v1.1.1l<br/>3. Update included wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

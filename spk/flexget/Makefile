@@ -1,6 +1,6 @@
 SPK_NAME = flexget
 SPK_VERS = 3.1.129
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
