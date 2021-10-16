@@ -17,15 +17,15 @@ service_postinst ()
 {
 
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG} 2>&1
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install the wheels (using virtual env through PATH)
     ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall \
         -f ${SYNOPKG_PKGDEST}/share/wheelhouse \
-        ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
+        ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
 
-    mkdir -p "${SYNOPKG_PKGVAR}/data"  >> "${INST_LOG}" 2>&1
+    mkdir -p "${SYNOPKG_PKGVAR}/data"
     
-    set_unix_permissions "${SYNOPKG_PKGVAR}/data" >> "${INST_LOG}" 2>&1
+    set_unix_permissions "${SYNOPKG_PKGVAR}/data"
 
 }
