@@ -1,7 +1,0 @@
-{
-  "defaults": {
-    "run-as": "package"
-  },
-  "username": "tt-rss",
-  "groupname": "http"
-}

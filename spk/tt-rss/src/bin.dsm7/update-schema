@@ -3,10 +3,4 @@
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 source ${SCRIPT_DIR}/settings.sh
 
-if [ "$(whoami)" == "root" ]
-then
-  # tt rss should always be running as tt-rss user
-  sudo -u tt-rss "${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema=force-yes
-else
-  "${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema=force-yes
-fi
+"${SCRIPT_DIR}/virtual-php" "${WEB_DIR}/${PACKAGE}/update.php" --update-schema=force-yes
