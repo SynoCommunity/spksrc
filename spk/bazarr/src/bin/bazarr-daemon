@@ -1,12 +1,13 @@
 #!/bin/bash
 
 PACKAGE=bazarr
+BAZARR_DIR="/var/packages/${PACKAGE}"
+INSTALL_DIR="${BAZARR_DIR}/target"
 
-INSTALL_DIR="/var/packages/${PACKAGE}/target"
+source "${INSTALL_DIR}/bin/settings"
+
 FFMPEG_DIR="/usr/local/ffmpeg"
 export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${FFMPEG_DIR}/bin:${PATH}"
-VAR_DIR="${INSTALL_DIR}/var"
-
 
 export LC_ALL=en_US.utf8
 export LANG=en_US.utf8

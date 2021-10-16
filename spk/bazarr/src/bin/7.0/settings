@@ -1,0 +1,3 @@
+#!/bin/bash
+
+VAR_DIR="${BAZARR_DIR}/var"

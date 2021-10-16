@@ -40,3 +40,8 @@ include ../../mk/spksrc.spk.mk
 bazarr_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/bazarr-daemon $(STAGING_DIR)/bin/bazarr-daemon
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	install -m 755 src/bin/7.0/settings $(STAGING_DIR)/bin/settings
+else
+	install -m 755 src/bin/settings $(STAGING_DIR)/bin/settings
+endif
