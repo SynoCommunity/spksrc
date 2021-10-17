@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = eb59284
-SPK_GIT_DATE = 20210612
+SPK_GIT_HASH = 1ee9c5b
+SPK_GIT_DATE = 20211016
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 29
+SPK_REV = 30
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -22,7 +22,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version eb59284 as of June 12th 2021<br/>2. Update openssl to 1.1<br/>3. Updated to use FFMPEG 4.3.2<br/>4. Updated libhdhomerun to version 20210224<br/>5. Update dtv-scan-tables"
+CHANGELOG = "1. Update to latest git version 1ee9c5b as of October 16th 2021<br/>2. Update openssl to 1.1l<br/>3. Updated libhdhomerun to version 20210624<br/>4. Fix 403 Forbidden after login"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -44,15 +44,13 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 # Admin link
 ADMIN_PORT = ${SERVICE_PORT}
 
-POST_STRIP_TARGET = tvheadend_extra_install
-
 # Reuse ffmpeg libraries
 # Requires to invoke: make [package|publish] ARCH= TCVERSION=
 export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 PRE_DEPEND_TARGET = tvheadend_pre_depend
-SPK_DEPENDS = "ffmpeg>4.1"
+SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg>4.3"
 endif
 
 include ../../mk/spksrc.spk.mk
@@ -75,10 +73,3 @@ tvheadend_pre_depend:
 	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
-
-tvheadend_extra_install:
-	install -p -m 700 -d $(STAGING_DIR)/var/accesscontrol
-	install -p -m 700 -d $(STAGING_DIR)/var/passwd
-	# The following filenames stem from an arbitrary (valid) combination created by TVH
-	install -m 640 src/accesscontrol.json $(STAGING_DIR)/var/accesscontrol/d80ccc09630261ffdcae1497a690acc8
-	install -m 640 src/passwd.json $(STAGING_DIR)/var/passwd/a927e30a755504f9784f23a4efac5109
