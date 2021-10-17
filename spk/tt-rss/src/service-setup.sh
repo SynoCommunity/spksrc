@@ -23,8 +23,6 @@ MYSQLDUMP="${MARIADB_10_BIN_DIRECTORY}/mysqldump"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 
-SERVICE_COMMAND="${INSTALL_DIR}/bin/tt-rss-daemon"
-
 service_postinst ()
 {
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then

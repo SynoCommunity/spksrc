@@ -21,6 +21,7 @@ WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
 
 SERVICE_SETUP = src/service-setup.sh
+SERVICE_COMMAND = ${INSTALL_DIR}/bin/tt-rss-daemon
 SYSTEM_GROUP	 = http
 
 INSTALL_DEP_SERVICES = apache-web mysql
