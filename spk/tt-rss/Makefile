@@ -31,6 +31,7 @@ POST_STRIP_TARGET = tt-rss_extra_install
 
 PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
 
+override ARCH=
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
