@@ -34,7 +34,6 @@ PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
-SYSTEM_GROUP = http
 INSTUNINST_RESTART_SERVICES = apache-web
 
 SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10"
