@@ -17,7 +17,7 @@ fi
 
 if [ -z "${LOGS_DIR}" ]
 then
-    LOGS_DIR="${INSTALL_DIR}/var/logs"
+    LOGS_DIR="/var/packages/${PACKAGE}/var/logs"
 fi
 
 if [ -z "${WEB_DIR}" ]
@@ -53,33 +53,7 @@ guess_php_profile_name()
 #   - guess_php_fpm_bin <profile_name>
 guess_php_fpm_bin()
 {
-    local profile_name
-    local profile_path
-    local fpm_configuration_file
-    local php_fpm
-    if [ $# -eq 0 ]
-    then
-        profile_name=$(guess_php_profile_name)
-    else
-        profile_name=$1
-    fi
-    profile_path="${WEB_STATION_HOME_DIR}/etc/php_profile/${profile_name}"
-    fpm_configuration_file="${profile_path}/fpm.conf"
-
-    if [ -f "${fpm_configuration_file}" ]
-    then
-        php_fpm=$(php -r 'print(parse_ini_file($argv[1], true)["global"]["syslog.ident"]);' "${fpm_configuration_file}" 2>>"${LOG_FILE}")
-        if [ $? -ne 0 ]
-        then
-            echo "Failed computing php fpm path." >>"${LOG_FILE}"
-            return 1
-        fi
-    else
-        echo "No fpm configuration file can be found under ${fpm_configuration_file}" >>"${LOG_FILE}"
-        return 1
-    fi
-
-    echo -n "${php_fpm}"
+    echo -n "/usr/local/bin/php73-fpm"
 }
 
 # Computes the PHP cli configuration file which should be used when running php code
@@ -119,31 +93,10 @@ guess_php_configuration_file()
 # Computes the command which should be run to execute php code
 # Examples:
 #   - guess_php
-#   - guess_php <profile_name>
 guess_php()
 {
-    local profile_name
-    local php_fpm
     local php
-    if [ $# -eq 0 ]
-    then
-        profile_name=$(guess_php_profile_name)
-        if [ $? -ne 0 ]
-        then
-            echo "Failed computing PHP profile name" >>"${LOG_FILE}"
-            return 1
-        fi
-    else
-        profile_name=$1
-    fi
 
-
-    php_fpm="$(guess_php_fpm_bin ${profile_name})"
-    if [ -z "${php_fpm}" ]
-    then
-        echo -n "php -c /etc/php/php.ini"
-    else
-        php="$(echo ${php_fpm} | sed 's/-fpm//g')"
-        echo -n "${php} -c $(guess_php_configuration_file ${php})"
-    fi
+    php="/usr/local/bin/php73"
+    echo -n "/usr/local/bin/php73 -c $(guess_php_configuration_file ${php})"
 }

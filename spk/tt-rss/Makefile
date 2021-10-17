@@ -60,8 +60,8 @@ tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
 	install -m 755 src/bin/tt-rss-daemon $(STAGING_DIR)/bin/tt-rss-daemon
 	install -m 755 src/bin/virtual-php $(STAGING_DIR)/bin/virtual-php
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	install -m 644 src/bin.dsm7/settings.sh $(STAGING_DIR)/bin/settings.sh
-	install -m 755 src/bin.dsm7/update-schema $(STAGING_DIR)/bin/update-schema
+	install -m 644 src/bin/7.0/settings.sh $(STAGING_DIR)/bin/settings.sh
+	install -m 755 src/bin/7.0/update-schema $(STAGING_DIR)/bin/update-schema
 else
 	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
 	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
