@@ -13,9 +13,11 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
-WHEELS = src/requirements.txt
+BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 SPK_DEPENDS = "python38"
+WHEELS = src/requirements.txt
+
+DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
 
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
@@ -30,7 +32,6 @@ LICENSE = GPL v3
 # https://tvheadend.org/issues/5060
 UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
 
-WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
 
 # 'auto' reserved value grabs SPK_NAME
