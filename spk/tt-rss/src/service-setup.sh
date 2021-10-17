@@ -137,7 +137,7 @@ service_postupgrade ()
     if [ "${SPK_REV}" -lt "14" ]
     then
       # Parse old configuration and save to new config format
-      sed -i -e "s|define('DB_TYPE', \(.*\));|putenv('TTRSS_DB_TYPE=\1');|" \
+      sed -i -e "s|define('DB_TYPE', '\(.*\)');|putenv('TTRSS_DB_TYPE=\1');|" \
         -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
         -e "s|define('DB_USER', '\(.*\)');|putenv('TTRSS_DB_USER=\1');|" \
         -e "s|define('DB_NAME', '\(.*\)');|putenv('TTRSS_DB_NAME=\1');|" \
