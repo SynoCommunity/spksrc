@@ -20,8 +20,7 @@ LICENSE    = GPL
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 SYSTEM_GROUP	 = http
 
 INSTALL_DEP_SERVICES = apache-web mysql
@@ -33,7 +32,6 @@ POST_STRIP_TARGET = tt-rss_extra_install
 
 PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
 
-SERVICE_SETUP = src/service-setup.sh
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_DSM = 6.0
