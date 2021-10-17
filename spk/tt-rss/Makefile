@@ -4,7 +4,7 @@ SPK_REV = 15
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/$(SPK_NAME)
+DEPENDS  = cross/$(SPK_NAME)
 
 MAINTAINER = moneytoo
 DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
