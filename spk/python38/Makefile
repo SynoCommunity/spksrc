@@ -5,7 +5,7 @@ SPK_REV = 5
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
-DEPENDS += cross/setuptools cross/pip cross/wheel
+DEPENDS += cross/setuptools cross/pip cross/wheel cross/platformdirs
 DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml

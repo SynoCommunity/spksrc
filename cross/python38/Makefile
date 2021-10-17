@@ -122,6 +122,8 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.14.6"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cffi==1.14.6"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "platformdirs==2.4.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "platformdirs==2.4.0"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
