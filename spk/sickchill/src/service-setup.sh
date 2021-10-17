@@ -1,12 +1,12 @@
 PYTHON_DIR="/var/packages/python38/target"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-HOME="${SYNOPKG_PKGDEST}/var"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+HOME="${SYNOPKG_PKGVAR}"
+VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SC_INSTALL_DIR="${SYNOPKG_PKGDEST}/share/SickChill"
 SC_BINARY="${SC_INSTALL_DIR}/SickChill.py"
-SC_DATA_DIR="${SYNOPKG_PKGDEST}/var/data"
+SC_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 SC_CFG_FILE="${SC_DATA_DIR}/config.ini"
 
 
@@ -44,18 +44,26 @@ service_postinst() {
     ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install the wheels
-    ${PIP} install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
-
+    # ${PIP} install -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
+    # ${PIP} install --extra-index-url https://wheel-index.linuxserver.io/ubuntu/ -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
+    # ${PIP} install --no-deps --no-index --upgrade --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    ${PIP} install --extra-index-url https://wheel-index.linuxserver.io/ubuntu/ --upgrade --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
+    
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config
     fi
 
-    set_unix_permissions "${SYNOPKG_PKGDEST}"
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+        set_unix_permissions "${SYNOPKG_PKGDEST}"
+    fi
 }
 
 service_postupgrade() {
     set_config
-    set_unix_permissions "${SYNOPKG_PKGDEST}"
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+        set_unix_permissions "${SYNOPKG_PKGDEST}"
+    fi
 }
 
 service_preupgrade ()
