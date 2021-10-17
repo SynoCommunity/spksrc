@@ -27,14 +27,13 @@ SYSTEM_GROUP	 = http
 INSTALL_DEP_SERVICES = apache-web mysql
 START_DEP_SERVICES = apache-web mysql
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+INSTALL_PREFIX = /var/packages/$(SPK_NAME)/target
 
 POST_STRIP_TARGET = tt-rss_extra_install
 
-BUSYBOX_CONFIG = daemon nice
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
+
+SERVICE_SETUP = src/service-setup.sh
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_DSM = 6.0
@@ -44,7 +43,6 @@ INSTUNINST_RESTART_SERVICES = apache-web
 SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10"
 
 include ../../mk/spksrc.spk.mk
-
 
 $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini: 
 	@$(MSG) Generating $@

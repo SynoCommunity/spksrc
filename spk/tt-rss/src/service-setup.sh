@@ -4,10 +4,12 @@
 PACKAGE="tt-rss"
 
 # Others
-LINK_DIR="/usr/local/${PACKAGE}"
 LOGS_DIR="${SYNOPKG_PKGVAR}/logs"
-WEB_DIR="/var/services/web"
-TMP_DIR="${SYNOPKG_PKGDEST}/../../@tmp"
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+  WEB_DIR="/var/services/web_packages"
+else
+  WEB_DIR="/var/services/web"
+fi
 
 VERSION_FILE_DIRECTORY="var"
 VERSION_FILE="${VERSION_FILE_DIRECTORY}/version.txt"
@@ -21,22 +23,18 @@ MYSQLDUMP="${MARIADB_10_BIN_DIRECTORY}/mysqldump"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 
-preinst ()
-{
-    return 0
-}
+SERVICE_COMMAND="${INSTALL_DIR}/bin/tt-rss-daemon"
 
-postinst ()
+service_postinst ()
 {
-    {
-      # Link
-      ln -s "${SYNOPKG_PKGDEST}" "${LINK_DIR}";
-          
-      # Install busybox stuff
-      "${SYNOPKG_PKGDEST}/bin/busybox" --install ${SYNOPKG_PKGDEST}/bin;
-      # Install the web interface
-      cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
-    } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      {
+        # Install busybox stuff
+        "${SYNOPKG_PKGDEST}/bin/busybox" --install ${SYNOPKG_PKGDEST}/bin;
+        # Install the web interface
+        cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
+      } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    fi
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -71,7 +69,7 @@ postinst ()
     return 0
 }
 
-preuninst ()
+validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
@@ -86,15 +84,10 @@ preuninst ()
             exit 1
         fi
     fi
-
-    return 0
 }
 
-postuninst ()
+service_postuninst ()
 {
-    # Remove link
-    rm -f ${LINK_DIR}
-
     # Export and remove database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         if [ -n "${wizard_dbexport_path}" ]; then
@@ -103,16 +96,17 @@ postuninst ()
         fi
     fi
 
-    # Remove the web interface
-    rm -fr ${WEB_DIR}/${PACKAGE}
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      # Remove the web interface
+      rm -fr ${WEB_DIR}/${PACKAGE}
+    fi
 
     return 0
 }
 
-preupgrade ()
+service_preupgrade ()
 {
     # Save the configuration file
-    rm -fr "${TMP_DIR}/${PACKAGE}"
     mkdir -p "${TMP_DIR}/${PACKAGE}"
     mv "${WEB_DIR}/${PACKAGE}/config.php" "${TMP_DIR}/${PACKAGE}/"
 
@@ -128,7 +122,7 @@ preupgrade ()
     return 0
 }
 
-postupgrade ()
+service_postupgrade ()
 {
     # Restore the configuration file
     cp "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1

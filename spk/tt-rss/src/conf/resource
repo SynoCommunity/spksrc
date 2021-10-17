@@ -44,7 +44,8 @@
           "gd",
           "intl",
           "mysqli",
-          "pdo_mysql"
+          "pdo_mysql",
+          "posix"
         ],
         "user": "tt-rss",
         "group": "http"
