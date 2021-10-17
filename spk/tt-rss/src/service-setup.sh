@@ -26,17 +26,13 @@ MYSQL_DATABASE="ttrss"
 service_postinst ()
 {
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      {
-        # Install busybox stuff
-        "${SYNOPKG_PKGDEST}/bin/busybox" --install ${SYNOPKG_PKGDEST}/bin;
-        # Install the web interface
-        cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
-      } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+      # Install the web interface
+      cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
     fi
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        "${MYSQL}" -u "${MYSQL_USER}" -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" < "${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+        "${MYSQL}" -u "${MYSQL_USER}" -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" < "${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql"
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
         cp "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
         {
@@ -53,16 +49,14 @@ service_postinst ()
     fi
 
     # Fix permissions
-    {
-      chown "${USER}" "${WEB_DIR}/${PACKAGE}/lock";
-      chown "${USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
-      chown -R "${USER}" "${WEB_DIR}/${PACKAGE}/cache";
-      chown -R "${USER}" "${LOGS_DIR}";
-      chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
-    } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    chown "${USER}" "${WEB_DIR}/${PACKAGE}/lock";
+    chown "${USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
+    chown -R "${USER}" "${WEB_DIR}/${PACKAGE}/cache";
+    chown -R "${USER}" "${LOGS_DIR}";
+    chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-       "${SYNOPKG_PKGDEST}/bin/update-schema" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+       "${SYNOPKG_PKGDEST}/bin/update-schema"
     fi
     return 0
 }
@@ -123,7 +117,7 @@ service_preupgrade ()
 service_postupgrade ()
 {
     # Restore the configuration file
-    cp "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"  >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    cp "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"
     SPK_REV=$(cat "${TMP_DIR}/${PACKAGE}/${VERSION_FILE}")
     if [ "${SPK_REV}" -lt "14" ]
     then
@@ -137,23 +131,21 @@ service_postupgrade ()
         -e "s|define('SELF_URL_PATH', '\(.*\)');|putenv('TTRSS_SELF_URL_PATH=\1');|" \
         -e "s|define('DB_PORT', '\(.*\)');|putenv('TTRSS_DB_PORT=\1');|" \
         -e "s|define('PHP_EXECUTABLE', \(.*\));||" \
-        "${WEB_DIR}/${PACKAGE}/config.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php" 2>>"${LOGS_DIR}/${PACKAGE}_install.log"
+        "${WEB_DIR}/${PACKAGE}/config.php"
+      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php"
     fi
     if [ "${SPK_REV}" -lt "15" ]
     then
       sed -i -e "s|putenv('TTRSS_DB_PASS=.*');|putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');|" \
         "${WEB_DIR}/${PACKAGE}/config.php" >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
-      echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php" 2>>"${LOGS_DIR}/${PACKAGE}_install.log"
+      echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php"
     fi
 
-    {
-      mv -f "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/;
-      mv -f "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
-      mv -f "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
+    mv -f "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/;
+    mv -f "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
+    mv -f "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
 
-      "${SYNOPKG_PKGDEST}"/bin/update-schema;
-    } >> "${LOGS_DIR}/${PACKAGE}_install.log" 2>&1
+    "${SYNOPKG_PKGDEST}"/bin/update-schema;
 
     return 0
 }
