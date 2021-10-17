@@ -92,7 +92,7 @@ Remapping container filesystem
 3. Add `/home/spksrc` from the hsot to the LXC container:
 ```
 lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
-Device home added to spksrc-debian10
+Device home added to spksrc
 ```
 4. Connect as `spksrc` user:
 ```
