@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
 SPK_VERS = 20210729
-SPK_REV = 18
+SPK_REV = 3
 SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python38 cross/poetry cross/lxml cross/PyNaCl
