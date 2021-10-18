@@ -3,9 +3,9 @@ SPK_VERS = 20210729
 SPK_REV = 3
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python38 cross/poetry cross/lxml cross/PyNaCl
-# cross/cffi cross/setuptools cross/cryptography350
-DEPENDS = cross/$(SPK_NAME)
+BUILD_DEPENDS = cross/python38 cross/poetry cross/lxml
+# cross/cffi cross/setuptools cross/cryptography350 cross/PyNaCl
+DEPENDS = cross/PyNaCl cross/$(SPK_NAME)
 SPK_DEPENDS = "python38"
 
 WHEELS = src/requirements.txt
