@@ -58,7 +58,7 @@ lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake bc bis
                                 cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf \
                                 imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev \
                                 libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev \
-                                libtool libunistring-dev lzip mercurial ncurses-dev ninja-buld php pkg-config \
+                                libtool libunistring-dev lzip mercurial ncurses-dev ninja-build php pkg-config \
                                 python3 python3-distutils rename scons subversion swig texinfo unzip \
                                 xmlto zlib1g-dev
 ```
@@ -73,10 +73,10 @@ lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - 
 lxc exec spksrc -- /bin/bash -c "pip3 install virtualenv httpie"
 ```
 7. Install `meson` (requires `autoconf-archive`):
-```lxc exec $image -- /bin/bash -c "pip3 install meson==0.56.0"```
+```lxc exec spksrc -- /bin/bash -c "pip3 install meson==0.56.0"```
 8. (OPTIONAL) Install misc base tools:
 ```
-lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrem rsync tree time
+lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrep rsync tree time
 lxc exec spksrc -- /usr/bin/updatedb
 ```
 
@@ -92,7 +92,7 @@ Remapping container filesystem
 3. Add `/home/spksrc` from the hsot to the LXC container:
 ```
 lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
-Device home added to spksrc-debian10
+Device home added to spksrc
 ```
 4. Connect as `spksrc` user:
 ```
