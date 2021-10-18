@@ -1,4 +1,4 @@
-[syncthing]
+[syncthing-bep]
 title="BEP (Block Exchange Protocol)"
 desc="Syncthing File Synchronization"
 port_forward="yes"
