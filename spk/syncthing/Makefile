@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
 SPK_VERS = 1.17.0
-SPK_REV = 22
+SPK_REV = 23
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
@@ -23,6 +23,8 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8384
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_CERT = syncthing-webui
+SERVICE_CERT_RELOAD = tools/ca_reloader.sh
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
@@ -38,3 +40,5 @@ syncthing_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 600 src/config.xml $(STAGING_DIR)/var/config.xml
 	install -m 644 src/options.conf $(STAGING_DIR)/var/options.conf
+	install -m 755 -d $(STAGING_DIR)/tools
+	install -m 700 src/ca_reloader.sh $(STAGING_DIR)/$(SERVICE_CERT_RELOAD)
