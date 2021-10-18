@@ -58,8 +58,8 @@ lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake bc bis
                                 cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf \
                                 imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev \
                                 libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev \
-                                libtool libunistring-dev lzip mercurial ncurses-dev ninja-build php pkg-config \
-                                python3 python3-distutils rename scons subversion swig texinfo unzip \
+                                libtool libunistring-dev lzip mercurial moreutils ncurses-dev ninja-build php \
+                                pkg-config python3 python3-distutils rename scons subversion swig texinfo unzip \
                                 xmlto zlib1g-dev
 ```
 5. Install `python2` wheels:
@@ -116,9 +116,9 @@ lxc config set spksrc environment.https_proxy http://192.168.1.1:3128
 lxc exec spksrc -- su --login spksrc
 spksrc@spksrc:~$ cat << EOF > $HOME/.wgetrc
 use_proxy = on
-http_proxy = http://192.168.80.10:3128/
-https_proxy = http://192.168.80.10:3128/
-ftp_proxy = http://192.168.80.10:3128/
+http_proxy = http://192.168.1.1:3128/
+https_proxy = http://192.168.1.1:3128/
+ftp_proxy = http://192.168.1.1:3128/
 EOF
 ```
 
