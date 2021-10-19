@@ -13,7 +13,6 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 SPK_DEPENDS = "python38"
 WHEELS = src/requirements.txt
 
