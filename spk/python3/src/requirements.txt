@@ -1,5 +1,5 @@
 ## Pure-python via spksrc.wheel.mk
-virtualenv==20.8.1
+virtualenv==20.4.6
 filelock==3.3.0
 importlib-resources==5.2.2
 importlib-metadata==4.8.1
