@@ -5,14 +5,14 @@ SPK_REV = 6
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
-DEPENDS += cross/setuptools cross/pip cross/wheel cross/platformdirs
+DEPENDS += cross/setuptools cross/pip cross/wheel
 DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
 DEPENDS += cross/msgpack-python cross/ruamel.yaml cross/immutables
 DEPENDS += cross/cryptography
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
