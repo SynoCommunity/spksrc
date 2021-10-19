@@ -23,7 +23,7 @@ CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
-#CONFIGURE_ARGS += --enable-optimizations
+CONFIGURE_ARGS += --enable-optimizations
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
@@ -46,9 +46,9 @@ CONFIGURE_ARGS += --with-system-ffi
 include ../../mk/spksrc.archs.mk
 
 # Enable Link-Time Optimization
-#ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-#CONFIGURE_ARGS += --with-lto
-#endif
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --with-lto
+endif
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
