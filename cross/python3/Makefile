@@ -89,8 +89,8 @@ python3_post_install: $(WORK_DIR)/python-cc.mk
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.2.4"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.2.4"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.2.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.2.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.0"

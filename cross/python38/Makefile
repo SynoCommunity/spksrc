@@ -23,7 +23,7 @@ CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
-CONFIGURE_ARGS += --enable-optimizations
+#CONFIGURE_ARGS += --enable-optimizations
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
@@ -46,9 +46,9 @@ CONFIGURE_ARGS += --with-system-ffi
 include ../../mk/spksrc.archs.mk
 
 # Enable Link-Time Optimization
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-lto
-endif
+#ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+#CONFIGURE_ARGS += --with-lto
+#endif
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
@@ -114,16 +114,14 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.2.4"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.2.4"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.2.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.2.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.14.6"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cffi==1.14.6"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "platformdirs==2.4.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "platformdirs==2.4.0"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
