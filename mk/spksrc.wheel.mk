@@ -44,34 +44,32 @@ pre_wheel_target: wheel_msg_target
 			mkdir -p $(PIP_DIR) ; \
 		fi; \
 		mkdir -p $(WORK_DIR)/wheelhouse ; \
-		if [ -f "$(WHEELS)" ] ; then \
-			$(MSG) "Using existing requirements file" ; \
-			cp -f $(WHEELS) $(WORK_DIR)/wheelhouse/requirements.txt ; \
-		else \
-			$(MSG) "Creating requirements file" ; \
-			rm -f $(WORK_DIR)/wheelhouse/requirements.txt ; \
-			for wheel in $(WHEELS) ; \
-			do \
+		for wheel in $(WHEELS) ; \
+		do \
+			if [ -f $$wheel ] ; then \
+				$(MSG) "Using existing requirements.txt file" ; \
+				cp -f $$wheel $(WORK_DIR)/wheelhouse/$$(basename $$wheel) ; \
+			else \
+				$(MSG) "Adding to requirements.txt file" ; \
 				echo $$wheel >> $(WORK_DIR)/wheelhouse/requirements.txt ; \
-			done \
-		fi ; \
+			fi ; \
+		done \
 	fi
 
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ ! -z "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
-		if [ ! -z "$(CROSS_COMPILE_WHEELS)" ] ; then \
+		if [ -f "$(WORK_DIR)/wheelhouse/cross-requirements.txt" ]; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
-				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --use-deprecated=legacy-resolver ; \
+				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --requirement $(WORK_DIR)/wheelhouse/cross-requirements.txt ; \
 			else \
-				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" pip $(PIP_WHEEL_ARGS) --use-deprecated=legacy-resolver --no-build-isolation ; \
+				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" pip $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WORK_DIR)/wheelhouse/cross-requirements.txt ; \
 			fi ; \
-		else \
-			$(MSG) "Force pure-python" ; \
-			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-				$(RUN) $(PIP_WHEEL) ; \
 		fi ; \
+		$(MSG) "Force pure-python" ; \
+		export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
+			$(RUN) $(PIP_WHEEL) --requirement $(WORK_DIR)/wheelhouse/requirements.txt ; \
 	fi
 
 
