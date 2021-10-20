@@ -1,4 +1,2 @@
 cheetah3==3.2.6
-configobj==5.0.6
-sgmllib3k==1.0.0
 sabyenc3==4.0.2
