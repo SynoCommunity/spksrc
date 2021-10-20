@@ -67,7 +67,6 @@ pyads==3.2.2
 pyitachip2ir==0.0.7
 
 netifaces==0.11.0
-cbor2==5.4.1
 pycares==4.0.0
 regex==2021.8.3
 websockets==9.1
