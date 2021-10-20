@@ -398,6 +398,7 @@ spkclean:
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
+	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
