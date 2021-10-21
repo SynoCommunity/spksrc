@@ -1,6 +1,6 @@
 argh==0.26.1
 awesome-slugify==1.6.5
-Babel==2.0
+Babel==2.9.1
 backports.ssl-match-hostname==3.4.0.2
 blinker==1.4
 certifi==2015.9.6.2
