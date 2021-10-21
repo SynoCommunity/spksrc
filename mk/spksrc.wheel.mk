@@ -54,6 +54,7 @@ pre_wheel_target: wheel_msg_target
 				$(MSG) "Using existing $$wheel file" ; \
 				$(MSG) cp -f $$wheel $(WHEELHOUSE)/$$(basename $$wheel) ; \
 				cp -f $$wheel $(WHEELHOUSE)/$$(basename $$wheel) ; \
+				sed -i -e '$$a\\' $(WHEELHOUSE)/$$(basename $$wheel) ; \
 			else \
 				$(MSG) "Adding to $(WHEELS_PURE_PYTHON) file" ; \
 				echo $$wheel >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
