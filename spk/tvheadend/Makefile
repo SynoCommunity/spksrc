@@ -1,7 +1,7 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
 SPK_GIT_HASH = c6bb43d
-SPK_GIT_DATE = 20211016
+SPK_GIT_DATE = 20211020
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
 SPK_REV = 30
@@ -23,7 +23,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 1ee9c5b as of October 16th 2021<br/>2. Update openssl to 1.1l<br/>3. Updated libhdhomerun to version 20210624<br/>4. Fix 403 Forbidden after login"
+CHANGELOG = "1. Update to latest git version c6bb43d as of June 20th 2021<br/>2. Update openssl to 1.1<br/>3. Updated to use FFMPEG 4.3.3<br/>4. Updated libhdhomerun to version 20210224<br/>5. Update dtv-scan-tables"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
