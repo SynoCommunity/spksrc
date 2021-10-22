@@ -150,6 +150,11 @@ ifneq ($(strip $(SERVICE_PORT)),)
 	@echo 'SERVICE_PORT="$(SERVICE_PORT)"' >> $@
 	@echo '' >> $@
 endif
+ifneq ($(strip $(SERVICE_CERT)),)
+	@echo "# Certificate for service" >> $@
+	@echo 'SERVICE_CERT="$(SERVICE_CERT)"' >> $@
+	@echo '' >> $@
+endif
 ifneq ($(STARTABLE),no)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo "# define SYNOPKG_PKGVAR for compatibility with DSM7" >> $@
