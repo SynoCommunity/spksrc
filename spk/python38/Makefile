@@ -6,11 +6,12 @@ SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
-DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
-DEPENDS += cross/msgpack-python cross/ruamel.yaml cross/immutables
-DEPENDS += cross/cryptography
+DEPENDS += cross/bcrypt cross/cffi
+DEPENDS += cross/cryptography cross/greenlet cross/immutables
+DEPENDS += cross/lxml cross/msgpack-python
+DEPENDS += cross/pycrypto cross/pycurl
+DEPENDS += cross/pyyaml cross/ruamel.yaml cross/sqlite
 
 WHEELS = src/requirements-cross.txt src/requirements.txt
 
