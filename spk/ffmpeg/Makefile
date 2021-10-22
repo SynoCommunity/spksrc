@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.3.3
 SPK_REV = 39
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 4.3.3<br/>2. Update libVA to 2.13.0"
+CHANGELOG = "1. Update to version 4.3.3<br/>2. Update libVA to 2.13.0<br/>3. Update libaom to version 3.2.0"
 
 CONF_DIR = src/conf
 
