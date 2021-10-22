@@ -6,7 +6,7 @@ SPK_ICON = src/duplicity.png
 BUILD_DEPENDS = cross/python38
 DEPENDS = cross/cffi cross/lxml cross/duplicity cross/duply
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 SPK_DEPENDS = "python38>=3.8.8:gnupg>=2.1.6"
 

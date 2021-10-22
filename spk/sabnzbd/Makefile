@@ -9,7 +9,7 @@ SPK_DEPENDS = "python38>=3.8.1-1"
 
 # To generate full requirements.txt, extend SABnzbd's own
 # requirements.txt with the depedencies of cherrypy and cheroot
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.

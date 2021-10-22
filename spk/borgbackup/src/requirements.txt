@@ -8,9 +8,7 @@ idna==3.2
 jsonschema==3.2.0
 packaging==21.0
 pyparsing==2.4.7
-pyrsistent==0.18.0
 requests==2.26.0
 ruamel.yaml==0.17.16
-ruamel.yaml.clib==0.2.6
 six==1.16.0
 urllib3==1.26.6
