@@ -11,3 +11,4 @@ pyparsing==2.4.7
 requests==2.26.0
 ruamel.yaml==0.17.16
 six==1.16.0
+urllib3==1.26.6

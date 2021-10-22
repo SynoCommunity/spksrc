@@ -50,6 +50,7 @@ tempora==4.0.2
 transmission-rpc==3.2.5
 typing-extensions==3.10.0.0
 tzlocal==2.1
+urllib3==1.26.5
 webencodings==0.5.1
 Werkzeug==1.0.1
 zc.lockfile==2.0

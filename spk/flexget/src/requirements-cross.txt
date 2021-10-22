@@ -12,5 +12,4 @@ PyYAML==5.4.1
 sgmllib3k==1.0.0
 SQLAlchemy==1.4.15
 terminaltables==3.1.0
-urllib3==1.26.5
 zxcvbn-python==4.4.24

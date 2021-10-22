@@ -3,7 +3,6 @@ chardet==4.0.0
 future==0.18.2
 ### idna==2.10    # idna==2.9 is included in python38
 python-gettext==4.0
-urllib3==1.26.4
 
 
 ##### backend libraries #####
