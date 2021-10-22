@@ -334,11 +334,11 @@ endif
 else ifneq ($(strip $(SERVICE_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
-	@$(dsm_script_copy)
+	@$(dsm_resource_copy)
 	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
-	@$(dsm_script_copy)
+	@$(dsm_resource_copy)
 	@$(MSG) "(privilege) spksrc.service.privilege-startasroot"
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
@@ -391,7 +391,7 @@ SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 else
 $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
-	@$(dsm_script_copy)
+	@$(dsm_resource_copy)
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif
