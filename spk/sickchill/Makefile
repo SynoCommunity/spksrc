@@ -1,14 +1,14 @@
 SPK_NAME = sickchill
 SPK_VERS = 20210729
-SPK_REV = 3
+SPK_REV = 21
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python38 cross/poetry cross/lxml
-# cross/cffi cross/setuptools cross/cryptography350 cross/PyNaCl
+BUILD_DEPENDS = cross/python38 cross/poetry
+# cross/cffi cross/setuptools cross/cryptography cross/lxml
 DEPENDS = cross/PyNaCl cross/$(SPK_NAME)
 SPK_DEPENDS = "python38"
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
