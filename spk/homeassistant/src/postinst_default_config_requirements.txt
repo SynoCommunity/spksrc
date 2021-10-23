@@ -57,7 +57,7 @@ pycparser==2.19
 ### pycrypto==2.6.1
 ### pycryptodomex @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/pycryptodomex-3.10.1-cp35-abi3-linux_aarch64.whl
 pyipp==0.11.0
-PyJWT==1.7.1
+### PyJWT @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyJWT-1.7.1-py2.py3-none-any.whl
 PyMetno==0.8.3
 ### PyNaCl @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyNaCl-1.4.0-cp38-cp38-linux_aarch64.whl
 pyOpenSSL==20.0.1
@@ -93,8 +93,7 @@ scapy==2.4.5
 sniffio==1.2.0
 snitun==0.27.0
 spotipy==2.18.0
-SQLAlchemy==1.4.23
-ssdp==1.1.0
+### SQLAlchemy @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/SQLAlchemy-1.4.23-cp38-cp38-linux_aarch64.whl
 text-unidecode==1.3
 typing-extensions==3.10.0.0
 Unidecode==1.2.0

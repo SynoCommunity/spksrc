@@ -7,7 +7,7 @@ SPK_DEPENDS = "python38"
 
 BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 
-DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex
+DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex cross/pycryptodome
 DEPENDS += cross/pillow
 # for iqvia
 DEPENDS += cross/numpy
@@ -20,7 +20,8 @@ DEPENDS += cross/dtlssocket
 # for denonavr
 DEPENDS += cross/asyncstdlib
 
-WHEELS = src/requirements-cross.txt cbor2==5.4.1
+# Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
+WHEELS = src/requirements-cross.txt
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
@@ -42,9 +43,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = homeassistant_extra_install
-
-# The package installer downloads pure python wheels at installation time.
-EXCLUDE_PURE_PYTHON_WHEELS = yes
 
 include ../../mk/spksrc.spk.mk
 
