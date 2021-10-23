@@ -16,8 +16,7 @@ idna==2.10
 ipaddress==1.0.23
 typing==3.7.4.1
 
-# Twisted and dependencies
-twisted==20.3.0
+# Twisted dependencies
 Automat==20.2.0
 constantly==15.1.0
 hyperlink==19.0.0

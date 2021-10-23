@@ -28,7 +28,8 @@ cheetah==2.4.4
 # which are installed through cross/bcrypt
 #cryptography==2.9.2 now built as buildtime dependency
 
-# Twisted dependencies
+# Twisted and dependencies
+twisted==20.3.0
 zope.interface==5.1.0
 
 # pillow dependencies
