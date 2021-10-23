@@ -5,6 +5,8 @@ SPK_ICON = src/mosh.png
 
 DEPENDS = cross/$(SPK_NAME)
 
+SPK_DEPENDS = "Perl>=5.14"
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = mosh, the mobile shell is a remote terminal application that allows roaming, supports intermittent connectivity, and provides intelligent local echo and line editing of user keystrokes. Mosh is a replacement for interactive SSH terminals. It's more robust and responsive, especially over Wi-Fi, cellular, and long-distance links.
 
