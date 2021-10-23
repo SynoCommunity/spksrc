@@ -16,7 +16,7 @@ SPK_DEPENDS = "python38"
 # pip freeze > requirements.txt
 # deactivate
 # adjust the first line in requirements.txt to "#borgbackup==1.1.17"
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
