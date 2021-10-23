@@ -71,7 +71,6 @@ geographiclib==1.52
 geojson==2.5.0
 geopy==2.1.0
 getmac==0.8.2
-gevent==21.8.0
 google-api-core==1.31.1
 google-auth==1.34.0
 graphql-subscription-manager==0.4.0
