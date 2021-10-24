@@ -9,7 +9,7 @@ BUILD_DEPENDS = cross/python38
 
 DEPENDS = cross/$(SPK_NAME)
 
-WHEELS = 
+WHEELS = src/requirements.txt
 SPK_DEPENDS = "python38:ffmpeg"
 
 MAINTAINER = smaarn
