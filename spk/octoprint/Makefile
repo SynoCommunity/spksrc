@@ -1,5 +1,5 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.5.3
+SPK_VERS   = 1.6.0
 SPK_REV    = 5
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
@@ -18,7 +18,7 @@ RELOAD_UI    = yes
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.5.3 and python3"
+CHANGELOG    = "Update OctoPrint to v1.6.0 and python3"
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

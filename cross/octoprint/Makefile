@@ -1,5 +1,5 @@
 PKG_NAME = OctoPrint
-PKG_VERS = 1.5.3
+PKG_VERS = 1.6.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/OctoPrint/$(PKG_NAME)/archive
@@ -12,11 +12,9 @@ HOMEPAGE = https://octoprint.org/
 COMMENT  = OctoPrint provides a snappy web interface for controlling consumer 3D printers.
 LICENSE  = AGPLv3
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = octoprint_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: octoprint_install
 octoprint_install:
