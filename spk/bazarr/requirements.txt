@@ -1,0 +1,8 @@
+## Modules cross-compiled via spksrc.python-wheel.mk
+## These modules require patches or have cross dependencies
+#setuptools
+#gevent==21.8.0
+#gevent-websocket==0.10.1
+#lxml==4.6.3
+#numpy==1.21.1
+#webrtcvad-wheels==2.0.10
