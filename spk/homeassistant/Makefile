@@ -20,6 +20,8 @@ DEPENDS += cross/PyNaCl
 DEPENDS += cross/dtlssocket
 # for denonavr
 DEPENDS += cross/asyncstdlib
+# for flunearyou
+DEPENDS += cross/ujson
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
 WHEELS = src/requirements-cross.txt
