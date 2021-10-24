@@ -12,7 +12,7 @@ DESCRIPTION = mosh, the mobile shell is a remote terminal application that allow
 
 DISPLAY_NAME = mosh
 STARTABLE = no
-CHANGELOG = "1. Add libutempter to show detached sessions.<br/>2. Update openssl to v1.1.1k."
+CHANGELOG = "1. Add libutempter to show detached sessions.<br/>2. Update openssl to v1.1.1l.<br/>3. Add Perl dependency for advanced customization and scripting."
 
 HOMEPAGE = https://mosh.org
 LICENSE  = GPLv3+
