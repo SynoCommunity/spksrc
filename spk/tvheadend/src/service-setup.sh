@@ -16,7 +16,7 @@ HTSP=9982
 # Replace generic service startup, run service in background
 GRPN=$(id -gn ${EFF_USER})
 UPGRADE_CFG_DIR="${SYNOPKG_PKGVAR}/dvr/config"
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -C -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE} -l ${LOG_FILE}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -C -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE} -l ${LOG_FILE} --debug \"\""
 SVC_BACKGROUND=yes
 
 # Group configuration to manage permissions of recording folders
