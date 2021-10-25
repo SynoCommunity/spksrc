@@ -5,7 +5,12 @@ INST_VARIABLES="${INST_ETC}/installer-variables"
 
 # Reload wizard variables stored by postinst
 if [ -r "${INST_VARIABLES}" ]; then
-    . "${INST_VARIABLES}"
+    # we cannot source the file to reload the variables, when values have special characters like <, >, ...
+    for _line in $(cat "${INST_VARIABLES}"); do
+        _key="$(echo ${_line} | awk -F'=' '{print $1}')"
+        _value="$(echo ${_line} | awk -F'=' '{print $2}')"
+        declare "${_key}=${_value}"
+    done
 fi
 
 cat <<EOF > $SYNOPKG_TEMP_LOGFILE
@@ -84,7 +89,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                 ]
             },
             {
-				"type": "textfield",
+				"type": "password",
 				"subitems": [
 					{
 						"key": "wizard_root_password",

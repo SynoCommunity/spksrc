@@ -72,7 +72,7 @@
                 ]
             },
             {
-				"type": "textfield",
+				"type": "password",
 				"subitems": [
 					{
 						"key": "wizard_root_password",
