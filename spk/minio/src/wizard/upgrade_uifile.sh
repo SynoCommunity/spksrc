@@ -76,7 +76,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 							"allowBlank": false,
 							"minLength": 3,
 							"regex": {
-								"expr": "/^[^<>:*/?\"|]*$/",
+								"expr": "/^[a-zA-Z0-9-_]*$/",
 								"errorText": "Not allowed character in username"
 							}
 						}
@@ -94,7 +94,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 							"allowBlank": false,
 							"minLength": 8,
 							"regex": {
-								"expr": "/^[^\"|]*$/",
+								"expr": "/^[a-zA-Z0-9-_!@#]*$/",
 								"errorText": "Not allowed character in password"
 							}
 						}
