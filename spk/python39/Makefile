@@ -40,12 +40,12 @@ SERVICE_SETUP = src/service-setup.sh
 
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
-POST_STRIP_TARGET = python38_extra_install
+POST_STRIP_TARGET = python39_extra_install
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: python38_extra_install
-python38_extra_install:
+.PHONY: python39_extra_install
+python39_extra_install:
 	rm -f $(STAGING_DIR)/$(PYTHON_LIB_DIR)/config/libpython*.a
 	rm -rf $(STAGING_DIR)/$(PYTHON_LIB_DIR)/test/
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' | xargs rm -f
