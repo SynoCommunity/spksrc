@@ -42,11 +42,11 @@ EOF
 service_postinst() {
     # Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
-
+    
+    # attempt to get current pip updated during install procedure
+    ${PYTHON} -m pip install --upgrade pip
+    
     # Install the wheels
-    # ${PIP} install -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
-    # ${PIP} install --extra-index-url https://wheel-index.linuxserver.io/ubuntu/ -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
-    # ${PIP} install --no-deps --no-index --upgrade --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
     ${PIP} install --extra-index-url https://wheel-index.linuxserver.io/ubuntu/ --upgrade --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
     

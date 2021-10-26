@@ -19,7 +19,7 @@ gntp==1.0.3
 guessit==3.3.1
 html5lib==1.1
 httplib2==0.19.1
-###py38 idna==3.2
+###py38 idna==3.3
 ifaddr==0.1.7
 imagesize==1.2.0
 IMDbPY==2021.4.18
@@ -37,6 +37,7 @@ putio.py==8.7.0
 pyaes==1.6.1
 ###py38 pycparser==2.20
 pygithub==1.55
+###py38 pyopenssl==21.0.0
 pyjsparser==2.7.1
 pyjwt==2.1.0
 pymediainfo==5.1.0
