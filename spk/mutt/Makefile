@@ -27,4 +27,4 @@ include ../../mk/spksrc.spk.mk
 mutt_extra_install:
 	install -d -m 755 $(STAGING_SPKVAR)
 	install -m 644 src/Muttrc.local $(STAGING_SPKVAR)/Muttrc.local
-	echo "source $(INSTALL_PREFIX_VAR)/Muttrc.local" >> $(STAGING_DIR)/var/Muttrc
+	echo "source $(INSTALL_PREFIX_VAR)/Muttrc.local" >> $(STAGING_SPKVAR)/Muttrc
