@@ -14,4 +14,4 @@ sqlalchemy==1.4.26
 zope.interface==5.4.0
 
 # cryptography dependencies
-cryptography==3.4.8
+cryptography==3.3.2
