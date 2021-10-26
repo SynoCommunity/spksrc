@@ -1,25 +1,25 @@
-Index: libavformat/segment.c
-#Source: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
+Index: jellyfin-ffmpeg/libavformat/segment.c
+Source: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
 ===================================================================
---- libavformat/segment.c.orig	2019-10-02 13:05:57.119005772 -0400
-+++ libavformat/segment.c	2019-10-02 13:06:11.367388679 -0400
-@@ -87,6 +87,7 @@
+--- libavformat/segment.c.orig
++++ libavformat/segment.c
+@@ -87,6 +87,7 @@ typedef struct SegmentContext {
      int64_t last_val;      ///< remember last time for wrap around detection
      int cut_pending;
      int header_written;    ///< whether we've already called avformat_write_header
 +    int64_t start_pts;     ///< pts of the very first packet processed, used to compute correct segment length
-
+ 
      char *entry_prefix;    ///< prefix to add to list entry filenames
      int list_type;         ///< set the list type
-@@ -702,6 +703,7 @@
+@@ -712,6 +713,7 @@ static int seg_init(AVFormatContext *s)
          if ((ret = parse_frames(s, &seg->frames, &seg->nb_frames, seg->frames_str)) < 0)
              return ret;
      } else {
 +        seg->start_pts = -1;
-         /* set default value if not specified */
-         if (!seg->time_str)
-             seg->time_str = av_strdup("2");
-@@ -914,7 +916,15 @@
+         if (seg->use_clocktime) {
+             if (seg->time <= 0) {
+                 av_log(s, AV_LOG_ERROR, "Invalid negative segment_time with segment_atclocktime option set\n");
+@@ -889,7 +891,15 @@ calc_times:
                  seg->cut_pending = 1;
              seg->last_val = wrapped_val;
          } else {
@@ -35,4 +35,4 @@ Index: libavformat/segment.c
 +            }
          }
      }
-
+ 
