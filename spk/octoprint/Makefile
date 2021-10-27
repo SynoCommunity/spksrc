@@ -8,7 +8,7 @@ BETA = 1
 
 BUILD_DEPENDS = cross/python2 cross/setuptools_py2 cross/pip_py2 cross/wheel
 DEPENDS = cross/$(SPK_NAME)
-WHEELS  = src/requirements.txt src/requirements-cross.txt
+WHEELS  = src/requirements.txt
 
 SPK_DEPENDS = "python>=2.7.11-15"
 
