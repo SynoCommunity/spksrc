@@ -6,7 +6,6 @@ SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/bcrypt
-DEPENDS += cross/curl
 DEPENDS += cross/cffi
 DEPENDS += cross/libffi
 DEPENDS += cross/libxml2
@@ -16,12 +15,12 @@ DEPENDS += cross/openssl
 DEPENDS += cross/sqlite
 
 # Required for pycurl wheel
+DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# Required for pycrypto wheel
-# on non 64-bit archs
-ENV += cross_compiling=yes
-ADDITIONAL_LDFLAGS = -L$(STAGING_INSTALL_PREFIX)/lib
+# Required for Pillow
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+ENV += STAGING_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 
 WHEELS = src/requirements-cross.txt src/requirements.txt
 
