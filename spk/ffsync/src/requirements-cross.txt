@@ -1,0 +1,5 @@
+cffi==1.14.1
+MarkupSafe==1.1.1
+msgpack==0.6.2
+simplejson==3.10.0
+zope.interface==5.1.0

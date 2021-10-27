@@ -1,0 +1,4 @@
+netifaces==0.10.4
+regex==2016.03.02
+tornado==4.0.1
+watchdog==0.8.3
