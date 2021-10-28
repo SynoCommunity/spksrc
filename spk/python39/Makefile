@@ -18,9 +18,8 @@ DEPENDS += cross/sqlite
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# Required for Pillow
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-ENV += STAGING_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
+# Patched cross-compiled wheel
+DEPENDS += cross/pillow
 
 WHEELS = src/requirements-cross.txt src/requirements.txt
 
