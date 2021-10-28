@@ -14,8 +14,8 @@
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
-WHEELS_PURE_PYTHON = requirements.txt
-WHEELS_CROSS_COMPILE = requirements-cross.txt
+WHEELS_PURE_PYTHON    = requirements.txt
+WHEELS_CROSS_COMPILE  = requirements-cross.txt
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)
 PRE_WHEEL_TARGET = pre_wheel_target
@@ -75,11 +75,10 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 			if [ -z "$(CROSSENV)" ]; then \
 				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 			else \
-				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" pip $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 			fi ; \
 		fi ; \
 	fi
-
 
 post_wheel_target: $(WHEEL_TARGET)
 	@if [ -d "$(WHEELHOUSE)" ] ; then \
