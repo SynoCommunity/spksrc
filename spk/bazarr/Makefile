@@ -14,7 +14,6 @@ SPK_DEPENDS = "python38:ffmpeg"
 MAINTAINER = smaarn
 
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
-RELOAD_UI = no
 DISPLAY_NAME = Bazarr
 STARTABLE = yes
 CHANGELOG = "Initial release"

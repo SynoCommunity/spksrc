@@ -6,7 +6,7 @@ INSTALL_DIR="${BAZARR_DIR}/target"
 
 source "${INSTALL_DIR}/bin/settings"
 
-FFMPEG_DIR="/usr/local/ffmpeg"
+FFMPEG_DIR="/var/packages/ffmpeg/target"
 export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${FFMPEG_DIR}/bin:${PATH}"
 
 export LC_ALL=en_US.utf8

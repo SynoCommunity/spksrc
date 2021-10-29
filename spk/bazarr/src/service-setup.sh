@@ -6,7 +6,6 @@ PYTHON_DIR="/var/packages/python38/target"
 
 VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
-SC_USER="sc-${PACKAGE}"
 GROUP="sc-download"
 SVC_BACKGROUND=y
 PID_FILE="${SYNOPKG_PKGVAR}/bazarr.pid"
