@@ -8,7 +8,6 @@ VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
 
 GROUP="sc-download"
 SVC_BACKGROUND=y
-PID_FILE="${SYNOPKG_PKGVAR}/bazarr.pid"
 SVC_WRITE_PID=y
 SVC_CWD="${SYNOPKG_PKGDEST}/share/${PACKAGE}"
 
@@ -25,6 +24,7 @@ service_postinst ()
 
     mkdir -p "${SYNOPKG_PKGVAR}/data"
     
-    set_unix_permissions "${SYNOPKG_PKGVAR}/data"
-
+    if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      set_unix_permissions "${SYNOPKG_PKGVAR}/data"
+    fi
 }

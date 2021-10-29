@@ -8,6 +8,13 @@ SPK_ICON = src/bazarr.png
 BUILD_DEPENDS = cross/python38
 
 DEPENDS = cross/$(SPK_NAME)
+DEPENDS += cross/unrar
+DEPENDS += cross/numpy
+DEPENDS += cross/webrtcvad
+DEPENDS += cross/gevent
+DEPENDS += cross/gevent-websocket
+DEPENDS += cross/greenlet
+DEPENDS += cross/zope.event
 
 SPK_DEPENDS = "python38:ffmpeg"
 

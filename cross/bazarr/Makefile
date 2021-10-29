@@ -8,22 +8,12 @@ PKG_DIST_SITE = https://github.com/morpheus65535/bazarr/releases/download/v$(PKG
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = bazarr_custom_install
-
-DEPENDS = cross/unrar
-DEPENDS += cross/numpy
-DEPENDS += cross/webrtcvad
-DEPENDS += cross/gevent
-DEPENDS += cross/gevent-websocket
-DEPENDS += cross/greenlet
-DEPENDS += cross/zope.event
 
 HOMEPAGE = https://www.bazarr.media
 LICENSE = GPLv3
 
-include ../../mk/spksrc.python-module.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: bazarr_custom_install
 bazarr_custom_install: 
