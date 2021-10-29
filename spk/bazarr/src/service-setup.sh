@@ -11,6 +11,9 @@ SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 SVC_CWD="${SYNOPKG_PKGDEST}/share/${PACKAGE}"
 
+export SYNOPKG_PKGDEST
+export SYNOPKG_PKGVAR
+
 service_postinst ()
 {
 

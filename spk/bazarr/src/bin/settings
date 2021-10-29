@@ -1,3 +1,0 @@
-#!/bin/bash
-
-VAR_DIR="${INSTALL_DIR}/var"

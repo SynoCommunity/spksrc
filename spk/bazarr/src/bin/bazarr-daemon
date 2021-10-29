@@ -1,19 +1,13 @@
 #!/bin/bash
 
-PACKAGE=bazarr
-BAZARR_DIR="/var/packages/${PACKAGE}"
-INSTALL_DIR="${BAZARR_DIR}/target"
-
-source "${INSTALL_DIR}/bin/settings"
-
 FFMPEG_DIR="/var/packages/ffmpeg/target"
-export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${FFMPEG_DIR}/bin:${PATH}"
+export PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${FFMPEG_DIR}/bin:${PATH}"
 
 export LC_ALL=en_US.utf8
 export LANG=en_US.utf8
 
-if [ -f "${VAR_DIR}/profile" ]; then
-	source "${VAR_DIR}/profile"
+if [ -f "${SYNOPKG_PKGVAR}/profile" ]; then
+	source "${SYNOPKG_PKGVAR}/profile"
 fi
 
-exec python3 bazarr.py --no-update --config "${VAR_DIR}/data" >> "${VAR_DIR}/bazarr.log" 2>&1
+exec python3 bazarr.py --no-update --config "${SYNOPKG_PKGVAR}/data" >> "${SYNOPKG_PKGVAR}/bazarr.log" 2>&1
