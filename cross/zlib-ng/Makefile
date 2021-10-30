@@ -11,6 +11,12 @@ DEPENDS =
 # ARMv5_ARCHS might get fixed (see https://github.com/zlib-ng/zlib-ng/issues/1054)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
+include ../../mk/spksrc.archs.mk
+
+ifneq ($(findstring $(ARCH),$(DSM_ARMv7_ARCHS)),$(ARCH))
+CMAKE_ARGS += -DWITH_ACLE=no
+endif
+
 HOMEPAGE = https://github.com/zlib-ng/zlib-ng
 COMMENT  = zlib replacement with optimizations for "next generation" systems.
 LICENSE  = zlib-license

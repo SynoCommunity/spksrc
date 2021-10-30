@@ -54,7 +54,7 @@ ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
 # may be not supported for cargo
 RUST_TARGET=armv5te-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
 RUST_TARGET=armv7-unknown-linux-gnueabihf
 endif
 ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
