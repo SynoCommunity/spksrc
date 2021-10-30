@@ -3,18 +3,13 @@
 # DSM 5 -> 6 upgrade path:
 # - Not supported anymore
 
-# define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
-SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
-
 # installer log is not writable, use for reference only.
 INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
-
-INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
-INST_VARIABLES="${INST_ETC}/installer-variables"
 
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
+# Only DSM 5 has this temp upgrade folder
 TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
 
@@ -49,6 +44,12 @@ call_func ()
     fi
 }
 
+# Source installer variables and functions
+INST_FUNCTIONS=`dirname $0`"/functions"
+if [ -r "${INST_FUNCTIONS}" ]; then
+    . "${INST_FUNCTIONS}"
+fi
+
 
 # Source package specific variables and functions
 SVC_SETUP=`dirname $0`"/service-setup"
@@ -56,67 +57,15 @@ if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
+
 # Reload wizard variables stored by postinst
-if [ -r "${INST_VARIABLES}" ]; then
-    # we cannot source the file to reload the variables, when values have special characters like <, >, ...
-    for _line in $(cat "${INST_VARIABLES}"); do
-        _key="$(echo ${_line} | awk -F'=' '{print $1}')"
-        _value="$(echo ${_line} | awk -F'=' '{print $2}')"
-        declare "${_key}=${_value}"
-    done
-fi
+call_func "reload_inst_variables"
 
-# Expect user to be set from package specific variables
-if [ -n "${USER}" -a -z "${USER_DESC}" ]; then
-    USER_DESC="User running $SYNOPKG_PKGNAME"
-fi
+# init variables either reloaded, from package or from wizard
+call_func "initialize_variables"
 
-# Default description if group name provided by UI
-if [ -n "${GROUP}" -a -z "${GROUP_DESC}" ]; then
-    GROUP_DESC="SynoCommunity Package Group"
-fi
-
-# Extract share volume and share name from download location if provided
-if [ -n "${SHARE_PATH}" ]; then
-    if [ -n "${wizard_volume}" ]; then
-        SHARE_PATH="${wizard_volume}/${SHARE_PATH}"
-    fi
-    SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
-    SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
-fi
-
-# Tools shortcuts
-MV="/bin/mv -f"
-RM="/bin/rm -rf"
-CP="/bin/cp -rfp"
-MKDIR="/bin/mkdir -p"
-LN="/bin/ln -nsf"
-TEE="/usr/bin/tee -a"
 
 ### Functions library
-
-log_step ()
-{
-    install_log "===> Step $1. USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
-}
-
-save_wizard_variables ()
-{
-    if [ -e "${INST_VARIABLES}" ]; then
-        $RM "${INST_VARIABLES}"
-    fi
-    if [ -n "${GROUP}" ]; then
-        echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
-    fi
-    if [ -n "${SHARE_PATH}" ]; then
-        echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
-    fi
-    # Restrict permissions to protect sensitive options
-    if [ -e "${INST_VARIABLES}" ]; then
-        chmod go-rwx ${INST_VARIABLES}
-        chown ${EFF_USER} ${INST_VARIABLES}
-    fi
-}
 
 # Remove user from system and from groups it is member of
 syno_remove_user ()
@@ -280,7 +229,12 @@ preinst ()
 postinst ()
 {
     log_step "postinst"
-    save_wizard_variables 2>&1 | install_log
+    call_func "save_wizard_variables" install_log
+    # Restrict permissions to protect sensitive options
+    if [ -e "${INST_VARIABLES}" ]; then
+        chmod go-rwx ${INST_VARIABLES}
+        chown ${EFF_USER} ${INST_VARIABLES}
+    fi
 
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log

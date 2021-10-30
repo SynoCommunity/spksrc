@@ -194,6 +194,10 @@ else
 endif
 endif
 ifneq ($(strip $(SERVICE_SETUP)),)
+	@echo '' >> $@
+	@echo '# Package specific variables and functions' >> $@
+	@echo '# ----------------------------------------' >> $@
+	@echo '' >> $@
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
 
@@ -259,6 +263,10 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
+DSM_SCRIPT_FILES += functions
+$(DSM_SCRIPTS_DIR)/functions: $(SPKSRC_MK)spksrc.service.installer.functions
+	@$(dsm_script_copy)
+
 DSM_SCRIPT_FILES += installer
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
