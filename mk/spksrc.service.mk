@@ -1,19 +1,47 @@
 ### Service rules
-# Generate background service support files in SPK:
+# Generate service support files in SPK:
 #   scripts/installer
 #   scripts/start-stop-status
 #   scripts/service-setup
-#   conf/privilege        if SERVICE_USER or DSM7
-#   conf/SPK_NAME.sc      if SERVICE_PORT and DSM<7
-#   conf/resource         if DSM7
-#   app/SPK_NAME.sc       if SERVICE_PORT and DSM7
-#   app/config            if DSM_UI_DIR
+#   conf/privilege         if SERVICE_USER or DSM7
+#   conf/SPK_NAME.sc       if SERVICE_PORT and DSM<7
+#   conf/resource          if DSM7
+#   app/SPK_NAME.sc        if SERVICE_PORT and DSM7
+#   app/config             if DSM_UI_DIR
 #
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  service_msg_target
-#  pre_service_target   (override with PRE_SERVICE_TARGET)
-#  service_target       (override with SERVICE_TARGET)
-#  post_service_target  (override with POST_SERVICE_TARGET)
+#  pre_service_target            (override with PRE_SERVICE_TARGET)
+#  service_target                (override with SERVICE_TARGET)
+#  post_service_target           (override with POST_SERVICE_TARGET)
+#
+# Variables:      
+#  SERVICE_SETUP                 service-setup script file for generic installer
+#  FWPORTS                       (optional) custom firewall port/rules file
+#  SERVICE_PORT                  service port firewall config file (*.sc) and dsm-ui config file
+#  SERVICE_PORT_PROTOCOL         service port protocol for dsm-ui config file, default = "http"
+#  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
+#  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
+#  SERVICE_WIZARD_GROUP          (optional) use name of wizard-variable to define the GROUP
+#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define SHARE_PATH (uses DSM resource linker for DSM 7)
+#  SERVICE_WIZARD_SHARE_RESOURCE (optional) use name of wizard-varible to define SHARE_PATH and use DSM resource linker for DSM 6 too.
+#  SERVICE_USER                  (optional) runtime user account for generic service support. 
+#                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
+#  SPK_GROUP                     (optional) defines the group to use in privilege resource file
+#  SYSTEM_GROUP                  (optional) defines an additional group to join in privilege resource file
+#  STARTABLE                     default = yes, must be "no" for packages that do not create a service (command line tools)
+#  SERVICE_COMMAND               service command, to be used with generic service support
+#  SERVICE_EXE                   (deprecated) service command, implemented with busybox start-stop-daemon
+#  SPK_COMMANDS                  (optional) list of "folder/command" to create links for in folder /usr/local
+#  SPK_USR_LOCAL_LINKS           (optional) list of "folder:command" to create links for in folder /usr/local
+#                                           with 'command' in relative folder
+#  USE_ALTERNATE_TMPDIR          (optional) with USE_ALTERNATE_TMPDIR=1 TMD_DIR is defined to use a package specific temp
+#                                           folder at intallation and runtime.
+#  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic 
+#                                           installer generated script (SERVICE_SETUP) is not usable.
+#  NO_SERVICE_SHORTCUT           (optional) do not create 
+#  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
+#
 
 ifeq ($(strip $(PRE_SERVICE_TARGET)),)
 PRE_SERVICE_TARGET = pre_service_target
@@ -72,6 +100,14 @@ $(error Set STARTABLE=no or provide either SERVICE_COMMAND, SERVICE_EXE, SSS_SCR
 endif
 endif
 
+# SERVICE_WIZARD_SHARE and SERVICE_WIZARD_SHARE_RESOURCE are exclusive
+ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
+ifneq ($(strip $(SERVICE_WIZARD_SHARE_RESOURCE)),)
+$(error User either SERVICE_WIZARD_SHARE or SERVICE_WIZARD_SHARE_RESOURCE, but not both)
+endif
+endif
+
+
 SPKSRC_MK = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 SERVICE_FILES =
@@ -109,6 +145,11 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"; fi' >> $@
 	@echo '' >> $@
 endif
+ifneq ($(strip $(SERVICE_WIZARD_SHARE_RESOURCE)),)
+	@echo "# Share download location from UI if provided" >> $@
+	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE_RESOURCE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE_RESOURCE)}"; fi' >> $@
+	@echo '' >> $@
+endif
 ifneq ($(strip $(SERVICE_PORT)),)
 	@echo "# Service port" >> $@
 	@echo 'SERVICE_PORT="$(SERVICE_PORT)"' >> $@
@@ -128,12 +169,7 @@ endif
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_COMMAND)),)
-ifneq ($(strip $(SERVICE_SHELL)),)
-	@echo "# Service shell to run command" >> $@
-	@echo 'SERVICE_SHELL="$(SERVICE_SHELL)"' >> $@
-	@echo '' >> $@
-endif
-	@echo "# Service command to execute (either with shell or as is)" >> $@
+	@echo "# Service command to execute" >> $@
 	@echo 'SERVICE_COMMAND="$(SERVICE_COMMAND)"' >> $@
 	@echo '' >> $@
 endif
@@ -190,11 +226,17 @@ ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
 endif
+ifneq ($(strip $(SERVICE_WIZARD_SHARE_RESOURCE)),)
+# e.g. SERVICE_WIZARD_SHARE_RESOURCE=wizard_download_dir
+	@jq --arg share "{{${SERVICE_WIZARD_SHARE_RESOURCE}}}" --arg user sc-${SPK_USER} \
+		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
+endif
+
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf

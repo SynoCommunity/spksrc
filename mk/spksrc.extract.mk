@@ -1,7 +1,7 @@
 ### Extract rules
 #   Extract the $(DIST_FILE) in $(EXTRACT_PATH)
 # Override EXTRACT_PATH to specify path to use instead of $(WORK_DIR)
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  extract_msg_target
 #  pre_extract_target   (override with PRE_EXTRACT_TARGET)
 #  extract_target       (override with EXTRACT_TARGET)

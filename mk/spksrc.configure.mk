@@ -1,6 +1,6 @@
 ### Configure rules
 #   Run the GNU configure script or any similar configure tool. 
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  configure_msg_target
 #  pre_configure_target   (override with PRE_CONFIGURE_TARGET)
 #  configure_target       (override with CONFIGURE_TARGET)

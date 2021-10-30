@@ -23,7 +23,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9000
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-SERVICE_WIZARD_SHARE = wizard_data_directory
+SERVICE_WIZARD_SHARE_RESOURCE = wizard_data_directory
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
