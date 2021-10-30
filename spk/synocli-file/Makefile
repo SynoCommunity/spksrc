@@ -1,14 +1,15 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.4
-SPK_REV = 14
+SPK_REV = 12
 SPK_ICON = src/synocli-file.png
 
-DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
-DEPENDS += cross/detox cross/pcre2
-DEPENDS += cross/zstd cross/lzip cross/plzip
-DEPENDS += cross/fdupes
+# packages depending on cross/zlib must be defined later, see below
+DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS += cross/detox
+DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
-OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
+
+OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/bat cross/exa
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
@@ -16,6 +17,17 @@ DISPLAY_NAME = SynoCli File Tools
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.archs.mk
+
+# build rust tools before packages depending on cross/zlib
+# These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/bat cross/exa
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
+endif
+
+# packages depending on cross/zlib
+DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
+
 
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -40,11 +52,6 @@ DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg \(ripgrep\)"
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd \(fd-find\)"
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/bat cross/exa
-OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
 endif
 
 

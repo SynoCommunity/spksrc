@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/ogham/exa/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS =
+DEPENDS = cross/zlib-ng
 
 # git2 package not supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
