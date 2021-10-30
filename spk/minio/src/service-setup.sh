@@ -1,5 +1,3 @@
-
-# service definitions
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 GROUP="sc-minio"
 
@@ -20,7 +18,9 @@ export MINIO_ROOT_USER="${WIZARD_ROOT_USER}"
 export MINIO_ROOT_PASSWORD="${WIZARD_ROOT_PASSWORD}"
 export HOME="${SYNOPKG_PKGVAR}"
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/minio server --quiet --anonymous ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY}"
+CONSOLE_PORT=9001
+
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/minio server --quiet --console-address :${CONSOLE_PORT} --anonymous ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
@@ -32,5 +32,4 @@ service_postinst ()
     echo WIZARD_ROOT_USER="${wizard_root_user}"             >> ${INST_VARIABLES}
     echo WIZARD_ROOT_PASSWORD="${wizard_root_password}"     >> ${INST_VARIABLES}
 }
-
 
