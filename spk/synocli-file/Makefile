@@ -59,9 +59,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add rust tools 'bat' and 'exa' for supported archs.<br>2. Update openssl to v1.1.1l."
+CHANGELOG = "1. Add rust tools 'bat' and 'exa' for supported archs.<br>2. Update openssl to v1.1.1l.<br>3. Update mc to v4.8.27."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
