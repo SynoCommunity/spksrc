@@ -1,14 +1,15 @@
 SPK_NAME = synocli-file
-SPK_VERS = 2.3
-SPK_REV = 11
+SPK_VERS = 2.4
+SPK_REV = 12
 SPK_ICON = src/synocli-file.png
 
-DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
-DEPENDS += cross/detox cross/pcre2
-DEPENDS += cross/zstd cross/lzip cross/plzip
-DEPENDS += cross/fdupes
+# packages depending on cross/zlib must be defined later, see below
+DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS += cross/detox
+DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
-OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
+
+OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/bat cross/exa
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
@@ -16,6 +17,17 @@ DISPLAY_NAME = SynoCli File Tools
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.archs.mk
+
+# build rust tools before packages depending on cross/zlib
+# These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/bat cross/exa
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
+endif
+
+# packages depending on cross/zlib
+DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
+
 
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -49,7 +61,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Fix ripgrep<br>2. Fix mc for comcerto2k"
+CHANGELOG = "1. Add rust tools 'bat' and 'exa' for supported archs.<br>2. Update openssl to v1.1.1l."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
@@ -73,6 +85,8 @@ SPK_COMMANDS += bin/fzf
 SPK_COMMANDS += bin/rg
 SPK_COMMANDS += bin/fd
 SPK_COMMANDS += bin/mg
+SPK_COMMANDS += bin/bat
+SPK_COMMANDS += bin/exa
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
