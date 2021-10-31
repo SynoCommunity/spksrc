@@ -14,8 +14,12 @@
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
+ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
 WHEELS_PURE_PYTHON    = requirements.txt
+endif
+ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
 WHEELS_CROSS_COMPILE  = requirements-cross.txt
+endif
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)
 PRE_WHEEL_TARGET = pre_wheel_target
