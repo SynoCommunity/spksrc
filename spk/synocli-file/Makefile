@@ -59,9 +59,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add rust tools 'bat' and 'exa' for supported archs.<br>2. Update openssl to v1.1.1l.<br>3. Update mc to v4.8.27."
+CHANGELOG = "1. Add rust tools 'bat' and 'exa' for supported archs.<br>2. Update openssl to v1.1.1l.<br>3. Update mc to v4.8.27.<br>4. Update nano to v5.9.<br>5. Update micro to v2.0.10.<br>6. Update mg to v3.5.<br>7. Update RHash to v1.4.2.<br>8. Update less to v590.<br>9. Update jdupes to v1.20.1.<br>10. Update fzf to v0.27.3."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
@@ -92,7 +92,8 @@ SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
 SPK_COMMANDS += bin/edonr256-hash
 SPK_COMMANDS += bin/edonr512-hash
-SPK_COMMANDS += bin/gost-hash
+SPK_COMMANDS += bin/gost12-256-hash
+SPK_COMMANDS += bin/gost12-512-hash
 SPK_COMMANDS += bin/has160-hash
 SPK_COMMANDS += bin/magnet-link
 SPK_COMMANDS += bin/sfv-hash
