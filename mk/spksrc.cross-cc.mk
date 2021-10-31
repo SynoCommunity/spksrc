@@ -10,7 +10,7 @@
 # within cross/* only.
 #
 # This does not affect building from spk/*
-# where .NOTPARALLE is mandatory but will still
+# where .NOTPARALLEL is mandatory but will still
 # obey to both -jX + PARALLEL_MAKE options.
 #
 ifneq ($(PARALLEL_MAKE),nop)

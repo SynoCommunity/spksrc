@@ -1,6 +1,6 @@
 ### Download rules
 #   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR). 
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  download_msg_target
 #  pre_download_target   (override with PRE_DOWNLOAD_TARGET)
 #  download_target       (override with DOWNLOAD_TARGET)
