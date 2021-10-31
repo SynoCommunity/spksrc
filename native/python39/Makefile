@@ -17,7 +17,7 @@ CONFIGURE_ARGS += --with-lto
 COMPILE_MAKE_OPTIONS += Parser/pgen
 COMPILE_MAKE_OPTIONS += all
 
-POST_INSTALL_TARGET = python38_native_post_install
+POST_INSTALL_TARGET = python39_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
 
@@ -25,12 +25,12 @@ PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
-.PHONY: python38_native_post_install
-python38_native_post_install: $(WORK_DIR)/python-native.mk
+.PHONY: python39_native_post_install
+python39_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip, setuptools, cffi and cross env
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==21.3.1"
-	@$(PIP) install "setuptools==58.3.0" "cffi==1.15" "crossenv==1.0"
+	@$(PIP) install "setuptools==58.3.0" "cffi==1.15" "crossenv==1.1.4"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

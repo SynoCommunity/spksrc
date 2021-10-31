@@ -18,6 +18,10 @@ DEPENDS += cross/sqlite
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
+# Required for PyNaCl
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
 # Patched cross-compiled wheel
 DEPENDS += cross/pillow
 
