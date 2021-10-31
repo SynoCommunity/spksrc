@@ -1,7 +1,7 @@
 attrs==21.2.0
 #borgbackup==1.1.17
 borgmatic==1.5.18
-certifi==2021.5.30
+certifi
 charset-normalizer==2.0.4
 colorama==0.4.4
 idna==3.2

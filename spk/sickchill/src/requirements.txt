@@ -5,7 +5,7 @@ beautifulsoup4==4.9.3
 ###beekeeper==0.9.2
 bencode.py==4.0.0
 CacheControl==0.12.6
-certifi==2020.11.8
+certifi
 ###cffi==1.14.3
 chardet==3.0.4
 click==7.1.2

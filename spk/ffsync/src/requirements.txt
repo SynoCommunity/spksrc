@@ -6,7 +6,7 @@ alembic==1.4.2
 appdirs==1.4.3
 boto==2.49.0
 CacheControl==0.12.6
-certifi==2019.11.28
+certifi
 chardet==3.0.4
 colorama==0.4.3
 configparser==3.5.0
@@ -35,7 +35,7 @@ PyMySQL==0.9.3
 pymysql-sa==1.0
 pyparsing==2.4.6
 pyramid==1.5
-pyramid_hawkauth==0.1.0 
+pyramid_hawkauth==0.1.0
 python-dateutil==2.8.1
 python-editor==1.0.4
 pytoml==0.1.21

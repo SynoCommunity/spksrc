@@ -30,7 +30,7 @@
 #duplicity==0.8.19
 
 ##### basic requirements #####
-certifi==2020.12.5
+certifi
 fasteners==0.16
 requests==2.25.1
 #setuptools-scm==6.0.1
