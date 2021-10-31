@@ -1,5 +1,5 @@
 PKG_NAME = fzf
-PKG_VERS = 0.25.1
+PKG_VERS = 0.27.3
 PKG_EXT = tar.gz
 PKG_REVISION = $(shell date +%m/%d/%Y)
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)

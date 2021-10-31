@@ -1,6 +1,6 @@
 SPK_NAME = less
-SPK_VERS = 530
-SPK_REV = 1
+SPK_VERS = 590
+SPK_REV = 2
 SPK_ICON = src/gnu-logo.png
 
 DEPENDS = cross/less
