@@ -23,8 +23,8 @@
 #  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
 #  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
 #  SERVICE_WIZARD_GROUP          (optional) use name of wizard-variable to define the GROUP
-#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define SHARE_PATH (uses DSM resource linker for DSM 7)
-#  SERVICE_WIZARD_SHARE_RESOURCE (optional) use name of wizard-varible to define SHARE_PATH and use DSM resource linker for DSM 6 too.
+#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define SHARE_PATH (uses DSM data share worker for DSM 7)
+#  USE_DATA_SHARE_WORKER         (optional) use DSM data share worker for SERVICE_WIZARD_SHARE and DSM 6 too
 #  SERVICE_USER                  (optional) runtime user account for generic service support. 
 #                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
 #  SPK_GROUP                     (optional) defines the group to use in privilege resource file
@@ -83,6 +83,10 @@ pre_service_target: service_msg_target
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # always use SPK_USER on DSM >= 7, not only when SERVICE_USER is defined
 SPK_USER = $(SPK_NAME)
+ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
+# always use data share worker on DSM >= 7
+USE_DATA_SHARE_WORKER = yes
+endif
 else
 # SERVICE_USER=auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
@@ -100,14 +104,6 @@ $(error Set STARTABLE=no or provide either SERVICE_COMMAND, SERVICE_EXE, SSS_SCR
 endif
 endif
 
-# SERVICE_WIZARD_SHARE and SERVICE_WIZARD_SHARE_RESOURCE are exclusive
-ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-ifneq ($(strip $(SERVICE_WIZARD_SHARE_RESOURCE)),)
-$(error User either SERVICE_WIZARD_SHARE or SERVICE_WIZARD_SHARE_RESOURCE, but not both)
-endif
-endif
-
-
 SPKSRC_MK = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 SERVICE_FILES =
@@ -115,7 +111,9 @@ SERVICE_FILES =
 # Generate service-setup from SERVICE variables
 $(DSM_SCRIPTS_DIR)/service-setup:
 	$(create_target_dir)
-	@echo "### Package specific variables and functions" > $@
+	@echo "### Generic variables and functions" > $@
+	@echo '### -------------------------------' >> $@
+	@echo '' >> $@
 	@echo 'if [ -z "$${SYNOPKG_PKGNAME}" ] || [ -z "$${SYNOPKG_DSM_VERSION_MAJOR}" ]; then' >> $@
 	@echo '  echo "Error: Environment variables are not set." 1>&2;' >> $@
 	@echo '  echo "Please run me using synopkg instead. Example: \"synopkg start [packagename]\"" 1>&2;' >> $@
@@ -141,13 +139,8 @@ ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-	@echo "# Share download location from UI if provided" >> $@
+	@echo "# DSM shared folder location from UI if provided" >> $@
 	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"; fi' >> $@
-	@echo '' >> $@
-endif
-ifneq ($(strip $(SERVICE_WIZARD_SHARE_RESOURCE)),)
-	@echo "# Share download location from UI if provided" >> $@
-	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE_RESOURCE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE_RESOURCE)}"; fi' >> $@
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_PORT)),)
@@ -195,14 +188,15 @@ endif
 endif
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@echo '' >> $@
-	@echo '# Package specific variables and functions' >> $@
-	@echo '# ----------------------------------------' >> $@
+	@echo '### Package specific variables and functions' >> $@
+	@echo '### ----------------------------------------' >> $@
 	@echo '' >> $@
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
 
 # Define resources for
 # - firewall rules/port definitions (DSM >= 6.0-5936)
+# - data share worker (DSM 7, optional for DSM 6)
 # - usr local links (DSM >= 6.0-5941)
 # for DSM<6.0 link creation is provided by spksrc.service.create_links
 # and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
@@ -229,16 +223,11 @@ ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ | sponge $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir, for DSM 6 with USE_DATA_SHARE_WORKER = yes
+ifeq ($(strip $(USE_DATA_SHARE_WORKER)),yes)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
-endif
-ifneq ($(strip $(SERVICE_WIZARD_SHARE_RESOURCE)),)
-# e.g. SERVICE_WIZARD_SHARE_RESOURCE=wizard_download_dir
-	@jq --arg share "{{${SERVICE_WIZARD_SHARE_RESOURCE}}}" --arg user sc-${SPK_USER} \
-		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
 
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
