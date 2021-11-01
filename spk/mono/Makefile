@@ -1,6 +1,6 @@
 SPK_NAME = mono
 SPK_VERS = 5.20.1.34
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
