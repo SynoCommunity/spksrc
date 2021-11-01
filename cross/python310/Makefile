@@ -52,12 +52,6 @@ ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-lto
 endif
 
-# Enfore 32-bit object-mode on 32-bit platforms
-# as otherwise it fails to build on github-action
-ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
-ENV = OBJECT_MODE=32
-endif
-
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
 POST_PATCH_TARGET    = python310_post_patch
