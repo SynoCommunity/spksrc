@@ -1,8 +1,8 @@
 PKG_NAME = curl
-PKG_VERS = 7.76.1
-PKG_EXT = tar.bz2
+PKG_VERS = 7.78.0
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://curl.haxx.se/download
+PKG_DIST_SITE = https://curl.se/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
@@ -12,7 +12,8 @@ COMMENT  = Command line tool and library for transferring data with URLs
 LICENSE  = https://curl.haxx.se/docs/copyright.html
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-ipv6
+CONFIGURE_ARGS  = --enable-ipv6
+CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
 POST_INSTALL_TARGET = curl_post_install

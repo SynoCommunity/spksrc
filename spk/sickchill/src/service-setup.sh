@@ -1,4 +1,4 @@
-PYTHON_DIR="/usr/local/python3"
+PYTHON_DIR="/var/packages/python38/target"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
@@ -22,9 +22,10 @@ set_config() {
             sed -i "/^\s*web_username\s*=/s/\s*=\s*.*/ = ${wizard_username}/" ${SC_CFG_FILE}
             sed -i "/^\s*web_password\s*=/s/\s*=\s*.*/ = ${wizard_password}/" ${SC_CFG_FILE}
         fi
-        sed -i "/^\s*branch\s*=/s/\s*=\s*.*/ = ${SC_CONFIG_GIT_BRANCH}/" ${SC_CFG_FILE}
-        sed -i "/^\s*cur_commit_hash\s*=/s/\s*=\s*.*/ = ${SC_CONFIG_GIT_COMMIT_HASH}/" ${SC_CFG_FILE}
-        sed -i "/^\s*cur_commit_branch\s*=/s/\s*=\s*.*/ = ${SC_CONFIG_GIT_COMMIT_BRANCH}/" ${SC_CFG_FILE}
+        # update git commit to sickchill updater
+        sed -i "/^\s*branch\s*=/s/\s*=\s*.*/ = ${SC_GIT_BRANCH}/" ${SC_CFG_FILE}
+        sed -i "/^\s*cur_commit_hash\s*=/s/\s*=\s*.*/ = ${SC_GIT_COMMIT_HASH}/" ${SC_CFG_FILE}
+        sed -i "/^\s*cur_commit_branch\s*=/s/\s*=\s*.*/ = ${SC_GIT_COMMIT_BRANCH}/" ${SC_CFG_FILE}
     else
         mkdir -p ${SC_DATA_DIR}
         cat << EOF > ${SC_CFG_FILE}
@@ -40,16 +41,29 @@ EOF
 
 service_postinst() {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >>${INST_LOG}
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Install the wheels
-    ${PIP} install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
+    ${PIP} install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config
     fi
+
+    set_unix_permissions "${SYNOPKG_PKGDEST}"
 }
 
 service_postupgrade() {
     set_config
+    set_unix_permissions "${SYNOPKG_PKGDEST}"
+}
+
+service_preupgrade ()
+{
+    # We have to reset /env folder to 3.8 so remove entire folder as it gets rebuilt in postinst and this avoids any conflicts.
+    # Revision 1 was running python 3.7
+    if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ] && [ "$(echo ${SYNOPKG_OLD_PKGVER} | sed -r 's/^.*-([0-9]+)$/\1/')" -le 1 ]; then
+        echo "Removing old ${SYNOPKG_PKGDEST}/env for new Python 3.8"
+        rm -rf ${SYNOPKG_PKGDEST}/env
+    fi
 }

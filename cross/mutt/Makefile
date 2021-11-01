@@ -1,5 +1,5 @@
 PKG_NAME = mutt
-PKG_VERS = 2.0.6
+PKG_VERS = 2.1.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = ftp://ftp.mutt.org/pub/$(PKG_NAME)
@@ -12,7 +12,13 @@ COMMENT  = Mutt is a small but very powerful text-based mail client for Unix ope
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-ssl=openssl --enable-pop --enable-imap --enable-smtp --with-sasl
+CONFIGURE_ARGS = --with-ssl=openssl
+CONFIGURE_ARGS += --enable-pop
+CONFIGURE_ARGS += --enable-imap
+CONFIGURE_ARGS += --enable-smtp
+CONFIGURE_ARGS += --with-sasl
+CONFIGURE_ARGS += --disable-doc
+CONFIGURE_ARGS += --sysconfdir=$(INSTALL_PREFIX)/var
 
 INSTALL_TARGET = mutt_install
 
@@ -21,4 +27,5 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: mutt_install
 mutt_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-	cp $(WORK_DIR)/$(PKG_DIR)/doc/Muttrc.head $(STAGING_INSTALL_PREFIX)/etc/Muttrc
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/var
+	cp $(WORK_DIR)/$(PKG_DIR)/doc/Muttrc.head $(STAGING_INSTALL_PREFIX)/var/Muttrc

@@ -1,19 +1,47 @@
 ### Service rules
-# Generate background service support files in SPK:
+# Generate service support files in SPK:
 #   scripts/installer
 #   scripts/start-stop-status
 #   scripts/service-setup
-#   conf/privilege        if SERVICE_USER or DSM7
-#   conf/SPK_NAME.sc      if SERVICE_PORT and DSM<7
-#   conf/resource         if DSM7
-#   app/SPK_NAME.sc       if SERVICE_PORT and DSM7
-#   app/config            if DSM_UI_DIR
+#   conf/privilege         if SERVICE_USER or DSM7
+#   conf/SPK_NAME.sc       if SERVICE_PORT and DSM<7
+#   conf/resource          if DSM7
+#   app/SPK_NAME.sc        if SERVICE_PORT and DSM7
+#   app/config             if DSM_UI_DIR
 #
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  service_msg_target
-#  pre_service_target   (override with PRE_SERVICE_TARGET)
-#  service_target       (override with SERVICE_TARGET)
-#  post_service_target  (override with POST_SERVICE_TARGET)
+#  pre_service_target            (override with PRE_SERVICE_TARGET)
+#  service_target                (override with SERVICE_TARGET)
+#  post_service_target           (override with POST_SERVICE_TARGET)
+#
+# Variables:      
+#  SERVICE_SETUP                 service-setup script file for generic installer
+#  FWPORTS                       (optional) custom firewall port/rules file
+#  SERVICE_PORT                  service port firewall config file (*.sc) and dsm-ui config file
+#  SERVICE_PORT_PROTOCOL         service port protocol for dsm-ui config file, default = "http"
+#  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
+#  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
+#  SERVICE_WIZARD_GROUP          (optional) use name of wizard-variable to define the GROUP
+#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define SHARE_PATH (uses DSM data share worker for DSM 7)
+#  USE_DATA_SHARE_WORKER         (optional) use DSM data share worker for SERVICE_WIZARD_SHARE and DSM 6 too
+#  SERVICE_USER                  (optional) runtime user account for generic service support. 
+#                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
+#  SPK_GROUP                     (optional) defines the group to use in privilege resource file
+#  SYSTEM_GROUP                  (optional) defines an additional group to join in privilege resource file
+#  STARTABLE                     default = yes, must be "no" for packages that do not create a service (command line tools)
+#  SERVICE_COMMAND               service command, to be used with generic service support
+#  SERVICE_EXE                   (deprecated) service command, implemented with busybox start-stop-daemon
+#  SPK_COMMANDS                  (optional) list of "folder/command" to create links for in folder /usr/local
+#  SPK_USR_LOCAL_LINKS           (optional) list of "folder:command" to create links for in folder /usr/local
+#                                           with 'command' in relative folder
+#  USE_ALTERNATE_TMPDIR          (optional) with USE_ALTERNATE_TMPDIR=1 TMD_DIR is defined to use a package specific temp
+#                                           folder at intallation and runtime.
+#  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic 
+#                                           installer generated script (SERVICE_SETUP) is not usable.
+#  NO_SERVICE_SHORTCUT           (optional) do not create 
+#  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
+#
 
 ifeq ($(strip $(PRE_SERVICE_TARGET)),)
 PRE_SERVICE_TARGET = pre_service_target
@@ -55,6 +83,10 @@ pre_service_target: service_msg_target
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # always use SPK_USER on DSM >= 7, not only when SERVICE_USER is defined
 SPK_USER = $(SPK_NAME)
+ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
+# always use data share worker on DSM >= 7
+USE_DATA_SHARE_WORKER = yes
+endif
 else
 # SERVICE_USER=auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
@@ -79,7 +111,9 @@ SERVICE_FILES =
 # Generate service-setup from SERVICE variables
 $(DSM_SCRIPTS_DIR)/service-setup:
 	$(create_target_dir)
-	@echo "### Package specific variables and functions" > $@
+	@echo "### Generic variables and functions" > $@
+	@echo '### -------------------------------' >> $@
+	@echo '' >> $@
 	@echo 'if [ -z "$${SYNOPKG_PKGNAME}" ] || [ -z "$${SYNOPKG_DSM_VERSION_MAJOR}" ]; then' >> $@
 	@echo '  echo "Error: Environment variables are not set." 1>&2;' >> $@
 	@echo '  echo "Please run me using synopkg instead. Example: \"synopkg start [packagename]\"" 1>&2;' >> $@
@@ -105,7 +139,7 @@ ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-	@echo "# Share download location from UI if provided" >> $@
+	@echo "# DSM shared folder location from UI if provided" >> $@
 	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"; fi' >> $@
 	@echo '' >> $@
 endif
@@ -128,12 +162,7 @@ endif
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_COMMAND)),)
-ifneq ($(strip $(SERVICE_SHELL)),)
-	@echo "# Service shell to run command" >> $@
-	@echo 'SERVICE_SHELL="$(SERVICE_SHELL)"' >> $@
-	@echo '' >> $@
-endif
-	@echo "# Service command to execute (either with shell or as is)" >> $@
+	@echo "# Service command to execute" >> $@
 	@echo 'SERVICE_COMMAND="$(SERVICE_COMMAND)"' >> $@
 	@echo '' >> $@
 endif
@@ -158,11 +187,16 @@ else
 endif
 endif
 ifneq ($(strip $(SERVICE_SETUP)),)
+	@echo '' >> $@
+	@echo '### Package specific variables and functions' >> $@
+	@echo '### ----------------------------------------' >> $@
+	@echo '' >> $@
 	@cat $(CURDIR)/$(SERVICE_SETUP) >> $@
 endif
 
 # Define resources for
 # - firewall rules/port definitions (DSM >= 6.0-5936)
+# - data share worker (DSM 7, optional for DSM 6)
 # - usr local links (DSM >= 6.0-5941)
 # for DSM<6.0 link creation is provided by spksrc.service.create_links
 # and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
@@ -171,30 +205,31 @@ $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
 ifneq ($(strip $(SERVICE_PORT)),)
-	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ 1<>$@
+	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ | sponge $@
 endif
 ifneq ($(strip $(FWPORTS)),)
 # e.g. FWPORTS=src/foo.sc
 	@jq --arg file $(FWPORTS) \
-		'."port-config"."protocol-file" = "$(DSM_UI_DIR)/"+($$file | split("/")[-1])' $@ 1<>$@
+		'."port-config"."protocol-file" = "$(DSM_UI_DIR)/"+($$file | split("/")[-1])' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_COMMANDS)),)
 # e.g. SPK_COMMANDS=bin/foo bin/bar
 	@jq --arg binaries '$(SPK_COMMANDS)' \
-		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ 1<>$@
+		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 # e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
 	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
-		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ 1<>$@
+		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ | sponge $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
-# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# e.g. SERVICE_WIZARD_SHARE=wizard_download_dir, for DSM 6 with USE_DATA_SHARE_WORKER = yes
+ifeq ($(strip $(USE_DATA_SHARE_WORKER)),yes)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
-		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ 1<>$@
+		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
 endif
+
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -217,6 +252,10 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
+DSM_SCRIPT_FILES += functions
+$(DSM_SCRIPTS_DIR)/functions: $(SPKSRC_MK)spksrc.service.installer.functions
+	@$(dsm_script_copy)
+
 DSM_SCRIPT_FILES += installer
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 $(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
@@ -256,23 +295,21 @@ $(DSM_CONF_DIR)/privilege:
 	@$(MSG) '(privilege) run-as: package'
 	@$(MSG) "(privilege) DSM >= 7 $(DSM_CONF_DIR)/privilege"
 # Apply variables to privilege file
-ifneq ($(strip $(GROUP)),)
-# Creates group but is different from the groups the user can create, they are invisible in the UI an are only usefull to access another packages permissions (ffmpeg comes to mind)
-# For DSM7 I recommend setting permissions for individual packages (System Internal User)
-# or use the shared folder resource worker to add permissions, ask user from wizard see transmission package for an example
-	@jq --arg packagename $(GROUP) '."join-pkg-groupnames" += [{$$packagename}]' $@ 1<>$@
-endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
-	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
+	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USER)),)
-	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
+	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
-ifneq ($(strip $(SPK_GROUP)),)
-	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
+ifneq ($(strip $(GROUP)),)
+	@jq '."groupname" = "$(GROUP)"' $@ | sponge $@
 else
-	@jq '."groupname" = "sc-$(SPK_USER)"' $@ 1<>$@
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@jq '."groupname" = "synocommunity"' $@ | sponge $@
+else
+	@jq '."groupname" = "sc-$(SPK_USER)"' $@ | sponge $@
+endif
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -291,13 +328,13 @@ $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
-	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ 1<>$@
+	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USER)),)
-	@jq '."username" = "sc-$(SPK_USER)"' $@ 1<>$@
+	@jq '."username" = "sc-$(SPK_USER)"' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_GROUP)),)
-	@jq '."groupname" = "$(SPK_GROUP)"' $@ 1<>$@
+	@jq '."groupname" = "$(SPK_GROUP)"' $@ | sponge $@
 endif
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -360,24 +397,23 @@ endif
 ifeq ($(strip $(SERVICE_PORT_ALL_USERS)),)
 SERVICE_PORT_ALL_USERS=true
 endif
+ifeq ($(strip $(SERVICE_TYPE)),)
+SERVICE_TYPE=url
+endif
 
+DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
-	@echo '{ ".url": { ' > $@
-	@echo "  \"com.synocommunity.packages.${SPK_NAME}\": {" >> $@
-	@echo "    \"title\": \"${DISPLAY_NAME}\"," >> $@
-	@/bin/echo -n "    \"desc\": \"" >> $@
-	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
-	@echo "\",\n    \"icon\": \"images/${SPK_NAME}-{0}.png\"," >> $@
-	@echo "    \"type\": \"url\"," >> $@
-	@echo "    \"protocol\": \"${SERVICE_PORT_PROTOCOL}\"," >> $@
-	@echo "    \"port\": \"${SERVICE_PORT}\"," >> $@
-	@echo "    \"url\": \"${SERVICE_URL}\"," >> $@
-	@echo "    \"allUsers\": ${SERVICE_PORT_ALL_USERS}," >> $@
-	@echo "    \"grantPrivilege\": \"all\"," >> $@
-	@echo "    \"advanceGrantPrivilege\": true" >> $@
-	@echo '} } }' >> $@
-	cat $@ | python -m json.tool > /dev/null
+	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
+		--arg desc "${DESC}" \
+		--arg id "com.synocommunity.packages.${SPK_NAME}" \
+		--arg icon "images/${SPK_NAME}-{0}.png" \
+		--arg prot "${SERVICE_PORT_PROTOCOL}" \
+		--arg port "${SERVICE_PORT}" \
+		--arg url "${SERVICE_URL}" \
+		--arg type "${SERVICE_TYPE}" \
+		--argjson allUsers ${SERVICE_PORT_ALL_USERS} \
+		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":true}}}' > $@
 
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif

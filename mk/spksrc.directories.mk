@@ -51,6 +51,15 @@ ifeq ($(strip $(STAGING_INSTALL_PREFIX)),)
 STAGING_INSTALL_PREFIX = $(INSTALL_DIR)$(INSTALL_PREFIX)
 endif
 
+# python wheelhouse directories
+ifndef WHEELHOUSE
+WHEELHOUSE = $(WORK_DIR)/wheelhouse
+endif
+
+ifndef STAGING_INSTALL_WHEELHOUSE
+STAGING_INSTALL_WHEELHOUSE = $(STAGING_INSTALL_PREFIX)/share/wheelhouse
+endif
+
 define create_target_dir
 @mkdir -p `dirname $@`
 endef

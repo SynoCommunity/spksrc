@@ -4,7 +4,7 @@
         "desc": "Keep Radarr up-to-date by using Radarr's built-in updater.<br>Navigate to System>Updates in the Radarr UI."
     }]
 }, {
-    "step_title": "Attention! DSM Permissions",
+    "step_title": "DSM Permissions",
     "items": [{
         "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM."
     },{

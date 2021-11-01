@@ -1,0 +1,15 @@
+Brotli==1.0.9
+click==7.1.2
+colorclass==2.2.0
+greenlet==1.0.0
+MarkupSafe==2.0.0
+progressbar==2.5
+psutil==5.8.0
+pynzb==0.1.0
+pyrsistent==0.17.3
+PyRSS2Gen==1.1
+PyYAML==5.4.1
+sgmllib3k==1.0.0
+SQLAlchemy==1.4.15
+terminaltables==3.1.0
+zxcvbn-python==4.4.24

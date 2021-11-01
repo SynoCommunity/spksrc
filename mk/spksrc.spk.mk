@@ -1,16 +1,16 @@
 ### Rules to create the spk package
 #   Most of the rules are imported from spksrc.*.mk files
-# 
+#
 # Variables used in this file:
 #  NAME:              The internal name of the package.
 #                     Note that all synocoummunity packages use lowercase names.
-#                     This enables to have concurrent packages with synology.com, that use 
-#                     package names starting with upper case letters. 
+#                     This enables to have concurrent packages with synology.com, that use
+#                     package names starting with upper case letters.
 #                     (e.g. Mono => synology.com, mono => synocommunity.com)
 #  SPK_FILE_NAME:     The full spk name with folder, package name, arch, tc- and package version.
 #  SPK_CONTENT:       List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
-#  
+#
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -334,6 +334,13 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 endif
 ifneq ($(strip $(WIZARDS_DIR)),)
+	@$(MSG) "Look for DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"
+	@mkdir -p $(DSM_WIZARDS_DIR)
+	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
+		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
+	fi
+endif
+ifneq ($(strip $(WIZARDS_DIR)),)
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
@@ -375,7 +382,7 @@ endif
 ifeq ($(PUBLISH_API_KEY),)
 	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	http --verify=no --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
+	http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
 
 
 ### Clean rules
@@ -391,6 +398,7 @@ spkclean:
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
+	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
@@ -398,6 +406,9 @@ spkclean:
 	       work-*/WIZARD_UIFILES
 
 all: package
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
+endif
 
 ### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
@@ -450,52 +461,59 @@ pre-build-native:
 	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee build-$${depend%/*}-$${depend#*/}.log ; \
 	  fi ; \
 	done
+ifneq ($(filter all,$(subst -, ,$(MAKECMDGOALS))),)
 	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
+endif
 
 $(PUBLISH)all-$(ACTION): | pre-build-native
+
+spk_msg:
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(MAKECMDGOALS), SPK: $(SPK_NAME) >> $(PSTAT_LOG)
+endif
 
 supported-arch-error:
 	@$(MSG) ########################################################
 	@$(MSG) ERROR - Please run make setup from spksrc root directory
 	@$(MSG) ########################################################
 
-supported-arch-%:
+supported-arch-%: spk_msg
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
 
-publish-supported-arch-%:
+publish-supported-arch-%: spk_msg
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee build-$*.log
 
-latest-arch-%:
+latest-arch-%: spk_msg
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) 2>&1 | tee build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) 2>&1 | tee build-$*.log
 
-publish-latest-arch-%:
+publish-latest-arch-%: spk_msg
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish 2>&1 | tee build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish 2>&1 | tee build-$*.log
 
 ####
 
-all-legacy:
+all-legacy: spk_msg
+	@$(MSG) BUILDING package for legacy DSM and SRM archs
 	$(MAKE) legacy-toolchain-5.2 legacy-toolchain-1.2
-	@$(MSG) Built legacy DSM and SRM archs
 
-publish-all-legacy:
+publish-all-legacy: spk_msg
+	@$(MSG) BUILDING and PUBLISHING package for legacy DSM archs
 	$(MAKE) publish-legacy-toolchain-5.2
-	@$(MSG) Published legacy DSM archs
 
 ####
 
-legacy-toolchain-%:
-	@$(MSG) Built packages for toolchain $*
+legacy-toolchain-%: spk_msg
+	@$(MSG) BUILDING packages for toolchain $*
 	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
 	do \
 	  $(MAKE) arch-$$arch-$* ; \
 	done \
 
-publish-legacy-toolchain-%:
-	@$(MSG) Built packages for toolchain $*
+publish-legacy-toolchain-%: spk_msg
+	@$(MSG) BUILDING and PUBLISHING packages for toolchain $*
 	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
 	do \
 	  $(MAKE) publish-arch-$$arch-$* ; \
@@ -503,13 +521,24 @@ publish-legacy-toolchain-%:
 
 ####
 
-arch-%:
-	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+arch-%: | pre-build-native
+	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
+	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
+	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
-publish-arch-%:
-	@$(MSG) Building and publishing package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish
+build-arch-%: spk_msg
+	@$(MSG) BUILDING package for arch $*
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
+endif
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
+endif
+
+publish-arch-%: spk_msg
+	@$(MSG) BUILDING and PUBLISHING package for arch $*
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee build-$*.log
 
 ####
 

@@ -1,7 +1,7 @@
 SPK_NAME = python3
-SPK_VERS = 3.7.10
+SPK_VERS = 3.7.12
 SPK_SHORT_VERS = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 17
+SPK_REV = 20
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/busybox cross/$(SPK_NAME)
@@ -12,16 +12,16 @@ DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
 DEPENDS += cross/msgpack-python cross/ruamel.yaml cross/immutables
 DEPENDS += cross/cryptography
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = Allan Clark
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
-RELOAD_UI = yes
+
 STARTABLE = no
 DISPLAY_NAME = Python3
-CHANGELOG = "Update depencencies (PyYAML, cryptography and others) including security fixes for CVE-2020-14343."
+CHANGELOG = "1. Update to Python 3.7.12.<br/>2. Update OpenSSL to v1.1.1l<br/>3. Update all requirements.txt"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

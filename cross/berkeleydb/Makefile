@@ -1,5 +1,5 @@
 PKG_NAME = db
-PKG_VERS = 6.2.23
+PKG_VERS = 6.2.32
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.oracle.com/berkeley-db
@@ -13,9 +13,15 @@ COMMENT  = Berkeley DB is a family of embedded key-value database libraries prov
 LICENSE  = AGPLv3
 
 CONFIGURE_TARGET = db_configure
+CONFIGURE_ARGS  = $(TC_CONFIGURE_ARGS)
+CONFIGURE_ARGS += --prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --enable-compat185
+CONFIGURE_ARGS += --enable-cxx
+CONFIGURE_ARGS += --enable-dbm
+CONFIGURE_ARGS += --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: db_configure
 db_configure: 
-	$(RUN) dist/configure $(TC_CONFIGURE_ARGS) --prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX) --enable-dbm
+	@$(RUN) dist/configure $(CONFIGURE_ARGS)
