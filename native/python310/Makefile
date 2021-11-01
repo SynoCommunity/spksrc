@@ -1,5 +1,5 @@
-PKG_NAME = python39
-PKG_VERS = 3.9.7
+PKG_NAME = python310
+PKG_VERS = 3.10.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -14,10 +14,9 @@ CONFIGURE_ARGS  = --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-optimizations
 CONFIGURE_ARGS += --with-lto
-COMPILE_MAKE_OPTIONS += Parser/pgen
 COMPILE_MAKE_OPTIONS += all
 
-POST_INSTALL_TARGET = python39_native_post_install
+POST_INSTALL_TARGET = python310_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
 
@@ -25,8 +24,8 @@ PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
-.PHONY: python39_native_post_install
-python39_native_post_install: $(WORK_DIR)/python-native.mk
+.PHONY: python310_native_post_install
+python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip, setuptools, cffi and cross env
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==21.3.1"
