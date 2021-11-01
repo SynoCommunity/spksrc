@@ -13,10 +13,15 @@ COMMENT  = Berkeley DB is a family of embedded key-value database libraries prov
 LICENSE  = AGPLv3
 
 CONFIGURE_TARGET = db_configure
-CONFIGURE_ARGS = --enable-compat185 --enable-dbm --disable-static --enable-cxx
+CONFIGURE_ARGS  = $(TC_CONFIGURE_ARGS)
+CONFIGURE_ARGS += --prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --enable-compat185
+CONFIGURE_ARGS += --enable-cxx
+CONFIGURE_ARGS += --enable-dbm
+CONFIGURE_ARGS += --disable-static
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: db_configure
 db_configure: 
-	$(RUN) dist/configure $(TC_CONFIGURE_ARGS) --prefix=$(INSTALL_DIR)/$(INSTALL_PREFIX) --enable-dbm
+	@$(RUN) dist/configure $(CONFIGURE_ARGS)
