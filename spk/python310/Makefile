@@ -28,7 +28,7 @@ DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
-DISPLAY_NAME = Python 3.9
+DISPLAY_NAME = Python 3.10
 CHANGELOG = "1. Initial release"
 
 HOMEPAGE = https://www.python.org
