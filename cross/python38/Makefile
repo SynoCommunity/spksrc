@@ -42,6 +42,11 @@ endif
 
 endif
 
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# older gcc does not know -Wno-unused-result
+CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
+endif
+
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
