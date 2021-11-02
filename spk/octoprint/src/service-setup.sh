@@ -1,5 +1,4 @@
 
-# service definitions
 PYTHON_DIR="/var/packages/python38/target/bin"
 VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
