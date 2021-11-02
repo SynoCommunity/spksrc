@@ -28,6 +28,9 @@ PPC_ARCHS = powerpc ppc824x ppc853x ppc854x qoriq
 i686_ARCHS = evansport
 x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk bromolow cedarview denverton dockerx64 geminilake grantley purley kvmx64 v1000 x86 x86_64
 
+32bit_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(i686_ARCHS) $(PPC_ARCHS)
+64bit_ARCHS = $(ARMv8_ARCHS) $(x64_ARCHS)
+
 # Arch groups
 ALL_ARCHS = $(x64_ARCHS) $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
 ARCHS_WITH_GENERIC_SUPPORT = $(filter-out $(GENERIC_ARCHS), $(ARMv7_ARCHS) $(ARMv8_ARCHS) $(x64_ARCHS))
