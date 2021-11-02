@@ -5,8 +5,6 @@ SPK_REV = 1
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
-DEPENDS += cross/bcrypt
-DEPENDS += cross/cffi
 DEPENDS += cross/libffi
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
@@ -43,14 +41,6 @@ SERVICE_SETUP = src/service-setup.sh
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
-
-include ../../mk/spksrc.archs.mk
-
-# Enfore 32-bit object-mode on 32-bit platforms
-# as otherwise it fails to build on github-action
-ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
-ENV = OBJECT_MODE=32
-endif
 
 include ../../mk/spksrc.spk.mk
 

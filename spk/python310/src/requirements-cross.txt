@@ -1,4 +1,5 @@
 ## Cross-compiled via spksrc.wheel.mk
+bcrypt==3.2.0
 cffi==1.15.0
 cryptography==3.3.2
 greenlet==1.1.2
