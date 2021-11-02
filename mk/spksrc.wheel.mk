@@ -69,11 +69,6 @@ pre_wheel_target: wheel_msg_target
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ ! -z "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
-		if [ -f "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
-			$(MSG) "Force pure-python" ; \
-			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-				$(RUN) $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-		fi ; \
 		if [ -f "$(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)" ]; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
@@ -81,6 +76,11 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 			else \
 				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 			fi ; \
+		fi ; \
+		if [ -f "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
+			$(MSG) "Force pure-python" ; \
+			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
+				$(RUN) $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 		fi ; \
 	fi
 
