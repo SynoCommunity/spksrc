@@ -1,5 +1,5 @@
 PKG_NAME = jdupes
-PKG_VERS = 1.19.0
+PKG_VERS = 1.20.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jbruchon/jdupes/archive
@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 
 HOMEPAGE = https://github.com/jbruchon/jdupes
-COMMENT  = A powerful duplicate file finder and an enhanced fork of fdupes
+COMMENT  = A powerful duplicate file finder and an enhanced fork of fdupes.
 LICENSE  = MIT
 
 CONFIGURE_TARGET = none
