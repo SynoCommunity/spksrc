@@ -5,12 +5,9 @@ SPK_REV = 1
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
-DEPENDS += cross/libffi
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 DEPENDS += cross/libyaml
-DEPENDS += cross/openssl
-DEPENDS += cross/sqlite
 
 # Required for pycurl wheel
 DEPENDS += cross/curl
