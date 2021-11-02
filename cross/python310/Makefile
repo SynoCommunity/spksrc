@@ -25,7 +25,29 @@ CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
+
+include ../../mk/spksrc.archs.mk
+
+# optionally generate optimized code
+ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
+
+# old compilers fail with: unrecognized command line option "-fprofile-correction"
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-optimizations
+endif
+
+# old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# Enable Link-Time Optimization
+CONFIGURE_ARGS += --with-lto
+endif
+
+endif
+
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# older gcc does not know -Wno-unused-result
+CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
+endif
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
@@ -45,12 +67,6 @@ CONFIGURE_ARGS += --with-system-expat
 DEPENDS += cross/libffi
 CONFIGURE_ARGS += --with-system-ffi
 
-include ../../mk/spksrc.archs.mk
-
-# Enable Link-Time Optimization
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-lto
-endif
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
