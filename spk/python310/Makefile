@@ -18,6 +18,7 @@ DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
 # Patched cross-compiled wheel
+# https://github.com/python-pillow/Pillow/issues/5799
 DEPENDS += cross/pillow
 
 WHEELS = src/requirements-cross.txt src/requirements.txt
