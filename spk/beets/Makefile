@@ -6,7 +6,7 @@ SPK_ICON = src/beets.png
 BUILD_DEPENDS = cross/python310
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python310>=3.10"
 
 # Required for PyYAML
 DEPENDS += cross/libyaml
