@@ -15,7 +15,7 @@
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
 ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
-WHEELS_PURE_PYTHON = requirements.txt
+WHEELS_PURE_PYTHON = requirements-pure.txt
 endif
 ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
 WHEELS_CROSS_COMPILE = requirements-cross.txt
@@ -67,10 +67,18 @@ pre_wheel_target: wheel_msg_target
 		for wheel in $(WHEELS) ; \
 		do \
 			if [ -f $$wheel ] ; then \
-				$(MSG) "Using existing $$wheel file" ; \
-				sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-				sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
-				sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
+				if [ $$(basename $$wheel) = $(WHEELS_PURE_PYTHON) ]; then \
+					$(MSG) "Adding existing $$wheel file as pure-python" ; \
+					cat $$wheel | sed -e '/^#\|^$$/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				elif [ $$(basename $$wheel) = $(WHEELS_CROSS_COMPILE) ]; then \
+					$(MSG) "Adding existing $$wheel file as cross-compiled" ; \
+					cat $$wheel | sed -e '/^#\|^$$/d' >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				else \
+					$(MSG) "Adapting existing $$wheel file" ; \
+					sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+					sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+					sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
+				fi ;\
 			else \
 				$(MSG) "Adding $$wheel to requirement file" ; \
 				echo $$wheel | sed -rn /^pure:/s/^pure://gp         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
@@ -105,8 +113,8 @@ post_wheel_target: $(WHEEL_TARGET)
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
-			cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-		fi ;\
+			cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/requirements.txt ; \
+		fi ; \
 		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
 			echo "Pure python wheels are excluded from the package wheelhouse." ; \
 			for w in *.whl; do \
