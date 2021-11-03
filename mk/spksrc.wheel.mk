@@ -46,8 +46,8 @@ wheel_msg_target:
 # will move if the user chooses a custom persistent distribution dir for caching downloads between
 # containers and builds.
 pre_wheel_target: wheel_msg_target
-	@if [ ! -z "$(WHEELS)" ] ; then \
-		if [ ! -z "$(PIP_CACHE_OPT)" ] ; then \
+	@if [ -n "$(WHEELS)" ] ; then \
+		if [ -n "$(PIP_CACHE_OPT)" ] ; then \
 			mkdir -p $(PIP_DIR) ; \
 		fi; \
 		rm -fr $(WHEELHOUSE) ; \
@@ -66,8 +66,10 @@ pre_wheel_target: wheel_msg_target
 		done \
 	fi
 
+# Build cross compiled wheels first, to fail fast.
+# There might be an issue with some pure python wheels when built after that.
 build_wheel_target: $(PRE_WHEEL_TARGET)
-	@if [ ! -z "$(WHEELS)" ] ; then \
+	@if [ -n "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
 		if [ -f "$(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)" ]; then \
 			$(MSG) "Force cross-compile" ; \
