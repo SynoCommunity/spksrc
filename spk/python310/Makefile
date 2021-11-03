@@ -21,7 +21,7 @@ ENV += SODIUM_INSTALL=system
 # https://github.com/python-pillow/Pillow/issues/5799
 DEPENDS += cross/pillow
 
-WHEELS = src/requirements-cross.txt src/requirements.txt
+WHEELS = src/requirements.txt setuptools==58.3.0 pip==21.3.1 wheel==0.37.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.

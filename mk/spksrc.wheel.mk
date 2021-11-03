@@ -15,11 +15,23 @@
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
 ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
-WHEELS_PURE_PYTHON    = requirements.txt
+WHEELS_PURE_PYTHON = requirements.txt
 endif
 ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
-WHEELS_CROSS_COMPILE  = requirements-cross.txt
+WHEELS_CROSS_COMPILE = requirements-cross.txt
 endif
+
+ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),)
+WHEEL_DEFAULT_PREFIX = pure
+endif
+
+ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),pure)
+WHEEL_DEFAULT_REQUIREMENT = $(WHEELS_PURE_PYTHON)
+else
+WHEEL_DEFAULT_REQUIREMENT = $(WHEELS_CROSS_COMPILE)
+endif
+
+##
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)
 PRE_WHEEL_TARGET = pre_wheel_target
@@ -56,12 +68,12 @@ pre_wheel_target: wheel_msg_target
 		do \
 			if [ -f $$wheel ] ; then \
 				$(MSG) "Using existing $$wheel file" ; \
-				$(MSG) cp -f $$wheel $(WHEELHOUSE)/$$(basename $$wheel) ; \
-				cp -f $$wheel $(WHEELHOUSE)/$$(basename $$wheel) ; \
-				sed -i -e '$$a\\' $(WHEELHOUSE)/$$(basename $$wheel) ; \
+				sed -rn /^pure:/s/^pure://gp $$wheel >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				sed -rn /^cross:/s/^cross://gp $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
 			else \
-				$(MSG) "Adding to $(WHEELS_PURE_PYTHON) file" ; \
-				echo $$wheel >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				$(MSG) "Adding $$wheel to top of $(WHEEL_DEFAULT_REQUIREMENT) file" ; \
+				sed -i "1s/^/$${wheel}\n/" $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
 			fi ; \
 		done \
 	fi
