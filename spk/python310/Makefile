@@ -1,7 +1,7 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -21,7 +21,7 @@ ENV += SODIUM_INSTALL=system
 # https://github.com/python-pillow/Pillow/issues/5799
 DEPENDS += cross/pillow
 
-WHEELS = src/requirements.txt setuptools==58.3.0 pip==21.3.1 wheel==0.37.0
+WHEELS = src/requirements.txt setuptools==58.3.0 pip==21.3.1 wheel==0.37.0 pure:appdirs==1.4.4 cross:bcrypt==3.2.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
