@@ -14,7 +14,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Initial SickChill env fix and move to Python 3.8 without git"
+CHANGELOG = 1. SickChill environment fix<br>2. Move to Python 3.8 without git<br>3. Added DSM7 Support
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
