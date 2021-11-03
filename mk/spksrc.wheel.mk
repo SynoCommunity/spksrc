@@ -68,11 +68,11 @@ pre_wheel_target: wheel_msg_target
 		do \
 			if [ -f $$wheel ] ; then \
 				if [ $$(basename $$wheel) = $(WHEELS_PURE_PYTHON) ]; then \
-					$(MSG) "Adding existing $$wheel file as pure-python" ; \
-					cat $$wheel | sed -e '/^#\|^$$/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+					$(MSG) "Adding existing $$wheel file as pure-python (discarding any cross-compiled)" ; \
+					sed -e '/^cross:\|^#\|^$$/d' -e /^pure:/s/^pure://g $$wheel  >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 				elif [ $$(basename $$wheel) = $(WHEELS_CROSS_COMPILE) ]; then \
-					$(MSG) "Adding existing $$wheel file as cross-compiled" ; \
-					cat $$wheel | sed -e '/^#\|^$$/d' >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+					$(MSG) "Adding existing $$wheel file as cross-compiled (discarding any pure-python)" ; \
+					sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 				else \
 					$(MSG) "Adapting existing $$wheel file" ; \
 					sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
