@@ -64,22 +64,3 @@ service_postinst ()
 
     mkdir -p "${CONFIG_DIR}"
 }
-
-
-service_prestart()
-{
-    insmod /lib/modules/usbserial.ko
-    insmod /lib/modules/ftdi_sio.ko
-    insmod /lib/modules/cdc-acm.ko
-    
-    # Create device
-    test -e /dev/ttyACM0 || mknod /dev/ttyACM0 c 166 0
-    chmod 777 /dev/ttyACM0
-}
-
-service_poststop ()
-{
-    rmmod /lib/modules/usbserial.ko
-    rmmod /lib/modules/ftdi_sio.ko
-    rmmod /lib/modules/cdc-acm.ko
-}
