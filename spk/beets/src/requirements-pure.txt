@@ -14,7 +14,7 @@ Unidecode
 
 # Plugin dependencies
 beautifulsoup4==4.10.0
-certifi
+certifi==2021.10.8
 chardet==4.0.0
 discogs-client==2.3.0
 langdetect==1.0.9
