@@ -72,8 +72,10 @@ pre_wheel_target: wheel_msg_target
 				sed -rn /^cross:/s/^cross://gp $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 				sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
 			else \
-				$(MSG) "Adding $$wheel to top of $(WHEEL_DEFAULT_REQUIREMENT) file" ; \
-				sed -i "1s/^/$${wheel}\n/" $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
+				$(MSG) "Adding $$wheel to requirement file" ; \
+				echo $$wheel | sed -rn /^pure:/s/^pure://gp         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				echo $$wheel | sed -rn /^cross:/s/^cross://gp       >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				echo $$wheel | sed -e '/^pure:\|^cross:\|^#\|^$$/d' >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
 			fi ; \
 		done \
 	fi
