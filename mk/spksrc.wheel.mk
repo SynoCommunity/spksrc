@@ -68,8 +68,8 @@ pre_wheel_target: wheel_msg_target
 		do \
 			if [ -f $$wheel ] ; then \
 				$(MSG) "Using existing $$wheel file" ; \
-				sed -rn /^pure:/s/^pure://gp $$wheel >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-				sed -rn /^cross:/s/^cross://gp $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 				sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
 			else \
 				$(MSG) "Adding $$wheel to requirement file" ; \
