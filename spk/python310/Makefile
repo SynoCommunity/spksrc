@@ -36,6 +36,8 @@ LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
+ENV += PYTHON_OPTIMIZE=1
+
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install

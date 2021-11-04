@@ -10,7 +10,12 @@ COMMENT  = Python Programming Language
 LICENSE  = PSF
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-ipv6 --without-ensurepip
+CONFIGURE_ARGS  = --enable-ipv6
+CONFIGURE_ARGS += --without-ensurepip
+# old gcc does not know -Wno-unused-result
+# without this setting, cross compile wheels for ppc853x-5.2 will fail
+CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
+
 COMPILE_MAKE_OPTIONS += Parser/pgen
 COMPILE_MAKE_OPTIONS += all
 
