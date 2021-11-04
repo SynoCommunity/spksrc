@@ -18,7 +18,7 @@ PIP ?= pip
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
 PIP_ARGS = --no-binary :all: $(PIP_CACHE_OPT) --no-deps
-PIP_WHEEL = $(PIP) wheel $(PIP_ARGS) --global-option="build_ext" --global-option="-j$(NCPUS)" --wheel-dir $(WHEELHOUSE)
+PIP_WHEEL = $(PIP) wheel $(PIP_ARGS) --wheel-dir $(WHEELHOUSE)
 PIP_DOWNLOAD = $(PIP) download $(PIP_ARGS) --dest $(BASE_DISTRIB_DIR)
 
 # Available languages
