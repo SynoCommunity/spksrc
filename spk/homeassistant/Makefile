@@ -6,7 +6,6 @@ SPK_ICON = src/${SPK_NAME}.png
 SPK_DEPENDS = "python38"
 
 BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/poetry
 
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex
 DEPENDS += cross/pillow
@@ -21,7 +20,7 @@ DEPENDS += cross/dtlssocket
 # for denonavr
 DEPENDS += cross/asyncstdlib
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt cbor2==5.4.1
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."

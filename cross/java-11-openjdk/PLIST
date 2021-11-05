@@ -195,7 +195,7 @@ lib:jvm/openjdk-11.0.12/lib/libawt_headless.so
 lib:jvm/openjdk-11.0.12/lib/libawt.so
 lib:jvm/openjdk-11.0.12/lib/libdt_socket.so
 lib:jvm/openjdk-11.0.12/lib/libextnet.so
-lib:jvm/openjdk-11.0.12/lib/libffi.so.7
+lib:jvm/openjdk-11.0.12/lib/libffi.so.8
 lib:jvm/openjdk-11.0.12/lib/libfontmanager.so
 lib:jvm/openjdk-11.0.12/lib/libharfbuzz.so
 lib:jvm/openjdk-11.0.12/lib/libinstrument.so

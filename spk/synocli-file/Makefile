@@ -1,14 +1,15 @@
 SPK_NAME = synocli-file
-SPK_VERS = 2.3
-SPK_REV = 10
+SPK_VERS = 2.4
+SPK_REV = 12
 SPK_ICON = src/synocli-file.png
 
-DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/mc cross/nano cross/file
-DEPENDS += cross/detox cross/pcre2
-DEPENDS += cross/zstd cross/lzip cross/plzip
-DEPENDS += cross/fdupes
+# packages depending on cross/zlib must be defined later, see below
+DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS += cross/detox
+DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
-OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
+
+OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/bat cross/exa
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
@@ -16,6 +17,17 @@ DISPLAY_NAME = SynoCli File Tools
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.archs.mk
+
+# build rust tools before packages depending on cross/zlib
+# These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/bat cross/exa
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
+endif
+
+# packages depending on cross/zlib
+DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
+
 
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -49,7 +61,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add rg (ripgrep).<br/>2. Add fd (fd-find).<br/>3. Add mg (emacs-like text editor)."
+CHANGELOG = "1. Add rust tools 'bat' and 'exa' for supported archs.<br>2. Update openssl to v1.1.1l.<br>3. Update mc to v4.8.27.<br>4. Update nano to v5.9.<br>5. Update micro to v2.0.10.<br>6. Update mg to v3.5.<br>7. Update RHash to v1.4.2.<br>8. Update less to v590.<br>9. Update jdupes to v1.20.1.<br>10. Update fzf to v0.27.3."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
@@ -73,12 +85,15 @@ SPK_COMMANDS += bin/fzf
 SPK_COMMANDS += bin/rg
 SPK_COMMANDS += bin/fd
 SPK_COMMANDS += bin/mg
+SPK_COMMANDS += bin/bat
+SPK_COMMANDS += bin/exa
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
 SPK_COMMANDS += bin/edonr256-hash
 SPK_COMMANDS += bin/edonr512-hash
-SPK_COMMANDS += bin/gost-hash
+SPK_COMMANDS += bin/gost12-256-hash
+SPK_COMMANDS += bin/gost12-512-hash
 SPK_COMMANDS += bin/has160-hash
 SPK_COMMANDS += bin/magnet-link
 SPK_COMMANDS += bin/sfv-hash

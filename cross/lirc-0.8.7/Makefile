@@ -13,7 +13,7 @@ COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix doma
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
+CONFIGURE_ARGS = --with-transmitter --with-driver=all --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_ROOT)
 
 POST_CONFIGURE_TARGET = lirc_kill_drivers
 

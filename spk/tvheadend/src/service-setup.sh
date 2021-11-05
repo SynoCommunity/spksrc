@@ -16,7 +16,7 @@ HTSP=9982
 # Replace generic service startup, run service in background
 GRPN=$(id -gn ${EFF_USER})
 UPGRADE_CFG_DIR="${SYNOPKG_PKGVAR}/dvr/config"
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -C -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE} -l ${LOG_FILE} --debug \"\""
 SVC_BACKGROUND=yes
 
 # Group configuration to manage permissions of recording folders
@@ -24,12 +24,6 @@ GROUP=sc-media
 
 service_postinst ()
 {
-    # Encrypt password
-    wizard_password=$(echo -n "TVHeadend-Hide-${wizard_password:=admin}" | openssl enc -a)
-
-    # Edit the password configuration according to the wizard
-    sed -i -e "s/@password@/${wizard_password}/g" ${SYNOPKG_PKGVAR}/passwd/a927e30a755504f9784f23a4efac5109
-
     # EPG Grabber (zap2epg) - Create a Python virtualenv
     ${VIRTUALENV} --system-site-packages ${PYTHONENV}
 

@@ -1,6 +1,6 @@
 ### Dependency rules
 #   Build all dependencies listed in DEPENDS.
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  depend_msg_target
 #  pre_depend_target   (override with PRE_DEPEND_TARGET)
 #  depend_target       (override with DEPEND_TARGET)

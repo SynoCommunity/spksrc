@@ -1,7 +1,7 @@
 ### Copy rules
 #   Copy files from the installation directory to the staging directory,
 #   ready to be packed.
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  copy_msg_target
 #  pre_copy_target   (override with PRE_COPY_TARGET)
 #  copy_target       (override with COPY_TARGET)

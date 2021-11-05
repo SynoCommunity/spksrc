@@ -1,6 +1,6 @@
 SPK_NAME = rabbitmq
-SPK_VERS = 3.8.21
-SPK_REV = 5
+SPK_VERS = 3.8.23
+SPK_REV = 6
 SPK_ICON = src/rabbitmq.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -9,7 +9,7 @@ SPK_DEPENDS = "erlang<25"
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = RabbitMQ is one of the most popular open source message brokers. From T-Mobile to Runtastic, RabbitMQ is used worldwide at small startups and large enterprises. RabbitMQ is lightweight and easy to deploy on premises and in the cloud. It supports multiple messaging protocols. RabbitMQ can be deployed in distributed and federated configurations to meet high-scale, high-availability requirements.
-CHANGELOG = "Update RabbitMQ to v3.8.21. Includes fixes for CVE-2021-32719 and CVE-2021-32718."
+CHANGELOG = "1. Update RabbitMQ to v3.8.23.<br/>2. Update OpenSSL to v1.1.1l."
 
 DISPLAY_NAME = RabbitMQ
 

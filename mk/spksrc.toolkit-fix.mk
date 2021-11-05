@@ -1,6 +1,6 @@
 ### Toolkit fix rules
 #   Invoke fixes toolkit's libtool files
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  toolkit_fix_msg_target
 #  pre_toolkit_fix_target   (override with PRE_FIX_TARGET)
 #  toolkit_fix_target       (override with FIX_TARGET)

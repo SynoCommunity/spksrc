@@ -1,0 +1,2 @@
+pyrsistent==0.18.0
+ruamel.yaml.clib==0.2.6

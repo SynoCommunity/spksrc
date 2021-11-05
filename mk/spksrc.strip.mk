@@ -1,6 +1,6 @@
 ### Strip rules
 #   Strip the binary files (exec and libs) in the staging directory. 
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  strip_msg_target
 #  pre_strip_target   (override with PRE_STRIP_TARGET)
 #  strip_target       (override with STRIP_TARGET)

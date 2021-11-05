@@ -2,7 +2,7 @@
 #   Install the freshly compiled software, and correct the pkg_config files.
 #   This installation will be used to configure and compile other pieces of softwares. This is
 #   not the target directory, theses files are copied in the stating directory.
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  install_msg_target
 #  $(PRE_INSTALL_PLIST)
 #  pre_install_target              (override with PRE_INSTALL_TARGET)

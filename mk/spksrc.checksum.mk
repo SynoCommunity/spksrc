@@ -1,6 +1,6 @@
 ### Checksum rules
 #   Validate the downloaded files with sha256 or similar.
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  checksum_msg_target
 #  pre_checksum_target   (override with PRE_CHECKSUM_TARGET)
 #  checksum_target       (override with CHECKSUM_TARGET)

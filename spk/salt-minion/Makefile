@@ -15,7 +15,7 @@ BUILD_DEPENDS += cross/salt
 # source salt-env/bin/activate
 # pip install salt
 # pip freeze > requirements.txt
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.

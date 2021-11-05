@@ -1,10 +1,10 @@
 certifi==2021.5.30
 charset-normalizer==2.0.4
 contextvars
-distro>=1.0.1
+distro==1.5.0
 idna==3.2
 immutables==0.16
-Jinja2
+Jinja2==2.11.2
 MarkupSafe
 msgpack>=0.5,!=0.5.5
 # Avoid 3.10.1 since it has 
@@ -17,6 +17,6 @@ pyzmq<=20.0.0 ; python_version < "3.6"
 pyzmq>=17.0.0 ; "arm" not in platform_machine
 pyzmq==17.0.0 ; "arm" in platform_machine
 pyzmq>=19.0.2 ; python_version >= "3.9"
-requests>=1.0.0
+requests==2.24.0
 typing-extensions==3.10.0.2
 urllib3==1.26.6

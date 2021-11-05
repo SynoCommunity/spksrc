@@ -10,7 +10,7 @@ musicbrainzngs==0.7.1
 munkres==1.1.2
 
 # Plugin dependencies
-beautifulsoup4==4.8.2
+beautifulsoup4==4.10.0
 certifi==2019.11.28
 chardet==3.0.4
 discogs-client==2.2.2

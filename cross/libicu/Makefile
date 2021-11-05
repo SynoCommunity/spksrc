@@ -1,7 +1,6 @@
 PKG_NAME = libicu
 PKG_VERS = 68.2
 PKG_EXT = tgz
-
 PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
 PKG_DIR = icu/source
@@ -9,7 +8,7 @@ PKG_DIR = icu/source
 BUILD_DEPENDS = native/$(PKG_NAME)
 
 HOMEPAGE = http://site.icu-project.org/home
-COMMENT  = International Components for Unicode
+COMMENT  = International Components for Unicode.
 LICENSE  = https://www.unicode.org/copyright.html#License
 
 include ../../mk/spksrc.archs.mk
@@ -35,9 +34,39 @@ CONFIGURE_ARGS = --host=x86_64-pc-linux-gnu
 endif
 
 NATIVE_BUILD_DIR = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)
-CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) --prefix=$(INSTALL_PREFIX)
 
+# the packaging can be customized in a dependent package by definition
+# of LIBICU_DATA_PACKAGING_MODE like:
+# export LIBICU_DATA_PACKAGING_MODE=files
+# 
+# valid data packaging values are
+# - library (the default)
+# - archive
+# - files
+DATA_PACKAGING = $(LIBICU_DATA_PACKAGING_MODE)
+ifeq ($(strip $(DATA_PACKAGING)),)
+# default data packaging
+DATA_PACKAGING = library
+endif
+CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
+
+ifeq ($(strip $(DATA_PACKAGING)),"files")
+# needs a custom install target to successfully build.
+INSTALL_TARGET = libicu_install_with_data_files
+endif
+
+CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) 
+CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --enable-shared
+CONFIGURE_ARGS += --disable-static
+CONFIGURE_ARGS += --without-samples
+
+ADDITIONAL_CFLAGS = -O2
 ADDITIONAL_CPPFLAGS = -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 ADDITIONAL_CXXFLAGS = $(ADDITIONAL_CPPFLAGS)
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: libicu_install_with_data_files
+libicu_install_with_data_files:
+	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) ICUPKGDATA_DIR=$(INSTALL_PREFIX)/share install PREFIX=$(INSTALL_PREFIX)
