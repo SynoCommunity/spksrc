@@ -2,7 +2,7 @@
 poetry==1.2.0a2
 poetry-core==1.1.0a6
 poetry-date-version-plugin==2021.7.16-6
-###py38 appdirs==1.4.4 
+###py38 appdirs==1.4.4
 babelfish==0.6.0
 beautifulsoup4==4.10.0
 beekeeper-alt==2021.7.16
@@ -35,7 +35,7 @@ Mako==1.1.5
 markdown2==2.4.1
 new-rtorrent-python==1.0.1a0
 oauthlib==3.1.1
-packaging==21.2
+packaging==20.9
 pbr==5.7.0
 profilehooks==1.12.0
 putio.py==8.7.0
@@ -48,7 +48,7 @@ pyjwt==2.3.0
 pymediainfo==5.1.0
 pynma==1.0
 ###py38 pyopenssl==20.0.1
-pyparsing==3.0.4
+pyparsing==2.4.7
 pysocks==1.7.1
 pysrt==1.1.2
 ###python-dateutil==2.8.2
