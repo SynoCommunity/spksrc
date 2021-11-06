@@ -1,5 +1,5 @@
 SPK_NAME = salt-minion
-SPK_VERS = 3003.3
+SPK_VERS = 3004
 SPK_REV  = 2
 SPK_ICON = src/salt-minion.png
 
