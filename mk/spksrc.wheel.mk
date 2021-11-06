@@ -14,11 +14,14 @@
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
-ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
-WHEELS_PURE_PYTHON    = requirements.txt
+ifeq ($(strip $(WHEELS_DEFAULT)),)
+WHEELS_DEFAULT = requirements.txt
 endif
 ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
-WHEELS_CROSS_COMPILE  = requirements-cross.txt
+WHEELS_CROSS_COMPILE = requirements-cross.txt
+endif
+ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
+WHEELS_PURE_PYTHON = requirements.txt
 endif
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)
@@ -90,7 +93,8 @@ post_wheel_target: $(WHEEL_TARGET)
 	@if [ -d "$(WHEELHOUSE)" ] ; then \
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
-		cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+		[ -f $(WHEELS_CROSS_COMPILE) ] && cat $(WHEELS_CROSS_COMPILE) >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
+		[ -f $(WHEELS_PURE_PYTHON) ] && cat $(WHEELS_PURE_PYTHON) >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
 			echo "Pure python wheels are excluded from the package wheelhouse." ; \
 			for w in *.whl; do \
