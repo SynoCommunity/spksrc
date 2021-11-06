@@ -20,7 +20,7 @@ WHEELS = src/requirements-cross.txt src/requirements.txt
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG    = "Update to 3003.3"
+CHANGELOG    = "Update to 3004"
 
 HOMEPAGE     = https://www.saltstack.com/
 LICENSE      = Apache
