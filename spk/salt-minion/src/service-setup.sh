@@ -29,7 +29,7 @@ service_postinst ()
 
     # Populate salt master address and minion_id only if file don't already exist
     test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf || echo "master: localhost" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/99-master-address.conf
-    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf || echo -n "id: " > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf && hostname -s >> ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf
+    test -f ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf || echo -n "id: $(hostname -s)" > ${SYNOPKG_PKGDEST}/env/etc/salt/minion.d/98-minion-id.conf
 
     # DSM 6
     set_unix_permissions "${SYNOPKG_PKGDEST}"
