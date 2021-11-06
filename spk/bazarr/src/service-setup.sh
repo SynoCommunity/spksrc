@@ -1,9 +1,6 @@
-# Package
-PACKAGE="bazarr"
-
-# Others
+FFMPEG_DIR="/var/packages/ffmpeg/target"
 PYTHON_DIR="/var/packages/python38/target"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${FFMPEG_DIR}/bin:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip
@@ -11,7 +8,12 @@ PIP=${SYNOPKG_PKGDEST}/env/bin/pip
 GROUP="sc-download"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
-SVC_CWD="${SYNOPKG_PKGDEST}/share/${PACKAGE}"
+SVC_CWD="${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}"
+
+export LC_ALL=en_US.utf8
+export LANG=en_US.utf8
+
+SERVICE_COMMAND="$PYTHON ${SVC_CWD}/bazarr.py --no-update --config ${SYNOPKG_PKGVAR}/data "
 
 service_postinst ()
 {

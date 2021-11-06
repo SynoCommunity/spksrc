@@ -33,15 +33,8 @@ SERVICE_SETUP = src/service-setup.sh
 
 SERVICE_PORT  = 6767
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-SERVICE_COMMAND = /var/packages/$(SPK_NAME)/target/bin/$(SPK_NAME)-daemon
+
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-POST_STRIP_TARGET = bazarr_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: bazarr_extra_install
-bazarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 src/bin/bazarr-daemon $(STAGING_DIR)/bin/bazarr-daemon
