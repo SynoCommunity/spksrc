@@ -17,9 +17,10 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 PIP ?= pip
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
+PIP_DOWNLOAD_ARGS = download --no-binary :all: $(PIP_CACHE_OPT) --no-deps --dest $(BASE_DISTRIB_DIR)
+PIP_DOWNLOAD = $(PIP) $(PIP_DOWNLOAD_ARGS)
 PIP_WHEEL_ARGS = wheel --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
 PIP_WHEEL = $(PIP) $(PIP_WHEEL_ARGS)
-PIP_DOWNLOAD = $(PIP) download $(PIP_ARGS) --dest $(BASE_DISTRIB_DIR)
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
