@@ -1,10 +1,14 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
+# Mandatory for installing pip & tools under
+# target/bin for availability at installation
+DEPENDS += cross/setuptools cross/pip cross/wheel
+
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 DEPENDS += cross/libyaml
