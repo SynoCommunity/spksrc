@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
 SPK_VERS = 2.0
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
@@ -24,7 +24,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, sshfs, rsync, autossh, etherwake$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "Remove fritzctl because it is unsupported on golang 1.16."
+CHANGELOG = "1. Update nmap to v7.92.<br/>2. Update openssl to v1.1.1l.<br/>3. Update rsync to v3.2.3 and add support for lz4, zstd and xxhash.<br/>4. Update socat to v1.7.4.2.<br/>5. Update tmux to v3.2a"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
