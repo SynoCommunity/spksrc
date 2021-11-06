@@ -4,4 +4,7 @@ MarkupSafe==1.1.1
 msgpack==1.0.2
 pycryptodomex==3.9.8
 # PyYAML==5.3.1 # included in py3.8
-pyzmq==19.0.2
+pyzmq<=20.0.0 ; python_version < "3.6"
+pyzmq>=17.0.0 ; "arm" not in platform_machine
+pyzmq==17.0.0 ; "arm" in platform_machine
+pyzmq>=19.0.2 ; python_version >= "3.9"
