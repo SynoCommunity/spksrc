@@ -1,8 +1,8 @@
 PKG_NAME = domoticz
-PKG_VERS = 2020.2
+PKG_VERS = 2021.1
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git-repository
-PKG_GIT_HASH = aad65002eea99b8336cefd773e7422f0a7f1873f
+PKG_GIT_HASH = 037a4299fca4d45d9b94b389726cce27c1bee9aa
 PKG_DIST_SITE = https://github.com/domoticz/domoticz.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
@@ -40,6 +40,11 @@ CMAKE_ARGS += -DUSE_STATIC_OPENZWAVE=no
 
 # without this, domoticz does not find some openzwave include files:
 ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/openzwave
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH"
+endif
 
 USE_NATIVE_CMAKE = 1
 
