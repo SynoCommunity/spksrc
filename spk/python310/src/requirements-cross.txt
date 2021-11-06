@@ -1,0 +1,15 @@
+## Cross-compiled via spksrc.wheel.mk
+bcrypt==3.2.0
+cffi==1.15.0
+cryptography==3.3.2
+greenlet==1.1.2
+immutables==0.16
+lxml==4.6.3
+markupsafe==2.0.1
+msgpack-python==0.5.6
+psutil==5.8.0
+pycurl==7.44.1
+PyNaCl==1.4.0
+PyYAML==6.0
+sqlalchemy==1.4.26
+zope.interface==5.4.0

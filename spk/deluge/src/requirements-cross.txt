@@ -1,0 +1,2 @@
+setproctitle==1.1.10
+rencode==1.0.6

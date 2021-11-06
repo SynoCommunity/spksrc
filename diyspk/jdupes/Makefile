@@ -1,12 +1,12 @@
 SPK_NAME = jdupes
-SPK_VERS = 1.13.2
-SPK_REV = 2
+SPK_VERS = 1.20.1
+SPK_REV = 3
 SPK_ICON = src/jdupes.png
 
 DEPENDS = cross/jdupes
 
 MAINTAINER = jbruchon
-DESCRIPTION = A powerful duplicate file finder and an enhanced fork of fdupes
+DESCRIPTION = A powerful duplicate file finder and an enhanced fork of fdupes.
 DISPLAY_NAME = jdupes
 STARTABLE = no
 

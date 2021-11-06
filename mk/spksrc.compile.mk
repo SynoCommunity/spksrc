@@ -1,6 +1,6 @@
 ### Compile rules
 #   Invoke make to (cross-) compile the software.
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  compile_msg_target
 #  pre_compile_target   (override with PRE_COMPILE_TARGET)
 #  compile_target       (override with COMPILE_TARGET)

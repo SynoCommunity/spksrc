@@ -16,4 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --enable-libgdbm-compat
 
+# fix unknown type blksize_t for older compilers (https://github.com/Homebrew/linuxbrew-core/pull/6242)
+ADDITIONAL_CFLAGS = -D_GNU_SOURCE
+
 include ../../mk/spksrc.cross-cc.mk

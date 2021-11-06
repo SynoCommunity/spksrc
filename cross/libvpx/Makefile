@@ -1,5 +1,5 @@
 PKG_NAME = libvpx
-PKG_VERS = 1.10.0
+PKG_VERS = 1.11.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/webmproject/libvpx/archive

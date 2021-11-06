@@ -1,5 +1,5 @@
 PKG_NAME = RHash
-PKG_VERS = 1.4.0
+PKG_VERS = 1.4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rhash/RHash/archive
@@ -10,7 +10,7 @@ DEPENDS =
 
 HOMEPAGE = http://rhash.sourceforge.net/
 COMMENT  = RHash (Recursive Hasher) is a console utility for computing and verifying hash sums of files. It supports CRC32, CRC32C, MD4, MD5, SHA1, SHA256, SHA512, SHA3, AICH, ED2K, DC++ TTH, BitTorrent BTIH, Tiger, GOST R 34.11-94, RIPEMD-160, HAS-160, EDON-R, and Whirlpool.
-LICENSE  = MIT
+LICENSE  = 0-Clause BSD
 
 include ../../mk/spksrc.archs.mk
 
