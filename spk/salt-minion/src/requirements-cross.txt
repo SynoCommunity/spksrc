@@ -1,4 +1,5 @@
 chardet==3.0.4
+immutables==0.15
 MarkupSafe==1.1.1
 msgpack==1.0.2
 pycryptodomex==3.9.8
