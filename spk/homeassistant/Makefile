@@ -9,7 +9,7 @@ BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
 
 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex cross/pycryptodome
 DEPENDS += cross/gevent
-DEPENDS += cross/pillow
+DEPENDS += cross/homeassistant.pillow
 # for iqvia
 DEPENDS += cross/numpy
 # for python-libnmap
