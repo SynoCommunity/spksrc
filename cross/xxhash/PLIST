@@ -1,6 +1,6 @@
-bin:bin/xxh128sum
-bin:bin/xxh32sum
-bin:bin/xxh64sum
+lnk:bin/xxh128sum
+lnk:bin/xxh32sum
+lnk:bin/xxh64sum
 bin:bin/xxhsum
 lnk:lib/libxxhash.so
 lnk:lib/libxxhash.so.0
