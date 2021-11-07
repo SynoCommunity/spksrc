@@ -1,6 +1,6 @@
 SPK_NAME = nmap
-SPK_VERS = 7.80
-SPK_REV = 1
+SPK_VERS = 7.92
+SPK_REV = 2
 SPK_ICON = src/nmap.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -14,6 +14,5 @@ HOMEPAGE = https://nmap.org/
 LICENSE  = https://svn.nmap.org/nmap/COPYING
 
 SPK_COMMANDS = bin/nmap bin/nping bin/ndiff
-
 
 include ../../mk/spksrc.spk.mk
