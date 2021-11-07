@@ -1,5 +1,5 @@
 PKG_NAME = fish
-PKG_VERS = 3.2.2
+PKG_VERS = 3.3.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fish-shell/fish-shell/releases/download/$(PKG_VERS)

@@ -7,7 +7,7 @@ FIRMWARE = 4.3-3776
 LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
-UNSUPPORTED_ARCHS = powerpc
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # include arch definitions
 include ../../mk/spksrc.archs.mk

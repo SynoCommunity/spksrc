@@ -1,23 +1,23 @@
 SPK_NAME = sickchill
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_VERS = 20210729
+SPK_REV = 3
 SPK_ICON = src/sickchill.png
 
-DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python3>=3.6:git"
-PIP=pip3
+BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel cross/poetry cross/lxml
+# cross/cffi cross/setuptools cross/cryptography cross/poetry
+DEPENDS = cross/PyNaCl cross/$(SPK_NAME)
+SPK_DEPENDS = "python38"
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
-MAINTAINER = Nyaran
+MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
-DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Initial SickChill version"
+CHANGELOG = "1. SickChill environment fix<br/>2. Move to Python 3.8 without git<br/>3. Added DSM7 Support"
 
 HOMEPAGE   = https://sickchill.github.io/
-LICENSE    = GPL
+LICENSE    = GPLv3+
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -30,9 +30,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = sickchill_extra_install
-
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
 
 include ../../mk/spksrc.spk.mk
 

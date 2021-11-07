@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.1.16
-SPK_REV = 8
+SPK_VERS = 1.1.17
+SPK_REV = 9
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python38
@@ -15,15 +15,15 @@ SPK_DEPENDS = "python38"
 # pip install  ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic
 # pip freeze > requirements.txt
 # deactivate
-# adjust the first line in requirements.txt to "#borgbackup==1.1.16"
-WHEELS = src/requirements.txt
+# adjust the first line in requirements.txt to "#borgbackup==1.1.17"
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgbackup to v1.1.16 and Python 3.8<br/>2. Update borgmatic to v1.5.15.<br/>3. Add security fix CVE-2020-14343 (PyYAML dependency removed)."
+CHANGELOG = "1. Update borgbackup to v1.1.17 and borgmatic to v1.5.18.<br/>2. Update OpenSSL to v1.1.1l."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause

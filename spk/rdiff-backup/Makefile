@@ -6,7 +6,7 @@ SPK_ICON = src/rdiff-backup.png
 BUILD_DEPENDS = cross/python3
 DEPENDS = cross/librsync cross/attr cross/acl
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt
 
 SPK_DEPENDS = "python3>=3.7"
 

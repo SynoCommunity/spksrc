@@ -1,5 +1,5 @@
 PKG_NAME = gensio
-PKG_VERS = 1.5.6
+PKG_VERS = 2.2.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/$(PKG_NAME)/archive
@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 HOMEPAGE = https://github.com/cminyard/gensio
-COMMENT  = gensio - General Stream I/O
+COMMENT  = A library to abstract stream I/O like serial port, TCP, telnet, UDP, SSL, IPMI SOL, etc.
 LICENSE  = GPLv2
 
 # qoriq is the only PPC arch that is supported
@@ -18,7 +18,7 @@ DEPENDS = cross/openssl
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = gensio_pre_configure
 
-CONFIGURE_ARGS  = --with-python=no --with-swig=no
+CONFIGURE_ARGS = --with-python=no --with-swig=no
 
 include ../../mk/spksrc.cross-cc.mk
 

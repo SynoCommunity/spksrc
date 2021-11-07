@@ -1,8 +1,9 @@
 PKG_NAME = libaom
-PKG_VERS = v3.1.0
+PKG_VERS = v3.2.0
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 33aff8586e35ffe385637f6aa2c991858c0fb58e
+PKG_GIT_HASH = 287164de79516c25c8c84fd544f67752c170082a
+# Tag v3.2.0: 287164de79516c25c8c84fd544f67752c170082a
 # Tag v3.1.0: 33aff8586e35ffe385637f6aa2c991858c0fb58e
 # Tag v3.0.0: d853caa2ab62d161e5edf344ffee7b597449dc0d
 PKG_DIST_SITE = https://aomedia.googlesource.com/aom
@@ -21,11 +22,15 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 
 CMAKE_USE_NASM = 1
+CMAKE_USE_NINJA = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
 # libaom specific cmake options
 CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
+
+# Disable tests
+CMAKE_ARGS += -DENABLE_TESTS=0
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_C99_MATH

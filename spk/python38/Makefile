@@ -1,32 +1,34 @@
 SPK_NAME = python38
-SPK_VERS = 3.8.8
+SPK_VERS = 3.8.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 3
+SPK_REV = 6
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/wheel
-DEPENDS += cross/cffi cross/bcrypt cross/sqlite
 # Cross-compiled wheels
-DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
-DEPENDS += cross/msgpack-python cross/ruamel.yaml cross/immutables
-DEPENDS += cross/cryptography
+DEPENDS += cross/bcrypt cross/cffi
+DEPENDS += cross/cryptography cross/greenlet cross/immutables
+DEPENDS += cross/lxml cross/msgpack-python
+DEPENDS += cross/pycrypto cross/pycurl
+DEPENDS += cross/pyyaml cross/ruamel.yaml cross/sqlite
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
-RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Python 3.8
-CHANGELOG = "Update depencencies (PyYAML, cryptography, and others) including security fixes for CVE-2020-14343."
+CHANGELOG = "1. Update to Python 3.8.12<br/>2. Update OpenSSL to v1.1.1l<br/>3. Update included wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
+
+ENV += PYTHON_OPTIMIZE=1
 
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 

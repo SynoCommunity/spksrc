@@ -1,5 +1,5 @@
 PKG_NAME = go
-PKG_VERS = 1.16.5
+PKG_VERS = 1.17.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS).linux-amd64.$(PKG_EXT)
 PKG_DIST_SITE = https://golang.org/dl

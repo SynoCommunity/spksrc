@@ -22,6 +22,6 @@
         }]
     },
     {
-        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "<p>The first time SickChill is started it might take a few moments for the interface to become available!</p><p>Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details.</p>"
     }]
 }]

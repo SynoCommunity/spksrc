@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.3.2
+PKG_VERS = 4.3.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -50,6 +50,10 @@ OPTIONAL_DEPENDS += cross/intel-media-sdk
 OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
+
+DEPENDS += cross/libxml2
+CONFIGURE_ARGS += --enable-libxml2
+CONFIGURE_ARGS += --enable-demuxer=dash
 
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
@@ -104,6 +108,8 @@ endif
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
 
 #
 # fdk-acc is now considered compatible with (L)GPL.

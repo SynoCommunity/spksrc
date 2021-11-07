@@ -1,0 +1,20 @@
+## Modules cross-compiled via spksrc.python-wheel.mk
+# Included for reference
+#lxml==4.6.3
+#pycrypto==2.6.1
+#Pillow==8.2.0
+#pycurl==7.43.0.6
+#pyyaml==5.4.1
+#immutables==0.16
+
+## Cross-compiled via spksrc.wheel.mk
+markupsafe==2.0.1
+psutil==5.8.0
+sqlalchemy==1.4.26
+zope.interface==5.4.0
+
+# cryptography dependencies
+pyasn1==0.4.8
+
+# pillow dependencies
+olefile==0.46

@@ -1,0 +1,33 @@
+From 71469442cb640bec4979b1ee6392dd9fc0471ce0 Mon Sep 17 00:00:00 2001
+From: BKSteve <stephen.rieger@gmail.com>
+Date: Mon, 23 Aug 2021 00:13:31 +0700
+Subject: [PATCH] Helpers clean warning from list
+
+regex to remove the warning from poetry in the string and enable loading via pip install.
+---
+ sickchill/init_helpers.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/sickchill/init_helpers.py b/sickchill/init_helpers.py
+index 3b82bb29c7..3e97c8cbfc 100644
+--- sickchill/init_helpers.py
++++ sickchill/init_helpers.py
+@@ -2,6 +2,7 @@
+ import gettext
+ import logging
+ import os
++import re
+ import site
+ import subprocess
+ import sys
+@@ -182,7 +183,9 @@ def get_os_id():
+
+ def pip_install(packages: Union[List[str], str]) -> bool:
+     if not isinstance(packages, list):
+-        packages = packages.splitlines()
++        # clean out Warning line in list (dirty clean)
++        packages = re.sub(r'Warning.*', "", packages)
++        packages = packages.strip().splitlines()
+
+     cmd = [
+         sys.executable,

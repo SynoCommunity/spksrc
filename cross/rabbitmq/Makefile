@@ -1,5 +1,5 @@
 PKG_NAME = rabbitmq
-PKG_VERS = 3.8.16
+PKG_VERS = 3.8.23
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-server-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rabbitmq/rabbitmq-server/releases/download/v$(PKG_VERS)

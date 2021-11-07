@@ -13,8 +13,6 @@ LICENSE  = BSD
 
 include ../../mk/spksrc.archs.mk
 
-GNU_CONFIGURE = 1
-
 # Link to atomic library for QorIQ architecture
 ifneq ($(findstring $(ARCH),qoriq),)
 CONFIGURE_TARGET = redis_patch_makefile_to_use_atomic_library

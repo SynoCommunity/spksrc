@@ -17,8 +17,9 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 PIP ?= pip
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
-PIP_WHEEL_ARGS = wheel --no-binary :all: $(PIP_CACHE_OPT) --no-deps --requirement $(WORK_DIR)/wheelhouse/requirements.txt --wheel-dir $(WORK_DIR)/wheelhouse
+PIP_WHEEL_ARGS = wheel --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
 PIP_WHEEL = $(PIP) $(PIP_WHEEL_ARGS)
+PIP_DOWNLOAD = $(PIP) download $(PIP_ARGS) --dest $(BASE_DISTRIB_DIR)
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
@@ -57,17 +58,50 @@ SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
 #         all archs except generic archs
 LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))
 
+# Set parallel build mode
+ifeq ($(PARALLEL_MAKE),)
+# If not set but -j or -l argument passed, must
+# manually specify the value of PARALLEL_MAKE
+# as otherwise this will create too high load
+ifneq ($(strip $(filter -j% -l%, $(shell ps T $$PPID))),)
+PARALLEL_MAKE = nop
+ENV += PARALLEL_MAKE=nop
+# If not set, force max parallel build mode
+else
+PARALLEL_MAKE = max
+ENV += PARALLEL_MAKE=max
+endif
+endif
 
-# Relocate to set conditionally according to existing parallel options in caller
-ifneq ($(PARALLEL_MAKE),)
-ifeq ($(PARALLEL_MAKE),max)
+# Allow parallel make to be disabled per package
+ifeq ($(DISABLE_PARALLEL_MAKE),1)
+PARALLEL_MAKE = nop
+endif
+
+# Set NCPUS based on PARALLEL_MAKE
+ifeq ($(PARALLEL_MAKE),nop)
+NCPUS = 1
+else ifeq ($(PARALLEL_MAKE),max)
 NCPUS = $(shell grep -c ^processor /proc/cpuinfo)
 else
 NCPUS = $(PARALLEL_MAKE)
 endif
-ifeq ($(filter $(NCPUS),0 1),)
-COMPILE_MAKE_OPTIONS += -j$(NCPUS)
+
+# Enable stats over parallel build mode
+ifneq ($(filter 1 on ON,$(PSTAT)),)
+PSTAT_TIME = time -o $(PSTAT_LOG) --append
+else
+PSTAT_TIME =
 endif
+
+# Always send PSTAT output to proper log file
+# independantly from active Makefile location
+ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
+PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build.stats.log
+else ifneq ($(wildcard $(WORK_DIR)),)
+PSTAT_LOG = $(WORK_DIR)/../build.stats.log
+else
+PSTAT_LOG = $(shell pwd)/build.stats.log
 endif
 
 # Terminal colors

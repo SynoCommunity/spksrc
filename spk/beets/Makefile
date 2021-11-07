@@ -1,6 +1,6 @@
 SPK_NAME = beets
 SPK_VERS = 1.4.9
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/beets.png
 
 PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip

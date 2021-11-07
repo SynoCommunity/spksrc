@@ -12,18 +12,17 @@ COMMENT  = 7-Zip is a file archiver with a high compression ratio.
 LICENSE  = https://www.7-zip.org/license.txt
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = p7zip_compile
 INSTALL_TARGET = p7zip_install
 OFLAG = -O3
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS =
+COMPILE_MAKE_OPTIONS += all3
+COMPILE_MAKE_OPTIONS += CC="$(TC_PATH)$(TC_PREFIX)gcc \$$(ALLFLAGS) $(OFLAG)"
+COMPILE_MAKE_OPTIONS += CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) $(OFLAG)"
+COMPILE_MAKE_OPTIONS += CPPFLAGS="$(CPPFLAGS)"
+COMPILE_MAKE_OPTIONS += LDFLAGS="$(LDFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: p7zip_compile
-p7zip_compile:
-	@$(RUN) $(MAKE) all3 CC="$(TC_PATH)$(TC_PREFIX)gcc \$$(ALLFLAGS) $(OFLAG)" CXX="$(TC_PATH)$(TC_PREFIX)g++ \$$(ALLFLAGS) $(OFLAG)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 .PHONY: p7zip_install
 p7zip_install:
