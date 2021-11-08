@@ -1,6 +1,6 @@
 SPK_NAME = prowlarr
-SPK_VERS = 0.1.1.875
 SPK_REV = 1
+SPK_VERS = 0.1.1.1030
 SPK_ICON = src/prowlarr.png
 
 # .NET is not supported on PPC, ARM5, ARM7L and x86
