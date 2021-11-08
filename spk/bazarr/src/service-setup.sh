@@ -4,16 +4,14 @@ PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${FFMP
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip
+LANGUAGE="env LANG=en_US.UTF-8 LC_ALL=en_US.utf8"
 
 GROUP="sc-download"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 SVC_CWD="${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}"
 
-export LC_ALL=en_US.utf8
-export LANG=en_US.utf8
-
-SERVICE_COMMAND="$PYTHON ${SVC_CWD}/bazarr.py --no-update --config ${SYNOPKG_PKGVAR}/data "
+SERVICE_COMMAND="$LANGUAGE $PYTHON ${SVC_CWD}/bazarr.py --no-update --config ${SYNOPKG_PKGVAR}/data "
 
 service_postinst ()
 {
