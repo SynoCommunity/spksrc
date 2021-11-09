@@ -133,7 +133,6 @@ postinst ()
     fi
 
     call_func "service_postinst" install_log
-    call_func "service_clean_tmpdir" install_log
 
     if [ -n "${LOG_FILE}" ]; then
         echo "Installation log: ${INST_LOG}" >> ${LOG_FILE}
