@@ -7,12 +7,14 @@ aniso8601==9.0.1
 APScheduler==3.7.0
 attrs==20.3.0
 babelfish==0.5.5
-beautifulsoup4==4.10.0
-certifi==2020.12.5
-chardet==4.0.0
-cheroot==8.5.2
+#beautifulsoup4==4.10.0              ==> python310
+Brotli==1.0.9
+#certifi==2020.12.5                  ==> python310
+#chardet==4.0.0                      ==> python310
 CherryPy==18.6.0
+click==7.1.2
 colorama==0.4.4
+colorclass==2.2.0
 feedparser==6.0.2
 Flask==1.1.2
 Flask-Compress==1.9.0
@@ -21,37 +23,54 @@ Flask-Login==0.5.0
 Flask-RESTful==0.3.8
 flask-restx==0.4.0
 FlexGet==3.1.129
+#greenlet==1.0.0                     ==> python310
 guessit==3.2.0
 html5lib==1.1
 idna==2.10
-importlib-metadata==4.0.1
 itsdangerous==1.1.0
-jaraco.classes==3.2.1
-jaraco.collections==3.3.0
-jaraco.functools==3.3.0
-jaraco.text==3.5.0
 Jinja2==2.11.3
-jsonschema==3.2.0
 loguru==0.5.3
+#MarkupSafe==2.0.0                   ==> python310
 more-itertools==8.7.0
-#plumbum==1.7.0
 plumbum==1.6.9
-portend==2.7.1
+#plumbum==1.7.0
+progressbar==2.5
+#psutil==5.8.0                       ==> python310
+pynzb==0.1.0
 pyparsing==2.4.7
-python-dateutil==2.8.1
+pyrsistent==0.17.3
+PyRSS2Gen==1.1
 pytz==2021.1
+PyYAML==5.4.1
 rebulk==3.0.1
 requests==2.25.1
-#rpyc==5.0.1
 rpyc==4.1.2
-six==1.16.0
+#rpyc==5.0.1
+sgmllib3k==1.0.0
+#six==1.16.0                         ==> python310
 soupsieve==2.2.1
-tempora==4.0.2
-transmission-rpc==3.2.5
+#SQLAlchemy==1.4.15                  ==> python310
+terminaltables==3.1.0
 typing-extensions==3.10.0.0
-tzlocal==2.1
-urllib3==1.26.5
-webencodings==0.5.1
+#tzlocal==2.1                        ==> python310
+#urllib3==1.26.5                     ==> python310
+#webencodings==0.5.1                 ==> python310
 Werkzeug==1.0.1
 zc.lockfile==2.0
-zipp==3.4.1
+zxcvbn-python==4.4.24
+
+# Wheels that absolutely needs
+# to be managed as pure-python
+pure:cheroot==8.5.2
+#pure:importlib-metadata==4.0.1      ==> python310
+pure:jaraco.classes==3.2.1
+pure:jaraco.collections==3.3.0
+pure:jaraco.functools==3.3.0
+pure:jaraco.text==3.5.0
+pure:jsonschema==3.2.0
+pure:poetry==1.1.11
+pure:portend==2.7.1
+#pure:python-dateutil==2.8.1         ==> python310
+pure:tempora==4.0.2
+pure:transmission-rpc==3.2.5
+#pure:zipp==3.4.1                    ==> python310
