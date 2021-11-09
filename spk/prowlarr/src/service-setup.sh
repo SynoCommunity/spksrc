@@ -5,7 +5,7 @@ PROWLARR="${SYNOPKG_PKGDEST}/share/Prowlarr/bin/Prowlarr"
 
 # Prowlarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGVAR}"
-CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
 
 SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${PROWLARR}"
 SVC_BACKGROUND=y
