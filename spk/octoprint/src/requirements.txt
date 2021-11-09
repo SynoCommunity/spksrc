@@ -20,19 +20,29 @@ colorlog==5.0.1
 emoji==1.6.1
 feedparser==6.0.8
 filetype==1.0.8
-future==0.18.2
-immutabledict==2.2.1
+#future==0.18.2         ==> python310
 itsdangerous==1.1.0
+MarkupSafe==1.1.1
 netaddr==0.8.0
+#netifaces==0.11.0      ==> python310
 pathvalidate==2.5.0
+#psutil==5.8.0          ==> python310
 pkginfo==1.7.1
 pylru==1.2.0
 pyserial==3.5
-requests==2.26.0
+PyYAML==5.4.1
+#regex==2021.10.23      ==> python310
+#requests==2.26.0       ==> python310
 sarge==0.1.6
 semantic_version==2.8.5
 sentry_sdk==1.4.3
+tornado==6.1
 watchdog==0.10.4
 websocket_client==0.59.0
+wrapt==1.12.1
 zeroconf==0.33.4
 zipstream_new==1.1.8
+
+# Wheels that absolutely needs
+# to be managed as pure-python
+pure:immutabledict==2.2.1

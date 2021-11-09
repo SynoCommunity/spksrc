@@ -1,25 +1,25 @@
 SPK_NAME   = octoprint
 SPK_VERS   = 1.7.2
-SPK_REV    = 6
+SPK_REV    = 7
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python310
 DEPENDS = cross/octoprint
 
-WHEELS = src/requirements-cross.txt src/requirements.txt
+WHEELS = src/requirements.txt
 
-SPK_DEPENDS = "python38"
+SPK_DEPENDS = "python310"
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = The snappy web interface for your 3D printer.
 SERVICE_PORT = 8088
-ADMIN_PORT 	 = $(SERVICE_PORT)
+ADMIN_PORT   = $(SERVICE_PORT)
 
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.7.2 and python38"
+CHANGELOG    = "Update OctoPrint to v1.7.2 and python310"
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
