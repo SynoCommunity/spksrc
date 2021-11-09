@@ -1,2 +1,0 @@
-cheetah3==3.2.6
-sabyenc3==4.0.2
