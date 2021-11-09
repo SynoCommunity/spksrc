@@ -14,6 +14,9 @@
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
+ifeq ($(strip $(WHEELS_DEFAULT)),)
+WHEELS_DEFAULT = requirements.txt
+endif
 ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
 WHEELS_PURE_PYTHON = requirements-pure.txt
 endif
@@ -22,7 +25,12 @@ WHEELS_CROSS_COMPILE = requirements-cross.txt
 endif
 
 ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),)
+# If no ARCH then pure by default
+ifeq ($(strip $(ARCH)),)
 WHEEL_DEFAULT_PREFIX = pure
+else
+WHEEL_DEFAULT_PREFIX = cross
+endif
 endif
 
 ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),pure)
@@ -93,18 +101,18 @@ pre_wheel_target: wheel_msg_target
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ -n "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
-		if [ -f "$(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)" ]; then \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)" ]; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
-				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 			else \
-				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" pip $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 			fi ; \
 		fi ; \
-		if [ -f "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 			$(MSG) "Force pure-python" ; \
 			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-				$(RUN) $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				$(RUN) $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 		fi ; \
 	fi
 
