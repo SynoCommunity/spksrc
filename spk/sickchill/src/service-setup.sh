@@ -1,4 +1,4 @@
-PYTHON_DIR="/var/packages/python38/target"
+PYTHON_DIR="/var/packages/python310/target"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGVAR}"
