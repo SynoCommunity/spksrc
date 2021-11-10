@@ -124,6 +124,8 @@ python38_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
+# Create the crossenv in preparation for
+# cross-compiling all the necessary wheels
 .PHONY: python38_post_install
 python38_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
@@ -138,6 +140,10 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.15.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cffi==1.15.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cryptography==3.3.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cryptography==3.3.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "poetry==1.1.11"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "poetry==1.1.11"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
