@@ -21,6 +21,7 @@ emoji==1.6.1
 feedparser==6.0.8
 filetype==1.0.8
 #future==0.18.2         ==> python310
+immutabledict==2.2.1
 itsdangerous==1.1.0
 MarkupSafe==1.1.1
 netaddr==0.8.0
@@ -42,7 +43,3 @@ websocket_client==0.59.0
 wrapt==1.12.1
 zeroconf==0.33.4
 zipstream_new==1.1.8
-
-# Wheels that absolutely needs
-# to be managed as pure-python
-pure:immutabledict==2.2.1
