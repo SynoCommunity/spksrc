@@ -3,7 +3,7 @@
 service_postinst ()
 {
     # Create a Python virtualenv
-    /var/packages/python3/target/bin/python3 -m venv ${SYNOPKG_PKGDEST}/env
+    /var/packages/python310/target/bin/python3 -m venv ${SYNOPKG_PKGDEST}/env
 
     # Install the wheels
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
