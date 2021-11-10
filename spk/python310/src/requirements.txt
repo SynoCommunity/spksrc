@@ -6,6 +6,7 @@ beautifulsoup4==4.10.0
 certifi==2021.10.8
 cffi==1.15.0
 chardet==4.0.0
+charset-normalizer==2.0.7
 click==8.0.3
 cryptography==3.3.2
 distlib==0.3.3
@@ -26,6 +27,7 @@ olefile==0.46
 oauthlib==3.1.1
 packaging==21.0
 paramiko==2.8.0
+poetry==1.1.11
 psutil==5.8.0
 pyasn1==0.4.8
 pycparser==2.20
@@ -56,7 +58,6 @@ pure:filelock==3.3.2
 pure:importlib-metadata==4.8.1
 pure:importlib-resources==5.3.0
 pure:platformdirs==2.4.0
-pure:poetry==1.1.11
 pure:python-dateutil==2.8.2
 pure:virtualenv==20.9.0
 pure:zipp==3.6.0
