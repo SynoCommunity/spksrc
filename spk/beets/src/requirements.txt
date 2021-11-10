@@ -19,7 +19,7 @@ langdetect==1.0.7
 #oauthlib==3.1.0         ==> included in python310 package installation
 pyacoustid==1.1.7
 pylast==3.2.0
-python-mpd2==1.0.0
+python-mpd2==1.1.0
 pyxdg==0.26
 rarfile==3.1
 #requests==2.23.0         ==> included in python310 package installation
