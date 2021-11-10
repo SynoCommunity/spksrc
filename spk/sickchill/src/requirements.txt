@@ -1,14 +1,13 @@
-babelfish==0.6.0
-beautifulsoup4==4.10.0
-beekeeper-alt==2021.7.16
 #appdirs==1.4.4               ==> python310
+babelfish==0.6.0
 #beautifulsoup4==4.10.0       ==> python310
+beekeeper-alt==2021.7.16
 bencode.py==4.0.0
 cachecontrol==0.12.9
 #certifi==2021.10.8           ==> python310
 #cffi==1.15.0                 ==> python310
 #chardet==4.0.0               ==> python310
-charset-normalizer==2.0.7
+#charset-normalizer==2.0.7    ==> python310
 #click==8.0.3                 ==> python310
 cloudscraper==1.2.58
 colorama==0.4.4
@@ -34,6 +33,7 @@ IMDbPY==2021.4.18
 #ipaddress==1.0.23            ==> python310
 Js2Py==0.71
 jsonrpclib-pelix==0.4.3.1
+kodipydent-alt==2021.7.16
 #lxml==4.6.3                  ==> python310
 Mako==1.1.5
 markdown2==2.4.1
@@ -43,7 +43,9 @@ new-rtorrent-python==1.0.1a0
 #oauthlib==3.1.1              ==> python310
 #packaging==20.9              ==> python310
 pbr==5.7.0
+poetry==1.2.0a2
 poetry-core==1.1.0a6
+poetry-date-version-plugin==2021.7.16-6
 profilehooks==1.12.0
 putio.py==8.7.0
 #pycparser==2.20              ==> python310
@@ -90,12 +92,4 @@ webencodings==0.5.1
 win-inet-pton==1.1.0
 wrapt==1.13.3
 xmltodict==0.12.0
-
-# Wheels that absolutely needs
-# to be managed as pure-python
-pure:babelfish==0.6.0
-pure:beekeeper-alt==2021.7.16
-pure:kodipydent-alt==2021.7.16
-pure:poetry==1.2.0a2
-pure:poetry-date-version-plugin==2021.7.16-6
-#pure:zipp==3.6.0                 ==> python310
+#zipp==3.6.0                     ==> python310
