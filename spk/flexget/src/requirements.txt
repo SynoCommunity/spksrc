@@ -34,6 +34,7 @@ loguru==0.5.3
 more-itertools==8.7.0
 plumbum==1.6.9
 #plumbum==1.7.0
+#poetry==1.1.11                      ==> python310
 progressbar==2.5
 #psutil==5.8.0                       ==> python310
 pynzb==0.1.0
@@ -51,6 +52,7 @@ sgmllib3k==1.0.0
 soupsieve==2.2.1
 #SQLAlchemy==1.4.15                  ==> python310
 terminaltables==3.1.0
+transmission-rpc==3.2.5
 typing-extensions==3.10.0.0
 #tzlocal==2.1                        ==> python310
 #urllib3==1.26.5                     ==> python310
@@ -68,9 +70,7 @@ pure:jaraco.collections==3.3.0
 pure:jaraco.functools==3.3.0
 pure:jaraco.text==3.5.0
 pure:jsonschema==3.2.0
-pure:poetry==1.1.11
 pure:portend==2.7.1
 #pure:python-dateutil==2.8.1         ==> python310
 pure:tempora==4.0.2
-pure:transmission-rpc==3.2.5
 #pure:zipp==3.4.1                    ==> python310
