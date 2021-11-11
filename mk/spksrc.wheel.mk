@@ -14,30 +14,8 @@
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
-ifeq ($(strip $(WHEELS_DEFAULT)),)
-WHEELS_DEFAULT = requirements.txt
-endif
-ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
-WHEELS_PURE_PYTHON = requirements-pure.txt
-endif
-ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
-WHEELS_CROSS_COMPILE = requirements-cross.txt
-endif
-
-ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),)
-# If no ARCH then pure by default
-ifeq ($(strip $(ARCH)),)
-WHEEL_DEFAULT_PREFIX = pure
-else
-WHEEL_DEFAULT_PREFIX = cross
-endif
-endif
-
-ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),pure)
-WHEEL_DEFAULT_REQUIREMENT = $(WHEELS_PURE_PYTHON)
-else
-WHEEL_DEFAULT_REQUIREMENT = $(WHEELS_CROSS_COMPILE)
-endif
+## python wheel specific configurations
+include ../../mk/spksrc.wheel-env.mk
 
 ##
 
@@ -81,6 +59,9 @@ pre_wheel_target: wheel_msg_target
 				elif [ $$(basename $$wheel) = $(WHEELS_CROSS_COMPILE) ]; then \
 					$(MSG) "Adding existing $$wheel file as cross-compiled (discarding any pure-python)" ; \
 					sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				elif [ $$(basename $$wheel) = $(WHEELS_LIMITED_API) ]; then \
+					$(MSG) "Adding existing $$wheel file as ABI-limited" ; \
+					cat $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 				else \
 					$(MSG) "Adapting existing $$wheel file" ; \
 					sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
@@ -108,6 +89,10 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 			else \
 				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 			fi ; \
+		fi ; \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_LIMITED_API)" ]; then \
+			$(MSG) "Force limited API $(PYTHON_LIMITED_API)" ; \
+			. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --build-option='--py-limited-api=$(PYTHON_LIMITED_API)' --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 		fi ; \
 		if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 			$(MSG) "Force pure-python" ; \
