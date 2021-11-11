@@ -4,7 +4,7 @@ SPK_GIT_HASH = c6bb43d
 SPK_GIT_DATE = 20211020
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 31
+SPK_REV = 30
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,9 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python38"
+WHEELS = src/requirements.txt
+
 DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
 
 MAINTAINER = th0ma7

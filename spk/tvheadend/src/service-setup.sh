@@ -2,9 +2,12 @@
 # Sourced script by generic installer and start-stop-status scripts
 
 # Add ffmpeg and ifself to path
-PYTHON_DIR="/var/packages/python310/target"
+PYTHON_DIR="/var/packages/python38/target"
+PYTHONENV="${SYNOPKG_PKGDEST}/env"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+WHEELHOUSE=${SYNOPKG_PKGDEST}/share/wheelhouse
 FFMPEG_DIR="/var/packages/ffmpeg/target"
-PATH="${SYNOPKG_PKGDEST}/bin:${FFMPEG_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${FFMPEG_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
 
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
 HTTP=9981
@@ -18,6 +21,18 @@ SVC_BACKGROUND=yes
 
 # Group configuration to manage permissions of recording folders
 GROUP=sc-media
+
+service_postinst ()
+{
+    # EPG Grabber (zap2epg) - Create a Python virtualenv
+    ${VIRTUALENV} --system-site-packages ${PYTHONENV}
+
+    # EPG Grabber (zap2epg) - Install the wheels/requirements
+    ${SYNOPKG_PKGDEST}/env/bin/pip install \
+             --no-deps --no-index --no-input --upgrade \
+             --force-reinstall --find-links \
+             ${WHEELHOUSE} ${WHEELHOUSE}/*.whl
+}
 
 service_postupgrade ()
 {
