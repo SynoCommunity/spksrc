@@ -123,12 +123,3 @@ stone==3.2.1
 uritemplate==3.0.1
 #urllib3==1.26.4                 ==> python310
 wrapt==1.12.1
-
-# Wheels that absolutely needs
-# to be managed as pure-python
-pure:humanize==3.5.0
-#pure:importlib-metadata==4.0.1  ==> python310
-pure:keyring==23.0.1
-#pure:python-dateutil==2.8.1     ==> python310
-pure:tqdm==4.60.0
-#pure:zipp==3.4.1                ==> python310
