@@ -41,7 +41,7 @@ endif
 # prefix in file naming matches `uname -m`
 #
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-PYTHON_ARCH = armv5
+PYTHON_ARCH = armv5tel
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
