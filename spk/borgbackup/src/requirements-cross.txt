@@ -15,7 +15,3 @@ pyrsistent==0.18.0
 ruamel.yaml.clib==0.2.6
 #six==1.16.0                   ==> python310
 #urllib3==1.26.6               ==> python310
-
-# Wheels that absolutely needs
-# to be managed as pure-python
-pure:jsonschema==3.2.0
