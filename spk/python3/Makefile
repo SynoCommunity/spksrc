@@ -12,7 +12,7 @@ DEPENDS += cross/lxml cross/pycrypto cross/pycurl cross/pyyaml
 DEPENDS += cross/msgpack-python cross/ruamel.yaml cross/immutables
 DEPENDS += cross/cryptography
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-cross.txt src/requirements-pure.txt
 
 MAINTAINER = Allan Clark
 DESCRIPTION = Python Programming Language.

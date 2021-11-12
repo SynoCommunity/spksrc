@@ -27,12 +27,3 @@ pyasn1==0.4.8
 
 # pillow dependencies
 olefile==0.46
-
-# Wheels that absolutely needs
-# to be managed as pure-python
-pure:filelock==3.0.12
-pure:importlib-resources==5.2.2
-pure:importlib-metadata==4.8.1
-pure:platformdirs==2.4.0
-pure:virtualenv==20.4.6
-pure:zipp==3.6.0
