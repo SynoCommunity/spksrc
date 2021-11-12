@@ -1,6 +1,5 @@
 # all requirements are taken from the list "INSTALL_REQUIRES" in the 
 # original setup.py at: https://github.com/OctoPrint/OctoPrint/blob/master/setup.py
-# this file contains the pure python wheels only
 
 Flask==1.1.4
 Flask_Assets==2.0
