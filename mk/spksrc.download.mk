@@ -157,7 +157,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      else \
 	        $(MSG) "  wget $${url}" ; \
 	        rm -f $${localFile}.part ; \
-	        wget --secure-protocol=TLSv1_2 --no-check-certificate -nv -O $${localFile}.part -nc $${url} ; \
+	        wget --secure-protocol=TLSv1_2 -nv -O $${localFile}.part -nc $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
 	      flock -u 9 ; \
