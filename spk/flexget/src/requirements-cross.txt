@@ -60,17 +60,3 @@ typing-extensions==3.10.0.0
 Werkzeug==1.0.1
 zc.lockfile==2.0
 zxcvbn-python==4.4.24
-
-# Wheels that absolutely needs
-# to be managed as pure-python
-pure:cheroot==8.5.2
-#pure:importlib-metadata==4.0.1      ==> python310
-pure:jaraco.classes==3.2.1
-pure:jaraco.collections==3.3.0
-pure:jaraco.functools==3.3.0
-pure:jaraco.text==3.5.0
-pure:jsonschema==3.2.0
-pure:portend==2.7.1
-#pure:python-dateutil==2.8.1         ==> python310
-pure:tempora==4.0.2
-#pure:zipp==3.4.1                    ==> python310
