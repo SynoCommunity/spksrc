@@ -105,19 +105,21 @@ post_wheel_target: $(WHEEL_TARGET)
 	@if [ -d "$(WHEELHOUSE)" ] ; then \
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
+		$(MSG) Copying $(WHEELS_DEFAULT) wheelhouse ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
-			cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/requirements.txt ; \
+			cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		fi ; \
 		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
 			echo "Pure python wheels are excluded from the package wheelhouse." ; \
 			for w in *.whl; do \
 				if echo $${w} | grep -viq "-none-any\.whl" ; then \
-					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl; \
+					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
 				fi ; \
 			done ; \
 		else \
 			for w in *.whl; do \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl; \
+				$(MSG) Copying to wheelhouse: $$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
+				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
 			done ; \
 		fi ; \
 	fi

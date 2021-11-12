@@ -35,3 +35,35 @@ endif
 ifeq ($(strip $(PYTHON_LIMITED_API)),)
 PYTHON_LIMITED_API = cp35
 endif
+
+#
+# Define _PYTHON_HOST_PLATFORM so wheel
+# prefix in file naming matches `uname -m`
+#
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+PYTHON_ARCH = armv5
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+PYTHON_ARCH = armv7
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+PYTHON_ARCH = armv7l
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+PYTHON_ARCH = aarch64
+endif
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+PYTHON_ARCH = ppc
+endif
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+PYTHON_ARCH = x86_64
+endif
+
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PYTHON_ARCH += i686
+endif
