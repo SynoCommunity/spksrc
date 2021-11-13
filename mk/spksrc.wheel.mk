@@ -91,7 +91,7 @@ post_wheel_target: $(WHEEL_TARGET)
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
-			cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+		cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 		fi ;\
 		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
 			echo "Pure python wheels are excluded from the package wheelhouse." ; \
