@@ -72,7 +72,7 @@ ifneq ($(strip $(WHEELS)),)
 	done
 endif
 
-download_wheel_target:
+download_wheel:
 	@if [ -n "$(WHEELS)" ] ; then \
 		for wheel in $(WHEELS) ; \
 		do \
@@ -86,7 +86,7 @@ download_wheel_target:
 # Build cross compiled wheels first, to fail fast.
 # There might be an issue with some pure python wheels when built after that.
 build_wheel_target: SHELL:=/bin/bash
-build_wheel_target: $(PRE_WHEEL_TARGET) download_wheel_target
+build_wheel_target: $(PRE_WHEEL_TARGET) download_wheel
 ifneq ($(strip $(WHEELS)),)
 	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
 	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
