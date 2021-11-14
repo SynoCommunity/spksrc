@@ -83,6 +83,8 @@ RUN pip2 install virtualenv httpie
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 # Install meson cross-platform build system
 RUN pip3 install meson==0.56.0
+# Install poetry to allow pre-downloading wheels
+RUN pip3 install poetry==1.1.13
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
