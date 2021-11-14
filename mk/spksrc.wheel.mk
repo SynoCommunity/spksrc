@@ -72,10 +72,21 @@ ifneq ($(strip $(WHEELS)),)
 	done
 endif
 
+download_wheel_target:
+	@if [ -n "$(WHEELS)" ] ; then \
+		for wheel in $(WHEELS) ; \
+		do \
+			if [ -f $$wheel ] ; then \
+				$(MSG) "Downloading wheels from $$wheel ..." ; \
+				xargs -n 1 $(PIP_DOWNLOAD) 2>/dev/null < $$wheel || true ; \
+			fi ; \
+		done \
+	fi
+
 # Build cross compiled wheels first, to fail fast.
 # There might be an issue with some pure python wheels when built after that.
 build_wheel_target: SHELL:=/bin/bash
-build_wheel_target: $(PRE_WHEEL_TARGET)
+build_wheel_target: $(PRE_WHEEL_TARGET) download_wheel_target
 ifneq ($(strip $(WHEELS)),)
 	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
 	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
