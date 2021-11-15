@@ -85,6 +85,9 @@ jobs:
         run: ./.github/actions/download.sh
         env:
           DOWNLOAD_PACKAGES: ${{ needs.prepare.outputs.download_packages }}
+          ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
+          NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
+          GH_ARCH: ${{ matrix.arch }}
 
   build:
     name: Build

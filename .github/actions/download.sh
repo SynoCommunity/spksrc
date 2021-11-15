@@ -30,11 +30,14 @@ else
 fi
 
 echo ""
+echo "GH_ARCH: ${GH_ARCH%%-*}"
+echo "GH_ARCH: ${GH_ARCH}"
+echo "NOARCH_PACKAGES: ${NOARCH_PACKAGES}"
+echo "ARCH_PACKAGES: ${ARCH_PACKAGES}"
+echo "build_packages: ${build_packages}"
 
 if [ -z "${build_packages}" ]; then
     echo "===> No wheels to download. <==="
-    echo "GH_ARCH: ${GH_ARCH%%-*}"
-    echo "GH_ARCH: ${GH_ARCH}"
     exit 0
 fi
 for package in ${build_packages}
@@ -42,3 +45,5 @@ do
     echo "===> Download wheels: ${package}"
     make -C ${package} download_wheel
 fi
+
+echo ""
