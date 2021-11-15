@@ -43,7 +43,7 @@ fi
 for package in ${build_packages}
 do
     echo "===> Download wheels: ${package}"
-    make -C ${package} download_wheel
+    make -C src/${package} download_wheel
 fi
 
 echo ""
