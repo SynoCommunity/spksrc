@@ -6,6 +6,7 @@
 #
 # Functions:
 # - Download all referenced native and cross source files for packages to build.
+# - Download all referenced python wheels needed to build.
 
 set -o pipefail
 
@@ -31,7 +32,9 @@ fi
 echo ""
 
 if [ -z "${build_packages}" ]; then
-    echo "===> No packages to build. <==="
+    echo "===> No wheels to download. <==="
+    echo "GH_ARCH: ${GH_ARCH%%-*}"
+    echo "GH_ARCH: ${GH_ARCH}"
     exit 0
 fi
 for package in ${build_packages}
