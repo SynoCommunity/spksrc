@@ -44,6 +44,6 @@ for package in ${build_packages}
 do
     echo "===> Download wheels: ${package}"
     make -C src/${package} download_wheel
-fi
+done
 
 echo ""
