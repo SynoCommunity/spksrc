@@ -23,15 +23,9 @@ else
 fi
 
 # Download any python wheel sources
-if [ "${GH_ARCH%%-*}" = "noarch" ]; then
-    build_packages=${NOARCH_PACKAGES}
-else
-    build_packages=${ARCH_PACKAGES}
-fi
+build_packages="${NOARCH_PACKAGES} ${ARCH_PACKAGES}"
 
 echo ""
-echo "GH_ARCH: ${GH_ARCH%%-*}"
-echo "GH_ARCH: ${GH_ARCH}"
 echo "NOARCH_PACKAGES: ${NOARCH_PACKAGES}"
 echo "ARCH_PACKAGES: ${ARCH_PACKAGES}"
 echo "build_packages: ${build_packages}"
@@ -43,7 +37,7 @@ fi
 for package in ${build_packages}
 do
     echo "===> Download wheels: ${package}"
-    make -C src/${package} download_wheel
+    make -C spk/${package} download_wheel
 done
 
 echo ""
