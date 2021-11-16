@@ -22,13 +22,10 @@ else
     done
 fi
 
+echo ""
+
 # Download any python wheel sources
 build_packages="${NOARCH_PACKAGES} ${ARCH_PACKAGES}"
-
-echo ""
-echo "NOARCH_PACKAGES: ${NOARCH_PACKAGES}"
-echo "ARCH_PACKAGES: ${ARCH_PACKAGES}"
-echo "build_packages: ${build_packages}"
 
 if [ -z "${build_packages}" ]; then
     echo "===> No wheels to download. <==="
