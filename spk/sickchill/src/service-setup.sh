@@ -69,9 +69,11 @@ service_postupgrade() {
 service_preupgrade ()
 {
     # We have to reset /env folder to 3.8 so remove entire folder as it gets rebuilt in postinst and this avoids any conflicts.
-    # Revision 1 was running python 3.7
+    # Revision 1 was python 3.7. For cleaner update remove share and lib folders for clean install, leave user data /var.
     if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ] && [ "$(echo ${SYNOPKG_OLD_PKGVER} | sed -r 's/^.*-([0-9]+)$/\1/')" -le 1 ]; then
-        echo "Removing old ${SYNOPKG_PKGDEST}/env for new Python 3.8"
+        echo "Removing old ${SYNOPKG_PKGDEST}/env and /share for new Python 3.8 and old install"
         rm -rf ${SYNOPKG_PKGDEST}/env
+        rm -rf ${SYNOPKG_PKGDEST}/share
+        rm -rf ${SYNOPKG_PKGDEST}/lib
     fi
 }

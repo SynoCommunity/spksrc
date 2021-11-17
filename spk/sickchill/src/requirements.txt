@@ -1,7 +1,7 @@
 ###poetry adds with removal of cross/poetry
-poetry==1.2.0a2
-poetry-core==1.1.0a6
-poetry-date-version-plugin==2021.7.16-6
+###poetry==1.2.0a2
+###poetry-core==1.1.0a6
+###poetry-date-version-plugin==2021.7.16-6
 ###py38 appdirs==1.4.4
 babelfish==0.6.0
 beautifulsoup4==4.10.0
@@ -80,4 +80,4 @@ validators==0.18.2
 webencodings==0.5.1
 win-inet-pton==1.1.0
 xmltodict==0.12.0
-zipp==3.6.0
+###py38 zipp==3.6.0
