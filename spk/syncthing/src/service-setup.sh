@@ -1,5 +1,5 @@
 # syncthing service definition
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/syncthing -home=${SYNOPKG_PKGVAR}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/syncthing serve --home=${SYNOPKG_PKGVAR}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
