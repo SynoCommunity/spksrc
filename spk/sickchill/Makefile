@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
 SPK_VERS = 20211110
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python38
