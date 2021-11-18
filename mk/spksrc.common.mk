@@ -20,11 +20,11 @@ PIP ?= pip
 PIP_SYSTEM = $(shell which pip)
 
 # Why ask for the same thing twice? Always cache downloads
-PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --find-links $(BASE_DISTRIB_DIR) --wheel-dir $(WHEELHOUSE)
+PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR) --find-links $(BASE_DISTRIB_DIR)
+PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
 PIP_WHEEL = $(PIP) $(PIP_WHEEL_ARGS)
 # Allow pre-downloading wheel sources
-PIP_DOWNLOAD_ARGS = download --no-binary :all: $(PIP_CACHE_OPT) --find-links $(BASE_DISTRIB_DIR) --dest $(BASE_DISTRIB_DIR) --no-build-isolation
+PIP_DOWNLOAD_ARGS = download --no-binary :all: $(PIP_CACHE_OPT) --dest $(BASE_DISTRIB_DIR) --no-build-isolation
 PIP_DOWNLOAD = $(PIP) $(PIP_DOWNLOAD_ARGS)
 
 # Available languages
