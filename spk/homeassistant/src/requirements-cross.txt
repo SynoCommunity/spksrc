@@ -15,18 +15,18 @@ aiohttp==3.7.4.post0
 #attrs==21.2.0
 #awesomeversion==21.4.0
 backports.zoneinfo;python_version<"3.9"
-bcrypt==3.1.7
+#py310 bcrypt==3.1.7
 #certifi==2021.5.30
 ciso8601==2.1.3
 #httpx==0.19.0
 ## jinja2==3.0.1      # fails to build, moved to postinst_default_config_requirements.txt
-PyJWT==1.7.1
+#py310 PyJWT==1.7.1
 ## cryptography==3.3.2
 ## pip>=8.0.3,<20.3
 #python-slugify==4.0.1
-pyyaml==5.4.1
+#py310 pyyaml==5.4.1
 #requests==2.25.1
-ruamel.yaml==0.15.100
+#py310 ruamel.yaml==0.15.100
 #voluptuous==0.12.1
 #voluptuous-serialize==2.4.0
 yarl==1.6.3
@@ -38,12 +38,12 @@ yarl==1.6.3
 #hass-nabucasa==0.46.0
 
 ### other default dependencies that need cross compiled wheel
-MarkupSafe==2.0.1
+#py310 MarkupSafe==2.0.1
 aiokafka==0.6.0
-cffi==1.14.1
-greenlet==1.1.1
+#py310 cffi==1.14.1
+#py310 greenlet==1.1.1
 multidict==5.1.0
-sqlalchemy==1.4.23
+#py310 sqlalchemy==1.4.23
 
 
 # Failed to build: av clx-sdk-xms homeassistant-pyozw python-twitch-client
@@ -62,16 +62,16 @@ sqlalchemy==1.4.23
 
 ephem==3.7.7.0
 ###gevent==21.8.0
-guppy3==3.1.0
+guppy3==3.1.2
 ###homeassistant-pyozw==0.1.10    # deprecated open-z-wave, fails to cross compile
-netifaces==0.11.0
-psutil==5.8.0
+#py310 netifaces==0.11.0
+#py310 psutil==5.8.0
 pyads==3.2.2
 pycares==4.0.0
 # pybluez==0.22       # for fjaraskupan fails to build
 # pycocotools==2.0.1  # fails to cross compile (aarch64)
 pyitachip2ir==0.0.7
-regex==2021.8.3
+#py310 regex==2021.8.3
 #ujson==4.2.0         # dependency of pyflunearyou
 websockets==9.1
 # pandas==1.3.1  # depends on numpy...
