@@ -1,22 +1,18 @@
 SPK_NAME = homeassistant
 SPK_VERS = 2021.9.7
-SPK_REV = 16
+SPK_REV = 17
 SPK_ICON = src/${SPK_NAME}.png
 
 SPK_DEPENDS = "python310"
 
-###py310 BUILD_DEPENDS = cross/python310 cross/setuptools cross/pip cross/wheel
 BUILD_DEPENDS = cross/python310
 
-###py310 DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex cross/pycryptodome
 DEPENDS += cross/gevent
 DEPENDS += cross/homeassistant.pillow
 # for iqvia
 DEPENDS += cross/numpy
 # for python-libnmap
 DEPENDS += cross/nmap
-# for mobile_app
-###py310 DEPENDS += cross/PyNaCl
 # for tradfri
 DEPENDS += cross/dtlssocket
 # for denonavr
