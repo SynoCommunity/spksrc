@@ -22,7 +22,7 @@ include ../../mk/spksrc.cross-cc.mk
 busybox_configure:
 	cp spksrc_defconfig $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig
 	cat $(addprefix configs/, $(BUSYBOX_CONFIG)) | while IFS== read option value; do \
-	  sed -i -r -e "s/^(# )?$$option .*$$/$$option=$$value/" $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig ; \
+	  sed -i -r -e "s/^(# )?$$option\s.*$$/$$option=$$value/" $(WORK_DIR)/$(PKG_DIR)/configs/spksrc_defconfig ; \
 	done
 	$(RUN) $(MAKE) spksrc_defconfig
 
