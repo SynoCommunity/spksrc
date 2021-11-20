@@ -1,7 +1,7 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -25,6 +25,10 @@ ENV += SODIUM_INSTALL=system
 # Patched cross-compiled wheel
 # https://github.com/python-pillow/Pillow/issues/5799
 DEPENDS += cross/pillow
+
+# Required for pycares
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
 
 WHEELS = src/requirements-cross.txt src/requirements-pure.txt src/requirements-abi3.txt
 
