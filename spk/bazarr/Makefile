@@ -12,7 +12,6 @@ DEPENDS += cross/unrar
 DEPENDS += cross/numpy
 DEPENDS += cross/webrtcvad
 DEPENDS += cross/greenlet
-DEPENDS += cross/zope.event
 
 SPK_DEPENDS = "python38:ffmpeg"
 
@@ -34,5 +33,7 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
+
+WHEELS = src/requirements.txt
 
 include ../../mk/spksrc.spk.mk
