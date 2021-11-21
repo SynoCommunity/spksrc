@@ -37,6 +37,7 @@ SPK_COMMANDS += sbin/logsave sbin/mke2fs sbin/mkfs.ext2 sbin/mkfs.ext3 sbin/mkfs
 SPK_COMMANDS += sbin/mklost+found sbin/resize2fs sbin/tune2fs sbin/uuidd
 SPK_COMMANDS += sbin/mkntfs sbin/ntfsclone sbin/ntfscp sbin/ntfslabel sbin/ntfsresize sbin/ntfsundelete
 SPK_COMMANDS += bin/ntfs-3g.probe bin/ntfscat bin/ntfscluster bin/ntfscmp bin/ntfsfix bin/ntfsinfo bin/ntfsls
+SPK_COMMANDS += bin/lowntfs-3g bin/ntfs-3g
 
 SPK_COMMANDS += bin/fusermount bin/ulockmgr_server
 SPK_COMMANDS += bin/testdisk bin/photorec bin/fidentify
