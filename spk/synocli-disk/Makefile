@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
 SPK_VERS = 3.2
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
@@ -14,7 +14,7 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.archs.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # DAR: archs without C++11 support are not supported
 DEPENDS += cross/dar
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
@@ -23,7 +23,7 @@ endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update e2fsprogs to v1.46.2.<br/>2. Update lsscsi to v0.32."
+CHANGELOG = "1. Updateopenssl to v1.1.1l.<br/>2. Update ntfs-3g to v2021.8.22.<br/>3. Update e2fsprogs to v1.46.4.<br/>4. Update ncdu to v1.16.<br/>5. Update davfs2 to v1.6.1."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -37,6 +37,7 @@ SPK_COMMANDS += sbin/logsave sbin/mke2fs sbin/mkfs.ext2 sbin/mkfs.ext3 sbin/mkfs
 SPK_COMMANDS += sbin/mklost+found sbin/resize2fs sbin/tune2fs sbin/uuidd
 SPK_COMMANDS += sbin/mkntfs sbin/ntfsclone sbin/ntfscp sbin/ntfslabel sbin/ntfsresize sbin/ntfsundelete
 SPK_COMMANDS += bin/ntfs-3g.probe bin/ntfscat bin/ntfscluster bin/ntfscmp bin/ntfsfix bin/ntfsinfo bin/ntfsls
+SPK_COMMANDS += bin/lowntfs-3g bin/ntfs-3g
 
 SPK_COMMANDS += bin/fusermount bin/ulockmgr_server
 SPK_COMMANDS += bin/testdisk bin/photorec bin/fidentify
