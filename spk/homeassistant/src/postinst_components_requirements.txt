@@ -34,7 +34,7 @@ authcaptureproxy==1.0.2
 authlib==0.15.4
 axis==44
 backoff==1.11.1
-beautifulsoup4==4.9.3
+#beautifulsoup4==4.9.3          ==> python310
 bellows==0.27.0
 bidict==0.21.2
 bimmer-connected==0.7.20
@@ -146,7 +146,7 @@ stringcase==1.2.0
 tenacity==8.0.1
 teslajsonpy==0.18.3
 typing-inspect==0.7.1
-tzlocal==3.0
+#tzlocal==3.0                   ==> python310
 WSDiscovery==2.0.0
 xmltodict==0.12.0
 yalexs==1.1.13

@@ -8,7 +8,6 @@ SPK_DEPENDS = "python310"
 BUILD_DEPENDS = cross/python310
 
 DEPENDS += cross/gevent
-DEPENDS += cross/homeassistant.pillow
 # for iqvia
 DEPENDS += cross/numpy
 # for python-libnmap

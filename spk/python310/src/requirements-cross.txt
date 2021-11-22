@@ -25,7 +25,7 @@ ipaddress==1.0.23
 itsdangerous==2.0.1
 Jinja2==3.0.2
 lxml==4.6.3
-markupsafe==2.0.1
+MarkupSafe==2.0.1
 msgpack-python==0.5.6
 netifaces==0.11.0
 olefile==0.46
@@ -38,7 +38,7 @@ pyasn1==0.4.8
 pycares==4.1.2
 pycparser==2.20
 pycurl==7.44.1
-PyJWT==2.3.0
+#PyJWT==2.3.0           ==> some packages needs version < 2.0
 PyNaCl==1.4.0
 pyOpenSSL==21.0.0
 pyparsing==3.0.1
