@@ -19,7 +19,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.7.2 and python310"
+CHANGELOG    = "Update OctoPrint to v1.7.2 and Python 3.10"
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
