@@ -7,7 +7,7 @@ feedparser==6.0.8
 guessit==3.3.1
 more-itertools==8.9.0
 puremagic==1.10
-pytz==2021.1
+#pytz==2021.1                   ==> python310
 rebulk==3.0.1
 sabyenc3==4.0.2
 sgmllib3k==1.0.0
