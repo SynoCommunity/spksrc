@@ -3,7 +3,7 @@ SPK_VERS = 20211110
 SPK_REV = 5
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python38
+BUILD_DEPENDS = cross/python310
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python310"
 
