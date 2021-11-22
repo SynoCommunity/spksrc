@@ -53,7 +53,7 @@ putio.py==8.7.0
 pyaes==1.6.1
 pygithub==1.55
 pyjsparser==2.7.1
-pyjwt==2.3.0
+PyJWT==2.3.0
 pymediainfo==5.1.0
 #PyNaCl==1.4.0                 ==> python310
 pynma==1.0
