@@ -51,7 +51,7 @@ dropbox==11.7.0
 #duplicity==0.8.19
 fasteners==0.16
 funcsigs==1.0.2
-future==0.18.2
+#future==0.18.2                  ==> python310
 # gdata                          ; python_version == '2.7'
 google-api-core==1.26.3
 google-api-python-client==2.3.0
