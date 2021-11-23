@@ -14,7 +14,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v0.8.19 and duply to v2.3.1</br>2. Update to Python 3.10</br>3. Add supported backend libraries: <ul><li>azure-storage-blob</li><li>b2sdk</li><li>boto</li><li>boto3</li><li>boxsdk[jwt]</li><li>dropbox</li><li>google_auth_oauthlib</li><li>jottalib</li><li>pydrive</li><li>pyrax</li><li>python-swiftclient</li><li>requests_oauthlib</li></ul><br/>4. Update includes a security update urllib3"
+CHANGELOG = "1. Update duplicity to v0.8.19 and duply to v2.3.1<br/>2. Update to Python 3.10<br/>3. Add supported backend libraries: <ul><li>azure-storage-blob</li><li>b2sdk</li><li>boto</li><li>boto3</li><li>boxsdk[jwt]</li><li>dropbox</li><li>google_auth_oauthlib</li><li>jottalib</li><li>pydrive</li><li>pyrax</li><li>python-swiftclient</li><li>requests_oauthlib</li></ul><br/>4. Update includes a security update urllib3"
 
 HOMEPAGE = http://duplicity.nongnu.org/
 LICENSE  = GPLv2

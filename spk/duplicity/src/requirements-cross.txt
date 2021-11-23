@@ -31,7 +31,7 @@
 
 args==0.1.0
 arrow==0.17.0
-attrs==20.3.0
+#attrs==20.3.0                   ==> python310
 azure-core==1.13.0
 azure-storage-blob==12.8.1
 b2sdk==1.7.0
@@ -85,7 +85,7 @@ oslo.serialization==2.16.1
 oslo.utils==3.22.3
 os-networksv2-python-novaclient-ext==0.26
 os-virtual-interfacesv2-python-novaclient-ext==0.20
-packaging==20.9
+#packaging==20.9                 ==> python310
 pbr==5.7.0
 ply==3.11
 positional==1.2.1
@@ -96,13 +96,13 @@ pyasn1-modules==0.2.8
 #pycparser==2.20                 ==> python310
 PyDrive==1.3.1
 PyJWT==2.1.0
-pyparsing==2.4.7
+#pyparsing==2.4.7                ==> python310
 pyrax==1.10.0
 python-gettext==4.0
 python-keystoneclient==3.10.0
 python-novaclient==2.27.0
 python-swiftclient==3.11.1
-pytz==2021.1
+#pytz==2021.1                    ==> python310
 #PyYAML==5.4.1                   ==> python310
 rackspace-auth-openstack==1.3
 rackspace-novaclient==2.1
@@ -117,7 +117,7 @@ s3transfer==0.4.2
 SecretStorage==3.3.1
 setuptools-scm==5.0.2
 simplejson==3.17.2
-six==1.15.0
+#six==1.15.0                     ==> python310
 stevedore==1.20.1
 stone==3.2.1
 uritemplate==3.0.1
