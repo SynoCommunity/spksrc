@@ -20,7 +20,7 @@ DEPENDS += cross/asyncstdlib
 DEPENDS += cross/ujson
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
-WHEELS = src/requirements-cross.txt
+WHEELS = src/requirements-crossenv.txt
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."

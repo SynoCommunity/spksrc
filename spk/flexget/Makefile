@@ -4,7 +4,7 @@ SPK_REV = 11
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python310
-WHEELS = src/requirements-cross.txt src/requirements-pure.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 SPK_DEPENDS = "python310"
 
 MAINTAINER = manowark

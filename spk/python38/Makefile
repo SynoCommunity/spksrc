@@ -13,7 +13,7 @@ DEPENDS += cross/lxml cross/msgpack-python
 DEPENDS += cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/ruamel.yaml cross/sqlite
 
-WHEELS = src/requirements-cross.txt src/requirements-pure.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.

@@ -16,7 +16,7 @@ DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow_py2
 DEPENDS += cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/pyzmq cross/uwsgi
 
-WHEELS = src/requirements.txt src/requirements-cross.txt
+WHEELS = src/requirements.txt
 
 
 MAINTAINER = Safihre

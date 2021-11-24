@@ -30,7 +30,7 @@ DEPENDS += cross/pillow
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
 
-WHEELS = src/requirements-cross.txt src/requirements-pure.txt src/requirements-abi3.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
