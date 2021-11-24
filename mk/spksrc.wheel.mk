@@ -48,7 +48,6 @@ pre_wheel_target: wheel_msg_target
 		if [ -n "$(PIP_CACHE_OPT)" ] ; then \
 			mkdir -p $(PIP_DIR) ; \
 		fi; \
-		rm -fr $(WHEELHOUSE) ; \
 		mkdir -p $(WHEELHOUSE) ; \
 		for wheel in $(WHEELS) ; \
 		do \
@@ -56,17 +55,17 @@ pre_wheel_target: wheel_msg_target
 				if [ $$(basename $$wheel) = $(WHEELS_PURE_PYTHON) ]; then \
 					$(MSG) "Adding existing $$wheel file as pure-python (discarding any cross-compiled)" ; \
 					sed -e '/^cross:\|^#\|^$$/d' -e /^pure:/s/^pure://g $$wheel  >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-				elif [ $$(basename $$wheel) = $(WHEELS_CROSS_COMPILE) ]; then \
+				elif [ $$(basename $$wheel) = $(WHEELS_CROSSENV_COMPILE) ]; then \
 					$(MSG) "Adding existing $$wheel file as cross-compiled (discarding any pure-python)" ; \
-					sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+					sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 				elif [ $$(basename $$wheel) = $(WHEELS_LIMITED_API) ]; then \
 					$(MSG) "Adding existing $$wheel file as ABI-limited" ; \
 					cat $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 				else \
 					$(MSG) "Adapting existing $$wheel file" ; \
 					sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-					sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
-					sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEEL_DEFAULT_REQUIREMENT) ; \
+					sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+					sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_DEFAULT_REQUIREMENT) ; \
 				fi ;\
 			else \
 				$(MSG) "ERROR: File $$wheel does not exist" ; \
@@ -79,12 +78,12 @@ pre_wheel_target: wheel_msg_target
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ -n "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
-		if [ -s "$(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)" ]; then \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE)" ]; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
-				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 			else \
-				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 			fi ; \
 		fi ; \
 		if [ -s "$(WHEELHOUSE)/$(WHEELS_LIMITED_API)" ]; then \
@@ -98,29 +97,7 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		fi ; \
 	fi
 
-post_wheel_target: $(WHEEL_TARGET)
-	@if [ -d "$(WHEELHOUSE)" ] ; then \
-		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
-		cd $(WHEELHOUSE) ; \
-		$(MSG) Copying $(WHEELS_DEFAULT) wheelhouse ; \
-		if stat -t requirements*.txt >/dev/null 2>&1; then \
-			cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
-		fi ; \
-		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
-			echo "Pure python wheels are excluded from the package wheelhouse." ; \
-			for w in *.whl; do \
-				if echo $${w} | grep -viq "-none-any\.whl" ; then \
-					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
-				fi ; \
-			done ; \
-		else \
-			for w in *.whl; do \
-				$(MSG) Copying to wheelhouse: $$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
-			done ; \
-		fi ; \
-	fi
-
+post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
 ifeq ($(wildcard $(WHEEL_COOKIE)),)
 wheel: $(WHEEL_COOKIE)

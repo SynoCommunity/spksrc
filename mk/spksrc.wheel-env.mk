@@ -14,6 +14,9 @@ endif
 ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
 WHEELS_CROSS_COMPILE = requirements-cross.txt
 endif
+ifeq ($(strip $(WHEELS_CROSSENV_COMPILE)),)
+WHEELS_CROSSENV_COMPILE = requirements-crossenv.txt
+endif
 
 ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),)
 # If no ARCH then pure by default
@@ -25,9 +28,9 @@ endif
 endif
 
 ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),pure)
-WHEEL_DEFAULT_REQUIREMENT = $(WHEELS_PURE_PYTHON)
+WHEELS_DEFAULT_REQUIREMENT = $(WHEELS_PURE_PYTHON)
 else
-WHEEL_DEFAULT_REQUIREMENT = $(WHEELS_CROSS_COMPILE)
+WHEELS_DEFAULT_REQUIREMENT = $(WHEELS_CROSSENV_COMPILE)
 endif
 
 # For generating abi3 wheels with limited
@@ -67,3 +70,28 @@ endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PYTHON_ARCH += i686
 endif
+
+install_python_wheel:
+	@if [ -d "$(WHEELHOUSE)" ] ; then \
+		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
+		cd $(WHEELHOUSE) ; \
+		$(MSG) Copying $(WHEELS_DEFAULT) wheelhouse ; \
+		if stat -t requirements*.txt >/dev/null 2>&1; then \
+			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
+			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
+		fi ; \
+		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
+			echo "Pure python wheels are excluded from the package wheelhouse." ; \
+			for w in *.whl; do \
+				if echo $${w} | grep -viq "-none-any\.whl" ; then \
+					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
+				fi ; \
+			done ; \
+		else \
+			for w in *.whl; do \
+				$(MSG) Copying to wheelhouse: $$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
+				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
+			done ; \
+		fi ; \
+	fi
+
