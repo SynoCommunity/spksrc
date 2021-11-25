@@ -205,7 +205,7 @@ endif
 # - firewall rules/port definitions (DSM >= 6.0-5936)
 # - data share worker (DSM 7, optional for DSM 6)
 # - usr local links (DSM >= 6.0-5941)
-# - certificate config
+# - certificate config (DSM < 7, available only for Synology packages since DSM 7)
 # for DSM<6.0 link creation is provided by spksrc.service.create_links
 # and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
@@ -239,10 +239,14 @@ ifeq ($(strip $(USE_DATA_SHARE_WORKER)),yes)
 endif
 endif
 ifneq ($(strip $(SERVICE_CERT)),)
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 	@jq --arg service "${SERVICE_CERT}" \
 	    --arg reload "${SERVICE_CERT_RELOAD}" \
 	    --arg display_name "${DISPLAY_NAME}" \
 		'."certificate-config" = {"services": [{"display_name": $$display_name, "display_name_i18n": $$display_name, "service":$$service} ], "reloader-relpath": $$reload } | ."service-cfg" = {}' $@ | sponge $@
+else
+	$(warning Certificate configuration is blocked for community packages in DSM $(TCVERSION))
+endif
 endif
 
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
