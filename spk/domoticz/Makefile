@@ -1,6 +1,6 @@
 SPK_NAME = domoticz
 SPK_VERS = 2020.2
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/domoticz.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Domoticz is a Home Automation System that lets you monitor and configure various devices like: Lights, Switches, various sensors/meters like Temperature, Rain, Wind, UV, Electra, Gas, Water and much more. Notifications/Alerts can be sent to any mobile device.
 DESCRIPTION_FRE = Domoticz est un système domotique qui vous permet de surveiller et de configurer différents périphériques tels que: Lumières, Interrupteurs, divers capteurs/compteurs  afin de surveiller température, pluie, vent, UV, électricité, gaz, eau et bien plus encore. Notifications et alertes peuvent être envoyées à n\'importe quel appareil mobile.
 DISPLAY_NAME = Domoticz
-CHANGELOG = "1. Update domoticz to v2020.2<br/>2. Update openssl to 1.1.1l.<br/>3. Update bundled python to 3.8<br/>4. Use generic service support."
+CHANGELOG = "1. Include dzVents runtime files.<br/>2. Update openssl to 1.1.1t.<br/>3. Minor updates of included libraries."
 
 HOMEPAGE = https://www.domoticz.com/
 LICENSE  = GPLv3
@@ -31,7 +31,7 @@ SERVICE_USER = auto
 
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# privilege file for DSM<=6 (use default for DSM >=7)
+# privilege file for DSM<=6 (use default for DSM>=7)
 CONF_DIR = src/conf
 endif
 
