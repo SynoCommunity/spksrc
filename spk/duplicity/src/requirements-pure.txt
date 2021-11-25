@@ -1,0 +1,8 @@
+# Wheels that absolutely needs
+# to be managed as pure-python
+humanize==3.5.0
+#importlib-metadata==4.0.1  ==> python310
+keyring==23.0.1
+#python-dateutil==2.8.1     ==> python310
+tqdm==4.60.0
+#zipp==3.4.1                ==> python310

@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/python38
+BUILD_DEPENDS = cross/python310
 DEPENDS = cross/openssl cross/libicu
 
 # due to libicu:

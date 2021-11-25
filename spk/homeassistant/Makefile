@@ -1,21 +1,17 @@
 SPK_NAME = homeassistant
 SPK_VERS = 2021.9.7
-SPK_REV = 15
+SPK_REV = 17
 SPK_ICON = src/${SPK_NAME}.png
 
-SPK_DEPENDS = "python38"
+SPK_DEPENDS = "python310"
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS = cross/python310
 
-DEPENDS += cross/libyaml cross/bcrypt cross/cryptography cross/pycrypto cross/pycryptodomex cross/pycryptodome
 DEPENDS += cross/gevent
-DEPENDS += cross/homeassistant.pillow
 # for iqvia
 DEPENDS += cross/numpy
 # for python-libnmap
 DEPENDS += cross/nmap
-# for mobile_app
-DEPENDS += cross/PyNaCl
 # for tradfri
 DEPENDS += cross/dtlssocket
 # for denonavr
@@ -24,7 +20,7 @@ DEPENDS += cross/asyncstdlib
 DEPENDS += cross/ujson
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
-WHEELS = src/requirements-cross.txt
+WHEELS = src/requirements-crossenv.txt
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."

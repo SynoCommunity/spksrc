@@ -83,18 +83,26 @@ python3_custom_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
+# Create the crossenv in preparation for
+# cross-compiling all the necessary wheels
 .PHONY: python3_post_install
 python3_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.2.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.2.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.3.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.3.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.15.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cffi==1.15.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cryptography==3.3.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cryptography==3.3.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "poetry==1.1.11"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "poetry==1.1.11"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

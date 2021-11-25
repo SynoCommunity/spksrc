@@ -13,13 +13,19 @@ MSG = echo "===> "
 # Launch command in the working dir of the package source and the right environment
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
-# Pip command
+# fallback by default to native/python*
 PIP ?= pip
+
+# Cross compiling must call "pip" directly to ensure using
+# $(WORK_DIR)/crossenv pip version instead from adjusted $PATH
+PIP_CROSS = $(shell . $(CROSSENV) && $(RUN) which pip)
+
+# System default pip outside from build environment
+PIP_SYSTEM = $(shell which pip)
+
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
 PIP_WHEEL_ARGS = wheel --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
-PIP_WHEEL = $(PIP) $(PIP_WHEEL_ARGS)
-PIP_DOWNLOAD = $(PIP) download $(PIP_ARGS) --dest $(BASE_DISTRIB_DIR)
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk

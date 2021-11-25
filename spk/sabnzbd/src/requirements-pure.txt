@@ -1,0 +1,10 @@
+# Wheels that absolutely needs
+# to be managed as pure-python
+cheroot==8.5.2
+jaraco.classes==3.2.1
+jaraco.collections==3.4.0
+jaraco.functools==3.3.0
+jaraco.text==3.5.1
+portend==2.7.1
+#python-dateutil==2.8.2    ==> python310
+tempora==4.1.1

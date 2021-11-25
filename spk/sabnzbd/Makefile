@@ -1,15 +1,15 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 3.4.2
-SPK_REV = 50
+SPK_REV = 51
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel cross/poetry
+BUILD_DEPENDS = cross/python310
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python38>=3.8.1-1"
+SPK_DEPENDS = "python310"
 
 # To generate full requirements.txt, extend SABnzbd's own
 # requirements.txt with the depedencies of cherrypy and cheroot
-WHEELS = src/requirements-cross.txt src/requirements.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
@@ -17,7 +17,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.4.2."
+CHANGELOG = "1. Update SABnzbd to 3.4.2.<br/>2. Update to python 3.10"
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL

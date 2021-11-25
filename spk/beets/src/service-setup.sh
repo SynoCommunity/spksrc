@@ -1,5 +1,5 @@
 
-PYTHON_DIR="/var/packages/python3/target/bin"
+PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
 VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PIP=${SYNOPKG_PKGDEST}/env/bin/pip

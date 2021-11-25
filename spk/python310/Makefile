@@ -1,10 +1,15 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 1
+SPK_REV = 3
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
+# Mandatory binaries for wheel
+# setup during package install
+DEPENDS += cross/setuptools cross/pip cross/wheel
+
+# Required for misc wheels
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 DEPENDS += cross/libyaml
@@ -21,7 +26,11 @@ ENV += SODIUM_INSTALL=system
 # https://github.com/python-pillow/Pillow/issues/5799
 DEPENDS += cross/pillow
 
-WHEELS = src/requirements-cross.txt src/requirements.txt
+# Required for pycares
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
