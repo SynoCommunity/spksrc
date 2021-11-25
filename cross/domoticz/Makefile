@@ -1,8 +1,8 @@
 PKG_NAME = domoticz
-PKG_VERS = 2021.1
+PKG_VERS = 2020.2
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git-repository
-PKG_GIT_HASH = 037a4299fca4d45d9b94b389726cce27c1bee9aa
+PKG_GIT_HASH = aad65002eea99b8336cefd773e7422f0a7f1873f
 PKG_DIST_SITE = https://github.com/domoticz/domoticz.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
