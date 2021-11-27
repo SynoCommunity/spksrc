@@ -6,7 +6,7 @@ SPK_ICON = src/ser2net.png
 DEPENDS = cross/ser2net
 
 # qoriq is the only PPC arch that is supported
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ser2net provides a way for a user to connect from a network connection to a serial port.

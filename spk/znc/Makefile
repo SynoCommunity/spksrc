@@ -19,7 +19,7 @@ HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 

@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/openssl
 
 # ppc except qoriq
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://libwebsockets.org/
 COMMENT  = Libwebsockets (LWS) is a flexible, lightweight pure C library for implementing modern network protocols easily with a tiny footprint, using a nonblocking event loop.

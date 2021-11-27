@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # PPC archs except qoriq
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 # error: template instantiation depth exceeds maximum of 900 (requires gcc >= 4.9)
 # see: https://github.com/rakshasa/rtorrent/issues/223

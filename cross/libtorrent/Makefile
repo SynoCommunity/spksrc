@@ -10,7 +10,7 @@ BUILD_DEPENDS = cross/python2
 DEPENDS = cross/boost cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 # libtorrent:
 UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
