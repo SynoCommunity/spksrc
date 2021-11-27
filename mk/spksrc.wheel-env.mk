@@ -47,11 +47,7 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 PYTHON_ARCH = armv5tel
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-PYTHON_ARCH = armv7
-endif
-
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 PYTHON_ARCH = armv7l
 endif
 
