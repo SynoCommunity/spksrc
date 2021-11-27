@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mosquitto.org/files/source
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/c-ares cross/openssl cross/util-linux cross/libwebsockets
+DEPENDS = cross/c-ares cross/openssl cross/libuuid cross/libwebsockets
 
 UNSUPPORETED_ARCHS = $(OLD_PPC_ARCHS)
 
@@ -17,7 +17,8 @@ CONFIGURE_TARGET = nop
 
 COMPILE_MAKE_OPTIONS = WITH_WEBSOCKETS=yes WITH_SRV=yes WITH_DOCS=no
 
-ifeq ($(findstring $(ARCH), 88f6281),$(ARCH))
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # use clock_gettime of librt
 ADDITIONAL_LDFLAGS = -lrt 
 endif

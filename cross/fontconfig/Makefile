@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.freedesktop.org/software/fontconfig/release
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/expat cross/freetype cross/util-linux
+DEPENDS = cross/expat cross/freetype cross/libuuid
 
 HOMEPAGE = https://www.freedesktop.org/wiki/Software/fontconfig/
 COMMENT  = Fontconfig is a library for configuring and customizing font access.
