@@ -90,7 +90,9 @@ install_python_wheel:
 		else \
 			for w in *.whl; do \
 				$(MSG) Copying to wheelhouse: $$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
+				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w \
+					| sed -E "s/(.*-).*(linux_.*\.whl)/\1\2/" \
+					| sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
 			done ; \
 		fi ; \
 	fi
