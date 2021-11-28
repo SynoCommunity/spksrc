@@ -1,8 +1,9 @@
 PKG_NAME = libzen
 PKG_VERS = 0.4.39
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/MediaArea/ZenLib/archive/v$(PKG_VERS)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/MediaArea/ZenLib/archive
+PKG_DIST_FILE = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = ZenLib-$(PKG_VERS)/Project/GNU/Library
 
 DEPENDS =
@@ -18,5 +19,6 @@ CONFIGURE_ARGS = --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: libzen_pre_configure
 libzen_pre_configure:
 	$(RUN) ; ./autogen.sh
