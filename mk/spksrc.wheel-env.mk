@@ -64,7 +64,7 @@ PYTHON_ARCH = x86_64
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-PYTHON_ARCH += i686
+PYTHON_ARCH = i686
 endif
 
 install_python_wheel:
