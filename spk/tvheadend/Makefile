@@ -30,7 +30,7 @@ LICENSE = GPL v3
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CONF_DIR = src/conf/
 

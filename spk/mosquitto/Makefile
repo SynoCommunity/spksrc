@@ -6,7 +6,7 @@ SPK_ICON = src/mosquitto.png
 DEPENDS = cross/$(SPK_NAME)
 
 # libwebsockets is not supported for ppc except qoriq
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mosquitto is an open source message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
