@@ -47,11 +47,7 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 PYTHON_ARCH = armv5tel
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-PYTHON_ARCH = armv7
-endif
-
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 PYTHON_ARCH = armv7l
 endif
 
@@ -68,7 +64,7 @@ PYTHON_ARCH = x86_64
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-PYTHON_ARCH += i686
+PYTHON_ARCH = i686
 endif
 
 install_python_wheel:
@@ -89,8 +85,9 @@ install_python_wheel:
 			done ; \
 		else \
 			for w in *.whl; do \
-				$(MSG) Copying to wheelhouse: $$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
+				_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
+				$(MSG) Copying to wheelhouse: $$_new_name ; \
+				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
 			done ; \
 		fi ; \
 	fi

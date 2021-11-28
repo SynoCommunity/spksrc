@@ -24,7 +24,7 @@ immutables==0.16
 ipaddress==1.0.23
 itsdangerous==2.0.1
 Jinja2==3.0.2
-lxml==4.6.3
+lxml==4.6.4
 MarkupSafe==2.0.1
 msgpack-python==0.5.6
 netifaces==0.11.0
