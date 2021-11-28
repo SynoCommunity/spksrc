@@ -9,9 +9,11 @@ DEPENDS  = cross/$(SPK_NAME)
 # setup during package install
 DEPENDS += cross/setuptools cross/pip cross/wheel
 
-# Required for misc wheels
+# Required for lxml wheel
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
+
+# Required for PyYAML
 DEPENDS += cross/libyaml
 
 # Required for pycurl wheel
