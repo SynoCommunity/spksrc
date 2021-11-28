@@ -1,19 +1,58 @@
-[{
+[
+  {
     "step_title": "Emplacement des fichiers PS3",
-    "items": [{
-        "type": "textfield",
-        "desc": "Chemin vers le répertoire contenant les fichiers PS3. Par défaut: /volume1/PS3",
-        "subitems": [{
-            "key": "wizard_dir",
-            "desc": "Emplacement des fichiers",
-            "defaultValue": "/volume1/PS3",
+    "items": [
+      {
+        "type": "combobox",
+        "desc": "Veuillez sélectionner un volume à utiliser pour le dossier des fichiers PS3",
+        "subitems": [
+          {
+            "key": "wizard_data_volume",
+            "desc": "Nom du volume",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
             "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
-                }
+              "fn": "{console.log(arguments);return true;}"
             }
-        }]
-    }]
-}]
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "Dossier partagé contenant des fichiers PS3 (en utilisant le volume choisi ci-dessus)",
+        "subitems": [
+          {
+            "key": "wizard_data_directory",
+            "desc": "Dossier partagé",
+            "defaultValue": "PS3",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Les sous-répertoires ne sont pas pris en charge."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

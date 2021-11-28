@@ -1,30 +1,28 @@
 SPK_NAME = ps3netsrv
-SPK_VERS = 1.47.26
-SPK_REV = 6
+SPK_VERS = 1.47.37
+SPK_REV = 7
 SPK_ICON = src/${SPK_NAME}.png
-
-REQUIRED_DSM = 5.0
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = Anonym-tsk
-# From Cobra/Deank
-DESCRIPTION = Allows PS3 content to be loaded from network
-DESCRIPTION_FRE = Fournit l\'accès par le réseau aux contenus pour PS3
-RELOAD_UI = yes
-STARTABLE = yes
+# webMAN MOD is a homebrew plugin for PlayStation®3 forked from the original webMAN/sMAN by DeanK with many features added.
+DESCRIPTION = Allows PS3 content to be loaded from network.
+DESCRIPTION_FRE = Fournit l\'accès par le réseau aux contenus pour PS3.
 DISPLAY_NAME = ps3netsrv
-CHANGELOG =
+CHANGELOG = "Update to v1.47.37 with ps3netsrv 20200708."
 
 HOMEPAGE = https://github.com/aldostools/webMAN-MOD
-LICENSE  = GPL
+LICENSE  = GPLv3
 
-WIZARDS_DIR = src/wizard/
+WIZARDS_DIR = src/wizard
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_WIZARD_SHARE = wizard_dir
 SERVICE_PORT = 38008
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_WIZARD_SHARE = wizard_data_directory
 SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/ps3netsrv-starter.sh
 NO_SERVICE_SHORTCUT = yes
 
