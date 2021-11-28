@@ -85,10 +85,9 @@ install_python_wheel:
 			done ; \
 		else \
 			for w in *.whl; do \
-				$(MSG) Copying to wheelhouse: $$(echo $$w | sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$(echo $$w \
-					| sed -E "s/(.*-).*(linux_.*\.whl)/\1\2/" \
-					| sed -E "s/(.*linux_).*(\.whl)/\1$(PYTHON_ARCH)\2/") ; \
+				_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
+				$(MSG) Copying to wheelhouse: $$_new_name ; \
+				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
 			done ; \
 		fi ; \
 	fi
