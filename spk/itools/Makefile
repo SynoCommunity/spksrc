@@ -1,7 +1,8 @@
 SPK_NAME = itools
-SPK_VERS = 1.2
-SPK_REV = 4
+SPK_VERS = 2.0
+SPK_REV = 5
 SPK_ICON = src/itools.png
+
 # A collection of tools from ifuse and usbmuxd projects of libimobiledevice.org
 # There exists no source code package "itools" and therefore no cross/itools project
 DEPENDS = cross/usbmuxd cross/ifuse
@@ -11,9 +12,9 @@ MAINTAINER = bxxxjxxg
 MAINTAINER_URL = https://www.linkedin.com/in/bingjing-chang/
 DISTRIBUTOR = SynoCommunity
 DISTRIBUTOR_URL = https://synocommunity.com
-DESCRIPTION = "This package mounts an iOS® device \(connected by USB\) to a shared folder of your Diskstation. You can access such folders locally or from remote with Synology FileStation. Some command line tools are included to communicate with connected devices."
+DESCRIPTION = "This package contains tools of libimobiledevice to mount an iOS® device \(connected by USB\) to a shared folder of your Diskstation. You can access such folders locally or from remote with Synology FileStation. Some command line tools are included to communicate with connected devices."
 DISPLAY_NAME = iOS Access
-CHANGELOG = "Update openssl to 1.1."
+CHANGELOG = "1. Update usb tools and imobile device libraries to v2.0<br/>2. Update openssl to 1.1.1s."
 
 HOMEPAGE   = https://www.libimobiledevice.org
 LICENSE    = LGPL 2.1
@@ -49,7 +50,6 @@ SPK_COMMANDS += bin/ifuse
 SPK_COMMANDS += bin/inetcat
 SPK_COMMANDS += bin/iproxy
 SPK_COMMANDS += bin/plistutil
-
 
 include ../../mk/spksrc.spk.mk
 

@@ -1,10 +1,13 @@
 PKG_NAME = libusb
 PKG_VERS = 1.0.23
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/libusb/libusb/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/libusb/libusb/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+# this is the latest version that builds with C99 compiler.
+# libusb >= v1.0.24 needs C11 compiler (not supported by OLD_PPC_ARCHS and ARMv5_ARCHS).
+# qoriq has C11 compiler, but fails with "configure: error: Linux netlink header not found"
 
 DEPENDS =
 
@@ -13,20 +16,6 @@ COMMENT  = C library that provides generic access to USB devices. It is intended
 LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = libusb_pre_configure
 CONFIGURE_ARGS = --disable-udev --disable-debug-log --disable-examples-build
-LIBUSB_AUTOGEN_ARGS = $(CONFIGURE_ARGS)
 
 include ../../mk/spksrc.cross-cc.mk
-
-
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-LIBUSB_AUTOGEN_ARGS += --host=arm-linux
-endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-LIBUSB_AUTOGEN_ARGS += --host=ppc-linux
-endif
-
-.PHONY: libusb_pre_configure
-libusb_pre_configure:
-	$(RUN) ; ./autogen.sh $(LIBUSB_AUTOGEN_ARGS)
