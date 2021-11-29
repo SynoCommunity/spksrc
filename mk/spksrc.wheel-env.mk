@@ -2,6 +2,11 @@
 # Configuration for python wheel build
 #
 
+# Enable pure-python packaging
+ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = FALSE
+endif
+
 ifeq ($(strip $(WHEELS_DEFAULT)),)
 WHEELS_DEFAULT = requirements.txt
 endif
@@ -73,6 +78,7 @@ install_python_wheel:
 		cd $(WHEELHOUSE) ; \
 		$(MSG) Copying $(WHEELS_DEFAULT) wheelhouse ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
+			cp requirements*.txt $(STAGING_INSTALL_WHEELHOUSE) ; \
 			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		fi ; \
