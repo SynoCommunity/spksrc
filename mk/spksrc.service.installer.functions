@@ -53,6 +53,29 @@ initialize_variables ()
 }
 
 
+install_python_wheels ()
+{
+    # default PATH to wheelhouse
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+
+    # Install the wheels
+    echo "Install packages from wheels"
+    for type in cross crossenv pure abi3
+    do
+       if [ -f ${wheelhouse}/requirements-${type}.txt ]; then
+          pip install $([ "$type" != "pure" ] && echo "--no-index") \
+                      --no-deps \
+                      --force-reinstall \
+                      --find-links ${wheelhouse} \
+                      --requirement ${wheelhouse}/requirements-${type}.txt
+       fi
+    done
+
+    echo "Installed modules:"
+    pip freeze
+}
+
+
 reload_inst_variables ()
 {
     # Reload wizard variables stored by postinst
