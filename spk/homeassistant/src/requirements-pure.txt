@@ -1,7 +1,7 @@
 # Home Assistant core
 # requirements are splitted into multiple files
-# - requirements-crossenv.txt             (this file, containing requirements that need cross compilation)
-# - requirements-pure.txt                 (containing pure-python requirements)
+# - requirements-crossenv.txt             (containing requirements that need cross compilation)
+# - requirements-pure.txt                 (this file, containing pure-python requirements)
 # - postinst_default_requirements.txt     (requirements for default_config)
 # - postinst_integration_requirements.txt (requirements for integrations)
 # postinst requirements must be pure python wheels.
@@ -10,7 +10,7 @@
 #homeassistant==2021.9.7
 
 # Home Assistant Core
-aiohttp==3.7.4.post0
+# aiohttp==3.7.4.post             ==> crossenv
 # astral==2.2
 # async_timeout==3.0.1
 # attrs==21.2.0                   ==> python310:pure
@@ -18,12 +18,12 @@ aiohttp==3.7.4.post0
 # backports.zoneinfo;python_version<"3.9"   ==> Does not build with python310
 # bcrypt==3.1.7                   ==> python310:crossenv
 # certifi==2021.5.30              ==> python310:pure
-ciso8601==2.1.3
+# ciso8601==2.1.3                 ==> crossenv
 # cryptography==3.3.2             ==> python310:crossenv
 # httpx==0.19.0
 # jinja2==3.0.1                   # fails to build, moved to postinst_default_config_requirements.txt
 # numpy==1.21.4                   # requires to be built as cross/numpy
-# PyJWT==1.7.1                    ==> pure
+# PyJWT==1.7.1                    ==> python310:pure
 # PyNaCl                          ==> python310:crossenv  # for mobile_app
 ## pip>=8.0.3,<20.3
 # python-slugify==4.0.1
@@ -32,7 +32,7 @@ ciso8601==2.1.3
 # ruamel.yaml==0.15.100           ==> python310:pure
 # voluptuous==0.12.1
 # voluptuous-serialize==2.4.0
-yarl==1.6.3
+# yarl==1.6.3                     ==> crossenv
 
 # homeassistant.components.frontend
 #home-assistant-frontend==20210830.0
@@ -42,10 +42,10 @@ yarl==1.6.3
 
 ### other default dependencies that need cross compiled wheel
 # MarkupSafe==2.0.1               ==> python310:crossenv
-# aiokafka==0.6.0                 ==> pure
+aiokafka==0.6.0
 # cffi==1.14.1                    ==> python310:crossenv
 # greenlet==1.1.1                 ==> python310:crossenv
-multidict==5.1.0
+# multidict==5.1.0                ==> crossenv
 # sqlalchemy==1.4.23              ==> python310:crossenv
 
 
@@ -63,18 +63,18 @@ multidict==5.1.0
 ### Could not find libswresample with pkg-config.
 
 
-ephem==3.7.7.0
+# ephem==3.7.7.0                  ==> crossenv
 # gevent==21.8.0
-guppy3==3.1.2
+# guppy3==3.1.2                   ==> crossenv
 ###homeassistant-pyozw==0.1.10    # deprecated open-z-wave, fails to cross compile
 # netifaces==0.11.0               ==> python310:crossenv
 # psutil==5.8.0                   ==> python310:crossenv
-# pyads==3.2.2                    ==> pure
+pyads==3.2.2
 # pycares==4.0.0                  ==> python310:crossenv
 # pybluez==0.22                   # for fjaraskupan fails to build
 # pycocotools==2.0.1              # fails to cross compile (aarch64)
-pyitachip2ir==0.0.7
+# pyitachip2ir==0.0.7             ==> crossenv
 # regex==2021.8.3                 ==> python310:crossenv
-websockets==9.1
+# websockets==9.1                 ==> crossenv
 # pandas==1.3.1                   # depends on numpy...
-wrapt==1.12.1
+# wrapt==1.12.1                   ==> crossenv

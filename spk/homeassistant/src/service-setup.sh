@@ -24,19 +24,17 @@ service_postinst ()
     ${SYNOPKG_PKGDEST}/env/bin/python3 -m pip install --upgrade pip
     
     separator="===================================================="
-    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
 
     echo ${separator}
-    echo "Install packages from wheels"
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --no-index ${wheelhouse}/*.whl
+    install_python_wheels
 
     echo ${separator}
     echo "Install packages for default_config from index"
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/postinst_default_config_requirements.txt
+    pip install --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/postinst_default_config_requirements.txt
 
     echo ${separator}
     echo "Install packages for homeassistant.components from index"
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
+    pip install --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
 
     mkdir -p "${CONFIG_DIR}"
 }
