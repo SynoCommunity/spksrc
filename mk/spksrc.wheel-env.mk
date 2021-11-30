@@ -82,19 +82,21 @@ install_python_wheel:
 			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		fi ; \
-		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
-			echo "Pure python wheels are excluded from the package wheelhouse." ; \
-			for w in *.whl; do \
-				if echo $${w} | grep -viq "-none-any\.whl" ; then \
-					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
-				fi ; \
-			done ; \
-		else \
-			for w in *.whl; do \
-				_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
-				$(MSG) Copying to wheelhouse: $$_new_name ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
-			done ; \
+		if stat -t *.whl >/dev/null 2>&1; then \
+			if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
+				echo "Pure python wheels are excluded from the package wheelhouse." ; \
+				for w in *.whl; do \
+					if echo $${w} | grep -viq "-none-any\.whl" ; then \
+						cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
+					fi ; \
+				done ; \
+			else \
+				for w in *.whl; do \
+					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
+					$(MSG) Copying to wheelhouse: $$_new_name ; \
+					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 
