@@ -53,6 +53,19 @@ initialize_variables ()
 }
 
 
+install_python_virtualenv ()
+{
+    # Output Python version (confirming PATH)
+    python3 --version
+
+    # Create a Python virtualenv
+    python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
+
+    # Update to latest pip
+    python3 -m pip install --upgrade pip
+}
+
+
 install_python_wheels ()
 {
     # default PATH to wheelhouse
@@ -62,10 +75,12 @@ install_python_wheels ()
     echo "Install packages from wheels"
     for type in cross crossenv pure abi3
     do
-       if [ -f ${wheelhouse}/requirements-${type}.txt ]; then
+       if [ -s ${wheelhouse}/requirements-${type}.txt ]; then
+          echo "Install packages from wheels [${type}]"
           pip install $([ "$type" != "pure" ] && echo "--no-index") \
                       --no-deps \
                       --force-reinstall \
+                      --cache-dir ${SYNOPKG_PKGVAR}/pip-cache \
                       --find-links ${wheelhouse} \
                       --requirement ${wheelhouse}/requirements-${type}.txt
        fi
