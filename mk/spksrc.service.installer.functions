@@ -78,7 +78,7 @@ install_python_wheels ()
        if [ -s ${wheelhouse}/requirements-${type}.txt ]; then
           echo "Install packages from wheels [${type}]"
           pip install $([ "$type" != "pure" ] && echo "--no-index") \
-                      --no-deps \
+                      $([ "$type" != "pure" ] && echo "--no-deps") \
                       --force-reinstall \
                       --cache-dir ${SYNOPKG_PKGVAR}/pip-cache \
                       --find-links ${wheelhouse} \
