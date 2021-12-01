@@ -1,15 +1,18 @@
 beets==1.5.0
 
 # Direct dependencies
-confuse==1.6.0
-six>=1.10.0
-MarkupSafe>=0.23
-mediafile==0.8.1
-mutagen==1.44.0
-musicbrainzngs==0.7.1
-munkres==1.1.2
+# automtically downloaded
+
+# confuse>=1.0.0
+# jellyfish==0.8.9
+# mediafile>=0.2.0
+# MarkupSafe>=0.23           ==> python310
+# munkres>=1.0.0
+# musicbrainzngs>=0.4
+# mutagen>=1.45
 # PyYAML>=3.12               ==> python310
-Unidecode==1.1.1
+# six>=1.9
+# Unidecode
 
 # Plugin dependencies
 beautifulsoup4==4.10.0
@@ -17,7 +20,7 @@ beautifulsoup4==4.10.0
 chardet==3.0.4
 discogs-client==2.2.2
 langdetect==1.0.7
-#Pillow==7.0.0               ==> python310
+#Pillow==7.0.0               ==> python310:8.2.0
 oauthlib==3.1.0
 pyacoustid==1.1.7
 pylast==3.2.0
