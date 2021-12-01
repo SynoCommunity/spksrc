@@ -79,6 +79,7 @@ install_python_wheels ()
           echo "Install packages from wheels [${type}]"
           pip install $([ "$type" != "pure" ] && echo "--no-index") \
                       $([ "$type" != "pure" ] && echo "--no-deps") \
+                      $([ $# -gt 0 ] && echo $*) \
                       --force-reinstall \
                       --cache-dir ${SYNOPKG_PKGVAR}/pip-cache \
                       --find-links ${wheelhouse} \

@@ -1,0 +1,14 @@
+#cffi==1.15.0                 ==> python310:crossenv
+#cryptography==3.4.7          ==> python310:crossenv:3.3.2
+greenlet==1.1.2
+lxml==4.6.4
+#MarkupSafe==2.0.1            ==> python310:crossenv
+msgpack==1.0.2
+#poetry==1.2.0a2
+#poetry-core==1.1.0a6
+#poetry-date-version-plugin==2021.7.16-6
+#pyopenssl==21.0.0
+PyNaCl==1.4.0
+SQLAlchemy==1.4.26
+tornado==6.1
+wrapt==1.13.3
