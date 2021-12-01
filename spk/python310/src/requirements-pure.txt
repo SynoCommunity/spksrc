@@ -9,3 +9,25 @@ certifi
 # in order to install wheels within
 # their running environment
 virtualenv==20.9.0
+# Requirements for virtualenv==20.9.0
+backports.entry-points-selectable>=1.0.4
+distlib<1,>=0.3.1
+filelock<4,>=3.2
+platformdirs<3,>=2
+
+# Requirements for poetry==1.1.11
+cachecontrol[filecache]<0.13.0,>=0.12.4
+cachy<0.4.0,>=0.3.0
+cleo<0.9.0,>=0.8.1
+clikit<0.7.0,>=0.6.2
+crashtest<0.4.0,>=0.3.0
+html5lib<2.0,>=1.0
+keyring<22.0.0,>=21.2.0
+packaging<21.0,>=20.4
+pexpect<5.0.0,>=4.7.0
+pkginfo<2.0,>=1.4
+poetry-core<1.1.0,>=1.0.7
+requests<3.0,>=2.18
+requests-toolbelt<0.10.0,>=0.9.1
+shellingham<2.0,>=1.1
+tomlkit<1.0.0,>=0.7.0
