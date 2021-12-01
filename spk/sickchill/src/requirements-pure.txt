@@ -3,7 +3,7 @@ babelfish==0.6.0
 beautifulsoup4==4.10.0
 beekeeper-alt==2021.7.16
 bencode.py==4.0.0
-CacheControl==0.12.9
+#CacheControl==0.12.9         ==> python310:pure:<0.13.0,>=0.12.4
 #certifi==2021.10.8           ==> python310:pure
 chardet==4.0.0
 charset-normalizer==2.0.7
