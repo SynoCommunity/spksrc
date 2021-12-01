@@ -29,7 +29,7 @@ PyJWT==1.7.1
 ## pip>=8.0.3,<20.3
 # python-slugify==4.0.1
 # PyYAML==5.4.1                   ==> python310:crossenv:6.0
-requests==2.25.1
+# requests==2.25.1                ==> python310:pure:<3.0,>=2.18
 ruamel.yaml==0.15.100
 six==1.16.0
 # voluptuous==0.12.1
@@ -43,13 +43,17 @@ six==1.16.0
 #hass-nabucasa==0.46.0
 
 ### other default dependencies that need cross compiled wheel
-# MarkupSafe==2.0.1               ==> crossenv
+# MarkupSafe==2.0.1               ==> python310:crossenv
 # aiohttp==3.7.4.post             ==> crossenv
-# cffi==1.14.1                    ==> crossenv
+# cffi==1.14.1                    ==> python310:crossenv:1.15.0
 # greenlet==1.1.1                 ==> crossenv
 # multidict==5.1.0                ==> crossenv
 # sqlalchemy==1.4.23              ==> crossenv
 
+# Requirements for aiohttp==3.7.4.post
+async-timeout==3.0.1
+chardet==4.0.0
+typing-extensions==3.10.0.0
 
 # Failed to build: av clx-sdk-xms homeassistant-pyozw python-twitch-client
 

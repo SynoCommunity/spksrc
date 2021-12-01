@@ -5,7 +5,7 @@ aiohttp-cors==0.7.0
 aiohue==2.6.1
 anyio==3.3.0
 astral==2.2
-async-timeout==3.0.1
+# async-timeout==3.0.1       ==> pure
 async-upnp-client==0.20.0
 ### asyncstdlib @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/asyncstdlib-3.9.2-py3-none-any.whl
 atomicwrites==1.4.0
@@ -17,7 +17,7 @@ boto3==1.18.18
 botocore==1.21.18
 #certifi==2021.5.30          ==> python310:pure
 ### cffi==1.14.1
-chardet==4.0.0
+# chardet==4.0.0             ==> pure
 ### ciso8601 @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ciso8601-2.1.3-cp38-none-any.whl
 click==7.1.2
 ### cryptography @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/cryptography-3.3.2-cp38-none-any.whl
@@ -83,8 +83,8 @@ PythonDNS==0.1
 pytz==2021.1
 ### PyYAML @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyYAML-5.4.1-cp38-cp38-linux_aarch64.whl
 pyudev==0.22.0
-requests==2.25.1
-requests-toolbelt==0.9.1
+# requests==2.25.1               ==> python310:pure:<3.0,>=2.18
+# requests-toolbelt==0.9.1       ==> python310:pure:<0.10.0,>=0.9.1
 rfc3986==1.5.0
 rsa==4.7.2
 ### ruamel.yaml @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ruamel.yaml-0.15.100-cp38-cp38-linux_aarch64.whl
@@ -96,7 +96,7 @@ snitun==0.27.0
 spotipy==2.18.0
 ### SQLAlchemy @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/SQLAlchemy-1.4.23-cp38-cp38-linux_aarch64.whl
 text-unidecode==1.3
-typing-extensions==3.10.0.0
+# typing-extensions==3.10.0.0    ==> pure
 Unidecode==1.2.0
 urllib3==1.26.6
 voluptuous==0.12.1
