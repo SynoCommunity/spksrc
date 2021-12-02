@@ -26,4 +26,6 @@ USE_ALTERNATE_TMPDIR = 1
 
 SPK_COMMANDS = bin/duply bin/duplicity
 
+SPK_USR_LOCAL_LINKS = bin:env/bin/duplicity
+
 include ../../mk/spksrc.spk.mk
