@@ -6,6 +6,10 @@ SPK_ICON = src/duplicity.png
 BUILD_DEPENDS = cross/python310
 DEPENDS = cross/duplicity cross/duply
 
+# Required for lxml wheel
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 SPK_DEPENDS = "python310:gnupg>=2.1.6"

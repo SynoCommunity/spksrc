@@ -29,97 +29,19 @@
 ##### Included for reference #####
 #duplicity==0.8.19
 
-args==0.1.0
-arrow==0.17.0
-#attrs==20.3.0                   ==> python310
-azure-core==1.13.0
-azure-storage-blob==12.8.1
-b2sdk==1.7.0
-Babel==2.9.1
-boto==2.49.0
-boto3==1.17.62
-botocore==1.20.62
-boxsdk==2.12.0
-cachetools==4.2.2
-#certifi==2020.12.5              ==> python310
-#cffi==1.14.5                    ==> python310
-#chardet==4.0.0                  ==> python310
-clint==0.5.1
-#cryptography==3.4.7             ==> python310
-debtcollector==1.11.0
-dropbox==11.7.0
-#duplicity==0.8.19
-fasteners==0.16
-funcsigs==1.0.2
-#future==0.18.2                  ==> python310
+#cffi==1.14.5                    ==> python310:crossenv:1.15.0
+#cryptography==3.4.7             ==> python310:crossenv:3.3.2
 # gdata                          ; python_version == '2.7'
-google-api-core==1.26.3
-google-api-python-client==2.3.0
-googleapis-common-protos==1.53.0
-google-auth==1.30.0
-google-auth-httplib2==0.1.0
-google-auth-oauthlib==0.4.4
-httplib2==0.19.1
-#idna==2.10                      ==> python310
-ip-associations-python-novaclient-ext==0.2
 iso8601==0.1.14
-isodate==0.6.0
 #jeepney==0.7.1                  ### cross compile wheel fails to find flit_core
-jmespath==0.10.0
-jottalib==0.5.1
-keystoneauth1==2.18.0
-logfury==0.1.2
-#lxml==4.6.3                     ==> python310
+lxml==4.6.3
 #mediafire                       ###  Development Status 3 - Alpha: outdated (Nov 2016), not supported by Python >3.4
 #monotonic==1.6
-#msgpack-python==0.5.6           ==> python310
-msrest==0.6.21
-netaddr==0.8.0
-#netifaces==0.10.9               ==> python310
-oauth2client==4.1.3
-#oauthlib==3.1.0                 ==> python310
-os-diskconfig-python-novaclient-ext==0.1.3
-oslo.config==4.12.0
-oslo.i18n==3.12.0
-oslo.serialization==2.16.1
-oslo.utils==3.22.3
-os-networksv2-python-novaclient-ext==0.26
-os-virtual-interfacesv2-python-novaclient-ext==0.20
-#packaging==20.9                 ==> python310
-pbr==5.7.0
-ply==3.11
-positional==1.2.1
-prettytable==0.7.2
-protobuf==3.15.8
-#pyasn1==0.4.8                   ==> python310
-pyasn1-modules==0.2.8
-#pycparser==2.20                 ==> python310
-PyDrive==1.3.1
-PyJWT==2.1.0
-#pyparsing==2.4.7                ==> python310
-pyrax==1.10.0
-python-gettext==4.0
-python-keystoneclient==3.10.0
-python-novaclient==2.27.0
+msgpack-python==0.5.6
+netifaces==0.11.0
+pyparsing==2.4.7
 python-swiftclient==3.11.1
-#pytz==2021.1                    ==> python310
-#PyYAML==5.4.1                   ==> python310
-rackspace-auth-openstack==1.3
-rackspace-novaclient==2.1
-rax-default-network-flags-python-novaclient-ext==0.4.0
-rax-scheduled-images-python-novaclient-ext==0.3.1
-#requests==2.25.1                ==> python310
-#requests-oauthlib==1.3.0        ==> python310
-#requests-toolbelt==0.9.1        ==> python310
+#PyYAML==5.4.1                   ==> python310:crossenv:6.0
 rfc3986==1.4.0
-rsa==4.7.2
-s3transfer==0.4.2
-SecretStorage==3.3.1
-setuptools-scm==5.0.2
 simplejson==3.17.2
-#six==1.15.0                     ==> python310
-stevedore==1.20.1
-stone==3.2.1
-uritemplate==3.0.1
-#urllib3==1.26.4                 ==> python310
 wrapt==1.12.1
