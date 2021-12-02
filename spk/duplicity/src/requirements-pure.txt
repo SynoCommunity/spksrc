@@ -83,8 +83,8 @@ oslo.utils==3.22.3
 os-networksv2-python-novaclient-ext==0.26
 os-virtual-interfacesv2-python-novaclient-ext==0.20
 packaging==20.9
-#pbr==5.7.0
-pbr
+#pbr==5.7.0      ==> dependency conflicting with python-novaclient 2.27.0 depends on pbr<2.0 and >=1.6
+pbr==1.10.0
 ply==3.11
 positional==1.2.1
 prettytable==0.7.2
@@ -98,8 +98,7 @@ pyrax==1.10.0
 python-dateutil==2.8.1
 python-gettext==4.0
 python-keystoneclient==3.10.0
-#python-novaclient==2.27.0
-python-novaclient
+python-novaclient==2.27.0
 pytz==2021.1
 rackspace-auth-openstack==1.3
 rackspace-novaclient==2.1

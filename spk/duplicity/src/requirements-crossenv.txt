@@ -34,7 +34,7 @@
 # gdata                          ; python_version == '2.7'
 iso8601==0.1.14
 #jeepney==0.7.1                  ### cross compile wheel fails to find flit_core
-lxml==4.6.3
+lxml==4.6.4
 #mediafire                       ###  Development Status 3 - Alpha: outdated (Nov 2016), not supported by Python >3.4
 #monotonic==1.6
 msgpack-python==0.5.6
