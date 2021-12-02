@@ -29,7 +29,7 @@ PyJWT==1.7.1
 ## pip>=8.0.3,<20.3
 # python-slugify==4.0.1
 # PyYAML==5.4.1                   ==> python310:crossenv:6.0
-# requests==2.25.1                ==> python310:pure:<3.0,>=2.18
+requests==2.26.0
 ruamel.yaml==0.15.100
 six==1.16.0
 # voluptuous==0.12.1

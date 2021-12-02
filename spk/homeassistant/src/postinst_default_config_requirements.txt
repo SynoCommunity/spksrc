@@ -83,8 +83,8 @@ PythonDNS==0.1
 pytz==2021.1
 ### PyYAML @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyYAML-5.4.1-cp38-cp38-linux_aarch64.whl
 pyudev==0.22.0
-# requests==2.25.1               ==> python310:pure:<3.0,>=2.18
-# requests-toolbelt==0.9.1       ==> python310:pure:<0.10.0,>=0.9.1
+requests==2.26.0
+requests-toolbelt==0.9.1
 rfc3986==1.5.0
 rsa==4.7.2
 ### ruamel.yaml @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ruamel.yaml-0.15.100-cp38-cp38-linux_aarch64.whl
