@@ -7,9 +7,9 @@ borgmatic==1.5.18
 charset-normalizer==2.0.4
 colorama==0.4.4
 idna==3.2
-#packaging==21.0               ==> python310:pure:<21.0,>=20.4
+packaging==20.9
 pyparsing==2.4.7
-#requests==2.26.0              ==> python310:pure:<3.0,>=2.18
+requests==2.26.0
 ruamel.yaml==0.17.16
 six==1.16.0
 urllib3==1.26.6
