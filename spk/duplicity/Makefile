@@ -10,6 +10,9 @@ DEPENDS = cross/duplicity cross/duply
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
+# Required for PyYAML
+DEPENDS += cross/libyaml
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 SPK_DEPENDS = "python310:gnupg>=2.1.6"
