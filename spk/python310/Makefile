@@ -26,7 +26,8 @@ ENV += SODIUM_INSTALL=system
 
 # Patched cross-compiled wheel
 # https://github.com/python-pillow/Pillow/issues/5799
-DEPENDS += cross/pillow
+# Moved to individual packages, uncoment to enable
+# DEPENDS += cross/pillow
 
 # Required for pycares
 DEPENDS += cross/c-ares
