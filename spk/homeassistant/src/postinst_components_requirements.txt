@@ -62,7 +62,7 @@ cssselect==1.1.0
 dacite==1.6.0
 dataclasses-json==0.5.4
 dateparser==1.0.0
-demjson==2.2.4
+#demjson==2.2.4           ==> build error
 denonavr==0.10.8
 dicttoxml==1.7.4
 fjaraskupan==1.0.0

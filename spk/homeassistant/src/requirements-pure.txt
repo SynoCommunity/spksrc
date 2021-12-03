@@ -19,7 +19,7 @@ attrs==21.2.0
 # bcrypt==3.1.7                   ==> crossenv
 # certifi==2021.5.30              ==> python310:pure
 # ciso8601==2.1.3                 ==> crossenv
-# cryptography==3.3.2             ==> python310:crossenv
+# cryptography==3.3.2             ==> crossenv
 # httpx==0.19.0
 idna==3.3
 jinja2==3.0.3
@@ -43,9 +43,9 @@ six==1.16.0
 #hass-nabucasa==0.46.0
 
 ### other default dependencies that need cross compiled wheel
-# MarkupSafe==2.0.1               ==> python310:crossenv
+# MarkupSafe==2.0.1               ==> crossenv
 # aiohttp==3.7.4.post             ==> crossenv
-# cffi==1.14.1                    ==> python310:crossenv:1.15.0
+# cffi==1.14.1                    ==> crossenv
 # greenlet==1.1.1                 ==> crossenv
 # multidict==5.1.0                ==> crossenv
 # sqlalchemy==1.4.23              ==> crossenv
