@@ -61,7 +61,7 @@ install_python_virtualenv ()
     # Create a Python virtualenv
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
 
-    # Update to latest pip
+    # Update to latest pip package installer
     python3 -m pip install --upgrade pip
 }
 
@@ -69,6 +69,30 @@ install_python_virtualenv ()
 install_python_wheels ()
 {
     # default PATH to wheelhouse
+    cachedir=${SYNOPKG_PKGVAR}/pip-cache
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    requirements=${wheelhouse}/requirements.txt
+
+    # Install the wheels
+    echo "Install packages from wheels"
+    if [ -s ${requirements} ]; then
+       echo "Install packages from wheels [${requirements}]"
+       pip install $([ $# -gt 0 ] && echo $*) \
+                   --force-reinstall \
+                   --cache-dir ${cachedir} \
+                   --find-links ${wheelhouse} \
+                   --requirement ${requirements}
+    fi
+
+    echo "Installed modules:"
+    pip freeze
+}
+
+
+install_python_wheels_alt ()
+{
+    # default PATH to wheelhouse
+    cachedir=${SYNOPKG_PKGVAR}/pip-cache
     wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
 
     # Install the wheels
@@ -81,7 +105,7 @@ install_python_wheels ()
                       $([ "$type" != "pure" ] && echo "--no-deps") \
                       $([ $# -gt 0 ] && echo $*) \
                       --force-reinstall \
-                      --cache-dir ${SYNOPKG_PKGVAR}/pip-cache \
+                      --cache-dir ${cachedir} \
                       --find-links ${wheelhouse} \
                       --requirement ${wheelhouse}/requirements-${type}.txt
        fi
