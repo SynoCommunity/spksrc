@@ -7,7 +7,7 @@ borgmatic==1.5.18
 charset-normalizer==2.0.4
 colorama==0.4.4
 idna==3.2
-packaging==20.9
+packaging==21.0
 pyparsing==2.4.7
 requests==2.26.0
 ruamel.yaml==0.17.16
