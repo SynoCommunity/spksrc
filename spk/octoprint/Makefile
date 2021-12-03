@@ -7,7 +7,10 @@ DSM_UI_DIR = app
 BUILD_DEPENDS = cross/python310
 DEPENDS = cross/octoprint
 
-WHEELS = src/requirements.txt
+# Required for PyYAML
+DEPENDS += cross/libyaml
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 SPK_DEPENDS = "python310"
 
