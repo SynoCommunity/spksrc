@@ -36,6 +36,10 @@ endif
 
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
+# force DSM 7 compatible sysconfdir
+# sysconfdir=/var/packages/{spk-name}/var - i.e. var as sibling instead of child of "target" folder
+CONFIGURE_ARGS += --sysconfdir=$(dir $(INSTALL_PREFIX))var
+
 PRE_CONFIGURE_TARGET = shairport-sync_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
