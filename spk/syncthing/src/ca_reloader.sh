@@ -1,8 +1,8 @@
 #!/bin/sh
 
 CERT_DIR=/usr/local/etc/certificate/syncthing/syncthing-webui
-CONF_DIR=/usr/local/syncthing/var
-SYNCTHING=/usr/local/syncthing/bin/syncthing
+CONF_DIR=/var/packages/syncthing/target/var
+SYNCTHING=/var/packages/syncthing/target/bin/syncthing
 
 case $1 in
     syncthing-webui)
