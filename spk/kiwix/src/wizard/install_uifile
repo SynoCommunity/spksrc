@@ -1,0 +1,57 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "combobox",
+        "desc": "Please select a volume to use for the data folder",
+        "subitems": [{
+            "key": "wizard_data_volume",
+            "desc": "Volume name",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      }, {
+        "type": "textfield",
+        "desc": "Shared folder for zim files. This must be a name for the shared folder only, without any path. This share is created at installation when it does not already exist.",
+        "subitems": [{
+            "key": "wizard_data_folder",
+            "desc": "Shared folder",
+            "defaultValue": "kiwix-share",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[^<>: */?\"]*/",
+                "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": ""
+      }, {
+        "desc": "The web server <b>kiwix-serve</b> runs as internal service user <b>'sc-kiwix'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>If you add content with <b>kiwix-manage</b>, make sure 'sc-kiwix' has permissions to access library.xml and *.zim files in this folder.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      }
+    ]
+  }
+]
