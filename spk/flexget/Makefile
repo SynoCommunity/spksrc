@@ -31,6 +31,8 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+USE_ALTERNATE_TMPDIR = 1
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: flexget_extra_install
