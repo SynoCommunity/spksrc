@@ -39,7 +39,7 @@
 #                                           folder at intallation and runtime.
 #  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic 
 #                                           installer generated script (SERVICE_SETUP) is not usable.
-#  NO_SERVICE_SHORTCUT           (optional) do not create 
+#  NO_SERVICE_SHORTCUT           (optional) do not create an app icon in the DSM desktop
 #  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
 #
 
@@ -406,7 +406,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
 		--arg desc "${DESC}" \
-		--arg id "com.synocommunity.${SPK_NAME}" \
+		--arg id "com.synocommunity.packages.${SPK_NAME}" \
 		--arg icon "images/${SPK_NAME}-{0}.png" \
 		--arg prot "${SERVICE_PORT_PROTOCOL}" \
 		--arg port "${SERVICE_PORT}" \

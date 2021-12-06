@@ -198,12 +198,16 @@ ifneq ($(strip $(DSM_UI_DIR)),)
 endif
 ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
-	@echo dsmapppage=\"$(DSM_APP_NAME)\" >> $@
-	@echo dsmapplaunchname=\"$(DSM_APP_NAME)\" >> $@
 else
-	@echo dsmappname=\"com.synocommunity.$(SPK_NAME)\" >> $@
-	@echo dsmapppage=\"com.synocommunity.$(SPK_NAME)\" >> $@
-	@echo dsmapplaunchname=\"com.synocommunity.$(SPK_NAME)\" >> $@
+	@echo dsmappname=\"com.synocommunity.packages.$(SPK_NAME)\" >> $@
+endif
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifneq ($(strip $(DSM_APP_PAGE)),)
+	@echo dsmapppage=\"$(DSM_APP_PAGE)\" >> $@
+endif
+ifneq ($(strip $(DSM_APP_LAUNCH_NAME)),)
+	@echo dsmapplaunchname=\"$(DSM_APP_LAUNCH_NAME)\" >> $@
+endif
 endif
 ifneq ($(strip $(ADMIN_PROTOCOL)),)
 	@echo adminprotocol=\"$(ADMIN_PROTOCOL)\" >> $@
