@@ -34,7 +34,7 @@ authcaptureproxy==1.0.2
 authlib==0.15.4
 axis==44
 backoff==1.11.1
-#beautifulsoup4==4.9.3          ==> python310
+beautifulsoup4==4.9.3
 bellows==0.27.0
 bidict==0.21.2
 bimmer-connected==0.7.20
@@ -62,7 +62,7 @@ cssselect==1.1.0
 dacite==1.6.0
 dataclasses-json==0.5.4
 dateparser==1.0.0
-demjson==2.2.4
+#demjson==2.2.4           ==> build error
 denonavr==0.10.8
 dicttoxml==1.7.4
 fjaraskupan==1.0.0
@@ -101,7 +101,7 @@ metar==1.8.0
 ms-cv==0.1.1
 mypy-extensions==0.4.3
 oauthlib==3.1.1
-packaging==21.0
+packaging==20.9
 paho-mqtt==1.5.1
 pi1wire==0.1.0
 pkce==1.0.3
@@ -146,7 +146,7 @@ stringcase==1.2.0
 tenacity==8.0.1
 teslajsonpy==0.18.3
 typing-inspect==0.7.1
-#tzlocal==3.0                   ==> python310
+tzlocal==3.0
 WSDiscovery==2.0.0
 xmltodict==0.12.0
 yalexs==1.1.13

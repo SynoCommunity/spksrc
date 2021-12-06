@@ -6,6 +6,13 @@ SPK_ICON = src/duplicity.png
 BUILD_DEPENDS = cross/python310
 DEPENDS = cross/duplicity cross/duply
 
+# Required for lxml wheel
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+
+# Required for PyYAML
+DEPENDS += cross/libyaml
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 SPK_DEPENDS = "python310:gnupg>=2.1.6"
@@ -25,5 +32,7 @@ SERVICE_SETUP = src/service-setup.sh
 USE_ALTERNATE_TMPDIR = 1
 
 SPK_COMMANDS = bin/duply bin/duplicity
+
+SPK_USR_LOCAL_LINKS = bin:env/bin/duplicity
 
 include ../../mk/spksrc.spk.mk

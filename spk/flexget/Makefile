@@ -1,11 +1,14 @@
 SPK_NAME = flexget
-SPK_VERS = 3.1.129
+SPK_VERS = 3.1.155
 SPK_REV = 11
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python310
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 SPK_DEPENDS = "python310"
+
+# Required for PyYAML
+DEPENDS += cross/libyaml
 
 MAINTAINER = manowark
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
@@ -27,6 +30,8 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
+
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 

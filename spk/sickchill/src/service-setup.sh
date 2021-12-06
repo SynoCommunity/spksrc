@@ -1,8 +1,6 @@
-PYTHON_DIR="/var/packages/python310/target"
-PIP=${SYNOPKG_PKGDEST}/env/bin/pip3
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
+PYTHON_DIR="/var/packages/python310/target/bin"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 HOME="${SYNOPKG_PKGVAR}"
-VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SC_INSTALL_DIR="${SYNOPKG_PKGDEST}/share/SickChill"
 SC_BINARY="${SC_INSTALL_DIR}/SickChill.py"
@@ -41,14 +39,10 @@ EOF
 
 service_postinst() {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
-    
-    # attempt to get current pip updated during install procedure
-    ${PYTHON} -m pip install --upgrade pip
+    install_python_virtualenv
     
     # Install the wheels
-    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
-    ${PIP} install --extra-index-url https://wheel-index.linuxserver.io/ubuntu/ --upgrade --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
+    install_python_wheels --extra-index-url https://wheel-index.linuxserver.io/ubuntu/
     
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config

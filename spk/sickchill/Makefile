@@ -7,7 +7,15 @@ BUILD_DEPENDS = cross/python310
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "python310"
 
-WHEELS = src/requirements.txt
+# Required for lxml wheel
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+
+# Required for PyNaCl
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
@@ -27,6 +35,8 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
+
+USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = sickchill_extra_install
 

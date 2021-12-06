@@ -8,19 +8,39 @@ SPK_DEPENDS = "python310"
 BUILD_DEPENDS = cross/python310
 
 DEPENDS += cross/gevent
+
 # for iqvia
 DEPENDS += cross/numpy
+
 # for python-libnmap
 DEPENDS += cross/nmap
+
 # for tradfri
 DEPENDS += cross/dtlssocket
+
 # for denonavr
 DEPENDS += cross/asyncstdlib
+
 # for flunearyou
 DEPENDS += cross/ujson
 
+# Required for PyYAML
+DEPENDS += cross/libyaml
+
+# Required for PyNaCl
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# Required for pycares
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+# Patched cross-compiled wheel
+# https://github.com/python-pillow/Pillow/issues/5799
+DEPENDS += cross/pillow
+
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
-WHEELS = src/requirements-crossenv.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."

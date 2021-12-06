@@ -3,11 +3,17 @@ SPK_VERS = 1.5.0
 SPK_REV = 7
 SPK_ICON = src/beets.png
 
-PIP = $(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin/pip
-BUILD_DEPENDS = native/python310
+BUILD_DEPENDS = cross/python310
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 SPK_DEPENDS = "python310"
+
+# Required for PyYAML
+DEPENDS += cross/libyaml
+
+# Patched cross-compiled wheel
+# https://github.com/python-pillow/Pillow/issues/5799
+DEPENDS += cross/pillow
 
 MAINTAINER = ymartin59
 DESCRIPTION = "Beets is the media library management system for obsessive-compulsive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AcousticBrainz Submit, Gmusic, ReplayGain."
@@ -23,8 +29,5 @@ SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/beet
-
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
 
 include ../../mk/spksrc.spk.mk

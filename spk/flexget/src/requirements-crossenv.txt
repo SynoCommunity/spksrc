@@ -3,60 +3,13 @@
 # Additionally added the flexget and the transmission-rpc packages.
 # plumbum and rpyc packages are adjusted as the proposed versions are not accepted.
 
+cryptography==3.3.2
+cffi==1.15.0
 aniso8601==9.0.1
-APScheduler==3.7.0
-#attrs==20.3.0                       ==> python310
-babelfish==0.5.5
-#beautifulsoup4==4.10.0              ==> python310
 Brotli==1.0.9
-#certifi==2020.12.5                  ==> python310
-#chardet==4.0.0                      ==> python310
-CherryPy==18.6.0
-#click==7.1.2                        ==> python310
-colorama==0.4.4
-colorclass==2.2.0
-feedparser==6.0.2
-#Flask==1.1.2                        ==> python310
-Flask-Compress==1.9.0
-Flask-Cors==3.0.10
-Flask-Login==0.5.0
-Flask-RESTful==0.3.8
-flask-restx==0.4.0
-FlexGet==3.1.129
-#greenlet==1.0.0                     ==> python310
-guessit==3.2.0
-#html5lib==1.1                       ==> python310
-#idna==2.10                          ==> python310
-#itsdangerous==1.1.0                 ==> python310
-#Jinja2==2.11.3                      ==> python310
-loguru==0.5.3
-#MarkupSafe==2.0.0                   ==> python310
-more-itertools==8.7.0
-plumbum==1.6.9
-#plumbum==1.7.0
-#poetry==1.1.11                      ==> python310
-progressbar==2.5
-#psutil==5.8.0                       ==> python310
-pynzb==0.1.0
-#pyparsing==2.4.7                    ==> python310
-pyrsistent==0.17.3
-PyRSS2Gen==1.1
-#pytz==2021.1                        ==> python310
-#PyYAML==5.4.1                       ==> python310
-rebulk==3.0.1
-#requests==2.25.1                    ==> python310
-rpyc==4.1.2
-#rpyc==5.0.1
-sgmllib3k==1.0.0
-#six==1.16.0                         ==> python310
-soupsieve==2.2.1
-#SQLAlchemy==1.4.15                  ==> python310
-terminaltables==3.1.0
-transmission-rpc==3.2.5
-typing-extensions==3.10.0.0
-#tzlocal==2.1                        ==> python310
-#urllib3==1.26.5                     ==> python310
-#webencodings==0.5.1                 ==> python310
-#Werkzeug==1.0.1                     ==> python310
-zc.lockfile==2.0
-zxcvbn-python==4.4.24
+greenlet==1.1.2
+MarkupSafe==2.0.1
+psutil==5.8.0
+pyrsistent==0.18.0
+PyYAML==6.0
+SQLAlchemy==1.4.27

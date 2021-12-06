@@ -2,6 +2,11 @@
 # Configuration for python wheel build
 #
 
+# Enable pure-python packaging
+ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = FALSE
+endif
+
 ifeq ($(strip $(WHEELS_DEFAULT)),)
 WHEELS_DEFAULT = requirements.txt
 endif
@@ -73,22 +78,25 @@ install_python_wheel:
 		cd $(WHEELHOUSE) ; \
 		$(MSG) Copying $(WHEELS_DEFAULT) wheelhouse ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
+			cp requirements*.txt $(STAGING_INSTALL_WHEELHOUSE) ; \
 			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		fi ; \
-		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
-			echo "Pure python wheels are excluded from the package wheelhouse." ; \
-			for w in *.whl; do \
-				if echo $${w} | grep -viq "-none-any\.whl" ; then \
-					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
-				fi ; \
-			done ; \
-		else \
-			for w in *.whl; do \
-				_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
-				$(MSG) Copying to wheelhouse: $$_new_name ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
-			done ; \
+		if stat -t *.whl >/dev/null 2>&1; then \
+			if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
+				echo "Pure python wheels are excluded from the package wheelhouse." ; \
+				for w in *.whl; do \
+					if echo $${w} | grep -viq "-none-any\.whl" ; then \
+						cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl ; \
+					fi ; \
+				done ; \
+			else \
+				for w in *.whl; do \
+					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
+					$(MSG) Copying to wheelhouse: $$_new_name ; \
+					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 
