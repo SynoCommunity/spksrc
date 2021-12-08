@@ -35,6 +35,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: kiwix_extra_install
 kiwix_extra_install:
-	install -d -m 755 $(STAGING_DIR)/var
-	install -m 644 src/empty_library.xml  $(STAGING_DIR)/var/empty_library.xml
-	install -m 644 src/kiwix.cfg  $(STAGING_DIR)/var/kiwix.cfg
+	install -d -m 755 $(STAGING_SPKVAR)
+	install -m 644 src/empty_library.xml  $(STAGING_SPKVAR)/empty_library.xml
+	install -m 644 src/kiwix.cfg  $(STAGING_SPKVAR)/kiwix.cfg
