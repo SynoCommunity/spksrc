@@ -25,7 +25,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: umurmur_extra_install
 umurmur_extra_install:
-<<<<<<< HEAD
 	install -m 755 -d $(STAGING_SPKVAR) $(STAGING_DIR)/app
 	install -m 644 src/umurmur.conf $(STAGING_SPKVAR)/umurmur.conf
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
