@@ -1,13 +1,9 @@
-# Package specific behaviors
-# Sourced script by generic installer and start-stop-status scripts
-
-# Add ffmpeg and ifself to path
-PYTHON_DIR="/var/packages/python38/target"
-PYTHONENV="${SYNOPKG_PKGDEST}/env"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-WHEELHOUSE=${SYNOPKG_PKGDEST}/share/wheelhouse
-FFMPEG_DIR="/var/packages/ffmpeg/target"
-PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${FFMPEG_DIR}/bin:${PYTHON_DIR}/bin:${PATH}"
+# Define python310 binary path
+PYTHON_DIR="/var/packages/python310/target/bin"
+# Define ffmpeg binary path
+FFMPEG_DIR="/var/packages/ffmpeg/target/bin"
+# Add local bin, virtualenv along with ffmpeg and python310 to the default PATH
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
 HTTP=9981
@@ -16,7 +12,7 @@ HTSP=9982
 # Replace generic service startup, run service in background
 GRPN=$(id -gn ${EFF_USER})
 UPGRADE_CFG_DIR="${SYNOPKG_PKGVAR}/dvr/config"
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/tvheadend -f -C -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE} -l ${LOG_FILE} --debug \"\""
+SERVICE_COMMAND="tvheadend -f -C -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE} -l ${LOG_FILE} --debug \"\""
 SVC_BACKGROUND=yes
 
 # Group configuration to manage permissions of recording folders
@@ -25,13 +21,10 @@ GROUP=sc-media
 service_postinst ()
 {
     # EPG Grabber (zap2epg) - Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${PYTHONENV}
+    install_python_virtualenv
 
-    # EPG Grabber (zap2epg) - Install the wheels/requirements
-    ${SYNOPKG_PKGDEST}/env/bin/pip install \
-             --no-deps --no-index --no-input --upgrade \
-             --force-reinstall --find-links \
-             ${WHEELHOUSE} ${WHEELHOUSE}/*.whl
+    # EPG Grabber (zap2epg) - Install the Python wheels
+    install_python_wheels
 }
 
 service_postupgrade ()
