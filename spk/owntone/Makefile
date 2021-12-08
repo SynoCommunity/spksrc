@@ -1,12 +1,13 @@
 SPK_NAME = owntone
-SPK_VERS = 27.4
+SPK_VERS = 28.1
 SPK_REV = 1
 SPK_ICON = src/owntone.png
 
 DEPENDS = cross/owntone
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = OwnTone is forked-daapd's new name! Linux/FreeBSD DAAP (iTunes) and MPD media server with support for AirPlay devices (multiroom), Apple Remote (and compatibles), Chromecast, Spotify and internet radio.
+DESCRIPTION = OwnTone is forked-daapd\'s new name. Linux/FreeBSD DAAP (iTunes) and MPD media server with support for AirPlay devices (multiroom), Apple Remote (and compatibles), Chromecast, Spotify and internet radio.
+CHANGELOG = "Initial package release."
 
 DISPLAY_NAME = OwnTone
 
@@ -23,8 +24,10 @@ export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 PRE_DEPEND_TARGET = owntone_pre_depend
 SPK_DEPENDS = "ffmpeg>4.2"
-# Use FFMPEG package shared libraries
-FFMPEG_LIBS = libavcodec.pc libavdevice.pc libavfilter.pc libavformat.pc libavresample.pc libavutil.pc
+# Use some of the FFMPEG package shared libraries
+FFMPEG_LIBS = libavformat.pc libavcodec.pc libavutil.pc libavfilter.pc
+FFMPEG_LIBS += libswscale.pc libpostproc.pc
+FFMPEG_LIBS += libswresample.pc libavresample.pc
 endif
 
 include ../../mk/spksrc.spk.mk

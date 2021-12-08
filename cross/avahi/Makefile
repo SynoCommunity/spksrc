@@ -5,7 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/lathiat/avahi/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/glib cross/glib cross/libevent cross/expat cross/libdaemon cross/dbus
+BUILD_DEPENDS = native/glib
+DEPENDS = cross/glib cross/libevent cross/expat cross/libdaemon cross/dbus
 
 HOMEPAGE = https://www.avahi.org/
 COMMENT  = Avahi - Service Discovery for Linux using mDNS/DNS-SD -- compatible with Bonjour
