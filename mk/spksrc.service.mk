@@ -39,7 +39,7 @@
 #                                           folder at intallation and runtime.
 #  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic 
 #                                           installer generated script (SERVICE_SETUP) is not usable.
-#  NO_SERVICE_SHORTCUT           (optional) do not create 
+#  NO_SERVICE_SHORTCUT           (optional) do not create an app icon in the DSM desktop
 #  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
 #
 
