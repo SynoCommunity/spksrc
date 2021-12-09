@@ -23,7 +23,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8384
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-SERVICE_CERT = syncthing-webui
+SERVICE_CERT = syncthing_webui
 SERVICE_CERT_RELOAD = tools/ca_reloader.sh
 
 # Admin link for in DSM UI
