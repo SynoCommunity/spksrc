@@ -27,4 +27,15 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -std=c99
 
+POST_INSTALL_TARGET = owntone_post_install
+
 include ../../mk/spksrc.cross-cc.mk
+
+# use libssp of toolchain
+TC_LIPRARY_PATH = $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TC_VERS)/work/$(TC_TARGET)/$(TC_LIBRARY)
+
+.PHONY: owntone_post_install
+owntone_post_install:
+	@$(RUN) install $(TC_LIPRARY_PATH)/libssp.so.0.0.0 $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/
+	@$(RUN) ; cd $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/ && ln -sf libssp.so.0.0.0 libssp.so.0
+	@$(RUN) ; cd $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/ && ln -sf libssp.so.0.0.0 libssp.so	
