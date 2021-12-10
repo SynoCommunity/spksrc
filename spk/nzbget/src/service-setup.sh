@@ -1,3 +1,4 @@
+
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 NZBGET="${SYNOPKG_PKGDEST}/bin/nzbget"
 CFG_FILE="${SYNOPKG_PKGVAR}/nzbget.conf"
@@ -12,7 +13,7 @@ SERVICE_COMMAND="${NZBGET} -c ${CFG_FILE} -o WebDir=${WEBDIR} -o LockFile=${PID_
 
 service_postinst ()
 {
-    # Download latest NZBGet
+    # Download current NZBGet (stable or testing)
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
         echo "Download nzbget installer: latest"
         wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run"
@@ -22,23 +23,20 @@ service_postinst ()
         wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run"
     fi
 
-    # Stop if download failed
+    # Abort if download failed
     if [ ! -r "${NZBGET_INSTALLER}" ]; then
         echo "Failed to download installer, please check the internet connection of your device."
         exit 1
     fi
     echo "Download completed"
 
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        # On DSM5 the lib-dir is not owned by the package-user
-        set_unix_permissions "${SYNOPKG_PKGDEST}/bin"
+    chmod +x "${NZBGET_INSTALLER}"
+    ${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin
 
-        # Install as nzbget user, for correct permissions
-        chmod +x "${NZBGET_INSTALLER}"
-        su ${EFF_USER} -s /bin/sh -c "${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin"
-    else
-        chmod +x "${NZBGET_INSTALLER}"
-        ${NZBGET_INSTALLER} --destdir ${SYNOPKG_PKGDEST}/bin
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+        # On DSM 5 and 6 the nzbget archive is extracted with the internal build owner (id 1001).
+        # Overwrite with the package owner
+        set_unix_permissions "${SYNOPKG_PKGDEST}/bin"
     fi
 
     # Make sure installation worked
@@ -48,30 +46,30 @@ service_postinst ()
         exit 1
     fi
 
-    # Copy the new template config file created by installer
+    # Make a copy of the config file created by the current installer
     cp -f ${SYNOPKG_PKGDEST}/bin/nzbget.conf ${TEMPLATE_CFG_FILE}
 
     # Remove installer
     rm -f "${NZBGET_INSTALLER}"
 
-    # Create config file if not exists
+    # Create the config file on demand
     if [ ! -e "${CFG_FILE}" ]; then
-        echo "create config file"
+        echo "Create initial config file"
 
         # Use whatever the installer found best
         # It does optimizations based on the current system
         cp -f ${TEMPLATE_CFG_FILE} ${CFG_FILE}
 
         # Edit the configuration according to the wizard
-        sed -i -e "s|MainDir=.*$|MainDir=${wizard_download_dir:=/volume1/downloads}|g" \
-               -e "s/ControlUsername=.*$/ControlUsername=${wizard_control_username:=nzbget}/g" \
-               -e "s/ControlPassword=.*$/ControlPassword=${wizard_control_password:=nzbget}/g" \
-               ${CFG_FILE}
+        sed -e "s|MainDir=.*$|MainDir=${wizard_download_volume}/${wizard_download_folder}|g" \
+            -e "s/ControlUsername=.*$/ControlUsername=${wizard_control_username:=nzbget}/g" \
+            -e "s/ControlPassword=.*$/ControlPassword=${wizard_control_password:=nzbget}/g" \
+            -i ${CFG_FILE}
 
         # Update to match our paths
-        sed -i -e "s|ScriptDir=.*$|ScriptDir=${SYNOPKG_PKGDEST}/share/nzbget/scripts|g" \
-               -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGDEST}/var/nzbget.log|g" \
-               -e "s|ConfigTemplate=.*$|ConfigTemplate=${TEMPLATE_CFG_FILE}|g" \
-               ${CFG_FILE}
+        sed -e "s|ScriptDir=.*$|ScriptDir=${SYNOPKG_PKGDEST}/share/nzbget/scripts|g" \
+            -e "s|LogFile=.*$|LogFile=${SYNOPKG_PKGVAR}/nzbget.log|g" \
+            -e "s|ConfigTemplate=.*$|ConfigTemplate=${TEMPLATE_CFG_FILE}|g" \
+            -i ${CFG_FILE}
     fi
 }
