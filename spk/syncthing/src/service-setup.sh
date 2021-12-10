@@ -10,7 +10,6 @@ set_credentials() {
         # Password needs to be hashed for config entry
         ${SYNOPKG_PKGDEST}/bin/syncthing generate --home=${SYNOPKG_PKGVAR} \
             --gui-user="${wizard_username}" --gui-password="${wizard_password}"
-        fi
     fi
 }
 
