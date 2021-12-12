@@ -11,7 +11,8 @@ CP="/bin/cp -rfp"
 MKDIR="/bin/mkdir -p"
 LN="/bin/ln -nsf"
 TEE="/usr/bin/tee -a"
-
+RSYNC="/bin/rsync -avh"
+TAR="/bin/tar"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
