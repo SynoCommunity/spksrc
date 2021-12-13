@@ -34,14 +34,14 @@ SERVICE_PORT_TITLE = DemoService(HTTP)
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
-PRE_COPY_TARGET = demoservice_install
+PRE_COPY_TARGET = demoservice_pre_copy
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: demoservice_install
 # Replace standard copy/install targets, no sources, no content
-demoservice_install:
+demoservice_pre_copy:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mkdir --parents $(STAGING_INSTALL_PREFIX)/var
-	echo "No files package" > $(STAGING_INSTALL_PREFIX)/var/README
+	echo "No files package" > $(STAGING_INSTALL_PREFIX)/var/README.var
