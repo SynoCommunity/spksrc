@@ -12,6 +12,8 @@ INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/conf/${SYNOPKG_PKGNAME}.sc"
 
+# Temporary directory when the package is upgrading
+TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}"
 
 install_log ()
 {
@@ -71,19 +73,21 @@ call_func "initialize_variables"
 # (@appdata) /var/packages/<package>/target/var -> /var/packages/<package>/target/../var
 #
 syno_sync_var_folder () {
-    # Copy and delete all files except don't overwrite any existing
-    echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}"
-    $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}
+    if [ -d ${SYNOPKG_PKGDEST}/var -a "$(ls -A ${SYNOPKG_PKGDEST}/var 2>/dev/null)" ]; then
+        # Copy and delete all files except don't overwrite any existing
+        echo "$RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}"
+        $RSYNC --ignore-existing --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}
 
-    # Rename any remaining (thus pre-existing) files with .new suffix
-    find ${SYNOPKG_PKGDEST}/var -type f -exec sh -c 'x="{}"; mv "$x" "${x}.new"' \;
+        # Rename any remaining (thus pre-existing) files with .new suffix
+        find ${SYNOPKG_PKGDEST}/var -type f -exec sh -c 'x="{}"; mv "$x" "${x}.new"' \;
 
-    # Force-copy and delete all .new files
-    echo "$RSYNC --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}"
-    $RSYNC --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}
+        # Force-copy and delete all .new files
+        echo "$RSYNC --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}"
+        $RSYNC --remove-source-files ${SYNOPKG_PKGDEST}/var/ ${SYNOPKG_PKGVAR}
 
-    # Remove remaining directory
-    $RM ${SYNOPKG_PKGDEST}/var
+        # Remove remaining directory
+        $RM ${SYNOPKG_PKGDEST}/var
+    fi
 }
 
 set_unix_permissions ()
@@ -217,8 +221,7 @@ postupgrade ()
     # Migrate data once to permanent storage at postupgrade
     if [ -d ${TMP_DIR} -a "$(ls -A ${TMP_DIR} 2>/dev/null)" ]; then
         echo "$RSYNC ${TMP_DIR}/ ${SYNOPKG_PKGVAR}" | install_log
-        $RSYNC ${TMP_DIR}/ ${SYNOPKG_PKGVAR} 2>&1 | install_log && chk=$?
-        [ "${chk}" = "0" ] && rm -fr ${TMP_DIR} || true
+        $RSYNC ${TMP_DIR}/ ${SYNOPKG_PKGVAR} 2>&1 | install_log
     fi
 
     # dsm7: Now sync in any new files to permanent storage
