@@ -1,6 +1,6 @@
 SPK_NAME = demoservice
 SPK_VERS = 1.2
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/demoservice.png
 
 override ARCH=
@@ -44,4 +44,4 @@ demoservice_pre_copy:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
 	mkdir --parents $(STAGING_INSTALL_PREFIX)/var
-	echo "No files package" > $(STAGING_INSTALL_PREFIX)/var/README.var
+	echo "Test file for $(INSTALL_PREFIX)/var" > $(STAGING_INSTALL_PREFIX)/var/README
