@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/ncursesw
 
-HOMEPAGE = https://www.gnupg.org/
+HOMEPAGE = https://www.gnu.org/software/inetutils/
 COMMENT  = GNU network utilities.
 LICENSE  = GPLv3
 
