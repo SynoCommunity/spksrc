@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
 SPK_VERS = 2.1
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
