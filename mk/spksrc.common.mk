@@ -17,7 +17,7 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 PIP ?= pip
 
 # System default pip outside from build environment
-PIP_SYSTEM = $(shell which pip)
+PIP_HOST = $(shell which pip)
 
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR) --find-links $(BASE_DISTRIB_DIR)

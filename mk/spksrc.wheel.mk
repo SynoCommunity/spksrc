@@ -41,7 +41,7 @@ download_wheel:
 		do \
 			if [ -f $$wheel -a $$(basename $$wheel) != $(WHEELS_PURE_PYTHON) ] ; then \
 				$(MSG) "Downloading wheels from $$wheel ..." ; \
-				xargs -n 1 $(PIP_SYSTEM) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
+				xargs -n 1 $(PIP_HOST) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
 			fi ; \
 		done \
 	fi
