@@ -39,7 +39,7 @@ download_wheel:
 	@if [ -n "$(WHEELS)" ] ; then \
 		for wheel in $(WHEELS) ; \
 		do \
-			if [ -f $$wheel ] ; then \
+			if [ -f $$wheel -a $$(basename $$wheel) != $(WHEELS_PURE_PYTHON) ] ; then \
 				$(MSG) "Downloading wheels from $$wheel ..." ; \
 				xargs -n 1 $(PIP_SYSTEM) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
 			fi ; \
@@ -53,7 +53,7 @@ wheel_msg_target:
 # PIP_CACHE_OPT is default "--cache-dir $(PIP_DIR)", PIP_DIR defaults to $(DISTRIB_DIR)/pip, so
 # will move if the user chooses a custom persistent distribution dir for caching downloads between
 # containers and builds.
-pre_wheel_target: wheel_msg_target
+pre_wheel_target: wheel_msg_target download_wheel
 ifneq ($(strip $(WHEELS)),)
 	@if [ -n "$(PIP_CACHE_OPT)" ] ; then \
 	   mkdir -p $(PIP_DIR) ; \

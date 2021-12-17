@@ -23,8 +23,8 @@ PIP_SYSTEM = $(shell which pip)
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR) --find-links $(BASE_DISTRIB_DIR)
 
 # Define default wheel & download pip options
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
-PIP_DOWNLOAD_ARGS = download --no-binary :all: $(PIP_CACHE_OPT) --dest $(BASE_DISTRIB_DIR) --no-build-isolation
+PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --no-index --wheel-dir $(WHEELHOUSE)
+PIP_DOWNLOAD_ARGS = download --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --dest $(BASE_DISTRIB_DIR) --no-build-isolation
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
