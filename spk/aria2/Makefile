@@ -1,23 +1,22 @@
 SPK_NAME = aria2
-SPK_VERS = 1.35.0
+SPK_VERS = 1.36.0
 SPK_REV = 1
 SPK_ICON = src/aria2.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/aria2
 
 MAINTAINER = cnrat
 DESCRIPTION = aria2 is a lightweight multi-protocol and multi-source command-line download utility.
 DESCRIPTION_CHS = Aria2是一个命令行下运行、多协议、多来源下载工具（HTTP/HTTPS、FTP、BitTorrent、Metalink）。
-RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Aria2
-CHANGELOG = "Apr 6 2018 This is a first beta version."
+CHANGELOG = "Initial package release."
 
 LICENSE  = GPLv2/GPLv3
 HOMEPAGE = http://aria2.github.io
 BETA = 1
 
-WIZARDS_DIR = src/wizard/
+WIZARDS_DIR = src/wizard
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER         = auto
@@ -25,10 +24,9 @@ SERVICE_WIZARD_GROUP = wizard_group
 SERVICE_WIZARD_SHARE = wizard_download_dir
 SERVICE_SETUP        = src/service-setup.sh
 
-
 # Service configuration
 SERVICE_PORT = 6800
-SERVICE_PORT_TITLE = Aria2-RPC
+SERVICE_PORT_TITLE = Aria2 RPC
 
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
