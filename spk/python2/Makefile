@@ -19,7 +19,7 @@ DEPENDS += cross/pyyaml cross/pyzmq cross/uwsgi
 WHEELS = src/requirements.txt
 
 
-MAINTAINER = Safihre
+MAINTAINER = SynoCommunity
 DESCRIPTION = Python 2.7 Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python 2.7.
 DESCRIPTION_SPN = Lenguaje de programación Python 2.7.
