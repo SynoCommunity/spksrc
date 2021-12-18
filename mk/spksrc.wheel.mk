@@ -46,8 +46,8 @@ download_wheel:
 				while IFS= read -r requirement ; \
 				do \
 					query="curl -s https://pypi.org/pypi/$${requirement%%=*}/json" ; \
-					query="$${query} | jq -r '.releases[][] | select(.packagetype==\"sdist\") | select(.filename|test(\"-" ; \
-					query="$${query}$${requirement##*=}.tar.gz\")) | .url'" ; \
+					query+=" | jq -r '.releases[][] | select(.packagetype==\"sdist\") | select(.filename|test(\"-" ; \
+					query+="$${requirement##*=}.tar.gz\")) | .url'" ; \
 					localFile=$$(basename $$(eval $${query})) ; \
 					echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
 					wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
