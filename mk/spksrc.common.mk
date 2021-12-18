@@ -20,11 +20,12 @@ PIP ?= pip
 PIP_HOST = $(shell which pip)
 
 # Why ask for the same thing twice? Always cache downloads
-PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR) --find-links $(BASE_DISTRIB_DIR)
+PIP_CACHE_OPT ?= --no-cache-dir --find-links $(BASE_DISTRIB_DIR)
 
 # Define default wheel & download pip options
 PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --no-index --wheel-dir $(WHEELHOUSE)
-PIP_DOWNLOAD_ARGS = download --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --dest $(BASE_DISTRIB_DIR) --no-build-isolation
+# BROKEN: https://github.com/pypa/pip/issues/1884
+PIP_DOWNLOAD_ARGS = download --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --dest $(BASE_DISTRIB_DIR) --no-build-isolation
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk

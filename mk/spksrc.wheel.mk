@@ -41,7 +41,17 @@ download_wheel:
 		do \
 			if [ -f $$wheel -a $$(basename $$wheel) != $(WHEELS_PURE_PYTHON) ] ; then \
 				$(MSG) "Downloading wheels from $$wheel ..." ; \
-				xargs -n 1 $(PIP_HOST) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
+				# BROKEN: https://github.com/pypa/pip/issues/1884 ; \
+				# xargs -n 1 $(PIP_HOST) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
+				while IFS= read -r requirement ; \
+				do \
+					query="curl -s https://pypi.org/pypi/$${requirement%%=*}/json" ; \
+					query="$${query} | jq -r '.releases[][] | select(.packagetype==\"sdist\") | select(.filename|test(\"-" ; \
+					query="$${query}$${requirement##*=}.tar.gz\")) | .url'" ; \
+					localFile=$$(basename $$(eval $${query})) ; \
+					wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
+					mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
+				done < $$wheel || true ; \
 			fi ; \
 		done \
 	fi
