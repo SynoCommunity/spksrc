@@ -12,6 +12,9 @@
 #  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
 #
 
+# Allow more extensive shell commands
+SHELL := /bin/bash
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
