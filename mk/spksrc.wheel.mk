@@ -49,9 +49,10 @@ download_wheel:
 					query="$${query} | jq -r '.releases[][] | select(.packagetype==\"sdist\") | select(.filename|test(\"-" ; \
 					query="$${query}$${requirement##*=}.tar.gz\")) | .url'" ; \
 					localFile=$$(basename $$(eval $${query})) ; \
+					echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
 					wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
 					mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
-				done < $$wheel || true ; \
+				done < <(grep -v  -e "^\#" -e "^\$$" $$wheel) || true ; \
 			fi ; \
 		done \
 	fi
