@@ -1,2 +1,1 @@
-gevent-websocket==0.10.1
 zope.event==4.5.0
