@@ -205,7 +205,7 @@ endif
 # - firewall rules/port definitions (DSM >= 6.0-5936)
 # - data share worker (DSM 7, optional for DSM 6)
 # - usr local links (DSM >= 6.0-5941)
-# - certificate config (DSM < 7, available only for Synology packages since DSM 7)
+# - certificate config (DSM < 7, restricted to only Synology's packages since DSM 7)
 # for DSM<6.0 link creation is provided by spksrc.service.create_links
 # and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
