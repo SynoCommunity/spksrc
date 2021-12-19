@@ -50,12 +50,14 @@ download_wheel:
 					query+=" | select(.packagetype==\"sdist\")" ; \
 					query+=" | select((.filename|test(\"-$${requirement##*=}.tar.gz\")) or (.filename|test(\"-$${requirement##*=}.zip\"))) | .url'" ; \
 					localFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
-					if [ "$${localFile}" != "" ]; then \
+					if [ "$${localFile}" = "" ]; then \
+						echo "ERROR: Invalid package name [$${requirement%%=*}]" ; \
+					elif [ -s $(DISTRIB_DIR)/$${localFile} ]; then \
+						echo "INFO: File already exists [$${localFile}]" ; \
+					else \
 						echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
 						wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
 						mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
-					else \
-						echo "ERROR: Invalid package name [$${requirement%%=*}]" ; \
 					fi ; \
 				done < <(grep -v  -e "^\#" -e "^\$$" $$wheel) || true ; \
 			fi ; \
