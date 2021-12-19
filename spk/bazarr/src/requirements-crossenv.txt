@@ -1,0 +1,4 @@
+greenlet==1.1.2
+# gevent==21.8.0              # requires to be built as cross/gevent
+# numpy==1.21.4               # requires to be built as cross/numpy
+webrtcvad==2.0.10

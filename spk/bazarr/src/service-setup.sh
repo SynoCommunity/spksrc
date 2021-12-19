@@ -1,9 +1,7 @@
-FFMPEG_DIR="/var/packages/ffmpeg/target"
-PYTHON_DIR="/var/packages/python38/target"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${FFMPEG_DIR}/bin:${PATH}"
+FFMPEG_DIR="/var/packages/ffmpeg/target/bin"
+PYTHON_DIR="/var/packages/python310/target/bin"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
-VIRTUALENV="${PYTHON_DIR}/bin/python3 -m venv"
-PIP=${SYNOPKG_PKGDEST}/env/bin/pip
 LANGUAGE="env LANG=en_US.UTF-8 LC_ALL=en_US.utf8"
 
 GROUP="sc-download"
@@ -15,14 +13,11 @@ SERVICE_COMMAND="$LANGUAGE $PYTHON ${SVC_CWD}/bazarr.py --no-update --config ${S
 
 service_postinst ()
 {
-
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
-
-    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    install_python_virtualenv
 
     # Install the wheels (using virtual env through PATH)
-    ${PIP} install --no-deps --no-index --upgrade --force-reinstall --find-links ${wheelhouse} ${wheelhouse}/*.whl
+    install_python_wheels
 
     mkdir -p "${SYNOPKG_PKGVAR}/data"
 
