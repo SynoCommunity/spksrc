@@ -1,6 +1,52 @@
-[{
-    "step_title": "DSM Permissions",
-    "items": [{
-        "desc": "Permissions for this package are handled by the <b>'sc-syncthing'</b> group. <br>Using File Station, add this group to every folder Syncthing should be allowed to access.<br>Please read <a <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
-    }]
-}]
+[
+    {
+        "step_title": "Web UI Authentication Credentials",
+        "invalid_next_disabled": true,
+        "items": [
+            {
+                "desc": "The Syncthing Web GUI should not be accessible without authentication.  That would be dangerous because with access to the Web GUI, any folder can be configured for sharing by a malicious third-party.<br/>Please provide a user name and password to protect from unauthorized logins.  It will be required every time the Syncthing Web GUI is opened.<br/><br/>(Leaving either field empty disables authentication.)"
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_username",
+                        "desc": "User name",
+                        "defaultValue": "syncthing",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[^<>:*/?\"|]*$/",
+                                "errorText": "Character not allowed in user name"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_password",
+                        "desc": "Password",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[^<>:*/?\"|]*$/",
+                                "errorText": "Character not allowed in password"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "step_title": "DSM Permissions",
+        "items": [
+            {
+                "desc": "Permissions for this package are handled by the <b>'sc-syncthing'</b> group. <br>Using File Station, add this group to every folder Syncthing should be allowed to access.<br>Please read <a <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+            }
+        ]
+    }
+]
