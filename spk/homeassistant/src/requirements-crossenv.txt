@@ -47,7 +47,7 @@ aiohttp==3.7.4.post0
 cffi==1.14.1
 greenlet==1.1.1
 multidict==5.1.0
-sqlalchemy==1.4.23
+SQLAlchemy==1.4.23
 
 
 # Failed to build: av clx-sdk-xms homeassistant-pyozw python-twitch-client
