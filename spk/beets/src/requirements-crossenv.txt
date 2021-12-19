@@ -1,5 +1,5 @@
 # Cross-compiled Dependencies
 
-MarkupSafe>=0.23
-PyYAML>=3.12
+MarkupSafe==2.0.1
+PyYAML==6.0
 #Pillow==8.2.0               ==> cross/pillow
