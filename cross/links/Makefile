@@ -1,5 +1,5 @@
 PKG_NAME = links
-PKG_VERS = 2.21
+PKG_VERS = 2.25
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://links.twibright.com/download
@@ -12,6 +12,6 @@ COMMENT  = Links is a web browser running in text mode.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-ssl=openssl
+CONFIGURE_ARGS = --with-ssl=openssl --with-zstd=zstd 
 
 include ../../mk/spksrc.cross-cc.mk

@@ -1,5 +1,5 @@
 PKG_NAME = ser2net
-PKG_VERS = 4.1.6
+PKG_VERS = 4.3.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/$(PKG_NAME)/archive
@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/gensio cross/libyaml
 
 HOMEPAGE = https://sourceforge.net/projects/ser2net/
-COMMENT  = Serial port to network proxy.
+COMMENT  = Serial to network interface, allows TCP/UDP to serial port connections.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1

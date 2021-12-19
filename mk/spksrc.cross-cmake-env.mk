@@ -61,15 +61,15 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-fPIC $(ADDITIONAL_CXXFLAGS)" -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC -DCROSS_COMPILE_ARM=ON
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-fPIC $(ADDITIONAL_CXXFLAGS)" -DCROSS_COMPILE_ARM=ON
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-  CMAKE_ARGS += -DCMAKE_C_FLAGS="-mcpu=8548 -mhard-float -mfloat-gprs=double"
+  CMAKE_ARGS += -DCMAKE_C_FLAGS="-mcpu=8548 -mhard-float -mfloat-gprs=double $(ADDITIONAL_CFLAGS)"
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
@@ -78,3 +78,16 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DARCH=64
 endif
+ifneq ($(strip $(ADDITIONAL_CFLAGS)),)
+# define cflags if not applied above
+ifneq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DCMAKE_C_FLAGS="$(ADDITIONAL_CFLAGS)"
+endif
+endif
+ifneq ($(strip $(ADDITIONAL_CXXFLAGS)),)
+# define cxxflags if not applied above
+ifneq ($(findstring $(ARCH), $(ARMv7_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS="$(ADDITIONAL_CXXFLAGS)"
+endif
+endif
+

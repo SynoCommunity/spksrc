@@ -1,0 +1,14 @@
+# basic default wheels
+setuptools==58.3.0
+#pip==21.3.1             ==> Always install latest version (service-setup.sh:install_python_virtualenv)
+wheel==0.37.0
+
+# Always use latest version available
+# certifi==2021.10.8
+certifi
+
+# Mandatory for python application
+# to create their local virtualenv
+# in order to install wheels within
+# their running environment
+virtualenv==20.9.0

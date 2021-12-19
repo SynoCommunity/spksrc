@@ -1,5 +1,5 @@
 PKG_NAME = e2fsprogs
-PKG_VERS = 1.46.2
+PKG_VERS = 1.46.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.sourceforge.net/project/$(PKG_NAME)/$(PKG_NAME)/v$(PKG_VERS)
@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 
 HOMEPAGE = http://e2fsprogs.sourceforge.net/
-COMMENT  = Ext2/3/4 filesystem userspace utilities
+COMMENT  = Ext2/3/4 filesystem userspace utilities.
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1

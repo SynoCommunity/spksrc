@@ -1,5 +1,5 @@
 PKG_NAME = iperf2
-PKG_VERS = 2.1.1
+PKG_VERS = 2.1.4
 PKG_EXT = tar.gz
 PKG_NAME_REAL = iperf
 PKG_DIST_NAME = $(PKG_NAME_REAL)-$(PKG_VERS).$(PKG_EXT)/download
@@ -11,7 +11,7 @@ DEPENDS =
 
 HOMEPAGE = https://sourceforge.net/projects/iperf2/
 COMMENT  = A tool for measuring TCP and UDP network performance, based on iperf 2.0.5.
-LICENSE  = 
+LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 

@@ -5,7 +5,7 @@ SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python38"
+SPK_DEPENDS = "python310"
 
 MAINTAINER = worstje
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
@@ -19,7 +19,7 @@ HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 

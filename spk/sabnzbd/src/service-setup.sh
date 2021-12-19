@@ -1,7 +1,7 @@
+PYTHON_DIR="/var/packages/python310/target/bin"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
+
 BIN="${SYNOPKG_PKGDEST}/bin"
-PYTHON_DIR="/var/packages/python38/target/bin"
-PATH="${BIN}:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
@@ -16,10 +16,10 @@ SERVICE_COMMAND="${LANGUAGE} ${PYTHON} -OO ${SABNZBD} -f ${CFG_FILE} --pidfile $
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
+    install_python_virtualenv
 
     # Install wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
+    install_python_wheels
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard

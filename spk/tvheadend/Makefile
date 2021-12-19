@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = c6bb43d
-SPK_GIT_DATE = 20211020
+SPK_GIT_HASH = b871020
+SPK_GIT_DATE = 20211121
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 30
+SPK_REV = 31
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -13,8 +13,8 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-SPK_DEPENDS = "python38"
-WHEELS = src/requirements.txt
+SPK_DEPENDS = "python310"
+WHEELS = src/requirements-pure.txt
 
 DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
 
@@ -24,13 +24,13 @@ DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour 
 RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version c6bb43d as of June 20th 2021<br/>2. Update openssl to 1.1<br/>3. Updated to use FFMPEG 4.3.3<br/>4. Updated libhdhomerun to version 20210624"
+CHANGELOG = "1. Update to latest git version b871020 as of November 21th 2021<br/>2. Update openssl to 1.1l<br/>3. Updated to use FFMPEG 4.3.3<br/>4. Updated libhdhomerun to version 20210624<br/>5. Update to Python 3.10<br/>6. Update pngquant to version 2.17.0<br/>7. Update readline to version 8.1"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CONF_DIR = src/conf/
 

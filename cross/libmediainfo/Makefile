@@ -1,8 +1,9 @@
 PKG_NAME = libmediainfo
-PKG_VERS = 21.03
+PKG_VERS = 21.09
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/MediaArea/MediaInfoLib/archive/v$(PKG_VERS)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/MediaArea/MediaInfoLib/archive
+PKG_DIST_FILE = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = MediaInfoLib-$(PKG_VERS)/Project/GNU/Library
 
 DEPENDS = cross/libzen cross/zlib

@@ -1,30 +1,33 @@
 SPK_NAME = synocli-net
-SPK_VERS = 2.0
-SPK_REV = 10
+SPK_VERS = 2.1
+SPK_REV = 12
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
 DEPENDS += cross/rsync cross/autossh cross/arp-scan
 DEPENDS += cross/mtr
 DEPENDS += cross/etherwake
+DEPENDS += cross/inetutils
 
-OPTIONAL_DEPENDS = cross/sshfs cross/ser2net
+OPTIONAL_DEPENDS = cross/sshfs cross/ser2net cross/bind
 
 include ../../mk/spksrc.archs.mk
 
 OPTIONAL_DESC =
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/bind
+OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
 DEPENDS += cross/ser2net
 DEPENDS += cross/sshfs 
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sshfs, ser2net"
 endif
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, sshfs, rsync, autossh, etherwake$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, autossh, etherwake, telnet, whois$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "Remove fritzctl because it is unsupported on golang 1.16."
+CHANGELOG = "1. Add telnet and whois from inetutils.<br/>2. Add arpaname, delv, dig and mdig from bind9utils."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -45,5 +48,7 @@ SPK_COMMANDS += sbin/sshd
 SPK_COMMANDS += sbin/ser2net
 SPK_COMMANDS += sbin/mtr sbin/mtr-packet
 SPK_COMMANDS += bin/etherwake
+SPK_COMMANDS += bin/telnet bin/whois
+SPK_COMMANDS += bin/arpaname bin/delv bin/dig bin/mdig
 
 include ../../mk/spksrc.spk.mk

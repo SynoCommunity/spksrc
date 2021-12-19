@@ -8,11 +8,11 @@ DEPENDS = cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-MAINTAINER = Safihre, acolomb
+MAINTAINER = SynoCommunity
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Integrate with the certificate management UI in Control Panel.  Update syncthing to v1.18.5."
+CHANGELOG = "Update syncthing to v1.18.5.  Add wizard page to preconfigure credentials for the Web GUI.  Integrate with the certificate management UI in Control Panel."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes

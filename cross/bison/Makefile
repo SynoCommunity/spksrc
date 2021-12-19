@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.archs.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PCC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = gl_cv_func_signbit_gcc=no
 endif
 

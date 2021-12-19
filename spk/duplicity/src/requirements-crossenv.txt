@@ -1,0 +1,47 @@
+## To update this file:
+## --------------------
+## cd ./spksrc/cross/duplicity
+## download current package:
+##   make digests (or make download)
+## extract requirements.txt:
+##   tar -ztvf ../../distrib/duplicity.{PKG_VERS}.tar.gz --no-anchored requirements.txt
+## copy and rename requirements.txt:
+##   cp duplicity-{PKG_VERS}/requirements.txt ./spksrc/spk/duplicity/src/requirements.original.txt
+## create update requirements file for package:
+##   cd ./spksrc/spk/duplicity/src
+##   /spksrc/native/python38/work-native/install/usr/local/bin/python3 -m venv venv
+##   . venv/bin/activate
+##   pip install --upgrade pip
+### make some modification in requirements.original.txt
+### - remove testing dependencies
+### - comment out packages included as cross compiled wheels
+### - comment out unsupported dependencies
+##   pip install -r requirements.original.txt
+##   pip freeze > requirements.txt
+##   deactivate
+## --------------------
+
+## This content is generated following the instructions above, except
+## that the base and backend requirements are updated separately and
+## the results are merged together.
+
+
+##### Included for reference #####
+#duplicity==0.8.19
+
+cffi==1.15.0
+cryptography==3.3.2
+# gdata                          ; python_version == '2.7'
+iso8601==0.1.14
+#jeepney==0.7.1                  ### cross compile wheel fails to find flit_core
+lxml==4.6.4
+#mediafire                       ###  Development Status 3 - Alpha: outdated (Nov 2016), not supported by Python >3.4
+#monotonic==1.6
+msgpack-python==0.5.6
+netifaces==0.11.0
+pyparsing==2.4.7
+python-swiftclient==3.11.1
+PyYAML==5.4.1
+rfc3986==1.4.0
+simplejson==3.17.2
+wrapt==1.12.1

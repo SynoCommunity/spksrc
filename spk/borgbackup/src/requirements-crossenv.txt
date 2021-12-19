@@ -1,0 +1,5 @@
+# For reference
+#borgbackup==1.1.17
+
+pyrsistent==0.18.0
+ruamel.yaml.clib==0.2.6

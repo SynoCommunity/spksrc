@@ -1,7 +1,7 @@
 SPK_NAME = python38
 SPK_VERS = 3.8.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DEPENDS += cross/lxml cross/msgpack-python
 DEPENDS += cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/ruamel.yaml cross/sqlite
 
-WHEELS = src/requirements-cross.txt src/requirements.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -27,6 +27,8 @@ HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
+
+ENV += PYTHON_OPTIMIZE=1
 
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 

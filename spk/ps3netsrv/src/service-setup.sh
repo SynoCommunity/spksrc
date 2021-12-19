@@ -1,10 +1,12 @@
-CFG_FILE="${SYNOPKG_PKGDEST}/var/ps3netsrv.conf"
 
-export PID_FILE CFG_FILE
+# service setup
+CFG_FILE="${SYNOPKG_PKGVAR}/ps3netsrv.conf"
+
+export CFG_FILE PID_FILE SERVICE_PORT
 
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        sed -i -e "s|@wizard_dir@|${wizard_dir:=/volume1/PS3}|g" ${CFG_FILE}
+        sed -i -e "s|@wizard_dir@|${wizard_data_volume}/${wizard_data_directory}|g" ${CFG_FILE}
     fi
 }

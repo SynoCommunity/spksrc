@@ -12,8 +12,10 @@ LICENSE  = PSF
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
-CONFIGURE_ARGS += --enable-optimizations
-CONFIGURE_ARGS += --with-lto
+# old gcc does not know -Wno-unused-result
+# without this setting, cross compile wheels for ppc853x-5.2 will fail
+CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
+
 COMPILE_MAKE_OPTIONS += all
 
 POST_INSTALL_TARGET = python310_native_post_install
@@ -26,7 +28,7 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 
 .PHONY: python310_native_post_install
 python310_native_post_install: $(WORK_DIR)/python-native.mk
-	@$(MSG) Installing pip, setuptools, cffi and cross env
+	@$(MSG) Installing pip, setuptools and crossenv
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==21.3.1"
 	@$(PIP) install "setuptools==58.3.0" "cffi==1.15" "crossenv==1.1.4"

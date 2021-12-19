@@ -1,0 +1,64 @@
+# This file is a copy of the https://raw.githubusercontent.com/Flexget/Flexget/v3.1.129/requirements.txt file
+# including the https://raw.githubusercontent.com/Flexget/Flexget/v3.1.129/requirements.in
+# Additionally added the flexget and the transmission-rpc packages.
+# plumbum and rpyc packages are adjusted as the proposed versions are not accepted.
+
+APScheduler==3.8.1
+attrs==21.2.0
+babelfish==0.6.0
+beautifulsoup4==4.10.0
+#certifi==2020.12.5                  ==> python310:pure
+chardet==4.0.0
+cheroot==8.5.2
+CherryPy==18.6.1
+click==8.0.3
+colorama==0.4.4
+colorclass==2.2.0
+feedparser==6.0.8
+Flask==2.0.2
+Flask-Compress==1.10.1
+Flask-Cors==3.0.10
+Flask-Login==0.5.0
+Flask-RESTful==0.3.9
+flask-restx==0.5.1
+FlexGet==3.1.155
+guessit==3.4.3
+html5lib==1.1
+idna==3.3
+importlib-metadata==4.0.1
+itsdangerous==2.0.1
+jaraco.classes==3.2.1
+jaraco.collections==3.4.0
+jaraco.functools==3.3.0
+jaraco.text==3.5.1
+Jinja2==3.0.3
+jsonschema==3.2.0
+loguru==0.5.3
+more-itertools==8.10.0
+plumbum==1.7.0
+poetry==1.1.12
+portend==3.0.0
+progressbar==2.5
+pynzb==0.1.0
+pyparsing==3.0.6
+PyRSS2Gen==1.1
+python-dateutil==2.8.2
+pytz==2021.3
+rebulk==3.1.0
+requests==2.26.0
+#rpyc==4.1.2
+rpyc==5.0.1
+sgmllib3k==1.0.0
+six==1.16.0
+soupsieve==2.2.1
+tempora==4.1.2
+terminaltables==3.1.0
+transmission-rpc==3.2.5
+typing-extensions==3.10.0.0
+tzlocal==2.1
+urllib3==1.26.7
+webencodings==0.5.1
+Werkzeug==2.0.2
+zc.lockfile==2.0
+zipp==3.4.1
+zxcvbn-python==4.4.24

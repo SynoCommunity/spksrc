@@ -16,10 +16,10 @@ DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow_py2
 DEPENDS += cross/pyalsa cross/pyaudio cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/pyzmq cross/uwsgi
 
-WHEELS = src/requirements.txt src/requirements-cross.txt
+WHEELS = src/requirements.txt
 
 
-MAINTAINER = Safihre
+MAINTAINER = SynoCommunity
 DESCRIPTION = Python 2.7 Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python 2.7.
 DESCRIPTION_SPN = Lenguaje de programación Python 2.7.

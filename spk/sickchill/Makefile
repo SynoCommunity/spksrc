@@ -1,23 +1,30 @@
 SPK_NAME = sickchill
-SPK_VERS = 20210729
-SPK_REV = 2
+SPK_VERS = 20211110
+SPK_REV = 5
 SPK_ICON = src/sickchill.png
 
+BUILD_DEPENDS = cross/python310
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python38:git"
-PIP=pip3
+SPK_DEPENDS = "python310"
 
-WHEELS = src/requirements.txt
+# Required for lxml wheel
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+
+# Required for PyNaCl
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
-DESCRIPTION_SPN = Gestor automático para bibliotecas de series. Busca nuevos episodios de tus series favoritas, y cuando son publicados hace su magia.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Initial SickChill env fix and move to Python 3.8"
+CHANGELOG = "1. Migration to Python 3.10<br/>2. SickChill environment fix<br/>3. Added DSM7 Support<br/>4. cryptography resolution for armv7"
 
 HOMEPAGE   = https://sickchill.github.io/
-LICENSE    = GPL
+LICENSE    = GPLv3+
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -29,10 +36,9 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
 
-POST_STRIP_TARGET = sickchill_extra_install
+USE_ALTERNATE_TMPDIR = 1
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+POST_STRIP_TARGET = sickchill_extra_install
 
 include ../../mk/spksrc.spk.mk
 

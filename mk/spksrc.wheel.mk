@@ -14,12 +14,10 @@
 
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
-ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
-WHEELS_PURE_PYTHON    = requirements.txt
-endif
-ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
-WHEELS_CROSS_COMPILE  = requirements-cross.txt
-endif
+## python wheel specific configurations
+include ../../mk/spksrc.wheel-env.mk
+
+##
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)
 PRE_WHEEL_TARGET = pre_wheel_target
@@ -46,63 +44,65 @@ wheel_msg_target:
 # will move if the user chooses a custom persistent distribution dir for caching downloads between
 # containers and builds.
 pre_wheel_target: wheel_msg_target
-	@if [ ! -z "$(WHEELS)" ] ; then \
-		if [ ! -z "$(PIP_CACHE_OPT)" ] ; then \
+	@if [ -n "$(WHEELS)" ] ; then \
+		if [ -n "$(PIP_CACHE_OPT)" ] ; then \
 			mkdir -p $(PIP_DIR) ; \
 		fi; \
-		rm -fr $(WHEELHOUSE) ; \
 		mkdir -p $(WHEELHOUSE) ; \
 		for wheel in $(WHEELS) ; \
 		do \
 			if [ -f $$wheel ] ; then \
-				$(MSG) "Using existing $$wheel file" ; \
-				$(MSG) cp -f $$wheel $(WHEELHOUSE)/$$(basename $$wheel) ; \
-				cp -f $$wheel $(WHEELHOUSE)/$$(basename $$wheel) ; \
-				sed -i -e '$$a\\' $(WHEELHOUSE)/$$(basename $$wheel) ; \
+				if [ $$(basename $$wheel) = $(WHEELS_PURE_PYTHON) ]; then \
+					$(MSG) "Adding existing $$wheel file as pure-python (discarding any cross-compiled)" ; \
+					sed -e '/^cross:\|^#\|^$$/d' -e /^pure:/s/^pure://g $$wheel  >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				elif [ $$(basename $$wheel) = $(WHEELS_CROSSENV_COMPILE) ]; then \
+					$(MSG) "Adding existing $$wheel file as cross-compiled (discarding any pure-python)" ; \
+					sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+				elif [ $$(basename $$wheel) = $(WHEELS_LIMITED_API) ]; then \
+					$(MSG) "Adding existing $$wheel file as ABI-limited" ; \
+					cat $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
+				else \
+					$(MSG) "Adapting existing $$wheel file" ; \
+					sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+					sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+					sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_DEFAULT_REQUIREMENT) ; \
+				fi ;\
 			else \
-				$(MSG) "Adding to $(WHEELS_PURE_PYTHON) file" ; \
-				echo $$wheel >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+				$(MSG) "ERROR: File $$wheel does not exist" ; \
 			fi ; \
 		done \
 	fi
 
+# Build cross compiled wheels first, to fail fast.
+# There might be an issue with some pure python wheels when built after that.
 build_wheel_target: $(PRE_WHEEL_TARGET)
-	@if [ ! -z "$(WHEELS)" ] ; then \
+	@if [ -n "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
-		if [ -f "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
-			$(MSG) "Force pure-python" ; \
-			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-				$(RUN) $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-		fi ; \
-		if [ -f "$(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)" ]; then \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE)" ]; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
-				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 			else \
-				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_WHEEL) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
+				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 			fi ; \
 		fi ; \
-	fi
-
-post_wheel_target: $(WHEEL_TARGET)
-	@if [ -d "$(WHEELHOUSE)" ] ; then \
-		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
-		cd $(WHEELHOUSE) ; \
-		cat requirements*.txt > $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-		if [ "$(EXCLUDE_PURE_PYTHON_WHEELS)" = "yes" ] ; then \
-			echo "Pure python wheels are excluded from the package wheelhouse." ; \
-			for w in *.whl; do \
-				if echo $${w} | grep -viq "-none-any\.whl" ; then \
-					cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl; \
-				fi ; \
-			done ; \
-		else \
-			for w in *.whl; do \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/`echo $$w | cut -d"-" -f -3`-none-any.whl; \
-			done ; \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_LIMITED_API)" ]; then \
+			$(MSG) "Force limited API $(PYTHON_LIMITED_API)" ; \
+			. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" $(PIP_CROSS) $(PIP_WHEEL_ARGS) --build-option='--py-limited-api=$(PYTHON_LIMITED_API)' --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 		fi ; \
 	fi
+ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
+	@if [ -n "$(WHEELS)" ] ; then \
+		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
+		if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
+			$(MSG) "Force pure-python" ; \
+			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
+				$(RUN) $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+		fi ; \
+	fi
+endif
 
+post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
 ifeq ($(wildcard $(WHEEL_COOKIE)),)
 wheel: $(WHEEL_COOKIE)
