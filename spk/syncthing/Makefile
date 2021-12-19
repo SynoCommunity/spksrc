@@ -8,7 +8,7 @@ DEPENDS = cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
