@@ -23,8 +23,18 @@ PIP_HOST = $(shell which pip)
 PIP_CACHE_OPT ?= --no-cache-dir --find-links $(BASE_DISTRIB_DIR)
 
 # Define default wheel & download pip options
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --no-index --wheel-dir $(WHEELHOUSE)
+PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+
+# If we're only building cross-compiled wheels
+# all packages will be pre-downloaded, do not
+# check online index to ensure using local files
+ifneq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),TRUE)
+PIP_WHEEL_ARGS += --no-index
+endif
+
 # BROKEN: https://github.com/pypa/pip/issues/1884
+# Current implementation is a work-around for the
+# lack of proper source download support from pip
 PIP_DOWNLOAD_ARGS = download --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --dest $(BASE_DISTRIB_DIR) --no-build-isolation
 
 # Available languages
