@@ -46,12 +46,17 @@ download_wheel:
 				while IFS= read -r requirement ; \
 				do \
 					query="curl -s https://pypi.org/pypi/$${requirement%%=*}/json" ; \
-					query+=" | jq -r '.releases[][] | select(.packagetype==\"sdist\") | select(.filename|test(\"-" ; \
-					query+="$${requirement##*=}.tar.gz\")) | .url'" ; \
-					localFile=$$(basename $$(eval $${query})) ; \
-					echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
-					wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
-					mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
+					query+=" | jq -r '.releases[][]" ; \
+					query+=" | select(.packagetype==\"sdist\")" ; \
+					query+=" | select((.filename|test(\"-$${requirement##*=}.tar.gz\")) or (.filename|test(\"-$${requirement##*=}.zip\"))) | .url'" ; \
+					localFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
+					if [ "$${localFile}" != "" ]; then \
+						echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
+						wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
+						mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
+					else \
+						echo "ERROR: Invalid package name [$${requirement%%=*}]" ; \
+					fi ; \
 				done < <(grep -v  -e "^\#" -e "^\$$" $$wheel) || true ; \
 			fi ; \
 		done \
