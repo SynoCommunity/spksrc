@@ -1,5 +1,8 @@
 # Common definitions, shared by all makefiles
 
+# Allow more extensive shell commands
+SHELL := /bin/bash
+
 # all will be the default target, regardless of what is defined in the other
 # makefiles.
 default: all
