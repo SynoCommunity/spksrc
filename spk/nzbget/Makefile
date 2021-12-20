@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 27
+SPK_REV = 28
 SPK_ICON = src/nzbget.png
 
 DEPENDS = cross/p7zip cross/unrar
@@ -11,18 +11,19 @@ DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écr
 DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ para descargar binarios, desde servidores de noticias, utilizando archivos nzb. Soporta modo cliente y servidor, verificación y descompresión automática y una interfaz web. NZBGet utiliza pocos recursos de sistema.
 STARTABLE = yes
 DISPLAY_NAME = NZBGet
-CHANGELOG = "1. Remove DSM5 -> DSM6 migration.<br/>2. Support for DS-x20 models."
+CHANGELOG = "Update for DSM 7 and DSM 7 compatible shared folders."
 
 HOMEPAGE = https://nzbget.net
 LICENSE  = GPLv2
 
-WIZARDS_DIR = src/wizard/
+WIZARDS_DIR = src/wizard
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARE = wizard_download_folder
+USE_DATA_SHARE_WORKER = yes
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 6789
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = NZBGet (HTTP)
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
