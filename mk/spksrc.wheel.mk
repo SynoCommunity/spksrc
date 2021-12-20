@@ -75,6 +75,7 @@ pre_wheel_target: wheel_msg_target
 
 # Build cross compiled wheels first, to fail fast.
 # There might be an issue with some pure python wheels when built after that.
+build_wheel_target: SHELL:=/bin/sh
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ -n "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
