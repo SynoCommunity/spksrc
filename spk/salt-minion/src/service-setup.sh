@@ -2,7 +2,6 @@
 PYTHON_DIR="/var/packages/python310/target/bin"
 # Add local bin, virtualenv along with python310 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
-PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 LANGUAGE="env LANG=en_US.UTF-8"
 PID_FILE="${SYNOPKG_PKGVAR}/run/salt-minion.pid"
 
@@ -16,8 +15,12 @@ service_postinst ()
     # Install wheels
     install_python_wheels
 
-    # Patch rsax931.py file to find libcrypto lib
-    # (Rely on patch util bundled with python3's busybox)
+    # patch rsax931.py file to find libcrypto lib provided by python310
+    # (rely on patch==1.16 included in requirements-pure.txt)
+    python ${SYNOPKG_PKGDEST}/env/lib/python3.10/site-packages/patch.py \
+           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.10/site-packages/salt/utils \
+           ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
+
     #${PYTHON_DIR}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.10/site-packages/salt/utils/rsax931.py < ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
     # Prepare salt-minion config in /var/packages/salt-minion/target/etc
