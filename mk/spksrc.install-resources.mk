@@ -53,22 +53,9 @@ include ../../mk/spksrc.patch.mk
 install: patch
 include ../../mk/spksrc.install.mk
 
-ifeq ($(strip $(PLIST_TRANSFORM)),)
-PLIST_TRANSFORM= cat
-endif
+plist: install
+include ../../mk/spksrc.plist.mk
 
-.PHONY: cat_PLIST
-cat_PLIST:
-	@for depend in $(DEPENDS) ; \
-	do                          \
-	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
-	done
-	@if [ -f PLIST ] ; \
-	then \
-	  $(PLIST_TRANSFORM) PLIST ; \
-	else \
-	  $(MSG) "No PLIST for $(NAME)" >&2; \
-	fi
 
 ### Clean rules
 smart-clean:
@@ -76,10 +63,9 @@ smart-clean:
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:
-	rm -fr work work-*
+	rm -fr work work-* build-*.log
 
-
-all: install
+all: install plist
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
