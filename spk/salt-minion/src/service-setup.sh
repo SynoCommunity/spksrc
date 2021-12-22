@@ -24,18 +24,13 @@ service_postinst ()
     test -d ${SYNOPKG_PKGDEST}/etc/minion.d || install -m 755 -d ${SYNOPKG_PKGDEST}/etc/minion.d
     test -f ${SYNOPKG_PKGDEST}/etc/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGDEST}/etc/minion
     test -f ${SYNOPKG_PKGDEST}/etc/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGDEST}/etc/proxy
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/02_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/etc/minion.d/02_pidfile.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/01_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGDEST}" > ${SYNOPKG_PKGDEST}/etc/minion.d/01_rootdir.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/01_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/etc/minion.d/01_pidfile.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/02_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGDEST}/etc/minion.d/02_cachedir.conf
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/03_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGDEST}/etc/minion.d/03_logging.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/03_logging.conf || echo "log_level_logfile: info" >> ${SYNOPKG_PKGDEST}/etc/minion.d/03_logging.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/04_loglevel.conf || echo "log_level_logfile: debug" > ${SYNOPKG_PKGDEST}/etc/minion.d/04_loglevel.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/05_pkidir.conf || echo "pki_dir: ${SYNOPKG_PKGVAR}/pki/minion" > ${SYNOPKG_PKGDEST}/etc/minion.d/05_pkidir.conf
 
     # Populate salt master address and minion_id only if file don't already exist
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/99-master-address.conf || echo "master: localhost" > ${SYNOPKG_PKGDEST}/etc/minion.d/99-master-address.conf
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/98-minion-id.conf || echo -n "id: $(hostname -s)" > ${SYNOPKG_PKGDEST}/etc/minion.d/98-minion-id.conf
-
-    # DSM 6
-    if [ $SYNOPKG_DSM_VERSION_MAJOR == 6 ]; then
-        set_unix_permissions "${SYNOPKG_PKGDEST}"
-        set_unix_permissions "${SYNOPKG_PKGDEST}/etc/"
-    fi
 }
