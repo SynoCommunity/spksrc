@@ -19,7 +19,6 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI    = yes
 DISPLAY_NAME = Salt Minion
 CHANGELOG    = "1. Update to 3004<br/>2. Migrate to Python 3.10"
 
