@@ -3,7 +3,6 @@ PYTHON_DIR="/var/packages/python310/target/bin"
 # Add local bin, virtualenv along with python310 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 LANGUAGE="env LANG=en_US.UTF-8"
-PID_FILE="${SYNOPKG_PKGVAR}/run/salt-minion.pid"
 
 SERVICE_COMMAND="salt-minion -c ${SYNOPKG_PKGDEST}/etc -d"
 
@@ -27,11 +26,12 @@ service_postinst ()
     test -d ${SYNOPKG_PKGDEST}/etc/minion.d || install -m 755 -d ${SYNOPKG_PKGDEST}/etc/minion.d
     test -f ${SYNOPKG_PKGDEST}/etc/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGDEST}/etc/minion
     test -f ${SYNOPKG_PKGDEST}/etc/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGDEST}/etc/proxy
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/01_pidfile.conf || echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/etc/minion.d/01_pidfile.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/02_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGDEST}/etc/minion.d/02_cachedir.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/03_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGDEST}/etc/minion.d/03_logging.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/04_loglevel.conf || echo "log_level_logfile: debug" > ${SYNOPKG_PKGDEST}/etc/minion.d/04_loglevel.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/05_pkidir.conf || echo "pki_dir: ${SYNOPKG_PKGVAR}/pki/minion" > ${SYNOPKG_PKGDEST}/etc/minion.d/05_pkidir.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/01_pidfile.conf || echo "pidfile: ${SYNOPKG_PKGVAR}/run/" > ${SYNOPKG_PKGDEST}/etc/minion.d/01_pidfile.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/02_sockdir.conf.conf || echo "sock_dir: ${SYNOPKG_PKGVAR}/run/minion" > ${SYNOPKG_PKGDEST}/etc/minion.d/02_sockdir.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/03_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGDEST}/etc/minion.d/03_cachedir.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/04_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGDEST}/etc/minion.d/04_logging.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/05_loglevel.conf || echo "log_level_logfile: debug" > ${SYNOPKG_PKGDEST}/etc/minion.d/05_loglevel.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/06_pkidir.conf || echo "pki_dir: ${SYNOPKG_PKGVAR}/pki/minion" > ${SYNOPKG_PKGDEST}/etc/minion.d/06_pkidir.conf
 
     # Populate salt master address and minion_id only if file don't already exist
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/99-master-address.conf || echo "master: localhost" > ${SYNOPKG_PKGDEST}/etc/minion.d/99-master-address.conf
