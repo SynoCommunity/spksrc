@@ -1,8 +1,8 @@
 PKG_NAME = libssh2
-PKG_VERS = 1.9.0
+PKG_VERS = 1.10.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.libssh2.org/download/
+PKG_DIST_SITE = https://www.libssh2.org/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl
