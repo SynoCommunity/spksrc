@@ -22,7 +22,7 @@ DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough
 DISPLAY_NAME = Salt Minion
 CHANGELOG    = "1. Update to 3004<br/>2. Migrate to Python 3.10"
 
-HOMEPAGE     = https://www.saltstack.com/
+HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache
 #LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 
