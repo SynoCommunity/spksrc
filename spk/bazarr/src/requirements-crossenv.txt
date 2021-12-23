@@ -1,4 +1,5 @@
 greenlet==1.1.2
 # gevent==21.8.0              # requires to be built as cross/gevent
 # numpy==1.21.4               # requires to be built as cross/numpy
-webrtcvad==2.0.10
+# webrtcvad==2.0.10           # requires unreleased version at specific commit
+git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad
