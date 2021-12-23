@@ -4,7 +4,7 @@ PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 LANGUAGE="env LANG=en_US.UTF-8"
 
-SERVICE_COMMAND="salt-minion -c ${SYNOPKG_PKGDEST}/etc -d"
+SERVICE_COMMAND="salt-minion --pid-file ${PID_FILE} -c ${SYNOPKG_PKGDEST}/etc -d"
 
 service_postinst ()
 {
