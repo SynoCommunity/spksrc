@@ -37,7 +37,11 @@ override ARCH=
 REQUIRED_MIN_DSM = 6.0
 INSTUNINST_RESTART_SERVICES = apache-web
 
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10"
+else
+SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10:Apache2.4"
+endif
 
 include ../../mk/spksrc.spk.mk
 
