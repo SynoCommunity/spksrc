@@ -36,7 +36,7 @@
       "display_name": "Tiny Tiny RSS",
       "type": "apache_php",
       "root": "tt-rss",
-      "backend": 1,
+      "backend": 2,
       "php": {
         "profile_name": "tt-rss",
         "profile_desc": "PHP profile used by tt-rss",
