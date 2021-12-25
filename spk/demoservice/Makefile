@@ -38,7 +38,7 @@ PRE_COPY_TARGET = demoservice_pre_copy
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: demoservice_install
+.PHONY: demoservice_pre_copy
 # Replace standard copy/install targets, no sources, no content
 demoservice_pre_copy:
 	rm -fr $(STAGING_DIR)

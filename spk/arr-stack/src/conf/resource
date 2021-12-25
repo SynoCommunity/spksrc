@@ -1,0 +1,170 @@
+{
+  "docker": {
+    "services": [
+      {
+        "service": "radarr",
+        "image": "cr.hotio.dev/hotio/radarr",
+        "container_name": "radarr",
+        "tag": "latest",
+        "shares": [
+          {
+            "host_dir": "radarr",
+            "mount_point": "/config"
+          },
+          {
+            "host_dir": "storage",
+            "mount_point": "/data"
+          }
+        ],
+        "environment": [
+          {
+            "env_var": "PUID",
+            "env_value": "PUID"
+          },
+          {
+            "env_var": "PGID",
+            "env_value": "PGID"
+          },
+          {
+            "env_var": "TZ",
+            "env_value": "TZ"
+          }
+        ],
+        "ports": [
+          {
+            "host_port": "7879",
+            "container_port": "7878",
+            "protocol": "tcp"
+          }
+        ]
+      },
+      {
+        "service": "sonarr",
+        "image": "cr.hotio.dev/hotio/sonarr",
+        "tag": "latest",
+        "container_name": "sonarr",
+        "shares": [
+          {
+            "host_dir": "sonarr",
+            "mount_point": "/config"
+          },
+          {
+            "host_dir": "storage",
+            "mount_point": "/data"
+          }
+        ],
+        "environment": [
+          {
+            "env_var": "PUID",
+            "env_value": "PUID"
+          },
+          {
+            "env_var": "PGID",
+            "env_value": "PGID"
+          },
+          {
+            "env_var": "TZ",
+            "env_value": "TZ"
+          }
+        ],
+        "ports": [
+          {
+            "host_port": "8990",
+            "container_port": "8989",
+            "protocol": "tcp"
+          }
+        ]
+      },
+      {
+        "service": "bazarr",
+        "image": "cr.hotio.dev/hotio/bazarr",
+        "tag": "latest",
+        "container_name": "bazarr",
+        "shares": [
+          {
+            "host_dir": "bazarr",
+            "mount_point": "/config"
+          },
+          {
+            "host_dir": "storage/media",
+            "mount_point": "/data/media"
+          }
+        ],
+        "environment": [
+          {
+            "env_var": "PUID",
+            "env_value": "PUID"
+          },
+          {
+            "env_var": "PGID",
+            "env_value": "PGID"
+          },
+          {
+            "env_var": "TZ",
+            "env_value": "TZ"
+          }
+        ],
+        "ports": [
+          {
+            "host_port": "6768",
+            "container_port": "6767",
+            "protocol": "tcp"
+          }
+        ]
+      },
+      {
+        "service": "plex",
+        "image": "cr.hotio.dev/hotio/plex",
+        "tag": "latest",
+        "container_name": "plex",
+        "shares": [
+          {
+            "host_dir": "plex",
+            "mount_point": "/config"
+          },
+          {
+            "host_dir": "storage/media",
+            "mount_point": "/data/media"
+          }
+        ],
+        "environment": [
+          {
+            "env_var": "PUID",
+            "env_value": "PUID"
+          },
+          {
+            "env_var": "PGID",
+            "env_value": "PGID"
+          },
+          {
+            "env_var": "TZ",
+            "env_value": "TZ"
+          },
+          {
+            "env_var": "UMASK",
+            "env_value": "002"
+          },
+          {
+            "env_var": "PLEX_CLAIM",
+            "env_value": "PLEX_CLAIM"
+          },
+          {
+            "env_var": "PLEX_ADVERTISE_IP",
+            "env_value": "PLEX_ADVERTISE_IP"
+          },
+          {
+            "env_var": "PLEX_PASS",
+            "env_value": "PLEX_PASS"
+          }
+        ],
+        "ports": [
+          {
+            "host_port": "32401",
+            "container_port": "32400",
+            "protocol": "tcp"
+          }
+        ]
+      }
+    ]
+  }
+}
