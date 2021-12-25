@@ -10,7 +10,7 @@ body:
   attributes:
     label: Is this a new Bug?
     options:
-      - label: "Did you check that the bug hasn't been reported before?"
+      - label: "I checkd that the bug hasn't been reported before"
         required: true
           
 - type: input
