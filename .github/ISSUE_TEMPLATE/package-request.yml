@@ -70,7 +70,7 @@ body:
     id: license-other
     attributes:
       label: License
-      description: Software License of the project. Common licenses: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type
-      placeholder: ex. GPLv2 (MIT, BSD-2-clause, Apache, GPLv3 or a link to the licence file)
+      description: Software License of the project. [Common licenses](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type)
+      placeholder: ex. GPLv2 or a link to the licence file
     validations:
       required: false
