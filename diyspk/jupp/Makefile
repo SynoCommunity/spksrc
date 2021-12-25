@@ -1,25 +1,21 @@
 SPK_NAME = jupp
-SPK_VERS = 30
-SPK_REV = 1
+SPK_VERS = 40
+SPK_REV = 2
 SPK_ICON = src/jupp.png
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = text editor with emacs, joe, pico, Wordstar  and jupp user interface
-DESCRIPTION_GER = ein Editor mit emacs, joe, pico, Wordstar und jupp-Benutzeroberfläche
-RELOAD_UI = no
+DESCRIPTION = text editor jupp comes with the editor flavours known from joe, specifically, jmacs, joe, jpico, jstar, and rjoe.
+DESCRIPTION_GER = jupp ist ein Editor mit den joe Benutzeroberflächen für emacs, joe, pico, Wordstar und jupp-Benutzeroberfläche.
+
 DISPLAY_NAME = jupp
 STARTABLE = no
-CHANGELOG = "Initial release"
+CHANGELOG = "Update to joe 3.1, jupp v40."
 
-HOMEPAGE   = https://www.mirbsd.org/jupp.htm
-LICENSE    = GPLv1
+HOMEPAGE = http://www.mirbsd.org/jupp.htm
+LICENSE = GPLv1
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-GNU_CONFIGURE = 1
+SPK_COMMANDS = bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 
 include ../../mk/spksrc.spk.mk
