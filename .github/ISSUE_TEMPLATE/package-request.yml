@@ -70,7 +70,7 @@ body:
     id: license-other
     attributes:
       label: Other License
-      description: What is the OpenSource license of the project? [Common licenses](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type)
+      description: Other [Common licenses](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type)
       placeholder: ex. GPLv2 or a link to the licence file
     validations:
       required: false
