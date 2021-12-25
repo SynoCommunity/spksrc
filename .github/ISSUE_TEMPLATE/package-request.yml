@@ -48,7 +48,7 @@ body:
     id: source-code
     attributes:
       label: Source code
-      description: The source code, typically a Git reposetory
+      description: A link to the source code, typically a Git reposetory or tarball
       placeholder: https://github.com/jellyfin/jellyfin
     validations:
       required: true
