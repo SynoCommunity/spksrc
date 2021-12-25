@@ -1,9 +1,8 @@
 
 name: Package request
-about: Request for a new package
+description: Request for a new package
 title: "[Package Request] "
 labels: request
-assignees: ''
 body:
   - type: input
     id: package-name
