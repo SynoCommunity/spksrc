@@ -6,27 +6,35 @@ body:
   attributes:
     value: |
       Thanks for taking the time to fill out this bug report!
+- type: checkboxes
+  attributes:
+    label: Is this a new Bug?
+    description: "Did you check that the bug hasn't been reported before?"
+  options:
+    - label: Yes
+      required: true
+          
 - type: input
   attributes:
-    label: Package
-    description: Which package is the bug report abour?
+    label: Package Name
+    description: Which package is the bug report about?
   validations:
     required: true
 - type: input
   attributes:
     label: Package Version
-    description: What package version do you have installed?
+    description: What version of our package are you running?
   validations:
     required: true
 - type: input
   attributes:
-    label: Model
-    description: Which NAS Model have you experienced the bug with?
+    label: Device Model
+    description: Which NAS/Router Model have you experienced the bug with?
   validations:
     required: true
 - type: input
   attributes:
-    label: Architecture
+    label: Device Architecture
     description: Which CPU Architecture does your NAS have? [You can look up the Architectrue for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
   validations:
     required: true
@@ -39,14 +47,8 @@ body:
     
 - type: textarea
   attributes:
-    label: Expected Behaviour / Description
-    description: Please tell us you expteded to happen.
-  validations:
-    required: false
-- type: textarea
-  attributes:
-    label: Actual Behaviour
-    description: Please tell us what happens instead.
+    label: What happened?
+    description: Also tell us, what did you expect to happen?
   validations:
     required: false
 - type: textarea
