@@ -11,7 +11,7 @@ body:
     label: Is this a new Bug?
     description: "Did you check that the bug hasn't been reported before?"
     options:
-      - label: Yes
+      - label: "Yes"
         required: true
           
 - type: input
