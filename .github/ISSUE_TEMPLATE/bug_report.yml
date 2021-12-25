@@ -49,7 +49,7 @@ body:
     label: What happened?
     description: Also tell us, what did you expect to happen?
   validations:
-    required: false
+    required: true
 - type: textarea
   attributes:
     label: Reproduction steps
