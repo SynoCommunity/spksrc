@@ -53,11 +53,24 @@ body:
       placeholder: ex. https://github.com/jellyfin/jellyfin
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: license
     attributes:
-      label: License
-      description: Software License of the project (Common licenses: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type
-      placeholder: ex. GPLv2 (MIT, BSD-2-clause, Apache, GPLv3 or a link to the licence file)
+      label: What is the OpenSource license of the project.?
+      options:
+        - MIT
+        - BSD-2-clause
+        - GPLv2
+        - GPLv3
+        - Apache
+        - other (please specify below)
     validations:
       required: true
+  - type: input
+    id: license-other
+    attributes:
+      label: License
+      description: Software License of the project. Common licenses: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type
+      placeholder: ex. GPLv2 (MIT, BSD-2-clause, Apache, GPLv3 or a link to the licence file)
+    validations:
+      required: false
