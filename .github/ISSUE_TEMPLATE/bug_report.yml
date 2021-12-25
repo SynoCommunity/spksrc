@@ -1,11 +1,13 @@
 name: Bug report
-dscription: Create a report to help us improve
+description: Create a report to help us improve
 labels: bug
 body:
   - type: input
     attributes:
       label: Package
       description: Which package is the bug report abour?
+    validations:
+      required: true
   - type: input
     attributes:
       label: Package Version
