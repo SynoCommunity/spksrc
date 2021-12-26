@@ -9,9 +9,21 @@ BUILD_DEPENDS = cross/python310
 
 DEPENDS = cross/$(SPK_NAME)
 DEPENDS += cross/unrar
-DEPENDS += cross/numpy
 
 SPK_DEPENDS = "python310:ffmpeg"
+
+include ../../mk/spksrc.common.mk
+
+# To optimize numpy (optional)
+DEPENDS += cross/blasfeo
+
+# Fix numpy compilation with older compilers
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+WHEELS_CPPFLAGS = -std=c++0x
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = -std=c99 -O0
+endif
+endif
 
 MAINTAINER = smaarn
 
