@@ -3,6 +3,7 @@ description: Create a report to help us improve
 labels: bug
 body:
 - type: markdown
+  id: new
   attributes:
     value: |
       Thanks for taking the time to fill out this bug report!
@@ -86,7 +87,7 @@ body:
   validations:
     required: false
 - type: textarea
-  od: other-log
+  id: other-log
   attributes:
     label: Other Logs
     description: "Please copy any other log files from `/var/log/messages`, `/var/log/synopkg.log` or application specific log files in here"
