@@ -3,11 +3,11 @@ description: Create a report to help us improve
 labels: bug
 body:
 - type: markdown
-  id: new
   attributes:
     value: |
       Thanks for taking the time to fill out this bug report!
 - type: checkboxes
+  id: checks
   attributes:
     label: Is this a new Bug?
     options:
