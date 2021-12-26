@@ -1,5 +1,5 @@
 PKG_NAME = bazarr
-PKG_VERS = 1.0.2-beta.11
+PKG_VERS = 1.0.2-beta.12
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
