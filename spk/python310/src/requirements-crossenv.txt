@@ -5,9 +5,6 @@
 # Requirement for cryptography
 # cffi==1.15.0
 
-# Compiled using cross/pillow
-# Pillow==8.2.0
-
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
@@ -27,3 +24,14 @@
 # regex==2021.11.2
 # SQLAlchemy==1.4.26
 # zope.interface==5.4.0
+
+# Require: WHEELS_BUILD_ARGS = build_ext --disable-platform-guessing
+Pillow==8.4.0
+
+# numpy:
+#   - Require Cython in cross/python310 crossenv
+#   - DSM6 require WHEELS_CFLAGS=-std=c++0x
+#   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
+#     ref: https://github.com/numpy/numpy/issues/13622
+# numpy==1.21.5
+git+https://github.com/numpy/numpy@v1.22.0rc3#egg=numpy

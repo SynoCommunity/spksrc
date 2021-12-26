@@ -9,29 +9,47 @@ DEPENDS  = cross/$(SPK_NAME)
 # setup during package install
 DEPENDS += cross/setuptools cross/pip cross/wheel
 
-# Required for lxml wheel
-DEPENDS += cross/libxml2
-DEPENDS += cross/libxslt
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
 
-# Required for PyYAML
-DEPENDS += cross/libyaml
+# [wheel] Required for lxml
+# DEPENDS += cross/libxml2
+# DEPENDS += cross/libxslt
 
-# Required for pycurl wheel
-DEPENDS += cross/curl
-ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+# [wheel] Required for PyYAML
+# DEPENDS += cross/libyaml
 
-# Required for PyNaCl
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
+# [wheel] Required for pycurl
+# DEPENDS += cross/curl
+# ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# Patched cross-compiled wheel
-# https://github.com/python-pillow/Pillow/issues/5799
-# Moved to individual packages, uncoment to enable
-# DEPENDS += cross/pillow
+# [wheel] Required for PyNaCl
+# DEPENDS += cross/libsodium
+# ENV += SODIUM_INSTALL=system
 
-# Required for pycares
-DEPENDS += cross/c-ares
-ENV += PYCARES_USE_SYSTEM_LIB=1
+# [wheel] Required for Pillow
+WHEELS_BUILD_ARGS = build_ext --disable-platform-guessing
+
+# [wheel] Required for pycares
+# DEPENDS += cross/c-ares
+# ENV += PYCARES_USE_SYSTEM_LIB=1
+
+include ../../mk/spksrc.common.mk
+
+# [wheel] numpy -> gcc-4.6.4 failed with exit status 1
+# https://github.com/numpy/numpy/issues/20664
+# UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
+# [wheel] Fix numpy wheel compilation with older compilers
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+WHEELS_CPPFLAGS = -std=c++0x
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = -O0
+endif
+endif
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
