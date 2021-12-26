@@ -35,11 +35,19 @@ body:
     description: Which NAS/Router Model have you experienced the bug with?
   validations:
     required: true
-- type: input
+- type: dropdown
   id: arch
   attributes:
     label: Device Architecture
     description: Which CPU Architecture does your NAS have? [You can look up the Architectrue for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
+    options:
+      - x86_64
+      - aarch64 (ARMv8)
+      - ARMv7
+      - ARMv7L (hi3535)
+      - ARMv5
+      - i686 (evansport)
+      - ppc
   validations:
     required: true
 - type: input
