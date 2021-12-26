@@ -14,30 +14,35 @@ body:
         required: true
           
 - type: input
+  id: package
   attributes:
     label: Package Name
     description: Which package is the bug report about?
   validations:
     required: true
 - type: input
+  id: version
   attributes:
     label: Package Version
     description: What version of our package are you running?
   validations:
     required: true
 - type: input
+  id: model
   attributes:
     label: Device Model
     description: Which NAS/Router Model have you experienced the bug with?
   validations:
     required: true
 - type: input
+  id: arch
   attributes:
     label: Device Architecture
     description: Which CPU Architecture does your NAS have? [You can look up the Architectrue for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
   validations:
     required: true
 - type: input
+  id: firmware
   attributes:
     label: Firmware Version
     description: Which DSM/SRM version is the NAS running?
@@ -45,12 +50,14 @@ body:
     required: true
     
 - type: textarea
+  id: decription
   attributes:
     label: What happened?
     description: Also tell us, what did you expect to happen?
   validations:
     required: true
 - type: textarea
+  id: repoduce
   attributes:
     label: Reproduction steps
     description: "How do you trigger this bug? Please walk us through it step by step."
@@ -63,6 +70,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: install-log
   attributes:
     label: Install Log
     description: "Please copy the log file from `/var/log/packages/{package}.log` or for DSM<6: `/var/packages/{package}/target/var/{package}_installer.log` in here"
@@ -70,6 +78,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: service-log
   attributes:
     label: Service Log
     description: "Please copy the log file from `/var/packages/{package}/var/{package}.log` or for DSM<6: `/var/packages/{package}/target/var/{package}.log` in here if the package is a service."
@@ -77,6 +86,7 @@ body:
   validations:
     required: false
 - type: textarea
+  od: other-log
   attributes:
     label: Other Logs
     description: "Please copy any other log files from `/var/log/messages`, `/var/log/synopkg.log` or application specific log files in here"
