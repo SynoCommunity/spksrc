@@ -145,6 +145,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cryptography==3.3.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "poetry==1.1.11"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "poetry==1.1.11"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "Cython==0.29.26"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "Cython==0.29.26"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
