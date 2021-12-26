@@ -12,6 +12,9 @@ DEPENDS += cross/unrar
 
 SPK_DEPENDS = "python310:ffmpeg"
 
+# gcc-4.6.4 failed with exit status 1
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
 include ../../mk/spksrc.common.mk
 
 # To optimize numpy (optional)
