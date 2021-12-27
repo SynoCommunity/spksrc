@@ -50,12 +50,12 @@ include ../../mk/spksrc.common.mk
 # UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 # [wheel] Fix numpy wheel compilation with older compilers
-# ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# WHEELS_CPPFLAGS = -std=c++0x
-# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# WHEELS_CFLAGS = -O0
-# endif
-# endif
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+WHEELS_CPPFLAGS = -std=c++0x
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = -O0
+endif
+endif
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
