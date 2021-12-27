@@ -1,4 +1,9 @@
-# Common wheel at latest version
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
 # Next update will require rustc
 # cryptography==3.3.2
 
@@ -26,7 +31,7 @@
 # zope.interface==5.4.0
 
 # Require: WHEELS_BUILD_ARGS = build_ext --disable-platform-guessing
-Pillow==8.4.0
+# Pillow==8.4.0
 
 # numpy:
 #   - Require Cython in cross/python310 crossenv
@@ -34,4 +39,7 @@ Pillow==8.4.0
 #   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
 #     ref: https://github.com/numpy/numpy/issues/13622
 # numpy==1.21.5
-git+https://github.com/numpy/numpy@v1.22.0rc3#egg=numpy
+# git+https://github.com/numpy/numpy@v1.22.0rc3#egg=numpy
+
+# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
+# git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad

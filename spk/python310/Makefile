@@ -31,13 +31,12 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 # ENV += SODIUM_INSTALL=system
 
 # [wheel] Required for Pillow
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS  = build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
-WHEELS_BUILD_ARGS += --debug
+# DEPENDS += cross/freetype cross/libjpeg cross/zlib
+# WHEELS_BUILD_ARGS  = build_ext
+# WHEELS_BUILD_ARGS += --disable-platform-guessing
+# WHEELS_BUILD_ARGS += --enable-freetype
+# WHEELS_BUILD_ARGS += --enable-jpeg
+# WHEELS_BUILD_ARGS += --enable-zlib
 
 # [wheel] Required for pycares
 # DEPENDS += cross/c-ares
@@ -50,12 +49,12 @@ include ../../mk/spksrc.common.mk
 # UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 # [wheel] Fix numpy wheel compilation with older compilers
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-WHEELS_CPPFLAGS = -std=c++0x
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS = -O0
-endif
-endif
+# ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# WHEELS_CPPFLAGS = -std=c++0x
+# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+# WHEELS_CFLAGS = -O0
+# endif
+# endif
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
