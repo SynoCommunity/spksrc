@@ -109,7 +109,7 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		fi ; \
 		if [ -s "$(WHEELHOUSE)/$(WHEELS_LIMITED_API)" ]; then \
 			$(MSG) "Force limited API $(PYTHON_LIMITED_API)" ; \
-			. $(CROSSENV) && $(RUN) $(subst pip,$(PIP_CROSSENV),$(PIP_CROSS_BUILD)) \
+			. $(CROSSENV) && $(RUN) \
 				_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 				CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
 				LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
