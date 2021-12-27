@@ -82,14 +82,45 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		if [ -s "$(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE)" ]; then \
 			$(MSG) "Force cross-compile" ; \
 			if [ -z "$(CROSSENV)" ]; then \
-				$(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" $(PIP) $(PIP_WHEEL_ARGS) $(addsuffix --global-option=,$(WHEELS_BUILD_ARGS)) --requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+				$(RUN) \
+					_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+					CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
+					LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
+					CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
+					CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
+					$(PIP) \
+					$(PIP_WHEEL_ARGS) \
+					$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
+					--no-build-isolation \
+					--requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 			else \
-				. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" $(PIP_CROSSENV) $(PIP_WHEEL_ARGS) $(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+				. $(CROSSENV) && $(RUN) \
+					_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+					CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
+					LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
+					CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
+					CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
+					$(PIP_CROSSENV) \
+					$(PIP_WHEEL_ARGS) \
+					$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
+					--no-build-isolation \
+					--requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 			fi ; \
 		fi ; \
 		if [ -s "$(WHEELHOUSE)/$(WHEELS_LIMITED_API)" ]; then \
 			$(MSG) "Force limited API $(PYTHON_LIMITED_API)" ; \
-			. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM="$(TC_TARGET)" CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" $(PIP_CROSSENV) $(PIP_WHEEL_ARGS) $(addsuffix --global-option=,$(WHEELS_BUILD_ARGS)) --build-option='--py-limited-api=$(PYTHON_LIMITED_API)' --no-build-isolation --requirement $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
+			. $(CROSSENV) && $(RUN) $(subst pip,$(PIP_CROSSENV),$(PIP_CROSS_BUILD)) \
+				_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+				CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
+				LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
+				CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
+				CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
+				$(PIP_CROSSENV) \
+				$(PIP_WHEEL_ARGS) \
+				$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
+				--build-option='--py-limited-api=$(PYTHON_LIMITED_API)' \
+				--no-build-isolation \
+				--requirement $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 		fi ; \
 	fi
 ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
@@ -97,8 +128,11 @@ ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
 		if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 			$(MSG) "Force pure-python" ; \
-			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-				$(RUN) BUILD_ARGS="$(WHEELS_BUILD_ARGS)" $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && $(RUN) \
+				$(PIP) \
+				$(PIP_WHEEL_ARGS) \
+				$(addsuffix --global-option=,$(WHEELS_BUILD_ARGS)) \
+				--requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 		fi ; \
 	fi
 endif
