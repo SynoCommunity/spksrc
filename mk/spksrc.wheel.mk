@@ -88,7 +88,16 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		while IFS= read -r requirement ; do \
 			wheel=$${requirement#*:} ; \
 			file=$$(basename $${requirement%%:*}) ; \
-			[ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" ; \
+			[ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
+			[ "$$(grep -s egg <<< $${wheel})" ] && name=$${wheel#*egg=} || name=$${wheel%%[<>=]=*} ; \
+			if [ "$$(grep -s $${name} <<< "$(WHEELS_BUILD_ARGS)")" ]; then \
+				options=($$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+				global_option=$$(printf "\x2D\x2Dglobal-option=%s " "$${options[@]}") ; \
+			else \
+				options=("") ; \
+				global_option="" ; \
+			fi ; \
+			$(MSG) "[$${name}] $${abi3} $${options[@]}" ; \
 			$(RUN) \
 				_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 				CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
@@ -98,7 +107,7 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 				$${localPIP} \
 				$(PIP_WHEEL_ARGS) \
 				$${abi3} \
-				$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
+				$${global_option} \
 				--no-build-isolation \
 				$${wheel} ; \
 		done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) || true ; \
