@@ -1,6 +1,6 @@
 #!/bin/sh
 
-IP="$(curl -qs4 https://icanhazip.com)"
+IP=$(ip route get 1 | awk '{print $(NF);exit}')
 NEW_UID=$(id -u sc-$SYNOPKG_PKGNAME)
 NEW_GID=$(id -g sc-$SYNOPKG_PKGNAME)
 TZ=$(ls -l /etc/localtime | sed -e 's#.*zoneinfo\/##g')
@@ -14,6 +14,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
         "subitems": [{
             "key": "wizard_tz",
             "desc": "Timezone",
+            "hidden": true,
             "defaultValue": "@tz@",
             "validator": {
                 "allowBlank": false
@@ -24,6 +25,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
         "subitems": [{
             "key": "wizard_uid",
             "desc": "UID",
+            "hidden": true,
             "defaultValue": "@uid@",
             "validator": {
                 "allowBlank": false
@@ -35,15 +37,17 @@ WIZARD_CONTENT="$(cat << 'EOF'
             "key": "wizard_gid",
             "desc": "GID",
             "defaultValue": "@gid@",
+            "hidden": true,
             "validator": {
                 "allowBlank": false
             }
         }]
     }, {
         "type": "textfield",
+        "desc": "If you already have a server, you can claim it by grabbing the code at <a href=\"https://plex.tv/claim\">plex.tv/claim</a>",
         "subitems": [{
             "key": "wizard_plex_claim",
-            "desc": "Plex Claim",
+            "desc": "Plex claim code",
             "defaultValue": "",
             "validator": {
                 "allowBlank": true
@@ -56,7 +60,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
             "desc": "Plex Advertise IP",
             "defaultValue": "@public_ip@",
             "validator": {
-                "allowBlank": true
+                "allowBlank": false
             }
         }]
     }, {
@@ -70,13 +74,21 @@ WIZARD_CONTENT="$(cat << 'EOF'
             }
         }]
     }, {
-        "type": "textfield",
+        "type": "combobox",
         "subitems": [{
             "key": "wizard_plex_pass",
             "desc": "Plex Pass",
-            "defaultValue": "",
+            "editable": false,
+            "displayField": "display_name",
+            "valueField": "value",
+            "mode": "local",
+            "store": {
+                "xtype": "arraystore",
+                "fields": ["value", "display_name"],
+                "data": [["true", "Yes"], ["false", "No"]]
+            },
             "validator": {
-                "allowBlank": true
+                "fn": "{var v=arguments[0]; console.log(v);if (!v) return 'Select an option';return true;}"
             }
         }]
     }]
