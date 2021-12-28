@@ -12,7 +12,7 @@
             "mount_point": "/config"
           },
           {
-            "host_dir": "storage",
+            "host_dir": "appdata",
             "mount_point": "/data"
           }
         ],
@@ -49,7 +49,7 @@
             "mount_point": "/config"
           },
           {
-            "host_dir": "storage",
+            "host_dir": "appdata",
             "mount_point": "/data"
           }
         ],
@@ -86,7 +86,7 @@
             "mount_point": "/config"
           },
           {
-            "host_dir": "storage/media",
+            "host_dir": "appdata/media",
             "mount_point": "/data/media"
           }
         ],
@@ -123,7 +123,7 @@
             "mount_point": "/config"
           },
           {
-            "host_dir": "storage/media",
+            "host_dir": "appdata/media",
             "mount_point": "/data/media"
           }
         ],
@@ -151,6 +151,10 @@
           {
             "env_var": "PLEX_ADVERTISE_IP",
             "env_value": "{{wizard_plex_ip}}"
+          },
+          {
+            "env_var": "ALLOWED_NETWORKS",
+            "env_value": "{{wizard_allowed_networks}}"
           },
           {
             "env_var": "PLEX_PASS",
