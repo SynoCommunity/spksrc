@@ -20,7 +20,7 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 # DEPENDS += cross/libxslt
 
 # [wheel] Required for PyYAML
-# DEPENDS += cross/libyaml
+DEPENDS += cross/libyaml
 
 # [wheel] Required for pycurl
 # DEPENDS += cross/curl
@@ -31,12 +31,13 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 # ENV += SODIUM_INSTALL=system
 
 # [wheel] Required for Pillow
-# DEPENDS += cross/freetype cross/libjpeg cross/zlib
-# WHEELS_BUILD_ARGS  = build_ext
-# WHEELS_BUILD_ARGS += --disable-platform-guessing
-# WHEELS_BUILD_ARGS += --enable-freetype
-# WHEELS_BUILD_ARGS += --enable-jpeg
-# WHEELS_BUILD_ARGS += --enable-zlib
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+#WHEELS_BUILD_ARGS  = [pillow]
+#WHEELS_BUILD_ARGS += build_ext
+#WHEELS_BUILD_ARGS += --disable-platform-guessing
+#WHEELS_BUILD_ARGS += --enable-freetype
+#WHEELS_BUILD_ARGS += --enable-jpeg
+#WHEELS_BUILD_ARGS += --enable-zlib
 
 # [wheel] Required for pycares
 # DEPENDS += cross/c-ares
@@ -56,7 +57,7 @@ include ../../mk/spksrc.common.mk
 # endif
 # endif
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
