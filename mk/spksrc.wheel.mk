@@ -120,7 +120,6 @@ ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 			export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && $(RUN) \
 				$(PIP) \
 				$(PIP_WHEEL_ARGS) \
-				$(addsuffix --global-option=,$(WHEELS_BUILD_ARGS)) \
 				--requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 		fi ; \
 	fi
