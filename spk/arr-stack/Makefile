@@ -21,6 +21,7 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # SERVICE_PORT = $(ADMIN_PORT)
 SERVICE_PORT = 7879,8990,6768,32401
 CONF_DIR = src/conf
+WIZARDS_DIR = src/wizard/
 SSS_SCRIPT = src/service-start-stop.sh
 INSTALLER_SCRIPT = src/installer.sh
 

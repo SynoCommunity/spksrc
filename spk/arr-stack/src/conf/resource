@@ -19,15 +19,15 @@
         "environment": [
           {
             "env_var": "PUID",
-            "env_value": "PUID"
+            "env_value": "{{wizard_uid}}"
           },
           {
             "env_var": "PGID",
-            "env_value": "PGID"
+            "env_value": "{{wizard_gid}}"
           },
           {
             "env_var": "TZ",
-            "env_value": "TZ"
+            "env_value": "{{wizard_tz}}"
           }
         ],
         "ports": [
@@ -56,15 +56,15 @@
         "environment": [
           {
             "env_var": "PUID",
-            "env_value": "PUID"
+            "env_value": "{{wizard_uid}}"
           },
           {
             "env_var": "PGID",
-            "env_value": "PGID"
+            "env_value": "{{wizard_gid}}"
           },
           {
             "env_var": "TZ",
-            "env_value": "TZ"
+            "env_value": "{{wizard_tz}}"
           }
         ],
         "ports": [
@@ -93,15 +93,15 @@
         "environment": [
           {
             "env_var": "PUID",
-            "env_value": "PUID"
+            "env_value": "{{wizard_uid}}"
           },
           {
             "env_var": "PGID",
-            "env_value": "PGID"
+            "env_value": "{{wizard_gid}}"
           },
           {
             "env_var": "TZ",
-            "env_value": "TZ"
+            "env_value": "{{wizard_tz}}"
           }
         ],
         "ports": [
@@ -130,15 +130,15 @@
         "environment": [
           {
             "env_var": "PUID",
-            "env_value": "PUID"
+            "env_value": "{{wizard_uid}}"
           },
           {
             "env_var": "PGID",
-            "env_value": "PGID"
+            "env_value": "{{wizard_gid}}"
           },
           {
             "env_var": "TZ",
-            "env_value": "TZ"
+            "env_value": "{{wizard_tz}}"
           },
           {
             "env_var": "UMASK",
@@ -146,15 +146,15 @@
           },
           {
             "env_var": "PLEX_CLAIM",
-            "env_value": "PLEX_CLAIM"
+            "env_value": "{{wizard_plex_claim}}"
           },
           {
             "env_var": "PLEX_ADVERTISE_IP",
-            "env_value": "PLEX_ADVERTISE_IP"
+            "env_value": "{{wizard_plex_ip}}"
           },
           {
             "env_var": "PLEX_PASS",
-            "env_value": "PLEX_PASS"
+            "env_value": "{{wizard_plex_pass}}"
           }
         ],
         "ports": [

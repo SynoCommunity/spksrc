@@ -1,0 +1,35 @@
+[{
+    "step_title": "Configuration",
+    "invalid_next_disabled": true,
+    "items": [{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_tz",
+            "desc": "Timezone",
+            "defaultValue": "@tz@",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_uid",
+            "desc": "UID",
+            "defaultValue": "@uid@",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_gid",
+            "desc": "GID",
+            "defaultValue": "@gid@",
+            "validator": {
+                "allowBlank": true
+            }
+        }]
+    }]
+}]
