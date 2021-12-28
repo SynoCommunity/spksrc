@@ -6,7 +6,7 @@ case "$1" in
     stop)
         ;;
     status)
-        "$DOCKER_INSPECT" "arr-atack" | grep -q "\"Status\": \"running\"," || exit 1
+        "$DOCKER_INSPECT" "arr-stack" | grep -q "\"Status\": \"running\"," || exit 1
         ;;
     log)
         echo ""

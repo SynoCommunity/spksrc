@@ -149,7 +149,7 @@
             "env_value": "{{wizard_plex_claim}}"
           },
           {
-            "env_var": "PLEX_ADVERTISE_IP",
+            "env_var": "ADVERTISE_IP",
             "env_value": "{{wizard_plex_ip}}"
           },
           {
