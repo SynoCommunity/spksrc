@@ -75,53 +75,33 @@ pre_wheel_target: wheel_msg_target
 
 # Build cross compiled wheels first, to fail fast.
 # There might be an issue with some pure python wheels when built after that.
-build_wheel_target: SHELL:=/bin/sh
+build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: $(PRE_WHEEL_TARGET)
 	@if [ -n "$(WHEELS)" ] ; then \
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
-		if [ -s "$(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE)" ]; then \
-			$(MSG) "Force cross-compile" ; \
-			if [ -z "$(CROSSENV)" ]; then \
-				$(RUN) \
-					_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-					CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
-					LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
-					CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
-					CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
-					$(PIP) \
-					$(PIP_WHEEL_ARGS) \
-					$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
-					--no-build-isolation \
-					--requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
-			else \
-				. $(CROSSENV) && $(RUN) \
-					_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-					CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
-					LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
-					CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
-					CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
-					$(PIP_CROSSENV) \
-					$(PIP_WHEEL_ARGS) \
-					$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
-					--no-build-isolation \
-					--requirement $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
-			fi ; \
+		$(MSG) "Cross-compiling wheels" ; \
+		localPIP=$(PIP) ; \
+		if [ -z "$(CROSSENV)" ] ; then \
+			. $(CROSSENV) ; \
+			localPIP=$(PIP_CROSSENV) ; \
 		fi ; \
-		if [ -s "$(WHEELHOUSE)/$(WHEELS_LIMITED_API)" ]; then \
-			$(MSG) "Force limited API $(PYTHON_LIMITED_API)" ; \
-			. $(CROSSENV) && $(RUN) \
+		while IFS= read -r requirement ; do \
+			wheel=$${requirement#*:} ; \
+			file=$$(basename $${requirement%%:*}) ; \
+			[ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" ; \
+			$(RUN) \
 				_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 				CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
 				LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
 				CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
 				CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
-				$(PIP_CROSSENV) \
+				$${localPIP} \
 				$(PIP_WHEEL_ARGS) \
+				$${abi3} \
 				$(addprefix --global-option=,$(WHEELS_BUILD_ARGS)) \
-				--build-option='--py-limited-api=$(PYTHON_LIMITED_API)' \
 				--no-build-isolation \
-				--requirement $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
-		fi ; \
+				$${wheel} ; \
+		done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) || true ; \
 	fi
 ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -n "$(WHEELS)" ] ; then \
