@@ -7,7 +7,7 @@ SPK_DEPENDS = "Docker>=18.09.0-1017"
 override ARCH=
 
 MAINTAINER = publicarray
-DESCRIPTION = Docker setup with Sonarr/Radarr/Bazarr/Plex images from hotio.dev https://github.com/TRaSH-/Guides-Synology-Templates
+DESCRIPTION = "Docker setup with Sonarr/Radarr/Bazarr/Plex images from <a href=\"https://hotio.dev\">hotio.dev</a>. Thanks to <a href=\"https://github.com/TRaSH-/Guides-Synology-Templates\">TRaSH guides</a>"
 
 HOMEPAGE = https://hotio.dev/
 LICENSE  = GPLv3

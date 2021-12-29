@@ -44,7 +44,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
         }]
     }, {
         "type": "textfield",
-        "desc": "If you already have a server, you can claim it by grabbing the code at <a href=\"https://plex.tv/claim\">plex.tv/claim</a>",
+        "desc": "If you already have a server, you can claim it by grabbing the code at <a target=\"_blank\" href=\"https://plex.tv/claim\">plex.tv/claim</a>",
         "subitems": [{
             "key": "wizard_plex_claim",
             "desc": "Plex claim code",
@@ -68,7 +68,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
         "subitems": [{
             "key": "wizard_allowed_networks",
             "desc": "Plex Allowed Networks",
-            "defaultValue": "192.168.0.0/24",
+            "defaultValue": "192.168.0.0/24,172.18.0.0/24",
             "validator": {
                 "allowBlank": true
             }
@@ -77,7 +77,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
         "type": "combobox",
         "subitems": [{
             "key": "wizard_plex_pass",
-            "desc": "Plex Pass",
+            "desc": "Plex Pass Beta Installation",
             "editable": false,
             "displayField": "display_name",
             "valueField": "value",
