@@ -16,32 +16,32 @@ DEPENDS += cross/setuptools cross/pip cross/wheel
 ##
 
 # [wheel] Required for lxml
-# DEPENDS += cross/libxml2
-# DEPENDS += cross/libxslt
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
 
 # [wheel] Required for PyYAML
 DEPENDS += cross/libyaml
 
 # [wheel] Required for pycurl
-# DEPENDS += cross/curl
-# ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [wheel] Required for PyNaCl
-# DEPENDS += cross/libsodium
-# ENV += SODIUM_INSTALL=system
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
 
 # [wheel] Required for Pillow
 DEPENDS += cross/freetype cross/libjpeg cross/zlib
-#WHEELS_BUILD_ARGS  = [pillow]
-#WHEELS_BUILD_ARGS += build_ext
-#WHEELS_BUILD_ARGS += --disable-platform-guessing
-#WHEELS_BUILD_ARGS += --enable-freetype
-#WHEELS_BUILD_ARGS += --enable-jpeg
-#WHEELS_BUILD_ARGS += --enable-zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
 # [wheel] Required for pycares
-# DEPENDS += cross/c-ares
-# ENV += PYCARES_USE_SYSTEM_LIB=1
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
 
 include ../../mk/spksrc.common.mk
 
@@ -50,12 +50,15 @@ include ../../mk/spksrc.common.mk
 # UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 # [wheel] Fix numpy wheel compilation with older compilers
-# ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# WHEELS_CPPFLAGS = -std=c++0x
-# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# WHEELS_CFLAGS = -O0
-# endif
-# endif
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+WHEELS_CPPFLAGS = [numpy] -std=c++0x
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = [numpy] -O0
+endif
+endif
+
+# Force building pure-python wheels
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
