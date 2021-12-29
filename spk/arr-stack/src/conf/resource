@@ -69,7 +69,7 @@
         ],
         "ports": [
           {
-            "host_port": "8989",
+            "host_port": "8990",
             "container_port": "8989",
             "protocol": "tcp"
           }
@@ -106,7 +106,7 @@
         ],
         "ports": [
           {
-            "host_port": "6767",
+            "host_port": "6768",
             "container_port": "6767",
             "protocol": "tcp"
           }
@@ -154,7 +154,7 @@
           },
           {
             "env_var": "ADVERTISE_IP",
-            "env_value": "http://{{wizard_plex_ip}}:32401"
+            "env_value": "http://{{wizard_plex_ip}}:32400"
           },
           {
             "env_var": "ALLOWED_NETWORKS",

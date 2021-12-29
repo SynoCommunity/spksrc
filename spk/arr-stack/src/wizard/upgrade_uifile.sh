@@ -1,6 +1,6 @@
 #!/bin/sh
 
-IP=$(ip route get 1 | awk '{print $(NF);exit}')
+IP=$(cat /run/dms.ip)
 NEW_UID=$(id -u sc-$SYNOPKG_PKGNAME)
 NEW_GID=$(id -g sc-$SYNOPKG_PKGNAME)
 TZ=$(ls -l /etc/localtime | sed -e 's#.*zoneinfo\/##g')
@@ -68,7 +68,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
         "subitems": [{
             "key": "wizard_allowed_networks",
             "desc": "Plex Allowed Networks",
-            "defaultValue": "",
+            "defaultValue": "192.168.0.0/24",
             "validator": {
                 "allowBlank": true
             }
