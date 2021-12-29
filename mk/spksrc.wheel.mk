@@ -81,7 +81,8 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 		$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e))) \
 		$(MSG) "Cross-compiling wheels" ; \
 		localPIP=$(PIP) ; \
-		if [ -z "$(CROSSENV)" ] ; then \
+		if [ -s "$(CROSSENV)" ] ; then \
+			$(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
 			. $(CROSSENV) ; \
 			localPIP=$(PIP_CROSSENV) ; \
 		fi ; \
@@ -90,20 +91,19 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 			file=$$(basename $${requirement%%:*}) ; \
 			[ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 			[ "$$(grep -s egg <<< $${wheel})" ] && name=$${wheel#*egg=} || name=$${wheel%%[<>=]=*} ; \
-			if [ "$$(grep -s $${name} <<< "$(WHEELS_BUILD_ARGS)")" ]; then \
-				options=($$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-				global_option=$$(printf "\x2D\x2Dglobal-option=%s " "$${options[@]}") ; \
-			else \
-				options=("") ; \
-				global_option="" ; \
-			fi ; \
-			$(MSG) "[$${name}] $${abi3} $${options[@]}" ; \
+			options=($$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+			[ "$${options}" ] && global_option=$$(printf "\x2D\x2Dglobal-option=%s " "$${options[@]}") || global_option="" ; \
+			localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+			localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+			localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+			localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+			$(MSG) [$${name}] $$([ "$${localCFLAGS[@]}" ] && echo "CFLAGS=$${localCFLAGS[@]} ")$$([ "$${localLDFLAGS[@]}" ] && echo "LDFLAGS=$${localLDFLAGS[@]} ")$$([ "$${localCPPFLAGS[@]}" ] && echo "CPPFLAGS=$${localCPPFLAGS[@]} ")$$([ "$${localCXXFLAGS[@]}" ] && echo "CXXFLAGS=$${localCXXFLAGS[@]} ")$$([ "$${abi3}" ] && echo "$${abi3} ")"$${global_option}" ; \
 			$(RUN) \
 				_PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-				CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $(WHEELS_CFLAGS)" \
-				LDFLAGS="$(LDFLAGS) $(WHEELS_LDFLAGS)" \
-				CPPFLAGS="$(CPPFLAGS) $(WHEELS_CPPFLAGS)" \
-				CXXFLAGS="$(CXXFLAGS) $(WHEELS_CXXFLAGS)" \
+				CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
+				LDFLAGS="$(LDFLAGS) $${localLDFLAGS[@]}" \
+				CPPFLAGS="$(CPPFLAGS) $${localCPPFLAGS[@]}" \
+				CXXFLAGS="$(CXXFLAGS) $${localCXXFLAGS[@]}" \
 				$${localPIP} \
 				$(PIP_WHEEL_ARGS) \
 				$${abi3} \
