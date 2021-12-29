@@ -1,1 +1,8 @@
+bin:bin/ctags
+bin:bin/ebrowse
 lnk:bin/emacs
+bin:bin/emacs-27.2
+bin:bin/emacsclient
+bin:bin/etags
+rsc:libexec/emacs/27.2/
+rsc:share/emacs/27.2/etc/charsets/

@@ -1,21 +1,20 @@
 SPK_NAME = emacs
-SPK_VERS = 26.1
+SPK_VERS = 27.2
 SPK_REV = 1
 SPK_ICON = src/emacs.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = Tim Visher
+MAINTAINER = timvisher
 DESCRIPTION = Emacs is the extensible, customizable, self-documenting real-time display editor.
-RELOAD_UI = no
 DISPLAY_NAME = Emacs
 STARTABLE = no
-BETA = 1
-CHANGELOG = 1. First package release
 
-HOMEPAGE   = https://www.gnu.org/software/emacs/
-LICENSE    = GPLv3
+CHANGELOG = "Initial package release"
 
-SERVICE_SETUP = src/service-setup.sh
+HOMEPAGE = https://www.gnu.org/software/emacs/
+LICENSE = GPLv3
+
+SPK_COMMANDS = bin/emacs bin/ctags bin/ebrowse bin/emacs-27.2 bin/emacsclient bin/etags
 
 include ../../mk/spksrc.spk.mk
