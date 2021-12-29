@@ -1,6 +1,6 @@
 #!/bin/sh
 
-IP=$(cat /run/dms.ip)
+IP=$(ip route get 1 | awk '{print $(NF);exit}')
 NEW_UID=$(id -u sc-$SYNOPKG_PKGNAME)
 NEW_GID=$(id -g sc-$SYNOPKG_PKGNAME)
 TZ=$(ls -l /etc/localtime | sed -e 's#.*zoneinfo\/##g')
