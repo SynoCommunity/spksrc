@@ -7,13 +7,12 @@ SPK_DEPENDS = "Docker>=18.09.0-1017"
 override ARCH=
 
 MAINTAINER = publicarray
-DESCRIPTION = Sonarr/Radarr/Bazarr https://hotio.dev/ https://trash-guides.info/ https://github.com/TRaSH-/Guides-Synology-Templates
+DESCRIPTION = Docker setup with Sonarr/Radarr/Bazarr/Plex images from hotio.dev https://github.com/TRaSH-/Guides-Synology-Templates
 
-HOMEPAGE = https://trash-guides.info/
+HOMEPAGE = https://hotio.dev/
 LICENSE  = GPLv3
 
 DISPLAY_NAME = arr-stack
-RELOADUI = yes
 CHANGELOG = "First version"
 
 # ADMIN_PORT = 7878,8989,6767,32400

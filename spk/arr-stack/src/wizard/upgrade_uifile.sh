@@ -85,7 +85,7 @@ WIZARD_CONTENT="$(cat << 'EOF'
             "store": {
                 "xtype": "arraystore",
                 "fields": ["value", "display_name"],
-                "data": [["true", "Yes"], ["false", "No"]]
+                "data": [["yes", "Yes"], ["no", "No"]]
             },
             "validator": {
                 "fn": "{var v=arguments[0]; console.log(v);if (!v) return 'Select an option';return true;}"

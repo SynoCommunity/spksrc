@@ -69,7 +69,7 @@
         ],
         "ports": [
           {
-            "host_port": "8990",
+            "host_port": "8989",
             "container_port": "8989",
             "protocol": "tcp"
           }
@@ -106,7 +106,7 @@
         ],
         "ports": [
           {
-            "host_port": "6768",
+            "host_port": "6767",
             "container_port": "6767",
             "protocol": "tcp"
           }
@@ -125,6 +125,10 @@
           {
             "host_dir": "storage/media",
             "mount_point": "/data/media"
+          },
+          {
+            "host_dir": "storage/transcode",
+            "mount_point": "/transcode"
           }
         ],
         "environment": [
@@ -150,7 +154,7 @@
           },
           {
             "env_var": "ADVERTISE_IP",
-            "env_value": "{{wizard_plex_ip}}"
+            "env_value": "http://{{wizard_plex_ip}}:32401"
           },
           {
             "env_var": "ALLOWED_NETWORKS",
@@ -163,7 +167,7 @@
         ],
         "ports": [
           {
-            "host_port": "32401",
+            "host_port": "32400",
             "container_port": "32400",
             "protocol": "tcp"
           }
