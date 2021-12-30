@@ -24,6 +24,9 @@ CONFIGURE_ARGS = --disable-mcs-build
 # needed for platforms compiling with gcc < 4.8
 # patches/001-add-boringssl-alignas-support.patch adds the necessary compatibility
 CONFIGURE_ARGS += --enable-btls
+CONFIGURE_ARGS += --disable-dependency-tracking
+CONFIGURE_ARGS += --without-mcs-docs
+
 # Optimize compilation for size
 ADDITIONAL_CFLAGS = -Os
 

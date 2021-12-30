@@ -13,11 +13,18 @@ LICENSE  = https://github.com/mono/mono/blob/master/LICENSE
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS  = --disable-dependency-tracking
+# disable-static does not work without disable-libraries
+CONFIGURE_ARGS += --disable-static --disable-libraries 
+CONFIGURE_ARGS += --without-mcs-docs
+
 POST_INSTALL_TARGET = mono_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
 
 .PHONY: mono_native_post_install
 mono_native_post_install:
-	sed -i -e 's#/usr/local#/var/packages/mono/target#g' $(WORK_DIR)/install/usr/local/bin/*
-	sed -i -e 's#/usr/local#/var/packages/mono/target#g' $(WORK_DIR)/install/usr/local/etc/mono/config
+	# adjust path in shell scripts
+	file $(WORK_DIR)/install/usr/local/bin/* | grep ASCII | cut -d ':' -f1 | xargs sed -i -e 's# /usr/local# /var/packages/mono/target#g'
+	# adjust path in config file
+	find $(WORK_DIR)/install/usr/local -name monodoc.dll.config | xargs sed -i -e 's#/usr/local#/var/packages/mono/target#g'

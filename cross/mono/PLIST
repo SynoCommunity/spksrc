@@ -19,7 +19,7 @@ rsc:bin/mkbundle
 bin:bin/mono
 bin:bin/mono-boehm
 rsc:bin/mono-configuration-crypto
-rsc:bin/monodis
+bin:bin/monodis
 rsc:bin/monodocer
 rsc:bin/monodocs2html
 rsc:bin/monodocs2slashdoc
