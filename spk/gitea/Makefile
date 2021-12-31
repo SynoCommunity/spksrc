@@ -1,5 +1,5 @@
 SPK_NAME = gitea
-SPK_VERS = 1.15.8
+SPK_VERS = 1.15.9
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -16,6 +16,8 @@ SPK_DEPENDS = "git"
 SERVICE_USER         = auto
 SERVICE_SETUP        = src/service-setup.sh
 STARTABLE            = yes
+WIZARDS_DIR          = src/wizard
+SERVICE_WIZARD_SHARE = wizard_gitea_dir
 
 SERVICE_PORT = 8418
 SERVICE_PORT_TITLE = Gitea (HTTP)

@@ -1,5 +1,5 @@
 PKG_NAME = gitea
-PKG_VERS = 1.15.8
+PKG_VERS = 1.15.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive/refs/tags
@@ -21,9 +21,18 @@ GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 include ../../mk/spksrc.cross-go.mk
 
-TAGS = "bindata sqlite sqlite_unlock_notify"
-ENV += TAGS=$(TAGS)
-ENV += LDFLAGS=""
+SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/target/var
+endif
+CUSTOM_PATH = -X \"code.gitea.io/gitea/modules/setting.CustomPath=$(SYNOPKG_PKGVAR)/custom\"
+CUSTOM_CONF = -X \"code.gitea.io/gitea/modules/setting.CustomConf=$(SYNOPKG_PKGVAR)/conf.ini\"
+WORK_PATH = -X \"code.gitea.io/gitea/modules/setting.AppWorkPath=$(SYNOPKG_PKGVAR)\"
+PID = -X \"code.gitea.io/gitea/modules/setting.PIDFile=$(SYNOPKG_PKGVAR)/gitea.pid\"
+
+ENV += LDFLAGS="$(CUSTOM_PATH) $(CUSTOM_CONF) $(WORK_PATH) $(PID)"
+ENV += TAGS="bindata sqlite sqlite_unlock_notify"
+ENV += GITEA_VERSION=$(PKG_VERS)
 
 gitea_compile_target:
 	cd $(GO_SRC_DIR) && env $(ENV) $(MAKE) build
