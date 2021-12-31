@@ -2,7 +2,7 @@
 GITEA="${SYNOPKG_PKGDEST}/bin/gitea"
 CONF_FILE="${SYNOPKG_PKGVAR}/conf.ini"
 ENV="HOME=${SYNOPKG_PKGVAR}"
-SERVICE_COMMAND="env ${ENV} ${GITEA} web --port 8418"
+SERVICE_COMMAND="env ${ENV} ${GITEA} web --port 8418 --pid ${PID_FILE}"
 SVC_BACKGROUND=y
 
 service_preinst ()
