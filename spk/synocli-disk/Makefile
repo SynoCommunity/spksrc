@@ -1,10 +1,12 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 3.3
-SPK_REV = 9
+SPK_VERS = 3.4
+SPK_REV = 10
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
 DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
+DEPENDS += cross/s3backer
+
 OPTIONAL_DEPENDS  = cross/dar cross/duf cross/gdu cross/tdu
 OPTIONAL_DEPENDS += cross/dua cross/dutree
 
@@ -33,9 +35,9 @@ DEPENDS += cross/dua cross/dutree
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 endif
 
-DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure, s3backer$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update dar for public key encryption and for largefile support on 32bit archs.<br/>2. Update ncdu to v1.17.<br/>3. Update e2fsprogs to v1.46.5.<br/>4. Update ddrescure to v1.26.<br/>5. Update dua to v.2.17.2.<br/>6. Update dutree to v.0.2.18."
+CHANGELOG = "1. Add s3backer."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -60,5 +62,6 @@ SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split b
 SPK_COMMANDS += bin/ddrescue bin/ddrescuelog
 SPK_COMMANDS += bin/duf bin/gdu bin/tdu
 SPK_COMMANDS += bin/dua bin/dutree
+SPK_COMMANDS += bin/s3backer
 
 include ../../mk/spksrc.spk.mk
