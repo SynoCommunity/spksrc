@@ -2,9 +2,9 @@
   "docker": {
     "services": [
       {
-        "service": "radarr",
+        "service": "sc-radarr",
         "image": "cr.hotio.dev/hotio/radarr",
-        "container_name": "radarr",
+        "container_name": "sc-radarr",
         "tag": "release-3.2.2.5080",
         "shares": [
           {
@@ -39,10 +39,10 @@
         ]
       },
       {
-        "service": "sonarr",
+        "service": "sc-sonarr",
         "image": "cr.hotio.dev/hotio/sonarr",
         "tag": "release-3.0.6.1342",
-        "container_name": "sonarr",
+        "container_name": "sc-sonarr",
         "shares": [
           {
             "host_dir": "sonarr",
@@ -76,10 +76,10 @@
         ]
       },
       {
-        "service": "bazarr",
+        "service": "sc-bazarr",
         "image": "cr.hotio.dev/hotio/bazarr",
         "tag": "release-1.0.1",
-        "container_name": "bazarr",
+        "container_name": "sc-bazarr",
         "shares": [
           {
             "host_dir": "bazarr",
