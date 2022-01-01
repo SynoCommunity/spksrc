@@ -12,7 +12,7 @@ DESCRIPTION = "Docker setup with Sonarr/Radarr/Bazarr images from <a href=\"http
 HOMEPAGE = https://hotio.dev/
 LICENSE  = GPLv3
 
-DISPLAY_NAME = arr-stack
+DISPLAY_NAME = "*arr Docker Stack"
 CHANGELOG = "First version"
 
 # ADMIN_PORT = 7878,8989,6767
@@ -21,7 +21,9 @@ ADMIN_PORT = 7879,8990,6768
 SERVICE_PORT = $(ADMIN_PORT)
 
 CONF_DIR = src/conf
-WIZARDS_DIR = src/wizard/
+DSM_UI_DIR = ui
+NO_SERVICE_SHORTCUT = yes
+WIZARDS_DIR = src/wizard
 SSS_SCRIPT = src/service-start-stop.sh
 INSTALLER_SCRIPT = src/installer.sh
 
@@ -34,5 +36,7 @@ include ../../mk/spksrc.spk.mk
 arr_stack_pre_copy:
 	rm -fr $(STAGING_DIR)
 	mkdir $(STAGING_DIR)
-	mkdir --parents $(STAGING_INSTALL_PREFIX)/var
+	mkdir -p $(STAGING_INSTALL_PREFIX)/var
 	touch $(STAGING_INSTALL_PREFIX)/var/.gitkeep
+	install -m 755 -d $(STAGING_DIR)/$(DSM_UI_DIR)/
+	install $(CURDIR)/src/$(DSM_UI_DIR)/config $(STAGING_DIR)/$(DSM_UI_DIR)

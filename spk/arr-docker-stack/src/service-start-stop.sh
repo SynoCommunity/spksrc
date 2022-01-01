@@ -6,9 +6,9 @@ case "$1" in
     stop)
         ;;
     status)
-        "$DOCKER_INSPECT" "radarr" | grep -q "\"Status\": \"running\"," || exit 1
-        "$DOCKER_INSPECT" "sonarr" | grep -q "\"Status\": \"running\"," || exit 1
-        "$DOCKER_INSPECT" "bazarr" | grep -q "\"Status\": \"running\"," || exit 1
+        "$DOCKER_INSPECT" "sc-radarr" | grep -q "\"Status\": \"running\"," || exit 1
+        "$DOCKER_INSPECT" "sc-sonarr" | grep -q "\"Status\": \"running\"," || exit 1
+        "$DOCKER_INSPECT" "sc-bazarr" | grep -q "\"Status\": \"running\"," || exit 1
         ;;
     log)
         echo ""
