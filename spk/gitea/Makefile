@@ -11,7 +11,7 @@ CHANGELOG = "First release"
 LICENSE = MIT
 
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "Git>=2"
+SPK_DEPENDS = "git>=2"
 
 SERVICE_USER         = auto
 SERVICE_SETUP        = src/service-setup.sh
