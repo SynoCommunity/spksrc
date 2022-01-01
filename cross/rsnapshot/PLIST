@@ -1,3 +1,3 @@
 rsc:bin/rsnapshot
 rsc:bin/rsnapshot-diff
-rsc:etc/rsnapshot.conf.default
+rsc:var/rsnapshot.conf.default
