@@ -7,14 +7,14 @@ ifneq ($(wildcard BROKEN),)
   @$(error $(NAME): Broken package)
 endif
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-  ifneq ($(strip $(INSTALLER_SCRIPT)),)
-    ifneq ($(BUILD_UNSUPPORTED_FILE),)
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used with DSM7+ >> $(BUILD_UNSUPPORTED_FILE))
-    endif
-    @$(error INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used for DSM7+ packages)
-  endif
-endif
+# ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+#   ifneq ($(strip $(INSTALLER_SCRIPT)),)
+#     ifneq ($(BUILD_UNSUPPORTED_FILE),)
+#       $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(NAME): INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used with DSM7+ >> $(BUILD_UNSUPPORTED_FILE))
+#     endif
+#     @$(warning INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' is deprecated please use the SERVICE_SETUP instead)
+#   endif
+# endif
 
 # Check for build for generic archs, these are not supporting `require kernel`.
 ifneq ($(REQUIRE_KERNEL),)

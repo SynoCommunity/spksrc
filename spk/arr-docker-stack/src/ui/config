@@ -1,0 +1,34 @@
+{
+  ".url": {
+    "com.synocommunity.packages.arr-docker-stack-radarr": {
+      "title": "Radarr",
+      "desc": "Docker setup with Sonarr/Radarr/Bazarr/Plex images from <a href=\"https://hotio.dev\">hotio.dev</a>. Thanks to <a href=\"https://github.com/TRaSH-/Guides-Synology-Templates\">TRaSH guides</a>",
+      "icon": "images/arr-docker-stack-{0}.png",
+      "type": "url",
+      "protocol": "http",
+      "port": "7879",
+      "url": "/",
+      "allUsers": true
+    },
+    "com.synocommunity.packages.arr-docker-stack-sonarr": {
+        "title": "Sonarr",
+        "desc": "Docker setup with Sonarr/Radarr/Bazarr/Plex images from <a href=\"https://hotio.dev\">hotio.dev</a>. Thanks to <a href=\"https://github.com/TRaSH-/Guides-Synology-Templates\">TRaSH guides</a>",
+        "icon": "images/arr-docker-stack-{0}.png",
+        "type": "url",
+        "protocol": "http",
+        "port": "8990",
+        "url": "/",
+        "allUsers": true
+      },
+      "com.synocommunity.packages.arr-docker-stack-bazarr": {
+        "title": "Bazarr",
+        "desc": "Docker setup with Sonarr/Radarr/Bazarr/Plex images from <a href=\"https://hotio.dev\">hotio.dev</a>. Thanks to <a href=\"https://github.com/TRaSH-/Guides-Synology-Templates\">TRaSH guides</a>",
+        "icon": "images/arr-docker-stack-{0}.png",
+        "type": "url",
+        "protocol": "http",
+        "port": "6768",
+        "url": "/",
+        "allUsers": true
+      }
+  }
+}
