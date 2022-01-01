@@ -111,67 +111,6 @@
             "protocol": "tcp"
           }
         ]
-      },
-      {
-        "service": "plex",
-        "image": "cr.hotio.dev/hotio/plex",
-        "tag": "release-1.25.2.5319-c43dc0277",
-        "container_name": "plex",
-        "shares": [
-          {
-            "host_dir": "plex",
-            "mount_point": "/config"
-          },
-          {
-            "host_dir": "storage/media",
-            "mount_point": "/data/media"
-          },
-          {
-            "host_dir": "storage/transcode",
-            "mount_point": "/transcode"
-          }
-        ],
-        "environment": [
-          {
-            "env_var": "PUID",
-            "env_value": "{{wizard_uid}}"
-          },
-          {
-            "env_var": "PGID",
-            "env_value": "{{wizard_gid}}"
-          },
-          {
-            "env_var": "TZ",
-            "env_value": "{{wizard_tz}}"
-          },
-          {
-            "env_var": "UMASK",
-            "env_value": "002"
-          },
-          {
-            "env_var": "PLEX_CLAIM",
-            "env_value": "{{wizard_plex_claim}}"
-          },
-          {
-            "env_var": "ADVERTISE_IP",
-            "env_value": "http://{{wizard_plex_ip}}:32400"
-          },
-          {
-            "env_var": "ALLOWED_NETWORKS",
-            "env_value": "{{wizard_allowed_networks}}"
-          },
-          {
-            "env_var": "PLEX_PASS",
-            "env_value": "{{wizard_plex_pass}}"
-          }
-        ],
-        "ports": [
-          {
-            "host_port": "32400",
-            "container_port": "32400",
-            "protocol": "tcp"
-          }
-        ]
       }
     ]
   }

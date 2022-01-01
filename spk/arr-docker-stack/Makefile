@@ -1,4 +1,4 @@
-SPK_NAME = arr-stack
+SPK_NAME = arr-docker-stack
 SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
@@ -7,7 +7,7 @@ SPK_DEPENDS = "Docker>=18.09.0-1017"
 override ARCH=
 
 MAINTAINER = publicarray
-DESCRIPTION = "Docker setup with Sonarr/Radarr/Bazarr/Plex images from <a href=\"https://hotio.dev\">hotio.dev</a>. Thanks to <a href=\"https://github.com/TRaSH-/Guides-Synology-Templates\">TRaSH guides</a>"
+DESCRIPTION = "Docker setup with Sonarr/Radarr/Bazarr images from <a href=\"https://hotio.dev\">hotio.dev</a>. Thanks to <a href=\"https://github.com/TRaSH-/Guides-Synology-Templates\">TRaSH guides</a>"
 
 HOMEPAGE = https://hotio.dev/
 LICENSE  = GPLv3
@@ -15,7 +15,7 @@ LICENSE  = GPLv3
 DISPLAY_NAME = arr-stack
 CHANGELOG = "First version"
 
-# ADMIN_PORT = 7878,8989,6767,32400
+# ADMIN_PORT = 7878,8989,6767
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = 7879,8990,6768
 SERVICE_PORT = $(ADMIN_PORT)

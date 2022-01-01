@@ -9,7 +9,6 @@ case "$1" in
         "$DOCKER_INSPECT" "radarr" | grep -q "\"Status\": \"running\"," || exit 1
         "$DOCKER_INSPECT" "sonarr" | grep -q "\"Status\": \"running\"," || exit 1
         "$DOCKER_INSPECT" "bazarr" | grep -q "\"Status\": \"running\"," || exit 1
-        "$DOCKER_INSPECT" "plex" | grep -q "\"Status\": \"running\"," || exit 1
         ;;
     log)
         echo ""
