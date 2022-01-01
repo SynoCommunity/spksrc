@@ -7,37 +7,42 @@ SPK_DEPENDS = "python310"
 
 BUILD_DEPENDS = cross/python310
 
-DEPENDS += cross/gevent
+# [gevent]
+DEPENDS += cross/libev cross/c-ares
+ENV += GEVENTSETUP_EMBED_CARES=FALSE
+ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
 # for iqvia
 DEPENDS += cross/numpy
 
-# for python-libnmap
+# [python-libnmap]
 DEPENDS += cross/nmap
 
-# for tradfri
+# [DTLSSocket] Required for postinst [tradfri]
 DEPENDS += cross/dtlssocket
 
-# for denonavr
-DEPENDS += cross/asyncstdlib
-
-# for flunearyou
+# [flunearyou]
 DEPENDS += cross/ujson
 
-# Required for PyYAML
+# [PyYAML]
 DEPENDS += cross/libyaml
 
-# Required for PyNaCl
+# [PyNaCl]
 DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
-# Required for pycares
+# [pycares]
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
 
-# Patched cross-compiled wheel
-# https://github.com/python-pillow/Pillow/issues/5799
-DEPENDS += cross/pillow
+# [Pillow]
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
