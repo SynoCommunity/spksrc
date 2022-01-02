@@ -1,6 +1,6 @@
 SPK_NAME = filebrowser
-SPK_REV = 1
 SPK_VERS = 2.20.1
+SPK_REV = 1
 SPK_ICON = src/filebrowser.png
 
 DEPENDS = cross/$(SPK_NAME)
