@@ -1,0 +1,8 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# pycryptodome==3.12.0
+# pycryptodomex==3.12.0
