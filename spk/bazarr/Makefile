@@ -18,7 +18,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
-[numpy] Fix wheel building with older compilers
+# [numpy] Fix wheel building with older compilers
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 WHEELS_CPPFLAGS = [numpy] -std=c++0x
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
