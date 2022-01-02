@@ -42,10 +42,6 @@ if [ -f "${BUILD_UNSUPPORTED_FILE}" ]; then
     if [ -f "${BUILD_ERROR_FILE}" ]; then
         # remove unsupported packages from errors:
         unsupported_packages=$(cat "${BUILD_UNSUPPORTED_FILE}" | grep -Po "\- \K.*:" | sort -u | tr '\n' '|' | sed -e 's/|$//')
-        # fix for packages with different name
-        if [ "$(echo ${unsupported_packages} | grep -ow nzbdrone)" != "" ]; then
-            unsupported_packages=$(echo "${unsupported_packages}|sonarr:")
-        fi
         cat "${BUILD_ERROR_FILE}" | grep -Pv "\- (${unsupported_packages}) " > "${BUILD_ERROR_FILE}.tmp"
         rm -f "${BUILD_ERROR_FILE}"
         mv "${BUILD_ERROR_FILE}.tmp" "${BUILD_ERROR_FILE}"

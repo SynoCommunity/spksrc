@@ -1,5 +1,5 @@
 PKG_NAME = mono
-PKG_VERS = 5.20.1.34
+PKG_VERS = 5.8.0.108
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/$(PKG_NAME)
@@ -14,8 +14,7 @@ LICENSE  = https://github.com/mono/mono/blob/master/LICENSE
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --disable-dependency-tracking
-# disable-static does not work without disable-libraries
-CONFIGURE_ARGS += --disable-static --disable-libraries 
+CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --without-mcs-docs
 
 POST_INSTALL_TARGET = mono_native_post_install

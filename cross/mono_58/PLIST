@@ -1,7 +1,6 @@
 rsc:bin/al
 rsc:bin/al2
 rsc:bin/csc
-rsc:bin/csc-dim
 rsc:bin/csi
 rsc:bin/gacutil
 rsc:bin/gacutil2
@@ -43,7 +42,6 @@ rsc:bin/peverify
 rsc:bin/resgen
 rsc:bin/resgen2
 rsc:bin/sn
-rsc:bin/vbc
 rsc:bin/wsdl
 rsc:bin/wsdl2
 rsc:etc/mono/2.0/Browsers/Compat.browser
@@ -78,6 +76,9 @@ lib:lib/libmono-profiler-aot.so.0.0.0
 lnk:lib/libmono-profiler-coverage.so
 lnk:lib/libmono-profiler-coverage.so.0
 lib:lib/libmono-profiler-coverage.so.0.0.0
+lnk:lib/libmono-profiler-iomap.so
+lnk:lib/libmono-profiler-iomap.so.0
+lib:lib/libmono-profiler-iomap.so.0.0.0
 lnk:lib/libmono-profiler-log.so
 lnk:lib/libmono-profiler-log.so.0
 lib:lib/libmono-profiler-log.so.0.0.0
@@ -85,10 +86,3 @@ lnk:lib/libmonosgen-2.0.so
 lnk:lib/libmonosgen-2.0.so.1
 lib:lib/libmonosgen-2.0.so.1.0.0
 lib:lib/libMonoSupportW.so
-lnk:lib/libmono-native.so
-lnk:lib/libmono-native.so.0
-lib:lib/libmono-native.so.0.0.0
-rsc:lib/mono/lldb/mono.py
-rsc:share/mono-2.0/mono/cil/cil-opcodes.xml
-rsc:share/mono-2.0/mono/eglib/eglib-config.h
-rsc:share/mono-2.0/mono/profiler/mono-profiler-coverage.suppression
