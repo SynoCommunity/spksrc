@@ -12,20 +12,6 @@ DEPENDS += cross/unrar
 
 SPK_DEPENDS = "python310:ffmpeg"
 
-# [numpy] gcc-4.6.4 failed with exit status 1
-# https://github.com/numpy/numpy/issues/20664
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
-include ../../mk/spksrc.common.mk
-
-# [numpy] Fix wheel building with older compilers
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-WHEELS_CPPFLAGS = [numpy] -std=c++0x
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS = [numpy] -O0
-endif
-endif
-
 MAINTAINER = smaarn
 
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
@@ -46,5 +32,19 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
+# [numpy] gcc-4.6.4 failed with exit status 1
+# https://github.com/numpy/numpy/issues/20664
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
+include ../../mk/spksrc.common.mk
+
+# [numpy] Fix wheel building with older compilers
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+WHEELS_CPPFLAGS = [numpy] -std=c++0x
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = [numpy] -O0
+endif
+endif
 
 include ../../mk/spksrc.spk.mk
