@@ -1,5 +1,5 @@
 SPK_NAME = fishnet
-# SPK_VERS must be in sync with src/requirements.txt
+# SPK_VERS must be in sync with src/requirements-pure.txt
 SPK_VERS = 1.18.1
 SPK_REV = 2
 SPK_ICON= src/fishnet.png
