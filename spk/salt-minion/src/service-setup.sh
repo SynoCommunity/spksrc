@@ -30,7 +30,7 @@ service_postinst ()
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/02_sockdir.conf.conf || echo "sock_dir: ${SYNOPKG_PKGVAR}/run/minion" > ${SYNOPKG_PKGDEST}/etc/minion.d/02_sockdir.conf
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/03_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGDEST}/etc/minion.d/03_cachedir.conf
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/04_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGDEST}/etc/minion.d/04_logging.conf
-    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/05_loglevel.conf || echo "log_level_logfile: debug" > ${SYNOPKG_PKGDEST}/etc/minion.d/05_loglevel.conf
+    test -f ${SYNOPKG_PKGDEST}/etc/minion.d/05_loglevel.conf || echo "log_level_logfile: info" > ${SYNOPKG_PKGDEST}/etc/minion.d/05_loglevel.conf
     test -f ${SYNOPKG_PKGDEST}/etc/minion.d/06_pkidir.conf || echo "pki_dir: ${SYNOPKG_PKGVAR}/pki/minion" > ${SYNOPKG_PKGDEST}/etc/minion.d/06_pkidir.conf
 
     # Populate salt master address and minion_id only if file don't already exist
