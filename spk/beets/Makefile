@@ -11,9 +11,14 @@ SPK_DEPENDS = "python310>=3.10"
 # Required for PyYAML
 DEPENDS += cross/libyaml
 
-# Patched cross-compiled wheel
-# https://github.com/python-pillow/Pillow/issues/5799
-DEPENDS += cross/pillow
+# [Pillow]
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
 MAINTAINER = ymartin59
 DESCRIPTION = "Beets is the media library management system for obsessive-compulsive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AcousticBrainz Submit, Gmusic, ReplayGain."
