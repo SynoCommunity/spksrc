@@ -80,6 +80,7 @@ install_python_wheel:
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
 			cp requirements*.txt $(STAGING_INSTALL_WHEELHOUSE) ; \
 			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
+			sed -i -e '/^#/! s/^.*egg=//g' $(STAGING_INSTALL_WHEELHOUSE)/requirements*.txt ; \
 			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		fi ; \
 		if stat -t *.whl >/dev/null 2>&1; then \

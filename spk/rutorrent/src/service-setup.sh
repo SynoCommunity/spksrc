@@ -1,12 +1,15 @@
-
 # Package
 PACKAGE="rutorrent"
 DNAME="ruTorrent"
 PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
+# Define python310 binary path
+PYTHON_DIR="/var/packages/python310/target/bin"
+# Add local bin, virtualenv along with python310 to the default PATH
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
+
 # Others
 WEB_DIR="/var/services/web"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PATH}"
 APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
@@ -18,12 +21,10 @@ GROUP_DESC="SynoCommunity's download related group"
 LEGACY_USER="rutorrent"
 LEGACY_GROUP="users"
 
-PYTHON_DIR="/var/packages/python3/target/bin"
-VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
 
 SVC_BACKGROUND=y
-PID_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.pid"
-LOG_FILE="${SYNOPKG_PKGDEST}/var/rtorrent.log"
+PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
+LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
 validate_preinst ()
@@ -97,8 +98,8 @@ service_postinst ()
     cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR}
 
     # Allow direct-user access to rtorrent configuration file
-    mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${RTORRENT_RC}
-    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGDEST}/var/.rtorrent.rc
+    mv ${SYNOPKG_PKGVAR}/.rtorrent.rc ${RTORRENT_RC}
+    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGVAR}/.rtorrent.rc
 
     # Configure open_basedir
     if [ "${APACHE_USER}" == "nobody" ]; then
@@ -156,9 +157,10 @@ service_postinst ()
 
     # Setup a virtual environment with cloudscraper
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
-    # Install the cloudscraper wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install -U cloudscraper==1.2.48
+    install_python_virtualenv
+
+    # Install the wheels (cloudscraper)
+    install_python_wheels
 
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
 
@@ -197,14 +199,14 @@ service_save ()
     fi
 
     # Save session files
-    mv ${SYNOPKG_PKGDEST}/var/.session ${TMP_DIR}/
+    mv ${SYNOPKG_PKGVAR}/.session ${TMP_DIR}/
 
     # Save rtorrent configuration file (new location)
-    if [ -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
+    if [ -L ${SYNOPKG_PKGVAR}/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
        mv ${RTORRENT_RC} ${TMP_DIR}/
     # Save rtorrent configuration file (old location -> prior to symlink)
-    elif [ ! -L ${SYNOPKG_PKGDEST}/var/.rtorrent.rc -a -f ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ]; then
-       mv ${SYNOPKG_PKGDEST}/var/.rtorrent.rc ${TMP_DIR}/rtorrent.rc
+    elif [ ! -L ${SYNOPKG_PKGVAR}/.rtorrent.rc -a -f ${SYNOPKG_PKGVAR}/.rtorrent.rc ]; then
+       mv ${SYNOPKG_PKGVAR}/.rtorrent.rc ${TMP_DIR}/rtorrent.rc
     fi
 
     # Save rutorrent share directory
@@ -249,9 +251,9 @@ service_restore ()
         sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC}
     fi
 
-    echo "Restoring rtorrent session files ${SYNOPKG_PKGDEST}/var/.session"
-    mv ${TMP_DIR}/.session ${SYNOPKG_PKGDEST}/var/
-    set_unix_permissions "${SYNOPKG_PKGDEST}/var/"
+    echo "Restoring rtorrent session files ${SYNOPKG_PKGVAR}/.session"
+    mv ${TMP_DIR}/.session ${SYNOPKG_PKGVAR}
+    set_unix_permissions "${SYNOPKG_PKGVAR}"
 
     echo "Restoring rutorrent web shared directory ${WEB_DIR}/${PACKAGE}/share"
     cp -pnr ${TMP_DIR}/share ${WEB_DIR}/${PACKAGE}/
