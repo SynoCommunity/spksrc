@@ -12,7 +12,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool
 STARTABLE = no
 DISPLAY_NAME = Mercurial
-CHANGELOG = "1. Update mercurial to 6.0<br/>2. Update ti Python 3.10"
+CHANGELOG = "1. Update mercurial to 6.0<br/>2. Update to Python 3.10"
 
 HOMEPAGE = https://www.mercurial-scm.org/
 LICENSE  = MPL1.1
