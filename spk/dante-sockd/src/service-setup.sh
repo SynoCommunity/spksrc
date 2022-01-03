@@ -29,6 +29,12 @@ validate_preinst ()
         echo "Port ${wizard_proxy_port}/tcp is in use by: $(servicetool --conf-port-conflict-check --tcp ${wizard_proxy_port} | grep -oP  'ServiceName:\s\K.*')."
         exit 1
     fi
+
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -ge 7 ] && [ ${wizard_proxy_port} -lt 1024 ]; then
+        echo "ERROR:"
+        echo "Port ${wizard_proxy_port} is privileged, try a port above 1024 instead."
+        exit 1
+    fi
 }
 
 service_postinst ()
