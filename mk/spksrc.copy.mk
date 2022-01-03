@@ -43,7 +43,7 @@ copy_msg:
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
-	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && cat $(INSTALL_PLIST) | cut -d':' -f2 | tar cpf - -T -) | \
+	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
 	  tar xpf - -C $(STAGING_DIR)
 
 post_copy_target: $(COPY_TARGET)
