@@ -8,7 +8,7 @@ BUILD_DEPENDS = cross/python310
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 SPK_DEPENDS = "python310"
 
-MAINTAINER = Dr-Bean
+MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool
 STARTABLE = no
 DISPLAY_NAME = Mercurial
