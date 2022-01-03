@@ -1,6 +1,6 @@
 SPK_NAME = nano
-SPK_VERS = 5.9
-SPK_REV = 7
+SPK_VERS = 6.0
+SPK_REV = 8
 SPK_ICON = src/nano.png
 
 DEPENDS = cross/nano
@@ -13,6 +13,8 @@ STARTABLE = no
 
 HOMEPAGE   = http://www.nano-editor.org
 LICENSE    = GPLv2
+
+SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS = bin/nano bin/rnano
 
