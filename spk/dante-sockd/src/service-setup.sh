@@ -10,7 +10,12 @@ SERVICE_COMMAND="${SOCKD} -f ${CFG_FILE} -p ${PID_FILE} -D"
 PORT_CONFIG_FILE="/var/packages/${SYNOPKG_PKGNAME}/etc/port_config"
 port=""
 
-socks_user=""
+socks_privileged_user=${EFF_USER}
+socks_unprivileged_user=${EFF_USER}
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+    socks_privileged_user=root
+    socks_unprivileged_user=nobody
+fi
 
 validate_preinst ()
 {
@@ -38,7 +43,8 @@ service_postinst ()
             -e "s|@socks_log@|${LOG_FILE}|g" \
             -e "s|@socks_auth@|${auth_method}|g" \
             -e "s|@socks_auth_group@|${auth_method_group}|g" \
-            -e "s|@socks_user@|${EFF_USER}|g" \
+            -e "s|@socks_privileged_user@|${socks_privileged_user}|g" \
+            -e "s|@socks_unprivileged_user@|${socks_unprivileged_user}|g" \
             -i ${CFG_FILE}
 
         synogroup --add ${SC_GROUP}
