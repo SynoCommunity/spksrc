@@ -10,8 +10,8 @@ SERVICE_COMMAND="${SOCKD} -f ${CFG_FILE} -p ${PID_FILE} -D"
 PORT_CONFIG_FILE="/var/packages/${SYNOPKG_PKGNAME}/var/port_config"
 port=""
 
-socks_privileged_user=${EFF_USER}
-socks_unprivileged_user=${EFF_USER}
+socks_privileged_user=${USER}
+socks_unprivileged_user=${USER}
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
     socks_privileged_user=root
     socks_unprivileged_user=nobody

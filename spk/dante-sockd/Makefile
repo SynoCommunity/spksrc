@@ -23,7 +23,7 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = @socks_port@
 SERVICE_PORT_TITLE = "TCP \(proxy server\)"
 NO_SERVICE_SHORTCUT = true
-
+SERVICE_USER = auto
 POST_STRIP_TARGET = sockd_extra_install
 
 SPK_COMMANDS = bin/socksify
