@@ -1,5 +1,5 @@
 service_postinst ()
 {
-    mkdir -p /var/packages/${SYNOPKG_PKGNAME}/target/etc/
-    echo "include /var/packages/${SYNOPKG_PKGNAME}/target/share/nano/*.nanorc" > /var/packages/${SYNOPKG_PKGNAME}/target/etc/nanorc
+    mkdir -p ${SYNOPKG_PKGDEST}/etc/
+    echo "include ${SYNOPKG_PKGDEST}/share/nano/*.nanorc" > ${SYNOPKG_PKGDEST}/etc/nanorc
 }
