@@ -122,7 +122,6 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo '  exit 1' >> $@
 	@echo 'fi' >> $@
 	@echo '' >> $@
-ifneq ($(strip $(SERVICE_USER)),)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo USER=\"sc-$(SPK_USER)\" >> $@
 	@echo EFF_USER=\"sc-$(SPK_USER)\" >> $@
@@ -132,8 +131,6 @@ else
 	@echo "PRIV_PREFIX=sc-" >> $@
 	@echo "SYNOUSER_PREFIX=svc-" >> $@
 	@echo 'if [ -n "$${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "$${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
-endif
-	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 	@echo "# Group name from UI if provided" >> $@

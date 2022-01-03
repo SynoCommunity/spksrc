@@ -7,6 +7,11 @@ SC_GROUP_DESC="Users with access to SOCKS proxy server"
 
 SERVICE_COMMAND="${SOCKD} -f ${CFG_FILE} -p ${PID_FILE} -D"
 
+PORT_CONFIG_FILE="/var/packages/${SYNOPKG_PKGNAME}/etc/port_config"
+port=""
+
+socks_user=""
+
 validate_preinst ()
 {
 	# validate whether the service port from wizard variable is not in use
@@ -21,15 +26,6 @@ validate_preinst ()
     fi
 }
 
-service_preinst ()
-{
-	# set service port from wizard variable
-    SERVICE_CONFIGURE_FILE="${SYNOPKG_PKGINST_TEMP_DIR}/app/${SYNOPKG_PKGNAME}.sc"
-    sed -e "s|@socks_port@|${wizard_proxy_port}|g" \
-        -e "s|@socks_interface@|${wizard_interface}|g" \
-        -i ${SERVICE_CONFIGURE_FILE}
-}
-
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -42,11 +38,21 @@ service_postinst ()
             -e "s|@socks_log@|${LOG_FILE}|g" \
             -e "s|@socks_auth@|${auth_method}|g" \
             -e "s|@socks_auth_group@|${auth_method_group}|g" \
+            -e "s|@socks_user@|${EFF_USER}|g" \
             -i ${CFG_FILE}
 
         synogroup --add ${SC_GROUP}
         synogroup --descset ${SC_GROUP} "${SC_GROUP_DESC}"
     fi
+
+
+    if [ -n "${wizard_proxy_port}" ]; then # new install
+        port="${wizard_proxy_port}"
+    elif [ -f "${PORT_CONFIG_FILE}" ]; then # upgrade
+        port=$(get_key_value "${PORT_CONFIG_FILE}" port)
+    fi
+    echo "port=${port}" > ${PORT_CONFIG_FILE}
+    sed -e "s/@socks_port@/${port}/g" -i "${SYNOPKG_PKGDEST}/app/${SYNOPKG_PKGNAME}.sc"
 }
 
 service_preuninst ()
