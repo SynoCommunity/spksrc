@@ -25,7 +25,9 @@ service_preinst ()
 {
 	# set service port from wizard variable
     SERVICE_CONFIGURE_FILE="${SYNOPKG_PKGINST_TEMP_DIR}/app/${SYNOPKG_PKGNAME}.sc"
-    sed -e "s|@socks_port@|${wizard_proxy_port}|g" -i ${SERVICE_CONFIGURE_FILE}
+    sed -e "s|@socks_port@|${wizard_proxy_port}|g" \
+        -e "s|@socks_interface@|${wizard_interface}|g" \
+        -i ${SERVICE_CONFIGURE_FILE}
 }
 
 service_postinst ()
@@ -35,6 +37,7 @@ service_postinst ()
         auth_method_group=$([ "${wizard_proxy_auth}" == "true" ] && echo "    socksmethod: username\n    group: ${SC_GROUP}" || echo "")
 
         sed -e "s|@socks_port@|${wizard_proxy_port}|g" \
+            -e "s|@socks_interface@|${wizard_interface}|g" \
             -e "s|@socks_block@|${wizard_proxy_block}|g" \
             -e "s|@socks_log@|${LOG_FILE}|g" \
             -e "s|@socks_auth@|${auth_method}|g" \
