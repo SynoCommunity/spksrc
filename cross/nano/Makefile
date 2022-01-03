@@ -12,6 +12,5 @@ COMMENT  = nano is a text editor for Unix-like computing systems or operating en
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
