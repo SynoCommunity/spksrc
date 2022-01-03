@@ -7,7 +7,7 @@ SC_GROUP_DESC="Users with access to SOCKS proxy server"
 
 SERVICE_COMMAND="${SOCKD} -f ${CFG_FILE} -p ${PID_FILE} -D"
 
-PORT_CONFIG_FILE="/var/packages/${SYNOPKG_PKGNAME}/etc/port_config"
+PORT_CONFIG_FILE="/var/packages/${SYNOPKG_PKGNAME}/var/port_config"
 port=""
 
 socks_privileged_user=${EFF_USER}
