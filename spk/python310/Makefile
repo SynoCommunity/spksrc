@@ -84,6 +84,8 @@ PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
 
+SPK_USR_LOCAL_LINKS = bin:bin/python3.10
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: python310_extra_install
