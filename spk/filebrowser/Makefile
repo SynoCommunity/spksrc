@@ -7,8 +7,9 @@ DEPENDS = cross/$(SPK_NAME)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = publicarray
-DESCRIPTION = Web File Browser
 DISPLAY_NAME = File Browser
+DESCRIPTION = filebrowser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. It allows the creation of multiple users and each user can have its own directory.
+HOMEPAGE = https://filebrowser.org/
 HELPURL = https://github.com/filebrowser/filebrowser/issues
 LICENSE = Apache-2.0
 CHANGELOG = "First Version"
