@@ -5,9 +5,7 @@ SPK_REV = 6
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
-# Mandatory binaries for wheel
-# setup during package install
-DEPENDS += cross/setuptools cross/pip cross/wheel
+DEPENDS += cross/pip
 
 ##
 ## All configurations below are optional and
