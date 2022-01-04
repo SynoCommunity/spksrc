@@ -22,7 +22,8 @@ CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-overwrite
 CONFIGURE_ARGS += --enable-pc-files
 CONFIGURE_ARGS += --disable-stripping
-CONFIGURE_ARGS += --disable-widec
 CONFIGURE_ARGS += --disable-home-terminfo
+# Specific to regular ncurses
+CONFIGURE_ARGS += --disable-widec
 
 include ../../mk/spksrc.cross-cc.mk
