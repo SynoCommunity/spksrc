@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.0
+PKG_VERS = 3.10.1
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -135,16 +135,16 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.3.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.3.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==60.2.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==60.2.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.15.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cffi==1.15.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cryptography==3.3.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cryptography==3.3.2"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "poetry==1.1.11"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "poetry==1.1.11"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "poetry==1.1.12"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "poetry==1.1.12"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "Cython==0.29.26"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "Cython==0.29.26"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "flit==3.6.0"

@@ -1,13 +1,11 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.0
+SPK_VERS = 3.10.1
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
 SPK_REV = 6
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
-# Mandatory binaries for wheel
-# setup during package install
-DEPENDS += cross/setuptools cross/pip cross/wheel
+DEPENDS += cross/pip
 
 ##
 ## All configurations below are optional and
@@ -73,7 +71,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Initial release"
+CHANGELOG = "1. Update to python 3.10.1"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -85,6 +83,8 @@ ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
+
+SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 
 include ../../mk/spksrc.spk.mk
 
