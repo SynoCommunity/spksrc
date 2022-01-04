@@ -1,5 +1,5 @@
 PKG_NAME = ncurses
-PKG_VERS = 6.1
+PKG_VERS = 6.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/$(PKG_NAME)
@@ -12,8 +12,17 @@ COMMENT  = The NCURSES (new curses) library is a free software emulation of curs
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --with-shared --enable-rpath --without-manpages --without-tests --enable-overwrite --disable-widec
-CONFIGURE_ARGS += --disable-home-terminfo --enable-pc-files --with-pkg-config-libdir=$(INSTALL_PREFIX)/lib/pkgconfig
-CONFIGURE_ARGS += --disable-stripping --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
+
+CONFIGURE_ARGS  = --with-shared
+CONFIGURE_ARGS += --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
+CONFIGURE_ARGS += --with-pkg-config-libdir=$(INSTALL_PREFIX)/lib/pkgconfig
+CONFIGURE_ARGS += --without-manpages
+CONFIGURE_ARGS += --without-tests
+CONFIGURE_ARGS += --enable-rpath
+CONFIGURE_ARGS += --enable-overwrite
+CONFIGURE_ARGS += --enable-pc-files
+CONFIGURE_ARGS += --disable-stripping
+CONFIGURE_ARGS += --disable-widec
+CONFIGURE_ARGS += --disable-home-terminfo
 
 include ../../mk/spksrc.cross-cc.mk
