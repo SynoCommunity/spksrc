@@ -17,6 +17,10 @@ SPK_DEPENDS = "python310"
 # deactivate
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
+# Does not build on PPC
+# https://github.com/borgbackup/borg/issues/6105
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
 
