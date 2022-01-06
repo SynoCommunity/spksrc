@@ -1,7 +1,7 @@
 # basic default wheels
 #pip==21.3.1             ==> Always install latest version (service-setup.sh:install_python_virtualenv)
-#setuptools==60.2.0      ==> Version provided by default with Python 3.10.1
-#wheel==0.37.1           ==> Version provided by default with Python 3.10.1
+setuptools==60.2.0
+wheel==0.37.1
 
 # Always use latest version available
 # certifi==2021.10.8
