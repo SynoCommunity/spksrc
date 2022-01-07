@@ -19,12 +19,8 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # newer compilers need this
 ADDITIONAL_CPPFLAGS = -std=c11
-endif
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# newer compilers need this
-ADDITIONAL_CPPFLAGS = -std=c11
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# fixes build for arm64
+# and arm64 for DSM 6 too
 ADDITIONAL_CPPFLAGS = -std=c11
 endif
 
