@@ -14,7 +14,9 @@ lnk:bin/stream
 rsc:etc/ImageMagick-7/
 rsc:lib/ImageMagick-7.0.11/config-Q16HDRI/configure.xml
 lib:lib/ImageMagick-7.0.11/modules-Q16HDRI/coders/*.so
+rsc:lib/ImageMagick-7.0.11/modules-Q16HDRI/coders/*.la
 lib:lib/ImageMagick-7.0.11/modules-Q16HDRI/filters/*.so
+rsc:lib/ImageMagick-7.0.11/modules-Q16HDRI/filters/*.la
 lnk:lib/libMagickCore-7.Q16HDRI.so
 lnk:lib/libMagickCore-7.Q16HDRI.so.10
 lib:lib/libMagickCore-7.Q16HDRI.so.10.0.0
