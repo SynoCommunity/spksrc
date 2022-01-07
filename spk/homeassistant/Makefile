@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = 2021.9.7
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/${SPK_NAME}.png
 
 SPK_DEPENDS = "python310"

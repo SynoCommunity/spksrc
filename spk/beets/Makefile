@@ -1,6 +1,6 @@
 SPK_NAME = beets
 SPK_VERS = 1.6.0
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/beets.png
 
 BUILD_DEPENDS = cross/python310

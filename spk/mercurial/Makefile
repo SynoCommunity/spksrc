@@ -1,6 +1,6 @@
 SPK_NAME = mercurial
 SPK_VERS = 6.0
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/mercurial.png
 
 BUILD_DEPENDS = cross/python310
