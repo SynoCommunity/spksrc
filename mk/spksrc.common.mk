@@ -35,7 +35,7 @@ endif
 # BROKEN: https://github.com/pypa/pip/issues/1884
 # Current implementation is a work-around for the
 # lack of proper source download support from pip
-PIP_DOWNLOAD_ARGS = download --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --dest $(BASE_DISTRIB_DIR) --no-build-isolation
+PIP_DOWNLOAD_ARGS = download --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --dest $(BASE_DISTRIB_DIR) --no-build-isolation --exists-action w
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk

@@ -35,6 +35,7 @@ else
 $(POST_WHEEL_TARGET): $(WHEEL_TARGET)
 endif
 
+download_wheel: SHELL:=/bin/bash
 download_wheel:
 	@if [ -n "$(WHEELS)" ] ; then \
 		for wheel in $(WHEELS) ; \
@@ -45,19 +46,32 @@ download_wheel:
 				# xargs -n 1 $(PIP_HOST) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
 				while IFS= read -r requirement ; \
 				do \
-					query="curl -s https://pypi.org/pypi/$${requirement%%=*}/json" ; \
-					query+=" | jq -r '.releases[][]" ; \
-					query+=" | select(.packagetype==\"sdist\")" ; \
-					query+=" | select((.filename|test(\"-$${requirement##*=}.tar.gz\")) or (.filename|test(\"-$${requirement##*=}.zip\"))) | .url'" ; \
-					localFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
-					if [ "$${localFile}" = "" ]; then \
-						echo "ERROR: Invalid package name [$${requirement%%=*}]" ; \
-					elif [ -s $(DISTRIB_DIR)/$${localFile} ]; then \
-						echo "INFO: File already exists [$${localFile}]" ; \
+					if [ "$$(grep -s egg <<< $${requirement})" ] ; then \
+						name=$$(echo $${requirement#*egg=} | cut -f1 -d=) ; \
+						url=$${requirement} ; \
 					else \
-						echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
-						wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
-						mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
+						name=$${requirement%%[<>=]=*} ; \
+						url="" ; \
+					fi ; \
+					version=$${requirement#*[<>=]=} ; \
+					$(MSG) pip download [$${name}], version [$${version}]$$([ "$${url}" ] && echo ", URL: [$${url}] ") ; \
+					if [ "$$(grep -s egg <<< $${requirement})" ] ; then \
+						$(PIP) $(PIP_DOWNLOAD_ARGS) --verbose $${requirement} ; \
+					else \
+						query="curl -s https://pypi.org/pypi/$${requirement%%=*}/json" ; \
+						query+=" | jq -r '.releases[][]" ; \
+						query+=" | select(.packagetype==\"sdist\")" ; \
+						query+=" | select((.filename|test(\"-$${requirement##*=}.tar.gz\")) or (.filename|test(\"-$${requirement##*=}.zip\"))) | .url'" ; \
+						localFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
+						if [ "$${localFile}" = "" ]; then \
+							echo "ERROR: Invalid package name [$${requirement%%=*}]" ; \
+						elif [ -s $(DISTRIB_DIR)/$${localFile} ]; then \
+							echo "INFO: File already exists [$${localFile}]" ; \
+						else \
+							echo "wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
+							wget --secure-protocol=TLSv1_2 -nv -O $(DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
+							mv $(DISTRIB_DIR)/$${localFile}.part $(DISTRIB_DIR)/$${localFile} ; \
+						fi ; \
 					fi ; \
 				done < <(grep -v  -e "^\#" -e "^\$$" $$wheel) || true ; \
 			fi ; \
@@ -121,15 +135,21 @@ ifneq ($(strip $(WHEELS)),)
 	   while IFS= read -r requirement ; do \
 	      wheel=$${requirement#*:} ; \
 	      file=$$(basename $${requirement%%:*}) ; \
+	      version=$${wheel#*[<>=]=} ; \
 	      [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
-	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$${wheel#*egg=} || name=$${wheel%%[<>=]=*} ; \
+	      if [ "$$(grep -s egg <<< $${wheel})" ] ; then \
+	              name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
+	              wheel="$${name}==$${version}" ; \
+	      else \
+	              name=$${wheel%%[<>=]=*} ; \
+	      fi ; \
 	      options=($$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      [ "$${options}" ] && global_option=$$(printf "\x2D\x2Dglobal-option=%s " "$${options[@]}") || global_option="" ; \
 	      localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	      $(MSG) [$${name}] $$([ "$${localCFLAGS[@]}" ] && echo "CFLAGS=$${localCFLAGS[@]} ")$$([ "$${localLDFLAGS[@]}" ] && echo "LDFLAGS=$${localLDFLAGS[@]} ")$$([ "$${localCPPFLAGS[@]}" ] && echo "CPPFLAGS=$${localCPPFLAGS[@]} ")$$([ "$${localCXXFLAGS[@]}" ] && echo "CXXFLAGS=$${localCXXFLAGS[@]} ")$$([ "$${abi3}" ] && echo "$${abi3} ")"$${global_option}" ; \
+	      $(MSG) pip wheel [$${name}], version [$${version}] $$([ "$${localCFLAGS[@]}" ] && echo "CFLAGS=$${localCFLAGS[@]} ")$$([ "$${localLDFLAGS[@]}" ] && echo "LDFLAGS=$${localLDFLAGS[@]} ")$$([ "$${localCPPFLAGS[@]}" ] && echo "CPPFLAGS=$${localCPPFLAGS[@]} ")$$([ "$${localCXXFLAGS[@]}" ] && echo "CXXFLAGS=$${localCXXFLAGS[@]} ")$$([ "$${abi3}" ] && echo "$${abi3} ")"$${global_option}" ; \
 	      $(RUN) \
 	         _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	         CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
