@@ -1,14 +1,14 @@
 SPK_NAME = imagemagick
 SPK_VERS = 7.0.11
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/imagemagick.png
 
-DEPENDS = cross/$(SPK_NAME) cross/jpegoptim
+DEPENDS = cross/imagemagick cross/jpegoptim
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images. This package includes jpegoptim, a utility to optimize/compress JPEG files, that is not part of imagemagick.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update to ImageMagick 7.0.11-6.<br/>2. Add jpegoptim, a jpeg compression tool."
+CHANGELOG = "1. Update to ImageMagick 7.0.11-14.<br/>2. Add jemalloc memory allocation library.<br/>3. Add webp image format for ARM64 packages."
 
 STARTABLE = no
 

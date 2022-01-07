@@ -1,4 +1,2 @@
-bin:bin/jemalloc.sh
-bin:bin/pprof
 lnk:lib/libjemalloc.so
-lib:lib/libjemalloc.so.1
+lib:lib/libjemalloc.so.2

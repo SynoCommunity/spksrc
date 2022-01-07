@@ -15,6 +15,12 @@ LICENSE  = https://github.com/webmproject/libwebp/blob/master/COPYING
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libwebp_pre_configure
 
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+# fixes build for arm64
+ADDITIONAL_CPPFLAGS = -std=c11
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libwebp_pre_configure
