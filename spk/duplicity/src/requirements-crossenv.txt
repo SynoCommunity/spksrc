@@ -25,7 +25,11 @@
 ## that the base and backend requirements are updated separately and
 ## the results are merged together.
 
-git+https://gitlab.com/duplicity/duplicity.git@rel.0.8.21#egg=duplicity==0.8.21
+# gitlab source fails to generate $version
+# using launchpad source instead
+# ref: https://gitlab.com/duplicity/duplicity/-/issues/109
+#git+https://gitlab.com/duplicity/duplicity.git@rel.0.8.21#egg=duplicity==0.8.21
+https://launchpad.net/duplicity/0.8-series/0.8.21/+download/duplicity-0.8.21.tar.gz#egg=duplicity==0.8.21
 
 bcrypt==3.2.0
 cffi==1.15.0
