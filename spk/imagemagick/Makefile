@@ -15,9 +15,18 @@ STARTABLE = no
 HOMEPAGE = https://www.imagemagick.org/
 LICENSE  = Apache 2.0
 
+
+POST_STRIP_TARGET = imagemagick_extra_install
+
 SPK_COMMANDS  = bin/magick bin/magick-script bin/animate bin/compare bin/composite bin/conjure
 SPK_COMMANDS += bin/convert bin/display bin/identify bin/import bin/mogrify bin/montage bin/stream
 # additional tools:
 SPK_COMMANDS += bin/jpegoptim
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: imagemagick_extra_install
+# install type files for included fonts
+imagemagick_extra_install:
+	@install -m 644 src/type-windows.xml $(STAGING_DIR)/etc/ImageMagick-7/
+	@install -m 644 src/type-urw-base35.xml $(STAGING_DIR)/etc/ImageMagick-7/
