@@ -14,6 +14,7 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 
 PRE_CONFIGURE_TARGET = libnuma_pre_configure
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
 

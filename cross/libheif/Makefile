@@ -16,5 +16,6 @@ LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-examples --disable-go
+ADDITIONAL_CXXFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

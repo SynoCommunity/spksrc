@@ -9,9 +9,10 @@ PKG_DIR = $(PKG_NAME)-RELEASE.$(PKG_VERS)
 DEPENDS = cross/libjpeg
 
 HOMEPAGE = https://github.com/tjko/jpegoptim
-COMMENT = utility to optimize/compress JPEG files 
+COMMENT = utility to optimize/compress JPEG files.
 LICENSE = GPLv2
 
 GNU_CONFIGURE = 1
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

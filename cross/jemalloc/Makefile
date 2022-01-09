@@ -17,5 +17,6 @@ LICENSE  = https://github.com/jemalloc/jemalloc/blob/dev/COPYING
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-doc --disable-static
 CONFIGURE_ARGS += je_cv_static_page_shift=12
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

@@ -17,4 +17,6 @@ GNU_CONFIGURE = 1
 # Disable build of applications, build library only
 CONFIGURE_ARGS = --disable-dec265 --disable-sherlock265
 
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk

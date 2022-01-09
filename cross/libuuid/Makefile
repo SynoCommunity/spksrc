@@ -18,4 +18,7 @@ CONFIGURE_ARGS  = --without-ncurses --without-python
 # We use libuuid only
 CONFIGURE_ARGS += --disable-all-programs --enable-libuuid
 
+ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk

@@ -43,4 +43,6 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += CFLAGS=-lrt
 endif
 
+ADDITIONAL_CFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk
