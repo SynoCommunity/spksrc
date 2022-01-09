@@ -64,6 +64,8 @@ DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities
 STARTABLE = no
 CHANGELOG = "1. Add jupp editor."
 
+SERVICE_SETUP = src/service-setup.sh
+
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
 
