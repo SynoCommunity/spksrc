@@ -15,7 +15,6 @@ STARTABLE = no
 HOMEPAGE = https://www.imagemagick.org/
 LICENSE  = Apache 2.0
 
-
 POST_STRIP_TARGET = imagemagick_extra_install
 
 SPK_COMMANDS  = bin/magick bin/magick-script bin/animate bin/compare bin/composite bin/conjure
@@ -26,7 +25,11 @@ SPK_COMMANDS += bin/jpegoptim
 include ../../mk/spksrc.spk.mk
 
 .PHONY: imagemagick_extra_install
-# install type files for included fonts
 imagemagick_extra_install:
+	@$(MSG) Install type files for included fonts
 	@install -m 644 src/type-windows.xml $(STAGING_DIR)/etc/ImageMagick-7/
 	@install -m 644 src/type-urw-base35.xml $(STAGING_DIR)/etc/ImageMagick-7/
+	@$(MSG) Adjust included libtool files
+	@for la_file in $(wildcard $(STAGING_DIR)/lib/ImageMagick-7.1.0/modules-Q16HDRI/*/*.la) ; do \
+	  sed -i -e 's#$(INSTALL_DIR)##g' $${la_file} ; \
+	done
