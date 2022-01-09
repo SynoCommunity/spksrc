@@ -1,34 +1,11 @@
-## To update this file:
-## --------------------
-## cd ./spksrc/cross/duplicity
-## download current package:
-##   make digests (or make download)
-## extract requirements.txt:
-##   tar -ztvf ../../distrib/duplicity.{PKG_VERS}.tar.gz --no-anchored requirements.txt
-## copy and rename requirements.txt:
-##   cp duplicity-{PKG_VERS}/requirements.txt ./spksrc/spk/duplicity/src/requirements.original.txt
-## create update requirements file for package:
-##   cd ./spksrc/spk/duplicity/src
-##   /spksrc/native/python38/work-native/install/usr/local/bin/python3 -m venv venv
-##   . venv/bin/activate
-##   pip install --upgrade pip
-### make some modification in requirements.original.txt
-### - remove testing dependencies
-### - comment out packages included as cross compiled wheels
-### - comment out unsupported dependencies
-##   pip install -r requirements.original.txt
-##   pip freeze > requirements.txt
-##   deactivate
-## --------------------
-
-## This content is generated following the instructions above, except
-## that the base and backend requirements are updated separately and
-## the results are merged together.
+# pypi source fails as versions either YANKED or uses -postX tag
+#duplicity==0.8.21
 
 # gitlab source fails to generate $version
-# using launchpad source instead
 # ref: https://gitlab.com/duplicity/duplicity/-/issues/109
 #git+https://gitlab.com/duplicity/duplicity.git@rel.0.8.21#egg=duplicity==0.8.21
+
+# Using launchpad source instead as functional
 https://launchpad.net/duplicity/0.8-series/0.8.21/+download/duplicity-0.8.21.tar.gz#egg=duplicity==0.8.21
 
 bcrypt==3.2.0

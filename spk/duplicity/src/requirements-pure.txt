@@ -1,3 +1,4 @@
+## --------------------
 ## To update this file:
 ## --------------------
 ## cd ./spksrc/cross/duplicity
@@ -17,14 +18,13 @@
 ### - comment out packages included as cross compiled wheels
 ### - comment out unsupported dependencies
 ##   pip install -r requirements.original.txt
-##   pip freeze > requirements.txt
+##   pip freeze > requirements-pure.txt
 ##   deactivate
 ## --------------------
-
 ## This content is generated following the instructions above, except
 ## that the base and backend requirements are updated separately and
 ## the results are merged together.
-
+## --------------------
 
 args==0.1.0
 arrow==1.2.1
