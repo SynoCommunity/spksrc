@@ -10,5 +10,5 @@ rsc:bin/rdoc
 rsc:bin/ri
 rsc:bin/ruby
 rsc:bin/typeprof
-rsc:lib/ruby/3.0.0
+rsc:lib/ruby/3.1.0
 rsc:lib/ruby/gems
