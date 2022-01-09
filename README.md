@@ -39,10 +39,18 @@ If you can't find an answer, or if you want to open a package request, read [CON
 ```bash
 cd spksrc # Go to the cloned repository's root folder.
 
-# If running on Linux:
+
+# If running on Linux using Docker:
 docker run -it -v $(pwd):/spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
+# If running on Linux using PodMan
+# Some distributions (Fedora, ) use podman instead of docker as Fedora. Eventhough you run docker it uses podman underneath
+docker run -it -v $(pwd):/spksrc:Z ghcr.io/synocommunity/spksrc /bin/bash
+# or
+podman run -it --rm --name spksrc --userns keep-id -v "$PWD":/spksrc ghcr.io/synocommunity/spksrc
+
 # If running on macOS:
+
 docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
@@ -66,8 +74,7 @@ lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake bc bis
 ```
 lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python2"
 lxc exec spksrc -- /bin/bash -c "pip2 install virtualenv httpie"
-```
-6. Install `python3` wheels:
+c6. Install `python3` wheels:
 ```
 lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python3"
 lxc exec spksrc -- /bin/bash -c "pip3 install virtualenv httpie"
