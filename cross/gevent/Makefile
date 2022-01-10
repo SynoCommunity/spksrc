@@ -14,6 +14,4 @@ LICENSE  = MIT
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
 ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
-ENV += EMBED=false LIBEV_EMBED=false CARES_EMBED=false 
-
 include ../../mk/spksrc.python-wheel.mk
