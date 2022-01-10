@@ -6,8 +6,9 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+BUILD_DEPENDS = native/$(PKG_NAME)
 DEPENDS  = cross/zlib cross/openssl cross/sqlite cross/readline cross/ncursesw cross/bzip2
-DEPENDS += cross/berkeleydb-5.3 native/$(PKG_NAME)
+DEPENDS += cross/berkeleydb-5.3
 
 HOMEPAGE = http://www.python.org
 COMMENT  = Python Programming Language
