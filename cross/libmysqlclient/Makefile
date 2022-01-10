@@ -7,7 +7,7 @@ PKG_DIST_NAME = $(DIST_NAME).$(PKG_EXT)
 PKG_DIST_SITE = https://cdn.mysql.com/archives/$(PKG_REAL_NAME)
 PKG_DIR = $(DIST_NAME)
 
-DEPENDS = native/libmysqlclient
+DEPENDS = native/libmysqlclient cross/openssl cross/zlib
 
 HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
@@ -28,6 +28,18 @@ CMAKE_ARGS += -DWITH_EMBEDDED_SERVER=FALSE
 CMAKE_ARGS += -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
 # Fix full lib version:
 CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
+
+# WITH_SSL=[yes|bundled|system|<path/to/custom/installation>]
+# Not compatible with OpenSSL 1.1
+# Requires updating to mysql-connector-c++ version 8.x
+#DEPENDS += cross/openssl
+#CMAKE_ARGS += -DWITH_SSL=system
+DEPENDS += cross/zlib
+CMAKE_ARGS += -DWITH_ZLIB=system
+DEPENDS += cross/libevent
+CMAKE_ARGS += -DWITH_LIBEVENT=system
+DEPENDS += cross/lz4
+CMAKE_ARGS += -DWITH_LZ4=system
 
 # Use gcc builtin atomic functions for ppc architectures
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),)
