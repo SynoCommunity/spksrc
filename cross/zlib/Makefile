@@ -11,6 +11,4 @@ HOMEPAGE = https://zlib.net/
 COMMENT  = A Massively Spiffy Yet Delicately Unobtrusive Compression Library.
 LICENSE  = zlib-license
 
-ADDITIONAL_CFLAGS = -O
-
 include ../../mk/spksrc.cross-cc.mk

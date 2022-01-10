@@ -14,6 +14,5 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-docs --enable-iconv
-ADDITIONAL_CPPFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
