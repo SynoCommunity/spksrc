@@ -8,7 +8,6 @@ PKG_DIST_SITE = https://cdn.mysql.com/archives/$(PKG_REAL_NAME)
 PKG_DIR = $(DIST_NAME)
 
 BUILD_DEPENDS = native/libmysqlclient
-DEPENDS = cross/openssl cross/zlib
 
 HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
