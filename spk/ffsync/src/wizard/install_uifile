@@ -1,5 +1,5 @@
 [{
-    "step_title": "Firefox Sync Server 1.5 database configuration",
+    "step_title": "Sync Server database configuration",
     "items": [{
         "type": "password",
         "desc": "Enter your MySQL root password",
@@ -22,7 +22,7 @@
         "desc": "Provide the client-visible URL. The URL to configure on your device is:<br/><br><b>Public URL</b>/token/1.0/sync/1.5<br/><br>Note: Configure a reverse proxy for SSL support",
         "subitems": [{
             "key": "wizard_ffsync_public_url",
-            "desc": "Public URL (http://diskstation:8132/ or https://myhostname/)"
+            "desc": "Public URL (http://diskstation:8192/ or https://myhostname/)"
         }]
     }]
 }]
