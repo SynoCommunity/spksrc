@@ -1,5 +1,5 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.18.5
+SPK_VERS = 1.18.6
 SPK_REV = 23
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Update syncthing to v1.18.5.  Add wizard page to preconfigure credentials for the Web GUI.  Integrate with the certificate management UI in Control Panel."
+CHANGELOG = "Update syncthing to v1.18.6.  Add wizard page to preconfigure credentials for the Web GUI.  Integrate with the certificate management UI in Control Panel."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
