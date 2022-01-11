@@ -4,5 +4,6 @@
 service_postinst ()
 {
     # Sync ca certificates
-    ${SYNOPKG_PKGDEST}/bin/cert-sync /etc/ssl/certs/ca-certificates.crt
+    curl -Lko ${SYNOPKG_PKGDEST}/ca-certificates.crt https://curl.se/ca/cacert.pem
+    ${SYNOPKG_PKGDEST}/bin/cert-sync ${SYNOPKG_PKGDEST}/ca-certificates.crt
 }
