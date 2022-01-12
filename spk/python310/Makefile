@@ -47,7 +47,7 @@ DEPENDS += cross/pip
 # ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
 # [mysqlclient]
-DEPENDS += cross/libmysqlclient
+DEPENDS += cross/libmysqlclient cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
