@@ -7,7 +7,7 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
-CHANGELOG = "Update Node.js to v16.13.2 and fix runtime for models with ARMv7 CPU. This a security update addressing CVE-2021-44531, CVE-2021-44532, CVE-2021-44533 and CVE-2022-21824."
+CHANGELOG = "Update Node.js to v16.13.2 and fix runtime for models with ARMv7 CPU. This security update is addressing CVE-2021-44531, CVE-2021-44532, CVE-2021-44533 and CVE-2022-21824."
 DISPLAY_NAME = Node.js® v16
 
 HOMEPAGE = https://nodejs.org
