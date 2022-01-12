@@ -113,16 +113,6 @@ ifneq ($(strip $(SPK_ICON)),)
 include ../../mk/spksrc.icon.mk
 endif
 
-# exclude unsupported archs from SPK_ARCH (for generic archs this is a list).
-SPK_ARCH := $(filter-out $(UNSUPPORTED_ARCHS), $(SPK_ARCH))
-ifeq ($(strip $(SPK_ARCH)),)
-  # packages without arch are invalid.
-  ifneq (,$(BUILD_UNSUPPORTED_FILE))
-    $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)' is not a supported architecture >> $(BUILD_UNSUPPORTED_FILE))
-  endif
-  @$(error Arch '$(ARCH)' is not a supported architecture)
-endif
-
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
