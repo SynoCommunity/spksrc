@@ -12,6 +12,7 @@ COMMENT  = NUMA stands for Non-Uniform Memory Access.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+ADDITIONAL_CFLAGS = -O
 
 PRE_CONFIGURE_TARGET = libnuma_pre_configure
 

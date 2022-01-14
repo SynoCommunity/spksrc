@@ -16,4 +16,6 @@ GNU_CONFIGURE = 1
 # TODO check "getrandom" syscall availability for each arch/DSM versions
 CONFIGURE_ARGS = CFLAGS=-DXML_POOR_ENTROPY
 
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk
