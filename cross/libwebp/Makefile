@@ -15,6 +15,18 @@ LICENSE  = https://github.com/webmproject/libwebp/blob/master/COPYING
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libwebp_pre_configure
 
+ADDITIONAL_CPPFLAGS = -O
+ADDITIONAL_CFLAGS = -O
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# newer compilers need this
+ADDITIONAL_CPPFLAGS += -std=c11
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+# and arm64 for DSM 6 too
+ADDITIONAL_CPPFLAGS += -std=c11
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libwebp_pre_configure

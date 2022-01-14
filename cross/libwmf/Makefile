@@ -13,5 +13,6 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-freetype=$(STAGING_INSTALL_PREFIX)
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
