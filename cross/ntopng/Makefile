@@ -53,6 +53,10 @@ CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
 CONFIGURE_ARGS += --with-ndpi-static-lib=$(STAGING_INSTALL_PREFIX)/lib
 
+# May be required as mysql-connector-c include
+# files are now located under include/mysql
+# ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/mysql
+
 # let ./configure find mysql_config (it is a script and works for cross compile)
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
 ENV += DESTDIR=$(INSTALL_DIR)
