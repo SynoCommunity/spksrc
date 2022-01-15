@@ -27,3 +27,10 @@ CONFIGURE_ARGS += --disable-home-terminfo
 CONFIGURE_ARGS += --disable-widec
 
 include ../../mk/spksrc.cross-cc.mk
+
+# Known issues:
+#   1) PKG_CONFIG_LIBDIR needs to be relative to DESTDIR (ref.: export below)
+#   2) PKG_CONFIG_LIBDIR not considered without --with-pkg-config-libdir
+#   3) PKG_CONFIG_LIBDIR overrides --with-pkg-config-libdir
+#   4) --with-pkg-config-libdir value not important as overriden by PKG_CONFIG_LIBDIR
+export PKG_CONFIG_LIBDIR=$(INSTALL_PREFIX)/lib/pkgconfig
