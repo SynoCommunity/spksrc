@@ -12,6 +12,7 @@ COMMENT  = FreeType is a freely available software library to render fonts.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --enable-freetype-config
 ADDITIONAL_CPPFLAGS = -O
 
-include ../../mk/spksrc.cross-meson.mk
+include ../../mk/spksrc.cross-cc.mk
