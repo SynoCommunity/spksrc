@@ -36,8 +36,9 @@
 #  MYSQLCLIENT_LDFLAGS
 mysqlclient==2.1.0
 
-# Require: WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
-# Pillow==8.4.0
+# Require --global-options arguments
+#  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
+Pillow==9.0.0
 
 # numpy:
 #   - Require Cython in cross/python310 crossenv
