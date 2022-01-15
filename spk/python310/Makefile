@@ -29,13 +29,13 @@ DEPENDS += cross/pip
 # ENV += SODIUM_INSTALL=system
 
 # [Pillow]
-# DEPENDS += cross/freetype cross/libjpeg cross/zlib
-# WHEELS_BUILD_ARGS += [Pillow]
-# WHEELS_BUILD_ARGS += build_ext
-# WHEELS_BUILD_ARGS += --disable-platform-guessing
-# WHEELS_BUILD_ARGS += --enable-freetype
-# WHEELS_BUILD_ARGS += --enable-jpeg
-# WHEELS_BUILD_ARGS += --enable-zlib
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
 # [pycares]
 # DEPENDS += cross/c-ares
@@ -48,7 +48,7 @@ DEPENDS += cross/pip
 
 # [mysqlclient]
 DEPENDS += cross/libmysqlclient cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 include ../../mk/spksrc.common.mk

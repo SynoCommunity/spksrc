@@ -27,6 +27,8 @@ CMAKE_ARGS += -DWITH_EMBEDDED_SERVER=FALSE
 CMAKE_ARGS += -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
 # Fix full lib version:
 CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
+# Fix for mariadb connector
+CMAKE_ARGS += -DINSTALL_INCLUDEDIR=include/mysql
 
 # WITH_SSL=[yes|bundled|system|<path/to/custom/installation>]
 # Not compatible with OpenSSL 1.1
@@ -35,10 +37,6 @@ CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
 #CMAKE_ARGS += -DWITH_SSL=system
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DWITH_ZLIB=system
-DEPENDS += cross/libevent
-CMAKE_ARGS += -DWITH_LIBEVENT=system
-DEPENDS += cross/lz4
-CMAKE_ARGS += -DWITH_LZ4=system
 
 # Use gcc builtin atomic functions for ppc architectures
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),)

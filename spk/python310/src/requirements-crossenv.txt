@@ -31,7 +31,9 @@
 # SQLAlchemy==1.4.29
 # zope.interface==5.4.0
 
-# Require: MYSQLCLIENT_CFLAGS and MYSQLCLIENT_LDFLAGS env variables
+# Require environment variables
+#  MYSQLCLIENT_CFLAGS
+#  MYSQLCLIENT_LDFLAGS
 mysqlclient==2.1.0
 
 # Require: WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
