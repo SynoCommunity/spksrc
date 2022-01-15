@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
-DEPENDS += cross/libmaxminddb cross/sqlite cross/libmysqlclient
+DEPENDS += cross/libmaxminddb cross/sqlite cross/mysql-connector-c
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 
