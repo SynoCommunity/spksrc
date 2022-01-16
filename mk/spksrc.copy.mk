@@ -68,15 +68,11 @@ endif
 
 $(INSTALL_PLIST):
 	@(\
-	  for depend in $(DEPENDS) ; \
-	  do                          \
+	  for depend in $(DEPENDS) ; do \
 	    $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$${depend} cat_PLIST ; \
 	  done ; \
-	  if [ -f PLIST ] ; \
-	  then \
+	  if [ -s PLIST ] ; then \
 	    cat PLIST ; \
-	  else \
-	    $(MSG) "No PLIST for $(NAME)" >&2; \
 	  fi \
 	) | $(PLIST_TRANSFORM) | sort -u > $@
 
