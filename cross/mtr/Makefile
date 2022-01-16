@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/traviscross/mtr/archive/
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/ncurses 
+DEPENDS = cross/ncursesw
 
 OPTIONAL_DEPENDS = cross/libcap
 include ../../mk/spksrc.archs.mk
