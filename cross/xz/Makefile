@@ -13,5 +13,6 @@ LICENSE  = various
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-scripts
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

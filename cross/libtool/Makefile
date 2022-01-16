@@ -12,5 +12,6 @@ COMMENT  = GNU Libtool is a generic library support script that hides the comple
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
