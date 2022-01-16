@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = otp-OTP-$(PKG_VERS)
 
 BUILD_DEPENDS = native/$(PKG_NAME)
-DEPENDS = cross/ncurses cross/openssl
+DEPENDS = cross/ncursesw cross/openssl
 
 HOMEPAGE = https://www.erlang.org
 COMMENT  = Erlang is a programming language used to build massively scalable soft real-time systems with requirements on high availability.
@@ -27,7 +27,6 @@ CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
 CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
-
 include ../../mk/spksrc.archs.mk
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
@@ -41,7 +40,6 @@ CONFIGURE_ARGS += --build=x86_64-pc-linux
 else
 CONFIGURE_ARGS += --build=i686-pc-linux
 endif
-
 
 include ../../mk/spksrc.cross-cc.mk
 
