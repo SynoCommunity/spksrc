@@ -1,13 +1,13 @@
 PKG_NAME = libjpeg
-PKG_VERS = 09e
+PKG_VERS = 9e
 PKG_EXT = tar.gz
 PKG_DIST_NAME = jpegsrc.v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://jpegclub.org/reference/wp-content/uploads/2022/01
-PKG_DIR = jpeg-$(subst 0,,$(PKG_VERS))
+PKG_DIST_SITE = https://www.ijg.org/files
+PKG_DIR = jpeg-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = https://jpegclub.org/reference/reference-sources/
+HOMEPAGE = https://www.ijg.org/
 COMMENT  = JPEG library
 LICENSE  = Custom BSD-like (free software)
 
