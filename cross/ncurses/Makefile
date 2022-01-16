@@ -5,6 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+$(error cross/ncurses is not supported anymore. Please use cross/ncursesw)
+
 DEPENDS =
 
 HOMEPAGE = https://invisible-island.net/ncurses
