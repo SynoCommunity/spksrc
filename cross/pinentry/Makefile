@@ -9,7 +9,7 @@ HOMEPAGE = https://www.gnupg.org/related_software/pinentry/
 COMMENT  = pinentry is a small collection of dialog programs that allow GnuPG to read passphrases and PIN numbers in a secure manner.
 LICENSE  = LGPLv2+
 
-DEPENDS = cross/libassuan cross/libgpg-error cross/ncurses
+DEPENDS = cross/ncursesw cross/libassuan cross/libgpg-error
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-pinentry-curses
