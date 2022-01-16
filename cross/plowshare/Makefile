@@ -2,25 +2,32 @@ PKG_NAME = plowshare
 PKG_VERS = 2.1.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mcrapet/$(PKG_NAME)/archive
+PKG_DIST_SITE = https://github.com/mcrapet/plowshare/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS =
+OPTIONAL_DEPENDS = cross/bash
 
 HOMEPAGE = https://github.com/mcrapet/plowshare
 COMMENT  = Command-line tool and engine for managing sharing websites 
 LICENSE  = GPLv3
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = plowshare_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, $(TCVERSION), 6.0),1)
+# install and patch for bash for DSM <= 5.x
+POST_INSTALL_TARGET = plowshare_post_install
+DEPENDS += cross/bash
+endif
 
-.PHONY: myInstall
-myInstall:
+include ../../mk/spksrc.install-resources.mk
+
+.PHONY: plowshare_install
+plowshare_install:
 	$(RUN) $(MAKE) install PREFIX=$(INSTALL_PREFIX) DESTDIR=$(INSTALL_DIR)
-	sed -i "s|^#!/usr/bin/env bash|#!/usr/bin/env $(INSTALL_PREFIX)/bin/bash|g" $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/plowshare/*.sh
-	sed -i "s|img2txt|$(INSTALL_PREFIX)/bin/img2txt|g" $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/plowshare/core.sh
+	sed -i "s|img2txt|$(INSTALL_PREFIX)/bin/img2txt|g" $(STAGING_INSTALL_PREFIX)/share/plowshare/core.sh
 
+.PHONY: plowshare_post_install
+plowshare_post_install:
+	@sed -i "s|^#!/usr/bin/env bash|#!/usr/bin/env $(INSTALL_PREFIX)/bin/bash|g" $(STAGING_INSTALL_PREFIX)/share/plowshare/*.sh
