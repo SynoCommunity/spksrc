@@ -43,6 +43,8 @@ SVC_BACKGROUND=y
 service_postinst ()
 {
     mkdir -p ${CONFIG_DIR}
+    mkdir -p ${HOME_DIR}/.config ${HOME_DIR}/.mono
+    HOME="${HOME_DIR}" ${MONO_PATH}/cert-sync --user /etc/ssl/certs/ca-certificates.crt
     set_unix_permissions "${CONFIG_DIR}"
 }
 
