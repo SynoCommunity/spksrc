@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)$(SPECIFIC_VERSION)
 PYTHON_PACKAGE=python38
 
 BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
-DEPENDS = cross/ncurses
+DEPENDS = cross/ncursesw
 
 HOMEPAGE = https://www.vim.org/
 COMMENT  = Vim is a highly configurable text editor built to enable efficient text editing. It is an improved version of the vi editor distributed with most UNIX systems.
@@ -17,7 +17,7 @@ LICENSE  = Charityware
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-compiledby=SynoCommunity
-CONFIGURE_ARGS += --with-features=huge --with-tlib=ncurses 
+CONFIGURE_ARGS += --with-features=huge --with-tlib=ncursesw
 CONFIGURE_ARGS += vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tgetent=zero vim_cv_tty_group=world
 CONFIGURE_ARGS += vim_cv_getcwd_broken=yes vim_cv_stat_ignores_slash=yes vim_cv_memmove_handles_overlap=yes
 CONFIGURE_ARGS += --enable-python3interp=dynamic --with-python3-command=$(HOSTPYTHON) 
@@ -64,4 +64,4 @@ ENV += PYTHONPATH=$(PYTHONPATH)
 vim_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
 	install -m 644 src/vimrc $(STAGING_INSTALL_PREFIX)/share/vim/vimrc
-	cd $(STAGING_INSTALL_PREFIX)/bin; ln -s vim vim$(SPECIFIC_VERSION)
+	cd $(STAGING_INSTALL_PREFIX)/bin; ln -sf vim vim$(SPECIFIC_VERSION)

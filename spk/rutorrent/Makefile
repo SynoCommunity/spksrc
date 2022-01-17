@@ -1,25 +1,24 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.10
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
 SPK_DEPENDS = "python310:PHP5.6"
 WHEELS = src/requirements-pure.txt
 
-DEPENDS = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
+DEPENDS = cross/busybox cross/curl cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 DEPENDS += cross/sox
 
 MAINTAINER = smaarn
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 ADMIN_URL = /rutorrent/
-RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Update rutorrent to 3.10<br/>2. Update rtorrent to 0.9.8<br/>3. Update openssl to 1.1<br/>4. Fix bug issue no. 4295<br/>5. Move rtorrent configuration file to web volume for direct user access<br/>6. Update to Python 3.10"
+CHANGELOG = "1. Update rutorrent to 3.10<br/>2. Update rtorrent to 0.9.8<br/>3. Update openssl to 1.1<br/>4. Fix bug issue no. 4295<br/>5. Move rtorrent configuration file to web volume for direct user access<br/>6. Update to Python 3.10.<br/>7. Remove tools from procps-ng."
 
-HOMEPAGE   = https://github.com/Novik/ruTorrent
-LICENSE    = GPLv3
+HOMEPAGE = https://github.com/Novik/ruTorrent
+LICENSE = GPLv3
 
 SERVICE_USER = auto
 
@@ -51,9 +50,8 @@ include ../../mk/spksrc.spk.mk
 rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 755 -d $(STAGING_DIR)/var/.session
+	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
 	install -m 775 -d $(STAGING_DIR)/tmp
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

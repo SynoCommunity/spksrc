@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://static.process-one.net/ejabberd/downloads/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/erlang
-DEPENDS = cross/ncurses cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
+DEPENDS = cross/ncursesw cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
 
 # PPC archs except qoriq have compiler errors with 64 bit values
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -54,4 +54,4 @@ ejabberd_post_install:
 		 -e "s#/var/lib/ejabberd\"#/var/lib\"#g"					\
 		 -e "s#/var/log/ejabberd\"#/var/log\"#g"					\
 		 -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	cd $(STAGING_INSTALL_PREFIX)/bin && ln -s ../sbin/ejabberdctl .
+	cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../sbin/ejabberdctl .

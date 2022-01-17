@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/irssi-import/$(PKG_NAME)/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/ncurses cross/openssl
+DEPENDS = cross/ncursesw cross/openssl
 OPTIONAL_DEPENDS = cross/glib cross/glib-2.58
 
 include ../../mk/spksrc.archs.mk
@@ -21,12 +21,6 @@ COMMENT  = Irssi is a terminal based IRC client for UNIX systems. It also suppor
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-ssl=openssl --with-curses=ncurses --without-perl
-
-INSTALL_TARGET = install_irssi
+CONFIGURE_ARGS = --without-perl
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: install_irssi
-install_irssi:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
