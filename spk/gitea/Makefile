@@ -1,6 +1,6 @@
 SPK_NAME = gitea
 SPK_VERS = 1.15.10
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/$(SPK_NAME).png
 
 MAINTAINER = publicarray
