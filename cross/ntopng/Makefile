@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
-DEPENDS += cross/libmaxminddb cross/sqlite cross/libmysqlclient
+DEPENDS += cross/libmaxminddb cross/sqlite cross/mysql-connector-c
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 
@@ -52,6 +52,10 @@ PRE_COMPILE_TARGET = ntopng_pre_compile
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
 CONFIGURE_ARGS += --with-ndpi-static-lib=$(STAGING_INSTALL_PREFIX)/lib
+
+# May be required as mysql-connector-c include
+# files are now located under include/mysql
+# ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include/mysql
 
 # let ./configure find mysql_config (it is a script and works for cross compile)
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
