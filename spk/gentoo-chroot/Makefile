@@ -10,7 +10,6 @@ SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gentoo is a free operating system based on either Linux or FreeBSD that can be automatically optimized and customized for just about any application or need. Gentoo Chroot allows you to install the Gentoo OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
-RELOAD_UI = yes
 DISPLAY_NAME = Gentoo Chroot
 CHANGELOG =
 
@@ -62,9 +61,9 @@ ifeq ($(strip $(GENTOO_ARCH)),)
 $(error Arch $(ARCH) not supported)
 endif
 
-GENTOO_STAGE3 := $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d' | awk '{print $$1}')
-GENTOO_STAGE3_URL := http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/$(GENTOO_STAGE3)
-GENTOO_STAGE3_FILE := $(shell basename $(GENTOO_STAGE3))
+GENTOO_STAGE3 = $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d' | awk '{print $$1}')
+GENTOO_STAGE3_URL = http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/$(GENTOO_STAGE3)
+GENTOO_STAGE3_FILE = $(shell basename $(GENTOO_STAGE3))
 
 include ../../mk/spksrc.spk.mk
 
