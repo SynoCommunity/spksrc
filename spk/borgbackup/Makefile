@@ -1,5 +1,5 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.1.17
+SPK_VERS = 1.1.18
 SPK_REV = 10
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -16,10 +16,6 @@ SPK_DEPENDS = "python310"
 # pip freeze > requirements.txt
 # deactivate
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-
-# Does not build on PPC
-# https://github.com/borgbackup/borg/issues/6105
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
