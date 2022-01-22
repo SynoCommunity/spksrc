@@ -6,10 +6,10 @@ PKG_DIST_SITE = https://github.com/filebrowser/$(PKG_NAME)/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR =  $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/go native/nodejs
+BUILD_DEPENDS = native/go native/nodejs
 
 HOMEPAGE = https://github.com/filebrowser/filebrowser
-COMMENT  = Web File Browser
+COMMENT  = Web File Browser.
 LICENSE  = Apache-2.0
 
 PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
@@ -24,4 +24,4 @@ include ../../mk/spksrc.cross-go.mk
 
 .PHONY: filebrowser_pre_compile
 filebrowser_pre_compile:
-	$(RUN) $(MAKE) build-frontend
+	@$(RUN) $(MAKE) build-frontend

@@ -12,7 +12,7 @@ DESCRIPTION = filebrowser provides a file managing interface within a specified 
 HOMEPAGE = https://filebrowser.org/
 HELPURL = https://github.com/filebrowser/filebrowser/issues
 LICENSE = Apache-2.0
-CHANGELOG = "First Version"
+CHANGELOG = "Initial package release."
 
 GROUP = synocommunity
 
@@ -23,6 +23,6 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8091
 ADMIN_PORT = $(SERVICE_PORT)
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = File Browser (HTTP)
 
 include ../../mk/spksrc.spk.mk
