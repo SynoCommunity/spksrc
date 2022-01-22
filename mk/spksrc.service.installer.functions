@@ -22,6 +22,25 @@ if [ -z "${SYNOPKG_PKGVAR}" ]; then
     SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
 fi
 
+if [ -z "${SYNOPKG_PKGTMP}" ]; then
+    # define SYNOPKG_PKGTMP for compatibility with DSM7
+    SYNOPKG_PKGTMP="${SYNOPKG_PKGDEST}/tmp"
+    if [[ ! -e "${SYNOPKG_PKGTMP}" ]]; then
+        ${MKDIR} -p "${SYNOPKG_PKGTMP}"
+        chown ${EFF_USER} "${SYNOPKG_PKGTMP}"
+    fi
+fi
+
+if [ -z "${SYNOPKG_PKGHOME}" ]; then
+    # define SYNOPKG_PKGHOME for compatibility with DSM7
+    SYNOPKG_PKGHOME="${SYNOPKG_PKGDEST}/home"
+    if [ ! -e "${SYNOPKG_PKGHOME}" ]; then
+        ${MKDIR} "${SYNOPKG_PKGHOME}"
+        chown ${EFF_USER} "${SYNOPKG_PKGHOME}"
+        chmod 700 "${SYNOPKG_PKGHOME}"
+    fi
+fi
+
 
 ### Functions library
 

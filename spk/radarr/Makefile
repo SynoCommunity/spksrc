@@ -35,9 +35,6 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = radarr_extra_install
 
-# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
-USE_ALTERNATE_TMPDIR = 1
-
 include ../../mk/spksrc.spk.mk
 
 PACKAGE_VERSION = $(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)
