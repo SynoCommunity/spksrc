@@ -109,7 +109,7 @@ ifneq ($(strip $(WHEELS)),)
 	      $${global_option} \
 	      --no-build-isolation \
 	      $${wheel} ; \
-	done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) || true
+	done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API))
 ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 	   $(MSG) "Force pure-python" ; \
