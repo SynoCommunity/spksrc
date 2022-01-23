@@ -29,6 +29,7 @@
 # PyYAML==6.0
 # regex==2021.11.10
 # SQLAlchemy==1.4.29
+ujson==5.1.0
 # zope.interface==5.4.0
 
 # Require environment variables

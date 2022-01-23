@@ -31,6 +31,7 @@ PyNaCl==1.4.0
 PyYAML==5.4.1
 # requests==2.26.0                ==> pure
 # ruamel.yaml==0.15.100           ==> pure
+ujson==4.2.0
 # voluptuous==0.12.1
 # voluptuous-serialize==2.4.0
 yarl==1.6.3

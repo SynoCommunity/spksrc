@@ -21,9 +21,6 @@ DEPENDS += cross/nmap
 # [DTLSSocket] Required for postinst [tradfri]
 DEPENDS += cross/dtlssocket
 
-# [flunearyou]
-DEPENDS += cross/ujson
-
 # [PyYAML]
 DEPENDS += cross/libyaml
 
