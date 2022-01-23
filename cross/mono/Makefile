@@ -26,6 +26,7 @@ CONFIGURE_ARGS = --disable-mcs-build
 CONFIGURE_ARGS += --enable-btls
 CONFIGURE_ARGS += --disable-dependency-tracking
 CONFIGURE_ARGS += --without-mcs-docs
+CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 
 # Optimize compilation for size
 ADDITIONAL_CFLAGS = -Os
@@ -52,7 +53,7 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 	endif
 endif
-AG_ARGS += --disable-mcs-build
+AG_ARGS += --disable-mcs-build --with-mcs-docs=no --prefix=$(INSTALL_PREFIX)
 
 .PHONY: mono_pre_configure
 mono_pre_configure:
