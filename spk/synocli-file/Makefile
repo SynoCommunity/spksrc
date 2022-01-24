@@ -9,6 +9,7 @@ DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
+DEPENDS += cross/nnn
 
 OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/bat cross/exa
 
@@ -60,9 +61,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nnn (n³), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add jupp editor."
+CHANGELOG = "1. Add jupp editor.<br/>2. Add nnn (n³) file manager."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -91,6 +92,7 @@ SPK_COMMANDS += bin/mg
 SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/exa
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
+SPK_COMMANDS += bin/nnn
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
