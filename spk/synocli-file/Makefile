@@ -38,8 +38,16 @@ DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+TC_HAS_STDC11 = 0
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+TC_HAS_STDC11 = 1
+endif
+ifeq ($(call version_lt, ${TCVERSION}, 3.0),1)
+TC_HAS_STDC11 = 1
+endif
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(TC_HAS_STDC11),1)
 # to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
