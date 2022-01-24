@@ -9,16 +9,17 @@ DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
-DEPENDS += cross/nnn
 
-OPTIONAL_DEPENDS = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/bat cross/exa
+OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
+OPTIONAL_DEPENDS += cross/bat cross/exa
+OPTIONAL_DEPENDS += cross/nnn
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
 
 OPTIONAL_DESC =
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # build rust tools before packages depending on cross/zlib
 # These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
@@ -38,9 +39,14 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 # to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
+# to build nnn -std=c11 is required
+DEPENDS += cross/nnn
+OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
+endif
 endif
 
 # PPC archs are not supported with golang
@@ -51,9 +57,9 @@ endif
 
 ifneq ($(findstring $(ARCH), $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/ripgrep
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rg \(ripgrep\)"
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 DEPENDS += cross/fd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", fd \(fd-find\)"
+OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
 
 
@@ -61,7 +67,7 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), nnn \(n³\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG = "1. Add jupp editor.<br/>2. Add nnn (n³) file manager."
 
