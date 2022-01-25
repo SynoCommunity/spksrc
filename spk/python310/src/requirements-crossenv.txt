@@ -40,6 +40,10 @@
 #  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
 # Pillow==9.0.0
 
+# ujson:
+#   - Require setuptools-scm in cross/python310 crossenv
+# ujson==5.1.0
+
 # numpy:
 #   - Require Cython in cross/python310 crossenv
 #   - DSM6 require WHEELS_CFLAGS=-std=c++0x

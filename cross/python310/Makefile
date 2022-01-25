@@ -137,6 +137,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==60.2.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==60.2.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools-scm==6.4.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools-scm==6.4.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.15.0"

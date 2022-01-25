@@ -7,46 +7,6 @@ SPK_DEPENDS = "python310"
 
 BUILD_DEPENDS = cross/python310
 
-# [gevent]
-DEPENDS += cross/libev cross/c-ares
-ENV += GEVENTSETUP_EMBED_CARES=FALSE
-ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
-
-# for iqvia
-DEPENDS += cross/numpy
-
-# [python-libnmap]
-DEPENDS += cross/nmap
-
-# [DTLSSocket] Required for postinst [tradfri]
-DEPENDS += cross/dtlssocket
-
-# [flunearyou]
-DEPENDS += cross/ujson
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [pycares]
-DEPENDS += cross/c-ares
-ENV += PYCARES_USE_SYSTEM_LIB=1
-
-# [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
-
-# Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
-
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
@@ -68,7 +28,57 @@ USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = homeassistant_extra_install
 
+# Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
+
+# [gevent]
+DEPENDS += cross/libev cross/c-ares
+ENV += GEVENTSETUP_EMBED_CARES=FALSE
+ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+
+# [python-libnmap]
+DEPENDS += cross/nmap
+
+# [DTLSSocket] Required for postinst [tradfri]
+DEPENDS += cross/dtlssocket
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [pycares]
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+# [Pillow]
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
+
+# [numpy]
+# gcc-4.6.4 failed with exit status 1
+# https://github.com/numpy/numpy/issues/20664
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
 include ../../mk/spksrc.spk.mk
+
+# [numpy]
+# Fix wheel building with older compilers
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS = [numpy] -std=c++0x
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = [numpy] -O0
+endif
+endif
 
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:

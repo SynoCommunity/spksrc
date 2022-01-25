@@ -78,7 +78,7 @@ build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: $(PRE_WHEEL_TARGET)
 ifneq ($(strip $(WHEELS)),)
 	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
-	$(MSG) "Cross-compiling wheels" ; \
+	@$(MSG) "Cross-compiling wheels" ; \
 	localPIP=$(PIP) ; \
 	if [ -s "$(CROSSENV)" ] ; then \
 	   $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
