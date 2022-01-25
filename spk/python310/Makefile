@@ -95,6 +95,11 @@ include ../../mk/spksrc.spk.mk
 # [numpy] Fix wheel building with older compilers
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CPPFLAGS = [numpy] -std=c++0x
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = [numpy] -O0
+endif
 endif
 
 .PHONY: python310_extra_install
