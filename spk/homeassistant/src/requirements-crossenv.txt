@@ -23,7 +23,7 @@ cryptography==3.3.2
 # httpx==0.19.0
 # idna==3.3                       ==> pure
 # jinja2==3.0.3                   ==> pure
-# numpy==1.21.4                   # requires to be built as cross/numpy
+numpy==1.21.4
 # PyJWT==1.7.1                    ==> pure
 PyNaCl==1.4.0
 ## pip>=8.0.3,<20.3
