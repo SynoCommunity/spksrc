@@ -42,15 +42,14 @@
 
 # ujson:
 #   - Require setuptools-scm in cross/python310 crossenv
-ujson==5.1.0
+# ujson==5.1.0
 
 # numpy:
 #   - Require Cython in cross/python310 crossenv
 #   - DSM6 require WHEELS_CFLAGS=-std=c++0x
-# numpy==1.21.*:
 #   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
 #     ref: https://github.com/numpy/numpy/issues/13622
-numpy==1.22.0
+# numpy==1.22.0
 
 # webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
 # git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10
