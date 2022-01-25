@@ -62,13 +62,15 @@ WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
 
-# [numpy] gcc-4.6.4 failed with exit status 1
+# [numpy]
+# gcc-4.6.4 failed with exit status 1
 # https://github.com/numpy/numpy/issues/20664
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 include ../../mk/spksrc.spk.mk
 
-# [numpy] Fix wheel building with older compilers
+# [numpy]
+# Fix wheel building with older compilers
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CPPFLAGS = [numpy] -std=c++0x
 # workaround for compiler bug:
