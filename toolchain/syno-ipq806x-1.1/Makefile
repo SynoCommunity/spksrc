@@ -2,7 +2,6 @@ TC_ARCH = ipq806x
 TC_VERS = 1.1
 TC_TYPE = SRM
 TC_KERNEL = 3.4.103
-TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = gcc493_glibc220_hard-GPL

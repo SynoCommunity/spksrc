@@ -1,7 +1,6 @@
 TC_ARCH = apollolake
 TC_VERS = 6.1
 TC_KERNEL = 4.4.15
-TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = apollolake-gcc493_glibc220_linaro_x86_64-GPL

@@ -1,7 +1,6 @@
 TC_ARCH = comcerto2k
 TC_VERS = 5.2
 TC_KERNEL = 3.2.40
-TC_GCC = 4.6.4
 TC_GLIBC = 2.17
 
 TC_DIST = comcerto2k-gcc464_glibc217_neon_comcerto-GPL

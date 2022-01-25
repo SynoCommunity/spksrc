@@ -1,7 +1,6 @@
 TC_ARCH = armadaxp
 TC_VERS = 6.2
 TC_KERNEL = 3.2.40
-TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = armadaxp-gcc493_glibc220_hard-GPL

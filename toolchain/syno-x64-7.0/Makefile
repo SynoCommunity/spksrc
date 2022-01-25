@@ -4,7 +4,6 @@ TC_ARCH = apollolake avoton braswell broadwell broadwellnk bromolow cedarview de
 TC_VERS = 7.0
 TC_BUILD = 41890
 TC_KERNEL = 4.4.180
-TC_GCC = 7.5.0
 TC_GLIBC = 2.26
 
 TC_DIST = apollolake-gcc750_glibc226_x86_64-GPL

@@ -1,7 +1,6 @@
 TC_ARCH = evansport
 TC_VERS = 5.0
 TC_KERNEL = 3.2.40
-TC_GCC = 4.6.3
 TC_GLIBC = 2.13
 
 TC_DIST = gcc463_glibc213_i686_evansport-GPL

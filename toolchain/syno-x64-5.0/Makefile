@@ -3,7 +3,6 @@ TC_NAME = syno-x64
 TC_ARCH = x86_64 bromolow cedarview avoton
 TC_VERS = 5.0
 TC_KERNEL = 3.2.40
-TC_GCC = 4.7.3
 TC_GLIBC = 2.17
 
 TC_DIST = gcc473_glibc217_x86_64-GPL
