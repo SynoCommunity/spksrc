@@ -1,0 +1,30 @@
+# - make version configurable
+#   to build target from source instead from git clone
+# - set build user to 'SynoCommunity'
+# 
+--- Makefile.orig	2021-12-11 11:53:31.000000000 +0100
++++ Makefile	2022-01-26 22:45:24.563111145 +0100
+@@ -2,12 +2,12 @@
+ MAJOR_VER := v5
+ PACKAGE := github.com/dundee/$(NAME)/$(MAJOR_VER)
+ CMD_GDU := cmd/gdu
+-VERSION := $(shell git describe --tags 2>/dev/null)
++VERSION ?= $(shell git describe --tags 2>/dev/null)
+ DATE := $(shell date +'%Y-%m-%d')
+ GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw
+ LDFLAGS := -s -w -extldflags '-static' \
+ 	-X '$(PACKAGE)/build.Version=$(VERSION)' \
+-	-X '$(PACKAGE)/build.User=$(shell id -u -n)' \
++	-X '$(PACKAGE)/build.User=SynoCommunity' \
+ 	-X '$(PACKAGE)/build.Time=$(shell LC_ALL=en_US.UTF-8 date)'
+ 
+ all: clean build-all man clean-uncompressed-dist shasums
+@@ -18,7 +18,7 @@
+ build:
+ 	@echo "Version: " $(VERSION)
+ 	mkdir -p dist
+-	GOFLAGS="$(GOFLAGS)" CGO_ENABLED=0 go build -ldflags="$(LDFLAGS)" -o dist/$(NAME) $(PACKAGE)/$(CMD_GDU)
++	GOFLAGS="$(GOFLAGS)" CGO_ENABLED=1 go build -ldflags="$(LDFLAGS)" -o dist/$(NAME) $(PACKAGE)/$(CMD_GDU)
+ 
+ build-all:
+ 	@echo "Version: " $(VERSION)
