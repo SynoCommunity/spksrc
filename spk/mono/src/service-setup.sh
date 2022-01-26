@@ -4,5 +4,6 @@
 service_postinst ()
 {
     # Sync ca certificates
-    ${SYNOPKG_PKGDEST}/bin/cert-sync /etc/ssl/certs/ca-certificates.crt
+    mkdir -p ${SYNOPKG_PKGDEST}/share/.config ${SYNOPKG_PKGDEST}/share/.mono
+    HOME="${SYNOPKG_PKGDEST}/share" ${MONO_PATH}/cert-sync --user /etc/ssl/certs/ca-certificates.crt
 }
