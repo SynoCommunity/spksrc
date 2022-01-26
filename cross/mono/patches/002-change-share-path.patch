@@ -1,0 +1,34 @@
+--- mcs/class/corlib/System/Environment.cs.org	2022-01-26 14:48:46.677004670 +1100
++++ mcs/class/corlib/System/Environment.cs	2022-01-26 14:48:56.449000000 +1100
+@@ -676,7 +676,7 @@
+ 			case SpecialFolder.MyVideos:
+ 				return ReadXdgUserDir (config, home, "XDG_VIDEOS_DIR", "Videos");
+ 			case SpecialFolder.CommonTemplates:
+-				return "/usr/share/templates";
++				return "/var/packages/mono/target/share/templates";
+ 			case SpecialFolder.Fonts:
+ 				if (Platform == PlatformID.MacOSX)
+ 					return Path.Combine (home, "Library", "Fonts");
+@@ -739,7 +739,7 @@
+ 				return String.Empty;
+ 			// This is where data common to all users goes
+ 			case SpecialFolder.CommonApplicationData:
+-				return "/usr/share";
++				return "/var/packages/mono/target/share";
+ 			default:
+ 				throw new ArgumentException ("Invalid SpecialFolder");
+ 			}
+
+--- external/corefx/src/System.Runtime.Extensions/src/System/Environment.Unix.cs.org	2022-01-26 14:52:41.987541663 +1100
++++ external/corefx/src/System.Runtime.Extensions/src/System/Environment.Unix.cs	2022-01-26 14:52:37.914000000 +1100
+@@ -98,8 +98,8 @@
+             // https://www.freedesktop.org/software/systemd/man/file-hierarchy.html
+             switch (folder)
+             {
+-                case SpecialFolder.CommonApplicationData: return "/usr/share";
+-                case SpecialFolder.CommonTemplates: return "/usr/share/templates";
++                case SpecialFolder.CommonApplicationData: return "/var/packages/mono/target/share";
++                case SpecialFolder.CommonTemplates: return "/var/packages/mono/target/share/templates";
+             }
+             if (IsMac)
+             {
