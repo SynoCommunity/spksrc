@@ -31,7 +31,10 @@ python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip, setuptools and crossenv
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==21.3.1"
-	@$(PIP) install "setuptools==60.5.0" "cffi==1.15" "crossenv==1.2.0"
+# 	@$(PIP) install "setuptools==60.2.0"
+	@$(PIP) install git+https://github.com/pypa/setuptools.git@v60.5.4#egg=setuptools
+	@$(PIP) install "crossenv==1.2.0"
+	@$(PIP) install "cffi==1.15"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
