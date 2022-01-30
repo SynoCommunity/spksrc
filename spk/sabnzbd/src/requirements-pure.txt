@@ -11,6 +11,7 @@ jaraco.classes==3.2.1
 jaraco.collections==3.4.0
 jaraco.functools==3.3.0
 jaraco.text==3.5.1
+PySocks==1.7.1
 more-itertools==8.9.0
 portend==2.7.1
 puremagic==1.10
