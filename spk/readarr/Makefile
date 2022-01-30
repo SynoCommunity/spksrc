@@ -1,5 +1,5 @@
 SPK_NAME = readarr
-SPK_VERS = $(shell date +%Y%m%d)
+SPK_VERS = 0.1.0.1225
 SPK_REV = 1
 SPK_ICON = src/readarr.png
 
