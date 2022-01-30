@@ -4,7 +4,6 @@ CONF_FILE="${SYNOPKG_PKGVAR}/conf.ini"
 PATH="/var/packages/git/target/bin:${PATH}"
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
     SYNOPKG_PKGHOME="${SYNOPKG_PKGDEST}"
-    mkdir -p "${SYNOPKG_PKGHOME}"
 fi
 ENV="PATH=${PATH} HOME=${SYNOPKG_PKGHOME}"
 SERVICE_COMMAND="env ${ENV} ${GITEA} web --port 8418 --pid ${PID_FILE}"
