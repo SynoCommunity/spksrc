@@ -23,7 +23,7 @@ endif
 ifeq ($(strip $(TC_DIST_SITE_URL)),)
 TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20Tool%20Chains/
 ifeq ($(TC_VERS),7.0)
-TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%207.0.0%20Tool%20Chains/
+TC_DIST_SITE_URL = https://global.download.synology.com/download/ToolChain/toolchain/$(TC_VERS)-$(TC_BUILD)/
 endif
 endif
 
