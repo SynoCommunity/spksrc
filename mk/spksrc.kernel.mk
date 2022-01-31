@@ -7,10 +7,17 @@ include ../../mk/spksrc.kernel-flags.mk
 
 # Configure the included makefiles
 NAME          = $(KERNEL_NAME)
-COOKIE_PREFIX = linux-
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+PKG_NAME      = linux-$(subst syno-,,$(NAME))
+PKG_DIR       = $(PKG_NAME)
+else
 PKG_NAME      = linux
 PKG_DIR       = $(PKG_NAME)
+endif
+
 ifneq ($(KERNEL_DIST_FILE),)
 LOCAL_FILE    = $(KERNEL_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
@@ -34,10 +41,6 @@ COMPILE_TARGET       = nop
 else
 COMPILE_TARGET       = kernel_module_compile_target
 endif
-# spksrc.install.mk called for PRE_INSTALL_PLIST
-# in order to generate a work*/linux.plist.auto
-# later used by spksr.plist.mk to generate the
-# diff based on .ko kernel objects
 INSTALL_TARGET       = nop
 
 #####
@@ -82,7 +85,7 @@ include ../../mk/spksrc.generate-digests.mk
 .PHONY: kernel_pre_configure_target
 
 kernel_pre_configure_target:
-	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/linux
+	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: kernel_configure_target
 
@@ -130,7 +133,7 @@ kernel_module_compile_target:
 
 kernel_module_build:
 	@$(MSG) Building kernel module module=$(module)
-	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/linux INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
-	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/linux/modules.order
-	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
-	install -m 644 $(WORK_DIR)/linux/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
+	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
+	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/$(PKG_DIR)/modules.order
+	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))

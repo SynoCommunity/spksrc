@@ -534,8 +534,17 @@ publish-legacy-toolchain-%: spk_msg
 
 arch-%: | pre-build-native
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
+ifeq ($(strip $(REQUIRE_KERNEL)),)
 	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+else ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+	$(MSG) MM $(filter $(firstword $(subst -, ,$*))-$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%, $(AVAILABLE_TOOLCHAINS))
+	@for arch in $(filter $(firstword $(subst -, ,$*))-$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%, $(AVAILABLE_TOOLCHAINS)) ; \
+	do \
+	   $(MAKE) spkclean ; \
+	   $(MAKE) WORK_DIR=$(PWD)/work-$(firstword $(subst -, ,$*)) $(addprefix build-arch-, $${arch}) ; \
+	done
+endif
 
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: spk_msg
