@@ -407,6 +407,7 @@ spkclean:
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
+	       work-*/tc_vars.mk \
 	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
@@ -541,8 +542,10 @@ else ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 	$(MSG) MM $(filter $(firstword $(subst -, ,$*))-$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%, $(AVAILABLE_TOOLCHAINS))
 	@for arch in $(filter $(firstword $(subst -, ,$*))-$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%, $(AVAILABLE_TOOLCHAINS)) ; \
 	do \
-	   $(MAKE) spkclean ; \
-	   $(MAKE) WORK_DIR=$(PWD)/work-$(firstword $(subst -, ,$*)) $(addprefix build-arch-, $${arch}) ; \
+	  if [ -d ../../kernel/syno-$${arch} ]; then \
+	    $(MAKE) spkclean ; \
+	    $(MAKE) WORK_DIR=$(PWD)/work-$(firstword $(subst -, ,$*)) $(addprefix build-arch-, $${arch}) ; \
+	  fi ; \
 	done
 endif
 
