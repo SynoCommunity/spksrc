@@ -1,5 +1,5 @@
 SPK_NAME = gitea
-SPK_VERS = 1.15.10
+SPK_VERS = 1.16.0
 SPK_REV = 2
 SPK_ICON = src/$(SPK_NAME).png
 
