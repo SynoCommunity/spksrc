@@ -254,7 +254,7 @@ ifneq ($(LICENSE_FILE),)
 DSM_LICENSE = $(DSM_LICENSE_FILE)
 endif
 
-define dsm_license_copy
+define dsm_resource_copy
 $(MSG) "Creating $@"
 cp $< $@
 chmod 644 $@
@@ -262,7 +262,7 @@ endef
 
 $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 	@echo $@
-	@$(dsm_license_copy)
+	@$(dsm_resource_copy)
 
 ### Packaging rules
 $(WORK_DIR)/package.tgz: icon service

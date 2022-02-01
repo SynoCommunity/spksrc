@@ -5,7 +5,7 @@
 #   scripts/service-setup
 #   conf/privilege         if SERVICE_USER or DSM7
 #   conf/SPK_NAME.sc       if SERVICE_PORT and DSM<7
-#   conf/resource          if DSM7
+#   conf/resource          if SERVICE_CERT or DSM7
 #   app/SPK_NAME.sc        if SERVICE_PORT and DSM7
 #   app/config             if DSM_UI_DIR
 #
@@ -15,17 +15,19 @@
 #  service_target                (override with SERVICE_TARGET)
 #  post_service_target           (override with POST_SERVICE_TARGET)
 #
-# Variables:      
+# Variables:
 #  SERVICE_SETUP                 service-setup script file for generic installer
 #  FWPORTS                       (optional) custom firewall port/rules file
 #  SERVICE_PORT                  service port firewall config file (*.sc) and dsm-ui config file
 #  SERVICE_PORT_PROTOCOL         service port protocol for dsm-ui config file, default = "http"
 #  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
+#  SERVICE_CERT                  (optional) configure DSM certificate management for this service name from the firewall config file (*.sc)
+#  SERVICE_CERT_RELOAD           (optional) package-relative path to a script for reloading the service after certificate changes
 #  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
 #  SERVICE_WIZARD_GROUP          (optional) use name of wizard-variable to define the GROUP
 #  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define SHARE_PATH (uses DSM data share worker for DSM 7)
 #  USE_DATA_SHARE_WORKER         (optional) use DSM data share worker for SERVICE_WIZARD_SHARE and DSM 6 too
-#  SERVICE_USER                  (optional) runtime user account for generic service support. 
+#  SERVICE_USER                  (optional) runtime user account for generic service support.
 #                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
 #  SPK_GROUP                     (optional) defines the group to use in privilege resource file
 #  SYSTEM_GROUP                  (optional) defines an additional group to join in privilege resource file
@@ -37,7 +39,7 @@
 #                                           with 'command' in relative folder
 #  USE_ALTERNATE_TMPDIR          (optional) with USE_ALTERNATE_TMPDIR=1 TMD_DIR is defined to use a package specific temp
 #                                           folder at intallation and runtime.
-#  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic 
+#  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic
 #                                           installer generated script (SERVICE_SETUP) is not usable.
 #  NO_SERVICE_SHORTCUT           (optional) do not create an app icon in the DSM desktop
 #  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
@@ -148,6 +150,11 @@ ifneq ($(strip $(SERVICE_PORT)),)
 	@echo 'SERVICE_PORT="$(SERVICE_PORT)"' >> $@
 	@echo '' >> $@
 endif
+ifneq ($(strip $(SERVICE_CERT)),)
+	@echo "# Certificate for service" >> $@
+	@echo 'SERVICE_CERT="$(SERVICE_CERT)"' >> $@
+	@echo '' >> $@
+endif
 ifneq ($(STARTABLE),no)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@echo "# define SYNOPKG_PKGVAR for compatibility with DSM7" >> $@
@@ -198,12 +205,14 @@ endif
 # - firewall rules/port definitions (DSM >= 6.0-5936)
 # - data share worker (DSM 7, optional for DSM 6)
 # - usr local links (DSM >= 6.0-5941)
+# - certificate config (DSM < 7, restricted to only Synology's packages since DSM 7)
 # for DSM<6.0 link creation is provided by spksrc.service.create_links
 # and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
 	@echo '{}' > $@
+	@$(MSG) "Creating $@"
 ifneq ($(strip $(SERVICE_PORT)),)
 	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ | sponge $@
 endif
@@ -227,6 +236,16 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 ifeq ($(strip $(USE_DATA_SHARE_WORKER)),yes)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
+endif
+endif
+ifneq ($(strip $(SERVICE_CERT)),)
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+	@jq --arg service "${SERVICE_CERT}" \
+	    --arg reload "${SERVICE_CERT_RELOAD}" \
+	    --arg display_name "${DISPLAY_NAME}" \
+		'."certificate-config" = {"services": [{"display_name": $$display_name, "display_name_i18n": $$display_name, "service":$$service} ], "reloader-relpath": $$reload } | ."service-cfg" = {}' $@ | sponge $@
+else
+	$(warning Certificate configuration is blocked for community packages in DSM $(TCVERSION))
 endif
 endif
 
@@ -319,11 +338,11 @@ endif
 else ifneq ($(strip $(SERVICE_USER)),)
 ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
-	@$(dsm_script_copy)
+	@$(dsm_resource_copy)
 	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
 else
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
-	@$(dsm_script_copy)
+	@$(dsm_resource_copy)
 	@$(MSG) "(privilege) spksrc.service.privilege-startasroot"
 endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
@@ -376,7 +395,7 @@ SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 else
 $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
-	@$(dsm_script_copy)
+	@$(dsm_resource_copy)
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
 endif

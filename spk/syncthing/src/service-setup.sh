@@ -31,6 +31,13 @@ service_prestart ()
         SERVICE_COMMAND="${SERVICE_COMMAND} ${SYNCTHING_OPTIONS}"
     fi
 
+    # If the system has a TLS certificate for us, force its usage
+    cert_dir=/usr/local/etc/certificate/${SYNOPKG_PKGNAME}/${SERVICE_CERT}
+    if [ -f ${cert_dir}/cert.pem -a -f ${cert_dir}/privkey.pem ]; then
+        ln -sf ${cert_dir}/cert.pem ${SYNOPKG_PKGVAR}/https-cert.pem
+        ln -sf ${cert_dir}/privkey.pem ${SYNOPKG_PKGVAR}/https-key.pem
+    fi
+
     # Required: set $HOME environment variable
     HOME=${SYNOPKG_PKGVAR}
     export HOME
