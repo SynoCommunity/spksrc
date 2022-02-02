@@ -255,6 +255,7 @@ DSM_LICENSE = $(DSM_LICENSE_FILE)
 endif
 
 define dsm_resource_copy
+$(create_target_dir)
 $(MSG) "Creating $@"
 cp $< $@
 chmod 644 $@
