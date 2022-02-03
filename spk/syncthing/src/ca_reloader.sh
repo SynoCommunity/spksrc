@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CERT_DIR=/usr/local/etc/certificate/syncthing/syncthing-webui
+CERT_DIR=/usr/local/etc/certificate/syncthing/syncthing_webui
 CONF_DIR=/var/packages/syncthing/var
 if [ ! -d "$CONF_DIR" ]; then
    CONF_DIR=/var/packages/syncthing/target/var
