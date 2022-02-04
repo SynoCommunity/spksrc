@@ -1,8 +1,10 @@
+
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 GROUP="sc-minio"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
+ENV_VARIABLES="${SYNOPKG_PKGVAR}/environment-variables"
 
 # Reload wizard variables stored by postinst
 if [ -r "${INST_VARIABLES}" ]; then
@@ -17,6 +19,11 @@ fi
 export MINIO_ROOT_USER="${WIZARD_ROOT_USER}"
 export MINIO_ROOT_PASSWORD="${WIZARD_ROOT_PASSWORD}"
 export HOME="${SYNOPKG_PKGVAR}"
+
+# Load custom variables
+if [ -r "${ENV_VARIABLES}" ]; then
+    . "${ENV_VARIABLES}"
+fi
 
 CONSOLE_PORT=9001
 
