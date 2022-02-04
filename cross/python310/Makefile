@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.1
+PKG_VERS = 3.10.2
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -135,8 +135,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==60.2.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==60.2.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==60.7.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==60.7.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools-scm==6.4.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools-scm==6.4.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.1"
