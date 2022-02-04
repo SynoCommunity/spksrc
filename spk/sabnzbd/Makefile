@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 3.5.0
-SPK_REV = 52
+SPK_REV = 53
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python310
@@ -17,7 +17,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.5.0."
+CHANGELOG = "1. Update SABnzbd to 3.5.0.<br/>2. Fix DSM 7 installer to preserve config.ini on update."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -42,7 +42,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/SabToSyno.py $(STAGING_DIR)/var/scripts/SabToSyno.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini
