@@ -10,10 +10,10 @@ DESCRIPTION = Redis is an open source, advanced key-value store. It is often ref
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v6.2.6"
+CHANGELOG = "Update redis to v6.2.6."
 
-# PPC archs except qoriq are not supported anymore
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# atomic operations are not supported on ARMv5 and PPC archs except qoriq.
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
