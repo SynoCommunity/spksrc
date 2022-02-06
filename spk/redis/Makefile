@@ -1,6 +1,6 @@
 SPK_NAME = redis
 SPK_VERS = 6.2.6
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/redis.png
 
 DEPENDS = cross/$(SPK_NAME)
