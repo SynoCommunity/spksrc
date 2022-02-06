@@ -1,6 +1,6 @@
 SPK_NAME = redis
-SPK_VERS = 5.0.12
-SPK_REV = 7
+SPK_VERS = 5.0.14
+SPK_REV = 8
 SPK_ICON = src/redis.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ DESCRIPTION = Redis is an open source, advanced key-value store. It is often ref
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v5.0.12"
+CHANGELOG = "Update redis to v5.0.14."
 
 # PPC archs except qoriq are not supported anymore
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
