@@ -1,0 +1,34 @@
+PKG_NAME = server
+PKG_VERS = 2.1.4
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/gotify/server/archive
+PKG_DIST_FILE = server-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+DEPENDS = native/go
+
+HOMEPAGE = https://gotify.net/
+COMMENT  = a simple server for sending and receiving messages
+LICENSE  = MIT
+
+GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
+GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
+
+.PHONY: gotify_pre_compile
+BUILD_DEPENDS = native/nodejs
+
+PRE_COMPILE_TARGET = gotify_pre_compile
+
+GO_BUILD_ARGS += -ldflags "-w -s -X main.Version=$(PKG_VERS) -X main.BuildDate=$(shell date "+%F-%T") -X main.Commit=$(PKG_VERS) -X main.Mode=prod"
+
+include ../../mk/spksrc.cross-go.mk
+
+ENV += NPM_CONFIG_USER=root
+PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
+
+gotify_pre_compile:
+	cd $(GO_SRC_DIR) && env $(filter-out GOARCH=%, $(ENV)) go run hack/packr/packr.go
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/ui/build
+	cd $(GO_SRC_DIR)/ui && npm install && npm run build
+	cp -R $(WORK_DIR)/$(PKG_DIR)/ui/build/* $(STAGING_INSTALL_PREFIX)/ui/build
