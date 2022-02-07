@@ -1,8 +1,8 @@
 PKG_NAME = gitea
-PKG_VERS = 1.16.0
+PKG_VERS = 1.16.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive/refs/tags
+PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
@@ -13,12 +13,15 @@ COMMENT  = Gitea is a community managed lightweight code hosting solution writte
 LICENSE  = MIT
 
 ENV += NPM_CONFIG_USER=root
-PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 CGO_ENABLED = 1
 COMPILE_TARGET = gitea_compile_target
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 include ../../mk/spksrc.cross-go.mk
+
+# PATH must be defined after include of spksrc.cross-go.mk,
+# otherwise WORK_DIR is not defined when building in cross/gitea folder
+PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
 CUSTOM_PATH = -X \"code.gitea.io/gitea/modules/setting.CustomPath=$(SYNOPKG_PKGVAR)/custom\"
@@ -30,5 +33,6 @@ ENV += LDFLAGS="$(CUSTOM_PATH) $(CUSTOM_CONF) $(WORK_PATH) $(PID)"
 ENV += TAGS="bindata sqlite sqlite_unlock_notify"
 ENV += GITEA_VERSION=$(PKG_VERS)
 
+.PHONY: gitea_compile_target
 gitea_compile_target:
-	$(RUN) $(MAKE) build
+	@$(RUN) $(MAKE) build
