@@ -16,8 +16,6 @@ CHANGELOG = "Initial release"
 
 GROUP = synocommunity
 
-WIZARDS_DIR = src/wizard/
-
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
