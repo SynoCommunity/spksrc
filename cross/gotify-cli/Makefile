@@ -31,3 +31,4 @@ include ../../mk/spksrc.install-resources.mk
 gotify-cli_install:
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
 	@cp -f $(DIST_FILE) $(STAGING_INSTALL_PREFIX)/bin/gotify-cli
+	@chmod +x $(STAGING_INSTALL_PREFIX)/bin/gotify-cli
