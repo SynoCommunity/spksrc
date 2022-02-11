@@ -5,7 +5,7 @@ SPK_ICON = src/gotify.png
 
 DEPENDS = cross/gotify-server cross/gotify-cli
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Gotify

@@ -1,32 +1,34 @@
 PKG_NAME = gotify-server
 PKG_VERS = 2.1.4
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/gotify/server/archive
-PKG_DIST_FILE = ${PKG_NAME}-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = server-$(PKG_VERS)
+PKG_EXT = zip
+PKG_DIST_NAME = gotify-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/gotify/server/releases/download/v$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs native/go
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://gotify.net/
-COMMENT  = a simple server for sending and receiving messages
+COMMENT  = A simple server for sending and receiving messages
 LICENSE  = MIT
 
-GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
-GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
+INSTALL_TARGET = gotify-server_install
 
+# use digests with multiple files
+PKG_DIST_ARCH_LIST = amd64 386 arm-7 arm64
 
-PRE_COMPILE_TARGET = gotify_pre_compile
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = amd64
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = 386
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = arm-7
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = arm64
+endif
 
-CGO_ENABLED = 1
-GO_BUILD_ARGS += -ldflags "-w -s -X main.Version=$(PKG_VERS) -X main.BuildDate=$(shell date "+%F-%T") -X main.Commit=$(PKG_VERS) -X main.Mode=prod"
+include ../../mk/spksrc.install-resources.mk
 
-include ../../mk/spksrc.cross-go.mk
-
-ENV += NPM_CONFIG_USER=root
-PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
-
-.PHONY: gotify_pre_compile
-gotify_pre_compile:
-	cd $(GO_SRC_DIR)/ui && npm install && npm run build
-	cd $(GO_SRC_DIR) && env $(filter-out GOARCH=%, $(ENV)) go run hack/packr/packr.go
+.PHONY: gotify-server_install
+gotify-server_install:
+	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
+	@cp -f $(WORK_DIR)/gotify-linux-$(PKG_DIST_ARCH) $(STAGING_INSTALL_PREFIX)/bin/gotify-server

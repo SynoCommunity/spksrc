@@ -1,21 +1,33 @@
 PKG_NAME = gotify-cli
 PKG_VERS = 2.2.1
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/gotify/cli/archive
-PKG_DIST_FILE = ${PKG_NAME}-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = cli-$(PKG_VERS)
+PKG_DIST_NAME = gotify-cli-linux-$(PKG_DIST_ARCH)
+PKG_DIST_SITE = https://github.com/gotify/cli/releases/download/v$(PKG_VERS)
 
-BUILD_DEPENDS = native/go
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://gotify.net/
 COMMENT  = A command line interface for pushing messages to gotify/server.
 LICENSE  = MIT
 
-GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
-GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
+INSTALL_TARGET = gotify-cli_install
 
-CGO_ENABLED = 1
-GO_BUILD_ARGS += -ldflags "-w -s -X main.Version=$(PKG_VERS) -X main.BuildDate=$(shell date "+%F-%T") -X main.Commit=$(PKG_VERS) -X main.Mode=prod"
+# use digests with multiple files
+PKG_DIST_ARCH_LIST = amd64 386 arm-7 arm64
 
-include ../../mk/spksrc.cross-go.mk
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = amd64
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = 386
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = arm-7
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = arm64
+endif
+
+include ../../mk/spksrc.install-resources.mk
+
+.PHONY: gotify-cli_install
+gotify-cli_install:
+	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
+	@cp -f $(DIST_FILE) $(STAGING_INSTALL_PREFIX)/bin/gotify-cli
