@@ -539,14 +539,14 @@ ifeq ($(strip $(REQUIRE_KERNEL)),)
 	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 else ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-	$(MSG) MM $(filter $(firstword $(subst -, ,$*))-$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%, $(AVAILABLE_TOOLCHAINS))
-	@for arch in $(filter $(firstword $(subst -, ,$*))-$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%, $(AVAILABLE_TOOLCHAINS)) ; \
-	do \
+	@for arch in $(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)) ; do \
 	  if [ -d ../../kernel/syno-$${arch} ]; then \
+	    $(MAKE) WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $${arch}) ; \
 	    $(MAKE) spkclean ; \
-	    $(MAKE) WORK_DIR=$(PWD)/work-$(firstword $(subst -, ,$*)) $(addprefix build-arch-, $${arch}) ; \
 	  fi ; \
-	done
+	done ; \
+	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
+	exit 0
 endif
 
 build-arch-%: SHELL:=/bin/bash
@@ -555,8 +555,13 @@ build-arch-%: spk_msg
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
 endif
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) strip 2>&1 | tee --append build-$*.log ; \
+	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+else
 	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+endif
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
 endif
