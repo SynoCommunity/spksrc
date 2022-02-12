@@ -13,6 +13,8 @@ REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 MAINTAINER = th0ma7
 DESCRIPTION = "1. Includes cdrom.ko and sr_mod.ko"
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
 RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
