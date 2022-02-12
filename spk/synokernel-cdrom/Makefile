@@ -6,7 +6,7 @@ CHANGELOG = "1. Synology Kernel CD-ROM drivers"
 
 DEPENDS = 
 
-REQUIRE_KERNEL = 1
+REQUIRE_KERNEL ?= 1
 REQUIRE_KERNEL_MODULE  = CONFIG_CDROM_PKTCDVD:drivers/cdrom:cdrom
 REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
