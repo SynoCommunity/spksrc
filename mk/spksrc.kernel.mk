@@ -35,6 +35,8 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 # Always configure the kernel source tree
 PRE_CONFIGURE_TARGET = kernel_pre_configure_target
 CONFIGURE_TARGET     = kernel_configure_target
+COMPILE_TARGET       = nop
+INSTALL_TARGET       = nop
 
 # Only build kernel module on non-generic archs
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
@@ -43,11 +45,8 @@ PRE_COMPILE_TARGET   = kernel_module_prepare_target
 COMPILE_TARGET       = kernel_module_compile_target
 else
 CONFIGURE_TARGET     = nop
-PRE_COMPILE_TARGET   = nop
-COMPILE_TARGET       = nop
 endif
 endif
-INSTALL_TARGET       = nop
 
 #####
 
