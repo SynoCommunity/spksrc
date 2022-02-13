@@ -1,4 +1,5 @@
-TC_ARCH = pineview
+TC_NAME = syno-pineview
+TC_ARCH = x86
 TC_VERS = 4.3
 TC_FIRMWARE = 3.1-1594
 TC_KERNEL = 3.2.40
