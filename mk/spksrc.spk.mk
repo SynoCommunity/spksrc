@@ -546,7 +546,6 @@ else ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 	  fi ; \
 	done ; \
 	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
-	exit 0
 endif
 
 build-arch-%: SHELL:=/bin/bash
