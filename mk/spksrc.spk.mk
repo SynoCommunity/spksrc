@@ -543,6 +543,7 @@ else ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 	  if [ -d ../../kernel/syno-$${arch} ]; then \
 	    $(MAKE) WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $${arch}) ; \
 	    $(MAKE) spkclean ; \
+	    rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
 	  fi ; \
 	done ; \
 	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
