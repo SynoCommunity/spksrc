@@ -1,12 +1,12 @@
 SPK_NAME = gitea
-SPK_VERS = 1.16.1
-SPK_REV = 2
+SPK_VERS = 1.16.2
+SPK_REV = 3
 SPK_ICON = src/$(SPK_NAME).png
 
 MAINTAINER = publicarray
 DESCRIPTION  = Gitea is a community managed lightweight code hosting solution written in Go.
 DISPLAY_NAME = Gitea
-CHANGELOG = "1. Making setting up SSH easier.<br/> 2. Update to v1.16.1"
+CHANGELOG = "1. Making setting up SSH easier.<br/> 2. Update to v1.16.1<br/> 3. Update to v1.16.2"
 
 LICENSE = MIT
 
