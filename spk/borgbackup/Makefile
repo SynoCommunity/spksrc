@@ -1,5 +1,5 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.1.18
+SPK_VERS = 1.2.0
 SPK_REV = 10
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -22,7 +22,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v1.5.21<br/>2. Update OpenSSL to v1.1.1m<br/>3. Add BLAKE2-libb2 support<br/>4. Update to Python 3.10"
+CHANGELOG = "1. Update to borgbackup 1.2.0<br/>2. Update borgmatic to v1.5.23<br/>3. Update OpenSSL to v1.1.1m<br/>4. Add BLAKE2-libb2 support<br/>5. Update to Python 3.10"
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause
