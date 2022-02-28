@@ -1,7 +1,7 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.2
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
