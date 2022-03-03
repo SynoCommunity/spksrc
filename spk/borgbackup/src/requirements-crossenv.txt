@@ -1,5 +1,8 @@
-# For reference
-#borgbackup==1.1.17
+# Pending final 1.2 release:
+#   Ref: https://github.com/borgbackup/borg/issues/6105
+#   Ref: https://github.com/borgbackup/borg/commit/e41d8e82863bac17d0b64e2091a2fe14f0ffb776
+# git+https://github.com/borgbackup/borg@e41d8e82863bac17d0b64e2091a2fe14f0ffb776#egg=borgbackup==1.2.0
+borgbackup==1.2.0
 
 pyrsistent==0.18.0
 ruamel.yaml.clib==0.2.6
