@@ -1,15 +1,15 @@
 # Wheels that absolutely needs
 # to be managed as pure-python
 #certifi==2021.5.30            ==> python310:pure
-jsonschema==3.2.0
-attrs==21.2.0
-borgmatic==1.5.18
-charset-normalizer==2.0.4
+attrs==21.4.0
+borgmatic==1.5.23
+charset-normalizer==2.0.12
 colorama==0.4.4
-idna==3.2
-packaging==21.0
-pyparsing==2.4.7
-requests==2.26.0
-ruamel.yaml==0.17.16
-six==1.16.0
-urllib3==1.26.6
+idna==3.3
+jsonschema==4.4.0
+msgpack==1.0.3
+packaging==21.3
+pyparsing==3.0.7
+requests==2.27.1
+ruamel.yaml==0.17.21
+urllib3==1.26.8

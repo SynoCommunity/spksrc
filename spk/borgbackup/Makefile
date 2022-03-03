@@ -1,10 +1,10 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.1.17
+SPK_VERS = 1.2.0
 SPK_REV = 10
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python310
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2
 
 SPK_DEPENDS = "python310"
 
@@ -15,7 +15,6 @@ SPK_DEPENDS = "python310"
 # pip install  ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic
 # pip freeze > requirements.txt
 # deactivate
-# adjust the first line in requirements.txt to "#borgbackup==1.1.17"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity
@@ -23,14 +22,19 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgbackup to v1.1.17 and borgmatic to v1.5.18.<br/>2. Update OpenSSL to v1.1.1l.<br/>3. Update to Python 3.10"
+CHANGELOG = "1. Update to borgbackup 1.2.0<br/>2. Update borgmatic to v1.5.23<br/>3. Update OpenSSL to v1.1.1m<br/>4. Add BLAKE2-libb2 support<br/>5. Update to Python 3.10"
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause
-LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
+#LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
 
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic
+
+ENV += BORG_OPENSSL_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 
 include ../../mk/spksrc.spk.mk
