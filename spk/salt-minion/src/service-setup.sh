@@ -26,7 +26,7 @@ service_postinst ()
     test -f ${SYNOPKG_PKGETC}/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGETC}/minion
     test -f ${SYNOPKG_PKGETC}/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGETC}/proxy
     test -f ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf || echo "pidfile: ${SYNOPKG_PKGVAR}/run/" > ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf
-    test -f ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf.conf || echo "sock_dir: ${SYNOPKG_PKGVAR}/run/minion" > ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf || echo "sock_dir: ${SYNOPKG_PKGVAR}/run/minion" > ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf
     test -f ${SYNOPKG_PKGETC}/minion.d/03_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGETC}/minion.d/03_cachedir.conf
     test -f ${SYNOPKG_PKGETC}/minion.d/04_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGETC}/minion.d/04_logging.conf
     test -f ${SYNOPKG_PKGETC}/minion.d/05_loglevel.conf || echo "log_level_logfile: info" > ${SYNOPKG_PKGETC}/minion.d/05_loglevel.conf
