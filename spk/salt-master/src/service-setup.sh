@@ -24,7 +24,7 @@ service_postinst ()
     # Prepare salt-master config in /var/packages/salt-master/target/etc
     test -d ${SYNOPKG_PKGETC}/master.d || install -m 755 -d ${SYNOPKG_PKGETC}/master.d
     test -f ${SYNOPKG_PKGETC}/master || install -m 644 ${SYNOPKG_PKGDEST}/share/master ${SYNOPKG_PKGETC}/master
-    test -f ${SYNOPKG_PKGETC}/master.d/01_pidfile.conf || echo "pidfile: ${SYNOPKG_PKGVAR}/run/" > ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf
+    test -f ${SYNOPKG_PKGETC}/master.d/01_pidfile.conf || echo "pidfile: ${SYNOPKG_PKGVAR}/run/" > ${SYNOPKG_PKGETC}/master.d/01_pidfile.conf
     test -f ${SYNOPKG_PKGETC}/master.d/02_sockdir.conf.conf || echo "sock_dir: ${SYNOPKG_PKGVAR}/run/master" > ${SYNOPKG_PKGETC}/master.d/02_sockdir.conf
     test -f ${SYNOPKG_PKGETC}/master.d/03_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGETC}/master.d/03_cachedir.conf
     test -f ${SYNOPKG_PKGETC}/master.d/04_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGETC}/master.d/04_logging.conf
