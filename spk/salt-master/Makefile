@@ -30,9 +30,10 @@ POST_STRIP_TARGET = salt-master_extra_install
 # Service configuration
 SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
-SERVICE_PORT       = 4505,4506,8282
+SERVICE_PORT       = 8282
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 STARTABLE          = yes
+FWPORTS            = src/salt-master.sc
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
