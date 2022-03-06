@@ -25,12 +25,13 @@ service_postinst ()
     test -d ${SYNOPKG_PKGETC}/minion.d || install -m 755 -d ${SYNOPKG_PKGETC}/minion.d
     test -f ${SYNOPKG_PKGETC}/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGETC}/minion
     test -f ${SYNOPKG_PKGETC}/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGETC}/proxy
-    test -f ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf || echo "pidfile: ${SYNOPKG_PKGVAR}/run/" > ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf
-    test -f ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf || echo "sock_dir: ${SYNOPKG_PKGVAR}/run/minion" > ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf
-    test -f ${SYNOPKG_PKGETC}/minion.d/03_cachedir.conf || echo "cachedir: ${SYNOPKG_PKGVAR}/cache" > ${SYNOPKG_PKGETC}/minion.d/03_cachedir.conf
-    test -f ${SYNOPKG_PKGETC}/minion.d/04_logging.conf || echo "log_file: ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGETC}/minion.d/04_logging.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf || echo "pidfile: run" > ${SYNOPKG_PKGETC}/minion.d/01_pidfile.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf || echo "sock_dir: run/minion" > ${SYNOPKG_PKGETC}/minion.d/02_sockdir.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/03_cachedir.conf || echo "cachedir: cache" > ${SYNOPKG_PKGETC}/minion.d/03_cachedir.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/04_logging.conf || echo "log_file: ${SYNOPKG_PKGNAME}.log" > ${SYNOPKG_PKGETC}/minion.d/04_logging.conf
     test -f ${SYNOPKG_PKGETC}/minion.d/05_loglevel.conf || echo "log_level_logfile: info" > ${SYNOPKG_PKGETC}/minion.d/05_loglevel.conf
-    test -f ${SYNOPKG_PKGETC}/minion.d/06_pkidir.conf || echo "pki_dir: ${SYNOPKG_PKGVAR}/pki/minion" > ${SYNOPKG_PKGETC}/minion.d/06_pkidir.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/06_pkidir.conf || echo "pki_dir: pki/minion" > ${SYNOPKG_PKGETC}/minion.d/06_pkidir.conf
+    test -f ${SYNOPKG_PKGETC}/minion.d/07_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGVAR}" > ${SYNOPKG_PKGETC}/minion.d/07_rootdir.conf
 
     # Populate salt master address and minion_id only if file don't already exist
     test -f ${SYNOPKG_PKGETC}/minion.d/99-master-address.conf || echo "master: localhost" > ${SYNOPKG_PKGETC}/minion.d/99-master-address.conf

@@ -4,7 +4,6 @@ SPK_REV = 10
 SPK_ICON = src/salt-master.png
 
 BUILD_DEPENDS = cross/python310
-#DEPENDS = cross/openssl
 SPK_DEPENDS = "python310"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
