@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
 SPK_VERS = 3004
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/salt-master.png
 
 BUILD_DEPENDS = cross/python310
@@ -18,7 +18,6 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI = yes
 DISPLAY_NAME = Salt Master
 CHANGELOG    = "1. Update to 3004<br/>2. Migrate to Python 3.10"
 
@@ -43,6 +42,8 @@ SPK_USR_LOCAL_LINKS += bin:env/bin/salt-run
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-unity
 SPK_USR_LOCAL_LINKS += bin:env/bin/spm
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
+
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 
