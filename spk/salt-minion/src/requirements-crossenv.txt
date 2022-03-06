@@ -1,0 +1,12 @@
+# https://github.com/saltstack/salt/blob/master/requirements/static/pkg/py3.10/linux.txt
+cffi==1.14.6
+cryptography==3.3.2
+immutables==0.15
+MarkupSafe==1.1.1
+msgpack==1.0.2
+psutil==5.8.0
+pycryptodomex==3.9.8
+PyYAML==5.4.1
+pyzmq==20.0.0
+setproctitle==1.2.2
+timelib==0.2.5
