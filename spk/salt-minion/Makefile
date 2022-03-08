@@ -1,6 +1,6 @@
 SPK_NAME = salt-minion
 SPK_VERS = 3004
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/salt-minion.png
 
 BUILD_DEPENDS = cross/python310
@@ -36,6 +36,8 @@ SPK_USR_LOCAL_LINKS  = bin:env/bin/salt-call
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-minion
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-proxy
 SPK_USR_LOCAL_LINKS += bin:env/bin/spm
+
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 
