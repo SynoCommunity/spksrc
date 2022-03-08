@@ -5,6 +5,8 @@ SPK_ICON = src/salt-master.png
 
 BUILD_DEPENDS = cross/python310
 SPK_DEPENDS = "python310"
+# TODO: Enable as website to provide salt-master status
+DEPENDS = cross/saltgui
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
@@ -30,10 +32,8 @@ POST_STRIP_TARGET = salt-master_extra_install
 # Service configuration
 SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
-SERVICE_PORT       = 8282
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 STARTABLE          = yes
-FWPORTS            = src/salt-master.sc
+FWPORTS            = src/conf/salt-master.sc
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
