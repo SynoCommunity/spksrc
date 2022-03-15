@@ -2,7 +2,7 @@
 
 .PHONY: kernel-required
 kernel-required:
-	@if [ -n "$(REQUIRE_KERNEL)" ]; then \
+	@if [ -n "$(REQUIRE_KERNEL)" -o -n "$(REQUIRE_KERNEL_MODULE)" ]; then \
 	  exit 1 ; \
 	fi
 	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \
