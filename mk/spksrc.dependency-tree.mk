@@ -48,4 +48,4 @@ dependency-flat:
 .PHONY: kernel-dependency-list
 kernel-dependency-list:
 	@echo -n "$(NAME): "
-	@echo "$(KERNEL_DEPEND)"
+	@echo "$(KERNEL_MOULE_DEPEND)"
