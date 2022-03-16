@@ -40,7 +40,7 @@ ifeq ($(strip $(REQUIRE_KERNEL)),)
 KERNEL_DEPEND = 
 else ifeq ($(strip $(REQUIRE_KERNEL)),1)
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-KERNEL_DEPEND = $(filter-out $(GENERIC_ARCHS),$(addprefix kernel/syno-,$(filter $(addprefix %-,$(filter $(firstword $(subst ., ,$(TCVERSION))).%,$(AVAILABLE_KERNEL_VERSIONS))),$(LEGACY_ARCHS))))
+KERNEL_DEPEND = $(filter-out $(GENERIC_ARCHS),$(addprefix kernel/syno-,$(filter $(addprefix %-,$(filter $(firstword $(subst ., ,$(TCVERSION))).%,$(AVAILABLE_KERNEL_VERSIONS))),$(filter-out $(addsuffix -%,$(UNSUPPORTED_ARCHS)),$(LEGACY_ARCHS)))))
 else
 KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)
 endif
