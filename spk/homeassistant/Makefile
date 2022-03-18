@@ -62,11 +62,6 @@ WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
 
-# [numpy]
-# gcc-4.6.4 failed with exit status 1
-# https://github.com/numpy/numpy/issues/20664
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
 include ../../mk/spksrc.spk.mk
 
 # [numpy]
