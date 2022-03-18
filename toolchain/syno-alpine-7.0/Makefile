@@ -1,13 +1,11 @@
-TC_NAME = syno-alpine
-
-TC_ARCH = alpine alpine4k
+TC_ARCH = alpine
 TC_VERS = 7.0
 TC_BUILD = 41890
 TC_KERNEL = 3.10.108
 TC_GCC = 7.5.0
 TC_GLIBC = 2.36
 
-TC_DIST = alpine4k-gcc750_glibc226_hard-GPL
+TC_DIST = alpine-gcc750_glibc226_hard-GPL
 TC_DIST_SITE_PATH = Annapurna%20Alpine%20Linux%203.10.108
 
 TC_TARGET = arm-unknown-linux-gnueabi
