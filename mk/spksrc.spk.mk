@@ -534,12 +534,13 @@ publish-legacy-toolchain-%: spk_msg
 ####
 
 kernel-modules-%:
-	@$(MSG) ARCH to be processed: $(filter $(addprefix %-,$(AVAILABLE_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))
-	@for arch in $(filter $(addprefix %-,$(AVAILABLE_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS))) ; do \
+	@$(MSG) ARCH to be processed: $(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))
+	@for arch in $(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS))) ; do \
 	  $(MSG) "Processing $${arch} ARCH" ; \
 	  $(MAKE) WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $${arch}) ; \
 	  $(MAKE) spkclean ; \
 	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
+	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
 	done
 
 arch-%: | pre-build-native
