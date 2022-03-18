@@ -25,7 +25,7 @@ bin:bin/pg_verify_checksums
 bin:bin/pg_waldump
 bin:bin/pgbench
 bin:bin/postgres
-bin:bin/postmaster
+lnk:bin/postmaster
 bin:bin/psql
 bin:bin/reindexdb
 bin:bin/vacuumdb

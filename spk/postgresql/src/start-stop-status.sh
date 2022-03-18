@@ -1,35 +1,26 @@
 #!/bin/sh
-  
-DAEMON_USER="`echo ${SYNOPKG_PKGNAME} | awk {'print tolower($_)'}`"
-DAEMON_ID="${SYNOPKG_PKGNAME} daemon user"
-DAEMON_USER_SHORT=`echo ${DAEMON_USER} | cut -c 1-8`
 
-DATABASE_DIR="${SYNOPKG_PKGDEST}/share/data"
+# Source package specific variables and functions
+SVC_SETUP=$(dirname $0)"/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    . "${SVC_SETUP}"
+fi
 
-daemon_status ()
-{
-    ps -efa | grep "postgresql" > /dev/null
-}
-
+POSTGRES="${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR}"
 
 case $1 in
   start)
-    su - ${DAEMON_USER} -s /bin/sh -c "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${DATABASE_DIR}/logfile start"
+    ${POSTGRES} -l ${LOG_FILE} start
     exit 0
   ;;
 
   stop)
-    su - ${DAEMON_USER} -s /bin/sh -c "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop"
+    ${POSTGRES} stop
     exit 0
   ;;
 
   status)
-    if daemon_status ; then
-      exit 0
-    else
-      exit 1
-    fi
+    ${POSTGRES} status &> /dev/null && exit 0 || exit 1
   ;;
 
 esac
-~         

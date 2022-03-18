@@ -16,5 +16,17 @@
             "desc": "Databases dump location",
             "defaultValue": "/volume1/pg_dump/"
         }]
+        }, {
+          "type": "singleselect",
+          "desc": "Keep or delete package settings and database.",
+          "subitems": [{
+            "key": "wizard_keep_data",
+            "desc": "<b>Uninstall only.</b> Keep existing files for future re-installation.",
+            "defaultValue": true
+          }, {
+            "key": "wizard_delete_data",
+            "desc": "<b style=\"color: red\">Erase all of the package data files. (Not Recoverable)</b>",
+            "defaultValue": false
+        }]
     }]
 }]
