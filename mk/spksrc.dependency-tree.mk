@@ -45,7 +45,7 @@ dependency-flat:
 	done
 
 
-.PHONY: kernel-dependency-list
-kernel-dependency-list:
+.PHONY: dependency-kernel-list
+dependency-kernel-list:
 	@echo -n "$(NAME): "
 	@echo "$(KERNEL_MODULE_DEPEND)"

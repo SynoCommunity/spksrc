@@ -97,8 +97,8 @@ else
     for package in ${packages}
     do
         DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=6.1 kernel-dependency-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=7.0 kernel-dependency-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=6.1 dependency-kernel-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=7.0 dependency-kernel-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
