@@ -2,7 +2,6 @@ TC_ARCH = alpine
 TC_VERS = 7.0
 TC_BUILD = 41890
 TC_KERNEL = 3.10.108
-TC_GCC = 7.5.0
 TC_GLIBC = 2.36
 
 TC_DIST = alpine-gcc750_glibc226_hard-GPL

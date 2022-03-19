@@ -1,7 +1,6 @@
 TC_ARCH = grantley
 TC_VERS = 6.2.3
 TC_KERNEL = 3.10.105
-TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = grantley-gcc493_glibc220_linaro_x86_64-GPL

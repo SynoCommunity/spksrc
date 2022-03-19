@@ -1,7 +1,6 @@
 TC_ARCH = evansport
 TC_VERS = 6.2.4
 TC_KERNEL = 3.2.40
-TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = evansport-gcc493_glibc220_linaro_i686-GPL
