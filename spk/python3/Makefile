@@ -14,7 +14,7 @@ DEPENDS += cross/cryptography
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-MAINTAINER = Allan Clark
+MAINTAINER = chickenandpork
 DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
