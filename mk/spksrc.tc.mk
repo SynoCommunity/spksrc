@@ -50,14 +50,14 @@ include ../../mk/spksrc.tc-flags.mk
 fix: flag
 include ../../mk/spksrc.tc-fix.mk
 
-all: $(TC_LOCAL_VARS_MK)
+all: fix $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK): fix
 	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
 
-.PHONY: tc_vars
-tc_vars: fix
+.PHONY:
+tc_vars:
 	@echo TC_ENV :=
 	@for tool in $(TOOLS) ; \
 	do \
