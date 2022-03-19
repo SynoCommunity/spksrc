@@ -24,13 +24,23 @@ export INSTALL_PREFIX
 
 $(TC_VARS_MK):
 	$(create_target_dir)
-	@$(MSG) "Set up toolchain "
+ifeq ($(strip $(MAKECMDGOALS)),download)
+	@$(MSG) "Downloading toolchain"
+	@if env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) download ; \
+	then \
+	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $@ ; \
+	else \
+	  echo "$$""(error An error occured while downloading the toolchain, please check the messages above)" > $@; \
+	fi
+else
+	@$(MSG) "Setting-up toolchain "
 	@if env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) ; \
 	then \
 	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $@ ; \
 	else \
 	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
 	fi
+endif
 
 -include $(TC_VARS_MK)
 ENV += TC=$(TC)

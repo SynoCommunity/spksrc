@@ -15,6 +15,7 @@ else
     echo "===> Download packages: ${DOWNLOAD_PACKAGES}"
     for download in ${DOWNLOAD_PACKAGES}
     do
+        echo "$ make -c ${download} download"
         make -C ${download} download
     done
 fi
