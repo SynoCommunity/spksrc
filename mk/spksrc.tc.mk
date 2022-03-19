@@ -65,7 +65,7 @@ tc_vars:
 	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
 	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
 	  if [ "$${target}" = "cc" ] ; then \
-	    gcc_version=`eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion)` ; \
+	    gcc_version=`eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true` ; \
 	  fi ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\)\" ; \
