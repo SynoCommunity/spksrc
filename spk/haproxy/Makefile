@@ -13,7 +13,6 @@ MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité, la répartition de charge et le proxy de services TCP ou HTTP.
 ADMIN_PORT = 8280
-RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
 CHANGELOG = "1. Update haproxy 2.2.4.<br/>2. Update openssl to 1.1."
 

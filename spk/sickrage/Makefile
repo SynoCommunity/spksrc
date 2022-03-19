@@ -8,7 +8,6 @@ SPK_DEPENDS = "python>=2.7.6-8:git"
 MAINTAINER = echel0n
 DESCRIPTION = Video File Manager for TV Shows. It watches for new episodes of your favorite shows and when they are posted it does its magic.
 STARTABLE = yes
-RELOAD_UI = yes
 DISPLAY_NAME = SiCKRAGE
 CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 

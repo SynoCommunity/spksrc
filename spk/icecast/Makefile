@@ -11,7 +11,6 @@ DESCRIPTION = "Icecast is a streaming media server which currently supports Ogg 
 ADMIN_PORT = 8000
 CHANGELOG = "Update openssl to 1.1."
 
-RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = Icecast
 

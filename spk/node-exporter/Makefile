@@ -7,7 +7,7 @@ DEPENDS = cross/$(SPK_NAME)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-MAINTAINER = FatMinMin
+MAINTAINER = chiehmin
 DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels
 STARTABLE = yes
 DISPLAY_NAME = Node Exporter

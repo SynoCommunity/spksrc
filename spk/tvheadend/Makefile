@@ -21,7 +21,6 @@ DEPENDS = cross/$(SPK_NAME) cross/zap2epg cross/dtv-scan-tables
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
-RELOAD_UI = yes
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
 CHANGELOG = "1. Update to latest git version b871020 as of November 21th 2021<br/>2. Update openssl to 1.1l<br/>3. Updated to use FFMPEG 4.3.3<br/>4. Updated libhdhomerun to version 20210624<br/>5. Update to Python 3.10<br/>6. Update pngquant to version 2.17.0<br/>7. Update readline to version 8.1"
