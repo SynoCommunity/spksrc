@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# Package
-PACKAGE="adminer"
-DNAME="Adminer"
-
-
 case $1 in
     start)
         exit 0
