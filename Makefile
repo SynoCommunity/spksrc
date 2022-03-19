@@ -177,7 +177,6 @@ dsm-%: local.mk
 setup-synocommunity: setup
 	@sed -i -e "s|PUBLISH_URL\s*=.*|PUBLISH_URL = https://api.synocommunity.com|" \
 		-e "s|MAINTAINER\s*?=.*|MAINTAINER ?= SynoCommunity|" \
-		-e "s|MAINTAINER_URL\s*?=.*|MAINTAINER_URL ?= https://synocommunity.com|" \
 		-e "s|DISTRIBUTOR\s*=.*|DISTRIBUTOR = SynoCommunity|" \
 		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
 		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
