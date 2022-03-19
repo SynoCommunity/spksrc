@@ -23,7 +23,6 @@ OPTIONAL_DEPENDS = cross/lirc-0.8.7
 
 MAINTAINER = bru7us
 DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
-RELOAD_UI = no
 DISPLAY_NAME = LIRC
 
 HOMEPAGE = https://www.lirc.org/

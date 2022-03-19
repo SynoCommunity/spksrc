@@ -12,7 +12,6 @@ MAINTAINER_URL = https://www.linkedin.com/in/bingjing-chang/
 DISTRIBUTOR = SynoCommunity
 DISTRIBUTOR_URL = https://synocommunity.com
 DESCRIPTION = "This package mounts an iOS® device \(connected by USB\) to a shared folder of your Diskstation. You can access such folders locally or from remote with Synology FileStation. Some command line tools are included to communicate with connected devices."
-RELOAD_UI = no
 DISPLAY_NAME = iOS Access
 CHANGELOG = "Update openssl to 1.1."
 

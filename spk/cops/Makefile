@@ -10,7 +10,6 @@ MAINTAINER = Diaoul
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
-RELOAD_UI = yes
 DISPLAY_NAME = COPS
 CHANGELOG = "1. Update to 1.0.1<br>2. Improved DSM6 compatibility"
 

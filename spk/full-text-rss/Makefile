@@ -9,7 +9,6 @@ DEPENDS  =
 MAINTAINER = moneytoo
 DESCRIPTION = Create full-text feed from feed or webpage URL.
 ADMIN_URL = /full-text-rss/
-RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Full-Text RSS
 CHANGELOG = "1. Add site config files"

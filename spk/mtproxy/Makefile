@@ -12,7 +12,6 @@ MAINTAINER = Anonym-tsk
 # From TelegramMessenger/MTProxy
 DESCRIPTION = Simple MT-Proto proxy server
 DESCRIPTION_RUS = Простой MT-Proto прокси сервер
-RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = MTProxy
 CHANGELOG = "1. Update openssl to 1.1."

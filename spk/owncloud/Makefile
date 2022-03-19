@@ -9,7 +9,6 @@ DEPENDS  = cross/busybox cross/$(SPK_NAME)
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 ADMIN_URL = /owncloud/
-RELOAD_UI = yes
 DISPLAY_NAME = ownCloud
 CHANGELOG = "1. Update ownCloud to 8.1.12"
 

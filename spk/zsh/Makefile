@@ -12,7 +12,6 @@ DEPENDS = cross/zsh
 MAINTAINER = SynoCommunity
 DESCRIPTION = Zsh is a shell designed for interactive use, although it is also a powerful scripting language.
 DESCRIPTION_FRE = Zsh est un shell conçu pour un usage intéractif, mais il est aussi un puissant langage de script.
-RELOAD_UI = no
 DISPLAY_NAME = Z shell
 STARTABLE = no
 CHANGELOG = "Update to 5.8.1"

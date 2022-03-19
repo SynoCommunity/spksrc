@@ -10,7 +10,6 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 MAINTAINER = SynoCommunity
 DESCRIPTION = Aggregate automatically NZB search results. Easy. Quick. Clean. NZBmegasearcH collects all your \(not only\) newznab-based accounts to one place. It is your meta-search engine and your SB, CP unique NZB provider.
 ADMIN_PORT = 8086
-RELOAD_UI = yes
 DISPLAY_NAME = NZBmegasearcH
 
 CHANGELOG = "Fix DSM 6 service start."

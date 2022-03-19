@@ -184,9 +184,6 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
-ifeq ($(RELOAD_UI),yes)
-	@echo reloadui=\"$(RELOAD_UI)\" >> $@
-endif
 
 # for non startable (i.e. non service, cli tools only)
 # as default is 'yes' we only add this value for 'no'

@@ -11,7 +11,6 @@ SPK_DEPENDS = "python>=2.7.11-15"
 MAINTAINER = M4tt075
 DESCRIPTION = Gate One is an HTML5-powered terminal emulator and SSH client
 DESCRIPTION_FRE = Gate One est un émulateur de terminal et un client SSH fonctionnant en HTML5
-RELOAD_UI = yes
 DISPLAY_NAME = GateOne
 STARTABLE = yes
 CHANGELOG = "1. Update Gateone to revision 6ae1d01, 2. Update dtach to v0.9, 3. Use DSM 5+6 service approach."

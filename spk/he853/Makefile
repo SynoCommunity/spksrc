@@ -8,7 +8,6 @@ REQUIRED_DSM = 5.0
 
 MAINTAINER = ymartin59
 DESCRIPTION = HomeEasy HE853 USB device executable - https://github.com/hphde/he853-cli - Allows usage of 433MHz HomeEasy and Smartwares devices from your NAS.
-RELOAD_UI = no
 DISPLAY_NAME = HomeEasy HE853 USB device executable
 STARTABLE = no
 CHANGELOG = "Build for DSM 6.1 and upper"
