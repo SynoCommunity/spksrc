@@ -115,19 +115,10 @@ endif
 
 ifeq ($(strip $(MAINTAINER)),)
 $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAINER in local.mk.)
-else
-	ifeq ($(strip $(MAINTAINER_URL)),)
-	   MAINTAINER_URL = $(shell wget --quiet --spider https://github.com/$(MAINTAINER) && echo "https://github.com/$(MAINTAINER)" || echo "")
-      ifeq ($(strip $(MAINTAINER_URL)),)
-$(error When MAINTAINER $(MAINTAINER) is not a gihub user you must define MAINTAINER_URL in spk Makefile for $(SPK_NAME) too.)
-      endif
-	endif
-	MAINTAINER_NAME = $(shell curl -s  https://api.github.com/users/$(MAINTAINER) | jq -r '.name')
-	ifeq ($(strip $(MAINTAINER_NAME)),null)
-	   # MAINTAINER has valid login, but no name configured.
-	   MAINTAINER_NAME =
-	endif
 endif
+
+get_github_maintainer_url = $(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo "")
+get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' )
 
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
@@ -143,12 +134,12 @@ $(WORK_DIR)/INFO:
             /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
             /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
-ifneq ($(strip $(MAINTAINER_NAME)),)
-	@echo maintainer=\"$(MAINTAINER_NAME)\" >> $@
+	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
+ifeq ($(strip $(MAINTAINER_URL)),)
+	@echo maintainer_url=\"$(call get_github_maintainer_url,$(MAINTAINER))\" >> $@
 else
-	@echo maintainer=\"$(MAINTAINER)\" >> $@
-endif
 	@echo maintainer_url=\"$(MAINTAINER_URL)\" >> $@
+endif
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
 ifneq ($(strip $(OS_MIN_VER)),)
