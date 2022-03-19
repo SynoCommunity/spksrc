@@ -46,7 +46,7 @@ echo "===> PACKAGES to Build: ${build_packages}"
 # publish to synocommunity.com when the API key is set
 MAKE_ARGS=
 if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
-    MAKE_ARGS=publish
+    MAKE_ARGS="publish-"
 fi
 
 # Build
@@ -57,22 +57,21 @@ do
     echo >build.log
 
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
-        # use TCVERSION and ARCH to get real exit codes.
-        echo "$ make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}" >>build.log
-        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package} ${MAKE_ARGS} |& tee >(tail -15 >>build.log)
+        echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+        make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
             TCVERSION=
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS} |& tee >(tail -15 >>build.log)
+        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
     fi
     result=$?
 
-    if [ ${result} -eq 0 ];
-    then
+    # For a build to succeed a <package>_<arch>-<version>.spk must also be generated
+    if [ ${result} -eq 0 -a "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk)" ]; then
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE"   >> ${BUILD_SUCCESS_FILE}
     else
         cat build.log >> ${BUILD_ERROR_LOGFILE}
