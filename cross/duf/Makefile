@@ -1,5 +1,5 @@
 PKG_NAME = duf
-PKG_VERS = 0.7.0
+PKG_VERS = 0.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/muesli/duf/archive

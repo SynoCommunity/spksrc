@@ -1,5 +1,5 @@
 SPK_NAME = duf
-SPK_VERS = 0.7.0
+SPK_VERS = 0.8.1
 SPK_REV = 1
 
 DEPENDS = cross/$(SPK_NAME)
