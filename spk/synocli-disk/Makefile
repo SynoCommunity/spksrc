@@ -5,7 +5,8 @@ SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
 DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
-OPTIONAL_DEPENDS = cross/dar cross/duf cross/gdu
+OPTIONAL_DEPENDS  = cross/dar cross/duf cross/gdu cross/tdu
+OPTIONAL_DEPENDS += cross/dua cross/dutree
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli Disk Tools
@@ -22,13 +23,19 @@ endif
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # Tools built with go are not supported on PPC archs
-DEPENDS += cross/duf cross/gdu
-OPTIONAL_DESC := $(OPTIONAL_DESC)", duf, gdu"
+DEPENDS += cross/duf cross/gdu cross/tdu
+OPTIONAL_DESC := $(OPTIONAL_DESC)", duf, gdu, tdu"
+endif
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# not supported on old PPC archs
+DEPENDS += cross/dua cross/dutree
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add duf, a 'df' alternative.<br/>2. Add gdu, disk usage analyzer."
+CHANGELOG = "1. Add duf, a 'df' alternative.<br/>2. Add gdu, disk usage analyzer.<br/>3. Add dua, Disk Usage Analyzer.<br/>4. Add dutree, analyze file system usage.<br/>5. Add tdu, Top Disk Usage."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -51,6 +58,7 @@ SPK_COMMANDS += sbin/mount.davfs sbin/umount.davfs
 SPK_COMMANDS += bin/lsscsi
 SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
 SPK_COMMANDS += bin/ddrescue bin/ddrescuelog
-SPK_COMMANDS += bin/duf bin/gdu
+SPK_COMMANDS += bin/duf bin/gdu bin/tdu
+SPK_COMMANDS += bin/dua bin/dutree
 
 include ../../mk/spksrc.spk.mk

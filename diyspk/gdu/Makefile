@@ -8,7 +8,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Fast disk usage analyzer with console interface written in Go.
-DISPLAY_NAME = gdu
+DISPLAY_NAME = $(SPK_NAME)
 STARTABLE = no
 
 HOMEPAGE = https://github.com/dundee/gdu

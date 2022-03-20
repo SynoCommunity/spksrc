@@ -8,7 +8,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Disk Usage/Free Utility - a better 'df' alternative.
-DISPLAY_NAME = duf
+DISPLAY_NAME = $(SPK_NAME)
 STARTABLE = no
 
 HOMEPAGE = https://github.com/muesli/duf
