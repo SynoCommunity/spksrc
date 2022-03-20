@@ -22,4 +22,4 @@ include ../../mk/spksrc.cross-go.mk
 .PHONY: duf_pre_compile
 duf_pre_compile:
 	@$(MSG) Patch version into main.go
-	@$(RUN) ; sed -i -e 's|Version   = ""|Version   = "$(PKG_VERS)"|g' main.go
+	@$(RUN) ; sed -e 's|Version = ""|Version = "$(PKG_VERS)"|g' -i main.go
