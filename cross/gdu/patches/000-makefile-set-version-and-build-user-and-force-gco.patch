@@ -1,9 +1,11 @@
-# - make version configurable
-#   to build target from source instead from git clone
+# - make version configurable to build target from source instead from git clone
 # - set build user to 'SynoCommunity'
+# - revert https://github.com/dundee/gdu/commit/c4db1104dd3c25124a5ea01da91b1400d091ccd7
+#   - build with CGO_ENABLED=1
+#   - remove 'static' linker flag
 # 
---- Makefile.orig	2021-12-11 11:53:31.000000000 +0100
-+++ Makefile	2022-01-26 22:45:24.563111145 +0100
+--- Makefile.orig	2021-12-11 10:53:31.000000000 +0000
++++ Makefile	2022-03-20 12:04:02.484366788 +0000
 @@ -2,12 +2,12 @@
  MAJOR_VER := v5
  PACKAGE := github.com/dundee/$(NAME)/$(MAJOR_VER)
@@ -12,7 +14,8 @@
 +VERSION ?= $(shell git describe --tags 2>/dev/null)
  DATE := $(shell date +'%Y-%m-%d')
  GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw
- LDFLAGS := -s -w -extldflags '-static' \
+-LDFLAGS := -s -w -extldflags '-static' \
++LDFLAGS := -s -w \
  	-X '$(PACKAGE)/build.Version=$(VERSION)' \
 -	-X '$(PACKAGE)/build.User=$(shell id -u -n)' \
 +	-X '$(PACKAGE)/build.User=SynoCommunity' \
