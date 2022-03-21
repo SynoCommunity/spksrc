@@ -38,13 +38,24 @@ endif
 copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
 	@rm -fr $(STAGING_DIR)
-	@mkdir $(STAGING_DIR)
 
 pre_copy_target: copy_msg
 
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
-	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@$(MSG) Copy target to staging, discard var directory [DSM7]
+	@(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | sed -e '/^.*:var\/.*/d' -e 's/^.*://g'`) | \
 	  tar xpf - -C $(STAGING_DIR)
+	@$(MSG) Copy var to STAGING_SPKVAR
+	@if [ "`cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`" ] ; then \
+	  (mkdir -p $(STAGING_SPKVAR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
+	  tar xpf - -C $(STAGING_SPKVAR) ; \
+	fi
+else
+	@$(MSG) Copy target to staging [DSM6]
+	@(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
+	  tar xpf - -C $(STAGING_DIR)
+endif
 
 post_copy_target: $(COPY_TARGET)
 
