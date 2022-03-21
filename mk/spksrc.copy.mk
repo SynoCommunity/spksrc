@@ -48,7 +48,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	  tar xpf - -C $(STAGING_DIR)
 	@$(MSG) Copy var to $(STAGING_DIR)/var
 	@if [ "`cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`" ] ; then \
-	  (mkdir -p $(STAGING_SPKVAR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
+	  (mkdir -p $(STAGING_DIR)/var && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
 	  tar xpf - -C $(STAGING_DIR)/var ; \
 	fi
 else
