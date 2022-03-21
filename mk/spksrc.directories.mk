@@ -71,12 +71,6 @@ ifeq ($(strip $(STAGING_DIR)),)
 STAGING_DIR = $(WORK_DIR)/staging
 endif
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-STAGING_SPKVAR  = $(STAGING_DIR)/_var
-else
-STAGING_SPKVAR  = $(STAGING_DIR)/var
-endif
-
 # python wheelhouse directories
 ifndef WHEELHOUSE
 WHEELHOUSE = $(WORK_DIR)/wheelhouse
