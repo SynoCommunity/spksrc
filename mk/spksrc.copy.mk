@@ -41,15 +41,17 @@ copy_msg:
 
 pre_copy_target: copy_msg
 
+copy_target: SHELL:=/bin/bash
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@$(MSG) Copy target to staging, discard var directory [DSM7]
+	@$(MSG) [DSM7+] Copy target to staging, discard var directory
 	@(mkdir -p $(STAGING_DIR) && cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | sed -e '/^.*:var\/.*/d' -e 's/^.*://g'`) | \
 	  tar xpf - -C $(STAGING_DIR)
-	@$(MSG) Copy var to $(STAGING_DIR)/var
+	@$(MSG) "[DSM7+] Copy & merge var and target/var to $(STAGING_DIR)/var"
 	@if [ "`cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`" ] ; then \
-	  (mkdir -p $(STAGING_DIR)/var && cd $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR) && tar cpf - `cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p'`) | \
-	  tar xpf - -C $(STAGING_DIR)/var ; \
+	  mkdir -p $(STAGING_DIR)/var ; \
+	  (cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - $$(eval ls -d $$(cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p' | sed -e 's?^?{var,target/var}/?') 2>/dev/null)) | \
+	    tar xpf - -C $(STAGING_DIR)/var --strip-components=1 --transform='s!^target/!!' ; \
 	fi
 else
 	@$(MSG) Copy target to staging [DSM6]
