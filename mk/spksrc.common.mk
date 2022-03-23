@@ -18,7 +18,7 @@ PIP ?= pip
 
 # Cross compiling must call "pip" directly to ensure using
 # $(WORK_DIR)/crossenv pip version instead from adjusted $PATH
-PIP_CROSSENV = $(shell . $(CROSSENV) && $(RUN) which pip)
+PIP_CROSSENV = $(shell [ -s "$(CROSSENV)" ] && . $(CROSSENV) && $(RUN) which pip)
 
 # System default pip outside from build environment
 PIP_SYSTEM = $(shell which pip)
