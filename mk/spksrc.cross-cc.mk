@@ -1,20 +1,24 @@
 # Default make programs
 #
 
+# When compiling from cross/* it is possible
+# build in parallel but only using all-supported
+# option.
+#  Ex: PARALLEL_MAKE=max make -j4 all-supported
 #
-# When compiling from cross/* it's not possible
-# to build in parallel using both -jX command
-# line argument in conjunction with flag
-# PARALLEL_MAKE=X.  The .NOTPARALLEL is needed
-# in order to disable the -jX flag when called
-# within cross/* only.
-#
+# Manual multi-arch parallel build using both
+# -jX in conjunction with PARALLEL_MAKE=X flag
+# is NOT supported.
+#  EX: PARALLEL_MAKE=max make -j2 arch-aarch64-7.0 arch-x64-7.0
+# 
+# The .NOTPARALLEL is needed in order to disable
+# the -jX flag when called within cross/* only.
 # This does not affect building from spk/*
-# where .NOTPARALLEL is mandatory but will still
-# obey to both -jX + PARALLEL_MAKE options.
 #
+ifeq ($(filter all,$(subst -, ,$(MAKECMDGOALS))),)
 ifneq ($(PARALLEL_MAKE),nop)
 .NOTPARALLEL:
+endif
 endif
 
 # Common makefiles
@@ -93,6 +97,24 @@ include ../../mk/spksrc.dependency-tree.mk
 all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
+
+all-supported: SHELL:=/bin/bash
+all-supported:
+	@$(MSG) Pre-build native dependencies for parallel build
+	@for depend in $$($(MAKE) dependency-list) ; \
+	do \
+	  if [ "$${depend%/*}" = "native" ]; then \
+	    $(MSG) "Pre-processing $${depend}" ; \
+	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee build-$${depend%/*}-$${depend#*/}.log ; \
+	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	  fi ; \
+	done ; \
+	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
+
+supported-arch-%:
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee build-$*.log
 
 cross-cc_msg:
 ifneq ($(filter 1 on ON,$(PSTAT)),)
