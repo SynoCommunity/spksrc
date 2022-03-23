@@ -1,26 +1,6 @@
 # Default make programs
 #
 
-# When compiling from cross/* it is possible
-# build in parallel but only using all-supported
-# option.
-#  Ex: PARALLEL_MAKE=max make -j4 all-supported
-#
-# Manual multi-arch parallel build using both
-# -jX in conjunction with PARALLEL_MAKE=X flag
-# is NOT supported.
-#  EX: PARALLEL_MAKE=max make -j2 arch-aarch64-7.0 arch-x64-7.0
-# 
-# The .NOTPARALLEL is needed in order to disable
-# the -jX flag when called within cross/* only.
-# This does not affect building from spk/*
-#
-ifeq ($(filter all,$(subst -, ,$(MAKECMDGOALS))),)
-ifneq ($(PARALLEL_MAKE),nop)
-.NOTPARALLEL:
-endif
-endif
-
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
