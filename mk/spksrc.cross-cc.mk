@@ -1,22 +1,6 @@
 # Default make programs
 #
 
-#
-# When compiling from cross/* it's not possible
-# to build in parallel using both -jX command
-# line argument in conjunction with flag
-# PARALLEL_MAKE=X.  The .NOTPARALLEL is needed
-# in order to disable the -jX flag when called
-# within cross/* only.
-#
-# This does not affect building from spk/*
-# where .NOTPARALLEL is mandatory but will still
-# obey to both -jX + PARALLEL_MAKE options.
-#
-ifneq ($(PARALLEL_MAKE),nop)
-.NOTPARALLEL:
-endif
-
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
@@ -94,6 +78,24 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
 
+all-supported: SHELL:=/bin/bash
+all-supported:
+	@$(MSG) Pre-build native dependencies for parallel build
+	@for depend in $$($(MAKE) dependency-list) ; \
+	do \
+	  if [ "$${depend%/*}" = "native" ]; then \
+	    $(MSG) "Pre-processing $${depend}" ; \
+	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee build-$${depend%/*}-$${depend#*/}.log ; \
+	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	  fi ; \
+	done ; \
+	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
+
+supported-arch-%:
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee build-$*.log
+
 cross-cc_msg:
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(subst build-arch-,,$(MAKECMDGOALS)), NAME: $(NAME) >> $(PSTAT_LOG)
@@ -103,6 +105,7 @@ arch-%:
 	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
+build-arch-%: SHELL:=/bin/bash
 build-arch-%: cross-cc_msg
 	@$(MSG) Building package for arch $*
 ifneq ($(filter 1 on ON,$(PSTAT)),)

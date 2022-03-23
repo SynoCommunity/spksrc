@@ -487,29 +487,21 @@ supported-arch-error:
 	@$(MSG) ERROR - Please run make setup from spksrc root directory
 	@$(MSG) ########################################################
 
-supported-arch-%: SHELL:=/bin/bash
 supported-arch-%: spk_msg
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
 
-publish-supported-arch-%: SHELL:=/bin/bash
 publish-supported-arch-%: spk_msg
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee build-$*.log
 
-latest-arch-%: SHELL:=/bin/bash
 latest-arch-%: spk_msg
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) 2>&1 | tee build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) 2>&1 | tee build-$*.log
 
-publish-latest-arch-%: SHELL:=/bin/bash
 publish-latest-arch-%: spk_msg
 	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish 2>&1 | tee build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish 2>&1 | tee build-$*.log
 
 ####
 
