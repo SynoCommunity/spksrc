@@ -30,7 +30,7 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-# WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
