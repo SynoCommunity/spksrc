@@ -85,8 +85,9 @@ endif
 	   localPIP=$(PIP) ; \
 	   if [ -s "$(CROSSENV)" ] ; then \
 	      . $(CROSSENV) ; \
-	      localPIP=$($(RUN) which pip) ; \
-	      $(MSG) "Python crossenv found: [$(CROSSENV)] - $${localPIP}" ; \
+	      localPIP=$$($(RUN) which pip) ; \
+	      $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
+	      $(MSG) "pip crossenv found: [$${localPIP}]" ; \
 	   fi ; \
 	   while IFS= read -r requirement ; do \
 	      wheel=$${requirement#*:} ; \
