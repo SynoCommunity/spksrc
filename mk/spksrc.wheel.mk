@@ -77,9 +77,7 @@ endif
 build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: $(PRE_WHEEL_TARGET)
 ifneq ($(strip $(WHEELS)),)
-ifneq ($(wildcard $(WORK_DIR)/python-cc.mk),)
 	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
-endif
 	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
 	   $(MSG) "Cross-compiling wheels" ; \
 	   localPIP=$(PIP) ; \
@@ -88,6 +86,9 @@ endif
 	      localPIP=$$($(RUN) which pip) ; \
 	      $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
 	      $(MSG) "pip crossenv found: [$${localPIP}]" ; \
+	   else \
+	      $(MSG) "WARNING: Python crossenv NOT found!" ; \
+	      $(MSG) "WARNING: pip crossenv NOT found!" ; \
 	   fi ; \
 	   while IFS= read -r requirement ; do \
 	      wheel=$${requirement#*:} ; \
