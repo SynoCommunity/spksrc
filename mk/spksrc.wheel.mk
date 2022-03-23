@@ -84,11 +84,10 @@ endif
 	   $(MSG) "Cross-compiling wheels" ; \
 	   localPIP=$(PIP) ; \
 	   if [ -s "$(CROSSENV)" ] ; then \
-	      $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
 	      . $(CROSSENV) ; \
-	      localPIP=$(PIP_CROSSENV) ; \
+	      localPIP=$($(RUN) which pip) ; \
+	      $(MSG) "Python crossenv found: [$(CROSSENV)] - $${localPIP}" ; \
 	   fi ; \
-	   echo "PIP_CROSSENV: $(PIP_CROSSENV)" ; \
 	   while IFS= read -r requirement ; do \
 	      wheel=$${requirement#*:} ; \
 	      file=$$(basename $${requirement%%:*}) ; \
