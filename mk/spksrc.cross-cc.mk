@@ -103,6 +103,7 @@ arch-%:
 	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
+build-arch-%: SHELL:=/bin/bash
 build-arch-%: cross-cc_msg
 	@$(MSG) Building package for arch $*
 ifneq ($(filter 1 on ON,$(PSTAT)),)
