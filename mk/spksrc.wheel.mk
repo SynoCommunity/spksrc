@@ -78,46 +78,56 @@ build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: $(PRE_WHEEL_TARGET)
 ifneq ($(strip $(WHEELS)),)
 	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
-	@$(MSG) "Cross-compiling wheels" ; \
-	localPIP=$(PIP) ; \
-	if [ -s "$(CROSSENV)" ] ; then \
-	   $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
-	   . $(CROSSENV) ; \
-	   localPIP=$(PIP_CROSSENV) ; \
-	fi ; \
-	while IFS= read -r requirement ; do \
-	   wheel=$${requirement#*:} ; \
-	   file=$$(basename $${requirement%%:*}) ; \
-	   [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
-	   [ "$$(grep -s egg <<< $${wheel})" ] && name=$${wheel#*egg=} || name=$${wheel%%[<>=]=*} ; \
-	   options=($$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	   [ "$${options}" ] && global_option=$$(printf "\x2D\x2Dglobal-option=%s " "$${options[@]}") || global_option="" ; \
-	   localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	   localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	   localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	   localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	   $(MSG) [$${name}] $$([ "$${localCFLAGS[@]}" ] && echo "CFLAGS=$${localCFLAGS[@]} ")$$([ "$${localLDFLAGS[@]}" ] && echo "LDFLAGS=$${localLDFLAGS[@]} ")$$([ "$${localCPPFLAGS[@]}" ] && echo "CPPFLAGS=$${localCPPFLAGS[@]} ")$$([ "$${localCXXFLAGS[@]}" ] && echo "CXXFLAGS=$${localCXXFLAGS[@]} ")$$([ "$${abi3}" ] && echo "$${abi3} ")"$${global_option}" ; \
-	   $(RUN) \
-	      _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-	      CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
-	      LDFLAGS="$(LDFLAGS) $${localLDFLAGS[@]}" \
-	      CPPFLAGS="$(CPPFLAGS) $${localCPPFLAGS[@]}" \
-	      CXXFLAGS="$(CXXFLAGS) $${localCXXFLAGS[@]}" \
-	      $${localPIP} \
-	      $(PIP_WHEEL_ARGS) \
-	      $${abi3} \
-	      $${global_option} \
-	      --no-build-isolation \
-	      $${wheel} || exit 1 ; \
-	done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API))
+	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
+	   $(MSG) "Cross-compiling wheels" ; \
+	   localPIP=$(PIP) ; \
+	   if [ -s "$(CROSSENV)" ] ; then \
+	      . $(CROSSENV) ; \
+	      localPIP=$$($(RUN) which pip) ; \
+	      $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
+	      $(MSG) "pip crossenv found: [$${localPIP}]" ; \
+	   else \
+	      $(MSG) "WARNING: Python crossenv NOT found!" ; \
+	      $(MSG) "WARNING: pip crossenv NOT found!" ; \
+	   fi ; \
+	   while IFS= read -r requirement ; do \
+	      wheel=$${requirement#*:} ; \
+	      file=$$(basename $${requirement%%:*}) ; \
+	      [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
+	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$${wheel#*egg=} || name=$${wheel%%[<>=]=*} ; \
+	      options=($$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	      [ "$${options}" ] && global_option=$$(printf "\x2D\x2Dglobal-option=%s " "$${options[@]}") || global_option="" ; \
+	      localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	      localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	      localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	      localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	      $(MSG) [$${name}] $$([ "$${localCFLAGS[@]}" ] && echo "CFLAGS=$${localCFLAGS[@]} ")$$([ "$${localLDFLAGS[@]}" ] && echo "LDFLAGS=$${localLDFLAGS[@]} ")$$([ "$${localCPPFLAGS[@]}" ] && echo "CPPFLAGS=$${localCPPFLAGS[@]} ")$$([ "$${localCXXFLAGS[@]}" ] && echo "CXXFLAGS=$${localCXXFLAGS[@]} ")$$([ "$${abi3}" ] && echo "$${abi3} ")"$${global_option}" ; \
+	      $(RUN) \
+	         _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	         CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
+	         LDFLAGS="$(LDFLAGS) $${localLDFLAGS[@]}" \
+	         CPPFLAGS="$(CPPFLAGS) $${localCPPFLAGS[@]}" \
+	         CXXFLAGS="$(CXXFLAGS) $${localCXXFLAGS[@]}" \
+	         $${localPIP} \
+	         $(PIP_WHEEL_ARGS) \
+	         $${abi3} \
+	         $${global_option} \
+	         --no-build-isolation \
+	         $${wheel} || exit 1 ; \
+	   done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) ; \
+	else \
+	   $(MSG) "[SKIP] Cross-compiling wheels" ; \
+	fi
 ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
-	   $(MSG) "Force pure-python" ; \
+	   $(MSG) "Building pure-python" ; \
 	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && $(RUN) \
 	      $(PIP) \
 	      $(PIP_WHEEL_ARGS) \
 	      --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 	fi
+else
+	@$(MSG) "[SKIP] Building pure-python"
 endif
 endif
 
