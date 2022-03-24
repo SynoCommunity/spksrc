@@ -87,7 +87,7 @@ install_python_wheel:
 		fi ; \
 		if stat -t *.whl >/dev/null 2>&1; then \
 			for w in *.whl; do \
-				if echo $${w} | grep -viq "-none-any\.whl" ; then \
+				if echo $${w} | grep -iq "-none-any\.whl" ; then \
 					_new_name=$$(echo $$w | cut -d"-" -f -3)-none-any.whl ; \
 				else \
 					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
