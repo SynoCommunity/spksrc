@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.2
+PKG_VERS = 3.10.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -30,8 +30,8 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip, setuptools and crossenv
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py "pip==21.3.1"
-	@$(PIP) install "setuptools==60.7.1"
+	@$(RUN) $(PYTHON) get-pip.py "pip==22.0.4"
+	@$(PIP) install "setuptools==60.10.0"
 	@$(PIP) install "crossenv==1.2.0"
 	@$(PIP) install "cffi==1.15"
 
