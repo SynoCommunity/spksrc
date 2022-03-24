@@ -24,3 +24,4 @@ SERVICE_PORT_TITLE = Gitea (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
 include ../../mk/spksrc.spk.mk
+pk.mk
