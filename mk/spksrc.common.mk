@@ -28,7 +28,7 @@ PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE
 # If we're only building cross-compiled wheels
 # all packages will be pre-downloaded, do not
 # check online index to ensure using local files
-ifneq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),TRUE)
+ifeq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 PIP_WHEEL_ARGS += --no-index
 endif
 
