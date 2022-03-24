@@ -157,10 +157,6 @@ endif
 endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
-# If require kernel modules then limit
-# 'os_max_ver' to point releases only
-else ifeq ($(strip $(REQUIRE_KERNEL)),1)
-	@echo os_max_ver=\"$(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$$(expr $(TC_BUILD) + 10)\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
 	@echo beta=\"yes\" >> $@
