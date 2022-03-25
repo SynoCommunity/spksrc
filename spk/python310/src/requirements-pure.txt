@@ -12,3 +12,11 @@ certifi
 # in order to install wheels within
 # their running environment
 virtualenv==20.13.4
+
+# Other mandatory wheels that
+# gets install by default as
+# basic dependencies of above
+distlib==0.3.4
+filelock==3.6.0
+platformdirs==2.5.1
+six==1.16.0
