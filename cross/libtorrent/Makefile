@@ -25,8 +25,16 @@ INSTALL_TARGET = install_destdir_target install_python_wheel
 include ../../mk/spksrc.common.mk
 
 GNU_CONFIGURE = 1
+
+BOOST_LIBRARIES += system python chrono random
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+
+include ../../mk/spksrc.python-wheel.mk
+
+# The following definitions must be below the include of spksrc.python-wheel.mk 
+# to get evaluated WORK_DIR for builds in cross/libtorrent.
 -include $(WORK_DIR)/python-cc.mk
-CONFIGURE_ARGS  = --enable-python-binding --with-libiconv
+CONFIGURE_ARGS  = --enable-python-binding --with-libiconv --disable-static
 CONFIGURE_ARGS += --with-boost-system=boost_system --with-boost-python=boost_python37
 CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/python3
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
@@ -38,8 +46,3 @@ ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
 # Only required for DSM <= 6.* using gcc-4.9 along with comcerto2k-7.0
 # Leaving enabled by default for all as no negative impact
 ADDITIONAL_CXXFLAGS += -std=c++11
-
-BOOST_LIBRARIES += system python chrono random
-ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-
-include ../../mk/spksrc.python-wheel.mk
