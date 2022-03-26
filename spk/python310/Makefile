@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.2
+SPK_VERS = 3.10.4
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to python 3.10.2"
+CHANGELOG = "1. Update to python 3.10.4 <br/>2. Update to OpenSSL 1.1.1n"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -30,7 +30,7 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-#WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+# WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
