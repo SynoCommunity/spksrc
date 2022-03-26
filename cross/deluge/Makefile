@@ -1,8 +1,8 @@
 PKG_NAME = deluge
-PKG_VERS = 2.0.4-str0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/Strangelovian/deluge/archive
+PKG_VERS = 2.0.5
+PKG_EXT = tar.xz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://ftp.osuosl.org/pub/deluge/source/2.0
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libtorrent
@@ -10,17 +10,15 @@ DEPENDS = cross/libtorrent
 HOMEPAGE = https://deluge-torrent.org/
 # cross/boost: archs lacking C++11 compiler, 88f6281(arm5) and ppc archs except QorIQ
 # libtorrent: qoriq(ppc) evansport(x86) lack some recent linux includes network definitions (if_link.h IFLA_CARRIER IFLA_PROMISCUITY)
-UNSUPPORTED_ARCHS = hi3535 $(ARM5_ARCHES) $(PPC_ARCHES) $(x86_ARCHES)
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARM5_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
 
 HOMEPAGE = http://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
-LICENSE  = MIT License
+LICENSE  = MIT
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = deluge_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: deluge_install
 deluge_install:

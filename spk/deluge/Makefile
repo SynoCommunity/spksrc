@@ -1,26 +1,23 @@
 SPK_NAME = deluge
-SPK_VERS = 2.0.4
-SPK_REV = 14
+SPK_VERS = 2.0.5
+SPK_REV = 15
 SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/$(SPK_NAME)
+
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python3>=3.7.7"
 
 REQUIRED_MIN_DSM = 5.0
 # archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ) required by cross/libtorrent
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-
-# cross/boost: archs lacking C++11 compiler, 88f6281(arm5) and ppc archs except QorIQ
-# libtorrent: qoriq(ppc) evansport(x86) lack some recent linux includes network definitions (if_link.h IFLA_CARRIER IFLA_PROMISCUITY)
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARM5_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
 
 MAINTAINER = Strangelovian
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. 
 DESCRIPTION += This syno community package runs the deluge deamon (deluged), as well as the deluge web daemon (deluge-web), which serves the deluge web UI. 
 STARTABLE = yes
-CHANGELOG = Build 2.0.4 from bleeding edge, i.e. not released by the deluge team as of 08/30/2020
+CHANGELOG = Update to v2.0.5
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
