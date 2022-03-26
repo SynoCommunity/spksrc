@@ -1,17 +1,16 @@
 PKG_NAME = libtorrent
-PKG_VERS = 1.2.9
+PKG_VERS = 1.2.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/arvidn/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/arvidn/libtorrent/releases/download/$(PKG_NAME)-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
 BUILD_DEPENDS = native/python3
 # for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python3 must appear before cross/boost
 DEPENDS = cross/python3 cross/boost cross/geoip cross/libiconv cross/openssl
 
-# cross/boost: archs lacking C++11 compiler (88f6281 and ppc archs except QorIQ)
-# libtorrent: qoriq(ppc) evansport(x86) lack some recent linux includes network definitions (if_link.h IFLA_CARRIER IFLA_PROMISCUITY)
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARM5_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
+# cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.rasterbar.com/products/libtorrent
 COMMENT  = libtorrent is a feature complete C++ bittorrent implementation focusing on efficiency and scalability. It runs on embedded devices as well as desktops.
@@ -44,5 +43,5 @@ ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
 
 # Only required for DSM <= 6.* using gcc-4.9 along with comcerto2k-7.0
-# Leaving enabled by default for all as no negative impact
+# Enabled for all as no negative impact.
 ADDITIONAL_CXXFLAGS += -std=c++11

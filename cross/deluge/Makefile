@@ -7,12 +7,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libtorrent
 
-HOMEPAGE = https://deluge-torrent.org/
-# cross/boost: archs lacking C++11 compiler, 88f6281(arm5) and ppc archs except QorIQ
-# libtorrent: qoriq(ppc) evansport(x86) lack some recent linux includes network definitions (if_link.h IFLA_CARRIER IFLA_PROMISCUITY)
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARM5_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
+# cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
-HOMEPAGE = http://deluge-torrent.org/
+HOMEPAGE = https://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
 LICENSE  = MIT
 
