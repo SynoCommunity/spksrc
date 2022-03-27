@@ -34,7 +34,8 @@
 
 # [libtorrent]
 #libtorrent==2.0.5
-#git+https://github.com/arvidn/libtorrent.git@v2.0.5
+git+https://github.com/arvidn/libtorrent.git@v2.0.5#egg=libtorrent
+#git+https://github.com/arvidn/libtorrent.git@v2.0.5#egg=libtorrent==2.0.5
 
 # [rencode]
 rencode==1.0.6

@@ -46,18 +46,22 @@ UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/boost cross/geoip cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-ENV += PATH=$(WORK_DIR)/boost_1_78_0:${PATH}
+ENV += BOOST_ROOT=$(WORK_DIR)/boost_1_78_0
+ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin:${PATH}
 WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --enable-python-binding
 WHEELS_BUILD_ARGS += --with-libiconv
 WHEELS_BUILD_ARGS += --disable-static
+WHEELS_BUILD_ARGS += --enable-shared
 WHEELS_BUILD_ARGS += --with-boost-system=boost_system
 WHEELS_BUILD_ARGS += --with-boost-python=boost_python310
-#CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin/python3
-#CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
-#ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
-WHEELS_LDFLAGS = [libtorrent] "-Wl,-Bsymbolic"
+WHEELS_CXXFLAGS += [libtorrent]
+WHEELS_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+WHEELS_CXXFLAGS += -std=c++11
+WHEELS_LDFLAGS += [libtorrent]
+WHEELS_LDFLAGS += -Wl,-Bsymbolic
+#WHEELS_LDFLAGS += -L$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 
 # [gevent]
 # DEPENDS += cross/libev cross/c-ares
