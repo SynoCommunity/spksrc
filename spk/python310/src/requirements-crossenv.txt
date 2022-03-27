@@ -32,6 +32,10 @@
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
 # gevent==21.12.0
 
+# [libtorrent]
+#libtorrent==2.0.5
+git+https://github.com/arvidn/libtorrent.git@v2.0.5
+
 # [lxml]
 # Depends: libxml2, libxslt
 # lxml==4.8.0

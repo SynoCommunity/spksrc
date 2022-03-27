@@ -20,7 +20,7 @@ LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
-ENV += PYTHON_OPTIMIZE=1
+#ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
@@ -30,13 +30,34 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-# WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
 ## are provided to demonstrate how to build
 ## various wheels.  Uncoment to enable.
 ##
+
+# [deluge]
+# cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+
+# [libtorrent]
+DEPENDS += cross/boost cross/geoip cross/libiconv
+BOOST_LIBRARIES += system python chrono random
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+ENV += PATH=$(WORK_DIR)/boost_1_78_0:${PATH}
+WHEELS_BUILD_ARGS += [libtorrent]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --enable-python-binding
+WHEELS_BUILD_ARGS += --with-libiconv
+WHEELS_BUILD_ARGS += --disable-static
+WHEELS_BUILD_ARGS += --with-boost-system=boost_system
+WHEELS_BUILD_ARGS += --with-boost-python=boost_python310
+#CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin/python3
+#CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
+#ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+WHEELS_LDFLAGS = [libtorrent] "-Wl,-Bsymbolic"
 
 # [gevent]
 # DEPENDS += cross/libev cross/c-ares
