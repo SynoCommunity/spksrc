@@ -5,9 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-rasterbar-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/arvidn/libtorrent/releases/download/$(PKG_NAME)-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
-# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python38 must appear before cross/boost
-# Remarks: current cross/boost fails to build with python310 (needs boost 1.78).
-BUILD_DEPENDS = cross/python38
+# for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python310 must appear before cross/boost
+BUILD_DEPENDS = cross/python310
 DEPENDS = cross/boost cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
@@ -34,7 +33,7 @@ include ../../mk/spksrc.python-wheel.mk
 -include $(WORK_DIR)/python-cc.mk
 CONFIGURE_ARGS  = --with-boost --enable-python-binding --with-libiconv
 CONFIGURE_ARGS += --with-boost-libdir=$(STAGING_INSTALL_PREFIX)/lib
-CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python38/work-native/install/usr/local/bin/python3
+CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin/python3
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
