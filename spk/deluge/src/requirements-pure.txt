@@ -1,0 +1,12 @@
+## pure python wheels
+## 
+
+incremental==21.3.0
+Mako==1.2.0
+MarkupSafe==2.1.1
+pyasn1==0.4.8
+pycparser==2.21
+pyxdg==0.27
+service-identity==21.1.0
+six==1.16.0
+Twisted==22.2.0

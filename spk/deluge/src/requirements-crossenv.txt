@@ -1,0 +1,6 @@
+## required wheels that need cross compilation
+##
+
+#deluge==2.0.5
+#rencode==1.0.6
+zope.interface==5.4.0

@@ -5,8 +5,10 @@ SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python310 cross/setuptools cross/pip cross/wheel
 DEPENDS = cross/libtorrent cross/deluge
+#DEPENDS += cross/rencode
 
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
 SPK_DEPENDS = "python310"
 
 REQUIRED_MIN_DSM = 5.0
