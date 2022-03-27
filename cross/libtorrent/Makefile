@@ -34,6 +34,8 @@ include ../../mk/spksrc.python-wheel.mk
 CONFIGURE_ARGS  = --with-boost --enable-python-binding --with-libiconv
 CONFIGURE_ARGS += --with-boost-libdir=$(STAGING_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += PYTHON=$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin/python3
+CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
+CONFIGURE_ARGS += PYTHON_LIBS="-L$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR) -lpython$(PYTHON_VERSION)"
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
