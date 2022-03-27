@@ -34,7 +34,11 @@
 
 # [libtorrent]
 #libtorrent==2.0.5
-git+https://github.com/arvidn/libtorrent.git@v2.0.5
+#git+https://github.com/arvidn/libtorrent.git@v2.0.5
+
+# [rencode]
+rencode==1.0.6
+#git+https://github.com/totaam/rencode.git@master==1.0.6
 
 # [lxml]
 # Depends: libxml2, libxslt
