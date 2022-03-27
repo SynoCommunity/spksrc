@@ -6,6 +6,11 @@ SVC_WRITE_PID=y
 
 GROUP="sc-syncthing"
 
+# Required to run any syncthing command: set $HOME environment variable
+HOME=${SYNOPKG_PKGVAR}
+export HOME
+
+
 set_credentials() {
     if [ -n "${wizard_username}" -a -n "${wizard_password}" ]; then
         # Password needs to be hashed for config entry
@@ -15,10 +20,6 @@ set_credentials() {
 }
 
 service_postinst() {
-    # Required: set $HOME environment variable
-    HOME=${SYNOPKG_PKGVAR}
-    export HOME
-
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_credentials
     fi
@@ -38,8 +39,4 @@ service_prestart ()
         ln -sf ${cert_dir}/cert.pem ${SYNOPKG_PKGVAR}/https-cert.pem
         ln -sf ${cert_dir}/privkey.pem ${SYNOPKG_PKGVAR}/https-key.pem
     fi
-
-    # Required: set $HOME environment variable
-    HOME=${SYNOPKG_PKGVAR}
-    export HOME
 }
