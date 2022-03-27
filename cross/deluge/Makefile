@@ -5,10 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.osuosl.org/pub/deluge/source/2.0
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libtorrent
-
-# cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+DEPENDS =
 
 HOMEPAGE = https://deluge-torrent.org/
 COMMENT  = Deluge is a lightweight, Free Software, cross-platform BitTorrent client.
