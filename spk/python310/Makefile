@@ -47,15 +47,20 @@ DEPENDS += cross/boost cross/geoip cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_ROOT=$(WORK_DIR)/boost_1_78_0
+ENV += BUILD_CONFIG="release link=shared crypto=openssl warnings=off address-model=64"
 ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin:${PATH}
 WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --enable-python-binding
 WHEELS_BUILD_ARGS += --with-libiconv
 WHEELS_BUILD_ARGS += --disable-static
-WHEELS_BUILD_ARGS += --enable-shared
 WHEELS_BUILD_ARGS += --with-boost-system=boost_system
 WHEELS_BUILD_ARGS += --with-boost-python=boost_python310
+###WHEELS_BUILD_ARGS += --config-mode=b2
+###WHEELS_BUILD_ARGS += --b2-args=boost-link=shared
+###WHEELS_BUILD_ARGS += --b2-args=libtorrent-link=shared
+###WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
+###['b2', 'boost-link=static', 'libtorrent-link=static', 'crypto=openssl', 'deprecated-functions=on', 'variant=release', 'address-model=64', 'python=3.10', 'libtorrent-python=on'
 WHEELS_CXXFLAGS += [libtorrent]
 WHEELS_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 WHEELS_CXXFLAGS += -std=c++11
