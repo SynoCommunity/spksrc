@@ -102,18 +102,18 @@ ifneq ($(strip $(WHEELS)),)
 	      localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      $(MSG) [$${name}] \
-	            $$([ '$${localCFLAGS[@]}' ] && echo "CFLAGS=$${localCFLAGS[@]} ") \
-	            $$([ '$${localLDFLAGS[@]}' ] && echo "LDFLAGS=$${localLDFLAGS[@]} ") \
-	            $$([ '$${localCPPFLAGS[@]}' ] && echo "CPPFLAGS=$${localCPPFLAGS[@]} ") \
-	            $$([ '$${localCXXFLAGS[@]}' ] && echo "CXXFLAGS=$${localCXXFLAGS[@]} ") \
-	            $$([ '$${abi3}' ] && echo "$${abi3} ")" \
+	            $$([ "$$(echo $${localCFLAGS[@]})" ] && echo "CFLAGS=\"$${localCFLAGS[@]}\" ") \
+	            $$([ "$$(echo $${localCPPFLAGS[@]})" ] && echo "CPPFLAGS=\"$${localCPPFLAGS[@]}\" ") \
+	            $$([ "$$(echo $${localCXXFLAGS[@]})" ] && echo "CXXFLAGS=\"$${localCXXFLAGS[@]}\" ") \
+	            $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
+	            $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
 	            $${global_option}" ; \
 	      $(RUN) \
 	         _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	         CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
+	         CPPFLAGS="$(CPPFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
+	         CXXFLAGS="$(CXXFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
 	         LDFLAGS="$(LDFLAGS) $${localLDFLAGS[@]}" \
-	         CPPFLAGS="$(CPPFLAGS) $${localCPPFLAGS[@]}" \
-	         CXXFLAGS="$(CXXFLAGS) $${localCXXFLAGS[@]}" \
 	         $${localPIP} \
 	         $(PIP_WHEEL_ARGS) \
 	         $${abi3} \
