@@ -19,6 +19,9 @@ STARTABLE            = yes
 WIZARDS_DIR          = src/wizard
 SERVICE_WIZARD_SHARE = wizard_gitea_dir
 
+# Use shared folder provided by DSM for DSM 6 too (not only for DSM 7).
+USE_DATA_SHARE_WORKER = yes
+
 SERVICE_PORT = 8418
 SERVICE_PORT_TITLE = Gitea (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
