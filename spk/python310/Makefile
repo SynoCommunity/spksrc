@@ -38,6 +38,8 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 ## various wheels.  Uncoment to enable.
 ##
 
+include ../../mk/spksrc.archs.mk
+
 # [gevent]
 # DEPENDS += cross/libev cross/c-ares
 # ENV += GEVENTSETUP_EMBED_CARES=FALSE
@@ -45,12 +47,18 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 # [libtorrent]
 # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/boost cross/geoip cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_ROOT=$(WORK_DIR)/boost_1_78_0
 ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin:${PATH}
+
+# [libtorrent]
+ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
+WHEELS_BUILD_ARGS += [libtorrent]
+WHEELS_BUILD_ARGS += --b2-args="address-model=32"
+endif
 
 # [lxml]
 # DEPENDS += cross/libxml2
@@ -67,6 +75,17 @@ ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-
 # https://github.com/numpy/numpy/issues/20664
 # UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 # >> See more option under include below <<
+
+# [numpy]
+# Fix wheel building with older compilers
+# ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+# WHEELS_CPPFLAGS = [numpy] -std=c++0x
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+# WHEELS_CFLAGS = [numpy] -O0
+# endif
+# endif
 
 # [Pillow]
 # DEPENDS += cross/freetype cross/libjpeg cross/zlib
@@ -93,17 +112,6 @@ ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-
 # DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.spk.mk
-
-# [numpy]
-# Fix wheel building with older compilers
-# ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-# WHEELS_CPPFLAGS = [numpy] -std=c++0x
-# workaround for compiler bug:
-# https://github.com/numpy/numpy/issues/13622
-# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# WHEELS_CFLAGS = [numpy] -O0
-# endif
-# endif
 
 .PHONY: python310_extra_install
 python310_extra_install:
