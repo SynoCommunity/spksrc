@@ -57,7 +57,8 @@ ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-
 # [libtorrent]
 ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += [libtorrent]
-WHEELS_BUILD_ARGS += --b2-args="address-model=32"
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += '--b2-args=\"address-model=32\"'
 endif
 
 # [lxml]
