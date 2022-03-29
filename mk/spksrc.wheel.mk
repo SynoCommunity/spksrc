@@ -82,8 +82,7 @@ ifneq ($(strip $(WHEELS)),)
 	   $(MSG) "Cross-compiling wheels" ; \
 	   localPIP=$(PIP) ; \
 	   if [ -s "$(CROSSENV)" ] ; then \
-	      . $(CROSSENV) ; \
-	      localPIP=$$($(RUN) which pip) ; \
+	      localPIP=$$(. $(CROSSENV) && which pip) ; \
 	      $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
 	      $(MSG) "pip crossenv found: [$${localPIP}]" ; \
 	   else \
@@ -108,6 +107,19 @@ ifneq ($(strip $(WHEELS)),)
 	            $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
 	            $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
 	            $${global_option}" ; \
+	      $(MSG) \
+	         _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	         CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
+	         CPPFLAGS="$(CPPFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
+	         CXXFLAGS="$(CXXFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
+	         LDFLAGS="$(LDFLAGS) $${localLDFLAGS[@]}" \
+	         $${localPIP} \
+	         $(PIP_WHEEL_ARGS) \
+	         $${abi3} \
+	         $${global_option} \
+	         --no-build-isolation \
+	         --no-use-pep517 \
+	         $${wheel} ; \
 	      $(RUN) \
 	         _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	         CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
@@ -119,6 +131,7 @@ ifneq ($(strip $(WHEELS)),)
 	         $${abi3} \
 	         $${global_option} \
 	         --no-build-isolation \
+	         --no-use-pep517 \
 	         $${wheel} || exit 1 ; \
 	   done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) ; \
 	else \
