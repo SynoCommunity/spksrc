@@ -30,9 +30,6 @@ else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
 CONFIGURE_ARGS += --without-libraries=python
 endif
 
-# Enforce c++11
-ADDITIONAL_CXXFLAGS += -std=c11
-
 # Useful variables for subst
 comma:= ,
 empty:=
