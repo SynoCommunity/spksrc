@@ -1,5 +1,5 @@
 PKG_NAME = boost
-PKG_VERS = 1.66.0
+PKG_VERS = 1.68.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/bzip2 cross/zlib
 
-# keep boost version 1.66, as 
-# - 1.67+ is not compatible with domoticz 2020.2
+# keep boost version 1.68, as 
+# - 1.69+ is not compatible with domoticz 2020.2
 
 HOMEPAGE = https://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
@@ -55,9 +55,10 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 endif
 
-ADDRESS_MODEL = 32
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
 ADDRESS_MODEL = 64
+else
+ADDRESS_MODEL = 32
 endif
 
 include ../../mk/spksrc.cross-cc.mk
