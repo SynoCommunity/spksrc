@@ -170,7 +170,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: packages
+          name: Packages for ${{ matrix.arch }}
           path: packages/*.spk
 
   release:

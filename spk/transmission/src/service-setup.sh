@@ -5,15 +5,16 @@ if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
     PYTHON_BIN_PATHS=""
 else
     GROUP="sc-download"
-    PYTHON_BIN_PATHS="/var/packages/python38/target/bin:/var/packages/python3/target/bin:"
+    PYTHON_BIN_PATHS="/var/packages/python310/target/bin:/var/packages/python38/target/bin:/var/packages/python3/target/bin:"
 fi
+
 PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_BIN_PATHS}${PATH}"
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 
 SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
 
-validate_preinst()
+validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # If chosen, they need to exist
@@ -41,33 +42,35 @@ service_postinst ()
             wizard_incomplete_dir="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
             mkdir -p "${wizard_watch_dir}"
             mkdir -p "${wizard_incomplete_dir}"
+        else
+            # Set permissions for optional folders for DSM <7
+            # existance is validated with validate_preinst
+            set_syno_permissions "${wizard_watch_dir}" "${GROUP}"
+            set_syno_permissions "${wizard_incomplete_dir}" "${GROUP}"
         fi
 
         # Edit the configuration according to the wizard
-        sed -i -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}|g" "${CFG_FILE}"
-        sed -i -e "s|@username@|${wizard_username:=admin}|g" "${CFG_FILE}"
-        sed -i -e "s|@password@|${wizard_password:=admin}|g" "${CFG_FILE}"
+        sed -e "s|@download_dir@|${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}|g" \
+            -e "s|@username@|${wizard_username:=admin}|g" \
+            -e "s|@password@|${wizard_password:=admin}|g" \
+            -i ${CFG_FILE}
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir_enabled@|true|g" "${CFG_FILE}"
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" "${CFG_FILE}"
+            sed -e "s|@watch_dir_enabled@|true|g" \
+                -e "s|@watch_dir@|${wizard_watch_dir}|g" \
+                -i ${CFG_FILE}
         else
-            sed -i -e "s|@watch_dir_enabled@|false|g" "${CFG_FILE}"
-            sed -i -e "/@watch_dir@/d" "${CFG_FILE}"
+            sed -e "s|@watch_dir_enabled@|false|g" \
+                -e "/@watch_dir@/d" \
+                -i ${CFG_FILE}
         fi
         if [ -d "${wizard_incomplete_dir}" ]; then
-            sed -i -e "s|@incomplete_dir_enabled@|true|g" "${CFG_FILE}"
-            sed -i -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" "${CFG_FILE}"
+            sed -e "s|@incomplete_dir_enabled@|true|g" \
+                -e "s|@incomplete_dir@|${wizard_incomplete_dir}|g" \
+                -i ${CFG_FILE}
         else
-            sed -i -e "s|@incomplete_dir_enabled@|false|g" "${CFG_FILE}"
-            sed -i -e "/@incomplete_dir@/d" "${CFG_FILE}"
-        fi
-
-        # Set permissions for optional folders
-        if [ -d "${wizard_watch_dir}" ]; then
-            set_syno_permissions "${wizard_watch_dir}" "${GROUP}"
-        fi
-        if [ -d "${wizard_incomplete_dir}" ]; then
-            set_syno_permissions "${wizard_incomplete_dir}" "${GROUP}"
+            sed -e "s|@incomplete_dir_enabled@|false|g" \
+                -e "/@incomplete_dir@/d" \
+                -i ${CFG_FILE}
         fi
     fi
 }
@@ -75,45 +78,45 @@ service_postinst ()
 service_postupgrade ()
 {
     if [ -r "${CFG_FILE}" ]; then
-        # Migrate to DSM7
+    
+        # Extract the paths from config file
+        DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' ${CFG_FILE})
+        INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"\s*:\s*"\(.*\)",/\1/p' ${CFG_FILE})
+        WATCH_DIR=$(sed -n 's/.*"watch-dir"\s*:\s*"\(.*\)",/\1/p' ${CFG_FILE})
+    
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-            OLD_DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-            OLD_INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-            OLD_WATCHED_DIR=$(sed -n 's/.*"watch-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
+            # Migrate from DSM6 to DSM7 or update folders on DSM7 when changed in upgrade wizard
 
             NEW_DOWNLOAD_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}"
             NEW_INCOMPLETE_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
-            NEW_WATCHED_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+            NEW_WATCH_DIR="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+            mkdir -p "${NEW_INCOMPLETE_DIR}"
+            mkdir -p "${NEW_WATCH_DIR}"
 
-            # update folders
+            # update folders in config file according to the wizard
             SETTINGS=$(cat "${CFG_FILE}")
             SETTINGS=$(echo "$SETTINGS" | jq '."watch-dir-enabled"=true | ."incomplete-dir-enabled"=true')
             SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_DOWNLOAD_DIR} '."download-dir"=$path')
             SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_INCOMPLETE_DIR} '."incomplete-dir"=$path')
-            SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_WATCHED_DIR} '."watch-dir"=$path')
-            echo "$SETTINGS" > "${CFG_FILE}"
+            SETTINGS=$(echo "$SETTINGS" | jq --arg path ${NEW_WATCH_DIR} '."watch-dir"=$path')
+            echo "${SETTINGS}" > ${CFG_FILE}
 
-            mkdir -p "$NEW_INCOMPLETE_DIR"
-            mkdir -p "$NEW_WATCHED_DIR"
+            # move files when folders are changed
+            shopt -s dotglob # move hidden folder/files too
+            if [ -n "${DOWNLOAD_DIR}" ] && [ $(realpath "${DOWNLOAD_DIR}") != $(realpath "${NEW_DOWNLOAD_DIR}") ]; then
+                # move only files from previous download folder that are created by this package (${EFF_USER})
+                find "${DOWNLOAD_DIR}" -maxdepth 1 -user ${EFF_USER} -exec mv -nv {} "${NEW_DOWNLOAD_DIR}/" \;
+            fi
+            if [ -n "${INCOMPLETE_DIR}" ] && [ $(realpath "${INCOMPLETE_DIR}") != $(realpath "${NEW_INCOMPLETE_DIR}") ]; then
+                mv -nv "${INCOMPLETE_DIR}/*" "${NEW_INCOMPLETE_DIR}/"
+            fi
+            if [ -n "${WATCH_DIR}" ] && [ $(realpath "${WATCH_DIR}") != $(realpath "${NEW_WATCH_DIR}") ]; then
+                mv -nv "${WATCH_DIR}/*" "${NEW_WATCH_DIR}/"
+            fi
+            shopt -u dotglob
 
-            # move files
-            # not moving download dir because it could contain data not from this package
-            # if [ "$OLD_DOWNLOAD_DIR" != "$NEW_DOWNLOAD_DIR" ]; then
-            #     mv -nv "$OLD_DOWNLOAD_DIR"/* "$NEW_DOWNLOAD_DIR"
-            # fi
-            shopt -s dotglob # copy hidden folder/files too
-            if [ -n "${OLD_INCOMPLETE_DIR}" ] &&  [ "$OLD_INCOMPLETE_DIR" != "$NEW_INCOMPLETE_DIR" ]; then
-                mv -nv "$OLD_INCOMPLETE_DIR"/* "$NEW_INCOMPLETE_DIR/"
-            fi
-            if [ -n "${OLD_WATCHED_DIR}" ] && [ "$OLD_WATCHED_DIR" != "$NEW_WATCHED_DIR" ]; then
-                mv -nv "$OLD_WATCHED_DIR"/* "$NEW_WATCHED_DIR/"
-            fi
-            shopt -d dotglob
         else
-            # Extract the right paths from config file and update Permissions
-            DOWNLOAD_DIR=$(sed -n 's/.*"download-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-            INCOMPLETE_DIR=$(sed -n 's/.*"incomplete-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
-            WATCHED_DIR=$(sed -n 's/.*"watch-dir"\s*:\s*"\(.*\)",/\1/p' "${CFG_FILE}")
+
             # Apply permissions
             if [ -n "${DOWNLOAD_DIR}" ] && [ -d "${DOWNLOAD_DIR}" ]; then
                 set_syno_permissions "${DOWNLOAD_DIR}" "${GROUP}"
@@ -121,8 +124,8 @@ service_postupgrade ()
             if [ -n "${INCOMPLETE_DIR}" ] && [ -d "${INCOMPLETE_DIR}" ]; then
                 set_syno_permissions "${INCOMPLETE_DIR}" "${GROUP}"
             fi
-            if [ -n "${WATCHED_DIR}" ] && [ -d "${WATCHED_DIR}" ]; then
-                set_syno_permissions "${WATCHED_DIR}" "${GROUP}"
+            if [ -n "${WATCH_DIR}" ] && [ -d "${WATCH_DIR}" ]; then
+                set_syno_permissions "${WATCH_DIR}" "${GROUP}"
             fi
         fi
     fi

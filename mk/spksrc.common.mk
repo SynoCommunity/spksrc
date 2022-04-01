@@ -16,16 +16,12 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 # fallback by default to native/python*
 PIP ?= pip
 
-# Cross compiling must call "pip" directly to ensure using
-# $(WORK_DIR)/crossenv pip version instead from adjusted $PATH
-PIP_CROSSENV = $(shell . $(CROSSENV) && $(RUN) which pip)
-
 # System default pip outside from build environment
 PIP_SYSTEM = $(shell which pip)
 
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
-PIP_WHEEL_ARGS = wheel --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk

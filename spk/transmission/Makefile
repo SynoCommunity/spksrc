@@ -1,6 +1,6 @@
 SPK_NAME = transmission
 SPK_VERS = 3.00
-SPK_REV = 19
+SPK_REV = 20
 SPK_ICON = src/transmission.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -11,7 +11,7 @@ DESCRIPTION_FRE = Transmission est un client BitTorrent simple et rapide. Vous p
 DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes controlarlo remotamente mediante su interfaz web o alguna aplicación dedicada.
 STARTABLE = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "Update openssl to 1.1."
+CHANGELOG = "1. Update openssl to 1.1.1n.<br/>2. Deploy dedicated package for DSM7 on comcerto2k (DS414j)."
 
 HOMEPAGE = https://transmissionbt.com
 LICENSE  = GPLv2/GPLv3

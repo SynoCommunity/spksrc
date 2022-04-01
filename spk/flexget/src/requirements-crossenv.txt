@@ -1,12 +1,12 @@
-# This file is a copy of the https://raw.githubusercontent.com/Flexget/Flexget/v3.1.129/requirements.txt file
-# including the https://raw.githubusercontent.com/Flexget/Flexget/v3.1.129/requirements.in
+# This file is a copy of the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.txt file
+# including the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.in
 # Additionally added the flexget and the transmission-rpc packages.
 # plumbum and rpyc packages are adjusted as the proposed versions are not accepted.
 
-cryptography==3.3.2
-cffi==1.15.0
 aniso8601==9.0.1
 Brotli==1.0.9
+cffi==1.15.0
+cryptography==3.3.2
 greenlet==1.1.2
 MarkupSafe==2.0.1
 psutil==5.8.0

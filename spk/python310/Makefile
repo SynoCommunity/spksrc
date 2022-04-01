@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.2
+SPK_VERS = 3.10.4
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to python 3.10.2"
+CHANGELOG = "1. Update to python 3.10.4 <br/>2. Update to OpenSSL 1.1.1n"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -38,20 +38,26 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 ## various wheels.  Uncoment to enable.
 ##
 
+# [gevent]
+# DEPENDS += cross/libev cross/c-ares
+# ENV += GEVENTSETUP_EMBED_CARES=FALSE
+# ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+
 # [lxml]
 # DEPENDS += cross/libxml2
 # DEPENDS += cross/libxslt
 
-# [PyYAML]
-# DEPENDS += cross/libyaml
+# [mysqlclient]
+# DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+# ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+# ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
-# [pycurl]
-# DEPENDS += cross/curl
-# ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
-
-# [PyNaCl]
-# DEPENDS += cross/libsodium
-# ENV += SODIUM_INSTALL=system
+# [numpy]
+# Last known working version: 1.21.5
+# gcc-4.6.4 failed with exit status 1
+# https://github.com/numpy/numpy/issues/20664
+# UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# >> See more option under include below <<
 
 # [Pillow]
 # DEPENDS += cross/freetype cross/libjpeg cross/zlib
@@ -66,20 +72,16 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 # DEPENDS += cross/c-ares
 # ENV += PYCARES_USE_SYSTEM_LIB=1
 
-# [gevent]
-# DEPENDS += cross/libev cross/c-ares
-# ENV += GEVENTSETUP_EMBED_CARES=FALSE
-# ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+# [pycurl]
+# DEPENDS += cross/curl
+# ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# [mysqlclient]
-# DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-# ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-# ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+# [PyNaCl]
+# DEPENDS += cross/libsodium
+# ENV += SODIUM_INSTALL=system
 
-# [numpy]
-# gcc-4.6.4 failed with exit status 1
-# https://github.com/numpy/numpy/issues/20664
-# UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# [PyYAML]
+# DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.spk.mk
 

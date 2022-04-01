@@ -30,11 +30,11 @@ KERNEL_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%2
 endif
 
 #
-# For DSM version >= 7.0
+# For DSM version >= 6.2.4
 #
-ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 41890),1)
+ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 25556),1)
 
-KERNEL_DIST_SITE = https://global.download.synology.com/download/ToolChain/Synology%20NAS%20GPL%20Source/$(TC_VERS)-$(KERNEL_BUILD)/$(KERNEL_URL_DIR)
+KERNEL_DIST_SITE = https://global.download.synology.com/download/ToolChain/Synology%20NAS%20GPL%20Source/$(firstword $(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$(KERNEL_BUILD)/$(KERNEL_URL_DIR)
 
 ifeq ($(strip $(KERNEL_DIST_NAME)),)
 KERNEL_DIST_NAME = $(KERNEL_DIST).$(KERNEL_EXT)
