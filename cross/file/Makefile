@@ -15,4 +15,6 @@ LICENSE  = https://github.com/file/file/blob/master/COPYING
 
 GNU_CONFIGURE = 1
 
+ADDITIONAL_CPPFLAGS = -Os
+
 include ../../mk/spksrc.cross-cc.mk

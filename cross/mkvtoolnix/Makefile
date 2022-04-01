@@ -40,6 +40,8 @@ ENV += PATH=$(NATIVE_RUBY_DIR):$$PATH
 # fix compilation with newer compilers
 ADDITIONAL_CXXFLAGS = -D_GLIBCXX_USE_C99_MATH=1
 
+ADDITIONAL_CXXFLAGS += -Os
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: mkvtoolnix_compile

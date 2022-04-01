@@ -1,5 +1,5 @@
 PKG_NAME = flac
-PKG_VERS = 1.3.3
+PKG_VERS = 1.3.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.osuosl.org/pub/xiph/releases/$(PKG_NAME)/
@@ -8,10 +8,13 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/libogg
 
 HOMEPAGE = https://xiph.org/flac/download.html
-COMMENT  = Free Lossless Audio Codec
+COMMENT  = Free Lossless Audio Codec.
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
+
+# warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+ADDITIONAL_CPPFLAGS = -Os
 
 # Required for linking microbench/util.c on cross toolchains
 ADDITIONAL_LDFLAGS = -lrt
