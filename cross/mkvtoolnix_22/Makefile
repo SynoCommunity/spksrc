@@ -1,26 +1,19 @@
 PKG_NAME = mkvtoolnix
-PKG_VERS = 53.0.0
+PKG_VERS = 22.0.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-REQUIRED_DSM = 7.0
-# mkvtoolnix > 22.x require C++14 (DSM 7 only)
-# no further updates possible:
-# mkvtoolnix > 46.x need some features of C++17
-# mkvtoolnix > 53.x need features file system library (C++17) not supported on DSM 7
-
-# comcerto2k has older toolchain than other DSM 7 archs
-UNSUPPORTED_ARCHS = comcerto2k
+# compiler too old, gcc >= 4.9.x required.
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 BUILD_DEPENDS = native/ruby
 # build cross/libicu before cross/boost to build libboost_regex with unicode support
-DEPENDS = cross/libicu cross/boost
+DEPENDS = cross/libicu cross/boost_1.70 
 DEPENDS += cross/libogg cross/libvorbis cross/zlib
 DEPENDS += cross/flac cross/file
 DEPENDS += cross/libebml cross/libmatroska
-DEPENDS += cross/pcre2
 
 HOMEPAGE = https://mkvtoolnix.download/index.html
 COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
@@ -39,8 +32,13 @@ ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 NATIVE_RUBY_DIR = $(realpath $(WORK_DIR)/../../../native/ruby/work-native/install/usr/local/bin)
 ENV += PATH=$(NATIVE_RUBY_DIR):$$PATH
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # fix compilation with newer compilers
 ADDITIONAL_CXXFLAGS = -D_GLIBCXX_USE_C99_MATH=1
+# disable warnings (by includes of boost header files)
+ADDITIONAL_CXXFLAGS += -Wno-implicit-fallthrough
+endif
 
 ADDITIONAL_CXXFLAGS += -Os
 
