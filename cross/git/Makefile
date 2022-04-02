@@ -1,5 +1,5 @@
 PKG_NAME = git
-PKG_VERS = 2.34.1
+PKG_VERS = 2.35.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://kernel.org/pub/software/scm/$(PKG_NAME)
@@ -16,6 +16,10 @@ CONFIGURE_ARGS  = --without-tcltk --without-python
 CONFIGURE_ARGS += ac_cv_fread_reads_directories=yes
 CONFIGURE_ARGS += ac_cv_snprintf_returns_bogus=no
 CONFIGURE_ARGS += ac_cv_iconv_omits_bom=no
+
+# git (since version 2.35.0) requires C99 support (such as -std=c99, -std=gnu99, -std=c11 or -std=gnu11)
+ADDITIONAL_CPPFLAGS  = -std=c99
+ADDITIONAL_CPPFLAGS += -O
 
 PRE_CONFIGURE_TARGET = git_pre_configure
 INSTALL_TARGET = git_install
