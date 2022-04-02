@@ -167,11 +167,11 @@ jobs:
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
       - name: Upload artifacts
-        if: success()
         uses: actions/upload-artifact@v2
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk
+          if-no-files-found: ignore
 
   release:
     needs: build
