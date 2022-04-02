@@ -9,7 +9,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 BUILD_DEPENDS = native/ruby
-DEPENDS = cross/boost_1.70 cross/libogg cross/libvorbis cross/zlib
+# build cross/libicu before cross/boost to build libboost_regex with unicode support
+DEPENDS = cross/libicu cross/boost_1.70 
+DEPENDS += cross/libogg cross/libvorbis cross/zlib
 DEPENDS += cross/flac cross/file
 DEPENDS += cross/libebml cross/libmatroska
 
@@ -37,6 +39,8 @@ ADDITIONAL_CXXFLAGS = -D_GLIBCXX_USE_C99_MATH=1
 # disable warnings (by includes of boost header files)
 ADDITIONAL_CXXFLAGS += -Wno-implicit-fallthrough
 endif
+
+ADDITIONAL_CXXFLAGS += -Os
 
 include ../../mk/spksrc.cross-cc.mk
 

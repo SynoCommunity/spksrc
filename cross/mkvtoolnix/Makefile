@@ -15,7 +15,9 @@ REQUIRED_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
 BUILD_DEPENDS = native/ruby
-DEPENDS = cross/boost cross/libogg cross/libvorbis cross/zlib 
+# build cross/libicu before cross/boost to build libboost_regex with unicode support
+DEPENDS = cross/libicu cross/boost
+DEPENDS += cross/libogg cross/libvorbis cross/zlib
 DEPENDS += cross/flac cross/file
 DEPENDS += cross/libebml cross/libmatroska
 DEPENDS += cross/pcre2
