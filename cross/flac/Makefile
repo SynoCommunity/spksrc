@@ -27,3 +27,9 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # avoid error: AltiVec and SPE instructions cannot coexist
 CONFIGURE_ARGS += --disable-altivec
 endif
+
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# force disable of -fstack-protector-strong
+# where gcc does not support it - but g++ does and configure would enable it.
+CONFIGURE_ARGS += enable_stack_smash_protection=no
+endif
