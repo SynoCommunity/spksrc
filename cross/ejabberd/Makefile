@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://static.process-one.net/ejabberd/downloads/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/erlang
-DEPENDS = cross/ncursesw cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
+DEPENDS = cross/ncursesw cross/erlang cross/libexpat cross/zlib cross/openssl cross/libyaml
 
 # PPC archs except qoriq have compiler errors with 64 bit values
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)

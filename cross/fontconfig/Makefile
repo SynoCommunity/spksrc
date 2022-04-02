@@ -1,11 +1,11 @@
 PKG_NAME = fontconfig
-PKG_VERS = 2.13.1
-PKG_EXT = tar.gz
+PKG_VERS = 2.14.0
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.freedesktop.org/software/fontconfig/release
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/expat cross/freetype cross/libuuid
+DEPENDS = cross/libexpat cross/freetype cross/libuuid
 
 HOMEPAGE = https://www.freedesktop.org/wiki/Software/fontconfig/
 COMMENT  = Fontconfig is a library for configuring and customizing font access.
