@@ -41,9 +41,9 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 include ../../mk/spksrc.archs.mk
 
 # [gevent]
-# DEPENDS += cross/libev cross/c-ares
-# ENV += GEVENTSETUP_EMBED_CARES=FALSE
-# ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+DEPENDS += cross/libev cross/c-ares
+ENV += GEVENTSETUP_EMBED_CARES=FALSE
+ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
 # [libtorrent]
 # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
@@ -62,13 +62,13 @@ WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 
 # [lxml]
-# DEPENDS += cross/libxml2
-# DEPENDS += cross/libxslt
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
 
 # [mysqlclient]
-# DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-# ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-# ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 # [numpy]
 # Last known working version: 1.21.5
@@ -83,34 +83,34 @@ WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 # WHEELS_CPPFLAGS = [numpy] -std=c++0x
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
-# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# WHEELS_CFLAGS = [numpy] -O0
-# endif
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = [numpy] -O0
+endif
 # endif
 
 # [Pillow]
-# DEPENDS += cross/freetype cross/libjpeg cross/zlib
-# WHEELS_BUILD_ARGS += [Pillow]
-# WHEELS_BUILD_ARGS += build_ext
-# WHEELS_BUILD_ARGS += --disable-platform-guessing
-# WHEELS_BUILD_ARGS += --enable-freetype
-# WHEELS_BUILD_ARGS += --enable-jpeg
-# WHEELS_BUILD_ARGS += --enable-zlib
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
 # [pycares]
-# DEPENDS += cross/c-ares
-# ENV += PYCARES_USE_SYSTEM_LIB=1
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
 
 # [pycurl]
-# DEPENDS += cross/curl
-# ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [PyNaCl]
-# DEPENDS += cross/libsodium
-# ENV += SODIUM_INSTALL=system
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
 
 # [PyYAML]
-# DEPENDS += cross/libyaml
+DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.spk.mk
 
