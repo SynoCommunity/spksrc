@@ -47,7 +47,11 @@ include ../../mk/spksrc.archs.mk
 
 # [libtorrent]
 # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
-UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS += $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
+REQUIRED_DSM = 7.0
+# comcerto2k has older toolchain than other DSM 7 archs
+UNSUPPORTED_ARCHS += comcerto2k
 DEPENDS += cross/boost cross/geoip cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
