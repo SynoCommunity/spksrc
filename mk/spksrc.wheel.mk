@@ -115,7 +115,7 @@ ifneq ($(strip $(WHEELS)),)
 	         ABI3="$${abi3}" \
 	         PIP_GLOBAL_OPTION="$${global_options}" \
 	         $(MAKE) \
-	         cross-compile-wheel-$${name} ; \
+	         cross-compile-wheel-$${name} || exit 1 ; \
 	   done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) ; \
 	else \
 	   $(MSG) "[SKIP] Cross-compiling wheels" ; \
@@ -155,7 +155,7 @@ cross-compile-wheel-%:
 	   $${pip_global_option} \
 	   --no-build-isolation \
 	   $(ABI3) \
-	   $(REQUIREMENT) || exit 1
+	   $(REQUIREMENT)
 
 
 post_wheel_target: $(WHEEL_TARGET) install_python_wheel
