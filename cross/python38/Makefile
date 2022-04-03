@@ -58,7 +58,7 @@ CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 DEPENDS += cross/gdbm
 CONFIGURE_ARGS += --with-dbmliborder=gdbm:ndbm:bdb
 
-DEPENDS += cross/expat
+DEPENDS += cross/libexpat
 CONFIGURE_ARGS += --with-system-expat
 
 # libffi is no longer bundled with python

@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/aria2/aria2/releases/download/release-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libssh2 cross/gnutls cross/libgcrypt cross/expat cross/c-ares cross/sqlite
+DEPENDS = cross/libssh2 cross/gnutls cross/libgcrypt cross/libexpat cross/c-ares cross/sqlite
 
 # archs with too old c++ compiler (c++ 11 is required)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
