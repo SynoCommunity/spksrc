@@ -52,13 +52,15 @@ DEPENDS += cross/boost cross/geoip cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_ROOT=$(WORK_DIR)/boost_1_78_0
-ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin:${PATH}
+ENV += BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
+ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(PATH)
+WHEELS_BUILD_ARGS += [libtorrent]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 
 # [libtorrent]
 ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
-WHEELS_BUILD_ARGS += [libtorrent]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += '--b2-args=\"address-model=32\"'
+WHEELS_BUILD_ARGS += --b2-args=address-model=32
 endif
 
 # [lxml]
