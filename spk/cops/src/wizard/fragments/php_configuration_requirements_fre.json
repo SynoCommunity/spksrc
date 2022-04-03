@@ -1,0 +1,11 @@
+[{
+    "step_title": "Configuration PHP requise",
+    "items": [
+        {
+            "desc": "Vous devriez activer les extensions PHP suivantes (au sein de WebStation):"
+        },
+        {
+            "desc": "<ul><li>gd</li><li>intl</li><li>pdo_sqlite</li><li>sqlite3</li></ul>"
+        }
+    ]
+}]
