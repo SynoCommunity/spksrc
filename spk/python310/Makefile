@@ -55,7 +55,6 @@ UNSUPPORTED_ARCHS += comcerto2k
 DEPENDS += cross/boost cross/geoip cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-ENV += BOOST_ROOT=$(WORK_DIR)/boost_1_78_0
 ENV += BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
 ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(PATH)
 WHEELS_BUILD_ARGS += [libtorrent]
