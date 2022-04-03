@@ -61,11 +61,6 @@ WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 
-# [libtorrent]
-ifneq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
-WHEELS_BUILD_ARGS += --b2-args=address-model=32
-endif
-
 # [lxml]
 # DEPENDS += cross/libxml2
 # DEPENDS += cross/libxslt
