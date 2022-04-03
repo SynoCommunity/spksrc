@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-rasterbar-$(PKG_VERS)
 
 # for boost python binding (BOOST_LIBRARIES = python), the dependency on cross/python310 must appear before cross/boost
 BUILD_DEPENDS = cross/python310
-DEPENDS = cross/boost cross/geoip cross/libiconv cross/openssl
+DEPENDS = cross/boost_1.70 cross/geoip cross/libiconv cross/openssl
 
 # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
 UNSUPPORTED_ARCHS = $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
@@ -38,9 +38,8 @@ CONFIGURE_ARGS += PYTHON_CPPFLAGS=-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 CONFIGURE_ARGS += PYTHON_LIBS="-L$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR) -lpython$(PYTHON_VERSION)"
 CONFIGURE_ARGS += LIB=-L/$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 
-ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
 ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)
-ADDITIONAL_LDFLAGS = "-Wl,-Bsymbolic"
+ADDITIONAL_LDFLAGS = -L$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)
 
 # Only required for DSM <= 6.* using gcc-4.9 along with comcerto2k-7.0
 # Enabled for all as without negative impact.

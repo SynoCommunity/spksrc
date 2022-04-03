@@ -46,10 +46,12 @@ ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations
 
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
+CONFIGURE_ARGS += LIBS="-L$(STAGING_INSTALL_PREFIX)/$(PYTHON_LIB_DIR)"
+ADDITIONAL_CFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
 ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
 endif
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
 # fix compilation with newer compilers
@@ -62,7 +64,6 @@ else
 ADDRESS_MODEL = 32
 endif
 
-include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: boost_configure
 boost_configure:
