@@ -38,7 +38,8 @@
 #  BOOST_LIBRARIES
 #  BOOST_ROOT
 #libtorrent==2.0.5
-git+https://github.com/arvidn/libtorrent.git@master#egg=libtorrent==2.0.6
+#git+https://github.com/arvidn/libtorrent.git@master#egg=libtorrent==2.0.6
+git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.6
 
 # [lxml]
 # Depends: libxml2, libxslt
