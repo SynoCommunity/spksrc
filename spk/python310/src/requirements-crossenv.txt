@@ -32,6 +32,15 @@
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
 # gevent==21.12.0
 
+# [libtorrent]
+# Depends: boost, geoip, libiconv
+# Require environment variables
+#  BOOST_LIBRARIES
+#  BOOST_ROOT
+# libtorrent==2.0.5
+# git+https://github.com/arvidn/libtorrent.git@master#egg=libtorrent==2.0.5 (use RC_2_0)
+# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.5
+
 # [lxml]
 # Depends: libxml2, libxslt
 # lxml==4.8.0
@@ -80,6 +89,11 @@
 # [PyYAML]
 # Depends: libyaml
 # PyYAML==6.0
+
+# [rencode]
+# Updated fork of the project
+# rencode==1.0.6 <<-- unsupported
+# git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
 
 # [ujson]
 #   - Require setuptools-scm in cross/python310 crossenv
