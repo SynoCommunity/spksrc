@@ -30,7 +30,7 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-# WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
@@ -41,9 +41,9 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 include ../../mk/spksrc.archs.mk
 
 # [gevent]
-DEPENDS += cross/libev cross/c-ares
-ENV += GEVENTSETUP_EMBED_CARES=FALSE
-ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+# DEPENDS += cross/libev cross/c-ares
+# ENV += GEVENTSETUP_EMBED_CARES=FALSE
+# ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
 # [libtorrent]
 # # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
