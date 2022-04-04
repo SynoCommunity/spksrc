@@ -36,5 +36,5 @@ include ../../mk/spksrc.spk.mk
 nzbget_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var $(STAGING_DIR)/share/nzbget/scripts
 	# Include usefull scripts
-	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/nzbToMedia.git
-	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/GetScripts.git
+	cd $(STAGING_DIR)/share/nzbget/scripts && git clone --depth=1 https://github.com/clinton-hall/nzbToMedia.git
+	cd $(STAGING_DIR)/share/nzbget/scripts && git clone --depth=1 https://github.com/clinton-hall/GetScripts.git
