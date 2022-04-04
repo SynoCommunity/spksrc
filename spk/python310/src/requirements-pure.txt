@@ -21,5 +21,11 @@ filelock==3.6.0
 platformdirs==2.5.1
 six==1.16.0
 
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
 # [deluge]
-deluge==2.0.5
+# deluge==2.0.5
