@@ -55,7 +55,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 ADDRESS_MODEL = 64
 else
 ADDRESS_MODEL = 32

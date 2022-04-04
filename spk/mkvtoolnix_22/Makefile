@@ -7,7 +7,7 @@ DEPENDS = cross/mkvtoolnix_22
 
 MAINTAINER = cytec
 DESCRIPTION = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
-CHANGELOG = "Update boost libraries. MkvToolNix v22.0 is the latest version that is compatible with DSM 6 and older DSM versions."
+CHANGELOG = "Update boost libraries. MKVToolNix v22.0 is the final version that is compatible with DSM 6."
 DISPLAY_NAME = MKVToolNix
 STARTABLE = no
 
