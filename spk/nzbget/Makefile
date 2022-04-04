@@ -1,9 +1,7 @@
 SPK_NAME = nzbget
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 28
+SPK_REV = 29
 SPK_ICON = src/nzbget.png
-
-DEPENDS = cross/p7zip cross/unrar
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
