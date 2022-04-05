@@ -26,6 +26,10 @@ SERVICE_PORT_TITLE = NZBGet (HTTP)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+# Installer brings all the binaries
+COPY_TARGET = nop
+override ARCH=
+
 POST_STRIP_TARGET = nzbget_extra_install
 
 include ../../mk/spksrc.spk.mk
