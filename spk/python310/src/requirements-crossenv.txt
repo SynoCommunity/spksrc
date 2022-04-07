@@ -95,7 +95,7 @@ git+https://github.com/arvidn/libtorrent.git@v2.0.5#egg=libtorrent==2.0.5
 # [rencode]
 # Updated fork of the project
 # rencode==1.0.6 <<-- unsupported
-# git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
+git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
 
 # [ujson]
 #   - Require setuptools-scm in cross/python310 crossenv

@@ -28,4 +28,4 @@ six==1.16.0
 ##
 
 # [deluge]
-# deluge==2.0.5
+deluge==2.0.5
