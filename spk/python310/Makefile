@@ -20,7 +20,7 @@ LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
-ENV += PYTHON_OPTIMIZE=1
+# ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
@@ -46,23 +46,25 @@ include ../../mk/spksrc.archs.mk
 # ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
 # [libtorrent]
-# # cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
-# UNSUPPORTED_ARCHS += $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-# # libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
-# REQUIRED_MIN_DSM = 7.0
-# # comcerto2k has older toolchain than other DSM 7 archs
-# UNSUPPORTED_ARCHS += comcerto2k
-# DEPENDS += cross/boost cross/geoip cross/libiconv
-# BOOST_LIBRARIES += system python chrono random
-# ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-# ENV += BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
-# ENV += PATH=$(WORK_DIR)/boost_1_78_0:$(PATH)
-# # Fails to build on evansport-7.0 but enabling
-# # -fPIC allows it to go much further
-# # https://github.com/arvidn/libtorrent/issues/6792
-# WHEELS_BUILD_ARGS += [libtorrent]
-# WHEELS_BUILD_ARGS += build_ext
-# WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
+# cross/boost: archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
+UNSUPPORTED_ARCHS += $(ARM5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# libtorrent: requires include/linux/if_link.h IFLA_* declarations
+UNSUPPORTED_ARCHS += $(i686_ARCHS)
+# libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
+REQUIRED_DSM = 7.0
+# comcerto2k has older toolchain than other DSM 7 archs
+UNSUPPORTED_ARCHS += comcerto2k
+DEPENDS += cross/boost_1.76 cross/geoip cross/libiconv
+BOOST_LIBRARIES += system python chrono random
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+ENV += BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_76_0
+ENV += PATH=$(WORK_DIR)/boost_1_76_0:$(PATH)
+# Fails to build on evansport-7.0 but enabling
+# -fPIC allows it to go much further
+# https://github.com/arvidn/libtorrent/issues/6792
+WHEELS_BUILD_ARGS += [libtorrent]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 
 # [lxml]
 # DEPENDS += cross/libxml2

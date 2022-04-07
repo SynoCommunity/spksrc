@@ -37,8 +37,10 @@
 # Require environment variables
 #  BOOST_LIBRARIES
 #  BOOST_ROOT
-# libtorrent==2.0.5
-# git+https://github.com/arvidn/libtorrent.git@master#egg=libtorrent==2.0.5 (use RC_2_0)
+# git+https://github.com/arvidn/libtorrent.git@v2.0.4#egg=python-libtorrent==2.0.4
+git+https://github.com/arvidn/libtorrent.git@v2.0.5#egg=libtorrent==2.0.5
+# git+https://github.com/arvidn/libtorrent.git@master#egg=libtorrent==2.0.5
+# Use RC_2_0 with boost 1.78.0+
 # git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.5
 
 # [lxml]
