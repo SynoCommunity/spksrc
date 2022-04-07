@@ -17,6 +17,8 @@ on:
     - 'cross/**'
     - 'native/**'
   push:
+    tags:
+      - "*-*"
     branches:
       - "**"
     paths:
@@ -32,9 +34,10 @@ jobs:
     outputs:
         arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
         noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
+        download_packages: ${{ steps.dependencies.outputs.download_packages }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
             fetch-depth: 0
             persist-credentials: false
@@ -47,7 +50,7 @@ jobs:
           echo "::set-output name=files::$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)"
 
       - name: Get changed files for push
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') == false
         id: getfile
         run: |
           git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
@@ -60,8 +63,19 @@ jobs:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
+  download:
+    name: Download sources
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+            persist-credentials: false
+
       - name: Cache downloaded files
-        uses: actions/cache@v2
+        uses: actions/cache@v3.0.1
         with:
           path: distrib
           # use run_id in key to cache within workflow only.
@@ -70,11 +84,11 @@ jobs:
       - name: Download source files
         run: ./.github/actions/download.sh
         env:
-          DOWNLOAD_PACKAGES: ${{ steps.dependencies.outputs.download_packages }}
+          DOWNLOAD_PACKAGES: ${{ needs.prepare.outputs.download_packages }}
 
   build:
     name: Build
-    needs: prepare
+    needs: [ download, prepare ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -85,21 +99,25 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+            persist-credentials: false
 
       - name: Cache toolchains
-        uses: actions/cache@v2
+        uses: actions/cache@v3.0.1
         with:
           path: toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/*/digests') }}
 
       - name: Use cache of downloaded files
-        uses: actions/cache@v2
+        uses: actions/cache@v3.0.1
         with:
           path: distrib
           key: distrib-${{ github.run_id }}
 
-      - name: Build Package (based on changed files)
+      - name: Build Package (file changes)
+        if: startsWith(github.ref, 'refs/tags/') == false
         # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
         continue-on-error: true
@@ -113,6 +131,23 @@ jobs:
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
+          BUILD_ERROR_FILE: /github/workspace/build_errors.txt
+          BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
+          BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
+          BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      - name: Build Package (Tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        # We don't want to stop the build on errors.
+        # Errors are reported in "Build Status"
+        continue-on-error: true
+        uses: docker://ghcr.io/synocommunity/spksrc:latest
+        with:
+          entrypoint: ./.github/actions/build-tag.sh
+        env:
+          # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
+          GH_ARCH: ${{ matrix.arch }}
+          API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
