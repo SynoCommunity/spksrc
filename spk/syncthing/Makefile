@@ -1,5 +1,5 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.19.1
+SPK_VERS = 1.19.2
 SPK_REV = 26
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "1. Update syncthing to v1.19.1.<br/>2. Fix failure to start after upgrade with newer config file version."
+CHANGELOG = "1. Update syncthing to v1.19.2.<br/>2. Fix failure to start after upgrade with newer config file version."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
