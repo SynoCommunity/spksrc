@@ -272,7 +272,7 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 $(WORK_DIR)/package.tgz: icon service
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
+	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
 
