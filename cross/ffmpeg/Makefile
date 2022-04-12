@@ -143,12 +143,13 @@ CONFIGURE_ARGS += --enable-libaom
 endif
 
 # Add SVT-AV1 codec to supported ARCH
-# Patch for support from: https://github.com/OpenVisualCloud/SVT-AV1/tree/master/ffmpeg_plugin
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
+# Add SVT-HEVC codec to x64
+# Patch for support from: https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/n4.4-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
