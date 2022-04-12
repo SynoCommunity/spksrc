@@ -1,53 +1,100 @@
-diff -uprN ../ffmpeg-4.3-004/configure ./configure
---- ../ffmpeg-4.3-004/configure	2020-06-16 20:34:21.915744696 -0400
-+++ ./configure	2020-06-16 20:36:43.842819905 -0400
-@@ -268,6 +268,7 @@ External library support:
-   --enable-libsrt          enable Haivision SRT protocol via libsrt [no]
-   --enable-libssh          enable SFTP protocol via libssh [no]
-   --enable-libsvthevc      enable HEVC encoding via svt [no]
+diff -uprN ../ffmpeg-4.4.1/configure ./configure
+--- ../ffmpeg-4.4.1/configure	2022-04-12 18:03:36.169345544 +0000
++++ ./configure	2022-04-12 18:03:00.436950236 +0000
+@@ -249,6 +249,7 @@ External library support:
+   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
+   --enable-libopencore-amrnb enable AMR-NB de/encoding via libopencore-amrnb [no]
+   --enable-libopencore-amrwb enable AMR-WB decoding via libopencore-amrwb [no]
 +  --enable-libsvtav1       enable AV1 encoding via svt [no]
-   --enable-libtensorflow   enable TensorFlow as a DNN module backend
-                            for DNN based filters like sr [no]
-   --enable-libtesseract    enable Tesseract, needed for ocr filter [no]
-@@ -1805,6 +1806,7 @@ EXTERNAL_LIBRARY_LIST="
-     libsrt
-     libssh
-     libsvthevc
+   --enable-libopencv       enable video filtering via libopencv [no]
+   --enable-libopenh264     enable H.264 encoding via OpenH264 [no]
+   --enable-libopenjpeg     enable JPEG 2000 de/encoding via OpenJPEG [no]
+@@ -1791,6 +1792,7 @@ EXTERNAL_LIBRARY_LIST="
+     libmodplug
+     libmp3lame
+     libmysofa
 +    libsvtav1
-     libtensorflow
-     libtesseract
-     libtheora
-@@ -3243,6 +3245,7 @@ libspeex_decoder_deps="libspeex"
- libspeex_encoder_deps="libspeex"
- libspeex_encoder_select="audio_frame_queue"
- libsvt_hevc_encoder_deps="libsvthevc"
+     libopencv
+     libopenh264
+     libopenjpeg
+@@ -3257,6 +3259,7 @@ libopencore_amrnb_decoder_deps="libopenc
+ libopencore_amrnb_encoder_deps="libopencore_amrnb"
+ libopencore_amrnb_encoder_select="audio_frame_queue"
+ libopencore_amrwb_decoder_deps="libopencore_amrwb"
 +libsvt_av1_encoder_deps="libsvtav1"
- libtheora_encoder_deps="libtheora"
- libtwolame_encoder_deps="libtwolame"
- libvo_amrwbenc_encoder_deps="libvo_amrwbenc"
-@@ -6373,6 +6376,7 @@ enabled libssh            && require_pkg
- enabled libspeex          && require_pkg_config libspeex speex speex/speex.h speex_decoder_init
- enabled libsrt            && require_pkg_config libsrt "srt >= 1.3.0" srt/srt.h srt_socket
- enabled libsvthevc        && require_pkg_config libsvthevc SvtHevcEnc EbApi.h EbInitHandle
+ libopenh264_decoder_deps="libopenh264"
+ libopenh264_decoder_select="h264_mp4toannexb_bsf"
+ libopenh264_encoder_deps="libopenh264"
+@@ -6401,6 +6404,7 @@ enabled libnpp            && { check_lib
+                                die "ERROR: libnpp not found"; }
+ enabled libopencore_amrnb && require libopencore_amrnb opencore-amrnb/interf_dec.h Decoder_Interface_init -lopencore-amrnb
+ enabled libopencore_amrwb && require libopencore_amrwb opencore-amrwb/dec_if.h D_IF_init -lopencore-amrwb
 +enabled libsvtav1         && require_pkg_config libsvtav1 SvtAv1Enc EbSvtAv1Enc.h svt_av1_enc_init_handle
- enabled libtensorflow     && require libtensorflow tensorflow/c/c_api.h TF_Version -ltensorflow
- enabled libtesseract      && require_pkg_config libtesseract tesseract tesseract/capi.h TessBaseAPICreate
- enabled libtheora         && require libtheora theora/theoraenc.h th_info_init -ltheoraenc -ltheoradec -logg
-diff -uprN ../ffmpeg-4.3-004/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
---- ../ffmpeg-4.3-004/libavcodec/allcodecs.c	2020-06-16 20:34:21.916744767 -0400
-+++ ./libavcodec/allcodecs.c	2020-06-16 20:36:43.842819905 -0400
-@@ -729,6 +729,7 @@ extern AVCodec ff_libshine_encoder;
- extern AVCodec ff_libspeex_encoder;
- extern AVCodec ff_libspeex_decoder;
- extern AVCodec ff_libsvt_hevc_encoder;
+ enabled libopencv         && { check_headers opencv2/core/core_c.h &&
+                                { check_pkg_config libopencv opencv opencv2/core/core_c.h cvCreateImageHeader ||
+                                  require libopencv opencv2/core/core_c.h cvCreateImageHeader -lopencv_core -lopencv_imgproc; } ||
+diff -uprN ../ffmpeg-4.4.1/configure.orig ./configure.orig
+--- ../ffmpeg-4.4.1/configure.orig	2021-10-24 20:47:11.000000000 +0000
++++ ./configure.orig	2022-04-12 17:57:17.689050087 +0000
+@@ -289,6 +289,7 @@ External library support:
+   --enable-libwebp         enable WebP encoding via libwebp [no]
+   --enable-libx264         enable H.264 encoding via x264 [no]
+   --enable-libx265         enable HEVC encoding via x265 [no]
++  --enable-libsvthevc      enable HEVC encoding via svt [no]
+   --enable-libxavs         enable AVS encoding via xavs [no]
+   --enable-libxavs2        enable AVS2 encoding via xavs2 [no]
+   --enable-libxcb          enable X11 grabbing using XCB [autodetect]
+@@ -1764,6 +1765,7 @@ EXTERNAL_LIBRARY_LIST="
+     gnutls
+     jni
+     ladspa
++    libsvthevc
+     libaom
+     libass
+     libbluray
+@@ -3292,6 +3294,7 @@ libx264_encoder_select="atsc_a53"
+ libx264rgb_encoder_deps="libx264 x264_csp_bgr"
+ libx264rgb_encoder_select="libx264_encoder"
+ libx265_encoder_deps="libx265"
++libsvt_hevc_encoder_deps="libsvthevc"
+ libxavs_encoder_deps="libxavs"
+ libxavs2_encoder_deps="libxavs2"
+ libxvid_encoder_deps="libxvid"
+@@ -6499,6 +6502,7 @@ enabled mmal              && { check_lib
+                                  check_lib mmal interface/mmal/mmal.h mmal_port_connect -lmmal_core -lmmal_util -lmmal_vc_client -lbcm_host; } ||
+                                die "ERROR: mmal not found" &&
+                                check_func_headers interface/mmal/mmal.h "MMAL_PARAMETER_VIDEO_MAX_NUM_CALLBACKS"; }
++enabled libsvthevc        && require_pkg_config libsvthevc SvtHevcEnc EbApi.h EbInitHandle
+ enabled openal            && { { for al_extralibs in "${OPENAL_LIBS}" "-lopenal" "-lOpenAL32"; do
+                                check_lib openal 'AL/al.h' alGetError "${al_extralibs}" && break; done } ||
+                                die "ERROR: openal not found"; } &&
+diff -uprN ../ffmpeg-4.4.1/libavcodec/allcodecs.c ./libavcodec/allcodecs.c
+--- ../ffmpeg-4.4.1/libavcodec/allcodecs.c	2022-04-12 18:03:36.173345589 +0000
++++ ./libavcodec/allcodecs.c	2022-04-12 18:03:00.436950236 +0000
+@@ -738,6 +738,7 @@ extern AVCodec ff_libmp3lame_encoder;
+ extern AVCodec ff_libopencore_amrnb_encoder;
+ extern AVCodec ff_libopencore_amrnb_decoder;
+ extern AVCodec ff_libopencore_amrwb_decoder;
 +extern AVCodec ff_libsvt_av1_encoder;
- extern AVCodec ff_libtheora_encoder;
- extern AVCodec ff_libtwolame_encoder;
- extern AVCodec ff_libvo_amrwbenc_encoder;
-diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
---- ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c	1969-12-31 19:00:00.000000000 -0500
-+++ ./libavcodec/libsvt_av1.c	2020-06-16 20:36:43.843819976 -0400
-@@ -0,0 +1,551 @@
+ extern AVCodec ff_libopenjpeg_encoder;
+ extern AVCodec ff_libopenjpeg_decoder;
+ extern AVCodec ff_libopus_encoder;
+diff -uprN ../ffmpeg-4.4.1/libavcodec/allcodecs.c.orig ./libavcodec/allcodecs.c.orig
+--- ../ffmpeg-4.4.1/libavcodec/allcodecs.c.orig	2021-10-24 20:47:07.000000000 +0000
++++ ./libavcodec/allcodecs.c.orig	2022-04-12 17:57:17.689050087 +0000
+@@ -765,6 +765,7 @@ extern AVCodec ff_libx262_encoder;
+ extern AVCodec ff_libx264_encoder;
+ extern AVCodec ff_libx264rgb_encoder;
+ extern AVCodec ff_libx265_encoder;
++extern AVCodec ff_libsvt_hevc_encoder;
+ extern AVCodec ff_libxavs_encoder;
+ extern AVCodec ff_libxavs2_encoder;
+ extern AVCodec ff_libxvid_encoder;
+diff -uprN ../ffmpeg-4.4.1/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
+--- ../ffmpeg-4.4.1/libavcodec/libsvt_av1.c	1970-01-01 00:00:00.000000000 +0000
++++ ./libavcodec/libsvt_av1.c	2022-04-12 18:03:00.436950236 +0000
+@@ -0,0 +1,583 @@
++
 +/*
 +* Scalable Video Technology for AV1 encoder library plugin
 +*
@@ -81,6 +128,9 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +#include "libavutil/avassert.h"
 +
 +#include "internal.h"
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(58, 93, 100)
++#include "encode.h"
++#endif
 +#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(58, 90, 100)
 +#include "packet_internal.h"
 +#endif
@@ -102,6 +152,8 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    int                         raw_size;
 +    int                         max_tu_size;
 +
++    AVFrame *frame;
++
 +    AVBufferPool* pool;
 +
 +    EOS_STATUS eos_flag;
@@ -120,7 +172,8 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    int level;
 +    int profile;
 +
-+
++    int tile_columns;
++    int tile_rows;
 +} SvtContext;
 +
 +static const struct {
@@ -211,7 +264,6 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +{
 +    SvtContext *svt_enc = avctx->priv_data;
 +    const AVPixFmtDescriptor *desc;
-+    int ret;
 +
 +    param->source_width     = avctx->width;
 +    param->source_height    = avctx->height;
@@ -275,6 +327,9 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +
 +    if (svt_enc->la_depth != -1)
 +        param->look_ahead_distance  = svt_enc->la_depth;
++
++    param->tile_columns = svt_enc->tile_columns;
++    param->tile_rows = svt_enc->tile_rows;
 +
 +    return 0;
 +}
@@ -360,6 +415,10 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +        }
 +    }
 +
++    svt_enc->frame = av_frame_alloc();
++    if (!svt_enc->frame)
++        return AVERROR(ENOMEM);
++
 +    ret = alloc_buffer(&svt_enc->enc_params, svt_enc);
 +    if (ret < 0)
 +        return ret;
@@ -374,6 +433,10 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +
 +    if (!frame) {
 +        EbBufferHeaderType headerPtrLast;
++
++        if (svt_enc->eos_flag == EOS_SENT)
++            return 0;
++
 +        headerPtrLast.n_alloc_len   = 0;
 +        headerPtrLast.n_filled_len  = 0;
 +        headerPtrLast.n_tick_count  = 0;
@@ -426,12 +489,24 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +{
 +    SvtContext  *svt_enc = avctx->priv_data;
 +    EbBufferHeaderType *headerPtr;
++    AVFrame *frame = svt_enc->frame;
 +    EbErrorType svt_ret;
 +    int ret = 0, pict_type;
 +    AVBufferRef* ref;
 +
 +    if (svt_enc->eos_flag == EOS_RECEIVED)
 +        return AVERROR_EOF;
++
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(58, 93, 100)
++    ret = ff_encode_get_frame(avctx, frame);
++    if (ret < 0 && ret != AVERROR_EOF)
++        return ret;
++    if (ret == AVERROR_EOF)
++        frame = NULL;
++
++    eb_send_frame(avctx, frame);
++    av_frame_unref(svt_enc->frame);
++#endif
 +
 +    svt_ret = svt_av1_enc_get_packet(svt_enc->svt_handle, &headerPtr, svt_enc->eos_flag);
 +    if (svt_ret == EB_NoErrorEmptyQueue)
@@ -470,7 +545,7 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +
 +    svt_av1_enc_release_out_buffer(&headerPtr);
 +
-+    return ret;
++    return 0;
 +}
 +
 +static av_cold int eb_enc_close(AVCodecContext *avctx)
@@ -482,6 +557,8 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +            svt_av1_enc_deinit(svt_enc->svt_handle);
 +            svt_av1_enc_deinit_handle(svt_enc->svt_handle);
 +        }
++
++        av_frame_free(&svt_enc->frame);
 +
 +        free_buffer(svt_enc);
 +        svt_enc = NULL;
@@ -546,9 +623,9 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +
 +    { "rc", "Bit rate control mode", OFFSET(rc_mode),
 +      AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 3, VE , "rc"},
-+        { "cqp", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 0 },  INT_MIN, INT_MAX, VE, "rc" },
-+        { "vbr", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 2 },  INT_MIN, INT_MAX, VE, "rc" },
-+        { "cvbr", NULL, 0, AV_OPT_TYPE_CONST,{ .i64 = 3 },  INT_MIN, INT_MAX, VE, "rc" },
++        { "cqp", "Const Quantization Parameter", 0, AV_OPT_TYPE_CONST, { .i64 = 0 },  INT_MIN, INT_MAX, VE, "rc" },
++        { "vbr", "Variable Bit Rate, use a target bitrate for the entire stream", 0, AV_OPT_TYPE_CONST, { .i64 = 1 },  INT_MIN, INT_MAX, VE, "rc" },
++        { "cvbr", "Constrained Variable Bit Rate, use a target bitrate for each GOP", 0, AV_OPT_TYPE_CONST,{ .i64 = 2 },  INT_MIN, INT_MAX, VE, "rc" },
 +
 +    { "qp", "QP value for intra frames", OFFSET(qp),
 +      AV_OPT_TYPE_INT, { .i64 = 50 }, 0, 63, VE },
@@ -556,11 +633,10 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    { "sc_detection", "Scene change detection", OFFSET(scd),
 +      AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
 +
-+
-+
-+
 +    { "forced-idr", "If forcing keyframes, force them as IDR frames.", OFFSET(forced_idr),
-+      AV_OPT_TYPE_BOOL,   { .i64 = 0 }, 0, 1, VE },
++      AV_OPT_TYPE_BOOL,   { .i64 = 1 }, 0, 1, VE },
++    { "tile-columns",     "Log2 of number of tile columns to use", OFFSET(tile_columns), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 4, VE},
++    { "tile-rows",        "Log2 of number of tile rows to use",    OFFSET(tile_rows), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 6, VE},
 +
 +    {NULL},
 +};
@@ -587,7 +663,9 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    .type           = AVMEDIA_TYPE_VIDEO,
 +    .id             = AV_CODEC_ID_AV1,
 +    .init           = eb_enc_init,
++#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 93, 100)
 +    .send_frame     = eb_send_frame,
++#endif
 +    .receive_packet = eb_receive_packet,
 +    .close          = eb_enc_close,
 +    .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AUTO_THREADS,
@@ -599,14 +677,25 @@ diff -uprN ../ffmpeg-4.3-004/libavcodec/libsvt_av1.c ./libavcodec/libsvt_av1.c
 +    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 +    .wrapper_name   = "libsvt_av1",
 +};
-diff -uprN ../ffmpeg-4.3-004/libavcodec/Makefile ./libavcodec/Makefile
---- ../ffmpeg-4.3-004/libavcodec/Makefile	2020-06-16 20:34:21.915744696 -0400
-+++ ./libavcodec/Makefile	2020-06-16 20:36:43.842819905 -0400
-@@ -1025,6 +1025,7 @@ OBJS-$(CONFIG_LIBSHINE_ENCODER)
- OBJS-$(CONFIG_LIBSPEEX_DECODER)           += libspeexdec.o
- OBJS-$(CONFIG_LIBSPEEX_ENCODER)           += libspeexenc.o
- OBJS-$(CONFIG_LIBSVT_HEVC_ENCODER)        += libsvt_hevc.o
+diff -uprN ../ffmpeg-4.4.1/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-4.4.1/libavcodec/Makefile	2022-04-12 18:03:36.173345589 +0000
++++ ./libavcodec/Makefile	2022-04-12 18:03:00.436950236 +0000
+@@ -1001,6 +1001,7 @@ OBJS-$(CONFIG_WEBM_MUXER)              +
+ OBJS-$(CONFIG_ELBG_FILTER)             += elbg.o
+ 
+ # external codec libraries
 +OBJS-$(CONFIG_LIBSVT_AV1_ENCODER)         += libsvt_av1.o
- OBJS-$(CONFIG_LIBTHEORA_ENCODER)          += libtheoraenc.o
- OBJS-$(CONFIG_LIBTWOLAME_ENCODER)         += libtwolame.o
- OBJS-$(CONFIG_LIBVO_AMRWBENC_ENCODER)     += libvo-amrwbenc.o
+ OBJS-$(CONFIG_AAC_AT_DECODER)             += audiotoolboxdec.o
+ OBJS-$(CONFIG_AC3_AT_DECODER)             += audiotoolboxdec.o
+ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+diff -uprN ../ffmpeg-4.4.1/libavcodec/Makefile.orig ./libavcodec/Makefile.orig
+--- ../ffmpeg-4.4.1/libavcodec/Makefile.orig	2021-10-24 20:47:07.000000000 +0000
++++ ./libavcodec/Makefile.orig	2022-04-12 17:57:17.689050087 +0000
+@@ -1071,6 +1071,7 @@ OBJS-$(CONFIG_LIBWEBP_ANIM_ENCODER)
+ OBJS-$(CONFIG_LIBX262_ENCODER)            += libx264.o
+ OBJS-$(CONFIG_LIBX264_ENCODER)            += libx264.o
+ OBJS-$(CONFIG_LIBX265_ENCODER)            += libx265.o
++OBJS-$(CONFIG_LIBSVT_HEVC_ENCODER)        += libsvt_hevc.o
+ OBJS-$(CONFIG_LIBXAVS_ENCODER)            += libxavs.o
+ OBJS-$(CONFIG_LIBXAVS2_ENCODER)           += libxavs2.o
+ OBJS-$(CONFIG_LIBXVID_ENCODER)            += libxvid.o
