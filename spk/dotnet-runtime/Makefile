@@ -1,5 +1,5 @@
 SPK_NAME = dotnet-runtime
-SPK_VERS = 6.0.3
+SPK_VERS = 6.0.4
 SPK_REV = 1
 SPK_ICON = src/dotnet.png
 
