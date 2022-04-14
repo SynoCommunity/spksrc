@@ -11,6 +11,7 @@ DEPENDS = cross/libunistring cross/libtasn1 cross/nettle cross/zlib
 HOMEPAGE = https://gnutls.org/
 COMMENT  = GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them.
 LICENSE  = LGPL
+FORCE_GITHUBBUILD = 1
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-doc
