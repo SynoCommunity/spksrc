@@ -37,11 +37,13 @@
 # Require environment variables
 #  BOOST_LIBRARIES
 #  BOOST_ROOT
-git+https://github.com/arvidn/libtorrent.git@v1.2.15#egg=libtorrent==1.2.15
+#git+https://github.com/arvidn/libtorrent.git@v1.2.15#egg=libtorrent==1.2.15
+# With IFLA_* upstream fix (PR #6806)
+git+https://github.com/arvidn/libtorrent.git@0b84deb11ce198f246f63c4156f8f65cbb6b07bc#egg=libtorrent==1.2.15
 
 # [libtorrent] 2.0.5
 # Only supported on DSM7 armv7, aarch64, x64
-git+https://github.com/arvidn/libtorrent.git@v2.0.5#egg=libtorrent==2.0.5
+# git+https://github.com/arvidn/libtorrent.git@v2.0.5#egg=libtorrent==2.0.5
 # Use RC_2_0 with boost 1.78.0+
 # git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.5
 
