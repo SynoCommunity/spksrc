@@ -1,6 +1,7 @@
-diff -uprN ../ffmpeg-4.4.1-orig/libavfilter/vf_tonemap_vaapi.c ./libavfilter/vf_tonemap_vaapi.c
---- ../ffmpeg-4.4.1-orig/libavfilter/vf_tonemap_vaapi.c	2021-10-21 17:06:35.000000000 +0000
-+++ ./libavfilter/vf_tonemap_vaapi.c	2022-04-12 18:27:11.499188475 +0000
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
+===================================================================
+--- libavfilter/vf_tonemap_vaapi.c
++++ libavfilter/vf_tonemap_vaapi.c
 @@ -41,7 +41,13 @@ typedef struct HDRVAAPIContext {
      enum AVColorTransferCharacteristic color_transfer;
      enum AVColorSpace color_matrix;
