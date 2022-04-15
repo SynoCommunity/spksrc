@@ -396,9 +396,7 @@ endif
 else
 $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
 	@$(dsm_resource_copy)
-ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
-SPK_CONTENT += conf
-endif
+
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 
