@@ -21,4 +21,11 @@ FWPORTS = src/node-exporter.sc
 
 SERVICE_SETUP = src/service-setup.sh
 
+POST_STRIP_TARGET = node-exporter_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: node-exporter_extra_install
+node-exporter_extra_install:
+	@install -m 755 -d $(STAGING_DIR)/var
+	@install -m 644 src/parameters.txt $(STAGING_DIR)/var/
