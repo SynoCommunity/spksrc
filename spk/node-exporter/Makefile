@@ -11,7 +11,7 @@ MAINTAINER = chiehmin
 DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 STARTABLE = yes
 DISPLAY_NAME = Node Exporter
-CHANGELOG = "Update to v1.3.1"
+CHANGELOG = "1. Update to v1.3.1.<br/>2. Add 'parameters.txt' file to define custom parameters."
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
 LICENSE  = Apache License 2.0

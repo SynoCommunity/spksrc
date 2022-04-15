@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/prometheus/node_exporter/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/go
+BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
 COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
