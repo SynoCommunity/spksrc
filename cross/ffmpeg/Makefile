@@ -120,15 +120,6 @@ CONFIGURE_ARGS += --enable-libzvbi
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-# Compiling tvheadend for evansport requires #include synology.h
-POST_INSTALL_TARGET = ffmpeg_post_install
-# Hardware acceleration requires
-# intelce-toolchain from the DSM toolkit
-REQUIRE_TOOLKIT = 1
-endif
-
-
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
@@ -195,28 +186,5 @@ CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-DEPENDS += cross/json-c
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
-CONFIGURE_ARGS += --disable-x86asm
-CONFIGURE_ARGS += --extra-cflags=-fasm
-CONFIGURE_ARGS += --extra-cflags=-std=c99
-CONFIGURE_ARGS += --extra-cflags=-pedantic
-CONFIGURE_ARGS += --extra-cflags=-I$(TOOLKIT_ROOT)/include/intelce-utilities
-CONFIGURE_ARGS += --extra-cflags=-I$(TOOLKIT_ROOT)/include/intelce-utilities/linux_user
-CONFIGURE_ARGS += --extra-ldflags=-L$(TOOLKIT_ROOT)/lib/intelce-utilities
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TOOLKIT_ROOT)/lib
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TOOLKIT_ROOT)/lib/intelce-utilities
-# DISABLE
-CONFIGURE_ARGS += --disable-decoder=h264_smd
-CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd
-CONFIGURE_ARGS += --disable-decoder=mpeg4_smd
-CONFIGURE_ARGS += --disable-decoder=vc1_smd
-CONFIGURE_ARGS += --disable-decoder=wmv3_smd
-# ENABLE
-#CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
-#CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
-
-.PHONY: ffmpeg_post_install
-ffmpeg_post_install:
-	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/synoconfig.h $(WORK_DIR)/install$(INSTALL_PREFIX)/include
 endif
