@@ -8,13 +8,16 @@ DEPENDS = cross/$(SPK_NAME)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = chiehmin
-DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels
+DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 STARTABLE = yes
 DISPLAY_NAME = Node Exporter
 CHANGELOG = "Update to v1.3.1"
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
 LICENSE  = Apache License 2.0
+
+ADMIN_PORT = 9100
+FWPORTS = src/node-exporter.sc
 
 SERVICE_SETUP = src/service-setup.sh
 

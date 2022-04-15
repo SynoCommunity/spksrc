@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = native/go
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
-COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels
+COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 LICENSE  = Apache License 2.0
 
 COMPILE_MAKE_OPTIONS += build
