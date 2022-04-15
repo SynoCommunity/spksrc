@@ -47,7 +47,7 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 CONFIGURE_ARGS += --nowerror
 endif
 
