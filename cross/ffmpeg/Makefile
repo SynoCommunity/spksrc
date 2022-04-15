@@ -164,6 +164,7 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --extra-libs=-latomic
 CONFIGURE_ARGS += --disable-asm
 CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
