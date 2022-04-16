@@ -1,6 +1,6 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.4.1
-SPK_REV = 39
+SPK_REV = 40
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to version 4.3.3<br/>2. Update intel-media-driver to 21Q3<br/>3. Update libaom to 3.2.0<br/>4. Update libvpx to 1.11.0<br/>5. Update zmq to 4.3.4"
 
