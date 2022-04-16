@@ -85,9 +85,11 @@ ifneq ($(strip $(WHEELS)),)
 	      crossenvPIP=$$(. $(CROSSENV) && which pip) ; \
 	      $(MSG) "Python crossenv found: [$(CROSSENV)]" ; \
 	      $(MSG) "pip crossenv found: [$${crossenvPIP}]" ; \
-	   else \
+	   elif [ "$(PYTHON_VERSION)" != "2.7" ] ; then \
 	      $(MSG) "WARNING: Python crossenv NOT found!" ; \
 	      $(MSG) "WARNING: pip crossenv NOT found!" ; \
+	   else \
+	      $(MSG) "Python $(PYTHON_VERSION) uses pip: $${crossenvPIP}" ; \
 	   fi ; \
 	   while IFS= read -r requirement ; do \
 	      wheel=$${requirement#*:} ; \
@@ -123,10 +125,8 @@ ifneq ($(strip $(WHEELS)),)
 ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 	   $(MSG) "Building pure-python" ; \
-	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && $(RUN) \
-	      $(PIP) \
-	      $(PIP_WHEEL_ARGS) \
-	      --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
+	      $(RUN) $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 	fi
 else
 	@$(MSG) "[SKIP] Building pure-python"
