@@ -8,7 +8,7 @@ PKG_DIST_SITE = https://github.com/zyedidia/$(PKG_NAME)/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/go
+BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://micro-editor.github.io/
 COMMENT  = a modern and intuitive terminal-based text editor.

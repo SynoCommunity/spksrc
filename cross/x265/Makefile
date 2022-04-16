@@ -5,7 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
 PKG_DIR = $(PKG_NAME)_$(PKG_VERS)/source
 
-DEPENDS =
 OPTIONAL_DEPENDS = native/nasm cross/libnuma
 
 HOMEPAGE = http://x265.org/
@@ -13,8 +12,6 @@ COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
 
 CONFIGURE_TARGET = x265_configure
-
-NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
 
 CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
@@ -56,18 +53,18 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64 -DENABLE_ALTIVEC=OFF -DCPU_POWER8=OFF
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += native/nasm cross/libnuma
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)$(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/nasm
+DEPENDS = cross/libnuma
+NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
 ENV += PATH=$(NASM_PATH):$$PATH
 ENV += AS=$(NASM_PATH)/nasm
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
 endif
-
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-DEPENDS += native/nasm cross/libnuma
-ENV += PATH=$(NASM_PATH):$$PATH
-ENV += AS=$(NASM_PATH)/nasm
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
+endif
 endif
 
 # For ppc853x-4.3, disable atomics

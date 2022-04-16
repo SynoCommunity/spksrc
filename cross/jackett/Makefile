@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/Jackett/Jackett/archive
 PKG_DIR = Jackett-$(PKG_VERS)/src
 
 DOTNET_VERSION = 5.0
-DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
+BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
 
 HOMEPAGE = https://github.com/Jackett/Jackett
 COMMENT  = Jackett works as a proxy server: it translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping & translation logic - removing the burden from other apps.
