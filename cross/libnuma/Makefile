@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = https://linux.die.net/man/8/numactl
 COMMENT  = NUMA stands for Non-Uniform Memory Access.
-LICENSE  = GPLv2
+LICENSE  = LGPLv2
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O
