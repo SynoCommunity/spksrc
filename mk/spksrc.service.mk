@@ -211,8 +211,8 @@ endif
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
-	@echo '{}' > $@
 	@$(MSG) "Creating $@"
+	@echo '{}' > $@
 ifneq ($(strip $(SERVICE_PORT)),)
 	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ | sponge $@
 endif

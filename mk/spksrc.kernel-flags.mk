@@ -54,7 +54,7 @@ endif
 
 #
 #
-# For DSM version >= 6.1
+# For DSM version 6.1 .. 6.2.3
 #
 else ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 15152),1)
 ifeq ($(strip $(KERNEL_DIST_NAME)),)
