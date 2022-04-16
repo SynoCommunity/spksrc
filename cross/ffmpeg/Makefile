@@ -184,7 +184,7 @@ endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/nasm
-NASM_PATH = $(relapath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
+NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
 ENV += PATH=$(NASM_PATH):$$PATH
 endif
 
