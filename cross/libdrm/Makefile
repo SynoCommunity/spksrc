@@ -12,7 +12,6 @@ COMMENT = Userspace interface to kernel DRM services
 LICENSE =
 
 CONFIGURE_ARGS = -Dlibdir=lib
-CONFIGURE_ARGS += -Damdgpu=false
 CONFIGURE_ARGS += -Dnouveau=false
 CONFIGURE_ARGS += -Dvmwgfx=false
 
@@ -22,6 +21,7 @@ include ../../mk/spksrc.archs.mk
 # then disable radeon driver
 ifneq ($(findstring $(ARCH),x64 v1000),$(ARCH))
 CONFIGURE_ARGS += -Dradeon=false
+CONFIGURE_ARGS += -Damdgpu=false
 endif
 
 include ../../mk/spksrc.cross-meson.mk
