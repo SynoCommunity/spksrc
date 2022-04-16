@@ -183,7 +183,7 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
-CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
+CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libdrm
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
