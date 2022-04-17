@@ -5,8 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
 PKG_DIR = $(PKG_NAME)_$(PKG_VERS)/source
 
-DEPENDS =
-OPTIONAL_DEPENDS = native/nasm cross/libnuma
+OPTIONAL_DEPENDS = native/nasm
 
 HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
@@ -14,9 +13,7 @@ LICENSE  = GPL
 
 CONFIGURE_TARGET = x265_configure
 
-NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
-
-CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+CMAKE_ARGS  = -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=Linux
 CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TC_PATH)$(TC_PREFIX)gcc
@@ -24,6 +21,13 @@ CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TC_PATH)$(TC_PREFIX)g++
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(INSTALL_PREFIX)/lib
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
+CMAKE_ARGS += -DENABLE_LIBNUMA=OFF
+
+# additional cmake args for the build of 10 and 12 bit depth libraries
+CMAKE_BITLIB_ARGS =
+
+# additional cmake args for the final multilib build
+CMAKE_MULTILIB_ARGS =
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -56,18 +60,21 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=ppc64 -DENABLE_ALTIVEC=OFF -DCPU_POWER8=OFF
 endif
 
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/nasm
+NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
+ENV += PATH=$(NASM_PATH):$$PATH
+ENV += AS=$(NASM_PATH)/nasm
+CMAKE_ARGS += -DNASM_EXECUTABLE=$(NASM_PATH)/nasm
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += native/nasm cross/libnuma
-ENV += PATH=$(NASM_PATH):$$PATH
-ENV += AS=$(NASM_PATH)/nasm
-CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
-
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-DEPENDS += native/nasm cross/libnuma
-ENV += PATH=$(NASM_PATH):$$PATH
-ENV += AS=$(NASM_PATH)/nasm
-CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF -DCMAKE_SYSTEM_PROCESSOR=x86
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86
+# asm code for HIGH_BIT_DEPTH is not compatible with 32 bit arch
+CMAKE_BITLIB_ARGS += -DENABLE_ASSEMBLY=OFF
+CMAKE_MULTILIB_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
+endif
 endif
 
 # For ppc853x-4.3, disable atomics
@@ -84,7 +91,7 @@ PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)
 PKG_BUILD_12BIT = $(PKG_WORK_DIR)/build12bit
 PKG_BUILD_10BIT = $(PKG_WORK_DIR)/build10bit
 
-CMAKE_BITLIB_ARGS = -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF
+CMAKE_BITLIB_ARGS += -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF
 CMAKE_BITLIB_ARGS += -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LINK_FLAGS="-ldl"
 
 $(PKG_DIR)/libx265_main12.a:
@@ -104,7 +111,7 @@ $(PKG_DIR)/libx265_main10.a:
 	@$(RUN) ln -sf $(PKG_BUILD_10BIT)/libx265.a libx265_main10.a
 
 # Aggregate them all together in default 8 bit depth build
-CMAKE_MULTILIB_ARGS = -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
+CMAKE_MULTILIB_ARGS += -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
 CMAKE_MULTILIB_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
 
 x265_configure: $(PKG_DIR)/libx265_main12.a $(PKG_DIR)/libx265_main10.a

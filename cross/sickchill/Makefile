@@ -2,24 +2,23 @@ PKG_NAME = SickChill
 PKG_VERS = 2021.11.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/SickChill/SickChill/archive/refs/tags
+PKG_DIST_SITE = https://github.com/SickChill/SickChill/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-SC_GIT_BRANCH=master
-SC_GIT_COMMIT_HASH=01020f3636d01535f60b83464d8127ea0efabfc7
-SC_GIT_COMMIT_BRANCH=$(PKG_VERS)
+SC_GIT_BRANCH = master
+SC_GIT_COMMIT_HASH = 01020f3636d01535f60b83464d8127ea0efabfc7
+SC_GIT_COMMIT_BRANCH = $(PKG_VERS)
 
 DEPENDS =
 
 HOMEPAGE = https://sickchill.github.io/
 COMMENT = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
-LICENSE = GPL
+LICENSE = GPLv3+
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = sickchill_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: sickchill_install
 sickchill_install:

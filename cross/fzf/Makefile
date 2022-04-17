@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/junegunn/fzf/archive/
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/go
+BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://github.com/junegunn/fzf
 COMMENT  = A command-line fuzzy finder.

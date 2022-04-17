@@ -9,8 +9,6 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-NASM_PATH=$(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
-
 CONFIGURE_ARGS = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
 CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
@@ -183,17 +181,19 @@ CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS += native/nasm
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
+
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/nasm
+NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
 ENV += PATH=$(NASM_PATH):$$PATH
+endif
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
 CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-BUILD_DEPENDS += native/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
-
 DEPENDS += cross/json-c
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
 CONFIGURE_ARGS += --disable-x86asm

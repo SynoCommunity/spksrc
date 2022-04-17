@@ -9,7 +9,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_ORG)
 PKG_DIR = $(PKG_NAME)
 
-DEPENDS = native/go
+BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://$(PKG_IMPORT_PATH)
 COMMENT  = fritzctl is a command line client for the AVM FRITZ!Box primarily focused on the AVM Home Automation HTTP Interface.

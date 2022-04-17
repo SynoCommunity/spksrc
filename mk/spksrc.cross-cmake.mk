@@ -58,7 +58,7 @@ endif
 
 .PHONY: cmake_install_target
 
-# default isntall:
+# default install:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)

@@ -12,7 +12,7 @@ PKG_DIR = $(PKG_NAME)
 # - use native/go
 # - remove path overwrite below
 # - remove native/go_1.17
-DEPENDS = native/go_1.17
+BUILD_DEPENDS = native/go_1.17
 
 HOMEPAGE = https://www.syncthing.net/
 COMMENT  = Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how ...

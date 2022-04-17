@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/mono_58
+BUILD_DEPENDS = native/mono_58
 
 HOMEPAGE = https://www.mono-project.com
 COMMENT  = Cross platform, open source .NET development framework.

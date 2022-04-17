@@ -16,9 +16,6 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-# YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
-NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
-
 CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross-prefix=$(TC_PATH)$(TC_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
@@ -38,16 +35,15 @@ ENV += x264_ARCH=PPC
 CONFIGURE_ARGS += --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += native/nasm
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/nasm
+NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ENV += x264_ARCH=X86_64
 endif
-
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-DEPENDS += native/nasm
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
 ENV += x264_ARCH=X86
+endif
 endif
