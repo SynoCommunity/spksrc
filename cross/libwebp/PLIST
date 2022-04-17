@@ -2,7 +2,10 @@ bin:bin/cwebp
 bin:bin/dwebp
 lnk:lib/libwebp.so
 lnk:lib/libwebp.so.7
-lib:lib/libwebp.so.7.1.1
+lib:lib/libwebp.so.7.1.3
 lnk:lib/libwebpdemux.so
 lnk:lib/libwebpdemux.so.2
-lib:lib/libwebpdemux.so.2.0.7
+lib:lib/libwebpdemux.so.2.0.9
+lnk:lib/libwebpmux.so
+lnk:lib/libwebpmux.so.3
+lib:lib/libwebpmux.so.3.0.8
