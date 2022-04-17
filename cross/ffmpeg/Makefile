@@ -34,7 +34,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/json-c
+OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
@@ -58,6 +58,9 @@ CONFIGURE_ARGS += --enable-libfreetype
 
 DEPENDS += cross/fribidi
 CONFIGURE_ARGS += --enable-libfribidi
+
+DEPENDS += cross/openjpeg
+CONFIGURE_ARGS += --enable-libopenjpeg
 
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
@@ -87,10 +90,16 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/dav1d
-CONFIGURE_ARGS += --enable-libdav1d
+DEPENDS += cross/davs2 cross/xavs2
+CONFIGURE_ARGS += --enable-libdavs2 --enable-libxavs2
 
+DEPENDS += cross/libzmq
+CONFIGURE_ARGS += --enable-libzmq
+
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 
@@ -106,11 +115,10 @@ CONFIGURE_ARGS += --enable-libshine
 # end ifneq $(OLD_PPC_ARCHS)
 endif
 
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
-
-DEPENDS += cross/zvbi
-CONFIGURE_ARGS += --enable-libzvbi
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/dav1d
+CONFIGURE_ARGS += --enable-libdav1d
+endif
 
 #
 # fdk-acc is now considered compatible with (L)GPL.

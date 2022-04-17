@@ -1,0 +1,3 @@
+bin:bin/xavs2
+lnk:lib/libxavs2.so
+lib:lib/libxavs2.so.13
