@@ -118,6 +118,11 @@ endif
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
+
+DEPENDS += cross/librist
+CONFIGURE_ARGS += --enable-librist
+
+# end ifneq $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 endif
 
 #
