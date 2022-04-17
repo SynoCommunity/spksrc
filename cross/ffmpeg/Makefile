@@ -88,6 +88,9 @@ DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/dav1d
+CONFIGURE_ARGS += --enable-libdav1d
+
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 
