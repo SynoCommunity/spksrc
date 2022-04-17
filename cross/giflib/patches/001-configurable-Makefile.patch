@@ -1,0 +1,20 @@
+# Makefile: make 'PREFIX' and 'CFLAGS to suppress warnings' configurable
+# 
+--- Makefile.orig	2019-06-24 16:08:57.000000000 +0000
++++ Makefile	2022-04-17 16:40:49.866854053 +0000
+@@ -8,13 +8,13 @@
+ #
+ OFLAGS = -O0 -g
+ OFLAGS  = -O2
+-CFLAGS  = -std=gnu99 -fPIC -Wall -Wno-format-truncation $(OFLAGS)
++CFLAGS  = -std=gnu99 -fPIC -Wall $(ADDITIONAL_CFLAGS) $(OFLAGS)
+ 
+ SHELL = /bin/sh
+ TAR = tar
+ INSTALL = install
+ 
+-PREFIX = /usr/local
++PREFIX ?= /usr/local
+ BINDIR = $(PREFIX)/bin
+ INCDIR = $(PREFIX)/include
+ LIBDIR = $(PREFIX)/lib
