@@ -1,6 +1,6 @@
 SPK_NAME = redis
-SPK_VERS = 5.0.14
-SPK_REV = 8
+SPK_VERS = 6.2.6
+SPK_REV = 9
 SPK_ICON = src/redis.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,10 +10,10 @@ DESCRIPTION = Redis is an open source, advanced key-value store. It is often ref
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v5.0.14."
+CHANGELOG = "Update redis to v6.2.6."
 
-# PPC archs except qoriq are not supported anymore
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# atomic operations are not supported on ARMv5 and PPC archs except qoriq.
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
@@ -25,7 +25,11 @@ SERVICE_SETUP = src/service-setup.sh
 POST_STRIP_TARGET = redis_extra_install
 
 # add links for tools
-SPK_COMMANDS = bin/redis-benchmark bin/redis-check-aof bin/redis-check-rdb bin/redis-cli
+SPK_COMMANDS  = bin/redis-benchmark
+SPK_COMMANDS += bin/redis-check-aof
+SPK_COMMANDS += bin/redis-check-rdb
+SPK_COMMANDS += bin/redis-cli
+SPK_COMMANDS += bin/redis-sentinel
 
 include ../../mk/spksrc.spk.mk
 
@@ -33,3 +37,4 @@ include ../../mk/spksrc.spk.mk
 redis_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/redis.conf $(STAGING_DIR)/var/redis.conf
+	install -m 644 src/sentinel.conf $(STAGING_DIR)/var/sentinel.conf
