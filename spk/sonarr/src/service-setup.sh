@@ -78,6 +78,10 @@ service_preupgrade ()
 
 service_postupgrade ()
 {
+    # Make Sonarr do an update check on start to avoid possible Sonarr
+    # downgrade when synocommunity package is updated
+    touch ${CONFIG_DIR}/Sonarr/update_required
+    
     # Restore Current Sonarr Binary If Current Ver. >= SPK Ver.
     . ${CONFIG_DIR}/KEEP_VAR
     if [ "$KEEP_CUR" == "yes" ]; then
@@ -87,7 +91,9 @@ service_postupgrade ()
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
 
-    set_unix_permissions "${CONFIG_DIR}"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_unix_permissions "${CONFIG_DIR}"
+    fi
 
     # If backup was created before new-style packages
     # new updates/backups will fail due to permissions (see #3185)
