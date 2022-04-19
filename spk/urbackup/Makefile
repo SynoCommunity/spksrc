@@ -1,5 +1,5 @@
 SPK_NAME = urbackup
-SPK_VERS = 2.4.13
+SPK_VERS = 2.4.15
 SPK_REV = 1
 SPK_ICON = src/urbackup.png
 DSM_UI_DIR = app
@@ -7,13 +7,12 @@ DSM_UI_DIR = app
 DEPENDS = cross/urbackup-server cross/urbackup-client
 
 # see cross/cryptopp
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = josef109
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
-RELOAD_UI = yes
 DISPLAY_NAME = UrBackup
-CHANGELOG = "Initial package release with server and client"
+CHANGELOG = "Initial package release with server v2.4.15 and client v2.4.11"
 
 HOMEPAGE = https://www.urbackup.org/
 LICENSE  = AGPL-3.0
@@ -29,8 +28,6 @@ STARTABLE            = yes
 SERVICE_PORT = 55414
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/urbackupsrv run -d -v error -u sc-urbackup --pidfile $${PID_FILE} --logfile $${LOG_FILE}
-
-SPK_COMMANDS = bin/blockalign bin/urbackupclientctl sbin/urbackupclientbackend
+SPK_COMMANDS = bin/blockalign bin/urbackupclientctl bin/urbackupclientbackend
 
 include ../../mk/spksrc.spk.mk

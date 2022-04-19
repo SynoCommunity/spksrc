@@ -1,5 +1,5 @@
 PKG_NAME = urbackup-server
-PKG_VERS = 2.4.13
+PKG_VERS = 2.4.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://hndl.urbackup.org/Server/$(PKG_VERS)
@@ -16,7 +16,7 @@ CONFIGURE_ARGS = --enable-packaging
 CONFIGURE_ARGS += --with-zlib=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-crypto-prefix=$(STAGING_INSTALL_PREFIX)
 
-ADDITIONAL_CXXFLAGS = -Os
-ADDITIONAL_CFLAGS = -Os
+ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CXXFLAGS = -O -Wno-deprecated-declarations
 
 include ../../mk/spksrc.cross-cc.mk

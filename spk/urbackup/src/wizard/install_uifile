@@ -1,19 +1,57 @@
 [{
     "step_title": "Basic configuration",
     "items": [{
-	      "type": "textfield",
+        "type": "combobox",
+        "desc": "Please select a volume to use for the backup folder",
+        "subitems": [{
+            "key": "wizard_volume",
+            "desc": "volume name",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      }, {
+        "type": "textfield",
         "desc": "Backup folder. Shared folder to save the client backup files. This folder will be created if it does not already exist.",
         "subitems": [{
             "key": "wizard_backup_dir",
             "desc": "Backup folder",
-            "defaultValue": "/volume1/urbackup",
+            "defaultValue": "urbackup",
             "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Path should begin with /volumename?/ where volumename can be 'volume' or 'volumeUSB' and ? is the volume number (1-99)."
-                }
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
             }
-        }]
-    }]
-}]
+          }
+        ]
+      }, {
+        "desc": "If the specified share does not exist, it will be created. Example of external USB-drive <em>/volumeUSB1/usbshare</em>."
+      }, {
+        "desc": "Package user and group will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      }
+    ]
+  }
+]

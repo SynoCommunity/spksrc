@@ -4,6 +4,7 @@ rsc:etc/urbackup/mariadbdump.conf
 rsc:etc/urbackup/mariadbxtrabackup.conf
 rsc:etc/urbackup/postgresbase.conf
 rsc:etc/urbackup/postgresqldump.conf
+lnk:bin/urbackupclientbackend
 bin:sbin/urbackupclientbackend
 rsc:share/urbackup/scripts/
 rsc:share/urbackup/updates_h.dat

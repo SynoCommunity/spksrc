@@ -1,19 +1,57 @@
 [{
     "step_title": "Grundkonfiguration",
     "items": [{
+        "type": "combobox",
+        "desc": "Bitte ein Volume für das Backup Verzeichnis wählen",
+        "subitems": [{
+            "key": "wizard_volume",
+            "desc": "volume name",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      }, {
 	      "type": "textfield",
         "desc": "Backup Verzeichnis. Hier werden Backup-Dateien der Clients gespeichert. Dieser 'Gemeinsame Ordner' wird bei Bedarf durch die Installation angelegt.",
         "subitems": [{
             "key": "wizard_backup_dir",
             "desc": "Sicherungsverzeichnis",
-            "defaultValue": "/volume1/urbackup",
+            "defaultValue": "urbackup",
             "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Das Verzeichnis muss mit /volumename?/ beginnen, wobei für volumename 'volume' oder 'volumeUSB' verwendet werden muss und ? steht die Nummer des Volumes (1-99)."
-                }
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Unterverzeichnisse sind nicht erlaubt."
+              }
             }
-        }]
-    }]
-}]
+          }
+        ]
+      }, {
+        "desc": "Wenn das Verzeichnis nicht als Gemeinsames Verzeichnis besteht, dann wird es erstellt. Beispiel für ein externes USB-Laufwerk <em>/volumeUSB1/usbshare</em>."
+      }, {
+        "desc": "Package user und group sind in den meisten UI Einstellungen nicht sichtbar.<br>Bitte <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> für entsprechende Detailinformationen beachten."
+      }
+    ]
+  }
+]
