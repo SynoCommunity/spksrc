@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 16
+SPK_REV = 17
 SPK_ICON = src/radarr.png
 
 REQUIRED_DSM = 5.0
@@ -18,7 +18,7 @@ SUPPORTURL = https://radarr.video/\#support
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
 STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "Update Radarr to v3.0.2.4552 .NET Core"
+CHANGELOG = "Update Radarr to v4.1.0.6175 .NET 6"
 
 HOMEPAGE = https://radarr.video/
 LICENSE  = GPLv3
