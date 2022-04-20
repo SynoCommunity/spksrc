@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 4.3.3
-SPK_REV = 39
+SPK_VERS = 4.4.1
+SPK_REV = 41
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 4.3.3<br/>2. Update intel-media-driver to 21Q3<br/>3. Update libaom to 3.2.0<br/>4. Update libvpx to 1.11.0<br/>5. Update zmq to 4.3.4"
+CHANGELOG = "1. Update to version 4.4.1<br/>2. Update intel-media-driver to 22Q1<br/>3. Import Jellyfin project patches<br/>4. Multiple dependency updates: fribidi, libaom, libass, libbluray, SVT-AV1, x264<br/>5. Enable dav1d decoder<br/>6. Enable libopenjpeg en/decoder<br/>7. Enable RIST protocol"
 
 CONF_DIR = src/conf
 

@@ -1,13 +1,8 @@
-#From c1fb9225a1b8e26875cb9b4e2b3ae2f4d68c5630 Mon Sep 17 00:00:00 2001
-#From: nyanmisaka <nst799610810@gmail.com>
-#Date: Sun, 24 Jan 2021 19:58:04 +0800
-#Subject: [PATCH] lavfi: add a filter for uploading normal frames to VAAPI
-#Source: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
-Index: configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- configure.orig
+--- configure
 +++ configure
-@@ -3538,6 +3538,7 @@ fspp_filter_deps="gpl"
+@@ -3579,6 +3579,7 @@ fspp_filter_deps="gpl"
  headphone_filter_select="fft"
  histeq_filter_deps="gpl"
  hqdn3d_filter_deps="gpl"
@@ -15,31 +10,31 @@ Index: configure
  interlace_filter_deps="gpl"
  kerndeint_filter_deps="gpl"
  ladspa_filter_deps="ladspa libdl"
-Index: libavfilter/Makefile
+Index: jellyfin-ffmpeg/libavfilter/Makefile
 ===================================================================
---- libavfilter/Makefile.orig
+--- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -279,6 +279,7 @@ OBJS-$(CONFIG_HUE_FILTER)
+@@ -297,6 +297,7 @@ OBJS-$(CONFIG_HUE_FILTER)
  OBJS-$(CONFIG_HWDOWNLOAD_FILTER)             += vf_hwdownload.o
  OBJS-$(CONFIG_HWMAP_FILTER)                  += vf_hwmap.o
  OBJS-$(CONFIG_HWUPLOAD_CUDA_FILTER)          += vf_hwupload_cuda.o
 +OBJS-$(CONFIG_HWUPLOAD_VAAPI_FILTER)         += vf_hwupload_vaapi.o
  OBJS-$(CONFIG_HWUPLOAD_FILTER)               += vf_hwupload.o
  OBJS-$(CONFIG_HYSTERESIS_FILTER)             += vf_hysteresis.o framesync.o
- OBJS-$(CONFIG_IDET_FILTER)                   += vf_idet.o
-Index: libavfilter/allfilters.c
+ OBJS-$(CONFIG_IDENTITY_FILTER)               += vf_identity.o
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
 ===================================================================
---- libavfilter/allfilters.c.orig
+--- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -265,6 +265,7 @@ extern AVFilter ff_vf_hwdownload;
+@@ -282,6 +282,7 @@ extern AVFilter ff_vf_hwdownload;
  extern AVFilter ff_vf_hwmap;
  extern AVFilter ff_vf_hwupload;
  extern AVFilter ff_vf_hwupload_cuda;
 +extern AVFilter ff_vf_hwupload_vaapi;
  extern AVFilter ff_vf_hysteresis;
+ extern AVFilter ff_vf_identity;
  extern AVFilter ff_vf_idet;
- extern AVFilter ff_vf_il;
-Index: libavfilter/vf_hwupload_vaapi.c
+Index: jellyfin-ffmpeg/libavfilter/vf_hwupload_vaapi.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_hwupload_vaapi.c
@@ -113,13 +108,13 @@ Index: libavfilter/vf_hwupload_vaapi.c
 +    AVFilterFormats *in_fmts  = ff_make_format_list(input_pix_fmts);
 +    AVFilterFormats *out_fmts;
 +
-+    ret = ff_formats_ref(in_fmts, &ctx->inputs[0]->out_formats);
++    ret = ff_formats_ref(in_fmts, &ctx->inputs[0]->outcfg.formats);
 +    if (ret < 0)
 +        return ret;
 +
 +    out_fmts = ff_make_format_list(output_pix_fmts);
 +
-+    ret = ff_formats_ref(out_fmts, &ctx->outputs[0]->in_formats);
++    ret = ff_formats_ref(out_fmts, &ctx->outputs[0]->incfg.formats);
 +    if (ret < 0)
 +        return ret;
 +

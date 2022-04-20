@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.3.3
+PKG_VERS = 4.4.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -34,7 +34,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/json-c
+OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
@@ -58,6 +58,9 @@ CONFIGURE_ARGS += --enable-libfreetype
 
 DEPENDS += cross/fribidi
 CONFIGURE_ARGS += --enable-libfribidi
+
+DEPENDS += cross/openjpeg
+CONFIGURE_ARGS += --enable-libopenjpeg
 
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
@@ -87,6 +90,12 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
+DEPENDS += cross/libzmq
+CONFIGURE_ARGS += --enable-libzmq
+
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
+
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
@@ -103,11 +112,15 @@ CONFIGURE_ARGS += --enable-libshine
 # end ifneq $(OLD_PPC_ARCHS)
 endif
 
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/dav1d
+CONFIGURE_ARGS += --enable-libdav1d
 
-DEPENDS += cross/zvbi
-CONFIGURE_ARGS += --enable-libzvbi
+DEPENDS += cross/librist
+CONFIGURE_ARGS += --enable-librist
+
+# end ifneq $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+endif
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
@@ -119,15 +132,6 @@ CONFIGURE_ARGS += --enable-libzvbi
 #
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
-
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-# Compiling tvheadend for evansport requires #include synology.h
-POST_INSTALL_TARGET = ffmpeg_post_install
-# Hardware acceleration requires
-# intelce-toolchain from the DSM toolkit
-REQUIRE_TOOLKIT = 1
-endif
-
 
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
@@ -143,12 +147,13 @@ CONFIGURE_ARGS += --enable-libaom
 endif
 
 # Add SVT-AV1 codec to supported ARCH
-# Patch for support from: https://github.com/OpenVisualCloud/SVT-AV1/tree/master/ffmpeg_plugin
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
+# Add SVT-HEVC codec to x64
+# Patch for support from: https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/n4.4-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
@@ -172,6 +177,7 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --extra-libs=-latomic
 CONFIGURE_ARGS += --disable-asm
 CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
@@ -190,32 +196,9 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
-CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx
+CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libdrm
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-DEPENDS += cross/json-c
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
-CONFIGURE_ARGS += --disable-x86asm
-CONFIGURE_ARGS += --extra-cflags=-fasm
-CONFIGURE_ARGS += --extra-cflags=-std=c99
-CONFIGURE_ARGS += --extra-cflags=-pedantic
-CONFIGURE_ARGS += --extra-cflags=-I$(TOOLKIT_ROOT)/include/intelce-utilities
-CONFIGURE_ARGS += --extra-cflags=-I$(TOOLKIT_ROOT)/include/intelce-utilities/linux_user
-CONFIGURE_ARGS += --extra-ldflags=-L$(TOOLKIT_ROOT)/lib/intelce-utilities
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TOOLKIT_ROOT)/lib
-CONFIGURE_ARGS += --extra-ldflags=-Wl,-rpath-link,$(TOOLKIT_ROOT)/lib/intelce-utilities
-# DISABLE
-CONFIGURE_ARGS += --disable-decoder=h264_smd
-CONFIGURE_ARGS += --disable-decoder=mpeg2video_smd
-CONFIGURE_ARGS += --disable-decoder=mpeg4_smd
-CONFIGURE_ARGS += --disable-decoder=vc1_smd
-CONFIGURE_ARGS += --disable-decoder=wmv3_smd
-# ENABLE
-#CONFIGURE_ARGS += --extra-cflags=-DSYNO_EVANSPORT_SMD
-#CONFIGURE_ARGS += --enable-libh264_smd --enable-smd
-
-.PHONY: ffmpeg_post_install
-ffmpeg_post_install:
-	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/synoconfig.h $(WORK_DIR)/install$(INSTALL_PREFIX)/include
 endif

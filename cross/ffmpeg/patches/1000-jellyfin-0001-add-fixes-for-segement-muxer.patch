@@ -1,7 +1,6 @@
 Index: jellyfin-ffmpeg/libavformat/segment.c
-Source: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
 ===================================================================
---- libavformat/segment.c.orig
+--- libavformat/segment.c
 +++ libavformat/segment.c
 @@ -87,6 +87,7 @@ typedef struct SegmentContext {
      int64_t last_val;      ///< remember last time for wrap around detection

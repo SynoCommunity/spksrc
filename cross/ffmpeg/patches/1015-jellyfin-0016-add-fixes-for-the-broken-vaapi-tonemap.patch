@@ -1,24 +1,61 @@
-# Fix for the broken tonemap_vaapi filter
-# avfilter/tonemap_vaapi: pass filter parameters to VA parameter buffer
-# avfilter: Add H2H support in tonemap_vaapi
-#Source: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
-Index: libavfilter/vf_tonemap_vaapi.c
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
 ===================================================================
---- libavfilter/vf_tonemap_vaapi.c.orig
+--- libavfilter/vf_tonemap_vaapi.c
 +++ libavfilter/vf_tonemap_vaapi.c
-@@ -41,7 +41,11 @@ typedef struct HDRVAAPIContext {
+@@ -41,7 +41,13 @@ typedef struct HDRVAAPIContext {
      enum AVColorTransferCharacteristic color_transfer;
      enum AVColorSpace color_matrix;
  
-+    char *master_display;
-+    char *content_light;
++    char *in_master_display;
++    char *in_content_light;
++    char *out_master_display;
++    char *out_content_light;
 +
      VAHdrMetaDataHDR10  in_metadata;
 +    VAHdrMetaDataHDR10  out_metadata;
  
      AVFrameSideData    *src_display;
      AVFrameSideData    *src_light;
-@@ -148,6 +152,107 @@ static int tonemap_vaapi_save_metadata(A
+@@ -54,7 +60,7 @@ static int tonemap_vaapi_save_metadata(A
+     AVContentLightMetadata *light_meta;
+ 
+     if (input_frame->color_trc != AVCOL_TRC_SMPTE2084) {
+-        av_log(avctx, AV_LOG_WARNING, "Only support HDR10 as input for vaapi tone-mapping\n");
++        av_log(avctx, AV_LOG_DEBUG, "Only support HDR10 as input for vaapi tone-mapping\n");
+     }
+ 
+     ctx->src_display = av_frame_get_side_data(input_frame,
+@@ -62,8 +68,7 @@ static int tonemap_vaapi_save_metadata(A
+     if (ctx->src_display) {
+         hdr_meta = (AVMasteringDisplayMetadata *)ctx->src_display->data;
+         if (!hdr_meta) {
+-            av_log(avctx, AV_LOG_ERROR, "No mastering display data\n");
+-            return AVERROR(EINVAL);
++            av_log(avctx, AV_LOG_DEBUG, "No mastering display data\n");
+         }
+ 
+         if (hdr_meta->has_luminance) {
+@@ -120,8 +125,7 @@ static int tonemap_vaapi_save_metadata(A
+                    ctx->in_metadata.white_point_y);
+         }
+     } else {
+-        av_log(avctx, AV_LOG_ERROR, "No mastering display data from input\n");
+-        return AVERROR(EINVAL);
++        av_log(avctx, AV_LOG_DEBUG, "No mastering display data from input\n");
+     }
+ 
+     ctx->src_light = av_frame_get_side_data(input_frame,
+@@ -129,8 +133,7 @@ static int tonemap_vaapi_save_metadata(A
+     if (ctx->src_light) {
+         light_meta = (AVContentLightMetadata *)ctx->src_light->data;
+         if (!light_meta) {
+-            av_log(avctx, AV_LOG_ERROR, "No light metadata\n");
+-            return AVERROR(EINVAL);
++            av_log(avctx, AV_LOG_DEBUG, "No light metadata\n");
+         }
+ 
+         ctx->in_metadata.max_content_light_level = light_meta->MaxCLL;
+@@ -148,6 +151,107 @@ static int tonemap_vaapi_save_metadata(A
      return 0;
  }
  
@@ -126,7 +163,7 @@ Index: libavfilter/vf_tonemap_vaapi.c
  static int tonemap_vaapi_set_filter_params(AVFilterContext *avctx, AVFrame *input_frame)
  {
      VAAPIVPPContext *vpp_ctx   = avctx->priv;
-@@ -210,15 +315,26 @@ static int tonemap_vaapi_build_filter_pa
+@@ -210,15 +314,26 @@ static int tonemap_vaapi_build_filter_pa
          return AVERROR(EINVAL);
      }
  
@@ -162,7 +199,7 @@ Index: libavfilter/vf_tonemap_vaapi.c
      }
  
      hdrtm_param.type = VAProcFilterHighDynamicRangeToneMapping;
-@@ -243,6 +359,8 @@ static int tonemap_vaapi_filter_frame(AV
+@@ -243,6 +358,8 @@ static int tonemap_vaapi_filter_frame(AV
      VAProcPipelineParameterBuffer params;
      int err;
  
@@ -171,7 +208,22 @@ Index: libavfilter/vf_tonemap_vaapi.c
      av_log(avctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input_frame->format),
             input_frame->width, input_frame->height, input_frame->pts);
-@@ -291,11 +409,26 @@ static int tonemap_vaapi_filter_frame(AV
+@@ -252,9 +369,11 @@ static int tonemap_vaapi_filter_frame(AV
+         return AVERROR(EINVAL);
+     }
+ 
+-    err = tonemap_vaapi_save_metadata(avctx, input_frame);
+-    if (err < 0)
+-        goto fail;
++    if (!ctx->in_master_display && !ctx->in_content_light) {
++        err = tonemap_vaapi_save_metadata(avctx, input_frame);
++        if (err < 0)
++            goto fail;
++    }
+ 
+     err = tonemap_vaapi_set_filter_params(avctx, input_frame);
+     if (err < 0)
+@@ -291,11 +410,26 @@ static int tonemap_vaapi_filter_frame(AV
      if (ctx->color_matrix != AVCOL_SPC_UNSPECIFIED)
          output_frame->colorspace = ctx->color_matrix;
  
@@ -198,59 +250,75 @@ Index: libavfilter/vf_tonemap_vaapi.c
      err = ff_vaapi_vpp_render_picture(avctx, &params, output_frame);
      if (err < 0)
          goto fail;
-@@ -355,6 +488,46 @@ static av_cold int tonemap_vaapi_init(AV
+@@ -355,6 +489,60 @@ static av_cold int tonemap_vaapi_init(AV
      STRING_OPTION(color_transfer,  color_transfer,  AVCOL_TRC_UNSPECIFIED);
      STRING_OPTION(color_matrix,    color_space,     AVCOL_SPC_UNSPECIFIED);
  
++#define READ_DISPLAY_OPTION(in_or_out) do { \
++        if (10 != sscanf(ctx->in_or_out ## _master_display, \
++                         "G(%hu|%hu)B(%hu|%hu)R(%hu|%hu)WP(%hu|%hu)L(%u|%u)", \
++                         &ctx->in_or_out ## _metadata.display_primaries_x[0], \
++                         &ctx->in_or_out ## _metadata.display_primaries_y[0], \
++                         &ctx->in_or_out ## _metadata.display_primaries_x[1], \
++                         &ctx->in_or_out ## _metadata.display_primaries_y[1], \
++                         &ctx->in_or_out ## _metadata.display_primaries_x[2], \
++                         &ctx->in_or_out ## _metadata.display_primaries_y[2], \
++                         &ctx->in_or_out ## _metadata.white_point_x, \
++                         &ctx->in_or_out ## _metadata.white_point_y, \
++                         &ctx->in_or_out ## _metadata.min_display_mastering_luminance, \
++                         &ctx->in_or_out ## _metadata.max_display_mastering_luminance)) { \
++            av_log(avctx, AV_LOG_ERROR, \
++                   "Option " #in_or_out "-mastering-display input invalid\n"); \
++            return AVERROR(EINVAL); \
++        } \
++    } while (0)
++
++#define READ_LIGHT_OPTION(in_or_out) do { \
++        if (2 != sscanf(ctx->in_or_out ## _content_light, \
++                        "CLL(%hu)FALL(%hu)", \
++                        &ctx->in_or_out ## _metadata.max_content_light_level, \
++                        &ctx->in_or_out ## _metadata.max_pic_average_light_level)) { \
++            av_log(avctx, AV_LOG_ERROR, \
++                   "Option " #in_or_out "-content-light input invalid\n"); \
++            return AVERROR(EINVAL); \
++        } \
++    } while (0)
++
++    if (ctx->in_master_display) {
++        READ_DISPLAY_OPTION(in);
++    }
++
++    if (ctx->in_content_light) {
++        READ_LIGHT_OPTION(in);
++    }
++
 +    if (ctx->color_transfer == AVCOL_TRC_SMPTE2084) {
-+        if (!ctx->master_display) {
++        if (!ctx->out_master_display) {
 +            av_log(avctx, AV_LOG_ERROR,
-+                   "Option mastering-display input invalid\n");
++                   "H2H tone-mapping requires valid out-mastering-display metadata\n");
 +            return AVERROR(EINVAL);
 +        }
++        READ_DISPLAY_OPTION(out);
 +
-+        if (10 != sscanf(ctx->master_display,
-+                         "G(%hu|%hu)B(%hu|%hu)R(%hu|%hu)WP(%hu|%hu)L(%u|%u)",
-+                         &ctx->out_metadata.display_primaries_x[0],
-+                         &ctx->out_metadata.display_primaries_y[0],
-+                         &ctx->out_metadata.display_primaries_x[1],
-+                         &ctx->out_metadata.display_primaries_y[1],
-+                         &ctx->out_metadata.display_primaries_x[2],
-+                         &ctx->out_metadata.display_primaries_y[2],
-+                         &ctx->out_metadata.white_point_x,
-+                         &ctx->out_metadata.white_point_y,
-+                         &ctx->out_metadata.min_display_mastering_luminance,
-+                         &ctx->out_metadata.max_display_mastering_luminance)) {
++        if (!ctx->out_content_light) {
 +            av_log(avctx, AV_LOG_ERROR,
-+                   "Option mastering-display input invalid\n");
++                   "H2H tone-mapping requires valid out-content-light metadata\n");
 +            return AVERROR(EINVAL);
 +        }
-+
-+        if (!ctx->content_light) {
-+            av_log(avctx, AV_LOG_ERROR,
-+                   "Option content-light input invalid\n");
-+            return AVERROR(EINVAL);
-+        }
-+
-+        if (2 != sscanf(ctx->content_light,
-+                        "CLL(%hu)FALL(%hu)",
-+                        &ctx->out_metadata.max_content_light_level,
-+                        &ctx->out_metadata.max_pic_average_light_level)) {
-+            av_log(avctx, AV_LOG_ERROR,
-+                   "Option content-light input invalid\n");
-+            return AVERROR(EINVAL);
-+        }
++        READ_LIGHT_OPTION(out);
 +    }
 +
      return 0;
  }
  
-@@ -380,10 +553,11 @@ static const AVOption tonemap_vaapi_opti
+@@ -380,10 +568,13 @@ static const AVOption tonemap_vaapi_opti
      { "t",        "Output color transfer characteristics set",
        OFFSET(color_transfer_string),  AV_OPT_TYPE_STRING,
        { .str = NULL }, .flags = FLAGS, "transfer" },
-+    { "display", "set master display",  OFFSET(master_display), AV_OPT_TYPE_STRING, {.str=NULL}, CHAR_MIN, CHAR_MAX, FLAGS },
-+    { "light",   "set content light",   OFFSET(content_light),  AV_OPT_TYPE_STRING, {.str=NULL}, CHAR_MIN, CHAR_MAX, FLAGS },
++    { "indisplay", "Set input mastering display",  OFFSET(in_master_display), AV_OPT_TYPE_STRING, { .str = NULL }, CHAR_MIN, CHAR_MAX, FLAGS },
++    { "inlight",   "Set input content light",   OFFSET(in_content_light),  AV_OPT_TYPE_STRING, { .str = NULL }, CHAR_MIN, CHAR_MAX, FLAGS },
++    { "outdisplay", "Set output mastering display for H2H",  OFFSET(out_master_display), AV_OPT_TYPE_STRING, { .str = NULL }, CHAR_MIN, CHAR_MAX, FLAGS },
++    { "outlight",   "Set output content light for H2H",   OFFSET(out_content_light),  AV_OPT_TYPE_STRING, { .str = NULL }, CHAR_MIN, CHAR_MAX, FLAGS },
      { NULL }
  };
  
