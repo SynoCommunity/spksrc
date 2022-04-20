@@ -21,10 +21,10 @@ endif
 BUSYBOX_CONFIG += ionice
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3, htop, ionice$(OPTIONAL_DESC).
+DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3, htop, ionice, cpulimit$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "Add cpulimit tool."
+CHANGELOG = "1. Add cpulimit tool.<br/>2. Update htop to v3.1.2.<br/>3. Update iperf2 to v2.1.7.<br/>4. Update iperf3 to v3.11.<br/>5. Update nmon to v16n.<br/>6. Update busybox for process utilities to v1.35.0."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
