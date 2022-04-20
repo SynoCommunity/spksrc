@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.3
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox cross/htop
