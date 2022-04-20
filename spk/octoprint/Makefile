@@ -1,11 +1,10 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.7.2
-SPK_REV    = 7
+SPK_VERS   = 1.7.3
+SPK_REV    = 8
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
 BUILD_DEPENDS = cross/python310
-DEPENDS = cross/octoprint
 
 # Required for PyYAML
 DEPENDS += cross/libyaml
@@ -22,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.7.2 and Python 3.10"
+CHANGELOG    = "1. Update OctoPrint to v1.7.3<br/>2. Update to Python 3.10"
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
