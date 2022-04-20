@@ -1,9 +1,9 @@
 PKG_NAME = iperf3
-PKG_VERS = 3.10.1
+PKG_VERS = 3.11
 PKG_EXT = tar.gz
 PKG_NAME_REAL = iperf
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/esnet/$(PKG_NAME_REAL)/archive
+PKG_DIST_SITE = https://github.com/esnet/iperf/archive
 PKG_DIST_FILE = $(PKG_NAME_REAL)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME_REAL)-$(PKG_VERS)
 
