@@ -90,9 +90,6 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
-#DEPENDS += cross/davs2 cross/xavs2
-#CONFIGURE_ARGS += --enable-libdavs2 --enable-libxavs2
-
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 
