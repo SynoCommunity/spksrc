@@ -11,9 +11,6 @@ service_postinst ()
 
     # Install the wheels
     install_python_wheels
-
-    # Install OctoPrint
-    cd ${SYNOPKG_PKGDEST}/share/OctoPrint && ${SYNOPKG_PKGDEST}/env/bin/python3 setup.py install
 }
 
 
