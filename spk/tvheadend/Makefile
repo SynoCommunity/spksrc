@@ -52,7 +52,7 @@ export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 PRE_DEPEND_TARGET = tvheadend_pre_depend
-SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg>4.3"
+SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg>4.4"
 endif
 
 include ../../mk/spksrc.spk.mk
