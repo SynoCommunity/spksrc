@@ -21,7 +21,7 @@ export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg/target/lib
 PRE_DEPEND_TARGET = chromaprint_pre_depend
-SPK_DEPENDS = "ffmpeg>4.2"
+SPK_DEPENDS = "ffmpeg>4.4"
 endif
 
 SPK_COMMANDS = bin/fpcalc
