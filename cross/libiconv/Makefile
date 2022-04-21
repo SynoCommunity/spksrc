@@ -1,5 +1,5 @@
 PKG_NAME = libiconv
-PKG_VERS = 1.15
+PKG_VERS = 1.16
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/$(PKG_NAME)
