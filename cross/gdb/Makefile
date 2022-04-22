@@ -13,4 +13,6 @@ LICENSE  = GPLv2/LGPLv2
 
 GNU_CONFIGURE = 1
 
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+
 include ../../mk/spksrc.cross-cc.mk
