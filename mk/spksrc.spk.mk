@@ -10,6 +10,7 @@
 #  SPK_FILE_NAME:     The full spk name with folder, package name, arch, tc- and package version.
 #  SPK_CONTENT:       List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
+#  CONF_DIR:          To provide a package specific conf folder for e.g. privilege file
 #
 
 # Common makefiles
@@ -102,7 +103,7 @@ SPK_CONTENT = package.tgz INFO scripts
 DSM_CONF_DIR = $(WORK_DIR)/conf
 
 ifneq ($(CONF_DIR),)
-export SPKSRC_CONF_DIR=$(CONF_DIR)
+SPK_CONF_DIR=$(CONF_DIR)
 endif
 
 # Generic service scripts
@@ -365,7 +366,7 @@ conf:
 ifneq ($(strip $(CONF_DIR)),)
 	@$(MSG) "Preparing conf"
 	@mkdir -p $(DSM_CONF_DIR)
-	@find $${SPKSRC_CONF_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
+	@find $(SPK_CONF_DIR) -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
