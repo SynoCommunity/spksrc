@@ -1,4 +1,13 @@
 # Common requirement checks
+# Variables:
+#  BUILD_UNSUPPORTED_FILE  Set by github build action to collect 
+#                          and suppress errors for unsupported packages.
+#  REQUIRED_MIN_DSM        Set to define minimal supported DSM version for a package.
+#  REQUIRED_MAX_DSM        Set to define maximal supported DSM version for a package.
+#  REQUIRED_MIN_SRM        Set to define minimal supported SRM version for a package.
+#  INSTALLER_SCRIPT        Used before introduction of generic installer. Not recommended anymore,
+#                          use SERVICE_SETUP instead, this includes support for DSM >= 7.
+#
 
 # SPK_FOLDER    
 # name of the spk package folder
@@ -13,22 +22,13 @@ ifneq ($(wildcard BROKEN),)
   @$(error $(NAME): Broken package)
 endif
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-  ifneq ($(strip $(INSTALLER_SCRIPT)),)
-    ifneq ($(BUILD_UNSUPPORTED_FILE),)
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used with DSM7+ >> $(BUILD_UNSUPPORTED_FILE))
-    endif
-    @$(error INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used for DSM7+ packages)
-  endif
-endif
-
-# Check for build for generic archs, these are not supporting `require kernel`.
+# Check for build for generic archs, these are not supporting 'require kernel'.
 ifneq ($(REQUIRE_KERNEL),)
-  ifneq (,$(findstring $(ARCH),x64 aarch64 armv7))
+  ifneq (,$(findstring $(ARCH),$(GENERIC_ARCHS)))
     ifneq ($(BUILD_UNSUPPORTED_FILE),)
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set >> $(BUILD_UNSUPPORTED_FILE))
+      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set >> $(BUILD_UNSUPPORTED_FILE))
     endif
-    @$(error Arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set)
+    @$(error Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set)
   endif
 endif
 
@@ -42,26 +42,51 @@ ifneq ($(UNSUPPORTED_ARCHS),)
   endif
 endif
 
-# Check minimum DSM requirements of package
-ifneq ($(REQUIRED_DSM),)
+ifneq ($(TCVERSION),)
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+  ifneq ($(strip $(INSTALLER_SCRIPT)),)
+    ifneq ($(BUILD_UNSUPPORTED_FILE),)
+      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used for DSM ${TCVERSION} >> $(BUILD_UNSUPPORTED_FILE))
+    endif
+    @$(error INSTALLER_SCRIPT '$(INSTALLER_SCRIPT)' cannot be used for DSM ${TCVERSION})
+  endif
+endif
+
+# Check maximal DSM requirements of package
+ifneq ($(REQUIRED_MAX_DSM),)
   ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
+    ifneq ($(TCVERSION),$(firstword $(sort $(TCVERSION) $(REQUIRED_MAX_DSM))))
       ifneq (,$(BUILD_UNSUPPORTED_FILE))
-        $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): DSM Toolchain $(TCVERSION) is lower than required version $(REQUIRED_DSM) >> $(BUILD_UNSUPPORTED_FILE))
+        $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): DSM Toolchain $(TCVERSION) is higher than $(REQUIRED_MAX_DSM) >> $(BUILD_UNSUPPORTED_FILE))
       endif
-      @$(error DSM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM))
+      @$(error DSM Toolchain $(TCVERSION) is higher than $(REQUIRED_MAX_DSM))
+    endif
+  endif
+endif
+
+# Check minimum DSM requirements of package
+ifneq ($(REQUIRED_MIN_DSM),)
+  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
+    ifneq ($(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM))))
+      ifneq (,$(BUILD_UNSUPPORTED_FILE))
+        $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): DSM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_DSM) >> $(BUILD_UNSUPPORTED_FILE))
+      endif
+      @$(error DSM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_DSM))
     endif
   endif
 endif
 
 # Check minimum SRM requirements of package
-ifneq ($(REQUIRED_SRM),)
+ifneq ($(REQUIRED_MIN_SRM),)
   ifeq ($(ARCH),$(findstring $(ARCH),$(SRM_ARCHS)))
-    ifneq ($(REQUIRED_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_SRM))))
+    ifneq ($(REQUIRED_MIN_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_SRM))))
       ifneq (,$(BUILD_UNSUPPORTED_FILE))
-        $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): SRM Toolchain $(TCVERSION) is lower than required version $(REQUIRED_SRM) >> $(BUILD_UNSUPPORTED_FILE))
+        $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): SRM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_SRM) >> $(BUILD_UNSUPPORTED_FILE))
       endif
-      @$(error SRM Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_SRM))
+      @$(error SRM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_SRM))
     endif
   endif
+endif
+
 endif

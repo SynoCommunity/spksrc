@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 
 HOMEPAGE = https://www.mono-project.com
-COMMENT  = Cross platform, open source .NET development framework
+COMMENT  = Cross platform, open source .NET development framework.
 LICENSE  = https://github.com/mono/mono/blob/master/LICENSE
 
 GNU_CONFIGURE = 1
@@ -19,6 +19,8 @@ CONFIGURE_ARGS += --disable-static --disable-libraries
 CONFIGURE_ARGS += --without-mcs-docs
 
 POST_INSTALL_TARGET = mono_native_post_install
+
+ENV += PATH=$($(realpath work-native/install)):$${PATH}
 
 include ../../mk/spksrc.native-cc.mk
 

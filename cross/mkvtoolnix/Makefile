@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mkvtoolnix.download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-REQUIRED_DSM = 7.0
+REQUIRED_MIN_DSM = 7.0
 # mkvtoolnix > 22.x require C++14 (DSM 7 only)
 # no further updates possible:
 # mkvtoolnix > 46.x need some features of C++17
