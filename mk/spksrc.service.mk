@@ -388,9 +388,6 @@ else
 endif
 	@echo "port_forward=\"yes\"" >> $@
 	@echo "dst.ports=\"${SERVICE_PORT}/tcp\"" >> $@
-ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
-SPK_CONTENT += conf
-endif
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 else
