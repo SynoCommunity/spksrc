@@ -14,7 +14,7 @@ LICENSE_FILE = $(WORK_DIR)/Lidarr/LICENSE.md
 HELPURL = https://wiki.servarr.com/Lidarr_Troubleshooting
 SUPPORTURL = https://lidarr.audio/\#support
 
-REQUIRED_DSM = 5.0
+REQUIRED_MIN_DSM = 5.0
 
 # Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)

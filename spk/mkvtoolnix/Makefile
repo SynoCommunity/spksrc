@@ -6,7 +6,7 @@ SPK_ICON = src/$(SPK_NAME).png
 DEPENDS = cross/$(SPK_NAME)
 
 # mkvtoolnix > 22.x and < 54.x are DSM 7 only
-REQUIRED_DSM = 7.0
+REQUIRED_MIN_DSM = 7.0
 # comcerto2k has older toolchain than other DSM 7 archs
 UNSUPPORTED_ARCHS = comcerto2k
 

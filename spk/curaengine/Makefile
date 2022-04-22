@@ -5,7 +5,7 @@ SPK_ICON = src/curaengine.png
 BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
-REQUIRED_DSM = 5.0
+REQUIRED_MIN_DSM = 5.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION  = CuraEngine is a powerful, fast and robust engine for processing 3D models into 3D printing instruction for Ultimaker and other GCode based 3D printers.
