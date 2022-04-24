@@ -1,5 +1,0 @@
-bin:bin/gcore
-bin:bin/gdb
-bin:bin/gdb-add-index
-bin:bin/gdbserver
-lib:lib/libinproctrace.so
