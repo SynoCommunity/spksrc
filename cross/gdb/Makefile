@@ -18,3 +18,8 @@ CONFIGURE_ARGS += --with-system-zlib
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 include ../../mk/spksrc.cross-cc.mk
+
+# Library is not created under armv7
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+PLIST_TRANSFORM = sed -e 's?lib:lib/libinproctrace.so??g'
+endif
