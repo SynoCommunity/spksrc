@@ -529,11 +529,13 @@ publish-legacy-toolchain-%: spk_msg
 
 ####
 
+kernel-modules-%: SHELL:=/bin/bash
 kernel-modules-%:
 	@$(MSG) ARCH to be processed: $(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))
 	@for arch in $(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS))) ; do \
 	  $(MSG) "Processing $${arch} ARCH" ; \
-	  $(MAKE) WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $${arch}) ; \
+	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$${arch}.log ; \
+	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  $(MAKE) spkclean ; \
 	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
 	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
@@ -555,13 +557,8 @@ build-arch-%: spk_msg
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
 endif
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) strip 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
-else
 	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
-endif
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
 endif
