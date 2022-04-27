@@ -54,7 +54,7 @@ ARCHS_DUPES = $(ARCHS_DUPES_DEFAULT) $(TCVERSION_DUPES)
 DEFAULT_ARCHS = $(sort $(filter-out $(ARCHS_DUPES_DEFAULT), $(AVAILABLE_TOOLCHAINS)))
 
 # supported: used for all-supported target
-SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)) comcerto2k-7.0)
 
 # legacy: used for all-legacy and when kernel support is used
 #         all archs except generic archs
