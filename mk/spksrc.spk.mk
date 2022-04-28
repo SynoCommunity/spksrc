@@ -490,7 +490,7 @@ supported-arch-error:
 
 supported-arch-%: spk_msg
 	@$(MSG) "BUILDING package for arch $* (all-supported)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $*)
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix arch-, $*)
 
 publish-supported-arch-%: spk_msg
 	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-supported)" | tee --append build-$*.log
@@ -498,7 +498,7 @@ publish-supported-arch-%: spk_msg
 
 latest-arch-%: spk_msg
 	@$(MSG) "BUILDING package for arch $* (all-latest)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $*)
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix arch-, $*)
 
 publish-latest-arch-%: spk_msg
 	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-latest)" | tee --append build-$*.log
