@@ -2,7 +2,6 @@ SPK_NAME = synokernel-cdrom
 SPK_VERS = 1.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
-CHANGELOG = "1. Synology Kernel CD-ROM drivers"
 
 DEPENDS = 
 
@@ -11,7 +10,8 @@ REQUIRE_KERNEL_MODULE  = CONFIG_CDROM_PKTCDVD:drivers/cdrom:cdrom
 REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
-DESCRIPTION = "1. Includes cdrom.ko and sr_mod.ko"
+DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko"
+CHANGELOG = "1. Initial release"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
