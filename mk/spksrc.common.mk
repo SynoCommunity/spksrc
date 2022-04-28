@@ -42,19 +42,17 @@ endif
 # Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
 TCVERSION_DUPES = $(addprefix %,$(filter-out $(DEFAULT_TC),$(AVAILABLE_TCVERSIONS)))
 
-# Archs that are supported by generic archs
-ARCHS_DUPES_DEFAULT = $(addsuffix %,$(ARCHS_WITH_GENERIC_SUPPORT))
 # remove unsupported (outdated) archs
-ARCHS_DUPES_DEFAULT += $(addsuffix %,$(DEPRECATED_ARCHS))
+ARCHS_DUPES_DEPRECATED += $(addsuffix %,$(DEPRECATED_ARCHS))
 
 # Filter for all-supported
-ARCHS_DUPES = $(ARCHS_DUPES_DEFAULT) $(TCVERSION_DUPES)
-
-# default: used for all-latest target
-DEFAULT_ARCHS = $(sort $(filter-out $(ARCHS_DUPES_DEFAULT), $(AVAILABLE_TOOLCHAINS)))
+ARCHS_DUPES = $(ARCHS_WITH_GENERIC_SUPPORT) $(ARCHS_DUPES_DEPRECATED) $(TCVERSION_DUPES)
 
 # supported: used for all-supported target
 SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+
+# default: used for all-latest target
+LATEST_ARCHS = $(foreach arch,$(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))),$(arch)-$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS))))))))
 
 # legacy: used for all-legacy and when kernel support is used
 #         all archs except generic archs

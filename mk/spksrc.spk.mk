@@ -442,7 +442,7 @@ endif
 # make all-latest
 else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = latest
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS))))))
+ALL_ACTION = $(LATEST_ARCHS)
 endif
 
 # make publish-all-supported | make publish-all-latest
@@ -489,20 +489,20 @@ supported-arch-error:
 	@$(MSG) ########################################################
 
 supported-arch-%: spk_msg
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log
+	@$(MSG) "BUILDING package for arch $* (all-supported)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $*)
 
 publish-supported-arch-%: spk_msg
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee --append build-$*.log
+	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-supported)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix publish-arch-, $*)
 
 latest-arch-%: spk_msg
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) 2>&1 | tee --append build-$*.log
+	@$(MSG) "BUILDING package for arch $* (all-latest)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $*)
 
 publish-latest-arch-%: spk_msg
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish 2>&1 | tee --append build-$*.log
+	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-latest)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix publish-arch-, $*)
 
 ####
 
