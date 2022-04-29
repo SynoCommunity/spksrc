@@ -29,6 +29,8 @@ printf '%40s %s\n' "[-f <path> ] : " "Additional firmware base path (OPTIONAL)" 
 printf '%40s %s\n' "[-k <path> ] : " "Kernel version (OPTIONAL: uses \`uname -r\` if not provided)" 1>&2
 printf '%40s %s\n' "[-n <package> ] : " "SynoCommunity package name containing kernel modules" 1>&2
 printf '%40s %s\n' "[-a <insmod|rmmod|reload|status> ] : " "Action to be performed" 1>&2
+printf '%40s %s\n' "[-h] : " "Print this help" 1>&2
+printf '%40s %s\n' "[-v] : " "Verbose mode" 1>&2
 echo 1>&2
 printf '%10s %s\n' "" "Examples :" 1>&2
 printf '%20s %s\n' "" "$0 -a status -n synokernel-cdrom cdrom sr_mod" 1>&2
@@ -42,14 +44,15 @@ echo 1>&2
 [ $# -eq 0 ] && usage && exit 1
 
 # Get basic options
-while getopts ":h:m:f:k:n:a:" arg; do
+while getopts ":h:m:f:k:n:a:v:" arg; do
   case $arg in
     m) MPATH=${OPTARG};;
     f) FPATH=${OPTARG};;
     k) KVER=${OPTARG};;
-    n) DNAME=${OPTARG};;
+    n) PKGNAME=${OPTARG};;
     a) ACTION=${OPTARG};;
     h) usage && exit 0;;
+    v) VERBOSE="TRUE";;
   esac
 done
 
@@ -62,7 +65,7 @@ SYS_FIRMWARE_PATH=/sys/module/firmware_class/parameters/path
 
 # Set LOG output
 SYNOLOG=/tmp/synocli-kernelmodule.log
-[ -n "${DNAME}" ] && SYNOLOG=/tmp/synocli-kernelmodule-${DNAME}.log
+[ -n "${PKGNAME}" ] && SYNOLOG=/tmp/synocli-kernelmodule-${PKGNAME}.log
 
 exec >> $SYNOLOG
 
@@ -71,9 +74,9 @@ exec >> $SYNOLOG
 
 # If neither the module path or name is being provided, exit
 if [ -z "${MPATH}" ]; then
-   [ -z "{DNAME}" ] \
+   [ -z "{PKGNAME}" ] \
       && usage \
-	  || MPATH=/var/packages/${DNAME}/target/lib/modules
+	  || MPATH=/var/packages/${PKGNAME}/target/lib/modules
 fi
 
 # If module path does not exists, exit
@@ -83,15 +86,20 @@ if [ ! -d ${MPATH} ]; then
    usage
 fi
 
+# Assign default firmware path if not set
+if [ -z "${FPATH}" ]; then
+   FPATH=/var/packages/${PKGNAME}/target/lib/firmware
+fi
+
 # Get ARCH
 [ -z "${ARCH}" ] && ARCH=$(uname -a | awk '{print $NF}' | cut -f2 -d_)
 
-# Get DSM VERSION
-[ -z "${VERSION}" ] && VERSION=$(sed -n 's/^productversion=\(.*\)/\1/p' /etc/VERSION | sed -e 's/"//g')
+# Get DSM DSM_VERSION
+[ -z "${DSM_VERSION}" ] && DSM_VERSION=$(sed -n 's/^productversion=\(.*\)/\1/p' /etc/VERSION | sed -e 's/"//g')
 
 # Set kernel module .ko object base path
 # If does not exists, exit
-KPATH=${MPATH}/${ARCH}-${VERSION}/${KVER}
+KPATH=${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}
 if [ ! -d ${KPATH} ]; then
    echo "ERROR: Kernel modules base path [${KPATH}] does not exist or inaccessible..." 1>&2
    echo 1>&2
@@ -245,40 +253,53 @@ status ()
 # kernel object name only
 fix_ko_path
 
+# Print details if in debug mode
+if [ ${VERBOSE} = "TRUE" ]; then
+   printf '%20s %s\n' "" "$0 (verbose)" 1>&2
+   printf '%60s %s\n' "SynoCommunity kernel driver package name (PKGNAME)" "[${PKGNAME}]" 1>&2
+   printf '%60s %s\n' "Synology NAS arch (ARCH)" "[${ARCH}]" 1>&2
+   printf '%60s %s\n' "Synology DSM version (DSM_VERSION)" "[${DSM_VERSION}]" 1>&2
+   printf '%60s %s\n' "Module action insmod|rmmod|reload|status (ACTION)" "[${ACTION}]" 1>&2
+   printf '%60s %s\n' "Kernel modules path (MPATH)" "[${MPATH}]" 1>&2
+   printf '%60s %s\n' "Device firmware path (FPATH)" "[${FPATH}]" 1>&2
+   printf '%60s %s\n' "Running kernel version (KVER)" "[${KVER}]" 1>&2
+   printf '%60s %s\n' "Kernel objects (KO)" "[${KO}]" 1>&2
+fi
+
 case $ACTION in
     insmod)
        if status; then
-           echo ${DNAME} is already running
+           echo ${PKGNAME} is already running
            exit 0
        else
-           echo Starting ${DNAME} ...
+           echo Starting ${PKGNAME} ...
            load
            exit $?
        fi
        ;;
     rmmod)
        if status; then
-           echo Stopping ${DNAME} ...
+           echo Stopping ${PKGNAME} ...
            unload
            exit $?
        else
-           echo ${DNAME} is not running
+           echo ${PKGNAME} is not running
            exit 0
        fi
        ;;
     reload)
-       echo -ne "---\nReloading ${DNAME} package...\n"
+       echo -ne "---\nReloading ${PKGNAME} package...\n"
        unload
        load
        exit $?
        ;;
     status)
-       echo -ne "---\nStatus of ${DNAME} package...\n"
+       echo -ne "---\nStatus of ${PKGNAME} package...\n"
        if status; then
-           echo ${DNAME} is running
+           echo ${PKGNAME} is running
            exit 0
        else
-           echo ${DNAME} is not running
+           echo ${PKGNAME} is not running
            exit 1
        fi
        ;;
