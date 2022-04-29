@@ -4,7 +4,7 @@ SPK_VERS = 5.8.1
 SPK_CONFLICT ?= zsh-static
 # Allow overriding the revision, used by spk/zsh-static.
 # If you rev here, please also rev spk/zsh-static.
-SPK_REV ?= 12
+SPK_REV ?= 13
 SPK_ICON = ../zsh/src/zsh.png
 
 DEPENDS = cross/zsh
