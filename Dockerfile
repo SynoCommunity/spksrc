@@ -11,6 +11,7 @@ RUN dpkg --add-architecture i386
 
 # Install required packages (in sync with README.rst instructions)
 RUN apt-get update && apt-get install --no-install-recommends -y \
+		autopoint \
 		autoconf-archive \
 		autogen \
 		automake \
