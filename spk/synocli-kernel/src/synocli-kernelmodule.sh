@@ -33,7 +33,8 @@ printf '%40s %s\n' "[-h|--help] : " "Print this help"
 printf '%40s %s\n' "[-v|--verbose] : " "Verbose mode"
 echo
 printf '%10s %s\n' "" "Examples :"
-printf '%20s %s\n' "" "$0 --spk synokernel-cdrom cdrom sr_mod --verbose status"
+printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
+printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
 echo 1>&2
 }
 
@@ -195,7 +196,7 @@ load ()
    error=0
 
    # Add firmware path to running kernel
-   if [ -n "${FPATH}" ]; then
+   if [ -d "${FPATH}" ]; then
       echo -ne "\tAdd optional firmware path...\n"
 	  printf '%65s' "[${FPATH}]"
       echo "${FPATH}" > ${FPATH_SYS}
@@ -255,7 +256,7 @@ unload ()
    done
 
    # Remove firmware path to running kernel
-   if [ -n "${FPATH}" ]; then
+   if [ -d "${FPATH}" ]; then
       echo -ne "\tUnloading of optional firmware path...\n"
       echo "" > ${FPATH_SYS}
       error=$?
@@ -286,7 +287,7 @@ status ()
    done
 
    # Validate option firmware path
-   if [ -n "${FPATH}" ]; then
+   if [ -d "${FPATH}" ]; then
       echo -ne "\tStatus of optional firmware path...\n"
 	  printf '%65s' "[${FPATH}]"
 
