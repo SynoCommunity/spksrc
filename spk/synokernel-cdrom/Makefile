@@ -25,5 +25,11 @@ LICENSE  = GPLv2
 SPK_DEPENDS = synocli-kernel
 
 STRIP_TARGET = nop
+POST_STRIP_TARGET = synokernel-cdrom_extra-install
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: synokernel-cdrom_extra-install
+synokernel-cdrom_extra-install:
+	install -m 755 -d $(STAGING_DIR)/etc/
+	install -m 644 src/synokernel-cdrom.cfg $(STAGING_DIR)/etc/
