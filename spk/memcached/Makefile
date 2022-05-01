@@ -27,9 +27,6 @@ START_DEP_SERVICES = apache-web
 
 POST_STRIP_TARGET = memcached_extra_install
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
-
 include ../../mk/spksrc.spk.mk
 
 .PHONY: memcached_extra_install
