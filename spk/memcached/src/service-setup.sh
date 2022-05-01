@@ -31,8 +31,6 @@ service_postinst ()
       chgrp http "${CONFIG_FILE}"
       chmod g+w "${CONFIG_FILE}"
     fi
-
-    return 0
 }
 
 service_postuninst ()
@@ -41,8 +39,6 @@ service_postuninst ()
       # Remove the web interface
       rm -fr "${WEB_DIR}/phpMemcachedAdmin"
     fi
-
-    return 0
 }
 
 service_preupgrade ()
@@ -55,11 +51,4 @@ service_preupgrade ()
       # Remove the web interface
       rm -fr "${WEB_DIR}/phpMemcachedAdmin"
     fi
-
-    return 0
-}
-
-service_postupgrade ()
-{
-  
 }
