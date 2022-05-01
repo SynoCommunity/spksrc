@@ -21,13 +21,13 @@ service_postinst ()
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-      cp "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.sample.php" "${CONFIG_FILE}"
+      cp -p "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.sample.php" "${CONFIG_FILE}"
       chgrp http "${CONFIG_FILE}"
       chmod g+w "${CONFIG_FILE}"
     elif [ -f "${TMP_DIR}/Config/Memcache.php" ]; then
       cp -p "${TMP_DIR}/Config/Memcache.php" "${CONFIG_FILE}"
     else
-      cp "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.sample.php" "${CONFIG_FILE}"
+      cp -p "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.sample.php" "${CONFIG_FILE}"
       chgrp http "${CONFIG_FILE}"
       chmod g+w "${CONFIG_FILE}"
     fi
@@ -47,14 +47,13 @@ service_postuninst ()
 
 service_preupgrade ()
 {
+    if [ -f "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.php" ]; then
+      mkdir -p "${TMP_DIR}/Config/"
+      cp -p "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.php" "${TMP_DIR}/Config/Memcache.php"
+    fi
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
       # Remove the web interface
       rm -fr "${WEB_DIR}/phpMemcachedAdmin"
-    else
-      if [ -f "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.php" ]; then
-        mkdir -p "${TMP_DIR}/Config/"
-        cp -p "${WEB_DIR}/phpMemcachedAdmin/Config/Memcache.php" "${TMP_DIR}/Config/Memcache.php"
-      fi
     fi
 
     return 0
