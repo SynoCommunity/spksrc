@@ -15,6 +15,8 @@ CHANGELOG = "1. Bump 1.4.13 -> 1.6.9 <br />2. Add DSM 7 compliance"
 HOMEPAGE = https://memcached.org/
 LICENSE  =
 
+CONF_DIR = src/conf
+
 SPK_USER = auto
 
 SERVICE_SETUP    = src/service-setup.sh
