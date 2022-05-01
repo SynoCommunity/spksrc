@@ -1,43 +1,44 @@
 #!/bin/sh
 
-# Package
-PACKAGE="memcached"
-
 # Others
-INSTALL_DIR="/var/packages/${PACKAGE}/target/"
+# Only used for DSM 6
 WEB_DIR="/var/services/web"
-PATH="${INSTALL_DIR}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
-MEMCACHED="${INSTALL_DIR}/bin/memcached"
+PATH="${SYNOPKG_PKGDEST}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
+MEMCACHED="${SYNOPKG_PKGDEST}/bin/memcached"
 SERVICE_COMMAND="${MEMCACHED} -d -m `awk '/MemTotal/{memory=$2/1024*0.15; if (memory > 64) memory=64; printf "%0.f", memory}' /proc/meminfo` -P ${PID_FILE}"
 
 service_postinst ()
 {
 
-    # Install the web interface
-    cp -Rp ${INSTALL_DIR}/share/phpMemcachedAdmin ${WEB_DIR}
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
 
-    chown http ${WEB_DIR}/phpMemcachedAdmin/Temp/
-
-    chown http ${WEB_DIR}/phpMemcachedAdmin/Config/
-
-    # Install busybox stuff
-    ${INSTALL_DIR}/bin/busybox --install ${INSTALL_DIR}/bin
+      # Install the web interface
+      cp -Rp "${SYNOPKG_PKGDEST}/share/phpMemcachedAdmin" "${WEB_DIR}"
+  
+      chown http "${WEB_DIR}/phpMemcachedAdmin/Temp/"
+  
+      chown http "${WEB_DIR}/phpMemcachedAdmin/Config/"
+    fi
 
     return 0
 }
 
 service_postuninst ()
 {
-    # Remove the web interface
-    rm -fr ${WEB_DIR}/phpMemcachedAdmin
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      # Remove the web interface
+      rm -fr "${WEB_DIR}/phpMemcachedAdmin"
+    fi
 
     return 0
 }
 
 service_preupgrade ()
 {
-    # Remove the web interface
-    rm -fr ${WEB_DIR}/phpMemcachedAdmin
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      # Remove the web interface
+      rm -fr "${WEB_DIR}/phpMemcachedAdmin"
+    fi
 
     return 0
 }
