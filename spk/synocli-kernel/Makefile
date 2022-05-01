@@ -29,4 +29,3 @@ include ../../mk/spksrc.spk.mk
 synocli-kernel_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/synocli-kernelmodule.sh $(STAGING_DIR)/bin/
-	install -m 755 src/synocli-kernelmodule-dbg.sh $(STAGING_DIR)/bin/
