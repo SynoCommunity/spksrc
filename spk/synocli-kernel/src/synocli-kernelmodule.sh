@@ -79,9 +79,9 @@ ko_path_match ()
 		 # Replace any '-' or '_' by '[-_]
 		 ko=$(echo ${ko} | sed -r 's/[-_]/[-_]/g')
          # Find full module kernel object path
-         ko=$(find $KPATH -name $ko | awk -F'drivers/' '{print $2}')
+         ko=$(find $KPATH -name $ko)
       fi
-      KO_FOUND+="$ko "
+      KO_FOUND+="${ko##*${KVER}} "
    done
 
    KO_FOUND=$(echo $KO_FOUND | xargs)
@@ -133,7 +133,7 @@ MPATH="/var/packages/${SPK}/target/lib/modules"                        # Kernel 
 FPATH="/var/packages/${SPK}/target/lib/firmware"                       # Device firmware path
 FPATH_SYS="/sys/module/firmware_class/parameters/path"                 # System module firmware path file index
 KVER=$(uname -r)                                                       # Running kernel version
-KPATH="${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}/drivers"                # Full kernel modules path
+KPATH="${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}"                        # Full kernel modules path
 KO_LIST=$(echo ${KO_LIST} | xargs)                                     # List of kernel objects to enable|disable
 KO_LIST_CFG=""                                                         # List of kernel objects in configuration
 KO_FOUND=""                                                            # List of found kernel objects
@@ -213,7 +213,7 @@ load ()
    for ko in $KO_FOUND
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%40s %-25s' $(basename $ko) "[$module]"
+      printf '%40s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -243,7 +243,7 @@ unload ()
    for item in $KO_FOUND; do echo $item; done | tac | while read ko
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%40s %-25s' $(basename $ko) "[$module]"
+      printf '%40s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -275,7 +275,7 @@ status ()
    for ko in $KO_FOUND
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%40s %-25s' $(basename $ko) "[$module]"
+      printf '%40s %-25s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
