@@ -1,7 +1,7 @@
 SPK_NAME = bazarr
 
-SPK_VERS = 1.0.3
-SPK_REV = 4
+SPK_VERS = 1.0.4
+SPK_REV = 5
 
 SPK_ICON = src/bazarr.png
 
@@ -17,7 +17,7 @@ MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
 STARTABLE = yes
-CHANGELOG = "Update to version 1.0.3. See <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.0.3">here</a> for more details"
+CHANGELOG = "Update to version 1.0.4. See <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.0.4">here</a> for more details"
 
 HOMEPAGE = https://www.bazarr.media
 LICENSE = GPLv3
