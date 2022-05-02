@@ -4,7 +4,7 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://download.visualstudio.microsoft.com/download/pr/$(PKG_DIST_FOLDER)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-EXTRACT_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 include ../../mk/spksrc.archs.mk
 
@@ -37,7 +37,11 @@ HOMEPAGE = https://dotnet.microsoft.com/
 COMMENT  = Free. Cross-platform. Open source. A developer platform for building all apps.
 LICENSE  = MIT
 
-# source is extracted directly to the install folder
-INSTALL_TARGET = nop
+INSTALL_TARGET = dotnet_runtime_custom_install
 
 include ../../mk/spksrc.install-resources.mk
+
+.PHONY: dotnet_runtime_custom_install
+dotnet_runtime_custom_install:
+	mkdir -p "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"
+	tar -cf - -C $(EXTRACT_PATH) . | tar -xf - -C "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"

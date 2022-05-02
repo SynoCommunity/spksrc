@@ -21,7 +21,7 @@ cat_PLIST:
 	# If there is a PLIST.auto file or if parent directory is kernel \
 	elif [ -f PLIST.auto -o $$(basename $$(dirname $$(pwd))) = "kernel" ] ; \
 	then \
-	  cat $(WORK_DIR)/$(PKG_NAME).plist.tmp | sort | while read -r file ; \
+	  cat $(WORK_DIR)/$(PKG_NAME).plist | sort | while read -r file ; \
 	  do \
 	    type=$$(file --brief "$(INSTALL_DIR)/$(INSTALL_PREFIX)/$$file" | cut -d , -f1) ; \
 	    case $$type in \
