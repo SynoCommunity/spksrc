@@ -169,8 +169,13 @@ if [ ${SPK_CFG} ]; then
    fi	
    # Check that configuration option exists
    KO_LIST_CFG=$(sed -n "s/^${SPK_CFG_OPT}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
+
+   # Merge modules from config file
+   # and parameters passed as arguments
+   # but keep its order, starting with
+   # the config file followed by args
    if [ "${KO_LIST_CFG}" ]; then
-      KO_LIST=$(echo ${KO_LIST} ${KO_LIST_CFG} | xargs -n1 | sort -u | xargs)
+      KO_LIST=$(echo ${KO_LIST_CFG} ${KO_LIST} | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}' | xargs)
    else
       usage
       echo -ne "\nERROR: Configuration option [${SPK_CFG_OPT}:] no found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
