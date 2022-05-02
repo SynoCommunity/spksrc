@@ -69,6 +69,9 @@ printf '%60s %s\n' "Kernel objects found (KO_FOUND)" "[${KO_FOUND}]"
 #------------------------------------------------
 ko_path_match ()
 {
+   ko_find=""
+   ko_missing=""
+
    for ko in $KO_LIST
    do
       # first check if the name
@@ -79,17 +82,19 @@ ko_path_match ()
 		 # Replace any '-' or '_' by '[-_]
 		 ko=$(echo ${ko} | sed -r 's/[-_]/[-_]/g')
          # Find full module kernel object path
-         ko=$(find $KPATH -name $ko)
+         ko_find=$(find $KPATH -name $ko)
+	     [ ! "$ko_find" ] && ko_missing+="$ko "
       fi
-      KO_FOUND+="${ko##*${KVER}} "
+      KO_FOUND+="${ko_find##*${KVER}} "
    done
 
    KO_FOUND=$(echo $KO_FOUND | xargs)
 
    if [ ! $(echo $KO_LIST | wc -w) -eq $(echo $KO_FOUND | wc -w) ]; then
 	  verbose && usage
-      echo "ERROR: Some kernel modules where not found..." 1>&2
-      echo 1>&2
+      echo
+      echo "ERROR: Missing kernel modules: [$(echo $ko_missing | xargs)]"
+      echo
 	  exit 1
    fi
 }
@@ -160,7 +165,7 @@ if [ ! -d ${KPATH} ]; then
    exit 1
 fi
 
-if [ ${SPK_CFG} ]; then
+if [ "${SPK_CFG}" ]; then
    # Check that configuration exists (if requested)
    if [ ! -f ${SPK_CFG_PATH}/${SPK_CFG} ]; then
       usage
@@ -183,7 +188,6 @@ if [ ${SPK_CFG} ]; then
    fi	
 fi
 
-echo 179 $(sed -n "s/^${SPK_CFG_OPT}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
 
 # Find resulting kernel object path
 # and confirm that KO_LIST and KO_FOUND
