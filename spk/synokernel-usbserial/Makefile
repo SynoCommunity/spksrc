@@ -18,6 +18,8 @@ MAINTAINER = th0ma7
 DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko"
 CHANGELOG = "1. Synology Kernel USB serial drivers"
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
 RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers
