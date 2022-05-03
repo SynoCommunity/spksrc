@@ -1,8 +1,8 @@
 PKG_NAME = libmicrohttpd
-PKG_VERS = 0.9.72
+PKG_VERS = 0.9.75
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://mirror.kumi.systems/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://mirror.kumi.systems/gnu/libmicrohttpd
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

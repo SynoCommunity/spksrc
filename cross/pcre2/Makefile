@@ -1,5 +1,5 @@
 PKG_NAME = pcre2
-PKG_VERS = 10.39
+PKG_VERS = 10.40
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/PhilipHazel/pcre2/releases/download/$(PKG_NAME)-$(PKG_VERS)
@@ -24,5 +24,7 @@ COMMENT  = The PCRE library is a set of functions that implement regular express
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
+
+ADDITIONAL_CPPFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk

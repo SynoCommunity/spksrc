@@ -10,6 +10,7 @@
 #  SPK_FILE_NAME:     The full spk name with folder, package name, arch, tc- and package version.
 #  SPK_CONTENT:       List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
+#  CONF_DIR:          To provide a package specific conf folder for e.g. privilege file
 #
 
 # Common makefiles
@@ -102,7 +103,7 @@ SPK_CONTENT = package.tgz INFO scripts
 DSM_CONF_DIR = $(WORK_DIR)/conf
 
 ifneq ($(CONF_DIR),)
-export SPKSRC_CONF_DIR=$(CONF_DIR)
+SPK_CONF_DIR=$(CONF_DIR)
 endif
 
 # Generic service scripts
@@ -156,10 +157,6 @@ endif
 endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
-# If require kernel modules then limit
-# 'os_max_ver' to point releases only
-else ifeq ($(strip $(REQUIRE_KERNEL)),1)
-	@echo os_max_ver=\"$(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$$(expr $(TC_BUILD) + 10)\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
 	@echo beta=\"yes\" >> $@
@@ -197,7 +194,7 @@ endif
 
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
 ifneq ($(strip $(DSM_UI_DIR)),)
-	@echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@
+	@[ -d $(STAGING_DIR)/$(DSM_UI_DIR) ] && echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@ || true
 endif
 ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
@@ -272,7 +269,7 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 $(WORK_DIR)/package.tgz: icon service
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && tar cpzf $@ --owner=root --group=root *)
+	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
 
@@ -365,7 +362,7 @@ conf:
 ifneq ($(strip $(CONF_DIR)),)
 	@$(MSG) "Preparing conf"
 	@mkdir -p $(DSM_CONF_DIR)
-	@find $${SPKSRC_CONF_DIR} -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
+	@find $(SPK_CONF_DIR) -maxdepth 1 -type f -print -exec cp -f {} $(DSM_CONF_DIR) \;
 	@find $(DSM_CONF_DIR) -maxdepth 1 -type f -print -exec chmod 0644 {} \;
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
 SPK_CONTENT += conf
@@ -406,6 +403,7 @@ spkclean:
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
+	       work-*/tc_vars.mk \
 	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
@@ -441,7 +439,7 @@ endif
 # make all-latest
 else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
 ACTION = latest
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(DEFAULT_ARCHS))))))
+ALL_ACTION = $(LATEST_ARCHS)
 endif
 
 # make publish-all-supported | make publish-all-latest
@@ -467,7 +465,7 @@ pre-build-native:
 	  if [ "$${depend%/*}" = "native" ]; then \
 	    $(MSG) "Pre-processing $${depend}" ; \
 	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
-	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee build-$${depend%/*}-$${depend#*/}.log ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
 	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  fi ; \
 	done
@@ -488,20 +486,20 @@ supported-arch-error:
 	@$(MSG) ########################################################
 
 supported-arch-%: spk_msg
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log
+	@$(MSG) "BUILDING package for arch $* (all-supported)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix arch-, $*)
 
 publish-supported-arch-%: spk_msg
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee build-$*.log
+	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-supported)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix publish-arch-, $*)
 
 latest-arch-%: spk_msg
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) 2>&1 | tee build-$*.log
+	@$(MSG) "BUILDING package for arch $* (all-latest)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix arch-, $*)
 
 publish-latest-arch-%: spk_msg
-	@$(MSG) BUILDING and PUBLISHING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$*)) TCVERSION=$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $*%, $(AVAILABLE_TOOLCHAINS))))))) publish 2>&1 | tee build-$*.log
+	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-latest)" | tee --append build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix publish-arch-, $*)
 
 ####
 
@@ -531,10 +529,34 @@ publish-legacy-toolchain-%: spk_msg
 
 ####
 
+kernel-modules-%: SHELL:=/bin/bash
+kernel-modules-%:
+	@if [ "$(filter $(DEFAULT_TC),lastword $(subst -, ,$(MAKECMDGOALS)))" ]; then \
+	   archs2process="$(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
+	elif [ "$(filter $(GENERIC_ARCHS),$(subst -, ,$(MAKECMDGOALS)))" ]; then \
+	   archs2process="$(filter $(addprefix %-,$(lastword $(subst -, ,$(MAKECMDGOALS)))),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
+	else \
+	   archs2process=$* ; \
+	fi ; \
+	$(MSG) ARCH to be processed: $${archs2process} ; \
+	for arch in $${archs2process} ; do \
+	  $(MSG) "Processing $${arch} ARCH" ; \
+	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
+	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	  $(MAKE) spkclean ; \
+	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
+	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
+	done
+
 arch-%: | pre-build-native
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
+else
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+endif
 
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: spk_msg
@@ -542,7 +564,7 @@ build-arch-%: spk_msg
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
 endif
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log ; \
+	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
@@ -551,10 +573,15 @@ endif
 
 publish-arch-%: SHELL:=/bin/bash
 publish-arch-%: spk_msg
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
+else
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING and PUBLISHING package for arch $*
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee build-$*.log ; \
+	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+endif
 
 ####
 

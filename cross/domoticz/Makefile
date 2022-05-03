@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/domoticz/domoticz/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/boost cross/sqlite cross/curl cross/python38 cross/lua cross/zlib
+DEPENDS = cross/boost_1.68 cross/sqlite cross/curl cross/python38 cross/lua cross/zlib
 DEPENDS += cross/jsoncpp
 DEPENDS += cross/mosquitto
 DEPENDS += cross/cereal

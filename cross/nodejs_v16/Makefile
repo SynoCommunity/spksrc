@@ -1,5 +1,5 @@
 PKG_NAME = node
-PKG_VERS = 16.13.2
+PKG_VERS = 16.14.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://nodejs.org/dist/v$(PKG_VERS)
@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 # C++ compiler (CXX=/spksrc/toolchain/syno-x64-7.0/work/x86_64-pc-linux-gnu/bin/x86_64-pc-linux-gnu-g++, 7.3.0) too old, need g++ 8.3.0 or clang++ 8.0.0
 # DSM 7 toolchains have g++ 7.3.0 only, but succeed to compile nodejs v16.
 # newest DSM 6 toolchains have g++ <= 4.9.3.
-REQUIRED_DSM = 7.0
+REQUIRED_MIN_DSM = 7.0
 # comcerto2k is supported by DSM 7, but toolchain has g++ 4.9.3 that is too old.
 UNSUPPORTED_ARCHS = comcerto2k
 

@@ -54,7 +54,7 @@ A container based on 64-bit version of Debian 10 stable OS is recommended. Non-x
 3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
 4. Install all required packages:
 ```
-lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake bc bison build-essential check \
+lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake autopoint bc bison build-essential check \
                                 cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf \
                                 imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev \
                                 libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev \

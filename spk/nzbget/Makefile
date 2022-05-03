@@ -1,9 +1,7 @@
 SPK_NAME = nzbget
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 28
+SPK_REV = 29
 SPK_ICON = src/nzbget.png
-
-DEPENDS = cross/p7zip cross/unrar
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = NZBGet is a command-line based binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair, unpack and web-interface. NZBGet requires low system resources.
@@ -28,6 +26,10 @@ SERVICE_PORT_TITLE = NZBGet (HTTP)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+# Installer brings all the binaries
+COPY_TARGET = nop
+override ARCH=
+
 POST_STRIP_TARGET = nzbget_extra_install
 
 include ../../mk/spksrc.spk.mk
@@ -36,5 +38,5 @@ include ../../mk/spksrc.spk.mk
 nzbget_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var $(STAGING_DIR)/share/nzbget/scripts
 	# Include usefull scripts
-	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/nzbToMedia.git
-	cd $(STAGING_DIR)/share/nzbget/scripts && git clone https://github.com/clinton-hall/GetScripts.git
+	cd $(STAGING_DIR)/share/nzbget/scripts && git clone --depth=1 https://github.com/clinton-hall/nzbToMedia.git
+	cd $(STAGING_DIR)/share/nzbget/scripts && git clone --depth=1 https://github.com/clinton-hall/GetScripts.git

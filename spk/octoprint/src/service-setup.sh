@@ -1,7 +1,7 @@
 PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 PYTHON=${SYNOPKG_PKGDEST}/env/bin/python3
-OCTOPRINT=${SYNOPKG_PKGDEST}/share/OctoPrint/run
+OCTOPRINT=${SYNOPKG_PKGDEST}/env/bin/octoprint
 SERVICE_COMMAND="${PYTHON} ${OCTOPRINT} daemon start -b ${SYNOPKG_PKGVAR}/.octoprint -c ${SYNOPKG_PKGVAR}/.octoprint/config.yaml --pid ${PID_FILE}"
 
 service_postinst ()
@@ -11,9 +11,6 @@ service_postinst ()
 
     # Install the wheels
     install_python_wheels
-
-    # Install OctoPrint
-    cd ${SYNOPKG_PKGDEST}/share/OctoPrint && ${SYNOPKG_PKGDEST}/env/bin/python3 setup.py install
 }
 
 

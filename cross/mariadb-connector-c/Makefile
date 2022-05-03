@@ -3,7 +3,7 @@ PKG_VERS = 3.2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mariadb-corporation/mariadb-connector-c/archive/refs/tags
+PKG_DIST_SITE = https://github.com/mariadb-corporation/mariadb-connector-c/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 HOMEPAGE = https://mariadb.com/kb/en/mariadb-connector-c/

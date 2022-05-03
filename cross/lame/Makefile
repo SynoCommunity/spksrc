@@ -8,18 +8,17 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm
 
-HOMEPAGE = http://lame.sourceforge.net/
-COMMENT  = High quality MPEG Audio Layer III encoder
+HOMEPAGE = https://lame.sourceforge.net/
+COMMENT  = High quality MPEG Audio Layer III encoder.
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
-
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
-DEPENDS += native/nasm
+BUILD_DEPENDS = native/nasm
+NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --enable-nasm

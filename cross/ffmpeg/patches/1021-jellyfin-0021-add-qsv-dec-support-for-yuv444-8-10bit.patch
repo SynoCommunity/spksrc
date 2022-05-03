@@ -1,0 +1,369 @@
+Index: jellyfin-ffmpeg/libavcodec/qsv.c
+===================================================================
+--- libavcodec/qsv.c
++++ libavcodec/qsv.c
+@@ -201,10 +201,14 @@ enum AVPixelFormat ff_qsv_map_fourcc(uin
+     case MFX_FOURCC_NV12: return AV_PIX_FMT_NV12;
+     case MFX_FOURCC_P010: return AV_PIX_FMT_P010;
+     case MFX_FOURCC_P8:   return AV_PIX_FMT_PAL8;
+-#if CONFIG_VAAPI
++#if CONFIG_VAAPI || CONFIG_D3D11VA
+     case MFX_FOURCC_YUY2: return AV_PIX_FMT_YUYV422;
++#if QSV_VERSION_ATLEAST(1, 17)
++    case MFX_FOURCC_AYUV: return AV_PIX_FMT_0YUV;
++#endif
+ #if QSV_VERSION_ATLEAST(1, 27)
+     case MFX_FOURCC_Y210: return AV_PIX_FMT_Y210;
++    case MFX_FOURCC_Y410: return AV_PIX_FMT_Y410;
+ #endif
+ #endif
+     }
+@@ -223,16 +227,26 @@ int ff_qsv_map_pixfmt(enum AVPixelFormat
+     case AV_PIX_FMT_P010:
+         *fourcc = MFX_FOURCC_P010;
+         return AV_PIX_FMT_P010;
+-#if CONFIG_VAAPI
++#if CONFIG_VAAPI || CONFIG_D3D11VA
+     case AV_PIX_FMT_YUV422P:
+     case AV_PIX_FMT_YUYV422:
+         *fourcc = MFX_FOURCC_YUY2;
+         return AV_PIX_FMT_YUYV422;
++#if QSV_VERSION_ATLEAST(1, 17)
++    case AV_PIX_FMT_0YUV:
++    case AV_PIX_FMT_YUV444P:
++        *fourcc = MFX_FOURCC_AYUV;
++        return AV_PIX_FMT_0YUV;
++#endif
+ #if QSV_VERSION_ATLEAST(1, 27)
+     case AV_PIX_FMT_YUV422P10:
+     case AV_PIX_FMT_Y210:
+         *fourcc = MFX_FOURCC_Y210;
+         return AV_PIX_FMT_Y210;
++    case AV_PIX_FMT_Y410:
++    case AV_PIX_FMT_YUV444P10:
++        *fourcc = MFX_FOURCC_Y410;
++        return AV_PIX_FMT_Y410;
+ #endif
+ #endif
+     default:
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
+===================================================================
+--- libavutil/hwcontext_d3d11va.c
++++ libavutil/hwcontext_d3d11va.c
+@@ -85,6 +85,10 @@ static const struct {
+ } supported_formats[] = {
+     { DXGI_FORMAT_NV12,           AV_PIX_FMT_NV12 },
+     { DXGI_FORMAT_P010,           AV_PIX_FMT_P010 },
++    { DXGI_FORMAT_AYUV,           AV_PIX_FMT_0YUV },
++    { DXGI_FORMAT_YUY2,           AV_PIX_FMT_YUYV422 },
++    { DXGI_FORMAT_Y210,           AV_PIX_FMT_Y210 },
++    { DXGI_FORMAT_Y410,           AV_PIX_FMT_Y410 },
+     { DXGI_FORMAT_B8G8R8A8_UNORM, AV_PIX_FMT_BGRA },
+     // Special opaque formats. The pix_fmt is merely a place holder, as the
+     // opaque format cannot be accessed directly.
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -100,12 +100,18 @@ static const struct {
+     { AV_PIX_FMT_BGRA, MFX_FOURCC_RGB4 },
+     { AV_PIX_FMT_P010, MFX_FOURCC_P010 },
+     { AV_PIX_FMT_PAL8, MFX_FOURCC_P8   },
+-#if CONFIG_VAAPI
++#if CONFIG_VAAPI || CONFIG_D3D11VA
+     { AV_PIX_FMT_YUYV422,
+                        MFX_FOURCC_YUY2 },
++#if QSV_VERSION_ATLEAST(1, 17)
++    { AV_PIX_FMT_0YUV,
++                       MFX_FOURCC_AYUV },
++#endif
+ #if QSV_VERSION_ATLEAST(1, 27)
+     { AV_PIX_FMT_Y210,
+                        MFX_FOURCC_Y210 },
++    { AV_PIX_FMT_Y410,
++                       MFX_FOURCC_Y410 },
+ #endif
+ #endif
+ };
+@@ -919,7 +925,7 @@ static int map_frame_to_surface(const AV
+         surface->Data.R = frame->data[0] + 2;
+         surface->Data.A = frame->data[0] + 3;
+         break;
+-#if CONFIG_VAAPI
++#if CONFIG_VAAPI || CONFIG_D3D11VA
+     case AV_PIX_FMT_YUYV422:
+         surface->Data.Y = frame->data[0];
+         surface->Data.U = frame->data[0] + 1;
+@@ -931,6 +937,15 @@ static int map_frame_to_surface(const AV
+         surface->Data.U16 = (mfxU16 *)frame->data[0] + 1;
+         surface->Data.V16 = (mfxU16 *)frame->data[0] + 3;
+         break;
++    case AV_PIX_FMT_0YUV:
++        surface->Data.V = frame->data[0];
++        surface->Data.U = frame->data[0] + 1;
++        surface->Data.Y = frame->data[0] + 2;
++        surface->Data.A = frame->data[0] + 3;
++        break;
++    case AV_PIX_FMT_Y410:
++        surface->Data.U = frame->data[0];
++        break;
+ #endif
+     default:
+         return MFX_ERR_UNSUPPORTED;
+Index: jellyfin-ffmpeg/libavutil/pixdesc.c
+===================================================================
+--- libavutil/pixdesc.c
++++ libavutil/pixdesc.c
+@@ -228,6 +228,41 @@ static const AVPixFmtDescriptor av_pix_f
+         },
+         .flags = AV_PIX_FMT_FLAG_BE,
+     },
++    [AV_PIX_FMT_0YUV] = {
++        .name = "0yuv",
++        .nb_components = 3,
++        .log2_chroma_w = 0,
++        .log2_chroma_h = 0,
++        .comp = {
++            { 0, 4, 1, 0, 8 },        /* Y */
++            { 0, 4, 2, 0, 8 },        /* U */
++            { 0, 4, 3, 0, 8 },        /* V */
++        },
++    },
++    [AV_PIX_FMT_Y410LE] = {
++        .name = "y410le",
++        .nb_components = 3,
++        .log2_chroma_w = 0,
++        .log2_chroma_h = 0,
++        .comp = {
++            { 0, 32, 10, 0, 10 },        /* Y */
++            { 0, 32,  0, 0, 10 },        /* U */
++            { 0, 32, 20, 0, 10 },        /* V */
++        },
++        .flags = AV_PIX_FMT_FLAG_ALPHA | AV_PIX_FMT_FLAG_BITSTREAM,
++    },
++    [AV_PIX_FMT_Y410BE] = {
++        .name = "y410be",
++        .nb_components = 3,
++        .log2_chroma_w = 0,
++        .log2_chroma_h = 0,
++        .comp = {
++            { 0, 32, 10, 0, 10 },        /* Y */
++            { 0, 32,  0, 0, 10 },        /* U */
++            { 0, 32, 20, 0, 10 },        /* V */
++        },
++        .flags = AV_PIX_FMT_FLAG_ALPHA | AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_BE,
++    },
+     [AV_PIX_FMT_RGB24] = {
+         .name = "rgb24",
+         .nb_components = 3,
+Index: jellyfin-ffmpeg/libavutil/pixfmt.h
+===================================================================
+--- libavutil/pixfmt.h
++++ libavutil/pixfmt.h
+@@ -358,6 +358,10 @@ enum AVPixelFormat {
+     AV_PIX_FMT_Y210BE,    ///< packed YUV 4:2:2 like YUYV422, 20bpp, data in the high bits, big-endian
+     AV_PIX_FMT_Y210LE,    ///< packed YUV 4:2:2 like YUYV422, 20bpp, data in the high bits, little-endian
+ 
++    AV_PIX_FMT_0YUV,      ///< packed YUV 4:4:4, 32bpp,  X  Y Cb Cr, X=unused/undefined
++    AV_PIX_FMT_Y410LE,    ///< packed YUV 4:4:4, 32bpp, Cr  Y Cb  A, little-endian
++    AV_PIX_FMT_Y410BE,    ///< packed YUV 4:4:4, 32bpp, Cr  Y Cb  A, big-endian
++
+     AV_PIX_FMT_X2RGB10LE, ///< packed RGB 10:10:10, 30bpp, (msb)2X 10R 10G 10B(lsb), little-endian, X=unused/undefined
+     AV_PIX_FMT_X2RGB10BE, ///< packed RGB 10:10:10, 30bpp, (msb)2X 10R 10G 10B(lsb), big-endian, X=unused/undefined
+     AV_PIX_FMT_NB         ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
+@@ -449,6 +453,7 @@ enum AVPixelFormat {
+ #define AV_PIX_FMT_P016       AV_PIX_FMT_NE(P016BE,  P016LE)
+ 
+ #define AV_PIX_FMT_Y210       AV_PIX_FMT_NE(Y210BE,  Y210LE)
++#define AV_PIX_FMT_Y410       AV_PIX_FMT_NE(Y410BE,  Y410LE)
+ #define AV_PIX_FMT_X2RGB10    AV_PIX_FMT_NE(X2RGB10BE, X2RGB10LE)
+ 
+ /**
+Index: jellyfin-ffmpeg/libswscale/input.c
+===================================================================
+--- libswscale/input.c
++++ libswscale/input.c
+@@ -573,6 +573,25 @@ static void y210le_Y_c(uint8_t *dst, con
+         AV_WN16(dst + i * 2, AV_RL16(src + i * 4) >> 6);
+ }
+ 
++static void XyuvToY_c(uint8_t *dst, const uint8_t *src, const uint8_t *unused1, const uint8_t *unused2,  int width,
++                      uint32_t *unused)
++{
++    int i;
++    for (i = 0; i < width; i++)
++        dst[i] = src[4 * i + 2];
++}
++
++static void XyuvToUV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused0, const uint8_t *src1,
++                       const uint8_t *src2, int width, uint32_t *unused)
++{
++    int i;
++    for (i = 0; i < width; i++) {
++        dstV[i] = src1[4 * i];
++        dstU[i] = src1[4 * i + 1];
++    }
++    av_assert1(src1 == src2);
++}
++
+ static void bswap16Y_c(uint8_t *_dst, const uint8_t *_src, const uint8_t *unused1, const uint8_t *unused2, int width,
+                        uint32_t *unused)
+ {
+@@ -1257,6 +1276,9 @@ av_cold void ff_sws_init_input_funcs(Sws
+     case AV_PIX_FMT_Y210LE:
+         c->chrToYV12 = y210le_UV_c;
+         break;
++    case AV_PIX_FMT_0YUV:
++        c->lumToYV12 = XyuvToY_c;
++        break;
+     }
+     if (c->chrSrcHSubSample) {
+         switch (srcFormat) {
+@@ -1708,6 +1730,9 @@ av_cold void ff_sws_init_input_funcs(Sws
+     case AV_PIX_FMT_Y210LE:
+         c->lumToYV12 = y210le_Y_c;
+         break;
++    case AV_PIX_FMT_0YUV:
++        c->lumToYV12 = XyuvToY_c;
++        break;
+     case AV_PIX_FMT_X2RGB10LE:
+         c->lumToYV12 =rgb30leToY_c;
+         break;
+Index: jellyfin-ffmpeg/libswscale/output.c
+===================================================================
+--- libswscale/output.c
++++ libswscale/output.c
+@@ -2492,6 +2492,53 @@ yuv2ya8_X_c(SwsContext *c, const int16_t
+ }
+ 
+ static void
++yuv2Xyuv_X_c(SwsContext *c, const int16_t *lumFilter,
++                 const int16_t **lumSrc, int lumFilterSize,
++                 const int16_t *chrFilter, const int16_t **chrUSrc,
++                 const int16_t **chrVSrc, int chrFilterSize,
++                 const int16_t **alpSrc, uint8_t *dest, int dstW, int y)
++{
++    int hasAlpha = !!alpSrc;
++    int i;
++
++    for (i = 0; i < dstW; i++) {
++        int j;
++        int A = 1 << 18;
++        int Y = 1 << 18;
++        int U = 1 << 18;
++        int V = 1 << 18;
++
++        for (j = 0; j < lumFilterSize; j++) {
++            Y += lumSrc[j][i]  * lumFilter[j];
++        }
++        for (j = 0; j < chrFilterSize; j++) {
++            U += chrUSrc[j][i] * chrFilter[j];
++            V += chrVSrc[j][i] * chrFilter[j];
++        }
++        if (hasAlpha)
++            for (j = 0; j < lumFilterSize; j++)
++                A += alpSrc[j][i] * lumFilter[j];
++        A >>= 19;
++        Y >>= 19;
++        U >>= 19;
++        V >>= 19;
++        A = hasAlpha ? A : 255;
++
++        if ((A | Y | U | V) & 0x100) {
++            A = av_clip_uint8(A);
++            Y = av_clip_uint8(Y);
++            U = av_clip_uint8(U);
++            V = av_clip_uint8(V);
++        }
++
++        dest[4*i]     = V;
++        dest[4*i + 1] = U;
++        dest[4*i + 2] = Y;
++        dest[4*i + 3] = A;
++    }
++}
++
++static void
+ yuv2ayuv64le_X_c(SwsContext *c, const int16_t *lumFilter,
+                  const int16_t **_lumSrc, int lumFilterSize,
+                  const int16_t *chrFilter, const int16_t **_chrUSrc,
+@@ -3033,6 +3080,9 @@ av_cold void ff_sws_init_output_funcs(Sw
+         *yuv2packed2 = yuv2ya16be_2_c;
+         *yuv2packedX = yuv2ya16be_X_c;
+         break;
++    case AV_PIX_FMT_0YUV:
++        *yuv2packedX = yuv2Xyuv_X_c;
++        break;
+     case AV_PIX_FMT_AYUV64LE:
+         *yuv2packedX = yuv2ayuv64le_X_c;
+         break;
+Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
+===================================================================
+--- libswscale/swscale_unscaled.c
++++ libswscale/swscale_unscaled.c
+@@ -403,6 +403,41 @@ static int yuyvToYuv422Wrapper(SwsContex
+     return srcSliceH;
+ }
+ 
++static void yuv444pTo0yuv(const uint8_t *src[], int srcStride[],
++                          uint8_t *dst, int dstStride, int srcSliceH, int width)
++{
++    int x, h, i;
++    for (h = 0; h < srcSliceH; h++) {
++        uint8_t *dest = dst + dstStride * h;
++
++        for (x = 0; x < width; x++) {
++            *dest++ = src[2][x];
++            *dest++ = src[1][x];
++            *dest++ = src[0][x];
++            *dest++ = 0xFF;
++        }
++
++        for (i = 0; i < 3; i++)
++            src[i] += srcStride[i];
++    }
++}
++
++
++static int yuv444pTo0yuvWrapper(SwsContext *c, const uint8_t *src[],
++                                int srcStride[], int srcSliceY, int srcSliceH,
++                                uint8_t *dstParam[], int dstStride[])
++{
++    uint8_t *dst = dstParam[0] + dstStride[0] * srcSliceY;
++
++    const uint8_t *source[] = { src[0], src[1], src[2] };
++    int stride[] = { srcStride[0], srcStride[1], srcStride[2] };
++
++    yuv444pTo0yuv(source, stride, dst + srcSliceY * dstStride[0], dstStride[0],
++                  srcSliceH, c->srcW);
++
++    return srcSliceH;
++}
++
+ static int uyvyToYuv420Wrapper(SwsContext *c, const uint8_t *src[],
+                                int srcStride[], int srcSliceY, int srcSliceH,
+                                uint8_t *dstParam[], int dstStride[])
+@@ -2170,6 +2205,11 @@ void ff_get_unscaled_swscale(SwsContext
+             c->swscale = yuv422pToUyvyWrapper;
+     }
+ 
++    if (srcFormat == AV_PIX_FMT_YUV444P) {
++        if (dstFormat == AV_PIX_FMT_0YUV)
++            c->swscale = yuv444pTo0yuvWrapper;
++    }
++
+     /* uint Y to float Y */
+     if (srcFormat == AV_PIX_FMT_GRAY8 && dstFormat == AV_PIX_FMT_GRAYF32){
+         c->swscale = uint_y_to_float_y_wrapper;
+Index: jellyfin-ffmpeg/libswscale/utils.c
+===================================================================
+--- libswscale/utils.c
++++ libswscale/utils.c
+@@ -271,6 +271,7 @@ static const FormatEntry format_entries[
+     [AV_PIX_FMT_NV24]        = { 1, 1 },
+     [AV_PIX_FMT_NV42]        = { 1, 1 },
+     [AV_PIX_FMT_Y210LE]      = { 1, 0 },
++    [AV_PIX_FMT_0YUV]        = { 1, 1 },
+     [AV_PIX_FMT_X2RGB10LE]   = { 1, 1 },
+ };
+ 

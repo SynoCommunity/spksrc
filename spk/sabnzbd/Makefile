@@ -7,8 +7,6 @@ BUILD_DEPENDS = cross/python310
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
 SPK_DEPENDS = "python310"
 
-# To generate full requirements.txt, extend SABnzbd's own
-# requirements.txt with the depedencies of cherrypy and cheroot
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre

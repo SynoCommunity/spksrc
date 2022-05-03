@@ -211,8 +211,8 @@ endif
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
-	@echo '{}' > $@
 	@$(MSG) "Creating $@"
+	@echo '{}' > $@
 ifneq ($(strip $(SERVICE_PORT)),)
 	@jq '."port-config"."protocol-file" = "$(DSM_UI_DIR)/$(SPK_NAME).sc"' $@ | sponge $@
 endif
@@ -388,17 +388,12 @@ else
 endif
 	@echo "port_forward=\"yes\"" >> $@
 	@echo "dst.ports=\"${SERVICE_PORT}/tcp\"" >> $@
-ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
-SPK_CONTENT += conf
-endif
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 else
 $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
 	@$(dsm_resource_copy)
-ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
-SPK_CONTENT += conf
-endif
+
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 

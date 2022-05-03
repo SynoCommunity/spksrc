@@ -1,5 +1,5 @@
 PKG_NAME = boost
-PKG_VERS = 1.66.0
+PKG_VERS = 1.78.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
@@ -38,19 +38,27 @@ space:= $(empty) $(empty)
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
 
+ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations
+
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
-ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
-ADDITIONAL_CXXFLAGS = -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
+ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
+endif
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# fix compilation with newer compilers
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
+endif
+
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+ADDRESS_MODEL = 64
+else
+ADDRESS_MODEL = 32
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
-ADDRESS_MODEL = 32
-ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
-ADDRESS_MODEL = 64
-endif
-
 
 .PHONY: boost_configure
 boost_configure:

@@ -86,7 +86,7 @@ all-supported:
 	  if [ "$${depend%/*}" = "native" ]; then \
 	    $(MSG) "Pre-processing $${depend}" ; \
 	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
-	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee build-$${depend%/*}-$${depend#*/}.log ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
 	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  fi ; \
 	done ; \
@@ -94,7 +94,7 @@ all-supported:
 
 supported-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee build-$*.log
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
 
 cross-cc_msg:
 ifneq ($(filter 1 on ON,$(PSTAT)),)
@@ -111,7 +111,7 @@ build-arch-%: cross-cc_msg
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] >> $(PSTAT_LOG)
 endif
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee build-$*.log ; \
+	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG)

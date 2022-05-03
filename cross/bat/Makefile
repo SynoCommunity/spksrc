@@ -2,7 +2,7 @@ PKG_NAME = bat
 PKG_VERS = 0.18.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/sharkdp/bat/archive/refs/tags
+PKG_DIST_SITE = https://github.com/sharkdp/bat/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 

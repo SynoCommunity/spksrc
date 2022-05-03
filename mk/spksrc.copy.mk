@@ -38,13 +38,25 @@ endif
 copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
 	@rm -fr $(STAGING_DIR)
-	@mkdir $(STAGING_DIR)
 
 pre_copy_target: copy_msg
 
+copy_target: SHELL:=/bin/bash
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
-	(cd $(INSTALL_DIR)/$(INSTALL_PREFIX) && tar cpf - `cat $(INSTALL_PLIST) | cut -d':' -f2`) | \
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@$(MSG) [DSM7+] Copy target to staging, discard var directory
+	@(mkdir -p $(STAGING_DIR) && cd $(STAGING_INSTALL_PREFIX) && tar cpf - $$(cat $(INSTALL_PLIST) | sed -e '/^.*:var\/.*/d' -e 's/^.*://g')) | \
 	  tar xpf - -C $(STAGING_DIR)
+	@$(MSG) "[DSM7+] Copy and merge var and target/var to $(STAGING_DIR)/var"
+	@if [ "$$(cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p')" ] ; then \
+	  mkdir -p $(STAGING_DIR)/var ; \
+	  (cd $(STAGING_INSTALL_PREFIX)/../ && tar cpf - $$(eval ls -d $$(cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p' | sed -e 's?^?{var,target/var}/?') 2>/dev/null)) | \
+	    tar xpf - -C $(STAGING_DIR)/var --strip-components=1 --transform='s!^target/!!' ; \
+	fi
+else
+	@$(MSG) Copy target to staging [DSM6]
+	@(mkdir -p $(STAGING_DIR) && cd $(STAGING_INSTALL_PREFIX) && tar cpf - $$(cat $(INSTALL_PLIST) | cut -d':' -f2)) | tar xpf - -C $(STAGING_DIR)
+endif
 
 post_copy_target: $(COPY_TARGET)
 
@@ -62,8 +74,11 @@ ifeq ($(strip $(PLIST_TRANSFORM)),)
 PLIST_TRANSFORM= cat
 endif
 
+# If we require kernel but NOT building kernel modules
 ifeq ($(strip $(REQUIRE_KERNEL)),1)
+ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 DEPENDS += kernel/syno-$(TC_ARCH)-$(TC_VERS)
+endif
 endif
 
 $(INSTALL_PLIST):

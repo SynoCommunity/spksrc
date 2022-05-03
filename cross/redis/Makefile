@@ -1,5 +1,5 @@
 PKG_NAME = redis
-PKG_VERS = 5.0.14
+PKG_VERS = 6.2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.redis.io/releases
@@ -33,8 +33,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: redis_patch_makefile_to_use_atomic_library
 redis_patch_makefile_to_use_atomic_library:
-	$(RUN) sed -i 's/^FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $(WORK_DIR)/$(PKG_DIR)/src/Makefile
+	@$(RUN) sed -i 's/^FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $(WORK_DIR)/$(PKG_DIR)/src/Makefile
 
 .PHONY: redis_install
 redis_install:
-	$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)
+	@$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)

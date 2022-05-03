@@ -1,11 +1,11 @@
 PKG_NAME = git
-PKG_VERS = 2.34.1
+PKG_VERS = 2.35.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://kernel.org/pub/software/scm/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/expat cross/zlib cross/openssl cross/libssh2 cross/curl
+DEPENDS = cross/libexpat cross/zlib cross/openssl cross/libssh2 cross/curl
 
 HOMEPAGE = https://git-scm.com
 COMMENT  = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
@@ -16,6 +16,11 @@ CONFIGURE_ARGS  = --without-tcltk --without-python
 CONFIGURE_ARGS += ac_cv_fread_reads_directories=yes
 CONFIGURE_ARGS += ac_cv_snprintf_returns_bogus=no
 CONFIGURE_ARGS += ac_cv_iconv_omits_bom=no
+
+# git (since version 2.35.0) requires C99 support (such as -std=c99, -std=gnu99, -std=c11 or -std=gnu11)
+# builds with -std=c99 do not run on 32 bit arm and ppc archs ("fatal: Cannot handle files this big")
+ADDITIONAL_CPPFLAGS  = -std=gnu99
+ADDITIONAL_CPPFLAGS += -O
 
 PRE_CONFIGURE_TARGET = git_pre_configure
 INSTALL_TARGET = git_install

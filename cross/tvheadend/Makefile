@@ -1,8 +1,8 @@
 PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
-# git hash from November 21th 2021
-PKG_GIT_HASH = b8710206eb073c72b142bce95846b77a0ffa34a6
+# git hash from April 14th 2022
+PKG_GIT_HASH = 26713c1e451a74dbcc7aaec8427c0356cc2c546f
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -47,7 +47,7 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 CONFIGURE_ARGS += --nowerror
 endif
 

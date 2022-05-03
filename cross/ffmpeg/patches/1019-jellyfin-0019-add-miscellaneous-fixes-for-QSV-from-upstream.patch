@@ -1,0 +1,631 @@
+Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
+===================================================================
+--- libavcodec/qsv_internal.h
++++ libavcodec/qsv_internal.h
+@@ -52,6 +52,8 @@
+ 
+ #define QSV_MAX_ENC_PAYLOAD 2       // # of mfxEncodeCtrl payloads supported
+ 
++#define QSV_PAYLOAD_SIZE 1024
++
+ #define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
+     (MFX_VERSION_MAJOR > (MAJOR) ||         \
+      MFX_VERSION_MAJOR == (MAJOR) && MFX_VERSION_MINOR >= (MINOR))
+Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
+===================================================================
+--- libavcodec/qsvdec.c
++++ libavcodec/qsvdec.c
+@@ -38,14 +38,27 @@
+ #include "libavutil/pixfmt.h"
+ #include "libavutil/time.h"
+ #include "libavutil/imgutils.h"
++#include "libavutil/stereo3d.h"
+ 
+ #include "avcodec.h"
+ #include "internal.h"
+ #include "decode.h"
+ #include "hwconfig.h"
++#include "get_bits.h"
+ #include "qsv.h"
++#include "h264_sei.h"
+ #include "qsv_internal.h"
+ 
++static const AVRational mfx_tb = { 1, 90000 };
++
++#define PTS_TO_MFX_PTS(pts, pts_tb) ((pts) == AV_NOPTS_VALUE ? \
++    MFX_TIMESTAMP_UNKNOWN : pts_tb.num ? \
++    av_rescale_q(pts, pts_tb, mfx_tb) : pts)
++
++#define MFX_PTS_TO_PTS(mfx_pts, pts_tb) ((mfx_pts) == MFX_TIMESTAMP_UNKNOWN ? \
++    AV_NOPTS_VALUE : pts_tb.num ? \
++    av_rescale_q(mfx_pts, mfx_tb, pts_tb) : mfx_pts)
++
+ typedef struct QSVContext {
+     // the session used for decoding
+     mfxSession session;
+@@ -63,14 +76,13 @@ typedef struct QSVContext {
+ 
+     AVFifoBuffer *async_fifo;
+     int zero_consume_run;
+-    int buffered_count;
+     int reinit_flag;
+ 
+     enum AVPixelFormat orig_pix_fmt;
+     uint32_t fourcc;
+     mfxFrameInfo frame_info;
+     AVBufferPool *pool;
+-
++    int suggest_pool_size;
+     int initialized;
+ 
+     // options set by the caller
+@@ -80,8 +92,13 @@ typedef struct QSVContext {
+ 
+     char *load_plugins;
+ 
++    mfxPayload payload;
++
+     mfxExtBuffer **ext_buffers;
+     int         nb_ext_buffers;
++
++    H264SEIContext sei;
++    H264ParamSets ps;
+ } QSVContext;
+ 
+ static const AVCodecHWConfigInternal *const qsv_hw_configs[] = {
+@@ -218,6 +235,8 @@ static int qsv_decode_preinit(AVCodecCon
+         pix_fmt,        /* system memory format obtained from bitstream parser */
+         AV_PIX_FMT_NONE };
+ 
++    av_buffer_unref(&q->frames_ctx.mids_buf);
++    av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+     ret = ff_get_format(avctx, pix_fmts);
+     if (ret < 0) {
+         q->orig_pix_fmt = avctx->pix_fmt = AV_PIX_FMT_NONE;
+@@ -255,7 +274,7 @@ static int qsv_decode_preinit(AVCodecCon
+         hwframes_ctx->height            = FFALIGN(avctx->coded_height, 32);
+         hwframes_ctx->format            = AV_PIX_FMT_QSV;
+         hwframes_ctx->sw_format         = avctx->sw_pix_fmt;
+-        hwframes_ctx->initial_pool_size = 64 + avctx->extra_hw_frames;
++        hwframes_ctx->initial_pool_size = q->suggest_pool_size + 16 + avctx->extra_hw_frames;
+         frames_hwctx->frame_type        = MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
+ 
+         ret = av_hwframe_ctx_init(avctx->hw_frames_ctx);
+@@ -330,14 +349,15 @@ static int qsv_decode_header(AVCodecCont
+                              mfxVideoParam *param)
+ {
+     int ret;
+-
++    mfxExtVideoSignalInfo video_signal_info = { 0 };
++    mfxExtBuffer *header_ext_params[1] = { (mfxExtBuffer *)&video_signal_info };
+     mfxBitstream bs = { 0 };
+ 
+     if (avpkt->size) {
+         bs.Data       = avpkt->data;
+         bs.DataLength = avpkt->size;
+         bs.MaxLength  = bs.DataLength;
+-        bs.TimeStamp  = avpkt->pts;
++        bs.TimeStamp  = PTS_TO_MFX_PTS(avpkt->pts, avctx->pkt_timebase);
+         if (avctx->field_order == AV_FIELD_PROGRESSIVE)
+             bs.DataFlag   |= MFX_BITSTREAM_COMPLETE_FRAME;
+     } else
+@@ -355,6 +375,12 @@ static int qsv_decode_header(AVCodecCont
+         return ret;
+ 
+     param->mfx.CodecId = ret;
++    video_signal_info.Header.BufferId = MFX_EXTBUFF_VIDEO_SIGNAL_INFO;
++    video_signal_info.Header.BufferSz = sizeof(video_signal_info);
++    // The SDK doesn't support other ext buffers when calling MFXVideoDECODE_DecodeHeader,
++    // so do not append this buffer to the existent buffer array
++    param->ExtParam    = header_ext_params;
++    param->NumExtParam = 1;
+     ret = MFXVideoDECODE_DecodeHeader(q->session, &bs, param);
+     if (MFX_ERR_MORE_DATA == ret) {
+        return AVERROR(EAGAIN);
+@@ -363,6 +389,17 @@ static int qsv_decode_header(AVCodecCont
+         return ff_qsv_print_error(avctx, ret,
+                 "Error decoding stream header");
+ 
++    avctx->color_range = video_signal_info.VideoFullRange ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
++
++    if (video_signal_info.ColourDescriptionPresent) {
++        avctx->color_primaries = video_signal_info.ColourPrimaries;
++        avctx->color_trc = video_signal_info.TransferCharacteristics;
++        avctx->colorspace = video_signal_info.MatrixCoefficients;
++    }
++
++    param->ExtParam    = q->ext_buffers;
++    param->NumExtParam = q->nb_ext_buffers;
++
+     return 0;
+ }
+ 
+@@ -381,13 +418,13 @@ static int alloc_frame(AVCodecContext *a
+     if (frame->frame->format == AV_PIX_FMT_QSV) {
+         frame->surface = *(mfxFrameSurface1*)frame->frame->data[3];
+     } else {
+-        frame->surface.Info = q->frame_info;
+-
+         frame->surface.Data.PitchLow = frame->frame->linesize[0];
+         frame->surface.Data.Y        = frame->frame->data[0];
+         frame->surface.Data.UV       = frame->frame->data[1];
+     }
+ 
++    frame->surface.Info = q->frame_info;
++
+     if (q->frames_ctx.mids) {
+         ret = ff_qsv_find_surface_idx(&q->frames_ctx, frame);
+         if (ret < 0)
+@@ -470,6 +507,147 @@ static QSVFrame *find_frame(QSVContext *
+     return NULL;
+ }
+ 
++static int h264_decode_fpa(H264SEIFramePacking *fpa, AVFrame *frame)
++{
++    if (!fpa || !frame) {
++        return AVERROR(EINVAL);
++    }
++
++    if (!fpa->arrangement_cancel_flag &&
++        fpa->arrangement_type <= 6 &&
++        fpa->content_interpretation_type > 0 &&
++        fpa->content_interpretation_type < 3) {
++        AVStereo3D *stereo = av_stereo3d_create_side_data(frame);
++        if (stereo) {
++            switch (fpa->arrangement_type) {
++            case 0:
++                stereo->type = AV_STEREO3D_CHECKERBOARD;
++                break;
++            case 1:
++                stereo->type = AV_STEREO3D_COLUMNS;
++                break;
++            case 2:
++                stereo->type = AV_STEREO3D_LINES;
++                break;
++            case 3:
++                if (fpa->quincunx_sampling_flag)
++                    stereo->type = AV_STEREO3D_SIDEBYSIDE_QUINCUNX;
++                else
++                    stereo->type = AV_STEREO3D_SIDEBYSIDE;
++                break;
++            case 4:
++                stereo->type = AV_STEREO3D_TOPBOTTOM;
++                break;
++            case 5:
++                stereo->type = AV_STEREO3D_FRAMESEQUENCE;
++                if (fpa->current_frame_is_frame0_flag)
++                    stereo->view = AV_STEREO3D_VIEW_LEFT;
++                else
++                    stereo->view = AV_STEREO3D_VIEW_RIGHT;
++                break;
++            case 6:
++                stereo->type = AV_STEREO3D_2D;
++                break;
++            }
++
++            if (fpa->content_interpretation_type == 2)
++                stereo->flags = AV_STEREO3D_FLAG_INVERT;
++        }
++    }
++    return 0;
++}
++
++static int h264_parse_side_data(AVCodecContext *avctx, QSVContext *q, AVFrame *frame)
++{
++    GetBitContext gb_payload;
++    uint8_t *sei_buffer;
++    int sei_buffer_index;
++    int ret;
++
++    /* remove emulation prevention bytes */
++    sei_buffer = (uint8_t *)av_mallocz(q->payload.NumBit / 8);
++    if (!sei_buffer) {
++        av_freep(&sei_buffer);
++        return AVERROR(ENOMEM);
++    }
++    sei_buffer_index = 0;
++    for (int i = 0; i < q->payload.NumBit / 8; i++) {
++        if (q->payload.Data[i] == 3)
++            i++;
++        sei_buffer[sei_buffer_index] = q->payload.Data[i];
++        sei_buffer_index += 1;
++    }
++
++    ret = init_get_bits8(&gb_payload, sei_buffer, sei_buffer_index+1);
++    if (ret < 0) {
++        av_freep(&sei_buffer);
++        return ret;
++    }
++
++    ret = ff_h264_sei_decode(&q->sei, &gb_payload, &q->ps, avctx);
++    if (ret < 0) {
++        av_freep(&sei_buffer);
++        return ret;
++    }
++
++    switch (q->payload.Type) {
++    case SEI_TYPE_FRAME_PACKING_ARRANGEMENT:
++        ret = h264_decode_fpa(&q->sei.frame_packing, frame);
++        break;
++    default:
++        break;
++    }
++
++    av_freep(&sei_buffer);
++    return ret;
++}
++
++static int extract_frame_side_data(AVCodecContext *avctx, QSVContext *q, AVFrame *frame)
++{
++    mfxU64 ts;
++    mfxStatus sts;
++    int ret;
++
++    if (q->payload.BufSize == 0) {
++        q->payload.Data = av_mallocz(QSV_PAYLOAD_SIZE);
++        if (!q->payload.Data) {
++            av_freep(&q->payload.Data);
++            return AVERROR(ENOMEM);
++        }
++        q->payload.BufSize = QSV_PAYLOAD_SIZE;
++    }
++
++    sts = MFX_ERR_NONE;
++    while (sts == MFX_ERR_NONE) {
++
++        sts = MFXVideoDECODE_GetPayload(q->session, &ts, &q->payload);
++
++        if (sts == MFX_ERR_NOT_ENOUGH_BUFFER) {
++            av_log(avctx, AV_LOG_DEBUG, "Space for SEI is not enough. One SEI will be skipped\n");
++            continue;
++        } else if (sts != MFX_ERR_NONE || q->payload.NumBit == 0) {
++            break;
++        }
++
++        if (q->payload.Type != SEI_TYPE_FRAME_PACKING_ARRANGEMENT)
++            continue;
++
++        switch (avctx->codec_id) {
++        case AV_CODEC_ID_H264:
++            ret = h264_parse_side_data(avctx, q, frame);
++            break;
++        default:
++            break;
++        }
++
++        if (ret < 0) {
++            av_log(avctx, AV_LOG_WARNING, "parse side data failed\n");
++            break;
++        }
++    }
++    return ret;
++}
++
+ static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
+                       AVFrame *frame, int *got_frame,
+                       const AVPacket *avpkt)
+@@ -485,7 +663,7 @@ static int qsv_decode(AVCodecContext *av
+         bs.Data       = avpkt->data;
+         bs.DataLength = avpkt->size;
+         bs.MaxLength  = bs.DataLength;
+-        bs.TimeStamp  = avpkt->pts;
++        bs.TimeStamp  = PTS_TO_MFX_PTS(avpkt->pts, avctx->pkt_timebase);
+         if (avctx->field_order == AV_FIELD_PROGRESSIVE)
+             bs.DataFlag   |= MFX_BITSTREAM_COMPLETE_FRAME;
+     }
+@@ -510,6 +688,13 @@ static int qsv_decode(AVCodecContext *av
+ 
+     } while (ret == MFX_WRN_DEVICE_BUSY || ret == MFX_ERR_MORE_SURFACE);
+ 
++    if (ret == MFX_ERR_INCOMPATIBLE_VIDEO_PARAM) {
++        q->reinit_flag = 1;
++        av_log(avctx, AV_LOG_DEBUG, "Video parameter change\n");
++        av_freep(&sync);
++        return 0;
++    }
++
+     if (ret != MFX_ERR_NONE &&
+         ret != MFX_ERR_MORE_DATA &&
+         ret != MFX_WRN_VIDEO_PARAM_CHANGED &&
+@@ -526,8 +711,6 @@ static int qsv_decode(AVCodecContext *av
+         ++q->zero_consume_run;
+         if (q->zero_consume_run > 1)
+             ff_qsv_print_warning(avctx, ret, "A decode call did not consume any data");
+-    } else if (!*sync && bs.DataOffset) {
+-        ++q->buffered_count;
+     } else {
+         q->zero_consume_run = 0;
+     }
+@@ -542,7 +725,7 @@ static int qsv_decode(AVCodecContext *av
+             return AVERROR_BUG;
+         }
+ 
+-        out_frame->queued = 1;
++        out_frame->queued += 1;
+         av_fifo_generic_write(q->async_fifo, &out_frame, sizeof(out_frame), NULL);
+         av_fifo_generic_write(q->async_fifo, &sync,      sizeof(sync),      NULL);
+     } else {
+@@ -555,7 +738,7 @@ static int qsv_decode(AVCodecContext *av
+ 
+         av_fifo_generic_read(q->async_fifo, &out_frame, sizeof(out_frame), NULL);
+         av_fifo_generic_read(q->async_fifo, &sync,      sizeof(sync),      NULL);
+-        out_frame->queued = 0;
++        out_frame->queued -= 1;
+ 
+         if (avctx->pix_fmt != AV_PIX_FMT_QSV) {
+             do {
+@@ -573,12 +756,16 @@ static int qsv_decode(AVCodecContext *av
+ 
+         outsurf = &out_frame->surface;
+ 
++        ret = extract_frame_side_data(avctx, q, frame);
++        if (ret < 0)
++            av_log(avctx, AV_LOG_WARNING, "Extracting side from packet failed\n");
++
+ #if FF_API_PKT_PTS
+ FF_DISABLE_DEPRECATION_WARNINGS
+         frame->pkt_pts = outsurf->Data.TimeStamp;
+ FF_ENABLE_DEPRECATION_WARNINGS
+ #endif
+-        frame->pts = outsurf->Data.TimeStamp;
++        frame->pts = MFX_PTS_TO_PTS(outsurf->Data.TimeStamp, avctx->pkt_timebase);
+ 
+         frame->repeat_pict =
+             outsurf->Info.PicStruct & MFX_PICSTRUCT_FRAME_TRIPLING ? 4 :
+@@ -635,6 +822,8 @@ static void qsv_decode_close_qsvcontext(
+     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+     av_buffer_unref(&q->frames_ctx.mids_buf);
+     av_buffer_pool_uninit(&q->pool);
++
++    av_freep(&q->payload.Data);
+ }
+ 
+ static int qsv_process_data(AVCodecContext *avctx, QSVContext *q,
+@@ -659,26 +848,37 @@ static int qsv_process_data(AVCodecConte
+     if (!avctx->coded_height)
+         avctx->coded_height = 720;
+ 
+-    ret = qsv_decode_header(avctx, q, pkt, pix_fmt, &param);
+-
+-    if (ret >= 0 && (q->orig_pix_fmt != ff_qsv_map_fourcc(param.mfx.FrameInfo.FourCC) ||
+-        avctx->coded_width  != param.mfx.FrameInfo.Width ||
+-        avctx->coded_height != param.mfx.FrameInfo.Height)) {
++    /* decode zero-size pkt to flush the buffered pkt before reinit */
++    if (q->reinit_flag) {
+         AVPacket zero_pkt = {0};
++        ret = qsv_decode(avctx, q, frame, got_frame, &zero_pkt);
++        if (ret < 0 || *got_frame)
++            return ret;
++    }
++
++    if (q->reinit_flag || !q->session) {
++        mfxFrameAllocRequest request;
++        memset(&request, 0, sizeof(request));
+ 
+-        if (q->buffered_count) {
+-            q->reinit_flag = 1;
+-            /* decode zero-size pkt to flush the buffered pkt before reinit */
+-            q->buffered_count--;
+-            return qsv_decode(avctx, q, frame, got_frame, &zero_pkt);
+-        }
+         q->reinit_flag = 0;
++        ret = qsv_decode_header(avctx, q, pkt, pix_fmt, &param);
++        if (ret < 0) {
++            av_log(avctx, AV_LOG_ERROR, "Error decoding header\n");
++            goto reinit_fail;
++        }
++        param.IOPattern = q->iopattern;
+ 
+         q->orig_pix_fmt = avctx->pix_fmt = pix_fmt = ff_qsv_map_fourcc(param.mfx.FrameInfo.FourCC);
+ 
+         avctx->coded_width  = param.mfx.FrameInfo.Width;
+         avctx->coded_height = param.mfx.FrameInfo.Height;
+ 
++        ret = MFXVideoDECODE_QueryIOSurf(q->session, &param, &request);
++        if (ret < 0)
++            return ff_qsv_print_error(avctx, ret, "Error querying IO surface");
++
++        q->suggest_pool_size = request.NumFrameSuggested;
++
+         ret = qsv_decode_preinit(avctx, q, pix_fmt, &param);
+         if (ret < 0)
+             goto reinit_fail;
+@@ -782,6 +982,9 @@ static av_cold int qsv_decode_init(AVCod
+         goto fail;
+     }
+ 
++    if (!avctx->pkt_timebase.num)
++        av_log(avctx, AV_LOG_WARNING, "Invalid pkt_timebase, passing timestamps as-is.\n");
++
+     return 0;
+ fail:
+     qsv_decode_close(avctx);
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -448,7 +448,7 @@ static int init_video_param_jpeg(AVCodec
+     q->param.mfx.FrameInfo.ChromaFormat   = MFX_CHROMAFORMAT_YUV420;
+     q->param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
+     q->param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
+-    q->param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
++    q->param.mfx.FrameInfo.Shift          = desc->comp[0].shift > 0;
+ 
+     q->param.mfx.FrameInfo.Width  = FFALIGN(avctx->width, 16);
+     q->param.mfx.FrameInfo.Height = FFALIGN(avctx->height, 16);
+@@ -510,7 +510,7 @@ static int init_video_param(AVCodecConte
+         }
+     }
+ 
+-    if (q->low_power) {
++    if (q->low_power == 1) {
+ #if QSV_HAVE_VDENC
+         q->param.mfx.LowPower = MFX_CODINGOPTION_ON;
+ #else
+@@ -519,7 +519,9 @@ static int init_video_param(AVCodecConte
+         q->low_power = 0;
+         q->param.mfx.LowPower = MFX_CODINGOPTION_OFF;
+ #endif
+-    } else
++    } else if (q->low_power == -1)
++        q->param.mfx.LowPower = MFX_CODINGOPTION_UNKNOWN;
++    else
+         q->param.mfx.LowPower = MFX_CODINGOPTION_OFF;
+ 
+     q->param.mfx.CodecProfile       = q->profile;
+@@ -527,7 +529,7 @@ static int init_video_param(AVCodecConte
+     q->param.mfx.GopPicSize         = FFMAX(0, avctx->gop_size);
+     q->param.mfx.GopRefDist         = FFMAX(-1, avctx->max_b_frames) + 1;
+     q->param.mfx.GopOptFlag         = avctx->flags & AV_CODEC_FLAG_CLOSED_GOP ?
+-                                      MFX_GOP_CLOSED : 0;
++                                      MFX_GOP_CLOSED : MFX_GOP_STRICT;
+     q->param.mfx.IdrInterval        = q->idr_interval;
+     q->param.mfx.NumSlice           = avctx->slices;
+     q->param.mfx.NumRefFrame        = FFMAX(0, avctx->refs);
+@@ -550,7 +552,7 @@ static int init_video_param(AVCodecConte
+                                             !desc->log2_chroma_w + !desc->log2_chroma_h;
+     q->param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
+     q->param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
+-    q->param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
++    q->param.mfx.FrameInfo.Shift          = desc->comp[0].shift > 0;
+ 
+     // If the minor version is greater than or equal to 19,
+     // then can use the same alignment settings as H.264 for HEVC
+@@ -646,7 +648,7 @@ static int init_video_param(AVCodecConte
+     case MFX_RATECONTROL_LA_ICQ:
+         q->extco2.LookAheadDepth = q->look_ahead_depth;
+     case MFX_RATECONTROL_ICQ:
+-        q->param.mfx.ICQQuality  = avctx->global_quality;
++        q->param.mfx.ICQQuality  = av_clip(avctx->global_quality, 1, 51);
+         break;
+ #endif
+ #endif
+@@ -804,6 +806,24 @@ FF_ENABLE_DEPRECATION_WARNINGS
+     }
+ #endif
+ 
++    q->extvsi.VideoFullRange = (avctx->color_range == AVCOL_RANGE_JPEG);
++    q->extvsi.ColourDescriptionPresent = 0;
++
++    if (avctx->color_primaries != AVCOL_PRI_UNSPECIFIED ||
++        avctx->color_trc != AVCOL_TRC_UNSPECIFIED ||
++        avctx->colorspace != AVCOL_SPC_UNSPECIFIED) {
++        q->extvsi.ColourDescriptionPresent = 1;
++        q->extvsi.ColourPrimaries = avctx->color_primaries;
++        q->extvsi.TransferCharacteristics = avctx->color_trc;
++        q->extvsi.MatrixCoefficients = avctx->colorspace;
++    }
++
++    if (q->extvsi.VideoFullRange || q->extvsi.ColourDescriptionPresent) {
++        q->extvsi.Header.BufferId = MFX_EXTBUFF_VIDEO_SIGNAL_INFO;
++        q->extvsi.Header.BufferSz = sizeof(q->extvsi);
++        q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->extvsi;
++    }
++
+     if (!check_enc_param(avctx,q)) {
+         av_log(avctx, AV_LOG_ERROR,
+                "some encoding parameters are not supported by the QSV "
+@@ -1250,6 +1270,8 @@ static void clear_unused_frames(QSVEncCo
+     while (cur) {
+         if (cur->used && !cur->surface.Data.Locked) {
+             free_encoder_ctrl_payloads(&cur->enc_ctrl);
++            //do not reuse enc_ctrl from previous frame
++            memset(&cur->enc_ctrl, 0, sizeof(cur->enc_ctrl));
+             if (cur->frame->format == AV_PIX_FMT_QSV) {
+                 av_frame_unref(cur->frame);
+             }
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.h
+===================================================================
+--- libavcodec/qsvenc.h
++++ libavcodec/qsvenc.h
+@@ -96,7 +96,7 @@
+ { "adaptive_b",     "Adaptive B-frame placement",             OFFSET(qsv.adaptive_b),     AV_OPT_TYPE_INT, { .i64 = -1 }, -1,          1, VE },                         \
+ { "b_strategy",     "Strategy to choose between I/P/B-frames", OFFSET(qsv.b_strategy),    AV_OPT_TYPE_INT, { .i64 = -1 }, -1,          1, VE },                         \
+ { "forced_idr",     "Forcing I frames as IDR frames",         OFFSET(qsv.forced_idr),     AV_OPT_TYPE_BOOL,{ .i64 = 0  },  0,          1, VE },                         \
+-{ "low_power", "enable low power mode(experimental: many limitations by mfx version, BRC modes, etc.)", OFFSET(qsv.low_power), AV_OPT_TYPE_BOOL, { .i64 = 0}, 0, 1, VE},\
++{ "low_power", "enable low power mode(experimental: many limitations by mfx version, BRC modes, etc.)", OFFSET(qsv.low_power), AV_OPT_TYPE_BOOL, { .i64 = -1}, -1, 1, VE},\
+ 
+ extern const AVCodecHWConfigInternal *const ff_qsv_enc_hw_configs[];
+ 
+@@ -139,7 +139,9 @@ typedef struct QSVEncContext {
+     mfxFrameSurface1       **opaque_surfaces;
+     AVBufferRef             *opaque_alloc_buf;
+ 
+-    mfxExtBuffer  *extparam_internal[2 + QSV_HAVE_CO2 + QSV_HAVE_CO3 + (QSV_HAVE_MF * 2)];
++    mfxExtVideoSignalInfo extvsi;
++
++    mfxExtBuffer  *extparam_internal[3 + QSV_HAVE_CO2 + QSV_HAVE_CO3 + (QSV_HAVE_MF * 2)];
+     int         nb_extparam_internal;
+ 
+     mfxExtBuffer **extparam;
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -488,9 +488,6 @@ static QSVFrame *query_frame(QSVVPPConte
+         if (!out_frame->frame)
+             return NULL;
+ 
+-        out_frame->frame->width  = outlink->w;
+-        out_frame->frame->height = outlink->h;
+-
+         ret = map_frame_to_surface(out_frame->frame,
+                                   &out_frame->surface_internal);
+         if (ret < 0)
+@@ -499,6 +496,8 @@ static QSVFrame *query_frame(QSVVPPConte
+         out_frame->surface = &out_frame->surface_internal;
+     }
+ 
++    out_frame->frame->width  = outlink->w;
++    out_frame->frame->height = outlink->h;
+     out_frame->surface->Info = s->vpp_param.vpp.Out;
+ 
+     return out_frame;
+Index: jellyfin-ffmpeg/libavfilter/vf_scale_qsv.c
+===================================================================
+--- libavfilter/vf_scale_qsv.c
++++ libavfilter/vf_scale_qsv.c
+@@ -275,7 +275,7 @@ static mfxStatus frame_get_hdl(mfxHDL pt
+     return MFX_ERR_NONE;
+ }
+ 
+-static int init_out_session(AVFilterContext *ctx)
++static int init_out_session(AVFilterContext *ctx, int in_width, int in_height)
+ {
+ 
+     QSVScaleContext                   *s = ctx->priv;
+@@ -392,8 +392,11 @@ static int init_out_session(AVFilterCont
+                                          sizeof(*s->mem_ids_in));
+         if (!s->mem_ids_in)
+             return AVERROR(ENOMEM);
+-        for (i = 0; i < in_frames_hwctx->nb_surfaces; i++)
++        for (i = 0; i < in_frames_hwctx->nb_surfaces; i++) {
+             s->mem_ids_in[i] = in_frames_hwctx->surfaces[i].Data.MemId;
++            in_frames_hwctx->surfaces[i].Info.CropW = in_width;
++            in_frames_hwctx->surfaces[i].Info.CropH = in_height;
++        }
+         s->nb_mem_ids_in = in_frames_hwctx->nb_surfaces;
+ 
+         s->mem_ids_out = av_mallocz_array(out_frames_hwctx->nb_surfaces,
+@@ -465,7 +468,7 @@ static int init_scale_session(AVFilterCo
+     if (ret < 0)
+         return ret;
+ 
+-    ret = init_out_session(ctx);
++    ret = init_out_session(ctx, in_width, in_height);
+     if (ret < 0)
+         return ret;
+ 
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -404,7 +404,7 @@ static int qsv_init_surface(AVHWFramesCo
+ 
+     surf->Info.BitDepthLuma   = desc->comp[0].depth;
+     surf->Info.BitDepthChroma = desc->comp[0].depth;
+-    surf->Info.Shift          = desc->comp[0].depth > 8;
++    surf->Info.Shift          = desc->comp[0].shift > 0;
+ 
+     if (desc->log2_chroma_w && desc->log2_chroma_h)
+         surf->Info.ChromaFormat   = MFX_CHROMAFORMAT_YUV420;

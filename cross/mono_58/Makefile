@@ -5,13 +5,12 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/mono_58
+BUILD_DEPENDS = native/mono_58
 
 HOMEPAGE = https://www.mono-project.com
 COMMENT  = Cross platform, open source .NET development framework.
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
-REQUIRED_DSM = 5.0
 # Although qoriq can be compiled successfully it won't run as classic floating point unit not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)

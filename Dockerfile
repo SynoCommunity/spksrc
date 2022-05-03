@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		autoconf-archive \
 		autogen \
 		automake \
+		autopoint \
 		bc \
 		bison \
 		build-essential \

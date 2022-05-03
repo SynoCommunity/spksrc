@@ -2,7 +2,7 @@ PKG_NAME = zlib-ng
 PKG_VERS = 2.0.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/zlib-ng/zlib-ng/archive/refs/tags
+PKG_DIST_SITE = https://github.com/zlib-ng/zlib-ng/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 

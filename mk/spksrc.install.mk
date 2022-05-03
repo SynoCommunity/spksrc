@@ -24,6 +24,16 @@ INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
+# Define find search path for creating plist
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifeq ($(lastword $(subst /, ,$(INSTALL_PREFIX))),target)
+PLIST_SEARCH_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)/../
+endif
+endif
+ifeq ($(strip $(PLIST_SEARCH_PATH)),)
+PLIST_SEARCH_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)/
+endif
+
 $(PRE_INSTALL_PLIST): install_msg_target
 ifeq ($(strip $(PRE_INSTALL_TARGET)),)
 PRE_INSTALL_TARGET = pre_install_target
@@ -47,8 +57,8 @@ install_msg_target:
 
 $(PRE_INSTALL_PLIST):
 	$(create_target_dir)
-	@mkdir -p $(INSTALL_DIR)/$(INSTALL_PREFIX)
-	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort > $@
+	@mkdir -p $(INSTALL_DIR)/$(INSTALL_PREFIX) $(INSTALL_DIR)/$(INSTALL_PREFIX_VAR)
+	find $(PLIST_SEARCH_PATH) \! -type d -printf '%P\n' | sed 's?^target/??g' | sort > $@
 
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
@@ -61,8 +71,8 @@ install_destdir_target: $(PRE_INSTALL_TARGET)
 post_install_target: $(INSTALL_TARGET)
 
 $(INSTALL_PLIST):
-	find $(INSTALL_DIR)/$(INSTALL_PREFIX)/ \! -type d -printf '%P\n' | sort | \
-	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | cut -d' ' -f2- > $@
+	find $(PLIST_SEARCH_PATH)/ \! -type d -printf '%P\n' | sed 's?^target/??g' | sort | \
+	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | sed 's?> ??g' > $@
 
 install_correct_lib_files: $(INSTALL_PLIST)
 	@for pc_file in `grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)` ; \

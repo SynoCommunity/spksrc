@@ -4,7 +4,7 @@ SPK_REV = 13
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = moneytoo
 DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
@@ -39,7 +39,7 @@ ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
 
 # Due to not obvious WebStation handling requirements
-REQUIRED_DSM = 6.0
+REQUIRED_MIN_DSM = 6.0
 
 INSTUNINST_RESTART_SERVICES = apache-web
 
@@ -54,12 +54,9 @@ $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini:
 
 .PHONY: tt-rss_extra_install
 tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/logs
-	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/var/logs $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
 	install -m 755 src/bin/tt-rss-daemon $(STAGING_DIR)/bin/tt-rss-daemon
 	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
 	install -m 755 src/bin/virtual-php $(STAGING_DIR)/bin/virtual-php
-

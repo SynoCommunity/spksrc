@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-cpp-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/google/protobuf/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/protoc
+BUILD_DEPENDS = native/protoc
 
 HOMEPAGE = https://github.com/google/protobuf
 COMMENT  = Protocol Buffers implementation in CPP
