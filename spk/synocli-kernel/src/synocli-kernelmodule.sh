@@ -35,7 +35,7 @@ echo
 printf '%10s %s\n' "" "Examples :"
 printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
 printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
-echo 1>&2
+echo
 }
 
 #------------------------------------------------
@@ -108,6 +108,7 @@ ko_path_match ()
 SPK=""                                                                 # SynoCommunity kernel driver package name
 SPK_CFG=""                                                             # SynoCommunity configuration file
 SPK_CFG_OPT=""                                                         # SynoCommunity configuration option
+SPK_CFG_PATH=""                                                        # SynoCommunity configuration path
 ACTION=""                                                              # Module action insmod|rmmod|reload|status
 VERBOSE="FALSE"                                                        # Set verbose mode
 HELP="FALSE"                                                           # Print help
@@ -133,37 +134,28 @@ done
 ###
 ARCH=$(uname -a | awk '{print $NF}' | cut -f2 -d_)                     # Synology NAS arch
 DSM_VERSION=$(sed -n 's/^productversion="\(.*\)"/\1/p' /etc/VERSION)   # Synology DSM version
-SPK_CFG_PATH="/var/packages/${SPK}/target/etc"                         # SynoCommunity configuration path
-MPATH="/var/packages/${SPK}/target/lib/modules"                        # Kernel modules path
-FPATH="/var/packages/${SPK}/target/lib/firmware"                       # Device firmware path
 FPATH_SYS="/sys/module/firmware_class/parameters/path"                 # System module firmware path file index
 KVER=$(uname -r)                                                       # Running kernel version
-KPATH="${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}"                        # Full kernel modules path
+FPATH=""                                                               # Device firmware path
+KPATH=""                                                               # Full kernel modules path
+MPATH=""                                                               # Kernel modules path
 KO_LIST=$(echo ${KO_LIST} | xargs)                                     # List of kernel objects to enable|disable
 KO_LIST_CFG=""                                                         # List of kernel objects in configuration
 KO_FOUND=""                                                            # List of found kernel objects
-SYNOLOG=/tmp/synocli-kernelmodule.log                                  # Default log output file
+SYNOLOG_PATH=/var/log/packages                                         # Default log output file
+SYNOLOG=${SYNOLOG_PATH}/synocli-kernelmodule.log                       # Default log output file
 
-# Set LOG output using SPK
-[ -n "${SPK}" ] && SYNOLOG=/tmp/synocli-kernelmodule-${SPK}.log
+# If SPK is set reassign variables
+if [ -n "${SPK}" ]; then
+   SPK_CFG_PATH="/var/packages/${SPK}/target/etc"
+   FPATH="/var/packages/${SPK}/target/lib/firmware"
+   MPATH="/var/packages/${SPK}/target/lib/modules"
+   KPATH="${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}"
+   SYNOLOG="${SYNOLOG_PATH}/synocli-kernelmodule-${SPK}.log"
+fi
 
 # All output to SYNOLOG, STDOUT to the screen
 exec > >(tee -a ${SYNOLOG}) 2> >(tee -a ${SYNOLOG} >/dev/null)
-
-# If module path does not exists, exit
-if [ ! -d ${MPATH} ]; then
-   usage
-   echo -ne "\nERROR: Module path [${MPATH}] does not exist or inaccessible...\n\n"
-   exit 1
-fi
-
-# Set kernel module .ko object base path
-# If does not exists, exit
-if [ ! -d ${KPATH} ]; then
-   usage
-   echo -ne "\nERROR: Kernel modules base path [${KPATH}] does not exist or inaccessible...\n\n"
-   exit 1
-fi
 
 if [ "${SPK_CFG}" ]; then
    # Check that configuration exists (if requested)
@@ -198,6 +190,21 @@ ko_path_match
 [ ${VERBOSE} = "TRUE" ] && verbose
 
 [ ${HELP} = "TRUE" ] && usage && exit 0
+
+# If module path does not exists, exit
+if [ ! -d ${MPATH} ]; then
+   usage
+   echo -ne "\nERROR: Module path [${MPATH}] does not exist or inaccessible...\n\n"
+   exit 1
+fi
+
+# Set kernel module .ko object base path
+# If does not exists, exit
+if [ ! -d ${KPATH} ]; then
+   usage
+   echo -ne "\nERROR: Kernel modules base path [${KPATH}] does not exist or inaccessible...\n\n"
+   exit 1
+fi
 
 # load the requested modules
 load ()
