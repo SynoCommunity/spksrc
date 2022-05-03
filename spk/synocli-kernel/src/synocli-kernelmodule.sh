@@ -35,6 +35,8 @@ echo
 printf '%10s %s\n' "" "Examples :"
 printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
 printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
+printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --verbose usbserial ch341 cp210x status"
+printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x status"
 echo
 }
 
@@ -124,7 +126,7 @@ do
                          -h|--help ) HELP="TRUE";;
         insmod|rmmod|reload|status ) ACTION=$1;;
                       -v|--verbose ) VERBOSE="TRUE";;
-                                 * ) KO_LIST+="$1 ";;
+                                 * ) KO_LIST_ARG+="$1 ";;
    esac
    shift 1;
 done
@@ -139,8 +141,9 @@ KVER=$(uname -r)                                                       # Running
 FPATH=""                                                               # Device firmware path
 KPATH=""                                                               # Full kernel modules path
 MPATH=""                                                               # Kernel modules path
-KO_LIST=$(echo ${KO_LIST} | xargs)                                     # List of kernel objects to enable|disable
-KO_LIST_CFG=""                                                         # List of kernel objects in configuration
+KO_LIST=""                                                             # List of kernel objects to enable|disable
+KO_LIST_ARG=$(echo ${KO_LIST_ARG} | xargs)                             # List of kernel objects passed in argument
+KO_LIST_CFG=""                                                         # List of kernel objects in configuration (has priority over ARG)
 KO_FOUND=""                                                            # List of found kernel objects
 SYNOLOG_PATH=/var/log/packages                                         # Default log output file
 SYNOLOG=${SYNOLOG_PATH}/synocli-kernelmodule.log                       # Default log output file
@@ -157,33 +160,47 @@ fi
 # All output to SYNOLOG, STDOUT to the screen
 exec > >(tee -a ${SYNOLOG}) 2> >(tee -a ${SYNOLOG} >/dev/null)
 
+# Get all kernel modules from configuration file
+# based on passed configuration option
 if [ "${SPK_CFG}" ]; then
    # Check that configuration exists (if requested)
    if [ ! -f ${SPK_CFG_PATH}/${SPK_CFG} ]; then
       usage
       echo -ne "\nERROR: Configuration file [${SPK_CFG_PATH}/${SPK_CFG}] does not exist or inaccessible...\n\n"
       exit 1
+   fi
+
+   # Always include default first
+   KO_LIST_CFG=$(sed -n "s/^default:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
+   if [ ! "${KO_LIST_CFG}" ]; then
+      usage
+      echo -ne "\nERROR: Configuration option [default] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
+      exit 1
    fi	
-   # Check that configuration option exists
-   KO_LIST_CFG=$(sed -n "s/^${SPK_CFG_OPT}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
+
+   IFS=","
+   for config in ${SPK_CFG_OPT}
+   do
+      ko_list_cfg=$(sed -n "s/^${config}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
+	  if [ ! "${ko_list_cfg}" ]; then
+         usage
+         echo -ne "\nERROR: Configuration option [${config}:] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
+         exit 1
+      fi
+      KO_LIST_CFG+="${ko_list_cfg} "
+   done
+   IFS=" "
 
    # Merge modules from config file
    # and parameters passed as arguments
    # but keep its order, starting with
    # the config file followed by args
-   if [ "${KO_LIST_CFG}" ]; then
-      KO_LIST=$(echo ${KO_LIST_CFG} ${KO_LIST} | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}' | xargs)
-   else
-      usage
-      echo -ne "\nERROR: Configuration option [${SPK_CFG_OPT}:] no found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
-      exit 1
-   fi	
+   KO_LIST=$(echo ${KO_LIST_CFG} ${KO_LIST_ARG} | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}' | xargs)
 fi
 
 
-# Find resulting kernel object path
-# and confirm that KO_LIST and KO_FOUND
-# do match
+# Find resulting kernel object (*.ko) full path
+# and confirm that KO_LIST and KO_FOUND do match
 ko_path_match
 
 # If verbose is set print default arguments
