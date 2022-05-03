@@ -2,7 +2,15 @@
 
 # Others
 # Only used for DSM 6
-WEB_DIR="/var/services/web"
+WEB_DIR="/var/services/web_packages"
+DSM6_WEB_DIR="/var/services/web"
+DSM7_WEB_DIR="/var/services/web_packages"
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+WEB_DIR="${DSM6_WEB_DIR}"
+else
+WEB_DIR="${DSM7_WEB_DIR}"
+fi
+
 PATH="${SYNOPKG_PKGDEST}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 MEMCACHED="${SYNOPKG_PKGDEST}/bin/memcached"
 SERVICE_COMMAND="${MEMCACHED} -d -m `awk '/MemTotal/{memory=$2/1024*0.15; if (memory > 64) memory=64; printf "%0.f", memory}' /proc/meminfo` -P ${PID_FILE}"
