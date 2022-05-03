@@ -15,7 +15,6 @@ PATH="${SYNOPKG_PKGDEST}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"
 MEMCACHED="${SYNOPKG_PKGDEST}/bin/memcached"
 SERVICE_COMMAND="${MEMCACHED} -d -m `awk '/MemTotal/{memory=$2/1024*0.15; if (memory > 64) memory=64; printf "%0.f", memory}' /proc/meminfo` -P ${PID_FILE}"
 CONFIG_DIR="${WEB_DIR}/phpMemcachedAdmin/Config"
-CONFIG_FILE="${CONFIG_DIR}/Memcache.php"
 CONFIG_BACKUP="${TMP_DIR}/Config"
 
 service_postinst ()
@@ -41,22 +40,19 @@ service_postuninst ()
 
 service_restore () 
 {
-    tar -cf - -C "${CONFIG_BACKUP}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_DIR}"
+    tar -cf - -C "${CONFIG_BACKUP}" . | tar -xvf - -C "${CONFIG_DIR}"
     rm -rvf "${CONFIG_BACKUP}"
 }
 
 service_preupgrade ()
 {
+    if [ -d "${CONFIG_DIR}" ]; then
+      mkdir -p "${CONFIG_BACKUP}"
+      tar -cf - -C "${CONFIG_DIR}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_BACKUP}"
+    fi
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      if [ -d "${CONFIG_DIR}" ]; then
-         cp -pRv "${CONFIG_DIR}" "${TMP_DIR}"
-      fi
       # Remove the web interface
       rm -fr "${WEB_DIR}/phpMemcachedAdmin"
-    else
-      if [ -d "${CONFIG_DIR}" ]; then
-         cp -Rv "${CONFIG_DIR}" "${TMP_DIR}"
-      fi
     fi
 }
 
