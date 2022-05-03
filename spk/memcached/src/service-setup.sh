@@ -35,15 +35,6 @@ service_postinst ()
     fi
 }
 
-service_preuninst ()
-{
-    if [ "${SYNOPKG_PKG_STATUS}" == "UPGRADE" ]; then
-        if [ -d "${TMP_DIR}/Config/" ]; then
-           cp -pRv "${TMP_DIR}/Config" "${TMP_DIR}"
-        fi
-    fi
-}
-
 service_postuninst ()
 {
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
@@ -55,7 +46,14 @@ service_postuninst ()
 service_preupgrade ()
 {
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      if [ -d "${CONFIG_DIR}" ]; then
+         cp -pRv "${CONFIG_DIR}" "${TMP_DIR}"
+      fi
       # Remove the web interface
       rm -fr "${WEB_DIR}/phpMemcachedAdmin"
+    else
+      if [ -d "${CONFIG_DIR}" ]; then
+         cp -Rv "${CONFIG_DIR}" "${TMP_DIR}"
+      fi
     fi
 }
