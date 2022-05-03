@@ -11,13 +11,13 @@ DESCRIPTION = Free \& open source, high-performance, distributed memory object c
 ADMIN_URL = /phpMemcachedAdmin/
 DISPLAY_NAME = Memcached
 CHANGELOG = "1. Bump 1.4.13 -> 1.6.9 <br />2. Add DSM 7 compliance"
-
 HOMEPAGE = https://memcached.org/
 LICENSE  =
 
 CONF_DIR = src/conf
 
 SPK_USER = auto
+SPK_GROUP = http
 
 SERVICE_SETUP    = src/service-setup.sh
 # This is a bogus value to ensure that everything is tailored for a SERVICE_COMMAND
@@ -35,3 +35,5 @@ include ../../mk/spksrc.spk.mk
 memcached_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 775 $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.sample.php \
+				   $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.php

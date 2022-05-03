@@ -29,18 +29,6 @@ service_postinst ()
   
       chown http "${WEB_DIR}/phpMemcachedAdmin/Config/"
     fi
-
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-      cp -v "${CONFIG_DIR}/Memcache.sample.php" "${CONFIG_FILE}"
-      chgrp http "${CONFIG_FILE}"
-      chmod g+w "${CONFIG_FILE}"
-    elif [ -d "${CONFIG_BACKUP}" ]; then
-      tar -cf - -C "${CONFIG_BACKUP}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_DIR}"
-    else
-      cp -v "${CONFIG_DIR}/Memcache.sample.php" "${CONFIG_FILE}"
-      chgrp http "${CONFIG_FILE}"
-      chmod g+w "${CONFIG_FILE}"
-    fi
 }
 
 service_postuninst ()
@@ -49,6 +37,11 @@ service_postuninst ()
       # Remove the web interface
       rm -fr "${WEB_DIR}/phpMemcachedAdmin"
     fi
+}
+
+service_postupgrade () 
+{
+    tar -cf - -C "${CONFIG_BACKUP}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_DIR}"
 }
 
 service_preupgrade ()
