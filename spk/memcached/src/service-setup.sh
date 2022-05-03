@@ -39,9 +39,10 @@ service_postuninst ()
     fi
 }
 
-service_postupgrade () 
+service_restore () 
 {
     tar -cf - -C "${CONFIG_BACKUP}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_DIR}"
+    rm -rvf "${CONFIG_BACKUP}"
 }
 
 service_preupgrade ()
@@ -58,3 +59,4 @@ service_preupgrade ()
       fi
     fi
 }
+
