@@ -30,6 +30,11 @@ LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus 
 AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard ../../toolchain/syno-*))))
 AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
 
+# Available toolchains formatted as '{ARCH}-{TC}'
+AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard ../../kernel/syno-*))))
+AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
+SUPPORTED_KERNEL_VERSIONS = 6.1 6.2.4 7.0
+
 # Global arch definitions
 include ../../mk/spksrc.archs.mk
 

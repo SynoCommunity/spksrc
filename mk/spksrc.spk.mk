@@ -157,10 +157,6 @@ endif
 endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
-# If require kernel modules then limit
-# 'os_max_ver' to point releases only
-else ifeq ($(strip $(REQUIRE_KERNEL)),1)
-	@echo os_max_ver=\"$(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$$(expr $(TC_BUILD) + 10)\" >> $@
 endif
 ifneq ($(strip $(BETA)),)
 	@echo beta=\"yes\" >> $@
@@ -407,6 +403,7 @@ spkclean:
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
+	       work-*/tc_vars.mk \
 	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
@@ -532,10 +529,34 @@ publish-legacy-toolchain-%: spk_msg
 
 ####
 
+kernel-modules-%: SHELL:=/bin/bash
+kernel-modules-%:
+	@if [ "$(filter $(DEFAULT_TC),lastword $(subst -, ,$(MAKECMDGOALS)))" ]; then \
+	   archs2process="$(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
+	elif [ "$(filter $(GENERIC_ARCHS),$(subst -, ,$(MAKECMDGOALS)))" ]; then \
+	   archs2process="$(filter $(addprefix %-,$(lastword $(subst -, ,$(MAKECMDGOALS)))),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
+	else \
+	   archs2process=$* ; \
+	fi ; \
+	$(MSG) ARCH to be processed: $${archs2process} ; \
+	for arch in $${archs2process} ; do \
+	  $(MSG) "Processing $${arch} ARCH" ; \
+	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
+	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	  $(MAKE) spkclean ; \
+	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
+	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
+	done
+
 arch-%: | pre-build-native
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
+else
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
 	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+endif
 
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: spk_msg
@@ -552,10 +573,15 @@ endif
 
 publish-arch-%: SHELL:=/bin/bash
 publish-arch-%: spk_msg
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
+else
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING and PUBLISHING package for arch $*
 	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
+endif
 
 ####
 

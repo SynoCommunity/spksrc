@@ -13,6 +13,10 @@ set -o pipefail
 
 echo "::group:: ---- find dependent packages"
 
+# Generate local.mk to capture DEFAULT_TC
+make setup-synocommunity
+DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
+
 # filter for changes made in the spk directories and take unique package name (without spk folder)
 SPK_TO_BUILD+=" "
 SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
@@ -97,6 +101,10 @@ else
     for package in ${packages}
     do
         DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        for version in ${DEFAULT_TC}
+        do
+           DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=${version} dependency-kernel-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        done
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')

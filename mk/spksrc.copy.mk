@@ -74,8 +74,11 @@ ifeq ($(strip $(PLIST_TRANSFORM)),)
 PLIST_TRANSFORM= cat
 endif
 
+# If we require kernel but NOT building kernel modules
 ifeq ($(strip $(REQUIRE_KERNEL)),1)
+ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 DEPENDS += kernel/syno-$(TC_ARCH)-$(TC_VERS)
+endif
 endif
 
 $(INSTALL_PLIST):

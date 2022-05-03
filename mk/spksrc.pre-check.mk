@@ -22,13 +22,16 @@ ifneq ($(wildcard BROKEN),)
   @$(error $(NAME): Broken package)
 endif
 
-# Check for build for generic archs, these are not supporting 'require kernel'.
+# Check for build for generic archs, these are not supporting by default `require kernel`.
+# Unless building kernel modules where a package will contain multiple kernel sub-architectures and versions.
 ifneq ($(REQUIRE_KERNEL),)
-  ifneq (,$(findstring $(ARCH),$(GENERIC_ARCHS)))
-    ifneq ($(BUILD_UNSUPPORTED_FILE),)
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set >> $(BUILD_UNSUPPORTED_FILE))
+  ifeq ($(REQUIRE_KERNEL_MODULE),)
+    ifneq (,$(findstring $(ARCH),$(GENERIC_ARCHS)))
+      ifneq ($(BUILD_UNSUPPORTED_FILE),)
+        $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set unless using REQUIRE_KERNEL_MODULE >> $(BUILD_UNSUPPORTED_FILE))
+      endif
+      @$(error Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set unless using REQUIRE_KERNEL_MODULE)
     endif
-    @$(error Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set)
   endif
 endif
 
