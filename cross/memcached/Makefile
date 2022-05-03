@@ -12,7 +12,7 @@ COMMENT  = Free & open source, high-performance, distributed memory object cachi
 LICENSE  = BSD
 
 PRE_CONFIGURE_TARGET = memcached_pre_configure
-CONFIGURE_ARGS = ac_cv_c_endian=little
+
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
