@@ -21,44 +21,86 @@
 #------------------------------------------------
 # Make sure an argument was passed 
 #------------------------------------------------
-usage ()
-{
-echo
-printf '%10s %s\n' "Usage :" "$0 [-s|--spk <package>] [<insmod|rmmod|reload|status>] module1.ko module2.ko ..."
-printf '%20s %s\n' "Optional :" "[-c|--config <file>:<option>]"
-echo
-printf '%40s %s\n' "[-s|--spk <package>] : " "SynoCommunity package name containing kernel modules"
-printf '%40s %s\n' "[<insmod|rmmod|reload|status>] : " "Action to be performed"
-printf '%40s %s\n' "[-h|--help] : " "Print this help"
-printf '%40s %s\n' "[-v|--verbose] : " "Verbose mode"
-echo
-printf '%10s %s\n' "" "Examples :"
-printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
-printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
-printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --verbose usbserial ch341 cp210x status"
-printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x status"
-echo
+usage() {
+   echo
+   printf '%10s %s\n' "Usage :" "$0 [-s|--spk <package>] [<insmod|rmmod|reload|status>] module1.ko module2.ko ..."
+   printf '%20s %s\n' "Optional :" "[-c|--config <file>:<option>]"
+   echo
+   printf '%40s %s\n' "[-s|--spk <package>] : " "SynoCommunity package name containing kernel modules"
+   printf '%40s %s\n' "[<insmod|rmmod|reload|status>] : " "Action to be performed"
+   printf '%40s %s\n' "[-h|--help] : " "Print this help"
+   printf '%40s %s\n' "[-v|--verbose] : " "Verbose mode"
+   echo
+   printf '%10s %s\n' "" "Examples :"
+   printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
+   printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
+   printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --verbose usbserial ch341 cp210x status"
+   printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x status"
+   echo
 }
 
 #------------------------------------------------
 # Print detailed information for debugging
 #------------------------------------------------
-verbose ()
-{
-printf '%20s %s\n' "" "$0 (verbose)"
-printf '%60s %s\n' "SynoCommunity kernel driver package name (SPK)" "[${SPK}]"
-printf '%60s %s\n' "SynoCommunity configuration file (SPK_CFG)" "[${SPK_CFG}]"
-printf '%60s %s\n' "SynoCommunity configuration path (SPK_CFG_PATH)" "[${SPK_CFG_PATH}]"
-printf '%60s %s\n' "SynoCommunity configuration option (SPK_CFG_OPT)" "[${SPK_CFG_OPT}]"
-printf '%60s %s\n' "Synology NAS arch (ARCH)" "[${ARCH}]"
-printf '%60s %s\n' "Synology DSM version (DSM_VERSION)" "[${DSM_VERSION}]"
-printf '%60s %s\n' "Running kernel version (KVER)" "[${KVER}]"
-printf '%60s %s\n' "Module action insmod|rmmod|reload|status (ACTION)" "[${ACTION}]"
-printf '%60s %s\n' "Kernel modules path (MPATH)" "[${MPATH}]"
-printf '%60s %s\n' "Full kernel modules path (KPATH)" "[${KPATH}]"
-printf '%60s %s\n' "Device firmware path (FPATH)" "[${FPATH}]"
-printf '%60s %s\n' "Kernel objects list (KO_LIST)" "[${KO_LIST}]"
-printf '%60s %s\n' "Kernel objects found (KO_FOUND)" "[${KO_FOUND}]"
+verbose() {
+   printf '%20s %s\n' "" "$0 (verbose)"
+   printf '%60s %s\n' "SynoCommunity kernel driver package name (SPK)" "[${SPK}]"
+   printf '%60s %s\n' "SynoCommunity configuration file (SPK_CFG)" "[${SPK_CFG}]"
+   printf '%60s %s\n' "SynoCommunity configuration path (SPK_CFG_PATH)" "[${SPK_CFG_PATH}]"
+   printf '%60s %s\n' "SynoCommunity configuration option (SPK_CFG_OPT)" "[${SPK_CFG_OPT}]"
+   printf '%60s %s\n' "Synology NAS arch (ARCH)" "[${ARCH}]"
+   printf '%60s %s\n' "Synology DSM version (DSM_VERSION)" "[${DSM_VERSION}]"
+   printf '%60s %s\n' "Running kernel version (KVER)" "[${KVER}]"
+   printf '%60s %s\n' "Module action insmod|rmmod|reload|status (ACTION)" "[${ACTION}]"
+   printf '%60s %s\n' "Kernel modules path (MPATH)" "[${MPATH}]"
+   printf '%60s %s\n' "Full kernel modules path (KPATH)" "[${KPATH}]"
+   printf '%60s %s\n' "Device firmware path (FPATH)" "[${FPATH}]"
+   printf '%60s %s\n' "Kernel objects list (KO_LIST)" "[${KO_LIST}]"
+   printf '%60s %s\n' "Kernel objects found (KO_PATH)" "[${KO_PATH}]"
+}
+
+
+#------------------------------------------------
+# Get all kernel modules from configuration file
+# based on passed configuration option
+#------------------------------------------------
+get_ko_list() {
+   ko_list_cfg=""
+
+   if [ "${SPK_CFG}" ]; then
+      # Check that configuration exists (if requested)
+      if [ ! -f ${SPK_CFG_PATH}/${SPK_CFG} ]; then
+         usage
+         echo -ne "\nERROR: Configuration file [${SPK_CFG_PATH}/${SPK_CFG}] does not exist or inaccessible...\n\n"
+         exit 1
+      fi
+
+      # Always include default first
+      ko_list_cfg=$(sed -n "s/^default:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
+      if [ ! "${ko_list_cfg}" ]; then
+         usage
+         echo -ne "\nERROR: Configuration option [default] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
+         exit 1
+      fi
+
+      IFS=","
+      for config in ${SPK_CFG_OPT}
+      do
+         ko_list_cfg_tmp=$(sed -n "s/^${config}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
+         if [ ! "${ko_list_cfg}" ]; then
+            usage
+            echo -ne "\nERROR: Configuration option [${config}:] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
+            exit 1
+         fi
+         ko_list_cfg+="${ko_list_cfg_tmp} "
+      done
+      IFS=" "
+   fi
+
+   # Return merged module list from config file and
+   # parameters passed as arguments but keep its order,
+   # starting with the config file followed by args
+   echo ${ko_list_cfg} ${KO_LIST_ARG} | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}' | xargs
 }
 
 
@@ -69,36 +111,32 @@ printf '%60s %s\n' "Kernel objects found (KO_FOUND)" "[${KO_FOUND}]"
 #   /<path>/<module>*
 # The following find the right module as needed
 #------------------------------------------------
-ko_path_match ()
-{
+ko_path_match() {
    ko_find=""
+   ko_path=""
    ko_missing=""
 
    for ko in $KO_LIST
    do
       # first check if the name
-	  # matches to a path
+      # matches to a path
       if [ ! "$(echo $ko | grep '/')" ]; then
          # Ensure to add .ko if needed
          [ ! "$(echo $ko | grep '.ko$')" ] && ko=$ko.ko
-		 # Replace any '-' or '_' by '[-_]
-		 ko=$(echo ${ko} | sed -r 's/[-_]/[-_]/g')
+         # Replace any '-' or '_' by '[-_]
+         ko=$(echo ${ko} | sed -r 's/[-_]/[-_]/g')
          # Find full module kernel object path
          ko_find=$(find $KPATH -name $ko)
-	     [ ! "$ko_find" ] && ko_missing+="$ko "
+         [ ! "$ko_find" ] && ko_missing+="$ko "
       fi
-      KO_FOUND+="${ko_find##*${KVER}} "
+      ko_path+="${ko_find##*${KVER}} "
    done
 
-   KO_FOUND=$(echo $KO_FOUND | xargs)
-
-   if [ ! $(echo $KO_LIST | wc -w) -eq $(echo $KO_FOUND | wc -w) ]; then
-	  verbose && usage
-      echo
-      echo "ERROR: Missing kernel modules: [$(echo $ko_missing | xargs)]"
-      echo
-	  exit 1
-   fi
+   # Return missing modules in case of error
+   # else return the list of found modules
+   [ ! "${ko_missing}" ] \
+      && echo "$ko_path" | xargs \
+      || echo "missing: ${ko_missing}" | xargs
 }
 
 
@@ -119,10 +157,10 @@ while [ $# -gt 0 ]
 do
    case $1 in
                           -s|--spk ) shift 1
-						             SPK=$1;;
+                                     SPK=$1;;
                        -c|--config ) shift 1
-						             SPK_CFG=$(echo $1 | cut -f1 -d:)
-						             SPK_CFG_OPT=$(echo $1 | cut -f2 -d:);;
+                                     SPK_CFG=$(echo $1 | cut -f1 -d:)
+                                     SPK_CFG_OPT=$(echo $1 | cut -f2 -d:);;
                          -h|--help ) HELP="TRUE";;
         insmod|rmmod|reload|status ) ACTION=$1;;
                       -v|--verbose ) VERBOSE="TRUE";;
@@ -141,10 +179,9 @@ KVER=$(uname -r)                                                       # Running
 FPATH=""                                                               # Device firmware path
 KPATH=""                                                               # Full kernel modules path
 MPATH=""                                                               # Kernel modules path
-KO_LIST=""                                                             # List of kernel objects to enable|disable
+KO_LIST=""                                                             # List of kernel objects to enable|disable (includes config+args)
 KO_LIST_ARG=$(echo ${KO_LIST_ARG} | xargs)                             # List of kernel objects passed in argument
-KO_LIST_CFG=""                                                         # List of kernel objects in configuration (has priority over ARG)
-KO_FOUND=""                                                            # List of found kernel objects
+KO_PATH=""                                                             # List of found kernel objects (*.ko) with path (includes config+args)
 SYNOLOG_PATH=/var/log/packages                                         # Default log output file
 SYNOLOG=${SYNOLOG_PATH}/synocli-kernelmodule.log                       # Default log output file
 
@@ -160,48 +197,23 @@ fi
 # All output to SYNOLOG, STDOUT to the screen
 exec > >(tee -a ${SYNOLOG}) 2> >(tee -a ${SYNOLOG} >/dev/null)
 
-# Get all kernel modules from configuration file
-# based on passed configuration option
-if [ "${SPK_CFG}" ]; then
-   # Check that configuration exists (if requested)
-   if [ ! -f ${SPK_CFG_PATH}/${SPK_CFG} ]; then
-      usage
-      echo -ne "\nERROR: Configuration file [${SPK_CFG_PATH}/${SPK_CFG}] does not exist or inaccessible...\n\n"
-      exit 1
-   fi
 
-   # Always include default first
-   KO_LIST_CFG=$(sed -n "s/^default:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
-   if [ ! "${KO_LIST_CFG}" ]; then
-      usage
-      echo -ne "\nERROR: Configuration option [default] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
-      exit 1
-   fi	
-
-   IFS=","
-   for config in ${SPK_CFG_OPT}
-   do
-      ko_list_cfg=$(sed -n "s/^${config}:\(.*\)/\1/p" ${SPK_CFG_PATH}/${SPK_CFG})
-	  if [ ! "${ko_list_cfg}" ]; then
-         usage
-         echo -ne "\nERROR: Configuration option [${config}:] not found in file [${SPK_CFG_PATH}/${SPK_CFG}]...\n\n"
-         exit 1
-      fi
-      KO_LIST_CFG+="${ko_list_cfg} "
-   done
-   IFS=" "
-
-   # Merge modules from config file
-   # and parameters passed as arguments
-   # but keep its order, starting with
-   # the config file followed by args
-   KO_LIST=$(echo ${KO_LIST_CFG} ${KO_LIST_ARG} | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}' | xargs)
-fi
-
+# Get list of kernel objects from
+# both the configuration file and
+# arguments passed on cmd line
+KO_LIST=$(get_ko_list)
 
 # Find resulting kernel object (*.ko) full path
-# and confirm that KO_LIST and KO_FOUND do match
-ko_path_match
+KO_PATH=$(ko_path_match)
+
+# exit if modules are missing/not found
+if [ "$(echo $KO_PATH | cut -f1 -d:)" = "missing" ]; then
+   verbose && usage
+   echo
+   echo "ERROR: Missing kernel modules: [$(echo $KO_PATH | cut -f2 -d: | xargs)]"
+   echo
+   exit 1
+fi
 
 # If verbose is set print default arguments
 [ ${VERBOSE} = "TRUE" ] && verbose
@@ -243,7 +255,7 @@ load ()
    fi
 
    echo -ne "\t[insmod] kernel modules...\n"
-   for ko in $KO_FOUND
+   for ko in $KO_PATH
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
       printf '%40s %-25s' $ko "[$module]"
@@ -273,7 +285,7 @@ unload ()
 
    # Unload drivers in reverse order
    echo -ne "\t[rmmod] kernel modules...\n"
-   for item in $KO_FOUND; do echo $item; done | tac | while read ko
+   for item in $KO_PATH; do echo $item; done | tac | while read ko
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
       printf '%40s %-25s' $ko "[$module]"
@@ -305,7 +317,7 @@ status ()
    error=0
 
    echo -ne "\t[status] kernel modules...\n"
-   for ko in $KO_FOUND
+   for ko in $KO_PATH
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
       printf '%40s %-25s' $ko "[$module]"
