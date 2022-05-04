@@ -23,8 +23,9 @@
 #------------------------------------------------
 usage() {
    echo
-   printf '%10s %s\n' "Usage :" "$0 [-s|--spk <package>] [<insmod|rmmod|reload|status>] module1.ko module2.ko ..."
-   printf '%20s %s\n' "Optional :" "[-c|--config <file>:<option>]"
+   printf '%10s %s\n' "Usage :" "$0 [-s|--spk <package>] [<insmod,start|rmmod,stop|reload,restart|status>] module1.ko module2.ko ..."
+   printf '%20s %s\n' "Optional :" "[-c|--config <file>:<option1>,<option2>,...]"
+   printf '%20s %s\n' "" "[-u|--udev <file>]"
    echo
    printf '%40s %s\n' "[-s|--spk <package>] : " "SynoCommunity package name containing kernel modules"
    printf '%40s %s\n' "[<insmod|rmmod|reload|status>] : " "Action to be performed"
@@ -34,7 +35,7 @@ usage() {
    printf '%10s %s\n' "" "Examples :"
    printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --verbose cdrom sr_mod status"
    printf '%20s %s\n' "" "$0 --spk synokernel-cdrom --config synokernel-cdrom.cfg:default status"
-   printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --verbose usbserial ch341 cp210x status"
+   printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --udev 60-synokernel-usbserial.rules usbserial ch341 cp210x status"
    printf '%20s %s\n' "" "$0 --spk synokernel-usbserial --config synokernel-usbserial.cfg:ch341,cp210x status"
    echo
 }
@@ -55,6 +56,8 @@ verbose() {
    printf '%60s %s\n' "Kernel modules path (MPATH)" "[${MPATH}]"
    printf '%60s %s\n' "Full kernel modules path (KPATH)" "[${KPATH}]"
    printf '%60s %s\n' "Device firmware path (FPATH)" "[${FPATH}]"
+   printf '%60s %s\n' "udev rules.d path (UPATH)" "[${UPATH}]"
+   printf '%60s %s\n' "udev rules.d file (URULE)" "[${URULE}]"
    printf '%60s %s\n' "Kernel objects list (KO_LIST)" "[${KO_LIST}]"
    printf '%60s %s\n' "Kernel objects found (KO_PATH)" "[${KO_PATH}]"
 }
@@ -139,8 +142,18 @@ ko_path_match() {
       || echo "missing: ${ko_missing}" | xargs
 }
 
-
+# exit if no parameters passed
 [ $# -eq 0 ] && usage && exit 1
+
+# must be root to load/unload kernel modules
+if [ ! "$(id -un)" = "root" ]; then
+   verbose && usage
+   echo
+   echo "ERROR: Must have root or sudo priviledges..."
+   echo
+   exit 1
+fi
+
 
 ###
 ### Global variables
@@ -156,15 +169,17 @@ HELP="FALSE"                                                           # Print h
 while [ $# -gt 0 ] 
 do
    case $1 in
-                          -s|--spk ) shift 1
-                                     SPK=$1;;
-                       -c|--config ) shift 1
-                                     SPK_CFG=$(echo $1 | cut -f1 -d:)
-                                     SPK_CFG_OPT=$(echo $1 | cut -f2 -d:);;
-                         -h|--help ) HELP="TRUE";;
-        insmod|rmmod|reload|status ) ACTION=$1;;
-                      -v|--verbose ) VERBOSE="TRUE";;
-                                 * ) KO_LIST_ARG+="$1 ";;
+                                        -s|--spk ) shift 1
+                                                   SPK=$1;;
+                                     -c|--config ) shift 1
+                                                   SPK_CFG=$(echo $1 | cut -f1 -d:)
+                                                   SPK_CFG_OPT=$(echo $1 | cut -f2 -d:);;
+                                       -u|--udev ) shift 1
+                                                   URULE=$(echo $1 | cut -f1 -d:);;
+                                       -h|--help ) HELP="TRUE";;
+   insmod|rmmod|reload|start|stop|restart|status ) ACTION=$1;;
+                                    -v|--verbose ) VERBOSE="TRUE";;
+                                               * ) KO_LIST_ARG+="$1 ";;
    esac
    shift 1;
 done
@@ -190,6 +205,7 @@ if [ -n "${SPK}" ]; then
    SPK_CFG_PATH="/var/packages/${SPK}/target/etc"
    FPATH="/var/packages/${SPK}/target/lib/firmware"
    MPATH="/var/packages/${SPK}/target/lib/modules"
+   UPATH="/var/packages/${SPK}/target/rules.d"
    KPATH="${MPATH}/${ARCH}-${DSM_VERSION}/${KVER}"
    SYNOLOG="${SYNOLOG_PATH}/synocli-kernelmodule-${SPK}.log"
 fi
@@ -235,17 +251,36 @@ if [ ! -d ${KPATH} ]; then
    exit 1
 fi
 
+# Check that udev rules file exist
+if [ ! -f ${UPATH}/${URULE} ]; then
+   usage
+   echo -ne "\nERROR: udev rules.d file [${UPATH}/${URULE}] does not exist or inaccessible...\n\n"
+   exit 1
+fi
+
 # load the requested modules
 load ()
 {
    error=0
 
+   if [ "{URULE}" ]; then
+      echo -ne "\t[enable] optional udev rules...\n"
+      printf '%40s %-34s' "" "[$URULE]"
+      ln -s ${UPATH}/${URULE} /lib/udev/rules.d/${URULE}
+      udevadm control --reload-rules
+      if [ $? -eq 0 ]; then
+         echo -ne " OK\n"
+      else
+         error=1
+         echo -ne " N/A\n"
+      fi
+   fi
+
    # Add firmware path to running kernel
    if [ -d "${FPATH}" ]; then
-      echo -ne "\tAdd optional firmware path...\n"
-	  printf '%65s' "[${FPATH}]"
+      echo -ne "\t[loading] optional firmware path...\n"
+      printf '%65s' "[${FPATH}]"
       echo "${FPATH}" > ${FPATH_SYS}
-
       if [ $? -eq 0 ]; then
          echo -ne " OK\n"
       else
@@ -258,7 +293,7 @@ load ()
    for ko in $KO_PATH
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/' -e 's/\.ko//')
-      printf '%40s %-25s' $ko "[$module]"
+      printf '%40s %-35s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -288,8 +323,7 @@ unload ()
    for item in $KO_PATH; do echo $item; done | tac | while read ko
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%40s %-25s' $ko "[$module]"
-
+      printf '%40s %-35s' $ko "[$module]"
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
          rmmod $module
@@ -302,9 +336,23 @@ unload ()
 
    # Remove firmware path to running kernel
    if [ -d "${FPATH}" ]; then
-      echo -ne "\tUnloading of optional firmware path...\n"
+      echo -ne "\t[unloading] optional firmware path...\n"
       echo "" > ${FPATH_SYS}
       error=$?
+   fi
+
+   # Remove udev rules
+   if [ "{URULE}" ]; then
+      echo -ne "\t[remove] optional udev rules...\n"
+      printf '%40s %-34s' "" "[$URULE]"
+      rm -f /lib/udev/rules.d/${URULE}
+      udevadm control --reload-rules
+      if [ $? -eq 0 ]; then
+         echo -ne " N/A\n"
+      else
+         error=1
+         echo -ne " ERROR\n"
+      fi
    fi
 
    return $error
@@ -320,7 +368,7 @@ status ()
    for ko in $KO_PATH
    do
       module=$(echo "${ko}" | sed -e 's/.*\///' -e 's/-/_/g' -e 's/\.ko//')
-      printf '%40s %-25s' $ko "[$module]"
+      printf '%40s %-35s' $ko "[$module]"
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
@@ -333,11 +381,23 @@ status ()
 
    # Validate option firmware path
    if [ -d "${FPATH}" ]; then
-      echo -ne "\tStatus of optional firmware path...\n"
+      echo -ne "\t[status] of optional firmware path...\n"
 	  printf '%65s' "[${FPATH}]"
 
       grep -q ${FPATH} ${FPATH_SYS}
       if [ $? -eq 0 ]; then
+         echo -ne " OK\n"
+      else
+         error=1
+         echo -ne " N/A\n"
+      fi
+   fi
+
+   # Validate udev rules (not much can be done)
+   if [ "{URULE}" ]; then
+      echo -ne "\t[status] of optional udev rules...\n"
+      printf '%40s %-34s' "" "[$URULE]"
+      if [ -h /lib/udev/rules.d/${URULE} ]; then
          echo -ne " OK\n"
       else
          error=1
@@ -350,7 +410,7 @@ status ()
 
 
 case $ACTION in
-    insmod)
+    insmod|start)
        if status; then
            echo ${SPK} is already running
            exit 0
@@ -360,7 +420,7 @@ case $ACTION in
            exit $?
        fi
        ;;
-    rmmod)
+    rmmod|stop)
        if status; then
            echo Stopping ${SPK} ...
            unload
@@ -370,7 +430,7 @@ case $ACTION in
            exit 0
        fi
        ;;
-    reload)
+    reload|restart)
        echo -ne "---\nReloading ${SPK} package...\n"
        unload
        load
