@@ -1,4 +1,7 @@
 {
+    "port-config": {
+        "protocol-file": "app/memcached.sc"
+    },
     "webservice": {
         "services": [{
             "service": "phpMemcachedAdmin",
