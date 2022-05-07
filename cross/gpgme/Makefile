@@ -22,4 +22,6 @@ CONFIGURE_ARGS += --disable-static
 # Disable tests that cannot be run with cross compilation
 CONFIGURE_ARGS += --disable-glibtest --disable-gpg-test --disable-gpgsm-test
 
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk

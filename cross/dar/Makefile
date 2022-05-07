@@ -10,7 +10,7 @@ OPTIONAL_DEPENDS = cross/libthreadar
 # archs without C++11 support are not supported:
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-DEPENDS = cross/attr 
+DEPENDS  = cross/attr
 DEPENDS += cross/libgcrypt cross/gpgme
 DEPENDS += cross/zlib cross/bzip2 cross/lzo cross/xz
 DEPENDS += cross/e2fsprogs
@@ -27,9 +27,12 @@ endif
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --enable-mode=64
+CONFIGURE_ARGS  = --enable-mode=64
+CONFIGURE_ARGS += --enable-special-alloc
 CONFIGURE_ARGS += --disable-dar-static
 CONFIGURE_ARGS += --disable-upx
 CONFIGURE_ARGS += --with-gpgme-prefix=$(STAGING_INSTALL_PREFIX)
+
+ADDITIONAL_CPPFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

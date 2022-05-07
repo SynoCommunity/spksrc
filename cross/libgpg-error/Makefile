@@ -13,6 +13,8 @@ LICENSE  = LGPLv2.1+
 
 GNU_CONFIGURE = 1
 
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
