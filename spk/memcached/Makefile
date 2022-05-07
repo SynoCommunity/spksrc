@@ -21,6 +21,9 @@ SYSTEM_GROUP = http
 
 SERVICE_PORT = 11211
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+NO_SERVICE_SHORTCUT = yes
+# The service shortcut is not auto generated **but** images are still useful
+ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
 
 SERVICE_SETUP    = src/service-setup.sh
 # This is a bogus value to ensure that everything is tailored for a SERVICE_COMMAND
