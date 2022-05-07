@@ -37,15 +37,17 @@ service_postuninst ()
 
 service_restore () 
 {
-    tar -cf - -C "${CONFIG_BACKUP}" . | tar -xvf - -C "${CONFIG_DIR}"
-    rm -rvf "${CONFIG_BACKUP}"
+    if [ -d "${CONFIG_BACKUP}" ]; then 
+      tar -cf - -C "${CONFIG_BACKUP}" . | tar -xf - -C "${CONFIG_DIR}"
+      rm -rvf "${CONFIG_BACKUP}"
+    fi
 }
 
 service_preupgrade ()
 {
     if [ -d "${CONFIG_DIR}" ]; then
       mkdir -p "${CONFIG_BACKUP}"
-      tar -cf - -C "${CONFIG_DIR}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_BACKUP}"
+      tar -cf - -C "${CONFIG_DIR}" --exclude="Memcache.sample.php" . | tar -xf - -C "${CONFIG_BACKUP}"
     fi
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
       # Remove the web interface
