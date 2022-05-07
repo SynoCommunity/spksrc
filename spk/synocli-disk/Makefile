@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
 SPK_VERS = 3.3
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
@@ -35,7 +35,7 @@ endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add duf, a 'df' alternative.<br/>2. Add gdu, disk usage analyzer.<br/>3. Add dua, Disk Usage Analyzer.<br/>4. Add dutree, analyze file system usage.<br/>5. Add tdu, Top Disk Usage."
+CHANGELOG = "1. Update dar for public key encryption and for largefile support on 32bit archs."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.

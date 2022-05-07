@@ -1,0 +1,6 @@
+lnk:lib/libgpgme.so
+lnk:lib/libgpgme.so.11
+lib:lib/libgpgme.so.11.26.0
+lnk:lib/libgpgmepp.so
+lnk:lib/libgpgmepp.so.6
+lib:lib/libgpgmepp.so.6.14.0

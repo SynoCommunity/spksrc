@@ -5,15 +5,13 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/dar/files/dar/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# https://github.com/Edrusb/DAR/archive/refs/tags/v2.5.22.tar.gz
-
 OPTIONAL_DEPENDS = cross/libthreadar
 
 # archs without C++11 support are not supported:
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/attr 
-DEPENDS += cross/libgcrypt
+DEPENDS += cross/libgcrypt cross/gpgme
 DEPENDS += cross/zlib cross/bzip2 cross/lzo cross/xz
 DEPENDS += cross/e2fsprogs
 
@@ -31,5 +29,7 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --enable-mode=64
 CONFIGURE_ARGS += --disable-dar-static
+CONFIGURE_ARGS += --disable-upx
+CONFIGURE_ARGS += --with-gpgme-prefix=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
