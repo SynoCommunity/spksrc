@@ -2,13 +2,10 @@
 
 # Others
 # Only used for DSM 6
-WEB_DIR="/var/services/web_packages"
 DSM6_WEB_DIR="/var/services/web"
-DSM7_WEB_DIR="/var/services/web_packages"
+WEB_DIR="/var/services/web_packages"
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
 WEB_DIR="${DSM6_WEB_DIR}"
-else
-WEB_DIR="${DSM7_WEB_DIR}"
 fi
 
 PATH="${SYNOPKG_PKGDEST}/bin:/usr/local/bin:/bin:/usr/bin:/usr/syno/bin"

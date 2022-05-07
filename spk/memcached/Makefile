@@ -17,7 +17,7 @@ LICENSE  =
 CONF_DIR = src/conf
 
 SPK_USER = auto
-SPK_GROUP = http
+SYSTEM_GROUP = http
 
 SERVICE_SETUP    = src/service-setup.sh
 # This is a bogus value to ensure that everything is tailored for a SERVICE_COMMAND
