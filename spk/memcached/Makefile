@@ -19,6 +19,9 @@ CONF_DIR = src/conf
 SPK_USER = auto
 SYSTEM_GROUP = http
 
+SERVICE_PORT = 11211
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+
 SERVICE_SETUP    = src/service-setup.sh
 # This is a bogus value to ensure that everything is tailored for a SERVICE_COMMAND
 # The real value is defined by the setup file
