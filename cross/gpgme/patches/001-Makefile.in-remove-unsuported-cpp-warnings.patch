@@ -1,0 +1,13 @@
+# remove unsupported warning from Makefile.in to get toolchain compatible Makefile
+#
+--- lang/cpp/src/Makefile.in.orig	2022-03-06 16:51:59.000000000 +0000
++++ lang/cpp/src/Makefile.in	2022-05-07 12:05:24.995501260 +0000
+@@ -550,7 +550,7 @@
+                         $(interface_headers) $(private_gpgmepp_headers)
+ 
+ AM_CPPFLAGS = -I$(top_builddir)/src @GPG_ERROR_CFLAGS@ @LIBASSUAN_CFLAGS@ \
+-              -DBUILDING_GPGMEPP -Wsuggest-override \
++              -DBUILDING_GPGMEPP \
+               -Wzero-as-null-pointer-constant
+ 
+ libgpgmepp_la_LIBADD = ../../../src/libgpgme.la @LIBASSUAN_LIBS@

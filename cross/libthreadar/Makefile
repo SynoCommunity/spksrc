@@ -20,4 +20,6 @@ GNU_CONFIGURE = 1
 # avoid build of subdir "doc"
 CONFIGURE_ARGS = ac_subdirs_all="src"
 
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk

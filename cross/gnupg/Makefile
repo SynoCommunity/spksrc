@@ -19,6 +19,8 @@ CONFIGURE_ARGS += --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ksba-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-npth-prefix=$(STAGING_INSTALL_PREFIX)
 
+ADDITIONAL_CPPFLAGS = -O
+
 include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))

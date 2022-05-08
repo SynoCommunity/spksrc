@@ -12,8 +12,9 @@ COMMENT  = This is a general purpose cryptographic library based on the code fro
 LICENSE  = LGPLv2.1+
 
 GNU_CONFIGURE = 1
-
 CONFIGURE_ARGS = --with-gpg-error-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += ac_cv_sys_symbol_underscore=no
+
+ADDITIONAL_CPPFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
