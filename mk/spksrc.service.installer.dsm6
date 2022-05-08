@@ -270,12 +270,12 @@ postinst ()
         # Create share if does not exist
         #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
         if ! synoshare --get "${SHARE_NAME}" &> /dev/null; then
-            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "rw" "" 1 0 2>&1 | install_log
+            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "" "" 1 0 2>&1 | install_log
         fi
 
         # Add user permission if no GROUP is set in UI
         # GROUP permission will be added in set_syno_permissions
-        if [ ! -n "$GROUP" ] && [ -n "${EFF_USER}" ]; then
+        if [ -z "$GROUP" ] && [ -n "${EFF_USER}" ]; then
             synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
         fi
         synoshare --build 2>&1 | install_log
