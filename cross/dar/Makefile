@@ -21,13 +21,16 @@ LICENSE = GPLv3
 
 include ../../mk/spksrc.archs.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+# use invariant integers, build for 64bit mode fails on src/libdar/macro_tools.cpp
+PLIST_TRANSFORM = sed -e 's|libdar64|libdar|'
+else
+CONFIGURE_ARGS = --enable-mode=64
 DEPENDS += cross/libthreadar
 endif
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS  = --enable-mode=64
 CONFIGURE_ARGS += --enable-special-alloc
 CONFIGURE_ARGS += --disable-dar-static
 CONFIGURE_ARGS += --disable-upx
