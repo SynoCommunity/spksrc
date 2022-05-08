@@ -1,5 +1,5 @@
 SPK_NAME = dutree
-SPK_VERS = 0.2.15
+SPK_VERS = 0.2.18
 SPK_REV = 1
 
 DEPENDS = cross/$(SPK_NAME)

@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
 SPK_VERS = 3.3
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
@@ -35,7 +35,7 @@ endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update dar for public key encryption and for largefile support on 32bit archs."
+CHANGELOG = "1. Update dar for public key encryption and for largefile support on 32bit archs.<br/>2. Update ncdu to v1.17.<br/>3. Update e2fsprogs to v1.46.5.<br/>4. Update ddrescure to v1.26.<br/>5. Update dua to v.2.17.2.<br/>6. Update dutree to v.0.2.18."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
