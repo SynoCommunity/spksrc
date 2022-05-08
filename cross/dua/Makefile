@@ -1,5 +1,5 @@
 PKG_NAME = dua
-PKG_VERS = 2.17.1
+PKG_VERS = 2.17.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Byron/dua-cli/archive

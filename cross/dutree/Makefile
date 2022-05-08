@@ -1,5 +1,5 @@
 PKG_NAME = dutree
-PKG_VERS = 0.2.15
+PKG_VERS = 0.2.18
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/nachoparker/dutree/archive
