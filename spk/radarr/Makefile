@@ -12,16 +12,16 @@ DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
-HELPURL    = https://wiki.servarr.com/Radarr
+HELPURL = https://wiki.servarr.com/Radarr
 SUPPORTURL = https://radarr.video/\#support
 
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
 STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "Update Radarr to v3.0.2.4552 .NET Core"
+CHANGELOG = "Update Radarr to v3.2.2.5080 .NET Core"
 
 HOMEPAGE = https://radarr.video/
-LICENSE  = GPLv3
+LICENSE = GPLv3
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
