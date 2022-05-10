@@ -1,6 +1,6 @@
 SPK_NAME = jackett
-SPK_VERS = 0.17.668
-SPK_REV = 14
+SPK_VERS = 0.20.1043
+SPK_REV = 15
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -10,7 +10,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
 DISPLAY_NAME = Jackett
 STARTABLE = yes
-CHANGELOG = "Update Jackett 0.17.668 and compile using .NET"
+CHANGELOG = "Update Jackett 0.20.1043, compile with .NET 6.0 and add alternate tmpdir"
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
 LICENSE_FILE = $(WORK_DIR)/Jackett-$(SPK_VERS)/LICENSE
@@ -33,12 +33,15 @@ include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
-CHANGELOG = "Update Jackett 0.17.668"
+CHANGELOG = "Update Jackett 0.20.1043"
 LICENSE_FILE = $(WORK_DIR)/Jackett/LICENSE
-SPK_DEPENDS = "mono>3.6"
+SPK_DEPENDS = "mono>5.8"
 endif
 
 POST_STRIP_TARGET = jackett_extra_install
+
+# use alternate TMPDIR as /tmp might be too small.
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 
