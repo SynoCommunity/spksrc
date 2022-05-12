@@ -1,4 +1,3 @@
-rsc:bin/c_rehash
 bin:bin/openssl
 lib:lib/engines-1.1/afalg.so
 lib:lib/engines-1.1/capi.so
