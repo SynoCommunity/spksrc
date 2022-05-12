@@ -22,7 +22,7 @@ service_postinst ()
   # update default config file
   # - Change port according to the wizard
   sed -e "s/^#port = 5432/port=${PG_PORT}/g" -i ${CFG_FILE}
-  # - Change listen addresses
+  # Change listen addresses
   sed -e "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g" -i ${CFG_FILE}
 
   # Start server
