@@ -6,6 +6,7 @@ rsc:bin/irb
 rsc:bin/racc
 rsc:bin/rake
 rsc:bin/rbs
+rsc:bin/rdbg
 rsc:bin/rdoc
 rsc:bin/ri
 rsc:bin/ruby

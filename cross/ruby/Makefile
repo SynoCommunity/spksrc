@@ -1,9 +1,9 @@
 PKG_NAME = ruby
-PKG_VERS = 3.1.0
+PKG_VERS = 3.1.2
 PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
-PKG_EXT = tar.gz
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://cache.ruby-lang.org/pub/$(PKG_NAME)/$(PKG_SHORT_VERS)
+PKG_DIST_SITE = https://cache.ruby-lang.org/pub/ruby/$(PKG_SHORT_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/ruby
@@ -50,7 +50,6 @@ ruby_post_configure:
 # Finally fix path to ruby in scripts
 ruby_install:
 	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install
-	@for tool in $(RUBYTOOLS) ; \
-	do \
+	@for tool in $(RUBYTOOLS) ; do \
 		sed -i -e 's|^#\!$(STAGING_INSTALL_PREFIX)|#\!$(INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/bin/$${tool} ; \
 	done
