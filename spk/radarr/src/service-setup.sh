@@ -1,15 +1,14 @@
 
 # Radarr service setup
-
 RADARR="${SYNOPKG_PKGDEST}/share/Radarr/bin/Radarr"
 
 # Radarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGVAR}"
-CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
+CONFIG_DIR="${HOME_DIR}/.config"
 PID_FILE="${CONFIG_DIR}/Radarr/radarr.pid"
 
-# Some have it stored in the root of package
-LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
+# SPK_REV 15 has it in the wrong place for DSM 7
+LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
 
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
@@ -34,15 +33,12 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    # We have to account for legacy folder in the root
-    # It should go, after the upgrade, into /var/.config/
-    # The /var/ folder gets automatically copied by service-installer after this
-    if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-        echo "Moving ${LEGACY_CONFIG_DIR} to ${INST_VAR}"
-        mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
-    else
-        # Create, in case it's missing for some reason
-        mkdir ${CONFIG_DIR} 2>&1
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ]; then
+        # ensure config is in @appdata folder
+        if [ "$(realpath ${LEGACY_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
+            echo "Move ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
+            mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
+        fi
     fi
 }
 
@@ -54,15 +50,5 @@ service_postupgrade ()
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions "${CONFIG_DIR}"
-    fi
-    
-    UPDATE_FROM_VERSION=${SYNOPKG_OLD_PKGVER%-*}
-    UPDATE_FROM_REV=${SYNOPKG_OLD_PKGVER##*-}
-    if [ ${UPDATE_FROM_REV} -lt 6 ]; then
-        # If backup was created before new-style packages
-        # new updates/backups will fail due to permissions (see #3185)
-        # fixed in #3190, i.e. radarr v20180303-6
-        set_unix_permissions "/tmp/radarr_backup"
-        set_unix_permissions "/tmp/radarr_update"
     fi
 }
