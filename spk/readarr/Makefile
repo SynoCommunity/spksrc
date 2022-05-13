@@ -1,25 +1,25 @@
 SPK_NAME = readarr
-SPK_VERS = 0.1.0.1225
+SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/readarr.png
 
+REQUIRED_MIN_DSM = 5.0
+
+# .NET is not supported on PPC, ARM5, ARM7L and x86
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+
+DEPENDS = cross/sqlite cross/curl cross/libstdc++ cross/readarr
+
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://readarr.com/
-DESCRIPTION  = Readarr is an eBook collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new books and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
-CHANGELOG = "Initial SynoCommunity release."
+DESCRIPTION  = Readarr is an ebook and audiobook collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new books from your favorite authors and will grab, sort, and rename them.
+CHANGELOG = "Initial package release."
 DISPLAY_NAME = Readarr
 HOMEPAGE = https://readarr.com/
 LICENSE  = GPLv3
 LICENSE_FILE = $(WORK_DIR)/Readarr/LICENSE.md
 HELPURL = https://wiki.servarr.com/readarr/troubleshooting
 SUPPORTURL = https://readarr.com/\#support
-
-REQUIRED_DSM = 5.0
-
-# .NET is not supported on PPC, ARM5, ARM7L and x86
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
-
-DEPENDS = cross/sqlite cross/curl cross/libstdc++ cross/$(SPK_NAME)
 
 STARTABLE = yes
 SERVICE_USER = auto
@@ -34,7 +34,7 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = readarr_extra_install
 
-# use alternate TMPDIR as /tmp might be too small.
+# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
