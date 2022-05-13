@@ -35,9 +35,11 @@ service_preupgrade ()
 {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ]; then
         # ensure config is in @appdata folder
-        if [ "$(realpath ${LEGACY_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
-            echo "Move ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
-            mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
+        if [ -d "${LEGACY_CONFIG_DIR}" ]; then
+            if [ "$(realpath ${LEGACY_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
+                echo "Move ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
+                mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
+            fi
         fi
     fi
 }
