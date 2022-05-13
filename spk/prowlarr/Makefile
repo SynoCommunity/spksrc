@@ -1,6 +1,6 @@
 SPK_NAME = prowlarr
-SPK_REV = 1
-SPK_VERS = 0.1.1.1030
+SPK_VERS = $(shell date +%Y%m%d)
+SPK_REV = 2
 SPK_ICON = src/prowlarr.png
 
 # .NET is not supported on PPC, ARM5, ARM7L and x86
@@ -14,10 +14,10 @@ HELPURL    = https://wiki.servarr.com/prowlarr
 # Placeholder support URL
 SUPPORTURL = https://prowlarr.com/\#support
 
-DESCRIPTION = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required (we do it all).
+DESCRIPTION = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required \(we do it all\).
 STARTABLE = yes
 DISPLAY_NAME = Prowlarr
-CHANGELOG = "Initial SynoCommunity release."
+CHANGELOG = "1. Update prowlarr to v0.2.0.1678.<br/>2. Fix DSM service status.<br/>3. User package date for version since internal updater is used."
 
 HOMEPAGE = https://prowlarr.com/
 LICENSE  = GPLv3
@@ -34,7 +34,7 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = prowlarr_extra_install
 
-# use alternate TMPDIR as /tmp might be too small.
+# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
