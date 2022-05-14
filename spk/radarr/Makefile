@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/radarr.png
 
 REQUIRED_MIN_DSM = 5.0
