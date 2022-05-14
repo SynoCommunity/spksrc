@@ -5,7 +5,8 @@ RADARR="${SYNOPKG_PKGDEST}/share/Radarr/bin/Radarr"
 # Radarr uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGVAR}"
 CONFIG_DIR="${HOME_DIR}/.config"
-PID_FILE="${CONFIG_DIR}/Radarr/radarr.pid"
+RADARR_CONFIG_DIR="${CONFIG_DIR}/Radarr"
+PID_FILE="${RADARR_CONFIG_DIR}/radarr.pid"
 
 # SPK_REV 15 has it in the wrong place for DSM 7
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
@@ -13,14 +14,14 @@ LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
 GROUP="sc-download"
 LEGACY_GROUP="sc-media"
 
-SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${RADARR}"
+SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${RADARR} -nobrowser -data=${RADARR_CONFIG_DIR}"
 SVC_BACKGROUND=y
 
 service_postinst ()
 {
     # Move config.xml to .config
-    mkdir -p ${CONFIG_DIR}/Radarr
-    mv ${SYNOPKG_PKGDEST}/app/config.xml ${CONFIG_DIR}/Radarr/config.xml
+    mkdir -p ${RADARR_CONFIG_DIR}
+    mv ${SYNOPKG_PKGDEST}/app/config.xml ${RADARR_CONFIG_DIR}/config.xml
     
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions "${CONFIG_DIR}"
@@ -62,7 +63,7 @@ service_postupgrade ()
         echo "Set update required"
         # Make Radarr do an update check on start to avoid possible Radarr
         # downgrade when synocommunity package is updated
-        touch ${CONFIG_DIR}/Radarr/update_required 2>&1
+        touch ${RADARR_CONFIG_DIR}/update_required 2>&1
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
