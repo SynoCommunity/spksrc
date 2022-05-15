@@ -1,7 +1,9 @@
 [{
     "step_title": "Mettre à jour Radarr",
     "items": [{
-        "desc": "Garder Radarr à jour en utilisant System>Updates dans l'interface Radarr."
+        "desc": "Cette mise à jour concerne les bibliothèques supplémentaires et l'intégration DSM. Il ne modifie pas votre version actuelle de Radarr."
+    },{
+        "desc": "Garder Radarr à jour en utilisant <b>System>Updates</b> dans l'interface Radarr."
     }]
 },{
     "step_title": "Permissions DSM",
