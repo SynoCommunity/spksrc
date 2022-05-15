@@ -6,6 +6,6 @@
 },{
     "step_title": "Permissions DSM",
     "items": [{
-        "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM."
+        "desc": "Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
     }]
 }]
