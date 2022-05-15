@@ -8,8 +8,6 @@
 }, {
     "step_title": "DSM Permissions",
     "items": [{
-        "desc": "Permissions for download-related packages of SynoCommunity are managed with the group <b>'sc-download'</b> in DSM."
-    },{
-        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to update permissions on your folders. If you get permission errors within Radarr, manually set Read/Write permissions for the 'sc-download' group on the reported folders using File Station."
+        "desc": "Permissions for download-related packages of SynoCommunity are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
 }]
