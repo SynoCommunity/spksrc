@@ -11,6 +11,7 @@ PID_FILE="${RADARR_CONFIG_DIR}/radarr.pid"
 # SPK_REV 15 has it in the wrong place for DSM 7
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
 
+# for DSM < 7 only:
 GROUP="sc-download"
 
 SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${RADARR} -nobrowser -data=${RADARR_CONFIG_DIR}"
