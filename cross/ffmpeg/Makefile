@@ -9,7 +9,7 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-CONFIGURE_ARGS = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
 CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
 CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
@@ -20,6 +20,9 @@ CONFIGURE_ARGS += --enable-fontconfig --enable-avresample
 CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
+
+# Must match $(SPK_REV) from spk/ffmpeg/Makefil
+CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg/Makefile)
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
