@@ -93,6 +93,9 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
+DEPENDS += cross/libwebp
+CONFIGURE_ARGS += --enable-libwebp
+
 DEPENDS += cross/libzmq
 CONFIGURE_ARGS += --enable-libzmq
 

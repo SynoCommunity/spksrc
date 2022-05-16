@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.4.2
 SPK_REV = 44
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Add extra-version flag"
+CHANGELOG = "1. Add extra-version flag<br/>2. Enable WebP encoder/decoder"
 
 CONF_DIR = src/conf
 
