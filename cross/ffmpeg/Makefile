@@ -16,7 +16,7 @@ CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
-CONFIGURE_ARGS += --enable-fontconfig --enable-avresample
+CONFIGURE_ARGS += --enable-avresample
 CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
@@ -55,6 +55,9 @@ OPTIONAL_DEPENDS += cross/shine
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2
 CONFIGURE_ARGS += --enable-demuxer=dash
+
+DEPENDS += cross/fontconfig
+CONFIGURE_ARGS += --enable-libfontconfig
 
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype

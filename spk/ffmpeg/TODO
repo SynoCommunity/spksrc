@@ -1,6 +1,3 @@
-To modify:
-  --enable-libfontconfig VS --enable-fontconfig
-
 Candidates for enablement:
   --enable-ladspa
   --enable-libbs2b 
