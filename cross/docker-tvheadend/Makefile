@@ -2,7 +2,6 @@ PKG_NAME = docker-tvheadend
 PKG_VERS = master
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_SITE = https://github.com/linuxserver/docker-tvheadend/archive/refs/heads
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
