@@ -1,0 +1,39 @@
+To modify:
+  --enable-libfontconfig VS --enable-fontconfig
+
+Candidates for enablement:
+  --enable-ladspa
+  --enable-libbs2b 
+  --enable-libcaca 
+  --enable-libcdio 
+  --enable-libcodec2 
+  --enable-libflite 
+  --enable-libgme 
+  --enable-libgsm 
+  --enable-libmysofa 
+  --enable-libopenmpt 
+  --enable-librabbitmq 
+  --enable-librubberband 
+  --enable-libsnappy 
+  --enable-libsrt 
+  --enable-libssh 
+  --enable-libtwolame 
+  --enable-libvidstab 
+  --enable-libxvid 
+  --enable-libzimg 
+  --enable-lv2 
+  --enable-omx 
+  --enable-pocketsphinx 
+  --enable-librsvg 
+  --enable-libdc1394 
+  --enable-libiec61883 
+  --enable-chromaprint 
+  --enable-frei0r
+
+Not to be enabled:
+  --enable-libjack 
+  --enable-libpulse 
+  --enable-openal 
+  --enable-opencl 
+  --enable-opengl 
+  --enable-sdl2
