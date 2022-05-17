@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/dyne/frei0r/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/freetype cross/cairo
+DEPENDS = 
 
 HOMEPAGE = https://frei0r.dyne.org/
 COMMENT  = Frei0r is a minimalistic plugin API for video effects.
