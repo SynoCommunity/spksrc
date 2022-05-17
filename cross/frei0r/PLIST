@@ -21,10 +21,6 @@ lib:lib/frei0r-1/B.so
 lib:lib/frei0r-1/burn.so
 lib:lib/frei0r-1/bw0r.so
 lib:lib/frei0r-1/c0rners.so
-lib:lib/frei0r-1/cairoaffineblend.so
-lib:lib/frei0r-1/cairoblend.so
-lib:lib/frei0r-1/cairogradient.so
-lib:lib/frei0r-1/cairoimagegrid.so
 lib:lib/frei0r-1/cartoon.so
 lib:lib/frei0r-1/cluster.so
 lib:lib/frei0r-1/colgate.so
