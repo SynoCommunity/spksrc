@@ -62,6 +62,9 @@ CONFIGURE_ARGS += --enable-libfontconfig
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
 
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-libfrei0r
+
 DEPENDS += cross/fribidi
 CONFIGURE_ARGS += --enable-libfribidi
 

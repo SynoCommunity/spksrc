@@ -1,7 +1,6 @@
 Candidates for enablement:
   --enable-ladspa
   --enable-libbs2b 
-  --enable-libcaca 
   --enable-libcdio 
   --enable-libcodec2 
   --enable-libflite 
@@ -24,7 +23,6 @@ Candidates for enablement:
   --enable-libdc1394 
   --enable-libiec61883 
   --enable-chromaprint 
-  --enable-frei0r
 
 Not to be enabled:
   --enable-libjack 
