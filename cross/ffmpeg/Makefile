@@ -62,9 +62,6 @@ CONFIGURE_ARGS += --enable-libfontconfig
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
 
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-libfrei0r
-
 DEPENDS += cross/fribidi
 CONFIGURE_ARGS += --enable-libfribidi
 
@@ -108,7 +105,7 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
-DEPENDS += cross/rabbitmq
+DEPENDS += cross/librabbitmq
 CONFIGURE_ARGS += --enable-librabbitmq
 
 DEPENDS += cross/zvbi
@@ -133,6 +130,9 @@ endif
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
+
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
 
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
