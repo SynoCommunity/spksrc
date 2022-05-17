@@ -1,0 +1,15 @@
+# declaration and implementation of copy_fh do not use the same 
+# data type for parameter 'bytes_to_copy'
+# fix function declaration for (64-bit) archs where sizeof(size_t) != sizeof(unsigned int)
+# 
+--- mspack/oabd.c.orig	2019-03-04 00:53:58.000000000 +0000
++++ mspack/oabd.c	2022-05-11 18:12:34.410316805 +0000
+@@ -35,7 +35,7 @@
+                                        const char *output);
+ static int oabd_param(struct msoab_decompressor *base, int param, int value);
+ static int copy_fh(struct mspack_system *sys, struct mspack_file *infh,
+-                   struct mspack_file *outfh, unsigned int bytes_to_copy,
++                   struct mspack_file *outfh, size_t bytes_to_copy,
+                    unsigned char *buf, int buf_size);
+ 
+ 
