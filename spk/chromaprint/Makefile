@@ -1,6 +1,6 @@
 SPK_NAME = chromaprint
-SPK_VERS = 1.5.0
-SPK_REV = 17
+SPK_VERS = 1.5.1
+SPK_REV = 18
 SPK_ICON = src/chromaprint.png
 
 DEPENDS = cross/$(SPK_NAME)
