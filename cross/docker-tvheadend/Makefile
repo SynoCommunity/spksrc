@@ -1,9 +1,10 @@
 PKG_NAME = docker-tvheadend
-PKG_VERS = master
+# git hash from April 22nd 2022
+PKG_VERS = 8d64a8b94105530c1e149b3973a66da9299c20dd
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/linuxserver/docker-tvheadend/archive/refs/heads
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/linuxserver/docker-tvheadend/archive
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
