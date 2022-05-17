@@ -81,8 +81,17 @@ DEPENDS += cross/flac
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --enable-libtheora
 
+DEPENDS += cross/libcaca
+CONFIGURE_ARGS += --enable-libcaca
+
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
+
+DEPENDS += cross/libwebp
+CONFIGURE_ARGS += --enable-libwebp
+
+DEPENDS += cross/libzmq
+CONFIGURE_ARGS += --enable-libzmq
 
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
@@ -96,11 +105,8 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
-DEPENDS += cross/libwebp
-CONFIGURE_ARGS += --enable-libwebp
-
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
+DEPENDS += cross/rabbitmq
+CONFIGURE_ARGS += --enable-librabbitmq
 
 DEPENDS += cross/zvbi
 CONFIGURE_ARGS += --enable-libzvbi

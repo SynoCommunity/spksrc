@@ -9,7 +9,6 @@ Candidates for enablement:
   --enable-libgsm 
   --enable-libmysofa 
   --enable-libopenmpt 
-  --enable-librabbitmq 
   --enable-librubberband 
   --enable-libsnappy 
   --enable-libsrt 
