@@ -23,7 +23,6 @@ Candidates for enablement:
   --enable-libtwolame 
   --enable-libvidstab 
   --enable-libxvid 
-  --enable-libzimg 
   --enable-lv2 
   --enable-omx 
   --enable-pocketsphinx 

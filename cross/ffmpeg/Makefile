@@ -137,6 +137,9 @@ CONFIGURE_ARGS += --enable-frei0r
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
+DEPENDS += cross/libzimg
+CONFIGURE_ARGS += --enable-libzimg
+
 # end ifneq $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 endif
 
