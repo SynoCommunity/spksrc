@@ -38,9 +38,11 @@ include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = native/nasm
 OPTIONAL_DEPENDS += cross/dav1d
+OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
+OPTIONAL_DEPENDS += cross/libzimg
 OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
 OPTIONAL_DEPENDS += cross/libva
@@ -83,6 +85,9 @@ CONFIGURE_ARGS += --enable-libtheora
 
 DEPENDS += cross/libcaca
 CONFIGURE_ARGS += --enable-libcaca
+
+DEPENDS += cross/libdc1394
+CONFIGURE_ARGS += --enable-libdc1394
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis

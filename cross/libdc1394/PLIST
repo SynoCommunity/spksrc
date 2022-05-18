@@ -1,0 +1,4 @@
+bin:bin/dc1394_reset_bus
+lnk:lib/libdc1394.so
+lnk:lib/libdc1394.so.25
+lib:lib/libdc1394.so.25.0.0

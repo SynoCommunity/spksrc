@@ -26,7 +26,6 @@ Candidates for enablement:
   --enable-lv2 
   --enable-omx 
   --enable-pocketsphinx 
-  --enable-libdc1394 
   --enable-libiec61883 
   --enable-chromaprint 
 
