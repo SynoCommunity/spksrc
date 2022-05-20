@@ -1,5 +1,5 @@
 PKG_NAME = boost
-PKG_VERS = 1.76.0
+PKG_VERS = 1.78.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
 PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
@@ -47,7 +47,7 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
 # fix compilation with newer compilers
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 endif
