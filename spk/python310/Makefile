@@ -63,7 +63,7 @@ WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
 # libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
 # Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
-REQUIRED_DSM = 7.0
+REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS += comcerto2k
 # ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=1y
