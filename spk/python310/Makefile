@@ -48,28 +48,24 @@ include ../../mk/spksrc.common.mk
 # ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
 # [libtorrent] 2.0.6
-# # cross/boost: archs lacking C++14 compiler (88f6281, hi3535 and ppc archs except QorIQ)
 # UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 # # libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
+# # Unless c++1y if fixed: https://github.com/arvidn/libtorrent/issues/6868
 # # REQUIRED_DSM = 7.0
-# # comcerto2k has older toolchain than other DSM 7 archs
-# # UNSUPPORTED_ARCHS += comcerto2k
 # DEPENDS += cross/boost_1.76 cross/geoip
 # BOOST_LIBRARIES += system python chrono random
+# BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_76_0
 # ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-# ENV += BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_76_0
-# ENV += PATH=$(WORK_DIR)/boost_1_76_0:$(PATH)
+# ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
+# ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 # WHEELS_BUILD_ARGS += [libtorrent]
 # WHEELS_BUILD_ARGS += build_ext
 # WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 # ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 # WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 # endif
-# # Require c++14 (c++1y) using older GCC 4.9.x
-# ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# # Require c++11 using older GCC 4.9.x
+# ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=1y
-# WHEELS_CXXFLAGS += [libtorrent] -Wno-missing-field-initializers
 # endif
 
 # [libtorrent] 1.2.16
@@ -87,7 +83,7 @@ WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
 WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 endif
 
