@@ -49,9 +49,6 @@ include ../../mk/spksrc.common.mk
 
 # [libtorrent] 2.0.6
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-# libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
-# Unless c++1y if fixed: https://github.com/arvidn/libtorrent/issues/6868
-REQUIRED_DSM = 7.0
 DEPENDS += cross/boost_1.78 cross/geoip
 BOOST_LIBRARIES += system python chrono random
 BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
@@ -64,9 +61,13 @@ WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
-ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
-WHEELS_BUILD_ARGS += --b2-args=cxxstd=1y
-endif
+# libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
+# Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
+REQUIRED_DSM = 7.0
+UNSUPPORTED_ARCHS += comcerto2k
+# ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
+# WHEELS_BUILD_ARGS += --b2-args=cxxstd=1y
+# endif
 
 # [libtorrent] 1.2.16
 # # Compiler too old due to c++11 minimal requirement
