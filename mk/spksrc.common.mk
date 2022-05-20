@@ -121,4 +121,4 @@ version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | so
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
 # GCC version
-version_gcc = $(shell $$(sed -n -e '/TC_ENV += TC_GCC/ s/.*= *//p' $(PWD)/$(subst arch,work,$(MAKECMDGOALS))/tc_vars.mk))
+version_gcc = $(shell $$(sed -n -e '/TC_ENV += TC_GCC/ s/.*= *//p' $(PWD)/$(subst arch,work,$(MAKECMDGOALS))/tc_vars.mk 2>/dev/null))
