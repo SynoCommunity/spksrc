@@ -1,0 +1,14 @@
+# patch source for Python 3.10 compatiblity.
+# https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
+# 
+--- libs/python/src/exec.cpp.orig	2017-12-13 23:56:47.000000000 +0000
++++ libs/python/src/exec.cpp	2022-03-27 15:03:48.947382255 +0000
+@@ -106,7 +106,7 @@
+   char *f = const_cast<char *>(filename);
+   // Let python open the file to avoid potential binary incompatibilities.
+ #if PY_VERSION_HEX >= 0x03040000
+-  FILE *fs = _Py_fopen(f, "r");
++  FILE *fs = fopen(f, "r");
+ #elif PY_VERSION_HEX >= 0x03000000
+   PyObject *fo = Py_BuildValue("s", f);
+   FILE *fs = _Py_fopen(fo, "r");

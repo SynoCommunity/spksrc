@@ -26,6 +26,3 @@ six==1.16.0
 ## are provided to demonstrate how to build
 ## various wheels.  Uncoment to enable.
 ##
-
-# [deluge]
-# deluge==2.0.5

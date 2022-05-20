@@ -32,14 +32,22 @@
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
 # gevent==21.12.0
 
-# [libtorrent]
-# Depends: boost, geoip, libiconv
+# [libtorrent] 1.2.16
+# Depends: openssl, boost 1.70, geoip, libiconv
 # Require environment variables
 #  BOOST_LIBRARIES
-#  BOOST_ROOT
-# libtorrent==2.0.5
-# git+https://github.com/arvidn/libtorrent.git@master#egg=libtorrent==2.0.5 (use RC_2_0)
-# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.5
+#  BOOST_BUILD_PATH
+# git+https://github.com/arvidn/libtorrent.git@v1.2.16#egg=libtorrent==1.2.16
+
+# [libtorrent] 2.0.6
+# Depends: openssl, boost 1.78, geoip
+# Require environment variables
+#  BOOST_LIBRARIES
+#  BOOST_BUILD_PATH
+# Only supported on DSM7 armv7, aarch64, x64
+# git+https://github.com/arvidn/libtorrent.git@v2.0.6#egg=libtorrent==2.0.6
+# Use RC_2_0 for latest development snapshots
+# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.6
 
 # [lxml]
 # Depends: libxml2, libxslt
