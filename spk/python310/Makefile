@@ -38,8 +38,6 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 ## various wheels.  Uncoment to enable.
 ##
 
-include ../../mk/spksrc.archs.mk
-
 include ../../mk/spksrc.common.mk
 
 # [gevent]
