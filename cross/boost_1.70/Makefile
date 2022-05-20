@@ -51,7 +51,7 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
 # fix compilation with newer compilers
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 endif
