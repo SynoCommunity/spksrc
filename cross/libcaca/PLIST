@@ -1,5 +1,5 @@
 bin:bin/cacaclock
-bin:bin/caca-config
+rsc:bin/caca-config
 bin:bin/cacademo
 bin:bin/cacafire
 bin:bin/cacaplay

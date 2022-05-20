@@ -1,4 +1,4 @@
-bin:bin/imlib2-config
+rsc:bin/imlib2-config
 bin:bin/imlib2_conv
 lib:lib/imlib2/filters/bumpmap.so
 lib:lib/imlib2/filters/colormod.so

@@ -8,7 +8,7 @@ DEPENDS = cross/imagemagick cross/jpegoptim
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images. This package includes jpegoptim, a utility to optimize/compress JPEG files, that is not part of imagemagick.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.0-31.<br/>2. Update jpegoptim to v1.4.7."
+CHANGELOG = "1. Update ImageMagick to v7.1.0-35.<br/>2. Update jpegoptim to v1.4.7."
 
 STARTABLE = no
 
