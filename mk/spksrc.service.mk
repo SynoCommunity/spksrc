@@ -7,7 +7,7 @@
 #   conf/SPK_NAME.sc       if SERVICE_PORT and DSM<7
 #   conf/resource          if SERVICE_CERT or DSM7
 #   app/SPK_NAME.sc        if SERVICE_PORT and DSM7
-#   app/config             if DSM_UI_DIR
+#   app/config             if DSM_UI_DIR (may be overwritten by DSM_UI_CONFIG)
 #
 # Targets are executed in the following order:
 #  service_msg_target
@@ -418,6 +418,9 @@ endif
 DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
+ifneq ($(wildcard $(DSM_UI_CONFIG)),)
+	cat $(DSM_UI_CONFIG) > $@
+else
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
 		--arg desc "${DESC}" \
 		--arg id "com.synocommunity.packages.${SPK_NAME}" \
@@ -428,7 +431,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 		--arg type "${SERVICE_TYPE}" \
 		--argjson allUsers ${SERVICE_PORT_ALL_USERS} \
 		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":true}}}' > $@
-
+endif
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif
 endif
