@@ -1,6 +1,6 @@
 SPK_NAME = minio
-SPK_VERS = 2022.04.01
-SPK_REV = 13
+SPK_VERS = 2022.05.19
+SPK_REV = 14
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 MAINTAINER = fgma
 DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
 DISPLAY_NAME = MinIO
-CHANGELOG = "Update to MinIO 2022-04-01T03-41-39Z. Multiple minor feature releases and some bugfix releases."
+CHANGELOG = "Update to MinIO 2022-04-26T01-20-24Z. Multiple minor feature releases and security releases."
 LICENSE_FILE = $(WORK_DIR)/src/github.com/minio/minio/LICENSE
 HOMEPAGE = https://min.io/
 LICENSE = AGPLv3.0
