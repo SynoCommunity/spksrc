@@ -19,6 +19,7 @@ CONF_DIR = src/conf
 
 SERVICE_USER = auto
 SERVICE_PORT = 11211
+DSM_UI_CONFIG = src/app/config
 
 # SERVICE_COMMAND is defined in service setup script
 STARTABLE = yes
