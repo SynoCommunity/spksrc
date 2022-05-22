@@ -19,7 +19,6 @@ LICENSE  = GPLv2
 # 3688	(web UI)
 # 6600	(MPD client requests)
 
-
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = yes
@@ -32,7 +31,7 @@ export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 PRE_DEPEND_TARGET = owntone_pre_depend
 SPK_DEPENDS = "ffmpeg>4.2"
-# Use some of the FFMPEG package shared libraries
+# Use some shared libraries of the FFMPEG package
 FFMPEG_LIBS = libavformat.pc libavcodec.pc libavutil.pc libavfilter.pc
 FFMPEG_LIBS += libswscale.pc libpostproc.pc
 FFMPEG_LIBS += libswresample.pc libavresample.pc

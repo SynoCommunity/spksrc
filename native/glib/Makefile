@@ -12,8 +12,6 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library
 LICENSE  = GPLv2
 
-UNSUPPORTED_ARCHS = powerpc ppc824x ppc853x ppc854x
-
 CONFIGURE_ARGS += -Dman=false -Dlibmount=disabled -Ddefault_library=shared -Dselinux=disabled
 
 include ../../mk/spksrc.native-meson.mk

@@ -11,6 +11,8 @@ DEPENDS = cross/openssl
 # ppc except qoriq
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
+ADDITIONAL_CPPFLAGS = -O
+
 HOMEPAGE = https://libwebsockets.org/
 COMMENT  = Libwebsockets (LWS) is a flexible, lightweight pure C library for implementing modern network protocols easily with a tiny footprint, using a nonblocking event loop.
 LICENSE  = MIT
