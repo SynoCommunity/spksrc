@@ -31,7 +31,7 @@ SERVICE_USER  = auto
 POST_STRIP_TARGET = octoprint_extra_install
 
 # [frozendict]
-WHEELS_CFLAGS = [frozendict] -std=c11
+WHEELS_CFLAGS = [frozendict] -std=c99
 
 include ../../mk/spksrc.spk.mk
 
