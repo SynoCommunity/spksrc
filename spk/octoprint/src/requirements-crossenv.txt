@@ -1,11 +1,12 @@
 # all requirements are taken from the list "INSTALL_REQUIRES" in the 
 # original setup.py at: https://github.com/OctoPrint/OctoPrint/blob/master/setup.py
 
-MarkupSafe==1.1.1
+MarkupSafe==2.1.1
 netifaces==0.11.0
-psutil==5.9.0
+psutil==5.9.1
+frozendict==2.3.2
 PyYAML==5.4.1
-regex==2022.3.15
+regex==2022.4.24
 tornado==6.1
-Werkzeug==1.0.1
-wrapt==1.12.1
+Werkzeug==2.0.3
+wrapt==1.13.3

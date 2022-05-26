@@ -1,6 +1,6 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.7.3
-SPK_REV    = 8
+SPK_VERS   = 1.8.1
+SPK_REV    = 9
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "1. Update OctoPrint to v1.7.3<br/>2. Update to Python 3.10"
+CHANGELOG    = "Update OctoPrint to v1.8.1, including fixes for CVE-2022-1430, CVE-2022-1432 and other security issues."
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
@@ -29,6 +29,9 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_USER  = auto
 
 POST_STRIP_TARGET = octoprint_extra_install
+
+# [frozendict]
+WHEELS_CFLAGS = [frozendict] -std=c99
 
 include ../../mk/spksrc.spk.mk
 
