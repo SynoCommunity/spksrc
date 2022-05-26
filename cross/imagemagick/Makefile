@@ -1,5 +1,5 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 7.1.0-19
+PKG_VERS = 7.1.0-35
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
@@ -16,6 +16,7 @@ DEPENDS += cross/libpng cross/libjpeg cross/openjpeg
 DEPENDS += cross/libtiff
 DEPENDS += cross/libwmf
 DEPENDS += cross/libwebp
+DEPENDS += cross/zstd
 
 include ../../mk/spksrc.archs.mk
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))

@@ -2,7 +2,7 @@ PKG_NAME = libwmf
 PKG_VERS = 0.2.8.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://sourceforge.net/projects/wvware/files/$(PKG_NAME)/$(PKG_VERS)
+PKG_DIST_SITE = https://sourceforge.net/projects/wvware/files/libwmf/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/freetype cross/libpng cross/libjpeg cross/libxml2

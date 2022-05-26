@@ -2,7 +2,7 @@ PKG_NAME = libde265
 PKG_VERS = 1.0.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/strukturag/$(PKG_NAME)/releases/download/v$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/strukturag/libde265/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
