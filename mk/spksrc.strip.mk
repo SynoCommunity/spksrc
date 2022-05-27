@@ -50,10 +50,11 @@ include_libatomic:
 	do \
 	  case $${type} in \
 	    lib|bin) \
-	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep libatomic)" ]; then \
+	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep libatomic\.so)" ]; then \
 	        _libatomic_="$$(readlink $(TC_LIBRARY_PATH)/libatomic.so)" ; \
-	        echo  "===>  Include libatomic from toolchain ($${_libatomic_})" ; \
-	        install -m 644 $(TC_LIBRARY_PATH)/$${_libatomic_} $(STAGING_DIR)/lib ; \
+	        echo  "===>  Add libatomic from toolchain ($${_libatomic_})" ; \
+	        install -d -m 755 $(STAGING_DIR)/lib ; \
+	        install -m 644 $(TC_LIBRARY_PATH)/$${_libatomic_} $(STAGING_DIR)/lib/ ; \
 	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so.1 ; \
 	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so ; \
 	        break ; \
