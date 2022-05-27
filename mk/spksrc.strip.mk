@@ -48,11 +48,12 @@ include_libatomic:
 	do \
 	  case $${type} in \
 	    lib|bin) \
-	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} | grep NEEDED | grep libatomic)" ]; then \
-	        echo -n "Including libatomic.so..." ; \
+	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep libatomic)" ]; then \
+	        echo "Including libatomic.so..." ; \
 	        install -m 644 $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/$$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) $(STAGING_DIR)/lib ; \
 	        cd $(STAGING_DIR)/lib/ && ln -sf $$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) libatomic.so.1 ; \
 	        cd $(STAGING_DIR)/lib/ && ln -sf $$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) libatomic.so ; \
+	        break ; \
 	      fi \
 	    ;; \
 	  esac ; \
