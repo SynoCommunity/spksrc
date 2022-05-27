@@ -43,9 +43,24 @@ endif
 strip_msg:
 	@$(MSG) "Stripping binaries and libraries of $(NAME)"
 
+include_libatomic:
+	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
+	do \
+	  case $${type} in \
+	    lib|bin) \
+	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} | grep NEEDED | grep libatomic)" ]; then \
+	        echo -n "Including libatomic.so..." ; \
+	        install -m 644 $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/$$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) $(STAGING_DIR)/lib ; \
+	        cd $(STAGING_DIR)/lib/ && ln -sf $$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) libatomic.so.1 ; \
+	        cd $(STAGING_DIR)/lib/ && ln -sf $$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) libatomic.so ; \
+	      fi \
+	    ;; \
+	  esac ; \
+	done
+
 pre_strip_target: strip_msg
 
-strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST)
+strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_libatomic
 	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
 	do \
 	  case $${type} in \
