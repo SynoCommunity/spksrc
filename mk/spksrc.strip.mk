@@ -37,6 +37,8 @@ else
 $(POST_STRIP_TARGET): $(STRIP_TARGET)
 endif
 
+TC_LIBRARY_PATH = $(realpath $(TC_PATH)..)/$(TC_LIBRARY)
+
 .PHONY: strip strip_msg
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
 
@@ -49,10 +51,11 @@ include_libatomic:
 	  case $${type} in \
 	    lib|bin) \
 	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep libatomic)" ]; then \
-	        echo "Including libatomic.so..." ; \
-	        install -m 644 $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/$$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) $(STAGING_DIR)/lib ; \
-	        cd $(STAGING_DIR)/lib/ && ln -sf $$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) libatomic.so.1 ; \
-	        cd $(STAGING_DIR)/lib/ && ln -sf $$(readlink $(realpath $(TC_PATH)..)/$(TC_LIBRARY)/libatomic.so) libatomic.so ; \
+	        _libatomic_="$$(readlink $(TC_LIBRARY_PATH)/libatomic.so)" ; \
+	        echo  "===>  Include libatomic from toolchain ($${_libatomic_})" ; \
+	        install -m 644 $(TC_LIBRARY_PATH)/$${_libatomic_} $(STAGING_DIR)/lib ; \
+	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so.1 ; \
+	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so ; \
 	        break ; \
 	      fi \
 	    ;; \
