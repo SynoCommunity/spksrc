@@ -13,6 +13,5 @@ COMMENT  = Codec 2 is an open source (LGPL 2.1) low bit rate speech codec.
 LICENSE  = LGPL 2.1
 
 CMAKE_ARGS  = -DUNITTEST=FALSE
-CMAKE_ARGS += -DGENERATE_CODEBOOK=$(WORK_DIR)/../../../native/codec2/work-native/install/usr/local/bin/generate_codebook
 
 include ../../mk/spksrc.cross-cmake.mk

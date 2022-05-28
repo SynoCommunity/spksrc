@@ -8,8 +8,10 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-##### cmake specific configurations
+# cmake specific configurations
 include ../../mk/spksrc.cross-cmake-env.mk
+
+####
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
@@ -40,7 +42,7 @@ cmake_configure_target:
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: cmake_compile_target
 
@@ -68,5 +70,5 @@ else
 endif
 endif
 
-# call-up regular build process
+# Call regular build process
 include ../../mk/spksrc.cross-cc.mk
