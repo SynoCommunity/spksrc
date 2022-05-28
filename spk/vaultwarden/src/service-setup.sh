@@ -27,7 +27,7 @@ service_postinst ()
         fi
         sed -e "s|@@domain@@|${wizard_domain}|g"  \
             -e "s|@@admin_token@@|${wizard_admin_token}|g"  \
-            -e "s|@@disable_admin_token@@|${disable_admin_token}|g"  \
+            -e "s|\"@@disable_admin_token@@\"|${disable_admin_token}|g"  \
             -i ${CONFIG_FILE}
     else
         echo "Missing config file: ${CONFIG_FILE}"

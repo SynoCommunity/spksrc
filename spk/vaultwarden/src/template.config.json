@@ -24,7 +24,7 @@
   "require_device_email": false,
   "reload_templates": false,
   "log_timestamp_format": "%Y-%m-%d %H:%M:%S.%3f",
-  "disable_admin_token": @@disable_admin_token@@,
+  "disable_admin_token": "@@disable_admin_token@@",
   "_enable_yubico": true,
   "_enable_duo": false,
   "_enable_smtp": true,
