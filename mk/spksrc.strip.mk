@@ -37,15 +37,35 @@ else
 $(POST_STRIP_TARGET): $(STRIP_TARGET)
 endif
 
+TC_LIBRARY_PATH = $(realpath $(TC_PATH)..)/$(TC_LIBRARY)
+
 .PHONY: strip strip_msg
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
 
 strip_msg:
 	@$(MSG) "Stripping binaries and libraries of $(NAME)"
 
+include_libatomic:
+	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
+	do \
+	  case $${type} in \
+	    lib|bin) \
+	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep libatomic\.so)" ]; then \
+	        _libatomic_="$$(readlink $(TC_LIBRARY_PATH)/libatomic.so)" ; \
+	        echo  "===>  Add libatomic from toolchain ($${_libatomic_})" ; \
+	        install -d -m 755 $(STAGING_DIR)/lib ; \
+	        install -m 644 $(TC_LIBRARY_PATH)/$${_libatomic_} $(STAGING_DIR)/lib/ ; \
+	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so.1 ; \
+	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so ; \
+	        break ; \
+	      fi \
+	    ;; \
+	  esac ; \
+	done
+
 pre_strip_target: strip_msg
 
-strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST)
+strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_libatomic
 	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
 	do \
 	  case $${type} in \

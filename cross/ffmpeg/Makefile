@@ -9,17 +9,20 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-CONFIGURE_ARGS = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
 CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
 CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
-CONFIGURE_ARGS += --enable-fontconfig --enable-avresample
+CONFIGURE_ARGS += --enable-avresample
 CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
+
+# Must match $(SPK_REV) from spk/ffmpeg/Makefil
+CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg/Makefile)
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
@@ -35,9 +38,11 @@ include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = native/nasm
 OPTIONAL_DEPENDS += cross/dav1d
+OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
+OPTIONAL_DEPENDS += cross/libzimg
 OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
 OPTIONAL_DEPENDS += cross/libva
@@ -52,6 +57,9 @@ OPTIONAL_DEPENDS += cross/shine
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2
 CONFIGURE_ARGS += --enable-demuxer=dash
+
+DEPENDS += cross/fontconfig
+CONFIGURE_ARGS += --enable-libfontconfig
 
 DEPENDS += cross/freetype
 CONFIGURE_ARGS += --enable-libfreetype
@@ -75,8 +83,20 @@ DEPENDS += cross/flac
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --enable-libtheora
 
+DEPENDS += cross/libcaca
+CONFIGURE_ARGS += --enable-libcaca
+
+DEPENDS += cross/libdc1394
+CONFIGURE_ARGS += --enable-libdc1394
+
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
+
+DEPENDS += cross/libwebp
+CONFIGURE_ARGS += --enable-libwebp
+
+DEPENDS += cross/libzmq
+CONFIGURE_ARGS += --enable-libzmq
 
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
@@ -90,8 +110,8 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
+DEPENDS += cross/librabbitmq
+CONFIGURE_ARGS += --enable-librabbitmq
 
 DEPENDS += cross/zvbi
 CONFIGURE_ARGS += --enable-libzvbi
@@ -116,8 +136,14 @@ ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
 
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
+
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
+
+DEPENDS += cross/libzimg
+CONFIGURE_ARGS += --enable-libzimg
 
 # end ifneq $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 endif
