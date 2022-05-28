@@ -54,6 +54,9 @@ OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
 
+DEPENDS += cross/codec2
+CONFIGURE_ARGS += --enable-libcodec2
+
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2
 CONFIGURE_ARGS += --enable-demuxer=dash

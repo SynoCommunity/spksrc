@@ -10,7 +10,6 @@ Candidates for enablement:
   --enable-ladspa
   --enable-libbs2b 
   --enable-libcdio 
-  --enable-libcodec2 
   --enable-libflite 
   --enable-libgme 
   --enable-libgsm 
