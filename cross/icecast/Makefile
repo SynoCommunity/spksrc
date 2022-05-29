@@ -15,6 +15,7 @@ GNU_CONFIGURE = 1
 POST_INSTALL_TARGET = icecast_extra_install
 
 CONFIGURE_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
 
