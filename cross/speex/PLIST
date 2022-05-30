@@ -1,5 +1,3 @@
-bin:bin/speexdec
-bin:bin/speexenc
 lnk:lib/libspeex.so
 lnk:lib/libspeex.so.1
 lib:lib/libspeex.so.1.5.1

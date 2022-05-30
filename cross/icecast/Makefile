@@ -12,7 +12,13 @@ COMMENT  = Icecast is a streaming media server which currently supports Ogg (Vor
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+POST_INSTALL_TARGET = icecast_extra_install
 
 CONFIGURE_ARGS = --with-xslt-config=$(STAGING_INSTALL_PREFIX)/bin/xslt-config
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: icecast_extra_install
+icecast_extra_install:
+	@$(RUN) cp win32/icecast.ico $(STAGING_INSTALL_PREFIX)/share/icecast/web/favicon.ico
