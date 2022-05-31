@@ -62,7 +62,6 @@ $(TC_LOCAL_VARS_MK): fix
 .PHONY: $(TC_CMAKE_VARS_MK)
 $(TC_CMAKE_VARS_MK): fix
 	env $(MAKE) --no-print-directory cmake_vars > $@ 2>/dev/null;
-	env $(MAKE) --no-print-directory cmake_vars ;
 
 .PHONY: cmake_vars
 cmake_vars:
