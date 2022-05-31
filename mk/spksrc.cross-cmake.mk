@@ -70,5 +70,5 @@ else
 endif
 endif
 
-# Call regular build process
+# call-up regular build process
 include ../../mk/spksrc.cross-cc.mk
