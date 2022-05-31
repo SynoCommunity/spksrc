@@ -27,11 +27,16 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -std=c99
 
+include ../../mk/spksrc.archs.mk
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 POST_INSTALL_TARGET = owntone_post_install
+else
+PLIST_TRANSFORM = sed -e '/\/libssp\.so/d' 
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-# use libssp of toolchain
+# install libssp of toolchain
 TC_LIBSSP_FILE = libssp.so.0.0.0
 
 .PHONY: owntone_post_install
