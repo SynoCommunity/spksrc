@@ -1,6 +1,6 @@
 SPK_NAME = synocli-kernel
-SPK_VERS = 1.0
-SPK_REV = 7
+SPK_VERS = 1.1
+SPK_REV = 8
 SPK_ICON = src/synocli-kernel.png
 
 DEPENDS = cross/usbutils cross/psmisc
@@ -10,7 +10,7 @@ DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utili
 OPTIONAL_DESC =
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
-CHANGELOG     = "1. Add ability to manage multiple config options from files<br/>2. Ability to enable udev rules"
+CHANGELOG     = "1. Fix issue \#5286 where 2.6 kernels presents extra-version and mismatch<br/>2. Fix UDEV rule check"
 
 HOMEPAGE = https://synocommunity.com/
 LICENSE  = Each tool is licensed under it\'s respective license.
