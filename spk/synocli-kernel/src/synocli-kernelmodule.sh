@@ -165,6 +165,7 @@ SPK_CFG_PATH=""                                                        # SynoCom
 ACTION=""                                                              # Module action insmod|rmmod|reload|status
 VERBOSE="FALSE"                                                        # Set verbose mode
 HELP="FALSE"                                                           # Print help
+URULE="FALSE"                                                          # Set udev rules to false by default
 
 while [ $# -gt 0 ] 
 do
@@ -190,7 +191,7 @@ done
 ARCH=$(uname -a | awk '{print $NF}' | cut -f2 -d_)                     # Synology NAS arch
 DSM_VERSION=$(sed -n 's/^productversion="\(.*\)"/\1/p' /etc/VERSION)   # Synology DSM version
 FPATH_SYS="/sys/module/firmware_class/parameters/path"                 # System module firmware path file index
-KVER=$(uname -r)                                                       # Running kernel version
+KVER=$(uname -r | awk -F. '{print $1 "." $2 "." $3}')                  # Running kernel version
 FPATH=""                                                               # Device firmware path
 KPATH=""                                                               # Full kernel modules path
 MPATH=""                                                               # Kernel modules path
@@ -252,7 +253,7 @@ if [ ! -d ${KPATH} ]; then
 fi
 
 # Check that udev rules file exist
-if [ ! -f ${UPATH}/${URULE} ]; then
+if [ ! ${URULE} "FALSE" -a ! -f ${UPATH}/${URULE} ]; then
    usage
    echo -ne "\nERROR: udev rules.d file [${UPATH}/${URULE}] does not exist or inaccessible...\n\n"
    exit 1
