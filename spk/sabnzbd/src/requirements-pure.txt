@@ -1,6 +1,6 @@
 # Wheels that absolutely needs
 # to be managed as pure-python
-feedparser==6.0.8
+feedparser==6.0.10
 configobj==5.0.6
 cheroot==8.6.0
 cherrypy==18.6.1
@@ -9,16 +9,16 @@ jaraco.collections==3.5.1
 jaraco.text==3.7.0
 jaraco.classes==3.2.1
 jaraco.context==4.1.1
-more-itertools==8.12.0
+more-itertools==8.13.0
 zc.lockfile==2.0
 python-dateutil==2.8.2
 tempora==5.0.1
-pytz==2021.3
+pytz==2022.1
 sgmllib3k==1.0.0
 portend==3.1.0
 chardet==4.0.0
 PySocks==1.7.1
-puremagic==1.11
+puremagic==1.14
 guessit==3.4.3
 babelfish==0.6.0
 rebulk==3.1.0
