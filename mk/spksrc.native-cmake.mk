@@ -70,9 +70,6 @@ else
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) >> $(PSTAT_LOG)
-endif
 	env $(ENV) $(PSTAT_TIME) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
