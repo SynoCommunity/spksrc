@@ -35,9 +35,6 @@ CMAKE_ARGS += -DENABLE_TESTS=0
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_C99_MATH
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DENABLE_NEON=OFF
-endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -46,6 +43,7 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm
+CMAKE_ARGS += -DENABLE_NEON=OFF
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
