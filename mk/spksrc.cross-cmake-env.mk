@@ -38,8 +38,11 @@ BUILD_SHARED_LIBS = ON
 # Configuration for CMake build
 CMAKE_TOOLCHAIN_FILE = $(WORK_DIR)/$(ARCH)-toolchain.cmake
 
-# Keep native environment for host build
-include ../../mk/spksrc.native-env.mk
+# Ensure to unset cross-compiler target toolchain
+# so host toolset can be available to CMAKE
+ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
+ENV := -u AR -u AS -u CC -u CPP -u CXX -u LD -u NM -u OBJDUMP -u RANLIB -u READELF -u STRIP $(ENV)
+endif
 
 # Use native cmake
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
@@ -56,7 +59,9 @@ ifeq ($(strip $(CMAKE_USE_NINJA)),1)
   CMAKE_ARGS += -G Ninja
 endif
 
-# set default ASM build environment
+# Set default ASM build environment
+# At toolchain step variables are not yet evaluated
+# resulting in inability to set in toolchain file
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
   NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
