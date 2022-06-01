@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.4.2
 SPK_REV = 45
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. support for codec2 speech codec"
+CHANGELOG = "1. Add support for codec2 speech codec"
 
 CONF_DIR = src/conf
 
