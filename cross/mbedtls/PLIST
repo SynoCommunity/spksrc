@@ -1,9 +1,9 @@
 lnk:lib/libmbedcrypto.so
-lib:lib/libmbedcrypto.so.2.27.0
+lib:lib/libmbedcrypto.so.2.28.0
 lnk:lib/libmbedcrypto.so.7
 lnk:lib/libmbedtls.so
-lnk:lib/libmbedtls.so.13
-lib:lib/libmbedtls.so.2.27.0
+lnk:lib/libmbedtls.so.14
+lib:lib/libmbedtls.so.2.28.0
 lnk:lib/libmbedx509.so
 lib:lib/libmbedx509.so.1
-lib:lib/libmbedx509.so.2.27.0
+lib:lib/libmbedx509.so.2.28.0
