@@ -6,7 +6,7 @@ PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/drowe67/codec2/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/codec2
+DEPENDS = 
 
 HOMEPAGE = https://www.rowetel.com/
 COMMENT  = Codec 2 is an open source (LGPL 2.1) low bit rate speech codec.
