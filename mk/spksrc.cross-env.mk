@@ -46,7 +46,7 @@ else
 endif
 
 -include $(TC_VARS_MK)
-ifneq ($(strip $(CMAKE_ENVIRONMENT)),TRUE)
+ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif

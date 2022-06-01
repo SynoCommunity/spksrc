@@ -96,10 +96,12 @@ endif
 	echo "set(CMAKE_STRIP $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)strip)" ; \
 	echo
 	@echo "# which compilers flags to use" ; \
-	echo "set(CMAKE_C_FLAGS $(ADDITIONAL_CFLAGS))" ; \
-	echo "set(CMAKE_CXX_FLAGS $(CMAKE_CXX_FLAGS))" ; \
-	echo ; \
-	echo "# where is the target environment located" ; \
+	echo "set(CMAKE_C_FLAGS '$(CFLAGS) $(CMAKE_C_FLAGS) "'$${ADDITIONAL_CFLAGS}'"')" ; \
+	echo "set(CMAKE_CPP_FLAGS '$(CPPFLAGS) $(CMAKE_CPP_FLAGS) "'$${ADDITIONAL_CPPFLAGS}'"')" ; \
+	echo "set(CMAKE_CXX_FLAGS '$(CXXFLAGS) $(CMAKE_CXX_FLAGS) "'$${ADDITIONAL_CXXFLAGS}'"')" ; \
+	echo "set(CMAKE_LD_FLAGS '$(LDFLAGS) $(CMAKE_LD_FLAGS) "'$${ADDITIONAL_LDFLAGS}'"')" ; \
+	echo
+	@echo "# where is the target environment located" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH $(CMAKE_FIND_ROOT_PATH))" ; \
 	echo ; \
 	echo "# adjust the default behavior of the FIND_XXX() commands:" ; \
