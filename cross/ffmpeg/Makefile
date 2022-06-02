@@ -37,6 +37,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = native/nasm
+OPTIONAL_DEPENDS += cross/chromaprint-fftw
 OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
@@ -136,6 +137,9 @@ CONFIGURE_ARGS += --enable-libshine
 endif
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/chromaprint-fftw
+CONFIGURE_ARGS += --enable-chromaprint
+
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
 

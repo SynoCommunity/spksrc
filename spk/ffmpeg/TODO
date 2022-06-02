@@ -26,7 +26,6 @@ Candidates for enablement:
   --enable-omx 
   --enable-pocketsphinx 
   --enable-libiec61883 
-  --enable-chromaprint 
 
 Not to be enabled:
   --enable-librsvg   ==> Requires gobject-introspection + python + many other dependencies increasing spk size
