@@ -36,12 +36,14 @@ CMAKE_BUILD_WITH_INSTALL_RPATH = TRUE
 BUILD_SHARED_LIBS = ON
 
 # Configuration for CMake build
-CMAKE_TOOLCHAIN_FILE = $(WORK_DIR)/$(ARCH)-toolchain.cmake
+CMAKE_TOOLCHAIN_FILE = $(ARCH)-toolchain.cmake
+CMAKE_WRK_TOOLCHAIN_FILE = $(WORK_DIR)/$(CMAKE_TOOLCHAIN_FILE)
+CMAKE_PKG_TOOLCHAIN_FILE = $(WORK_DIR)/$(PKG_DIR)/$(CMAKE_TOOLCHAIN_FILE)
 
 # Ensure to unset cross-compiler target toolchain
 # so host toolset can be available to CMAKE
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-ENV := -u AR -u AS -u CC -u CPP -u CXX -u LD -u NM -u OBJDUMP -u RANLIB -u READELF -u STRIP $(ENV)
+ENV := -u AR -u AS -u CC -u CPP -u CXX -u LD -u NM -u OBJDUMP -u RANLIB -u READELF -u STRIP -u CFLAGS -u CPPFLAGS -u CXXFLAGS -u LDFLAGS $(ENV)
 endif
 
 # Use native cmake
@@ -67,8 +69,8 @@ ifeq ($(strip $(CMAKE_USE_NASM)),1)
   NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
   ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
-  CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
-  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(NASM_PATH)/nasm
+  ENABLE_ASSEMBLY = ON
+  CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
 else
   CMAKE_USE_NASM = 0
 endif

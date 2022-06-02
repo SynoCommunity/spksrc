@@ -30,10 +30,31 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
+.PHONY: $(CMAKE_PKG_TOOLCHAIN_FILE)
+$(CMAKE_PKG_TOOLCHAIN_FILE):
+	@$(MSG) Generating $(CMAKE_PKG_TOOLCHAIN_FILE)
+	env $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_PKG_TOOLCHAIN_FILE) 2>/dev/null;
+
+.PHONY: cmake_pkg_toolchain
+cmake_pkg_toolchain:
+	@cat $(CMAKE_WRK_TOOLCHAIN_FILE)
+	@echo ; \
+	echo "# set compiler flags for cross-compiling" ; \
+	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $${ADDITIONAL_CFLAGS}")' ; \
+	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $${ADDITIONAL_CPPFLAGS}")' ; \
+	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $${ADDITIONAL_CXXFLAGS}")' ; \
+	echo 'set(CMAKE_LD_FLAGS "$(LDFLAGS) $(CMAKE_LD_FLAGS) $${ADDITIONAL_LDFLAGS}")' ; \
+	echo
+ifeq ($(strip $(CMAKE_USE_NASM)),1)
+	@echo "# set assembly compiler" ; \
+	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
+	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))"
+endif
+
 .PHONY: cmake_configure_target
 
 # default cmake configure:
-cmake_configure_target:
+cmake_configure_target: $(CMAKE_PKG_TOOLCHAIN_FILE)
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
@@ -42,7 +63,7 @@ cmake_configure_target:
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_PKG_TOOLCHAIN_FILE) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 
 .PHONY: cmake_compile_target
 
