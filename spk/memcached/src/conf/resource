@@ -8,6 +8,7 @@
             "display_name": "phpMemcachedAdmin",
             "type": "apache_php",
             "root": "phpMemcachedAdmin",
+            "icon": "app/images/memcached-{0}.png",
             "backend": 2,
             "php": {
                 "profile_name": "php-memcached-admin",
