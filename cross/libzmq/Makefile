@@ -16,8 +16,8 @@ include ../../mk/spksrc.cross-cmake.mk
 
 # Flags to be added to CMake toolchain file
 ifeq ($(findstring $(ARCH), 88f6281 ppc853x),$(ARCH))
-CMAKE_CXX_FLAGS += -lrt
-CMAKE_C_FLAGS += -std=gnu99
+ADDITIONAL_CFLAGS += -std=gnu99
+ADDITIONAL_CXXFLAGS += -lrt
 endif
 
 # Build ZeroMQ with encryption support

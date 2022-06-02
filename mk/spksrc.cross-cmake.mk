@@ -40,10 +40,10 @@ cmake_pkg_toolchain:
 	@cat $(CMAKE_WRK_TOOLCHAIN_FILE)
 	@echo ; \
 	echo "# set compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $${ADDITIONAL_CFLAGS}")' ; \
-	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $${ADDITIONAL_CPPFLAGS}")' ; \
-	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $${ADDITIONAL_CXXFLAGS}")' ; \
-	echo 'set(CMAKE_LD_FLAGS "$(LDFLAGS) $(CMAKE_LD_FLAGS) $${ADDITIONAL_LDFLAGS}")' ; \
+	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
+	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)")' ; \
+	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)")' ; \
+	echo 'set(CMAKE_LD_FLAGS "$(LDFLAGS) $(CMAKE_LD_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
 	@echo "# set assembly compiler" ; \

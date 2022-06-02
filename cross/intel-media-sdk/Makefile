@@ -22,4 +22,4 @@ CMAKE_ARGS += -DBUILD_TUTORIALS=OFF
 CMAKE_ARGS += -Wno-dev
 
 # Flags to be added to CMake toolchain file
-CMAKE_CXX_FLAGS += -std=c++11
+ADDITIONAL_CXXFLAGS += -std=c++11

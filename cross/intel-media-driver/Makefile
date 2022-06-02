@@ -29,5 +29,5 @@ CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
 
 # Flags to be added to CMake toolchain file
-CMAKE_C_FLAGS += -Wno-error=delete-incomplete
-CMAKE_CXX_FLAGS += -std=c++11
+ADDITIONAL_CFLAGS += -Wno-error=delete-incomplete
+ADDITIONAL_CXXFLAGS += -std=c++11

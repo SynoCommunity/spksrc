@@ -36,7 +36,7 @@ CMAKE_ARGS += -DENABLE_TESTS=0
 # Fix compilation with newer compilers
 # Flags to be added to CMake toolchain file
 ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
-CMAKE_CXX_FLAGS += -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))

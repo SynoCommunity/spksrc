@@ -19,7 +19,7 @@ include ../../mk/spksrc.common.mk
 
 # Flags to be added to CMake toolchain file
 ifeq ($(call version_lt, $(call version_gcc), 5),1)
-CMAKE_C_FLAGS += -std=gnu99
+ADDITIONAL_CFLAGS += -std=gnu99
 endif
 
 include ../../mk/spksrc.cross-cmake.mk
