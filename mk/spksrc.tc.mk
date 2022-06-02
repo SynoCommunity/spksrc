@@ -68,17 +68,14 @@ cmake_vars:
 	@echo "# the name of the target operating system" ; \
 	echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" ; \
 	echo
+	@echo "# define target processor" ; \
+	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_SYSTEM_PROCESSOR))"
 ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-	@echo "# define target processor" ; \
-	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_SYSTEM_PROCESSOR))" ; \
-	echo "set(CROSS_COMPILE_ARM $(CROSS_COMPILE_ARM))" ; \
-	echo
+	@echo "set(CROSS_COMPILE_ARM $(CROSS_COMPILE_ARM))"
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-	@echo "# define target processor" ; \
-	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_SYSTEM_PROCESSOR))" ; \
-	echo "set(ARCH $(CMAKE_ARCH))" ; \
-	echo
+	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
+	@echo
 	@echo "# which compilers to use" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \
