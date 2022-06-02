@@ -103,11 +103,6 @@ endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))" ; \
 	echo ; \
-	echo "# define library rpath" ; \
-	echo "set(CMAKE_INSTALL_RPATH $(CMAKE_INSTALL_RPATH))" ; \
-	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
-	echo "set(CMAKE_BUILD_WITH_INSTALL_RPATH $(CMAKE_BUILD_WITH_INSTALL_RPATH))" ; \
-	echo ; \
 	echo "# always build shared library" ; \
 	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
 

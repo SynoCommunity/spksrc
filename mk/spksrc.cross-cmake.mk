@@ -37,19 +37,25 @@ $(CMAKE_PKG_TOOLCHAIN_FILE):
 
 .PHONY: cmake_pkg_toolchain
 cmake_pkg_toolchain:
-	@cat $(CMAKE_WRK_TOOLCHAIN_FILE)
-	@echo ; \
-	echo "# set compiler flags for cross-compiling" ; \
+	@cat $(CMAKE_WRK_TOOLCHAIN_FILE) ; \
+	echo
+ifeq ($(strip $(CMAKE_USE_NASM)),1)
+	@echo "# set assembly compiler" ; \
+	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
+	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))" ; \
+	echo
+endif
+	@echo "# set compiler flags for cross-compiling" ; \
 	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
 	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)")' ; \
 	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)")' ; \
 	echo 'set(CMAKE_LD_FLAGS "$(LDFLAGS) $(CMAKE_LD_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo
-ifeq ($(strip $(CMAKE_USE_NASM)),1)
-	@echo "# set assembly compiler" ; \
-	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
-	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))"
-endif
+	@echo "# define library rpath" ; \
+	echo "set(CMAKE_INSTALL_RPATH $(subst $() $(),:,$(CMAKE_INSTALL_RPATH)))" ; \
+	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
+	echo "set(CMAKE_BUILD_WITH_INSTALL_RPATH $(CMAKE_BUILD_WITH_INSTALL_RPATH))" ; \
+	echo
 
 .PHONY: cmake_configure_target
 
