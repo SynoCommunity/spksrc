@@ -63,13 +63,19 @@ endif
 cmake_configure_target: $(CMAKE_PKG_TOOLCHAIN_FILE)
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
+	@$(MSG)    - Optional Dependencies = $(OPTIONAL_DEPENDS)
+	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_PKG_TOOLCHAIN_FILE)]
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
+ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_PKG_TOOLCHAIN_FILE) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+else
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+endif
 
 .PHONY: cmake_compile_target
 

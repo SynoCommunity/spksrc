@@ -22,6 +22,7 @@ CMAKE_RPATH =
 endif
 
 CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
+CMAKE_USE_TOOLCHAIN_FILE = OFF
 
 include ../../mk/spksrc.cross-cmake.mk
 
