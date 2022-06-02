@@ -18,7 +18,7 @@ service_postinst ()
     
         # Install the web interface
         cp -Rpv "${SYNOPKG_PKGDEST}/share/phpMemcachedAdmin" "${WEB_DIR}"
-    
+
         if [ -d "${CONFIG_BACKUP}" ]; then
             tar -cf - -C "${CONFIG_BACKUP}" --exclude="Memcache.sample.php" . | tar -xvf - -C "${CONFIG_DIR}"
         fi

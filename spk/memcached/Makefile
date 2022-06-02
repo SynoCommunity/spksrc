@@ -13,7 +13,7 @@ DISPLAY_NAME = Memcached
 CHANGELOG = "1. Update memcached from v1.4.13 to v1.6.15.<br/>2. Add DSM 7 compliance."
 
 HOMEPAGE = https://memcached.org/
-LICENSE  =
+LICENSE  = 3-Clause BSD
 
 CONF_DIR = src/conf
 
@@ -37,4 +37,4 @@ memcached_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 775 $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.sample.php \
-				   $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.php
+	               $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.php

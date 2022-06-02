@@ -9,14 +9,8 @@ DEPENDS = cross/libevent
 
 HOMEPAGE = https://www.memcached.org/
 COMMENT  = Free & open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
-LICENSE  = BSD
-
-PRE_CONFIGURE_TARGET = memcached_pre_configure
+LICENSE  = 3-Clause BSD
 
 GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: memcached_pre_configure
-memcached_pre_configure:
-	@$(RUN) autoconf
