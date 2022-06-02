@@ -33,8 +33,10 @@ CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
 # Disable tests
 CMAKE_ARGS += -DENABLE_TESTS=0
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_C99_MATH
+# Fix compilation with newer compilers
+# Flags to be added to CMake toolchain file
+ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
+CMAKE_CXX_FLAGS += -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
