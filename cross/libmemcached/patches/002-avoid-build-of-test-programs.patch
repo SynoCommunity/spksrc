@@ -1,0 +1,15 @@
+# For faster build:
+# - remove target with test programs (noinst_PROGRAMS) in generated Makefile.
+#   PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+# 
+--- Makefile.in.orig	2014-02-09 11:52:56.000000000 +0000
++++ Makefile.in	2022-06-03 08:39:02.989627735 +0000
+@@ -9961,7 +9961,7 @@
+ 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
+ check: $(BUILT_SOURCES)
+ 	$(MAKE) $(AM_MAKEFLAGS) check-am
+-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(MANS) $(DATA) $(HEADERS) \
++all-am: Makefile $(LTLIBRARIES) $(bin_PROGRAMS) $(MANS) $(DATA) $(HEADERS) \
+ 		mem_config.h
+ install-binPROGRAMS: install-libLTLIBRARIES
+ 
