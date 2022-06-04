@@ -53,6 +53,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		moreutils \
 		ncurses-dev \
 		ninja-build \
+		patchelf \
 		php \
 		pkg-config \
 		python3 \
@@ -83,7 +84,7 @@ RUN pip2 install virtualenv httpie
 # Default pip -> python3 aware for native python wheels builds
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 # Install meson cross-platform build system
-RUN pip3 install meson==0.56.0
+RUN pip3 install meson==0.62.2
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
