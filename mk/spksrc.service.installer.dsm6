@@ -178,8 +178,8 @@ set_unix_permissions ()
     DIRNAME=$1
     if [ -n "${EFF_USER}" ]; then
         echo "Granting '${EFF_USER}' unix ownership on ${DIRNAME}"
-        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-            chown -R ${EFF_USER}:root "${DIRNAME}"
+        if [ -n "${GROUP}" ]; then
+            chown -R ${EFF_USER}:${GROUP} "${DIRNAME}"
         else
             chown -R ${EFF_USER}:${USER} "${DIRNAME}"
         fi
