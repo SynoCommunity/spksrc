@@ -23,11 +23,6 @@ include ../../mk/spksrc.install-resources.mk
 
 CONFIG_FOLDER = $(STAGING_INSTALL_PREFIX)/var/phpmemcachedadmin.config
 
-# remarks:
-# PLIST must containe rsc:var/*
-# without '*' wildcard, the folder is not copied to the staging folder 
-# for packages for DSM 7
-
 .PHONY: phpmemcachedadmin_install
 # link the Config folder into var for backup/restore on package update
 # and for on demand creation of the default config on DSM 7.

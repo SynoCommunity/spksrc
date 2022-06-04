@@ -20,10 +20,10 @@ service_postinst ()
     fi
 
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        # make config writable by user http
+        # make config writable by http group
         chmod -R g+w ${CONFIG_DIR}
         chown -R :http ${SYNOPKG_PKGDEST}/share
-        # make Temp and other folders ritable by user http
+        # make Temp and other folders writable by http group
         chmod -R g+w ${SYNOPKG_PKGDEST}/share
     fi
 }

@@ -1,2 +1,2 @@
 rsc:share/phpMemcachedAdmin/
-rsc:var/*
+rsc:var/phpmemcachedadmin.config/
