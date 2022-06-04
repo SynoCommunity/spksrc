@@ -34,7 +34,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: memcached_extra_install
 memcached_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 775 $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.sample.php \
-	               $(STAGING_DIR)/share/phpMemcachedAdmin/Config/Memcache.php
+	@install -m 755 -d $(STAGING_DIR)/app $(STAGING_DIR)/var/phpmemcachedadmin.config
+	@install -m 644 src/app/config $(STAGING_DIR)/app/config
