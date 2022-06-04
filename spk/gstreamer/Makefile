@@ -36,4 +36,6 @@ ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 DEPENDS += cross/gst-omx
 endif
 
+CONF_DIR = src/conf
+
 include ../../mk/spksrc.spk.mk
