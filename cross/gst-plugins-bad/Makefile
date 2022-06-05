@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-bad
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/gstreamer cross/gst-plugins-base cross/libdrm cross/libxml2
+DEPENDS = cross/gstreamer cross/gst-plugins-base cross/libxml2
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
@@ -19,6 +19,11 @@ ADDITIONAL_CFLAGS = -std=c99
 
 ifeq ($(call version_lt, $(call version_gcc), 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
+endif
+
+# libgstdvb.so only gets built on x64
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+PLIST_TRANSFORM = grep -v libgstdvb.so
 endif
 
 include ../../mk/spksrc.cross-meson.mk
