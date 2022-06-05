@@ -3,7 +3,10 @@ SPK_VERS = 1.20.2
 SPK_REV = 1
 SPK_ICON = src/gstreamer.png
 
-DEPENDS = cross/$(SPK_NAME) cross/gst-plugins-base cross/gst-plugins-good
+DEPENDS  = cross/$(SPK_NAME)
+DEPENDS += cross/gst-plugins-base
+DEPENDS += cross/gst-plugins-good
+DEPENDS += cross/gst-plugins-bad
 
 CHANGELOG = "1. Initial package release"
 
