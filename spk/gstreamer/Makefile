@@ -3,9 +3,9 @@ SPK_VERS = 1.20.2
 SPK_REV = 1
 SPK_ICON = src/gstreamer.png
 
-DEPENDS = cross/$(SPK_NAME) cross/gst-plugins-base
+DEPENDS = cross/$(SPK_NAME) cross/gst-plugins-base cross/gst-plugins-good
 
-CHANGELOG = "1. Initial basic package"
+CHANGELOG = "1. Initial package release"
 
 MAINTAINER = th0ma7
 DESCRIPTION = GStreamer is a library for constructing graphs of media-handling components. The applications it supports range from simple Ogg/Vorbis playback, audio/video streaming to complex audio \(mixing\) and video \(non-linear editing\) processing.
@@ -14,7 +14,7 @@ DISPLAY_NAME = GStreamer
 STARTABLE = no
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
-LICENSE  = GLPLv2.1
+LICENSE  = LGPLv2.1
 
 CONF_DIR = src/conf
 
