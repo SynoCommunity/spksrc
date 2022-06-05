@@ -4,6 +4,8 @@ SPK_REV = 2
 SPK_ICON = src/dotnet.png
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
+# ARMv7_ARCHS without full vfpv3 support (having only vfpv3-d16) are not supported
+UNSUPPORTED_ARCHS += armada370 armadaxp alpine alpine4k
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
