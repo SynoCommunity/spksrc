@@ -1,13 +1,13 @@
 SPK_NAME = dotnet-runtime
-SPK_VERS = 6.0.4
-SPK_REV = 1
+SPK_VERS = 6.0.5
+SPK_REV = 2
 SPK_ICON = src/dotnet.png
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update to dotnet-runtime v6.0.5 (security patch)."
 
 STARTABLE = no
 DISPLAY_NAME = .NET 6.0 runtime
@@ -35,6 +35,4 @@ include ../../mk/spksrc.spk.mk
 # Set library path to use bundled libstdc++
 dotnet_patch_target:
 	@$(MSG) "Set library runpath in dotnet executable."
-	@sudo apt-get update 
-	@sudo apt-get install -y patchelf
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/share/dotnet/dotnet

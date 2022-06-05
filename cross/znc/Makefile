@@ -8,7 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 BUILD_DEPENDS = cross/python310
 DEPENDS = cross/openssl cross/libicu
 
-# due to libicu:
+# configure: No compiler with C++11 support was found
+# error: Upgrade your compiler. GCC 4.8+ and Clang 3.2+ are known to work.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://wiki.znc.in/
