@@ -1,5 +1,5 @@
 PKG_NAME = libicu
-PKG_VERS = 68.2
+PKG_VERS = 71.1
 PKG_EXT = tgz
 PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
@@ -13,6 +13,7 @@ LICENSE  = https://www.unicode.org/copyright.html#License
 
 include ../../mk/spksrc.archs.mk
 
+# Compiler too old, stdc++11 is required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 GNU_CONFIGURE = 1
@@ -33,7 +34,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --host=x86_64-pc-linux-gnu
 endif
 
-NATIVE_BUILD_DIR = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR)
+NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/$(PKG_DIR))
 
 # the packaging can be customized in a dependent package by definition
 # of LIBICU_DATA_PACKAGING_MODE like:
@@ -57,11 +58,11 @@ endif
 
 CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) 
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --enable-shared
-CONFIGURE_ARGS += --disable-static
-CONFIGURE_ARGS += --without-samples
+CONFIGURE_ARGS += --disable-samples
+CONFIGURE_ARGS += --disable-tools
+CONFIGURE_ARGS += --disable-tests
 
-ADDITIONAL_CFLAGS = -O2
+ADDITIONAL_CFLAGS = -O3
 ADDITIONAL_CPPFLAGS = -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 ADDITIONAL_CXXFLAGS = $(ADDITIONAL_CPPFLAGS)
 
