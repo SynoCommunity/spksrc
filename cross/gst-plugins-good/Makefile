@@ -21,4 +21,8 @@ ifeq ($(call version_lt, $(call version_gcc), 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
 endif
 
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_LDFLAGS += -lrt
+endif
+
 include ../../mk/spksrc.cross-meson.mk
