@@ -9,7 +9,7 @@ DEPENDS = native/glib cross/glib cross/gmp
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
-LICENSE  = BSD 2-Clause "Simplified" License
+LICENSE  = LGPLv2.1
 
 ENV += PATH=$(WORK_DIR)/../../../native/glib/work-native/install/usr/local/bin:$$PATH
 
