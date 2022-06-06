@@ -2,7 +2,9 @@ PKG_NAME = pngquant
 PKG_VERS = 2.17.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
-PKG_DIST_SITE = https://pngquant.org
+PKG_DIST_SITE = http://sources.buildroot.net/pngquant
+# Many connection timed out using official source
+#PKG_DIST_SITE = https://pngquant.org
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/libimagequant
