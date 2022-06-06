@@ -12,13 +12,20 @@ HOMEPAGE = https://01.org/vaapi
 COMMENT  = Libva is an implementation for VA-API (Video Acceleration API).
 LICENSE = MIT
 
-PRE_CONFIGURE_TARGET = libva_custom_preconfigure
+CONFIGURE_ARGS = -Ddriverdir=$(INSTALL_PREFIX)/lib
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-drivers-path=$(INSTALL_PREFIX)/lib
+include ../../mk/spksrc.common.mk
 
-include ../../mk/spksrc.cross-cc.mk
+# freedreno: All except i686/x86_64
+# intel: i686/x86_64
+# amdgpu+radeon: x86_64
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+PLIST_TRANSFORM = grep -v -e libdrm_freedreno.so
+else
+PLIST_TRANSFORM = grep -v -e libdrm_amdgpu.so -e libdrm_intel.so -e libdrm_radeon.so
+endif
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PLIST_TRANSFORM += -e libdrm_amdgpu.so -e libdrm_radeon.so
+endif
 
-.PHONY: libva_custom_preconfigure
-libva_custom_preconfigure:
-	$(RUN) ./autogen.sh --with-drivers-path=$(INSTALL_PREFIX)/lib
+include ../../mk/spksrc.cross-meson.mk
