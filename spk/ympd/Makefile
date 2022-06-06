@@ -17,7 +17,7 @@ LICENSE = GPLv2
 
 # SERVICE_COMMAND is defined in service-setup.sh
 STARTABLE = yes
-SERVICE_PORT = 8182
+SERVICE_PORT = 8184
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 ADMIN_PORT = $(SERVICE_PORT)
