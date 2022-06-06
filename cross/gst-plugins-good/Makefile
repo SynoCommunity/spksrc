@@ -27,6 +27,10 @@ OPTIONAL_DEPENDS = cross/libvpx
 
 PLIST_TRANSFORM = grep -v -e TBD
 
+OPTIONAL_DEPENDS = cross/libvpx
+
+PLIST_TRANSFORM = grep -v -e TBD
+
 include ../../mk/spksrc.common.mk
 
 ADDITIONAL_CFLAGS = -std=c99

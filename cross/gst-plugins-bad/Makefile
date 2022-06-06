@@ -32,6 +32,21 @@ PLIST_TRANSFORM = grep -v -e TBD
 
 CONFIGURE_ARGS += -Dgpl=enabled
 
+OPTIONAL_DEPENDS  = cross/frei0r
+OPTIONAL_DEPENDS += cross/libass
+OPTIONAL_DEPENDS += cross/libaom
+#OPTIONAL_DEPENDS += cross/svt-hevc
+OPTIONAL_DEPENDS += cross/libva
+OPTIONAL_DEPENDS += cross/libva-utils
+OPTIONAL_DEPENDS += cross/intel-vaapi-driver
+OPTIONAL_DEPENDS += cross/intel-media-driver
+#OPTIONAL_DEPENDS += cross/intel-media-sdk
+OPTIONAL_DEPENDS += cross/x265
+
+PLIST_TRANSFORM = grep -v -e TBD
+
+CONFIGURE_ARGS += -Dgpl=enabled
+
 include ../../mk/spksrc.common.mk
 
 ADDITIONAL_CFLAGS  = -std=c99
