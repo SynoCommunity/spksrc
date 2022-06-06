@@ -38,4 +38,10 @@ endif
 
 CONF_DIR = src/conf
 
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+SERVICE_SETUP = src/service-setup.sh
+endif
+
 include ../../mk/spksrc.spk.mk
