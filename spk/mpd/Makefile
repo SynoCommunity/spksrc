@@ -7,13 +7,12 @@ DSM_UI_DIR = app
 DEPENDS = cross/$(SPK_NAME)
 
 # A compiler with support for C++14 language features is required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
 CHANGELOG = "Initial package release."
 
-STARTABLE = yes
 DISPLAY_NAME = Music Player Daemon
 
 HOMEPAGE   = https://www.musicpd.org/
@@ -21,6 +20,8 @@ LICENSE    = GPLv2
 
 WIZARDS_DIR = src/wizards
 
+# SERVICE_COMMAND is defined in service-setup.sh
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 NO_SERVICE_SHORTCUT = yes
