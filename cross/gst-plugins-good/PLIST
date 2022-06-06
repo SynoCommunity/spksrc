@@ -47,6 +47,7 @@ lib:lib/gstreamer-1.0/libgstvideobox.so
 lib:lib/gstreamer-1.0/libgstvideocrop.so
 lib:lib/gstreamer-1.0/libgstvideofilter.so
 lib:lib/gstreamer-1.0/libgstvideomixer.so
+lib:lib/gstreamer-1.0/libgstvpx.so
 lib:lib/gstreamer-1.0/libgstwavenc.so
 lib:lib/gstreamer-1.0/libgstwavparse.so
 lib:lib/gstreamer-1.0/libgsty4menc.so

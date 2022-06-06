@@ -13,6 +13,10 @@ LICENSE  = LGPLv2.1
 
 ENV += PATH=$(WORK_DIR)/../../../native/glib/work-native/install/usr/local/bin:$$PATH
 
+OPTIONAL_DEPENDS = cross/libvpx
+
+PLIST_TRANSFORM = grep -v -e TBD
+
 include ../../mk/spksrc.common.mk
 
 ADDITIONAL_CFLAGS = -std=c99
@@ -23,6 +27,12 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_LDFLAGS += -lrt
+endif
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/libvpx
+else
+PLIST_TRANSFORM += -e libgstvpx.so
 endif
 
 include ../../mk/spksrc.cross-meson.mk

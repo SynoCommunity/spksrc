@@ -2,7 +2,9 @@ lib:lib/gstreamer-1.0/libgstaccurip.so
 lib:lib/gstreamer-1.0/libgstadpcmdec.so
 lib:lib/gstreamer-1.0/libgstadpcmenc.so
 lib:lib/gstreamer-1.0/libgstaiff.so
+lib:lib/gstreamer-1.0/libgstaom.so
 lib:lib/gstreamer-1.0/libgstasfmux.so
+lib:lib/gstreamer-1.0/libgstassrender.so
 lib:lib/gstreamer-1.0/libgstaudiobuffersplit.so
 lib:lib/gstreamer-1.0/libgstaudiofxbad.so
 lib:lib/gstreamer-1.0/libgstaudiolatency.so
@@ -68,9 +70,11 @@ lib:lib/gstreamer-1.0/libgstsubenc.so
 lib:lib/gstreamer-1.0/libgstswitchbin.so
 lib:lib/gstreamer-1.0/libgsttimecode.so
 lib:lib/gstreamer-1.0/libgsttranscode.so
+lib:lib/gstreamer-1.0/libgstva.so
 lib:lib/gstreamer-1.0/libgstvideofiltersbad.so
 lib:lib/gstreamer-1.0/libgstvideoframe_audiolevel.so
 lib:lib/gstreamer-1.0/libgstvideoparsersbad.so
 lib:lib/gstreamer-1.0/libgstvideosignal.so
 lib:lib/gstreamer-1.0/libgstvmnc.so
+lib:lib/gstreamer-1.0/libgstx265.so
 lib:lib/gstreamer-1.0/libgsty4mdec.so
