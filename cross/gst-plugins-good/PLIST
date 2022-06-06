@@ -7,12 +7,15 @@ lib:lib/gstreamer-1.0/libgstaudioparsers.so
 lib:lib/gstreamer-1.0/libgstauparse.so
 lib:lib/gstreamer-1.0/libgstautodetect.so
 lib:lib/gstreamer-1.0/libgstavi.so
+lib:lib/gstreamer-1.0/libgstcacasink.so
+lib:lib/gstreamer-1.0/libgstcairo.so
 lib:lib/gstreamer-1.0/libgstcutter.so
 lib:lib/gstreamer-1.0/libgstdebug.so
 lib:lib/gstreamer-1.0/libgstdeinterlace.so
 lib:lib/gstreamer-1.0/libgstdtmf.so
 lib:lib/gstreamer-1.0/libgsteffectv.so
 lib:lib/gstreamer-1.0/libgstequalizer.so
+lib:lib/gstreamer-1.0/libgstflac.so
 lib:lib/gstreamer-1.0/libgstflv.so
 lib:lib/gstreamer-1.0/libgstflxdec.so
 lib:lib/gstreamer-1.0/libgstgoom2k1.so
@@ -41,6 +44,8 @@ lib:lib/gstreamer-1.0/libgstshapewipe.so
 lib:lib/gstreamer-1.0/libgstsmpte.so
 lib:lib/gstreamer-1.0/libgstsoup.so
 lib:lib/gstreamer-1.0/libgstspectrum.so
+lib:lib/gstreamer-1.0/libgstspeex.so
+lib:lib/gstreamer-1.0/libgsttaglib.so
 lib:lib/gstreamer-1.0/libgstudp.so
 lib:lib/gstreamer-1.0/libgstvideo4linux2.so
 lib:lib/gstreamer-1.0/libgstvideobox.so

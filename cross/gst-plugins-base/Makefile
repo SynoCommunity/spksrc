@@ -5,7 +5,13 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-base
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/glib cross/pango cross/opus cross/gstreamer
+DEPENDS  = native/glib cross/gstreamer
+DEPENDS += cross/libjpeg
+DEPENDS += cross/libpng
+DEPENDS += cross/libtheora
+DEPENDS += cross/libvorbis
+DEPENDS += cross/opus
+DEPENDS += cross/pango
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.

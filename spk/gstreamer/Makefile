@@ -7,6 +7,7 @@ DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/gst-plugins-good
 DEPENDS += cross/gst-plugins-bad
+DEPENDS += cross/gst-plugins-ugly
 
 CHANGELOG = "1. Initial package release"
 
@@ -20,5 +21,11 @@ HOMEPAGE = https://gstreamer.freedesktop.org/
 LICENSE  = LGPLv2.1
 
 CONF_DIR = src/conf
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+SERVICE_SETUP = src/service-setup.sh
+endif
 
 include ../../mk/spksrc.spk.mk

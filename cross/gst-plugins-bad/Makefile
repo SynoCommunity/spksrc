@@ -47,7 +47,6 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver
-#CONFIGURE_ARGS += -Dvaapi=enabled
 else
 # libgstdvb.so only gets built on x64
 CONFIGURE_ARGS += -Ddvb=disabled
