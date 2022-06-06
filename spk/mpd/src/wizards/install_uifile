@@ -1,0 +1,55 @@
+[{
+    "step_title": "Settings for MPD server",
+    "items": [{
+        "type": "combobox",
+        "desc": "Please select a volume to use for the music folder",
+        "subitems": [{
+            "key": "wizard_music_volume",
+            "desc": "Volume name",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      }, {
+        "type": "textfield",
+        "desc": "Music shared folder (using the volume chosen above)",
+        "subitems": [{
+            "key": "wizard_music_folder",
+            "desc": "Music shared folder",
+            "defaultValue": "music",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-mpd</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
+      }
+    ]
+  }
+]

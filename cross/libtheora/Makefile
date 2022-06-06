@@ -13,6 +13,9 @@ LICENSE  = BSD-Style
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-examples --disable-spec
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --disable-examples
+CONFIGURE_ARGS += --disable-spec
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
