@@ -23,9 +23,8 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DDISABLE_WERROR=ON
 endif
 
-# mosquitto build warning:
+# mosquitto needs external poll feature:
 # warning "libwebsockets is not compiled with LWS_WITH_EXTERNAL_POLL support. Websocket performance will be unusable." [-Wcpp]
-# LWS_WITH_EXTERNAL_POLL
 CMAKE_ARGS += -DLWS_WITH_EXTERNAL_POLL=ON
 
 include ../../mk/spksrc.cross-cmake.mk

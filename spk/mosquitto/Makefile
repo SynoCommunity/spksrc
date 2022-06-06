@@ -14,6 +14,8 @@ CHANGELOG = "Update mosquitto to v2.0.14."
 HOMEPAGE = https://www.mosquitto.org/
 LICENSE  = EPL/EDL
 
+WIZARDS_DIR = src/wizard/
+
 SERVICE_USER = auto
 STARTABLE = yes
 # SERVICE_COMMAND is provided there
