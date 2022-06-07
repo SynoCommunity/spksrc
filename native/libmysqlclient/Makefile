@@ -13,11 +13,8 @@ HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
 LICENSE  = GNU GPLv2
 
-CONFIGURE_TARGET = libmysqlclient_configure
 PRE_INSTALL_TARGET = libmysqlclient_pre_install
 
-CMAKE_ARGS = -DCMAKE_BUILD_TYPE=Release
-CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 # MySQL specific:
 CMAKE_ARGS += -DSTACK_DIRECTION=1
 CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
@@ -26,13 +23,9 @@ CMAKE_ARGS += -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
 # Fix full lib version:
 CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
 
-include ../../mk/spksrc.native-cc.mk
-
-.PHONY: libmysqlclient_configure
-libmysqlclient_configure:
-	$(RUN) cmake $(CMAKE_ARGS) .
+include ../../mk/spksrc.native-cmake.mk
 
 .PHONY: libmysqlclient_pre_install
 libmysqlclient_pre_install:
 	$(RUN) install -m 755 -d $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/
-	$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/extra/comp_err $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/
+	$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/build/extra/comp_err $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/

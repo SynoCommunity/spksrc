@@ -12,12 +12,6 @@ HOMEPAGE = https://01.org/linuxmedia
 COMMENT = Libva-utils is a collection of tests for VA-API (Video Acceleration API)
 LICENSE = MIT
 
-PRE_CONFIGURE_TARGET = libva_utils_configure
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-GNU_CONFIGURE = 1
-
-include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: libva_utils_configure
-libva_utils_configure:
-	$(RUN) ./autogen.sh
+include ../../mk/spksrc.cross-meson.mk

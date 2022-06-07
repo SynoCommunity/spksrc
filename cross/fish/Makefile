@@ -16,4 +16,10 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 include ../../mk/spksrc.cross-cmake.mk
 
 CMAKE_ARGS += -DCURSES_NCURSES_LIBRARY=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib/libncursesw.so
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH"
+CMAKE_ARGS += -DWITH_GETTEXT=OFF
+
+# Fix compilation with newer compilers
+# Flags to be added to CMake toolchain file
+ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH
+endif

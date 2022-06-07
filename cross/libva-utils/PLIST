@@ -7,12 +7,10 @@ bin:bin/loadjpeg
 bin:bin/mpeg2vaenc
 bin:bin/mpeg2vldemo
 bin:bin/sfcsample
-bin:bin/vacopy
 bin:bin/vainfo
 bin:bin/vavpp
 bin:bin/vp8enc
 bin:bin/vp9enc
-bin:bin/vpp3dlut
 bin:bin/vppblending
 bin:bin/vppchromasitting
 bin:bin/vppdenoise

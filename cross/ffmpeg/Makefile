@@ -37,6 +37,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 include ../../mk/spksrc.common.mk
 
 OPTIONAL_DEPENDS  = native/nasm
+OPTIONAL_DEPENDS += cross/chromaprint-fftw
 OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
@@ -53,6 +54,9 @@ OPTIONAL_DEPENDS += cross/intel-media-sdk
 OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
+
+DEPENDS += cross/codec2
+CONFIGURE_ARGS += --enable-libcodec2
 
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2
@@ -133,6 +137,9 @@ CONFIGURE_ARGS += --enable-libshine
 endif
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/chromaprint-fftw
+CONFIGURE_ARGS += --enable-chromaprint
+
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
 

@@ -25,7 +25,9 @@ include ../../mk/spksrc.cross-cmake.mk
 # intel-media-driver specific args
 # for succesfull build
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
-CMAKE_ARGS += -DCMAKE_C_FLAGS=-Wno-error=delete-incomplete
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-std=c++11
 CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
+
+# Flags to be added to CMake toolchain file
+ADDITIONAL_CFLAGS += -Wno-error=delete-incomplete
+ADDITIONAL_CXXFLAGS += -std=c++11

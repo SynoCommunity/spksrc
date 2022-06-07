@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.4.2
-SPK_REV = 44
+SPK_REV = 45
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Add extra-version flag<br/>2. Enable WebP encoder/decoder<br/>3. Enable libcaca (color ASCII art) output device<br/>4. Enable rabbitmq support<br/>5. Enable frei0r plugin API support<br/>6. Enable zimg image processing support<br/>7. Enable dc1394 API support"
+CHANGELOG = "1. Add support for codec2 speech codec<br/>2. Enable chromaprint support for extracting fingerprints audio sources"
 
 CONF_DIR = src/conf
 
