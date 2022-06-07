@@ -30,14 +30,14 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
-.PHONY: $(CMAKE_PKG_TOOLCHAIN_FILE)
-$(CMAKE_PKG_TOOLCHAIN_FILE):
-	@$(MSG) Generating $(CMAKE_PKG_TOOLCHAIN_FILE)
-	env $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_PKG_TOOLCHAIN_FILE) 2>/dev/null;
+.PHONY: $(CMAKE_TOOLCHAIN_PKG)
+$(CMAKE_TOOLCHAIN_PKG):
+	@$(MSG) Generating $(CMAKE_TOOLCHAIN_PKG)
+	env $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_PKG) 2>/dev/null;
 
 .PHONY: cmake_pkg_toolchain
 cmake_pkg_toolchain:
-	@cat $(CMAKE_WRK_TOOLCHAIN_FILE) ; \
+	@cat $(CMAKE_TOOLCHAIN_WRK) ; \
 	echo
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
 	@echo "# set assembly compiler" ; \
@@ -60,11 +60,11 @@ endif
 .PHONY: cmake_configure_target
 
 # default cmake configure:
-cmake_configure_target: $(CMAKE_PKG_TOOLCHAIN_FILE)
+cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Optional Dependencies = $(OPTIONAL_DEPENDS)
-	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_PKG_TOOLCHAIN_FILE)]
+	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_TOOLCHAIN_PKG)]
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
@@ -72,7 +72,7 @@ cmake_configure_target: $(CMAKE_PKG_TOOLCHAIN_FILE)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_PKG_TOOLCHAIN_FILE) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 else
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
 endif

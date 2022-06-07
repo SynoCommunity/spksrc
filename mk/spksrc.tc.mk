@@ -12,21 +12,21 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.cross-cmake-env.mk
 
 # Configure the included makefiles
-URLS                   = $(TC_DIST_SITE)/$(TC_DIST_NAME)
-NAME                   = $(TC_NAME)
-COOKIE_PREFIX          = 
+URLS                = $(TC_DIST_SITE)/$(TC_DIST_NAME)
+NAME                = $(TC_NAME)
+COOKIE_PREFIX       = 
 ifneq ($(TC_DIST_FILE),)
-LOCAL_FILE             = $(TC_DIST_FILE)
+LOCAL_FILE          = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE          = $(TC_DIST_FILE)
+PKG_DIST_FILE       = $(TC_DIST_FILE)
 else
-LOCAL_FILE             = $(TC_DIST_NAME)
+LOCAL_FILE          = $(TC_DIST_NAME)
 endif
-DISTRIB_DIR            = $(TOOLCHAIN_DIR)/$(TC_VERS)
-DIST_FILE              = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT               = $(TC_EXT)
-TC_LOCAL_VARS_MK       = $(WORK_DIR)/tc_vars.mk
-TC_LOCAL_CMAKE_VARS_MK = $(WORK_DIR)/$(ARCH)-toolchain.cmake
+DISTRIB_DIR         = $(TOOLCHAIN_DIR)/$(TC_VERS)
+DIST_FILE           = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT            = $(TC_EXT)
+TC_LOCAL_VARS_MK    = $(WORK_DIR)/tc_vars.mk
+TC_LOCAL_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
 
 #####
 
@@ -53,14 +53,14 @@ include ../../mk/spksrc.tc-flags.mk
 fix: flag
 include ../../mk/spksrc.tc-fix.mk
 
-all: fix $(TC_CMAKE_VARS_MK) $(TC_LOCAL_VARS_MK)
+all: fix $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK): fix
 	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
 
-.PHONY: $(TC_CMAKE_VARS_MK)
-$(TC_CMAKE_VARS_MK): fix
+.PHONY: $(TC_LOCAL_VARS_CMAKE)
+$(TC_LOCAL_VARS_CMAKE): fix
 	env $(MAKE) --no-print-directory cmake_vars > $@ 2>/dev/null;
 
 .PHONY: cmake_vars

@@ -17,7 +17,7 @@ endif
 
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
-TC_CMAKE_VARS_MK = $(WORK_DIR)/$(ARCH)-toolchain.cmake
+TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
 
 # These two variables are needed to build the CFLAGS and LDFLAGS env variables
 export INSTALL_DIR
@@ -30,7 +30,7 @@ ifeq ($(strip $(MAKECMDGOALS)),download)
 	@if env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) download ; \
 	then \
 	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
-	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_CMAKE_VARS_MK) ; \
+	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
 	else \
 	  echo "$$""(error An error occured while downloading the toolchain, please check the messages above)" > $@; \
 	fi
@@ -39,7 +39,7 @@ else
 	@if env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) ; \
 	then \
 	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
-	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_CMAKE_VARS_MK) ; \
+	  env $(MAKE) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
 	else \
 	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
 	fi

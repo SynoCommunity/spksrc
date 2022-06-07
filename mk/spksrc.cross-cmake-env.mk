@@ -36,9 +36,9 @@ CMAKE_BUILD_WITH_INSTALL_RPATH = TRUE
 BUILD_SHARED_LIBS = ON
 
 # Configuration for CMake build
-CMAKE_TOOLCHAIN_FILE = $(ARCH)-toolchain.cmake
-CMAKE_WRK_TOOLCHAIN_FILE = $(WORK_DIR)/$(CMAKE_TOOLCHAIN_FILE)
-CMAKE_PKG_TOOLCHAIN_FILE = $(WORK_DIR)/$(PKG_DIR)/$(CMAKE_TOOLCHAIN_FILE)
+CMAKE_TOOLCHAIN_NAME = $(ARCH)-toolchain.cmake
+CMAKE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.cmake
+CMAKE_TOOLCHAIN_PKG = $(WORK_DIR)/$(PKG_DIR)/$(CMAKE_TOOLCHAIN_NAME)
 
 # Ensure to unset cross-compiler target toolchain
 # so host toolset can be available to CMAKE
