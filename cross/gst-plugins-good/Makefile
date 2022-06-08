@@ -5,7 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-good
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS  = cross/gstreamer
+DEPENDS  = cross/glib
+DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/cairo
 DEPENDS += cross/flac
