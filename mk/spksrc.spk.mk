@@ -404,7 +404,7 @@ spkclean:
 	       work-*/scripts \
 	       work-*/staging \
 	       work-*/tc_vars.mk \
-	       work-*/*-toolchain.cmake \
+	       work-*/tc_vars.cmake \
 	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
