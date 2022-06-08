@@ -5,14 +5,16 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-ugly
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS  = cross/gstreamer cross/gst-plugins-base
+DEPENDS  = cross/gstreamer
+DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/opencore-amr
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
 
-ENV += PATH=$(WORK_DIR)/../../../native/glib/work-native/install/usr/local/bin:$$PATH
+# Require access to glib-mkenums Python script
+ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
 
 OPTIONAL_DEPENDS  = cross/x264
 

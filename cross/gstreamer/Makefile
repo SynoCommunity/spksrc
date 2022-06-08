@@ -5,12 +5,13 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gstreamer
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/glib cross/glib cross/gmp
+DEPENDS = cross/glib cross/gmp
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
 
-ENV += PATH=$(WORK_DIR)/../../../native/glib/work-native/install/usr/local/bin:$$PATH
+# Require access to glib-mkenums Python script
+ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
 
 include ../../mk/spksrc.cross-meson.mk

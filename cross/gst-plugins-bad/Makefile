@@ -11,7 +11,8 @@ HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
 
-ENV += PATH=$(WORK_DIR)/../../../native/glib/work-native/install/usr/local/bin:$$PATH
+# Require access to glib-mkenums Python script
+ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
 
 OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
