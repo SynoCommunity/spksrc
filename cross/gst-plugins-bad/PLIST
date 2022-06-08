@@ -49,6 +49,7 @@ lib:lib/gstreamer-1.0/libgstmpegtsmux.so
 lib:lib/gstreamer-1.0/libgstmxf.so
 lib:lib/gstreamer-1.0/libgstnetsim.so
 lib:lib/gstreamer-1.0/libgstnvcodec.so
+lib:lib/gstreamer-1.0/libgstopenh264.so
 lib:lib/gstreamer-1.0/libgstopusparse.so
 lib:lib/gstreamer-1.0/libgstpcapparse.so
 lib:lib/gstreamer-1.0/libgstpnm.so
