@@ -70,7 +70,7 @@ endif
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/openh264
 else
-PLIST_TRANSFORM += -e libgstuvch264.so
+PLIST_TRANSFORM += -e libgstopenh264.so
 endif
 
 # Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
