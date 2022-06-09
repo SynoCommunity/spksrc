@@ -58,7 +58,7 @@ else
 # libgstdvb.so only gets built on x64
 CONFIGURE_ARGS += -Ddvb=disabled
 PLIST_TRANSFORM += -e libgstdvb.so
-PLIST_TRANSFORM += -e libgstva.so
+PLIST_TRANSFORM += -e libgstva.*.so
 PLIST_TRANSFORM += -e libgstsvthevcenc.so
 endif
 
