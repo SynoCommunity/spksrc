@@ -117,6 +117,9 @@ CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 DEPENDS += cross/librabbitmq
 CONFIGURE_ARGS += --enable-librabbitmq
 
+DEPENDS += cross/twolame
+CONFIGURE_ARGS += --enable-libtwolame
+
 DEPENDS += cross/zvbi
 CONFIGURE_ARGS += --enable-libzvbi
 

@@ -14,6 +14,7 @@ DEPENDS += cross/lame
 DEPENDS += cross/libcaca
 DEPENDS += cross/speex
 DEPENDS += cross/taglib
+DEPENDS += cross/twolame
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
