@@ -21,12 +21,11 @@ OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/openh264
-#OPTIONAL_DEPENDS += cross/svt-hevc
+OPTIONAL_DEPENDS += cross/svt-hevc
 OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
-#OPTIONAL_DEPENDS += cross/intel-media-sdk
 OPTIONAL_DEPENDS += cross/x265
 
 PLIST_TRANSFORM = grep -v -e TBD
@@ -54,11 +53,13 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver
+DEPENDS += cross/svt-hevc
 else
 # libgstdvb.so only gets built on x64
 CONFIGURE_ARGS += -Ddvb=disabled
 PLIST_TRANSFORM += -e libgstdvb.so
 PLIST_TRANSFORM += -e libgstva.so
+PLIST_TRANSFORM += -e libgstsvthevcenc.so
 endif
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))

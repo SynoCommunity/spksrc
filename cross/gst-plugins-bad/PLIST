@@ -68,6 +68,7 @@ lib:lib/gstreamer-1.0/libgstsiren.so
 lib:lib/gstreamer-1.0/libgstsmooth.so
 lib:lib/gstreamer-1.0/libgstspeed.so
 lib:lib/gstreamer-1.0/libgstsubenc.so
+lib:lib/gstreamer-1.0/libgstsvthevcenc.so
 lib:lib/gstreamer-1.0/libgstswitchbin.so
 lib:lib/gstreamer-1.0/libgsttimecode.so
 lib:lib/gstreamer-1.0/libgsttranscode.so
