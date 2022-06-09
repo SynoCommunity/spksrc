@@ -40,7 +40,6 @@ OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
-#OPTIONAL_DEPENDS += cross/intel-media-sdk
 OPTIONAL_DEPENDS += cross/x265
 
 PLIST_TRANSFORM = grep -v -e TBD
