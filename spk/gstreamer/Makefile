@@ -8,6 +8,7 @@ DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/gst-plugins-good
 DEPENDS += cross/gst-plugins-bad
 DEPENDS += cross/gst-plugins-ugly
+DEPENDS += cross/gst-rtsp-server
 
 CHANGELOG = "1. Initial package release"
 

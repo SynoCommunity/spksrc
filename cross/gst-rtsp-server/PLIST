@@ -1,0 +1,4 @@
+lnk:lib/libgstrtspserver-1.0.so
+lnk:lib/libgstrtspserver-1.0.so.0
+lib:lib/libgstrtspserver-1.0.so.0.2002.0
+lib:lib/gstreamer-1.0/libgstrtspclientsink.so
