@@ -1,0 +1,41 @@
+diff --uprN ../gstreamer-1.20.2/tools/gst-launch.c ./tools/gst-launch.c
+--- ../gstreamer-1.20.2/tools/gst-launch.c	(revision d084a38aaea9d247cc876bac3f853838eab5aeb6)
++++ ./tools/gst-launch.c	(date 1654800940046)
+@@ -1082,6 +1082,8 @@
+   gchar *savefile = NULL;
+   gboolean no_position = FALSE;
+   gboolean force_position = FALSE;
++  glong seek_time = 0;
++
+ #ifndef GST_DISABLE_OPTION_PARSING
+   GOptionEntry options[] = {
+     {"tags", 't', 0, G_OPTION_ARG_NONE, &tags,
+@@ -1102,6 +1104,12 @@
+         N_("Do not install a fault handler"), NULL},
+     {"eos-on-shutdown", 'e', 0, G_OPTION_ARG_NONE, &eos_on_shutdown,
+         N_("Force EOS on sources before shutting the pipeline down"), NULL},
++    {"seek", 's', 0, G_OPTION_ARG_INT64, &seek_time,
++        N_("Seek to TIME in seconds"),
++        N_("TIME")},
++    {"seek-no-flush", 'S', 0, G_OPTION_ARG_INT64, &seek_time,
++        N_("Seek to TIME in seconds"),
++        N_("TIME")},
+ #if 0
+     {"index", 'i', 0, G_OPTION_ARG_NONE, &check_index,
+         N_("Gather and print index statistics"), NULL},
+@@ -1276,6 +1284,15 @@
+         PRINT (_("Pipeline is PREROLLING ...\n"));
+         break;
+       default:
++        if(bus == 0) {
++            PRINT (_("Pipeline is PREROLLED ...\n"));
++        }
++
++        if(seek_time != 0) {
++            if(gst_element_seek(pipeline, 0x3ff0000000000000, GST_FORMAT_TIME, GST_SEEK_FLAG_ACCURATE, GST_SEEK_TYPE_SET, seek_time * 1000000000, GST_SEEK_TYPE_NONE, 0) == 0) {
++                gst_printerr (_("Error, pipeline doesn't want to seek."))
++            }
++        }
+         break;
+     }
+ 
