@@ -36,6 +36,8 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 # Add nice and ionice commands
 ENV += BUSYBOX_CONFIG="nice ionice"
 
+SPK_COMMANDS = bin/7za
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: sabnzbd_extra_install
