@@ -1,0 +1,51 @@
+make[2]: Entering directory '/spksrc/spk/zsh'
+===>  Setting-up toolchain 
+===>    Downloading files for syno-apollolake
+===>      wget --secure-protocol=TLSv1_2 --timeout=30 --waitretry=0 --tries=5 -nv https://global.download.synology.com/download/ToolChain/toolchain/7.0-41890/Intel%20x86%20Linux%204.4.180%20%28Apollolake%29/apollolake-gcc750_glibc226_x86_64-GPL.txz
+failed: Connection timed out.
+failed: Connection timed out.
+failed: Connection timed out.
+failed: Connection timed out.
+failed: Connection timed out.
+failed: Connection timed out.
+failed: Connection timed out.
+make[2]: Entering directory '/spksrc/spk/zsh'
+===>  Setting-up toolchain 
+===>    Downloading files for syno-apollolake
+===>      wget --secure-protocol=TLSv1_2 --timeout=30 --waitretry=0 --tries=5 -nv https://global.download.synology.com/download/ToolChain/toolchain/7.0-41890/Intel%20x86%20Linux%204.4.180%20%28Apollolake%29/apollolake-gcc750_glibc226_x86_64-GPL.txz
+failed: Connection timed out.
+failed: Connection timed out.
+2022-06-12 07:17:57 URL:https://global.download.synology.com/download/ToolChain/toolchain/7.0-41890/Intel%20x86%20Linux%204.4.180%20%28Apollolake%29/apollolake-gcc750_glibc226_x86_64-GPL.txz [79940764/79940764] -> "apollolake-gcc750_glibc226_x86_64-GPL.txz.part" [1]
+===>    Verifying files for syno-apollolake
+===>      Checking sha1sum of file apollolake-gcc750_glibc226_x86_64-GPL.txz
+===>      Checking sha256sum of file apollolake-gcc750_glibc226_x86_64-GPL.txz
+===>      Checking md5sum of file apollolake-gcc750_glibc226_x86_64-GPL.txz
+/spksrc/toolchain/syno-apollolake-7.0/../../distrib/toolchain/7.0/apollolake-gcc750_glibc226_x86_64-GPL.txz
+===>    Extracting for syno-apollolake
+fakeroot tar -xpf /spksrc/toolchain/syno-apollolake-7.0/../../distrib/toolchain/7.0/apollolake-gcc750_glibc226_x86_64-GPL.txz -C /spksrc/toolchain/syno-apollolake-7.0/work 
+===>    Patching for syno-apollolake
+===>    Fixing libtool files for syno-apollolake
+chmod -R u+w /spksrc/toolchain/syno-apollolake-7.0/work
+env make --no-print-directory cmake_vars > /spksrc/toolchain/syno-apollolake-7.0/work/tc_vars.cmake 2>/dev/null;
+env make --no-print-directory tc_vars > /spksrc/toolchain/syno-apollolake-7.0/work/tc_vars.mk 2>/dev/null;
+===>  Processing dependencies of zsh
+make[3]: Entering directory '/spksrc/cross/zsh'
+===>  Downloading files for zsh
+===>    wget --secure-protocol=TLSv1_2 --timeout=30 --waitretry=0 --tries=5 -nv https://www.zsh.org/pub/zsh-5.8.1.tar.xz
+https://www.zsh.org/pub/zsh-5.8.1.tar.xz:
+2022-06-12 07:18:57 ERROR 404: Not Found.
+make[3]: *** [../../mk/spksrc.download.mk:65: download_target] Error 8
+make[3]: Leaving directory '/spksrc/cross/zsh'
+make[2]: *** [../../mk/spksrc.depend.mk:54: depend_target] Error 2
+make[2]: Leaving directory '/spksrc/spk/zsh'
+make[2]: Entering directory '/spksrc/spk/zsh'
+===>  Processing dependencies of zsh
+make[3]: Entering directory '/spksrc/cross/zsh'
+===>  Downloading files for zsh
+===>    wget --secure-protocol=TLSv1_2 --timeout=30 --waitretry=0 --tries=5 -nv https://www.zsh.org/pub/zsh-5.8.1.tar.xz
+https://www.zsh.org/pub/zsh-5.8.1.tar.xz:
+2022-06-12 07:19:06 ERROR 404: Not Found.
+make[3]: *** [../../mk/spksrc.download.mk:65: download_target] Error 8
+make[3]: Leaving directory '/spksrc/cross/zsh'
+make[2]: *** [../../mk/spksrc.depend.mk:54: depend_target] Error 2
+make[2]: Leaving directory '/spksrc/spk/zsh'
