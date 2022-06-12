@@ -8,7 +8,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-web
 
-MAINTAINER = publicarray
+MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
