@@ -6,7 +6,7 @@ PKG_DIST_FILE = $(PKG_NAME)-dotnet-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Jackett/Jackett/archive
 PKG_DIR = Jackett-$(PKG_VERS)/src
 
-DOTNET_VERSION = 5.0
+DOTNET_VERSION = 6.0
 BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
 
 HOMEPAGE = https://github.com/Jackett/Jackett
