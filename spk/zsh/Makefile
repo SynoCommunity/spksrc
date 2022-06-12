@@ -1,6 +1,6 @@
 # Allow overriding the name, used by spk/zsh-static.
 SPK_NAME ?= zsh
-SPK_VERS = 5.9
+SPK_VERS = 5.8.1
 SPK_CONFLICT ?= zsh-static
 # Allow overriding the revision, used by spk/zsh-static.
 # If you rev here, please also rev spk/zsh-static.
