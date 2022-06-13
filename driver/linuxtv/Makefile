@@ -53,11 +53,11 @@ MEDIA_VERSION = 2021-01-08-321af22a3d2f
 else
 # Do not use LATEST by default so
 # builds can be reproducible
-PKG_VERS      = 70188fd
-PKG_GIT_HASH  = 70188fdddcfedda190f1118529888cd3dc2581d6
-# At time of build "LATEST" was dated of March 24th
-#MEDIA_VERSION = LATEST
-MEDIA_VERSION = 2021-03-26-7acc54ed6061
+PKG_VERS      = 4e29721
+PKG_GIT_HASH  = 4e29721804ea4e824c776101214389642dccad98
+# At time of build "LATEST" file was modification dated of April 18th 2022
+MEDIA_VERSION = LATEST
+#MEDIA_VERSION = 2021-03-26-7acc54ed6061
 endif
 
 .PHONY: linuxtv_pre_patch
