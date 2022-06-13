@@ -8,11 +8,11 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-web
 
-MAINTAINER = publicarray
+MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.8.0<br/>2. Use .NET 6.0<br/>"
+CHANGELOG = "1. Update jellyfin to 10.8.0<br/>2. Use .NET 6.0"
 HOMEPAGE = https://jellyfin.org
 HELPURL    = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
