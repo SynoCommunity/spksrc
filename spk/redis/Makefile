@@ -1,5 +1,5 @@
 SPK_NAME = redis
-SPK_VERS = 7.0.0
+SPK_VERS = 7.0.2
 SPK_REV = 11
 SPK_ICON = src/redis.png
 
@@ -10,7 +10,7 @@ DESCRIPTION = Redis is an open source, advanced key-value store. It is often ref
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v7.0.0."
+CHANGELOG = "Update redis to v7.0.2."
 
 # atomic operations are not supported on ARMv5 and PPC archs except qoriq.
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
