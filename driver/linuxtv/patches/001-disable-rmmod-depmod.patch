@@ -1,6 +1,5 @@
-diff -uprN ../linuxtv.orig/v4l/Makefile v4l/Makefile
---- ../linuxtv.orig/v4l/Makefile	2021-02-08 10:24:43.000000000 +0000
-+++ v4l/Makefile	2021-03-13 14:39:19.674250245 +0000
+--- v4l/Makefile-orig	2022-06-13 14:16:23.064017690 +0000
++++ v4l/Makefile	2022-06-13 14:23:12.255264154 +0000
 @@ -51,13 +51,17 @@ default:: prepare
  	@echo Kernel build directory is $(OUTDIR)
  	$(MAKE) -C ../linux apply_patches
@@ -19,37 +18,35 @@ diff -uprN ../linuxtv.orig/v4l/Makefile v4l/Makefile
  
  # Anything in this target shouldn't be build in parallel.
  prepare:: config-compat.h Makefile.media links
-@@ -66,9 +70,16 @@ prepare:: config-compat.h Makefile.media
+@@ -66,9 +70,15 @@ prepare:: config-compat.h Makefile.media
  # Object specific rules
  
  # Targets which don't need Makefile.media's rules
 +ifneq ($(strip $(CROSS_COMPILE)),y)
+ no-makefile-media-targets := %config clean distclean snapshot snap \
+ 	tarball release %links start insmod load stop rmmod unload reload \
+ 	card% update push %commit help debug cx88-ivtv lxdialog
++else
 +no-makefile-media-targets := %config clean distclean snapshot snap \
 +	tarball release %links \
-+	start insmod load stop rmmod unload reload \
 +	card% update push %commit help debug cx88-ivtv lxdialog
-+else ifeq ($(strip $(CROSS_COMPILE)),y)
- no-makefile-media-targets := %config clean distclean snapshot snap \
--	tarball release %links start insmod load stop rmmod unload reload \
-+	tarball release %links \
- 	card% update push %commit help debug cx88-ivtv lxdialog
 +endif
  
  # Targets which don't need .myconfig to exist, to keep us from including it
  no-dot-config-targets := $(no-makefile-media-targets) %install remove
-@@ -188,7 +199,11 @@ ifeq ($(inst-m),)
+@@ -180,7 +191,11 @@ ifeq ($(inst-m),)
    inst-m	:= $(obj-m)
  endif
  
 +ifneq ($(strip $(CROSS_COMPILE)),y)
  v4l_modules := $(shell /sbin/lsmod|cut -d' ' -f1 ) $(patsubst %.ko,%,$(inst-m))
-+else ifeq ($(strip $(CROSS_COMPILE)),y)
-+v4l_modules := 
++else
++v4l_modules :=
 +endif
  
  #################################################
  # locales seem to cause trouble sometimes.
-@@ -416,7 +431,9 @@ old-install:: rminstall
+@@ -405,7 +420,9 @@ old-install:: rminstall
  	-install -d $(DEST)
  	-install -m 644 -c $(inst-m) $(DEST)
  
@@ -59,9 +56,8 @@ diff -uprN ../linuxtv.orig/v4l/Makefile v4l/Makefile
  
  #################################################
  # Tree management rules
-diff -uprN ../linuxtv.orig/v4l/scripts/make_makefile.pl v4l/scripts/make_makefile.pl
---- ../linuxtv.orig/v4l/scripts/make_makefile.pl	2021-02-08 10:24:43.000000000 +0000
-+++ v4l/scripts/make_makefile.pl	2021-03-13 14:39:47.238414024 +0000
+--- v4l/scripts/make_makefile.pl-orig	2022-04-05 06:22:11.000000000 +0000
++++ v4l/scripts/make_makefile.pl	2022-06-13 14:55:05.039484622 +0000
 @@ -258,7 +258,10 @@ while (my ($dir, $files) = each %instdir
  	print OUT "fi;\n\n";
  }

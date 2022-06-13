@@ -30,13 +30,14 @@ CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
 INSTALL_TARGET = linuxtv_install
 
-# Disable all PCI adaptors
+# Disable all PCI adaptors & other that do not compile
 include ko-blacklist.mk
-# Enable specific USB adaptors
+# Enable specific "extra" USB adaptors
 include ko-whitelist.mk
 
 # Blacklist modules that does not compile
-BLACKLIST += CONFIG_VIDEO_IVTV
+# Suggest using ko-blacklist.mk
+#BLACKLIST += CONFIG_VIDEO_IVTV
 
 include ../../mk/spksrc.cross-cc.mk
 
