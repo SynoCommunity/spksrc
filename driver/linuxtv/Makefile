@@ -25,10 +25,17 @@ REQUIRE_KERNEL = 1
 FIRMWARE_URL = http://www.linuxtv.org/downloads/firmware/
 FIRMWARE_PKG = dvb-firmwares.tar.bz2
 
+ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
+PATCH_TARGET = nop
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = nop
+else
 PRE_PATCH_TARGET = linuxtv_pre_patch
 CONFIGURE_TARGET = linuxtv_configure
 COMPILE_TARGET = linuxtv_compile
 INSTALL_TARGET = linuxtv_install
+endif
 
 # Disable all PCI adaptors & other that do not compile
 include ko-blacklist.mk
