@@ -1,0 +1,10 @@
+--- v4l/Makefile-orig	2022-06-13 12:51:19.197065049 +0000
++++ v4l/Makefile	2022-06-13 12:54:22.151113978 +0000
+@@ -132,6 +132,7 @@ EXTRA_CFLAGS += -include $(obj)/compat.h
+ 
+ # gives too much warnings (false positives) -> disable it
+ EXTRA_CFLAGS += -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration
++EXTRA_CFLAGS += -Wno-unused-result
+ 
+ #################################################
+ # Kernel 2.6/3.x specific rules
