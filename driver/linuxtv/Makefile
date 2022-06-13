@@ -41,7 +41,8 @@ include ko-whitelist.mk
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Specify linux-media driver version
+# Specify linux-media git hash
+#   https://git.linuxtv.org/media_build.git
 # git hash from	2021-01-13
 #   Linux-media patchset and linuxtv git hash must
 #   be aligned in date of releases.  Versions post
@@ -54,11 +55,12 @@ MEDIA_VERSION = 2021-01-08-321af22a3d2f
 else
 # Do not use LATEST by default so
 # builds can be reproducible
-PKG_VERS      = 4e29721
-PKG_GIT_HASH  = 4e29721804ea4e824c776101214389642dccad98
-# At time of build "LATEST" file was modification dated of April 18th 2022
-MEDIA_VERSION = LATEST
-#MEDIA_VERSION = 2021-03-26-7acc54ed6061
+PKG_VERS      = 0fe857b
+PKG_GIT_HASH  = 0fe857b86addf382f6fd383948bd7736a3201403
+#PKG_VERS      = 4e29721
+#PKG_GIT_HASH  = 4e29721804ea4e824c776101214389642dccad98
+MEDIA_VERSION = 2022-06-05-f2906aa86338
+#MEDIA_VERSION = LATEST
 endif
 
 .PHONY: linuxtv_pre_patch
