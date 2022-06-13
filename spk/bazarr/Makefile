@@ -39,6 +39,9 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 # https://github.com/numpy/numpy/issues/20664
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
+# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+USE_ALTERNATE_TMPDIR = 1
+
 include ../../mk/spksrc.spk.mk
 
 # [numpy]
