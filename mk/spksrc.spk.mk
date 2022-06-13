@@ -541,25 +541,25 @@ kernel-modules-%:
 	fi ; \
 	$(MSG) ARCH to be processed: $${archs2process} | tee --append build-$*.log ; \
 	for arch in $${archs2process} ; do \
-	  $(MSG) "Processing $${arch} ARCH" | tee --append build-$*.log ; \
-	  MAKEFLAGS= $(PSTAT_TIME) WORK_DIR=$(PWD)/work-$* $(MAKE) ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	  $(MSG) "Processing $${arch} ARCH" ; \
+	  MAKEFLAGS= $(PSTAT_TIME) WORK_DIR=$(PWD)/work-$* $(MAKE) ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 ; \
+	  [ $$0 -eq 0 ] || false ; \
 	  if [ $$(echo $${archs2process} | wc -w) -gt 1 ]; then \
-	    echo  "===>  Cleaning-up working directory" | tee --append build-$*.log ; \
+	    echo  "===>  Cleaning-up working directory" ; \
 	    $(MAKE) spkclean ; \
-	    echo  "===>  Cleaning-up toolchain directory: syno-$${arch}" | tee --append build-$*.log ; \
+	    echo  "===>  Cleaning-up toolchain directory: syno-$${arch}" ; \
 	    $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
-	    echo  "===>  Deleting $(addprefix linux-, $${arch}) directory" | tee --append build-$*.log ; \
+	    echo  "===>  Deleting $(addprefix linux-, $${arch}) directory" ; \
 	    rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
 	    for depend in $$($(MAKE) --no-print-directory dependency-list | cut -f2 -d:); do \
 	      pkg_name=$$(grep ^PKG_NAME $(PWD)/../../$${depend}/Makefile | cut -f2 -d= | xargs) ; \
-	      echo  "===>  Deleting dependency work files: $${pkg_name}" | tee --append build-$*.log ; \
+	      echo  "===>  Deleting dependency work files: $${pkg_name}" ; \
 	      rm -fr $(PWD)/work-$*/$${pkg_name}-*; \
 	      rm -f $(PWD)/work-$*/$${pkg_name}.plist*; \
 	      rm -f $(PWD)/work-$*/.$${pkg_name}-*; \
 	    done ; \
 	  fi ; \
-	done
+	done | tee --append build-$*.log
 
 arch-%: | pre-build-native
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
