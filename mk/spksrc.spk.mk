@@ -544,9 +544,11 @@ kernel-modules-%:
 	  $(MSG) "Processing $${arch} ARCH" ; \
 	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  $(MAKE) spkclean ; \
-	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
-	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
+	  if [ $$(echo $${archs2process} | wc -w) -gt 1 ]; then \
+	    $(MAKE) spkclean ; \
+	    rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
+	    $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
+	  fi ; \
 	done
 
 arch-%: | pre-build-native
