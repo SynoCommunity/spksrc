@@ -15,4 +15,8 @@ HOMEPAGE = https://the.exa.website/
 COMMENT  = A modern replacement for ‘ls’.
 LICENSE  = MIT
 
+# workaround for https://github.com/rust-lang/rust/issues/97255
+# remove when rust is fixed
+CARGO_PROFILE_RELEASE_LTO = "false"
+
 include ../../mk/spksrc.cross-rust.mk
