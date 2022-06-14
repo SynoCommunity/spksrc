@@ -1,6 +1,6 @@
 SPK_NAME = redis
-SPK_VERS = 6.2.7
-SPK_REV = 10
+SPK_VERS = 7.0.2
+SPK_REV = 11
 SPK_ICON = src/redis.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,13 +10,15 @@ DESCRIPTION = Redis is an open source, advanced key-value store. It is often ref
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v6.2.7 (bugfix release and security updates for CVE-2022-24736 and CVE-2022-24735)."
+CHANGELOG = "Update redis to v7.0.2."
 
 # atomic operations are not supported on ARMv5 and PPC archs except qoriq.
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
+
+WIZARDS_DIR = src/wizard/
 
 STARTABLE = yes
 SERVICE_USER = auto
