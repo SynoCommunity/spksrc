@@ -18,6 +18,8 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
 
+WIZARDS_DIR = src/wizard/
+
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh

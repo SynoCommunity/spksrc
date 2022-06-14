@@ -9,7 +9,7 @@ INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
-# Only DSM 5 has this temp upgrade folder
+# Only DSM > 5 have this temp upgrade folder variable
 TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
 
