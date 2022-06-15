@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.5.3
-SPK_REV = 55
+SPK_VERS = 3.6.0
+SPK_REV = 56
 SPK_ICON = src/sabnzbd.png
 
 BUILD_DEPENDS = cross/python310
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 3.5.3."
+CHANGELOG = "Update SABnzbd to 3.6.0."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -35,6 +35,8 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 
 # Add nice and ionice commands
 ENV += BUSYBOX_CONFIG="nice ionice"
+
+SPK_COMMANDS = bin/7za
 
 include ../../mk/spksrc.spk.mk
 
