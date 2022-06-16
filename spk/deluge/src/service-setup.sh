@@ -1,7 +1,5 @@
-PYTHON_DIR="/usr/local/python3"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
+PYTHON_DIR="/var/packages/python310/target/bin"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 CORE_CFG_FILE="${SYNOPKG_PKGDEST}/var/core.conf"
 WATCH_CFG_FILE="${SYNOPKG_PKGDEST}/var/autoadd.conf"
 
@@ -28,13 +26,10 @@ service_preinst ()
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    install_python_virtualenv
 
-    # Install the wheels/requirements
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG}  2>&1
-
-    # Install Deluge
-    export PYTHON_EGG_CACHE=${SYNOPKG_PKGDEST}/env/cache && cd ${SYNOPKG_PKGDEST}/share/deluge && ${PYTHON} setup.py build >> ${INST_LOG} 2>&1 && ${PYTHON} setup.py install >> ${INST_LOG} 2>&1
+    # Install the wheels
+    install_python_wheels
 
     # Correct permissions, otherwise Deluge can't write to cache
     set_unix_permissions "${SYNOPKG_PKGDEST}/env"

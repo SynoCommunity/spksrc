@@ -3,22 +3,16 @@ SPK_VERS = 2.0.5
 SPK_REV = 15
 SPK_ICON = src/deluge.png
 
-BUILD_DEPENDS = cross/python310 cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/libtorrent cross/deluge
-#DEPENDS += cross/rencode
+BUILD_DEPENDS = cross/python310
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 SPK_DEPENDS = "python310"
 
-REQUIRED_MIN_DSM = 5.0
-# archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ) required by cross/libtorrent
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(x86_ARCHS)
-
 MAINTAINER = Strangelovian
 DESCRIPTION = "Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This syno community package runs the deluge deamon \(deluged\), as well as the deluge web daemon \(deluge-web\), which serves the deluge web UI."
 STARTABLE = yes
-CHANGELOG = "Update to v2.0.5 and Python 3.10"
+CHANGELOG = "1. Update to v2.0.5<br/>2. Update to libtorrent 1.2.16<br/>3. Update to Python 3.10<br/>4. Update to OpenSSL 1.1.1o"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -40,6 +34,50 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = deluge_extra_install
+
+include ../../mk/spksrc.common.mk
+
+# [libtorrent] 2.0.6
+# # archs lacking C++14 (and c++1y) compiler (88f6281, hi3535 and ppc archs except QorIQ)
+# UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# DEPENDS += cross/openssl cross/boost_1.78 cross/geoip
+# BOOST_LIBRARIES += system python chrono random
+# BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
+# ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+# ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
+# ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+# WHEELS_BUILD_ARGS += [libtorrent]
+# WHEELS_BUILD_ARGS += build_ext
+# WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
+# ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+# WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
+# endif
+# # libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
+# # Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
+# REQUIRED_MIN_DSM = 7.0
+# UNSUPPORTED_ARCHS += comcerto2k
+# # ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
+# # WHEELS_BUILD_ARGS += --b2-args=cxxstd=1y
+# # endif
+
+# [libtorrent] 1.2.16
+# archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+DEPENDS += cross/openssl cross/boost_1.70 cross/geoip cross/libiconv
+BOOST_LIBRARIES += system python chrono random
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_70_0
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
+ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+WHEELS_BUILD_ARGS += [libtorrent]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
+ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
+endif
+ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
+WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
+endif
 
 include ../../mk/spksrc.spk.mk
 

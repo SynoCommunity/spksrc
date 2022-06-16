@@ -1,6 +1,9 @@
 ## pure python wheels
 ## 
 
+# [deluge]
+deluge==2.0.5
+
 incremental==21.3.0
 Mako==1.2.0
 MarkupSafe==2.1.1
