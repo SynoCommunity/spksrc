@@ -33,7 +33,7 @@ python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(RUN) $(PYTHON) get-pip.py --no-setuptools --no-wheel
 	@$(PIP) install "setuptools==60.10.0"
 	@$(PIP) install "wheel==0.37.1"
-	@$(PIP) install "crossenv==1.2.0"
+	@$(PIP) install "crossenv==1.3.0"
 	@$(PIP) install "cffi==1.15"
 
 $(WORK_DIR)/python-native.mk:
