@@ -93,8 +93,8 @@ python3_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py --no-setuptools --no-wheel
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py --no-setuptools --no-wheel
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.3.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.3.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==62.4.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==62.4.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.15.0"
