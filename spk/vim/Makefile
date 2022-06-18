@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Vim est un éditeur de texte avancé basé sur Vi \(unix\) ave
 DISPLAY_NAME = Vim
 STARTABLE = no
 
-CHANGELOG = "1. You now need Python 3.8 to enable Python support.<br/>2. utf-8 wrapper removed."
+CHANGELOG = "1. You now need Python 3.10 to enable Python support."
 
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware
