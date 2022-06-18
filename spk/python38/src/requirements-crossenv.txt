@@ -2,7 +2,7 @@
 appdirs==1.4.4
 distlib==0.3.3
 markupsafe==2.0.1
-poetry==1.1.11
+poetry==1.1.13
 psutil==5.8.0
 pyopenssl==21.0.0
 six==1.16.0
