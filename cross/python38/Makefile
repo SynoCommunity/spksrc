@@ -29,18 +29,12 @@ include ../../mk/spksrc.archs.mk
 
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
-
-# old compilers fail with: unrecognized command line option "-fprofile-correction"
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-optimizations
-endif
-
 # old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
 endif
-
 endif
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -97,8 +91,6 @@ PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bi
 LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib:$(LD_LIBRARY_PATH)
 export PATH LD_LIBRARY_PATH
 
-ENV += LIBFFI_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/
-
 .PHONY: python38_post_patch
 python38_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
@@ -134,11 +126,9 @@ python38_post_install: $(WORK_DIR)/python-cc.mk
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==22.0.4" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==62.4.0" "wheel==0.37.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cffi==1.15.0" "cryptography==3.3.2" "poetry==1.1.13"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==62.4.0" "wheel==0.37.1" "cffi==1.15.0" "cryptography==3.3.2" "poetry==1.1.13"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.0.4" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==62.4.0" "wheel==0.37.1" 
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "cffi==1.15.0" "cryptography==3.3.2" "poetry==1.1.13"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==62.4.0" "wheel==0.37.1" "cffi==1.15.0" "cryptography==3.3.2" "poetry==1.1.13"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

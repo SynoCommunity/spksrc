@@ -32,23 +32,15 @@ include ../../mk/spksrc.archs.mk
 
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
-
-# old compilers fail with: unrecognized command line option "-fprofile-correction"
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-optimizations
-endif
-
 # old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
 endif
-
 else
-
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-
 endif
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -104,8 +96,6 @@ PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bi
 LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib:$(LD_LIBRARY_PATH)
 export PATH LD_LIBRARY_PATH
 
-ENV += LIBFFI_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/
-
 .PHONY: python310_post_patch
 python310_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
@@ -148,7 +138,7 @@ ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
 
-$(WORK_DIR)/python-cc.mk: 
+$(WORK_DIR)/python-cc.mk:
 	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
 	@echo CROSSENV=$(WORK_DIR)/crossenv/bin/activate >> $@
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@

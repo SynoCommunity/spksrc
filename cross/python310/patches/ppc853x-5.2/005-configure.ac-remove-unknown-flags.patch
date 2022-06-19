@@ -1,0 +1,24 @@
+# remove lto optimization flags unknown by older gcc
+# - remove -fuse-linker-plugin
+# - remove -fprofile-correction
+
+--- configure.ac.orig	2022-06-06 11:53:30.000000000 +0000
++++ configure.ac	2022-06-19 15:36:23.019811638 +0000
+@@ -1427,7 +1427,7 @@
+           LTOCFLAGS="-flto"
+           ;;
+         *)
+-          LTOFLAGS="-flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none"
++          LTOFLAGS="-flto -ffat-lto-objects -flto-partition=none"
+           ;;
+       esac
+       ;;
+@@ -1506,7 +1506,7 @@
+         ;;
+       *)
+         PGO_PROF_GEN_FLAG="-fprofile-generate"
+-        PGO_PROF_USE_FLAG="-fprofile-use -fprofile-correction"
++        PGO_PROF_USE_FLAG="-fprofile-use"
+         LLVM_PROF_MERGER="true"
+         LLVM_PROF_FILE=""
+         ;;
