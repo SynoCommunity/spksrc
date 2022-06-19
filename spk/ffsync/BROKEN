@@ -1,0 +1,8 @@
+something is wrong with python2 wheels:
+
+ make[3]: Leaving directory '/github/workspace/spk/ffsync'
+===>  [https://github.com/mozilla-services/tokenserver/archive/1.5.11.tar.gz]
+make[3]: Entering directory '/github/workspace/spk/ffsync'
+make[3]: *** No rule to make target 'cross-compile-wheel-https://github.com/mozilla-services/tokenserver/archive/1.5.11.tar.gz'.  Stop.
+make[3]: Leaving directory '/github/workspace/spk/ffsync'
+
