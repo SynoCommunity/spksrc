@@ -11,6 +11,9 @@ DEPENDS = cross/zlib-ng
 # git2 package not supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
+# temp fix, until rust > 1.61.0 is released.
+RUST_TOOLCHAIN = nightly
+
 HOMEPAGE = https://the.exa.website/
 COMMENT  = A modern replacement for ‘ls’.
 LICENSE  = MIT
