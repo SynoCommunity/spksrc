@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 2.5
-SPK_REV = 13
+SPK_VERS = 2.6
+SPK_REV = 14
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -38,11 +38,10 @@ DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
+# only SRM 1.x and DSM >= 6.x have gcc with stdc++11 support
+ifeq ($(call version_ge, ${TCVERSION}, 6.0)$(call version_lt, ${TCVERSION}, 3.0),00)
 TC_HAS_STDC11 = 0
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-TC_HAS_STDC11 = 1
-endif
-ifeq ($(call version_lt, ${TCVERSION}, 3.0),1)
+else
 TC_HAS_STDC11 = 1
 endif
 
@@ -70,14 +69,16 @@ DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
 
+# libiconv dependency must appear after cross/glib (required by mc and rmlint)
+DEPENDS += cross/libiconv
 
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add jupp editor.<br/>2. Add nnn (n³) file manager."
+CHANGELOG = "1. Add GNU iconv."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -107,6 +108,7 @@ SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/exa
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
+SPK_COMMANDS += bin/iconv
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
