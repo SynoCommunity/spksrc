@@ -9,6 +9,7 @@ DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
+DEPENDS += cross/iconv
 
 OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
 OPTIONAL_DEPENDS += cross/bat cross/exa
@@ -68,9 +69,6 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
-
-# libiconv dependency must appear after cross/glib (required by mc and rmlint)
-DEPENDS += cross/libiconv
 
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL = 1
