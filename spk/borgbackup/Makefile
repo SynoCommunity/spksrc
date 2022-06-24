@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.2.0
-SPK_REV = 11
+SPK_VERS = 1.2.1
+SPK_REV = 12
 SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python310
@@ -25,7 +25,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update to borgbackup 1.2.0<br/>2. Update borgmatic to v1.5.23<br/>3. Update OpenSSL to v1.1.1n<br/>4. Add BLAKE2-libb2 support<br/>5. Update to Python 3.10<br/>6. Add llfuse support<br/>7. Include pure-python wheel for behind proxy installations"
+CHANGELOG = "1. Add emborg 1.32.0<br/>2. Update borgmatic to v1.6.3<br/>3. Update borg to 1.2.1<br/>"
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause
@@ -33,7 +33,7 @@ LICENSE  = BSD-3-Clause
 
 SERVICE_SETUP = src/service-setup.sh
 
-SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic
+SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
 ENV += BORG_OPENSSL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
