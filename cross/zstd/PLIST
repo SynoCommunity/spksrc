@@ -7,4 +7,4 @@ rsc:bin/zstdless
 lnk:bin/zstdmt
 lnk:lib/libzstd.so
 lnk:lib/libzstd.so.1
-lib:lib/libzstd.so.1.5.1
+lib:lib/libzstd.so.1.5.2
