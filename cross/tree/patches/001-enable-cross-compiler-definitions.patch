@@ -1,11 +1,23 @@
---- Makefile.orig	2019-01-26 21:44:34.571112711 +0100
-+++ Makefile	2019-01-26 21:44:44.315151754 +0100
-@@ -18,7 +18,7 @@
+--- Makefile.orig	2022-02-16 21:45:43.000000000 +0000
++++ Makefile	2022-06-25 08:02:58.467213836 +0000
+@@ -16,9 +16,9 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  
- prefix = /usr
+-PREFIX=/usr/local
++PREFIX=?/usr/local
  
 -CC=gcc
 +#CC=gcc
+ INSTALL=install
  
- VERSION=1.8.0
- TREE_DEST=tree
+ VERSION=2.0.2
+@@ -33,7 +33,7 @@
+ 
+ # Linux defaults:
+ #CFLAGS=-ggdb -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+-CFLAGS=-O3 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
++#CFLAGS=-O3 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+ LDFLAGS=-s
+ 
+ # Uncomment for FreeBSD:

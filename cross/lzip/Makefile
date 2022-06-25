@@ -1,8 +1,8 @@
 PKG_NAME = lzip
-PKG_VERS = 1.22
+PKG_VERS = 1.23
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.savannah.gnu.org/releases/$(PKG_NAME)
+PKG_DIST_SITE = https://download.savannah.gnu.org/releases/lzip
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

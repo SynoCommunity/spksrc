@@ -1,5 +1,5 @@
 PKG_NAME = bat
-PKG_VERS = 0.18.3
+PKG_VERS = 0.21.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sharkdp/bat/archive
@@ -8,8 +8,11 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib-ng
 
-# git2 package not supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# unsupported by cross/zlib-ng
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# rust issue with target 'armv5te-unknown-linux-gnueabi'
+# https://github.com/rust-lang/compiler-builtins/issues/420
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://github.com/sharkdp/bat
 COMMENT  = A cat(1) clone with wings.

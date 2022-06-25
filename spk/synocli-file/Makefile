@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 2.5
-SPK_REV = 13
+SPK_VERS = 2.6
+SPK_REV = 14
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -9,6 +9,7 @@ DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
+DEPENDS += cross/iconv
 
 OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
 OPTIONAL_DEPENDS += cross/bat cross/exa
@@ -23,6 +24,8 @@ include ../../mk/spksrc.common.mk
 
 # build rust tools before packages depending on cross/zlib
 # These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
+# rust issue with target 'armv5te-unknown-linux-gnueabi'
+# https://github.com/rust-lang/compiler-builtins/issues/420
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/bat cross/exa
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
@@ -38,11 +41,10 @@ DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
+# only SRM 1.x and DSM >= 6.x have gcc with stdc++11 support
+ifeq ($(call version_ge, ${TCVERSION}, 6.0)$(call version_lt, ${TCVERSION}, 3.0),00)
 TC_HAS_STDC11 = 0
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-TC_HAS_STDC11 = 1
-endif
-ifeq ($(call version_lt, ${TCVERSION}, 3.0),1)
+else
 TC_HAS_STDC11 = 1
 endif
 
@@ -70,14 +72,13 @@ DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
 
-
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add jupp editor.<br/>2. Add nnn (n³) file manager."
+CHANGELOG = "1. Add iconv.<br/>2. Update of the following tools<ul><li>update bat to v0.21.0</li><li>update detox to v1.4.5</li><li>update fd to v8.3.2</li><li>update fzf to v0.30.0</li><li>update jdupes to v1.20.2</li><li>update lzip to v1.23 and plzip to v1.10</li><li>update Midnight Commander to v4.8.28</li><li>update nano to v6.3</li><li>update nnn to v4.5</li><li>udate RHash to v1.4.3</li><li>update tree to v2.0.2</li></ul>"
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -107,6 +108,7 @@ SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/exa
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
+SPK_COMMANDS += bin/iconv
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link

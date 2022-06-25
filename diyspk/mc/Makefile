@@ -1,5 +1,5 @@
 SPK_NAME = mc
-SPK_VERS = 4.8.27
+SPK_VERS = 4.8.28
 SPK_REV = 10
 SPK_ICON = src/mc.png
 
@@ -10,7 +10,7 @@ DESCRIPTION = Midnight Commander is a console application with a text user inter
 DESCRIPTION_FRE = Midnight Commander est une application en mode texte. L\'interface principale se compose de deux «panneaux» qui affichent les fichiers présents par rapport à leur emplacement sur le disque.
 DISPLAY_NAME = Midnight Commander
 STARTABLE = no
-CHANGELOG = "Update mc to version 4.8.27"
+CHANGELOG = "Update mc to version 4.8.28"
 
 HOMEPAGE = https://www.midnight-commander.org
 LICENSE  = GPL
