@@ -1,0 +1,13 @@
+# avoid build of doc, demos and tests
+# 
+--- Makefile.in.orig	2020-11-14 18:45:16.000000000 +0000
++++ Makefile.in	2022-06-25 14:06:26.284881269 +0000
+@@ -572,7 +572,7 @@
+ LIBGMPXX_LT_CURRENT = 10
+ LIBGMPXX_LT_REVISION = 1
+ LIBGMPXX_LT_AGE = 6
+-SUBDIRS = tests mpn mpz mpq mpf printf scanf rand cxx demos tune doc
++SUBDIRS = mpn mpz mpq mpf printf scanf rand cxx tune
+ 
+ # Put asl.h here for now.
+ 

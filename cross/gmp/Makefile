@@ -1,8 +1,8 @@
 PKG_NAME = gmp
-PKG_VERS = 6.2.0
+PKG_VERS = 6.2.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/gmp
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -13,6 +13,7 @@ LICENSE  = LGPLv3 or GPLv2
 
 GNU_CONFIGURE = 1
 
+CONFIGURE_ARGS = --disable-static
 
 # create c++ library of gmp. This is required by cross/rnm
 CONFIGURE_ARGS += --enable-cxx
