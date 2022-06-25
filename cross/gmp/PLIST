@@ -1,6 +1,6 @@
 lnk:lib/libgmp.so
 lnk:lib/libgmp.so.10
-lib:lib/libgmp.so.10.4.0
+lib:lib/libgmp.so.10.4.1
 lnk:lib/libgmpxx.so
 lnk:lib/libgmpxx.so.4
-lib:lib/libgmpxx.so.4.6.0
+lib:lib/libgmpxx.so.4.6.1
