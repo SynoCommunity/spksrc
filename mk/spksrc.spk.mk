@@ -192,7 +192,9 @@ else
 endif
 endif
 
+ifneq ($(strip $(DISPLAY_NAME)),)
 	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
+endif
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@[ -d $(STAGING_DIR)/$(DSM_UI_DIR) ] && echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@ || true
 endif
