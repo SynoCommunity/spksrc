@@ -4,7 +4,7 @@ PKG_EXT = tar.gz
 # make sure the hash matches this release, as it is shown with 'micro --version'
 GIT_HASH = b976385
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/zyedidia/$(PKG_NAME)/archive
+PKG_DIST_SITE = https://github.com/zyedidia/micro/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 

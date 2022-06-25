@@ -8,11 +8,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib-ng
 
-# git2 package not supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# unsupported by cross/zlib-ng
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# rust issue with target 'armv5te-unknown-linux-gnueabi'
+# https://github.com/rust-lang/compiler-builtins/issues/420
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 # temp fix, until rust > 1.61.0 is released.
-RUST_TOOLCHAIN = nightly
+RUST_TOOLCHAIN = 1.60.0
 
 HOMEPAGE = https://the.exa.website/
 COMMENT  = A modern replacement for ‘ls’.

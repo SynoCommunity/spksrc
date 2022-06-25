@@ -1,5 +1,5 @@
 SPK_NAME = rhash
-SPK_VERS = 1.4.2
+SPK_VERS = 1.4.3
 SPK_REV = 2
 
 DEPENDS = cross/$(SPK_NAME)

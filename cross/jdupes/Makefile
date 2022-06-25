@@ -1,5 +1,5 @@
 PKG_NAME = jdupes
-PKG_VERS = 1.20.1
+PKG_VERS = 1.20.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jbruchon/jdupes/archive
@@ -13,10 +13,10 @@ COMMENT  = A powerful duplicate file finder and an enhanced fork of fdupes.
 LICENSE  = MIT
 
 CONFIGURE_TARGET = none
-INSTALL_TARGET = jdupes_install_target
+INSTALL_TARGET = jdupes_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: jdupes_install_target
-jdupes_install_target:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+.PHONY: jdupes_install
+jdupes_install:
+	@$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)

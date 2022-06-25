@@ -1,5 +1,5 @@
 PKG_NAME = nnn
-PKG_VERS = 4.4
+PKG_VERS = 4.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jarun/nnn/releases/download/v$(PKG_VERS)

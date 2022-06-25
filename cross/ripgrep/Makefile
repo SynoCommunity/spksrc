@@ -12,7 +12,7 @@ DEPENDS =
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://github.com/BurntSushi/ripgrep
-COMMENT  = ripgrep recursively searches directories for a regex pattern
+COMMENT  = ripgrep recursively searches directories for a regex pattern.
 LICENSE  = public domain/Unlicense
 
 # Force static build when pcre2 is detected in synocli-file build environment

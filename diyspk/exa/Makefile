@@ -8,12 +8,11 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A modern replacement for ‘ls’.
-DISPLAY_NAME = exa
 STARTABLE = no
-
-SPK_COMMANDS = bin/exa
 
 HOMEPAGE = https://the.exa.website/
 LICENSE  = MIT
+
+SPK_COMMANDS = bin/exa
 
 include ../../mk/spksrc.spk.mk
