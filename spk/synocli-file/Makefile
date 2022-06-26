@@ -11,7 +11,7 @@ DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 
-OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd
+OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/sd
 OPTIONAL_DEPENDS += cross/bat cross/exa
 OPTIONAL_DEPENDS += cross/nnn
 
@@ -22,11 +22,11 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-# build rust tools before packages depending on cross/zlib
-# These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
 # rust issue with target 'armv5te-unknown-linux-gnueabi'
 # https://github.com/rust-lang/compiler-builtins/issues/420
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+# build rust tools before packages depending on cross/zlib
+# These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
 DEPENDS += cross/bat cross/exa
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
 endif
@@ -65,20 +65,22 @@ DEPENDS += cross/micro cross/fzf
 OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor), fzf (fuzzy finder)"
 endif
 
-ifneq ($(findstring $(ARCH), $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
+DEPENDS += cross/sd
+OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
 endif
 
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provides a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add iconv.<br/>2. Update of the following tools<ul><li>update bat to v0.21.0</li><li>update detox to v1.4.5</li><li>update fd to v8.3.2</li><li>update fzf to v0.30.0</li><li>update jdupes to v1.20.2</li><li>update lzip to v1.23 and plzip to v1.10</li><li>update Midnight Commander to v4.8.28</li><li>update nano to v6.3</li><li>update nnn to v4.5</li><li>udate RHash to v1.4.3</li><li>update tree to v2.0.2</li></ul>"
+CHANGELOG = "1. Add iconv.<br/>2. Update of the following tools<ul><li>update bat to v0.21.0</li><li>update detox to v1.4.5</li><li>update fd to v8.3.2</li><li>update fzf to v0.30.0</li><li>update jdupes to v1.20.2</li><li>update lzip to v1.23 and plzip to v1.10</li><li>update Midnight Commander to v4.8.28</li><li>update nano to v6.3</li><li>update nnn to v4.5</li><li>update RHash to v1.4.3</li><li>update tree to v2.0.2</li></ul><br/>3. Update zstd to v1.5.2."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -103,6 +105,7 @@ SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
 SPK_COMMANDS += bin/rg
 SPK_COMMANDS += bin/fd
+SPK_COMMANDS += bin/sd
 SPK_COMMANDS += bin/mg
 SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/exa
