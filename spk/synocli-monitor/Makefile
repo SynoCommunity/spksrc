@@ -28,7 +28,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3, htop, ionice, cpulimit$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "1. Add bandwhich v0.20.0.<br/>2. Add bottom v0.6.8.<br/>3. Add procs v0.12.3."
+CHANGELOG = "1. Add bandwhich v0.20.0.<br/>2. Add bottom v0.6.8.<br/>3. Add procs v0.12.3.<br/>4. Update openssl to v1.1.1p."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
