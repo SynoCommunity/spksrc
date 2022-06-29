@@ -1,7 +1,7 @@
 SPK_NAME = cloudflared
 SPK_VERS = 2022.6.3
 SPK_REV = 1
-SPK_ICON = src/cf-logo-v-rgb.png
+SPK_ICON = src/cloudflared.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
