@@ -81,5 +81,5 @@ STAGING_INSTALL_WHEELHOUSE = $(STAGING_INSTALL_PREFIX)/share/wheelhouse
 endif
 
 define create_target_dir
-@mkdir -p `dirname $@`
+@mkdir -p $$(dirname $@)
 endef

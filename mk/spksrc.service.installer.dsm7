@@ -46,14 +46,14 @@ call_func ()
 }
 
 # Source installer variables and functions
-INST_FUNCTIONS=`dirname $0`"/functions"
+INST_FUNCTIONS=$(dirname $0)"/functions"
 if [ -r "${INST_FUNCTIONS}" ]; then
     . "${INST_FUNCTIONS}"
 fi
 
 
 # Source package specific variables and functions
-SVC_SETUP=`dirname $0`"/service-setup"
+SVC_SETUP=$(dirname $0)"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi

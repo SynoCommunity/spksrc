@@ -13,13 +13,10 @@ COMMENT  = 7-Zip is a file archiver with a high compression ratio.
 LICENSE = LGPLv2.1+
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = p7zip_install
 
 COMPILE_MAKE_OPTIONS += CC="$(TC_PATH)$(TC_PREFIX)gcc"
 COMPILE_MAKE_OPTIONS += CXX="$(TC_PATH)$(TC_PREFIX)g++"
 
-include ../../mk/spksrc.cross-cc.mk
+INSTALL_MAKE_OPTIONS = install DEST_DIR=$(INSTALL_DIR) DEST_HOME=$(INSTALL_PREFIX)
 
-.PHONY: p7zip_install
-p7zip_install:
-	@$(RUN) $(MAKE) install DEST_DIR=$(INSTALL_DIR) DEST_HOME=$(INSTALL_PREFIX)
+include ../../mk/spksrc.cross-cc.mk

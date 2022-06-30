@@ -2,9 +2,9 @@
 #   Run the GNU configure script or any similar configure tool. 
 # Targets are executed in the following order:
 #  configure_msg_target
-#  pre_configure_target   (override with PRE_CONFIGURE_TARGET)
-#  configure_target       (override with CONFIGURE_TARGET)
-#  post_configure_target  (override with POST_CONFIGURE_TARGET)
+#  pre_configure_target    (override with PRE_CONFIGURE_TARGET)
+#  configure_target        (override with CONFIGURE_TARGET)
+#  post_configure_target   (override with POST_CONFIGURE_TARGET)
 # Variables:
 #  GNU_CONFIGURE           If set, configure is assumed to be an autoconf generated script
 #                          which accepts --host=, --build, and --prefix= options.

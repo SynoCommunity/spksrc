@@ -110,9 +110,9 @@ PSTAT_LOG = $(shell pwd)/build.stats.log
 endif
 
 # Terminal colors
-RED=`tput setaf 1`
-GREEN=`tput setaf 2`
-NC=`tput sgr0`
+RED=$$(tput setaf 1)
+GREEN=$$(tput setaf 2)
+NC=$$(tput sgr0)
 
 # Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
