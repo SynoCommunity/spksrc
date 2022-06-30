@@ -83,7 +83,7 @@ install_correct_lib_files: $(INSTALL_PLIST)
 	  sed -e 's#=\($(INSTALL_PREFIX)\)#=$(INSTALL_DIR)\1#g' \
 	      -e 's#-rpath,\([^ ,]*\)#-rpath,\1,-rpath-link,$(INSTALL_DIR)\1#g' \
 	      -e 's#$$(libdir)#$${libdir}#g' \
-         -i $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
+              -i $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
 	done
 	@for la_file in $$(grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)) ; \
 	do \
