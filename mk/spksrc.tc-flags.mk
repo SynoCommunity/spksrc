@@ -21,9 +21,10 @@ TC_OS_MIN_VER = $(word 1,$(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS
 endif
 
 ifeq ($(strip $(TC_DIST_SITE_URL)),)
-TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20Tool%20Chains/
-ifeq ($(TC_VERS),7.0)
+ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
 TC_DIST_SITE_URL = https://global.download.synology.com/download/ToolChain/toolchain/$(TC_VERS)-$(TC_BUILD)/
+else
+TC_DIST_SITE_URL = https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/$(TC_TYPE)%20$(TC_VERS)%20Tool%20Chains/
 endif
 endif
 
