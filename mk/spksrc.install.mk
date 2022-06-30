@@ -77,7 +77,7 @@ $(INSTALL_PLIST):
 	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | sed 's?> ??g' > $@
 
 install_correct_lib_files: $(INSTALL_PLIST)
-	@for pc_file in $(grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)) ; \
+	@for pc_file in $$(grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)) ; \
 	do \
 	  $(MSG) "Correcting pkg-config file $${pc_file}" ; \
 	  sed -e 's#=\($(INSTALL_PREFIX)\)#=$(INSTALL_DIR)\1#g' \
@@ -85,7 +85,7 @@ install_correct_lib_files: $(INSTALL_PLIST)
 	      -e 's#$$(libdir)#$${libdir}#g' \
          -i $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
 	done
-	@for la_file in $(grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)) ; \
+	@for la_file in $$(grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)) ; \
 	do \
 	  $(MSG) "Correcting libtool file $${la_file}" ; \
 	  perl -p -i -e 's#(?<!\Q$(INSTALL_DIR)\E/)$(INSTALL_PREFIX)#$(INSTALL_DIR)/$(INSTALL_PREFIX)#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${la_file} ; \
