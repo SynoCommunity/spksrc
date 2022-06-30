@@ -16,7 +16,7 @@ else
 DEPENDS = cross/glib
 endif
 
-DEPENDS += cross/slang cross/libssh2
+DEPENDS += cross/slang cross/libext2fs cross/libssh2
 
 HOMEPAGE = https://www.midnight-commander.org
 COMMENT  = GNU Midnight Commander is a visual file manager. It\'s a feature rich full-screen text mode application that allows you to copy, move and delete files and whole directory trees, search for files and run commands in the subshell. Internal viewer and editor are included.
