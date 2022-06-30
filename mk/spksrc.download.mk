@@ -86,7 +86,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      ;; \
 	    svn) \
 	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
-	        rev=`svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -` ; \
+	        rev=$$(svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -) ; \
 	      else \
 	        rev=$(PKG_SVN_REV) ; \
 	      fi ; \
@@ -115,7 +115,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      ;; \
 	    hg) \
 	      if [ "$(PKG_HG_REV)" = "tip" ]; then \
-	        rev=`hg identify -r "tip" $${url}` ; \
+	        rev=$$(hg identify -r "tip" $${url}) ; \
 	      else \
 	        rev=$(PKG_HG_REV) ; \
 	      fi ; \
@@ -145,9 +145,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	    *) \
 	      localFile=$(PKG_DIST_FILE) ; \
 	      if [ -z "$${localFile}" ]; then \
-	        localFile=`basename $${url}` ; \
+	        localFile=$$(basename $${url}) ; \
 	      fi ; \
-	      url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
+	      url=$$(echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
 	      pid=$$$$ ; \

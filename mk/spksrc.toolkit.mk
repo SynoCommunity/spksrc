@@ -26,7 +26,6 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$
 #####
 
 RUN = cd $(WORK_DIR)/$(TOOLKIT_TARGET) && env $(ENV)
-MSG = echo "===>   "
 
 include ../../mk/spksrc.download.mk
 

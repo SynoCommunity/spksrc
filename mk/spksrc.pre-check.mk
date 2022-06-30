@@ -22,7 +22,7 @@ ifneq ($(wildcard BROKEN),)
   @$(error $(NAME): Broken package)
 endif
 
-# Check for build for generic archs, these are not supporting by default `require kernel`.
+# Check for build for generic archs, these are not supporting by default 'require kernel'.
 # Unless building kernel modules where a package will contain multiple kernel sub-architectures and versions.
 ifneq ($(REQUIRE_KERNEL),)
   ifeq ($(REQUIRE_KERNEL_MODULE),)
