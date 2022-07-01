@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.6
-SPK_REV = 14
+SPK_REV = 15
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -41,16 +41,10 @@ DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
-# only SRM 1.x and DSM >= 6.x have gcc with stdc++11 support
-ifeq ($(call version_ge, ${TCVERSION}, 6.0)$(call version_lt, ${TCVERSION}, 3.0),00)
-TC_HAS_STDC11 = 0
-else
-TC_HAS_STDC11 = 1
-endif
-
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
-ifeq ($(TC_HAS_STDC11),1)
-# to build rnm, GCC >= 4.8 is required, but not contained in older toolchains.
+# gcc with stdc++11 support
+ifeq ($(call version_ge, $(call version_gcc), 4.8),1)
+# to build rnm, GCC >= 4.8 is required
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
 # to build nnn -std=c11 is required
