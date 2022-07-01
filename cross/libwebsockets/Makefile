@@ -15,13 +15,10 @@ HOMEPAGE = https://libwebsockets.org/
 COMMENT  = Libwebsockets (LWS) is a flexible, lightweight pure C library for implementing modern network protocols easily with a tiny footprint, using a nonblocking event loop.
 LICENSE  = MIT
 
+CMAKE_USE_TOOLCHAIN_FILE = OFF
 CMAKE_ARGS += -DLWS_WITHOUT_TESTAPPS=ON
-
-include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-# ignore some sign-conversion warnings
 CMAKE_ARGS += -DDISABLE_WERROR=ON
-endif
+CMAKE_ARGS += -DLWS_WITH_STATIC=OFF
 
 # mosquitto needs external poll feature:
 # warning "libwebsockets is not compiled with LWS_WITH_EXTERNAL_POLL support. Websocket performance will be unusable." [-Wcpp]
