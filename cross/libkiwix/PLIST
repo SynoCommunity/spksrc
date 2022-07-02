@@ -1,3 +1,3 @@
 lnk:lib/libkiwix.so
-lnk:lib/libkiwix.so.10
-lib:lib/libkiwix.so.10.1.0
+lnk:lib/libkiwix.so.11
+lib:lib/libkiwix.so.11.0.0
