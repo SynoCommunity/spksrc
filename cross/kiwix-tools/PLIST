@@ -1,4 +1,3 @@
 bin:bin/kiwix-manage
-bin:bin/kiwix-read
 bin:bin/kiwix-search
 bin:bin/kiwix-serve

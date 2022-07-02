@@ -29,7 +29,7 @@ USE_DATA_SHARE_WORKER = yes
 
 POST_STRIP_TARGET = kiwix_extra_install
 
-SPK_COMMANDS = bin/kiwix-manage bin/kiwix-read bin/kiwix-search bin/kiwix-serve
+SPK_COMMANDS = bin/kiwix-manage bin/kiwix-search bin/kiwix-serve
 
 include ../../mk/spksrc.spk.mk
 
