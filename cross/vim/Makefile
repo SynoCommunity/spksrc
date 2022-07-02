@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://ftp.nluug.nl/pub/vim/unix
 SPECIFIC_VERSION=$(subst .,,$(PKG_VERS))
 PKG_DIR = $(PKG_NAME)$(SPECIFIC_VERSION)
 
-PYTHON_PACKAGE=python38
+PYTHON_PACKAGE=python310
 
 BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
 DEPENDS = cross/ncursesw

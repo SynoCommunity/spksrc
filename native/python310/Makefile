@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.4
+PKG_VERS = 3.10.5
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -11,10 +11,11 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-ipv6
+CONFIGURE_ARGS += --without-static-libpython
+# installed pip is not on PATH
 CONFIGURE_ARGS += --without-ensurepip
-# old gcc does not know -Wno-unused-result
-# without this setting, cross compile wheels for ppc853x-5.2 will fail
-CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
+# test modules are required for optimization only
+CONFIGURE_ARGS += --disable-test-modules
 
 COMPILE_MAKE_OPTIONS += all
 
@@ -28,13 +29,11 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 
 .PHONY: python310_native_post_install
 python310_native_post_install: $(WORK_DIR)/python-native.mk
-	@$(MSG) Installing pip, setuptools and crossenv
+	@$(MSG) Installing pip
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py --no-setuptools --no-wheel
-	@$(PIP) install "setuptools==62.4.0"
-	@$(PIP) install "wheel==0.37.1"
-	@$(PIP) install "crossenv==1.3.0"
-	@$(PIP) install "cffi==1.15"
+	@$(RUN) $(PYTHON) get-pip.py "pip==22.0.4" --no-setuptools --no-wheel --disable-pip-version-check
+	@$(MSG) Installing setuptools, wheel, cffi and cross env
+	@$(PIP) --disable-pip-version-check install "setuptools==62.4.0" "wheel==0.37.1" "cffi==1.15" "crossenv==1.3.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

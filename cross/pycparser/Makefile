@@ -1,5 +1,5 @@
 PKG_NAME = pycparser
-PKG_VERS = 2.20
+PKG_VERS = 2.21
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/$(PKG_NAME)
