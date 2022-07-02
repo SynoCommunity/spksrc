@@ -1,6 +1,6 @@
 SPK_NAME = kiwix
-SPK_VERS = 3.2.0
-SPK_REV  = 2
+SPK_VERS = 3.3.0
+SPK_REV  = 3
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "Update kiwix to v3.2.0"
+CHANGELOG = "Update kiwix to v3.3.0"
 
 SERVICE_USER = auto
 STARTABLE = yes
