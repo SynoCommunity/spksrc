@@ -1,0 +1,8 @@
+[{
+    "step_title": "Configuration",
+    "items": [{
+        "desc": "Mosquitto default configuration is for anonymous access and restricted to localhost (127.0.0.1).<p/>Please edit <code>/var/packages/mosquitto/var/mosquitto.conf</code> regarding your needs after installation."
+      }
+    ]
+  }
+]
