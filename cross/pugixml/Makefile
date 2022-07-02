@@ -13,4 +13,6 @@ LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 
+CMAKE_USE_TOOLCHAIN_FILE = OFF
+
 include ../../mk/spksrc.cross-cmake.mk
