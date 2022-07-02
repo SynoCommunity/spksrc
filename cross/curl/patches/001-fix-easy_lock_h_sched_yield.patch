@@ -1,0 +1,16 @@
+# fix cross compile as fixed in
+# https://github.com/curl/curl/commit/e2e7f54b7bea521fa8373095d0f43261a720cda0
+
+--- lib/easy_lock.h.orig	2022-06-26 20:58:05.000000000 +0000
++++ lib/easy_lock.h	2022-07-02 05:51:58.276997285 +0000
+@@ -36,7 +36,9 @@
+ 
+ #elif defined (HAVE_ATOMIC)
+ #include <stdatomic.h>
+-
++#if defined(HAVE_SCHED_YIELD)
++#include <sched.h>
++#endif
+ #define curl_simple_lock atomic_bool
+ #define CURL_SIMPLE_LOCK_INIT false
+ 
