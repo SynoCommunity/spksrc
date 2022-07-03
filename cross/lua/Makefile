@@ -1,8 +1,8 @@
 PKG_NAME = lua
-PKG_VERS = 5.4.3
+PKG_VERS = 5.4.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.lua.org/ftp/
+PKG_DIST_SITE = https://www.lua.org/ftp
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw cross/readline
@@ -12,7 +12,7 @@ COMMENT = Lua is a powerful, efficient, lightweight, embeddable scripting langua
 LICENSE = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = lua_install
+INSTALL_MAKE_OPTIONS = install INSTALL_TOP=$(STAGING_INSTALL_PREFIX)
 
 COMPILE_MAKE_OPTIONS += linux-readline
 COMPILE_MAKE_OPTIONS += CC="$(TC_PATH)$(TC_PREFIX)gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"
@@ -24,7 +24,3 @@ COMPILE_MAKE_OPTIONS += LDFLAGS="$(LDFLAGS) -Wl,--rpath,$(INSTALL_PREFIX)/lib"
 COMPILE_MAKE_OPTIONS += MYLIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: lua_install
-lua_install:
-	@$(RUN) $(MAKE) install INSTALL_TOP=$(STAGING_INSTALL_PREFIX)
