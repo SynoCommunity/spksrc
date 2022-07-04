@@ -11,11 +11,9 @@ HOMEPAGE = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 COMMENT  = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = cops_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: cops_install
 cops_install:
