@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.6
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -43,7 +43,7 @@ endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 # gcc with stdc++11 support
-ifeq ($(call version_ge, $(call version_gcc), 4.8),1)
+ifneq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0),11)
 # to build rnm, GCC >= 4.8 is required
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
