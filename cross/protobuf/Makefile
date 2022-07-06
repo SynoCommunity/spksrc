@@ -13,7 +13,9 @@ COMMENT  = Protocol Buffers implementation in CPP
 NATIVE_PROTOC = $(realpath $(WORK_DIR)/../../../native/protoc/work-native/bin/protoc)
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = cross_compiling=yes --with-protoc=$(NATIVE_PROTOC)
+CONFIGURE_ARGS  = cross_compiling=yes 
+CONFIGURE_ARGS += --with-protoc=$(NATIVE_PROTOC)
+CONFIGURE_ARGS += --disable-static
 
 PRE_COMPILE_TARGET = protobuf_pre_compile
 
