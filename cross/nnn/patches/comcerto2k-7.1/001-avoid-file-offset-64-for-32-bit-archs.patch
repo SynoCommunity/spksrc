@@ -1,0 +1,17 @@
+# older toolchains do not support _FILE_OFFSET_BITS=64 for 32-bit archs,
+# only DSM 7+ toolchains do (but comcerto2k-7.1 has old toolchain).
+# 
+# /sysroot/usr/include/fts.h:41:3: error: #error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
+# 
+--- src/nnn.c.orig	2021-11-23 13:03:45.000000000 +0000
++++ src/nnn.c	2021-12-16 19:45:28.030685890 +0000
+@@ -33,9 +33,6 @@
+ #ifndef _GNU_SOURCE
+ #define _GNU_SOURCE
+ #endif
+-#if defined(__arm__) || defined(__i386__)
+-#define _FILE_OFFSET_BITS 64 /* Support large files on 32-bit */
+-#endif
+ #if defined(__linux__)
+ #include <sys/inotify.h>
+ #define LINUX_INOTIFY
