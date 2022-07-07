@@ -13,11 +13,9 @@ HOMEPAGE = https://tt-rss.org/
 COMMENT  = Tiny Tiny RSS is an open source web-based news feed (RSS/Atom) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = tt-rss_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: tt-rss_install
 tt-rss_install:

@@ -11,11 +11,9 @@ HOMEPAGE = https://lidarr.audio/
 COMMENT  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
 LICENSE  = GPLv3
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = lidarr_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 lidarr_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)
