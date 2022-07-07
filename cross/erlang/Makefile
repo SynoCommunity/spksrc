@@ -16,7 +16,7 @@ LICENSE  = Apache 2.0
 NATIVE_ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 ENV = PATH=$$PATH:$(NATIVE_ERLANG_BIN_DIR)
 
-INSTALL_TARGET = erlang_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
 
 CONFIGURE_ARGS  = --without-javac
 CONFIGURE_ARGS += --without-jinterface
@@ -42,7 +42,3 @@ CONFIGURE_ARGS += --build=i686-pc-linux
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: erlang_install
-erlang_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=

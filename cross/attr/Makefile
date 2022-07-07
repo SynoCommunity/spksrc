@@ -12,12 +12,9 @@ HOMEPAGE = https://savannah.nongnu.org/projects/attr/
 COMMENT  = Commands for Manipulating Filesystem Extended Attributes.
 LICENSE  = GPLv2+
 
-INSTALL_TARGET = attr_install
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-static=no
 
-include ../../mk/spksrc.cross-cc.mk
+INSTALL_MAKE_OPTIONS = install-lib install-dev DIST_ROOT=$(INSTALL_DIR)
 
-.PHONY: attr_install
-attr_install:
-	$(RUN) $(MAKE) DIST_ROOT=$(INSTALL_DIR) install-lib install-dev
+include ../../mk/spksrc.cross-cc.mk

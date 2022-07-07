@@ -12,14 +12,13 @@ COMMENT  = Mantis is an easily deployable, web based bugtracker to aid product b
 LICENSE  = GPL
 
 EXTRACT_PATH = $(WORK_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
+
 INSTALL_TARGET = mantisbt_install
 
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: mantisbt_install
 mantisbt_install:

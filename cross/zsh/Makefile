@@ -21,7 +21,7 @@ else
 	BUILD_MSG = "Building zsh with dynamically linked modules."
 endif
 
-INSTALL_TARGET = zsh_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -34,7 +34,3 @@ link-zsh-modules:
 .PHONY: zsh_pre_compile
 zsh_pre_compile:
 	@$(MSG) $(BUILD_MSG)
-
-.PHONY: zsh_install
-zsh_install:
-	umask 022; $(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

@@ -12,11 +12,9 @@ COMMENT  = ownCloud gives you universal access to your files through a web inter
 LICENSE  = AGPL
 
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = owncloud_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: owncloud_install
 owncloud_install:

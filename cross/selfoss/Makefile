@@ -12,11 +12,9 @@ COMMENT  = The new multipurpose rss reader, live stream, mashup, aggregation web
 LICENSE  = GPLv3
 
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = selfoss_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: selfoss_install
 selfoss_install:

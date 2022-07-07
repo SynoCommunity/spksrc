@@ -12,6 +12,7 @@ bin:bin/aseqdump
 bin:bin/aseqnet
 bin:bin/iecset
 bin:bin/speaker-test
+rsc:sbin/alsa-info.sh
 bin:sbin/alsaconf
 bin:sbin/alsactl
 rsc:share/alsa
