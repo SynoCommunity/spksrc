@@ -15,15 +15,8 @@ LICENSE = Apache 2.0
 ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = elixir_compile
-INSTALL_TARGET = elixir_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+
+ENV += PATH=$$PATH:$(ERLANG_BIN_DIR)
 
 include ../../mk/spksrc.native-cc.mk
-
-.PHONY: elixir_compile
-elixir_compile:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) $(MAKE_COMPILE_OPTIONS)
-
-.PHONY: elixir_install
-elixir_install:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) install

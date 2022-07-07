@@ -23,10 +23,6 @@ ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr
 ENV += PATH=$$PATH:$(ERLANG_BIN_DIR):$(ELIXIR_BIN_DIR):$(RSYNC_BIN_DIR):$(ZIP_BIN_DIR)
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = rabbitmq_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: rabbitmq_install
-rabbitmq_install:
-	$(RUN) DESTDIR=$(INSTALL_DIR) $(MAKE) install PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
