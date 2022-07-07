@@ -20,7 +20,7 @@ else
 CONFIGURE_TARGET = nop
 endif
 
-INSTALL_TARGET = redis_install
+INSTALL_MAKE_OPTIONS = install PREFIX=$(STAGING_INSTALL_PREFIX)
 
 # use jemalloc for intel archs
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))
@@ -34,7 +34,3 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: redis_patch_makefile_to_use_atomic_library
 redis_patch_makefile_to_use_atomic_library:
 	@$(RUN) sed -i 's/^FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $(WORK_DIR)/$(PKG_DIR)/src/Makefile
-
-.PHONY: redis_install
-redis_install:
-	@$(RUN) $(MAKE) install PREFIX=$(STAGING_INSTALL_PREFIX)

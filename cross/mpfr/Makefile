@@ -2,7 +2,7 @@ PKG_NAME = mpfr
 PKG_VERS = 4.0.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/mpfr
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/gmp
@@ -17,12 +17,9 @@ LICENSE  = GNU Lesser GPL
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --with-gmp=$(STAGING_INSTALL_PREFIX)
-COMPILE_MAKE_OPTIONS += SUBDIRS=src
+CONFIGURE_ARGS += --disable-static
 
-INSTALL_TARGET = mpfr_install
+COMPILE_MAKE_OPTIONS += SUBDIRS=src
+INSTALL_MAKE_OPTIONS = install SUBDIRS=src DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: mpfr_install
-mpfr_install:
-	$(RUN) $(MAKE) SUBDIRS=src DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)

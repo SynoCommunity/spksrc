@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://ftp.nluug.nl/pub/vim/unix
 SPECIFIC_VERSION=$(subst .,,$(PKG_VERS))
 PKG_DIR = $(PKG_NAME)$(SPECIFIC_VERSION)
 
-PYTHON_PACKAGE=python310
+PYTHON_PACKAGE = python310
 
 BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
 DEPENDS = cross/ncursesw
@@ -43,7 +43,9 @@ ADDITIONAL_LDFLAGS = -Wl,--rpath,/var/packages/$(PYTHON_PACKAGE)/target/lib
 
 PLIST_TRANSFORM = sed -e 's%@SPECIFIC_VERSION@%$(SPECIFIC_VERSION)%'
 
-INSTALL_TARGET = vim_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
+
+POST_INSTALL_TARGET = vim_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -60,8 +62,7 @@ PYTHON_CFG_PATH = $(shell $(STAGING_INSTALL_PREFIX)/bin/python3-config --configd
 
 ENV += PYTHONPATH=$(PYTHONPATH)
 
-.PHONY: vim_install
-vim_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
-	install -m 644 src/vimrc $(STAGING_INSTALL_PREFIX)/share/vim/vimrc
+.PHONY: vim_post_install
+vim_post_install:
+	@install -m 644 src/vimrc $(STAGING_INSTALL_PREFIX)/share/vim/vimrc
 	cd $(STAGING_INSTALL_PREFIX)/bin; ln -sf vim vim$(SPECIFIC_VERSION)
