@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.4
+SPK_VERS = 3.10.5
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to python 3.10.4 <br/>2. Update to OpenSSL 1.1.1n"
+CHANGELOG = "1. Update to Python 3.10.5<br/>2. Update to OpenSSL 1.1.1o"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -141,6 +141,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python310_extra_install
 python310_extra_install:
-	rm -f $(STAGING_DIR)/$(PYTHON_LIB_DIR)/config/libpython*.a
+	@$(MSG) - Remove test folder
 	rm -rf $(STAGING_DIR)/$(PYTHON_LIB_DIR)/test/
-	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' | xargs rm -f
+	@$(MSG) - Remove compiled files from __pycache__
+	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete

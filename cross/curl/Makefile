@@ -1,5 +1,5 @@
 PKG_NAME = curl
-PKG_VERS = 7.83.1
+PKG_VERS = 7.84.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://curl.se/download
@@ -16,8 +16,11 @@ CONFIGURE_ARGS  = --enable-ipv6
 CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
-POST_INSTALL_TARGET = curl_post_install
+ifneq ($(strip $(CURL_INCLUDE_EXECUTABLE)),1)
+PLIST_TRANSFORM = sed -e '/bin:bin/d'
+endif
 
+POST_INSTALL_TARGET = curl_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 

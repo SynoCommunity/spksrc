@@ -8,6 +8,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # powerpc archs (except qoriq) are not supported
+# undefined reference to `pipe2'
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://github.com/sharkdp/fd

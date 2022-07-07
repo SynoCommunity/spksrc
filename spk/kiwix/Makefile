@@ -1,6 +1,6 @@
 SPK_NAME = kiwix
-SPK_VERS = 3.2.0
-SPK_REV  = 2
+SPK_VERS = 3.3.0
+SPK_REV  = 3
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "Update kiwix to v3.2.0"
+CHANGELOG = "Update kiwix to v3.3.0"
 
 SERVICE_USER = auto
 STARTABLE = yes
@@ -29,7 +29,7 @@ USE_DATA_SHARE_WORKER = yes
 
 POST_STRIP_TARGET = kiwix_extra_install
 
-SPK_COMMANDS = bin/kiwix-manage bin/kiwix-read bin/kiwix-search bin/kiwix-serve
+SPK_COMMANDS = bin/kiwix-manage bin/kiwix-search bin/kiwix-serve
 
 include ../../mk/spksrc.spk.mk
 

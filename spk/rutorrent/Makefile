@@ -10,6 +10,9 @@ WHEELS = src/requirements-pure.txt
 DEPENDS = cross/busybox cross/curl cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 DEPENDS += cross/sox
 
+# include bin/curl from cross/curl
+export CURL_INCLUDE_EXECUTABLE=1
+
 MAINTAINER = smaarn
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 ADMIN_URL = /rutorrent/
@@ -21,14 +24,13 @@ HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
 
 SERVICE_USER = auto
-
-SERVICE_SETUP        = src/service-setup.sh
+SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_download_dir
 
-SERVICE_COMMAND  = /var/packages/$(SPK_NAME)/target/bin/rtorrent-daemon
-FWPORTS          = src/$(SPK_NAME).sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+SERVICE_COMMAND = /var/packages/rutorrent/target/bin/rtorrent-daemon
+FWPORTS = src/rutorrent.sc
+CONF_DIR = src/conf/
+WIZARDS_DIR = src/wizard/
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web

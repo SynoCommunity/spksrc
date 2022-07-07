@@ -14,11 +14,8 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # https://github.com/rust-lang/compiler-builtins/issues/420
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-# temp fix, until rust > 1.61.0 is released.
-RUST_TOOLCHAIN = 1.60.0
-
 HOMEPAGE = https://the.exa.website/
-COMMENT  = A modern replacement for ‘ls’.
+COMMENT  = A modern replacement for 'ls'.
 LICENSE  = MIT
 
 include ../../mk/spksrc.cross-rust.mk

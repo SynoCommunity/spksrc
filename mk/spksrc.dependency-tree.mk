@@ -22,7 +22,7 @@
 
 .PHONY: dependency-tree
 dependency-tree:
-	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
+	@echo $$(perl -e 'print "\\\t" x $(MAKELEVEL),"\n"')+ $(NAME) $(PKG_VERS)
 	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS) ; \
 	do \
 	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-tree ; \

@@ -1,30 +1,34 @@
 SPK_NAME = synocli-monitor
-SPK_VERS = 1.3
-SPK_REV = 5
+SPK_VERS = 1.4
+SPK_REV = 6
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS = cross/nmon cross/iperf2 cross/iperf3 cross/busybox cross/htop
 DEPENDS += cross/cpulimit
+OPTIONAL_DEPENDS = cross/bandwhich cross/bottom cross/procs
 
-BUSYBOX_CONFIG = procutils
-OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
+BUSYBOX_CONFIG = ionice
 
-# include process utilities including pstree for DSM<6 and DSM>2
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, ${TCVERSION}, 6.0),1)
-ifeq ($(call version_gt, ${TCVERSION}, 2.0),1)
-BUSYBOX_CONFIG = procutils.dsm5
+ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
+# include process utilities including pstree for DSM<6 and DSM>2
+BUSYBOX_CONFIG += procutils.dsm5
 OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, pstree, watch\)"
-endif
+else
+BUSYBOX_CONFIG += procutils
+OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
 endif
 
-BUSYBOX_CONFIG += ionice
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/bandwhich cross/bottom cross/procs
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
+endif
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, iperf2, iperf3, htop, ionice, cpulimit$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "1. Add cpulimit tool.<br/>2. Update htop to v3.1.2.<br/>3. Update iperf2 to v2.1.7.<br/>4. Update iperf3 to v3.11.<br/>5. Update nmon to v16n.<br/>6. Update busybox for process utilities to v1.35.0."
+CHANGELOG = "1. Add bandwhich v0.20.0.<br/>2. Add bottom v0.6.8.<br/>3. Add procs v0.12.3.<br/>4. Update openssl to v1.1.1p."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -37,5 +41,8 @@ SPK_COMMANDS  = bin/htop bin/nmon bin/iperf2 bin/iperf3
 SPK_COMMANDS += bin/ionice
 SPK_COMMANDS += bin/iostat bin/lsof bin/pgrep bin/pmap bin/watch bin/pstree
 SPK_COMMANDS += bin/cpulimit
+SPK_COMMANDS += bin/bandwhich
+SPK_COMMANDS += bin/btm
+SPK_COMMANDS += bin/procs
 
 include ../../mk/spksrc.spk.mk

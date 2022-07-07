@@ -2,7 +2,7 @@ PKG_NAME = rnm
 PKG_VERS = 4.0.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/neurobin/rnm/archive
+PKG_DIST_SITE = https://github.com/neurobin/rnm/archive/refs/tags
 PKG_DIST_FILE=$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 

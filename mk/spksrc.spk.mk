@@ -232,7 +232,7 @@ endif
 ifneq ($(strip $(SPK_CONFLICT)),)
 	@echo install_conflict_packages=\"$(SPK_CONFLICT)\" >> $@
 endif
-	@echo checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\" >> $@
+	@echo checksum=\"$$(md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)\" >> $@
 
 ifneq ($(strip $(DEBUG)),)
 INSTALLER_OUTPUT = >> /root/$${PACKAGE}-$${SYNOPKG_PKG_STATUS}.log 2>&1
@@ -279,8 +279,8 @@ define dsm_script_redirect
 $(create_target_dir)
 $(MSG) "Creating $@"
 echo '#!/bin/sh' > $@
-echo '. `dirname $$0`/installer' >> $@
-echo '`basename $$0` $(INSTALLER_OUTPUT)' >> $@
+echo '. $$(dirname $$0)/installer' >> $@
+echo '$$(basename $$0) $(INSTALLER_OUTPUT)' >> $@
 chmod 755 $@
 endef
 
@@ -326,7 +326,7 @@ endif
 .PHONY: info-checksum
 info-checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
-	@sed -i -e "s|checksum=\".*|checksum=\"`md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1`\"|g" $(WORK_DIR)/INFO
+	@sed -i -e "s|checksum=\".*|checksum=\"$$(md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)\"|g" $(WORK_DIR)/INFO
 
 .PHONY: wizards
 wizards:

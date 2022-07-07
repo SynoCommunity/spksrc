@@ -1,5 +1,5 @@
 PKG_NAME = python38
-PKG_VERS = 3.8.12
+PKG_VERS = 3.8.13
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -11,10 +11,8 @@ LICENSE  = PSF
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-ipv6
+# installed pip is not on PATH
 CONFIGURE_ARGS += --without-ensurepip
-# old gcc does not know -Wno-unused-result
-# without this setting, cross compile wheels for ppc853x-5.2 will fail
-CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
 
 COMPILE_MAKE_OPTIONS += Parser/pgen
 COMPILE_MAKE_OPTIONS += all
@@ -29,10 +27,11 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 
 .PHONY: python38_native_post_install
 python38_native_post_install: $(WORK_DIR)/python-native.mk
-	@$(MSG) Installing pip, setuptools, cffi and cross env
+	@$(MSG) Installing pip
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py --no-setuptools --no-wheel
-	@$(PIP) install "setuptools==62.4.0" "wheel==0.37.1" "cffi==1.15.0" "crossenv==1.3"
+	@$(RUN) $(PYTHON) get-pip.py "pip==22.0.4" --no-setuptools --no-wheel --disable-pip-version-check
+	@$(MSG) Installing setuptools, wheel, cffi and cross env
+	@$(PIP) --disable-pip-version-check install "setuptools==62.4.0" "wheel==0.37.1" "cffi==1.15" "crossenv==1.3.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

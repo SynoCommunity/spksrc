@@ -9,7 +9,7 @@ if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
 fi
 
 # Source package specific variable and functions
-SVC_SETUP=`dirname $0`"/service-setup"
+SVC_SETUP=$(dirname $0)"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi

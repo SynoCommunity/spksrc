@@ -46,7 +46,7 @@ endif
 
 #
 # Define _PYTHON_HOST_PLATFORM so wheel
-# prefix in file naming matches `uname -m`
+# prefix in file naming matches 'uname -m'
 #
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 PYTHON_ARCH = armv5tel

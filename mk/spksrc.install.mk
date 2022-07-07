@@ -5,24 +5,29 @@
 # Targets are executed in the following order:
 #  install_msg_target
 #  $(PRE_INSTALL_PLIST)
-#  pre_install_target              (override with PRE_INSTALL_TARGET)
-#  install_destdir_target          (default override with INSTALL_TARGET)
-#  install_target                  (alternative for INSTALL_TARGET)
-#  post_install_target             (override with POST_INSTALL_TARGET)
+#  pre_install_target               (override with PRE_INSTALL_TARGET)
+#  install_target                   (default override with INSTALL_TARGET)
+#  post_install_target              (override with POST_INSTALL_TARGET)
 #  $(INSTALL_PLIST)
 #  install_correct_lib_files
 # Variables:
-#  INSTALL_PREFIX          Target directory where the software will be run.
-#  INSTALL_DIR             Where to install files. INSTALL_PREFIX will be added.
-#  STAGING_INSTALL_PREFIX  Where to install files, in extenso.
+#  INSTALL_PREFIX                   Target directory where the software will be run.
+#  INSTALL_DIR                      Where to install files. INSTALL_PREFIX will be added.
+#  STAGING_INSTALL_PREFIX           Where to install files, in extenso.
+#  INSTALL_MAKE_OPTIONS             Parameters to add to make command
+#                                   (default: install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX))
 # Files:
-#  $(WORK_DIR)/$(PKG_NAME).plist   List of files installed. Can be used to build the PLIST file
-#                                  of each software.
+#  $(WORK_DIR)/$(PKG_NAME).plist    List of files installed. Can be used to build the PLIST file
+#                                   of each software.
 
 INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
+
+ifeq ($(strip $(INSTALL_MAKE_OPTIONS)),)
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+endif
 
 # Define find search path for creating plist
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -41,7 +46,7 @@ else
 $(PRE_INSTALL_TARGET): $(PRE_INSTALL_PLIST)
 endif
 ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = install_destdir_target
+INSTALL_TARGET = install_target
 else
 $(INSTALL_TARGET): $(PRE_INSTALL_TARGET)
 endif
@@ -63,10 +68,7 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) install prefix=$(INSTALL_PREFIX)
-
-install_destdir_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
+	$(RUN) $(MAKE) $(INSTALL_MAKE_OPTIONS)
 
 post_install_target: $(INSTALL_TARGET)
 
@@ -75,14 +77,15 @@ $(INSTALL_PLIST):
 	  diff $(PRE_INSTALL_PLIST) -  | grep '>' | sed 's?> ??g' > $@
 
 install_correct_lib_files: $(INSTALL_PLIST)
-	@for pc_file in `grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)` ; \
+	@for pc_file in $$(grep -e "^lib/pkgconfig/.*\.pc$$" $(INSTALL_PLIST)) ; \
 	do \
 	  $(MSG) "Correcting pkg-config file $${pc_file}" ; \
-	  sed -i -e 's#=\($(INSTALL_PREFIX)\)#=$(INSTALL_DIR)\1#g' \
-	         -e 's#-rpath,\([^ ,]*\)#-rpath,\1,-rpath-link,$(INSTALL_DIR)\1#g' \
-	         -e 's#$$(libdir)#$${libdir}#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
+	  sed -e 's#=\($(INSTALL_PREFIX)\)#=$(INSTALL_DIR)\1#g' \
+	      -e 's#-rpath,\([^ ,]*\)#-rpath,\1,-rpath-link,$(INSTALL_DIR)\1#g' \
+	      -e 's#$$(libdir)#$${libdir}#g' \
+              -i $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${pc_file} ; \
 	done
-	@for la_file in `grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)` ; \
+	@for la_file in $$(grep -e "^lib/.*\.la$$" $(INSTALL_PLIST)) ; \
 	do \
 	  $(MSG) "Correcting libtool file $${la_file}" ; \
 	  perl -p -i -e 's#(?<!\Q$(INSTALL_DIR)\E/)$(INSTALL_PREFIX)#$(INSTALL_DIR)/$(INSTALL_PREFIX)#g' $(INSTALL_DIR)/$(INSTALL_PREFIX)/$${la_file} ; \

@@ -1,4 +1,5 @@
 bin:sbin/mosquitto
+bin:bin/mosquitto_ctrl
 bin:bin/mosquitto_passwd
 bin:bin/mosquitto_pub
 bin:bin/mosquitto_rr
@@ -7,7 +8,4 @@ lnk:lib/libmosquitto.so
 lib:lib/libmosquitto.so.1
 lnk:lib/libmosquittopp.so
 lib:lib/libmosquittopp.so.1
-rsc:etc/mosquitto/aclfile.example
-rsc:etc/mosquitto/mosquitto.conf.example
-rsc:etc/mosquitto/pskfile.example
-rsc:etc/mosquitto/pwfile.example
+lib:lib/mosquitto_dynamic_security.so

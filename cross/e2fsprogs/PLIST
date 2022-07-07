@@ -2,7 +2,6 @@ bin:bin/chattr
 rsc:bin/compile_et
 bin:bin/lsattr
 rsc:bin/mk_cmds
-bin:bin/uuidgen
 rsc:etc/e2scrub.conf
 rsc:etc/mke2fs.conf
 rsc:lib/e2fsprogs/e2scrub_all_cron
@@ -22,9 +21,6 @@ lib:lib/libext2fs.so.2.4
 lnk:lib/libss.so
 lnk:lib/libss.so.2
 lib:lib/libss.so.2.0
-lnk:lib/libuuid.so
-lnk:lib/libuuid.so.1
-lib:lib/libuuid.so.1.2
 bin:sbin/badblocks
 bin:sbin/blkid
 bin:sbin/debugfs
@@ -53,4 +49,3 @@ bin:sbin/mkfs.ext4
 bin:sbin/mklost+found
 bin:sbin/resize2fs
 bin:sbin/tune2fs
-bin:sbin/uuidd
