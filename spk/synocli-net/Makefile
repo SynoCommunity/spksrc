@@ -33,7 +33,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, autossh, etherwake, telnet, whois$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "Add aria2 command line tool v1.36.0."
+CHANGELOG = "1. Update openssl to v1.1.1q.<br/>2. Update openssh to v9.0p1."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
