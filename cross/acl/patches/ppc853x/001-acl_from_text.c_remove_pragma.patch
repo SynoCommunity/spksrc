@@ -1,0 +1,16 @@
+# remove pragma GCC diagnostics within function not supported on older gcc.
+# 
+--- libacl/acl_from_text.c.orig	2020-02-06 16:03:31.000000000 +0000
++++ libacl/acl_from_text.c	2022-07-08 05:36:16.955727680 +0000
+@@ -304,11 +304,8 @@
+ create_entry:
+ 	if (acl_create_entry(acl_p, &entry_d) != 0)
+ 		return -1;
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Waddress"
+ 	if (acl_copy_entry(entry_d, int2ext(&entry_obj)) != 0)
+ 		return -1;
+-#pragma GCC diagnostic pop
+ 	return 0;
+ 
+ fail:
