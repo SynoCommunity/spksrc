@@ -14,8 +14,8 @@ STARTABLE = no
 CHANGELOG = "Update fish to 3.5.0"
 
 HOMEPAGE = https://fishshell.com
-LICENSE = Custom
-LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/doc_src/license.rst
+LICENSE = GPL-2.0
+LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/COPYING
 
 SERVICE_SETUP = src/service-setup.sh
 
