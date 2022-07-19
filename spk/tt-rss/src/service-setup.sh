@@ -50,6 +50,9 @@ service_postinst ()
           echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');";
           echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');"
         } >>"${WEB_DIR}/${PACKAGE}/config.php"
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+          touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
+        fi
     fi
 
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
