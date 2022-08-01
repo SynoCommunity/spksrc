@@ -4,8 +4,8 @@
 # - mp4 tags: use mp4File->tag()->item instead of mp4File->tag()->itemMap() to access covers
 #             as side effect this fixes the build with older gcc
 #
---- scanner/metadata/taglib/taglib_wrapper.cpp.orig	2022-01-22 01:35:19.000000000 +0100
-+++ scanner/metadata/taglib/taglib_wrapper.cpp	2022-07-30 13:44:25.711760171 +0200
+--- scanner/metadata/taglib/taglib_wrapper.cpp.orig	2022-01-22 00:35:19.000000000 +0000
++++ scanner/metadata/taglib/taglib_wrapper.cpp	2022-07-30 20:04:45.252885556 +0000
 @@ -95,7 +95,7 @@
    if (TagLib::MPEG::File *
        mp3File{dynamic_cast<TagLib::MPEG::File *>(f.file())}) {
@@ -15,17 +15,18 @@
        hasCover = !frameListMap["APIC"].isEmpty();
      }
    }
-@@ -107,8 +107,11 @@
+@@ -107,9 +107,11 @@
    // ----- MP4
    else if (TagLib::MP4::File *
             mp4File{dynamic_cast<TagLib::MP4::File *>(f.file())}) {
 -    auto &coverItem{mp4File->tag()->itemMap()["covr"]};
 -    TagLib::MP4::CoverArtList coverArtList{coverItem.toCoverArtList()};
-+    if (!mp4File->tag()->itemMap().contains("covr")) {
-+        return false;
+-    hasCover = !coverArtList.isEmpty();
++    if (mp4File->tag()->itemMap().contains("covr")) {
++      auto const &coverItem = mp4File->tag()->item("covr");
++      auto const coverArtList = coverItem.toCoverArtList();
++      hasCover = !coverArtList.isEmpty();
 +    }
-+    auto const &coverItem = mp4File->tag()->item("covr");
-+    auto const coverArtList = coverItem.toCoverArtList();
-     hasCover = !coverArtList.isEmpty();
    }
    // ----- Ogg
+   else if (TagLib::Ogg::Vorbis::File *
