@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.8.1
-SPK_REV = 6
+SPK_VERS = 10.8.3
+SPK_REV = 7
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "Update jellyfin to 10.8.1"
+CHANGELOG = "Update jellyfin to 10.8.3"
 HOMEPAGE = https://jellyfin.org
 HELPURL    = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
