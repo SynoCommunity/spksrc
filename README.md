@@ -40,10 +40,10 @@ If you can't find an answer, or if you want to open a package request, read [CON
 cd spksrc # Go to the cloned repository's root folder.
 
 # If running on Linux:
-docker run -it -v $(pwd):/spksrc ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
 # If running on macOS:
-docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 

@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2021.9.7
-SPK_REV = 17
+SPK_VERS = 2022.7.7
+SPK_REV = 18
 SPK_ICON = src/${SPK_NAME}.png
 
 SPK_DEPENDS = "python310"
@@ -10,7 +10,7 @@ BUILD_DEPENDS = cross/python310
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Update homeassistant to 2021.9.7.<br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "Update homeassistant to 2022.7.7.<br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
