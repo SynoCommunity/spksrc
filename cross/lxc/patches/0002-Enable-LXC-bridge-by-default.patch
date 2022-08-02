@@ -1,0 +1,34 @@
+From f33a6f416278265d66761a1bcab879ccb5439977 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 14:16:16 +0000
+Subject: [PATCH] Enable LXC bridge by default
+
+---
+ config/sysconfig/Makefile.am | 3 ++-
+ config/sysconfig/lxc-net     | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ create mode 100644 config/sysconfig/lxc-net
+
+diff --git config/sysconfig/Makefile.am config/sysconfig/Makefile.am
+index 3829a01..d4b7ec3 100644
+--- config/sysconfig/Makefile.am
++++ config/sysconfig/Makefile.am
+@@ -1,6 +1,7 @@
+ sysconfigdir="@LXC_DISTRO_SYSCONF@"
+ 
+ sysconfig_DATA = \
+-	lxc
++	lxc \
++	lxc-net
+ 
+ EXTRA_DIST = $(sysconfig_DATA)
+diff --git config/sysconfig/lxc-net config/sysconfig/lxc-net
+new file mode 100644
+index 0000000..5d52f62
+--- /dev/null
++++ config/sysconfig/lxc-net
+@@ -0,0 +1 @@
++USE_LXC_BRIDGE="true"
+-- 
+2.25.1
+

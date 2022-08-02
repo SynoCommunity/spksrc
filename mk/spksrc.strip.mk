@@ -71,7 +71,7 @@ strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_libatomic
 	  case $${type} in \
 	    lib|bin) \
 	      echo -n "Stripping $${file}... " ; \
-	      chmod u+w $(STAGING_DIR)/$${file} ; \
+	      chmod u+w $(STAGING_DIR)/$${file} || true ; \
 	      $(STRIP) $(STAGING_DIR)/$${file} > /dev/null 2>&1 && echo "ok" || echo "failed!" \
 	      ;; \
 	  esac ; \

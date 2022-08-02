@@ -1,0 +1,49 @@
+From d97f86002cbf26b942f4e08b95a79e83659a66a8 Mon Sep 17 00:00:00 2001
+From: Ross Brown <rbrownwsws@googlemail.com>
+Date: Sat, 17 Apr 2021 14:30:49 +0000
+Subject: [PATCH] Set up static route for lxc bridge
+
+---
+ config/init/common/lxc-net.in | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git config/init/common/lxc-net.in config/init/common/lxc-net.in
+index 801dc63..35b4a58 100644
+--- config/init/common/lxc-net.in
++++ config/init/common/lxc-net.in
+@@ -32,6 +32,8 @@ LXC_IPV6_NAT="false"
+ use_iptables_lock="-w"
+ iptables -w -L -n > /dev/null 2>&1 || use_iptables_lock=""
+ 
++LXC_ROUTE="proto static scope link ${LXC_NETWORK} dev ${LXC_BRIDGE}"
++
+ _netmask2cidr ()
+ {
+     # Assumes there's no "255." after a non-255 byte in the mask
+@@ -42,6 +44,9 @@ _netmask2cidr ()
+ }
+ 
+ _ifdown() {
++    # Get rid of manually added static route
++    ip route del ${LXC_ROUTE} 2>/dev/null || true
++
+     ip addr flush dev ${LXC_BRIDGE}
+     ip link set dev ${LXC_BRIDGE} down
+ }
+@@ -139,6 +144,13 @@ start() {
+             --dhcp-leasefile="${varlib}"/misc/dnsmasq.${LXC_BRIDGE}.leases \
+             --dhcp-authoritative $LXC_IPV6_ARG || cleanup
+ 
++    # Manually add route for LXC bridge because dnsmasq does not seem to
++    # provide one automatically for some reason
++    echo "Waiting for dnsmasq to settle..."
++    sleep 10
++    echo "Add static route to lxc network"
++    ip route add ${LXC_ROUTE}
++
+     touch "${varrun}"/network_up
+     FAILED=0
+ }
+-- 
+2.25.1
+

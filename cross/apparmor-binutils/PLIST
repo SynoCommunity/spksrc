@@ -1,0 +1,3 @@
+bin:bin/aa-enabled
+bin:bin/aa-exec
+bin:bin/aa-features-abi
