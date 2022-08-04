@@ -24,7 +24,7 @@ NAME = $(SPK_NAME)
 FLOCK_TIMEOUT = 300
 
 ifneq ($(ARCH),)
-SPK_ARCH = $(TC_ARCH)
+SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS),$(TC_ARCH))
 SPK_NAME_ARCH = $(ARCH)
 SPK_TCVERS = $(TCVERSION)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
@@ -124,6 +124,11 @@ get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json h
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
+	@if [ -z "$(SPK_ARCH)" ]; then \
+	   echo "ERROR: Arch '$(ARCH)' is not a supported architecture" ; \
+	   echo " - There is no remaining arch in '$(TC_ARCH)' for unsupported archs '$(UNSUPPORTED_ARCHS)'"; \
+	   exit 1; \
+	fi
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@/bin/echo -n "description=\"" >> $@
