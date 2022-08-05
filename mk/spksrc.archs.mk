@@ -39,3 +39,18 @@ OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 # outdated unsupported archs
 DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
+
+DOTNET_UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) 
+# .NET for x86 (32-bit) is supported on windows only (for linux, it must be built from source)
+DOTNET_UNSUPPORTED_ARCHS += $(i686_ARCHS)
+# issue #5315
+DOTNET_UNSUPPORTED_ARCHS += armada370
+# issue #5302
+DOTNET_UNSUPPORTED_ARCHS += alpine
+# issue #5089
+DOTNET_UNSUPPORTED_ARCHS += monaco
+# issue #4790
+DOTNET_UNSUPPORTED_ARCHS += armadaxp
+
+# compatibility with .NET not yet confirmed:
+# alpine4k armada375 armada38x comcerto2k

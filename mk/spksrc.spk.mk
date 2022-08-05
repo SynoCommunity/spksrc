@@ -1,16 +1,29 @@
 ### Rules to create the spk package
 #   Most of the rules are imported from spksrc.*.mk files
 #
-# Variables used in this file:
-#  NAME:              The internal name of the package.
-#                     Note that all synocoummunity packages use lowercase names.
-#                     This enables to have concurrent packages with synology.com, that use
-#                     package names starting with upper case letters.
-#                     (e.g. Mono => synology.com, mono => synocommunity.com)
-#  SPK_FILE_NAME:     The full spk name with folder, package name, arch, tc- and package version.
-#  SPK_CONTENT:       List of files and folders that are added to package.tgz within the spk file.
-#  DSM_SCRIPT_FILES:  List of script files that are in the scripts folder within the spk file.
-#  CONF_DIR:          To provide a package specific conf folder for e.g. privilege file
+# Variables:
+#  ARCH                         A dedicated arch, a generic arch or empty for arch independent packages
+#  SPK_NAME                     Package name
+#  MAINTAINER                   Package maintainer (mandatory)
+#  MAINTAINER_URL               URL of package maintainer (optional when MAINTAINER is a valid github user)
+#  SPK_NAME_ARCH                (optional) arch specific spk file name (default: $(ARCH))
+#  SPK_PACKAGE_ARCHS            (optional) list of archs in the spk file (default: $(ARCH) or list of archs when generic arch)
+#  UNSUPPORTED_ARCHS            (optional) Unsupported archs are removed from gemeric arch list (ignored when SPK_PACKAGE_ARCHS is used)
+#  REMOVE_FROM_GENERIC_ARCHS    (optional) A list of archs to be excluded from generic archs (ignored when SPK_PACKAGE_ARCHS is used)
+#  SSS_SCRIPT                   (optional) Use service start stop script from given file
+#  INSTALLER_SCRIPT             (optional) Use installer script from given file
+#  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
+#  LICENSE_FILE                 (optional) Add licence from given file
+# 
+# Internal variables used in this file:
+#  NAME                         The internal name of the package.
+#                               Note that all synocoummunity packages use lowercase names.
+#                               This enables to have concurrent packages with synology.com, that use
+#                               package names starting with upper case letters.
+#                               (e.g. Mono => synology.com, mono => synocommunity.com)
+#  SPK_FILE_NAME                The full spk name with folder, package name, arch, tc- and package version.
+#  SPK_CONTENT                  List of files and folders that are added to package.tgz within the spk file.
+#  DSM_SCRIPT_FILES             List of script files that are in the scripts folder within the spk file.
 #
 
 # Common makefiles
@@ -20,12 +33,19 @@ include ../../mk/spksrc.directories.mk
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
-# Configure file descriptor lock timeout
-FLOCK_TIMEOUT = 300
-
 ifneq ($(ARCH),)
-SPK_ARCH = $(TC_ARCH)
+ifneq ($(SPK_PACKAGE_ARCHS),)
+SPK_ARCH = $(SPK_PACKAGE_ARCHS)
+else
+ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
+SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS) $(REMOVE_FROM_GENERIC_ARCHS),$(TC_ARCH))
+else
+SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS),$(TC_ARCH))
+endif
+endif
+ifeq ($(SPK_NAME_ARCH),)
 SPK_NAME_ARCH = $(ARCH)
+endif
 SPK_TCVERS = $(TCVERSION)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
@@ -95,15 +115,13 @@ $(DSM_SCRIPTS_DIR)/installer: $(INSTALLER_SCRIPT)
 	@$(dsm_script_copy)
 endif
 
-DSM_SCRIPT_FILES += $(notdir $(basename $(ADDITIONAL_SCRIPTS)))
-
 SPK_CONTENT = package.tgz INFO scripts
 
 # conf
 DSM_CONF_DIR = $(WORK_DIR)/conf
 
 ifneq ($(CONF_DIR),)
-SPK_CONF_DIR=$(CONF_DIR)
+SPK_CONF_DIR = $(CONF_DIR)
 endif
 
 # Generic service scripts
@@ -124,6 +142,11 @@ get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json h
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
+	@if [ -z "$(SPK_ARCH)" ]; then \
+	   echo "ERROR: Arch '$(ARCH)' is not a supported architecture" ; \
+	   echo " - There is no remaining arch in '$(TC_ARCH)' for unsupported archs '$(UNSUPPORTED_ARCHS)'"; \
+	   exit 1; \
+	fi
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
 	@/bin/echo -n "description=\"" >> $@
@@ -304,9 +327,6 @@ $(DSM_SCRIPTS_DIR)/preupgrade:
 $(DSM_SCRIPTS_DIR)/postupgrade:
 	@$(dsm_script_redirect)
 
-$(DSM_SCRIPTS_DIR)/%: $(filter %.sh,$(ADDITIONAL_SCRIPTS))
-	@$(dsm_script_copy)
-
 # Package Icons
 .PHONY: icons
 icons:
@@ -328,35 +348,45 @@ info-checksum:
 	@$(MSG) "Creating checksum for $(SPK_NAME)"
 	@sed -i -e "s|checksum=\".*|checksum=\"$$(md5sum $(WORK_DIR)/package.tgz | cut -d" " -f1)\"|g" $(WORK_DIR)/INFO
 
+
+# file names to be used with "find" command
+WIZARD_FILE_NAMES  =     -name "install_uifile" 
+WIZARD_FILE_NAMES += -or -name "install_uifile_???" 
+WIZARD_FILE_NAMES += -or -name "install_uifile.sh"
+WIZARD_FILE_NAMES += -or -name "install_uifile_???.sh"
+WIZARD_FILE_NAMES += -or -name "upgrade_uifile"
+WIZARD_FILE_NAMES += -or -name "upgrade_uifile_???"
+WIZARD_FILE_NAMES += -or -name "upgrade_uifile.sh"
+WIZARD_FILE_NAMES += -or -name "upgrade_uifile_???.sh"
+WIZARD_FILE_NAMES += -or -name "uninstall_uifile"
+WIZARD_FILE_NAMES += -or -name "uninstall_uifile_???"
+WIZARD_FILE_NAMES += -or -name "uninstall_uifile.sh"
+WIZARD_FILE_NAMES += -or -name "uninstall_uifile_???.sh"
+
+
 .PHONY: wizards
 wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
 	@find $(SPKSRC_MK)wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+ifeq ($(strip $(WIZARDS_DIR)),)
+	$(eval SPK_CONTENT += WIZARD_UIFILES)
+endif
 endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Create DSM Wizards"
+	$(eval SPK_CONTENT += WIZARD_UIFILES)
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
-endif
-ifneq ($(strip $(WIZARDS_DIR)),)
-	@$(MSG) "Look for DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"
-	@mkdir -p $(DSM_WIZARDS_DIR)
+	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
-		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( -name "install_uifile" -or -name "install_uifile_???" -or -name "install_uifile.sh" -or -name "install_uifile_???.sh" -or -name "upgrade_uifile" -or -name "upgrade_uifile_???" -or -name "upgrade_uifile.sh" -or -name "upgrade_uifile_???.sh" -or -name "uninstall_uifile" -or -name "uninstall_uifile_???" -or -name "uninstall_uifile.sh" -or -name "uninstall_uifile_???.sh" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
+	    $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
+		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
 	fi
 endif
-ifneq ($(strip $(WIZARDS_DIR)),)
+ifneq ($(wildcard $(DSM_WIZARDS_DIR)/*),)
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
 	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
-	$(eval SPK_CONTENT += WIZARD_UIFILES)
-else
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
-	$(eval SPK_CONTENT += WIZARD_UIFILES)
-endif
 endif
 
 .PHONY: conf
