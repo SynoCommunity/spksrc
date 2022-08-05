@@ -1,5 +1,5 @@
 PKG_NAME = ombi
-PKG_VERS = 4.16.12
+PKG_VERS = 4.22.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Ombi-app/Ombi/releases/download/v$(PKG_VERS)
@@ -7,16 +7,10 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS)-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)/shared
 
-OPTIONAL_DEPENDS = cross/libstdc++
-
-include ../../mk/spksrc.common.mk
-
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-DEPENDS = cross/libstdc++
-endif
-
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = linux-x64 linux-arm linux-arm64
+
+include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = linux-x64

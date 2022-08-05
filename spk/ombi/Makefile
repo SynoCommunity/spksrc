@@ -1,14 +1,13 @@
 SPK_NAME = ombi
-SPK_VERS = 4.16.12
+SPK_VERS = 4.22.5
 SPK_REV = 1
 SPK_ICON = src/ombi.png
 
 UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
 UNSUPPORTED_ARCHS_TCVERSION = armv7-1.2
 
-DOTNET_SPK = dotnet-runtime
-SPK_DEPENDS = $(DOTNET_SPK)
 DEPENDS = cross/ombi
+OPTIONAL_DEPENDS = cross/libstdc++
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Ombi
@@ -25,8 +24,10 @@ SERVICE_SETUP = src/service-setup.sh
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# adjust the library search path to use the libraries built for dotnet-runtime.
-POST_STRIP_TARGET = ombi_patch_target
+# we do not only need the updated libstdc++ library, we also need to
+# adjust the library search path in ombi executables to use this version.
+DEPENDS += cross/libstdc++
+POST_STRIP_TARGET = dotnet_patch_target
 endif
 
 include ../../mk/spksrc.spk.mk
@@ -34,8 +35,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: ombi_patch_target
 # Set library path to use libstdc++ of dotnet-runtime package.
 ombi_patch_target:
-	@$(MSG) "Set library runpath in ombi executable."
-	@sudo apt-get update 
-	@sudo apt-get install -y patchelf
-	@patchelf --set-rpath /var/packages/$(DOTNET_SPK)/target/lib $(STAGING_DIR)/shared/Ombi
-	@patchelf --set-rpath /var/packages/$(DOTNET_SPK)/target/lib $(STAGING_DIR)/shared/Ombi.Updater
+	@$(MSG) "Set library runpath in ombi executables."
+	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/shared/Ombi
+	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/shared/Ombi.Updater
