@@ -5,14 +5,15 @@
 #  ARCH                         A dedicated arch, a generic arch or empty for arch independent packages
 #  SPK_NAME                     Package name
 #  MAINTAINER                   Package maintainer (mandatory)
-#  MAINTAINER_URL               URL to package maintainer (optional when MAINTAINER is valid github user)
+#  MAINTAINER_URL               URL of package maintainer (optional when MAINTAINER is a valid github user)
 #  SPK_NAME_ARCH                (optional) arch specific spk file name (default: $(ARCH))
-#  UNSUPPORTED_ARCHS            (optional) Unsupported archs are removed from gemeric arch list
-#  REMOVE_FROM_GENERIC_ARCHS    (optional) A list of archs to be excluded from generic archs
+#  SPK_PACKAGE_ARCHS            (optional) list of archs in the spk file (default: $(ARCH) or list of archs when generic arch)
+#  UNSUPPORTED_ARCHS            (optional) Unsupported archs are removed from gemeric arch list (ignored when SPK_PACKAGE_ARCHS is used)
+#  REMOVE_FROM_GENERIC_ARCHS    (optional) A list of archs to be excluded from generic archs (ignored when SPK_PACKAGE_ARCHS is used)
 #  SSS_SCRIPT                   (optional) Use service start stop script from given file
 #  INSTALLER_SCRIPT             (optional) Use installer script from given file
-#  CONF_DIR                     (optional) To provide a package specific conf folder for e.g. privilege file
-#  LICENSE_FILE                 (optional) Use licence from given file
+#  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
+#  LICENSE_FILE                 (optional) Add licence from given file
 # 
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
@@ -33,13 +34,16 @@ include ../../mk/spksrc.directories.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
-ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
-REMOVE_ARCHS = $(UNSUPPORTED_ARCHS) $(REMOVE_FROM_GENERIC_ARCHS)
+ifneq ($(SPK_PACKAGE_ARCHS),)
+SPK_ARCH = $(SPK_PACKAGE_ARCHS)
 else
-REMOVE_ARCHS = $(UNSUPPORTED_ARCHS)
+ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
+SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS) $(REMOVE_FROM_GENERIC_ARCHS),$(TC_ARCH))
+else
+SPK_ARCH = $(filter-out $(UNSUPPORTED_ARCHS),$(TC_ARCH))
 endif
-SPK_ARCH = $(filter-out $(REMOVE_ARCHS),$(TC_ARCH))
-ifeq (,$(SPK_NAME_ARCH))
+endif
+ifeq ($(SPK_NAME_ARCH),)
 SPK_NAME_ARCH = $(ARCH)
 endif
 SPK_TCVERS = $(TCVERSION)
