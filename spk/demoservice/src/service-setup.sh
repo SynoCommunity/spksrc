@@ -7,7 +7,7 @@ PYTHON_VERSION=$(python --version 2>&1)
 PYTHON_MAJOR_VERSION=$(echo ${PYTHON_VERSION} | cut -d ' ' -f2 | cut -d . -f1)
 
 if [ "${PYTHON_MAJOR_VERSION}" == "3" ]; then
-SERVER_MODULE="http.server"
+    SERVER_MODULE="http.server"
 fi
 
 
@@ -69,16 +69,20 @@ service_preinst ()
 service_postinst ()
 {
     echo "service_postinst ${SYNOPKG_PKG_STATUS}"
-    echo "# Database created with random password:"     > ${DEMOSERVICE_INI}
-    echo "${SYNOPKG_DB_USER_RAND_PW}"                   >> ${DEMOSERVICE_INI}
+    echo "# Database credentials"                                   > ${DEMOSERVICE_INI}
+    echo "password: ${wizard_mysql_password_user}"                  >> ${DEMOSERVICE_INI}
+    echo ""                                                         >> ${DEMOSERVICE_INI}
+    echo "# Shared folder"                                          >> ${DEMOSERVICE_INI}
+    echo "folder: ${wizard_data_volume}/${wizard_data_folder}"      >> ${DEMOSERVICE_INI}
     echo "ini file created: ${DEMOSERVICE_INI}"
 }
 
 service_preuninst ()
 {
     echo "service_preuninst ${SYNOPKG_PKG_STATUS}"
-    echo "wizard_mysql_drop_database = ${wizard_mysql_drop_database}"   >> $INST_LOG
-    echo "wizard_mysql_drop_db_user = ${wizard_mysql_drop_db_user}"     >> $INST_LOG
+    echo "wizard_mysql_drop_database = ${wizard_mysql_drop_database}"
+    echo "wizard_mysql_drop_db_user  = ${wizard_mysql_drop_db_user}"
+    echo "wizard_mysql_create_backup = ${wizard_mysql_create_backup}"
 }
 
 service_postuninst ()

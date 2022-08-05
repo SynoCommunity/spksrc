@@ -1,15 +1,27 @@
 {
+  "data-share": {
+    "shares": [{
+        "name": "{{wizard_data_folder}}",
+        "permission": {
+          "rw": [
+            "sc-demoservice",
+            "{{wizard_group}}"
+          ]
+        }
+      }
+    ]
+  },
   "mysql-db": {
     "info": {
       "db-name": "demoservice"
     },
     "root-pw": "{{wizard_mysql_password_root}}",
-    "create-db" : {
+    "create-db": {
       "db-collision": "skip"
     },
     "grant-user": {
-      "user-name" : "demoservice",
-      "rand-pw" : true
+      "user-name": "demoservice",
+      "user-pw": "{{wizard_mysql_password_user}}"
     },
     "drop-db-uninst": "{{wizard_mysql_drop_database}}",
     "drop-user-uninst": "{{wizard_mysql_drop_db_user}}"
