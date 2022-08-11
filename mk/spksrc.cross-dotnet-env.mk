@@ -68,7 +68,7 @@ endif
 
 ifeq ($(strip $(DOTNET_SINGLE_FILE)),1)
 	# package all dlls into a single binary
-	DOTNET_BUILD_PROPERTIES += "-p:PublishSingleFile=true"
+	DOTNET_BUILD_PROPERTIES += -p:PublishSingleFile=true
 endif
 
 DOTNET_BUILD_ARGS += --runtime $(DOTNET_OS)-$(DOTNET_ARCH)
@@ -80,7 +80,7 @@ ifeq ($(strip $(DOTNET_OPTIMIZE)),1)
 #   R2R is a form of ahead-of-time (AOT) compilation.
 # PublishTrimmed reduce the size of apps by analyzing IL and trimming unused assemblies.
 #   (not aware of reflection, needs testing, shaves ~10mb of binary)
-	DOTNET_BUILD_PROPERTIES += "-p:UseAppHost=true;PublishReadyToRun=true;PublishReadyToRunShowWarnings=true"
+	DOTNET_BUILD_PROPERTIES += -p:UseAppHost=true -p:PublishReadyToRun=true -p:PublishReadyToRunShowWarnings=true
 endif
 
 DOTNET_BUILD_ARGS += $(DOTNET_BUILD_PROPERTIES)
