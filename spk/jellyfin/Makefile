@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
 SPK_VERS = 10.8.3
-SPK_REV = 7
+SPK_REV = 6
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
