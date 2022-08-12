@@ -8,13 +8,13 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) comcerto2k
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
 
 MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "Update jellyfin to 10.8.3"
+CHANGELOG = "1. Update jellyfin to 10.8.3.<br/>2. Package ist built with .NET 6.0.8.<br>3. Unsupported ARMv7 models removed from package."
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
