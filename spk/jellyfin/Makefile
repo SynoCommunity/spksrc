@@ -6,9 +6,9 @@ SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
 
-DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-web
+DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) comcerto2k
 
 MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."

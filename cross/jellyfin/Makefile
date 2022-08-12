@@ -13,8 +13,9 @@ LICENSE  = GPLv2
 DOTNET_VERSION = 6.0
 BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
 
-DOTNET_OPTIMIZE = 1
 DOTNET_OUTPUT_PATH = share
 DOTNET_PACKAGE_NAME = Jellyfin.Server
+# avoid the creation of pdb files
+DOTNET_BUILD_PROPERTIES = -p:DebugSymbols=false -p:DebugType=none
 
 include ../../mk/spksrc.cross-dotnet.mk
