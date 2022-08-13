@@ -27,7 +27,7 @@ ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # we do not only need the updated libstdc++ library, we also need to
 # adjust the library search path in ombi executables to use this version.
 DEPENDS += cross/libstdc++
-POST_STRIP_TARGET = dotnet_patch_target
+POST_STRIP_TARGET = ombi_patch_target
 endif
 
 include ../../mk/spksrc.spk.mk
