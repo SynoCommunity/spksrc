@@ -34,6 +34,7 @@ include ../../mk/spksrc.directories.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
+# arch specific packages
 ifneq ($(SPK_PACKAGE_ARCHS),)
 SPK_ARCH = $(SPK_PACKAGE_ARCHS)
 else
@@ -50,25 +51,37 @@ SPK_TCVERS = $(TCVERSION)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 else
+# different noarch packages
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifeq ($(strip $(TCVERSION)),)
+# default: 3.1 .. 5.2
+TCVERSION = 5.2
+endif
+ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SPK_TCVERS = dsm7
-OS_MIN_VER = 7.0-40000
-else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+TC_OS_MIN_VER = 7.0-40000
+else ifeq ($(call version_ge, $(TCVERSION), 6.1),1)
 SPK_TCVERS = dsm6
-OS_MIN_VER = 6.0-7321
-else
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-SPK_TCVERS = dsm6
-OS_MIN_VER = 6.0-7321
+TC_OS_MIN_VER = 6.1-15047
+else ifeq ($(call version_lt, $(TCVERSION), 3.0),1)
+SPK_TCVERS = srm
+TC_OS_MIN_VER = 1.1-6931
 else
 SPK_TCVERS = all
-OS_MIN_VER = 3.1-1594
-endif
+TC_OS_MIN_VER = 3.1-1594
 endif
 ARCH_SUFFIX = -$(SPK_TCVERS)
-FIRMWARE = $(OS_MIN_VER)
+endif
+
+ifeq ($(call version_lt, ${TC_OS_MIN_VER}, 6.1)$(call version_ge, ${TC_OS_MIN_VER}, 3.0),11)
+OS_MIN_VER = $(TC_OS_MIN_VER)
+else
+ifneq ($(strip $(OS_MIN_VER)),)
+$(warning WARNING: OS_MIN_VER is forced to $(OS_MIN_VER) (default by toolchain is $(TC_OS_MIN_VER)))
+else
+OS_MIN_VER = $(TC_OS_MIN_VER)
+endif
 endif
 
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
@@ -166,20 +179,13 @@ else
 endif
 	@echo distributor=\"$(DISTRIBUTOR)\" >> $@
 	@echo distributor_url=\"$(DISTRIBUTOR_URL)\" >> $@
-ifneq ($(strip $(OS_MIN_VER)),)
+ifeq ($(call version_lt, ${TC_OS_MIN_VER}, 6.1)$(call version_ge, ${TC_OS_MIN_VER}, 3.0),11)
+	@echo firmware=\"$(OS_MIN_VER)\" >> $@
+else
 	@echo os_min_ver=\"$(OS_MIN_VER)\" >> $@
-else
-	@echo os_min_ver=\"$(TC_OS_MIN_VER)\" >> $@
-endif
-ifeq ($(call version_le, ${TC_OS_MIN_VER}, 6.1),1)
-ifneq ($(strip $(FIRMWARE)),)
-	@echo firmware=\"$(FIRMWARE)\" >> $@
-else
-	@echo firmware=\"$(TC_OS_MIN_VER)\" >> $@
-endif
-endif
 ifneq ($(strip $(OS_MAX_VER)),)
 	@echo os_max_ver=\"$(OS_MAX_VER)\" >> $@
+endif
 endif
 ifneq ($(strip $(BETA)),)
 	@echo beta=\"yes\" >> $@
@@ -208,10 +214,10 @@ endif
 # for non startable (i.e. non service, cli tools only)
 # as default is 'yes' we only add this value for 'no'
 ifeq ($(STARTABLE),no)
-ifeq ($(call version_ge, ${TCVERSION}, 6.1),1)
-	@echo ctl_stop=\"$(STARTABLE)\" >> $@
-else
+ifeq ($(call version_lt, ${TC_OS_MIN_VER}, 6.1)$(call version_ge, ${TC_OS_MIN_VER}, 3.0),11)
 	@echo startable=\"$(STARTABLE)\" >> $@
+else
+	@echo ctl_stop=\"$(STARTABLE)\" >> $@
 endif
 endif
 
