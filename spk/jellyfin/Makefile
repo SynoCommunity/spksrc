@@ -1,20 +1,22 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.8.0
-SPK_REV = 5
+SPK_VERS = 10.8.3
+SPK_REV = 6
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
 
-DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-web
+DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
+
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
 
 MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.8.0<br/>2. Use .NET 6.0"
+CHANGELOG = "1. Update jellyfin to 10.8.3.<br/>2. Package ist built with .NET 6.0.8.<br>3. Unsupported ARMv7 models removed from package."
 HOMEPAGE = https://jellyfin.org
-HELPURL    = https://jellyfin.org/docs/general/server/settings.html
+HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
 LICENSE = GPLv2
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
@@ -32,7 +34,5 @@ SERVICE_PORT_TITLE = Jellyfin (HTTP)
 
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
-
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
 
 include ../../mk/spksrc.spk.mk
