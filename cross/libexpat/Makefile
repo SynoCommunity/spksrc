@@ -14,7 +14,8 @@ LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS  = --without-xmlwf
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --without-xmlwf
 CONFIGURE_ARGS += --without-examples
 CONFIGURE_ARGS += --without-tests
 # TODO check "getrandom" syscall availability for each arch/DSM versions
