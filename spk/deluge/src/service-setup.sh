@@ -1,9 +1,20 @@
-PYTHON_DIR="/usr/local/python"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
-PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
-CORE_CFG_FILE="${SYNOPKG_PKGDEST}/var/core.conf"
-WATCH_CFG_FILE="${SYNOPKG_PKGDEST}/var/autoadd.conf"
+PYTHON_DIR="/var/packages/python310/target/bin"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
+CORE_CFG_FILE="${SYNOPKG_PKGVAR}/core.conf"
+WATCH_CFG_FILE="${SYNOPKG_PKGVAR}/autoadd.conf"
+
+# Required variables to start both processes
+# We use Generic Service variables for main deamon
+DELUGED="${SYNOPKG_PKGDEST}/env/bin/deluged"
+DELUGE_WEB="${SYNOPKG_PKGDEST}/env/bin/deluge-web"
+CFG_DIR="${SYNOPKG_PKGVAR}"
+PYTHON_EGG_CACHE="${SYNOPKG_PKGDEST}/env/cache"
+DELUGE_WEB_PID="${SYNOPKG_PKGDEST}/var/deluge-web.pid"
+DELUGE_WEB_LOG="${SYNOPKG_PKGDEST}/var/deluge-web.log"
+
+DAEMON_DELUGED="env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED} -- --config ${CFG_DIR} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}"
+DAEMON_DELUGE_WEB="env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED_WEB} -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info --pidfile ${DELUGE_WEB_PID}"
+SERVICE_COMMAND="${DAEMON_DELUGED}:${DAEMON_DELUGE_WEB}"
 
 GROUP="sc-download"
 
@@ -28,16 +39,15 @@ service_preinst ()
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
+    install_python_virtualenv
 
-    # Install the wheels/requirements
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG}  2>&1
+    # Install the wheels
+    install_python_wheels
 
-    # Install Deluge
-    export PYTHON_EGG_CACHE=${SYNOPKG_PKGDEST}/env/cache && cd ${SYNOPKG_PKGDEST}/share/deluge && ${PYTHON} setup.py build >> ${INST_LOG} 2>&1 && ${PYTHON} setup.py install >> ${INST_LOG} 2>&1
-
-    # Correct permissions, otherwise Deluge can't write to cache
-    set_unix_permissions "${SYNOPKG_PKGDEST}/env"
+    # For backwards compatibility, correct permissions, otherwise Deluge can't write to cache
+    if [ $SYNOPKG_DSM_VERSION_MAJOR == 6 ]; then
+        set_unix_permissions "${SYNOPKG_PKGDEST}/env"
+    fi
 
     # Edit the configuration files according to the wizard
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -58,11 +68,6 @@ service_postinst ()
             sed -i -e "/@watch_dir@/d" ${WATCH_CFG_FILE}
         fi
     fi
-
-    # Discard legacy obsolete busybox user account
-    # Commands of busybox from spk/python
-    delgroup "${USER}" "users" >> ${INST_LOG}
-    deluser "${USER}" >> ${INST_LOG}
 }
 
 
