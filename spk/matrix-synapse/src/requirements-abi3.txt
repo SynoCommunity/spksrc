@@ -1,0 +1,3 @@
+# [cryptography]
+#  Requires rust: WHEELS_RUST_BUILD_ENABLE = TRUE
+cryptography==37.0.4
