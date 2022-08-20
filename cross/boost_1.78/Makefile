@@ -52,10 +52,8 @@ ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
 ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-else ifeq ($(call version_ge, $(call version_gcc), 4.9),1)
-ADDITIONAL_CXXFLAGS += -std=c++11
 else
-ADDITIONAL_CXXFLAGS += -std=c++0x
+ADDITIONAL_CXXFLAGS += -std=c++11
 endif
 
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))

@@ -79,8 +79,6 @@ WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 ifeq ($(call version_ge, $(call version_gcc), 4.9),1)
 WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
-else
-WHEELS_BUILD_ARGS += --b2-args=cxxstd=0x
 endif
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
