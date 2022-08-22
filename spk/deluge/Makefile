@@ -5,7 +5,7 @@ SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python310
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 SPK_DEPENDS = "python310"
 
@@ -31,6 +31,9 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = deluge_extra_install
+
+# [rencode]
+PYTHON_LIMITED_API=cp37
 
 # [libtorrent] common to both versions
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)

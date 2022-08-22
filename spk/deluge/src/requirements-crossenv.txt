@@ -6,11 +6,7 @@
 # [libtorrent] 1.2.17 ==> DSM6
 # [libtorrent] 2.0.7  ==> DSM7
 
-# [rencode]
-# rencode==1.0.6 <<-- unsupported
-git+https://github.com/aresch/rencode.git@master#egg=rencode==1.0.6
-# Updated fork of the project
-#git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
+# [rencode] 1.0.6     ==> abi3
 
 cffi==1.15.1
 cryptography==3.3.2
