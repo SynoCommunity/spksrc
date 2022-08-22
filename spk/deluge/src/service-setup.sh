@@ -9,12 +9,14 @@ DELUGED="${SYNOPKG_PKGDEST}/env/bin/deluged"
 DELUGE_WEB="${SYNOPKG_PKGDEST}/env/bin/deluge-web"
 CFG_DIR="${SYNOPKG_PKGVAR}"
 PYTHON_EGG_CACHE="${SYNOPKG_PKGDEST}/env/cache"
-DELUGE_WEB_PID="${SYNOPKG_PKGDEST}/var/deluge-web.pid"
+#DELUGE_WEB_PID="${SYNOPKG_PKGDEST}/var/deluge-web.pid"
 DELUGE_WEB_LOG="${SYNOPKG_PKGDEST}/var/deluge-web.log"
 
-DAEMON_DELUGED="env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED} -- --config ${CFG_DIR} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}"
-DAEMON_DELUGE_WEB="env PYTHON_EGG_CACHE=${PYTHON_EGG_CACHE} ${DELUGED_WEB} -- --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info --pidfile ${DELUGE_WEB_PID}"
-SERVICE_COMMAND="${DAEMON_DELUGED}:${DAEMON_DELUGE_WEB}"
+DAEMON_DELUGED="${DELUGED} --config ${CFG_DIR} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}"
+#DAEMON_DELUGE_WEB="${DELUGE_WEB} --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info --pidfile ${DELUGE_WEB_PID}"
+DAEMON_DELUGE_WEB="${DELUGE_WEB} --config ${CFG_DIR} --logfile ${DELUGE_WEB_LOG} --loglevel info --pidfile ${PID_FILE}"
+SERVICE_COMMAND[0]="${DAEMON_DELUGED}"
+SERVICE_COMMAND[1]="${DAEMON_DELUGE_WEB}"
 
 GROUP="sc-download"
 
@@ -68,6 +70,9 @@ service_postinst ()
             sed -i -e "/@watch_dir@/d" ${WATCH_CFG_FILE}
         fi
     fi
+
+    # Create logs directory, otherwise it does not start due to permissions errors
+    #mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 }
 
 
