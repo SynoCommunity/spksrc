@@ -75,7 +75,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add dos2unix tools."
+CHANGELOG = "1. Add dos2unix tools.<br/2. Update fzf to v0.32.1.<br/>3. Update micro to v2.0.11.<br/>4. Update nano to v6.4.<br/>5. Update nnn to v4.6."
 
 SERVICE_SETUP = src/service-setup.sh
 
