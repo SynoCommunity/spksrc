@@ -7,9 +7,10 @@
 # [libtorrent] 2.0.7  ==> DSM7
 
 # [rencode]
-# Updated fork of the project
 # rencode==1.0.6 <<-- unsupported
-git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
+git+https://github.com/aresch/rencode.git@master#egg=rencode==1.0.6
+# Updated fork of the project
+#git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
 
 cffi==1.15.1
 cryptography==3.3.2
