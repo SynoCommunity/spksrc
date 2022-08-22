@@ -45,6 +45,9 @@ ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
+
+include ../../mk/spksrc.common.mk
+
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
