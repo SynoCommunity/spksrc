@@ -32,43 +32,11 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = deluge_extra_install
 
-include ../../mk/spksrc.common.mk
-
-ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
-# [libtorrent] 2.0.7
-# archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS) comcerto2k
-WHEELS += src/requirements-crossenv-DSM7.txt
-# libtorrent > 2.x are DSM 7 only due to c++14 minimal requirement
-# Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
-DEPENDS += cross/openssl
-DEPENDS += cross/boost_1.78
-DEPENDS += cross/geoip
-DEPENDS += cross/libiconv
-BOOST_LIBRARIES += system python chrono random
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
-ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
-ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
-WHEELS_BUILD_ARGS += [libtorrent]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
-ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
-WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
-endif
-# ifeq ($(call version_lt, $(call version_gcc), 5.0),1)
-# WHEELS_BUILD_ARGS += --b2-args=cxxstd=1y
-# endif
-
-else
-# [libtorrent] 1.2.17
-# archs lacking C++11 compiler (88f6281, hi3535 and ppc archs except QorIQ)
+# [libtorrent] common to both versions
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-WHEELS += src/requirements-crossenv-DSM6.txt
 DEPENDS += cross/openssl
 DEPENDS += cross/boost_1.78
 DEPENDS += cross/geoip
-DEPENDS += cross/libiconv
 BOOST_LIBRARIES += system python chrono random
 BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
@@ -77,16 +45,32 @@ ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
-ifeq ($(call version_ge, $(call version_gcc), 4.9),1)
-WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
-endif
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
-endif
 endif
 
 include ../../mk/spksrc.spk.mk
 
+ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
+# [libtorrent] 2.0.7 - DSM7 only due to c++14 minimal requirement
+# Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
+# archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
+UNSUPPORTED_ARCHS += comcerto2k
+WHEELS += src/requirements-crossenv-DSM7.txt
+# Ensure build arguments matches boost
+WHEELS_CXXFLAGS += [libtorrent]
+WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
+WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
+WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
+else
+# [libtorrent] 1.2.17
+WHEELS += src/requirements-crossenv-DSM6.txt
+DEPENDS += cross/libiconv
+# Ensure build arguments matches boost
+WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
+endif
+
+.NOTPARALLEL:
 .PHONY: deluge_extra_install
 deluge_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
