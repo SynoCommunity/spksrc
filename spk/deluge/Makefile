@@ -35,7 +35,9 @@ POST_STRIP_TARGET = deluge_extra_install
 # [rencode]
 PYTHON_LIMITED_API=cp37
 
-# [libtorrent] common to both versions
+include ../../mk/spksrc.common.mk
+
+# [libtorrent] - generic
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl
 DEPENDS += cross/boost_1.78
@@ -48,22 +50,21 @@ ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
-
-include ../../mk/spksrc.common.mk
-
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
 
 include ../../mk/spksrc.spk.mk
 
+# [libtorrent]
 ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
-# [libtorrent] 2.0.7 - DSM7 only due to c++14 minimal requirement
+# [libtorrent] 2.0.7
+# DSM7 only due to c++14 minimal requirement
 # Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
 # archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
 UNSUPPORTED_ARCHS += comcerto2k
 WHEELS += src/requirements-crossenv-DSM7.txt
-# Ensure build arguments matches boost
+# Ensure build arguments matches boost_1.78
 WHEELS_CXXFLAGS += [libtorrent]
 WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
 WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
