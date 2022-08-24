@@ -81,7 +81,7 @@ start_daemon ()
             if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
                 [ $i -eq 1 ] && echo -ne "$!" > ${PID_FILE} || echo -ne " $!" >> ${PID_FILE}
             else
-                wait_for_status 0 ${SVC_WAIT_TIMEOUT}
+                wait_for_status 0 ${SVC_WAIT_TIMEOUT:=20}
             fi
         fi
     done
@@ -150,7 +150,8 @@ daemon_status ()
 wait_for_status ()
 {
     # default value: 20 seconds
-    counter=${2:=20}
+    counter=${2}
+    counter=${counter:=20}
     while [ ${counter} -gt 0 ]; do
         daemon_status ${3}
         [ $? -eq $1 ] && return
