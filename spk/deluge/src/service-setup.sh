@@ -7,34 +7,25 @@ CFG_WATCH="${SYNOPKG_PKGVAR}/autoadd.conf"
 #
 PYTHON_EGG_CACHE="${SYNOPKG_PKGDEST}/env/cache"
 #
-# deluded & deluge-web options:
-# -c --config
-# -l --logfile
-# -L --loglevel
-# -d --do-not-daemonize
-# -P --pidfile
-#
 DELUGED="${SYNOPKG_PKGDEST}/env/bin/deluged"
 DELUGED_LOG="${SYNOPKG_PKGDEST}/var/deluged.log"
 DELUGED_PID="${SYNOPKG_PKGDEST}/var/deluged.pid"
-#DELUGED_DAEMON="${DELUGED} --config ${CFG_PATH} --logfile ${DELUGED_LOG} --loglevel info --logrotate --pidfile ${DELUGED_PID}"
-#DELUGED_DAEMON="${DELUGED} --config ${CFG_PATH} --logfile ${DELUGED_LOG} --loglevel info --logrotate --pidfile ${PID_FILE}"
-#DELUGED_DAEMON="${DELUGED} --config ${CFG_PATH} --logfile ${DELUGED_LOG} --loglevel info --logrotate"
-#DELUGED_DAEMON="${DELUGED} --config ${CFG_PATH} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}"
 #
 DELUGEWEB="${SYNOPKG_PKGDEST}/env/bin/deluge-web"
 DELUGEWEB_LOG="${SYNOPKG_PKGDEST}/var/deluge-web.log"
 DELUGEWEB_PID="${SYNOPKG_PKGDEST}/var/deluge-web.pid"
-#DELUGEWEB_DAEMON="${DELUGEWEB} --config ${CFG_PATH} --logfile ${DELUGEWEB_LOG} --loglevel info --logrotate --pidfile ${DELUGEWEB_PID}"
-#DELUGEWEB_DAEMON="${DELUGEWEB} --config ${CFG_PATH} --logfile ${DELUGEWEB_LOG} --loglevel info --logrotate --pidfile ${PID_FILE}"
-#DELUGEWEB_DAEMON="${DELUGEWEB} --config ${CFG_PATH} --logfile ${DELUGEWEB_LOG} --loglevel info --logrotate"
-#DELUGEWEB_DAEMON="${DELUGEWEB} --config ${CFG_PATH} --logfile ${LOG_FILE} --loglevel info --pidfile ${PID_FILE}"
 #
-# Startup OPTION 1:
+# deluded & deluge-web options:
+# -c --config
+# -l --logfile
+# -L --loglevel
+# -d --do-not-daemonize ==> forked PID untrackable
+# -P --pidfile          ==> generated PID file unusable for tracking
+#
 SVC_BACKGROUND=yes
 SVC_WRITE_PID=yes
 DELUGEWEB_DAEMON="${DELUGEWEB} -c ${CFG_PATH} ${DELUGE_ARGS} -l ${DELUGEWEB_LOG} -L info --logrotate -P ${DELUGEWEB_PID} -d"
-DELUGED_DAEMON="${DELUGED} -c ${CFG_PATH} ${DELUGE_ARGS} -l ${DELUGED_LOG} -L info --logrotate -P ${DELUGED_PID} --d"
+DELUGED_DAEMON="${DELUGED} -c ${CFG_PATH} ${DELUGE_ARGS} -l ${DELUGED_LOG} -L info --logrotate -P ${DELUGED_PID} -d"
 #
 SERVICE_COMMAND[0]="${DELUGED_DAEMON}"
 SERVICE_COMMAND[1]="${DELUGEWEB_DAEMON}"
@@ -68,7 +59,7 @@ service_postinst ()
     install_python_wheels
 
     # For backwards compatibility, correct permissions, otherwise Deluge can't write to cache
-    if [ $SYNOPKG_DSM_VERSION_MAJOR == 6 ]; then
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         set_unix_permissions "${SYNOPKG_PKGDEST}/env"
     fi
 
@@ -91,9 +82,6 @@ service_postinst ()
             sed -i -e "/@watch_dir@/d" ${CFG_WATCH}
         fi
     fi
-
-    # Create logs directory, otherwise it does not start due to permissions errors
-    #mkdir "$(dirname ${LOG_FILE})" >> ${INST_LOG} 2>&1
 }
 
 
@@ -106,15 +94,17 @@ service_postupgrade ()
         complete=`sed -n 's/.*"move_completed_path"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_CORE}`
         watch=`sed -n 's/.*"autoadd_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_CORE}`
 
-        # Apply permissions
-        if [ -n "${download}" ] && [ -d "${download}" ]; then
-            set_syno_permissions "${download}" "${GROUP}"
-        fi
-        if [ -n "${complete}" ] && [ -d "${complete}" ]; then
-            set_syno_permissions "${complete}" "${GROUP}"
-        fi
-        if [ -n "${watch}" ] && [ -d "${watch}" ]; then
-            set_syno_permissions "${watch}" "${GROUP}"
+        # For backwards compatibility, apply permissions
+        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+            if [ -n "${download}" ] && [ -d "${download}" ]; then
+                set_syno_permissions "${download}" "${GROUP}"
+            fi
+            if [ -n "${complete}" ] && [ -d "${complete}" ]; then
+                set_syno_permissions "${complete}" "${GROUP}"
+            fi
+            if [ -n "${watch}" ] && [ -d "${watch}" ]; then
+                set_syno_permissions "${watch}" "${GROUP}"
+            fi
         fi
     fi
 }
