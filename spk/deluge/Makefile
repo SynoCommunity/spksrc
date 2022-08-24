@@ -10,9 +10,10 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 SPK_DEPENDS = "python310"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = "Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This syno community package runs the deluge deamon \(deluged\), as well as the deluge web daemon \(deluge-web\), which serves the deluge web UI."
+DESCRIPTION = "Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI."
+DESCRIPTION_FRE = "Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), déservant l\'interface utilisateur web deluge."
 STARTABLE = yes
-CHANGELOG = "1. Update to v2.1.1<br/>2. Update to libtorrent 1.2.17<br/>3. Update to Python 3.10<br/>4. Update to OpenSSL 1.1.1q"
+CHANGELOG = "1. Update to v2.1.1<br/>2. Update to libtorrent DSM7-2.0.7 and DSM6-1.2.17<br/>3. Update to Python 3.10<br/>4. Update to OpenSSL 1.1.1q"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
