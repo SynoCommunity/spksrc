@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 2.6
-SPK_REV = 16
+SPK_VERS = 2.7
+SPK_REV = 17
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -10,6 +10,7 @@ DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
+DEPENDS += cross/dos2unix
 
 OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/sd
 OPTIONAL_DEPENDS += cross/bat cross/exa
@@ -17,6 +18,8 @@ OPTIONAL_DEPENDS += cross/nnn
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli File Tools
+
+POST_STRIP_TARGET = synocli-file_extra_install
 
 OPTIONAL_DESC =
 
@@ -72,9 +75,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add iconv.<br/>2. Update of the following tools<ul><li>update bat to v0.21.0</li><li>update detox to v1.4.5</li><li>update fd to v8.3.2</li><li>update fzf to v0.30.0</li><li>update jdupes to v1.20.2</li><li>update lzip to v1.23 and plzip to v1.10</li><li>update Midnight Commander to v4.8.28</li><li>update nano to v6.3</li><li>update nnn to v4.5</li><li>update RHash to v1.4.3</li><li>update tree to v2.0.2</li></ul><br/>3. Update zstd to v1.5.2."
+CHANGELOG = "1. Add dos2unix tools.<br/2. Update fzf to v0.32.1.<br/>3. Update micro to v2.0.11.<br/>4. Update nano to v6.4.<br/>5. Update nnn to v4.6."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -106,6 +109,7 @@ SPK_COMMANDS += bin/exa
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
 SPK_COMMANDS += bin/iconv
+SPK_COMMANDS += bin/dos2unix bin/unix2dos bin/mac2unix bin/unix2mac 
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
@@ -121,3 +125,8 @@ SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: synocli-file_extra_install
+synocli-file_extra_install:
+	@$(MSG) "Set library runpath in rhash executable."
+	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rhash
