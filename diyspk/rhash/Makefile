@@ -9,6 +9,8 @@ DESCRIPTION = "RHash is a console utility for calculation and verification of ma
 DISPLAY_NAME = RHash
 STARTABLE = no
 
+POST_STRIP_TARGET = rhash_extra_install
+
 HOMEPAGE   = http://rhash.sourceforge.net/
 LICENSE    = MIT
 
@@ -26,3 +28,8 @@ SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: rhash_extra_install
+rhash_extra_install:
+	@$(MSG) "Set library runpath in rhash executable."
+	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rhash
