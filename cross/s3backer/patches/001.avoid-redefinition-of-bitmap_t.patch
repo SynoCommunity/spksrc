@@ -1,14 +1,13 @@
-# avoid redefinition of bitmap_t (fix for older compilers)
-#
---- util.h.orig	2021-10-02 17:08:51.000000000 +0000
-+++ util.h	2021-12-31 21:41:25.852672917 +0000
-@@ -34,7 +34,8 @@
-  * also delete it here.
-  */
+--- util.h.orig	2022-07-17 22:36:05.000000000 +0000
++++ util.h	2022-08-26 13:05:52.003629134 +0000
+@@ -38,7 +38,10 @@
+ struct s3b_config;
  
--typedef uintptr_t bitmap_t;
+ // Bitmap type
 +// already defined in s3backer.h, older compilers cannot handle this
-+//typedef uintptr_t bitmap_t;
++#ifndef S3B_BLOCK_NUM_DIGITS
+ typedef uintptr_t bitmap_t;
++#endif
  
- /* A list of block numbers */
+ // A list of block numbers
  struct block_list {

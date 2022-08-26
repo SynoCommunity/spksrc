@@ -1,12 +1,12 @@
 PKG_NAME = s3backer
-PKG_VERS = 1.6.3
+PKG_VERS = 2.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/archiecobbs/s3backer/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/fuse cross/curl cross/libexpat cross/openssl
+DEPENDS = cross/fuse cross/curl cross/libexpat cross/openssl cross/zstd
 
 HOMEPAGE = https://github.com/archiecobbs/s3backer/wiki/ManPage
 COMMENT  = FUSE-based single file backing store via Amazon S3.
@@ -19,4 +19,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: s3backer_pre_configure
 s3backer_pre_configure:
-	$(RUN) ./autogen.sh
+	$(RUN) autoreconf -iv
