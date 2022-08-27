@@ -31,11 +31,11 @@ start_daemon ()
 {
     declare -i i=0
     if [ -z "${SVC_QUIET}" ]; then
-        # Keep logs by default
-        case "${SVC_KEEP_LOG}" in
-            no|NO|false|FALSE|0 ) date >  ${LOG_FILE} ;;
-                               *) date >> ${LOG_FILE} ;;
-        esac
+        if [ -z "${SVC_KEEP_LOG}" ]; then
+            date > ${LOG_FILE}
+        else
+            date >> ${LOG_FILE}
+        fi
     fi
     call_func "service_prestart"
     for service in "${SERVICE_COMMAND[@]}"
