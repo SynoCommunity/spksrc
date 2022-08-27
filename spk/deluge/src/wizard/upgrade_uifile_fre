@@ -4,6 +4,6 @@
         "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
     },
     {
-        "desc": "<strong style='color:red'>NOTE:</strong> Sous DSM6 uniquement, la mise à jour de tentera de corriger les permissions associées aux répertoires. En cas d'erreur de permission dans Deluge ou sous DSM7, appliquer les droits en Lecture/Ecriture au groupe 'sc-download' sur les répertoires mentionnés depuis File Station."
+        "desc": "<strong style='color:red'>NOTE:</strong> La mise à jour de l'application va tenter de corriger les permissions des répertoires. En cas d'erreur de permission dans SABnzbd, donner les droits de Lecture/Ecriture au groupe 'sc-download' sur les répertoires mentionnés depuis File Station."
     }]
 }]

@@ -1,7 +1,13 @@
 [
   {
-    "step_title": "Basic configuration",
+    "step_title": "Attention! DSM Permissions",
     "items": [
+      {
+        "desc": "The package user will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      },
+      {
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within SABnzbd, manually set Read/Write permissions for the 'sc-download' group on the reported folders using File Station."
+      },
       {
         "type": "combobox",
         "desc": "Please select a volume to use for the download folder",
@@ -41,7 +47,7 @@
         "subitems": [
           {
             "key": "wizard_download_dir",
-            "desc": "Download location",
+            "desc": "Download shared folder",
             "defaultValue": "downloads",
             "validator": {
               "allowBlank": false,
@@ -52,12 +58,6 @@
             }
           }
         ]
-      },
-      {
-        "desc": "If the specified share does not exist, it will be created. You can use an existing share by specifying the name of the folder."
-      },
-      {
-        "desc": "Package user and group will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
       }
     ]
   }
