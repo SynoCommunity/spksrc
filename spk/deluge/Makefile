@@ -82,5 +82,6 @@ endif
 .PHONY: deluge_extra_install
 deluge_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/var/logs
 	install -m 644 src/core.conf $(STAGING_DIR)/var/core.conf
 	install -m 644 src/autoadd.conf $(STAGING_DIR)/var/autoadd.conf

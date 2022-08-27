@@ -1,14 +1,14 @@
 [
   {
-    "step_title": "Basic configuration",
+    "step_title": "Configuration de base",
     "items": [
       {
         "type": "combobox",
-        "desc": "Please select a volume to use for the download folder",
+        "desc": "Sélectionner le volume à utiliser pour le répertoire de téléchargements",
         "subitems": [
           {
             "key": "wizard_volume",
-            "desc": "volume name",
+            "desc": "Nom du volume",
             "displayField": "display_name",
             "valueField": "volume_path",
             "editable": false,
@@ -37,27 +37,27 @@
       },
       {
         "type": "textfield",
-        "desc": "Download shared folder (using the volume chosen above)",
+        "desc": "Répertoire partagé de téléchargements (utilisant le volume sélectionné ci-dessus)",
         "subitems": [
           {
             "key": "wizard_download_dir",
-            "desc": "Download location",
+            "desc": "Répertoire de téléchargements",
             "defaultValue": "downloads",
             "validator": {
               "allowBlank": false,
               "regex": {
                 "expr": "/^[\\w _-]+$/",
-                "errorText": "Subdirectories are not supported."
+                "errorText": "Sous-répertoires non-supportés."
               }
             }
           }
         ]
       },
       {
-        "desc": "If the specified share does not exist, it will be created. You can use an existing share by specifying the name of the folder."
+        "desc": "Si le répertoire partagé est inexistant, il sera créé.  Vous pouvez utiliser un partage existant en spécifiant le nom du répertoire destination."
       },
       {
-        "desc": "Package user and group will not appear on most UI settings. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Le nom d'utilisateur et groupe n'apparaîteront pas dans la plupart des options de configuration de l'interface utilisateur. Prière de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour d'avantage de détails."
       }
     ]
   }
