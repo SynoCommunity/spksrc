@@ -73,6 +73,13 @@ service_postinst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         deluge_default_install
     fi
+
+    # DSM<=6: Copy new default configuration files prior from them being
+    #         overwritten by old version during postupgrade recovery
+    if [ -r "${CFG_FILE}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+        cp -p ${CFG_FILE} ${CFG_FILE}.new
+        cp -p ${CFG_WATCH} ${CFG_WATCH}.new
+    fi
 }
 
 
@@ -94,12 +101,13 @@ service_postupgrade ()
         # be updated using a newer configuration
 
         # Backup current old version of core.conf and autoadd.conf
-        cp -p ${CFG_FILE} ${CFG_FILE}-backup.$(date +%Y%m%d-%H%M)
-        cp -p ${CFG_WATCH} ${CFG_WATCH}-backup.$(date +%Y%m%d-%H%M)
+        cp -p ${CFG_FILE} ${CFG_FILE}.bak.$(date +%Y%m%d%H%M)
+        cp -p ${CFG_WATCH} ${CFG_WATCH}.bak.$(date +%Y%m%d%H%M)
 
         # Copy new "default" version of core.conf
         cp -p ${CFG_FILE}.new ${CFG_FILE}
         cp -p ${CFG_WATCH}.new ${CFG_WATCH}
+
         # Reset to default installation
         deluge_default_install
 
@@ -117,12 +125,14 @@ service_postupgrade ()
         # Migrate data to the new download paths except
         # already completed files as may be large volume
         shopt -s dotglob # copy hidden folder/files too
-        if [ -n "${OLD_INCOMPLETE_FOLDER}" ] &&  [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_FOLDER" ]; then
+        if [ -n "${OLD_INCOMPLETE_FOLDER}" ] \
+             && [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_FOLDER" ] \
+             && [ "$OLD_INCOMPLETE_FOLDER" != "$OLD_COMPLETE_FOLDER" ]; then
             mkdir -p "$NEW_INCOMPLETE_FOLDER"
             echo "mv -nv $OLD_INCOMPLETE_FOLDER/* $NEW_INCOMPLETE_FOLDER/"
             #mv -nv "$OLD_INCOMPLETE_FOLDER"/* "$NEW_INCOMPLETE_FOLDER/"
         fi
-        if [ -n "${OLD_WATCH_FOLDER}" ] &&  [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
+        if [ -n "${OLD_WATCH_FOLDER}" ] && [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
             mkdir -p "$NEW_WATCH_FOLDER"
             echo "mv -nv $OLD_WATCH_FOLDER/* $NEW_WATCH_FOLDER"
             #mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
