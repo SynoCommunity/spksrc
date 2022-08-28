@@ -15,11 +15,9 @@ CMAKE_ARGS = -DUSE_SHARED_MBEDTLS_LIBRARY=On
 CMAKE_ARGS += -DENABLE_TESTING=Off
 CMAKE_ARGS += -DENABLE_PROGRAMS=Off
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.cross-cmake.mk
 
 # Flags to be added to CMake toolchain file
-ifeq ($(call version_lt, $(call version_gcc), 5),1)
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -std=gnu99
 endif
-
-include ../../mk/spksrc.cross-cmake.mk
