@@ -89,13 +89,9 @@ service_postupgrade ()
     # Needed to force correct permissions, during update from prior version
     # Extract the right paths from config file
     if [ -r "${CFG_FILE}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        OLD_INCOMPLETE_FOLDER=`sed -n 's/.*"download_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        OLD_COMPLETE_FOLDER=`sed -n 's/.*"move_completed_path"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        OLD_WATCH_FOLDER=`sed -n 's/.*"autoadd_location"[ ]*:[ ]*"\(.*\)",/\1/p' ${CFG_FILE}`
-        #
-        NEW_INCOMPLETE_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
-        NEW_COMPLETE_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
-        NEW_WATCH_FOLDER="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+        incomplete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
+        complete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
+        watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
 
         # Older versions of Deluge on DSM <= 6 must
         # be updated using a newer configuration
@@ -112,31 +108,14 @@ service_postupgrade ()
         deluge_default_install
 
         # add group (DSM6)
-        if [ -n "${NEW_INCOMPLETE_FOLDER}" ] && [ -d "${NEW_INCOMPLETE_FOLDER}" ]; then
-            set_syno_permissions "${NEW_INCOMPLETE_FOLDER}" "${GROUP}"
+        if [ -n "${incomplete_folder}" ] && [ -d "${incomplete_folder}" ]; then
+            set_syno_permissions "${incomplete_folder}" "${GROUP}"
         fi
-        if [ -n "${NEW_COMPLETE_FOLDER}" ] && [ -d "${NEW_COMPLETE_FOLDER}" ]; then
-            set_syno_permissions "${NEW_COMPLETE_FOLDER}" "${GROUP}"
+        if [ -n "${complete_folder}" ] && [ -d "${complete_folder}" ]; then
+            set_syno_permissions "${complete_folder}" "${GROUP}"
         fi
-        if [ -n "${NEW_WATCHED_FOLDER}" ] && [ -d "${NEW_WATCHED_FOLDER}" ]; then
-            set_syno_permissions "${NEW_WATCHED_FOLDER}" "${GROUP}"
+        if [ -n "${watch_folder}" ] && [ -d "${watch_folder}" ]; then
+            set_syno_permissions "${watch_folder}" "${GROUP}"
         fi
-
-        # Migrate data to the new download paths except
-        # already completed files as may be large volume
-        shopt -s dotglob # copy hidden folder/files too
-        if [ -n "${OLD_INCOMPLETE_FOLDER}" ] \
-             && [ "$OLD_INCOMPLETE_FOLDER" != "$NEW_INCOMPLETE_FOLDER" ] \
-             && [ "$OLD_INCOMPLETE_FOLDER" != "$OLD_COMPLETE_FOLDER" ]; then
-            mkdir -p "$NEW_INCOMPLETE_FOLDER"
-            echo "mv -nv $OLD_INCOMPLETE_FOLDER/* $NEW_INCOMPLETE_FOLDER/"
-            #mv -nv "$OLD_INCOMPLETE_FOLDER"/* "$NEW_INCOMPLETE_FOLDER/"
-        fi
-        if [ -n "${OLD_WATCH_FOLDER}" ] && [ "$OLD_WATCH_FOLDER" != "$NEW_WATCH_FOLDER" ]; then
-            mkdir -p "$NEW_WATCH_FOLDER"
-            echo "mv -nv $OLD_WATCH_FOLDER/* $NEW_WATCH_FOLDER"
-            #mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
-        fi
-        shopt -u dotglob
     fi
 }
