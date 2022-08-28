@@ -17,12 +17,19 @@ INSTALL_TARGET = cryptopp_install
 
 ADDITIONAL_CXXFLAGS = -DNDEBUG -g2 -O -fPIC -pipe
 
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # avoid errors like: unknown register name '%xmm5' in 'asm'
 ADDITIONAL_CXXFLAGS += -DCRYPTOPP_DISABLE_SSE2
 endif
 
-MAKE_OPTIONS = -f GNUmakefile-cross HAS_SOLIB_VERSION=1
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ADDITIONAL_CXXFLAGS += -DCRYPTOPP_DISABLE_ASM
+endif
+
+MAKE_OPTIONS = -f GNUmakefile HAS_SOLIB_VERSION=1
+
 COMPILE_MAKE_OPTIONS = $(MAKE_OPTIONS) shared
 
 include ../../mk/spksrc.cross-cc.mk
