@@ -33,9 +33,9 @@ service_postinst ()
 
         # Create logs directory, otherwise it does not start due to permissions errors
         mkdir -p "$(dirname ${LOG_FILE})"
-        mkdir -p "${shared_folder}/incomplete"
-        mkdir -p "${shared_folder}/complete"
-        mkdir -p "${shared_folder}/watch"
+        mkdir -p -m 0775 "${shared_folder}/incomplete"
+        mkdir -p -m 0775 "${shared_folder}/complete"
+        mkdir -p -m 0775 "${shared_folder}/watch"
     fi
 
     # Install nice/ionice
