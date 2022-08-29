@@ -31,33 +31,48 @@ DELUGED_DAEMON="${DELUGED} -c ${CFG_PATH} ${DELUGE_ARGS} -l ${DELUGED_LOG} -L in
 SERVICE_COMMAND[0]="${DELUGED_DAEMON}"
 SERVICE_COMMAND[1]="${DELUGEWEB_DAEMON}"
 
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+    GROUP="synocommunity"
+else
     GROUP="sc-download"
 fi
 
 deluge_default_install ()
 {
-    # Edit the configuration according to the wizard
-    shared_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}"
-    sed -i -e "s|@shared_folder@|${shared_folder}|g" ${CFG_FILE}
-    sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
+    incomplete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
+    complete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
+    watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
 
     # Create download directories
-    mkdir -p -m 0775 "${shared_folder}/incomplete"
-    mkdir -p -m 0775 "${shared_folder}/complete"
-    mkdir -p -m 0775 "${shared_folder}/watch"
+    install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${incomplete_folder}"
+    install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${complete_folder}"
+    install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${watch_folder}"
+
+    # DSM<=6: add group ACL
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+        echo "Setting-up group ACL permissions"
+        if [ -n "${incomplete_folder}" ] && [ -d "${incomplete_folder}" ]; then
+            set_syno_permissions "${incomplete_folder}" "${GROUP}"
+        fi
+        if [ -n "${complete_folder}" ] && [ -d "${complete_folder}" ]; then
+            set_syno_permissions "${complete_folder}" "${GROUP}"
+        fi
+        if [ -n "${watch_folder}" ] && [ -d "${watch_folder}" ]; then
+            set_syno_permissions "${watch_folder}" "${GROUP}"
+        fi
+    fi
 
     # Edit the configuration files according to the wizard
     for cfg_file in "${CFG_FILE} ${CFG_WATCH}"; do
         # Default download directory
-        sed -i -e "s|@download_dir@|${shared_folder}/incomplete|g" ${cfg_file}
+        sed -i -e "s|@download_dir@|${incomplete_folder}|g" ${cfg_file}
         # Complete directory enabled
         sed -i -e "s|@complete_dir_enabled@|true|g" ${cfg_file}
-        sed -i -e "s|@complete_dir@|${shared_folder}/complete|g" ${cfg_file}
+        sed -i -e "s|@complete_dir@|${complete_folder}|g" ${cfg_file}
     done
     # Watch directory
     sed -i -e "s|\"enabled_plugins\": \[\],|\"enabled_plugins\": \[\n        \"AutoAdd\"\n    \], \n|g" ${CFG_FILE}
-    sed -i -e "s|@watch_dir@|${shared_folder}/watch|g" ${CFG_WATCH}
+    sed -i -e "s|@watch_dir@|${watch_folder}|g" ${CFG_WATCH}
     # plugins directory
     sed -i -e "s|@plugins_dir@|${SYNOPKG_PKGVAR}/plugins|g" ${CFG_FILE}
 }
@@ -89,10 +104,6 @@ service_postupgrade ()
     # Needed to force correct permissions, during update from prior version
     # Extract the right paths from config file
     if [ -r "${CFG_FILE}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        incomplete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
-        complete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
-        watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
-
         # Older versions of Deluge on DSM <= 6 must
         # be updated using a newer configuration
 
@@ -100,22 +111,11 @@ service_postupgrade ()
         cp -p ${CFG_FILE} ${CFG_FILE}.bak.$(date +%Y%m%d%H%M)
         cp -p ${CFG_WATCH} ${CFG_WATCH}.bak.$(date +%Y%m%d%H%M)
 
-        # Copy new "default" version of core.conf
+        # Copy new "default" version of core.conf and autoadd.conf
         cp -p ${CFG_FILE}.new ${CFG_FILE}
         cp -p ${CFG_WATCH}.new ${CFG_WATCH}
 
         # Reset to default installation
         deluge_default_install
-
-        # add group (DSM6)
-        if [ -n "${incomplete_folder}" ] && [ -d "${incomplete_folder}" ]; then
-            set_syno_permissions "${incomplete_folder}" "${GROUP}"
-        fi
-        if [ -n "${complete_folder}" ] && [ -d "${complete_folder}" ]; then
-            set_syno_permissions "${complete_folder}" "${GROUP}"
-        fi
-        if [ -n "${watch_folder}" ] && [ -d "${watch_folder}" ]; then
-            set_syno_permissions "${watch_folder}" "${GROUP}"
-        fi
     fi
 }
