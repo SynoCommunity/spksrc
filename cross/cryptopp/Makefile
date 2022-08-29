@@ -15,9 +15,16 @@ LICENSE  = Boost Software License 1.0
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = cryptopp_install
 
-ADDITIONAL_CXXFLAGS = -DNDEBUG -g2 -O -fPIC -pipe
+ADDITIONAL_CXXFLAGS = -DNDEBUG -g2 -fPIC -pipe
 
 include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+# aarch64 fails to generate keys with optimized code
+ADDITIONAL_CXXFLAGS += -O0
+else
+ADDITIONAL_CXXFLAGS += -O
+endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # avoid errors like: unknown register name '%xmm5' in 'asm'
