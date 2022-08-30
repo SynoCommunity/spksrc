@@ -7,7 +7,9 @@ SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+    GROUP="synocommunity"
+else
     GROUP="sc-download"
 fi
 
