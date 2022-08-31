@@ -30,14 +30,18 @@ service_postinst ()
         sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
 
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+            # DSM7: SABnzbd should not set permissions, but let DSM handle it
             sed -i -e "s|permissions\s*=.*|permissions = ""|g" ${CFG_FILE}
-        fi
+        else
+            # DSM6: Create folders with right permissions
+            # DSM7: Let SABnzbd create them on first start
+            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/incomplete"
+            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/complete"
+            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/watch"
 
-        # Create logs directory, otherwise it does not start due to permissions errors
-        mkdir -p "$(dirname ${LOG_FILE})"
-        install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/incomplete"
-        install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/complete"
-        install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/watch"
+            # Create logs directory, otherwise it does not start due to permissions errors
+            mkdir -p "$(dirname ${LOG_FILE})"
+        fi
     fi
 
     # Install nice/ionice
