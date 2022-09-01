@@ -1,5 +1,5 @@
 PKG_NAME = intel-media
-PKG_VERS = 22.1.0
+PKG_VERS = 22.4.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/media-driver/archive
@@ -29,5 +29,7 @@ CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
 
 # Flags to be added to CMake toolchain file
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -Wno-error=delete-incomplete
 ADDITIONAL_CXXFLAGS += -std=c++11
+endif

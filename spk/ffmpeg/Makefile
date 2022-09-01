@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.4.2
 SPK_REV = 45
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Add support for codec2 speech codec<br/>2. Enable chromaprint support for extracting fingerprints audio sources"
+CHANGELOG = "1. Update Intel Driver to version 22.4.4<br/>2. Add support for codec2 speech codec<br/>3. Enable chromaprint support for extracting fingerprints audio sources"
 
 CONF_DIR = src/conf
 
