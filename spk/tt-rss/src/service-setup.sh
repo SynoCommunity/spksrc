@@ -1,4 +1,3 @@
-#!/bin/sh
 
 # Package
 PACKAGE="tt-rss"
