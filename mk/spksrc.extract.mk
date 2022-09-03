@@ -11,6 +11,7 @@ EXTRACT_PATH ?= $(WORK_DIR)
 # Extract commands (optionally use TAR_CMD="fakeroot tar" as workaround on OSX)
 TAR_CMD ?= tar
 ifeq ($(strip $(EXTRACT_CMD.$(DIST_EXT))),)
+EXTRACT_CMD.spk = $(TAR_CMD) --to-command='tar -Jxf - -C $(EXTRACT_PATH)/$(PKG_DIR)' -xf $(DIST_FILE) package.tgz
 EXTRACT_CMD.tgz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.txz = $(TAR_CMD) -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
 EXTRACT_CMD.tar.gz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
