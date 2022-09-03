@@ -170,7 +170,7 @@ DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
 # Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-ifeq ($(call version_ge, $(call version_gcc), 4.8),1)
+ifeq ($(call version_ge, ${TC_GCC}, 4.8),1)
 DEPENDS += cross/libass
 CONFIGURE_ARGS += --enable-libass
 endif
