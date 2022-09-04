@@ -30,6 +30,14 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
+# install
+ifeq ($(strip $(CMAKE_DIR)),)
+CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
+endif
+endif
+
+
+.PHONY: cmake_configure_target
 .PHONY: $(CMAKE_TOOLCHAIN_PKG)
 $(CMAKE_TOOLCHAIN_PKG):
 	@$(MSG) Generating $(CMAKE_TOOLCHAIN_PKG)
@@ -72,9 +80,9 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(CMAKE_DIR)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
 endif
 
 .PHONY: cmake_compile_target
