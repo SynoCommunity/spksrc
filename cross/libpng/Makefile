@@ -12,7 +12,7 @@ COMMENT  = Portable Network Graphics Library
 LICENSE  = http://www.libpng.org/pub/png/src/libpng-LICENSE.txt
 
 GNU_CONFIGURE = 1
-
+CONFIGURE_ARGS = --disable-static
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

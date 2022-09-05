@@ -12,7 +12,7 @@ COMMENT  = Fontconfig is a library for configuring and customizing font access.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-
-CONFIGURE_ARGS = --disable-docs --enable-iconv
+CONFIGURE_ARGS = --disable-docs --enable-iconv --disable-cache-build
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
