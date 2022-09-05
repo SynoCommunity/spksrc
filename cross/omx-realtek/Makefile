@@ -1,5 +1,5 @@
 PKG_NAME = omx-realtek
-PKG_VERS = 2.4.9-1626
+PKG_VERS = 2.5.0-1656
 PKG_EXT = spk
 PKG_DIST_NAME = VideoStation-rtd1296-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://global.download.synology.com/download/Package/spk/VideoStation/$(PKG_VERS)
