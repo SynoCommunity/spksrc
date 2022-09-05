@@ -1,12 +1,10 @@
-bin:bin/pango-querymodules
 bin:bin/pango-view
 lnk:lib/libpango-1.0.so
 lnk:lib/libpango-1.0.so.0
-lib:lib/libpango-1.0.so.0.2800.4
+lib:lib/libpango-1.0.so.0.3800.1
 lnk:lib/libpangocairo-1.0.so
 lnk:lib/libpangocairo-1.0.so.0
-lib:lib/libpangocairo-1.0.so.0.2800.4
+lib:lib/libpangocairo-1.0.so.0.3800.1
 lnk:lib/libpangoft2-1.0.so
 lnk:lib/libpangoft2-1.0.so.0
-lib:lib/libpangoft2-1.0.so.0.2800.4
-rsc:lib/pango/1.6.0/modules
+lib:lib/libpangoft2-1.0.so.0.3800.1
