@@ -12,7 +12,8 @@ COMMENT  = Libxml2 is the XML C parser and toolkit developed for the Gnome proje
 LICENSE  = MIT
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-python
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --without-python
 ADDITIONAL_CFLAGS = -O3
 
 POST_INSTALL_TARGET = libxml2_post_install
