@@ -24,6 +24,7 @@ DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/gst-plugins-bad
 #DEPENDS += cross/gst-plugins-ugly
 
+
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
