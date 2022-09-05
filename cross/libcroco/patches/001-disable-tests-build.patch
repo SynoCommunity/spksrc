@@ -1,0 +1,13 @@
+# remove tests folder from SUBDIRS to disable build of test code.
+# 
+--- Makefile.in.orig	2019-04-06 17:28:07.000000000 +0000
++++ Makefile.in	2022-09-03 21:47:34.788971931 +0000
+@@ -383,7 +383,7 @@
+ top_srcdir = @top_srcdir@
+ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
+-SUBDIRS = src csslint docs tests win32
++SUBDIRS = src csslint docs win32
+ PKG_CONFIG_FILE_UNINSTALLED = libcroco-@LIBCROCO_MAJOR_VERSION@.@LIBCROCO_MINOR_VERSION@-uninstalled.pc
+ PKG_CONFIG_FILE = libcroco-@LIBCROCO_MAJOR_VERSION@.@LIBCROCO_MINOR_VERSION@.pc
+ pkgconfigdir = $(libdir)/pkgconfig
