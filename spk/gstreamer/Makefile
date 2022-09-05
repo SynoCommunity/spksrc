@@ -8,7 +8,6 @@ DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/gst-plugins-good
 DEPENDS += cross/gst-plugins-bad
 DEPENDS += cross/gst-plugins-ugly
-#DEPENDS += cross/gst-omx
 DEPENDS += cross/gst-rtsp-server
 
 CHANGELOG = "1. Initial package release"
@@ -27,8 +26,12 @@ CONF_DIR = src/conf
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS  = cross/gstreamer-vaapi
+DEPENDS += cross/gstreamer-vaapi
 SERVICE_SETUP = src/service-setup.sh
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+#DEPENDS += cross/gst-omx
 endif
 
 include ../../mk/spksrc.spk.mk
