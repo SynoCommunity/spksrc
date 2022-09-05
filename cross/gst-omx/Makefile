@@ -5,8 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-omx
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-#DEPENDS  = cross/glib
-DEPENDS += cross/realtek-omx
+DEPENDS += cross/omx-realtek
 DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
 
@@ -15,19 +14,11 @@ COMMENT  = This plugin wraps available OpenMAX IL components and makes them avai
 LICENSE  = LGPLv2.1
 
 CONFIGURE_ARGS += -Ddoc=disabled
-#CONFIGURE_ARGS += -Dexamples=disabled
+CONFIGURE_ARGS += -Dexamples=disabled
+CONFIGURE_ARGS += -Dheader_path=$(WORK_DIR)/$(PKG_DIR)/omx/openmax
 CONFIGURE_ARGS += -Dtarget=generic
 
-# Require access to glib-mkenums Python script
-#ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
-
-#include ../../mk/spksrc.common.mk
-
-#ADDITIONAL_CFLAGS = -std=c99
-#ADDITIONAL_CFLAGS += -D_XOPEN_SOURCE=600
-
-#ifeq ($(call version_lt, $(call version_gcc), 5),1)
-#ADDITIONAL_CFLAGS += -D_GNU_SOURCE
-#endif
+# Link in to realtek librarie
+ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib/realtek -Wl,--rpath,$(INSTALL_PREFIX)/lib/realtek
 
 include ../../mk/spksrc.cross-meson.mk
