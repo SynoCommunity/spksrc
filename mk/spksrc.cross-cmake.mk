@@ -33,11 +33,6 @@ endif
 ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
 endif
-
-# install
-ifeq ($(strip $(CMAKE_DIR)),)
-CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
-endif
 endif
 
 .PHONY: $(CMAKE_TOOLCHAIN_PKG)
