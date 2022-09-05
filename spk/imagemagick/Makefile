@@ -1,6 +1,6 @@
 SPK_NAME = imagemagick
 SPK_VERS = 7.1.0
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/imagemagick.png
 
 DEPENDS = cross/imagemagick cross/jpegoptim
@@ -8,7 +8,7 @@ DEPENDS = cross/imagemagick cross/jpegoptim
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images. This package includes jpegoptim, a utility to optimize/compress JPEG files, that is not part of imagemagick.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.0-35.<br/>2. Update jpegoptim to v1.4.7."
+CHANGELOG = "1. Update ImageMagick to v7.1.0-47.<br/>2. Add DejaVu fonts.<br/>3. Update OpenJPEG library to v2.5.0.<br/>4. Add libraries to support additional image formats: Raw, OpenEXR, SVG."
 
 STARTABLE = no
 
@@ -26,7 +26,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: imagemagick_extra_install
 imagemagick_extra_install:
-	@$(MSG) Install type files for included fonts
+	@$(MSG) Install type files for included fonts.
+	@install -m 644 src/type-dejavu.xml $(STAGING_DIR)/etc/ImageMagick-7/
 	@install -m 644 src/type-windows.xml $(STAGING_DIR)/etc/ImageMagick-7/
 	@install -m 644 src/type-urw-base35.xml $(STAGING_DIR)/etc/ImageMagick-7/
 	@$(MSG) Adjust included libtool files
