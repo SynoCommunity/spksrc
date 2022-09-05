@@ -1,5 +1,6 @@
-rsc:bin/cairo-trace
-lib:lib/cairo/libcairo-trace.so
+lnk:lib/libcairo-gobject.so
+lnk:lib/libcairo-gobject.so.2
+lib:lib/libcairo-gobject.so.2.11600.0
 lnk:lib/libcairo-script-interpreter.so
 lnk:lib/libcairo-script-interpreter.so.2
 lib:lib/libcairo-script-interpreter.so.2.11600.0
