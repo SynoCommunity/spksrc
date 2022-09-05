@@ -31,7 +31,7 @@ SERVICE_SETUP = src/service-setup.sh
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-#DEPENDS += cross/gst-omx
+DEPENDS += cross/gst-omx
 endif
 
 include ../../mk/spksrc.spk.mk
