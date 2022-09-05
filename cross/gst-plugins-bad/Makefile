@@ -75,7 +75,7 @@ PLIST_TRANSFORM += -e libgstopenh264.so
 endif
 
 # Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-ifeq ($(call version_ge, $(call version_gcc), 4.8),1)
+ifeq ($(call version_ge, ${TC_GCC}, 4.8),1)
 DEPENDS += cross/libass
 else
 PLIST_TRANSFORM += -e libgstassrender.so
