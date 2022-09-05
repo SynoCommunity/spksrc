@@ -18,6 +18,11 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
 endif
 
+# install
+ifeq ($(strip $(CMAKE_DIR)),)
+CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
+endif
+
 ifneq ($(strip $(CMAKE_USE_NINJA)),1)
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -27,12 +32,6 @@ endif
 # install
 ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
-endif
-endif
-
-# install
-ifeq ($(strip $(CMAKE_DIR)),)
-CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 endif
 
@@ -77,6 +76,7 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
+	@$(MSG)    - Path CMAKE_DIR = $(CMAKE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
