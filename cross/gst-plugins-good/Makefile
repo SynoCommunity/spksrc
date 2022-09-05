@@ -31,7 +31,7 @@ include ../../mk/spksrc.common.mk
 
 ADDITIONAL_CFLAGS = -std=c99
 
-ifeq ($(call version_lt, $(call version_gcc), 5),1)
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
 endif
 

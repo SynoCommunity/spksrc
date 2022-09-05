@@ -26,7 +26,7 @@ include ../../mk/spksrc.common.mk
 ADDITIONAL_CFLAGS = -std=c99
 ADDITIONAL_CFLAGS += -D_XOPEN_SOURCE=600
 
-ifeq ($(call version_lt, $(call version_gcc), 5),1)
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
 endif
 

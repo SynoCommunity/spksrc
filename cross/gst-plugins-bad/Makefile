@@ -38,7 +38,7 @@ ADDITIONAL_CFLAGS  = -std=c99
 # For openh264
 ADDITIONAL_CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/wels
 
-ifeq ($(call version_lt, $(call version_gcc), 5),1)
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
 endif
 
