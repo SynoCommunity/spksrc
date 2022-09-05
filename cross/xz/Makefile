@@ -1,5 +1,5 @@
 PKG_NAME = xz
-PKG_VERS = 5.2.5
+PKG_VERS = 5.2.6
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://tukaani.org/xz
@@ -12,7 +12,9 @@ COMMENT  = Free general-purpose data compression software with high compression 
 LICENSE  = various
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-scripts
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --disable-scripts
+CONFIGURE_ARGS += --disable-doc
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
