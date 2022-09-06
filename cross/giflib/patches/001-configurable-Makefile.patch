@@ -4,7 +4,7 @@
 # - add targets to build shared libraries only
 # 
 --- Makefile.orig	2019-06-24 16:08:57.000000000 +0000
-+++ Makefile	2022-09-05 19:25:17.085094254 +0000
++++ Makefile	2022-09-06 05:28:43.957220363 +0000
 @@ -8,13 +8,13 @@
  #
  OFLAGS = -O0 -g
@@ -34,7 +34,7 @@
  	$(INSTALL) -m 755 libgif.so "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBVER)"
  	ln -sf libgif.so.$(LIBVER) "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBMAJOR)"
  	ln -sf libgif.so.$(LIBMAJOR) "$(DESTDIR)$(LIBDIR)/libgif.so"
-+install-shared-lib:
++install-shared-lib: install-include
 +	$(INSTALL) -d "$(DESTDIR)$(LIBDIR)"
 +	$(INSTALL) -m 755 libgif.so "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBVER)"
 +	ln -sf libgif.so.$(LIBVER) "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBMAJOR)"
