@@ -11,3 +11,4 @@ lnk:bin/sfv-hash
 lnk:bin/tiger-hash
 lnk:bin/tth-hash
 lnk:bin/whirlpool-hash
+lib:lib/librhash.so.0

@@ -1,0 +1,13 @@
+# [rencode]
+# ---------
+# Must use abi3 compatibility else error:
+#      [WARNING ][deluge.transfer               :130 ]
+#      Failed to decompress (25 bytes) and load serialized data with rencode: rencode._rencode.loads() takes no keyword arguments
+# rencode==1.0.6 ==> does not build!
+
+# [rencode]
+# GitHUB official project
+# git+https://github.com/aresch/rencode.git@master#egg=rencode==1.0.6
+git+https://github.com/aresch/rencode.git@572ff74586d9b1daab904c6f7f7009ce0143bb75#egg=rencode==1.0.6
+# Updated fork of the project
+# git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7

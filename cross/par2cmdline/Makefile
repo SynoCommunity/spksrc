@@ -1,5 +1,5 @@
 PKG_NAME = par2cmdline
-PKG_VERS = 0.8.0
+PKG_VERS = 0.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Parchive/par2cmdline/releases/download/v$(PKG_VERS)

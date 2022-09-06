@@ -7,7 +7,9 @@ SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+    GROUP="synocommunity"
+else
     GROUP="sc-download"
 fi
 
@@ -33,9 +35,9 @@ service_postinst ()
 
         # Create logs directory, otherwise it does not start due to permissions errors
         mkdir -p "$(dirname ${LOG_FILE})"
-        mkdir -p "${shared_folder}/incomplete"
-        mkdir -p "${shared_folder}/complete"
-        mkdir -p "${shared_folder}/watch"
+        install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/incomplete"
+        install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/complete"
+        install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/watch"
     fi
 
     # Install nice/ionice

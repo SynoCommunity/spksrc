@@ -12,7 +12,7 @@ HOMEPAGE = https://github.com/jbruchon/jdupes
 COMMENT  = A powerful duplicate file finder and an enhanced fork of fdupes.
 LICENSE  = MIT
 
-CONFIGURE_TARGET = none
+CONFIGURE_TARGET = nop
 INSTALL_TARGET = jdupes_install
 
 include ../../mk/spksrc.cross-cc.mk

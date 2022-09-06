@@ -10,6 +10,3 @@ lib:lib/libdrm_radeon.so.1.0.1
 lnk:lib/libdrm.so
 lnk:lib/libdrm.so.2
 lib:lib/libdrm.so.2.4.0
-lnk:lib/libkms.so
-lnk:lib/libkms.so.1
-lib:lib/libkms.so.1.0.0
