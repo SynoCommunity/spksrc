@@ -1,6 +1,6 @@
 SPK_NAME = prowlarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/prowlarr.png
 
 # .NET is not supported on PPC, ARM5, ARM7L and x86
