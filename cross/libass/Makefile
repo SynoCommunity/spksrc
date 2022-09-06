@@ -12,5 +12,7 @@ COMMENT  = libass is a portable subtitle renderer for the ASS/SSA (Advanced Subs
 LICENSE  = ICS
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

@@ -15,6 +15,8 @@ LICENSE  = GPLv3
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = jbigkit_pre_configure
 
+ADDITIONAL_CFLAGS = -O
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: jbigkit_pre_configure
