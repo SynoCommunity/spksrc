@@ -1,5 +1,5 @@
 PKG_NAME = libwebp
-PKG_VERS = 1.2.2
+PKG_VERS = 1.2.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/webmproject/libwebp/archive
@@ -14,16 +14,14 @@ LICENSE  = https://github.com/webmproject/libwebp/blob/master/COPYING
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = libwebp_pre_configure
-CONFIGURE_ARGS = --disable-static
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --enable-libwebpdecoder
 
 ADDITIONAL_CPPFLAGS = -O
 
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifeq ($(call version_lt, ${TC_OS_MIN_VER}, 6.1)$(call version_ge, ${TC_OS_MIN_VER}, 3.0),11)
 # newer compilers need this
-ADDITIONAL_CPPFLAGS += -std=c11
-else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# and arm64 for DSM 6 too
 ADDITIONAL_CPPFLAGS += -std=c11
 endif
 
