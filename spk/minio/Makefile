@@ -9,9 +9,9 @@ DEPENDS = cross/minio cross/minio-client
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = fgma
-DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs. This Package include the minio-client \(mc\).
+DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs. This Package includes the 'minio-client' \(mc\).
 DISPLAY_NAME = MinIO
-CHANGELOG = "1. Update to MinIO 2022-09-07T22-25-02Z. Multiple minor feature releases and security releases.<br/>2. Include minio-client (mc) in the package (named minio-client availbalbe in the path, to use client as mc your have to specify the full path: /var/packages/minio/target/bin/mc)."
+CHANGELOG = "1. Update to MinIO 2022-09-07T22-25-02Z. Multiple minor feature releases and security releases.<br/>2. Include minio-client (mc) in the package (named 'minio-client' and availalbe in the path, to use the client as 'mc' your have to specify the full path: /var/packages/minio/target/bin/mc)."
 LICENSE_FILE = $(WORK_DIR)/src/github.com/minio/minio/LICENSE
 HOMEPAGE = https://min.io/
 LICENSE = AGPLv3.0
