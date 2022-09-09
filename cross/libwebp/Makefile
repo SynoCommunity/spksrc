@@ -20,9 +20,11 @@ CONFIGURE_ARGS += --enable-libwebpdecoder
 ADDITIONAL_CPPFLAGS = -O
 
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, ${TC_OS_MIN_VER}, 6.1)$(call version_ge, ${TC_OS_MIN_VER}, 3.0),11)
-# newer compilers need this
+# newer gcc require definition of -std=c11
+ifneq ($(call version_lt,$(TCVERSION),6.1)$(call version_ge,$(TCVERSION),3.0),11)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 ADDITIONAL_CPPFLAGS += -std=c11
+endif
 endif
 
 include ../../mk/spksrc.cross-cc.mk
