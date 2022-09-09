@@ -12,7 +12,8 @@ COMMENT  = Self-contained, serverless, zero-configuration, transactional SQL dat
 LICENSE  = Public Domain (https://www.sqlite.org/copyright.html)
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --disable-static-shell
 
 ADDITIONAL_CFLAGS  = -O
 ADDITIONAL_CFLAGS += -DSQLITE_ENABLE_COLUMN_METADATA
