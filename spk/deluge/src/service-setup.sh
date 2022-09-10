@@ -16,6 +16,9 @@ DELUGEWEB="${SYNOPKG_PKGDEST}/env/bin/deluge-web"
 DELUGEWEB_LOG="${DELUGE_LOGS}/deluge-web.log"
 DELUGEWEB_PID="${DELUGE_LOGS}/deluge-web.pid"
 #
+# Fixes 'Tracker Status: Error: certificate verify failed'
+export SSL_CERT_FILE=$(${PYTHON_DIR}/python3 -c "import certifi; print(certifi.where())")
+#
 # deluded & deluge-web options:
 # -c --config
 # -l --logfile
