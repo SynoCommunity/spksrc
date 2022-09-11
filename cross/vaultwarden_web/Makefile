@@ -1,5 +1,5 @@
 PKG_NAME = vaultwarden_web
-PKG_VERS = 2.28.1
+PKG_VERS = 2022.9.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = bw_web_v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dani-garcia/bw_web_builds/releases/download/v$(PKG_VERS)
@@ -10,7 +10,7 @@ DEPENDS =
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden/wiki
 COMMENT = Web Vault build for Vaultwarden. Bitwarden web vault, patched to work with vaultwarden.
-LICENSE =
+LICENSE = GPLv3
 
 INSTALL_TARGET = vaultwarden_web_install
 
