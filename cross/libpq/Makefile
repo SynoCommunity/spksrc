@@ -1,5 +1,5 @@
 PKG_NAME = libpq
-PKG_VERS = 11.16
+PKG_VERS = 11.17
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = postgresql-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)/
@@ -17,19 +17,15 @@ LICENSE  = PostgreSQL Licence
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --with-template=linux --with-openssl
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --with-template=linux
+CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --with-system-tzdata=/usr/share/zoneinfo
 CONFIGURE_ARGS += --without-readline
+ADDITIONAL_CFLAGS = -O
 
 COMPILE_TARGET = libpq_compile
 INSTALL_TARGET = libpq_install
-
-ADDITIONAL_CFLAGS = -O
-
-# If you want to invoke the build from another makefile rather than manually,
-# you must unset MAKELEVEL or set it to zero.
-# see: INSTALL file
-#ENV += MAKELEVEL=
 
 include ../../mk/spksrc.cross-cc.mk
 
