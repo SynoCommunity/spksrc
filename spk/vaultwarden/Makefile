@@ -1,5 +1,5 @@
 SPK_NAME = vaultwarden
-SPK_VERS = 1.25.0
+SPK_VERS = 1.25.2
 SPK_REV = 1
 SPK_ICON = src/vaultwarden.png
 
@@ -18,7 +18,7 @@ LICENSE  = GPLv3
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8180
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = vaultwarden web
 ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
