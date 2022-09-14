@@ -94,12 +94,13 @@ reload_inst_variables ()
 {
     # Reload wizard variables stored by postinst
     if [ -r "${INST_VARIABLES}" ]; then
-        # we cannot source the file to reload the variables, when values have special characters like <, >, ...
-        for _line in $(cat "${INST_VARIABLES}"); do
-            _key="$(echo ${_line} | awk -F'=' '{print $1}')"
-            _value="$(echo ${_line} | awk -F'=' '{print $2}')"
+        # we cannot source the file to reload variables, when values have special characters.
+        # This works even with following characers (e.g. for passwords): " ' < \ > :space: = $ | ...
+        while read -r _line; do
+            _key="$(echo ${_line} | cut --fields=1 --delimiter='=')"
+            _value="$(echo ${_line} | cut --fields=2- -delimiter='=')"
             declare "${_key}=${_value}"
-        done
+        done < ${INST_VARIABLES}
     fi
 }
 
@@ -116,4 +117,3 @@ save_wizard_variables ()
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
     fi
 }
-
