@@ -13,3 +13,6 @@ toolkit/*/work*
 local.mk
 *.DS_Store
 *~
+
+# PyCharm project settings
+.idea

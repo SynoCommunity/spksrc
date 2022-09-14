@@ -1,3 +1,8 @@
+sickchill==2022.9.14
+
+# Direct dependencies
+# automtically downloaded
+
 appdirs==1.4.4
 babelfish==0.6.0
 beautifulsoup4==4.10.0
