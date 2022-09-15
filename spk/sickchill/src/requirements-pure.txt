@@ -63,7 +63,7 @@ python-dateutil==2.8.2
 python-slugify==6.1.2
 python-twitter==3.5
 pytz==2022.2.1
-qbittorrent-api==2021.8.38
+qbittorrent-api==2022.8.38
 rarfile==4.0
 rebulk==3.1.0
 requests==2.28.1
