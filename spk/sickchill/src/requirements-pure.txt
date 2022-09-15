@@ -44,7 +44,6 @@ packaging==21.3
 pbr==5.10.0
 poetry==1.2.0
 poetry-core==1.1.0
-poetry-date-version-plugin==2021.7.16-6
 profilehooks==1.12.0
 putio.py==8.7.0
 pycparser==2.21
