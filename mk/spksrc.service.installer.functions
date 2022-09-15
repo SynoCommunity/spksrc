@@ -98,7 +98,7 @@ reload_inst_variables ()
         # This works even with following characers (e.g. for passwords): " ' < \ > :space: = $ | ...
         while read -r _line; do
             _key="$(echo ${_line} | cut --fields=1 --delimiter='=')"
-            _value="$(echo ${_line} | cut --fields=2- -delimiter='=')"
+            _value="$(echo ${_line} | cut --fields=2- --delimiter='=')"
             declare "${_key}=${_value}"
         done < ${INST_VARIABLES}
     fi
