@@ -37,7 +37,7 @@ service_postinst() {
     install_python_virtualenv
 
     echo ${separator}
-    install_python_wheels
+    install_python_wheels --extra-index-url https://wheel-index.linuxserver.io/ubuntu/ --extra-index-url https://www.piwheels.org/simple
     
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config
