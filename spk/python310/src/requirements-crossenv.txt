@@ -6,6 +6,9 @@
 
 # Next update will require rustc
 # cryptography==3.3.2
+cryptography==38.0.1
+#cryptography==35.0.0
+#cryptography==3.4.8
 
 # Requirement for cryptography
 # cffi==1.15.0

@@ -54,20 +54,19 @@ else
 # different noarch packages
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
-ifneq ($(strip $(TCVERSION)),)
+ifeq ($(strip $(TCVERSION)),)
+# default: 3.1 .. 5.2
+TCVERSION = 5.2
+endif
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SPK_TCVERS = dsm7
 TC_OS_MIN_VER = 7.0-40000
 else ifeq ($(call version_ge, $(TCVERSION), 6.1),1)
 SPK_TCVERS = dsm6
 TC_OS_MIN_VER = 6.1-15047
-else ifeq ($(call version_ge, $(TCVERSION), 3.0),1)
-SPK_TCVERS = all
-TC_OS_MIN_VER = 3.1-1594
-else
+else ifeq ($(call version_lt, $(TCVERSION), 3.0),1)
 SPK_TCVERS = srm
 TC_OS_MIN_VER = 1.1-6931
-endif
 else
 SPK_TCVERS = all
 TC_OS_MIN_VER = 3.1-1594
@@ -438,18 +437,21 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
-	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
 	       work-*/tc_vars.mk \
 	       work-*/tc_vars.cmake \
-	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
+
+wheelclean: spkclean
+	rm -fr work-*/.wheel_done \
+	       work-*/wheelhouse \
+	       work-*/install/**/share/wheelhouse/*
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)

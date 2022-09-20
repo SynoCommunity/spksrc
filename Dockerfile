@@ -87,6 +87,20 @@ RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 # Install meson cross-platform build system
 RUN pip3 install meson==0.62.2
 
+# Install rustc - environment located in /root/.rustup
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | CARGO_HOME=/usr/local sh -s -- -y
+# Install rustc stable toolchain
+RUN CARGO_HOME=/usr/local rustup toolchain install stable
+RUN CARGO_HOME=/usr/local rustup default stable
+# Install all rustc targets
+RUN CARGO_HOME=/usr/local rustup target install x86_64-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target install i686-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target install armv5te-unknown-linux-gnueabi
+RUN CARGO_HOME=/usr/local rustup target install armv7-unknown-linux-gnueabihf
+RUN CARGO_HOME=/usr/local rustup target install armv7-unknown-linux-gnueabi
+RUN CARGO_HOME=/usr/local rustup target install aarch64-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target install powerpc-unknown-linux-gnu
+
 # Volume pointing to spksrc sources
 VOLUME /spksrc
 WORKDIR /spksrc
