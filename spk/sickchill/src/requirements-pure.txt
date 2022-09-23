@@ -1,4 +1,4 @@
-sickchill==2022.9.14
+sickchill==2022.9.22
 
 # Direct dependencies
 # automtically downloaded
