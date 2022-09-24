@@ -93,13 +93,13 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | CARGO_HOME=/usr/
 RUN CARGO_HOME=/usr/local rustup toolchain install stable
 RUN CARGO_HOME=/usr/local rustup default stable
 # Install all rustc targets
-RUN CARGO_HOME=/usr/local rustup target install x86_64-unknown-linux-gnu
-RUN CARGO_HOME=/usr/local rustup target install i686-unknown-linux-gnu
-RUN CARGO_HOME=/usr/local rustup target install armv5te-unknown-linux-gnueabi
-RUN CARGO_HOME=/usr/local rustup target install armv7-unknown-linux-gnueabihf
-RUN CARGO_HOME=/usr/local rustup target install armv7-unknown-linux-gnueabi
-RUN CARGO_HOME=/usr/local rustup target install aarch64-unknown-linux-gnu
-RUN CARGO_HOME=/usr/local rustup target install powerpc-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target add x86_64-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target add i686-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target add armv5te-unknown-linux-gnueabi
+RUN CARGO_HOME=/usr/local rustup target add armv7-unknown-linux-gnueabihf
+RUN CARGO_HOME=/usr/local rustup target add armv7-unknown-linux-gnueabi
+RUN CARGO_HOME=/usr/local rustup target add aarch64-unknown-linux-gnu
+RUN CARGO_HOME=/usr/local rustup target add powerpc-unknown-linux-gnu
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
