@@ -126,8 +126,8 @@ tc_vars:
 	echo TC_ENV += CARGO_HOME=\"/opt/cargo\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"/opt/rustup\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-#	echo TC_ENV += RUSTFLAGS=\"--target=$(RUST_TARGET) -Clinker=$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
 	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_TARGET := $(TC_TARGET) ; \
