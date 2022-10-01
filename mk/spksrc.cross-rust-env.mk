@@ -30,8 +30,3 @@ endif
 ifeq ($(RUST_TARGET),)
 $(error Arch $(ARCH) not supported)
 endif
-
-# Set linker environment variable
-#RUST_LINKER_ENV = CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER
-#ENV += $(RUST_LINKER_ENV)=$(TC_PATH)$(TC_PREFIX)gcc
-#ENV += CARGO_BUILD_TARGET=$(RUST_TARGET)
