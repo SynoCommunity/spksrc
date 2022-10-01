@@ -132,8 +132,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.1" "setuptools-scm==7.0.5" "wheel==0.37.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.1" "setuptools-scm==7.0.5" "wheel==0.37.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cffi==1.15.1" "cryptography==3.3.2" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "cffi==1.15.1" "cryptography==3.3.2" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1"
 #	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= PKG_CONFIG= PKG_CONFIG_LIBDIR= PKG_CONFIG_PATH= build-pip --disable-pip-version-check install "cryptography==38.0.1"
