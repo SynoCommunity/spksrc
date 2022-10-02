@@ -6,3 +6,9 @@
 
 # pycryptodome==3.12.0
 # pycryptodomex==3.12.0
+
+# [cryptography]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+cryptography==38.0.1

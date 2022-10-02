@@ -4,20 +4,14 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# Next update will require rustc
-# cryptography==3.3.2
-cryptography==38.0.1
-#cryptography==35.0.0
-#cryptography==3.4.8
-
 # Requirement for cryptography
-# cffi==1.15.0
+# cffi==1.15.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-# bcrypt==3.2.0
+bcrypt==4.0.0
 # greenlet==1.1.2
 # immutables==0.16
 # MarkupSafe==2.1.1

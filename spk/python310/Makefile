@@ -40,6 +40,10 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 
 include ../../mk/spksrc.common.mk
 
+# [cryptography]
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+
 # [gevent]
 # DEPENDS += cross/libev cross/c-ares
 # ENV += GEVENTSETUP_EMBED_CARES=FALSE
