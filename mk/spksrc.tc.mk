@@ -110,6 +110,7 @@ endif
 .PHONY: tc_vars
 tc_vars:
 	@echo TC_ENV := ; \
+	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
 	for tool in $(TOOLS) ; \
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/') ; \
@@ -137,8 +138,8 @@ tc_vars:
 	echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
-	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
+	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
