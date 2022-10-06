@@ -452,7 +452,7 @@ spkclean:
 wheelclean: spkclean
 	rm -fr work-*/.wheel_done \
 	       work-*/wheelhouse \
-	       work-*/install/**/share/wheelhouse/*
+	       work-*/install/var/packages/**/target/share/wheelhouse
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)
