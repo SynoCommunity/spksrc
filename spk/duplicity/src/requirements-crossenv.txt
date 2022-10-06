@@ -1,12 +1,12 @@
 # pypi source fails as versions either YANKED or uses -postX tag
-#duplicity==0.8.21
+duplicity==0.8.23
 
 # gitlab source fails to generate $version
 # ref: https://gitlab.com/duplicity/duplicity/-/issues/109
-#git+https://gitlab.com/duplicity/duplicity.git@rel.0.8.21#egg=duplicity==0.8.21
+#git+https://gitlab.com/duplicity/duplicity.git@rel.0.8.23#egg=duplicity==0.8.23
 
-# Using launchpad source instead as functional
-https://launchpad.net/duplicity/0.8-series/0.8.21/+download/duplicity-0.8.21.tar.gz#egg=duplicity==0.8.21
+# Using launchpad source as alternate
+#https://launchpad.net/duplicity/0.8-series/0.8.23/+download/duplicity-0.8.23.tar.gz#egg=duplicity==0.8.23
 
 bcrypt==3.2.0
 cffi==1.15.0
