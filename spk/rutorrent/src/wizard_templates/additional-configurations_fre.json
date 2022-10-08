@@ -1,0 +1,16 @@
+[{
+    "step_title": "Configuration additionnelle",
+    "items": [
+        {
+            "type": "multiselect",
+            "desc": "Certaines fonctionnalités de l'interface web nécessitent de désactiver open_basedir (restriction PHP). Certaines tâches ne sont pas effectuées en tant qu'utilisateur http et par conséquent un réglage global a besoin d'être modifié. Voulez vous désactiver open_basedir automatiquement? (La valeur précédente de open_basedir ne sera pas restorée à la désinstallation)",
+            "subitems": [
+                {
+                    "key": "wizard_disable_openbasedir",
+                    "desc": "Disable open_basedir",
+                    "defaultValue": true
+                }
+            ]
+        }
+    ]
+}]
