@@ -34,7 +34,7 @@ validate_preinst ()
             echo "Download directory ${wizard_download_dir} does not exist."
             exit 1
         fi
-        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
+        if [ -n "${wizard_watch_dir}" ] && [ ! -d "${wizard_watch_dir}" ]; then
             echo "Watch directory ${wizard_watch_dir} does not exist."
             exit 1
         fi
@@ -47,11 +47,11 @@ check_acl()
 {
     acl_path=$1
     acl_user=$2
-    acl_permissions=$(synoacltool -get-perm ${acl_path} ${acl_user} | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
-    if [ -z "${acl_permissions}" -o "${acl_permissions}" = "-------------" ]; then
+    acl_permissions=$(synoacltool -get-perm "${acl_path}" "${acl_user}" | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
+    if [ -z "${acl_permissions}" ] || [ "${acl_permissions}" = "-------------" ]; then
         return 1
     else
-        synoacltool -get-perm ${acl_path} ${acl_user}
+        synoacltool -get-perm "${acl_path}" "${acl_user}"
         return 0
     fi
 }
@@ -90,16 +90,16 @@ fix_shared_folders_rights()
 service_postinst ()
 {
     # Install busybox stuff
-    ${SYNOPKG_PKGDEST}/bin/busybox --install ${SYNOPKG_PKGDEST}/bin
+    "${SYNOPKG_PKGDEST}/bin/busybox" --install ${SYNOPKG_PKGDEST}/bin
 
     syno_user_add_to_legacy_group "${EFF_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
 
     # Install the web interface
-    cp -pR ${SYNOPKG_PKGDEST}/share/${PACKAGE} ${WEB_DIR}
+    cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR}
 
     # Allow direct-user access to rtorrent configuration file
-    mv ${SYNOPKG_PKGVAR}/.rtorrent.rc ${RTORRENT_RC}
-    ln -s -T -f ${RTORRENT_RC} ${SYNOPKG_PKGVAR}/.rtorrent.rc
+    mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" ${RTORRENT_RC}
+    ln -s -T -f "${RTORRENT_RC}" "${SYNOPKG_PKGVAR}/.rtorrent.rc"
 
     # Configure open_basedir
     if [ "${APACHE_USER}" == "nobody" ]; then
@@ -112,8 +112,8 @@ service_postinst ()
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        TOP_DIR=`echo "${wizard_download_dir:=/volume1/downloads}" | cut -d "/" -f 2`
-        MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
+        TOP_DIR=$(echo "${wizard_download_dir:=/volume1/downloads}" | cut -d "/" -f 2)
+        MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
@@ -132,7 +132,7 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_download_dir:=/volume1/downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
-               ${RTORRENT_RC}
+               "${RTORRENT_RC}"
 
         if [ -d "${wizard_watch_dir}" ]; then
             sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${RTORRENT_RC}
@@ -188,33 +188,33 @@ service_postuninst ()
 service_save ()
 {
     # Revision 8 introduces backward incompatible changes
-    if [ `echo ${SYNOPKG_OLD_PKGVER} | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
+    if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -le 8 ]; then
         sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${RTORRENT_RC}
     fi
 
     # Save the configuration file
-    mv ${WEB_DIR}/${PACKAGE}/conf/config.php ${TMP_DIR}/
+    mv "${WEB_DIR}/${PACKAGE}/conf/config.php" "${TMP_DIR}/"
     if [ -f "${WEB_DIR}/${PACKAGE}/.htaccess" ]; then
         mv "${WEB_DIR}/${PACKAGE}/.htaccess" "${TMP_DIR}/"
     fi
 
     # Save session files
-    mv ${SYNOPKG_PKGVAR}/.session ${TMP_DIR}/
+    mv "${SYNOPKG_PKGVAR}/.session" "${TMP_DIR}/"
 
     # Save rtorrent configuration file (new location)
-    if [ -L ${SYNOPKG_PKGVAR}/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
-       mv ${RTORRENT_RC} ${TMP_DIR}/
+    if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] || [ -f "${RTORRENT_RC}" ]; then
+       mv "${RTORRENT_RC}" ${TMP_DIR}/
     # Save rtorrent configuration file (old location -> prior to symlink)
-    elif [ ! -L ${SYNOPKG_PKGVAR}/.rtorrent.rc -a -f ${SYNOPKG_PKGVAR}/.rtorrent.rc ]; then
-       mv ${SYNOPKG_PKGVAR}/.rtorrent.rc ${TMP_DIR}/rtorrent.rc
+    elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
+       mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${TMP_DIR}/rtorrent.rc"
     fi
 
     # Save rutorrent share directory
-    mv ${WEB_DIR}/${PACKAGE}/share ${TMP_DIR}/
+    mv "${WEB_DIR}/${PACKAGE}/share" "${TMP_DIR}/"
 
     # Save plugins directory for any user-added plugins
-    mv ${WEB_DIR}/${PACKAGE}/conf/plugins.ini ${TMP_DIR}/
-    mv ${WEB_DIR}/${PACKAGE}/plugins ${TMP_DIR}/
+    mv "${WEB_DIR}/${PACKAGE}/conf/plugins.ini" "${TMP_DIR}/"
+    mv "${WEB_DIR}/${PACKAGE}/plugins" "${TMP_DIR}/"
 
     return 0
 }
@@ -245,32 +245,32 @@ service_restore ()
     fi
 
     echo "Restoring rtorrent configuration ${RTORRENT_RC}"
-    mv ${TMP_DIR}/rtorrent.rc ${RTORRENT_RC}
+    mv "${TMP_DIR}/rtorrent.rc" "${RTORRENT_RC}"
     # http_cacert command has been moved to network.http.cacert
-    if [ ! `grep 'http_cacert = ' "${RTORRENT_RC}" | wc -l` -eq 0 ]; then
+    if [ ! "$(grep -c 'http_cacert = ' "${RTORRENT_RC}")" -eq 0 ]; then
         sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC}
     fi
 
     echo "Restoring rtorrent session files ${SYNOPKG_PKGVAR}/.session"
-    mv ${TMP_DIR}/.session ${SYNOPKG_PKGVAR}
+    mv "${TMP_DIR}/.session" "${SYNOPKG_PKGVAR}"
     set_unix_permissions "${SYNOPKG_PKGVAR}"
 
     echo "Restoring rutorrent web shared directory ${WEB_DIR}/${PACKAGE}/share"
-    cp -pnr ${TMP_DIR}/share ${WEB_DIR}/${PACKAGE}/
+    cp -pnr "${TMP_DIR}/share" "${WEB_DIR}/${PACKAGE}/"
     fix_shared_folders_rights "${WEB_DIR}/${PACKAGE}/share"
     # Remove unecessary backup files post-recovery
-    rm -fr ${TMP_DIR}/share
+    rm -fr "${TMP_DIR}/share"
 
     echo "Restoring rutorrent custom plugins configuration ${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
-    mv ${TMP_DIR}/plugins.ini ${WEB_DIR}/${PACKAGE}/conf/
+    mv "${TMP_DIR}/plugins.ini" "${WEB_DIR}/${PACKAGE}/conf/"
     set_unix_permissions "${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
     chmod 0644 "${WEB_DIR}/${PACKAGE}/conf/plugins.ini"
 
     echo "Restoring rutorrent custom plugins ${WEB_DIR}/${PACKAGE}/plugins"
-    cp -pnr ${TMP_DIR}/plugins ${WEB_DIR}/${PACKAGE}/
+    cp -pnr "${TMP_DIR}/plugins" "${WEB_DIR}/${PACKAGE}/"
     set_unix_permissions "${WEB_DIR}/${PACKAGE}/plugins"
     # Remove unecessary backup files post-recovery
-    rm -fr ${TMP_DIR}/plugins
+    rm -fr "${TMP_DIR}/plugins"
 
     echo "Restoring rutorrent global configuration ${WEB_DIR}/${PACKAGE}/conf/config.php"
     mv -f "${TMP_DIR}/config.php" "${WEB_DIR}/${PACKAGE}/conf/"
@@ -282,43 +282,43 @@ service_restore ()
 
     # In previous versions the python entry had nothing defined, 
     # here we define it if, and only if, python3 is actually installed
-    if [ -f "${PYTHON_DIR}/python3" ] && `is_not_defined_external_program 'python'`; then
+    if [ -f "${PYTHON_DIR}/python3" ] && is_not_defined_external_program 'python'; then
         define_external_program 'python' "${SYNOPKG_PKGDEST}/env/bin/python3" '/usr/bin/python3'
     fi
 
     # In previous versions the pgrep entry had nothing defined
-    if `is_not_defined_external_program 'pgrep'`; then
+    if is_not_defined_external_program 'pgrep'; then
         define_external_program 'pgrep' "${SYNOPKG_PKGDEST}/bin/pgrep" '/usr/bin/pgrep'
     fi
 
     # In previous versions the sox entry had nothing defined
-    if `is_not_defined_external_program 'sox'`; then
+    if is_not_defined_external_program 'sox'; then
         define_external_program 'sox' "${SYNOPKG_PKGDEST}/bin/sox" '/usr/bin/sox'
     fi
 
     # In previous versions the mediainfo entry had nothing defined
-    if `is_not_defined_external_program 'mediainfo'`; then
+    if is_not_defined_external_program 'mediainfo'; then
         define_external_program 'mediainfo' "${SYNOPKG_PKGDEST}/bin/mediainfo" '/usr/bin/mediainfo'
     fi
 
     # In previous versions the stat entry had nothing defined
-    if `is_not_defined_external_program 'stat'`; then
+    if is_not_defined_external_program 'stat'; then
         define_external_program 'stat' '/bin/stat' '/usr/bin/stat'
     fi
 
-    if `is_not_defined_external_program 'id'`; then
+    if is_not_defined_external_program 'id'; then
         define_external_program 'id' '/bin/id' '/usr/bin/id'
     fi
 
-    if `is_not_defined_external_program 'gzip'`; then
+    if is_not_defined_external_program 'gzip'; then
         define_external_program 'gzip' '/bin/gzip' '/usr/bin/gzip'
     fi
 
-    if `is_not_defined_external_program 'curl'`; then
+    if is_not_defined_external_program 'curl'; then
         define_external_program 'curl' "${SYNOPKG_PKGDEST}/bin/curl" '/usr/bin/curl'
     fi
 
-    if `is_not_defined_external_program 'php'`; then
+    if is_not_defined_external_program 'php'; then
         define_external_program 'php' '/bin/php' '/usr/bin/php'
     fi
 
