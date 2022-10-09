@@ -42,7 +42,7 @@ include ../../mk/spksrc.common.mk
 
 # [cryptography]
 # To generate py36-abi3 limited API:
-#DEPENDS += cross/cryptography
+DEPENDS += cross/cryptography
 # To generate py310-py310 regular build using src/requirements-crossenv.txt:
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
