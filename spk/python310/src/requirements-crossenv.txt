@@ -23,7 +23,6 @@ immutables==0.19
 MarkupSafe==2.1.1
 msgpack-python==0.5.6
 netifaces==0.11.0
-psutil==5.9.2
 regex==2022.9.13
 SQLAlchemy==1.4.41
 zope.interface==5.4.0
@@ -62,6 +61,10 @@ numpy==1.21.5
 # Require --global-options arguments
 #  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
 Pillow==9.2.0
+
+# [psutil]
+# Last known version to build on armv5/ppc
+psutil==5.9.1
 
 # [pycares]
 # Depends: c-ares
