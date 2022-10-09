@@ -35,7 +35,7 @@ ifeq ($(strip $(CROSSENV)),)
 	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
 else
 # Python 3 case: using crossenv helper
-	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
+	@. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) python3 setup.py $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
 endif
 	@$(RUN) echo "$(PKG_NAME)==$(PKG_VERS)" >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)
 
