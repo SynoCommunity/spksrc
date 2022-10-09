@@ -132,31 +132,31 @@ include ../../mk/spksrc.spk.mk
 # # Last known working version: 1.21.5
 # # gcc-4.6.4 failed with exit status 1
 # # https://github.com/numpy/numpy/issues/20664
-# UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 # [numpy]
 # Fix wheel building with older compilers
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-WHEELS_CPPFLAGS = [numpy] -std=c++0x
+WHEELS_CPPFLAGS += [numpy] -std=c++0x
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS = [numpy] -O0
+WHEELS_CFLAGS += [numpy] -O0
 endif
 endif
 
 # [pycryptodome]
 ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-WHEELS_CFLAGS = [pycryptodome] -std=c11
+WHEELS_CFLAGS += [pycryptodome] -std=c11
 else
-WHEELS_CFLAGS = [pycryptodome] -std=c99
+WHEELS_CFLAGS += [pycryptodome] -std=c99
 endif
 
 # [pycryptodomex]
 ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-WHEELS_CFLAGS = [pycryptodomex] -std=c11
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
-WHEELS_CFLAGS = [pycryptodomex] -std=c99
+WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
 
 .PHONY: python310_extra_install
