@@ -66,6 +66,11 @@ CONFIGURE_ARGS += --with-system-expat
 DEPENDS += cross/libffi
 CONFIGURE_ARGS += --with-system-ffi
 
+# PYO3 variable for cross-compiling
+# cryptography through rustc
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
@@ -134,10 +139,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cryptography==38.0.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/ PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/ pip --disable-pip-version-check install "cryptography==38.0.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1" "cryptography==38.0.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1" "cryptography==38.0.1"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
