@@ -18,4 +18,7 @@ LICENSE  = BSD/ASL2
 
 WHEELS_BUILD_ARGS = --py-limited-api=$(PYTHON_LIMITED_API)
 
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+
 include ../../mk/spksrc.python-wheel.mk
