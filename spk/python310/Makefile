@@ -128,7 +128,7 @@ include ../../mk/spksrc.spk.mk
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 # endif
 
-# [numpy]
+# [numpy] >= 1.21.5
 # # Last known working version: 1.21.5
 # # gcc-4.6.4 failed with exit status 1
 # # https://github.com/numpy/numpy/issues/20664
