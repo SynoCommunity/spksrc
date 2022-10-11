@@ -65,7 +65,7 @@ endif
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
-  CMAKE_PATH = $(realpath $(PWD)/work-$(ARCH)-$(TCVERSION)/../../../native/cmake/work-native/install/usr/local/bin)
+  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
@@ -73,8 +73,8 @@ endif
 # Use native cmake (Debian 10 "Buster")
 ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
   BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(realpath $(PWD)/work-$(ARCH)-$(TCVERSION)/../../../native/cmake-legacy/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):$$PATH
+  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake-legacy/work-native/install/usr/local/bin)
+  ENV += PATH=$(CMAKE_PATH):toto:$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
 

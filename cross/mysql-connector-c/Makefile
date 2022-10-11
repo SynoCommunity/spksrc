@@ -17,7 +17,7 @@ USE_NATIVE_CMAKE_LEGACY = 1
 include ../../mk/spksrc.cross-cmake.mk
 
 # give access to comp_err binary on host
-ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$(CMAKE_PATH):$$PATH
 
 # Mandatory for build
 CMAKE_ARGS += -DHAVE_LLVM_LIBCPP_EXITCODE=1 
