@@ -8,7 +8,7 @@
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==38.0.1
+# cryptography==38.0.1
 
 # Requirement for cryptography
 # cffi==1.15.1
@@ -43,7 +43,7 @@ cryptography==38.0.1
 # Require environment variables
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
-mysqlclient==2.1.1
+# mysqlclient==2.1.1
 
 # [numpy]
 #   - armv5 (88f6281-6.1) Last known working version

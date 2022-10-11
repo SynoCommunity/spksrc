@@ -20,7 +20,7 @@ LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
-#ENV += PYTHON_OPTIMIZE=1
+ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
@@ -30,7 +30,7 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-#WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
@@ -38,13 +38,13 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 ## various wheels.  Uncoment to enable.
 ##
 
-# [cryptography]
-# To generate py36-abi3 limited API:
-DEPENDS += cross/cryptography
-# To generate py310-py310 regular build using src/requirements-crossenv.txt:
-# NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# # [cryptography]
+# # To generate py36-abi3 limited API:
+# DEPENDS += cross/cryptography
+# # To generate py310-py310 regular build using src/requirements-crossenv.txt:
+# # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
+# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # # [gevent]
 # DEPENDS += cross/libev cross/c-ares
@@ -55,10 +55,10 @@ ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # DEPENDS += cross/libxml2
 # DEPENDS += cross/libxslt
 
-# [mysqlclient]
-DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+# # [mysqlclient]
+# DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+# ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+# ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 # # [Pillow]
 # DEPENDS += cross/freetype cross/libjpeg cross/zlib
