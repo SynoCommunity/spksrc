@@ -56,9 +56,9 @@ ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # DEPENDS += cross/libxslt
 
 # [mysqlclient]
-#DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-#ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-#ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 # # [Pillow]
 # DEPENDS += cross/freetype cross/libjpeg cross/zlib

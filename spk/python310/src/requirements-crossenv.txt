@@ -43,7 +43,7 @@ cryptography==38.0.1
 # Require environment variables
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
-#mysqlclient==2.1.1
+mysqlclient==2.1.1
 
 # [numpy]
 #   - armv5 (88f6281-6.1) Last known working version
