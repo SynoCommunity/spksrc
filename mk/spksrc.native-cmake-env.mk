@@ -21,7 +21,7 @@ endif
 # set default ASM build environment
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
-  NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
+  NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
   ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
   CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
