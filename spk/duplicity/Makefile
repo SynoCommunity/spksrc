@@ -9,6 +9,10 @@ DEPENDS = cross/librsync cross/duply
 # [cryptography]
 DEPENDS += cross/cryptography
 
+# [bcrypt]
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
