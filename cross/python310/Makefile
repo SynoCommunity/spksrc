@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.6
+PKG_VERS = 3.10.8
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -66,6 +66,11 @@ CONFIGURE_ARGS += --with-system-expat
 DEPENDS += cross/libffi
 CONFIGURE_ARGS += --with-system-ffi
 
+# PYO3 variable for cross-compiling
+# cryptography through rustc
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
@@ -128,12 +133,14 @@ python310_install:
 python310_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $${CC} --cxx $${CXX} --ar $${AR} --sysroot $${SYSROOT} --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.1" "setuptools-scm==7.0.5" "wheel==0.37.1" "cffi==1.15.1" "cryptography==3.3.2" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.1" "setuptools-scm==7.0.5" "wheel==0.37.1" "cffi==1.15.1" "cryptography==3.3.2" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1" "cryptography==38.0.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1" "cryptography==38.0.1"
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

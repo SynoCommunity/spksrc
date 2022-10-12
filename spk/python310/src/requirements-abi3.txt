@@ -4,5 +4,9 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# pycryptodome==3.12.0
-# pycryptodomex==3.12.0
+# [pycryptodome] + [pycryptodomex]
+# Require:
+#    - CFLAGS=-sdt=c99 <  gcc-4.9
+#    - CFLAGS=-sdt=c11 >= gcc-4.9
+# pycryptodome==3.15.0
+# pycryptodomex==3.15.0

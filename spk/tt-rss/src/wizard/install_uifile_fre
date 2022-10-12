@@ -1,6 +1,24 @@
 [{
     "step_title": "Configuration de la base de donnée de tt-rss",
     "items": [{
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_run_migration",
+            "desc": "Run migration",
+            "defaultValue": false,
+            "hidden": true
+        }, {
+            "key": "wizard_create_db",
+            "desc": "Creates initial DB",
+            "defaultValue": true,
+            "hidden": true
+        }, {
+            "key": "mysql_grant_user",
+            "desc": "Configures user rights",
+            "defaultValue": true,
+            "hidden": true
+        }]
+    }, {
         "type": "password",
         "desc": "Saisissez votre mot de passe MySQL.",
         "subitems": [{
@@ -34,12 +52,9 @@
     }]
 }, {
     "step_title": "WebStation PHP Configuration",
-    "items": [
-        {
-            "desc": "Tiny Tiny RSS requiert que les extensions PHP suivantes soient activ&eacute;es pour le profil PHP courant (configurables dans <code>Web Station</code> &gt; <code>Param&egrave;tres PHP</code> dans l'onglet <code>Param&egrave;tres de serveur par d&eacute;faut</code>):"
-        },
-        {
-            "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
-        }
-    ]
+    "items": [{
+        "desc": "Tiny Tiny RSS requiert que les extensions PHP suivantes soient activ&eacute;es pour le profil PHP courant (configurables dans <code>Web Station</code> &gt; <code>Param&egrave;tres PHP</code> dans l'onglet <code>Param&egrave;tres de serveur par d&eacute;faut</code>):"
+    }, {
+        "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
+    }]
 }]

@@ -1,0 +1,53 @@
+[{
+    "step_title": "Tt-rss database configuration",
+    "items": [{
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_run_migration",
+            "desc": "Run migration",
+            "defaultValue": false,
+            "hidden": true
+        }, {
+            "key": "wizard_create_db",
+            "desc": "Creates initial DB",
+            "defaultValue": true,
+            "hidden": true
+        }, {
+            "key": "mysql_grant_user",
+            "desc": "Configures user rights",
+            "defaultValue": true,
+            "hidden": true
+        }]
+    }, {
+        "type": "password",
+        "desc": "Enter your MySQL password.",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "Root password"
+        }]
+    }, {
+        "type": "password",
+        "desc": "A 'ttrss' MySQL user and database will be created. Please enter a password for the 'ttrss' user.",
+        "subitems": [{
+            "key": "wizard_mysql_password_ttrss",
+            "desc": "Ttrss password"
+        }]
+    }]
+}, {
+    "step_title": "Tt-rss configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Domain name of your DiskStation. For example: you.synology.me.",
+        "subitems": [{
+            "key": "wizard_domain_name",
+            "desc": "Domain name"
+        }]
+    }, {
+        "type": "multiselect",
+        "desc": "Enable single user mode. If you do not use this mode, default login is 'admin' with password 'password'.",
+        "subitems": [{
+            "key": "wizard_single_user",
+            "desc": "Singler user"
+        }]
+    }]
+}]
