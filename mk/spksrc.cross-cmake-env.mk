@@ -74,7 +74,7 @@ endif
 ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
   BUILD_DEPENDS += native/cmake-legacy
   CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake-legacy/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):toto:$$PATH
+  ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
 
@@ -91,7 +91,7 @@ endif
 # resulting in inability to set in toolchain file
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
-  NASM_PATH = $(realpath $(PWD)/work-$(ARCH)-$(TCVERSION)/../../../native/nasm/work-native/install/usr/local/bin)
+  NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
   export PATH := $(NASM_PATH):$(PATH)
   ENV += AS=$(NASM_PATH)/nasm
   ENABLE_ASSEMBLY = ON
