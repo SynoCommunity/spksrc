@@ -19,7 +19,7 @@ msgpack==1.0.4
 msgpack-python==0.5.6
 netifaces==0.11.0
 protobuf==4.21.7
-psutil==5.9.2
+psutil==5.9.1
 PyNaCl==1.5.0
 PyYAML==6.0
 simplejson==3.17.6
