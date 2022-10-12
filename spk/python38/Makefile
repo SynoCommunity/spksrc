@@ -8,7 +8,7 @@ DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/setuptools cross/pip cross/wheel
 # Cross-compiled wheels
 DEPENDS += cross/bcrypt cross/cffi
-DEPENDS += cross/cryptography cross/greenlet cross/immutables
+DEPENDS += cross/cryptography-legacy cross/greenlet cross/immutables
 DEPENDS += cross/lxml cross/msgpack-python
 DEPENDS += cross/pycrypto cross/pycurl
 DEPENDS += cross/pyyaml cross/ruamel.yaml cross/sqlite

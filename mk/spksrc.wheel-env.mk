@@ -39,9 +39,9 @@ WHEELS_DEFAULT_REQUIREMENT = $(WHEELS_CROSSENV_COMPILE)
 endif
 
 # For generating abi3 wheels with limited
-# python API (e.g cp35 = Python 3.5)
+# python API (e.g cp36 = Python 3.6)
 ifeq ($(strip $(PYTHON_LIMITED_API)),)
-PYTHON_LIMITED_API = cp35
+PYTHON_LIMITED_API = cp36
 endif
 
 #

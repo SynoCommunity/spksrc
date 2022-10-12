@@ -4,25 +4,27 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# Next update will require rustc
-# cryptography==3.3.2
+# [cryptography]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# cryptography==38.0.1
 
 # Requirement for cryptography
-# cffi==1.15.0
+# cffi==1.15.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-# bcrypt==3.2.0
-# greenlet==1.1.2
-# immutables==0.16
+# bcrypt==4.0.0
+# greenlet==1.1.3
+# immutables==0.19
 # MarkupSafe==2.1.1
 # msgpack-python==0.5.6
 # netifaces==0.11.0
-# psutil==5.9.0
-# regex==2022.3.15
-# SQLAlchemy==1.4.32
+# regex==2022.9.13
+# SQLAlchemy==1.4.41
 # zope.interface==5.4.0
 
 # [gevent]
@@ -32,55 +34,46 @@
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
 # gevent==21.12.0
 
-# [libtorrent] 1.2.16
-# Depends: openssl, boost 1.70, geoip, libiconv
-# Require environment variables
-#  BOOST_LIBRARIES
-#  BOOST_BUILD_PATH
-# git+https://github.com/arvidn/libtorrent.git@v1.2.16#egg=libtorrent==1.2.16
-
-# [libtorrent] 2.0.6
-# Depends: openssl, boost 1.78, geoip
-# Require environment variables
-#  BOOST_LIBRARIES
-#  BOOST_BUILD_PATH
-# Only supported on DSM7 armv7, aarch64, x64
-# git+https://github.com/arvidn/libtorrent.git@v2.0.6#egg=libtorrent==2.0.6
-# Use RC_2_0 for latest development snapshots
-# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.6
-
 # [lxml]
 # Depends: libxml2, libxslt
-# lxml==4.8.0
+# lxml==4.9.1
 
 # [mysqlclient]
 # Depends: mysql-connector-c, mariadb-connector-c
 # Require environment variables
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
-# mysqlclient==2.1.0
+# mysqlclient==2.1.1
 
 # [numpy]
 #   - armv5 (88f6281-6.1) Last known working version
-# numpy==1.21.5
+# numpy==1.21.6
+
+# [numpy]
+#   - armv7L (hi3535-6.1) Last known working version
+# numpy==1.22.4
 
 # [numpy]
 #   - Require Cython in cross/python310 crossenv
 #   - DSM6 require WHEELS_CFLAGS=-std=c++0x
 #   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
 #     ref: https://github.com/numpy/numpy/issues/13622
-# numpy==1.22.3
+# numpy==1.23.3
 
 # [Pillow]
 # Require --global-options arguments
 #  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
-# Pillow==9.0.1
+# Pillow==9.2.0
+
+# [psutil]
+# Last known version to build on armv5/ppc
+# psutil==5.9.1
 
 # [pycares]
 # Depends: c-ares
 # Require environment variables
 #  PYCARES_USE_SYSTEM_LIB=1
-# pycares==4.1.2
+# pycares==4.2.2
 
 # [pycurl]
 # Depends: curl
@@ -105,7 +98,7 @@
 
 # [ujson]
 #   - Require setuptools-scm in cross/python310 crossenv
-# ujson==5.1.0
+# ujson==5.5.0
 
 # [webrtcvad]
 # webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
