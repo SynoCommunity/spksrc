@@ -92,8 +92,9 @@ endif
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
   NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-  export PATH := $(NASM_PATH):$(PATH)
+  ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
+  export PATH := $(NASM_PATH):$(PATH)
   ENABLE_ASSEMBLY = ON
   CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
 else
