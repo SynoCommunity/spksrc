@@ -8,7 +8,7 @@ BUILD_DEPENDS = cross/python310
 SPK_DEPENDS = "python310>=3.10.8"
 
 # [lxml]
-DEPENDS += cross/libxml2Ch
+DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
 # [PyNaCl]
