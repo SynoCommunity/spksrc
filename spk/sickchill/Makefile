@@ -1,11 +1,11 @@
 SPK_NAME = sickchill
-SPK_VERS = 20221008
+SPK_VERS = 20221013
 SPK_REV = 6
 SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python310
 
-SPK_DEPENDS = "python310>=3.10.8"
+SPK_DEPENDS = "python310"
 
 # [lxml]
 DEPENDS += cross/libxml2
