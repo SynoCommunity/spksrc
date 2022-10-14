@@ -1,4 +1,4 @@
-sickchill==2022.10.8
+sickchill==2022.10.13
 
 appdirs==1.4.4
 babelfish==0.6.0
