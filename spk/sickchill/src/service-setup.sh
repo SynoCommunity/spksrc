@@ -36,8 +36,7 @@ service_postinst() {
 
     echo ${separator}
     install_python_wheels
-     # --find-links=https://wheel-index.linuxserver.io/ubuntu/ --extra-index-url=https://www.piwheels.org/simple
-    
+
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_config
     fi
@@ -56,10 +55,12 @@ service_postupgrade() {
 
 service_preupgrade ()
 {
-    # We have to reset /env folder to 3.10 so remove entire folder as it gets rebuilt in postinst and this avoids any conflicts.
-    # Revision 1 was python 3.7. For cleaner update remove share and lib folders for clean install, leave user data /var.
+    # We have to reset /env for Python and package changes, it gets rebuilt in postinst and this avoids any conflicts.
+    # For cleaner update remove bin, env, share and lib folders for fresh install, leave user data /var & /@appdata
+
     if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ] && [ "$(echo ${SYNOPKG_OLD_PKGVER} | sed -r 's/^.*-([0-9]+)$/\1/')" -le 1 ]; then
         echo "Removing old ${SYNOPKG_PKGDEST}/env and /share for new Python 3.10 and old install"
+        rm -rf ${SYNOPKG_PKGDEST}/bin
         rm -rf ${SYNOPKG_PKGDEST}/env
         rm -rf ${SYNOPKG_PKGDEST}/share
         rm -rf ${SYNOPKG_PKGDEST}/lib
