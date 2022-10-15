@@ -1,16 +1,26 @@
 SPK_NAME = memcached
 SPK_VERS = 1.6.15
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/memcached.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/phpmemcachedadmin cross/$(SPK_NAME)
+# Only required for pre DSM 7 versions
+OPTIONAL_DEPENDS = cross/busybox
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
+DEPENDS += cross/busybox
+BUSYBOX_CONFIG = usrmng
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+endif
 
 MAINTAINER = Diaoul
 DESCRIPTION = Free \& open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load. It comes with phpMemcachedAdmin, a graphic stand-alone administration for memcached to monitor and debug purpose.
 ADMIN_URL = /phpMemcachedAdmin/
 DISPLAY_NAME = Memcached
-CHANGELOG = "1. Update memcached from v1.4.13 to v1.6.15.<br/>2. Add DSM 7 compliance."
+CHANGELOG = "Fix DSM 6 integration"
 
 HOMEPAGE = https://memcached.org/
 LICENSE  = 3-Clause BSD
