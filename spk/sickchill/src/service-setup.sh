@@ -1,12 +1,12 @@
+PACKAGE="sickchill"
+TMP_DIR="/tmp/${PACKAGE}"
 PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 HOME="${SYNOPKG_PKGVAR}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
-SC_INSTALL_DIR="${SYNOPKG_PKGDEST}/share/SickChill"
 SC_BINARY="${SYNOPKG_PKGDEST}/env/bin/SickChill"
 SC_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 SC_CFG_FILE="${SC_DATA_DIR}/config.ini"
-
 
 GROUP="sc-download"
 
@@ -41,15 +41,19 @@ service_postinst() {
         set_config
     fi
 
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         set_unix_permissions "${SYNOPKG_PKGDEST}"
     fi
 }
 
 service_postupgrade() {
     set_config
-    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-        set_unix_permissions "${SYNOPKG_PKGDEST}"
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ]; then
+        mv ${TMP_DIR}/var ${SYNOPKG_PKGDEST}/
+        rm -rf ${TMP_DIR}
+      fi
+      set_unix_permissions "${SYNOPKG_PKGDEST}"
     fi
 }
 
@@ -58,11 +62,10 @@ service_preupgrade ()
     # We have to reset /env for Python and package changes, it gets rebuilt in postinst and this avoids any conflicts.
     # For cleaner update remove bin, env, share and lib folders for fresh install, leave user data /var & /@appdata
 
-    if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ] && [ "$(echo ${SYNOPKG_OLD_PKGVER} | sed -r 's/^.*-([0-9]+)$/\1/')" -le 1 ]; then
-        echo "Removing old ${SYNOPKG_PKGDEST}/env and /share for new Python 3.10 and old install"
-        rm -rf ${SYNOPKG_PKGDEST}/bin
-        rm -rf ${SYNOPKG_PKGDEST}/env
-        rm -rf ${SYNOPKG_PKGDEST}/share
-        rm -rf ${SYNOPKG_PKGDEST}/lib
+    if [ "${SYNOPKG_PKG_STATUS}" != "INSTALL" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+        echo "Moving data ${SYNOPKG_PKGDEST}/var to ${TMP_DIR} whilst upgrading"
+        rm -rf ${TMP_DIR}
+        mkdir -p ${TMP_DIR}
+        mv ${SYNOPKG_PKGDEST}/var ${TMP_DIR}/
     fi
 }
