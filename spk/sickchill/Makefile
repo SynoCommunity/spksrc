@@ -31,6 +31,7 @@ HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
 
 SERVICE_USER = auto
+
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8081
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
