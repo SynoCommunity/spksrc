@@ -30,7 +30,7 @@ CHANGELOG = "Switched to a wheel based install, as source and git installs are n
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
 
-SERVICE_USER = AUTO
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8081
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
