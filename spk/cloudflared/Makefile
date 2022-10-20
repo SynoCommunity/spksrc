@@ -1,5 +1,5 @@
 SPK_NAME = cloudflared
-SPK_VERS = 2022.9.0
+SPK_VERS = 2022.10.2
 SPK_REV = 3
 SPK_ICON = src/cloudflared.png
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ DISPLAY_NAME = cloudflared
 DESCRIPTION = Cloudflare Tunnel client (formerly Argo Tunnel).
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 LICENSE = Apache-2.0
-CHANGELOG = "Update to 2022.9.0"
+CHANGELOG = "Update to 2022.10.2"
 
 WIZARDS_DIR = src/wizard/
 
