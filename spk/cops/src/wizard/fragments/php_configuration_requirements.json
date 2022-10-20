@@ -1,0 +1,11 @@
+[{
+    "step_title": "PHP Configuration Requirements",
+    "items": [
+        {
+            "desc": "The below PHP extensions are required for COPS to operate (in WebStation):"
+        },
+        {
+            "desc": "<ul><li>gd</li><li>intl</li><li>pdo_sqlite</li><li>sqlite3</li></ul>"
+        }
+    ]
+}]

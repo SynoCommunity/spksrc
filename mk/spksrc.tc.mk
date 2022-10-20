@@ -32,6 +32,8 @@ TC_LOCAL_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
+include ../../mk/spksrc.cross-rust-env.mk
+
 include ../../mk/spksrc.download.mk
 
 checksum: download
@@ -108,6 +110,7 @@ endif
 .PHONY: tc_vars
 tc_vars:
 	@echo TC_ENV := ; \
+	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
 	for tool in $(TOOLS) ; \
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/') ; \
@@ -121,6 +124,11 @@ tc_vars:
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
 	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
+	echo TC_ENV += CARGO_HOME=\"/opt/cargo\" ; \
+	echo TC_ENV += RUSTUP_HOME=\"/opt/rustup\" ; \
+	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
 	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_TARGET := $(TC_TARGET) ; \
@@ -130,8 +138,8 @@ tc_vars:
 	echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
-	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
+	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \

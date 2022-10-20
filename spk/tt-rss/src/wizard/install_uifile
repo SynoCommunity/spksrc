@@ -1,6 +1,24 @@
 [{
     "step_title": "Tt-rss database configuration",
     "items": [{
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_run_migration",
+            "desc": "Run migration",
+            "defaultValue": false,
+            "hidden": true
+        }, {
+            "key": "wizard_create_db",
+            "desc": "Creates initial DB",
+            "defaultValue": true,
+            "hidden": true
+        }, {
+            "key": "mysql_grant_user",
+            "desc": "Configures user rights",
+            "defaultValue": true,
+            "hidden": true
+        }]
+    }, {
         "type": "password",
         "desc": "Enter your MySQL password.",
         "subitems": [{
@@ -34,12 +52,9 @@
     }]
 }, {
     "step_title": "WebStation PHP Profile",
-    "items": [
-        {
-            "desc": "Tiny Tiny RSS requires the following PHP extensions to be enabled for the current PHP profile (under <code>Web Station</code> &gt; <code>PHP Settings</code> in tab <code>Default Server Settings</code>):"
-        },
-        {
-            "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
-        }
-    ]
+    "items": [{
+        "desc": "Tiny Tiny RSS requires the following PHP extensions to be enabled for the current PHP profile (under <code>Web Station</code> &gt; <code>PHP Settings</code> in tab <code>Default Server Settings</code>):"
+    }, {
+        "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
+    }]
 }]

@@ -1,0 +1,6 @@
+# [libtorrent] 1.2.17
+# Depends: openssl, boost 1.78, geoip, libiconv
+# Require environment variables
+#  BOOST_LIBRARIES
+#  BOOST_BUILD_PATH
+git+https://github.com/arvidn/libtorrent.git@v1.2.17#egg=libtorrent==1.2.17

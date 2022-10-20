@@ -438,18 +438,21 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
-	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
 	       work-*/tc_vars.mk \
 	       work-*/tc_vars.cmake \
-	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
+
+wheelclean: spkclean
+	rm -fr work-*/.wheel_done \
+	       work-*/wheelhouse \
+	       work-*/install/var/packages/**/target/share/wheelhouse
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)

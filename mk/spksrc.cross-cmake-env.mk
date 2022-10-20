@@ -62,11 +62,20 @@ CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=$(CMAKE_BUILD_WITH_INSTALL_RPATH)
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=$(BUILD_SHARED_LIBS)
 endif
 
-# Use native cmake
+# Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
   CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
+  export PATH := $(CMAKE_PATH):$(PATH)
+endif
+
+# Use native cmake (Debian 10 "Buster")
+ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
+  BUILD_DEPENDS += native/cmake-legacy
+  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake-legacy/work-native/install/usr/local/bin)
+  ENV += PATH=$(CMAKE_PATH):$$PATH
+  export PATH := $(CMAKE_PATH):$(PATH)
 endif
 
 # Use ninja to build
@@ -82,9 +91,10 @@ endif
 # resulting in inability to set in toolchain file
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   DEPENDS += native/nasm
-  NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
+  NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
   ENV += PATH=$(NASM_PATH):$$PATH
   ENV += AS=$(NASM_PATH)/nasm
+  export PATH := $(NASM_PATH):$(PATH)
   ENABLE_ASSEMBLY = ON
   CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
 else

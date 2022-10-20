@@ -12,7 +12,12 @@ HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
 LICENSE  = GNU GPLv2
 
+USE_NATIVE_CMAKE_LEGACY = 1
+
 include ../../mk/spksrc.cross-cmake.mk
+
+# give access to comp_err binary on host
+ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$(CMAKE_PATH):$$PATH
 
 # Mandatory for build
 CMAKE_ARGS += -DHAVE_LLVM_LIBCPP_EXITCODE=1 
@@ -41,6 +46,3 @@ CMAKE_ARGS += -DWITH_ZLIB=system
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),)
 CMAKE_ARGS += -DHAVE_GCC_ATOMIC_BUILTINS=1
 endif
-
-# give access to comp_err binary on host
-ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$$PATH
