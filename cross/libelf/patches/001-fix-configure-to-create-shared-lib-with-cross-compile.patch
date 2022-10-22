@@ -1,0 +1,13 @@
+# enable build of shared libs when cross compiling
+# 
+--- configure.orig	2008-05-23 08:18:03.000000000 +0000
++++ configure	2022-10-22 07:27:54.454720636 +0000
+@@ -3291,7 +3291,7 @@
+   echo $ac_n "(cached) $ac_c" 1>&6
+ else
+   if test "$cross_compiling" = yes; then
+-  mr_cv_target_elf=no
++  mr_cv_target_elf=yes
+ else
+   cat > conftest.$ac_ext <<EOF
+ #line 3298 "configure"
