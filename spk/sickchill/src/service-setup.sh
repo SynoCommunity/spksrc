@@ -49,3 +49,9 @@ service_postupgrade() {
       set_unix_permissions "${SYNOPKG_PKGDEST}"
     fi
 }
+
+service_postuninst ()
+{
+    # Do this as ${SYNOPKG_PKGDEST}/tmp folder not removed and should be.
+    rm -rf "${SYNOPKG_PKGDEST}"
+}
