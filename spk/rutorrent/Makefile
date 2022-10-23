@@ -71,6 +71,9 @@ INSTALL_WIZARD_TEMPLATES += additional-configurations
 INSTALL_WIZARD_TEMPLATES += dsm-permissions
 endif
 UPGRADE_WIZARD_TEMPLATES =
+ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
+UPGRADE_WIZARD_TEMPLATES += dsm-permissions
+endif
 
 SUPPORTED_LANGUAGES = fre
 
