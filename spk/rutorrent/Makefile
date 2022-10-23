@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 SPK_DEPENDS = "python310:PHP7.2"
 WHEELS = src/requirements-pure.txt
 
-DEPENDS = cross/curl 
+DEPENDS =
 DEPENDS += cross/busybox
 DEPENDS += cross/mediainfo 
 DEPENDS += cross/rtorrent 
@@ -16,6 +16,8 @@ DEPENDS += cross/screen
 DEPENDS += cross/sox
 DEPENDS += cross/unzip
 
+OPTIONAL_DEPENDS = cross/curl
+
 BUSYBOX_CONFIG = procutils
 
 include ../../mk/spksrc.common.mk
@@ -23,6 +25,7 @@ include ../../mk/spksrc.directories.mk
 
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 BUSYBOX_CONFIG += usrmng nice
+DEPENDS += cross/curl 
 endif
 
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
@@ -35,7 +38,7 @@ DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorren
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "<ul><li>Fix support of DSM 7.</li><li>Update curl to 7.84.0</li></ul>"
+CHANGELOG = "<li>Fix support of DSM 7.</li>"
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3

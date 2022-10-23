@@ -5,13 +5,17 @@ PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Define python310 binary path
 PYTHON_DIR="/var/packages/python310/target/bin"
+# Define explicit PHP binary
+PHP="/var/packages/PHP7.2/target/usr/local/bin/php72"
 # Add local bin, virtualenv along with python310 to the default PATH
 export PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib:${LD_LIBRARY_PATH}"
 
 # Others
 DSM6_WEB_DIR="/var/services/web"
+CURL=${SYNOPKG_PKGDEST}/bin/curl
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+  CURL=/bin/curl
   WEB_DIR="/var/services/web_packages"
 else
   WEB_DIR="${DSM6_WEB_DIR}"
@@ -139,10 +143,10 @@ service_postinst ()
                -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${SYNOPKG_PKGDEST}/bin/sox'\3,\4|g" \
                -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${SYNOPKG_PKGDEST}/bin/mediainfo'\3,\4|g" \
                -e "s|\"stat\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"stat\"\1=>\2'/bin/stat'\3,\4|g" \
-               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${SYNOPKG_PKGDEST}/bin/curl'\3,\4|g" \
+               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${CURL}'\3,\4|g" \
                -e "s|\"id\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"id\"\1=>\2'/bin/id'\3,\4|g" \
                -e "s|\"gzip\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"gzip\"\1=>\2'/bin/gzip'\3,\4|g" \
-               -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
+               -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'${PHP}'\3,\4|g" \
                "${RUTORRENT_WEB_DIR}/conf/config.php"
 
         sed -i -e "s|@download_dir@|${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}|g" \
@@ -258,7 +262,7 @@ service_save ()
 is_not_defined_external_program()
 {
     program=$1
-    php -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$pathToExternals['${program}']) && !empty(\$pathToExternals['${program}'])) { exit(1); } else { exit(0); }"
+    ${PHP} -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$pathToExternals['${program}']) && !empty(\$pathToExternals['${program}'])) { exit(1); } else { exit(0); }"
     return $?
 }
 
@@ -289,28 +293,24 @@ service_restore ()
     fi
 
     echo "Restoring rtorrent configuration ${RTORRENT_RC}"
-    mv "${TMP_DIR}/rtorrent.rc" "${RTORRENT_RC}"
+    mv -f "${TMP_DIR}/rtorrent.rc" "${RTORRENT_RC}"
     fix_unix_permissions "${RTORRENT_RC}"
     # http_cacert command has been moved to network.http.cacert
     if [ ! "$(grep -c 'http_cacert = ' "${RTORRENT_RC}")" -eq 0 ]; then
         sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC}
     fi
 
-    echo "Restoring rtorrent session files ${SYNOPKG_PKGVAR}/.session"
-    mv "${TMP_DIR}/.session" "${SYNOPKG_PKGVAR}"
-    fix_unix_permissions "${SYNOPKG_PKGVAR}"
-
     echo "Restoring rutorrent web shared directory ${RUTORRENT_WEB_DIR}/share"
-    mv "${TMP_DIR}/share" "${RUTORRENT_WEB_DIR}/"
+    mv -f "${TMP_DIR}/share" "${RUTORRENT_WEB_DIR}/"
     fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
 
     echo "Restoring rutorrent custom plugins configuration ${RUTORRENT_WEB_DIR}/conf/plugins.ini"
-    mv "${TMP_DIR}/plugins.ini" "${RUTORRENT_WEB_DIR}/conf/"
+    mv -f "${TMP_DIR}/plugins.ini" "${RUTORRENT_WEB_DIR}/conf/"
     fix_unix_permissions "${RUTORRENT_WEB_DIR}/conf/plugins.ini"
     chmod 0644 "${RUTORRENT_WEB_DIR}/conf/plugins.ini"
 
     echo "Restoring rutorrent custom plugins ${RUTORRENT_WEB_DIR}/plugins"
-    mv "${TMP_DIR}/plugins" "${RUTORRENT_WEB_DIR}/"
+    mv -f "${TMP_DIR}/plugins" "${RUTORRENT_WEB_DIR}/"
     fix_unix_permissions "${RUTORRENT_WEB_DIR}/plugins"
 
     echo "Restoring rutorrent global configuration ${RUTORRENT_WEB_DIR}/conf/config.php"
