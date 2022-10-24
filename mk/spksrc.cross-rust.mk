@@ -37,7 +37,8 @@ include ../../mk/spksrc.cross-rust-env.mk
 CONFIGURE_TARGET = nop
 
 ifeq ($(strip $(COMPILE_TARGET)),)
-COMPILE_TARGET = rust_build_target
+#COMPILE_TARGET = rust_build_target
+COMPILE_TARGET = nop
 endif
 
 ifeq ($(strip $(INSTALL_TARGET)),)
@@ -50,19 +51,21 @@ RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 # Set the cargo parameters
-CARGO_BUILD_ARGS += --target=$(RUST_TARGET)
-CARGO_BUILD_ARGS += --path $(RUST_SRC_DIR)
-CARGO_BUILD_ARGS += --root $(STAGING_INSTALL_PREFIX)
+CARGO_BUILD_ARGS += --manifest-path=$(WORK_DIR)/$(PKG_DIR)/Cargo.toml
+CARGO_INSTALL_ARGS += --path $(RUST_SRC_DIR)
+CARGO_INSTALL_ARGS += --root $(STAGING_INSTALL_PREFIX)
 
 # Default rust build and installation with cargo
+# DISABLED: generates error not seen using
+#           direct cargo install call
 rust_build_target:
 	@echo "  ==> Cargo build rust package $(PKG_NAME)"
-	$(ENV) cargo build $(CARGO_BUILD_ARGS)
+	$(RUN) cargo build $(CARGO_BUILD_ARGS)
 
 # Default rust build and installation with cargo
 rust_install_target:
 	@echo "  ==> Cargo install rust package $(PKG_NAME)"
-	$(ENV) cargo install $(CARGO_BUILD_ARGS)
+	$(RUN) cargo install $(CARGO_INSTALL_ARGS)
 
 
 #####
