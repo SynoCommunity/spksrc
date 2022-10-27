@@ -44,14 +44,14 @@ jobs:
         id: getfile_pr
         run: |
           git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
-          echo "::set-output name=files::$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)"
+          echo "files=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)" >> $GITHUB_OUTPUT
 
       - name: Get changed files for push
         if: github.event_name == 'push'
         id: getfile
         run: |
           git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
-          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+          echo "files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies

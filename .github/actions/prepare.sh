@@ -87,14 +87,14 @@ do
     fi
 done
 
-echo "::set-output name=arch_packages::${arch_packages}"
-echo "::set-output name=noarch_packages::${noarch_packages}"
+echo "arch_packages=${arch_packages}" >> $GITHUB_OUTPUT
+echo "noarch_packages=${noarch_packages}" >> $GITHUB_OUTPUT
 
 echo "::endgroup::"
 
 if [ -z "${packages}" ]; then
     echo "===> No packages to download. <==="
-    echo "::set-output name=download_packages::"
+    echo "download_packages" >> $GITHUB_OUTPUT
 else
     echo "===> PACKAGES to download references for: ${packages}"
     DOWNLOAD_LIST=
@@ -108,5 +108,5 @@ else
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
-    echo "::set-output name=download_packages::${downloads}"
+    echo "download_packages=${downloads}" >> $GITHUB_OUTPUT
 fi
