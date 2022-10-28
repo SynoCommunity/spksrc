@@ -1,0 +1,105 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [cryptography]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# cryptography==38.0.1
+
+# Requirement for cryptography
+# cffi==1.15.1
+
+# commonly used cross-compiled wheels
+# All tested and can be enabled but may conflict
+# with local python apps requirements
+
+# bcrypt==4.0.0
+# greenlet==1.1.3
+# immutables==0.19
+# MarkupSafe==2.1.1
+# msgpack-python==0.5.6
+# netifaces==0.11.0
+# regex==2022.9.13
+# SQLAlchemy==1.4.41
+# zope.interface==5.4.0
+
+# [gevent]
+# Depends: libev, c-ares
+# Require environment variables
+#  GEVENTSETUP_EMBED_CARES=FALSE
+#  GEVENTSETUP_EMBED_LIBEV=FALSE
+# gevent==21.12.0
+
+# [lxml]
+# Depends: libxml2, libxslt
+# lxml==4.9.1
+
+# [mysqlclient]
+# Depends: mysql-connector-c, mariadb-connector-c
+# Require environment variables
+#  MYSQLCLIENT_CFLAGS
+#  MYSQLCLIENT_LDFLAGS
+# mysqlclient==2.1.1
+
+# [numpy]
+#   - armv5 (88f6281-6.1) Last known working version
+# numpy==1.21.6
+
+# [numpy]
+#   - armv7L (hi3535-6.1) Last known working version
+# numpy==1.22.4
+
+# [numpy]
+#   - Require Cython in cross/python310 crossenv
+#   - DSM6 require WHEELS_CFLAGS=-std=c++0x
+#   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
+#     ref: https://github.com/numpy/numpy/issues/13622
+# numpy==1.23.3
+
+# [Pillow]
+# Require --global-options arguments
+#  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
+# Pillow==9.2.0
+
+# [psutil]
+# Last known version to build on armv5/ppc
+# psutil==5.9.1
+
+# [pycares]
+# Depends: c-ares
+# Require environment variables
+#  PYCARES_USE_SYSTEM_LIB=1
+# pycares==4.2.2
+
+# [pycurl]
+# Depends: curl
+# Require environment variables
+#  PYCURL_CURL_CONFIG
+# pycurl==7.45.1
+
+# [PyNaCl]
+# Depends: cross/libsodium
+# Require environment variables
+#  SODIUM_INSTALL=system
+# PyNaCl==1.5.0
+
+# [PyYAML]
+# Depends: libyaml
+# PyYAML==6.0
+
+# [rencode]
+# Updated fork of the project
+# rencode==1.0.6 <<-- unsupported
+# git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
+
+# [ujson]
+#   - Require setuptools-scm in cross/python310 crossenv
+# ujson==5.5.0
+
+# [webrtcvad]
+# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
+# git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10
