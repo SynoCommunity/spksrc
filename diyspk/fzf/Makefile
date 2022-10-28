@@ -1,6 +1,6 @@
 SPK_NAME = fzf
-SPK_VERS = 0.30.0
-SPK_REV = 2
+SPK_VERS = 0.34.0
+SPK_REV = 1
 SPK_ICON = src/fzf.png
 
 DEPENDS = cross/fzf
