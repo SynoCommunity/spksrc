@@ -34,15 +34,16 @@ DEPENDS += cross/bat cross/exa
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, exa"
 endif
 
-# packages depending on cross/zlib
-DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
-
-
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# rmlint must be built before "cross/mc cross/pcre2 cross/fdupes cross/zstd"
+# to use libblkid and support reflink
 DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
+
+# packages depending on cross/zlib
+DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 # gcc with stdc++11 support
