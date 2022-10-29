@@ -1,12 +1,12 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/lidarr.png
 
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-CHANGELOG = "Update Lidarr to .NET"
+CHANGELOG = "Update Lidarr to v1.0.2 and implement fix for alternate TMP directory"
 DISPLAY_NAME = Lidarr
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
@@ -45,6 +45,9 @@ DEPENDS += cross/libstdc++ cross/$(SPK_NAME)
 endif
 
 POST_STRIP_TARGET = lidarr_extra_install
+
+# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 
