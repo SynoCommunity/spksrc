@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libuuid
+DEPENDS =
 
 HOMEPAGE = http://e2fsprogs.sourceforge.net/
 COMMENT  = Ext2/3/4 filesystem userspace utilities.
@@ -13,8 +13,6 @@ LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-elf-shlibs
-# use cross/libuuid instead
-CONFIGURE_ARGS += --disable-libuuid
 
 include ../../mk/spksrc.archs.mk
 
