@@ -11,6 +11,8 @@ DEPENDS = cross/glib
 DEPENDS += cross/libblkid
 # libelf required to "Find non-stripped binaries"
 DEPENDS += cross/libelf
+# json-glib required to "Read json caches"
+DEPENDS += cross/json-glib
 
 HOMEPAGE = https://rmlint.readthedocs.io
 COMMENT = rmlint finds space waste and other broken things on your filesystem and offers to remove it.

@@ -78,7 +78,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update rmlint to support reflink.<br/>2. Update file to v5.39.<br/>3. Update fdupes to v2.2.1.<br/>4. Update jdupes to v1.21.0.<br/>5. Update fzf to v.0.34.0<br/>6. Update tree to v2.0.4.<br/>7. Update bat to v0.22.1."
+CHANGELOG = "1. Update rmlint to support reflink, find nonstripped binaries and to read json caches.<br/>2. Update file to v5.39.<br/>3. Update fdupes to v2.2.1.<br/>4. Update jdupes to v1.21.0.<br/>5. Update fzf to v.0.34.0<br/>6. Update tree to v2.0.4.<br/>7. Update bat to v0.22.1."
 
 SERVICE_SETUP = src/service-setup.sh
 
