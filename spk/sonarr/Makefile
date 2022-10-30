@@ -16,7 +16,7 @@ DESCRIPTION_FRE = Sonarr est un PVR pour les utilisateurs de groupes de discussi
 DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y torrents. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
 DISPLAY_NAME = Sonarr
 STARTABLE = yes
-CHANGELOG = "Enlarge the service start/stop timeout to 60 seconds."
+CHANGELOG = "Enlarge the service start/stop timeout to 90 seconds."
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
