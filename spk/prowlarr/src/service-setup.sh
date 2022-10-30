@@ -9,6 +9,7 @@ PID_FILE="${CONFIG_DIR}/Prowlarr/prowlarr.pid"
 
 SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${PROWLARR}"
 SVC_BACKGROUND=y
+SVC_WAIT_TIMEOUT=90
 
 service_postinst ()
 {

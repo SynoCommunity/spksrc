@@ -16,6 +16,7 @@ GROUP="sc-download"
 
 SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${RADARR} -nobrowser -data=${RADARR_CONFIG_DIR}"
 SVC_BACKGROUND=y
+SVC_WAIT_TIMEOUT=90
 
 service_postinst ()
 {
