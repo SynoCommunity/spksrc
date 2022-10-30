@@ -1,8 +1,8 @@
 PKG_NAME = file
-PKG_VERS = 5.35
+PKG_VERS = 5.39
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://ftp.astron.com/pub/file/
+PKG_DIST_SITE = http://ftp.astron.com/pub/file
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # remarks: the build environment must have file installed of the same version
