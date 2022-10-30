@@ -1,12 +1,12 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/lidarr.png
 
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-CHANGELOG = "Update Lidarr to v1.0.2 and implement fix for alternate TMP directory"
+CHANGELOG = "1. Update Lidarr to v1.0.2.<br/>2. Use alternate TMP directory to provide enough space for internal updater.<br/>3. Enlarge the service start/stop timeout to 60 seconds."
 DISPLAY_NAME = Lidarr
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
@@ -38,7 +38,7 @@ include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
-CHANGELOG = "no change"
+CHANGELOG = "Enlarge the service start/stop timeout to 60 seconds."
 SPK_DEPENDS = "mono>3.6:chromaprint>=1.5"
 else
 DEPENDS += cross/libstdc++ cross/$(SPK_NAME)
