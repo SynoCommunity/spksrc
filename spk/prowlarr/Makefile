@@ -1,6 +1,6 @@
 SPK_NAME = prowlarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/prowlarr.png
 
 # .NET is not supported on PPC, ARM5, ARM7L and x86
@@ -17,7 +17,7 @@ SUPPORTURL = https://prowlarr.com/\#support
 DESCRIPTION = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required \(we do it all\).
 STARTABLE = yes
 DISPLAY_NAME = Prowlarr
-CHANGELOG = "1. Update prowlarr to v0.4.7.2016."
+CHANGELOG = "1.Enlarge the service start/stop timeout to 90 seconds. 2.Update prowlarr to v0.4.7.2016."
 
 HOMEPAGE = https://prowlarr.com/
 LICENSE  = GPLv3
