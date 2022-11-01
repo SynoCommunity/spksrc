@@ -29,6 +29,6 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS = --target=x86_64-linux
 endif
-CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX) --enable-symlinks --enable-static
+CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX) --enable-symlinks --disable-static
 
 include ../../mk/spksrc.cross-cc.mk

@@ -2,7 +2,7 @@
     "step_title": "COPS configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Calibre directory. WARNING: has to end with a / and never use your web directory",
+        "desc": "Existing Calibre library directory. WARNING: has to end with a / and never use your web directory",
         "subitems": [{
             "key": "wizard_calibre_dir",
             "defaultValue": "/volume1/calibre/",
@@ -27,4 +27,11 @@
             "desc": "Kobo"
         }]
     }]
+}, {
+    "step_title": "Attention! DSM Permissions",
+    "items": [
+        {
+            "desc": "Permissions are managed with the group <b>http</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= sc-cops) will not appear on most UI settings.<br>Including the following:<br>- Application privilege's permission viewer<br>- FPT's chroot user selector<br>- File Stations's<br>- Change owner<br>- Shared Links Manager -> Enable secure sharing<br><br>The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor<br>"
+        }
+    ]
 }]

@@ -45,7 +45,7 @@ yarl==1.6.3
 ### other default dependencies that need cross compiled wheel
 MarkupSafe==2.0.1
 aiohttp==3.7.4.post0
-cffi==1.14.1
+cffi==1.15.1
 greenlet==1.1.1
 multidict==5.1.0
 SQLAlchemy==1.4.23

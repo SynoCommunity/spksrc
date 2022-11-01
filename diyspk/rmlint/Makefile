@@ -1,5 +1,5 @@
 SPK_NAME = rmlint
-SPK_VERS = 2.9.0
+SPK_VERS = 2.10.1
 SPK_REV = 1
 SPK_ICON = src/rmlint-logo.png
 

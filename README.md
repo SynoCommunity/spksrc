@@ -40,104 +40,154 @@ If you can't find an answer, or if you want to open a package request, read [CON
 cd spksrc # Go to the cloned repository's root folder.
 
 # If running on Linux:
-docker run -it -v $(pwd):/spksrc ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
 # If running on macOS:
-docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 
-### LXC
-A container based on 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your `lxd` environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC knowledge :
-1. Create a new container (will use x864_64/amd64 arch by default): `lxc launch images:debian/10 spksrc`
-2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
-3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
-4. Install all required packages:
-```
-lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake autopoint bc bison build-essential check \
-                                cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf \
-                                imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev \
-                                libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev \
-                                libtool libunistring-dev lzip mercurial moreutils ncurses-dev ninja-build patchelf php \
-                                pkg-config python3 python3-distutils rename scons subversion swig texinfo unzip \
-                                xmlto zlib1g-dev
-```
-5. Install `python2` wheels:
-```
-lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python2"
-lxc exec spksrc -- /bin/bash -c "pip2 install virtualenv httpie"
-```
-6. Install `python3` wheels:
-```
-lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python3"
-lxc exec spksrc -- /bin/bash -c "pip3 install virtualenv httpie"
-```
-7. Install `meson` (requires `autoconf-archive`):
-```lxc exec spksrc -- /bin/bash -c "pip3 install meson==0.62.2"```
-8. (OPTIONAL) Install misc base tools:
-```
-lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrep rsync tree time
-lxc exec spksrc -- /usr/bin/updatedb
-```
-
-#### LXC: Shared `spksrc` user (OPTIONAL)
-You can create a shared user between your Ubuntu and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already create a user `spksrc` with uid 1001 in your Ubuntu environment and that you which to share its `/home` userspace.
-1. Create the `spksrc` user: `lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc`
-2. Create a mapping rule between the hosts and the LXC image:
-```
-lxc config set spksrc raw.idmap "both 1001 1001"
-lxc restart spksrc
-Remapping container filesystem
-```
-3. Add `/home/spksrc` from the hsot to the LXC container:
-```
-lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
-Device home added to spksrc
-```
-4. Connect as `spksrc` user:
-```
-lxc exec spksrc -- su --login spksrc
-spksrc@spksrc:~$
-```
-5. Set a defualt shell environment:
-```
-lxc exec spksrc -- su --login spksrc
-spksrc@spksrc:~$ cp /etc/skel/.profile /etc/skel/.bashrc .
-```
-#### LXC: Proxy (OPTIONAL)
-The following assume you have a running proxy on your LAN setup at IP 192.168.1.1 listening on port 3128 that will allow caching files.
-1. Enforce using a proxy:
-```
-lxc config set spksrc environment.http_proxy http://192.168.1.1:3128
-lxc config set spksrc environment.https_proxy http://192.168.1.1:3128
-```
-2. Enforce using a proxy with `wget` in the spksrc container user account:
-```
-lxc exec spksrc -- su --login spksrc
-spksrc@spksrc:~$ cat << EOF > $HOME/.wgetrc
-use_proxy = on
-http_proxy = http://192.168.1.1:3128/
-https_proxy = http://192.168.1.1:3128/
-ftp_proxy = http://192.168.1.1:3128/
-EOF
-```
 
 
 ### Virtual machine
-A virtual machine based on an 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.
+A virtual machine based on an 64-bit version of Debian 11 stable OS is recommended. Non-x86 architectures are not supported.
 
-* Install the requirements (in sync with Dockerfile):
+Install the requirements (in sync with `Dockerfile`):
 ```bash
 sudo dpkg --add-architecture i386 && sudo apt-get update
 sudo apt update
-sudo apt install autoconf-archive autogen automake bc bison build-essential check cmake curl cython debootstrap ed expect fakeroot flex g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ncurses-dev ninja-build patchelf php pkg-config python3 python3-distutils rename scons subversion sudo swig texinfo unzip xmlto zlib1g-dev
+sudo apt install autoconf-archive autogen automake autopoint bash bc bison \
+                 build-essential check cmake curl cython3 debootstrap ed expect fakeroot flex \
+                 g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
+                 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
+                 libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
+                 php pkg-config python2 python3 python3-distutils rename rsync scons subversion swig \
+                 texinfo unzip xmlto zlib1g-dev
 wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
 sudo pip2 install wheel httpie
 wget https://bootstrap.pypa.io/get-pip.py -O - | sudo python3
 sudo pip3 install meson==0.62.2
 ```
+From there, follow the instructions in the [Developers HOW TO].
+
 * You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
 * Some older toolchains may require 32-bit development versions of packages, e.g. `zlib1g-dev:i386`
+
+
+
+### LXC
+A container based on 64-bit version of Debian 11 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your LXD/LXC environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC basic knowledge :
+1. Create a new container (will use x864_64/amd64 arch by default): `lxc launch images:debian/11 spksrc`
+2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
+3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
+4. Install all required packages:
+```bash
+lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopoint bash bc bison \
+                                build-essential check cmake curl cython3 debootstrap ed expect fakeroot flex \
+                                g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
+                                libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
+                                libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
+                                php pkg-config python2 python3 python3-distutils rename rsync scons subversion swig \
+                                texinfo unzip xmlto zlib1g-dev
+```
+5. Install `python2` wheels:
+```bash
+lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python2"
+lxc exec spksrc -- /bin/bash -c "pip2 install virtualenv httpie"
+```
+6. Install `python3` `pip`:
+```bash
+lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python3"
+```
+7. Install `meson`:
+```bash
+lxc exec spksrc -- /bin/bash -c "pip3 install meson==0.62.2"
+```
+
+
+#### LXC: `spksrc` user
+8. By default it is assumed that you will be running as `spksrc` user into the LXC container.  Such user needs to be created into the default container image:
+```bash
+lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
+```
+9. Setup a default shell environment:
+```bash
+lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
+```
+
+#### `rustc` compiler
+10. Prepare the install destination directories:
+```bash
+lxc exec spksrc -- mkdir -p -m 0755 /opt/cargo /opt/rustup
+lxc exec spksrc -- chown spksrc:spksrc /opt/cargo /opt/rustup
+```
+11. Install `rustc`:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup sh -s -- -y"
+```
+12. Install the `rustc` stable toolchain and set it as default
+```bash
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup toolchain install stable"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup default stable"
+```
+13. Install `rustc` toolchain for all archs targets:
+```bash
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add x86_64-unknown-linux-gnu"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add i686-unknown-linux-gnu"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add armv5te-unknown-linux-gnueabi"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add armv7-unknown-linux-gnueabihf"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add armv7-unknown-linux-gnueabi"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add aarch64-unknown-linux-gnu"
+lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add powerpc-unknown-linux-gnu"
+```
+
+From there you can connect to your container as `spksrc` and follow the instructions in the [Developers HOW TO].
+```bash
+lxc exec spksrc -- su --login spksrc
+spksrc@spksrc:~$
+```
+
+#### (OPTIONAL) Install misc base tools:
+```bash
+lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrep rsync tree time
+lxc exec spksrc -- /usr/bin/updatedb
+```
+
+#### (OPTIONAL) LXC: Shared `spksrc` user 
+You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you which to share its `/home` userspace.
+1. Create a mapping rule between the hosts and the LXC image:
+```bash
+lxc config set spksrc raw.idmap "both 1001 1001"
+lxc restart spksrc
+Remapping container filesystem
+```
+2. Add `/home/spksrc` from the hsot to the LXC container:
+```bash
+lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
+Device home added to spksrc
+```
+3. Connect as `spksrc` user:
+```bash
+lxc exec spksrc -- su --login spksrc
+spksrc@spksrc:~$
+```
+
+#### LXC: Proxy (OPTIONAL)
+The following assume you have a running proxy on your LAN setup at IP 192.168.1.1 listening on port 3128 that will allow caching files.
+1. Enforce using a proxy:
+```bash
+lxc config set spksrc environment.http_proxy http://192.168.1.1:3128
+lxc config set spksrc environment.https_proxy http://192.168.1.1:3128
+```
+2. Enforce using a proxy with `wget` in the spksrc container user account:
+```bash
+lxc exec spksrc --user $(id -u spksrc) -- bash -c "cat << EOF > ~spksrc/.wgetrc
+use_proxy = on
+http_proxy = http://192.168.1.1:3128/
+https_proxy = http://192.168.1.1:3128/
+ftp_proxy = http://192.168.1.1:3128/
+EOF"
+```
 
 
 ## Usage

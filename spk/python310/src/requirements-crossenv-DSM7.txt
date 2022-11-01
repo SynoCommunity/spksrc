@@ -1,0 +1,9 @@
+# [libtorrent] 2.0.7
+# Depends: openssl, boost 1.78, geoip
+# Require environment variables
+#  BOOST_LIBRARIES
+#  BOOST_BUILD_PATH
+# Only supported on DSM7 armv7, aarch64, x64
+git+https://github.com/arvidn/libtorrent.git@v2.0.7#egg=libtorrent==2.0.7
+# Use RC_2_0 for latest development snapshots
+# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.7

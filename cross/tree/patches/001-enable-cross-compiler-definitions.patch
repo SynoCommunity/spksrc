@@ -1,5 +1,5 @@
---- Makefile.orig	2022-02-16 21:45:43.000000000 +0000
-+++ Makefile	2022-06-25 08:02:58.467213836 +0000
+--- Makefile.orig	2022-09-06 13:31:53.000000000 +0000
++++ Makefile	2022-10-22 10:19:19.934111080 +0000
 @@ -16,9 +16,9 @@
  # along with this program; if not, write to the Free Software
  # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -11,13 +11,13 @@
 +#CC=gcc
  INSTALL=install
  
- VERSION=2.0.2
+ VERSION=2.0.4
 @@ -33,7 +33,7 @@
  
  # Linux defaults:
- #CFLAGS=-ggdb -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
--CFLAGS=-O3 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-+#CFLAGS=-O3 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
- LDFLAGS=-s
+ #CFLAGS+=-ggdb -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+-CFLAGS+=-O3 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
++#CFLAGS+=-O3 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+ #LDFLAGS+=-s
  
  # Uncomment for FreeBSD:
