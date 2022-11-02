@@ -3,9 +3,9 @@ SPK_VERS = 3.7.0
 SPK_REV = 58
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python310
+BUILD_DEPENDS = cross/python311
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
