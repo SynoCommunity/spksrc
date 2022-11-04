@@ -1,16 +1,19 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2022.7.7
-SPK_REV = 18
-SPK_ICON = src/${SPK_NAME}.png
+SPK_VERS = 2022.10.5
+SPK_REV = 19
+SPK_ICON = src/homeassistant.png
 
 SPK_DEPENDS = "python310"
 
 BUILD_DEPENDS = cross/python310
 
+# [numpy] > 1.22.4
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "Update homeassistant to 2022.7.7.<br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2022.10.5.<br/>2. Update Python to 3.10.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -61,6 +64,10 @@ WHEELS_BUILD_ARGS += --disable-platform-guessing
 WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
+
+# [cryptography]
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 include ../../mk/spksrc.spk.mk
 
