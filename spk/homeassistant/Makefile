@@ -8,7 +8,7 @@ SPK_DEPENDS = "python310"
 BUILD_DEPENDS = cross/python310
 
 # [numpy] > 1.22.4
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
