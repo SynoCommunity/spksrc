@@ -8,7 +8,7 @@ SPK_DEPENDS = "python310"
 BUILD_DEPENDS = cross/python310
 
 # [numpy] > 1.22.4
-UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
@@ -70,6 +70,9 @@ ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 include ../../mk/spksrc.spk.mk
+
+# prefere native python tools (pip, maturin, ...)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin):$(PATH)
 
 # [numpy]
 # Fix wheel building with older compilers
