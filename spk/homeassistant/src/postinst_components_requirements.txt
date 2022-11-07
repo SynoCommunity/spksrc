@@ -1,6 +1,6 @@
 # requirements by dedicated integrations
 
-### for components:
+### pure python packages for components:
 
 abodepy==1.2.0
 accuweather==0.4.0
@@ -29,9 +29,10 @@ arcam-fmj==0.12.0
 arrow==1.1.1
 asyncio-dgram==2.1.0
 asyncio-mqtt==0.10.0
+asyncio-throttle==1.0.2
 asyncssh==2.7.0
 authcaptureproxy==1.0.2
-authlib==0.15.4
+Authlib==0.15.4
 axis==44
 backoff==1.11.1
 beautifulsoup4==4.11.1
@@ -40,19 +41,22 @@ bidict==0.21.2
 bimmer-connected==0.10.4
 bitstring==3.1.9
 bleak==0.18.1
+bleak-retry-connector==2.1.3
 blebox-uniapi==2.0.2
 blinkpy==0.19.2
+bluetooth-adapters==0.6.0
+bluetooth-auto-recovery==0.3.6
 bond-api==0.1.12
 boschshcpy==0.2.35
 broadlink==0.18.2
 brother==2.0.0
 bsblan==0.5.0
+btsocket==0.2.0
 buienradar==1.0.5
 cached-property==1.5.2
-charset-normalizer==2.0.7
 casttube==0.2.1
 cbor2==5.4.1
-co2signal==0.4.2
+CO2Signal==0.4.2
 commentjson==0.9.0
 convertdate==2.3.2
 crccheck==1.0
@@ -62,10 +66,11 @@ cssselect==1.1.0
 dacite==1.6.0
 dataclasses-json==0.5.4
 dateparser==1.0.0
-#demjson==2.2.4           ==> build error
+dbus-fast==1.24.0
 denonavr==0.10.11
 dicttoxml==1.7.4
 fjaraskupan==2.0.0
+fnvhash==0.1.0
 fritzconnection==1.10.3
 future==0.18.2
 geographiclib==1.52
@@ -96,7 +101,7 @@ lomond==0.3.3
 marshmallow==3.13.0
 marshmallow-dataclass==8.5.3
 marshmallow-enum==1.5.1
-mechanicalsoup==1.1.0
+MechanicalSoup==1.1.0
 metar==1.8.0
 ms-cv==0.1.1
 mypy-extensions==0.4.3
@@ -108,23 +113,27 @@ pkce==1.0.3
 platformdirs==2.4.0
 plumbum==1.7.0
 protobuf==3.17.3
+psutil-home-assistant==0.0.1
 ptyprocess==0.7.0
 pubnub==5.1.4
 py-canary==0.5.3
-pyairvisual==2022.07.0
+pyairvisual==2022.7.0
 pyalmond==0.0.2
 pyatag==0.3.5.3
+pyatv==0.10.3
 pyclimacell==0.18.2
 pydantic==1.8.2
 pydaikin==2.7.2
 pyfritzhome==0.6.7
 pyialarm==2.2.0
 pyicloud==1.0.0
-pymeeus==0.5.11
+PyMeeus==0.5.11
+pyoctoprintapi==0.1.8
 pyownet==0.10.0.post1
 pyquery==1.4.3
-pyserial-asyncio==0.6
+PyRIC==0.1.6.3
 pyserial==3.5
+pyserial-asyncio==0.6
 pysiaalarm==3.0.2
 pysmb==1.2.7
 pysocketio==0.9.6a4
@@ -137,10 +146,11 @@ pytradfri==9.0.0
 pyusb==1.2.1
 pywemo==0.9.1
 ratelimit==2.2.1
-reparser==1.4.3
+ReParser==1.4.3
 requests-file==1.5.1
 requests-oauthlib==1.3.0
 semver==2.13.0
+srptools==1.0.1
 ssdp==1.1.0
 stringcase==1.2.0
 tenacity==8.0.1
@@ -152,10 +162,10 @@ xmltodict==0.13.0
 yalexs==1.2.6
 zeep==4.1.0
 zha-quirks==0.0.83
+zigpy==0.51.3
 zigpy-cc==0.5.2
 zigpy-deconz==0.19.0
 zigpy-xbee==0.16.2
 zigpy-zigate==0.10.2
 zigpy-znp==0.9.1
-zigpy==0.51.3
 zope.event==4.5.0

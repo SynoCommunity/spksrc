@@ -1,26 +1,28 @@
+# packages for default_config components
+
 acme==1.17.0
 aiodiscover==1.4.13
-### aiohttp @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/aiohttp-3.7.4.post0-cp38-cp38-linux_aarch64.whl
+### aiohttp @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/aiohttp-3.8.1-cp310-cp310-linux_aarch64.whl
 aiohttp-cors==0.7.0
 aiohue==4.5.0
-anyio==3.3.0
+anyio==3.6.1
 astral==2.2
 # async-timeout==3.0.1       ==> pure
 async-upnp-client==0.31.2
-### asyncstdlib @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/asyncstdlib-3.9.2-py3-none-any.whl
+### asyncstdlib @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/asyncstdlib-3.9.2-py2.py3-none-any.whl
 atomicwrites-homeassistant==1.4.1
 attrs==21.2.0
 awesomeversion==22.9.0
 ### backports.zoneinfo @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/backports.zoneinfo-0.2.1-cp38-cp38-linux_aarch64.whl
-### bcrypt==3.1.7
+### bcrypt @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/bcrypt-3.1.7-cp310-cp310-linux_aarch64.whl
 boto3==1.20.24
 botocore==1.21.18
 #certifi==2021.5.30          ==> python310:pure
-### cffi==1.15.1
+### cffi @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/cffi-1.15.1-cp310-cp310-linux_aarch64.whl
 # chardet==4.0.0             ==> pure
-### ciso8601 @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ciso8601-2.1.3-cp38-none-any.whl
+### ciso8601 @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ciso8601-2.2.0-cp310-cp310-linux_aarch64.whl
 click==7.1.2
-### cryptography @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/cryptography-3.3.2-cp38-none-any.whl
+### cryptography @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/cryptography-38.0.1-cp310-cp310-linux_aarch64.whl
 deepmerge==0.3.0
 defusedxml==0.7.1
 distro==1.5.0
@@ -29,13 +31,17 @@ dnspython==2.1.0
 ecdsa==0.14.1
 emoji==1.2.0
 envs==1.3
-### greenlet @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/greenlet-1.1.1-cp38-cp38-linux_aarch64.whl
+### ephem @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ephem-3.7.7.0-cp310-cp310-linux_aarch64.whl
+### gevent @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/gevent-21.8.0-cp310-cp310-linux_aarch64.whl
+### greenlet @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/greenlet-1.1.1-cp310-cp310-linux_aarch64.whl
 gTTS==2.2.4
+### guppy3 @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/guppy3-3.1.2-cp310-cp310-linux_aarch64.whl
 h11==0.12.0
 hass-nabucasa==0.56.0
+### home-assistant-bluetooth @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/home_assistant_bluetooth-1.3.0-py3-none-any.whl
 home-assistant-frontend==20221010.0
 homeassistant==2022.10.5
-httpcore==0.13.6
+httpcore==0.15.0
 httpx==0.23.0
 #idna==3.3                   ==> pure
 ifaddr==0.1.7
@@ -43,24 +49,29 @@ ifaddr==0.1.7
 jmespath==0.10.0
 jose==1.0.0
 josepy==1.8.0
-### MarkupSafe @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/MarkupSafe-2.0.1-cp38-cp38-linux_aarch64.whl
-### multidict @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/multidict-5.1.0-cp38-none-any.whl
+### lru-dict @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/lru_dict-1.1.8-cp310-cp310-linux_aarch64.whl
+### MarkupSafe @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/MarkupSafe-2.0.1-cp310-cp310-linux_aarch64.whl
+### miniaudio @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/miniaudio-1.53-cp310-cp310-linux_aarch64.whl
+### multidict @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/multidict-5.1.0-cp310-cp310-linux_aarch64.whl
 mutagen==1.45.1
-### numpy @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/numpy-1.21.1-cp38-cp38-linux_aarch64.whl
+### netifaces @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/netifaces-0.11.0-cp310-cp310-linux_aarch64.whl
+### numpy @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/numpy-1.23.2-cp310-cp310-linux_aarch64.whl
 onvif-zeep-async==1.2.1
-### Pillow @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/Pillow-8.2.0-cp38-cp38-linux_aarch64.whl
+### orjson @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/orjson-3.7.11-cp310-cp310-linux_aarch64.whl
+### Pillow @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/Pillow-9.2.0-cp310-cp310-linux_aarch64.whl
 ply==3.11
+### psutil @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/psutil-5.8.0-cp310-cp310-linux_aarch64.whl
 py-synologydsm-api==1.0.8
 pyasn1==0.4.8
 pycognito==2021.3.1
 pycparser==2.19
 ### pycrypto==2.6.1
-### pycryptodomex @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/pycryptodomex-3.10.1-cp35-abi3-linux_aarch64.whl
+### pycryptodomex @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/pycryptodomex-3.11.0-cp36-abi3-linux_aarch64.whl
 pyipp==0.11.0
 ### PyJWT @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyJWT-1.7.1-py2.py3-none-any.whl
 PyMetno==0.9.0
-### PyNaCl @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyNaCl-1.4.0-cp38-cp38-linux_aarch64.whl
-pyOpenSSL==20.0.1
+### PyNaCl @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyNaCl-1.5.0-cp310-cp310-linux_aarch64.whl
+pyOpenSSL==22.1.0
 pyotp==2.7.0
 PyQRCode==1.2.1
 pyRFC3339==1.1
@@ -73,33 +84,38 @@ pyroute2.ndb==0.6.4
 pyroute2.nftables==0.6.4
 pyroute2.nslink==0.6.4
 pysmi==0.3.4
-pysnmp==5.0.15
+pysnmp==4.4.12
+pysnmp-pyasn1==1.1.2
+pysnmp-pysmi==1.1.10
+pysnmplib==5.0.19
 python-dateutil==2.8.2
 python-didl-lite==1.2.6
 python-jose==3.2.0
 python-miio==0.5.12
-python-slugifypython-slugify==4.0.1
+python-slugify==4.0.1
 PythonDNS==0.1
 pytz==2021.1
-### PyYAML @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyYAML-5.4.1-cp38-cp38-linux_aarch64.whl
-pyudev==0.23.0
+pyudev==0.23.2
+### PyYAML @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/PyYAML-6.0-cp310-cp310-linux_aarch64.whl
+### regex @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/regex-2021.8.3-cp310-cp310-linux_aarch64.whl
 requests==2.28.1
 requests-toolbelt==0.9.1
 rfc3986==1.5.0
 rsa==4.7.2
-### ruamel.yaml @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ruamel.yaml-0.15.100-cp38-cp38-linux_aarch64.whl
+### ruamel.yaml==0.15.100
 s3transfer==0.5.0
 scapy==2.4.5
 ### six==1.16.0
 sniffio==1.2.0
 snitun==0.27.0
 spotipy==2.20.0
-### SQLAlchemy @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/SQLAlchemy-1.4.23-cp38-cp38-linux_aarch64.whl
+### SQLAlchemy @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/SQLAlchemy-1.4.41-cp310-cp310-linux_aarch64.whl
 text-unidecode==1.3
 # typing-extensions==4.4.0       ==> pure
+### ujson @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/ujson-4.2.0-cp310-cp310-linux_aarch64.whl
 Unidecode==1.2.0
 urllib3==1.26.6
 voluptuous==0.13.1
 voluptuous-serialize==2.5.0
-### yarl @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/yarl-1.6.3-cp38-cp38-linux_aarch64.whl
+### yarl @ file:///volume1/%40appstore/homeassistant/share/wheelhouse/yarl-1.8.1-cp310-cp310-linux_aarch64.whl
 zeroconf==0.39.1

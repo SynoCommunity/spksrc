@@ -12,7 +12,7 @@
 # Home Assistant Core
 aiokafka==0.7.2
 # astral==2.2
-# async_timeout==4.0.2
+# async-timeout==4.0.2
 attrs==21.2.0
 # awesomeversion==22.9.0
 # backports.zoneinfo;python_version<"3.9"   ==> Does not build with python310
@@ -21,14 +21,14 @@ attrs==21.2.0
 # ciso8601==2.2.0                 ==> crossenv
 # cryptography==38.0.1            ==> crossenv
 # httpx==0.23.0
-###idna==3.3
-jinja2==3.1.2
+idna==3.4
+Jinja2==3.1.2
 # numpy==1.23.2                   # requires to be built as cross/numpy
 PyJWT==2.5.0
 # PyNaCl                          ==> crossenv  # for mobile_app
 ## pip>=8.0.3,<20.3
 # python-slugify==4.0.1
-# pyyaml==6.0                     ==> python310:crossenv:6.0
+# PyYAML==6.0                     ==> crossenv
 requests==2.28.1
 ruamel.yaml==0.15.100
 six==1.16.0
@@ -51,8 +51,10 @@ six==1.16.0
 # sqlalchemy==1.4.41              ==> crossenv
 
 # Requirements for aiohttp==3.8.1
+aiosignal==1.2.0
 async_timeout==4.0.2
-chardet==4.0.0
+chardet==5.0.0
+# frozenlist==1.3.1               ==> crossenv
 typing-extensions==4.4.0
 
 # Failed to build: av clx-sdk-xms homeassistant-pyozw python-twitch-client
