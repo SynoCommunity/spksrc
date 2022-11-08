@@ -18,6 +18,6 @@ CONFIGURE_ARGS += --disable-static
 # as we use openssl backend:
 # configure: WARNING: secure clearing/zeroing of memory is not supported by the selected crypto backend
 
-ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk
