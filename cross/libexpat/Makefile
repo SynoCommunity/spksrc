@@ -1,5 +1,5 @@
 PKG_NAME = libexpat
-PKG_VERS = 2.4.8
+PKG_VERS = 2.5.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = expat-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$(PKG_VERS))
@@ -18,9 +18,9 @@ CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --without-xmlwf
 CONFIGURE_ARGS += --without-examples
 CONFIGURE_ARGS += --without-tests
-# TODO check "getrandom" syscall availability for each arch/DSM versions
+# TODO check "getrandom" syscall availability for each arch/DSM version
 CONFIGURE_ARGS += CFLAGS=-DXML_POOR_ENTROPY
 
-ADDITIONAL_CPPFLAGS = -O
+ADDITIONAL_CPPFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk

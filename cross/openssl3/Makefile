@@ -21,38 +21,38 @@ include ../../mk/spksrc.cross-cc.mk
 
 # Use CA certificates provided by DSM
 # OpenSSL data area, such as openssl.cnf, certificates and keys.
-openssl3_DATA_DIR=/etc/ssl
+OPENSSL_DATA_DIR=/etc/ssl
 
 # Map ARCH to arch expected by openssl Configure
-openssl3_ARCH =
+OPENSSL_ARCH =
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-openssl3_ARCH = linux-x86_64
+OPENSSL_ARCH = linux-x86_64
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-openssl3_ARCH = linux-x86
+OPENSSL_ARCH = linux-x86
 endif
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-openssl3_ARCH = linux-armv4 -march=armv5
+OPENSSL_ARCH = linux-armv4 -march=armv5
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-openssl3_ARCH = linux-armv4
+OPENSSL_ARCH = linux-armv4
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-openssl3_ARCH = linux-aarch64
+OPENSSL_ARCH = linux-aarch64
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-openssl3_ARCH = linux-ppc
+OPENSSL_ARCH = linux-ppc
 endif
 
-ifeq ($(strip $(openssl3_ARCH)),)
+ifeq ($(strip $(OPENSSL_ARCH)),)
 # Unexpected CPU architecture. Please add arch to mk/spksrc.archs.mk
 $(error Arch $(ARCH) not expected yet)
 endif
 
 .PHONY: openssl3_configure
 openssl3_configure:
-	$(RUN) ./Configure --openssldir=$(openssl3_DATA_DIR) --prefix=$(INSTALL_PREFIX) --libdir=lib $(openssl3_ARCH) zlib-dynamic shared threads
+	$(RUN) ./Configure --openssldir=$(OPENSSL_DATA_DIR) --prefix=$(INSTALL_PREFIX) --libdir=lib $(OPENSSL_ARCH) zlib-dynamic shared threads
 
 .PHONY: openssl3_install
 openssl3_install:

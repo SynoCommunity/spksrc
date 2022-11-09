@@ -4,6 +4,7 @@ lnk:bin/git-receive-pack
 bin:bin/git-shell
 lnk:bin/git-upload-archive
 lnk:bin/git-upload-pack
+bin:bin/scalar
 rsc:etc/gitconfig
 rsc:libexec/git-core/
 rsc:share/git-core/
