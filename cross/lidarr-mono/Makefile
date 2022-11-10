@@ -5,6 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Lidarr/Lidarr/releases/download/v$(PKG_VERS)
 PKG_DIR = Lidarr
 
+# REMARKS: outdated version, not supported anymore
+
 DEPENDS =
 
 HOMEPAGE = https://lidarr.audio/

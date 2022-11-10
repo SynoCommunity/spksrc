@@ -3,6 +3,10 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 10
 SPK_ICON = src/lidarr.png
 
+DEPENDS = cross/lidarr cross/libstdc++ cross/sqlite
+
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
@@ -14,14 +18,6 @@ LICENSE_FILE = $(WORK_DIR)/Lidarr/LICENSE.md
 HELPURL = https://wiki.servarr.com/Lidarr_Troubleshooting
 SUPPORTURL = https://lidarr.audio/\#support
 
-REQUIRED_MIN_DSM = 5.0
-
-# Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
-OPTIONAL_DEPENDS = cross/libstdc++ cross/$(SPK_NAME) cross/$(SPK_NAME)-mono
-DEPENDS = cross/sqlite 
-
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -32,17 +28,6 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
-
-# Mono build for unsupported .NET archs
-include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/$(SPK_NAME)-mono
-SERVICE_SETUP = src/service-setup-mono.sh
-CHANGELOG = "1. Enlarge the service start/stop timeout to 90 seconds.<br/>2. Avoid Lidarr downgrade on package update."
-SPK_DEPENDS = "mono>3.6:chromaprint>=1.5"
-else
-DEPENDS += cross/libstdc++ cross/$(SPK_NAME)
-endif
 
 POST_STRIP_TARGET = lidarr_extra_install
 
