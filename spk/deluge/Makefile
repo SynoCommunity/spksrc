@@ -55,6 +55,12 @@ ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
 
+ifneq ($(call version_lt, ${TCVERSION}, 7),1)
+# Enable debug builds
+GCC_DEBUG := -g3
+STRIP_TARGET = nop
+endif
+
 include ../../mk/spksrc.spk.mk
 
 # [libtorrent]
