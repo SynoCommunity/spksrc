@@ -1,5 +1,5 @@
 SPK_NAME = mtr
-SPK_VERS = 0.94
+SPK_VERS = 0.95
 SPK_REV = 1
 
 DEPENDS = cross/$(SPK_NAME)

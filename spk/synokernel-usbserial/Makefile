@@ -20,7 +20,6 @@ CHANGELOG = "1. Synology Kernel USB serial drivers"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers
 

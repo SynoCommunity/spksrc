@@ -7,9 +7,8 @@ DEPENDS = cross/inetutils
 MAINTAINER = SynoCommunity
 DESCRIPTION = GNU network utilities.
 STARTABLE = no
-CHANGELOG = "Initial package version"
 
-HOMEPAGE = https://ftp.gnu.org/gnu/inetutils
+HOMEPAGE = https://www.gnu.org/software/inetutils/
 LICENSE = GPLv3
 
 SPK_COMMANDS = bin/telnet bin/whois

@@ -1,5 +1,5 @@
 SPK_NAME = ser2net
-SPK_VERS = 4.1.6
+SPK_VERS = 4.3.10
 SPK_REV = 1
 SPK_ICON = src/ser2net.png
 
@@ -10,7 +10,6 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ser2net provides a way for a user to connect from a network connection to a serial port.
-CHANGELOG = "Initial release"
 DISPLAY_NAME = ser2net
 STARTABLE = no
 

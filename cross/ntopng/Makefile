@@ -2,7 +2,7 @@ PKG_NAME = ntopng
 PKG_VERS = 4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/ntop/$(PKG_NAME)/archive
+PKG_DIST_SITE = https://github.com/ntop/ntopng/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
@@ -10,6 +10,9 @@ DEPENDS  = cross/libcap cross/ndpi cross/curl
 DEPENDS += cross/libmaxminddb cross/sqlite cross/mysql-connector-c
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
+
+# cross/libcap not supported:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.ntop.org/
 COMMENT  = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.

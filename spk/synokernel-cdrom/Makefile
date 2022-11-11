@@ -15,7 +15,6 @@ CHANGELOG = "1. Initial release"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
 

@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
 SPK_VERS = 2.2
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
@@ -30,10 +30,10 @@ endif
 
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, autossh, etherwake, telnet, whois$(OPTIONAL_DESC). Credits to Sebastian Schmidt \(publicarray\) for icons."
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, autossh, etherwake, telnet, whois$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update openssl to v1.1.1q.<br/>2. Update openssh to v9.0p1."
+CHANGELOG = "1. Update openssl to v1.1.1s.<br/>2. Update bind to v9.16.28.<br/>3. Update screen to v4.9.0.<br/>4. Update links to v2.26.<br/>5. Update mtr to v0.95.<br/>6. Update ser2net to v4.3.10.<br/>7. Update rsync to v3.2.4.<br/>8. Update socat to v1.7.4.4."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
