@@ -42,6 +42,11 @@ fi
 
 deluge_default_install ()
 {
+    # Avoid Error: skipping tracker announce (unreachable)
+    # https://forum.deluge-torrent.org/viewtopic.php?f=7&t=56331&sid=321c7c1857bfe20c5af1ac7dedba106d
+    ip_addr=$(ip route show | grep default | awk '{print $NF}')
+    listen_interface=${ip_addr:=0.0.0.0}
+
     incomplete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
     complete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
     watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
@@ -73,10 +78,16 @@ deluge_default_install ()
         sed -i -e "s|@complete_dir_enabled@|true|g" ${cfg_file}
         sed -i -e "s|@complete_dir@|${complete_folder}|g" ${cfg_file}
     done
+
+    # Enforce using the default network interface always
+    sed -i '/"listen_interface":/s/:.*/: "'${listen_interface}'",/' ${CFG_FILE}
+
     # Watch directory
     sed -i -e "s|\"enabled_plugins\": \[\],|\"enabled_plugins\": \[\n        \"AutoAdd\"\n    \], \n|g" ${CFG_FILE}
     sed -i -e "s|@watch_dir@|${watch_folder}|g" ${CFG_WATCH}
+
     # plugins directory
+    install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${SYNOPKG_PKGVAR}/plugins"
     sed -i -e "s|@plugins_dir@|${SYNOPKG_PKGVAR}/plugins|g" ${CFG_FILE}
 }
 
