@@ -2,7 +2,7 @@
 <Config>
   <Branch>develop</Branch>
   <UpdateMechanism>BuiltIn</UpdateMechanism>
+  <UpdateAutomatically>True</UpdateAutomatically>
   <LaunchBrowser>False</LaunchBrowser>
   <Port>8686</Port>
-  <SslPort>8687</SslPort>
 </Config>
