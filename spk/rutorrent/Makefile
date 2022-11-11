@@ -4,19 +4,18 @@ SPK_REV = 13
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-SPK_DEPENDS = "python310:PHP7.2"
+SPK_DEPENDS = "python310:PHP7.3"
 WHEELS = src/requirements-pure.txt
 
 DEPENDS =
 DEPENDS += cross/busybox
+DEPENDS += cross/curl 
 DEPENDS += cross/mediainfo 
 DEPENDS += cross/rtorrent 
 DEPENDS += cross/rutorrent 
 DEPENDS += cross/screen 
-DEPENDS += cross/sox
 DEPENDS += cross/unzip
-
-OPTIONAL_DEPENDS = cross/curl
+DEPENDS += cross/sox
 
 BUSYBOX_CONFIG = procutils
 
@@ -25,10 +24,7 @@ include ../../mk/spksrc.directories.mk
 
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 BUSYBOX_CONFIG += usrmng nice
-DEPENDS += cross/curl 
 endif
-
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 # include bin/curl from cross/curl
 export CURL_INCLUDE_EXECUTABLE=1
@@ -58,6 +54,8 @@ START_DEP_SERVICES = apache-web
 INSTUNINST_RESTART_SERVICES = apache-web
 
 POST_STRIP_TARGET = rutorrent_extra_install
+
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 # some dependents require C++11 support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)

@@ -16,7 +16,7 @@
 			"php": {
 				"profile_name": "ruTorrent",
 				"profile_desc": "PHP profile used by ruTorrent",
-				"backend": 6,
+				"backend": 7,
 				"extensions": [],
 				"user": "sc-rutorrent",
 				"open_basedir": null,

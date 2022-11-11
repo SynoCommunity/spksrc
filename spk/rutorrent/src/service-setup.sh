@@ -5,12 +5,8 @@ PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Define python310 binary path
 PYTHON_DIR="/var/packages/python310/target/bin"
-# Define explicit PHP binary
-PHP="/var/packages/PHP7.2/target/usr/local/bin/php72"
 # Add local bin, virtualenv along with python310 to the default PATH
-export PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
-export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib:${LD_LIBRARY_PATH}"
-
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 # Others
 DSM6_WEB_DIR="/var/services/web"
 CURL=${SYNOPKG_PKGDEST}/bin/curl
@@ -40,7 +36,7 @@ PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
 LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
-export RTORRENT_RC SYNOPKG_PKGVAR
+SERVICE_COMMAND="env RTORRENT_RC=${RTORRENT_RC} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} PATH=${PATH} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib:${LD_LIBRARY_PATH} ${SERVICE_COMMAND}"
 
 validate_preinst ()
 {
@@ -76,8 +72,8 @@ fix_shared_folders_rights()
     local folder=$1
     echo "Fixing shared folder rights for ${folder}"
 
-    # Delete any previous ACL to limite duplicates
-    synoacltool -del "${folder}"
+    # Delete any previous ACL to limit duplicates
+    synoacltool -get "${folder}" >/dev/null && synoacltool -del "${folder}"
 
     # Set default user to sc-rutorrent and group to http
     chown -R "${EFF_USER}:${APACHE_USER}" "${folder}"
@@ -143,10 +139,10 @@ service_postinst ()
                -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${SYNOPKG_PKGDEST}/bin/sox'\3,\4|g" \
                -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${SYNOPKG_PKGDEST}/bin/mediainfo'\3,\4|g" \
                -e "s|\"stat\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"stat\"\1=>\2'/bin/stat'\3,\4|g" \
-               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${CURL}'\3,\4|g" \
+               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${SYNOPKG_PKGDEST}/bin/curl'\3,\4|g" \
                -e "s|\"id\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"id\"\1=>\2'/bin/id'\3,\4|g" \
                -e "s|\"gzip\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"gzip\"\1=>\2'/bin/gzip'\3,\4|g" \
-               -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'${PHP}'\3,\4|g" \
+               -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
                "${RUTORRENT_WEB_DIR}/conf/config.php"
 
         sed -i -e "s|@download_dir@|${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}|g" \
@@ -262,7 +258,7 @@ service_save ()
 is_not_defined_external_program()
 {
     program=$1
-    ${PHP} -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$pathToExternals['${program}']) && !empty(\$pathToExternals['${program}'])) { exit(1); } else { exit(0); }"
+    php -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$pathToExternals['${program}']) && !empty(\$pathToExternals['${program}'])) { exit(1); } else { exit(0); }"
     return $?
 }
 
