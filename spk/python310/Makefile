@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.9"
+CHANGELOG = "1. Update to Python 3.10.9<br/>2. Enable debug_info mode level 3 for DSM6 builds"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
