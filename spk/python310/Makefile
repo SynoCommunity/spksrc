@@ -92,6 +92,11 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 include ../../mk/spksrc.common.mk
 
+ifeq ($(call version_lt, ${TCVERSION}, 7),1)
+# Enable debug builds
+GCC_DEBUG := -g3
+endif
+
 # # [libtorrent] - generic
 # UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 # DEPENDS += cross/openssl

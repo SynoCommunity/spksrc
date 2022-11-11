@@ -38,6 +38,11 @@ PYTHON_LIMITED_API=cp37
 
 include ../../mk/spksrc.common.mk
 
+ifeq ($(call version_lt, ${TCVERSION}, 7),1)
+# Enable debug builds
+GCC_DEBUG := -g3
+endif
+
 # [libtorrent] - generic
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl
@@ -53,12 +58,6 @@ WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
-endif
-
-ifneq ($(call version_lt, ${TCVERSION}, 7),1)
-# Enable debug builds
-GCC_DEBUG := -g3
-STRIP_TARGET = nop
 endif
 
 include ../../mk/spksrc.spk.mk
