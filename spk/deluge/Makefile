@@ -13,7 +13,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to libtorrent DSM7-2.0.8 and DSM6-1.2.18<br/>2. Update to OpenSSL 1.1.1s"
+CHANGELOG = "1. Update to libtorrent DSM7-2.0.8 and DSM6-1.2.18<br/>2. Update to OpenSSL 1.1.1s<br/>3. Fix Error: skipping tracker announce (unreachable)<br/>4. Enable debug_info mode level 3 for DSM6 builds"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
