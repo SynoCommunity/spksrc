@@ -20,7 +20,7 @@ LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
-ENV += PYTHON_OPTIMIZE=1
+#ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python310_extra_install
@@ -94,7 +94,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt, ${TCVERSION}, 7),1)
 # Enable debug builds
-GCC_DEBUG := -g3
+GCC_DEBUG := -O0 -g3
 endif
 
 # # [libtorrent] - generic
