@@ -43,7 +43,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_download_dir
 
-SERVICE_COMMAND = /var/packages/rutorrent/target/bin/rtorrent-daemon
+SERVICE_COMMAND = screen -D -m rtorrent
 FWPORTS = src/rutorrent.sc
 CONF_DIR = src/conf/
 WIZARD_TEMPLATES_DIR = src/wizard_templates
@@ -100,8 +100,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
 	install -m 755 -d $(STAGING_DIR)/var/.session
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
 	install -m 775 -d $(STAGING_DIR)/tmp
