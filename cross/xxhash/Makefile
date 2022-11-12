@@ -1,5 +1,5 @@
 PKG_NAME = xxHash
-PKG_VERS = 0.8.0
+PKG_VERS = 0.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Cyan4973/xxHash/archive
