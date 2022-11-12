@@ -193,13 +193,15 @@ service_postinst ()
          && synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n"
     fi
     
-    mkdir -p "${RUTORRENT_WEB_DIR}/share"
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+      mkdir -p "${RUTORRENT_WEB_DIR}/share"
+  
+      # Allow read/write/execute over the share web/rutorrent/share directory
+      fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
 
-    # Allow read/write/execute over the share web/rutorrent/share directory
-    fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
-
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ] && [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-      touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
+      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+        touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
+      fi
     fi
 
     return 0
@@ -229,28 +231,28 @@ service_save ()
     fi
 
     # Save the configuration file
-    mv "${source_directory}/conf/config.php" "${TMP_DIR}/"
+    cp -ap -t "${TMP_DIR}" "${source_directory}/conf/config.php"
     if [ -f "${source_directory}/.htaccess" ]; then
-        mv "${source_directory}/.htaccess" "${TMP_DIR}/"
+        cp -ap -t "${TMP_DIR}" "${source_directory}/.htaccess"
     fi
 
     # Save session files
-    mv "${SYNOPKG_PKGVAR}/.session" "${TMP_DIR}/"
+    cp -ap -t "${TMP_DIR}" "${SYNOPKG_PKGVAR}/.session"
 
     # Save rtorrent configuration file (new location)
     if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] || [ -f "${RTORRENT_RC}" ]; then
-       mv "${RTORRENT_RC}" ${TMP_DIR}/
+       mv -t "${TMP_DIR}" "${RTORRENT_RC}"
     # Save rtorrent configuration file (old location -> prior to symlink)
     elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
        mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${TMP_DIR}/rtorrent.rc"
     fi
 
     # Save rutorrent share directory
-    mv "${source_directory}/share" "${TMP_DIR}/"
+    cp -ap -t "${TMP_DIR}" "${source_directory}/share"
 
     # Save plugins directory for any user-added plugins
-    mv "${source_directory}/conf/plugins.ini" "${TMP_DIR}/"
-    mv "${source_directory}/plugins" "${TMP_DIR}/"
+    cp -ap -t "${TMP_DIR}" "${source_directory}/conf/plugins.ini"
+    cp -ap -t "${TMP_DIR}" "${source_directory}/plugins"
 
     return 0
 }
@@ -283,36 +285,35 @@ service_restore ()
 {
     echo "Restoring http custom security file ${RUTORRENT_WEB_DIR}/.htaccess"
     if [ -f "${TMP_DIR}/.htaccess" ]; then
-        mv -f "${TMP_DIR}/.htaccess" "${RUTORRENT_WEB_DIR}/"
-        fix_unix_permissions "${RUTORRENT_WEB_DIR}/.htaccess"
-        chmod 0644 "${RUTORRENT_WEB_DIR}/.htaccess"
+        cp -ap -t "${RUTORRENT_WEB_DIR}" "${TMP_DIR}/.htaccess"
+        rm "${TMP_DIR}/.htaccess"
     fi
 
     echo "Restoring rtorrent configuration ${RTORRENT_RC}"
-    mv -f "${TMP_DIR}/rtorrent.rc" "${RTORRENT_RC}"
-    fix_unix_permissions "${RTORRENT_RC}"
+    cp -apf "${TMP_DIR}/rtorrent.rc" "${RTORRENT_RC}"
+    rm "${TMP_DIR}/rtorrent.rc"
+
     # http_cacert command has been moved to network.http.cacert
     if [ ! "$(grep -c 'http_cacert = ' "${RTORRENT_RC}")" -eq 0 ]; then
         sed -i -e 's|http_cacert = \(.*\)|network.http.cacert = \1|g' ${RTORRENT_RC}
     fi
 
     echo "Restoring rutorrent web shared directory ${RUTORRENT_WEB_DIR}/share"
-    mv -f "${TMP_DIR}/share" "${RUTORRENT_WEB_DIR}/"
-    fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
+    cp -ap -t "${RUTORRENT_WEB_DIR}" -f "${TMP_DIR}/share"
+    rm -rf "${TMP_DIR}/share"
 
     echo "Restoring rutorrent custom plugins configuration ${RUTORRENT_WEB_DIR}/conf/plugins.ini"
-    mv -f "${TMP_DIR}/plugins.ini" "${RUTORRENT_WEB_DIR}/conf/"
-    fix_unix_permissions "${RUTORRENT_WEB_DIR}/conf/plugins.ini"
-    chmod 0644 "${RUTORRENT_WEB_DIR}/conf/plugins.ini"
+    cp -ap -t "${RUTORRENT_WEB_DIR}/conf/" -f "${TMP_DIR}/plugins.ini"
+    rm "${TMP_DIR}/plugins.ini"
 
     echo "Restoring rutorrent custom plugins ${RUTORRENT_WEB_DIR}/plugins"
-    mv -f "${TMP_DIR}/plugins" "${RUTORRENT_WEB_DIR}/"
+    cp -apu -t "${RUTORRENT_WEB_DIR}" "${TMP_DIR}/plugins"
     fix_unix_permissions "${RUTORRENT_WEB_DIR}/plugins"
+    rm -rf "${TMP_DIR}/plugins"
 
     echo "Restoring rutorrent global configuration ${RUTORRENT_WEB_DIR}/conf/config.php"
-    mv -f "${TMP_DIR}/config.php" "${RUTORRENT_WEB_DIR}/conf/"
-    fix_unix_permissions "${RUTORRENT_WEB_DIR}/conf/config.php"
-    chmod 0644 "${RUTORRENT_WEB_DIR}/conf/config.php"
+    cp -ap -t "${RUTORRENT_WEB_DIR}/conf" -f "${TMP_DIR}/config.php"
+    rm -f "${TMP_DIR}/config.php"
 
     # Force new line at EOF for older rutorrent upgrade when missing (#4295)
     [ ! -z "$(tail -c1 ${RUTORRENT_WEB_DIR}/conf/config.php)" ] && echo >> "${RUTORRENT_WEB_DIR}/conf/config.php"
