@@ -34,7 +34,7 @@ DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorren
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "<li>Fix support of DSM 7.</li>"
+CHANGELOG = "<ul><li>Fix support of DSM 7.</li><li>Fix torrent creation wizard</li></ul>"
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
