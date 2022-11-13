@@ -1,8 +1,8 @@
 PKG_NAME = nettle
-PKG_VERS = 3.7.2
+PKG_VERS = 3.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/nettle
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/gmp
@@ -12,5 +12,14 @@ COMMENT  = Nettle is a cryptographic library that is designed to fit easily in m
 LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11) 
+# older compilers to not support x86/x64 assembler code
+CONFIGURE_ARGS += --disable-assembler
+endif
+
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
