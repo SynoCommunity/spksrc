@@ -94,7 +94,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt, ${TCVERSION}, 7),1)
 # Enable debug builds
-GCC_DEBUG := -O0 -g3
+GCC_DEBUG_INFO := 1
 endif
 
 # # [libtorrent] - generic
