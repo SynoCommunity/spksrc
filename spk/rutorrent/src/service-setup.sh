@@ -36,6 +36,9 @@ PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
 LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
+# Watch out for LD_LIBRARY_PATH as it needs to be prefixed by /usr/bin directory otherwise php binary
+# may not be loading appropriately libz. See https://github.com/SynoCommunity/spksrc/issues/5288 for more
+# details on the symptoms.
 SERVICE_COMMAND="env RTORRENT_RC=${RTORRENT_RC} HOME=${SYNOPKG_PKGVAR} PATH=${PATH} LD_LIBRARY_PATH=/usr/lib:${SYNOPKG_PKGDEST}/lib:${LD_LIBRARY_PATH} ${SERVICE_COMMAND}"
 
 if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${RTORRENT_RC}" ]; then
