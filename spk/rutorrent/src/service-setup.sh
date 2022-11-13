@@ -155,7 +155,6 @@ service_postinst ()
         sed -i -e "s|@download_dir@|${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
-               -e "s|@var_dir@|${SYNOPKG_PKGVAR}|g" \
                "${RTORRENT_RC}"
 
         if [ -d "${wizard_watch_dir}" ]; then
