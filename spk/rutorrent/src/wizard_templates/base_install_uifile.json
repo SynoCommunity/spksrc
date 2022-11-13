@@ -55,17 +55,13 @@
             },
             {
                 "type": "textfield",
-                "desc": "Watch a directory for torrent files and add them to ruTorrent. Leave empty to disable",
+                "desc": "Watch a directory for torrent files and add them to ruTorrent. Path will be relative to downloads share. Leave empty to disable.",
                 "subitems": [
                     {
                         "key": "wizard_watch_dir",
                         "desc": "Watch directory",
                         "validator": {
-                            "allowBlank": true,
-                            "regex": {
-                                "expr": "/^\\\/volume[0-9]+\\\//",
-                                "errorText": "Path should begin with /volume?/ with ? the number of the volume"
-                            }
+                            "allowBlank": true
                         }
                     }
                 ]

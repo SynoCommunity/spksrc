@@ -28,9 +28,6 @@
                                 "display_name",
                                 "volume_path"
                             ]
-                        },
-                        "validator": {
-                            "fn": "{console.log(arguments);return true;}"
                         }
                     }
                 ]
@@ -58,17 +55,13 @@
             },
             {
                 "type": "textfield",
-                "desc": "Surveille les torrents dans un répertoire et les ajoute à ruTorrent automatiquement. Laisser vide pour désactiver",
+                "desc": "Surveille les torrents dans un répertoire et les ajoute à ruTorrent automatiquement. Relatif au répertoire partagé. Laisser vide pour désactiver",
                 "subitems": [
                     {
                         "key": "wizard_watch_dir",
                         "desc": "Répertoire surveillé",
                         "validator": {
-                            "allowBlank": true,
-                            "regex": {
-                                "expr": "/^\\\/volume[0-9]+\\\//",
-                                "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume"
-                            }
+                            "allowBlank": true
                         }
                     }
                 ]

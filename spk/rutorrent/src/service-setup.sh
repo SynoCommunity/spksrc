@@ -135,7 +135,8 @@ service_postinst ()
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        TOP_DIR=$(echo "${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}" | cut -d "/" -f 2)
+        local effective_download_dir="${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}"
+        TOP_DIR=$(echo "${effective_download_dir}" | cut -d "/" -f 2)
         MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
@@ -152,13 +153,15 @@ service_postinst ()
                -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
                "${RUTORRENT_WEB_DIR}/conf/config.php"
 
-        sed -i -e "s|@download_dir@|${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}|g" \
+        sed -i -e "s|@download_dir@|${effective_download_dir}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
                "${RTORRENT_RC}"
 
         if [ -d "${wizard_watch_dir}" ]; then
-            sed -i -e "s|@watch_dir@|${wizard_watch_dir}|g" ${RTORRENT_RC}
+            local effective_watch_dir="${effective_download_dir}/${wizard_watch_dir}"
+            mkdir -p "${effective_watch_dir}"
+            sed -i -e "s|@watch_dir@|${effective_watch_dir}|g" ${RTORRENT_RC}
         else
             sed -i -e "/@watch_dir@/d" ${RTORRENT_RC}
         fi
@@ -173,9 +176,6 @@ service_postinst ()
           # Permissions handling
           if [ "${BUILDNUMBER}" -ge "4418" ]; then
               set_syno_permissions "${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}" "${GROUP}"
-              if [ -d "${wizard_watch_dir}" ]; then
-                  set_syno_permissions "${wizard_watch_dir}" "${GROUP}"
-              fi
           fi
         fi
     fi
