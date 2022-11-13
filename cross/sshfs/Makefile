@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/fuse cross/glib
 
 HOMEPAGE = https://github.com/libfuse/sshfs
-COMMENT  = sshfs is a network filesystem client to connect to SSH servers
+COMMENT  = sshfs is a network filesystem client to connect to SSH servers.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1

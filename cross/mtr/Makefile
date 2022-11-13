@@ -1,5 +1,5 @@
 PKG_NAME = mtr
-PKG_VERS = 0.94
+PKG_VERS = 0.95
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/traviscross/mtr/archive
@@ -8,10 +8,15 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
 
-OPTIONAL_DEPENDS = cross/libcap
+OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
+
 include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/libcap_2.51
+else
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/libcap
+endif
 endif
 
 HOMEPAGE = https://www.bitwizard.nl/mtr/
