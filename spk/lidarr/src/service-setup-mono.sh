@@ -1,3 +1,5 @@
+# REMARKS: outdated, not used anymore
+
 PATH="${SYNOPKG_PKGDEST}/bin:/var/packages/chromaprint/target/bin/:${PATH}"
 MONO_PATH="/var/packages/mono/target/bin"
 MONO="${MONO_PATH}/mono"
@@ -23,7 +25,7 @@ GROUP="sc-download"
 
 SERVICE_COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${LIDARR}"
 SVC_BACKGROUND=y
-SVC_WAIT_TIMEOUT=60
+SVC_WAIT_TIMEOUT=90
 
 service_postinst ()
 {
