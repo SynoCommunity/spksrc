@@ -11,7 +11,7 @@ DEPENDS += cross/inetutils
 
 OPTIONAL_DEPENDS = cross/sshfs cross/ser2net cross/bind cross/aria2
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 OPTIONAL_DESC =
 
@@ -24,8 +24,10 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", sshfs, ser2net"
 endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
 DEPENDS += cross/aria2
 OPTIONAL_DESC := $(OPTIONAL_DESC)", aria2c"
+endif
 endif
 
 

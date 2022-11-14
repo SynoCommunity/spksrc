@@ -5,6 +5,15 @@ SPK_ICON = src/aria2.png
 
 DEPENDS = cross/aria2
 
+# archs with too old c++ compiler (c++ 11 is required)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
+# compiler too old
+UNSUPPORTED_ARCHS += $(ARCH)
+endif
+
 MAINTAINER = cnrat
 DESCRIPTION = aria2 is a lightweight multi-protocol and multi-source command-line download utility.
 DESCRIPTION_CHS = Aria2是一个命令行下运行、多协议、多来源下载工具（HTTP/HTTPS、FTP、BitTorrent、Metalink）。
