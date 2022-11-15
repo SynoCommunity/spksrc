@@ -1,9 +1,9 @@
 PKG_NAME = Prowlarr
-PKG_VERS = 0.4.7.2016
+PKG_VERS = 0.4.9.2083
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux-core-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Prowlarr/Prowlarr/releases/download/v$(PKG_VERS)
-PKG_DIR = Prowlarr
+PKG_DIR = $(PKG_NAME)
 
 DEPENDS = cross/curl cross/sqlite
 
@@ -28,8 +28,8 @@ endif
 
 include ../../mk/spksrc.install-resources.mk
 
-.PHONY: prowlarr
+.PHONY: prowlarr_install
 prowlarr_install:
 	rm -rf $(WORK_DIR)/$(PKG_DIR)/Prowlarr.Update
-	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)/bin
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_DIR)/bin
+	mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)/bin
+	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)/bin
