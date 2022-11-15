@@ -1,6 +1,6 @@
 [{
     "step_title": "Starting and updating Prowlarr",
     "items": [{
-        "desc": "The first time Prowlarr is started it might take a few moments for the interface to become available.<br/><br/>Keep Prowlarr up-to-date by using Prowlarr's built-in updater.<br>Navigate to System>Updates in the Prowlarr UI.<br/><br/><b style=\"color: red\">Due to an error in Prowlarr, the automatic update in service start does not work, and you have to start the update manually.</b>"
+        "desc": "The first time Prowlarr is started it might take a few moments for the interface to become available.<br/><br/>Keep Prowlarr up-to-date by using Prowlarr's built-in updater.<br>Navigate to System>Updates in the Prowlarr UI.<br/><br/><b style=\"color: red\">Due to an error in Prowlarr, the automatic update in service start does not work, and you have to start the update manually. </b><b><a href=\"https://github.com/Prowlarr/Prowlarr/issues/1199\">Issue #1199</a></b>"
     }]
 }]
