@@ -1,6 +1,6 @@
 [{
     "step_title": "Updating Prowlarr",
     "items": [{
-        "desc": "Keep Prowlarr up-to-date by using Prowlarr's built-in updater.<br>Navigate to System>Updates in the Prowlarr UI.<br/><br/><b style=\"color: red\">Due to an error in Prowlarr, the automatic update in service start does not work, and you have to start the update manually.</b>""
+        "desc": "Keep Prowlarr up-to-date by using Prowlarr's built-in updater.<br>Navigate to System>Updates in the Prowlarr UI.<br/><br/><b style=\"color: red\">Due to an error in Prowlarr, the automatic update in service start does not work, and you have to start the update manually.</b>"
     }]
 }]
