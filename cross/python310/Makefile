@@ -127,6 +127,21 @@ python310_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
+
+# wheels to install in crossenv
+CROSSENV_WHEELS  = setuptools==63.4.3
+CROSSENV_WHEELS += setuptools-rust==1.5.2
+CROSSENV_WHEELS += setuptools-scm==7.0.5
+CROSSENV_WHEELS += wheel==0.37.1
+CROSSENV_WHEELS += cffi==1.15.1
+CROSSENV_WHEELS += poetry==1.1.14
+CROSSENV_WHEELS += Cython==0.29.32
+CROSSENV_WHEELS += flit==3.7.1
+CROSSENV_WHEELS += cryptography==38.0.1
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+CROSSENV_WHEELS += maturin==0.13.7
+endif
+
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
 .PHONY: python310_post_install
@@ -137,10 +152,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "setuptools-scm==7.0.5" "wheel==0.37.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1" "cryptography==38.0.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "cffi==1.15.1" "poetry==1.1.14" "Cython==0.29.32" "flit==3.7.1" "cryptography==38.0.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif
