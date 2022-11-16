@@ -6,8 +6,14 @@ PKG_DIST_SITE = https://download.gnome.org/sources/pango/$(word 1,$(subst ., ,$(
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# we must build glib before harfbuzz to get harbuzz glib integration (hb-glib.h)
-DEPENDS = cross/fontconfig cross/cairo cross/glib cross/harfbuzz
+DEPENDS = cross/fontconfig cross/cairo cross/glib
+OPTIONAL_DEPENDS = cross/harfbuzz
+
+include ../../mk/spksrc.archs.mk
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# REMARKS: we must build glib before harfbuzz to get harbuzz glib integration (hb-glib.h)
+DEPENDS += cross/harfbuzz
+endif
 
 HOMEPAGE = https://pango.gnome.org/
 COMMENT  = Pango is a library for layout and rendering of text, with an emphasis on internationalization.

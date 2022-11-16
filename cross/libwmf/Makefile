@@ -17,4 +17,8 @@ CONFIGURE_ARGS += --with-freetype=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-libxml2=$(STAGING_INSTALL_PREFIX)
 ADDITIONAL_CFLAGS = -O
 
+# for some reason configure does not find ft2build.h of freetype library
+CONFIGURE_ARGS += ac_cv_header_ft2build_h=yes
+ADDITIONAL_CFLAGS += -I$(STAGING_INSTALL_PREFIX)/include/freetype2
+
 include ../../mk/spksrc.cross-cc.mk
