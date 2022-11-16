@@ -1,5 +1,5 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.2.1
+SPK_VERS = 1.2.2
 SPK_REV = 12
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -25,7 +25,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Add emborg 1.32.0<br/>2. Update borgmatic to v1.6.3<br/>3. Update borg to 1.2.1<br/>"
+CHANGELOG = "Update borg to 1.2.2"
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = BSD-3-Clause
