@@ -69,6 +69,6 @@ miniaudio==1.53
 
 ephem==3.7.7.0
 guppy3==3.1.2
-psutil==5.9.2
+psutil==5.9.4
 Pillow==9.2.0
 pyitachip2ir==0.0.7
