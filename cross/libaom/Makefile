@@ -1,8 +1,9 @@
 PKG_NAME = libaom
-PKG_VERS = v3.3.0
+PKG_VERS = v3.4.0
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 87460cef80fb03def7d97df1b47bad5432e5e2e4
+PKG_GIT_HASH = fd0c9275d36930a6eea6d3c35972e7cf9c512944
+# Tag v3.4.0: fd0c9275d36930a6eea6d3c35972e7cf9c512944
 # Tag v3.3.0: 87460cef80fb03def7d97df1b47bad5432e5e2e4
 # Tag v3.2.0: 287164de79516c25c8c84fd544f67752c170082a
 # Tag v3.1.0: 33aff8586e35ffe385637f6aa2c991858c0fb58e
@@ -32,6 +33,10 @@ CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
 
 # Disable tests
 CMAKE_ARGS += -DENABLE_TESTS=0
+
+CMAKE_ARGS += -DENABLE_DOCS=0
+CMAKE_ARGS += -DAOM_EXTRA_C_FLAGS=-O
+CMAKE_ARGS += -DAOM_EXTRA_CXX_FLAGS=-O
 
 # Fix compilation with newer compilers
 # Flags to be added to CMake toolchain file

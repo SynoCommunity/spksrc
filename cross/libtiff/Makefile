@@ -12,7 +12,7 @@ COMMENT  = LibTIFF provides support for the Tag Image File Format (TIFF), a wide
 LICENSE  = No license. All rights reserved.
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-rpath
+CONFIGURE_ARGS = --enable-rpath --disable-static
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

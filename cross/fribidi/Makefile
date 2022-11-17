@@ -1,5 +1,5 @@
 PKG_NAME = fribidi
-PKG_VERS = 1.0.11
+PKG_VERS = 1.0.12
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fribidi/fribidi/releases/download/v$(PKG_VERS)
@@ -12,7 +12,7 @@ COMMENT  = GNU FriBidi is an implementation of the Unicode Bidirectional Algorit
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-
 CONFIGURE_ARGS = --with-pic
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

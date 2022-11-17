@@ -1,8 +1,8 @@
 PKG_NAME = libtool
-PKG_VERS = 2.4.6
+PKG_VERS = 2.4.7
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/libtool
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -12,6 +12,7 @@ COMMENT  = GNU Libtool is a generic library support script that hides the comple
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

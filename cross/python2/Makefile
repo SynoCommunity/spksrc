@@ -48,6 +48,8 @@ python_post_patch:
 python_pre_configure:
 	# Needed for cross-compilation of wheels
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
+	# Need "typing" installed to build wheel of "twisted==20.3.0"
+	$(PIP_NATIVE) install "typing==3.7.4.1"
 	# Needed to apply patch-changes to configure.ac
 	$(RUN) autoreconf
 

@@ -14,8 +14,10 @@ COMMENT  = Open h.265 video codec implementation.
 LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS  = --disable-static
 # Disable build of applications, build library only
-CONFIGURE_ARGS = --disable-dec265 --disable-sherlock265
+CONFIGURE_ARGS += --disable-dec265
+CONFIGURE_ARGS += --disable-sherlock265
 
 ADDITIONAL_CPPFLAGS = -O
 

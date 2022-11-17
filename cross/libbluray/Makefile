@@ -13,7 +13,11 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava-jar
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --disable-examples
+CONFIGURE_ARGS += --disable-doxygen-doc
+CONFIGURE_ARGS += --disable-doxygen-dot
+CONFIGURE_ARGS += --disable-bdjava-jar
 
 # For ppc853x-5.2, define GNU_SOURCE
 ifeq ($(findstring $(ARCH)-$(TCVERSION), ppc853x-5.2 qoriq-5.2),$(ARCH)-$(TCVERSION))
