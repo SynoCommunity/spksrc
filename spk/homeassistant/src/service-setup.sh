@@ -1,8 +1,4 @@
 
-# service setup: content is included by following scripts
-# - installer
-# - start-stop-status
-
 PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
@@ -19,6 +15,11 @@ service_postinst ()
     separator="===================================================="
 
     echo ${separator}
+    echo "Create folder: ${CONFIG_DIR}"
+    mkdir -p "${CONFIG_DIR}"
+
+    echo ${separator}
+    echo "Install Python virtual environment"
     install_python_virtualenv
 
     echo ${separator}
@@ -31,20 +32,8 @@ service_postinst ()
                 --requirement ${SYNOPKG_PKGDEST}/share/wheelhouse/requirements-pure.txt
 
     echo ${separator}
-    echo "Install packages for default_config from index"
-    pip install --no-deps --no-input \
-                --cache-dir ${SYNOPKG_PKGVAR}/pip-cache \
-                --requirement ${SYNOPKG_PKGDEST}/share/postinst_default_config_requirements.txt
-    if [ $? -ne 0 ]; then
-        echo "ERROR: default_config installation failed";
-        return;
-    fi
-
-    echo ${separator}
     echo "Install packages for homeassistant.components from index"
     pip install --no-deps --no-input \
-                --cache-dir ${SYNOPKG_PKGVAR}/pip-cache \
                 --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
 
-    mkdir -p "${CONFIG_DIR}"
 }

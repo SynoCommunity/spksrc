@@ -32,7 +32,7 @@ USE_ALTERNATE_TMPDIR = 1
 POST_STRIP_TARGET = homeassistant_extra_install
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -88,5 +88,4 @@ endif
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/share
-	@install -m 644 src/postinst_default_config_requirements.txt $(STAGING_DIR)/share/
 	@install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/
