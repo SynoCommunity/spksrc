@@ -1,5 +1,5 @@
 PKG_NAME = libtasn1
-PKG_VERS = 4.16.0
+PKG_VERS = 4.17.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
