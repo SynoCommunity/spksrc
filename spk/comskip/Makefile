@@ -10,7 +10,7 @@ STARTABLE = no
 MAINTAINER = SynoCommunity
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to latest git hash from April 7th 2022<br/>2. Update to ffmpeg 4.4.2"
+CHANGELOG = "1. Update to latest git hash from April 7th 2022<br/>2. Update to FFMPEG 4.4.3"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
