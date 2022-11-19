@@ -1,5 +1,5 @@
 PKG_NAME = harfbuzz
-PKG_VERS = 2.9.1
+PKG_VERS = 5.3.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/harfbuzz/harfbuzz/releases/download/$(PKG_VERS)
@@ -16,7 +16,10 @@ LICENSE  = Old MIT
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = -Dtests=disabled
-ADDITIONAL_CFLAGS = -std=c11
+
+ifeq ($(call version_lt, $(TCVERSION), 7),1)
+ADDITIONAL_CFLAGS  = -std=c11
+endif
 
 # let it find glib-mkenums
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
