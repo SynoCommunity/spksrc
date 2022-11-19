@@ -13,4 +13,9 @@ LICENSE  = zlib-license
 
 ADDITIONAL_CFLAGS = -Os -fPIC
 
-include ../../mk/spksrc.cross-cc.mk
+# fix pkgconfig file
+# build with cross-cc creates wrong pkgconfig file (prefix without missing package name)
+# build with cross-cmake creates correct pkgconfig file, but default folder is share not lib
+CMAKE_ARGS += -DINSTALL_PKGCONFIG_DIR=$(INSTALL_PREFIX)/lib/pkgconfig
+
+include ../../mk/spksrc.cross-cmake.mk
