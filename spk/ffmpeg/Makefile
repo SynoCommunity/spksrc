@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 4.4.2
-SPK_REV = 46
+SPK_VERS = 4.4.3
+SPK_REV = 47
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update Intel Driver to version 22.4.4<br/>2. Add support for codec2 speech codec<br/>3. Enable chromaprint support for extracting fingerprints audio sources<br/>4. Fix ppc x265 librarie issue \#5314"
+CHANGELOG = "1. Update to FFMPEG 4.4.3<br/>2. Update Intel Media Driver 2022Q3 Release - 22.5.4<br/>3. Fix ppc x265 librarie issue \#5314<br/>5. Update libaom to version 3.5<br/>6. Multiple dependency updates"
 
 CONF_DIR = src/conf
 

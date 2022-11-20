@@ -1,6 +1,6 @@
 PKG_NAME = libpciaccess
-PKG_VERS = 0.16
-PKG_EXT = tar.bz2
+PKG_VERS = 0.17
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://xorg.freedesktop.org/archive/individual/lib
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)

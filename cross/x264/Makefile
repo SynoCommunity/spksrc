@@ -1,11 +1,11 @@
 PKG_NAME = x264
 PKG_VERS = 20220222-stable
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = bfc87b7a330f75f5c9a21e56081e4b20344f139e
-PKG_DIST_SITE = https://github.com/mirror/x264.git
+PKG_GIT_HASH = b093bbe7d9bc642c8f24067cbdcc73bb43562eab
+PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/mirror/x264/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm

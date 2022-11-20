@@ -4,12 +4,6 @@ lib:lib/libdrm.so.2.4.0
 lnk:lib/libdrm_amdgpu.so
 lnk:lib/libdrm_amdgpu.so.1
 lib:lib/libdrm_amdgpu.so.1.0.0
-lnk:lib/libdrm_etnaviv.so
-lnk:lib/libdrm_etnaviv.so.1
-lib:lib/libdrm_etnaviv.so.1.0.0
-lnk:lib/libdrm_freedreno.so
-lnk:lib/libdrm_freedreno.so.1
-lib:lib/libdrm_freedreno.so.1.0.0
 lnk:lib/libdrm_intel.so
 lnk:lib/libdrm_intel.so.1
 lib:lib/libdrm_intel.so.1.0.0

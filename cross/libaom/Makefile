@@ -1,16 +1,21 @@
 PKG_NAME = libaom
-PKG_VERS = v3.4.0
+PKG_VERS = 3.5.0
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = fd0c9275d36930a6eea6d3c35972e7cf9c512944
+# PKG_GIT_HASH = 9a83c6a5a55c176adbce740e47d3512edfc9ae71
+# Tag v3.5.0: 9a83c6a5a55c176adbce740e47d3512edfc9ae71
 # Tag v3.4.0: fd0c9275d36930a6eea6d3c35972e7cf9c512944
 # Tag v3.3.0: 87460cef80fb03def7d97df1b47bad5432e5e2e4
 # Tag v3.2.0: 287164de79516c25c8c84fd544f67752c170082a
 # Tag v3.1.0: 33aff8586e35ffe385637f6aa2c991858c0fb58e
 # Tag v3.0.0: d853caa2ab62d161e5edf344ffee7b597449dc0d
-PKG_DIST_SITE = https://aomedia.googlesource.com/aom
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+# PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+# PKG_DIST_SITE = https://aomedia.googlesource.com/aom/+archive
+# PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+# PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
+# EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://storage.googleapis.com/aom-releases
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 

@@ -1,15 +1,17 @@
 PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
-# git hash from April 14th 2022
-PKG_GIT_HASH = 26713c1e451a74dbcc7aaec8427c0356cc2c546f
+# git hash from November 10th 2022
+PKG_GIT_HASH = 52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
-DEPENDS = cross/openssl cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
+DEPENDS  = cross/openssl cross/gnutls
+DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
 DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/pngquant
+DEPENDS += cross/curl
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
@@ -23,7 +25,8 @@ GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
 
-CONFIGURE_ARGS = --enable-imagecache --enable-bundle --enable-trace --release
+CONFIGURE_ARGS  = --python=/usr/bin/python3
+CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
