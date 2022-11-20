@@ -8,9 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm  cross/librsvg
 
-# cross/openjpeg fails to build for DSM 7 when later in the dependency list...
-DEPENDS  = cross/openjpeg
-DEPENDS += cross/jemalloc
+DEPENDS  = cross/jemalloc
 DEPENDS += cross/bzip2 
 DEPENDS += cross/xz
 DEPENDS += cross/zstd
@@ -19,6 +17,7 @@ DEPENDS += cross/freetype
 DEPENDS += cross/fontconfig
 DEPENDS += cross/urw-base35-fonts
 DEPENDS += cross/dejavu
+DEPENDS += cross/openjpeg
 DEPENDS += cross/libjpeg
 DEPENDS += cross/jbigkit
 DEPENDS += cross/libpng
@@ -68,7 +67,5 @@ CONFIGURE_ARGS += CFLAGS=-lrt
 endif
 
 ADDITIONAL_CFLAGS  = -O
-# librsvg-2.0.pc does not define the correct include dir.
-ADDITIONAL_CFLAGS += -I$(STAGING_INSTALL_PREFIX)/include/librsvg-2.0
 
 include ../../mk/spksrc.cross-cc.mk
