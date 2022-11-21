@@ -10,7 +10,7 @@ DEPENDS = cross/fontconfig cross/cairo cross/glib
 OPTIONAL_DEPENDS = cross/harfbuzz
 
 include ../../mk/spksrc.archs.mk
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # REMARKS: we must build glib before harfbuzz to get harbuzz glib integration (hb-glib.h)
 DEPENDS += cross/harfbuzz
 endif
