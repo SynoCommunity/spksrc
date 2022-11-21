@@ -7,12 +7,16 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/fontconfig cross/cairo cross/glib
-OPTIONAL_DEPENDS = cross/harfbuzz
+OPTIONAL_DEPENDS = cross/harfbuzz cross/harfbuzz_3
 
 include ../../mk/spksrc.archs.mk
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # REMARKS: we must build glib before harfbuzz to get harbuzz glib integration (hb-glib.h)
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/harfbuzz_3
+else
 DEPENDS += cross/harfbuzz
+endif
 endif
 
 HOMEPAGE = https://pango.gnome.org/
