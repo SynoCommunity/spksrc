@@ -24,6 +24,14 @@ SPK_COMMANDS += bin/jpegoptim
 
 include ../../mk/spksrc.spk.mk
 
+SUPPORT_CPP11 = 1
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+SUPPORT_CPP11 = 0
+endif
+ifeq ($(call version_lt, $(TCVERSION), 6.0)$(call version_ge, $(TCVERSION), 3.0),11)
+SUPPORT_CPP11 = 0
+endif
+
 .PHONY: imagemagick_extra_install
 imagemagick_extra_install:
 	@$(MSG) Install type files for included fonts.
@@ -60,7 +68,7 @@ imagemagick_extra_install:
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/lib/libfreetype.so.6.18.3
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/lib/libwmf-0.2.so.7.1.0
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/lib/libxml2.so.2.9.12
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(SUPPORT_CPP11),1)
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/pango-view
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rsvg-convert
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/lib/libIlmImf-2_5.so.26.0.0
