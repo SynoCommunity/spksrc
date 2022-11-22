@@ -12,6 +12,7 @@ COMMENT  = Generic PCI access library.
 LICENSE  = https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/blob/master/COPYING
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
