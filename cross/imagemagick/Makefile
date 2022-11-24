@@ -26,6 +26,8 @@ DEPENDS += cross/libwmf
 DEPENDS += cross/libwebp
 DEPENDS += cross/djvulibre
 DEPENDS += cross/libtool
+DEPENDS += cross/libfpx
+DEPENDS += cross/fftw
 
 include ../../mk/spksrc.common.mk
 SUPPORT_CPP11 = 1
@@ -59,6 +61,8 @@ CONFIGURE_ARGS += --with-modules
 CONFIGURE_ARGS += --with-dejavu-font-dir=$(INSTALL_PREFIX)/share/dejavu/fonts
 CONFIGURE_ARGS += --with-urw-base35-font-dir=$(INSTALL_PREFIX)/share/fonts
 CONFIGURE_ARGS += --with-windows-font-dir=$(INSTALL_PREFIX)/share/libwmf/fonts
+CONFIGURE_ARGS += --with-fpx
+CONFIGURE_ARGS += --with-fftw
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # ARMv5 and PPC archs (except QorIQ) have older kernels

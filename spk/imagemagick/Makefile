@@ -10,7 +10,7 @@ DEPENDS += cross/jpegoptim cross/pngcrush cross/advancecomp
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; pngcrush an optimizer for png files; advancecomp a collection of recompression utilities for png and mng files.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.0-52 and jpegoptim to v1.5.0.<br/>2. Add DejaVu fonts.<br/>3. Update OpenJPEG library to v2.5.0.<br/>4. Add libraries to support additional image formats: Raw, OpenEXR, SVG.<br/>5. Add pngcrush v1.8.13.<br/>6. Add advancecomp v2.3."
+CHANGELOG = "1. Update ImageMagick to v7.1.0-52 and jpegoptim to v1.5.0.<br/>2. Add DejaVu fonts.<br/>3. Update OpenJPEG library to v2.5.0.<br/>4. Add libraries to support additional image formats: Raw, OpenEXR, SVG, Flashpix (fpx).<br/>5. Add pngcrush v1.8.13.<br/>6. Add advancecomp v2.3."
 
 STARTABLE = no
 
