@@ -37,7 +37,7 @@ SUPPORT_CPP11 = 0
 endif
 
 .PHONY: imagemagick_patch_rpath
-# some binaries and libraries contain the full installation path in RPATH (spksrc/spk/imagemagick/...)
+# some binaries and libraries contain the full installation path in RPATH (.../spk/imagemagick/...)
 # might be caused by incomplete implementation of install_correct_lib_files target in spksrc.install.mk
 # or false paths in generated pkgconfig files
 imagemagick_patch_rpath:
@@ -46,7 +46,7 @@ imagemagick_patch_rpath:
 	do \
 	  case $${type} in \
 	    lib|bin) \
-	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep RPATH | grep spksrc)" ]; then \
+	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep RPATH | grep spk/$(SPK_NAME))" ]; then \
 	         echo -n "Patch rpath in $${file}... " ; \
 	         patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/$${file} &> /dev/null && echo "ok." || echo "failed!" ; \
 	      fi \
