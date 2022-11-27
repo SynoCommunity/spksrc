@@ -1,0 +1,96 @@
+diff -uprN ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/descrambler.c ./src/descrambler/descrambler.c
+--- ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/descrambler.c	2022-11-10 17:31:18.000000000 +0000
++++ ./src/descrambler/descrambler.c	2022-11-27 15:34:14.526200847 +0000
+@@ -966,12 +966,12 @@ key_flush( th_descrambler_runtime_t *dr,
+   /* update the keys */
+   if (changed & 1) {
+     debug2("%p: even key[%d] set for decoder", dr, tk->key_pid);
+-    tvhcsa_set_key_even(&tk->key_csa, tk->key_data[0]);
++    tvhcsa_set_key_even(&tk->key_csa, tk->key_data[0], dr->dr_ecm);
+     tk->key_valid |= 0x40;
+   }
+   if (changed & 2) {
+     debug2("%p: odd key[%d] set for decoder", dr, tk->key_pid);
+-    tvhcsa_set_key_odd(&tk->key_csa, tk->key_data[1]);
++    tvhcsa_set_key_odd(&tk->key_csa, tk->key_data[1], dr->dr_ecm);
+     tk->key_valid |= 0x80;
+   }
+ }
+@@ -1371,6 +1371,7 @@ descrambler_table_callback
+                 }
+               }
+             }
++            dr->dr_ecm = (ptr[2] - ptr[4]) == 4 ? ptr[0x15] : 0;
+             tvhtrace(LS_DESCRAMBLER, "ECM message %02x:%02x (section %d, len %d, pid %d) for service \"%s\"",
+                      ptr[0], ptr[1], des->number, len, mt->mt_pid, t->s_dvb_svcname);
+           }
+diff -uprN ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/descrambler.h ./src/descrambler/descrambler.h
+--- ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/descrambler.h	2022-11-10 17:31:18.000000000 +0000
++++ ./src/descrambler/descrambler.h	2022-11-27 15:34:14.526200847 +0000
+@@ -103,6 +103,7 @@ typedef struct th_descrambler_runtime {
+   int64_t  dr_ecm_start[2];
+   int64_t  dr_ecm_last_key_time;
+   int64_t  dr_ecm_key_margin;
++  uint8_t  dr_ecm;
+   int64_t  dr_last_err;
+   int64_t  dr_force_skip;
+   th_descrambler_key_t dr_keys[DESCRAMBLER_MAX_KEYS];
+diff -uprN ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/tvhcsa.c ./src/descrambler/tvhcsa.c
+--- ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/tvhcsa.c	2022-11-10 17:31:18.000000000 +0000
++++ ./src/descrambler/tvhcsa.c	2022-11-27 15:34:14.526200847 +0000
+@@ -220,12 +220,12 @@ tvhcsa_set_type( tvhcsa_t *csa, struct m
+ }
+ 
+ 
+-void tvhcsa_set_key_even( tvhcsa_t *csa, const uint8_t *even )
++void tvhcsa_set_key_even( tvhcsa_t *csa, const uint8_t *even, const uint8_t ecm)
+ {
+   switch (csa->csa_type) {
+   case DESCRAMBLER_CSA_CBC:
+ #if ENABLE_DVBCSA
+-    dvbcsa_bs_key_set(even, csa->csa_key_even);
++    dvbcsa_bs_key_set_ecm(ecm, even, csa->csa_key_even);
+ #endif
+     break;
+   case DESCRAMBLER_DES_NCB:
+@@ -241,13 +241,13 @@ void tvhcsa_set_key_even( tvhcsa_t *csa,
+   }
+ }
+ 
+-void tvhcsa_set_key_odd( tvhcsa_t *csa, const uint8_t *odd )
++void tvhcsa_set_key_odd( tvhcsa_t *csa, const uint8_t *odd, const uint8_t ecm )
+ {
+   assert(csa->csa_type);
+   switch (csa->csa_type) {
+   case DESCRAMBLER_CSA_CBC:
+ #if ENABLE_DVBCSA
+-    dvbcsa_bs_key_set(odd, csa->csa_key_odd);
++    dvbcsa_bs_key_set_ecm(ecm, odd, csa->csa_key_odd);
+ #endif
+     break;
+   case DESCRAMBLER_DES_NCB:
+diff -uprN ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/tvhcsa.h ./src/descrambler/tvhcsa.h
+--- ../tvheadend-52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f-orig/src/descrambler/tvhcsa.h	2022-11-10 17:31:18.000000000 +0000
++++ ./src/descrambler/tvhcsa.h	2022-11-27 15:34:14.526200847 +0000
+@@ -66,8 +66,8 @@ typedef struct tvhcsa
+ 
+ int  tvhcsa_set_type( tvhcsa_t *csa, struct mpegts_service *s, int type );
+ 
+-void tvhcsa_set_key_even( tvhcsa_t *csa, const uint8_t *even );
+-void tvhcsa_set_key_odd ( tvhcsa_t *csa, const uint8_t *odd );
++void tvhcsa_set_key_even( tvhcsa_t *csa, const uint8_t *even, const uint8_t ecm );
++void tvhcsa_set_key_odd ( tvhcsa_t *csa, const uint8_t *odd, const uint8_t ecm );
+ 
+ void tvhcsa_init    ( tvhcsa_t *csa );
+ void tvhcsa_destroy ( tvhcsa_t *csa );
+@@ -76,8 +76,8 @@ void tvhcsa_destroy ( tvhcsa_t *csa );
+ 
+ static inline int tvhcsa_set_type( tvhcsa_t *csa, struct mpegts_service *s, int type ) { return -1; }
+ 
+-static inline void tvhcsa_set_key_even( tvhcsa_t *csa, const uint8_t *even ) { };
+-static inline void tvhcsa_set_key_odd ( tvhcsa_t *csa, const uint8_t *odd ) { };
++static inline void tvhcsa_set_key_even( tvhcsa_t *csa, const uint8_t *even, const uint8_t ecm ) { };
++static inline void tvhcsa_set_key_odd ( tvhcsa_t *csa, const uint8_t *odd, const uint8_t ecm ) { };
+ 
+ static inline void tvhcsa_init ( tvhcsa_t *csa ) { };
+ static inline void tvhcsa_destroy ( tvhcsa_t *csa ) { };
