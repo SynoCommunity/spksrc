@@ -26,6 +26,8 @@ DEPENDS += cross/libwmf
 DEPENDS += cross/libwebp
 DEPENDS += cross/djvulibre
 DEPENDS += cross/libtool
+DEPENDS += cross/libfpx
+DEPENDS += cross/fftw
 
 include ../../mk/spksrc.common.mk
 SUPPORT_CPP11 = 1
@@ -50,8 +52,10 @@ LICENSE  = Apache 2.0
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
-CONFIGURE_ARGS += --without-perl --without-x --without-fpx
+CONFIGURE_ARGS += --without-perl --without-x
 CONFIGURE_ARGS += --with-rsvg
+CONFIGURE_ARGS += --with-fpx
+CONFIGURE_ARGS += --with-fftw
 # magick *++* files fail to add to package by PLIST
 CONFIGURE_ARGS += --without-magick-plus-plus
 CONFIGURE_ARGS += --with-jemalloc
@@ -66,6 +70,6 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += CFLAGS=-lrt
 endif
 
-ADDITIONAL_CFLAGS  = -O
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
