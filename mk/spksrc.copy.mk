@@ -54,7 +54,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	    tar xpf - -C $(STAGING_DIR)/var --strip-components=1 --transform='s!^target/!!' ; \
 	fi
 else
-	@$(MSG) Copy target to staging [DSM6]
+	@$(MSG) [DSM6] Copy target to staging
 	@(mkdir -p $(STAGING_DIR) && cd $(STAGING_INSTALL_PREFIX) && tar cpf - $$(cat $(INSTALL_PLIST) | cut -d':' -f2)) | tar xpf - -C $(STAGING_DIR)
 endif
 

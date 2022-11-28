@@ -57,6 +57,7 @@ validate_preupgrade ()
 
 service_preinst ()
 {
+    # use echo to write to the installer log file.
     echo "service_preinst ${SYNOPKG_PKG_STATUS}"
     
     echo "PYTHON_VERSION:       ${PYTHON_VERSION}"
@@ -68,6 +69,7 @@ service_preinst ()
 
 service_postinst ()
 {
+    # use echo to write to the installer log file.
     echo "service_postinst ${SYNOPKG_PKG_STATUS}"
     
     ln -sf ${INST_LOG} ${SYNOPKG_PKGVAR}/installer.log
@@ -75,31 +77,37 @@ service_postinst ()
 
 service_preuninst ()
 {
+    # use echo to write to the installer log file.
     echo "service_preuninst ${SYNOPKG_PKG_STATUS}"
 }
 
 service_postuninst ()
 {
+    # use echo to write to the installer log file.
     echo "service_postuninst ${SYNOPKG_PKG_STATUS}"
 }
 
 service_preupgrade ()
 {
+    # use echo to write to the installer log file.
     echo "service_preupgrade ${SYNOPKG_PKG_STATUS}"
 }
 
 service_postupgrade ()
 {
+    # use echo to write to the installer log file.
     echo "service_postupgrade ${SYNOPKG_PKG_STATUS}"
 }
 
 service_prestart ()
 {
-    echo "Before service start"
+    # use echo to write to the service log file.
+    echo "service_prestart: Before service start"
 }
 
 service_poststop ()
 {
-    echo "After service stop"
+    # use echo to write to the service log file.
+    echo "service_poststop: After service stop"
 }
 
