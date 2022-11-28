@@ -54,10 +54,10 @@ service_preupgrade()
     CUR_VER=$(${SYNCTHING} --version | awk '{print $2}' | awk --field-separator=- '{print $1}')
     PKG_VER=$(${SYNOPKG_PKGINST_TEMP_DIR}/bin/syncthing --version | awk '{print $2}' | awk --field-separator=- '{print $1}')
     if version_le $CUR_VER $PKG_VER; then
-	install_log "Package ${PKG_VER} is newer than or same as installed binary ${CUR_VER}"
+        echo "Package ${PKG_VER} is newer than or same as installed binary ${CUR_VER}"
     else
-	install_log "Installed binary ${CUR_VER} is newer than package ${PKG_VER}, preserving a backup"
-	mkdir ${SYNOPKG_TEMP_UPGRADE_FOLDER}/bin
+        echo "Installed binary ${CUR_VER} is newer than package ${PKG_VER}, preserving a backup"
+        mkdir ${SYNOPKG_TEMP_UPGRADE_FOLDER}/bin
         cp -p ${SYNCTHING} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/bin/syncthing
     fi
 }
@@ -65,7 +65,7 @@ service_preupgrade()
 service_postupgrade()
 {
     if [ -x ${SYNOPKG_TEMP_UPGRADE_FOLDER}/bin/syncthing ]; then
-	install_log "Restoring preserved binary backup"
-	mv -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/bin/syncthing ${SYNCTHING}
+        echo "Restoring preserved binary backup"
+        mv -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/bin/syncthing ${SYNCTHING}
     fi
 }
