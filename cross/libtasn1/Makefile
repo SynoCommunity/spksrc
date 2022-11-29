@@ -1,5 +1,5 @@
 PKG_NAME = libtasn1
-PKG_VERS = 4.17.0
+PKG_VERS = 4.19.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
@@ -13,6 +13,6 @@ LICENSE  = LGPLv2.1
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-gcc-warnings --disable-static
-ADDITIONAL_CPPFLAGS = -std=c99
+ADDITIONAL_CFLAGS  = -std=gnu99
 
 include ../../mk/spksrc.cross-cc.mk

@@ -167,8 +167,8 @@ DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.9 (88f6281-6.1 = gcc-4.6.4)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
 DEPENDS += cross/libass
 CONFIGURE_ARGS += --enable-libass
 endif

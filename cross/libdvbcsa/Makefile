@@ -19,6 +19,7 @@ CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 
 PRE_CONFIGURE_TARGET = libdvbcsa_pre_configure
+PATCHES_LEVEL = 1
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-neon

@@ -1,8 +1,8 @@
 PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
-# git hash from November 10th 2022
-PKG_GIT_HASH = 52c3ed3ef17eeccddc6a4cf7c0d7151c2823438f
+# git hash from November 28th 2022
+PKG_GIT_HASH = d8854960361b0fb6846f0912f509dfad61f3ccbf
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -48,11 +48,14 @@ ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/ffmpeg
 endif
 
-include ../../mk/spksrc.cross-cc.mk
-
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ADDITIONAL_CFLAGS += -std=gnu11
+else
 CONFIGURE_ARGS += --nowerror
+ADDITIONAL_CFLAGS += -std=gnu99
 endif
+
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
@@ -60,6 +63,8 @@ ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/libva
 endif
 endif
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: tvheadend_pre_configure
 tvheadend_pre_configure:
