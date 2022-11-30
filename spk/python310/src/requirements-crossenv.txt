@@ -8,7 +8,7 @@
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# cryptography==38.0.1
+cryptography==38.0.4
 
 # Requirement for cryptography
 # cffi==1.15.1
@@ -17,7 +17,7 @@
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-# bcrypt==4.0.0
+bcrypt==4.0.0
 # greenlet==1.1.3
 # immutables==0.19
 # MarkupSafe==2.1.1
