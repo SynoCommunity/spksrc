@@ -54,7 +54,13 @@ include ../../mk/spksrc.tc-vers.mk
 flag: vers
 include ../../mk/spksrc.tc-flags.mk
 
-all: fix $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MK)
+fix: flag
+include ../../mk/spksrc.tc-fix.mk
+
+rustc: fix
+include ../../mk/spksrc.tc-rust.mk
+
+all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK): flag
@@ -128,8 +134,8 @@ tc_vars: flag
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
 	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
-	echo TC_ENV += CARGO_HOME=\"/opt/cargo\" ; \
-	echo TC_ENV += RUSTUP_HOME=\"/opt/rustup\" ; \
+	echo TC_ENV += CARGO_HOME=\"$(CARGO_HOME)\" ; \
+	echo TC_ENV += RUSTUP_HOME=\"$(RUSTUP_HOME)\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
