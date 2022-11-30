@@ -6,6 +6,11 @@
 #  rustc_target       (override with RUSTC_TARGET)
 #  post_rustc_target  (override with POST_RUSTC_TARGET)
 
+# Configure file descriptor lock timeout
+ifeq ($(strip $(FLOCK_TIMEOUT)),)
+FLOCK_TIMEOUT = 300
+endif
+
 RUSTC_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc_done
 
 ifeq ($(strip $(PRE_RUSTC_TARGET)),)
@@ -38,12 +43,17 @@ pre_rustc_target: rustc_msg
 	@curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 rustc_target: $(PRE_RUSTC_TARGET)
-	@$(MSG) "rustup toolchain install $(RUST_TOOLCHAIN)"
-	rustup toolchain install $(RUST_TOOLCHAIN)
-	@$(MSG) "rustup default $(RUST_TOOLCHAIN)"
-	rustup default $(RUST_TOOLCHAIN)
-	@$(MSG) "rustup target add $(RUST_TARGET)"
-	rustup target add $(RUST_TARGET)
+	@$(MSG) "rustup toolchain install $(RUST_TOOLCHAIN)" ; \
+	exec 5> /tmp/tc-rustc.lock ; \
+	flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
+	pid=$$$$ ; \
+	echo "$${pid}" 1>&5 ; \
+	rustup toolchain install $(RUST_TOOLCHAIN) ; \
+	$(MSG) "rustup default $(RUST_TOOLCHAIN)" ; \
+	rustup default $(RUST_TOOLCHAIN) ; \
+	$(MSG) "rustup target add $(RUST_TARGET)" ; \
+	rustup target add $(RUST_TARGET) ; \
+	flock -u 5
 
 post_rustc_target: $(RUSTC_TARGET)
 
