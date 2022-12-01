@@ -13,10 +13,9 @@ COMMENT  = A powerful duplicate file finder and an enhanced fork of fdupes.
 LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = jdupes_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+
+ADDITIONAL_CFLAGS = -DENABLE_DEDUPE
+PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: jdupes_install
-jdupes_install:
-	@$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)

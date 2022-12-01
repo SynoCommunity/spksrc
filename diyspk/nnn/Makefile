@@ -1,5 +1,5 @@
 SPK_NAME = nnn
-SPK_VERS = 4.5
+SPK_VERS = 4.7
 SPK_REV = 1
 SPK_ICON = src/nnn.png
 

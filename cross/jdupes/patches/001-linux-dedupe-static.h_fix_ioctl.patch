@@ -1,0 +1,20 @@
+From 0d4d98f51c99999d2c6dbbb89d554af551b5b69b Mon Sep 17 00:00:00 2001
+From: Calum McConnell <calumlikesapplepie@gmail.com>
+Date: Mon, 12 Sep 2022 14:42:50 -0400
+Subject: [PATCH] Fix linux static header IOCTL decimal literal (#212)
+
+---
+ linux-dedupe-static.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux-dedupe-static.h b/linux-dedupe-static.h
+index df45f4d..2e774e9 100644
+--- a/linux-dedupe-static.h
++++ b/linux-dedupe-static.h
+@@ -20,5 +20,5 @@ struct file_dedupe_range {
+ 	__u32 reserved2;
+ 	struct file_dedupe_range_info info[0];
+ };
+-#define FIDEDUPERANGE _IOWR(94, 54, struct file_dedupe_range)
++#define FIDEDUPERANGE _IOWR(0x94, 54, struct file_dedupe_range)
+ #endif /* JDUPES_DEDUPESTATIC_H */
