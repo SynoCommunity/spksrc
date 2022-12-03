@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libfuse/libfuse/archive/
 PKG_DIR = libfuse-$(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/systemd cross/libiconv
+DEPENDS = cross/libudev cross/libiconv
 
 HOMEPAGE = https://github.com/libfuse/libfuse
 COMMENT  = The reference implementation of the Linux FUSE (Filesystem in Userspace) interface
