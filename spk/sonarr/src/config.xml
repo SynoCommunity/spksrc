@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Config>
+  <Branch>main</Branch>
+  <LaunchBrowser>False</LaunchBrowser>
+  <UpdateAutomatically>True</UpdateAutomatically>
+  <UpdateMechanism>BuiltIn</UpdateMechanism>
+</Config>

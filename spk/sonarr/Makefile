@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/sonarr.png
 
 # Mono not supported on ppc platforms. C.f. cross/mono/Makefile and references therein for details.
@@ -16,7 +16,7 @@ DESCRIPTION_FRE = Sonarr est un PVR pour les utilisateurs de groupes de discussi
 DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y torrents. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
 DISPLAY_NAME = Sonarr
 STARTABLE = yes
-CHANGELOG = "Enlarge the service start/stop timeout to 90 seconds."
+CHANGELOG = "1. Enlarge the service start/stop timeout to 90 seconds<br/>2. Avoid Sonarr downgrade on package update<br/>3. Upgrade to Sonarr 3.0.9.1549"
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
@@ -35,6 +35,11 @@ POST_STRIP_TARGET = sonarr_extra_install
 
 include ../../mk/spksrc.spk.mk
 
+PACKAGE_VERSION = $(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)
+PACKAGE_AUTHOR = [Team Sonarr](https://sonarr.tv)
+
 .PHONY: sonarr_extra_install
 sonarr_extra_install:
 	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
+	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Sonarr/package_info
