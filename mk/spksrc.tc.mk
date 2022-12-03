@@ -77,21 +77,25 @@ else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
 	@echo
-	@echo "# which compilers to use" ; \
+	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \
 	echo
-	@echo "set(CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)" ; \
-	echo "set(CMAKE_CPP_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)cpp)" ; \
-	echo "set(CMAKE_CXX_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)c++)" ; \
-	echo "set(CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ld)" ; \
-	echo "set(CMAKE_AR $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar)" ; \
-	echo "set(CMAKE_AS $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)as)" ; \
-	echo "set(CMAKE_NM $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)nm)" ; \
-	echo "set(CMAKE_OBJDUMP $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)objdump)" ; \
-	echo "set(CMAKE_RANLIB $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ranlib)" ; \
-	echo "set(CMAKE_READELF $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)readelf)" ; \
-	echo "set(CMAKE_STRIP $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)strip)" ; \
+	@echo "# define compilers and tools to use" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "CC" ] ; then \
+	    echo "set(CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
+	    echo "set(CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  elif [ "$${target}" = "LD" ] ; then \
+	    echo "set(CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  else \
+	    echo "set(CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  fi ; \
+	done ; \
 	echo
 	@echo "# where is the target environment located" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH $(CMAKE_FIND_ROOT_PATH))" ; \
@@ -113,10 +117,10 @@ tc_vars:
 	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
 	for tool in $(TOOLS) ; \
 	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/') ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/') ; \
-	  echo TC_ENV += $$(echo $${target} | tr [:lower:] [:upper:] )=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
-	  if [ "$${target}" = "cc" ] ; then \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  echo TC_ENV += $${target}=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
+	  if [ "$${target}" = "CC" ] ; then \
 	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
 	  fi ; \
 	done ; \

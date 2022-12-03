@@ -35,8 +35,6 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
-
-.PHONY: cmake_configure_target
 .PHONY: $(CMAKE_TOOLCHAIN_PKG)
 $(CMAKE_TOOLCHAIN_PKG):
 	@$(MSG) Generating $(CMAKE_TOOLCHAIN_PKG)
