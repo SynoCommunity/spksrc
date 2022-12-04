@@ -13,4 +13,7 @@ LICENSE  = GPLv2
 
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/cmake
 
+CMAKE_ARGS += -DDBUS_BUILD_TESTS=OFF
+CMAKE_ARGS += -DDBUS_ENABLE_XML_DOCS=OFF
+
 include ../../mk/spksrc.cross-cmake.mk
