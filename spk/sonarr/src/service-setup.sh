@@ -39,16 +39,32 @@ service_postinst ()
     mkdir -p "${SONARR_CONFIG_DIR}"
     # Check if config.xml is present in .comfig
     if [ -f "${SONARR_CONFIG_DIR}/config.xml" ]; then
-        # Modify config.xml with correct values
-        keys=("Branch" "LaunchBrowser" "UpdateAutomatically" "UpdateMechanism")
-        values=("main" "False" "True" "BuiltIn")
-        for i in "${!keys[@]}"; do
-            key="${keys[$i]}"
-            value="${values[$i]}"
-            if grep -q "<$key>" "${SONARR_CONFIG_DIR}/config.xml"; then
-                sed -i "s/<$key>.*<\/$key>/<$key>$value<\/$key>/g" "${SONARR_CONFIG_DIR}/config.xml"
+        # Modify config.xml with package values
+        declare -a keys=()
+        declare -a values=()
+        # Use awk to parse the package config file and extract the keys and values
+        while read -r line; do
+            # Check if the current line is the declaration line or the root element's opening or closing line
+            if [[ $line == *"<?xml"* ]] || [[ $line == *"<Config>"* ]] || [[ $line == *"</Config>"* ]]; then
+                # Skip these lines
+                continue
+            fi
+            # Extract the key and value from the current line
+            key=$(echo "$line" | awk -F '[<>]' '{print $2}')
+            value=$(echo "$line" | awk -F '[<>]' '{print $3}')
+            # Add the key and value to their respective arrays
+            keys+=("$key")
+            values+=("$value")
+        done < "${SYNOPKG_PKGDEST}/app/config.xml"
+        # Iterate through the keys and values
+        for ((i = 0; i < ${#keys[@]}; i++)); do
+            # Check if the current key is present in the existing config file
+            if grep -q "<${keys[$i]}>" "${SONARR_CONFIG_DIR}/config.xml"; then
+                # The key is present, so replace its value
+                sed -i "s#<${keys[$i]}>.*</${keys[$i]}>#<${keys[$i]}>${values[$i]}</${keys[$i]}>#g" "${SONARR_CONFIG_DIR}/config.xml"
             else
-                sed -i "s/\(<\/Config>\)/  <$key>$value<\/$key>\n\1/g" "${SONARR_CONFIG_DIR}/config.xml"
+                # The key is not present, so add it and its value
+                sed -i "/<\/Config>/i\  <${keys[$i]}>${values[$i]}</${keys[$i]}>" "${SONARR_CONFIG_DIR}/config.xml"
             fi
         done
     else
