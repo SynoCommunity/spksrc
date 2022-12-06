@@ -26,35 +26,56 @@ CONFIGURE_ARGS  = --without-python
 CONFIGURE_ARGS += --disable-manpages
 CONFIGURE_ARGS += --disable-tests
 CONFIGURE_ARGS += --disable-gudev
-CONFIGURE_ARGS += --disable-ima
-CONFIGURE_ARGS += --disable-chkconfig
-CONFIGURE_ARGS += --disable-selinux
-CONFIGURE_ARGS += --disable-xz
-CONFIGURE_ARGS += --disable-tcpwrap
-CONFIGURE_ARGS += --disable-pam
 CONFIGURE_ARGS += --disable-acl
-CONFIGURE_ARGS += --disable-xattr
-CONFIGURE_ARGS += --disable-gcrypt
+CONFIGURE_ARGS += --disable-apparmor
 CONFIGURE_ARGS += --disable-audit
-CONFIGURE_ARGS += --disable-elfutils
-CONFIGURE_ARGS += --disable-libcryptsetup
-CONFIGURE_ARGS += --disable-qrencode
-CONFIGURE_ARGS += --disable-microhttpd
+CONFIGURE_ARGS += --disable-backlight
 CONFIGURE_ARGS += --disable-binfmt
-CONFIGURE_ARGS += --disable-vconsole
-CONFIGURE_ARGS += --disable-readahead
 CONFIGURE_ARGS += --disable-bootchart
+CONFIGURE_ARGS += --disable-chkconfig
+CONFIGURE_ARGS += --disable-coredump
+CONFIGURE_ARGS += --disable-efi
+CONFIGURE_ARGS += --disable-elfutils
+CONFIGURE_ARGS += --disable-firstboot
+CONFIGURE_ARGS += --disable-gcrypt
+CONFIGURE_ARGS += --disable-gnutls
+CONFIGURE_ARGS += --disable-hibernate
+CONFIGURE_ARGS += --disable-hostnamed
+CONFIGURE_ARGS += --disable-hwdb
+CONFIGURE_ARGS += --disable-ima
+CONFIGURE_ARGS += --disable-importd
+CONFIGURE_ARGS += --disable-keymap
+CONFIGURE_ARGS += --disable-ldconfig
+CONFIGURE_ARGS += --disable-libcryptsetup
+CONFIGURE_ARGS += --disable-libcurl
+CONFIGURE_ARGS += --disable-libidn
+CONFIGURE_ARGS += --disable-libiptc
+CONFIGURE_ARGS += --disable-localed
+CONFIGURE_ARGS += --disable-logind
+CONFIGURE_ARGS += --disable-machined
+CONFIGURE_ARGS += --disable-microhttpd
+CONFIGURE_ARGS += --disable-myhostname
+CONFIGURE_ARGS += --disable-networkd
+CONFIGURE_ARGS += --disable-pam
+CONFIGURE_ARGS += --disable-polkit
+CONFIGURE_ARGS += --disable-qrencode
 CONFIGURE_ARGS += --disable-quotacheck
 CONFIGURE_ARGS += --disable-randomseed
-CONFIGURE_ARGS += --disable-logind
-CONFIGURE_ARGS += --disable-hostnamed
+CONFIGURE_ARGS += --disable-readahead
+CONFIGURE_ARGS += --disable-resolved
+CONFIGURE_ARGS += --disable-rfkill
+CONFIGURE_ARGS += --disable-seccomp
+CONFIGURE_ARGS += --disable-selinux
+CONFIGURE_ARGS += --disable-smack
+CONFIGURE_ARGS += --disable-sysusers
+CONFIGURE_ARGS += --disable-tcpwrap
 CONFIGURE_ARGS += --disable-timedated
-CONFIGURE_ARGS += --disable-localed
-CONFIGURE_ARGS += --disable-coredump
-CONFIGURE_ARGS += --disable-polkit
-CONFIGURE_ARGS += --disable-efi
-CONFIGURE_ARGS += --disable-myhostname
-CONFIGURE_ARGS += --disable-keymap
+CONFIGURE_ARGS += --disable-timesyncd
+CONFIGURE_ARGS += --disable-tmpfiles
+CONFIGURE_ARGS += --disable-vconsole
+CONFIGURE_ARGS += --disable-xattr
+CONFIGURE_ARGS += --disable-xz
+CONFIGURE_ARGS += --disable-zlib
 CONFIGURE_ARGS += --with-dbuspolicydir=$(INSTALL_PREFIX)/share/dbus-1/system.d
 CONFIGURE_ARGS += --with-dbussessionservicedir=$(INSTALL_PREFIX)/share/dbus-1/services
 CONFIGURE_ARGS += --with-dbussystemservicedir=$(INSTALL_PREFIX)/share/dbus-1/system-services
@@ -68,6 +89,12 @@ include ../../mk/spksrc.cross-cc.mk
 libudev_pre_configure:
 	@$(RUN) ACLOCAL_PATH=$(STAGING_INSTALL_PREFIX)/share/aclocal ./autogen.sh nop
 
+.PHONY: libudev_add_missing_toolchain_file
+# workaround for arch-evansport-7.0 and arch-comcerto2k-7.0
+libudev_add_missing_toolchain_file:
+	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/include/linux
+	@install -m 755 src/ppp-ioctl.h $(STAGING_INSTALL_PREFIX)/include/linux/
+
 
 .PHONY: libudev_post_configure
 # patch some files generated during configure with gperf
@@ -75,7 +102,7 @@ libudev_pre_configure:
 # mtd_probe.h:
 # include <stdint.h> for missing 'uint32_t' and 'uint8_t'
 # and define 'u_int32_t' missing for some archs and required by <mtd-user.h>
-libudev_post_configure:
+libudev_post_configure: libudev_add_missing_toolchain_file
 	@$(MSG) Patching some files created with gperf while autogen...
 	@$(RUN) sed -i.bak ":1;/lookup_errno/{n;s/unsigned int/size_t/;b1}" $(WORK_DIR)/$(PKG_DIR)/src/shared/errno-list.c
 	@$(RUN) sed -i.bak -e "/lookup_af/s/unsigned int/size_t/" $(WORK_DIR)/$(PKG_DIR)/src/shared/af-list.c
