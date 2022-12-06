@@ -6,12 +6,19 @@ PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libfuse/libfuse/archive/
 PKG_DIR = libfuse-$(PKG_REAL_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libudev
+OPTIONAL_DEPENDS = cross/libudev_204 cross/libudev_219
 
 # libudev:
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+DEPENDS = cross/libudev_219
+else
+DEPENDS = cross/libudev_204
+endif
+
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 PRE_CONFIGURE_TARGET = fuse3_add_missing_toolchain_file
 endif
