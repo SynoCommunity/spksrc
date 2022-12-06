@@ -16,7 +16,7 @@ DESCRIPTION_FRE = Sonarr est un PVR pour les utilisateurs de groupes de discussi
 DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y torrents. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
 DISPLAY_NAME = Sonarr
 STARTABLE = yes
-CHANGELOG = "1. Enlarge the service start/stop timeout to 90 seconds<br/>2. Avoid Sonarr downgrade on package update<br/>3. Upgrade to Sonarr 3.0.9.1549"
+CHANGELOG = "1. Enlarge the service start/stop timeout to 90 seconds<br>2. Avoid Sonarr downgrade on package update<br>3. Upgrade to Sonarr 3.0.9.1549<br>4. Implement fix for alternate TMP directory"
 
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
@@ -34,6 +34,9 @@ WIZARDS_DIR = src/wizard/
 POST_STRIP_TARGET = sonarr_extra_install
 
 include ../../mk/spksrc.spk.mk
+
+# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+USE_ALTERNATE_TMPDIR = 1
 
 PACKAGE_VERSION = $(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)
 PACKAGE_AUTHOR = [Team Sonarr](https://sonarr.tv)
