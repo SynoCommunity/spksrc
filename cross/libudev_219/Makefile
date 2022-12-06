@@ -44,7 +44,6 @@ CONFIGURE_ARGS += --disable-hostnamed
 CONFIGURE_ARGS += --disable-hwdb
 CONFIGURE_ARGS += --disable-ima
 CONFIGURE_ARGS += --disable-importd
-CONFIGURE_ARGS += --disable-keymap
 CONFIGURE_ARGS += --disable-ldconfig
 CONFIGURE_ARGS += --disable-libcryptsetup
 CONFIGURE_ARGS += --disable-libcurl
@@ -61,25 +60,21 @@ CONFIGURE_ARGS += --disable-polkit
 CONFIGURE_ARGS += --disable-qrencode
 CONFIGURE_ARGS += --disable-quotacheck
 CONFIGURE_ARGS += --disable-randomseed
-CONFIGURE_ARGS += --disable-readahead
 CONFIGURE_ARGS += --disable-resolved
 CONFIGURE_ARGS += --disable-rfkill
 CONFIGURE_ARGS += --disable-seccomp
 CONFIGURE_ARGS += --disable-selinux
 CONFIGURE_ARGS += --disable-smack
 CONFIGURE_ARGS += --disable-sysusers
-CONFIGURE_ARGS += --disable-tcpwrap
 CONFIGURE_ARGS += --disable-timedated
 CONFIGURE_ARGS += --disable-timesyncd
 CONFIGURE_ARGS += --disable-tmpfiles
 CONFIGURE_ARGS += --disable-vconsole
-CONFIGURE_ARGS += --disable-xattr
 CONFIGURE_ARGS += --disable-xz
 CONFIGURE_ARGS += --disable-zlib
 CONFIGURE_ARGS += --with-dbuspolicydir=$(INSTALL_PREFIX)/share/dbus-1/system.d
 CONFIGURE_ARGS += --with-dbussessionservicedir=$(INSTALL_PREFIX)/share/dbus-1/services
 CONFIGURE_ARGS += --with-dbussystemservicedir=$(INSTALL_PREFIX)/share/dbus-1/system-services
-CONFIGURE_ARGS += --with-dbusinterfacedir=$(INSTALL_PREFIX)/share/dbus-1/interfaces
 
 ADDITIONAL_CFLAGS = -DSG_FLAG_LUN_INHIBIT=2
 
