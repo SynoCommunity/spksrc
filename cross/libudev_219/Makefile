@@ -72,9 +72,9 @@ CONFIGURE_ARGS += --disable-tmpfiles
 CONFIGURE_ARGS += --disable-vconsole
 CONFIGURE_ARGS += --disable-xz
 CONFIGURE_ARGS += --disable-zlib
-CONFIGURE_ARGS += --with-dbuspolicydir=$(INSTALL_PREFIX)/share/dbus-1/system.d
-CONFIGURE_ARGS += --with-dbussessionservicedir=$(INSTALL_PREFIX)/share/dbus-1/services
-CONFIGURE_ARGS += --with-dbussystemservicedir=$(INSTALL_PREFIX)/share/dbus-1/system-services
+CONFIGURE_ARGS += --with-dbuspolicydir=/usr/share/dbus-1/system.d
+CONFIGURE_ARGS += --with-dbussessionservicedir=/usr/share/dbus-1/services
+CONFIGURE_ARGS += --with-dbussystemservicedir=/usr/share/dbus-1/system-services
 
 ADDITIONAL_CFLAGS = -DSG_FLAG_LUN_INHIBIT=2
 

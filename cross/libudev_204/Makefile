@@ -64,10 +64,10 @@ CONFIGURE_ARGS += --disable-polkit
 CONFIGURE_ARGS += --disable-efi
 CONFIGURE_ARGS += --disable-myhostname
 CONFIGURE_ARGS += --disable-keymap
-CONFIGURE_ARGS += --with-dbuspolicydir=$(INSTALL_PREFIX)/share/dbus-1/system.d
-CONFIGURE_ARGS += --with-dbussessionservicedir=$(INSTALL_PREFIX)/share/dbus-1/services
-CONFIGURE_ARGS += --with-dbussystemservicedir=$(INSTALL_PREFIX)/share/dbus-1/system-services
-CONFIGURE_ARGS += --with-dbusinterfacedir=$(INSTALL_PREFIX)/share/dbus-1/interfaces
+CONFIGURE_ARGS += --with-dbuspolicydir=/usr/share/dbus-1/system.d
+CONFIGURE_ARGS += --with-dbussessionservicedir=/usr/share/dbus-1/services
+CONFIGURE_ARGS += --with-dbussystemservicedir=/usr/share/dbus-1/system-services
+CONFIGURE_ARGS += --with-dbusinterfacedir=/usr/share/dbus-1/interfaces
 
 include ../../mk/spksrc.cross-cc.mk
 
