@@ -1,4 +1,4 @@
-TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump readelf
+TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
 
 ifeq ($(strip $(TC_NAME)),)
 TC_NAME = syno-$(TC_ARCH)

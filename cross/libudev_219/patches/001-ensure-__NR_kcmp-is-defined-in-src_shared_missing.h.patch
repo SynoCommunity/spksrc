@@ -1,0 +1,16 @@
+# define __NR_kcmp for toolchains missing it in linux/include/uapi/asm-generic/unistd.h 
+# 
+--- src/shared/missing.h.orig	2015-02-16 20:55:07.000000000 +0000
++++ src/shared/missing.h	2022-12-06 18:02:26.159528905 +0000
+@@ -755,6 +755,11 @@
+ #endif
+ 
+ #if !HAVE_DECL_KCMP
++
++#ifndef __NR_kcmp
++#define __NR_kcmp 2
++#endif
++
+ static inline int kcmp(pid_t pid1, pid_t pid2, int type, unsigned long idx1, unsigned long idx2) {
+         return syscall(__NR_kcmp, pid1, pid2, type, idx1, idx2);
+ }
