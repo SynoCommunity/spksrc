@@ -39,7 +39,7 @@ include ../../mk/spksrc.spk.mk
 USE_ALTERNATE_TMPDIR = 1
 
 PACKAGE_VERSION = $(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)
-PACKAGE_AUTHOR = [Team Sonarr](https://sonarr.tv)
+PACKAGE_AUTHOR = [SynoCommunity](https://synocommunity.com)
 
 .PHONY: sonarr_extra_install
 sonarr_extra_install:
