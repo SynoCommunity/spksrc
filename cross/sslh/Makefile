@@ -9,11 +9,12 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/libconfig cross/pcre2 cross/tcp_wrappers
 DEPENDS += cross/libcap
 
+# compiller must support -std=c11
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 HOMEPAGE = https://www.rutschle.net/tech/sslh/README.html
 COMMENT  = Applicative Protocol Multiplexer (e.g. share SSH and HTTPS on the same port).
 LICENSE  = GPLv2
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CONFIGURE_TARGET = sslh_configure
 INSTALL_TARGET = sslh_install
