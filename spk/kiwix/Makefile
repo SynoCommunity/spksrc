@@ -1,6 +1,6 @@
 SPK_NAME = kiwix
-SPK_VERS = 3.3.0
-SPK_REV  = 3
+SPK_VERS = 3.4.0
+SPK_REV  = 4
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "Update kiwix to v3.3.0"
+CHANGELOG = "Update kiwix to v3.4.0.<br>Fix initialization of empty library file on DSM 7."
 
 SERVICE_USER = auto
 STARTABLE = yes
