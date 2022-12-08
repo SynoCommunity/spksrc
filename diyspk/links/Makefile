@@ -1,6 +1,6 @@
 SPK_NAME = links
-SPK_VERS = 2.26
-SPK_REV = 3
+SPK_VERS = 2.28
+SPK_REV = 1
 SPK_ICON = src/links.png
 
 DEPENDS = cross/links
