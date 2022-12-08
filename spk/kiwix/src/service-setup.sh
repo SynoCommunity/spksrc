@@ -21,7 +21,7 @@ service_prestart ()
     fi
 
     if [ ! -f "${LIBRARY_FILE}" ]; then
-        cp ${SYNOPKG_PKGDEST}/var/empty_library.xml "${LIBRARY_FILE}"
+        cp ${SYNOPKG_PKGVAR}/empty_library.xml "${LIBRARY_FILE}"
     fi
 }
 
@@ -29,4 +29,3 @@ service_postinst ()
 {
     sed -e "s|@@_wizard_shared_folder_@@|${wizard_data_volume}/${wizard_data_folder}|g" -i "${CONFIG_FILE}"
 }
-
