@@ -44,7 +44,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, autossh, etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update sshfs to v3.7.3 for models supporting it (others stay on sshfs v2.10)."
+CHANGELOG = "1. Update sshfs to v3.7.3 for models supporting it (others stay on sshfs v2.10).<br/>2. Update arp-scan to v1.9.8.<br/>3. Update links to v2.28.<br/>4. Update nmap to v7.93.<br/>5. Update rsync to v3.2.7.<br/>6. Update tmux to v3.3a."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.

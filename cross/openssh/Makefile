@@ -1,5 +1,5 @@
 PKG_NAME = openssh
-PKG_VERS = 9.0p1
+PKG_VERS = 9.1p1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable

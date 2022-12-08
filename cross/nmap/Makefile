@@ -1,5 +1,5 @@
 PKG_NAME = nmap
-PKG_VERS = 7.92
+PKG_VERS = 7.93
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://nmap.org/dist
@@ -19,7 +19,6 @@ ADDITIONAL_CPPFLAGS = -O3
 POST_INSTALL_TARGET = nmap_post_install
 
 include ../../mk/spksrc.cross-cc.mk
-
 
 .PHONY: nmap_post_install
 nmap_post_install:
