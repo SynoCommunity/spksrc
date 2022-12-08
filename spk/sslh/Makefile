@@ -1,16 +1,16 @@
 SPK_NAME = sslh
-SPK_VERS = 1.21
-SPK_REV = 6
+SPK_VERS = 1.22
+SPK_REV = 7
 SPK_ICON = src/sslh.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/sslh
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = sslh accepts HTTPS, SSH, OpenVPN, tinc and XMPP connections on the same port. This makes it possible to connect to any of these servers on port 443 \(e.g. from inside a corporate firewall, which almost never block port 443\) while still serving HTTPS on that port.
 DESCRIPTION_FRE = sslh accepte des connexions HTTPS, SSH, OpenVPN, tinc et XMPP sur le même port TCP. Il est ainsi possible de se connecter à l\'un de ces services sur le port 443 \(par exemple depuis derrière un firewall d\'entrepise qui ne bloque en général pas le port 443\) tout en préservant les accès HTTPS sur ce même port.
 
 DISPLAY_NAME = sslh
-CHANGELOG = "sslh v1.21c. Add tcp wrappers. Remove letter ('c') from spk version for DSM7 compatibility."
+CHANGELOG = "update sslh to v1.22c."
 
 HOMEPAGE   = https://www.rutschle.net/tech/sslh/README.html
 LICENSE    = GPLv2
