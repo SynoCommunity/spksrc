@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "Update kiwix to v3.4.0"
+CHANGELOG = "Update kiwix to v3.4.0.<br>Fix initialization of empty library file on DSM 7."
 
 SERVICE_USER = auto
 STARTABLE = yes
