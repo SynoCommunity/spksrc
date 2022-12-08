@@ -1,5 +1,5 @@
 PKG_NAME = pcre2
-PKG_VERS = 10.40
+PKG_VERS = 10.41
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/PhilipHazel/pcre2/releases/download/$(PKG_NAME)-$(PKG_VERS)
@@ -8,7 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 OPTIONAL_DEPENDS = cross/readline cross/zlib cross/bzip2
 
-CONFIGURE_ARGS = --enable-pcre2-32
+CONFIGURE_ARGS  = --enable-pcre2-32
+CONFIGURE_ARGS += --disable-static
 
 ifeq ($(strip $(PCRE2_CLI_FULL)),1)
 # add additional features to pcre2grep and pcre2test

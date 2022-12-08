@@ -3,10 +3,10 @@ bin:bin/pcre2grep
 bin:bin/pcre2test
 lnk:lib/libpcre2-32.so
 lnk:lib/libpcre2-32.so.0
-lib:lib/libpcre2-32.so.0.11.0
+lib:lib/libpcre2-32.so.0.11.1
 lnk:lib/libpcre2-8.so
 lnk:lib/libpcre2-8.so.0
-lib:lib/libpcre2-8.so.0.11.0
+lib:lib/libpcre2-8.so.0.11.1
 lnk:lib/libpcre2-posix.so
 lnk:lib/libpcre2-posix.so.3
-lib:lib/libpcre2-posix.so.3.0.2
+lib:lib/libpcre2-posix.so.3.0.3
