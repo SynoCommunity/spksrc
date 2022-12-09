@@ -9,7 +9,7 @@ Fixes # <!--Optionally, add links to existing issues or other PR's-->
 - [ ] Build rule `all-supported` completed successfully
 - [ ] New installation of package completed successfully
 - [ ] Package upgrade completed successfully (Manually install the package again)
-- [ ] Package [functionality was tested](https://github.com/SynoCommunity/spksrc/wiki/Update-Policy#tests-checks)
+- [ ] Package [functionality was tested](https://github.com/SynoCommunity/spksrc/wiki/Package-Update-Policy#tests-checks)
 - [ ] Any needed [documentation](https://github.com/SynoCommunity/spksrc/wiki/Create-documentation) is updated/created
 
 
