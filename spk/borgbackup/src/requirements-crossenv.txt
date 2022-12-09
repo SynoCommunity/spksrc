@@ -1,6 +1,7 @@
+# requirements that need crossenv to build wheel for
+
 borgbackup==1.2.2
 
-pyrsistent==0.19.2
+msgpack==1.0.4     # used compiled verrsion for performance
 ruamel.yaml.clib==0.2.7
 llfuse==1.4.2
-msgpack==1.0.4  # compiling extensions for performance
