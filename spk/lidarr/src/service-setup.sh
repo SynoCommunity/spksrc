@@ -18,10 +18,6 @@ SVC_WAIT_TIMEOUT=90
 
 service_postinst ()
 {
-    # Move config.xml to .config
-    mkdir -p ${LIDARR_CONFIG_DIR}
-    mv ${SYNOPKG_PKGDEST}/app/config.xml ${LIDARR_CONFIG_DIR}/config.xml
-
     echo "Set update required"
     # Make Lidarr do an update check on start to avoid possible Lidarr
     # downgrade when synocommunity package is updated
