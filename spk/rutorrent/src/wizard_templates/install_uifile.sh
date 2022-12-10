@@ -134,8 +134,6 @@ END_OF_STEP
   if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     echo ",";
     additional_configuration_step;
-    echo ",";
-    dsm_pre7_permissions_step;
   fi
   echo "]";
 }> "${SYNOPKG_TEMP_LOGFILE}"
