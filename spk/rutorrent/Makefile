@@ -56,8 +56,8 @@ SERVICE_WIZARD_SHARE = wizard_download_dir
 SERVICE_COMMAND = screen -D -m rtorrent
 FWPORTS = src/rutorrent.sc
 CONF_DIR = src/conf/
-WIZARD_TEMPLATES_DIR = src/wizard_templates
-WIZARDS_DIR = $(WORK_DIR)/wizards
+WIZARDS_DIR = $(WORK_DIR)/generated-wizards
+WIZARDS = install_uifile upgrade_uifile
 
 INSTALL_DEP_SERVICES = apache-web
 START_DEP_SERVICES = apache-web
@@ -76,37 +76,32 @@ SYSTEM_GROUP = http
 
 ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
 
-INSTALL_WIZARD_TEMPLATES = base_install_uifile
-ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-INSTALL_WIZARD_TEMPLATES += additional-configurations
-INSTALL_WIZARD_TEMPLATES += dsm-permissions
-endif
-UPGRADE_WIZARD_TEMPLATES =
-ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-UPGRADE_WIZARD_TEMPLATES += dsm-permissions
-endif
-
 SUPPORTED_LANGUAGES = fre
-
-define generate_wizard
-	for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
-	    jq -s "[.[][]]" $$(for template in $(patsubst %,"%",$(1)) ; do echo "$(WIZARD_TEMPLATES_DIR)/$${template}$${suffix}.json "; done)>"$(2)$${suffix}"; \
-	done
-endef
-
-.PHONY: generated-wizards
-generated-wizards:
-	@mkdir -p $(WIZARDS_DIR)
-ifneq ($(strip $(INSTALL_WIZARD_TEMPLATES)),)
-	@$(call generate_wizard,$(INSTALL_WIZARD_TEMPLATES),$(WIZARDS_DIR)/install_uifile)
-endif
-ifneq ($(strip $(UPGRADE_WIZARD_TEMPLATES)),)
-	@$(call generate_wizard,$(UPGRADE_WIZARD_TEMPLATES),$(WIZARDS_DIR)/upgrade_uifile)
-endif
 
 wizards: generated-wizards
 
 include ../../mk/spksrc.spk.mk
+
+
+.PHONY: generated-wizards
+generated-wizards:
+	@mkdir -p $(WIZARDS_DIR)
+	@for template in $(WIZARDS); do \
+		for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
+			{\
+			  	echo "#!/bin/sh";\
+				echo "";\
+				cat src/wizard_templates/uifile_vars$${suffix} | sed -e 's/\\/\\\\/g' -e 's/\"/\\\"/g' -e 's/^\([^=]*\)=\\"\(.*\)\\"$$/\1="\2"/g';\
+				echo "";\
+				cat "$(SPKSRC_MK)spksrc.service.installer.functions";\
+				echo "";\
+				cat src/wizard_templates/shared_uifile_setup.sh;\
+				echo "";\
+				cat src/wizard_templates/$${template}.sh;\
+			}>$(WIZARDS_DIR)/$${template}$${suffix}.sh;\
+		done;\
+	done
+
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:

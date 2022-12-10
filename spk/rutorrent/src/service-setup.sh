@@ -48,10 +48,6 @@ fi
 validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ ! -d "${wizard_download_volume}/${wizard_download_dir}" ]; then
-            echo "Download directory ${wizard_download_volume}/${wizard_download_dir} does not exist."
-            exit 1
-        fi
         if [ -n "${wizard_watch_dir}" ] && [ ! -d "${wizard_watch_dir}" ]; then
             echo "Watch directory ${wizard_watch_dir} does not exist."
             exit 1
@@ -135,7 +131,7 @@ service_postinst ()
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        local effective_download_dir="${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}"
+        local effective_download_dir="${wizard_download_volume:=/volume1}/${wizard_download_share:=downloads}"
         TOP_DIR=$(echo "${effective_download_dir}" | cut -d "/" -f 2)
         MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
 
@@ -155,7 +151,6 @@ service_postinst ()
 
         sed -i -e "s|@download_dir@|${effective_download_dir}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
-               -e "s|@port_range@|${wizard_port_range:=6881-6999}|g" \
                "${RTORRENT_RC}"
 
         if [ -d "${wizard_watch_dir}" ]; then
@@ -175,7 +170,7 @@ service_postinst ()
           fi
           # Permissions handling
           if [ "${BUILDNUMBER}" -ge "4418" ]; then
-              set_syno_permissions "${wizard_download_volume:=/volume1}/${wizard_download_dir:=downloads}" "${GROUP}"
+              set_syno_permissions "${wizard_download_volume:=/volume1}/${wizard_download_share:=downloads}" "${GROUP}"
           fi
         fi
     fi

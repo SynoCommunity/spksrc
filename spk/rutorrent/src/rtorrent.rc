@@ -12,4 +12,4 @@ protocol.encryption.set = require,require_RC4,allow_incoming,try_outgoing
 dht.mode.set = auto
 dht.port.set = 6881
 protocol.pex.set= yes
-port_range = @port_range@
+port_range = 6881-6999

@@ -49,8 +49,9 @@
 	"data-share": {
 		"shares": [
 			{
-				"name": "{{wizard_download_dir}}", 
-				"permission":{"rw":["sc-rutorrent"]}
+				"name": "{{wizard_download_share}}", 
+				"permission":{"rw":["sc-rutorrent"]},
+				"once": true
 			}
 		]
 	}
