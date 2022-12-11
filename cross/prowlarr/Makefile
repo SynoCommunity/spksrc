@@ -1,5 +1,5 @@
 PKG_NAME = Prowlarr
-PKG_VERS = 0.4.9.2083
+PKG_VERS = 0.4.10.2111
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux-core-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Prowlarr/Prowlarr/releases/download/v$(PKG_VERS)
