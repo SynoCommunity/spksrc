@@ -15,7 +15,7 @@ SUPPORTURL = https://prowlarr.com/\#support
 
 DESCRIPTION = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required \(we do it all\).
 DISPLAY_NAME = Prowlarr
-CHANGELOG = "1. Enlarge the service start/stop timeout to 90 seconds.<br/>2. Update Prowlarr to v0.4.7.2016.<br/>3. Avoid Prowlarr downgrade on package update."
+CHANGELOG = "1. Enlarge the service start/stop timeout to 90 seconds.<br/>2. Update Prowlarr to v0.4.10.2111.<br/>3. Avoid Prowlarr downgrade on package update."
 
 HOMEPAGE = https://prowlarr.com/
 LICENSE  = GPLv3
