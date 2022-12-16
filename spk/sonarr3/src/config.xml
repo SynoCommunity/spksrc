@@ -1,0 +1,6 @@
+<Config>
+  <Branch>main</Branch>
+  <LaunchBrowser>False</LaunchBrowser>
+  <UpdateAutomatically>True</UpdateAutomatically>
+  <UpdateMechanism>BuiltIn</UpdateMechanism>
+</Config>
