@@ -23,7 +23,7 @@ WIZARDS_DIR = src/wizard/
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8384
-SERVICE_PORT_TITLE = Syncthing GUI
+SERVICE_PORT_TITLE = Syncthing Web GUI
 SERVICE_CERT = syncthing_webui
 SERVICE_CERT_RELOAD = tools/ca_reloader.sh
 
