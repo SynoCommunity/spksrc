@@ -8,7 +8,7 @@ fi
 SYNCTHING=/var/packages/syncthing/target/bin/syncthing
 
 case $1 in
-    syncthing-webui)
+    syncthing_webui)
         # Forcefully overwrite certificate files by symlinks
         ln -sf $CERT_DIR/cert.pem $CONF_DIR/https-cert.pem
         ln -sf $CERT_DIR/privkey.pem $CONF_DIR/https-key.pem
@@ -22,7 +22,7 @@ case $1 in
         exit $RESTART_STATUS
         ;;
     *)
-        echo "Usage: $0 syncthing-webui" >&2
+        echo "Usage: $0 syncthing_webui" >&2
         exit 1
         ;;
 esac
