@@ -10,6 +10,8 @@ GROUP="sc-syncthing"
 HOME=${SYNOPKG_PKGVAR}
 export HOME
 
+# include next gen gui
+export STGUIASSETS=${SYNOPKG_PKGDEST}/gui
 
 set_credentials() {
     if [ -n "${wizard_username}" -a -n "${wizard_password}" ]; then
