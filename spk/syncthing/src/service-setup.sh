@@ -1,23 +1,25 @@
 # syncthing service definition
 SYNCTHING="${SYNOPKG_PKGDEST}/bin/syncthing"
-SERVICE_COMMAND="${SYNCTHING} serve --home=${SYNOPKG_PKGVAR}"
+# define folder for configuration (config, keys, database, logs)
+SYNCTHING_CONFIG="--config=${SYNOPKG_PKGVAR} --data=${SYNOPKG_PKGVAR}"
+SERVICE_COMMAND="${SYNCTHING} serve ${SYNCTHING_CONFIG}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
 GROUP="sc-syncthing"
-
-# Required to run any syncthing command: set $HOME environment variable
-HOME=${SYNOPKG_PKGVAR}
-export HOME
 
 # include next gen gui
 export STGUIASSETS=${SYNOPKG_PKGDEST}/gui
 
 set_credentials() {
     if [ -n "${wizard_username}" -a -n "${wizard_password}" ]; then
+        echo "create user ${wizard_username} for syncthing web gui access"
         # Password needs to be hashed for config entry
-        ${SYNCTHING} generate --home=${SYNOPKG_PKGVAR} \
-            --gui-user="${wizard_username}" --gui-password="${wizard_password}"
+        # Required to run any syncthing command: set $HOME environment variable
+        HOME=${SYNOPKG_PKGVAR} ${SYNCTHING} generate    \
+                --config=${SYNOPKG_PKGVAR}              \
+                --gui-user="${wizard_username}"         \
+                --gui-password="${wizard_password}"
     fi
 }
 
@@ -29,11 +31,19 @@ service_postinst() {
 
 service_prestart ()
 {
-    # Read additional startup options from var/options.conf
+    # Read additional startup options and variables from var/options.conf
     if [ -f ${SYNOPKG_PKGVAR}/options.conf ]; then
         . ${SYNOPKG_PKGVAR}/options.conf
         SERVICE_COMMAND="${SERVICE_COMMAND} ${SYNCTHING_OPTIONS}"
     fi
+
+    # Required to run any syncthing command: set $HOME environment variable
+    if [ -z "${HOME}" ]; then
+        # if HOME is not set in options.conf
+        # use a default folder the package user has permissions for
+        HOME=${SYNOPKG_PKGVAR}
+    fi
+    export HOME
 
     # If the system has a TLS certificate for us, force its usage
     cert_dir=/usr/local/etc/certificate/${SYNOPKG_PKGNAME}/${SERVICE_CERT}
