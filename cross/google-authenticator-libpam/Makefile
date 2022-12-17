@@ -15,6 +15,8 @@ LICENSE = Apache-2.0
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = google-authenticator-libpam_pre_configure
 
+ADDITIONAL_CPPFLAGS = -O2
+
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: google-authenticator-libpam_pre_configure

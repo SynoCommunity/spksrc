@@ -6,11 +6,11 @@ PKG_DIST_SITE = https://github.com/linux-pam/linux-pam/releases/download/v$(PKG_
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 HOMEPAGE = https://github.com/linux-pam/linux-pam
-COMMENT = Linux PAM (Pluggable Authentication Modules for Linux) project
-LICENSE = BSD-3-Clause
+COMMENT = Linux PAM (Pluggable Authentication Modules for Linux) project.
+LICENSE = 3-Clause BSD
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-regenerate-docu
+CONFIGURE_ARGS  = --disable-regenerate-docu
 CONFIGURE_ARGS += --disable-db
 CONFIGURE_ARGS += --disable-nls
 
