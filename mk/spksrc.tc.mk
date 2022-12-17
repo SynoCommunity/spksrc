@@ -42,7 +42,10 @@ include ../../mk/spksrc.checksum.mk
 extract: checksum
 include ../../mk/spksrc.extract.mk
 
-patch: extract
+fix: extract
+include ../../mk/spksrc.tc-fix.mk
+
+patch: fix
 include ../../mk/spksrc.patch.mk
 
 vers: patch
@@ -51,13 +54,10 @@ include ../../mk/spksrc.tc-vers.mk
 flag: vers
 include ../../mk/spksrc.tc-flags.mk
 
-fix: flag
-include ../../mk/spksrc.tc-fix.mk
-
 all: fix $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
-$(TC_LOCAL_VARS_MK): fix
+$(TC_LOCAL_VARS_MK): flag
 	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
 
 .PHONY: $(TC_LOCAL_VARS_CMAKE)
@@ -112,7 +112,7 @@ endif
 	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
 
 .PHONY: tc_vars
-tc_vars:
+tc_vars: flag
 	@echo TC_ENV := ; \
 	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
 	for tool in $(TOOLS) ; \
