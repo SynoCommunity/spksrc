@@ -23,6 +23,9 @@ WIZARDS_DIR = src/wizard/
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 6379
+SERVICE_PORT_TITLE = redis TCP
+NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = redis_extra_install
 
