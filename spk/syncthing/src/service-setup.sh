@@ -13,7 +13,7 @@ export STGUIASSETS=${SYNOPKG_PKGDEST}/gui
 
 set_credentials() {
     if [ -n "${wizard_username}" -a -n "${wizard_password}" ]; then
-        echo "create user ${wizard_username} for syncthing web gui access"
+        echo "set user name ${wizard_username} for syncthing Web GUI access"
         # Password needs to be hashed for config entry
         # Required to run any syncthing command: set $HOME environment variable
         HOME=${SYNOPKG_PKGVAR} ${SYNCTHING} generate    \
