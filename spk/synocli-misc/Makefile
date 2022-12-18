@@ -8,7 +8,7 @@ DEPENDS = cross/bc cross/moreutils cross/misc-util-linux
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli misc. Tools
 
-DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge."
+DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, cal, col, colcrt, colrm, column, hexdump, lscpu, lsipc, lsirq, rev, wall, whereis."
 STARTABLE = no
 CHANGELOG = "Initial package release."
 
@@ -36,13 +36,9 @@ SPK_COMMANDS += bin/colcrt
 SPK_COMMANDS += bin/colrm
 SPK_COMMANDS += bin/column
 SPK_COMMANDS += bin/hexdump
-SPK_COMMANDS += bin/last
-SPK_COMMANDS += bin/lastb
 SPK_COMMANDS += bin/lscpu
 SPK_COMMANDS += bin/lsipc
 SPK_COMMANDS += bin/lsirq
-SPK_COMMANDS += bin/lslogins
-SPK_COMMANDS += bin/lsmem
 SPK_COMMANDS += bin/rev
 SPK_COMMANDS += bin/wall
 SPK_COMMANDS += bin/whereis

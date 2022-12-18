@@ -4,13 +4,12 @@ bin:bin/colcrt
 bin:bin/colrm
 bin:bin/column
 bin:bin/hexdump
-bin:bin/last
-bin:bin/lastb
 bin:bin/lscpu
 bin:bin/lsipc
 bin:bin/lsirq
-bin:bin/lslogins
-bin:bin/lsmem
 bin:bin/rev
 bin:bin/wall
 bin:bin/whereis
+lnk:lib/libsmartcols.so
+lnk:lib/libsmartcols.so.1
+lib:lib/libsmartcols.so.1.1.0
