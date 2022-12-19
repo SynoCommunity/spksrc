@@ -13,7 +13,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-ipv6
 CONFIGURE_ARGS += --without-static-libpython
 # installed pip is not on PATH
-CONFIGURE_ARGS += --without-ensurepip
+CONFIGURE_ARGS += --with-ensurepip=no
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
 # Uses system default libffi-dev
@@ -37,7 +37,7 @@ python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==22.2.2" --no-setuptools --no-wheel --disable-pip-version-check
 	@$(MSG) Installing setuptools, wheel, cffi and cross env
-	@$(PIP) --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "maturin==0.13.7" "wheel==0.37.1" "cffi==1.15.1" "crossenv==1.3.0"
+	@$(PIP) --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.5.2" "maturin==0.14.6" "wheel==0.37.1" "cffi==1.15.1" "crossenv==1.4.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
