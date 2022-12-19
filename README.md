@@ -115,32 +115,6 @@ lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
 lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
 ```
 
-#### `rustc` compiler
-10. Prepare the install destination directories:
-```bash
-lxc exec spksrc -- mkdir -p -m 0755 /opt/cargo /opt/rustup
-lxc exec spksrc -- chown spksrc:spksrc /opt/cargo /opt/rustup
-```
-11. Install `rustc`:
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup sh -s -- -y"
-```
-12. Install the `rustc` stable toolchain and set it as default
-```bash
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup toolchain install stable"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup default stable"
-```
-13. Install `rustc` toolchain for all archs targets:
-```bash
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add x86_64-unknown-linux-gnu"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add i686-unknown-linux-gnu"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add armv5te-unknown-linux-gnueabi"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add armv7-unknown-linux-gnueabihf"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add armv7-unknown-linux-gnueabi"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add aarch64-unknown-linux-gnu"
-lxc exec spksrc --user 1001 -- bash -c "CARGO_HOME=/opt/cargo RUSTUP_HOME=/opt/rustup /opt/cargo/bin/rustup target add powerpc-unknown-linux-gnu"
-```
-
 From there you can connect to your container as `spksrc` and follow the instructions in the [Developers HOW TO].
 ```bash
 lxc exec spksrc -- su --login spksrc
@@ -149,7 +123,8 @@ spksrc@spksrc:~$
 
 #### (OPTIONAL) Install misc base tools:
 ```bash
-lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrep rsync tree time
+lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev \
+                                        mlocate ripgrep rsync tree time
 lxc exec spksrc -- /usr/bin/updatedb
 ```
 
