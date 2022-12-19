@@ -54,10 +54,7 @@ include ../../mk/spksrc.tc-vers.mk
 flag: vers
 include ../../mk/spksrc.tc-flags.mk
 
-fix: flag
-include ../../mk/spksrc.tc-fix.mk
-
-rustc: fix
+rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
 all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MK)
