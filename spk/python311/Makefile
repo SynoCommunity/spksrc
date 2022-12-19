@@ -38,13 +38,13 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 ## various wheels.  Uncoment to enable.
 ##
 
-# # [bcrypt]
-# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# [bcrypt]
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # # [cryptography]
 # # To generate py36-abi3 limited API:
-# DEPENDS += cross/cryptography
+DEPENDS += cross/cryptography
 # # To generate py311-py311 regular build using src/requirements-crossenv.txt:
 # # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 # ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
