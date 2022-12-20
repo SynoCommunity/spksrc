@@ -1,0 +1,13 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [numpy]
+#   - Require Cython in cross/python310 crossenv
+#   - DSM6 require WHEELS_CFLAGS=-std=c++0x
+#   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
+#     ref: https://github.com/numpy/numpy/issues/13622
+numpy==1.23.3
+#numpy==1.24.0
