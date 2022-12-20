@@ -18,7 +18,7 @@ SUPPORTURL = https://radarr.video/\#support
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
 STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "Enlarge the service start/stop timeout to 90 seconds."
+CHANGELOG = "1. Fix package update.<br>2. Enlarge the service start/stop timeout to 90 seconds."
 
 HOMEPAGE = https://radarr.video/
 LICENSE = GPLv3
@@ -36,6 +36,7 @@ WIZARDS_DIR = src/wizard/
 POST_STRIP_TARGET = radarr_extra_install
 
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+# TMPDIR is used for radarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
@@ -45,6 +46,7 @@ PACKAGE_AUTHOR = [Team Radarr](https://radarr.video)
 
 .PHONY: radarr_extra_install
 radarr_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/app
-	@install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
+	@$(MSG) "Install config.xml and provide package_info."
+	@install -m 755 -d $(STAGING_DIR)/var/.config/Radarr
+	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Radarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Radarr/package_info
