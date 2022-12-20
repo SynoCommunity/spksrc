@@ -42,8 +42,8 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 # ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 # ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
-# [cryptography]
-# To generate py36-abi3 limited API:
+# # [cryptography]
+# # To generate py36-abi3 limited API:
 # DEPENDS += cross/cryptography
 # # To generate py310-py310 regular build using src/requirements-crossenv.txt:
 # # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
