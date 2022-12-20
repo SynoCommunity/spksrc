@@ -44,22 +44,17 @@ bellows==0.34.2
 bidict==0.21.2
 bimmer-connected==0.10.4
 bitstring==3.1.9
-bleak-retry-connector==2.1.3
-bleak==0.18.1
 blebox-uniapi==2.0.2
 blinkpy==0.19.2
-bluetooth-adapters==0.6.0
-bluetooth-auto-recovery==0.3.6
 bond-api==0.1.12
 boschshcpy==0.2.35
 broadlink==0.18.2
 brother==2.0.0
 bsblan==0.5.0
-btsocket==0.2.0
 buienradar==1.0.5
 cached-property==1.5.2
 casttube==0.2.1
-cbor2==5.4.1
+# cbor2==5.4.1         => cross-env
 CO2Signal==0.4.2
 commentjson==0.9.0
 convertdate==2.3.2
@@ -74,7 +69,6 @@ deepmerge==1.1.0
 denonavr==0.10.11
 dicttoxml==1.7.4
 fjaraskupan==2.0.0
-fnvhash==0.1.0
 fritzconnection==1.10.3
 future==0.18.2
 geographiclib==1.52

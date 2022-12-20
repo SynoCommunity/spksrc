@@ -12,7 +12,6 @@
 
 #homeassistant==2022.10.5           ==> pure
 
-psutil==5.9.2
 # aiohttp==3.8.1
 # bcrypt==3.1.7
 bitarray==2.6.0
@@ -31,13 +30,10 @@ ephem==4.1.2
 # ha_av==10.0.0b5          => fails to build:  libavformat was not found (braucht vermutlich libav von ffmpeg)
 # kiwisolver==1.4.4           => ModuleNotFoundError: No module named 'cppy'
 lxml==4.9.1
-MarkupSafe==2.1.1
 # matplotlib==3.6.2           => ModuleNotFoundError: No module named 'numpy.core._multiarray_umath'
 
 msgpack==1.0.4
 multidict==6.0.2
-numpy==1.23.2
-orjson==3.7.11
 # pandas==1.4.3               => ModuleNotFoundError: No module named 'numpy'
 
 # Pillow==9.2.0
@@ -113,7 +109,6 @@ aiohttp==3.8.1
 cffi==1.15.1
 frozenlist==1.3.1
 greenlet==1.1.1
-multidict==6.0.2
 SQLAlchemy==1.4.41
 
 
@@ -123,8 +118,9 @@ miniaudio==1.53
 
 # ephem==3.7.7.0
 guppy3==3.1.2
+# psutil==5.9.2 fails to build for qoriq
+psutil==5.9.4
 Pillow==9.2.0
 pyitachip2ir==0.0.7
 
 # DTLSSocket==0.1.12                ==> cross/dtlssocket
-
