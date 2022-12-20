@@ -1,7 +1,7 @@
 SPK_NAME = python311
 SPK_VERS = 3.11.1
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -20,7 +20,7 @@ LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
-#ENV += PYTHON_OPTIMIZE=1
+ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python311_extra_install
@@ -30,7 +30,7 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.11
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-#WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
@@ -38,13 +38,13 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirement
 ## various wheels.  Uncoment to enable.
 ##
 
-# [bcrypt]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# # [bcrypt]
+# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # # [cryptography]
 # # To generate py36-abi3 limited API:
-DEPENDS += cross/cryptography
+# DEPENDS += cross/cryptography
 # # To generate py311-py311 regular build using src/requirements-crossenv.txt:
 # # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 # ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
