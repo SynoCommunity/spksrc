@@ -2,6 +2,9 @@
 
 ### pure python packages for components:
 
+# for HACS
+aiogithubapi==22.10.1
+
 abodepy==1.2.0
 accuweather==0.4.0
 adax==0.2.0
@@ -65,8 +68,9 @@ crcmod==1.7
 croniter==1.0.6
 cssselect==1.1.0
 dacite==1.6.0
-dataclasses-json==0.5.4
+dataclasses-json==0.5.3
 dateparser==1.0.0
+deepmerge==1.1.0
 denonavr==0.10.11
 dicttoxml==1.7.4
 fjaraskupan==2.0.0
@@ -101,7 +105,9 @@ lomond==0.3.3
 marshmallow-dataclass==8.5.3
 marshmallow-enum==1.5.1
 marshmallow==3.13.0
-MechanicalSoup==1.1.0
+# for hangups==0.4.18:
+# ConfigArgParse-1.5.3 MechanicalSoup-0.12.0 ReParser-1.4.3 appdirs-1.4.4 hangups-0.4.18 readlike-0.1.3 urwid-2.1.2
+MechanicalSoup==0.12.0
 metar==1.8.0
 ms-cv==0.1.1
 mypy-extensions==0.4.3
@@ -112,10 +118,10 @@ pi1wire==0.1.0
 pkce==1.0.3
 platformdirs==2.4.0
 plumbum==1.7.0
-protobuf==3.17.3
-psutil-home-assistant==0.0.1
+# protobuf==3.17.3          => cross-env
+# psutil-home-assistant==0.0.1 => pure
 ptyprocess==0.7.0
-pubnub==5.1.4
+pubnub==7.0.2
 py-canary==0.5.3
 py-synologydsm-api==1.0.8
 pyairvisual==2022.7.0
@@ -124,7 +130,7 @@ pyatag==0.3.5.3
 pyatv==0.10.3
 pyclimacell==0.18.2
 pydaikin==2.7.2
-pydantic==1.8.2
+pydantic==1.10.2
 pyfritzhome==0.6.7
 pyialarm==2.2.0
 pyicloud==1.0.0
@@ -138,8 +144,8 @@ pyserial-asyncio==0.6
 pysiaalarm==3.0.2
 pysmb==1.2.7
 pysnmplib==5.0.15
-pysocketio==0.9.6a4
-python-awair==0.2.1
+# pysocketio==0.9.6a4  => requires gevent==0.13.7 (this is python2 only)
+# python-awair==0.2.1  => python-awair 0.2.1 requires voluptuous<0.13.0,>=0.11.7, but homeassistant==2022.10.5 requires voluptuous==0.13.1
 python-engineio==4.2.1
 python-izone==1.2.9
 python-socketio==5.4.0
@@ -160,7 +166,7 @@ synology-srm==0.2.0
 tenacity==8.0.1
 teslajsonpy==0.18.3
 typing-inspect==0.7.1
-tzlocal==3.0
+tzlocal==4.2
 WSDiscovery==2.0.0
 xmltodict==0.13.0
 yalexs==1.2.6
