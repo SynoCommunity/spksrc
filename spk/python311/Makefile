@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.0
+SPK_VERS = 3.11.1
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,24 +13,24 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "Release Python 3.11.0"
+CHANGELOG = "Release Python 3.11.1"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
 SERVICE_SETUP = src/service-setup.sh
 
-ENV += PYTHON_OPTIMIZE=1
+#ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python311_extra_install
 
-SPK_USR_LOCAL_LINKS = bin:bin/python3.10
+SPK_USR_LOCAL_LINKS = bin:bin/python3.11
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
 
 # Force building pure-python wheels
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+#WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 ##
 ## All configurations below are optional and
