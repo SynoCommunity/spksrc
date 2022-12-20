@@ -33,7 +33,7 @@ lxml==4.9.1
 # matplotlib==3.6.2           => ModuleNotFoundError: No module named 'numpy.core._multiarray_umath'
 
 msgpack==1.0.4
-multidict==6.0.2
+multidict==5.2.0
 # pandas==1.4.3               => ModuleNotFoundError: No module named 'numpy'
 
 # Pillow==9.2.0
