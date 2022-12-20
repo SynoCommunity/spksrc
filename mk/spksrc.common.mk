@@ -14,7 +14,11 @@ MSG = echo "===> "
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Add cargo for rust compiler to default PATH
-export PATH := /opt/cargo/bin:$(PATH)
+ifneq ($(BASE_DISTRIB_DIR),)
+export PATH := $(realpath $(BASE_DISTRIB_DIR)/cargo/bin):$(PATH)
+export CARGO_HOME = $(realpath $(BASE_DISTRIB_DIR)/cargo)
+export RUSTUP_HOME = $(realpath $(BASE_DISTRIB_DIR)/rustup)
+endif
 
 # fallback by default to native/python*
 PIP ?= pip
