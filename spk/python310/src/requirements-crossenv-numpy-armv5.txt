@@ -6,4 +6,5 @@
 
 # [numpy]
 #   - armv5 (88f6281-6.1) Last known working version
-numpy==1.21.5
+#   - Require Cython in cross/python310 crossenv
+numpy==1.21.6

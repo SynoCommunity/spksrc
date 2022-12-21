@@ -52,9 +52,7 @@ mysqlclient==2.1.1
 Pillow==9.3.0
 
 # [psutil]
-# Last known version to build on armv5/ppc
-psutil==5.9.1
-#psutil==5.9.4
+psutil==5.9.4
 
 # [pycares]
 # Depends: c-ares

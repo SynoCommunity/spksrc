@@ -132,26 +132,24 @@ include ../../mk/spksrc.spk.mk
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 # endif
 
-# [numpy] <= 1.21.5
-# Last known working version for armv5: 1.21.5
+# [numpy] <= 1.21.6
+# Last known working version for armv5: 1.21.6
 # gcc-4.6.4 failed with exit status 1
 # https://github.com/numpy/numpy/issues/20664
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv5.txt
 # [numpy] <= 1.22.4
-# Last known working version for armv7l: 1.21.5
+# Last known working version for armv7l: 1.22.4
 else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
-# Fix wheel building with older compilers
-ifeq ($(call version_le, ${TC_GCC}, 5.0),1)
-WHEELS_CPPFLAGS += [numpy] -std=c++0x
+endif
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
+ifeq ($(call version_le, ${TC_GCC}, 5.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
-endif
 endif
 endif
 
