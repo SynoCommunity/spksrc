@@ -18,7 +18,8 @@ cffi==1.15.1
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-greenlet==2.0.1
+#greenlet==2.0.1
+greenlet==1.1.3
 immutables==0.19
 MarkupSafe==2.1.1
 msgpack-python==0.5.6
