@@ -90,3 +90,8 @@ RUN pip3 install meson==0.62.2
 # Volume pointing to spksrc sources
 VOLUME /spksrc
 WORKDIR /spksrc
+
+# Setup the rustc environment
+ENV CARGO_HOME=/spksrc/distrib/cargo
+ENV RUSTUP_HOME=/spksrc/distrib/rustup
+ENV PATH="$VENV_PATH/bin:$RUSTUP_HOME/bin:$CARGO_HOME/bin:$PATH"
