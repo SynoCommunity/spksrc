@@ -32,6 +32,7 @@ TC_LOCAL_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
+##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
 
 include ../../mk/spksrc.download.mk

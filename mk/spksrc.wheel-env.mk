@@ -2,6 +2,9 @@
 # Configuration for python wheel build
 #
 
+##### rust specific configurations
+include ../../mk/spksrc.cross-rust-env.mk
+
 # Enable pure-python packaging
 ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = FALSE
