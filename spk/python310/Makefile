@@ -115,6 +115,13 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.spk.mk
 
+# [greenlet]
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+WHEELS += src/requirements-crossenv-greenlet-DSM7.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-DSM6.txt
+endif
+
 # # [libtorrent]
 # ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
 # # [libtorrent] 2.0.7
