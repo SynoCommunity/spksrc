@@ -1,6 +1,13 @@
 # Configuration for rust compiler
 # 
 
+# Add cargo for rust compiler to default PATH
+ifneq ($(BASE_DISTRIB_DIR),)
+export CARGO_HOME = $(BASE_DISTRIB_DIR)/cargo
+export RUSTUP_HOME = $(BASE_DISTRIB_DIR)/rustup
+export PATH := $(BASE_DISTRIB_DIR)/cargo/bin:$(PATH)
+endif
+
 RUST_TOOLCHAIN ?= stable
 
 RUST_TARGET =
