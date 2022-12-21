@@ -118,7 +118,7 @@ include ../../mk/spksrc.spk.mk
 # # [libtorrent]
 # ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
 # # [libtorrent] 2.0.7
-# WHEELS += src/requirements-crossenv-DSM7.txt
+# WHEELS += src/requirements-crossenv-libtorrent-DSM7.txt
 # # Ensure build arguments matches boost_1.78
 # WHEELS_CXXFLAGS += [libtorrent]
 # WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
@@ -126,7 +126,7 @@ include ../../mk/spksrc.spk.mk
 # WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 # else
 # # [libtorrent] 1.2.17
-# WHEELS += src/requirements-crossenv-DSM6.txt
+# WHEELS += src/requirements-crossenv-libtorrent-DSM6.txt
 # DEPENDS += cross/libiconv
 # # Ensure build arguments matches boost
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
