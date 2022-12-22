@@ -116,16 +116,16 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.spk.mk
 
 # [greenlet]
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-WHEELS += src/requirements-crossenv-greenlet-DSM7.txt
+ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
+WHEELS += src/requirements-crossenv-greenlet.txt
 else
-WHEELS += src/requirements-crossenv-greenlet-DSM6.txt
+WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
 endif
 
 # # [libtorrent]
 # ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
 # # [libtorrent] 2.0.7
-# WHEELS += src/requirements-crossenv-libtorrent-DSM7.txt
+# WHEELS += src/requirements-crossenv-libtorrent.txt
 # # Ensure build arguments matches boost_1.78
 # WHEELS_CXXFLAGS += [libtorrent]
 # WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
@@ -133,7 +133,7 @@ endif
 # WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 # else
 # # [libtorrent] 1.2.17
-# WHEELS += src/requirements-crossenv-libtorrent-DSM6.txt
+# WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
 # DEPENDS += cross/libiconv
 # # Ensure build arguments matches boost
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
