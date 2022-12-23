@@ -29,7 +29,7 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.11
 
 WHEELS  = src/requirements-pure.txt
 #WHEELS += src/requirements-crossenv.txt
-WHEELS += src/requirements-abi3.txt
+#WHEELS += src/requirements-abi3.txt
 
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -160,19 +160,19 @@ include ../../mk/spksrc.spk.mk
 # endif
 # endif
 
-# [pycryptodome]
-ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-WHEELS_CFLAGS += [pycryptodome] -std=c11
-else
-WHEELS_CFLAGS += [pycryptodome] -std=c99
-endif
+# # [pycryptodome]
+# ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
+# WHEELS_CFLAGS += [pycryptodome] -std=c11
+# else
+# WHEELS_CFLAGS += [pycryptodome] -std=c99
+# endif
 
-# [pycryptodomex]
-ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-WHEELS_CFLAGS += [pycryptodomex] -std=c11
-else
-WHEELS_CFLAGS += [pycryptodomex] -std=c99
-endif
+# # [pycryptodomex]
+# ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
+# WHEELS_CFLAGS += [pycryptodomex] -std=c11
+# else
+# WHEELS_CFLAGS += [pycryptodomex] -std=c99
+# endif
 
 .PHONY: python311_extra_install
 python311_extra_install:
