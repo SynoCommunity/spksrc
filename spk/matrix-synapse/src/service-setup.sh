@@ -8,16 +8,10 @@ SERVICE_COMMAND="${HOMESERVER} --config-path ${CONFIG_FILE} --daemonize --config
 # synapse_homeserver pid file name is not configurable
 PID_FILE=${SYNOPKG_PKGVAR}/homeserver.pid
 
-# optional arguments for wizard:
-#  --report-stats=no|yes
 # optional arguments for options.conf file:
 #  --enable-registration
 #  --open-private-ports
 #  --manhole PORT
-
-# TODO: create wizard to customize the server-name (domain):
-### It is important to choose the name for your server before you install Synapse, because it cannot be changed later.
-wizard_server=my.domain.com
 
 
 # save and restore the pip-cache on package update
@@ -67,9 +61,12 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         echo ${separator}
-        echo "Create initial configuration for server ${wizard_server}"
-        ${HOMESERVER} --config-path ${CONFIG_FILE} --server-name ${wizard_server} --config-directory ${SYNOPKG_PKGVAR} --data-directory ${SYNOPKG_PKGVAR} --generate-config --report-stats=no
-        echo "Fix logfile path in ${wizard_server}.config.log"
-        sed -i.bak -e "s/filename: \/homeserver.log/filename: \/var\/packages\/matrix-synapse\/var\/homeserver.log/g" ${SYNOPKG_PKGVAR}/${wizard_server}.log.config
+        if [ "${wizard_report_stats}" = "true" ]; then
+            REPORT_STATS="--report-stats=yes"
+        else
+            REPORT_STATS="--report-stats=no"
+        fi
+        echo "Create initial configuration for server '${wizard_servername}' (${REPORT_STATS})"
+        cd ${SYNOPKG_PKGVAR} && ${HOMESERVER} --config-path ${CONFIG_FILE} --server-name ${wizard_servername} --generate-config ${REPORT_STATS}
     fi
 }

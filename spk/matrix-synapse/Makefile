@@ -6,6 +6,9 @@ SPK_ICON = src/matrix-synapse.png
 BUILD_DEPENDS = cross/python310
 DEPENDS =
 
+# cryptography built with rust not supported:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 SPK_DEPENDS = "python310"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -37,7 +40,6 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-
 MAINTAINER = hgy59
 DESCRIPTION = Synapse is an open-source Matrix homeserver written and maintained by the Matrix.org Foundation.
 
@@ -46,6 +48,8 @@ CHANGELOG = "Initial package release."
 
 HOMEPAGE = https://matrix.org/
 LICENSE  = Apache 2.0
+
+WIZARDS_DIR = src/wizard/
 
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh

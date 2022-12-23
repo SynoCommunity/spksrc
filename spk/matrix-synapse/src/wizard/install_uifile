@@ -1,0 +1,35 @@
+[{
+    "step_title": "Homeserver configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configure the name for the server (my.domain.name). It is important to choose the name for your server before you install Synapse, because it cannot be changed later.",
+        "subitems": [{
+            "key": "wizard_servername",
+            "desc": "Server Name",
+            "emptyText": "homestation.diskstation.me",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,6}$/i",
+                "errorText": "Invalid server name."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "multiselect",
+        "desc": "<br/>Select whether to create and report homeserver usage statistics.",
+        "subitems": [{
+            "key": "wizard_report_stats",
+            "desc": "Report usage statistics",
+            "defaultValue": true
+          }
+        ]
+      },
+      {
+        "desc": "<br/>You can modify the usage statistics and other options later in <code>/var/packages/matrix-synapse/var/homeserver.yaml</code>, but you cannot change the server name choosen above."
+      }
+    ]
+  }
+]
