@@ -1,7 +1,7 @@
 SPK_NAME = matrix-synapse
 SPK_VERS = 1.74.0
 SPK_REV = 1
-SPK_ICON = src/$(SPK_NAME).png
+SPK_ICON = src/matrix-synapse.png
 
 BUILD_DEPENDS = cross/python310
 DEPENDS =
@@ -19,7 +19,7 @@ ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # [frozendict]
-WHEELS_CFLAGS += [frozendict] --std=c11
+WHEELS_CFLAGS += [frozendict] --std=c99
 
 # [Pillow]
 DEPENDS += cross/freetype cross/libjpeg cross/zlib
