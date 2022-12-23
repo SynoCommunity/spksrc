@@ -1,5 +1,5 @@
 SPK_NAME = matrix-synapse
-SPK_VERS = 1.64.0
+SPK_VERS = 1.74.0
 SPK_REV = 1
 SPK_ICON = src/$(SPK_NAME).png
 
@@ -8,17 +8,15 @@ DEPENDS =
 
 SPK_DEPENDS = "python310"
 
-WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt src/requirements-pure.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # Additional requirements for cross compiled wheels (abi3 and crossenv):
 WHEELS_CFLAGS =
 WHEELS_BUILD_ARGS =
 
-# cryptography requires rust build (and setuptools-rust)
-WHEELS_RUST_BUILD_ENABLE = TRUE
-## hints on cross compiling cryptography with rust:
-## https://github.com/pyca/cryptography/issues/5814
-## https://github.com/rust-lang/cargo/issues/8147
+# [bcrypt] and [cryptography]
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # [frozendict]
 WHEELS_CFLAGS += [frozendict] --std=c11
