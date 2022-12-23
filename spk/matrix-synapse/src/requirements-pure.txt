@@ -1,6 +1,5 @@
 attrs==22.2.0
 Automat==22.10.0
-bleach/_vendor/html5lib==1.1
 bleach==5.0.1
 canonicaljson==1.6.4
 certifi==2022.12.7
