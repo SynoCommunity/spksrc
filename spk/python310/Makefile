@@ -162,19 +162,19 @@ include ../../mk/spksrc.spk.mk
 # endif
 # endif
 
-# # [pycryptodome]
-# ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-# WHEELS_CFLAGS += [pycryptodome] -std=c11
-# else
-# WHEELS_CFLAGS += [pycryptodome] -std=c99
-# endif
+# [pycryptodome]
+ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
+WHEELS_CFLAGS += [pycryptodome] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodome] -std=c99
+endif
 
-# # [pycryptodomex]
-# ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-# WHEELS_CFLAGS += [pycryptodomex] -std=c11
-# else
-# WHEELS_CFLAGS += [pycryptodomex] -std=c99
-# endif
+# [pycryptodomex]
+ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
 
 .PHONY: python310_extra_install
 python310_extra_install:
