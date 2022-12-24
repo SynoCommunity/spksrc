@@ -10,10 +10,6 @@ cryptography==38.0.4
 # Requirement for cryptography
 cffi==1.15.1
 
-# [frozendict]
-# Requires CFLAGS = --std=c11
-frozendict==2.3.4
-
 ijson==3.1.4
 
 MarkupSafe==2.1.1

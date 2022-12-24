@@ -3,13 +3,13 @@ SPK_VERS = 1.74.0
 SPK_REV = 1
 SPK_ICON = src/matrix-synapse.png
 
-BUILD_DEPENDS = cross/python310
+BUILD_DEPENDS = cross/python311
 DEPENDS =
 
 # cryptography built with rust not supported:
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -20,9 +20,6 @@ WHEELS_BUILD_ARGS =
 # [bcrypt] and [cryptography]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-
-# [frozendict]
-WHEELS_CFLAGS += [frozendict] --std=c99
 
 # [Pillow]
 DEPENDS += cross/freetype cross/libjpeg cross/zlib

@@ -5,6 +5,7 @@ canonicaljson==1.6.4
 certifi==2022.12.7
 charset_normalizer==2.1.1
 constantly==15.1.0
+frozendict==2.3.4
 hyperlink==21.0.0
 idna==3.4
 incremental==22.10.0
