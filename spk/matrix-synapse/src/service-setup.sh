@@ -4,14 +4,8 @@ PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 CONFIG_FILE="${SYNOPKG_PKGVAR}/homeserver.yaml"
 HOMESERVER="${SYNOPKG_PKGDEST}/env/bin/synapse_homeserver"
 SERVICE_COMMAND="${HOMESERVER} --config-path ${CONFIG_FILE} --daemonize --config-directory ${SYNOPKG_PKGVAR} --data-directory ${SYNOPKG_PKGVAR}"
-
 # synapse_homeserver pid file name is not configurable
 PID_FILE=${SYNOPKG_PKGVAR}/homeserver.pid
-
-# optional arguments for options.conf file:
-#  --enable-registration
-#  --open-private-ports
-#  --manhole PORT
 
 
 # save and restore the pip-cache on package update
