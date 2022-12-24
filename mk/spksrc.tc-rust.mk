@@ -39,8 +39,8 @@ rustc_msg:
 	@$(MSG) "- default PATH: $(PATH)"
 
 pre_rustc_target: rustc_msg
-	@$(MSG) "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-	@curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+	@$(MSG) "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path"
+	@curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 
 rustc_target: $(PRE_RUSTC_TARGET)
 	@$(MSG) "rustup toolchain install $(RUST_TOOLCHAIN)" ; \
