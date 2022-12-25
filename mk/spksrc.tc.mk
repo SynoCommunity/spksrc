@@ -11,6 +11,12 @@ include ../../mk/spksrc.common.mk
 # Include cross-cmake-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-cmake-env.mk
 
+# Include cross-meson-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-meson-env.mk
+
+##### rust specific configurations
+include ../../mk/spksrc.cross-rust-env.mk
+
 # Configure the included makefiles
 URLS                = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME                = $(TC_NAME)
@@ -27,14 +33,13 @@ DIST_FILE           = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT            = $(TC_EXT)
 TC_LOCAL_VARS_MK    = $(WORK_DIR)/tc_vars.mk
 TC_LOCAL_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
+TC_LOCAL_VARS_MESON = $(WORK_DIR)/tc_vars.meson
 
 #####
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
-##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
-
+download:
 include ../../mk/spksrc.download.mk
 
 checksum: download
@@ -58,15 +63,19 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MK)
+all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
-$(TC_LOCAL_VARS_MK): flag
+$(TC_LOCAL_VARS_MK):
 	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
 
 .PHONY: $(TC_LOCAL_VARS_CMAKE)
-$(TC_LOCAL_VARS_CMAKE): fix
+$(TC_LOCAL_VARS_CMAKE): 
 	env $(MAKE) --no-print-directory cmake_vars > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_MESON)
+$(TC_LOCAL_VARS_MESON): 
+	env $(MAKE) --no-print-directory meson_vars > $@ 2>/dev/null;
 
 .PHONY: cmake_vars
 cmake_vars:
@@ -114,6 +123,20 @@ endif
 	echo ; \
 	echo "# always build shared library" ; \
 	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
+
+.PHONY: meson_vars
+meson_vars:
+	@echo "[built-in]" ; \
+	echo "c_args = ['$(MESON_BUILTIN_C_ARGS)']" ; \
+	echo "c_link_args = ['$(MESON_BUILTIN_C_LINK_ARGS)']" ; \
+	echo "cpp_args = ['$(MESON_BUILTIN_CPP_ARGS)']" ; \
+	echo "cpp_link_args = ['$(MESON_BUILTIN_CPP_LINK_ARGS)']"
+	@echo
+	@echo "[host_machine]" ; \
+	echo "system = 'linux'" ; \
+	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
+	echo "cpu = '$(MESON_HOST_CPU)'" ; \
+	echo "endian = '$(MESON_HOST_ENDIAN)'"
 
 .PHONY: tc_vars
 tc_vars: flag
