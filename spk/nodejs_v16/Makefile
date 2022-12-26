@@ -1,15 +1,15 @@
 SPK_NAME = nodejs_v16
-SPK_VERS = 16.17.0
+SPK_VERS = 16.19.0
 SPK_REV = 4
 SPK_ICON = src/node.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/nodejs_v16
 
 REQUIRED_MIN_DSM = 7.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
-CHANGELOG = "Update Node.js to v16.17.0."
+CHANGELOG = "Update Node.js to v16.19.0."
 DISPLAY_NAME = Node.js® v16
 
 HOMEPAGE = https://nodejs.org
