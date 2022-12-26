@@ -41,7 +41,7 @@
       }, {
         "desc": "<br/>You can modify the listener, usage statistics and other options later in <code>/var/packages/matrix-synapse/var/homeserver.yaml</code>, but you cannot change the server name choosen."
       }, {
-        "desc": "For configuration details see <a target=\"_blank\" href=\"https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html\">Configuring Synapse</a>."
+        "desc": "For configuration details see the SynoCommunity wiki page <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Synapse-homeserver-package\">[matrix] Synapse homeserver</a>."
       }
     ]
   }
