@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/matrix-synapse.png
 
 BUILD_DEPENDS = cross/python311
-DEPENDS =
+DEPENDS = cross/jemalloc
 
 # cryptography built with rust not supported:
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)

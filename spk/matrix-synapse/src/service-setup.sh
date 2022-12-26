@@ -7,6 +7,8 @@ SERVICE_COMMAND="${HOMESERVER} --config-path ${CONFIG_FILE} --daemonize --config
 # synapse_homeserver pid file name is not configurable
 PID_FILE=${SYNOPKG_PKGVAR}/homeserver.pid
 
+export LD_PRELOAD=${SYNOPKG_PKGDEST}/lib/libjemalloc.so.2
+
 
 # save and restore the pip-cache on package update
 # ------------------------------------------------
@@ -60,7 +62,13 @@ service_postinst ()
         else
             REPORT_STATS="--report-stats=no"
         fi
-        echo "Create initial configuration for server '${wizard_servername}' (${REPORT_STATS})"
-        cd ${SYNOPKG_PKGVAR} && ${HOMESERVER} --config-path ${CONFIG_FILE} --server-name ${wizard_servername} --generate-config ${REPORT_STATS}
+        if [ "${wizard_open_private_ports}" = "true" ]; then
+            # avoid the "bind_addresses" definition in generated config
+            EXTERNAL_ACCESS=" --open-private-ports"
+        else
+            EXTERNAL_ACCESS=""
+        fi
+        echo "Create initial configuration for server '${wizard_servername}' (${REPORT_STATS}${EXTERNAL_ACCESS})"
+        cd ${SYNOPKG_PKGVAR} && ${HOMESERVER} --config-path ${CONFIG_FILE} --server-name ${wizard_servername} --generate-config ${REPORT_STATS} ${EXTERNAL_ACCESS}
     fi
 }
