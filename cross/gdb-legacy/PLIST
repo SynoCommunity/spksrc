@@ -1,0 +1,5 @@
+bin:bin/gcore
+bin:bin/gdb
+bin:bin/gdbserver
+bin:bin/run
+lib:lib/libinproctrace.so
