@@ -97,7 +97,7 @@ fix_shared_folders_rights()
     synoacltool -add "${folder}" "group:${APACHE_GROUP}:allow:rwxp-D------:fd"
 
     # Enforce permissions to sub-folders
-    echo 'find ${folder} -mindepth 1 -type d -exec synoacltool -enforce-inherit {} \;'
+    echo "find \"${folder}\" -mindepth 1 -type d -exec synoacltool -enforce-inherit {} \\;"
     find "${folder}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \;
 }
 
