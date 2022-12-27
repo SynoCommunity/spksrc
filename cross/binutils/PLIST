@@ -3,7 +3,7 @@ bin:bin/ar
 bin:bin/as
 bin:bin/c++filt
 bin:bin/elfedit
-bin:bin/gprof
+bin:bin/gp*
 bin:bin/ld
 bin:bin/ld.bfd
 bin:bin/nm
