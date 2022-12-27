@@ -1,8 +1,8 @@
 SPK_NAME = gdb
-SPK_VERS = 11.2
+SPK_VERS = 12.1
 SPK_REV = 1
 SPK_ICON = src/gdb.png
-CHANGELOG = "1. Initial release of gdb 11.2 including binutils 2.38"
+CHANGELOG = "1. Initial release of gdb 12.1 including binutils 2.39"
 
 DEPENDS = cross/$(SPK_NAME) cross/binutils
 
