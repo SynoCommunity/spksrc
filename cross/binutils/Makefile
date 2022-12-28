@@ -13,9 +13,15 @@ LICENSE  = GPLv2/LGPLv2
 
 GNU_CONFIGURE = 1
 
+include ../../mk/spksrc.archs.mk
+
 CONFIGURE_ARGS += --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 CONFIGURE_ARGS += --enable-gold=yes
+# Fails to build on i686
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --enable-gprofng=no
+endif
 # Otherwise conflicts with gdb
 CONFIGURE_ARGS += --includedir=$(INSTALL_PREFIX)/include/binutils
 
