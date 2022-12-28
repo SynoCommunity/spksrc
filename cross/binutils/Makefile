@@ -16,5 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 CONFIGURE_ARGS += --enable-gold=yes
+# Otherwise conflicts with gdb
+CONFIGURE_ARGS += --includedir=$(INSTALL_PREFIX)/include/binutils
 
 include ../../mk/spksrc.cross-cc.mk
