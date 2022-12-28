@@ -1,5 +1,5 @@
 SPK_NAME = nodejs_v16
-SPK_VERS = 16.19.0
+SPK_VERS = 16.18.1
 SPK_REV = 4
 SPK_ICON = src/node.png
 
@@ -8,8 +8,8 @@ DEPENDS = cross/nodejs_v16
 REQUIRED_MIN_DSM = 7.0
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
-CHANGELOG = "Update Node.js to v16.19.0."
+DESCRIPTION = Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine. Node.js by SynoCommunity is now obsolete, since Synology provides node.js v18 for DSM 7.
+CHANGELOG = "Update Node.js to v16.18.1."
 DISPLAY_NAME = Node.js® v16
 
 HOMEPAGE = https://nodejs.org
