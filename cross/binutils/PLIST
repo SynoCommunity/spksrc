@@ -2,10 +2,10 @@ bin:bin/addr2line
 bin:bin/ar
 bin:bin/as
 bin:bin/c++filt
+bin:bin/dwp
 bin:bin/elfedit
 bin:bin/gp*
-bin:bin/ld
-bin:bin/ld.bfd
+bin:bin/ld*
 bin:bin/nm
 bin:bin/objcopy
 bin:bin/objdump
