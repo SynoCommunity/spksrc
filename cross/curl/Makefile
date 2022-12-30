@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
 # optional features (see BUILD_CURL_WITH below)
-OPTIONAL_DEPENDS = cross/libssh2 cross/gnutls cross/mbedtls cross/libidn2
+OPTIONAL_DEPENDS = cross/libssh2 cross/gnutls cross/mbedtls cross/libidn2 cross/libpsl cross/nghttp2 cross/gsasl cross/gss cross/openldap
 
 HOMEPAGE = https://curl.haxx.se
 COMMENT  = Command line tool and library for transferring data with URLs.
@@ -47,9 +47,34 @@ DEPENDS += cross/libidn2
 CONFIGURE_ARGS += --with-libidn2
 endif
 
+ifeq ($(findstring libpsl,$(BUILD_CURL_WITH)),libpsl)
+DEPENDS += cross/libpsl
+CONFIGURE_ARGS += --with-libpsl
+endif
+
+ifeq ($(findstring nghttp2,$(BUILD_CURL_WITH)),nghttp2)
+DEPENDS += cross/nghttp2
+CONFIGURE_ARGS += --with-nghttp2
+endif
+
+ifeq ($(findstring gsasl,$(BUILD_CURL_WITH)),gsasl)
+DEPENDS += cross/gsasl
+endif
+
+ifeq ($(findstring gss,$(BUILD_CURL_WITH)),gss)
+DEPENDS += cross/gss
+CONFIGURE_ARGS += --with-gssapi=$(STAGING_INSTALL_PREFIX)
+endif
+
+ifeq ($(findstring ldap,$(BUILD_CURL_WITH)),ldap)
+DEPENDS += cross/openldap
+CONFIGURE_ARGS += --enable-ldap
+CONFIGURE_ARGS += --enable-ldaps
+endif
+
 ifeq ($(findstring websockets,$(BUILD_CURL_WITH)),websockets)
 CONFIGURE_ARGS += --enable-websockets
-$(WARN  "Websockets enabled but marked EXPERIMENTAL. Use with caution!")
+$(warning  "Websockets enabled but marked EXPERIMENTAL. Use with caution!")
 endif
 
 endif

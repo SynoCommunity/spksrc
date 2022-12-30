@@ -6,8 +6,8 @@ SPK_REV = 1
 
 DEPENDS = cross/zstd
 DEPENDS += cross/curl
-# curl build needs additional configuration for mbedtls, gnutls, libssh2, libidn2, websockets
-export BUILD_CURL_WITH="mbedtls gnutls libssh2 libidn2 websockets"
+# curl needs additional configuration for building with these features:
+export BUILD_CURL_WITH="mbedtls gnutls libssh2 libidn2 libpsl nghttp2 gsasl gss ldap websockets"
 export CURL_INCLUDE_EXECUTABLE=1
 
 MAINTAINER = SynoCommunity
