@@ -1,11 +1,10 @@
 SPK_NAME = curl
-SPK_VERS = 7.86.0
+SPK_VERS = 7.87.0
 SPK_REV = 1
 
 # package of curl with all optional features
 
 DEPENDS = cross/zstd
-DEPENDS += cross/libwebsockets
 DEPENDS += cross/curl
 # curl build needs additional configuration for mbedtls, gnutls and libssh2
 export BUILD_CURL_WITH="mbedtls gnutls libssh2"
