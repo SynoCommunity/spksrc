@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
 # optional features (see BUILD_CURL_WITH below)
-OPTIONAL_DEPENDS = cross/libssh2 cross/gnutls cross/mbedtls
+OPTIONAL_DEPENDS = cross/libssh2 cross/gnutls cross/mbedtls cross/libidn2
 
 HOMEPAGE = https://curl.haxx.se
 COMMENT  = Command line tool and library for transferring data with URLs.
@@ -24,20 +24,34 @@ ifneq ($(strip $(CURL_INCLUDE_EXECUTABLE)),1)
 PLIST_TRANSFORM = sed -e '/bin:bin/d'
 endif
 
-ifneq ($(strip $(BUILD_CURL_WITH)),)
 # optional dependencies to build curl with
+ifneq ($(strip $(BUILD_CURL_WITH)),)
+
 ifeq ($(findstring libssh2,$(BUILD_CURL_WITH)),libssh2)
 DEPENDS += cross/libssh2
 CONFIGURE_ARGS += --with-libssh2
 endif
+
 ifeq ($(findstring gnutls,$(BUILD_CURL_WITH)),gnutls)
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --with-gnutls
 endif
+
 ifeq ($(findstring mbedtls,$(BUILD_CURL_WITH)),mbedtls)
 DEPENDS += cross/mbedtls
 CONFIGURE_ARGS += --with-mbedtls
 endif
+
+ifeq ($(findstring libidn2,$(BUILD_CURL_WITH)),libidn2)
+DEPENDS += cross/libidn2
+CONFIGURE_ARGS += --with-libidn2
+endif
+
+ifeq ($(findstring websockets,$(BUILD_CURL_WITH)),websockets)
+CONFIGURE_ARGS += --enable-websockets
+$(WARN  "Websockets enabled but marked EXPERIMENTAL. Use with caution!")
+endif
+
 endif
 
 POST_INSTALL_TARGET = curl_post_install
