@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://curl.se/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl
+DEPENDS = cross/zlib cross/openssl cross/c-ares
 # optional features (see BUILD_CURL_WITH below)
 OPTIONAL_DEPENDS = cross/libssh2 cross/gnutls cross/mbedtls cross/libidn2 cross/libpsl cross/nghttp2 cross/gsasl cross/gss cross/openldap
 
@@ -17,6 +17,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --with-openssl
+CONFIGURE_ARGS += --enable-ares
 CONFIGURE_ARGS += --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 CONFIGURE_ARGS += --with-ca-path=/usr/share/ca-certificates/mozilla
 
