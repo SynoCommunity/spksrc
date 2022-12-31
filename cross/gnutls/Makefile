@@ -12,11 +12,14 @@ HOMEPAGE = https://gnutls.org/
 COMMENT  = GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them.
 LICENSE  = LGPL
 
+ifneq ($(strip $(GNUTLS_INCLUDE_EXECUTABLES)),1)
+PLIST_TRANSFORM = sed -e '/bin:bin/d'
+endif
+
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-doc
 CONFIGURE_ARGS += --without-p11-kit
 CONFIGURE_ARGS += --disable-nls
-CONFIGURE_ARGS += --enable-local-libopts
 CONFIGURE_ARGS += gl_cv_func_gettimeofday_clobber=no 
 CONFIGURE_ARGS += gl_cv_func_signbit_gcc=no
 
