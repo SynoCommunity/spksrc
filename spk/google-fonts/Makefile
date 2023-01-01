@@ -1,9 +1,9 @@
-SPK_NAME = googlefonts
+SPK_NAME = google-fonts
 SPK_VERS = 20221223
 SPK_REV = 1
-SPK_ICON = src/googlefonts.png
+SPK_ICON = src/google-fonts.png
 
-DEPENDS = cross/google-fonts-minimal
+DEPENDS = cross/google-fonts
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Collection of all available Google Fonts.
