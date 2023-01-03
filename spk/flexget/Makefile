@@ -1,7 +1,7 @@
 SPK_NAME = flexget
 SPK_VERS = 3.3.4
 SPK_REV = 12
-SPK_ICON = src/${SPK_NAME}.png
+SPK_ICON = src/$(SPK_NAME).png
 
 BUILD_DEPENDS = cross/python310
 SPK_DEPENDS = "python310"
@@ -30,8 +30,6 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
-
-USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 

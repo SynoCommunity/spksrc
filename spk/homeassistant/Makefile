@@ -24,8 +24,6 @@ SERVICE_PORT = 8123
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
-USE_ALTERNATE_TMPDIR = 1
-
 POST_STRIP_TARGET = homeassistant_extra_install
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.

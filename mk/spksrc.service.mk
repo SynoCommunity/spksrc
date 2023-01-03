@@ -37,8 +37,6 @@
 #  SPK_COMMANDS                  (optional) list of "folder/command" to create links for in folder /usr/local
 #  SPK_USR_LOCAL_LINKS           (optional) list of "folder:command" to create links for in folder /usr/local
 #                                           with 'command' in relative folder
-#  USE_ALTERNATE_TMPDIR          (optional) with USE_ALTERNATE_TMPDIR=1 TMD_DIR is defined to use a package specific temp
-#                                           folder at intallation and runtime.
 #  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic
 #                                           installer generated script (SERVICE_SETUP) is not usable.
 #  NO_SERVICE_SHORTCUT           (optional) do not create an app icon in the DSM desktop
@@ -157,8 +155,11 @@ ifneq ($(strip $(SERVICE_CERT)),)
 endif
 ifneq ($(STARTABLE),no)
 ifneq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo "# define SYNOPKG_PKGVAR for compatibility with DSM7" >> $@
+	# https://help.synology.com/developer-guide/integrate_dsm/fhs.html
+	@echo "# define SYNOPKG_PKGVAR, SYNOPKG_PKGTMP and SYNOPKG_PKGHOME for compatibility with DSM7" >> $@
 	@echo 'SYNOPKG_PKGVAR="$${SYNOPKG_PKGDEST}/var"' >> $@
+	@echo 'SYNOPKG_PKGTMP="$${SYNOPKG_PKGDEST}/tmp"' >> $@
+	@echo 'SYNOPKG_PKGHOME="$${SYNOPKG_PKGDEST}/home"' >> $@
 	@echo '' >> $@
 endif
 	@echo "# start-stop-status script redirect stdout/stderr to LOG_FILE" >> $@
@@ -186,13 +187,7 @@ ifneq ($(strip $(SERVICE_OPTIONS)),)
 endif
 	@echo '' >> $@
 endif
-ifeq ($(strip $(USE_ALTERNATE_TMPDIR)),1)
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@cat $(SPKSRC_MK)spksrc.service.use_alternate_tmpdir.dsm7 >> $@
-else
 	@cat $(SPKSRC_MK)spksrc.service.use_alternate_tmpdir >> $@
-endif
-endif
 ifneq ($(strip $(SERVICE_SETUP)),)
 	@echo '' >> $@
 	@echo '### Package specific variables and functions' >> $@

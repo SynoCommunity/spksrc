@@ -1,15 +1,11 @@
 
-# create and define alternate TMPDIR, this can be useful to avoid errors like:
+# use SYNOPKG_PKGTMP folder as TMPDIR, this can be useful to avoid errors like:
 # Could not install packages due to an EnvironmentError: [Errno 28] No space left on device
 # as /tmp might be too small.
 # typically used to install a huge amount of wheels with pip (see homeassistant package)
 # TMPDIR is supported by pip https://github.com/pypa/pip/issues/4462 ('--build dir' is not supported anymore)
 
-TMPDIR=${SYNOPKG_PKGDEST}/tmp
-if [[ ! -e "${TMPDIR}" ]]; then
-    mkdir -p "${TMPDIR}"
-    chown ${EFF_USER} "${TMPDIR}"
-fi
+TMPDIR=${SYNOPKG_PKGTMP}
 export TMPDIR=${TMPDIR}
 
 

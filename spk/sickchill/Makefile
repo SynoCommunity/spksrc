@@ -41,8 +41,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
 
-USE_ALTERNATE_TMPDIR = 1
-
 POST_STRIP_TARGET = sickchill_extra_install
 
 include ../../mk/spksrc.spk.mk
