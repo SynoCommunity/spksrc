@@ -13,9 +13,6 @@ MSG = echo "===> "
 # Launch command in the working dir of the package source and the right environment
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
-# Add cargo for rust compiler to default PATH
-export PATH := /opt/cargo/bin:$(PATH)
-
 # fallback by default to native/python*
 PIP ?= pip
 

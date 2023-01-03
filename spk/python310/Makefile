@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.8
+SPK_VERS = 3.10.9
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.8"
+CHANGELOG = "1. Update to Python 3.10.9"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -27,7 +27,9 @@ POST_STRIP_TARGET = python310_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
+WHEELS  = src/requirements-pure.txt
+# WHEELS += src/requirements-crossenv.txt
+# WHEELS += src/requirements-abi3.txt
 
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -113,21 +115,19 @@ include ../../mk/spksrc.common.mk
 # # archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
 # UNSUPPORTED_ARCHS += comcerto2k
 
-# # [numpy] > 1.21.6
-# # Last known working version: 1.21.6
-# # gcc-4.6.4 failed with exit status 1
-# # https://github.com/numpy/numpy/issues/20664
-# UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-
-# # [numpy] > 1.22.4
-# UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
-
 include ../../mk/spksrc.spk.mk
+
+# # [greenlet]
+# ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
+# WHEELS += src/requirements-crossenv-greenlet.txt
+# else
+# WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
+# endif
 
 # # [libtorrent]
 # ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
 # # [libtorrent] 2.0.7
-# WHEELS += src/requirements-crossenv-DSM7.txt
+# WHEELS += src/requirements-crossenv-libtorrent.txt
 # # Ensure build arguments matches boost_1.78
 # WHEELS_CXXFLAGS += [libtorrent]
 # WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
@@ -135,18 +135,28 @@ include ../../mk/spksrc.spk.mk
 # WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 # else
 # # [libtorrent] 1.2.17
-# WHEELS += src/requirements-crossenv-DSM6.txt
+# WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
 # DEPENDS += cross/libiconv
 # # Ensure build arguments matches boost
 # WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 # endif
 
-# # [numpy]
-# # Fix wheel building with older compilers
-# ifeq ($(call version_le, ${TC_GCC}, 5.0),1)
-# WHEELS_CPPFLAGS += [numpy] -std=c++0x
+# # [numpy] <= 1.21.6
+# # Last known working version for armv5: 1.21.6
+# # gcc-4.6.4 failed with exit status 1
+# # https://github.com/numpy/numpy/issues/20664
+# ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+# WHEELS += src/requirements-crossenv-numpy-armv5.txt
+# # [numpy] <= 1.22.4
+# # Last known working version for armv7l: 1.22.4
+# else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+# WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+# else
+# WHEELS += src/requirements-crossenv-numpy.txt
+# endif
 # # workaround for compiler bug:
 # # https://github.com/numpy/numpy/issues/13622
+# ifeq ($(call version_le, ${TC_GCC}, 5.0),1)
 # ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 # WHEELS_CFLAGS += [numpy] -O0
 # endif

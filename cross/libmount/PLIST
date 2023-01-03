@@ -1,0 +1,6 @@
+lnk:lib/libblkid.so
+lnk:lib/libblkid.so.1
+lib:lib/libblkid.so.1.1.0
+lnk:lib/libmount.so
+lnk:lib/libmount.so.1
+lib:lib/libmount.so.1.1.0

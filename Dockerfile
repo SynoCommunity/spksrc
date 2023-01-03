@@ -85,28 +85,8 @@ RUN pip2 install virtualenv httpie
 # Default pip -> python3 aware for native python wheels builds
 RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 # Install meson cross-platform build system
-RUN pip3 install meson==0.62.2
+RUN pip3 install meson==1.0.0
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
 WORKDIR /spksrc
-
-# Set cargo/rustc default path
-ENV CARGO_HOME=/opt/cargo
-ENV RUSTUP_HOME=/opt/rustup
-RUN mkdir -p $CARGO_HOME $RUSTUP_HOME
-ENV PATH="$VENV_PATH/bin:$RUSTUP_HOME/bin:$CARGO_HOME/bin:$PATH"
-
-# Install rustc - environment located in /opt/rustup
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-# Install rustc stable toolchain
-RUN rustup toolchain install stable
-RUN rustup default stable
-# Install all rustc targets
-RUN rustup target add x86_64-unknown-linux-gnu
-RUN rustup target add i686-unknown-linux-gnu
-RUN rustup target add armv5te-unknown-linux-gnueabi
-RUN rustup target add armv7-unknown-linux-gnueabihf
-RUN rustup target add armv7-unknown-linux-gnueabi
-RUN rustup target add aarch64-unknown-linux-gnu
-RUN rustup target add powerpc-unknown-linux-gnu

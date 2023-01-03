@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.7
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -78,7 +78,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update rmlint to support reflink, find nonstripped binaries and to read json caches.<br/>2. Update file to v5.39.<br/>3. Update fdupes to v2.2.1.<br/>4. Update jdupes to v1.21.0.<br/>5. Update fzf to v.0.34.0<br/>6. Update tree to v2.0.4.<br/>7. Update bat to v0.22.1."
+CHANGELOG = "1. Update jdupes to support dedupe.<br/>2. Update fzf to v0.35.1.<br/>3. Update less to v608.<br/>4. Update nano to v7.0.<br/>5. Update nnn to v4.7."
 
 SERVICE_SETUP = src/service-setup.sh
 

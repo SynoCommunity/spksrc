@@ -1,6 +1,6 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/lidarr.png
 
 DEPENDS = cross/lidarr cross/libstdc++ cross/sqlite
@@ -41,6 +41,6 @@ PACKAGE_AUTHOR = [Team Lidarr](https://lidarr.audio/)
 
 .PHONY: lidarr_extra_install
 lidarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
+	install -m 755 -d $(STAGING_DIR)/var/.config/Lidarr
+	install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Lidarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Lidarr/package_info

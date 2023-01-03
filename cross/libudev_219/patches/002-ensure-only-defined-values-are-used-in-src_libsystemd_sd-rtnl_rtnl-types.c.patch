@@ -1,0 +1,23 @@
+# ensure only defined NDA_* enum values are used (see in <linux/neighbour.h>)
+# 
+--- src/libsystemd/sd-rtnl/rtnl-types.c.orig	2015-02-16 20:55:07.000000000 +0000
++++ src/libsystemd/sd-rtnl/rtnl-types.c	2022-12-06 18:31:32.578224909 +0000
+@@ -400,10 +400,18 @@
+         [NDA_LLADDR]            = { .type = NLA_ETHER_ADDR },
+         [NDA_CACHEINFO]         = { .type = NLA_CACHE_INFO, .size = sizeof(struct nda_cacheinfo) },
+         [NDA_PROBES]            = { .type = NLA_U32 },
++#ifdef NDA_VLAN
+         [NDA_VLAN]              = { .type = NLA_U16 },
++#endif        
++#ifdef NDA_PORT
+         [NDA_PORT]              = { .type = NLA_U16 },
++#endif        
++#ifdef NDA_VNI
+         [NDA_VNI]               = { .type = NLA_U32 },
++#endif        
++#ifdef NDA_IFINDEX
+         [NDA_IFINDEX]           = { .type = NLA_U32 },
++#endif        
+ };
+ 
+ static const NLTypeSystem rtnl_neigh_type_system = {

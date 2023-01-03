@@ -43,6 +43,7 @@ DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
 DOTNET_UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) 
 # .NET for x86 (32-bit) is supported on windows only (for linux, it must be built from source)
 DOTNET_UNSUPPORTED_ARCHS += $(i686_ARCHS)
+# ARMv7_ARCHS without full vfpv3 support (having only vfpv3-d16) are not supported
 # issue #5315
 DOTNET_UNSUPPORTED_ARCHS += armada370
 # issue #5302

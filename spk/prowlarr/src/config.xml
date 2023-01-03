@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Config>
   <Branch>develop</Branch>
   <UpdateMechanism>BuiltIn</UpdateMechanism>
+  <UpdateAutomatically>True</UpdateAutomatically>
   <LaunchBrowser>False</LaunchBrowser>
+  <LogLevel>info</LogLevel>
   <Port>9696</Port>
-  <SslPort>6969</SslPort>
 </Config>

@@ -44,7 +44,7 @@ done
 
 # fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD+=" sonarr"
+    SPK_TO_BUILD+=" sonarr3"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
     SPK_TO_BUILD+=" python2"

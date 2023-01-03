@@ -1,13 +1,16 @@
 SPK_NAME = dotnet-runtime
-SPK_VERS = 6.0.5
-SPK_REV = 2
+SPK_VERS = 6.0.12
+SPK_REV = 3
 SPK_ICON = src/dotnet.png
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
+OPTIONAL_DEPENDS = cross/libstdc++
+DEPENDS = cross/libicu cross/dotnet-runtime
+
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "Update to dotnet-runtime v6.0.5 (security patch)."
+CHANGELOG = "1. Update to dotnet-runtime v6.0.12 (several security patches).<br/>2. Remove unsupported armv7 archs from provided packages."
 
 STARTABLE = no
 DISPLAY_NAME = .NET 6.0 runtime
@@ -15,11 +18,7 @@ DISPLAY_NAME = .NET 6.0 runtime
 HOMEPAGE = https://dotnet.microsoft.com/
 LICENSE  = MIT
 
-OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/libicu cross/dotnet-runtime
-
 include ../../mk/spksrc.common.mk
-
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # we do not only need the updated libstdc++ library, we also need to
 # adjust the library search path for dotnet to use this version.
