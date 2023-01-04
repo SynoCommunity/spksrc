@@ -28,10 +28,8 @@ service_postinst ()
 validate_preuninst ()
 {
     if [ "${wizard_delete_data}" = "true" ]; then
-        # variables of reload_inst_variables are not availabel here
-        echo "FONTS_FOLDER=${FONTS_FOLDER}" | install_log
+        # variables of reload_inst_variables are not available here
         FONTS_FOLDER=$(cat ${INST_VARIABLES} | grep ^FONTS_FOLDER | awk -F'=' '{print $2}')
-        echo "FONTS_FOLDER=${FONTS_FOLDER}" | install_log
         if [ -z "${FONTS_FOLDER}" ]; then
             echo "The folder of the installed fonts is not available. You cannot delete the installed fonts (${FONTS_FOLDER})."
             exit 1;
