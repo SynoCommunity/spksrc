@@ -11,7 +11,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 DEPENDS  = cross/openssl cross/gnutls
 DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
 DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/pngquant
-DEPENDS += cross/libwebsockets
 # To build curl with zstd feature define depends zstd before cross/curl
 DEPENDS += cross/zstd
 DEPENDS += cross/curl
