@@ -7,7 +7,18 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl cross/c-ares
 # optional features (see BUILD_CURL_WITH below)
-OPTIONAL_DEPENDS = cross/libssh2 cross/gnutls cross/mbedtls cross/libidn2 cross/libpsl cross/nghttp2 cross/gsasl cross/gss cross/openldap
+OPTIONAL_DEPENDS  = cross/libssh2 
+OPTIONAL_DEPENDS += cross/gnutls
+OPTIONAL_DEPENDS += cross/mbedtls
+OPTIONAL_DEPENDS += cross/libidn2
+OPTIONAL_DEPENDS += cross/libpsl
+OPTIONAL_DEPENDS += cross/nghttp2
+OPTIONAL_DEPENDS += cross/gsasl
+OPTIONAL_DEPENDS += cross/gss
+OPTIONAL_DEPENDS += cross/zstd
+OPTIONAL_DEPENDS += cross/brotli
+OPTIONAL_DEPENDS += cross/openldap
+
 
 HOMEPAGE = https://curl.haxx.se
 COMMENT  = Command line tool and library for transferring data with URLs.
@@ -65,6 +76,16 @@ endif
 ifeq ($(findstring gss,$(BUILD_CURL_WITH)),gss)
 DEPENDS += cross/gss
 CONFIGURE_ARGS += --with-gssapi=$(STAGING_INSTALL_PREFIX)
+endif
+
+ifeq ($(findstring zstd,$(BUILD_CURL_WITH)),zstd)
+DEPENDS += cross/zstd
+CONFIGURE_ARGS += --with-zstd
+endif
+
+ifeq ($(findstring brotli,$(BUILD_CURL_WITH)),brotli)
+DEPENDS += cross/brotli
+CONFIGURE_ARGS += --with-brotli
 endif
 
 ifeq ($(findstring ldap,$(BUILD_CURL_WITH)),ldap)
