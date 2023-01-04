@@ -13,6 +13,22 @@ if [ -r "${INST_VARIABLES}" ]; then
     done
 fi
 
+function default_if_true(){
+   if [ "$1" == "true" ]; then
+      echo "true"
+   else
+      echo "false"
+   fi
+}
+
+function default_if_false(){
+   if [ "$1" == "false" ]; then
+      echo "true"
+   else
+      echo "false"
+   fi
+}
+
 cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 [
    {
@@ -83,11 +99,12 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_append_only",
                   "desc": "enabled",
-                  "defaultValue": "${WIZARD_APPEND_ONLY}"
+                  "defaultValue": $(default_if_true ${WIZARD_APPEND_ONLY})
                },
                {
                   "key": "",
-                  "desc": "disabled"
+                  "desc": "disabled",
+                  "defaultValue": $(default_if_false ${WIZARD_APPEND_ONLY})
                }
             ]
          },
@@ -98,11 +115,12 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_private_repos",
                   "desc": "enable",
-                  "defaultValue": "${WIZARD_PRIVATE_REPOS}"
+                  "defaultValue": $(default_if_true ${WIZARD_PRIVATE_REPOS})
                },
                {
                   "key": "",
-                  "desc": "disabled"
+                  "desc": "disabled",
+                  "defaultValue": $(default_if_false ${WIZARD_PRIVATE_REPOS})
                }
             ]
          },
@@ -113,11 +131,12 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_prometheus",
                   "desc": "enable",
-                  "defaultValue": "${WIZARD_PROMETHEUS}"
+                  "defaultValue": $(default_if_true ${WIZARD_PROMETHEUS})
                },
                {
                   "key": "",
-                  "desc": "disabled"
+                  "desc": "disabled",
+                  "defaultValue": $(default_if_false ${WIZARD_PROMETHEUS})
                }
             ]
          },
@@ -128,11 +147,12 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_prometheus_no_auth",
                   "desc": "enable",
-                  "defaultValue": "${WIZARD_PROMETHEUS_NO_AUTH}"
+                  "defaultValue": $(default_if_true ${WIZARD_PROMETHEUS_NO_AUTH})
                },
                {
                   "key": "",
-                  "desc": "disabled"
+                  "desc": "disabled",
+                  "defaultValue": $(default_if_false ${WIZARD_PROMETHEUS_NO_AUTH})
                }
             ]
          }
