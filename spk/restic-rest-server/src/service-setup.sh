@@ -1,6 +1,6 @@
 
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-GROUP="sc-rest-server"
+GROUP="sc-restic-rest-server"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
@@ -33,7 +33,7 @@ fi
 
 PORT=8500
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/rest-server --listen ":${PORT}" --path ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY} ${ARGS}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/restic-rest-server --listen ":${PORT}" --path ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY} ${ARGS}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 

@@ -1,8 +1,9 @@
-PKG_NAME = rest-server
+PKG_NAME = restic-rest-server
+PKG_REAL_NAME = rest-server
 PKG_VERS = 0.11.0
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com//restic/rest-server/releases/download/v$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/restic/rest-server/releases/download/v$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)
 

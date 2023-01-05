@@ -32,7 +32,7 @@ function default_if_false(){
 cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 [
    {
-      "step_title": "rest-server configuration",
+      "step_title": "Restic rest-server configuration",
       "items": [
          {
             "type": "combobox",
@@ -87,10 +87,10 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
             ]
          },
          {
-            "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-rest-server</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
+            "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-restic-rest-server</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
          },
          {
-            "desc": "Please define the following settings for the rest-server:"
+            "desc": "Please define the following settings for restic rest-server:"
          },
          {
             "type": "singleselect",
