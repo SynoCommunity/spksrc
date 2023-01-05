@@ -60,66 +60,46 @@
             "desc": "Please define the following settings for restic rest-server:"
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Append only mode",
             "subitems": [
                {
                   "key": "wizard_append_only",
                   "desc": "enabled",
                   "defaultValue": true
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": false
                }
             ]
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Private repositories",
             "subitems": [
                {
                   "key": "wizard_private_repos",
-                  "desc": "enable",
+                  "desc": "enabled",
                   "defaultValue": true
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": false
                }
             ]
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Prometheus",
             "subitems": [
                {
                   "key": "wizard_prometheus",
-                  "desc": "enable",
+                  "desc": "enabled",
                   "defaultValue": true
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": false
                }
             ]
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Prometheus no auth",
             "subitems": [
                {
                   "key": "wizard_prometheus_no_auth",
-                  "desc": "enable",
+                  "desc": "enabled",
                   "defaultValue": false
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": true
                }
             ]
          }

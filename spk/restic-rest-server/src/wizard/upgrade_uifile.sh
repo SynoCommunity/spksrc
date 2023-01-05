@@ -13,22 +13,6 @@ if [ -r "${INST_VARIABLES}" ]; then
     done
 fi
 
-function default_if_true(){
-   if [ "$1" == "true" ]; then
-      echo "true"
-   else
-      echo "false"
-   fi
-}
-
-function default_if_false(){
-   if [ "$1" == "false" ]; then
-      echo "true"
-   else
-      echo "false"
-   fi
-}
-
 cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 [
    {
@@ -93,66 +77,46 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
             "desc": "Please define the following settings for restic rest-server:"
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Append only mode",
             "subitems": [
                {
                   "key": "wizard_append_only",
                   "desc": "enabled",
-                  "defaultValue": $(default_if_true ${WIZARD_APPEND_ONLY})
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": $(default_if_false ${WIZARD_APPEND_ONLY})
+                  "defaultValue": ${WIZARD_APPEND_ONLY}
                }
             ]
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Private repositories",
             "subitems": [
                {
                   "key": "wizard_private_repos",
-                  "desc": "enable",
-                  "defaultValue": $(default_if_true ${WIZARD_PRIVATE_REPOS})
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": $(default_if_false ${WIZARD_PRIVATE_REPOS})
+                  "desc": "enabled",
+                  "defaultValue": ${WIZARD_PRIVATE_REPOS}
                }
             ]
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Prometheus",
             "subitems": [
                {
                   "key": "wizard_prometheus",
-                  "desc": "enable",
-                  "defaultValue": $(default_if_true ${WIZARD_PROMETHEUS})
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": $(default_if_false ${WIZARD_PROMETHEUS})
+                  "desc": "enabled",
+                  "defaultValue": ${WIZARD_PROMETHEUS}
                }
             ]
          },
          {
-            "type": "singleselect",
+            "type": "multiselect",
             "desc": "Prometheus no auth",
             "subitems": [
                {
                   "key": "wizard_prometheus_no_auth",
-                  "desc": "enable",
-                  "defaultValue": $(default_if_true ${WIZARD_PROMETHEUS_NO_AUTH})
-               },
-               {
-                  "key": "",
-                  "desc": "disabled",
-                  "defaultValue": $(default_if_false ${WIZARD_PROMETHEUS_NO_AUTH})
+                  "desc": "enabled",
+                  "defaultValue": ${WIZARD_PROMETHEUS_NO_AUTH}
                }
             ]
          }
