@@ -31,9 +31,7 @@ if [ "${WIZARD_PROMETHEUS}" == "true" ]; then
     fi
 fi
 
-PORT=8500
-
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/restic-rest-server --listen ":${PORT}" --path ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY} ${ARGS}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/restic-rest-server --listen ":${SERVICE_PORT}" --path ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY} ${ARGS}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 

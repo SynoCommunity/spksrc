@@ -24,6 +24,7 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_data_directory
 USE_DATA_SHARE_WORKER = yes
 FWPORTS = src/restic-rest-server.sc
-ADMIN_PORT = 8500
+SERVICE_PORT = 8500
+NO_SERVICE_SHORTCUT = yes
 
 include ../../mk/spksrc.spk.mk
