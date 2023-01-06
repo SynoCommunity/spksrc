@@ -74,7 +74,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
             "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-restic-rest-server</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
          },
          {
-            "desc": "The .htpasswd file is located at the root of the shared folder defined above. Add users acccording to the official documentation. Please define the following settings for restic rest-server:"
+            "desc": "The non-standard port 8500 is used. The .htpasswd file is located at the root of the shared folder defined above. Add users acccording to the official documentation. Please define the following additional settings for restic rest-server:"
          },
          {
             "type": "multiselect",
