@@ -2,39 +2,36 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 GROUP="sc-restic-rest-server"
 
-INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
-INST_VARIABLES="${INST_ETC}/installer-variables"
-
-# Reload wizard variables stored by postinst
-if [ -r "${INST_VARIABLES}" ]; then
-    # we cannot source the file to reload the variables, when values have special characters like <, >, ...
-    for _line in $(cat "${INST_VARIABLES}"); do
-        _key="$(echo ${_line} | awk -F'=' '{print $1}')"
-        _value="$(echo ${_line} | awk -F'=' '{print $2}')"
-        declare "${_key}=${_value}"
-    done
+# Source installer variables and functions to be available for service start (and not only during installation)
+INST_FUNCTIONS=$(dirname $0)"/functions"
+if [ -r "${INST_FUNCTIONS}" ]; then
+    . "${INST_FUNCTIONS}"
 fi
 
-ARGS=""
+reload_inst_variables
 
-if [ "${WIZARD_APPEND_ONLY}" == "true" ]; then
-    ARGS="${ARGS} --append-only"
-fi
-if [ "${WIZARD_PRIVATE_REPOS}" == "true" ]; then
-    ARGS="${ARGS} --private-repos"
-fi
-if [ "${WIZARD_PROMETHEUS}" == "true" ]; then
-    ARGS="${ARGS} --prometheus"
+service_prestart ()
+{
+    ARGS=""
 
-    if [ "${WIZARD_PROMETHEUS_NO_AUTH}" == "true" ]; then
-        ARGS="${ARGS} --prometheus-no-auth"
+    if [ "${WIZARD_APPEND_ONLY}" == "true" ]; then
+        ARGS="${ARGS} --append-only"
     fi
-fi
+    if [ "${WIZARD_PRIVATE_REPOS}" == "true" ]; then
+        ARGS="${ARGS} --private-repos"
+    fi
+    if [ "${WIZARD_PROMETHEUS}" == "true" ]; then
+        ARGS="${ARGS} --prometheus"
 
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/restic-rest-server --listen ":${SERVICE_PORT}" --path ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY} ${ARGS}"
-SVC_BACKGROUND=y
-SVC_WRITE_PID=y
+        if [ "${WIZARD_PROMETHEUS_NO_AUTH}" == "true" ]; then
+            ARGS="${ARGS} --prometheus-no-auth"
+        fi
+    fi
 
+    SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/restic-rest-server --listen ":${SERVICE_PORT}" --path ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY} ${ARGS}"
+    SVC_BACKGROUND=y
+    SVC_WRITE_PID=y
+}
 
 service_postinst ()
 {
