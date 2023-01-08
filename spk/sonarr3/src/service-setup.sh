@@ -25,7 +25,7 @@ SERVICE_COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=
 SVC_BACKGROUND=y
 SVC_WAIT_TIMEOUT=90
 
-validate_preinst ()
+validate_preupgrade ()
 {
     # check if the installed distribution is a legacy version
     if [ -f "${SYNOPKG_PKGDEST}/share/NzbDrone/NzbDrone.exe" ]; then
