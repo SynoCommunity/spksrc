@@ -12,6 +12,7 @@ OPTIONAL_DEPENDS += cross/gnutls
 OPTIONAL_DEPENDS += cross/mbedtls
 OPTIONAL_DEPENDS += cross/libidn2
 OPTIONAL_DEPENDS += cross/libpsl
+OPTIONAL_DEPENDS += cross/librtmp
 OPTIONAL_DEPENDS += cross/nghttp2
 OPTIONAL_DEPENDS += cross/gsasl
 OPTIONAL_DEPENDS += cross/gss
@@ -62,6 +63,11 @@ endif
 ifeq ($(findstring libpsl,$(BUILD_CURL_WITH)),libpsl)
 DEPENDS += cross/libpsl
 CONFIGURE_ARGS += --with-libpsl
+endif
+
+ifeq ($(findstring librtmp,$(BUILD_CURL_WITH)),librtmp)
+DEPENDS += cross/librtmp
+CONFIGURE_ARGS += --with-librtmp
 endif
 
 ifeq ($(findstring nghttp2,$(BUILD_CURL_WITH)),nghttp2)
