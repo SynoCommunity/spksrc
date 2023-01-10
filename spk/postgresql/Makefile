@@ -1,5 +1,5 @@
 SPK_NAME = postgresql
-SPK_VERS = 11.16
+SPK_VERS = 11.18
 SPK_REV = 3
 SPK_ICON = src/postgresql.png
 
@@ -25,7 +25,7 @@ WIZARDS_DIR = src/wizard
 SERVICE_SETUP = src/service-setup.as-root.sh
 endif
 
-# sc-postgresql is not a valid user (sc_postpres is defined in privilege file as package/service user)
+# sc-postgresql is not a valid user (sc_postgres is defined in privilege file as package/service user)
 #SERVICE_USER=auto
 SSS_SCRIPT = src/start-stop-status.sh
 
