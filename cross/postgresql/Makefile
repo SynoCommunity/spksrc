@@ -2,7 +2,7 @@ PKG_NAME = postgresql
 PKG_VERS = 11.16
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)/
+PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl cross/libxml2 cross/libxslt cross/readline
