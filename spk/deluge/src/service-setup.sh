@@ -106,8 +106,10 @@ service_postinst ()
     # DSM<=6: Copy new default configuration files prior from them being
     #         overwritten by old version during postupgrade recovery
     if [ -r "${CFG_FILE}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        cp -p ${CFG_FILE} ${CFG_FILE}.new
         cp -p ${CFG_WATCH} ${CFG_WATCH}.new
+        cp -p ${CFG_FILE} ${CFG_FILE}.new
+        # Ensure core.conf as no newline at end of file
+        sed -i -z 's/\n$//' ${CFG_FILE}.new
     fi
 }
 
@@ -126,10 +128,13 @@ service_postupgrade ()
         cp -p ${CFG_WATCH} ${CFG_WATCH}.bak.$(date +%Y%m%d%H%M)
 
         # Copy new "default" version of core.conf and autoadd.conf
-        cp -p ${CFG_FILE}.new ${CFG_FILE}
         cp -p ${CFG_WATCH}.new ${CFG_WATCH}
+        cp -p ${CFG_FILE}.new ${CFG_FILE}
 
         # Reset to default installation
         deluge_default_install
     fi
+
+    # At first run always ensure core.conf as no newline at end of file
+    sed -i -z 's/\n$//' ${CFG_FILE}
 }
