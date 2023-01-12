@@ -40,7 +40,7 @@
       "php": {
         "profile_name": "tt-rss",
         "profile_desc": "PHP profile used by tt-rss",
-        "backend": 6,
+        "backend": 8,
         "extensions": [
           "curl",
           "gd",

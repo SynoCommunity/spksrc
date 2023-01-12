@@ -32,6 +32,8 @@ service_postinst ()
       # Install the web interface
       ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
     fi
+    
+    mkdir "-p" "${LOGS_DIR}"
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
