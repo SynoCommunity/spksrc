@@ -3,7 +3,6 @@ PKG_VERS = 0.15.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/restic/restic/releases/download/v$(PKG_VERS)
-EXTRACT_PATH = $(WORK_DIR)
 PKG_DIR = $(PKG_NAME)
 
 BUILD_DEPENDS = native/go
