@@ -55,3 +55,6 @@ DOTNET_UNSUPPORTED_ARCHS += armadaxp
 
 # compatibility with .NET not yet confirmed:
 # alpine4k armada375 armada38x comcerto2k
+
+# .NET unsupported archs group excluding .NET for x86 (32-bit)
+DOTNET_UNSUPPORTED_ARCHSv2 = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine monaco armadaxp
