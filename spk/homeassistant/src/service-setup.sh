@@ -70,4 +70,10 @@ service_postinst ()
     echo ${separator}
     echo "Install packages for homeassistant.components from index"
     pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
+
+
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        # ensure package user has access to the virtual env packages, installed as root
+        set_unix_permissions ${SYNOPKG_PKGDEST}/env
+    fi
 }
