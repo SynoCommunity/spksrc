@@ -122,5 +122,6 @@ guppy3==3.1.2
 psutil==5.9.4
 Pillow==9.2.0
 pyitachip2ir==0.0.7
+websockets==10.4
 
 # DTLSSocket==0.1.12                ==> cross/dtlssocket

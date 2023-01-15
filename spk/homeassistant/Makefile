@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2022.10.5.<br/>2. Update Python to 3.10.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2022.10.5.<br/>2. Update Python to 3.10.<br/>3. Add requirements-custom.txt where a user can add manually installed python modules, that will be reinstalled on package updates.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -106,14 +106,17 @@ endif
 
 # [pycryptodomex]
 ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
+WHEELS_CFLAGS += [pycryptodome] -std=c11
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
+WHEELS_CFLAGS += [pycryptodome] -std=c99
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
 
 
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/share
+	@install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/var
 	@install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/
 	@install -m 644 src/hacs.tar.gz $(STAGING_DIR)/share/
+	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/

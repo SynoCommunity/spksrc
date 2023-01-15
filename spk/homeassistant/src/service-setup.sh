@@ -71,6 +71,11 @@ service_postinst ()
     echo "Install packages for homeassistant.components from index"
     pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
 
+    if [ -e ${SYNOPKG_PKGVAR}/requirements-custom.txt ]; then
+        echo ${separator}
+        echo "Install custom packages from index"
+        pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGVAR}/requirements-custom.txt
+    fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # ensure package user has access to the virtual env packages, installed as root
