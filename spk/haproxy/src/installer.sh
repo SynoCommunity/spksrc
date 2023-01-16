@@ -16,6 +16,8 @@ BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 FWPORTS="/var/packages/${PACKAGE}/scripts/${PACKAGE}.sc"
 CFG_FILE="${INSTALL_DIR}/var/haproxy.cfg"
 TPL_FILE="${CFG_FILE}.tpl"
+CERT_DIR="${INSTALL_DIR}/var/crt"
+CERT_FILE=default.pem
 
 DSM6_UPGRADE="${INSTALL_DIR}/var/.dsm6_upgrade"
 SC_USER="sc-haproxy"
@@ -49,10 +51,25 @@ postinst ()
     # Install the wheels
     ${INSTALL_DIR}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${INSTALL_DIR}/share/wheelhouse ${INSTALL_DIR}/share/wheelhouse/*.whl > /dev/null 2>&1
 
+    # Create a self signed certificate
+    mkdir -p ${CERT_DIR}
+    OPENSSL=${SYNOPKG_PKGDEST}/bin/openssl
+    ${OPENSSL} req -subj "/CN=default" -newkey rsa:4096 -nodes -keyout ${CERT_DIR}/default.key -out ${CERT_DIR}/default.csr
+    ${OPENSSL} x509 -req -days 7320 -in ${CERT_DIR}/default.csr -signkey ${CERT_DIR}/default.key -out ${CERT_DIR}/default.crt
+
+    cat ${CERT_DIR}/default.key ${CERT_DIR}/default.crt > ${CERT_DIR}/${CERT_FILE}
+    rm -f ${CERT_DIR}/default.{csr,key,crt}
+
     # Setup the database
     ${INSTALL_DIR}/env/bin/python ${INSTALL_DIR}/app/setup.py
 
-    # Correct the files ownership
+    # Set the user in the configuration
+    # sed -i -e "s/@user@/${USER}/g" ${CFG_FILE}
+    sed -ie "/^global$/a\	user ${USER}" ${CFG_FILE}
+    sed -ie "/^global$/a\	user ${USER}" ${TPL_FILE}
+
+
+    # Set the files ownership
     chown -R ${USER}:root ${SYNOPKG_PKGDEST}
 
     # Add firewall config

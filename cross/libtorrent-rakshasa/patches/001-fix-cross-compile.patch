@@ -1,58 +1,29 @@
-# Fix cross compiling issue
-# Remove -fvisibility=hidden flag
---- configure.orig      2015-11-15 13:32:43.244650908 -0500
-+++ configure   2015-11-15 13:34:28.800652406 -0500
-@@ -15850,7 +15850,7 @@
+--- ../libtorrent-0.13.8-old/configure	2020-10-07 00:04:23.116018099 +0000
++++ configure	2020-10-07 00:05:20.380336668 +0000
+@@ -17271,7 +17271,7 @@ else
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking the byte alignment" >&5
  $as_echo_n "checking the byte alignment... " >&6; }
-
+ 
 -  if test "$cross_compiling" = yes; then :
 +  if test "$cross_compiling" = maybe; then :
    { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
  $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
  as_fn_error $? "cannot run test program while cross compiling
-@@ -16458,7 +16458,7 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether kqueue supports pipes and ptys" >&5
- $as_echo_n "checking whether kqueue supports pipes and ptys... " >&6; }
-
--  if test "$cross_compiling" = yes; then :
-+  if test "$cross_compiling" = maybe; then :
-   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
- $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
- as_fn_error $? "cannot run test program while cross compiling
-@@ -16553,7 +16553,7 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether kqueue supports pipes and ptys" >&5
- $as_echo_n "checking whether kqueue supports pipes and ptys... " >&6; }
-
--  if test "$cross_compiling" = yes; then :
-+  if test "$cross_compiling" = maybe; then :
-   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
- $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
- as_fn_error $? "cannot run test program while cross compiling
-@@ -17229,7 +17229,7 @@
-
-
+@@ -18234,7 +18234,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+ 
+ 
          tmp_CXXFLAGS=$CXXFLAGS
 -        CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
 +        CXXFLAGS="$CXXFLAGS"
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler supports __attribute__((visibility(\"default\")))" >&5
+ 
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler supports __attribute__((visibility(\"default\")))" >&5
  $as_echo_n "checking if compiler supports __attribute__((visibility(\"default\")))... " >&6; }
-@@ -17265,7 +17265,7 @@
-
+@@ -18270,7 +18270,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
  $as_echo "#define SUPPORT_ATTRIBUTE_VISIBILITY 1" >>confdefs.h
-
+ 
 -                CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
 +                CXXFLAGS="$CXXFLAGS"
-
-        else
+ 
+ 	else
                  true
-@@ -18268,7 +18268,7 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for execinfo.h" >&5
- $as_echo_n "checking for execinfo.h... " >&6; }
-
--  if test "$cross_compiling" = yes; then :
-+  if test "$cross_compiling" = maybe; then :
-   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
- $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
- as_fn_error $? "cannot run test program while cross compiling

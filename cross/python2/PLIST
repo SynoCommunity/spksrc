@@ -1,0 +1,13 @@
+rsc:bin/2to3
+rsc:bin/idle
+rsc:bin/pydoc
+rsc:bin/smtpd.py
+lnk:bin/python
+lnk:bin/python2
+bin:bin/python@PKG_SHORT_VERS@
+lnk:lib/libpython@PKG_SHORT_VERS@.so
+lib:lib/libpython@PKG_SHORT_VERS@.so.1.0
+rsc:lib/python@PKG_SHORT_VERS@
+lib:lib/python@PKG_SHORT_VERS@/lib-dynload/*.so
+rsc:etc/mime.types
+rsc:include/python@PKG_SHORT_VERS@/pyconfig.h

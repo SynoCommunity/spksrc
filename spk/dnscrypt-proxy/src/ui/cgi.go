@@ -10,8 +10,8 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"net/http/cgi"
 	"io/ioutil"
+	"net/http/cgi"
 	"os"
 	"os/exec"
 	"regexp"
@@ -100,24 +100,24 @@ func auth() {
 	}
 
 	// check permissions
-	if (checkIfFileExists("/usr/syno/synoman/webman/initdata.cgi")) {
-	cmd = exec.Command("/usr/syno/synoman/webman/initdata.cgi") // performance hit
-	cmdOut, err := cmd.Output()
-	if err != nil {
-		logUnauthorised(err.Error())
-	}
-	cmdOut = bytes.TrimLeftFunc(cmdOut, findJSON)
+	if checkIfFileExists("/usr/syno/synoman/webman/initdata.cgi") {
+		cmd = exec.Command("/usr/syno/synoman/webman/initdata.cgi") // performance hit
+		cmdOut, err := cmd.Output()
+		if err != nil {
+			logUnauthorised(err.Error())
+		}
+		cmdOut = bytes.TrimLeftFunc(cmdOut, findJSON)
 
-	var jsonData AuthJSON
-	if err := json.Unmarshal(cmdOut, &jsonData); err != nil {  // performance hit
-		logUnauthorised(err.Error())
-	}
+		var jsonData AuthJSON
+		if err := json.Unmarshal(cmdOut, &jsonData); err != nil { // performance hit
+			logUnauthorised(err.Error())
+		}
 
-	isAdmin := jsonData.Session.IsAdmin              // Session.IsAdmin:true
-	isPermitted := jsonData.AppPrivilege.IsPermitted // AppPrivilege.SYNO.SDS.DNSCryptProxy.Application:true
-	if !(isAdmin || isPermitted) {
-		notFound()
-	}
+		isAdmin := jsonData.Session.IsAdmin              // Session.IsAdmin:true
+		isPermitted := jsonData.AppPrivilege.IsPermitted // AppPrivilege.SYNO.SDS.DNSCryptProxy.Application:true
+		if !(isAdmin || isPermitted) {
+			notFound()
+		}
 	}
 
 	os.Setenv("QUERY_STRING", tempQueryEnv)
@@ -146,7 +146,7 @@ func notFound() {
 }
 
 // Return true if the file path exists.
-func checkIfFileExists (file string) bool {
+func checkIfFileExists(file string) bool {
 	_, err := os.Stat(file)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -177,7 +177,7 @@ func loadFile(file string) string {
 // Save file content (data) to the approved file path (fileKey)
 func saveFile(fileKey string, data string) {
 	// If file exists get file info struct
-	fInfo, err := os.Stat(rootDir+files[fileKey])
+	fInfo, err := os.Stat(rootDir + files[fileKey])
 	if err != nil {
 		logError(err.Error())
 	}
@@ -186,7 +186,7 @@ func saveFile(fileKey string, data string) {
 	stat := fInfo.Sys().(*syscall.Stat_t)
 
 	// Create file
-	file, err := os.Create(rootDir+files[fileKey]+".tmp")
+	file, err := os.Create(rootDir + files[fileKey] + ".tmp")
 	if err != nil {
 		logError(err.Error())
 	}
@@ -239,20 +239,20 @@ func checkCmdExists(cmd string) bool {
 }
 
 // Execute generate-domains-blacklist.py to generate blacklist.txt
-func generateBlacklist () {
+func generateBlocklist() {
 	if !checkCmdExists("python") {
 		logError("Python could not be found or is not installed!")
 	}
 
 	var stderr bytes.Buffer
 	cmd := exec.Command("python", rootDir+"/var/generate-domains-blacklist.py")
-	cmd.Dir = rootDir+"/var"
+	cmd.Dir = rootDir + "/var"
 	cmd.Stderr = &stderr
 	stdout, err := cmd.Output()
 	if err != nil {
 		logError(err.Error() + string(stdout) + string(stderr.Bytes()))
 	}
-	saveFile("blacklist", string(stdout))
+	saveFile("blocklist", string(stdout))
 }
 
 // Return HTML from layout.html.
@@ -293,7 +293,7 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		rootDir = pwd+"/test"
+		rootDir = pwd + "/test"
 	} else { // production environment
 		auth()
 		rootDir = "/var/packages/dnscrypt-proxy/target"
@@ -301,15 +301,15 @@ func main() {
 
 	files = make(map[string]string)
 	files["config"] = "/var/dnscrypt-proxy.toml"
-	files["blacklist"] = "/var/blacklist.txt"
-	files["ip-blacklist"] = "/var/ip-blacklist.txt"
+	files["blocklist"] = "/var/blacklist.txt"
+	files["ip-blocklist"] = "/var/ip-blacklist.txt"
 	files["cloaking"] = "/var/cloaking-rules.txt"
 	files["forwarding"] = "/var/forwarding-rules.txt"
 	files["whitelist"] = "/var/whitelist.txt"
-	files["-domains-blacklist"] = "/var/domains-blacklist.conf" // - is used for ordering
+	files["-domains-blocklist"] = "/var/domains-blacklist.conf" // - is used for ordering
 	files["-domains-whitelist"] = "/var/domains-whitelist.txt"
 	files["-domains-time-restricted"] = "/var/domains-time-restricted.txt"
-	files["-domains-blacklist-local-additions"] = "/var/domains-blacklist-local-additions.txt"
+	files["-domains-blocklist-local-additions"] = "/var/domains-blacklist-local-additions.txt"
 
 	// Retrieve Form Values
 	httpReqest, err := cgi.Request()
@@ -321,7 +321,7 @@ func main() {
 	}
 
 	fileKey := strings.TrimSpace(httpReqest.FormValue("file"))
-	generateBlacklistStr := strings.TrimSpace(httpReqest.FormValue("generateBlacklist"))
+	generateBlocklistStr := strings.TrimSpace(httpReqest.FormValue("generateBlocklist"))
 	fileData := httpReqest.FormValue("fileContent")
 
 	method := os.Getenv("REQUEST_METHOD")
@@ -331,9 +331,9 @@ func main() {
 			renderHTML(fileKey, "File saved successfully!", "")
 			// fmt.Println("Status: 200 OK\nContent-Type: text/plain;\n")
 			// return
-		} else if generateBlacklistStr != "" {
-			generateBlacklist()
-			if fileKey == "blacklist" {
+		} else if generateBlocklistStr != "" {
+			generateBlocklist()
+			if fileKey == "blocklist" {
 				renderHTML(fileKey, "File saved successfully!", "")
 			}
 			fmt.Print("Status: 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n")

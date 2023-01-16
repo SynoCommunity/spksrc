@@ -1,3 +1,5 @@
+bin:bin/inetcat
+bin:bin/iproxy
 lnk:lib/libusbmuxd.so
-lnk:lib/libusbmuxd.so.4
-lib:lib/libusbmuxd.so.4.0.0
+lnk:lib/libusbmuxd.so.6
+lib:lib/libusbmuxd.so.6.0.0

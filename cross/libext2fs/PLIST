@@ -1,0 +1,3 @@
+lnk:lib/libext2fs.so
+lnk:lib/libext2fs.so.2
+lib:lib/libext2fs.so.2.4

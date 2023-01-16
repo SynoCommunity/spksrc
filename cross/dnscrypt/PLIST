@@ -1,7 +1,0 @@
-bin:bin/hostip
-rsc:etc/dnscrypt-proxy.conf
-lib:lib/dnscrypt-proxy/libdcplugin_example_cache.so
-lib:lib/dnscrypt-proxy/libdcplugin_example_logging.so
-lib:lib/dnscrypt-proxy/libdcplugin_example.so
-bin:sbin/dnscrypt-proxy
-rsc:share

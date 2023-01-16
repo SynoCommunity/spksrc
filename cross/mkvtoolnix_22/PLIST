@@ -1,0 +1,5 @@
+bin:bin/mkvextract
+bin:bin/mkvinfo
+bin:bin/mkvmerge
+bin:bin/mkvpropedit
+rsc:share/locale/

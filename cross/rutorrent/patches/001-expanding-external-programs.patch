@@ -1,0 +1,17 @@
+Added entries corresponding to external programs which are also potentially used by plugins and
+may therefore be configured
+index b68c526c..604f6263 100644
+--- conf/config.php.orig
++++ conf/config.php
+@@ -52,6 +52,10 @@
+ 		"gzip"	=> '',			// Something like /usr/bin/gzip. If empty, will be found in PATH.
+ 		"id"	=> '',			// Something like /usr/bin/id. If empty, will be found in PATH.
+ 		"stat"	=> '',			// Something like /usr/bin/stat. If empty, will be found in PATH.
++		"python"=> '',			// Something like /usr/bin/python3. If empty, will be found in PATH
++		"pgrep"	=> '',			// Something like /usr/bin/pgrep. If empty, will be found in PATH 
++		"sox"	=> '',			// Something like /usr/bin/sox. If empty, will be found in PATH
++		"mediainfo"	=> '',			// Something like /usr/bin/mediainfo. If empty, will be found in PATH
+ 	);
+ 
+ 	$localhosts = array( 			// list of local interfaces
+root@b1d8647331b2:/spksrc/spk/rutorrent/work-evansport-6.1/ruTorrent-3.10# 

@@ -1,0 +1,19 @@
+# let configure find readline built with ncursesw
+# 
+--- ext/readline/extconf.rb.orig	2020-12-25 04:33:01.000000000 +0100
++++ ext/readline/extconf.rb	2021-01-02 10:42:09.029425669 +0100
+@@ -26,12 +26,14 @@
+ 
+ dir_config('curses')
+ dir_config('ncurses')
++dir_config('ncursesw')
+ dir_config('termcap')
+ dir_config("readline")
+ enable_libedit = enable_config("libedit")
+ 
+ have_library("user32", nil) if /cygwin/ === RUBY_PLATFORM
+ have_library("ncurses", "tgetnum") ||
++  have_library("ncursesw", "tgetnum") ||
+   have_library("termcap", "tgetnum") ||
+   have_library("curses", "tgetnum")
+ 

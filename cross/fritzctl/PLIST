@@ -1,1 +1,1 @@
-bin/fritzctl
+bin:bin/fritzctl

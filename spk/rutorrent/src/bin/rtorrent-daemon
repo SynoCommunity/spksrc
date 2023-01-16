@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Package
+PACKAGE="rutorrent"
+
+INSTALL_DIR="/var/packages/${PACKAGE}/target"
+WEB_DIR="/var/services/web"
+RTORRENT_RC=${WEB_DIR}/${PACKAGE}/conf/rtorrent.rc
+
+export HOME=${INSTALL_DIR}/var
+export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
+export LD_LIBRARY_PATH="${INSTALL_DIR}/lib:${LD_LIBRARY_PATH}"
+RTORRENT="${INSTALL_DIR}/bin/rtorrent"
+
+# If default config ($HOME/.rtorrent.rc) is a symlink
+# and package default location file exists, use parameters
+# to force using that config file
+if [ -L ${HOME}/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
+    export RC_PARAM="-n -o import=${RTORRENT_RC}"
+fi
+
+exec screen -D -m ${RTORRENT} ${RC_PARAM}

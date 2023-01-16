@@ -1,0 +1,107 @@
+name: Bug report
+description: Create a report to help us improve
+labels: bug
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thanks for taking the time to fill out this bug report!
+- type: checkboxes
+  id: checks
+  attributes:
+    label: Is this a new Bug?
+    options:
+      - label: "I checkd that the bug hasn't been reported before"
+        required: true
+          
+- type: input
+  id: package
+  attributes:
+    label: Package Name
+    description: Which package is the bug report about?
+  validations:
+    required: true
+- type: input
+  id: version
+  attributes:
+    label: Package Version
+    description: What version of our package are you running?
+  validations:
+    required: true
+- type: input
+  id: model
+  attributes:
+    label: Device Model
+    description: Which NAS/Router Model have you experienced the bug with?
+  validations:
+    required: true
+- type: dropdown
+  id: arch
+  attributes:
+    label: Device Architecture
+    description: Which CPU Architecture does your NAS have? [You can look up the Architectrue for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
+    options:
+      - x86_64
+      - AArch64 (ARMv8)
+      - ARMv7
+      - ARMv7L (hi3535)
+      - ARMv5
+      - i686 (evansport)
+      - PPC
+  validations:
+    required: true
+- type: input
+  id: firmware
+  attributes:
+    label: Firmware Version
+    description: Which DSM/SRM version is the NAS running?
+  validations:
+    required: true
+    
+- type: textarea
+  id: decription
+  attributes:
+    label: What happened?
+    description: |
+      Also tell us, what did you expect to happen?
+      
+      Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+  validations:
+    required: true
+- type: textarea
+  id: repoduce
+  attributes:
+    label: Reproduction steps
+    description: "How do you trigger this bug? Please walk us through it step by step."
+    value: |
+      1.
+      2.
+      3.
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: install-log
+  attributes:
+    label: Install Log
+    description: "Please copy the log file from `/var/log/packages/{package}.log` or for DSM<6: `/var/packages/{package}/target/var/{package}_installer.log` in here"
+    render: log
+  validations:
+    required: true
+- type: textarea
+  id: service-log
+  attributes:
+    label: Service Log
+    description: "Please copy the log file from `/var/packages/{package}/var/{package}.log` or for DSM<6: `/var/packages/{package}/target/var/{package}.log` in here if the package is a service."
+    render: log
+  validations:
+    required: false
+- type: textarea
+  id: other-log
+  attributes:
+    label: Other Logs
+    description: "Please copy any other log files from `/var/log/messages`, `/var/log/synopkg.log` or application specific log files in here"
+    render: log
+  validations:
+    required: false

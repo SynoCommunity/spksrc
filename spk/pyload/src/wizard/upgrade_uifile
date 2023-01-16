@@ -1,6 +1,6 @@
 [{
-    "step_title": "Attention! DSM6 Permissions",
+    "step_title": "DSM6 Permissions",
     "items": [{
-    "desc": "Permissions are managed with the group 'sc-download' in DSM. The group 'users' is no longer used."
+    "desc": "DSM access permissions for this package are managed with the group <b>'sc-download'</b>.<br><br>Package installation will ensure, the group exists and the permissions are set for the chosen directory.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
 }]

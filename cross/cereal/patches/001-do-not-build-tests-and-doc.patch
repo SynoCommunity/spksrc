@@ -1,0 +1,12 @@
+--- CMakeLists.txt.orig	2019-10-25 04:38:52.000000000 +0000
++++ CMakeLists.txt	2021-06-10 17:35:08.757194836 +0000
+@@ -76,9 +76,4 @@
+   include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+ endif(Boost_FOUND)
+   
+-enable_testing()
+-add_subdirectory(unittests)
+-
+ add_subdirectory(sandbox)
+-
+-add_subdirectory(doc)

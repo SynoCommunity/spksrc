@@ -1,0 +1,14 @@
+--- ../ntopng-4.2-ORIG/configure	2020-11-03 12:29:24.663744889 +0000
++++ configure	2020-11-04 01:56:55.581691869 +0000
+@@ -5750,9 +5750,9 @@ else
+ #
+ #_ACEOF
+ #if ac_fn_c_try_run "$LINENO"; then :
+-#  my_cv_rw_locks_supported=yes
++  my_cv_rw_locks_supported=yes
+ #else
+-  my_cv_rw_locks_supported=no
++#  my_cv_rw_locks_supported=no
+ #fi
+ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+   conftest.$ac_objext conftest.beam conftest.$ac_ext

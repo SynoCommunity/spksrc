@@ -1,0 +1,13 @@
+# fix the include path for openssl
+--- setup.org.py	2020-07-02 15:36:45.000000000 +0000
++++ setup.py	2020-09-26 14:36:57.276855700 +0000
+@@ -111,7 +111,7 @@
+     def initialize_options(self):
+         """Overload to enable custom openssl settings to be picked up."""
+         build.build.initialize_options(self)
+-        self.openssl = None
++        self.openssl = os.environ.get('STAGING_INSTALL_PREFIX')
+         self.bundledlls = None
+ 
+ 
+ 

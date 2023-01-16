@@ -1,0 +1,30 @@
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -411,10 +411,10 @@ void os::init_system_properties_values()
+   //        1: ...
+   //        ...
+   //        7: The default directories, normally /lib and /usr/lib.
+-#if defined(AMD64) || (defined(_LP64) && defined(SPARC)) || defined(PPC64) || defined(S390)
+-  #define DEFAULT_LIBPATH "/usr/lib64:/lib64:/lib:/usr/lib"
++#ifdef DEB_MULTIARCH
++#define DEFAULT_LIBPATH	"/usr/lib/" DEB_MULTIARCH "/jni" ":/lib/" DEB_MULTIARCH ":/usr/lib/" DEB_MULTIARCH ":/usr/lib/jni:/lib:/usr/lib"
+ #else
+-  #define DEFAULT_LIBPATH "/lib:/usr/lib"
++  #define DEFAULT_LIBPATH "/usr/lib/jni:/lib:/usr/lib"
+ #endif
+ 
+ // Base path of extensions installed on the system.
+--- a/make/hotspot/lib/CompileJvm.gmk
++++ b/make/hotspot/lib/CompileJvm.gmk
+@@ -131,6 +131,11 @@ ifeq ($(OPENJDK_TARGET_OS)-$(OPENJDK_TAR
+   endif
+ endif
+ 
++DEB_MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null || true)
++ifneq (,$(DEB_MULTIARCH))
++JVM_CFLAGS += -DDEB_MULTIARCH="\"$(DEB_MULTIARCH)\""
++endif
++
+ ifeq ($(OPENJDK_TARGET_OS), windows)
+   ifeq ($(OPENJDK_TARGET_CPU_BITS), 64)
+     RC_DESC := 64-Bit$(SPACE)

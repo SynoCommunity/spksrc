@@ -1,14 +1,15 @@
 ### Dependency rules
 #   Build all dependencies listed in DEPENDS.
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  depend_msg_target
 #  pre_depend_target   (override with PRE_DEPEND_TARGET)
 #  depend_target       (override with DEPEND_TARGET)
 #  post_depend_target  (override with POST_DEPEND_TARGET)
 # Variables:
 #  DEPENDS             List of dependencies to go through
-#  REQ_KERNEL          If set, will compile kernel modules and allow
+#  REQUIRE_KERNEL      If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
+#  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
@@ -29,10 +30,19 @@ else
 $(POST_DEPEND_TARGET): $(DEPEND_TARGET)
 endif
 
-ifeq ($(strip $(REQ_KERNEL)),)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),)
+TOOLKIT_DEPEND = 
+else
+TOOLKIT_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
+endif
+
+ifeq ($(strip $(REQUIRE_KERNEL)),)
 KERNEL_DEPEND = 
 else
 KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+KERNEL_MODULE_DEPEND = $(filter-out $(GENERIC_ARCHS),$(addprefix kernel/syno-,$(filter $(addprefix %-,$(filter $(firstword $(subst ., ,$(TCVERSION))).%,$(SUPPORTED_KERNEL_VERSIONS))),$(filter-out $(addsuffix -%,$(UNSUPPORTED_ARCHS)),$(LEGACY_ARCHS)))))
+endif
 endif
 
 depend_msg_target:
@@ -41,7 +51,7 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-	@for depend in $(KERNEL_DEPEND) $(BUILD_DEPENDS) $(DEPENDS) ; \
+	@for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TOOLKIT_DEPEND) $(DEPENDS); \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done

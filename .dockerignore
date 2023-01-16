@@ -1,10 +1,2 @@
-distrib
-packages
-native/*/work*
-cross/*/work*
-kernel/*/work*
-spk/*/work*
-toolchains/*/work*
-local.mk
-*.DS_Store
-*~
+# exclude all files in the repository
+*

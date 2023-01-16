@@ -1,0 +1,37 @@
+To enhance if other requirements:
+  --enable-frei0r   ==> Could benefit from adding cross/cairo
+                        Generates the following extras libs:
+                           lib:lib/frei0r-1/cairoaffineblend.so
+                           lib:lib/frei0r-1/cairoblend.so
+                           lib:lib/frei0r-1/cairogradient.so
+                           lib:lib/frei0r-1/cairoimagegrid.so
+
+Candidates for enablement:
+  --enable-ladspa
+  --enable-libbs2b 
+  --enable-libcdio 
+  --enable-libflite 
+  --enable-libgme 
+  --enable-libgsm 
+  --enable-libmysofa 
+  --enable-libopenmpt 
+  --enable-librubberband 
+  --enable-libsnappy 
+  --enable-libsrt 
+  --enable-libssh 
+  --enable-libtwolame 
+  --enable-libvidstab 
+  --enable-libxvid 
+  --enable-lv2 
+  --enable-omx 
+  --enable-pocketsphinx 
+  --enable-libiec61883 
+
+Not to be enabled:
+  --enable-librsvg   ==> Requires gobject-introspection + python + many other dependencies increasing spk size
+  --enable-libjack 
+  --enable-libpulse 
+  --enable-openal 
+  --enable-opencl 
+  --enable-opengl 
+  --enable-sdl2

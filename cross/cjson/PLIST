@@ -1,0 +1,3 @@
+lnk:lib/libcjson.so
+lnk:lib/libcjson.so.1
+lib:lib/libcjson.so.1.7.15

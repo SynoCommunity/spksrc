@@ -1,0 +1,8 @@
+{
+    "php56": {
+		"php-ini": [{
+			"relpath": "etc/php/conf.d/com.synocommunity.rutorrent.ini",
+			"destpath": "/usr/local/etc/php56/conf.d"
+		}]
+    }
+}

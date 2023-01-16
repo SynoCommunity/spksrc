@@ -1,0 +1,3 @@
+lnk:lib/libmpdclient.so
+lnk:lib/libmpdclient.so.2
+lib:lib/libmpdclient.so.2.20

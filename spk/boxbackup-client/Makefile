@@ -1,6 +1,6 @@
 SPK_NAME = boxbackup-client
-SPK_VERS = 0.11.1
-SPK_REV = 1
+SPK_VERS = 0.12
+SPK_REV = 2
 SPK_ICON = src/boxbackup.png
 
 DEPENDS = cross/boxbackup
@@ -9,8 +9,9 @@ SPK_DEPENDS = "Perl"
 MAINTAINER = SynoCommunity
 DESCRIPTION = Box Backup is an open source, completely automatic, on-line backup system. This is the client part of Box Backup.
 DISPLAY_NAME = Box Backup Client
+CHANGELOG = "1. Update BoxBackup to 0.12.<br/>2. Update openssl to 1.1."
 
-HOMEPAGE = http://www.boxbackup.org/
+HOMEPAGE = https://www.boxbackup.org/
 LICENSE  = BSD/GPL
 
 INSTALLER_SCRIPT = src/installer.sh

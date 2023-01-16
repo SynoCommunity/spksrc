@@ -1,0 +1,100 @@
+# Adjust the program name to be able to identify the tool as memaslap
+# 
+# memslap is another tool of libmemcached, that is not as useful 
+# as it does not show stats nor accepts parameters such as threads or time.
+# 
+--- clients/memaslap.c.orig	2014-02-09 11:52:42.000000000 +0000
++++ clients/memaslap.c	2022-06-03 09:57:33.085672134 +0000
+@@ -1,5 +1,5 @@
+ /*
+- *  memslap
++ *  memaslap
+  *
+  *  (c) Copyright 2009, Schooner Information Technology, Inc.
+  *  All rights reserved.
+@@ -32,7 +32,7 @@
+ #include "ms_setting.h"
+ #include "ms_thread.h"
+ 
+-#define PROGRAM_NAME    "memslap"
++#define PROGRAM_NAME    "memaslap"
+ #define PROGRAM_DESCRIPTION \
+                         "Generates workload against memcached servers."
+ 
+@@ -111,7 +111,7 @@
+ static void ms_statistic_init(void);
+ static void ms_stats_init(void);
+ static void ms_print_statistics(int in_time);
+-static void ms_print_memslap_stats(struct timeval *start_time,
++static void ms_print_memaslap_stats(struct timeval *start_time,
+                                    struct timeval *end_time);
+ static void ms_monitor_slap_mode(void);
+ 
+@@ -130,7 +130,7 @@
+   printf("    %s\n\n", description);
+   printf(
+     "Usage:\n"
+-    "    memslap -hV | -s servers [-F config_file] [-t time | -x exe_num] [...]\n\n"
++    "    memaslap -hV | -s servers [-F config_file] [-t time | -x exe_num] [...]\n\n"
+     "Options:\n");
+ 
+   for (int x= 0; long_options[x].name; x++)
+@@ -146,13 +146,13 @@
+ 
+   printf(
+     "\nExamples:\n"
+-    "    memslap -s 127.0.0.1:11211 -S 5s\n"
+-    "    memslap -s 127.0.0.1:11211 -t 2m -v 0.2 -e 0.05 -b\n"
+-    "    memslap -s 127.0.0.1:11211 -F config -t 2m -w 40k -S 20s -o 0.2\n"
+-    "    memslap -s 127.0.0.1:11211 -F config -t 2m -T 4 -c 128 -d 20 -P 40k\n"
+-    "    memslap -s 127.0.0.1:11211 -F config -t 2m -d 50 -a -n 40\n"
+-    "    memslap -s 127.0.0.1:11211,127.0.0.1:11212 -F config -t 2m\n"
+-    "    memslap -s 127.0.0.1:11211,127.0.0.1:11212 -F config -t 2m -p 2\n\n");
++    "    memaslap -s 127.0.0.1:11211 -S 5s\n"
++    "    memaslap -s 127.0.0.1:11211 -t 2m -v 0.2 -e 0.05 -b\n"
++    "    memaslap -s 127.0.0.1:11211 -F config -t 2m -w 40k -S 20s -o 0.2\n"
++    "    memaslap -s 127.0.0.1:11211 -F config -t 2m -T 4 -c 128 -d 20 -P 40k\n"
++    "    memaslap -s 127.0.0.1:11211 -F config -t 2m -d 50 -a -n 40\n"
++    "    memaslap -s 127.0.0.1:11211,127.0.0.1:11212 -F config -t 2m\n"
++    "    memaslap -s 127.0.0.1:11211,127.0.0.1:11212 -F config -t 2m -p 2\n\n");
+ 
+   exit(0);
+ } /* ms_help_command */
+@@ -286,7 +286,7 @@
+ 
+   case OPT_UDP:
+     return
+-      "UDP support, default memslap uses TCP, TCP port and UDP port of\n"
++      "UDP support, default memaslap uses TCP, TCP port and UDP port of\n"
+       "        server must be same.";
+ 
+   case OPT_EXPIRE:
+@@ -708,8 +708,8 @@
+ } /* ms_print_statistics */
+ 
+ 
+-/* used to print the states of memslap */
+-static void ms_print_memslap_stats(struct timeval *start_time,
++/* used to print the states of memaslap */
++static void ms_print_memaslap_stats(struct timeval *start_time,
+                                    struct timeval *end_time)
+ {
+   char buf[1024];
+@@ -803,7 +803,7 @@
+ 
+   fprintf(stdout, "%s", buf);
+   fflush(stdout);
+-} /* ms_print_memslap_stats */
++} /* ms_print_memaslap_stats */
+ 
+ 
+ /* the loop of the main thread, wait the work threads to complete */
+@@ -883,7 +883,7 @@
+     gettimeofday(&end_time, NULL);
+   }
+ 
+-  ms_print_memslap_stats(&start_time, &end_time);
++  ms_print_memaslap_stats(&start_time, &end_time);
+ } /* ms_monitor_slap_mode */
+ 
+ 

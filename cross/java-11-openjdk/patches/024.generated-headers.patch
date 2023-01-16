@@ -1,0 +1,20 @@
+--- a/make/lib/Awt2dLibraries.gmk
++++ b/make/lib/Awt2dLibraries.gmk
+@@ -383,7 +383,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIB
+     INCLUDE_FILES := $(BUILD_LIBLCMS_INCLUDE_FILES), \
+     OPTIMIZATION := HIGHEST, \
+     CFLAGS := $(LCMS_CFLAGS_JDKLIB) \
+-        $(LCMS_CFLAGS), \
++        $(LCMS_CFLAGS) -I$(SUPPORT_OUTPUTDIR)/headers/java.desktop, \
+     CFLAGS_solaris := -xc99=no_lib, \
+     CFLAGS_windows := -DCMS_IS_WINDOWS_, \
+     EXTRA_HEADER_DIRS := \
+@@ -432,7 +432,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIB
+     NAME := javajpeg, \
+     INCLUDE_FILES := $(BUILD_LIBJAVAJPEG_INCLUDE_FILES), \
+     OPTIMIZATION := HIGHEST, \
+-    CFLAGS := $(CFLAGS_JDKLIB), \
++    CFLAGS := $(CFLAGS_JDKLIB) -I$(SUPPORT_OUTPUTDIR)/headers/java.desktop, \
+     HEADERS_FROM_SRC := $(LIBJPEG_HEADERS_FROM_SRC), \
+     DISABLED_WARNINGS_gcc := clobbered implicit-fallthrough shift-negative-value, \
+     LDFLAGS := $(LDFLAGS_JDKLIB) \

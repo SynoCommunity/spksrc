@@ -1,0 +1,24 @@
+diff -uprN ../par2cmdline-0.8.1.orig/Makefile.am ./Makefile.am
+--- ../par2cmdline-0.8.1.orig/Makefile.am	2020-02-09 14:29:09.000000000 +0000
++++ ./Makefile.am	2022-08-29 10:53:46.532922839 +0000
+@@ -57,7 +57,7 @@ par2_SOURCES = src/par2cmdline.cpp \
+ par2_LDADD = libpar2.a
+ 
+ LDADD = -lstdc++
+-AM_CXXFLAGS = -Wall -std=c++11 $(OPENMP_CXXFLAGS)
++AM_CXXFLAGS = -Wall -std=c++0x $(OPENMP_CXXFLAGS)
+ 
+ EXTRA_DIST = PORTING ROADMAP \
+ 			 man/par2.1 \
+diff -uprN ../par2cmdline-0.8.1.orig/Makefile.in ./Makefile.in
+--- ../par2cmdline-0.8.1.orig/Makefile.in	2020-02-09 14:54:10.000000000 +0000
++++ ./Makefile.in	2022-08-29 10:53:55.193034929 +0000
+@@ -650,7 +650,7 @@ par2_SOURCES = src/par2cmdline.cpp \
+ 
+ par2_LDADD = libpar2.a
+ LDADD = -lstdc++
+-AM_CXXFLAGS = -Wall -std=c++11 $(OPENMP_CXXFLAGS)
++AM_CXXFLAGS = -Wall -std=c++0x $(OPENMP_CXXFLAGS)
+ EXTRA_DIST = PORTING ROADMAP \
+ 			 man/par2.1 \
+ 			 automake.sh \

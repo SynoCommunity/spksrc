@@ -1,0 +1,3 @@
+lnk:lib/libwrap.so
+lnk:lib/libwrap.so.0
+lib:lib/libwrap.so.0.7.6

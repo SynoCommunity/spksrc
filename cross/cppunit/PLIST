@@ -1,0 +1,3 @@
+lnk:lib/libcppunit.so
+lnk:lib/libcppunit-1.15.so.1
+lib:lib/libcppunit-1.15.so.1.0.0

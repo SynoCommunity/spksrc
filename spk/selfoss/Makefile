@@ -9,11 +9,10 @@ DEPENDS  = cross/busybox cross/$(SPK_NAME)
 MAINTAINER = moneytoo
 DESCRIPTION = The new multipurpose rss reader, live stream, mashup, aggregation web application.
 ADMIN_URL = /selfoss/
-RELOAD_UI = yes
 DISPLAY_NAME = Selfoss
 CHANGELOG = "1. Update Selfoss to 2.13<br>2. Fix DSM4.3 compatibility"
 
-HOMEPAGE   = http://selfoss.aditu.de/
+HOMEPAGE   = https://selfoss.aditu.de/
 LICENSE    = GPLv3
 
 WIZARDS_DIR = src/wizard/

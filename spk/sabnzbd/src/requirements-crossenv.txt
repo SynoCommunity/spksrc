@@ -1,0 +1,6 @@
+# cross-compiled wheels
+cffi==1.15.1
+Cheetah3==3.2.6
+cryptography==3.3.2
+sabyenc3==5.4.4
+ujson==5.5.0

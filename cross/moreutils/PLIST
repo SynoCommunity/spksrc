@@ -1,0 +1,9 @@
+bin:bin/errno
+bin:bin/ifdata
+bin:bin/ifne
+bin:bin/isutf8
+bin:bin/lckdo
+bin:bin/mispipe
+bin:bin/parallel
+bin:bin/pee
+bin:bin/sponge

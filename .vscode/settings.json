@@ -1,0 +1,8 @@
+{
+    "files.watcherExclude": {
+        "**/distrib/**": true,
+        "**/packages/**": true,
+        "**/work-*/**": true,
+        "**/work/**": true
+    }
+}

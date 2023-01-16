@@ -1,0 +1,33 @@
+# - make version configurable to build target from source instead from git clone
+# - set build user to 'SynoCommunity'
+# - revert https://github.com/dundee/gdu/commit/c4db1104dd3c25124a5ea01da91b1400d091ccd7
+#   - build with CGO_ENABLED=1
+#   - remove 'static' linker flag
+# 
+--- Makefile.orig	2021-12-11 10:53:31.000000000 +0000
++++ Makefile	2022-03-20 12:04:02.484366788 +0000
+@@ -2,12 +2,12 @@
+ MAJOR_VER := v5
+ PACKAGE := github.com/dundee/$(NAME)/$(MAJOR_VER)
+ CMD_GDU := cmd/gdu
+-VERSION := $(shell git describe --tags 2>/dev/null)
++VERSION ?= $(shell git describe --tags 2>/dev/null)
+ DATE := $(shell date +'%Y-%m-%d')
+ GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw
+-LDFLAGS := -s -w -extldflags '-static' \
++LDFLAGS := -s -w \
+ 	-X '$(PACKAGE)/build.Version=$(VERSION)' \
+-	-X '$(PACKAGE)/build.User=$(shell id -u -n)' \
++	-X '$(PACKAGE)/build.User=SynoCommunity' \
+ 	-X '$(PACKAGE)/build.Time=$(shell LC_ALL=en_US.UTF-8 date)'
+ 
+ all: clean build-all man clean-uncompressed-dist shasums
+@@ -18,7 +18,7 @@
+ build:
+ 	@echo "Version: " $(VERSION)
+ 	mkdir -p dist
+-	GOFLAGS="$(GOFLAGS)" CGO_ENABLED=0 go build -ldflags="$(LDFLAGS)" -o dist/$(NAME) $(PACKAGE)/$(CMD_GDU)
++	GOFLAGS="$(GOFLAGS)" CGO_ENABLED=1 go build -ldflags="$(LDFLAGS)" -o dist/$(NAME) $(PACKAGE)/$(CMD_GDU)
+ 
+ build-all:
+ 	@echo "Version: " $(VERSION)

@@ -10,14 +10,13 @@ SPK_DEPENDS = "python>=2.7.6-8"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Gentoo is a free operating system based on either Linux or FreeBSD that can be automatically optimized and customized for just about any application or need. Gentoo Chroot allows you to install the Gentoo OS inside your DiskStation, alongside DSM. This package is intended for advanced users only.
-RELOAD_UI = yes
 DISPLAY_NAME = Gentoo Chroot
 CHANGELOG =
 
-HOMEPAGE   = http://www.gentoo.org/
+HOMEPAGE   = https://www.gentoo.org/
 LICENSE    =
 HELPURL    = 3rdparty/gentoo-chroot/help/enu/index.html
-SUPPORTURL = http://www.gentoo.org/main/en/support.xml
+SUPPORTURL = https://www.gentoo.org/main/en/support.xml
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh
@@ -26,20 +25,35 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = gentoo-chroot_extra_install
 
+include ../../mk/spksrc.archs.mk
+
+UNSUPPORTED_ARCHS = $(ARMv8_ARCHS)
+
 GENTOO_ARCH =
-ifeq ($(findstring $(ARCH),88f6281),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv5tel
 endif
-ifeq ($(findstring $(ARCH),alpine armada370 armada375 armada38x armadaxp monaco),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+GENTOO_CPU = arm
+GENTOO_ARCH = armv7a
+endif
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 GENTOO_CPU = arm
 GENTOO_ARCH = armv7a_hardfp
 endif
-ifeq ($(findstring $(ARCH),braswell bromolow cedarview evansport x86 avoton x64),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+GENTOO_ARCH = arm64
+endif
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+GENTOO_CPU = x86
+GENTOO_ARCH = i386
+endif
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 GENTOO_CPU = x86
 GENTOO_ARCH = i686
 endif
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 GENTOO_CPU = ppc
 GENTOO_ARCH = ppc
 endif
@@ -47,9 +61,9 @@ ifeq ($(strip $(GENTOO_ARCH)),)
 $(error Arch $(ARCH) not supported)
 endif
 
-GENTOO_STAGE3 := $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d' | awk '{print $$1}')
-GENTOO_STAGE3_URL := http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/$(GENTOO_STAGE3)
-GENTOO_STAGE3_FILE := $(shell basename $(GENTOO_STAGE3))
+GENTOO_STAGE3 = $(shell curl -s http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/latest-stage3-$(GENTOO_ARCH).txt | sed '/^\#/d' | awk '{print $$1}')
+GENTOO_STAGE3_URL = http://distfiles.gentoo.org/releases/$(GENTOO_CPU)/autobuilds/$(GENTOO_STAGE3)
+GENTOO_STAGE3_FILE = $(shell basename $(GENTOO_STAGE3))
 
 include ../../mk/spksrc.spk.mk
 

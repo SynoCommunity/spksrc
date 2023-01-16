@@ -1,49 +1,82 @@
 SPK_NAME = homeassistant
-SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_VERS = 2022.7.7
+SPK_REV = 18
 SPK_ICON = src/${SPK_NAME}.png
-DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python3 cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/busybox cross/nmap #for python-libnmap
-WHEELS = src/requirements.txt
-SPK_DEPENDS = "python3>=3.4.1-4:git"
+SPK_DEPENDS = "python310"
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
-ADMIN_PORT = 8123
-DISPLAY_NAME = Home Assistant
-CHANGELOG = "First release"
+BUILD_DEPENDS = cross/python310
 
-BETA = 1
+MAINTAINER = hgy59
+DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
+DISPLAY_NAME = Home Assistant Core
+CHANGELOG = "Update homeassistant to 2022.7.7.<br/>Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+STARTABLE = yes
 
-HOMEPAGE = https://home-assistant.io/
-LICENSE  = MIT
+HOMEPAGE = https://www.home-assistant.io/
+LICENSE  = Apache-2.0
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+WIZARDS_DIR = src/wizard
 
-UNSUPPORTED_ARCHS = powerpc ppc824x
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8123
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+ADMIN_PORT = $(SERVICE_PORT)
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = homeassistant_extra_install
 
-BUSYBOX_CONFIG = usrmng daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
+
+# [gevent]
+DEPENDS += cross/libev cross/c-ares
+ENV += GEVENTSETUP_EMBED_CARES=FALSE
+ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+
+# [python-libnmap]
+DEPENDS += cross/nmap
+
+# [DTLSSocket] Required for postinst [tradfri]
+DEPENDS += cross/dtlssocket
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [pycares]
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+# [Pillow]
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: homeassistant_extra_install
-homeassistant_extra_install: $(STAGING_DIR)/share/homeassistant
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+# [numpy]
+# Fix wheel building with older compilers
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS = [numpy] -std=c++0x
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS = [numpy] -O0
+endif
+endif
 
-$(STAGING_DIR)/share/homeassistant:
-	install -m 755 -d $(STAGING_DIR)/share
-	cd $(STAGING_DIR)/share && git clone --recursive https://github.com/balloob/home-assistant.git homeassistant
-	rm -fr $(STAGING_DIR)/share/homeassistant/.git $(STAGING_DIR)/share/homeassistant/.gitignore
+.PHONY: homeassistant_extra_install
+homeassistant_extra_install:
+	@install -m 755 -d $(STAGING_DIR)/share
+	@install -m 644 src/postinst_default_config_requirements.txt $(STAGING_DIR)/share/
+	@install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/

@@ -9,11 +9,10 @@ DEPENDS  = cross/busybox cross/$(SPK_NAME)
 MAINTAINER = moneytoo
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 ADMIN_URL = /fengoffice/
-RELOAD_UI = yes
 DISPLAY_NAME = Feng Office
 CHANGELOG = "1. DSM 5.0 compatibility"
 
-HOMEPAGE   = http://www.fengoffice.com/
+HOMEPAGE   = https://www.fengoffice.com/
 LICENSE    = AGPL
 
 WIZARDS_DIR = src/wizard/

@@ -1,0 +1,5 @@
+# Cross-compiled Dependencies
+
+MarkupSafe==2.0.1
+PyYAML==6.0
+# Pillow               ==> Makefile

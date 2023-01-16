@@ -1,32 +1,22 @@
 SPK_NAME = vim
-SPK_VERS = 7.4
-SPK_REV = 2
+SPK_VERS = 8.2
+SPK_REV = 4
 SPK_ICON = src/vim.png
 
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Vim is an advanced text editor that seeks to provide the power of the de-facto Unix editor Vi, with a more complete feature set.
+DESCRIPTION = Vim is a highly configurable text editor built to enable efficient text editing. It is an improved version of the vi editor distributed with most UNIX systems.
 DESCRIPTION_CSY = Vim je pokročilý textový editor, který usiluje o to poskytnout sílu de-facto Unixového editoru Vi, s komplexnější sadou vlastností.
 DESCRIPTION_FRE = Vim est un éditeur de texte avancé basé sur Vi \(unix\) avec des fonctions plus complètes.
-RELOAD_UI = no
 DISPLAY_NAME = Vim
 STARTABLE = no
-BETA = 1
-CHANGELOG = "1. Support UTF8 by default"
 
-HOMEPAGE   = http://www.vim.org/
-LICENSE    = Charityware
+CHANGELOG = "1. You now need Python 3.10 to enable Python support."
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+HOMEPAGE = https://www.vim.org/
+LICENSE  = Charityware
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
-POST_STRIP_TARGET = vim_extra_install
+SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: vim_extra_install
-vim_extra_install:
-	install -m 755 src/vim-utf8 $(STAGING_DIR)/bin/vim-utf8

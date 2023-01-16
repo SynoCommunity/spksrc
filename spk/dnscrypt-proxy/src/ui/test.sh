@@ -67,14 +67,14 @@ echo "$data" | ./index.cgi --dev | tail -n +4 > test/post.html
 fixLinks test/post.html
 
 export REQUEST_METHOD=GET
-export QUERY_STRING=file=blacklist
+export QUERY_STRING=file=blocklist
 ./index.cgi --dev | tail -n +4 > test/get.html
 fixLinks test/get.html
 
 export REQUEST_METHOD=POST
 export CONTENT_TYPE="application/x-www-form-urlencoded"
-data="generateBlacklist=true"
+data="generateBlocklist=true"
 numOfBytes=$(countBytes "$data")
 export CONTENT_LENGTH=$numOfBytes
-echo "$data" | ./index.cgi --dev > test/generateBlacklist.html
-fixLinks test/generateBlacklist.html
+echo "$data" | ./index.cgi --dev > test/generateBlocklist.html
+fixLinks test/generateBlocklist.html

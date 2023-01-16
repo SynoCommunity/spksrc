@@ -1,0 +1,16 @@
+[{
+  "step_title": "Uninstall package",
+  "items": [{
+    "type": "singleselect",
+    "desc": "Keep or delete package settings.",
+    "subitems": [{
+      "key": "wizard_keep_data",
+      "desc": "<b>Uninstall only.</b> Keep existing files for future re-installation.",
+      "defaultValue": true
+    }, {
+      "key": "wizard_delete_data",
+      "desc": "<b style=\"color: red\">Erase all of the package data files. (Not Recoverable)</b>",
+      "defaultValue": false
+    }]
+  }]
+}]

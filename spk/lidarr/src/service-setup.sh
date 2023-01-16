@@ -1,61 +1,59 @@
-PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-MONO_PATH="/usr/local/mono/bin"
-MONO="${MONO_PATH}/mono"
-
-# Check versions during upgrade
-LIDARR="${SYNOPKG_PKGDEST}/share/Lidarr/Lidarr.exe"
-SPK_LIDARR="${SYNOPKG_PKGINST_TEMP_DIR}/share/Lidarr/Lidarr.exe"
+LIDARR="${SYNOPKG_PKGDEST}/share/Lidarr/bin/Lidarr"
 
 # Lidarr uses custom Config and PID directories
-HOME_DIR="${SYNOPKG_PKGDEST}/var"
-CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
-PID_FILE="${CONFIG_DIR}/Lidarr/lidarr.pid"
+HOME_DIR="${SYNOPKG_PKGVAR}"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/.config"
+LIDARR_CONFIG_DIR="${CONFIG_DIR}/Lidarr"
+PID_FILE="${LIDARR_CONFIG_DIR}/lidarr.pid"
 
-# Some have it stored in the root of package
+# Older installations have it in the wrong place for DSM 7
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
 
+# for DSM < 7 only:
 GROUP="sc-download"
 
-SERVICE_COMMAND="env PATH=${MONO_PATH}:${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${LIDARR}"
+SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${LIDARR}"
 SVC_BACKGROUND=y
+SVC_WAIT_TIMEOUT=90
 
 service_postinst ()
 {
-    # Move config.xml to .config
-    mkdir -p ${CONFIG_DIR}/Lidarr
-    mv ${SYNOPKG_PKGDEST}/app/config.xml ${CONFIG_DIR}/Lidarr/config.xml
-    set_unix_permissions "${CONFIG_DIR}"
+    echo "Set update required"
+    # Make Lidarr do an update check on start to avoid possible Lidarr
+    # downgrade when synocommunity package is updated
+    touch ${LIDARR_CONFIG_DIR}/update_required
+
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_unix_permissions "${CONFIG_DIR}"
+    fi
 }
 
 service_preupgrade ()
 {
-    # Is Installed Lidarr Binary Ver. >= SPK Lidarr Binary Ver.?
-    CUR_VER=$(${MONO_PATH}/monodis --assembly ${LIDARR} | grep "Version:" | awk '{print $2}')
-    echo "Installed Lidarr Binary: ${CUR_VER}" >> ${INST_LOG}
-    SPK_VER=$(${MONO_PATH}/monodis --assembly ${SPK_LIDARR} | grep "Version:" | awk '{print $2}')
-    echo "Requested Lidarr Binary: ${SPK_VER}" >> ${INST_LOG}
-    if [ "${CUR_VER//.}" -ge "${SPK_VER//.}" ]; then
-        echo 'KEEP_CUR="yes"' > ${CONFIG_DIR}/KEEP_VAR
-        echo "[KEEPING] Installed Lidarr Binary - Upgrading Package Only" >> ${INST_LOG}
-        mv ${SYNOPKG_PKGDEST}/share ${INST_VAR}
-    else
-        echo 'KEEP_CUR="no"' > ${CONFIG_DIR}/KEEP_VAR
-        echo "[REPLACING] Installed Lidarr Binary" >> ${INST_LOG}
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ]; then
+        # ensure config is in @appdata folder
+        if [ -d "${LEGACY_CONFIG_DIR}" ]; then
+            if [ "$(realpath ${LEGACY_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
+                echo "Move ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
+                mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
+            fi
+        fi
     fi
+
+    ## never update Lidarr distribution, use internal updater only
+    [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup ] && rm -rf ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup
+    echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
+    mkdir -p ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup 2>&1
+    rsync -aX ${SYNOPKG_PKGDEST}/share ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/ 2>&1
 }
 
 service_postupgrade ()
 {
-    # Restore Current Lidarr Binary If Current Ver. >= SPK Ver.
-    . ${CONFIG_DIR}/KEEP_VAR
-    if [ "$KEEP_CUR" == "yes" ]; then
-        echo "Restoring Lidarr version from before upgrade" >> ${INST_LOG}
-        rm -fr ${SYNOPKG_PKGDEST}/share >> $INST_LOG 2>&1
-        mv ${INST_VAR}/share ${SYNOPKG_PKGDEST}/ >> $INST_LOG 2>&1
-        set_unix_permissions "${SYNOPKG_PKGDEST}/share"
+    ## restore Lidarr distribution
+    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share ]; then
+        echo "Restore previous distribution from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
+        rm -rf ${SYNOPKG_PKGDEST}/share/Lidarr/bin 2>&1
+        # prevent overwrite of updated package_info
+        rsync -aX --exclude=package_info ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share/ ${SYNOPKG_PKGDEST}/share 2>&1
     fi
-    set_unix_permissions "${CONFIG_DIR}"
-
-    # Remove upgrade Flag
-    rm ${CONFIG_DIR}/KEEP_VAR
 }

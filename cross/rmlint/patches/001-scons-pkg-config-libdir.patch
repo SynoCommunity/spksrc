@@ -1,0 +1,11 @@
+--- SConstruct.orig	2019-09-22 14:00:34.610189122 +0200
++++ SConstruct	2019-09-22 13:59:57.096414135 +0200
+@@ -558,7 +558,7 @@
+     PREFIX=GetOption('prefix'),
+     ENV = dict([ (key, os.environ[key])
+                  for key in os.environ
+-                 if key in ['PATH', 'TERM', 'HOME', 'PKG_CONFIG_PATH']
++                 if key in ['PATH', 'TERM', 'HOME', 'PKG_CONFIG_PATH', 'PKG_CONFIG_LIBDIR']
+               ])
+ )
+ 

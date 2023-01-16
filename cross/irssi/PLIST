@@ -1,3 +1,4 @@
 bin:bin/irssi
-etc:etc/irssi.conf
-shr:share/irssi/themes
+rsc:etc/irssi.conf
+rsc:share/irssi/scripts/
+rsc:share/irssi/themes/

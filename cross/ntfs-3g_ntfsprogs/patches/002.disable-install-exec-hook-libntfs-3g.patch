@@ -1,0 +1,11 @@
+--- libntfs-3g/Makefile.in.org	2017-03-23 09:43:00.000000000 +0000
++++ libntfs-3g/Makefile.in	2020-02-12 23:40:39.816924867 +0000
+@@ -984,7 +984,7 @@
+ 
+ install-exec-am: install-libLTLIBRARIES
+ 	@$(NORMAL_INSTALL)
+-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
++
+ install-html: install-html-am
+ 
+ install-html-am:

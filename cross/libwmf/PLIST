@@ -1,0 +1,13 @@
+rsc:bin/libwmf-config
+rsc:bin/libwmf-fontmap
+bin:bin/wmf2eps
+bin:bin/wmf2fig
+bin:bin/wmf2gd
+bin:bin/wmf2svg
+lnk:lib/libwmf-0.2.so.7
+lib:lib/libwmf-0.2.so.7.1.0
+lnk:lib/libwmf.so
+lnk:lib/libwmflite-0.2.so.7
+lib:lib/libwmflite-0.2.so.7.0.1
+lib:lib/libwmflite.so
+rsc:share/libwmf/fonts

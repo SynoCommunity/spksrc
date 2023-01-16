@@ -1,0 +1,11 @@
+--- src/Makefile.in.org	2017-03-23 09:43:00.000000000 +0000
++++ src/Makefile.in	2020-02-12 23:49:06.499389042 +0000
+@@ -896,7 +896,7 @@
+ 
+ install-exec-am: install-binPROGRAMS install-exec-local
+ 	@$(NORMAL_INSTALL)
+-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
++
+ install-html: install-html-am
+ 
+ install-html-am:

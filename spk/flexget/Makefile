@@ -1,35 +1,40 @@
 SPK_NAME = flexget
-SPK_VERS = 2.9.14
-SPK_REV = 6
-SPK_ICON = src/flexget.png
+SPK_VERS = 3.3.4
+SPK_REV = 12
+SPK_ICON = src/${SPK_NAME}.png
 
-WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>=2.7.8-11"
+BUILD_DEPENDS = cross/python310
+SPK_DEPENDS = "python310"
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-MAINTAINER = Diaoul
+# Required for PyYAML
+DEPENDS += cross/libyaml
+
+MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-BETA = 1
-CHANGELOG = "Update Flexget to version 2.9.14"
+CHANGELOG = "1. Update FlexGet to version 3.3.4.<br/>2. Update to python 3.10"
+STARTABLE = yes
 
-HOMEPAGE   = http://flexget.com/
-LICENSE    = GPL
+HOMEPAGE = https://flexget.com/
+LICENSE = MIT
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = flexget_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8290
+SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
+
+USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/config.yml $(STAGING_DIR)/var/
+	install -m 644 src/config.yml $(STAGING_DIR)/share/

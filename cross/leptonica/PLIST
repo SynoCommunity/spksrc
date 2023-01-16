@@ -1,3 +1,3 @@
 lnk:lib/liblept.so
-lnk:lib/liblept.so.4
-lib:lib/liblept.so.4.0.3
+lnk:lib/liblept.so.5
+lib:lib/liblept.so.5.0.3

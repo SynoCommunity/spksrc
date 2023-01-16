@@ -1,0 +1,13 @@
+# Disable subdirs "tests" and "doc" to speedup the build.
+# 
+--- Makefile.in.orig	2019-05-27 18:51:18.000000000 +0000
++++ Makefile.in	2022-09-05 06:33:57.432965360 +0000
+@@ -389,7 +389,7 @@
+ top_srcdir = @top_srcdir@
+ NULL = 
+ ACLOCAL_AMFLAGS = -I m4
+-SUBDIRS = src docs tests
++SUBDIRS = src
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = @PACKAGE@.pc
+ MAINTAINERCLEANFILES = \

@@ -1,0 +1,47 @@
+--- support/mkbundle.ORIG	2020-06-10 17:27:21.000000000 -0400
++++ support/mkbundle	2020-06-23 19:29:54.421073924 -0400
+@@ -86,25 +86,25 @@ def output_file ( path, name, idx, next
+   outf.write('static const uint8_t filebundle_data_%06d[] = {' % idx)
+   o = -1
+   d = open(p, 'rb').read()
+-  if opts.pngquant and p.endswith('.png'):
+-    fd = subprocess.PIPE
+-    child = subprocess.Popen([pngquant_bin, '-Q80-95', '-'],
+-                             stdin=fd, stdout=fd, stderr=fd)
+-    child.stdin.write(d)
+-    child.stdin.close()
+-    d = b''
+-    while 1:
+-      rc = child.poll()
+-      if rc is not None:
+-        break
+-      d2 = child.stdout.read(64*1024)
+-      if not d2:
+-        time.sleep(0.05)
+-      d += d2
+-    d += child.stdout.read()
+-    if rc != 0: d = ''
+-    if not d:
+-      d = open(p, 'rb').read()
++#  if opts.pngquant and p.endswith('.png'):
++#    fd = subprocess.PIPE
++#    child = subprocess.Popen([pngquant_bin, '-Q80-95', '-'],
++#                             stdin=fd, stdout=fd, stderr=fd)
++#    child.stdin.write(d)
++#    child.stdin.close()
++#    d = b''
++#    while 1:
++#      rc = child.poll()
++#      if rc is not None:
++#        break
++#      d2 = child.stdout.read(64*1024)
++#      if not d2:
++#        time.sleep(0.05)
++#      d += d2
++#    d += child.stdout.read()
++#    if rc != 0: d = ''
++#    if not d:
++#      d = open(p, 'rb').read()
+   if p.endswith('.gz'):
+     t = BytesIO(d)
+     z = gzip.GzipFile(filename=name, mode='r', fileobj=t)

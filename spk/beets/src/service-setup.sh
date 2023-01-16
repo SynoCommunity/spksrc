@@ -1,23 +1,17 @@
-PYTHON_DIR="/usr/local/python"
-PATH="${INSTALL_DIR}/bin:${INSTALL_DIR}/env/bin:${PYTHON_DIR}/bin:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+
+PYTHON_DIR="/var/packages/python310/target/bin"
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 service_postinst ()
 {
-    # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env > /dev/null
+    separator="===================================================="
 
-    # Install the wheels
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall -f ${SYNOPKG_PKGDEST}/share/wheelhouse ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl >> ${INST_LOG} 2>&1
+    echo ${separator}
+    install_python_virtualenv
 
-    # Add symlink
-    mkdir -p /usr/local/bin
-    ln -s ${SYNOPKG_PKGDEST}/env/bin/beet /usr/local/bin/beet
-    ln -s ${SYNOPKG_PKGDEST}/env/bin/borgmatic /usr/local/bin/borgmatic
+    echo ${separator}
+    install_python_wheels
 
-    # Extended diagnostic information
-    ${SYNOPKG_PKGDEST}/env/bin/beet version >> ${INST_LOG}
-    ${SYNOPKG_PKGDEST}/env/bin/beet --version --help >> ${INST_LOG}
-    echo -e "\nModules:" >> ${INST_LOG}
-    ${SYNOPKG_PKGDEST}/env/bin/pip freeze >> ${INST_LOG}
+    # Log installation information
+    echo "Installed version: $(${SYNOPKG_PKGDEST}/env/bin/beet version 2>&1)"
 }

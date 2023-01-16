@@ -1,0 +1,8 @@
+bin:bin/rrdcached
+bin:bin/rrdcreate
+bin:bin/rrdinfo
+bin:bin/rrdtool
+bin:bin/rrdupdate
+lnk:lib/librrd.so
+lnk:lib/librrd.so.8
+lib:lib/librrd.so.8.2.1

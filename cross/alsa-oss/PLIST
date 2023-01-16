@@ -1,4 +1,4 @@
-bin:bin/aoss
+rsc:bin/aoss
 lnk:lib/libalsatoss.so
 lnk:lib/libalsatoss.so.0
 lib:lib/libalsatoss.so.0.0.0

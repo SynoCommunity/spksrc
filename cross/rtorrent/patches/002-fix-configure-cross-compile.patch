@@ -1,15 +1,6 @@
---- configure.orig	2012-04-20 09:00:08.000000000 +0200
-+++ configure	2013-08-25 00:09:45.166052900 +0200
-@@ -15672,7 +15672,7 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for execinfo.h" >&5
- $as_echo_n "checking for execinfo.h... " >&6; }
- 
--  if test "$cross_compiling" = yes; then :
-+  if test "$cross_compiling" = maybe; then :
-   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
- $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
- as_fn_error $? "cannot run test program while cross compiling
-@@ -17927,18 +17927,10 @@
+--- ../rtorrent-0.9.8-old/configure	2020-10-07 00:30:13.113972337 +0000
++++ configure	2020-10-07 00:34:03.499327179 +0000
+@@ -19938,18 +19938,10 @@ main ()
    return 0;
  }
  _ACEOF

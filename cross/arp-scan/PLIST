@@ -1,0 +1,5 @@
+rsc:bin/arp-fingerprint
+bin:bin/arp-scan
+rsc:bin/get-iab
+rsc:bin/get-oui
+rsc:share/arp-scan

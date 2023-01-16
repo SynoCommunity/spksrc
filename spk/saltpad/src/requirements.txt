@@ -1,7 +1,8 @@
-Flask==0.10.1
-Flask-WTF==0.11
-itsdangerous==0.24
-Jinja2==2.7.3
-requests==2.7.0
-Werkzeug==0.10.4
-WTForms==2.0.2
+Flask==1.1.2
+Flask-WTF==0.14.3
+itsdangerous==1.1.0
+Jinja2==2.11.2
+requests==2.23.0
+Werkzeug==1.0.1
+WTForms==2.3.1
+click==7.1.2

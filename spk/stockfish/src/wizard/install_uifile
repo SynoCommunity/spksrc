@@ -1,0 +1,33 @@
+[{
+    "step_title": "Basic configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Webgui configuration.",
+        "subitems": [{
+            "key": "wizard_security_code",
+            "desc": "Security Code",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[0-9]{4,}$/",
+                    "errorText": "invalid numeric security code: must be at least 4 digits"
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Engine configuration.",
+        "subitems": [{
+            "key": "wizard_thinking_time_ms",
+            "desc": "Thinking Time [ms]",
+            "defaultValue": "500",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[1-9][0-9]{2,6}$/",
+                    "errorText": "Invalid thinking time: expected numeric value >= 100"
+                }
+            }
+        }]
+    }]
+}]

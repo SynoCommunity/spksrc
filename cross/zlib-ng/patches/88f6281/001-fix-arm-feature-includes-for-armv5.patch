@@ -1,0 +1,12 @@
+# adjust include paths for arm features for ARMv5
+# 
+--- arch/arm/armfeature.c.orig	2021-12-24 11:52:14.000000000 +0000
++++ arch/arm/armfeature.c	2022-06-24 10:29:26.335133407 +0000
+@@ -1,7 +1,6 @@
+ #include "../../zutil.h"
+ 
+ #if defined(__linux__)
+-#  include <sys/auxv.h>
+ #  ifdef ARM_ASM_HWCAP
+ #    include <asm/hwcap.h>
+ #  endif

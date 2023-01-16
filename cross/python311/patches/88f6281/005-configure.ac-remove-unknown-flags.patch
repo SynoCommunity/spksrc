@@ -1,0 +1,24 @@
+# remove lto optimization flags unknown by ARMv5 gcc
+# - remove -ffat-lto-objects
+
+--- configure.ac.orig	2022-06-06 11:53:30.000000000 +0000
++++ configure.ac	2022-06-19 15:36:23.019811638 +0000
+@@ -1872,7 +1872,7 @@ if test "$Py_LTO" = 'true' ; then
+           LTOCFLAGS="-flto"
+           ;;
+         *)
+-          LTOFLAGS="-flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none"
++          LTOFLAGS="-flto -fuse-linker-plugin -flto-partition=none"
+           ;;
+       esac
+       ;;
+@@ -2157,7 +2157,7 @@ AC_DEFUN([PY_CHECK_CC_WARNING], [
+ # tweak BASECFLAGS based on compiler and platform
+ case $GCC in
+ yes)
+-    CFLAGS_NODIST="$CFLAGS_NODIST -std=c11"
++    CFLAGS_NODIST="$CFLAGS_NODIST -std=c99"
+ 
+     PY_CHECK_CC_WARNING([enable], [extra], [if we can add -Wextra])
+     AS_VAR_IF([ac_cv_enable_extra_warning], [yes],
+

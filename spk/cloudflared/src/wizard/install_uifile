@@ -1,0 +1,20 @@
+[
+    {
+        "step_title": "Tunnel configuration",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Token for the cloudflare tunnel",
+                "subitems": [
+                    {
+                        "key": "wizard_cloudflared_token",
+                        "desc": "Tunnel token",
+                        "validator": {
+                            "allowBlank": false
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

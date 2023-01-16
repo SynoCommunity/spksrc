@@ -1,0 +1,14 @@
+bin:bin/fish
+bin:bin/fish_indent
+bin:bin/fish_key_reader
+rsc:etc/fish/
+rsc:share/doc/fish/
+rsc:share/fish/__fish_build_paths.fish
+rsc:share/fish/completions/
+rsc:share/fish/config.fish
+rsc:share/fish/functions/
+rsc:share/fish/tools/
+rsc:share/fish/vendor_completions.d/
+rsc:share/fish/vendor_conf.d/
+rsc:share/fish/vendor_functions.d/
+rsc:share/locale/
