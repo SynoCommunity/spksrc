@@ -13,5 +13,11 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 
+PRE_CONFIGURE_TARGET = libogg-pre-configure
+
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: libogg-pre-configure
+
+libogg-pre-configure:
+	$(RUN) autoreconf -f -i
