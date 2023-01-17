@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.monit": {
+            "title": "monit",
+            "desc": "monit",
+            "icon": "images/monit-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "2812",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

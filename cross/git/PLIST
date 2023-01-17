@@ -1,11 +1,10 @@
 bin:bin/git
-rsc:bin/git-cvsserver
+bin:bin/git-cvsserver
 lnk:bin/git-receive-pack
 bin:bin/git-shell
 lnk:bin/git-upload-archive
-lnk:bin/git-upload-pack
-bin:bin/scalar
-rsc:etc/gitconfig
-rsc:libexec/git-core/
+bin:bin/git-upload-pack
+etc:etc/gitconfig
+libexec:libexec/git-core/
 rsc:share/git-core/
-rsc:share/locale/
+rsc:share/gitweb/

@@ -1,0 +1,231 @@
+--- debianutils/start_stop_daemon.c.orig	2016-12-12 09:22:20.924026522 +0100
++++ debianutils/start_stop_daemon.c	2016-12-12 10:07:59.791951616 +0100
+@@ -115,6 +115,11 @@
+ //usage:     "\nOther:"
+ //usage:	IF_FEATURE_START_STOP_DAEMON_FANCY(
+ //usage:     "\n	-o,--oknodo		Exit with status 0 if nothing is done"
++//usage:     "\n	-g,--group GRP		Change group"
++//usage:     "\n	-r,--chroot DIR		Change root directory"
++//usage:     "\n	-d,--chdir DIR		Change current directory"
++//usage:     "\n	-C,--no-close		Do not close any file descriptor with -b"
++//usage:     "\n	-k,--umask MASK		set umask"
+ //usage:     "\n	-v,--verbose		Verbose"
+ //usage:	)
+ //usage:     "\n	-q,--quiet		Quiet"
+@@ -143,6 +148,11 @@
+ //usage:     "\nOther:"
+ //usage:	IF_FEATURE_START_STOP_DAEMON_FANCY(
+ //usage:     "\n	-o		Exit with status 0 if nothing is done"
++//usage:     "\n	-g GRP	Change group"
++//usage:     "\n	-r DIR	Change root directory"
++//usage:     "\n	-d DIR	Change current directory"
++//usage:     "\n	-C		Do not close any file descriptor with -b"
++//usage:     "\n	-k MASK	set umask"
+ //usage:     "\n	-v		Verbose"
+ //usage:	)
+ //usage:     "\n	-q		Quiet"
+@@ -161,22 +171,32 @@
+ };
+ 
+ enum {
+-	CTX_STOP       = (1 <<  0),
+-	CTX_START      = (1 <<  1),
+-	OPT_BACKGROUND = (1 <<  2), // -b
+-	OPT_QUIET      = (1 <<  3), // -q
+-	OPT_TEST       = (1 <<  4), // -t
+-	OPT_MAKEPID    = (1 <<  5), // -m
+-	OPT_a          = (1 <<  6), // -a
+-	OPT_n          = (1 <<  7), // -n
+-	OPT_s          = (1 <<  8), // -s
+-	OPT_u          = (1 <<  9), // -u
+-	OPT_c          = (1 << 10), // -c
+-	OPT_x          = (1 << 11), // -x
+-	OPT_p          = (1 << 12), // -p
+-	OPT_OKNODO     = (1 << 13) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -o
+-	OPT_VERBOSE    = (1 << 14) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -v
+-	OPT_NICELEVEL  = (1 << 15) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -N
++	CTX_STOP         = (1 <<  0),
++	CTX_START        = (1 <<  1),
++	OPT_BACKGROUND   = (1 <<  2), // -b
++	OPT_QUIET        = (1 <<  3), // -q
++	OPT_TEST         = (1 <<  4), // -t
++	OPT_MAKEPID      = (1 <<  5), // -m
++	OPT_STARTAS      = (1 <<  6), // -a
++	OPT_NAME         = (1 <<  7), // -n
++	OPT_SIGNAL       = (1 <<  8), // -s
++	OPT_USER         = (1 <<  9), // -u
++	OPT_CHUID        = (1 << 10), // -c
++	OPT_EXEC         = (1 << 11), // -x
++	OPT_MAKE_PIDFILE = (1 << 12), // -p
++	OPT_OKNODO       = (1 << 13) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -o
++	OPT_VERBOSE      = (1 << 14) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -v
++	OPT_NICELEVEL    = (1 << 15) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -N
++//    OPT_STATUS       = (1 << 16) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -T
++    OPT_GROUP        = (1 << 17) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -g
++//    OPT_RETRY        = (1 << 18) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -R
++    OPT_CHROOT       = (1 << 19) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -r
++    OPT_CHDIR        = (1 << 20) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -d
++    OPT_NO_CLOSE     = (1 << 21) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -C
++//    OPT_PROCSHED     = (1 << 22) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -P
++//    OPT_IOSCHED      = (1 << 23) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -I
++    OPT_UMASK        = (1 << 24) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -k
++    OPT_VERSION      = (1 << 25) * ENABLE_FEATURE_START_STOP_DAEMON_FANCY, // -V
+ };
+ #define QUIET (option_mask32 & OPT_QUIET)
+ #define TEST  (option_mask32 & OPT_TEST)
+@@ -425,7 +445,16 @@
+ 	"exec\0"         Required_argument "x"
+ 	"pidfile\0"      Required_argument "p"
+ #if ENABLE_FEATURE_START_STOP_DAEMON_FANCY
+-	"retry\0"        Required_argument "R"
++	//"status\0"       No_argument       "T"
++	"group\0"        Required_argument "g"
++	//"retry\0"        Required_argument "R"
++	"chroot\0"       Required_argument "r"
++	"chdir\0"        Required_argument "d"
++	"no-close\0"     No_argument       "C"
++	//"procsched\0"    Required_argument "P"
++	//"iosched\0"      Required_argument "I"
++	"umask\0"        Required_argument "k"
++	"version\0"      No_argument       "V"
+ #endif
+ 	;
+ #endif
+@@ -444,6 +473,13 @@
+ //	char *retry_arg = NULL;
+ //	int retries = -1;
+ 	char *opt_N;
++	char *opt_g;
++	char *opt_R;
++	char *opt_r;
++	char *opt_d;
++	char *opt_P;
++	char *opt_I;
++	char *opt_k;
+ #endif
+ 
+ 	INIT_G();
+@@ -460,19 +496,19 @@
+ 	opt_complementary = "K:S:K--S:S--K:m?p:K?xpun:S?xa"
+ 		IF_FEATURE_START_STOP_DAEMON_FANCY("q-v");
+ 	opt = getopt32(argv, "KSbqtma:n:s:u:c:x:p:"
+-		IF_FEATURE_START_STOP_DAEMON_FANCY("ovN:R:"),
++		IF_FEATURE_START_STOP_DAEMON_FANCY("ovN:Tg:R:r:d:CP:I:k:vV"),
+ 		&startas, &cmdname, &signame, &userspec, &chuid, &execname, &pidfile
+-		IF_FEATURE_START_STOP_DAEMON_FANCY(,&opt_N)
++		IF_FEATURE_START_STOP_DAEMON_FANCY(, &opt_N)
+ 		/* We accept and ignore -R <param> / --retry <param> */
+-		IF_FEATURE_START_STOP_DAEMON_FANCY(,NULL)
++		IF_FEATURE_START_STOP_DAEMON_FANCY(, &opt_g, &opt_R, &opt_r, &opt_d, &opt_P, &opt_I, &opt_k)
+ 	);
+ 
+-	if (opt & OPT_s) {
++	if (opt & OPT_SIGNAL) {
+ 		signal_nr = get_signum(signame);
+ 		if (signal_nr < 0) bb_show_usage();
+ 	}
+ 
+-	if (!(opt & OPT_a))
++	if (!(opt & OPT_STARTAS))
+ 		startas = execname;
+ 	if (!execname) /* in case -a is given and -x is not */
+ 		execname = startas;
+@@ -515,9 +551,10 @@
+ 	*--argv = startas;
+ 	if (opt & OPT_BACKGROUND) {
+ #if BB_MMU
+-		bb_daemonize(DAEMON_DEVNULL_STDIO + DAEMON_CLOSE_EXTRA_FDS + DAEMON_DOUBLE_FORK);
+-		/* DAEMON_DEVNULL_STDIO is superfluous -
+-		 * it's always done by bb_daemonize() */
++		bb_daemonize((opt & OPT_NO_CLOSE ? DAEMON_ONLY_SANITIZE : DAEMON_DEVNULL_STDIO + DAEMON_CLOSE_EXTRA_FDS)
++             + DAEMON_DOUBLE_FORK);
++		/* DAEMON_DEVNULL_STDIO is always done by bb_daemonize()
++           unless DAEMON_ONLY_SANITIZE is set*/
+ #else
+ 		pid_t pid = xvfork();
+ 		if (pid != 0) {
+@@ -530,8 +567,7 @@
+ 		setsid(); /* detach from controlling tty */
+ 		/* Redirect stdio to /dev/null, close extra FDs.
+ 		 * We do not actually daemonize because of DAEMON_ONLY_SANITIZE */
+-		bb_daemonize_or_rexec(DAEMON_DEVNULL_STDIO
+-			+ DAEMON_CLOSE_EXTRA_FDS
++		bb_daemonize_or_rexec((opt & OPT_NO_CLOSE ? 0 : DAEMON_DEVNULL_STDIO + DAEMON_CLOSE_EXTRA_FDS)
+ 			+ DAEMON_ONLY_SANITIZE,
+ 			NULL /* argv, unused */ );
+ #endif
+@@ -540,7 +576,28 @@
+ 		/* User wants _us_ to make the pidfile */
+ 		write_pidfile(pidfile);
+ 	}
+-	if (opt & OPT_c) {
++#if ENABLE_FEATURE_START_STOP_DAEMON_FANCY
++    if (opt & OPT_GROUP) {
++        gid_t gid = get_ug_id(opt_g, xgroup2gid);
++        if (gid == (gid_t) -1){
++            bb_perror_msg_and_die("getting group (%s)", opt_g);
++        }
++        if (opt & OPT_CHUID) {
++			struct passwd *pw;
++            uid_t uid = get_ug_id(chuid, xuname2uid);
++            if (uid == (uid_t) -1L){
++                bb_perror_msg_and_die("getting user (%s)", chuid);
++            }
++			pw = xgetpwuid(uid);
++            pw->pw_gid = gid;
++			change_identity(pw);
++        } else {
++			xsetgid(gid);
++			setgroups(1, &gid);
++        }
++    } else /* let's continue with the next "if" */
++#endif
++    if (opt & OPT_CHUID) {
+ 		struct bb_uidgid_t ugid;
+ 		parse_chown_usergroup_or_die(&ugid, chuid);
+ 		if (ugid.uid != (uid_t) -1L) {
+@@ -552,16 +609,42 @@
+ 		} else if (ugid.gid != (gid_t) -1L) {
+ 			xsetgid(ugid.gid);
+ 			setgroups(1, &ugid.gid);
+-		}
++		} else {
++            bb_perror_msg_and_die("getting user and group (%s)", chuid);
++        }
+ 	}
+ #if ENABLE_FEATURE_START_STOP_DAEMON_FANCY
+ 	if (opt & OPT_NICELEVEL) {
+ 		/* Set process priority */
+ 		int prio = getpriority(PRIO_PROCESS, 0) + xatoi_range(opt_N, INT_MIN/2, INT_MAX/2);
+-		if (setpriority(PRIO_PROCESS, 0, prio) < 0) {
++		if (setpriority(PRIO_PROCESS, 0, prio) != 0) {
+ 			bb_perror_msg_and_die("setpriority(%d)", prio);
+ 		}
+ 	}
++    if(opt & OPT_UMASK){
++        char* ap = opt_k;
++        mode_t mask = 0;
++        do{
++            if (*ap >= '8' || *ap < '0'){
++                bb_perror_msg_and_die("umask(%s)", opt_k);
++            }
++            mask = (mask << 3) + (*ap - '0');
++        } while (*++ap != '\0');
++        umask(mask);
++    }
++    if(opt & OPT_CHROOT) {
++        if(chroot(opt_r) != 0){
++			bb_perror_msg_and_die("chroot(%s)", opt_r);
++        }
++        if(!(opt & OPT_CHDIR)){
++			chdir("/");
++        }
++    }
++    if(opt & OPT_CHDIR) {
++        if(chdir(opt_d) != 0){
++			bb_perror_msg_and_die("chdir(%s)", opt_d);
++        }
++    }
+ #endif
+ 	execvp(startas, argv);
+ 	bb_perror_msg_and_die("can't execute '%s'", startas);

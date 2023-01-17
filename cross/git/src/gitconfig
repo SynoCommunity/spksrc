@@ -1,2 +1,3 @@
 [http]
-	sslcainfo = /etc/ssl/certs/ca-certificates.crt
+	sslcainfo = /usr/local/git/cert.pem
+

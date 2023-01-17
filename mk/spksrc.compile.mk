@@ -1,12 +1,10 @@
 ### Compile rules
-#   Invoke make to (cross-) compile the software.
-# Targets are executed in the following order:
+#   Invoke make to (cross-) compile the software. 
+# Target are executed in the following order:
 #  compile_msg_target
-#  pre_compile_target      (override with PRE_COMPILE_TARGET)
-#  compile_target          (override with COMPILE_TARGET)
-#  post_compile_target     (override with POST_COMPILE_TARGET)
-# Variables:
-#  COMPILE_MAKE_OPTIONS    Additional parameters to add to make command
+#  pre_compile_target   (override with PRE_COMPILE_TARGET)
+#  compile_target       (override with COMPILE_TARGET)
+#  post_compile_target  (override with POST_COMPILE_TARGET)
 
 COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)compile_done
 
@@ -31,23 +29,11 @@ endif
 
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-ifeq ($(filter cross spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(dir $(abspath $(dir $$PWD)))), NAME: $(NAME) >> $(PSTAT_LOG)
-else
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
-endif
-endif
 
 pre_compile_target: compile_msg
 
-compile_target:  $(PRE_COMPILE_TARGET)
-ifeq ($(filter $(NCPUS),0 1),)
-	@$(RUN) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
-else
-	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
-endif
-
+compile_target:  $(PRE_COMPILE_TARGET) 
+	@$(RUN) $(MAKE)
 
 post_compile_target: $(COMPILE_TARGET)
 
@@ -60,3 +46,4 @@ $(COMPILE_COOKIE): $(POST_COMPILE_TARGET)
 else
 compile: ;
 endif
+

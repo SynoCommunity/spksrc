@@ -1,18 +1,22 @@
 PKG_NAME = alsa-oss
 PKG_VERS = 1.0.28
 PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.alsa-project.org/files/pub/oss-lib
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = ftp://ftp.alsa-project.org/pub/oss-lib
 
 DEPENDS = cross/alsa-lib
 
-HOMEPAGE = https://www.alsa-project.org/
-COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system.
-LICENSE  = GPLv2
+HOMEPAGE = http://www.alsa-project.org/
+COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionality to the Linux operating system
+LICENSE  =
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
-ADDITIONAL_CFLAGS = -O
+INSTALL_TARGET = myInstall
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: myInstall
+myInstall:
+	$(RUN) make install DESTDIR=$(INSTALL_DIR)
+

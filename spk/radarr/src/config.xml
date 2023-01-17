@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Config>
-  <Branch>master</Branch>
+  <Branch>develop</Branch>
   <UpdateMechanism>BuiltIn</UpdateMechanism>
   <LaunchBrowser>False</LaunchBrowser>
   <Port>8310</Port>

@@ -1,4 +1,0 @@
-bin:bin/uchardet
-lnk:lib/libuchardet.so
-lnk:lib/libuchardet.so.0
-lib:lib/libuchardet.so.0.0.6

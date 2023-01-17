@@ -158,7 +158,7 @@
     border: 1px solid #7eadd9;
 }
 
-.dnscrypt-proxy .updateBlocklist .btn {
+.dnscrypt-proxy .updateBlacklist .btn {
     position: fixed;
     bottom: 10px;
     left: 10px;

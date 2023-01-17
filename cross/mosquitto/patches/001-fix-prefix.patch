@@ -1,0 +1,19 @@
+--- Makefile.orig	2017-12-02 16:02:12.391948436 +0100
++++ Makefile	2017-12-02 16:03:32.141307039 +0100
+@@ -39,11 +39,11 @@
+ ifeq ($(WITH_DOCS),yes)
+ 	set -e; for d in ${DOCDIRS}; do $(MAKE) -C $${d} install; done
+ endif
+-	$(INSTALL) -d ${DESTDIR}/etc/mosquitto
+-	$(INSTALL) -m 644 mosquitto.conf ${DESTDIR}/etc/mosquitto/mosquitto.conf.example
+-	$(INSTALL) -m 644 aclfile.example ${DESTDIR}/etc/mosquitto/aclfile.example
+-	$(INSTALL) -m 644 pwfile.example ${DESTDIR}/etc/mosquitto/pwfile.example
+-	$(INSTALL) -m 644 pskfile.example ${DESTDIR}/etc/mosquitto/pskfile.example
++	$(INSTALL) -d ${DESTDIR}${prefix}/etc/mosquitto
++	$(INSTALL) -m 644 mosquitto.conf ${DESTDIR}${prefix}/etc/mosquitto/mosquitto.conf.example
++	$(INSTALL) -m 644 aclfile.example ${DESTDIR}${prefix}/etc/mosquitto/aclfile.example
++	$(INSTALL) -m 644 pwfile.example ${DESTDIR}${prefix}/etc/mosquitto/pwfile.example
++	$(INSTALL) -m 644 pskfile.example ${DESTDIR}${prefix}/etc/mosquitto/pskfile.example
+ 
+ uninstall :
+ 	set -e; for d in ${DIRS}; do $(MAKE) -C $${d} uninstall; done

@@ -1,41 +1,40 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.8.1
-SPK_REV    = 9
+SPK_VERS   = $(shell date +%Y%m%d)
+SPK_REV    = 4
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python310
+BETA = 1
 
-# Required for PyYAML
-DEPENDS += cross/libyaml
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+DEPENDS = cross/$(SPK_NAME)
+WHEELS  = src/requirements.txt
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python>=2.7.11-15"
 
 MAINTAINER   = SynoCommunity
-DESCRIPTION  = The snappy web interface for your 3D printer.
-SERVICE_PORT = 8088
-ADMIN_PORT   = $(SERVICE_PORT)
-
+DESCRIPTION  = OctoPrint is a so called host software for 3D printers that controls your 3D printer and sends it the actual commands to do its job.
+ADMIN_PORT   = 8088
+RELOAD_UI    = yes
 DISPLAY_NAME = OctoPrint
-HOMEPAGE     = https://octoprint.org/
+HOMEPAGE     = http://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.8.1, including fixes for CVE-2022-1430, CVE-2022-1432 and other security issues."
 
-# SERVICE_COMMAND is in src/service-setup.sh
-STARTABLE     = yes
-SERVICE_SETUP = src/service-setup.sh
-SERVICE_USER  = auto
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
+FWPORTS          = src/${SPK_NAME}.sc
+CONF_DIR         = src/conf/
+
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = octoprint_extra_install
-
-# [frozendict]
-WHEELS_CFLAGS = [frozendict] -std=c99
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: octoprint_extra_install
 octoprint_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var/.octoprint
-	install -m 600 src/config.yaml $(STAGING_DIR)/var/.octoprint/config.yaml
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d ${STAGING_DIR}/var/.octoprint
+	install -m 600 src/config.yaml ${STAGING_DIR}/var/.octoprint/config.yaml
+	install -m 755 -d $(STAGING_DIR)/app
+	install -m 644 src/app/config $(STAGING_DIR)/app/config

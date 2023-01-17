@@ -1,3 +1,0 @@
-lnk:lib/libssh2.so
-lnk:lib/libssh2.so.1
-lib:lib/libssh2.so.1.0.1

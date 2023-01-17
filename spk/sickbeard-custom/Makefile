@@ -1,6 +1,6 @@
 SPK_NAME = sickbeard-custom
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 8
+SPK_REV = 7
 SPK_ICON = src/sickbeard-custom.png
 
 SPK_DEPENDS = "python>2.7.3-3:git"
@@ -8,11 +8,12 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 MAINTAINER = Diaoul
 DESCRIPTION = SickBeard Custom allows you to run the fork of your choice of SickBeard. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = SickBeard Custom vous permet d\'exécuter la variante de votre choix de SickBeard. Vous aurez besoin de saisir l\'URL git de la variante à l\'installation.
+RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = SickBeard Custom
 CHANGELOG = "Integrate with DSM5+6 Generic Service support for correct permissions."
 
-HOMEPAGE   = https://sickbeard.com
+HOMEPAGE   = http://sickbeard.com
 LICENSE    = GPL
 HELPURL    = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SickBeard-custom
 

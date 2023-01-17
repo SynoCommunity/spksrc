@@ -7,6 +7,7 @@ DEPENDS =  cross/busybox cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Use Synology NAS as an AirPlay receiver. Requires USB soundcard or speakers.
+RELOAD_UI = no
 DISPLAY_NAME = Shairport Sync
 BETA = 1
 CHANGELOG = "Initial SynoCommunity Release"

@@ -1,2 +1,0 @@
-bin:bin/google-authenticator
-lib:lib/security/pam_google_authenticator.so

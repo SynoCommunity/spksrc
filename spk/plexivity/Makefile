@@ -1,6 +1,6 @@
 SPK_NAME = plexivity
 SPK_VERS = 0.9.9
-SPK_REV = 4
+SPK_REV = 3
 SPK_ICON = src/plexivity.png
 DSM_UI_DIR = app
 BETA = 1
@@ -13,6 +13,7 @@ WHEELS = src/requirements.txt
 MAINTAINER = cytec
 DESCRIPTION = plexivity is a simple alternative for plexWatch. It connects with your Plex Media Server and is able to notify you on activity.
 ADMIN_PORT = 6060
+RELOAD_UI = yes
 DISPLAY_NAME = plexivity
 
 HOMEPAGE   = http://raphaelmutschler.de/work/plexivity/

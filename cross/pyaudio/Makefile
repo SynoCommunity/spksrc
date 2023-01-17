@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/portaudio
 
-HOMEPAGE = https://people.csail.mit.edu/hubert/pyaudio/
+HOMEPAGE = http://people.csail.mit.edu/hubert/pyaudio/
 COMMENT  = Provide Python bindings for PortAudio, the cross-platform audio I/O library
 LICENSE  = MIT
 

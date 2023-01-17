@@ -1,17 +1,11 @@
-[syncthing_bep]
-title="BEP (Block Exchange Protocol)"
-desc="Syncthing File Synchronization"
+[syncthing]
+title="Syncthing protocols"
+desc="Syncthing"
 port_forward="yes"
-dst.ports="22000/tcp"
-
-[syncthing_discovery]
-title="Local Discovery Protocol"
-desc="Syncthing Local Announcement"
-port_forward="no"
-dst.ports="21027/udp"
+dst.ports="22000,21027/tcp,udp"
 
 [syncthing_webui]
-title="HTTP(S)"
-desc="Syncthing Web GUI"
+title="Syncthing WebUI (HTTP)"
+desc="Syncthing Web"
 port_forward="yes"
 dst.ports="8384/tcp"

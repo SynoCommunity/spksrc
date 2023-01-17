@@ -1,0 +1,2 @@
+bin:bin/museekd
+shr:share/museek/museekd/config.xml.tmpl

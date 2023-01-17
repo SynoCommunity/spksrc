@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.icecast": {
+            "title": "Icecast",
+            "desc": "Icecast",
+            "icon": "images/icecast-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8000",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

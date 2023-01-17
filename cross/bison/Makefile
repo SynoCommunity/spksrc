@@ -1,29 +1,28 @@
 PKG_NAME = bison
 PKG_VERS = 3.0.4
 PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = http://ftp.gnu.org/gnu/$(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE = https://www.gnu.org/s/bison/
+HOMEPAGE = http://www.gnu.org/s/bison/
 COMMENT  = General-purpose parser generator
-LICENSE  = GPLv3
+LICENSE  = GNU GPL
 
 GNU_CONFIGURE = 1
-
-include ../../mk/spksrc.archs.mk
-
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), powerpc ppc824x ppc853x ppc854x),$(ARCH))
 CONFIGURE_ARGS = gl_cv_func_signbit_gcc=no
 endif
 
-PRE_CONFIGURE_TARGET = bison_pre_configure
+PRE_CONFIGURE_TARGET = myPreConfigure
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: bison_pre_configure
-bison_pre_configure:
+
+.PHONY: myPreConfigure
+myPreConfigure:
 	$(RUN) aclocal
 	$(RUN) automake
+

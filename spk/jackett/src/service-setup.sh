@@ -1,22 +1,34 @@
 
-PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
-JACKETT="${SYNOPKG_PKGDEST}/share/jackett"
-HOME_DIR="${SYNOPKG_PKGVAR}"
+# Package specific behaviors
+# Sourced script by generic installer and start-stop-status scripts
 
-SERVICE_COMMAND="env HOME=${HOME_DIR} PATH=${PATH} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${JACKETT} --PIDFile ${PID_FILE}"
-SVC_BACKGROUND=y
-
-service_preupgrade ()
+service_prestart ()
 {
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ]; then
-        CONFIG_DIR="${HOME_DIR}/.config"
-        LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/var/.config"
-        # ensure user data is in @appdata folder
-        if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-            if [ "$(realpath ${LEGACY_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
-                echo "Move ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
-                mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
-            fi
-        fi
+    # Replace generic service startup
+
+    MONO_PATH="${SYNOPKG_PKGDEST}/../mono/bin"
+    PATH="${SYNOPKG_PKGDEST}/bin:${MONO_PATH}:${PATH}"
+    MONO="${MONO_PATH}/mono"
+    JACKETT="${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/JackettConsole.exe"
+    HOME_DIR="${SYNOPKG_PKGDEST}/var"
+
+    echo "Starting Jackett as user ${EFF_USER}" >> ${LOG_FILE}
+    COMMAND="env HOME=${HOME_DIR} PATH=${PATH} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${MONO} ${JACKETT} --PIDFile ${PID_FILE}"
+
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
+        su ${EFF_USER} -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1 &
+    else
+        ${COMMAND} >> ${LOG_FILE} 2>&1 &
     fi
+}
+
+service_postinst ()
+{
+    # Discard legacy obsolete busybox user account
+    BIN=${SYNOPKG_PKGDEST}/bin
+    $BIN/busybox --install $BIN
+    $BIN/delgroup "${USER}" "users" >> ${INST_LOG}
+    $BIN/deluser "${USER}" >> ${INST_LOG}
+
+    echo "service_postinst ${SYNOPKG_PKG_STATUS}" >> $INST_LOG
 }

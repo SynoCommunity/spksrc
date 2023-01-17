@@ -1,0 +1,69 @@
+[{
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "textfield",
+        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
+        "subitems": [{
+            "key": "wizard_download_dir",
+            "desc": "Répertoire de téléchargement",
+            "defaultValue": "/volume1/downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Surveille les torrents dans un répertoire et les ajoute à transmission automatiquement. Laisser vide pour désactiver",
+        "subitems": [{
+            "key": "wizard_watch_dir",
+            "desc": "Répertoire surveillé",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Répertoire où conserver les fichiers de torrent incomplets. Laisser vide pour désactiver",
+        "subitems": [{
+            "key": "wizard_incomplete_dir",
+            "desc": "Répertoire incomplet",
+            "validator": {
+                "allowBlank": true,
+                "regex": {
+                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
+                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "Configuration de base",
+    "items": [{
+        "type": "textfield",
+        "desc": "Nom d'utilisateur de l'interface web. admin par défaut",
+        "subitems": [{
+            "key": "wizard_username",
+            "desc": "Nom d'utilisateur"
+        }]
+    }, {
+        "type": "password",
+        "desc": "Mot de passe de l'interface web. admin par défaut",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Mot de passe"
+        }]
+    }]
+}, {
+     "step_title": "Attention! DSM6 Permissions",
+     "items": [{
+         "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+     }]
+}]

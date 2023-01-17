@@ -1,19 +1,28 @@
 PKG_NAME = libffi
-PKG_VERS = 3.4.2
+PKG_VERS = 3.2.1
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/libffi/libffi/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://sourceware.org/pub/$(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE = https://sourceware.org/libffi/
-COMMENT  = A Portable Foreign Function Interface Library.
+HOMEPAGE = http://sourceware.org/libffi/
+COMMENT  = A Portable Foreign Function Interface Library
 LICENSE  = libffi BSD-like
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --disable-static
-CONFIGURE_ARGS += enable_multi_os_directory=no
-ADDITIONAL_CFLAGS = -O
+PRE_CONFIGURE_TARGET = libffi_pre_configure
+INSTALL_TARGET = libffi_install
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: libffi_pre_configure
+libffi_pre_configure:
+	$(RUN) autoconf
+	$(RUN) aclocal
+	$(RUN) automake
+
+.PHONY: libffi_install
+libffi_install:
+	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
