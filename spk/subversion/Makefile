@@ -5,18 +5,17 @@ SPK_ICON = src/subversion.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hgy59
 DESCRIPTION = Subversion is an open source version control system.
 
 DISPLAY_NAME = Subversion
-CHANGELOG = "Initial SynoCommunity Package release"
+CHANGELOG = "Initial SynoCommunity Package release."
 
 HOMEPAGE = https://subversion.apache.org/
 LICENSE  = Apache 2.0
 
 
-
-SPK_COMMANDS = bin/svn
+SPK_COMMANDS  = bin/svn
 SPK_COMMANDS += bin/svnadmin
 SPK_COMMANDS += bin/svnbench
 SPK_COMMANDS += bin/svndumpfilter

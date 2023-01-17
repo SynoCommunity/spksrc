@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/apr
 DEPENDS += cross/apr-util
-#DEPENDS += cross/serf
+DEPENDS += cross/serf
 DEPENDS += cross/sqlite
 DEPENDS += cross/cyrus-sasl
 DEPENDS += cross/lz4

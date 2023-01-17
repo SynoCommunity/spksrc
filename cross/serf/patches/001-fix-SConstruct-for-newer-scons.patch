@@ -1,0 +1,23 @@
+# fix syntax errors in SConstruct for newer scons versions (i.e. SCons v4.0.1)
+# 
+# 
+--- SConstruct.orig	2015-09-17 12:46:24.000000000 +0000
++++ SConstruct	2023-01-17 20:24:59.548936038 +0000
+@@ -166,7 +166,7 @@
+ match = re.search('SERF_MAJOR_VERSION ([0-9]+).*'
+                   'SERF_MINOR_VERSION ([0-9]+).*'
+                   'SERF_PATCH_VERSION ([0-9]+)',
+-                  env.File('serf.h').get_contents(),
++                  env.File('serf.h').get_contents().decode('utf-8'),
+                   re.DOTALL)
+ MAJOR, MINOR, PATCH = [int(x) for x in match.groups()]
+ env.Append(MAJOR=str(MAJOR))
+@@ -183,7 +183,7 @@
+ 
+ unknown = opts.UnknownVariables()
+ if unknown:
+-  print 'Warning: Used unknown variables:', ', '.join(unknown.keys())
++  print('Warning: Used unknown variables:', ', '.join(unknown.keys()))
+ 
+ apr = str(env['APR'])
+ apu = str(env['APU'])
