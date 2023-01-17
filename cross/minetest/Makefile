@@ -25,7 +25,7 @@ PKG_DIR_GAME = $(PKG_NAME_GAME)-$(PKG_VERS_GAME)
 PKG_DIR_IRRLICHT = $(PKG_NAME_IRRLICHT)-$(PKG_VERS_IRRLICHT)
 
 # Hope it's ok and those dependecies are not needed with spk
-BUILD_DEPENDS = cross/ncurses cross/sqlite cross/curl
+BUILD_DEPENDS = cross/sqlite cross/curl
 
 HOMEPAGE = https://www.minetest.net/
 COMMENT  = An open source voxel game engine. Play one of our many games, mod a game to your liking, make your own game, or play on a multiplayer server. 

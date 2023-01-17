@@ -13,13 +13,6 @@ LICENSE  = http://www.sqlite.org/copyright.html
 
 GNU_CONFIGURE = 1
 
-PRE_CONFIGURE_TARGET = sqlite-pre-configure
-
 ADDITIONAL_CFLAGS = -DSQLITE_ENABLE_COLUMN_METADATA
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: sqlite-pre-configure
-
-sqlite-pre-configure:
-	$(RUN) autoreconf -f -i

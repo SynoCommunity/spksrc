@@ -13,11 +13,6 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 
-PRE_CONFIGURE_TARGET = speex-pre-configure
-
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: speex-pre-configure
 
-speex-pre-configure:
-	$(RUN) autoreconf -f -i
