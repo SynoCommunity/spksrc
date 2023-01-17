@@ -1,0 +1,35 @@
+--- configure.orig
++++ configure
+@@ -6868,7 +6868,7 @@
+ SRC_PATH:=\$(SRC_PATH:.%=..%)
+ endif
+ CC_IDENT=$cc_ident
+-ARCH=$arch
++FFMPEG_ARCH=$arch
+ INTRINSICS=$intrinsics
+ CC=$cc
+ CXX=$cxx
+--- ffbuild/common.mak.orig
++++ ffbuild/common.mak
+@@ -137,8 +137,8 @@
+ STATIC_DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
+ 
+ SRC_DIR    := $(SRC_PATH)/lib$(NAME)
+-ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
+-SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
++ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(FFMPEG_ARCH)/*.h))
++SKIPHEADERS += $(ARCH_HEADERS:%=$(FFMPEG_ARCH)/%) $(SKIPHEADERS-)
+ SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
+ PTXOBJS      = $(filter %.ptx.o,$(OBJS))
+ $(HOBJS):     CCFLAGS += $(CFLAGS_HEADERS)
+--- Makefile.orig
++++ Makefile
+@@ -83,7 +83,7 @@
+ $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
+ SUBDIR := $(1)/
+ include $(SRC_PATH)/$(1)/Makefile
+--include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
++-include $(SRC_PATH)/$(1)/$(FFMPEG_ARCH)/Makefile
+ -include $(SRC_PATH)/$(1)/$(INTRINSICS)/Makefile
+ include $(SRC_PATH)/library.mak
+ endef

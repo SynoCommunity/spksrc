@@ -1,34 +1,22 @@
 PKG_NAME = boost
-PKG_VERS = 1.78.0
+PKG_VERS = 1.63.0
 PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
-PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = http://sourceforge.net/projects/$(PKG_NAME)/files/$(PKG_NAME)/$(PKG_VERS)
 
-DEPENDS = cross/bzip2 cross/zlib
+DEPENDS = cross/bzip2 cross/zlib cross/python
 
-HOMEPAGE = https://www.boost.org/
+HOMEPAGE = http://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
-LICENSE  = https://www.boost.org/LICENSE_1_0.txt
+LICENSE  = http://www.boost.org/LICENSE_1_0.txt
 
-CONFIGURE_TARGET = boost_configure
-COMPILE_TARGET = boost_compile
-INSTALL_TARGET = boost_install
+CONFIGURE_TARGET = myConfigure
+COMPILE_TARGET = myCompile
+INSTALL_TARGET = myInstall
 
-# Build all if not told otherwise (we exclude python library when "all" selected)
+# Build all if not told otherwise (will most likely fail)
 BOOST_LIBRARIES ?= all
-
-# Expect already built python when python library selected
-WITH_PYTHON_LIBRARY =
-ifneq ($(findstring python,$(BOOST_LIBRARIES)),)
-WITH_PYTHON_LIBRARY = 1
-# The packages depending on boost with python, must build python before.
-include $(WORK_DIR)/python-cc.mk
-PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
-else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
-# exclude python library if "all" selected
-CONFIGURE_ARGS += --without-libraries=python
-endif
 
 # Useful variables for subst
 comma:= ,
@@ -36,45 +24,31 @@ empty:=
 space:= $(empty) $(empty)
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
-
-ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations
-
-ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
-CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
-ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
-endif
-
-include ../../mk/spksrc.common.mk
-
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# fix compilation with newer compilers
-ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-endif
-
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-ADDRESS_MODEL = 64
-else
-ADDRESS_MODEL = 32
-endif
+CONFIGURE_ARGS  = --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/python/work-native/install/usr/local/bin/python
 
 include ../../mk/spksrc.cross-cc.mk
+-include $(WORK_DIR)/python-cc.mk
 
-.PHONY: boost_configure
-boost_configure:
+ADDRESS_MODEL = 32
+ifeq ($(findstring $(ARCH),$(x64_ARCHES)),$(ARCH))
+ADDRESS_MODEL = 64
+endif
+
+
+.PHONY: myConfigure
+myConfigure:
 	$(RUN) ./bootstrap.sh $(CONFIGURE_ARGS)
 
-.PHONY: boost_compile
-boost_compile:
+.PHONY: myCompile
+myCompile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 	@echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-ifneq ($(strip $(WITH_PYTHON)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-endif
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam
 
-.PHONY: boost_install
-boost_install:
+.PHONY: myInstall
+myInstall:
 	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam install

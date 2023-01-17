@@ -1,25 +1,23 @@
 SPK_NAME = rsnapshot
-SPK_VERS = 1.4.4
-SPK_REV = 4
-SPK_ICON = src/rsnapshot.png
+SPK_VERS = 1.4.2
+SPK_REV = 2
+SPK_ICON = src/rdiff-backup.png
 
-DEPENDS = cross/rsnapshot
+DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "Perl"
 
 MAINTAINER = ymartin59
-DESCRIPTION = rsnapshot is a filesystem snapshot utility based on rsync. rsnapshot makes it easy to make periodic snapshots of local machines, and remote machines over ssh. The code makes extensive use of hard links whenever possible, to greatly reduce the disk space required.
+DESCRIPTION = Rsnapshot is a filesystem snapshot utility. It can take incremental snapshots of local and remote filesystems.
 STARTABLE = no
 DISPLAY_NAME = rsnapshot
-CHANGELOG = "Update rsnapshot to v1.4.4 released on 12 Jun 2021."
+CHANGELOG = "Initial release"
 
-HOMEPAGE = https://rsnapshot.org
+HOMEPAGE = http://rsnapshot.org/
 LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
 # Pure Perl package, make sure ARCH is not defined
 override ARCH=
-
-SPK_COMMANDS = bin/rsnapshot bin/rsnapshot-diff
 
 include ../../mk/spksrc.spk.mk

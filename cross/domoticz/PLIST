@@ -1,5 +1,5 @@
 bin:bin/domoticz
-lib:lib/libminizip.so
+rsc:svnversion.h
 rsc:www
 rsc:Config
 rsc:scripts

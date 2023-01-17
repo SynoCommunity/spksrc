@@ -1,18 +1,17 @@
 PKG_NAME = libtool
-PKG_VERS = 2.4.7
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/libtool
+PKG_VERS = 2.4.2
+PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = http://ftp.gnu.org/gnu/$(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE = https://www.gnu.org/software/libtool/
-COMMENT  = GNU Libtool is a generic library support script that hides the complexity of using shared libraries behind a consistent, portable interface.
-LICENSE  = GPLv2
+HOMEPAGE = http://www.gnu.org/s/bison/
+COMMENT  = General-purpose parser generator
+LICENSE  = GNU GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
-ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
+

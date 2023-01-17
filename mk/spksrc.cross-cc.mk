@@ -1,6 +1,3 @@
-# Default make programs
-#
-
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
@@ -22,9 +19,30 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 
+
 #####
 
-include ../../mk/spksrc.pre-check.mk
+ifneq ($(REQ_KERNEL),)
+  ifeq ($(ARCH),x64)
+    @$(error x64 arch cannot be used when REQ_KERNEL is set )
+  endif
+endif
+
+# Check if package supports ARCH
+ifneq ($(UNSUPPORTED_ARCHS),)
+  ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
+    @$(error Arch '$(ARCH)' is not a supported architecture )
+  endif
+endif
+
+# Check minimum DSM requirements of package
+ifneq ($(REQUIRED_DSM),)
+  ifneq ($(REQUIRED_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_DSM))))
+    @$(error Toolchain $(TCVERSION) is lower than required version in Makefile $(REQUIRED_DSM) )
+  endif
+endif
+
+#####
 
 include ../../mk/spksrc.cross-env.mk
 
@@ -50,9 +68,22 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
-plist: install
-include ../../mk/spksrc.plist.mk
+ifeq ($(strip $(PLIST_TRANSFORM)),)
+PLIST_TRANSFORM= cat
+endif
 
+.PHONY: cat_PLIST
+cat_PLIST:
+	@for depend in $(DEPENDS) ; \
+	do                          \
+	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
+	done
+	@if [ -f PLIST ] ; \
+	then \
+	  $(PLIST_TRANSFORM) PLIST ; \
+	else \
+	  $(MSG) "No PLIST for $(NAME)" >&2; \
+	fi
 
 ### Clean rules
 smart-clean:
@@ -60,61 +91,52 @@ smart-clean:
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:
-	rm -fr work work-* build-*.log
+	rm -fr work work-*
 
-all: install plist
 
-### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel-required.mk
+all: install
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
+sha1sum := $(shell which sha1sum 2>/dev/null || which gsha1sum 2>/dev/null)
+sha256sum := $(shell which sha256sum 2>/dev/null || which gsha256sum 2>/dev/null)
+md5sum := $(shell which md5sum 2>/dev/null || which gmd5sum 2>/dev/null || which md5 2>/dev/null)
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
+.PHONY: $(DIGESTS_FILE)
+$(DIGESTS_FILE): download
+	@$(MSG) "Generating digests for $(PKG_NAME)"
+	@rm -f $@ && touch -f $@
+	@for type in SHA1 SHA256 MD5; do \
+	  case $$type in \
+	    SHA1)     tool=${sha1sum} ;; \
+	    SHA256)	  tool=${sha256sum} ;; \
+	    MD5)      tool=${md5sum} ;; \
+	  esac ; \
+	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
+	done
+
+dependency-tree:
+	@echo `perl -e 'print "\\\t" x $(MAKELEVEL),"\n"'`+ $(NAME) $(PKG_VERS)
+	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; \
+	do \
+	  $(MAKE) --no-print-directory -C ../../$$depend dependency-tree ; \
+	done
 
 .PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
-
-####
-
-all-supported: SHELL:=/bin/bash
-all-supported:
-	@$(MSG) Pre-build native dependencies for parallel build
-	@for depend in $$($(MAKE) dependency-list) ; \
-	do \
-	  if [ "$${depend%/*}" = "native" ]; then \
-	    $(MSG) "Pre-processing $${depend}" ; \
-	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
-	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
-	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  fi ; \
-	done ; \
-	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
-
-supported-arch-%:
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
-
-cross-cc_msg:
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(subst build-arch-,,$(MAKECMDGOALS)), NAME: $(NAME) >> $(PSTAT_LOG)
-endif
+all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
 
 arch-%:
-	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
-	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-
-build-arch-%: SHELL:=/bin/bash
-build-arch-%: cross-cc_msg
 	@$(MSG) Building package for arch $*
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] >> $(PSTAT_LOG)
-endif
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG)
-endif
+	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
 
-####
+.PHONY: kernel-required
+kernel-required:
+	@if [ -n "$(REQ_KERNEL)" ]; then \
+	  exit 1 ; \
+	fi
+	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \
+	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
+	    exit 0 ; \
+	  else \
+	    exit 1 ; \
+	  fi ; \
+	done
+

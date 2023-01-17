@@ -1,5 +1,5 @@
 [dnscrypt-proxy]
 title="DNS"
-desc="dnscrypt-proxy"
+desc="DNSCrypt-proxy"
 port_forward="yes"
-dst.ports="53"
+dst.ports="53/tcp,udp"

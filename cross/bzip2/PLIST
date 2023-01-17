@@ -1,13 +1,13 @@
 lnk:bin/bunzip2
 lnk:bin/bzcat
 lnk:bin/bzcmp
-rsc:bin/bzdiff
+bin:bin/bzdiff
 lnk:bin/bzegrep
 lnk:bin/bzfgrep
-rsc:bin/bzgrep
+bin:bin/bzgrep
 bin:bin/bzip2
 bin:bin/bzip2recover
 lnk:bin/bzless
-rsc:bin/bzmore
+bin:bin/bzmore
 lnk:lib/libbz2.so.1.0
-lib:lib/libbz2.so.1.0.8
+lib:lib/libbz2.so.1.0.6

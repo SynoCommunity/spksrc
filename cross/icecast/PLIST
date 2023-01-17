@@ -1,2 +1,2 @@
 bin:bin/icecast
-rsc:share/icecast/
+shr:share/icecast/

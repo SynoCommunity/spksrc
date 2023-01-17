@@ -1,5 +1,4 @@
-rsc:bin/ndiff
-rsc:bin/ndiff.py
+bin:bin/ndiff
 bin:bin/nmap
 bin:bin/nping
-rsc:share/nmap
+shr:share/nmap

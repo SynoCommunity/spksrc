@@ -1,0 +1,17 @@
+# Update path to python2
+--- bin/duplicity.orig	2017-01-28 20:52:26.982988635 +0100
++++ bin/duplicity	2017-01-28 20:52:56.506988742 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python2
++#!/usr/local/duplicity/env/bin/python2
+ # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+ #
+ # duplicity -- Encrypted bandwidth efficient backup
+--- bin/rdiffdir.orig	2017-01-28 20:52:33.682988659 +0100
++++ bin/rdiffdir	2017-01-28 20:53:14.698988808 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python2
++#!/usr/local/duplicity/env/bin/python2
+ # rdiffdir -- Extend rdiff functionality to directories
+ # Version 0.7.11 released December 31, 2016
+ #

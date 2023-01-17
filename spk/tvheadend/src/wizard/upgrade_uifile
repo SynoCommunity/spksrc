@@ -1,0 +1,9 @@
+[{
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions are managed with the group <b>'sc-media'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= svc-tvheadend on DSM5 and sc-tvheadend on DSM6+) will not appear on most UI settings. The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    },
+    {
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on the recording folder(s) specified in your current installation.<br>If you get permission errors within Tvheadend, manually set Read/Write permissions for the <b>'sc-media'</b> group on the reported folders using the DSM File Station, shared folder or group management tools."
+    }]
+}]

@@ -1,4 +1,0 @@
-bin:bin/rsvg-convert
-lnk:lib/librsvg-2.so
-lnk:lib/librsvg-2.so.2
-lib:lib/librsvg-2.so.2.40.21

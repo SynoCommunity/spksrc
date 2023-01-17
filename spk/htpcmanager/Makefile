@@ -1,6 +1,6 @@
 SPK_NAME = htpcmanager
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 4
+SPK_REV = 2
 SPK_ICON = src/htpcmanager.png
 DSM_UI_DIR = app
 
@@ -11,9 +11,10 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 MAINTAINER = SynoCommunity
 DESCRIPTION = Control your Htpc with ease. Using multiple applications to control you htpc? No More! Htpc Manager combines all your software and provides an easy way to controll them all!
 ADMIN_PORT = 8087
+RELOAD_UI = yes
 DISPLAY_NAME = HTPC-Manager
 
-HOMEPAGE   = https://htpc.io
+HOMEPAGE   = http://htpc.io
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

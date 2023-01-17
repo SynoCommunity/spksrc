@@ -1,0 +1,11 @@
+--- libs.mk.orig	2017-02-14 21:37:49.108060382 +0100
++++ libs.mk	2017-02-14 19:01:20.491912108 +0100
+@@ -117,8 +117,6 @@
+ $(BUILD_PFX)third_party/googletest/%.cc.o: CXXFLAGS += -Wno-missing-field-initializers
+ # Suppress -Wextra warnings in first party code pending investigation.
+ # https://bugs.chromium.org/p/webm/issues/detail?id=1069
+-$(BUILD_PFX)vp8/encoder/onyx_if.c.o: CFLAGS += -Wno-unknown-warning-option -Wno-clobbered
+-$(BUILD_PFX)vp8/decoder/onyxd_if.c.o: CFLAGS += -Wno-unknown-warning-option -Wno-clobbered
+ 
+ ifeq ($(CONFIG_MSVS),yes)
+ CODEC_LIB=$(if $(CONFIG_STATIC_MSVCRT),vpxmt,vpxmd)

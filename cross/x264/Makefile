@@ -1,49 +1,50 @@
 PKG_NAME = x264
-PKG_VERS = 20220222-stable
-PKG_EXT = tar.gz
-PKG_GIT_HASH = b093bbe7d9bc642c8f24067cbdcc73bb43562eab
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mirror/x264/archive
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
+PKG_VERS = 20180119-2245-stable
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)-snapshot-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://download.videolan.org/x264/snapshots
+PKG_DIR = $(PKG_NAME)-snapshot-$(PKG_VERS)
 
 DEPENDS =
-OPTIONAL_DEPENDS = native/nasm
 
-HOMEPAGE = https://www.videolan.org/developers/x264.html
+HOMEPAGE = http://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+# YASM_PATH = $(WORK_DIR)/../../../native/yasm/work-native/install/usr/local/bin
+NASM_PATH = $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin
+
 CONFIGURE_ARGS = --enable-shared --prefix=$(INSTALL_PREFIX) --enable-pic --cross-prefix=$(TC_PATH)$(TC_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM5_ARCHES) $(ARM7_ARCHES)),$(ARCH))
 ENV += x264_ARCH=ARM
 CONFIGURE_ARGS += --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(ARM8_ARCHES)),$(ARCH))
 ENV += x264_ARCH=aarch64
 CONFIGURE_ARGS += --disable-asm --host=arm-linux
 endif
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH), $(PPC_ARCHES)),$(ARCH))
 ENV += x264_ARCH=PPC
 CONFIGURE_ARGS += --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
+ifeq ($(findstring $(ARCH), $(x64_ARCHES)),$(ARCH))
+DEPENDS += native/nasm
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ENV += x264_ARCH=X86_64
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+
+ifeq ($(findstring $(ARCH), $(x86_ARCHES)),$(ARCH))
+DEPENDS += native/nasm
+ENV += AS=$(NASM_PATH)/nasm
+ENV += PATH=$(NASM_PATH):$$PATH
 ENV += x264_ARCH=X86
-endif
 endif

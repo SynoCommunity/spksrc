@@ -4,10 +4,11 @@ SPK_REV  = 2
 SPK_ICON = src/HE853.png
 
 DEPENDS = cross/$(SPK_NAME)
-REQUIRED_MIN_DSM = 5.0
+REQUIRED_DSM = 5.0
 
 MAINTAINER = ymartin59
 DESCRIPTION = HomeEasy HE853 USB device executable - https://github.com/hphde/he853-cli - Allows usage of 433MHz HomeEasy and Smartwares devices from your NAS.
+RELOAD_UI = no
 DISPLAY_NAME = HomeEasy HE853 USB device executable
 STARTABLE = no
 CHANGELOG = "Build for DSM 6.1 and upper"
@@ -18,6 +19,5 @@ HOMEPAGE   = https://github.com/hphde/he853-cli
 LICENSE    = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
-SPK_COMMANDS = bin/he853
 
 include ../../mk/spksrc.spk.mk

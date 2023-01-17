@@ -1,9 +1,9 @@
 SPK_NAME = mtproxy
 SPK_VERS = 1
-SPK_REV = 4
+SPK_REV = 3
 SPK_ICON = src/${SPK_NAME}.jpg
 
-REQUIRED_MIN_DSM = 5.2
+REQUIRED_DSM = 5.2
 BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
@@ -12,11 +12,12 @@ MAINTAINER = Anonym-tsk
 # From TelegramMessenger/MTProxy
 DESCRIPTION = Simple MT-Proto proxy server
 DESCRIPTION_RUS = Простой MT-Proto прокси сервер
+RELOAD_UI = yes
 STARTABLE = yes
 DISPLAY_NAME = MTProxy
-CHANGELOG = "1. Update openssl to 1.1."
+CHANGELOG =
 
-UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARM_ARCHES) $(PPC_ARCHES)
 
 HOMEPAGE = https://github.com/TelegramMessenger/MTProxy
 LICENSE  = GPL

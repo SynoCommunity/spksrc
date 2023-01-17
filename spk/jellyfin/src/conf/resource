@@ -1,6 +1,0 @@
-{
-  "video-driver": {},
-  "port-config": {
-    "protocol-file": "app/jellyfin.sc"
-  }
-}

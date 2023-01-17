@@ -1,19 +1,17 @@
 PKG_NAME = librsync
-PKG_VERS = 2.3.2
+PKG_VERS = 0.9.7
 PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/librsync/$(PKG_NAME)/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_DIR).$(PKG_EXT)
+PKG_DIST_SITE = http://downloads.sourceforge.net/project/librsync/$(PKG_NAME)/$(PKG_VERS)
 
-DEPENDS = cross/popt cross/zlib cross/bzip2
+DEPENDS =
 
-HOMEPAGE = http://librsync.sourcefrog.net
-COMMENT  = remote delta-compression library.
-LICENSE  = LPGL-2.1
+HOMEPAGE = http://librsync.sourceforge.net/
+COMMENT  = librsync is a free software library that implements the rsync remote-delta algorithm
+LICENSE  =
 
-CMAKE_ARGS += -D BZIP2_LIBRARIES=$(STAGING_INSTALL_PREFIX)/lib
-CMAKE_ARGS += -D ZLIB_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib
-CMAKE_ARGS += -Wno-dev
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static --enable-shared
 
-include ../../mk/spksrc.cross-cmake.mk
+include ../../mk/spksrc.cross-cc.mk

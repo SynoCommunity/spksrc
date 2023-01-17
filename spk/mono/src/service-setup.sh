@@ -1,8 +1,5 @@
-
-# mono service setup
-
 service_postinst ()
 {
-    # Sync ca certificates
-    ${SYNOPKG_PKGDEST}/bin/cert-sync /etc/ssl/certs/ca-certificates.crt
+    # Sync certificate
+    ${SYNOPKG_PKGDEST}/bin/cert-sync /etc/ssl/certs/ca-certificates.crt >> ${INST_LOG} 2>&1
 }

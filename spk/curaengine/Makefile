@@ -1,21 +1,23 @@
 SPK_NAME = curaengine
-SPK_VERS = 2.1.3
-SPK_REV = 2
+SPK_VERS = 15.04
+SPK_REV = 1
 SPK_ICON = src/curaengine.png
+BETA = 1
 
 DEPENDS = cross/$(SPK_NAME)
-
-# c++11 compiler required
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+REQUIRED_DSM = 5.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION  = CuraEngine is a powerful, fast and robust engine for processing 3D models into 3D printing instruction for Ultimaker and other GCode based 3D printers.
+STARTABLE = no
 DISPLAY_NAME = CuraEngine
 
-HOMEPAGE = https://ultimaker.com/software/ultimaker-cura
+HOMEPAGE = https://ultimaker.com
 LICENSE  = AGPLv3
 
-STARTABLE = no
-SPK_COMMANDS = bin/CuraEngine
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
+
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk

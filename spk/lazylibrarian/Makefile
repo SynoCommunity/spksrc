@@ -1,17 +1,18 @@
 SPK_NAME = lazylibrarian
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 7
+SPK_REV = 6
 SPK_ICON = src/lazylibrarian.png
 
-DEPENDS =
+DEPENDS  =
 SPK_DEPENDS = "python>2.7.3-3:git"
 
 MAINTAINER = Diaoul
 DESCRIPTION = LazyLibrarian is a program to follow authors and grab metadata for all your digital reading needs. It uses Goodreads.com for author info and book info websites as a source.
+RELOAD_UI = yes
 DISPLAY_NAME = LazyLibrarian
-CHANGELOG = "Fix DSM 6 service start."
+CHANGELOG = "1. Integrate with DSM5+6 Generic Service support and added to 'sc-download' group. 2. Selecting of fork for new installs. 3. Depend on Git for auto-updates"
 
-HOMEPAGE   = https://lazylibrarian.gitlab.io/
+HOMEPAGE   = http://github.com/DobyTang/LazyLibrarian
 LICENSE    = GPLv3
 STARTABLE  = yes
 

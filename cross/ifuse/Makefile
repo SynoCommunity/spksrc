@@ -2,8 +2,7 @@ PKG_NAME = ifuse
 PKG_VERS = 1.1.3
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-# commited on Oct 8, 2018
-PKG_GIT_HASH = e75d32c34d0e8b80320f0a007d5ecbb3f55ef7f0
+PKG_GIT_HASH = df048a1d07628a6a02ed77a8dc0f64930b78acee
 PKG_DIST_SITE = https://github.com/libimobiledevice/$(PKG_NAME).git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
@@ -16,22 +15,17 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = ifuse_pre_configure
-INSTALL_TARGET = ifuse_install
-IFUSE_AUTOGEN_ARGS =
+INSTALL_TARGET = ifuse_extra_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-IFUSE_AUTOGEN_ARGS += --host=arm-linux
-endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-IFUSE_AUTOGEN_ARGS += --host=ppc-linux
-endif
-
-.PHONY ifuse_pre_configure:
+ifeq ($(findstring $(ARCH), $(ARM_ARCHES)),$(ARCH))
 ifuse_pre_configure:
-	$(RUN) ./autogen.sh $(IFUSE_AUTOGEN_ARGS)
+	$(RUN) ; ./autogen.sh --host=arm-linux
+else
+ifuse_pre_configure:
+	$(RUN) ; ./autogen.sh
+endif
 
-.PHONY ifuse_install:
-ifuse_install:
+ifuse_extra_install:
 	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

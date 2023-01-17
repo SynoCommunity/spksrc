@@ -1,27 +1,23 @@
 PKG_NAME = umurmur
-PKG_VERS = 0.2.20
+PKG_VERS = 0.2.17
 PKG_EXT = tar.gz
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/umurmur/umurmur/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libconfig cross/protobuf-c cross/mbedtls
+DEPENDS = cross/libconfig cross/protobuf-c cross/openssl
 
 HOMEPAGE = https://github.com/umurmur/umurmur
-COMMENT  = uMurmur is a minimalistic Mumble server.
-LICENSE  = 3-clause BSD
+COMMENT  = Minimalistic Murmur (Mumble server)
+LICENSE  = BSD 3-clause License
 
-# 'cmake install' does not handle INSTALL_PREFIX/DESTDIR as expected.
-INSTALL_TARGET = umurmur_install
+CONFIGURE_TARGET = myConfigure
 
-CMAKE_ARGS = -DSSL=mbedtls
-# let cmake find include and library of mbedtls
-CMAKE_ARGS += -DCMAKE_STAGING_PREFIX=$(STAGING_INSTALL_PREFIX)
+CMAKE_ARGS = -DSSL=openssl -DCMAKE_INSTALL_PREFIX=$(STAGING_INSTALL_PREFIX)
 
-include ../../mk/spksrc.cross-cmake.mk
+include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: umurmur_install
-umurmur_install:
-	install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(CMAKE_BUILD_DIR)/bin/umurmurd $(STAGING_INSTALL_PREFIX)/bin
+.PHONY: myConfigure
+myConfigure:
+	$(RUN) cmake ${CMAKE_ARGS} .

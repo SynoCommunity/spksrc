@@ -1,3 +1,3 @@
-go1.19.5.linux-amd64.tar.gz SHA1 16d0f3caa4968749ca9c488cc5298ff9e0fbb6d0
-go1.19.5.linux-amd64.tar.gz SHA256 36519702ae2fd573c9869461990ae550c8c0d955cd28d2827a6b159fda81ff95
-go1.19.5.linux-amd64.tar.gz MD5 68a99766b7f2ea9bb6f5e431c8cfb658
+go1.11.1.src.tar.gz SHA1 70ea29428af285e75a1f7edbf884bc04a450ee0d
+go1.11.1.src.tar.gz SHA256 558f8c169ae215e25b81421596e8de7572bd3ba824b79add22fba6e284db1117
+go1.11.1.src.tar.gz MD5 eb9e9792247143705a7aacea9398cde0

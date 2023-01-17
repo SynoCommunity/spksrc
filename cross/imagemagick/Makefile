@@ -1,75 +1,34 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 7.1.0-52
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_VERS = 7.0.7-30
+PKG_EXT = tar.xz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = http://www.imagemagick.org/download/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm  cross/librsvg
+DEPENDS = cross/freetype cross/libpng cross/libxml2 cross/libtiff cross/libjpeg
 
-DEPENDS  = cross/jemalloc
-DEPENDS += cross/bzip2 
-DEPENDS += cross/xz
-DEPENDS += cross/zstd
-DEPENDS += cross/libxml2
-DEPENDS += cross/freetype
-DEPENDS += cross/fontconfig
-DEPENDS += cross/urw-base35-fonts
-DEPENDS += cross/dejavu
-DEPENDS += cross/openjpeg
-DEPENDS += cross/libjpeg
-DEPENDS += cross/jbigkit
-DEPENDS += cross/libpng
-DEPENDS += cross/libtiff
-DEPENDS += cross/libwmf
-DEPENDS += cross/libwebp
-DEPENDS += cross/djvulibre
-DEPENDS += cross/libtool
-DEPENDS += cross/libfpx
-DEPENDS += cross/fftw
-
-include ../../mk/spksrc.common.mk
-SUPPORT_CPP11 = 1
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-SUPPORT_CPP11 = 0
-endif
-ifeq ($(call version_lt, $(TCVERSION), 6.0)$(call version_ge, $(TCVERSION), 3.0),11)
-SUPPORT_CPP11 = 0
-endif
-ifeq ($(SUPPORT_CPP11),1)
-DEPENDS += cross/libheif
-DEPENDS += cross/libraw
-DEPENDS += cross/openexr
-DEPENDS += cross/libraqm
-DEPENDS += cross/librsvg
-endif
-
-HOMEPAGE = https://www.imagemagick.org/
+HOMEPAGE = http://www.imagemagick.org/
 COMMENT  = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
 LICENSE  = Apache 2.0
 
+UNSUPPORTED_ARCHS = powerpc ppc824x
+
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
-CONFIGURE_ARGS += --without-perl --without-x
-CONFIGURE_ARGS += --with-rsvg
-CONFIGURE_ARGS += --with-fpx
-CONFIGURE_ARGS += --with-fftw
-# magick *++* files fail to add to package by PLIST
-CONFIGURE_ARGS += --without-magick-plus-plus
-CONFIGURE_ARGS += --with-jemalloc
-CONFIGURE_ARGS += --with-modules
-CONFIGURE_ARGS += --with-dejavu-font-dir=$(INSTALL_PREFIX)/share/dejavu/fonts
-CONFIGURE_ARGS += --with-urw-base35-font-dir=$(INSTALL_PREFIX)/share/fonts
-CONFIGURE_ARGS += --with-windows-font-dir=$(INSTALL_PREFIX)/share/libwmf/fonts
+CONFIGURE_ARGS = --disable-installed --without-perl --without-x --without-fpx --without-wmf --disable-openmp
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# ARMv5 and PPC archs (except QorIQ) have older kernels
-# linking to lib rt fixes unreferenced clock_gettime
-CONFIGURE_ARGS += CFLAGS=-lrt
-endif
 
-ADDITIONAL_CFLAGS = -O2
+INSTALL_TARGET = imagemagick_extra_install
 
 include ../../mk/spksrc.cross-cc.mk
+
+imagemagick_extra_install:
+	$(RUN) make install prefix=$(STAGING_INSTALL_PREFIX) \
+	SHARE_PATH=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
+	DATA_DIR=$(STAGING_INSTALL_PREFIX)/share/ImageMagick-7/ \
+	CONFIGURE_PATH=$(STAGING_INSTALL_PREFIX)/etc/ImageMagick-6/ \
+	LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.7/ \
+	SHAREARCH_PATH=$(STAGING_INSTALL_PREFIX)/lib/ImageMagick-7.0.7/config-Q16 \
+	DOCUMENTATION_PATH=$(STAGING_INSTALL_PREFIX)/share/doc/ImageMagick-7 \
+	INCLUDE_PATH=$(STAGING_INSTALL_PREFIX)/include/ImageMagick-7 \
+	INCLUDEARCH_PATH=$(STAGING_INSTALL_PREFIX)/include/ImageMagick-7

@@ -1,0 +1,15 @@
+# Avoid an error with ppc853x-4.3
+--- encoder/sao.h.orig	2016-05-31 10:27:19.096685802 +0200
++++ encoder/sao.h	2016-05-31 10:32:49.833303929 +0200
+@@ -69,7 +69,11 @@
+     typedef int32_t (PerClass[MAX_NUM_SAO_TYPE][MAX_NUM_SAO_CLASS]);
+     typedef int32_t (PerPlane[NUM_PLANE][MAX_NUM_SAO_TYPE][MAX_NUM_SAO_CLASS]);
+
++#ifdef SPKSRC_FIX_PPC853X_4_3
++public:
++#else
+ protected:
++#endif
+
+     /* allocated per part */
+     PerPlane    m_count;

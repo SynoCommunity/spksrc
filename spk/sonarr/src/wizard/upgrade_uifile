@@ -1,0 +1,13 @@
+[{
+    "step_title": "Updating Sonarr",
+    "items": [{
+        "desc": "Keep Sonarr up-to-date by using Sonarr's built-in updater.<br>Navigate to System>Updates in the Sonarr UI."
+    }]
+},{
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
+    },{
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within Sonarr, manually set Read/Write permissions for the 'sc-download' group on the reported folders using File Station."
+    }]
+}]

@@ -1,9 +1,9 @@
-PYTHON_DIR="/var/packages/python/target/bin"
-GIT_DIR="/var/packages/git/target/bin"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${GIT_DIR}:${PATH}"
+PYTHON_DIR="/usr/local/python"
+GIT_DIR="/usr/local/git"
+PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
 HOME="${SYNOPKG_PKGDEST}/var"
-VIRTUALENV="${PYTHON_DIR}/virtualenv"
-GIT="${GIT_DIR}/git"
+VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+GIT="${GIT_DIR}/bin/git"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 SICKBEARD="${SYNOPKG_PKGDEST}/var/SickBeard/SickBeard.py"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/config.ini"
@@ -13,7 +13,7 @@ LEGACY_GROUP="sc-media"
 
 SERVICE_COMMAND="${PYTHON} ${SICKBEARD} --daemon --pidfile ${PID_FILE} --config ${CFG_FILE} --datadir ${SYNOPKG_PKGDEST}/var/"
 
-validate_preinst ()
+service_preinst ()
 {
     # Check fork
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/midgetspy/Sick-Beard.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
@@ -25,7 +25,7 @@ validate_preinst ()
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG}
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
@@ -38,7 +38,6 @@ service_postinst ()
 
     # Remove legacy user
     # Commands of busybox from spk/python
-    delgroup "${USER}" "users"
-    deluser "${USER}"
+    delgroup "${USER}" "users" >> ${INST_LOG}
+    deluser "${USER}" >> ${INST_LOG}
 }
-

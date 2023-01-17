@@ -1,0 +1,5 @@
+salt==2015.5.3
+Jinja2
+requests>=1.0.0
+CherryPy
+futures>=2.0

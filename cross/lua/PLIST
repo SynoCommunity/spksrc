@@ -1,6 +1,0 @@
-bin:bin/lua
-bin:bin/luac
-lib:lib/liblua.so
-lnk:lib/liblua.so.5.4
-lnk:lib/liblua.so.5.4.4
-

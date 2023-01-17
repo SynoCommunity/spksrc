@@ -1,0 +1,4 @@
+#!/bin/sh
+
+LOC=$(dirname "$(readlink -f "$0")")
+LC_ALL=en_US.UTF8 exec $LOC/tmux "$@"

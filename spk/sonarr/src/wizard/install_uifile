@@ -1,0 +1,11 @@
+[{
+    "step_title": "Updating Sonarr",
+    "items": [{
+        "desc": "The first time Sonarr is started it might take a few moments for the interface to become available!<br><br>Keep Sonarr up-to-date by using Sonarr's built-in updater.<br>Navigate to System>Updates in the Sonarr UI."
+    }]
+},{
+    "step_title": "Attention! DSM Permissions",
+    "items": [{
+        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
+    }]
+}]

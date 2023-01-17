@@ -1,29 +1,28 @@
 SPK_NAME = rdiff-backup
-SPK_VERS = 2.0.5
-SPK_REV = 4
+SPK_VERS = 1.2.8
+SPK_REV = 1
 SPK_ICON = src/rdiff-backup.png
 
-BUILD_DEPENDS = cross/python310
-DEPENDS = cross/librsync cross/attr cross/acl
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-
-SPK_DEPENDS = "python310"
+BUILD_DEPENDS = cross/python cross/setuptools cross/pip cross/wheel
+BUILD_DEPENDS += cross/$(SPK_NAME)
+DEPENDS = cross/librsync
+WHEELS = src/requirements.txt
+SPK_DEPENDS = "python>=2.7.8-9"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Reverse differential backup tool, over a network or locally.
+DESCRIPTION = A remote incremental backup of all your files
 STARTABLE = no
 DISPLAY_NAME = rdiff-backup
-CHANGELOG = "Update to v2.0.5 and update dependencies for Python 3.10"
+CHANGELOG = "Initial release"
+BETA = 1
 
-HOMEPAGE = https://rdiff-backup.net/
-LICENSE  = GPLv2
+HOMEPAGE = http://www.nongnu.org/rdiff-backup/
+LICENSE  = GNU GPL
 
-SERVICE_SETUP = src/service-setup.sh
+INSTALLER_SCRIPT = src/installer.sh
+SSS_SCRIPT       = src/dsm-control.sh
 
-SPK_USR_LOCAL_LINKS = bin:env/bin/rdiff-backup bin:env/bin/rdiff-backup-statistics
+INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
+

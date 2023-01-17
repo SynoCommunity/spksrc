@@ -1,0 +1,174 @@
+--- module/plugins/hooks/UpdateManager.py.orig	2012-10-13 10:31:30.000000000 +0200
++++ module/plugins/hooks/UpdateManager.py	2017-12-30 00:32:55.514653100 +0000
+@@ -1,27 +1,10 @@
+ # -*- coding: utf-8 -*-
+ 
+-"""
+-    This program is free software; you can redistribute it and/or modify
+-    it under the terms of the GNU General Public License as published by
+-    the Free Software Foundation; either version 3 of the License,
+-    or (at your option) any later version.
+-
+-    This program is distributed in the hope that it will be useful,
+-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+-    See the GNU General Public License for more details.
+-
+-    You should have received a copy of the GNU General Public License
+-    along with this program; if not, see <http://www.gnu.org/licenses/>.
+-
+-    @author: RaNaN
+-    @interface-version: 0.1
+-"""
+ 
+ import sys
+ import re
+-from os import stat
+-from os.path import join, exists
++from os import remove, stat
++from os.path import join, isfile
+ from time import time
+ 
+ from module.ConfigParser import IGNORE
+@@ -30,13 +13,13 @@
+ 
+ class UpdateManager(Hook):
+     __name__ = "UpdateManager"
+-    __version__ = "0.1"
++    __version__ = "0.16"
+     __description__ = """checks for updates"""
+     __config__ = [("activated", "bool", "Activated", "True"),
+-        ("interval", "int", "Check interval in minutes", "360"),
+-        ("debug", "bool", "Check for plugin changes when in debug mode", False)]
+-    __author_name__ = ("RaNaN")
+-    __author_mail__ = ("ranan@pyload.org")
++                  ("interval", "int", "Check interval in minutes", "480"),
++                  ("debug", "bool", "Check for plugin changes when in debug mode", False)]
++    __author_name__ = ("RaNaN", "stickell")
++    __author_mail__ = ("ranan@pyload.org", "l.stickell@yahoo.it")
+ 
+     @property
+     def debug(self):
+@@ -47,10 +30,10 @@
+         if self.debug:
+             self.logDebug("Monitoring file changes")
+             self.interval = 4
+-            self.last_check = 0 #timestamp of updatecheck
++            self.last_check = 0  # timestamp of updatecheck
+             self.old_periodical = self.periodical
+             self.periodical = self.checkChanges
+-            self.mtimes = {}  #recordes times
++            self.mtimes = {}  # recordes times
+         else:
+             self.interval = self.getConfig("interval") * 60
+ 
+@@ -65,17 +48,17 @@
+         if update:
+             self.info["pyload"] = True
+         else:
+-            self.log.info(_("No Updates for pyLoad"))
++            self.logInfo(_("No Updates for pyLoad"))
+             self.checkPlugins()
+ 
+         if self.updated and not self.reloaded:
+             self.info["plugins"] = True
+-            self.log.info(_("*** Plugins have been updated, please restart pyLoad ***"))
++            self.logInfo(_("*** Plugins have been updated, please restart pyLoad ***"))
+         elif self.updated and self.reloaded:
+-            self.log.info(_("Plugins updated and reloaded"))
++            self.logInfo(_("Plugins updated and reloaded"))
+             self.updated = False
+         else:
+-            self.log.info(_("No plugin updates available"))
++            self.logInfo(_("No plugin updates available"))
+ 
+     @Expose
+     def recheckForUpdates(self):
+@@ -83,18 +66,18 @@
+         self.periodical()
+ 
+     def checkForUpdate(self):
+-        """checks if an update is available"""
++        """checks if an update is available, return result"""
+ 
+         try:
+             version_check = getURL("http://get.pyload.org/check/%s/" % self.core.api.getServerVersion())
+             if version_check == "":
+                 return False
+             else:
+-                self.log.info(_("***  New pyLoad Version %s available  ***") % version_check)
+-                self.log.info(_("***  Get it here: http://pyload.org/download  ***"))
++                self.logInfo(_("***  New pyLoad Version %s available  ***") % version_check)
++                self.logInfo(_("***  Get it here: http://pyload.org/download  ***"))
+                 return True
+         except:
+-            self.log.warning(_("Not able to connect server for updates"))
++            self.logWarning(_("Not able to connect server for updates"))
+             return False
+ 
+ 
+@@ -102,12 +85,13 @@
+         """ checks for plugins updates"""
+ 
+         # plugins were already updated
+-        if self.info["plugins"]: return
++        if self.info["plugins"]:
++            return
+ 
+         try:
+             updates = getURL("http://get.pyload.org/plugins/check/")
+         except:
+-            self.log.warning(_("Not able to connect server for updates"))
++            self.logWarning(_("Not able to connect server for updates"))
+             return False
+ 
+         updates = updates.splitlines()
+@@ -138,7 +122,7 @@
+             if name in IGNORE or (type, name) in IGNORE:
+                 continue
+ 
+-            self.log.info(_("New version of %(type)s|%(name)s : %(version).2f") % {
++            self.logInfo(_("New version of %(type)s|%(name)s : %(version).2f") % {
+                 "type": type,
+                 "name": name,
+                 "version": float(version)
+@@ -164,6 +148,18 @@
+ 
+         self.reloaded = self.core.pluginManager.reloadPlugins(reloads)
+ 
++    def executeBlacklist(self, blacklist):
++        for b in blacklist:
++            type, name = b.split('|')
++            if isfile(join("userplugins", type, name)):
++                self.logInfo(_("Removing blacklisted plugin %(type)s|%(name)s") % {
++                    "type": type,
++                    "name": name
++                })
++                remove(join("userplugins", type, name))
++            if isfile(join("userplugins", type, name.replace('.py', '.pyc'))):
++                remove(join("userplugins", type, name.replace('.py', '.pyc')))
++
+     def checkChanges(self):
+ 
+         if self.last_check + self.getConfig("interval") * 60 < time():
+@@ -171,8 +167,8 @@
+             self.last_check = time()
+ 
+         modules = filter(
+-            lambda m: m and (m.__name__.startswith("module.plugins.") or m.__name__.startswith("userplugins.")),
+-            sys.modules.itervalues())
++            lambda m: m and (m.__name__.startswith("module.plugins.") or m.__name__.startswith(
++                "userplugins.")) and m.__name__.count(".") >= 2, sys.modules.itervalues())
+ 
+         reloads = []
+ 
+@@ -181,7 +177,8 @@
+             id = (type, name)
+             if type in self.core.pluginManager.plugins:
+                 f = m.__file__.replace(".pyc", ".py")
+-                if not exists(f): continue
++                if not isfile(f):
++                    continue
+ 
+                 mtime = stat(f).st_mtime
+ 

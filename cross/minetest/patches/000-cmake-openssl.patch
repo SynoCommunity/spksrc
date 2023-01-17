@@ -1,0 +1,27 @@
+--- src/CMakeLists.txt.orig	2018-06-10 15:18:11.000000000 +0000
++++ src/CMakeLists.txt	2019-01-30 12:39:15.302008800 +0000
+@@ -43,6 +43,10 @@
+ 		message(STATUS "cURL support enabled.")
+ 		set(USE_CURL TRUE)
+ 	endif()
++	find_package(OpenSSL)
++	if (NOT OPENSSL_FOUND)
++		message(WARNING "OpenSSL not found.")
++	endif()
+ else()
+ 	mark_as_advanced(CLEAR CURL_LIBRARY CURL_INCLUDE_DIR)
+ endif()
+@@ -678,6 +682,13 @@
+ 			${PROJECT_NAME}server
+ 			${CURL_LIBRARY}
+ 		)
++		if(OPENSSL_FOUND)
++			target_link_libraries(
++				${PROJECT_NAME}server
++				${OPENSSL_CRYPTO_LIBRARY}
++				${OPENSSL_SSL_LIBRARY}
++		)
++		endif()
+ 	endif()
+ endif(BUILD_SERVER)
+ 
