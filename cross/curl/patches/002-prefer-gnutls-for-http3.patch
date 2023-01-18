@@ -1,0 +1,295 @@
+# To use GNUTLS for http3 (ngtcp2) when USE_OPENSSL is defined too,
+# we must first check for USE_GNUTLS and apply code for.
+# 
+--- lib/vquic/ngtcp2.h.orig	2022-12-19 07:48:23.000000000 +0000
++++ lib/vquic/ngtcp2.h	2023-01-12 00:26:19.639594100 +0000
+@@ -60,11 +60,11 @@
+   ngtcp2_transport_params transport_params;
+   ngtcp2_connection_close_error last_error;
+   ngtcp2_crypto_conn_ref conn_ref;
+-#ifdef USE_OPENSSL
++#ifdef USE_GNUTLS
++  struct gtls_instance *gtls;
++#elif defined(USE_OPENSSL)
+   SSL_CTX *sslctx;
+   SSL *ssl;
+-#elif defined(USE_GNUTLS)
+-  struct gtls_instance *gtls;
+ #elif defined(USE_WOLFSSL)
+   WOLFSSL_CTX *sslctx;
+   WOLFSSL *ssl;
+
+--- lib/vquic/ngtcp2.c.orig	2022-12-19 07:48:23.000000000 +0000
++++ lib/vquic/ngtcp2.c	2023-01-12 00:15:39.967828400 +0000
+@@ -28,7 +28,10 @@
+ #include <ngtcp2/ngtcp2.h>
+ #include <nghttp3/nghttp3.h>
+ 
+-#ifdef USE_OPENSSL
++#ifdef USE_GNUTLS
++#include <ngtcp2/ngtcp2_crypto_gnutls.h>
++#include "vtls/gtls.h"
++#elif defined(USE_OPENSSL)
+ #include <openssl/err.h>
+ #ifdef OPENSSL_IS_BORINGSSL
+ #include <ngtcp2/ngtcp2_crypto_boringssl.h>
+@@ -36,9 +39,6 @@
+ #include <ngtcp2/ngtcp2_crypto_openssl.h>
+ #endif
+ #include "vtls/openssl.h"
+-#elif defined(USE_GNUTLS)
+-#include <ngtcp2/ngtcp2_crypto_gnutls.h>
+-#include "vtls/gtls.h"
+ #elif defined(USE_WOLFSSL)
+ #include <ngtcp2/ngtcp2_crypto_wolfssl.h>
+ #include "vtls/wolfssl.h"
+@@ -96,17 +96,17 @@
+ #define QUIC_MAX_DATA (1*1024*1024)
+ #define QUIC_IDLE_TIMEOUT (60*NGTCP2_SECONDS)
+ 
+-#ifdef USE_OPENSSL
+-#define QUIC_CIPHERS                                                          \
+-  "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_"               \
+-  "POLY1305_SHA256:TLS_AES_128_CCM_SHA256"
+-#define QUIC_GROUPS "P-256:X25519:P-384:P-521"
+-#elif defined(USE_GNUTLS)
++#ifdef USE_GNUTLS
+ #define QUIC_PRIORITY \
+   "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+AES-256-GCM:" \
+   "+CHACHA20-POLY1305:+AES-128-CCM:-GROUP-ALL:+GROUP-SECP256R1:" \
+   "+GROUP-X25519:+GROUP-SECP384R1:+GROUP-SECP521R1:" \
+   "%DISABLE_TLS13_COMPAT_MODE"
++#elif defined(USE_OPENSSL)
++#define QUIC_CIPHERS                                                          \
++  "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_"               \
++  "POLY1305_SHA256:TLS_AES_128_CCM_SHA256"
++#define QUIC_GROUPS "P-256:X25519:P-384:P-521"
+ #elif defined(USE_WOLFSSL)
+ #define QUIC_CIPHERS                                                          \
+   "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_"               \
+@@ -192,13 +192,7 @@
+   }
+ }
+ 
+-#ifdef USE_OPENSSL
+-static void keylog_callback(const SSL *ssl, const char *line)
+-{
+-  (void)ssl;
+-  Curl_tls_keylog_write_line(line);
+-}
+-#elif defined(USE_GNUTLS)
++#ifdef USE_GNUTLS
+ static int keylog_callback(gnutls_session_t session, const char *label,
+                     const gnutls_datum_t *secret)
+ {
+@@ -213,6 +207,12 @@
+   Curl_tls_keylog_write(label, crandom.data, secret->data, secret->size);
+   return 0;
+ }
++#elif defined(USE_OPENSSL)
++static void keylog_callback(const SSL *ssl, const char *line)
++{
++  (void)ssl;
++  Curl_tls_keylog_write_line(line);
++}
+ #elif defined(USE_WOLFSSL)
+ #if defined(HAVE_SECRET_CALLBACK)
+ static void keylog_callback(const WOLFSSL *ssl, const char *line)
+@@ -225,7 +225,60 @@
+ 
+ static int init_ngh3_conn(struct quicsocket *qs);
+ 
+-#ifdef USE_OPENSSL
++#ifdef USE_GNUTLS
++static CURLcode quic_init_ssl(struct quicsocket *qs,
++                              struct Curl_easy *data,
++                              struct connectdata *conn)
++{
++  CURLcode result;
++  gnutls_datum_t alpn[2];
++  /* this will need some attention when HTTPS proxy over QUIC get fixed */
++  const char * const hostname = qs->conn->host.name;
++  long * const pverifyresult = &data->set.ssl.certverifyresult;
++  int rc;
++
++  DEBUGASSERT(qs->gtls == NULL);
++  qs->gtls = calloc(1, sizeof(*(qs->gtls)));
++  if(!qs->gtls)
++    return CURLE_OUT_OF_MEMORY;
++
++  result = gtls_client_init(data, &conn->ssl_config, &data->set.ssl,
++                            hostname, qs->gtls, pverifyresult);
++  if(result)
++    return result;
++
++  gnutls_session_set_ptr(qs->gtls->session, &qs->conn_ref);
++
++  if(ngtcp2_crypto_gnutls_configure_client_session(qs->gtls->session) != 0) {
++    H3BUGF(fprintf(stderr,
++                   "ngtcp2_crypto_gnutls_configure_client_session failed\n"));
++    return CURLE_QUIC_CONNECT_ERROR;
++  }
++
++  rc = gnutls_priority_set_direct(qs->gtls->session, QUIC_PRIORITY, NULL);
++  if(rc < 0) {
++    H3BUGF(fprintf(stderr, "gnutls_priority_set_direct failed: %s\n",
++                   gnutls_strerror(rc)));
++    return CURLE_QUIC_CONNECT_ERROR;
++  }
++
++  /* Open the file if a TLS or QUIC backend has not done this before. */
++  Curl_tls_keylog_open();
++  if(Curl_tls_keylog_enabled()) {
++    gnutls_session_set_keylog_function(qs->gtls->session, keylog_callback);
++  }
++
++  /* strip the first byte (the length) from NGHTTP3_ALPN_H3 */
++  alpn[0].data = (unsigned char *)H3_ALPN_H3_29 + 1;
++  alpn[0].size = sizeof(H3_ALPN_H3_29) - 2;
++  alpn[1].data = (unsigned char *)H3_ALPN_H3 + 1;
++  alpn[1].size = sizeof(H3_ALPN_H3) - 2;
++
++  gnutls_alpn_set_protocols(qs->gtls->session, alpn, 2, GNUTLS_ALPN_MANDATORY);
++
++  return CURLE_OK;
++}
++#elif defined(USE_OPENSSL)
+ static SSL_CTX *quic_ssl_ctx(struct Curl_easy *data)
+ {
+   struct connectdata *conn = data->conn;
+@@ -350,59 +403,7 @@
+   SSL_set_tlsext_host_name(qs->ssl, hostname);
+   return CURLE_OK;
+ }
+-#elif defined(USE_GNUTLS)
+-static CURLcode quic_init_ssl(struct quicsocket *qs,
+-                              struct Curl_easy *data,
+-                              struct connectdata *conn)
+-{
+-  CURLcode result;
+-  gnutls_datum_t alpn[2];
+-  /* this will need some attention when HTTPS proxy over QUIC get fixed */
+-  const char * const hostname = qs->conn->host.name;
+-  long * const pverifyresult = &data->set.ssl.certverifyresult;
+-  int rc;
+-
+-  DEBUGASSERT(qs->gtls == NULL);
+-  qs->gtls = calloc(1, sizeof(*(qs->gtls)));
+-  if(!qs->gtls)
+-    return CURLE_OUT_OF_MEMORY;
+-
+-  result = gtls_client_init(data, &conn->ssl_config, &data->set.ssl,
+-                            hostname, qs->gtls, pverifyresult);
+-  if(result)
+-    return result;
+-
+-  gnutls_session_set_ptr(qs->gtls->session, &qs->conn_ref);
+-
+-  if(ngtcp2_crypto_gnutls_configure_client_session(qs->gtls->session) != 0) {
+-    H3BUGF(fprintf(stderr,
+-                   "ngtcp2_crypto_gnutls_configure_client_session failed\n"));
+-    return CURLE_QUIC_CONNECT_ERROR;
+-  }
+-
+-  rc = gnutls_priority_set_direct(qs->gtls->session, QUIC_PRIORITY, NULL);
+-  if(rc < 0) {
+-    H3BUGF(fprintf(stderr, "gnutls_priority_set_direct failed: %s\n",
+-                   gnutls_strerror(rc)));
+-    return CURLE_QUIC_CONNECT_ERROR;
+-  }
+-
+-  /* Open the file if a TLS or QUIC backend has not done this before. */
+-  Curl_tls_keylog_open();
+-  if(Curl_tls_keylog_enabled()) {
+-    gnutls_session_set_keylog_function(qs->gtls->session, keylog_callback);
+-  }
+-
+-  /* strip the first byte (the length) from NGHTTP3_ALPN_H3 */
+-  alpn[0].data = (unsigned char *)H3_ALPN_H3_29 + 1;
+-  alpn[0].size = sizeof(H3_ALPN_H3_29) - 2;
+-  alpn[1].data = (unsigned char *)H3_ALPN_H3 + 1;
+-  alpn[1].size = sizeof(H3_ALPN_H3) - 2;
+ 
+-  gnutls_alpn_set_protocols(qs->gtls->session, alpn, 2, GNUTLS_ALPN_MANDATORY);
+-
+-  return CURLE_OK;
+-}
+ #elif defined(USE_WOLFSSL)
+ 
+ static WOLFSSL_CTX *quic_ssl_ctx(struct Curl_easy *data)
+@@ -794,7 +795,8 @@
+         sockfd, ipbuf, port);
+ 
+   qs->version = NGTCP2_PROTO_VER_MAX;
+-#ifdef USE_OPENSSL
++#ifdef USE_GNUTLS
++#elif defined(USE_OPENSSL)
+   qs->sslctx = quic_ssl_ctx(data);
+   if(!qs->sslctx)
+     return CURLE_QUIC_CONNECT_ERROR;
+@@ -933,12 +935,7 @@
+     close(qs->qlogfd);
+     qs->qlogfd = -1;
+   }
+-#ifdef USE_OPENSSL
+-  if(qs->ssl)
+-    SSL_free(qs->ssl);
+-  qs->ssl = NULL;
+-  SSL_CTX_free(qs->sslctx);
+-#elif defined(USE_GNUTLS)
++#ifdef USE_GNUTLS
+   if(qs->gtls) {
+     if(qs->gtls->cred)
+       gnutls_certificate_free_credentials(qs->gtls->cred);
+@@ -947,6 +944,11 @@
+     free(qs->gtls);
+     qs->gtls = NULL;
+   }
++#elif defined(USE_OPENSSL)
++  if(qs->ssl)
++    SSL_free(qs->ssl);
++  qs->ssl = NULL;
++  SSL_CTX_free(qs->sslctx);
+ #elif defined(USE_WOLFSSL)
+   if(qs->ssl)
+     wolfSSL_free(qs->ssl);
+@@ -1691,7 +1693,14 @@
+   conn->quic = &conn->hequic[tempindex];
+ 
+   if(conn->ssl_config.verifyhost) {
+-#ifdef USE_OPENSSL
++#ifdef USE_GNUTLS
++    result = Curl_gtls_verifyserver(data, conn->quic->gtls->session,
++                                    &conn->ssl_config, &data->set.ssl,
++                                    hostname, disp_hostname,
++                                    data->set.str[STRING_SSL_PINNEDPUBLICKEY]);
++    if(result)
++      return result;
++#elif defined(USE_OPENSSL)
+     X509 *server_cert;
+     server_cert = SSL_get_peer_certificate(conn->quic->ssl);
+     if(!server_cert) {
+@@ -1701,13 +1710,6 @@
+     X509_free(server_cert);
+     if(result)
+       return result;
+-#elif defined(USE_GNUTLS)
+-    result = Curl_gtls_verifyserver(data, conn->quic->gtls->session,
+-                                    &conn->ssl_config, &data->set.ssl,
+-                                    hostname, disp_hostname,
+-                                    data->set.str[STRING_SSL_PINNEDPUBLICKEY]);
+-    if(result)
+-      return result;
+ #elif defined(USE_WOLFSSL)
+     if(wolfSSL_check_domain_name(conn->quic->ssl, snihost) == SSL_FAILURE)
+       return CURLE_PEER_FAILED_VERIFICATION;
+@@ -1716,7 +1718,8 @@
+   }
+   else
+     infof(data, "Skipped certificate verification");
+-#ifdef USE_OPENSSL
++#ifdef USE_GNUTLS
++#elif defined(USE_OPENSSL)
+   if(data->set.ssl.certinfo)
+     /* asked to gather certificate info */
+     (void)Curl_ossl_certchain(data, conn->quic->ssl);

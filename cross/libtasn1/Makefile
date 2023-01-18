@@ -12,7 +12,7 @@ COMMENT  = ASN.1 library used by GnuTLS, p11-kit and some other packages.
 LICENSE  = LGPLv2.1
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-gcc-warnings --disable-static
-ADDITIONAL_CFLAGS  = -std=gnu99
+CONFIGURE_ARGS = --disable-gcc-warnings --disable-static --disable-doc
+ADDITIONAL_CFLAGS = -std=gnu99 -O2
 
 include ../../mk/spksrc.cross-cc.mk

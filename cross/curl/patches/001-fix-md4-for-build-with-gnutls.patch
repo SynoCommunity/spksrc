@@ -1,4 +1,4 @@
-# fixed in curl > 0.87.0
+# fixed in curl > 7.87.0
 # apply fix https://github.com/curl/curl/pull/10142/files 
 # 
 --- lib/md4.c.orig	2022-12-19 07:48:23.000000000 +0000

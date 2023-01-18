@@ -14,6 +14,8 @@ OPTIONAL_DEPENDS += cross/libidn2
 OPTIONAL_DEPENDS += cross/libpsl
 OPTIONAL_DEPENDS += cross/librtmp
 OPTIONAL_DEPENDS += cross/nghttp2
+OPTIONAL_DEPENDS += cross/nghttp3
+OPTIONAL_DEPENDS += cross/ngtcp2
 OPTIONAL_DEPENDS += cross/gsasl
 OPTIONAL_DEPENDS += cross/gss
 OPTIONAL_DEPENDS += cross/zstd
@@ -35,6 +37,16 @@ CONFIGURE_ARGS += --with-ca-path=/usr/share/ca-certificates/mozilla
 
 ifneq ($(strip $(CURL_INCLUDE_EXECUTABLE)),1)
 PLIST_TRANSFORM = sed -e '/bin:bin/d'
+endif
+
+
+include ../../mk/spksrc.archs.mk
+ifneq ($(ARCH),)
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+HTTP3_SUPPORTED = 0
+else
+HTTP3_SUPPORTED = 1
+endif
 endif
 
 # optional dependencies to build curl with
@@ -75,6 +87,24 @@ DEPENDS += cross/nghttp2
 CONFIGURE_ARGS += --with-nghttp2
 endif
 
+ifeq ($(findstring nghttp3,$(BUILD_CURL_WITH)),nghttp3)
+ifneq ($(findstring gnutls,$(BUILD_CURL_WITH)),gnutls)
+# for http3 with openssl we would need an early verison of openssl 3 (like branch: openssl-3.0.7+quic)
+# so we use gnutls for http3 support only.
+$(error "ERROR: For curl with http3 support you must build with gnutls.")
+else
+ifneq ($(HTTP3_SUPPORTED),1)
+ifneq ($(ARCH),)
+$(warning "WARNING: HTTP3 is not supported for ARCH=$(ARCH)")
+endif
+else
+$(warning "WARNING: HTTP3 enabled but marked EXPERIMENTAL. Use with caution!")
+DEPENDS += cross/ngtcp2 cross/nghttp3
+CONFIGURE_ARGS += --with-ngtcp2 --with-nghttp3
+endif
+endif
+endif
+
 ifeq ($(findstring gsasl,$(BUILD_CURL_WITH)),gsasl)
 DEPENDS += cross/gsasl
 endif
@@ -102,7 +132,7 @@ endif
 
 ifeq ($(findstring websockets,$(BUILD_CURL_WITH)),websockets)
 CONFIGURE_ARGS += --enable-websockets
-$(warning  "Websockets enabled but marked EXPERIMENTAL. Use with caution!")
+$(warning  "WARNING: Websockets enabled but marked EXPERIMENTAL. Use with caution!")
 endif
 
 endif
