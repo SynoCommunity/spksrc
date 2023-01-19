@@ -3,8 +3,6 @@ SPK_VERS = 2.39.1
 SPK_REV = 26
 SPK_ICON = src/git.png
 
-# dummy change to force build...
-
 DEPENDS = cross/git
 OPTIONAL_DEPENDS = cross/git-lfs
 
