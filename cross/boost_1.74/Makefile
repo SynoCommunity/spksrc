@@ -7,15 +7,12 @@ PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/bzip2 cross/zlib
 
-# keep dedicated cross/boost version 1.70
-# - cross/mkvtoolnix v22.0 is not compatible with boost 1.69+ due to breaking API changes.
-# - mkvtoolnix 22.0 needs only 3 small patches for compatibility with boost 1.70.
-
 HOMEPAGE = https://www.boost.org/
 COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
 LICENSE  = https://www.boost.org/LICENSE_1_0.txt
 
 CONFIGURE_TARGET = boost_configure
+PRE_COMPILE_TARGET = boost_pre_compile
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
@@ -72,15 +69,18 @@ endif
 boost_configure:
 	$(RUN) ./bootstrap.sh $(CONFIGURE_ARGS)
 
-.PHONY: boost_compile
-boost_compile:
+.PHONY: boost_pre_compile
+boost_pre_compile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-ifneq ($(strip $(WITH_PYTHON)),)
+ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+
+.PHONY: boost_compile
+boost_compile:
 	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam
 
 .PHONY: boost_install

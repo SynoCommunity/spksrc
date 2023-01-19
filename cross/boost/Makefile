@@ -12,6 +12,7 @@ COMMENT  = Boost provides free peer-reviewed portable C++ source libraries.
 LICENSE  = https://www.boost.org/LICENSE_1_0.txt
 
 CONFIGURE_TARGET = boost_configure
+PRE_COMPILE_TARGET = boost_pre_compile
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
@@ -47,11 +48,6 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# fix compilation with newer compilers
-ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-endif
-
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 ADDRESS_MODEL = 64
 else
@@ -60,19 +56,31 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
+# fix compilation with newer compilers
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
+else
+ADDITIONAL_CXXFLAGS += -std=c++11
+endif
+
 .PHONY: boost_configure
 boost_configure:
 	$(RUN) ./bootstrap.sh $(CONFIGURE_ARGS)
 
-.PHONY: boost_compile
-boost_compile:
+.PHONY: boost_pre_compile
+boost_pre_compile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-	@echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-ifneq ($(strip $(WITH_PYTHON)),)
+	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+
+.PHONY: boost_compile
+boost_compile:
 	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam
 
 .PHONY: boost_install
