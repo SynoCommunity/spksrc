@@ -47,6 +47,12 @@ endif
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl
 DEPENDS += cross/geoip
+DEPENDS += cross/boost_1.78
+BOOST_LIBRARIES += system python chrono random
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
+ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
+ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 WHEELS_BUILD_ARGS += [libtorrent]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
@@ -61,12 +67,6 @@ include ../../mk/spksrc.spk.mk
 # Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
 ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
 WHEELS += src/requirements-crossenv-libtorrent.txt
-DEPENDS += cross/boost_1.78
-BOOST_LIBRARIES += system python chrono random
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
-ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
-ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 # Ensure build arguments matches boost_1.78
 WHEELS_CXXFLAGS += [libtorrent]
 WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
@@ -78,13 +78,7 @@ WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 else
 WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.74
-BOOST_LIBRARIES += system python chrono random
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_74_0
-ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
-ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
-# Ensure build arguments matches boost
+# Ensure build arguments matches boost_1.78
 WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 endif
 
