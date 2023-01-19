@@ -13,7 +13,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to libtorrent DSM7-2.0.8 and DSM6-1.2.18<br/>2. Update to OpenSSL 1.1.1s<br/>3. Fix Error: skipping tracker announce (unreachable)<br/>4. Enable debug_info mode level 3 for DSM6 builds"
+CHANGELOG = "1. Update to libtorrent DSM7-2.0.8 and DSM6-1.2.18<br/>2. Update to OpenSSL 1.1.1s<br/>3. Fix Error: skipping tracker announce (unreachable)<br/>4. Enable debug_info mode level 3 for DSM6 builds<br/>5. Fix issue with special characters on DSM7"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -47,6 +47,7 @@ endif
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl
 DEPENDS += cross/geoip
+DEPENDS += cross/libiconv
 DEPENDS += cross/boost_1.78
 BOOST_LIBRARIES += system python chrono random
 BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
@@ -77,7 +78,6 @@ WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 # DSM6 & archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
 else
 WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
-DEPENDS += cross/libiconv
 # Ensure build arguments matches boost_1.78
 WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 endif
