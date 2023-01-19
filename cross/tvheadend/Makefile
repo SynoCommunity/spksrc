@@ -12,6 +12,8 @@ DEPENDS  = cross/openssl cross/gnutls
 DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
 DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/pngquant
 DEPENDS += cross/curl
+# curl build needs additional configuration for gnutls and libssh2
+export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060

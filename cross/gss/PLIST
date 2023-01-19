@@ -1,0 +1,3 @@
+lnk:lib/libgss.so
+lnk:lib/libgss.so.3
+lib:lib/libgss.so.3.0.3
