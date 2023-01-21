@@ -38,7 +38,7 @@ start_daemon ()
         fi
     fi
     call_func "service_prestart"
-    printf "%s" "$SERVICE_COMMAND" | while read -r service
+    printf "%s" "$SERVICE_COMMAND" | while read -r service || [ -n "$service" ]
     do
         i=$((i + 1))
         if [ -z "${SVC_QUIET}" ]; then
