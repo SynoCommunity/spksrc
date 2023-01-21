@@ -10,7 +10,7 @@ if [ -r "${INST_VARIABLES}" ]; then
     while read -r _line; do
         _key="$(echo ${_line} | cut --fields=1 --delimiter='=')"
         _value="$(echo ${_line} | cut --fields=2- --delimiter='=')"
-        declare "${_key}=${_value}"
+        declare -g "${_key}=${_value}"
     done < ${INST_VARIABLES}
 fi
 
@@ -83,7 +83,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_root_user",
                   "desc": "MinIO root user",
-                  "defaultValue": "${WIZARD_ROOT_USER}",
+                  "defaultValue": "${MINIO_ROOT_USER}",
                   "validator": {
                      "allowBlank": false,
                      "minLength": 3,
@@ -101,7 +101,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_root_password",
                   "desc": "MinIO root password",
-                  "defaultValue": "${WIZARD_ROOT_PASSWORD}",
+                  "defaultValue": "${MINIO_ROOT_PASSWORD}",
                   "validator": {
                      "allowBlank": false,
                      "minLength": 8,

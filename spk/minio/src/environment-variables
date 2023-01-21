@@ -2,4 +2,4 @@
 # see: https://docs.min.io/docs/minio-server-configuration-guide.html
 #
 # example:
-#export MINIO_DOMAIN=mydomain.com
+#MINIO_DOMAIN=mydomain.com
