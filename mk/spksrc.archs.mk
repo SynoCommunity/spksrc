@@ -55,3 +55,6 @@ DOTNET_UNSUPPORTED_ARCHS += armadaxp
 
 # compatibility with .NET not yet confirmed:
 # alpine4k armada375 armada38x comcerto2k
+
+# .NET testing for generic ARMv7 archs
+DOTNET_UNSUPPORTED_ARCHSv3 = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)

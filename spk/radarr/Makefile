@@ -5,7 +5,7 @@ SPK_ICON = src/radarr.png
 
 DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHSv3)
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
