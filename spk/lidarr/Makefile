@@ -1,11 +1,11 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/lidarr.png
 
 DEPENDS = cross/lidarr cross/libstdc++ cross/sqlite
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHSv3)
 
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/

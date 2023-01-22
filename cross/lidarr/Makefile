@@ -7,7 +7,7 @@ PKG_DIR = Lidarr
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(i686_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHSv3)
 
 HOMEPAGE = https://lidarr.audio/
 COMMENT  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
