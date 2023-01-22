@@ -5,7 +5,7 @@ SPK_ICON = src/sonarr.png
 
 DEPENDS = cross/sonarr cross/libstdc++ cross/sqlite
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHSv3)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Sonarr is a PVR for newsgroup and torrent users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.

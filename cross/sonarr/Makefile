@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHSv3)
 
 HOMEPAGE = https://sonarr.tv
 COMMENT  = Sonarr is a PVR for newsgroup users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
