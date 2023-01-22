@@ -119,4 +119,4 @@ homeassistant_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/var
 	@install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/
 	@install -m 644 src/hacs.tar.gz $(STAGING_DIR)/share/
-	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/
+	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/requirements-custom.txt.new

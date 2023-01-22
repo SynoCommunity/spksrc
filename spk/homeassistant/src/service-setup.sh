@@ -45,7 +45,7 @@ service_postinst ()
         echo "Create pip cache directory: ${PIP_CACHE_DIR}"
         $MKDIR ${PIP_CACHE_DIR}
     fi
-    
+
     echo ${separator}
     echo "Install Python virtual environment"
     install_python_virtualenv
@@ -71,10 +71,21 @@ service_postinst ()
     echo "Install packages for homeassistant.components from index"
     pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
 
-    if [ -e ${SYNOPKG_PKGVAR}/requirements-custom.txt ]; then
-        echo ${separator}
-        echo "Install custom packages from index"
-        pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGVAR}/requirements-custom.txt
+
+    if [ "${SYNOPKG_PKG_STATUS}" == "UPGRADE" ]; then
+        if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
+            # restore custom requirements file
+            if [ -f ${TMP_DIR}/requirements-custom.txt ]; then
+                $CP ${TMP_DIR}/requirements-custom.txt ${SYNOPKG_PKGVAR}/requirements-custom.txt
+            fi
+        fi
+        if [ -e ${SYNOPKG_PKGVAR}/requirements-custom.txt ]; then
+            echo ${separator}
+            echo "Install custom packages from index"
+            pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGVAR}/requirements-custom.txt
+        fi
+    else
+        $MV ${SYNOPKG_PKGVAR}/requirements-custom.txt.new ${SYNOPKG_PKGVAR}/requirements-custom.txt
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
