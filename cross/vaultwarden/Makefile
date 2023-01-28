@@ -19,7 +19,7 @@ HOMEPAGE = https://github.com/dani-garcia/vaultwarden/wiki
 COMMENT = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 LICENSE = GPLv3
 
-CARGO_BUILD_ARGS = --features sqlite,mysql,postgresql
+CARGO_INSTALL_ARGS = --features sqlite,mysql,postgresql
 
 ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 # prevent reading version from local git repository:
