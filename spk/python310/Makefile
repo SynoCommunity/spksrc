@@ -28,7 +28,7 @@ POST_STRIP_TARGET = python310_extra_install
 SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 
 WHEELS  = src/requirements-pure.txt
-# WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-crossenv.txt
 # WHEELS += src/requirements-abi3.txt
 
 # Force building pure-python wheels
@@ -41,8 +41,8 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 ##
 
 # # [bcrypt]
-# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # # [cryptography]
 # # To generate py36-abi3 limited API:
