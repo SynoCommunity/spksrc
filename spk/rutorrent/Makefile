@@ -4,17 +4,10 @@ SPK_REV = 13
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-SPK_DEPENDS = "python310:PHP7.3"
+SPK_DEPENDS = "python310:PHP7.4"
 WHEELS = src/requirements-pure.txt
 
-DEPENDS =
-DEPENDS += cross/busybox
-DEPENDS += cross/curl 
-DEPENDS += cross/mediainfo 
-DEPENDS += cross/rtorrent 
-DEPENDS += cross/rutorrent 
-DEPENDS += cross/screen 
-DEPENDS += cross/unzip
+DEPENDS = cross/busybox cross/curl cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
 DEPENDS += cross/sox
 
 BUSYBOX_CONFIG = procutils
@@ -53,7 +46,9 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_download_dir
 
-SERVICE_COMMAND = screen -D -m rtorrent
+# Required environment variables will be injected in service-setup.sh
+SERVICE_COMMAND = /var/packages/rutorrent/target/bin/rtorrent-daemon
+
 FWPORTS = src/rutorrent.sc
 CONF_DIR = src/conf/
 WIZARDS_DIR = $(WORK_DIR)/generated-wizards
@@ -105,6 +100,8 @@ generated-wizards:
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
 	install -m 755 -d $(STAGING_DIR)/var/.session
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
 	install -m 775 -d $(STAGING_DIR)/tmp

@@ -1,7 +1,5 @@
 # Package
 PACKAGE="rutorrent"
-DNAME="ruTorrent"
-PACKAGE_NAME="com.synocommunity.packages.${PACKAGE}"
 
 # Define python310 binary path
 PYTHON_DIR="/var/packages/python310/target/bin"
@@ -9,9 +7,7 @@ PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 # Others
 DSM6_WEB_DIR="/var/services/web"
-CURL=${SYNOPKG_PKGDEST}/bin/curl
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-  CURL=/bin/curl
   WEB_DIR="/var/services/web_packages"
 else
   WEB_DIR="${DSM6_WEB_DIR}"
@@ -36,14 +32,7 @@ PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
 LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
-# Watch out for LD_LIBRARY_PATH as it needs to be prefixed by /usr/bin directory otherwise php binary
-# may not be loading appropriately libz. See https://github.com/SynoCommunity/spksrc/issues/5288 for more
-# details on the symptoms.
-SERVICE_COMMAND="env RTORRENT_RC=${RTORRENT_RC} HOME=${SYNOPKG_PKGVAR} PATH=${PATH} LD_LIBRARY_PATH=/usr/lib:${SYNOPKG_PKGDEST}/lib:${LD_LIBRARY_PATH} ${SERVICE_COMMAND}"
-
-if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${RTORRENT_RC}" ]; then
-  SERVICE_COMMAND="${SERVICE_COMMAND} -n -o import=${RTORRENT_RC}"
-fi
+SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST} ${SERVICE_COMMAND}"
 
 validate_preinst ()
 {
@@ -76,7 +65,7 @@ fix_shared_folders_rights()
     echo "Fixing shared folder rights for ${folder}"
 
     # Delete any previous ACL to limit duplicates
-    synoacltool -get "${folder}" >/dev/null && synoacltool -del "${folder}"
+    synoacltool -get "${folder}" >/dev/null 2>&1 && synoacltool -del "${folder}"
 
     # Set default user to sc-rutorrent and group to http
     chown -R "${EFF_USER}:${APACHE_USER}" "${folder}"
@@ -124,7 +113,7 @@ service_postinst ()
           echo -e "<Directory \"${RUTORRENT_WEB_DIR}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
       else
           if [ -d "/etc/php/conf.d/" ]; then
-              echo -e "[PATH=${RUTORRENT_WEB_DIR}]\nopen_basedir = Null" > /etc/php/conf.d/${PACKAGE_NAME}.ini
+              echo -e "[PATH=${RUTORRENT_WEB_DIR}]\nopen_basedir = Null" > /etc/php/conf.d/com.synocommunity.packages.${PACKAGE}.ini
           fi
       fi
     fi
