@@ -28,6 +28,10 @@ echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
 
+# Remove rust toolchain status file to enfore re-installing
+# to avoid lack of installed version due to caching
+rm -f toolchain/syno-${GH_ARCH}/work/.rustc_done
+
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}
 else

@@ -17,9 +17,6 @@ echo "::group:: ---- find dependent packages"
 make setup-synocommunity
 DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
-# Remove rust toolchain status file to enfore re-installing
-rm -f toolchain/syno-*/work/.rustc_done
-
 # filter for changes made in the spk directories and take unique package name (without spk folder)
 SPK_TO_BUILD+=" "
 SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
