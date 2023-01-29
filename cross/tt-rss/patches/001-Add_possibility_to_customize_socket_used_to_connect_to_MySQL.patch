@@ -4,8 +4,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/classes/db.php b/classes/db.php
---- a/classes/db.php	(revision 36e174750ee61e1a7856e9459e2d91deb4f8f93f)
-+++ b/classes/db.php	(date 1631473774000)
+--- a/classes/db.php	(revision c30b24d09f4096e612965af658540595262f6848)
++++ b/classes/db.php	(date 1673518844000)
 @@ -35,8 +35,12 @@
  		} else {
  			$db_charset = '';
@@ -26,17 +26,18 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/classes/config.php b/classes/config.php
---- a/classes/config.php	(revision 36e174750ee61e1a7856e9459e2d91deb4f8f93f)
-+++ b/classes/config.php	(date 1631483474000)
-@@ -34,6 +34,8 @@
- 	const MYSQL_CHARSET = "MYSQL_CHARSET";
- 	// connection charset for MySQL. if you have a legacy database and/or experience
- 	// garbage unicode characters with this option, try setting it to a blank string.
+--- a/classes/config.php	(revision c30b24d09f4096e612965af658540595262f6848)
++++ b/classes/config.php	(date 1673518844000)
+@@ -45,6 +45,9 @@
+	/** connection charset for MySQL. if you have a legacy database and/or experience
+	 * garbage unicode characters with this option, try setting it to a blank string. */
+	const MYSQL_CHARSET = "MYSQL_CHARSET";
++
++	/** Path to the MySQL Socket to use for connecting */ 
 +	const MYSQL_DB_SOCKET = "MYSQL_DB_SOCKET";
-+	// Path to the MySQL Socket to use for connecting
- 
- 	const SELF_URL_PATH = "SELF_URL_PATH";
- 	// this should be set to a fully qualified URL used to access
+
+	/** this should be set to a fully qualified URL used to access
+	 * your tt-rss instance over the net, such as: https://example.com/tt-rss/
 @@ -182,6 +184,7 @@
  		Config::DB_PASS => [ "", 											Config::T_STRING ],
  		Config::DB_PORT => [ "5432",										Config::T_STRING ],
