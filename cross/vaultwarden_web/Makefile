@@ -1,5 +1,5 @@
 PKG_NAME = vaultwarden_web
-PKG_VERS = 2022.9.0
+PKG_VERS = 2023.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = bw_web_v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dani-garcia/bw_web_builds/releases/download/v$(PKG_VERS)
