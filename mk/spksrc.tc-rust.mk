@@ -39,8 +39,13 @@ rustc_msg:
 	@$(MSG) "- default PATH: $(PATH)"
 
 pre_rustc_target: rustc_msg
-	@$(MSG) "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path"
-	@curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+	@$(MSG) "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path" ; \
+	exec 5> /tmp/tc-rustc.lock ; \
+	flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
+	pid=$$$$ ; \
+	echo "$${pid}" 1>&5 ; \
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path ; \
+	flock -u 5
 
 rustc_target: $(PRE_RUSTC_TARGET)
 	@$(MSG) "rustup toolchain install $(RUST_TOOLCHAIN)" ; \
