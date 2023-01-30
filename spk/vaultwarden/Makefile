@@ -32,8 +32,6 @@ include ../../mk/spksrc.spk.mk
 # Set library path to find shared libraries and install template files
 vaultwarden_custom_install:
 	@$(MSG) "Set library runpath in vaultwarden executable."
-	@sudo apt-get update 
-	@sudo apt-get install -y patchelf
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/vaultwarden
 	@$(MSG) "Install template files for config.json and .env."
 	@install -d -m 775 $(STAGING_DIR)/var
