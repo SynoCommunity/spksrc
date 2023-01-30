@@ -1,5 +1,5 @@
 SPK_NAME = restic
-SPK_VERS = 0.15.0
+SPK_VERS = 0.15.1
 SPK_REV = 1
 SPK_ICON = src/logo.png
 
