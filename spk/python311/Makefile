@@ -28,7 +28,7 @@ POST_STRIP_TARGET = python311_extra_install
 SPK_USR_LOCAL_LINKS = bin:bin/python3.11
 
 WHEELS  = src/requirements-pure.txt
-WHEELS += src/requirements-crossenv.txt
+# WHEELS += src/requirements-crossenv.txt
 # WHEELS += src/requirements-abi3.txt
 
 # Force building pure-python wheels
