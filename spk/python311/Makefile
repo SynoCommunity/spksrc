@@ -28,8 +28,8 @@ POST_STRIP_TARGET = python311_extra_install
 SPK_USR_LOCAL_LINKS = bin:bin/python3.11
 
 WHEELS  = src/requirements-pure.txt
-#WHEELS += src/requirements-crossenv.txt
-#WHEELS += src/requirements-abi3.txt
+WHEELS += src/requirements-crossenv.txt
+# WHEELS += src/requirements-abi3.txt
 
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -40,17 +40,17 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 ## various wheels.  Uncoment to enable.
 ##
 
-# # [bcrypt]
-# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Mandatory for rustc wheel building
+#   [bcrypt]
+#   [cryptography]
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # # [cryptography]
-# # To generate py36-abi3 limited API:
-# DEPENDS += cross/cryptography
-# # To generate py311-py311 regular build using src/requirements-crossenv.txt:
+# # Use cross/cryptography to generate py36-abi3 limited API
 # # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# #       To generate py310-py310 regular build use src/requirements-crossenv.txt
+# DEPENDS += cross/cryptography
 
 # # [gevent]
 # DEPENDS += cross/libev cross/c-ares
