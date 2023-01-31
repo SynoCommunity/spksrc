@@ -54,10 +54,10 @@ if [ -r "${SVC_SETUP}" ]; then
 fi
 
 
-# Reload wizard variables stored by postinst
-call_func "reload_inst_variables"
+# Load (wizard) variables stored by postinst
+call_func "load_variables_from_file" ${INST_VARIABLES}
 
-# init variables either reloaded, from package or from wizard
+# init variables either from ${INST_VARIABLES}, from package or from wizard
 call_func "initialize_variables"
 
 

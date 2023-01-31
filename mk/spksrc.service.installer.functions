@@ -2,8 +2,11 @@
 ### common installer functions and variables for synocommunity generic service installer
 # 
 # functions are common for all DSM versions
+#
+# The script must be sh/ash compatible and not use bash syntax.
+# SRM and DSM < 6.0 have only the busybox built-in shell an not bash
 # 
-
+    
 # Tools shortcuts
 MV="/bin/mv -f"
 RM="/bin/rm -rf"
@@ -98,18 +101,20 @@ install_python_wheels ()
 }
 
 
-reload_inst_variables ()
+# function to read and export variables from a text file
+# empty lines and lines starting with # are ignored
+# we cannot 'source' the file to load the variables, when values have special characters like <, >, ...
+load_variables_from_file ()
 {
-    # Reload wizard variables stored by postinst
-    if [ -r "${INST_VARIABLES}" ]; then
-        # we cannot source the file to reload variables, when values have special characters.
-        # This works even with following characers (e.g. for passwords): " ' < \ > :space: = $ | ...
-        while read -r _line; do
-            _key="$(echo ${_line} | cut --fields=1 --delimiter='=')"
-            _value="$(echo ${_line} | cut --fields=2- --delimiter='=')"
-            declare "${_key}=${_value}"
-        done < ${INST_VARIABLES}
-    fi
+   if [ -n "$1" -a -r "$1" ]; then
+      while read -r _line; do
+        if [ "$(echo ${_line} | grep -v ^[/s]*#)" != "" ]; then
+           _key="$(echo ${_line} | cut --fields=1 --delimiter==)"
+           _value="$(echo ${_line} | cut --fields=2- --delimiter==)"
+           export "${_key}=${_value}"
+        fi
+      done < "$1"
+   fi
 }
 
 
