@@ -1,6 +1,6 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/sonarr.png
 
 # Mono is not supported on ppc platforms. See cross/mono/Makefile for details.
