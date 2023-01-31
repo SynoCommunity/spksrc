@@ -97,29 +97,6 @@ ifeq ($(call version_lt, ${TCVERSION}, 7),1)
 GCC_DEBUG_INFO := 1
 endif
 
-# # [libtorrent] - generic
-# UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-# DEPENDS += cross/openssl
-# DEPENDS += cross/boost_1.78
-# DEPENDS += cross/geoip
-# BOOST_LIBRARIES += system python chrono random
-# BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
-# ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-# ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
-# ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
-# WHEELS_BUILD_ARGS += [libtorrent]
-# WHEELS_BUILD_ARGS += build_ext
-# WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
-# ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
-# WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
-# endif
-
-# # [libtorrent] 2.0.7
-# # DSM7 only due to c++14 minimal requirement
-# # Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
-# # archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
-# UNSUPPORTED_ARCHS += comcerto2k
-
 include ../../mk/spksrc.spk.mk
 
 # # [greenlet]
@@ -127,23 +104,6 @@ include ../../mk/spksrc.spk.mk
 # WHEELS += src/requirements-crossenv-greenlet.txt
 # else
 # WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
-# endif
-
-# # [libtorrent]
-# ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
-# # [libtorrent] 2.0.7
-# WHEELS += src/requirements-crossenv-libtorrent.txt
-# # Ensure build arguments matches boost_1.78
-# WHEELS_CXXFLAGS += [libtorrent]
-# WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
-# WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
-# WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-# else
-# # [libtorrent] 1.2.17
-# WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
-# DEPENDS += cross/libiconv
-# # Ensure build arguments matches boost
-# WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 # endif
 
 # # [numpy] <= 1.21.6
