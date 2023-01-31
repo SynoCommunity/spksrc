@@ -1,10 +1,12 @@
 PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 #
+# Set default language
+export LC_ALL=en_US.UTF-8
+#
 CFG_PATH="${SYNOPKG_PKGVAR}"
 CFG_FILE="${SYNOPKG_PKGVAR}/core.conf"
 CFG_WATCH="${SYNOPKG_PKGVAR}/autoadd.conf"
-LANGUAGE="env LANG=en_US.UTF-8"
 #
 DELUGE_LOGS="${SYNOPKG_PKGVAR}/logs"
 #
