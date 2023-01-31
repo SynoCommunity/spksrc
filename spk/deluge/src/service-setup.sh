@@ -49,7 +49,7 @@ deluge_default_install ()
 
     incomplete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
     complete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
-    watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+    watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch-deluge"
 
     # Create download directories
     install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${incomplete_folder}"
