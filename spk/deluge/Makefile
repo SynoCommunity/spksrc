@@ -44,8 +44,8 @@ PYTHON_LIMITED_API=cp36
 
 include ../../mk/spksrc.common.mk
 
+# Enable debug_info builds for DSM6 for segfault tracking
 ifeq ($(call version_lt, ${TCVERSION}, 7),1)
-# Enable debug builds
 GCC_DEBUG_INFO := 1
 endif
 

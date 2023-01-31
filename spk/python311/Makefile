@@ -92,10 +92,10 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_lt, ${TCVERSION}, 7),1)
-# Enable debug builds
-GCC_DEBUG_INFO := 1
-endif
+# # Enable debug_info builds for DSM6
+# ifeq ($(call version_lt, ${TCVERSION}, 7),1)
+# GCC_DEBUG_INFO := 1
+# endif
 
 include ../../mk/spksrc.spk.mk
 

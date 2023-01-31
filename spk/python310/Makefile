@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.9<br/>2. Enable debug_info mode level 3 for DSM6 builds"
+CHANGELOG = "1. Update to Python 3.10.9"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -92,10 +92,10 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_lt, ${TCVERSION}, 7),1)
-# Enable debug builds
-GCC_DEBUG_INFO := 1
-endif
+# # Enable debug_info builds for DSM6
+# ifeq ($(call version_lt, ${TCVERSION}, 7),1)
+# GCC_DEBUG_INFO := 1
+# endif
 
 include ../../mk/spksrc.spk.mk
 
