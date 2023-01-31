@@ -35,8 +35,12 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = deluge_extra_install
 
+# [cryptography]
+# To generate py36-abi3 limited API
+DEPENDS += cross/cryptography
+
 # [rencode]
-PYTHON_LIMITED_API=cp37
+PYTHON_LIMITED_API=cp36
 
 include ../../mk/spksrc.common.mk
 
