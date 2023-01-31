@@ -5,7 +5,9 @@ SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python310
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt src/requirements-abi3.txt
+WHEELS  = src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt
+WHEELS += src/requirements-abi3.txt
 
 SPK_DEPENDS = "python310"
 
