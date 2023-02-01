@@ -5,7 +5,9 @@ SPK_ICON = src/lidarr.png
 
 DEPENDS = cross/lidarr cross/libstdc++ cross/sqlite
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
+# custom exclusions for dotNET 6 on ARMv7 archs
+UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
 
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
