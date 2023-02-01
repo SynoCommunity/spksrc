@@ -8,14 +8,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
-# custom exclusions for dotNET 6 on ARMv7 archs
-include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-UNSUPPORTED_ARCHS += $(ARMv7_ARCHS)
-else
-UNSUPPORTED_ARCHS += armada370
-endif
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
 
 MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
