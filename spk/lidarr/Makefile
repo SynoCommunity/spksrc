@@ -5,12 +5,12 @@ SPK_ICON = src/lidarr.png
 
 DEPENDS = cross/lidarr cross/libstdc++ cross/sqlite
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-CHANGELOG = "1. Update Lidarr to v1.0.2.<br/>2. Use alternate TMP directory to provide enough space for internal updater.<br/>3. Enlarge the service start/stop timeout to 90 seconds.<br/>4. Avoid Lidarr downgrade on package update."
+CHANGELOG = "1. Fix package update.<br>2. Add support for x86 (32-bit) architecture."
 DISPLAY_NAME = Lidarr
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
