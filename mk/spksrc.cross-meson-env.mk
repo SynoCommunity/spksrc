@@ -24,13 +24,13 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
   MESON_BUILTIN_CPP_ARGS = -fPIC
-  MESON_HOST_CPU_FAMILY = armv
+  MESON_HOST_CPU_FAMILY = arm
   MESON_HOST_CPU = armv7
   MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
   MESON_BUILTIN_CPP_ARGS = -fPIC
-  MESON_HOST_CPU_FAMILY = armv
+  MESON_HOST_CPU_FAMILY = arm
   MESON_HOST_CPU = armv7l
   MESON_HOST_ENDIAN = little
 endif
