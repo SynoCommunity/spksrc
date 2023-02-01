@@ -21,6 +21,8 @@ STARTABLE = no
 HOMEPAGE = https://gstreamer.freedesktop.org/
 LICENSE  = LGPLv2.1
 
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 CONF_DIR = src/conf
 
 include ../../mk/spksrc.common.mk
