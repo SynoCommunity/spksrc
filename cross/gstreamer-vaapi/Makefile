@@ -5,8 +5,15 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gstreamer-vaapi
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+DEPENDS = cross/libudev_219
+else
+DEPENDS = cross/libudev_204
+endif
+
 DEPENDS  = cross/glib
-DEPENDS  = cross/libudev
 DEPENDS += cross/libva
 DEPENDS += cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
