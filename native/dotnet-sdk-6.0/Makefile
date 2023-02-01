@@ -1,5 +1,5 @@
 PKG_NAME = dotnet-sdk-6.0
-# Version 6.0.9, SDK 6.0.401
+# Version 6.0.13, SDK 6.0.405
 # https://dotnet.microsoft.com/download/dotnet/6.0
 PKG_VERS = 6.0.405
 PKG_EXT = tar.gz
