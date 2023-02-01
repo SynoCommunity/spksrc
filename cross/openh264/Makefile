@@ -1,15 +1,10 @@
 PKG_NAME = openh264
-PKG_VERS = 2.3.0
+PKG_VERS = 2.3.1
 PKG_EXT = tar.gz
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-#PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-#PKG_DIST_SITE = https://github.com/cisco/openh264/archive/refs/tags
-#PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-# git hash from June 5th 2022 - preparation for 2.3 tag
-PKG_GIT_HASH = 8fe55e3f4accac7fd1af4262bcd6eff5d008396d
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
-PKG_DIST_SITE = https://github.com/cisco/openh264/archive
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/cisco/openh264/archive/refs/tags
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
@@ -21,7 +16,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 CONFIGURE_ARGS += -Dtests=disabled
 
-POST_INSTALL_TARGET = openh264_post-install
+POST_INSTALL_TARGET = openh264-post_install
 
 BUILD_DEPENDS = native/nasm
 NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
@@ -30,8 +25,8 @@ ENV += AS=$(NASM_PATH)/nasm
 
 include ../../mk/spksrc.cross-meson.mk
 
-.PHONY: openh264_post-install
-openh264_post-install:
+.PHONY: openh264-post_install
+openh264-post_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/builddir/codec/console/dec/h264dec $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/builddir/codec/console/enc/h264enc $(STAGING_INSTALL_PREFIX)/bin
