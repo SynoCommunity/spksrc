@@ -1,5 +1,5 @@
 SPK_NAME = gstreamer
-SPK_VERS = 1.20.3
+SPK_VERS = 1.20.5
 SPK_REV = 1
 SPK_ICON = src/gstreamer.png
 
