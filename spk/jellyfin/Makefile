@@ -8,13 +8,14 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+# x64 and armv8 archs are supported only.
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.8.9<br>2. Update dotnet 6.0.405"
+CHANGELOG = "1. Update jellyfin to 10.8.9<br/>2. Update dotnet to 6.0.13<br/>3. Remove support for 32-bit archs."
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
