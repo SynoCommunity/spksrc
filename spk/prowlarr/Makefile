@@ -3,7 +3,9 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 5
 SPK_ICON = src/prowlarr.png
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
+# custom exclusions for dotNET 6 on ARMv7 archs
+UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
 
 DEPENDS = cross/libstdc++ cross/prowlarr
 
