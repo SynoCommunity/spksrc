@@ -13,7 +13,7 @@ else
 DEPENDS = cross/libudev_204
 endif
 
-DEPENDS  = cross/glib
+DEPENDS += cross/glib
 DEPENDS += cross/libva
 DEPENDS += cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
