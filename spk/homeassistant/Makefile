@@ -104,13 +104,15 @@ WHEELS_CFLAGS = [numpy] -O0
 endif
 endif
 
-# [pycryptodomex]
+# [pycryptodome] [pycryptodomex] [ciso8601]
 ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
 WHEELS_CFLAGS += [pycryptodome] -std=c11
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
+WHEELS_CFLAGS += [ciso8601] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodome] -std=c99
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
+WHEELS_CFLAGS += [ciso8601] -std=c99
 endif
 
 
