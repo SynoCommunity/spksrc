@@ -1,5 +1,5 @@
 PKG_NAME = Radarr
-PKG_VERS = 3.2.2.5080
+PKG_VERS = 4.3.2.6857
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).linux-core-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Radarr/Radarr/releases/download/v$(PKG_VERS)
