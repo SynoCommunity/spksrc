@@ -5,10 +5,9 @@ SPK_ICON = src/radarr.png
 
 REQUIRED_MIN_DSM = 5.0
 
-# .NET is not supported on PPC, ARM5, ARM7L and x86
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
-DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
+DEPENDS = cross/libstdc++ cross/sqlite cross/radarr
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
@@ -18,7 +17,7 @@ SUPPORTURL = https://radarr.video/\#support
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
 STARTABLE = yes
 DISPLAY_NAME = Radarr
-CHANGELOG = "1. Fix package update.<br>2. Enlarge the service start/stop timeout to 90 seconds."
+CHANGELOG = "1. Fix package update.<br>2. Enlarge the service start/stop timeout to 90 seconds.<br>3. Add support for x86 (32-bit) architecture."
 
 HOMEPAGE = https://radarr.video/
 LICENSE = GPLv3

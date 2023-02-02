@@ -7,7 +7,7 @@ PKG_DIR = Radarr
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://radarr.video/
 COMMENT  = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
@@ -16,11 +16,14 @@ LICENSE  = GPLv3
 INSTALL_TARGET = radarr_install
 
 # use digests with multiple files
-PKG_DIST_ARCH_LIST = x64 arm arm64
+PKG_DIST_ARCH_LIST = x86 x64 arm arm64
 
 include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PKG_DIST_ARCH = x86
+else ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x64
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
