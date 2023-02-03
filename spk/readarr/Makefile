@@ -3,10 +3,9 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/readarr.png
 
-REQUIRED_MIN_DSM = 5.0
-
-# .NET is not supported on PPC, ARM5, ARM7L and x86
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
+# custom exclusions for dotNET 6 on ARMv7 archs
+UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
 
 DEPENDS = cross/sqlite cross/curl cross/libstdc++ cross/readarr
 
