@@ -20,5 +20,5 @@ lnk:lib/libgstreamer-1.0.so.0
 lib:lib/libgstreamer-1.0.so.0.2005.0
 lib:lib/gstreamer-1.0/libgstcoreelements.so
 lib:lib/gstreamer-1.0/libgstcoretracers.so
-lib:libexec/gstreamer-1.0/gst-plugin-scanner
-lib:libexec/gstreamer-1.0/gst-ptp-helper
+bin:libexec/gstreamer-1.0/gst-plugin-scanner
+bin:libexec/gstreamer-1.0/gst-ptp-helper
