@@ -18,7 +18,6 @@ HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
 LICENSE_FILE = $(WORK_DIR)/Lidarr/LICENSE.md
 HELPURL = https://wiki.servarr.com/Lidarr_Troubleshooting
-SUPPORTURL = https://lidarr.audio/\#support
 
 STARTABLE = yes
 SERVICE_USER = auto
@@ -34,6 +33,7 @@ WIZARDS_DIR = src/wizard/
 POST_STRIP_TARGET = lidarr_extra_install
 
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+# TMPDIR is used for lidarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
@@ -43,6 +43,7 @@ PACKAGE_AUTHOR = [Team Lidarr](https://lidarr.audio/)
 
 .PHONY: lidarr_extra_install
 lidarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var/.config/Lidarr
-	install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Lidarr/config.xml
+	@$(MSG) "Install config.xml and provide package_info."
+	@install -m 755 -d $(STAGING_DIR)/var/.config/Lidarr
+	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Lidarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Lidarr/package_info
