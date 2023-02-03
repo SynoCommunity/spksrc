@@ -33,6 +33,7 @@ WIZARDS_DIR = src/wizard/
 POST_STRIP_TARGET = readarr_extra_install
 
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+# TMPDIR is used for readarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
@@ -42,6 +43,7 @@ PACKAGE_AUTHOR = [SynoCommunity](https://synocommunity.com/)
 
 .PHONY: readarr_extra_install
 readarr_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/app
-	@install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
+	@$(MSG) "Install config.xml and provide package_info."
+	@install -m 755 -d $(STAGING_DIR)/var/.config/Readarr
+	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Readarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Readarr/package_info
