@@ -50,6 +50,6 @@ service_postupgrade ()
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        set_unix_permissions "${CONFIG_DIR}"
+        set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
 }
