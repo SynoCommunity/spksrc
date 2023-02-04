@@ -47,6 +47,7 @@ lib:lib/gstreamer-1.0/libgstsoup.so
 lib:lib/gstreamer-1.0/libgstspectrum.so
 lib:lib/gstreamer-1.0/libgstspeex.so
 lib:lib/gstreamer-1.0/libgsttaglib.so
+lib:lib/gstreamer-1.0/libgsttwolame.so
 lib:lib/gstreamer-1.0/libgstudp.so
 lib:lib/gstreamer-1.0/libgstvideo4linux2.so
 lib:lib/gstreamer-1.0/libgstvideobox.so
