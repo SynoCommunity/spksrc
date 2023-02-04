@@ -9,6 +9,7 @@ DEPENDS  = cross/glib
 DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/libxml2
+DEPENDS += cross/dssim
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
