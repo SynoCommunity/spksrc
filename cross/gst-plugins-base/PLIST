@@ -42,8 +42,6 @@ lib:lib/gstreamer-1.0/libgstaudiorate.so
 lib:lib/gstreamer-1.0/libgstaudioresample.so
 lib:lib/gstreamer-1.0/libgstaudiotestsrc.so
 lib:lib/gstreamer-1.0/libgstcompositor.so
-lib:lib/gstreamer-1.0/libgstcoreelements.so
-lib:lib/gstreamer-1.0/libgstcoretracers.so
 lib:lib/gstreamer-1.0/libgstencoding.so
 lib:lib/gstreamer-1.0/libgstgio.so
 lib:lib/gstreamer-1.0/libgstogg.so
