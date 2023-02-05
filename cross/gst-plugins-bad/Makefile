@@ -74,8 +74,10 @@ else
 # libgstdvb.so only gets built on x64
 CONFIGURE_ARGS += -Ddvb=disabled
 PLIST_TRANSFORM += -e libgstdvb.so
+# x86_64 hardware acceleration specific
 PLIST_TRANSFORM += -e libgstva.*.so
 PLIST_TRANSFORM += -e libgstsvthevcenc.so
+PLIST_TRANSFORM += -e libgstkms.so
 endif
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
