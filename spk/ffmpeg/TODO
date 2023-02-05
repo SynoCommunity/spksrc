@@ -13,20 +13,20 @@ Candidates for enablement:
   --enable-libflite 
   --enable-libgme 
   --enable-libgsm 
-  --enable-libmysofa 
+  --enable-libmysofa      --> https://github.com/hoene/libmysofa
   --enable-libopenmpt 
-  --enable-librubberband 
-  --enable-libsnappy 
-  --enable-libsrt 
+  --enable-librubberband  --> https://breakfastquay.com/rubberband/
+  --enable-libsnappy      --> https://github.com/google/snappy
+  --enable-libsrt         --> https://github.com/Haivision/srt
   --enable-libssh 
-  --enable-libvidstab 
-  --enable-libxvid 
-  --enable-lv2 
-  --enable-omx 
+  --enable-libvidstab     --> https://github.com/georgmartius/vid.stab
+  --enable-lv2            --> https://lv2plug.in/
+  --enable-omx            --> arch64 specific: to revisit if working for gstreamer
   --enable-pocketsphinx 
   --enable-libiec61883 
 
 Not to be enabled:
+  --enable-libxvid 
   --enable-librsvg   ==> Requires gobject-introspection + python + many other dependencies increasing spk size
   --enable-libjack 
   --enable-libpulse 
