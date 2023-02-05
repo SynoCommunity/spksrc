@@ -20,10 +20,7 @@ DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver
 DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
-#DEPENDS += cross/gst-plugins-good
 DEPENDS += cross/gst-plugins-bad
-#DEPENDS += cross/gst-plugins-ugly
-
 
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
