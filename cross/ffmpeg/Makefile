@@ -105,6 +105,9 @@ CONFIGURE_ARGS += --enable-libzmq
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
 
+DEPENDS += cross/openh264
+CONFIGURE_ARGS += --enable-libopenh264
+
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --enable-libopus
 
