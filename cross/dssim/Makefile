@@ -12,6 +12,4 @@ HOMEPAGE = https://github.com/kornelski/dssim
 COMMENT  = This tool computes (dis)similarity between two or more PNG &/or JPEG images using an algorithm approximating human vision. Comparison is done using a variant of the SSIM algorithm.
 LICENSE  = AGPL-3.0 license
 
-#UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
-
 include ../../mk/spksrc.cross-rust.mk
