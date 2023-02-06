@@ -44,6 +44,7 @@ OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
 OPTIONAL_DEPENDS += cross/libzimg
+OPTIONAL_DEPENDS += cross/openh264
 OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
 OPTIONAL_DEPENDS += cross/libva
@@ -105,8 +106,10 @@ CONFIGURE_ARGS += --enable-libzmq
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
 
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/openh264
 CONFIGURE_ARGS += --enable-libopenh264
+endif
 
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --enable-libopus
