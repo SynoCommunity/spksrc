@@ -8,6 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS  = cross/glib
 DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
+DEPENDS += cross/libwebp
 DEPENDS += cross/libxml2
 DEPENDS += cross/dssim
 DEPENDS += cross/openjpeg
@@ -37,7 +38,6 @@ CONFIGURE_ARGS += -Dgpl=enabled
 OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
-#OPTIONAL_DEPENDS += cross/svt-hevc
 OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver

@@ -132,6 +132,7 @@ lib:lib/gstreamer-1.0/libgstvideoframe_audiolevel.so
 lib:lib/gstreamer-1.0/libgstvideoparsersbad.so
 lib:lib/gstreamer-1.0/libgstvideosignal.so
 lib:lib/gstreamer-1.0/libgstvmnc.so
+lib:lib/gstreamer-1.0/libgstwebp.so
 lib:lib/gstreamer-1.0/libgstx265.so
 lib:lib/gstreamer-1.0/libgsty4mdec.so
 rsc:share/gstreamer-1.0/encoding-profiles/device/dvd.gep
