@@ -3,14 +3,14 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/readarr.png
 
+DEPENDS = cross/sqlite cross/curl cross/libstdc++ cross/readarr
+
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
 # custom exclusions for dotNET 6 on ARMv7 archs
 UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
 
-DEPENDS = cross/sqlite cross/curl cross/libstdc++ cross/readarr
-
 MAINTAINER = SynoCommunity
-MAINTAINER_URL = https://readarr.com/
+MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION  = Readarr is an ebook and audiobook collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new books from your favorite authors and will grab, sort, and rename them.
 CHANGELOG = "Initial package release."
 DISPLAY_NAME = Readarr
@@ -18,7 +18,6 @@ HOMEPAGE = https://readarr.com/
 LICENSE  = GPLv3
 LICENSE_FILE = $(WORK_DIR)/Readarr/LICENSE.md
 HELPURL = https://wiki.servarr.com/readarr/troubleshooting
-SUPPORTURL = https://readarr.com/\#support
 
 STARTABLE = yes
 SERVICE_USER = auto
