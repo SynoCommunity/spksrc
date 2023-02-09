@@ -18,13 +18,15 @@ HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
 
+CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
+
+ADDITIONAL_CFLAGS = -std=c99
+ADDITIONAL_CFLAGS += -D_XOPEN_SOURCE=600
+
 # Require access to glib-mkenums Python script
 ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
 
 include ../../mk/spksrc.common.mk
-
-ADDITIONAL_CFLAGS = -std=c99
-ADDITIONAL_CFLAGS += -D_XOPEN_SOURCE=600
 
 ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE

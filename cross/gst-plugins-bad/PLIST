@@ -53,6 +53,7 @@ lib:lib/gstreamer-1.0/libgstadpcmenc.so
 lib:lib/gstreamer-1.0/libgstaiff.so
 lib:lib/gstreamer-1.0/libgstaom.so
 lib:lib/gstreamer-1.0/libgstasfmux.so
+lib:lib/gstreamer-1.0/libgstassrender.so
 lib:lib/gstreamer-1.0/libgstaudiobuffersplit.so
 lib:lib/gstreamer-1.0/libgstaudiofxbad.so
 lib:lib/gstreamer-1.0/libgstaudiolatency.so
@@ -65,6 +66,7 @@ lib:lib/gstreamer-1.0/libgstclosedcaption.so
 lib:lib/gstreamer-1.0/libgstcodecalpha.so
 lib:lib/gstreamer-1.0/libgstcoloreffects.so
 lib:lib/gstreamer-1.0/libgstcolormanagement.so
+lib:lib/gstreamer-1.0/libgstcurl.so
 lib:lib/gstreamer-1.0/libgstdash.so
 lib:lib/gstreamer-1.0/libgstdebugutilsbad.so
 lib:lib/gstreamer-1.0/libgstdecklink.so

@@ -8,17 +8,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS  = cross/glib
 DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
+DEPENDS += cross/dssim
 DEPENDS += cross/libwebp
 DEPENDS += cross/libxml2
-DEPENDS += cross/dssim
 DEPENDS += cross/openjpeg
 
-HOMEPAGE = https://gstreamer.freedesktop.org/
-COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
-LICENSE  = LGPLv2.1
-
-# Require access to glib-mkenums Python script
-ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
+# curl build needs additional configuration for gnutls and libssh2
+DEPENDS += cross/curl
+export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
 OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
@@ -31,31 +28,35 @@ OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
 OPTIONAL_DEPENDS += cross/x265
 
-PLIST_TRANSFORM = grep -v -e TBD
+HOMEPAGE = https://gstreamer.freedesktop.org/
+COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
+LICENSE  = LGPLv2.1
 
+CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
 CONFIGURE_ARGS += -Dgpl=enabled
-
-OPTIONAL_DEPENDS  = cross/frei0r
-OPTIONAL_DEPENDS += cross/libass
-OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libva
-OPTIONAL_DEPENDS += cross/libva-utils
-OPTIONAL_DEPENDS += cross/intel-vaapi-driver
-OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/x265
-
-PLIST_TRANSFORM = grep -v -e TBD
-
-CONFIGURE_ARGS += -Dgpl=enabled
-
-include ../../mk/spksrc.common.mk
 
 ADDITIONAL_CFLAGS  = -std=c99
 # For openh264
 ADDITIONAL_CFLAGS += -I$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/wels
 
+# Require access to glib-mkenums Python script
+ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
+
+PLIST_TRANSFORM = grep -v -e TBD
+
+include ../../mk/spksrc.common.mk
+
 ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
+endif
+
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
+DEPENDS += cross/libass
+else
+PLIST_TRANSFORM += -e libgstassrender.so
+endif
 endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -90,13 +91,6 @@ ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/openh264
 else
 PLIST_TRANSFORM += -e libgstopenh264.so
-endif
-
-# Newer libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-ifeq ($(call version_ge, ${TC_GCC}, 4.8),1)
-DEPENDS += cross/libass
-else
-PLIST_TRANSFORM += -e libgstassrender.so
 endif
 
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))

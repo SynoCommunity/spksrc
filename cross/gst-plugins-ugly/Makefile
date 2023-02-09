@@ -10,18 +10,19 @@ DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/opencore-amr
 
+OPTIONAL_DEPENDS  = cross/x264
+
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
 
+CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
+CONFIGURE_ARGS += -Dgpl=enabled
+
 # Require access to glib-mkenums Python script
 ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
 
-OPTIONAL_DEPENDS  = cross/x264
-
 PLIST_TRANSFORM = grep -v -e TBD
-
-CONFIGURE_ARGS += -Dgpl=enabled
 
 include ../../mk/spksrc.common.mk
 

@@ -22,17 +22,21 @@ DEPENDS += cross/gstreamer
 DEPENDS += cross/gst-plugins-base
 DEPENDS += cross/gst-plugins-bad
 
+OPTIONAL_DEPENDS  = cross/libudev_204
+OPTIONAL_DEPENDS  = cross/libudev_219
+
 HOMEPAGE = https://gstreamer.freedesktop.org/
 COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
 LICENSE  = LGPLv2.1
 
-# Require access to glib-mkenums Python script
-ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
-
+CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
 CONFIGURE_ARGS += -Dwith_drm=yes
 CONFIGURE_ARGS += -Dwith_x11=no
 CONFIGURE_ARGS += -Dwith_glx=no
 CONFIGURE_ARGS += -Dwith_wayland=no
 CONFIGURE_ARGS += -Dwith_egl=no
+
+# Require access to glib-mkenums Python script
+ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
 
 include ../../mk/spksrc.cross-meson.mk
