@@ -13,7 +13,7 @@ COMMENT  = Commands for Manipulating Filesystem Extended Attributes.
 LICENSE  = GPLv2+
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-static=no
+CONFIGURE_ARGS = --disable-static
 
 INSTALL_MAKE_OPTIONS = install-lib install-dev DIST_ROOT=$(INSTALL_DIR)
 
