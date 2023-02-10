@@ -1,3 +1,9 @@
-Jackett-dotnet-0.20.1171.tar.gz SHA1 80ddbb771e4165e005612fb0c2378c2e1d736610
-Jackett-dotnet-0.20.1171.tar.gz SHA256 9a2d2c17951831669d165b5326f213db5573a9940c5ed4517241d2b4f0a73b73
-Jackett-dotnet-0.20.1171.tar.gz MD5 5bd371c5c697e34df6640cff6a6f9ea8
+Jackett.Binaries.LinuxAMDx64.tar.gz SHA1 51c586fd15621f657117d2469d472e0af27ba17c
+Jackett.Binaries.LinuxAMDx64.tar.gz SHA256 898e27bbed6389f94ad5bec40b0fa013a81f6eb4891ac3a85227df6666bc703b
+Jackett.Binaries.LinuxAMDx64.tar.gz MD5 7ddd37ec8416e16f44384f3d4f498889
+Jackett.Binaries.LinuxARM32.tar.gz SHA1 78c31719a711af78f795c8212c4697313f74abf8
+Jackett.Binaries.LinuxARM32.tar.gz SHA256 0bd17ae3c32d1aaac79a0ffb3caeafc42a4dd7084573918e22aabbb1d77ef54f
+Jackett.Binaries.LinuxARM32.tar.gz MD5 30c706e42aa473733f9f0ef5802cd4ea
+Jackett.Binaries.LinuxARM64.tar.gz SHA1 eb10506ca6c1b85ed9b40348cea3205d7d069f5a
+Jackett.Binaries.LinuxARM64.tar.gz SHA256 5e08eb1b756f727f725f31c53e3dd062060bd16df2acd3c080b0f7f93c550894
+Jackett.Binaries.LinuxARM64.tar.gz MD5 cb5d57f547d8e33558f06b3968903ffb

@@ -1,10 +1,9 @@
 PKG_NAME = Jackett
-PKG_VERS = 0.20.1171
+PKG_VERS = 0.20.3017
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).Binaries.Mono.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Jackett/Jackett/releases/download/v$(PKG_VERS)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = jackett
+PKG_DIR = Jackett
 
 DEPENDS =
 
