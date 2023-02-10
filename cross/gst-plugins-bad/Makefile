@@ -46,17 +46,8 @@ PLIST_TRANSFORM = grep -v -e TBD
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_lt, ${TC_GCC}, 5),1)
+ifeq ($(call version_lt, $$TC_GCC, 5),1)
 ADDITIONAL_CFLAGS += -D_GNU_SOURCE
-endif
-
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-DEPENDS += cross/libass
-else
-PLIST_TRANSFORM += -e libgstassrender.so
-endif
 endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -100,3 +91,10 @@ PLIST_TRANSFORM += -e libgstaom.so
 endif
 
 include ../../mk/spksrc.cross-meson.mk
+
+ifeq ($(call version_le, $$TC_GCC, 4.8),1)
+# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
+DEPENDS += cross/libass
+else
+PLIST_TRANSFORM += -e libgstassrender.so
+endif
