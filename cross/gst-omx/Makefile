@@ -13,7 +13,6 @@ HOMEPAGE = https://github.com/GStreamer/gst-omx
 COMMENT  = This plugin wraps available OpenMAX IL components and makes them available as standard GStreamer elements.
 LICENSE  = LGPLv2.1
 
-CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
 CONFIGURE_ARGS += -Ddoc=disabled
 CONFIGURE_ARGS += -Dexamples=disabled
 CONFIGURE_ARGS += -Dheader_path=$(STAGING_INSTALL_PREFIX)/include/omx/khronos
