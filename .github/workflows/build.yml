@@ -86,10 +86,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+            persist-credentials: false
 
-      - name: Configure Git
+      - name: Configure Git for $GITHUB_WORKSPACE
         run: |
-          git config --global --add safe.directory "*"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown -R $(id -u):$(id -g) $GITHUB_WORKSPACE
 
       - name: Cache toolchains
         uses: actions/cache@v3
