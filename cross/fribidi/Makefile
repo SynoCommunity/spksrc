@@ -11,8 +11,6 @@ HOMEPAGE = http://fribidi.org/
 COMMENT  = GNU FriBidi is an implementation of the Unicode Bidirectional Algorithm (bidi).
 LICENSE  = GPLv2
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-pic
-ADDITIONAL_CFLAGS = -O
+CONFIGURE_ARGS += -Ddocs=false
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-meson.mk
