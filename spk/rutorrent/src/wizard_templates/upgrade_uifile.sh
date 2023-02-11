@@ -1,6 +1,5 @@
 
-reload_inst_variables
-initialize_variables
+load_variables_from_file "${INST_VARIABLES}"
 
 wizard_download_share_input()
 {
