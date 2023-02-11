@@ -90,10 +90,10 @@ jobs:
             fetch-depth: 0
             persist-credentials: false
 
-      - name: Configure Git for $GITHUB_WORKSPACE
+      - name: Configure Git for /github/workspace
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          chown -R $(id -u):$(id -g) $GITHUB_WORKSPACE
+          git config --global --add safe.directory "/github/workspace"
+          chown -R $(id -u):$(id -g) /github/workspace
 
       - name: Cache toolchains
         uses: actions/cache@v3
