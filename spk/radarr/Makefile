@@ -11,17 +11,15 @@ UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
-HELPURL = https://wiki.servarr.com/Radarr
-SUPPORTURL = https://radarr.video/\#support
-
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
-STARTABLE = yes
-DISPLAY_NAME = Radarr
 CHANGELOG = "1. Upgrade to Radarr 4.3.2.6857.<br/>2. Fix package update.<br/>3. Enlarge the service start/stop timeout to 90 seconds.<br/>4. Add support for x86 (32-bit) architecture."
-
+DISPLAY_NAME = Radarr
 HOMEPAGE = https://radarr.video/
 LICENSE = GPLv3
+LICENSE_FILE = $(WORK_DIR)/Radarr/LICENSE
+HELPURL = https://wiki.servarr.com/Radarr
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8310
