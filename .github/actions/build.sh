@@ -22,6 +22,9 @@ make setup-synocommunity
 sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" \
     -e "s|PUBLISH_API_KEY\s*=.*|PUBLISH_API_KEY=$API_KEY|" \
     local.mk
+# Git >= 2.35.2 stops directory traversals when ownership changes from the current user (in response to CVE-2022-24765). 
+# This prevents errors on nested repos that might have different file owner.
+git config --global --add safe.directory "/github/workspace"
 echo "::endgroup::"
 
 echo "===> TARGET: ${GH_ARCH}"

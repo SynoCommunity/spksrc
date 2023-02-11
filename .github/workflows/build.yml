@@ -86,14 +86,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-            fetch-depth: 0
-            persist-credentials: false
-
-      - name: Configure Git for /github/workspace
-        run: |
-          git config --global --add safe.directory "/github/workspace"
-          chown -R $(id -u):$(id -g) /github/workspace
 
       - name: Cache toolchains
         uses: actions/cache@v3
