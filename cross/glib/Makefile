@@ -1,11 +1,11 @@
 PKG_NAME = glib
-PKG_VERS = 2.66.8
+PKG_VERS = 2.74.5
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.gnome.org/sources/glib/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 
-DEPENDS = cross/libffi cross/pcre cross/zlib
+DEPENDS = cross/libffi cross/pcre2 cross/zlib
 
 HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
