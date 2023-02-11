@@ -4,7 +4,8 @@ SPK_REV = 29
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/syncthing
+DEPENDS  = cross/syncthing
+DEPENDS += cross/syncthing-tech-ui
 
 # archs not supported by go
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
