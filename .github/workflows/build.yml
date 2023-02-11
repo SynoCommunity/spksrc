@@ -39,6 +39,10 @@ jobs:
             fetch-depth: 0
             persist-credentials: false
 
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Get changed files for pull request
         if: github.event_name == 'pull_request'
         id: getfile_pr
