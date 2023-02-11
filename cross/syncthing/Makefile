@@ -20,7 +20,7 @@ GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
 include ../../mk/spksrc.cross-go.mk
 
-BUILD_ARGS = -goos=$(GOOS) -goarch=$(GO_ARCH) -version=v$(PKG_VERS)
+BUILD_ARGS = -goos=$(GOOS) -goarch=$(GO_ARCH) -version=v$(PKG_VERS) -buildvcs=false
 
 # use custom build to remove GOARCH from ENV and for custom BUILD_ARGS
 syncthing_compile:
