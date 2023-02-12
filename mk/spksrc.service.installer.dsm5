@@ -35,12 +35,7 @@ call_func ()
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Begin ${FUNC}"
-        ARG=$2
-        if [ -z "${ARG}" ]; then
-            eval ${FUNC} 2>&1 | install_log
-        else
-            eval ${FUNC} ${ARG} 2>&1 | install_log
-        fi
+        eval ${FUNC} 2>&1 | install_log
         install_log "End ${FUNC}"
     fi
 }
