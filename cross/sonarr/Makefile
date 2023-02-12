@@ -7,10 +7,6 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370
-# custom exclusions for dotNET 6 on ARMv7 archs
-UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
-
 HOMEPAGE = https://sonarr.tv
 COMMENT  = Sonarr is a PVR for newsgroup users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
 LICENSE  = GNU GPL v3
