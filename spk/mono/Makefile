@@ -1,6 +1,6 @@
 SPK_NAME = mono
 SPK_VERS = 5.20.1.34
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -15,7 +15,7 @@ MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework.
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "1. Update to version 5.20.1.34<br/>2. Fix workaround for ARMv5 (88f628x archs)<br/>3. Remove static libraries."
+CHANGELOG = "Fix DSM 7 compatibility."
 
 HOMEPAGE = https://mono-project.com
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
