@@ -7,10 +7,6 @@ PKG_DIR = Lidarr
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
-# custom exclusions for dotNET 6 on ARMv7 archs
-UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
-
 HOMEPAGE = https://lidarr.audio/
 COMMENT  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
 LICENSE  = GPLv3
