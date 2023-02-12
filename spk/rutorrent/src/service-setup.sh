@@ -37,7 +37,7 @@ SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYN
 validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ -n "${wizard_watch_dir}" ] && [ ! -d "${wizard_watch_dir}" ]; then
+        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
             echo "Watch directory ${wizard_watch_dir} does not exist."
             exit 1
         fi
@@ -51,7 +51,7 @@ check_acl()
     acl_path=$1
     acl_user=$2
     acl_permissions=$(synoacltool -get-perm "${acl_path}" "${acl_user}" | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
-    if [ -z "${acl_permissions}" ] || [ "${acl_permissions}" = "-------------" ]; then
+    if [ -z "${acl_permissions}" -o "${acl_permissions}" = "-------------" ]; then
         return 1
     else
         synoacltool -get-perm "${acl_path}" "${acl_user}"
@@ -121,8 +121,8 @@ service_postinst ()
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         local effective_download_dir="${wizard_download_volume:=/volume1}/${wizard_download_share:=downloads}"
-        TOP_DIR=$(echo "${effective_download_dir}" | cut -d "/" -f 2)
-        MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
+        TOP_DIR=`echo "${effective_download_dir}" | cut -d "/" -f 2`
+        MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
@@ -216,7 +216,7 @@ service_save ()
     fi
 
     # Revision 8 introduces backward incompatible changes
-    if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -le 8 ]; then
+    if [ `echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
         sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${RTORRENT_RC}
     fi
 
@@ -230,10 +230,10 @@ service_save ()
     cp -ap -t "${TMP_DIR}" "${SYNOPKG_PKGVAR}/.session"
 
     # Save rtorrent configuration file (new location)
-    if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] || [ -f "${RTORRENT_RC}" ]; then
+    if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" -a -f "${RTORRENT_RC}" ]; then
        mv -t "${TMP_DIR}" "${RTORRENT_RC}"
     # Save rtorrent configuration file (old location -> prior to symlink)
-    elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
+    elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" -a -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
        mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${TMP_DIR}/rtorrent.rc"
     fi
 
@@ -350,7 +350,7 @@ service_restore ()
         define_external_program 'php' '/bin/php' '/usr/bin/php'
     fi
 
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ] && [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 -a ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
 
