@@ -6,7 +6,7 @@
 # The script must be sh/ash compatible and not use bash syntax.
 # SRM and DSM < 6.0 have only the busybox built-in shell an not bash
 # 
-    
+
 # Tools shortcuts
 MV="/bin/mv -f"
 RM="/bin/rm -rf"
