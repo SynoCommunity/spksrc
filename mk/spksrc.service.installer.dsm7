@@ -36,10 +36,19 @@ call_func ()
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Begin ${FUNC}"
         LOG=$2
+        ARG=$3
         if [ -z "${LOG}" ]; then
-            eval ${FUNC}
+            if [ -z "${ARG}" ]; then
+                eval ${FUNC}
+            else
+                eval ${FUNC} ${ARG}
+            fi
         else
-            eval ${FUNC} 2>&1 | ${LOG}
+            if [ -z "${ARG}" ]; then
+                eval ${FUNC} 2>&1 | ${LOG}
+            else
+                eval ${FUNC} ${ARG} 2>&1 | ${LOG}
+            fi
         fi
         install_log "End ${FUNC}"
     fi
@@ -60,7 +69,7 @@ fi
 
 
 # Load (wizard) variables stored by postinst
-call_func "load_variables_from_file" ${INST_VARIABLES}
+call_func "load_variables_from_file" install_log ${INST_VARIABLES}
 
 # init variables either from ${INST_VARIABLES}, from package or from wizard
 call_func "initialize_variables"
