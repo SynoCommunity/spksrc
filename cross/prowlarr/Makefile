@@ -7,10 +7,6 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS = cross/curl cross/sqlite
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
-# custom exclusions for dotNET 6 on ARMv7 archs
-UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
-
 HOMEPAGE = https://prowlarr.com/
 COMMENT  = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required (we do it all).
 LICENSE  = GPLv3
