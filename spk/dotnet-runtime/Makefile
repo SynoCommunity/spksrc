@@ -6,9 +6,8 @@ SPK_ICON = src/dotnet.png
 OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/libicu cross/dotnet-runtime
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370
-# custom exclusions for dotNET 6 on ARMv7 archs
-UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
+# Arch exclusions for dotnet 6.0
+DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
