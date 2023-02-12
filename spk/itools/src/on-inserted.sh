@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/local/itools/mounting.py 2>> /usr/local/itools/var/error.log &
+/var/packages/itools/target/mounting.py 2>> /var/packages/itools/var/error.log &

@@ -1,11 +1,15 @@
 
-PACKAGE="itools"
-INSTALL_DIR="/var/packages/${PACKAGE}/target"
-VOLUME_DIR="${INSTALL_DIR}/volume"
 
+# service requires root access, not supported on DSM >= 7
+if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+
+VOLUME_DIR="${SYNOPKG_PKGDEST}/volume"
+
+SERVICE_COMMAND = ${SYNOPKG_PKGDEST}/sbin/usbmuxd
 SVC_CWD="${SYNOPKG_PKGDEST}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
+
 
 service_postinst ()
 {
@@ -26,8 +30,9 @@ service_prestart ()
 
 service_poststop ()
 {
-    ${INSTALL_DIR}/umounting.py
+    ${SYNOPKG_PKGDEST}/umounting.py
     rm -f /usr/lib/udev/rules.d/39-libimobiledevice.rules
     udevadm control --reload-rules
 }
 
+fi
