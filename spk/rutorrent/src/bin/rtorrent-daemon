@@ -2,17 +2,17 @@
 
 # This script starts rtorrent within a screen session
 
-if [ "${RUTORRENT_WEB_DIR}" == "" ]; then
+if [ -z "${RUTORRENT_WEB_DIR}" ]; then
   echo "This script requires the RUTORRENT_WEB_DIR environment variable to be set"
   exit 1
 fi
 
-if [ "${SYNOPKG_PKGVAR}" == "" ]; then
+if [ -z "${SYNOPKG_PKGVAR}" ]; then
   echo "This script requires the SYNOPKG_PKGVAR environment variable to be set"
   exit 1
 fi
 
-if [ "${SYNOPKG_PKGDEST}" == "" ]; then
+if [ -z "${SYNOPKG_PKGDEST}" ]; then
   echo "This script requires the SYNOPKG_PKGDEST environment variable to be set"
   exit 1
 fi
