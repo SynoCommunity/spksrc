@@ -19,6 +19,10 @@ CONFIGURE_ARGS = --with-privsep-path=$(INSTALL_PREFIX)/var/empty
 CONFIGURE_ARGS += --disable-lastlog --disable-strip
 CONFIGURE_ARGS += --disable-utmp --disable-utmpx
 CONFIGURE_ARGS += --disable-wtmp --disable-wtmpx
+# need to disable use of system getentropy for kernels < 3.17
+CONFIGURE_ARGS += ac_cv_func_getentropy=no
+# tbd: probably we have to disable use of system getrandom too...
+#CONFIGURE_ARGS += ac_cv_func_getrandom=no
 
 include ../../mk/spksrc.cross-cc.mk
 
