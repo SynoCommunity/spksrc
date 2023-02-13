@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://download.gnome.org/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # support for c++11 language features is required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 DEPENDS =
 
