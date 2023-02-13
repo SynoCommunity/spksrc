@@ -11,8 +11,6 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = nop
 
-DEPENDS = cross/libsigc++ cross/glib
-
 OPTIONAL_DEPENDS  = cross/glibmm-latest
 OPTIONAL_DEPENDS += cross/glibmm-2.66
 
