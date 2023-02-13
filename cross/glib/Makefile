@@ -1,22 +1,28 @@
 PKG_NAME = glib
-PKG_VERS = 2.74.5
-PKG_EXT = tar.xz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.gnome.org/sources/glib/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
-
-DEPENDS = cross/libffi cross/pcre2 cross/zlib
 
 HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
 LICENSE  = LGPLv2.1+
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+DOWNLOAD_TARGET = nop
+CHECKSUM_TARGET = nop
+EXTRACT_TARGET = nop
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = nop
 
-# https://docs.gtk.org/glib/building.html
-CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
-CONFIGURE_ARGS += -Dlibmount=disabled
-CONFIGURE_ARGS += -Ddefault_library=shared
-CONFIGURE_ARGS += -Dselinux=disabled
+OPTIONAL_DEPENDS  = cross/glib-latest
+OPTIONAL_DEPENDS += cross/glib-2.66
+OPTIONAL_DEPENDS += cross/glib-2.58
 
-include ../../mk/spksrc.cross-meson.mk
+include ../../mk/spksrc.install-resources.mk
+
+ifeq ($(call version_ge, $(TC_KERNEL), 4.4),1)
+DEPENDS = cross/glib-latest
+else
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS = cross/glib-2.66
+else
+DEPENDS = cross/glib-2.58
+endif
+endif
