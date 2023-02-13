@@ -61,3 +61,10 @@ ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
 endif
+
+# Allow toolchain mandatory variables to
+# be available at all build stages in
+# particular for dependencies (spksrc.depends.mk)
+ENV += TC_GCC=$$(eval $$(echo $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -dumpversion) 2>/dev/null || true)
+ENV += TC_GLIBC=$(TC_GLIBC)
+ENV += TC_KERNEL=$(TC_KERNEL)
