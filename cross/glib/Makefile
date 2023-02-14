@@ -17,7 +17,8 @@ OPTIONAL_DEPENDS += cross/glib-2.58
 
 include ../../mk/spksrc.install-resources.mk
 
-ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
+# If kernel >= 3.10 && gcc >= 7.5
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10)$(call version_ge, $(TC_GCC), 7.5),11)
 DEPENDS = cross/glib-latest
 else
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
