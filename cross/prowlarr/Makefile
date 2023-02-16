@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).linux-core-$(PKG_DIST_ARCH).$(PKG
 PKG_DIST_SITE = https://github.com/Prowlarr/Prowlarr/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)
 
-DEPENDS = cross/curl cross/sqlite
+DEPENDS =
 
 HOMEPAGE = https://prowlarr.com/
 COMMENT  = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required (we do it all).

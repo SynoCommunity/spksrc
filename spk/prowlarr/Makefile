@@ -3,7 +3,7 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 5
 SPK_ICON = src/prowlarr.png
 
-DEPENDS = cross/libstdc++ cross/prowlarr
+DEPENDS = cross/sqlite cross/libstdc++ cross/prowlarr
 
 # Arch exclusions for dotnet 6.0
 DOTNET_SERVARR_ARCHS = 1
