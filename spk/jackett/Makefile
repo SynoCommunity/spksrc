@@ -1,5 +1,5 @@
 SPK_NAME = jackett
-SPK_VERS = 0.20.3017
+SPK_VERS = 0.20.3127
 SPK_REV = 16
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
@@ -9,7 +9,7 @@ DEPENDS = cross/libstdc++ cross/$(SPK_NAME)
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
-CHANGELOG = "Update Jackett to 0.20.3017"
+CHANGELOG = "Update Jackett to 0.20.3127"
 DISPLAY_NAME = Jackett
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
