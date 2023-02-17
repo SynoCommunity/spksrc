@@ -4,7 +4,7 @@ SPK_REV = 13
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-SPK_DEPENDS = "WebStation;python310:PHP7.4"
+SPK_DEPENDS = "WebStation:python310:PHP7.4"
 WHEELS = src/requirements-pure.txt
 
 DEPENDS = cross/busybox cross/curl cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
