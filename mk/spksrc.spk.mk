@@ -370,6 +370,7 @@ WIZARD_FILE_NAMES += -or -name "uninstall_uifile_???"
 WIZARD_FILE_NAMES += -or -name "uninstall_uifile.sh"
 WIZARD_FILE_NAMES += -or -name "uninstall_uifile_???.sh"
 
+WIZARD_FILE_LIST := $(shell find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name ".*" 2> /dev/null)
 
 .PHONY: wizards
 wizards:
@@ -390,10 +391,11 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 	    $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
 		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
 	fi
-endif
-ifneq ($(wildcard $(DSM_WIZARDS_DIR)/*),)
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
+	@$(MSG) "Set permissions for DSM Wizards"
+	@if [ -z "$(WIZARD_FILE_LIST)" ]; then \
+		find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \; ;\
+		find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \; ;\
+	fi
 endif
 
 .PHONY: conf
