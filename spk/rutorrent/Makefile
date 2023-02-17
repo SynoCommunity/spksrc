@@ -41,6 +41,7 @@ SERVICE_COMMAND = /var/packages/rutorrent/target/bin/rtorrent-daemon
 
 FWPORTS = src/rutorrent.sc
 CONF_DIR = src/conf/
+WIZARDS_DIR = $(WORK_DIR)/generated-wizards
 WIZARDS = install_uifile upgrade_uifile
 
 INSTALL_DEP_SERVICES = apache-web
@@ -69,7 +70,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: generated-wizards
 generated-wizards:
-	@mkdir -p $(DSM_WIZARDS_DIR)
+	@mkdir -p $(WIZARDS_DIR)
 	@for template in $(WIZARDS); do \
 		for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
 			{\
@@ -82,8 +83,7 @@ generated-wizards:
 				cat src/wizard_templates/shared_uifile_setup.sh;\
 				echo "";\
 				cat src/wizard_templates/$${template}.sh;\
-			}>$(DSM_WIZARDS_DIR)/$${template}$${suffix}.sh;\
-		chmod +x $(DSM_WIZARDS_DIR)/$${template}$${suffix}.sh;\
+			}>$(WIZARDS_DIR)/$${template}$${suffix}.sh;\
 		done;\
 	done
 
