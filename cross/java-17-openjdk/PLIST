@@ -114,7 +114,6 @@ lib:jvm/openjdk-17.0.6/lib/libawt.so
 lib:jvm/openjdk-17.0.6/lib/libawt_headless.so
 lib:jvm/openjdk-17.0.6/lib/libdt_socket.so
 lib:jvm/openjdk-17.0.6/lib/libextnet.so
-lib:jvm/openjdk-17.0.6/lib/libffi.so.8
 lib:jvm/openjdk-17.0.6/lib/libfontmanager.so
 lib:jvm/openjdk-17.0.6/lib/libinstrument.so
 lib:jvm/openjdk-17.0.6/lib/libj2gss.so

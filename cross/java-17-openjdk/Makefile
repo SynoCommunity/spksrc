@@ -1,7 +1,7 @@
 PKG_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
-JAVA_RELEASE = 7
+JAVA_RELEASE = 9
 JAVA_VERSION = 17.0.6
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
@@ -20,7 +20,6 @@ BUILD_DEPENDS += cross/libX11
 BUILD_DEPENDS += cross/libXrender
 
 DEPENDS  = cross/fontconfig
-# libffi is required by the Zero version of Hotspot.
 DEPENDS += cross/libffi
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
@@ -62,11 +61,6 @@ CONFIGURE_ARGS += --with-libpng=system
 CONFIGURE_ARGS += --with-lcms=system
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
-CONFIGURE_ARGS += --with-jvm-variants=zero
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-# shenandoahgc is not supported on 32-bit ARM
-CONFIGURE_ARGS += --with-jvm-features=-shenandoahgc
-endif
 CONFIGURE_ARGS += --disable-warnings-as-errors
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
