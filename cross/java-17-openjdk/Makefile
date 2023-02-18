@@ -2,7 +2,7 @@ PKG_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
 JAVA_RELEASE = 7
-JAVA_VERSION = 17.0.5
+JAVA_VERSION = 17.0.6
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -60,41 +60,18 @@ CONFIGURE_ARGS += --disable-javac-server
 CONFIGURE_ARGS += --with-jvm-variants=zero
 CONFIGURE_ARGS += --with-jvm-features=shenandoahgc,-zgc
 CONFIGURE_ARGS += --disable-warnings-as-errors
-#CONFIGURE_ARGS += --with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-freetype=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --enable-libffi-bundling
 CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
-#CONFIGURE_ARGS += --enable-aot=no
 CONFIGURE_ARGS += --disable-manpages
-#CONFIGURE_ARGS += --disable-hotspot-gtest
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
-
-
-
-### The following warnings were produced. Repeated here for convenience:
-### WARNING: Ignoring value of READELF from the environment. Use command line variables instead.
-### WARNING: Ignoring CFLAGS(-I/spksrc/toolchain/syno-x64-7.1/work/x86_64-pc-linux-gnu/x86_64-pc-linux-gnu/sys-root/usr/include -I/spksrc/cross/java-17-openjdk/work-x64-7.1/install//usr/local/java-17-openjdk/include -Os) found in environment. Use --with-extra-cflags
-### WARNING: Ignoring CXXFLAGS(-I/spksrc/toolchain/syno-x64-7.1/work/x86_64-pc-linux-gnu/x86_64-pc-linux-gnu/sys-root/usr/include -I/spksrc/cross/java-17-openjdk/work-x64-7.1/install//usr/local/java-17-openjdk/include ) found in environment. Use --with-extra-cxxflags
-### WARNING: Ignoring LDFLAGS(-L/spksrc/toolchain/syno-x64-7.1/work/x86_64-pc-linux-gnu/x86_64-pc-linux-gnu/sys-root/lib -L/spksrc/cross/java-17-openjdk/work-x64-7.1/install//usr/local/java-17-openjdk/lib -Wl,--rpath-link,/spksrc/cross/java-17-openjdk/work-x64-7.1/install//usr/local/java-17-openjdk/lib -Wl,--rpath,/usr/local/java-17-openjdk/lib ) found in environment. Use --with-extra-ldflags
-### WARNING: Ignoring value of AR from the environment. Use command line variables instead.
-### WARNING: Ignoring value of STRIP from the environment. Use command line variables instead.
-### WARNING: Ignoring value of NM from the environment. Use command line variables instead.
-### WARNING: Ignoring value of OBJDUMP from the environment. Use command line variables instead.
-### WARNING: X11 is not used, so --with-x is ignored
-### WARNING: jpeglib.h: accepted by the compiler, rejected by the preprocessor!
-### WARNING: jpeglib.h: proceeding with the compiler's result
-### WARNING: gif_lib.h: accepted by the compiler, rejected by the preprocessor!
-### WARNING: gif_lib.h: proceeding with the compiler's result
-### WARNING: Option --enable-hotspot-gtest is deprecated and will be ignored.
-
-
-#PATCHES_LEVEL = 1
 
 # Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += product-images
