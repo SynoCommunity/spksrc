@@ -16,10 +16,12 @@ BUILD_DEPENDS = native/openjdk-17 native/zip
 # Dependencies are required at build time only.
 BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
-BUILD_DEPENDS += cross/fontconfig
-BUILD_DEPENDS += cross/libX11 cross/libXext cross/libXrender cross/libXrandr cross/libXtst cross/libXt
+BUILD_DEPENDS += cross/libX11
+BUILD_DEPENDS += cross/libXrender
+
+DEPENDS  = cross/fontconfig
 # libffi is required by the Zero version of Hotspot.
-BUILD_DEPENDS += cross/libffi
+DEPENDS += cross/libffi
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
@@ -42,6 +44,8 @@ PRE_COMPILE_TARGET = java-17-openjdk_pre_compile
 # Fix symlinks
 POST_INSTALL_TARGET = java-17-openjdk_post_compile
 
+include ../../mk/spksrc.archs.mk
+
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-17/work-native/jdk-17
 CONFIGURE_ARGS += --with-version-build=$(JAVA_RELEASE)
@@ -49,8 +53,8 @@ CONFIGURE_ARGS += --with-version-pre=
 CONFIGURE_ARGS += --with-version-opt=LTS
 CONFIGURE_ARGS += --with-debug-level=release
 CONFIGURE_ARGS += --with-native-debug-symbols=none
-CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-unlimited-crypto
+CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-zlib=system
 CONFIGURE_ARGS += --with-libjpeg=system
 CONFIGURE_ARGS += --with-giflib=system
@@ -59,10 +63,14 @@ CONFIGURE_ARGS += --with-lcms=system
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
 CONFIGURE_ARGS += --with-jvm-variants=zero
-CONFIGURE_ARGS += --with-jvm-features=shenandoahgc,-zgc
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+# shenandoahgc is not supported on 32-bit ARM
+CONFIGURE_ARGS += --with-jvm-features=-shenandoahgc
+endif
 CONFIGURE_ARGS += --disable-warnings-as-errors
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-freetype=system
 CONFIGURE_ARGS += --with-freetype-include=$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/freetype2
 CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
@@ -73,6 +81,14 @@ CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-manpages
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
+
+# arguments not taken from environment
+CONFIGURE_ARGS += READELF=$(READELF)
+CONFIGURE_ARGS += AR=$(AR)
+CONFIGURE_ARGS += STRIP=$(STRIP)
+CONFIGURE_ARGS += NM=$(NM)
+CONFIGURE_ARGS += OBJCOPY=$(OBJCOPY)
+CONFIGURE_ARGS += OBJDUMP=$(OBJDUMP)
 
 # Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += product-images
@@ -90,7 +106,7 @@ include ../../mk/spksrc.cross-cc.mk
 # Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
 # Disables the normal host build target triplets since openjdk use its own openjdk-target
 java-17-openjdk_configure:
-	$(RUN) bash ./configure $(CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && PATH=$$PATH:$(ZIP_BIN_DIR) && bash ./configure $(CONFIGURE_ARGS)
 
 .PHONY: java-17-openjdk_pre_compile
 # As DESTDIR is not supported we must patch the make file for make install.
