@@ -49,6 +49,7 @@ CONFIGURE_ARGS += --with-version-pre=
 CONFIGURE_ARGS += --with-version-opt=LTS
 CONFIGURE_ARGS += --with-debug-level=release
 CONFIGURE_ARGS += --with-native-debug-symbols=none
+CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-unlimited-crypto
 CONFIGURE_ARGS += --with-zlib=system
 CONFIGURE_ARGS += --with-libjpeg=system
@@ -62,8 +63,8 @@ CONFIGURE_ARGS += --with-jvm-features=shenandoahgc,-zgc
 CONFIGURE_ARGS += --disable-warnings-as-errors
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-freetype=$(INSTALL_DIR)/$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-freetype-include=$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/freetype2
+CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
