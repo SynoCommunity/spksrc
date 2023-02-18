@@ -60,12 +60,6 @@ CONFIGURE_ARGS += --with-libpng=system
 CONFIGURE_ARGS += --with-lcms=system
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-jvm-variants=zero
-endif
-ifneq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-jvm-features=shenandoahgc,-zgc
-endif
 CONFIGURE_ARGS += --disable-warnings-as-errors
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
