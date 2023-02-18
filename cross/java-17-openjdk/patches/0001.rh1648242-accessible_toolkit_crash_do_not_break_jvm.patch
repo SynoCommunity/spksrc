@@ -1,0 +1,16 @@
+diff -r 618ad1237e73 src/java.desktop/share/classes/java/awt/Toolkit.java
+--- a/src/java.desktop/share/classes/java/awt/Toolkit.java	Thu Jun 13 19:37:49 2019 +0200
++++ b/src/java.desktop/share/classes/java/awt/Toolkit.java	Thu Jul 04 10:35:42 2019 +0200
+@@ -595,7 +595,11 @@
+                 toolkit = new HeadlessToolkit(toolkit);
+             }
+             if (!GraphicsEnvironment.isHeadless()) {
+-                loadAssistiveTechnologies();
++                try {
++                    loadAssistiveTechnologies();
++                } catch (AWTError error) {
++                    // ignore silently
++                }
+             }
+         }
+         return toolkit;

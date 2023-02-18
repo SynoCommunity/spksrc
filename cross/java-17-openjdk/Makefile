@@ -1,7 +1,7 @@
 PKG_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
-JAVA_RELEASE = 7
+JAVA_RELEASE = 10
 JAVA_VERSION = 17.0.6
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
@@ -82,6 +82,8 @@ CONFIGURE_ARGS += --enable-headless-only
 
 # Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += product-images
+
+PATCHES_LEVEL = 1
 
 ADDITIONAL_CFLAGS = -Os
 

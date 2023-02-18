@@ -1,0 +1,117 @@
+diff --git openjdk.orig/make/modules/java.base/Launcher.gmk openjdk/make/modules/java.base/Launcher.gmk
+index 700ddefda49..2882de68eb2 100644
+--- openjdk.orig/make/modules/java.base/Launcher.gmk
++++ openjdk/make/modules/java.base/Launcher.gmk
+@@ -41,6 +41,14 @@ $(eval $(call SetupBuildLauncher, java, \
+     OPTIMIZATION := HIGH, \
+ ))
+ 
++#Wno-error=cpp is present to allow commented warning in ifdef part of main.c
++$(eval $(call SetupBuildLauncher, alt-java, \
++    CFLAGS := -DEXPAND_CLASSPATH_WILDCARDS -DENABLE_ARG_FILES -DREDHAT_ALT_JAVA -Wno-error=cpp, \
++    EXTRA_RCFLAGS := $(JAVA_RCFLAGS), \
++    VERSION_INFO_RESOURCE := $(JAVA_VERSION_INFO_RESOURCE), \
++    OPTIMIZATION := HIGH, \
++))
++
+ ifeq ($(call isTargetOs, windows), true)
+   $(eval $(call SetupBuildLauncher, javaw, \
+       CFLAGS := -DJAVAW -DEXPAND_CLASSPATH_WILDCARDS -DENABLE_ARG_FILES, \
+diff --git openjdk.orig/src/java.base/share/native/launcher/alt_main.h openjdk/src/java.base/share/native/launcher/alt_main.h
+new file mode 100644
+index 00000000000..697df2898ac
+--- /dev/null
++++ openjdk/src/java.base/share/native/launcher/alt_main.h
+@@ -0,0 +1,73 @@
++/*
++ * Copyright (c) 2019, Red Hat, Inc. All rights reserved.
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 only, as
++ * published by the Free Software Foundation.  Oracle designates this
++ * particular file as subject to the "Classpath" exception as provided
++ * by Oracle in the LICENSE file that accompanied this code.
++ *
++ * This code is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * version 2 for more details (a copy is included in the LICENSE file that
++ * accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License version
++ * 2 along with this work; if not, write to the Free Software Foundation,
++ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
++ *
++ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
++ * or visit www.oracle.com if you need additional information or have any
++ * questions.
++ */
++
++#ifdef REDHAT_ALT_JAVA
++
++#include <sys/prctl.h>
++
++
++/* Per task speculation control */
++#ifndef PR_GET_SPECULATION_CTRL
++# define PR_GET_SPECULATION_CTRL    52
++#endif
++#ifndef PR_SET_SPECULATION_CTRL
++# define PR_SET_SPECULATION_CTRL    53
++#endif
++/* Speculation control variants */
++#ifndef PR_SPEC_STORE_BYPASS
++# define PR_SPEC_STORE_BYPASS          0
++#endif
++/* Return and control values for PR_SET/GET_SPECULATION_CTRL */
++
++#ifndef PR_SPEC_NOT_AFFECTED
++# define PR_SPEC_NOT_AFFECTED          0
++#endif
++#ifndef PR_SPEC_PRCTL
++# define PR_SPEC_PRCTL                 (1UL << 0)
++#endif
++#ifndef PR_SPEC_ENABLE
++# define PR_SPEC_ENABLE                (1UL << 1)
++#endif
++#ifndef PR_SPEC_DISABLE
++# define PR_SPEC_DISABLE               (1UL << 2)
++#endif
++#ifndef PR_SPEC_FORCE_DISABLE
++# define PR_SPEC_FORCE_DISABLE         (1UL << 3)
++#endif
++#ifndef PR_SPEC_DISABLE_NOEXEC
++# define PR_SPEC_DISABLE_NOEXEC        (1UL << 4)
++#endif
++
++static void set_speculation() __attribute__((constructor));
++static void set_speculation() {
++  if ( prctl(PR_SET_SPECULATION_CTRL,
++             PR_SPEC_STORE_BYPASS,
++             PR_SPEC_DISABLE_NOEXEC, 0, 0) == 0 ) {
++    return;
++  }
++  prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_STORE_BYPASS, PR_SPEC_DISABLE, 0, 0);
++}
++
++#endif // REDHAT_ALT_JAVA
+diff --git openjdk.orig/src/java.base/share/native/launcher/main.c openjdk/src/java.base/share/native/launcher/main.c
+index b734fe2ba78..79dc8307650 100644
+--- openjdk.orig/src/java.base/share/native/launcher/main.c
++++ openjdk/src/java.base/share/native/launcher/main.c
+@@ -34,6 +34,14 @@
+ #include "jli_util.h"
+ #include "jni.h"
+ 
++#ifdef REDHAT_ALT_JAVA
++#if defined(__linux__) && defined(__x86_64__)
++#include "alt_main.h"
++#else
++#warning alt-java requested but SSB mitigation not available on this platform.
++#endif
++#endif
++
+ #ifdef _MSC_VER
+ #if _MSC_VER > 1400 && _MSC_VER < 1600
+ 
