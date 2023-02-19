@@ -1,6 +1,8 @@
 
 load_variables_from_file "${INST_VARIABLES}"
 
+initialize_variables
+
 wizard_download_share_input()
 {
   local wizard_download_share_input_value=$1
