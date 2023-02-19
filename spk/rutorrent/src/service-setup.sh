@@ -100,7 +100,7 @@ service_postinst ()
       syno_user_add_to_legacy_group "${EFF_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
   
       # Install the web interface
-      cp -pR "${SYNOPKG_PKGDEST}/share/${PACKAGE}" "${WEB_DIR}"
+      cp -pR -t "${WEB_DIR}" "${SYNOPKG_PKGDEST}/share/${PACKAGE}"
     fi
 
     # Allow direct-user access to rtorrent configuration file
