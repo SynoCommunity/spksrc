@@ -10,6 +10,8 @@ REQUIRED_MIN_DSM = 5.0
 # Although qoriq can be compiled successfully it won't run as classic floating point unit not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+# Mono versions newer than 5.8.0 have an incompatibility with aarch64 on DSM 6.x (issue #3666)
+UNSUPPORTED_ARCHS_TCVERSION = aarch64-6.1
 
 MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework.
