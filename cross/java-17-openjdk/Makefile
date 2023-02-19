@@ -85,7 +85,7 @@ CONFIGURE_ARGS += OBJDUMP=$(OBJDUMP)
 # Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += product-images
 
-ADDITIONAL_CFLAGS = -Os
+ADDITIONAL_CFLAGS = -O2
 
 # Filter out any -jN since java's configure will autodetect number of CPU's
 # Use make JOBS=N to set number of CPU's in this package
