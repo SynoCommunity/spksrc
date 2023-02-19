@@ -43,7 +43,7 @@ END_OF_STEP
 
 {
   echo "["
-  if [ "${SYNOPKG_OLD_PKGVER}" -lt 13 ]; then
+  if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -lt 13 ]; then
     # Means that we'll need to have a wizard step about the download directory
     data_share_migration_step;
   fi
