@@ -1,7 +1,7 @@
 PKG_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
-JAVA_RELEASE = 9
+JAVA_RELEASE = 10
 JAVA_VERSION = 17.0.6
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
@@ -13,12 +13,13 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # https://openjdk.java.net/groups/build/doc/building.html
 
 BUILD_DEPENDS = native/openjdk-17 native/zip
-# Dependencies are required at build time only.
+# Dependencies required at build time only:
 BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
 BUILD_DEPENDS += cross/libX11
 BUILD_DEPENDS += cross/libXrender
 
+# Dependencies used as system dependencies:
 DEPENDS  = cross/fontconfig
 DEPENDS += cross/libffi
 DEPENDS += cross/zlib
@@ -42,8 +43,6 @@ PRE_COMPILE_TARGET = java-17-openjdk_pre_compile
 
 # Fix symlinks
 POST_INSTALL_TARGET = java-17-openjdk_post_compile
-
-include ../../mk/spksrc.archs.mk
 
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-17/work-native/jdk-17
@@ -97,7 +96,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: java-17-openjdk_configure
 # Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
-# Disables the normal host build target triplets since openjdk use its own openjdk-target
+# Disable the normal host build target triplets since openjdk uses its own openjdk-target
+# Avoid the use of $(RUN) since configure complains about env variables
 java-17-openjdk_configure:
 	cd $(WORK_DIR)/$(PKG_DIR) && PATH=$$PATH:$(ZIP_BIN_DIR) && bash ./configure $(CONFIGURE_ARGS)
 
