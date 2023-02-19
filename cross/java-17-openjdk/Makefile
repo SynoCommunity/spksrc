@@ -50,9 +50,7 @@ CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-17/work-na
 CONFIGURE_ARGS += --with-version-build=$(JAVA_RELEASE)
 CONFIGURE_ARGS += --with-version-pre=
 CONFIGURE_ARGS += --with-version-opt=LTS
-CONFIGURE_ARGS += --with-debug-level=release
 CONFIGURE_ARGS += --with-native-debug-symbols=none
-CONFIGURE_ARGS += --enable-unlimited-crypto
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-zlib=system
 CONFIGURE_ARGS += --with-libjpeg=system
@@ -70,9 +68,10 @@ CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
-CONFIGURE_ARGS += --enable-libffi-bundling
 CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-manpages
+CONFIGURE_ARGS += --with-cacerts-file=/etc/ssl/certs/ca-certificates.crt
+CONFIGURE_ARGS += --with-cacerts-src=/etc/ssl/certs
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
 

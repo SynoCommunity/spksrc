@@ -150,6 +150,5 @@ rsc:jvm/openjdk-17.0.6/lib/security/default.policy
 rsc:jvm/openjdk-17.0.6/lib/security/public_suffix_list.dat
 lib:jvm/openjdk-17.0.6/lib/server/libjsig.so
 lib:jvm/openjdk-17.0.6/lib/server/libjvm.so
-rsc:jvm/openjdk-17.0.6/lib/src.zip
 rsc:jvm/openjdk-17.0.6/lib/tzdb.dat
 rsc:jvm/openjdk-17.0.6/release
