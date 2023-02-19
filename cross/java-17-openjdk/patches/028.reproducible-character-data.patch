@@ -1,0 +1,14 @@
+Description: Makes the generated character data classes reproducible (removes a timestamp and trims a build path captured in the comments)
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+--- a/make/jdk/src/classes/build/tools/generatecharacter/GenerateCharacter.java
++++ b/make/jdk/src/classes/build/tools/generatecharacter/GenerateCharacter.java
+@@ -1729,7 +1729,7 @@ OUTER:  for (int i = 0; i < n; i += m) {
+         }
+         commentStart = (Csyntax ? "/*" : "//");
+         commentEnd = (Csyntax ? " */" : "");
+-        commandLineDescription = desc.toString().replace("\\", "\\\\");
++        commandLineDescription = desc.toString().replace("\\", "\\\\").replace(System.getProperty("user.dir").replace("make/gensrc", ""), "");
+     }
+ 
+     private static void searchBins(long[] map, int binsOccupied) throws Exception {

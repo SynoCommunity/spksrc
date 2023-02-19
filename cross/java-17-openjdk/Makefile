@@ -56,6 +56,7 @@ CONFIGURE_ARGS += --with-libjpeg=system
 CONFIGURE_ARGS += --with-giflib=system
 CONFIGURE_ARGS += --with-libpng=system
 CONFIGURE_ARGS += --with-lcms=system
+CONFIGURE_ARGS += --with-alsa=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
 CONFIGURE_ARGS += --disable-warnings-as-errors
@@ -73,6 +74,7 @@ CONFIGURE_ARGS += --with-cacerts-file=/etc/ssl/certs/ca-certificates.crt
 CONFIGURE_ARGS += --with-cacerts-src=/etc/ssl/certs
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
+CONFIGURE_ARGS += --with-jvm-variants=server
 
 # arguments not taken from environment
 CONFIGURE_ARGS += READELF=$(READELF)
@@ -82,8 +84,8 @@ CONFIGURE_ARGS += NM=$(NM)
 CONFIGURE_ARGS += OBJCOPY=$(OBJCOPY)
 CONFIGURE_ARGS += OBJDUMP=$(OBJDUMP)
 
-# Build images twice, second time with newly built JDK
-COMPILE_MAKE_OPTIONS += product-images
+# Just build the hotspot version
+COMPILE_MAKE_OPTIONS += hotspot-server
 
 ADDITIONAL_CFLAGS = -O2
 
@@ -91,6 +93,7 @@ ADDITIONAL_CFLAGS = -O2
 # Use make JOBS=N to set number of CPU's in this package
 DISABLE_PARALLEL_MAKE = 1
 COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
+PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk
 

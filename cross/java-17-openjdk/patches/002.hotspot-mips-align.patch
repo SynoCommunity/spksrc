@@ -1,0 +1,11 @@
+--- a/src/hotspot/cpu/zero/zeroInterpreter_zero.cpp
++++ b/src/hotspot/cpu/zero/zeroInterpreter_zero.cpp
+@@ -418,7 +418,7 @@ int ZeroInterpreter::native_entry(Method
+   ThreadStateTransition::transition_from_java(thread, _thread_in_native);
+ 
+   // Make the call
+-  intptr_t result[4 - LogBytesPerWord];
++  intptr_t result[4 - LogBytesPerWord] __attribute__((__aligned__(__alignof__(double))));
+   ffi_call(handler->cif(), (void (*)()) function, result, arguments);
+ 
+   // Change the thread state back to _thread_in_Java and ensure it
