@@ -15,6 +15,7 @@ INSTALL_TARGET = jackett_install
 
 include ../../mk/spksrc.install-resources.mk
 
+.PHONY: jackett_install
 jackett_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share
-	tar -cf - -C $(WORK_DIR)/$(PKG_NAME) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share
+	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share
