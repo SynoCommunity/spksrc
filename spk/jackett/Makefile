@@ -30,19 +30,18 @@ ADMIN_PORT = $(SERVICE_PORT)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # Mono build for unsupported .NET archs
-include ../../mk/spksrc.archs.mk
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
 DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
-SPK_DEPENDS = "mono>3.6"
+SPK_DEPENDS = "mono>=5.8"
 endif
 else
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) armada370),$(ARCH))
 DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
-SPK_DEPENDS = "mono>3.6"
+SPK_DEPENDS = "mono>=5.8"
 endif
 endif
 
@@ -56,6 +55,4 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: jackett_extra_install
 jackett_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/var
-	@install -m 755 -d $(STAGING_DIR)/var/.config
 	@install -m 755 -d $(STAGING_DIR)/var/.config/Jackett
