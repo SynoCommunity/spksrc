@@ -18,7 +18,7 @@ CONFIGURE_ARGS += -Dcache-build=disabled
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, ${TC_GCC}, 4.8),1) 
+ifeq ($(call version_lt, $(TC_GCC), 4.8),1) 
 ADDITIONAL_CFLAGS += -std=c99
 else
 ADDITIONAL_CFLAGS += -std=c11
