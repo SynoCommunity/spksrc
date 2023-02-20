@@ -12,7 +12,7 @@ DESCRIPTION = mosh, the mobile shell is a remote terminal application that allow
 
 DISPLAY_NAME = mosh
 STARTABLE = no
-CHANGELOG = "1. Update Mosh to version 1.4.0."
+CHANGELOG = "1. Update Mosh to version 1.4.0.<br/>2. Update openssl to 1.1.1t."
 
 HOMEPAGE = https://mosh.org
 LICENSE  = GPLv3+
