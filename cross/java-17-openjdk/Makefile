@@ -20,7 +20,8 @@ BUILD_DEPENDS += cross/libX11
 BUILD_DEPENDS += cross/libXrender
 
 # Dependencies used as system dependencies:
-DEPENDS  = cross/fontconfig
+DEPENDS  = cross/alsa-lib
+DEPENDS += cross/fontconfig
 DEPENDS += cross/libffi
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
@@ -74,7 +75,11 @@ CONFIGURE_ARGS += --with-cacerts-file=/etc/ssl/certs/ca-certificates.crt
 CONFIGURE_ARGS += --with-cacerts-src=/etc/ssl/certs
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
-CONFIGURE_ARGS += --with-jvm-variants=server
+# customize for SynoCommunity
+CONFIGURE_ARGS += --with-vendor-name=SynoCommunity
+CONFIGURE_ARGS += --with-vendor-url=https://synocommunity.com/package/java-17-openjdk
+CONFIGURE_ARGS += --with-vendor-bug-url=https://github.com/SynoCommunity/spksrc/issues
+CONFIGURE_ARGS += --with-vendor-vm-bug-url=https://github.com/SynoCommunity/spksrc/issues
 
 # arguments not taken from environment
 CONFIGURE_ARGS += READELF=$(READELF)
@@ -84,8 +89,10 @@ CONFIGURE_ARGS += NM=$(NM)
 CONFIGURE_ARGS += OBJCOPY=$(OBJCOPY)
 CONFIGURE_ARGS += OBJDUMP=$(OBJDUMP)
 
-# Just build the hotspot version
-COMPILE_MAKE_OPTIONS += hotspot-server
+# Build images twice, second time with newly built JDK
+COMPILE_MAKE_OPTIONS += product-images
+
+PATCHES_LEVEL = 1
 
 ADDITIONAL_CFLAGS = -O2
 
@@ -93,7 +100,6 @@ ADDITIONAL_CFLAGS = -O2
 # Use make JOBS=N to set number of CPU's in this package
 DISABLE_PARALLEL_MAKE = 1
 COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
-PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk
 
