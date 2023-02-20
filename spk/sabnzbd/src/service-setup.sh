@@ -7,9 +7,7 @@ SABNZBD="${SYNOPKG_PKGDEST}/share/SABnzbd/SABnzbd.py"
 CFG_FILE="${SYNOPKG_PKGVAR}/config.ini"
 LANGUAGE="env LANG=en_US.UTF-8"
 
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-    GROUP="synocommunity"
-else
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     GROUP="sc-download"
 fi
 
@@ -81,7 +79,7 @@ service_postupgrade ()
                 mkdir -p "$NEW_WATCH_FOLDER"
                 mv -nv "$OLD_WATCH_FOLDER"/* "$NEW_WATCH_FOLDER/"
             fi
-            shopt -d dotglob
+            shopt -u dotglob
 
         else
             # add group (DSM6)
