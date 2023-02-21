@@ -1,0 +1,21 @@
+BASE_INSTALL_STEP_TITLE="Configuration de base"
+
+SELECT_VOLUME="Sélectionner le volume à utiliser pour le répertoire de téléchargements"
+SELECT_VOLUME_INPUT_LABEL="Nom du volume"
+
+DOWNLOAD_SHARED_FOLDER="Répertoire partagé de téléchargements (utilisant le volume sélectionné ci-dessus)"
+SUBDIRECTORIES_ARE_NOT_SUPPORTED="Sous-répertoires non-supportés."
+DOWNLOAD_SHARED_FOLDER_LOCATION="Répertoire de téléchargements"
+
+IF_SPECIFIED_SHARE_DOES_NOT_EXIST="Si le répertoire partagé est inexistant, il sera créé.  Vous pouvez utiliser un partage existant en spécifiant le nom du répertoire destination."
+
+DSM_PERMISSIONS_STEP_TITLE="Attention! Permissions DSM et répertoires partagés"
+DSM_PERMISSIONS_STEP_DESC="Les permissions de cette application de téléchargement ne sont plus gérées par le groupe <b>'sc-download'</b> dans DSM.<br />L'utilisateur spécifique à l'application se verra attribuer les droits au répertoire partagé ci-dessous."
+
+WATCH_DIR_DESC="Surveille les torrents dans un répertoire et les ajoute à ruTorrent automatiquement. Relatif au répertoire partagé. Laisser vide pour désactiver"
+WATCH_DIR_INPUT_DESC="Répertoire surveillé"
+PERMISSION_MANAGEMENT="L'utilisateur et le group du package n'apparaîtront pas sur la plupart des UI réglages. Veuillez vous référrer à <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+
+ADDITIONAL_CONFIGURATION_STEP_TITLE="Configuration additionnelle"
+WEB_INTERFACE_ITEM_DESC="Certaines fonctionnalités de l'interface web nécessitent de désactiver open_basedir (restriction PHP). Certaines tâches ne sont pas effectuées en tant qu'utilisateur http et par conséquent un réglage global a besoin d'être modifié. Voulez vous désactiver open_basedir automatiquement? (La valeur précédente de open_basedir ne sera pas restorée à la désinstallation)"
+DISABLE_OPEN_DIR_INPUT_DESC="Désactiver open_basedir"
