@@ -124,7 +124,7 @@ service_postinst ()
         TOP_DIR=`echo "${effective_download_dir}" | cut -d "/" -f 2`
         MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
 
-        sed -i -e "s|scgi_port = 5000;|scgi_port = 8050;|g" \
+        sed -i -e "s|scgi_port = 5000;|scgi_port = ${SERVICE_PORT};|g" \
                -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
                -e "s|tempDirectory = null;|tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|g" \
                -e "s|\"python\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"python\"\1=>\2'${SYNOPKG_PKGDEST}/env/bin/python3'\3,\4|g" \
@@ -140,6 +140,7 @@ service_postinst ()
 
         sed -i -e "s|@download_dir@|${effective_download_dir}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
+               -e "s|@service_port@|${SERVICE_PORT}|g" \
                "${RTORRENT_RC}"
 
         if [ -d "${wizard_watch_dir}" ]; then

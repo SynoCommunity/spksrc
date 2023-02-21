@@ -27,7 +27,7 @@ DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorren
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "<ol><li>Update to Python 3.10</li><li>Update to PHP 7.4</li><li>Remove tools from procps-ng</li><li>Fix support of DSM 7.</li><li>Fix torrent creation wizard (\#5288)</li></ol>"
+CHANGELOG = "<ol><li>Update to Python 3.10</li><li>Update to PHP 7.4</li><li>Remove tools from procps-ng</li><li>Fix support of DSM 7.</li><li>Fix torrent creation wizard (\#5288)</li><li>Add service port declarations</li></ol>"
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
@@ -35,6 +35,8 @@ LICENSE = GPLv3
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_WIZARD_SHARE = wizard_download_dir
+
+DSM_UI_CONFIG = src/app/config
 
 # Required environment variables will be injected in service-setup.sh
 SERVICE_COMMAND = /var/packages/rutorrent/target/bin/rtorrent-daemon
@@ -59,7 +61,8 @@ UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 SYSTEM_GROUP = http
 
-ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
+SERVICE_PORT = 8050
+SERVICE_PORT_TITLE = rutorrent RPC
 
 SUPPORTED_LANGUAGES = fre
 
@@ -95,8 +98,6 @@ rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.session
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
 	install -m 775 -d $(STAGING_DIR)/tmp
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 	install -m 755 -d $(STAGING_DIR)/etc/php/conf.d/
 	install -m 644 src/etc/php/conf.d/com.synocommunity.rutorrent.ini $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.rutorrent.ini

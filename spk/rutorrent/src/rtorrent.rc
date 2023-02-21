@@ -1,4 +1,4 @@
-scgi_port = localhost:8050
+scgi_port = localhost:@service_port@
 directory = @download_dir@
 session = /var/packages/rutorrent/var/.session
 schedule = watch_directory,5,5,load.start=@watch_dir@/*.torrent
