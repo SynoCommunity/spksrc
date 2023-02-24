@@ -32,9 +32,9 @@ DEPENDS += cross/lcms2
 ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
 
-HOMEPAGE = http://openjdk.java.net/
-COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by by JSR 392 in the Java Community Process.
-LICENSE  = ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
+HOMEPAGE = https://openjdk.org/projects/jdk/17/
+COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
+LICENSE  = GPLv2 with the Classpath Exception
 
 # Use our own configure since the one supplied by openjdk has no shebang
 CONFIGURE_TARGET = java-17-openjdk_configure
@@ -117,5 +117,7 @@ java-17-openjdk_pre_compile:
 
 .PHONY: java-17-openjdk_post_compile
 java-17-openjdk_post_compile:
-	cd $(STAGING_INSTALL_PREFIX)/bin ; \
-	ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/

@@ -14,13 +14,13 @@ REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by by JSR 392 in the Java Community Process.
+DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
 
 STARTABLE = no
 DISPLAY_NAME = Java 17 OpenJDK
 CHANGELOG = "Initial Java 17 package release"
 
-HOMEPAGE = http://openjdk.java.net/
+HOMEPAGE = https://openjdk.org/projects/jdk/17/
 LICENSE_FILE = src/LICENSE
 
 SPK_COMMANDS += bin/jar
