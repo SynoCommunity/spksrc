@@ -16,7 +16,6 @@ INSTALL_TARGET = node-red_install
 
 include ../../mk/spksrc.install-resources.mk
 
-ENV += NPM_CONFIG_USER=root
 PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 .PHONY: node-red_install
