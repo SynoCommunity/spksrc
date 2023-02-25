@@ -33,7 +33,7 @@ CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
 
-# Enable all libraries incoming from FFMPEG
+# Enable all libraries incoming from FFMPEG4
 CONFIGURE_ARGS += --disable-libfdkaac_static --enable-libfdkaac
 CONFIGURE_ARGS += --disable-libopus_static --enable-libopus
 CONFIGURE_ARGS += --disable-libtheora_static --enable-libtheora
@@ -41,12 +41,12 @@ CONFIGURE_ARGS += --disable-libvorbis_static --enable-libvorbis
 CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
-ifeq ($(wildcard $(FFMPEG_DIR)),)
+ifeq ($(wildcard $(FFMPEG4_DIR)),)
 DEPENDS += cross/fdk-aac cross/opus cross/libtheora cross/libvorbis cross/libvpx cross/x264 cross/x265
 endif
 
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
-ifeq ($(wildcard $(FFMPEG_DIR)),)
+ifeq ($(wildcard $(FFMPEG4_DIR)),)
 DEPENDS += cross/ffmpeg
 endif
 
@@ -61,7 +61,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
-ifeq ($(wildcard $(FFMPEG_DIR)),)
+ifeq ($(wildcard $(FFMPEG4_DIR)),)
 DEPENDS += cross/libva
 endif
 endif

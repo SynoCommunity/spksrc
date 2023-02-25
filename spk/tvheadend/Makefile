@@ -48,11 +48,11 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 # Reuse ffmpeg libraries
 # Requires to invoke: make [package|publish] ARCH= TCVERSION=
-export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+export FFMPEG4_DIR = $(shell pwd)/../ffmpeg4/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
 
-ifneq ($(wildcard $(FFMPEG_DIR)),)
+ifneq ($(wildcard $(FFMPEG4_DIR)),)
 PRE_DEPEND_TARGET = tvheadend_pre_depend
-SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg>4.4"
+SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg4>4.4"
 endif
 
 include ../../mk/spksrc.spk.mk
@@ -60,18 +60,42 @@ include ../../mk/spksrc.spk.mk
 .PHONY: tvheadend_pre_depend tvheadend_extra_install
 
 # Use FFMPEG package shared libraries
-FFMPEG_LIBS = libavfilter.pc libpostproc.pc libswresample.pc libavresample.pc libswscale.pc libavutil.pc libavformat.pc libavcodec.pc
+FFMPEG4_LIBS  = libavfilter.pc
+FFMPEG4_LIBS += libpostproc.pc
+FFMPEG4_LIBS += libswresample.pc
+FFMPEG4_LIBS += libavresample.pc
+FFMPEG4_LIBS += libswscale.pc
+FFMPEG4_LIBS += libavutil.pc
+FFMPEG4_LIBS += libavformat.pc
+FFMPEG4_LIBS += libavcodec.pc
 
 # Use other media libraries through FFMPEG package shared libraries
-MEDIA_LIBS = fdk-aac.pc numa.pc ogg.pc opus.pc theoradec.pc theoraenc.pc theora.pc vorbisenc.pc vorbisfile.pc vorbis.pc vpx.pc x264.pc x265.pc
+MEDIA_LIBS  = fdk-aac.pc
+MEDIA_LIBS += numa.pc
+MEDIA_LIBS += ogg.pc
+MEDIA_LIBS += opus.pc
+MEDIA_LIBS += theoradec.pc
+MEDIA_LIBS += theoraenc.pc
+MEDIA_LIBS += theora.pc
+MEDIA_LIBS += vorbisenc.pc
+MEDIA_LIBS += vorbisfile.pc
+MEDIA_LIBS += vorbis.pc
+MEDIA_LIBS += vpx.pc
+MEDIA_LIBS += x264.pc
+MEDIA_LIBS += x265.pc
 
 # Add Intel VAAPI libraries on Intel platforms
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-VAAPI_LIBS = libdrm.pc libdrm_intel.pc libkms.pc libva.pc libva-drm.pc pciaccess.pc
+VAAPI_LIBS  = libdrm.pc
+VAAPI_LIBS += libdrm_intel.pc
+VAAPI_LIBS += libkms.pc
+VAAPI_LIBS += libva.pc
+VAAPI_LIBS += libva-drm.pc
+VAAPI_LIBS += pciaccess.pc
 endif
 
 tvheadend_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
-	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
-	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(FFMPEG4_LIBS),ln -sfT $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)

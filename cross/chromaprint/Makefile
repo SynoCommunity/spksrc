@@ -14,7 +14,7 @@ OPTIONAL_DEPENDS = cross/ffmpeg
 # compiler too old
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-ifneq ($(wildcard $(FFMPEG_DIR)),)
+ifneq ($(wildcard $(FFMPEG4_DIR)),)
 CMAKE_RPATH = /var/packages/ffmpeg/target/lib
 else
 DEPENDS = cross/ffmpeg

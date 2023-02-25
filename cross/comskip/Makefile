@@ -14,7 +14,7 @@ HOMEPAGE = https://www.kaashoek.com/comskip
 COMMENT  = Commercial detector
 LICENSE  = GNU/LGPL
 
-ifeq ($(wildcard $(FFMPEG_DIR)),)
+ifeq ($(wildcard $(FFMPEG4_DIR)),)
 DEPENDS += cross/ffmpeg
 endif
 

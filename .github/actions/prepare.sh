@@ -6,7 +6,7 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - ffmpeg is moved to head of packages to built first if triggered by its own or a dependent.
+# - ffmpeg4 is moved to head of packages to built first if triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -54,16 +54,16 @@ fi
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 
-# find all packages that depend on spk/ffmpeg is built before.
-all_ffmpeg_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "export FFMPEG_DIR" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+# find all packages that depend on spk/ffmpeg4 is built before.
+all_ffmpeg4_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "export FFMPEG4_DIR" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-# if ffmpeg or one of its dependents is to build, ensure
-# ffmpeg is first package in the list of packages to build.
+# if ffmpeg4 or one of its dependents is to build, ensure
+# ffmpeg4 is first package in the list of packages to build.
 for package in ${packages}
 do
-    if [ "$(echo ffmpeg ${all_ffmpeg_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')
-        packages="ffmpeg ${packages_without_ffmpeg}"
+    if [ "$(echo ffmpeg4 ${all_ffmpeg4_packages} | grep -ow ${package})" != "" ]; then
+        packages_without_ffmpeg4=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg4" | tr '\n' ' ')
+        packages="ffmpeg4 ${packages_without_ffmpeg4}"
         break;
     fi
 done
