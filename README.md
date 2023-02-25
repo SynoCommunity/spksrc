@@ -66,7 +66,7 @@ sudo apt install autoconf-archive autogen automake autopoint bash bc bison \
 wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
 sudo pip2 install wheel httpie
 wget https://bootstrap.pypa.io/get-pip.py -O - | sudo python3
-sudo pip3 install meson==0.62.2
+sudo pip3 install meson==1.0.0
 ```
 From there, follow the instructions in the [Developers HOW TO].
 
@@ -101,7 +101,7 @@ lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - 
 ```
 7. Install `meson`:
 ```bash
-lxc exec spksrc -- /bin/bash -c "pip3 install meson==0.62.2"
+lxc exec spksrc -- /bin/bash -c "pip3 install meson==1.0.0"
 ```
 
 
