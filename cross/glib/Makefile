@@ -1,4 +1,4 @@
-PKG_NAME = glib
+PKG_NAME = glib-main
 
 HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.

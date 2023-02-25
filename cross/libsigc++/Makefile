@@ -1,4 +1,4 @@
-PKG_NAME = libsigc++
+PKG_NAME = libsigc++-main
 
 HOMEPAGE = http://libsigc.sourceforge.net/
 COMMENT  = libsigc++ implements a typesafe callback system for standard C++

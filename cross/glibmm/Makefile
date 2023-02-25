@@ -1,4 +1,4 @@
-PKG_NAME = glibmm
+PKG_NAME = glibmm-main
 
 HOMEPAGE = https://www.gtkmm.org/en/
 COMMENT  = GLib is a low-level general-purpose library used mainly by GTK+/GNOME applications, but is useful for other programs as well. glibmm is the C++ wrapper for GLib.
