@@ -48,11 +48,13 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 # Reuse ffmpeg libraries
 # Requires to invoke: make [package|publish] ARCH= TCVERSION=
-export FFMPEG4_DIR = $(shell pwd)/../ffmpeg4/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+export FFMPEG_VERSION = 4
+export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(FFMPEG_VERSION)/target)
 
-ifneq ($(wildcard $(FFMPEG4_DIR)),)
+ifneq ($(wildcard $(FFMPEG_DIR)),)
+export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(FFMPEG_VERSION)/target/lib
 PRE_DEPEND_TARGET = tvheadend_pre_depend
-SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg4>4.4"
+SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg$(FFMPEG_VERSION)"
 endif
 
 include ../../mk/spksrc.spk.mk
@@ -60,18 +62,17 @@ include ../../mk/spksrc.spk.mk
 .PHONY: tvheadend_pre_depend tvheadend_extra_install
 
 # Use FFMPEG package shared libraries
-FFMPEG4_LIBS  = libavfilter.pc
-FFMPEG4_LIBS += libpostproc.pc
-FFMPEG4_LIBS += libswresample.pc
-FFMPEG4_LIBS += libavresample.pc
-FFMPEG4_LIBS += libswscale.pc
-FFMPEG4_LIBS += libavutil.pc
-FFMPEG4_LIBS += libavformat.pc
-FFMPEG4_LIBS += libavcodec.pc
+FFMPEG_LIBS  = libavfilter.pc
+FFMPEG_LIBS += libpostproc.pc
+FFMPEG_LIBS += libswresample.pc
+FFMPEG_LIBS += libavresample.pc
+FFMPEG_LIBS += libswscale.pc
+FFMPEG_LIBS += libavutil.pc
+FFMPEG_LIBS += libavformat.pc
+FFMPEG_LIBS += libavcodec.pc
 
 # Use other media libraries through FFMPEG package shared libraries
 MEDIA_LIBS  = fdk-aac.pc
-MEDIA_LIBS += numa.pc
 MEDIA_LIBS += ogg.pc
 MEDIA_LIBS += opus.pc
 MEDIA_LIBS += theoradec.pc
@@ -88,14 +89,17 @@ MEDIA_LIBS += x265.pc
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 VAAPI_LIBS  = libdrm.pc
 VAAPI_LIBS += libdrm_intel.pc
-VAAPI_LIBS += libkms.pc
 VAAPI_LIBS += libva.pc
 VAAPI_LIBS += libva-drm.pc
 VAAPI_LIBS += pciaccess.pc
 endif
 
 tvheadend_pre_depend:
+	echo FFMPEG_VERSION: $(FFMPEG_VERSION)
+	echo FFMPEG_DIR: $(FFMPEG_DIR)
+	echo ADDITIONAL_LDFLAGS: $(ADDITIONAL_LDFLAGS)
+	echo SPK_DEPENDS: $(SPK_DEPENDS)
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG4_LIBS),ln -sfT $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
-	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
-	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
+	$(foreach lib,$(VAAPI_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)

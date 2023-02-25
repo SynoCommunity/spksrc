@@ -16,12 +16,13 @@ HOMEPAGE   = https://acoustid.org/chromaprint
 LICENSE    = LGPL2.1+
 
 # Reuse FFmpeg libraries
-export FFMPEG4_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg4/target
+export FFMPEG_VERSION = 4
+export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(FFMPEG_VERSION)/target)
 
-ifneq ($(wildcard $(FFMPEG4_DIR)),)
-export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG4_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg4/target/lib
+ifneq ($(wildcard $(FFMPEG_DIR)),)
+export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(FFMPEG_VERSION)/target/lib
 PRE_DEPEND_TARGET = chromaprint_pre_depend
-SPK_DEPENDS = "ffmpeg4>4.4"
+SPK_DEPENDS = "ffmpeg$(FFMPEG_VERSION)"
 endif
 
 SPK_COMMANDS = bin/fpcalc
@@ -31,10 +32,10 @@ include ../../mk/spksrc.spk.mk
 .PHONY: chromaprint_pre_depend
 
 # From library detection at cmake/modules/FindFFmpeg.cmake
-FFMPEG4_LIBS  = libavcodec.pc
-FFMPEG4_LIBS += libavformat.pc
-FFMPEG4_LIBS += libavutil.pc
+FFMPEG_LIBS  = libavcodec.pc
+FFMPEG_LIBS += libavformat.pc
+FFMPEG_LIBS += libavutil.pc
 
 chromaprint_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG4_LIBS),ln -sf $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)

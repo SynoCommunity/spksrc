@@ -21,26 +21,28 @@ SPK_COMMANDS = bin/comskip
 POST_STRIP_TARGET = comskip_extra_install
 
 # Reuse FFmpeg libraries
-export FFMPEG4_DIR = $(shell pwd)/../ffmpeg4/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+export FFMPEG_VERSION = 4
+export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(FFMPEG_VERSION)/target)
 
-ifneq ($(wildcard $(FFMPEG4_DIR)),)
+ifneq ($(wildcard $(FFMPEG_DIR)),)
+export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(FFMPEG_VERSION)/target/lib
 PRE_DEPEND_TARGET = comskip_pre_depend
-SPK_DEPENDS = "ffmpeg4>4.4"
+SPK_DEPENDS = "ffmpeg$(FFMPEG_VERSION)"
 endif
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: comskip_pre_depend comskip_extra_install
 
-FFMPEG4_LIBS  = libswresample.pc
-FFMPEG4_LIBS += libavutil.pc
-FFMPEG4_LIBS += libavformat.pc
-FFMPEG4_LIBS += libavcodec.pc
-FFMPEG4_LIBS += libswscale.pc
+FFMPEG_LIBS  = libswresample.pc
+FFMPEG_LIBS += libavutil.pc
+FFMPEG_LIBS += libavformat.pc
+FFMPEG_LIBS += libavcodec.pc
+FFMPEG_LIBS += libswscale.pc
 
 comskip_pre_depend:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG4_LIBS),ln -sf $(FFMPEG4_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 
 comskip_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
