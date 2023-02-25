@@ -17,6 +17,8 @@ STARTABLE = no
 HOMEPAGE = https://www.ffmpeg.org/
 LICENSE  = GPLv3
 
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 SERVICE_SETUP = src/service-setup.sh
+endif
 
 include ../../mk/spksrc.spk.mk
