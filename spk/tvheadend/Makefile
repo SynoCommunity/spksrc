@@ -95,10 +95,6 @@ VAAPI_LIBS += pciaccess.pc
 endif
 
 tvheadend_pre_depend:
-	echo FFMPEG_VERSION: $(FFMPEG_VERSION)
-	echo FFMPEG_DIR: $(FFMPEG_DIR)
-	echo ADDITIONAL_LDFLAGS: $(ADDITIONAL_LDFLAGS)
-	echo SPK_DEPENDS: $(SPK_DEPENDS)
 	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	$(foreach lib,$(FFMPEG_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)
 	$(foreach lib,$(MEDIA_LIBS),ln -sfT $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) ;)

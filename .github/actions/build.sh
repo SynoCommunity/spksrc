@@ -12,8 +12,8 @@
 # - The build output is structured into log groups by package.
 # - As the disk space in the workflow environment is limitted, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - ffmpeg4 is not cleaned to be available for dependents.
-# - Therefore ffmpeg4 is built first if triggered by its own or a dependent (see prepare.sh).
+# - ffmpeg4 & ffmpeg5 are not cleaned to be available for dependents.
+# - Therefore ffmpeg4 and ffmpeg5 are built first if triggered by its own or a dependent (see prepare.sh).
 
 set -o pipefail
 
@@ -58,7 +58,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="ffmpeg4"
+PACKAGES_TO_KEEP="ffmpeg4 ffmpeg5"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"

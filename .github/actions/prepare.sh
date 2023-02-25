@@ -55,16 +55,20 @@ packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 
 # find all packages that depend on spk/ffmpeg4 is built before.
-all_ffmpeg4_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "export FFMPEG4_DIR" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+all_ffmpeg4_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = 4" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+all_ffmpeg5_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = 5" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-# if ffmpeg4 or one of its dependents is to build, ensure
-# ffmpeg4 is first package in the list of packages to build.
+# if ffmpeg4|ffmpeg5 or one of its dependents is to built, ensure
+# ffmpeg4|ffmpeg5 are first packages in the list of packages to build.
 for package in ${packages}
 do
     if [ "$(echo ffmpeg4 ${all_ffmpeg4_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg4=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg4" | tr '\n' ' ')
-        packages="ffmpeg4 ${packages_without_ffmpeg4}"
-        break;
+        packages_without_ffmpeg=${packages//ffmpeg4/}
+        packages="ffmpeg4 ${packages_without_ffmpeg}"
+    fi
+    if [ "$(echo ffmpeg5 ${all_ffmpeg5_packages} | grep -ow ${package})" != "" ]; then
+        packages_without_ffmpeg=${packages//ffmpeg5/}
+        packages="ffmpeg5 ${packages_without_ffmpeg}"
     fi
 done
 
