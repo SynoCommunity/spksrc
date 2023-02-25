@@ -19,7 +19,6 @@ Candidates for enablement:
   --enable-libsnappy 
   --enable-libsrt 
   --enable-libssh 
-  --enable-libtwolame 
   --enable-libvidstab 
   --enable-libxvid 
   --enable-lv2 
