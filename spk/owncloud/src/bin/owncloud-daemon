@@ -5,13 +5,12 @@ PACKAGE="owncloud"
 DNAME="ownCloud"
 
 # Others
-INSTALL_DIR="/usr/local/${PACKAGE}"
-WEB_DIR="/var/services/web"
-PATH="${INSTALL_DIR}/bin:${PATH}"
+WEB_DIR="/var/services/web_packages"
+PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 USER="$([ "${BUILDNUMBER}" -ge "4418" ] && echo -n http || echo -n nobody)"
-OWNCLOUD="${INSTALL_DIR}/bin/owncloud.sh"
-PID_FILE="${INSTALL_DIR}/var/owncloud.pid"
+OWNCLOUD="${SYNOPKG_PKGDEST}/bin/owncloud.sh"
+PID_FILE="${SYNOPKG_PKGDEST}/var/owncloud.pid"
 
 
 start_daemon ()

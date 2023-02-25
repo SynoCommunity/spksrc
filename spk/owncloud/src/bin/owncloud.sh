@@ -3,7 +3,7 @@
 set -e
 
 PHP="php -d open_basedir=none -f"
-OWNCLOUD="/var/services/web/owncloud/cron.php"
+OWNCLOUD="/var/services/web_packages/owncloud/cron.php"
 SLEEP_TIME="1800"
 
 # Main loop

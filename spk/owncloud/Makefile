@@ -4,7 +4,7 @@ SPK_REV = 9
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
@@ -20,25 +20,22 @@ REQUIRED_MIN_DSM = 5.0
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf/
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_COMMAND = $(INSTALL_PREFIX)/bin/owncloud-daemon
 
+SPK_DEPENDS = "WebStation:MariaDB10:PHP7.4:Apache2.4"
 INSTALL_DEP_SERVICES = apache-web mysql
 START_DEP_SERVICES = apache-web mysql
 INSTUNINST_RESTART_SERVICES = apache-web
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+SYSTEM_GROUP = http
 
 POST_STRIP_TARGET = owncloud_extra_install
-
-BUSYBOX_CONFIG = daemon nice
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
 owncloud_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var -d $(STAGING_DIR)/app
-	install -m 755 src/owncloud.sh $(STAGING_DIR)/bin/
+	install -m 755 -d $(STAGING_DIR)/app -d $(STAGING_DIR)/bin
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 644 src/autoconfig.php $(STAGING_DIR)/share/$(SPK_NAME)/config/autoconfig.php
+	install -m 755 src/bin/owncloud-daemon $(STAGING_DIR)/bin/owncloud-daemon
+	install -m 755 src/bin/owncloud.sh $(STAGING_DIR)/bin/owncloud.sh
