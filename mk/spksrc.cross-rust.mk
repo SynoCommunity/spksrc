@@ -56,7 +56,7 @@ CARGO_INSTALL_ARGS += --root $(STAGING_INSTALL_PREFIX)
 # Default build with rust and installation with cargo
 rust_install_target:
 	@echo "  ==> Cargo install rust package $(PKG_NAME)"
-	@$(RUN) cargo install $(CARGO_INSTALL_ARGS)
+	@$(RUN) cargo +$(RUST_TOOLCHAIN) install $(CARGO_INSTALL_ARGS)
 
 
 #####
