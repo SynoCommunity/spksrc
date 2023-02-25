@@ -8,7 +8,9 @@ export RUSTUP_HOME=$(BASE_DISTRIB_DIR)/rustup
 export PATH:=$(BASE_DISTRIB_DIR)/cargo/bin:$(PATH)
 endif
 
-RUST_TOOLCHAIN ?= stable
+ifeq ($(RUST_TOOLCHAIN),)
+RUST_TOOLCHAIN = stable
+endif
 
 RUST_TARGET =
 # map archs to rust targets
