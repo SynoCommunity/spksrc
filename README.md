@@ -127,6 +127,15 @@ lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev \
                                         mlocate ripgrep rsync tree time
 lxc exec spksrc -- /usr/bin/updatedb
 ```
+Install github client:
+```
+$ lxc exec spksrc -- su --login root
+# curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+# echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+# sudo apt update
+# sudo apt install gh
+# exit
+```
 
 #### (OPTIONAL) LXC: Shared `spksrc` user 
 You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you which to share its `/home` userspace.
