@@ -1,6 +1,6 @@
 SPK_NAME = comskip
 SPK_VERS = 0.82.010
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/comskip.png
 
 DEPENDS = cross/$(SPK_NAME)
