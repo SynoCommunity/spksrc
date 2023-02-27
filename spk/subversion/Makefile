@@ -3,7 +3,7 @@ SPK_VERS = 1.14.2
 SPK_REV = 1
 SPK_ICON = src/subversion.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/subversion
 
 MAINTAINER = hgy59
 DESCRIPTION = Subversion is an open source version control system.
@@ -14,6 +14,17 @@ CHANGELOG = "Initial SynoCommunity Package release."
 HOMEPAGE = https://subversion.apache.org/
 LICENSE  = Apache 2.0
 
+SERVICE_PORT = 3691
+WIZARDS_DIR = src/wizard
+SERVICE_WIZARD_SHARE = wizard_repo_directory
+USE_DATA_SHARE_WORKER = yes
+
+STARTABLE = yes
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+NO_SERVICE_SHORTCUT = yes
+
+POST_STRIP_TARGET = subversion_extra_install
 
 SPK_COMMANDS  = bin/svn
 SPK_COMMANDS += bin/svnadmin
@@ -28,3 +39,9 @@ SPK_COMMANDS += bin/svnsync
 SPK_COMMANDS += bin/svnversion
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: subversion_extra_install
+subversion_extra_install:
+	@$(MSG) Install template for service-variables
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/service-variables.template $(STAGING_DIR)/var/service-variables.template
