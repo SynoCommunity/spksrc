@@ -118,11 +118,13 @@ endif
 
 # [numpy] <= 1.21.6 (armv5)
 # This version is now unsupported using py311
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # [numpy] <= 1.22.4 (armv7l)
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
+endif
 endif
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
