@@ -25,8 +25,8 @@
 #  SERVICE_CERT_RELOAD           (optional) package-relative path to a script for reloading the service after certificate changes
 #  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
 #  SERVICE_WIZARD_GROUP          (optional) use name of wizard-variable to define the GROUP
-#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define SHARE_PATH (uses DSM data share worker for DSM 7)
-#  USE_DATA_SHARE_WORKER         (optional) use DSM data share worker for SERVICE_WIZARD_SHARE and DSM 6 too
+#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define folder name of SHARE_PATH (uses DSM data share worker for DSM 7)
+#  USE_DATA_SHARE_WORKER         (optional) use DSM data share worker for SERVICE_WIZARD_SHARE for DSM 6 too
 #  SERVICE_USER                  (optional) runtime user account for generic service support.
 #                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
 #  SPK_GROUP                     (optional) defines the group to use in privilege resource file
@@ -123,15 +123,11 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo 'fi' >> $@
 	@echo '' >> $@
 ifneq ($(strip $(SERVICE_USER)),)
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo USER=\"sc-$(SPK_USER)\" >> $@
+	@echo USER=\"$(SPK_USER)\" >> $@
+ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 	@echo EFF_USER=\"sc-$(SPK_USER)\" >> $@
 else
-	@echo "# Base service USER to run background process prefixed according to DSM" >> $@
-	@echo USER=\"$(SPK_USER)\" >> $@
-	@echo "PRIV_PREFIX=sc-" >> $@
-	@echo "SYNOUSER_PREFIX=svc-" >> $@
-	@echo 'if [ -n "$${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "$${SYNOPKG_DSM_VERSION_MAJOR}" -lt 6 ]; then EFF_USER="$${SYNOUSER_PREFIX}$${USER}"; else EFF_USER="$${PRIV_PREFIX}$${USER}"; fi' >> $@
+	@echo EFF_USER=\"svc-$(SPK_USER)\" >> $@
 endif
 	@echo '' >> $@
 endif
@@ -142,7 +138,19 @@ ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 	@echo "# DSM shared folder location from UI if provided" >> $@
-	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"; fi' >> $@
+	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then' >> $@
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@echo '   SHARE_PATH=$$(realpath "/var/packages/$${SYNOPKG_PKGNAME}/shares/$${$(SERVICE_WIZARD_SHARE)}")' >> $@
+else
+	@echo '   if synoshare --get "$${$(SERVICE_WIZARD_SHARE)}" &> /dev/null; then ' >> $@
+	@echo '      SHARE_PATH=$$(synoshare --get "$${$(SERVICE_WIZARD_SHARE)}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)' >> $@
+	@echo '      echo "SHARE_PATH from share [$${SHARE_PATH}]"' >> $@
+	@echo '   else' >> $@
+	@echo '      SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"' >> $@
+	@echo '      echo "SHARE_PATH [$${SHARE_PATH}] is not an existing shared folder"' >> $@
+	@echo '   fi' >> $@
+endif
+	@echo 'fi' >> $@
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_PORT)),)
