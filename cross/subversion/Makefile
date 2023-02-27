@@ -24,6 +24,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --with-apr=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-apr-util=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-serf=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-zlib=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --without-berkeley-db
 CONFIGURE_ARGS += --with-utf8proc=internal
