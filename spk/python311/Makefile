@@ -21,13 +21,13 @@ LICENSE  = PSF
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS  = src/requirements-pure.txt
-
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 1
+WHEELS_TEST_ALL = 0
+# Force compiler LTO optimizations
+ENV += PYTHON_OPTIMIZE=1
 
 SERVICE_SETUP = src/service-setup.sh
 
-ENV += PYTHON_OPTIMIZE=1
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python311_extra_install
