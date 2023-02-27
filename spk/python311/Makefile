@@ -13,10 +13,17 @@ DESCRIPTION_FRE = Langage de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.1"
+CHANGELOG = "1. Update to Python 3.11.2<br/>2. Update to OpenSSL 1.1.1t"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
+
+# Force building pure-python wheels
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
+WHEELS  = src/requirements-pure.txt
+
+# Force testing all wheel builds
+WHEELS_TEST_ALL = 1
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -27,18 +34,15 @@ POST_STRIP_TARGET = python311_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:bin/python3.11
 
-WHEELS  = src/requirements-pure.txt
-# WHEELS += src/requirements-crossenv.txt
-# WHEELS += src/requirements-abi3.txt
-
-# Force building pure-python wheels
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
-
 ##
 ## All configurations below are optional and
 ## are provided to demonstrate how to build
 ## various wheels.  Uncoment to enable.
 ##
+## Force testing all wheel building
+ifeq ($(strip $(WHEELS_TEST_ALL)),1)
+WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-abi3.txt
 
 # Mandatory for rustc wheel building
 #   [bcrypt]
@@ -46,49 +50,52 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
-# # [cryptography]
-# # Use cross/cryptography to generate py36-abi3 limited API
-# # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-# #       To generate py310-py310 regular build use src/requirements-crossenv.txt
-# DEPENDS += cross/cryptography
+# [cryptography]
+# Use cross/cryptography to generate py36-abi3 limited API
+# NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
+#       To generate py310-py310 regular build use src/requirements-crossenv.txt
+DEPENDS += cross/cryptography
 
-# # [gevent]
-# DEPENDS += cross/libev cross/c-ares
-# ENV += GEVENTSETUP_EMBED_CARES=FALSE
-# ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+# [gevent]
+DEPENDS += cross/libev cross/c-ares
+ENV += GEVENTSETUP_EMBED_CARES=FALSE
+ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 
-# # [lxml]
-# DEPENDS += cross/libxml2
-# DEPENDS += cross/libxslt
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
 
-# # [mysqlclient]
-# DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-# ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-# ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+# [mysqlclient]
+DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
-# # [Pillow]
-# DEPENDS += cross/freetype cross/libjpeg cross/zlib
-# WHEELS_BUILD_ARGS += [Pillow]
-# WHEELS_BUILD_ARGS += build_ext
-# WHEELS_BUILD_ARGS += --disable-platform-guessing
-# WHEELS_BUILD_ARGS += --enable-freetype
-# WHEELS_BUILD_ARGS += --enable-jpeg
-# WHEELS_BUILD_ARGS += --enable-zlib
+# [Pillow]
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
 
-# # [pycares]
-# DEPENDS += cross/c-ares
-# ENV += PYCARES_USE_SYSTEM_LIB=1
+# [pycares]
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
 
-# # [pycurl]
-# DEPENDS += cross/curl
-# ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+# [pycurl]
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# # [PyNaCl]
-# DEPENDS += cross/libsodium
-# ENV += SODIUM_INSTALL=system
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
 
-# # [PyYAML]
-# DEPENDS += cross/libyaml
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# Force testing all wheel building
+endif
 
 include ../../mk/spksrc.common.mk
 
@@ -99,45 +106,48 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.spk.mk
 
-# # [greenlet]
-# ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
-# WHEELS += src/requirements-crossenv-greenlet.txt
-# else
-# WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
-# endif
+## Force testing all wheel building
+ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
-# # [numpy] <= 1.21.6
-# # Last known working version for armv5: 1.21.6
-# # This version is now unsupported using py311
-# UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-# # [numpy] <= 1.22.4
-# # Last known working version for armv7l: 1.22.4
-# ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-# WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-# else
-# WHEELS += src/requirements-crossenv-numpy.txt
-# endif
-# # workaround for compiler bug:
-# # https://github.com/numpy/numpy/issues/13622
-# ifeq ($(call version_le, ${TC_GCC}, 5.0),1)
-# ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# WHEELS_CFLAGS += [numpy] -O0
-# endif
-# endif
+# [greenlet]
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+WHEELS += src/requirements-crossenv-greenlet.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
+endif
 
-# # [pycryptodome]
-# ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-# WHEELS_CFLAGS += [pycryptodome] -std=c11
-# else
-# WHEELS_CFLAGS += [pycryptodome] -std=c99
-# endif
+# [numpy] <= 1.21.6 (armv5)
+# This version is now unsupported using py311
+# [numpy] <= 1.22.4 (armv7l)
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+else
+WHEELS += src/requirements-crossenv-numpy.txt
+endif
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS += [numpy] -O0
+endif
+endif
 
-# # [pycryptodomex]
-# ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
-# WHEELS_CFLAGS += [pycryptodomex] -std=c11
-# else
-# WHEELS_CFLAGS += [pycryptodomex] -std=c99
-# endif
+# [pycryptodome]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pycryptodome] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodome] -std=c99
+endif
+
+# [pycryptodomex]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
+
+# Force testing all wheel building
+endif
 
 .PHONY: python311_extra_install
 python311_extra_install:
