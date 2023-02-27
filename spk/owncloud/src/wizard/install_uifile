@@ -1,29 +1,4 @@
 [{
-    "step_title": "ownCloud database configuration",
-    "items": [{
-        "type": "password",
-        "desc": "Enter your MySQL root password.",
-        "subitems": [{
-            "key": "wizard_mysql_password_root",
-            "desc": "Root database password",
-            "defaultValue": "",
-            "validator": {
-              "allowBlank": false
-            }
-        }]
-    }, {
-        "type": "password",
-        "desc": "A 'owncloud' MySQL user and database will be created. Please enter a password for the 'owncloud' user.",
-        "subitems": [{
-            "key": "wizard_mysql_password_owncloud",
-            "desc": "owncloud database password",
-            "defaultValue": "",
-            "validator": {
-              "allowBlank": false
-            }
-        }]
-    }]
-}, {
     "step_title": "ownCloud admin configuration",
     "items": [{
         "type": "textfield",

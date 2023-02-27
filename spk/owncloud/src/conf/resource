@@ -1,21 +1,4 @@
 {
-   "mariadb10-db":{
-      "admin-account-m10":"root",
-      "admin-pw-m10":"{{wizard_mysql_password_root}}",
-      "create-db":{
-         "db-collision":"skip",
-         "db-name":"owncloud",
-         "flag":true
-      },
-      "drop-db-uninst":false,
-      "drop-user-uninst":false,
-      "grant-user":{
-         "db-name":"owncloud",
-         "flag":true,
-         "user-name":"owncloud",
-         "user-pw":"{{wizard_mysql_password_owncloud}}"
-      }
-   },
    "webservice":{
       "migrate":{
          "root":[
@@ -39,8 +22,8 @@
             "alias":"owncloud",
             "app":"com.synocommunity.packages.owncloud",
             "display_name":"ownCloud",
-            "name":"owncloud",
-            "service":"owncloud",
+            "name":"ownCloud",
+            "service":"ownCloud",
             "type":"alias"
          }
       ],
@@ -62,7 +45,8 @@
                   "intl",
                   "ldap",
                   "openssl",
-                  "pdo_mysql",
+                  "pdo_sqlite",
+                  "sqlite3",
                   "ssh2",
                   "zip",
                   "zlib"
@@ -70,16 +54,16 @@
                "group":"http",
                "php_settings":{
                   "error_log":"/var/services/web_packages/owncloud/php_errors.log",
-                  "pdo_mysql.default_socket":"/run/mysqld/mysqld10.sock"
+                  "max_execution_time":"900"
                },
-               "profile_desc":"PHP Profile for owncloud",
-               "profile_name":"owncloud Profile",
-               "read_timeout":3600,
-               "send_timeout":120,
+               "profile_desc":"PHP Profile for ownCloud",
+               "profile_name":"ownCloud Profile",
                "user":"sc-owncloud"
             },
+            "read_timeout":3600,
             "root":"owncloud",
-            "service":"owncloud",
+            "send_timeout":120,
+            "service":"ownCloud",
             "type":"apache_php"
          }
       ]
