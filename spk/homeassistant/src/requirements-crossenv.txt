@@ -66,7 +66,7 @@ cchardet==2.1.7
 lru-dict==1.1.8
 # [orjson]
 # Requires maturin to build (and rust)
-orjson==3.7.11
+orjson==3.7.12
 
 # Home Assistant Core
 # aiokafka==0.7.2                 ==> pure
