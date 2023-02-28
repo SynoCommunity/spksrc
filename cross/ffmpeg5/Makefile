@@ -231,11 +231,14 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/nasm
 NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
 ENV += PATH=$(NASM_PATH):$$PATH
+#CONFIGURE_ARGS += --x86asmexe=$(NASM_PATH)/nasm
+CONFIGURE_ARGS += --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
-CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libdrm
+CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --enable-vaapi --enable-libmfx --enable-libdrm
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
