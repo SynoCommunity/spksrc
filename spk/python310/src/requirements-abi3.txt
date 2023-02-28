@@ -8,5 +8,5 @@
 # Require:
 #    - CFLAGS=-sdt=c99 <  gcc-4.9
 #    - CFLAGS=-sdt=c11 >= gcc-4.9
-pycryptodome==3.16.0
-pycryptodomex==3.16.0
+pycryptodome==3.17
+pycryptodomex==3.17
