@@ -56,6 +56,16 @@ OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
 
+ifeq ($(findstring $(ARCH),evansport $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS += native/nasm
+NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
+ENV += PATH=$(NASM_PATH):$$PATH
+#ENV += AS=$(NASM_PATH)/nasm
+CONFIGURE_ARGS += --x86asmexe=nasm
+else
+CONFIGURE_ARGS += --disable-asm
+endif
+
 DEPENDS += cross/codec2
 CONFIGURE_ARGS += --enable-libcodec2
 
@@ -202,37 +212,28 @@ CONFIGURE_ARGS += --enable-libass
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --disable-neon --disable-asm
+CONFIGURE_ARGS += --arch=arm --disable-neon
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te --disable-asm
+CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
 ifneq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb --disable-asm
+CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --extra-libs=-latomic
-CONFIGURE_ARGS += --disable-asm
 CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --cpu=e500v2
 else
 CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
-endif
-
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-ENV += PATH=$(NASM_PATH):$$PATH
-#CONFIGURE_ARGS += --x86asmexe=$(NASM_PATH)/nasm
-CONFIGURE_ARGS += --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
