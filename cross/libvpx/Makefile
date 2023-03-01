@@ -24,6 +24,11 @@ CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
 CONFIGURE_ARGS += --enable-webm-io
 CONFIGURE_ARGS += --disable-multithread
 
+BUILD_DEPENDS = native/nasm
+YASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
+ENV += PATH=$(YASM_PATH):$$PATH
+CONFIGURE_ARGS += --as=nasm
+
 include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -34,17 +39,11 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv7-linux-gcc
+CONFIGURE_ARGS += --disable-neon
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
-endif
-
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-YASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += PATH=$(YASM_PATH):$$PATH
-CONFIGURE_ARGS += --as=nasm
 endif
 
 # neon_asm does not work under armv8/arm64
@@ -55,11 +54,19 @@ endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=x86-linux-gcc
 endif
+
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=x86_64-linux-gcc
 endif
 
 include ../../mk/spksrc.cross-cc.mk
+
+# Disable NEON on armv7/armv7l/armv8 when using gcc-4.9 or lower
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+CONFIGURE_ARGS += --disable-neon
+endif
+endif
 
 .PHONY: libvpx_install
 libvpx_install:
