@@ -1,0 +1,22 @@
+Subject: [PATCH] Disable PHP output buffering when reading file contents (fixes #389)
+---
+Index: fetch.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git fetch.php fetch.php
+--- fetch.php	(revision f65537cdc6f11e135fdc0fbfcaf05524f63ec667)
++++ fetch.php	(revision fbb82adca05f570b7c8e64c6e24c207c3a2a230f)
+@@ -118,9 +118,9 @@
+ 
+     if (empty($config['cops_x_accel_redirect'])) {
+         $filename = $dir . $file;
+-        $fp = fopen($filename, 'rb');
+         header('Content-Length: ' . filesize($filename));
+-        fpassthru($fp);
++        ob_end_flush();
++        readfile($filename);
+     } else {
+         header($config['cops_x_accel_redirect'] . ': ' . $dir . $file);
+     }

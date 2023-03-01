@@ -1,6 +1,6 @@
 SPK_NAME = cops
 SPK_VERS = 1.1.3
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/cops.png
 DSM_UI_DIR = app
 
@@ -11,9 +11,9 @@ DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre co
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to 1.1.3<br>2. Improved DSM7 compatibility"
+CHANGELOG = "1. Update to PHP 7.4.<br />2. Fix OOM issue when serving big files"
 
-SPK_DEPENDS=WebStation
+SPK_DEPENDS=WebStation:PHP7.4
 
 SYSTEM_GROUP = http
 
