@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg4
 SPK_VERS = 4.4.3
 SPK_REV = 48
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Rename package to ffmpeg4<br/>2. Enable openh264<br/>3. Enable twolane"
+CHANGELOG = "1. Rename package to ffmpeg4<br/>2. Enable openh264<br/>3. Enable twolane<br/>4. Enable aarch64 asm neon optimization"
 
 CONF_DIR = src/conf
 
