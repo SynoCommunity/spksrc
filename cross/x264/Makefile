@@ -43,10 +43,8 @@ ENV += x264_ARCH=PPC
 CONFIGURE_ARGS += --disable-asm
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-
 # Define x86asm
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/nasm
 NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
 ENV += AS=$(NASM_PATH)/nasm
