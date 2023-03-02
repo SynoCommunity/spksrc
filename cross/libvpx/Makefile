@@ -24,11 +24,6 @@ CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
 CONFIGURE_ARGS += --enable-webm-io
 CONFIGURE_ARGS += --disable-multithread
 
-BUILD_DEPENDS = native/nasm
-YASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += PATH=$(YASM_PATH):$$PATH
-CONFIGURE_ARGS += --as=nasm
-
 include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -49,6 +44,15 @@ endif
 # neon_asm does not work under armv8/arm64
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv8-linux-gcc
+endif
+
+# Define x86asm
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/nasm
+NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
+ENV += AS=$(NASM_PATH)/nasm
+ENV += PATH=$(NASM_PATH):$$PATH
+CONFIGURE_ARGS += --as=nasm
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
