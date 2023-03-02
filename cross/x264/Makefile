@@ -33,8 +33,9 @@ ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 ENV += x264_ARCH=ARM
 CONFIGURE_ARGS += --host=aarch64-linux
 # Expects to be assembled with a C compiler as frontend
-# .s is raw assembly passed to as, .S is assembly which
-# expects to be preprocessed by a cpp then fed to assembler
+# .s is raw assembly passed to as
+# .S is assembly which expects to be preprocessed by a cpp then fed to assembler
+# More info: https://code.videolan.org/videolan/x264/-/issues/61
 ENV += AS=$(abspath $(PWD)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
 endif
 
