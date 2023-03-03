@@ -1,13 +1,13 @@
 SPK_NAME = mpd
-SPK_VERS = 0.20.23
-SPK_REV = 1
+SPK_VERS = 0.23.12
+SPK_REV = 2
 SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/mpd
 
-# A compiler with support for C++14 language features is required.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = $(comcerto2k)
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.

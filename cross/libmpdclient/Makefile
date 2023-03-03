@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/libmpdclient/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# https://github.com/MusicPlayerDaemon/libmpdclient/archive/refs/tags/v2.20.tar.gz
-
 DEPENDS =
 
 HOMEPAGE = https://www.musicpd.org/libs/libmpdclient/
