@@ -3,6 +3,7 @@
     "services": [{
       "service": "cops",
       "display_name": "COPS",
+      "icon": "app/images/cops-{0}.png",
       "type": "apache_php",
       "root": "cops",
       "backend": 2,
