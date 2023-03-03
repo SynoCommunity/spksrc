@@ -1,5 +1,5 @@
 SPK_NAME = mpd
-SPK_VERS = 0.20.23
+SPK_VERS = 0.23.12
 SPK_REV = 1
 SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update to version 0.23.12."
 
 DISPLAY_NAME = Music Player Daemon
 
