@@ -3,7 +3,7 @@ PKG_VERS = 0.23.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/MPD/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = MPD-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = MPD-$(PKG_VERS)
 
 # A compiler with support for C++14 language features is required.
