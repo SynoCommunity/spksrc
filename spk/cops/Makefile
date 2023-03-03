@@ -34,10 +34,6 @@ CONF_DIR = src/conf/
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-INSTUNINST_RESTART_SERVICES = apache-web
-
 POST_STRIP_TARGET = cops_extra_install
 
 # Pure PHP package, make sure ARCH is not defined
