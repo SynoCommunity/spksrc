@@ -61,7 +61,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
-ifeq ($(wildcard $(FFMPEG4_DIR)),)
+ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/libva
 endif
 endif
