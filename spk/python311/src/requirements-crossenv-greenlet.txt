@@ -6,4 +6,4 @@
 
 # [greenlet]
 #   - Mandatory require full c++11 support (DSM7)
-greenlet==2.0.1
+greenlet==2.0.2

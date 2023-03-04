@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.9
+PKG_VERS = 3.10.10
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -134,12 +134,12 @@ CROSSENV_WHEELS += setuptools-rust==1.5.2
 CROSSENV_WHEELS += setuptools-scm==7.1.0
 CROSSENV_WHEELS += wheel==0.38.4
 CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += poetry==1.3.1
-CROSSENV_WHEELS += Cython==0.29.32
+CROSSENV_WHEELS += poetry==1.3.2
+CROSSENV_WHEELS += Cython==0.29.33
 CROSSENV_WHEELS += flit==3.8.0
-CROSSENV_WHEELS += cryptography==38.0.4
+CROSSENV_WHEELS += cryptography==39.0.1
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-CROSSENV_WHEELS += maturin==0.14.6
+CROSSENV_WHEELS += maturin==0.14.14
 endif
 
 # Create the crossenv in preparation for
@@ -150,8 +150,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $${CC} --cxx $${CXX} --ar $${AR} --sysroot $${SYSROOT} --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==22.3.1" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.3.1" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.0.1" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.0.1" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))

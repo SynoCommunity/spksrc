@@ -9,4 +9,4 @@
 #   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
 #     ref: https://github.com/numpy/numpy/issues/13622
 numpy==1.23.5
-#numpy==1.24.0
+#numpy==1.24.2
