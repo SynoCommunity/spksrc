@@ -57,12 +57,16 @@ OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
 OPTIONAL_DEPENDS += cross/shine
 
-ifeq ($(findstring $(ARCH),evansport $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS += native/nasm
+# Define x86asm
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/nasm
 NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
+ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --x86asmexe=nasm
-else
+
+# Allow ASM on aarch64, disable on all others
+else ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-asm
 endif
 
