@@ -12,13 +12,9 @@ COMMENT  = C library for reading and writing files containing sampled sound.
 LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
-INSTALL_TARGET = libsndfile_install
 
+CONFIGURE_ARGS = --disable-static
 # Avoid warning that _FORTIFY_SOURCE requires compiling with optimization 
 ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: libsndfile_install
-libsndfile_install:
-	$(RUN) make install DESTDIR=$(INSTALL_DIR)
