@@ -8,7 +8,7 @@ if [ -r "${INST_FUNCTIONS}" ]; then
     . "${INST_FUNCTIONS}"
 fi
 
-reload_inst_variables
+load_variables_from_file "${INST_VARIABLES}"
 
 service_prestart ()
 {
