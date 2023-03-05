@@ -25,7 +25,7 @@ meson_configure_target:
 	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 # call-up ninja build process
 include ../../mk/spksrc.cross-ninja.mk
