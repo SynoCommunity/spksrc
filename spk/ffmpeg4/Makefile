@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.4.3
 SPK_REV = 48
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Rename package to ffmpeg4<br/>2. Enable openh264<br/>3. Enable twolane<br/>4. Enable aarch64 asm neon optimization<br/>Update dav1d to version 1.1.0<br/>Update frei0r to version 2.2.0"
+CHANGELOG = "1. Change package directory to ffmpeg4<br/>2. Enable openh264<br/>3. Enable twolane<br/>4. Enable aarch64 asm neon optimization<br/>5. Update dav1d to version 1.1.0<br/>6. Update frei0r to version 2.2.0<br/>7. Update libvpx to version 1.13<br/>8. Update x264 to latest git commit<br/>9. Update SVT-AV1 to version 1.4.1<br/>10. Update libass to version 0.17.1"
 
 CONF_DIR = src/conf
 
