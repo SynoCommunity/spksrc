@@ -35,7 +35,12 @@ call_func ()
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Begin ${FUNC}"
-        eval ${FUNC} 2>&1 | install_log
+        ARG=$2
+        if [ -z "${ARG}" ]; then
+            eval ${FUNC} 2>&1 | install_log
+        else
+            eval ${FUNC} ${ARG} 2>&1 | install_log
+        fi
         install_log "End ${FUNC}"
     fi
 }
@@ -54,10 +59,10 @@ if [ -r "${SVC_SETUP}" ]; then
 fi
 
 
-# Reload wizard variables stored by postinst
-call_func "reload_inst_variables"
+# Load (wizard) variables stored by postinst
+call_func "load_variables_from_file" ${INST_VARIABLES}
 
-# init variables either reloaded, from package or from wizard
+# init variables either from ${INST_VARIABLES}, from package or from wizard
 call_func "initialize_variables"
 
 

@@ -2,6 +2,9 @@
 ### common installer functions and variables for synocommunity generic service installer
 # 
 # functions are common for all DSM versions
+#
+# The script must be sh/ash compatible and not use bash syntax.
+# SRM and DSM < 6.0 have only the busybox built-in shell an not bash
 # 
 
 # Tools shortcuts
@@ -64,6 +67,10 @@ install_python_virtualenv ()
 
     # Update to latest pip package installer
     python3 -m pip install --upgrade pip
+
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_unix_permissions ${SYNOPKG_PKGDEST}/env
+    fi
 }
 
 
@@ -85,22 +92,29 @@ install_python_wheels ()
                    --requirement ${requirements}
     fi
 
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_unix_permissions ${SYNOPKG_PKGDEST}/env
+    fi
+
     echo "Installed modules:"
     pip freeze
 }
 
 
-reload_inst_variables ()
+# function to read and export variables from a text file
+# empty lines and lines starting with # are ignored
+# we cannot 'source' the file to load the variables, when values have special characters like <, >, ...
+load_variables_from_file ()
 {
-    # Reload wizard variables stored by postinst
-    if [ -r "${INST_VARIABLES}" ]; then
-        # we cannot source the file to reload the variables, when values have special characters like <, >, ...
-        for _line in $(cat "${INST_VARIABLES}"); do
-            _key="$(echo ${_line} | awk -F'=' '{print $1}')"
-            _value="$(echo ${_line} | awk -F'=' '{print $2}')"
-            declare "${_key}=${_value}"
-        done
-    fi
+   if [ -n "$1" -a -r "$1" ]; then
+      while read -r _line; do
+        if [ "$(echo ${_line} | grep -v ^[/s]*#)" != "" ]; then
+           _key="$(echo ${_line} | cut --fields=1 --delimiter==)"
+           _value="$(echo ${_line} | cut --fields=2- --delimiter==)"
+           export "${_key}=${_value}"
+        fi
+      done < "$1"
+   fi
 }
 
 
@@ -116,4 +130,3 @@ save_wizard_variables ()
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
     fi
 }
-

@@ -4,8 +4,8 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
-PKG_DIR = $(PKG_NAME)
+PKG_DIR = src/github.com/$(PKG_NAME)
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 DEPENDS = native/go
 

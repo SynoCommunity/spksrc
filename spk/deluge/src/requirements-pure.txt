@@ -5,21 +5,21 @@
 deluge==2.1.1
 
 # Other requirements
-attrs==22.1.0
-Automat==20.2.0
+attrs==22.2.0
+Automat==22.10.0
 constantly==15.1.0
 #distlib==0.3.4     ==> python310
 #filelock==3.6.0    ==> python310
 hyperlink==21.0.0
-idna==3.3
-incremental==21.3.0
-Mako==1.2.1
+idna==3.4
+incremental==22.10.0
+Mako==1.2.4
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
-pyOpenSSL==21.0.0
+pyOpenSSL==23.0.0
 pyxdg==0.28
 service-identity==21.1.0
 #six==1.16.0        ==> python310
-Twisted==22.4.0
-typing_extensions==4.3.0
+Twisted==22.10.0
+typing_extensions==4.4.0

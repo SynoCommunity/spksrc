@@ -61,12 +61,12 @@ sudo apt install autoconf-archive autogen automake autopoint bash bc bison \
                  g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
                  libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                  libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
-                 php pkg-config python2 python3 python3-distutils rename rsync scons subversion swig \
-                 texinfo unzip xmlto zlib1g-dev
+                 patchelf php pkg-config python2 python3 python3-distutils rename rsync scons subversion \
+                 swig texinfo unzip xmlto zlib1g-dev
 wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
 sudo pip2 install wheel httpie
 wget https://bootstrap.pypa.io/get-pip.py -O - | sudo python3
-sudo pip3 install meson==0.62.2
+sudo pip3 install meson==1.0.0
 ```
 From there, follow the instructions in the [Developers HOW TO].
 
@@ -87,8 +87,8 @@ lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopo
                                 g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
                                 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                                 libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
-                                php pkg-config python2 python3 python3-distutils rename rsync scons subversion swig \
-                                texinfo unzip xmlto zlib1g-dev
+                                patchelf php pkg-config python2 python3 python3-distutils rename rsync scons subversion \
+                                swig texinfo unzip xmlto zlib1g-dev
 ```
 5. Install `python2` wheels:
 ```bash
@@ -101,7 +101,7 @@ lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - 
 ```
 7. Install `meson`:
 ```bash
-lxc exec spksrc -- /bin/bash -c "pip3 install meson==0.62.2"
+lxc exec spksrc -- /bin/bash -c "pip3 install meson==1.0.0"
 ```
 
 
@@ -126,6 +126,15 @@ spksrc@spksrc:~$
 lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev \
                                         mlocate ripgrep rsync tree time
 lxc exec spksrc -- /usr/bin/updatedb
+```
+Install github client:
+```
+$ lxc exec spksrc -- su --login root
+# curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+# echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+# sudo apt update
+# sudo apt install gh
+# exit
 ```
 
 #### (OPTIONAL) LXC: Shared `spksrc` user 

@@ -1,6 +1,6 @@
 SPK_NAME = mosh
-SPK_VERS = 1.3.2
-SPK_REV = 2
+SPK_VERS = 1.4.0
+SPK_REV = 3
 SPK_ICON = src/mosh.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -12,7 +12,7 @@ DESCRIPTION = mosh, the mobile shell is a remote terminal application that allow
 
 DISPLAY_NAME = mosh
 STARTABLE = no
-CHANGELOG = "1. Add libutempter to show detached sessions.<br/>2. Update openssl to v1.1.1l.<br/>3. Add Perl dependency for advanced customization and scripting."
+CHANGELOG = "1. Update Mosh to version 1.4.0.<br/>2. Update openssl to 1.1.1t."
 
 HOMEPAGE = https://mosh.org
 LICENSE  = GPLv3+

@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20210902
-SPK_REV = 15
+SPK_VERS = 20221230
+SPK_REV = 16
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) r
 DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et Atom open source conçu pour vous permettre de lire des nouvelles de n\'importe quel endroit, tout en se sentant aussi proche d\'une application de bureau que possible.
 ADMIN_URL = /tt-rss/
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "1. Update Tiny Tiny RSS to Git revision 36e174750e (20210902) <br /> 2. Migrated to Maria DB 10 and add support for DSM 7 <br /> 3. Fixed installation procedures"
+CHANGELOG = "1. Update Tiny Tiny RSS to Git revision c30b24d09f (20221230) <br /> 2. Fixed broken DSM 7 initial installation procedure. <br /> 3. Upgrade PHP version to 7.4"
 
 HOMEPAGE   = https://tt-rss.org/
 LICENSE    = GPL
@@ -37,7 +37,7 @@ override ARCH=
 REQUIRED_MIN_DSM = 6.0
 INSTUNINST_RESTART_SERVICES = apache-web
 
-SPK_DEPENDS = "WebStation:PHP7.2:MariaDB10:Apache2.4"
+SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 
 include ../../mk/spksrc.spk.mk
 
@@ -48,9 +48,6 @@ $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini:
 
 .PHONY: tt-rss_extra_install
 tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-	install -m 755 -d $(STAGING_DIR)/var/logs
-endif
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 644 src/app/config $(STAGING_DIR)/app/config

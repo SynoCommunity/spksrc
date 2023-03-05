@@ -22,11 +22,19 @@ make setup-synocommunity
 sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" \
     -e "s|PUBLISH_API_KEY\s*=.*|PUBLISH_API_KEY=$API_KEY|" \
     local.mk
+# Git >= 2.35.2 stops directory traversals when ownership changes from the current user (in response to CVE-2022-24765). 
+# This prevents errors on nested repos that might have different file owner.
+git config --global --add safe.directory "/github/workspace"
 echo "::endgroup::"
 
 echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
+
+# Remove rust toolchain status file to enfore re-installing cargo/rust
+# This fixes isees on github-action where toolchain caching omits the
+# actual installation state of cargo/rust within the distrib folder
+rm -f toolchain/syno-${GH_ARCH}/work/.rustc_done
 
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}
@@ -71,7 +79,7 @@ do
     result=$?
 
     # For a build to succeed a <package>_<arch>-<version>.spk must also be generated
-    if [ ${result} -eq 0 -a "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk)" ]; then
+    if [ ${result} -eq 0 -a "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2> /dev/null)" ]; then
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE"   >> ${BUILD_SUCCESS_FILE}
     # Ensure it's not a false-positive due to pre-check
     elif tail -15 build.log | grep -viq 'spksrc.pre-check.mk'; then

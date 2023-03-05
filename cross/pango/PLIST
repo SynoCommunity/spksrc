@@ -1,10 +1,12 @@
+bin:bin/pango-list
+bin:bin/pango-segmentation
 bin:bin/pango-view
 lnk:lib/libpango-1.0.so
 lnk:lib/libpango-1.0.so.0
-lib:lib/libpango-1.0.so.0.3800.1
+lib:lib/libpango-1.0.so.0.5000.9
 lnk:lib/libpangocairo-1.0.so
 lnk:lib/libpangocairo-1.0.so.0
-lib:lib/libpangocairo-1.0.so.0.3800.1
+lib:lib/libpangocairo-1.0.so.0.5000.9
 lnk:lib/libpangoft2-1.0.so
 lnk:lib/libpangoft2-1.0.so.0
-lib:lib/libpangoft2-1.0.so.0.3800.1
+lib:lib/libpangoft2-1.0.so.0.5000.9

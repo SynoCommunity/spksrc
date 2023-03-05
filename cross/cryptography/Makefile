@@ -1,5 +1,5 @@
 PKG_NAME = cryptography
-PKG_VERS = 38.0.4
+PKG_VERS = 39.0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/c/$(PKG_NAME)

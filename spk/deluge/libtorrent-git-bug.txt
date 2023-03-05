@@ -1,0 +1,20 @@
+SEGFAULT * 37f6647c6 (tag: v1.2.18) Continue to ack incoming uTP data while finalizing the connection
+         * 97997c3ee Fix sending ST_FIN packet while the socket is stalled
+SEGFAULT * d2dca8955 back-port fix to close uTP sockets gracefully instead of timing out
+SEGFAULT * 6a5d63f65 back-port preventing sending data on a closed uTP socket
+SEGFAULT * 312670a6e bump version to 1.2.18
+   OK    * c362f5f11 back-port fix for closing files when stop-when-ready triggers
+         * 83c5b1e00 Fix: back-port bytes-in-flight uTP fix
+         * 161a474f6 back-port bytes-in-flight uTP fix
+         * 854eaa2bf Resend uTP acks that fail to send due to stalling
+   OK    * e1460bc0c When the uTP socket stalls, mark failed packets for resend
+         * 700bba089 Update state when need to save resume data
+... <skipping>
+
+         * 5d60cfa4e add a script to update openssl build scripts vendored from manylinux, and run the script
+   OK    * 0106578b0 use --project-config=<temp> where supported
+         * 3d96b52c1 move version declaration from setup.py to setup.cfg
+... <skipping>
+
+         * 1ec11e4e9 back-port Jamfile version fix from RC_2_0
+         * 7931be920 (tag: v1.2.17) bump version to 1.2.17

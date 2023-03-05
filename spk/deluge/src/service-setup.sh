@@ -1,10 +1,12 @@
 PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 #
+# Set default language
+export LC_ALL=en_US.UTF-8
+#
 CFG_PATH="${SYNOPKG_PKGVAR}"
 CFG_FILE="${SYNOPKG_PKGVAR}/core.conf"
 CFG_WATCH="${SYNOPKG_PKGVAR}/autoadd.conf"
-LANGUAGE="env LANG=en_US.UTF-8"
 #
 DELUGE_LOGS="${SYNOPKG_PKGVAR}/logs"
 #
@@ -31,8 +33,8 @@ SVC_WRITE_PID=yes
 DELUGEWEB_DAEMON="${DELUGEWEB} -c ${CFG_PATH} ${DELUGE_ARGS} -l ${DELUGEWEB_LOG} -L info --logrotate -P ${DELUGEWEB_PID} -d"
 DELUGED_DAEMON="${DELUGED} -c ${CFG_PATH} ${DELUGE_ARGS} -l ${DELUGED_LOG} -L info --logrotate -P ${DELUGED_PID} -d"
 #
-SERVICE_COMMAND[0]="${DELUGED_DAEMON}"
-SERVICE_COMMAND[1]="${DELUGEWEB_DAEMON}"
+
+SERVICE_COMMAND=$(printf "${DELUGED_DAEMON}\n${DELUGEWEB_DAEMON}")
 
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
     GROUP="synocommunity"
@@ -42,9 +44,14 @@ fi
 
 deluge_default_install ()
 {
+    # Avoid Error: skipping tracker announce (unreachable)
+    # https://forum.deluge-torrent.org/viewtopic.php?f=7&t=56331&sid=321c7c1857bfe20c5af1ac7dedba106d
+    ip_addr=$(ip route show | grep default | awk '{print $NF}')
+    listen_interface=${ip_addr:=0.0.0.0}
+
     incomplete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/incomplete"
     complete_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/complete"
-    watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch"
+    watch_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=/downloads}/watch-deluge"
 
     # Create download directories
     install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${incomplete_folder}"
@@ -73,10 +80,16 @@ deluge_default_install ()
         sed -i -e "s|@complete_dir_enabled@|true|g" ${cfg_file}
         sed -i -e "s|@complete_dir@|${complete_folder}|g" ${cfg_file}
     done
+
+    # Enforce using the default network interface always
+    sed -i '/"listen_interface":/s/:.*/: "'${listen_interface}'",/' ${CFG_FILE}
+
     # Watch directory
     sed -i -e "s|\"enabled_plugins\": \[\],|\"enabled_plugins\": \[\n        \"AutoAdd\"\n    \], \n|g" ${CFG_FILE}
     sed -i -e "s|@watch_dir@|${watch_folder}|g" ${CFG_WATCH}
+
     # plugins directory
+    install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${SYNOPKG_PKGVAR}/plugins"
     sed -i -e "s|@plugins_dir@|${SYNOPKG_PKGVAR}/plugins|g" ${CFG_FILE}
 }
 
@@ -95,8 +108,10 @@ service_postinst ()
     # DSM<=6: Copy new default configuration files prior from them being
     #         overwritten by old version during postupgrade recovery
     if [ -r "${CFG_FILE}" -a "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        cp -p ${CFG_FILE} ${CFG_FILE}.new
         cp -p ${CFG_WATCH} ${CFG_WATCH}.new
+        cp -p ${CFG_FILE} ${CFG_FILE}.new
+        # Ensure core.conf as no newline at end of file
+        sed -i -z 's/\n$//' ${CFG_FILE}.new
     fi
 }
 
@@ -115,10 +130,13 @@ service_postupgrade ()
         cp -p ${CFG_WATCH} ${CFG_WATCH}.bak.$(date +%Y%m%d%H%M)
 
         # Copy new "default" version of core.conf and autoadd.conf
-        cp -p ${CFG_FILE}.new ${CFG_FILE}
         cp -p ${CFG_WATCH}.new ${CFG_WATCH}
+        cp -p ${CFG_FILE}.new ${CFG_FILE}
 
         # Reset to default installation
         deluge_default_install
     fi
+
+    # At first run always ensure core.conf as no newline at end of file
+    sed -i -z 's/\n$//' ${CFG_FILE}
 }

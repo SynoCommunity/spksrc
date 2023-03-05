@@ -12,7 +12,7 @@ COMMENT  = Commands for Manipulating POSIX Access Control Lists.
 LICENSE  = GPLv2+
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-static=no
-ADDITIONAL_CPPFLAGS = -O
+CONFIGURE_ARGS = --disable-static
+ADDITIONAL_CPPFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk

@@ -20,7 +20,7 @@ ARMv5_ARCHS = 88f6281
 ARMv7_ARCHS = $(GENERIC_ARMv7_ARCH) $(DSM_ARMv7_ARCHS) $(SRM_ARMv7_ARCHS)
 # hi3535 is not supported by generic ARMv7 arch
 ARMv7L_ARCHS = hi3535
-ARMv8_ARCHS = $(GENERIC_ARMv8_ARCH) rtd1296 armada37xx
+ARMv8_ARCHS = $(GENERIC_ARMv8_ARCH) rtd1296 rtd1619b armada37xx
 ARM_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS)
 
 PPC_ARCHS = powerpc ppc824x ppc853x ppc854x qoriq
@@ -55,3 +55,15 @@ DOTNET_UNSUPPORTED_ARCHS += armadaxp
 
 # compatibility with .NET not yet confirmed:
 # alpine4k armada375 armada38x comcerto2k
+
+# Exclusions for dotnet 6.0 core apps
+ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
+endif
+
+# Exclusions for dotnet 6.0 servarr apps (except x86)
+ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
+endif

@@ -1,0 +1,14 @@
+# disable VCS stamping 
+# - due to nested repos it is not possible to embed vcs info with github build action
+# 
+--- Makefile.orig	2023-01-12 21:55:01.000000000 +0000
++++ Makefile	2023-02-11 10:30:49.625113722 +0000
+@@ -124,7 +124,7 @@
+ 	$(info Building cloudflared with go-fips)
+ 	cp -f fips/fips.go.linux-amd64 cmd/cloudflared/fips.go
+ endif
+-	GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) $(ARM_COMMAND) go build -v -mod=vendor $(GO_BUILD_TAGS) $(LDFLAGS) $(IMPORT_PATH)/cmd/cloudflared
++	GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) $(ARM_COMMAND) go build -v -buildvcs=false -mod=vendor $(GO_BUILD_TAGS) $(LDFLAGS) $(IMPORT_PATH)/cmd/cloudflared
+ ifeq ($(FIPS), true)
+ 	rm -f cmd/cloudflared/fips.go
+ 	./check-fips.sh cloudflared

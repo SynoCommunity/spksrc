@@ -53,7 +53,7 @@ guess_php_profile_name()
 #   - guess_php_fpm_bin <profile_name>
 guess_php_fpm_bin()
 {
-    echo -n "/usr/local/bin/php72-fpm"
+    echo -n "/usr/local/bin/php74-fpm"
 }
 
 # Computes the PHP cli configuration file which should be used when running php code
@@ -68,5 +68,5 @@ guess_php_configuration_file()
 #   - guess_php
 guess_php()
 {
-    echo -n "/usr/local/bin/php72 -c $(guess_php_configuration_file)"
+    echo -n "/usr/local/bin/php74 -c $(guess_php_configuration_file)"
 }

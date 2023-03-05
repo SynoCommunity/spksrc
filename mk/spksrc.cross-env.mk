@@ -15,6 +15,13 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+GCC_DEBUG_FLAGS = -O0 -g3
+ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_DEBUG_FLAGS)
+ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_DEBUG_FLAGS)
+ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_DEBUG_FLAGS)
+endif
+
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
@@ -54,3 +61,10 @@ ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
 endif
+
+# Allow toolchain mandatory variables to
+# be available at all build stages in
+# particular for dependencies (spksrc.depends.mk)
+ENV += TC_GCC=$$(eval $$(echo $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -dumpversion) 2>/dev/null || true)
+ENV += TC_GLIBC=$(TC_GLIBC)
+ENV += TC_KERNEL=$(TC_KERNEL)

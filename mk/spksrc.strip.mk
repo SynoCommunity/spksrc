@@ -27,7 +27,9 @@ else
 $(PRE_STRIP_TARGET): strip_msg
 endif
 ifeq ($(strip $(STRIP_TARGET)),)
+ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 STRIP_TARGET = strip_target
+endif
 else
 $(STRIP_TARGET): $(PRE_STRIP_TARGET)
 endif

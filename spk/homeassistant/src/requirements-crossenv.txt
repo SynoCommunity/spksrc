@@ -1,86 +1,127 @@
 # Home Assistant core
-# requirements are splitted into multiple files
-# - requirements-crossenv.txt             (this file, containing requirements that need cross compilation)
-# - requirements-pure.txt                 (containing pure-python requirements)
-# - postinst_default_requirements.txt     (requirements for default_config)
+# requirements are taken from homeassistant dependency files
+# - pyproject.toml
+# - requirements.txt (including homeassistant/package_constraints.txt)
+# - requirements_all.txt
+# those requirements are splitted into multiple files
+# - requirements-crossenv.txt             (containing requirements that need cross compilation, this file)
+# - requirements-pure.txt                 (containing pure-python requirements for homeassistant core and default_configuration)
 # - postinst_integration_requirements.txt (requirements for integrations)
 # postinst requirements must be pure python wheels.
-# To minimize the package size the spk wheelhouse does not contain dependent wheels that are pure python.
+# To minimize the package size the spk does not contain dependent wheels that are pure python.
 
-#homeassistant==2021.9.7
+#homeassistant==2022.10.5           ==> pure
+
+# aiohttp==3.8.1
+# bcrypt==3.1.7
+bitarray==2.6.0
+Brotli==1.0.9
+caio==0.9.11
+cbor2==5.4.3
+### contourpy==1.0.6    => fails to build: ModuleNotFoundError: No module named 'pybind11'
+# cryptography==38.0.1
+ephem==4.1.2
+# gevent==0.13.7        => cross/gevent_0.13 => fails to build, is outdated, Python 2.7
+
+### grpcio==1.48.0      => fails to build
+# guppy3==3.1.2
+
+
+# ha_av==10.0.0b5          => fails to build:  libavformat was not found (braucht vermutlich libav von ffmpeg)
+# kiwisolver==1.4.4           => ModuleNotFoundError: No module named 'cppy'
+lxml==4.9.1
+# matplotlib==3.6.2           => ModuleNotFoundError: No module named 'numpy.core._multiarray_umath'
+
+msgpack==1.0.4
+multidict==5.2.0
+# pandas==1.4.3               => ModuleNotFoundError: No module named 'numpy'
+
+# Pillow==9.2.0
+protobuf==3.20.3
+pycares==4.2.2
+# pycryptodomex==3.15.0  => abi3
+# PyNaCl==1.5.0
+pyrsistent==0.19.2
+# PyYAML==6.0
+regex==2021.8.28
+simplejson==3.18.0
+# SQLAlchemy==1.4.41
+tornado==6.2
+watchdog==2.1.9
+wrapt==1.14.1
+# yarl==1.8.1
+zope.interface==5.5.2
+
+
+pyads==3.2.2
+crc16==0.1.1
+netifaces==0.11.0
+uamqp==1.6.0
+cchardet==2.1.7
+# pycocotools depends on numpy and cannot be built in crossenv (so far)
+#pycocotools==2.0.1
+
+
+#home-assistant-bluetooth==1.3.0    ==> pure
+lru-dict==1.1.8
+# [orjson]
+# Requires maturin to build (and rust)
+orjson==3.7.12
 
 # Home Assistant Core
-# aiokafka==0.6.0                 ==> pure
-# astral==2.2
-# async_timeout==3.0.1
+# aiokafka==0.7.2                 ==> pure
+# astral==2.2                     ==> pure
+# async_timeout==4.0.2            ==> pure
 # attrs==21.2.0                   ==> pure
-# awesomeversion==21.4.0
-# backports.zoneinfo;python_version<"3.9"   ==> Does not build with python310
+# awesomeversion==22.9.0          ==> pure
 bcrypt==3.1.7
 # certifi==2021.5.30              ==> python310:pure
-ciso8601==2.1.3
-cryptography==3.3.2
-# httpx==0.19.0
-# idna==3.3                       ==> pure
-# jinja2==3.0.3                   ==> pure
-numpy==1.21.4
-# PyJWT==1.7.1                    ==> pure
-PyNaCl==1.4.0
+ciso8601==2.2.0
+# [cryptography]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+cryptography==38.0.1
+# httpx==0.23.0                   ==> pure
+# idna==3.4                       ==> pure
+# Jinja2==3.1.2                   ==> pure
+numpy==1.23.2
+# PyJWT==2.5.0                    ==> pure
+PyNaCl==1.5.0
 ## pip>=8.0.3,<20.3
-# python-slugify==4.0.1
-PyYAML==5.4.1
-# requests==2.26.0                ==> pure
+# python-slugify==4.0.1           ==> pure
+PyYAML==6.0
+# requests==2.28.1                ==> pure
 # ruamel.yaml==0.15.100           ==> pure
-ujson==4.2.0
-# voluptuous==0.12.1
-# voluptuous-serialize==2.4.0
-yarl==1.6.3
+# voluptuous==0.13.1              ==> pure
+# voluptuous-serialize==2.5.0     ==> pure
+yarl==1.8.1
 
 # homeassistant.components.frontend
-#home-assistant-frontend==20210830.0
+#home-assistant-frontend==20221010.0    ==> pure
 
 # homeassistant.components.cloud
-#hass-nabucasa==0.46.0
+#hass-nabucasa==0.56.0                  ==> pure
 
 ### other default dependencies that need cross compiled wheel
-MarkupSafe==2.0.1
-aiohttp==3.7.4.post0
+MarkupSafe==2.1.1
+aiohttp==3.8.1
 cffi==1.15.1
+frozenlist==1.3.1
 greenlet==1.1.1
-multidict==5.1.0
-SQLAlchemy==1.4.23
+SQLAlchemy==1.4.41
 
-
-# Failed to build: av clx-sdk-xms homeassistant-pyozw python-twitch-client
 
 ### integration dependencies that need cross compiled wheel
 # For Apple TV
-# av==8.0.3  # depends on ffmpeg, PyAV is an FFMPEG wrapper...
-### Could not find libavformat with pkg-config.
-### Could not find libavcodec with pkg-config.
-### Could not find libavdevice with pkg-config.
-### Could not find libavutil with pkg-config.
-### Could not find libavfilter with pkg-config.
-### Could not find libswscale with pkg-config.
-### Could not find libswresample with pkg-config.
+miniaudio==1.53
 
-
-ephem==3.7.7.0
-gevent==21.8.0
+# ephem==3.7.7.0
 guppy3==3.1.2
-###homeassistant-pyozw==0.1.10    # deprecated open-z-wave, fails to cross compile
-netifaces==0.11.0
-psutil==5.8.0
-pyads==3.2.2
-pycares==4.0.0
-# pybluez==0.22                   # for fjaraskupan fails to build
-# pycocotools==2.0.1              # fails to cross compile (aarch64)
-Pillow==8.2.0
+# psutil==5.9.2 fails to build for qoriq
+psutil==5.9.4
+Pillow==9.2.0
 pyitachip2ir==0.0.7
-regex==2021.8.3
-websockets==9.1
-# pandas==1.3.1                   # depends on numpy...
-wrapt==1.12.1
+websockets==10.4
 
-# Required for denonavr
-asyncstdlib==3.9.2
+# DTLSSocket==0.1.12                ==> cross/dtlssocket
