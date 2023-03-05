@@ -6,7 +6,7 @@ CHANGELOG = "1. Rename package to ffmpeg4<br/>2. Enable openh264<br/>3. Enable t
 
 CONF_DIR = src/conf
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/ffmpeg4
 
 # Enforce using ffmpeg4 directory
 INSTALL_PREFIX = /var/packages/ffmpeg4/target
