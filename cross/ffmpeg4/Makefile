@@ -201,7 +201,8 @@ CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
 # Add SVT-HEVC codec to x64
-# Patch for support from: https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/n4.4-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
+# Patch for support from:
+# https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
