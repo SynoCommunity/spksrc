@@ -52,6 +52,8 @@ DOTNET_UNSUPPORTED_ARCHS += alpine
 DOTNET_UNSUPPORTED_ARCHS += monaco
 # issue #4790
 DOTNET_UNSUPPORTED_ARCHS += armadaxp
+# SRM armv7 archs are not supported
+DOTNET_UNSUPPORTED_ARCHS += $(SRM_ARMv7_ARCHS)
 
 # compatibility with .NET not yet confirmed:
 # alpine4k armada375 armada38x comcerto2k
@@ -59,11 +61,11 @@ DOTNET_UNSUPPORTED_ARCHS += armadaxp
 # Exclusions for dotnet 6.0 core apps
 ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-1.2
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-1.2
 endif
