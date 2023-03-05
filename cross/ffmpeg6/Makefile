@@ -207,13 +207,9 @@ DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
 endif
 
-include ../../mk/spksrc.cross-cc.mk
-
-# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
-endif
+##
+## ARCH SPECIFIC
+##
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon
@@ -248,4 +244,22 @@ endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
+endif
+
+include ../../mk/spksrc.cross-cc.mk
+
+##
+## GCC SPECIFIC
+##
+
+# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/libass
+CONFIGURE_ARGS += --enable-libass
+endif
+
+# Newer frei0r requires newer gcc
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
 endif

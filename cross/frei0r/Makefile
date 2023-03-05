@@ -1,5 +1,5 @@
 PKG_NAME = frei0r
-PKG_VERS = 1.8.0
+PKG_VERS = 2.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dyne/frei0r/archive/refs/tags
