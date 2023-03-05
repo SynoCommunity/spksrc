@@ -14,7 +14,7 @@ CHANGELOG = "Initial release."
 
 HOMEPAGE = https://restic.net/
 LICENSE  = BSD 2-Clause License
-LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
+LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)/LICENSE
 
 SPK_COMMANDS = bin/restic
 
