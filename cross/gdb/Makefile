@@ -1,4 +1,4 @@
-PKG_NAME = gdb
+PKG_NAME = gdb-main
 
 HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger
