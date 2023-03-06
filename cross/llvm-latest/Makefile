@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 
-DEPENDS = 
+DEPENDS = cross/zlib
 
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
@@ -22,6 +22,7 @@ CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
 CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
+CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld;clang-tools-extra'
 
 include ../../mk/spksrc.common.mk
