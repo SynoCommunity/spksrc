@@ -213,6 +213,12 @@ service_preupgrade ()
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     rsync -aX ${OCROOT}/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} 2>&1
 
+    # Backup server database
+    [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
+    echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
+    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
+    ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak'" 2>&1
+
     exit 0
 }
 
@@ -226,6 +232,25 @@ service_restore ()
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
         rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${OCROOT}/ 2>&1
         ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
+    fi
+
+    # Archive backup server database
+    echo "Archive backup server database to ${OCROOT}/data"
+    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ]; then
+        if [ -d ${OCROOT}/data/db_backup ]; then
+            i=1
+            while [ -d "${OCROOT}/data/db_backup.${i}" ]
+            do
+                i=$((i+1))
+            done
+            while [ $i -gt 1 ]; do
+                j=$((i-1))
+                ${MV} "${OCROOT}/data/db_backup.${j}" "${OCROOT}/data/db_backup.${i}"
+                i=$j
+            done
+            ${MV} "${OCROOT}/data/db_backup" "${OCROOT}/data/db_backup.1"
+        fi
+        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ${OCROOT}/data/ 2>&1
     fi
 
     # Restore the configuration files
