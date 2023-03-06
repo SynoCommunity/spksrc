@@ -12,6 +12,7 @@ COMMENT = The LLVM Project is a collection of modular and reusable compiler and 
 LICENSE  = Apache License v2.0 with LLVM Exceptions
 
 CMAKE_USE_NINJA = 1
+POST_INSTALL_TARGET = llvm_post_install
 
 # Using LLVM project source need to change to llvm sub-directory
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
@@ -26,3 +27,8 @@ CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang'
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 
 include ../../mk/spksrc.native-cmake.mk
+
+.PHONY: llvm_post_install
+llvm_post_install:
+	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+	$(RUN) install -m 755 build/bin/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen

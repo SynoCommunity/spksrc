@@ -25,7 +25,8 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
 CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld;clang-tools-extra'
-CMAKE_ARGS += -DLLVM_NATIVE_TOOL_DIR=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin)
+CMAKE_ARGS += -DLLVM_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-tblgen)
+CMAKE_ARGS += -DCLANG_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/clang-tblgen)
 
 include ../../mk/spksrc.common.mk
 
