@@ -50,7 +50,7 @@ SPK_COMMANDS += bin/strip
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 OPTIONAL_DESC += ", gdb 7.12.1"
 else
-OPTIONAL_DESC += ", gdb 12.1"
+OPTIONAL_DESC += ", gdb 13.1"
 endif
 
 SPK_COMMANDS += bin/gcore
