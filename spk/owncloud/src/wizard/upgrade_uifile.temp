@@ -1,0 +1,77 @@
+
+### NEW LOGIC TO CREATE / VALIDATE FOR UPGRADES ###
+
+# From: https://doc.owncloud.com/server/next/admin_manual/maintenance/upgrading/manual_upgrade.html
+
+### PREPARATION
+
+# 1. Put your server in maintenance mode and disable Cron jobs.
+#    From: https://doc.owncloud.com/server/next/admin_manual/maintenance/enable_maintenance.html
+#       sudo -u www-data ./occ maintenance:mode --on [done]
+#    From: https://doc.owncloud.com/server/next/admin_manual/troubleshooting/remove_non_existent_bg_jobs.html#remove-the-background-job
+#       sudo -u www-data ./occ background:queue:status
+#       sudo -u www-data ./occ background:queue:delete ID
+# 2. Stop your webserver to prevent users trying to access ownCloud via the web
+#       sudo service apache2 stop
+# 3. Backup ownCloud and the server database
+#    From: https://doc.owncloud.com/server/next/admin_manual/maintenance/backup_and_restore/backup.html
+#       rsync -Aax config data apps apps-external /oc-backupdir/ [done]
+#       sqlite3 data/owncloud.db .dump > owncloud-dbbackup_`date +"%Y%m%d"`.bak
+#       ?? sudo crontab -u www-data -l > www-data_crontab.bak
+# 4. Review any installed third-party apps for compatibility with the new ownCloud release. 
+#    Ensure that they are all disabled before beginning the upgrade.
+#       sudo -u www-data ./occ app:list
+#       sudo -u www-data ./occ app:disable <app-id>
+# 5. Backup Manual Changes in .htaccess [done]
+# 6. Backup Manual Changes in .user.ini [done]
+
+### UPGRADE
+
+# 7.Move Current ownCloud Directory
+#       sudo mv /var/www/owncloud /var/www/backup_owncloud [done]
+# 8. Extract the New Source
+#    ?? Should this automatically happen as part of the package function and put in place? [done]
+# 9. Copy the data/ Directory
+#    ?? Check if the data directory is inside your owncloud/ directory. Sample code to check pre-upgrade: [done]
+#       if [[ $(realpath $potential_subdir) =~ ^$(realpath $parent_dir) ]]; then
+#           echo "$potential_subdir is a subdirectory of $parent_dir"
+#       else
+#           echo "$potential_subdir is not a subdirectory of $parent_dir"
+#       fi
+#    ?? If true, move it from your old version of ownCloud to your new version
+#       sudo mv /var/www/backup_owncloud/data /var/www/owncloud/data [done]
+#10. Copy Relevant config.php Content
+#       sudo cp /var/www/backup_owncloud/config/*config.php \
+#       /var/www/owncloud/config/ [done]
+#       sudo cp /var/www/backup_owncloud/config/*.json \
+#       /var/www/owncloud/config/ [done]
+#11. Market and Marketplace App Upgrades
+#12. Copy Old Apps
+#    ?? If you are using third party applications, look in your new /var/www/owncloud/apps/
+#    or /var/www/owncloud/apps-external/ directory to see if they are present.
+#    If not, copy them from your old instance to your new one. [done]
+#13. Set correct ownership
+#       sudo find -L /var/www/owncloud \
+#           \( -path ./data -o -path ./config \) -prune -o \
+#           -type f -print0 | sudo xargs -0 chown root:www-data [done]
+#14. Set correct permissions [?? done]
+#       sudo find -L /var/www/owncloud -type f -print0 | sudo xargs -0 chmod 640
+#       sudo find -L /var/www/owncloud -type d -print0 | sudo xargs -0 chmod 750
+#       sudo chmod +x /var/www/owncloud/occ
+
+### FINALIZE
+
+#15. Start the Upgrade
+#       sudo -u www-data ./occ upgrade [done]
+#16. Reapply Manual Changes [?? done]
+#       ?? Manual Changes in .htaccess can be re-applied using installer logic
+#       diff -y -W 70 --suppress-common-lines owncloud/.user.ini owncloud_2022-02-15-09.18.48/.user.ini
+#17. Strong Permissions
+#    Check that chmod with 0640 for .htaccess and .user.ini files has been applied.
+#18. Disable Maintenance Mode
+#       sudo -u www-data ./occ maintenance:mode --off [done]
+#19. Enable Browser Access
+#       sudo service apache2 start
+#20. Check the Upgrade
+#    After the upgrade is complete, re-enable any third-party apps that are compatible with the new release.
+#    ?? Use occ app:enable <app-id> to enable all compatible third-party apps.

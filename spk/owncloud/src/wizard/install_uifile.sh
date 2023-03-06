@@ -1,0 +1,100 @@
+#!/bin/bash
+
+WEB_DIR="/var/services/web_packages"
+# for backwards compatability
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+	WEB_DIR="/var/services/web"
+fi
+OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
+DATADIR="/volume1/@appdata/owncloud/data"
+# for backwards compatability
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+	DATADIR="/volume1/@appstore/owncloud/var/data"
+fi
+
+quote_json () {
+    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
+}
+
+page_append ()
+{
+	if [ -z "$1" ]; then
+		echo "$2"
+	elif [ -z "$2" ]; then
+		echo "$1"
+	else
+		echo "$1,$2"
+	fi
+}
+
+PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
+{
+	"step_title": "ownCloud admin configuration",
+	"items": [{
+		"type": "textfield",
+		"desc": "Administrator's login. Defaults to 'admin'",
+		"subitems": [{
+			"key": "wizard_owncloud_admin_username",
+			"desc": "User name",
+			"defaultValue": "admin",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
+	}, {
+		"type": "password",
+		"desc": "Administrator's password. Defaults to 'admin'",
+		"subitems": [{
+			"key": "wizard_owncloud_admin_password",
+			"desc": "Password",
+			"defaultValue": "admin",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "ownCloud data directory",
+		"subitems": [{
+			"key": "wizard_owncloud_datadirectory",
+			"desc": "Directory",
+			"defaultValue": "$DATADIR",
+			"validator": {
+				"allowBlank": false,
+				"regex": {
+					"expr": "/^\\\/volume[0-9]+\\\//",
+					"errorText": "Path should begin with /volume?/ with ? the number of the volume"
+				}
+			}
+		}]
+	}]
+}, {
+	"step_title": "ownCloud trusted domains",
+	"items": [{
+		"type": "textfield",
+		"desc": "To access your ownCloud server, you must whitelist all URLs in your settings, including any additional URLs you want to use besides the current hostname.",
+		"subitems": [{
+			"key": "wizard_owncloud_trusted_domain_1",
+			"desc": "Domain or IP address",
+			"emptyText": "localhost"
+		}, {
+			"key": "wizard_owncloud_trusted_domain_2",
+			"desc": "Domain or IP address",
+			"emptyText": "server1.example.com"
+		}, {
+			"key": "wizard_owncloud_trusted_domain_3",
+			"desc": "Domain or IP address",
+			"emptyText": "192.168.1.50"
+		}]
+	}]
+}
+EOF
+)
+
+main () {
+	local install_page=""
+	install_page=$(page_append "$install_page" "$PAGE_ADMIN_CONFIG")
+	echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
+}
+
+main "$@"

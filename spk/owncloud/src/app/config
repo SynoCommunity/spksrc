@@ -1,12 +1,12 @@
 {
-    ".url":{
-       "com.synocommunity.packages.owncloud":{
-          "allUsers":true,
-          "desc":"ownCloud",
-          "icon":"images/owncloud-{0}.png",
-          "title":"ownCloud",
-          "type":"url",
-          "url":"/owncloud"
-       }
-    }
- }
+	".url": {
+		"com.synocommunity.packages.owncloud": {
+			"allUsers": true,
+			"desc": "ownCloud",
+			"icon": "images/owncloud-{0}.png",
+			"title": "ownCloud",
+			"type": "url",
+			"url": "/owncloud"
+		}
+	}
+}

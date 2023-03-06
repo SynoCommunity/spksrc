@@ -10,6 +10,10 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
 fi
 OWNCLOUD="${WEB_DIR}/${SYNOPKG_PKGNAME}/occ background:cron"
 HOME_DIR="${SYNOPKG_PKGVAR}"
+# for backwards compatability
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+    HOME_DIR="${SYNOPKG_PKGDEST}/var"
+fi
 PHP="/usr/local/bin/php74"
 SLEEP_TIME="1800"
 
@@ -17,7 +21,7 @@ SLEEP_TIME="1800"
 while true; do
     # Update
     echo "Updating..."
-    ${PHP} ${OWNCLOUD} >> "${SYNOPKG_PKGVAR}/daemon.log" 2>&1
+    ${PHP} ${OWNCLOUD} >> "${HOME_DIR}/daemon.log" 2>&1
 
     # Wait
     echo "Waiting ${SLEEP_TIME} seconds..."

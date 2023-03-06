@@ -28,8 +28,6 @@ service_prestart ()
 service_preinst ()
 {
     :
-    
-    exit 0
 }
 
 service_postinst ()
@@ -39,6 +37,7 @@ service_postinst ()
         ${MKDIR} ${OCROOT}
         rsync -aX ${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/ ${OCROOT} 2>&1
         # Fix permissions
+        chown -R ${SYNOPKG_USERNAME} ${OCROOT} 2>&1
         chgrp -R ${GROUP} ${OCROOT} 2>&1
         chmod -R 0755 ${OCROOT} 2>&1
     fi
@@ -68,6 +67,15 @@ service_postinst ()
             fi
             line_number=$((line_number+1))
         done
+        # Add user specified trusted domains
+        line_number=$(( $(echo -ne "$DOMAINS" | wc -l) + 1 ))
+        for var in wizard_owncloud_trusted_domain_1 wizard_owncloud_trusted_domain_2 wizard_owncloud_trusted_domain_3; do
+            val="${!var}"
+            if [ -n "$val" ]; then
+                ${OCC} config:system:set trusted_domains $line_number --value="$val"
+                line_number=$((line_number+1))
+            fi
+        done
 
         # Add HTTP to HTTPS redirect to Apache configuration file
         APACHE_CONF="${OCROOT}/.htaccess"
@@ -76,36 +84,86 @@ service_postinst ()
             echo "RewriteCond %{HTTPS} off" >> ${APACHE_CONF}
             echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> ${APACHE_CONF}
         fi
-    fi
 
-    exit 0
+        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+            # Fix permissions
+            chown -R ${SYNOPKG_USERNAME} ${wizard_owncloud_datadirectory} 2>&1
+            chgrp -R ${GROUP} ${wizard_owncloud_datadirectory} 2>&1
+            chmod -R 0755 ${wizard_owncloud_datadirectory} 2>&1
+        fi
+    fi
 }
 
 service_preuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
-        # Check database export location
-        if [ -f "${wizard_dbexport_path}" ] || [ -e "${wizard_dbexport_path}/${SYNOPKG_PKGNAME}.db" ]; then
-            echo "The export location already exists as a file or a directory containing a file named ${SYNOPKG_PKGNAME}.db. Please remove the file or choose a different location."
-            exit 1
-        fi
+        # Check export directory
+        if [ -n "${wizard_export_path}" ]; then
+            # Get data directory
+            DATADIR="$(${OCC} config:system:get datadirectory)"
 
-        # Check that the path is writable
-        if [ -d "${wizard_dbexport_path}" ] && [ ! -w "${wizard_dbexport_path}" ]; then
-            echo "Export directory exists but does not allow writing. Please add write permissions for the user 'sc-${SYNOPKG_PKGNAME}'."
-            exit 1
-        fi
+            # Prepare archive structure
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}-backup_$(date +"%Y%m%d")"
+            ${MKDIR} "${TEMPDIR}"
 
-        # Get data directory
-        DATADIR="$(${OCC} config:system:get datadirectory)"
-        # Export database
-        if [ -n "${wizard_dbexport_path}" ]; then
-            ${MKDIR} -p ${wizard_dbexport_path}
-            ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${wizard_dbexport_path}/${SYNOPKG_PKGNAME}.db'" 2>&1
+            # Check database export
+            if [ "${wizard_export_database}" = "true" ]; then
+                echo "Copying previous database from ${DATADIR}"
+                ${MKDIR} "${TEMPDIR}/database"
+                ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${TEMPDIR}/database/${SYNOPKG_PKGNAME}.db'" 2>&1
+            fi
+
+            # Check configuration export
+            if [ "${wizard_export_configs}" = "true" ]; then
+                echo "Copying previous configuration from ${OCROOT}"
+                ${MKDIR} "${TEMPDIR}/configs"
+                ${CP} "${OCROOT}/.user.ini" "${TEMPDIR}/configs/"
+                ${CP} "${OCROOT}/.htaccess" "${TEMPDIR}/configs/"
+                ${MKDIR} "${TEMPDIR}/configs/config"
+                source="${OCROOT}/config"
+                patterns=(
+                "*config.php"
+                "*.json"
+                )
+                target="${TEMPDIR}/configs/config"
+                # Process each pattern of files in the source directory
+                for pattern in "${patterns[@]}"; do
+                    files=$(find "$source" -type f -name "$pattern")
+                    if [ -n "$files" ]; then
+                        for file in "${files[@]}"; do
+                            file_name=$(basename "$file")
+                            ${CP} "$file" "$target/"
+                        done
+                    fi
+                done
+            fi
+
+            # Check user data export
+            if [ "${wizard_export_userdata}" = "true" ]; then
+                echo "Copying previous user data from ${DATADIR}"
+                dir_name=$(basename "$DATADIR")
+                ${MKDIR} "${TEMPDIR}/$dir_name"
+                ${CP} "${DATADIR}" "${TEMPDIR}/$dir_name/"
+            fi
+
+            # Create backup archive
+            archive_name="$(basename "$TEMPDIR").tar.gz"
+            echo "Creating compressed archive of ownCloud data in file $archive_name"
+            /bin/tar -czvf "${SYNOPKG_PKGTMP}/$archive_name" "$TEMPDIR" 2>&1
+
+            # Move archive to export directory
+            if ${RSYNC} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/"; then
+                echo "Backup file copied successfully to ${wizard_export_path}."
+            else
+                echo "File copy failed. Trying to copy to alternate location..."
+                if ${RSYNC} "${SYNOPKG_PKGTMP}/$archive_name" "${SYNOPKG_PKGDEST_VOL}/@tmp/"; then
+                    echo "Backup file copied successfully to alternate location (${SYNOPKG_PKGDEST_VOL}/@tmp)."
+                else
+                    echo "File copy failed. Backup of ownCloud data will not be saved."
+                fi
+            fi
         fi
     fi
-
-    exit 0
 }
 
 service_postuninst ()
@@ -114,88 +172,29 @@ service_postuninst ()
         # Remove the web interface
         ${RM} ${OCROOT}
     fi
-
-    exit 0
 }
 
-### NEW LOGIC TO CREATE / VALIDATE FOR UPGRADES ###
+validate_preupgrade ()
+{
+    # ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
+    is_upgrade_possible="no"
+    valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
+    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d'-' -f1)
+    for version in "${valid_versions[@]}"; do
+        if echo "$previous" | grep -q "$version"; then
+            is_upgrade_possible="yes"
+            break
+        fi
+    done
 
-# From: https://doc.owncloud.com/server/next/admin_manual/maintenance/upgrading/manual_upgrade.html
+    # No matching ugrade paths found
+    if [ "$is_upgrade_possible" = "no" ]; then
+        echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}.<br>Remember to save your ${OCROOT}/data files before uninstalling."
+        exit 1
+    fi
+}
 
-### PREPARATION
-
-# 1. Put your server in maintenance mode and disable Cron jobs.
-#    From: https://doc.owncloud.com/server/next/admin_manual/maintenance/enable_maintenance.html
-#       sudo -u www-data ./occ maintenance:mode --on
-#    From: https://doc.owncloud.com/server/next/admin_manual/troubleshooting/remove_non_existent_bg_jobs.html#remove-the-background-job
-#       sudo -u www-data ./occ background:queue:status
-#       sudo -u www-data ./occ background:queue:delete ID
-# 2. Stop your webserver to prevent users trying to access ownCloud via the web
-#       sudo service apache2 stop
-# 3. Backup ownCloud and the server database
-#    From: https://doc.owncloud.com/server/next/admin_manual/maintenance/backup_and_restore/backup.html
-#       rsync -Aax config data apps apps-external /oc-backupdir/
-#       sqlite3 data/owncloud.db .dump > owncloud-dbbackup_`date +"%Y%m%d"`.bak
-#       ?? sudo crontab -u www-data -l > www-data_crontab.bak
-# 4. Review any installed third-party apps for compatibility with the new ownCloud release. 
-#    Ensure that they are all disabled before beginning the upgrade.
-#       sudo -u www-data ./occ app:list
-#       sudo -u www-data ./occ app:disable <app-id>
-# 5. Backup Manual Changes in .htaccess
-# 6. Backup Manual Changes in .user.ini
-
-### UPGRADE
-
-# 7.Move Current ownCloud Directory
-#       sudo mv /var/www/owncloud /var/www/backup_owncloud
-# 8. Extract the New Source
-#    ?? Should this automatically happen as part of the package function and put in place?
-# 9. Copy the data/ Directory
-#    ?? Check if the data directory is inside your owncloud/ directory. Sample code to check pre-upgrade:
-#       if [[ $(realpath $potential_subdir) =~ ^$(realpath $parent_dir) ]]; then
-#           echo "$potential_subdir is a subdirectory of $parent_dir"
-#       else
-#           echo "$potential_subdir is not a subdirectory of $parent_dir"
-#       fi
-#    ?? If true, move it from your old version of ownCloud to your new version
-#       sudo mv /var/www/backup_owncloud/data /var/www/owncloud/data
-#10. Copy Relevant config.php Content
-#       sudo cp /var/www/backup_owncloud/config/*config.php \
-#       /var/www/owncloud/config/
-#       sudo cp /var/www/backup_owncloud/config/*.json \
-#       /var/www/owncloud/config/
-#11. Market and Marketplace App Upgrades
-#12. Copy Old Apps
-#    ?? If you are using third party applications, look in your new /var/www/owncloud/apps/
-#    or /var/www/owncloud/apps-external/ directory to see if they are present.
-#    If not, copy them from your old instance to your new one.
-#13. Set correct ownership
-#       sudo find -L /var/www/owncloud \
-#           \( -path ./data -o -path ./config \) -prune -o \
-#           -type f -print0 | sudo xargs -0 chown root:www-data
-#14. Set correct permissions
-#       sudo find -L /var/www/owncloud -type f -print0 | sudo xargs -0 chmod 640
-#       sudo find -L /var/www/owncloud -type d -print0 | sudo xargs -0 chmod 750
-#       sudo chmod +x /var/www/owncloud/occ
-
-### FINALIZE
-
-#15. Start the Upgrade
-#       sudo -u www-data ./occ upgrade
-#16. Reapply Manual Changes
-#       ?? Manual Changes in .htaccess can be re-applied using installer logic
-#       diff -y -W 70 --suppress-common-lines owncloud/.user.ini owncloud_2022-02-15-09.18.48/.user.ini
-#17. Strong Permissions
-#    Check that chmod with 0640 for .htaccess and .user.ini files has been applied.
-#18. Disable Maintenance Mode
-#       sudo -u www-data ./occ maintenance:mode --off
-#19. Enable Browser Access
-#       sudo service apache2 start
-#20. Check the Upgrade
-#    After the upgrade is complete, re-enable any third-party apps that are compatible with the new release.
-#    ?? Use occ app:enable <app-id> to enable all compatible third-party apps.
-
-service_preupgrade ()
+service_save ()
 {
     # Place server in maintenance mode
     ${OCC} maintenance:mode --on
@@ -218,8 +217,6 @@ service_preupgrade ()
     echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
     ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak'" 2>&1
-
-    exit 0
 }
 
 service_restore ()
@@ -234,27 +231,8 @@ service_restore ()
         ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
     fi
 
-    # Archive backup server database
-    echo "Archive backup server database to ${OCROOT}/data"
-    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ]; then
-        if [ -d ${OCROOT}/data/db_backup ]; then
-            i=1
-            while [ -d "${OCROOT}/data/db_backup.${i}" ]
-            do
-                i=$((i+1))
-            done
-            while [ $i -gt 1 ]; do
-                j=$((i-1))
-                ${MV} "${OCROOT}/data/db_backup.${j}" "${OCROOT}/data/db_backup.${i}"
-                i=$j
-            done
-            ${MV} "${OCROOT}/data/db_backup" "${OCROOT}/data/db_backup.1"
-        fi
-        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ${OCROOT}/data/ 2>&1
-    fi
-
     # Restore the configuration files
-    echo "Restoring previous configuration from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    echo "Restore previous configuration from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     source="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config"
     patterns=(
     "*config.php"
@@ -281,7 +259,7 @@ service_restore ()
         rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${OCROOT}/ 2>&1
     fi
 
-    echo "Restoring manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     # Migrate manually installed apps from source to destination directories
     dirs=(
     "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps"
@@ -316,15 +294,36 @@ service_restore ()
     # Finalize upgrade
     ${OCC} upgrade
 
+    DATADIR=$(realpath "$(${OCC} config:system:get datadirectory)")
+    # Archive backup server database
+    echo "Archive backup server database to ${DATADIR}"
+    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ]; then
+        if [ -d ${DATADIR}/db_backup ]; then
+            i=1
+            while [ -d "${DATADIR}/db_backup.${i}" ]; do
+                i=$((i+1))
+            done
+            while [ $i -gt 1 ]; do
+                j=$((i-1))
+                ${MV} "${DATADIR}/db_backup.${j}" "${DATADIR}/db_backup.${i}"
+                i=$j
+            done
+            ${MV} "${DATADIR}/db_backup" "${DATADIR}/db_backup.1"
+        fi
+        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ${DATADIR}/ 2>&1
+    fi
+
     # Remove upgrade backup files
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
+    ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
+}
 
-    exit 0
+service_preupgrade ()
+{
+    :
 }
 
 service_postupgrade ()
 {
     :
-    
-    exit 0
 }
