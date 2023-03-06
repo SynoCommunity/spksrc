@@ -16,7 +16,9 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 
-DEPENDS = cross/binutils
+DEPENDS  = cross/binutils
+DEPENDS += cross/gdb
+DEPENDS += cross/llvm
 
 SPK_COMMANDS += bin/addr2line
 SPK_COMMANDS += bin/ar
@@ -45,13 +47,9 @@ SPK_COMMANDS += bin/size
 SPK_COMMANDS += bin/strings
 SPK_COMMANDS += bin/strip
 
-# ******* Fails to build on PPC *******
-#ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/gdb-legacy
 OPTIONAL_DESC += ", gdb 7.12.1"
 else
-DEPENDS += cross/gdb
 OPTIONAL_DESC += ", gdb 12.1"
 endif
 

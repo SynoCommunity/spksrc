@@ -1,28 +1,23 @@
 PKG_NAME = gdb
-PKG_VERS = 12.1
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-DEPENDS = cross/zlib cross/libexpat cross/gmp cross/ncursesw cross/mpfr
 
 HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger
 LICENSE  = GPLv2/LGPLv2
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --enable-host-shared
-CONFIGURE_ARGS += --with-system-zlib
+DOWNLOAD_TARGET = nop
+CHECKSUM_TARGET = nop
+EXTRACT_TARGET = nop
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = nop
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+OPTIONAL_DEPENDS  = cross/gdb-latest
+OPTIONAL_DEPENDS += cross/gdb-7.12
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
-# Library is not created under armv7
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-PLIST_TRANSFORM = sed -e 's?lib:lib/libinproctrace.so??g'
-# binary only created on armv7
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/gdb-7.12
 else
-PLIST_TRANSFORM = sed -e 's?bin:bin/run??g'
+DEPENDS += cross/gdb-latest
 endif
