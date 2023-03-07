@@ -38,10 +38,12 @@ SERVICE_SETUP = src/service-setup-mono.sh
 SPK_DEPENDS = "mono>=5.8"
 endif
 else
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) armada370),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) armada370),$(ARCH))
 DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
 SPK_DEPENDS = "mono>=5.8"
+else
+UNSUPPORTED_ARCHS += armada370
 endif
 endif
 
