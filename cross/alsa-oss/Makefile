@@ -1,5 +1,5 @@
 PKG_NAME = alsa-oss
-PKG_VERS = 1.0.28
+PKG_VERS = 1.1.8
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.alsa-project.org/files/pub/oss-lib
@@ -12,7 +12,7 @@ COMMENT  = Advanced Linux Sound Architecture provides audio and MIDI functionali
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
+CONFIGURE_ARGS = --disable-static --disable-alsatest
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

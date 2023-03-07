@@ -1,6 +1,8 @@
 bin:bin/aconnect
+bin:bin/alsabat
 bin:bin/alsaloop
 bin:bin/alsamixer
+bin:bin/alsatplg
 bin:bin/alsaucm
 bin:bin/amidi
 bin:bin/amixer
@@ -10,10 +12,12 @@ bin:bin/arecord
 bin:bin/arecordmidi
 bin:bin/aseqdump
 bin:bin/aseqnet
+bin:bin/axfer
 bin:bin/iecset
 bin:bin/speaker-test
+lib:lib/alsa-topology/libalsatplg_module_nhlt.so
 rsc:sbin/alsa-info.sh
 bin:sbin/alsaconf
 bin:sbin/alsactl
-rsc:share/alsa
-rsc:share/sounds
+rsc:share/alsa/
+rsc:share/sounds/
