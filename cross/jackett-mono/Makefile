@@ -1,10 +1,9 @@
 PKG_NAME = Jackett
-PKG_VERS = 0.20.1171
+PKG_VERS = 0.20.3521
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).Binaries.Mono.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Jackett/Jackett/releases/download/v$(PKG_VERS)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = jackett
+PKG_DIR = Jackett
 
 DEPENDS =
 
@@ -16,6 +15,7 @@ INSTALL_TARGET = jackett_install
 
 include ../../mk/spksrc.install-resources.mk
 
+.PHONY: jackett_install
 jackett_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share
-	tar -cf - -C $(WORK_DIR)/$(PKG_NAME) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share
+	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share
