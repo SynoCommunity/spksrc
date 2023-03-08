@@ -30,5 +30,6 @@ include ../../mk/spksrc.native-cmake.mk
 
 .PHONY: llvm_post_install
 llvm_post_install:
-	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+	$(RUN) install -m 755 build/bin/llvm-config $(STAGING_INSTALL_PREFIX)/bin/llvm-config
 	$(RUN) install -m 755 build/bin/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen
+	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
