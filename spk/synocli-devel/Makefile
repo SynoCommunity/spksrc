@@ -16,8 +16,8 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 
-DEPENDS += cross/llvm
-DEPENDS  = cross/binutils
+DEPENDS  = cross/llvm
+DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 
 ##
