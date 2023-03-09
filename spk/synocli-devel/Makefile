@@ -12,7 +12,7 @@ STARTABLE = no
 HOMEPAGE = https://www.sourceware.org/gdb/
 LICENSE  = GPLv2
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 
