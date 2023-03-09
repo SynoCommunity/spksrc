@@ -1,7 +1,7 @@
 SPK_NAME = synocli-devel
 SPK_VERS = 1.0
 SPK_REV = 1
-SPK_ICON = src/synocli-develop.png
+SPK_ICON = src/synocli-devel.png
 CHANGELOG = "1. Initial release of synocli-devel"
 
 MAINTAINER = SynoCommunity
@@ -16,9 +16,9 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 
+DEPENDS += cross/llvm
 DEPENDS  = cross/binutils
 DEPENDS += cross/gdb
-DEPENDS += cross/llvm
 
 ##
 ## binutils
@@ -73,13 +73,15 @@ include ../../mk/spksrc.spk.mk
 ##
 ## LLVM
 ##
-SPK_COMMANDS += bin/clang
-SPK_COMMANDS += bin/clang++
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
+OPTIONAL_DESC += ", LLVM 15.0.7"
 SPK_COMMANDS += bin/clang-15
 else
+OPTIONAL_DESC += ", LLVM 9.0.1"
 SPK_COMMANDS += bin/clang-9
-fi
+endif
+SPK_COMMANDS += bin/clang
+SPK_COMMANDS += bin/clang++
 SPK_COMMANDS += bin/clang-apply-replacements
 SPK_COMMANDS += bin/clang-change-namespace
 SPK_COMMANDS += bin/clang-check
