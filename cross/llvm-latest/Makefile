@@ -5,8 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 
-DEPENDS = cross/zlib
-
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
 LICENSE  = Apache License v2.0 with LLVM Exceptions
@@ -35,7 +33,11 @@ CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 
 # Enable building with zlib to support compression/uncompression
-CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
+# FAILS: lib/libLLVM-15.so: undefined reference to `compress2'
+#        lib/libLLVM-15.so: undefined reference to `crc32'
+#        lib/libLLVM-15.so: undefined reference to `compressBound@ZLIB_1.2.0'
+#DEPENDS = cross/zlib
+#CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
 # Indicates whether the LLVM Interpreter will be
 # linked with the Foreign Function Interface library
@@ -59,9 +61,6 @@ CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 # Allow users to build with RTTI (Run-Time Type Info)
 # enabled and still inherit from LLVM classes
 #CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON                    <-- TO TEST
-
-# Otherwise builds with error
-#CMAKE_ARGS += -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
 
 # This switch enables building for the r600 AMD GPU
 # used by the Mesa r600 and radeonsi drivers.
@@ -93,6 +92,8 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=AArch64
 CMAKE_ARGS += -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-unknown-linux-gnueabi
+# Otherwise builds with error
+CMAKE_ARGS += -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
