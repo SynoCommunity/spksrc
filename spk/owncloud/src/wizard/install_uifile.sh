@@ -2,18 +2,18 @@
 
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 	WEB_DIR="/var/services/web"
 fi
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 DATADIR="/volume1/@appdata/owncloud/data"
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
-	DATADIR="/volume1/@appstore/owncloud/var/data"
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+	DATADIR="$(realpath ${WEB_DIR})/${SYNOPKG_PKGNAME}/data"
 fi
 
 quote_json () {
-    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
+	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
 
 page_append ()

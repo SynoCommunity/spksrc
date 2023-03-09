@@ -2,17 +2,45 @@
 
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 	WEB_DIR="/var/services/web"
+	if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+		SYNOPKG_PKGDEST_VOL="/volume1"
+	fi
+	if [ -z ${SYNOPKG_PKGNAME} ]; then
+		SYNOPKG_PKGNAME="owncloud"
+	fi
 fi
-PHP="/usr/local/bin/php74"
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-OCC="${PHP} ${OCROOT}/occ"
-DATADIR="$(${OCC} config:system:get datadirectory)"
+DATADIR="$(exec_occ config:system:get datadirectory)"
+# data directory fail-safe
+if [ ! -d "$DATADIR" ]; then
+	echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
+	DATADIR="${OCROOT}/data"
+fi
 DATASIZE="$(/bin/du -sh ${DATADIR} | /bin/cut -f1)"
 
+exec_occ() {
+	PHP="/usr/local/bin/php74"
+	OCC="${OCROOT}/occ"
+	PKGUSER="sc-${SYNOPKG_PKGNAME}"
+	OCC_ARGS=()
+	for arg in "$@"; do
+		OCC_ARGS+=("$arg")
+	done
+	COMMAND="${PHP} ${OCC} ${OCC_ARGS[@]}"
+	if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+		OCC_OUTPUT=$(/bin/su "$PKGUSER" -s /bin/sh -c "$COMMAND")
+	else
+		OCC_OUTPUT=$("$COMMAND")
+	fi
+	OCC_EXIT_CODE=$?
+	echo "$OCC_OUTPUT"
+	return $OCC_EXIT_CODE
+}
+
 quote_json () {
-    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
+	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
 
 page_append ()

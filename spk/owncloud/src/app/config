@@ -4,9 +4,11 @@
 			"allUsers": true,
 			"desc": "ownCloud",
 			"icon": "images/owncloud-{0}.png",
+			"port": "443",
+			"protocol": "https",
 			"title": "ownCloud",
 			"type": "url",
-			"url": "/owncloud"
+			"url": "/owncloud/"
 		}
 	}
 }

@@ -8,7 +8,7 @@
 		},
 		"pkg_dir_prepare": [{
 			"group": "http",
-			"mode": "0755",
+			"mode": "0750",
 			"source": "/var/packages/owncloud/target/share/owncloud",
 			"target": "owncloud",
 			"user": "sc-owncloud"
