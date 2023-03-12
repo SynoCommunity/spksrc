@@ -57,7 +57,7 @@ exec_occ() {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         OCC_OUTPUT=$(/bin/su "$PKGUSER" -s /bin/sh -c "$COMMAND")
     else
-        OCC_OUTPUT=$("$COMMAND")
+        OCC_OUTPUT=$($COMMAND)
     fi
     OCC_EXIT_CODE=$?
     echo "$OCC_OUTPUT"

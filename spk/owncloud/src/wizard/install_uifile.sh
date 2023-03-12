@@ -5,6 +5,9 @@ WEB_DIR="/var/services/web_packages"
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 	WEB_DIR="/var/services/web"
 fi
+if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+	SYNOPKG_PKGDEST_VOL="/volume1"
+fi
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 DATADIR="${SYNOPKG_PKGDEST_VOL}/@appdata/${SYNOPKG_PKGNAME}/data"
 # for backwards compatability

@@ -12,13 +12,6 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 	fi
 fi
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-DATADIR="$(exec_occ config:system:get datadirectory)"
-# data directory fail-safe
-if [ ! -d "$DATADIR" ]; then
-	echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-	DATADIR="${OCROOT}/data"
-fi
-DATASIZE="$(/bin/du -sh ${DATADIR} | /bin/cut -f1)"
 
 exec_occ() {
 	PHP="/usr/local/bin/php74"
@@ -32,7 +25,7 @@ exec_occ() {
 	if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
 		OCC_OUTPUT=$(/bin/su "$PKGUSER" -s /bin/sh -c "$COMMAND")
 	else
-		OCC_OUTPUT=$("$COMMAND")
+		OCC_OUTPUT=$($COMMAND)
 	fi
 	OCC_EXIT_CODE=$?
 	echo "$OCC_OUTPUT"
@@ -53,6 +46,15 @@ page_append ()
 		echo "$1,$2"
 	fi
 }
+
+# Calculate size of data directory
+DATADIR="$(exec_occ config:system:get datadirectory)"
+# data directory fail-safe
+if [ ! -d "$DATADIR" ]; then
+	echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
+	DATADIR="${OCROOT}/data"
+fi
+DATASIZE="$(/bin/du -sh ${DATADIR} | /bin/cut -f1)"
 
 PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 {
