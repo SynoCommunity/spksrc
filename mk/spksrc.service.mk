@@ -418,6 +418,11 @@ endif
 ifeq ($(strip $(SERVICE_TYPE)),)
 SERVICE_TYPE=url
 endif
+ifneq ($(strip $(DSM_APP_NAME)),)
+	SPK_APPNAME = $(DSM_APP_NAME)
+else
+	SPK_APPNAME = com.synocommunity.packages.$(SPK_NAME)
+endif
 
 DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
@@ -427,7 +432,7 @@ ifneq ($(wildcard $(DSM_UI_CONFIG)),)
 else
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
 		--arg desc "${DESC}" \
-		--arg id "com.synocommunity.packages.${SPK_NAME}" \
+		--arg id "${SPK_APPNAME}" \
 		--arg icon "images/${SPK_NAME}-{0}.png" \
 		--arg prot "${SERVICE_PORT_PROTOCOL}" \
 		--arg port "${SERVICE_PORT}" \
