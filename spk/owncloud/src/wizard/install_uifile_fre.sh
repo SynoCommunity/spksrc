@@ -29,13 +29,13 @@ page_append ()
 
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
-	"step_title": "ownCloud admin configuration",
+	"step_title": "Configuration de l'administrateur d'ownCloud",
 	"items": [{
 		"type": "textfield",
-		"desc": "Administrator's login. Defaults to 'admin'",
+		"desc": "Connexion de l'administrateur. Par défaut, 'admin'",
 		"subitems": [{
 			"key": "wizard_owncloud_admin_username",
-			"desc": "User name",
+			"desc": "Nom d'utilisateur",
 			"defaultValue": "admin",
 			"validator": {
 				"allowBlank": false
@@ -43,10 +43,10 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "password",
-		"desc": "Administrator's password. Defaults to 'admin'",
+		"desc": "Mot de passe de l'administrateur. Par défaut, 'admin'",
 		"subitems": [{
 			"key": "wizard_owncloud_admin_password",
-			"desc": "Password",
+			"desc": "Mot de passe",
 			"defaultValue": "admin",
 			"validator": {
 				"allowBlank": false
@@ -54,36 +54,36 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "ownCloud data directory",
+		"desc": "répertoire de données ownCloud",
 		"subitems": [{
 			"key": "wizard_owncloud_datadirectory",
-			"desc": "Directory",
+			"desc": "Répertoire",
 			"defaultValue": "$DATADIR",
 			"validator": {
 				"allowBlank": false,
 				"regex": {
 					"expr": "/^\\\/volume[0-9]+\\\//",
-					"errorText": "Path should begin with /volume?/ with ? the number of the volume"
+					"errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro de volume"
 				}
 			}
 		}]
 	}]
 }, {
-	"step_title": "ownCloud trusted domains",
+	"step_title": "Domaines de confiance ownCloud",
 	"items": [{
 		"type": "textfield",
-		"desc": "To access your ownCloud server, you must whitelist all URLs in your settings, including any additional URLs you want to use besides the current hostname.",
+		"desc": "Pour accéder à votre serveur ownCloud, vous devez mettre en liste blanche toutes les URL dans vos paramètres, y compris toutes les URL supplémentaires que vous souhaitez utiliser en plus du nom d'hôte actuel.",
 		"subitems": [{
 			"key": "wizard_owncloud_trusted_domain_1",
-			"desc": "Domain or IP address",
+			"desc": "Domaine ou adresse IP",
 			"emptyText": "localhost"
 		}, {
 			"key": "wizard_owncloud_trusted_domain_2",
-			"desc": "Domain or IP address",
+			"desc": "Domaine ou adresse IP",
 			"emptyText": "server1.example.com"
 		}, {
 			"key": "wizard_owncloud_trusted_domain_3",
-			"desc": "Domain or IP address",
+			"desc": "Domaine ou adresse IP",
 			"emptyText": "192.168.1.50"
 		}]
 	}]
