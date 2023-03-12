@@ -11,19 +11,22 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 		SYNOPKG_PKGNAME="owncloud"
 	fi
 fi
+if [ -z ${EFF_USER} ]; then
+	EFF_USER="sc-owncloud"
+fi
+
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 
 exec_occ() {
 	PHP="/usr/local/bin/php74"
 	OCC="${OCROOT}/occ"
-	PKGUSER="sc-${SYNOPKG_PKGNAME}"
 	OCC_ARGS=()
 	for arg in "$@"; do
 		OCC_ARGS+=("$arg")
 	done
 	COMMAND="${PHP} ${OCC} ${OCC_ARGS[@]}"
 	if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-		OCC_OUTPUT=$(/bin/su "$PKGUSER" -s /bin/sh -c "$COMMAND")
+		OCC_OUTPUT=$(/bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND")
 	else
 		OCC_OUTPUT=$($COMMAND)
 	fi
@@ -47,6 +50,10 @@ page_append ()
 	fi
 }
 
+CHECKBOX1_ID="wizard_export_database"
+CHECKBOX2_ID="wizard_export_configs"
+CHECKBOX3_ID="wizard_export_userdata"
+ERROR_TEXT="Le chemin doit commencer par /volume?/ avec ? le numéro de volume"
 # Calculate size of data directory
 DATADIR="$(exec_occ config:system:get datadirectory)"
 # data directory fail-safe
@@ -56,9 +63,42 @@ if [ ! -d "$DATADIR" ]; then
 fi
 DATASIZE="$(/bin/du -sh ${DATADIR} | /bin/cut -f1)"
 
+getValidPath()
+{
+	VALID_PATH=$(/bin/cat<<EOF
+{
+	var exportPath = arguments[0];
+	var step = arguments[2];
+	var checkBox1 = step.getComponent("${CHECKBOX1_ID}");
+	var checkBox2 = step.getComponent("${CHECKBOX2_ID}");
+	var checkBox3 = step.getComponent("${CHECKBOX3_ID}");
+	const pattern = /^\/volume[0-9]+\//;
+	if (exportPath === "") {
+		checkBox1.setDisabled(true);
+		checkBox2.setDisabled(true);
+		checkBox3.setDisabled(true);
+		return true;
+	} else if (pattern.test(exportPath)) {
+		checkBox1.setDisabled(false);
+		checkBox2.setDisabled(false);
+		checkBox3.setDisabled(false);
+		return true;
+	} else {
+		checkBox1.setDisabled(true);
+		checkBox2.setDisabled(true);
+		checkBox3.setDisabled(true);
+		return "${ERROR_TEXT}";
+	}
+}
+EOF
+)
+	echo "$VALID_PATH" | quote_json
+}
+
 PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 {
-	"step_title": "Backup ownCloud server",
+	"step_title": "Sauvegarder le serveur ownCloud",
+	"invalid_next_disabled_v2": true,
 	"items": [{
 		"desc": "<strong>AVERTISSEMENT:</strong> La désinstallation du package ownCloud entraînera la suppression du serveur ownCloud, ainsi que de tous les comptes d'utilisateurs, données et configurations associés."
 	}, {
@@ -70,10 +110,7 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 			"emptyText": "${SYNOPKG_PKGDEST_VOL}/backup",
 			"validator": {
 				"allowBlank": true,
-				"regex": {
-					"expr": "/^\\\/volume[0-9]+\\\//",
-					"errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro de volume"
-				}
+				"fn": "$(getValidPath)"
 			}
 		}]
 	}, {
@@ -87,17 +124,20 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 		"type": "multiselect",
 		"desc": "Choisissez les éléments que vous souhaitez inclure dans la sauvegarde.",
 		"subitems": [{
-			"key": "wizard_export_database",
+			"key": "${CHECKBOX1_ID}",
 			"desc": "Inclure la base de données",
-			"defaultValue": true
+			"defaultValue": false,
+			"disabled": true
 		}, {
-			"key": "wizard_export_configs",
+			"key": "${CHECKBOX2_ID}",
 			"desc": "Inclure les fichiers de configuration",
-			"defaultValue": true
+			"defaultValue": false,
+			"disabled": true
 		}, {
-			"key": "wizard_export_userdata",
-			"desc": "Inclure les données utilisateur ($DATASIZE)",
-			"defaultValue": true
+			"key": "${CHECKBOX3_ID}",
+			"desc": "Inclure les données utilisateur (${DATASIZE})",
+			"defaultValue": false,
+			"disabled": true
 		}]
 	}]
 }

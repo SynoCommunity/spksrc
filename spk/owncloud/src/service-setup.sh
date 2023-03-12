@@ -22,11 +22,10 @@ set_owncloud_permissions ()
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         DIRAPP=$1
         DIRDATA=$2
-        PKGUSER="sc-${SYNOPKG_PKGNAME}"
         echo "Setting the correct ownership and permissions of the files and folders in ${DIRAPP}"
         # Set the ownership for all files and folders to sc-owncloud:http
-        find -L ${DIRAPP} -type d -print0 | xargs -0 chown ${PKGUSER}:${GROUP} 2>/dev/null
-        find -L ${DIRAPP} -type f -print0 | xargs -0 chown ${PKGUSER}:${GROUP} 2>/dev/null
+        find -L ${DIRAPP} -type d -print0 | xargs -0 chown ${EFF_USER}:${GROUP} 2>/dev/null
+        find -L ${DIRAPP} -type f -print0 | xargs -0 chown ${EFF_USER}:${GROUP} 2>/dev/null
         # Use chmod on files and directories with different permissions
         # For all files use 0640
         find -L ${DIRAPP} -type f -print0 | xargs -0 chmod 640 2>/dev/null
@@ -34,7 +33,7 @@ set_owncloud_permissions ()
         find -L ${DIRAPP} -type d -print0 | xargs -0 chmod 750 2>/dev/null
         # For external data directory
         if [ -n "${DIRDATA}" ] && [ -d "${DIRDATA}" ]; then
-            chown -R ${PKGUSER}:${GROUP} ${DIRDATA} 2>/dev/null
+            chown -R ${EFF_USER}:${GROUP} ${DIRDATA} 2>/dev/null
             find -L ${DIRDATA} -type f -print0 | xargs -0 chmod 640 2>/dev/null
             find -L ${DIRDATA} -type d -print0 | xargs -0 chmod 750 2>/dev/null
         fi
@@ -48,14 +47,13 @@ set_owncloud_permissions ()
 exec_occ() {
     PHP="/usr/local/bin/php74"
     OCC="${OCROOT}/occ"
-    PKGUSER="sc-${SYNOPKG_PKGNAME}"
     OCC_ARGS=()
     for arg in "$@"; do
         OCC_ARGS+=("$arg")
     done
     COMMAND="${PHP} ${OCC} ${OCC_ARGS[@]}"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        OCC_OUTPUT=$(/bin/su "$PKGUSER" -s /bin/sh -c "$COMMAND")
+        OCC_OUTPUT=$(/bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND")
     else
         OCC_OUTPUT=$($COMMAND)
     fi
@@ -248,7 +246,6 @@ service_preuninst ()
                     files=$(find "$source" -type f -name "$pattern")
                     if [ -n "$files" ]; then
                         for file in "${files[@]}"; do
-                            file_name=$(basename "$file")
                             ${CP} "$file" "$target/"
                         done
                     fi
