@@ -59,6 +59,10 @@ endif
 	echo 'set(CMAKE_EXE_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo
+ifneq ($(strip $(BUILD_SHARED_LIBS)),)
+	@echo "# build shared library" ; \
+	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
+endif
 	@echo "# define library rpath" ; \
 	echo "set(CMAKE_INSTALL_RPATH $(subst $() $(),:,$(CMAKE_INSTALL_RPATH)))" ; \
 	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \

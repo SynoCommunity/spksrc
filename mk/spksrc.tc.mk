@@ -119,10 +119,7 @@ endif
 	echo ; \
 	echo "# search headers and libraries in the target environment" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
-	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))" ; \
-	echo ; \
-	echo "# always build shared library" ; \
-	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
 
 .PHONY: meson_vars
 meson_vars:
