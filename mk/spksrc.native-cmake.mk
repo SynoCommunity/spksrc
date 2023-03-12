@@ -35,6 +35,11 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
 endif
 
+# install
+ifeq ($(strip $(CMAKE_DIR)),)
+CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
+endif
+
 ifneq ($(strip $(CMAKE_USE_NINJA)),1)
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -59,7 +64,7 @@ cmake_configure_target:
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
