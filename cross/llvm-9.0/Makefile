@@ -72,7 +72,7 @@ CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 
 # Allow users to build with RTTI (Run-Time Type Info)
 # enabled and still inherit from LLVM classes
-#CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON                    <-- TO TEST
+CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
 
 # This switch enables building for the r600 AMD GPU
 # used by the Mesa r600 and radeonsi drivers.
