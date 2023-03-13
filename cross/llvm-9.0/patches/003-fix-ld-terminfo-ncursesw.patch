@@ -1,0 +1,24 @@
+diff -uprN ../llvm-project-9.0.1-orig/llvm/utils/gn/build/libs/terminfo/BUILD.gn ./llvm/utils/gn/build/libs/terminfo/BUILD.gn
+--- ../llvm-project-9.0.1-orig/llvm/utils/gn/build/libs/terminfo/BUILD.gn	2019-12-11 19:15:30.000000000 +0000
++++ ./llvm/utils/gn/build/libs/terminfo/BUILD.gn	2023-03-12 13:32:19.256980118 +0000
+@@ -2,7 +2,7 @@ import("//llvm/utils/gn/build/libs/termi
+ 
+ config("terminfo_config") {
+   visibility = [ ":terminfo" ]
+-  libs = [ "ncurses" ]
++  libs = [ "ncursesw" ]
+ }
+ 
+ group("terminfo") {
+diff -uprN ../llvm-project-9.0.1-orig/llvm/utils/gn/secondary/llvm/tools/llvm-config/BUILD.gn ./llvm/utils/gn/secondary/llvm/tools/llvm-config/BUILD.gn
+--- ../llvm-project-9.0.1-orig/llvm/utils/gn/secondary/llvm/tools/llvm-config/BUILD.gn	2019-12-11 19:15:30.000000000 +0000
++++ ./llvm/utils/gn/secondary/llvm/tools/llvm-config/BUILD.gn	2023-03-12 13:32:01.224805945 +0000
+@@ -57,7 +57,7 @@ write_cmake_config("BuildVariables.inc")
+     system_libs += " ${l}xml2${lib}"
+   }
+   if (llvm_enable_terminfo) {
+-    system_libs += " ${l}ncurses${lib}"
++    system_libs += " ${l}ncursesw${lib}"
+   }
+   if (llvm_enable_zlib) {
+     system_libs += " ${l}z${lib}"
