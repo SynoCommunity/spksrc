@@ -1,3 +1,13 @@
+#---
+#
+# Solves build issue when compiling a LLVM or GCC compiler:
+#
+# sanitizer_platform_limits_posix.cc:874:46: error: ‘SCSI_IOCTL_TAGGED_DISABLE’ was not declared in this scope
+# unsigned IOCTL_SCSI_IOCTL_TAGGED_DISABLE = SCSI_IOCTL_TAGGED_DISABLE;
+# sanitizer_platform_limits_posix.cc:875:45: error: ‘SCSI_IOCTL_TAGGED_ENABLE’ was not declared in this scope
+# unsigned IOCTL_SCSI_IOCTL_TAGGED_ENABLE = SCSI_IOCTL_TAGGED_ENABLE;
+#
+#----
 diff -uprN ../../work.orig/aarch64-unknown-linux-gnu/aarch64-unknown-linux-gnu/sysroot/usr/include/scsi/scsi.h ./aarch64-unknown-linux-gnu/sysroot/usr/include/scsi/scsi.h
 --- ../../work.orig/aarch64-unknown-linux-gnu/aarch64-unknown-linux-gnu/sysroot/usr/include/scsi/scsi.h	2021-07-01 19:35:13.000000000 +0000
 +++ ./aarch64-unknown-linux-gnu/sysroot/usr/include/scsi/scsi.h	2023-03-08 23:41:05.122316868 +0000
