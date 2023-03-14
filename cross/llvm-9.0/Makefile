@@ -5,11 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS)
 
-BUILD_DEPENDS = native/llvm-9.0
-DEPENDS = cross/pcre2
-
 HOMEPAGE = https://llvm.org/
-COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
+COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies
 LICENSE  = Apache License v2.0 with LLVM Exceptions
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
@@ -74,12 +71,8 @@ CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 # enabled and still inherit from LLVM classes
 CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
 
-# This switch enables building for the r600 AMD GPU
-# used by the Mesa r600 and radeonsi drivers.
-# The BPF target is required to build v4l-utils-1.24.1.
-# -DLLVM_TARGETS_TO_BUILD="AMDGPU;BPF"                 <-- Something to play with for CUDA and NVIDIA GPU transcoding?
-
 # Requires native/llvm-9.0
+BUILD_DEPENDS = native/llvm-9.0
 CMAKE_ARGS += -DLLVM_TOOLS_BINARY_DIR=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin)
 CMAKE_ARGS += -DLLVM_CONFIG=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-config)
 CMAKE_ARGS += -DLLVM_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-tblgen)
@@ -90,12 +83,18 @@ include ../../mk/spksrc.common.mk
 #
 # https://llvm.org/docs/HowToCrossCompileBuiltinsOnArm.html
 #
+# armv7-6.1, hi3535-6.1 and comcerto2k
+# has errors with gnu-as related to compiler-rt
+#
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
+
 ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
+
 else ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
+
 else
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
