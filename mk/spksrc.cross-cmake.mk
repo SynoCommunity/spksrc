@@ -45,10 +45,12 @@ cmake_pkg_toolchain:
 	@cat $(CMAKE_TOOLCHAIN_WRK) ; \
 	echo
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "# set assembly compiler" ; \
 	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
 	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))" ; \
 	echo
+endif
 endif
 	@echo "# set compiler flags for cross-compiling" ; \
 	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
@@ -57,11 +59,18 @@ endif
 	echo 'set(CMAKE_EXE_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo
+ifneq ($(strip $(BUILD_SHARED_LIBS)),)
+	@echo "# build shared library" ; \
+	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
+endif
 	@echo "# define library rpath" ; \
 	echo "set(CMAKE_INSTALL_RPATH $(subst $() $(),:,$(CMAKE_INSTALL_RPATH)))" ; \
 	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
 	echo "set(CMAKE_BUILD_WITH_INSTALL_RPATH $(CMAKE_BUILD_WITH_INSTALL_RPATH))" ; \
 	echo
+	@echo "# set pkg-config path" ; \
+	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(abspath $(PKG_CONFIG_LIBDIR))")' ; \
+	echo 'set(ENV{PKG_CONFIG_SYSROOT_DIR} "$(abspath $(INSTALL_DIR))")'
 
 .PHONY: cmake_configure_target
 
