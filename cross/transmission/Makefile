@@ -1,5 +1,5 @@
 PKG_NAME = transmission
-PKG_VERS = 4.0.1
+PKG_VERS = 4.0.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/transmission/transmission/releases/download/$(PKG_VERS)
@@ -16,7 +16,5 @@ REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
 CMAKE_ARGS  = -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-# disable unit tests to avoid cmake/cmake#18840
-CMAKE_ARGS += -DENABLE_TESTS=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
