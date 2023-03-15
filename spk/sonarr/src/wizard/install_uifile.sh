@@ -5,8 +5,16 @@ function incompatible_upgrade
     cat <<EOF >"${SYNOPKG_TEMP_LOGFILE}"
 [{
 	"step_title": "ATTENTION! Incompatible upgrade detected",
+	"invalid_next_disabled_v2": true,
 	"items": [{
-		"desc": "<strong style='color:red'>WARNING:</strong> This update is an upgrade to Sonarr v4 from Sonarr v3. We have detected that you have Sonarr v2 installed. We suggest that you upgrade your previous installation to Sonarr v3 before installing this upgrade.<br><br><b>If you proceed, the installation will abort.</b>"
+		"type": "textfield",
+		"desc": "<strong style='color:red'>WARNING:</strong> This update is an upgrade to Sonarr v4 from Sonarr v3. We have detected that you have Sonarr v2 installed. We suggest that you upgrade your previous installation to Sonarr v3 before installing this upgrade.<br><br><b>Installation will abort.</b>",
+		"subitems": [{
+			"hidden": true,
+			"validator": {
+				"fn": "{return false;}"
+			}
+		}]
 	}]
 }]
 EOF
