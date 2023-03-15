@@ -69,8 +69,7 @@ endif
 	echo "set(CMAKE_BUILD_WITH_INSTALL_RPATH $(CMAKE_BUILD_WITH_INSTALL_RPATH))" ; \
 	echo
 	@echo "# set pkg-config path" ; \
-	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(abspath $(PKG_CONFIG_LIBDIR))")' ; \
-	echo 'set(ENV{PKG_CONFIG_SYSROOT_DIR} "$(abspath $(INSTALL_DIR))")'
+	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(abspath $(PKG_CONFIG_LIBDIR))")'
 
 .PHONY: cmake_configure_target
 

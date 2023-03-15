@@ -37,11 +37,11 @@ TC_PREFIX = $(TC_TARGET)-
 endif
 
 ifeq ($(strip $(TC_INCLUDE)),)
-TC_INCLUDE = $(abspath $(TC_SYSROOT)/usr/include)
+TC_INCLUDE = $(TC_SYSROOT)/usr/include
 endif
 
 ifeq ($(strip $(TC_LIBRARY)),)
-TC_LIBRARY = $(abspath $(TC_SYSROOT)/lib)
+TC_LIBRARY = $(TC_SYSROOT)/lib
 endif
 
 CFLAGS += -I$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_CFLAGS)
