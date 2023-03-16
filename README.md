@@ -8,15 +8,15 @@ DSM 7 was released on June 29 2021 as Version 7.0.41890.
 
 ## In SynoCommunity some packages are available for DSM 7 but some are not.
 * You find the status of the packages in the issue [#4524] **Meta: DSM7 package status**
-* Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, some of the packages are not compatible with DSM 7.
+* If you are running DSM7, some packages that are not compatible may continue appear in the Package Center of your Disk Station.
 * PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7. All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
 * Please regard all DSM 7 packages as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
 * **ATTENTION**: As reported, package configuration settings may be lost following the upgrade to DSM 7 and the execution of a Package repair. Make sure to backup your settings and configuration for your SynoCommunity packages before installation of DSM 7 to facilitate restoration if needed.
 * Packages of the following kind will need some time to make DSM 7 compatible
-  * Packages depending MySQL database must be migrated to MariaDB 10
-  * Packages with installation Wizard to configure a shared folder (all download related packages and others)
-  * Packages that integrate into DSM webstation
-* As this is a community project where people spend there spare time for contribution, it may take a long time until most of the packages are ported to DSM 7. (There are still packages here that are not ported from DSM 5 to DSM 6 yet).
+  * Packages depending on MySQL database must be migrated to MariaDB 10
+  * Packages that use an Installation Wizard to configure a shared folder (all download related packages and others)
+  * Packages that integrate into DSM Webstation
+* As this is a community project where people contribue in their spare time, it may take awhile until packages are ported to DSM 7. (There are still packages here that are not ported from DSM 5 to DSM 6 yet).
 
 # spksrc
 spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository].
