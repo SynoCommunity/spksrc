@@ -1,0 +1,4 @@
+lnk:lib/libcryptsetup.so
+lnk:lib/libcryptsetup.so.12
+lib:lib/libcryptsetup.so.12.9.0
+bin:sbin/cryptsetup
