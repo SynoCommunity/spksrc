@@ -19,7 +19,8 @@ LICENSE  = GPLv2/GPLv3
 WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARE = wizard_download_share
+USE_DATA_SHARE_WORKER = yes
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9091
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)

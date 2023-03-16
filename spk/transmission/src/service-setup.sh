@@ -17,15 +17,19 @@ SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FI
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        # Capture wizard variables
-        TXN_VOLUME=${wizard_volume:=/volume1}
-        TXN_DNLOAD=${wizard_download_dir:=downloads}
+        # Capture wizard variable
+        TXN_DNLOAD=${wizard_download_dir:=volume1/downloads}
+        # Check that the path exists, if not use path in package shares
+        if [ ! -d "${TXN_DNLOAD}" ]; then
+            TXN_DNLOAD=$(realpath "/var/packages/${SYNOPKG_PKGNAME}/shares/${wizard_download_share}")
+        fi
+        TXN_FUNCTS=("complete" "incomplete" "watch")
         TXN_FOLDRS=("complete" "incomplete" "watch-transmission")
         TXN_PATHS=()
 
         # Create the managed folders
         for item in "${TXN_FOLDRS[@]}"; do
-            folder="$TXN_VOLUME/$TXN_DNLOAD/$item"
+            folder="$TXN_DNLOAD/$item"
             if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
                 mkdir -p "$folder"
             else
@@ -40,21 +44,21 @@ service_postinst ()
             -e "s|@password@|${wizard_password:=admin}|g" \
             -i "${CFG_FILE}"
         i=0
-        while [ $i -lt ${#TXN_FOLDRS[@]} ]; do
+        while [ $i -lt ${#TXN_FUNCTS[@]} ]; do
             if [ -d "${TXN_PATHS[$i]}" ]; then
-                if [ "${TXN_FOLDRS[$i]}" = "complete" ]; then
+                if [ "${TXN_FUNCTS[$i]}" = "complete" ]; then
                     sed -e "s|@download_dir@|${TXN_PATHS[$i]}|g" -i "${CFG_FILE}"
                 else
-                    sed -e "s|@${TXN_FOLDRS[$i]}_dir_enabled@|true|g" \
-                        -e "s|@${TXN_FOLDRS[$i]}_dir@|${TXN_PATHS[$i]}|g" \
+                    sed -e "s|@${TXN_FUNCTS[$i]}_dir_enabled@|true|g" \
+                        -e "s|@${TXN_FUNCTS[$i]}_dir@|${TXN_PATHS[$i]}|g" \
                         -i "${CFG_FILE}"
                 fi
             else
-                if [ "${TXN_FOLDRS[$i]}" = "complete" ]; then
-                    sed -e "s|@download_dir@|${TXN_VOLUME}/${TXN_DNLOAD}|g" -i "${CFG_FILE}"
+                if [ "${TXN_FUNCTS[$i]}" = "complete" ]; then
+                    sed -e "s|@download_dir@|${TXN_DNLOAD}|g" -i "${CFG_FILE}"
                 else
-                    sed -e "s|@${TXN_FOLDRS[$i]}_dir_enabled@|false|g" \
-                        -e "/@${TXN_FOLDRS[$i]}_dir@/d" \
+                    sed -e "s|@${TXN_FUNCTS[$i]}_dir_enabled@|false|g" \
+                        -e "/@${TXN_FUNCTS[$i]}_dir@/d" \
                         -i "${CFG_FILE}"
                 fi
             fi
