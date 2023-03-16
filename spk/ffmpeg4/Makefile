@@ -26,8 +26,8 @@ endif
 
 POST_STRIP_TARGET = ffmpeg4_extra_install
 
-SPK_COMMANDS += bin/ffmpeg
-SPK_COMMANDS += bin/ffmpeg4
+SPK_USR_LOCAL_LINKS  = bin:bin/ffmpeg
+SPK_USR_LOCAL_LINKS += bin:bin/ffmpeg4
 
 include ../../mk/spksrc.spk.mk
 

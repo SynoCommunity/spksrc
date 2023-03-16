@@ -23,8 +23,8 @@ endif
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS += bin/ffmpeg
-SPK_COMMANDS += bin/$(SPK_NAME)
+SPK_USR_LOCAL_LINKS  = bin:bin/ffmpeg
+SPK_USR_LOCAL_LINKS += bin:bin/$(SPK_NAME)
 
 include ../../mk/spksrc.spk.mk
 
