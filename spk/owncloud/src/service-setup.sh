@@ -20,26 +20,26 @@ fi
 set_owncloud_permissions ()
 {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        DIRNAME=$1
-        DIRDATA="${wizard_owncloud_datadirectory}"
+        DIRAPP=$1
+        DIRDATA=$2
         PKGUSER="sc-${SYNOPKG_PKGNAME}"
-        echo "Setting the correct ownership and permissions of the files and folders in ${DIRNAME}"
+        echo "Setting the correct ownership and permissions of the files and folders in ${DIRAPP}"
         # Set the ownership for all files and folders to sc-owncloud:http
-        find -L ${DIRNAME} -type d -print0 | xargs -0 chown ${PKGUSER}:${GROUP} 2>/dev/null
-        find -L ${DIRNAME} -type f -print0 | xargs -0 chown ${PKGUSER}:${GROUP} 2>/dev/null
+        find -L ${DIRAPP} -type d -print0 | xargs -0 chown ${PKGUSER}:${GROUP} 2>/dev/null
+        find -L ${DIRAPP} -type f -print0 | xargs -0 chown ${PKGUSER}:${GROUP} 2>/dev/null
         # Use chmod on files and directories with different permissions
         # For all files use 0640
-        find -L ${DIRNAME} -type f -print0 | xargs -0 chmod 640 2>/dev/null
+        find -L ${DIRAPP} -type f -print0 | xargs -0 chmod 640 2>/dev/null
         # For all directories use 0750
-        find -L ${DIRNAME} -type d -print0 | xargs -0 chmod 750 2>/dev/null
+        find -L ${DIRAPP} -type d -print0 | xargs -0 chmod 750 2>/dev/null
         # For external data directory
-        if [ -d "${DIRDATA}" ]; then
+        if [ -n "${DIRDATA}" ] && [ -d "${DIRDATA}" ]; then
             chown -R ${PKGUSER}:${GROUP} ${DIRDATA} 2>/dev/null
             find -L ${DIRDATA} -type f -print0 | xargs -0 chmod 640 2>/dev/null
             find -L ${DIRDATA} -type d -print0 | xargs -0 chmod 750 2>/dev/null
         fi
         # Set the occ command to executable
-        chmod +x ${DIRNAME}/occ 2>/dev/null
+        chmod +x ${DIRAPP}/occ 2>/dev/null
     else
         echo "Notice: set_owncloud_permissions() is no longer required on DSM7."
     fi
@@ -157,7 +157,7 @@ service_postinst ()
 
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${OCROOT}
+            set_owncloud_permissions ${OCROOT} ${wizard_owncloud_datadirectory}
         fi
 
         # Setup configuration file
@@ -201,7 +201,7 @@ service_postinst ()
 
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${OCROOT}
+            set_owncloud_permissions ${OCROOT} ${wizard_owncloud_datadirectory}
         fi
     fi
 }
