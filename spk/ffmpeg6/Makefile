@@ -21,4 +21,13 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 SERVICE_SETUP = src/service-setup.sh
 endif
 
+POST_STRIP_TARGET = $(SPK_NAME)_extra_install
+
+SPK_COMMANDS += bin/ffmpeg
+SPK_COMMANDS += bin/$(SPK_NAME)
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: $(SPK_NAME)_extra_install
+$(SPK_NAME)_extra_install:
+	cd $(STAGING_DIR)/bin && ln -sf ffmpeg $(SPK_NAME)
