@@ -582,6 +582,7 @@ kernel-modules-%:
 	   archs2process=$* ; \
 	fi ; \
 	$(MSG) ARCH to be processed: $${archs2process} ; \
+	set -e ; \
 	for arch in $${archs2process} ; do \
 	  $(MSG) "Processing $${arch} ARCH" ; \
 	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
