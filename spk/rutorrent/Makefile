@@ -98,7 +98,3 @@ rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.session
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
 	install -m 775 -d $(STAGING_DIR)/tmp
-ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-	install -m 755 -d $(STAGING_DIR)/etc/php/conf.d/
-	install -m 644 src/etc/php/conf.d/com.synocommunity.rutorrent.ini $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.rutorrent.ini
-endif
