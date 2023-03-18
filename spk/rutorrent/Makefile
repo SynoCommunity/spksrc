@@ -27,7 +27,7 @@ DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorren
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "<ol><li>Remove no outdated resources</li><li>Fix missing dependency declaration on Apache 2.4</li><li>Fixed invalid handling of volume customization upon installation</li></ol>"
+CHANGELOG = "<ol><li>Remove no outdated resources</li><li>Fix missing dependency declaration on Apache 2.4</li><li>Fixed invalid handling of volume customization upon installation</li><li>Fix handling of watch directory by creating it if it does not exist.</li></ol>"
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3

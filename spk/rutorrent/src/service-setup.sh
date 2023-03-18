@@ -82,7 +82,7 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
       if [ -n "${wizard_watch_dir}" ]; then
-          mkdir -p "${wizard_watch_dir}"
+          mkdir -p "${wizard_download_dir}${wizard_watch_dir}"
       fi
     fi
 
