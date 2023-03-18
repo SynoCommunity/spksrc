@@ -4,7 +4,7 @@ wizard_download_share_validator()
   jsonify "{
   var value = arguments[0];
   var step = arguments[2];
-  step.items.map['wizard_download_dir'].setValue('/' + step.items.map['wizard_download_volume'].value + '/' + value + '/');
+  step.items.map['wizard_download_dir'].setValue(step.items.map['wizard_download_volume'].value + '/' + value + '/');
   return true;
 }"
 }
@@ -14,7 +14,7 @@ wizard_download_volume_validator()
   jsonify "{
   var value = arguments[0];
   var step = arguments[2];
-  step.items.map['wizard_download_dir'].setValue('/' + value + '/' + step.items.map['wizard_download_share'].value + '/');
+  step.items.map['wizard_download_dir'].setValue(value + '/' + step.items.map['wizard_download_share'].value + '/');
   return true;
 }"
 }
