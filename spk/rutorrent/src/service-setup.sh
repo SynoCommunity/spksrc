@@ -34,18 +34,6 @@ SVC_WRITE_PID=y
 
 SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST} ${SERVICE_COMMAND}"
 
-validate_preinst ()
-{
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
-            echo "Watch directory ${wizard_watch_dir} does not exist."
-            exit 1
-        fi
-    fi
-
-    return 0
-}
-
 check_acl()
 {
     acl_path=$1
@@ -92,6 +80,12 @@ fix_shared_folders_rights()
 
 service_postinst ()
 {
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+      if [ -n "${wizard_watch_dir}" ]; then
+          mkdir -p "${wizard_watch_dir}"
+      fi
+    fi
+
     # Install busybox stuff
     "${SYNOPKG_PKGDEST}/bin/busybox" --install "${SYNOPKG_PKGDEST}/bin"
 
