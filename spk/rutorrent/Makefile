@@ -1,6 +1,6 @@
 SPK_NAME = rutorrent
 SPK_VERS = 3.10
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
@@ -27,7 +27,7 @@ DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorren
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "<ol><li>Update to Python 3.10</li><li>Update to PHP 7.4</li><li>Remove tools from procps-ng</li><li>Fix support of DSM 7.</li><li>Fix torrent creation wizard (\#5288)</li><li>Add service port declarations</li></ol>"
+CHANGELOG = "<ol><li>Remove no outdated resources</li><li>Fix missing dependency declaration on Apache 2.4</li><li>Fixed invalid handling of volume customization upon installation</li></ol>"
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
