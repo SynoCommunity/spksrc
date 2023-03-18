@@ -60,5 +60,14 @@
 			"service": "ownCloud",
 			"type": "apache_php"
 		}]
+	},
+	"data-share": {
+		"shares": [{
+			"name": "{{wizard_data_share}}",
+			"permission": {
+				"rw": ["sc-owncloud"]
+			},
+			"once": true
+		}]
 	}
 }

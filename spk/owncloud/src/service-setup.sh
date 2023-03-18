@@ -150,19 +150,21 @@ service_postinst ()
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Parse data directory
+        DATA_DIR="/volume1/${wizard_data_share}/data"
         # Create data directory
-        ${MKDIR} "${wizard_owncloud_datadirectory}"
+        ${MKDIR} "${DATA_DIR}"
 
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${OCROOT} ${wizard_owncloud_datadirectory}
+            set_owncloud_permissions ${OCROOT} ${DATA_DIR}
         fi
 
         # Setup configuration file
         exec_occ maintenance:install \
         --database "sqlite" \
         --database-name "${SYNOPKG_PKGNAME}" \
-        --data-dir "${wizard_owncloud_datadirectory}" \
+        --data-dir "${DATA_DIR}" \
         --admin-user "${wizard_owncloud_admin_username}" \
         --admin-pass "${wizard_owncloud_admin_password}" 2>&1
 
@@ -199,7 +201,7 @@ service_postinst ()
 
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${OCROOT} ${wizard_owncloud_datadirectory}
+            set_owncloud_permissions ${OCROOT} ${DATA_DIR}
         fi
     fi
 }

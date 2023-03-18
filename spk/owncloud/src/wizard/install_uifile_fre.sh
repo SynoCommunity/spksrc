@@ -9,11 +9,8 @@ if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-DATADIR="${SYNOPKG_PKGDEST_VOL}/@appdata/${SYNOPKG_PKGNAME}/data"
-# for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-	DATADIR="$(realpath ${WEB_DIR})/${SYNOPKG_PKGNAME}/data"
-fi
+SHAREDIR="${SYNOPKG_PKGNAME}"
+DIR_VALID="/^[\\w _-]+$/"
 
 quote_json () {
 	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -33,6 +30,7 @@ page_append ()
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
 	"step_title": "Configuration de l'administrateur d'ownCloud",
+	"invalid_next_disabled_v2": true,
 	"items": [{
 		"type": "textfield",
 		"desc": "Connexion de l'administrateur. Par défaut, 'admin'",
@@ -59,14 +57,14 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		"type": "textfield",
 		"desc": "répertoire de données ownCloud",
 		"subitems": [{
-			"key": "wizard_owncloud_datadirectory",
-			"desc": "Répertoire",
-			"defaultValue": "$DATADIR",
+			"key": "wizard_data_share",
+			"desc": "Partager le nom",
+			"defaultValue": "${SHAREDIR}",
 			"validator": {
 				"allowBlank": false,
 				"regex": {
-					"expr": "/^\\\/volume[0-9]+\\\//",
-					"errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro de volume"
+					"expr": "$(echo ${DIR_VALID} | quote_json)",
+					"errorText": "Les sous-répertoires ne sont pas pris en charge."
 				}
 			}
 		}]
