@@ -6,7 +6,7 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - ffmpeg4 is moved to head of packages to built first if triggered by its own or a dependent.
+# - ffmpeg, ffmpeg5 and ffmpeg6 are moved to head of packages to built first if triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -53,25 +53,17 @@ fi
 # remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
+# for ffmpeg v4-6 find all packages that depends on them
+for i in {4..6}; do
+    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-# find all packages that depend on spk/ffmpeg4 is built before.
-all_ffmpeg4_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = 4" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-all_ffmpeg5_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = 5" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-
-# if ffmpeg4|ffmpeg5 or one of its dependents is to built, ensure
-# ffmpeg4|ffmpeg5 are first packages in the list of packages to build.
-for package in ${packages}
-do
-    if [ "$(echo ffmpeg4 ${all_ffmpeg4_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg=${packages//ffmpeg4/}
-        packages="ffmpeg4 ${packages_without_ffmpeg}"
-    fi
-    if [ "$(echo ffmpeg5 ${all_ffmpeg5_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg=${packages//ffmpeg5/}
-        packages="ffmpeg5 ${packages_without_ffmpeg}"
+    # If packages are found in the list then ensure
+    # relevant ffmpeg|ffmpeg5|ffmpeg6 is first in list
+    # then remove any duplicates from the list
+    if [ "${ffmpeg_dependent_packages}" != "" ]; then
+        packages=$(echo "ffmpeg${i//4/} ${packages}" | sed ':s;s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;s/  */ /g')
     fi
 done
-
 
 # find all noarch packages
 all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "override ARCH" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
