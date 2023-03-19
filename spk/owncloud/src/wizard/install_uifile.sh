@@ -67,6 +67,11 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 					"errorText": "Subdirectories are not supported."
 				}
 			}
+		}, {
+			"key": "wizard_volume",
+			"desc": "Dummy value for DSM6 compatibility, to be fixed by PR #5649",
+			"hidden": true,
+			"defaultValue": "/volume1"
 		}]
 	}]
 }, {
