@@ -1,6 +1,6 @@
 PKG_NAME = owncloud
-PKG_VERS = 10.11
-PKG_DATE = 20220919
+PKG_VERS = 10.12
+PKG_DATE = 20230313
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-complete-$(PKG_DATE).$(PKG_EXT)
 PKG_DIST_SITE = https://download.owncloud.com/server/stable

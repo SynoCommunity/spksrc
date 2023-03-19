@@ -1,5 +1,5 @@
 SPK_NAME = owncloud
-SPK_VERS = 10.11
+SPK_VERS = 10.12
 SPK_REV = 9
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
@@ -11,7 +11,7 @@ REQUIRED_MIN_DSM = 6.0
 
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
-CHANGELOG = "1. Update ownCloud to 10.11.<br/>2. Use faster SQLite database."
+CHANGELOG = "1. Update ownCloud to 10.12.<br/>2. Use faster SQLite database.<br.>3. Use shared folder for data directory."
 DISPLAY_NAME = ownCloud
 HOMEPAGE = https://owncloud.org/
 LICENSE = AGPL
