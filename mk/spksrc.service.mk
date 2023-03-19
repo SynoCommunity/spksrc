@@ -248,6 +248,10 @@ else
 	$(warning Certificate configuration is blocked for community packages in DSM $(TCVERSION))
 endif
 endif
+ifneq ($(strip $(VIDEODRIVER)),)
+# e.g. Grant access to GPU device files {"video-driver":{}}
+	@jq '."video-driver" = {}' $@ | sponge $@
+endif
 
 SERVICE_FILES += $(DSM_CONF_DIR)/resource
 ifneq ($(findstring conf,$(SPK_CONTENT)),conf)
