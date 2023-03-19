@@ -5,6 +5,9 @@ WEB_DIR="/var/services/web_packages"
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
     WEB_DIR="/var/services/web"
 fi
+if [ -z "${SYNOPKG_PKGTMP}" ]; then
+    SYNOPKG_PKGTMP="${SYNOPKG_PKGDEST_VOL}/@tmp"
+fi
 
 # Others
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
@@ -133,7 +136,7 @@ service_postinst ()
             ${SED} -i "s|^user = http$|user = ${SUBST_TEXT}|g; s|^listen.owner = http$|listen.owner = ${SUBST_TEXT}|g" "${TEMPDIR}/${WS_TMPL_FILE}"
             ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
             rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
+            ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
             CFG_UPDATE="yes"
         fi
         # Check for ownCloud Apache config
@@ -147,6 +150,8 @@ service_postinst ()
             echo "Restart Apache to load new configs"
             ${SYNOSVC} --restart pkgctl-Apache2.4
         fi
+        # Clean-up temporary files
+        ${RM} ${TEMPDIR}
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
@@ -257,9 +262,7 @@ service_preuninst ()
             # Check user data export
             if [ "${wizard_export_userdata}" = "true" ]; then
                 echo "Copying previous user data from ${DATADIR}"
-                dir_name=$(basename "$DATADIR")
-                ${MKDIR} "${TEMPDIR}/$dir_name"
-                ${CP} "${DATADIR}" "${TEMPDIR}/$dir_name/"
+                ${CP} "${DATADIR}" "${TEMPDIR}/"
             fi
 
             # Create backup archive
@@ -278,6 +281,10 @@ service_preuninst ()
                     echo "File copy failed. Backup of ownCloud data will not be saved."
                 fi
             fi
+
+            # Clean-up temporary files
+            ${RM} "${TEMPDIR}"
+            ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
         fi
     fi
 }
@@ -324,6 +331,8 @@ service_postuninst ()
             echo "Restart Apache to load new configs"
             ${SYNOSVC} --restart pkgctl-Apache2.4
         fi
+        # Clean-up temporary files
+        ${RM} ${TEMPDIR}
     fi
 }
 
@@ -404,17 +413,17 @@ service_restore ()
         if [ -n "$files" ]; then
             for file in "${files[@]}"; do
                 file_name=$(basename "$file")
-                [ -f $target/$file_name ] && ${MV} $target/$file_name $target/$file_name.bak
+                [ -f $target/$file_name ] && ${RM} $target/$file_name
                 rsync -aX "$file" "$target/" 2>&1
             done
         fi
     done
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
-        [ -f ${OCROOT}/.user.ini ] && ${MV} ${OCROOT}/.user.ini ${OCROOT}/.user.ini.bak
+        [ -f ${OCROOT}/.user.ini ] && ${RM} ${OCROOT}/.user.ini
         rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${OCROOT}/ 2>&1
     fi
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ]; then
-        [ -f ${OCROOT}/.htaccess ] && ${MV} ${OCROOT}/.htaccess ${OCROOT}/.htaccess.bak
+        [ -f ${OCROOT}/.htaccess ] && ${RM} ${OCROOT}/.htaccess
         rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${OCROOT}/ 2>&1
     fi
 
