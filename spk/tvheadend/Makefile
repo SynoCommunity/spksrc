@@ -47,12 +47,11 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 # Reuse ffmpeg libraries
-# Requires to invoke: make [package|publish] ARCH= TCVERSION=
 export FFMPEG_VERSION = 4
-export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(FFMPEG_VERSION)/target)
+export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target)
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
-export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(FFMPEG_VERSION)/target/lib
+export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target/lib
 PRE_DEPEND_TARGET = tvheadend_pre_depend
 SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg$(FFMPEG_VERSION)"
 endif

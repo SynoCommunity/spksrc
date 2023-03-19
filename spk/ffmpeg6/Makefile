@@ -4,8 +4,6 @@ SPK_REV = 1
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Initial package release"
 
-CONF_DIR = src/conf
-
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = th0ma7
@@ -17,14 +15,19 @@ STARTABLE = no
 HOMEPAGE = https://www.ffmpeg.org/
 LICENSE  = GPLv3
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SERVICE_SETUP = src/service-setup.sh
-endif
-
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_USR_LOCAL_LINKS  = bin:bin/ffmpeg
-SPK_USR_LOCAL_LINKS += bin:bin/$(SPK_NAME)
+SERVICE_USER = auto
+VIDEODRIVER = on
+SPK_COMMANDS  = bin/ffmpeg
+SPK_COMMANDS += bin/$(SPK_NAME)
+
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+SERVICE_SETUP = src/service-setup.sh
+SPK_COMMANDS += bin/vainfo
+endif
 
 include ../../mk/spksrc.spk.mk
 
