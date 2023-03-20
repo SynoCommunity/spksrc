@@ -6,7 +6,7 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - ffmpeg, ffmpeg5 and ffmpeg6 are moved to head of packages to built first if triggered by its own or a dependent.
+# - ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are moved to head of packages to built first if triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -61,7 +61,7 @@ for i in {4..6}; do
     # relevant ffmpeg|ffmpeg5|ffmpeg6 is first in list
     # then remove any duplicates from the list
     if [ "${ffmpeg_dependent_packages}" != "" ]; then
-        packages=$(echo "ffmpeg${i//4/} ${packages}" | sed ':s;s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;s/  */ /g')
+        packages=$(echo "ffmpeg${i} ${packages}" | sed ':s;s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;s/  */ /g')
     fi
 done
 
