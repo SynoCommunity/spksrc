@@ -34,18 +34,6 @@ SVC_WRITE_PID=y
 
 SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST} ${SERVICE_COMMAND}"
 
-validate_preinst ()
-{
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        if [ -n "${wizard_watch_dir}" -a ! -d "${wizard_watch_dir}" ]; then
-            echo "Watch directory ${wizard_watch_dir} does not exist."
-            exit 1
-        fi
-    fi
-
-    return 0
-}
-
 check_acl()
 {
     acl_path=$1
@@ -120,8 +108,7 @@ service_postinst ()
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        local effective_download_dir="${wizard_download_volume:=/volume1}/${wizard_download_share:=downloads}"
-        TOP_DIR=`echo "${effective_download_dir}" | cut -d "/" -f 2`
+        TOP_DIR=`echo "${wizard_download_dir}" | cut -d "/" -f 2`
         MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
 
         sed -i -e "s|scgi_port = 5000;|scgi_port = ${SERVICE_PORT};|g" \
@@ -138,13 +125,13 @@ service_postinst ()
                -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
                "${RUTORRENT_WEB_DIR}/conf/config.php"
 
-        sed -i -e "s|@download_dir@|${effective_download_dir}|g" \
+        sed -i -e "s|@download_dir@|${wizard_download_dir}|g" \
                -e "s|@max_memory@|$MAX_MEMORY|g" \
                -e "s|@service_port@|${SERVICE_PORT}|g" \
                "${RTORRENT_RC}"
 
-        if [ -d "${wizard_watch_dir}" ]; then
-            local effective_watch_dir="${effective_download_dir}/${wizard_watch_dir}"
+        if [ -n "${wizard_watch_dir}" ]; then
+            local effective_watch_dir="${wizard_download_dir}${wizard_watch_dir}"
             mkdir -p "${effective_watch_dir}"
             sed -i -e "s|@watch_dir@|${effective_watch_dir}|g" ${RTORRENT_RC}
         else
