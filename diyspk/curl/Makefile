@@ -1,5 +1,5 @@
 SPK_NAME = curl
-SPK_VERS = 7.87.0
+SPK_VERS = 7.88.1
 SPK_REV = 1
 
 # package of curl with all optional features
