@@ -11,7 +11,7 @@ REQUIRED_MIN_DSM = 6.0
 
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
-CHANGELOG = "1. Update ownCloud to 10.12.<br/>2. Use faster SQLite database.<br.>3. Use shared folder for data directory."
+CHANGELOG = "1. Update ownCloud to 10.12.<br/>2. Use faster SQLite database.<br/>3. Use shared folder for data directory."
 DISPLAY_NAME = ownCloud
 HOMEPAGE = https://owncloud.org/
 LICENSE = AGPL
@@ -21,6 +21,7 @@ SERVICE_USER = auto
 SERVICE_WIZARD_SHARE = wizard_data_share
 USE_DATA_SHARE_WORKER = yes
 SERVICE_SETUP = src/service-setup.sh
+SERVICE_COMMAND = $(INSTALL_PREFIX)/bin/owncloud-daemon
 
 SYSTEM_GROUP = http
 
@@ -37,6 +38,9 @@ POST_STRIP_TARGET = owncloud_extra_install
 
 # TMPDIR is used for owncloud built in backup and update
 USE_ALTERNATE_TMPDIR = 1
+
+# Pure PHP package, make sure ARCH is not defined
+override ARCH=
 
 include ../../mk/spksrc.spk.mk
 

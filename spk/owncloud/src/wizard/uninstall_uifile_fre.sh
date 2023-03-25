@@ -20,19 +20,13 @@ OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 exec_occ() {
 	PHP="/usr/local/bin/php74"
 	OCC="${OCROOT}/occ"
-	OCC_ARGS=()
-	for arg in "$@"; do
-		OCC_ARGS+=("$arg")
-	done
-	COMMAND="${PHP} ${OCC} ${OCC_ARGS[@]}"
+	COMMAND="${PHP} ${OCC} $*"
 	if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-		OCC_OUTPUT=$(/bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND")
+		/bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
 	else
-		OCC_OUTPUT=$($COMMAND)
+		$COMMAND
 	fi
-	OCC_EXIT_CODE=$?
-	echo "$OCC_OUTPUT"
-	return $OCC_EXIT_CODE
+	return $?
 }
 
 quote_json () {

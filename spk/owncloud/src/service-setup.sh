@@ -50,33 +50,13 @@ set_owncloud_permissions ()
 exec_occ() {
     PHP="/usr/local/bin/php74"
     OCC="${OCROOT}/occ"
-    OCC_ARGS=()
-    for arg in "$@"; do
-        OCC_ARGS+=("$arg")
-    done
-    COMMAND="${PHP} ${OCC} ${OCC_ARGS[@]}"
+    COMMAND="${PHP} ${OCC} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        OCC_OUTPUT=$(/bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND")
+        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
     else
-        OCC_OUTPUT=$($COMMAND)
+        $COMMAND
     fi
-    OCC_EXIT_CODE=$?
-    echo "$OCC_OUTPUT"
-    return $OCC_EXIT_CODE
-}
-
-service_prestart ()
-{
-    # Replace generic service startup, fork process in background
-    echo "Starting owncloud-daemon at ${SYNOPKG_PKGDEST}/bin" >> ${LOG_FILE}
-    COMMAND="${SYNOPKG_PKGDEST}/bin/owncloud-daemon"
-    ${COMMAND} >> ${LOG_FILE} 2>&1 &
-    echo "$!" > "${PID_FILE}"
-}
-
-service_preinst ()
-{
-    :
+    return $?
 }
 
 service_postinst ()
@@ -122,7 +102,7 @@ service_postinst ()
         # Check for ownCloud PHP profile
         if ! ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
             echo "Add PHP profile for ownCloud"
-            ${JQ} --argfile ocNode ${SYNOPKG_PKGDEST}/web/owncloud.json '.["com-synocommunity-packages-owncloud"] = $ocNode' ${WS_CFG_PATH}/${PHP_CFG_FILE} > ${TEMPDIR}/${PHP_CFG_FILE}
+            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/owncloud.json '.["com-synocommunity-packages-owncloud"] = $ocNode[0]' ${WS_CFG_PATH}/${PHP_CFG_FILE} > ${TEMPDIR}/${PHP_CFG_FILE}
             ${MV} ${WS_CFG_PATH}/${PHP_CFG_FILE} ${WS_CFG_PATH}/${PHP_CFG_FILE}.bak
             rsync -aX ${TEMPDIR}/${PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
             ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
@@ -312,11 +292,15 @@ service_postuninst ()
             ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
             CFG_UPDATE="yes"
         fi
-        # Check for backup PHP template
-        if [ -f "$WS_TMPL_PATH/$WS_TMPL_FILE.bak" ]; then
-            echo "Restore PHP template from backup"
-            ${RM} ${WS_TMPL_PATH}/${WS_TMPL_FILE}
-            ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak ${WS_TMPL_PATH}/${WS_TMPL_FILE}
+        # Check for PHP template defaults
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+            echo "Restore default PHP template"
+            rsync -aX ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${TEMPDIR}/ 2>&1
+            SUBST_TEXT="{{#fpm_settings.user_owncloud}}sc-owncloud{{/fpm_settings.user_owncloud}}{{^fpm_settings.user_owncloud}}http{{/fpm_settings.user_owncloud}}"
+            ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TEMPDIR}/${WS_TMPL_FILE}"
+            ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
+            rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
+            ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
             CFG_UPDATE="yes"
         fi
 
@@ -368,6 +352,7 @@ service_save ()
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
         DATADIR="${OCROOT}/data"
     fi
+    # Check if data directory inside owncloud directory and flag for restore if true
     DATADIR_REAL=$(realpath "$DATADIR")
     WEBROOT_REAL=$(realpath "${OCROOT}")
     if echo "$DATADIR_REAL" | grep -q "^$WEBROOT_REAL"; then
@@ -494,14 +479,4 @@ service_restore ()
     # Remove upgrade backup files
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-}
-
-service_preupgrade ()
-{
-    :
-}
-
-service_postupgrade ()
-{
-    :
 }
