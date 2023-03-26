@@ -1,44 +1,52 @@
 SPK_NAME = owncloud
-SPK_VERS = 8.1.12
-SPK_REV = 8
+SPK_VERS = 10.12
+SPK_REV = 9
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
+SPK_DEPENDS = "WebStation:PHP7.4:Apache2.4"
+
+REQUIRED_MIN_DSM = 6.0
 
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
-ADMIN_URL = /owncloud/
+CHANGELOG = "1. Update ownCloud to 10.12.<br/>2. Use faster SQLite database.<br/>3. Use shared folder for data directory."
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 8.1.12"
+HOMEPAGE = https://owncloud.org/
+LICENSE = AGPL
 
-HOMEPAGE   = https://owncloud.org/
-LICENSE    = AGPL
+STARTABLE = yes
+SERVICE_USER = auto
+SERVICE_WIZARD_SHARE = wizard_data_share
+USE_DATA_SHARE_WORKER = yes
+SERVICE_SETUP = src/service-setup.sh
 
-REQUIRED_MIN_DSM = 5.0
+SYSTEM_GROUP = http
 
-WIZARDS_DIR = src/wizard/
+# Admin link for in DSM UI
+ADMIN_URL = /owncloud/
+ADMIN_PROTOCOL = https
+
 CONF_DIR = src/conf/
+WIZARDS_DIR = src/wizard/
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-
-INSTALL_DEP_SERVICES = apache-web mysql
-START_DEP_SERVICES = apache-web mysql
-INSTUNINST_RESTART_SERVICES = apache-web
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+DSM_UI_CONFIG = src/app/config
 
 POST_STRIP_TARGET = owncloud_extra_install
 
-BUSYBOX_CONFIG = daemon nice
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# TMPDIR is used for owncloud built in backup and update
+USE_ALTERNATE_TMPDIR = 1
+
+# Pure PHP package, make sure ARCH is not defined
+override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
 owncloud_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var -d $(STAGING_DIR)/app
-	install -m 755 src/owncloud.sh $(STAGING_DIR)/bin/
+	install -m 755 -d $(STAGING_DIR)/app -d $(STAGING_DIR)/bin -d $(STAGING_DIR)/web
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 644 src/autoconfig.php $(STAGING_DIR)/share/$(SPK_NAME)/config/autoconfig.php
+	install -m 755 src/bin/owncloud-daemon $(STAGING_DIR)/bin/owncloud-daemon
+	install -m 644 src/web/owncloud.conf $(STAGING_DIR)/web/owncloud.conf
+	install -m 644 src/web/owncloud.json $(STAGING_DIR)/web/owncloud.json

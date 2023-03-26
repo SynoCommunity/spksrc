@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+# ownCloud service setup
+WEB_DIR="/var/services/web_packages"
+# for backwards compatability
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+    WEB_DIR="/var/services/web"
+    if [ -z ${SYNOPKG_PKGNAME} ]; then
+        SYNOPKG_PKGNAME="owncloud"
+    fi
+fi
+PHP="/usr/local/bin/php74"
+OWNCLOUD="${PHP} ${WEB_DIR}/${SYNOPKG_PKGNAME}/occ background:cron"
+HOME_DIR="${SYNOPKG_PKGVAR}"
+# for backwards compatability
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+    HOME_DIR="${SYNOPKG_PKGDEST}/var"
+fi
+SLEEP_TIME="1800"
+
+# Main loop
+while true; do
+    # Update
+    echo "Updating..."
+    ${OWNCLOUD} >> "${HOME_DIR}/daemon.log" 2>&1
+
+    # Wait
+    echo "Waiting ${SLEEP_TIME} seconds..."
+    sleep ${SLEEP_TIME}
+done
