@@ -29,7 +29,7 @@ CONFIGURE_ARGS += --without-mcs-docs
 CONFIGURE_ARGS += --disable-boehm
 CONFIGURE_ARGS += --without-ikvm-native
 # disable some features
-CONFIGURE_ARGS += --enable-minimal=aot,profiler,debug
+CONFIGURE_ARGS += --enable-minimal=profiler
 
 # Optimize compilation for minimal size
 ADDITIONAL_CFLAGS = -Os
