@@ -7,7 +7,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.c
  
      cle = clBuildProgram(ctx->program, 1, &ctx->hwctx->device_id,
 -                         NULL, NULL, NULL);
-+                         "-cl-fast-relaxed-math -cl-mad-enable", NULL, NULL);
++                         "-cl-finite-math-only -cl-unsafe-math-optimizations", NULL, NULL);
      if (cle != CL_SUCCESS) {
          av_log(avctx, AV_LOG_ERROR, "Failed to build program: %d.\n", cle);
  

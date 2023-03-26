@@ -150,13 +150,14 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
  
      while (s->eof && av_fifo_read(s->async_fifo, &aframe, 1) >= 0) {
          if (MFXVideoCORE_SyncOperation(s->session, aframe.sync, 1000) < 0)
-@@ -842,8 +845,32 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+@@ -842,8 +845,33 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
                  return AVERROR(EAGAIN);
              break;
          }
 -        out_frame->frame->pts = av_rescale_q(out_frame->surface.Data.TimeStamp,
 -                                             default_tb, outlink->time_base);
 +
++        /* Copy the color side data */
 +        if (in_frame->frame->color_primaries != -1)
 +            out_frame->frame->color_primaries = in_frame->frame->color_primaries;
 +        if (in_frame->frame->color_trc != -1)
@@ -185,7 +186,7 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
  
          out_frame->queued++;
          aframe = (QSVAsyncFrame){ sync, out_frame };
-@@ -853,8 +880,13 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+@@ -853,8 +881,13 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
              av_fifo_read(s->async_fifo, &aframe, 1);
  
              do {
@@ -201,7 +202,7 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
  
              filter_ret = s->filter_frame(outlink, aframe.frame->frame);
              if (filter_ret < 0) {
-@@ -868,6 +900,8 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+@@ -868,6 +901,8 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
          }
      } while(ret == MFX_ERR_MORE_SURFACE);
  
@@ -1631,7 +1632,12 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
          goto eof;
  
      FF_FILTER_FORWARD_WANTED(outlink, inlink);
-@@ -589,7 +635,96 @@ eof:
+@@ -585,11 +631,101 @@ not_ready:
+     return FFERROR_NOT_READY;
+ 
+ eof:
++    pts = av_rescale_q(pts, inlink->time_base, outlink->time_base);
+     ff_outlink_set_status(outlink, status, pts);
      return 0;
  }
  
@@ -1729,7 +1735,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  {
      int ret;
      static const enum AVPixelFormat in_pix_fmts[] = {
-@@ -615,46 +750,79 @@ static int query_formats(AVFilterContext
+@@ -615,46 +751,79 @@ static int query_formats(AVFilterContext
                            &ctx->outputs[0]->incfg.formats);
  }
  

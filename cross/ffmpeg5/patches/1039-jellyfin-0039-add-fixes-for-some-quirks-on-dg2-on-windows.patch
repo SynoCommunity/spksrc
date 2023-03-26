@@ -99,7 +99,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
                  (intptr_t)src_hwctx->device,
                  CL_CONTEXT_INTEROP_USER_SYNC,
 -                CL_TRUE,
-+                (!src_hwctx->device_desc.VendorId == 0x8086 || src_hwctx->is_uma),
++                (src_hwctx->device_desc.VendorId != 0x8086 || src_hwctx->is_uma),
                  0,
              };
              OpenCLDeviceSelector selector = {

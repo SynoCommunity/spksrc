@@ -4,6 +4,17 @@ Patches: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patche
 Extract jellyfin-ffmpeg git repository
 $ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
 
+Check out jellyfin-5.1 branch:
+$ git branch -a
+* jellyfin
+  remotes/origin/HEAD -> origin/jellyfin
+  remotes/origin/jellyfin
+  remotes/origin/jellyfin-4.4
+  remotes/origin/jellyfin-5.1
+$ git checkout jellyfin-5.1
+Branch 'jellyfin-5.1' set up to track remote branch 'jellyfin-5.1' from 'origin'.
+Switched to a new branch 'jellyfin-5.1'
+
 Check that current ffmpeg matches jellyfin version
 $ cat jellyfin-ffmpeg/VERSION 
 5.1.2
