@@ -15,9 +15,6 @@ LICENSE  = https://www.mono-project.com/docs/faq/licensing
 # Although qoriq can be compiled successfully it won't run as a classic floating point unit is not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-# BTLS is not built for armv5 anymore (and mono without TLS support is rather useless)
-# https://github.com/mono/mono/issues/11422
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 PRE_CONFIGURE_TARGET = mono_pre_configure
 GNU_CONFIGURE = 1
@@ -42,8 +39,8 @@ include ../../mk/spksrc.cross-cc.mk
 PLIST_TRANSFORM = cat
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
-	# ARMv5 does not support BTLS (kept for the case someone wants to build for ARMv5 - marked as unsupported)
-	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
+	# enforce build of BTLS library
+	CONFIGURE_ARGS += ac_cv_header_stdalign_h=yes
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux

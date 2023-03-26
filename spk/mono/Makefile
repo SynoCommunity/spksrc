@@ -7,14 +7,13 @@ DEPENDS = cross/mono
 
 # Although qoriq can be compiled successfully it won't run as classic floating point unit not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
-# ARMv5 does not support the build of BTLS library.
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework.
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "1. Update mono to version 6.12.0.182.<br/>2. Fix BTLS for aarch64 on DSM 6<br/>4. Remove support for ARMv5 (88f628x CPU).<br/>3. Add script to update ca certificates."
+CHANGELOG = "1. Update mono to version 6.12.0.182.<br/>2. Fix BTLS for aarch64 on DSM 6<br/>3. Add script to update ca certificates."
 
 HOMEPAGE = https://mono-project.com
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
