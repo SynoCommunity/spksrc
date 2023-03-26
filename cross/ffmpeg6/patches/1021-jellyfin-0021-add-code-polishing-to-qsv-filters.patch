@@ -32,128 +32,6 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
          out_frame->queued++;
          aframe = (QSVAsyncFrame){ sync, out_frame };
          av_fifo_write(s->async_fifo, &aframe, 1);
-Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
-===================================================================
---- libavfilter/vf_vpp_qsv.c
-+++ libavfilter/vf_vpp_qsv.c
-@@ -344,6 +344,30 @@ static mfxStatus get_mfx_version(const A
-     return MFXQueryVersion(device_hwctx->session, mfx_version);
- }
- 
-+static mfxStatus get_mfx_platform(const AVFilterContext *ctx, mfxPlatform *mfx_platform)
-+{
-+    const AVFilterLink *inlink = ctx->inputs[0];
-+    AVBufferRef *device_ref;
-+    AVHWDeviceContext *device_ctx;
-+    AVQSVDeviceContext *device_hwctx;
-+
-+    if (inlink->hw_frames_ctx) {
-+        AVHWFramesContext *frames_ctx = (AVHWFramesContext *)inlink->hw_frames_ctx->data;
-+        device_ref = frames_ctx->device_ref;
-+    } else if (ctx->hw_device_ctx) {
-+        device_ref = ctx->hw_device_ctx;
-+    } else {
-+        mfx_platform->CodeName = 0;
-+        mfx_platform->DeviceId = 0;
-+        return MFX_ERR_NONE;
-+    }
-+
-+    device_ctx   = (AVHWDeviceContext *)device_ref->data;
-+    device_hwctx = device_ctx->hwctx;
-+
-+    return MFXVideoCORE_QueryPlatform(device_hwctx->session, mfx_platform);
-+}
-+
- static int config_output(AVFilterLink *outlink)
- {
-     AVFilterContext *ctx = outlink->src;
-@@ -504,12 +528,21 @@ static int config_output(AVFilterLink *o
- 
-     if (inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format) {
-         if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
-+            mfxPlatform mfx_platform;
-+            int compute = 0;
-             int mode = vpp->scale_mode;
-+            int vpl = QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 255);
- 
--#if QSV_ONEVPL
--            if (mode > 2)
--                mode = MFX_SCALING_MODE_VENDOR + mode - 2;
--#endif
-+            /* Compute mode is only available on DG2+ platforms */
-+            if (vpl && get_mfx_platform(ctx, &mfx_platform) == MFX_ERR_NONE) {
-+                int code_name = mfx_platform.CodeName;
-+                compute = code_name >= 45 && code_name != 55 && code_name != 50;
-+            }
-+
-+            if (mode == -1)
-+                mode = (vpl && compute) ? 1001 : MFX_SCALING_MODE_DEFAULT;
-+            else if (mode > 2)
-+                mode = vpl ? (1000 + mode - 2) : MFX_SCALING_MODE_DEFAULT;
- 
-             INIT_MFX_EXTBUF(scale_conf, MFX_EXTBUFF_VPP_SCALING);
-             SET_MFX_PARAM_FIELD(scale_conf, ScalingMode, mode);
-@@ -685,20 +718,14 @@ static const AVOption vpp_options[] = {
-     { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
-     { "height", "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
-     { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
--    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, .flags = FLAGS },
--#if QSV_ONEVPL
--    { "scale_mode", "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 5, .flags = FLAGS, "scale mode" },
--#else
--    { "scale_mode", "scaling & format conversion mode", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = MFX_SCALING_MODE_DEFAULT }, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, .flags = FLAGS, "scale mode" },
--#endif
-+    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
-+    { "scale_mode", "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 5, .flags = FLAGS, "scale mode" },
-     { "auto",      "auto mode",             0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_DEFAULT},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
-     { "low_power", "low power mode",        0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "scale mode"},
-     { "hq",        "high quality mode",     0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
--#if QSV_ONEVPL
-     { "compute",   "compute",               0,    AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
-     { "vd",        "vd",                    0,    AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
-     { "ve",        "ve",                    0,    AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
--#endif
- 
-     { "rate", "Generate output at frame rate or field rate, available only for deinterlace mode",
-       OFFSET(field_rate), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, FLAGS, "rate" },
-@@ -707,6 +734,7 @@ static const AVOption vpp_options[] = {
-     { "field", "Output at field rate (one frame of output for each field)",
-       0, AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0, FLAGS, "rate" },
- 
-+    { "passthrough", "Apply pass through mode if possible.", OFFSET(has_passthrough), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, .flags = FLAGS },
-     { NULL }
- };
- 
-@@ -751,19 +779,14 @@ static const AVOption qsvscale_options[]
-     { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
-     { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
- 
--#if QSV_ONEVPL
--    { "mode",      "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = 0}, 0, 5, FLAGS, "mode"},
--#else
--    { "mode",      "scaling & format conversion mode",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = MFX_SCALING_MODE_DEFAULT}, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, FLAGS, "mode"},
--#endif
-+    { "mode",      "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = -1}, -1, 5, FLAGS, "mode"},
-     { "low_power", "low power mode",        0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "mode"},
-     { "hq",        "high quality mode",     0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "mode"},
--#if QSV_ONEVPL
-     { "compute",   "compute",               0,             AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "mode"},
-     { "vd",        "vd",                    0,             AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "mode"},
-     { "ve",        "ve",                    0,             AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "mode"},
--#endif
- 
-+    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
-     { NULL },
- };
- 
-@@ -788,6 +811,7 @@ static const AVOption qsvdeint_options[]
-     { "bob",   "bob algorithm",                  0, AV_OPT_TYPE_CONST,      {.i64 = MFX_DEINTERLACING_BOB}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
-     { "advanced", "Motion adaptive algorithm",   0, AV_OPT_TYPE_CONST, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
- 
-+    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
-     { NULL },
- };
- 
 Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
 ===================================================================
 --- libavfilter/vf_overlay_qsv.c
@@ -264,3 +142,133 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
          AV_PIX_FMT_QSV,
          AV_PIX_FMT_NONE
      };
+Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
+===================================================================
+--- libavfilter/vf_vpp_qsv.c
++++ libavfilter/vf_vpp_qsv.c
+@@ -344,6 +344,30 @@ static mfxStatus get_mfx_version(const A
+     return MFXQueryVersion(device_hwctx->session, mfx_version);
+ }
+ 
++static mfxStatus get_mfx_platform(const AVFilterContext *ctx, mfxPlatform *mfx_platform)
++{
++    const AVFilterLink *inlink = ctx->inputs[0];
++    AVBufferRef *device_ref;
++    AVHWDeviceContext *device_ctx;
++    AVQSVDeviceContext *device_hwctx;
++
++    if (inlink->hw_frames_ctx) {
++        AVHWFramesContext *frames_ctx = (AVHWFramesContext *)inlink->hw_frames_ctx->data;
++        device_ref = frames_ctx->device_ref;
++    } else if (ctx->hw_device_ctx) {
++        device_ref = ctx->hw_device_ctx;
++    } else {
++        mfx_platform->CodeName = 0;
++        mfx_platform->DeviceId = 0;
++        return MFX_ERR_NONE;
++    }
++
++    device_ctx   = (AVHWDeviceContext *)device_ref->data;
++    device_hwctx = device_ctx->hwctx;
++
++    return MFXVideoCORE_QueryPlatform(device_hwctx->session, mfx_platform);
++}
++
+ static int config_output(AVFilterLink *outlink)
+ {
+     AVFilterContext *ctx = outlink->src;
+@@ -504,12 +528,21 @@ static int config_output(AVFilterLink *o
+ 
+     if (inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format) {
+         if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
++            mfxPlatform mfx_platform;
++            int compute = 0;
+             int mode = vpp->scale_mode;
++            int vpl = QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 255);
+ 
+-#if QSV_ONEVPL
+-            if (mode > 2)
+-                mode = MFX_SCALING_MODE_VENDOR + mode - 2;
+-#endif
++            /* Compute mode is only available on DG2+ platforms */
++            if (vpl && get_mfx_platform(ctx, &mfx_platform) == MFX_ERR_NONE) {
++                int code_name = mfx_platform.CodeName;
++                compute = code_name >= 45 && code_name != 55 && code_name != 50;
++            }
++
++            if (mode == -1)
++                mode = (vpl && compute) ? 1001 : MFX_SCALING_MODE_DEFAULT;
++            else if (mode > 2)
++                mode = vpl ? (1000 + mode - 2) : MFX_SCALING_MODE_DEFAULT;
+ 
+             INIT_MFX_EXTBUF(scale_conf, MFX_EXTBUFF_VPP_SCALING);
+             SET_MFX_PARAM_FIELD(scale_conf, ScalingMode, mode);
+@@ -602,6 +635,7 @@ not_ready:
+     return FFERROR_NOT_READY;
+ 
+ eof:
++    pts = av_rescale_q(pts, inlink->time_base, outlink->time_base);
+     ff_outlink_set_status(outlink, status, pts);
+     return 0;
+ }
+@@ -685,20 +719,14 @@ static const AVOption vpp_options[] = {
+     { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
+     { "height", "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
+     { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
+-    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, .flags = FLAGS },
+-#if QSV_ONEVPL
+-    { "scale_mode", "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 5, .flags = FLAGS, "scale mode" },
+-#else
+-    { "scale_mode", "scaling & format conversion mode", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = MFX_SCALING_MODE_DEFAULT }, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, .flags = FLAGS, "scale mode" },
+-#endif
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
++    { "scale_mode", "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 5, .flags = FLAGS, "scale mode" },
+     { "auto",      "auto mode",             0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_DEFAULT},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "low_power", "low power mode",        0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "hq",        "high quality mode",     0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+-#if QSV_ONEVPL
+     { "compute",   "compute",               0,    AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "vd",        "vd",                    0,    AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "ve",        "ve",                    0,    AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+-#endif
+ 
+     { "rate", "Generate output at frame rate or field rate, available only for deinterlace mode",
+       OFFSET(field_rate), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, FLAGS, "rate" },
+@@ -707,6 +735,7 @@ static const AVOption vpp_options[] = {
+     { "field", "Output at field rate (one frame of output for each field)",
+       0, AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0, FLAGS, "rate" },
+ 
++    { "passthrough", "Apply pass through mode if possible.", OFFSET(has_passthrough), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, .flags = FLAGS },
+     { NULL }
+ };
+ 
+@@ -751,19 +780,14 @@ static const AVOption qsvscale_options[]
+     { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
+     { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
+ 
+-#if QSV_ONEVPL
+-    { "mode",      "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = 0}, 0, 5, FLAGS, "mode"},
+-#else
+-    { "mode",      "scaling & format conversion mode",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = MFX_SCALING_MODE_DEFAULT}, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, FLAGS, "mode"},
+-#endif
++    { "mode",      "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = -1}, -1, 5, FLAGS, "mode"},
+     { "low_power", "low power mode",        0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "mode"},
+     { "hq",        "high quality mode",     0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "mode"},
+-#if QSV_ONEVPL
+     { "compute",   "compute",               0,             AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "mode"},
+     { "vd",        "vd",                    0,             AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "mode"},
+     { "ve",        "ve",                    0,             AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "mode"},
+-#endif
+ 
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
+     { NULL },
+ };
+ 
+@@ -788,6 +812,7 @@ static const AVOption qsvdeint_options[]
+     { "bob",   "bob algorithm",                  0, AV_OPT_TYPE_CONST,      {.i64 = MFX_DEINTERLACING_BOB}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
+     { "advanced", "Motion adaptive algorithm",   0, AV_OPT_TYPE_CONST, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
+ 
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
+     { NULL },
+ };
+ 
