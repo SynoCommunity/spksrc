@@ -21,7 +21,6 @@ SERVICE_USER = auto
 SERVICE_WIZARD_SHARE = wizard_data_share
 USE_DATA_SHARE_WORKER = yes
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_COMMAND = $(INSTALL_PREFIX)/bin/owncloud-daemon
 
 SYSTEM_GROUP = http
 

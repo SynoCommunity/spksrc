@@ -59,6 +59,15 @@ exec_occ() {
     return $?
 }
 
+service_prestart ()
+{
+    # Replace generic service startup, fork process in background
+    echo "Starting owncloud-daemon at ${SYNOPKG_PKGDEST}/bin" >> ${LOG_FILE}
+    COMMAND="${SYNOPKG_PKGDEST}/bin/owncloud-daemon"
+    ${COMMAND} >> ${LOG_FILE} 2>&1 &
+    echo "$!" > "${PID_FILE}"
+}
+
 service_postinst ()
 {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
