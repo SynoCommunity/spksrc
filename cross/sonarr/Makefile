@@ -17,8 +17,9 @@ INSTALL_TARGET = sonarr_install
 PKG_DIST_ARCH_LIST = x64 arm arm64
 
 include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x64
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64

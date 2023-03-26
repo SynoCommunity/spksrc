@@ -40,6 +40,8 @@ USE_ALTERNATE_TMPDIR = 1
 
 # replace previous legacy package
 INSTALL_REPLACE_PACKAGES = "nzbdrone>=20210329-19"
+# mark package as beta
+BETA = 1
 USE_DEPRECATED_REPLACE_MECHANISM = yes
 # disable checking for port conflicts
 CHECKPORT = no
