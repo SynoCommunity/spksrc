@@ -1,21 +1,23 @@
 PKG_NAME = mono
-PKG_VERS = 5.20.1.34
-PKG_EXT = tar.bz2
+PKG_VERS = 6.12.0.182
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+# native/mono must be of the same version
+BUILD_DEPENDS = native/mono
 
 HOMEPAGE = https://www.mono-project.com
 COMMENT  = Cross platform, open source .NET development framework.
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
-# Although qoriq can be compiled successfully it won't run as classic floating point unit not available
+# Although qoriq can be compiled successfully it won't run as a classic floating point unit is not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-# Mono versions newer than 5.8.0 have an incompatibility with aarch64 on DSM 6.x (issue #3666)
-UNSUPPORTED_ARCHS_TCVERSION = aarch64-6.1
+# BTLS is not built for armv5 anymore (and mono without TLS support is rather useless)
+# https://github.com/mono/mono/issues/11422
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 PRE_CONFIGURE_TARGET = mono_pre_configure
 GNU_CONFIGURE = 1
@@ -27,8 +29,12 @@ CONFIGURE_ARGS = --disable-mcs-build
 CONFIGURE_ARGS += --enable-btls
 CONFIGURE_ARGS += --disable-dependency-tracking
 CONFIGURE_ARGS += --without-mcs-docs
+CONFIGURE_ARGS += --disable-boehm
+CONFIGURE_ARGS += --without-ikvm-native
+# disable some features
+CONFIGURE_ARGS += --enable-minimal=aot,profiler,debug
 
-# Optimize compilation for size
+# Optimize compilation for minimal size
 ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk
@@ -36,24 +42,24 @@ include ../../mk/spksrc.cross-cc.mk
 PLIST_TRANSFORM = cat
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
+	# ARMv5 does not support BTLS (kept for the case someone wants to build for ARMv5 - marked as unsupported)
 	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
-	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
-		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
-	endif
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	AG_ARGS = --host=aarch64-linux
-	PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+	# fix for https://github.com/SynoCommunity/spksrc/issues/3666
+	ADDITIONAL_CFLAGS += -fno-split-wide-types
+endif
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
-		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
-	endif
 endif
 AG_ARGS += --disable-mcs-build
+AG_ARGS += --disable-boehm
+AG_ARGS += --without-ikvm-native
 
 .PHONY: mono_pre_configure
 mono_pre_configure:
