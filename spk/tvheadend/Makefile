@@ -25,7 +25,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version d885496 as of November 28th 2022<br/>2. Update openssl to 1.1.1s<br/>3. Updated to using ffmpeg4 version 4.4.3<br/>4. Updated libhdhomerun to version 20221031<br/>5. iptv_auto: Add support for m3u channel-number tag with HDhomeRun<br/>6. Include enhanced curl<br/>7. Use newer libdvbcsa with CPU optimizations<br/>8. Add OSCam support"
+CHANGELOG = "1. Update to latest git version d885496 as of November 28th 2022<br/>2. Update openssl to 1.1.1t<br/>3. Updated to using ffmpeg4 version 4.4.3<br/>4. Updated libhdhomerun to version 20221031<br/>5. iptv_auto: Add support for m3u channel-number tag with HDhomeRun<br/>6. Include enhanced curl<br/>7. Use newer libdvbcsa with CPU optimizations<br/>8. Add OSCam support"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
