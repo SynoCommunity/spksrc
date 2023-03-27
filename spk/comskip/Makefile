@@ -27,7 +27,7 @@ export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(AR
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg/target$(subst 4,,$(FFMPEG_VERSION))/lib
 PRE_DEPEND_TARGET = comskip_pre_depend
-SPK_DEPENDS = "ffmpeg$(subst 4,,$(FFMPEG_VERSION))"
+SPK_DEPENDS := "ffmpeg$(subst 4,,$(FFMPEG_VERSION))>$(shell sed -n 's/^SPK_VERS = \(.*\)/\1/p' $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/Makefile | cut -c -3)"
 endif
 
 include ../../mk/spksrc.spk.mk
