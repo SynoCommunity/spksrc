@@ -1,0 +1,837 @@
+diff -uprN ../gstreamer-1.20.5-orig/gst/gstsystemclock.c ./gst/gstsystemclock.c
+--- ../gstreamer-1.20.5-orig/gst/gstsystemclock.c	2022-12-19 23:34:46.000000000 +0000
++++ ./gst/gstsystemclock.c	2023-02-03 12:23:42.471951129 +0000
+@@ -70,15 +70,11 @@
+ #define GST_SYSTEM_CLOCK_WAIT(clock)            g_cond_wait(GST_SYSTEM_CLOCK_GET_COND(clock),GST_SYSTEM_CLOCK_GET_LOCK(clock))
+ #define GST_SYSTEM_CLOCK_BROADCAST(clock)       g_cond_broadcast(GST_SYSTEM_CLOCK_GET_COND(clock))
+ 
+-#if defined(HAVE_FUTEX) || defined(HAVE_FUTEX_TIME64)
++#if defined(HAVE_FUTEX)
+ #include <unistd.h>
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
+ 
+-#if !defined(__NR_futex) && !defined(__NR_futex_time64)
+-#error "Neither __NR_futex nor __NR_futex_time64 are defined but were found by meson"
+-#endif
+-
+ #ifndef FUTEX_WAIT_BITSET_PRIVATE
+ #define FUTEX_WAIT_BITSET_PRIVATE FUTEX_WAIT_BITSET
+ #endif
+@@ -127,35 +123,14 @@ gst_futex_cond_broadcast (guint * cond_v
+ {
+   g_atomic_int_inc (cond_val);
+ 
+-#if defined(__NR_futex_time64)
+-  {
+-    int res;
+-    res = syscall (__NR_futex_time64, cond_val, (gsize) FUTEX_WAKE_PRIVATE,
+-        (gsize) INT_MAX, NULL);
+-
+-    /* If the syscall does not exist (`ENOSYS`), we retry again below with the
+-     * normal `futex` syscall. This can happen if newer kernel headers are
+-     * used than the kernel that is actually running.
+-     */
+-#ifdef __NR_futex
+-    if (res >= 0 || errno != ENOSYS) {
+-#else
+-    {
+-#endif
+-      return;
+-    }
+-  }
+-#endif
+-
+-#if defined(__NR_futex)
+   syscall (__NR_futex, cond_val, (gsize) FUTEX_WAKE_PRIVATE, (gsize) INT_MAX,
+       NULL);
+-#endif
+ }
+ 
+ static gboolean
+ gst_futex_cond_wait_until (guint * cond_val, GMutex * mutex, gint64 end_time)
+ {
++  struct timespec end;
+   guint sampled;
+   int res;
+   gboolean success;
+@@ -163,92 +138,20 @@ gst_futex_cond_wait_until (guint * cond_
+   if (end_time < 0)
+     return FALSE;
+ 
++  end.tv_sec = end_time / 1000000000;
++  end.tv_nsec = end_time % 1000000000;
++
+   sampled = *cond_val;
+   g_mutex_unlock (mutex);
++  /* we use FUTEX_WAIT_BITSET_PRIVATE rather than FUTEX_WAIT_PRIVATE to be
++   * able to use absolute time */
++  res =
++      syscall (__NR_futex, cond_val, (gsize) FUTEX_WAIT_BITSET_PRIVATE,
++      (gsize) sampled, &end, NULL, FUTEX_BITSET_MATCH_ANY);
++  success = (res < 0 && errno == ETIMEDOUT) ? FALSE : TRUE;
++  g_mutex_lock (mutex);
+ 
+-  /* `struct timespec` as defined by the libc headers does not necessarily
+-   * have any relation to the one used by the kernel for the `futex` syscall.
+-   *
+-   * Specifically, the libc headers might use 64-bit `time_t` while the kernel
+-   * headers use 32-bit `__kernel_old_time_t` on certain systems.
+-   *
+-   * To get around this problem we
+-   *   a) check if `futex_time64` is available, which only exists on 32-bit
+-   *      platforms and always uses 64-bit `time_t`.
+-   *   b) otherwise (or if that returns `ENOSYS`), we call the normal `futex`
+-   *      syscall with the `struct timespec_t` used by the kernel, which uses
+-   *      `__kernel_long_t` for both its fields. We use that instead of
+-   *      `__kernel_old_time_t` because it is equivalent and available in the
+-   *      kernel headers for a longer time.
+-   *
+-   * Also some 32-bit systems do not define `__NR_futex` at all and only
+-   * define `__NR_futex_time64`.
+-   */
+-
+-#ifdef __NR_futex_time64
+-  {
+-    struct
+-    {
+-      gint64 tv_sec;
+-      gint64 tv_nsec;
+-    } end;
+-
+-    end.tv_sec = end_time / 1000000000;
+-    end.tv_nsec = end_time % 1000000000;
+-
+-    /* we use FUTEX_WAIT_BITSET_PRIVATE rather than FUTEX_WAIT_PRIVATE to be
+-     * able to use absolute time */
+-    res =
+-        syscall (__NR_futex_time64, cond_val, (gsize) FUTEX_WAIT_BITSET_PRIVATE,
+-        (gsize) sampled, &end, NULL, FUTEX_BITSET_MATCH_ANY);
+-
+-    /* If the syscall does not exist (`ENOSYS`), we retry again below with the
+-     * normal `futex` syscall. This can happen if newer kernel headers are
+-     * used than the kernel that is actually running.
+-     */
+-#ifdef __NR_futex
+-    if (res >= 0 || errno != ENOSYS) {
+-#else
+-    {
+-#endif
+-      success = (res < 0 && errno == ETIMEDOUT) ? FALSE : TRUE;
+-      g_mutex_lock (mutex);
+-
+-      return success;
+-    }
+-  }
+-#endif
+-
+-#ifdef __NR_futex
+-  {
+-    struct
+-    {
+-      __kernel_long_t tv_sec;
+-      __kernel_long_t tv_nsec;
+-    } end;
+-
+-    /* Make sure to only ever call this if the end time actually fits into the
+-     * target type */
+-    g_assert (sizeof (__kernel_long_t) >= 8
+-        || end_time / 1000000000 <= G_MAXINT32);
+-
+-    end.tv_sec = end_time / 1000000000;
+-    end.tv_nsec = end_time % 1000000000;
+-
+-    /* we use FUTEX_WAIT_BITSET_PRIVATE rather than FUTEX_WAIT_PRIVATE to be
+-     * able to use absolute time */
+-    res =
+-        syscall (__NR_futex, cond_val, (gsize) FUTEX_WAIT_BITSET_PRIVATE,
+-        (gsize) sampled, &end, NULL, FUTEX_BITSET_MATCH_ANY);
+-    success = (res < 0 && errno == ETIMEDOUT) ? FALSE : TRUE;
+-    g_mutex_lock (mutex);
+-
+-    return success;
+-  }
+-#endif
+-
+-  /* We can't end up here because of the checks above */
+-  g_assert_not_reached ();
++  return success;
+ }
+ 
+ #elif defined (G_OS_UNIX)
+diff -uprN ../gstreamer-1.20.5-orig/meson.build ./meson.build
+--- ../gstreamer-1.20.5-orig/meson.build	2022-12-19 23:34:46.000000000 +0000
++++ ./meson.build	2023-02-03 12:23:42.471951129 +0000
+@@ -273,7 +273,7 @@ if cc.has_header_symbol('pthread.h', 'pt
+ endif
+ 
+ # Check for futex(2)
+-if cc.compiles('''#include <linux/futex.h>
++if cc.links('''#include <linux/futex.h>
+                #include <sys/syscall.h>
+                #include <unistd.h>
+                int main (int argc, char ** argv) {
+@@ -282,15 +282,6 @@ if cc.compiles('''#include <linux/futex.
+                }''', name : 'futex(2) system call')
+   cdata.set('HAVE_FUTEX', 1)
+ endif
+-if cc.compiles('''#include <linux/futex.h>
+-               #include <sys/syscall.h>
+-               #include <unistd.h>
+-               int main (int argc, char ** argv) {
+-                 syscall (__NR_futex_time64, NULL, FUTEX_WAKE, FUTEX_WAIT);
+-                 return 0;
+-               }''', name : 'futex(2) system call')
+-  cdata.set('HAVE_FUTEX_TIME64', 1)
+-endif
+ 
+ # Check for posix timers and monotonic clock
+ time_prefix = '#include <time.h>\n'
+diff -uprN ../gstreamer-1.20.5-orig/meson.build.orig ./meson.build.orig
+--- ../gstreamer-1.20.5-orig/meson.build.orig	1970-01-01 00:00:00.000000000 +0000
++++ ./meson.build.orig	2022-12-19 23:34:46.000000000 +0000
+@@ -0,0 +1,644 @@
++project('gstreamer', 'c',
++  version : '1.20.5',
++  meson_version : '>= 0.59',
++  default_options : [ 'warning_level=1',
++                      'buildtype=debugoptimized' ])
++
++gst_version = meson.project_version()
++version_arr = gst_version.split('.')
++gst_version_major = version_arr[0].to_int()
++gst_version_minor = version_arr[1].to_int()
++gst_version_micro = version_arr[2].to_int()
++if version_arr.length() == 4
++  gst_version_nano = version_arr[3].to_int()
++else
++  gst_version_nano = 0
++endif
++gst_version_is_dev = gst_version_minor % 2 == 1 and gst_version_micro < 90
++
++host_system = host_machine.system()
++
++apiversion = '1.0'
++soversion = 0
++# maintaining compatibility with the previous libtool versioning
++# current = minor * 100 + micro
++curversion = gst_version_minor * 100 + gst_version_micro
++libversion = '@0@.@1@.0'.format(soversion, curversion)
++osxversion = curversion + 1
++
++prefix = get_option('prefix')
++
++datadir = join_paths(prefix, get_option('datadir'))
++libexecdir = get_option('libexecdir')
++helpers_install_dir = join_paths(libexecdir, 'gstreamer-1.0')
++
++cc = meson.get_compiler('c')
++
++cdata = configuration_data()
++
++if cc.get_id() == 'msvc'
++  msvc_args = [
++      # Ignore several spurious warnings for things gstreamer does very commonly
++      # If a warning is completely useless and spammy, use '/wdXXXX' to suppress it
++      # If a warning is harmless but hard to fix, use '/woXXXX' so it's shown once
++      # NOTE: Only add warnings here if you are sure they're spurious
++      '/wd4018', # implicit signed/unsigned conversion
++      '/wd4146', # unary minus on unsigned (beware INT_MIN)
++      '/wd4244', # lossy type conversion (e.g. double -> int)
++      '/wd4305', # truncating type conversion (e.g. double -> float)
++      cc.get_supported_arguments(['/utf-8']), # set the input encoding to utf-8
++
++      # Enable some warnings on MSVC to match GCC/Clang behaviour
++      '/w14062', # enumerator 'identifier' in switch of enum 'enumeration' is not handled
++      '/w14101', # 'identifier' : unreferenced local variable
++      '/w14189', # 'identifier' : local variable is initialized but not referenced
++  ]
++  add_project_arguments(msvc_args, language: 'c')
++elif cc.has_link_argument('-Wl,-Bsymbolic-functions')
++  # FIXME: Add an option for this if people ask for it
++  add_project_link_arguments('-Wl,-Bsymbolic-functions', language : 'c')
++endif
++
++# Symbol visibility
++have_visibility_hidden = false
++if cc.get_id() == 'msvc'
++  export_define = '__declspec(dllexport) extern'
++elif cc.has_argument('-fvisibility=hidden')
++  add_project_arguments('-fvisibility=hidden', language: 'c')
++  export_define = 'extern __attribute__ ((visibility ("default")))'
++  have_visibility_hidden = true
++else
++  export_define = 'extern'
++endif
++
++# Passing this through the command line would be too messy
++cdata.set('GST_API_EXPORT', export_define)
++
++# Disable strict aliasing
++if cc.has_argument('-fno-strict-aliasing')
++  add_project_arguments('-fno-strict-aliasing', language: 'c')
++endif
++
++# Define G_DISABLE_DEPRECATED for development versions
++if gst_version_is_dev
++  message('Disabling deprecated GLib API')
++  add_project_arguments('-DG_DISABLE_DEPRECATED', language: 'c')
++endif
++
++cast_checks = get_option('gobject-cast-checks')
++if cast_checks.disabled() or (cast_checks.auto() and not gst_version_is_dev)
++  message('Disabling GLib cast checks')
++  add_project_arguments('-DG_DISABLE_CAST_CHECKS', language: 'c')
++endif
++
++glib_asserts = get_option('glib-asserts')
++if glib_asserts.disabled() or (glib_asserts.auto() and not gst_version_is_dev)
++  message('Disabling GLib asserts')
++  add_project_arguments('-DG_DISABLE_ASSERT', language: 'c')
++endif
++
++glib_checks = get_option('glib-checks')
++if glib_checks.disabled() or (glib_checks.auto() and not gst_version_is_dev)
++  message('Disabling GLib checks')
++  add_project_arguments('-DG_DISABLE_CHECKS', language: 'c')
++endif
++
++cdata.set_quoted('GST_API_VERSION', apiversion)
++cdata.set_quoted('GST_DATADIR', datadir)
++cdata.set_quoted('LOCALEDIR', join_paths(prefix, get_option('localedir')))
++cdata.set_quoted('LIBDIR', join_paths(prefix, get_option('libdir')))
++cdata.set_quoted('GST_API_VERSION', '1.0')
++cdata.set_quoted('GETTEXT_PACKAGE', 'gstreamer-1.0')
++cdata.set_quoted('GST_LICENSE', 'LGPL')
++cdata.set_quoted('PACKAGE', 'gstreamer')
++cdata.set_quoted('PACKAGE_NAME', 'GStreamer')
++cdata.set_quoted('PACKAGE_STRING', 'GStreamer @0@'.format(gst_version))
++cdata.set_quoted('PACKAGE_TARNAME', 'gstreamer')
++cdata.set_quoted('PACKAGE_BUGREPORT', 'https://gitlab.freedesktop.org/gstreamer/gstreamer/issues/new')
++cdata.set_quoted('PACKAGE_URL', '')
++cdata.set_quoted('PACKAGE_VERSION', gst_version)
++cdata.set_quoted('PLUGINDIR', join_paths(get_option('prefix'), get_option('libdir'), 'gstreamer-1.0'))
++cdata.set_quoted('VERSION', gst_version)
++cdata.set_quoted('GST_PLUGIN_SCANNER_INSTALLED', join_paths(prefix, helpers_install_dir, 'gst-plugin-scanner'))
++cdata.set_quoted('GST_PTP_HELPER_INSTALLED', join_paths(prefix, helpers_install_dir, 'gst-ptp-helper'))
++cdata.set_quoted('GST_PLUGIN_SUBDIR', get_option('libdir'),
++  description: 'plugin directory path component, used to find plugins on relocatable builds')
++cdata.set_quoted('GST_PLUGIN_SCANNER_SUBDIR', libexecdir,
++  description: 'libexecdir path component, used to find plugin-scanner on relocatable builds')
++cdata.set('GST_DISABLE_OPTION_PARSING', not get_option('option-parsing'))
++
++mem_align_opt = get_option('memory-alignment')
++if mem_align_opt == 'malloc'
++  cdata.set('MEMORY_ALIGNMENT_MALLOC', 1)
++elif mem_align_opt == 'pagesize'
++  cdata.set('MEMORY_ALIGNMENT_PAGESIZE', 1)
++else
++  cdata.set('MEMORY_ALIGNMENT', mem_align_opt.to_int())
++endif
++
++if ['darwin', 'ios'].contains(host_system)
++  cdata.set_quoted('GST_EXTRA_MODULE_SUFFIX', '.dylib')
++endif
++
++if gst_version_nano > 0
++    # Have GST_ERROR message printed when running from git
++    cdata.set('GST_LEVEL_DEFAULT', 'GST_LEVEL_ERROR')
++else
++    cdata.set('GST_LEVEL_DEFAULT', 'GST_LEVEL_NONE')
++endif
++
++# GStreamer package name and origin url
++gst_package_name = get_option('package-name')
++if gst_package_name == ''
++  if gst_version_nano == 0
++    gst_package_name = 'GStreamer source release'
++  elif gst_version_nano == 1
++    gst_package_name = 'GStreamer git'
++  else
++    gst_package_name = 'GStreamer prerelease'
++  endif
++endif
++cdata.set_quoted('GST_PACKAGE_NAME', gst_package_name)
++cdata.set_quoted('GST_PACKAGE_ORIGIN', get_option('package-origin'))
++
++# These are only needed/used by the ABI tests
++host_defines = [
++  [ 'x86', 'HAVE_CPU_I386' ],
++  [ 'x86_64', 'HAVE_CPU_X86_64' ],
++  [ 'arm', 'HAVE_CPU_ARM' ],
++  [ 'aarch64', 'HAVE_CPU_AARCH64' ],
++  [ 'mips', 'HAVE_CPU_MIPS' ],
++  [ 'powerpc', 'HAVE_CPU_PPC' ],
++  [ 'powerpc64', 'HAVE_CPU_PPC64' ],
++  [ 'alpha', 'HAVE_CPU_ALPHA' ],
++  [ 'sparc', 'HAVE_CPU_SPARC' ],
++  [ 'ia64', 'HAVE_CPU_IA64' ],
++  [ 'hppa', 'HAVE_CPU_HPPA' ],
++  [ 'm68k', 'HAVE_CPU_M68K' ],
++  [ 's390', 'HAVE_CPU_S390' ],
++]
++foreach h : host_defines
++  if h.get(0) == host_machine.cpu_family()
++    cdata.set(h.get(1), 1)
++  endif
++endforeach
++# FIXME: should really be called HOST_CPU or such
++cdata.set_quoted('TARGET_CPU', host_machine.cpu())
++
++check_headers = [
++  'dlfcn.h',
++  'inttypes.h',
++  'memory.h',
++  'poll.h',
++  'stdint.h',
++  'stdio_ext.h',
++  'strings.h',
++  'string.h',
++  'sys/param.h',
++  'sys/poll.h',
++  'sys/prctl.h',
++  'sys/socket.h',
++  'sys/stat.h',
++  'sys/times.h',
++  'sys/time.h',
++  'sys/types.h',
++  'sys/utsname.h',
++  'sys/wait.h',
++  'ucontext.h',
++  'unistd.h',
++  'sys/resource.h',
++  'sys/uio.h',
++]
++
++if host_system == 'windows'
++  check_headers += ['winsock2.h']
++endif
++
++foreach h : check_headers
++  if cc.has_header(h)
++    define = 'HAVE_' + h.underscorify().to_upper()
++    cdata.set(define, 1)
++  endif
++endforeach
++
++if cc.has_member('struct tm', 'tm_gmtoff', prefix : '#include <time.h>')
++  cdata.set('HAVE_TM_GMTOFF', 1)
++endif
++
++check_functions = [
++  'gmtime_r',
++  'sigaction',
++  'getrusage',
++  'fseeko',
++  'ftello',
++  'poll',
++  'ppoll',
++  'pselect',
++  'getpagesize',
++  'clock_gettime',
++  'clock_nanosleep',
++  'strnlen',
++  # These are needed by libcheck
++  'getline',
++  'mkstemp',
++  'alarm',
++  'gettimeofday',
++]
++
++foreach f : check_functions
++  if cc.has_function(f)
++    define = 'HAVE_' + f.underscorify().to_upper()
++    cdata.set(define, 1)
++  endif
++endforeach
++
++if cc.has_function('localtime_r', prefix : '#include<time.h>')
++  cdata.set('HAVE_LOCALTIME_R', 1)
++  # Needed by libcheck
++  cdata.set('HAVE_DECL_LOCALTIME_R', 1)
++endif
++
++if cc.links('''#define _GNU_SOURCE
++               #include <pthread.h>
++               int main() {
++                 pthread_setname_np("example"); return 0;
++               }''', name : 'pthread_setname_np(const char*)')
++  cdata.set('HAVE_PTHREAD_SETNAME_NP_WITHOUT_TID', 1)
++endif
++if cc.has_header_symbol('pthread.h', 'pthread_condattr_setclock')
++  cdata.set('HAVE_PTHREAD_CONDATTR_SETCLOCK', 1)
++endif
++if cc.has_header_symbol('pthread.h', 'pthread_cond_timedwait_relative_np')
++  cdata.set('HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE_NP', 1)
++endif
++
++# Check for futex(2)
++if cc.compiles('''#include <linux/futex.h>
++               #include <sys/syscall.h>
++               #include <unistd.h>
++               int main (int argc, char ** argv) {
++                 syscall (__NR_futex, NULL, FUTEX_WAKE, FUTEX_WAIT);
++                 return 0;
++               }''', name : 'futex(2) system call')
++  cdata.set('HAVE_FUTEX', 1)
++endif
++if cc.compiles('''#include <linux/futex.h>
++               #include <sys/syscall.h>
++               #include <unistd.h>
++               int main (int argc, char ** argv) {
++                 syscall (__NR_futex_time64, NULL, FUTEX_WAKE, FUTEX_WAIT);
++                 return 0;
++               }''', name : 'futex(2) system call')
++  cdata.set('HAVE_FUTEX_TIME64', 1)
++endif
++
++# Check for posix timers and monotonic clock
++time_prefix = '#include <time.h>\n'
++if cdata.has('HAVE_UNISTD_H')
++  time_prefix += '#include <unistd.h>'
++endif
++
++posix_timers_src = time_prefix + '''
++#if !defined(_POSIX_TIMERS) || _POSIX_TIMERS < 0 || !defined(CLOCK_REALTIME)
++#error Either _POSIX_TIMERS or CLOCK_REALTIME not defined
++#endif
++'''
++if cc.compiles(posix_timers_src, name : 'posix timers from time.h')
++  cdata.set('HAVE_POSIX_TIMERS', 1)
++endif
++
++monotonic_clock_src = time_prefix + '''
++#if !defined(_POSIX_MONOTONIC_CLOCK) || _POSIX_MONOTONIC_CLOCK < 0 || !defined(CLOCK_MONOTONIC)
++#error Either _POSIX_MONOTONIC_CLOCK or CLOCK_MONOTONIC not defined
++#endif
++'''
++if cc.compiles(monotonic_clock_src, name : 'monotonic clock from time.h')
++  cdata.set('HAVE_MONOTONIC_CLOCK', 1)
++endif
++
++# Check for __uint128_t (gcc) by checking for 128-bit division
++uint128_t_src = '''int main() {
++static __uint128_t v1 = 100;
++static __uint128_t v2 = 10;
++static __uint128_t u;
++u = v1 / v2;
++}'''
++if cc.compiles(uint128_t_src, name : '__uint128_t available')
++  cdata.set('HAVE_UINT128_T', 1)
++endif
++
++# All supported platforms have long long now
++cdata.set('HAVE_LONG_LONG', 1)
++
++# We only want to use the __declspec(dllexport/import) dance in GST_EXPORT when
++# building with MSVC
++if cc.get_id() == 'msvc'
++  cdata.set('GSTCONFIG_BUILT_WITH_MSVC', 1)
++else
++  cdata.set('GSTCONFIG_BUILT_WITH_MSVC', 0)
++endif
++
++# -------------------------------------------------------------------------------------
++# config.h things needed by libcheck
++# -------------------------------------------------------------------------------------
++if cc.has_function('getpid')
++  cdata.set('HAVE_GETPID', 1)
++elif host_system == 'windows' and cc.has_function('_getpid')
++  cdata.set('HAVE_PROCESS_H', 1) # Used by gstreamer too
++  cdata.set('HAVE__GETPID', 1)
++endif
++if cc.has_function('strdup')
++  cdata.set('HAVE_DECL_STRDUP', 1)
++elif host_system == 'windows' and cc.has_function('_strdup')
++  cdata.set('HAVE__STRDUP', 1) # Windows (MSVC)
++endif
++if host_system != 'windows'
++  cdata.set('HAVE_FORK', 1)
++else
++  # libcheck requires HAVE_FORK to be 0 when fork() is not available
++  cdata.set('HAVE_FORK', 0)
++endif
++if cc.has_function('strsignal')
++  cdata.set('HAVE_DECL_STRSIGNAL', 1)
++endif
++# Check for availability of types
++if not cc.has_type('clockid_t', prefix : '#include <time.h>')
++  cdata.set('clockid_t', 'int')
++endif
++if not cc.has_type('timer_t', prefix : '#include <time.h>')
++  cdata.set('timer_t', 'int')
++endif
++if not cc.has_members('struct timespec', 'tv_sec', 'tv_nsec',
++		      prefix : '#include <time.h>')
++  cdata.set('STRUCT_TIMESPEC_DEFINITION_MISSING', 1)
++endif
++if not cc.has_members('struct itimerspec', 'it_interval', 'it_value',
++		      prefix : '#include <time.h>')
++  cdata.set('STRUCT_ITIMERSPEC_DEFINITION_MISSING', 1)
++endif
++
++# Platform deps; only ws2_32 and execinfo for now
++platform_deps = []
++if host_system == 'windows'
++  platform_deps = [cc.find_library('ws2_32')]
++endif
++
++building_for_uwp = false
++if host_system == 'windows'
++  # Check whether we're building for UWP apps
++  code = '''
++  #include <windows.h>
++  #if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP))
++  #error "Not building for UWP"
++  #endif'''
++  if cc.compiles(code, name : 'building for UWP')
++    building_for_uwp = true
++  endif
++endif
++
++backtrace_deps = []
++unwind_dep = dependency('libunwind', required : get_option('libunwind'))
++dw_dep = dependency('libdw', required: get_option('libdw'))
++dbghelp_option = get_option('dbghelp')
++if dbghelp_option.enabled() and building_for_uwp
++  error('DbgHelp is not supported for UWP')
++endif
++have_dbghelp = cc.has_header('dbghelp.h', required: dbghelp_option) and cc.has_header('tlhelp32.h', required: dbghelp_option)
++backtrace_deps = [unwind_dep, dw_dep]
++backtrace_source_info = false
++backtrace_minimal = false
++# MSVC debug stack trace support
++if host_system == 'windows' and have_dbghelp and not building_for_uwp
++  cdata.set('HAVE_DBGHELP', 1)
++  backtrace_source_info = true
++# DWARF stack trace support with libunwind and elf-utils
++elif unwind_dep.found()
++  cdata.set('HAVE_UNWIND', 1)
++  if dw_dep.found()
++    cdata.set('HAVE_DW', 1)
++    backtrace_source_info = true
++  endif
++  backtrace_minimal = true
++# Basic backtrace() stack trace support
++elif cc.has_function('backtrace')
++  cdata.set('HAVE_BACKTRACE', 1)
++  backtrace_minimal = true
++endif
++# Print messages about what was enabled
++if not backtrace_source_info
++  if not backtrace_minimal
++    message('NO support for stack traces.')
++  else
++    message('Minimal support for stack traces, no source info.')
++  endif
++endif
++
++if cc.has_header('execinfo.h')
++  if cc.has_function('backtrace', prefix : '#include <execinfo.h>')
++    cdata.set('HAVE_BACKTRACE', 1)
++  else
++    execinfo_dep = cc.find_library('execinfo', required : false)
++    if execinfo_dep.found() and cc.has_function('backtrace', prefix : '#include <execinfo.h>', dependencies : execinfo_dep)
++      cdata.set('HAVE_BACKTRACE', 1)
++      platform_deps += execinfo_dep
++    endif
++  endif
++endif
++
++gst_debug = get_option('gst_debug')
++if not gst_debug
++  add_project_arguments(['-Wno-unused'], language: 'c')
++endif
++
++warning_flags = [
++  '-Wmissing-declarations',
++  '-Wmissing-prototypes',
++  '-Wredundant-decls',
++  '-Wundef',
++  '-Wwrite-strings',
++  '-Wformat',
++  '-Wformat-nonliteral',
++  '-Wformat-security',
++  '-Wold-style-definition',
++  '-Winit-self',
++  '-Wmissing-include-dirs',
++  '-Waddress',
++  '-Waggregate-return',
++  '-Wno-multichar',
++  '-Wvla',
++  '-Wpointer-arith',
++]
++
++foreach extra_arg : warning_flags
++  if cc.has_argument (extra_arg)
++    add_project_arguments([extra_arg], language: 'c')
++  endif
++endforeach
++
++# Used by the gstutils test
++gmp_dep = cc.find_library('gmp', required : false)
++cdata.set('HAVE_GMP', gmp_dep.found())
++gsl_dep = cc.find_library('gsl', required : false)
++gslcblas_dep = cc.find_library('gslcblas', required : false)
++cdata.set('HAVE_GSL', gsl_dep.found() and gslcblas_dep.found())
++test_deps = [gmp_dep, gsl_dep, gslcblas_dep]
++
++# Used by gstinfo.c
++dl_dep = cc.find_library('dl', required : false)
++cdata.set('HAVE_DLADDR', cc.has_function('dladdr', dependencies : dl_dep))
++cdata.set('GST_ENABLE_EXTRA_CHECKS', not get_option('extra-checks').disabled())
++cdata.set('USE_POISONING', get_option('poisoning'))
++
++configinc = include_directories('.')
++libsinc = include_directories('libs')
++privinc = include_directories('gst')
++
++# Find dependencies
++glib_dep = dependency('glib-2.0', version : '>=2.56.0',
++  fallback: ['glib', 'libglib_dep'])
++gobject_dep = dependency('gobject-2.0',
++  fallback: ['glib', 'libgobject_dep'])
++gmodule_dep = dependency('gmodule-2.0',
++  fallback: ['glib', 'libgmodule_dep'])
++if host_system == 'windows'
++    gio_dep = dependency('gio-2.0',
++        fallback: ['glib', 'libgio_dep'])
++else
++    gio_dep = [dependency('gio-2.0',
++                  fallback: ['glib', 'libgio_dep']),
++               dependency('gio-unix-2.0',
++                  fallback: ['glib', 'libgio_dep'])]
++endif
++
++mathlib = cc.find_library('m', required : false)
++# Needed for timer_create/settime/delete
++# Also provides clock_gettime in glibc < 2.17
++rt_lib = cc.find_library('rt', required : false)
++
++gir = find_program('g-ir-scanner', required : get_option('introspection'))
++gnome = import('gnome')
++
++build_gir = gir.found() and (not meson.is_cross_build() or get_option('introspection').enabled())
++
++gir_init_section = [ '--add-init-section=extern void gst_init(gint*,gchar**);' + \
++    'g_setenv("GST_REGISTRY_DISABLE", "yes", TRUE);' + \
++    'g_setenv("GST_REGISTRY_1.0", "/no/way/this/exists.reg", TRUE);' + \
++    'g_setenv("GST_PLUGIN_PATH_1_0", "", TRUE);' + \
++    'g_setenv("GST_PLUGIN_SYSTEM_PATH_1_0", "", TRUE);' + \
++    'gst_init(NULL,NULL);', '--quiet']
++
++gst_c_args = ['-DHAVE_CONFIG_H']
++
++# FIXME: This is only needed on windows and probably breaks when
++# default_library = 'both'. We should add this flag to static_c_args instead
++# when Meson supports it: https://github.com/mesonbuild/meson/issues/3304
++if get_option('default_library') == 'static'
++  gst_c_args += ['-DGST_STATIC_COMPILATION']
++endif
++
++# Used in gst/parse/meson.build and below
++python3 = import('python').find_installation()
++
++bashcomp_option = get_option('bash-completion')
++bashcomp_dep = dependency('bash-completion', version : '>= 2.0', required : bashcomp_option)
++bash_completions_dir = ''
++bash_helpers_dir = ''
++
++bashcomp_found = false
++if bashcomp_dep.found()
++  bashcomp_found = true
++  bashcomp_dir_override = bashcomp_dep.version().version_compare('>= 2.10') ? ['datadir', datadir] : ['prefix', prefix]
++  bash_completions_dir = bashcomp_dep.get_variable('completionsdir', pkgconfig_define:  bashcomp_dir_override)
++  if bash_completions_dir == ''
++    msg = 'Found bash-completion but the .pc file did not set \'completionsdir\'.'
++    if bashcomp_option.enabled()
++      error(msg)
++    else
++      message(msg)
++    endif
++    bashcomp_found = false
++  endif
++
++  bash_helpers_dir = bashcomp_dep.get_variable('helpersdir', pkgconfig_define:  bashcomp_dir_override)
++  if bash_helpers_dir == ''
++    msg = 'Found bash-completion, but the .pc file did not set \'helpersdir\'.'
++    if bashcomp_option.enabled()
++      error(msg)
++    else
++      message(msg)
++    endif
++    bashcomp_found = false
++  endif
++endif
++
++plugins_install_dir = join_paths(get_option('libdir'), 'gstreamer-1.0')
++
++pkgconfig = import('pkgconfig')
++plugins_pkgconfig_install_dir = join_paths(plugins_install_dir, 'pkgconfig')
++if get_option('default_library') == 'shared'
++  # If we don't build static plugins there is no need to generate pc files
++  plugins_pkgconfig_install_dir = disabler()
++endif
++pkgconfig_variables = ['exec_prefix=${prefix}',
++    'toolsdir=${exec_prefix}/bin',
++    'pluginsdir=${libdir}/gstreamer-1.0',
++    'datarootdir=${prefix}/share',
++    'datadir=${datarootdir}',
++    'girdir=${datadir}/gir-1.0',
++    'typelibdir=${libdir}/girepository-1.0',
++    'libexecdir=${prefix}/libexec',
++    'pluginscannerdir=${libexecdir}/gstreamer-1.0']
++pkgconfig_uninstalled_variables = ['exec_prefix=${prefix}',
++	'gstreamerdir=${prefix}/subprojects/gstreamer',
++    'bashhelpersdir=${gstreamerdir}/data/bash-completion/helpers',
++    'helpersdir=${gstreamerdir}/libs/gst/helpers']
++pkgconfig_subdirs = ['gstreamer-1.0']
++pkgconfig_libs = []
++if host_system == 'darwin'
++  pkgconfig_libs = ['-Wl,-rpath,${libdir}']
++endif
++
++static_build = get_option('default_library') == 'static'
++libraries = []
++subdir('gst')
++subdir('libs')
++subdir('plugins')
++if not get_option('tools').disabled()
++  subdir('tools')
++endif
++subdir('tests')
++subdir('data')
++subdir('docs')
++
++# xgettext is optional (on Windows for instance)
++if find_program('xgettext', required : get_option('nls')).found()
++  cdata.set('ENABLE_NLS', 1)
++  subdir('po')
++endif
++
++subdir('scripts')
++
++# Set release date
++if gst_version_nano == 0
++  extract_release_date = find_program('scripts/extract-release-date-from-doap-file.py')
++  run_result = run_command(extract_release_date, gst_version, files('gstreamer.doap'), check: true)
++  release_date = run_result.stdout().strip()
++  cdata.set_quoted('GST_PACKAGE_RELEASE_DATETIME', release_date)
++  message('Package release date: ' + release_date)
++endif
++
++configure_file(output : 'config.h', configuration : cdata)
++install_data('gst-element-check-1.0.m4', install_dir : join_paths(get_option('datadir'), 'aclocal'))
++
++plugin_names = []
++foreach plugin: plugins
++  if plugin.name().startswith('gst')
++    plugin_names += [plugin.name().substring(3)]
++  else
++    plugin_names += [plugin.name()]
++  endif
++endforeach
++
++summary({
++    'Plugins': plugin_names,
++}, list_sep: ', ')

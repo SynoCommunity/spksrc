@@ -44,6 +44,7 @@ OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
 OPTIONAL_DEPENDS += cross/libzimg
+OPTIONAL_DEPENDS += cross/openh264
 OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
 OPTIONAL_DEPENDS += cross/libva
@@ -105,6 +106,11 @@ CONFIGURE_ARGS += --enable-libzmq
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
 
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/openh264
+CONFIGURE_ARGS += --enable-libopenh264
+endif
+
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --enable-libopus
 
@@ -116,6 +122,9 @@ CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
 DEPENDS += cross/librabbitmq
 CONFIGURE_ARGS += --enable-librabbitmq
+
+DEPENDS += cross/twolame
+CONFIGURE_ARGS += --enable-libtwolame
 
 DEPENDS += cross/zvbi
 CONFIGURE_ARGS += --enable-libzvbi
@@ -166,14 +175,6 @@ endif
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
-endif
-endif
-
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
@@ -193,6 +194,12 @@ CONFIGURE_ARGS += --enable-libsvthevc
 endif
 
 include ../../mk/spksrc.cross-cc.mk
+
+ifeq ($(call version_le, $$TC_GCC, 4.8),1)
+# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
+DEPENDS += cross/libass
+CONFIGURE_ARGS += --enable-libass
+endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --disable-neon --disable-asm
@@ -219,7 +226,6 @@ else
 CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
 endif
-
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/nasm

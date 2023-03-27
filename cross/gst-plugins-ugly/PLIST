@@ -1,0 +1,10 @@
+lib:lib/gstreamer-1.0/libgstamrnb.so
+lib:lib/gstreamer-1.0/libgstamrwbdec.so
+lib:lib/gstreamer-1.0/libgstasf.so
+lib:lib/gstreamer-1.0/libgstdvdlpcmdec.so
+lib:lib/gstreamer-1.0/libgstdvdsub.so
+lib:lib/gstreamer-1.0/libgstrealmedia.so
+lib:lib/gstreamer-1.0/libgstx264.so
+lib:lib/gstreamer-1.0/libgstxingmux.so
+rsc:share/gstreamer-1.0/presets/GstAmrnbEnc.prs
+rsc:share/gstreamer-1.0/presets/GstX264Enc.prs

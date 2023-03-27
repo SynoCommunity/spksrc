@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg
 SPK_VERS = 4.4.3
-SPK_REV = 47
+SPK_REV = 48
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to FFMPEG 4.4.3<br/>2. Update Intel Media Driver 2022Q3 Release - 22.5.4<br/>3. Fix ppc x265 librarie issue \#5314<br/>5. Update libaom to version 3.5<br/>6. Multiple dependency updates<br/>7. Restore libass for ARMv7L"
+CHANGELOG = "1. Update to FFMPEG 4.4.3<br/>2. Update Intel Media Driver 2022Q3 Release - 22.5.4<br/>3. Fix ppc x265 librarie issue \#5314<br/>5. Update libaom to version 3.5<br/>6. Multiple dependency updates<br/>7. Restore libass for ARMv7L<br/>8. Enable twolame code support<br/>9. Enable openH264 codec support"
 
 CONF_DIR = src/conf
 
@@ -17,6 +17,10 @@ STARTABLE = no
 HOMEPAGE = https://www.ffmpeg.org/
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 SERVICE_SETUP = src/service-setup.sh
+endif
 
 include ../../mk/spksrc.spk.mk

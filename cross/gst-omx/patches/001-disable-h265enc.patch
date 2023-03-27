@@ -1,0 +1,30 @@
+diff -uprN ../gst-omx-1.20.3.orig/omx/gstomx.c ./omx/gstomx.c
+--- ../gst-omx-1.20.3.orig/omx/gstomx.c	2022-06-15 22:36:22.000000000 +0000
++++ ./omx/gstomx.c	2023-02-01 01:35:38.186835742 +0000
+@@ -3531,7 +3531,7 @@ static const GGetTypeFunction types[] =
+       , gst_omx_theora_dec_get_type
+ #endif
+ #ifdef HAVE_HEVC
+-      , gst_omx_h265_enc_get_type, gst_omx_h265_dec_get_type
++      , gst_omx_h265_dec_get_type
+ #endif
+ };
+ 
+diff -uprN ../gst-omx-1.20.3.orig/omx/meson.build ./omx/meson.build
+--- ../gst-omx-1.20.3.orig/omx/meson.build	2022-06-15 22:36:22.000000000 +0000
++++ ./omx/meson.build	2023-02-01 01:35:09.434496828 +0000
+@@ -39,7 +39,6 @@ endif
+ 
+ if have_omx_hevc
+   omx_sources += 'gstomxh265utils.c'
+-  omx_sources += 'gstomxh265enc.c'
+   omx_sources += 'gstomxh265dec.c'
+ endif
+ 
+@@ -60,4 +59,4 @@ gstomx = library('gstomx',
+   install_dir : plugins_install_dir,
+ )
+ 
+-plugins = [gstomx]
+\ No newline at end of file
++plugins = [gstomx]

@@ -12,7 +12,9 @@ COMMENT  = TagLib is a library for reading and editing the meta-data of several 
 LICENSE  = LGPLv2.1
 
 GNU_CONFIGURE = 1
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
+ADDITIONAL_CFLAGS = -O
 CMAKE_ARGS += -Wno-dev
+CMAKE_ARGS += -DBUILD_TESTS=OFF
+CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 include ../../mk/spksrc.cross-cmake.mk

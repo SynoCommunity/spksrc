@@ -1,0 +1,50 @@
+PKG_NAME = gst-plugins-good
+PKG_VERS = 1.20.5
+PKG_EXT = tar.xz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-good
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+DEPENDS  = cross/glib
+DEPENDS += cross/gstreamer
+DEPENDS += cross/gst-plugins-base
+DEPENDS += cross/cairo
+DEPENDS += cross/flac
+DEPENDS += cross/lame
+DEPENDS += cross/libcaca
+DEPENDS += cross/speex
+DEPENDS += cross/taglib
+DEPENDS += cross/twolame
+
+OPTIONAL_DEPENDS = cross/libvpx
+
+HOMEPAGE = https://gstreamer.freedesktop.org/
+COMMENT  = GStreamer is a library for constructing graphs of media-handling components.
+LICENSE  = LGPLv2.1
+
+CONFIGURE_ARGS += -Dpackage-origin=https://synocommunity.com
+
+ADDITIONAL_CFLAGS = -std=c99
+
+# Require access to glib-mkenums Python script
+ENV += PATH=$(STAGING_INSTALL_PREFIX)/bin:$$PATH
+
+PLIST_TRANSFORM = grep -v -e TBD
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
+ADDITIONAL_CFLAGS += -D_GNU_SOURCE
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_LDFLAGS += -lrt
+endif
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/libvpx
+else
+PLIST_TRANSFORM += -e libgstvpx.so
+endif
+
+include ../../mk/spksrc.cross-meson.mk
