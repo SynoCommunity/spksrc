@@ -53,7 +53,7 @@ export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(AR
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target/lib
 PRE_DEPEND_TARGET = tvheadend_pre_depend
-SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg$(FFMPEG_VERSION)"
+SPK_DEPENDS = "$(SPK_DEPENDS):ffmpeg$(subst 4,,$(FFMPEG_VERSION))"
 endif
 
 include ../../mk/spksrc.spk.mk
