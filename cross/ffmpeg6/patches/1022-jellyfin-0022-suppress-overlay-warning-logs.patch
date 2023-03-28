@@ -1,0 +1,16 @@
+Index: jellyfin-ffmpeg/libavfilter/buffersrc.c
+===================================================================
+--- libavfilter/buffersrc.c
++++ libavfilter/buffersrc.c
+@@ -65,9 +65,9 @@ typedef struct BufferSourceContext {
+ 
+ #define CHECK_VIDEO_PARAM_CHANGE(s, c, width, height, format, pts)\
+     if (c->w != width || c->h != height || c->pix_fmt != format) {\
+-        av_log(s, AV_LOG_INFO, "filter context - w: %d h: %d fmt: %d, incoming frame - w: %d h: %d fmt: %d pts_time: %s\n",\
++        av_log(s, AV_LOG_DEBUG, "filter context - w: %d h: %d fmt: %d, incoming frame - w: %d h: %d fmt: %d pts_time: %s\n",\
+                c->w, c->h, c->pix_fmt, width, height, format, av_ts2timestr(pts, &s->outputs[0]->time_base));\
+-        av_log(s, AV_LOG_WARNING, "Changing video frame properties on the fly is not supported by all filters.\n");\
++        av_log(s, AV_LOG_DEBUG, "Changing video frame properties on the fly is not supported by all filters.\n");\
+     }
+ 
+ #define CHECK_AUDIO_PARAM_CHANGE(s, c, srate, layout, format, pts)\

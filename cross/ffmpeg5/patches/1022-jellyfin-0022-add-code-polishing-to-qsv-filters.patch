@@ -1,0 +1,1849 @@
+Index: jellyfin-ffmpeg/libavcodec/qsv.c
+===================================================================
+--- libavcodec/qsv.c
++++ libavcodec/qsv.c
+@@ -171,7 +171,7 @@ int ff_qsv_print_warning(void *log_ctx,
+ {
+     const char *desc;
+     int ret = qsv_map_error(err, &desc);
+-    av_log(log_ctx, AV_LOG_WARNING, "%s: %s (%d)\n", warning_string, desc, err);
++    av_log(log_ctx, AV_LOG_VERBOSE, "%s: %s (%d)\n", warning_string, desc, err);
+     return ret;
+ }
+ 
+Index: jellyfin-ffmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -252,7 +252,7 @@ OBJS-$(CONFIG_DECONVOLVE_FILTER)
+ OBJS-$(CONFIG_DEDOT_FILTER)                  += vf_dedot.o
+ OBJS-$(CONFIG_DEFLATE_FILTER)                += vf_neighbor.o
+ OBJS-$(CONFIG_DEFLICKER_FILTER)              += vf_deflicker.o
+-OBJS-$(CONFIG_DEINTERLACE_QSV_FILTER)        += vf_deinterlace_qsv.o
++OBJS-$(CONFIG_DEINTERLACE_QSV_FILTER)        += vf_vpp_qsv.o
+ OBJS-$(CONFIG_DEINTERLACE_VAAPI_FILTER)      += vf_deinterlace_vaapi.o vaapi_vpp.o
+ OBJS-$(CONFIG_DEJUDDER_FILTER)               += vf_dejudder.o
+ OBJS-$(CONFIG_DELOGO_FILTER)                 += vf_delogo.o
+@@ -440,7 +440,7 @@ OBJS-$(CONFIG_SCALE_CUDA_FILTER)
+                                                 vf_scale_cuda.ptx.o cuda/load_helper.o
+ OBJS-$(CONFIG_SCALE_NPP_FILTER)              += vf_scale_npp.o scale_eval.o
+ OBJS-$(CONFIG_SCALE_OPENCL_FILTER)           += vf_scale_opencl.o opencl.o opencl/scale.o scale_eval.o
+-OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_scale_qsv.o
++OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_vpp_qsv.o
+ OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
+ OBJS-$(CONFIG_SCALE_VULKAN_FILTER)           += vf_scale_vulkan.o vulkan.o vulkan_filter.o
+ OBJS-$(CONFIG_SCALE2REF_FILTER)              += vf_scale.o scale_eval.o
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -145,7 +145,7 @@ int ff_qsvvpp_print_warning(void *log_ct
+     const char *desc;
+     int ret;
+     ret = qsv_map_error(err, &desc);
+-    av_log(log_ctx, AV_LOG_WARNING, "%s: %s (%d)\n", warning_string, desc, err);
++    av_log(log_ctx, AV_LOG_VERBOSE, "%s: %s (%d)\n", warning_string, desc, err);
+     return ret;
+ }
+ 
+@@ -302,6 +302,14 @@ static int fill_frameinfo_by_link(mfxFra
+     frameinfo->CropH          = link->h;
+     frameinfo->FrameRateExtN  = link->frame_rate.num;
+     frameinfo->FrameRateExtD  = link->frame_rate.den;
++
++    /* Apparently VPP in the SDK requires the frame rate to be set to some value, otherwise
++     * init will fail */
++    if (frameinfo->FrameRateExtD == 0 || frameinfo->FrameRateExtN == 0) {
++        frameinfo->FrameRateExtN = 25;
++        frameinfo->FrameRateExtD = 1;
++    }
++
+     frameinfo->AspectRatioW   = link->sample_aspect_ratio.num ? link->sample_aspect_ratio.num : 1;
+     frameinfo->AspectRatioH   = link->sample_aspect_ratio.den ? link->sample_aspect_ratio.den : 1;
+ 
+@@ -646,16 +654,13 @@ static int init_vpp_session(AVFilterCont
+     return 0;
+ }
+ 
+-int ff_qsvvpp_create(AVFilterContext *avctx, QSVVPPContext **vpp, QSVVPPParam *param)
++int ff_qsvvpp_init(AVFilterContext *avctx, QSVVPPParam *param)
+ {
+     int i;
+     int ret;
+-    QSVVPPContext *s;
+-
+-    s = av_mallocz(sizeof(*s));
+-    if (!s)
+-        return AVERROR(ENOMEM);
++    QSVVPPContext *s = avctx->priv;
+ 
++    s->last_in_pts   = AV_NOPTS_VALUE;
+     s->filter_frame  = param->filter_frame;
+     if (!s->filter_frame)
+         s->filter_frame = ff_filter_frame;
+@@ -721,14 +726,13 @@ int ff_qsvvpp_create(AVFilterContext *av
+     s->got_frame = 0;
+ 
+     /** keep fifo size at least 1. Even when async_depth is 0, fifo is used. */
+-    s->async_fifo  = av_fifo_alloc2(param->async_depth + 1, sizeof(QSVAsyncFrame), 0);
+-    s->async_depth = param->async_depth;
++    s->async_fifo  = av_fifo_alloc2(s->async_depth + 1, sizeof(QSVAsyncFrame), 0);
+     if (!s->async_fifo) {
+         ret = AVERROR(ENOMEM);
+         goto failed;
+     }
+ 
+-    s->vpp_param.AsyncDepth = param->async_depth;
++    s->vpp_param.AsyncDepth = s->async_depth;
+ 
+     if (IS_SYSTEM_MEMORY(s->in_mem_mode))
+         s->vpp_param.IOPattern |= MFX_IOPATTERN_IN_SYSTEM_MEMORY;
+@@ -755,27 +759,26 @@ int ff_qsvvpp_create(AVFilterContext *av
+     } else if (ret > 0)
+         ff_qsvvpp_print_warning(avctx, ret, "Warning When creating qsvvpp");
+ 
+-    *vpp = s;
+     return 0;
+ 
+ failed:
+-    ff_qsvvpp_free(&s);
++    ff_qsvvpp_close(avctx);
+ 
+     return ret;
+ }
+ 
+-int ff_qsvvpp_free(QSVVPPContext **vpp)
++int ff_qsvvpp_close(AVFilterContext *avctx)
+ {
+-    QSVVPPContext *s = *vpp;
+-
+-    if (!s)
+-        return 0;
++    QSVVPPContext *s = avctx->priv;
+ 
+     if (s->session) {
+         MFXVideoVPP_Close(s->session);
+         MFXClose(s->session);
++        s->session = NULL;
+     }
+ 
++    s->last_in_pts = AV_NOPTS_VALUE;
++
+     /* release all the resources */
+     clear_frame_list(&s->in_frame_list);
+     clear_frame_list(&s->out_frame_list);
+@@ -784,7 +787,6 @@ int ff_qsvvpp_free(QSVVPPContext **vpp)
+     av_freep(&s->ext_buffers);
+     av_freep(&s->frame_infos);
+     av_fifo_freep2(&s->async_fifo);
+-    av_freep(vpp);
+ 
+     return 0;
+ }
+@@ -796,7 +798,8 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+     QSVAsyncFrame     aframe;
+     mfxSyncPoint      sync;
+     QSVFrame         *in_frame, *out_frame;
+-    int               ret, filter_ret;
++    int               ret, ret1, filter_ret;
++    int64_t           dpts = 0;
+ 
+     while (s->eof && av_fifo_read(s->async_fifo, &aframe, 1) >= 0) {
+         if (MFXVideoCORE_SyncOperation(s->session, aframe.sync, 1000) < 0)
+@@ -842,8 +845,33 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+                 return AVERROR(EAGAIN);
+             break;
+         }
+-        out_frame->frame->pts = av_rescale_q(out_frame->surface.Data.TimeStamp,
+-                                             default_tb, outlink->time_base);
++
++        /* Copy the color side data */
++        if (in_frame->frame->color_primaries != -1)
++            out_frame->frame->color_primaries = in_frame->frame->color_primaries;
++        if (in_frame->frame->color_trc != -1)
++            out_frame->frame->color_trc = in_frame->frame->color_trc;
++        if (in_frame->frame->colorspace != -1)
++            out_frame->frame->colorspace = in_frame->frame->colorspace;
++        if (in_frame->frame->color_range != -1)
++            out_frame->frame->color_range = in_frame->frame->color_range;
++
++        ret = av_frame_copy_side_data(out_frame->frame, in_frame->frame, 0);
++        if (ret < 0)
++            return ret;
++
++        /* TODO: calculate the PTS for other cases */
++        if (s->deinterlace_enabled &&
++            s->last_in_pts != AV_NOPTS_VALUE &&
++            ret == MFX_ERR_MORE_SURFACE &&
++            out_frame->surface.Data.TimeStamp == MFX_TIMESTAMP_UNKNOWN)
++            dpts = (in_frame->frame->pts - s->last_in_pts) / 2;
++        else
++            dpts = 0;
++
++        out_frame->frame->pts = av_rescale_q(in_frame->frame->pts - dpts,
++                                             inlink->time_base,
++                                             outlink->time_base);
+ 
+         out_frame->queued++;
+         aframe = (QSVAsyncFrame){ sync, out_frame };
+@@ -853,8 +881,13 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+             av_fifo_read(s->async_fifo, &aframe, 1);
+ 
+             do {
+-                ret = MFXVideoCORE_SyncOperation(s->session, aframe.sync, 1000);
+-            } while (ret == MFX_WRN_IN_EXECUTION);
++                ret1 = MFXVideoCORE_SyncOperation(s->session, sync, 1000);
++            } while (ret1 == MFX_WRN_IN_EXECUTION);
++
++            if (ret1 < 0) {
++                ret = ret1;
++                break;
++            }
+ 
+             filter_ret = s->filter_frame(outlink, aframe.frame->frame);
+             if (filter_ret < 0) {
+@@ -868,6 +901,8 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+         }
+     } while(ret == MFX_ERR_MORE_SURFACE);
+ 
++    s->last_in_pts = in_frame->frame->pts;
++
+     if (ret < 0)
+         return ff_qsvvpp_print_error(ctx, ret, "Error running VPP");
+     else if (ret > 0)
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.h
+===================================================================
+--- libavfilter/qsvvpp.h
++++ libavfilter/qsvvpp.h
+@@ -48,6 +48,8 @@ typedef struct QSVFrame {
+ } QSVFrame;
+ 
+ typedef struct QSVVPPContext {
++    const AVClass      *class;
++
+     mfxSession          session;
+     int (*filter_frame) (AVFilterLink *outlink, AVFrame *frame); /**< callback */
+     enum AVPixelFormat  out_sw_format;   /**< Real output format */
+@@ -72,8 +74,11 @@ typedef struct QSVVPPContext {
+     int got_frame;
+     int async_depth;
+     int eof;
++    int deinterlace_enabled;
+     /** order with frame_out, sync */
+     AVFifo *async_fifo;
++
++    int64_t last_in_pts;
+ } QSVVPPContext;
+ 
+ typedef struct QSVVPPCrop {
+@@ -95,15 +100,13 @@ typedef struct QSVVPPParam {
+     /* Crop information for each input, if needed */
+     int num_crop;
+     QSVVPPCrop *crop;
+-
+-   int async_depth;
+ } QSVVPPParam;
+ 
+ /* create and initialize the QSV session */
+-int ff_qsvvpp_create(AVFilterContext *avctx, QSVVPPContext **vpp, QSVVPPParam *param);
++int ff_qsvvpp_init(AVFilterContext *avctx, QSVVPPParam *param);
+ 
+ /* release the resources (eg.surfaces) */
+-int ff_qsvvpp_free(QSVVPPContext **vpp);
++int ff_qsvvpp_close(AVFilterContext *avctx);
+ 
+ /* vpp filter frame and call the cb if needed */
+ int ff_qsvvpp_filter_frame(QSVVPPContext *vpp, AVFilterLink *inlink, AVFrame *frame);
+Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
+===================================================================
+--- libavfilter/vf_overlay_qsv.c
++++ libavfilter/vf_overlay_qsv.c
+@@ -57,10 +57,9 @@ enum var_name {
+ };
+ 
+ typedef struct QSVOverlayContext {
+-    const AVClass      *class;
++    QSVVPPContext      qsv;
+ 
+     FFFrameSync fs;
+-    QSVVPPContext      *qsv;
+     QSVVPPParam        qsv_param;
+     mfxExtVPPComposite comp_conf;
+     double             var_values[VAR_VARS_NB];
+@@ -229,40 +228,51 @@ static int config_overlay_input(AVFilter
+ 
+ static int process_frame(FFFrameSync *fs)
+ {
+-    AVFilterContext  *ctx = fs->parent;
+-    QSVOverlayContext  *s = fs->opaque;
+-    AVFrame        *frame = NULL;
+-    int               ret = 0, i;
+-
+-    for (i = 0; i < ctx->nb_inputs; i++) {
+-        ret = ff_framesync_get_frame(fs, i, &frame, 0);
+-        if (ret == 0)
+-            ret = ff_qsvvpp_filter_frame(s->qsv, ctx->inputs[i], frame);
+-        if (ret < 0 && ret != AVERROR(EAGAIN))
+-            break;
+-    }
++    AVFilterContext *ctx = fs->parent;
++    QSVVPPContext   *qsv = fs->opaque;
++    AVFilterLink    *in0 = ctx->inputs[0];
++    AVFilterLink    *in1 = ctx->inputs[1];
++    AVFrame        *main = NULL;
++    AVFrame     *overlay = NULL;
++    int              ret = 0;
+ 
+-    return ret;
++    ret = ff_framesync_get_frame(fs, 0, &main, 0);
++    if (ret < 0)
++        return ret;
++    ret = ff_framesync_get_frame(fs, 1, &overlay, 0);
++    if (ret < 0)
++        return ret;
++
++    if (!main)
++        return AVERROR_BUG;
++
++    /* composite main frame */
++    ret = ff_qsvvpp_filter_frame(qsv, in0, main);
++    if (ret < 0 && ret != AVERROR(EAGAIN))
++        return ret;
++
++    /* remove all side data of the overlay frame*/
++    if (overlay)
++        av_frame_remove_all_side_data(overlay);
++
++    /* composite overlay frame */
++    /* or overwrite main frame again if the overlay frame isn't ready yet */
++    return ff_qsvvpp_filter_frame(qsv, overlay ? in1 : in0, overlay ? overlay : main);
+ }
+ 
+ static int init_framesync(AVFilterContext *ctx)
+ {
+-    QSVOverlayContext *s = ctx->priv;
+-    int ret, i;
++    QSVOverlayContext  *s = ctx->priv;
++    AVFilterLink *outlink = ctx->outputs[0];
++    int ret;
+ 
+-    s->fs.on_event = process_frame;
+-    s->fs.opaque   = s;
+-    ret = ff_framesync_init(&s->fs, ctx, ctx->nb_inputs);
++    ret = ff_framesync_init_dualinput(&s->fs, ctx);
+     if (ret < 0)
+         return ret;
+ 
+-    for (i = 0; i < ctx->nb_inputs; i++) {
+-        FFFrameSyncIn *in = &s->fs.in[i];
+-        in->before    = EXT_STOP;
+-        in->after     = EXT_INFINITY;
+-        in->sync      = i ? 1 : 2;
+-        in->time_base = ctx->inputs[i]->time_base;
+-    }
++    s->fs.time_base = outlink->time_base;
++    s->fs.on_event  = process_frame;
++    s->fs.opaque    = s;
+ 
+     return ff_framesync_configure(&s->fs);
+ }
+@@ -276,18 +286,14 @@ static int config_output(AVFilterLink *o
+     int ret;
+ 
+     av_log(ctx, AV_LOG_DEBUG, "Output is of %s.\n", av_get_pix_fmt_name(outlink->format));
++    vpp->qsv_param.out_sw_format = in0->format;
+     if ((in0->format == AV_PIX_FMT_QSV && in1->format != AV_PIX_FMT_QSV) ||
+         (in0->format != AV_PIX_FMT_QSV && in1->format == AV_PIX_FMT_QSV)) {
+         av_log(ctx, AV_LOG_ERROR, "Mixing hardware and software pixel formats is not supported.\n");
+         return AVERROR(EINVAL);
+     } else if (in0->format == AV_PIX_FMT_QSV) {
+         AVHWFramesContext *hw_frame0 = (AVHWFramesContext *)in0->hw_frames_ctx->data;
+-        AVHWFramesContext *hw_frame1 = (AVHWFramesContext *)in1->hw_frames_ctx->data;
+-
+-        if (hw_frame0->device_ctx != hw_frame1->device_ctx) {
+-            av_log(ctx, AV_LOG_ERROR, "Inputs with different underlying QSV devices are forbidden.\n");
+-            return AVERROR(EINVAL);
+-        }
++        vpp->qsv_param.out_sw_format = hw_frame0->sw_format;
+     }
+ 
+     outlink->w          = vpp->var_values[VAR_MW];
+@@ -299,7 +305,7 @@ static int config_output(AVFilterLink *o
+     if (ret < 0)
+         return ret;
+ 
+-    return ff_qsvvpp_create(ctx, &vpp->qsv, &vpp->qsv_param);
++    return ff_qsvvpp_init(ctx, &vpp->qsv_param);
+ }
+ 
+ /*
+@@ -348,7 +354,7 @@ static av_cold void overlay_qsv_uninit(A
+ {
+     QSVOverlayContext *vpp = ctx->priv;
+ 
+-    ff_qsvvpp_free(&vpp->qsv);
++    ff_qsvvpp_close(ctx);
+     ff_framesync_uninit(&vpp->fs);
+     av_freep(&vpp->comp_conf.InputStream);
+     av_freep(&vpp->qsv_param.ext_buf);
+@@ -368,6 +374,7 @@ static int overlay_qsv_query_formats(AVF
+     static const enum AVPixelFormat main_in_fmts[] = {
+         AV_PIX_FMT_YUV420P,
+         AV_PIX_FMT_NV12,
++        AV_PIX_FMT_P010,
+         AV_PIX_FMT_YUYV422,
+         AV_PIX_FMT_RGB32,
+         AV_PIX_FMT_QSV,
+@@ -375,6 +382,7 @@ static int overlay_qsv_query_formats(AVF
+     };
+     static const enum AVPixelFormat out_pix_fmts[] = {
+         AV_PIX_FMT_NV12,
++        AV_PIX_FMT_P010,
+         AV_PIX_FMT_QSV,
+         AV_PIX_FMT_NONE
+     };
+Index: jellyfin-ffmpeg/libavfilter/vf_scale_qsv.c
+===================================================================
+--- libavfilter/vf_scale_qsv.c
++++ /dev/null
+@@ -1,664 +0,0 @@
+-/*
+- * This file is part of FFmpeg.
+- *
+- * FFmpeg is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2.1 of the License, or (at your option) any later version.
+- *
+- * FFmpeg is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with FFmpeg; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+- */
+-
+-/**
+- * @file
+- * scale video filter - QSV
+- */
+-
+-#include <mfx/mfxvideo.h>
+-
+-#include <stdio.h>
+-#include <string.h>
+-
+-#include "libavutil/avstring.h"
+-#include "libavutil/common.h"
+-#include "libavutil/eval.h"
+-#include "libavutil/hwcontext.h"
+-#include "libavutil/hwcontext_qsv.h"
+-#include "libavutil/internal.h"
+-#include "libavutil/mathematics.h"
+-#include "libavutil/opt.h"
+-#include "libavutil/pixdesc.h"
+-#include "libavutil/time.h"
+-#include "libavfilter/qsvvpp.h"
+-
+-#include "avfilter.h"
+-#include "formats.h"
+-#include "internal.h"
+-#include "video.h"
+-
+-static const char *const var_names[] = {
+-    "PI",
+-    "PHI",
+-    "E",
+-    "in_w",   "iw",
+-    "in_h",   "ih",
+-    "out_w",  "ow",
+-    "out_h",  "oh",
+-    "a", "dar",
+-    "sar",
+-    NULL
+-};
+-
+-enum var_name {
+-    VAR_PI,
+-    VAR_PHI,
+-    VAR_E,
+-    VAR_IN_W,   VAR_IW,
+-    VAR_IN_H,   VAR_IH,
+-    VAR_OUT_W,  VAR_OW,
+-    VAR_OUT_H,  VAR_OH,
+-    VAR_A, VAR_DAR,
+-    VAR_SAR,
+-    VARS_NB
+-};
+-
+-#define MFX_IMPL_VIA_MASK(impl) (0x0f00 & (impl))
+-
+-typedef struct QSVScaleContext {
+-    const AVClass *class;
+-
+-    /* a clone of the main session, used internally for scaling */
+-    mfxSession   session;
+-
+-    mfxMemId *mem_ids_in;
+-    int nb_mem_ids_in;
+-
+-    mfxMemId *mem_ids_out;
+-    int nb_mem_ids_out;
+-
+-    mfxFrameSurface1 **surface_ptrs_in;
+-    int             nb_surface_ptrs_in;
+-
+-    mfxFrameSurface1 **surface_ptrs_out;
+-    int             nb_surface_ptrs_out;
+-
+-    mfxExtOpaqueSurfaceAlloc opaque_alloc;
+-
+-    mfxExtVPPScaling         scale_conf;
+-    int                      mode;
+-
+-    mfxExtBuffer             *ext_buffers[2];
+-    int                      num_ext_buf;
+-
+-    int shift_width, shift_height;
+-
+-    /**
+-     * New dimensions. Special values are:
+-     *   0 = original width/height
+-     *  -1 = keep original aspect
+-     */
+-    int w, h;
+-
+-    /**
+-     * Output sw format. AV_PIX_FMT_NONE for no conversion.
+-     */
+-    enum AVPixelFormat format;
+-
+-    char *w_expr;               ///< width  expression string
+-    char *h_expr;               ///< height expression string
+-    char *format_str;
+-} QSVScaleContext;
+-
+-static av_cold int qsvscale_init(AVFilterContext *ctx)
+-{
+-    QSVScaleContext *s = ctx->priv;
+-
+-    if (!strcmp(s->format_str, "same")) {
+-        s->format = AV_PIX_FMT_NONE;
+-    } else {
+-        s->format = av_get_pix_fmt(s->format_str);
+-        if (s->format == AV_PIX_FMT_NONE) {
+-            av_log(ctx, AV_LOG_ERROR, "Unrecognized pixel format: %s\n", s->format_str);
+-            return AVERROR(EINVAL);
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-static av_cold void qsvscale_uninit(AVFilterContext *ctx)
+-{
+-    QSVScaleContext *s = ctx->priv;
+-
+-    if (s->session) {
+-        MFXClose(s->session);
+-        s->session = NULL;
+-    }
+-
+-    av_freep(&s->mem_ids_in);
+-    av_freep(&s->mem_ids_out);
+-    s->nb_mem_ids_in  = 0;
+-    s->nb_mem_ids_out = 0;
+-
+-    av_freep(&s->surface_ptrs_in);
+-    av_freep(&s->surface_ptrs_out);
+-    s->nb_surface_ptrs_in  = 0;
+-    s->nb_surface_ptrs_out = 0;
+-}
+-
+-static int init_out_pool(AVFilterContext *ctx,
+-                         int out_width, int out_height)
+-{
+-    QSVScaleContext *s = ctx->priv;
+-    AVFilterLink *outlink = ctx->outputs[0];
+-
+-    AVHWFramesContext *in_frames_ctx;
+-    AVHWFramesContext *out_frames_ctx;
+-    AVQSVFramesContext *in_frames_hwctx;
+-    AVQSVFramesContext *out_frames_hwctx;
+-    enum AVPixelFormat in_format;
+-    enum AVPixelFormat out_format;
+-    int i, ret;
+-
+-    /* check that we have a hw context */
+-    if (!ctx->inputs[0]->hw_frames_ctx) {
+-        av_log(ctx, AV_LOG_ERROR, "No hw context provided on input\n");
+-        return AVERROR(EINVAL);
+-    }
+-    in_frames_ctx   = (AVHWFramesContext*)ctx->inputs[0]->hw_frames_ctx->data;
+-    in_frames_hwctx = in_frames_ctx->hwctx;
+-
+-    in_format     = in_frames_ctx->sw_format;
+-    out_format    = (s->format == AV_PIX_FMT_NONE) ? in_format : s->format;
+-
+-    outlink->hw_frames_ctx = av_hwframe_ctx_alloc(in_frames_ctx->device_ref);
+-    if (!outlink->hw_frames_ctx)
+-        return AVERROR(ENOMEM);
+-    out_frames_ctx   = (AVHWFramesContext*)outlink->hw_frames_ctx->data;
+-    out_frames_hwctx = out_frames_ctx->hwctx;
+-
+-    out_frames_ctx->format            = AV_PIX_FMT_QSV;
+-    out_frames_ctx->width             = FFALIGN(out_width,  16);
+-    out_frames_ctx->height            = FFALIGN(out_height, 16);
+-    out_frames_ctx->sw_format         = out_format;
+-    out_frames_ctx->initial_pool_size = 4;
+-
+-    out_frames_hwctx->frame_type = in_frames_hwctx->frame_type | MFX_MEMTYPE_FROM_VPPOUT;
+-
+-    ret = ff_filter_init_hw_frames(ctx, outlink, 32);
+-    if (ret < 0)
+-        return ret;
+-
+-    ret = av_hwframe_ctx_init(outlink->hw_frames_ctx);
+-    if (ret < 0)
+-        return ret;
+-
+-    for (i = 0; i < out_frames_hwctx->nb_surfaces; i++) {
+-        mfxFrameInfo *info = &out_frames_hwctx->surfaces[i].Info;
+-        info->CropW = out_width;
+-        info->CropH = out_height;
+-    }
+-
+-    return 0;
+-}
+-
+-static mfxStatus frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
+-                             mfxFrameAllocResponse *resp)
+-{
+-    AVFilterContext *ctx = pthis;
+-    QSVScaleContext   *s = ctx->priv;
+-
+-    if (!(req->Type & MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET) ||
+-        !(req->Type & (MFX_MEMTYPE_FROM_VPPIN | MFX_MEMTYPE_FROM_VPPOUT)) ||
+-        !(req->Type & MFX_MEMTYPE_EXTERNAL_FRAME))
+-        return MFX_ERR_UNSUPPORTED;
+-
+-    if (req->Type & MFX_MEMTYPE_FROM_VPPIN) {
+-        resp->mids           = s->mem_ids_in;
+-        resp->NumFrameActual = s->nb_mem_ids_in;
+-    } else {
+-        resp->mids           = s->mem_ids_out;
+-        resp->NumFrameActual = s->nb_mem_ids_out;
+-    }
+-
+-    return MFX_ERR_NONE;
+-}
+-
+-static mfxStatus frame_free(mfxHDL pthis, mfxFrameAllocResponse *resp)
+-{
+-    return MFX_ERR_NONE;
+-}
+-
+-static mfxStatus frame_lock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
+-{
+-    return MFX_ERR_UNSUPPORTED;
+-}
+-
+-static mfxStatus frame_unlock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
+-{
+-    return MFX_ERR_UNSUPPORTED;
+-}
+-
+-static mfxStatus frame_get_hdl(mfxHDL pthis, mfxMemId mid, mfxHDL *hdl)
+-{
+-    mfxHDLPair *pair_dst = (mfxHDLPair*)hdl;
+-    mfxHDLPair *pair_src = (mfxHDLPair*)mid;
+-
+-    pair_dst->first = pair_src->first;
+-
+-    if (pair_src->second != (mfxMemId)MFX_INFINITE)
+-        pair_dst->second = pair_src->second;
+-    return MFX_ERR_NONE;
+-}
+-
+-static int init_out_session(AVFilterContext *ctx)
+-{
+-
+-    QSVScaleContext                   *s = ctx->priv;
+-    AVHWFramesContext     *in_frames_ctx = (AVHWFramesContext*)ctx->inputs[0]->hw_frames_ctx->data;
+-    AVHWFramesContext    *out_frames_ctx = (AVHWFramesContext*)ctx->outputs[0]->hw_frames_ctx->data;
+-    AVQSVFramesContext  *in_frames_hwctx = in_frames_ctx->hwctx;
+-    AVQSVFramesContext *out_frames_hwctx = out_frames_ctx->hwctx;
+-    AVQSVDeviceContext     *device_hwctx = in_frames_ctx->device_ctx->hwctx;
+-
+-    int opaque = !!(in_frames_hwctx->frame_type & MFX_MEMTYPE_OPAQUE_FRAME);
+-
+-    mfxHDL handle = NULL;
+-    mfxHandleType handle_type;
+-    mfxVersion ver;
+-    mfxIMPL impl;
+-    mfxVideoParam par;
+-    mfxStatus err;
+-    int i;
+-
+-    s->num_ext_buf = 0;
+-
+-    /* extract the properties of the "master" session given to us */
+-    err = MFXQueryIMPL(device_hwctx->session, &impl);
+-    if (err == MFX_ERR_NONE)
+-        err = MFXQueryVersion(device_hwctx->session, &ver);
+-    if (err != MFX_ERR_NONE) {
+-        av_log(ctx, AV_LOG_ERROR, "Error querying the session attributes\n");
+-        return AVERROR_UNKNOWN;
+-    }
+-
+-    if (MFX_IMPL_VIA_VAAPI == MFX_IMPL_VIA_MASK(impl)) {
+-        handle_type = MFX_HANDLE_VA_DISPLAY;
+-    } else if (MFX_IMPL_VIA_D3D11 == MFX_IMPL_VIA_MASK(impl)) {
+-        handle_type = MFX_HANDLE_D3D11_DEVICE;
+-    } else if (MFX_IMPL_VIA_D3D9 == MFX_IMPL_VIA_MASK(impl)) {
+-        handle_type = MFX_HANDLE_D3D9_DEVICE_MANAGER;
+-    } else {
+-        av_log(ctx, AV_LOG_ERROR, "Error unsupported handle type\n");
+-        return AVERROR_UNKNOWN;
+-    }
+-
+-    err = MFXVideoCORE_GetHandle(device_hwctx->session, handle_type, &handle);
+-    if (err < 0)
+-        return ff_qsvvpp_print_error(ctx, err, "Error getting the session handle");
+-    else if (err > 0) {
+-        ff_qsvvpp_print_warning(ctx, err, "Warning in getting the session handle");
+-        return AVERROR_UNKNOWN;
+-    }
+-
+-    /* create a "slave" session with those same properties, to be used for
+-     * actual scaling */
+-    err = MFXInit(impl, &ver, &s->session);
+-    if (err != MFX_ERR_NONE) {
+-        av_log(ctx, AV_LOG_ERROR, "Error initializing a session for scaling\n");
+-        return AVERROR_UNKNOWN;
+-    }
+-
+-    if (handle) {
+-        err = MFXVideoCORE_SetHandle(s->session, handle_type, handle);
+-        if (err != MFX_ERR_NONE)
+-            return AVERROR_UNKNOWN;
+-    }
+-
+-    if (QSV_RUNTIME_VERSION_ATLEAST(ver, 1, 25)) {
+-        err = MFXJoinSession(device_hwctx->session, s->session);
+-            if (err != MFX_ERR_NONE)
+-                return AVERROR_UNKNOWN;
+-    }
+-
+-    memset(&par, 0, sizeof(par));
+-
+-    if (opaque) {
+-        s->surface_ptrs_in = av_calloc(in_frames_hwctx->nb_surfaces,
+-                                       sizeof(*s->surface_ptrs_in));
+-        if (!s->surface_ptrs_in)
+-            return AVERROR(ENOMEM);
+-        for (i = 0; i < in_frames_hwctx->nb_surfaces; i++)
+-            s->surface_ptrs_in[i] = in_frames_hwctx->surfaces + i;
+-        s->nb_surface_ptrs_in = in_frames_hwctx->nb_surfaces;
+-
+-        s->surface_ptrs_out = av_calloc(out_frames_hwctx->nb_surfaces,
+-                                        sizeof(*s->surface_ptrs_out));
+-        if (!s->surface_ptrs_out)
+-            return AVERROR(ENOMEM);
+-        for (i = 0; i < out_frames_hwctx->nb_surfaces; i++)
+-            s->surface_ptrs_out[i] = out_frames_hwctx->surfaces + i;
+-        s->nb_surface_ptrs_out = out_frames_hwctx->nb_surfaces;
+-
+-        s->opaque_alloc.In.Surfaces   = s->surface_ptrs_in;
+-        s->opaque_alloc.In.NumSurface = s->nb_surface_ptrs_in;
+-        s->opaque_alloc.In.Type       = in_frames_hwctx->frame_type;
+-
+-        s->opaque_alloc.Out.Surfaces   = s->surface_ptrs_out;
+-        s->opaque_alloc.Out.NumSurface = s->nb_surface_ptrs_out;
+-        s->opaque_alloc.Out.Type       = out_frames_hwctx->frame_type;
+-
+-        s->opaque_alloc.Header.BufferId = MFX_EXTBUFF_OPAQUE_SURFACE_ALLOCATION;
+-        s->opaque_alloc.Header.BufferSz = sizeof(s->opaque_alloc);
+-
+-        s->ext_buffers[s->num_ext_buf++] = (mfxExtBuffer*)&s->opaque_alloc;
+-
+-        par.IOPattern = MFX_IOPATTERN_IN_OPAQUE_MEMORY | MFX_IOPATTERN_OUT_OPAQUE_MEMORY;
+-    } else {
+-        mfxFrameAllocator frame_allocator = {
+-            .pthis  = ctx,
+-            .Alloc  = frame_alloc,
+-            .Lock   = frame_lock,
+-            .Unlock = frame_unlock,
+-            .GetHDL = frame_get_hdl,
+-            .Free   = frame_free,
+-        };
+-
+-        s->mem_ids_in = av_calloc(in_frames_hwctx->nb_surfaces,
+-                                  sizeof(*s->mem_ids_in));
+-        if (!s->mem_ids_in)
+-            return AVERROR(ENOMEM);
+-        for (i = 0; i < in_frames_hwctx->nb_surfaces; i++)
+-            s->mem_ids_in[i] = in_frames_hwctx->surfaces[i].Data.MemId;
+-        s->nb_mem_ids_in = in_frames_hwctx->nb_surfaces;
+-
+-        s->mem_ids_out = av_calloc(out_frames_hwctx->nb_surfaces,
+-                                   sizeof(*s->mem_ids_out));
+-        if (!s->mem_ids_out)
+-            return AVERROR(ENOMEM);
+-        for (i = 0; i < out_frames_hwctx->nb_surfaces; i++)
+-            s->mem_ids_out[i] = out_frames_hwctx->surfaces[i].Data.MemId;
+-        s->nb_mem_ids_out = out_frames_hwctx->nb_surfaces;
+-
+-        err = MFXVideoCORE_SetFrameAllocator(s->session, &frame_allocator);
+-        if (err != MFX_ERR_NONE)
+-            return AVERROR_UNKNOWN;
+-
+-        par.IOPattern = MFX_IOPATTERN_IN_VIDEO_MEMORY | MFX_IOPATTERN_OUT_VIDEO_MEMORY;
+-    }
+-
+-    memset(&s->scale_conf, 0, sizeof(mfxExtVPPScaling));
+-    s->scale_conf.Header.BufferId     = MFX_EXTBUFF_VPP_SCALING;
+-    s->scale_conf.Header.BufferSz     = sizeof(mfxExtVPPScaling);
+-    s->scale_conf.ScalingMode         = s->mode;
+-    s->ext_buffers[s->num_ext_buf++]  = (mfxExtBuffer*)&s->scale_conf;
+-    av_log(ctx, AV_LOG_VERBOSE, "Scaling mode: %d\n", s->mode);
+-
+-    par.ExtParam    = s->ext_buffers;
+-    par.NumExtParam = s->num_ext_buf;
+-
+-    par.AsyncDepth = 1;    // TODO async
+-
+-    par.vpp.In  = in_frames_hwctx->surfaces[0].Info;
+-    par.vpp.Out = out_frames_hwctx->surfaces[0].Info;
+-
+-    /* Apparently VPP requires the frame rate to be set to some value, otherwise
+-     * init will fail (probably for the framerate conversion filter). Since we
+-     * are only doing scaling here, we just invent an arbitrary
+-     * value */
+-    par.vpp.In.FrameRateExtN  = 25;
+-    par.vpp.In.FrameRateExtD  = 1;
+-    par.vpp.Out.FrameRateExtN = 25;
+-    par.vpp.Out.FrameRateExtD = 1;
+-
+-    /* Print input memory mode */
+-    ff_qsvvpp_print_iopattern(ctx, par.IOPattern & 0x0F, "VPP");
+-    /* Print output memory mode */
+-    ff_qsvvpp_print_iopattern(ctx, par.IOPattern & 0xF0, "VPP");
+-    err = MFXVideoVPP_Init(s->session, &par);
+-    if (err < 0)
+-        return ff_qsvvpp_print_error(ctx, err,
+-                                     "Error opening the VPP for scaling");
+-    else if (err > 0) {
+-        ff_qsvvpp_print_warning(ctx, err,
+-                                "Warning in VPP initialization");
+-        return AVERROR_UNKNOWN;
+-    }
+-
+-    return 0;
+-}
+-
+-static int init_scale_session(AVFilterContext *ctx, int in_width, int in_height,
+-                              int out_width, int out_height)
+-{
+-    int ret;
+-
+-    qsvscale_uninit(ctx);
+-
+-    ret = init_out_pool(ctx, out_width, out_height);
+-    if (ret < 0)
+-        return ret;
+-
+-    ret = init_out_session(ctx);
+-    if (ret < 0)
+-        return ret;
+-
+-    return 0;
+-}
+-
+-static int qsvscale_config_props(AVFilterLink *outlink)
+-{
+-    AVFilterContext *ctx = outlink->src;
+-    AVFilterLink *inlink = outlink->src->inputs[0];
+-    QSVScaleContext  *s = ctx->priv;
+-    int64_t w, h;
+-    double var_values[VARS_NB], res;
+-    char *expr;
+-    int ret;
+-
+-    var_values[VAR_PI]    = M_PI;
+-    var_values[VAR_PHI]   = M_PHI;
+-    var_values[VAR_E]     = M_E;
+-    var_values[VAR_IN_W]  = var_values[VAR_IW] = inlink->w;
+-    var_values[VAR_IN_H]  = var_values[VAR_IH] = inlink->h;
+-    var_values[VAR_OUT_W] = var_values[VAR_OW] = NAN;
+-    var_values[VAR_OUT_H] = var_values[VAR_OH] = NAN;
+-    var_values[VAR_A]     = (double) inlink->w / inlink->h;
+-    var_values[VAR_SAR]   = inlink->sample_aspect_ratio.num ?
+-        (double) inlink->sample_aspect_ratio.num / inlink->sample_aspect_ratio.den : 1;
+-    var_values[VAR_DAR]   = var_values[VAR_A] * var_values[VAR_SAR];
+-
+-    /* evaluate width and height */
+-    av_expr_parse_and_eval(&res, (expr = s->w_expr),
+-                           var_names, var_values,
+-                           NULL, NULL, NULL, NULL, NULL, 0, ctx);
+-    s->w = var_values[VAR_OUT_W] = var_values[VAR_OW] = res;
+-    if ((ret = av_expr_parse_and_eval(&res, (expr = s->h_expr),
+-                                      var_names, var_values,
+-                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+-        goto fail;
+-    s->h = var_values[VAR_OUT_H] = var_values[VAR_OH] = res;
+-    /* evaluate again the width, as it may depend on the output height */
+-    if ((ret = av_expr_parse_and_eval(&res, (expr = s->w_expr),
+-                                      var_names, var_values,
+-                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+-        goto fail;
+-    s->w = res;
+-
+-    w = s->w;
+-    h = s->h;
+-
+-    /* sanity check params */
+-    if (w <  -1 || h <  -1) {
+-        av_log(ctx, AV_LOG_ERROR, "Size values less than -1 are not acceptable.\n");
+-        return AVERROR(EINVAL);
+-    }
+-    if (w == -1 && h == -1)
+-        s->w = s->h = 0;
+-
+-    if (!(w = s->w))
+-        w = inlink->w;
+-    if (!(h = s->h))
+-        h = inlink->h;
+-    if (w == -1)
+-        w = av_rescale(h, inlink->w, inlink->h);
+-    if (h == -1)
+-        h = av_rescale(w, inlink->h, inlink->w);
+-
+-    if (w > INT_MAX || h > INT_MAX ||
+-        (h * inlink->w) > INT_MAX  ||
+-        (w * inlink->h) > INT_MAX)
+-        av_log(ctx, AV_LOG_ERROR, "Rescaled value for width or height is too big.\n");
+-
+-    outlink->w = w;
+-    outlink->h = h;
+-
+-    ret = init_scale_session(ctx, inlink->w, inlink->h, w, h);
+-    if (ret < 0)
+-        return ret;
+-
+-    av_log(ctx, AV_LOG_VERBOSE, "w:%d h:%d -> w:%d h:%d\n",
+-           inlink->w, inlink->h, outlink->w, outlink->h);
+-
+-    if (inlink->sample_aspect_ratio.num)
+-        outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h*inlink->w,
+-                                                             outlink->w*inlink->h},
+-                                                inlink->sample_aspect_ratio);
+-    else
+-        outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
+-
+-    return 0;
+-
+-fail:
+-    av_log(ctx, AV_LOG_ERROR,
+-           "Error when evaluating the expression '%s'\n", expr);
+-    return ret;
+-}
+-
+-static int qsvscale_filter_frame(AVFilterLink *link, AVFrame *in)
+-{
+-    AVFilterContext             *ctx = link->dst;
+-    QSVScaleContext               *s = ctx->priv;
+-    AVFilterLink            *outlink = ctx->outputs[0];
+-
+-    mfxSyncPoint sync = NULL;
+-    mfxStatus err;
+-
+-    AVFrame *out = NULL;
+-    int ret = 0;
+-
+-    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+-    if (!out) {
+-        ret = AVERROR(ENOMEM);
+-        goto fail;
+-    }
+-
+-    do {
+-        err = MFXVideoVPP_RunFrameVPPAsync(s->session,
+-                                           (mfxFrameSurface1*)in->data[3],
+-                                           (mfxFrameSurface1*)out->data[3],
+-                                           NULL, &sync);
+-        if (err == MFX_WRN_DEVICE_BUSY)
+-            av_usleep(1);
+-    } while (err == MFX_WRN_DEVICE_BUSY);
+-
+-    if (err < 0) {
+-        ret = ff_qsvvpp_print_error(ctx, err, "Error during scaling");
+-        goto fail;
+-    }
+-
+-    if (!sync) {
+-        av_log(ctx, AV_LOG_ERROR, "No sync during scaling\n");
+-        ret = AVERROR_UNKNOWN;
+-        goto fail;
+-    }
+-
+-    do {
+-        err = MFXVideoCORE_SyncOperation(s->session, sync, 1000);
+-    } while (err == MFX_WRN_IN_EXECUTION);
+-    if (err < 0) {
+-        ret = ff_qsvvpp_print_error(ctx, err, "Error synchronizing the operation");
+-        goto fail;
+-    }
+-
+-    ret = av_frame_copy_props(out, in);
+-    if (ret < 0)
+-        goto fail;
+-
+-    out->width  = outlink->w;
+-    out->height = outlink->h;
+-
+-    av_reduce(&out->sample_aspect_ratio.num, &out->sample_aspect_ratio.den,
+-              (int64_t)in->sample_aspect_ratio.num * outlink->h * link->w,
+-              (int64_t)in->sample_aspect_ratio.den * outlink->w * link->h,
+-              INT_MAX);
+-
+-    av_frame_free(&in);
+-    return ff_filter_frame(outlink, out);
+-fail:
+-    av_frame_free(&in);
+-    av_frame_free(&out);
+-    return ret;
+-}
+-
+-#define OFFSET(x) offsetof(QSVScaleContext, x)
+-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+-static const AVOption options[] = {
+-    { "w",      "Output video width",  OFFSET(w_expr),     AV_OPT_TYPE_STRING, { .str = "iw"   }, .flags = FLAGS },
+-    { "h",      "Output video height", OFFSET(h_expr),     AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
+-    { "format", "Output pixel format", OFFSET(format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
+-
+-    { "mode",      "set scaling mode",    OFFSET(mode),    AV_OPT_TYPE_INT,    { .i64 = MFX_SCALING_MODE_DEFAULT}, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, FLAGS, "mode"},
+-    { "low_power", "low power mode",        0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "mode"},
+-    { "hq",        "high quality mode",     0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "mode"},
+-
+-    { NULL },
+-};
+-
+-static const AVClass qsvscale_class = {
+-    .class_name = "scale_qsv",
+-    .item_name  = av_default_item_name,
+-    .option     = options,
+-    .version    = LIBAVUTIL_VERSION_INT,
+-};
+-
+-static const AVFilterPad qsvscale_inputs[] = {
+-    {
+-        .name         = "default",
+-        .type         = AVMEDIA_TYPE_VIDEO,
+-        .filter_frame = qsvscale_filter_frame,
+-    },
+-};
+-
+-static const AVFilterPad qsvscale_outputs[] = {
+-    {
+-        .name         = "default",
+-        .type         = AVMEDIA_TYPE_VIDEO,
+-        .config_props = qsvscale_config_props,
+-    },
+-};
+-
+-const AVFilter ff_vf_scale_qsv = {
+-    .name      = "scale_qsv",
+-    .description = NULL_IF_CONFIG_SMALL("QuickSync video scaling and format conversion"),
+-
+-    .init          = qsvscale_init,
+-    .uninit        = qsvscale_uninit,
+-
+-    .priv_size = sizeof(QSVScaleContext),
+-    .priv_class = &qsvscale_class,
+-
+-    FILTER_INPUTS(qsvscale_inputs),
+-    FILTER_OUTPUTS(qsvscale_outputs),
+-
+-    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_QSV),
+-
+-    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
+-};
+Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
+===================================================================
+--- libavfilter/vf_vpp_qsv.c
++++ libavfilter/vf_vpp_qsv.c
+@@ -45,9 +45,7 @@
+ #define ENH_FILTERS_COUNT (8)
+ 
+ typedef struct VPPContext{
+-    const AVClass *class;
+-
+-    QSVVPPContext *qsv;
++    QSVVPPContext qsv;
+ 
+     /* Video Enhancement Algorithms */
+     mfxExtVPPDeinterlacing  deinterlace_conf;
+@@ -59,6 +57,11 @@ typedef struct VPPContext{
+     mfxExtVPPMirroring mirroring_conf;
+     mfxExtVPPScaling scale_conf;
+ 
++    /**
++     * New dimensions. Special values are:
++     *   0 = original width/height
++     *  -1 = keep original aspect
++     */
+     int out_width;
+     int out_height;
+     /**
+@@ -85,7 +88,7 @@ typedef struct VPPContext{
+     int scale_mode;             /* scale mode : 0 = auto, 1 = low power, 2 = high quality */
+ 
+     /* param for the procamp */
+-    int    procamp;            /* enable procamp */
++    int    procamp;             /* enable procamp */
+     float  hue;
+     float  saturation;
+     float  contrast;
+@@ -95,48 +98,10 @@ typedef struct VPPContext{
+     char *ow, *oh;
+     char *output_format_str;
+ 
+-    int async_depth;
+-    int eof;
++    int has_passthrough;        /* apply pass through mode if possible */
++    int field_rate;             /* deinterlace mode */
+ } VPPContext;
+ 
+-static const AVOption options[] = {
+-    { "deinterlace", "deinterlace mode: 0=off, 1=bob, 2=advanced", OFFSET(deinterlace), AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, MFX_DEINTERLACING_ADVANCED, .flags = FLAGS, "deinterlace" },
+-    { "bob",         "Bob deinterlace mode.",                      0,                   AV_OPT_TYPE_CONST,    { .i64 = MFX_DEINTERLACING_BOB },            .flags = FLAGS, "deinterlace" },
+-    { "advanced",    "Advanced deinterlace mode. ",                0,                   AV_OPT_TYPE_CONST,    { .i64 = MFX_DEINTERLACING_ADVANCED },       .flags = FLAGS, "deinterlace" },
+-
+-    { "denoise",     "denoise level [0, 100]",       OFFSET(denoise),     AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, 100, .flags = FLAGS },
+-    { "detail",      "enhancement level [0, 100]",   OFFSET(detail),      AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, 100, .flags = FLAGS },
+-    { "framerate",   "output framerate",             OFFSET(framerate),   AV_OPT_TYPE_RATIONAL, { .dbl = 0.0 },0, DBL_MAX, .flags = FLAGS },
+-    { "procamp",     "Enable ProcAmp",               OFFSET(procamp),     AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, 1, .flags = FLAGS},
+-    { "hue",         "ProcAmp hue",                  OFFSET(hue),         AV_OPT_TYPE_FLOAT,    { .dbl = 0.0 }, -180.0, 180.0, .flags = FLAGS},
+-    { "saturation",  "ProcAmp saturation",           OFFSET(saturation),  AV_OPT_TYPE_FLOAT,    { .dbl = 1.0 }, 0.0, 10.0, .flags = FLAGS},
+-    { "contrast",    "ProcAmp contrast",             OFFSET(contrast),    AV_OPT_TYPE_FLOAT,    { .dbl = 1.0 }, 0.0, 10.0, .flags = FLAGS},
+-    { "brightness",  "ProcAmp brightness",           OFFSET(brightness),  AV_OPT_TYPE_FLOAT,    { .dbl = 0.0 }, -100.0, 100.0, .flags = FLAGS},
+-
+-    { "transpose",  "set transpose direction",       OFFSET(transpose),   AV_OPT_TYPE_INT,      { .i64 = -1 }, -1, 6, FLAGS, "transpose"},
+-        { "cclock_hflip",  "rotate counter-clockwise with horizontal flip",  0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CCLOCK_FLIP }, .flags=FLAGS, .unit = "transpose" },
+-        { "clock",         "rotate clockwise",                               0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CLOCK       }, .flags=FLAGS, .unit = "transpose" },
+-        { "cclock",        "rotate counter-clockwise",                       0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CCLOCK      }, .flags=FLAGS, .unit = "transpose" },
+-        { "clock_hflip",   "rotate clockwise with horizontal flip",          0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CLOCK_FLIP  }, .flags=FLAGS, .unit = "transpose" },
+-        { "reversal",      "rotate by half-turn",                            0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_REVERSAL    }, .flags=FLAGS, .unit = "transpose" },
+-        { "hflip",         "flip horizontally",                              0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_HFLIP       }, .flags=FLAGS, .unit = "transpose" },
+-        { "vflip",         "flip vertically",                                0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_VFLIP       }, .flags=FLAGS, .unit = "transpose" },
+-
+-    { "cw",   "set the width crop area expression",   OFFSET(cw), AV_OPT_TYPE_STRING, { .str = "iw" }, 0, 0, FLAGS },
+-    { "ch",   "set the height crop area expression",  OFFSET(ch), AV_OPT_TYPE_STRING, { .str = "ih" }, 0, 0, FLAGS },
+-    { "cx",   "set the x crop area expression",       OFFSET(cx), AV_OPT_TYPE_STRING, { .str = "(in_w-out_w)/2" }, 0, 0, FLAGS },
+-    { "cy",   "set the y crop area expression",       OFFSET(cy), AV_OPT_TYPE_STRING, { .str = "(in_h-out_h)/2" }, 0, 0, FLAGS },
+-
+-    { "w",      "Output video width",  OFFSET(ow), AV_OPT_TYPE_STRING, { .str="cw" }, 0, 255, .flags = FLAGS },
+-    { "width",  "Output video width",  OFFSET(ow), AV_OPT_TYPE_STRING, { .str="cw" }, 0, 255, .flags = FLAGS },
+-    { "h",      "Output video height", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
+-    { "height", "Output video height", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
+-    { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
+-    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(async_depth), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, .flags = FLAGS },
+-    { "scale_mode", "scale mode: 0=auto, 1=low power, 2=high quality", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = MFX_SCALING_MODE_DEFAULT }, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, .flags = FLAGS, "scale mode" },
+-    { NULL }
+-};
+-
+ static const char *const var_names[] = {
+     "iw", "in_w",
+     "ih", "in_h",
+@@ -146,32 +111,41 @@ static const char *const var_names[] = {
+     "ch",
+     "cx",
+     "cy",
++    "a", "dar",
++    "sar",
+     NULL
+ };
+ 
+ enum var_name {
+-    VAR_iW, VAR_IN_W,
+-    VAR_iH, VAR_IN_H,
+-    VAR_oW, VAR_OUT_W, VAR_W,
+-    VAR_oH, VAR_OUT_H, VAR_H,
+-    CW,
+-    CH,
+-    CX,
+-    CY,
++    VAR_IW, VAR_IN_W,
++    VAR_IH, VAR_IN_H,
++    VAR_OW, VAR_OUT_W, VAR_W,
++    VAR_OH, VAR_OUT_H, VAR_H,
++    VAR_CW,
++    VAR_CH,
++    VAR_CX,
++    VAR_CY,
++    VAR_A, VAR_DAR,
++    VAR_SAR,
+     VAR_VARS_NB
+ };
+ 
+ static int eval_expr(AVFilterContext *ctx)
+ {
+ #define PASS_EXPR(e, s) {\
+-    ret = av_expr_parse(&e, s, var_names, NULL, NULL, NULL, NULL, 0, ctx); \
+-    if (ret < 0) {\
+-        av_log(ctx, AV_LOG_ERROR, "Error when passing '%s'.\n", s);\
+-        goto release;\
++    if (s) {\
++        ret = av_expr_parse(&e, s, var_names, NULL, NULL, NULL, NULL, 0, ctx); \
++        if (ret < 0) {                                                  \
++            av_log(ctx, AV_LOG_ERROR, "Error when passing '%s'.\n", s); \
++            goto release;                                               \
++        }                                                               \
+     }\
+ }
+-#define CALC_EXPR(e, v, i) {\
+-    i = v = av_expr_eval(e, var_values, NULL); \
++#define CALC_EXPR(e, v, i, d) {\
++    if (e)\
++        i = v = av_expr_eval(e, var_values, NULL);      \
++    else\
++        i = v = d;\
+ }
+     VPPContext *vpp = ctx->priv;
+     double  var_values[VAR_VARS_NB] = { NAN };
+@@ -189,39 +163,43 @@ static int eval_expr(AVFilterContext *ct
+     PASS_EXPR(cx_expr, vpp->cx);
+     PASS_EXPR(cy_expr, vpp->cy);
+ 
+-    var_values[VAR_iW] =
++    var_values[VAR_IW] =
+     var_values[VAR_IN_W] = ctx->inputs[0]->w;
+ 
+-    var_values[VAR_iH] =
++    var_values[VAR_IH] =
+     var_values[VAR_IN_H] = ctx->inputs[0]->h;
+ 
++    var_values[VAR_A] = (double)var_values[VAR_IN_W] / var_values[VAR_IN_H];
++    var_values[VAR_SAR] = ctx->inputs[0]->sample_aspect_ratio.num ?
++        (double)ctx->inputs[0]->sample_aspect_ratio.num / ctx->inputs[0]->sample_aspect_ratio.den : 1;
++    var_values[VAR_DAR] = var_values[VAR_A] * var_values[VAR_SAR];
++
+     /* crop params */
+-    CALC_EXPR(cw_expr, var_values[CW], vpp->crop_w);
+-    CALC_EXPR(ch_expr, var_values[CH], vpp->crop_h);
++    CALC_EXPR(cw_expr, var_values[VAR_CW], vpp->crop_w, var_values[VAR_IW]);
++    CALC_EXPR(ch_expr, var_values[VAR_CH], vpp->crop_h, var_values[VAR_IH]);
+ 
+     /* calc again in case cw is relative to ch */
+-    CALC_EXPR(cw_expr, var_values[CW], vpp->crop_w);
++    CALC_EXPR(cw_expr, var_values[VAR_CW], vpp->crop_w, var_values[VAR_IW]);
+ 
+     CALC_EXPR(w_expr,
+-            var_values[VAR_OUT_W] = var_values[VAR_oW] = var_values[VAR_W],
+-            vpp->out_width);
++            var_values[VAR_OUT_W] = var_values[VAR_OW] = var_values[VAR_W],
++            vpp->out_width, var_values[VAR_CW]);
+     CALC_EXPR(h_expr,
+-            var_values[VAR_OUT_H] = var_values[VAR_oH] = var_values[VAR_H],
+-            vpp->out_height);
++            var_values[VAR_OUT_H] = var_values[VAR_OH] = var_values[VAR_H],
++            vpp->out_height, var_values[VAR_CH]);
+ 
+     /* calc again in case ow is relative to oh */
+     CALC_EXPR(w_expr,
+-            var_values[VAR_OUT_W] = var_values[VAR_oW] = var_values[VAR_W],
+-            vpp->out_width);
+-
++            var_values[VAR_OUT_W] = var_values[VAR_OW] = var_values[VAR_W],
++            vpp->out_width, var_values[VAR_CW]);
+ 
+-    CALC_EXPR(cx_expr, var_values[CX], vpp->crop_x);
+-    CALC_EXPR(cy_expr, var_values[CY], vpp->crop_y);
++    CALC_EXPR(cx_expr, var_values[VAR_CX], vpp->crop_x, (var_values[VAR_IW] - var_values[VAR_OW]) / 2);
++    CALC_EXPR(cy_expr, var_values[VAR_CY], vpp->crop_y, (var_values[VAR_IH] - var_values[VAR_OH]) / 2);
+ 
+     /* calc again in case cx is relative to cy */
+-    CALC_EXPR(cx_expr, var_values[CX], vpp->crop_x);
++    CALC_EXPR(cx_expr, var_values[VAR_CX], vpp->crop_x, (var_values[VAR_IW] - var_values[VAR_OW]) / 2);
+ 
+-    if ((vpp->crop_w != var_values[VAR_iW]) || (vpp->crop_h != var_values[VAR_iH]))
++    if ((vpp->crop_w != var_values[VAR_IW]) || (vpp->crop_h != var_values[VAR_IH]))
+         vpp->use_crop = 1;
+ 
+ release:
+@@ -237,11 +215,25 @@ release:
+     return ret;
+ }
+ 
++static av_cold int vpp_preinit(AVFilterContext *ctx)
++{
++    VPPContext  *vpp  = ctx->priv;
++    /* For AV_OPT_TYPE_STRING options, NULL is handled in other way so
++     * we needn't set default value here
++     */
++    vpp->saturation = 1.0;
++    vpp->contrast = 1.0;
++    vpp->transpose = -1;
++    vpp->field_rate = 1;
++
++    return 0;
++}
++
+ static av_cold int vpp_init(AVFilterContext *ctx)
+ {
+     VPPContext  *vpp  = ctx->priv;
+ 
+-    if (!strcmp(vpp->output_format_str, "same")) {
++    if (!vpp->output_format_str || !strcmp(vpp->output_format_str, "same")) {
+         vpp->out_format = AV_PIX_FMT_NONE;
+     } else {
+         vpp->out_format = av_get_pix_fmt(vpp->output_format_str);
+@@ -259,11 +251,15 @@ static int config_input(AVFilterLink *in
+     AVFilterContext *ctx = inlink->dst;
+     VPPContext      *vpp = ctx->priv;
+     int              ret;
++    int64_t          ow, oh;
+ 
+     if (vpp->framerate.den == 0 || vpp->framerate.num == 0)
+         vpp->framerate = inlink->frame_rate;
+ 
+-    if (av_cmp_q(vpp->framerate, inlink->frame_rate))
++    if (vpp->field_rate == 2)
++        vpp->framerate = av_mul_q(inlink->frame_rate,
++                                  (AVRational){ 2, 1 });
++    else if (av_cmp_q(vpp->framerate, inlink->frame_rate))
+         vpp->use_frc = 1;
+ 
+     ret = eval_expr(ctx);
+@@ -272,11 +268,38 @@ static int config_input(AVFilterLink *in
+         return ret;
+     }
+ 
+-    if (vpp->out_height == 0 || vpp->out_width == 0) {
+-        vpp->out_width  = inlink->w;
+-        vpp->out_height = inlink->h;
++    ow = vpp->out_width;
++    oh = vpp->out_height;
++
++    /* sanity check params */
++    if (ow <  -1 || oh <  -1) {
++        av_log(ctx, AV_LOG_ERROR, "Size values less than -1 are not acceptable.\n");
++        return AVERROR(EINVAL);
+     }
+ 
++    if (ow == -1 && oh == -1)
++        vpp->out_width = vpp->out_height = 0;
++
++    if (!(ow = vpp->out_width))
++        ow = inlink->w;
++
++    if (!(oh = vpp->out_height))
++        oh = inlink->h;
++
++    if (ow == -1)
++        ow = av_rescale(oh, inlink->w, inlink->h);
++
++    if (oh == -1)
++        oh = av_rescale(ow, inlink->h, inlink->w);
++
++    if (ow > INT_MAX || oh > INT_MAX ||
++        (oh * inlink->w) > INT_MAX  ||
++        (ow * inlink->h) > INT_MAX)
++        av_log(ctx, AV_LOG_ERROR, "Rescaled value for width or height is too big.\n");
++
++    vpp->out_width = ow;
++    vpp->out_height = oh;
++
+     if (vpp->use_crop) {
+         vpp->crop_x = FFMAX(vpp->crop_x, 0);
+         vpp->crop_y = FFMAX(vpp->crop_y, 0);
+@@ -316,6 +339,30 @@ static mfxStatus get_mfx_version(const A
+     return MFXQueryVersion(device_hwctx->session, mfx_version);
+ }
+ 
++static mfxStatus get_mfx_platform(const AVFilterContext *ctx, mfxPlatform *mfx_platform)
++{
++    const AVFilterLink *inlink = ctx->inputs[0];
++    AVBufferRef *device_ref;
++    AVHWDeviceContext *device_ctx;
++    AVQSVDeviceContext *device_hwctx;
++
++    if (inlink->hw_frames_ctx) {
++        AVHWFramesContext *frames_ctx = (AVHWFramesContext *)inlink->hw_frames_ctx->data;
++        device_ref = frames_ctx->device_ref;
++    } else if (ctx->hw_device_ctx) {
++        device_ref = ctx->hw_device_ctx;
++    } else {
++        mfx_platform->CodeName = 0;
++        mfx_platform->DeviceId = 0;
++        return MFX_ERR_NONE;
++    }
++
++    device_ctx   = (AVHWDeviceContext *)device_ref->data;
++    device_hwctx = device_ctx->hwctx;
++
++    return MFXVideoCORE_QueryPlatform(device_hwctx->session, mfx_platform);
++}
++
+ static int config_output(AVFilterLink *outlink)
+ {
+     AVFilterContext *ctx = outlink->src;
+@@ -335,7 +382,6 @@ static int config_output(AVFilterLink *o
+     param.filter_frame  = NULL;
+     param.num_ext_buf   = 0;
+     param.ext_buf       = ext_buf;
+-    param.async_depth   = vpp->async_depth;
+ 
+     if (get_mfx_version(ctx, &mfx_version) != MFX_ERR_NONE) {
+         av_log(ctx, AV_LOG_ERROR, "Failed to query mfx version.\n");
+@@ -365,53 +411,46 @@ static int config_output(AVFilterLink *o
+         param.crop     = &crop;
+     }
+ 
+-    if (vpp->deinterlace) {
+-        memset(&vpp->deinterlace_conf, 0, sizeof(mfxExtVPPDeinterlacing));
+-        vpp->deinterlace_conf.Header.BufferId = MFX_EXTBUFF_VPP_DEINTERLACING;
+-        vpp->deinterlace_conf.Header.BufferSz = sizeof(mfxExtVPPDeinterlacing);
+-        vpp->deinterlace_conf.Mode = vpp->deinterlace == 1 ?
+-                                     MFX_DEINTERLACING_BOB : MFX_DEINTERLACING_ADVANCED;
++#define INIT_MFX_EXTBUF(extbuf, id) do { \
++        memset(&vpp->extbuf, 0, sizeof(vpp->extbuf)); \
++        vpp->extbuf.Header.BufferId = id; \
++        vpp->extbuf.Header.BufferSz = sizeof(vpp->extbuf); \
++        param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->extbuf; \
++    } while (0)
++
++#define SET_MFX_PARAM_FIELD(extbuf, field, value) do { \
++        vpp->extbuf.field = value; \
++    } while (0)
+ 
+-        param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->deinterlace_conf;
++    vpp->qsv.deinterlace_enabled = !!vpp->deinterlace;
++
++    if (vpp->deinterlace) {
++        INIT_MFX_EXTBUF(deinterlace_conf, MFX_EXTBUFF_VPP_DEINTERLACING);
++        SET_MFX_PARAM_FIELD(deinterlace_conf, Mode, (vpp->deinterlace == 1 ?
++                            MFX_DEINTERLACING_BOB : MFX_DEINTERLACING_ADVANCED));
+     }
+ 
+     if (vpp->use_frc) {
+-        memset(&vpp->frc_conf, 0, sizeof(mfxExtVPPFrameRateConversion));
+-        vpp->frc_conf.Header.BufferId = MFX_EXTBUFF_VPP_FRAME_RATE_CONVERSION;
+-        vpp->frc_conf.Header.BufferSz = sizeof(mfxExtVPPFrameRateConversion);
+-        vpp->frc_conf.Algorithm = MFX_FRCALGM_DISTRIBUTED_TIMESTAMP;
+-
+-        param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->frc_conf;
++        INIT_MFX_EXTBUF(frc_conf, MFX_EXTBUFF_VPP_FRAME_RATE_CONVERSION);
++        SET_MFX_PARAM_FIELD(frc_conf, Algorithm, MFX_FRCALGM_DISTRIBUTED_TIMESTAMP);
+     }
+ 
+     if (vpp->denoise) {
+-        memset(&vpp->denoise_conf, 0, sizeof(mfxExtVPPDenoise));
+-        vpp->denoise_conf.Header.BufferId = MFX_EXTBUFF_VPP_DENOISE;
+-        vpp->denoise_conf.Header.BufferSz = sizeof(mfxExtVPPDenoise);
+-        vpp->denoise_conf.DenoiseFactor   = vpp->denoise;
+-
+-        param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->denoise_conf;
++        INIT_MFX_EXTBUF(denoise_conf, MFX_EXTBUFF_VPP_DENOISE);
++        SET_MFX_PARAM_FIELD(denoise_conf, DenoiseFactor, vpp->denoise);
+     }
+ 
+     if (vpp->detail) {
+-        memset(&vpp->detail_conf, 0, sizeof(mfxExtVPPDetail));
+-        vpp->detail_conf.Header.BufferId  = MFX_EXTBUFF_VPP_DETAIL;
+-        vpp->detail_conf.Header.BufferSz  = sizeof(mfxExtVPPDetail);
+-        vpp->detail_conf.DetailFactor = vpp->detail;
+-
+-        param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->detail_conf;
++        INIT_MFX_EXTBUF(detail_conf, MFX_EXTBUFF_VPP_DETAIL);
++        SET_MFX_PARAM_FIELD(detail_conf, DetailFactor, vpp->detail);
+     }
+ 
+     if (vpp->procamp) {
+-        memset(&vpp->procamp_conf, 0, sizeof(mfxExtVPPProcAmp));
+-        vpp->procamp_conf.Header.BufferId  = MFX_EXTBUFF_VPP_PROCAMP;
+-        vpp->procamp_conf.Header.BufferSz  = sizeof(mfxExtVPPProcAmp);
+-        vpp->procamp_conf.Hue              = vpp->hue;
+-        vpp->procamp_conf.Saturation       = vpp->saturation;
+-        vpp->procamp_conf.Contrast         = vpp->contrast;
+-        vpp->procamp_conf.Brightness       = vpp->brightness;
+-
+-        param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->procamp_conf;
++        INIT_MFX_EXTBUF(procamp_conf, MFX_EXTBUFF_VPP_PROCAMP);
++        SET_MFX_PARAM_FIELD(procamp_conf, Hue, vpp->hue);
++        SET_MFX_PARAM_FIELD(procamp_conf, Saturation, vpp->saturation);
++        SET_MFX_PARAM_FIELD(procamp_conf, Contrast, vpp->contrast);
++        SET_MFX_PARAM_FIELD(procamp_conf, Brightness, vpp->brightness);
+     }
+ 
+     if (vpp->transpose >= 0) {
+@@ -458,18 +497,14 @@ static int config_output(AVFilterLink *o
+ 
+     if (vpp->rotate) {
+         if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 17)) {
+-            memset(&vpp->rotation_conf, 0, sizeof(mfxExtVPPRotation));
+-            vpp->rotation_conf.Header.BufferId  = MFX_EXTBUFF_VPP_ROTATION;
+-            vpp->rotation_conf.Header.BufferSz  = sizeof(mfxExtVPPRotation);
+-            vpp->rotation_conf.Angle = vpp->rotate;
++            INIT_MFX_EXTBUF(rotation_conf, MFX_EXTBUFF_VPP_ROTATION);
++            SET_MFX_PARAM_FIELD(rotation_conf, Angle, vpp->rotate);
+ 
+             if (MFX_ANGLE_90 == vpp->rotate || MFX_ANGLE_270 == vpp->rotate) {
+                 FFSWAP(int, vpp->out_width, vpp->out_height);
+                 FFSWAP(int, outlink->w, outlink->h);
+                 av_log(ctx, AV_LOG_DEBUG, "Swap width and height for clock/cclock rotation.\n");
+             }
+-
+-            param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->rotation_conf;
+         } else {
+             av_log(ctx, AV_LOG_WARNING, "The QSV VPP rotate option is "
+                    "not supported with this MSDK version.\n");
+@@ -479,12 +514,8 @@ static int config_output(AVFilterLink *o
+ 
+     if (vpp->hflip) {
+         if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
+-            memset(&vpp->mirroring_conf, 0, sizeof(mfxExtVPPMirroring));
+-            vpp->mirroring_conf.Header.BufferId = MFX_EXTBUFF_VPP_MIRRORING;
+-            vpp->mirroring_conf.Header.BufferSz = sizeof(mfxExtVPPMirroring);
+-            vpp->mirroring_conf.Type = vpp->hflip;
+-
+-            param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->mirroring_conf;
++            INIT_MFX_EXTBUF(mirroring_conf, MFX_EXTBUFF_VPP_MIRRORING);
++            SET_MFX_PARAM_FIELD(mirroring_conf, Type, vpp->hflip);
+         } else {
+             av_log(ctx, AV_LOG_WARNING, "The QSV VPP hflip option is "
+                    "not supported with this MSDK version.\n");
+@@ -494,22 +525,38 @@ static int config_output(AVFilterLink *o
+ 
+     if (inlink->w != outlink->w || inlink->h != outlink->h) {
+         if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
+-            memset(&vpp->scale_conf, 0, sizeof(mfxExtVPPScaling));
+-            vpp->scale_conf.Header.BufferId    = MFX_EXTBUFF_VPP_SCALING;
+-            vpp->scale_conf.Header.BufferSz    = sizeof(mfxExtVPPScaling);
+-            vpp->scale_conf.ScalingMode        = vpp->scale_mode;
++            mfxPlatform mfx_platform;
++            int compute = 0;
++            int mode = vpp->scale_mode;
++            int vpl = QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 255);
++
++            if (vpl && get_mfx_platform(ctx, &mfx_platform) == MFX_ERR_NONE) {
++                int code_name = mfx_platform.CodeName;
++                compute = code_name >= 45 && code_name != 55 && code_name != 50;
++            }
++
++            if (mode == -1)
++                mode = (vpl && compute) ? 1001 : MFX_SCALING_MODE_DEFAULT;
++            else if (mode > 2)
++                mode = vpl ? (1000 + mode - 2) : MFX_SCALING_MODE_DEFAULT;
+ 
+-            param.ext_buf[param.num_ext_buf++] = (mfxExtBuffer*)&vpp->scale_conf;
++            INIT_MFX_EXTBUF(scale_conf, MFX_EXTBUFF_VPP_SCALING);
++            SET_MFX_PARAM_FIELD(scale_conf, ScalingMode, mode);
+         } else
+             av_log(ctx, AV_LOG_WARNING, "The QSV VPP Scale option is "
+                 "not supported with this MSDK version.\n");
+     }
+ 
++#undef INIT_MFX_EXTBUF
++#undef SET_MFX_PARAM_FIELD
++
+     if (vpp->use_frc || vpp->use_crop || vpp->deinterlace || vpp->denoise ||
+         vpp->detail || vpp->procamp || vpp->rotate || vpp->hflip ||
+-        inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format)
+-        return ff_qsvvpp_create(ctx, &vpp->qsv, &param);
++        inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format ||
++        !vpp->has_passthrough)
++        return ff_qsvvpp_init(ctx, &param);
+     else {
++        /* No MFX session is created in this case */
+         av_log(ctx, AV_LOG_VERBOSE, "qsv vpp pass through mode.\n");
+         if (inlink->hw_frames_ctx)
+             outlink->hw_frames_ctx = av_buffer_ref(inlink->hw_frames_ctx);
+@@ -522,29 +569,27 @@ static int activate(AVFilterContext *ctx
+ {
+     AVFilterLink *inlink = ctx->inputs[0];
+     AVFilterLink *outlink = ctx->outputs[0];
+-    VPPContext *s =ctx->priv;
+-    QSVVPPContext *qsv = s->qsv;
++    QSVVPPContext *qsv = ctx->priv;
+     AVFrame *in = NULL;
+     int ret, status = 0;
+     int64_t pts = AV_NOPTS_VALUE;
+ 
+     FF_FILTER_FORWARD_STATUS_BACK(outlink, inlink);
+ 
+-    if (!s->eof) {
++    if (!qsv->eof) {
+         ret = ff_inlink_consume_frame(inlink, &in);
+         if (ret < 0)
+             return ret;
+ 
+         if (ff_inlink_acknowledge_status(inlink, &status, &pts)) {
+             if (status == AVERROR_EOF) {
+-                s->eof = 1;
++                qsv->eof = 1;
+             }
+         }
+     }
+ 
+-    if (qsv) {
+-        if (in || s->eof) {
+-            qsv->eof = s->eof;
++    if (qsv->session) {
++        if (in || qsv->eof) {
+             ret = ff_qsvvpp_filter_frame(qsv, inlink, in);
+             av_frame_free(&in);
+             if (ret == AVERROR(EAGAIN))
+@@ -552,7 +597,7 @@ static int activate(AVFilterContext *ctx
+             else if (ret < 0)
+                 return ret;
+ 
+-            if (s->eof)
++            if (qsv->eof)
+                 goto eof;
+ 
+             if (qsv->got_frame) {
+@@ -561,6 +606,7 @@ static int activate(AVFilterContext *ctx
+             }
+         }
+     } else {
++        /* No MFX session is created in pass-through mode */
+         if (in) {
+             if (in->pts != AV_NOPTS_VALUE)
+                 in->pts = av_rescale_q(in->pts, inlink->time_base, outlink->time_base);
+@@ -569,7 +615,7 @@ static int activate(AVFilterContext *ctx
+             if (ret < 0)
+                 return ret;
+ 
+-            if (s->eof)
++            if (qsv->eof)
+                 goto eof;
+ 
+             return 0;
+@@ -577,7 +623,7 @@ static int activate(AVFilterContext *ctx
+     }
+ 
+ not_ready:
+-    if (s->eof)
++    if (qsv->eof)
+         goto eof;
+ 
+     FF_FILTER_FORWARD_WANTED(outlink, inlink);
+@@ -585,11 +631,101 @@ not_ready:
+     return FFERROR_NOT_READY;
+ 
+ eof:
++    pts = av_rescale_q(pts, inlink->time_base, outlink->time_base);
+     ff_outlink_set_status(outlink, status, pts);
+     return 0;
+ }
+ 
+-static int query_formats(AVFilterContext *ctx)
++static av_cold void vpp_uninit(AVFilterContext *ctx)
++{
++    ff_qsvvpp_close(ctx);
++}
++
++static const AVFilterPad vpp_inputs[] = {
++    {
++        .name          = "default",
++        .type          = AVMEDIA_TYPE_VIDEO,
++        .config_props  = config_input,
++    },
++};
++
++static const AVFilterPad vpp_outputs[] = {
++    {
++        .name          = "default",
++        .type          = AVMEDIA_TYPE_VIDEO,
++        .config_props  = config_output,
++    },
++};
++
++#define DEFINE_QSV_FILTER(x, sn, ln, fmts) \
++static const AVClass x##_class = { \
++    .class_name = #sn "_qsv", \
++    .item_name  = av_default_item_name, \
++    .option     = x##_options, \
++    .version    = LIBAVUTIL_VERSION_INT, \
++}; \
++const AVFilter ff_vf_##sn##_qsv = { \
++    .name           = #sn "_qsv", \
++    .description    = NULL_IF_CONFIG_SMALL("Quick Sync Video " #ln), \
++    .preinit        = x##_preinit, \
++    .init           = vpp_init, \
++    .uninit         = vpp_uninit, \
++    .priv_size      = sizeof(VPPContext), \
++    .priv_class     = &x##_class, \
++    FILTER_INPUTS(vpp_inputs), \
++    FILTER_OUTPUTS(vpp_outputs), \
++    fmts, \
++    .activate       = activate, \
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE, \
++};
++
++static const AVOption vpp_options[] = {
++    { "deinterlace", "deinterlace mode: 0=off, 1=bob, 2=advanced", OFFSET(deinterlace), AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, MFX_DEINTERLACING_ADVANCED, .flags = FLAGS, "deinterlace" },
++    { "bob",         "Bob deinterlace mode.",                      0,                   AV_OPT_TYPE_CONST,    { .i64 = MFX_DEINTERLACING_BOB },            .flags = FLAGS, "deinterlace" },
++    { "advanced",    "Advanced deinterlace mode. ",                0,                   AV_OPT_TYPE_CONST,    { .i64 = MFX_DEINTERLACING_ADVANCED },       .flags = FLAGS, "deinterlace" },
++
++    { "denoise",     "denoise level [0, 100]",       OFFSET(denoise),     AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, 100, .flags = FLAGS },
++    { "detail",      "enhancement level [0, 100]",   OFFSET(detail),      AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, 100, .flags = FLAGS },
++    { "framerate",   "output framerate",             OFFSET(framerate),   AV_OPT_TYPE_RATIONAL, { .dbl = 0.0 },0, DBL_MAX, .flags = FLAGS },
++    { "procamp",     "Enable ProcAmp",               OFFSET(procamp),     AV_OPT_TYPE_INT,      { .i64 = 0 }, 0, 1, .flags = FLAGS},
++    { "hue",         "ProcAmp hue",                  OFFSET(hue),         AV_OPT_TYPE_FLOAT,    { .dbl = 0.0 }, -180.0, 180.0, .flags = FLAGS},
++    { "saturation",  "ProcAmp saturation",           OFFSET(saturation),  AV_OPT_TYPE_FLOAT,    { .dbl = 1.0 }, 0.0, 10.0, .flags = FLAGS},
++    { "contrast",    "ProcAmp contrast",             OFFSET(contrast),    AV_OPT_TYPE_FLOAT,    { .dbl = 1.0 }, 0.0, 10.0, .flags = FLAGS},
++    { "brightness",  "ProcAmp brightness",           OFFSET(brightness),  AV_OPT_TYPE_FLOAT,    { .dbl = 0.0 }, -100.0, 100.0, .flags = FLAGS},
++
++    { "transpose",  "set transpose direction",       OFFSET(transpose),   AV_OPT_TYPE_INT,      { .i64 = -1 }, -1, 6, FLAGS, "transpose"},
++        { "cclock_hflip",  "rotate counter-clockwise with horizontal flip",  0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CCLOCK_FLIP }, .flags=FLAGS, .unit = "transpose" },
++        { "clock",         "rotate clockwise",                               0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CLOCK       }, .flags=FLAGS, .unit = "transpose" },
++        { "cclock",        "rotate counter-clockwise",                       0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CCLOCK      }, .flags=FLAGS, .unit = "transpose" },
++        { "clock_hflip",   "rotate clockwise with horizontal flip",          0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CLOCK_FLIP  }, .flags=FLAGS, .unit = "transpose" },
++        { "reversal",      "rotate by half-turn",                            0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_REVERSAL    }, .flags=FLAGS, .unit = "transpose" },
++        { "hflip",         "flip horizontally",                              0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_HFLIP       }, .flags=FLAGS, .unit = "transpose" },
++        { "vflip",         "flip vertically",                                0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_VFLIP       }, .flags=FLAGS, .unit = "transpose" },
++
++    { "cw",   "set the width crop area expression",   OFFSET(cw), AV_OPT_TYPE_STRING, { .str = "iw" }, 0, 0, FLAGS },
++    { "ch",   "set the height crop area expression",  OFFSET(ch), AV_OPT_TYPE_STRING, { .str = "ih" }, 0, 0, FLAGS },
++    { "cx",   "set the x crop area expression",       OFFSET(cx), AV_OPT_TYPE_STRING, { .str = "(in_w-out_w)/2" }, 0, 0, FLAGS },
++    { "cy",   "set the y crop area expression",       OFFSET(cy), AV_OPT_TYPE_STRING, { .str = "(in_h-out_h)/2" }, 0, 0, FLAGS },
++
++    { "w",      "Output video width(0=input video width, -1=keep input video aspect)",  OFFSET(ow), AV_OPT_TYPE_STRING, { .str="cw" }, 0, 255, .flags = FLAGS },
++    { "width",  "Output video width(0=input video width, -1=keep input video aspect)",  OFFSET(ow), AV_OPT_TYPE_STRING, { .str="cw" }, 0, 255, .flags = FLAGS },
++    { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
++    { "height", "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
++    { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
++    { "scale_mode", "scale mode", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 5, .flags = FLAGS, "scale mode" },
++    { "auto",      "auto mode",             0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_DEFAULT},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
++    { "low_power", "low power mode",        0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "scale mode"},
++    { "hq",        "high quality mode",     0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
++    { "compute",   "compute mode",          0,    AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
++    { "vd",        "vd mode",               0,    AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
++    { "ve",        "ve mode",               0,    AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
++    { "passthrough", "Apply pass through mode if possible.", OFFSET(has_passthrough), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, .flags = FLAGS },
++
++    { NULL }
++};
++
++static int vpp_query_formats(AVFilterContext *ctx)
+ {
+     int ret;
+     static const enum AVPixelFormat in_pix_fmts[] = {
+@@ -615,46 +751,79 @@ static int query_formats(AVFilterContext
+                           &ctx->outputs[0]->incfg.formats);
+ }
+ 
+-static av_cold void vpp_uninit(AVFilterContext *ctx)
++DEFINE_QSV_FILTER(vpp, vpp, VPP, FILTER_QUERY_FUNC(vpp_query_formats));
++
++static av_cold int default_preinit(AVFilterContext *ctx)
+ {
+-    VPPContext *vpp = ctx->priv;
++    VPPContext  *vpp  = ctx->priv;
++
++    vpp_preinit(ctx);
++    vpp->has_passthrough = 0;
+ 
+-    ff_qsvvpp_free(&vpp->qsv);
++    return 0;
+ }
+ 
+-static const AVClass vpp_class = {
+-    .class_name = "vpp_qsv",
+-    .item_name  = av_default_item_name,
+-    .option     = options,
+-    .version    = LIBAVUTIL_VERSION_INT,
++static const enum AVPixelFormat qsvscale_pix_fmts[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_P010,
++    AV_PIX_FMT_QSV,
++    AV_PIX_FMT_NONE,
+ };
+ 
+-static const AVFilterPad vpp_inputs[] = {
+-    {
+-        .name          = "default",
+-        .type          = AVMEDIA_TYPE_VIDEO,
+-        .config_props  = config_input,
+-    },
++static const AVOption qsvscale_options[] = {
++    { "w",      "Output video width(0=input video width, -1=keep input video aspect)",  OFFSET(ow), AV_OPT_TYPE_STRING, { .str = "iw"   }, .flags = FLAGS },
++    { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
++    { "cw",     "set the width crop area expression",   OFFSET(cw), AV_OPT_TYPE_STRING, { .str = "iw" }, .flags = FLAGS },
++    { "ch",     "set the height crop area expression",  OFFSET(ch), AV_OPT_TYPE_STRING, { .str = "ih" }, .flags = FLAGS },
++    { "cx",     "set the x crop area expression",       OFFSET(cx), AV_OPT_TYPE_STRING, { .str = "(iw-ow)/2" }, .flags = FLAGS },
++    { "cy",     "set the y crop area expression",       OFFSET(cy), AV_OPT_TYPE_STRING, { .str = "(ih-oh)/2" }, .flags = FLAGS },
++    { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
++
++    { "mode",      "set scaling mode",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = -1 }, -1, 5, FLAGS, "mode"},
++    { "auto",      "auto mode",             0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_DEFAULT},  INT_MIN, INT_MAX, FLAGS, "mode"},
++    { "low_power", "low power mode",        0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "mode"},
++    { "hq",        "high quality mode",     0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "mode"},
++    { "compute",   "compute mode",          0,             AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "mode"},
++    { "vd",        "vd mode",               0,             AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "mode"},
++    { "ve",        "ve mode",               0,             AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "mode"},
++
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
++
++    { NULL },
+ };
+ 
+-static const AVFilterPad vpp_outputs[] = {
+-    {
+-        .name          = "default",
+-        .type          = AVMEDIA_TYPE_VIDEO,
+-        .config_props  = config_output,
+-    },
++static av_cold int qsvscale_preinit(AVFilterContext *ctx)
++{
++    return default_preinit(ctx);
++}
++
++DEFINE_QSV_FILTER(qsvscale, scale, scaling and format conversion, FILTER_PIXFMTS_ARRAY(qsvscale_pix_fmts));
++
++static const enum AVPixelFormat qsvdeint_pix_fmts[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_QSV,
++    AV_PIX_FMT_NONE,
+ };
+ 
+-const AVFilter ff_vf_vpp_qsv = {
+-    .name          = "vpp_qsv",
+-    .description   = NULL_IF_CONFIG_SMALL("Quick Sync Video VPP."),
+-    .priv_size     = sizeof(VPPContext),
+-    .init          = vpp_init,
+-    .uninit        = vpp_uninit,
+-    FILTER_INPUTS(vpp_inputs),
+-    FILTER_OUTPUTS(vpp_outputs),
+-    FILTER_QUERY_FUNC(query_formats),
+-    .activate      = activate,
+-    .priv_class    = &vpp_class,
+-    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++static const AVOption qsvdeint_options[] = {
++    { "mode", "set deinterlace mode", OFFSET(deinterlace),   AV_OPT_TYPE_INT, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
++    { "bob",   "bob algorithm",                  0, AV_OPT_TYPE_CONST,      {.i64 = MFX_DEINTERLACING_BOB}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
++    { "advanced", "Motion adaptive algorithm",   0, AV_OPT_TYPE_CONST, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
++
++    { "rate", "Generate output at frame rate or field rate",
++      OFFSET(field_rate), AV_OPT_TYPE_INT, { .i64 = 2 }, 1, 2, FLAGS, "rate" },
++    { "frame", "Output at frame rate (one frame of output for each field-pair)",
++      0, AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0, FLAGS, "rate" },
++    { "field", "Output at field rate (one frame of output for each field)",
++      0, AV_OPT_TYPE_CONST, { .i64 = 2 }, 0, 0, FLAGS, "rate" },
++
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
++    { NULL },
+ };
++
++static av_cold int qsvdeint_preinit(AVFilterContext *ctx)
++{
++    return default_preinit(ctx);
++}
++
++DEFINE_QSV_FILTER(qsvdeint, deinterlace, deinterlacing, FILTER_PIXFMTS_ARRAY(qsvdeint_pix_fmts));

@@ -31,23 +31,15 @@ PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 CMAKE_USE_NASM = 1
 CMAKE_USE_NINJA = 1
 
-include ../../mk/spksrc.cross-cmake.mk
-
 # libaom specific cmake options
 CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
 
-# Disable tests
 CMAKE_ARGS += -DENABLE_TESTS=0
-
 CMAKE_ARGS += -DENABLE_DOCS=0
 CMAKE_ARGS += -DAOM_EXTRA_C_FLAGS=-O
 CMAKE_ARGS += -DAOM_EXTRA_CXX_FLAGS=-O
 
-# Fix compilation with newer compilers
-# Flags to be added to CMake toolchain file
-ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
-ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH
-endif
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm
@@ -74,4 +66,12 @@ endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=x86
+endif
+
+include ../../mk/spksrc.cross-cmake.mk
+
+# Fix compilation with newer compilers
+# Flags to be added to CMake toolchain file
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH
 endif

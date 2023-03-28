@@ -6,7 +6,7 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - ffmpeg is moved to head of packages to built first if triggered by its own or a dependent.
+# - ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are moved to head of packages to built first if triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -53,21 +53,17 @@ fi
 # remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
+# for ffmpeg v4-6 find all packages that depends on them
+for i in {4..6}; do
+    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-# find all packages that depend on spk/ffmpeg is built before.
-all_ffmpeg_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "export FFMPEG_DIR" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-
-# if ffmpeg or one of its dependents is to build, ensure
-# ffmpeg is first package in the list of packages to build.
-for package in ${packages}
-do
-    if [ "$(echo ffmpeg ${all_ffmpeg_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')
-        packages="ffmpeg ${packages_without_ffmpeg}"
-        break;
+    # If packages are found in the list then ensure
+    # relevant ffmpeg|ffmpeg5|ffmpeg6 is first in list
+    # then remove any duplicates from the list
+    if [ "${ffmpeg_dependent_packages}" != "" ]; then
+        packages=$(echo "ffmpeg${i} ${packages}" | sed ':s;s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;s/  */ /g')
     fi
 done
-
 
 # find all noarch packages
 all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "override ARCH" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')

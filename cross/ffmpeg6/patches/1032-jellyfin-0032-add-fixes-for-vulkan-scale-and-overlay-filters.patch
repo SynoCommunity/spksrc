@@ -1,0 +1,545 @@
+Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
+===================================================================
+--- libavfilter/vf_overlay_vulkan.c
++++ libavfilter/vf_overlay_vulkan.c
+@@ -31,6 +31,7 @@ typedef struct OverlayVulkanContext {
+     FFVkQueueFamilyCtx qf;
+     FFVkExecContext *exec;
+     FFVulkanPipeline *pl;
++    FFVulkanPipeline *pl_pass;
+     FFFrameSync fs;
+     FFVkBuffer params_buf;
+ 
+@@ -44,6 +45,10 @@ typedef struct OverlayVulkanContext {
+     int overlay_y;
+     int overlay_w;
+     int overlay_h;
++
++    int opt_repeatlast;
++    int opt_shortest;
++    int opt_eof_action;
+ } OverlayVulkanContext;
+ 
+ static const char overlay_noalpha[] = {
+@@ -81,6 +86,7 @@ static av_cold int init_filter(AVFilterC
+ {
+     int err;
+     FFVkSampler *sampler;
++    FFVkSPIRVShader *shd;
+     OverlayVulkanContext *s = ctx->priv;
+     FFVulkanContext *vkctx = &s->vkctx;
+     const int planes = av_pix_fmt_count_planes(s->vkctx.output_format);
+@@ -91,6 +97,67 @@ static av_cold int init_filter(AVFilterC
+     if (!sampler)
+         return AVERROR_EXTERNAL;
+ 
++    FFVulkanDescriptorSetBinding desc_i[3] = {
++        {
++            .name       = "main_img",
++            .type       = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
++            .dimensions = 2,
++            .elems      = planes,
++            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
++            .updater    = s->main_images,
++            .sampler    = sampler,
++        },
++        {
++            .name       = "overlay_img",
++            .type       = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
++            .dimensions = 2,
++            .elems      = planes,
++            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
++            .updater    = s->overlay_images,
++            .sampler    = sampler,
++        },
++        {
++            .name       = "output_img",
++            .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
++            .mem_layout = ff_vk_shader_rep_fmt(s->vkctx.output_format),
++            .mem_quali  = "writeonly",
++            .dimensions = 2,
++            .elems      = planes,
++            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
++            .updater    = s->output_images,
++        },
++    };
++
++    s->pl_pass = ff_vk_create_pipeline(vkctx, &s->qf);
++    if (!s->pl_pass)
++        return AVERROR(ENOMEM);
++
++    { /* Create the shader passthrough */
++        shd = ff_vk_init_shader(s->pl_pass, "overlay_compute_passthrough",
++                                VK_SHADER_STAGE_COMPUTE_BIT);
++        if (!shd)
++            return AVERROR(ENOMEM);
++
++        ff_vk_set_compute_shader_sizes(shd, CGROUPS);
++
++        RET(ff_vk_add_descriptor_set(vkctx, s->pl_pass, shd, desc_i, FF_ARRAY_ELEMS(desc_i), 0)); /* set 0 */
++
++        GLSLC(0, void main()                                                  );
++        GLSLC(0, {                                                            );
++        GLSLC(1,     ivec2 pos = ivec2(gl_GlobalInvocationID.xy);             );
++        GLSLF(1,     int planes = %i;                                  ,planes);
++        GLSLC(1,     for (int i = 0; i < planes; i++) {                       );
++        GLSLC(2,         vec4 res = texture(main_img[i], pos);                );
++        GLSLC(2,         imageStore(output_img[i], pos, res);                 );
++        GLSLC(1,     }                                                        );
++        GLSLC(0, }                                                            );
++
++        RET(ff_vk_compile_shader(vkctx, shd, "main"));
++    }
++
++    RET(ff_vk_init_pipeline_layout(vkctx, s->pl_pass));
++    RET(ff_vk_init_compute_pipeline(vkctx, s->pl_pass));
++
+     s->pl = ff_vk_create_pipeline(vkctx, &s->qf);
+     if (!s->pl)
+         return AVERROR(ENOMEM);
+@@ -98,37 +165,6 @@ static av_cold int init_filter(AVFilterC
+     { /* Create the shader */
+         const int ialpha = av_pix_fmt_desc_get(s->vkctx.input_format)->flags & AV_PIX_FMT_FLAG_ALPHA;
+ 
+-        FFVulkanDescriptorSetBinding desc_i[3] = {
+-            {
+-                .name       = "main_img",
+-                .type       = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+-                .dimensions = 2,
+-                .elems      = planes,
+-                .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+-                .updater    = s->main_images,
+-                .sampler    = sampler,
+-            },
+-            {
+-                .name       = "overlay_img",
+-                .type       = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+-                .dimensions = 2,
+-                .elems      = planes,
+-                .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+-                .updater    = s->overlay_images,
+-                .sampler    = sampler,
+-            },
+-            {
+-                .name       = "output_img",
+-                .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+-                .mem_layout = ff_vk_shader_rep_fmt(s->vkctx.output_format),
+-                .mem_quali  = "writeonly",
+-                .dimensions = 2,
+-                .elems      = planes,
+-                .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+-                .updater    = s->output_images,
+-            },
+-        };
+-
+         FFVulkanDescriptorSetBinding desc_b = {
+             .name        = "params",
+             .type        = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+@@ -139,8 +175,8 @@ static av_cold int init_filter(AVFilterC
+             .buf_content = "ivec2 o_offset[3], o_size[3];",
+         };
+ 
+-        FFVkSPIRVShader *shd = ff_vk_init_shader(s->pl, "overlay_compute",
+-                                                 VK_SHADER_STAGE_COMPUTE_BIT);
++        shd = ff_vk_init_shader(s->pl, "overlay_compute",
++                                VK_SHADER_STAGE_COMPUTE_BIT);
+         if (!shd)
+             return AVERROR(ENOMEM);
+ 
+@@ -229,7 +265,7 @@ fail:
+ }
+ 
+ static int process_frames(AVFilterContext *avctx, AVFrame *out_f,
+-                          AVFrame *main_f, AVFrame *overlay_f)
++                          AVFrame *main_f, AVFrame *overlay_f, int passthrough)
+ {
+     int err;
+     VkCommandBuffer cmd_buf;
+@@ -240,14 +276,20 @@ static int process_frames(AVFilterContex
+ 
+     AVVkFrame *out     = (AVVkFrame *)out_f->data[0];
+     AVVkFrame *main    = (AVVkFrame *)main_f->data[0];
+-    AVVkFrame *overlay = (AVVkFrame *)overlay_f->data[0];
++    AVVkFrame *overlay;
+ 
+     AVHWFramesContext *main_fc    = (AVHWFramesContext*)main_f->hw_frames_ctx->data;
+-    AVHWFramesContext *overlay_fc = (AVHWFramesContext*)overlay_f->hw_frames_ctx->data;
++    AVHWFramesContext *overlay_fc;
+ 
+     const VkFormat *output_formats     = av_vkfmt_from_pixfmt(s->vkctx.output_format);
+     const VkFormat *main_sw_formats    = av_vkfmt_from_pixfmt(main_fc->sw_format);
+-    const VkFormat *overlay_sw_formats = av_vkfmt_from_pixfmt(overlay_fc->sw_format);
++    const VkFormat *overlay_sw_formats;
++
++    if (!passthrough) {
++        overlay = (AVVkFrame *)overlay_f->data[0];
++        overlay_fc = (AVHWFramesContext*)overlay_f->hw_frames_ctx->data;
++        overlay_sw_formats = av_vkfmt_from_pixfmt(overlay_fc->sw_format);
++    }
+ 
+     /* Update descriptors and init the exec context */
+     ff_vk_start_exec_recording(vkctx, s->exec);
+@@ -255,92 +297,128 @@ static int process_frames(AVFilterContex
+ 
+     for (int i = 0; i < planes; i++) {
+         RET(ff_vk_create_imageview(vkctx, s->exec,
+-                                   &s->main_images[i].imageView, main->img[i],
+-                                   main_sw_formats[i],
+-                                   ff_comp_identity_map));
+-
+-        RET(ff_vk_create_imageview(vkctx, s->exec,
+-                                   &s->overlay_images[i].imageView, overlay->img[i],
+-                                   overlay_sw_formats[i],
+-                                   ff_comp_identity_map));
++                                    &s->main_images[i].imageView, main->img[i],
++                                    main_sw_formats[i],
++                                    ff_comp_identity_map));
+ 
+         RET(ff_vk_create_imageview(vkctx, s->exec,
+-                                   &s->output_images[i].imageView, out->img[i],
+-                                   output_formats[i],
+-                                   ff_comp_identity_map));
++                                    &s->output_images[i].imageView, out->img[i],
++                                    output_formats[i],
++                                    ff_comp_identity_map));
+ 
+         s->main_images[i].imageLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+-        s->overlay_images[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+         s->output_images[i].imageLayout  = VK_IMAGE_LAYOUT_GENERAL;
++
++        if (!passthrough) {
++            RET(ff_vk_create_imageview(vkctx, s->exec,
++                                        &s->overlay_images[i].imageView, overlay->img[i],
++                                        overlay_sw_formats[i],
++                                        ff_comp_identity_map));
++
++            s->overlay_images[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
++        }
+     }
+ 
+     ff_vk_update_descriptor_set(vkctx, s->pl, 0);
++    ff_vk_update_descriptor_set(vkctx, s->pl_pass, 0);
+ 
+-    for (int i = 0; i < planes; i++) {
+-        VkImageMemoryBarrier bar[3] = {
+-            {
+-                .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+-                .srcAccessMask = 0,
+-                .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+-                .oldLayout = main->layout[i],
+-                .newLayout = s->main_images[i].imageLayout,
+-                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+-                .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+-                .image = main->img[i],
+-                .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+-                .subresourceRange.levelCount = 1,
+-                .subresourceRange.layerCount = 1,
+-            },
+-            {
+-                .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+-                .srcAccessMask = 0,
+-                .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+-                .oldLayout = overlay->layout[i],
+-                .newLayout = s->overlay_images[i].imageLayout,
+-                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+-                .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+-                .image = overlay->img[i],
+-                .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+-                .subresourceRange.levelCount = 1,
+-                .subresourceRange.layerCount = 1,
+-            },
+-            {
+-                .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+-                .srcAccessMask = 0,
+-                .dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+-                .oldLayout = out->layout[i],
+-                .newLayout = s->output_images[i].imageLayout,
+-                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+-                .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+-                .image = out->img[i],
+-                .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+-                .subresourceRange.levelCount = 1,
+-                .subresourceRange.layerCount = 1,
+-            },
+-        };
+-
+-        vk->CmdPipelineBarrier(cmd_buf, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+-                               VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0,
+-                               0, NULL, 0, NULL, FF_ARRAY_ELEMS(bar), bar);
++#define MAIN_BARRIER \
++    { \
++        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, \
++        .srcAccessMask = 0, \
++        .dstAccessMask = VK_ACCESS_SHADER_READ_BIT, \
++        .oldLayout = main->layout[i], \
++        .newLayout = s->main_images[i].imageLayout, \
++        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, \
++        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, \
++        .image = main->img[i], \
++        .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
++        .subresourceRange.levelCount = 1, \
++        .subresourceRange.layerCount = 1, \
++    }
+ 
+-        main->layout[i]    = bar[0].newLayout;
+-        main->access[i]    = bar[0].dstAccessMask;
++#define OVERLAY_BARRIER \
++    { \
++        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, \
++        .srcAccessMask = 0, \
++        .dstAccessMask = VK_ACCESS_SHADER_READ_BIT, \
++        .oldLayout = overlay->layout[i], \
++        .newLayout = s->overlay_images[i].imageLayout, \
++        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, \
++        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, \
++        .image = overlay->img[i], \
++        .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
++        .subresourceRange.levelCount = 1, \
++        .subresourceRange.layerCount = 1, \
++    }
+ 
+-        overlay->layout[i] = bar[1].newLayout;
+-        overlay->access[i] = bar[1].dstAccessMask;
++#define OUT_BARRIER \
++    { \
++        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, \
++        .srcAccessMask = 0, \
++        .dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT, \
++        .oldLayout = out->layout[i], \
++        .newLayout = s->output_images[i].imageLayout, \
++        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, \
++        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, \
++        .image = out->img[i], \
++        .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
++        .subresourceRange.levelCount = 1, \
++        .subresourceRange.layerCount = 1, \
++    }
+ 
+-        out->layout[i]     = bar[2].newLayout;
+-        out->access[i]     = bar[2].dstAccessMask;
++    for (int i = 0; i < planes; i++) {
++        if (passthrough) {
++            VkImageMemoryBarrier bar_pass[2] = {
++                MAIN_BARRIER,
++                OUT_BARRIER,
++            };
++
++            vk->CmdPipelineBarrier(cmd_buf, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
++                                   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0,
++                                   0, NULL, 0, NULL, FF_ARRAY_ELEMS(bar_pass), bar_pass);
++
++            main->layout[i]    = bar_pass[0].newLayout;
++            main->access[i]    = bar_pass[0].dstAccessMask;
++            out->layout[i]     = bar_pass[1].newLayout;
++            out->access[i]     = bar_pass[1].dstAccessMask;
++        } else {
++            VkImageMemoryBarrier bar[3] = {
++                MAIN_BARRIER,
++                OVERLAY_BARRIER,
++                OUT_BARRIER,
++            };
++
++            vk->CmdPipelineBarrier(cmd_buf, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
++                                   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0,
++                                   0, NULL, 0, NULL, FF_ARRAY_ELEMS(bar), bar);
++
++            main->layout[i]    = bar[0].newLayout;
++            main->access[i]    = bar[0].dstAccessMask;
++            overlay->layout[i] = bar[1].newLayout;
++            overlay->access[i] = bar[1].dstAccessMask;
++            out->layout[i]     = bar[2].newLayout;
++            out->access[i]     = bar[2].dstAccessMask;
++        }
+     }
+ 
+-    ff_vk_bind_pipeline_exec(vkctx, s->exec, s->pl);
++    if (passthrough) {
++        av_log(avctx, AV_LOG_DEBUG, "Binding pl_pass to exec: overlay_compute_passthrough\n");
++        ff_vk_bind_pipeline_exec(vkctx, s->exec, s->pl_pass);
++    } else {
++        av_log(avctx, AV_LOG_DEBUG, "Binding pl to exec: overlay_compute\n");
++        ff_vk_bind_pipeline_exec(vkctx, s->exec, s->pl);
++    }
+ 
+     vk->CmdDispatch(cmd_buf,
+                     FFALIGN(s->vkctx.output_width,  CGROUPS[0])/CGROUPS[0],
+                     FFALIGN(s->vkctx.output_height, CGROUPS[1])/CGROUPS[1], 1);
+ 
+     ff_vk_add_exec_dep(vkctx, s->exec, main_f, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+-    ff_vk_add_exec_dep(vkctx, s->exec, overlay_f, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
++
++    if (!passthrough)
++        ff_vk_add_exec_dep(vkctx, s->exec, overlay_f, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
++
+     ff_vk_add_exec_dep(vkctx, s->exec, out_f, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+ 
+     err = ff_vk_submit_exec_queue(vkctx, s->exec);
+@@ -358,7 +436,7 @@ fail:
+ 
+ static int overlay_vulkan_blend(FFFrameSync *fs)
+ {
+-    int err;
++    int err, passthrough = 0;
+     AVFilterContext *ctx = fs->parent;
+     OverlayVulkanContext *s = ctx->priv;
+     AVFilterLink *outlink = ctx->outputs[0];
+@@ -371,22 +449,14 @@ static int overlay_vulkan_blend(FFFrameS
+     if (err < 0)
+         goto fail;
+ 
+-    if (!input_main || !input_overlay)
+-        return 0;
++    if (!input_main)
++        return AVERROR_BUG;
+ 
+-    if (!s->initialized) {
+-        AVHWFramesContext *main_fc = (AVHWFramesContext*)input_main->hw_frames_ctx->data;
+-        AVHWFramesContext *overlay_fc = (AVHWFramesContext*)input_overlay->hw_frames_ctx->data;
+-        if (main_fc->sw_format != overlay_fc->sw_format) {
+-            av_log(ctx, AV_LOG_ERROR, "Mismatching sw formats!\n");
+-            return AVERROR(EINVAL);
+-        }
+-
+-        s->overlay_w = input_overlay->width;
+-        s->overlay_h = input_overlay->height;
++    if (!input_overlay)
++        passthrough = 1;
+ 
++    if (!s->initialized)
+         RET(init_filter(ctx));
+-    }
+ 
+     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+     if (!out) {
+@@ -394,7 +464,7 @@ static int overlay_vulkan_blend(FFFrameS
+         goto fail;
+     }
+ 
+-    RET(process_frames(ctx, out, input_main, input_overlay));
++    RET(process_frames(ctx, out, input_main, input_overlay, passthrough));
+ 
+     err = av_frame_copy_props(out, input_main);
+     if (err < 0)
+@@ -412,6 +482,18 @@ static int overlay_vulkan_config_output(
+     int err;
+     AVFilterContext *avctx = outlink->src;
+     OverlayVulkanContext *s = avctx->priv;
++    AVFilterLink *inlink = avctx->inputs[0];
++    AVFilterLink *inlink_overlay = avctx->inputs[1];
++    AVHWFramesContext *main_fc = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++    AVHWFramesContext *overlay_fc = (AVHWFramesContext*)inlink_overlay->hw_frames_ctx->data;
++
++    if (main_fc->sw_format != overlay_fc->sw_format) {
++        av_log(avctx, AV_LOG_ERROR, "Mismatching sw formats!\n");
++        return AVERROR(EINVAL);
++    }
++
++    s->overlay_w = inlink_overlay->w;
++    s->overlay_h = inlink_overlay->h;
+ 
+     err = ff_vk_filter_config_output(outlink);
+     if (err < 0)
+@@ -421,6 +503,11 @@ static int overlay_vulkan_config_output(
+     if (err < 0)
+         return err;
+ 
++    s->fs.opt_repeatlast = s->opt_repeatlast;
++    s->fs.opt_shortest = s->opt_shortest;
++    s->fs.opt_eof_action = s->opt_eof_action;
++    s->fs.time_base = outlink->time_base = inlink->time_base;
++
+     return ff_framesync_configure(&s->fs);
+ }
+ 
+@@ -456,6 +543,14 @@ static void overlay_vulkan_uninit(AVFilt
+ static const AVOption overlay_vulkan_options[] = {
+     { "x", "Set horizontal offset", OFFSET(overlay_x), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, .flags = FLAGS },
+     { "y", "Set vertical offset",   OFFSET(overlay_y), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, .flags = FLAGS },
++    { "eof_action", "Action to take when encountering EOF from secondary input ",
++        OFFSET(opt_eof_action), AV_OPT_TYPE_INT, { .i64 = EOF_ACTION_REPEAT },
++        EOF_ACTION_REPEAT, EOF_ACTION_PASS, .flags = FLAGS, "eof_action" },
++        { "repeat", "Repeat the previous frame.",   0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_REPEAT }, .flags = FLAGS, "eof_action" },
++        { "endall", "End both streams.",            0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_ENDALL }, .flags = FLAGS, "eof_action" },
++        { "pass",   "Pass through the main input.", 0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_PASS },   .flags = FLAGS, "eof_action" },
++    { "shortest", "force termination when the shortest input terminates", OFFSET(opt_shortest), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
++    { "repeatlast", "repeat overlay of the last overlay frame", OFFSET(opt_repeatlast), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
+     { NULL },
+ };
+ 
+Index: jellyfin-ffmpeg/libavfilter/vf_scale_vulkan.c
+===================================================================
+--- libavfilter/vf_scale_vulkan.c
++++ libavfilter/vf_scale_vulkan.c
+@@ -220,14 +220,17 @@ static av_cold int init_filter(AVFilterC
+                 GLSLC(1, }                                                       );
+             }
+         } else {
+-            GLSLC(1, vec4 res = scale_bilinear(0, pos, c_r, c_o);                );
+-            GLSLF(1, res = rgb2yuv(res, %i);    ,s->out_range == AVCOL_RANGE_JPEG);
++            GLSLC(1, size = imageSize(output_img[0]);                            );
++            GLSLC(1, if (IS_WITHIN(pos, size)) {                                 );
++            GLSLC(2,     vec4 res = scale_bilinear(0, pos, c_r, c_o);            );
++            GLSLF(2,     res = rgb2yuv(res, %i);,s->out_range == AVCOL_RANGE_JPEG);
+             switch (s->vkctx.output_format) {
+-            case AV_PIX_FMT_NV12:    GLSLC(1, write_nv12(res, pos); ); break;
+-            case AV_PIX_FMT_YUV420P: GLSLC(1,  write_420(res, pos); ); break;
+-            case AV_PIX_FMT_YUV444P: GLSLC(1,  write_444(res, pos); ); break;
++            case AV_PIX_FMT_NV12:    GLSLC(2, write_nv12(res, pos); ); break;
++            case AV_PIX_FMT_YUV420P: GLSLC(2,  write_420(res, pos); ); break;
++            case AV_PIX_FMT_YUV444P: GLSLC(2,  write_444(res, pos); ); break;
+             default: return AVERROR(EINVAL);
+             }
++            GLSLC(1, }                                                           );
+         }
+ 
+         GLSLC(0, }                                                               );
+@@ -305,7 +308,8 @@ static int process_frames(AVFilterContex
+     AVVkFrame *out = (AVVkFrame *)out_f->data[0];
+     VkImageMemoryBarrier barriers[AV_NUM_DATA_POINTERS*2];
+     int barrier_count = 0;
+-    const int planes = av_pix_fmt_count_planes(s->vkctx.input_format);
++    const int in_planes = av_pix_fmt_count_planes(s->vkctx.input_format);
++    const int out_planes = av_pix_fmt_count_planes(s->vkctx.output_format);
+     const VkFormat *input_formats = av_vkfmt_from_pixfmt(s->vkctx.input_format);
+     const VkFormat *output_formats = av_vkfmt_from_pixfmt(s->vkctx.output_format);
+ 
+@@ -313,24 +317,27 @@ static int process_frames(AVFilterContex
+     ff_vk_start_exec_recording(vkctx, s->exec);
+     cmd_buf = ff_vk_get_exec_buf(s->exec);
+ 
+-    for (int i = 0; i < planes; i++) {
++    for (int i = 0; i < in_planes; i++) {
+         RET(ff_vk_create_imageview(vkctx, s->exec,
+                                    &s->input_images[i].imageView, in->img[i],
+                                    input_formats[i],
+                                    ff_comp_identity_map));
+ 
++        s->input_images[i].imageLayout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
++    }
++
++    for (int i = 0; i < out_planes; i++) {
+         RET(ff_vk_create_imageview(vkctx, s->exec,
+                                    &s->output_images[i].imageView, out->img[i],
+                                    output_formats[i],
+                                    ff_comp_identity_map));
+ 
+-        s->input_images[i].imageLayout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+         s->output_images[i].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+     }
+ 
+     ff_vk_update_descriptor_set(vkctx, s->pl, 0);
+ 
+-    for (int i = 0; i < planes; i++) {
++    for (int i = 0; i < in_planes; i++) {
+         VkImageMemoryBarrier bar = {
+             .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+             .srcAccessMask = 0,
+@@ -351,7 +358,7 @@ static int process_frames(AVFilterContex
+         in->access[i]  = bar.dstAccessMask;
+     }
+ 
+-    for (int i = 0; i < av_pix_fmt_count_planes(s->vkctx.output_format); i++) {
++    for (int i = 0; i < out_planes; i++) {
+         VkImageMemoryBarrier bar = {
+             .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+             .srcAccessMask = 0,

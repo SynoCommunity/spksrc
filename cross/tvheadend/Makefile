@@ -47,7 +47,7 @@ endif
 
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 ifeq ($(wildcard $(FFMPEG_DIR)),)
-DEPENDS += cross/ffmpeg
+DEPENDS += cross/ffmpeg$(FFMPEG_VERSION)
 endif
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)

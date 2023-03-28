@@ -1,0 +1,34 @@
+Projet page: https://github.com/jellyfin/jellyfin-ffmpeg
+Patches: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
+
+Extract jellyfin-ffmpeg git repository
+$ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
+
+$ git branch -a
+* jellyfin
+  remotes/origin/HEAD -> origin/jellyfin
+  remotes/origin/jellyfin
+  remotes/origin/jellyfin-4.4
+  remotes/origin/jellyfin-5.1
+$ git checkout jellyfin-4.4
+Updating files: 100% (4584/4584), done.
+Branch 'jellyfin-4.4' set up to track remote branch 'jellyfin-4.4' from 'origin'.
+Switched to a new branch 'jellyfin-4.4'
+
+Check that current ffmpeg matches jellyfin version
+$ cat jellyfin-ffmpeg/VERSION 
+4.4.2
+
+Modify patches to be in -p0 mode:
+cd debian/patches
+$ sed -i -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
+         -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
+         *.patch
+
+Rename the patches:
+$ i=1001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-jellyfin-$LINE; mv $LINE $(printf "%04d" $i)-jellyfin-$LINE; let i++; done
+
+Test the patches on a clean ffmpeg 4.4 tree:
+$ tar -jxvf ffmpeg-4.4.3.tar.bz2 
+$ cd ffmpeg-4.4.3/
+$ ls -1d ~/jellyfin-ffmpeg/debian/patches/*.patch | while read LINE; do patch -p0 < $LINE; done
