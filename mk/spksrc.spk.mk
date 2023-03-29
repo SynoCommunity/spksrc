@@ -431,7 +431,7 @@ endif
 
 ### Clean rules
 clean:
-	rm -fr work work-* build-*.log
+	rm -fr work work-* build-*.log publish-*.log
 
 spkclean:
 	rm -fr work-*/.copy_done \
@@ -622,7 +622,7 @@ ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 else
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING and PUBLISHING package for arch $*
-	@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log ; \
+	@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log >(grep -e '^http' -e '^{"package":' -e '^{"message":' >> publish-$*.log) ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
 endif
 
