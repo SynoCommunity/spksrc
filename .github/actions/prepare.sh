@@ -57,12 +57,16 @@ packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 for i in {4..6}; do
     ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-    # If packages are found in the list then ensure
-    # relevant ffmpeg|ffmpeg5|ffmpeg6 is first in list
-    # then remove any duplicates from the list
-    if [ "${ffmpeg_dependent_packages}" != "" ]; then
-        packages=$(echo "ffmpeg${i} ${packages}" | sed ':s;s/\(\<\S*\>\)\(.*\)\<\1\>/\1\2/g;ts;s/  */ /g')
-    fi
+    # If packages contain a package that depends on ffmpeg (or is ffmpeg), then ensure
+    # relevant ffmpeg4|ffmpeg5|ffmpeg6 is first in list
+    for package in ${packages}
+    do
+        if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
+            packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg${i}" | tr '\n' ' ')
+            packages="ffmpeg${i} ${packages_without_ffmpeg}"
+            break
+        fi
+    done
 done
 
 # find all noarch packages
