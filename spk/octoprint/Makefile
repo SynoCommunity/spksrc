@@ -1,6 +1,6 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.8.1
-SPK_REV    = 9
+SPK_VERS   = 1.8.6
+SPK_REV    = 10
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
@@ -21,7 +21,13 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.8.1, including fixes for CVE-2022-1430, CVE-2022-1432 and other security issues."
+CHANGELOG    = "Update OctoPrint to v1.8.6. Please have a look at the changes in 1.8.3 https://github.com/OctoPrint/OctoPrint/releases/tag/1.8.3 regarding the password hashing change."
+
+# TODO: 
+# DSM6 pip-cache: 
+#   - create folder to enable the pip-cache
+#   - backup and restore pip-cache on package update
+#
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
@@ -31,7 +37,7 @@ SERVICE_USER  = auto
 POST_STRIP_TARGET = octoprint_extra_install
 
 # [frozendict]
-WHEELS_CFLAGS = [frozendict] -std=c99
+WHEELS_CFLAGS = [frozendict] --std=c99
 
 include ../../mk/spksrc.spk.mk
 
