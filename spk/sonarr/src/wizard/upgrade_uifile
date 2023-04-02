@@ -1,0 +1,13 @@
+[{
+	"step_title": "Updating Sonarr",
+	"items": [{
+		"desc": "This update is for additional libraries and DSM integration. It does not modify your current Sonarr version."
+	}, {
+		"desc": "Keep Sonarr up-to-date by using Sonarr's built-in updater.<br>Navigate to <b>System>Updates</b> in the Sonarr UI."
+	}]
+}, {
+	"step_title": "DSM Permissions",
+	"items": [{
+		"desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+	}]
+}]

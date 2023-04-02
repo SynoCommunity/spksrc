@@ -211,6 +211,15 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
+ifneq ($(strip $(INSTALL_REPLACE_PACKAGES)),)
+	@echo install_replace_packages=\"$(INSTALL_REPLACE_PACKAGES)\" >> $@
+endif
+ifneq ($(strip $(USE_DEPRECATED_REPLACE_MECHANISM)),)
+	@echo use_deprecated_replace_mechanism=\"$(USE_DEPRECATED_REPLACE_MECHANISM)\" >> $@
+endif
+ifneq ($(strip $(CHECKPORT)),)
+	@echo checkport=\"$(CHECKPORT)\" >> $@
+endif
 
 # for non startable (i.e. non service, cli tools only)
 # as default is 'yes' we only add this value for 'no'
