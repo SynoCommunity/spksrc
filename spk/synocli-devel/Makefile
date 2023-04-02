@@ -19,12 +19,15 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 include ../../mk/spksrc.archs.mk
 
 DEPENDS  = cross/llvm
+# build pkg-config before autoconf otherwise
+# glib fails on libiconv on some platforms
+# (to investigate ...)
+DEPENDS += cross/pkg-config
 DEPENDS += cross/autoconf
 DEPENDS += cross/automake
 DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 DEPENDS += cross/make
-DEPENDS += cross/pkg-config
 
 ##
 ## autoconf
