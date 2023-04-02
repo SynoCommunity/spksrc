@@ -24,6 +24,7 @@ DEPENDS += cross/automake
 DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 DEPENDS += cross/make
+DEPENDS += cross/pkg-config
 
 ##
 ## autoconf
@@ -141,3 +142,8 @@ SPK_COMMANDS += bin/wasm-ld
 ## make
 ##
 SPK_COMMANDS += bin/make
+
+##
+## pkg-config
+##
+SPK_COMMANDS += bin/pkg-config
