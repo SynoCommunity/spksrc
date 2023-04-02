@@ -16,8 +16,8 @@ OPTIONAL_DEPENDS += cross/llvm-9.0
 
 include ../../mk/spksrc.install-resources.mk
 
-#ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-#DEPENDS = cross/llvm-latest
-#else
+ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
+DEPENDS = cross/llvm-latest
+else
 DEPENDS = cross/llvm-9.0
-#endif
+endif

@@ -74,8 +74,8 @@ include ../../mk/spksrc.spk.mk
 ## LLVM
 ##
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 15.0.7"
-SPK_COMMANDS += bin/clang-15
+OPTIONAL_DESC += ", LLVM 16.0"
+SPK_COMMANDS += bin/clang-16
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
 SPK_COMMANDS += bin/clang-9
