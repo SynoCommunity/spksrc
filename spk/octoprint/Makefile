@@ -23,18 +23,15 @@ HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
 CHANGELOG    = "Update OctoPrint to v1.8.7. Please have a look at the changes in 1.8.3 https://github.com/OctoPrint/OctoPrint/releases/tag/1.8.3 regarding the password hashing change."
 
-# TODO: 
-# DSM6 pip-cache: 
-#   - create folder to enable the pip-cache
-#   - backup and restore pip-cache on package update
-#
-
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_USER  = auto
 
 POST_STRIP_TARGET = octoprint_extra_install
+
+# /tmp might be too small for plugin installation
+USE_ALTERNATE_TMPDIR = 1
 
 # [frozendict]
 WHEELS_CFLAGS = [frozendict] --std=c99
