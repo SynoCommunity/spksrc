@@ -1,5 +1,5 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.8.6
+SPK_VERS   = 1.8.7
 SPK_REV    = 10
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.8.6. Please have a look at the changes in 1.8.3 https://github.com/OctoPrint/OctoPrint/releases/tag/1.8.3 regarding the password hashing change."
+CHANGELOG    = "Update OctoPrint to v1.8.7. Please have a look at the changes in 1.8.3 https://github.com/OctoPrint/OctoPrint/releases/tag/1.8.3 regarding the password hashing change."
 
 # TODO: 
 # DSM6 pip-cache: 

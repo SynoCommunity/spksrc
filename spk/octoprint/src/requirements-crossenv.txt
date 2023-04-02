@@ -1,9 +1,10 @@
 argon2_cffi_bindings==21.2.0
 # cffi==1.15.1  => python 3.10 package
-frozendict==2.3.4
-MarkupSafe==2.1.1
+charset_normalizer==3.1.0
+frozendict==2.3.6
+MarkupSafe==2.1.2
 psutil==5.9.4
 PyYAML==5.4.1
-regex==2022.10.31
+regex==2023.3.23
 tornado==6.2
-wrapt==1.13.3
+wrapt==1.14.1
