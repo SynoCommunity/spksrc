@@ -5,20 +5,45 @@ SPK_ICON = src/synocli-devel.png
 CHANGELOG = "1. Initial release of synocli-devel"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: binutils 2.39$(OPTIONAL_DESC).
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.39$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
 HOMEPAGE = https://www.sourceware.org/gdb/
 LICENSE  = GPLv2
 
+SPK_DEPENDS = "Perl"
+
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 
 DEPENDS  = cross/llvm
+DEPENDS  = cross/autoconf
+DEPENDS  = cross/automake
 DEPENDS += cross/binutils
 DEPENDS += cross/gdb
+
+##
+## autoconf
+##
+SPK_COMMANDS += bin/autoconf
+SPK_COMMANDS += bin/autoheader
+SPK_COMMANDS += bin/autom4te
+SPK_COMMANDS += bin/autoreconf
+SPK_COMMANDS += bin/autoscan
+SPK_COMMANDS += bin/autoupdate
+SPK_COMMANDS += bin/ifnames
+## m4 dependency
+SPK_COMMANDS += bin/m4
+
+##
+## automake
+##
+SPK_COMMANDS += bin/aclocal
+SPK_COMMANDS += bin/aclocal-1.16
+SPK_COMMANDS += bin/automake
+SPK_COMMANDS += bin/automake-1.16
 
 ##
 ## binutils
