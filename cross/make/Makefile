@@ -9,7 +9,7 @@ DEPENDS =
 
 HOMEPAGE = https://ftp.gnu.org/gnu/make/
 COMMENT  = GNU Make is a tool which controls the generation of executables and other non-source files of a program from the program's source files
-LICENSE  = GPLv2
+LICENSE  = GPLv3+
 
 GNU_CONFIGURE = 1
 
