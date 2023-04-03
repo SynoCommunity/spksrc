@@ -7,8 +7,3 @@ server:
 plugins:
   cura:
     cura_engine: /var/packages/curaengine/target/bin/CuraEngine
-  softwareupdate:
-    checks:
-      octoprint:
-        checkout_folder: /var/packages/octoprint/target/share/OctoPrint
-        type: github_release
