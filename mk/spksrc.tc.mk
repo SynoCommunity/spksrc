@@ -159,6 +159,7 @@ tc_vars: flag
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
 	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_TYPE := $(TC_TYPE) ; \
+	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
 	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
