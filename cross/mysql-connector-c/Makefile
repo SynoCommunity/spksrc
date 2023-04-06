@@ -10,7 +10,7 @@ BUILD_DEPENDS = native/libmysqlclient
 
 HOMEPAGE = https://downloads.mysql.com/archives/c-c
 COMMENT  = MySQL C API (libmysqlclient) 
-LICENSE  = GNU GPLv2
+LICENSE  = GPLv2
 
 USE_NATIVE_CMAKE_LEGACY = 1
 
@@ -52,8 +52,9 @@ CMAKE_ARGS += -DINSTALL_INCLUDEDIR=include/mysql
 # Requires updating to mysql-connector-c++ version 8.x
 #DEPENDS += cross/openssl
 #CMAKE_ARGS += -DWITH_SSL=system
-DEPENDS += cross/zlib
-CMAKE_ARGS += -DWITH_ZLIB=system
+# Use bundled zip to avoid linker error in vaultwarden
+#DEPENDS += cross/zlib
+#CMAKE_ARGS += -DWITH_ZLIB=system
 
 # Use gcc builtin atomic functions for ppc architectures
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),)
