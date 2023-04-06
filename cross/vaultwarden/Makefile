@@ -25,4 +25,11 @@ ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 # prevent reading version from local git repository:
 ENV += VW_VERSION="$(PKG_VERS) (SynoCommunity-$(ARCH))"
 
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# fix for build of "libmimalloc-sys v0.1.30"
+ADDITIONAL_CFLAGS = -std=c99
+endif
+
 include ../../mk/spksrc.cross-rust.mk
