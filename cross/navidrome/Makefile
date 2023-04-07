@@ -1,5 +1,5 @@
 PKG_NAME = navidrome
-PKG_VERS = 0.47.5
+PKG_VERS = 0.49.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/navidrome/navidrome/archive
@@ -15,7 +15,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://www.navidrome.org/
-COMMENT  = Ì†ºÌæß‚òÅ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
+COMMENT  = ÔøΩÔøΩÔøΩÔøΩ‚òÅ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
 LICENSE  = GPL-3.0 License
 
 PRE_COMPILE_TARGET = navidrome_pre_compile
@@ -28,6 +28,9 @@ include ../../mk/spksrc.cross-go.mk
 
 ENV += NPM_CONFIG_USER=root
 PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
+
+# avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs v18
+ENV += NODE_OPTIONS=--openssl-legacy-provider
 
 .PHONY: navidrome_pre_compile
 navidrome_pre_compile:

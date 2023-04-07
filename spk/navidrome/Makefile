@@ -1,5 +1,5 @@
 SPK_NAME = navidrome
-SPK_VERS = 0.47.5
+SPK_VERS = 0.49.3
 SPK_REV = 1
 SPK_ICON = src/navidrome.png
 
