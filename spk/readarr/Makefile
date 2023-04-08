@@ -3,7 +3,7 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 1
 SPK_ICON = src/readarr.png
 
-DEPENDS = cross/sqlite cross/curl cross/libstdc++ cross/readarr
+DEPENDS = cross/sqlite cross/libstdc++ cross/readarr
 
 # Arch exclusions for dotnet 6.0
 DOTNET_SERVARR_ARCHS = 1
