@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libiconv
 
-HOMEPAGE = https://ftp.gnu.org/gnu/m4/
+HOMEPAGE = https://www.gnu.org/software/m4/
 COMMENT  = GNU M4 is an implementation of the traditional Unix macro processor. It is mostly SVR4 compatible although it has some extensions
 LICENSE  = GPLv3
 
