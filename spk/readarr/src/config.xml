@@ -1,0 +1,7 @@
+<Config>
+  <Branch>develop</Branch>
+  <LaunchBrowser>False</LaunchBrowser>
+  <Port>8787</Port>
+  <UpdateAutomatically>True</UpdateAutomatically>
+  <UpdateMechanism>BuiltIn</UpdateMechanism>
+</Config>

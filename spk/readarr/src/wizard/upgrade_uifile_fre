@@ -1,0 +1,13 @@
+[{
+    "step_title": "Mettre à jour Readarr",
+    "items": [{
+        "desc": "Cette mise à jour concerne les bibliothèques supplémentaires et l'intégration DSM. Il ne modifie pas votre version actuelle de Readarr."
+    },{
+        "desc": "Garder Readarr à jour en utilisant <b>System>Updates</b> dans l'interface Readarr."
+    }]
+},{
+    "step_title": "Permissions DSM",
+    "items": [{
+        "desc": "Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+    }]
+}]
