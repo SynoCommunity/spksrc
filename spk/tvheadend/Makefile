@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = d885496
-SPK_GIT_DATE = 20221128
+SPK_GIT_HASH = f32c7c5
+SPK_GIT_DATE = 20230408
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 35
+SPK_REV = 36
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -26,7 +26,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version d885496 as of November 28th 2022<br/>2. Update openssl to 1.1.1t<br/>3. Updated to using ffmpeg4 version 4.4.3<br/>4. Updated libhdhomerun to version 20221031<br/>5. iptv_auto: Add support for m3u channel-number tag with HDhomeRun<br/>6. Include enhanced curl<br/>7. Use newer libdvbcsa with CPU optimizations<br/>8. Add OSCam support"
+CHANGELOG = "1. Update to latest git version f32c7c5 as of April 8th 2023<br/>2. Update FFMPEG 5.1.2"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -48,7 +48,7 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 # Reuse ffmpeg libraries
-export FFMPEG_VERSION = 4
+export FFMPEG_VERSION = 5
 export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target)
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
@@ -65,7 +65,6 @@ include ../../mk/spksrc.spk.mk
 FFMPEG_LIBS  = libavfilter.pc
 FFMPEG_LIBS += libpostproc.pc
 FFMPEG_LIBS += libswresample.pc
-FFMPEG_LIBS += libavresample.pc
 FFMPEG_LIBS += libswscale.pc
 FFMPEG_LIBS += libavutil.pc
 FFMPEG_LIBS += libavformat.pc
