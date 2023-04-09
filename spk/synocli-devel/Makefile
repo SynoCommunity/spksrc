@@ -9,8 +9,8 @@ DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
-HOMEPAGE = https://www.sourceware.org/gdb/
-LICENSE  = GPLv2
+HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDevel
+LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_DEPENDS = "Perl"
 
