@@ -5,7 +5,7 @@ SPK_ICON = src/synocli-devel.png
 CHANGELOG = "1. Initial release of synocli-devel"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.39$(OPTIONAL_DESC).
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.39$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2.
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -104,7 +104,7 @@ include ../../mk/spksrc.spk.mk
 ## LLVM
 ##
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 16.0"
+OPTIONAL_DESC += ", LLVM 16.0.1"
 SPK_COMMANDS += bin/clang-16
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
