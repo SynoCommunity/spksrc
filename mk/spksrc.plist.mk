@@ -26,6 +26,7 @@ cat_PLIST:
 	    type=$$(file --brief "$(INSTALL_DIR)/$(INSTALL_PREFIX)/$$file" | cut -d , -f1) ; \
 	    case $$type in \
 	       ELF*LSB[[:space:]]*executable ) echo "bin:$$file" ;; \
+	                            *script* ) echo "rsc:$$file" ;; \
 	                                ELF* ) echo "lib:$$file" ;; \
 	            symbolic[[:space:]]link* ) echo "lnk:$$file" ;; \
 	                                   * ) echo "rsc:$$file" ;; \

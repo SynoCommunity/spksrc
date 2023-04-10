@@ -1,0 +1,17 @@
+bin:bin/addr2line
+bin:bin/ar
+bin:bin/as
+bin:bin/c++filt
+bin:bin/dwp
+bin:bin/elfedit
+bin:bin/gp*
+bin:bin/ld*
+bin:bin/nm
+bin:bin/objcopy
+bin:bin/objdump
+bin:bin/ranlib
+bin:bin/readelf
+bin:bin/size
+bin:bin/strings
+bin:bin/strip
+lib:lib/bfd-plugins/libdep.so

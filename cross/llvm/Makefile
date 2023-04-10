@@ -1,4 +1,4 @@
-PKG_NAME = gdb-main
+PKG_NAME = llvm-main
 
 HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger
@@ -11,13 +11,13 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = nop
 
-OPTIONAL_DEPENDS  = cross/gdb-latest
-OPTIONAL_DEPENDS += cross/gdb-7.12
+OPTIONAL_DEPENDS  = cross/llvm-latest
+OPTIONAL_DEPENDS += cross/llvm-9.0
 
 include ../../mk/spksrc.install-resources.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/gdb-7.12
+ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
+DEPENDS = cross/llvm-latest
 else
-DEPENDS += cross/gdb-latest
+DEPENDS = cross/llvm-9.0
 endif
