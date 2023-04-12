@@ -4,7 +4,7 @@ SPK_REV = 16
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/libstdc++ cross/$(SPK_NAME)
+DEPENDS = cross/libstdc++ cross/libicu cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
@@ -38,12 +38,12 @@ SERVICE_SETUP = src/service-setup-mono.sh
 SPK_DEPENDS = "mono>=5.8"
 endif
 else
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) armada370),$(ARCH))
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) armada370 alpine alpine4k),$(ARCH))
 DEPENDS = cross/curl cross/$(SPK_NAME)-mono
 SERVICE_SETUP = src/service-setup-mono.sh
 SPK_DEPENDS = "mono>=5.8"
 else
-UNSUPPORTED_ARCHS += armada370
+UNSUPPORTED_ARCHS += armada370 alpine alpine4k
 endif
 endif
 
