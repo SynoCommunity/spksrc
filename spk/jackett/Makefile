@@ -1,6 +1,6 @@
 SPK_NAME = jackett
 SPK_VERS = 0.20.3521
-SPK_REV = 16
+SPK_REV = 17
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
@@ -9,7 +9,7 @@ DEPENDS = cross/libstdc++ cross/libicu cross/$(SPK_NAME)
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
-CHANGELOG = "Update Jackett to 0.20.3521"
+CHANGELOG = "1. Update Jackett to 0.20.3889.<br/>2. Add dotnet dependencies for DSM 7.2."
 DISPLAY_NAME = Jackett
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
