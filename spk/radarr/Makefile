@@ -1,9 +1,9 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 19
+SPK_REV = 20
 SPK_ICON = src/radarr.png
 
-DEPENDS = cross/libstdc++ cross/sqlite cross/radarr
+DEPENDS = cross/libstdc++ cross/libicu cross/sqlite cross/radarr
 
 # Arch exclusions for dotnet 6.0
 DOTNET_SERVARR_ARCHS = 1
@@ -11,7 +11,7 @@ DOTNET_SERVARR_ARCHS = 1
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
-CHANGELOG = "1. Upgrade to Radarr 4.3.2.6857.<br/>2. Fix package update.<br/>3. Enlarge the service start/stop timeout to 90 seconds.<br/>4. Add support for x86 (32-bit) architecture."
+CHANGELOG = "1. Add dotnet dependencies for DSM 7.2.<br/>2. Update Radarr to v4.4.4.7068."
 DISPLAY_NAME = Radarr
 HOMEPAGE = https://radarr.video/
 LICENSE = GPLv3
