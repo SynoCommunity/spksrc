@@ -3,20 +3,20 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 11
 SPK_ICON = src/lidarr.png
 
-DEPENDS = cross/lidarr cross/libstdc++ cross/sqlite
+DEPENDS = cross/lidarr cross/libstdc++ cross/libicu cross/sqlite
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+# Arch exclusions for dotnet 6.0
+DOTNET_SERVARR_ARCHS = 1
 
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-CHANGELOG = "1. Update Lidarr to v1.0.2.<br/>2. Use alternate TMP directory to provide enough space for internal updater.<br/>3. Enlarge the service start/stop timeout to 90 seconds.<br/>4. Avoid Lidarr downgrade on package update."
+CHANGELOG = "1. Add dotnet dependencies for DSM 7.2.<br/>2. Fix package update.<br/>3. Add support for x86 (32-bit) architecture."
 DISPLAY_NAME = Lidarr
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
 LICENSE_FILE = $(WORK_DIR)/Lidarr/LICENSE.md
 HELPURL = https://wiki.servarr.com/Lidarr_Troubleshooting
-SUPPORTURL = https://lidarr.audio/\#support
 
 STARTABLE = yes
 SERVICE_USER = auto
@@ -32,6 +32,7 @@ WIZARDS_DIR = src/wizard/
 POST_STRIP_TARGET = lidarr_extra_install
 
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+# TMPDIR is used for lidarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
@@ -41,6 +42,7 @@ PACKAGE_AUTHOR = [Team Lidarr](https://lidarr.audio/)
 
 .PHONY: lidarr_extra_install
 lidarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var/.config/Lidarr
-	install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Lidarr/config.xml
+	@$(MSG) "Install config.xml and provide package_info."
+	@install -m 755 -d $(STAGING_DIR)/var/.config/Lidarr
+	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Lidarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Lidarr/package_info
