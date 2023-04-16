@@ -1,0 +1,12 @@
+--- v4l/Makefile-orig	2022-06-13 11:55:55.767770973 +0000
++++ v4l/Makefile	2022-06-13 12:21:37.342080547 +0000
+@@ -130,6 +130,9 @@ EXTRA_CFLAGS += $(if $(wildcard $(srctre
+ # Make sure to use the backport header for common stuff
+ EXTRA_CFLAGS += -include $(obj)/compat.h
+ 
++# gives too much warnings (false positives) -> disable it
++EXTRA_CFLAGS += -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration
++
+ #################################################
+ # Kernel 2.6/3.x specific rules
+ 

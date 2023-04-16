@@ -32,13 +32,13 @@ dependency-tree:
 .PHONY: dependency-list
 dependency-list:
 	@echo -n "$(NAME): "
-	@$(MAKE) -s dependency-flat | grep -P "^(cross|native)" | sort -u | tr '\n' ' \0'
+	@$(MAKE) -s dependency-flat | grep -P "^(cross|driver|native)" | sort -u | tr '\n' ' \0'
 	@echo ""
 
 
 .PHONY: dependency-flat
 dependency-flat:
-	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk)/.*"
+	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|driver|native|diyspk)/.*"
 	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS) ; \
 	do \
 	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat ; \

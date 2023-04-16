@@ -584,21 +584,33 @@ publish-legacy-toolchain-%: spk_msg
 kernel-modules-%: SHELL:=/bin/bash
 kernel-modules-%:
 	@if [ "$(filter $(DEFAULT_TC),lastword $(subst -, ,$(MAKECMDGOALS)))" ]; then \
-	   archs2process="$(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
+	   archs2process="$(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/^TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
 	elif [ "$(filter $(GENERIC_ARCHS),$(subst -, ,$(MAKECMDGOALS)))" ]; then \
-	   archs2process="$(filter $(addprefix %-,$(lastword $(subst -, ,$(MAKECMDGOALS)))),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
+	   archs2process="$(filter $(addprefix %-,$(lastword $(subst -, ,$(MAKECMDGOALS)))),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/^TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
 	else \
 	   archs2process=$* ; \
 	fi ; \
-	$(MSG) ARCH to be processed: $${archs2process} ; \
+	$(MSG) ARCH to be processed: $${archs2process} | tee --append build-$*.log ; \
 	for arch in $${archs2process} ; do \
 	  $(MSG) "Processing $${arch} ARCH" ; \
-	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  $(MAKE) spkclean ; \
-	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
-	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
-	done
+	  MAKEFLAGS= $(PSTAT_TIME) WORK_DIR=$(PWD)/work-$* $(MAKE) ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 ; \
+	  [ $$0 -eq 0 ] || false ; \
+	  if [ $$(echo $${archs2process} | wc -w) -gt 1 ]; then \
+	    echo  "===>  Cleaning-up working directory" ; \
+	    $(MAKE) spkclean ; \
+	    echo  "===>  Cleaning-up toolchain directory: syno-$${arch}" ; \
+	    $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
+	    echo  "===>  Deleting $(addprefix linux-, $${arch}) directory" ; \
+	    rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
+	    for depend in $$($(MAKE) --no-print-directory dependency-list | cut -f2 -d:); do \
+	      pkg_name=$$(grep ^PKG_NAME $(PWD)/../../$${depend}/Makefile | cut -f2 -d= | xargs) ; \
+	      echo  "===>  Deleting dependency work files: $${pkg_name}" ; \
+	      rm -fr $(PWD)/work-$*/$${pkg_name}-*; \
+	      rm -f $(PWD)/work-$*/$${pkg_name}.plist*; \
+	      rm -f $(PWD)/work-$*/.$${pkg_name}-*; \
+	    done ; \
+	  fi ; \
+	done | tee --append build-$*.log
 
 arch-%: | pre-build-native
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
