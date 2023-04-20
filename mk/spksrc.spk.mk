@@ -435,7 +435,7 @@ endif
 ifeq ($(PUBLISH_API_KEY),)
 	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	@response=$$(http --verbose --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) 2>&1); \
+	@response=$$(http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) --print=hb); \
 	status=$$?; \
 	response_code=$$(echo "$$response" | grep -Fi "HTTP/1.1" | awk '{print $$2}'); \
 	if [ "$$response_code" = "201" ]; then \
