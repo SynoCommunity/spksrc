@@ -10,7 +10,7 @@ JELLYFIN_ARGS="--service \
  -w ${SYNOPKG_PKGDEST}/web \
  --ffmpeg /var/packages/ffmpeg/target/bin/ffmpeg"
 
-SERVICE_COMMAND="env LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
 
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
