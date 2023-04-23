@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.8.9
-SPK_REV = 9
+SPK_VERS = 10.8.10
+SPK_REV = 10
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
@@ -15,7 +15,7 @@ MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.8.9<br/>2. Update dotnet to 6.0.13<br/>3. Remove support for 32-bit archs."
+CHANGELOG = "1. Update jellyfin to 10.8.10<br/>2. Update dotnet to 6.0.16."
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
