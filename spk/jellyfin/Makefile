@@ -6,7 +6,7 @@ SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
 
-DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
+DEPENDS = cross/libstdc++ cross/libicu cross/jellyfin cross/jellyfin-web
 
 # x64 and armv8 archs are supported only.
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
@@ -15,7 +15,7 @@ MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.8.10<br/>2. Update dotnet to 6.0.16."
+CHANGELOG = "1. Update jellyfin to 10.8.10<br/>2. Update dotnet to 6.0.16.<br/>3. Add dotnet dependencies for DSM 7.2."
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
