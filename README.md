@@ -77,7 +77,7 @@ From there, follow the instructions in the [Developers HOW TO].
 
 ### LXC
 A container based on 64-bit version of Debian 11 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your LXD/LXC environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC basic knowledge :
-1. Create a new container (will use x864_64/amd64 arch by default): `lxc launch images:debian/11 spksrc`
+1. Create a new container (will use x86_64/amd64 arch by default): `lxc launch images:debian/11 spksrc`
 2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
 3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
 4. Install all required packages:
