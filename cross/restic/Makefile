@@ -1,5 +1,5 @@
 PKG_NAME = restic
-PKG_VERS = 0.15.1
+PKG_VERS = 0.15.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/restic/restic/releases/download/v$(PKG_VERS)
