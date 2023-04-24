@@ -6,6 +6,7 @@ SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
 
+OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/jellyfin cross/jellyfin-web
 
 # x64 and armv8 archs are supported only.
