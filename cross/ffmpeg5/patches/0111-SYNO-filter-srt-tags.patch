@@ -1,0 +1,72 @@
+diff -uprN ../ffmpeg-4.2.1-patch1-5-Update4/libavcodec/srtenc.c ./libavcodec/srtenc.c
+--- ../ffmpeg-4.2.1-patch1-5-Update4/libavcodec/srtenc.c	2018-11-01 14:34:25.000000000 -0400
++++ ./libavcodec/srtenc.c	2020-01-17 09:14:46.560339030 -0500
+@@ -26,6 +26,7 @@
+ #include "ass_split.h"
+ #include "ass.h"
+ 
++#include "synoconfig.h"
+ 
+ #define SRT_STACK_SIZE 64
+ 
+@@ -193,7 +194,9 @@ static void srt_alignment_cb(void *priv,
+ static void srt_cancel_overrides_cb(void *priv, const char *style)
+ {
+     srt_stack_push_pop(priv, 0, 1);
++#ifndef SYNO_FILTER_SRT_TAGS
+     srt_style_apply(priv, style);
++#endif
+ }
+ 
+ static void srt_move_cb(void *priv, int x1, int y1, int x2, int y2,
+@@ -221,6 +224,21 @@ static const ASSCodesCallbacks srt_callb
+     .end              = srt_end_cb,
+ };
+ 
++#ifdef SYNO_FILTER_SRT_TAGS
++static const ASSCodesCallbacks srt_callbacks_syno_notag = {
++    .text             = srt_text_cb,
++    .new_line         = srt_new_line_cb,
++    .style            = NULL,
++    .color            = NULL,
++    .font_name        = NULL,
++    .font_size        = NULL,
++    .alignment        = NULL,
++    .cancel_overrides = srt_cancel_overrides_cb,
++    .move             = NULL,
++    .end              = srt_end_cb,
++};
++#endif
++
+ static const ASSCodesCallbacks text_callbacks = {
+     .text             = srt_text_cb,
+     .new_line         = srt_new_line_cb,
+@@ -250,9 +268,13 @@ static int encode_frame(AVCodecContext *
+             dialog = ff_ass_split_dialog(s->ass_ctx, ass, 0, &num);
+             for (; dialog && num--; dialog++) {
+                 s->alignment_applied = 0;
++#ifdef SYNO_FILTER_SRT_TAGS
++                ff_ass_split_override_codes(&srt_callbacks_syno_notag, s, dialog->text);
++#else
+                 if (avctx->codec_id == AV_CODEC_ID_SUBRIP)
+                     srt_style_apply(s, dialog->style);
+                 ff_ass_split_override_codes(cb, s, dialog->text);
++#endif
+             }
+         } else {
+ #endif
+diff -uprN ../ffmpeg-4.2.1-patch1-5-Update4/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.1-patch1-5-Update4/synoconfig.h	2020-01-17 09:30:59.453135285 -0500
++++ ./synoconfig.h	2020-01-17 09:15:23.724603559 -0500
+@@ -45,3 +45,11 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_SMOOTH_STREAMING
+ #endif
++ 
++/* filter out some tag that not needed
++ * those tags producted at *.ass convert *.srt
++ * See Video Station #1031
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_FILTER_SRT_TAGS
++#endif
