@@ -985,7 +985,7 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 ===================================================================
 --- /dev/null
 +++ libavfilter/cuda/tonemap.cu
-@@ -0,0 +1,448 @@
+@@ -0,0 +1,418 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1016,6 +1016,7 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 +extern __constant__ const float dither_size;
 +extern __constant__ const float dither_quantization;
 +
++#define clamp(a, b, c) min(max((a), (b)), (c))
 +#define mix(x, y, a) ((x) + ((y) - (x)) * (a))
 +#define dot3(a, b) ((a).z * (b).z + ((a).y * (b).y + (a).x * (b).x))
 +#define dot4(a, b) ((a).w * (b).w + ((a).z * (b).z + ((a).y * (b).y + (a).x * (b).x)))
@@ -1122,23 +1123,11 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +static __inline__ __device__
-+float3 map_one_pixel_rgb(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
++float3 map_one_pixel_rgb_mode_max(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
 +    float sig = max(max(rgb.x, max(rgb.y, rgb.z)), FLOAT_EPS);
++    float sig_old = sig;
 +    float peak = src.peak;
 +    float dst_peak = 1.0f;
-+
-+/*
-+    // Rescale the variables in order to bring it into a representation where
-+    // 1.0 represents the dst_peak. This is because all of the tone mapping
-+    // algorithms are defined in such a way that they map to the range [0.0, 1.0].
-+    if (dst.peak > 1.0f) {
-+        float scale = 1.0f / dst.peak;
-+        sig *= scale;
-+        peak *= scale;
-+    }
-+*/
-+
-+    float sig_old = sig;
 +
 +    // Desaturate the color using a coefficient dependent on the signal level
 +    if (desat_param > 0.0f) {
@@ -1150,6 +1139,36 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 +
 +    sig = map(sig, peak, dst_peak);
 +    sig = min(sig, 1.0f);
++    rgb = rgb * (sig / sig_old);
++
++    return rgb;
++}
++
++static __inline__ __device__
++float3 map_one_pixel_rgb_mode_rgb(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
++    float3 sig;
++    sig.x = max(rgb.x, FLOAT_EPS);
++    sig.y = max(rgb.y, FLOAT_EPS);
++    sig.z = max(rgb.z, FLOAT_EPS);
++    float3 sig_old = sig;
++    float peak = src.peak;
++    float dst_peak = 1.0f;
++
++    // Desaturate the color using a coefficient dependent on the signal level
++    if (desat_param > 0.0f) {
++        float sig_max = max(max(rgb.x, max(rgb.y, rgb.z)), FLOAT_EPS);
++        float luma = get_luma_dst(rgb, luma_dst);
++        float coeff = max(sig_max - 0.18f, FLOAT_EPS) / max(sig_max, FLOAT_EPS);
++        coeff = __powf(coeff, 10.0f / desat_param);
++        rgb = mix(rgb, make_float3(luma, luma, luma), make_float3(coeff, coeff, coeff));
++    }
++
++    sig.x = map(sig.x, peak, dst_peak);
++    sig.y = map(sig.y, peak, dst_peak);
++    sig.z = map(sig.z, peak, dst_peak);
++    sig.x = min(sig.x, 1.0f);
++    sig.y = min(sig.y, 1.0f);
++    sig.z = min(sig.z, 1.0f);
 +    rgb = rgb * (sig / sig_old);
 +
 +    return rgb;
@@ -1324,11 +1343,17 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 +    float3 c2 = map_to_dst_space_from_yuv_dovi_fast(yuv2); \
 +    float3 c3 = map_to_dst_space_from_yuv_dovi_fast(yuv3);
 +
-+#define _TONEMAP \
-+    c0 = map_one_pixel_rgb(c0, src, dst); \
-+    c1 = map_one_pixel_rgb(c1, src, dst); \
-+    c2 = map_one_pixel_rgb(c2, src, dst); \
-+    c3 = map_one_pixel_rgb(c3, src, dst);
++#define _TONEMAP_MAX \
++    c0 = map_one_pixel_rgb_mode_max(c0, src, dst); \
++    c1 = map_one_pixel_rgb_mode_max(c1, src, dst); \
++    c2 = map_one_pixel_rgb_mode_max(c2, src, dst); \
++    c3 = map_one_pixel_rgb_mode_max(c3, src, dst);
++
++#define _TONEMAP_RGB \
++    c0 = map_one_pixel_rgb_mode_rgb(c0, src, dst); \
++    c1 = map_one_pixel_rgb_mode_rgb(c1, src, dst); \
++    c2 = map_one_pixel_rgb_mode_rgb(c2, src, dst); \
++    c3 = map_one_pixel_rgb_mode_rgb(c3, src, dst);
 +
 +#define _RGB2YUV \
 +    yuv0 = lrgb2yuv(c0); \
@@ -1346,99 +1371,44 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 +#define _WRITER \
 +    write_2x2_flt(dst, x, y, yuv0, yuv1, yuv2, yuv3);
 +
-+__global__ void tonemap(FFCUDAFrame src, FFCUDAFrame dst,
-+                        cudaTextureObject_t ditherTex, float *unused)
-+{
-+    _READER
-+    _YUV2RGB
-+    _TONEMAP
-+    _RGB2YUV
-+    _WRITER
++#define TONEMAP_VARIANT(NAME, READER, RESHAPE, YUV2RGB, TONEMAP, RGB2YUV, DITHER, WRITER) \
++__global__ void tonemap ## NAME( \
++    FFCUDAFrame src, FFCUDAFrame dst, \
++    cudaTextureObject_t ditherTex, float *doviBuf) \
++{ \
++    READER \
++    RESHAPE \
++    YUV2RGB \
++    TONEMAP \
++    RGB2YUV \
++    DITHER \
++    WRITER \
 +}
 +
-+__global__ void tonemap_d(FFCUDAFrame src, FFCUDAFrame dst,
-+                          cudaTextureObject_t ditherTex, float *unused)
-+{
-+    _READER
-+    _YUV2RGB
-+    _TONEMAP
-+    _RGB2YUV
-+    _DITHER
-+    _WRITER
-+}
++TONEMAP_VARIANT(,              _READER,         , _YUV2RGB,   _TONEMAP_MAX, _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_d,            _READER,         , _YUV2RGB,   _TONEMAP_MAX, _RGB2YUV, _DITHER, _WRITER)
++TONEMAP_VARIANT(_rgb,          _READER,         , _YUV2RGB,   _TONEMAP_RGB, _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_rgb_d,        _READER,         , _YUV2RGB,   _TONEMAP_RGB, _RGB2YUV, _DITHER, _WRITER)
 +
-+__global__ void tonemap_dovi(FFCUDAFrame src, FFCUDAFrame dst,
-+                             cudaTextureObject_t ditherTex, float *doviBuf)
-+{
-+    _READER
-+    _RESHAPE
-+    _YCC2RGB
-+    _TONEMAP
-+    _RGB2YUV
-+    _WRITER
-+}
++TONEMAP_VARIANT(_dovi,         _READER, _RESHAPE, _YCC2RGB,   _TONEMAP_MAX, _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_dovi_d,       _READER, _RESHAPE, _YCC2RGB,   _TONEMAP_MAX, _RGB2YUV, _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_rgb,     _READER, _RESHAPE, _YCC2RGB,   _TONEMAP_RGB, _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_dovi_rgb_d,   _READER, _RESHAPE, _YCC2RGB,   _TONEMAP_RGB, _RGB2YUV, _DITHER, _WRITER)
 +
-+__global__ void tonemap_dovi_d(FFCUDAFrame src, FFCUDAFrame dst,
-+                               cudaTextureObject_t ditherTex, float *doviBuf)
-+{
-+    _READER
-+    _RESHAPE
-+    _YCC2RGB
-+    _TONEMAP
-+    _RGB2YUV
-+    _DITHER
-+    _WRITER
-+}
++TONEMAP_VARIANT(_dovi_f,       _READER, _RESHAPE, _YCC2RGB_F, _TONEMAP_MAX, _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_dovi_d_f,     _READER, _RESHAPE, _YCC2RGB_F, _TONEMAP_MAX, _RGB2YUV, _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_rgb_f,   _READER, _RESHAPE, _YCC2RGB_F, _TONEMAP_RGB, _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_dovi_rgb_d_f, _READER, _RESHAPE, _YCC2RGB_F, _TONEMAP_RGB, _RGB2YUV, _DITHER, _WRITER)
 +
-+__global__ void tonemap_dovi_f(FFCUDAFrame src, FFCUDAFrame dst,
-+                               cudaTextureObject_t ditherTex, float *doviBuf)
-+{
-+    _READER
-+    _RESHAPE
-+    _YCC2RGB_F
-+    _TONEMAP
-+    _RGB2YUV
-+    _WRITER
-+}
-+
-+__global__ void tonemap_dovi_d_f(FFCUDAFrame src, FFCUDAFrame dst,
-+                                 cudaTextureObject_t ditherTex, float *doviBuf)
-+{
-+    _READER
-+    _RESHAPE
-+    _YCC2RGB_F
-+    _TONEMAP
-+    _RGB2YUV
-+    _DITHER
-+    _WRITER
-+}
-+
-+__global__ void tonemap_dovi_pq(FFCUDAFrame src, FFCUDAFrame dst,
-+                                cudaTextureObject_t ditherTex, float *doviBuf)
-+{
-+    _READER
-+    _RESHAPE
-+    _YCC2RGB
-+    _RGB2YUV
-+    _WRITER
-+}
-+
-+__global__ void tonemap_dovi_pq_f(FFCUDAFrame src, FFCUDAFrame dst,
-+                                  cudaTextureObject_t ditherTex, float *doviBuf)
-+{
-+    _READER
-+    _RESHAPE
-+    _YCC2RGB_F
-+    _RGB2YUV
-+    _WRITER
-+}
++TONEMAP_VARIANT(_dovi_pq,      _READER, _RESHAPE, _YCC2RGB,               , _RGB2YUV,        , _WRITER)
++TONEMAP_VARIANT(_dovi_pq_f,    _READER, _RESHAPE, _YCC2RGB_F,             , _RGB2YUV,        , _WRITER)
 +
 +}
 Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
 ===================================================================
 --- /dev/null
 +++ libavfilter/cuda/tonemap.h
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,40 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1469,7 +1439,13 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
 +    TONEMAP_HABLE,
 +    TONEMAP_MOBIUS,
 +    TONEMAP_BT2390,
-+    TONEMAP_MAX,
++    TONEMAP_COUNT,
++};
++
++enum TonemapMode {
++    TONEMAP_MODE_MAX,
++    TONEMAP_MODE_RGB,
++    TONEMAP_MODE_COUNT,
 +};
 +
 +#endif /* AVFILTER_CUDA_TONEMAP_H */
@@ -1568,7 +1544,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_tonemap_cuda.c
-@@ -0,0 +1,1088 @@
+@@ -0,0 +1,1096 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1675,6 +1651,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +    float *dovi_pbuf;
 +
 +    enum TonemapAlgorithm tonemap;
++    enum TonemapMode tonemap_mode;
 +    int apply_dovi;
 +    int tradeoff;
 +    int init_with_dovi;
@@ -2080,6 +2057,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +    enum AVColorSpace in_spc = s->in_spc, out_spc = s->out_spc;
 +    enum AVColorPrimaries in_pri = s->in_pri, out_pri = s->out_pri;
 +    enum AVColorRange in_range = s->in_range, out_range = s->out_range;
++    int rgb = s->tonemap_mode == TONEMAP_MODE_RGB;
 +    int d = s->in_desc->comp[0].depth > s->out_desc->comp[0].depth && s->ditherTex;
 +    char info_log[4096], error_log[4096];
 +    CUjit_option options[] = { CU_JIT_INFO_LOG_BUFFER,
@@ -2311,13 +2289,16 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +        goto fail2;
 +
 +    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module,
-+                                           d ? "tonemap_d" : "tonemap"));
++                                           rgb ? (d ? "tonemap_rgb_d" : "tonemap_rgb")
++                                               : (d ? "tonemap_d" : "tonemap")));
 +    if (ret < 0)
 +        goto fail2;
 +
 +    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module,
-+                                           s->tradeoff == 1 ? (d ? "tonemap_dovi_d_f" : "tonemap_dovi_f")
-+                                                            : (d ? "tonemap_dovi_d" : "tonemap_dovi")));
++                                           s->tradeoff == 1 ? (rgb ? (d ? "tonemap_dovi_rgb_d_f" : "tonemap_dovi_rgb_f")
++                                                                   : (d ? "tonemap_dovi_d_f" : "tonemap_dovi_f"))
++                                                            : (rgb ? (d ? "tonemap_dovi_rgb_d" : "tonemap_dovi_rgb")
++                                                                   : (d ? "tonemap_dovi_d" : "tonemap_dovi"))));
 +    if (ret < 0)
 +        goto fail2;
 +
@@ -2576,7 +2557,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +#define OFFSET(x) offsetof(TonemapCUDAContext, x)
 +#define FLAGS (AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM)
 +static const AVOption options[] = {
-+    { "tonemap",       "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, {.i64 = TONEMAP_NONE}, TONEMAP_NONE, TONEMAP_MAX - 1, FLAGS, "tonemap" },
++    { "tonemap",       "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, {.i64 = TONEMAP_NONE}, TONEMAP_NONE, TONEMAP_COUNT - 1, FLAGS, "tonemap" },
 +    {     "none",      0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_NONE},              0, 0, FLAGS, "tonemap" },
 +    {     "linear",    0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_LINEAR},            0, 0, FLAGS, "tonemap" },
 +    {     "gamma",     0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_GAMMA},             0, 0, FLAGS, "tonemap" },
@@ -2585,6 +2566,9 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +    {     "hable",     0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_HABLE},             0, 0, FLAGS, "tonemap" },
 +    {     "mobius",    0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_MOBIUS},            0, 0, FLAGS, "tonemap" },
 +    {     "bt2390",    0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_BT2390},            0, 0, FLAGS, "tonemap" },
++    { "tonemap_mode",  "Tonemap mode selection", OFFSET(tonemap_mode), AV_OPT_TYPE_INT, {.i64 = TONEMAP_MODE_MAX}, TONEMAP_MODE_MAX, TONEMAP_MODE_COUNT - 1, FLAGS, "tonemap_mode" },
++    {     "max",       0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_MODE_MAX},          0, 0, FLAGS, "tonemap_mode" },
++    {     "rgb",       0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_MODE_RGB},          0, 0, FLAGS, "tonemap_mode" },
 +    { "transfer",      "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, {.i64 = AVCOL_TRC_BT709}, -1, INT_MAX, FLAGS, "transfer" },
 +    { "t",             "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, {.i64 = AVCOL_TRC_BT709}, -1, INT_MAX, FLAGS, "transfer" },
 +    {     "bt709",     0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_TRC_BT709},           0, 0, FLAGS, "transfer" },
