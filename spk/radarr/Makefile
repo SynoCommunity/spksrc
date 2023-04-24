@@ -3,6 +3,7 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 20
 SPK_ICON = src/radarr.png
 
+OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/radarr
 
 # Arch exclusions for dotnet 6.0
@@ -37,7 +38,7 @@ USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# use the updated libstdc++ library on DSM < 7.0.
+# dotnet requires libstdc++ version >= 6.0.22
 DEPENDS += cross/libstdc++
 endif
 
