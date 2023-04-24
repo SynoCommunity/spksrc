@@ -4,6 +4,7 @@ SPK_REV = 17
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
+OPTIONAL_DEPENDS = cross/libstdc++ cross/curl cross/$(SPK_NAME)-mono
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = SynoCommunity
