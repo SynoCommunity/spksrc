@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Initial package release"
+CHANGELOG = "1. Initial package release<br/>2. Fix permissions on DSM6"
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -17,12 +17,15 @@ LICENSE  = GPLv3
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SERVICE_USER = auto
-VIDEODRIVER = on
 SPK_COMMANDS  = bin/ffmpeg
 SPK_COMMANDS += bin/$(SPK_NAME)
 
 include ../../mk/spksrc.archs.mk
+
+ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
+SERVICE_USER = auto
+VIDEODRIVER = on
+endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 SERVICE_SETUP = src/service-setup.sh
