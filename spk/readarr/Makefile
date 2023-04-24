@@ -1,9 +1,10 @@
 SPK_NAME = readarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/readarr.png
 
-DEPENDS = cross/sqlite cross/libstdc++ cross/readarr
+OPTIONAL_DEPENDS = cross/libstdc++
+DEPENDS = cross/readarr
 
 # Arch exclusions for dotnet 6.0
 DOTNET_SERVARR_ARCHS = 1
@@ -11,7 +12,7 @@ DOTNET_SERVARR_ARCHS = 1
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION  = Readarr is an ebook and audiobook collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new books from your favorite authors and will grab, sort, and rename them.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Fix dotnet dependencies for DSM 7.2."
 DISPLAY_NAME = Readarr
 HOMEPAGE = https://readarr.com/
 LICENSE  = GPLv3
@@ -34,6 +35,12 @@ POST_STRIP_TARGET = readarr_extra_install
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 # TMPDIR is used for readarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# dotnet requires libstdc++ version >= 6.0.22
+DEPENDS += cross/libstdc++
+endif
 
 include ../../mk/spksrc.spk.mk
 
