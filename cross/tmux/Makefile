@@ -12,11 +12,5 @@ COMMENT  = tmux is a terminal multiplexer, it enables a number of terminals or w
 LICENSE  = BSD License
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = tmux_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: tmux_pre_configure
-tmux_pre_configure:
-	@$(MSG) Reconfigure with patched configure.ac
-	@$(RUN) autoreconf

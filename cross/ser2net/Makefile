@@ -1,5 +1,5 @@
 PKG_NAME = ser2net
-PKG_VERS = 4.3.10
+PKG_VERS = 4.3.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/ser2net/archive

@@ -12,6 +12,7 @@ COMMENT  = Portable C/C++ library for network traffic capture.
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-pcap=linux
+CONFIGURE_ARGS  = --with-pcap=linux
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
