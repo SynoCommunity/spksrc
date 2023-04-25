@@ -436,13 +436,12 @@ ifeq ($(PUBLISH_API_KEY),)
 	$(error Set PUBLISH_API_KEY in local.mk)
 endif
 	@response=$$(http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) --print=hb); \
-	status=$$?; \
 	response_code=$$(echo "$$response" | grep -Fi "HTTP/1.1" | awk '{print $$2}'); \
 	if [ "$$response_code" = "201" ]; then \
 		output=$$(echo "$$response" | awk '/^[[:space:]]*$$/ {p=1;next} p'); \
-		echo "Package published successfully: $$output" | tee --append publish-$*.log; \
+		echo -e "Package published successfully\n$$output" | tee --append publish-$*.log; \
 	else \
-		echo "ERROR: Failed to publish package - HTTP response code $$response_code" | tee --append publish-$*.log; \
+		echo -e "ERROR: Failed to publish package - HTTP response code $$response_code\n$$output" | tee --append publish-$*.log; \
 		exit 1; \
 	fi
 
