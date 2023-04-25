@@ -2,7 +2,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
 ===================================================================
 --- libavutil/hwcontext_vaapi.c
 +++ libavutil/hwcontext_vaapi.c
-@@ -1319,8 +1319,17 @@ static int vaapi_map_to_drm_esh(AVHWFram
+@@ -1319,8 +1319,16 @@ static int vaapi_map_to_drm_esh(AVHWFram
      surface_id = (VASurfaceID)(uintptr_t)src->data[3];
  
      export_flags = VA_EXPORT_SURFACE_SEPARATE_LAYERS;
@@ -12,9 +12,8 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
 +
 +        vas = vaSyncSurface(hwctx->display, surface_id);
 +        if (vas != VA_STATUS_SUCCESS) {
-+            av_log(hwfc, AV_LOG_ERROR, "Failed to sync surface "
++            av_log(hwfc, AV_LOG_WARNING, "Failed to sync surface "
 +                   "%#x: %d (%s).\n", surface_id, vas, vaErrorStr(vas));
-+            return AVERROR(EIO);
 +        }
 +    }
 +
