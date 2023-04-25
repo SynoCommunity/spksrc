@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg6
 SPK_VERS = 6.0
 SPK_REV = 2
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Initial package release<br/>2. Fix permissions on DSM6"
+CHANGELOG = "1. Fix permissions on DSM6<br/>2. Update Jellyfin upstream patches from Apr 13th"
 
 DEPENDS = cross/$(SPK_NAME)
 
