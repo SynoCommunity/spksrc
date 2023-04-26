@@ -1,10 +1,13 @@
 #!/bin/sh
 
+source /etc.defaults/VERSION
+if [ ${majorversion} -ge 7 ]; then
+    echo "ERROR: ${0} does not work on DSM 7+" >&2
+    exit -1
+fi
+
 CERT_DIR=/usr/local/etc/certificate/syncthing/syncthing_webui
 CONF_DIR=/var/packages/syncthing/var
-if [ ! -d "$CONF_DIR" ]; then
-   CONF_DIR=/var/packages/syncthing/target/var
-fi
 SYNCTHING=/var/packages/syncthing/target/bin/syncthing
 
 case $1 in
