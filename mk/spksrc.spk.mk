@@ -439,9 +439,9 @@ endif
 	response_code=$$(echo "$$response" | grep -Fi "HTTP/1.1" | awk '{print $$2}'); \
 	if [ "$$response_code" = "201" ]; then \
 		output=$$(echo "$$response" | awk '/^[[:space:]]*$$/ {p=1;next} p'); \
-		echo -e "Package published successfully\n$$output" | tee --append publish-$*.log; \
+		echo "Package published successfully\n$$output" | tee --append publish-$*.log; \
 	else \
-		echo -e "ERROR: Failed to publish package - HTTP response code $$response_code\n$$output" | tee --append publish-$*.log; \
+		echo "ERROR: Failed to publish package - HTTP response code $$response_code\n$$output" | tee --append publish-$*.log; \
 		exit 1; \
 	fi
 
