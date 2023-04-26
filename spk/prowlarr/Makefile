@@ -1,9 +1,10 @@
 SPK_NAME = prowlarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/prowlarr.png
 
-DEPENDS = cross/sqlite cross/libstdc++ cross/prowlarr
+OPTIONAL_DEPENDS = cross/libstdc++
+DEPENDS = cross/prowlarr
 
 # Arch exclusions for dotnet 6.0
 DOTNET_SERVARR_ARCHS = 1
@@ -11,7 +12,7 @@ DOTNET_SERVARR_ARCHS = 1
 MAINTAINER = Team Prowlarr
 MAINTAINER_URL = https://prowlarr.com/
 DESCRIPTION = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required \(we do it all\).
-CHANGELOG = "1. Update Prowlarr to v1.1.3.2521.<br/>2. Add support for x86 (32-bit) architecture."
+CHANGELOG = "1. Fix dotnet dependencies for DSM 7.2.<br/>2. Update Prowlarr to v1.3.2.3006."
 DISPLAY_NAME = Prowlarr
 HOMEPAGE = https://prowlarr.com/
 LICENSE  = GPLv3
@@ -34,6 +35,12 @@ POST_STRIP_TARGET = prowlarr_extra_install
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 # TMPDIR is used for prowlarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# dotnet requires libstdc++ version >= 6.0.22
+DEPENDS += cross/libstdc++
+endif
 
 include ../../mk/spksrc.spk.mk
 
