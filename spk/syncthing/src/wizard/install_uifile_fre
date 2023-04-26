@@ -1,10 +1,60 @@
 [
     {
-        "step_title": "Permissions DSM",
+        "step_title": "Authentification pour interface graphique",
+        "invalid_next_disabled": true,
         "items": [
             {
-                "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-syncthing'</b> dans DSM.<br>Depuis File Station, ajouter ce groupe à tout répertoire auquel Syncthing doit avoir accès.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+                "desc": "L'interface graphique Syncthing ne doit pas être accessible sans authentification. Ce serait dangereux car avec l'accès à l'interface graphique Web, n'importe quel dossier peut être configuré pour être partagé par un tiers malveillant.<br/>Veuillez fournir un nom d'utilisateur et un mot de passe pour vous protéger contre les connexions non autorisées. Il sera requis à chaque ouverture de l'interface graphique de Syncthing.<br/><br/>(Laisser l'un ou l'autre des champs vide désactive l'authentification.)"
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_username",
+                        "desc": "Nom d'utilisateur",
+                        "defaultValue": "syncthing",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[^<>:*/?\"|]*$/",
+                                "errorText": "Caractère non autorisé dans le nom d'utilisateur"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_password",
+                        "desc": "Le mot de passe",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^[^<>:*/?\"|]*$/",
+                                "errorText": "Caractère non autorisé dans le mot de passe"
+                            }
+                        }
+                    }
+                ]
             }
+        ]
+    },
+    {
+        "step_title": "Permissions et Personnalisation",
+        "items": [
+            {
+                "desc": "<b>Permissions</b>"
+            },
+            {
+                "desc": "Les permissions pour cette application sont gérées par le groupe <b>'sc-syncthing'</b>.<br>Depuis File Station, ajouter ce groupe à tout répertoire auquel Syncthing doit avoir accès.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+            },
+            {
+                "desc": "<b>Personnalisation</b>"
+            },
+            {
+                "desc": "Pour une personnalisation avancée, vous pouvez modifier le fichier <code>/var/packages/syncthing/var/options.conf</code>. Par exemple, vous pouvez définir un dossier <code>HOME</code> personnalisé ou des paramètres supplémentaires avec lesquels démarrer Syncthing. <br/>Pour modifier le fichier d'options, vous avez besoin d'un accès <code>SSH</code> avec un compte utilisateur privilégié. <br/>Pour appliquer vos modifications, vous devez redémarrer Syncthing dans le Centre de paquets."            }
         ]
     }
 ]
