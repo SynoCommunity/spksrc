@@ -59,14 +59,14 @@ diff -uprN ../ffmpeg-4.3-022/libavformat/matroskaenc.c ./libavformat/matroskaenc
 +                               mkv->old_key_packet.duration = pkt->duration;
 +                               av_packet_unref(pkt);
 +                               av_init_packet(pkt);
-+                               av_copy_packet(pkt, &mkv->old_key_packet);
++                               av_packet_ref(pkt, &mkv->old_key_packet);
 +                               mkv->unfilled = 0;
 +                       }
 +                       av_packet_unref(&mkv->old_key_packet);
 +               } else {
 +                       if (pkt->flags & AV_PKT_FLAG_KEY) {
 +                               av_packet_unref(&mkv->old_key_packet);
-+                               av_copy_packet(&mkv->old_key_packet, pkt);
++                               av_packet_ref(&mkv->old_key_packet, pkt);
 +                       }
 +                       return 0;
 +               }

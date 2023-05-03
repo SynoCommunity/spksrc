@@ -57,16 +57,16 @@ diff -uprN ../ffmpeg-4.3-005/libavformat/segment.c ./libavformat/segment.c
 +				seg->old_key_packet.pts = pkt->pts;
 +				seg->old_key_packet.dts = pkt->dts;
 +				seg->old_key_packet.duration = pkt->duration;
-+				av_free_packet(pkt);
++				av_packet_unref(pkt);
 +				av_init_packet(pkt);
-+				av_copy_packet(pkt, &seg->old_key_packet);
++				av_packet_ref(pkt, &seg->old_key_packet);
 +				seg->filled = 0;
 +			}
-+			av_free_packet(&seg->old_key_packet);
++			av_packet_unref(&seg->old_key_packet);
 +		} else {
 +			if (pkt->flags & AV_PKT_FLAG_KEY) {
-+				av_free_packet(&seg->old_key_packet);
-+				av_copy_packet(&seg->old_key_packet, pkt);
++				av_packet_unref(&seg->old_key_packet);
++				av_packet_ref(&seg->old_key_packet, pkt);
 +			}
 +			return 0;
 +		}
