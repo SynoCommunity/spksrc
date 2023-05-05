@@ -1,21 +1,20 @@
 # Package specific behaviors
 # Sourced script by generic installer and start-stop-status scripts
 
-ARCHS="apollolake geminilake"
-UNAME=$(uname -a)
-SUPPORTED=FALSE
-FFMPEG_VER=5
+KERNEL_MIN="4.4"
+KERNEL_RUNNING=$(uname -r)
+STATUS=$(printf '%s\n%s' "${KERNEL_MIN}" "${KERNEL_RUNNING}" | sort -VC && echo $?)
+FFMPEG_VER=$(printf %.1s "$SYNOPKG_PKGVER")
 FFMPEG_DIR=/var/packages/ffmpeg${FFMPEG_VER}/target
 iHD=${FFMPEG_DIR}/lib/iHD_drv_video.so
 
+###
+### Disable Intel iHD driver on older kernels
+### $(uname -r) <= ${KERNEL}
+###
 disable_iHD ()
 {
-    for arch in ${ARCHS}
-    do
-       echo ${UNAME} | grep -q ${arch} && SUPPORTED=TRUE
-    done
-
-    if [ "${SUPPORTED}" = "FALSE" ]; then
+    if [ "${STATUS}" = "0" ]; then
        [ -s ${iHD} ] && mv ${iHD} ${iHD}-DISABLED 2>/dev/null
     fi
 }
