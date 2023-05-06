@@ -11,13 +11,13 @@ CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = nop
 
-OPTIONAL_DEPENDS  = cross/intel-media-latest
-OPTIONAL_DEPENDS += cross/intel-media-22.5
+OPTIONAL_DEPENDS  = cross/intel-media-driver-latest
+OPTIONAL_DEPENDS += cross/intel-media-driver-22.5
 
 include ../../mk/spksrc.install-resources.mk
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-DEPENDS = cross/intel-media-latest
+DEPENDS = cross/intel-media-driver-latest
 else
-DEPENDS = cross/intel-media-22.5
+DEPENDS = cross/intel-media-driver-22.5
 endif
