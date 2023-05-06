@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg
 SPK_VERS = 4.4.4
 SPK_REV = 49
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 4.4.4<br/>2. Fix permissions on DSM6"
+CHANGELOG = "1. Update to version 4.4.4<br/>2. Fix permissions on DSM6<br/>3. Update Intel Media Driver 2023Q1 Release (DSM7 only)"
 
 DEPENDS = cross/ffmpeg4
 
