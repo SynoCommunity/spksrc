@@ -4,8 +4,7 @@
 KERNEL_MIN="4.4"
 KERNEL_RUNNING=$(uname -r)
 STATUS=$(printf '%s\n%s' "${KERNEL_MIN}" "${KERNEL_RUNNING}" | sort -VCr && echo $?)
-FFMPEG_VER=$(printf %.1s "$SYNOPKG_PKGVER")
-FFMPEG_DIR=/var/packages/ffmpeg${FFMPEG_VER}/target
+FFMPEG_DIR=/var/packages/ffmpeg/target
 iHD=${FFMPEG_DIR}/lib/iHD_drv_video.so
 
 ###
