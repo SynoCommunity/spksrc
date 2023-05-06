@@ -11,6 +11,15 @@ DEPENDS = cross/$(SPK_NAME)
 DEPENDS += cross/libxml2 cross/libxslt
 DEPENDS += cross/unrar
 
+# [Pillow]
+DEPENDS += cross/freetype cross/libjpeg cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += build_ext
+WHEELS_BUILD_ARGS += --disable-platform-guessing
+WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-zlib
+
 SPK_DEPENDS = "python310:ffmpeg"
 
 MAINTAINER = smaarn
