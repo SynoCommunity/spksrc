@@ -129,14 +129,15 @@ python311_install:
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
 # wheels to install in crossenv
-CROSSENV_WHEELS  = setuptools==63.4.3
-CROSSENV_WHEELS += setuptools-rust==1.6.0
+CROSSENV_WHEELS  = setuptools-rust==1.6.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
-CROSSENV_WHEELS += wheel==0.40.0
+CROSSENV_WHEELS += cffi==1.15.1
 CROSSENV_WHEELS += poetry==1.4.2
 CROSSENV_WHEELS += Cython==0.29.34
 CROSSENV_WHEELS += flit==3.8.0
-CROSSENV_WHEELS += cryptography==40.0.2
+# Build failures with version >= 40
+#CROSSENV_WHEELS += cryptography==40.0.2
+CROSSENV_WHEELS += cryptography==39.0.2
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==0.15.1
 endif
@@ -151,6 +152,8 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.40.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.40.0"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
