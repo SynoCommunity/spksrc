@@ -2,7 +2,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.c
 ===================================================================
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
-@@ -169,7 +169,7 @@ int ff_opencl_filter_load_program(AVFilt
+@@ -170,7 +170,7 @@ int ff_opencl_filter_load_program(AVFilt
      }
  
      cle = clBuildProgram(ctx->program, 1, &ctx->hwctx->device_id,
@@ -11,7 +11,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.c
      if (cle != CL_SUCCESS) {
          av_log(avctx, AV_LOG_ERROR, "Failed to build program: %d.\n", cle);
  
-@@ -330,7 +330,7 @@ void ff_opencl_print_const_matrix_3x3(AV
+@@ -331,7 +331,7 @@ void ff_opencl_print_const_matrix_3x3(AV
      av_bprintf(buf, "__constant float %s[9] = {\n", name_str);
      for (i = 0; i < 3; i++) {
          for (j = 0; j < 3; j++)
@@ -384,7 +384,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
      float j = tone_param;
      float a, b;
  
-@@ -71,202 +77,312 @@ float mobius(float s, float peak) {
+@@ -71,202 +77,335 @@ float mobius(float s, float peak) {
          return s;
  
      a = -j * j * (peak - 1.0f) / (j * j - 2.0f * j + peak);
@@ -442,13 +442,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 -        atomic_max(&peak_buf[frame_idx], avg_wg);
 -        atomic_add(&avg_buf[frame_idx], avg_wg);
 -    }
--
--    if (scene_frame_num > 0) {
--        float peak = (float)*max_total_p / (REFERENCE_WHITE * scene_frame_num);
--        float avg = (float)*avg_total_p / (REFERENCE_WHITE * scene_frame_num);
--        r.peak = max(1.0f, peak);
--        r.average = max(0.25f, avg);
--    }
 +float bt2390(float s, float peak_inv_pq, float target_peak_inv_pq) {
 +    float peak_pq = peak_inv_pq;
 +    float scale = peak_pq > 0.0f ? (1.0f / peak_pq) : 1.0f;
@@ -464,6 +457,37 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +               (tb3 - 2.0f * tb2 + tb) * (1.0f - ks) +
 +               (-2.0f * tb3 + 3.0f * tb2) * max_lum;
 +    float sig = mix(pb, s_pq, s_pq < ks);
++
++    return eotf_st2084(sig * peak_pq);
++}
++
++void map_four_pixels_rgb(float4 *r4, float4 *g4, float4 *b4, float peak) {
++#ifdef TONE_MODE_RGB
++    float4 sig_r = fmax(*r4, FLOAT_EPS), sig_ro = sig_r;
++    float4 sig_g = fmax(*g4, FLOAT_EPS), sig_go = sig_g;
++    float4 sig_b = fmax(*b4, FLOAT_EPS), sig_bo = sig_b;
++#else
++    float4 sig = fmax(fmax(*r4, fmax(*g4, *b4)), FLOAT_EPS);
++    float4 sig_o = sig;
++#endif
+ 
+-    if (scene_frame_num > 0) {
+-        float peak = (float)*max_total_p / (REFERENCE_WHITE * scene_frame_num);
+-        float avg = (float)*avg_total_p / (REFERENCE_WHITE * scene_frame_num);
+-        r.peak = max(1.0f, peak);
+-        r.average = max(0.25f, avg);
++    // Desaturate the color using a coefficient dependent on the signal level
++    if (desat_param > 0.0f) {
++#ifdef TONE_MODE_RGB
++        float4 sig = fmax(fmax(*r4, fmax(*g4, *b4)), FLOAT_EPS);
++#endif
++        float4 luma = get_luma_dst4(*r4, *g4, *b4);
++        float4 coeff = fmax(sig - 0.18f, FLOAT_EPS) / fmax(sig, FLOAT_EPS);
++        coeff = native_powr(coeff, 10.0f / desat_param);
++        *r4 = mix(*r4, luma, coeff);
++        *g4 = mix(*g4, luma, coeff);
++        *b4 = mix(*b4, luma, coeff);
+     }
  
 -    if (lidx == 0 && lidy == 0 && atomic_add(counter_wg_p, 1) == num_wg - 1) {
 -        *counter_wg_p = 0;
@@ -496,77 +520,51 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 -                                 (uint)DETECTION_FRAMES);
 -    }
 -    return r;
-+    return eotf_st2084(sig * peak_pq);
- }
- 
--float3 map_one_pixel_rgb(float3 rgb, float peak, float average) {
--    float sig = max(max(rgb.x, max(rgb.y, rgb.z)), 1e-6f);
--
-+/*
-+float rescale_peak(float sig) {
-     // Rescale the variables in order to bring it into a representation where
-     // 1.0 represents the dst_peak. This is because all of the tone mapping
-     // algorithms are defined in such a way that they map to the range [0.0, 1.0].
--    if (target_peak > 1.0f) {
-+    if (target_peak > 1.0f)
-         sig *= 1.0f / target_peak;
--        peak *= 1.0f / target_peak;
--    }
- 
--    float sig_old = sig;
-+    return sig;
++#define MAP_FOUR_PIXELS(sig, peak, target_peak) \
++{ \
++    sig.x = TONE_FUNC(sig.x, peak, target_peak); \
++    sig.y = TONE_FUNC(sig.y, peak, target_peak); \
++    sig.z = TONE_FUNC(sig.z, peak, target_peak); \
++    sig.w = TONE_FUNC(sig.w, peak, target_peak); \
 +}
-+*/
- 
--    // Scale the signal to compensate for differences in the average brightness
--    float slope = min(1.0f, sdr_avg / average);
--    sig *= slope;
--    peak *= slope;
-+void map_four_pixels_rgb(float4 *r4, float4 *g4, float4 *b4, float peak) {
-+    float4 sig = fmax(fmax(*r4, fmax(*g4, *b4)), FLOAT_EPS);
-+    float4 sig_old = sig;
- 
-     // Desaturate the color using a coefficient dependent on the signal level
-     if (desat_param > 0.0f) {
--        float luma = get_luma_dst(rgb);
--        float coeff = max(sig - 0.18f, 1e-6f) / max(sig, 1e-6f);
-+        float4 luma = get_luma_dst4(*r4, *g4, *b4);
-+        float4 coeff = fmax(sig - 0.18f, FLOAT_EPS) / fmax(sig, FLOAT_EPS);
-         coeff = native_powr(coeff, 10.0f / desat_param);
--        rgb = mix(rgb, (float3)luma, (float3)coeff);
--        sig = mix(sig, luma * slope, coeff);
-+        *r4 = mix(*r4, luma, coeff);
-+        *g4 = mix(*g4, luma, coeff);
-+        *b4 = mix(*b4, luma, coeff);
-     }
- 
--    sig = TONE_FUNC(sig, peak);
--
--    sig = min(sig, 1.0f);
--    rgb *= (sig/sig_old);
--    return rgb;
--}
--// map from source space YUV to destination space RGB
--float3 map_to_dst_space_from_yuv(float3 yuv, float peak) {
++
 +#ifdef TONE_FUNC_BT2390
 +    float src_peak_delin_pq = inverse_eotf_st2084(peak);
 +    float dst_peak_delin_pq = inverse_eotf_st2084(1.0f);
-+    sig.x = TONE_FUNC(sig.x, src_peak_delin_pq, dst_peak_delin_pq);
-+    sig.y = TONE_FUNC(sig.y, src_peak_delin_pq, dst_peak_delin_pq);
-+    sig.z = TONE_FUNC(sig.z, src_peak_delin_pq, dst_peak_delin_pq);
-+    sig.w = TONE_FUNC(sig.w, src_peak_delin_pq, dst_peak_delin_pq);
++  #ifdef TONE_MODE_RGB
++    MAP_FOUR_PIXELS(sig_r, src_peak_delin_pq, dst_peak_delin_pq)
++    MAP_FOUR_PIXELS(sig_g, src_peak_delin_pq, dst_peak_delin_pq)
++    MAP_FOUR_PIXELS(sig_b, src_peak_delin_pq, dst_peak_delin_pq)
++  #else
++    MAP_FOUR_PIXELS(sig, src_peak_delin_pq, dst_peak_delin_pq)
++  #endif
 +#else
-+    sig.x = TONE_FUNC(sig.x, peak, 1.0f);
-+    sig.y = TONE_FUNC(sig.y, peak, 1.0f);
-+    sig.z = TONE_FUNC(sig.z, peak, 1.0f);
-+    sig.w = TONE_FUNC(sig.w, peak, 1.0f);
++  #ifdef TONE_MODE_RGB
++    MAP_FOUR_PIXELS(sig_r, peak, 1.0f)
++    MAP_FOUR_PIXELS(sig_g, peak, 1.0f)
++    MAP_FOUR_PIXELS(sig_b, peak, 1.0f)
++  #else
++    MAP_FOUR_PIXELS(sig, peak, 1.0f)
++  #endif
 +#endif
-+    sig = fmin(sig, 1.0f);
 +
-+    float4 factor = sig / sig_old;
++#ifdef TONE_MODE_RGB
++    sig_r = fmin(sig_r, 1.0f);
++    sig_g = fmin(sig_g, 1.0f);
++    sig_b = fmin(sig_b, 1.0f);
++    float4 factor_r = sig_r / sig_ro;
++    float4 factor_g = sig_g / sig_go;
++    float4 factor_b = sig_b / sig_bo;
++    *r4 *= factor_r;
++    *g4 *= factor_g;
++    *b4 *= factor_b;
++#else
++    sig = fmin(sig, 1.0f);
++    float4 factor = sig / sig_o;
 +    *r4 *= factor;
 +    *g4 *= factor;
 +    *b4 *= factor;
++#endif
 +}
 +
 +// Map from source space YUV to destination space RGB
@@ -576,18 +574,25 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +    c = lms2rgb(c.x, c.y, c.z);
 +    c = rgb2lrgb(c);
 +#else
-     float3 c = yuv2lrgb(yuv);
--    c = ootf(c, peak);
-     c = lrgb2lrgb(c);
++    float3 c = yuv2lrgb(yuv);
++    c = lrgb2lrgb(c);
 +#endif
-     return c;
++    return c;
  }
  
+-float3 map_one_pixel_rgb(float3 rgb, float peak, float average) {
+-    float sig = max(max(rgb.x, max(rgb.y, rgb.z)), 1e-6f);
 +#ifdef DOVI_RESHAPE
 +float reshape_poly(float s, float4 coeffs) {
 +    return (coeffs.z * s + coeffs.y) * s + coeffs.x;
 +}
-+
+ 
+-    // Rescale the variables in order to bring it into a representation where
+-    // 1.0 represents the dst_peak. This is because all of the tone mapping
+-    // algorithms are defined in such a way that they map to the range [0.0, 1.0].
+-    if (target_peak > 1.0f) {
+-        sig *= 1.0f / target_peak;
+-        peak *= 1.0f / target_peak;
 +float reshape_mmr(float3 sig,
 +                  float4 coeffs,
 +                  __global float4 *dovi_mmr,
@@ -616,8 +621,9 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +            s += dot(dovi_mmr[mmr_idx + 4].xyz, sig2 * sig);
 +            s += dot(dovi_mmr[mmr_idx + 5], sigX2 * sigX);
 +        }
-+    }
-+
+     }
+ 
+-    float sig_old = sig;
 +    return s;
 +}
 +
@@ -666,20 +672,43 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +                             (float4)(s >= dovi_pivots[5])),
 +                         (float4)(s >= dovi_pivots[3]));
 +        }
-+
+ 
+-    // Scale the signal to compensate for differences in the average brightness
+-    float slope = min(1.0f, sdr_avg / average);
+-    sig *= slope;
+-    peak *= slope;
 +        int has_mmr_poly = dovi_has_mmr && dovi_has_poly;
-+
+ 
+-    // Desaturate the color using a coefficient dependent on the signal level
+-    if (desat_param > 0.0f) {
+-        float luma = get_luma_dst(rgb);
+-        float coeff = max(sig - 0.18f, 1e-6f) / max(sig, 1e-6f);
+-        coeff = native_powr(coeff, 10.0f / desat_param);
+-        rgb = mix(rgb, (float3)luma, (float3)coeff);
+-        sig = mix(sig, luma * slope, coeff);
+-    }
 +        if ((has_mmr_poly && coeffs.w == 0.0f) || (!has_mmr_poly && dovi_has_poly))
 +            s = reshape_poly(s, coeffs);
 +        else
 +            s = reshape_mmr(sig, coeffs, dovi_mmr,
 +                            dovi_mmr_single, dovi_min_order, dovi_max_order);
-+
+ 
+-    sig = TONE_FUNC(sig, peak);
 +        sig_arr[i] = clamp(s, dovi_lo, dovi_hi);
 +    }
-+
+ 
+-    sig = min(sig, 1.0f);
+-    rgb *= (sig/sig_old);
+-    return rgb;
+-}
+-// map from source space YUV to destination space RGB
+-float3 map_to_dst_space_from_yuv(float3 yuv, float peak) {
+-    float3 c = yuv2lrgb(yuv);
+-    c = ootf(c, peak);
+-    c = lrgb2lrgb(c);
+-    return c;
 +    return (float3)(sig_arr[0], sig_arr[1], sig_arr[2]);
-+}
+ }
 +#endif
 +
 +__constant sampler_t sampler = (CLK_NORMALIZED_COORDS_FALSE |
@@ -693,7 +722,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +__constant sampler_t d_sampler = (CLK_NORMALIZED_COORDS_TRUE |
 +                                  CLK_ADDRESS_REPEAT         |
 +                                  CLK_FILTER_NEAREST);
-+
+ 
  __kernel void tonemap(__write_only image2d_t dst1,
                        __read_only  image2d_t src1,
                        __write_only image2d_t dst2,
@@ -906,15 +935,23 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
  enum TonemapAlgorithm {
      TONEMAP_NONE,
-@@ -45,6 +56,7 @@ enum TonemapAlgorithm {
+@@ -45,7 +56,14 @@ enum TonemapAlgorithm {
      TONEMAP_REINHARD,
      TONEMAP_HABLE,
      TONEMAP_MOBIUS,
+-    TONEMAP_MAX,
 +    TONEMAP_BT2390,
-     TONEMAP_MAX,
++    TONEMAP_COUNT,
++};
++
++enum TonemapMode {
++    TONEMAP_MODE_MAX,
++    TONEMAP_MODE_RGB,
++    TONEMAP_MODE_COUNT,
  };
  
-@@ -56,23 +68,43 @@ typedef struct TonemapOpenCLContext {
+ typedef struct TonemapOpenCLContext {
+@@ -56,23 +74,44 @@ typedef struct TonemapOpenCLContext {
      enum AVColorPrimaries primaries, primaries_in, primaries_out;
      enum AVColorRange range, range_in, range_out;
      enum AVChromaLocation chroma_loc;
@@ -936,6 +973,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +    cl_mem dovi_buf;
  
      enum TonemapAlgorithm tonemap;
++    enum TonemapMode      tonemap_mode;
      enum AVPixelFormat    format;
 +    int                   apply_dovi;
 +    double                ref_white;
@@ -962,7 +1000,16 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  };
  
  static const char *const delinearize_funcs[AVCOL_TRC_NB] = {
-@@ -88,8 +120,54 @@ static const char *const tonemap_func[TO
+@@ -80,7 +119,7 @@ static const char *const delinearize_fun
+     [AVCOL_TRC_BT2020_10] = "inverse_eotf_bt1886",
+ };
+ 
+-static const char *const tonemap_func[TONEMAP_MAX] = {
++static const char *const tonemap_func[TONEMAP_COUNT] = {
+     [TONEMAP_NONE]     = "direct",
+     [TONEMAP_LINEAR]   = "linear",
+     [TONEMAP_GAMMA]    = "gamma",
+@@ -88,8 +127,54 @@ static const char *const tonemap_func[TO
      [TONEMAP_REINHARD] = "reinhard",
      [TONEMAP_HABLE]    = "hable",
      [TONEMAP_MOBIUS]   = "mobius",
@@ -1017,7 +1064,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  static int get_rgb2rgb_matrix(enum AVColorPrimaries in, enum AVColorPrimaries out,
                                double rgb2rgb[3][3]) {
      double rgb2xyz[3][3], xyz2rgb[3][3];
-@@ -108,23 +186,149 @@ static int get_rgb2rgb_matrix(enum AVCol
+@@ -108,23 +193,149 @@ static int get_rgb2rgb_matrix(enum AVCol
      return 0;
  }
  
@@ -1176,7 +1223,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      switch(ctx->tonemap) {
      case TONEMAP_GAMMA:
-@@ -144,48 +348,143 @@ static int tonemap_opencl_init(AVFilterC
+@@ -144,48 +355,148 @@ static int tonemap_opencl_init(AVFilterC
      if (isnan(ctx->param))
          ctx->param = 1.0f;
  
@@ -1314,6 +1361,11 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +    if (ctx->tonemap == TONEMAP_BT2390)
 +        av_bprintf(&header, "#define TONE_FUNC_BT2390\n");
 +
++    if (ctx->tonemap_mode == TONEMAP_MODE_RGB)
++        av_bprintf(&header, "#define TONE_MODE_RGB\n");
++    else
++        av_bprintf(&header, "#define TONE_MODE_MAX\n");
++
 +    if (ctx->in_planes > 2)
 +        av_bprintf(&header, "#define NON_SEMI_PLANAR_IN\n");
 +
@@ -1335,7 +1387,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      if (ctx->range_in == AVCOL_RANGE_JPEG)
          av_bprintf(&header, "#define FULL_RANGE_IN\n");
  
-@@ -199,19 +498,41 @@ static int tonemap_opencl_init(AVFilterC
+@@ -199,19 +510,41 @@ static int tonemap_opencl_init(AVFilterC
      else
          ff_opencl_print_const_matrix_3x3(&header, "rgb2rgb", rgb2rgb);
  
@@ -1384,7 +1436,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
                 ctx->colorspace_out, av_color_space_name(ctx->colorspace_out));
          goto fail;
      }
-@@ -219,24 +540,23 @@ static int tonemap_opencl_init(AVFilterC
+@@ -219,24 +552,23 @@ static int tonemap_opencl_init(AVFilterC
      ff_fill_rgb2yuv_table(luma_dst, rgb2yuv);
      ff_opencl_print_const_matrix_3x3(&header, "yuv_matrix", rgb2yuv);
  
@@ -1424,7 +1476,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(avctx, AV_LOG_DEBUG, "Generated OpenCL header:\n%s\n", header.str);
      opencl_sources[0] = header.str;
-@@ -254,46 +574,170 @@ static int tonemap_opencl_init(AVFilterC
+@@ -254,46 +586,170 @@ static int tonemap_opencl_init(AVFilterC
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create OpenCL "
                       "command queue %d.\n", cle);
  
@@ -1614,7 +1666,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      ret = ff_opencl_filter_config_output(outlink);
      if (ret < 0)
          return ret;
-@@ -308,13 +752,42 @@ static int launch_kernel(AVFilterContext
+@@ -308,13 +764,42 @@ static int launch_kernel(AVFilterContext
      size_t global_work[2];
      size_t local_work[2];
      cl_int cle;
@@ -1659,7 +1711,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      local_work[0]  = 16;
      local_work[1]  = 16;
-@@ -338,13 +811,10 @@ static int tonemap_opencl_filter_frame(A
+@@ -338,13 +823,10 @@ static int tonemap_opencl_filter_frame(A
      AVFilterContext    *avctx = inlink->dst;
      AVFilterLink     *outlink = avctx->outputs[0];
      TonemapOpenCLContext *ctx = avctx->priv;
@@ -1674,7 +1726,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input->format),
-@@ -363,9 +833,6 @@ static int tonemap_opencl_filter_frame(A
+@@ -363,9 +845,6 @@ static int tonemap_opencl_filter_frame(A
      if (err < 0)
          goto fail;
  
@@ -1684,7 +1736,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      if (ctx->trc != -1)
          output->color_trc = ctx->trc;
      if (ctx->primaries != -1)
-@@ -385,72 +852,92 @@ static int tonemap_opencl_filter_frame(A
+@@ -385,72 +864,92 @@ static int tonemap_opencl_filter_frame(A
      ctx->range_out = output->color_range;
      ctx->chroma_loc = output->chroma_location;
  
@@ -1817,14 +1869,13 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      av_frame_free(&input);
      av_frame_free(&output);
      return err;
-@@ -458,24 +945,9 @@ fail:
+@@ -458,24 +957,9 @@ fail:
  
  static av_cold void tonemap_opencl_uninit(AVFilterContext *avctx)
  {
 -    TonemapOpenCLContext *ctx = avctx->priv;
 -    cl_int cle;
-+    tonemap_opencl_uninit_common(avctx);
- 
+-
 -    if (ctx->util_mem)
 -        clReleaseMemObject(ctx->util_mem);
 -    if (ctx->kernel) {
@@ -1833,7 +1884,8 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 -            av_log(avctx, AV_LOG_ERROR, "Failed to release "
 -                   "kernel: %d.\n", cle);
 -    }
--
++    tonemap_opencl_uninit_common(avctx);
+ 
 -    if (ctx->command_queue) {
 -        cle = clReleaseCommandQueue(ctx->command_queue);
 -        if (cle != CL_SUCCESS)
@@ -1844,7 +1896,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      ff_opencl_filter_uninit(avctx);
  }
-@@ -483,37 +955,44 @@ static av_cold void tonemap_opencl_unini
+@@ -483,37 +967,47 @@ static av_cold void tonemap_opencl_unini
  #define OFFSET(x) offsetof(TonemapOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
  static const AVOption tonemap_opencl_options[] = {
@@ -1879,7 +1931,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 -    { "param",     "tonemap parameter",   OFFSET(param), AV_OPT_TYPE_DOUBLE, {.dbl = NAN}, DBL_MIN, DBL_MAX, FLAGS },
 -    { "desat",     "desaturation parameter",   OFFSET(desat_param), AV_OPT_TYPE_DOUBLE, {.dbl = 0.5}, 0, DBL_MAX, FLAGS },
 -    { "threshold", "scene detection threshold",   OFFSET(scene_threshold), AV_OPT_TYPE_DOUBLE, {.dbl = 0.2}, 0, DBL_MAX, FLAGS },
-+    { "tonemap", "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, { .i64 = TONEMAP_NONE }, TONEMAP_NONE, TONEMAP_MAX - 1, FLAGS, "tonemap" },
++    { "tonemap", "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, { .i64 = TONEMAP_NONE }, TONEMAP_NONE, TONEMAP_COUNT - 1, FLAGS, "tonemap" },
 +        { "none",     0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_NONE },              0, 0, FLAGS, "tonemap" },
 +        { "linear",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_LINEAR },            0, 0, FLAGS, "tonemap" },
 +        { "gamma",    0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_GAMMA },             0, 0, FLAGS, "tonemap" },
@@ -1888,6 +1940,9 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +        { "hable",    0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_HABLE },             0, 0, FLAGS, "tonemap" },
 +        { "mobius",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MOBIUS },            0, 0, FLAGS, "tonemap" },
 +        { "bt2390",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_BT2390 },            0, 0, FLAGS, "tonemap" },
++    { "tonemap_mode", "Tonemap mode selection", OFFSET(tonemap_mode), AV_OPT_TYPE_INT, { .i64 = TONEMAP_MODE_MAX }, TONEMAP_MODE_MAX, TONEMAP_MODE_COUNT - 1, FLAGS, "tonemap_mode" },
++        { "max",      0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_MAX },          0, 0, FLAGS, "tonemap_mode" },
++        { "rgb",      0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_RGB },          0, 0, FLAGS, "tonemap_mode" },
 +    { "transfer", "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
 +    { "t",        "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
 +        { "bt709",            0,       0,                 AV_OPT_TYPE_CONST, { .i64 = AVCOL_TRC_BT709 },         0, 0, FLAGS, "transfer" },

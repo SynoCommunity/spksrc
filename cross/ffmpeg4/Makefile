@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.4.3
+PKG_VERS = 4.4.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -51,7 +51,7 @@ OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/intel-media-sdk
+OPTIONAL_DEPENDS += cross/intel-mediasdk
 OPTIONAL_DEPENDS += cross/twolame
 OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
@@ -235,7 +235,7 @@ endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
+DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
 CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libdrm
 endif
 

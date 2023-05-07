@@ -50,7 +50,7 @@ OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/intel-media-sdk
+OPTIONAL_DEPENDS += cross/intel-mediasdk
 OPTIONAL_DEPENDS += cross/twolame
 OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
@@ -234,7 +234,7 @@ endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-media-sdk
+DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-vaapi --enable-libmfx --enable-libdrm
 endif

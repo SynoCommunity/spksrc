@@ -14,7 +14,7 @@ LICENSE  = MIT
 
 include ../../mk/spksrc.cross-cmake.mk
 
-# intel-media-sdk specific args
+# intel-mediasdk specific args
 # for succesfull build
 CMAKE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib
 CMAKE_ARGS += -DBUILD_SAMPLES=OFF

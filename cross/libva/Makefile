@@ -1,19 +1,23 @@
-PKG_NAME = libva
-PKG_VERS = 2.17.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/intel/libva/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-DEPENDS = cross/libdrm
+PKG_NAME = libva-main
 
 HOMEPAGE = https://01.org/vaapi
 COMMENT  = Libva is an implementation for VA-API (Video Acceleration API).
 LICENSE  = MIT
 
-CONFIGURE_ARGS = -Ddriverdir=$(INSTALL_PREFIX)/lib
+DOWNLOAD_TARGET = nop
+CHECKSUM_TARGET = nop
+EXTRACT_TARGET = nop
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = nop
 
-ADDITIONAL_CFLAGS = -Os
+OPTIONAL_DEPENDS  = cross/libva-latest
+OPTIONAL_DEPENDS += cross/libva-2.17
 
-include ../../mk/spksrc.cross-meson.mk
+include ../../mk/spksrc.install-resources.mk
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+DEPENDS = cross/libva-latest
+else
+DEPENDS = cross/libva-2.17
+endif
