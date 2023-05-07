@@ -135,7 +135,7 @@ CROSSENV_WHEELS += wheel==0.40.0
 CROSSENV_WHEELS += poetry==1.4.2
 CROSSENV_WHEELS += Cython==0.29.34
 CROSSENV_WHEELS += flit==3.8.0
-# Build failures with version >= 40
+# Fails to cross-compile version >= 40
 #CROSSENV_WHEELS += cryptography==40.0.2
 CROSSENV_WHEELS += cryptography==39.0.2
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))

@@ -9,7 +9,9 @@
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 bcrypt==4.0.1
-cryptography==40.0.2
+# Fails to cross-compile version >= 40
+#cryptography==40.0.2
+cryptography==39.0.2
 
 # Requirement for cryptography
 cffi==1.15.1
