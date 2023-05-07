@@ -202,6 +202,7 @@ service_save ()
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ] && [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       source_directory="${DSM6_WEB_DIR}/${PACKAGE}"
     fi
+    local ruTorrentConfigFile="${source_directory}/conf/config.php"
 
     # Revision 8 introduces backward incompatible changes
     if [ `echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
@@ -219,19 +220,19 @@ service_save ()
               -e "s/@define\(\s*'PHP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$phpUseGzip = \\1/g" \
               -e "s/@define\(\s*'PHP_GZIP_LEVEL'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$phpGzipLevel = \\1/g" \
               -e "s|\\\$profilePath(\s*)=(\s*)'\\.\\./share'|\\\$profilePath\\1=\\2'../../share'|g" \
-          ${RTORRENT_RC}
-        echo '  $throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!'  >> ${RTORRENT_RC}
-        echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function." >> ${RTORRENT_RC}
-        echo "  \$al_diagnostic = true; // Diagnose auto-loader. Set to \"false\" to make composer plugins work." >> ${RTORRENT_RC}
-        echo "  \$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent" >> ${RTORRENT_RC}
-        echo "  \$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins" >> ${RTORRENT_RC}
-        echo "  \$enableCSRFCheck = false;		// If true then Origin and Referer will be checked" >> ${RTORRENT_RC}
-	      echo "  \$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.)." >> ${RTORRENT_RC}
-        echo "  // If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST" >> ${RTORRENT_RC}
+          "${ruTorrentConfigFile}"
+        echo '  $throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!'  >> "${ruTorrentConfigFile}"
+        echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function." >> "${ruTorrentConfigFile}"
+        echo "  \$al_diagnostic = true; // Diagnose auto-loader. Set to \"false\" to make composer plugins work." >> "${ruTorrentConfigFile}"
+        echo "  \$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent" >> "${ruTorrentConfigFile}"
+        echo "  \$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins" >> "${ruTorrentConfigFile}"
+        echo "  \$enableCSRFCheck = false;		// If true then Origin and Referer will be checked" >> "${ruTorrentConfigFile}"
+	      echo "  \$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.)." >> "${ruTorrentConfigFile}"
+        echo "  // If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST" >> "${ruTorrentConfigFile}"
     fi
 
     # Save the configuration file
-    cp -ap -t "${TMP_DIR}" "${source_directory}/conf/config.php"
+    cp -ap -t "${TMP_DIR}" "${ruTorrentConfigFile}"
     if [ -f "${source_directory}/.htaccess" ]; then
         cp -ap -t "${TMP_DIR}" "${source_directory}/.htaccess"
     fi
@@ -383,14 +384,6 @@ service_restore ()
         define_external_program 'php' '/bin/php' '/usr/bin/php'
     fi
     
-    if is_not_defined_variable 'enableCSRFCheck'; then
-      define_variable 'enableCSRFCheck' 'false' 'If true then Origin and Referer will be checked'
-    fi
-    
-    if is_not_defined_variable 'enabledOrigins'; then
-      define_variable 'enabledOrigins' 'array()' 'List of enabled domains for CSRF check (only hostnames, without protocols, port etc.).' 'If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST'
-    fi
-
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 -a ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
