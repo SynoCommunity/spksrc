@@ -266,18 +266,18 @@ is_not_defined_external_program()
 
 is_not_defined_variable()
 {
-    local $variable_name=$1
+    local variable_name="$1"
     php -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$${variable_name})) { exit(1); } else { exit(0); }"
     return $?
 }
 
 define_variable()
 {
-    local $variable_name="$1"
+    local variable_name="$1"
     shift
-    local $value="$1"
+    local value="$1"
     shift
-    local $comment="$1"
+    local comment="$1"
     shift
     echo "\$${variable_name} = ${value}; // ${comment}" \
         >> "${RUTORRENT_WEB_DIR}/conf/config.php"
