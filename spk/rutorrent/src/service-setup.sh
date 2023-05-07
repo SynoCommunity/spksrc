@@ -223,7 +223,7 @@ service_save ()
         echo '  $throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!'  >> ${RTORRENT_RC}
         echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function." >> ${RTORRENT_RC}
         echo "  \$al_diagnostic = true; // Diagnose auto-loader. Set to \"false\" to make composer plugins work." >> ${RTORRENT_RC}
-        echo "  \$localHostedMode = false;		// Set to true if rTorrent is hosted on the SAME machine as ruTorrent" >> ${RTORRENT_RC}
+        echo "  \$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent" >> ${RTORRENT_RC}
         echo "  \$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins" >> ${RTORRENT_RC}
         echo "  \$enableCSRFCheck = false;		// If true then Origin and Referer will be checked" >> ${RTORRENT_RC}
 	      echo "  \$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.)." >> ${RTORRENT_RC}
