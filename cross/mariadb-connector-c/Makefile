@@ -1,5 +1,5 @@
 PKG_NAME = mariadb-connector-c
-PKG_VERS = 3.2.6
+PKG_VERS = 3.3.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -9,6 +9,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 HOMEPAGE = https://mariadb.com/kb/en/mariadb-connector-c/
 COMMENT  = MariaDB C Connector
 LICENSE  = LGPL
+
+#USE_NATIVE_CMAKE_LEGACY = 1
+#CMAKE_USE_TOOLCHAIN_FILE = OFF
+CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
