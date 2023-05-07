@@ -6,5 +6,5 @@
 
 # [numpy]
 #   - armv7L (hi3535-6.1) Last known working version
-#   - Require Cython in cross/python310 crossenv
+#   - Require Cython in cross/python311 crossenv
 numpy==1.22.4
