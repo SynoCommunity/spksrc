@@ -218,6 +218,7 @@ service_save ()
               -e "s/@define\(\s*'LOG_RPC_FAULTS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogFaults = \\1/g" \
               -e "s/@define\(\s*'PHP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$phpUseGzip = \\1/g" \
               -e "s/@define\(\s*'PHP_GZIP_LEVEL'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$phpGzipLevel = \\1/g" \
+              -e "s|\\\$profilePath(\s*)=(\s*)'\\.\\./share'|\\\$profilePath\\1=\\2'../../share'|g" \
           ${RTORRENT_RC}
         echo '  $throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!'  >> ${RTORRENT_RC}
         echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function." >> ${RTORRENT_RC}
