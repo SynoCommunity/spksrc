@@ -133,7 +133,6 @@ CROSSENV_WHEELS  = setuptools==63.4.3
 CROSSENV_WHEELS += setuptools-rust==1.6.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
 CROSSENV_WHEELS += wheel==0.40.0
-CROSSENV_WHEELS += cffi==1.15.1
 CROSSENV_WHEELS += poetry==1.4.2
 CROSSENV_WHEELS += Cython==0.29.34
 CROSSENV_WHEELS += flit==3.8.0
