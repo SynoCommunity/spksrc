@@ -67,10 +67,10 @@ CONFIGURE_ARGS += --with-system-expat
 DEPENDS += cross/libffi
 CONFIGURE_ARGS += --with-system-ffi
 
-# PYO3 variable for cross-compiling
-# cryptography through rustc
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
@@ -135,9 +135,7 @@ CROSSENV_WHEELS += cffi==1.15.1
 CROSSENV_WHEELS += poetry==1.4.2
 CROSSENV_WHEELS += Cython==0.29.34
 CROSSENV_WHEELS += flit==3.8.0
-# Fails to cross-compile version >= 40
-#CROSSENV_WHEELS += cryptography==40.0.2
-CROSSENV_WHEELS += cryptography==39.0.2
+CROSSENV_WHEELS += cryptography==40.0.2
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==0.15.1
 endif

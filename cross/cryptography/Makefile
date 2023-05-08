@@ -1,5 +1,5 @@
 PKG_NAME = cryptography
-PKG_VERS = 39.0.1
+PKG_VERS = 40.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/c/$(PKG_NAME)
@@ -18,7 +18,9 @@ LICENSE  = BSD/ASL2
 
 WHEELS_BUILD_ARGS = --py-limited-api=$(PYTHON_LIMITED_API)
 
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 include ../../mk/spksrc.python-wheel.mk

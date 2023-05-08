@@ -4,14 +4,18 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# [bcrypt] & [cryptography]
+# [bcrypt]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 bcrypt==4.0.1
-# Fails to cross-compile version >= 40
-#cryptography==40.0.2
-cryptography==39.0.2
+
+# [cryptography]
+# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+#  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+cryptography==40.0.2
 
 # Requirement for cryptography
 cffi==1.15.1

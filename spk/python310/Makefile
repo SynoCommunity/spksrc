@@ -44,9 +44,8 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
+# [bcrypt]
 # Mandatory for rustc wheel building
-#   [bcrypt]
-#   [cryptography]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
@@ -54,6 +53,10 @@ ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # Use cross/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py310-py310 regular build use src/requirements-crossenv.txt
+#
+# Mandatory mandatory of using OPENSSL_*_DIR starting with version >= 40
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 DEPENDS += cross/cryptography
 
 # [gevent]
