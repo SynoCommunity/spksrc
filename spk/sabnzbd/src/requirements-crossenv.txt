@@ -2,5 +2,5 @@
 cffi==1.15.1
 Cheetah3==3.2.6
 cryptography==3.3.2
-sabyenc3==5.4.4
+sabctools==7.0.2
 ujson==5.7.0
