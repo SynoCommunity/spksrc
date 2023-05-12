@@ -18,7 +18,11 @@ LICENSE  = BSD/ASL2
 
 WHEELS_BUILD_ARGS = --py-limited-api=$(PYTHON_LIMITED_API)
 
-# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# Mandatory PYO3_* variables for rust cross-compiling
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with
+# cryptography version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
 ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/

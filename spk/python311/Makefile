@@ -44,7 +44,7 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
-# [bcrypt]
+# [bcrypt] and [cryptography]
 # Mandatory for rustc wheel building
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
