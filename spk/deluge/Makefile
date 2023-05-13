@@ -67,7 +67,6 @@ endif
 # [libtorrent]
 # DSM7 only due to c++14 minimal requirement
 # Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
-ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
 WHEELS += src/requirements-crossenv-libtorrent.txt
 # Ensure build arguments matches boost_1.78
 WHEELS_CXXFLAGS += [libtorrent]
