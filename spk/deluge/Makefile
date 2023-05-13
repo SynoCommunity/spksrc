@@ -54,9 +54,9 @@ UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl
 DEPENDS += cross/geoip
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.78
+DEPENDS += cross/boost_1.82
 BOOST_LIBRARIES += system python chrono random
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_82_0
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
 ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
@@ -84,7 +84,7 @@ WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 # DSM6 & archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
 else
 WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
-# Ensure build arguments matches boost_1.78
+# Ensure build arguments matches boost_1.82
 WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
 endif
 
