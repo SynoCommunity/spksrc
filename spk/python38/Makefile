@@ -1,7 +1,7 @@
 SPK_NAME = python38
-SPK_VERS = 3.8.13
+SPK_VERS = 3.8.16
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -17,11 +17,11 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
-DESCRIPTION_FRE = Langage de programmation Python.
+DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.8
-CHANGELOG = "1. Update to Python 3.8.13<br/>2. Update to OpenSSL 1.1.1o"
+CHANGELOG = "1. Update to Python 3.8.16<br/>2. Update to OpenSSL 1.1.1t"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

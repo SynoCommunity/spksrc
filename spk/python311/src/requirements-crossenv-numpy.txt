@@ -5,8 +5,8 @@
 ##
 
 # [numpy]
-#   - Require Cython in cross/python310 crossenv
+#   - Require Cython in cross/python311 crossenv
 #   - aarch64-6.1 require workaround WHEELS_CFLAGS=-O0
 #     ref: https://github.com/numpy/numpy/issues/13622
-numpy==1.23.5
-#numpy==1.24.2
+#numpy==1.23.5
+numpy==1.24.3

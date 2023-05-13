@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.10
+SPK_VERS = 3.10.11
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 14
+SPK_REV = 15
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -9,11 +9,11 @@ DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
-DESCRIPTION_FRE = Langage de programmation Python.
+DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.10<br/>2. Update to OpenSSL 1.1.1t"
+CHANGELOG = "1. Update to Python 3.10.11"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -39,14 +39,13 @@ SPK_USR_LOCAL_LINKS = bin:bin/python3.10
 ## are provided to demonstrate how to build
 ## various wheels.  Uncoment to enable.
 ##
-## Force testing all wheel building
+## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
+# [bcrypt] and [cryptography]
 # Mandatory for rustc wheel building
-#   [bcrypt]
-#   [cryptography]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
@@ -54,6 +53,10 @@ ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # Use cross/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py310-py310 regular build use src/requirements-crossenv.txt
+#
+# Mandatory mandatory of using OPENSSL_*_DIR starting with version >= 40
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 DEPENDS += cross/cryptography
 
 # [gevent]
@@ -94,7 +97,7 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-# Force testing all wheel building
+# WHEELS_TEST_ALL: Force testing all wheel building
 endif
 
 include ../../mk/spksrc.common.mk
@@ -106,7 +109,7 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.spk.mk
 
-## Force testing all wheel building
+## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
 # [greenlet]
@@ -149,7 +152,7 @@ else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
 
-# Force testing all wheel building
+# WHEELS_TEST_ALL: Force testing all wheel building
 endif
 
 .PHONY: python310_extra_install
