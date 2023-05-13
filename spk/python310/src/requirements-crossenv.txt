@@ -4,7 +4,7 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# [bcrypt]
+# [bcrypt] & [cryptography]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
