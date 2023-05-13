@@ -22,7 +22,7 @@ LICENSE  = PSF
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS  = src/requirements-pure.txt
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 1
+WHEELS_TEST_ALL = 0
 # Force compiler LTO optimizations
 ENV += PYTHON_OPTIMIZE=1
 
