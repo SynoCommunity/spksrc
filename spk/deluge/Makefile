@@ -23,6 +23,7 @@ LICENSE  = GPL
 HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
 REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
 
 WIZARDS_DIR = src/wizard/
 
