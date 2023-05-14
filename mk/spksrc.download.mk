@@ -84,6 +84,27 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      fi ; \
 	      flock -u 6 ; \
 	      ;; \
+	    git-repository) \
+	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
+	      localFile=$${localFolder}.tar.gz ; \
+	      exec 6> /tmp/git.$${localFolder}.lock ; \
+	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 6 || exit 1 ; \
+	      pid=$$$$ ; \
+	      echo "$${pid}" 1>&6 ; \
+	      if [ -f $${localFile} ]; then \
+	        $(MSG) "  File $${localFile} already downloaded" ; \
+	      else \
+	        $(MSG) "  git clone $${url}" ; \
+	        rm -fr $${localFolder} $${localFolder}.part ; \
+	        git clone --no-checkout --quiet $${url} $${localFolder}.part ; \
+	        mv $${localFolder}.part $${localFolder} ; \
+	        git --git-dir=$${localFolder}/.git config --local core.fileMode false ; \
+	        git --git-dir=$${localFolder}/.git --work-tree=$${localFolder} checkout $(PKG_GIT_HASH) --quiet ; \
+	        tar -c $${localFolder} | gzip -n > $${localFile} ; \
+	        rm -fr $${localFolder} ; \
+	      fi ; \
+	      flock -u 6 ; \
+	      ;; \
 	    svn) \
 	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
 	        rev=$$(svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -) ; \
