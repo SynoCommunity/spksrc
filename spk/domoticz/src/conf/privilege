@@ -3,7 +3,7 @@
     "run-as": "package"
   },
   "username": "sc-domoticz",
-  "groupname": "sc-domoticz",
+  "groupname": "domoticz",
   "ctrl-script": [{
       "action": "postinst",
       "run-as": "root"
