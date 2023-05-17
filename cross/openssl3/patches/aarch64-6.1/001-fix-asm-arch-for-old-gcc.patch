@@ -1,0 +1,28 @@
+# fix march for older gcc for aarch64
+# - downgrade to use armv8-a instead of armv8.2-a for ASM sources
+# 
+# this patch will get obsolete, when https://github.com/openssl/openssl/pull/20967 
+# is merged into a future release
+# 
+--- crypto/modes/asm/aes-gcm-armv8-unroll8_64.pl.orig	2023-03-14 12:59:07.000000000 +0000
++++ crypto/modes/asm/aes-gcm-armv8-unroll8_64.pl	2023-05-14 15:18:21.261988014 +0000
+@@ -174,7 +174,7 @@
+ 
+ #if __ARM_MAX_ARCH__>=8
+ ___
+-$code.=".arch   armv8.2-a+crypto\n.text\n";
++$code.=".arch   armv8-a+crypto\n.text\n";
+ 
+ $input_ptr="x0";  #argument block
+ $bit_length="x1";
+--- crypto/sm3/asm/sm3-armv8.pl.orig	2023-03-14 12:59:07.000000000 +0000
++++ crypto/sm3/asm/sm3-armv8.pl	2023-05-14 15:07:33.531335243 +0000
+@@ -109,7 +109,7 @@
+ 
+ $code=<<___;
+ #include "arm_arch.h"
+-.arch	armv8.2-a
++.arch	armv8-a
+ .text
+ ___
+ 
