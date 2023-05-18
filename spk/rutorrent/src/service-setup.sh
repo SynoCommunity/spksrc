@@ -1,9 +1,9 @@
 # Package
 PACKAGE="rutorrent"
 
-# Define python310 binary path
-PYTHON_DIR="/var/packages/python310/target/bin"
-# Add local bin, virtualenv along with python310 to the default PATH
+# Define python311 binary path
+PYTHON_DIR="/var/packages/python311/target/bin"
+# Add local bin, virtualenv along with python311 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 # Others
 DSM6_WEB_DIR="/var/services/web"
