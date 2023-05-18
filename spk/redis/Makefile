@@ -1,6 +1,6 @@
 SPK_NAME = redis
-SPK_VERS = 7.0.7
-SPK_REV = 13
+SPK_VERS = 7.0.11
+SPK_REV = 14
 SPK_ICON = src/redis.png
 
 DEPENDS = cross/redis
@@ -8,12 +8,12 @@ DEPENDS = cross/redis
 # Unable to determine atomic operations for your platform
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
-MAINTAINER = DigitalBox98
+MAINTAINER = hgy59
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v7.0.7 (CVE-2022-35951 and other fixes)."
+CHANGELOG = "Update redis to v7.0.11 (CVE-2023-28856, CVE-2023-28425, CVE-2023-25155, CVE-2022-35977, CVE-2023-22458 and other fixes)."
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
