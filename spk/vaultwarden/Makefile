@@ -5,13 +5,13 @@ SPK_ICON = src/vaultwarden.png
 
 DEPENDS = cross/vaultwarden cross/vaultwarden_web
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 STARTABLE = yes
 DISPLAY_NAME = vaultwarden
-CHANGELOG = "Initial package release with vaultwarden 1.28.1 and vaultwarden_web 2023.3.0b."
+CHANGELOG = "Initial package release with vaultwarden 1.28.1 and vaultwarden_web 2023.4.2."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
 LICENSE  = GPLv3
