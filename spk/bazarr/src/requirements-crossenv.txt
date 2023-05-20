@@ -1,9 +1,3 @@
-#
-# Download bazarr from github directly as not available on pypi
-# Current not supported:
-#   https://github.com/morpheus65535/bazarr/issues/1648
-# git+https://github.com/morpheus65535/bazarr@v1.0.2#egg=bazarr==1.0.2
-
 greenlet==1.1.2
 numpy==1.22.0
 
@@ -13,3 +7,5 @@ lxml==4.8.0
 
 # webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
 git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10
+
+Pillow==9.3.0
