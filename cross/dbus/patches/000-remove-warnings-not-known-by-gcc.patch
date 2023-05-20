@@ -1,0 +1,56 @@
+# remove warnings (some are introduced with dbus v1.13.22)
+# remove warnings unknown by older gcc:
+# - double-promotion
+# - jump-misses-init
+# - unused-but-set-variable
+# remove warnings unknown by gcc of DSM 6 toolchains:
+# - duplicated-branches
+# - duplicated-cond
+# - null-dereference
+# - restrict
+# ignore further warnings
+# - inline
+# 
+--- CMakeLists.txt.orig	2022-02-21 15:28:30.000000000 +0000
++++ CMakeLists.txt	2023-05-20 14:23:18.386712356 +0000
+@@ -281,9 +281,6 @@
+         cast-align
+         char-subscripts
+         declaration-after-statement
+-        double-promotion
+-        duplicated-branches
+-        duplicated-cond
+         extra
+         float-equal
+         format-nonliteral
+@@ -291,8 +288,6 @@
+         format=2
+         implicit-function-declaration
+         init-self
+-        inline
+-        jump-misses-init
+         logical-op
+         missing-declarations
+         missing-format-attribute
+@@ -306,13 +301,11 @@
+         no-missing-field-initializers
+         no-unused-label
+         no-unused-parameter
+-        null-dereference
+         old-style-definition
+         packed
+         pointer-arith
+         pointer-sign
+         redundant-decls
+-        restrict
+         return-type
+         shadow
+         sign-compare
+@@ -321,7 +314,6 @@
+         switch-default
+         switch-enum
+         undef
+-        unused-but-set-variable
+         write-strings
+     )
+     set(WARNINGS_C
