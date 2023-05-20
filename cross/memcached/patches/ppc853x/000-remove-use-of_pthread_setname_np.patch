@@ -1,0 +1,26 @@
+# libthread of old ppc archs do not implement pthread_setname_np
+# 
+--- thread.c.orig	2023-05-12 23:07:43.000000000 +0000
++++ thread.c	2023-05-20 17:23:40.278542314 +0000
+@@ -635,9 +635,6 @@
+ #define THR_NAME_MAXLEN 16
+ void thread_setname(pthread_t thread, const char *name) {
+ assert(strlen(name) < THR_NAME_MAXLEN);
+-#if defined(__linux__)
+-pthread_setname_np(thread, name);
+-#endif
+ }
+ #undef THR_NAME_MAXLEN
+ 
+--- extstore.c.orig	2023-01-11 06:10:10.000000000 +0000
++++ extstore.c	2023-05-20 17:27:31.413889750 +0000
+@@ -119,9 +119,6 @@
+ #define THR_NAME_MAXLEN 16
+ static void thread_setname(pthread_t thread, const char *name) {
+ assert(strlen(name) < THR_NAME_MAXLEN);
+-#if defined(__linux__)
+-pthread_setname_np(thread, name);
+-#endif
+ }
+ #undef THR_NAME_MAXLEN
+ 
