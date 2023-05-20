@@ -4,7 +4,7 @@ SPK_REV = 5
 SPK_ICON = src/memcached.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/phpmemcachedadmin cross/$(SPK_NAME)
+DEPENDS = cross/phpmemcachedadmin cross/memcached
 # Only required for pre DSM 7 versions
 OPTIONAL_DEPENDS = cross/busybox
 
