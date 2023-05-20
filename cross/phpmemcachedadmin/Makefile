@@ -1,10 +1,10 @@
 PKG_NAME = phpMemcachedAdmin
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
 PKG_GIT_HASH = aaf3d16a2a1e3dff72dd358f1758d96f0f174cb3
-PKG_DIST_SITE = https://github.com/elijaa/phpmemcachedadmin.git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/elijaa/phpmemcachedadmin/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = phpmemcachedadmin-$(PKG_GIT_HASH)
 
 # Unfortunately only version 1.3.0 is officially released, but
 # we need the commit aaf3d16 of 12 Jun 2020 for memcached 1.6.x

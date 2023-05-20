@@ -8,9 +8,13 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/openssl
 
 HOMEPAGE = https://libevent.org
-COMMENT  = Event notification library
+COMMENT  = Event notification library.
 LICENSE  = 3-clause BSD
 
-GNU_CONFIGURE = 1
+CMAKE_ARGS += -DEVENT__DISABLE_DEBUG_MODE=ON
+CMAKE_ARGS += -DEVENT__DISABLE_BENCHMARK=ON
+CMAKE_ARGS += -DEVENT__DISABLE_TESTS=ON
+CMAKE_ARGS += -DEVENT__DISABLE_REGRESS=ON
+CMAKE_ARGS += -DEVENT__DISABLE_SAMPLES=ON
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-cmake.mk

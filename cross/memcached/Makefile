@@ -1,5 +1,5 @@
 PKG_NAME = memcached
-PKG_VERS = 1.6.15
+PKG_VERS = 1.6.20
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.memcached.org/files
@@ -12,6 +12,7 @@ COMMENT  = Free & open source, high-performance, distributed memory object cachi
 LICENSE  = 3-Clause BSD
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-werror
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.archs.mk
