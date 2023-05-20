@@ -30,6 +30,10 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # fix for build of "libmimalloc-sys v0.1.30"
 ADDITIONAL_CFLAGS = -std=c99
+else
+ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+ADDITIONAL_CFLAGS = -std=c99
+endif
 endif
 
 include ../../mk/spksrc.cross-rust.mk
