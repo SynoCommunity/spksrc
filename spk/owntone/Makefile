@@ -26,7 +26,7 @@ SERVICE_PORT = 3689
 ADMIN_PORT = $(SERIVCE_PORT)
 
 # Reuse FFmpeg libraries
-export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+export FFMPEG_DIR = $(shell pwd)/../ffmpeg4/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 PRE_DEPEND_TARGET = owntone_pre_depend

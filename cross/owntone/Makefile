@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/owntone/owntone-server/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/ffmpeg
+OPTIONAL_DEPENDS = cross/ffmpeg4
 
 DEPENDS = cross/libunistring cross/zlib cross/libconfuse cross/curl
 DEPENDS += cross/mxml cross/sqlite cross/libevent cross/json-c
@@ -17,7 +17,7 @@ DEPENDS += cross/libsodium
 DEPENDS += cross/alsa-lib
 
 ifeq ($(wildcard $(FFMPEG_DIR)),)
-DEPENDS += cross/ffmpeg
+DEPENDS += cross/ffmpeg4
 endif
 
 HOMEPAGE = http://owntone.github.io/owntone-server
