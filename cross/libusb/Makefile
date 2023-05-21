@@ -16,8 +16,12 @@ COMMENT  = C library that provides generic access to USB devices. It is intended
 LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --disable-static
+ifneq ($(strip $(LIBUSB_ENABLE_STATIC)),1)
+CONFIGURE_ARGS += --disable-static
+endif
+ifneq ($(strip $(LIBUSB_WITH_LIBUDEV)),1)
 CONFIGURE_ARGS += --disable-udev
+endif
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

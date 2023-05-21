@@ -13,6 +13,9 @@ LICENSE  = GPLv2
 
 CONFIGURE_TARGET = nop
 
+# need static libusb (when built without libudev)
+export LIBUSB_ENABLE_STATIC=1
+
 INSTALL_TARGET = he853_install
 
 include ../../mk/spksrc.cross-cc.mk
