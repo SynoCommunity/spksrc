@@ -1,15 +1,3 @@
-bin:bin/dbus-cleanup-sockets
-bin:bin/dbus-daemon
-bin:bin/dbus-launch
-bin:bin/dbus-monitor
-bin:bin/dbus-run-session
-bin:bin/dbus-send
-bin:bin/dbus-test-tool
-bin:bin/dbus-update-activation-environment
-bin:bin/dbus-uuidgen
-lnk:lib/libdbus-1.so
-lnk:lib/libdbus-1.so.3
-lib:lib/libdbus-1.so.3.29.0
 lnk:lib/libdbus-1.so
 lnk:lib/libdbus-1.so.3
 lib:lib/libdbus-1.so.3.31.0

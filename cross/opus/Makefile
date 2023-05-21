@@ -13,9 +13,6 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 
-# avoid warning _FORTIFY_SOURCE requires compiling with optimization (-O)
-ADDITIONAL_CPPFLAGS = -O2
-
 CONFIGURE_ARGS = --disable-doc --disable-extra-programs
 ADDITIONAL_CPPFLAGS = -O2
 
