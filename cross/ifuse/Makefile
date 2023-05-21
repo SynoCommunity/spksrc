@@ -12,10 +12,7 @@ COMMENT  = A fuse filesystem implementation to access the contents of iOS device
 LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
-INSTALL_TARGET = ifuse_install
+# avoid prefix definition for make install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY ifuse_install:
-ifuse_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)
