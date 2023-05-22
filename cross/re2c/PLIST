@@ -1,0 +1,3 @@
+bin:bin/re2c
+bin:bin/re2go
+bin:bin/re2rust

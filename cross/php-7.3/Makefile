@@ -11,14 +11,24 @@ LICENSE  = PHP License, version 3.01
 
 GNU_CONFIGURE = 1
 ENV += INSTALL_ROOT=$(INSTALL_DIR)
+#ADDITIONAL_CFLAGS += -std=gnu11
+ADDITIONAL_CPPFLAGS = -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 
-DEPENDS = cross/berkeleydb-5.3
+include ../../mk/spksrc.common.mk
+
+DEPENDS = native/re2c cross/re2c
+CONFIGURE_ARGS = --enable-re2c-cgoto
+RE2C_PATH = $(abspath $(PWD)/../../native/re2c/work-native/install/usr/local/bin)
+ENV += PATH=$(RE2C_PATH):$$PATH
+
+DEPENDS += cross/berkeleydb-5.3
 CONFIGURE_ARGS = --with-db4=$(STAGING_INSTALL_PREFIX)
 
 DEPENDS += cross/bzip2
 CONFIGURE_ARGS += --with-bz2=shared,$(STAGING_INSTALL_PREFIX)
 
 DEPENDS += cross/curl
+export BUILD_CURL_WITH="gnutls zstd"
 CONFIGURE_ARGS += --with-curl=shared,$(STAGING_INSTALL_PREFIX)
 
 DEPENDS += cross/freetype
@@ -71,5 +81,6 @@ CONFIGURE_ARGS += --enable-dba=shared
 CONFIGURE_ARGS += --enable-ftp
 CONFIGURE_ARGS += --with-gettext
 CONFIGURE_ARGS += --enable-mbstring
+CONFIGURE_ARGS += --with-tsrm-pthreads
 
 include ../../mk/spksrc.cross-cc.mk
