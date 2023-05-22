@@ -8,6 +8,6 @@ bin:bin/peardev
 bin:bin/pecl
 bin:bin/phar.phar
 lnk:bin/phar
-lib:lib/extensions/**/*.so
+lib:lib/php/extensions/**/*.so
 rsc:lib/**/*.php
 rsc:etc/pear.conf
