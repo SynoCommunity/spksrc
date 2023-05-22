@@ -1,0 +1,13 @@
+bin:bin/php
+bin:bin/php-cgi
+bin:bin/php-config
+bin:bin/phpdbg
+bin:bin/phpize
+bin:bin/pear
+bin:bin/peardev
+bin:bin/pecl
+bin:bin/phar.phar
+lnk:bin/phar
+lib:lib/extensions/**/*.so
+rsc:lib/**/*.php
+rsc:etc/pear.conf
