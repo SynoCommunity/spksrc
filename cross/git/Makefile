@@ -28,7 +28,7 @@ PRE_CONFIGURE_TARGET = git_pre_configure
 POST_COMPILE_TARGET = git_post_compile
 POST_INSTALL_TARGET = git_post_install
 
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) NO_INSTALL_HARDLINKS=1
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 # compiling needs access to curl-config from cross/curl
 ENV += PATH=$$PATH:$(STAGING_INSTALL_PREFIX)/bin
