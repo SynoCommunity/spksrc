@@ -1,10 +1,10 @@
 SPK_NAME = rutorrent
-SPK_VERS = 3.10
-SPK_REV = 14
+SPK_VERS = 4.1.5
+SPK_REV = 15
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-SPK_DEPENDS = "WebStation:python310:PHP7.4:Apache2.4"
+SPK_DEPENDS = "WebStation:python311:PHP7.4:Apache2.4"
 WHEELS = src/requirements-pure.txt
 
 DEPENDS = cross/busybox cross/curl cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
@@ -27,7 +27,7 @@ DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorren
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "<ol><li>Remove outdated resources</li><li>Fix missing dependency declaration on Apache 2.4</li><li>Fixed invalid handling of volume customization upon installation</li><li>Fix handling of watch directory by creating it if it does not exist.</li></ol>"
+CHANGELOG = "<ol><li>Upgrade rutorrent to 4.1.5</li><li>Update to Python 3.11</li><li>Update to PHP 7.4</li><li>Remove tools from procps-ng</li><li>Fix support of DSM 7.</li><li>Fix torrent creation wizard (\#5288)</li><li>Add service port declarations</li></ol>"
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
@@ -45,10 +45,6 @@ FWPORTS = src/rutorrent.sc
 CONF_DIR = src/conf/
 WIZARDS_DIR = $(WORK_DIR)/generated-wizards
 WIZARDS = install_uifile upgrade_uifile
-
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-INSTUNINST_RESTART_SERVICES = apache-web
 
 POST_STRIP_TARGET = rutorrent_extra_install
 
