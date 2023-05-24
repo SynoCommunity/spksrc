@@ -1,14 +1,19 @@
 ### Configure rules
-#   Run the GNU configure script or any similar configure tool. 
+#   Prepare the kernel sources to match target version and be ready for latest steps.
 # Targets are executed in the following order:
 #  kernel_configure_msg_target
 #  pre_kernel_configure_target    (override with PRE_KERNEL_CONFIGURE_TARGET)
 #  kernel_configure_target        (override with KERNEL_CONFIGURE_TARGET)
 #  post_kernel_configure_target   (override with POST_KERNEL_CONFIGURE_TARGET)
 # Variables:
-#  INSTALL_PREFIX          Directory for the --prefix option of configure.
-#  INSTALL_DIR             Where the install (at build time) will be done. INSTALL_PREFIX
-#                          will be added. 
+#  KERNEL_CONFIGURE_ARGS   Currently unused, may be used at a later time
+#  KERNEL_ARCH             Kernel arch as define in kernel/syno-<arch>-<version>/Makefile
+#  KERNEL_BASE_ARCH        Default kernel source arch directory
+#  KERNEL_CONFIG           Actual kernel configuration to use to build modules from
+#  NAME                    Refers to $(KERNEL_NAME) being syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+#  TC_KERNEL               Exact kernel version as provided by toolchain configuration $(WORK_DIR)/tc_vars.mk
+#  TC_PATH                 Arch toolchain path as provided in $(WORK_DIR)/tc_vars.mk
+#  TC_PREFIX               Arch triplet bineg used as prefix for toolchain compilers & tools
 
 KERNEL_CONFIGURE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_configure_done
 
@@ -32,10 +37,8 @@ endif
 .PHONY: $(PRE_KERNEL_CONFIGURE_TARGET) $(KERNEL_CONFIGURE_TARGET) $(POST_KERNEL_CONFIGURE_TARGET)
 
 kernel_configure_msg:
-	@$(MSG) "Configuring for $(NAME)"
-	@$(MSG)     - Configure ARGS: $(KERNEL_CONFIGURE_ARGS)
-	@$(MSG)     - Install prefix: $(INSTALL_PREFIX)
-	@$(MSG)     - Install prefix [var]:  $(INSTALL_PREFIX_VAR)
+	@$(MSG) "Configuring kernel for $(NAME)"
+	@$(MSG)     - Kernel configure ARGS: $(KERNEL_CONFIGURE_ARGS)
 
 pre_kernel_configure_target: kernel_configure_msg
 
