@@ -92,11 +92,6 @@ kernel_module_prepare_target:
 	@$(MSG) "DISTRIB_DIR = $(DISTRIB_DIR)"
 	@$(MSG) "Prepare kernel source for module build"
 	$(RUN) $(MAKE) modules_prepare
-# Call to make kernelversion is not available for kernel <= 3.0
-ifeq ($(call version_ge, ${TC_KERNEL}, 3),1)
-	@$(MSG) "Get kernel version"
-	$(RUN) $(MAKE) kernelversion
-endif
 
 .PHONY: kernel_module_compile_target
 

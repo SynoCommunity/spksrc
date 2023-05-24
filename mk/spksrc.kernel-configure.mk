@@ -60,6 +60,11 @@ ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
 else
 	$(RUN) $(MAKE) olddefconfig
 endif
+# Call to make kernelversion is not available for kernel <= 3.0
+ifeq ($(call version_ge, ${TC_KERNEL}, 3),1)
+	@$(MSG) "Get kernel version"
+	$(RUN) $(MAKE) kernelversion
+endif
 
 post_kernel_configure_target: $(KERNEL_CONFIGURE_TARGET)
 
