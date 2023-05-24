@@ -54,7 +54,7 @@ pre_kernel_module_target: kernel_module_msg
 kernel_module_prepare:
 	@$(MSG) "DISTRIB_DIR = $(DISTRIB_DIR)"
 	@$(MSG) "Prepare kernel source for module build"
-	$(RUN) $(MAKE) modules_prepare
+	@$(RUN) $(MAKE) modules_prepare
 
 .PHONY: kernel_module_target
 kernel_module_target:  $(PRE_KERNEL_MODULE_TARGET) kernel_module_prepare
@@ -66,9 +66,9 @@ kernel_module_target:  $(PRE_KERNEL_MODULE_TARGET) kernel_module_prepare
 .PHONY: kernel_module_compile
 kernel_module_compile:
 	@$(MSG) Compiling kernel module module=$(module)
-	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
-	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/$(PKG_DIR)/modules.order
-	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
+	@$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
+	@$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/$(PKG_DIR)/modules.order
+	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
 	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
 
 post_kernel_module_target: $(KERNEL_MODULE_TARGET)
