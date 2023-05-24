@@ -1,0 +1,75 @@
+### Configure rules
+#   Run the GNU configure script or any similar configure tool. 
+# Targets are executed in the following order:
+#  kernel_configure_msg_target
+#  pre_kernel_configure_target    (override with PRE_KERNEL_CONFIGURE_TARGET)
+#  kernel_configure_target        (override with KERNEL_CONFIGURE_TARGET)
+#  post_kernel_configure_target   (override with POST_KERNEL_CONFIGURE_TARGET)
+# Variables:
+#  INSTALL_PREFIX          Directory for the --prefix option of configure.
+#  INSTALL_DIR             Where the install (at build time) will be done. INSTALL_PREFIX
+#                          will be added. 
+
+KERNEL_CONFIGURE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_configure_done
+
+ifeq ($(strip $(PRE_KERNEL_CONFIGURE_TARGET)),)
+PRE_KERNEL_CONFIGURE_TARGET = pre_kernel_configure_target
+else
+$(PRE_KERNEL_CONFIGURE_TARGET): kernel_configure_msg
+endif
+ifeq ($(strip $(KERNEL_CONFIGURE_TARGET)),)
+KERNEL_CONFIGURE_TARGET = kernel_configure_target
+else
+$(KERNEL_CONFIGURE_TARGET): $(PRE_KERNEL_CONFIGURE_TARGET)
+endif
+ifeq ($(strip $(POST_KERNEL_CONFIGURE_TARGET)),)
+POST_KERNEL_CONFIGURE_TARGET = post_kernel_configure_target
+else
+$(POST_KERNEL_CONFIGURE_TARGET): $(KERNEL_CONFIGURE_TARGET)
+endif
+
+.PHONY: kernel_configure kernel_configure_msg
+.PHONY: $(PRE_KERNEL_CONFIGURE_TARGET) $(KERNEL_CONFIGURE_TARGET) $(POST_KERNEL_CONFIGURE_TARGET)
+
+kernel_configure_msg:
+	@$(MSG) "Configuring for $(NAME)"
+	@$(MSG)     - Configure ARGS: $(KERNEL_CONFIGURE_ARGS)
+	@$(MSG)     - Install prefix: $(INSTALL_PREFIX)
+	@$(MSG)     - Install prefix [var]:  $(INSTALL_PREFIX_VAR)
+
+pre_kernel_configure_target: kernel_configure_msg
+
+kernel_configure_target:  $(PRE_KERNEL_CONFIGURE_TARGET)
+	@$(MSG) "Updating kernel Makefile"
+	$(RUN) sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' Makefile
+	$(RUN) sed -i -r 's,^ARCH\s*.+,ARCH\t= $(KERNEL_ARCH),' Makefile
+# Add "+" to EXTRAVERSION for kernels version >= 4.4
+ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
+	$(RUN) sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' Makefile
+endif
+	test -e $(WORK_DIR)/arch/$(KERNEL_ARCH) || $(RUN) ln -sf $(KERNEL_BASE_ARCH) arch/$(KERNEL_ARCH)
+	@$(MSG) "Cleaning the kernel source"
+	$(RUN) $(MAKE) mrproper
+	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
+	$(RUN) cp $(KERNEL_CONFIG) .config
+	@$(MSG) "Set any new symbols to their default value"
+# olddefconfig is not available < 3.8
+ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
+	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
+	$(RUN) yes "" | $(MAKE) oldconfig
+else
+	$(RUN) $(MAKE) olddefconfig
+endif
+
+post_kernel_configure_target: $(KERNEL_CONFIGURE_TARGET)
+
+ifeq ($(wildcard $(KERNEL_CONFIGURE_COOKIE)),)
+kernel_configure: $(KERNEL_CONFIGURE_COOKIE)
+
+$(KERNEL_CONFIGURE_COOKIE): $(POST_KERNEL_CONFIGURE_TARGET)
+	$(create_target_dir)
+	@touch -f $@
+else
+kernel_configure: ;
+endif
+

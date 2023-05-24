@@ -33,8 +33,7 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 #####
 
 # Always configure the kernel source tree
-PRE_CONFIGURE_TARGET = kernel_pre_configure_target
-CONFIGURE_TARGET     = kernel_configure_target
+POST_EXTRACT_TARGET  = kernel_post_extract_target
 COMPILE_TARGET       = nop
 INSTALL_TARGET       = nop
 
@@ -67,10 +66,10 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-configure: patch
-include ../../mk/spksrc.configure.mk
+kernel_configure: patch
+include ../../mk/spksrc.kernel-configure.mk
 
-compile: configure
+compile: kernel_configure
 include ../../mk/spksrc.compile.mk
 
 install: compile
@@ -82,34 +81,10 @@ include ../../mk/spksrc.plist.mk
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
 
-.PHONY: kernel_pre_configure_target
+.PHONY: kernel_post_extract_target
 
-kernel_pre_configure_target:
+kernel_post_extract_target:
 	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
-
-.PHONY: kernel_configure_target
-
-kernel_configure_target: 
-	@$(MSG) "Updating kernel Makefile"
-	$(RUN) sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' Makefile
-	$(RUN) sed -i -r 's,^ARCH\s*.+,ARCH\t= $(KERNEL_ARCH),' Makefile
-# Add "+" to EXTRAVERSION for kernels version >= 4.4
-ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
-	$(RUN) sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' Makefile
-endif
-	test -e $(WORK_DIR)/arch/$(KERNEL_ARCH) || $(RUN) ln -sf $(KERNEL_BASE_ARCH) arch/$(KERNEL_ARCH)
-	@$(MSG) "Cleaning the kernel source"
-	$(RUN) $(MAKE) mrproper
-	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
-	$(RUN) cp $(KERNEL_CONFIG) .config
-	@$(MSG) "Set any new symbols to their default value"
-# olddefconfig is not available < 3.8
-ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
-	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
-	$(RUN) yes "" | $(MAKE) oldconfig
-else
-	$(RUN) $(MAKE) olddefconfig
-endif
 
 .PHONY: kernel_module_prepare_target
 
