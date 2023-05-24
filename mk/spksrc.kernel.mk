@@ -36,12 +36,6 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 # move the kernel source tree to its final destination
 POST_EXTRACT_TARGET      = kernel_post_extract_target
 
-# Always configure the kernel
-# unless on generic archs
-ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
-KERNEL_CONFIGURE_TARGET  = nop
-endif
-
 # By default do not install kernel headers
 INSTALL_TARGET           = nop
 
