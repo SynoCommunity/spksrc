@@ -65,6 +65,9 @@ kernel_module: kernel_configure
 include ../../mk/spksrc.kernel-module.mk
 
 install: kernel_module
+include ../../mk/spksrc.kernel-headers.mk
+
+install: kernel_headers
 include ../../mk/spksrc.install.mk
 
 plist: install
