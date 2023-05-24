@@ -1,17 +1,19 @@
 ### Kernel module rules
-#   Compile kernel modules as provided thru the REQUIRE_KERNEL_MODULE variable.
+#   Compile kernel modules as provided with the REQUIRE_KERNEL_MODULE variable.
 # Targets are executed in the following order:
 #  kernel_module_msg_target
 #  pre_kernel_module_target    (override with PRE_KERNEL_MODULE_TARGET)
 #  kernel_module_target        (override with KERNEL_MODULE_TARGET)
 #  post_kernel_module_target   (override with POST_KERNEL_MODULE_TARGET)
 # Variables:
-#  REQUIRE_KERNEL_MODULE   TBD
-#  STAGING_INSTALL_PREFIX  TBD
-#  WORK_DIR                TBD
-#  PKG_DIR                 TBD
-#  NAME                    TBD
-#  TC_KERNEL               TBD
+#  ARCH                    Actual ARCH being built for
+#  GENERIC_ARCHS           Names of generic ARCH groups (i.e. armv7, aarch64, x64, etc)
+#  REQUIRE_KERNEL_MODULE   List of modules to be compiled
+#  STAGING_INSTALL_PREFIX  Full installation path consisting of $(INSTALL_DIR)$(INSTALL_PREFIX)
+#  WORK_DIR                Base directory used for compilation of specified ARCH
+#  PKG_DIR                 The extracted package directory name
+#  NAME                    Refers to $(KERNEL_NAME) being syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+#  TC_KERNEL               Exact kernel version as provided by toolchain configuration $(WORK_DIR)/tc_vars.mk
 
 KERNEL_MODULE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_module_done
 
@@ -20,10 +22,19 @@ PRE_KERNEL_MODULE_TARGET = pre_kernel_module_target
 else
 $(PRE_KERNEL_MODULE_TARGET): kernel_module_msg
 endif
+# Build kernel modules
+# - only for non-generic archs
+# - only when required (e.g. REQUIRE_KERNEL_MODULE not empty)
+ifneq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
+ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+KERNEL_MODULE_TARGET = nop
+else
 ifeq ($(strip $(KERNEL_MODULE_TARGET)),)
 KERNEL_MODULE_TARGET = kernel_module_target
 else
 $(KERNEL_MODULE_TARGET): $(PRE_KERNEL_MODULE_TARGET)
+endif
+endif
 endif
 ifeq ($(strip $(POST_KERNEL_MODULE_TARGET)),)
 POST_KERNEL_MODULE_TARGET = post_kernel_module_target
@@ -35,7 +46,7 @@ endif
 .PHONY: $(PRE_KERNEL_MODULE_TARGET) $(KERNEL_MODULE_TARGET) $(POST_KERNEL_MODULE_TARGET)
 
 kernel_module_msg:
-	@$(MSG) "Compiling for $(NAME)"
+	@$(MSG) "Compiling kernel modules for $(NAME)"
 
 pre_kernel_module_target: kernel_module_msg
 

@@ -42,20 +42,6 @@ ifeq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
 KERNEL_CONFIGURE_TARGET  = nop
 endif
 
-# By default do not build modules
-PRE_KERNEL_MODULE_TARGET = nop
-KERNEL_MODULE_TARGET     = nop
-
-# Build kernel module
-# - only when required
-# - only on non-generic archs
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-ifneq ($(findstring $(ARCH),$(GENERIC_ARCHS)),$(ARCH))
-PRE_KERNEL_MODULE_TARGET = pre_kernel_module_target
-KERNEL_MODULE_TARGET     = kernel_module_target
-endif
-endif
-
 # By default do not install kernel headers
 INSTALL_TARGET           = nop
 
