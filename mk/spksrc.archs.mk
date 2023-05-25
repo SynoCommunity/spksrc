@@ -26,7 +26,7 @@ ARM_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS)
 PPC_ARCHS = powerpc ppc824x ppc853x ppc854x qoriq
 
 i686_ARCHS = evansport
-x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk broadwellnkv2 bromolow cedarview denverton dockerx64 epyc7002 geminilake grantley purley kvmx64 v1000 r1000 x86 x86_64
+x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow cedarview denverton dockerx64 epyc7002 geminilake grantley purley kvmx64 v1000 r1000 x86 x86_64
 
 32bit_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) $(PPC_ARCHS)
 64bit_ARCHS = $(ARMv8_ARCHS) $(x64_ARCHS)
