@@ -1,5 +1,6 @@
 PKG_NAME = fd
 # Version 8.4.0 fails to build for ARMv5 (https://github.com/sharkdp/fd/issues/1049#issue-1283491635)
+# Version 8.7.0 still fails to build for ARMv5
 PKG_VERS = 8.3.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -8,7 +9,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # powerpc archs (except qoriq) are not supported
-# undefined reference to `pipe2'
+# undefined reference to 'pipe2'
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://github.com/sharkdp/fd
