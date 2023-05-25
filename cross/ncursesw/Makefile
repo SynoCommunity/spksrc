@@ -27,6 +27,8 @@ CONFIGURE_ARGS += --disable-home-terminfo
 # Specific for ncursesw
 CONFIGURE_ARGS += --enable-widec
 CONFIGURE_ARGS += --without-normal
+# create lib tinfo:
+CONFIGURE_ARGS += --with-termlib
 
 include ../../mk/spksrc.cross-cc.mk
 

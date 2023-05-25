@@ -9,7 +9,7 @@ PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/$(PKG_REAL_NAME)/v$(PKG_V
 PKG_DIR = $(PKG_NAME)/$(PKG_REAL_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
-DEPENDS =
+DEPENDS = cross/ncursesw
 
 HOMEPAGE = https://github.com/karelzak/util-linux
 COMMENT  = Random collection of Linux utilities. We use this only to build ... out of util-linux.
@@ -29,7 +29,6 @@ CONFIGURE_ARGS += --disable-makeinstall-chown
 
 # disable unused tools
 CONFIGURE_ARGS += --disable-libuuid --disable-uuidd
-CONFIGURE_ARGS += --disable-libblkid --disable-blkid
 CONFIGURE_ARGS += --disable-losetup
 CONFIGURE_ARGS += --disable-hwclock
 CONFIGURE_ARGS += --disable-agetty
@@ -41,6 +40,10 @@ CONFIGURE_ARGS += --disable-minix
 CONFIGURE_ARGS += --disable-wipefs
 CONFIGURE_ARGS += --disable-mountpoint
 CONFIGURE_ARGS += --disable-plymouth_support
+CONFIGURE_ARGS += --disable-unshare
+CONFIGURE_ARGS += --disable-irqtop
+CONFIGURE_ARGS += --disable-ul
+CONFIGURE_ARGS += --disable-more
 
 # fails to build for: hi3535-6.1
 CONFIGURE_ARGS += --disable-schedutils
@@ -53,9 +56,11 @@ CONFIGURE_ARGS += --disable-lsfd
 ADDITIONAL_CFLAGS += -DFIEMAP_EXTENT_SHARED=0x00002000
 ### disk-utils/mkswap.c:294:22: error: 'FIEMAP_EXTENT_SHARED' undeclared (first use in this function)
 
-# fails to build for: ppc853x-5.2
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-scriptutils
-CONFIGURE_ARGS += --disable-unshare
-
+CONFIGURE_ARGS += --disable-libblkid --disable-blkid
+PLIST_TRANSFORM = sed -e 's|bin/lsblk|d'
+endif
 
 include ../../mk/spksrc.cross-cc.mk
