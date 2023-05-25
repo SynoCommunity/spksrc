@@ -20,6 +20,9 @@ lib:lib/libncursesw.so.6.4
 lnk:lib/libpanelw.so
 lnk:lib/libpanelw.so.6
 lib:lib/libpanelw.so.6.4
+lnk:lib/libtinfow.so
+lnk:lib/libtinfow.so.6
+lib:lib/libtinfow.so.6.4
 rsc:share/tabset/std
 rsc:share/tabset/stdcrt
 rsc:share/tabset/vt100
