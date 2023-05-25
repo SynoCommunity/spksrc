@@ -1,6 +1,6 @@
 SPK_NAME = synocli-misc
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/synocli-misc.png
 
 DEPENDS = cross/bc cross/moreutils cross/misc-util-linux
@@ -10,7 +10,7 @@ DISPLAY_NAME = SynoCli misc. Tools
 
 DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, cal, col, colcrt, colrm, column, hexdump, lscpu, lsipc, lsirq, rev, wall, whereis."
 STARTABLE = no
-CHANGELOG = "Initial package release."
+CHANGELOG = "Add lsblk from util-linux."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMisc
 LICENSE  = Each tool is licensed under it's respective license.
@@ -36,12 +36,13 @@ SPK_COMMANDS += bin/colcrt
 SPK_COMMANDS += bin/colrm
 SPK_COMMANDS += bin/column
 SPK_COMMANDS += bin/hexdump
+# lsblk is not included in OLD_PPC_ARCHS
+SPK_COMMANDS += bin/lsblk
 SPK_COMMANDS += bin/lscpu
 SPK_COMMANDS += bin/lsipc
 SPK_COMMANDS += bin/lsirq
 SPK_COMMANDS += bin/rev
 SPK_COMMANDS += bin/wall
 SPK_COMMANDS += bin/whereis
-
 
 include ../../mk/spksrc.spk.mk
