@@ -1,6 +1,6 @@
 SPK_NAME = fish
-SPK_VERS = 3.5.0
-SPK_REV = 5
+SPK_VERS = 3.6.1
+SPK_REV = 6
 SPK_ICON = src/ascii_fish.png
 
 DEPENDS = cross/fish
@@ -11,7 +11,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
 DISPLAY_NAME = fish
 STARTABLE = no
-CHANGELOG = "Update fish to 3.5.0"
+CHANGELOG = "Update fish to 3.6.1"
 
 HOMEPAGE = https://fishshell.com
 LICENSE = GPL-2.0
