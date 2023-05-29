@@ -19,7 +19,7 @@ PIP_CACHE_BACKUP_DIR=${TMP_DIR}/pip-cache
 PIP_CACHE_DIR=${SYNOPKG_PKGDEST}/pip-cache
 export PIP_DOWNLOAD_CACHE=${PIP_CACHE_DIR}
 # avoid installation to user specific site-packages folder
-export PYTHONNOUSERSIZE=1
+export PYTHONNOUSERSITE=1
 
 service_save ()
 {

@@ -1,9 +1,9 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2023.1.7
+SPK_VERS = 2023.5.4
 SPK_REV = 21
 SPK_ICON = src/homeassistant.png
 
-HACS_VERS = 1.31.0
+HACS_VERS = 1.32.1
 
 SPK_DEPENDS = "python310>=3.10.12-18"
 
@@ -15,7 +15,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2023.1.7.<br/>2. Update HACS integration to v1.31.0.<br/><br/>3. Update to openssl v3.1.1.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2023.5.4.<br/>2. Update HACS integration to v1.32.1.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -79,6 +79,9 @@ WHEELS_BUILD_ARGS += --enable-zlib
 # [bcrypt]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# fix for openssl-sys crate (for cryptography >= 40.0.0)
+# https://docs.rs/openssl/latest/openssl/#manual
+ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 
 # [cryptography]
 DEPENDS += cross/cryptography_38
@@ -140,4 +143,4 @@ homeassistant_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/var
 	@install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/
 	@install -m 644 src/hacs.tar.gz $(STAGING_DIR)/share/
-	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/requirements-custom.txt.new
+	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/requirements-custom.txt
