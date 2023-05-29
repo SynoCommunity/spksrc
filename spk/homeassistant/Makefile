@@ -104,14 +104,19 @@ include ../../mk/spksrc.spk.mk
 # prefere native python tools (pip, maturin, ...)
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin):$(PATH)
 
+# [greenlet]
+ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
+WHEELS_CPPFLAGS += [greenlet] -std=c++11
+endif
+
 # [numpy]
 # Fix wheel building with older compilers
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS = [numpy] -std=c++0x
+WHEELS_CPPFLAGS += [numpy] -std=c++0x
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS = [numpy] -O0
+WHEELS_CFLAGS += [numpy] -O0
 endif
 endif
 
@@ -125,7 +130,6 @@ WHEELS_CFLAGS += [pycryptodome] -std=c99
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 WHEELS_CFLAGS += [ciso8601] -std=c99
 endif
-
 
 # target to download and prepare hacs after changing HACS_VERS above
 .PHONY: get_hacs
