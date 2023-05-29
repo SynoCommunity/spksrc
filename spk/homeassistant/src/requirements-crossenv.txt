@@ -49,7 +49,11 @@ simplejson==3.19.1
 SQLAlchemy==2.0.12
 tornado==6.3.2
 ulid_transform==0.7.2
-webrtcvad==2.0.10
+
+# [webrtcvad]
+# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
+git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10
+
 websockets==11.0.3
 wrapt==1.15.0
 yarl==1.9.2
