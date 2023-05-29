@@ -33,7 +33,7 @@ multidict==6.0.4
 netifaces==0.11.0
 numpy==1.23.2
 orjson==3.8.10
-# pandas==2.0.1         # depends on installed numby wheel ?...
+# pandas==2.0.1         # depends on installed numpy wheel ?...
 Pillow==9.5.0
 protobuf==4.23.2
 psutil==5.9.5

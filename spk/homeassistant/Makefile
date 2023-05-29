@@ -120,6 +120,11 @@ WHEELS_CFLAGS += [numpy] -O0
 endif
 endif
 
+# [protobuf]
+ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
+WHEELS_CFLAGS += [protobuf] -std=c99
+endif
+
 # [pycryptodome] [pycryptodomex] [ciso8601]
 ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
 WHEELS_CFLAGS += [pycryptodome] -std=c11
