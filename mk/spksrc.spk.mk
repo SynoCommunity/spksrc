@@ -441,7 +441,7 @@ endif
 		output=$$(echo "$$response" | awk '/^[[:space:]]*$$/ {p=1;next} p'); \
 		echo "Package published successfully\n$$output" | tee --append publish-$*.log; \
 	else \
-		echo "ERROR: Failed to publish package - HTTP response code $$response_code\n$$output" | tee --append publish-$*.log; \
+		echo "ERROR: Failed to publish package - HTTP response code $$response_code\n$$response" | tee --append publish-$*.log; \
 		exit 1; \
 	fi
 
