@@ -1,5 +1,5 @@
 PKG_NAME = openssl3
-PKG_VERS = 3.1.0
+PKG_VERS = 3.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = openssl-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source
@@ -48,10 +48,6 @@ OPENSSL_PLATFORM = linux-armv4
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-aarch64
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# asm of gcc for DSM<7 does not support ".arch	armv8.2-a+crypto"
-CONFIGURE_ARGS += no-asm
-endif
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-ppc
