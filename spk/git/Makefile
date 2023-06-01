@@ -1,6 +1,6 @@
 SPK_NAME = git
-SPK_VERS = 2.39.1
-SPK_REV = 26
+SPK_VERS = 2.40.1
+SPK_REV = 27
 SPK_ICON = src/git.png
 
 DEPENDS = cross/git
@@ -10,6 +10,7 @@ include ../../mk/spksrc.common.mk
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/git-lfs
+SPK_COMMANDS += bin/git-lfs
 endif
 
 MAINTAINER = SynoCommunity
@@ -17,7 +18,7 @@ DESCRIPTION = Git is a fast, scalable, distributed revision control system with 
 DESCRIPTION_FRE = Git est un système de gestion de révision rapide, extensible et distribué avec un ensemble de commandes inhabituellement riche qui fournit à la fois des opérations de haut niveau et un accès complet aux structures de bas niveau.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = "1. Update git to v2.39.1.<br/>2. Add git-lfs v3.3.0 for supported archs."
+CHANGELOG = "1. Update git to v2.40.1.<br/>Include contrib/subtree module."
 
 HOMEPAGE = https://git-scm.com
 LICENSE  = GPLv2
@@ -29,6 +30,5 @@ SPK_COMMANDS += bin/git-shell
 SPK_COMMANDS += bin/git-upload-archive
 SPK_COMMANDS += bin/git-upload-pack
 SPK_COMMANDS += bin/scalar
-SPK_COMMANDS += bin/git-lfs
 
 include ../../mk/spksrc.spk.mk
