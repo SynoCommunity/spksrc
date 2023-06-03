@@ -51,7 +51,7 @@ PyGithub==1.58.1
 PyJWT==2.6.0
 pymediainfo==6.0.1
 # PyNaCl==1.5.0    ==> crossenv
-PyNMA==1
+PyNMA==1.0
 pyOpenSSL==23.1.1
 pyparsing==3.0.9
 pysrt==1.1.2
