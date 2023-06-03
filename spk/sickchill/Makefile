@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
-SPK_VERS = 20221013
-SPK_REV = 6
+SPK_VERS = 20230530
+SPK_REV = 7
 SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python310
@@ -16,16 +16,26 @@ DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
 # [cryptography]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+DEPENDS += cross/cryptography
+# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+# ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
+# [greenlet]
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+WHEELS += src/requirements-crossenv-greenlet.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
+endif
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Switched to a wheel based install, as source and git installs are no longer supported by upstream."
+CHANGELOG = "Switched to a wheel based install, git installs are no longer supported by upstream."
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
