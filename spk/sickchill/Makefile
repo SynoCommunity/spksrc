@@ -18,6 +18,8 @@ ENV += SODIUM_INSTALL=system
 # [cryptography]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
