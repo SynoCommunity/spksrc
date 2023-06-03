@@ -41,7 +41,7 @@ mock==5.0.1
 # msgpack==1.0.5    ==> crossenv
 new-rtorrent-python==1.0.1a0
 oauthlib==3.2.2
-packaging==23
+packaging==23.0
 pbr==5.11.1
 pluggy==1.0.0
 profilehooks==1.12.0
