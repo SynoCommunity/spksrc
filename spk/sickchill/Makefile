@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
-SPK_VERS = 20221013
-SPK_REV = 6
+SPK_VERS = 20230530
+SPK_REV = 7
 SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python310
@@ -25,7 +25,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Switched to a wheel based install, as source and git installs are no longer supported by upstream."
+CHANGELOG = "Switched to a wheel based install, git installs are no longer supported by upstream."
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
