@@ -59,17 +59,26 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                 ]
             });
 
-            // Tab for Stores
+            // Tab for Stores 1
             allTabs.push({
-                title: "Stores",
+                title: "Stores 1",
                 layout: "fit",
                 items: [
                     this.createSynoStore(),
-					this.createRatesStore(),
 					this.createSqlStore()
                 ]
             });
 
+            // Tab for Stores 2
+            allTabs.push({
+                title: "Stores 2",
+                layout: "fit",
+                items: [
+                    this.createSynoAPIStore(),
+					this.createRatesStore()
+                ]
+            });
+            
             return allTabs;
         }).call(this);
 
@@ -941,6 +950,122 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
     },
 
+
+    // Create the display of API Store
+    createSynoAPIStore: function() {
+        return new SYNO.ux.FieldSet({
+            title: "Syno API Store",
+            collapsible: true,
+            autoHeight: true,
+            items: [{
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [
+						this.createAPIGrid()
+                    ]
+                }
+
+
+
+            ]
+        });
+    },
+
+    // Create API Store grid calling Syno API  
+    createAPIGrid: function() {
+
+        var APIName = "SYNO.Core.TaskScheduler";
+
+        var gridStore = new SYNO.API.JsonStore({
+            api: APIName,
+            method: "list",
+            version: 2,
+            root: "tasks",
+            totalProperty: "total",
+            fields: ["id", "name", "action"],
+            remoteSort: true,
+            sortInfo: {
+                field: "name",
+                direction: "ASC"
+            },
+            defaultParamNames: {
+                sort: "sort_by",
+                dir: "sort_direction"
+            },
+            baseParams: {
+                start: 0,
+                limit: this.TotalRecords
+            },
+            autoDestroy: false,
+            autoLoad: false
+        });    
+
+        var paging = new SYNO.ux.PagingToolbar({
+            store: gridStore,
+            displayInfo: true,
+            pageSize: 10,
+            refreshText: "Reload"
+        });
+
+        var c = {
+            store: gridStore,
+            colModel: new Ext.grid.ColumnModel({
+                defaults: {
+                    sortable: true,
+                    menuDisabled: true,
+                    width: 180,
+                    height: 20
+                },
+                columns: [{
+                    header: "Id",
+                    width: 20,
+                    dataIndex: "id"
+                }, {
+                    header: "Name",
+                    width: 60,
+                    dataIndex: "name"
+                }, {
+                    header: "Action",
+                    width: 100,
+                    dataIndex: "action"
+                }]
+            }),
+            viewConfig: {
+                forceFit: true,
+                onLoad: Ext.emptyFn,
+                listeners: {
+                    beforerefresh: function(f) {
+                        f.scrollTop = f.scroller.dom.scrollTop;
+                    },
+                    refresh: function(f) {
+                        f.scroller.dom.scrollTop = f.scrollTop;
+                    }
+                }
+            },
+            columnLines: true,
+            frame: false,
+            bbar: paging,
+            height: 200,
+            cls: "resource-monitor-performance",
+            listeners: {
+                scope: this,
+                render: function(grid) {
+                    grid.getStore().load({
+                        params: {
+                            offset: 0,
+                            limit: 10
+                        }
+                    });
+                }
+            }
+        };
+
+
+        return new SYNO.ux.GridPanel(c);
+
+    },
+	
+    
     // Create the display of Rates Store
     createRatesStore: function() {
         return new SYNO.ux.FieldSet({
@@ -1002,7 +1127,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     width: 30,
                     dataIndex: "key"
                 }, {
-                    header: "EUR rate",
+                    header: "USD rate",
                     width: 50,
                     dataIndex: "value"
                 }]
@@ -1041,6 +1166,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         return new SYNO.ux.GridPanel(c);
 
     },
+
 
     // Create the display of SQL Store
     createSqlStore: function() {
