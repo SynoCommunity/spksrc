@@ -2,7 +2,7 @@ PYTHON_DIR="/var/packages/python310/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 HOME="${SYNOPKG_PKGVAR}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
-SC_BINARY="${SYNOPKG_PKGDEST}/env/bin/SickChill"
+SC_BINARY="${SYNOPKG_PKGDEST}/env/bin/sickchill"
 SC_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 SC_CFG_FILE="${SC_DATA_DIR}/config.ini"
 
