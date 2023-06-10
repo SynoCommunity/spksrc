@@ -28,6 +28,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 WHEELS += src/requirements-crossenv-greenlet.txt
 else
+ADDITIONAL_CXXFLAGS += -std=c++11
 WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
 endif
 

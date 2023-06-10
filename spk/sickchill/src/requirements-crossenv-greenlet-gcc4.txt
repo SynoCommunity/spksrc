@@ -7,5 +7,4 @@
 # [greenlet]
 #   - gcc < 5.0 (DSM6) Last known working version
 # greenlet==1.1.3.post0
-ADDITIONAL_CXXFLAGS += -std=c++11
 greenlet==2.0.2
