@@ -25,11 +25,11 @@ DEPENDS += cross/cryptography
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # [greenlet]
-#ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-#WHEELS += src/requirements-crossenv-greenlet.txt
-#else
-#WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
-#endif
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+WHEELS += src/requirements-crossenv-greenlet.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
+endif
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
