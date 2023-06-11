@@ -22,16 +22,17 @@ DEPENDS += cross/cryptography
 # ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 # ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-
 # [greenlet]
 #ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifeq ($(call version_ge, ${TC_GCC}, 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet.txt
 else
-CFLAGS += -std=c++11
+CXXFLAGS += -std=c++11
 WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
 endif
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
 
 MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
