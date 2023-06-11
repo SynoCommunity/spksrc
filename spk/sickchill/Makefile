@@ -25,10 +25,11 @@ DEPENDS += cross/cryptography
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # [greenlet]
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+#ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifeq ($(call version_ge, ${TC_GCC}, 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet.txt
 else
-ADDITIONAL_CXXFLAGS += -std=c++11
+CFLAGS += -std=c++11
 WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
 endif
 
