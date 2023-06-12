@@ -1,6 +1,6 @@
 SPK_NAME = umurmur
 SPK_VERS = 0.2.20
-SPK_REV = 9
+SPK_REV = 8
 SPK_ICON = src/umurmur.png
 
 DEPENDS = cross/$(SPK_NAME)
