@@ -1,3 +1,6 @@
 lnk:lib/libngtcp2.so
-lnk:lib/libngtcp2.so.9
-lib:lib/libngtcp2.so.9.0.1
+lnk:lib/libngtcp2.so.12
+lib:lib/libngtcp2.so.12.0.0
+lnk:lib/libngtcp2_crypto_gnutls.so
+lnk:lib/libngtcp2_crypto_gnutls.so.4
+lib:lib/libngtcp2_crypto_gnutls.so.4.0.1

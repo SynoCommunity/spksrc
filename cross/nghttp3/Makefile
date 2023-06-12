@@ -1,9 +1,12 @@
 PKG_NAME = nghttp3
-PKG_VERS = 0.8.0
+PKG_VERS = 0.12.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ngtcp2/nghttp3/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+# for supported version for curl 
+# see: https://github.com/curl/curl/blob/master/docs/HTTP3.md
 
 DEPENDS = cross/gnutls
 
