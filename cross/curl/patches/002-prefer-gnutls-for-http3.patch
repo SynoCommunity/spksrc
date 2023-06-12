@@ -1,8 +1,8 @@
 # To use GNUTLS for http3 (ngtcp2) when USE_OPENSSL is defined too,
 # we must first check for USE_GNUTLS and apply code for.
 # 
---- lib/vquic/curl_ngtcp2.h.orig	2023-02-13 08:37:04.000000000 +0100
-+++ lib/vquic/curl_ngtcp2.h	2023-03-21 22:01:29.036201463 +0100
+--- lib/vquic/curl_ngtcp2.h.orig	2023-05-15 10:55:59.000000000 +0000
++++ lib/vquic/curl_ngtcp2.h	2023-06-11 07:37:17.255309500 +0000
 @@ -34,7 +34,9 @@
  
  #include <ngtcp2/ngtcp2_crypto.h>
@@ -14,9 +14,8 @@
  #include <openssl/ssl.h>
  #elif defined(USE_WOLFSSL)
  #include <wolfssl/options.h>
-
---- lib/vquic/curl_ngtcp2.c.orig	2023-02-13 17:09:38.000000000 +0100
-+++ lib/vquic/curl_ngtcp2.c	2023-03-21 22:13:58.581464761 +0100
+--- lib/vquic/curl_ngtcp2.c.orig	2023-05-26 06:37:58.000000000 +0000
++++ lib/vquic/curl_ngtcp2.c	2023-06-11 08:00:26.210096152 +0000
 @@ -28,7 +28,10 @@
  #include <ngtcp2/ngtcp2.h>
  #include <nghttp3/nghttp3.h>
@@ -39,9 +38,9 @@
  #elif defined(USE_WOLFSSL)
  #include <ngtcp2/ngtcp2_crypto_wolfssl.h>
  #include "vtls/wolfssl.h"
-@@ -92,17 +92,17 @@
- #define QUIC_IDLE_TIMEOUT (60*NGTCP2_SECONDS)
- #define QUIC_HANDSHAKE_TIMEOUT (10*NGTCP2_SECONDS)
+@@ -101,17 +101,17 @@
+           (H3_STREAM_WINDOW_SIZE / H3_STREAM_CHUNK_SIZE)
+ 
  
 -#ifdef USE_OPENSSL
 -#define QUIC_CIPHERS                                                          \
@@ -59,13 +58,13 @@
 +#define QUIC_CIPHERS                                                          \
 +  "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_"               \
 +  "POLY1305_SHA256:TLS_AES_128_CCM_SHA256"
-+#define QUIC_GROUPS "P-256:X25519:P-384:P-521"
++#define QUIC_GROUPS "P-256:P-384:P-521"
  #elif defined(USE_WOLFSSL)
  #define QUIC_CIPHERS                                                          \
    "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_"               \
-@@ -133,11 +133,11 @@
+@@ -142,11 +142,11 @@
    ngtcp2_transport_params transport_params;
-   ngtcp2_connection_close_error last_error;
+   ngtcp2_ccerr last_error;
    ngtcp2_crypto_conn_ref conn_ref;
 -#ifdef USE_OPENSSL
 +#ifdef USE_GNUTLS
@@ -78,7 +77,7 @@
  #elif defined(USE_WOLFSSL)
    WOLFSSL_CTX *sslctx;
    WOLFSSL *ssl;
-@@ -248,13 +248,7 @@
+@@ -331,13 +331,7 @@
    }
  }
  
@@ -93,7 +92,7 @@
  static int keylog_callback(gnutls_session_t session, const char *label,
                      const gnutls_datum_t *secret)
  {
-@@ -269,6 +263,12 @@
+@@ -352,6 +346,13 @@
    Curl_tls_keylog_write(label, crandom.data, secret->data, secret->size);
    return 0;
  }
@@ -103,16 +102,16 @@
 +  (void)ssl;
 +  Curl_tls_keylog_write_line(line);
 +}
++
  #elif defined(USE_WOLFSSL)
  #if defined(HAVE_SECRET_CALLBACK)
  static void keylog_callback(const WOLFSSL *ssl, const char *line)
-@@ -281,7 +281,63 @@
+@@ -364,7 +365,60 @@
  
  static int init_ngh3_conn(struct Curl_cfilter *cf);
  
 -#ifdef USE_OPENSSL
 +#ifdef USE_GNUTLS
-+
 +static CURLcode quic_init_ssl(struct Curl_cfilter *cf,
 +                              struct Curl_easy *data)
 +{
@@ -165,13 +164,11 @@
 +                            alpn, 2, GNUTLS_ALPN_MANDATORY);
 +  return CURLE_OK;
 +}
-+
 +#elif defined(USE_OPENSSL)
-+
  static CURLcode quic_ssl_ctx(SSL_CTX **pssl_ctx,
                               struct Curl_cfilter *cf, struct Curl_easy *data)
  {
-@@ -412,59 +468,7 @@
+@@ -495,59 +549,6 @@
    SSL_set_tlsext_host_name(ctx->ssl, cf->conn->host.name);
    return CURLE_OK;
  }
@@ -191,7 +188,7 @@
 -  ctx->gtls = calloc(1, sizeof(*(ctx->gtls)));
 -  if(!ctx->gtls)
 -    return CURLE_OUT_OF_MEMORY;
- 
+-
 -  result = gtls_client_init(data, &cf->conn->ssl_config, &data->set.ssl,
 -                            hostname, ctx->gtls, pverifyresult);
 -  if(result)
@@ -231,7 +228,7 @@
  #elif defined(USE_WOLFSSL)
  
  static CURLcode quic_ssl_ctx(WOLFSSL_CTX **pssl_ctx,
-@@ -1722,7 +1726,14 @@
+@@ -1730,7 +1731,14 @@
    cf->conn->bundle->multiuse = BUNDLE_MULTIPLEX;
  
    if(cf->conn->ssl_config.verifyhost) {
@@ -247,7 +244,7 @@
      X509 *server_cert;
      server_cert = SSL_get_peer_certificate(ctx->ssl);
      if(!server_cert) {
-@@ -1732,13 +1743,6 @@
+@@ -1740,13 +1748,6 @@
      X509_free(server_cert);
      if(result)
        return result;
@@ -261,7 +258,7 @@
  #elif defined(USE_WOLFSSL)
      if(wolfSSL_check_domain_name(ctx->ssl, snihost) == SSL_FAILURE)
        return CURLE_PEER_FAILED_VERIFICATION;
-@@ -1747,7 +1751,8 @@
+@@ -1755,7 +1756,8 @@
    }
    else
      infof(data, "Skipped certificate verification");
@@ -271,9 +268,9 @@
    if(data->set.ssl.certinfo)
      /* asked to gather certificate info */
      (void)Curl_ossl_certchain(data, ctx->ssl);
-@@ -2129,12 +2134,7 @@
+@@ -2170,12 +2172,7 @@
+   if(ctx->qlogfd != -1) {
      close(ctx->qlogfd);
-     ctx->qlogfd = -1;
    }
 -#ifdef USE_OPENSSL
 -  if(ctx->ssl)
@@ -285,7 +282,7 @@
    if(ctx->gtls) {
      if(ctx->gtls->cred)
        gnutls_certificate_free_credentials(ctx->gtls->cred);
-@@ -2142,6 +2142,11 @@
+@@ -2183,6 +2180,11 @@
        gnutls_deinit(ctx->gtls->session);
      free(ctx->gtls);
    }
@@ -297,10 +294,10 @@
  #elif defined(USE_WOLFSSL)
    if(ctx->ssl)
      wolfSSL_free(ctx->ssl);
-@@ -2216,7 +2221,8 @@
-   int qfd;
+@@ -2264,7 +2266,8 @@
+   Curl_bufcp_init(&ctx->stream_bufcp, H3_STREAM_CHUNK_SIZE,
+                   H3_STREAM_POOL_SPARES);
  
-   ctx->version = NGTCP2_PROTO_VER_MAX;
 -#ifdef USE_OPENSSL
 +#ifdef USE_GNUTLS
 +#elif defined(USE_OPENSSL)
