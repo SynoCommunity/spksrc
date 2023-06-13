@@ -1,0 +1,19 @@
+--- Makefile.orig	2023-06-13 22:54:36.923530347 +0100
++++ Makefile	2023-06-13 22:55:20.234620141 +0100
+@@ -16,13 +16,13 @@
+ build: generate build-quick
+ 
+ build-quick:
+-	go build -trimpath -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
++	go build -trimpath -buildvcs=false -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
+ 
+ build-dbg:
+-	go build -trimpath -ldflags "-s -w $(ADDITIONAL_GO_LINKER_FLAGS) $(DEBUGVAR)" ./cmd/micro
++	go build -trimpath -buildvcs=false -ldflags "-s -w $(ADDITIONAL_GO_LINKER_FLAGS) $(DEBUGVAR)" ./cmd/micro
+ 
+ build-tags: fetch-tags generate
+-	go build -trimpath -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
++	go build -trimpath -buildvcs=false -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
+ 
+ build-all: build
+ 
