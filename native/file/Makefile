@@ -5,8 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.astron.com/pub/file
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/file
-BIN_PATH = $(realpath $(WORK_DIR)/../../../native/file/work-native/install/usr/local/bin)
 DEPENDS =
 
 HOMEPAGE = https://www.darwinsys.com/file/
@@ -15,7 +13,6 @@ LICENSE  = https://github.com/file/file/blob/master/COPYING
 
 GNU_CONFIGURE = 1
 
-ADDITIONAL_CPPFLAGS = -Os
+CONFIGURE_ARGS += -enable-static --disable-shared
 
-include ../../mk/spksrc.cross-cc.mk
-ENV += PATH=$(BIN_PATH):$$PATH
+include ../../mk/spksrc.native-cc.mk
