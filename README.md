@@ -50,23 +50,20 @@ docker run -it -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/sy
 
 
 ### Virtual machine
-A virtual machine based on an 64-bit version of Debian 11 stable OS is recommended. Non-x86 architectures are not supported.
+A virtual machine based on an 64-bit version of Debian 12 (bookworm) stable OS is recommended. Non-x86 architectures are not supported.
 
 Install the requirements (in sync with `Dockerfile`):
 ```bash
-sudo dpkg --add-architecture i386 && sudo apt-get update
-sudo apt update
+sudo dpkg --add-architecture i386 && sudo apt update
 sudo apt install autoconf-archive autogen automake autopoint bash bc bison \
                  build-essential check cmake curl cython3 debootstrap ed expect fakeroot flex \
-                 g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
+                 g++-multilib gawk gettext git gperf httpie imagemagick intltool jq libbz2-dev libc6-i386 \
                  libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                  libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
-                 patchelf php pkg-config python2 python3 python3-distutils rename rsync scons subversion \
+                 patchelf php pkg-config python3 python3-distutils python3-pip python3-virtualenv \
+                 rename rsync scons subversion \
                  swig texinfo unzip xmlto zlib1g-dev
-wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
-sudo pip2 install wheel httpie
-wget https://bootstrap.pypa.io/get-pip.py -O - | sudo python3
-sudo pip3 install meson==1.0.0
+sudo pip3 install meson==1.0.2
 ```
 From there, follow the instructions in the [Developers HOW TO].
 
@@ -76,41 +73,34 @@ From there, follow the instructions in the [Developers HOW TO].
 
 
 ### LXC
-A container based on 64-bit version of Debian 11 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your LXD/LXC environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC basic knowledge :
-1. Create a new container (will use x86_64/amd64 arch by default): `lxc launch images:debian/11 spksrc`
+A container based on 64-bit version of Debian 12 (bookworm) stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your LXD/LXC environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC basic knowledge :
+1. Create a new container (will use x86_64/amd64 arch by default): `lxc launch images:debian/12 spksrc`
 2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
 3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
 4. Install all required packages:
 ```bash
 lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopoint bash bc bison \
                                 build-essential check cmake curl cython3 debootstrap ed expect fakeroot flex \
-                                g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
+                                g++-multilib gawk gettext git gperf httpie imagemagick intltool jq libbz2-dev libc6-i386 \
                                 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                                 libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
-                                patchelf php pkg-config python2 python3 python3-distutils rename rsync scons subversion \
+                                patchelf php pkg-config python3 python3-distutils python3-pip python3-virtualenv \
+                                rename rsync scons subversion \
                                 swig texinfo unzip xmlto zlib1g-dev
 ```
-5. Install `python2` wheels:
+5. Install `meson`:
 ```bash
-lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python2"
-lxc exec spksrc -- /bin/bash -c "pip2 install virtualenv httpie"
-```
-6. Install `python3` `pip`:
-```bash
-lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python3"
-```
-7. Install `meson`:
-```bash
-lxc exec spksrc -- /bin/bash -c "pip3 install meson==1.0.0"
+lxc exec spksrc -- /bin/bash -c "pip3 install meson==1.0.2"
 ```
 
+See also the Dockerfile for the specific commands when in doubt.
 
 #### LXC: `spksrc` user
-8. By default it is assumed that you will be running as `spksrc` user into the LXC container.  Such user needs to be created into the default container image:
+6. By default it is assumed that you will be running as `spksrc` user into the LXC container.  Such user needs to be created into the default container image:
 ```bash
 lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
 ```
-9. Setup a default shell environment:
+7. Setup a default shell environment:
 ```bash
 lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
 ```
