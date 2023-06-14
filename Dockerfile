@@ -52,7 +52,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		libunistring-dev \
 		lzip \
 		mercurial \
-		meson \
 		moreutils \
 		ninja-build \
 		patchelf \
@@ -77,6 +76,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	adduser --disabled-password --gecos '' user && \
 	adduser user sudo && \
 	echo "%users ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
+
+# https://pypi.org/project/meson/#history
+RUN pip3 install meson==1.0.2
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
