@@ -2,7 +2,7 @@
 # to be managed as pure-python
 feedparser==6.0.10
 configobj==5.0.8
-cheroot==9.0.0
+cheroot==10.0.0
 cherrypy==18.8.0
 jaraco.functools==3.6.0
 jaraco.collections==4.1.0
