@@ -1,5 +1,5 @@
 PKG_NAME = openldap
-PKG_VERS = 2.6.3
+PKG_VERS = 2.6.4
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openldap.org/software/download/OpenLDAP/openldap-release
