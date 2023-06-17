@@ -10,7 +10,8 @@ COMMENT  = Lightweight in-process concurrent programming
 LICENSE  = MIT
 
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-ADDITIONAL_CXXFLAGS += -std=c++11
+#ADDITIONAL_CXXFLAGS += -std=c++11
+ADDITIONAL_CFLAGS += -std=gnu11
 endif
 
 include ../../mk/spksrc.python-wheel.mk
