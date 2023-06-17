@@ -3,7 +3,7 @@ DIST_NAME = ncurses
 PKG_VERS = 6.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(DIST_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/$(DIST_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/ncurses
 PKG_DIR = $(DIST_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -27,8 +27,14 @@ CONFIGURE_ARGS += --disable-home-terminfo
 # Specific for ncursesw
 CONFIGURE_ARGS += --enable-widec
 CONFIGURE_ARGS += --without-normal
+
+# optional create lib tinfow:
+ifeq ($(strip $(NCURSES_WITH_TINFO)),yes)
 # create lib tinfo:
 CONFIGURE_ARGS += --with-termlib
+else
+PLIST_TRANSFORM = sed -e '/libtinfow/d'
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
