@@ -22,19 +22,12 @@ DEPENDS += cross/cryptography
 # ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 # ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
+include ../../mk/spksrc.common.mk
+
 # [greenlet]
-# Fix wheel building with older compilers
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS = [greenlet] -std=c++0x
+ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
+WHEELS_CPPFLAGS = [greenlet] -std=c++11
 endif
-#ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-#ifeq ($(call version_ge, ${TC_GCC}, 5.0),1)
-#WHEELS += src/requirements-crossenv-greenlet.txt
-#else
-#CXXFLAGS += -std=c++11
-#WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
-#endif
-#DEPENDS += cross/greenlet-2.0.2
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
