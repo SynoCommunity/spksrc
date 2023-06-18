@@ -1,0 +1,10 @@
+#rules for USB ACM serial devices
+KERNEL=="ttyACM*", ACTION=="add", MODE="0666", GROUP="users"
+KERNEL=="ttyUSB*", ACTION=="add", MODE="0666", GROUP="users"
+
+SUBSYSTEM!="usb_device", ACTION!="add", GOTO="owfs_rules_end"
+
+# DS2490r 1-Wire adapter 
+ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", MODE="0666", GROUP="users", SYMLINK+="ds2490r"
+
+LABEL="owfs_rules_end"
