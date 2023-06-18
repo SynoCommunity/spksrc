@@ -16,11 +16,16 @@ DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
 # [cryptography]
-DEPENDS += cross/cryptography
+# DEPENDS += cross/cryptography
 # ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 # ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 # ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# fix for openssl-sys crate (for cryptography >= 40.0.0)
+# https://docs.rs/openssl/latest/openssl/#manual
+ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.common.mk
 
@@ -57,6 +62,8 @@ USE_ALTERNATE_TMPDIR = 1
 POST_STRIP_TARGET = sickchill_extra_install
 
 include ../../mk/spksrc.spk.mk
+# prefere native python tools (pip, maturin, ...)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sickchill_extra_install
 sickchill_extra_install:
