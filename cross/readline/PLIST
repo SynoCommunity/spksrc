@@ -1,6 +1,6 @@
 lnk:lib/libhistory.so
 lnk:lib/libhistory.so.8
-lib:lib/libhistory.so.8.1
+lib:lib/libhistory.so.8.2
 lnk:lib/libreadline.so
 lnk:lib/libreadline.so.8
-lib:lib/libreadline.so.8.1
+lib:lib/libreadline.so.8.2
