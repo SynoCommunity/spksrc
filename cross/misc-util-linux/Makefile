@@ -61,6 +61,11 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-scriptutils
 CONFIGURE_ARGS += --disable-libblkid --disable-blkid
 PLIST_TRANSFORM = sed -e 's|bin/lsblk|d'
+else
+# for lsblk: ncurses must be built with tinfo
+# this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
+# dependencies when ncurses is build with lib tinfo
+export NCURSES_WITH_TINFO=yes
 endif
 
 include ../../mk/spksrc.cross-cc.mk
