@@ -19,6 +19,7 @@ CONFIGURE_ARGS += --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
 CONFIGURE_ARGS += --with-pkg-config-libdir=$(INSTALL_PREFIX)/lib/pkgconfig
 CONFIGURE_ARGS += --without-manpages
 CONFIGURE_ARGS += --without-tests
+CONFIGURE_ARGS += --without-debug
 CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-overwrite
 CONFIGURE_ARGS += --enable-pc-files
