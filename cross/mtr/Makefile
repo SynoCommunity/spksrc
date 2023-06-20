@@ -29,9 +29,6 @@ PRE_CONFIGURE_TARGET = mtr_pre_configure
 # avoid creation of exec hooks
 INSTALL_MAKE_OPTIONS = install-sbinPROGRAMS DESTDIR=$(INSTALL_DIR)
 
-# required since ncursesw is built with tinfo (--with-termlib)
-ADDITIONAL_LDFLAGS = -ltinfow
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: mtr_pre_configure
