@@ -12,6 +12,7 @@ DEPENDS += cross/libassuan
 DEPENDS += cross/libksba
 DEPENDS += cross/npth
 DEPENDS += cross/pinentry
+DEPENDS += cross/bzip2
 
 HOMEPAGE = https://www.gnupg.org/
 COMMENT  = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.
