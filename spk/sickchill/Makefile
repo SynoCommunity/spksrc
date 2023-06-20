@@ -19,11 +19,6 @@ DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
 # [cryptography]
-# DEPENDS += cross/cryptography
-# ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-# ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-# ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # fix for openssl-sys crate (for cryptography >= 40.0.0)
