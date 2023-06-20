@@ -15,7 +15,7 @@ charset-normalizer==3.1.0
 cinemagoer==2022.12.27
 click==8.1.3
 configobj==5.0.8
-# cryptography==40.0.1    ==> crossenv
+# cryptography==40.0.2    ==> crossenv
 decorator==5.1.1
 deluge-client==1.9.0
 Deprecated==1.2.13
@@ -24,7 +24,7 @@ enzyme==0.4.1
 Flask==2.2.3
 future==0.18.3
 gntp==1.0.3
-# greenlet==2.0.2    ==> python 3.10 cross
+# greenlet==2.0.2    ==> crossenv
 guessit==3.7.1
 idna==3.4
 ifaddr==0.2.0
