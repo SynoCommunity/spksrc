@@ -1,11 +1,11 @@
 SPK_NAME = sickchill
 SPK_VERS = 20230530
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python310
+BUILD_DEPENDS = cross/python311
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 # archs without C++11 support are not supported:
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -39,7 +39,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "A wheel based install, git installs are not supported by upstream.<br/>Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies."
+CHANGELOG = "A wheel based install, git installs are not supported by upstream.<br/>Python update to 3.11 <br/>Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies."
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
@@ -61,7 +61,7 @@ POST_STRIP_TARGET = sickchill_extra_install
 
 include ../../mk/spksrc.spk.mk
 # prefere native python tools (pip, maturin, ...)
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python310/work-native/install/usr/local/bin):$(PATH)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python311/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sickchill_extra_install
 sickchill_extra_install:
