@@ -42,4 +42,4 @@ include ../../mk/spksrc.cross-cc.mk
 bind_pre_compile:
 	@$(MSG) Build gen tool for host
 	# compile gen tool with host compiler to run in build environment
-	cd $(WORK_DIR)/$(PKG_DIR)/lib/dns; gcc -m32 -I../../lib/isc/include -o gen ./gen.c
+	cd $(WORK_DIR)/$(PKG_DIR)/lib/dns; gcc -I../../lib/isc/include -o gen ./gen.c
