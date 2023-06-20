@@ -7,6 +7,9 @@ BUILD_DEPENDS = cross/python310
 
 SPK_DEPENDS = "python310"
 
+# archs without C++11 support are not supported:
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
@@ -41,7 +44,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Switched to a wheel based install, git installs are no longer supported by upstream."
+CHANGELOG = "A wheel based install, git installs are not supported by upstream.<br/>Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies."
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
