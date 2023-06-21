@@ -1,0 +1,23 @@
+# Remove tests from SUBDIRS to build
+# - tests are not added to the package
+# - tests would fail to run in cross environment
+# - tests fail to build for OLD_PPC_ARCHS
+# 
+--- Makefile.in.orig	2023-04-06 19:07:16.000000000 +0000
++++ Makefile.in	2023-06-20 12:22:50.825337592 +0000
+@@ -417,12 +417,12 @@
+ GITLOG_TO_CHANGELOG = gitlog-to-changelog
+ @BUILD_DOC_FALSE@doc = 
+ @BUILD_DOC_TRUE@doc = doc
+-DIST_SUBDIRS = m4 compat mpi cipher random src doc tests
+-SUBDIRS = compat mpi cipher random src $(doc) tests
++DIST_SUBDIRS = m4 compat mpi cipher random src doc
++SUBDIRS = compat mpi cipher random src $(doc)
+ EXTRA_DIST = autogen.sh autogen.rc README.GIT LICENSES      	           \
+              ChangeLog-2011 build-aux/ChangeLog-2011 doc/ChangeLog-2011    \
+              m4/ChangeLog-2011 cipher/ChangeLog-2011 src/ChangeLog-2011    \
+-             random/ChangeLog-2011 tests/ChangeLog-2011 mpi/ChangeLog-2011 \
++             random/ChangeLog-2011 mpi/ChangeLog-2011 \
+              build-aux/git-log-footer build-aux/git-log-fix VERSION
+ 
+ DISTCLEANFILES = 
