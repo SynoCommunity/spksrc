@@ -41,7 +41,11 @@ INSTALL_TARGET           = nop
 
 #####
 
+ifneq ($(KERNEL_TC_VERS),)
+TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_TC_VERS)
+else
 TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+endif
 
 #####
 
@@ -58,16 +62,17 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-kernel_configure: patch
-include ../../mk/spksrc.kernel-configure.mk
+#kernel_configure: patch
+#include ../../mk/spksrc.kernel-configure.mk
 
-kernel_module: kernel_configure
-include ../../mk/spksrc.kernel-module.mk
+#kernel_module: kernel_configure
+#include ../../mk/spksrc.kernel-module.mk
 
-install: kernel_module
-include ../../mk/spksrc.kernel-headers.mk
+#install: kernel_module
+#include ../../mk/spksrc.kernel-headers.mk
 
-install: kernel_headers
+#install: kernel_headers
+install: patch
 include ../../mk/spksrc.install.mk
 
 plist: install
