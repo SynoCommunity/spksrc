@@ -1,0 +1,102 @@
+From 4657ee0fe05e15ab572b157f13a82e080d4b7d73 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 15 Jun 2019 17:31:03 -0700
+Subject: [PATCH 1/5] tcp: limit payload size of sacked skbs
+
+commit 3b4929f65b0d8249f19a50245cd88ed1a2f78cff upstream.
+
+Jonathan Looney reported that TCP can trigger the following crash
+in tcp_shifted_skb() :
+
+	BUG_ON(tcp_skb_pcount(skb) < pcount);
+
+This can happen if the remote peer has advertized the smallest
+MSS that linux TCP accepts : 48
+
+An skb can hold 17 fragments, and each fragment can hold 32KB
+on x86, or 64KB on PowerPC.
+
+This means that the 16bit witdh of TCP_SKB_CB(skb)->tcp_gso_segs
+can overflow.
+
+Note that tcp_sendmsg() builds skbs with less than 64KB
+of payload, so this problem needs SACK to be enabled.
+SACK blocks allow TCP to coalesce multiple skbs in the retransmit
+queue, thus filling the 17 fragments to maximal capacity.
+
+CVE-2019-11477 -- u16 overflow of TCP_SKB_CB(skb)->tcp_gso_segs
+
+Backport notes, provided by Joao Martins <joao.m.martins@oracle.com>
+
+v4.15 or since commit 737ff314563 ("tcp: use sequence distance to
+detect reordering") had switched from the packet-based FACK tracking and
+switched to sequence-based.
+
+v4.14 and older still have the old logic and hence on
+tcp_skb_shift_data() needs to retain its original logic and have
+@fack_count in sync. In other words, we keep the increment of pcount with
+tcp_skb_pcount(skb) to later used that to update fack_count. To make it
+more explicit we track the new skb that gets incremented to pcount in
+@next_pcount, and we get to avoid the constant invocation of
+tcp_skb_pcount(skb) all together.
+
+Fixes: 832d11c5cd07 ("tcp: Try to restore large SKBs while SACK processing")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: Jonathan Looney <jtl@netflix.com>
+Acked-by: Neal Cardwell <ncardwell@google.com>
+Reviewed-by: Tyler Hicks <tyhicks@canonical.com>
+Cc: Yuchung Cheng <ycheng@google.com>
+Cc: Bruce Curtis <brucec@netflix.com>
+Cc: Jonathan Lemon <jonathan.lemon@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ include/linux/tcp.h   |  3 +++
+ include/net/tcp.h     |  2 ++
+ net/ipv4/tcp.c        |  1 +
+ net/ipv4/tcp_input.c  | 28 ++++++++++++++++++++++------
+ net/ipv4/tcp_output.c |  4 ++--
+ 5 files changed, 30 insertions(+), 8 deletions(-)
+
+diff --git net/ipv4/tcp_output.c net/ipv4/tcp_output.c
+index b55b8954dae5..8ea892a94364 100644
+--- net/ipv4/tcp_output.c
++++ net/ipv4/tcp_output.c
+@@ -1332,7 +1332,8 @@ static inline int __tcp_mtu_to_mss(struc
+ 	mss_now -= icsk->icsk_ext_hdr_len;
+ 
+ 	/* Then reserve room for full set of TCP options and 8 bytes of data */
+-	mss_now = max(mss_now, sock_net(sk)->ipv4.sysctl_tcp_min_snd_mss);
++	if (mss_now < TCP_MIN_SND_MSS)
++		mss_now = TCP_MIN_SND_MSS;
+ 	return mss_now;
+ }
+ 
+-- 
+2.30.2
+
+
+From 33790f2eda7393d422927078597a33475792c82c Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Mon, 17 Jun 2019 19:54:23 +0200
+Subject: [PATCH 5/5] Linux 4.4.182
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git Makefile Makefile
+index b33f3ecf84fc..fcfede5e39de 100644
+--- Makefile
++++ Makefile
+@@ -1,6 +1,6 @@
+ VERSION = 4
+ PATCHLEVEL = 4
+-SUBLEVEL = 181
++SUBLEVEL = 182
+ EXTRAVERSION =
+ NAME = Blurry Fish Butt
+ 
+-- 
+2.30.2
+
